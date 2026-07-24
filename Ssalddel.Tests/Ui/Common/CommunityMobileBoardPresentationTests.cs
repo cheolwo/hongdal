@@ -85,6 +85,7 @@ public sealed class CommunityMobileBoardPresentationTests
     [InlineData("CommunityBoardManagementPage.razor", "공개 커뮤니티 · 01A.06")]
     [InlineData("CommunityWorkBoardPage.razor", "<CommunityMobileWorkBoardScreen")]
     [InlineData("CommunityPersonalPage.razor", "@page \"/community/me\"")]
+    [InlineData("CommunityIndividualOrdersPage.razor", "@page \"/community/orders\"")]
     public void MauiCommunity화면은_전용모바일Shell을사용한다(
         string fileName,
         string responsibilityMarker)
@@ -115,8 +116,45 @@ public sealed class CommunityMobileBoardPresentationTests
         Assert.Contains("공개 커뮤니티", source);
         Assert.Contains("내 정보", source);
         Assert.Contains("내 글", source);
+        Assert.Contains("내 개별주문", source);
+        Assert.Contains("CommunityPageRoutes.IndividualOrders", source);
+        Assert.Contains("역할·업무 선택", source);
         Assert.Contains("공공데이터 게시판", source);
         Assert.Contains("CommunityPageRoutes.Compose", source);
+    }
+
+    [Fact]
+    public void MauiApp은_커뮤니티로시작하고_개별주문에서_주문자App원장으로이어진다()
+    {
+        var root = FindRepositoryRoot();
+        var mainPageSource = File.ReadAllText(Path.Combine(root, "SsalddelApp", "MainPage.xaml"));
+        var communityHomeSource = File.ReadAllText(Path.Combine(
+            root,
+            "SsalddelApp",
+            "Components",
+            "Pages",
+            "CommunityHomePage.razor"));
+        var individualOrdersSource = File.ReadAllText(Path.Combine(
+            root,
+            "SsalddelApp",
+            "Components",
+            "Pages",
+            "CommunityIndividualOrdersPage.razor"));
+        var journeySource = File.ReadAllText(Path.Combine(
+            root,
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Community",
+            "CommunityIndividualOrderJourneyPanel.razor"));
+
+        Assert.Contains("StartPath=\"/community\"", mainPageSource);
+        Assert.Contains("<CommunityIndividualOrderJourneyPanel", communityHomeSource);
+        Assert.Contains("<CommunityIndividualOrderListScreen", individualOrdersSource);
+        Assert.Contains("0.0 둘러보기 → 0.5 내 주문 → 1.0 함께 주문", journeySource);
+        Assert.Contains("별도로 동의한 주문만", journeySource);
+        Assert.Contains("결제·계약·수입·운송을 자동 실행하지 않습니다", journeySource);
     }
 
     [Fact]

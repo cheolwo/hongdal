@@ -1,0 +1,193 @@
+.community-individual-orders {
+    display: grid;
+    gap: 14px;
+    padding: 18px 14px 100px;
+    color: #202634;
+}
+
+.community-individual-orders > header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.community-individual-orders > header div {
+    display: grid;
+    gap: 5px;
+}
+
+.community-individual-orders h1,
+.community-individual-orders h2,
+.community-individual-orders p {
+    margin: 0;
+}
+
+.community-individual-orders > header span {
+    color: #4656c5;
+    font-size: .7rem;
+    font-weight: 900;
+}
+
+.community-individual-orders h1 {
+    font-size: 1.42rem;
+    line-height: 1.25;
+    letter-spacing: -.04em;
+}
+
+.community-individual-orders > header p,
+.community-individual-orders__handoff span {
+    color: #667085;
+    font-size: .76rem;
+    line-height: 1.55;
+}
+
+.community-individual-orders > header > a,
+.community-individual-orders__state a {
+    flex: 0 0 auto;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #4656c5;
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.community-individual-orders__summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.community-individual-orders__summary span {
+    display: grid;
+    gap: 3px;
+    padding: 10px;
+    border: 1px solid #d7dce7;
+    border-radius: 10px;
+    background: #fff;
+    color: #667085;
+    font-size: .67rem;
+}
+
+.community-individual-orders__summary b {
+    color: #202634;
+    font-size: 1rem;
+}
+
+.community-individual-orders__list {
+    display: grid;
+    gap: 10px;
+}
+
+.community-individual-orders__list > article {
+    display: grid;
+    gap: 11px;
+    padding: 15px;
+    border: 1px solid #d3d9e6;
+    border-radius: 13px;
+    background: #fff;
+}
+
+.community-individual-orders__list article > header,
+.community-individual-orders__list article > footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.community-individual-orders__list article > header span,
+.community-individual-orders__list article > footer small {
+    color: #667085;
+    font-size: .65rem;
+}
+
+.community-individual-orders__list h2 {
+    margin-top: 3px;
+    font-size: 1rem;
+}
+
+.community-individual-orders__list em {
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: #eef0f4;
+    color: #667085;
+    font-size: .64rem;
+    font-style: normal;
+    font-weight: 850;
+}
+
+.community-individual-orders__list em.is-active {
+    background: #e7f6ec;
+    color: #356047;
+}
+
+.community-individual-orders__list article > p {
+    color: #475467;
+    font-size: .76rem;
+}
+
+.community-individual-orders__list article > aside {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    padding: 9px;
+    border-radius: 9px;
+    background: #f4f5fb;
+    color: #475467;
+    font-size: .7rem;
+}
+
+.community-individual-orders button {
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid #cfd5e3;
+    border-radius: 8px;
+    background: #fff;
+    color: #475467;
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.community-individual-orders__confirm {
+    display: grid;
+    gap: 9px;
+    padding: 10px;
+    border-radius: 9px;
+    background: #fff4e8;
+    color: #8a4b13;
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+.community-individual-orders__confirm > div {
+    display: flex;
+    gap: 6px;
+}
+
+.community-individual-orders__confirm button.danger {
+    border-color: #b42318;
+    background: #b42318;
+    color: #fff;
+}
+
+.community-individual-orders__state,
+.community-individual-orders__handoff {
+    display: grid;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid #d3d9e6;
+    border-radius: 12px;
+    background: #fff;
+    color: #475467;
+    font-size: .76rem;
+}
+
+.community-individual-orders__state.is-error {
+    border-color: #f2b8b5;
+    background: #fff7f6;
+    color: #9b2c25;
+}

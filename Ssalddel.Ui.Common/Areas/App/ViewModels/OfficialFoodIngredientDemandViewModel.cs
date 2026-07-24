@@ -22,6 +22,7 @@ public sealed class OfficialFoodIngredientDemandViewModel(
     private string _purchasingOrganizationReference = string.Empty;
     private string _purchasingOrganizationName = string.Empty;
     private bool _taxInvoiceRequired;
+    private bool _공동주문후보참여동의;
     private string _temperatureCode = "상온";
     private decimal _desiredQuantity = 1m;
     private string _quantityUnit = "kg";
@@ -181,6 +182,18 @@ public sealed class OfficialFoodIngredientDemandViewModel(
         }
     }
 
+    public bool 공동주문후보참여동의
+    {
+        get => _공동주문후보참여동의;
+        set
+        {
+            if (SetProperty(ref _공동주문후보참여동의, value))
+            {
+                OnPropertyChanged(nameof(CanRegister));
+            }
+        }
+    }
+
     public string TemperatureCode
     {
         get => _temperatureCode;
@@ -292,6 +305,7 @@ public sealed class OfficialFoodIngredientDemandViewModel(
     public bool CanPreview => HasSeed && IsAuthenticated && !ActionBusy;
     public bool CanRegister
         => CanPreview
+           && 공동주문후보참여동의
            && PlacementPreviews.Count == IngredientLines.Count
            && string.Equals(_previewFingerprint, DraftFingerprint(), StringComparison.Ordinal);
     public bool CanWithdraw => !ActionBusy && _registeredDemandSourceKeys.Count > 0;
@@ -331,6 +345,7 @@ public sealed class OfficialFoodIngredientDemandViewModel(
         _purchasingOrganizationReference = string.Empty;
         _purchasingOrganizationName = string.Empty;
         _taxInvoiceRequired = false;
+        _공동주문후보참여동의 = false;
         _temperatureCode = "상온";
         OnPropertyChanged(nameof(QuantityUnit));
         OnPropertyChanged(nameof(DesiredQuantity));
@@ -343,6 +358,7 @@ public sealed class OfficialFoodIngredientDemandViewModel(
         OnPropertyChanged(nameof(PurchasingOrganizationReference));
         OnPropertyChanged(nameof(PurchasingOrganizationName));
         OnPropertyChanged(nameof(TaxInvoiceRequired));
+        OnPropertyChanged(nameof(공동주문후보참여동의));
         OnPropertyChanged(nameof(TemperatureCode));
         OnPropertyChanged(nameof(IngredientLines));
         OnPropertyChanged(nameof(HasSeed));
@@ -397,9 +413,14 @@ public sealed class OfficialFoodIngredientDemandViewModel(
 
     public async Task<bool> RegisterAsync(CancellationToken cancellationToken = default)
     {
+        if (!공동주문후보참여동의)
+        {
+            return Fail("내 개별주문을 공동주문 할인 후보로 함께 보는 데 동의해 주세요.");
+        }
+
         if (!CanRegister)
         {
-            return Fail("현재 입력으로 집단화 미리보기를 먼저 확인해 주세요.");
+            return Fail("현재 입력으로 공동주문 할인 후보를 먼저 확인해 주세요.");
         }
 
         if (!TryCreateDemands(out var demands, out var error))
@@ -436,7 +457,7 @@ public sealed class OfficialFoodIngredientDemandViewModel(
                 RegisteredGroup = groups.FirstOrDefault();
                 OnPropertyChanged(nameof(HasActiveDemand));
                 OnPropertyChanged(nameof(CanWithdraw));
-                ActionNotice = $"재료 {groups.Count}개의 개별 원함 원장을 먼저 저장하고 공통 조건별 모집 후보에 연결했습니다. 결제·주문·계약·수입 신고·운송·창고 작업은 실행하지 않았습니다.";
+                ActionNotice = $"재료 {groups.Count}개의 개별주문 의향 원장을 먼저 저장하고, 동의한 범위에서만 공동주문 할인 후보에 연결했습니다. 결제·계약·수입 신고·운송·창고 작업은 실행하지 않았습니다.";
             },
             cancellationToken);
     }

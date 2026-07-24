@@ -11,7 +11,10 @@
                 @onclick="ToggleDrawer">
             <MudIcon Icon="@Icons.Material.Filled.Menu" />
         </button>
-        <a class="community-mobile-shell__brand" href="@CommunityPageRoutes.Home">살뜰</a>
+        <a class="community-mobile-shell__brand" href="@CommunityPageRoutes.Home">
+            <strong>살뜰</strong>
+            <small>공개 커뮤니티</small>
+        </a>
         <span class="community-mobile-shell__spacer"></span>
         <span class="community-mobile-shell__language">한국어</span>
         <span class="community-mobile-shell__sync" aria-label="동기화됨">
@@ -63,9 +66,17 @@
                     <MudIcon Icon="@Icons.Material.Filled.Handshake" />
                     업무에서 이어진 인연
                 </a>
+                <a href="@CommunityPageRoutes.IndividualOrders" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" />
+                    내 개별주문
+                </a>
                 <a href="@CommunityPageRoutes.Workspace" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.Dashboard" />
                     공동행동 공간
+                </a>
+                <a href="/" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Work" />
+                    역할·업무 선택
                 </a>
                 <a href="@CommunityPageRoutes.BoardManagement" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.Settings" />
@@ -102,6 +113,12 @@
             <MudIcon Icon="@Icons.Material.Filled.Article" Size="Size.Small" />
             <span>내 글</span>
         </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Orders)"
+           href="@CommunityPageRoutes.IndividualOrders"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Orders) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" Size="Size.Small" />
+            <span>내 주문</span>
+        </a>
         <a class="community-mobile-shell__compose"
            href="@CommunityPageRoutes.Compose"
            aria-label="새 글 쓰기">
@@ -134,8 +151,13 @@
             BottomDestination.Posts =>
                 string.Equals(CurrentPath, CommunityPageRoutes.Personal, StringComparison.OrdinalIgnoreCase)
                 && CurrentQuery.Contains("tab=posts", StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Orders =>
+                CurrentPath.StartsWith(CommunityPageRoutes.IndividualOrders, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(CommunityPageRoutes.GroupPurchaseDemand, StringComparison.OrdinalIgnoreCase),
             _ => CurrentPath.StartsWith("/community", StringComparison.OrdinalIgnoreCase)
                  && !string.Equals(CurrentPath, CommunityPageRoutes.Personal, StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith(CommunityPageRoutes.IndividualOrders, StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith(CommunityPageRoutes.GroupPurchaseDemand, StringComparison.OrdinalIgnoreCase)
         };
 
     private string BuildBottomLinkClass(BottomDestination destination)
@@ -156,6 +178,7 @@
     {
         Community,
         Profile,
-        Posts
+        Posts,
+        Orders
     }
 }

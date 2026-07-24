@@ -4,15 +4,15 @@
     <header class="ingredient-demand__hero">
         <div>
             <a href="@BackHref" class="ingredient-demand__back">← 음식·재료 탐색</a>
-            <span>NONBINDING GROUP-BUY DEMAND</span>
-            <h1 id="ingredient-demand-title">재료 수요 조건 확인</h1>
-            <p>탐색에서 고른 재료 문맥을 유지한 채 수령 권역과 희망 수량을 직접 정하고, 서버 집단화 결과를 미리 확인합니다.</p>
+            <span>0.5 · INDIVIDUAL ORDER INTENT</span>
+            <h1 id="ingredient-demand-title">내 개별주문 의향</h1>
+            <p>탐색에서 고른 재료 문맥을 유지한 채 내 수령 권역과 희망 수량을 먼저 정하고, 원할 때만 공동주문 할인 후보를 확인합니다.</p>
         </div>
         <ol aria-label="수요 등록 순서">
             <li><b>1</b>재료 근거 확인</li>
             <li><b>2</b>수령 조건 입력</li>
-            <li><b>3</b>집단화 미리보기</li>
-            <li><b>4</b>비구속 저장·철회</li>
+            <li><b>3</b>공동 할인 후보 확인</li>
+            <li><b>4</b>동의 후 저장·철회</li>
         </ol>
     </header>
 
@@ -29,8 +29,8 @@
         <section class="ingredient-demand__context" aria-labelledby="ingredient-demand-context-title">
             <div>
                 <span>선택 재료 @(ViewModel.IngredientLines.Count)개</span>
-                <h2 id="ingredient-demand-context-title">함께 살펴볼 재료 묶음</h2>
-                <p>각 재료는 독립된 비구속 수요로 저장되며, 이후 원장에서는 한 준비 묶음으로 연결할 수 있습니다.</p>
+                <h2 id="ingredient-demand-context-title">내 주문으로 살펴볼 재료</h2>
+                <p>각 재료는 독립된 개별주문 의향 원장으로 남고, 공동주문 후보 연결은 아래에서 별도로 선택합니다.</p>
             </div>
             <div class="ingredient-demand__context-list">
                 @foreach (var line in ViewModel.IngredientLines)
@@ -54,16 +54,16 @@
         </section>
 
         <section class="ingredient-demand__boundary" aria-label="비구속 수요 경계">
-            <strong>이 단계는 구매 주문이 아닙니다.</strong>
-            <span>수요 저장만으로 결제·계약·수입 신고·공급자 선정·운송 의뢰·창고 입고를 실행하지 않습니다.</span>
+            <strong>0.5는 내 필요를 기록하는 단계입니다.</strong>
+            <span>개별주문 의향 저장만으로 결제·계약·수입 신고·공급자 선정·운송 의뢰·창고 입고를 실행하지 않습니다.</span>
         </section>
 
         @if (!ViewModel.IsAuthenticated)
         {
             <section class="ingredient-demand__login" role="status">
                 <div>
-                    <strong>탐색은 공개, 수요 저장은 로그인 후</strong>
-                    <span>사용자 소유 수요와 철회 권한을 확인하기 위해 로그인한 계정이 필요합니다.</span>
+                    <strong>탐색은 공개, 내 주문 저장은 로그인 후</strong>
+                    <span>사용자 소유 개별주문 원장과 철회 권한을 확인하기 위해 로그인한 계정이 필요합니다.</span>
                 </div>
                 <a href="@LoginHref">로그인하고 이 수요로 돌아오기</a>
             </section>
@@ -72,8 +72,8 @@
         <section class="ingredient-demand__form" aria-labelledby="ingredient-demand-form-title">
             <header>
                 <span>YOUR CONDITIONS</span>
-                <h2 id="ingredient-demand-form-title">구매 목적·수령·수량 조건</h2>
-                <p>계정 종류가 아니라 이번 수요의 구매 목적을 선택합니다. 상세 주소는 받지 않습니다. 공개 집단화에는 권역과 B2B/B2C 집계만 사용합니다.</p>
+                <h2 id="ingredient-demand-form-title">내 구매 목적·수령·수량 조건</h2>
+                <p>계정 종류가 아니라 이번 주문의 목적을 선택합니다. 상세 주소는 받지 않으며 공동 후보에는 권역과 B2B/B2C 집계만 사용합니다.</p>
             </header>
 
             <div class="ingredient-demand__fields">
@@ -184,22 +184,32 @@
                 }
             </div>
 
+            <label class="ingredient-demand__checkbox">
+                <input type="checkbox"
+                       @bind="ViewModel.공동주문후보참여동의"
+                       disabled="@ViewModel.ActionBusy" />
+                <span>
+                    내 개별주문을 같은 상품·수령 조건의 공동주문 할인 후보로 함께 보는 데 동의합니다.
+                    이 동의는 철회할 수 있고 공동주문·결제 확정을 뜻하지 않습니다.
+                </span>
+            </label>
+
             <div class="ingredient-demand__actions">
                 <button type="button"
                         class="secondary"
                         disabled="@(!ViewModel.CanPreview)"
                         @onclick="PreviewAsync">
-                    @(ViewModel.ActionBusy ? "확인 중" : "집단화 미리보기")
+                    @(ViewModel.ActionBusy ? "확인 중" : "공동 할인 후보 미리보기")
                 </button>
                 <button type="button"
                         class="primary"
                         disabled="@(!ViewModel.CanRegister)"
                         @onclick="RegisterAsync">
-                    @(ViewModel.HasActiveDemand ? "비구속 수요 변경 저장" : "비구속 수요 저장")
+                    @(ViewModel.HasActiveDemand ? "개별주문 의향 변경 저장" : "개별주문 의향 저장")
                 </button>
                 @if (ViewModel.CanWithdraw)
                 {
-                    <button type="button" class="warning" @onclick="WithdrawAsync">내 수요 철회</button>
+                    <button type="button" class="warning" @onclick="WithdrawAsync">내 개별주문 철회</button>
                 }
             </div>
 
@@ -222,10 +232,10 @@
             {
                 var preview = ViewModel.PlacementPreviews[index];
                 var line = ViewModel.IngredientLines[index];
-                <section class="ingredient-demand__result" aria-label="@($"{line.Seed.IngredientName} 집단화 미리보기")">
+                <section class="ingredient-demand__result" aria-label="@($"{line.Seed.IngredientName} 공동 할인 후보 미리보기")">
                     <header>
                         <span>SERVER PREVIEW · @preview.정책버전</span>
-                        <h2>@line.Seed.IngredientName · @TransactionTypeLabel(ViewModel.TransactionTypeCode) · @(preview.배치유형 == 공동구매자동집단배치유형코드.기존집단 ? "기존 모집에 참여" : "새 모집 후보")</h2>
+                        <h2>@line.Seed.IngredientName · @TransactionTypeLabel(ViewModel.TransactionTypeCode) · @(preview.배치유형 == 공동구매자동집단배치유형코드.기존집단 ? "기존 공동주문 후보" : "새 공동주문 후보")</h2>
                         <p>@preview.안내</p>
                     </header>
                     <div class="ingredient-demand__metrics">
@@ -243,10 +253,10 @@
         {
             @foreach (var group in ViewModel.RegisteredGroups)
             {
-                <section class="ingredient-demand__saved" aria-label="@($"{group.상품명} 저장된 비구속 수요")">
+                <section class="ingredient-demand__saved" aria-label="@($"{group.상품명} 저장된 개별주문 의향")">
                     <div>
-                        <span>SAVED NONBINDING DEMAND</span>
-                        <h2>@group.상품명 · @TransactionTypeLabel(group.거래유형) · 모집 현황에 반영됨</h2>
+                        <span>SAVED INDIVIDUAL ORDER INTENT</span>
+                        <h2>@group.상품명 · @TransactionTypeLabel(group.거래유형) · 공동 할인 후보에 반영됨</h2>
                         <p>@group.배송권명</p>
                     </div>
                     <div class="ingredient-demand__metrics">
@@ -257,6 +267,7 @@
                     </div>
                 </section>
             }
+            <a class="ingredient-demand__orders-link" href="@OrdersHref">내 개별주문 원장에서 확인</a>
         }
     }
 </main>
@@ -273,6 +284,9 @@
 
     [Parameter]
     public string LoginHref { get; set; } = "/";
+
+    [Parameter]
+    public string OrdersHref { get; set; } = CommunityPageRoutes.IndividualOrders;
 
     protected override void OnParametersSet()
     {

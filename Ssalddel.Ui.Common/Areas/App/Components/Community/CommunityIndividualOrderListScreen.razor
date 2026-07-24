@@ -1,0 +1,144 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@inject GroupPurchaseMyWishesViewModel ViewModel
+
+<section class="community-individual-orders" aria-labelledby="community-individual-orders-title">
+    <header>
+        <div>
+            <span>0.5 · 내 개별주문</span>
+            <h1 id="community-individual-orders-title">내가 필요해서 남긴 주문</h1>
+            <p>내 주문은 독립된 원장으로 유지되고, 별도로 동의한 경우에만 1.0 공동주문 할인 후보에 연결됩니다.</p>
+        </div>
+        <a href="@CreateHref">새 개별주문</a>
+    </header>
+
+    @if (ViewModel.IsLoading)
+    {
+        <div class="community-individual-orders__state" role="status">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+            <span>내 개별주문 원장을 불러오고 있습니다.</span>
+        </div>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <div class="community-individual-orders__state is-error" role="alert">
+                <span>@ViewModel.ErrorMessage</span>
+                <button type="button" @onclick="ReloadAsync">다시 시도</button>
+            </div>
+        }
+        else if (ViewModel.Wishes.Count == 0)
+        {
+            <div class="community-individual-orders__state">
+                <strong>아직 남긴 개별주문 의향이 없습니다.</strong>
+                <span>커뮤니티에서 음식·재료 근거를 둘러본 뒤 필요한 것만 가볍게 기록해 보세요.</span>
+                <a href="@CreateHref">재료 둘러보기</a>
+            </div>
+        }
+        else
+        {
+            <div class="community-individual-orders__summary" aria-label="개별주문 요약">
+                <span>전체 <b>@(ViewModel.Result?.전체건수 ?? 0)</b></span>
+                <span>활성 <b>@(ViewModel.Result?.활성건수 ?? 0)</b></span>
+                <span>철회·종료 <b>@(ViewModel.Result?.닫힘건수 ?? 0)</b></span>
+            </div>
+
+            <div class="community-individual-orders__list">
+                @foreach (var wish in ViewModel.Wishes)
+                {
+                    <article @key="wish.개별원함원장Id">
+                        <header>
+                            <div>
+                                <span>@TransactionLabel(wish.거래유형) · @wish.배송권명</span>
+                                <h2>@wish.상품명</h2>
+                            </div>
+                            <em class="@(GroupPurchaseMyWishesViewModel.IsActive(wish) ? "is-active" : null)">
+                                @(GroupPurchaseMyWishesViewModel.IsActive(wish) ? "활성" : "닫힘")
+                            </em>
+                        </header>
+                        <p>내 희망 <strong>@wish.희망수량.ToString("N2") @wish.수량단위</strong></p>
+                        @if (wish.자동집단요약 is { } group)
+                        {
+                            <aside>
+                                <MudIcon Icon="@Icons.Material.Filled.Groups" Size="Size.Small" />
+                                <span>
+                                    공동 할인 후보 @group.참여자수.ToString("N0")명 ·
+                                    @group.총희망수량.ToString("N2") @group.수량단위
+                                </span>
+                            </aside>
+                        }
+                        else
+                        {
+                            <aside>
+                                <MudIcon Icon="@Icons.Material.Filled.PersonOutline" Size="Size.Small" />
+                                <span>개별주문 원장만 유지 중입니다.</span>
+                            </aside>
+                        }
+                        <footer>
+                            <small>수정 @DateLabel(wish.수정시각Utc)</small>
+                            @if (GroupPurchaseMyWishesViewModel.IsActive(wish))
+                            {
+                                <button type="button"
+                                        disabled="@ViewModel.IsOperating"
+                                        @onclick="() => AskWithdraw(wish)">
+                                    철회
+                                </button>
+                            }
+                        </footer>
+                        @if (ReferenceEquals(_pendingWithdraw, wish))
+                        {
+                            <div class="community-individual-orders__confirm" role="alert">
+                                <span>이 개별주문 의향을 철회할까요? 결제나 확정 주문을 취소하는 동작은 아닙니다.</span>
+                                <div>
+                                    <button type="button" class="danger" @onclick="() => ConfirmWithdrawAsync(wish)">철회 확인</button>
+                                    <button type="button" @onclick="CancelWithdraw">계속 유지</button>
+                                </div>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(ViewModel.Notice))
+        {
+            <div class="community-individual-orders__state" role="status">@ViewModel.Notice</div>
+        }
+    }
+
+    <aside class="community-individual-orders__handoff">
+        <strong>주문자App과 같은 원장을 봅니다.</strong>
+        <span>커뮤니티App에서는 가볍게 조회·철회하고, 주문자App에서는 수량 수정과 공동주문 진행 상세를 이어서 관리합니다.</span>
+    </aside>
+</section>
+
+@code {
+    private 공동구매내원함응답? _pendingWithdraw;
+
+    [Parameter]
+    public string CreateHref { get; set; } = "/information/food-ingredients";
+
+    protected override Task OnInitializedAsync() => ViewModel.LoadAsync();
+
+    private Task ReloadAsync() => ViewModel.LoadAsync(force: true);
+    private void AskWithdraw(공동구매내원함응답 wish) => _pendingWithdraw = wish;
+    private void CancelWithdraw() => _pendingWithdraw = null;
+
+    private async Task ConfirmWithdrawAsync(공동구매내원함응답 wish)
+    {
+        if (await ViewModel.WithdrawAsync(wish))
+        {
+            _pendingWithdraw = null;
+        }
+    }
+
+    private static string TransactionLabel(string value)
+        => 공동구매거래유형코드.정규화(value) == 공동구매거래유형코드.B2B
+            ? "사업 목적"
+            : "개인 소비";
+
+    private static string DateLabel(DateTime utc)
+        => utc == default
+            ? "미기록"
+            : DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+}

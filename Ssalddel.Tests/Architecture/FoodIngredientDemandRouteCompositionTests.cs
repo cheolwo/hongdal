@@ -12,6 +12,11 @@ public sealed class FoodIngredientDemandRouteCompositionTests
         var source = File.ReadAllText(Path.Combine(FindRepositoryRoot(), project, relativePath));
 
         Assert.Contains("@page \"/community/group-purchase/demand\"", source);
+        if (project == "SsalddelApp")
+        {
+            Assert.Contains("@page \"/community/orders/new\"", source);
+            Assert.Contains("@layout CommunityMobileLayout", source);
+        }
         Assert.Contains("<OfficialFoodIngredientDemandScreen", source);
         Assert.Contains("CommunityGroupPurchaseIngredientSeed.Create", source);
         Assert.Contains("DecodeMaterialBundle", source);
@@ -52,6 +57,8 @@ public sealed class FoodIngredientDemandRouteCompositionTests
         Assert.Contains("MaterialBundleQueryName", seed);
         Assert.Contains("CommunityPageRoutes.GroupPurchaseDemand", seed);
         Assert.Contains("GroupPurchaseDemand = \"/community/group-purchase/demand\"", routes);
+        Assert.Contains("IndividualOrderStart = \"/community/orders/new\"", routes);
+        Assert.Contains("IndividualOrders = \"/community/orders\"", routes);
     }
 
     [Fact]
@@ -66,12 +73,13 @@ public sealed class FoodIngredientDemandRouteCompositionTests
             "Information",
             "OfficialFoodIngredientDemandScreen.razor"));
 
-        Assert.Contains("집단화 미리보기", source);
-        Assert.Contains("비구속 수요 저장", source);
-        Assert.Contains("내 수요 철회", source);
+        Assert.Contains("공동 할인 후보 미리보기", source);
+        Assert.Contains("개별주문 의향 저장", source);
+        Assert.Contains("내 개별주문 철회", source);
+        Assert.Contains("공동주문후보참여동의", source);
         Assert.Contains("IngredientLines", source);
         Assert.Contains("결제·계약·수입 신고·공급자 선정·운송 의뢰·창고 입고", source);
-        Assert.Contains("상세 주소는 받지 않습니다", source);
+        Assert.Contains("상세 주소는 받지 않으며", source);
     }
 
     private static string FindRepositoryRoot()

@@ -1,0 +1,124 @@
+.community-individual-order {
+    display: grid;
+    gap: 14px;
+    margin: 14px;
+    padding: 18px;
+    border: 1px solid #cfd5e3;
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at top right, rgba(70, 86, 197, .14), transparent 34%),
+        #fff;
+    color: #202634;
+}
+
+.community-individual-order__copy {
+    display: grid;
+    gap: 6px;
+}
+
+.community-individual-order__copy > span {
+    color: #4656c5;
+    font-size: .7rem;
+    font-weight: 900;
+    letter-spacing: .02em;
+}
+
+.community-individual-order h2,
+.community-individual-order p {
+    margin: 0;
+}
+
+.community-individual-order h2 {
+    max-width: 24rem;
+    font-size: clamp(1.18rem, 4vw, 1.5rem);
+    line-height: 1.25;
+    letter-spacing: -.035em;
+}
+
+.community-individual-order p {
+    color: #667085;
+    font-size: .82rem;
+    line-height: 1.65;
+}
+
+.community-individual-order__steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-individual-order__steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    min-height: 58px;
+    padding: 9px;
+    border-radius: 10px;
+    background: #f5f6fc;
+    color: #475467;
+    font-size: .7rem;
+    line-height: 1.35;
+}
+
+.community-individual-order__steps b {
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #e5e8ff;
+    color: #4656c5;
+    font-size: .68rem;
+}
+
+.community-individual-order__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.community-individual-order__actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 46px;
+    padding: 9px 12px;
+    border: 1px solid #4656c5;
+    border-radius: 10px;
+    font-size: .76rem;
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.community-individual-order__actions .primary {
+    background: #4656c5;
+    color: #fff;
+}
+
+.community-individual-order__actions .secondary {
+    background: #fff;
+    color: #4656c5;
+}
+
+.community-individual-order > aside {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 7px;
+    color: #356047;
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 370px) {
+    .community-individual-order__steps,
+    .community-individual-order__actions {
+        grid-template-columns: 1fr;
+    }
+}

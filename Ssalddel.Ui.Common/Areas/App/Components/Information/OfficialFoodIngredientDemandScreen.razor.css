@@ -376,6 +376,21 @@
     background: #f4fbf7;
 }
 
+.ingredient-demand__orders-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 10px 14px;
+    border: 1px solid #176b4d;
+    border-radius: 10px;
+    background: #fff;
+    color: #176b4d;
+    font-size: .78rem;
+    font-weight: 850;
+    text-decoration: none;
+}
+
 @media (max-width: 760px) {
     .ingredient-demand {
         padding: 12px 10px 112px;

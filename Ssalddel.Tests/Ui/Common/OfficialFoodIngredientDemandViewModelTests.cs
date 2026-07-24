@@ -23,11 +23,31 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
     }
 
     [Fact]
+    public async Task 공동할인후보는_미리본뒤_별도동의해야_개별주문의향을저장한다()
+    {
+        var service = new FakeDemandService();
+        var viewModel = CreateViewModel(service, AuthenticatedUser(), consent: false);
+        viewModel.ApplySeed(Seed());
+        viewModel.DeliveryAreaCode = "06236";
+
+        Assert.True(await viewModel.PreviewAsync());
+        Assert.False(await viewModel.RegisterAsync());
+        Assert.Contains("동의", viewModel.ActionError, StringComparison.Ordinal);
+        Assert.Empty(service.SaveRequests);
+
+        viewModel.공동주문후보참여동의 = true;
+
+        Assert.True(await viewModel.RegisterAsync());
+        Assert.Single(service.SaveRequests);
+    }
+
+    [Fact]
     public async Task 탐색문맥은_stable상품키와_비식별수령권역으로_비구속수요에이어진다()
     {
         var service = new FakeDemandService();
         var viewModel = CreateViewModel(service, AuthenticatedUser());
         viewModel.ApplySeed(Seed(foodCountryCode: "JP"));
+        viewModel.공동주문후보참여동의 = true;
         viewModel.DeliveryCountryCode = "KR";
         viewModel.DeliveryAreaCode = "06236";
         viewModel.DesiredQuantity = 2.5m;
@@ -82,6 +102,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         var service = new FakeDemandService();
         var viewModel = CreateViewModel(service, AuthenticatedUser());
         viewModel.ApplySeeds([Seed(), Seed("TH", "ingredient:chili", "고추", "box")]);
+        viewModel.공동주문후보참여동의 = true;
         viewModel.DeliveryAreaCode = "06236";
         viewModel.TransactionTypeCode = 공동구매거래유형코드.B2B;
         viewModel.PurchasingOrganizationReference = "org:market-17";
@@ -115,6 +136,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         var service = new FakeDemandService { FailFirstSave = true };
         var viewModel = CreateViewModel(service, AuthenticatedUser());
         viewModel.ApplySeed(Seed());
+        viewModel.공동주문후보참여동의 = true;
         viewModel.DeliveryAreaCode = "06236";
         Assert.True(await viewModel.PreviewAsync());
 
@@ -132,6 +154,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         var service = new FakeDemandService();
         var viewModel = CreateViewModel(service, AuthenticatedUser());
         viewModel.ApplySeed(Seed());
+        viewModel.공동주문후보참여동의 = true;
         viewModel.DeliveryAreaCode = "06236";
         Assert.True(await viewModel.PreviewAsync());
         Assert.True(await viewModel.RegisterAsync());
@@ -160,6 +183,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         var service = new FakeDemandService();
         var viewModel = CreateViewModel(service, AuthenticatedUser());
         viewModel.ApplySeeds([Seed(), Seed("TH", "ingredient:chili", "고추", "box")]);
+        viewModel.공동주문후보참여동의 = true;
         viewModel.DeliveryAreaCode = "06236";
         var chili = viewModel.IngredientLines.Single(line => line.Seed.IngredientKey == "ingredient:chili");
         viewModel.UpdateLineQuantity(chili, 3m);
@@ -194,6 +218,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
             service,
             new FakeCurrentUserContext(AuthenticatedUser()));
         viewModel.ApplySeed(Seed());
+        viewModel.공동주문후보참여동의 = true;
         viewModel.DeliveryAreaCode = "06236";
         viewModel.DesiredQuantity = 3m;
 
@@ -258,8 +283,17 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
 
     private static OfficialFoodIngredientDemandViewModel CreateViewModel(
         FakeDemandService service,
-        현재사용자Snapshot user)
-        => new(service, new FakeCurrentUserContext(user));
+        현재사용자Snapshot user,
+        bool consent = false)
+    {
+        var viewModel = new OfficialFoodIngredientDemandViewModel(
+            service,
+            new FakeCurrentUserContext(user))
+        {
+            공동주문후보참여동의 = consent
+        };
+        return viewModel;
+    }
 
     private static 현재사용자Snapshot AuthenticatedUser()
         => new("user-17", "이웃 주문자", ["Orderer"]);

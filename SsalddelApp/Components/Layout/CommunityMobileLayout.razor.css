@@ -61,11 +61,23 @@
 }
 
 .community-mobile-shell__brand {
+    display: grid;
+    gap: 0;
     color: #202634;
-    font-size: 1.02rem;
-    font-weight: 900;
     text-decoration: none;
     letter-spacing: -.03em;
+}
+
+.community-mobile-shell__brand strong {
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.community-mobile-shell__brand small {
+    color: #667085;
+    font-size: .55rem;
+    font-weight: 750;
+    letter-spacing: 0;
 }
 
 .community-mobile-shell__language {
@@ -201,7 +213,7 @@
     bottom: 0;
     left: 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) 64px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) 58px;
     align-items: center;
     min-height: 70px;
     padding:

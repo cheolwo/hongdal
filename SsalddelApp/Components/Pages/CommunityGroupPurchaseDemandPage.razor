@@ -1,11 +1,14 @@
 @page "/community/group-purchase/demand"
+@page "/community/orders/new"
+@layout CommunityMobileLayout
 @using Ssalddel.Ui.Common.Areas.App.Components.Information
 
-<PageTitle>비구속 재료 수요</PageTitle>
+<PageTitle>내 개별주문 의향</PageTitle>
 
 <OfficialFoodIngredientDemandScreen IngredientSeed="@IngredientSeed"
                                     IngredientSeeds="@IngredientSeeds"
-                                    LoginHref="/" />
+                                    LoginHref="/"
+                                    OrdersHref="@CommunityPageRoutes.IndividualOrders" />
 
 @code {
     [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.IngredientKeyQueryName)]

@@ -1,0 +1,35 @@
+@page "/community/orders"
+@layout CommunityMobileLayout
+@inject IAuthSession AuthSession
+
+<PageTitle>내 개별주문 · 살뜰</PageTitle>
+
+@if (!AuthSession.IsLoggedIn)
+{
+    <section class="pa-4">
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3">
+            공개 커뮤니티는 로그인 없이 둘러볼 수 있습니다. 본인의 개별주문 원장을 조회하거나 철회할 때만 로그인합니다.
+        </MudAlert>
+        <ShipperHomeAppLoginPanel OnAuthenticated="HandleAuthenticated" />
+    </section>
+}
+else
+{
+    <CommunityIndividualOrderListScreen />
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthSession.IsLoggedIn)
+        {
+            await AuthSession.RestoreAsync();
+        }
+    }
+
+    private Task HandleAuthenticated()
+    {
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}
