@@ -10,10 +10,12 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Shipper.Request01
 {
-    [SsalddelApiVersion(
-        SsalddelProductVersion.V2_0,
-        FeatureKey = VersionFeatureFlagKeys.DomesticTransportWorkflow,
-        WorkflowKey = VersionFeatureFlagKeys.DomesticTransportWorkflow)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_0)]
+    [SsalddelApiFeature(VersionFeatureFlagKeys.DomesticTransportWorkflow)]
+    [SsalddelApiCapability(SsalddelCapability.TransportRequest)]
+    [SsalddelApiAudience(SsalddelActor.Shipper)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
+    [SsalddelApiOperation(SsalddelOperation.Request)]
     [SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
     [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.CoreLogistics)]
     [ApiController]

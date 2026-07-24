@@ -97,15 +97,23 @@ public sealed class WorkRelationshipSnapshotService : IWorkRelationshipSnapshotS
         var safeTake = Math.Clamp(take, 1, 100);
         var items = await _db.WorkRelationshipSnapshots
             .AsNoTracking()
-            .Where(x => x.ActorUserId == actorUserId)
+            .Where(x => x.ActorUserId == actorUserId
+                        || (x.CounterpartyUserId == actorUserId
+                            && x.PrivacyLevel == WorkRelationshipPrivacyLevels.ConnectionRequestEligible))
             .OrderByDescending(x => x.OccurredAtUtc)
             .Take(safeTake)
             .Select(x => new WorkRelationshipSnapshotResponse
             {
                 Id = x.Id,
-                ActorAnonymousLabel = x.ActorAnonymousLabel,
-                ActorRoleCode = x.ActorRoleCode,
-                ActorRoleName = x.ActorRoleName,
+                ActorAnonymousLabel = x.ActorUserId == actorUserId
+                    ? x.ActorAnonymousLabel
+                    : x.CounterpartyAnonymousLabel ?? string.Empty,
+                ActorRoleCode = x.ActorUserId == actorUserId
+                    ? x.ActorRoleCode
+                    : x.CounterpartyRoleCode ?? string.Empty,
+                ActorRoleName = x.ActorUserId == actorUserId
+                    ? x.ActorRoleName
+                    : x.CounterpartyRoleCode ?? string.Empty,
                 WorkDomain = x.WorkDomain,
                 WorkProcess = x.WorkProcess,
                 ActionCode = x.ActionCode,
@@ -113,8 +121,12 @@ public sealed class WorkRelationshipSnapshotService : IWorkRelationshipSnapshotS
                 RelatedEntityType = x.RelatedEntityType,
                 RelatedEntityId = x.RelatedEntityId,
                 RelatedDisplayLabel = x.RelatedDisplayLabel,
-                CounterpartyAnonymousLabel = x.CounterpartyAnonymousLabel,
-                CounterpartyRoleCode = x.CounterpartyRoleCode,
+                CounterpartyAnonymousLabel = x.ActorUserId == actorUserId
+                    ? x.CounterpartyAnonymousLabel
+                    : x.ActorAnonymousLabel,
+                CounterpartyRoleCode = x.ActorUserId == actorUserId
+                    ? x.CounterpartyRoleCode
+                    : x.ActorRoleCode,
                 PrivacyLevel = x.PrivacyLevel,
                 Memo = x.Memo,
                 OccurredAtUtc = x.OccurredAtUtc

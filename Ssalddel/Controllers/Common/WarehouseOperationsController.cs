@@ -14,10 +14,16 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Common;
 
-[SsalddelApiVersion(
-    SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
+[SsalddelApiIntroducedIn(SsalddelProductVersion.V2_5)]
+[SsalddelApiFeature(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
+[SsalddelApiCapability(SsalddelCapability.WarehouseInbound)]
+[SsalddelApiCapability(SsalddelCapability.InventoryManagement)]
+[SsalddelApiCapability(SsalddelCapability.WarehouseFulfillment)]
+[SsalddelApiAudience(SsalddelActor.WarehouseManager)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
+[SsalddelApiOperation(SsalddelOperation.Execute)]
+[SsalddelApiOperation(SsalddelOperation.Record)]
+[SsalddelApiOperation(SsalddelOperation.Manage)]
 [SsalddelApiWorkflow(SsalddelWorkflow.WarehouseFulfillment)]
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Warehouse)]
 [ApiController]

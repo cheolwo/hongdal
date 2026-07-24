@@ -3,7 +3,7 @@ using Ssalddel.Contracts.Common.Versioning;
 namespace Ssalddel.ApiMetadata;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public sealed class SsalddelApiVersionAttribute : Attribute
+public class SsalddelApiVersionAttribute : Attribute
 {
     public SsalddelApiVersionAttribute(SsalddelProductVersion version)
     {

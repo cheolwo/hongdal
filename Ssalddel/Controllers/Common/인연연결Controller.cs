@@ -3,13 +3,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ssalddel.Application.Connections.Commands;
 using Ssalddel.Application.Connections.Queries;
+using Ssalddel.Contracts.Common.Hr;
 using 살뜰.도메인.사용자;
 using Ssalddel.ApiMetadata;
 
 namespace Ssalddel.Controllers.Common;
 
-[SsalddelApiVersion(SsalddelProductVersion.V0_0)]
+[SsalddelApiIntroducedIn(SsalddelProductVersion.V0_0)]
+[SsalddelApiCapability(SsalddelCapability.RelationshipFormation)]
+[SsalddelApiAudience(SsalddelActor.CommunityMember)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
+[SsalddelApiOperation(SsalddelOperation.Request)]
+[SsalddelApiOperation(SsalddelOperation.Decide)]
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
+[SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
 [ApiController]
 [Authorize]
 [Route("api/v1/connections")]
@@ -37,6 +44,22 @@ public sealed class 인연연결Controller : ControllerBase
             request.요청메시지);
 
         var result = await _sender.Send(command, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("requests/from-work-relationship/{snapshotId:guid}")]
+    public async Task<IActionResult> 업무인연에서요청생성(
+        Guid snapshotId,
+        [FromBody] WorkRelationshipConnectionRequestCreateRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new 업무인연연결요청작성Command(
+                snapshotId,
+                request.Purpose,
+                request.Message),
+            cancellationToken);
+
         return this.ToActionResult(result);
     }
 

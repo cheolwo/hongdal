@@ -6,10 +6,17 @@ using Ssalddel.Application.Driver.DispatchAction;
 using Ssalddel.Contracts.Driver.Action;
 using 살뜰.도메인.공통;
 using Ssalddel.ApiMetadata;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Driver.Action03
 {
-    [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_0)]
+    [SsalddelApiFeature(VersionFeatureFlagKeys.DomesticTransportWorkflow)]
+    [SsalddelApiCapability(SsalddelCapability.Dispatch)]
+    [SsalddelApiCapability(SsalddelCapability.TransportExecution)]
+    [SsalddelApiAudience(SsalddelActor.Driver)]
+    [SsalddelApiOperation(SsalddelOperation.Decide)]
+    [SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/dispatch-actions")]

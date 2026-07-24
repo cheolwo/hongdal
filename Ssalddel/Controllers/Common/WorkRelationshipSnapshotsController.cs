@@ -6,8 +6,13 @@ using Ssalddel.ApiMetadata;
 
 namespace Ssalddel.Controllers.Common;
 
-[SsalddelApiVersion(SsalddelProductVersion.V0_0)]
+[SsalddelApiIntroducedIn(SsalddelProductVersion.V0_0)]
+[SsalddelApiCapability(SsalddelCapability.WorkActivitySignal)]
+[SsalddelApiCapability(SsalddelCapability.RelationshipFormation)]
+[SsalddelApiAudience(SsalddelActor.CommunityMember)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
+[SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
 [ApiController]
 [Authorize]
 [Route("api/v1/work-relationship-snapshots")]

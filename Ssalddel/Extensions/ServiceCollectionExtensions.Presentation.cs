@@ -18,7 +18,7 @@ public static partial class ServiceCollectionExtensions
     {
         services.AddControllers(options =>
         {
-            options.Filters.Add<SsalddelApiVersionFeatureFilter>();
+            options.Filters.Add<SsalddelApiFeatureBoundaryFilter>();
         });
         services.AddHttpContextAccessor();
         services.AddMemoryCache();

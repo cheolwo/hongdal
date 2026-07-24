@@ -11,9 +11,16 @@ namespace Ssalddel.Controllers.Orderer;
 
 [ApiController]
 [Authorize]
-[SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+[SsalddelApiIntroducedIn(SsalddelProductVersion.V1_0)]
+[SsalddelApiFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+[SsalddelApiCapability(SsalddelCapability.GroupPurchaseDemand)]
+[SsalddelApiCapability(SsalddelCapability.OrderParticipation)]
+[SsalddelApiAudience(SsalddelActor.Orderer)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
+[SsalddelApiOperation(SsalddelOperation.Request)]
+[SsalddelApiOperation(SsalddelOperation.Decide)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+[RequireFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/group-purchase-auto-groups")]
 public sealed class 공동구매자동집단화Controller : ControllerBase
 {

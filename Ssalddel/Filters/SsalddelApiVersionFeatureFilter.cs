@@ -9,14 +9,14 @@ using 살뜰.Services.Versioning;
 namespace Ssalddel.Filters;
 
 /// <summary>
-/// Enforces the feature key declared by <see cref="SsalddelApiVersionAttribute"/>
-/// for every MVC controller action.
+/// 제품 버전과 분리된 실행 Feature 경계를 모든 MVC Controller action에 적용합니다.
+/// 기존 Version metadata의 Feature Key는 전환 기간에만 호환 경로로 읽습니다.
 /// </summary>
-public sealed class SsalddelApiVersionFeatureFilter : IAsyncActionFilter, IOrderedFilter
+public class SsalddelApiFeatureBoundaryFilter : IAsyncActionFilter, IOrderedFilter
 {
     private readonly IVersionFeatureFlagService _featureFlagService;
 
-    public SsalddelApiVersionFeatureFilter(IVersionFeatureFlagService featureFlagService)
+    public SsalddelApiFeatureBoundaryFilter(IVersionFeatureFlagService featureFlagService)
     {
         _featureFlagService = featureFlagService;
     }
@@ -50,6 +50,23 @@ public sealed class SsalddelApiVersionFeatureFilter : IAsyncActionFilter, IOrder
             return null;
         }
 
+        var actionFeature = controllerAction.MethodInfo
+            .GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true)?
+            .FeatureKey;
+        if (!string.IsNullOrWhiteSpace(actionFeature))
+        {
+            return actionFeature;
+        }
+
+        var controllerFeature = controllerAction.ControllerTypeInfo
+            .GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true)?
+            .FeatureKey;
+        if (!string.IsNullOrWhiteSpace(controllerFeature))
+        {
+            return controllerFeature;
+        }
+
+        // 기존 Controller를 순차적으로 전환하기 위한 임시 호환 경로입니다.
         var actionFeatureKey = controllerAction.MethodInfo
             .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?
             .FeatureKey;
@@ -102,5 +119,17 @@ public sealed class SsalddelApiVersionFeatureFilter : IAsyncActionFilter, IOrder
         {
             StatusCode = StatusCodes.Status404NotFound
         };
+    }
+}
+
+/// <summary>
+/// 전환 기간 동안 기존 DI와 테스트가 참조할 수 있도록 남긴 호환 이름입니다.
+/// 새 코드는 <see cref="SsalddelApiFeatureBoundaryFilter"/>를 사용합니다.
+/// </summary>
+public sealed class SsalddelApiVersionFeatureFilter : SsalddelApiFeatureBoundaryFilter
+{
+    public SsalddelApiVersionFeatureFilter(IVersionFeatureFlagService featureFlagService)
+        : base(featureFlagService)
+    {
     }
 }

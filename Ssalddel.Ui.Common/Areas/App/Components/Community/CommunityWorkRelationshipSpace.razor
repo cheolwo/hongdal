@@ -1,0 +1,198 @@
+@using Ssalddel.Contracts.Common.Hr
+@inject 업무인연커뮤니티ViewModel ViewModel
+
+<main class="community-work-relationships">
+    <header class="community-work-relationships__hero">
+        <span>01 Community · 업무에서 다시 만난 인연</span>
+        <h1>함께 일한 기록이 관계의 출발점이 됩니다</h1>
+        <p>
+            02 주문자, 03 화주, 04 기사, 05 창고 앱에서 실제 업무 접점이 생기면
+            인연 DB에 익명 기록을 남기고 이곳에서 본인만 다시 확인합니다.
+        </p>
+    </header>
+
+    <section class="community-work-relationships__flow" aria-label="업무 인연 형성 흐름">
+        <article><span>1</span><strong>업무 수행</strong><p>각 역할 앱에서 실제 상태 전환을 완료합니다.</p></article>
+        <article><span>2</span><strong>인연 기록</strong><p>허용된 업무 접점만 익명화해 인연 DB에 남깁니다.</p></article>
+        <article><span>3</span><strong>커뮤니티 재회</strong><p>본인이 기록을 확인하고 관계를 이어갈지 선택합니다.</p></article>
+        <article><span>4</span><strong>서로 동의</strong><p>상대 수락 뒤에도 연락처 공개 항목은 따로 정합니다.</p></article>
+    </section>
+
+    <aside class="community-work-relationships__boundary">
+        <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Size="Size.Small" />
+        <span>
+            <strong>업무 로그는 공개 게시글이나 자동 친구 관계가 아닙니다.</strong>
+            업무 이력만으로 사람을 추천·평가·순위화하지 않으며 연결 요청과 연락처 공개는 각각 철회 가능한 동의로 처리합니다.
+        </span>
+    </aside>
+
+    <section class="community-work-relationships__records" aria-labelledby="work-relationship-records-title">
+        <header>
+            <div>
+                <span>내 업무 인연</span>
+                <h2 id="work-relationship-records-title">다시 확인할 업무 접점</h2>
+            </div>
+            <button type="button" @onclick="ReloadAsync" disabled="@ViewModel.처리중">새로고침</button>
+        </header>
+
+        @if (ViewModel.처리중 && !ViewModel.초기화됨)
+        {
+            <div class="community-work-relationships__state">
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                <span>인연 DB에서 내 업무 접점을 확인하고 있습니다.</span>
+            </div>
+        }
+        else if (ViewModel.오류발생)
+        {
+            <div class="community-work-relationships__state community-work-relationships__state--error">
+                <MudIcon Icon="@Icons.Material.Filled.Info" />
+                <strong>@ViewModel.오류메시지</strong>
+                <p>운영 API 실패를 임의의 사람이나 sample 관계로 대신하지 않습니다.</p>
+                <button type="button" @onclick="ReloadAsync">다시 확인</button>
+            </div>
+        }
+        else if (ViewModel.결과없음)
+        {
+            <div class="community-work-relationships__state">
+                <MudIcon Icon="@Icons.Material.Filled.Handshake" />
+                <strong>아직 확인할 업무 인연 기록이 없습니다.</strong>
+                <p>업무가 성공했고 해당 Command의 인연 기록 기능이 켜진 경우에만 이곳에 나타납니다.</p>
+            </div>
+        }
+        else
+        {
+            <div class="community-work-relationships__list">
+                @foreach (var item in ViewModel.업무인연목록)
+                {
+                    <article>
+                        <header>
+                            <span>@DomainLabel(item.WorkDomain)</span>
+                            <time datetime="@item.OccurredAtUtc.ToString("O")">@item.OccurredAtUtc.ToLocalTime().ToString("yyyy.MM.dd HH:mm")</time>
+                        </header>
+                        <h3>@ValueOrFallback(item.ActionLabel, ProcessLabel(item.WorkProcess))</h3>
+                        <p>@ValueOrFallback(item.RelatedDisplayLabel, "업무 원장 기록")</p>
+                        <div class="community-work-relationships__counterparty">
+                            <span class="community-work-relationships__avatar">인</span>
+                            <span>
+                                <strong>@ValueOrFallback(item.CounterpartyAnonymousLabel, "상대 비공개")</strong>
+                                <small>@RoleLabel(item.CounterpartyRoleCode)</small>
+                            </span>
+                        </div>
+
+                        @if (ViewModel.연결요청완료(item.Id))
+                        {
+                            <em>인연 요청을 보냈습니다 · 상대 응답 대기</em>
+                        }
+                        else if (ViewModel.연결요청가능(item))
+                        {
+                            <button type="button" @onclick="@(() => BeginConnection(item))">인연 이어보기</button>
+                        }
+                        else
+                        {
+                            <em>업무 기록만 확인 · 연결 요청 비활성</em>
+                        }
+
+                        @if (_selected?.Id == item.Id)
+                        {
+                            <div class="community-work-relationships__request">
+                                <label>
+                                    <span>이어가려는 목적</span>
+                                    <input @bind="_purpose" maxlength="300" placeholder="예: 다음 운송에서도 서로 제안받기" />
+                                </label>
+                                <label>
+                                    <span>상대에게 보낼 메시지</span>
+                                    <textarea @bind="_message" maxlength="1000" rows="3"
+                                              placeholder="업무에서 고마웠던 점과 다시 이야기하고 싶은 내용을 적어 주세요."></textarea>
+                                </label>
+                                <aside>요청을 보내도 연락처는 공개되지 않습니다. 상대가 수락하며 공개 항목을 직접 선택합니다.</aside>
+                                <div>
+                                    <button type="button" class="secondary" @onclick="CancelConnection">취소</button>
+                                    <button type="button" @onclick="SubmitConnectionAsync" disabled="@ViewModel.처리중">요청 보내기</button>
+                                </div>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</main>
+
+@code {
+    private WorkRelationshipSnapshotResponse? _selected;
+    private string _purpose = string.Empty;
+    private string _message = string.Empty;
+
+    protected override Task OnInitializedAsync()
+        => ViewModel.조회Async();
+
+    private Task ReloadAsync()
+        => ViewModel.조회Async();
+
+    private void BeginConnection(WorkRelationshipSnapshotResponse item)
+    {
+        _selected = item;
+        _purpose = string.Empty;
+        _message = string.Empty;
+        ViewModel.작업상태초기화();
+    }
+
+    private void CancelConnection()
+    {
+        _selected = null;
+        _purpose = string.Empty;
+        _message = string.Empty;
+        ViewModel.작업상태초기화();
+    }
+
+    private async Task SubmitConnectionAsync()
+    {
+        if (_selected is null)
+        {
+            return;
+        }
+
+        if (await ViewModel.연결요청Async(_selected, _purpose, _message))
+        {
+            _selected = null;
+            _purpose = string.Empty;
+            _message = string.Empty;
+        }
+    }
+
+    private static string ValueOrFallback(string? value, string fallback)
+        => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+
+    private static string DomainLabel(string? domain)
+        => domain?.Trim() switch
+        {
+            WorkRelationshipDomains.Dispatch => "운송·배차",
+            WorkRelationshipDomains.Warehouse => "창고",
+            WorkRelationshipDomains.Customs => "통관",
+            WorkRelationshipDomains.Commerce => "주문·판매",
+            _ => "업무"
+        };
+
+    private static string ProcessLabel(string? process)
+        => process?.Trim() switch
+        {
+            WorkRelationshipProcesses.Inbound => "입고 업무",
+            WorkRelationshipProcesses.Inventory => "재고 업무",
+            WorkRelationshipProcesses.Packing => "포장 업무",
+            WorkRelationshipProcesses.Dispatch => "운송 업무",
+            WorkRelationshipProcesses.DriverAssignment => "배차 업무",
+            WorkRelationshipProcesses.CustomsDelegation => "통관 업무",
+            _ => "업무 접점"
+        };
+
+    private static string RoleLabel(string? role)
+        => role?.Trim().ToLowerInvariant() switch
+        {
+            "orderer" or "buyer" or "주문자" => "주문자 역할",
+            "shipper" or "seller" or "판매자" => "화주·판매자 역할",
+            "driver" or "transportoperator" or "기사" => "기사 역할",
+            "warehousemanager" or "창고관리자" => "창고 관리자 역할",
+            "customsbroker" or "관세사" => "관세사 역할",
+            _ => "업무 상대 역할"
+        };
+}

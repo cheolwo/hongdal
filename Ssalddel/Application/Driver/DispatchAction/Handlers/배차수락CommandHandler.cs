@@ -111,14 +111,14 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
             WorkDomain = WorkRelationshipDomains.Dispatch,
             WorkProcess = WorkRelationshipProcesses.DriverAssignment,
             ActionCode = "DispatchAccepted",
-            ActionLabel = "Dispatch accepted",
+            ActionLabel = "배차 수락",
             RelatedEntityType = "TransportRequest",
             RelatedEntityId = request.RequestId,
-            RelatedDisplayLabel = $"Transport request {request.RequestId}",
+            RelatedDisplayLabel = $"운송 의뢰 {request.RequestId}",
             CounterpartyUserId = dispatchRequest.화주Id,
             CounterpartyRoleCode = "Shipper",
-            PrivacyLevel = "ActorVisibleAnonymized",
-            Memo = "The driver accepted a dispatch request, creating a work relationship context."
+            PrivacyLevel = WorkRelationshipPrivacyCodes.ConnectionRequestEligible,
+            Memo = "기사와 화주가 실제 배차 수락 업무에서 만난 인연 기록입니다."
         });
 
         try

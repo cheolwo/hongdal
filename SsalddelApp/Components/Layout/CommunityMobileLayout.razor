@@ -33,7 +33,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
                 </button>
             </header>
-            <p>생활 이야기에서 공동행동과 원장까지 이어 봅니다.</p>
+            <p>생활·지역·재료·시세 정보를 편하게 둘러보고, 관심이 생긴 이야기만 더 확인합니다.</p>
             <nav>
                 <a href="@CommunityPageRoutes.Home" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.GridView" />
@@ -51,9 +51,17 @@
                     <MudIcon Icon="@Icons.Material.Filled.TravelExplore" />
                     지역 문화·특산물
                 </a>
+                <a href="@($"{CommunityPageRoutes.Home}#public-data-boards")" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.QueryStats" />
+                    공공데이터 게시판
+                </a>
                 <a href="@CommunityMobileBoardPresentation.AllWorkGroupsPath" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.Workspaces" />
                     업무 게시판
+                </a>
+                <a href="@CommunityPageRoutes.WorkRelationships" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Handshake" />
+                    업무에서 이어진 인연
                 </a>
                 <a href="@CommunityPageRoutes.Workspace" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.Dashboard" />
@@ -80,7 +88,7 @@
            href="@CommunityPageRoutes.Home"
            aria-current="@(IsBottomDestinationActive(BottomDestination.Community) ? "page" : null)">
             <MudIcon Icon="@Icons.Material.Filled.GridView" Size="Size.Small" />
-            <span>공개 커뮤니티</span>
+            <span>둘러보기</span>
         </a>
         <a class="@BuildBottomLinkClass(BottomDestination.Profile)"
            href="@CommunityPageRoutes.Personal"

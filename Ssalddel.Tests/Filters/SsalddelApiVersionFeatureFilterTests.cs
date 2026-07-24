@@ -14,7 +14,7 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Tests.Filters;
 
-public sealed class SsalddelApiVersionFeatureFilterTests
+public sealed class SsalddelApiFeatureBoundaryFilterTests
 {
     [Fact]
     public async Task OnActionExecutionAsync_BlocksControllerFeatureMetadataWithoutRequireAttribute()
@@ -22,7 +22,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         var context = CreateContext<FeatureMetadataController>(nameof(FeatureMetadataController.ControllerFeature));
         var nextCalled = false;
         var featureFlags = new RecordingFeatureFlagService();
-        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+        var filter = new SsalddelApiFeatureBoundaryFilter(featureFlags);
 
         await filter.OnActionExecutionAsync(context, () =>
         {
@@ -46,7 +46,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         var context = CreateContext<FeatureMetadataController>(nameof(FeatureMetadataController.ActionFeature));
         var nextCalled = false;
         var featureFlags = new RecordingFeatureFlagService(VersionFeatureFlagKeys.FoodDeliveryWorkflow);
-        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+        var filter = new SsalddelApiFeatureBoundaryFilter(featureFlags);
 
         await filter.OnActionExecutionAsync(context, () =>
         {
@@ -64,7 +64,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         var context = CreateContext<FeatureMetadataController>(nameof(FeatureMetadataController.ActionVersionOnly));
         var nextCalled = false;
         var featureFlags = new RecordingFeatureFlagService();
-        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+        var filter = new SsalddelApiFeatureBoundaryFilter(featureFlags);
 
         await filter.OnActionExecutionAsync(context, () =>
         {
@@ -82,7 +82,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         var context = CreateContext<CapabilityController>(nameof(CapabilityController.Get));
         var nextCalled = false;
         var featureFlags = new RecordingFeatureFlagService();
-        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+        var filter = new SsalddelApiFeatureBoundaryFilter(featureFlags);
 
         await filter.OnActionExecutionAsync(context, () =>
         {
@@ -102,7 +102,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
             nameof(UnclassifiedFutureController.Get));
         var nextCalled = false;
         var featureFlags = new RecordingFeatureFlagService();
-        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+        var filter = new SsalddelApiFeatureBoundaryFilter(featureFlags);
 
         await filter.OnActionExecutionAsync(context, () =>
         {
@@ -126,7 +126,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
             nameof(V0ControllerWithFutureAction.Future));
         var nextCalled = false;
         var featureFlags = new RecordingFeatureFlagService();
-        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+        var filter = new SsalddelApiFeatureBoundaryFilter(featureFlags);
 
         await filter.OnActionExecutionAsync(context, () =>
         {
@@ -144,7 +144,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
     }
 
     [Fact]
-    public void AddSsalddelPresentation_RegistersAutomaticVersionFeatureFilter()
+    public void AddSsalddelPresentation_RegistersAutomaticFeatureBoundaryFilter()
     {
         var services = new ServiceCollection();
         services.AddSsalddelPresentation();
@@ -153,7 +153,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         var options = serviceProvider.GetRequiredService<IOptions<MvcOptions>>().Value;
 
         Assert.Contains(options.Filters.OfType<TypeFilterAttribute>(), filter =>
-            filter.ImplementationType == typeof(SsalddelApiVersionFeatureFilter));
+            filter.ImplementationType == typeof(SsalddelApiFeatureBoundaryFilter));
     }
 
     [Fact]
@@ -202,29 +202,28 @@ public sealed class SsalddelApiVersionFeatureFilterTests
             new object());
     }
 
-    [SsalddelApiVersion(
-        SsalddelProductVersion.V3_0,
-        FeatureKey = VersionFeatureFlagKeys.FoodDeliveryWorkflow)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V3_0)]
+    [SsalddelApiFeature(VersionFeatureFlagKeys.FoodDeliveryWorkflow)]
     private sealed class FeatureMetadataController
     {
         public void ControllerFeature()
         {
         }
 
-        [SsalddelApiVersion(
-            SsalddelProductVersion.V2_5,
-            FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+        [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_5)]
+        [SsalddelApiFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
         public void ActionFeature()
         {
         }
 
-        [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
+        [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_5)]
         public void ActionVersionOnly()
         {
         }
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V0_0)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V0_0)]
+    [SsalddelApiCapability(SsalddelCapability.CommunityInformationDiscovery)]
     private sealed class CapabilityController
     {
         public void Get()
@@ -232,7 +231,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         }
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_5)]
     private sealed class UnclassifiedFutureController
     {
         public void Get()
@@ -240,10 +239,10 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         }
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V0_0)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V0_0)]
     private sealed class V0ControllerWithFutureAction
     {
-        [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
+        [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_5)]
         public void Future()
         {
         }

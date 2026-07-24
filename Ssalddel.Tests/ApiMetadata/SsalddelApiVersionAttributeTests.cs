@@ -362,7 +362,7 @@ public sealed class SsalddelApiVersionAttributeTests
     }
 
     [Fact]
-    public void Controllers_HaveSsalddelProductVersionMetadata()
+    public void Controllers_HaveIntroductionHistoryMetadata()
     {
         var missingControllers = GetControllerTypes()
             .Where(type => type.GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true) is null)
@@ -374,41 +374,31 @@ public sealed class SsalddelApiVersionAttributeTests
     }
 
     [Fact]
-    public void VersionFeatureGatedApis_RecordMatchingFeatureKeyInVersionMetadata()
+    public void FeatureGatedApis_RecordMatchingFeatureBoundaryMetadata()
     {
         var missingFeatureMetadata = new List<string>();
 
         foreach (var controllerType in GetControllerTypes())
         {
-            var controllerVersion = controllerType.GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
             foreach (var featureAttribute in controllerType.GetCustomAttributes<RequireVersionFeatureAttribute>(inherit: true))
             {
                 var featureKey = Get필요FeatureKey(featureAttribute);
-                if (!string.Equals(controllerVersion?.FeatureKey, featureKey, StringComparison.Ordinal))
+                var declaredFeatureKey = GetDeclaredFeatureKey(controllerType);
+                if (!string.Equals(declaredFeatureKey, featureKey, StringComparison.Ordinal))
                 {
                     missingFeatureMetadata.Add($"{controllerType.FullName}: {featureKey}");
-                }
-
-                if (!string.Equals(controllerVersion?.WorkflowKey, featureKey, StringComparison.Ordinal))
-                {
-                    missingFeatureMetadata.Add($"{controllerType.FullName}: workflow {featureKey}");
                 }
             }
 
             foreach (var action in GetActionMethods(controllerType))
             {
-                var actionVersion = action.GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
                 foreach (var featureAttribute in action.GetCustomAttributes<RequireVersionFeatureAttribute>(inherit: true))
                 {
                     var featureKey = Get필요FeatureKey(featureAttribute);
-                    if (!string.Equals(actionVersion?.FeatureKey, featureKey, StringComparison.Ordinal))
+                    var declaredFeatureKey = GetDeclaredFeatureKey(action);
+                    if (!string.Equals(declaredFeatureKey, featureKey, StringComparison.Ordinal))
                     {
                         missingFeatureMetadata.Add($"{controllerType.FullName}.{action.Name}: {featureKey}");
-                    }
-
-                    if (!string.Equals(actionVersion?.WorkflowKey, featureKey, StringComparison.Ordinal))
-                    {
-                        missingFeatureMetadata.Add($"{controllerType.FullName}.{action.Name}: workflow {featureKey}");
                     }
                 }
             }
@@ -418,22 +408,18 @@ public sealed class SsalddelApiVersionAttributeTests
     }
 
     [Fact]
-    public void VersionFeatureMetadata_IsResolvableForEveryControllerAction()
+    public void FeatureBoundaryMetadata_IsResolvableForEveryControllerAction()
     {
         var unresolvedEndpoints = new List<string>();
         var featureEndpointCount = 0;
 
         foreach (var controllerType in GetControllerTypes())
         {
-            var controllerFeatureKey = controllerType
-                .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?
-                .FeatureKey;
+            var controllerFeatureKey = GetDeclaredFeatureKey(controllerType);
 
             foreach (var action in GetActionMethods(controllerType))
             {
-                var actionFeatureKey = action
-                    .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?
-                    .FeatureKey;
+                var actionFeatureKey = GetDeclaredFeatureKey(action);
                 var expectedFeatureKey = string.IsNullOrWhiteSpace(actionFeatureKey)
                     ? controllerFeatureKey
                     : actionFeatureKey;
@@ -450,7 +436,7 @@ public sealed class SsalddelApiVersionAttributeTests
                     ControllerTypeInfo = controllerType.GetTypeInfo(),
                     MethodInfo = action
                 };
-                var resolvedFeatureKey = SsalddelApiVersionFeatureFilter.ResolveFeatureKey(descriptor);
+                var resolvedFeatureKey = SsalddelApiFeatureBoundaryFilter.ResolveFeatureKey(descriptor);
                 if (!string.Equals(expectedFeatureKey, resolvedFeatureKey, StringComparison.Ordinal))
                 {
                     unresolvedEndpoints.Add($"{controllerType.FullName}.{action.Name}: {expectedFeatureKey}");
@@ -465,15 +451,15 @@ public sealed class SsalddelApiVersionAttributeTests
     [Fact]
     public void CoreWorkflowEntryPoints_DeclareTheirExecutionFeatureKeys()
     {
-        var cargoVersion = typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)
-            .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
-        var warehouseVersion = typeof(WarehouseOperationsController)
-            .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
+        var cargoFeature = typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)
+            .GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true);
+        var warehouseFeature = typeof(WarehouseOperationsController)
+            .GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true);
         var foodVersion = typeof(Ssalddel.Controllers.Food.음식주문Controller)
             .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
 
-        Assert.Equal(VersionFeatureFlagKeys.DomesticTransportWorkflow, cargoVersion?.FeatureKey);
-        Assert.Equal(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow, warehouseVersion?.FeatureKey);
+        Assert.Equal(VersionFeatureFlagKeys.DomesticTransportWorkflow, cargoFeature?.FeatureKey);
+        Assert.Equal(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow, warehouseFeature?.FeatureKey);
         Assert.Equal(VersionFeatureFlagKeys.FoodDeliveryWorkflow, foodVersion?.FeatureKey);
     }
 
@@ -497,7 +483,7 @@ public sealed class SsalddelApiVersionAttributeTests
                 MethodInfo = action
             };
 
-            Assert.Null(SsalddelApiVersionFeatureFilter.ResolveFeatureKey(descriptor));
+            Assert.Null(SsalddelApiFeatureBoundaryFilter.ResolveFeatureKey(descriptor));
         }
     }
 
@@ -595,6 +581,10 @@ public sealed class SsalddelApiVersionAttributeTests
         => controllerType
             .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?
             .Version;
+
+    private static string? GetDeclaredFeatureKey(MemberInfo member)
+        => member.GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true)?.FeatureKey
+            ?? member.GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?.FeatureKey;
 
     private static IEnumerable<Type> GetControllerTypes()
     {

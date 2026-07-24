@@ -1,0 +1,293 @@
+.community-work-relationships {
+    display: grid;
+    gap: 1rem;
+    width: min(100%, 560px);
+    margin: 0 auto;
+    padding: 1rem 1rem 6.5rem;
+    color: #172033;
+}
+
+.community-work-relationships__hero {
+    display: grid;
+    gap: .45rem;
+    padding: 1.2rem;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(135deg, #4451c7 0%, #247f75 100%);
+}
+
+.community-work-relationships__hero > span,
+.community-work-relationships__records > header span {
+    font-size: .7rem;
+    font-weight: 850;
+    letter-spacing: .02em;
+}
+
+.community-work-relationships__hero h1,
+.community-work-relationships__hero p,
+.community-work-relationships__records h2,
+.community-work-relationships__list h3,
+.community-work-relationships__list p,
+.community-work-relationships__state p {
+    margin: 0;
+}
+
+.community-work-relationships__hero h1 {
+    font-size: 1.35rem;
+    line-height: 1.35;
+}
+
+.community-work-relationships__hero p {
+    color: rgba(255, 255, 255, .84);
+    font-size: .78rem;
+    line-height: 1.6;
+}
+
+.community-work-relationships__flow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem;
+}
+
+.community-work-relationships__flow article {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .22rem .5rem;
+    padding: .8rem;
+    border: 1px solid #d9e0ea;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.community-work-relationships__flow article > span {
+    grid-row: 1 / span 2;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    color: #fff;
+    background: #4451c7;
+    font-size: .7rem;
+    font-weight: 850;
+}
+
+.community-work-relationships__flow strong {
+    font-size: .75rem;
+}
+
+.community-work-relationships__flow p {
+    margin: 0;
+    color: #667085;
+    font-size: .66rem;
+    line-height: 1.45;
+}
+
+.community-work-relationships__boundary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .6rem;
+    padding: .8rem;
+    border-radius: 12px;
+    color: #276b61;
+    background: #eaf7f1;
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+.community-work-relationships__boundary strong {
+    display: block;
+}
+
+.community-work-relationships__records {
+    display: grid;
+    gap: .75rem;
+}
+
+.community-work-relationships__records > header {
+    display: flex;
+    gap: .75rem;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.community-work-relationships__records > header div {
+    display: grid;
+    gap: .15rem;
+}
+
+.community-work-relationships__records > header span {
+    color: #4451c7;
+}
+
+.community-work-relationships__records h2 {
+    font-size: 1rem;
+}
+
+.community-work-relationships button {
+    min-height: 38px;
+    padding: .55rem .75rem;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: #4451c7;
+    font-size: .7rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.community-work-relationships button:disabled {
+    cursor: default;
+    opacity: .55;
+}
+
+.community-work-relationships__state {
+    display: grid;
+    justify-items: center;
+    gap: .45rem;
+    padding: 1.4rem 1rem;
+    border: 1px dashed #cfd8e5;
+    border-radius: 12px;
+    color: #667085;
+    text-align: center;
+    background: #fff;
+    font-size: .72rem;
+}
+
+.community-work-relationships__state strong {
+    color: #344054;
+}
+
+.community-work-relationships__state--error {
+    color: #b54708;
+    background: #fff8f0;
+}
+
+.community-work-relationships__list {
+    display: grid;
+    gap: .65rem;
+}
+
+.community-work-relationships__list > article {
+    display: grid;
+    gap: .55rem;
+    padding: .9rem;
+    border: 1px solid #d9e0ea;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.community-work-relationships__list > article > header {
+    display: flex;
+    justify-content: space-between;
+    gap: .6rem;
+    color: #4451c7;
+    font-size: .65rem;
+    font-weight: 800;
+}
+
+.community-work-relationships__list time {
+    color: #8a94a6;
+    font-weight: 600;
+}
+
+.community-work-relationships__list h3 {
+    font-size: .86rem;
+}
+
+.community-work-relationships__list > article > p {
+    color: #667085;
+    font-size: .7rem;
+}
+
+.community-work-relationships__counterparty {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .55rem;
+    align-items: center;
+    padding: .6rem;
+    border-radius: 10px;
+    background: #f5f7fb;
+}
+
+.community-work-relationships__avatar {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    color: #fff;
+    background: #247f75;
+    font-size: .7rem;
+    font-weight: 850;
+}
+
+.community-work-relationships__counterparty > span:last-child {
+    display: grid;
+    gap: .08rem;
+}
+
+.community-work-relationships__counterparty strong {
+    font-size: .72rem;
+}
+
+.community-work-relationships__counterparty small,
+.community-work-relationships__list em {
+    color: #667085;
+    font-size: .64rem;
+    font-style: normal;
+}
+
+.community-work-relationships__request {
+    display: grid;
+    gap: .65rem;
+    padding: .75rem;
+    border: 1px solid #b9c5f4;
+    border-radius: 10px;
+    background: #f7f8ff;
+}
+
+.community-work-relationships__request label {
+    display: grid;
+    gap: .25rem;
+    color: #344054;
+    font-size: .67rem;
+    font-weight: 800;
+}
+
+.community-work-relationships__request input,
+.community-work-relationships__request textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .6rem;
+    border: 1px solid #cbd3e1;
+    border-radius: 8px;
+    color: #172033;
+    background: #fff;
+    font: inherit;
+    font-weight: 500;
+}
+
+.community-work-relationships__request aside {
+    color: #667085;
+    font-size: .63rem;
+    line-height: 1.45;
+}
+
+.community-work-relationships__request > div {
+    display: flex;
+    justify-content: flex-end;
+    gap: .45rem;
+}
+
+.community-work-relationships button.secondary {
+    color: #4451c7;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #b9c5f4;
+}
+
+@media (max-width: 390px) {
+    .community-work-relationships__flow {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

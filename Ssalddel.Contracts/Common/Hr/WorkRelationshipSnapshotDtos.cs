@@ -57,3 +57,9 @@ public static class WorkRelationshipProcesses
     public const string DriverAssignment = "DriverAssignment";
     public const string CustomsDelegation = "CustomsDelegation";
 }
+
+public static class WorkRelationshipPrivacyCodes
+{
+    public const string ActorVisibleAnonymized = "ActorVisibleAnonymized";
+    public const string ConnectionRequestEligible = "ConnectionRequestEligible";
+}
