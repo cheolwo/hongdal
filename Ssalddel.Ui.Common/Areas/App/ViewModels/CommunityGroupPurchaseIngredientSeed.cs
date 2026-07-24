@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using Ssalddel.Contracts.Common.Community;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -16,6 +18,9 @@ public sealed record CommunityGroupPurchaseIngredientSeed
     public const string FoodNameQueryName = "food";
     public const string FoodCountryCodeQueryName = "foodCountry";
     public const string SourcingModeQueryName = "sourcingMode";
+    public const string MaterialBundleQueryName = "materials";
+    public const int MaxBundleItems = 12;
+    public const int MaxEncodedBundleLength = 32_768;
 
     private CommunityGroupPurchaseIngredientSeed(
         string ingredientKey,
@@ -138,6 +143,74 @@ public sealed record CommunityGroupPurchaseIngredientSeed
     public string ToDemandNavigationUri()
         => BuildNavigationUri(CommunityPageRoutes.GroupPurchaseDemand);
 
+    public static string ToDemandNavigationUri(IEnumerable<CommunityGroupPurchaseIngredientSeed> seeds)
+    {
+        ArgumentNullException.ThrowIfNull(seeds);
+        var items = seeds
+            .Where(seed => seed is not null)
+            .GroupBy(seed => seed.SuggestedProductKey, StringComparer.Ordinal)
+            .Select(group => group.Last())
+            .Take(MaxBundleItems)
+            .Select(SeedBundleItem.From)
+            .ToArray();
+        if (items.Length == 0)
+        {
+            return CommunityPageRoutes.GroupPurchaseDemand;
+        }
+
+        var json = JsonSerializer.Serialize(items);
+        var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(json))
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
+        return $"{CommunityPageRoutes.GroupPurchaseDemand}?{MaterialBundleQueryName}={Uri.EscapeDataString(encoded)}";
+    }
+
+    public static IReadOnlyList<CommunityGroupPurchaseIngredientSeed> DecodeMaterialBundle(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value.Trim().Length > MaxEncodedBundleLength)
+        {
+            return [];
+        }
+
+        try
+        {
+            var encoded = Uri.UnescapeDataString(value.Trim())
+                .Replace('-', '+')
+                .Replace('_', '/');
+            encoded = encoded.PadRight(encoded.Length + (4 - encoded.Length % 4) % 4, '=');
+            var json = Encoding.UTF8.GetString(Convert.FromBase64String(encoded));
+            var items = JsonSerializer.Deserialize<SeedBundleItem[]>(json) ?? [];
+            return items
+                .Take(MaxBundleItems)
+                .Select(item => Create(
+                    item.IngredientKey,
+                    item.IngredientName,
+                    item.RecipeTitle,
+                    item.RecipeUrl,
+                    item.RecipeSource,
+                    item.RecipeQuantity,
+                    item.PriceReference,
+                    item.PurchaseUnit,
+                    item.FoodName,
+                    item.FoodCountryCode,
+                    item.SourcingModeCode))
+                .Where(seed => seed is not null)
+                .Cast<CommunityGroupPurchaseIngredientSeed>()
+                .GroupBy(seed => seed.SuggestedProductKey, StringComparer.Ordinal)
+                .Select(group => group.Last())
+                .ToArray();
+        }
+        catch (FormatException)
+        {
+            return [];
+        }
+        catch (JsonException)
+        {
+            return [];
+        }
+    }
+
     private string BuildNavigationUri(string route)
     {
         var parameters = new List<string>();
@@ -231,6 +304,37 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         return normalized.Length == 2 && normalized.All(character => character is >= 'A' and <= 'Z')
             ? normalized
             : string.Empty;
+    }
+
+    public sealed class SeedBundleItem
+    {
+        public string IngredientKey { get; set; } = string.Empty;
+        public string IngredientName { get; set; } = string.Empty;
+        public string RecipeTitle { get; set; } = string.Empty;
+        public string RecipeUrl { get; set; } = string.Empty;
+        public string RecipeSource { get; set; } = string.Empty;
+        public string RecipeQuantity { get; set; } = string.Empty;
+        public string PriceReference { get; set; } = string.Empty;
+        public string PurchaseUnit { get; set; } = string.Empty;
+        public string FoodName { get; set; } = string.Empty;
+        public string FoodCountryCode { get; set; } = string.Empty;
+        public string SourcingModeCode { get; set; } = string.Empty;
+
+        public static SeedBundleItem From(CommunityGroupPurchaseIngredientSeed seed)
+            => new()
+            {
+                IngredientKey = seed.IngredientKey,
+                IngredientName = seed.IngredientName,
+                RecipeTitle = seed.RecipeTitle,
+                RecipeUrl = seed.RecipeUrl,
+                RecipeSource = seed.RecipeSource,
+                RecipeQuantity = seed.RecipeQuantity,
+                PriceReference = seed.PriceReference,
+                PurchaseUnit = seed.PurchaseUnit,
+                FoodName = seed.FoodName,
+                FoodCountryCode = seed.FoodCountryCode,
+                SourcingModeCode = seed.SourcingModeCode
+            };
     }
 }
 

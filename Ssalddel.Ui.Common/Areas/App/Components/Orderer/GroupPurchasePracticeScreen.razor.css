@@ -1,0 +1,18 @@
+.group-purchase-practice {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.practice-scenario,
+.practice-stat,
+.practice-message {
+    background: color-mix(in srgb, var(--mud-palette-primary) 6%, transparent);
+}
+
+.practice-progress {
+    border-color: color-mix(in srgb, var(--mud-palette-primary) 28%, var(--mud-palette-lines-default));
+}
+
+.practice-participant {
+    min-height: 9rem;
+}

@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Services.Community;
 
@@ -12,12 +13,64 @@ public partial class CommunityVoteService
         var settings = vote.GroupPurchase;
         if (settings is null)
         {
-            return new GroupPurchaseParticipation(1, string.Empty, null);
+            return new GroupPurchaseParticipation(
+                1,
+                string.Empty,
+                null,
+                공동구매거래유형코드.B2C,
+                공동구매가격표시기준코드.부가세포함,
+                null,
+                null,
+                false);
         }
 
         if (request.RequestedQuantity is < 1 or > 10_000)
         {
             throw new InvalidOperationException("희망 수량은 1개 이상 10,000개 이하여야 합니다.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.TransactionTypeCode)
+            && !공동구매거래유형코드.지원여부(request.TransactionTypeCode))
+        {
+            throw new InvalidOperationException("공동구매 거래유형은 B2C 또는 B2B여야 합니다.");
+        }
+
+        var transactionTypeCode = 공동구매거래유형코드.정규화(request.TransactionTypeCode);
+        var allowedTransactionTypeCodes = NormalizeAllowedTransactionTypeCodes(
+            settings.AllowedTransactionTypeCodes);
+        if (!allowedTransactionTypeCodes.Contains(transactionTypeCode, StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException("이 공동구매에서 허용하지 않는 거래유형입니다.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.PriceBasisCode)
+            && !공동구매가격표시기준코드.지원여부(request.PriceBasisCode))
+        {
+            throw new InvalidOperationException("가격 표시 기준은 부가세 포함 또는 부가세 별도여야 합니다.");
+        }
+
+        var priceBasisCode = 공동구매가격표시기준코드.정규화(
+            request.PriceBasisCode,
+            transactionTypeCode);
+        var purchasingOrganizationReference = NormalizeOptional(request.PurchasingOrganizationReference);
+        var purchasingOrganizationName = NormalizeOptional(request.PurchasingOrganizationName);
+        if (transactionTypeCode == 공동구매거래유형코드.B2B
+            && purchasingOrganizationReference is null
+            && purchasingOrganizationName is null)
+        {
+            throw new InvalidOperationException("B2B 구매 의향에는 구매 조직 이름 또는 조직 참조키가 필요합니다.");
+        }
+
+        if (transactionTypeCode == 공동구매거래유형코드.B2C
+            && (purchasingOrganizationReference is not null
+                || purchasingOrganizationName is not null
+                || request.TaxInvoiceRequired
+                || string.Equals(
+                    request.PriceBasisCode?.Trim(),
+                    공동구매가격표시기준코드.부가세별도,
+                    StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException("B2C 구매 의향에는 사업자 정보, 세금계산서 또는 부가세 별도 기준을 사용할 수 없습니다.");
         }
 
         var methodCode = NormalizeOptional(request.ParticipationMethodCode)
@@ -75,7 +128,15 @@ public partial class CommunityVoteService
             }
         }
 
-        return new GroupPurchaseParticipation(request.RequestedQuantity, methodCode, pickupPoint?.PickupPointId);
+        return new GroupPurchaseParticipation(
+            request.RequestedQuantity,
+            methodCode,
+            pickupPoint?.PickupPointId,
+            transactionTypeCode,
+            priceBasisCode,
+            purchasingOrganizationReference,
+            purchasingOrganizationName,
+            request.TaxInvoiceRequired);
     }
 
     private static string? QueueGroupPurchaseDemand(
@@ -127,6 +188,11 @@ public partial class CommunityVoteService
             DeliveryScopeName = deliveryScopeName,
             RequestedQuantity = participation.RequestedQuantity,
             QuantityUnit = string.IsNullOrWhiteSpace(option.QuantityUnit) ? settings.QuantityUnit : option.QuantityUnit,
+            TransactionTypeCode = participation.TransactionTypeCode,
+            PriceBasisCode = participation.PriceBasisCode,
+            PurchasingOrganizationReference = participation.PurchasingOrganizationReference,
+            PurchasingOrganizationName = participation.PurchasingOrganizationName,
+            TaxInvoiceRequired = participation.TaxInvoiceRequired,
             MinimumParticipantCount = pickupPoint?.MinimumParticipantCount ?? settings.MinimumParticipantCount,
             MinimumTotalQuantity = pickupPoint?.MinimumTotalQuantity ?? settings.MinimumTotalQuantity
         };
@@ -153,6 +219,10 @@ public partial class CommunityVoteService
 
         var totalRequestedQuantity = vote.Votes.Sum(x => x.RequestedQuantity);
         var unassignedVotes = vote.Votes.Where(x => x.PickupPointId is null).ToArray();
+        var transactionSegments = BuildTransactionSegments(
+            vote.Votes,
+            settings.MinimumParticipantCount,
+            settings.MinimumTotalQuantity);
         var hasExplicitTradeRoute = !string.IsNullOrWhiteSpace(settings.TradeRouteCode);
         var tradeRouteDecision = hasExplicitTradeRoute
             ? CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
@@ -194,6 +264,8 @@ public partial class CommunityVoteService
             TemperatureCode = settings.TemperatureCode,
             LogisticsMode = settings.LogisticsMode,
             QuantityUnit = settings.QuantityUnit,
+            AllowedTransactionTypeCodes = NormalizeAllowedTransactionTypeCodes(
+                settings.AllowedTransactionTypeCodes),
             TargetUnitPriceKrwPerKg = settings.TargetUnitPriceKrwPerKg,
             ServiceAreaKey = settings.ServiceAreaKey,
             ServiceAreaLabel = settings.ServiceAreaLabel,
@@ -209,8 +281,8 @@ public partial class CommunityVoteService
                     or CommunityVoteDemandHandoffStatusCodes.RetryPending),
             DemandHandoffFailedCount = vote.DemandHandoffOutbox.Count(x =>
                 x.Status is CommunityVoteDemandHandoffStatusCodes.Failed),
-            IsMinimumReached = vote.Votes.Count >= settings.MinimumParticipantCount
-                && totalRequestedQuantity >= settings.MinimumTotalQuantity,
+            IsMinimumReached = transactionSegments.Any(segment => segment.IsMinimumReached),
+            TransactionSegments = transactionSegments,
             PickupPoints = settings.PickupPoints.Select(point =>
             {
                 var assignedVotes = vote.Votes
@@ -219,6 +291,10 @@ public partial class CommunityVoteService
                 var requestedQuantity = assignedVotes.Sum(x => x.RequestedQuantity);
                 var minimumParticipantCount = point.MinimumParticipantCount ?? settings.MinimumParticipantCount;
                 var minimumTotalQuantity = point.MinimumTotalQuantity ?? settings.MinimumTotalQuantity;
+                var pickupTransactionSegments = BuildTransactionSegments(
+                    assignedVotes,
+                    minimumParticipantCount,
+                    minimumTotalQuantity);
                 return new CommunityVotePickupPointResponse
                 {
                     PickupPointId = point.PickupPointId,
@@ -235,12 +311,76 @@ public partial class CommunityVoteService
                     PickupFee = point.PickupFee,
                     ParticipantCount = assignedVotes.Length,
                     RequestedQuantity = requestedQuantity,
-                    IsMinimumReached = assignedVotes.Length >= minimumParticipantCount
-                        && requestedQuantity >= minimumTotalQuantity,
+                    IsMinimumReached = pickupTransactionSegments.Any(segment => segment.IsMinimumReached),
                     IsCapacityReached = point.CapacityQuantity is int capacityQuantity
-                        && requestedQuantity >= capacityQuantity
+                        && requestedQuantity >= capacityQuantity,
+                    TransactionSegments = pickupTransactionSegments
                 };
             }).ToArray()
         };
+    }
+
+    private static IReadOnlyList<string> NormalizeAllowedTransactionTypeCodes(
+        IReadOnlyList<string>? transactionTypeCodes)
+    {
+        var normalized = (transactionTypeCodes ?? [])
+            .Where(공동구매거래유형코드.지원여부)
+            .Select(공동구매거래유형코드.정규화)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        return normalized.Length == 0
+            ? [공동구매거래유형코드.B2C]
+            : normalized;
+    }
+
+    private static IReadOnlyList<CommunityGroupPurchaseTransactionSegmentResponse> BuildTransactionSegments(
+        IEnumerable<CommunityVoteCastRecord> votes,
+        int minimumParticipantCount,
+        int minimumTotalQuantity)
+    {
+        return votes
+            .GroupBy(voteCast =>
+            {
+                var transactionTypeCode = 공동구매거래유형코드.정규화(voteCast.TransactionTypeCode);
+                return (
+                    TransactionTypeCode: transactionTypeCode,
+                    PriceBasisCode: 공동구매가격표시기준코드.정규화(
+                        voteCast.PriceBasisCode,
+                        transactionTypeCode));
+            })
+            .Select(group =>
+            {
+                var buyerCount = group.Key.TransactionTypeCode == 공동구매거래유형코드.B2B
+                    ? group.Select(BusinessBuyerKey).Distinct(StringComparer.OrdinalIgnoreCase).Count()
+                    : group.Select(voteCast => voteCast.VoterHash).Distinct(StringComparer.Ordinal).Count();
+                var requestedQuantity = group.Sum(voteCast => voteCast.RequestedQuantity);
+                return new CommunityGroupPurchaseTransactionSegmentResponse
+                {
+                    TransactionTypeCode = group.Key.TransactionTypeCode,
+                    PriceBasisCode = group.Key.PriceBasisCode,
+                    BuyerCount = buyerCount,
+                    RequestedQuantity = requestedQuantity,
+                    IsMinimumReached = buyerCount >= minimumParticipantCount
+                        && requestedQuantity >= minimumTotalQuantity
+                };
+            })
+            .OrderBy(segment => segment.TransactionTypeCode == 공동구매거래유형코드.B2C ? 0 : 1)
+            .ThenBy(segment => segment.PriceBasisCode, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static string BusinessBuyerKey(CommunityVoteCastRecord voteCast)
+    {
+        if (!string.IsNullOrWhiteSpace(voteCast.PurchasingOrganizationReference))
+        {
+            return $"reference:{voteCast.PurchasingOrganizationReference.Trim()}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(voteCast.PurchasingOrganizationName))
+        {
+            return $"name:{voteCast.PurchasingOrganizationName.Trim()}";
+        }
+
+        return $"legacy-voter:{voteCast.VoterHash}";
     }
 }

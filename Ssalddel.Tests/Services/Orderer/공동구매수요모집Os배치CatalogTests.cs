@@ -25,7 +25,7 @@ public sealed class 공동구매수요모집Os배치CatalogTests
     }
 
     [Fact]
-    public void 수집후게시활성_게시작업을인계로등록하고독립Quartz중복을막는다()
+    public void Os등록계획은_공공데이터수집만포함하고_커뮤니티글쓰기작업을소유하지않는다()
     {
         var plan = 공동구매수요모집Os배치등록계획.생성(
             new AgriculturalFisheriesBatchOptions
@@ -34,53 +34,14 @@ public sealed class 공동구매수요모집Os배치CatalogTests
                 PublishCommunityPriceBriefs = true,
                 KamisDailyEnabled = true,
                 UsdaMonthlyEnabled = true
-            },
-            new CommunityEditorialBatchOptions
-            {
-                Enabled = true,
-                KamisPriceBriefEnabled = true,
-                UsdaNassPriceBriefEnabled = true
             });
 
-        var kamis = plan.조회(공동구매수요모집Os배치작업코드.Kamis가격브리프게시);
-        var usda = plan.조회(공동구매수요모집Os배치작업코드.UsdaNass가격브리프게시);
-
-        Assert.True(kamis.등록여부);
-        Assert.True(kamis.수집성공후인계여부);
-        Assert.False(kamis.Quartz등록여부);
-        Assert.Equal(
-            공동구매수요모집Os배치실행방식코드.수집성공후인계,
-            kamis.실행방식);
-        Assert.True(usda.등록여부);
-        Assert.True(usda.수집성공후인계여부);
-        Assert.False(usda.Quartz등록여부);
-    }
-
-    [Fact]
-    public void 수집후게시비활성_독립편집배치를조정작업으로등록한다()
-    {
-        var editorial = new CommunityEditorialBatchOptions
-        {
-            Enabled = true,
-            KamisPriceBriefEnabled = true,
-            KamisPriceBriefCronExpression = "0 50 6 * * ?"
-        };
-        var plan = 공동구매수요모집Os배치등록계획.생성(
-            new AgriculturalFisheriesBatchOptions
-            {
-                Enabled = true,
-                PublishCommunityPriceBriefs = false,
-                KamisDailyEnabled = true
-            },
-            editorial);
-
-        var kamis = plan.조회(공동구매수요모집Os배치작업코드.Kamis가격브리프게시);
-
-        Assert.True(kamis.등록여부);
-        Assert.False(kamis.수집성공후인계여부);
-        Assert.True(kamis.Quartz등록여부);
-        Assert.Equal(공동구매수요모집Os배치실행방식코드.Quartz, kamis.실행방식);
-        Assert.Equal(editorial.KamisPriceBriefCronExpression, kamis.스케줄);
+        Assert.True(plan.조회(
+            공동구매수요모집Os배치작업코드.Kamis일별가격수집).등록여부);
+        Assert.Throws<InvalidOperationException>(() =>
+            plan.조회("CommunityKamisPriceBrief"));
+        Assert.Throws<InvalidOperationException>(() =>
+            plan.조회("CommunityUsdaNassPriceBrief"));
     }
 
     [Fact]
@@ -95,11 +56,6 @@ public sealed class 공동구매수요모집Os배치CatalogTests
                 KamisMonthlyEnabled = true,
                 UsdaMonthlyEnabled = true,
                 IngredientCompanyResearchEnabled = false
-            },
-            new CommunityEditorialBatchOptions
-            {
-                KamisPriceBriefEnabled = true,
-                UsdaNassPriceBriefEnabled = true
             });
         var catalog = new 공동구매수요모집Os배치Catalog(
             plan,
@@ -116,15 +72,12 @@ public sealed class 공동구매수요모집Os배치CatalogTests
         Assert.True(result.기능활성여부);
         Assert.True(result.OsWorker활성여부);
         Assert.True(result.시뮬레이션여부);
-        Assert.Equal(7, result.작업목록.Count);
+        Assert.Equal(5, result.작업목록.Count);
         Assert.Equal(
             공동구매수요모집Os배치상태코드.Os활성,
             result.작업목록.Single(item =>
                 item.작업코드 == 공동구매수요모집Os배치작업코드.Kamis일별가격수집).상태코드);
-        Assert.Equal(
-            공동구매수요모집Os배치실행방식코드.수집성공후인계,
-            result.작업목록.Single(item =>
-                item.작업코드 == 공동구매수요모집Os배치작업코드.UsdaNass가격브리프게시).실행방식);
+        Assert.All(result.작업목록, item => Assert.False(item.게시글작성여부));
         Assert.Equal(
             공동구매수요모집Os배치상태코드.설정비활성,
             result.작업목록.Single(item =>

@@ -44,6 +44,20 @@ public static class CommunityGroupImportLedgerStageCodes
     ];
 }
 
+public static class CommunityGroupImportInternationalTransportModeCodes
+{
+    public const string ReviewRequired = "ReviewRequired";
+    public const string Lcl = "LCL";
+    public const string Fcl = "FCL";
+
+    public static IReadOnlySet<string> All { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ReviewRequired,
+        Lcl,
+        Fcl
+    };
+}
+
 public sealed class CommunityGroupImportLedgerConversionRequest
 {
     public Guid GroupPurchaseCampaignId { get; set; }
@@ -51,7 +65,9 @@ public sealed class CommunityGroupImportLedgerConversionRequest
     public string ProductSummary { get; set; } = string.Empty;
     public decimal PlannedQuantity { get; set; }
     public string QuantityUnit { get; set; } = string.Empty;
-    public string InternationalTransportMode { get; set; } = "LCL";
+    public string InternationalTransportMode { get; set; } = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired;
+    public string ForwarderOrLogisticsProviderName { get; set; } = string.Empty;
+    public string ForwarderResponseReference { get; set; } = string.Empty;
     public string FinalDestinationLabel { get; set; } = string.Empty;
     public string WarehouseReferenceKey { get; set; } = string.Empty;
     public string WarehouseDisplayName { get; set; } = string.Empty;
@@ -234,9 +250,17 @@ public static class CommunityGroupImportLedgerPlanBuilder
         {
             warnings.Add("수입 예정 수량과 단위가 필요합니다.");
         }
-        if (string.IsNullOrWhiteSpace(request.InternationalTransportMode))
+        var transportMode = request.InternationalTransportMode?.Trim() ?? string.Empty;
+        if (!CommunityGroupImportInternationalTransportModeCodes.All.Contains(transportMode))
         {
-            warnings.Add("FCL, LCL 등 국제 운송 방식이 필요합니다.");
+            warnings.Add("국제 운송 방식은 포워더 검토 필요, LCL 또는 FCL 중 하나여야 합니다.");
+        }
+        if ((string.Equals(transportMode, CommunityGroupImportInternationalTransportModeCodes.Lcl, StringComparison.OrdinalIgnoreCase)
+             || string.Equals(transportMode, CommunityGroupImportInternationalTransportModeCodes.Fcl, StringComparison.OrdinalIgnoreCase))
+            && (string.IsNullOrWhiteSpace(request.ForwarderOrLogisticsProviderName)
+                || string.IsNullOrWhiteSpace(request.ForwarderResponseReference)))
+        {
+            warnings.Add("LCL/FCL은 포워더·물류대행업체명과 회신 근거가 있을 때만 기록할 수 있습니다.");
         }
         if (string.IsNullOrWhiteSpace(request.FinalDestinationLabel))
         {

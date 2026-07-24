@@ -20,7 +20,9 @@ internal static class GroupPurchaseUiModule
         services.TryAddScoped<I공동구매원장절차Client, 공동구매원장절차Client>();
         services.TryAddScoped<I공동수입원장전환Client, 공동수입원장전환Client>();
         services.TryAddScoped<I공동수입준비주문자Client, 공동수입준비주문자Client>();
+        services.TryAddScoped<I무역확장원장Client, 무역확장원장Client>();
         services.TryAddScoped<I공동수입선적통관Client, 공동수입선적통관Client>();
+        services.TryAddScoped<I공동구매체험Client, 공동구매체험Client>();
         services.TryAddScoped<I공동구매가격의사결정Service, 공동구매가격의사결정Service>();
         services.TryAddScoped<IOperatingMarketProfileClient, OperatingMarketProfileClient>();
         services.TryAddScoped<공동구매화면상태ViewModel>();
@@ -72,6 +74,9 @@ internal static class GroupPurchaseUiModule
         services.TryAddScoped<공동수입원장물류ViewModel>();
         services.TryAddScoped<공동수입선적통관ViewModel>();
         services.TryAddScoped<공동수입원장조회ViewModel>();
+        services.TryAddScoped<개별수입원장생성ViewModel>();
+        services.TryAddScoped<개별수출원장생성ViewModel>();
+        services.TryAddScoped<공동수출원장생성ViewModel>();
         services.TryAddScoped<공동수입원장미리보기ViewModel>();
         services.TryAddScoped<공동수입원장전환ViewModel>();
         services.TryAddScoped<공동수입선적공개조회ViewModel>();
@@ -105,6 +110,7 @@ internal static class GroupPurchaseUiModule
         services.TryAddTransient<OfficialFoodIngredientDemandViewModel>();
         services.TryAddScoped<OrdererIngredientCardAutoGroupingViewModel>();
         services.TryAddScoped<GroupPurchaseMyWishesViewModel>();
+        services.TryAddScoped<GroupPurchasePracticeViewModel>();
 
         return services;
     }

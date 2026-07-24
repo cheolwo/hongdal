@@ -30,10 +30,14 @@ namespace Ssalddel.Controllers.Admin.Orderer;
 public sealed class 공동수입준비원장AdminController : ControllerBase
 {
     private readonly I공동수입준비원장Service _service;
+    private readonly I공동수입준비OS _operatingSystem;
 
-    public 공동수입준비원장AdminController(I공동수입준비원장Service service)
+    public 공동수입준비원장AdminController(
+        I공동수입준비원장Service service,
+        I공동수입준비OS operatingSystem)
     {
         _service = service;
+        _operatingSystem = operatingSystem;
     }
 
     [HttpGet]
@@ -88,6 +92,61 @@ public sealed class 공동수입준비원장AdminController : ControllerBase
         });
     }
 
+    [HttpGet("os")]
+    [ProducesResponseType(typeof(공동수입준비Os상태응답), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Os상태조회(
+        [FromRoute(Name = "autoGroupId")] string 자동집단Id,
+        CancellationToken cancellationToken)
+    {
+        var result = await _operatingSystem.운영상태조회Async(자동집단Id, cancellationToken);
+        return result is null
+            ? NotFound()
+            : Ok(result);
+    }
+
+    [HttpPost("os/workloads/run")]
+    [ProducesResponseType(typeof(공동수입준비Os상태응답), StatusCodes.Status200OK)]
+    public Task<IActionResult> Os작업실행(
+        [FromRoute(Name = "autoGroupId")] string 자동집단Id,
+        [FromBody] 공동수입준비Os작업실행요청 request,
+        [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
+        CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            request.요청멱등키 = idempotencyKey.Trim();
+        }
+
+        return ExecuteAsync(async () => Ok(await _operatingSystem.작업실행Async(
+            자동집단Id,
+            request,
+            CurrentUserId(),
+            CurrentUserDisplayName(),
+            cancellationToken)));
+    }
+
+    [HttpPost("os/qualified-review-handoff")]
+    [ProducesResponseType(typeof(공동수입준비Os상태응답), StatusCodes.Status200OK)]
+    public Task<IActionResult> 전문검토인계(
+        [FromRoute(Name = "autoGroupId")] string 자동집단Id,
+        [FromBody] 공동수입준비Os전문검토인계요청 request,
+        [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
+        CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            request.요청멱등키 = idempotencyKey.Trim();
+        }
+
+        return ExecuteAsync(async () => Ok(await _operatingSystem.전문검토인계Async(
+            자동집단Id,
+            request,
+            CurrentUserId(),
+            CurrentUserDisplayName(),
+            cancellationToken)));
+    }
+
     private static async Task<IActionResult> ExecuteAsync(Func<Task<IActionResult>> action)
     {
         try
@@ -120,7 +179,7 @@ public sealed class 공동수입준비원장AdminController : ControllerBase
             return new ConflictObjectResult(new ProblemDetails
             {
                 Status = StatusCodes.Status409Conflict,
-                Title = "현재 상태에서는 공동수입 준비 원장을 저장할 수 없습니다.",
+                Title = "현재 상태에서는 공동수입 원장의 1.5 준비 블록을 저장할 수 없습니다.",
                 Detail = exception.Message
             });
         }

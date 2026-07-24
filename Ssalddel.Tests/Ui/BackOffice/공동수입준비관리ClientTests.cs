@@ -62,6 +62,40 @@ public sealed class 공동수입준비관리ClientTests
         Assert.Equal("readiness-key", api.HeaderCalls[1].Headers["Idempotency-Key"]);
     }
 
+    [Fact]
+    public async Task Os조회_작업실행_전문검토인계는_준비원장하위경로와멱등헤더를사용한다()
+    {
+        const string osPath = "api/v1/admin/orderer/group-purchase-demand-os/groups/group%2F1/trade-readiness/os";
+        var response = new 공동수입준비Os상태응답();
+        var api = new RecordingApiClient
+        {
+            SendResponse = response,
+            HeaderSendResponse = response
+        };
+        api.GetResponses[osPath] = response;
+        var client = new 공동수입준비관리Client(api);
+
+        await client.준비Os상태조회Async("group/1");
+        await client.준비Os작업실행Async("group/1", new 공동수입준비Os작업실행요청
+        {
+            요청멱등키 = "os-run-key"
+        });
+        await client.전문검토인계Async("group/1", new 공동수입준비Os전문검토인계요청
+        {
+            요청멱등키 = "review-handoff-key"
+        });
+
+        Assert.Contains(api.GetCalls, call => call.Path == osPath && call.AllowNotFound);
+        Assert.Equal(
+            $"{osPath}/workloads/run",
+            api.HeaderCalls[0].Path);
+        Assert.Equal("os-run-key", api.HeaderCalls[0].Headers["Idempotency-Key"]);
+        Assert.Equal(
+            $"{osPath}/qualified-review-handoff",
+            api.HeaderCalls[1].Path);
+        Assert.Equal("review-handoff-key", api.HeaderCalls[1].Headers["Idempotency-Key"]);
+    }
+
     private static 공동구매자동집단요약응답 Group(string id, string state, DateTime updatedAt)
         => new()
         {

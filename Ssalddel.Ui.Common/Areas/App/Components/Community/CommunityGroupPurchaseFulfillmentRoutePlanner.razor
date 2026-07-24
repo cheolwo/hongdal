@@ -25,6 +25,14 @@
     </div>
 
     <div class="fulfillment-planner__form">
+        <MudSelect T="string" Label="거래유형" Value="@transactionTypeCode" ValueChanged="SetTransactionType" Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@공동구매거래유형코드.B2C">B2C · 개인 소비</MudSelectItem>
+            <MudSelectItem T="string" Value="@공동구매거래유형코드.B2B">B2B · 사업 구매</MudSelectItem>
+        </MudSelect>
+        <MudSelect T="string" Label="가격 표시" @bind-Value="priceBasisCode" Variant="Variant.Outlined" Disabled="@(transactionTypeCode == 공동구매거래유형코드.B2C)">
+            <MudSelectItem T="string" Value="@공동구매가격표시기준코드.부가세포함">부가세 포함</MudSelectItem>
+            <MudSelectItem T="string" Value="@공동구매가격표시기준코드.부가세별도">부가세 별도</MudSelectItem>
+        </MudSelect>
         <MudTextField Label="생산자·공급자" @bind-Value="producerDisplayName" Variant="Variant.Outlined" />
         <MudTextField Label="발주 품목" @bind-Value="productSummary" Variant="Variant.Outlined" />
         <MudTextField Label="발주 수량" @bind-Value="quantitySummary" Variant="Variant.Outlined" />
@@ -89,7 +97,7 @@
         <div class="fulfillment-planner__diagram-heading">
             <div>
                 <MudText Typo="Typo.subtitle1">@plan.RouteLabel 다이어그램</MudText>
-                <MudText Typo="Typo.caption">주문 옵션이 바뀌면 포함 원장과 업무 인계 순서도 함께 바뀝니다.</MudText>
+                <MudText Typo="Typo.caption">@TransactionTypeLabel(plan.TransactionContext) · 주문 옵션이 바뀌면 포함 원장과 업무 인계 순서도 함께 바뀝니다.</MudText>
             </div>
             <span>@($"{plan.LedgerNodes.Count}개 원장 · {plan.LedgerEdges.Count}개 관계 · v{plan.PlanVersion} · {ShortFingerprint(plan.PlanFingerprint)}")</span>
         </div>
@@ -176,6 +184,8 @@
     ];
 
     private Guid loadedCampaignId;
+    private string transactionTypeCode = 공동구매거래유형코드.B2C;
+    private string priceBasisCode = 공동구매가격표시기준코드.부가세포함;
     private string selectedRouteCode = DomesticGroupPurchaseFulfillmentRouteCodes.DirectCollectionPoint;
     private string producerDisplayName = "회원 생산자";
     private string productSummary = string.Empty;
@@ -291,6 +301,8 @@
         {
             GroupPurchaseCampaignId = CampaignId,
             CampaignTitle = CampaignTitle,
+            TransactionTypeCode = transactionTypeCode,
+            PriceBasisCode = priceBasisCode,
             RouteCode = selectedRouteCode,
             ProducerDisplayName = producerDisplayName,
             ProductSummary = productSummary,
@@ -318,6 +330,18 @@
                 CapacityUnit = hubCapacityUnit
             }
         };
+
+    private void SetTransactionType(string value)
+    {
+        transactionTypeCode = 공동구매거래유형코드.정규화(value);
+        priceBasisCode = transactionTypeCode == 공동구매거래유형코드.B2B
+            ? 공동구매가격표시기준코드.부가세별도
+            : 공동구매가격표시기준코드.부가세포함;
+        RefreshPlan();
+    }
+
+    private static string TransactionTypeLabel(공동구매거래문맥응답 context)
+        => $"{(context.거래유형 == 공동구매거래유형코드.B2B ? "B2B" : "B2C")} · {(context.가격표시기준 == 공동구매가격표시기준코드.부가세별도 ? "부가세 별도" : "부가세 포함")}";
 
     private void ResetHubCapabilities()
     {

@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.ContractManagement;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Services.Community;
 
 namespace Ssalddel.Tests.Services.Community;
@@ -372,6 +373,85 @@ public sealed class CommunityVoteServiceTests
     }
 
     [Fact]
+    public async Task GroupPurchaseDemand_B2B와B2C는_구매주체와최소조건을_분리집계한다()
+    {
+        var handoff = new CapturingGroupPurchaseDemandHandoff();
+        var service = new InMemoryCommunityVoteService(handoff);
+        var createRequest = CreateGroupPurchaseVoteRequest();
+        createRequest.GroupPurchase!.AllowedTransactionTypeCodes =
+        [
+            공동구매거래유형코드.B2C,
+            공동구매거래유형코드.B2B
+        ];
+        var vote = await service.CreateAsync(createRequest, CancellationToken.None);
+
+        await service.CastVoteAsync(
+            vote.Id,
+            CreatePickupVote("consumer-a", 3),
+            CancellationToken.None);
+        await service.CastVoteAsync(
+            vote.Id,
+            CreateBusinessPickupVote("business-user-a", "org:market-a", "동네마트", 3),
+            CancellationToken.None);
+        var separated = await service.CastVoteAsync(
+            vote.Id,
+            CreateBusinessPickupVote("business-user-b", "org:market-a", "동네마트", 3),
+            CancellationToken.None);
+
+        Assert.NotNull(separated);
+        Assert.False(separated.GroupPurchase!.IsMinimumReached);
+        var consumerSegment = Assert.Single(
+            separated.GroupPurchase.TransactionSegments,
+            segment => segment.TransactionTypeCode == 공동구매거래유형코드.B2C);
+        var businessSegment = Assert.Single(
+            separated.GroupPurchase.TransactionSegments,
+            segment => segment.TransactionTypeCode == 공동구매거래유형코드.B2B);
+        Assert.Equal(1, consumerSegment.BuyerCount);
+        Assert.Equal(3, consumerSegment.RequestedQuantity);
+        Assert.False(consumerSegment.IsMinimumReached);
+        Assert.Equal(1, businessSegment.BuyerCount);
+        Assert.Equal(6, businessSegment.RequestedQuantity);
+        Assert.False(businessSegment.IsMinimumReached);
+
+        var reached = await service.CastVoteAsync(
+            vote.Id,
+            CreateBusinessPickupVote("business-user-c", "org:restaurant-b", "지역식당", 1),
+            CancellationToken.None);
+
+        Assert.NotNull(reached);
+        Assert.True(reached.GroupPurchase!.IsMinimumReached);
+        businessSegment = Assert.Single(
+            reached.GroupPurchase.TransactionSegments,
+            segment => segment.TransactionTypeCode == 공동구매거래유형코드.B2B);
+        Assert.Equal(2, businessSegment.BuyerCount);
+        Assert.Equal(7, businessSegment.RequestedQuantity);
+        Assert.True(businessSegment.IsMinimumReached);
+        Assert.NotNull(handoff.LastRequest);
+        Assert.Equal(공동구매거래유형코드.B2B, handoff.LastRequest.TransactionTypeCode);
+        Assert.Equal(공동구매가격표시기준코드.부가세별도, handoff.LastRequest.PriceBasisCode);
+        Assert.Equal("org:restaurant-b", handoff.LastRequest.PurchasingOrganizationReference);
+        Assert.Equal("지역식당", handoff.LastRequest.PurchasingOrganizationName);
+        Assert.True(handoff.LastRequest.TaxInvoiceRequired);
+    }
+
+    [Fact]
+    public async Task GroupPurchaseDemand_B2B는_구매조직정보가_필요하다()
+    {
+        var service = new InMemoryCommunityVoteService();
+        var createRequest = CreateGroupPurchaseVoteRequest();
+        createRequest.GroupPurchase!.AllowedTransactionTypeCodes = [공동구매거래유형코드.B2B];
+        var vote = await service.CreateAsync(createRequest, CancellationToken.None);
+        var request = CreatePickupVote("business-user", 3);
+        request.TransactionTypeCode = 공동구매거래유형코드.B2B;
+        request.PriceBasisCode = 공동구매가격표시기준코드.부가세별도;
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CastVoteAsync(vote.Id, request, CancellationToken.None));
+
+        Assert.Contains("구매 조직", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task GroupPurchaseDemand_HandoffFailure_IsSavedAndRetriedWithoutLosingVote()
     {
         var handoff = new FailOnceGroupPurchaseDemandHandoff();
@@ -586,6 +666,21 @@ public sealed class CommunityVoteServiceTests
             ParticipationMethodCode = CommunityVoteParticipationMethodCodes.PickupPoint,
             PickupPointId = "seongsu-hub"
         };
+    }
+
+    private static CommunityVoteCastRequest CreateBusinessPickupVote(
+        string voterKey,
+        string organizationReference,
+        string organizationName,
+        int quantity)
+    {
+        var request = CreatePickupVote(voterKey, quantity);
+        request.TransactionTypeCode = 공동구매거래유형코드.B2B;
+        request.PriceBasisCode = 공동구매가격표시기준코드.부가세별도;
+        request.PurchasingOrganizationReference = organizationReference;
+        request.PurchasingOrganizationName = organizationName;
+        request.TaxInvoiceRequired = true;
+        return request;
     }
 
     private sealed class CapturingGroupPurchaseDemandHandoff : ICommunityGroupPurchaseDemandHandoff

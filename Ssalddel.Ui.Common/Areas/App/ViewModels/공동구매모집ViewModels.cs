@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -287,6 +288,12 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
     public partial string 참여정책코드 { get; set; } = CommunityVoteParticipationPolicyCodes.Hybrid;
 
     [ObservableProperty]
+    public partial bool B2C구매허용 { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool B2B구매허용 { get; set; } = true;
+
+    [ObservableProperty]
     public partial string 수량단위 { get; set; } = "개";
 
     [ObservableProperty]
@@ -308,7 +315,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
     public partial string 온도코드 { get; set; } = "상온";
 
     [ObservableProperty]
-    public partial string 물류방식 { get; set; } = "LCL";
+    public partial string 물류방식 { get; set; } = 공동구매자동수요물류방식코드.후속검토;
 
     [ObservableProperty]
     public partial int 모집기간일수 { get; set; } = 7;
@@ -401,6 +408,11 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             return 유효성실패("수량 단위, 최소 참여자·수량과 모집 기간을 올바르게 입력해 주세요.");
         }
 
+        if (!B2C구매허용 && !B2B구매허용)
+        {
+            return 유효성실패("B2C 개인 소비 구매 또는 B2B 사업 목적 구매를 하나 이상 허용해 주세요.");
+        }
+
         if (가격의사결정.제안가격Krw < 0
             || 가격의사결정.제안가격Krw > 0
             && 가격의사결정.가격기준중량Kg <= 0)
@@ -462,6 +474,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             ProposerRoleCode = 제안주체코드,
             ParticipationPolicyCode = 참여정책코드,
             QuantityUnit = 수량단위.Trim(),
+            AllowedTransactionTypeCodes = 허용거래유형목록(),
             TargetUnitPriceKrwPerKg = 가격의사결정.제안단가KrwPerKg,
             ServiceAreaKey = scope,
             ServiceAreaLabel = scope,
@@ -502,6 +515,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             $"상품: {상품명.Trim()}",
             $"최소 참여: {최소참여자수}명",
             $"최소 수량: {최소총수량}{수량단위.Trim()}",
+            $"구매 목적: {string.Join(", ", 허용거래유형목록().Select(공동구매거래유형코드.표시명))}",
             가격의사결정.제안단가KrwPerKg is > 0
                 ? $"목표 단가: {가격의사결정.제안단가KrwPerKg.Value:N0}원/kg"
                 : "목표 단가: 아직 입력하지 않음",
@@ -518,6 +532,22 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             string.IsNullOrWhiteSpace(수령소명)
                 ? "공동 수령소: 지정하지 않음"
                 : $"공동 수령소: {수령소명.Trim()} · {수령소주소.Trim()}");
+
+    private IReadOnlyList<string> 허용거래유형목록()
+    {
+        var result = new List<string>(2);
+        if (B2C구매허용)
+        {
+            result.Add(공동구매거래유형코드.B2C);
+        }
+
+        if (B2B구매허용)
+        {
+            result.Add(공동구매거래유형코드.B2B);
+        }
+
+        return result;
+    }
 
     public void Dispose()
     {
@@ -560,6 +590,22 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매모�
     public partial int 요청수량 { get; set; } = 1;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(사업구매))]
+    public partial string 거래유형코드 { get; set; } = 공동구매거래유형코드.B2C;
+
+    [ObservableProperty]
+    public partial string 가격표시기준코드 { get; set; } = 공동구매가격표시기준코드.부가세포함;
+
+    [ObservableProperty]
+    public partial string 구매조직참조키 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 구매조직표시명 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool 세금계산서필요 { get; set; }
+
+    [ObservableProperty]
     public partial string 참여방식코드 { get; set; } = CommunityVoteParticipationMethodCodes.CommunityMember;
 
     [ObservableProperty]
@@ -567,6 +613,9 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매모�
 
     [ObservableProperty]
     public partial bool 인근수령소대체허용 { get; set; } = true;
+
+    public bool 사업구매
+        => 공동구매거래유형코드.정규화(거래유형코드) == 공동구매거래유형코드.B2B;
 
     public async Task<bool> 참여Async(CancellationToken cancellationToken = default)
     {
@@ -587,6 +636,21 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매모�
             return 유효성실패("공동 수령소를 선택해 주세요.");
         }
 
+        var transactionTypeCode = 공동구매거래유형코드.정규화(거래유형코드);
+        var allowedTransactionTypeCodes = 허용거래유형정규화(
+            campaign.GroupPurchase?.AllowedTransactionTypeCodes);
+        if (!allowedTransactionTypeCodes.Contains(transactionTypeCode, StringComparer.Ordinal))
+        {
+            return 유효성실패("이 공동구매에서 허용하는 구매 목적을 선택해 주세요.");
+        }
+
+        if (transactionTypeCode == 공동구매거래유형코드.B2B
+            && string.IsNullOrWhiteSpace(구매조직참조키)
+            && string.IsNullOrWhiteSpace(구매조직표시명))
+        {
+            return 유효성실패("B2B 구매에는 구매 조직명을 입력해 주세요.");
+        }
+
         return await 작업실행Async(
             async token =>
             {
@@ -598,6 +662,18 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매모�
                         VoterKey = 참여자키.Trim(),
                         OptionIds = [상품선택지Id],
                         RequestedQuantity = 요청수량,
+                        TransactionTypeCode = transactionTypeCode,
+                        PriceBasisCode = 공동구매가격표시기준코드.정규화(
+                            가격표시기준코드,
+                            transactionTypeCode),
+                        PurchasingOrganizationReference = transactionTypeCode == 공동구매거래유형코드.B2B
+                            ? 구매조직참조키.Trim()
+                            : null,
+                        PurchasingOrganizationName = transactionTypeCode == 공동구매거래유형코드.B2B
+                            ? 구매조직표시명.Trim()
+                            : null,
+                        TaxInvoiceRequired = transactionTypeCode == 공동구매거래유형코드.B2B
+                            && 세금계산서필요,
                         ParticipationMethodCode = 참여방식코드,
                         PickupPointId = 참여방식코드 == CommunityVoteParticipationMethodCodes.PickupPoint
                             ? 수령소Id
@@ -633,6 +709,32 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매모�
         _입력대상Id = campaign?.Id;
         상품선택지Id = campaign?.Options.FirstOrDefault()?.OptionId ?? string.Empty;
         수령소Id = campaign?.GroupPurchase?.PickupPoints.FirstOrDefault()?.PickupPointId;
+        var allowedTransactionTypeCodes = 허용거래유형정규화(
+            campaign?.GroupPurchase?.AllowedTransactionTypeCodes);
+        거래유형코드 = allowedTransactionTypeCodes.Contains(
+            공동구매거래유형코드.B2C,
+            StringComparer.Ordinal)
+                ? 공동구매거래유형코드.B2C
+                : allowedTransactionTypeCodes[0];
+        구매조직참조키 = string.Empty;
+        구매조직표시명 = string.Empty;
+        가격표시기준코드 = 사업구매
+            ? 공동구매가격표시기준코드.부가세별도
+            : 공동구매가격표시기준코드.부가세포함;
+        세금계산서필요 = 사업구매;
+    }
+
+    private static IReadOnlyList<string> 허용거래유형정규화(
+        IReadOnlyList<string>? transactionTypeCodes)
+    {
+        var normalized = (transactionTypeCodes ?? [])
+            .Where(공동구매거래유형코드.지원여부)
+            .Select(공동구매거래유형코드.정규화)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        return normalized.Length == 0
+            ? [공동구매거래유형코드.B2C]
+            : normalized;
     }
 }
 

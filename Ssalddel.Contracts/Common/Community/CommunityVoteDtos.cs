@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.ContractManagement;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.Privacy;
 using System.Text.Json.Serialization;
 
@@ -69,6 +70,19 @@ public sealed class CommunityVoteCastRequest
 
     public int RequestedQuantity { get; set; } = 1;
 
+    /// <summary>
+    /// 계정 종류가 아니라 이번 공동구매 수요의 구매 목적입니다.
+    /// </summary>
+    public string TransactionTypeCode { get; set; } = 공동구매거래유형코드.B2C;
+
+    public string PriceBasisCode { get; set; } = 공동구매가격표시기준코드.부가세포함;
+
+    public string? PurchasingOrganizationReference { get; set; }
+
+    public string? PurchasingOrganizationName { get; set; }
+
+    public bool TaxInvoiceRequired { get; set; }
+
     public string ParticipationMethodCode { get; set; } = string.Empty;
 
     public string? CommunityMembershipReference { get; set; }
@@ -123,6 +137,12 @@ public sealed class CommunityGroupPurchaseVoteSettingsRequest
     public string LogisticsMode { get; set; } = "LCL";
 
     public string QuantityUnit { get; set; } = "개";
+
+    /// <summary>
+    /// 이 모집에서 받을 수 있는 구매 목적입니다. 기존 모집은 B2C로 해석합니다.
+    /// </summary>
+    public IReadOnlyList<string> AllowedTransactionTypeCodes { get; set; }
+        = [공동구매거래유형코드.B2C];
 
     /// <summary>
     /// 시장가격 비교에 사용하는 표준화된 공동구매 목표단가입니다.
@@ -338,6 +358,8 @@ public sealed class CommunityGroupPurchaseVoteResponse
 
     public string QuantityUnit { get; set; } = string.Empty;
 
+    public IReadOnlyList<string> AllowedTransactionTypeCodes { get; set; } = [];
+
     public decimal? TargetUnitPriceKrwPerKg { get; set; }
 
     public string ServiceAreaKey { get; set; } = string.Empty;
@@ -361,6 +383,12 @@ public sealed class CommunityGroupPurchaseVoteResponse
     public int DemandHandoffFailedCount { get; set; }
 
     public bool IsMinimumReached { get; set; }
+
+    /// <summary>
+    /// B2B와 B2C가 계약 준비 수량으로 합쳐지지 않도록 분리한 공개 집계입니다.
+    /// 구매 조직의 이름이나 참조키는 포함하지 않습니다.
+    /// </summary>
+    public IReadOnlyList<CommunityGroupPurchaseTransactionSegmentResponse> TransactionSegments { get; set; } = [];
 
     public IReadOnlyList<CommunityVotePickupPointResponse> PickupPoints { get; set; } = [];
 }
@@ -398,6 +426,24 @@ public sealed class CommunityVotePickupPointResponse
     public bool IsMinimumReached { get; set; }
 
     public bool IsCapacityReached { get; set; }
+
+    public IReadOnlyList<CommunityGroupPurchaseTransactionSegmentResponse> TransactionSegments { get; set; } = [];
+}
+
+public sealed class CommunityGroupPurchaseTransactionSegmentResponse
+{
+    public string TransactionTypeCode { get; set; } = 공동구매거래유형코드.B2C;
+
+    public string PriceBasisCode { get; set; } = 공동구매가격표시기준코드.부가세포함;
+
+    /// <summary>
+    /// B2C는 고유 참여자 수, B2B는 고유 구매 조직 수입니다.
+    /// </summary>
+    public int BuyerCount { get; set; }
+
+    public int RequestedQuantity { get; set; }
+
+    public bool IsMinimumReached { get; set; }
 }
 
 public sealed class CommunityVoteResolutionDocumentResponse

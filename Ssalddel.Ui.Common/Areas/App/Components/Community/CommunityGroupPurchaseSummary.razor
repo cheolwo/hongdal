@@ -1,8 +1,25 @@
+@using Ssalddel.Contracts.Common.Orderer
+
 <section class="group-purchase-summary">
     <div>
         <MudText Typo="Typo.overline">@Campaign.CommunityScope</MudText>
         <MudText Typo="Typo.h5">@Campaign.Title</MudText>
         <MudText Typo="Typo.body2">@Campaign.Description</MudText>
+        @if (Campaign.GroupPurchase is { } groupPurchase)
+        {
+            <div class="group-purchase-transaction-tags" aria-label="허용 구매 목적과 집계">
+                @foreach (var transactionTypeCode in EffectiveAllowedTransactionTypes(groupPurchase))
+                {
+                    <span>@공동구매거래유형코드.표시명(transactionTypeCode)</span>
+                }
+                @foreach (var segment in groupPurchase.TransactionSegments)
+                {
+                    <span class="group-purchase-transaction-segment">
+                        @($"{segment.TransactionTypeCode} {segment.BuyerCount}주체 · {segment.RequestedQuantity}{groupPurchase.QuantityUnit}")
+                    </span>
+                }
+            </div>
+        }
     </div>
     <div class="group-purchase-summary-metrics">
         <div><strong>@Campaign.TotalVoteCount</strong><span>참여자</span></div>
@@ -18,4 +35,17 @@
 
     [Parameter]
     public int ObjectionCount { get; set; }
+
+    private static IReadOnlyList<string> EffectiveAllowedTransactionTypes(
+        CommunityGroupPurchaseVoteResponse groupPurchase)
+    {
+        var normalized = groupPurchase.AllowedTransactionTypeCodes
+            .Where(공동구매거래유형코드.지원여부)
+            .Select(공동구매거래유형코드.정규화)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        return normalized.Length == 0
+            ? [공동구매거래유형코드.B2C]
+            : normalized;
+    }
 }

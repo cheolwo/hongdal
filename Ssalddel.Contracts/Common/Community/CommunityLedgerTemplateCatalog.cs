@@ -61,34 +61,190 @@ public static class CommunityLedgerTemplateCatalog
             WorkflowTag = "주문 이행 통합",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
             TargetOperatingSystemName = "커뮤니티 신뢰 OS",
-            Summary = "사용자의 주문을 루트로 두고 판매, 창고 입출고, 배송과 운송 원장을 연결해 전체 이행 상태를 한 맥락에서 조회하는 원장입니다.",
+            Summary = "사용자의 개별주문을 루트로 두고 필요한 경우 개별수입·개별수출 확장, 판매, 창고 입출고, 배송과 운송 원장을 연결해 전체 이행 상태를 한 맥락에서 조회하는 원장입니다.",
             EngineHints = [CommunityLedgerEngineHints.CommunityActivitySignal],
-            UiSectionHints = ["주문자", "판매자", "주문 항목", "이행 방식", "포함 원장", "진행 요약"],
-            ActionHints = ["판매 원장 연결", "입고 원장 연결", "출고 원장 연결", "배송 원장 연결", "운송 원장 연결"],
+            UiSectionHints = ["주문자", "판매자", "주문 항목", "이행 방식", "개별수입 확장", "개별수출 확장", "포함 원장", "진행 요약"],
+            ActionHints = ["개별수입 확장 연결", "개별수출 확장 연결", "판매 원장 연결", "입고 원장 연결", "출고 원장 연결", "배송 원장 연결", "운송 원장 연결"],
             CompositionRules =
             [
                 Rule(
                     CommunityLedgerCompositionRuleCodes.OrderBeforeFulfillment,
                     "주문이 먼저 구성되어야 합니다.",
-                    "판매, 창고 입출고, 배송과 운송 원장은 주문자와 주문 항목이 확인된 주문 원장 아래에 연결합니다.",
+                    "개별수입·개별수출, 판매, 창고 입출고, 배송과 운송 원장은 주문자와 주문 항목이 확인된 개별주문 원장 아래에 연결합니다.",
                     requiredUiSectionHints: ["주문자", "주문 항목"],
-                    gatedActionHints: ["판매 원장 연결", "입고 원장 연결", "출고 원장 연결", "배송 원장 연결", "운송 원장 연결"])
+                    gatedActionHints: ["개별수입 확장 연결", "개별수출 확장 연결", "판매 원장 연결", "입고 원장 연결", "출고 원장 연결", "배송 원장 연결", "운송 원장 연결"])
             ],
             ProcessingSurfaces =
             [
                 ApiEndpoint("GET", "주문원장Controller", "통합조회", "주문 원장과 연결된 하위 원장의 최신 상태를 함께 조회합니다.", "I주문원장통합UseCase.조회Async"),
-                ApiEndpoint("POST", "주문원장Controller", "하위원장연결", "기존 판매, 입출고, 배송 또는 운송 원장을 주문 원장에 연결합니다.", "I주문원장통합UseCase.하위원장연결Async")
+                ApiEndpoint("POST", "주문원장Controller", "하위원장연결", "기존 개별수입·개별수출 확장, 판매, 입출고, 배송 또는 운송 원장을 개별주문 원장에 연결합니다.", "I주문원장통합UseCase.하위원장연결Async")
             ],
             PersistencePolicy = MongoPolicy(),
             BestLedgerPatternTitle = "주문을 중심으로 이행 원장을 모은 통합 원장",
-            BestLedgerPatternSummary = "주문 원장에는 연결 관계만 두고 판매, 입출고, 배송과 운송의 상세 상태는 각 원장에서 독립적으로 관리합니다.",
-            CommunityDiscussionPrompts = ["이 주문에는 어떤 판매 원장이 필요한가요?", "창고 입출고와 배송은 몇 건으로 나뉘나요?", "어떤 원장이 완료되어야 전체 주문을 완료로 볼 수 있나요?"],
+            BestLedgerPatternSummary = "개별주문 원장에는 상품·수량·가격·서명 원본과 연결 관계를 두고 개별수입·개별수출, 판매, 입출고, 배송과 운송의 상세 상태는 하위 원장에서 관리합니다.",
+            CommunityDiscussionPrompts = ["이 주문은 국내 이행인가요, 개별수입 또는 개별수출 확장이 필요한가요?", "창고 입출고와 배송은 몇 건으로 나뉘나요?", "어떤 원장이 완료되어야 전체 주문을 완료로 볼 수 있나요?"],
             Roles =
             [
                 Role("주문자", "원하는 상품과 수령 조건을 남깁니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ConfirmCompletion),
                 Role("판매자", "판매 가능 여부와 준비 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState),
                 Role("이행 담당자", "입출고, 배송 또는 운송 원장을 처리합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
                 Role("확인자", "하위 원장과 전체 주문의 완료 여부를 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion, CommunityLedgerPermissionCodes.CloseLedger)
+            ]
+        },
+        new()
+        {
+            Key = CommunityLedgerTemplateKeys.IndividualImport,
+            DisplayName = "개별수입 확장 원장",
+            Category = "주문 확장 원장",
+            WorkflowTag = "개별주문 수입 이행 확장",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            TargetOperatingSystemName = "1.5 수입 준비 OS",
+            Summary = "독립 주문이 아니라 원천 개별 주문 원장의 상품·수량·가격·서명 동의를 참조하고 해외 판매자, 선적, 통관, 국내 반출과 최종 수령 정보만 덧붙이는 하위 원장입니다.",
+            IsExtensionTemplate = true,
+            EngineHints = [CommunityLedgerEngineHints.ImportCustoms],
+            UiSectionHints = ["원천 개별 주문 원장", "수입 주체", "해외 판매자", "해외 선적", "통관 상태", "국내 반출", "최종 수령"],
+            ActionHints = ["개별주문 원장 연결", "수입 주체 확인", "해외 판매자 확인", "선적 문서 등록", "통관 상태 기록", "국내 반출 인계", "최종 수령 확인"],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.IndividualOrderBeforeIndividualImport,
+                    "원천 개별주문 원장이 먼저 있어야 합니다.",
+                    "개별수입 확장 원장은 새 주문을 만들지 않고 한 개별주문 원장의 상품, 수량, 가격과 서명 동의를 원본으로 참조합니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.Order],
+                    requiredUiSectionHints: ["원천 개별 주문 원장", "수입 주체"],
+                    gatedActionHints: ["해외 판매자 확인", "선적 문서 등록", "통관 상태 기록", "국내 반출 인계", "최종 수령 확인"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.IndividualImportCustomsBeforeDomesticRelease,
+                    "통관 확인 뒤에 국내 반출과 최종 수령을 엽니다.",
+                    "통관 상태와 반출 가능 근거가 확인되기 전에는 국내 반출이나 최종 수령을 완료로 표시하지 않습니다.",
+                    requiredUiSectionHints: ["통관 상태", "국내 반출"],
+                    gatedActionHints: ["국내 반출 인계", "최종 수령 확인"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("GET", "주문원장Controller", "통합조회", "원천 개별주문과 연결된 개별수입 확장의 최신 상태를 함께 조회합니다.", "I주문원장통합UseCase.조회Async"),
+                ApiEndpoint("POST", "주문원장Controller", "하위원장연결", "개별수입 확장 원장을 개별주문 원장에 개별수입 역할로 연결합니다.", "I주문원장통합UseCase.하위원장연결Async"),
+                ApiEndpoint("POST", "개별수입원장Controller", "생성", "개별주문을 원천으로 삼는 개별수입 확장 원장을 멱등하게 만들고 연결합니다.", "I무역확장원장UseCase.개별수입생성Async")
+            ],
+            PersistencePolicy = MongoPolicy(),
+            BestLedgerPatternTitle = "개별주문에 붙는 수입 이행 확장 원장",
+            BestLedgerPatternSummary = "상품·수량·가격·계약·서명 원본은 개별주문 원장에 한 번만 두고, 개별수입 확장에는 수입 주체, 해외 판매자, 선적·통관·반출 상태와 근거만 둡니다.",
+            CommunityDiscussionPrompts = ["어느 개별주문 원장을 원천으로 연결할까요?", "실제 수입 책임 주체와 해외 판매자는 누구인가요?", "통관 뒤 국내 반출과 최종 수령은 누가 확인하나요?"],
+            Roles =
+            [
+                Role("주문자", "원천 개별주문의 수입 이행 전환과 최종 수령을 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("수입 주체 확인자", "실제 수입 책임 주체와 위임 근거를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("선적/통관 확인자", "해외 선적과 통관 상태 및 근거를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("수령 확인자", "국내 반출 뒤 최종 수령을 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion, CommunityLedgerPermissionCodes.CloseLedger)
+            ]
+        },
+        new()
+        {
+            Key = CommunityLedgerTemplateKeys.IndividualExport,
+            DisplayName = "개별수출 확장 원장",
+            Category = "주문 확장 원장",
+            WorkflowTag = "개별주문 수출 이행 확장",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            TargetOperatingSystemName = "커뮤니티 신뢰 OS",
+            Summary = "독립 주문이 아니라 원천 개별주문의 상품·수량·가격·계약·서명을 참조하고 수출자, 해외 구매자, 거래 조건, 요건 검토, 신고·수리·적재와 대금 증빙을 덧붙이는 하위 원장입니다. 수출 교류장에서 시작한 경우에는 원천 대화와 선택적 환류 동의도 참조할 수 있습니다.",
+            IsExtensionTemplate = true,
+            EngineHints = [CommunityLedgerEngineHints.ExportCompliance],
+            UiSectionHints =
+            [
+                "원천 수출 교류장(선택)",
+                "원천 개별 주문 원장",
+                "거래 문맥(B2B/B2C)",
+                "수출자·신고인",
+                "해외 구매자·수하인",
+                "수출 품목·HS 후보",
+                "원산지·FTA 근거",
+                "Incoterms·지정장소",
+                "전략물자·요건 확인",
+                "상업송장·포장명세",
+                "신고 방식·적용 근거",
+                "수출 신고 상태",
+                "신고 수리 상태",
+                "적재 예정·기한",
+                "포워더 인계",
+                "선적·적재 실적",
+                "수출 대금 정산",
+                "영세율 증빙",
+                "반품·재수입",
+                "완료 후 교류 환류 동의"
+            ],
+            ActionHints =
+            [
+                "원천 수출 교류장 참조",
+                "개별주문 원장 연결",
+                "B2B/B2C 문맥 확인",
+                "수출자·구매자 확인",
+                "품목·HS·원산지 근거 등록",
+                "Incoterms·지정장소 확인",
+                "전략물자·수출요건 검토 요청",
+                "상업송장·포장명세 등록",
+                "수출 신고 방식 검토",
+                "수출 신고 기록",
+                "신고 수리 근거 확인",
+                "적재기한 확인",
+                "포워더 인계",
+                "선적·적재 실적 등록",
+                "대금·영세율 근거 등록",
+                "반품·재수입 상태 기록",
+                "완료 경험 공유 동의",
+                "완료 경험 공유 철회",
+                "비식별 경험·편익 공유"
+            ],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.IndividualOrderBeforeIndividualExport,
+                    "원천 개별주문 원장이 먼저 있어야 합니다.",
+                    "개별수출 확장 원장은 새 주문을 만들지 않고 한 개별주문의 상품, 수량, 가격, 계약과 서명 동의를 원본으로 참조합니다. 수출 교류장과 비구속 관심은 이 주문 원본을 대신하지 않습니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.Order],
+                    requiredUiSectionHints: ["원천 개별 주문 원장", "거래 문맥(B2B/B2C)"],
+                    gatedActionHints: ["수출자·구매자 확인", "품목·HS·원산지 근거 등록", "Incoterms·지정장소 확인"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.ExportPartiesAndGoodsBeforeComplianceReview,
+                    "거래 당사자와 물품·인도 조건을 먼저 특정합니다.",
+                    "수출자·신고인, 해외 구매자·수하인, 품목·HS 후보와 Incoterms 규칙·버전·지정장소가 확인되어야 수출 규제 검토를 요청할 수 있습니다.",
+                    requiredUiSectionHints: ["수출자·신고인", "해외 구매자·수하인", "수출 품목·HS 후보", "Incoterms·지정장소"],
+                    gatedActionHints: ["전략물자·수출요건 검토 요청", "품목·HS·원산지 근거 등록", "상업송장·포장명세 등록"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.ExportComplianceBeforeDeclaration,
+                    "요건과 서류 근거 뒤에 신고를 준비합니다.",
+                    "엔진은 후보와 누락만 제안하고 전략물자 판정, 목적국 요건, 원산지 증명 적용 여부와 신고 방식은 자격 있는 사람의 확인 근거를 기록한 뒤 진행합니다.",
+                    requiredUiSectionHints: ["전략물자·요건 확인", "원산지·FTA 근거", "상업송장·포장명세", "신고 방식·적용 근거"],
+                    gatedActionHints: ["수출 신고 방식 검토", "수출 신고 기록"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.ExportDeclarationAcceptedBeforeLoading,
+                    "신고 수리와 적재기한을 확인한 뒤 선적 실적을 닫습니다.",
+                    "수출신고 수리번호·수리일과 적용되는 적재기한을 개별수출별로 보존하고, 실제 포워더 인계와 선적·적재 실적은 외부 회신 근거가 있을 때만 기록합니다.",
+                    requiredUiSectionHints: ["수출 신고 상태", "신고 수리 상태", "적재 예정·기한"],
+                    gatedActionHints: ["포워더 인계", "선적·적재 실적 등록"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.CompletedIndividualExportBeforeExchangeFeedback,
+                    "완료된 개별수출만 별도 동의 뒤 교류장에 환류합니다.",
+                    "선적·적재 실적이 확인된 뒤에도 각 참여자가 공개 범위와 비식별 처리에 동의한 경우에만 경험과 편익을 원천 수출 교류장에 공유합니다. 동의 철회, 연락처, 주문 상세와 신고 원본은 공개 환류에서 분리합니다.",
+                    requiredUiSectionHints: ["선적·적재 실적", "완료 후 교류 환류 동의"],
+                    gatedActionHints: ["비식별 경험·편익 공유"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("GET", "주문원장Controller", "통합조회", "원천 개별주문과 연결된 개별수출 확장의 최신 상태를 함께 조회합니다.", "I주문원장통합UseCase.조회Async"),
+                ApiEndpoint("POST", "주문원장Controller", "하위원장연결", "개별수출 확장 원장을 개별주문 원장에 개별수출 역할로 연결합니다.", "I주문원장통합UseCase.하위원장연결Async"),
+                ApiEndpoint("POST", "개별수출원장Controller", "생성", "개별주문을 원천으로 삼는 개별수출 확장 원장을 멱등하게 만들고 연결합니다.", "I무역확장원장UseCase.개별수출생성Async")
+            ],
+            PersistencePolicy = MongoPolicy(),
+            BestLedgerPatternTitle = "개별주문에 붙는 수출 이행 확장 원장",
+            BestLedgerPatternSummary = "상품·수량·가격·계약·서명은 개별주문에 한 번만 두고, 개별수출에는 수출자·구매자, Incoterms, 요건·서류 근거, 신고·수리·적재와 대금 증빙을 분리해 기록합니다. 교류 맥락과 완료 경험의 환류는 각각 선택 동의로 연결합니다.",
+            CommunityDiscussionPrompts = ["이 수출은 어떤 문화·사용 경험이나 상호 이익을 나눈 교류에서 시작했나요?", "어느 개별주문을 수출 원천으로 연결할까요?", "수출자와 수출신고인은 누구이며 해외 구매자·수하인은 누구인가요?", "어떤 요건과 문서가 사람의 전문 검토를 기다리고 있나요?", "완료 뒤 어떤 경험을 개인정보 없이 다시 나누는 데 동의하나요?"],
+            Roles =
+            [
+                Role("주문 당사자", "원천 개별주문의 거래 조건과 수출 이행 전환을 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("수출자·신고 확인자", "수출자, 신고인, 신고 방식·수리와 적재기한 근거를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("무역 요건 검토자", "HS 후보, 원산지, 전략물자와 목적국 요건을 전문 검토 결과와 구분해 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("포워더 인계 담당자", "사람이 정한 포워더에게 최소 정보를 전달하고 회신·선적 실적을 기록합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("정산·증빙 확인자", "수출 대금과 영세율 증빙 준비 상태를 세무 판단과 구분해 확인합니다.", CommunityLedgerPermissionCodes.MarkPayment, CommunityLedgerPermissionCodes.CloseLedger)
             ]
         },
         new()
@@ -546,6 +702,81 @@ public static class CommunityLedgerTemplateCatalog
         },
         new()
         {
+            Key = CommunityLedgerTemplateKeys.GroupExport,
+            DisplayName = "공동수출 원장",
+            Category = "통합 원장",
+            WorkflowTag = "개별수출 물류 집계·공동 선적",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            TargetOperatingSystemName = "커뮤니티 신뢰 OS",
+            Summary = "하나 이상의 개별수출 원장을 연결해 집하, 합포장, 운송 방식, 포워더 인계와 공동 선적을 조율하되 수출자·주문·신고·서류·적재 실적은 개별수출별로 보존하는 집계 원장입니다.",
+            EngineHints = [CommunityLedgerEngineHints.Grouping, CommunityLedgerEngineHints.ExportCompliance],
+            UiSectionHints =
+            [
+                "개별수출 원장 집합",
+                "거래 문맥 집계(B2B/B2C)",
+                "수출자별 신고 보존",
+                "집하 마감",
+                "합포장 계획",
+                "운송 방식(FCL/LCL/항공)",
+                "포워더 인계",
+                "통합 포장목록",
+                "선적·적재 실적",
+                "공통 비용 배부",
+                "예외·분할 선적"
+            ],
+            ActionHints =
+            [
+                "개별수출 원장 연결",
+                "B2B/B2C 문맥별 집계",
+                "수출자별 신고·서류 확인",
+                "집하 마감 확정",
+                "합포장 계획 작성",
+                "운송 방식 검토",
+                "포워더 인계",
+                "통합 포장목록 등록",
+                "공동 선적 확정",
+                "선적·적재 실적 등록",
+                "공통 비용 배부",
+                "예외·분할 선적 기록"
+            ],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.GroupExportRequiresIndividualExports,
+                    "공동수출은 개별수출 원장의 집합이어야 합니다.",
+                    "각 주문은 먼저 개별수출 확장 원장에서 수출자, 구매자, 품목, 신고·수리와 증빙을 보존합니다. 공동수출 원장은 그 원장들을 물류 집계 대상으로만 연결합니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.IndividualExport],
+                    requiredUiSectionHints: ["개별수출 원장 집합", "거래 문맥 집계(B2B/B2C)", "집하 마감"],
+                    gatedActionHints: ["합포장 계획 작성", "운송 방식 검토", "포워더 인계"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.GroupExportPreservesIndividualDeclarations,
+                    "합포장해도 수출자별 신고와 적재 근거를 합쳐 덮어쓰지 않습니다.",
+                    "통합 포장목록에는 개별수출 원장 ID와 포장 단위를 매핑하고, 수출자·구매자·신고번호·상업송장·신고 수리·적재 실적과 B2B/B2C 문맥은 각 개별수출에 남깁니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.IndividualExport],
+                    requiredUiSectionHints: ["수출자별 신고 보존", "통합 포장목록"],
+                    gatedActionHints: ["공동 선적 확정", "선적·적재 실적 등록", "공통 비용 배부"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("GET", "주문원장Controller", "통합조회", "공동수출 원장과 연결된 개별수출 원장들의 최신 신고·적재 상태를 함께 조회합니다.", "I주문원장통합UseCase.조회Async"),
+                ApiEndpoint("POST", "주문원장Controller", "하위원장연결", "기존 개별수출 원장을 공동수출 원장에 물류 집계 대상으로 연결합니다.", "I주문원장통합UseCase.하위원장연결Async"),
+                ApiEndpoint("POST", "공동수출원장Controller", "생성", "하나 이상의 개별수출 원장을 참조하는 공동수출 원장을 멱등하게 만들고 집하·포워더 인계 계획을 구성합니다.", "I무역확장원장UseCase.공동수출생성Async")
+            ],
+            PersistencePolicy = MongoPolicy(),
+            BestLedgerPatternTitle = "개별 신고를 보존하는 공동수출 물류 집계 원장",
+            BestLedgerPatternSummary = "여러 품목과 여러 수출자를 한 선적에 집하할 수 있지만, 공동 원장에는 집하·합포장·운송·공통비만 두고 거래와 신고의 원본은 개별수출 원장에 유지합니다.",
+            CommunityDiscussionPrompts = ["어떤 개별수출 원장을 같은 집하·선적에 묶을까요?", "온도·위험물·목적지·마감 조건상 함께 포장할 수 없는 항목은 무엇인가요?", "포워더에게 전달할 최소 집계 정보와 개별 신고 참조는 무엇인가요?", "공통 비용을 어떤 근거로 개별수출에 배부할까요?"],
+            Roles =
+            [
+                Role("수출 참여자", "자신이 관계된 개별수출 원장과 공동 집하 조건을 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("집하 조정자", "집하 마감, 합포장 가능성, 분할 선적과 포장 매핑을 관리합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("신고 보존 확인자", "공동 선적에서도 개별 수출자·신고·서류·적재 실적이 유지되는지 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("포워더 인계 담당자", "사람이 정한 포워더에게 최소 범위의 집계·참조 정보를 전달하고 회신을 기록합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("공통비 확인자", "포장·운송 공통비와 배부 근거를 개별 거래 정산과 구분해 확인합니다.", CommunityLedgerPermissionCodes.MarkPayment, CommunityLedgerPermissionCodes.CloseLedger)
+            ]
+        },
+        new()
+        {
             Key = CommunityLedgerTemplateKeys.MeatImportReadiness,
             DisplayName = "육류 수입 준비도 원장",
             Category = "정보 협업 원장",
@@ -640,13 +871,13 @@ public static class CommunityLedgerTemplateCatalog
         Module(
             2,
             CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
-            "원함-원장 판단 원장",
-            CommunityLedgerTemplateKeys.Errand,
+            "개별 원함·원장 판단 원장",
+            CommunityLedgerTemplateKeys.IndividualDemand,
             CommunityLedgerOperatingSystemCodes.CommunityTrust,
             "커뮤니티 신뢰 OS",
-            "사용자의 원함을 어떤 업무 원장으로 만들 수 있는지 판단하고 필요한 블록을 제안하는 원장입니다.",
+            "사용자 한 사람의 원함을 먼저 보존하고 어떤 업무 원장이나 공동집단으로 이어질 수 있는지 판단하는 원장입니다.",
             ["원함 확인", "원장화 판정", "추가 정보 요청"],
-            ["원함", "지원 범위", "사용자 확인 책임", "후속 원장 후보"]),
+            ["원함 주체", "원하는 상품", "희망 수량", "수령 권역", "비구속 상태", "후속 원장 후보"]),
         Module(
             3,
             CommunityLedgerImplementationModuleCodes.OrderRoot,
@@ -654,8 +885,8 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerTemplateKeys.Order,
             CommunityLedgerOperatingSystemCodes.CommunityTrust,
             "커뮤니티 신뢰 OS",
-            "주문을 루트로 두고 판매, 창고 입출고, 배송과 운송 원장의 최신 상태를 한 맥락으로 묶습니다.",
-            ["주문 원장", "판매 원장", "입출고 원장", "배송 원장", "운송 원장"],
+            "주문을 루트로 두고 개별수입·개별수출, 판매, 창고 입출고, 배송과 운송 원장의 최신 상태를 한 맥락으로 묶습니다.",
+            ["주문 원장", "개별수입 원장", "개별수출 원장", "판매 원장", "입출고 원장", "배송 원장", "운송 원장"],
             ["주문 항목", "포함 원장", "진행 요약"]),
         Module(
             4,
@@ -816,7 +1047,47 @@ public static class CommunityLedgerTemplateCatalog
             "커뮤니티 신뢰 OS",
             "확정된 개별 주문들을 연결하고 주문 수, 수량과 예약결제 금액을 개별 주문의 합으로 계산하는 원장입니다.",
             ["공동구매 주문집계", "개별 주문 원장", "공동 물류"],
-            ["확정 주문 수", "주문 수량 합계", "예약결제 합계", "수령 창고 분포"])
+            ["확정 주문 수", "주문 수량 합계", "예약결제 합계", "수령 창고 분포"]),
+        Module(
+            20,
+            CommunityLedgerImplementationModuleCodes.IndividualImportExtension,
+            "개별수입 확장 원장",
+            CommunityLedgerTemplateKeys.IndividualImport,
+            CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            "1.5 수입 준비 OS",
+            "개별주문의 상품·수량·가격·서명 원본을 유지하면서 해외 판매자, 선적, 통관, 국내 반출과 최종 수령 상태만 확장합니다.",
+            ["원천 개별 주문 원장", "해외 선적", "통관 상태", "국내 반출", "최종 수령"],
+            ["원천 개별 주문 원장", "수입 주체", "해외 판매자", "통관 상태", "국내 반출"]),
+        Module(
+            21,
+            CommunityLedgerImplementationModuleCodes.IndividualExportExtension,
+            "개별수출 확장 원장",
+            CommunityLedgerTemplateKeys.IndividualExport,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "개별주문의 상품·수량·가격·계약·서명 원본을 유지하면서 수출자, 구매자, 거래조건, 요건·서류, 신고·수리·적재와 대금 증빙을 확장합니다.",
+            ["원천 개별 주문 원장", "수출자·구매자", "수출 신고", "신고 수리", "선적·적재 실적"],
+            ["원천 개별 주문 원장", "거래 문맥(B2B/B2C)", "수출자·신고인", "수출 품목·HS 후보", "신고 수리 상태"]),
+        Module(
+            22,
+            CommunityLedgerImplementationModuleCodes.GroupExportAggregation,
+            "공동수출 집계 원장",
+            CommunityLedgerTemplateKeys.GroupExport,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "하나 이상의 개별수출을 집하·합포장·포워더 인계 단위로 조율하되 개별 수출자와 신고·서류·적재 실적을 보존합니다.",
+            ["개별수출 원장 집합", "공동 집하", "합포장", "공동 선적", "공통비 배부"],
+            ["개별수출 원장 집합", "수출자별 신고 보존", "합포장 계획", "포워더 인계", "통합 포장목록"]),
+        Module(
+            23,
+            CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity,
+            "수출 교류장",
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "문화·사용 경험, 서로의 원함과 상호 이익·기여, 비용·노동·위험을 나누는 비구속 커뮤니티입니다. 사람의 마음이나 관심을 점수화하거나 주문·거래 확정 근거로 사용하지 않습니다.",
+            ["수출 교류 게시글", "비구속 관심", "선택적 가원장", "완료 경험 환류"],
+            ["교류 주제·이야기", "서로의 원함", "상호 이익·기여", "비구속 관심", "주문 제안 동의", "완료 후 공유 동의"])
     ];
 
     private static readonly IReadOnlyList<CommunityLedgerRelationResponse> PriorityLedgerRelations =
@@ -872,19 +1143,79 @@ public static class CommunityLedgerTemplateCatalog
             "거점 간 이동이나 화물 운송이 필요할 때",
             "주문 원장은 창고 간 이동과 최종 운송을 각각의 운송 원장으로 포함할 수 있습니다."),
         LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.OrderRoot,
+            CommunityLedgerImplementationModuleCodes.IndividualImportExtension,
+            CommunityLedgerTemplateKeys.Order,
+            CommunityLedgerTemplateKeys.IndividualImport,
+            CommunityLedgerRelationTypes.Contains,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "개별주문 상품을 해외 판매자에게서 조달하고 선적·통관·국내 반출을 별도로 추적할 때",
+            "개별수입 원장은 새 주문이 아니라 원천 개별주문의 수입 이행 확장으로 포함하며 상품·수량·가격·서명 원본은 개별주문 원장에 둡니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.OrderRoot,
+            CommunityLedgerImplementationModuleCodes.IndividualExportExtension,
+            CommunityLedgerTemplateKeys.Order,
+            CommunityLedgerTemplateKeys.IndividualExport,
+            CommunityLedgerRelationTypes.Contains,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "개별주문을 해외 구매자에게 이행하고 수출 요건·신고·적재를 별도로 추적할 때",
+            "개별수출 원장은 원천 개별주문의 수출 이행 확장으로 포함하며 상품·수량·가격·계약·서명 원본은 개별주문 원장에 둡니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupExportAggregation,
+            CommunityLedgerImplementationModuleCodes.IndividualExportExtension,
+            CommunityLedgerTemplateKeys.GroupExport,
+            CommunityLedgerTemplateKeys.IndividualExport,
+            CommunityLedgerRelationTypes.Contains,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: true,
+            "하나 이상의 개별수출을 같은 집하·합포장·포워더 인계 단위로 조율할 때",
+            "공동수출 원장은 여러 개별수출 원장을 물류 집계 대상으로 포함하되 수출자별 주문·신고·서류·적재 실적은 각 개별수출에 보존합니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.CommunityConversation,
+            CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerRelationTypes.Reference,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "작성자나 참여자가 수출과 관련된 문화·사용 경험, 서로의 원함과 상호 이익을 나눌 교류를 명시적으로 이어갈 때",
+            "수출 교류장은 기존 커뮤니티 대화를 참조해 확장하며, 게시글 열람이나 관심 표현만으로 주문·계약·수출 원장을 자동 생성하지 않습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity,
+            CommunityLedgerImplementationModuleCodes.OrderRoot,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.Order,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "거래 당사자가 비구속 관심과 별도로 상품·수량·가격·책임 조건 및 주문 제안을 각각 명시적으로 수락할 때",
+            "수출 교류장은 개별주문 제안으로만 인계할 수 있습니다. 연락처 공개와 주문 동의는 분리하며, OS가 교류의 분위기나 마음을 점수화해 주문을 만들지 않습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.IndividualExportExtension,
+            CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity,
+            CommunityLedgerTemplateKeys.IndividualExport,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerRelationTypes.Reference,
+            CommunityLedgerRelationCardinality.ManyToOne,
+            required: false,
+            "개별수출의 선적·적재 실적이 확인되고 참여자가 완료 경험의 공개 범위와 비식별 환류에 별도로 동의할 때",
+            "완료된 개별수출은 선택적으로 원천 교류장을 참조해 경험과 편익을 환류할 수 있습니다. 연락처, 주문 상세, 신고·서류 원본과 동의하지 않은 내용은 공개하지 않습니다."),
+        LedgerRelation(
             CommunityLedgerImplementationModuleCodes.CommunityConversation,
             CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
             CommunityLedgerTemplateKeys.Errand,
-            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.IndividualDemand,
             CommunityLedgerRelationTypes.Handoff,
             CommunityLedgerRelationCardinality.OneToMany,
             required: true,
             "커뮤니티 대화가 실제 업무 의도로 읽힐 때",
-            "대화 원장은 여러 원함-원장 판단 원장을 만들 수 있습니다."),
+            "대화 원장은 참여자 각자의 동의에 따라 여러 개별 원함·원장 판단 원장을 만들 수 있습니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
             CommunityLedgerImplementationModuleCodes.CargoTransport,
-            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.IndividualDemand,
             CommunityLedgerTemplateKeys.CargoTransport,
             CommunityLedgerRelationTypes.Handoff,
             CommunityLedgerRelationCardinality.OneToMany,
@@ -894,13 +1225,13 @@ public static class CommunityLedgerTemplateCatalog
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
-            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.IndividualDemand,
             CommunityLedgerTemplateKeys.GroupPurchase,
             CommunityLedgerRelationTypes.Handoff,
-            CommunityLedgerRelationCardinality.OneToMany,
+            CommunityLedgerRelationCardinality.ManyToOne,
             required: false,
-            "커뮤니티 대화에서 여러 사람의 유사 주문 의사가 확인될 때",
-            "유사한 수요를 모집하고 가격·거래경로·공급 조건을 합의할 공동구매 원장으로 연결합니다."),
+            "여러 개별 원함 원장의 상품·수령 권역·거래 문맥이 맞을 때",
+            "여러 사람의 개별 원함을 원본으로 유지한 채 공통 조건만 자동집단에 투영하고, 가격·거래경로·공급 조건은 이후에 별도로 합의합니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
             CommunityLedgerImplementationModuleCodes.GroupOrderAggregation,
@@ -1107,12 +1438,12 @@ public static class CommunityLedgerTemplateCatalog
 
         if (string.IsNullOrWhiteSpace(key))
         {
-            template = Templates[0];
+            template = Templates.First(x => x.Key == CommunityLedgerTemplateKeys.Order);
         }
         else
         {
             template = Templates.FirstOrDefault(x => string.Equals(x.Key, key.Trim(), StringComparison.OrdinalIgnoreCase))
-                       ?? Templates[0];
+                       ?? Templates.First(x => x.Key == CommunityLedgerTemplateKeys.Order);
         }
 
         return EnsureLedgerBlocks(template);
@@ -1495,12 +1826,41 @@ public static class CommunityLedgerTemplateCatalog
             "구매 확정" => "purchase-decision",
             "수령 거점" => "pickup-point",
             "원천 공동구매 원장" => "source-group-purchase",
+            "원천 개별 주문 원장" => "source-individual-order",
+            "원천 수출 교류장(선택)" => "source-export-exchange",
             "수입 결정" => "import-decision",
             "해외 선적" => "overseas-shipment",
             "통관 상태" => "customs-state",
             "국내 반출" => "domestic-release",
             "3PL 입고" => "third-party-logistics-inbound",
             "세대 분배" => "household-distribution",
+            "거래 문맥(B2B/B2C)" => "trade-context",
+            "수출자·신고인" => "exporter-declarant",
+            "해외 구매자·수하인" => "overseas-buyer-consignee",
+            "수출 품목·HS 후보" => "export-items-hs",
+            "원산지·FTA 근거" => "origin-fta-evidence",
+            "Incoterms·지정장소" => "incoterms-named-place",
+            "전략물자·요건 확인" => "strategic-goods-requirements",
+            "상업송장·포장명세" => "commercial-invoice-packing-list",
+            "신고 방식·적용 근거" => "declaration-method-basis",
+            "수출 신고 상태" => "export-declaration-state",
+            "신고 수리 상태" => "declaration-acceptance-state",
+            "적재 예정·기한" => "loading-deadline",
+            "포워더 인계" => "forwarder-handoff",
+            "선적·적재 실적" => "shipment-loading-performance",
+            "수출 대금 정산" => "export-payment-settlement",
+            "영세율 증빙" => "zero-rate-evidence",
+            "반품·재수입" => "return-reimport",
+            "완료 후 교류 환류 동의" => "exchange-feedback-consent",
+            "개별수출 원장 집합" => "individual-export-ledgers",
+            "거래 문맥 집계(B2B/B2C)" => "trade-context-aggregation",
+            "수출자별 신고 보존" => "exporter-declaration-preservation",
+            "집하 마감" => "consolidation-cutoff",
+            "합포장 계획" => "consolidated-packing-plan",
+            "운송 방식(FCL/LCL/항공)" => "transport-mode",
+            "통합 포장목록" => "consolidation-manifest",
+            "공통 비용 배부" => "shared-cost-allocation",
+            "예외·분할 선적" => "split-shipment-exceptions",
             "정산 표시" => "settlement",
             "결제 표시" => "settlement",
             "증빙" => "evidence",
@@ -1533,6 +1893,45 @@ public static class CommunityLedgerTemplateCatalog
 
     private static string InferBlockType(string uiSectionHint)
     {
+        if (uiSectionHint == "완료 후 교류 환류 동의")
+        {
+            return CommunityLedgerBlockTypes.Decision;
+        }
+
+        if (uiSectionHint is "수출자·신고인" or "해외 구매자·수하인")
+        {
+            return CommunityLedgerBlockTypes.Participant;
+        }
+
+        if (uiSectionHint == "개별수출 원장 집합")
+        {
+            return CommunityLedgerBlockTypes.Order;
+        }
+
+        if (uiSectionHint == "수출 품목·HS 후보")
+        {
+            return CommunityLedgerBlockTypes.Item;
+        }
+
+        if (uiSectionHint == "Incoterms·지정장소")
+        {
+            return CommunityLedgerBlockTypes.Place;
+        }
+
+        if (uiSectionHint is "원산지·FTA 근거"
+            or "상업송장·포장명세"
+            or "신고 방식·적용 근거"
+            or "수출자별 신고 보존"
+            or "영세율 증빙")
+        {
+            return CommunityLedgerBlockTypes.Evidence;
+        }
+
+        if (uiSectionHint == "반품·재수입")
+        {
+            return CommunityLedgerBlockTypes.State;
+        }
+
         if (uiSectionHint.Contains("참여자", StringComparison.Ordinal))
         {
             return CommunityLedgerBlockTypes.Participant;
@@ -1648,20 +2047,52 @@ public static class CommunityLedgerTemplateCatalog
         };
 
     private static IReadOnlyList<string> BuildBlockDataHints(string blockType, string uiSectionHint)
-        => blockType switch
+        => uiSectionHint switch
         {
-            CommunityLedgerBlockTypes.Place => ["주소", "위도/경도", "접근 조건", "담당자 연락 힌트"],
-            CommunityLedgerBlockTypes.Item => ["품명", "수량", "부피/무게", "주의 조건"],
-            CommunityLedgerBlockTypes.Order => ["주문번호", "주문 품목", "수령 조건", "대체 허용 여부"],
-            CommunityLedgerBlockTypes.Inventory => ["재고 근거", "창고", "피킹 단위", "예약 수량"],
-            CommunityLedgerBlockTypes.Quantity => ["목표 수량", "참여 수량", "최소 진행 수량"],
-            CommunityLedgerBlockTypes.Decision => ["선택지", "참여자 의견", "결정 결과", "결정 시각"],
-            CommunityLedgerBlockTypes.Time => ["예정 시각", "마감 시각", "대기 시간", "우선순위"],
-            CommunityLedgerBlockTypes.State => ["현재 상태", "이전 상태", "다음 가능 상태", "상태 변경자"],
-            CommunityLedgerBlockTypes.Evidence => ["이미지", "메모", "서명", "바코드", "링크"],
-            CommunityLedgerBlockTypes.Settlement => ["결제 표시", "상대방 확인", "정산 메모", "보류 사유"],
-            CommunityLedgerBlockTypes.Handoff => ["인계 대상 처리 체계", "API 경로", "서비스 힌트", "외부/내부 참조 id"],
-            _ => [uiSectionHint]
+            "원천 개별 주문 원장" => ["원장 ID", "주문번호", "상품·수량·가격 참조", "계약·서명 참조"],
+            "원천 수출 교류장(선택)" => ["게시글 ID", "가원장 ID", "교류 시작 맥락", "참조 동의 상태"],
+            "거래 문맥(B2B/B2C)" => ["B2B/B2C", "판매자 유형", "구매자 유형", "세금·증빙 검토 상태"],
+            "수출자·신고인" => ["수출자 식별", "수출신고인 식별", "위임 근거", "책임 확인 상태"],
+            "해외 구매자·수하인" => ["구매자", "수하인", "목적국", "최종 도착지"],
+            "수출 품목·HS 후보" => ["품명·규격", "수량·단위", "금액·통화", "HS 후보와 근거"],
+            "원산지·FTA 근거" => ["원산지", "적용 협정 후보", "증명 방식", "발급·자율발급 근거"],
+            "Incoterms·지정장소" => ["Incoterms 규칙", "규칙 버전", "지정장소", "비용·위험·통관 책임"],
+            "전략물자·요건 확인" => ["전략물자 판정 상태", "목적국·품목 요건", "전문 검토자", "판정·허가 근거"],
+            "상업송장·포장명세" => ["상업송장 참조", "포장명세 참조", "포장 단위", "중량·수량"],
+            "신고 방식·적용 근거" => ["일반·간이·목록 후보", "공식 규정 출처", "기준 시행일", "사람 확인 상태"],
+            "수출 신고 상태" => ["신고 상태", "신고번호", "신고일", "신고 세관"],
+            "신고 수리 상태" => ["수리 상태", "수리번호", "수리일", "수리 근거"],
+            "적재 예정·기한" => ["적재 예정일", "적재기한", "연장 여부", "연장 근거"],
+            "포워더 인계" => ["사람이 선택한 포워더", "전달 범위", "동의·권한 근거", "회신 상태"],
+            "선적·적재 실적" => ["BL/AWB·운송 참조", "선박·항공편", "적재일", "적재 실적 근거"],
+            "수출 대금 정산" => ["결제 조건", "통화·금액", "수취 상태", "정산 근거"],
+            "영세율 증빙" => ["수출실적 근거", "첨부 서류 상태", "세무 검토자", "신고 반영 상태"],
+            "반품·재수입" => ["반품 사유", "재수입 여부", "원수출 신고 참조", "처리 상태"],
+            "완료 후 교류 환류 동의" => ["참여자별 동의", "공개 범위", "비식별 처리 상태", "철회 상태"],
+            "개별수출 원장 집합" => ["개별수출 원장 ID", "원천 주문 ID", "수출자", "목적국·수하인"],
+            "거래 문맥 집계(B2B/B2C)" => ["문맥별 건수", "문맥별 금액·통화", "혼합 여부", "분리 필요 사유"],
+            "수출자별 신고 보존" => ["수출자별 원장 ID", "신고·수리 참조", "상업송장 참조", "적재 실적 참조"],
+            "집하 마감" => ["집하 장소", "마감 시각", "반입 가능 시간", "미도착 처리 규칙"],
+            "합포장 계획" => ["포장 그룹", "온도·위험물 조건", "중량·부피", "분리 포장 사유"],
+            "운송 방식(FCL/LCL/항공)" => ["FCL/LCL/항공 후보", "선정 근거", "예상 일정", "포워더 회신"],
+            "통합 포장목록" => ["공동 선적 참조", "개별수출 원장 ID", "포장 번호", "품목·수량 매핑"],
+            "공통 비용 배부" => ["비용 항목", "통화·금액", "배부 기준", "개별수출별 배부액"],
+            "예외·분할 선적" => ["예외 사유", "영향 개별수출", "분할 선적 참조", "재계획 상태"],
+            _ => blockType switch
+            {
+                CommunityLedgerBlockTypes.Place => ["주소", "위도/경도", "접근 조건", "담당자 연락 힌트"],
+                CommunityLedgerBlockTypes.Item => ["품명", "수량", "부피/무게", "주의 조건"],
+                CommunityLedgerBlockTypes.Order => ["주문번호", "주문 품목", "수령 조건", "대체 허용 여부"],
+                CommunityLedgerBlockTypes.Inventory => ["재고 근거", "창고", "피킹 단위", "예약 수량"],
+                CommunityLedgerBlockTypes.Quantity => ["목표 수량", "참여 수량", "최소 진행 수량"],
+                CommunityLedgerBlockTypes.Decision => ["선택지", "참여자 의견", "결정 결과", "결정 시각"],
+                CommunityLedgerBlockTypes.Time => ["예정 시각", "마감 시각", "대기 시간", "우선순위"],
+                CommunityLedgerBlockTypes.State => ["현재 상태", "이전 상태", "다음 가능 상태", "상태 변경자"],
+                CommunityLedgerBlockTypes.Evidence => ["이미지", "메모", "서명", "바코드", "링크"],
+                CommunityLedgerBlockTypes.Settlement => ["결제 표시", "상대방 확인", "정산 메모", "보류 사유"],
+                CommunityLedgerBlockTypes.Handoff => ["인계 대상 처리 체계", "API 경로", "서비스 힌트", "외부/내부 참조 id"],
+                _ => [uiSectionHint]
+            }
         };
 
     private static IReadOnlyList<string> BuildBlockActionHints(
@@ -1701,7 +2132,11 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerBlockTypes.Order => action.Contains("주문", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Inventory => action.Contains("재고", StringComparison.Ordinal) || action.Contains("피킹", StringComparison.Ordinal) || action.Contains("검수", StringComparison.Ordinal) || action.Contains("입고", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Quantity => action.Contains("수량", StringComparison.Ordinal),
-            CommunityLedgerBlockTypes.Decision => action.Contains("확정", StringComparison.Ordinal) || action.Contains("결정", StringComparison.Ordinal),
+            CommunityLedgerBlockTypes.Decision => action.Contains("확정", StringComparison.Ordinal)
+                                                  || action.Contains("결정", StringComparison.Ordinal)
+                                                  || action.Contains("동의", StringComparison.Ordinal)
+                                                  || action.Contains("수락", StringComparison.Ordinal)
+                                                  || action.Contains("철회", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.State => action.Contains("시작", StringComparison.Ordinal) || action.Contains("완료", StringComparison.Ordinal) || action.Contains("보류", StringComparison.Ordinal) || action.Contains("선적", StringComparison.Ordinal) || action.Contains("통관", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Evidence => action.Contains("사진", StringComparison.Ordinal) || action.Contains("첨부", StringComparison.Ordinal) || action.Contains("보고", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Settlement => action.Contains("입금", StringComparison.Ordinal) || action.Contains("정산", StringComparison.Ordinal) || action.Contains("결제", StringComparison.Ordinal),

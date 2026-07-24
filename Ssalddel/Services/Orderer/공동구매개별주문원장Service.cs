@@ -86,10 +86,10 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
                             BlockType = CommunityLedgerBlockTypes.Generic,
                             Title = "입고 예정·수령 권리",
                             State = 공동구매개별주문입고상태코드.입고예정,
-                            Data = 안전한입고참조(group, demand, 주문원장Id)
+                            Data = 안전한입고참조(group, demand, 주문원장Id, 주문원장Id)
                         }
                     ],
-                    외부참조 = 안전한입고참조(group, demand, 주문원장Id)
+                    외부참조 = 안전한입고참조(group, demand, 주문원장Id, 주문원장Id)
                 },
                 변경자,
                 cancellationToken);
@@ -129,10 +129,10 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
                             BlockType = CommunityLedgerBlockTypes.Generic,
                             Title = "개별 주문·도착 창고",
                             State = 공동구매개별주문입고상태코드.입고예정,
-                            Data = 안전한입고참조(group, demand, 주문원장Id)
+                            Data = 개별주문참조(group, demand, 주문원장Id, 공동구매주문집계원장Id)
                         }
                     ],
-                    외부참조 = 안전한입고참조(group, demand, 주문원장Id)
+                    외부참조 = 개별주문참조(group, demand, 주문원장Id, 공동구매주문집계원장Id)
                 },
                 변경자,
                 cancellationToken);
@@ -323,6 +323,7 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
+        var transactionContext = 공동구매거래문맥정책.생성(group, sourceLedgerId);
         return new 커뮤니티원장블록Dto
         {
             BlockId = "individual-order-aggregation",
@@ -341,6 +342,12 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
                 ["TotalReservedPaymentAmount"] = demands.Sum(x => Math.Max(0, x.예약결제금액 ?? 0))
                     .ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["DestinationWarehouseCount"] = demands.Where(x => x.도착창고Id is > 0).Select(x => x.도착창고Id).Distinct().Count()
+                    .ToString(System.Globalization.CultureInfo.InvariantCulture),
+                [공동구매거래문맥원장키.거래유형] = transactionContext.거래유형,
+                [공동구매거래문맥원장키.가격표시기준] = transactionContext.가격표시기준,
+                [공동구매거래문맥원장키.구매조직수] = transactionContext.구매조직수
+                    .ToString(System.Globalization.CultureInfo.InvariantCulture),
+                [공동구매거래문맥원장키.세금계산서요청수] = transactionContext.세금계산서요청수
                     .ToString(System.Globalization.CultureInfo.InvariantCulture)
             }
         };
@@ -358,14 +365,24 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
     private static IReadOnlyDictionary<string, string> 주문집계참조(
         공동구매자동집단응답 group,
         string sourceLedgerId)
-        => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        var transactionContext = 공동구매거래문맥정책.생성(group, sourceLedgerId);
+        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["SourceGroupPurchaseLedgerId"] = sourceLedgerId,
             ["AutomaticGroupId"] = group.자동집단Id,
             ["ProductKey"] = group.상품키,
             ["ProductName"] = group.상품명,
-            ["AggregationMode"] = "SumOfIndividualOrders"
+            ["AggregationMode"] = "SumOfIndividualOrders",
+            [공동구매거래문맥원장키.거래유형] = transactionContext.거래유형,
+            [공동구매거래문맥원장키.가격표시기준] = transactionContext.가격표시기준,
+            [공동구매거래문맥원장키.원천거래문맥원장Id] = transactionContext.원천거래문맥원장Id,
+            [공동구매거래문맥원장키.구매조직수] = transactionContext.구매조직수
+                .ToString(System.Globalization.CultureInfo.InvariantCulture),
+            [공동구매거래문맥원장키.세금계산서요청수] = transactionContext.세금계산서요청수
+                .ToString(System.Globalization.CultureInfo.InvariantCulture)
         };
+    }
 
     private static string 공동구매주문집계원장Id생성(string sourceLedgerId, string automaticGroupId)
         => $"{sourceLedgerId}-{automaticGroupId}-group-order";
@@ -376,7 +393,8 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
     private static IReadOnlyDictionary<string, string> 안전한입고참조(
         공동구매자동집단응답 group,
         공동구매자동수요응답 demand,
-        string 주문원장Id)
+        string 주문원장Id,
+        string 원천거래문맥원장Id)
         => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["AutomaticGroupId"] = group.자동집단Id,
@@ -395,6 +413,31 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
             ["ProductName"] = group.상품명,
             ["RequestedQuantity"] = demand.희망수량.ToString(System.Globalization.CultureInfo.InvariantCulture),
             ["QuantityUnit"] = demand.수량단위,
-            ["SourceGroupPurchaseLedgerId"] = demand.커뮤니티원장Id
+            ["SourceGroupPurchaseLedgerId"] = demand.커뮤니티원장Id,
+            [공동구매거래문맥원장키.거래유형] = 공동구매거래유형코드.정규화(demand.거래유형),
+            [공동구매거래문맥원장키.가격표시기준] = 공동구매가격표시기준코드.정규화(
+                demand.가격표시기준,
+                demand.거래유형),
+            [공동구매거래문맥원장키.원천거래문맥원장Id] = 원천거래문맥원장Id
         };
+
+    private static IReadOnlyDictionary<string, string> 개별주문참조(
+        공동구매자동집단응답 group,
+        공동구매자동수요응답 demand,
+        string 주문원장Id,
+        string 원천거래문맥원장Id)
+    {
+        var result = new Dictionary<string, string>(
+            안전한입고참조(group, demand, 주문원장Id, 원천거래문맥원장Id),
+            StringComparer.OrdinalIgnoreCase);
+        if (공동구매거래유형코드.정규화(demand.거래유형) == 공동구매거래유형코드.B2B)
+        {
+            result[공동구매거래문맥원장키.구매조직참조키] = demand.구매조직참조키;
+            result[공동구매거래문맥원장키.구매조직표시명] = demand.구매조직표시명;
+            result[공동구매거래문맥원장키.사업자검증상태] = demand.사업자검증상태;
+            result[공동구매거래문맥원장키.세금계산서필요] = demand.세금계산서필요.ToString();
+        }
+
+        return result;
+    }
 }

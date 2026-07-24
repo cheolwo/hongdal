@@ -1,0 +1,52 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject 개별수입원장생성ViewModel ViewModel
+
+<MudStack Spacing="3" Class="pa-4">
+    <MudText Typo="Typo.h4">개별수입 원장</MudText>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        개별주문의 상품·수량·가격·서명을 복제하지 않고 수입 준비 상태만 연결합니다.
+        이 화면은 계약·결제·수입 신고·운송을 실행하지 않습니다.
+    </MudAlert>
+
+    <MudTextField Label="원천 개별주문 원장 ID" @bind-Value="ViewModel.주문원장Id" Required />
+    <MudTextField Label="제목" @bind-Value="ViewModel.요청.제목" />
+    <MudTextField Label="수입 주체" @bind-Value="ViewModel.요청.수입주체" />
+    <MudTextField Label="해외 판매자" @bind-Value="ViewModel.요청.해외판매자" />
+    <MudTextField Label="Incoterms 후보" @bind-Value="ViewModel.요청.Incoterms후보" />
+    <MudTextField Label="통관 검토 메모" @bind-Value="ViewModel.요청.통관검토메모" Lines="3" />
+
+    <MudButton Color="Color.Primary" Variant="Variant.Filled"
+               Disabled="@ViewModel.처리중"
+               OnClick="CreateAsync">
+        @(ViewModel.처리중 ? "저장 중" : "개별수입 준비 원장 만들기")
+    </MudButton>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.오류))
+    {
+        <MudAlert Severity="Severity.Error">@ViewModel.오류</MudAlert>
+    }
+    @if (ViewModel.결과 is not null)
+    {
+        <MudAlert Severity="Severity.Success">
+            원장 @ViewModel.결과.원장.원장Id · Revision @ViewModel.결과.원장.Revision · @ViewModel.결과.실행모드
+        </MudAlert>
+    }
+</MudStack>
+
+@code {
+    [Parameter] public string? OrderLedgerId { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(OrderLedgerId))
+        {
+            ViewModel.주문원장Id = OrderLedgerId;
+        }
+    }
+
+    private async Task CreateAsync()
+    {
+        await ViewModel.생성Async();
+        StateHasChanged();
+    }
+}

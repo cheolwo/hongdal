@@ -42,6 +42,12 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         Assert.Equal("delivery:kr:06236:shared-pickup", saved.배송권키);
         Assert.DoesNotContain("jp", saved.배송권키, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(2.5m, saved.희망수량);
+        Assert.Equal(공동구매자동수요물류방식코드.후속검토, saved.물류방식);
+        Assert.Equal(공동구매거래유형코드.B2C, saved.거래유형);
+        Assert.Equal(공동구매가격표시기준코드.부가세포함, saved.가격표시기준);
+        Assert.Empty(saved.구매조직참조키);
+        Assert.Empty(saved.구매조직표시명);
+        Assert.False(saved.세금계산서필요);
         Assert.Equal(공동구매자동수요유형코드.관심표시, saved.수요유형);
         Assert.Equal(공동구매자동결제상태코드.미결제, saved.결제상태);
         Assert.Null(saved.예약결제금액);
@@ -52,6 +58,55 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         Assert.Equal(preview.수요출처키, saved.수요출처키);
         Assert.Equal(preview.요청멱등키, saved.요청멱등키);
         Assert.True(viewModel.HasActiveDemand);
+    }
+
+    [Fact]
+    public async Task B2B수요는_구매조직정보가_없으면_미리보기를호출하지않는다()
+    {
+        var service = new FakeDemandService();
+        var viewModel = CreateViewModel(service, AuthenticatedUser());
+        viewModel.ApplySeed(Seed());
+        viewModel.DeliveryAreaCode = "06236";
+        viewModel.TransactionTypeCode = 공동구매거래유형코드.B2B;
+
+        var result = await viewModel.PreviewAsync();
+
+        Assert.False(result);
+        Assert.Contains("구매 조직", viewModel.ActionError, StringComparison.Ordinal);
+        Assert.Empty(service.PreviewRequests);
+    }
+
+    [Fact]
+    public async Task B2B수요는_조직가격세금계산서문맥을_모든재료에전달한다()
+    {
+        var service = new FakeDemandService();
+        var viewModel = CreateViewModel(service, AuthenticatedUser());
+        viewModel.ApplySeeds([Seed(), Seed("TH", "ingredient:chili", "고추", "box")]);
+        viewModel.DeliveryAreaCode = "06236";
+        viewModel.TransactionTypeCode = 공동구매거래유형코드.B2B;
+        viewModel.PurchasingOrganizationReference = "org:market-17";
+        viewModel.PurchasingOrganizationName = "이웃마트";
+
+        Assert.True(await viewModel.PreviewAsync());
+        Assert.True(await viewModel.RegisterAsync());
+
+        Assert.Equal(2, service.SaveRequests.Count);
+        Assert.All(service.SaveRequests, request =>
+        {
+            Assert.Equal(공동구매거래유형코드.B2B, request.거래유형);
+            Assert.Equal(공동구매가격표시기준코드.부가세별도, request.가격표시기준);
+            Assert.Equal("org:market-17", request.구매조직참조키);
+            Assert.Equal("이웃마트", request.구매조직표시명);
+            Assert.True(request.세금계산서필요);
+            Assert.Equal(1, request.목표참여자수);
+            Assert.Equal(30m, request.목표수량);
+        });
+        Assert.Equal(
+            2,
+            service.SaveRequests
+                .Select(request => request.수요출처키)
+                .Distinct(StringComparer.Ordinal)
+                .Count());
     }
 
     [Fact]
@@ -97,6 +152,37 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         Assert.StartsWith("demand-withdraw:", service.WithdrawIdempotencyKey, StringComparison.Ordinal);
         Assert.False(viewModel.HasActiveDemand);
         Assert.Null(viewModel.RegisteredGroup);
+    }
+
+    [Fact]
+    public async Task 여러재료는_재료별수량과온도로_각각비구속수요를저장하고함께철회한다()
+    {
+        var service = new FakeDemandService();
+        var viewModel = CreateViewModel(service, AuthenticatedUser());
+        viewModel.ApplySeeds([Seed(), Seed("TH", "ingredient:chili", "고추", "box")]);
+        viewModel.DeliveryAreaCode = "06236";
+        var chili = viewModel.IngredientLines.Single(line => line.Seed.IngredientKey == "ingredient:chili");
+        viewModel.UpdateLineQuantity(chili, 3m);
+        viewModel.UpdateLineTemperature(chili, "냉장");
+
+        Assert.True(await viewModel.PreviewAsync());
+        Assert.True(await viewModel.RegisterAsync());
+
+        Assert.Equal(2, service.PreviewRequests.Count);
+        Assert.Equal(2, service.SaveRequests.Count);
+        Assert.Equal(2, viewModel.RegisteredGroups.Count);
+        Assert.Equal(2, service.SaveRequests.Select(request => request.상품키).Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal(2, service.SaveRequests.Select(request => request.수요출처키).Distinct(StringComparer.Ordinal).Count());
+        Assert.All(service.SaveRequests, request =>
+            Assert.Equal(공동구매자동수요물류방식코드.후속검토, request.물류방식));
+        var savedChili = service.SaveRequests.Single(request => request.상품명 == "고추");
+        Assert.Equal(3m, savedChili.희망수량);
+        Assert.Equal("냉장", savedChili.온도코드);
+        Assert.Equal("box", savedChili.수량단위);
+
+        Assert.True(await viewModel.WithdrawAsync());
+        Assert.Equal(2, service.WithdrawDemandSourceKeys.Count);
+        Assert.False(viewModel.HasActiveDemand);
     }
 
     [Fact]
@@ -178,17 +264,21 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
     private static 현재사용자Snapshot AuthenticatedUser()
         => new("user-17", "이웃 주문자", ["Orderer"]);
 
-    private static CommunityGroupPurchaseIngredientSeed Seed(string foodCountryCode = "KR")
+    private static CommunityGroupPurchaseIngredientSeed Seed(
+        string foodCountryCode = "KR",
+        string ingredientKey = "ingredient:onion",
+        string ingredientName = "양파",
+        string purchaseUnit = "kg")
         => CommunityGroupPurchaseIngredientSeed.Create(
-               "ingredient:onion",
-               "양파",
-               "양파를 넣은 공식 음식",
-               "https://example.test/recipes/onion",
+               ingredientKey,
+               ingredientName,
+               $"{ingredientName}를 넣은 공식 음식",
+               $"https://example.test/recipes/{Uri.EscapeDataString(ingredientKey)}",
                "공식 레시피 원천",
                "2개",
                "KRW/kg · 공개 참고값",
-               "kg",
-               "양파 음식",
+               purchaseUnit,
+               $"{ingredientName} 음식",
                foodCountryCode,
                CommunityIngredientSourcingModeCodes.DomesticGroupPurchase)
            ?? throw new InvalidOperationException("테스트 재료 seed를 만들지 못했습니다.");
@@ -205,6 +295,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         public bool FailFirstSave { get; init; }
         public string? WithdrawDemandSourceKey { get; private set; }
         public string? WithdrawIdempotencyKey { get; private set; }
+        public List<string> WithdrawDemandSourceKeys { get; } = [];
 
         public Task<공동구매자동집단배치미리보기응답?> 수요배치미리보기Async(
             공동구매자동수요등록Command request,
@@ -270,6 +361,7 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
         {
             WithdrawDemandSourceKey = demandSourceKey;
             WithdrawIdempotencyKey = idempotencyKey;
+            WithdrawDemandSourceKeys.Add(demandSourceKey);
             return Task.FromResult<공동구매자동수요철회응답?>(new()
             {
                 수요출처키 = demandSourceKey,
@@ -288,6 +380,11 @@ public sealed class OfficialFoodIngredientDemandViewModelTests
                 HS코드 = source.HS코드,
                 온도코드 = source.온도코드,
                 물류방식 = source.물류방식,
+                거래유형 = source.거래유형,
+                가격표시기준 = source.가격표시기준,
+                구매조직참조키 = source.구매조직참조키,
+                구매조직표시명 = source.구매조직표시명,
+                세금계산서필요 = source.세금계산서필요,
                 주문자키 = source.주문자키,
                 주문자표시명 = source.주문자표시명,
                 배송권키 = source.배송권키,

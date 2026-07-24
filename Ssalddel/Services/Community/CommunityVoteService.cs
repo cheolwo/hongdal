@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.ContractManagement;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Services.Community;
 
@@ -283,6 +284,11 @@ public partial class CommunityVoteService : ICommunityVoteService
             VoterDisplayName = Normalize(request.VoterDisplayName, "익명 참여자"),
             OptionIds = selectedOptionIds,
             RequestedQuantity = groupPurchaseParticipation.RequestedQuantity,
+            TransactionTypeCode = groupPurchaseParticipation.TransactionTypeCode,
+            PriceBasisCode = groupPurchaseParticipation.PriceBasisCode,
+            PurchasingOrganizationReference = groupPurchaseParticipation.PurchasingOrganizationReference,
+            PurchasingOrganizationName = groupPurchaseParticipation.PurchasingOrganizationName,
+            TaxInvoiceRequired = groupPurchaseParticipation.TaxInvoiceRequired,
             ParticipationMethodCode = groupPurchaseParticipation.ParticipationMethodCode,
             PickupPointId = groupPurchaseParticipation.PickupPointId,
             AllowNearbyPickupPointFallback = request.AllowNearbyPickupPointFallback,
@@ -428,5 +434,10 @@ public partial class CommunityVoteService : ICommunityVoteService
     private sealed record GroupPurchaseParticipation(
         int RequestedQuantity,
         string ParticipationMethodCode,
-        string? PickupPointId);
+        string? PickupPointId,
+        string TransactionTypeCode,
+        string PriceBasisCode,
+        string? PurchasingOrganizationReference,
+        string? PurchasingOrganizationName,
+        bool TaxInvoiceRequired);
 }

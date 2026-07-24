@@ -1,0 +1,13 @@
+services:
+  app:
+    environment:
+      SsalddelExecution__Mode: Simulation
+      PersonalDataProtection__ApplicationName: Ssalddel.AzurePreview
+      PersonalDataProtection__KeyRingPath: /app/App_Data/DataProtection-Keys
+      PersonalDataProtection__RequireCertificate: "false"
+      IsmsPProtectedData__Aes256GcmKeyBase64: "${SSALDDEL_ISMS_P_AES_KEY_BASE64}"
+      IsmsPProtectedData__HashSalt: "${SSALDDEL_ISMS_P_HASH_SALT}"
+      IsmsPProtectedData__FailWhenKeyMissing: "true"
+      VersionFeatureFlags__GroupPurchaseDemandWorkflow: "true"
+      VersionFeatureFlags__GroupPurchasePracticeWorkflow: "true"
+      VersionFeatureFlags__CustomsAndTradeDataWorkflow: "true"

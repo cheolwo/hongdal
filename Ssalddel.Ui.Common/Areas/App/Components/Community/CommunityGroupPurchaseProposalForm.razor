@@ -61,6 +61,18 @@
             <MudTextField Label="상품명" @bind-Value="Draft.ProductName" Variant="Variant.Outlined" Required="true" />
             <MudTextField Label="상품 키" @bind-Value="Draft.ProductKey" Variant="Variant.Outlined" HelperText="상품 카탈로그 키 또는 운영용 식별자" />
             <MudTextField Label="커뮤니티·지역 범위" @bind-Value="Draft.CommunityScope" Variant="Variant.Outlined" />
+            <div class="group-purchase-form-wide">
+                <MudText Typo="Typo.subtitle2">받을 구매 목적</MudText>
+                <MudCheckBox T="bool" @bind-Value="Draft.AllowConsumerPurchases" Color="Color.Primary">
+                    B2C · 개인 소비 구매
+                </MudCheckBox>
+                <MudCheckBox T="bool" @bind-Value="Draft.AllowBusinessPurchases" Color="Color.Primary">
+                    B2B · 사업 목적 구매
+                </MudCheckBox>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    한 모집에서 함께 받을 수 있지만 수요 집단·가격 기준·계약 준비는 B2C와 B2B로 분리됩니다.
+                </MudText>
+            </div>
             <MudSelect T="string" Label="참여 방식" @bind-Value="Draft.ParticipationPolicyCode" Variant="Variant.Outlined">
                 <MudSelectItem Value="@CommunityVoteParticipationPolicyCodes.Hybrid">커뮤니티·지역·픽업 모두 허용</MudSelectItem>
                 <MudSelectItem Value="@CommunityVoteParticipationPolicyCodes.CommunityOnly">커뮤니티 구성원만</MudSelectItem>

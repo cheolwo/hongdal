@@ -174,7 +174,8 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanService
                     draftId,
                     createdByUserId,
                     includedLedgers: null,
-                    rootLedgerId),
+                    rootLedgerId,
+                    plan.TransactionContext),
                 createdByUserId,
                 cancellationToken);
         }
@@ -200,7 +201,8 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanService
                 draftId,
                 createdByUserId,
                 includedLedgers,
-                rootLedgerId),
+                rootLedgerId,
+                plan.TransactionContext),
             createdByUserId,
             cancellationToken);
 
@@ -240,7 +242,8 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanService
         Guid draftId,
         string createdByUserId,
         IReadOnlyList<커뮤니티포함원장참조Dto>? includedLedgers,
-        string rootLedgerId)
+        string rootLedgerId,
+        공동구매거래문맥응답 transactionContext)
     {
         var template = CommunityLedgerTemplateCatalog.Find(node.LedgerTemplateKey);
         return new 커뮤니티원장저장요청
@@ -269,7 +272,9 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanService
                     {
                         ["StageSummary"] = node.StageSummary,
                         ["ResponsiblePartyLabel"] = node.ResponsiblePartyLabel,
-                        ["StageOrder"] = node.StageOrder.ToString()
+                        ["StageOrder"] = node.StageOrder.ToString(),
+                        [공동구매거래문맥원장키.거래유형] = transactionContext.거래유형,
+                        [공동구매거래문맥원장키.가격표시기준] = transactionContext.가격표시기준
                     }
                 }
             ],
@@ -281,7 +286,12 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanService
                 ["SourceGroupPurchaseLedgerId"] = sourceLedger.원장Id,
                 ["FulfillmentDraftId"] = draftId.ToString("D"),
                 ["PlanNodeId"] = node.NodeId,
-                ["OrderRootLedgerId"] = rootLedgerId
+                ["OrderRootLedgerId"] = rootLedgerId,
+                [공동구매거래문맥원장키.거래유형] = transactionContext.거래유형,
+                [공동구매거래문맥원장키.가격표시기준] = transactionContext.가격표시기준,
+                [공동구매거래문맥원장키.원천거래문맥원장Id] = node.IsOrderRoot
+                    ? sourceLedger.원장Id
+                    : rootLedgerId
             }
         };
     }

@@ -25,7 +25,7 @@ public interface I주문원장통합UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
-[SsalddelUseCase("주문 원장 통합", Summary = "주문 원장을 루트로 두고 판매, 입출고, 배송과 운송 원장의 최신 상태를 한 번에 조합합니다.")]
+[SsalddelUseCase("주문 원장 통합", Summary = "개별주문을 루트로 개별수입·개별수출 확장을 연결하고, 공동수출에서는 개별수출별 신고를 보존한 채 물류 집계를 조합합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.CommunityMember)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 public sealed class 주문원장통합UseCase : I주문원장통합UseCase
@@ -186,7 +186,7 @@ public sealed class 주문원장통합UseCase : I주문원장통합UseCase
 
         return 주문원장구성정책.통합대상인가(주문원장.원장템플릿Key)
             ? Result.Ok(주문원장)
-            : BadRequest<커뮤니티원장Dto>("통합 조회 대상은 주문 원장이어야 합니다.");
+            : BadRequest<커뮤니티원장Dto>("통합 조회 대상은 주문, 공동구매, 공동수입 또는 공동수출 원장이어야 합니다.");
     }
 
     private async Task<Result<커뮤니티원장Dto>> 주문원장저장Async(

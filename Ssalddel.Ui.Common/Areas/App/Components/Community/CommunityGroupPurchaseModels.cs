@@ -1,5 +1,6 @@
 using MudBlazor;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 
@@ -62,6 +63,10 @@ public sealed class CommunityGroupPurchaseCampaignDraft
 
     public string QuantityUnit { get; set; } = "개";
 
+    public bool AllowConsumerPurchases { get; set; } = true;
+
+    public bool AllowBusinessPurchases { get; set; } = true;
+
     public int MinimumParticipantCount { get; set; } = 3;
 
     public int MinimumTotalQuantity { get; set; } = 10;
@@ -75,6 +80,8 @@ public sealed class CommunityGroupPurchaseCampaignDraft
 
 public sealed class CommunityGroupPurchaseParticipationDraft
 {
+    private string _transactionTypeCode = 공동구매거래유형코드.B2C;
+
     public string OptionId { get; set; } = string.Empty;
 
     public int Quantity { get; set; } = 1;
@@ -84,6 +91,42 @@ public sealed class CommunityGroupPurchaseParticipationDraft
     public string? PickupPointId { get; set; }
 
     public string DisplayName { get; set; } = string.Empty;
+
+    public string TransactionTypeCode
+    {
+        get => _transactionTypeCode;
+        set
+        {
+            var normalized = 공동구매거래유형코드.정규화(value);
+            if (string.Equals(_transactionTypeCode, normalized, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _transactionTypeCode = normalized;
+            if (normalized == 공동구매거래유형코드.B2B)
+            {
+                PriceBasisCode = 공동구매가격표시기준코드.부가세별도;
+                TaxInvoiceRequired = true;
+                return;
+            }
+
+            PriceBasisCode = 공동구매가격표시기준코드.부가세포함;
+            PurchasingOrganizationReference = string.Empty;
+            PurchasingOrganizationName = string.Empty;
+            TaxInvoiceRequired = false;
+        }
+    }
+
+    public bool IsBusinessPurchase => TransactionTypeCode == 공동구매거래유형코드.B2B;
+
+    public string PriceBasisCode { get; set; } = 공동구매가격표시기준코드.부가세포함;
+
+    public string PurchasingOrganizationReference { get; set; } = string.Empty;
+
+    public string PurchasingOrganizationName { get; set; } = string.Empty;
+
+    public bool TaxInvoiceRequired { get; set; }
 }
 
 public sealed class CommunityGroupPurchaseObjectionDraft

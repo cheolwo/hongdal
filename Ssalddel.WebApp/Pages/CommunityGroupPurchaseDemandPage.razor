@@ -5,6 +5,7 @@
 <PageTitle>비구속 재료 수요 · 살뜰</PageTitle>
 
 <OfficialFoodIngredientDemandScreen IngredientSeed="@IngredientSeed"
+                                    IngredientSeeds="@IngredientSeeds"
                                     LoginHref="@LoginHref" />
 
 @code {
@@ -41,6 +42,9 @@
     [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.SourcingModeQueryName)]
     public string? SourcingModeCode { get; set; }
 
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.MaterialBundleQueryName)]
+    public string? MaterialBundle { get; set; }
+
     private CommunityGroupPurchaseIngredientSeed? IngredientSeed
         => CommunityGroupPurchaseIngredientSeed.Create(
             IngredientKey,
@@ -54,6 +58,17 @@
             FoodName,
             FoodCountryCode,
             SourcingModeCode);
+
+    private IReadOnlyList<CommunityGroupPurchaseIngredientSeed> IngredientSeeds
+    {
+        get
+        {
+            var bundled = CommunityGroupPurchaseIngredientSeed.DecodeMaterialBundle(MaterialBundle);
+            return bundled.Count > 0
+                ? bundled
+                : IngredientSeed is { } seed ? [seed] : [];
+        }
+    }
 
     private string LoginHref
     {

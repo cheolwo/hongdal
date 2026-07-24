@@ -269,7 +269,7 @@ public sealed class 공동수입원장물류ViewModel : 공동구매작업ViewMo
                 : string.Join(", ", campaign.Options.Select(option => option.Text)),
             PlannedQuantity = quantity,
             QuantityUnit = quantityUnit,
-            InternationalTransportMode = "LCL",
+            InternationalTransportMode = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired,
             FinalDestinationLabel = settings?.ServiceAreaLabel
                                     ?? settings?.DeliveryCountryCode
                                     ?? string.Empty

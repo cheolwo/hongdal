@@ -8,6 +8,7 @@ public sealed class GroupPurchasePageRoutesTests
     public void 목록_상세_Action_후속조회_route가_서로_분리된다()
     {
         Assert.Equal("/group-purchase", GroupPurchasePageRoutes.Root);
+        Assert.Equal("/group-purchase/practice", GroupPurchasePageRoutes.Practice);
         Assert.Equal("/group-purchase/products", GroupPurchasePageRoutes.ProductsRoot);
         Assert.Equal(
             "/group-purchase/products/hs-food-0203-pork-frozen",

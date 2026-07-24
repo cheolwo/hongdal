@@ -25,6 +25,11 @@ public sealed class OrdererGroupPurchasePageCompositionTests
             expectedBusinessComponent: null);
         AssertPage(
             pagesRoot,
+            "GroupPurchasePractice.razor",
+            "@page \"/group-purchase/practice\"",
+            expectedBusinessComponent: null);
+        AssertPage(
+            pagesRoot,
             "GroupPurchaseProducts.razor",
             "@page \"/group-purchase/products\"",
             "<GroupPurchaseProductCatalogPanel");
@@ -50,6 +55,40 @@ public sealed class OrdererGroupPurchasePageCompositionTests
             "<GroupPurchaseShipmentTrackingPanel");
 
         Assert.False(File.Exists(Path.Combine(pagesRoot, "GroupPurchaseIntent.razor")));
+    }
+
+    [Fact]
+    public void 체험공동구매는_가상참여자와무저장경계를_공용화면에고정한다()
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var screen = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Orderer",
+            "GroupPurchasePracticeScreen.razor"));
+        var webPage = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityGroupPurchasePracticePage.razor"));
+        var server = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "Ssalddel",
+            "Services",
+            "Orderer",
+            "공동구매체험Service.cs"));
+
+        Assert.Contains("실제 사람이 아닌", screen);
+        Assert.Contains("가상 이웃", screen);
+        Assert.Contains("실제 비구속 수요를 새로 확인하기", screen);
+        Assert.DoesNotContain("비구속수요저장Async", screen, StringComparison.Ordinal);
+        Assert.Contains("@page \"/community/group-purchase/practice\"", webPage);
+        Assert.Contains("서버저장여부 = false", server);
+        Assert.Contains("외부효과발생여부 = false", server);
+        Assert.Contains("실제 주문·결제·계약", server);
     }
 
     [Fact]

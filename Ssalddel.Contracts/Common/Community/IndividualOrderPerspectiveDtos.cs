@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Orderer;
+
 namespace Ssalddel.Contracts.Common.Community;
 
 public static class 개별주문관점코드
@@ -22,6 +24,7 @@ public sealed class 개별주문관점항목응답
     public string 관계코드 { get; set; } = string.Empty;
     public string 조회근거 { get; set; } = string.Empty;
     public string? 공동원장Id { get; set; }
+    public 공동구매거래문맥응답 거래문맥 { get; set; } = new();
     public IReadOnlyList<string> 관련원장역할목록 { get; set; } = [];
     public int 관련하위원장수 { get; set; }
     public int 상세공개요청필요수 { get; set; }

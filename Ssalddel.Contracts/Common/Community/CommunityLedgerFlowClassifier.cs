@@ -27,7 +27,9 @@ public static class CommunityLedgerFlowClassifier
         request ??= new CommunityLedgerFlowAnalysisRequest();
 
         var candidates = CommunityLedgerTemplateCatalog.All
-            .Where(template => !template.IsCommunityOpportunityTemplate && !template.IsInternalAggregationTemplate)
+            .Where(template => !template.IsCommunityOpportunityTemplate
+                               && !template.IsInternalAggregationTemplate
+                               && !template.IsExtensionTemplate)
             .Select(template => BuildCandidate(template, request))
             .OrderByDescending(candidate => candidate.MatchScore)
             .ThenBy(candidate => candidate.MissingRequiredSignals.Count)

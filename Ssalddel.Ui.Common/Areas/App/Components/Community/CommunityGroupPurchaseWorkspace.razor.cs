@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Ui.Common.Areas.App.Models;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -228,6 +229,19 @@ public partial class CommunityGroupPurchaseWorkspace
     {
         State.Participation.OptionId = campaign.Options.FirstOrDefault()?.OptionId ?? string.Empty;
         State.Participation.PickupPointId = campaign.GroupPurchase?.PickupPoints.FirstOrDefault()?.PickupPointId;
+        var allowedTransactionTypeCodes = NormalizeAllowedTransactionTypeCodes(
+            campaign.GroupPurchase?.AllowedTransactionTypeCodes);
+        State.Participation.PurchasingOrganizationReference = string.Empty;
+        State.Participation.PurchasingOrganizationName = string.Empty;
+        State.Participation.TransactionTypeCode = allowedTransactionTypeCodes.Contains(
+            공동구매거래유형코드.B2C,
+            StringComparer.Ordinal)
+                ? 공동구매거래유형코드.B2C
+                : allowedTransactionTypeCodes[0];
+        State.Participation.PriceBasisCode = State.Participation.IsBusinessPurchase
+            ? 공동구매가격표시기준코드.부가세별도
+            : 공동구매가격표시기준코드.부가세포함;
+        State.Participation.TaxInvoiceRequired = State.Participation.IsBusinessPurchase;
         State.ResolutionTitle = $"{campaign.Title} 공동구매 확정안";
         State.ResolutionText = CommunityGroupPurchasePresentation.DefaultResolutionText(campaign);
         State.ResetSignatureSelection();
@@ -247,6 +261,12 @@ public partial class CommunityGroupPurchaseWorkspace
             || string.IsNullOrWhiteSpace(draft.Password))
         {
             ShowError("제안 제목, 상품명, 제안자 표시명과 게시글 비밀번호를 입력해 주세요.");
+            return;
+        }
+
+        if (!draft.AllowConsumerPurchases && !draft.AllowBusinessPurchases)
+        {
+            ShowError("B2C 개인 소비 구매 또는 B2B 사업 목적 구매를 하나 이상 허용해 주세요.");
             return;
         }
 
@@ -302,7 +322,7 @@ public partial class CommunityGroupPurchaseWorkspace
                             : draft.ProductKey.Trim(),
                         QuantityUnit = draft.QuantityUnit.Trim(),
                         TemperatureCode = "상온",
-                        LogisticsMode = "LCL"
+                        LogisticsMode = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired
                     }
                 ],
                 ResolutionDocumentEnabled = true,
@@ -313,6 +333,7 @@ public partial class CommunityGroupPurchaseWorkspace
                 {
                     ParticipationPolicyCode = draft.ParticipationPolicyCode,
                     QuantityUnit = draft.QuantityUnit.Trim(),
+                    AllowedTransactionTypeCodes = BuildAllowedTransactionTypeCodes(draft),
                     ServiceAreaKey = draft.CommunityScope.Trim(),
                     ServiceAreaLabel = draft.CommunityScope.Trim(),
                     RadiusMeters = draft.RadiusMeters,
@@ -367,6 +388,24 @@ public partial class CommunityGroupPurchaseWorkspace
             return;
         }
 
+        var transactionTypeCode = 공동구매거래유형코드.정규화(
+            participation.TransactionTypeCode);
+        var allowedTransactionTypeCodes = NormalizeAllowedTransactionTypeCodes(
+            SelectedCampaign.GroupPurchase?.AllowedTransactionTypeCodes);
+        if (!allowedTransactionTypeCodes.Contains(transactionTypeCode, StringComparer.Ordinal))
+        {
+            ShowError("이 공동구매에서 허용하는 구매 목적을 선택해 주세요.");
+            return;
+        }
+
+        if (transactionTypeCode == 공동구매거래유형코드.B2B
+            && string.IsNullOrWhiteSpace(participation.PurchasingOrganizationName)
+            && string.IsNullOrWhiteSpace(participation.PurchasingOrganizationReference))
+        {
+            ShowError("B2B 구매에는 구매 조직명을 입력해 주세요.");
+            return;
+        }
+
         await RunBusyAsync(async () =>
         {
             var updated = await GroupPurchaseService.수요참여Async(
@@ -376,6 +415,18 @@ public partial class CommunityGroupPurchaseWorkspace
                     VoterDisplayName = participation.DisplayName,
                     OptionIds = [participation.OptionId],
                     RequestedQuantity = participation.Quantity,
+                    TransactionTypeCode = transactionTypeCode,
+                    PriceBasisCode = 공동구매가격표시기준코드.정규화(
+                        participation.PriceBasisCode,
+                        transactionTypeCode),
+                    PurchasingOrganizationReference = transactionTypeCode == 공동구매거래유형코드.B2B
+                        ? participation.PurchasingOrganizationReference
+                        : null,
+                    PurchasingOrganizationName = transactionTypeCode == 공동구매거래유형코드.B2B
+                        ? participation.PurchasingOrganizationName
+                        : null,
+                    TaxInvoiceRequired = transactionTypeCode == 공동구매거래유형코드.B2B
+                        && participation.TaxInvoiceRequired,
                     ParticipationMethodCode = participation.MethodCode,
                     PickupPointId = participation.MethodCode == CommunityVoteParticipationMethodCodes.PickupPoint
                         ? participation.PickupPointId
@@ -588,10 +639,41 @@ public partial class CommunityGroupPurchaseWorkspace
             $"상품: {draft.ProductName.Trim()}",
             $"최소 참여: {draft.MinimumParticipantCount}명",
             $"최소 수량: {draft.MinimumTotalQuantity}{draft.QuantityUnit.Trim()}",
+            $"구매 목적: {string.Join(", ", BuildAllowedTransactionTypeCodes(draft).Select(공동구매거래유형코드.표시명))}",
             $"참여 범위: {draft.CommunityScope.Trim()}",
             string.IsNullOrWhiteSpace(draft.PickupPointName)
                 ? "공동 수령소: 지정하지 않음"
                 : $"공동 수령소: {draft.PickupPointName.Trim()} · {draft.PickupPointAddress.Trim()}");
+
+    private static IReadOnlyList<string> BuildAllowedTransactionTypeCodes(
+        CommunityGroupPurchaseCampaignDraft draft)
+    {
+        var result = new List<string>(2);
+        if (draft.AllowConsumerPurchases)
+        {
+            result.Add(공동구매거래유형코드.B2C);
+        }
+
+        if (draft.AllowBusinessPurchases)
+        {
+            result.Add(공동구매거래유형코드.B2B);
+        }
+
+        return result;
+    }
+
+    private static IReadOnlyList<string> NormalizeAllowedTransactionTypeCodes(
+        IReadOnlyList<string>? transactionTypeCodes)
+    {
+        var normalized = (transactionTypeCodes ?? [])
+            .Where(공동구매거래유형코드.지원여부)
+            .Select(공동구매거래유형코드.정규화)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        return normalized.Length == 0
+            ? [공동구매거래유형코드.B2C]
+            : normalized;
+    }
 
     private void ShowSuccess(string message)
     {

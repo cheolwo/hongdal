@@ -35,6 +35,26 @@
     font-size: .72rem;
 }
 
+.group-purchase-transaction-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.group-purchase-transaction-tags > span {
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--gp-soft);
+    color: var(--gp-primary);
+    font-size: .75rem;
+}
+
+.group-purchase-transaction-tags > .group-purchase-transaction-segment {
+    background: #eef6f3;
+    color: #276052;
+}
+
 @media (max-width: 1100px) {
     .group-purchase-summary {
         grid-template-columns: 1fr;

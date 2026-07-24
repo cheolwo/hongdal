@@ -47,6 +47,36 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
         }
 
         var ledger = await ledgerStore.원장조회Async(원장Id생성(campaignId), cancellationToken);
+        if (ledger is null)
+        {
+            var source = await groupPurchaseWorkflow.조회Async(campaignId, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(source?.CommunityLedgerId))
+            {
+                var candidates = await ledgerStore.원장목록조회Async(
+                    new 커뮤니티원장조회조건
+                    {
+                        원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
+                        포함원장Id = source.CommunityLedgerId,
+                        Limit = 2
+                    },
+                    cancellationToken);
+                var matching = candidates
+                    .Where(candidate => string.Equals(
+                        candidate.원장템플릿Key,
+                        CommunityLedgerTemplateKeys.GroupImport,
+                        StringComparison.OrdinalIgnoreCase))
+                    .Where(candidate => candidate.포함원장목록.Any(reference => string.Equals(
+                        reference.원장Id,
+                        source.CommunityLedgerId,
+                        StringComparison.Ordinal)))
+                    .ToArray();
+                if (matching.Length > 1)
+                {
+                    throw new InvalidOperationException("원천 공동구매 원장에 연결된 공동수입 원장이 둘 이상입니다.");
+                }
+                ledger = matching.SingleOrDefault();
+            }
+        }
         if (ledger is null
             || !string.Equals(
                 ledger.원장템플릿Key,
@@ -87,8 +117,39 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
 
         var sourceLedger = await ledgerStore.원장조회Async(sourceProgress.CommunityLedgerId, cancellationToken)
             ?? throw new InvalidOperationException("원천 공동구매 원장 상세를 찾을 수 없습니다.");
-        var groupImportLedgerId = 원장Id생성(request.GroupPurchaseCampaignId);
-        var existing = await ledgerStore.원장조회Async(groupImportLedgerId, cancellationToken);
+        var deterministicLedger = await ledgerStore.원장조회Async(
+            원장Id생성(request.GroupPurchaseCampaignId),
+            cancellationToken);
+        var relatedLedgers = await ledgerStore.원장목록조회Async(
+            new 커뮤니티원장조회조건
+            {
+                원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
+                포함원장Id = sourceLedger.원장Id,
+                Limit = 3
+            },
+            cancellationToken);
+        var candidates = relatedLedgers
+            .Append(deterministicLedger)
+            .Where(ledger => ledger is not null)
+            .Cast<커뮤니티원장Dto>()
+            .Where(ledger => string.Equals(
+                ledger.원장템플릿Key,
+                CommunityLedgerTemplateKeys.GroupImport,
+                StringComparison.OrdinalIgnoreCase))
+            .Where(ledger => string.Equals(ledger.원장Id, deterministicLedger?.원장Id, StringComparison.Ordinal)
+                             || ledger.포함원장목록.Any(reference => string.Equals(
+                                 reference.원장Id,
+                                 sourceLedger.원장Id,
+                                 StringComparison.Ordinal)))
+            .GroupBy(ledger => ledger.원장Id, StringComparer.Ordinal)
+            .Select(group => group.First())
+            .ToArray();
+        if (candidates.Length > 1)
+        {
+            throw new InvalidOperationException("원천 공동구매에 연결된 공동수입 원장이 둘 이상입니다. 중복 원장을 먼저 정리해야 합니다.");
+        }
+        var existing = candidates.SingleOrDefault();
+        var groupImportLedgerId = existing?.원장Id ?? 원장Id생성(request.GroupPurchaseCampaignId);
         if (request.ExpectedRevision.HasValue
             && request.ExpectedRevision.Value != (existing?.Revision ?? 0))
         {
@@ -112,7 +173,7 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
 
         var sourceNode = plan.Nodes.Single(x => x.IsSourceReference);
         sourceNode.LedgerId = sourceLedger.원장Id;
-        var references = plan.Nodes
+        var planReferences = plan.Nodes
             .OrderBy(x => x.Order)
             .Select(x => new 커뮤니티포함원장참조Dto
             {
@@ -124,6 +185,37 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                 표시순서 = x.Order
             })
             .ToArray();
+        var references = (existing?.포함원장목록 ?? [])
+            .Concat(planReferences)
+            .Where(reference => !string.IsNullOrWhiteSpace(reference.원장Id))
+            .GroupBy(reference => reference.원장Id, StringComparer.Ordinal)
+            .Select(group => group.Last())
+            .OrderBy(reference => reference.표시순서)
+            .ToArray();
+        var operationalBlocks = BuildBlocks(request, campaign, sourceLedger, plan);
+        var blocks = MergeBlocks(existing, operationalBlocks);
+        var externalReferences = MergeDictionary(existing?.외부참조, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["GroupPurchaseCampaignId"] = request.GroupPurchaseCampaignId.ToString("D"),
+            ["SourceGroupPurchaseLedgerId"] = sourceLedger.원장Id,
+            ["HsCode"] = campaign.HsCode ?? string.Empty,
+            ["SellerCountryCode"] = campaign.SellerCountryCode ?? string.Empty,
+            ["ShipFromCountryCode"] = campaign.ShipFromCountryCode ?? string.Empty,
+            ["DeliveryCountryCode"] = campaign.DeliveryCountryCode ?? string.Empty,
+            ["OperatingMarketCountryCode"] = campaign.OperatingMarketCountryCode
+                                               ?? CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+            ["LogisticsRouteCode"] = plan.LogisticsRouteCode,
+            ["WarehouseReferenceKey"] = request.WarehouseReferenceKey.Trim()
+        });
+        var extensions = MergeDictionary(existing?.확장속성, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["WorkflowVersion"] = "1.5",
+            ["StageCatalog"] = string.Join(",", CommunityGroupImportLedgerStageCodes.Ordered),
+            ["LogisticsRouteLabel"] = plan.LogisticsRouteLabel,
+            ["FinalDestinationLabel"] = request.FinalDestinationLabel.Trim(),
+            ["PlatformRole"] = "CollectiveActionFacilitator",
+            ["ExecutionBoundary"] = "NoForwarderAutoSelectionNoExternalAutoSendNoContractNoPaymentNoFilingNoTransport"
+        });
 
         var saved = await ledgerStore.원장저장Async(
             new 커뮤니티원장저장요청
@@ -140,30 +232,12 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                 대상OsName = "공동수입 OS",
                 생성자UserId = existing?.생성자UserId ?? actorUserId.Trim(),
                 생성자표시명 = existing?.생성자표시명 ?? campaign.CreatedByDisplayName,
-                블록목록 = BuildBlocks(request, campaign, sourceLedger, plan),
+                블록목록 = blocks,
                 참여자목록 = existing?.참여자목록 ?? sourceLedger.참여자목록,
                 포함원장목록 = references,
                 다이어그램스냅샷 = BuildDiagram(groupImportLedgerId, plan),
-                외부참조 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["GroupPurchaseCampaignId"] = request.GroupPurchaseCampaignId.ToString("D"),
-                    ["SourceGroupPurchaseLedgerId"] = sourceLedger.원장Id,
-                    ["HsCode"] = campaign.HsCode ?? string.Empty,
-                    ["SellerCountryCode"] = campaign.SellerCountryCode ?? string.Empty,
-                    ["ShipFromCountryCode"] = campaign.ShipFromCountryCode ?? string.Empty,
-                    ["DeliveryCountryCode"] = campaign.DeliveryCountryCode ?? string.Empty,
-                    ["OperatingMarketCountryCode"] = campaign.OperatingMarketCountryCode
-                                                       ?? CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
-                    ["LogisticsRouteCode"] = plan.LogisticsRouteCode,
-                    ["WarehouseReferenceKey"] = request.WarehouseReferenceKey.Trim()
-                },
-                확장속성 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["WorkflowVersion"] = "1.0",
-                    ["StageCatalog"] = string.Join(",", CommunityGroupImportLedgerStageCodes.Ordered),
-                    ["LogisticsRouteLabel"] = plan.LogisticsRouteLabel,
-                    ["FinalDestinationLabel"] = request.FinalDestinationLabel.Trim()
-                }
+                외부참조 = externalReferences,
+                확장속성 = extensions
             },
             actorUserId,
             cancellationToken);
@@ -173,7 +247,7 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
             new CommunityGroupPurchaseLedgerProgressRequest
             {
                 StageCode = CommunityGroupPurchaseLedgerStageCodes.Execution,
-                Memo = $"별도 공동수입 원장 {saved.원장Id}을 생성하고 {plan.LogisticsRouteLabel} 경로로 인계했습니다."
+                Memo = $"공동수입 원장 {saved.원장Id}에 연결하고 {plan.LogisticsRouteLabel} 준비 경로를 기록했습니다."
             },
             actorUserId,
             cancellationToken);
@@ -249,7 +323,12 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                         ["WarehouseDisplayName"] = request.WarehouseDisplayName.Trim(),
                         ["FinalDestinationLabel"] = request.FinalDestinationLabel.Trim(),
                         ["RequiresWarehouseOutbound"] = request.RequiresWarehouseOutbound.ToString(),
-                        ["RequiresFinalDestinationDelivery"] = request.RequiresFinalDestinationDelivery.ToString()
+                        ["RequiresFinalDestinationDelivery"] = request.RequiresFinalDestinationDelivery.ToString(),
+                        ["InternationalTransportMode"] = request.InternationalTransportMode.Trim(),
+                        ["ForwarderOrLogisticsProviderName"] = request.ForwarderOrLogisticsProviderName.Trim(),
+                        ["ForwarderResponseReference"] = request.ForwarderResponseReference.Trim(),
+                        ["ForwarderAutoSelection"] = bool.FalseString,
+                        ["ExternalAutoSend"] = bool.FalseString
                     }
                 }
             ],
@@ -296,7 +375,12 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
             }),
             Block("shipment-customs", "해외 선적·통관", "planned", new()
             {
-                ["InternationalTransportMode"] = request.InternationalTransportMode.Trim()
+                ["InternationalTransportMode"] = request.InternationalTransportMode.Trim(),
+                ["ForwarderOrLogisticsProviderName"] = request.ForwarderOrLogisticsProviderName.Trim(),
+                ["ForwarderResponseReference"] = request.ForwarderResponseReference.Trim(),
+                ["ForwarderAutoSelection"] = bool.FalseString,
+                ["ExternalAutoSend"] = bool.FalseString,
+                ["TransportInstruction"] = bool.FalseString
             }),
             Block("domestic-logistics", "국내 물류 선택", "confirmed", new()
             {
@@ -310,6 +394,35 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
             }),
             Block("settlement", "수입 도착원가·정산", "planned", new())
         ];
+
+    private static IReadOnlyList<커뮤니티원장블록Dto> MergeBlocks(
+        커뮤니티원장Dto? existing,
+        IReadOnlyList<커뮤니티원장블록Dto> operationalBlocks)
+    {
+        var operationalIds = operationalBlocks
+            .Select(block => block.BlockId)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return (existing?.블록목록 ?? [])
+            .Where(block => !operationalIds.Contains(block.BlockId))
+            .Concat(operationalBlocks)
+            .ToArray();
+    }
+
+    private static Dictionary<string, string> MergeDictionary(
+        IReadOnlyDictionary<string, string>? existing,
+        IReadOnlyDictionary<string, string> updates)
+    {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in existing ?? new Dictionary<string, string>())
+        {
+            result[pair.Key] = pair.Value;
+        }
+        foreach (var pair in updates)
+        {
+            result[pair.Key] = pair.Value;
+        }
+        return result;
+    }
 
     private static 커뮤니티원장블록Dto Block(
         string blockId,

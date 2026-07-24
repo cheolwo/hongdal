@@ -180,6 +180,8 @@
         => role switch
         {
             주문원장포함역할.개별주문 => "개별 주문",
+            주문원장포함역할.개별수입 => "개별수입 확장",
+            주문원장포함역할.개별수출 => "개별수출 확장",
             주문원장포함역할.판매 => "판매",
             주문원장포함역할.창고입고 => "창고 입고",
             주문원장포함역할.창고출고 => "창고 출고",
@@ -200,7 +202,10 @@
         => templateKey switch
         {
             CommunityLedgerTemplateKeys.GroupPurchase => Icons.Material.Filled.Hub,
+            CommunityLedgerTemplateKeys.IndividualImport => Icons.Material.Filled.Public,
+            CommunityLedgerTemplateKeys.IndividualExport => Icons.Material.Filled.Public,
             CommunityLedgerTemplateKeys.GroupImport => Icons.Material.Filled.Public,
+            CommunityLedgerTemplateKeys.GroupExport => Icons.Material.Filled.Hub,
             CommunityLedgerTemplateKeys.Order or CommunityLedgerTemplateKeys.FoodOrder or CommunityLedgerTemplateKeys.SsalddelMart => Icons.Material.Filled.ShoppingCart,
             CommunityLedgerTemplateKeys.LocalSale => Icons.Material.Filled.Storefront,
             CommunityLedgerTemplateKeys.WarehouseInbound or CommunityLedgerTemplateKeys.WarehouseOutbound => Icons.Material.Filled.Warehouse,

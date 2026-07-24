@@ -1,6 +1,7 @@
 using FluentResults;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Microsoft.AspNetCore.Http;
 
 namespace Ssalddel.Services.Community;
@@ -251,6 +252,7 @@ public sealed class IndividualOrderPerspectiveReadService(
             관계코드 = candidate.Perspective,
             조회근거 = communityView ? "공동원장참여" : candidate.RoleView?.주문원장조회근거 ?? string.Empty,
             공동원장Id = candidate.CommunityLedgerId,
+            거래문맥 = TransactionContext(candidate.Root),
             관련원장역할목록 = roles,
             관련하위원장수 = candidate.RoleView?.관련원장목록.Count ?? candidate.Root.포함원장목록.Count,
             상세공개요청필요수 = candidate.RoleView?.상세공개요청필요수 ?? 0,
@@ -329,6 +331,24 @@ public sealed class IndividualOrderPerspectiveReadService(
                개별주문관점코드.운송담당자,
                개별주문관점코드.공동원장
            }.Contains(perspective, StringComparer.OrdinalIgnoreCase);
+
+    private static 공동구매거래문맥응답 TransactionContext(커뮤니티원장Dto ledger)
+    {
+        var transactionType = External(ledger, 공동구매거래문맥원장키.거래유형);
+        return new 공동구매거래문맥응답
+        {
+            거래유형 = 공동구매거래유형코드.정규화(transactionType),
+            가격표시기준 = 공동구매가격표시기준코드.정규화(
+                External(ledger, 공동구매거래문맥원장키.가격표시기준),
+                transactionType),
+            원천거래문맥원장Id = External(ledger, 공동구매거래문맥원장키.원천거래문맥원장Id)
+                ?? External(ledger, "SourceGroupPurchaseLedgerId")
+                ?? string.Empty
+        };
+    }
+
+    private static string? External(커뮤니티원장Dto ledger, string key)
+        => ledger.외부참조.TryGetValue(key, out var value) ? Clean(value) : null;
 
     private static string? Clean(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

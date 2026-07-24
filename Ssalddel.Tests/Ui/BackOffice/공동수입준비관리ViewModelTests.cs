@@ -17,13 +17,45 @@ public sealed class 공동수입준비관리ViewModelTests
         Assert.True(viewModel.초기화됨);
         Assert.Equal("group-1", viewModel.선택집단?.자동집단Id);
         Assert.Equal(5, viewModel.초안.예상비용목록.Count);
+        Assert.Single(viewModel.초안.재료품목목록);
+        Assert.Equal("ingredient-sauce", viewModel.초안.재료품목목록[0].재료키);
+        Assert.Equal(
+            [공동수입준비국제운송방식코드.Lcl, 공동수입준비국제운송방식코드.Fcl],
+            viewModel.초안.국제운송검토.방식후보목록);
         Assert.Single(viewModel.초안.품목분류후보목록);
         Assert.Single(viewModel.초안.국가별검토항목목록);
         Assert.Equal(4, viewModel.초안.책임초안목록.Count);
         Assert.False(viewModel.인계승인됨);
         Assert.False(viewModel.저장가능);
+        Assert.Contains(viewModel.추가가능재료집단목록, group => group.자동집단Id == "group-2");
+        Assert.DoesNotContain(viewModel.추가가능재료집단목록, group => group.자동집단Id == "group-b2b");
         Assert.Equal(1, client.OperatingStatusReadCount);
         Assert.Equal(1, client.ReadinessReadCount);
+    }
+
+    [Fact]
+    public async Task 승인된수요재료를_같은준비묶음에추가하고_포워더인계와회신을별도로기록한다()
+    {
+        var client = new FakeClient();
+        var viewModel = new 공동수입준비관리ViewModel(client);
+        await viewModel.초기화Async("운영 관리자");
+        viewModel.승인사유 = "기준 수요 승인";
+        await viewModel.인계승인Async();
+
+        viewModel.추가재료집단Id = "group-2";
+        await viewModel.재료집단추가Async();
+        viewModel.초안.포워더인계.전달대상업체명 = "회신 포워더";
+        viewModel.포워더인계상태변경(공동수입준비포워더인계상태코드.인계기록됨);
+        viewModel.포워더회신방식변경(공동수입준비국제운송방식코드.Fcl);
+
+        Assert.Equal(2, viewModel.초안.재료품목목록.Count);
+        Assert.Contains(viewModel.초안.재료품목목록, item => item.재료키 == "ingredient-spice");
+        Assert.Equal(2, viewModel.초안.품목분류후보목록.Count);
+        Assert.Equal(공동수입준비국제운송방식코드.Fcl, viewModel.초안.국제운송검토.포워더제안방식코드);
+        Assert.Equal(공동수입준비국제운송검토상태코드.포워더회신완료, viewModel.초안.국제운송검토.검토상태코드);
+        Assert.Equal("회신 포워더", viewModel.초안.국제운송검토.회신업체표시명);
+        Assert.Equal("운영 관리자", viewModel.초안.국제운송검토.회신기록자표시명);
+        Assert.Equal(공동수입준비포워더인계상태코드.회신기록됨, viewModel.초안.포워더인계.인계상태코드);
     }
 
     [Fact]
@@ -70,6 +102,36 @@ public sealed class 공동수입준비관리ViewModelTests
         Assert.Contains("비활성", viewModel.메시지, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task 저장된원장만_Os점검과전문검토인계에사용하고_Revision을동기화한다()
+    {
+        var client = new FakeClient();
+        var viewModel = new 공동수입준비관리ViewModel(client);
+        await viewModel.초기화Async("운영 관리자");
+        viewModel.승인사유 = "모집 근거 확인";
+        await viewModel.인계승인Async();
+        await viewModel.저장Async();
+
+        viewModel.초안.재료명 = "미저장 변경";
+        viewModel.초안변경됨();
+        Assert.False(viewModel.Os작업실행가능);
+
+        await viewModel.저장Async();
+        var revisionBeforeOs = viewModel.저장원장!.Revision;
+        await viewModel.Os작업실행Async(공동수입준비Os작업코드.전체준비점검, 재시도여부: false);
+
+        Assert.Equal(1, client.OsRunCount);
+        Assert.Equal(revisionBeforeOs + 1, viewModel.저장원장.Revision);
+        viewModel.전문검토수신자 = "검토 관세사";
+        viewModel.전문검토범위 = "HSK와 수입 규제";
+        viewModel.전문검토인계메모 = "공식 근거 확인 요청";
+        await viewModel.전문검토인계Async();
+
+        Assert.Equal(1, client.QualifiedHandoffCount);
+        Assert.Equal("검토 관세사", viewModel.준비Os상태?.전문검토인계기록?.검토수신자표시명);
+        Assert.False(viewModel.저장원장.평가.계약서명가능);
+    }
+
     private sealed class FakeClient(bool featureEnabled = true) : I공동수입준비관리Client
     {
         private 공동구매수요모집Os상태응답 _state = new()
@@ -86,6 +148,8 @@ public sealed class 공동수입준비관리ViewModelTests
         public int ReadinessReadCount { get; private set; }
         public List<string> SaveKeys { get; } = [];
         public List<long?> ExpectedRevisions { get; } = [];
+        public int OsRunCount { get; private set; }
+        public int QualifiedHandoffCount { get; private set; }
 
         public Task<IReadOnlyList<공동구매자동집단요약응답>> 작업대목록조회Async(CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<공동구매자동집단요약응답>>
@@ -101,6 +165,32 @@ public sealed class 공동수입준비관리ViewModelTests
                     총희망수량 = 1_800m,
                     수량단위 = "kg",
                     참여자수 = 18
+                },
+                new 공동구매자동집단요약응답
+                {
+                    자동집단Id = "group-2",
+                    상품키 = "ingredient-spice",
+                    상품명 = "혼합 향신료",
+                    HS코드 = "2106.90",
+                    배송권명 = "서울 모집권",
+                    현재상태 = 공동구매자동집단상태코드.확정,
+                    총희망수량 = 720m,
+                    수량단위 = "kg",
+                    참여자수 = 12
+                },
+                new 공동구매자동집단요약응답
+                {
+                    자동집단Id = "group-b2b",
+                    상품키 = "ingredient-business-spice",
+                    상품명 = "사업용 향신료",
+                    HS코드 = "2106.90",
+                    거래유형 = 공동구매거래유형코드.B2B,
+                    가격표시기준 = 공동구매가격표시기준코드.부가세별도,
+                    배송권명 = "서울 모집권",
+                    현재상태 = 공동구매자동집단상태코드.확정,
+                    총희망수량 = 2_000m,
+                    수량단위 = "kg",
+                    참여자수 = 3
                 }
             ]);
 
@@ -147,6 +237,43 @@ public sealed class 공동수입준비관리ViewModelTests
             ExpectedRevisions.Add(요청.기대Revision);
             return Task.FromResult(Response(요청, SaveKeys.Count));
         }
+
+        public Task<공동수입준비Os상태응답?> 준비Os상태조회Async(string 자동집단Id, CancellationToken cancellationToken = default)
+            => Task.FromResult<공동수입준비Os상태응답?>(OsResponse(SaveKeys.Count));
+
+        public Task<공동수입준비Os상태응답> 준비Os작업실행Async(string 자동집단Id, 공동수입준비Os작업실행요청 요청, CancellationToken cancellationToken = default)
+        {
+            OsRunCount++;
+            return Task.FromResult(OsResponse((요청.기대Revision ?? 0) + 1));
+        }
+
+        public Task<공동수입준비Os상태응답> 전문검토인계Async(string 자동집단Id, 공동수입준비Os전문검토인계요청 요청, CancellationToken cancellationToken = default)
+        {
+            QualifiedHandoffCount++;
+            var response = OsResponse((요청.기대Revision ?? 0) + 1);
+            response.전문검토인계기록 = new 공동수입준비Os전문검토인계기록
+            {
+                검토수신자표시명 = 요청.검토수신자표시명,
+                검토범위 = 요청.검토범위,
+                인계메모 = 요청.인계메모,
+                인계시각Utc = DateTimeOffset.UtcNow
+            };
+            return Task.FromResult(response);
+        }
+
+        private static 공동수입준비Os상태응답 OsResponse(long revision)
+            => new()
+            {
+                자동집단Id = "group-1",
+                원장Id = "trade-readiness-1",
+                원장Revision = revision,
+                기능활성여부 = true,
+                OsWorker활성여부 = true,
+                실행모드 = "Simulation",
+                시뮬레이션여부 = true,
+                상태코드 = 공동수입준비Os상태코드.전문검토인계준비,
+                전문검토인계가능 = true
+            };
 
         private static 공동수입준비원장응답 Response(공동수입준비원장저장요청 request, long revision)
             => new()

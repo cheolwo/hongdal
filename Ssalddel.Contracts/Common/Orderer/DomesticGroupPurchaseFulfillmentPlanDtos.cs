@@ -44,6 +44,8 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanRequest
 {
     public Guid GroupPurchaseCampaignId { get; set; }
     public string CampaignTitle { get; set; } = string.Empty;
+    public string TransactionTypeCode { get; set; } = 공동구매거래유형코드.B2C;
+    public string PriceBasisCode { get; set; } = 공동구매가격표시기준코드.부가세포함;
     public string RouteCode { get; set; } = DomesticGroupPurchaseFulfillmentRouteCodes.DirectCollectionPoint;
     public string ProducerDisplayName { get; set; } = string.Empty;
     public string ProductSummary { get; set; } = string.Empty;
@@ -86,7 +88,7 @@ public sealed class DomesticGroupPurchaseFulfillmentLedgerEdge
 
 public sealed class DomesticGroupPurchaseFulfillmentPlanResponse
 {
-    public string PlanVersion { get; set; } = "1.1";
+    public string PlanVersion { get; set; } = "1.2";
     public string PlanFingerprint { get; set; } = string.Empty;
     public string AgreementPolicyCode { get; set; } = CommunityGroupPurchaseAgreementPolicy.PolicyCode;
     public string ProposalOriginLegalEffectNotice { get; set; }
@@ -94,6 +96,7 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanResponse
     public Guid GroupPurchaseCampaignId { get; set; }
     public string RouteCode { get; set; } = string.Empty;
     public string RouteLabel { get; set; } = string.Empty;
+    public 공동구매거래문맥응답 TransactionContext { get; set; } = new();
     public string OrderLedgerNodeId { get; set; } = "order-root";
     public string OrderLedgerId { get; set; } = string.Empty;
     public bool OrderPlacementReady { get; set; }
@@ -260,13 +263,20 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         var ready = warnings.Count == 0;
         return new DomesticGroupPurchaseFulfillmentPlanResponse
         {
-            PlanVersion = "1.1",
+            PlanVersion = "1.2",
             PlanFingerprint = CreateFingerprint(request, routeCode),
             AgreementPolicyCode = CommunityGroupPurchaseAgreementPolicy.PolicyCode,
             ProposalOriginLegalEffectNotice = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice,
             GroupPurchaseCampaignId = request.GroupPurchaseCampaignId,
             RouteCode = routeCode,
             RouteLabel = GetRouteLabel(routeCode),
+            TransactionContext = new 공동구매거래문맥응답
+            {
+                거래유형 = 공동구매거래유형코드.정규화(request.TransactionTypeCode),
+                가격표시기준 = 공동구매가격표시기준코드.정규화(
+                    request.PriceBasisCode,
+                    request.TransactionTypeCode)
+            },
             OrderPlacementReady = ready,
             LedgersPersisted = false,
             OrderPlaced = false,
@@ -329,6 +339,22 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         if (request.GroupPurchaseCampaignId == Guid.Empty)
         {
             warnings.Add("공동구매 캠페인 식별자가 필요합니다.");
+        }
+        if (!공동구매거래유형코드.지원여부(request.TransactionTypeCode))
+        {
+            warnings.Add("발주 원장의 거래유형은 B2C 또는 B2B여야 합니다.");
+        }
+        if (!공동구매가격표시기준코드.지원여부(request.PriceBasisCode))
+        {
+            warnings.Add("발주 원장의 가격 표시 기준이 필요합니다.");
+        }
+        else if (공동구매거래유형코드.정규화(request.TransactionTypeCode) == 공동구매거래유형코드.B2C
+                 && !string.Equals(
+                     request.PriceBasisCode,
+                     공동구매가격표시기준코드.부가세포함,
+                     StringComparison.OrdinalIgnoreCase))
+        {
+            warnings.Add("B2C 발주 가격은 부가세 포함 기준이어야 합니다.");
         }
         if (string.IsNullOrWhiteSpace(request.ProductSummary))
         {
@@ -415,6 +441,10 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         {
             GroupPurchaseCampaignId = request.GroupPurchaseCampaignId,
             CampaignTitle = request.CampaignTitle,
+            TransactionTypeCode = 공동구매거래유형코드.정규화(request.TransactionTypeCode),
+            PriceBasisCode = 공동구매가격표시기준코드.정규화(
+                request.PriceBasisCode,
+                request.TransactionTypeCode),
             RouteCode = routeCode,
             ProducerDisplayName = request.ProducerDisplayName,
             ProductSummary = request.ProductSummary,
@@ -451,6 +481,10 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         var canonical = string.Join('|',
             request.GroupPurchaseCampaignId.ToString("N"),
             CommunityGroupPurchaseAgreementPolicy.PolicyCode,
+            NormalizeFingerprintPart(공동구매거래유형코드.정규화(request.TransactionTypeCode)),
+            NormalizeFingerprintPart(공동구매가격표시기준코드.정규화(
+                request.PriceBasisCode,
+                request.TransactionTypeCode)),
             NormalizeFingerprintPart(routeCode),
             NormalizeFingerprintPart(request.ProducerDisplayName),
             NormalizeFingerprintPart(request.ProductSummary),

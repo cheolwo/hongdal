@@ -33,22 +33,49 @@ public sealed class 공동수입준비원장AdminControllerTests
     }
 
     [Fact]
-    public void 계약_Api_Application은_같은1_5기능메타데이터를가진다()
+    public void 원장과Os_계약_Api_Application은_같은1_5기능메타데이터를가진다()
     {
         var metadata = new[]
         {
             typeof(공동수입준비원장저장요청),
+            typeof(공동수입준비Os상태응답),
             typeof(공동수입준비원장AdminController),
-            typeof(공동수입준비원장Service)
+            typeof(공동수입준비원장Service),
+            typeof(공동수입준비OS)
         }
             .SelectMany(SsalddelCodeMetadataReader.Read)
             .Where(item => item.FeatureKey == SsalddelCodeFeatureKeys.GroupImportTradeReadiness)
             .ToArray();
 
-        Assert.Equal(3, metadata.Length);
+        Assert.Equal(5, metadata.Length);
         Assert.Equal(
-            [SsalddelCodeLayer.Contract, SsalddelCodeLayer.Api, SsalddelCodeLayer.Application],
+            [
+                SsalddelCodeLayer.Contract,
+                SsalddelCodeLayer.Contract,
+                SsalddelCodeLayer.Api,
+                SsalddelCodeLayer.Application,
+                SsalddelCodeLayer.Application
+            ],
             metadata.OrderBy(item => item.FlowOrder).Select(item => item.Layer).ToArray());
         Assert.All(metadata, item => Assert.Contains("계약", item.Boundary + item.Responsibility, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Controller는_Os조회_작업실행_전문검토인계경로를제공한다()
+    {
+        var methods = typeof(공동수입준비원장AdminController).GetMethods();
+
+        Assert.Equal(
+            "os",
+            methods.Single(method => method.Name == nameof(공동수입준비원장AdminController.Os상태조회))
+                .GetCustomAttribute<HttpGetAttribute>()?.Template);
+        Assert.Equal(
+            "os/workloads/run",
+            methods.Single(method => method.Name == nameof(공동수입준비원장AdminController.Os작업실행))
+                .GetCustomAttribute<HttpPostAttribute>()?.Template);
+        Assert.Equal(
+            "os/qualified-review-handoff",
+            methods.Single(method => method.Name == nameof(공동수입준비원장AdminController.전문검토인계))
+                .GetCustomAttribute<HttpPostAttribute>()?.Template);
     }
 }

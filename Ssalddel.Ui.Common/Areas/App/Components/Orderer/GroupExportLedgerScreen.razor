@@ -1,0 +1,45 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject 공동수출원장생성ViewModel ViewModel
+
+<MudStack Spacing="3" Class="pa-4">
+    <MudText Typo="Typo.h4">공동수출 원장</MudText>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        이미 존재하는 개별수출 원장만 집하·합포장 후보로 묶습니다.
+        수출자별 신고와 서류 원본은 개별수출 원장에 그대로 보존됩니다.
+    </MudAlert>
+
+    <MudTextField Label="제목" @bind-Value="ViewModel.요청.제목" />
+    <MudTextField Label="개별수출 원장 ID 목록"
+                  HelperText="줄바꿈 또는 쉼표로 구분"
+                  @bind-Value="ViewModel.개별수출원장Ids입력"
+                  Lines="5"
+                  Required />
+    <MudTextField Label="집하 마감" @bind-Value="ViewModel.요청.집하마감" />
+    <MudTextField Label="포워더 인계 메모" @bind-Value="ViewModel.요청.포워더인계메모" Lines="3" />
+    <MudTextField Label="공통비 배부 근거" @bind-Value="ViewModel.요청.공통비배부근거" Lines="3" />
+
+    <MudButton Color="Color.Primary" Variant="Variant.Filled"
+               Disabled="@ViewModel.처리중"
+               OnClick="CreateAsync">
+        @(ViewModel.처리중 ? "저장 중" : "공동수출 집계 원장 만들기")
+    </MudButton>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.오류))
+    {
+        <MudAlert Severity="Severity.Error">@ViewModel.오류</MudAlert>
+    }
+    @if (ViewModel.결과 is not null)
+    {
+        <MudAlert Severity="Severity.Success">
+            원장 @ViewModel.결과.원장.원장Id · 개별수출 @ViewModel.결과.원천원장목록.Count 건 · @ViewModel.결과.실행모드
+        </MudAlert>
+    }
+</MudStack>
+
+@code {
+    private async Task CreateAsync()
+    {
+        await ViewModel.생성Async();
+        StateHasChanged();
+    }
+}

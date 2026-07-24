@@ -1,3 +1,5 @@
+@using Ssalddel.Contracts.Common.Orderer
+
 <div class="group-import-hs-workspace">
     <header class="group-import-hs-header">
         <div>
@@ -247,10 +249,14 @@
                         <MudTextField @bind-Value="draft.Title" Label="공동 선택 제목" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         <MudTextField @bind-Value="draft.CreatorDisplayName" Label="개설자 표시명" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         <MudTextField @bind-Value="draft.CommunityScope" Label="커뮤니티·지역 범위" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                        <MudSelect T="string" @bind-Value="draft.LogisticsMode" Label="예상 운송 방식" Variant="Variant.Outlined" Margin="Margin.Dense">
-                            <MudSelectItem Value="@("LCL")">LCL 혼재 화물</MudSelectItem>
-                            <MudSelectItem Value="@("FCL")">FCL 컨테이너</MudSelectItem>
-                            <MudSelectItem Value="@("국제특송")">국제특송</MudSelectItem>
+                        <div class="group-import-hs-form-wide group-import-hs-buyer-types">
+                            <strong>받을 구매 목적</strong>
+                            <MudCheckBox T="bool" @bind-Value="draft.AllowConsumerPurchases" Color="Color.Primary">B2C · 개인 소비 구매</MudCheckBox>
+                            <MudCheckBox T="bool" @bind-Value="draft.AllowBusinessPurchases" Color="Color.Primary">B2B · 사업 목적 구매</MudCheckBox>
+                            <small>B2C와 B2B 수요는 물류 검토에는 함께 참고할 수 있지만 계약·가격 기준은 분리합니다.</small>
+                        </div>
+                        <MudSelect T="string" @bind-Value="draft.LogisticsMode" Label="국제 운송 방식" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true" HelperText="여러 상품의 합산 조건을 받은 포워더·물류대행업체가 LCL/FCL 등을 제안합니다.">
+                            <MudSelectItem Value="@(CommunityGroupImportInternationalTransportModeCodes.ReviewRequired)">포워더 검토 필요</MudSelectItem>
                         </MudSelect>
                         <MudTextField @bind-Value="draft.QuantityUnit" Label="수량 단위" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         <MudNumericField T="int" @bind-Value="draft.MinimumParticipantCount" Label="최소 참여자" Min="1" Variant="Variant.Outlined" Margin="Margin.Dense" />
@@ -351,11 +357,42 @@
                         }
                     </div>
 
+                    @if (selectedCampaign.GroupPurchase?.TransactionSegments.Count > 0)
+                    {
+                        <div class="group-import-hs-transaction-segments" aria-label="거래유형별 수요 집계">
+                            @foreach (var segment in selectedCampaign.GroupPurchase.TransactionSegments)
+                            {
+                                <span>
+                                    @($"{segment.TransactionTypeCode} · {segment.BuyerCount}구매주체 · {segment.RequestedQuantity}{selectedCampaign.GroupPurchase.QuantityUnit}")
+                                </span>
+                            }
+                        </div>
+                    }
+
                     @if (selectedCampaign.Status == CommunityVoteStatusCodes.Open)
                     {
                         <div class="group-import-hs-participation">
                             <MudTextField @bind-Value="participantDisplayName" Label="참여자 표시명" Variant="Variant.Outlined" Margin="Margin.Dense" />
                             <MudNumericField T="int" @bind-Value="requestedQuantity" Label="희망 수량" Min="1" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudSelect T="string" @bind-Value="ParticipantTransactionTypeCode" Label="구매 목적" Variant="Variant.Outlined" Margin="Margin.Dense">
+                                @foreach (var transactionTypeCode in SelectedCampaignAllowedTransactionTypeCodes)
+                                {
+                                    <MudSelectItem Value="@transactionTypeCode">@공동구매거래유형코드.표시명(transactionTypeCode)</MudSelectItem>
+                                }
+                            </MudSelect>
+                            @if (IsBusinessParticipation)
+                            {
+                                <div class="group-import-hs-business-context">
+                                    <MudTextField @bind-Value="participantOrganizationName" Label="구매 조직명" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                    <MudTextField @bind-Value="participantOrganizationReference" Label="조직 참조키(선택)" HelperText="사업자등록번호가 아닌 플랫폼 내부 조직 ID" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                    <MudSelect T="string" @bind-Value="participantPriceBasisCode" Label="가격 기준" Variant="Variant.Outlined" Margin="Margin.Dense">
+                                        <MudSelectItem Value="@공동구매가격표시기준코드.부가세별도">부가세 별도</MudSelectItem>
+                                        <MudSelectItem Value="@공동구매가격표시기준코드.부가세포함">부가세 포함</MudSelectItem>
+                                    </MudSelect>
+                                    <MudCheckBox T="bool" @bind-Value="participantTaxInvoiceRequired" Color="Color.Primary">세금계산서 필요</MudCheckBox>
+                                    <small>사업자등록번호와 권한은 계약 확정 전에 별도로 검증합니다.</small>
+                                </div>
+                            }
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Success"
                                        StartIcon="@Icons.Material.Filled.CheckCircle"

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.ContractManagement;
+using Ssalddel.Contracts.Common.Orderer;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -720,6 +721,11 @@ internal sealed class CommunityVoteCastRecord
     public string VoterDisplayName { get; set; } = string.Empty;
     public IReadOnlyList<string> OptionIds { get; set; } = [];
     public int RequestedQuantity { get; set; }
+    public string TransactionTypeCode { get; set; } = 공동구매거래유형코드.B2C;
+    public string PriceBasisCode { get; set; } = 공동구매가격표시기준코드.부가세포함;
+    public string? PurchasingOrganizationReference { get; set; }
+    public string? PurchasingOrganizationName { get; set; }
+    public bool TaxInvoiceRequired { get; set; }
     public string ParticipationMethodCode { get; set; } = string.Empty;
     public string? PickupPointId { get; set; }
     public bool AllowNearbyPickupPointFallback { get; set; }
@@ -745,6 +751,8 @@ internal sealed class CommunityGroupPurchaseVoteSettingsRecord
     public string TemperatureCode { get; set; } = "상온";
     public string LogisticsMode { get; set; } = "LCL";
     public string QuantityUnit { get; set; } = "개";
+    public IReadOnlyList<string> AllowedTransactionTypeCodes { get; set; }
+        = [공동구매거래유형코드.B2C];
     public decimal? TargetUnitPriceKrwPerKg { get; set; }
     public string ServiceAreaKey { get; set; } = string.Empty;
     public string ServiceAreaLabel { get; set; } = string.Empty;

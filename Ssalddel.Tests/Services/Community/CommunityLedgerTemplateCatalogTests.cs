@@ -10,7 +10,10 @@ public sealed class CommunityLedgerTemplateCatalogTests
         var keys = CommunityLedgerTemplateCatalog.All.Select(x => x.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         Assert.Contains(CommunityLedgerTemplateKeys.CargoTransport, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.IndividualDemand, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.Order, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.IndividualImport, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.IndividualExport, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.FoodOrder, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.FoodDelivery, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.SsalddelMart, keys);
@@ -20,8 +23,16 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(CommunityLedgerTemplateKeys.GroupPurchase, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.GroupOrder, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.GroupImport, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.GroupExport, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.MeatImportReadiness, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.Errand, keys);
+    }
+
+    [Fact]
+    public void Find_UnknownKey_PreservesOrderLedgerFallback()
+    {
+        Assert.Equal(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateCatalog.Find(null).Key);
+        Assert.Equal(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateCatalog.Find("unknown-template").Key);
     }
 
     [Fact]
@@ -150,6 +161,41 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Inventory && block.UiSectionHint == "3PL 입고");
         Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "세대 분배");
         Assert.Contains(groupImport.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution));
+
+        var individualImport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.IndividualImport);
+        Assert.True(individualImport.IsExtensionTemplate);
+        Assert.Contains(individualImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "원천 개별 주문 원장");
+        Assert.Contains(individualImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "해외 선적");
+        Assert.Contains(individualImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "통관 상태");
+        Assert.Contains(individualImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "국내 반출");
+        Assert.Contains(individualImport.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.IndividualOrderBeforeIndividualImport));
+
+        var individualExport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.IndividualExport);
+        Assert.True(individualExport.IsExtensionTemplate);
+        Assert.Contains(individualExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "원천 개별 주문 원장");
+        Assert.Contains(individualExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Participant && block.UiSectionHint == "수출자·신고인");
+        Assert.Contains(individualExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Item && block.UiSectionHint == "수출 품목·HS 후보");
+        Assert.Contains(individualExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Place && block.UiSectionHint == "Incoterms·지정장소");
+        Assert.Contains(individualExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Evidence && block.UiSectionHint == "상업송장·포장명세");
+        Assert.Contains(individualExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Time && block.UiSectionHint == "적재 예정·기한");
+        Assert.Contains(individualExport.LedgerBlocks, block => block.UiSectionHint == "신고 방식·적용 근거" && block.DataHints.Contains("기준 시행일"));
+        Assert.Contains(individualExport.LedgerBlocks, block =>
+            block.UiSectionHint == "원천 수출 교류장(선택)"
+            && block.DataHints.Contains("게시글 ID"));
+        Assert.Contains(individualExport.LedgerBlocks, block =>
+            block.BlockType == CommunityLedgerBlockTypes.Decision
+            && block.UiSectionHint == "완료 후 교류 환류 동의"
+            && block.DataHints.Contains("철회 상태"));
+        Assert.Contains(individualExport.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.ExportDeclarationAcceptedBeforeLoading));
+        Assert.Contains(individualExport.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.CompletedIndividualExportBeforeExchangeFeedback));
+
+        var groupExport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupExport);
+        Assert.Contains(groupExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "개별수출 원장 집합");
+        Assert.Contains(groupExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Evidence && block.UiSectionHint == "수출자별 신고 보존");
+        Assert.Contains(groupExport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "포워더 인계");
+        Assert.Contains(groupExport.LedgerBlocks, block => block.UiSectionHint == "통합 포장목록" && block.DataHints.Contains("개별수출 원장 ID"));
+        Assert.Contains(groupExport.LedgerBlocks, block => block.UiSectionHint == "공통 비용 배부" && block.DataHints.Contains("배부 기준"));
+        Assert.Contains(groupExport.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.GroupExportPreservesIndividualDeclarations));
     }
 
     [Fact]
@@ -157,11 +203,20 @@ public sealed class CommunityLedgerTemplateCatalogTests
     {
         var modules = CommunityLedgerTemplateCatalog.PriorityImplementationModules;
 
-        Assert.Equal(19, modules.Count);
-        Assert.Equal(Enumerable.Range(1, 19), modules.Select(module => module.Priority).Order());
+        Assert.Equal(23, modules.Count);
+        Assert.Equal(Enumerable.Range(1, 23), modules.Select(module => module.Priority).Order());
         Assert.Equal("커뮤니티 대화 원장", modules[0].DisplayName);
-        Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment);
+        Assert.Contains(modules, module =>
+            module.ModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment
+            && module.LedgerTemplateKey == CommunityLedgerTemplateKeys.IndividualDemand);
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot);
+        Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.IndividualImportExtension);
+        Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.IndividualExportExtension);
+        Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.GroupExportAggregation);
+        Assert.Contains(modules, module =>
+            module.ModuleCode == CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity
+            && module.LedgerTemplateKey == CommunityLedgerTemplateKeys.Errand
+            && module.Summary.Contains("점수화", StringComparison.Ordinal));
         Assert.Contains(modules, module => module.DisplayName == "마트 배송 원장");
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand);
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.GroupOrderAggregation);
@@ -179,6 +234,54 @@ public sealed class CommunityLedgerTemplateCatalogTests
             && relation.RelationType == CommunityLedgerRelationTypes.Contains
             && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany);
         Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.IndividualImportExtension
+            && relation.FromLedgerTemplateKey == CommunityLedgerTemplateKeys.Order
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.IndividualImport
+            && relation.RelationType == CommunityLedgerRelationTypes.Contains
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany
+            && !relation.Required);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.IndividualExportExtension
+            && relation.FromLedgerTemplateKey == CommunityLedgerTemplateKeys.Order
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.IndividualExport
+            && relation.RelationType == CommunityLedgerRelationTypes.Contains
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany
+            && !relation.Required);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.GroupExportAggregation
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.IndividualExportExtension
+            && relation.FromLedgerTemplateKey == CommunityLedgerTemplateKeys.GroupExport
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.IndividualExport
+            && relation.RelationType == CommunityLedgerRelationTypes.Contains
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany
+            && relation.Required);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.CommunityConversation
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity
+            && relation.RelationType == CommunityLedgerRelationTypes.Reference
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany
+            && !relation.Required);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot
+            && relation.FromLedgerTemplateKey == CommunityLedgerTemplateKeys.Errand
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.Order
+            && relation.RelationType == CommunityLedgerRelationTypes.Handoff
+            && relation.Trigger.Contains("명시적으로", StringComparison.Ordinal)
+            && !relation.Required);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.IndividualExportExtension
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity
+            && relation.RelationType == CommunityLedgerRelationTypes.Reference
+            && relation.Cardinality == CommunityLedgerRelationCardinality.ManyToOne
+            && relation.Trigger.Contains("비식별", StringComparison.Ordinal)
+            && !relation.Required);
+        Assert.DoesNotContain(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.ExportExchangeCommunity
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.IndividualExportExtension);
+        Assert.Contains(relations, relation =>
             relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand
             && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.GroupOrderAggregation
             && relation.RelationType == CommunityLedgerRelationTypes.Contains
@@ -193,8 +296,15 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(relations, relation =>
             relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.CommunityConversation
             && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.IndividualDemand
             && relation.RelationType == CommunityLedgerRelationTypes.Handoff
             && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand
+            && relation.FromLedgerTemplateKey == CommunityLedgerTemplateKeys.IndividualDemand
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.GroupPurchase
+            && relation.Cardinality == CommunityLedgerRelationCardinality.ManyToOne);
         Assert.Contains(relations, relation =>
             relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.PickingPacking
             && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.SsalddelMartDelivery
@@ -437,6 +547,25 @@ public sealed class CommunityLedgerTemplateCatalogTests
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseImportDecisionBeforeShipment);
         var distributionRule = groupImport.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution);
+        var individualImport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.IndividualImport);
+        var sourceOrderRule = individualImport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.IndividualOrderBeforeIndividualImport);
+        var individualReleaseRule = individualImport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.IndividualImportCustomsBeforeDomesticRelease);
+        var individualExport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.IndividualExport);
+        var exportSourceOrderRule = individualExport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.IndividualOrderBeforeIndividualExport);
+        var exportComplianceRule = individualExport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.ExportComplianceBeforeDeclaration);
+        var exportLoadingRule = individualExport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.ExportDeclarationAcceptedBeforeLoading);
+        var exportFeedbackRule = individualExport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.CompletedIndividualExportBeforeExchangeFeedback);
+        var groupExport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupExport);
+        var groupExportSourceRule = groupExport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.GroupExportRequiresIndividualExports);
+        var preserveDeclarationsRule = groupExport.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.GroupExportPreservesIndividualDeclarations);
 
         Assert.Equal("공동구매 원장", groupPurchase.DisplayName);
         Assert.Equal("공동구매 주문집계 원장", groupOrder.DisplayName);
@@ -455,6 +584,30 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains("3PL 입고 인계", distributionRule.GatedActionHints);
         Assert.Contains(CommunityLedgerTemplateKeys.WarehouseInbound, distributionRule.RequiredLedgerTemplateKeys);
         Assert.Contains(CommunityLedgerTemplateKeys.CargoTransport, distributionRule.RequiredLedgerTemplateKeys);
+        Assert.Equal("개별수입 확장 원장", individualImport.DisplayName);
+        Assert.Contains(CommunityLedgerTemplateKeys.Order, sourceOrderRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("원천 개별 주문 원장", sourceOrderRule.RequiredUiSectionHints);
+        Assert.Contains("선적 문서 등록", sourceOrderRule.GatedActionHints);
+        Assert.Contains("통관 상태", individualReleaseRule.RequiredUiSectionHints);
+        Assert.Contains("국내 반출", individualReleaseRule.RequiredUiSectionHints);
+        Assert.Contains("최종 수령 확인", individualReleaseRule.GatedActionHints);
+        Assert.Equal("개별수출 확장 원장", individualExport.DisplayName);
+        Assert.Contains(CommunityLedgerTemplateKeys.Order, exportSourceOrderRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("거래 문맥(B2B/B2C)", exportSourceOrderRule.RequiredUiSectionHints);
+        Assert.Contains("신고 방식·적용 근거", exportComplianceRule.RequiredUiSectionHints);
+        Assert.Contains("수출 신고 기록", exportComplianceRule.GatedActionHints);
+        Assert.Contains("신고 수리 상태", exportLoadingRule.RequiredUiSectionHints);
+        Assert.Contains("적재 예정·기한", exportLoadingRule.RequiredUiSectionHints);
+        Assert.Contains("선적·적재 실적 등록", exportLoadingRule.GatedActionHints);
+        Assert.Contains("선적·적재 실적", exportFeedbackRule.RequiredUiSectionHints);
+        Assert.Contains("완료 후 교류 환류 동의", exportFeedbackRule.RequiredUiSectionHints);
+        Assert.Contains("비식별 경험·편익 공유", exportFeedbackRule.GatedActionHints);
+        Assert.Equal("공동수출 원장", groupExport.DisplayName);
+        Assert.Contains(CommunityLedgerTemplateKeys.IndividualExport, groupExportSourceRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("개별수출 원장 집합", groupExportSourceRule.RequiredUiSectionHints);
+        Assert.Contains("수출자별 신고 보존", preserveDeclarationsRule.RequiredUiSectionHints);
+        Assert.Contains("통합 포장목록", preserveDeclarationsRule.RequiredUiSectionHints);
+        Assert.Contains("공동 선적 확정", preserveDeclarationsRule.GatedActionHints);
     }
 
     [Fact]
@@ -532,6 +685,49 @@ public sealed class CommunityLedgerTemplateCatalogTests
     }
 
     [Fact]
+    public void FlowClassifier_IdentifiesGroupExportWithoutCollapsingIndividualDeclarations()
+    {
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "여러 수출자의 개별수출을 합포장하는 공동수출",
+            Body = "개별수출 원장 집합의 수출자별 신고를 보존하고 집하 마감, 합포장 계획, 포워더 인계, 통합 포장목록과 선적·적재 실적을 관리합니다.",
+            UiSectionHints =
+            [
+                "개별수출 원장 집합",
+                "거래 문맥 집계(B2B/B2C)",
+                "수출자별 신고 보존",
+                "집하 마감",
+                "합포장 계획",
+                "운송 방식(FCL/LCL/항공)",
+                "포워더 인계",
+                "통합 포장목록",
+                "선적·적재 실적",
+                "공통 비용 배부"
+            ],
+            ActionHints =
+            [
+                "개별수출 원장 연결",
+                "수출자별 신고·서류 확인",
+                "합포장 계획 작성",
+                "포워더 인계",
+                "공동 선적 확정",
+                "선적·적재 실적 등록",
+                "공통 비용 배부"
+            ]
+        });
+
+        Assert.Equal(CommunityLedgerTemplateKeys.GroupExport, result.PrimaryCandidate.TemplateKey);
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.CommunityTrust, result.PrimaryCandidate.TargetOperatingSystemCode);
+        Assert.Equal(CommunityLedgerFlowRelationCodes.StrongFlowMatch, result.PrimaryCandidate.RelationCode);
+        Assert.False(result.RequiresHumanReview);
+        Assert.Contains(CommunityLedgerEngineHints.ExportCompliance, result.PrimaryCandidate.EngineHints);
+        Assert.Contains(CommunityLedgerCompositionRuleCodes.GroupExportRequiresIndividualExports, result.PrimaryCandidate.RelatedCompositionRuleCodes);
+        Assert.Contains(CommunityLedgerCompositionRuleCodes.GroupExportPreservesIndividualDeclarations, result.PrimaryCandidate.RelatedCompositionRuleCodes);
+        Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("individual-export-ledgers", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("exporter-declaration-preservation", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void 수입준비도는_일반분류기의_자동전환후보가_아닌_커뮤니티선택형템플릿이다()
     {
         var template = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.MeatImportReadiness);
@@ -545,6 +741,36 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Equal(CommunityLedgerOperatingSystemCodes.CommunityTrust, template.TargetOperatingSystemCode);
         Assert.DoesNotContain(result.Candidates, candidate =>
             candidate.TemplateKey == CommunityLedgerTemplateKeys.MeatImportReadiness);
+    }
+
+    [Fact]
+    public void 개별수입은_독립루트가_아닌_개별주문확장후보다()
+    {
+        var template = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.IndividualImport);
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "해외 판매자 개별수입",
+            Body = "개별 주문 상품의 선적과 통관 상태를 확인하고 싶어요."
+        });
+
+        Assert.True(template.IsExtensionTemplate);
+        Assert.DoesNotContain(result.Candidates, candidate =>
+            candidate.TemplateKey == CommunityLedgerTemplateKeys.IndividualImport);
+    }
+
+    [Fact]
+    public void 개별수출은_독립루트가_아닌_개별주문확장후보다()
+    {
+        var template = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.IndividualExport);
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "해외 구매자 개별수출",
+            Body = "한 개별 주문의 수출신고와 신고 수리, 적재 실적을 확인하고 싶어요."
+        });
+
+        Assert.True(template.IsExtensionTemplate);
+        Assert.DoesNotContain(result.Candidates, candidate =>
+            candidate.TemplateKey == CommunityLedgerTemplateKeys.IndividualExport);
     }
 
     [Fact]

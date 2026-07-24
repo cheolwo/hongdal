@@ -33,11 +33,30 @@ public static class 주문원장구성정책
             CommunityLedgerTemplateKeys.GroupImport,
             StringComparison.OrdinalIgnoreCase);
 
+    public static bool 개별수입인가(string? 원장템플릿Key)
+        => string.Equals(
+            원장템플릿Key?.Trim(),
+            CommunityLedgerTemplateKeys.IndividualImport,
+            StringComparison.OrdinalIgnoreCase);
+
+    public static bool 공동수출인가(string? 원장템플릿Key)
+        => string.Equals(
+            원장템플릿Key?.Trim(),
+            CommunityLedgerTemplateKeys.GroupExport,
+            StringComparison.OrdinalIgnoreCase);
+
+    public static bool 개별수출인가(string? 원장템플릿Key)
+        => string.Equals(
+            원장템플릿Key?.Trim(),
+            CommunityLedgerTemplateKeys.IndividualExport,
+            StringComparison.OrdinalIgnoreCase);
+
     public static bool 통합대상인가(string? 원장템플릿Key)
         => 주문루트인가(원장템플릿Key)
            || 공동주문묶음인가(원장템플릿Key)
            || 공동구매인가(원장템플릿Key)
-           || 공동수입인가(원장템플릿Key);
+           || 공동수입인가(원장템플릿Key)
+           || 공동수출인가(원장템플릿Key);
 
     public static void 저장요청검증(커뮤니티원장저장요청 request)
     {
@@ -48,7 +67,7 @@ public static class 주문원장구성정책
 
         if (request.포함원장목록.Count > 0 && !통합대상인가(request.원장템플릿Key))
         {
-            throw new InvalidOperationException("관계 원장을 연결할 수 있는 원장은 주문, 공동구매 또는 공동수입 원장이어야 합니다.");
+            throw new InvalidOperationException("관계 원장을 연결할 수 있는 원장은 주문, 공동구매, 공동수입 또는 공동수출 원장이어야 합니다.");
         }
 
         var 중복원장Ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -108,7 +127,7 @@ public static class 주문원장구성정책
     {
         if (!통합대상인가(주문원장.원장템플릿Key))
         {
-            throw new InvalidOperationException("하위 원장을 연결할 대상은 주문 원장 또는 공동구매 주문집계 원장이어야 합니다.");
+            throw new InvalidOperationException("하위 원장을 연결할 대상은 주문, 공동구매, 공동수입 또는 공동수출 원장이어야 합니다.");
         }
 
         if (string.Equals(주문원장.원장Id, 하위원장.원장Id, StringComparison.OrdinalIgnoreCase))
@@ -139,6 +158,52 @@ public static class 주문원장구성정책
         string 역할,
         string? 관계유형)
     {
+        var normalizedRole = 역할.Trim();
+        var 개별수입역할인가 = string.Equals(
+            normalizedRole,
+            주문원장포함역할.개별수입,
+            StringComparison.OrdinalIgnoreCase);
+        if (개별수입역할인가 || 개별수입인가(하위원장템플릿Key))
+        {
+            if (!string.Equals(기준원장템플릿Key?.Trim(), CommunityLedgerTemplateKeys.Order, StringComparison.OrdinalIgnoreCase)
+                || !개별수입인가(하위원장템플릿Key)
+                || !개별수입역할인가
+                || 관계유형 != CommunityLedgerRelationTypes.Contains)
+            {
+                throw new InvalidOperationException(
+                    "개별수입 원장은 개별주문 원장(order)의 수입 이행 확장으로만 포함할 수 있습니다.");
+            }
+
+            return;
+        }
+
+        var 개별수출역할인가 = string.Equals(
+            normalizedRole,
+            주문원장포함역할.개별수출,
+            StringComparison.OrdinalIgnoreCase);
+        if (개별수출역할인가 || 개별수출인가(하위원장템플릿Key))
+        {
+            var 기준원장이개별주문인가 = string.Equals(
+                기준원장템플릿Key?.Trim(),
+                CommunityLedgerTemplateKeys.Order,
+                StringComparison.OrdinalIgnoreCase);
+            if ((!기준원장이개별주문인가 && !공동수출인가(기준원장템플릿Key))
+                || !개별수출인가(하위원장템플릿Key)
+                || !개별수출역할인가
+                || 관계유형 != CommunityLedgerRelationTypes.Contains)
+            {
+                throw new InvalidOperationException(
+                    "개별수출 원장은 개별주문 원장의 수출 이행 확장으로 만들고, 공동수출 원장에서는 그 개별수출 원장을 물류 집계 대상으로만 포함할 수 있습니다.");
+            }
+
+            return;
+        }
+
+        if (공동수출인가(기준원장템플릿Key))
+        {
+            throw new InvalidOperationException("공동수출 원장에는 개별수출 원장만 포함할 수 있습니다.");
+        }
+
         if (공동수입인가(기준원장템플릿Key))
         {
             공동수입관계검증(하위원장템플릿Key, 역할, 관계유형);
@@ -147,14 +212,14 @@ public static class 주문원장구성정책
 
         if (공동구매인가(기준원장템플릿Key))
         {
-            if (string.Equals(역할.Trim(), 주문원장포함역할.주문집계, StringComparison.OrdinalIgnoreCase)
+            if (string.Equals(normalizedRole, 주문원장포함역할.주문집계, StringComparison.OrdinalIgnoreCase)
                 && 공동주문묶음인가(하위원장템플릿Key))
             {
                 return;
             }
 
             // 기존 원장은 공동구매 아래에 개별 주문을 직접 연결했으므로 조회·갱신 호환성을 유지합니다.
-            if (string.Equals(역할.Trim(), 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase)
+            if (string.Equals(normalizedRole, 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase)
                 && 주문루트인가(하위원장템플릿Key))
             {
                 return;
@@ -166,7 +231,7 @@ public static class 주문원장구성정책
 
         if (공동주문묶음인가(기준원장템플릿Key))
         {
-            if (!string.Equals(역할.Trim(), 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase)
+            if (!string.Equals(normalizedRole, 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase)
                 || !주문루트인가(하위원장템플릿Key))
             {
                 throw new InvalidOperationException("공동구매 주문집계에는 개별 주문 원장만 연결할 수 있습니다.");
@@ -175,12 +240,12 @@ public static class 주문원장구성정책
             return;
         }
 
-        if (string.Equals(역할.Trim(), 주문원장포함역할.주문집계, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(normalizedRole, 주문원장포함역할.주문집계, StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException("주문집계 역할은 공동구매 원장에서만 사용할 수 있습니다.");
         }
 
-        if (string.Equals(역할.Trim(), 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(normalizedRole, 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException("개별주문 역할은 공동구매 주문집계에서만 사용할 수 있습니다.");
         }

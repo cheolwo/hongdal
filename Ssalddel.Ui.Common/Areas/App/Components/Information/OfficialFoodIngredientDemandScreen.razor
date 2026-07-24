@@ -16,7 +16,7 @@
         </ol>
     </header>
 
-    @if (ViewModel.Seed is not { } seed)
+    @if (ViewModel.IngredientLines.Count == 0)
     {
         <section class="ingredient-demand__state" role="alert">
             <strong>선택한 재료 문맥이 없습니다.</strong>
@@ -28,33 +28,29 @@
     {
         <section class="ingredient-demand__context" aria-labelledby="ingredient-demand-context-title">
             <div>
-                <span>선택 재료</span>
-                <h2 id="ingredient-demand-context-title">@seed.IngredientName</h2>
-                <code>@seed.SuggestedProductKey</code>
+                <span>선택 재료 @(ViewModel.IngredientLines.Count)개</span>
+                <h2 id="ingredient-demand-context-title">함께 살펴볼 재료 묶음</h2>
+                <p>각 재료는 독립된 비구속 수요로 저장되며, 이후 원장에서는 한 준비 묶음으로 연결할 수 있습니다.</p>
             </div>
-            <dl>
-                @if (!string.IsNullOrWhiteSpace(seed.FoodName))
+            <div class="ingredient-demand__context-list">
+                @foreach (var line in ViewModel.IngredientLines)
                 {
-                    <div><dt>둘러본 음식</dt><dd>@seed.FoodName</dd></div>
+                    var seed = line.Seed;
+                    <article @key="seed.SuggestedProductKey">
+                        <strong>@seed.IngredientName</strong>
+                        <code>@seed.SuggestedProductKey</code>
+                        <span>@seed.SourcingModeLabel</span>
+                        @if (!string.IsNullOrWhiteSpace(seed.RecipeTitle))
+                        {
+                            <small>@seed.RecipeTitle</small>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(seed.RecipeUrl))
+                        {
+                            <a href="@seed.RecipeUrl" target="_blank" rel="noreferrer">공식 레시피 원문</a>
+                        }
+                    </article>
                 }
-                @if (!string.IsNullOrWhiteSpace(seed.RecipeTitle))
-                {
-                    <div><dt>참고 레시피</dt><dd>@seed.RecipeTitle</dd></div>
-                }
-                <div><dt>조달 검토 방향</dt><dd>@seed.SourcingModeLabel</dd></div>
-                @if (!string.IsNullOrWhiteSpace(seed.FoodCountryCode))
-                {
-                    <div><dt>음식 문화 국가</dt><dd>@seed.FoodCountryCode · 상품 원산지나 배송국으로 자동 사용하지 않음</dd></div>
-                }
-                @if (!string.IsNullOrWhiteSpace(seed.PriceReference))
-                {
-                    <div><dt>공개 가격 참고</dt><dd>@seed.PriceReference</dd></div>
-                }
-            </dl>
-            @if (!string.IsNullOrWhiteSpace(seed.RecipeUrl))
-            {
-                <a href="@seed.RecipeUrl" target="_blank" rel="noreferrer">공식 레시피 원문</a>
-            }
+            </div>
         </section>
 
         <section class="ingredient-demand__boundary" aria-label="비구속 수요 경계">
@@ -76,11 +72,48 @@
         <section class="ingredient-demand__form" aria-labelledby="ingredient-demand-form-title">
             <header>
                 <span>YOUR CONDITIONS</span>
-                <h2 id="ingredient-demand-form-title">수령·수량 조건</h2>
-                <p>상세 주소는 받지 않습니다. 공개 집단화에는 국가와 우편번호·생활권 수준의 권역만 사용합니다.</p>
+                <h2 id="ingredient-demand-form-title">구매 목적·수령·수량 조건</h2>
+                <p>계정 종류가 아니라 이번 수요의 구매 목적을 선택합니다. 상세 주소는 받지 않습니다. 공개 집단화에는 권역과 B2B/B2C 집계만 사용합니다.</p>
             </header>
 
             <div class="ingredient-demand__fields">
+                <label>
+                    <span>이번 구매 목적</span>
+                    <select @bind="ViewModel.TransactionTypeCode" disabled="@ViewModel.ActionBusy">
+                        <option value="@공동구매거래유형코드.B2C">B2C · 개인 소비</option>
+                        <option value="@공동구매거래유형코드.B2B">B2B · 사업 목적</option>
+                    </select>
+                </label>
+                @if (ViewModel.IsBusinessPurchase)
+                {
+                    <label>
+                        <span>구매 조직 이름</span>
+                        <input @bind="ViewModel.PurchasingOrganizationName"
+                               maxlength="160"
+                               autocomplete="organization"
+                               placeholder="예: 한마음식당"
+                               disabled="@ViewModel.ActionBusy" />
+                    </label>
+                    <label>
+                        <span>기존 조직 참조(선택)</span>
+                        <input @bind="ViewModel.PurchasingOrganizationReference"
+                               maxlength="160"
+                               placeholder="등록된 운영 주체 ID"
+                               disabled="@ViewModel.ActionBusy" />
+                    </label>
+                    <label>
+                        <span>가격 표시 기준</span>
+                        <select @bind="ViewModel.PriceBasisCode" disabled="@ViewModel.ActionBusy">
+                            <option value="@공동구매가격표시기준코드.부가세별도">부가세 별도</option>
+                            <option value="@공동구매가격표시기준코드.부가세포함">부가세 포함</option>
+                        </select>
+                    </label>
+                    <label class="ingredient-demand__checkbox">
+                        <input type="checkbox" @bind="ViewModel.TaxInvoiceRequired" disabled="@ViewModel.ActionBusy" />
+                        <span>세금계산서 필요</span>
+                    </label>
+                    <p class="ingredient-demand__business-note">이 단계에서는 사업자등록번호를 받지 않습니다. 실제 계약 전 조직 권한·사업자 상태와 증빙 조건을 별도로 확인합니다.</p>
+                }
                 <label>
                     <span>수령 국가</span>
                     <select @bind="ViewModel.DeliveryCountryCode" disabled="@ViewModel.ActionBusy">
@@ -109,29 +142,46 @@
                         <option value="@OfficialFoodIngredientReceiptMethodCodes.Parcel">택배 수령</option>
                     </select>
                 </label>
-                <label>
-                    <span>보관 온도</span>
-                    <select @bind="ViewModel.TemperatureCode" disabled="@ViewModel.ActionBusy">
-                        <option value="상온">상온</option>
-                        <option value="냉장">냉장</option>
-                        <option value="냉동">냉동</option>
-                    </select>
-                </label>
-                <label>
-                    <span>희망 수량</span>
-                    <input type="number"
-                           min="0.1"
-                           step="0.1"
-                           @bind="ViewModel.DesiredQuantity"
-                           disabled="@ViewModel.ActionBusy" />
-                </label>
-                <label>
-                    <span>수량 단위</span>
-                    <input value="@ViewModel.QuantityUnit"
-                           @oninput="OnQuantityUnitInput"
-                           maxlength="20"
-                           disabled="@ViewModel.ActionBusy" />
-                </label>
+            </div>
+
+            <div class="ingredient-demand__line-list">
+                @foreach (var line in ViewModel.IngredientLines)
+                {
+                    <article @key="line.Seed.SuggestedProductKey">
+                        <header>
+                            <strong>@line.Seed.IngredientName</strong>
+                            <span>재료별 희망 조건</span>
+                        </header>
+                        <div class="ingredient-demand__fields">
+                            <label>
+                                <span>보관 온도</span>
+                                <select value="@line.TemperatureCode"
+                                        @onchange="args => OnLineTemperatureChanged(line, args)"
+                                        disabled="@ViewModel.ActionBusy">
+                                    <option value="상온">상온</option>
+                                    <option value="냉장">냉장</option>
+                                    <option value="냉동">냉동</option>
+                                </select>
+                            </label>
+                            <label>
+                                <span>희망 수량</span>
+                                <input type="number"
+                                       min="0.1"
+                                       step="0.1"
+                                       value="@line.DesiredQuantity.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                       @onchange="args => OnLineQuantityChanged(line, args)"
+                                       disabled="@ViewModel.ActionBusy" />
+                            </label>
+                            <label>
+                                <span>수량 단위</span>
+                                <input value="@line.QuantityUnit"
+                                       @oninput="args => OnLineUnitInput(line, args)"
+                                       maxlength="20"
+                                       disabled="@ViewModel.ActionBusy" />
+                            </label>
+                        </div>
+                    </article>
+                }
             </div>
 
             <div class="ingredient-demand__actions">
@@ -166,52 +216,57 @@
             }
         </section>
 
-        @if (ViewModel.PlacementPreview is { } preview)
+        @if (ViewModel.PlacementPreviews.Count > 0)
         {
-            <section class="ingredient-demand__result" aria-labelledby="ingredient-demand-preview-title">
-                <header>
-                    <span>SERVER PREVIEW · @preview.정책버전</span>
-                    <h2 id="ingredient-demand-preview-title">@(preview.배치유형 == 공동구매자동집단배치유형코드.기존집단 ? "기존 모집에 참여" : "새 모집 후보")</h2>
-                    <p>@preview.안내</p>
-                </header>
-                <div class="ingredient-demand__metrics">
-                    <div><span>예상 참여자</span><strong>@preview.예상진행.참여자수.ToString("N0")명</strong></div>
-                    <div><span>예상 수량</span><strong>@preview.예상진행.총희망수량.ToString("N1") @preview.예상진행.수량단위</strong></div>
-                    <div><span>추가 필요</span><strong>@NumberOrDash(preview.예상진행.추가필요참여자수)명</strong></div>
-                    <div><span>모집 마감</span><strong>@DateLabel(preview.예상진행.모집종료시각Utc)</strong></div>
-                </div>
-                <ul>
-                    @foreach (var criterion in preview.적용기준목록)
-                    {
-                        <li><span>@criterion.기준코드</span><strong>@criterion.기준값</strong></li>
-                    }
-                </ul>
-                <small>@preview.비구속안내</small>
-            </section>
+            @for (var index = 0; index < ViewModel.PlacementPreviews.Count; index++)
+            {
+                var preview = ViewModel.PlacementPreviews[index];
+                var line = ViewModel.IngredientLines[index];
+                <section class="ingredient-demand__result" aria-label="@($"{line.Seed.IngredientName} 집단화 미리보기")">
+                    <header>
+                        <span>SERVER PREVIEW · @preview.정책버전</span>
+                        <h2>@line.Seed.IngredientName · @TransactionTypeLabel(ViewModel.TransactionTypeCode) · @(preview.배치유형 == 공동구매자동집단배치유형코드.기존집단 ? "기존 모집에 참여" : "새 모집 후보")</h2>
+                        <p>@preview.안내</p>
+                    </header>
+                    <div class="ingredient-demand__metrics">
+                        <div><span>예상 참여자</span><strong>@preview.예상진행.참여자수.ToString("N0")명</strong></div>
+                        <div><span>예상 수량</span><strong>@preview.예상진행.총희망수량.ToString("N1") @preview.예상진행.수량단위</strong></div>
+                        <div><span>추가 필요</span><strong>@NumberOrDash(preview.예상진행.추가필요참여자수)명</strong></div>
+                        <div><span>모집 마감</span><strong>@DateLabel(preview.예상진행.모집종료시각Utc)</strong></div>
+                    </div>
+                    <small>@preview.비구속안내</small>
+                </section>
+            }
         }
 
-        @if (ViewModel.RegisteredGroup is { } group)
+        @if (ViewModel.RegisteredGroups.Count > 0)
         {
-            <section class="ingredient-demand__saved" aria-labelledby="ingredient-demand-saved-title">
-                <div>
-                    <span>SAVED NONBINDING DEMAND</span>
-                    <h2 id="ingredient-demand-saved-title">모집 현황에 반영됨</h2>
-                    <p>@group.상품명 · @group.배송권명</p>
-                </div>
-                <div class="ingredient-demand__metrics">
-                    <div><span>현재 참여자</span><strong>@group.참여자수.ToString("N0")명</strong></div>
-                    <div><span>총 희망 수량</span><strong>@group.총희망수량.ToString("N1") @group.수량단위</strong></div>
-                    <div><span>모집 상태</span><strong>@StatusLabel(group.현재상태)</strong></div>
-                    <div><span>모집 마감</span><strong>@DateLabel(group.모집종료시각Utc)</strong></div>
-                </div>
-            </section>
+            @foreach (var group in ViewModel.RegisteredGroups)
+            {
+                <section class="ingredient-demand__saved" aria-label="@($"{group.상품명} 저장된 비구속 수요")">
+                    <div>
+                        <span>SAVED NONBINDING DEMAND</span>
+                        <h2>@group.상품명 · @TransactionTypeLabel(group.거래유형) · 모집 현황에 반영됨</h2>
+                        <p>@group.배송권명</p>
+                    </div>
+                    <div class="ingredient-demand__metrics">
+                        <div><span>현재 참여자</span><strong>@group.참여자수.ToString("N0")명</strong></div>
+                        <div><span>총 희망 수량</span><strong>@group.총희망수량.ToString("N1") @group.수량단위</strong></div>
+                        <div><span>모집 상태</span><strong>@StatusLabel(group.현재상태)</strong></div>
+                        <div><span>모집 마감</span><strong>@DateLabel(group.모집종료시각Utc)</strong></div>
+                    </div>
+                </section>
+            }
         }
     }
 </main>
 
 @code {
-    [Parameter, EditorRequired]
+    [Parameter]
     public CommunityGroupPurchaseIngredientSeed? IngredientSeed { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<CommunityGroupPurchaseIngredientSeed> IngredientSeeds { get; set; } = [];
 
     [Parameter]
     public string BackHref { get; set; } = "/information/food-ingredients";
@@ -222,20 +277,40 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        ViewModel.ApplySeed(IngredientSeed);
+        ViewModel.ApplySeeds(IngredientSeeds.Count > 0
+            ? IngredientSeeds
+            : IngredientSeed is { } seed ? [seed] : []);
     }
 
     private void OnDeliveryAreaInput(ChangeEventArgs args)
         => ViewModel.DeliveryAreaCode = args.Value?.ToString() ?? string.Empty;
 
-    private void OnQuantityUnitInput(ChangeEventArgs args)
-        => ViewModel.QuantityUnit = args.Value?.ToString() ?? string.Empty;
+    private void OnLineTemperatureChanged(OfficialFoodIngredientDemandLine line, ChangeEventArgs args)
+        => ViewModel.UpdateLineTemperature(line, args.Value?.ToString());
+
+    private void OnLineUnitInput(OfficialFoodIngredientDemandLine line, ChangeEventArgs args)
+        => ViewModel.UpdateLineUnit(line, args.Value?.ToString());
+
+    private void OnLineQuantityChanged(OfficialFoodIngredientDemandLine line, ChangeEventArgs args)
+    {
+        if (decimal.TryParse(
+                args.Value?.ToString(),
+                System.Globalization.NumberStyles.Number,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out var value))
+        {
+            ViewModel.UpdateLineQuantity(line, value);
+        }
+    }
 
     private Task PreviewAsync() => ViewModel.PreviewAsync();
     private Task RegisterAsync() => ViewModel.RegisterAsync();
     private Task WithdrawAsync() => ViewModel.WithdrawAsync();
 
     private static string NumberOrDash(int? value) => value?.ToString("N0") ?? "-";
+
+    private static string TransactionTypeLabel(string? value)
+        => 공동구매거래유형코드.정규화(value) == 공동구매거래유형코드.B2B ? "B2B" : "B2C";
 
     private static string DateLabel(DateTime value)
         => value == default ? "미정" : value.ToLocalTime().ToString("yyyy.MM.dd HH:mm");

@@ -268,7 +268,7 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매실�
             상품명 = productName,
             HS코드 = First(option?.HsCode, groupPurchase?.HsCode),
             온도코드 = First(option?.TemperatureCode, groupPurchase?.TemperatureCode, "상온"),
-            물류방식 = First(option?.LogisticsMode, groupPurchase?.LogisticsMode, "LCL"),
+            물류방식 = First(option?.LogisticsMode, groupPurchase?.LogisticsMode, 공동구매자동수요물류방식코드.후속검토),
             배송권키 = deliveryKey,
             배송권명 = First(groupPurchase?.ServiceAreaLabel, deliveryKey),
             도착창고Id = warehouse?.Id,

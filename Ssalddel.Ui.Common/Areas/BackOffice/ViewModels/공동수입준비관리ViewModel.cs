@@ -19,11 +19,11 @@ public static class 공동수입준비작업대필터코드
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.GroupImportTradeReadiness,
     SsalddelCodeLayer.ViewModel,
-    "관리자가 1.0 인계를 승인하고 1.5 준비 근거를 미리 평가한 뒤 Revision과 멱등 키로 저장하도록 UI 상태를 조율합니다.",
+    "관리자가 1.0 인계를 승인하고 기존 공동수입 원장의 1.5 준비·포워더 인계 블록을 Revision과 멱등 키로 저장하도록 UI 상태를 조율합니다.",
     ContractType = typeof(I공동수입준비관리Client),
     FlowOrder = 50,
     Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.UiStateMutation,
-    Boundary = "검토 자료만 편집하며 계약, 결제, 신고, 공급자 선정, 운송 또는 창고 실행 상태를 만들지 않습니다.")]
+    Boundary = "플랫폼은 집계·최소화·동의·인계 사실과 포워더 회신만 기록하며 업체 자동 선정, 외부 자동 전송, 계약, 결제, 신고, 운송 또는 창고 실행 상태를 만들지 않습니다.")]
 public sealed class 공동수입준비관리ViewModel(I공동수입준비관리Client client) : ObservableObject
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
@@ -32,16 +32,22 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
     private 공동구매수요모집Os상태응답? _운영상태;
     private 공동수입준비원장응답? _저장원장;
     private 공동수입준비원장응답? _미리보기;
+    private 공동수입준비Os상태응답? _준비Os상태;
     private 공동수입준비원장저장요청 _초안 = new();
     private string _검색어 = string.Empty;
     private string _목록필터 = 공동수입준비작업대필터코드.전체;
+    private string _추가재료집단Id = string.Empty;
     private string _승인사유 = string.Empty;
     private string _미확인항목Text = string.Empty;
+    private string _전문검토수신자 = string.Empty;
+    private string _전문검토범위 = "HS·HTS 품목분류와 도착국가 수입 규제 검토";
+    private string _전문검토인계메모 = string.Empty;
     private string _관리자표시명 = "1.5 준비 관리자";
     private string? _메시지;
     private bool _오류메시지;
     private bool _처리중;
     private bool _초기화됨;
+    private bool _초안저장후변경됨;
     private string? _대기저장지문;
     private string? _대기저장멱등키;
 
@@ -55,6 +61,7 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
                 OnPropertyChanged(nameof(필터된작업대목록));
                 OnPropertyChanged(nameof(인계승인필요건수));
                 OnPropertyChanged(nameof(확정집단건수));
+                OnPropertyChanged(nameof(추가가능재료집단목록));
             }
         }
     }
@@ -107,6 +114,18 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         }
     }
 
+    public 공동수입준비Os상태응답? 준비Os상태
+    {
+        get => _준비Os상태;
+        private set
+        {
+            if (SetProperty(ref _준비Os상태, value))
+            {
+                RaiseStateProperties();
+            }
+        }
+    }
+
     public 공동수입준비원장저장요청 초안
     {
         get => _초안;
@@ -143,6 +162,32 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         }
     }
 
+    public string 추가재료집단Id
+    {
+        get => _추가재료집단Id;
+        set => SetProperty(ref _추가재료집단Id, value ?? string.Empty);
+    }
+
+    public IReadOnlyList<공동구매자동집단요약응답> 추가가능재료집단목록
+    {
+        get
+        {
+            var included = 초안.재료품목목록
+                .Select(item => item.원천자동집단Id)
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .ToHashSet(StringComparer.Ordinal);
+            return 작업대목록
+                .Where(item => !included.Contains(item.자동집단Id))
+                .Where(item => 선택집단 is null
+                               || 공동구매거래문맥정책.호환됨(
+                                   선택집단.거래유형,
+                                   선택집단.가격표시기준,
+                                   item.거래유형,
+                                   item.가격표시기준))
+                .ToArray();
+        }
+    }
+
     public string 승인사유
     {
         get => _승인사유;
@@ -164,6 +209,42 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
             초안변경됨();
+        }
+    }
+
+    public string 전문검토수신자
+    {
+        get => _전문검토수신자;
+        set
+        {
+            if (SetProperty(ref _전문검토수신자, value ?? string.Empty))
+            {
+                OnPropertyChanged(nameof(전문검토인계가능));
+            }
+        }
+    }
+
+    public string 전문검토범위
+    {
+        get => _전문검토범위;
+        set
+        {
+            if (SetProperty(ref _전문검토범위, value ?? string.Empty))
+            {
+                OnPropertyChanged(nameof(전문검토인계가능));
+            }
+        }
+    }
+
+    public string 전문검토인계메모
+    {
+        get => _전문검토인계메모;
+        set
+        {
+            if (SetProperty(ref _전문검토인계메모, value ?? string.Empty))
+            {
+                OnPropertyChanged(nameof(전문검토인계가능));
+            }
         }
     }
 
@@ -195,6 +276,18 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
     {
         get => _초기화됨;
         private set => SetProperty(ref _초기화됨, value);
+    }
+
+    public bool 초안저장후변경됨
+    {
+        get => _초안저장후변경됨;
+        private set
+        {
+            if (SetProperty(ref _초안저장후변경됨, value))
+            {
+                RaiseStateProperties();
+            }
+        }
     }
 
     public IReadOnlyList<공동구매자동집단요약응답> 필터된작업대목록
@@ -249,6 +342,25 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
 
     private bool 저장조건충족 => 미리보기조건충족 && 인계승인됨;
 
+    public bool Os작업실행가능
+        => !처리중 && Os작업실행조건충족;
+
+    private bool Os작업실행조건충족
+        => 저장원장 is not null
+           && 준비Os상태?.기능활성여부 == true
+           && !초안저장후변경됨;
+
+    public bool 전문검토인계가능
+        => !처리중 && 전문검토인계조건충족;
+
+    private bool 전문검토인계조건충족
+        => Os작업실행조건충족
+           && 준비Os상태?.전문검토인계가능 == true
+           && 준비Os상태.전문검토인계기록 is null
+           && !string.IsNullOrWhiteSpace(전문검토수신자)
+           && !string.IsNullOrWhiteSpace(전문검토범위)
+           && !string.IsNullOrWhiteSpace(전문검토인계메모);
+
     public 공동수입준비원장평가응답? 현재평가 => 미리보기?.평가 ?? 저장원장?.평가;
 
     public int 완료검토항목수
@@ -263,11 +375,14 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
 
             return new[]
             {
+                evaluation.재료품목구조완료,
                 evaluation.공급자근거구조완료,
                 evaluation.견적구조완료,
                 evaluation.예상비용구조완료,
                 evaluation.품목분류후보구조완료,
                 evaluation.국가별검토구조완료,
+                evaluation.포워더인계구조완료,
+                evaluation.국제운송검토구조완료,
                 evaluation.책임초안구조완료
             }.Count(value => value);
         }
@@ -369,18 +484,202 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
             초안 = Clone(저장원장.준비자료);
             _미확인항목Text = string.Join(Environment.NewLine, 초안.미확인항목목록);
             미리보기 = 저장원장;
+            초안저장후변경됨 = false;
+            준비Os상태 = await client.준비Os상태조회Async(선택집단.자동집단Id, cancellationToken);
             메시지 = 저장원장.평가.전문검토인계가능
-                ? "1.5 준비 원장을 저장했습니다. 계약·결제·신고·운송 실행은 열리지 않았습니다."
-                : "미완성 자료를 초안으로 저장했습니다. 차단 사유를 해소한 뒤 다시 미리 확인해 주세요.";
+                ? "기존 공동수입 원장의 1.5 준비 블록을 저장했습니다. 계약·결제·신고·운송 실행은 열리지 않았습니다."
+                : "기존 공동수입 원장에 미완성 준비 블록을 저장했습니다. 차단 사유를 해소한 뒤 다시 미리 확인해 주세요.";
+        });
+
+    public Task Os작업실행Async(
+        string 작업코드,
+        bool 재시도여부,
+        CancellationToken cancellationToken = default)
+        => RunAsync(async () =>
+        {
+            if (!Os작업실행조건충족 || 선택집단 is null || 준비Os상태 is null)
+            {
+                throw new InvalidOperationException(초안저장후변경됨
+                    ? "편집 중인 자료를 먼저 저장한 뒤 OS 점검을 실행해 주세요."
+                    : "준비 블록이 저장된 공동수입 원장과 활성 OS가 필요합니다.");
+            }
+
+            준비Os상태 = await client.준비Os작업실행Async(
+                선택집단.자동집단Id,
+                new 공동수입준비Os작업실행요청
+                {
+                    요청멱등키 = $"admin-os-{Guid.NewGuid():N}",
+                    기대Revision = 준비Os상태.원장Revision,
+                    작업코드 = 작업코드,
+                    재시도여부 = 재시도여부
+                },
+                cancellationToken);
+            if (저장원장 is not null)
+            {
+                저장원장.Revision = 준비Os상태.원장Revision;
+            }
+            메시지 = 재시도여부
+                ? "선택한 1.5 OS 작업을 다시 점검했습니다. 외부 실행은 발생하지 않았습니다."
+                : "1.5 OS가 저장 원장의 근거와 최신성을 다시 점검했습니다.";
+        });
+
+    public Task 전문검토인계Async(CancellationToken cancellationToken = default)
+        => RunAsync(async () =>
+        {
+            if (!전문검토인계조건충족 || 선택집단 is null || 준비Os상태 is null)
+            {
+                throw new InvalidOperationException("전문 검토 인계 조건과 수신자·범위·메모를 확인해 주세요.");
+            }
+
+            준비Os상태 = await client.전문검토인계Async(
+                선택집단.자동집단Id,
+                new 공동수입준비Os전문검토인계요청
+                {
+                    요청멱등키 = $"admin-qualified-review-{Guid.NewGuid():N}",
+                    기대Revision = 준비Os상태.원장Revision,
+                    검토수신자표시명 = 전문검토수신자.Trim(),
+                    검토범위 = 전문검토범위.Trim(),
+                    인계메모 = 전문검토인계메모.Trim()
+                },
+                cancellationToken);
+            if (저장원장 is not null)
+            {
+                저장원장.Revision = 준비Os상태.원장Revision;
+            }
+            전문검토인계메모 = string.Empty;
+            메시지 = "전문 검토 인계를 원장에 기록했습니다. 이 기록은 전문 판단 완료나 다음 단계 실행 승인이 아닙니다.";
         });
 
     public void 초안변경됨()
     {
+        초안저장후변경됨 = 저장원장 is not null;
+        OnPropertyChanged(nameof(추가가능재료집단목록));
         if (미리보기 is not null && !ReferenceEquals(미리보기, 저장원장))
         {
             미리보기 = null;
         }
     }
+
+    public Task 재료집단추가Async(CancellationToken cancellationToken = default)
+        => RunAsync(async () =>
+        {
+            if (선택집단 is null || string.IsNullOrWhiteSpace(추가재료집단Id))
+            {
+                throw new InvalidOperationException("추가할 재료의 1.0 수요 집단을 선택해 주세요.");
+            }
+
+            var group = 작업대목록.FirstOrDefault(item => string.Equals(
+                item.자동집단Id,
+                추가재료집단Id.Trim(),
+                StringComparison.Ordinal))
+                ?? throw new InvalidOperationException("추가할 재료 수요 집단을 대기열에서 찾을 수 없습니다.");
+            if (!공동구매거래문맥정책.호환됨(
+                    선택집단.거래유형,
+                    선택집단.가격표시기준,
+                    group.거래유형,
+                    group.가격표시기준))
+            {
+                throw new InvalidOperationException(
+                    "B2B/B2C 또는 부가세 표시 기준이 다른 수요는 같은 공동수입 원장에 합칠 수 없습니다.");
+            }
+            var state = await client.운영상태조회Async(group.자동집단Id, cancellationToken)
+                ?? throw new InvalidOperationException("추가할 재료의 1.0 수요 OS 상태를 찾을 수 없습니다.");
+            if (!string.Equals(
+                    state.인계상태,
+                    공동구매수요모집인계상태코드.승인후속대기,
+                    StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException($"'{group.상품명}' 수요 집단의 1.5 인계를 먼저 승인해 주세요.");
+            }
+
+            초안.재료품목목록.Add(Material(group));
+            초안.품목분류후보목록.Add(NewClassification(group, 초안));
+            추가재료집단Id = string.Empty;
+            초안변경됨();
+            메시지 = $"'{group.상품명}'을 같은 공동수입 준비 묶음에 추가했습니다.";
+        });
+
+    public void 재료삭제(공동수입준비재료품목 item)
+    {
+        if (선택집단 is not null
+            && string.Equals(item.원천자동집단Id, 선택집단.자동집단Id, StringComparison.Ordinal))
+        {
+            메시지 = "경로의 기준 수요 집단 재료는 묶음에서 제거할 수 없습니다.";
+            오류메시지 = true;
+            return;
+        }
+
+        초안.재료품목목록.Remove(item);
+        초안.견적목록.RemoveAll(quote => string.Equals(quote.재료키, item.재료키, StringComparison.OrdinalIgnoreCase));
+        초안.예상비용목록.RemoveAll(cost => string.Equals(cost.재료키, item.재료키, StringComparison.OrdinalIgnoreCase));
+        초안.품목분류후보목록.RemoveAll(candidate => string.Equals(candidate.재료키, item.재료키, StringComparison.OrdinalIgnoreCase));
+        초안변경됨();
+    }
+
+    public void 포워더인계상태변경(string? value)
+    {
+        var state = 공동수입준비포워더인계상태코드.지원목록.Contains(value?.Trim() ?? string.Empty)
+            ? value!.Trim()
+            : 공동수입준비포워더인계상태코드.초안;
+        초안.포워더인계.인계상태코드 = state;
+        if (string.Equals(state, 공동수입준비포워더인계상태코드.인계기록됨, StringComparison.OrdinalIgnoreCase))
+        {
+            초안.포워더인계.인계기록자표시명 = _관리자표시명;
+            초안.포워더인계.인계시각Utc = DateTimeOffset.UtcNow;
+        }
+        else if (string.Equals(state, 공동수입준비포워더인계상태코드.초안, StringComparison.OrdinalIgnoreCase))
+        {
+            초안.포워더인계.인계기록자표시명 = string.Empty;
+            초안.포워더인계.인계시각Utc = null;
+        }
+        초안변경됨();
+    }
+
+    public void 포워더전달정보범위변경(string? value)
+    {
+        var scope = 공동수입준비포워더전달정보범위코드.지원목록.Contains(value?.Trim() ?? string.Empty)
+            ? value!.Trim()
+            : 공동수입준비포워더전달정보범위코드.집계수요전용;
+        초안.포워더인계.전달정보범위코드 = scope;
+        초안.포워더인계.개인정보포함여부 = string.Equals(
+            scope,
+            공동수입준비포워더전달정보범위코드.동의된사용자별최소정보,
+            StringComparison.OrdinalIgnoreCase);
+        초안변경됨();
+    }
+
+    public void 포워더회신방식변경(string? value)
+    {
+        var proposal = value?.Trim().ToUpperInvariant() ?? string.Empty;
+        초안.국제운송검토.포워더제안방식코드 = proposal;
+        초안.국제운송검토.선택방식코드 = string.Empty;
+        초안.국제운송검토.검토상태코드 = string.IsNullOrWhiteSpace(proposal)
+            ? 공동수입준비국제운송검토상태코드.검토필요
+            : 공동수입준비국제운송검토상태코드.포워더회신완료;
+        if (string.IsNullOrWhiteSpace(proposal))
+        {
+            초안.국제운송검토.회신업체표시명 = string.Empty;
+            초안.국제운송검토.회신기록자표시명 = string.Empty;
+            초안.국제운송검토.회신시각Utc = null;
+        }
+        else
+        {
+            초안.국제운송검토.회신업체표시명 = 초안.포워더인계.전달대상업체명;
+            초안.국제운송검토.회신기록자표시명 = _관리자표시명;
+            초안.국제운송검토.회신시각Utc = DateTimeOffset.UtcNow;
+            if (string.Equals(
+                    초안.포워더인계.인계상태코드,
+                    공동수입준비포워더인계상태코드.인계기록됨,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                초안.포워더인계.인계상태코드 = 공동수입준비포워더인계상태코드.회신기록됨;
+            }
+        }
+        초안변경됨();
+    }
+
+    public void 국제운송선택변경(string? value)
+        => 포워더회신방식변경(value);
 
     public void 도착국가변경(string? value)
     {
@@ -426,8 +725,10 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         초안.견적목록.Add(new 공동수입견적근거
         {
             견적키 = $"quote-{sequence}",
+            재료키 = 초안.재료품목목록.FirstOrDefault()?.재료키 ?? string.Empty,
             공급자후보키 = 초안.공급자근거목록.FirstOrDefault()?.공급자후보키 ?? string.Empty,
             통화코드 = 초안.기준통화코드,
+            Incoterms후보 = 공동수입준비Incoterms코드.Fca,
             유효기한Utc = DateTimeOffset.UtcNow.AddDays(30),
             확인시각Utc = DateTimeOffset.UtcNow
         });
@@ -457,9 +758,10 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         초안.품목분류후보목록.Add(new 공동수입품목분류후보
         {
             후보키 = $"classification-{초안.품목분류후보목록.Count + 1}",
+            재료키 = 초안.재료품목목록.FirstOrDefault()?.재료키 ?? string.Empty,
             관할국가코드 = 초안.도착국가코드,
             분류체계코드 = 공동수입준비품목분류체계코드.대상국가체계(초안.도착국가코드),
-            품목코드 = 선택집단?.HS코드 ?? string.Empty,
+            품목코드 = 초안.재료품목목록.FirstOrDefault()?.원천Hs코드 ?? 선택집단?.HS코드 ?? string.Empty,
             검토상태코드 = 공동수입준비검토상태코드.전문가검토필요,
             전문가검토필요 = true,
             확인시각Utc = DateTimeOffset.UtcNow
@@ -511,13 +813,38 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         저장원장 = 운영상태?.후속워크플로우활성여부 == true
             ? await client.준비원장조회Async(item.자동집단Id, cancellationToken)
             : null;
+        준비Os상태 = 저장원장 is null
+            ? null
+            : await client.준비Os상태조회Async(item.자동집단Id, cancellationToken);
         미리보기 = 저장원장;
         초안 = 저장원장 is null ? CreateDraft(item) : Clone(저장원장.준비자료);
+        if (초안.재료품목목록.Count == 0)
+        {
+            초안.재료품목목록.Add(Material(item));
+        }
+        초안.국제운송검토 ??= new 공동수입준비국제운송검토();
+        초안.포워더인계 ??= new 공동수입준비포워더인계();
+        초안.포워더인계.전달항목코드목록 ??= [.. 공동수입준비포워더전달항목코드.기본집계목록];
+        if (초안.재료품목목록.Count == 1)
+        {
+            var materialKey = 초안.재료품목목록[0].재료키;
+            foreach (var quote in 초안.견적목록.Where(quote => string.IsNullOrWhiteSpace(quote.재료키)))
+            {
+                quote.재료키 = materialKey;
+            }
+            foreach (var classification in 초안.품목분류후보목록.Where(candidate => string.IsNullOrWhiteSpace(candidate.재료키)))
+            {
+                classification.재료키 = materialKey;
+            }
+        }
+        초안저장후변경됨 = false;
         _미확인항목Text = string.Join(Environment.NewLine, 초안.미확인항목목록);
         OnPropertyChanged(nameof(미확인항목Text));
         승인사유 = string.Empty;
         _대기저장지문 = null;
         _대기저장멱등키 = null;
+        추가재료집단Id = string.Empty;
+        OnPropertyChanged(nameof(추가가능재료집단목록));
         if (운영상태 is null)
         {
             메시지 = "선택한 집단의 모집 OS 상태를 찾을 수 없습니다.";
@@ -535,6 +862,7 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         {
             재료키 = group.상품키,
             재료명 = group.상품명,
+            재료품목목록 = [Material(group)],
             도착국가코드 = 공동수입준비국가코드.대한민국,
             기준통화코드 = "KRW",
             미확인항목목록 = ["공급자·견적·품목분류·국가별 규제 자료 확인 필요"]
@@ -543,16 +871,7 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         {
             draft.예상비용목록.Add(NewCost($"cost-{category}", category, CostLabel(category), draft.기준통화코드));
         }
-        draft.품목분류후보목록.Add(new 공동수입품목분류후보
-        {
-            후보키 = "classification-1",
-            관할국가코드 = 공동수입준비국가코드.대한민국,
-            분류체계코드 = 공동수입준비품목분류체계코드.한국HsK,
-            품목코드 = group.HS코드,
-            검토상태코드 = 공동수입준비검토상태코드.전문가검토필요,
-            전문가검토필요 = true,
-            확인시각Utc = DateTimeOffset.UtcNow
-        });
+        draft.품목분류후보목록.Add(NewClassification(group, draft));
         draft.국가별검토항목목록.Add(new 공동수입국가별검토항목
         {
             관할국가코드 = 공동수입준비국가코드.대한민국,
@@ -570,6 +889,32 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         }
         return draft;
     }
+
+    private static 공동수입준비재료품목 Material(공동구매자동집단요약응답 group)
+        => new()
+        {
+            재료키 = group.상품키,
+            재료명 = group.상품명,
+            원천자동집단Id = group.자동집단Id,
+            원천Hs코드 = group.HS코드,
+            모인수요수량 = group.총희망수량,
+            수량단위 = group.수량단위
+        };
+
+    private static 공동수입품목분류후보 NewClassification(
+        공동구매자동집단요약응답 group,
+        공동수입준비원장저장요청 draft)
+        => new()
+        {
+            후보키 = $"classification-{draft.품목분류후보목록.Count + 1}",
+            재료키 = group.상품키,
+            관할국가코드 = draft.도착국가코드,
+            분류체계코드 = 공동수입준비품목분류체계코드.대상국가체계(draft.도착국가코드),
+            품목코드 = group.HS코드,
+            검토상태코드 = 공동수입준비검토상태코드.전문가검토필요,
+            전문가검토필요 = true,
+            확인시각Utc = DateTimeOffset.UtcNow
+        };
 
     private static 공동수입예상비용근거 NewCost(string key, string category, string label, string currency)
         => new()
@@ -623,8 +968,12 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         운영상태 = null;
         저장원장 = null;
         미리보기 = null;
+        준비Os상태 = null;
         초안 = new 공동수입준비원장저장요청();
+        초안저장후변경됨 = false;
         _미확인항목Text = string.Empty;
+        추가재료집단Id = string.Empty;
+        OnPropertyChanged(nameof(추가가능재료집단목록));
     }
 
     private void 동기화미확인항목()
@@ -640,6 +989,8 @@ public sealed class 공동수입준비관리ViewModel(I공동수입준비관리C
         OnPropertyChanged(nameof(인계승인가능));
         OnPropertyChanged(nameof(미리보기가능));
         OnPropertyChanged(nameof(저장가능));
+        OnPropertyChanged(nameof(Os작업실행가능));
+        OnPropertyChanged(nameof(전문검토인계가능));
         OnPropertyChanged(nameof(현재평가));
         OnPropertyChanged(nameof(완료검토항목수));
     }

@@ -15,6 +15,7 @@ public sealed class CommunityLedgerTemplateResponse
     public string Summary { get; set; } = string.Empty;
     public bool IsCommunityOpportunityTemplate { get; set; }
     public bool IsInternalAggregationTemplate { get; set; }
+    public bool IsExtensionTemplate { get; set; }
     public string 원함확인질문 { get; set; } = "무엇을 원하나요?";
     public string 원함확인설명 { get; set; } = "원장은 사용자가 원하는 일을 바로 실행하기 전에, 그 원함을 참여자와 시스템이 함께 이해할 수 있는 업무 모양으로 정리하는 단계입니다.";
     public IReadOnlyList<string> 원함확인질문목록 { get; set; } =
@@ -432,6 +433,8 @@ public static class CommunityLedgerTemplateKeys
 {
     public const string IndividualDemand = "individual-demand";
     public const string Order = "order";
+    public const string IndividualImport = "individual-import";
+    public const string IndividualExport = "individual-export";
     public const string GroupOrder = "group-order";
     public const string CargoTransport = "cargo-transport";
     public const string FoodOrder = "food-order";
@@ -442,6 +445,7 @@ public static class CommunityLedgerTemplateKeys
     public const string LocalSale = "local-sale";
     public const string GroupPurchase = "group-purchase";
     public const string GroupImport = "group-import";
+    public const string GroupExport = "group-export";
     public const string MeatImportReadiness = "meat-import-readiness";
     public const string Errand = "errand";
 }
@@ -449,9 +453,13 @@ public static class CommunityLedgerTemplateKeys
 public static class CommunityLedgerImplementationModuleCodes
 {
     public const string CommunityConversation = "community-conversation";
+    public const string ExportExchangeCommunity = "export-exchange-community";
     public const string WishLedgerAssessment = "wish-ledger-assessment";
     public const string GroupOrderAggregation = "group-order-aggregation";
     public const string OrderRoot = "order-root";
+    public const string IndividualImportExtension = "individual-import-extension";
+    public const string IndividualExportExtension = "individual-export-extension";
+    public const string GroupExportAggregation = "group-export-aggregation";
     public const string CargoTransport = "cargo-transport";
     public const string TransportProgress = "transport-progress";
     public const string WarehouseOutbound = "warehouse-outbound";
@@ -482,6 +490,8 @@ public static class 주문원장포함역할
 {
     public const string 주문집계 = "주문집계";
     public const string 개별주문 = "개별주문";
+    public const string 개별수입 = "개별수입";
+    public const string 개별수출 = "개별수출";
     public const string 판매 = "판매";
     public const string 창고입고 = "창고입고";
     public const string 창고출고 = "창고출고";
@@ -492,6 +502,8 @@ public static class 주문원장포함역할
     {
         주문집계,
         개별주문,
+        개별수입,
+        개별수출,
         판매,
         창고입고,
         창고출고,
@@ -589,12 +601,22 @@ public static class CommunityLedgerEngineHints
     public const string PickingBatch = "피킹 배치 엔진";
     public const string Grouping = "집단화 엔진";
     public const string ImportCustoms = "수입 통관 엔진";
+    public const string ExportCompliance = "수출 통관·규제 검토 엔진";
 }
 
 public static class CommunityLedgerCompositionRuleCodes
 {
     public const string IndividualDemandBeforeAutomaticGrouping = "IndividualDemandBeforeAutomaticGrouping";
     public const string OrderBeforeFulfillment = "OrderBeforeFulfillment";
+    public const string IndividualOrderBeforeIndividualImport = "IndividualOrderBeforeIndividualImport";
+    public const string IndividualImportCustomsBeforeDomesticRelease = "IndividualImportCustomsBeforeDomesticRelease";
+    public const string IndividualOrderBeforeIndividualExport = "IndividualOrderBeforeIndividualExport";
+    public const string ExportPartiesAndGoodsBeforeComplianceReview = "ExportPartiesAndGoodsBeforeComplianceReview";
+    public const string ExportComplianceBeforeDeclaration = "ExportComplianceBeforeDeclaration";
+    public const string ExportDeclarationAcceptedBeforeLoading = "ExportDeclarationAcceptedBeforeLoading";
+    public const string CompletedIndividualExportBeforeExchangeFeedback = "CompletedIndividualExportBeforeExchangeFeedback";
+    public const string GroupExportRequiresIndividualExports = "GroupExportRequiresIndividualExports";
+    public const string GroupExportPreservesIndividualDeclarations = "GroupExportPreservesIndividualDeclarations";
     public const string GroupPurchaseAgreementBeforeGroupOrder = "GroupPurchaseAgreementBeforeGroupOrder";
     public const string GroupOrderRequiresIndividualOrders = "GroupOrderRequiresIndividualOrders";
     public const string GroupPurchaseRequiresIndividualOrders = "GroupPurchaseRequiresIndividualOrders";

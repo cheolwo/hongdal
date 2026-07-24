@@ -73,7 +73,7 @@ public sealed class CommunityGroupImportLedgerPlanBuilderTests
             ProductSummary = "태국산 망고",
             PlannedQuantity = 1_000,
             QuantityUnit = "kg",
-            InternationalTransportMode = "LCL",
+            InternationalTransportMode = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired,
             FinalDestinationLabel = "서울 공동 수령지"
         };
 

@@ -105,8 +105,6 @@ public static class 공동구매수요모집Os배치작업코드
     public const string Kamis일별가격수집 = "KamisDailyPriceCollection";
     public const string Kamis월별가격이력수집 = "KamisMonthlyPriceCollection";
     public const string UsdaNass월별가격수집 = "UsdaMonthlyPriceCollection";
-    public const string Kamis가격브리프게시 = "CommunityKamisPriceBrief";
-    public const string UsdaNass가격브리프게시 = "CommunityUsdaNassPriceBrief";
     public const string 공식재료기업근거수집 = "OfficialFoodIngredientCompanyResearch";
 }
 
@@ -114,7 +112,6 @@ public static class 공동구매수요모집Os배치실행방식코드
 {
     public const string HostedWorker = nameof(HostedWorker);
     public const string Quartz = nameof(Quartz);
-    public const string 수집성공후인계 = "AfterSuccessfulCollection";
 }
 
 public static class 공동구매수요모집Os배치상태코드
@@ -127,7 +124,7 @@ public static class 공동구매수요모집Os배치상태코드
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
     SsalddelCodeLayer.Contract,
-    "1.0 공동구매 판단을 돕는 모집 점검, 공공가격 수집·게시와 검토용 근거 수집 작업의 OS 등록 상태를 정의합니다.",
+    "1.0 공동구매 판단을 돕는 모집 점검, 공공가격과 검토용 근거 수집 작업의 OS 등록 상태를 정의합니다.",
     FlowOrder = 12,
     Effects = SsalddelCodeEffect.None,
     Boundary = "설정·스케줄·출처와 실행 경계만 공개하며 API key, 원문 개인정보와 외부 실행 자격은 노출하지 않습니다.")]

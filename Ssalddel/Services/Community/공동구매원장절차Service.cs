@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Services.Community;
 
@@ -34,7 +36,8 @@ public sealed record 공동구매원장캠페인Snapshot(
     string? CustomsClearanceStatusCode = null,
     decimal TotalRequestedQuantity = 0,
     string? QuantityUnit = null,
-    string? OperatingMarketCountryCode = null);
+    string? OperatingMarketCountryCode = null,
+    IReadOnlyList<string>? AllowedTransactionTypeCodes = null);
 
 public interface I공동구매원장캠페인Store
 {
@@ -78,7 +81,8 @@ internal sealed class CommunityVote공동구매원장캠페인Store(ICommunityVo
                 vote.GroupPurchase?.CustomsClearanceStatusCode,
                 vote.Votes.Sum(x => x.RequestedQuantity),
                 vote.GroupPurchase?.QuantityUnit,
-                vote.GroupPurchase?.OperatingMarketCountryCode);
+                vote.GroupPurchase?.OperatingMarketCountryCode,
+                vote.GroupPurchase?.AllowedTransactionTypeCodes);
     }
 
     public async Task 원장연결Async(
@@ -208,6 +212,15 @@ public sealed class 공동구매원장절차Service : I공동구매원장절차S
         if (ledger is null)
         {
             var initialStage = 진행단계추론(vote);
+            var allowedTransactionTypeCodes = (vote.AllowedTransactionTypeCodes ?? [])
+                .Where(공동구매거래유형코드.지원여부)
+                .Select(공동구매거래유형코드.정규화)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            if (allowedTransactionTypeCodes.Length == 0)
+            {
+                allowedTransactionTypeCodes = [공동구매거래유형코드.B2C];
+            }
             ledger = await _ledgerStore.원장저장Async(
                 new 커뮤니티원장저장요청
                 {
@@ -233,7 +246,9 @@ public sealed class 공동구매원장절차Service : I공동구매원장절차S
                     {
                         ["WorkflowVersion"] = "1.0",
                         ["StageCatalog"] = string.Join(",", CommunityGroupPurchaseLedgerStageCodes.Ordered),
-                        ["AutoLinked"] = bool.TrueString
+                        ["AutoLinked"] = bool.TrueString,
+                        ["AllowedTransactionTypeCodes"] = JsonSerializer.Serialize(allowedTransactionTypeCodes),
+                        ["TransactionContextMode"] = allowedTransactionTypeCodes.Length > 1 ? "Segmented" : "Single"
                     }
                 },
                 "system:group-purchase-ledger",

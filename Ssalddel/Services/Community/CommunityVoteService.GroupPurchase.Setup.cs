@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.ContractManagement;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Services.Community;
 
@@ -73,6 +74,25 @@ public partial class CommunityVoteService
             throw new InvalidOperationException("지원하지 않는 공동구매 참여 정책입니다.");
         }
 
+        var requestedTransactionTypeCodes = settings.AllowedTransactionTypeCodes ?? [];
+        var invalidTransactionTypeCode = requestedTransactionTypeCodes
+            .FirstOrDefault(code => !string.IsNullOrWhiteSpace(code)
+                && !공동구매거래유형코드.지원여부(code));
+        if (invalidTransactionTypeCode is not null)
+        {
+            throw new InvalidOperationException("공동구매 거래유형은 B2C 또는 B2B여야 합니다.");
+        }
+
+        var allowedTransactionTypeCodes = requestedTransactionTypeCodes
+            .Where(code => !string.IsNullOrWhiteSpace(code))
+            .Select(공동구매거래유형코드.정규화)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        if (allowedTransactionTypeCodes.Length == 0)
+        {
+            allowedTransactionTypeCodes = [공동구매거래유형코드.B2C];
+        }
+
         if (settings.MinimumParticipantCount is < 1 or > 100_000)
         {
             throw new InvalidOperationException("최소 참여 인원은 1명 이상 100,000명 이하여야 합니다.");
@@ -132,6 +152,7 @@ public partial class CommunityVoteService
             TemperatureCode = Normalize(settings.TemperatureCode, "상온"),
             LogisticsMode = Normalize(settings.LogisticsMode, "LCL"),
             QuantityUnit = Normalize(settings.QuantityUnit, "개"),
+            AllowedTransactionTypeCodes = allowedTransactionTypeCodes,
             TargetUnitPriceKrwPerKg = settings.TargetUnitPriceKrwPerKg,
             ServiceAreaKey = serviceAreaKey ?? string.Empty,
             ServiceAreaLabel = Normalize(settings.ServiceAreaLabel, serviceAreaKey ?? string.Empty),

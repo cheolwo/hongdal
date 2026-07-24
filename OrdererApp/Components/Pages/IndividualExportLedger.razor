@@ -1,0 +1,11 @@
+@page "/trade/individual-export"
+@page "/orders/{OrderLedgerId}/individual-export"
+@using Ssalddel.Ui.Common.Areas.App.Components.Orderer
+
+<PageTitle>개별수출 원장</PageTitle>
+
+<IndividualExportLedgerScreen OrderLedgerId="@OrderLedgerId" />
+
+@code {
+    [Parameter] public string? OrderLedgerId { get; set; }
+}

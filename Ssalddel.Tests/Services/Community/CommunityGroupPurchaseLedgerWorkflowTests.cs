@@ -23,6 +23,10 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
         Assert.True(created.AutomaticallyLinked);
         Assert.Equal(CommunityGroupPurchaseLedgerStageCodes.Recruitment, created.CurrentStageCode);
         Assert.Contains(created.History, x => x.StageCode == CommunityGroupPurchaseLedgerStageCodes.Recruitment);
+        var transactionLedger = await ledgerStore.원장조회Async(created.CommunityLedgerId);
+        Assert.NotNull(transactionLedger);
+        Assert.Equal("Segmented", transactionLedger.확장속성["TransactionContextMode"]);
+        Assert.Contains(공동구매거래유형코드.B2B, transactionLedger.확장속성["AllowedTransactionTypeCodes"]);
 
         var progressed = await service.진행Async(
             campaignId,
@@ -64,6 +68,8 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
             new 주문원장통합UseCase(ledgerStore));
 
         var request = CreateFulfillmentRequest(campaignId);
+        request.TransactionTypeCode = 공동구매거래유형코드.B2B;
+        request.PriceBasisCode = 공동구매가격표시기준코드.부가세별도;
         var created = await service.CreateOrderDraftAsync("representative-1", request);
 
         Assert.True(created.Plan.LedgersPersisted);
@@ -86,6 +92,24 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
         Assert.Contains(orderLedger.포함원장목록, x => x.역할 == 주문원장포함역할.창고입고);
         Assert.Contains(orderLedger.포함원장목록, x => x.역할 == 주문원장포함역할.창고출고);
         Assert.Contains(orderLedger.포함원장목록, x => x.역할 == 주문원장포함역할.운송);
+        Assert.Equal(
+            공동구매거래유형코드.B2B,
+            orderLedger.외부참조[공동구매거래문맥원장키.거래유형]);
+        Assert.Equal(
+            공동구매가격표시기준코드.부가세별도,
+            orderLedger.외부참조[공동구매거래문맥원장키.가격표시기준]);
+        var childLedgers = await Task.WhenAll(orderLedger.포함원장목록.Select(reference =>
+            ledgerStore.원장조회Async(reference.원장Id)));
+        Assert.All(childLedgers, child =>
+        {
+            Assert.NotNull(child);
+            Assert.Equal(
+                공동구매거래유형코드.B2B,
+                child.외부참조[공동구매거래문맥원장키.거래유형]);
+            Assert.Equal(
+                orderLedger.원장Id,
+                child.외부참조[공동구매거래문맥원장키.원천거래문맥원장Id]);
+        });
 
         var progress = await workflow.조회Async(campaignId);
         Assert.NotNull(progress);
@@ -217,7 +241,7 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
             ProductSummary = "태국산 망고",
             PlannedQuantity = 1_000,
             QuantityUnit = "kg",
-            InternationalTransportMode = "LCL",
+            InternationalTransportMode = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired,
             FinalDestinationLabel = "서울 공동 수령지",
             WarehouseReferenceKey = "dedicated-warehouse:verified",
             WarehouseDisplayName = "공동구매 전용 창고",
@@ -261,6 +285,74 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
         Assert.Equal(CommunityGroupPurchaseLedgerStageCodes.Execution, sourceProgress.CurrentStageCode);
     }
 
+    [Fact]
+    public async Task 공동수입전환은_원천공동구매에이미연결된공동수입원장을재사용하고_준비블록을보존한다()
+    {
+        var campaignId = Guid.NewGuid();
+        var campaignStore = new FakeCampaignStore(CreateImportCampaign(campaignId));
+        var ledgerStore = new FakeLedgerStore();
+        var workflow = new 공동구매원장절차Service(campaignStore, ledgerStore);
+        var source = await workflow.조회Async(campaignId);
+        Assert.NotNull(source);
+        const string existingGroupImportId = "group-import-existing-campaign";
+        await ledgerStore.원장저장Async(
+            new 커뮤니티원장저장요청
+            {
+                원장Id = existingGroupImportId,
+                커뮤니티Id = "platform",
+                원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
+                제목 = "기존 공동수입 원장",
+                상태 = 커뮤니티원장상태.진행중,
+                현재단계Key = CommunityGroupImportLedgerStageCodes.ImportDecision,
+                대상OsCode = CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+                대상OsName = "공동수입 OS",
+                블록목록 =
+                [
+                    new 커뮤니티원장블록Dto
+                    {
+                        BlockId = "trade-readiness-request",
+                        BlockType = CommunityLedgerBlockTypes.Generic,
+                        Title = "기존 1.5 준비 자료",
+                        State = "recorded",
+                        Data = new Dictionary<string, string> { ["Json"] = "{}" }
+                    }
+                ],
+                포함원장목록 =
+                [
+                    new 커뮤니티포함원장참조Dto
+                    {
+                        원장Id = source.CommunityLedgerId,
+                        원장템플릿Key = CommunityLedgerTemplateKeys.GroupPurchase,
+                        역할 = 공동수입원장관계역할.원천공동구매,
+                        관계유형 = CommunityLedgerRelationTypes.Reference,
+                        필수여부 = true
+                    }
+                ]
+            },
+            "admin-1");
+        var service = new 공동수입원장전환Service(campaignStore, workflow, ledgerStore);
+        var request = new CommunityGroupImportLedgerConversionRequest
+        {
+            GroupPurchaseCampaignId = campaignId,
+            LogisticsRouteCode = CommunityGroupImportLogisticsRouteCodes.DirectDestination,
+            ProductSummary = "태국산 망고",
+            PlannedQuantity = 1_000,
+            QuantityUnit = "kg",
+            InternationalTransportMode = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired,
+            FinalDestinationLabel = "서울 공동 수령지"
+        };
+
+        var result = await service.전환Async(request, "representative-1");
+
+        Assert.False(result.Created);
+        Assert.Equal(existingGroupImportId, result.GroupImportLedgerId);
+        var ledger = await ledgerStore.원장조회Async(existingGroupImportId);
+        Assert.NotNull(ledger);
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "trade-readiness-request");
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "import-decision");
+        Assert.Equal("CollectiveActionFacilitator", ledger.확장속성["PlatformRole"]);
+    }
+
     private static 공동구매원장캠페인Snapshot CreateCampaign(Guid campaignId)
         => new(
             campaignId,
@@ -272,7 +364,12 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
             "공동구매 대표",
             CommunityVoteStatusCodes.Open,
             null,
-            null);
+            null,
+            AllowedTransactionTypeCodes:
+            [
+                공동구매거래유형코드.B2C,
+                공동구매거래유형코드.B2B
+            ]);
 
     private static 공동구매원장캠페인Snapshot CreateImportCampaign(Guid campaignId)
         => new(

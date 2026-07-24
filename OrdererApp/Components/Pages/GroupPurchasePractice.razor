@@ -1,0 +1,14 @@
+@page "/group-purchase/practice"
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Ui.Common.Areas.App.Components.Orderer
+
+<PageTitle>체험 공동구매</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.Practice"
+                              Eyebrow="PRACTICE GROUP BUY · SIMULATION"
+                              Title="함께 장보기 연습방"
+                              Description="가상 이웃과 음식·재료 수요를 모아보며 공동구매 집단화 과정을 게임처럼 익힙니다.">
+        <GroupPurchasePracticeScreen BackHref="@GroupPurchasePageRoutes.Root" />
+    </GroupPurchaseScreenFrame>
+</MudContainer>

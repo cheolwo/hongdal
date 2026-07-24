@@ -3,6 +3,7 @@ namespace Ssalddel.Contracts.Common.Orderer;
 public enum GroupPurchaseScreenKind
 {
     Overview,
+    Practice,
     ProductList,
     ProductDetail,
     DemandCreate,
@@ -26,6 +27,7 @@ public enum GroupPurchaseScreenKind
 public static class GroupPurchasePageRoutes
 {
     public const string Root = "/group-purchase";
+    public const string Practice = $"{Root}/practice";
     public const string ProductsRoot = $"{Root}/products";
     public const string ProductDetailTemplate = $"{ProductsRoot}/{{ProductId}}";
     public const string DemandCreateRoot = $"{Root}/demands/new";

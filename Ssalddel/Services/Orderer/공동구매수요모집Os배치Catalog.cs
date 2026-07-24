@@ -15,7 +15,6 @@ internal sealed record 공동구매수요모집Os배치등록항목(
     string 작업코드,
     bool 등록여부,
     bool Quartz등록여부,
-    bool 수집성공후인계여부,
     string 실행방식,
     string 스케줄,
     string 시간대);
@@ -39,29 +38,15 @@ internal sealed class 공동구매수요모집Os배치등록계획
         => 조회(작업코드).Quartz등록여부;
 
     public static 공동구매수요모집Os배치등록계획 생성(
-        AgriculturalFisheriesBatchOptions 농수축산배치,
-        CommunityEditorialBatchOptions 커뮤니티편집배치)
+        AgriculturalFisheriesBatchOptions 농수축산배치)
     {
         ArgumentNullException.ThrowIfNull(농수축산배치);
-        ArgumentNullException.ThrowIfNull(커뮤니티편집배치);
 
         var kamis일별등록 = 농수축산배치.Enabled && 농수축산배치.KamisDailyEnabled;
         var kamis월별등록 = 농수축산배치.Enabled && 농수축산배치.KamisMonthlyEnabled;
         var usda등록 = 농수축산배치.Enabled && 농수축산배치.UsdaMonthlyEnabled;
         var 기업근거등록 = 농수축산배치.Enabled
                         && 농수축산배치.IngredientCompanyResearchEnabled;
-        var kamis연결게시 = kamis일별등록
-                         && 농수축산배치.PublishCommunityPriceBriefs
-                         && 커뮤니티편집배치.KamisPriceBriefEnabled;
-        var usda연결게시 = usda등록
-                        && 농수축산배치.PublishCommunityPriceBriefs
-                        && 커뮤니티편집배치.UsdaNassPriceBriefEnabled;
-        var kamis독립게시 = !kamis연결게시
-                         && 커뮤니티편집배치.Enabled
-                         && 커뮤니티편집배치.KamisPriceBriefEnabled;
-        var usda독립게시 = !usda연결게시
-                        && 커뮤니티편집배치.Enabled
-                        && 커뮤니티편집배치.UsdaNassPriceBriefEnabled;
 
         var 항목 = new[]
         {
@@ -84,30 +69,14 @@ internal sealed class 공동구매수요모집Os배치등록계획
                 공동구매수요모집Os배치작업코드.공식재료기업근거수집,
                 기업근거등록,
                 농수축산배치.IngredientCompanyResearchCronExpression,
-                농수축산배치.TimeZoneId),
-            게시항목(
-                공동구매수요모집Os배치작업코드.Kamis가격브리프게시,
-                kamis연결게시,
-                kamis독립게시,
-                농수축산배치.KamisDailyCronExpression,
-                농수축산배치.TimeZoneId,
-                커뮤니티편집배치.KamisPriceBriefCronExpression,
-                커뮤니티편집배치.TimeZoneId),
-            게시항목(
-                공동구매수요모집Os배치작업코드.UsdaNass가격브리프게시,
-                usda연결게시,
-                usda독립게시,
-                농수축산배치.UsdaMonthlyCronExpression,
-                농수축산배치.TimeZoneId,
-                커뮤니티편집배치.UsdaNassPriceBriefCronExpression,
-                커뮤니티편집배치.TimeZoneId)
+                농수축산배치.TimeZoneId)
         }.ToDictionary(item => item.작업코드, StringComparer.Ordinal);
 
         return new 공동구매수요모집Os배치등록계획(항목);
     }
 
     public static 공동구매수요모집Os배치등록계획 빈계획()
-        => 생성(new AgriculturalFisheriesBatchOptions(), new CommunityEditorialBatchOptions());
+        => 생성(new AgriculturalFisheriesBatchOptions());
 
     private static 공동구매수요모집Os배치등록항목 Quartz항목(
         string 작업코드,
@@ -118,35 +87,16 @@ internal sealed class 공동구매수요모집Os배치등록계획
             작업코드,
             등록여부,
             Quartz등록여부: 등록여부,
-            수집성공후인계여부: false,
             공동구매수요모집Os배치실행방식코드.Quartz,
             스케줄,
             시간대);
 
-    private static 공동구매수요모집Os배치등록항목 게시항목(
-        string 작업코드,
-        bool 수집성공후인계여부,
-        bool 독립Quartz등록여부,
-        string 수집스케줄,
-        string 수집시간대,
-        string 독립스케줄,
-        string 독립시간대)
-        => new(
-            작업코드,
-            수집성공후인계여부 || 독립Quartz등록여부,
-            독립Quartz등록여부,
-            수집성공후인계여부,
-            수집성공후인계여부
-                ? 공동구매수요모집Os배치실행방식코드.수집성공후인계
-                : 공동구매수요모집Os배치실행방식코드.Quartz,
-            수집성공후인계여부 ? 수집스케줄 : 독립스케줄,
-            수집성공후인계여부 ? 수집시간대 : 독립시간대);
 }
 
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
     SsalddelCodeLayer.Application,
-    "1.0에 필요한 내부 점검과 공유 공공데이터·커뮤니티 배치의 등록 상태, 선행 작업, 출처와 실행 경계를 한 OS 카탈로그로 조립합니다.",
+    "1.0 내부 점검과 공동구매 판단에 필요한 공유 공공데이터 수집 상태·출처·실행 경계를 OS 카탈로그로 조립합니다.",
     ContractType = typeof(I공동구매수요모집Os배치Catalog),
     FlowOrder = 35,
     Effects = SsalddelCodeEffect.None,
@@ -194,7 +144,6 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
                     "한국 농수산물의 조사일·품목·등급·단위가 있는 관측값을 보관합니다.",
                     "공공가격수집",
                     "KAMIS 농산물유통정보",
-                    게시글작성여부: false,
                     osWorker활성: osWorker활성,
                     필요설정목록:
                     [
@@ -210,7 +159,6 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
                     "최근 완료 월의 도매·소매 월평균 이력을 보관해 가격 추세 검토를 돕습니다.",
                     "공공가격수집",
                     "KAMIS 농산물유통정보",
-                    게시글작성여부: false,
                     osWorker활성: osWorker활성,
                     필요설정목록:
                     [
@@ -226,7 +174,6 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
                     "미국 전국 농축수산물 생산자 수취가격의 기준월·단위를 보관합니다.",
                     "공공가격수집",
                     "USDA NASS Quick Stats",
-                    게시글작성여부: false,
                     osWorker활성: osWorker활성,
                     필요설정목록:
                     [
@@ -236,42 +183,11 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
                     ],
                     실행경계: "미국 생산자 수취가격이며 소매가·한국 유통가·개별 공급 견적으로 해석하지 않습니다."),
                 공유작업(
-                    공동구매수요모집Os배치작업코드.Kamis가격브리프게시,
-                    "KAMIS 가격 브리프 게시",
-                    "검증해 보관한 최근 KAMIS 관측값 일부를 정보·시세 게시판 시스템 글로 정리합니다.",
-                    "커뮤니티근거게시",
-                    "KAMIS 보관 원장",
-                    게시글작성여부: true,
-                    osWorker활성: osWorker활성,
-                    선행작업코드목록: [공동구매수요모집Os배치작업코드.Kamis일별가격수집],
-                    필요설정목록:
-                    [
-                        "AgriculturalFisheriesBatch:PublishCommunityPriceBriefs 또는 CommunityEditorialBatch:Enabled",
-                        "CommunityEditorialBatch:KamisPriceBriefEnabled"
-                    ],
-                    실행경계: "원천·조사일·KRW·품목·등급·단위와 비교 주의를 표시하고 같은 기준일은 중복 게시하지 않습니다."),
-                공유작업(
-                    공동구매수요모집Os배치작업코드.UsdaNass가격브리프게시,
-                    "USDA NASS 가격 브리프 게시",
-                    "검증해 보관한 최근 미국 생산자 가격 일부를 정보·시세 게시판 시스템 글로 정리합니다.",
-                    "커뮤니티근거게시",
-                    "USDA NASS 보관 원장",
-                    게시글작성여부: true,
-                    osWorker활성: osWorker활성,
-                    선행작업코드목록: [공동구매수요모집Os배치작업코드.UsdaNass월별가격수집],
-                    필요설정목록:
-                    [
-                        "AgriculturalFisheriesBatch:PublishCommunityPriceBriefs 또는 CommunityEditorialBatch:Enabled",
-                        "CommunityEditorialBatch:UsdaNassPriceBriefEnabled"
-                    ],
-                    실행경계: "원문 단위와 생산자 가격 단계를 유지하고 같은 기준월은 중복 게시하지 않습니다."),
-                공유작업(
                     공동구매수요모집Os배치작업코드.공식재료기업근거수집,
                     "공식 재료 기업 근거 갱신",
                     "음식·재료 탐색에서 공동구매 후보를 이해할 수 있도록 공식 기업 관측 근거를 갱신합니다.",
                     "검토자료수집",
                     "공식 식품·사업자 공개 원천",
-                    게시글작성여부: false,
                     osWorker활성: osWorker활성,
                     필요설정목록:
                     [
@@ -323,7 +239,6 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
         string 목적,
         string 작업유형,
         string 데이터출처,
-        bool 게시글작성여부,
         bool osWorker활성,
         IReadOnlyList<string> 필요설정목록,
         string 실행경계,
@@ -343,7 +258,7 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
             등록여부 = 등록.등록여부,
             Os사용활성여부 = os활성,
             공유인프라여부 = true,
-            게시글작성여부 = 게시글작성여부,
+            게시글작성여부 = false,
             상태코드 = 상태코드(등록.등록여부, os활성),
             데이터출처 = 데이터출처,
             선행작업코드목록 = 선행작업코드목록 ?? [],

@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Orderer;
+
 namespace Ssalddel.Services.Community;
 
 public sealed class CommunityGroupPurchaseDemandHandoffRequest
@@ -17,6 +19,11 @@ public sealed class CommunityGroupPurchaseDemandHandoffRequest
     public string DeliveryScopeName { get; set; } = string.Empty;
     public int RequestedQuantity { get; set; }
     public string QuantityUnit { get; set; } = "개";
+    public string TransactionTypeCode { get; set; } = 공동구매거래유형코드.B2C;
+    public string PriceBasisCode { get; set; } = 공동구매가격표시기준코드.부가세포함;
+    public string? PurchasingOrganizationReference { get; set; }
+    public string? PurchasingOrganizationName { get; set; }
+    public bool TaxInvoiceRequired { get; set; }
     public int MinimumParticipantCount { get; set; }
     public int MinimumTotalQuantity { get; set; }
 }

@@ -136,10 +136,28 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanBuilderTests
 
         Assert.NotEqual(direct.PlanFingerprint, thirdParty.PlanFingerprint);
         Assert.Equal(64, direct.PlanFingerprint.Length);
-        Assert.Equal("1.1", direct.PlanVersion);
+        Assert.Equal("1.2", direct.PlanVersion);
         Assert.Equal(
             CommunityGroupPurchaseAgreementPolicy.PolicyCode,
             direct.AgreementPolicyCode);
+    }
+
+    [Fact]
+    public void Preview_B2B거래문맥은_가격기준과계획지문에포함된다()
+    {
+        var request = CreateRequest(DomesticGroupPurchaseFulfillmentRouteCodes.DirectCollectionPoint);
+        request.TransactionTypeCode = 공동구매거래유형코드.B2B;
+        request.PriceBasisCode = 공동구매가격표시기준코드.부가세별도;
+
+        var business = DomesticGroupPurchaseFulfillmentPlanBuilder.Preview(request);
+        request.TransactionTypeCode = 공동구매거래유형코드.B2C;
+        request.PriceBasisCode = 공동구매가격표시기준코드.부가세포함;
+        var consumer = DomesticGroupPurchaseFulfillmentPlanBuilder.Preview(request);
+
+        Assert.True(business.OrderPlacementReady);
+        Assert.Equal(공동구매거래유형코드.B2B, business.TransactionContext.거래유형);
+        Assert.Equal(공동구매가격표시기준코드.부가세별도, business.TransactionContext.가격표시기준);
+        Assert.NotEqual(business.PlanFingerprint, consumer.PlanFingerprint);
     }
 
     private static DomesticGroupPurchaseFulfillmentPlanRequest CreateRequest(string routeCode)

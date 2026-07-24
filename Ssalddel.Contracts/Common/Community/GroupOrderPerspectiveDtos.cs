@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Orderer;
+
 namespace Ssalddel.Contracts.Common.Community;
 
 public static class 공동주문관점코드
@@ -23,6 +25,7 @@ public sealed class 공동주문관점항목응답
     public string? 자동집단Id { get; set; }
     public string? 상품키 { get; set; }
     public string? 상품명 { get; set; }
+    public 공동구매거래문맥응답 거래문맥 { get; set; } = new();
     public int 개별주문수 { get; set; }
     public int 완료개별주문수 { get; set; }
     public bool 필수개별주문완료여부 { get; set; }

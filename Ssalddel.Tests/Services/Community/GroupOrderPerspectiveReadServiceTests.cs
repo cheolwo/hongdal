@@ -1,5 +1,6 @@
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Services.Community;
 using Microsoft.AspNetCore.Http;
 
@@ -24,6 +25,9 @@ public sealed class GroupOrderPerspectiveReadServiceTests
         Assert.Equal(1, item.개별주문수);
         Assert.Equal("감자", item.상품명);
         Assert.Equal("개별주문참여", item.조회근거);
+        Assert.Equal(공동구매거래유형코드.B2B, item.거래문맥.거래유형);
+        Assert.Equal(공동구매가격표시기준코드.부가세별도, item.거래문맥.가격표시기준);
+        Assert.Equal(2, item.거래문맥.구매조직수);
     }
 
     [Theory]
@@ -116,7 +120,12 @@ public sealed class GroupOrderPerspectiveReadServiceTests
             ["SourceGroupPurchaseLedgerId"] = "group-purchase-1",
             ["AutomaticGroupId"] = "auto-group-1",
             ["ProductKey"] = "potato",
-            ["ProductName"] = "감자"
+            ["ProductName"] = "감자",
+            [공동구매거래문맥원장키.거래유형] = 공동구매거래유형코드.B2B,
+            [공동구매거래문맥원장키.가격표시기준] = 공동구매가격표시기준코드.부가세별도,
+            [공동구매거래문맥원장키.원천거래문맥원장Id] = "group-purchase-1",
+            [공동구매거래문맥원장키.구매조직수] = "2",
+            [공동구매거래문맥원장키.세금계산서요청수] = "1"
         };
         groupOrder.포함원장목록 =
         [

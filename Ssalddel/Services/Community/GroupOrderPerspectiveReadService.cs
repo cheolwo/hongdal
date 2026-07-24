@@ -1,6 +1,7 @@
 using FluentResults;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Microsoft.AspNetCore.Http;
 
 namespace Ssalddel.Services.Community;
@@ -307,6 +308,7 @@ public sealed class GroupOrderPerspectiveReadService(
             자동집단Id = External(root, "AutomaticGroupId"),
             상품키 = External(root, "ProductKey"),
             상품명 = External(root, "ProductName"),
+            거래문맥 = TransactionContext(root),
             개별주문수 = individualOrders.Length,
             완료개별주문수 = individualOrders.Count(item => item.원장?.상태 == 커뮤니티원장상태.완료),
             필수개별주문완료여부 = individualOrders
@@ -386,6 +388,24 @@ public sealed class GroupOrderPerspectiveReadService(
 
     private static string? External(커뮤니티원장Dto ledger, string key)
         => ledger.외부참조.TryGetValue(key, out var value) ? Clean(value) : null;
+
+    private static 공동구매거래문맥응답 TransactionContext(커뮤니티원장Dto ledger)
+        => new()
+        {
+            거래유형 = 공동구매거래유형코드.정규화(
+                External(ledger, 공동구매거래문맥원장키.거래유형)),
+            가격표시기준 = 공동구매가격표시기준코드.정규화(
+                External(ledger, 공동구매거래문맥원장키.가격표시기준),
+                External(ledger, 공동구매거래문맥원장키.거래유형)),
+            원천거래문맥원장Id = External(ledger, 공동구매거래문맥원장키.원천거래문맥원장Id)
+                ?? External(ledger, "SourceGroupPurchaseLedgerId")
+                ?? string.Empty,
+            구매조직수 = ParseNonNegativeInt(External(ledger, 공동구매거래문맥원장키.구매조직수)),
+            세금계산서요청수 = ParseNonNegativeInt(External(ledger, 공동구매거래문맥원장키.세금계산서요청수))
+        };
+
+    private static int ParseNonNegativeInt(string? value)
+        => int.TryParse(value, out var parsed) ? Math.Max(0, parsed) : 0;
 
     private static string? Clean(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

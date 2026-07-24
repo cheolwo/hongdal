@@ -31,12 +31,26 @@ public interface I공동수입준비관리Client
         string 자동집단Id,
         공동수입준비원장저장요청 요청,
         CancellationToken cancellationToken = default);
+
+    Task<공동수입준비Os상태응답?> 준비Os상태조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken = default);
+
+    Task<공동수입준비Os상태응답> 준비Os작업실행Async(
+        string 자동집단Id,
+        공동수입준비Os작업실행요청 요청,
+        CancellationToken cancellationToken = default);
+
+    Task<공동수입준비Os상태응답> 전문검토인계Async(
+        string 자동집단Id,
+        공동수입준비Os전문검토인계요청 요청,
+        CancellationToken cancellationToken = default);
 }
 
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.GroupImportTradeReadiness,
     SsalddelCodeLayer.ClientAdapter,
-    "두 관리자 앱에서 1.0 인계 상태와 1.5 공급·가격·무역 준비 원장을 같은 API 계약으로 조회하고 저장합니다.",
+    "두 관리자 앱에서 1.0 인계 상태와 기존 공동수입 원장의 1.5 공급·가격·무역 준비 블록을 같은 API 계약으로 조회하고 저장합니다.",
     ContractType = typeof(I공동수입준비관리Client),
     FlowOrder = 40,
     Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
@@ -100,7 +114,7 @@ public sealed class 공동수입준비관리Client(ISsalddelJsonApiClient client
         CancellationToken cancellationToken = default)
         => client.GetAsync<공동수입준비원장응답>(
             ReadinessPath(자동집단Id),
-            "1.5 준비 원장 조회",
+            "공동수입 원장 1.5 준비 블록 조회",
             allowNotFound: true,
             cancellationToken);
 
@@ -113,9 +127,9 @@ public sealed class 공동수입준비관리Client(ISsalddelJsonApiClient client
             HttpMethod.Post,
             $"{ReadinessPath(자동집단Id)}/preview",
             요청,
-            "1.5 준비 원장 미리보기",
+            "공동수입 원장 1.5 준비 블록 미리보기",
             cancellationToken: cancellationToken);
-        return result ?? throw new InvalidOperationException("1.5 준비 원장 미리보기 응답이 비어 있습니다.");
+        return result ?? throw new InvalidOperationException("공동수입 원장 1.5 준비 블록 미리보기 응답이 비어 있습니다.");
     }
 
     public async Task<공동수입준비원장응답> 저장Async(
@@ -129,9 +143,50 @@ public sealed class 공동수입준비관리Client(ISsalddelJsonApiClient client
             ReadinessPath(자동집단Id),
             요청,
             IdempotencyHeader(요청.요청멱등키),
-            "1.5 준비 원장 저장",
+            "공동수입 원장 1.5 준비 블록 저장",
             cancellationToken: cancellationToken);
-        return result ?? throw new InvalidOperationException("1.5 준비 원장 저장 응답이 비어 있습니다.");
+        return result ?? throw new InvalidOperationException("공동수입 원장 1.5 준비 블록 저장 응답이 비어 있습니다.");
+    }
+
+    public Task<공동수입준비Os상태응답?> 준비Os상태조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken = default)
+        => client.GetAsync<공동수입준비Os상태응답>(
+            $"{ReadinessPath(자동집단Id)}/os",
+            "1.5 공동수입 준비 OS 상태 조회",
+            allowNotFound: true,
+            cancellationToken);
+
+    public async Task<공동수입준비Os상태응답> 준비Os작업실행Async(
+        string 자동집단Id,
+        공동수입준비Os작업실행요청 요청,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(요청);
+        var result = await client.SendWithHeadersAsync<공동수입준비Os작업실행요청, 공동수입준비Os상태응답>(
+            HttpMethod.Post,
+            $"{ReadinessPath(자동집단Id)}/os/workloads/run",
+            요청,
+            IdempotencyHeader(요청.요청멱등키),
+            "1.5 공동수입 준비 OS 작업 실행",
+            cancellationToken: cancellationToken);
+        return result ?? throw new InvalidOperationException("1.5 OS 작업 실행 응답이 비어 있습니다.");
+    }
+
+    public async Task<공동수입준비Os상태응답> 전문검토인계Async(
+        string 자동집단Id,
+        공동수입준비Os전문검토인계요청 요청,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(요청);
+        var result = await client.SendWithHeadersAsync<공동수입준비Os전문검토인계요청, 공동수입준비Os상태응답>(
+            HttpMethod.Post,
+            $"{ReadinessPath(자동집단Id)}/os/qualified-review-handoff",
+            요청,
+            IdempotencyHeader(요청.요청멱등키),
+            "1.5 전문 검토 인계",
+            cancellationToken: cancellationToken);
+        return result ?? throw new InvalidOperationException("1.5 전문 검토 인계 응답이 비어 있습니다.");
     }
 
     private static IReadOnlyDictionary<string, string> IdempotencyHeader(string key)

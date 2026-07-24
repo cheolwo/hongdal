@@ -1,0 +1,16 @@
+@page "/community/group-purchase/practice"
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.Components.Orderer
+
+<PageTitle>체험 공동구매</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-5">
+    <MudStack Spacing="3">
+        <WebPageHeader Eyebrow="PRACTICE GROUP BUY"
+                       Title="함께 장보기 연습방"
+                       Description="가상 이웃과 집단화 과정을 게임처럼 익힌 뒤 실제 비구속 수요는 별도로 다시 확인합니다."
+                       Badge="Experience · Simulation" />
+        <GroupPurchasePracticeScreen BackHref="@CommunityPageRoutes.GroupPurchase"
+                                     UseCommunityDemandRoute="true" />
+    </MudStack>
+</MudContainer>

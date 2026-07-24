@@ -1,5 +1,6 @@
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Services.Community;
 using Microsoft.AspNetCore.Http;
 
@@ -22,6 +23,8 @@ public sealed class IndividualOrderPerspectiveReadServiceTests
         Assert.Equal(["order-1"], result.Value.Items.Select(item => item.주문원장Id));
         Assert.Equal(개별주문관점코드.주문자, result.Value.Items[0].관계코드);
         Assert.Equal("주문자 1", result.Value.Items[0].주문자표시명);
+        Assert.Equal(공동구매거래유형코드.B2B, result.Value.Items[0].거래문맥.거래유형);
+        Assert.Equal(공동구매가격표시기준코드.부가세별도, result.Value.Items[0].거래문맥.가격표시기준);
     }
 
     [Theory]
@@ -105,6 +108,12 @@ public sealed class IndividualOrderPerspectiveReadServiceTests
     private static FakeLedgerStore CreateStore()
     {
         var order1 = Ledger("order-1", CommunityLedgerTemplateKeys.Order, "orderer-1", "주문자 1", "감자 개별 주문");
+        order1.외부참조 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [공동구매거래문맥원장키.거래유형] = 공동구매거래유형코드.B2B,
+            [공동구매거래문맥원장키.가격표시기준] = 공동구매가격표시기준코드.부가세별도,
+            [공동구매거래문맥원장키.원천거래문맥원장Id] = "group-order-1"
+        };
         order1.참여자목록 = [Participant("orderer-1", "주문자 1", "주문자")];
         order1.포함원장목록 =
         [

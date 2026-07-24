@@ -1,3 +1,5 @@
+@using Ssalddel.Contracts.Common.Orderer
+
 <div class="group-purchase-recruitment-stage">
     <MudText Typo="Typo.h6">수요 모집 참여</MudText>
     <MudText Typo="Typo.body2">상품, 수량과 수령 방법을 선택하면 공동구매 수요에 반영됩니다.</MudText>
@@ -8,6 +10,41 @@
         }
     </MudSelect>
     <MudNumericField T="int" Label="수량" @bind-Value="Draft.Quantity" Min="1" Variant="Variant.Outlined" Class="mt-3" />
+    <MudSelect T="string" Label="구매 목적" @bind-Value="Draft.TransactionTypeCode" Variant="Variant.Outlined" Class="mt-3">
+        @foreach (var transactionTypeCode in AllowedTransactionTypeCodes)
+        {
+            <MudSelectItem Value="@transactionTypeCode">@TransactionTypeLabel(transactionTypeCode)</MudSelectItem>
+        }
+    </MudSelect>
+    @if (Draft.IsBusinessPurchase)
+    {
+        <MudTextField Label="구매 조직명"
+                      @bind-Value="Draft.PurchasingOrganizationName"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      Class="mt-3" />
+        <MudTextField Label="조직 참조키(선택)"
+                      @bind-Value="Draft.PurchasingOrganizationReference"
+                      Variant="Variant.Outlined"
+                      HelperText="플랫폼에 이미 등록된 조직 ID가 있을 때만 입력합니다. 사업자등록번호 입력란이 아닙니다."
+                      Class="mt-3" />
+        <MudSelect T="string" Label="가격 표시 기준" @bind-Value="Draft.PriceBasisCode" Variant="Variant.Outlined" Class="mt-3">
+            <MudSelectItem Value="@공동구매가격표시기준코드.부가세별도">부가세 별도</MudSelectItem>
+            <MudSelectItem Value="@공동구매가격표시기준코드.부가세포함">부가세 포함</MudSelectItem>
+        </MudSelect>
+        <MudCheckBox T="bool" @bind-Value="Draft.TaxInvoiceRequired" Color="Color.Primary" Class="mt-2">
+            세금계산서 필요
+        </MudCheckBox>
+        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined" Class="mt-2">
+            수요 모집 단계에서는 사업자등록번호를 받지 않습니다. 계약 확정 전에 권한과 사업자 정보를 별도 검증합니다.
+        </MudAlert>
+    }
+    else
+    {
+        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-2">
+            B2C 가격은 소비자가 비교할 수 있도록 부가세 포함 기준으로 집계됩니다.
+        </MudText>
+    }
     <MudSelect T="string" Label="참여 방법" @bind-Value="Draft.MethodCode" Variant="Variant.Outlined" Class="mt-3">
         <MudSelectItem Value="@CommunityVoteParticipationMethodCodes.CommunityMember">커뮤니티 구성원</MudSelectItem>
         <MudSelectItem Value="@CommunityVoteParticipationMethodCodes.ServiceArea">인근 지역 참여</MudSelectItem>
@@ -48,4 +85,25 @@
 
     [Parameter]
     public EventCallback DemandSubmitted { get; set; }
+
+    private IReadOnlyList<string> AllowedTransactionTypeCodes
+    {
+        get
+        {
+            var configured = Campaign.GroupPurchase?.AllowedTransactionTypeCodes ?? [];
+            var normalized = configured
+                .Where(공동구매거래유형코드.지원여부)
+                .Select(공동구매거래유형코드.정규화)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            return normalized.Length == 0
+                ? [공동구매거래유형코드.B2C]
+                : normalized;
+        }
+    }
+
+    private static string TransactionTypeLabel(string transactionTypeCode)
+        => transactionTypeCode == 공동구매거래유형코드.B2B
+            ? "B2B · 사업 목적 구매"
+            : "B2C · 개인 소비 구매";
 }

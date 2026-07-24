@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Customs;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -28,6 +29,11 @@ public partial class CommunityGroupImportHsSelectionWorkspace
     private int marketLookbackMonths = 3;
     private decimal marketFxRateKrwPerUsd = 1350m;
     private string participantDisplayName = "공동수입 참여자";
+    private string participantTransactionTypeCode = 공동구매거래유형코드.B2C;
+    private string participantPriceBasisCode = 공동구매가격표시기준코드.부가세포함;
+    private string participantOrganizationReference = string.Empty;
+    private string participantOrganizationName = string.Empty;
+    private bool participantTaxInvoiceRequired;
     private string statusMessage = string.Empty;
     private string campaignLoadMessage = string.Empty;
     private Severity statusSeverity = Severity.Info;
@@ -35,6 +41,33 @@ public partial class CommunityGroupImportHsSelectionWorkspace
     private bool isCatalogLoading;
     private bool isCampaignLoading;
     private bool isCampaignBusy;
+
+    private string ParticipantTransactionTypeCode
+    {
+        get => participantTransactionTypeCode;
+        set
+        {
+            participantTransactionTypeCode = 공동구매거래유형코드.정규화(value);
+            if (participantTransactionTypeCode == 공동구매거래유형코드.B2B)
+            {
+                participantPriceBasisCode = 공동구매가격표시기준코드.부가세별도;
+                participantTaxInvoiceRequired = true;
+                return;
+            }
+
+            participantPriceBasisCode = 공동구매가격표시기준코드.부가세포함;
+            participantOrganizationReference = string.Empty;
+            participantOrganizationName = string.Empty;
+            participantTaxInvoiceRequired = false;
+        }
+    }
+
+    private bool IsBusinessParticipation
+        => ParticipantTransactionTypeCode == 공동구매거래유형코드.B2B;
+
+    private IReadOnlyList<string> SelectedCampaignAllowedTransactionTypeCodes
+        => NormalizeAllowedTransactionTypeCodes(
+            selectedCampaign?.GroupPurchase?.AllowedTransactionTypeCodes);
 
     private int CatalogPageCount
         => Math.Max(1, (int)Math.Ceiling(catalogResult.TotalCount / (double)Math.Max(1, catalogResult.PageSize)));
@@ -148,6 +181,12 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             return;
         }
 
+        if (!draft.AllowConsumerPurchases && !draft.AllowBusinessPurchases)
+        {
+            ShowStatus(Severity.Warning, "B2C 개인 소비 구매 또는 B2B 사업 목적 구매를 하나 이상 허용해 주세요.");
+            return;
+        }
+
         isCampaignBusy = true;
         try
         {
@@ -185,6 +224,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
                     TemperatureCode = "상온",
                     LogisticsMode = draft.LogisticsMode,
                     QuantityUnit = draft.QuantityUnit.Trim(),
+                    AllowedTransactionTypeCodes = BuildAllowedTransactionTypeCodes(draft),
                     ServiceAreaKey = draft.CommunityScope.Trim(),
                     ServiceAreaLabel = draft.CommunityScope.Trim(),
                     MinimumParticipantCount = Math.Max(1, draft.MinimumParticipantCount),
@@ -200,6 +240,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             importCampaigns.RemoveAll(item => item.Id == campaign.Id);
             importCampaigns.Insert(0, campaign);
             selectedCampaign = campaign;
+            ApplyParticipantTransactionDefaults(campaign);
             selectedOptionIds.Clear();
             selectedCandidates.Clear();
             activeView = GroupImportView.Campaigns;
@@ -286,6 +327,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             }
 
             selectedCampaign = campaign;
+            ApplyParticipantTransactionDefaults(campaign);
             selectedOptionIds.Clear();
             var index = importCampaigns.FindIndex(item => item.Id == campaign.Id);
             if (index >= 0)
@@ -338,6 +380,14 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             return;
         }
 
+        if (IsBusinessParticipation
+            && string.IsNullOrWhiteSpace(participantOrganizationReference)
+            && string.IsNullOrWhiteSpace(participantOrganizationName))
+        {
+            ShowStatus(Severity.Warning, "B2B 구매에는 구매 조직명을 입력해 주세요.");
+            return;
+        }
+
         isCampaignBusy = true;
         try
         {
@@ -348,6 +398,17 @@ public partial class CommunityGroupImportHsSelectionWorkspace
                     VoterDisplayName = participantDisplayName.Trim(),
                     OptionIds = selectedOptionIds.ToArray(),
                     RequestedQuantity = Math.Max(1, requestedQuantity),
+                    TransactionTypeCode = ParticipantTransactionTypeCode,
+                    PriceBasisCode = 공동구매가격표시기준코드.정규화(
+                        participantPriceBasisCode,
+                        ParticipantTransactionTypeCode),
+                    PurchasingOrganizationReference = IsBusinessParticipation
+                        ? participantOrganizationReference.Trim()
+                        : null,
+                    PurchasingOrganizationName = IsBusinessParticipation
+                        ? participantOrganizationName.Trim()
+                        : null,
+                    TaxInvoiceRequired = IsBusinessParticipation && participantTaxInvoiceRequired,
                     ParticipationMethodCode = CommunityVoteParticipationMethodCodes.CommunityMember
                 });
 
@@ -362,9 +423,11 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             }
 
             selectedOptionIds.Clear();
-            ShowStatus(Severity.Success, "공동수입 상품 선택을 반영했습니다.");
+            ShowStatus(
+                Severity.Success,
+                $"{공동구매거래유형코드.표시명(ParticipantTransactionTypeCode)} 수요를 공동수입 상품 선택에 반영했습니다.");
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
             ShowStatus(Severity.Error, "선택을 반영하지 못했습니다. 로그인 상태와 참여 조건을 확인해 주세요.");
         }
@@ -388,6 +451,53 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             .Take(3)
             .ToArray();
         return codes.Length == 0 ? "HS 코드 검토 중" : string.Join(" · ", codes);
+    }
+
+    private void ApplyParticipantTransactionDefaults(CommunityVoteResponse campaign)
+    {
+        var allowed = NormalizeAllowedTransactionTypeCodes(
+            campaign.GroupPurchase?.AllowedTransactionTypeCodes);
+        ParticipantTransactionTypeCode = allowed.Contains(
+            공동구매거래유형코드.B2C,
+            StringComparer.Ordinal)
+                ? 공동구매거래유형코드.B2C
+                : allowed[0];
+        participantOrganizationReference = string.Empty;
+        participantOrganizationName = string.Empty;
+        participantPriceBasisCode = IsBusinessParticipation
+            ? 공동구매가격표시기준코드.부가세별도
+            : 공동구매가격표시기준코드.부가세포함;
+        participantTaxInvoiceRequired = IsBusinessParticipation;
+    }
+
+    private static IReadOnlyList<string> NormalizeAllowedTransactionTypeCodes(
+        IReadOnlyList<string>? transactionTypeCodes)
+    {
+        var normalized = (transactionTypeCodes ?? [])
+            .Where(공동구매거래유형코드.지원여부)
+            .Select(공동구매거래유형코드.정규화)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        return normalized.Length == 0
+            ? [공동구매거래유형코드.B2C]
+            : normalized;
+    }
+
+    private static IReadOnlyList<string> BuildAllowedTransactionTypeCodes(
+        ImportSelectionDraft importDraft)
+    {
+        var result = new List<string>(2);
+        if (importDraft.AllowConsumerPurchases)
+        {
+            result.Add(공동구매거래유형코드.B2C);
+        }
+
+        if (importDraft.AllowBusinessPurchases)
+        {
+            result.Add(공동구매거래유형코드.B2B);
+        }
+
+        return result;
     }
 
     private static string GetCampaignStateLabel(CommunityVoteResponse campaign)
@@ -429,9 +539,13 @@ public partial class CommunityGroupImportHsSelectionWorkspace
 
         public string CommunityScope { get; set; } = "platform";
 
-        public string LogisticsMode { get; set; } = "LCL";
+        public string LogisticsMode { get; set; } = CommunityGroupImportInternationalTransportModeCodes.ReviewRequired;
 
         public string QuantityUnit { get; set; } = "개";
+
+        public bool AllowConsumerPurchases { get; set; } = true;
+
+        public bool AllowBusinessPurchases { get; set; } = true;
 
         public int MinimumParticipantCount { get; set; } = 3;
 

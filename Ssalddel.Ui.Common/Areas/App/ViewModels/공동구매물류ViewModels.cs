@@ -191,10 +191,21 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매물�
         _대상공동구매Id = campaign?.Id;
         var quantity = campaign?.GroupPurchase?.TotalRequestedQuantity ?? 0;
         var unit = campaign?.GroupPurchase?.QuantityUnit ?? string.Empty;
+        var allowedTransactionTypes = campaign?.GroupPurchase?.AllowedTransactionTypeCodes ?? [];
+        var transactionType = allowedTransactionTypes.Contains(
+            공동구매거래유형코드.B2C,
+            StringComparer.OrdinalIgnoreCase)
+            ? 공동구매거래유형코드.B2C
+            : allowedTransactionTypes.FirstOrDefault(공동구매거래유형코드.지원여부)
+              ?? 공동구매거래유형코드.B2C;
         초안 = new DomesticGroupPurchaseFulfillmentPlanRequest
         {
             GroupPurchaseCampaignId = campaign?.Id ?? Guid.Empty,
             CampaignTitle = campaign?.Title ?? string.Empty,
+            TransactionTypeCode = transactionType,
+            PriceBasisCode = transactionType == 공동구매거래유형코드.B2B
+                ? 공동구매가격표시기준코드.부가세별도
+                : 공동구매가격표시기준코드.부가세포함,
             RouteCode = DomesticGroupPurchaseFulfillmentRouteCodes.DirectCollectionPoint,
             ProducerDisplayName = "회원 생산자",
             ProductSummary = campaign is null

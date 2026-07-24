@@ -1,0 +1,292 @@
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject GroupPurchasePracticeViewModel ViewModel
+
+<MudStack Spacing="3" Class="group-purchase-practice">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+        <strong>체험 공동구매 · Simulation</strong><br />
+        실제 사람이 아닌 <strong>가상 이웃</strong>과 연습합니다. 결과는 저장되지 않고 주문·결제·계약으로 이어지지 않습니다.
+    </MudAlert>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h6">1. 같이 연습할 재료 고르기</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    처음에는 샘플 재료로 진행합니다. HS 코드와 단가는 연습용 후보입니다.
+                </MudText>
+            </MudStack>
+
+            @if (ViewModel.Scenarios.Count == 0 && ViewModel.IsBusy)
+            {
+                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            }
+            else
+            {
+                <MudSelect T="string"
+                           Label="연습 시나리오"
+                           Value="@ViewModel.SelectedScenario?.시나리오Id"
+                           ValueChanged="SelectScenario"
+                           Variant="Variant.Outlined">
+                    @foreach (var scenario in ViewModel.Scenarios)
+                    {
+                        <MudSelectItem T="string" Value="@scenario.시나리오Id">@scenario.제목</MudSelectItem>
+                    }
+                </MudSelect>
+            }
+
+            @if (ViewModel.SelectedScenario is { } scenario)
+            {
+                <MudPaper Elevation="0" Class="pa-3 practice-scenario">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle1">@scenario.제목</MudText>
+                        <MudText Typo="Typo.body2">@scenario.소개</MudText>
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@scenario.상품명</MudChip>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">HS 후보 @scenario.HS코드후보</MudChip>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@scenario.온도코드</MudChip>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@scenario.배송권명</MudChip>
+                        </MudStack>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@scenario.샘플안내</MudText>
+                    </MudStack>
+                </MudPaper>
+
+                <MudNumericField T="decimal"
+                                 Label="내가 연습할 희망 수량"
+                                 @bind-Value="ViewModel.DesiredQuantity"
+                                 Min="1"
+                                 Step="1M"
+                                 Adornment="Adornment.End"
+                                 AdornmentText="@scenario.수량단위"
+                                 Variant="Variant.Outlined" />
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">2. 먼저 건넬 한마디 고르기</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                실제 사람에게 점수를 매기지 않고, 서로 필요한 조건을 편하게 말하는 연습만 합니다.
+            </MudText>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudButton Variant="@TopicVariant(공동구매체험대화주제코드.처음참여)"
+                           Color="Color.Primary"
+                           OnClick="@(() => SelectTopic(공동구매체험대화주제코드.처음참여))">
+                    저도 처음이에요
+                </MudButton>
+                <MudButton Variant="@TopicVariant(공동구매체험대화주제코드.요리이야기)"
+                           Color="Color.Primary"
+                           OnClick="@(() => SelectTopic(공동구매체험대화주제코드.요리이야기))">
+                    어떤 요리 해볼까요?
+                </MudButton>
+                <MudButton Variant="@TopicVariant(공동구매체험대화주제코드.보관방법)"
+                           Color="Color.Primary"
+                           OnClick="@(() => SelectTopic(공동구매체험대화주제코드.보관방법))">
+                    보관부터 맞춰봐요
+                </MudButton>
+                <MudButton Variant="@TopicVariant(공동구매체험대화주제코드.수령방법)"
+                           Color="Color.Primary"
+                           OnClick="@(() => SelectTopic(공동구매체험대화주제코드.수령방법))">
+                    수령 시간을 정해요
+                </MudButton>
+            </MudStack>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.SportsEsports"
+                       Disabled="@(ViewModel.SelectedScenario is null || ViewModel.IsBusy)"
+                       OnClick="StartAsync">
+                @(ViewModel.IsBusy ? "연습방 준비 중" : "게임처럼 연습 시작")
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.ErrorMessage</MudAlert>
+    }
+
+    @if (ViewModel.Result is { } result)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 practice-progress">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">3. 가상 이웃과 조건 맞추기</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            연습 라운드 @result.현재라운드 / @result.최대라운드
+                        </MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="@(result.완료여부 ? Color.Success : Color.Info)" Variant="Variant.Filled">
+                        @(result.완료여부 ? "연습 목표 달성" : "함께 모으는 중")
+                    </MudChip>
+                </MudStack>
+
+                <MudProgressLinear Value="@ProgressPercent(result)"
+                                   Color="@(result.완료여부 ? Color.Success : Color.Primary)"
+                                   Rounded="true"
+                                   Size="Size.Large" />
+
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudPaper Elevation="0" Class="pa-3 practice-stat">
+                            <MudText Typo="Typo.caption">참여 연습</MudText>
+                            <MudText Typo="Typo.h6">@result.진행.참여자수 / @result.시나리오.목표참여자수 명</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudPaper Elevation="0" Class="pa-3 practice-stat">
+                            <MudText Typo="Typo.caption">수량 연습</MudText>
+                            <MudText Typo="Typo.h6">@result.진행.총희망수량.ToString("N0") / @result.시나리오.목표수량.ToString("N0") @result.시나리오.수량단위</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudPaper Elevation="0" Class="pa-3 practice-stat">
+                            <MudText Typo="Typo.caption">연습용 예상 단가</MudText>
+                            <MudText Typo="Typo.h6">@result.연습예상단가.ToString("N0") @result.통화코드</MudText>
+                            <MudText Typo="Typo.caption">샘플 절감률 @(result.연습절감률.ToString("P0"))</MudText>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+
+                <MudText Typo="Typo.subtitle1">이번 연습방의 사람들</MudText>
+                <MudGrid>
+                    @foreach (var participant in result.참여자목록)
+                    {
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100 practice-participant">
+                                <MudStack Spacing="1">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudText Typo="Typo.h5">@participant.이모지</MudText>
+                                        <MudText Typo="Typo.subtitle2">@participant.표시명</MudText>
+                                        @if (participant.가상참여자여부)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">가상</MudChip>
+                                        }
+                                        else
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">나</MudChip>
+                                        }
+                                    </MudStack>
+                                    <MudText Typo="Typo.body2">@participant.한줄소개</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        희망 @participant.희망수량.ToString("N0")@participant.수량단위
+                                    </MudText>
+                                </MudStack>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">
+                    <strong>친해지기 질문</strong><br />@result.친해지기질문
+                </MudAlert>
+
+                <MudStack Spacing="1">
+                    @foreach (var message in result.대화목록)
+                    {
+                        <MudPaper Elevation="0" Class="pa-3 practice-message">
+                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.subtitle2">@message.발화자</MudText>
+                                @if (message.가상대화여부)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">가상 대화</MudChip>
+                                }
+                            </MudStack>
+                            <MudText Typo="Typo.body2">@message.본문</MudText>
+                        </MudPaper>
+                    }
+                </MudStack>
+
+                <MudAlert Severity="@(result.완료여부 ? Severity.Success : Severity.Info)" Variant="Variant.Filled">
+                    @result.응원메시지
+                </MudAlert>
+
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    @if (!result.완료여부)
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.GroupAdd"
+                                   Disabled="@(!ViewModel.CanAdvance)"
+                                   OnClick="AdvanceAsync">
+                            @result.다음행동라벨
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Href="@RealDemandHref(result)"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.ArrowForward">
+                            실제 비구속 수요를 새로 확인하기
+                        </MudButton>
+                    }
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               Disabled="@ViewModel.IsBusy"
+                               OnClick="RestartAsync">
+                        처음부터 다시 연습
+                    </MudButton>
+                    <MudButton Href="@BackHref" Variant="Variant.Text" Color="Color.Secondary">
+                        공동구매로 돌아가기
+                    </MudButton>
+                </MudStack>
+
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@result.실제수요전환안내</MudText>
+                @foreach (var notice in result.안전경계안내)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">• @notice</MudText>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public string BackHref { get; set; } = GroupPurchasePageRoutes.Root;
+
+    [Parameter]
+    public bool UseCommunityDemandRoute { get; set; }
+
+    protected override async Task OnInitializedAsync()
+        => await ViewModel.InitializeAsync();
+
+    private Task SelectScenario(string scenarioId)
+    {
+        ViewModel.SelectScenario(scenarioId);
+        return Task.CompletedTask;
+    }
+
+    private void SelectTopic(string topicCode) => ViewModel.SelectTopic(topicCode);
+
+    private Variant TopicVariant(string topicCode)
+        => string.Equals(ViewModel.TopicCode, topicCode, StringComparison.Ordinal)
+            ? Variant.Filled
+            : Variant.Outlined;
+
+    private async Task StartAsync() => await ViewModel.StartAsync();
+
+    private async Task AdvanceAsync() => await ViewModel.AdvanceAsync();
+
+    private async Task RestartAsync() => await ViewModel.RestartAsync();
+
+    private string RealDemandHref(공동구매체험응답 result)
+        => UseCommunityDemandRoute
+            ? $"{CommunityPageRoutes.GroupPurchaseDemand}?ingredientKey={Uri.EscapeDataString(result.실제수요전환상품키)}"
+            : GroupPurchasePageRoutes.DemandCreateFor(result.실제수요전환상품키);
+
+    private static double ProgressPercent(공동구매체험응답 result)
+    {
+        var participantProgress = result.시나리오.목표참여자수 <= 0
+            ? 0
+            : (double)result.진행.참여자수 / result.시나리오.목표참여자수;
+        var quantityProgress = result.시나리오.목표수량 <= 0
+            ? 0
+            : (double)(result.진행.총희망수량 / result.시나리오.목표수량);
+        return Math.Clamp(Math.Min(participantProgress, quantityProgress) * 100, 0, 100);
+    }
+}

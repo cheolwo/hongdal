@@ -12,10 +12,14 @@ public static class OrdererRoutes
     public const string Restaurants = "/food/restaurants";
     public const string Cargo = "/cargo";
     public const string GroupPurchase = GroupPurchasePageRoutes.Root;
+    public const string GroupPurchasePractice = GroupPurchasePageRoutes.Practice;
     public const string GroupPurchaseProducts = GroupPurchasePageRoutes.ProductsRoot;
     public const string GroupPurchaseWishes = GroupPurchasePageRoutes.WishesRoot;
     public const string GroupPurchaseWishCreate = GroupPurchasePageRoutes.WishCreate;
     public const string GroupPurchaseGroups = GroupPurchasePageRoutes.GroupsRoot;
     public const string GroupPurchaseShipments = GroupPurchasePageRoutes.Shipments;
     public const string Orders = "/orders";
+    public const string IndividualImportLedger = "/trade/individual-import";
+    public const string IndividualExportLedger = "/trade/individual-export";
+    public const string GroupExportLedger = "/trade/group-export";
 }

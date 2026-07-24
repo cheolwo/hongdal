@@ -34,6 +34,187 @@ public sealed class OrderLedgerIntegrationUseCaseTests
     }
 
     [Fact]
+    public async Task Individual_import_is_linked_as_an_extension_of_the_individual_order()
+    {
+        var store = new FakeLedgerStore(
+            Ledger("order-1", CommunityLedgerTemplateKeys.Order, revision: 2),
+            Ledger("individual-import-1", CommunityLedgerTemplateKeys.IndividualImport));
+        var useCase = new 주문원장통합UseCase(store);
+
+        var result = await useCase.하위원장연결Async(
+            "order-1",
+            new 주문하위원장연결요청
+            {
+                하위원장Id = "individual-import-1",
+                역할 = 주문원장포함역할.개별수입,
+                필수여부 = true,
+                기대Revision = 2
+            },
+            "user-1");
+
+        Assert.True(result.IsSuccess);
+        var reference = Assert.Single(result.Value.주문원장.포함원장목록);
+        Assert.Equal(CommunityLedgerTemplateKeys.IndividualImport, reference.원장템플릿Key);
+        Assert.Equal(주문원장포함역할.개별수입, reference.역할);
+        Assert.Equal(CommunityLedgerRelationTypes.Contains, reference.관계유형);
+    }
+
+    [Theory]
+    [InlineData(CommunityLedgerTemplateKeys.FoodOrder, CommunityLedgerTemplateKeys.IndividualImport, 주문원장포함역할.개별수입)]
+    [InlineData(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateKeys.IndividualImport, 주문원장포함역할.운송)]
+    [InlineData(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateKeys.CargoTransport, 주문원장포함역할.개별수입)]
+    public void Individual_import_extension_rejects_another_root_template_or_role(
+        string rootTemplateKey,
+        string childTemplateKey,
+        string role)
+    {
+        var request = new 커뮤니티원장저장요청
+        {
+            원장Id = "root-1",
+            원장템플릿Key = rootTemplateKey,
+            제목 = "주문",
+            포함원장목록 =
+            [
+                new()
+                {
+                    원장Id = "child-1",
+                    원장템플릿Key = childTemplateKey,
+                    역할 = role,
+                    관계유형 = CommunityLedgerRelationTypes.Contains
+                }
+            ]
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => 주문원장구성정책.저장요청검증(request));
+
+        Assert.Contains("개별주문 원장(order)의 수입 이행 확장", exception.Message);
+    }
+
+    [Fact]
+    public async Task Individual_export_is_linked_as_an_extension_of_the_individual_order()
+    {
+        var store = new FakeLedgerStore(
+            Ledger("order-1", CommunityLedgerTemplateKeys.Order, revision: 2),
+            Ledger("individual-export-1", CommunityLedgerTemplateKeys.IndividualExport));
+        var useCase = new 주문원장통합UseCase(store);
+
+        var result = await useCase.하위원장연결Async(
+            "order-1",
+            new 주문하위원장연결요청
+            {
+                하위원장Id = "individual-export-1",
+                역할 = 주문원장포함역할.개별수출,
+                필수여부 = true,
+                기대Revision = 2
+            },
+            "user-1");
+
+        Assert.True(result.IsSuccess);
+        var reference = Assert.Single(result.Value.주문원장.포함원장목록);
+        Assert.Equal(CommunityLedgerTemplateKeys.IndividualExport, reference.원장템플릿Key);
+        Assert.Equal(주문원장포함역할.개별수출, reference.역할);
+        Assert.Equal(CommunityLedgerRelationTypes.Contains, reference.관계유형);
+    }
+
+    [Fact]
+    public async Task Group_export_aggregates_individual_exports_without_replacing_their_ledgers()
+    {
+        var store = new FakeLedgerStore(
+            Ledger("group-export-1", CommunityLedgerTemplateKeys.GroupExport),
+            Ledger("individual-export-1", CommunityLedgerTemplateKeys.IndividualExport),
+            Ledger("individual-export-2", CommunityLedgerTemplateKeys.IndividualExport));
+        var useCase = new 주문원장통합UseCase(store);
+
+        var first = await useCase.하위원장연결Async(
+            "group-export-1",
+            new 주문하위원장연결요청
+            {
+                하위원장Id = "individual-export-1",
+                역할 = 주문원장포함역할.개별수출,
+                필수여부 = true
+            },
+            "user-1");
+        var second = await useCase.하위원장연결Async(
+            "group-export-1",
+            new 주문하위원장연결요청
+            {
+                하위원장Id = "individual-export-2",
+                역할 = 주문원장포함역할.개별수출,
+                필수여부 = true
+            },
+            "user-1");
+
+        Assert.True(first.IsSuccess);
+        Assert.True(second.IsSuccess);
+        Assert.Equal(2, second.Value.포함원장목록.Count);
+        Assert.All(second.Value.포함원장목록, item =>
+        {
+            Assert.Equal(CommunityLedgerTemplateKeys.IndividualExport, item.원장템플릿Key);
+            Assert.Equal(주문원장포함역할.개별수출, item.역할);
+            Assert.NotNull(item.원장);
+        });
+    }
+
+    [Theory]
+    [InlineData(CommunityLedgerTemplateKeys.FoodOrder, CommunityLedgerTemplateKeys.IndividualExport, 주문원장포함역할.개별수출)]
+    [InlineData(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateKeys.IndividualExport, 주문원장포함역할.운송)]
+    [InlineData(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateKeys.CargoTransport, 주문원장포함역할.개별수출)]
+    [InlineData(CommunityLedgerTemplateKeys.GroupExport, CommunityLedgerTemplateKeys.Order, 주문원장포함역할.개별수출)]
+    [InlineData(CommunityLedgerTemplateKeys.GroupExport, CommunityLedgerTemplateKeys.IndividualExport, 주문원장포함역할.운송)]
+    public void Individual_export_extension_rejects_another_root_child_or_role(
+        string rootTemplateKey,
+        string childTemplateKey,
+        string role)
+    {
+        var request = new 커뮤니티원장저장요청
+        {
+            원장Id = "root-1",
+            원장템플릿Key = rootTemplateKey,
+            제목 = "수출",
+            포함원장목록 =
+            [
+                new()
+                {
+                    원장Id = "child-1",
+                    원장템플릿Key = childTemplateKey,
+                    역할 = role,
+                    관계유형 = CommunityLedgerRelationTypes.Contains
+                }
+            ]
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => 주문원장구성정책.저장요청검증(request));
+
+        Assert.Contains("개별주문 원장의 수출 이행 확장", exception.Message);
+        Assert.Contains("공동수출 원장", exception.Message);
+    }
+
+    [Fact]
+    public void Group_export_rejects_non_export_child_ledger()
+    {
+        var request = new 커뮤니티원장저장요청
+        {
+            원장Id = "group-export-1",
+            원장템플릿Key = CommunityLedgerTemplateKeys.GroupExport,
+            제목 = "공동수출",
+            포함원장목록 =
+            [
+                new()
+                {
+                    원장Id = "transport-1",
+                    원장템플릿Key = CommunityLedgerTemplateKeys.CargoTransport,
+                    역할 = 주문원장포함역할.운송,
+                    관계유형 = CommunityLedgerRelationTypes.Contains
+                }
+            ]
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => 주문원장구성정책.저장요청검증(request));
+
+        Assert.Contains("개별수출 원장만", exception.Message);
+    }
+
+    [Fact]
     public async Task Integrated_query_reads_current_child_state_instead_of_copied_state()
     {
         var root = Ledger("order-1", CommunityLedgerTemplateKeys.Order);
