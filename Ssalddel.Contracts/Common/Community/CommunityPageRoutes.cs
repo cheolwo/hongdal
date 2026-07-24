@@ -8,6 +8,7 @@ public static class CommunityPageRoutes
     public const string Home = "/community";
     public const string Boards = "/community/boards";
     public const string BoardDirectory = "/community/boards/directory";
+    public const string Regions = "/community/regions";
     public const string BoardManagement = "/community/boards/manage";
     public const string Compose = "/community/write";
     public const string Workspace = "/community/workspace";

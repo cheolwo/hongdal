@@ -1,0 +1,119 @@
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Content
+
+<main class="region-culture">
+    <header class="region-culture__hero">
+        <div>
+            <span>문화교통 0.0 · 지역 발견</span>
+            <h1>지역의 문화를 알고, 특산물을 발견해요</h1>
+            <p>
+                국가 이름만 보지 않고 미국의 주와 중국의 현재 행정구역·역사문화권을 나누어 살펴봅니다.
+                문화 이야기가 구매 압박 없이 관심과 질문으로 이어지는 공개 탐색 페이지입니다.
+            </p>
+        </div>
+        <aside>
+            <strong>먼저 이해하고, 나중에 선택하기</strong>
+            <span>이 페이지를 보는 것만으로 주문·참여·수입이 만들어지지 않습니다.</span>
+        </aside>
+    </header>
+
+    <nav class="region-culture__filters" aria-label="국가별 지역 필터">
+        <button type="button" class="@FilterClass(null)" @onclick="@(() => SelectCountry(null))">전체</button>
+        <button type="button" class="@FilterClass(RegionalCultureSpecialtyCatalog.UnitedStatesCountryCode)"
+                @onclick="@(() => SelectCountry(RegionalCultureSpecialtyCatalog.UnitedStatesCountryCode))">미국의 주</button>
+        <button type="button" class="@FilterClass(RegionalCultureSpecialtyCatalog.ChinaCountryCode)"
+                @onclick="@(() => SelectCountry(RegionalCultureSpecialtyCatalog.ChinaCountryCode))">중국의 지역</button>
+    </nav>
+
+    <section class="region-culture__guide" aria-label="지역 정보 읽는 방법">
+        <strong>지역 이름을 세 가지로 구분합니다</strong>
+        <div>
+            <span><b>현재 주·성</b> 행정구역을 그대로 표시</span>
+            <span><b>역사·지리권</b> 현재 주소를 함께 표시</span>
+            <span><b>넓은 문화권</b> 성·도시로 더 좁혀야 함</span>
+        </div>
+    </section>
+
+    <section class="region-culture__grid" aria-live="polite">
+        @foreach (var region in VisibleRegions)
+        {
+            <article class="region-card" id="@region.Key">
+                <header>
+                    <span>@region.CountryName · @region.RegionType</span>
+                    <h2>@region.RegionName</h2>
+                    <small>@region.Geography</small>
+                </header>
+
+                <p class="region-card__culture">@region.CultureSummary</p>
+
+                <section class="region-card__questions">
+                    <strong>문화를 알아가는 질문</strong>
+                    <ul>
+                        @foreach (var question in region.CultureQuestions)
+                        {
+                            <li>@question</li>
+                        }
+                    </ul>
+                </section>
+
+                <section class="region-card__specialties">
+                    <strong>특산물 탐색</strong>
+                    @foreach (var specialty in region.Specialties)
+                    {
+                        <details>
+                            <summary>
+                                <span>@specialty.Name</span>
+                                <small>@specialty.Category</small>
+                            </summary>
+                            <p>@specialty.DiscoveryNote</p>
+                        </details>
+                    }
+                </section>
+
+                <p class="region-card__boundary">@region.EvidenceBoundary</p>
+
+                <footer>
+                    <a href="@CultureConversationHref(region)">이 지역 이야기 보기</a>
+                    <a class="region-card__secondary" href="@SpecialtyEvidenceHref(region)">특산물 근거 찾기</a>
+                </footer>
+            </article>
+        }
+    </section>
+
+    <aside class="region-culture__next">
+        <div>
+            <span>관심이 생겼다면</span>
+            <strong>지역명보다 상품의 실제 근거를 먼저 확인해요</strong>
+            <p>생산지, 생산자, 제철, 규격, 총비용, 검역·표시 조건을 확인한 뒤에만 비구속 공동구매 수요로 이어갑니다.</p>
+        </div>
+        <a href="/information/food-ingredients">공식 음식·재료 탐색으로 이동</a>
+    </aside>
+</main>
+
+@code {
+    private string? _selectedCountry;
+
+    private IReadOnlyList<RegionalCultureSpecialty> VisibleRegions
+        => RegionalCultureSpecialtyCatalog.ForCountry(_selectedCountry);
+
+    private void SelectCountry(string? countryCode)
+        => _selectedCountry = countryCode;
+
+    private string FilterClass(string? countryCode)
+        => string.Equals(_selectedCountry, countryCode, StringComparison.OrdinalIgnoreCase)
+            ? "is-selected"
+            : string.Empty;
+
+    private static string CultureConversationHref(RegionalCultureSpecialty region)
+        => CommunityPageRoutes.BoardsFor(
+            CommunityBoardCatalog.Food.DisplayName,
+            CommunityBoardCatalog.Food.Key,
+            workflowTag: CultureTransportContentCatalog.FoodCultureWorkflowTag,
+            search: region.RegionName);
+
+    private static string SpecialtyEvidenceHref(RegionalCultureSpecialty region)
+        => CommunityPageRoutes.BoardsFor(
+            CommunityBoardCatalog.InformationPrices.DisplayName,
+            CommunityBoardCatalog.InformationPrices.Key,
+            search: region.Specialties[0].Name);
+}

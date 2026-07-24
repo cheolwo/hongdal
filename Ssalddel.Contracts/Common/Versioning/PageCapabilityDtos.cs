@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Mart;
 using Ssalddel.Contracts.Common.Orderer;
@@ -283,6 +284,8 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.ReadOnly, false, "0.0", "공개 가격 자료의 출처·단위·기준 시각을 비교합니다."),
         Exact("official-food-ingredients", SsalddelPageAppCodes.IntegratedWeb, "/information/food-ingredients", PageCapabilityStage.Live,
             PageInteractionBoundary.ReadOnly, false, "0.0", "공식 레시피의 표준 재료, 출처가 확인된 공공가격과 실제 관련 레시피를 조회합니다."),
+        Exact("regional-culture-specialties", SsalddelPageAppCodes.IntegratedWeb, RegionalCultureSpecialtyRoutes.Browse, PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.FoundationVersion, "미국의 주와 중국의 현재 행정구역·역사문화권을 구분해 문화와 대표 특산물을 탐색합니다."),
         Exact("us-korean-food-group-buy", SsalddelPageAppCodes.IntegratedWeb, "/us/korean-food-group-buy", PageCapabilityStage.Beta,
             PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion, "한국 음식과 식재료를 공개 탐색하고 로그인 사용자의 비구속 수요만 미국 ZIP 단위 자동집단에 기록합니다. 결제·주문·통관 신고는 실행하지 않습니다.", false,
             [GroupPurchase], ["GroupPurchaseDemand"]),

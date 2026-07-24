@@ -3,6 +3,7 @@ using Ssalddel.Contracts.Common.Inventory;
 using Ssalddel.Contracts.Common.Mart;
 using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.Sales;
+using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Versioning;
 using Ssalddel.Contracts.Common.Warehouse;
 
@@ -40,6 +41,7 @@ internal static class CommunityWorkBoardCatalog
             ],
             [
                 WebPage("커뮤니티 게시판", CommunityPageRoutes.Boards, "공개 글 목록과 게시판 문맥 조회"),
+                WebPage("지역 문화·특산물", RegionalCultureSpecialtyRoutes.Browse, "미국 주와 중국 지역의 문화·특산물 탐색"),
                 WebPage("공공데이터", "/information/public-data", "농수축산 가격과 공공 근거 조회"),
                 WebPage("공식 음식 재료", "/information/food-ingredients", "공식 레시피·재료·가격 근거 조회")
             ]),

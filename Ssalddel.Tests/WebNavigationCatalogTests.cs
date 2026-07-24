@@ -115,6 +115,7 @@ public sealed class WebNavigationCatalogTests
         Assert.Equal(
         [
             ("공개 커뮤니티", "/community"),
+            ("지역 문화·특산물", "/community/regions"),
             ("내 정보", "/community/me"),
             ("내 글", "/community/me/posts")
         ],

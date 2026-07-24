@@ -11,6 +11,9 @@ public static class WebNavigationCatalog
     private static readonly WebNavigationItem Community =
         new("공개 커뮤니티", "/community", Icons.Material.Filled.Forum, true);
 
+    private static readonly WebNavigationItem RegionalCulture =
+        new("지역 문화·특산물", CommunityPageRoutes.Regions, Icons.Material.Filled.TravelExplore, true);
+
     private static readonly WebNavigationItem UnitedStatesFoodGroupBuy =
         new("U.S. Korean food group buy", "/us/korean-food-group-buy", Icons.Material.Filled.ShoppingBasket, true);
 
@@ -107,6 +110,7 @@ public static class WebNavigationCatalog
     public static IReadOnlyList<WebNavigationItem> VisibleCommunityNavigationItems { get; } =
     [
         Community,
+        RegionalCulture,
         CommunityItems[0],
         CommunityItems[1]
     ];

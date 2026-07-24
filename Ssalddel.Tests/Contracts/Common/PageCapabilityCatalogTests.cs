@@ -113,6 +113,23 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
+    public void 지역문화특산물페이지는_0점0커뮤니티의_공개읽기전용으로분류한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            "/community/regions",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("regional-culture-specialties", capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Live, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.Equal(SsalddelProductRoadmapCatalog.FoundationVersion, capability.IntroducedVersion);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+    }
+
+    [Fact]
     public void 창고입고예정페이지는_인증된서버조회Beta로분류한다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
