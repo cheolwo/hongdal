@@ -1,142 +1,28 @@
 @page "/shipper/warehouse/inventory"
 @inject NavigationManager Navigation
-@inject WebShipperSalesWorkspaceService SalesService
 
-<MudStack Spacing="3">
-    <SsalddelWarehouseInventoryHub
-        @ref="InventoryHub"
-        Title="재고 목록"
-        Description="입고상품의 수량, 위치, 상태를 확인하고 판매 등록 또는 재위탁 운송으로 연결합니다."
-        AuxiliaryMetricLabel="연결 채널 계정"
-        AuxiliaryMetricValue="@Accounts.Count.ToString()"
-        IsBusy="@IsBusy"
-        OnReconsignmentRequested="SelectForReconsignment"
-        OnSaleRequested="SelectForSale" />
+<PageTitle>화주 재고 원장</PageTitle>
 
-    @if (SelectedInventory is not null)
-    {
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudStack Spacing="3">
-                <MudStack Spacing="0">
-                    <MudText Typo="Typo.h6">판매 등록 - @SelectedInventory.상품명</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">입고된 재고를 판매상품으로 등록하고 채널출품까지 연결합니다.</MudText>
-                </MudStack>
-
-                @if (!string.IsNullOrWhiteSpace(Message))
-                {
-                    <MudAlert Severity="@MessageSeverity">@Message</MudAlert>
-                }
-
-                <MudGrid>
-                    <MudItem xs="12" md="4"><MudTextField Label="대표상품명" @bind-Value="SaleProductName" Variant="Variant.Outlined" /></MudItem>
-                    <MudItem xs="12" md="4"><MudTextField Label="판매 SKU" @bind-Value="SaleSku" Variant="Variant.Outlined" /></MudItem>
-                    <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="판매가" @bind-Value="SalePrice" Variant="Variant.Outlined" Min="0" /></MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudSelect T="long?" Label="즉시 출품 채널" @bind-Value="SelectedAccountId" Variant="Variant.Outlined">
-                            <MudSelectItem T="long?" Value="@((long?)null)">출품 없이 판매상품만 생성</MudSelectItem>
-                            @foreach (var account in Accounts)
-                            {
-                                <MudSelectItem T="long?" Value="@account.Id">@account.채널종류 - @account.상점명</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                </MudGrid>
-
-                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="IsBusy" OnClick="CreateSaleAsync">판매 등록</MudButton>
-                    <MudButton Variant="Variant.Outlined" OnClick="ClearSelection">취소</MudButton>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@ShipperRoutes.SalesChannels">채널 연결 화면</MudButton>
-                </MudStack>
-            </MudStack>
-        </MudPaper>
-    }
-</MudStack>
+<SsalddelWarehouseInventoryHub
+    Title="화주 재고 원장"
+    Description="서버의 사용자 소유 재고를 조회하고, 선택한 재고의 다음 업무는 독립 화면에서 진행합니다."
+    AuxiliaryMetricLabel="실행 경계"
+    AuxiliaryMetricValue="조회 전용"
+    OnReconsignmentRequested="OpenReconsignment"
+    OnSaleRequested="OpenProductCreate" />
 
 @code {
-    private readonly List<판매채널계정항목응답> Accounts = [];
-    private SsalddelWarehouseInventoryHub? InventoryHub;
-    private 재고항목응답? SelectedInventory;
-    private bool IsBusy;
-    private string? Message;
-    private Severity MessageSeverity = Severity.Info;
-    private string SaleProductName = string.Empty;
-    private string SaleSku = string.Empty;
-    private decimal SalePrice = 39000m;
-    private long? SelectedAccountId;
-
-    protected override async Task OnInitializedAsync()
+    private Task OpenReconsignment(재고항목응답 item)
     {
-        var accounts = await SalesService.GetAccountsAsync();
-        Accounts.Clear();
-        Accounts.AddRange(accounts.Items);
-        SelectedAccountId = Accounts.FirstOrDefault()?.Id;
-    }
-
-    private Task SelectForReconsignment(재고항목응답 item)
-    {
-        Navigation.NavigateTo(ShipperRoutes.ReconsignmentOrdersForInventory(item.입고상품Id));
+        Navigation.NavigateTo(
+            ShipperRoutes.ReconsignmentOrdersForInventory(item.입고상품Id));
         return Task.CompletedTask;
     }
 
-    private Task SelectForSale(재고항목응답 item)
+    private Task OpenProductCreate(재고항목응답 item)
     {
-        SelectedInventory = item;
-        SaleProductName = item.상품명;
-        SaleSku = string.IsNullOrWhiteSpace(item.SKU) ? $"SALE-{item.입고상품Id}" : item.SKU;
-        SalePrice = item.상품명.Contains("테이블", StringComparison.OrdinalIgnoreCase) ? 59000m : 32900m;
-        SelectedAccountId = Accounts.FirstOrDefault()?.Id;
+        Navigation.NavigateTo(
+            ShipperRoutes.SalesProductCreateForInventory(item.입고상품Id));
         return Task.CompletedTask;
-    }
-
-    private void ClearSelection()
-    {
-        SelectedInventory = null;
-        Message = null;
-    }
-
-    private async Task CreateSaleAsync()
-    {
-        if (SelectedInventory is null || IsBusy)
-        {
-            return;
-        }
-
-        IsBusy = true;
-        try
-        {
-            var product = await SalesService.CreateProductAsync(new 판매상품저장요청
-            {
-                입고상품Id = SelectedInventory.입고상품Id,
-                대표상품명 = SaleProductName,
-                판매SKU = SaleSku,
-                판매가 = SalePrice,
-                샘플데이터여부 = true,
-                샘플데이터코드 = "web-inventory-sale"
-            });
-
-            if (SelectedAccountId.HasValue)
-            {
-                await SalesService.CreateListingAsync(new 채널출품저장요청
-                {
-                    판매상품Id = product.Id,
-                    판매채널계정Id = SelectedAccountId.Value
-                });
-            }
-
-            MessageSeverity = Severity.Success;
-            Message = $"판매상품 {product.대표상품명} 등록을 완료했습니다.";
-            ClearSelection();
-            await InventoryHub!.ReloadAsync();
-            Navigation.NavigateTo(ShipperRoutes.ProductListings);
-        }
-        catch (Exception ex)
-        {
-            MessageSeverity = Severity.Error;
-            Message = ex.Message;
-        }
-        finally
-        {
-            IsBusy = false;
-        }
     }
 }

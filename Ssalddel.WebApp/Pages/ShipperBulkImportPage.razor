@@ -1,9 +1,13 @@
 @page "/shipper/request/bulk"
 
 <WebPageHeader Eyebrow="Shipper Web"
-               Title="CSV 일괄등록"
-               Description="살뜰 앱의 일괄 운송 의뢰 등록 흐름을 웹에서 표 입력으로 먼저 확인합니다."
-               Badge="@($"{PreviewRows.Count}건")" />
+               Title="CSV 일괄등록 미리보기"
+               Description="CSV 행 형식만 브라우저에서 검토하며 운송 의뢰 원장에는 저장하지 않습니다."
+               Badge="2.0 · Simulation" />
+
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-3">
+    이 화면에는 등록 Command가 없습니다. 미리보기 결과는 서버나 운송 의뢰 원장에 저장되지 않습니다.
+</MudAlert>
 
 <MudGrid>
     <MudItem xs="12" lg="5">
@@ -52,12 +56,6 @@
     private readonly List<BulkPreviewRow> PreviewRows = [];
     private string CsvText = string.Empty;
 
-    protected override void OnInitialized()
-    {
-        LoadSample();
-        BuildPreview();
-    }
-
     private void LoadSample()
     {
         CsvText = """
@@ -79,7 +77,7 @@
                 continue;
             }
 
-            PreviewRows.Add(new(parts[0], parts[1], parts[2], parts[3], amount, "등록가능", Color.Success));
+            PreviewRows.Add(new(parts[0], parts[1], parts[2], parts[3], amount, "형식 통과", Color.Success));
         }
     }
 

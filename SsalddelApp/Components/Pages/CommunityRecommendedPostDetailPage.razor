@@ -1,12 +1,13 @@
 @page "/community/posts/recommended/detail"
+@layout CommunityMobileLayout
 
 <PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
 
 <CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
                          BackLabel="@RouteContext.BackLabel"
-                         Eyebrow="@RouteContext.WorkspaceEyebrow"
-                         Heading="@RouteContext.WorkspaceHeading"
-                         Description="@RouteContext.WorkspaceDescription"
+                         Eyebrow="공개 커뮤니티 · 추천 글"
+                         Heading="추천 글 상세"
+                         Description="추천된 글의 근거와 원문을 확인하고 참여 여부는 직접 결정합니다."
                          ShowComposeAction="true"
                          ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, RouteContext.BackHref)">
     <CommunityRecommendedPostDetailScreen AppName="살뜰"

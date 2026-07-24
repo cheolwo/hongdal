@@ -190,7 +190,7 @@ public sealed class OrdererIngredientCardAutoGroupingViewModel(
             product.상품카드Id,
             scope.ScopeKey,
             product.온도코드,
-            product.예상물류방식);
+            공동구매자동수요물류방식코드.후속검토);
 
         return new 공동구매자동수요등록Command
         {
@@ -200,7 +200,7 @@ public sealed class OrdererIngredientCardAutoGroupingViewModel(
             상품명 = product.상품명,
             HS코드 = product.HS코드,
             온도코드 = product.온도코드,
-            물류방식 = product.예상물류방식,
+            물류방식 = 공동구매자동수요물류방식코드.후속검토,
             주문자키 = user.UserId!,
             주문자표시명 = user.UserName ?? "공동구매 참여자",
             배송권키 = scope.ScopeKey,

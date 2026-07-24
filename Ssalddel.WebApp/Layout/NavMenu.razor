@@ -157,10 +157,12 @@
         => WebNavigationCatalog.IsCommunityRoute(Navigation.ToBaseRelativePath(Navigation.Uri));
 
     private IReadOnlyList<WebNavigationItem> CurrentItems
-        => WebNavigationCatalog.IntegratedItems
-            .Concat(ContextualItems)
-            .DistinctBy(item => item.Href, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+        => IsCommunityMode
+            ? WebNavigationCatalog.VisibleCommunityNavigationItems
+            : WebNavigationCatalog.IntegratedItems
+                .Concat(ContextualItems)
+                .DistinctBy(item => item.Href, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
 
     private IReadOnlyList<WebNavigationItem> ContextualItems
         => IsCommunityMode

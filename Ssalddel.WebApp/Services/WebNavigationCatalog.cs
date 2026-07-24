@@ -25,11 +25,11 @@ public static class WebNavigationCatalog
 
     private static readonly IReadOnlyList<WebNavigationItem> DriverItems =
     [
-        new("기사 홈", "/driver/home", Icons.Material.Filled.Route),
-        new("운행 시작", "/driver/work/start", Icons.Material.Filled.PlayArrow),
-        new("추천 배차", "/driver/recommendations", Icons.Material.Filled.TaskAlt),
-        new("진행 중 운송", "/driver/transports/current", Icons.Material.Filled.LocalShipping),
-        new("기사 알림함", "/driver/notifications", Icons.Material.Filled.Notifications)
+        new("기사 홈", DriverRoutes.Home, Icons.Material.Filled.Route),
+        new("운행 시작", DriverRoutes.WorkStart, Icons.Material.Filled.PlayArrow),
+        new("추천 목록", DriverRoutes.Recommendations, Icons.Material.Filled.TaskAlt),
+        new("진행 중 운송", DriverRoutes.CurrentTransport, Icons.Material.Filled.LocalShipping),
+        new("기사 알림함", DriverRoutes.Notifications, Icons.Material.Filled.Notifications)
     ];
 
     private static readonly IReadOnlyList<WebNavigationItem> ShipperItems =
@@ -59,6 +59,11 @@ public static class WebNavigationCatalog
     private static readonly IReadOnlyList<WebNavigationItem> OrdererItems =
     [
         new("주문자·공동주문 홈", WebOrdererRoutes.Home, Icons.Material.Filled.Groups),
+        new("공동구매 둘러보기", WebOrdererRoutes.GroupPurchase, Icons.Material.Filled.GroupWork),
+        new("공동구매 수요 등록", WebOrdererRoutes.GroupPurchaseDemand, Icons.Material.Filled.PlaylistAdd),
+        new("개별수입 원장", WebOrdererRoutes.IndividualImportLedger, Icons.Material.Filled.MoveToInbox),
+        new("개별수출 원장", WebOrdererRoutes.IndividualExportLedger, Icons.Material.Filled.Outbox),
+        new("공동수출 원장", WebOrdererRoutes.GroupExportLedger, Icons.Material.Filled.Inventory),
         new("마트 공개 상품", WebOrdererRoutes.Mart, Icons.Material.Filled.Storefront),
         new("예정 품목 문서", "/tools/expected-item-documents", Icons.Material.Filled.Print),
         new("번호 QR·바코드", "/tools/identifier-codes", Icons.Material.Filled.QrCodeScanner)
@@ -76,7 +81,7 @@ public static class WebNavigationCatalog
     [
         new("글로벌 상품 탐색", GlobalTradeRoutes.Home, Icons.Material.Filled.Language),
         new("화주·판매자", ShipperRoutes.Home, Icons.Material.Filled.LocalShipping),
-        new("기사", "/driver/home", Icons.Material.Filled.Route),
+        new("기사", DriverRoutes.Home, Icons.Material.Filled.Route),
         new("창고·현장", WarehouseManagerRoutes.Home, Icons.Material.Filled.Warehouse),
         new("주문자·공동주문", WebOrdererRoutes.Home, Icons.Material.Filled.Groups)
     ];
@@ -97,6 +102,13 @@ public static class WebNavigationCatalog
         new("알림", "/community/me/notifications", Icons.Material.Filled.Notifications),
         new("꾸미기", "/community/decorations", Icons.Material.Filled.Palette),
         new("사용 설정", "/community/me/settings", Icons.Material.Filled.Settings)
+    ];
+
+    public static IReadOnlyList<WebNavigationItem> VisibleCommunityNavigationItems { get; } =
+    [
+        Community,
+        CommunityItems[0],
+        CommunityItems[1]
     ];
 
     public static IReadOnlyList<WebNavigationItem> GetBusinessItems(string? themeCode)
@@ -120,7 +132,7 @@ public static class WebNavigationCatalog
     public static string GetBusinessHome(string? themeCode)
         => themeCode?.Trim().ToLowerInvariant() switch
         {
-            "driver" => "/driver/home",
+            "driver" => DriverRoutes.Home,
             "shipper" => ShipperRoutes.Home,
             "warehouse" => WarehouseManagerRoutes.Home,
             "orderer" => WebOrdererRoutes.Home,

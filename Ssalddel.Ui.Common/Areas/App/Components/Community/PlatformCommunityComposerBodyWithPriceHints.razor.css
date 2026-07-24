@@ -1,0 +1,12 @@
+.platform-community-compose-editor-grid {
+    align-items: start;
+    display: grid;
+    gap: 0.9rem;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.38fr);
+}
+
+@media (max-width: 640px) {
+    .platform-community-compose-editor-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

@@ -48,6 +48,15 @@ public sealed class CommunityDiagramRouteCompositionTests
         Assert.Contains("DiagramReturnHref", source);
         Assert.Contains("DiagramSelectedNodeChanged", source);
         Assert.Contains("CommunityPageRoutes.DiagramFor", source);
+        Assert.Contains("CommunityLedgerTemplateKeys.IndividualImport", source);
+        Assert.Contains("개별주문 → 개별수입 확장", source);
+        Assert.Contains("CommunityLedgerTemplateKeys.IndividualExport", source);
+        Assert.Contains("개별주문 → 개별수출 확장", source);
+        Assert.Contains("CommunityLedgerTemplateKeys.GroupExport", source);
+        Assert.Contains("개별수출 집계 → 공동 선적", source);
+        Assert.Contains("수출 교류장 → 개별주문 → 개별수출 → 환류", source);
+        Assert.Contains("비식별 경험·편익 환류", source);
+        Assert.Contains("별도 거래 동의", source);
     }
 
     [Fact]

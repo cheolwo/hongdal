@@ -76,7 +76,7 @@ public sealed class CommunityWorkspacePageCompositionTests
     }
 
     [Theory]
-    [InlineData("CommunityHomePage.razor", "/community", "<PlatformCommunityHome")]
+    [InlineData("CommunityHomePage.razor", "/community", "<CommunityMobileBoardDirectoryScreen")]
     [InlineData("CommunityBoardPage.razor", "/community/boards", "<CommunityBoardListScreen")]
     [InlineData("CommunityWorkspacePage.razor", "/community/workspace", "<CommunityWorkspaceScreen")]
     [InlineData("CommunityBoardManagementPage.razor", "/community/boards/manage", "<CommunityBoardManagementScreen")]
@@ -134,6 +134,9 @@ public sealed class CommunityWorkspacePageCompositionTests
         Assert.Contains("CommunityPageRoutes.PostDetailFor", commonScreen);
         Assert.Contains("CurrentBoardPath", commonScreen);
         Assert.Contains("scrollToFocusTarget", commonScreen);
+        Assert.Contains("ShowsImportedFoodCountryFilters", commonScreen);
+        Assert.Contains("CommunityImportedFoodCountryFilterCatalog.All", commonScreen);
+        Assert.Contains("data-country-code=\"@country.CountryCode\"", commonScreen);
         Assert.DoesNotContain("Ssalddel.WebApp", commonScreen);
         Assert.DoesNotContain("SsalddelApp", commonScreen);
     }

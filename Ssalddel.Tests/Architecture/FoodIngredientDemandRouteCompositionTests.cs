@@ -14,6 +14,8 @@ public sealed class FoodIngredientDemandRouteCompositionTests
         Assert.Contains("@page \"/community/group-purchase/demand\"", source);
         Assert.Contains("<OfficialFoodIngredientDemandScreen", source);
         Assert.Contains("CommunityGroupPurchaseIngredientSeed.Create", source);
+        Assert.Contains("DecodeMaterialBundle", source);
+        Assert.Contains("IngredientSeeds", source);
         Assert.DoesNotContain("I비구속공동구매수요Service", source);
         Assert.DoesNotContain("비구속수요저장Async", source);
         Assert.DoesNotContain("수요배치미리보기Async", source);
@@ -45,8 +47,9 @@ public sealed class FoodIngredientDemandRouteCompositionTests
             "Community",
             "CommunityPageRoutes.cs"));
 
-        Assert.Contains("Navigation.NavigateTo(seed.ToDemandNavigationUri())", journey);
+        Assert.Contains("ToDemandNavigationUri(_selectedPurchaseSeeds)", journey);
         Assert.Contains("ToDemandNavigationUri", seed);
+        Assert.Contains("MaterialBundleQueryName", seed);
         Assert.Contains("CommunityPageRoutes.GroupPurchaseDemand", seed);
         Assert.Contains("GroupPurchaseDemand = \"/community/group-purchase/demand\"", routes);
     }
@@ -66,6 +69,7 @@ public sealed class FoodIngredientDemandRouteCompositionTests
         Assert.Contains("집단화 미리보기", source);
         Assert.Contains("비구속 수요 저장", source);
         Assert.Contains("내 수요 철회", source);
+        Assert.Contains("IngredientLines", source);
         Assert.Contains("결제·계약·수입 신고·공급자 선정·운송 의뢰·창고 입고", source);
         Assert.Contains("상세 주소는 받지 않습니다", source);
     }

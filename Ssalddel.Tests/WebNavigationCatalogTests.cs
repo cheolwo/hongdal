@@ -39,9 +39,49 @@ public sealed class WebNavigationCatalogTests
     {
         var items = WebNavigationCatalog.GetBusinessItems("guest");
 
-        Assert.Equal(3, items.Count);
+        Assert.Equal(2, items.Count);
         Assert.Contains(items, item => item.Href == "/login");
         Assert.DoesNotContain(items, item => item.Href == WebNavigationCatalog.DiagramRoute);
+    }
+
+    [Fact]
+    public void GetBusinessItems_ForOrderer_ExposesV15TradeLedgerChecks()
+    {
+        var routes = WebNavigationCatalog.GetBusinessItems("orderer")
+            .Select(item => item.Href)
+            .ToArray();
+
+        Assert.Contains(WebOrdererRoutes.GroupPurchase, routes);
+        Assert.Contains(WebOrdererRoutes.GroupPurchaseDemand, routes);
+        Assert.Contains(WebOrdererRoutes.IndividualImportLedger, routes);
+        Assert.Contains(WebOrdererRoutes.IndividualExportLedger, routes);
+        Assert.Contains(WebOrdererRoutes.GroupExportLedger, routes);
+    }
+
+    [Fact]
+    public void GetBusinessItems_ForDriver_UsesV20ResponsibilityRoutes()
+    {
+        var routes = WebNavigationCatalog.GetBusinessItems("driver")
+            .Select(item => item.Href)
+            .ToArray();
+
+        Assert.Contains(DriverRoutes.WorkStart, routes);
+        Assert.Contains(DriverRoutes.Recommendations, routes);
+        Assert.Contains(DriverRoutes.CurrentTransport, routes);
+        Assert.DoesNotContain(DriverRoutes.DispatchDecisions, routes);
+    }
+
+    [Fact]
+    public void NavigationItems_DoNotExposeIntegratedHomeMenu()
+    {
+        var themeCodes = new[] { "guest", "driver", "shipper", "warehouse", "orderer", "customs", "member" };
+        var items = themeCodes
+            .SelectMany(WebNavigationCatalog.GetBusinessItems)
+            .Concat(WebNavigationCatalog.IntegratedItems);
+
+        Assert.DoesNotContain(items, item =>
+            item.Href == "/"
+            || item.Title == "통합 홈");
     }
 
     [Fact]
@@ -65,6 +105,27 @@ public sealed class WebNavigationCatalogTests
             or "/community/actions"
             or "/community/group-purchase"
             or "/community/group-import");
+    }
+
+    [Fact]
+    public void VisibleCommunityNavigationItems_ExposeOnlyPublicCommunityAndBasicPersonalViews()
+    {
+        var items = WebNavigationCatalog.VisibleCommunityNavigationItems;
+
+        Assert.Equal(
+        [
+            ("공개 커뮤니티", "/community"),
+            ("내 정보", "/community/me"),
+            ("내 글", "/community/me/posts")
+        ],
+            items.Select(item => (item.Title, item.Href)));
+
+        Assert.Contains(
+            WebNavigationCatalog.CommunityItems,
+            item => item.Href == "/community/me/settings");
+        Assert.DoesNotContain(
+            items,
+            item => item.Href == "/community/me/settings");
     }
 
     [Theory]

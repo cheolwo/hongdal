@@ -13,7 +13,7 @@ public sealed class UnitedStatesKoreanFoodGroupBuyStorefrontViewModel(
     ISsalddel현재사용자Context currentUserContext) : PageViewModelBase
 {
     private const string KoreaCountryCode = "KR";
-    private const string LogisticsMode = "LCL";
+    private const string LogisticsMode = 공동구매자동수요물류방식코드.후속검토;
     private const int TargetParticipantCount = 5;
     private const decimal TargetQuantity = 30m;
     private string _dishSearchText = string.Empty;

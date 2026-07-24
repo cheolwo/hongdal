@@ -264,7 +264,10 @@ public sealed class PlatformCommunityDiagramWorkspaceViewModel : 조립ViewModel
 
         if (template.Key is CommunityLedgerTemplateKeys.LocalSale
             or CommunityLedgerTemplateKeys.GroupPurchase
+            or CommunityLedgerTemplateKeys.IndividualImport
+            or CommunityLedgerTemplateKeys.IndividualExport
             or CommunityLedgerTemplateKeys.GroupImport
+            or CommunityLedgerTemplateKeys.GroupExport
             or CommunityLedgerTemplateKeys.FoodOrder
             or CommunityLedgerTemplateKeys.Errand)
         {

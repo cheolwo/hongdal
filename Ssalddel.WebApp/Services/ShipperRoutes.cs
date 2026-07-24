@@ -31,7 +31,10 @@ public static class ShipperRoutes
     public const string ReconsignmentOrders = "/shipper/reconsignment/orders";
     public const string SalesChannels = "/shipper/sales/channels";
     public const string SalesPageComposer = "/shipper/sales/pages/new";
+    public const string SalesProducts = "/shipper/sales/products";
+    public const string SalesProductCreate = "/shipper/sales/products/new";
     public const string ProductListings = "/shipper/sales/listings";
+    public const string SalesListingCreate = "/shipper/sales/listings/new";
     public const string SalesOrders = SalesOrderPageRoutes.Root;
     public const string CustomsHsReviews = "/shipper/customs/hs-reviews";
     public const string FclLclPlanner = "/shipper/international/fcl-lcl";
@@ -64,6 +67,19 @@ public static class ShipperRoutes
     public static string ReconsignmentOrdersForInventory(long inventoryItemId)
         => $"{ReconsignmentOrders}?inventoryItemId={inventoryItemId}";
 
+    public static string SalesProductCreateForInventory(long inventoryItemId)
+        => $"{SalesProductCreate}?inventoryItemId={RequirePositiveId(inventoryItemId, nameof(inventoryItemId))}";
+
+    public static string SalesListingCreateForProduct(long productId)
+        => $"{SalesListingCreate}?productId={RequirePositiveId(productId, nameof(productId))}";
+
     public static string SalesOrderDetailFor(long orderId)
         => SalesOrderPageRoutes.DetailFor(orderId);
+
+    private static long RequirePositiveId(long value, string parameterName)
+        => value > 0
+            ? value
+            : throw new ArgumentOutOfRangeException(
+                parameterName,
+                "원장 ID는 1 이상이어야 합니다.");
 }

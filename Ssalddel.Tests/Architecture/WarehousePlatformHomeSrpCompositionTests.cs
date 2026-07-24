@@ -102,7 +102,7 @@ public sealed class WarehousePlatformHomeSrpCompositionTests
             "Community",
             "PlatformCommunityHomeHero.razor"));
 
-        Assert.Contains("Href=\"@CommunityPageRoutes.Boards\"", hero);
+        Assert.Contains("Href=\"@CommunityPageRoutes.BoardDirectory\"", hero);
         Assert.DoesNotContain("/community/categories", hero);
     }
 

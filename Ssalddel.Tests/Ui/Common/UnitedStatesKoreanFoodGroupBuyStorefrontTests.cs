@@ -62,7 +62,7 @@ public sealed class UnitedStatesKoreanFoodGroupBuyStorefrontTests
         Assert.Equal("0703.10.2000", request.HS코드);
         Assert.Equal("us-zcta:10001", request.배송권키);
         Assert.Equal("냉장", request.온도코드);
-        Assert.Equal("LCL", request.물류방식);
+        Assert.Equal(공동구매자동수요물류방식코드.후속검토, request.물류방식);
         Assert.Equal(4.5m, request.희망수량);
         Assert.Equal("kg", request.수량단위);
         Assert.Equal(공동구매자동수요유형코드.관심표시, request.수요유형);

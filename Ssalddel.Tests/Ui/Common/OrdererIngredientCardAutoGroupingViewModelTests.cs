@@ -23,6 +23,7 @@ public sealed class OrdererIngredientCardAutoGroupingViewModelTests
         Assert.Equal("scope:seoul-gangnam", saved.배송권키);
         Assert.Equal("서울 강남 생활권", saved.배송권명);
         Assert.Equal(20m, saved.희망수량);
+        Assert.Equal(공동구매자동수요물류방식코드.후속검토, saved.물류방식);
         Assert.Equal(공동구매자동수요유형코드.관심표시, saved.수요유형);
         Assert.Equal(공동구매자동결제상태코드.미결제, saved.결제상태);
         Assert.Null(saved.예약결제금액);

@@ -1,0 +1,18 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject CommunityPostIngredientPriceHintsViewModel IngredientPriceHints
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<div class="platform-community-compose-editor-grid">
+    <PlatformCommunityComposerBodyFields Model="@Model"
+                                         DraftBlurred="@DraftBlurred" />
+    <CommunityPostIngredientPriceHintPanel ViewModel="@IngredientPriceHints"
+                                           Body="@Model.Draft.Body" />
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<FocusEventArgs> DraftBlurred { get; set; }
+}
