@@ -179,6 +179,13 @@
     align-self: start;
 }
 
+.region-card__specialty-summary {
+    margin: 7px 0 0;
+    color: var(--ink);
+    font-size: .78rem;
+    line-height: 1.5;
+}
+
 .region-card__specialties details {
     margin-top: 7px;
     border: 1px solid #e0e5e1;
@@ -325,4 +332,177 @@
     .region-culture__next > a {
         width: 100%;
     }
+}
+
+.region-culture--community-mobile {
+    --ink: var(--community-mobile-text, #1f2937);
+    --muted: var(--community-mobile-muted, #667085);
+    --leaf: var(--region-culture-leaf, #176b4d);
+    --paper: var(--community-mobile-surface, #fff);
+    gap: 12px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 16px 15px 104px;
+    background: var(--community-mobile-background, #f6f7fb);
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+.region-culture--community-mobile .region-culture__hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    box-shadow: none;
+}
+
+.region-culture--community-mobile .region-culture__hero > div > span {
+    color: var(--community-mobile-accent, #4656c5);
+    font-size: 11px;
+    letter-spacing: 0;
+}
+
+.region-culture--community-mobile .region-culture__hero h1 {
+    margin: 2px 0 4px;
+    font-size: 26px;
+    line-height: 34px;
+    letter-spacing: -.5px;
+}
+
+.region-culture--community-mobile .region-culture__hero p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.region-culture--community-mobile .region-culture__hero aside {
+    gap: 4px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 5px;
+    background: var(--paper);
+    backdrop-filter: none;
+}
+
+.region-culture--community-mobile .region-culture__hero aside strong {
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.region-culture--community-mobile .region-culture__hero aside span {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.region-culture--community-mobile .region-culture__filters {
+    gap: 8px;
+    padding: 0;
+}
+
+.region-culture--community-mobile .region-culture__filters button {
+    min-height: 44px;
+    padding: 8px 14px;
+    border-color: transparent;
+    border-radius: 18px;
+    color: var(--ink);
+    font-size: 11px;
+}
+
+.region-culture--community-mobile .region-culture__filters button.is-selected {
+    background: var(--community-mobile-accent, #4656c5);
+}
+
+.region-culture--community-mobile .region-culture__guide {
+    display: none;
+}
+
+.region-culture--community-mobile .region-culture__grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.region-culture--community-mobile .region-card {
+    display: grid;
+    grid-template-rows: auto;
+    border-color: var(--community-mobile-border, #cbd2e0);
+    border-radius: 18px;
+    background: var(--paper);
+    box-shadow: none;
+}
+
+.region-culture--community-mobile .region-card > header {
+    min-height: 0;
+    padding: 16px 16px 0;
+    background: transparent;
+}
+
+.region-culture--community-mobile .region-card > header span {
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0;
+}
+
+.region-culture--community-mobile .region-card h2 {
+    margin: 8px 0;
+    font-size: 18px;
+    line-height: 26px;
+    letter-spacing: -.2px;
+}
+
+.region-culture--community-mobile .region-card > header small {
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.region-culture--community-mobile .region-card__culture,
+.region-culture--community-mobile .region-card__specialties,
+.region-culture--community-mobile .region-card__boundary,
+.region-culture--community-mobile .region-card footer {
+    padding-right: 16px;
+    padding-left: 16px;
+}
+
+.region-culture--community-mobile .region-card__culture {
+    padding-top: 8px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.region-culture--community-mobile .region-card__specialties {
+    padding-top: 8px;
+}
+
+.region-culture--community-mobile .region-card__specialties > strong {
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.region-culture--community-mobile .region-card__specialty-summary {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.region-culture--community-mobile .region-card__boundary {
+    margin: 8px 16px 0;
+    padding: 0;
+    background: transparent;
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.region-culture--community-mobile .region-card footer {
+    padding-top: 12px;
+    padding-bottom: 16px;
+}
+
+.region-culture--community-mobile .region-culture__next {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 18px;
 }

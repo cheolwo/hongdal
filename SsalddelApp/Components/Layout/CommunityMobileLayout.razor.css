@@ -1,4 +1,19 @@
 .community-mobile-shell {
+    --community-mobile-accent: #4656c5;
+    --community-mobile-text: #1f2937;
+    --community-mobile-muted: #667085;
+    --community-mobile-border: #cbd2e0;
+    --community-mobile-background: #f6f7fb;
+    --community-mobile-surface: #fff;
+    --region-culture-leaf: #176b4d;
+    --community-space-xs: 4px;
+    --community-space-sm: 8px;
+    --community-space-md: 16px;
+    --community-space-lg: 24px;
+    --community-radius-sm: 5px;
+    --community-radius-md: 10px;
+    --community-radius-lg: 18px;
+    --community-touch-min: 44px;
     --mud-palette-primary: #4656c5;
     --mud-palette-primary-text: #fff;
     position: relative;

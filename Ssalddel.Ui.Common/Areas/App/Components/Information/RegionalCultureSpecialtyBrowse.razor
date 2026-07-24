@@ -1,10 +1,10 @@
 @using Ssalddel.Contracts.Common.Community
 @using Ssalddel.Contracts.Common.Content
 
-<main class="region-culture">
+<main class="@RootClass">
     <header class="region-culture__hero">
         <div>
-            <span>문화교통 0.0 · 지역 발견</span>
+            <span>@(CommunityMobilePresentation ? "공개 커뮤니티 · 01A.07" : "문화교통 0.0 · 지역 발견")</span>
             <h1>지역의 문화를 알고, 특산물을 발견해요</h1>
             <p>
                 국가 이름만 보지 않고 미국의 주와 중국의 현재 행정구역·역사문화권을 나누어 살펴봅니다.
@@ -46,27 +46,39 @@
 
                 <p class="region-card__culture">@region.CultureSummary</p>
 
-                <section class="region-card__questions">
-                    <strong>문화를 알아가는 질문</strong>
-                    <ul>
-                        @foreach (var question in region.CultureQuestions)
-                        {
-                            <li>@question</li>
-                        }
-                    </ul>
-                </section>
+                @if (!CommunityMobilePresentation)
+                {
+                    <section class="region-card__questions">
+                        <strong>문화를 알아가는 질문</strong>
+                        <ul>
+                            @foreach (var question in region.CultureQuestions)
+                            {
+                                <li>@question</li>
+                            }
+                        </ul>
+                    </section>
+                }
 
                 <section class="region-card__specialties">
                     <strong>특산물 탐색</strong>
-                    @foreach (var specialty in region.Specialties)
+                    @if (CommunityMobilePresentation)
                     {
-                        <details>
-                            <summary>
-                                <span>@specialty.Name</span>
-                                <small>@specialty.Category</small>
-                            </summary>
-                            <p>@specialty.DiscoveryNote</p>
-                        </details>
+                        <p class="region-card__specialty-summary">
+                            @string.Join(" · ", region.Specialties.Select(specialty => specialty.Name))
+                        </p>
+                    }
+                    else
+                    {
+                        @foreach (var specialty in region.Specialties)
+                        {
+                            <details>
+                                <summary>
+                                    <span>@specialty.Name</span>
+                                    <small>@specialty.Category</small>
+                                </summary>
+                                <p>@specialty.DiscoveryNote</p>
+                            </details>
+                        }
                     }
                 </section>
 
@@ -91,7 +103,15 @@
 </main>
 
 @code {
+    [Parameter]
+    public bool CommunityMobilePresentation { get; set; }
+
     private string? _selectedCountry;
+
+    private string RootClass
+        => CommunityMobilePresentation
+            ? "region-culture region-culture--community-mobile"
+            : "region-culture";
 
     private IReadOnlyList<RegionalCultureSpecialty> VisibleRegions
         => RegionalCultureSpecialtyCatalog.ForCountry(_selectedCountry);

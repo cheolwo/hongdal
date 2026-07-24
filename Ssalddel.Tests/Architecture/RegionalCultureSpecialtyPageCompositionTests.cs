@@ -32,6 +32,20 @@ public sealed class RegionalCultureSpecialtyPageCompositionTests
         Assert.Contains("주문·참여·수입이 만들어지지 않습니다", source);
     }
 
+    [Fact]
+    public void Maui지역탐색은_Figma01모바일Shell과_간결한카드표현을사용한다()
+    {
+        var source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "SsalddelApp",
+            "Components",
+            "Pages",
+            "RegionalCultureSpecialtyPage.razor"));
+
+        Assert.Contains("@layout CommunityMobileLayout", source);
+        Assert.Contains("CommunityMobilePresentation=\"true\"", source);
+    }
+
     private static string FindRepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
