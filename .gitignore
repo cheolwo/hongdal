@@ -26,6 +26,8 @@ appsettings.*.local.json
 *.secrets.json
 secrets.json
 secrets.*.json
+/secrets/
+/deploy/azure-vm/secrets/
 
 # OS files
 .DS_Store

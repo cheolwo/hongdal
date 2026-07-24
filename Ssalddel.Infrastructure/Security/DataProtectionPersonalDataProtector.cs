@@ -45,9 +45,11 @@ namespace 살뜰.Infrastructure.Security
             {
                 return _protector.Unprotect(payload);
             }
-            catch
+            catch (Exception ex)
             {
-                return value;
+                throw new InvalidOperationException(
+                    "개인정보 암호문을 복호화하지 못했습니다. Data Protection 키 구성을 확인해야 합니다.",
+                    ex);
             }
         }
     }

@@ -14,6 +14,12 @@ public sealed class SsalddelApiVersionAttribute : Attribute
 
     public string VersionLabel => SsalddelProductVersionLabels.GetLabel(Version);
 
+    public string ProductName
+        => SsalddelProductRoadmapCatalog.Find(VersionLabel).ProductName;
+
+    public string VersionDisplayName
+        => SsalddelProductRoadmapCatalog.Find(VersionLabel).FullDisplayName;
+
     public string? FeatureKey { get; set; }
 
     public string? WorkflowKey { get; set; }

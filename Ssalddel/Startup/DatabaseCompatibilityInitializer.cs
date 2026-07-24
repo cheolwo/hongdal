@@ -66,7 +66,9 @@ internal static class DatabaseCompatibilityInitializer
 
         try
         {
-            await IdentityDataSeeder.SeedAsync(services);
+            await IdentityDataSeeder.SeedAsync(
+                services,
+                includeDevelopmentAccounts: environment.IsDevelopment());
             var viewVisibilityService = services.GetRequiredService<IView가시성Service>();
             await viewVisibilityService.SeedPoliciesAsync();
             var documentService = services.GetRequiredService<I문서관리Service>();
@@ -79,6 +81,13 @@ internal static class DatabaseCompatibilityInitializer
         }
         catch (Exception ex)
         {
+            if (failOnError)
+            {
+                throw new InvalidOperationException(
+                    "Initial data seeding failed after database migration.",
+                    ex);
+            }
+
             logger.LogWarning(ex, "Initial data seeding failed after database migration.");
         }
     }

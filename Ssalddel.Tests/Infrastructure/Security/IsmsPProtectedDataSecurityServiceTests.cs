@@ -11,6 +11,36 @@ namespace Ssalddel.Tests.Infrastructure.Security;
 public sealed class IsmsPProtectedDataSecurityServiceTests
 {
     [Fact]
+    public void Constructor_RejectsMissingEncryptionKeyEvenWhenLegacyFallbackFlagIsFalse()
+    {
+        var options = Options.Create(new IsmsPProtectedDataOptions
+        {
+            Aes256GcmKeyBase64 = string.Empty,
+            FailWhenKeyMissing = false
+        });
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => new AesGcmIsmsPProtectedDataCryptoService(options));
+
+        Assert.Contains("encryption key is missing", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Constructor_RejectsMissingHashSalt()
+    {
+        var options = Options.Create(new IsmsPProtectedDataOptions
+        {
+            Aes256GcmKeyBase64 = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)),
+            HashSalt = string.Empty
+        });
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => new AesGcmIsmsPProtectedDataCryptoService(options));
+
+        Assert.Contains("hash salt is missing", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void EncryptAtRest_UsesAes256GcmPrefixAndDoesNotReturnPlainText()
     {
         var service = new AesGcmIsmsPProtectedDataCryptoService(CreateOptions());

@@ -59,8 +59,7 @@
     private Severity _statusSeverity = Severity.Info;
     private static readonly IReadOnlyList<string> DriverLoginHints =
     [
-        "개발용 기사: driver1@ssalddel.local",
-        "비밀번호: Driver123!"
+        "개발용 계정은 서버의 로컬 IdentitySeed 설정에서 명시적으로 활성화해야 합니다."
     ];
 
     private string CurrentUserLabel => AuthSession.UserName ?? "미로그인";

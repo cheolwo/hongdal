@@ -4,6 +4,8 @@ using Ssalddel.Contracts.Common;
 using Ssalddel.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Ssalddel.Security;
 
 namespace Ssalddel.Controllers.Common;
 
@@ -20,6 +22,7 @@ public class 인증Controller : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.Authentication)]
     public async Task<IActionResult> 로그인([FromBody] 로그인요청 request)
     {
         var result = await _인증UseCase.로그인Async(request, 요청Context생성());
@@ -27,6 +30,7 @@ public class 인증Controller : ControllerBase
     }
 
     [HttpPost("register/driver")]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.Authentication)]
     public async Task<IActionResult> 기사회원가입([FromBody] 기사회원가입요청 request)
     {
         var result = await _인증UseCase.기사회원가입Async(request);
@@ -34,6 +38,7 @@ public class 인증Controller : ControllerBase
     }
 
     [HttpPost("register/community")]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.Authentication)]
     public async Task<IActionResult> 커뮤니티회원가입([FromBody] 커뮤니티회원가입요청 request)
     {
         var result = await _인증UseCase.커뮤니티회원가입Async(request);
@@ -42,6 +47,7 @@ public class 인증Controller : ControllerBase
 
     [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
     [HttpPost("register/orderer")]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.Authentication)]
     public async Task<IActionResult> 주문자회원가입([FromBody] 주문자회원가입요청 request)
     {
         var result = await _인증UseCase.주문자회원가입Async(request);
@@ -67,6 +73,7 @@ public class 인증Controller : ControllerBase
     }
 
     [HttpPost("refresh")]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.Authentication)]
     public async Task<IActionResult> 토큰갱신([FromBody] 토큰갱신요청 request)
     {
         var result = await _인증UseCase.토큰갱신Async(request);

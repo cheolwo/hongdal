@@ -36,6 +36,22 @@ public sealed class SsalddelApiVersionAttributeTests
     }
 
     [Theory]
+    [InlineData(SsalddelProductVersion.V0_0, "문화교통", "문화교통 0.0 · 커뮤니티·공공데이터 기반")]
+    [InlineData(SsalddelProductVersion.V1_0, "문화교통", "문화교통 1.0 · 공동구매·주문자 집단화")]
+    [InlineData(SsalddelProductVersion.V1_5, "문화교통", "문화교통 1.5 · 공급·가격·무역 준비")]
+    [InlineData(SsalddelProductVersion.V2_0, "살뜰", "살뜰 2.0 · 국내 화물·운송 이행")]
+    public void ProductVersionAttribute_UsesRoadmapProductName(
+        SsalddelProductVersion version,
+        string productName,
+        string displayName)
+    {
+        var attribute = new SsalddelApiVersionAttribute(version);
+
+        Assert.Equal(productName, attribute.ProductName);
+        Assert.Equal(displayName, attribute.VersionDisplayName);
+    }
+
+    [Theory]
     [InlineData(SsalddelApiGrowthTrack.Community, "Community")]
     [InlineData(SsalddelApiGrowthTrack.OrdererGroupCommerce, "Orderer Group Commerce")]
     public void GetLabel_ReturnsStableGrowthTrackLabel(SsalddelApiGrowthTrack track, string expected)
@@ -293,7 +309,8 @@ public sealed class SsalddelApiVersionAttributeTests
         Assert.Contains(response.PageCapabilities, capability =>
             capability.PageKey == "shipper-request" &&
             capability.IntroducedVersion == "2.0" &&
-            capability.HasExternalEffects &&
+            capability.BoundaryCode == nameof(PageInteractionBoundary.PlatformPersistence) &&
+            !capability.HasExternalEffects &&
             capability.IsFeatureEnabled &&
             capability.FeatureKeys.Contains(VersionFeatureFlagKeys.DomesticTransportWorkflow));
         Assert.Contains(response.PageCapabilities, capability =>
@@ -320,6 +337,8 @@ public sealed class SsalddelApiVersionAttributeTests
             endpoint.Method == "POST" &&
             endpoint.RoutePattern == "api/v1/shipper/requests" &&
             endpoint.ProductVersionName == "2.0" &&
+            endpoint.ProductName == "살뜰" &&
+            endpoint.ProductVersionDisplayName == "살뜰 2.0 · 국내 화물·운송 이행" &&
             endpoint.FeatureKey == VersionFeatureFlagKeys.DomesticTransportWorkflow &&
             endpoint.IsEnabled);
         Assert.Contains(response.ApiEndpoints, endpoint =>
@@ -331,6 +350,8 @@ public sealed class SsalddelApiVersionAttributeTests
             endpoint.Method == "POST" &&
             endpoint.RoutePattern == "api/v1/community/posts" &&
             endpoint.ProductVersionName == "0.0" &&
+            endpoint.ProductName == "문화교통" &&
+            endpoint.ProductVersionDisplayName == "문화교통 0.0 · 커뮤니티·공공데이터 기반" &&
             endpoint.FeatureKey == string.Empty &&
             endpoint.IsEnabled &&
             endpoint.AllowsAnonymous);

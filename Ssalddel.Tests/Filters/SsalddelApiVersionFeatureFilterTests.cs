@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using 살뜰.Services.Versioning;
@@ -95,6 +96,54 @@ public sealed class SsalddelApiVersionFeatureFilterTests
     }
 
     [Fact]
+    public async Task OnActionExecutionAsync_BlocksPostV0EndpointWithoutFeatureMetadata()
+    {
+        var context = CreateContext<UnclassifiedFutureController>(
+            nameof(UnclassifiedFutureController.Get));
+        var nextCalled = false;
+        var featureFlags = new RecordingFeatureFlagService();
+        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+
+        await filter.OnActionExecutionAsync(context, () =>
+        {
+            nextCalled = true;
+            return Task.FromResult(new ActionExecutedContext(context, [], new object()));
+        });
+
+        Assert.False(nextCalled);
+        Assert.Empty(featureFlags.CheckedFeatureKeys);
+        var result = Assert.IsType<ObjectResult>(context.Result);
+        Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
+        var problem = Assert.IsType<ProblemDetails>(result.Value);
+        Assert.Equal("FeatureBoundaryUnclassified", problem.Extensions["errorCode"]);
+        Assert.Equal("2.5", problem.Extensions["productVersion"]);
+    }
+
+    [Fact]
+    public async Task OnActionExecutionAsync_BlocksPostV0ActionOverrideWithoutFeatureMetadata()
+    {
+        var context = CreateContext<V0ControllerWithFutureAction>(
+            nameof(V0ControllerWithFutureAction.Future));
+        var nextCalled = false;
+        var featureFlags = new RecordingFeatureFlagService();
+        var filter = new SsalddelApiVersionFeatureFilter(featureFlags);
+
+        await filter.OnActionExecutionAsync(context, () =>
+        {
+            nextCalled = true;
+            return Task.FromResult(new ActionExecutedContext(context, [], new object()));
+        });
+
+        Assert.False(nextCalled);
+        Assert.Empty(featureFlags.CheckedFeatureKeys);
+        var result = Assert.IsType<ObjectResult>(context.Result);
+        Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
+        var problem = Assert.IsType<ProblemDetails>(result.Value);
+        Assert.Equal("FeatureBoundaryUnclassified", problem.Extensions["errorCode"]);
+        Assert.Equal("2.5", problem.Extensions["productVersion"]);
+    }
+
+    [Fact]
     public void AddSsalddelPresentation_RegistersAutomaticVersionFeatureFilter()
     {
         var services = new ServiceCollection();
@@ -105,6 +154,27 @@ public sealed class SsalddelApiVersionFeatureFilterTests
 
         Assert.Contains(options.Filters.OfType<TypeFilterAttribute>(), filter =>
             filter.ImplementationType == typeof(SsalddelApiVersionFeatureFilter));
+    }
+
+    [Fact]
+    public void AddSsalddelPresentation_RequiresCertificatePathWhenConfigured()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["PersonalDataProtection:RequireCertificate"] = "true",
+                ["PersonalDataProtection:CertificatePath"] = ""
+            })
+            .Build();
+        var services = new ServiceCollection();
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => services.AddSsalddelPresentation(configuration));
+
+        Assert.Contains(
+            "PersonalDataProtection:CertificatePath is required",
+            exception.Message,
+            StringComparison.Ordinal);
     }
 
     private static ActionExecutingContext CreateContext<TController>(string actionName)
@@ -158,6 +228,23 @@ public sealed class SsalddelApiVersionFeatureFilterTests
     private sealed class CapabilityController
     {
         public void Get()
+        {
+        }
+    }
+
+    [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
+    private sealed class UnclassifiedFutureController
+    {
+        public void Get()
+        {
+        }
+    }
+
+    [SsalddelApiVersion(SsalddelProductVersion.V0_0)]
+    private sealed class V0ControllerWithFutureAction
+    {
+        [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
+        public void Future()
         {
         }
     }

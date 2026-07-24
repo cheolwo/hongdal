@@ -77,11 +77,72 @@ public sealed class 인증UseCase : I인증UseCase
             return 인증실패<토큰응답>("아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        if (_userManager.SupportsUserLockout)
+        {
+            if (!await _userManager.GetLockoutEnabledAsync(user))
+            {
+                var enableLockoutResult = await _userManager.SetLockoutEnabledAsync(user, true);
+                if (!enableLockoutResult.Succeeded)
+                {
+                    await 로그인로그기록Async(
+                        userNameOrEmail,
+                        user,
+                        false,
+                        "LockoutStateUpdateFailed",
+                        "로그인 보호 상태를 갱신하지 못했습니다.",
+                        context);
+                    return 인증실패<토큰응답>("아이디 또는 비밀번호가 올바르지 않습니다.");
+                }
+            }
+
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                await 로그인로그기록Async(
+                    userNameOrEmail,
+                    user,
+                    false,
+                    "LockedOut",
+                    "로그인 시도 제한 상태입니다.",
+                    context);
+                return 인증실패<토큰응답>("아이디 또는 비밀번호가 올바르지 않습니다.");
+            }
+        }
+
         var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!passwordValid)
         {
-            await 로그인로그기록Async(userNameOrEmail, user, false, "PasswordInvalid", "아이디 또는 비밀번호가 올바르지 않습니다.", context);
+            var errorCode = "PasswordInvalid";
+            if (_userManager.SupportsUserLockout)
+            {
+                var accessFailedResult = await _userManager.AccessFailedAsync(user);
+                if (!accessFailedResult.Succeeded)
+                {
+                    errorCode = "AccessFailureNotRecorded";
+                }
+                else if (await _userManager.IsLockedOutAsync(user))
+                {
+                    errorCode = "LockedOut";
+                }
+            }
+
+            await 로그인로그기록Async(userNameOrEmail, user, false, errorCode, "아이디 또는 비밀번호가 올바르지 않습니다.", context);
             return 인증실패<토큰응답>("아이디 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        if (_userManager.SupportsUserLockout)
+        {
+            var resetResult = await _userManager.ResetAccessFailedCountAsync(user);
+            if (!resetResult.Succeeded)
+            {
+                await 로그인로그기록Async(
+                    userNameOrEmail,
+                    user,
+                    false,
+                    "AccessFailureResetFailed",
+                    "로그인 보호 상태를 초기화하지 못했습니다.",
+                    context);
+                return 인증실패<토큰응답>("아이디 또는 비밀번호가 올바르지 않습니다.");
+            }
         }
 
         var response = await 토큰발급Async(user);
@@ -511,9 +572,9 @@ public sealed class 인증UseCase : I인증UseCase
                 _ => "Ssalddel.Server"
             },
             UserId = user?.Id ?? string.Empty,
-            UserName = user?.UserName ?? userNameOrEmail,
+            UserName = user?.UserName ?? string.Empty,
             RoleName = roleName,
-            Email = user?.Email ?? userNameOrEmail,
+            Email = user?.Email ?? string.Empty,
             PhoneNumber = user?.PhoneNumber ?? string.Empty,
             ActionType = "Auth",
             ActionName = "Login",
@@ -525,7 +586,9 @@ public sealed class 인증UseCase : I인증UseCase
             ClientIp = context.ClientIp,
             UserAgent = context.UserAgent,
             OccurredAtUtc = DateTime.UtcNow,
-            MetadataJson = $"{{\"userNameOrEmail\":\"{userNameOrEmail}\"}}"
+            MetadataJson = userNameOrEmail.Contains('@')
+                ? "{\"identifierKind\":\"Email\"}"
+                : "{\"identifierKind\":\"UserName\"}"
         });
     }
 

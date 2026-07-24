@@ -6,6 +6,7 @@ using Ssalddel.Contracts.Common;
 using Ssalddel.Contracts.Common.Localization;
 using Ssalddel.Security;
 using Ssalddel.Services.Auth;
+using 살뜰.Services.Audit;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
 
@@ -87,6 +88,47 @@ public sealed class 인증UseCase커뮤니티회원가입Tests
         Assert.Equal(DisplayLanguageCodes.Korean, languageClaim.Value);
     }
 
+    [Fact]
+    public async Task 잘못된비밀번호가_반복되면_계정을_잠근다()
+    {
+        await using var fixture = await IdentityFixture.CreateAsync();
+        var user = new ApplicationUser
+        {
+            UserName = "lockout-member",
+            Email = "lockout-member@example.com",
+            LockoutEnabled = true
+        };
+        Assert.True((await fixture.UserManager.CreateAsync(user, "Valid123!")).Succeeded);
+        var audit = new RecordingActivityLogService();
+        var useCase = CreateLoginUseCase(fixture.UserManager, audit);
+        var context = new 인증요청Context(
+            "/api/v1/auth/login",
+            "trace-lockout",
+            "203.0.113.10",
+            "test-agent");
+
+        for (var attempt = 0; attempt < 3; attempt++)
+        {
+            var result = await useCase.로그인Async(new 로그인요청
+            {
+                UserNameOrEmail = user.UserName!,
+                Password = "Wrong123!"
+            }, context);
+            Assert.True(result.IsFailed);
+        }
+
+        Assert.True(await fixture.UserManager.IsLockedOutAsync(user));
+        Assert.Contains(audit.Entries, entry =>
+            entry.ErrorCode == "LockedOut" && !entry.IsSuccess);
+
+        var lockedResult = await useCase.로그인Async(new 로그인요청
+        {
+            UserNameOrEmail = user.UserName!,
+            Password = "Valid123!"
+        }, context);
+        Assert.True(lockedResult.IsFailed);
+    }
+
     private static 인증UseCase CreateUseCase(UserManager<ApplicationUser> userManager)
         => new(
             userManager,
@@ -96,6 +138,28 @@ public sealed class 인증UseCase커뮤니티회원가입Tests
             null!,
             null!,
             null!);
+
+    private static 인증UseCase CreateLoginUseCase(
+        UserManager<ApplicationUser> userManager,
+        I사용자행위로그Service activityLogService)
+    {
+        var jwtOptions = new JwtOptions
+        {
+            Issuer = "Ssalddel.Tests",
+            Audience = "Ssalddel.Tests.Client",
+            SecretKey = "test-only-signing-key-that-is-longer-than-thirty-two-bytes",
+            AccessTokenMinutes = 5,
+            RefreshTokenDays = 1
+        };
+        return new 인증UseCase(
+            userManager,
+            new AuthTokenService(Options.Create(jwtOptions)),
+            null!,
+            Options.Create(jwtOptions),
+            activityLogService,
+            null!,
+            null!);
+    }
 
     private sealed class IdentityFixture : IAsyncDisposable
     {
@@ -117,7 +181,12 @@ public sealed class 인증UseCase커뮤니티회원가입Tests
             services.AddDbContext<SsalddelContext>(options =>
                 options.UseInMemoryDatabase($"community-signup-{Guid.NewGuid():N}"));
             services
-                .AddIdentityCore<ApplicationUser>()
+                .AddIdentityCore<ApplicationUser>(options =>
+                {
+                    options.Lockout.AllowedForNewUsers = true;
+                    options.Lockout.MaxFailedAccessAttempts = 3;
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<SsalddelContext>();
 
@@ -142,5 +211,18 @@ public sealed class 인증UseCase커뮤니티회원가입Tests
         public string? Protect(string? value) => value;
 
         public string? Unprotect(string? value) => value;
+    }
+
+    private sealed class RecordingActivityLogService : I사용자행위로그Service
+    {
+        public List<사용자행위로그기록> Entries { get; } = [];
+
+        public Task 기록Async(
+            사용자행위로그기록 entry,
+            CancellationToken cancellationToken = default)
+        {
+            Entries.Add(entry);
+            return Task.CompletedTask;
+        }
     }
 }

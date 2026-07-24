@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Ssalddel.Contracts.Common.Hr;
 using 살뜰.도메인.공통;
 using 살뜰.도메인.기사;
@@ -12,12 +13,15 @@ namespace 살뜰.Data
 {
     public static class IdentityDataSeeder
     {
-        public static async Task SeedAsync(IServiceProvider serviceProvider)
+        public static async Task SeedAsync(
+            IServiceProvider serviceProvider,
+            bool includeDevelopmentAccounts = false)
         {
             using var scope = serviceProvider.CreateScope();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var db = scope.ServiceProvider.GetRequiredService<SsalddelContext>();
+            var seedOptions = scope.ServiceProvider.GetRequiredService<IOptions<IdentitySeedOptions>>().Value;
 
             var roles = new[]
             {
@@ -38,159 +42,177 @@ namespace 살뜰.Data
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    var roleResult = await roleManager.CreateAsync(new IdentityRole(role));
+                    if (!roleResult.Succeeded)
+                    {
+                        throw IdentityFailure($"역할 '{role}'을 만들지 못했습니다.", roleResult);
+                    }
                 }
             }
 
-            var adminId = "qkrcjfdn79";
-            var adminEmail = "qkrcjfdn79@ssalddel.local";
-            var adminUser = await userManager.FindByNameAsync(adminId);
-            if (adminUser == null)
-            {
-                adminUser = new ApplicationUser
-                {
-                    UserName = adminId,
-                    Email = adminEmail,
-                    EmailConfirmed = true,
-                };
+            await EnsureBootstrapAdminAsync(userManager, seedOptions.BootstrapAdmin);
 
-                var createResult = await userManager.CreateAsync(adminUser, "tlstjstns79!");
-                if (!createResult.Succeeded)
-                {
-                    return;
-                }
-            }
-
-            if (!await userManager.IsInRoleAsync(adminUser, 역할명.서버관리자))
+            if (includeDevelopmentAccounts && seedOptions.DevelopmentAccounts.Enabled)
             {
-                await userManager.AddToRoleAsync(adminUser, 역할명.서버관리자);
-            }
-
-            var legacyAdminEmail = "admin@ssalddel.local";
-            var legacyAdminUser = await userManager.FindByEmailAsync(legacyAdminEmail);
-            if (legacyAdminUser != null && !string.Equals(legacyAdminUser.UserName, adminId, StringComparison.OrdinalIgnoreCase))
-            {
-                if (await userManager.IsInRoleAsync(legacyAdminUser, 역할명.서버관리자))
+                var adminId = "qkrcjfdn79";
+                var adminEmail = "qkrcjfdn79@ssalddel.local";
+                var adminUser = await userManager.FindByNameAsync(adminId);
+                if (adminUser == null)
                 {
-                    await userManager.RemoveFromRoleAsync(legacyAdminUser, 역할명.서버관리자);
+                    adminUser = new ApplicationUser
+                    {
+                        UserName = adminId,
+                        Email = adminEmail,
+                        EmailConfirmed = true,
+                        LockoutEnabled = true,
+                    };
+
+                    var createResult = await userManager.CreateAsync(
+                        adminUser,
+                        seedOptions.DevelopmentAccounts.AdminPassword);
+                    if (!createResult.Succeeded)
+                    {
+                        throw IdentityFailure("개발용 관리자 계정을 만들지 못했습니다.", createResult);
+                    }
                 }
 
-                await userManager.DeleteAsync(legacyAdminUser);
-            }
-
-            var driverEmail = "driver1@ssalddel.local";
-            var driverUser = await userManager.FindByEmailAsync(driverEmail);
-            if (driverUser == null)
-            {
-                driverUser = new ApplicationUser
+                if (!await userManager.IsInRoleAsync(adminUser, 역할명.서버관리자))
                 {
-                    UserName = driverEmail,
-                    Email = driverEmail,
-                    EmailConfirmed = true,
-                };
-
-                var createResult = await userManager.CreateAsync(driverUser, "Driver123!");
-                if (!createResult.Succeeded)
-                {
-                    return;
-                }
-            }
-
-            if (!await userManager.IsInRoleAsync(driverUser, 역할명.기사))
-            {
-                await userManager.AddToRoleAsync(driverUser, 역할명.기사);
-            }
-
-            var shipperId = "shipper1";
-            var shipperEmail = "shipper1@ssalddel.local";
-            var shipperUser = await userManager.FindByNameAsync(shipperId) ?? await userManager.FindByEmailAsync(shipperEmail);
-            if (shipperUser == null)
-            {
-                shipperUser = new ApplicationUser
-                {
-                    UserName = shipperId,
-                    Email = shipperEmail,
-                    EmailConfirmed = true,
-                    BusinessRegistrationNumber = "123-45-67890"
-                };
-
-                var createResult = await userManager.CreateAsync(shipperUser, "Shipper123!");
-                if (!createResult.Succeeded)
-                {
-                    return;
-                }
-            }
-            else
-            {
-                var needsUpdate = false;
-                if (!string.Equals(shipperUser.UserName, shipperId, StringComparison.OrdinalIgnoreCase))
-                {
-                    shipperUser.UserName = shipperId;
-                    needsUpdate = true;
+                    await userManager.AddToRoleAsync(adminUser, 역할명.서버관리자);
                 }
 
-                if (!string.Equals(shipperUser.Email, shipperEmail, StringComparison.OrdinalIgnoreCase))
+                var legacyAdminEmail = "admin@ssalddel.local";
+                var legacyAdminUser = await userManager.FindByEmailAsync(legacyAdminEmail);
+                if (legacyAdminUser != null && !string.Equals(legacyAdminUser.UserName, adminId, StringComparison.OrdinalIgnoreCase))
                 {
-                    shipperUser.Email = shipperEmail;
-                    shipperUser.EmailConfirmed = true;
-                    needsUpdate = true;
+                    if (await userManager.IsInRoleAsync(legacyAdminUser, 역할명.서버관리자))
+                    {
+                        await userManager.RemoveFromRoleAsync(legacyAdminUser, 역할명.서버관리자);
+                    }
+
+                    await userManager.DeleteAsync(legacyAdminUser);
                 }
 
-                if (!string.Equals(shipperUser.BusinessRegistrationNumber, "123-45-67890", StringComparison.OrdinalIgnoreCase))
+                var driverEmail = "driver1@ssalddel.local";
+                var driverUser = await userManager.FindByEmailAsync(driverEmail);
+                if (driverUser == null)
                 {
-                    shipperUser.BusinessRegistrationNumber = "123-45-67890";
-                    needsUpdate = true;
+                    driverUser = new ApplicationUser
+                    {
+                        UserName = driverEmail,
+                        Email = driverEmail,
+                        EmailConfirmed = true,
+                        LockoutEnabled = true,
+                    };
+
+                    var createResult = await userManager.CreateAsync(
+                        driverUser,
+                        seedOptions.DevelopmentAccounts.DriverPassword);
+                    if (!createResult.Succeeded)
+                    {
+                        throw IdentityFailure("개발용 기사 계정을 만들지 못했습니다.", createResult);
+                    }
                 }
 
-                if (needsUpdate)
+                if (!await userManager.IsInRoleAsync(driverUser, 역할명.기사))
                 {
-                    await userManager.UpdateAsync(shipperUser);
+                    await userManager.AddToRoleAsync(driverUser, 역할명.기사);
                 }
-            }
 
-            if (!await userManager.IsInRoleAsync(shipperUser, 역할명.화주))
-            {
-                await userManager.AddToRoleAsync(shipperUser, 역할명.화주);
-            }
-
-            if (!await userManager.IsInRoleAsync(shipperUser, 역할명.판매자))
-            {
-                await userManager.AddToRoleAsync(shipperUser, 역할명.판매자);
-            }
-
-            if (!await userManager.IsInRoleAsync(shipperUser, 역할명.창고관리자))
-            {
-                await userManager.AddToRoleAsync(shipperUser, 역할명.창고관리자);
-            }
-
-            await EnsureHrRoleAssignmentAsync(
-                db,
-                shipperUser.Id,
-                adminUser.Id,
-                HrDetailedRoleCodes.WarehouseManager,
-                "개발용 창고 관리자");
-
-            await EnsureOrdererProfileAsync(db, adminUser, "관리자 주문자", "010-0000-0001");
-            await EnsureOrdererProfileAsync(db, driverUser, "개발용 기사 주문자", "010-0000-0000");
-            await EnsureOrdererProfileAsync(db, shipperUser, "개발용 화주 주문자", "010-0000-0002");
-
-            var driverProfile = await db.용달기사.FirstOrDefaultAsync(d => d.기사Id == driverUser.Id);
-            if (driverProfile == null)
-            {
-                db.용달기사.Add(new 용달기사
+                var shipperId = "shipper1";
+                var shipperEmail = "shipper1@ssalddel.local";
+                var shipperUser = await userManager.FindByNameAsync(shipperId) ?? await userManager.FindByEmailAsync(shipperEmail);
+                if (shipperUser == null)
                 {
-                    기사명 = "개발용 기사",
-                    기사Id = driverUser.Id,
-                    상태 = "활동중",
-                    연락처 = "010-0000-0000",
-                    차량 = "오토바이",
-                    운행상태 = 상태값.기사운행상태.대기,
-                    주_활동지역 = "서울",
-                    메모 = "개발 시드 데이터",
-                    등록일 = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
+                    shipperUser = new ApplicationUser
+                    {
+                        UserName = shipperId,
+                        Email = shipperEmail,
+                        EmailConfirmed = true,
+                        BusinessRegistrationNumber = "123-45-67890",
+                        LockoutEnabled = true
+                    };
+
+                    var createResult = await userManager.CreateAsync(
+                        shipperUser,
+                        seedOptions.DevelopmentAccounts.ShipperPassword);
+                    if (!createResult.Succeeded)
+                    {
+                        throw IdentityFailure("개발용 화주 계정을 만들지 못했습니다.", createResult);
+                    }
+                }
+                else
+                {
+                    var needsUpdate = false;
+                    if (!string.Equals(shipperUser.UserName, shipperId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        shipperUser.UserName = shipperId;
+                        needsUpdate = true;
+                    }
+
+                    if (!string.Equals(shipperUser.Email, shipperEmail, StringComparison.OrdinalIgnoreCase))
+                    {
+                        shipperUser.Email = shipperEmail;
+                        shipperUser.EmailConfirmed = true;
+                        needsUpdate = true;
+                    }
+
+                    if (!string.Equals(shipperUser.BusinessRegistrationNumber, "123-45-67890", StringComparison.OrdinalIgnoreCase))
+                    {
+                        shipperUser.BusinessRegistrationNumber = "123-45-67890";
+                        needsUpdate = true;
+                    }
+
+                    if (needsUpdate)
+                    {
+                        await userManager.UpdateAsync(shipperUser);
+                    }
+                }
+
+                if (!await userManager.IsInRoleAsync(shipperUser, 역할명.화주))
+                {
+                    await userManager.AddToRoleAsync(shipperUser, 역할명.화주);
+                }
+
+                if (!await userManager.IsInRoleAsync(shipperUser, 역할명.판매자))
+                {
+                    await userManager.AddToRoleAsync(shipperUser, 역할명.판매자);
+                }
+
+                if (!await userManager.IsInRoleAsync(shipperUser, 역할명.창고관리자))
+                {
+                    await userManager.AddToRoleAsync(shipperUser, 역할명.창고관리자);
+                }
+
+                await EnsureHrRoleAssignmentAsync(
+                    db,
+                    shipperUser.Id,
+                    adminUser.Id,
+                    HrDetailedRoleCodes.WarehouseManager,
+                    "개발용 창고 관리자");
+
+                await EnsureOrdererProfileAsync(db, adminUser, "관리자 주문자", "010-0000-0001");
+                await EnsureOrdererProfileAsync(db, driverUser, "개발용 기사 주문자", "010-0000-0000");
+                await EnsureOrdererProfileAsync(db, shipperUser, "개발용 화주 주문자", "010-0000-0002");
+
+                var driverProfile = await db.용달기사.FirstOrDefaultAsync(d => d.기사Id == driverUser.Id);
+                if (driverProfile == null)
+                {
+                    db.용달기사.Add(new 용달기사
+                    {
+                        기사명 = "개발용 기사",
+                        기사Id = driverUser.Id,
+                        상태 = "활동중",
+                        연락처 = "010-0000-0000",
+                        차량 = "오토바이",
+                        운행상태 = 상태값.기사운행상태.대기,
+                        주_활동지역 = "서울",
+                        메모 = "개발 시드 데이터",
+                        등록일 = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    });
+                }
             }
 
             var 차량단가시드 = new[]
@@ -814,6 +836,65 @@ namespace 살뜰.Data
 
             await db.SaveChangesAsync();
         }
+
+        private static async Task EnsureBootstrapAdminAsync(
+            UserManager<ApplicationUser> userManager,
+            BootstrapAdminSeedOptions options)
+        {
+            if (!options.Enabled)
+            {
+                return;
+            }
+
+            var userName = options.UserName.Trim();
+            var email = options.Email.Trim();
+            var byName = await userManager.FindByNameAsync(userName);
+            var byEmail = await userManager.FindByEmailAsync(email);
+            if (byName is not null && byEmail is not null && byName.Id != byEmail.Id)
+            {
+                throw new InvalidOperationException(
+                    "관리자 부트스트랩 아이디와 이메일이 서로 다른 기존 계정을 가리킵니다.");
+            }
+
+            var adminUser = byName ?? byEmail;
+            if (adminUser is not null)
+            {
+                if (!await userManager.IsInRoleAsync(adminUser, 역할명.서버관리자))
+                {
+                    throw new InvalidOperationException(
+                        "관리자 부트스트랩 대상과 같은 아이디 또는 이메일의 일반 계정이 이미 있습니다. 자동으로 관리자 권한을 부여하지 않습니다.");
+                }
+
+                return;
+            }
+
+            adminUser = new ApplicationUser
+            {
+                UserName = userName,
+                Email = email,
+                EmailConfirmed = true,
+                LockoutEnabled = true
+            };
+
+            var createResult = await userManager.CreateAsync(adminUser, options.Password);
+            if (!createResult.Succeeded)
+            {
+                throw IdentityFailure("초기 관리자 계정을 만들지 못했습니다.", createResult);
+            }
+
+            var roleResult = await userManager.AddToRoleAsync(adminUser, 역할명.서버관리자);
+            if (!roleResult.Succeeded)
+            {
+                await userManager.DeleteAsync(adminUser);
+                throw IdentityFailure("초기 관리자 역할을 부여하지 못했습니다.", roleResult);
+            }
+        }
+
+        private static InvalidOperationException IdentityFailure(
+            string message,
+            IdentityResult result)
+            => new(
+                $"{message} {string.Join("; ", result.Errors.Select(error => error.Description))}");
 
         private static async Task EnsureOrdererProfileAsync(SsalddelContext db, ApplicationUser user, string displayName, string phoneNumber)
         {

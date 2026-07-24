@@ -21,7 +21,7 @@ public sealed class AesGcmIsmsPProtectedDataCryptoService : IIsmsPProtectedDataC
 
         var value = options.Value;
         key = ResolveKey(value);
-        hashSalt = value.HashSalt ?? string.Empty;
+        hashSalt = ResolveHashSalt(value);
     }
 
     public IsmsPProtectedValue EncryptAtRest(string fieldKey, string value)
@@ -113,12 +113,7 @@ public sealed class AesGcmIsmsPProtectedDataCryptoService : IIsmsPProtectedDataC
     {
         if (string.IsNullOrWhiteSpace(options.Aes256GcmKeyBase64))
         {
-            if (options.FailWhenKeyMissing)
-            {
-                throw new InvalidOperationException("ISMS-P protected data encryption key is missing. Configure IsmsPProtectedData:Aes256GcmKeyBase64 with a 32-byte Base64 key.");
-            }
-
-            return SHA256.HashData(Encoding.UTF8.GetBytes("Ssalddel.LocalDevelopment.IsmsPProtectedDataKey"));
+            throw new InvalidOperationException("ISMS-P protected data encryption key is missing. Configure IsmsPProtectedData:Aes256GcmKeyBase64 with a 32-byte Base64 key.");
         }
 
         byte[] decoded;
@@ -137,5 +132,16 @@ public sealed class AesGcmIsmsPProtectedDataCryptoService : IIsmsPProtectedDataC
         }
 
         return decoded;
+    }
+
+    private static string ResolveHashSalt(IsmsPProtectedDataOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(options.HashSalt))
+        {
+            throw new InvalidOperationException(
+                "ISMS-P protected data hash salt is missing. Configure IsmsPProtectedData:HashSalt.");
+        }
+
+        return options.HashSalt.Trim();
     }
 }
