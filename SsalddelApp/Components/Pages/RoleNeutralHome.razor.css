@@ -1,0 +1,205 @@
+.common-mobile-home {
+    --common-home-accent: #4656c5;
+    --common-home-text: #1f2937;
+    --common-home-muted: #667085;
+    --common-home-border: #cbd2e0;
+    display: grid;
+    gap: 16px;
+    width: min(100%, 560px);
+    margin: 0 auto;
+    padding: 10px 0 32px;
+    color: var(--common-home-text);
+}
+
+.common-mobile-home__hero {
+    display: grid;
+    gap: 9px;
+    padding: 24px 22px;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 92% 10%, rgba(255, 255, 255, .18) 0 72px, transparent 73px),
+        linear-gradient(140deg, #28378f, #4656c5 58%, #16805c);
+    color: #fff;
+    box-shadow: 0 14px 36px rgba(49, 64, 150, .18);
+}
+
+.common-mobile-home__hero > span,
+.common-mobile-home__section > header > span {
+    font-size: .7rem;
+    font-weight: 850;
+    letter-spacing: .06em;
+}
+
+.common-mobile-home__hero h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 6vw, 2.35rem);
+    line-height: 1.2;
+    letter-spacing: -.04em;
+}
+
+.common-mobile-home__hero p {
+    margin: 0;
+    color: rgba(255, 255, 255, .82);
+    font-size: .84rem;
+    line-height: 1.65;
+    word-break: keep-all;
+}
+
+.common-mobile-home__hero > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: fit-content;
+    min-height: 44px;
+    margin-top: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #fff;
+    color: #3443a3;
+    font-size: .78rem;
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.common-mobile-home__section {
+    display: grid;
+    gap: 10px;
+}
+
+.common-mobile-home__section > header {
+    display: grid;
+    gap: 3px;
+}
+
+.common-mobile-home__section > header > span {
+    color: var(--common-home-accent);
+}
+
+.common-mobile-home__section h2 {
+    margin: 0;
+    font-size: 1.18rem;
+    letter-spacing: -.02em;
+}
+
+.common-mobile-home__section header p {
+    margin: 1px 0 0;
+    color: var(--common-home-muted);
+    font-size: .74rem;
+    line-height: 1.5;
+}
+
+.common-mobile-home__destinations,
+.common-mobile-home__roles {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--common-home-border);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.common-mobile-home__destinations > a,
+.common-mobile-home__roles > button {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 11px;
+    min-height: 72px;
+    padding: 11px 13px;
+    border: 0;
+    border-bottom: 1px solid var(--common-home-border);
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.common-mobile-home__destinations > a:last-child,
+.common-mobile-home__roles > button:last-child {
+    border-bottom: 0;
+}
+
+.common-mobile-home__destinations > a > span:nth-child(2),
+.common-mobile-home__roles > button > span:nth-child(2) {
+    display: grid;
+    gap: 3px;
+}
+
+.common-mobile-home__destinations strong,
+.common-mobile-home__roles strong {
+    font-size: .88rem;
+}
+
+.common-mobile-home__destinations small,
+.common-mobile-home__roles small {
+    color: var(--common-home-muted);
+    font-size: .69rem;
+    line-height: 1.4;
+}
+
+.common-mobile-home__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+
+.common-mobile-home__icon--community {
+    background: #eceeff;
+    color: #4656c5;
+}
+
+.common-mobile-home__icon--region {
+    background: #e5f5e9;
+    color: #287553;
+}
+
+.common-mobile-home__icon--data {
+    background: #e8f3ff;
+    color: #2563a9;
+}
+
+.common-mobile-home__icon--shipper {
+    background: #e8f3ff;
+    color: #2563a9;
+}
+
+.common-mobile-home__icon--warehouse {
+    background: #fff3d6;
+    color: #9a6200;
+}
+
+.common-mobile-home__boundary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #e7f6ec;
+    color: #315b43;
+}
+
+.common-mobile-home__boundary > span {
+    display: grid;
+    gap: 3px;
+    font-size: .68rem;
+    line-height: 1.45;
+}
+
+.common-mobile-home__boundary strong {
+    font-size: .75rem;
+}
+
+@media (max-width: 640px) {
+    .common-mobile-home {
+        padding: 0 0 28px;
+    }
+
+    .common-mobile-home__hero {
+        border-radius: 14px;
+    }
+}

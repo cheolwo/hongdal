@@ -1,64 +1,99 @@
 @inject SsalddelClientRoleService RoleService
 @inject NavigationManager Navigation
 
-<PlatformCommunityHome AppName="살뜰"
-                       RoleLabel="커뮤니티 사용자"
-                       AppKey="role-neutral"
-                       CommunityDirectoryHref="@CommunityPageRoutes.Home"
-                       UseCompactHomeSummary="true"
-                       ShowPrajnaUpayaNavigator="true"
-                       PrajnaLabel="정보"
-                       PrajnaHref="@ShipperRoutes.PublicDataInformation"
-                       ShowRealtimeBest="true">
-    <CommunityModeContent>
-        <CommunityFirstStartPanel BrowseHref="#community-forum-list"
-                                  InformationHref="@ShipperRoutes.PublicDataInformation"
-                                  InformationLabel="농수산물 정보 보기"
-                                  ParticipationHref="#community-compose" />
-    </CommunityModeContent>
+<main class="common-mobile-home">
+    <header class="common-mobile-home__hero">
+        <span>살뜰 통합 · 00</span>
+        <h1>이야기에서 함께 사는 일까지</h1>
+        <p>
+            가입 없이 지역과 생활 이야기를 둘러보고, 필요할 때만 역할을 골라 공동행동과 업무를 이어갑니다.
+        </p>
+        <a href="@CommunityPageRoutes.Home">
+            <MudIcon Icon="@Icons.Material.Filled.Forum" Size="Size.Small" />
+            공개 커뮤니티 시작
+            <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+        </a>
+    </header>
 
-    <WorkModeContent>
-        <MudStack Spacing="3">
-            <MudStack Spacing="1">
-                <MudText Typo="Typo.h4">업무 역할 선택</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    역할을 고르면 바깥 태극이 해당 역할의 사방괘로 바뀝니다.
-                </MudText>
-            </MudStack>
+    <section class="common-mobile-home__section" aria-labelledby="common-home-discovery-title">
+        <header>
+            <span>먼저 둘러보기</span>
+            <h2 id="common-home-discovery-title">지금 살펴볼 곳</h2>
+        </header>
 
-            <MudGrid>
-                <MudItem xs="12" sm="6">
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-                        <MudStack Spacing="2" Class="h-100">
-                            <MudIcon Icon="@Icons.Material.Filled.LocalShipping" Color="Color.Primary" Size="Size.Large" />
-                            <MudText Typo="Typo.h6">화주</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="flex-grow-1">
-                                운송 의뢰와 판매·물류 흐름을 운영합니다.
-                            </MudText>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => SelectRole(SsalddelClientRole.Shipper))">
-                                화주로 시작
-                            </MudButton>
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-                        <MudStack Spacing="2" Class="h-100">
-                            <MudIcon Icon="@Icons.Material.Filled.Warehouse" Color="Color.Success" Size="Size.Large" />
-                            <MudText Typo="Typo.h6">창고 관리자</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="flex-grow-1">
-                                입고·출고·판매·운송을 연결해 운영합니다.
-                            </MudText>
-                            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(() => SelectRole(SsalddelClientRole.WarehouseManager))">
-                                창고 관리로 시작
-                            </MudButton>
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
-        </MudStack>
-    </WorkModeContent>
-</PlatformCommunityHome>
+        <nav class="common-mobile-home__destinations" aria-label="살뜰 공통 탐색">
+            <a href="@CommunityPageRoutes.Home">
+                <span class="common-mobile-home__icon common-mobile-home__icon--community">
+                    <MudIcon Icon="@Icons.Material.Filled.GridView" />
+                </span>
+                <span>
+                    <strong>공개 커뮤니티</strong>
+                    <small>생활 이야기와 관심을 나누는 출발점</small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+            </a>
+            <a href="@CommunityPageRoutes.Regions">
+                <span class="common-mobile-home__icon common-mobile-home__icon--region">
+                    <MudIcon Icon="@Icons.Material.Filled.TravelExplore" />
+                </span>
+                <span>
+                    <strong>지역 문화·특산물</strong>
+                    <small>미국의 주와 중국의 지역을 문화부터 탐색</small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+            </a>
+            <a href="@ShipperRoutes.PublicDataInformation">
+                <span class="common-mobile-home__icon common-mobile-home__icon--data">
+                    <MudIcon Icon="@Icons.Material.Filled.QueryStats" />
+                </span>
+                <span>
+                    <strong>공공데이터</strong>
+                    <small>가격·수입식품·농수산물 근거 확인</small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+            </a>
+        </nav>
+    </section>
+
+    <aside class="common-mobile-home__boundary">
+        <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" />
+        <span>
+            <strong>둘러보는 것만으로 참여나 주문이 만들어지지 않습니다.</strong>
+            관심, 참여, 연락처 공개와 실제 실행은 각각 따로 선택합니다.
+        </span>
+    </aside>
+
+    <section class="common-mobile-home__section" aria-labelledby="common-home-role-title">
+        <header>
+            <span>일이 필요할 때</span>
+            <h2 id="common-home-role-title">업무 역할 선택</h2>
+            <p>역할은 업무 화면만 바꾸며 커뮤니티의 가입·노출·신뢰 기준으로 사용하지 않습니다.</p>
+        </header>
+
+        <div class="common-mobile-home__roles">
+            <button type="button" @onclick="@(() => SelectRole(SsalddelClientRole.Shipper))">
+                <span class="common-mobile-home__icon common-mobile-home__icon--shipper">
+                    <MudIcon Icon="@Icons.Material.Filled.LocalShipping" />
+                </span>
+                <span>
+                    <strong>화주·판매자</strong>
+                    <small>운송 의뢰와 판매·물류 흐름</small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+            </button>
+            <button type="button" @onclick="@(() => SelectRole(SsalddelClientRole.WarehouseManager))">
+                <span class="common-mobile-home__icon common-mobile-home__icon--warehouse">
+                    <MudIcon Icon="@Icons.Material.Filled.Warehouse" />
+                </span>
+                <span>
+                    <strong>창고 관리자</strong>
+                    <small>입고·출고·재고와 배송 운영</small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+            </button>
+        </div>
+    </section>
+</main>
 
 @code {
     private void SelectRole(SsalddelClientRole role)
