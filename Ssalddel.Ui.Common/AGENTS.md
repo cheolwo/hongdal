@@ -12,6 +12,7 @@
 ## 사용자 경험과 검증
 
 - 모바일 목록은 넓은 table보다 compact card와 detail 전환을 우선한다.
+- Figma `01 Community`와 `SsalddelApp` MAUI 화면은 [Figma-MAUI 호환성 정책](../docs/Architecture/FigmaMauiCompatibilityPolicy.md)을 따른다. 화면 구조·토큰·route·상태가 바뀌면 같은 작업에서 양쪽 대응과 실제 렌더를 확인한다.
 - 초기 필수 데이터를 먼저 표시하고 loading, empty, error, retry, disabled 상태를 제공한다.
 - desktop/mobile에서 텍스트 잘림, 겹침, 터치 영역, 고정 navigation, drawer, dialog, diagram 연결선을 확인한다.
 - 시각 변경은 실제 렌더링으로 검증하고 개인정보·주소·연락처·계좌·결제 식별자·위치·증빙 원본은 마스킹한다.
