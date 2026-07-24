@@ -4,15 +4,15 @@
 @inject GroupPurchaseWishBatchViewModel WishBatch
 @inject 주문자앱인증ViewModel Authentication
 
-<PageTitle>여러 재료 원함 등록</PageTitle>
+<PageTitle>개별주문 의향 등록</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
     <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.WishCreate"
-                              Eyebrow="주문자 업무 · 02.03"
-                              Title="여러 재료 원함 등록"
-                              Description="한 품목으로 제한하지 않고 재료별 희망 수량을 기록합니다."
+                              Eyebrow="0.5 개별주문 · 02.03"
+                              Title="개별주문 의향 등록"
+                              Description="커뮤니티에서 발견한 필요를 재료별 독립 원장과 희망 수량으로 기록합니다."
                               BackHref="@GroupPurchasePageRoutes.ProductsRoot"
-                              BoundaryMessage="저장 결과는 비구속 원함입니다. 결제·주문·계약·수입·운송을 실행하지 않으며 국제운송 방식도 고정하지 않습니다.">
+                              BoundaryMessage="저장 결과는 철회 가능한 개별주문 의향입니다. 공동주문·결제·계약·수입·운송을 자동 실행하지 않습니다.">
         @if (Authentication.처리중 && !Authentication.초기화됨)
         {
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
@@ -22,13 +22,13 @@
         }
         else if (!Authentication.로그인됨)
         {
-            <Ssalddel공통로그인Panel 제목="내 원함 저장 로그인"
-                                 설명="재료 선택은 공개입니다. 여러 재료의 개별 원함을 내 원장으로 저장할 때만 로그인합니다."
+            <Ssalddel공통로그인Panel 제목="내 개별주문 저장 로그인"
+                                 설명="재료 선택은 공개입니다. 내 개별주문 의향 원장을 저장할 때만 로그인합니다."
                                  상태메시지="@Authentication.오류메시지"
                                  상태Severity="@(Authentication.오류발생 ? Severity.Error : Severity.Info)"
                                  일반로그인표시="true"
                                  소셜로그인표시="false"
-                                 일반로그인버튼텍스트="로그인하고 원함 저장"
+                                 일반로그인버튼텍스트="로그인하고 개별주문 저장"
                                  IsBusy="@Authentication.처리중"
                                  Elevation="0"
                                  OnPasswordLogin="LoginAsync" />

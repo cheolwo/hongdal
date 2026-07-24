@@ -1,18 +1,18 @@
 @page "/group-purchase/wishes"
 @using Ssalddel.Contracts.Common.Orderer
 
-<PageTitle>내 공동구매 원함</PageTitle>
+<PageTitle>내 개별주문</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="py-4 px-0">
     <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.WishList"
-                              Eyebrow="INDIVIDUAL FIRST · 1.0"
-                              Title="내 원함"
-                              Description="재료별 개별 원함을 먼저 보존하고, 내가 동의해 남긴 원함이 어떤 공동 진행으로 이어졌는지 확인합니다."
+                              Eyebrow="INDIVIDUAL FIRST · 0.5"
+                              Title="내 개별주문"
+                              Description="커뮤니티App과 같은 개별주문 의향 원장을 보고, 동의한 주문이 1.0 공동주문 후보로 이어진 상태를 확인합니다."
                               BackHref="@GroupPurchasePageRoutes.Root"
-                              BoundaryMessage="원함은 비구속 구매 의향입니다. 수량 변경과 철회가 가능하며 결제·주문·계약·수입·운송을 자동 실행하지 않습니다.">
-        <GroupPurchaseOrdererAccessGate LoginTitle="내 원함 로그인"
-                                        LoginDescription="본인이 저장한 원함과 연결 진행만 보려면 로그인해 주세요."
-                                        LoginButtonText="로그인하고 내 원함 보기">
+                              BoundaryMessage="개별주문 의향은 수정·철회할 수 있습니다. 공동주문 후보 연결과 결제·계약·수입·운송 실행은 각각 별도 확인이 필요합니다.">
+        <GroupPurchaseOrdererAccessGate LoginTitle="내 개별주문 로그인"
+                                        LoginDescription="본인이 저장한 개별주문과 연결 진행만 보려면 로그인해 주세요."
+                                        LoginButtonText="로그인하고 내 개별주문 보기">
             <Authorized>
                 <GroupPurchaseMyWishesScreen />
             </Authorized>

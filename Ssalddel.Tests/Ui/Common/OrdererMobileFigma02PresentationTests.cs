@@ -43,10 +43,10 @@ public sealed class OrdererMobileFigma02PresentationTests
 
         Assert.Contains("orderer-mobile-shell__appbar", source);
         Assert.Contains("orderer-mobile-shell__bottom-nav", source);
-        Assert.Contains("공동구매 · 주문", source);
+        Assert.Contains("개별주문 → 공동주문", source);
         Assert.Contains(">홈</span>", source);
         Assert.Contains(">재료</span>", source);
-        Assert.Contains(">원함</span>", source);
+        Assert.Contains(">내 주문</span>", source);
         Assert.Contains(">원장</span>", source);
     }
 
@@ -64,7 +64,7 @@ public sealed class OrdererMobileFigma02PresentationTests
         Assert.Contains("OrdererRoutes.Mart", source);
         Assert.Contains("OrdererRoutes.GroupPurchaseProducts", source);
         Assert.Contains("OrdererRoutes.Orders", source);
-        Assert.Contains("원함과 실행은 분리됩니다.", source);
+        Assert.Contains("개별주문과 공동 실행은 분리됩니다.", source);
     }
 
     [Theory]

@@ -13,7 +13,7 @@
         </button>
         <a class="orderer-mobile-shell__brand" href="@OrdererRoutes.Home">살뜰 주문</a>
         <span class="orderer-mobile-shell__spacer"></span>
-        <span class="orderer-mobile-shell__scope">공동구매 · 주문</span>
+        <span class="orderer-mobile-shell__scope">개별주문 → 공동주문</span>
         <span class="orderer-mobile-shell__avatar" aria-label="주문자">O</span>
     </header>
 
@@ -27,7 +27,7 @@
             <header>
                 <div>
                     <strong>살뜰 주문</strong>
-                    <span>원함에서 원장까지</span>
+                    <span>내 주문에서 함께 주문까지</span>
                 </div>
                 <button type="button" aria-label="메뉴 닫기" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
@@ -44,15 +44,15 @@
                 </a>
                 <a href="@OrdererRoutes.GroupPurchaseWishCreate" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" />
-                    여러 재료 원함 등록
+                    개별주문 의향 등록
                 </a>
                 <a href="@OrdererRoutes.GroupPurchaseWishes" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.FavoriteBorder" />
-                    내 원함
+                    내 개별주문
                 </a>
                 <a href="@OrdererRoutes.GroupPurchaseGroups" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.GroupWork" />
-                    주문자 집단
+                    공동주문 후보
                 </a>
                 <a href="@OrdererRoutes.Orders" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" />
@@ -69,7 +69,7 @@
             </nav>
             <aside>
                 <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
-                원함과 집단은 비구속 상태이며, 결제·계약·수입 실행과 분리됩니다.
+                개별주문 의향과 공동주문 후보는 비구속 상태이며, 결제·계약·수입 실행과 분리됩니다.
             </aside>
         </aside>
     }
@@ -95,7 +95,7 @@
            href="@OrdererRoutes.GroupPurchaseWishes"
            aria-current="@(IsBottomDestinationActive(BottomDestination.Wishes) ? "page" : null)">
             <MudIcon Icon="@Icons.Material.Filled.FavoriteBorder" Size="Size.Small" />
-            <span>원함</span>
+            <span>내 주문</span>
         </a>
         <a class="@BuildBottomLinkClass(BottomDestination.Ledgers)"
            href="@OrdererRoutes.Orders"
