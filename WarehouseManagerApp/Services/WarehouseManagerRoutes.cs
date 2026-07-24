@@ -46,7 +46,9 @@ public static class WarehouseManagerRoutes
     public const string MartInboundWorkStart = "/mart/work/mart-inbound";
     public const string MartReplenishmentWorkStart = "/mart/work/mart-replenishment";
     public const string MartPickingWorkStart = "/mart/work/mart-picking";
-    public const string MartPickingPacking = "/mart/picking";
+    public const string MartPickingPacking = Ssalddel.Contracts.Common.Mart.MartPickingPageRoutes.AppRoot;
+    public static string MartPickingOrderDetail(long orderId)
+        => Ssalddel.Contracts.Common.Mart.MartPickingPageRoutes.AppDetailFor(orderId);
     public const string MartDeliveryPickupWorkStart = "/mart/work/mart-delivery-pickup";
     public const string MartWorkBoard = "/mart/work-board";
 

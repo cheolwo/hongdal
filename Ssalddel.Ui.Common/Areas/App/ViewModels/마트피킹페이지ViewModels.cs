@@ -140,23 +140,24 @@ public sealed class 마트피킹작업PageViewModel : 조립ViewModelBase
     public 마트피킹주문상세ViewModel 상세 { get; }
     public bool 처리중 => 목록.처리중 || 상세.처리중;
 
+    public Task<bool> 목록초기화Async(CancellationToken cancellationToken = default)
+    {
+        상세.선택해제();
+        return 목록.조회Async(cancellationToken);
+    }
+
+    public Task<bool> 상세초기화Async(
+        long orderId,
+        CancellationToken cancellationToken = default)
+        => 상세.조회Async(orderId, cancellationToken);
+
     public async Task<bool> 초기화Async(
         long? orderId,
         CancellationToken cancellationToken = default)
     {
-        var listLoaded = await 목록.조회Async(cancellationToken);
-        if (!listLoaded)
-        {
-            return false;
-        }
-
-        if (orderId is > 0)
-        {
-            return await 상세.조회Async(orderId.Value, cancellationToken);
-        }
-
-        상세.선택해제();
-        return true;
+        return orderId is > 0
+            ? await 상세초기화Async(orderId.Value, cancellationToken)
+            : await 목록초기화Async(cancellationToken);
     }
 
     public void 결과초기화()

@@ -1,13 +1,12 @@
-@page "/mart/picking"
+@page "/mart/picking/orders/{OrderId:long}"
 @inherits MvvmComponentBase<마트피킹포장PageViewModel>
-@inject NavigationManager Navigation
 
-<PageTitle>알뜰살뜰 마트 피킹/포장 조회</PageTitle>
+<PageTitle>알뜰살뜰 마트 피킹/포장 주문 상세</PageTitle>
 
 <WarehousePageShell Model="@ViewModel"
-                    Title="알뜰살뜰 마트 피킹/포장"
-                    Description="접근 가능한 영속 마트 주문과 피킹·포장 작업을 조회합니다."
-                    Icon="@Icons.Material.Filled.Inventory2"
+                    Title="마트 피킹/포장 주문 상세"
+                    Description="주소에 지정한 영속 마트 주문 한 건과 접근 가능한 작업만 조회합니다."
+                    Icon="@Icons.Material.Filled.FactCheck"
                     Color="Color.Primary">
     <Actions>
         @if (ViewModel.기능사용가능 && ViewModel.인증.창고업무접근가능)
@@ -16,18 +15,11 @@
                 <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">
                     @ViewModel.인증.현재사용자표시
                 </MudChip>
-                <MudTooltip Text="마트 피킹 주문 다시 조회">
-                    <MudIconButton Icon="@Icons.Material.Filled.Refresh"
-                                   Color="Color.Default"
-                                   Disabled="@ViewModel.처리중"
-                                   OnClick="RefreshAsync"
-                                   aria-label="마트 피킹 주문 다시 조회" />
-                </MudTooltip>
-                <MudButton Href="@WarehouseManagerRoutes.MartHome"
+                <MudButton Href="@WarehouseManagerRoutes.MartPickingPacking"
                            Variant="Variant.Outlined"
                            Color="Color.Default"
-                           StartIcon="@Icons.Material.Filled.Storefront">
-                    마트 홈
+                           StartIcon="@Icons.Material.Filled.ArrowBack">
+                    주문 목록
                 </MudButton>
             </MudStack>
         }
@@ -39,7 +31,7 @@
                 <MudStack AlignItems="AlignItems.Center" Spacing="2">
                     <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        마트 기능, 창고 권한과 영속 피킹 작업을 확인하고 있습니다.
+                        마트 기능, 창고 권한과 주문 #@OrderId 을 확인하고 있습니다.
                     </MudText>
                 </MudStack>
             </MudPaper>
@@ -58,13 +50,8 @@
         else if (!ViewModel.기능사용가능)
         {
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                <MudStack Spacing="1">
-                    <MudText Typo="Typo.subtitle1">마트 피킹 조회가 비활성입니다.</MudText>
-                    <MudText Typo="Typo.body2">@ViewModel.기능안내</MudText>
-                    <MudText Typo="Typo.caption">
-                        <code>SsalddelMartWorkflow</code>가 활성화된 환경에서만 서버 작업 원장을 조회합니다.
-                    </MudText>
-                </MudStack>
+                <MudText Typo="Typo.subtitle1">마트 피킹 조회가 비활성입니다.</MudText>
+                <MudText Typo="Typo.body2">@ViewModel.기능안내</MudText>
             </MudAlert>
         }
         else if (!ViewModel.인증.창고업무접근가능)
@@ -75,19 +62,17 @@
         }
         else
         {
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Visibility">
-                Beta/ReadOnly 페이지입니다. 서버 성공 응답 없이 피킹 수량, 포장 또는 출고 상태를 바꾸는 동작은 제공하지 않습니다.
-            </MudAlert>
-
-            <SsalddelMartPickingOrderList Model="@ViewModel.작업조회.목록"
-                                          WorkBoardUrl="@WarehouseManagerRoutes.MartWorkBoard"
-                                          OnOrderSelected="OpenOrderAsync" />
+            <SsalddelMartPickingOrderDetail Model="@ViewModel.작업조회.상세"
+                                            BackUrl="@WarehouseManagerRoutes.MartPickingPacking" />
         }
     </ChildContent>
 </WarehousePageShell>
 
 @code {
-    private bool _loaded;
+    private long? _loadedOrderId;
+
+    [Parameter]
+    public long OrderId { get; set; }
 
     protected override void OnInitialized()
     {
@@ -100,13 +85,13 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_loaded)
+        if (_loadedOrderId == OrderId)
         {
             return;
         }
 
-        _loaded = true;
-        await ViewModel.초기화Async(null);
+        _loadedOrderId = OrderId;
+        await ViewModel.초기화Async(OrderId);
     }
 
     private async Task AfterAuthenticationAsync()
@@ -115,15 +100,6 @@
     private void OnLoggedOut()
         => ViewModel.인증해제적용();
 
-    private async Task RefreshAsync()
-        => await ViewModel.다시조회Async();
-
     private async Task RetryPageAsync()
-        => await ViewModel.초기화Async(null);
-
-    private Task OpenOrderAsync(long orderId)
-    {
-        Navigation.NavigateTo(WarehouseManagerRoutes.MartPickingOrderDetail(orderId));
-        return Task.CompletedTask;
-    }
+        => await ViewModel.초기화Async(OrderId);
 }

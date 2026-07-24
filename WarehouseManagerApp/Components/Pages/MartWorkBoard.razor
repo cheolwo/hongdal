@@ -1,217 +1,26 @@
 @page "/mart/work-board"
 
-@inherits MvvmComponentBase<마트주문처리PageViewModel>
-
-<PageTitle>알뜰살뜰 마트 작업 보드</PageTitle>
+<PageTitle>알뜰살뜰 마트 업무 흐름</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
     <MudStack Spacing="3">
         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">알뜰살뜰 마트 작업 보드</MudText>
+                <MudText Typo="Typo.h4">알뜰살뜰 마트 업무 흐름</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    음식점 주문 보드처럼 빠르게 보되, 기준 데이터는 창고 재고, 피킹 위치, 포장 완료, 배달 기사 픽업입니다.
+                    샘플 현황 대신 각 단계의 서버 원장 화면으로 이동하는 읽기 전용 허브입니다.
                 </MudText>
             </MudStack>
             <MudButton Href="@WarehouseManagerRoutes.MartHome"
                        Variant="Variant.Outlined"
                        Color="Color.Default"
                        StartIcon="@Icons.Material.Filled.Storefront">
-                알뜰살뜰 마트 홈
-            </MudButton>
-            <MudButton Href="@WarehouseManagerRoutes.MartPickingPacking"
-                       Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
-                피킹/포장 작업
+                마트 홈
             </MudButton>
         </MudStack>
 
-        <MudGrid>
-            @foreach (var summary in Summaries)
-            {
-                <MudItem xs="6" md="3">
-                    <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
-                        <MudStack Spacing="1">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">@summary.Label</MudText>
-                            <MudText Typo="Typo.h5">@summary.Value</MudText>
-                            <MudText Typo="Typo.body2" Color="@summary.Color">@summary.Note</MudText>
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            }
-        </MudGrid>
-
-        <MudGrid>
-            @foreach (var lane in Lanes)
-            {
-                <MudItem xs="12" lg="3">
-                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.h6">@lane.Title</MudText>
-                                <MudChip T="string" Size="Size.Small" Color="@lane.Color" Variant="Variant.Outlined">@($"{lane.Count}건")</MudChip>
-                            </MudStack>
-
-                            @foreach (var item in lane.Items)
-                            {
-                                <MudPaper Class="pa-3" Elevation="0" Outlined="true">
-                                    <MudStack Spacing="1">
-                                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                            <MudText Typo="Typo.subtitle2">@item.Title</MudText>
-                                            <MudChip T="string" Size="Size.Small" Color="@item.Color">@item.Status</MudChip>
-                                        </MudStack>
-
-                                        <SsalddelSensitiveDisclosureList Title="작업 관계와 상세"
-                                                                        Summary="@item.Description"
-                                                                        RelatedParties="@item.RelatedParties"
-                                                                        PrivacyHint="고객, 작업자, 배달 기사 관련 정보는 필요한 범위에서 단계적으로 확인합니다."
-                                                                        Icon="@item.Icon"
-                                                                        Color="@item.Color"
-                                                                        Compact="true">
-                                            <MudExpansionPanel Text="작업 정보" Icon="@Icons.Material.Filled.Assignment">
-                                                <SsalddelSensitiveInfoRow Label="작업" Value="@item.Title" />
-                                                <SsalddelSensitiveInfoRow Label="상태" Value="@item.Status" />
-                                                <SsalddelSensitiveInfoRow Label="마감" Value="@item.Deadline" />
-                                            </MudExpansionPanel>
-                                            <MudExpansionPanel Text="직접 관련 대상" Icon="@Icons.Material.Filled.Group">
-                                                <SsalddelSensitiveInfoRow Label="관련 대상" Value="@item.RelatedParties" />
-                                                <SsalddelSensitiveInfoRow Label="후속 연락" Value="@item.ContactContext" />
-                                                <SsalddelSensitiveInfoRow Label="관계 기록" Value="피킹, 포장, 픽업 완료 시 실제로 함께 처리한 사람과의 업무 관계 후보가 됩니다." />
-                                            </MudExpansionPanel>
-                                        </SsalddelSensitiveDisclosureList>
-
-                                        <MudText Typo="Typo.caption">@item.Deadline</MudText>
-                                    </MudStack>
-                                </MudPaper>
-                            }
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            }
-        </MudGrid>
+        <SsalddelMartWarehouseWorkflowHub ExpectedInboundsUrl="@WarehouseManagerRoutes.ExpectedInbounds"
+                                          InventoryUrl="@WarehouseManagerRoutes.GeneralInventory"
+                                          PickingUrl="@WarehouseManagerRoutes.MartPickingPacking" />
     </MudStack>
 </MudContainer>
-
-@code {
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        if (!string.Equals(ViewModel.세션.운영ProfileCode, 창고운영ProfileCodes.마트도심, StringComparison.OrdinalIgnoreCase))
-        {
-            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.마트도심);
-        }
-    }
-
-    private static readonly IReadOnlyList<BoardSummary> Summaries =
-    [
-        new("오늘 주문", "128", "마감 전 42건", Color.Primary),
-        new("포장 대기", "18", "피킹 완료 후 포장 필요", Color.Warning),
-        new("보충 필요", "14", "냉장 5 / 상온 9", Color.Info),
-        new("배달 픽업", "23", "30분 내 도착 8건", Color.Success)
-    ];
-
-    private static readonly IReadOnlyList<MartLane> Lanes =
-    [
-        new("입고/보충", Color.Warning,
-        [
-            new(
-                "신선 입고 확인",
-                "우유/샐러드 18박스 검수 대기",
-                "대기",
-                "10:20 이전",
-                Color.Warning,
-                Icons.Material.Filled.MoveToInbox,
-                "도심 입고 담당자 · 공급사 · 마트 재고 관리자 · 피킹 담당자",
-                "검수 차이가 있으면 공급사와 마트 재고 관리자에게 확인합니다."),
-            new(
-                "상온 보충",
-                "라면/생수 피킹존 보충 필요",
-                "진행",
-                "10:45 이전",
-                Color.Info,
-                Icons.Material.Filled.Warehouse,
-                "보충 담당자 · 재고 관리자 · 피킹 담당자",
-                "피킹존 위치나 수량이 맞지 않으면 재고 관리자에게 확인합니다.")
-        ]),
-        new("주문 피킹", Color.Primary,
-        [
-            new(
-                "MART-2401",
-                "3개 항목, 대체 후보 1건",
-                "피킹",
-                "11:00 마감",
-                Color.Primary,
-                Icons.Material.Filled.ShoppingBasket,
-                "피킹 담당자 · 주문자 · 포장 담당자 · 고객 응대 담당자",
-                "대체 상품이 필요하면 고객 응대 담당자와 주문자 확인으로 이어집니다."),
-            new(
-                "MART-2402",
-                "냉장 2개, 상온 4개",
-                "대기",
-                "11:10 마감",
-                Color.Default,
-                Icons.Material.Filled.ShoppingBasket,
-                "피킹 담당자 · 주문자 · 포장 담당자",
-                "냉장/상온 분리 포장 기준을 포장 담당자와 확인합니다.")
-        ]),
-        new("포장 완료", Color.Secondary,
-        [
-            new(
-                "냉장 묶음 검수",
-                "음식 배달 기사 A-12 배정 예정",
-                "검토",
-                "10:55 이전",
-                Color.Secondary,
-                Icons.Material.Filled.Inventory,
-                "포장 담당자 · 피킹 담당자 · 배달 기사 A-12 · 주문자",
-                "포장 상태 또는 누락 이슈가 있으면 피킹 담당자와 배달 기사에게 확인합니다."),
-            new(
-                "일반 묶음 라벨",
-                "고객 배송 라벨 재출력 필요",
-                "확인",
-                "11:05 이전",
-                Color.Warning,
-                Icons.Material.Filled.Print,
-                "포장 담당자 · 고객 응대 담당자 · 배달 기사 · 주문자",
-                "주소나 라벨 오류가 있으면 고객 응대 담당자와 확인합니다.")
-        ]),
-        new("배달 기사 픽업", Color.Success,
-        [
-            new(
-                "RIDER-73",
-                "근거리 4건 묶음 픽업",
-                "도착",
-                "10:50",
-                Color.Success,
-                Icons.Material.Filled.DeliveryDining,
-                "픽업 담당자 · 배달 기사 RIDER-73 · 주문자 4명 · 포장 담당자",
-                "픽업 수량이나 전달 누락이 있으면 포장 담당자와 배달 기사에게 확인합니다."),
-            new(
-                "RIDER-81",
-                "아파트 단지 3건 묶음",
-                "예정",
-                "11:20",
-                Color.Info,
-                Icons.Material.Filled.DeliveryDining,
-                "픽업 담당자 · 배달 기사 RIDER-81 · 주문자 3명",
-                "묶음 배송 순서나 지연 이슈가 있으면 배달 기사와 확인합니다.")
-        ])
-    ];
-
-    private sealed record BoardSummary(string Label, string Value, string Note, Color Color);
-    private sealed record MartLane(string Title, Color Color, IReadOnlyList<MartWorkItem> Items)
-    {
-        public int Count => Items.Count;
-    }
-
-    private sealed record MartWorkItem(
-        string Title,
-        string Description,
-        string Status,
-        string Deadline,
-        Color Color,
-        string Icon,
-        string RelatedParties,
-        string ContactContext);
-}

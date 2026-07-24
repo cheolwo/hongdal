@@ -1,0 +1,84 @@
+<MudStack Spacing="3" data-testid="ssalddel-mart-warehouse-workflow-hub">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Info">
+        주문 → 재고 확인 → 피킹·포장 조회 순서로 확인합니다. 포장 완료 뒤 배달 기사 인계는 전용 영속 화면이 준비되기 전까지 실행하지 않습니다.
+    </MudAlert>
+
+    <MudGrid>
+        <MudItem xs="12" md="6" xl="3">
+            <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Filled.MoveToInbox" Color="Color.Warning" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">1. 입고 예정</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        현재 계정이 접근할 수 있는 실제 입고 예정 원장을 조회합니다.
+                    </MudText>
+                    @if (string.IsNullOrWhiteSpace(ExpectedInboundsUrl))
+                    {
+                        <MudButton Disabled="true" Variant="Variant.Outlined" Color="Color.Default">
+                            현재 앱 미지원
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Href="@ExpectedInboundsUrl" Variant="Variant.Outlined" Color="Color.Warning">
+                            입고 예정 보기
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6" xl="3">
+            <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">2. 가용 재고</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        창고 접근 범위의 최소 재고와 입고 근거를 읽기 전용으로 확인합니다.
+                    </MudText>
+                    <MudButton Href="@InventoryUrl" Variant="Variant.Outlined" Color="Color.Info">
+                        재고 현황 보기
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6" xl="3">
+            <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingCartCheckout" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">3. 피킹·포장</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        주문 목록과 정확한 주문 상세를 서로 다른 화면에서 조회합니다.
+                    </MudText>
+                    <MudButton Href="@PickingUrl" Variant="Variant.Filled" Color="Color.Primary">
+                        피킹 주문 보기
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6" xl="3">
+            <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Filled.DeliveryDining" Color="Color.Secondary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">4. 배달 기사 인계</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        포장 완료 검증과 기사 인계 원장이 연결된 뒤 별도 화면으로 제공합니다.
+                    </MudText>
+                    <MudButton Disabled="true" Variant="Variant.Outlined" Color="Color.Default">
+                        준비 중
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+@code {
+    [Parameter]
+    public string? ExpectedInboundsUrl { get; set; }
+
+    [Parameter, EditorRequired]
+    public string InventoryUrl { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string PickingUrl { get; set; } = string.Empty;
+}

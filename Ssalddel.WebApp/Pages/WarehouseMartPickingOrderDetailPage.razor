@@ -1,12 +1,11 @@
-@page "/warehouse/mart/picking"
-@page "/mart/picking"
+@page "/warehouse/mart/picking/orders/{OrderId:long}"
+@page "/mart/picking/orders/{OrderId:long}"
 @inherits MvvmComponentBase<마트피킹작업PageViewModel>
 @inject WebAuthSessionService AuthSession
-@inject NavigationManager Navigation
 
 <WebPageHeader Eyebrow="Warehouse Web"
-               Title="알뜰살뜰 마트 피킹/포장"
-               Description="접근 가능한 영속 마트 주문과 피킹·포장 작업을 조회합니다."
+               Title="마트 피킹/포장 주문 상세"
+               Description="주소에 지정한 영속 마트 주문 한 건과 접근 가능한 작업만 조회합니다."
                Badge="Beta · ReadOnly" />
 
 @if (!AuthSession.IsLoggedIn)
@@ -29,7 +28,7 @@ else if (_initializing)
     <MudPaper Elevation="0" Outlined="true" Class="pa-6">
         <MudStack AlignItems="AlignItems.Center" Spacing="2">
             <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
-            <MudText Typo="Typo.body2" Color="Color.Secondary">마트 피킹 작업을 조회하고 있습니다.</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">주문 #@OrderId 상세를 조회하고 있습니다.</MudText>
         </MudStack>
     </MudPaper>
 }
@@ -44,19 +43,17 @@ else if (!string.IsNullOrWhiteSpace(_pageError))
 }
 else
 {
-    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-        서버 원본을 읽는 Beta/ReadOnly 화면입니다. 피킹·포장·출고 상태는 이 페이지에서 변경하지 않습니다.
-    </MudAlert>
-
-    <SsalddelMartPickingOrderList Model="@ViewModel.목록"
-                                  WorkBoardUrl="@WarehouseManagerRoutes.MartWorkBoard"
-                                  OnOrderSelected="OpenOrderAsync" />
+    <SsalddelMartPickingOrderDetail Model="@ViewModel.상세"
+                                    BackUrl="@WarehouseManagerRoutes.MartPickingPacking" />
 }
 
 @code {
     private bool _initializing;
-    private bool _loaded;
+    private long? _loadedOrderId;
     private string? _pageError;
+
+    [Parameter]
+    public long OrderId { get; set; }
 
     protected override void OnInitialized()
     {
@@ -66,7 +63,7 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (AuthSession.IsLoggedIn && !_loaded)
+        if (AuthSession.IsLoggedIn && _loadedOrderId != OrderId)
         {
             await LoadAsync();
         }
@@ -84,7 +81,7 @@ else
             {
                 ViewModel.결과초기화();
                 _pageError = null;
-                _loaded = false;
+                _loadedOrderId = null;
             }
 
             StateHasChanged();
@@ -93,7 +90,7 @@ else
 
     private async Task LoadAsync(bool force = false)
     {
-        if (_initializing || (!force && _loaded))
+        if (_initializing || (!force && _loadedOrderId == OrderId))
         {
             return;
         }
@@ -102,13 +99,13 @@ else
         _pageError = null;
         try
         {
-            var succeeded = await ViewModel.목록초기화Async();
+            var succeeded = await ViewModel.상세초기화Async(OrderId);
             if (!succeeded)
             {
-                _pageError = ViewModel.목록.오류메시지 ?? "마트 피킹 주문 목록을 조회하지 못했습니다.";
+                _pageError = ViewModel.상세.오류메시지 ?? "마트 피킹 주문 상세를 조회하지 못했습니다.";
             }
 
-            _loaded = true;
+            _loadedOrderId = OrderId;
         }
         finally
         {
@@ -117,12 +114,6 @@ else
     }
 
     private Task RetryAsync() => LoadAsync(force: true);
-
-    private Task OpenOrderAsync(long orderId)
-    {
-        Navigation.NavigateTo(WarehouseManagerRoutes.MartPickingOrderDetail(orderId));
-        return Task.CompletedTask;
-    }
 
     protected override void Dispose(bool disposing)
     {
