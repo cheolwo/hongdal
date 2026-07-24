@@ -232,6 +232,8 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
                         RoutePattern = CombineRoutes(controllerRoute, httpAttribute.Template),
                         ProductVersionCode = actionVersion?.Version.ToString() ?? string.Empty,
                         ProductVersionName = actionVersion?.VersionLabel ?? string.Empty,
+                        ProductName = actionVersion?.ProductName ?? string.Empty,
+                        ProductVersionDisplayName = actionVersion?.VersionDisplayName ?? string.Empty,
                         FeatureKey = featureKey ?? string.Empty,
                         IsEnabled = string.IsNullOrWhiteSpace(featureKey)
                             || flags.TryGetValue(featureKey, out var enabled) && enabled,

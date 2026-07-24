@@ -157,6 +157,7 @@ namespace 살뜰.Data
         public DbSet<PlatformCommunityPostAttachmentComment> PlatformCommunityPostAttachmentComments { get; set; } = null!;
         public DbSet<PlatformCommunityPostComment> PlatformCommunityPostComments { get; set; } = null!;
         public DbSet<PlatformCommunityPostRecommendation> PlatformCommunityPostRecommendations { get; set; } = null!;
+        public DbSet<CommunityPostEmailNotificationOutbox> CommunityPostEmailNotificationOutbox { get; set; } = null!;
         public DbSet<CommunityKeywordSubscription> CommunityKeywordSubscriptions { get; set; } = null!;
         public DbSet<PlatformCommunityPostKeywordScan> PlatformCommunityPostKeywordScans { get; set; } = null!;
         public DbSet<CommunityKeywordNotification> CommunityKeywordNotifications { get; set; } = null!;

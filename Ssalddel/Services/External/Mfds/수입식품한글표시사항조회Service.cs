@@ -1,8 +1,17 @@
 using System.Globalization;
 using Microsoft.Extensions.Options;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace 살뜰.Services.External.Mfds;
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.ImportedFoodKoreanLabelIntegration,
+    SsalddelCodeLayer.ExternalAdapter,
+    "식품의약품안전처 수입식품 제품별 한글표시사항 OpenAPI를 호출하고 공식 응답을 변환합니다.",
+    Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.ThirdPartyApiCall,
+    ContractType = typeof(I수입식품한글표시사항조회Service),
+    FlowOrder = 30,
+    Boundary = "공식 자료 조회 결과이며 수입 적합성·표시 적법성 판정이나 신고 제출을 수행하지 않습니다.")]
 public sealed class 수입식품한글표시사항조회Service : I수입식품한글표시사항조회Service
 {
     private readonly HttpClient _httpClient;

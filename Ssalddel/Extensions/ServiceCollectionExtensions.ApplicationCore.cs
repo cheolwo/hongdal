@@ -47,7 +47,7 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Command후처리Behavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CommunityActivityCommandPostBehavior<,>));
-        services.AddScoped(typeof(INotificationHandler<>), typeof(CommunityActivityEventPostHandler<>));
+        services.AddScoped(typeof(INotificationHandler<>), typeof(CommunityActivityEventPostEventHandler<>));
 
         services.AddSsalddelInfrastructure();
         services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();

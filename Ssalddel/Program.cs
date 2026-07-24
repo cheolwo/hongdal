@@ -92,7 +92,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
     }
 });
 
-builder.Services.AddSsalddelPresentation();
+builder.Services.AddSsalddelPresentation(builder.Configuration, builder.Environment);
 builder.Services.AddSsalddelApplicationCore();
 builder.Services.AddCors(options =>
 {
@@ -152,6 +152,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     })
     .AddEntityFrameworkStores<SsalddelContext>()
     .AddDefaultTokenProviders();
@@ -211,7 +214,7 @@ builder.Services.AddAgriculturalFisheriesInformationModule();
 builder.Services.AddSsalddelHttpClients();
 builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
 builder.Services.AddApifySocialMediaResearch(builder.Configuration);
-builder.Services.AddApifyYouTubeTranscriptResearch(builder.Configuration);
+builder.Services.AddApifyYouTubeContentCollection(builder.Configuration);
 builder.Services.AddFreeSocialMediaResearch(builder.Configuration);
 builder.Services.AddYouTubeSocialContextWorkspace(builder.Configuration);
 builder.Services.AddSsalddelDomainServices();
@@ -762,6 +765,8 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
+app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseCors(CustomsWebCorsPolicy);
 app.UseAuthorization();

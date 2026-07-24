@@ -257,7 +257,7 @@ function Show-FailureSummary {
             "error [A-Z]{2,}[0-9]+",
             "Build FAILED",
             "Failed!",
-            "실패",
+            [regex]::Escape("실패"),
             "Exception"
         ) -Encoding UTF8 |
             Select-Object -First 30 |

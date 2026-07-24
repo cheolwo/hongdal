@@ -1,0 +1,11 @@
+{
+  "name": "ssalddel-browser-e2e",
+  "private": true,
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.54.1",
+    "serve": "14.2.4"
+  }
+}

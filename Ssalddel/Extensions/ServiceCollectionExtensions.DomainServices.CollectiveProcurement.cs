@@ -16,6 +16,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I주문자집단자동배정Service, 주문자집단자동배정Service>();
         services.AddSingleton<I공동구매물류워크플로우저장소, Mongo공동구매물류워크플로우저장소>();
         services.AddSingleton<I공동구매주문자집단화Engine, 공동구매주문자집단화Engine>();
+        services.AddSingleton<I공동구매체험Service, 공동구매체험Service>();
         services.AddSingleton<Mongo공동구매자동집단화저장소>();
         services.AddSingleton<I공동구매자동집단화저장소>(provider =>
             provider.GetRequiredService<Mongo공동구매자동집단화저장소>());

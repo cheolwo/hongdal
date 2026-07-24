@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
+using Ssalddel.Contracts.Common.Metadata;
 using 살뜰.Services.Options;
 
 namespace Ssalddel.Services.External.Apify;
@@ -21,6 +22,13 @@ public sealed record ApifyActorSyncResult(
     string ActorId,
     IReadOnlyList<JsonElement> Items);
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.ApifyActorIntegration,
+    SsalddelCodeLayer.ExternalAdapter,
+    "허용 목록과 비용 상한을 적용한 Apify Actor HTTP 실행 계약입니다.",
+    Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.ThirdPartyApiCall | SsalddelCodeEffect.MayIncurExternalCost,
+    FlowOrder = 20,
+    Boundary = "활성화·비밀 토큰·Actor 허용 목록·요청별 비용 상한을 통과한 호출만 허용합니다.")]
 public interface IApifyActorGateway
 {
     Task<ApifyActorSyncResult> RunSyncGetDatasetItemsAsync(
@@ -28,6 +36,14 @@ public interface IApifyActorGateway
         CancellationToken cancellationToken);
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.ApifyActorIntegration,
+    SsalddelCodeLayer.ExternalAdapter,
+    "Apify run-sync-get-dataset-items HTTP 호출과 응답 배열 역직렬화를 수행합니다.",
+    Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.ThirdPartyApiCall | SsalddelCodeEffect.MayIncurExternalCost,
+    ContractType = typeof(IApifyActorGateway),
+    FlowOrder = 30,
+    Boundary = "API token은 Authorization 헤더로만 보내고 오류 본문은 제한 길이로만 노출합니다.")]
 public sealed partial class ApifyActorGateway : IApifyActorGateway
 {
     private readonly HttpClient _httpClient;

@@ -4,10 +4,15 @@ using MediatR;
 using Ssalddel.Application.Shipper.ImportFood;
 using Ssalddel.Contracts.Shipper.ImportFood;
 using Ssalddel.ApiMetadata;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Shipper
 {
-    [SsalddelApiVersion(SsalddelProductVersion.V1_5)]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V1_5,
+        FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
+    [SsalddelApiWorkflow(SsalddelWorkflow.CustomsAndTradeData)]
     [ApiController]
     [Route("api/v1/shipper/import-food/oversea-manufacturers")]
     [Authorize(Roles = 역할명.화주)]

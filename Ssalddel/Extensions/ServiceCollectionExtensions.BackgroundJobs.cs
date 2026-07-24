@@ -4,6 +4,7 @@ using Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 using Ssalddel.Infrastructure.BackgroundJobs.Community;
 using Ssalddel.Infrastructure.BackgroundJobs.Content;
 using Ssalddel.Infrastructure.BackgroundJobs.SalesOrders;
+using Ssalddel.Services.Community;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
 using Ssalddel.Services.Orderer;
 using 살뜰.Infrastructure.BackgroundJobs.Customs;
@@ -27,9 +28,13 @@ public static partial class ServiceCollectionExtensions
         SsalddelExecutionOptions executionOptions)
     {
         var 공동구매Os배치등록계획 = 공동구매수요모집Os배치등록계획.생성(
-            agriculturalFisheriesBatchOptions,
-            communityEditorialBatchOptions);
+            agriculturalFisheriesBatchOptions);
+        var communityEditorialBatchRegistrationPlan =
+            CommunityEditorialBatchRegistrationPlan.Create(
+                agriculturalFisheriesBatchOptions,
+                communityEditorialBatchOptions);
         services.AddSingleton(공동구매Os배치등록계획);
+        services.AddSingleton(communityEditorialBatchRegistrationPlan);
         services.AddScoped<AgriculturalFisheriesBatchRunner>();
         services.AddScoped<OfficialFoodIngredientCompanyBatchRunner>();
         services.AddScoped<CommunityEditorialBatchRunner>();
@@ -148,7 +153,7 @@ public static partial class ServiceCollectionExtensions
                 AddCommunityEditorialBatchJobs(
                     q,
                     communityEditorialBatchOptions,
-                    공동구매Os배치등록계획);
+                    communityEditorialBatchRegistrationPlan);
             }
         });
 
@@ -228,12 +233,12 @@ public static partial class ServiceCollectionExtensions
     private static void AddCommunityEditorialBatchJobs(
         IServiceCollectionQuartzConfigurator quartz,
         CommunityEditorialBatchOptions options,
-        공동구매수요모집Os배치등록계획 등록계획)
+        CommunityEditorialBatchRegistrationPlan registrationPlan)
     {
         var timeZone = AgriculturalFisheriesBatchSchedule.ResolveTimeZone(options.TimeZoneId);
 
-        if (등록계획.Quartz등록여부(
-                공동구매수요모집Os배치작업코드.Kamis가격브리프게시))
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.KamisPriceBrief))
         {
             var jobKey = new JobKey("CommunityKamisPriceBrief");
             quartz.AddJob<CommunityKamisPriceBriefJob>(job => job.WithIdentity(jobKey));
@@ -247,8 +252,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (등록계획.Quartz등록여부(
-                공동구매수요모집Os배치작업코드.UsdaNass가격브리프게시))
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief))
         {
             var jobKey = new JobKey("CommunityUsdaNassPriceBrief");
             quartz.AddJob<CommunityUsdaNassPriceBriefJob>(job => job.WithIdentity(jobKey));
@@ -262,7 +267,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.ReflectionEnabled)
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.Reflection))
         {
             var jobKey = new JobKey("CommunityReflection");
             quartz.AddJob<CommunityReflectionJob>(job => job.WithIdentity(jobKey));
@@ -276,7 +282,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.ActivityDigestEnabled)
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.ActivityDigest))
         {
             var jobKey = new JobKey("CommunityActivityDigest");
             quartz.AddJob<CommunityActivityDigestJob>(job => job.WithIdentity(jobKey));
@@ -290,7 +297,24 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.PrajnaPublicationEnabled)
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.CultureTransport))
+        {
+            var jobKey = new JobKey("CommunityCultureTransportEditorial");
+            quartz.AddJob<CommunityCultureTransportEditorialJob>(job =>
+                job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("CommunityCultureTransportEditorial-trigger")
+                .WithCronSchedule(
+                    options.CultureTransportCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.Prajna))
         {
             var jobKey = new JobKey("CommunityPrajnaPublication");
             quartz.AddJob<CommunityPrajnaPublicationJob>(job => job.WithIdentity(jobKey));

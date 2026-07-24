@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Versioning;
 
 namespace Ssalddel.Tests.Contracts.Common;
@@ -12,6 +13,18 @@ public sealed class PageCapabilityCatalogTests
             SsalddelProductRoadmapCatalog.All.Select(stage => stage.Version));
         Assert.Equal("1.5", SsalddelProductRoadmapCatalog.CurrentVersion);
         Assert.Equal("공동구매·주문자 집단화", SsalddelProductRoadmapCatalog.Find("1.0").DisplayName);
+        Assert.Equal(
+            ["0.0", "1.0", "1.5"],
+            SsalddelProductRoadmapCatalog.All
+                .Where(stage => stage.IsCultureTransport)
+                .Select(stage => stage.Version));
+        Assert.All(
+            SsalddelProductRoadmapCatalog.All.Take(3),
+            stage => Assert.Equal("문화교통", stage.ProductName));
+        Assert.Equal(
+            "문화교통 1.5 · 공급·가격·무역 준비",
+            SsalddelProductRoadmapCatalog.Find("1.5").FullDisplayName);
+        Assert.False(SsalddelProductRoadmapCatalog.IsCultureTransportVersion("2.0"));
         Assert.Equal("1.0", SsalddelProductRoadmapCatalog.Find("1.5").PrerequisiteVersion);
         Assert.Equal("1.5", SsalddelProductRoadmapCatalog.Find("2.0").PrerequisiteVersion);
     }
@@ -289,11 +302,11 @@ public sealed class PageCapabilityCatalogTests
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.Warehouse,
-            "/mart/picking?orderId=73",
+            "/mart/picking/orders/73",
             out var capability);
 
         Assert.True(found);
-        Assert.Equal("warehouse-app-mart-picking", capability.PageKey);
+        Assert.Equal("warehouse-app-mart-picking-orders", capability.PageKey);
         Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
         Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);
@@ -304,8 +317,10 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Theory]
-    [InlineData("/warehouse/mart/picking?orderId=73", "web-warehouse-mart-picking")]
-    [InlineData("/mart/picking?orderId=73", "web-mart-picking-alias")]
+    [InlineData("/warehouse/mart/picking", "web-warehouse-mart-picking")]
+    [InlineData("/warehouse/mart/picking/orders/73", "web-warehouse-mart-picking-orders")]
+    [InlineData("/mart/picking", "web-mart-picking-alias")]
+    [InlineData("/mart/picking/orders/73", "web-mart-picking-orders-alias")]
     public void 통합웹마트피킹경로도_같은읽기전용경계를사용한다(string route, string pageKey)
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
@@ -318,6 +333,28 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
         Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("SsalddelMartWorkflow", capability.FeatureKeys);
+    }
+
+    [Theory]
+    [InlineData("WarehouseManagerApp", "/mart", "warehouse-app-mart-home", true)]
+    [InlineData("WarehouseManagerApp", "/mart/work-board", "warehouse-app-mart-work-board", true)]
+    [InlineData("Ssalddel.WebApp", "/warehouse/mart", "web-warehouse-mart-home", false)]
+    [InlineData("Ssalddel.WebApp", "/warehouse/mart/work-board", "web-warehouse-mart-work-board", false)]
+    [InlineData("Ssalddel.WebApp", "/mart", "web-mart-home-alias", false)]
+    public void 마트허브는_샘플상태없는3점5읽기전용진입점이다(
+        string appCode,
+        string route,
+        string pageKey,
+        bool requiresAuthentication)
+    {
+        Assert.True(SsalddelPageCapabilityCatalog.TryResolve(appCode, route, out var capability));
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("3.5", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.Equal(requiresAuthentication, capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects);
         Assert.Contains("SsalddelMartWorkflow", capability.FeatureKeys);
     }
@@ -369,6 +406,21 @@ public sealed class PageCapabilityCatalogTests
         Assert.False(capability.HasExternalEffects);
         Assert.Equal("0.0", capability.IntroducedVersion);
         Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
+    }
+
+    [Fact]
+    public void 통합웹_게시판모음은_독립된읽기전용route로분류한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            CommunityPageRoutes.BoardDirectory,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("community-board-directory", capability.PageKey);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
     }
 
     [Fact]
@@ -426,6 +478,28 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal("1.0", capability.IntroducedVersion);
         Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
         Assert.Contains("로그인한 사용자만", capability.Notice);
+    }
+
+    [Theory]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase/practice", "community-group-purchase-practice")]
+    [InlineData(SsalddelPageAppCodes.Orderer, "/group-purchase/practice", "orderer-group-purchase-practice")]
+    public void 체험공동구매는_익명무저장Simulation으로_실수요와분리된다(
+        string appCode,
+        string route,
+        string pageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(appCode, route, out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Experience, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchasePracticeWorkflow", capability.FeatureKeys);
+        Assert.DoesNotContain("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("가상 이웃", capability.Notice);
     }
 
     [Fact]
@@ -612,6 +686,59 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal("2.5", capability.IntroducedVersion);
         Assert.Contains("SalesChannelFulfillmentWorkflow", capability.FeatureKeys);
         Assert.Contains("SalesChannelFulfillment", capability.WorkflowCodes);
+    }
+
+    [Theory]
+    [InlineData("/shipper/inbound/dashboard", "shipper-inbound-dashboard", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/shipper/inbound/requests", "shipper-inbound-list", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/shipper/inbound/requests/new", "shipper-inbound-create", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("/shipper/warehouses/new", "shipper-warehouse-create", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("/shipper/warehouse/workspace", "shipper-warehouse-workspace", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/shipper/warehouse/inventory", "shipper-warehouse-inventory", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/warehouse", "web-warehouse-home", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/warehouse/work-board", "web-warehouse-work-board", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/work-board", "warehouse-work-board-alias", PageInteractionBoundary.ReadOnly)]
+    public void 창고이행route는_2점5의_조회와저장책임을분리한다(
+        string route,
+        string pageKey,
+        PageInteractionBoundary boundary)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("2.5", capability.IntroducedVersion);
+        Assert.Equal(boundary, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("WarehouseFulfillmentWorkflow", capability.FeatureKeys);
+    }
+
+    [Theory]
+    [InlineData("/shipper/sales/products", "shipper-sales-products", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/shipper/sales/products/new?inventoryItemId=5001", "shipper-sales-product-create", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("/shipper/sales/listings", "shipper-sales-listings", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/shipper/sales/listings/new?productId=10", "shipper-sales-listing-create", PageInteractionBoundary.PlatformPersistence)]
+    public void 판매상품과채널출품은_2점5의_목표별route로분리한다(
+        string route,
+        string pageKey,
+        PageInteractionBoundary boundary)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("2.5", capability.IntroducedVersion);
+        Assert.Equal(boundary, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("SalesChannelFulfillmentWorkflow", capability.FeatureKeys);
     }
 
     [Fact]
@@ -898,6 +1025,66 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);
         Assert.True(capability.HasExternalEffects);
+    }
+
+    [Theory]
+    [InlineData("/shipper/request", "shipper-request", PageInteractionBoundary.PlatformPersistence, false)]
+    [InlineData("/shipper/request/cargo", "shipper-request-cargo", PageInteractionBoundary.PlatformPersistence, false)]
+    [InlineData("/shipper/request/REQ-20", "shipper-request-detail", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/request/REQ-20/timeline", "shipper-request-detail", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/request/REQ-20/payment", "shipper-request-detail", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/request/payment-status", "shipper-payment-status", PageInteractionBoundary.ReadOnly, false)]
+    public void 화주_2점0_운송화면은_작성과_책임별상세경계를_분리한다(
+        string route,
+        string expectedPageKey,
+        PageInteractionBoundary expectedBoundary,
+        bool expectedExternalEffects)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(expectedPageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(expectedBoundary, capability.Boundary);
+        Assert.Equal(expectedExternalEffects, capability.HasExternalEffects);
+        Assert.Equal("2.0", capability.IntroducedVersion);
+        Assert.Contains("DomesticTransportWorkflow", capability.FeatureKeys);
+    }
+
+    [Theory]
+    [InlineData("/driver/recommendations", "driver-recommendation-list", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/recommendations/REQ-20", "driver-recommendation-detail", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/dispatch-decisions/REQ-20", "driver-dispatch-decisions", PageInteractionBoundary.Simulation, true)]
+    [InlineData("/driver/transports/current", "driver-current-transport", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/transports/history", "driver-transport-history", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/transport/proof?transportId=20", "driver-proof-stage-selector", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/transports/20/pickup", "driver-transports", PageInteractionBoundary.Simulation, true)]
+    [InlineData("/driver/transports/20/dropoff", "driver-transports", PageInteractionBoundary.Simulation, true)]
+    [InlineData("/driver/settlements/current-month", "driver-settlements", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/notifications", "driver-notification-inbox", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/driver/notifications/settings", "driver-notifications", PageInteractionBoundary.PlatformPersistence, false)]
+    public void 기사_2점0_화면은_조회와_상태변경을_별도_route로_분리한다(
+        string route,
+        string expectedPageKey,
+        PageInteractionBoundary expectedBoundary,
+        bool expectedExternalEffects)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(expectedPageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(expectedBoundary, capability.Boundary);
+        Assert.Equal(expectedExternalEffects, capability.HasExternalEffects);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.Equal("2.0", capability.IntroducedVersion);
+        Assert.Contains("DomesticTransportWorkflow", capability.FeatureKeys);
     }
 
     [Fact]

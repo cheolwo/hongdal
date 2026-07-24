@@ -1,0 +1,84 @@
+name: Staging migration and recovery rehearsal
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type REHEARSE_STAGING_RECOVERY to run against the protected staging environment.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-readiness
+  cancel-in-progress: false
+
+jobs:
+  staging-readiness:
+    if: ${{ inputs.confirmation == 'REHEARSE_STAGING_RECOVERY' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: staging
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install EF migration tool
+        run: dotnet tool install --global dotnet-ef --version 9.0.0
+
+      - name: Install database client tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes default-mysql-client redis-tools
+          sudo tee /usr/local/bin/mongodump >/dev/null <<'EOF'
+          #!/usr/bin/env bash
+          exec docker run --rm --network host -v "$PWD:$PWD" -w "$PWD" mongo:8.0 mongodump "$@"
+          EOF
+          sudo tee /usr/local/bin/mongorestore >/dev/null <<'EOF'
+          #!/usr/bin/env bash
+          exec docker run --rm --network host -v "$PWD:$PWD" -w "$PWD" mongo:8.0 mongorestore "$@"
+          EOF
+          sudo chmod +x /usr/local/bin/mongodump /usr/local/bin/mongorestore
+
+      - name: Restore and build migration host
+        run: |
+          dotnet restore Ssalddel/Ssalddel.csproj
+          dotnet build Ssalddel/Ssalddel.csproj --configuration Release --no-restore -p:UseSharedCompilation=false
+
+      - name: Apply migration and rehearse isolated restores
+        shell: pwsh
+        env:
+          SSALDDEL_STAGING_MYSQL_CONNECTION: ${{ secrets.SSALDDEL_STAGING_MYSQL_CONNECTION }}
+          SSALDDEL_STAGING_MYSQL_HOST: ${{ secrets.SSALDDEL_STAGING_MYSQL_HOST }}
+          SSALDDEL_STAGING_MYSQL_PORT: ${{ secrets.SSALDDEL_STAGING_MYSQL_PORT }}
+          SSALDDEL_STAGING_MYSQL_USER: ${{ secrets.SSALDDEL_STAGING_MYSQL_USER }}
+          SSALDDEL_STAGING_MYSQL_PASSWORD: ${{ secrets.SSALDDEL_STAGING_MYSQL_PASSWORD }}
+          SSALDDEL_STAGING_MYSQL_DATABASE: ${{ vars.SSALDDEL_STAGING_MYSQL_DATABASE }}
+          SSALDDEL_STAGING_MYSQL_RESTORE_DATABASE: ${{ vars.SSALDDEL_STAGING_MYSQL_RESTORE_DATABASE }}
+          SSALDDEL_STAGING_MONGODB_URI: ${{ secrets.SSALDDEL_STAGING_MONGODB_URI }}
+          SSALDDEL_STAGING_MONGODB_DATABASE: ${{ vars.SSALDDEL_STAGING_MONGODB_DATABASE }}
+          SSALDDEL_STAGING_MONGODB_RESTORE_DATABASE: ${{ vars.SSALDDEL_STAGING_MONGODB_RESTORE_DATABASE }}
+          SSALDDEL_STAGING_REDIS_HOST: ${{ secrets.SSALDDEL_STAGING_REDIS_HOST }}
+          SSALDDEL_STAGING_REDIS_PORT: ${{ secrets.SSALDDEL_STAGING_REDIS_PORT }}
+          SSALDDEL_STAGING_REDIS_PASSWORD: ${{ secrets.SSALDDEL_STAGING_REDIS_PASSWORD }}
+        run: >-
+          ./eng/staging/Invoke-StagingReadiness.ps1
+          -EnvironmentName staging
+          -Confirmation REHEARSE_STAGING_RECOVERY
+          -EvidenceDirectory artifacts/staging-readiness
+
+      - name: Upload non-sensitive rehearsal evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: staging-readiness-${{ github.run_number }}
+          path: artifacts/staging-readiness/evidence.json
+          if-no-files-found: error
+          retention-days: 30

@@ -117,6 +117,10 @@ public sealed class WorkflowApiEndpointDto
 
     public string ProductVersionName { get; init; } = string.Empty;
 
+    public string ProductName { get; init; } = string.Empty;
+
+    public string ProductVersionDisplayName { get; init; } = string.Empty;
+
     public string FeatureKey { get; init; } = string.Empty;
 
     public bool IsEnabled { get; init; }

@@ -4,13 +4,28 @@ using Ssalddel.Contracts.Shipper.ImportFood;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Filters;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Shipper;
 
-    [SsalddelApiVersion(SsalddelProductVersion.V1_5)]
+[SsalddelApiVersion(
+    SsalddelProductVersion.V1_5,
+    FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.ImportedFoodKoreanLabelIntegration,
+    SsalddelCodeLayer.Api,
+    "인증된 화주에게 식약처 수입식품 한글표시사항 공식 조회 API를 제공합니다.",
+    Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.ThirdPartyApiCall,
+    ContractType = typeof(수입식품한글표시사항조회응답),
+    FlowOrder = 10,
+    Boundary = "CustomsAndTradeDataWorkflow가 켜진 1.5 Simulation에서 조회만 허용합니다.")]
 [ApiController]
 [Route("api/v1/shipper/import-food/korean-labels")]
 [Authorize(Roles = 역할명.화주)]
+[RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 public sealed class 수입식품한글표시사항Controller : ControllerBase
 {
     private readonly ISender _sender;

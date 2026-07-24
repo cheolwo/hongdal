@@ -55,6 +55,34 @@ public sealed class VersionFeatureFlagServiceTests
     }
 
     [Fact]
+    public void GroupPurchasePractice_CanRunWithoutDemandOrTrade()
+    {
+        var service = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = true,
+            GroupPurchasePracticeWorkflow = true,
+            GroupPurchaseDemandWorkflow = false,
+            CustomsAndTradeDataWorkflow = false
+        });
+
+        Assert.True(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchasePracticeWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow));
+    }
+
+    [Fact]
+    public void GroupPurchasePractice_RequiresCommunityFoundation()
+    {
+        var service = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = false,
+            GroupPurchasePracticeWorkflow = true
+        });
+
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchasePracticeWorkflow));
+    }
+
+    [Fact]
     public void LegacyGroupPurchaseImportKey_EnablesDemandOnly()
     {
         var service = CreateService(new VersionFeatureFlagsOptions

@@ -88,6 +88,22 @@ public static partial class ServiceCollectionExtensions
         services.Configure<HongikHakdangCardOptions>(configuration.GetSection(HongikHakdangCardOptions.SectionName));
         services.Configure<CommunityPostAudioOptions>(configuration.GetSection(CommunityPostAudioOptions.SectionName));
         services.Configure<CommunityPostPublicationOptions>(configuration.GetSection(CommunityPostPublicationOptions.SectionName));
+        services.Configure<CommunityPostEmailNotificationOptions>(
+            configuration.GetSection(CommunityPostEmailNotificationOptions.SectionName));
+        var bootstrapAdminEmail = configuration["IdentitySeed:BootstrapAdmin:Email"];
+        var gmailUserName = configuration[
+            $"{CommunityPostEmailNotificationOptions.SectionName}:Gmail:UserName"];
+        services.PostConfigure<CommunityPostEmailNotificationOptions>(options =>
+        {
+            if (!string.IsNullOrWhiteSpace(options.RecipientEmail))
+            {
+                return;
+            }
+
+            options.RecipientEmail = !string.IsNullOrWhiteSpace(bootstrapAdminEmail)
+                ? bootstrapAdminEmail
+                : gmailUserName ?? string.Empty;
+        });
         services.Configure<CommunityPostTranslationOptions>(configuration.GetSection(CommunityPostTranslationOptions.SectionName));
         services.Configure<CommunityKeywordNotificationOptions>(configuration.GetSection(CommunityKeywordNotificationOptions.SectionName));
         services.Configure<CommunityLedgerProjectionOptions>(configuration.GetSection(CommunityLedgerProjectionOptions.SectionName));

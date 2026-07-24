@@ -4,10 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Ssalddel.Application.Warehouse;
 using 살뜰.도메인.사용자;
 using Ssalddel.ApiMetadata;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Common;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_5)]
+[SsalddelApiVersion(
+    SsalddelProductVersion.V1_5,
+    FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
+[SsalddelApiWorkflow(SsalddelWorkflow.CustomsAndTradeData)]
 [ApiController]
 [Authorize]
 [Route("api/v1/customs")]

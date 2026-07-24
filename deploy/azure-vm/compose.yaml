@@ -61,11 +61,26 @@ services:
       TransientState__Provider: Memory
       DatabaseInitialization__RunAtStartup: "false"
       DatabaseInitialization__FailOnError: "true"
+      IdentitySeed__BootstrapAdmin__Enabled: "${SSALDDEL_BOOTSTRAP_ADMIN_ENABLED:-false}"
+      IdentitySeed__BootstrapAdmin__UserName: "${SSALDDEL_BOOTSTRAP_ADMIN_USER_NAME:-}"
+      IdentitySeed__BootstrapAdmin__Email: "${SSALDDEL_BOOTSTRAP_ADMIN_EMAIL:-}"
+      IdentitySeed__BootstrapAdmin__Password: "${SSALDDEL_BOOTSTRAP_ADMIN_PASSWORD:-}"
+      IdentitySeed__DevelopmentAccounts__Enabled: "false"
       Jwt__Issuer: Ssalddel.AzurePreview
       Jwt__Audience: Ssalddel.WebApp.AzurePreview
       Jwt__SecretKey: "${SSALDDEL_JWT_SECRET_KEY}"
-      IsmsPProtectedData__FailWhenKeyMissing: "false"
+      PersonalDataProtection__ApplicationName: Ssalddel.AzurePreview
+      PersonalDataProtection__KeyRingPath: /app/App_Data/DataProtection-Keys
+      PersonalDataProtection__RequireCertificate: "true"
+      PersonalDataProtection__CertificatePath: /run/secrets/ssalddel-data-protection.pfx
+      PersonalDataProtection__CertificatePassword: "${SSALDDEL_DATA_PROTECTION_CERTIFICATE_PASSWORD}"
+      IsmsPProtectedData__Aes256GcmKeyBase64: "${SSALDDEL_ISMS_P_AES_KEY_BASE64}"
+      IsmsPProtectedData__HashSalt: "${SSALDDEL_ISMS_P_HASH_SALT}"
+      IsmsPProtectedData__FailWhenKeyMissing: "true"
       SsalddelExecution__Mode: Simulation
+      VersionFeatureFlags__GroupPurchaseDemandWorkflow: "true"
+      VersionFeatureFlags__GroupPurchasePracticeWorkflow: "true"
+      VersionFeatureFlags__CustomsAndTradeDataWorkflow: "true"
       CustomsBrokerCors__AllowedOrigins__0: "https://${SSALDDEL_SITE_HOST}"
       AgriculturalFisheriesBatch__Enabled: "false"
       CommunityEditorialBatch__Enabled: "false"
@@ -75,6 +90,12 @@ services:
       CommunityPostTranslation__ResourceId: "${SSALDDEL_AZURE_TRANSLATOR_RESOURCE_ID:-}"
       CommunityPostTranslation__ManagedIdentityClientId: "${SSALDDEL_AZURE_TRANSLATOR_MANAGED_IDENTITY_CLIENT_ID:-}"
       CommunityPostTranslation__Region: "${SSALDDEL_AZURE_TRANSLATOR_REGION:-koreacentral}"
+      CommunityPostEmailNotifications__Enabled: "${SSALDDEL_COMMUNITY_POST_EMAIL_ENABLED:-false}"
+      CommunityPostEmailNotifications__RecipientEmail: "${SSALDDEL_COMMUNITY_POST_EMAIL_RECIPIENT:-}"
+      CommunityPostEmailNotifications__PublicBaseUrl: "https://${SSALDDEL_SITE_HOST}"
+      CommunityPostEmailNotifications__Gmail__UserName: "${SSALDDEL_GMAIL_USER_NAME:-}"
+      CommunityPostEmailNotifications__Gmail__AppPassword: "${SSALDDEL_GMAIL_APP_PASSWORD:-}"
+      CommunityPostEmailNotifications__Gmail__FromAddress: "${SSALDDEL_GMAIL_FROM_ADDRESS:-}"
       SalesChannelOrderSync__Enabled: "false"
       WorkRelationshipSnapshots__Enabled: "false"
       YouTube__Enabled: "false"
@@ -87,6 +108,7 @@ services:
     volumes:
       - app_data:/app/App_Data
       - app_uploads:/app/uploads
+      - ./secrets/ssalddel-data-protection.pfx:/run/secrets/ssalddel-data-protection.pfx:ro
     depends_on:
       mysql:
         condition: service_healthy

@@ -4,9 +4,12 @@ namespace Ssalddel.Contracts.Common.Metadata;
 
 public static class SsalddelCodeFeatureKeys
 {
+    public const string ApifyActorIntegration = "apify-actor-integration";
     public const string CommunityAuthoringImage = "community-authoring-image";
     public const string GroupPurchaseDemandOperatingSystem = "group-purchase-demand-operating-system";
     public const string GroupImportTradeReadiness = "group-import-trade-readiness";
+    public const string ImportedFoodKoreanLabelIntegration = "imported-food-korean-label-integration";
+    public const string TradeLedgerExtensions = "trade-ledger-extensions";
 }
 
 public enum SsalddelCodeLayer

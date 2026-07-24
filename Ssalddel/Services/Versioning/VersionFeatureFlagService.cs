@@ -26,6 +26,7 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             VersionFeatureFlagKeys.OrdererGroupOrderV25 => IsGroupPurchaseDemandEnabled(flags),
             VersionFeatureFlagKeys.ApartmentGroupOrderV25 => IsGroupPurchaseDemandEnabled(flags),
             VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow => IsGroupPurchaseDemandEnabled(flags),
+            VersionFeatureFlagKeys.GroupPurchasePracticeWorkflow => IsGroupPurchasePracticeEnabled(flags),
             VersionFeatureFlagKeys.GroupPurchaseImportWorkflow => IsGroupPurchaseDemandEnabled(flags),
             VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow => IsSalesChannelFulfillmentEnabled(flags),
             VersionFeatureFlagKeys.CommunityTrustWorkflow => IsCommunityTrustEnabled(flags),
@@ -47,6 +48,7 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             [VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow] = IsWarehouseFulfillmentEnabled(flags),
             [VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow] = IsCustomsAndTradeDataEnabled(flags),
             [VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow] = IsGroupPurchaseDemandEnabled(flags),
+            [VersionFeatureFlagKeys.GroupPurchasePracticeWorkflow] = IsGroupPurchasePracticeEnabled(flags),
             [VersionFeatureFlagKeys.GroupPurchaseImportWorkflow] = IsGroupPurchaseDemandEnabled(flags),
             [VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow] = IsSalesChannelFulfillmentEnabled(flags),
             [VersionFeatureFlagKeys.CommunityTrustWorkflow] = IsCommunityTrustEnabled(flags),
@@ -80,6 +82,9 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
                 || flags.OrdererGroupOrderV25
                 || flags.ApartmentGroupOrderV25);
 
+    private static bool IsGroupPurchasePracticeEnabled(VersionFeatureFlagsOptions flags)
+        => flags.CommunityTrustWorkflow && flags.GroupPurchasePracticeWorkflow;
+
     private static bool IsSalesChannelFulfillmentEnabled(VersionFeatureFlagsOptions flags)
         => flags.SalesChannelFulfillmentWorkflow || IsWarehouseFulfillmentEnabled(flags);
 
@@ -111,6 +116,8 @@ public static class VersionFeatureFlagKeys
     public const string CustomsHsV20 = nameof(CustomsHsV20);
 
     public const string GroupPurchaseDemandWorkflow = nameof(GroupPurchaseDemandWorkflow);
+
+    public const string GroupPurchasePracticeWorkflow = nameof(GroupPurchasePracticeWorkflow);
 
     public const string GroupPurchaseImportWorkflow = nameof(GroupPurchaseImportWorkflow);
 

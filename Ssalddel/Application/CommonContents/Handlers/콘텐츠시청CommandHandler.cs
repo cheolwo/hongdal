@@ -121,6 +121,7 @@ public sealed class 콘텐츠시청완료CommandHandler : IRequestHandler<콘텐
 
             return new 콘텐츠시청완료Result
             {
+                완료여부 = true,
                 보상지급여부 = false,
                 메시지 = "보상 없는 콘텐츠입니다."
             };
@@ -178,6 +179,7 @@ public sealed class 콘텐츠시청완료CommandHandler : IRequestHandler<콘텐
 
         return new 콘텐츠시청완료Result
         {
+            완료여부 = true,
             보상지급여부 = true,
             메시지 = "보상이 지급되었습니다.",
             지급포인트 = 보상.지급포인트,

@@ -151,3 +151,125 @@ jobs:
 
       - name: Build server container
         run: docker build --file Ssalddel/Dockerfile --tag ssalddel:release-readiness .
+
+  runtime-integration:
+    name: MySQL, MongoDB, and Redis integration
+    needs: version-readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: integration-root-password
+          MYSQL_DATABASE: ssalddel_integration
+          MYSQL_USER: ssalddel
+          MYSQL_PASSWORD: integration-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -pintegration-root-password"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+      mongo:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore integration tests
+        run: dotnet restore Ssalddel.Tests/Ssalddel.Tests.csproj
+
+      - name: Exercise runtime stores and migrations
+        env:
+          SSALDDEL_INFRA_INTEGRATION_REQUIRED: "true"
+          SSALDDEL_TEST_MYSQL_CONNECTION: server=127.0.0.1;port=3306;database=ssalddel_integration;user=ssalddel;password=integration-password;
+          SSALDDEL_TEST_MONGODB_CONNECTION: mongodb://127.0.0.1:27017
+          SSALDDEL_TEST_MONGODB_DATABASE: ssalddel_integration
+          SSALDDEL_TEST_REDIS_CONNECTION: 127.0.0.1:6379,abortConnect=false
+        run: >-
+          dotnet test Ssalddel.Tests/Ssalddel.Tests.csproj
+          --configuration Release
+          --no-restore
+          --filter "FullyQualifiedName~RuntimeInfrastructureIntegrationTests"
+          --logger "trx;LogFileName=runtime-integration.trx"
+          --results-directory artifacts/runtime-integration
+          -p:UseSharedCompilation=false
+
+      - name: Upload runtime integration evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: runtime-integration-${{ github.run_number }}
+          path: artifacts/runtime-integration/
+          if-no-files-found: error
+          retention-days: 14
+
+  browser-e2e:
+    name: Browser E2E for 1.5 trade ledgers
+    needs: version-readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore WebAssembly workloads
+        run: dotnet workload restore Ssalddel.WebApp/Ssalddel.WebApp.csproj
+
+      - name: Build web client
+        run: >-
+          dotnet build Ssalddel.WebApp/Ssalddel.WebApp.csproj
+          --configuration Release
+          --verbosity minimal
+          -p:ContinuousIntegrationBuild=true
+          -p:UseSharedCompilation=false
+
+      - name: Install browser test dependencies
+        working-directory: eng/e2e
+        run: npm install --ignore-scripts
+
+      - name: Install Chromium
+        working-directory: eng/e2e
+        run: npx playwright install --with-deps chromium
+
+      - name: Run desktop and mobile browser E2E
+        working-directory: eng/e2e
+        run: npx playwright test
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: browser-e2e-${{ github.run_number }}
+          path: artifacts/browser-e2e/
+          if-no-files-found: warn
+          retention-days: 14

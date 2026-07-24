@@ -22,6 +22,8 @@ public sealed class VersionFeatureFlagsOptions
 
     public bool GroupPurchaseDemandWorkflow { get; set; }
 
+    public bool GroupPurchasePracticeWorkflow { get; set; }
+
     public bool GroupPurchaseImportWorkflow { get; set; }
 
     public bool SalesChannelFulfillmentWorkflow { get; set; }

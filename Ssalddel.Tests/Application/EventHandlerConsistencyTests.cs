@@ -10,8 +10,8 @@ public sealed class EventHandlerConsistencyTests
     public void ApplicationEventHandlers_UseSingularEventHandlerSuffix()
     {
         var invalidNames = ApplicationEventHandlerTypes()
+            .Where(type => !HandlerTypeName(type).EndsWith("EventHandler", StringComparison.Ordinal))
             .Select(type => type.FullName ?? type.Name)
-            .Where(name => !name.EndsWith("EventHandler", StringComparison.Ordinal))
             .ToArray();
 
         Assert.Empty(invalidNames);
@@ -21,8 +21,8 @@ public sealed class EventHandlerConsistencyTests
     public void ApplicationEventHandlers_DoNotUsePluralEventHandlersSuffix()
     {
         var pluralNames = ApplicationEventHandlerTypes()
+            .Where(type => HandlerTypeName(type).EndsWith("EventHandlers", StringComparison.Ordinal))
             .Select(type => type.FullName ?? type.Name)
-            .Where(name => name.EndsWith("EventHandlers", StringComparison.Ordinal))
             .ToArray();
 
         Assert.Empty(pluralNames);
@@ -51,6 +51,9 @@ public sealed class EventHandlerConsistencyTests
     private static bool IsNotificationHandlerInterface(Type type)
         => type.IsGenericType
            && type.GetGenericTypeDefinition() == typeof(INotificationHandler<>);
+
+    private static string HandlerTypeName(Type type)
+        => type.Name.Split('`', 2)[0];
 
     private static IEnumerable<System.Reflection.FieldInfo> LoggerFields(Type type)
         => type

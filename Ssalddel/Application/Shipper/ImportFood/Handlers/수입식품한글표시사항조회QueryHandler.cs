@@ -1,7 +1,16 @@
 using Ssalddel.Contracts.Shipper.ImportFood;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Application.Shipper.ImportFood;
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.ImportedFoodKoreanLabelIntegration,
+    SsalddelCodeLayer.Application,
+    "한글표시사항 조회 요청을 외부 adapter 계약으로 전달하고 공식 출처 메타데이터를 포함한 응답으로 변환합니다.",
+    Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.ThirdPartyApiCall,
+    ContractType = typeof(수입식품한글표시사항조회응답),
+    FlowOrder = 20,
+    Boundary = "조회 시각과 공식 문서 URL을 표시하며 전문 판단을 대신하지 않습니다.")]
 public sealed class 수입식품한글표시사항조회QueryHandler
     : IRequestHandler<수입식품한글표시사항조회Query, 수입식품한글표시사항조회응답>
 {

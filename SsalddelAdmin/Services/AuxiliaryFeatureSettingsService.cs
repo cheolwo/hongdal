@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Ssalddel.Contracts.CommandSettings;
+using Ssalddel.Contracts.Common.Versioning;
 
 namespace SsalddelAdmin.Services;
 
@@ -111,6 +112,10 @@ public sealed class AuxiliaryFeatureSettingsService
     private static AuxiliaryFeatureSettingsResponse BuildMemoryResponse(string? userId)
     {
         var hasUser = !string.IsNullOrWhiteSpace(userId);
+        var foundation = SsalddelProductRoadmapCatalog.Find(
+            SsalddelProductRoadmapCatalog.FoundationVersion);
+        var transport = SsalddelProductRoadmapCatalog.Find(
+            SsalddelProductRoadmapCatalog.TransportVersion);
         return new AuxiliaryFeatureSettingsResponse
         {
             Items =
@@ -121,10 +126,10 @@ public sealed class AuxiliaryFeatureSettingsService
                     TargetName = "운송예외신고Command",
                     TargetDisplayName = "운송 예외 신고",
                     Category = "필수 업무",
-                    Version = "v1.0",
-                    VersionDisplayName = "살뜰 1.0",
-                    VersionSortOrder = 10,
-                    IsCurrentRelease = true,
+                    Version = transport.Version,
+                    VersionDisplayName = transport.FullDisplayName,
+                    VersionSortOrder = transport.SortOrder,
+                    IsCurrentRelease = transport.IsCurrent,
                     FeatureName = "상태전환",
                     FeatureDisplayName = "예외 상태 전환",
                     AppDefaultEnabled = true,
@@ -139,10 +144,10 @@ public sealed class AuxiliaryFeatureSettingsService
                     TargetName = "운송예외신고Command",
                     TargetDisplayName = "운송 예외 신고",
                     Category = "운영 보조",
-                    Version = "v1.0",
-                    VersionDisplayName = "살뜰 1.0",
-                    VersionSortOrder = 10,
-                    IsCurrentRelease = true,
+                    Version = transport.Version,
+                    VersionDisplayName = transport.FullDisplayName,
+                    VersionSortOrder = transport.SortOrder,
+                    IsCurrentRelease = transport.IsCurrent,
                     FeatureName = "관리자알림",
                     FeatureDisplayName = "관리자 알림",
                     AppDefaultEnabled = true,
@@ -160,10 +165,10 @@ public sealed class AuxiliaryFeatureSettingsService
                     TargetName = "WorkRelationshipSnapshotService",
                     TargetDisplayName = "업무 인연 스냅샷",
                     Category = "관계 보조",
-                    Version = "v1.5",
-                    VersionDisplayName = "살뜰 1.5",
-                    VersionSortOrder = 15,
-                    IsCurrentRelease = false,
+                    Version = foundation.Version,
+                    VersionDisplayName = foundation.FullDisplayName,
+                    VersionSortOrder = foundation.SortOrder,
+                    IsCurrentRelease = foundation.IsCurrent,
                     FeatureName = "인연스냅샷",
                     FeatureDisplayName = "인연 스냅샷 기록",
                     AppDefaultEnabled = true,

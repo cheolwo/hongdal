@@ -5,10 +5,14 @@ using Ssalddel.Contracts.Admin.Customs;
 using Ssalddel.Contracts.Common.ViewSettings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Admin.Customs;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_5)]
+[SsalddelApiVersion(
+    SsalddelProductVersion.V1_5,
+    FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.CustomsAndTradeData)]
 [ApiController]
 [Authorize(Policy = "HsCode운영자전용")]

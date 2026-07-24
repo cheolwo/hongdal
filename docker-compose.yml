@@ -17,15 +17,26 @@ services:
       MongoDb__Database: ssalddel_dev
       DatabaseInitialization__RunAtStartup: "${SSALDDEL_DATABASE_INITIALIZATION_AT_STARTUP:-false}"
       DatabaseInitialization__FailOnError: "true"
+      IdentitySeed__BootstrapAdmin__Enabled: "${SSALDDEL_BOOTSTRAP_ADMIN_ENABLED:-false}"
+      IdentitySeed__BootstrapAdmin__UserName: "${SSALDDEL_BOOTSTRAP_ADMIN_USER_NAME:-}"
+      IdentitySeed__BootstrapAdmin__Email: "${SSALDDEL_BOOTSTRAP_ADMIN_EMAIL:-}"
+      IdentitySeed__BootstrapAdmin__Password: "${SSALDDEL_BOOTSTRAP_ADMIN_PASSWORD:-}"
+      IdentitySeed__DevelopmentAccounts__Enabled: "${SSALDDEL_DEVELOPMENT_ACCOUNTS_ENABLED:-false}"
+      IdentitySeed__DevelopmentAccounts__AdminPassword: "${SSALDDEL_DEVELOPMENT_ADMIN_PASSWORD:-}"
+      IdentitySeed__DevelopmentAccounts__DriverPassword: "${SSALDDEL_DEVELOPMENT_DRIVER_PASSWORD:-}"
+      IdentitySeed__DevelopmentAccounts__ShipperPassword: "${SSALDDEL_DEVELOPMENT_SHIPPER_PASSWORD:-}"
       Jwt__Issuer: Ssalddel.Dev
       Jwt__Audience: Ssalddel.Client.Dev
       Jwt__SecretKey: "${SSALDDEL_JWT_SECRET_KEY:-development-only-jwt-secret-key-change-me-32bytes}"
+      PersonalDataProtection__KeyRingPath: /app/App_Data/DataProtection-Keys
+      PersonalDataProtection__CertificatePath: "${SSALDDEL_DATA_PROTECTION_CERTIFICATE_PATH:-}"
+      PersonalDataProtection__CertificatePassword: "${SSALDDEL_DATA_PROTECTION_CERTIFICATE_PASSWORD:-}"
       IsmsPProtectedData__Aes256GcmKeyBase64: "${SSALDDEL_ISMSP_AES256_GCM_KEY_BASE64:-}"
       IsmsPProtectedData__HashSalt: "${SSALDDEL_ISMSP_HASH_SALT:-}"
       IsmsPProtectedData__TransportKeyId: "${SSALDDEL_ISMSP_TRANSPORT_KEY_ID:-ssalddel-local-transport-v1}"
       IsmsPProtectedData__TransportPublicKeyPem: "${SSALDDEL_ISMSP_TRANSPORT_PUBLIC_KEY_PEM:-}"
       IsmsPProtectedData__TransportPrivateKeyPem: "${SSALDDEL_ISMSP_TRANSPORT_PRIVATE_KEY_PEM:-}"
-      IsmsPProtectedData__FailWhenKeyMissing: "${SSALDDEL_ISMSP_FAIL_WHEN_KEY_MISSING:-false}"
+      IsmsPProtectedData__FailWhenKeyMissing: "true"
       AgriculturalFisheriesBatch__Enabled: "${SSALDDEL_AGRICULTURAL_FISHERIES_BATCH_ENABLED:-false}"
       AgriculturalFisheriesBatch__PublishCommunityPriceBriefs: "${SSALDDEL_AGRICULTURAL_FISHERIES_COMMUNITY_PUBLICATION_ENABLED:-false}"
       AgriculturalFisheriesBatch__KamisDailyEnabled: "${SSALDDEL_KAMIS_DAILY_BATCH_ENABLED:-true}"
@@ -34,6 +45,9 @@ services:
       AgriculturalFisheriesBatch__KamisMonthlyCronExpression: "${SSALDDEL_KAMIS_MONTHLY_CRON_EXPRESSION:-0 0 7 2 * ?}"
       AgriculturalFisheriesBatch__UsdaMonthlyEnabled: "${SSALDDEL_USDA_MONTHLY_BATCH_ENABLED:-true}"
       AgriculturalFisheriesBatch__UsdaMonthlyCronExpression: "${SSALDDEL_USDA_MONTHLY_CRON_EXPRESSION:-0 30 7 10 * ?}"
+      AgriculturalFisheriesBatch__IngredientCompanyResearchEnabled: "${SSALDDEL_INGREDIENT_COMPANY_RESEARCH_ENABLED:-false}"
+      AgriculturalFisheriesBatch__PublishChinaImportedFoodRegionBriefs: "${SSALDDEL_CHINA_IMPORTED_FOOD_REGION_PUBLICATION_ENABLED:-false}"
+      AgriculturalFisheriesBatch__PublishUnitedStatesImportedFoodStateBriefs: "${SSALDDEL_US_IMPORTED_FOOD_STATE_PUBLICATION_ENABLED:-false}"
       PublicData__Kamis__CertificationKey: "${SSALDDEL_KAMIS_CERTIFICATION_KEY:-}"
       PublicData__Kamis__RequesterId: "${SSALDDEL_KAMIS_REQUESTER_ID:-}"
       PublicData__UsdaNassQuickStats__ApiKey: "${SSALDDEL_USDA_NASS_API_KEY:-}"
@@ -49,6 +63,12 @@ services:
       CommunityPostTranslation__ManagedIdentityClientId: "${SSALDDEL_AZURE_TRANSLATOR_MANAGED_IDENTITY_CLIENT_ID:-}"
       CommunityPostTranslation__ApiKey: "${SSALDDEL_AZURE_TRANSLATOR_KEY:-}"
       CommunityPostTranslation__Region: "${SSALDDEL_AZURE_TRANSLATOR_REGION:-koreacentral}"
+      CommunityPostEmailNotifications__Enabled: "${SSALDDEL_COMMUNITY_POST_EMAIL_ENABLED:-false}"
+      CommunityPostEmailNotifications__RecipientEmail: "${SSALDDEL_COMMUNITY_POST_EMAIL_RECIPIENT:-}"
+      CommunityPostEmailNotifications__PublicBaseUrl: "${SSALDDEL_PUBLIC_BASE_URL:-}"
+      CommunityPostEmailNotifications__Gmail__UserName: "${SSALDDEL_GMAIL_USER_NAME:-}"
+      CommunityPostEmailNotifications__Gmail__AppPassword: "${SSALDDEL_GMAIL_APP_PASSWORD:-}"
+      CommunityPostEmailNotifications__Gmail__FromAddress: "${SSALDDEL_GMAIL_FROM_ADDRESS:-}"
       SsalddelLogging__FilePath: "logs/ssalddel-.log"
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/health/ready"]
@@ -66,6 +86,7 @@ services:
       - app_uploads:/app/uploads
       - app_community:/app/community
       - app_logs:/app/logs
+      - ./secrets:/run/secrets:ro
 
   mysql:
     image: mysql:8.4

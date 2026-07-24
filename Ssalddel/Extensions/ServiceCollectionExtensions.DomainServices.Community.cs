@@ -27,6 +27,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I주문원장서명저장소, Mongo주문원장서명저장소>();
         services.AddSingleton<I주문원장공개요청저장소, Mongo주문원장공개요청저장소>();
         services.AddScoped<I주문원장통합UseCase, 주문원장통합UseCase>();
+        services.AddScoped<I무역확장원장UseCase, 무역확장원장UseCase>();
         services.AddScoped<I주문원장서명UseCase, 주문원장서명UseCase>();
         services.AddScoped<I주문원장역할별조회Service, 주문원장역할별조회Service>();
         services.AddScoped<I주문원장공개요청Service, 주문원장공개요청Service>();
@@ -41,6 +42,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityAutomatedPostSource, CommunityUsdaNassPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityReflectionSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityActivityDigestSource>();
+        services.AddScoped<ICommunityAutomatedPostSource, CommunityCultureTransportPostSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityPrajnaPostSource>();
         services.AddScoped<I공동수입원장관세사알림Service, 공동수입원장관세사알림Service>();
         services.AddScoped<I공동구매원장관계자알림Service, 공동구매원장관계자알림Service>();
@@ -93,6 +95,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityInformationCandidateSource, CommunityMaffRegionalCuisineRecipeCandidateSource>();
         services.AddScoped<ICommunityInformationCandidateSource, CommunityNhsHealthierFamiliesRecipeCandidateSource>();
         services.AddScoped<ICommunityInformationCollectionService, CommunityInformationCollectionService>();
+        services.AddScoped<ICommunityPostIngredientPriceHintService,
+            CommunityPostIngredientPriceHintService>();
         services.AddScoped<ICommunityAuthoringAiEvidenceTool, CommunityInformationAuthoringAiEvidenceTool>();
         services.AddScoped<ICommunityAuthoringAiEvidenceTool, YouTubeSocialContextAuthoringAiEvidenceTool>();
         services.AddScoped<ICommunityAuthoringAiDraftService, CommunityAuthoringAiDraftService>();
@@ -120,6 +124,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityKeywordSubscriptionService, CommunityKeywordSubscriptionService>();
         services.AddScoped<ICommunityKeywordInboxService, CommunityKeywordInboxService>();
         services.AddScoped<ICommunityKeywordNotificationProcessor, CommunityKeywordNotificationProcessor>();
+        services.AddScoped<ICommunityPostEmailNotificationOutboxStore, CommunityPostEmailNotificationOutboxStore>();
+        services.AddScoped<ICommunityPostEmailSender, GmailCommunityPostEmailSender>();
+        services.AddScoped<ICommunityPostEmailNotificationProcessor, CommunityPostEmailNotificationProcessor>();
         services.AddSingleton<I커뮤니티게시글음성본문분할기, 커뮤니티게시글음성본문분할기>();
         services.AddSingleton<I커뮤니티게시글음성작업예약Service, 커뮤니티게시글음성작업예약Service>();
         services.AddSingleton<I커뮤니티게시글음성작업신호, 커뮤니티게시글음성작업신호>();
@@ -130,6 +137,7 @@ public static partial class ServiceCollectionExtensions
         services.AddHostedService<CommunityScheduledPostPublicationWorker>();
         services.AddHostedService<커뮤니티게시글음성Worker>();
         services.AddHostedService<CommunityKeywordNotificationWorker>();
+        services.AddHostedService<CommunityPostEmailNotificationWorker>();
         services.AddHostedService<CommunityActivityBoardContentWorker>();
         services.AddHostedService<커뮤니티원장투영Worker>();
         services.AddHostedService<CommunityGroupPurchaseDemandOutboxWorker>();
