@@ -120,6 +120,8 @@ public sealed class CommunityPageRoutesTests
         Assert.Equal("/community/group-purchase", CommunityPageRoutes.GroupPurchase);
         Assert.Equal("/community/group-import", CommunityPageRoutes.GroupImport);
         Assert.Equal("/community/group-purchase/new", CommunityPageRoutes.GroupPurchaseCreate);
+        Assert.Equal("/community/orders/new", CommunityPageRoutes.IndividualOrderStart);
+        Assert.Equal("/community/orders", CommunityPageRoutes.IndividualOrders);
         Assert.Equal("/community/actions", CommunityPageRoutes.CollectiveActions);
         Assert.Equal(root, CommunityPageRoutes.GroupPurchaseDetailFor(campaignId));
         Assert.Equal($"{root}/participation", CommunityPageRoutes.GroupPurchaseParticipationFor(campaignId));

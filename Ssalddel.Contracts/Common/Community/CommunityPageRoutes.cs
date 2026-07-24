@@ -22,6 +22,8 @@ public static class CommunityPageRoutes
     public const string GroupPurchaseCreate = "/community/group-purchase/new";
     public const string GroupPurchasePractice = "/community/group-purchase/practice";
     public const string GroupPurchaseDemand = "/community/group-purchase/demand";
+    public const string IndividualOrderStart = "/community/orders/new";
+    public const string IndividualOrders = "/community/orders";
     public const string Personal = "/community/me";
     public const string WorkRelationships = "/community/relationships";
     public const string Decorations = "/community/decorations";

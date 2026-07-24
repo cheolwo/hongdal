@@ -218,12 +218,20 @@ public static class SsalddelPageCapabilityCatalog
             "상품·수량·수령 조건을 비구속 공동구매 제안과 수요 투표로 저장하며 결제나 계약을 확정하지 않습니다.",
             true, [Community, GroupPurchase], ["CommunityTrust"]),
         Exact("community-group-purchase-demand", SsalddelPageAppCodes.IntegratedWeb, CommunityPageRoutes.GroupPurchaseDemand, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
-            "공개 재료 근거를 유지해 집단화 결과를 미리 보고, 로그인한 사용자만 비구속 수요를 저장하거나 철회합니다.",
+            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "공개 재료 근거를 유지해 공동 할인 후보를 미리 보고, 로그인한 사용자가 동의한 경우에만 철회 가능한 개별주문 의향을 저장합니다.",
             false, [Community, GroupPurchase], ["CommunityTrust"]),
         Exact("shipper-community-group-purchase-demand", SsalddelPageAppCodes.Shipper, CommunityPageRoutes.GroupPurchaseDemand, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
-            "Web과 같은 공용 Screen에서 재료 근거와 수령 조건을 확인하고 로그인한 사용자만 비구속 수요를 저장하거나 철회합니다.",
+            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "호환 route에서 재료 근거와 수령 조건을 확인하고 로그인한 사용자가 동의한 경우에만 개별주문 의향을 저장하거나 철회합니다.",
+            false, [Community, GroupPurchase], ["CommunityTrust"]),
+        Exact("shipper-community-individual-order-start", SsalddelPageAppCodes.Shipper, CommunityPageRoutes.IndividualOrderStart, PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "커뮤니티에서 고른 재료를 개인 수령 조건과 함께 기록하고 별도 동의가 있을 때만 공동주문 할인 후보에 연결합니다.",
+            false, [Community, GroupPurchase], ["CommunityTrust", "GroupPurchaseDemand"]),
+        Exact("shipper-community-individual-orders", SsalddelPageAppCodes.Shipper, CommunityPageRoutes.IndividualOrders, PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "로그인한 사용자가 자신의 개별주문 의향과 공동주문 후보 연결 상태만 조회하고 철회합니다.",
             false, [Community, GroupPurchase], ["CommunityTrust"]),
         Prefix("community-group-purchase", SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase", PageCapabilityStage.Beta,
             PageInteractionBoundary.Simulation, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion, "campaign ID의 공개 상세를 읽고 참여·합의 Command는 화면과 서버에서 별도로 인증하며 실제 결제·계약·자동 배차는 실행하지 않습니다.", true,
@@ -869,20 +877,20 @@ public static class SsalddelPageCapabilityCatalog
             "한 상품의 재료·공공데이터·HS 근거를 읽되 구매·결제·계약을 실행하지 않습니다.",
             featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
         Prefix("orderer-group-purchase-demand-create", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.DemandCreateRoot, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
-            "로그인한 주문자의 비구속 수요를 멱등 저장하고 서버 집단화 대상으로 인계하며 결제나 계약을 만들지 않습니다.", true,
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "로그인한 주문자의 철회 가능한 주문 의향을 멱등 저장하고 공동 참여에 동의한 경우에만 1.0 집단화 후보로 인계하며 결제나 계약을 만들지 않습니다.", true,
             [GroupPurchase], ["GroupPurchaseDemand"]),
         Exact("orderer-group-purchase-wish-create", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.WishCreate, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
-            "로그인한 주문자가 여러 재료의 비구속 원함을 각각 독립 원장으로 저장하며 구매·결제·계약을 확정하지 않습니다.", true,
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "로그인한 주문자가 여러 재료의 주문 의향을 각각 독립된 개별 원장으로 저장하며 구매·결제·계약을 확정하지 않습니다.", true,
             [GroupPurchase], ["GroupPurchaseDemand"]),
         Exact("orderer-group-purchase-wishes", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.WishesRoot, PageCapabilityStage.Beta,
-            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
-            "로그인한 주문자가 자신이 남긴 비구속 원함과 집단화 연결 상태만 조회합니다.",
+            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "로그인한 주문자가 자신이 남긴 개별주문 원장과 1.0 공동주문 인계 여부만 조회합니다.",
             featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
         Prefix("orderer-group-purchase-wish-workspace", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.WishesRoot, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
-            "주문자 본인의 원함 원장을 조회하고 명시적으로 수정하거나 철회한 뒤 서버 상태를 다시 조회하며 결제·계약은 만들지 않습니다.", true,
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "주문자 본인의 개별 원장을 조회하고 명시적으로 수정하거나 철회한 뒤 서버 상태를 다시 조회하며 결제·계약은 만들지 않습니다.", true,
             [GroupPurchase], ["GroupPurchaseDemand"]),
         Exact("orderer-group-purchase-groups", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.GroupsRoot, PageCapabilityStage.Beta,
             PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
@@ -913,7 +921,7 @@ public static class SsalddelPageCapabilityCatalog
             "사용자가 선택한 공개 행정권역 기준점과 반경으로 영속된 공개 음식점·메뉴를 조회합니다.",
             featureKeys: [Food], workflowCodes: ["FoodDelivery"]),
         Exact("orderer-orders", SsalddelPageAppCodes.Orderer, "/orders", PageCapabilityStage.Beta,
-            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
             "로그인한 주문자가 자신이 소유한 개별주문 원장 목록과 각 원장의 현재 업무 단계를 조회합니다.",
             featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
         Exact("orderer-food-orders", SsalddelPageAppCodes.Orderer, "/orders/food", PageCapabilityStage.Beta,
@@ -921,7 +929,7 @@ public static class SsalddelPageCapabilityCatalog
             "로그인한 주문자가 소유한 영속 음식 주문 목록과 정확한 주문번호 상세만 조회합니다.", false,
             [Food], ["FoodDelivery"]),
         Prefix("orderer-order-detail", SsalddelPageAppCodes.Orderer, "/orders", PageCapabilityStage.Beta,
-            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.IndividualOrderVersion,
             "로그인한 주문자가 자신이 소유한 개별주문 원장 한 건과 연결된 이행 원장 식별자만 조회합니다.",
             featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
         Exact("orderer-mart", SsalddelPageAppCodes.Orderer, MartProductPageRoutes.Root, PageCapabilityStage.Beta,
@@ -1075,6 +1083,16 @@ public static class SsalddelPageCapabilityCatalog
         if (string.Equals(pageKey, "us-korean-food-group-buy", StringComparison.Ordinal))
         {
             return SsalddelProductRoadmapCatalog.GroupPurchaseVersion;
+        }
+
+        // 0.5 개별주문 화면은 아직 GroupPurchaseDemandWorkflow를 호환 사용하지만,
+        // 제품 도입 버전까지 1.0 공동주문으로 끌어올리지는 않는다.
+        if (string.Equals(
+                fallbackVersion,
+                SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+                StringComparison.Ordinal))
+        {
+            return SsalddelProductRoadmapCatalog.IndividualOrderVersion;
         }
 
         if (featureKeys?.Contains(Sales, StringComparer.Ordinal) == true

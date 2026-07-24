@@ -6,25 +6,31 @@ namespace Ssalddel.Tests.Contracts.Common;
 public sealed class PageCapabilityCatalogTests
 {
     [Fact]
-    public void 제품로드맵은_공동구매뒤에_무역준비와운송을배치한다()
+    public void 제품로드맵은_개별주문뒤에_공동주문과무역준비를배치한다()
     {
         Assert.Equal(
-            ["0.0", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5"],
+            ["0.0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5"],
             SsalddelProductRoadmapCatalog.All.Select(stage => stage.Version));
-        Assert.Equal("1.5", SsalddelProductRoadmapCatalog.CurrentVersion);
-        Assert.Equal("공동구매·주문자 집단화", SsalddelProductRoadmapCatalog.Find("1.0").DisplayName);
+        Assert.Equal("0.0", SsalddelProductRoadmapCatalog.CurrentVersion);
         Assert.Equal(
-            ["0.0", "1.0", "1.5"],
+            SsalddelProductRoadmapCatalog.FoundationVersion,
+            Assert.Single(SsalddelProductRoadmapCatalog.All, stage => stage.IsCurrent).Version);
+        Assert.Equal("개별주문·개별 원장", SsalddelProductRoadmapCatalog.Find("0.5").DisplayName);
+        Assert.Equal("공동주문·주문자 집단화", SsalddelProductRoadmapCatalog.Find("1.0").DisplayName);
+        Assert.Equal(
+            ["0.0", "0.5", "1.0", "1.5"],
             SsalddelProductRoadmapCatalog.All
                 .Where(stage => stage.IsCultureTransport)
                 .Select(stage => stage.Version));
         Assert.All(
-            SsalddelProductRoadmapCatalog.All.Take(3),
+            SsalddelProductRoadmapCatalog.All.Take(4),
             stage => Assert.Equal("문화교통", stage.ProductName));
         Assert.Equal(
             "문화교통 1.5 · 공급·가격·무역 준비",
             SsalddelProductRoadmapCatalog.Find("1.5").FullDisplayName);
         Assert.False(SsalddelProductRoadmapCatalog.IsCultureTransportVersion("2.0"));
+        Assert.Equal("0.0", SsalddelProductRoadmapCatalog.Find("0.5").PrerequisiteVersion);
+        Assert.Equal("0.5", SsalddelProductRoadmapCatalog.Find("1.0").PrerequisiteVersion);
         Assert.Equal("1.0", SsalddelProductRoadmapCatalog.Find("1.5").PrerequisiteVersion);
         Assert.Equal("1.5", SsalddelProductRoadmapCatalog.Find("2.0").PrerequisiteVersion);
     }
@@ -492,9 +498,38 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal(PageInteractionBoundary.PlatformPersistence, capability.Boundary);
         Assert.False(capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects);
-        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal("0.5", capability.IntroducedVersion);
         Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
-        Assert.Contains("로그인한 사용자만", capability.Notice);
+        Assert.Contains("로그인한 사용자", capability.Notice);
+    }
+
+    [Theory]
+    [InlineData(
+        "/community/orders/new?materialBundle=sample",
+        "shipper-community-individual-order-start",
+        false)]
+    [InlineData(
+        "/community/orders",
+        "shipper-community-individual-orders",
+        true)]
+    public void 모바일커뮤니티의_개별주문route는_05원장경계를명시한다(
+        string route,
+        string pageKey,
+        bool requiresAuthentication)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Shipper,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.PlatformPersistence, capability.Boundary);
+        Assert.Equal(requiresAuthentication, capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Equal("0.5", capability.IntroducedVersion);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
     }
 
     [Theory]
@@ -574,7 +609,7 @@ public sealed class PageCapabilityCatalogTests
 
         Assert.True(found);
         Assert.Equal(pageKey, capability.PageKey);
-        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal("0.5", capability.IntroducedVersion);
         Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
         Assert.Equal(boundary, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);
@@ -886,7 +921,7 @@ public sealed class PageCapabilityCatalogTests
 
         Assert.True(found);
         Assert.Equal(pageKey, capability.PageKey);
-        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal("0.5", capability.IntroducedVersion);
         Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
         Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);

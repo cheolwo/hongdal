@@ -23,13 +23,14 @@ public static class SsalddelProductRoadmapCatalog
     public const string CultureTransportName = "문화교통";
     public const string DefaultProductName = "살뜰";
     public const string FoundationVersion = "0.0";
+    public const string IndividualOrderVersion = "0.5";
     public const string GroupPurchaseVersion = "1.0";
     public const string TradeReadinessVersion = "1.5";
     public const string TransportVersion = "2.0";
     public const string FulfillmentVersion = "2.5";
     public const string FoodDeliveryVersion = "3.0";
     public const string MartVersion = "3.5";
-    public const string CurrentVersion = TradeReadinessVersion;
+    public const string CurrentVersion = FoundationVersion;
 
     public static IReadOnlyList<SsalddelProductRoadmapStage> All { get; } =
     [
@@ -39,22 +40,29 @@ public static class SsalddelProductRoadmapCatalog
             "커뮤니티·공공데이터 기반",
             0,
             string.Empty,
-            "공개 음식·재료 데이터와 참여 의사를 안전하게 기록할 수 있습니다."),
+            "공개 음식·재료 데이터와 참여 의사를 안전하게 기록할 수 있습니다.",
+            IsCurrent: true),
+        new(
+            IndividualOrderVersion,
+            CultureTransportName,
+            "개별주문·개별 원장",
+            50,
+            FoundationVersion,
+            "한 사람이 선택한 상품·수량·수령 조건과 철회 가능한 주문 의향을 자신의 개별 원장으로 관리합니다."),
         new(
             GroupPurchaseVersion,
             CultureTransportName,
-            "공동구매·주문자 집단화",
+            "공동주문·주문자 집단화",
             100,
-            FoundationVersion,
-            "품목·지역·수령 조건별 비구속 수요를 서버가 집단화하고 모집 원장으로 보여 줍니다."),
+            IndividualOrderVersion,
+            "동의한 개별주문을 품목·지역·수령 조건별로 집단화하고 공동주문 모집 원장으로 보여 줍니다."),
         new(
             TradeReadinessVersion,
             CultureTransportName,
             "공급·가격·무역 준비",
             150,
             GroupPurchaseVersion,
-            "공급자 근거, 견적, 원가, HS·HTS 후보와 수입 준비 체크포인트를 연결합니다.",
-            IsCurrent: true),
+            "공급자 근거, 견적, 원가, HS·HTS 후보와 수입 준비 체크포인트를 연결합니다."),
         new(
             TransportVersion,
             DefaultProductName,
