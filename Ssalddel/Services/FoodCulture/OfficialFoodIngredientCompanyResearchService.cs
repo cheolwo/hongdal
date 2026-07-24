@@ -278,6 +278,10 @@ public sealed class OfficialFoodIngredientCompanyResearchService(
             ?? UnitedStatesImportedFoodManufacturerRegionClassifier.Classify(
                 record.ManufacturerCountryName,
                 record.ForeignManufacturerAreaName,
+                record.ForeignManufacturerAddress)
+            ?? JapanImportedFoodManufacturerPrefectureClassifier.Classify(
+                record.ManufacturerCountryName,
+                record.ForeignManufacturerAreaName,
                 record.ForeignManufacturerAddress);
         candidates.Add(new OfficialFoodIngredientCompanyCandidateDto(
             CandidateKey(

@@ -45,6 +45,7 @@ using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Services.AgriculturalFisheries.Information;
 using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Services.Content;
 using Ssalddel.Services.Customs;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Startup;
@@ -227,6 +228,34 @@ builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개�
 
 var app = builder.Build();
 app.Logger.LogInformation("Ssalddel execution mode: {ExecutionMode}", executionOptions.Mode);
+
+var youTubeCountrySyncArgument = args.FirstOrDefault(argument =>
+    argument.StartsWith("--sync-youtube-country=", StringComparison.OrdinalIgnoreCase));
+if (youTubeCountrySyncArgument is not null)
+{
+    var countryCode = youTubeCountrySyncArgument["--sync-youtube-country=".Length..];
+    if (string.IsNullOrWhiteSpace(countryCode))
+    {
+        throw new InvalidOperationException(
+            "--sync-youtube-country에는 국가 코드가 필요합니다. 예: --sync-youtube-country=JP");
+    }
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<SsalddelContext>();
+    await db.Database.MigrateAsync();
+    var service = scope.ServiceProvider.GetRequiredService<IYouTube채널감시Service>();
+    var result = await service.국가별동기화Async(countryCode, CancellationToken.None);
+    app.Logger.LogInformation(
+        "YouTube 국가별 일회성 동기화 완료. CountryCode={CountryCode}, Executed={Executed}, Channels={Channels}, Received={Received}, Added={Added}, NewUploads={NewUploads}, Message={Message}",
+        result.국가코드,
+        result.동기화결과.실행됨,
+        result.동기화결과.처리채널수,
+        result.동기화결과.수신영상수,
+        result.동기화결과.추가영상수,
+        result.동기화결과.신규업로드수,
+        result.동기화결과.메시지);
+    return;
+}
 
 if (args.Any(argument =>
         string.Equals(argument, "--collect-usda-nass-prices", StringComparison.OrdinalIgnoreCase)))

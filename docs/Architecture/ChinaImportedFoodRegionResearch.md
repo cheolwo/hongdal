@@ -73,7 +73,7 @@
 
 ## 관련 게시판 월간 누적
 
-재료별 기업 근거 배치가 성공한 뒤 `AgriculturalFisheriesBatch:PublishChinaImportedFoodRegionBriefs=true`이면 현재 권역 근거를 `정보·시세` 게시판의 시스템 글로 누적한다.
+재료별 기업 근거 배치가 성공한 뒤 `AgriculturalFisheriesBatch:PublishChinaImportedFoodRegionBriefs=true`이면 현재 권역 근거를 `MFDS 수입식품 데이터` 게시판의 시스템 글로 누적한다.
 
 - 식별자는 `china-imported-food-region-brief + yyyyMM`이므로 같은 달에는 한 글만 생성한다.
 - 네 권역을 모두 표시해 0건 권역과 중국 기타·미분류를 숨기지 않는다.

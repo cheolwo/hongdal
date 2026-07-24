@@ -42,6 +42,8 @@ public sealed class PublicDataOptions
 
     public MaffRegionalCuisineOptions MaffRegionalCuisine { get; set; } = new();
 
+    public JapanRegionalDataOptions Japan { get; set; } = new();
+
     public NhsHealthierFamiliesRecipeOptions NhsHealthierFamiliesRecipes { get; set; } = new();
 }
 
@@ -214,6 +216,32 @@ public sealed class MaffRegionalCuisineOptions
     public string BaseUrl { get; set; } = "https://www.maff.go.jp";
 
     public string IndexPath { get; set; } = "/e/policies/market/k_ryouri/";
+}
+
+public sealed class JapanRegionalDataOptions
+{
+    public JapanEStatOptions EStat { get; set; } = new();
+
+    public JapanResasOptions Resas { get; set; } = new();
+}
+
+public sealed class JapanEStatOptions
+{
+    public string AppId { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://api.e-stat.go.jp";
+
+    public string ApiVersion { get; set; } = "3.0";
+}
+
+public sealed class JapanResasOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://opendata.resas-portal.go.jp";
+
+    public string AgricultureSalesPath { get; set; }
+        = "/api/v1/agriculture/sales/forLine";
 }
 
 public sealed class NhsHealthierFamiliesRecipeOptions

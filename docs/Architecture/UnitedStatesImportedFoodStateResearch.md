@@ -79,7 +79,7 @@
 
 ## 관련 게시판 월간 누적
 
-재료별 기업 근거 배치가 성공한 뒤 `AgriculturalFisheriesBatch:PublishUnitedStatesImportedFoodStateBriefs=true`이면 현재 미국 주별 근거를 `정보·시세` 게시판의 시스템 글로 누적한다.
+재료별 기업 근거 배치가 성공한 뒤 `AgriculturalFisheriesBatch:PublishUnitedStatesImportedFoodStateBriefs=true`이면 현재 미국 주별 근거를 `MFDS 수입식품 데이터` 게시판의 시스템 글로 누적한다.
 
 - 식별자는 `us-imported-food-state-brief + yyyyMM`이므로 같은 달에는 한 글만 생성한다.
 - 제품 근거가 많은 주 최대 10개, 나머지 분류 주 합계, 워싱턴 D.C.·미국령, 미국 기타·미분류를 분리한다.
