@@ -39,7 +39,8 @@ public sealed class 커뮤니티게시글조회UseCase : I커뮤니티게시글�
         string? roleTag,
         int page,
         int pageSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? periodicVisibility = null)
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 50);
@@ -82,6 +83,23 @@ public sealed class 커뮤니티게시글조회UseCase : I커뮤니티게시글�
         {
             var normalizedRoleTag = Normalize(roleTag, string.Empty, 40);
             query = query.Where(post => post.RoleTag == normalizedRoleTag);
+        }
+
+        var normalizedPeriodicVisibility =
+            CommunityPeriodicPostVisibilityModes.Normalize(periodicVisibility);
+        if (normalizedPeriodicVisibility == CommunityPeriodicPostVisibilityModes.Only)
+        {
+            query = query.Where(post =>
+                post.AuthorUserId != null
+                && post.AuthorUserId.StartsWith(
+                    CommunityAutomatedPostPublication.SystemAuthorPrefix));
+        }
+        else if (normalizedPeriodicVisibility == CommunityPeriodicPostVisibilityModes.Exclude)
+        {
+            query = query.Where(post =>
+                post.AuthorUserId == null
+                || !post.AuthorUserId.StartsWith(
+                    CommunityAutomatedPostPublication.SystemAuthorPrefix));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);

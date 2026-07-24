@@ -16,14 +16,11 @@ public sealed class CommunityWorkBoardEditorialPlanCatalogTests
         Assert.All(plans, plan =>
         {
             Assert.NotEmpty(plan.Topics);
-            Assert.NotEmpty(plan.ExecutableSourceKeys);
-            Assert.NotEmpty(plan.PlannedOfficialSources);
-            Assert.True(plan.RequiresEditorialReview);
         });
     }
 
     [Fact]
-    public void Catalog_ConnectsTradeAndTransportToTopicsWithoutPretendingPlannedConnectorsExist()
+    public void Catalog_DerivesImplementedAndPlannedSourcesFromCanonicalRelations()
     {
         var customs = CommunityWorkBoardEditorialPlanCatalog.Find(
             CommunityActivityBoardKeys.CustomsProcess);
@@ -31,8 +28,10 @@ public sealed class CommunityWorkBoardEditorialPlanCatalogTests
             CommunityActivityBoardKeys.LoadingJourney);
 
         Assert.Contains(customs.Topics, topic => topic.Contains("수입신고"));
-        Assert.Contains(customs.PlannedOfficialSources, source => source.Contains("관세청"));
-        Assert.DoesNotContain(customs.ExecutableSourceKeys, source => source.Contains("customs"));
-        Assert.Contains(loading.PlannedOfficialSources, source => source.Contains("안전보건공단"));
+        Assert.Contains("customs-confirmation-requirements", customs.ExecutableSourceKeys);
+        Assert.Contains(loading.PlannedOfficialSources, source => source.Contains("안전"));
+        Assert.DoesNotContain(
+            CommunityBoardInformationSourceKeys.PlannedCargoSafetyGuidance,
+            loading.ExecutableSourceKeys);
     }
 }

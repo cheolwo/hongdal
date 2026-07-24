@@ -1,18 +1,25 @@
 @page "/community/boards"
+@layout CommunityMobileLayout
 
 <PageTitle>커뮤니티 게시판 · 살뜰</PageTitle>
 
-<CommunityBoardListScreen AppKey="shipper"
-                          BackHref="@CommunityPageRoutes.Home"
-                          BoardKey="@BoardKey"
-                          BoardName="@BoardName"
-                          WorkflowTag="@WorkflowTag"
-                          RoleTag="@RoleTag"
-                          Page="@Page"
-                          SearchText="@SearchText"
-                          ListFilter="@ListFilter"
-                          ViewMode="@ViewMode"
-                          FocusTarget="@FocusTarget" />
+<CommunityRoutePageFrame BackHref="@CommunityPageRoutes.Home"
+                         BackLabel="게시판 모음"
+                         Eyebrow="공개 커뮤니티 · 01A.02"
+                         Heading="게시판 글 목록"
+                         Description="선택한 게시판의 글을 목록이나 카드로 바꾸어 가볍게 읽습니다.">
+    <CommunityBoardListScreen AppKey="shipper"
+                              BackHref="@CommunityPageRoutes.Home"
+                              BoardKey="@BoardKey"
+                              BoardName="@BoardName"
+                              WorkflowTag="@WorkflowTag"
+                              RoleTag="@RoleTag"
+                              Page="@Page"
+                              SearchText="@SearchText"
+                              ListFilter="@ListFilter"
+                              ViewMode="@ViewMode"
+                              FocusTarget="@FocusTarget" />
+</CommunityRoutePageFrame>
 
 @code {
     [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]

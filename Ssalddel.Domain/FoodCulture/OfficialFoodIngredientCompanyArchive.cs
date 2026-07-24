@@ -134,6 +134,18 @@ public sealed class OfficialFoodIngredientCompanyEvidence
 
     public string ResearchQueryTerm { get; set; } = string.Empty;
 
+    public string ManufacturerRegionCode { get; set; } = string.Empty;
+
+    public string ManufacturerRegionName { get; set; } = string.Empty;
+
+    public string ManufacturerRegionScope { get; set; } = string.Empty;
+
+    public string ManufacturerRegionClassificationMethod { get; set; } = string.Empty;
+
+    public string ManufacturerRegionEvidence { get; set; } = string.Empty;
+
+    public decimal ManufacturerRegionConfidence { get; set; }
+
     public DateTime FirstObservedAtUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime LastObservedAtUtc { get; set; } = DateTime.UtcNow;

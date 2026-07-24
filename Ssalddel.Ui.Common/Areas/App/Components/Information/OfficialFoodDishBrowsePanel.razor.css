@@ -122,6 +122,7 @@
     display: grid;
     align-content: start;
     gap: 8px;
+    min-width: 0;
     max-height: 720px;
     overflow-y: auto;
 }
@@ -150,6 +151,7 @@
 }
 
 .food-dish-browser__detail {
+    min-width: 0;
     padding: 18px;
     border: 1px solid #d5e1d9;
     border-radius: 14px;
@@ -261,39 +263,6 @@
     color: #294337;
 }
 
-.food-dish-browser__routes {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
-    margin-top: 13px;
-}
-
-.food-dish-browser__route {
-    display: grid;
-    gap: 4px;
-    padding: 12px;
-    border-radius: 11px;
-    cursor: pointer;
-    text-align: left;
-}
-
-.food-dish-browser__route span {
-    font-size: .72rem;
-    line-height: 1.4;
-}
-
-.food-dish-browser__route--domestic {
-    border: 1px solid #176b4d;
-    background: #176b4d;
-    color: #fff;
-}
-
-.food-dish-browser__route--import {
-    border: 1px solid #b96a2f;
-    background: #fff7ef;
-    color: #7b421b;
-}
-
 .food-dish-browser__detail footer {
     display: flex;
     justify-content: space-between;
@@ -344,7 +313,7 @@
     }
 
     .food-dish-browser__workspace {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .food-dish-browser__list {
@@ -365,8 +334,7 @@
         border-radius: 14px;
     }
 
-    .food-dish-browser__search > div,
-    .food-dish-browser__routes {
+    .food-dish-browser__search > div {
         grid-template-columns: 1fr;
     }
 

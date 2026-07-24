@@ -81,6 +81,14 @@ internal sealed class OfficialFoodIngredientCompanyEvidenceConfiguration
         builder.Property(x => x.SourceName).HasMaxLength(300).IsRequired();
         builder.Property(x => x.SourceUrl).HasMaxLength(1000).IsRequired();
         builder.Property(x => x.ResearchQueryTerm).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.ManufacturerRegionCode).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.ManufacturerRegionName).HasMaxLength(160).IsRequired();
+        builder.Property(x => x.ManufacturerRegionScope).HasMaxLength(800).IsRequired();
+        builder.Property(x => x.ManufacturerRegionClassificationMethod)
+            .HasMaxLength(50)
+            .IsRequired();
+        builder.Property(x => x.ManufacturerRegionEvidence).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.ManufacturerRegionConfidence).HasPrecision(5, 4);
 
         builder.HasOne(x => x.Ingredient)
             .WithMany(x => x.CompanyEvidence)
@@ -95,6 +103,7 @@ internal sealed class OfficialFoodIngredientCompanyEvidenceConfiguration
         builder.HasIndex(x => new { x.IngredientId, x.IsCurrent, x.RelationCode });
         builder.HasIndex(x => new { x.IngredientId, x.OrganizationKey, x.IsCurrent });
         builder.HasIndex(x => new { x.CountryCode, x.RelationCode, x.IsCurrent });
+        builder.HasIndex(x => new { x.CountryCode, x.ManufacturerRegionCode, x.IsCurrent });
         builder.HasIndex(x => new { x.SourceKey, x.IsCurrent, x.LastObservedAtUtc });
         builder.HasIndex(x => x.LastResearchRunId);
     }

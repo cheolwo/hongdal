@@ -1,0 +1,302 @@
+/* 문화교통 패널은 기존 레이아웃 구조를 유지해 화면 배치를 바꾸지 않습니다. */
+.culture-transport {
+    min-width: 0;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #cbdcd2;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.culture-transport__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: start;
+}
+
+.culture-transport__header > div {
+    min-width: 0;
+}
+
+.culture-transport__header > div > span {
+    color: #176b4d;
+    font-size: .68rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    overflow-wrap: anywhere;
+}
+
+.culture-transport__header h5 {
+    margin: 5px 0 0;
+    font-size: 1.06rem;
+}
+
+.culture-transport__header p {
+    max-width: 760px;
+    margin: 7px 0 0;
+    color: #607067;
+    font-size: .8rem;
+    line-height: 1.55;
+}
+
+.culture-transport__state {
+    flex: 0 0 auto;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: #eaf5ef;
+    color: #176b4d;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.culture-transport__evidence {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 13px;
+}
+
+.culture-transport__evidence article {
+    display: grid;
+    align-content: start;
+    gap: 3px;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #dbe6df;
+    border-radius: 10px;
+    background: #f8fbf9;
+}
+
+.culture-transport__evidence span {
+    color: #6a776f;
+    font-size: .66rem;
+}
+
+.culture-transport__evidence strong {
+    overflow-wrap: anywhere;
+    color: #294337;
+    font-size: .78rem;
+}
+
+.culture-transport__evidence small {
+    color: #76837b;
+    font-size: .66rem;
+    line-height: 1.4;
+}
+
+.culture-transport__routes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.culture-transport__route--conversation {
+    margin-top: 12px;
+    border-color: #bcd8c8;
+    background: #f6fbf8;
+}
+
+.culture-transport__purchase-options {
+    margin-top: 12px;
+    border: 1px solid #d7e0da;
+    border-radius: 12px;
+    background: #fcfdfc;
+}
+
+.culture-transport__purchase-options > summary {
+    display: grid;
+    gap: 3px;
+    min-height: 44px;
+    padding: 13px 40px 13px 14px;
+    position: relative;
+    cursor: pointer;
+    list-style: none;
+}
+
+.culture-transport__purchase-options > summary::-webkit-details-marker {
+    display: none;
+}
+
+.culture-transport__purchase-options > summary::after {
+    content: "+";
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    translate: 0 -50%;
+    color: #176b4d;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.culture-transport__purchase-options[open] > summary::after {
+    content: "−";
+}
+
+.culture-transport__purchase-options > summary span {
+    color: #176b4d;
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.culture-transport__purchase-options > summary strong {
+    color: #293e34;
+    font-size: .9rem;
+}
+
+.culture-transport__purchase-options > summary small,
+.culture-transport__purchase-boundary {
+    color: #718078;
+    font-size: .7rem;
+    line-height: 1.45;
+}
+
+.culture-transport__purchase-options .culture-transport__routes {
+    margin: 0;
+    padding: 0 12px 12px;
+}
+
+.culture-transport__choice-heading {
+    display: grid;
+    gap: 3px;
+    margin: 0 12px;
+    padding: 12px 2px 8px;
+}
+
+.culture-transport__choice-heading span,
+.culture-transport__together-bridge span {
+    color: #176b4d;
+    font-size: .67rem;
+    font-weight: 850;
+}
+
+.culture-transport__choice-heading strong,
+.culture-transport__together-bridge strong {
+    color: #293e34;
+    font-size: .85rem;
+}
+
+.culture-transport__choice-heading p,
+.culture-transport__together-bridge p {
+    margin: 0;
+    color: #68776f;
+    font-size: .71rem;
+    line-height: 1.45;
+}
+
+.culture-transport__together-bridge {
+    display: grid;
+    gap: 4px;
+    margin: 0 12px 12px;
+    padding: 12px 13px;
+    border: 1px solid #bcd8c8;
+    border-left: 4px solid #176b4d;
+    border-radius: 10px;
+    background: #eef8f2;
+}
+
+.culture-transport__route--group {
+    border-color: #bcd8c8;
+    background: #f6fbf8;
+}
+
+.culture-transport__purchase-boundary {
+    margin: 0 12px 12px;
+    padding: 9px 11px;
+    border-radius: 8px;
+    background: #f2f5f3;
+}
+
+.culture-transport__route {
+    display: grid;
+    align-content: start;
+    gap: 5px;
+    padding: 13px;
+    border: 1px solid #d6e2da;
+    border-radius: 11px;
+    background: #fbfdfc;
+    min-width: 0;
+}
+
+.culture-transport__route > span {
+    color: #64736a;
+    font-size: .67rem;
+    font-weight: 800;
+}
+
+.culture-transport__route > strong {
+    color: #263d32;
+    font-size: .86rem;
+}
+
+.culture-transport__route p {
+    margin: 0;
+    color: #69776f;
+    font-size: .72rem;
+    line-height: 1.45;
+}
+
+.culture-transport__route a,
+.culture-transport__route button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    padding: 8px 11px;
+    border: 1px solid #176b4d;
+    border-radius: 9px;
+    background: #fff;
+    color: #176b4d;
+    cursor: pointer;
+    font: inherit;
+    font-size: .74rem;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+}
+
+.culture-transport__route > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.culture-transport__route--import {
+    border-color: #e1c3ab;
+    background: #fffaf5;
+}
+
+.culture-transport__route--import button {
+    border-color: #b96a2f;
+    color: #7b421b;
+}
+
+.culture-transport__notice {
+    margin: 10px 0 0;
+    padding: 9px 11px;
+    border-radius: 9px;
+    background: #fff3d8;
+    color: #72511a;
+    font-size: .74rem;
+    line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+    .culture-transport {
+        padding: 13px;
+    }
+
+    .culture-transport__header,
+    .culture-transport__evidence,
+    .culture-transport__routes,
+    .culture-transport__route > div {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .culture-transport__state {
+        justify-self: start;
+    }
+}

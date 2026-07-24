@@ -18,6 +18,7 @@ public sealed record CommunityBoardPostQuery(
     string? LegacyCategory,
     string? WorkflowTag,
     string? RoleTag,
+    string? PeriodicVisibility,
     int Page,
     int PageSize);
 
@@ -64,6 +65,7 @@ public sealed class CommunityBoardPageViewModel(
         ErrorMessage = null;
         BoardSummaries = MergeWithCoreBoards([]);
         CurrentBoard = ResolveCurrentBoard(BoardSummaries, request);
+        NormalizePeriodicFilterForCurrentBoard();
 
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(LoadTimeout);
@@ -72,6 +74,7 @@ public sealed class CommunityBoardPageViewModel(
             var serverBoards = await loadBoardSummaries(timeout.Token);
             BoardSummaries = MergeWithCoreBoards(serverBoards);
             CurrentBoard = ResolveCurrentBoard(BoardSummaries, request);
+            NormalizePeriodicFilterForCurrentBoard();
 
             var resolvedKey = CurrentBoard?.BoardKey
                               ?? CommunityBoardCatalog.Find(request.BoardKey ?? request.LegacyBoardName)?.Key;
@@ -84,6 +87,9 @@ public sealed class CommunityBoardPageViewModel(
                     legacyCategory,
                     request.WorkflowTag,
                     request.RoleTag,
+                    CommunityPeriodicPostTopicCatalog.SupportsBoard(resolvedKey)
+                        ? CommunityPeriodicPostTopicCatalog.VisibilityFor(SelectedFilter)
+                        : CommunityPeriodicPostVisibilityModes.All,
                     CommunityBoardNavigationContext.NormalizePage(request.Page),
                     50),
                 timeout.Token);
@@ -188,10 +194,21 @@ public sealed class CommunityBoardPageViewModel(
     private bool MatchesListFilter(PlatformCommunityPostResponse post)
         => SelectedFilter switch
         {
+            CommunityPeriodicPostTopicCatalog.GeneralListFilter => !post.IsPeriodic,
+            CommunityPeriodicPostTopicCatalog.PeriodicListFilter => post.IsPeriodic,
             "공지" => post.IsOperatorPinned,
             "추천글" => post.IsTrending || post.RecommendationCount >= 5,
             _ => true
         };
+
+    private void NormalizePeriodicFilterForCurrentBoard()
+    {
+        if (CommunityPeriodicPostTopicCatalog.IsTopicFilter(SelectedFilter)
+            && !CommunityPeriodicPostTopicCatalog.SupportsBoard(CurrentBoard?.BoardKey))
+        {
+            SelectedFilter = "전체글";
+        }
+    }
 
     private bool MatchesSearch(PlatformCommunityPostResponse post)
     {

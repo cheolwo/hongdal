@@ -73,6 +73,12 @@ public sealed class PlatformCommunityPostResponse
     public string? AuthorDisplayCountryName { get; set; }
     public bool IsSystemGenerated { get; set; }
     public string? SystemPostKind { get; set; }
+    public bool IsPeriodic { get; set; }
+    public string TopicClassificationCode { get; set; } =
+        CommunityPostTopicClassificationCodes.General;
+    public string TopicClassificationName { get; set; } =
+        CommunityPostTopicClassificationCodes.DisplayName(
+            CommunityPostTopicClassificationCodes.General);
     public string? PrivacyNotice { get; set; }
     public bool CanEdit { get; set; }
     public bool EditRequiresPassword { get; set; }
@@ -130,6 +136,7 @@ public static class PlatformCommunitySystemPostKinds
     public const string KamisPriceBrief = "kamis-price-brief";
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
+    public const string CultureTransport = "culture-transport";
     public const string PrajnaContent = "prajna-content";
     public const string AutomatedEditorial = "automated-editorial";
 }

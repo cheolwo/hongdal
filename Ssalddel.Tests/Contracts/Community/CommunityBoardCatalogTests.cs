@@ -28,10 +28,52 @@ public sealed class CommunityBoardCatalogTests
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Prajna);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Food);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Cargo);
+        Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.PeriodicDataKamis);
+        Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.PeriodicDataMfds);
+        Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.PeriodicDataUsda);
+        Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.PeriodicDataCustomsImportUnitPrice);
         Assert.DoesNotContain(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.SafetyReport);
         Assert.False(CommunityBoardCatalog.SafetyReport.IsPublic);
         Assert.Equal("신고·분쟁", CommunityBoardCatalog.SafetyReport.DisplayName);
         Assert.True(CommunityBoardCatalog.IsProtectedCategory("신고/분쟁"));
+    }
+
+    [Fact]
+    public void 주기성데이터게시판은_운영자만작성하고_주기성필터를지원한다()
+    {
+        var dataBoards = CommunityBoardCatalog.PublicBoards
+            .Where(board => board.GroupCode == CommunityBoardGroupCodes.PeriodicData)
+            .ToArray();
+
+        Assert.Equal(4, dataBoards.Length);
+        Assert.All(dataBoards, board =>
+        {
+            Assert.False(board.IsUserCreatable);
+            Assert.Equal(
+                CommunityBoardPostingAccessCodes.OperatorOnly,
+                board.PostingAccessCode);
+            Assert.True(CommunityPeriodicPostTopicCatalog.SupportsBoard(board.Key));
+        });
+    }
+
+    [Fact]
+    public void 정보시세수입식품은_중국과미국의안정업무태그로분류한다()
+    {
+        Assert.Equal(
+            ["CN", "US"],
+            CommunityImportedFoodCountryFilterCatalog.All.Select(item => item.CountryCode));
+        Assert.Equal(
+            "중국 수입식품 공개근거",
+            CommunityImportedFoodCountryFilterCatalog.China.WorkflowTag);
+        Assert.Equal(
+            "미국 수입식품 공개근거",
+            CommunityImportedFoodCountryFilterCatalog.UnitedStates.WorkflowTag);
+        Assert.Equal(
+            "중국",
+            CommunityImportedFoodCountryFilterCatalog.FindByWorkflowTag(
+                " 중국 수입식품 공개근거 ")?.DisplayName);
+        Assert.Null(
+            CommunityImportedFoodCountryFilterCatalog.FindByWorkflowTag("국내 가격 정보"));
     }
 
     [Fact]

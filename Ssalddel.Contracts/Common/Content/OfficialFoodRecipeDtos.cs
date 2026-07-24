@@ -151,6 +151,10 @@ public sealed record OfficialFoodRecipeDishDto(
     int VariantCount,
     DateTime UpdatedAtUtc);
 
+public sealed record OfficialFoodRecipeDishReviewRequest(
+    string ReviewState,
+    string RepresentationState);
+
 public sealed record OfficialFoodDishDetailDto(
     OfficialFoodRecipeDishDto Dish,
     string RecipeRecordKey,

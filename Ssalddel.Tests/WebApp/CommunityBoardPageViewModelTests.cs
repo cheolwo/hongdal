@@ -143,6 +143,73 @@ public sealed class CommunityBoardPageViewModelTests
         Assert.Empty(viewModel.VisiblePosts);
     }
 
+    [Fact]
+    public async Task 업무게시판_주기성필터는_서버범위와_표시글을_함께_좁힌다()
+    {
+        CommunityBoardPostQuery? capturedQuery = null;
+        var periodic = Post(
+            10,
+            "정기 가격 근거",
+            "서버가 수집한 정기 자료",
+            "살뜰 시스템",
+            isPeriodic: true);
+        var viewModel = CreateViewModel(
+            loadPosts: (query, _) =>
+            {
+                capturedQuery = query;
+                return Task.FromResult(new PlatformCommunityPostListResponse
+                {
+                    Items = [periodic],
+                    TotalCount = 1,
+                    Page = 1,
+                    PageSize = 50
+                });
+            });
+
+        await viewModel.LoadAsync(new CommunityBoardPageRequest(
+            CommunityActivityBoardKeys.FoundationEvidence,
+            null,
+            null,
+            null,
+            1,
+            ListFilter: CommunityPeriodicPostTopicCatalog.PeriodicListFilter));
+
+        Assert.NotNull(capturedQuery);
+        Assert.Equal(
+            CommunityPeriodicPostVisibilityModes.Only,
+            capturedQuery.PeriodicVisibility);
+        Assert.True(Assert.Single(viewModel.VisiblePosts).IsPeriodic);
+        Assert.Equal(
+            CommunityPeriodicPostTopicCatalog.PeriodicListFilter,
+            viewModel.SelectedFilter);
+    }
+
+    [Fact]
+    public async Task 일반게시판은_주기성_딥링크를_전체글로_보정한다()
+    {
+        CommunityBoardPostQuery? capturedQuery = null;
+        var viewModel = CreateViewModel(
+            loadPosts: (query, _) =>
+            {
+                capturedQuery = query;
+                return Task.FromResult(new PlatformCommunityPostListResponse());
+            });
+
+        await viewModel.LoadAsync(new CommunityBoardPageRequest(
+            CommunityBoardKeys.FreeLife,
+            null,
+            null,
+            null,
+            1,
+            ListFilter: CommunityPeriodicPostTopicCatalog.PeriodicListFilter));
+
+        Assert.NotNull(capturedQuery);
+        Assert.Equal(
+            CommunityPeriodicPostVisibilityModes.All,
+            capturedQuery.PeriodicVisibility);
+        Assert.Equal("전체글", viewModel.SelectedFilter);
+    }
+
     private static CommunityBoardPageViewModel CreateViewModel(
         Func<CommunityBoardPostQuery, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts)
         => new(
@@ -156,7 +223,8 @@ public sealed class CommunityBoardPageViewModelTests
         string nickname,
         bool isPinned = false,
         bool isTrending = false,
-        int recommendations = 0)
+        int recommendations = 0,
+        bool isPeriodic = false)
         => new()
         {
             Id = id,
@@ -165,6 +233,14 @@ public sealed class CommunityBoardPageViewModelTests
             Nickname = nickname,
             IsOperatorPinned = isPinned,
             IsTrending = isTrending,
-            RecommendationCount = recommendations
+            RecommendationCount = recommendations,
+            IsPeriodic = isPeriodic,
+            TopicClassificationCode = isPeriodic
+                ? CommunityPostTopicClassificationCodes.Periodic
+                : CommunityPostTopicClassificationCodes.General,
+            TopicClassificationName = CommunityPostTopicClassificationCodes.DisplayName(
+                isPeriodic
+                    ? CommunityPostTopicClassificationCodes.Periodic
+                    : CommunityPostTopicClassificationCodes.General)
         };
 }

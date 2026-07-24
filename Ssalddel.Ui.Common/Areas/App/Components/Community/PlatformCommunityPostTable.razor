@@ -43,6 +43,10 @@
                         <MudIcon Icon="@Icons.Material.Filled.SmartDisplay" Size="Size.Small" />
                     }
                     <strong>@post.Title</strong>
+                    @if (post.IsPeriodic)
+                    {
+                        <em class="platform-community-periodic-label">@post.TopicClassificationName</em>
+                    }
                     @if (post.SalesOffer is { } salesOffer)
                     {
                         <em class="platform-community-sales-label">@PlatformCommunityPostListPresentation.SalesStatusLabel(salesOffer.Status) · @PlatformCommunityPostListPresentation.FormatSalesPrice(salesOffer)</em>

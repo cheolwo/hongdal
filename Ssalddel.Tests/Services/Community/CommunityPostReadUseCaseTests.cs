@@ -118,6 +118,64 @@ public sealed class CommunityPostReadUseCaseTests
         Assert.False(otherMemberItem.CanDelete);
     }
 
+    [Fact]
+    public async Task 목록은_주기성_서버글을_별도_주제로_포함하거나_제외한다()
+    {
+        await using var db = CreateContext();
+        var general = CreatePost(
+            "일반 업무 글",
+            CommunityActivityBoardCatalog.FindBundle(
+                CommunityActivityBoardKeys.FoundationEvidence)!.Board.DisplayName);
+        var periodic = CreatePost(
+            "정기 공공데이터",
+            CommunityActivityBoardCatalog.FindBundle(
+                CommunityActivityBoardKeys.FoundationEvidence)!.Board.DisplayName);
+        periodic.AuthorUserId = CommunityAutomatedPostPublication.BuildSystemAuthorKey(
+            "public-data-test",
+            "2026-07-24");
+        db.PlatformCommunityPosts.AddRange(general, periodic);
+        await db.SaveChangesAsync();
+        var useCase = CreateUseCase(db);
+
+        var onlyPeriodic = await useCase.목록Async(
+            "platform",
+            null,
+            CommunityActivityBoardKeys.FoundationEvidence,
+            null,
+            null,
+            1,
+            50,
+            CancellationToken.None,
+            CommunityPeriodicPostVisibilityModes.Only);
+        var excludePeriodic = await useCase.목록Async(
+            "platform",
+            null,
+            CommunityActivityBoardKeys.FoundationEvidence,
+            null,
+            null,
+            1,
+            50,
+            CancellationToken.None,
+            CommunityPeriodicPostVisibilityModes.Exclude);
+
+        Assert.True(onlyPeriodic.IsSuccess);
+        var periodicResponse = Assert.Single(onlyPeriodic.Value.Items);
+        Assert.Equal("정기 공공데이터", periodicResponse.Title);
+        Assert.True(periodicResponse.IsPeriodic);
+        Assert.Equal(
+            CommunityPostTopicClassificationCodes.Periodic,
+            periodicResponse.TopicClassificationCode);
+        Assert.Equal("주기성", periodicResponse.TopicClassificationName);
+
+        Assert.True(excludePeriodic.IsSuccess);
+        var generalResponse = Assert.Single(excludePeriodic.Value.Items);
+        Assert.Equal("일반 업무 글", generalResponse.Title);
+        Assert.False(generalResponse.IsPeriodic);
+        Assert.Equal(
+            CommunityPostTopicClassificationCodes.General,
+            generalResponse.TopicClassificationCode);
+    }
+
     private static 커뮤니티게시글조회UseCase CreateUseCase(
         SsalddelContext db,
         ICurrentUserAccessor? currentUserAccessor = null)

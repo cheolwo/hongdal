@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Information;
@@ -108,6 +109,118 @@ public static class OfficialFoodIngredientPresentation
             selection.SourcingModeCode);
     }
 
+    public static CommunityPostComposerSnapshot CreateCultureTransportDraft(
+        OfficialFoodDishIngredientPurchaseSelection selection,
+        OfficialFoodIngredientCompanyResearchResponse? companyResearch,
+        OfficialFoodIngredientHsMappingResponse? hsMapping,
+        DateTime savedAtUtc)
+    {
+        ArgumentNullException.ThrowIfNull(selection);
+        ArgumentNullException.ThrowIfNull(selection.Dish);
+        ArgumentNullException.ThrowIfNull(selection.Ingredient);
+
+        var dish = selection.Dish;
+        var ingredient = selection.Ingredient;
+        var countryName = CountryName(dish.Dish.CountryCode);
+        var dishWithConjunction = $"{dish.Dish.Name}{ConjunctionParticle(dish.Dish.Name)}";
+        var lines = new List<string>
+        {
+            $"{countryName} 음식 {dish.Dish.Name}, 재료 {ingredient.CanonicalName}에 관해 이야기를 나누고 싶습니다.",
+            string.Empty,
+            "[공식·공개 자료에서 확인한 출발점]",
+            $"음식: {dish.Dish.Name} ({dish.Dish.OriginalName})",
+            $"지역·국가: {dish.Dish.RegionName} · {countryName}",
+            $"선택 재료: {ingredient.CanonicalName} · {BuildRecipeIngredientText(ingredient)}",
+            $"음식 자료 제공기관: {dish.Provider}",
+            $"자료 확인 시각: {dish.LastCollectedAtUtc.ToUniversalTime():yyyy-MM-dd HH:mm} UTC"
+        };
+
+        var priceReference = BuildPriceReference(ingredient.PublicPrices ?? []);
+        AddDraftLine(lines, "공공 가격 참고", priceReference);
+
+        if (companyResearch is not null)
+        {
+            AddDraftLine(
+                lines,
+                "기업·상품 근거 원천",
+                string.Join(" · ", companyResearch.Sources
+                    .Select(source => source.Provider)
+                    .Where(provider => !string.IsNullOrWhiteSpace(provider))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Take(3)));
+            lines.Add($"관련 기업·상품 근거 후보: {companyResearch.Candidates.Count:N0}건 (거래 상대 추천·선정 결과 아님)");
+        }
+
+        if (hsMapping is not null)
+        {
+            var hsCandidates = hsMapping.Candidates
+                .Take(3)
+                .Select(candidate => $"{candidate.CountryCode} {candidate.StandardCode} {candidate.HsCode}")
+                .ToArray();
+            AddDraftLine(lines, "품목분류 참고 후보", string.Join(" · ", hsCandidates));
+            lines.Add("품목분류 후보는 신고용 확정값이 아니며 실제 상품 형태와 거래 국가를 정한 뒤 전문 검토가 필요합니다.");
+        }
+
+        lines.AddRange(
+        [
+            string.Empty,
+            "[함께 나누고 싶은 내용]",
+            "- 이 음식은 현지에서 언제, 누구와, 어떤 방식으로 먹나요?",
+            "- 원래 재료와 현지에서 구할 수 있는 대체 재료는 무엇인가요?",
+            "- 구매하지 않고 정보만 나눠도 좋습니다. 구해 보고 싶다면 먼저 개별구매나 개별수입 조건을 확인할 수 있나요?",
+            "- 최소수량·조건 확인·연락·통관·수령을 혼자 감당하기 부담스럽다면, 공동구매나 공동수입에서 어떤 역할을 함께 나누면 좋을까요?",
+            string.Empty,
+            "※ 공개 자료는 대화와 사전 검토를 위한 참고 정보입니다. 현재 판매 가능성, 거래 상대의 자격, 최종 가격, 계약 또는 수입 적격성을 보증하지 않습니다."
+        ]);
+
+        return new CommunityPostComposerSnapshot
+        {
+            SavedAtUtc = savedAtUtc,
+            Category = CommunityBoardCatalog.Food.DisplayName,
+            WorkflowTag = CultureTransportContentCatalog.FoodCultureWorkflowTag,
+            RoleTag = "문화교통 참여자",
+            Title = $"[문화교통][{countryName}] {dishWithConjunction} {ingredient.CanonicalName} 이야기",
+            Body = string.Join(Environment.NewLine, lines),
+            SharedLinkUrl = SafeHttpUrl(dish.OriginalUrl) ?? string.Empty,
+            IsInterestGatheringEnabled = false,
+            IsSalesPost = false
+        };
+    }
+
+    public static CommunityPostComposerSnapshot CreateIndividualImportReviewDraft(
+        OfficialFoodDishIngredientPurchaseSelection selection,
+        OfficialFoodIngredientCompanyResearchResponse? companyResearch,
+        OfficialFoodIngredientHsMappingResponse? hsMapping,
+        DateTime savedAtUtc)
+    {
+        var cultureDraft = CreateCultureTransportDraft(
+            selection,
+            companyResearch,
+            hsMapping,
+            savedAtUtc);
+        var countryName = CountryName(selection.Dish.Dish.CountryCode);
+        var importQuestions = string.Join(Environment.NewLine,
+        [
+            string.Empty,
+            "[개별수입 전에 확인하고 싶은 내용]",
+            "- 실제 상품명·성분·포장 형태와 수량은 무엇인가요?",
+            "- 출발 국가와 도착 국가에서 개인 반입이 허용되며 검역·신고·표시 의무가 있나요?",
+            "- 배송비·세금·검사 비용과 반송 또는 폐기 위험을 누가 부담하나요?",
+            "- 혼자 확인·통관·수령하기 어렵다면 누구와 어떤 책임을 나눌 수 있나요?",
+            string.Empty,
+            "※ 이 글은 개별수입 가능성을 함께 확인하기 위한 질문입니다. 주문, 구매 대행, 통관 신고 또는 계약을 요청하거나 자동 실행하지 않습니다."
+        ]);
+
+        return cultureDraft with
+        {
+            Category = CommunityBoardCatalog.InformationPrices.DisplayName,
+            WorkflowTag = "개별수입 사전 확인",
+            RoleTag = "정보 확인 참여자",
+            Title = $"[개별수입 사전 확인] {countryName} {selection.Ingredient.CanonicalName}",
+            Body = cultureDraft.Body + importQuestions
+        };
+    }
+
     public static string FormatPrice(OfficialFoodIngredientPublicPriceDto price)
     {
         ArgumentNullException.ThrowIfNull(price);
@@ -171,4 +284,21 @@ public static class OfficialFoodIngredientPresentation
            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
             ? uri.AbsoluteUri
             : null;
+
+    private static void AddDraftLine(List<string> lines, string label, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            lines.Add($"{label}: {value}");
+        }
+    }
+
+    private static string ConjunctionParticle(string value)
+    {
+        var lastCharacter = value.Trim().LastOrDefault();
+        return lastCharacter is >= '\uAC00' and <= '\uD7A3'
+               && (lastCharacter - '\uAC00') % 28 != 0
+            ? "과"
+            : "와";
+    }
 }

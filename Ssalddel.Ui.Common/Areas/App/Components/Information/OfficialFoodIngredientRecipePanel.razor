@@ -20,9 +20,12 @@
                     {
                         <a href="@recipeUrl" target="_blank" rel="noreferrer">원문 레시피</a>
                     }
-                    <button type="button" @onclick="@(() => StartRecipePurchaseAsync(recipe))">
-                        이 재료 수요 등록
-                    </button>
+                    <details class="ingredient-recipe__optional-action">
+                        <summary>혼자 준비하기 부담스럽다면</summary>
+                        <button type="button" @onclick="@(() => StartRecipePurchaseAsync(recipe))">
+                            이 레시피로 같이 구매할 이웃 알아보기
+                        </button>
+                    </details>
                 </div>
             </div>
         }

@@ -75,7 +75,8 @@ public sealed class OfficialFoodIngredientCompanyResearchService(
                 "표시된 업체는 공식 제품·표시 이력에서 재료 관계가 확인된 조사 후보이며 현재 재고, 공급능력, 판매 의사 또는 계약 권한을 보증하지 않습니다.",
                 "대표자명, 전화번호, 상세 주소 등 개인 또는 직접 연락 정보는 공개 화면에 복제하지 않습니다.",
                 "플랫폼은 업체를 자동 추천·선정·초대하지 않으며 실제 거래 전 당사자 동의와 최신 인허가·인증·수입중단 상태를 다시 확인해야 합니다.",
-                "음식의 문화적 국가, 제품 제조국, 상품 원산지와 실제 선적 출발국은 서로 다른 정보로 관리합니다."
+                "음식의 문화적 국가, 제품 제조국, 상품 원산지와 실제 선적 출발국은 서로 다른 정보로 관리합니다.",
+                "중국 권역은 식약처 등록 해외제조업소의 소재 근거이며 원재료 재배지·어획지나 법정 원산지 표기를 대신하지 않습니다."
             ]);
     }
 
@@ -269,6 +270,15 @@ public sealed class OfficialFoodIngredientCompanyResearchService(
             return;
         }
 
+        var manufacturerRegion =
+            ChinaImportedFoodManufacturerRegionClassifier.Classify(
+                record.ManufacturerCountryName,
+                record.ForeignManufacturerAreaName,
+                record.ForeignManufacturerAddress)
+            ?? UnitedStatesImportedFoodManufacturerRegionClassifier.Classify(
+                record.ManufacturerCountryName,
+                record.ForeignManufacturerAreaName,
+                record.ForeignManufacturerAddress);
         candidates.Add(new OfficialFoodIngredientCompanyCandidateDto(
             CandidateKey(
                 OfficialFoodIngredientCompanyRelationCodes.ForeignManufacturer,
@@ -299,7 +309,14 @@ public sealed class OfficialFoodIngredientCompanyResearchService(
             false)
         {
             RawIngredientText = record.RawIngredientText,
-            EvidenceDate = record.ProcessedDate
+            EvidenceDate = record.ProcessedDate,
+            ManufacturerRegionCode = manufacturerRegion?.RegionCode ?? string.Empty,
+            ManufacturerRegionName = manufacturerRegion?.RegionName ?? string.Empty,
+            ManufacturerRegionScope = manufacturerRegion?.RegionScope ?? string.Empty,
+            ManufacturerRegionClassificationMethod =
+                manufacturerRegion?.ClassificationMethodCode ?? string.Empty,
+            ManufacturerRegionEvidence = manufacturerRegion?.Evidence ?? string.Empty,
+            ManufacturerRegionConfidence = manufacturerRegion?.Confidence ?? 0m
         });
     }
 

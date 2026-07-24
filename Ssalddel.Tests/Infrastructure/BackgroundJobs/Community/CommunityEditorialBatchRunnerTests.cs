@@ -62,6 +62,23 @@ public sealed class CommunityEditorialBatchRunnerTests
         Assert.Equal(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, publisher.Draft?.SourceKey);
     }
 
+    [Fact]
+    public async Task CultureTransportRun_PublishesOnlyTheCultureTransportDraft()
+    {
+        var source = new RecordingSource(
+            CommunityAutomatedPostSourceKeys.CultureTransport,
+            hasDraft: true);
+        var publisher = new RecordingPublisher();
+        var runner = CreateRunner(source, publisher);
+
+        await runner.RunCultureTransportAsync(CancellationToken.None);
+
+        Assert.Equal(1, publisher.CallCount);
+        Assert.Equal(
+            CommunityAutomatedPostSourceKeys.CultureTransport,
+            publisher.Draft?.SourceKey);
+    }
+
     private static CommunityEditorialBatchRunner CreateRunner(
         ICommunityAutomatedPostSource targetSource,
         RecordingPublisher publisher)
@@ -72,7 +89,8 @@ public sealed class CommunityEditorialBatchRunnerTests
             new RecordingSource(CommunityAutomatedPostSourceKeys.KamisPriceBrief, hasDraft: false),
             new RecordingSource(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, hasDraft: false),
             new RecordingSource(CommunityAutomatedPostSourceKeys.Reflection, hasDraft: false),
-            new RecordingSource(CommunityAutomatedPostSourceKeys.ActivityDigest, hasDraft: false)
+            new RecordingSource(CommunityAutomatedPostSourceKeys.ActivityDigest, hasDraft: false),
+            new RecordingSource(CommunityAutomatedPostSourceKeys.CultureTransport, hasDraft: false)
         }
             .GroupBy(source => source.SourceKey, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())

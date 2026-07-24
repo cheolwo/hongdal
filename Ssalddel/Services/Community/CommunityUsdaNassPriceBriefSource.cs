@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Domain.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using 살뜰.Services.Options;
@@ -137,10 +138,10 @@ public sealed class CommunityUsdaNassPriceBriefSource : ICommunityAutomatedPostS
         return new CommunityAutomatedPostDraft(
             SourceKey,
             latestReferenceMonth.ToString("yyyyMM", CultureInfo.InvariantCulture),
-            CommunityBoardCatalog.InformationPrices.DisplayName,
-            "농수축산물 가격 정보",
+            CommunityBoardCatalog.PeriodicDataUsda.DisplayName,
+            CultureTransportContentCatalog.PriceEvidenceWorkflowTag,
             "자동 정보",
-            $"[자동 가격정보] {latestReferenceMonth:yyyy-MM} USDA NASS 미국 생산자가격",
+            $"[문화교통·가격] {latestReferenceMonth:yyyy-MM} USDA NASS 미국 생산자가격",
             BuildBody(latestReferenceMonth, selected),
             "살뜰 정보봇",
             sourceUrl);

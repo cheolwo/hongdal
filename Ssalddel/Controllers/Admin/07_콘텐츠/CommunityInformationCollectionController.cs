@@ -42,6 +42,26 @@ public sealed class CommunityInformationCollectionController : ControllerBase
     public ActionResult<IReadOnlyList<CommunityInformationSourceDto>> GetSources()
         => Ok(_service.GetSources());
 
+    [HttpGet("board-relations")]
+    public ActionResult<IReadOnlyList<CommunityBoardInformationRelation>> GetBoardRelations(
+        [FromQuery] string? boardKey)
+    {
+        if (string.IsNullOrWhiteSpace(boardKey))
+        {
+            return Ok(CommunityBoardInformationRelationCatalog.All);
+        }
+
+        var relation = CommunityBoardInformationRelationCatalog.Find(boardKey);
+        return relation is null
+            ? NotFound(CreateProblem(404, $"게시판 정보 관계를 찾을 수 없습니다. BoardKey={boardKey}"))
+            : Ok(new[] { relation });
+    }
+
+    [HttpGet("board-relations/batch-plans")]
+    public ActionResult<IReadOnlyList<CommunityBoardInformationBatchPlan>>
+        GetBoardRelationBatchPlans()
+        => Ok(CommunityBoardInformationRelationCatalog.PeriodicBatchPlans());
+
     [HttpGet("candidates")]
     public async Task<ActionResult<CommunityInformationCollectionResponse>> GetCandidates(
         [FromQuery] CommunityInformationCollectionQuery query,

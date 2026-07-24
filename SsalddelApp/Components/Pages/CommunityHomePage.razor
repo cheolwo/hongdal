@@ -1,10 +1,14 @@
 @page "/community"
+@layout CommunityMobileLayout
 
 <PageTitle>살뜰 공개 커뮤니티</PageTitle>
 
-<PlatformCommunityHome AppName="살뜰"
-                       RoleLabel="앱 사용자"
-                       AppKey="shipper"
-                       UseDedicatedCommunityRoutes="true"
-                       CommunityFeedOnly="true"
-                       UseClassicForumLayout="true" />
+<CommunityMobileBoardDirectoryScreen InitialWorkMode="@IsWorkMode" />
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "mode")]
+    public string? Mode { get; set; }
+
+    private bool IsWorkMode
+        => string.Equals(Mode, "work", StringComparison.OrdinalIgnoreCase);
+}

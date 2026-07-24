@@ -41,4 +41,8 @@ public sealed class AgriculturalFisheriesBatchOptions
     public int IngredientCompanyResearchRefreshAfterDays { get; set; } = 30;
 
     public int IngredientCompanyResearchRequestDelayMilliseconds { get; set; } = 250;
+
+    public bool PublishChinaImportedFoodRegionBriefs { get; set; }
+
+    public bool PublishUnitedStatesImportedFoodStateBriefs { get; set; }
 }

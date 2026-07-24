@@ -1,0 +1,52 @@
+@page "/community/me"
+@layout CommunityMobileLayout
+
+<PageTitle>@(ShowsPosts ? "내 글" : "내 정보") · 살뜰</PageTitle>
+
+<main class="community-personal">
+    <header>
+        <span>공개 커뮤니티 · 개인 공간</span>
+        <h1>@(ShowsPosts ? "내 글" : "내 정보")</h1>
+        <p>@(ShowsPosts
+            ? "로그인한 뒤 내가 작성한 글과 임시저장을 같은 공간에서 확인합니다."
+            : "현재는 방문자 상태입니다. 공개 커뮤니티는 로그인 없이 둘러볼 수 있습니다.")</p>
+    </header>
+
+    <nav aria-label="개인 공간 선택">
+        <a class="@(!ShowsPosts ? "active" : null)" href="@CommunityPageRoutes.Personal">내 정보</a>
+        <a class="@(ShowsPosts ? "active" : null)" href="@($"{CommunityPageRoutes.Personal}?tab=posts")">내 글</a>
+    </nav>
+
+    @if (ShowsPosts)
+    {
+        <section class="community-personal__empty">
+            <MudIcon Icon="@Icons.Material.Filled.Article" Size="Size.Large" />
+            <strong>로그인하면 내 글을 모아 볼 수 있습니다.</strong>
+            <p>공개 게시판의 글은 지금도 읽을 수 있고, 작성할 때 로그인 또는 익명 작성 조건을 확인합니다.</p>
+            <a href="@CommunityPageRoutes.Boards">게시판 글 보기</a>
+        </section>
+    }
+    else
+    {
+        <section class="community-personal__profile">
+            <span class="community-personal__avatar">방</span>
+            <span><strong>방문자</strong><small>로그인하지 않은 공개 커뮤니티 이용자</small></span>
+            <em>로그인 선택</em>
+        </section>
+        <section class="community-personal__notice">
+            <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Size="Size.Small" />
+            <span>
+                <strong>관심·참여·연락처 공개는 따로 동의합니다.</strong>
+                가까운 지역이나 활동 이력만으로 자동 가입하거나 상대를 정하지 않습니다.
+            </span>
+        </section>
+    }
+</main>
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "tab")]
+    public string? Tab { get; set; }
+
+    private bool ShowsPosts
+        => string.Equals(Tab, "posts", StringComparison.OrdinalIgnoreCase);
+}

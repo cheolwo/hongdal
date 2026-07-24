@@ -15,10 +15,15 @@
                                        PurchaseRequested="PurchaseRequested" />
 
     <footer class="ingredient-card__footer">
-        <span>희망 수량·수령 권역은 비구속 수요 화면에서 직접 정합니다.</span>
-        <button type="button" @onclick="StartIngredientPurchaseAsync">
-            @Ingredient.CanonicalName 수요 등록
-        </button>
+        <details class="ingredient-card__optional-action">
+            <summary>혼자 구입하기 부담스럽다면</summary>
+            <div>
+                <span>같이 조건·수량·수령 방법을 살피는 공동구매 관심 경로이며, 참여 의사를 적어도 구매가 확정되지 않습니다.</span>
+                <button type="button" @onclick="StartIngredientPurchaseAsync">
+                    @Ingredient.CanonicalName 같이 구매할 이웃 알아보기
+                </button>
+            </div>
+        </details>
     </footer>
 </article>
 

@@ -120,6 +120,108 @@ public sealed class OfficialFoodIngredientCompanyResearchServiceTests
     }
 
     [Fact]
+    public async Task 중국해외제조업소는_제조업소소재권역과분류근거를별도로제공한다()
+    {
+        var importedRecord = new OfficialFoodIngredientImportedCompanyRecord(
+            "한국수입",
+            "QINGDAO VEGETABLE FOODS",
+            "중국",
+            "냉동 양파",
+            "농산물",
+            "양파 100%",
+            "20260718",
+            "CN-FOOD-10",
+            true,
+            false,
+            string.Empty)
+        {
+            ForeignManufacturerAreaName = "SHANDONG",
+            ForeignManufacturerAddress = "QINGDAO, SHANDONG, CHINA"
+        };
+        var service = new OfficialFoodIngredientCompanyResearchService(
+            new FakeDomesticSource([], configured: false),
+            new FakeImportedSource(new OfficialFoodIngredientImportedCompanySourceResult(
+                [importedRecord],
+                true,
+                false)),
+            new FixedTimeProvider(ResearchedAtUtc),
+            NullLogger<OfficialFoodIngredientCompanyResearchService>.Instance);
+
+        var result = await service.ResearchAsync(new OfficialFoodIngredientCompanyQuery
+        {
+            IngredientKey = "ingredient:onion",
+            IngredientName = "양파",
+            Take = 20
+        });
+
+        var manufacturer = Assert.Single(result.Candidates, candidate =>
+            candidate.RelationCode
+            == OfficialFoodIngredientCompanyRelationCodes.ForeignManufacturer);
+        Assert.Equal(
+            ChinaImportedFoodManufacturerRegionCodes.Shandong,
+            manufacturer.ManufacturerRegionCode);
+        Assert.Equal("산둥성", manufacturer.ManufacturerRegionName);
+        Assert.Equal(
+            ChinaImportedFoodManufacturerRegionMethodCodes.OfficialAreaProvince,
+            manufacturer.ManufacturerRegionClassificationMethod);
+        Assert.Contains("산둥성", manufacturer.ManufacturerRegionEvidence);
+        Assert.Equal(1m, manufacturer.ManufacturerRegionConfidence);
+        Assert.DoesNotContain(
+            importedRecord.ForeignManufacturerAddress,
+            manufacturer.ManufacturerRegionEvidence);
+    }
+
+    [Fact]
+    public async Task 미국해외제조업소는_USPS주코드와분류근거를별도로제공한다()
+    {
+        var importedRecord = new OfficialFoodIngredientImportedCompanyRecord(
+            "한국수입",
+            "CALIFORNIA NUT FOODS",
+            "미국",
+            "아몬드 분말",
+            "땅콩또는견과류가공품",
+            "아몬드 100%",
+            "20260718",
+            "US-FOOD-20",
+            true,
+            false,
+            string.Empty)
+        {
+            ForeignManufacturerAreaName = "CALIFORNIA",
+            ForeignManufacturerAddress = "FRESNO, CA 93706, USA"
+        };
+        var service = new OfficialFoodIngredientCompanyResearchService(
+            new FakeDomesticSource([], configured: false),
+            new FakeImportedSource(new OfficialFoodIngredientImportedCompanySourceResult(
+                [importedRecord],
+                true,
+                false)),
+            new FixedTimeProvider(ResearchedAtUtc),
+            NullLogger<OfficialFoodIngredientCompanyResearchService>.Instance);
+
+        var result = await service.ResearchAsync(new OfficialFoodIngredientCompanyQuery
+        {
+            IngredientKey = "ingredient:almond",
+            IngredientName = "아몬드",
+            Take = 20
+        });
+
+        var manufacturer = Assert.Single(result.Candidates, candidate =>
+            candidate.RelationCode
+            == OfficialFoodIngredientCompanyRelationCodes.ForeignManufacturer);
+        Assert.Equal("US-CA", manufacturer.ManufacturerRegionCode);
+        Assert.Equal("캘리포니아주", manufacturer.ManufacturerRegionName);
+        Assert.Equal(
+            UnitedStatesImportedFoodManufacturerRegionMethodCodes.OfficialAreaName,
+            manufacturer.ManufacturerRegionClassificationMethod);
+        Assert.Contains("캘리포니아주", manufacturer.ManufacturerRegionEvidence);
+        Assert.Equal(1m, manufacturer.ManufacturerRegionConfidence);
+        Assert.DoesNotContain(
+            importedRecord.ForeignManufacturerAddress,
+            manufacturer.ManufacturerRegionEvidence);
+    }
+
+    [Fact]
     public async Task 조회상한이작아도_국내제조_수입_해외제조역할을균형있게유지한다()
     {
         var domesticRecords = Enumerable.Range(1, 6)

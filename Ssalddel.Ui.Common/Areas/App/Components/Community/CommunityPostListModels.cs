@@ -46,6 +46,7 @@ public static class CommunitySystemPostDisplay
             PlatformCommunitySystemPostKinds.KamisPriceBrief => "정보",
             PlatformCommunitySystemPostKinds.Reflection => "성찰",
             PlatformCommunitySystemPostKinds.ActivityDigest => "요약",
+            PlatformCommunitySystemPostKinds.CultureTransport => "문화교통",
             PlatformCommunitySystemPostKinds.PrajnaContent => "반야",
             _ => "자동"
         };
@@ -57,6 +58,7 @@ public static class CommunitySystemPostDisplay
             PlatformCommunitySystemPostKinds.KamisPriceBrief => "자동 가격 정보",
             PlatformCommunitySystemPostKinds.Reflection => "자동 성찰문",
             PlatformCommunitySystemPostKinds.ActivityDigest => "자동 활동 요약",
+            PlatformCommunitySystemPostKinds.CultureTransport => "공식 근거 문화교통 질문",
             PlatformCommunitySystemPostKinds.PrajnaContent => "관리자 선별 반야 자료",
             _ => "자동 작성 글"
         };
@@ -68,6 +70,7 @@ public static class CommunitySystemPostDisplay
             PlatformCommunitySystemPostKinds.KamisPriceBrief => "출처 기반 자동 정보",
             PlatformCommunitySystemPostKinds.Reflection => "시스템 작성 성찰문",
             PlatformCommunitySystemPostKinds.ActivityDigest => "비식별 자동 집계",
+            PlatformCommunitySystemPostKinds.CultureTransport => "문화·이동 질문·출처 안내",
             PlatformCommunitySystemPostKinds.PrajnaContent => "외부 출처·비제휴 안내",
             _ => "자동 작성 안내"
         };

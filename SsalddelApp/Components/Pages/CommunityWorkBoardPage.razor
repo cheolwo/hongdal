@@ -1,0 +1,11 @@
+@page "/community/work/{GroupKey}"
+@layout CommunityMobileLayout
+
+<PageTitle>업무 게시판 · 살뜰</PageTitle>
+
+<CommunityMobileWorkBoardScreen GroupKey="@GroupKey" />
+
+@code {
+    [Parameter]
+    public string? GroupKey { get; set; }
+}

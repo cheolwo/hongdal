@@ -17,15 +17,18 @@ public sealed class YouTube음식상품관리Controller : ControllerBase
     private readonly IYouTube음식상품발견Service _service;
     private readonly IYouTube영상재료자동인지Service _ingredientRecognitionService;
     private readonly IYouTubeTranscriptSource _transcriptSource;
+    private readonly IYouTubeContentCollectionService _contentCollectionService;
 
     public YouTube음식상품관리Controller(
         IYouTube음식상품발견Service service,
         IYouTube영상재료자동인지Service ingredientRecognitionService,
-        IYouTubeTranscriptSource transcriptSource)
+        IYouTubeTranscriptSource transcriptSource,
+        IYouTubeContentCollectionService contentCollectionService)
     {
         _service = service;
         _ingredientRecognitionService = ingredientRecognitionService;
         _transcriptSource = transcriptSource;
+        _contentCollectionService = contentCollectionService;
     }
 
     [HttpGet("product-candidates")]
@@ -55,6 +58,21 @@ public sealed class YouTube음식상품관리Controller : ControllerBase
             cancellationToken);
         return result is null
             ? NotFound("공개 자막을 찾지 못했습니다.")
+            : Ok(result);
+    }
+
+    [HttpPost("videos/{videoId}/collection")]
+    public async Task<IActionResult> 영상콘텐츠수집(
+        [FromRoute] string videoId,
+        [FromBody] YouTubeContentCollectionRequest 요청,
+        CancellationToken cancellationToken)
+    {
+        var result = await _contentCollectionService.CollectAsync(
+            videoId,
+            요청,
+            cancellationToken);
+        return result is null
+            ? NotFound("YouTube 감시 저장소에 영상이 없습니다.")
             : Ok(result);
     }
 

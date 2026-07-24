@@ -47,13 +47,70 @@
         }
     </nav>
 
+    @if (RelatedPeriodicDataBoards.Count > 0)
+    {
+        <section class="community-board-page__data-guides"
+                 data-periodic-data-guides="true"
+                 aria-label="관련 주기성 데이터 대표 안내">
+            <div class="community-board-page__data-guides-heading">
+                <span>대표 안내</span>
+                <strong>관련 주기성 데이터</strong>
+                <p>원천 글은 전용 게시판에 한 번만 저장합니다. 아래 안내를 따라 최신 누적 자료를 확인하세요.</p>
+            </div>
+            <div class="community-board-page__data-guide-grid">
+                @foreach (var dataBoard in RelatedPeriodicDataBoards)
+                {
+                    <a class="community-board-page__data-guide"
+                       data-periodic-data-board="@dataBoard.BoardKey"
+                       href="@PeriodicDataBoardHref(dataBoard.BoardKey)">
+                        <span>@dataBoard.Provider</span>
+                        <strong>@dataBoard.RepresentativeTitle</strong>
+                        <p>@dataBoard.RepresentativeSummary</p>
+                        <b>
+                            주기성 데이터 보기
+                            <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+                        </b>
+                    </a>
+                }
+            </div>
+        </section>
+    }
+
+    @if (ShowsImportedFoodCountryFilters)
+    {
+        <section class="community-board-page__country-filter"
+                 data-country-filter="imported-food"
+                 aria-label="수입식품 국가별 보기">
+            <div class="community-board-page__country-filter-copy">
+                <strong>수입식품 국가별 보기</strong>
+                <span>제조업소 소재 근거를 중국과 미국으로 나눠 봅니다.</span>
+            </div>
+            <nav class="community-board-page__country-filter-options">
+                <a class="@BuildCountryFilterLinkClass(null)"
+                   aria-current="@(IsCountryFilterSelected(null) ? "page" : null)"
+                   href="@ImportedFoodCountryHref(null)">
+                    전체 정보
+                </a>
+                @foreach (var country in CommunityImportedFoodCountryFilterCatalog.All)
+                {
+                    <a class="@BuildCountryFilterLinkClass(country.WorkflowTag)"
+                       data-country-code="@country.CountryCode"
+                       aria-current="@(IsCountryFilterSelected(country.WorkflowTag) ? "page" : null)"
+                       href="@ImportedFoodCountryHref(country.WorkflowTag)">
+                        @country.DisplayName
+                    </a>
+                }
+            </nav>
+        </section>
+    }
+
     @if (!string.IsNullOrWhiteSpace(WorkflowTag) || !string.IsNullOrWhiteSpace(RoleTag))
     {
         <div class="community-board-page__filters" aria-label="적용된 업무 필터">
             <span>적용된 필터</span>
             @if (!string.IsNullOrWhiteSpace(WorkflowTag))
             {
-                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@WorkflowTag</MudChip>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@DisplayWorkflowFilter(WorkflowTag)</MudChip>
             }
             @if (!string.IsNullOrWhiteSpace(RoleTag))
             {
@@ -61,6 +118,19 @@
             }
             <MudButton Href="@BoardHref(ViewModel.CurrentBoard?.BoardKey)" Variant="Variant.Text" Size="Size.Small">필터 지우기</MudButton>
         </div>
+    }
+
+    @if (ShowsPeriodicTopicFilters)
+    {
+        <section class="community-board-page__periodic-topic"
+                 data-periodic-topic-filter="true"
+                 aria-label="게시판 주제분류">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Size="Size.Small" />
+            <div>
+                <strong>주제분류 · 주기성</strong>
+                <span>`전체글`은 서버 정기 자료를 포함하고, `일반글`은 정기 자료를 숨기며, `주기성`은 정기 자료만 보여줍니다.</span>
+            </div>
+        </section>
     }
 
     @if (ViewModel.IsLoading)
@@ -140,7 +210,15 @@
     [Parameter] public string? ViewMode { get; set; }
     [Parameter] public string? FocusTarget { get; set; }
 
-    private static readonly IReadOnlyList<string> ListFilters = ["전체글", "공지", "추천글"];
+    private static readonly IReadOnlyList<string> GeneralListFilters = ["전체글", "공지", "추천글"];
+    private static readonly IReadOnlyList<string> WorkBoardListFilters =
+    [
+        "전체글",
+        CommunityPeriodicPostTopicCatalog.GeneralListFilter,
+        CommunityPeriodicPostTopicCatalog.PeriodicListFilter,
+        "공지",
+        "추천글"
+    ];
     private static readonly IReadOnlyList<CommunitySeedPost> NoSeedPosts = [];
     private CommunityBoardPageViewModel ViewModel { get; set; } = default!;
     private string? lastDataRequestKey;
@@ -157,6 +235,23 @@
             ? CommunityBoardNavigationContext.CardViewMode
             : CommunityBoardNavigationContext.ListViewMode;
 
+    private bool ShowsImportedFoodCountryFilters
+        => string.Equals(
+            ViewModel.CurrentBoard?.BoardKey,
+            CommunityBoardKeys.PeriodicDataMfds,
+            StringComparison.OrdinalIgnoreCase);
+
+    private IReadOnlyList<CommunityPeriodicDataBoardDefinition> RelatedPeriodicDataBoards
+        => CommunityPeriodicDataBoardCatalog.ForRelatedBoard(
+            ViewModel.CurrentBoard?.BoardKey ?? BoardKey ?? BoardName);
+
+    private bool ShowsPeriodicTopicFilters
+        => CommunityPeriodicPostTopicCatalog.SupportsBoard(
+            ViewModel.CurrentBoard?.BoardKey ?? BoardKey ?? BoardName);
+
+    private IReadOnlyList<string> ListFilters
+        => ShowsPeriodicTopicFilters ? WorkBoardListFilters : GeneralListFilters;
+
     protected override void OnInitialized()
     {
         ViewModel = new CommunityBoardPageViewModel(
@@ -169,6 +264,7 @@
                 roleTag: query.RoleTag,
                 page: query.Page,
                 pageSize: query.PageSize,
+                periodicVisibility: query.PeriodicVisibility,
                 cancellationToken: cancellationToken));
     }
 
@@ -176,7 +272,12 @@
     {
         normalizedFocusTarget = PageNavigationContext.NormalizeFocusTarget(FocusTarget);
         var request = CurrentRequest();
-        var dataRequestKey = $"{request.BoardKey}|{request.LegacyBoardName}|{request.WorkflowTag}|{request.RoleTag}|{request.Page}";
+        var periodicVisibility = CommunityPeriodicPostTopicCatalog.SupportsBoard(
+            request.BoardKey ?? request.LegacyBoardName)
+            ? CommunityPeriodicPostTopicCatalog.VisibilityFor(request.ListFilter)
+            : CommunityPeriodicPostVisibilityModes.All;
+        var dataRequestKey =
+            $"{request.BoardKey}|{request.LegacyBoardName}|{request.WorkflowTag}|{request.RoleTag}|{periodicVisibility}|{request.Page}";
         if (!string.Equals(lastDataRequestKey, dataRequestKey, StringComparison.Ordinal))
         {
             lastDataRequestKey = dataRequestKey;
@@ -287,7 +388,8 @@
     private void HandleListFilterChanged(string value)
     {
         ViewModel.SelectListFilter(value);
-        ReplaceRouteState();
+        normalizedFocusTarget = null;
+        Navigation.NavigateTo(CurrentBoardPath(page: 1), replace: true);
     }
 
     private void HandleViewModeChanged(CommunityPostViewMode value)
@@ -316,6 +418,41 @@
 
     private static string BoardHref(string? boardKey)
         => CommunityPageRoutes.BoardsFor(boardKey: boardKey);
+
+    private static string PeriodicDataBoardHref(string boardKey)
+        => CommunityPageRoutes.BoardsFor(
+            boardKey: boardKey,
+            listFilter: CommunityPeriodicPostTopicCatalog.PeriodicListFilter);
+
+    private string ImportedFoodCountryHref(string? workflowTag)
+        => CommunityPageRoutes.BoardsFor(
+            ViewModel.CurrentBoard is null ? BoardName : null,
+            ViewModel.CurrentBoard?.BoardKey ?? BoardKey,
+            workflowTag,
+            RoleTag,
+            page: 1,
+            search: ViewModel.SearchText,
+            listFilter: ViewModel.SelectedFilter,
+            viewMode: ViewModeCode);
+
+    private bool IsCountryFilterSelected(string? workflowTag)
+        => string.IsNullOrWhiteSpace(workflowTag)
+            ? string.IsNullOrWhiteSpace(WorkflowTag)
+            : string.Equals(
+                WorkflowTag?.Trim(),
+                workflowTag,
+                StringComparison.OrdinalIgnoreCase);
+
+    private string BuildCountryFilterLinkClass(string? workflowTag)
+        => IsCountryFilterSelected(workflowTag)
+            ? "community-board-page__country-filter-link community-board-page__country-filter-link--active"
+            : "community-board-page__country-filter-link";
+
+    private static string DisplayWorkflowFilter(string workflowTag)
+    {
+        var country = CommunityImportedFoodCountryFilterCatalog.FindByWorkflowTag(workflowTag);
+        return country is null ? workflowTag : $"수입식품 · {country.DisplayName}";
+    }
 
     private string PageHref(int page)
         => CurrentBoardPath(page: page);

@@ -44,6 +44,51 @@ public sealed class CommunityAutomatedPostServiceTests
     }
 
     [Fact]
+    public async Task Publisher_MovesExistingPeriodicPostToCanonicalBoardWithoutDuplication()
+    {
+        await using var context = CreateContext();
+        var existing = new PlatformCommunityPost
+        {
+            AppKey = "platform",
+            Category = CommunityBoardCatalog.InformationPrices.DisplayName,
+            Title = "기존 KAMIS 글",
+            Body = "기존 본문",
+            AuthorUserId = CommunityAutomatedPostPublication.BuildSystemAuthorKey(
+                CommunityAutomatedPostSourceKeys.KamisPriceBrief,
+                "20260716"),
+            Nickname = "살뜰 정보봇",
+            PasswordHash = "test",
+            CreatedAtUtc = new DateTime(2026, 7, 16, 0, 0, 0, DateTimeKind.Utc),
+            UpdatedAtUtc = new DateTime(2026, 7, 16, 0, 0, 0, DateTimeKind.Utc)
+        };
+        context.PlatformCommunityPosts.Add(existing);
+        await context.SaveChangesAsync();
+        var service = new EfCommunityAutomatedPostPublisher(
+            context,
+            new 커뮤니티게시글음성작업예약Service(),
+            new CommunityKeywordNotificationQueue(),
+            new RecordingPublisher(),
+            new FixedTimeProvider(new DateTimeOffset(2026, 7, 24, 0, 0, 0, TimeSpan.Zero)),
+            NullLogger<EfCommunityAutomatedPostPublisher>.Instance);
+        var draft = new CommunityAutomatedPostDraft(
+            CommunityAutomatedPostSourceKeys.KamisPriceBrief,
+            "20260716",
+            CommunityBoardCatalog.PeriodicDataKamis.DisplayName,
+            "농수산물 가격 정보",
+            "자동 정보",
+            "기존 KAMIS 글",
+            "기존 본문",
+            "살뜰 정보봇");
+
+        var result = await service.PublishIfMissingAsync(draft);
+
+        Assert.False(result.Created);
+        Assert.Equal(existing.Id, result.PostId);
+        var stored = Assert.Single(await context.PlatformCommunityPosts.ToListAsync());
+        Assert.Equal(CommunityBoardCatalog.PeriodicDataKamis.DisplayName, stored.Category);
+    }
+
+    [Fact]
     public async Task Publisher_CanCreatePinnedPostWithoutDerivedWorkOrCreatedEvent()
     {
         await using var context = CreateContext();
@@ -115,6 +160,29 @@ public sealed class CommunityAutomatedPostServiceTests
             "출처와 기준 시각",
             CommunityAutomatedPostPublication.GetPrivacyNotice(
                 PlatformCommunitySystemPostKinds.AutomatedEditorial));
+    }
+
+    [Fact]
+    public void CultureTransport_IsMarkedAsCultureQuestionInsteadOfCommercePost()
+    {
+        var post = new PlatformCommunityPost
+        {
+            AuthorUserId = CommunityAutomatedPostPublication.BuildSystemAuthorKey(
+                CommunityAutomatedPostSourceKeys.CultureTransport,
+                "20260723")
+        };
+
+        Assert.Equal(
+            PlatformCommunitySystemPostKinds.CultureTransport,
+            CommunityAutomatedPostPublication.GetSystemPostKind(post));
+        Assert.Contains(
+            "문화교통 질문",
+            CommunityAutomatedPostPublication.GetPrivacyNotice(
+                PlatformCommunitySystemPostKinds.CultureTransport));
+        Assert.Contains(
+            "구매 권유",
+            CommunityAutomatedPostPublication.GetPrivacyNotice(
+                PlatformCommunitySystemPostKinds.CultureTransport));
     }
 
     [Theory]

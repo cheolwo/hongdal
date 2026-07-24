@@ -37,6 +37,25 @@ public sealed class CommunityPersonalRouteContextTests
     }
 
     [Fact]
+    public void VisibleNavigationSections_ExposeOnlyProfileAndPosts()
+    {
+        Assert.Equal(
+        [
+            ("overview", "내 정보", "/community/me"),
+            ("posts", "내 글", "/community/me/posts")
+        ],
+            CommunityPersonalRouteContext.VisibleNavigationSections
+                .Select(section => (section.Key, section.Title, section.Href)));
+
+        Assert.Contains(
+            CommunityPersonalRouteContext.Sections,
+            section => section.Key == "settings");
+        Assert.DoesNotContain(
+            CommunityPersonalRouteContext.VisibleNavigationSections,
+            section => section.Key == "settings");
+    }
+
+    [Fact]
     public void UnknownSection_FallsBackToOverview()
     {
         var context = CommunityPersonalRouteContext.Resolve("unknown");

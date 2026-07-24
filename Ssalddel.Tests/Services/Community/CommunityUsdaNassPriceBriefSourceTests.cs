@@ -1,6 +1,8 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Domain.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Services.Community;
@@ -53,6 +55,9 @@ public sealed class CommunityUsdaNassPriceBriefSourceTests
         Assert.NotNull(draft);
         Assert.Equal(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, draft.SourceKey);
         Assert.Equal("202606", draft.PeriodKey);
+        Assert.Equal(CommunityBoardCatalog.PeriodicDataUsda.DisplayName, draft.Category);
+        Assert.Equal(CultureTransportContentCatalog.PriceEvidenceWorkflowTag, draft.WorkflowTag);
+        Assert.StartsWith("[문화교통·가격]", draft.Title, StringComparison.Ordinal);
         Assert.Contains("USD 22.50/CWT", draft.Body);
         Assert.DoesNotContain("99.00", draft.Body);
         Assert.DoesNotContain("CORN", draft.Body);

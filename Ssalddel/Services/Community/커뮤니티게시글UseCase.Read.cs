@@ -13,7 +13,8 @@ public sealed partial class 커뮤니티게시글UseCase
         string? roleTag,
         int page,
         int pageSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? periodicVisibility = null)
         => _readUseCase.목록Async(
             appKey,
             category,
@@ -22,7 +23,8 @@ public sealed partial class 커뮤니티게시글UseCase
             roleTag,
             page,
             pageSize,
-            cancellationToken);
+            cancellationToken,
+            periodicVisibility);
 
     public Task<Result<IReadOnlyList<CommunityBoardSummaryResponse>>> 게시판요약목록Async(
         string? appKey,

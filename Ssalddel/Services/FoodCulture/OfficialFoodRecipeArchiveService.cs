@@ -51,6 +51,11 @@ public interface IOfficialFoodRecipeArchiveService
         string dishKey,
         CancellationToken cancellationToken = default);
 
+    Task<OfficialFoodRecipeDishDto?> ReviewDishAsync(
+        string dishKey,
+        OfficialFoodRecipeDishReviewRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<OfficialFoodRecipeVariantDto>> GetVariantsAsync(
         string dishKey,
         CancellationToken cancellationToken = default);
@@ -221,6 +226,50 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
                 dish.RecipeVariants.Count,
                 dish.UpdatedAtUtc))
             .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<OfficialFoodRecipeDishDto?> ReviewDishAsync(
+        string dishKey,
+        OfficialFoodRecipeDishReviewRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(dishKey);
+        ArgumentNullException.ThrowIfNull(request);
+
+        var reviewState = NormalizeReviewState(request.ReviewState);
+        var representationState = NormalizeRepresentationState(request.RepresentationState);
+        ValidateReviewPair(reviewState, representationState);
+
+        var normalizedDishKey = dishKey.Trim();
+        var dish = await _db.OfficialFoodDishes
+            .SingleOrDefaultAsync(
+                candidate => candidate.DishKey == normalizedDishKey,
+                cancellationToken);
+        if (dish is null)
+        {
+            return null;
+        }
+
+        dish.ReviewState = reviewState;
+        dish.RepresentationState = representationState;
+        dish.UpdatedAtUtc = UtcNow();
+        await _db.SaveChangesAsync(cancellationToken);
+        var variantCount = await _db.OfficialFoodRecipeVariants
+            .CountAsync(variant => variant.DishId == dish.Id, cancellationToken);
+
+        return new OfficialFoodRecipeDishDto(
+            dish.DishKey,
+            dish.CountryCode,
+            dish.RegionName,
+            dish.Name,
+            dish.OriginalName,
+            dish.EnglishName,
+            dish.Category,
+            dish.Summary,
+            dish.RepresentationState,
+            dish.ReviewState,
+            variantCount,
+            dish.UpdatedAtUtc);
     }
 
     public async Task<IReadOnlyList<OfficialFoodRecipeVariantDto>> GetVariantsAsync(
@@ -590,6 +639,55 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
     }
 
     private DateTime UtcNow() => _timeProvider.GetUtcNow().UtcDateTime;
+
+    private static string NormalizeReviewState(string value)
+        => value?.Trim() switch
+        {
+            OfficialFoodRecipeReviewStates.PendingReview =>
+                OfficialFoodRecipeReviewStates.PendingReview,
+            OfficialFoodRecipeReviewStates.Approved =>
+                OfficialFoodRecipeReviewStates.Approved,
+            OfficialFoodRecipeReviewStates.Excluded =>
+                OfficialFoodRecipeReviewStates.Excluded,
+            _ => throw new ArgumentException(
+                "검토 상태는 PendingReview, Approved 또는 Excluded여야 합니다.",
+                nameof(value))
+        };
+
+    private static string NormalizeRepresentationState(string value)
+        => value?.Trim() switch
+        {
+            OfficialFoodRecipeRepresentationStates.Candidate =>
+                OfficialFoodRecipeRepresentationStates.Candidate,
+            OfficialFoodRecipeRepresentationStates.Representative =>
+                OfficialFoodRecipeRepresentationStates.Representative,
+            OfficialFoodRecipeRepresentationStates.Excluded =>
+                OfficialFoodRecipeRepresentationStates.Excluded,
+            _ => throw new ArgumentException(
+                "대표 상태는 Candidate, Representative 또는 Excluded여야 합니다.",
+                nameof(value))
+        };
+
+    private static void ValidateReviewPair(
+        string reviewState,
+        string representationState)
+    {
+        if (representationState == OfficialFoodRecipeRepresentationStates.Representative
+            && reviewState != OfficialFoodRecipeReviewStates.Approved)
+        {
+            throw new ArgumentException(
+                "대표 음식으로 지정하려면 검토 상태가 Approved여야 합니다.");
+        }
+
+        var reviewExcluded = reviewState == OfficialFoodRecipeReviewStates.Excluded;
+        var representationExcluded =
+            representationState == OfficialFoodRecipeRepresentationStates.Excluded;
+        if (reviewExcluded != representationExcluded)
+        {
+            throw new ArgumentException(
+                "제외할 음식은 검토 상태와 대표 상태를 모두 Excluded로 지정해야 합니다.");
+        }
+    }
 
     private static string PreferLonger(string current, string candidate, int maxLength)
         => string.IsNullOrWhiteSpace(current) || candidate.Trim().Length > current.Trim().Length

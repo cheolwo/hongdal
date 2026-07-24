@@ -5,7 +5,14 @@ namespace Ssalddel.Contracts.Common.Community;
 /// </summary>
 public sealed record CommunityBoardNavigationContext
 {
-    private static readonly string[] SupportedFilters = ["전체글", "공지", "추천글"];
+    private static readonly string[] SupportedFilters =
+    [
+        "전체글",
+        CommunityPeriodicPostTopicCatalog.GeneralListFilter,
+        CommunityPeriodicPostTopicCatalog.PeriodicListFilter,
+        "공지",
+        "추천글"
+    ];
 
     public const string ListViewMode = "list";
     public const string CardViewMode = "cards";

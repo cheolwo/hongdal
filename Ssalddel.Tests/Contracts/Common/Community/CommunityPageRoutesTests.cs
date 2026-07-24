@@ -7,6 +7,7 @@ public sealed class CommunityPageRoutesTests
     [Fact]
     public void 게시판과글쓰기경로는_선택문맥을encode한다()
     {
+        Assert.Equal("/community/boards/directory", CommunityPageRoutes.BoardDirectory);
         Assert.Equal(
             "/community/boards?boardKey=free%20life",
             CommunityPageRoutes.BoardsFor(boardKey: "free life"));

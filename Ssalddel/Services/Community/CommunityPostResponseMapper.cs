@@ -17,6 +17,7 @@ internal static class CommunityPostResponseMapper
         var isReportBoardPost = IsReportCategory(entity.Category) || entity.IsReportBoardPost;
         var systemPostKind = CommunityAutomatedPostPublication.GetSystemPostKind(entity);
         var isSystemGenerated = systemPostKind is not null;
+        var isPeriodic = CommunityAutomatedPostPublication.IsAutomatedPost(entity);
         var mutationCapabilities = CommunityPostMutationAccessPolicy.Resolve(
             entity,
             currentUserId,
@@ -59,6 +60,14 @@ internal static class CommunityPostResponseMapper
                 : null,
             IsSystemGenerated = isSystemGenerated,
             SystemPostKind = systemPostKind,
+            IsPeriodic = isPeriodic,
+            TopicClassificationCode = isPeriodic
+                ? CommunityPostTopicClassificationCodes.Periodic
+                : CommunityPostTopicClassificationCodes.General,
+            TopicClassificationName = CommunityPostTopicClassificationCodes.DisplayName(
+                isPeriodic
+                    ? CommunityPostTopicClassificationCodes.Periodic
+                    : CommunityPostTopicClassificationCodes.General),
             PrivacyNotice = isReportBoardPost
                 ? "신고·분쟁 기록은 공개 목록에서 제외되며 원문과 첨부·댓글을 공개하지 않습니다."
                 : CommunityAutomatedPostPublication.GetPrivacyNotice(systemPostKind),

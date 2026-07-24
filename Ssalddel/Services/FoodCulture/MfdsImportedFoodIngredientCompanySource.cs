@@ -15,7 +15,12 @@ public sealed record OfficialFoodIngredientImportedCompanyRecord(
     string ForeignManufacturerIdentifier,
     bool ForeignManufacturerRegistryMatched,
     bool RequiresAttention,
-    string AttentionReason);
+    string AttentionReason)
+{
+    public string ForeignManufacturerAreaName { get; init; } = string.Empty;
+
+    public string ForeignManufacturerAddress { get; init; } = string.Empty;
+}
 
 public sealed record OfficialFoodIngredientImportedCompanySourceResult(
     IReadOnlyList<OfficialFoodIngredientImportedCompanyRecord> Records,
@@ -184,6 +189,8 @@ public sealed class MfdsImportedFoodIngredientCompanySource
             {
                 ForeignManufacturerIdentifier = Clean(match.해외제조업소코드),
                 ForeignManufacturerRegistryMatched = true,
+                ForeignManufacturerAreaName = Clean(match.지역명),
+                ForeignManufacturerAddress = Clean(match.해외제조업소주소),
                 RequiresAttention = match.주의필요여부,
                 AttentionReason = Clean(match.주의사유)
             };

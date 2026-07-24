@@ -1,0 +1,180 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@inject PlatformCommunityService CommunityService
+
+<main class="community-mobile-work">
+    <header class="community-mobile-work__heading">
+        <a href="@CommunityMobileBoardPresentation.WorkModeQuery">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            게시판 모음
+        </a>
+        <span>업무 커뮤니티 · @ScreenCode</span>
+        <h1>@Heading</h1>
+        <p>@Description</p>
+    </header>
+
+    <nav class="community-mobile-work__filters" aria-label="업무 게시판 묶음 선택">
+        <a class="@BuildFilterClass(null)"
+           aria-current="@(ShowsAllGroups ? "page" : null)"
+           href="@CommunityMobileBoardPresentation.AllWorkGroupsPath">전체</a>
+        @foreach (var group in CommunityMobileBoardPresentation.WorkGroups)
+        {
+            <a class="@BuildFilterClass(group.Key)"
+               aria-current="@(IsSelected(group.Key) ? "page" : null)"
+               href="@group.Href">@group.ShortLabel</a>
+        }
+    </nav>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+    {
+        <section class="community-mobile-work__status" aria-live="polite">
+            <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Small" />
+            <span>@ViewModel.StatusMessage</span>
+        </section>
+    }
+
+    @if (ShowsAllGroups)
+    {
+        <section class="community-mobile-work__section">
+            <header>
+                <h2>업무단위 게시판</h2>
+                <span>@(CommunityMobileBoardPresentation.WorkGroups.Count)개 묶음</span>
+            </header>
+            <div class="community-mobile-work__groups">
+                @foreach (var group in CommunityMobileBoardPresentation.WorkGroups)
+                {
+                    <a href="@group.Href" class="@($"community-mobile-work__group community-mobile-work__group--{group.Tone}")">
+                        <span class="community-mobile-work__icon"><MudIcon Icon="@group.Icon" /></span>
+                        <span>
+                            <strong>@group.DisplayName</strong>
+                            <small>@group.Description</small>
+                        </span>
+                        <b>@(group.IsCrossCutting ? "횡단 보기" : $"{group.BoardKeys.Count}개 단위")</b>
+                        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                    </a>
+                }
+            </div>
+        </section>
+    }
+    else if (SelectedGroup is { IsCrossCutting: true } crossCuttingGroup)
+    {
+        <section class="community-mobile-work__section">
+            <header>
+                <h2>원장과 관계 보기</h2>
+                <span>별도 실행 없음</span>
+            </header>
+            <div class="community-mobile-work__actions">
+                <a href="@CommunityPageRoutes.Workspace">
+                    <MudIcon Icon="@Icons.Material.Filled.Dashboard" />
+                    <span><strong>업무 공간</strong><small>게시글에서 이어진 공동행동과 상태를 봅니다.</small></span>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                </a>
+                <a href="@CommunityPageRoutes.DiagramFor(returnPath: crossCuttingGroup.Href)">
+                    <MudIcon Icon="@Icons.Material.Filled.AccountTree" />
+                    <span><strong>다이어그램</strong><small>참여자·원장·단계의 관계를 시각화합니다.</small></span>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                </a>
+                <a href="@CommunityPageRoutes.LedgerDraft">
+                    <MudIcon Icon="@Icons.Material.Filled.PostAdd" />
+                    <span><strong>가원장 초안</strong><small>조건과 비용·노동·위험을 먼저 정리합니다.</small></span>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                </a>
+            </div>
+        </section>
+    }
+    else if (SelectedGroup is not null)
+    {
+        <section class="community-mobile-work__section">
+            <header>
+                <h2>최근 글을 볼 업무단위</h2>
+                <span>@(SelectedBoards.Count)개 게시판</span>
+            </header>
+
+            <div class="community-mobile-work__boards">
+                @foreach (var board in SelectedBoards)
+                {
+                    <a href="@CommunityPageRoutes.BoardsFor(boardKey: board.Key)">
+                        <span class="community-mobile-work__mountain" aria-label="간괘, 산">☶</span>
+                        <span>
+                            <strong>@board.DisplayName</strong>
+                            <small>@board.Description</small>
+                            <em>@board.PostingAccessDisplayName</em>
+                        </span>
+                        @if (ViewModel.HasLivePostCounts)
+                        {
+                            <b>@ViewModel.PostCountFor(board.Key)개 글</b>
+                        }
+                        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                    </a>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="community-mobile-work__empty">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" />
+            <strong>업무 게시판 묶음을 찾을 수 없습니다.</strong>
+            <a href="@CommunityMobileBoardPresentation.AllWorkGroupsPath">전체 업무 게시판 보기</a>
+        </section>
+    }
+
+    @if (SelectedGroup is not null)
+    {
+        <aside class="@($"community-mobile-work__boundary community-mobile-work__boundary--{SelectedGroup.Tone}")">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+            <span>
+                <strong>함께 확인</strong>
+                @SelectedGroup.Boundary
+            </span>
+        </aside>
+    }
+</main>
+
+@code {
+    [Parameter]
+    public string? GroupKey { get; set; }
+
+    private CommunityMobileBoardDirectoryViewModel ViewModel { get; set; } = default!;
+
+    private bool ShowsAllGroups
+        => string.IsNullOrWhiteSpace(GroupKey)
+           || string.Equals(GroupKey, "all", StringComparison.OrdinalIgnoreCase);
+
+    private CommunityMobileWorkGroupPresentation? SelectedGroup
+        => ShowsAllGroups
+            ? null
+            : CommunityMobileBoardPresentation.FindWorkGroup(GroupKey);
+
+    private IReadOnlyList<CommunityBoardDefinition> SelectedBoards
+        => SelectedGroup?.BoardKeys
+            .Select(CommunityBoardCatalog.Find)
+            .Where(board => board is not null)
+            .Cast<CommunityBoardDefinition>()
+            .ToArray()
+           ?? [];
+
+    private string ScreenCode => SelectedGroup?.ScreenCode ?? "01A.07";
+    private string Heading => SelectedGroup?.DisplayName ?? "업무 게시판 모음";
+    private string Description
+        => SelectedGroup?.Description
+           ?? "관심 있는 업무를 골라 글과 진행 근거를 함께 살펴봅니다.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        ViewModel = new CommunityMobileBoardDirectoryViewModel(
+            cancellationToken => CommunityService.GetBoardSummariesAsync("shipper", cancellationToken));
+        await ViewModel.LoadAsync();
+    }
+
+    private bool IsSelected(string groupKey)
+        => string.Equals(SelectedGroup?.Key, groupKey, StringComparison.OrdinalIgnoreCase);
+
+    private string BuildFilterClass(string? groupKey)
+        => groupKey is null
+            ? ShowsAllGroups
+                ? "community-mobile-work__filter community-mobile-work__filter--active"
+                : "community-mobile-work__filter"
+            : IsSelected(groupKey)
+                ? "community-mobile-work__filter community-mobile-work__filter--active"
+                : "community-mobile-work__filter";
+}

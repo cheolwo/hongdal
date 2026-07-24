@@ -121,6 +121,18 @@ public sealed record OfficialFoodIngredientCompanyCandidateDto(
     public string EvidenceSequence { get; init; } = string.Empty;
 
     public string EvidenceRecordIdentifier { get; init; } = string.Empty;
+
+    public string ManufacturerRegionCode { get; init; } = string.Empty;
+
+    public string ManufacturerRegionName { get; init; } = string.Empty;
+
+    public string ManufacturerRegionScope { get; init; } = string.Empty;
+
+    public string ManufacturerRegionClassificationMethod { get; init; } = string.Empty;
+
+    public string ManufacturerRegionEvidence { get; init; } = string.Empty;
+
+    public decimal ManufacturerRegionConfidence { get; init; }
 }
 
 public sealed record OfficialFoodIngredientCompanyResearchResponse(
@@ -188,7 +200,20 @@ public sealed record OfficialFoodIngredientCompanyArchivedEvidenceDto(
     bool IsCurrent,
     bool RequiresLiveRecheck,
     bool CanAutoSelect,
-    bool CanAutoContact);
+    bool CanAutoContact)
+{
+    public string ManufacturerRegionCode { get; init; } = string.Empty;
+
+    public string ManufacturerRegionName { get; init; } = string.Empty;
+
+    public string ManufacturerRegionScope { get; init; } = string.Empty;
+
+    public string ManufacturerRegionClassificationMethod { get; init; } = string.Empty;
+
+    public string ManufacturerRegionEvidence { get; init; } = string.Empty;
+
+    public decimal ManufacturerRegionConfidence { get; init; }
+}
 
 public sealed record OfficialFoodIngredientCompanyArchivedOrganizationDto(
     string OrganizationKey,

@@ -13,7 +13,8 @@ public interface I커뮤니티게시글조회UseCase
         string? roleTag,
         int page,
         int pageSize,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        string? periodicVisibility = null);
 
     Task<Result<IReadOnlyList<CommunityBoardSummaryResponse>>> 게시판요약목록Async(
         string? appKey,

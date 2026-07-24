@@ -21,6 +21,12 @@ public sealed record CommunityPersonalRouteContext(
         new("settings", "사용 설정", $"{CommunityPageRoutes.Personal}/settings")
     ];
 
+    public static IReadOnlyList<CommunityPersonalSectionDefinition> VisibleNavigationSections { get; } =
+    [
+        Sections[0],
+        Sections[1]
+    ];
+
     public string SectionKey => Section.Key;
     public string PageTitle => $"{Section.Title} · 살뜰 커뮤니티";
 

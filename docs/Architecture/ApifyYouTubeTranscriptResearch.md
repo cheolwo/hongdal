@@ -6,6 +6,8 @@
 
 현재 공급자는 [pintostudio/youtube-transcript-scraper](https://apify.com/pintostudio/youtube-transcript-scraper) Actor다. Actor 페이지 기준 입력은 `videoUrl`과 `targetLanguage`이고, 공개 자막이 있는 단일 영상의 timestamp·duration·text 세그먼트를 반환한다. 가격과 Actor 작성자·스키마는 변경될 수 있으므로 운영 활성화 전에 다시 확인한다.
 
+이 Adapter는 현재 [영상·자막·댓글 통합 수집 모듈](ApifyYouTubeContentCollection.md)에서도 재사용한다. 기존 자막 전용 API는 호환성을 위해 유지하고, 신규 통합 API가 같은 Adapter와 공통 Actor Gateway를 호출한다.
+
 ```mermaid
 flowchart LR
     A[관리자: VideoId와 언어 선택] --> B[YouTube음식상품관리Controller]

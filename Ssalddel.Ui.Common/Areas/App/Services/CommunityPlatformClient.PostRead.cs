@@ -30,6 +30,7 @@ public partial class CommunityPlatformClient
         string? roleTag = null,
         int page = 1,
         int pageSize = 50,
+        string? periodicVisibility = null,
         CancellationToken cancellationToken = default)
     {
         var query = new List<string>
@@ -42,6 +43,13 @@ public partial class CommunityPlatformClient
         AddQueryValue(query, "category", category);
         AddQueryValue(query, "workflowTag", workflowTag);
         AddQueryValue(query, "roleTag", roleTag);
+        AddQueryValue(
+            query,
+            "periodicVisibility",
+            CommunityPeriodicPostVisibilityModes.Normalize(periodicVisibility)
+                == CommunityPeriodicPostVisibilityModes.All
+                ? null
+                : CommunityPeriodicPostVisibilityModes.Normalize(periodicVisibility));
 
         using var response = await _protectedApiClient.GetAsync(
             $"api/v1/community/posts?{string.Join("&", query)}",

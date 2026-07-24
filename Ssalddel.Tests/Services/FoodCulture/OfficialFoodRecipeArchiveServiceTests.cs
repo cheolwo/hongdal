@@ -82,6 +82,54 @@ public sealed class OfficialFoodRecipeArchiveServiceTests
     }
 
     [Fact]
+    public async Task 서버관리자검토는_승인된대표음식상태를저장하고_즉시게시하지않는다()
+    {
+        await using var fixture = await ArchiveFixture.CreateAsync(
+            OfficialFoodRecipeSourceKeys.MfdsCookRecipe);
+        var service = fixture.CreateService();
+        await service.CollectAsync(new OfficialFoodRecipeCollectionRequest(
+            OfficialFoodRecipeSourceKeys.MfdsCookRecipe));
+        var dish = Assert.Single(await service.SearchDishesAsync(
+            new OfficialFoodRecipeQuery()));
+
+        var reviewed = await service.ReviewDishAsync(
+            dish.DishKey,
+            new OfficialFoodRecipeDishReviewRequest(
+                OfficialFoodRecipeReviewStates.Approved,
+                OfficialFoodRecipeRepresentationStates.Representative));
+
+        Assert.NotNull(reviewed);
+        Assert.Equal(OfficialFoodRecipeReviewStates.Approved, reviewed.ReviewState);
+        Assert.Equal(
+            OfficialFoodRecipeRepresentationStates.Representative,
+            reviewed.RepresentationState);
+        var saved = await fixture.Db.OfficialFoodDishes.SingleAsync();
+        Assert.Equal(OfficialFoodRecipeReviewStates.Approved, saved.ReviewState);
+        Assert.Equal(
+            OfficialFoodRecipeRepresentationStates.Representative,
+            saved.RepresentationState);
+    }
+
+    [Fact]
+    public async Task 승인없이대표음식으로지정할수없다()
+    {
+        await using var fixture = await ArchiveFixture.CreateAsync(
+            OfficialFoodRecipeSourceKeys.MfdsCookRecipe);
+        var service = fixture.CreateService();
+        await service.CollectAsync(new OfficialFoodRecipeCollectionRequest(
+            OfficialFoodRecipeSourceKeys.MfdsCookRecipe));
+        var dish = Assert.Single(await service.SearchDishesAsync(
+            new OfficialFoodRecipeQuery()));
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            service.ReviewDishAsync(
+                dish.DishKey,
+                new OfficialFoodRecipeDishReviewRequest(
+                    OfficialFoodRecipeReviewStates.PendingReview,
+                    OfficialFoodRecipeRepresentationStates.Representative)));
+    }
+
+    [Fact]
     public async Task 권리확인전_국가는_메타데이터만_보이고_자동수집은_거부한다()
     {
         await using var fixture = await ArchiveFixture.CreateAsync(null);

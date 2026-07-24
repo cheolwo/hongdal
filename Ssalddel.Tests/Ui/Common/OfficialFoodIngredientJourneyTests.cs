@@ -298,6 +298,38 @@ public sealed class OfficialFoodIngredientJourneyTests
     }
 
     [Fact]
+    public void 여러재료묶음은_비구속수요route에서_중복없이복원된다()
+    {
+        var onion = CommunityGroupPurchaseIngredientSeed.Create("ingredient:onion", "양파", purchaseUnit: "kg")!;
+        var chili = CommunityGroupPurchaseIngredientSeed.Create("ingredient:chili", "고추", purchaseUnit: "box")!;
+
+        var uri = CommunityGroupPurchaseIngredientSeed.ToDemandNavigationUri([onion, chili, onion]);
+        var query = new Uri($"https://example.test{uri}").Query;
+        var encoded = query.Split('=', 2)[1];
+        var restored = CommunityGroupPurchaseIngredientSeed.DecodeMaterialBundle(encoded);
+
+        Assert.StartsWith(CommunityPageRoutes.GroupPurchaseDemand, uri, StringComparison.Ordinal);
+        Assert.Equal(2, restored.Count);
+        Assert.Collection(
+            restored,
+            item => Assert.Equal("ingredient:onion", item.IngredientKey),
+            item =>
+            {
+                Assert.Equal("ingredient:chili", item.IngredientKey);
+                Assert.Equal("box", item.PurchaseUnit);
+            });
+    }
+
+    [Fact]
+    public void 여러재료묶음은_허용길이를넘거나_손상되면복원하지않는다()
+    {
+        var oversized = new string('a', CommunityGroupPurchaseIngredientSeed.MaxEncodedBundleLength + 1);
+
+        Assert.Empty(CommunityGroupPurchaseIngredientSeed.DecodeMaterialBundle(oversized));
+        Assert.Empty(CommunityGroupPurchaseIngredientSeed.DecodeMaterialBundle("not-a-valid-bundle"));
+    }
+
+    [Fact]
     public void 음식재료의_공동수입선택은_문화국가와상품출발국을분리한초안을만든다()
     {
         var detail = DishDetail();
@@ -317,6 +349,67 @@ public sealed class OfficialFoodIngredientJourneyTests
         var uri = Uri.UnescapeDataString(seed.ToNavigationUri());
         Assert.Contains("foodCountry=JP", uri, StringComparison.Ordinal);
         Assert.Contains("sourcingMode=GroupImportReview", uri, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void 문화교통초안은_국가기관근거와질문을담고_판매나거래를자동활성화하지않는다()
+    {
+        var detail = DishDetail();
+        var selection = new OfficialFoodDishIngredientPurchaseSelection(
+            detail,
+            Assert.Single(detail.Ingredients),
+            CommunityIngredientSourcingModeCodes.Unspecified);
+
+        var draft = OfficialFoodIngredientPresentation.CreateCultureTransportDraft(
+            selection,
+            CompanyResearchResponse(),
+            HsMappingResponse(),
+            new DateTime(2026, 7, 23, 4, 30, 0, DateTimeKind.Utc));
+
+        Assert.Equal(CommunityBoardCatalog.Food.DisplayName, draft.Category);
+        Assert.Equal(CultureTransportContentCatalog.FoodCultureWorkflowTag, draft.WorkflowTag);
+        Assert.Equal("문화교통 참여자", draft.RoleTag);
+        Assert.Equal("[문화교통][일본] 양파밥과 양파 이야기", draft.Title);
+        Assert.Contains("일본 농림수산성", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("식품의약품안전처", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("US HTSUS 0703.10.2000", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("현지에서 언제, 누구와, 어떤 방식으로", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("구매하지 않고 정보만 나눠도 좋습니다", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("먼저 개별구매나 개별수입 조건", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("혼자 감당하기 부담스럽다면", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("어떤 역할을 함께 나누면 좋을까요", draft.Body, StringComparison.Ordinal);
+        Assert.Equal(detail.OriginalUrl, draft.SharedLinkUrl);
+        Assert.False(draft.IsSalesPost);
+        Assert.False(draft.IsInterestGatheringEnabled);
+        Assert.Empty(draft.커뮤니티원장Id);
+    }
+
+    [Fact]
+    public void 개별수입질문초안은_정보확인으로남고_주문이나거래를활성화하지않는다()
+    {
+        var detail = DishDetail();
+        var selection = new OfficialFoodDishIngredientPurchaseSelection(
+            detail,
+            Assert.Single(detail.Ingredients),
+            CommunityIngredientSourcingModeCodes.Unspecified);
+
+        var draft = OfficialFoodIngredientPresentation.CreateIndividualImportReviewDraft(
+            selection,
+            CompanyResearchResponse(),
+            HsMappingResponse(),
+            new DateTime(2026, 7, 23, 5, 0, 0, DateTimeKind.Utc));
+
+        Assert.Equal(CommunityBoardCatalog.InformationPrices.DisplayName, draft.Category);
+        Assert.Equal("개별수입 사전 확인", draft.WorkflowTag);
+        Assert.Equal("정보 확인 참여자", draft.RoleTag);
+        Assert.Equal("[개별수입 사전 확인] 일본 양파", draft.Title);
+        Assert.Contains("개인 반입이 허용", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("검역·신고·표시 의무", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("누구와 어떤 책임을 나눌 수 있나요", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("주문, 구매 대행, 통관 신고 또는 계약을 요청하거나 자동 실행하지 않습니다", draft.Body, StringComparison.Ordinal);
+        Assert.False(draft.IsSalesPost);
+        Assert.False(draft.IsInterestGatheringEnabled);
+        Assert.Empty(draft.커뮤니티원장Id);
     }
 
     [Fact]
@@ -371,6 +464,8 @@ public sealed class OfficialFoodIngredientJourneyTests
         var cardCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCard.razor.css"));
         var dishBrowser = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodDishBrowsePanel.razor"));
         var dishBrowserCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodDishBrowsePanel.razor.css"));
+        var exchangePanel = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodCultureTransportPanel.razor"));
+        var exchangePanelCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodCultureTransportPanel.razor.css"));
         var companyPanel = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCompanyPanel.razor"));
         var companyPanelCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCompanyPanel.razor.css"));
         var hsPanel = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientHsPanel.razor"));
@@ -379,6 +474,10 @@ public sealed class OfficialFoodIngredientJourneyTests
         var searchCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientSearchPanel.razor.css"));
 
         Assert.Contains("IngredientName=\"@Ingredient.CanonicalName\"", card);
+        Assert.Contains("혼자 구입하기 부담스럽다면", card);
+        Assert.Contains("같이 구매할 이웃 알아보기", card);
+        Assert.Contains("혼자 준비하기 부담스럽다면", File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientRecipePanel.razor")));
+        Assert.Contains("이 레시피로 같이 구매할 이웃 알아보기", File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientRecipePanel.razor")));
         Assert.Contains("@media (max-width: 900px)", journeyCss);
         Assert.Contains("@media (max-width: 640px)", cardCss);
         Assert.Contains("@media (max-width: 640px)", recipeCss);
@@ -388,8 +487,33 @@ public sealed class OfficialFoodIngredientJourneyTests
         Assert.Contains("min-height: 44px", recipeCss);
         Assert.Contains("min-height: 44px", searchCss);
         Assert.Contains("음식 국가 ≠ 상품 출발국", dishBrowser);
-        Assert.Contains("국내 공동구매 수요 등록", dishBrowser);
-        Assert.Contains("공동수입 관심 수요 등록", dishBrowser);
+        Assert.Contains("문화교통 · 음식에서 이동 준비까지", dishBrowser);
+        Assert.Contains("OfficialFoodCultureTransportPanel", dishBrowser);
+        Assert.Contains("문화교통 0.0 → 1.0 → 1.5", exchangePanel);
+        Assert.Contains("공식 근거로 글 초안 만들기", exchangePanel);
+        Assert.Contains("<details class=\"culture-transport__purchase-options\">", exchangePanel);
+        Assert.DoesNotContain("<details class=\"culture-transport__purchase-options\" open", exchangePanel);
+        Assert.Contains("구매·수입 방법 살펴보기", exchangePanel);
+        Assert.Contains("먼저 혼자 알아보기", exchangePanel);
+        Assert.Contains("혼자 거래하기 부담스러울 때", exchangePanel);
+        Assert.Contains("같이 조건을 확인하고 역할·비용·위험 나누기", exchangePanel);
+        Assert.Contains("문화교통 0.0 · 개별구매 참고", exchangePanel);
+        Assert.Contains("문화교통 1.5 · 개별수입 준비", exchangePanel);
+        Assert.Contains("문화교통 1.0 · 공동구매", exchangePanel);
+        Assert.Contains("문화교통 1.5 · 공동수입 준비", exchangePanel);
+        Assert.True(exchangePanel.IndexOf("문화교통 1.5 · 개별수입 준비", StringComparison.Ordinal)
+                    < exchangePanel.IndexOf("혼자 거래하기 부담스러울 때", StringComparison.Ordinal));
+        Assert.True(exchangePanel.IndexOf("혼자 거래하기 부담스러울 때", StringComparison.Ordinal)
+                    < exchangePanel.IndexOf("문화교통 1.0 · 공동구매", StringComparison.Ordinal));
+        Assert.Contains("같이 구매할 이웃 알아보기", exchangePanel);
+        Assert.Contains("개별수입 가능성 질문 초안", exchangePanel);
+        Assert.Contains("같이 수입할 이웃 알아보기", exchangePanel);
+        Assert.Contains("아무것도 선택하지 않아도 됩니다", exchangePanel);
+        Assert.Contains("CommunityBoardCatalog.Food", exchangePanel);
+        Assert.Contains("CommunityBoardCatalog.SalesSupply", exchangePanel);
+        Assert.Contains("CommunityBoardCatalog.InformationPrices", dishBrowser);
+        Assert.Contains("@media (max-width: 640px)", exchangePanelCss);
+        Assert.Contains("min-height: 44px", exchangePanelCss);
         Assert.Contains("OfficialFoodIngredientCompanyPanel", dishBrowser);
         Assert.Contains("OfficialFoodIngredientHsPanel", dishBrowser);
         Assert.Contains("관련 국내외 기업 조사", companyPanel);
@@ -397,6 +521,7 @@ public sealed class OfficialFoodIngredientJourneyTests
         Assert.Contains("자동 추천·선정·초대", companyPanel);
         Assert.Contains("@media (max-width: 640px)", dishBrowserCss);
         Assert.Contains("min-height: 44px", dishBrowserCss);
+        Assert.Contains("grid-template-columns: minmax(0, 1fr)", dishBrowserCss);
         Assert.Contains("@media (max-width: 640px)", companyPanelCss);
         Assert.Contains("min-height: 44px", companyPanelCss);
         Assert.Contains("신고용 확정값 아님", hsPanel);

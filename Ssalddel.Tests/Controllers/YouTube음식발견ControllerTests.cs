@@ -34,6 +34,12 @@ public sealed class YouTube음식발견ControllerTests
                 .GetMethod(nameof(YouTube음식상품관리Controller.영상자막조회))
                 ?.GetCustomAttribute<HttpPostAttribute>()
                 ?.Template);
+        Assert.Equal(
+            "videos/{videoId}/collection",
+            typeof(YouTube음식상품관리Controller)
+                .GetMethod(nameof(YouTube음식상품관리Controller.영상콘텐츠수집))
+                ?.GetCustomAttribute<HttpPostAttribute>()
+                ?.Template);
     }
 
     [Fact]

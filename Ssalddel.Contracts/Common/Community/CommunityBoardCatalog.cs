@@ -45,6 +45,11 @@ public static class CommunityBoardKeys
     public const string FreeLife = "free-life";
     public const string QuestionHelp = "question-help";
     public const string InformationPrices = "information-prices";
+    public const string PeriodicDataKamis = "periodic-data-kamis";
+    public const string PeriodicDataMfds = "periodic-data-mfds";
+    public const string PeriodicDataUsda = "periodic-data-usda";
+    public const string PeriodicDataCustomsImportUnitPrice =
+        "periodic-data-customs-import-unit-price";
     public const string Food = "food";
     public const string Cargo = "cargo";
     public const string Prajna = "prajna";
@@ -59,6 +64,7 @@ public static class CommunityBoardKeys
 public static class CommunityBoardGroupCodes
 {
     public const string PeopleAndInformation = "people-information";
+    public const string PeriodicData = "periodic-data";
     public const string CollectiveWork = "collective-work";
     // Legacy grouping code retained only for resolving pre-work-unit links.
     public const string ActivityRoadmap = "activity-roadmap";
@@ -196,6 +202,46 @@ public static class CommunityBoardCatalog
         postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "정보 협업");
 
+    public static CommunityBoardDefinition PeriodicDataKamis { get; } = Board(
+        CommunityBoardKeys.PeriodicDataKamis,
+        "KAMIS 가격 데이터",
+        "KAMIS 농수산물 관측가격을 조사일·품목·등급·단위와 함께 한 번만 누적하는 원천 게시판",
+        CommunityBoardGroupCodes.PeriodicData,
+        "주기성 데이터",
+        isUserCreatable: false,
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly);
+
+    public static CommunityBoardDefinition PeriodicDataMfds { get; } = Board(
+        CommunityBoardKeys.PeriodicDataMfds,
+        "MFDS 수입식품 데이터",
+        "식약처 수입식품·해외제조업소 근거와 중국 권역·미국 주별 누적을 한 번만 보관하는 원천 게시판",
+        CommunityBoardGroupCodes.PeriodicData,
+        "주기성 데이터",
+        isUserCreatable: false,
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly);
+
+    public static CommunityBoardDefinition PeriodicDataUsda { get; } = Board(
+        CommunityBoardKeys.PeriodicDataUsda,
+        "USDA 가격 데이터",
+        "USDA NASS 미국 생산자 수취가격을 기준월·품목·원 단위와 함께 한 번만 누적하는 원천 게시판",
+        CommunityBoardGroupCodes.PeriodicData,
+        "주기성 데이터",
+        isUserCreatable: false,
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly);
+
+    public static CommunityBoardDefinition PeriodicDataCustomsImportUnitPrice { get; } = Board(
+        CommunityBoardKeys.PeriodicDataCustomsImportUnitPrice,
+        "관세청 수입단가 데이터",
+        "품목·국가·기간별 수입금액과 순중량으로 산출한 CIF 참고단가를 한 번만 누적하는 원천 게시판",
+        CommunityBoardGroupCodes.PeriodicData,
+        "주기성 데이터",
+        isUserCreatable: false,
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly);
+
     public static CommunityBoardDefinition Food { get; } = Board(
         CommunityBoardKeys.Food,
         "음식",
@@ -309,6 +355,10 @@ public static class CommunityBoardCatalog
             FreeLife,
             QuestionHelp,
             InformationPrices,
+            PeriodicDataKamis,
+            PeriodicDataMfds,
+            PeriodicDataUsda,
+            PeriodicDataCustomsImportUnitPrice,
             Food,
             Cargo,
             Prajna,

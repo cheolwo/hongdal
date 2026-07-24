@@ -4,6 +4,8 @@ using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Ssalddel.Security;
 
 namespace Ssalddel.Controllers.Common;
 
@@ -40,6 +42,7 @@ public sealed class 커뮤니티게시글운영Controller : ControllerBase
 
     [HttpPost("comments/{commentId:long}/reports")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> ReportComment(
         long commentId,
         CancellationToken cancellationToken)
@@ -60,6 +63,7 @@ public sealed class 커뮤니티게시글운영Controller : ControllerBase
 
     [HttpPost("attachments/comments/{commentId:long}/reports")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> ReportAttachmentComment(
         long commentId,
         CancellationToken cancellationToken)

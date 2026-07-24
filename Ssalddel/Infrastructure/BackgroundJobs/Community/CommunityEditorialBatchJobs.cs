@@ -40,6 +40,9 @@ public sealed class CommunityEditorialBatchRunner
     public Task RunActivityDigestAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.ActivityDigest, cancellationToken);
 
+    public Task RunCultureTransportAsync(CancellationToken cancellationToken)
+        => RunSourceAsync(CommunityAutomatedPostSourceKeys.CultureTransport, cancellationToken);
+
     public Task RunPrajnaPublicationAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.Prajna, cancellationToken);
 

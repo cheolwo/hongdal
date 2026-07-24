@@ -31,6 +31,8 @@ public sealed class MfdsImportedFoodIngredientCompanySourceTests
         Assert.Equal("한국수입", record.ImporterName);
         Assert.Equal("GLOBAL SESAME FOODS", record.ForeignManufacturerName);
         Assert.Equal("US-FOOD-10", record.ForeignManufacturerIdentifier);
+        Assert.Equal("CALIFORNIA", record.ForeignManufacturerAreaName);
+        Assert.Equal("100 SESAME ROAD, CALIFORNIA", record.ForeignManufacturerAddress);
         Assert.True(record.ForeignManufacturerRegistryMatched);
     }
 
@@ -80,7 +82,9 @@ public sealed class MfdsImportedFoodIngredientCompanySourceTests
                             {
                                 해외제조업소코드 = "US-FOOD-10",
                                 해외제조업소명 = "GLOBAL SESAME FOODS",
-                                국가명 = "미국"
+                                해외제조업소주소 = "100 SESAME ROAD, CALIFORNIA",
+                                국가명 = "미국",
+                                지역명 = "CALIFORNIA"
                             }
                         ]
                     }

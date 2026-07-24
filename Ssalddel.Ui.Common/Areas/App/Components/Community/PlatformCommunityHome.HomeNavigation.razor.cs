@@ -27,6 +27,12 @@ public partial class PlatformCommunityHome
 
     private void OpenPublicCommunity()
     {
+        if (!string.IsNullOrWhiteSpace(CommunityDirectoryHref))
+        {
+            Navigation.NavigateTo(CommunityDirectoryHref);
+            return;
+        }
+
         if (UseDedicatedCommunityRoutes && WorkspaceOnly)
         {
             Navigation.NavigateTo(CommunityPageRoutes.Home);
@@ -50,6 +56,12 @@ public partial class PlatformCommunityHome
 
     private async Task 공통홈게시판열기Async()
     {
+        if (!string.IsNullOrWhiteSpace(CommunityDirectoryHref))
+        {
+            Navigation.NavigateTo(CommunityDirectoryHref);
+            return;
+        }
+
         if (UseDedicatedCommunityRoutes && WorkspaceOnly)
         {
             Navigation.NavigateTo(CommunityPageRoutes.Home);

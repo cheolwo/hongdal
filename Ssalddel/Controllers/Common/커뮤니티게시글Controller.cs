@@ -4,7 +4,9 @@ using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
+using Ssalddel.Security;
 
 namespace Ssalddel.Controllers.Common;
 
@@ -55,6 +57,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
         [FromQuery] string? boardKey,
         [FromQuery] string? workflowTag,
         [FromQuery] string? roleTag,
+        [FromQuery] string? periodicVisibility,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -67,7 +70,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
             roleTag,
             page,
             pageSize,
-            cancellationToken);
+            cancellationToken,
+            periodicVisibility);
         return this.ToActionResult(result);
     }
 
@@ -80,6 +84,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> Create(
         [FromBody] PlatformCommunityPostCreateRequest request,
         CancellationToken cancellationToken)
@@ -174,6 +179,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpPut("{id:long}")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> Update(
         long id,
         [FromBody] PlatformCommunityPostUpdateRequest request,
@@ -182,6 +188,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpDelete("{id:long}")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> Delete(
         long id,
         [FromBody] PlatformCommunityPostPasswordRequest request,

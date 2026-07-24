@@ -4,6 +4,8 @@ using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Ssalddel.Security;
 
 namespace Ssalddel.Controllers.Common;
 
@@ -29,6 +31,7 @@ public sealed class 커뮤니티게시글참여Controller : ControllerBase
 
     [HttpPost("{id:long}/recommendations")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> Recommend(
         long id,
         [FromBody] PlatformCommunityPostRecommendationRequest request,
@@ -49,6 +52,7 @@ public sealed class 커뮤니티게시글참여Controller : ControllerBase
 
     [HttpPost("{id:long}/comments")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> CreateComment(
         long id,
         [FromBody] PlatformCommunityPostCommentCreateRequest request,
@@ -60,6 +64,7 @@ public sealed class 커뮤니티게시글참여Controller : ControllerBase
 
     [HttpDelete("{id:long}/comments/{commentId:long}")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> DeleteComment(
         long id,
         long commentId,
@@ -82,6 +87,7 @@ public sealed class 커뮤니티게시글참여Controller : ControllerBase
 
     [HttpPost("attachments/{attachmentId:long}/comments")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> CreateAttachmentComment(
         long attachmentId,
         [FromBody] PlatformCommunityPostAttachmentCommentCreateRequest request,
@@ -93,6 +99,7 @@ public sealed class 커뮤니티게시글참여Controller : ControllerBase
 
     [HttpDelete("attachments/{attachmentId:long}/comments/{commentId:long}")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     public async Task<IActionResult> DeleteAttachmentComment(
         long attachmentId,
         long commentId,

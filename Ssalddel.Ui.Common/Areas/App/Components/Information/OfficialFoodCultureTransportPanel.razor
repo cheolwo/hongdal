@@ -1,0 +1,205 @@
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="culture-transport" aria-labelledby="culture-transport-title">
+    <header class="culture-transport__header">
+        <div>
+            <span>문화교통 0.0 → 1.0 → 1.5</span>
+            <h5 id="culture-transport-title">음식의 문화에서 재료의 이동 준비까지</h5>
+            <p>
+                @(Dish.Dish.Name)의 문화 맥락과 @Ingredient.CanonicalName 공개 근거를 대화의 출발점으로 씁니다.
+                문화와 정보를 둘러보는 것만으로도 흐름은 완결됩니다. 원할 때만 함께 구하려는 마음과 공급·이동 준비로 이어지며,
+                국가기관 자료는 거래 상대 추천이나 현재 판매·수입 가능성을 보증하지 않습니다.
+            </p>
+        </div>
+        <span class="culture-transport__state">문화와 근거가 먼저</span>
+    </header>
+
+    <div class="culture-transport__evidence" aria-label="문화교통에 사용하는 공개 근거">
+        <article>
+            <span>음식 문화 원천</span>
+            <strong>@Dish.Provider</strong>
+            <small>@OfficialFoodIngredientPresentation.CountryName(Dish.Dish.CountryCode) · @Dish.LastCollectedAtUtc.ToLocalTime().ToString("yyyy.MM.dd") 확인</small>
+        </article>
+        <article>
+            <span>공공 가격 원천</span>
+            <strong>@PriceSourceLabel</strong>
+            <small>@PriceSourceDetail</small>
+        </article>
+        <article>
+            <span>기업·상품 근거</span>
+            <strong>@CompanySourceLabel</strong>
+            <small>@CompanySourceDetail</small>
+        </article>
+        <article>
+            <span>국가별 품목분류 참고</span>
+            <strong>@HsSourceLabel</strong>
+            <small>@HsSourceDetail</small>
+        </article>
+    </div>
+
+    <article class="culture-transport__route culture-transport__route--conversation">
+        <span>문화교통 0.0 · 문화 이야기</span>
+        <strong>먹는 방식과 현지 경험 나누기</strong>
+        <p>공식 자료에 없는 지역 경험, 대체 재료와 표현 차이를 질문하고 근거를 보완합니다.</p>
+        <div>
+            <a href="@FoodConversationHref">@Ingredient.CanonicalName 이야기 보기</a>
+            <button type="button" @onclick="StartDiscussionAsync">공식 근거로 글 초안 만들기</button>
+        </div>
+    </article>
+
+    <details class="culture-transport__purchase-options">
+        <summary>
+            <span>한번 구해볼까 하는 생각이 들 때</span>
+            <strong>구매·수입 방법 살펴보기</strong>
+            <small>선택지를 열어도 주문이나 참여가 자동으로 확정되지 않습니다.</small>
+        </summary>
+
+        <header class="culture-transport__choice-heading">
+            <span>먼저 혼자 알아보기</span>
+            <strong>내게 맞는 구매·수입 조건 확인</strong>
+            <p>판매 조건이나 개인 반입 요건을 직접 확인할 수 있다면 개인 경로에서 시작합니다.</p>
+        </header>
+
+        <div class="culture-transport__routes" aria-label="개인이 알아보는 구매와 수입 경로">
+            <article class="culture-transport__route culture-transport__route--individual">
+                <span>문화교통 0.0 · 개별구매 참고</span>
+                <strong>등록된 판매·공급 정보 찾기</strong>
+                <p>판매자가 공개한 가격·수량·결제 조건을 별도로 확인합니다. 국가기관 자료가 판매자를 인증하지는 않습니다.</p>
+                <a href="@IndividualPurchaseHref">@Ingredient.CanonicalName 판매 정보 보기</a>
+            </article>
+
+            <article class="culture-transport__route culture-transport__route--import">
+                <span>문화교통 1.5 · 개별수입 준비</span>
+                <strong>개인이 들여올 수 있는지 먼저 확인하기</strong>
+                <p>상품 형태·수량·도착 국가에 따라 개인통관, 검역, 표시와 반입 제한이 달라질 수 있습니다.</p>
+                <button type="button" @onclick="StartIndividualImportDiscussionAsync">개별수입 가능성 질문 초안</button>
+            </article>
+        </div>
+
+        <aside class="culture-transport__together-bridge">
+            <span>혼자 거래하기 부담스러울 때</span>
+            <strong>같이 조건을 확인하고 역할·비용·위험 나누기</strong>
+            <p>
+                공동 경로는 할인만을 위한 기능이 아닙니다. 최소수량, 공급자 확인, 연락, 통관과 수령처럼
+                혼자 감당하기 어려운 일을 나누되 담당자와 계산 근거를 함께 공개합니다.
+            </p>
+        </aside>
+
+        <div class="culture-transport__routes" aria-label="함께 알아보는 공동구매와 공동수입 경로">
+            <article class="culture-transport__route culture-transport__route--group">
+                <span>문화교통 1.0 · 공동구매</span>
+                <strong>혼자 부담스러운 조건을 이웃과 나누기</strong>
+                <p>희망 수량과 수령 권역을 모으고, 조건 확인·연락·수령 역할과 비용 담당자를 공개한 뒤 구매 여부를 정합니다.</p>
+                <button type="button" @onclick="@(() => StartPurchaseAsync(CommunityIngredientSourcingModeCodes.DomesticGroupPurchase))">같이 구매할 이웃 알아보기</button>
+            </article>
+
+            <article class="culture-transport__route culture-transport__route--import culture-transport__route--group">
+                <span>문화교통 1.5 · 공동수입 준비</span>
+                <strong>수입 확인과 책임을 함께 나누기</strong>
+                <p>출발국, 공급자 견적, HSK·HTS, 통관·수령 조건을 함께 검토하고 책임 주체가 정해질 때까지 수입을 확정하지 않습니다.</p>
+                <button type="button" @onclick="@(() => StartPurchaseAsync(CommunityIngredientSourcingModeCodes.GroupImportReview))">같이 수입할 이웃 알아보기</button>
+            </article>
+        </div>
+
+        <p class="culture-transport__purchase-boundary">
+            네 경로 중 아무것도 선택하지 않아도 됩니다. 선택 후에도 조건을 확인하고 명시적으로 동의하기 전에는 주문·계약·수입을 실행하지 않습니다.
+        </p>
+    </details>
+
+    @if (!string.IsNullOrWhiteSpace(DiscussionStatusMessage))
+    {
+        <p class="culture-transport__notice" role="status">@DiscussionStatusMessage</p>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfficialFoodDishDetailDto Dish { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public OfficialFoodRecipeIngredientDto Ingredient { get; set; } = default!;
+
+    [Parameter]
+    public OfficialFoodIngredientCompanyResearchResponse? CompanyResearch { get; set; }
+
+    [Parameter]
+    public OfficialFoodIngredientHsMappingResponse? HsMapping { get; set; }
+
+    [Parameter]
+    public EventCallback<OfficialFoodDishIngredientPurchaseSelection> DiscussionRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<OfficialFoodDishIngredientPurchaseSelection> IndividualImportDiscussionRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<OfficialFoodDishIngredientPurchaseSelection> PurchaseRequested { get; set; }
+
+    [Parameter]
+    public string? DiscussionStatusMessage { get; set; }
+
+    private IReadOnlyList<OfficialFoodIngredientPublicPriceDto> Prices
+        => Ingredient.PublicPrices ?? [];
+
+    private string PriceSourceLabel
+        => JoinLabels(Prices.Select(price => price.Provider), "연결된 가격 자료 없음");
+
+    private string PriceSourceDetail
+        => Prices.Count == 0
+            ? "가격이 없더라도 문화 이야기는 나눌 수 있습니다."
+            : $"{Prices.Select(price => price.CountryCode).Distinct(StringComparer.OrdinalIgnoreCase).Count():N0}개 국가·권역 자료 · 기준일과 단위 별도 확인";
+
+    private string CompanySourceLabel
+        => JoinLabels(CompanyResearch?.Sources.Select(source => source.Provider), "필요할 때 관련 기업 근거 조회");
+
+    private string CompanySourceDetail
+        => CompanyResearch is null
+            ? "공식 명부와 품목 이력을 조회하기 전 상태입니다."
+            : $"후보 {CompanyResearch.Candidates.Count:N0}건 · 자동 추천·연락 없음";
+
+    private string HsSourceLabel
+        => JoinLabels(HsMapping?.Candidates.Select(candidate => candidate.SourceName), "필요할 때 HSK·HTS 후보 조회");
+
+    private string HsSourceDetail
+        => HsMapping is null
+            ? "상품 형태와 거래 국가가 정해진 뒤 다시 확인합니다."
+            : $"후보 {HsMapping.Candidates.Count:N0}건 · 신고용 확정값 아님";
+
+    private string FoodConversationHref
+        => CommunityPageRoutes.BoardsFor(
+            CommunityBoardCatalog.Food.DisplayName,
+            CommunityBoardCatalog.Food.Key,
+            search: Ingredient.CanonicalName);
+
+    private string IndividualPurchaseHref
+        => CommunityPageRoutes.BoardsFor(
+            CommunityBoardCatalog.SalesSupply.DisplayName,
+            CommunityBoardCatalog.SalesSupply.Key,
+            search: Ingredient.CanonicalName);
+
+    private Task StartDiscussionAsync()
+        => DiscussionRequested.InvokeAsync(new(
+            Dish,
+            Ingredient,
+            CommunityIngredientSourcingModeCodes.Unspecified));
+
+    private Task StartIndividualImportDiscussionAsync()
+        => IndividualImportDiscussionRequested.InvokeAsync(new(
+            Dish,
+            Ingredient,
+            CommunityIngredientSourcingModeCodes.Unspecified));
+
+    private Task StartPurchaseAsync(string sourcingModeCode)
+        => PurchaseRequested.InvokeAsync(new(Dish, Ingredient, sourcingModeCode));
+
+    private static string JoinLabels(IEnumerable<string>? values, string fallback)
+    {
+        var labels = values?
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(2)
+            .ToArray() ?? [];
+        return labels.Length == 0 ? fallback : string.Join(" · ", labels);
+    }
+}

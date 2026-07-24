@@ -2,6 +2,7 @@ using System.Data;
 using System.Globalization;
 using Ssalddel.Application.Community;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Domain.AgriculturalFisheries;
 using Ssalddel.Domain.Community;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
@@ -19,6 +20,7 @@ public static class CommunityAutomatedPostSourceKeys
     public const string UsdaNassPriceBrief = "usda-nass-price-brief";
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
+    public const string CultureTransport = "culture-transport";
     public const string Prajna = "prajna";
     public const string PrajnaCard = "prajna-card";
     public const string PrajnaVideo = "prajna-video";
@@ -92,6 +94,8 @@ public static class CommunityAutomatedPostPublication
             CommunityAutomatedPostSourceKeys.KamisPriceBrief => PlatformCommunitySystemPostKinds.KamisPriceBrief,
             CommunityAutomatedPostSourceKeys.Reflection => PlatformCommunitySystemPostKinds.Reflection,
             CommunityAutomatedPostSourceKeys.ActivityDigest => PlatformCommunitySystemPostKinds.ActivityDigest,
+            CommunityAutomatedPostSourceKeys.CultureTransport =>
+                PlatformCommunitySystemPostKinds.CultureTransport,
             CommunityAutomatedPostSourceKeys.PrajnaCard or CommunityAutomatedPostSourceKeys.PrajnaVideo =>
                 PlatformCommunitySystemPostKinds.PrajnaContent,
             _ => PlatformCommunitySystemPostKinds.AutomatedEditorial
@@ -109,6 +113,8 @@ public static class CommunityAutomatedPostPublication
                 "살뜰 운영 원칙을 바탕으로 자동 편집한 성찰문이며 특정 사상가의 실제 인용문이 아닙니다.",
             PlatformCommunitySystemPostKinds.ActivityDigest =>
                 "완료 상태로 기록된 비식별 원장의 건수만 자동 집계했으며 참여자, 금액, 주소와 거래 세부정보를 포함하지 않습니다.",
+            PlatformCommunitySystemPostKinds.CultureTransport =>
+                "운영자가 승인한 공식 음식 메타데이터로 문화교통 질문을 만든 시스템 글입니다. 구매 권유나 국가 전체를 대표하는 설명이 아닙니다.",
             PlatformCommunitySystemPostKinds.PrajnaContent =>
                 "관리자가 선별한 외부 공개 자료의 제목과 짧은 소개만 게시합니다. 원 출처를 확인해야 하며 살뜰과 해당 기관의 제휴를 뜻하지 않습니다.",
             PlatformCommunitySystemPostKinds.AutomatedEditorial =>
@@ -170,19 +176,29 @@ public sealed class EfCommunityAutomatedPostPublisher : ICommunityAutomatedPostP
         await using var transaction = _db.Database.IsRelational()
             ? await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken)
             : null;
-        var existingPostId = await _db.PlatformCommunityPosts
-            .AsNoTracking()
+        var existingPost = await _db.PlatformCommunityPosts
             .Where(post => !post.IsDeleted && post.AuthorUserId == draft.SystemAuthorKey)
-            .Select(post => (long?)post.Id)
             .FirstOrDefaultAsync(cancellationToken);
-        if (existingPostId.HasValue)
+        if (existingPost is not null)
         {
+            var canonicalCategory =
+                CommunityBoardCatalog.ResolveCanonicalCategory(draft.Category);
+            if (!string.Equals(
+                    existingPost.Category,
+                    canonicalCategory,
+                    StringComparison.Ordinal))
+            {
+                existingPost.Category = canonicalCategory;
+                existingPost.UpdatedAtUtc = _timeProvider.GetUtcNow().UtcDateTime;
+                await _db.SaveChangesAsync(cancellationToken);
+            }
+
             if (transaction is not null)
             {
                 await transaction.CommitAsync(cancellationToken);
             }
 
-            return new CommunityAutomatedPostPublishResult(existingPostId.Value, false);
+            return new CommunityAutomatedPostPublishResult(existingPost.Id, false);
         }
 
         var now = _timeProvider.GetUtcNow().UtcDateTime;
@@ -342,10 +358,10 @@ public sealed class CommunityKamisPriceBriefSource : ICommunityAutomatedPostSour
         return new CommunityAutomatedPostDraft(
             SourceKey,
             latestSurveyDate.Value.ToString("yyyyMMdd", CultureInfo.InvariantCulture),
-            CommunityBoardCatalog.InformationPrices.DisplayName,
-            "농수산물 가격 정보",
+            CommunityBoardCatalog.PeriodicDataKamis.DisplayName,
+            CultureTransportContentCatalog.PriceEvidenceWorkflowTag,
             "자동 정보",
-            $"[자동 가격정보] {latestSurveyDate:yyyy-MM-dd} KAMIS 농수산물 관측값",
+            $"[문화교통·가격] {latestSurveyDate:yyyy-MM-dd} KAMIS 농수산물 관측값",
             BuildBody(latestSurveyDate.Value, selected),
             "살뜰 정보봇",
             sourceUrl);

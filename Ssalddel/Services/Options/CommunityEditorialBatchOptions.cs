@@ -30,6 +30,10 @@ public sealed class CommunityEditorialBatchOptions
 
     public string ActivityDigestCronExpression { get; set; } = "0 30 8 * * ?";
 
+    public bool CultureTransportEnabled { get; set; }
+
+    public string CultureTransportCronExpression { get; set; } = "0 0 11 ? * TUE,FRI";
+
     public bool PrajnaPublicationEnabled { get; set; }
 
     public string PrajnaPublicationCronExpression { get; set; } = "0 15 9 * * ?";

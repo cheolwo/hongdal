@@ -496,6 +496,19 @@ public sealed class OfficialFoodIngredientCompanyArchiveService(
             entity.SourceName = Truncate(candidate.SourceName, 300);
             entity.SourceUrl = Truncate(candidate.SourceUrl, 1000);
             entity.ResearchQueryTerm = Truncate(response.IngredientName, 300);
+            entity.ManufacturerRegionCode = Truncate(candidate.ManufacturerRegionCode, 50);
+            entity.ManufacturerRegionName = Truncate(candidate.ManufacturerRegionName, 160);
+            entity.ManufacturerRegionScope = Truncate(candidate.ManufacturerRegionScope, 800);
+            entity.ManufacturerRegionClassificationMethod = Truncate(
+                candidate.ManufacturerRegionClassificationMethod,
+                50);
+            entity.ManufacturerRegionEvidence = Truncate(
+                candidate.ManufacturerRegionEvidence,
+                300);
+            entity.ManufacturerRegionConfidence = Math.Clamp(
+                candidate.ManufacturerRegionConfidence,
+                0m,
+                1m);
             entity.LastObservedAtUtc = observedAtUtc;
             entity.ObservationCount++;
             entity.IsCurrent = true;
@@ -717,7 +730,16 @@ public sealed class OfficialFoodIngredientCompanyArchiveService(
                 item.IsCurrent,
                 true,
                 false,
-                false))
+                false)
+            {
+                ManufacturerRegionCode = item.ManufacturerRegionCode,
+                ManufacturerRegionName = item.ManufacturerRegionName,
+                ManufacturerRegionScope = item.ManufacturerRegionScope,
+                ManufacturerRegionClassificationMethod =
+                    item.ManufacturerRegionClassificationMethod,
+                ManufacturerRegionEvidence = item.ManufacturerRegionEvidence,
+                ManufacturerRegionConfidence = item.ManufacturerRegionConfidence
+            })
             .ToArray();
         var attention = evidence.FirstOrDefault(item => item.RequiresAttention);
         return new OfficialFoodIngredientCompanyArchivedOrganizationDto(

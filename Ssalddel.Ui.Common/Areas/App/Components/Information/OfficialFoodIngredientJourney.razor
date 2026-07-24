@@ -5,16 +5,16 @@
 <section class="ingredient-journey" aria-labelledby="ingredient-journey-title">
     <header class="ingredient-journey__header">
         <div>
-            <span class="ingredient-journey__eyebrow">FOOD → INGREDIENT → EVIDENCE → NONBINDING DEMAND</span>
-            <h2 id="ingredient-journey-title">세계 음식에서 재료 근거와 비구속 수요까지</h2>
-            <p>공식 음식과 재료를 보고 공개 근거를 확인한 뒤, 수령 지역과 희망 수량을 직접 정해 비구속 공동구매 수요로 이어갑니다.</p>
+            <span class="ingredient-journey__eyebrow">FOOD CULTURE → OFFICIAL DATA → COMMUNITY → OPTIONAL CHOICE</span>
+            <h2 id="ingredient-journey-title">세계 식문화를 둘러보고, 원할 때 다음 선택으로</h2>
+            <p>국가별 음식·재료·가격·기업·품목분류 자료를 함께 해석합니다. 먼저 혼자 구매·수입 조건을 알아보고, 부담스러울 때는 이웃과 역할·비용·위험을 나눌 수 있습니다.</p>
         </div>
         <div class="ingredient-journey__steps" aria-label="이용 순서">
             <span><b>1</b>나라·음식</span>
-            <span><b>2</b>레시피 재료</span>
-            <span><b>3</b>기업 근거</span>
-            <span><b>4</b>국내·수입 분기</span>
-            <span><b>5</b>비구속 수요</span>
+            <span><b>2</b>공식 근거</span>
+            <span><b>3</b>문화 교류</span>
+            <span><b>4</b>여기서 마쳐도 됨</span>
+            <span><b>5</b>부담되면 함께</span>
         </div>
     </header>
 
@@ -86,7 +86,39 @@
     }
 </section>
 
+@if (_selectedPurchaseSeeds.Count > 0)
+{
+    <section class="ingredient-purchase-basket" aria-labelledby="ingredient-purchase-basket-title">
+        <div>
+            <span>선택한 재료 @(_selectedPurchaseSeeds.Count)개</span>
+            <h3 id="ingredient-purchase-basket-title">여러 재료를 한 번에 수요 등록하기</h3>
+            <p>재료별 수량과 온도는 다음 화면에서 따로 정합니다. LCL/FCL은 수요 합산 정보를 받은 포워더·물류대행업체의 회신 단계에서 검토합니다.</p>
+        </div>
+        <div class="ingredient-purchase-basket__items">
+            @foreach (var seed in _selectedPurchaseSeeds)
+            {
+                <span @key="seed.SuggestedProductKey">
+                    <strong>@seed.IngredientName</strong>
+                    <small>@seed.SourcingModeLabel</small>
+                    <button type="button" @onclick="() => RemovePurchaseSeed(seed.SuggestedProductKey)" aria-label="@($"{seed.IngredientName} 선택 해제")">×</button>
+                </span>
+            }
+        </div>
+        <div class="ingredient-purchase-basket__actions">
+            <button type="button" class="secondary" @onclick="ClearPurchaseSeeds">모두 비우기</button>
+            <button type="button" class="primary" @onclick="ContinuePurchase">선택한 재료 수요 설정</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(_selectionNotice))
+        {
+            <p class="ingredient-purchase-basket__notice" role="status">@_selectionNotice</p>
+        }
+    </section>
+}
+
 @code {
+    private readonly List<CommunityGroupPurchaseIngredientSeed> _selectedPurchaseSeeds = [];
+    private string? _selectionNotice;
+
     protected override async Task OnInitializedAsync()
     {
         await ViewModel.초기화Async();
@@ -127,7 +159,7 @@
         var seed = OfficialFoodIngredientPresentation.CreatePurchaseSeed(selection);
         if (seed is not null)
         {
-            Navigation.NavigateTo(seed.ToDemandNavigationUri());
+            AddPurchaseSeed(seed);
         }
     }
 
@@ -136,7 +168,52 @@
         var seed = OfficialFoodIngredientPresentation.CreatePurchaseSeed(selection);
         if (seed is not null)
         {
-            Navigation.NavigateTo(seed.ToDemandNavigationUri());
+            AddPurchaseSeed(seed);
+        }
+    }
+
+    private void AddPurchaseSeed(CommunityGroupPurchaseIngredientSeed seed)
+    {
+        var existingIndex = _selectedPurchaseSeeds.FindIndex(item => string.Equals(
+            item.SuggestedProductKey,
+            seed.SuggestedProductKey,
+            StringComparison.Ordinal));
+        if (existingIndex >= 0)
+        {
+            _selectedPurchaseSeeds[existingIndex] = seed;
+            _selectionNotice = $"{seed.IngredientName}의 조달 방향을 갱신했습니다.";
+            return;
+        }
+        if (_selectedPurchaseSeeds.Count >= CommunityGroupPurchaseIngredientSeed.MaxBundleItems)
+        {
+            _selectionNotice = $"한 번에 최대 {CommunityGroupPurchaseIngredientSeed.MaxBundleItems}개 재료까지 선택할 수 있습니다.";
+            return;
+        }
+
+        _selectedPurchaseSeeds.Add(seed);
+        _selectionNotice = $"{seed.IngredientName}을 구매 준비 묶음에 담았습니다.";
+    }
+
+    private void RemovePurchaseSeed(string productKey)
+    {
+        _selectedPurchaseSeeds.RemoveAll(seed => string.Equals(
+            seed.SuggestedProductKey,
+            productKey,
+            StringComparison.Ordinal));
+        _selectionNotice = _selectedPurchaseSeeds.Count == 0 ? null : "선택한 재료를 묶음에서 뺐습니다.";
+    }
+
+    private void ClearPurchaseSeeds()
+    {
+        _selectedPurchaseSeeds.Clear();
+        _selectionNotice = null;
+    }
+
+    private void ContinuePurchase()
+    {
+        if (_selectedPurchaseSeeds.Count > 0)
+        {
+            Navigation.NavigateTo(CommunityGroupPurchaseIngredientSeed.ToDemandNavigationUri(_selectedPurchaseSeeds));
         }
     }
 }

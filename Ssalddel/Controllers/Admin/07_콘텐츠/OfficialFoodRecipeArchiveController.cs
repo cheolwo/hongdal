@@ -12,7 +12,7 @@ namespace Ssalddel.Controllers.Admin.Content07;
     SsalddelModuleKind.Api,
     "각국 정부 공식 음식 레시피의 권리 정책·대표 음식 후보·원문 변형을 보관하고 검토하는 HTTP 경계",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
-    Boundary = "서버관리자만 수집하며 사진 파일 저장, 자동 대표 선정, 커뮤니티 자동 게시, 주문·원장 생성은 수행하지 않습니다.")]
+    Boundary = "서버관리자만 수집·대표성 검토하며 사진 파일 저장, 자동 대표 선정, 요청 즉시 커뮤니티 게시, 주문·원장 생성은 수행하지 않습니다.")]
 [SsalddelApiVersion(SsalddelProductVersion.V0_0)]
 [SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
@@ -55,6 +55,26 @@ public sealed class OfficialFoodRecipeArchiveController : ControllerBase
         {
             var variants = await _service.GetVariantsAsync(dishKey, cancellationToken);
             return variants.Count == 0 ? NotFound() : Ok(variants);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateProblem(exception.Message));
+        }
+    }
+
+    [HttpPut("dishes/{dishKey}/review")]
+    public async Task<ActionResult<OfficialFoodRecipeDishDto>> ReviewDish(
+        string dishKey,
+        [FromBody] OfficialFoodRecipeDishReviewRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _service.ReviewDishAsync(
+                dishKey,
+                request,
+                cancellationToken);
+            return result is null ? NotFound() : Ok(result);
         }
         catch (ArgumentException exception)
         {

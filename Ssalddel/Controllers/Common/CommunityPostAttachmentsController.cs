@@ -4,6 +4,8 @@ using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Ssalddel.Security;
 
 namespace Ssalddel.Controllers.Common;
 
@@ -29,6 +31,7 @@ public sealed class 커뮤니티게시글첨부Controller : ControllerBase
 
     [HttpPost("{id:long}/attachments")]
     [AllowAnonymous]
+    [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
     [RequestSizeLimit(20_000_000)]
     public async Task<IActionResult> UploadAttachment(
         long id,

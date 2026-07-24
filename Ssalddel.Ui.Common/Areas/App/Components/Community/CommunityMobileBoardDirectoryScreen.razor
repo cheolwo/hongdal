@@ -1,0 +1,194 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@inject PlatformCommunityService CommunityService
+
+<main class="community-mobile-directory" data-community-mode="@(_workMode ? "work" : "life")">
+    <header class="community-mobile-directory__heading">
+        <div>
+            <span>공개 커뮤니티 · 01A.01</span>
+            <h1>게시판 모음</h1>
+            <p>@(_workMode
+                ? "하나의 업무를 골라 입력·상태·근거와 다음 인계를 함께 살펴봅니다."
+                : "생활 이야기와 안부를 전할 글을 두 갈래로 찾아봅니다.")</p>
+        </div>
+
+        <label class="community-mobile-directory__mode">
+            <span>업무</span>
+            <button type="button"
+                    role="switch"
+                    aria-label="업무 게시판 보기"
+                    aria-checked="@_workMode"
+                    class="@(_workMode ? "community-mobile-directory__switch community-mobile-directory__switch--on" : "community-mobile-directory__switch")"
+                    @onclick="ToggleMode">
+                <span></span>
+            </button>
+        </label>
+    </header>
+
+    <label class="community-mobile-directory__search">
+        <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
+        <input type="search"
+               aria-label="게시판 이름 또는 관심 주제 검색"
+               placeholder="게시판 이름 또는 관심 주제 검색"
+               value="@ViewModel.SearchText"
+               @oninput="HandleSearchInput" />
+    </label>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+    {
+        <section class="community-mobile-directory__status" aria-live="polite">
+            <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Small" />
+            <span>@ViewModel.StatusMessage</span>
+            <button type="button" disabled="@ViewModel.IsLoading" @onclick="ReloadAsync">재시도</button>
+        </section>
+    }
+
+    @if (_workMode)
+    {
+        <section class="community-mobile-directory__section" aria-labelledby="work-board-heading">
+            <header>
+                <div>
+                    <h2 id="work-board-heading">업무 게시판</h2>
+                    <span>@(ViewModel.VisibleWorkGroups.Count)개 묶음</span>
+                </div>
+                <a href="@CommunityMobileBoardPresentation.AllWorkGroupsPath">한눈에 보기</a>
+            </header>
+
+            @if (ViewModel.VisibleWorkGroups.Count == 0)
+            {
+                <CommunityMobileDirectoryEmptyState />
+            }
+            else
+            {
+                <div class="community-mobile-directory__work-grid">
+                    @foreach (var group in ViewModel.VisibleWorkGroups)
+                    {
+                        <a class="@($"community-mobile-directory__work-card community-mobile-directory__work-card--{group.Tone}")"
+                           href="@group.Href">
+                            <span class="community-mobile-directory__work-icon">
+                                <MudIcon Icon="@group.Icon" />
+                            </span>
+                            <span class="community-mobile-directory__work-copy">
+                                <span class="community-mobile-directory__work-title">
+                                    <strong>@group.DisplayName</strong>
+                                    <em>@group.ShortLabel</em>
+                                </span>
+                                <small>@group.Description</small>
+                            </span>
+                            <span class="community-mobile-directory__count">
+                                @if (group.IsCrossCutting)
+                                {
+                                    <b>횡단 보기</b>
+                                }
+                                else if (ViewModel.HasLivePostCounts)
+                                {
+                                    <b>@ViewModel.PostCountFor(group)개 글</b>
+                                }
+                                else
+                                {
+                                    <b>@(group.BoardKeys.Count)개 단위</b>
+                                }
+                                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                            </span>
+                        </a>
+                    }
+                </div>
+            }
+
+            <aside class="community-mobile-directory__work-boundary">
+                <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                <span>
+                    <strong>게시판에서 바로 실행되지 않습니다.</strong>
+                    참여·배차·계약·결제는 각 당사자의 별도 동의와 현재 상태 확인 뒤에만 이어집니다.
+                </span>
+            </aside>
+        </section>
+    }
+    else
+    {
+        <section class="community-mobile-directory__section" aria-labelledby="life-board-heading">
+            <header>
+                <div>
+                    <h2 id="life-board-heading">생활 게시판</h2>
+                    <span>@(ViewModel.VisibleLifeBoards.Count)개 게시판</span>
+                </div>
+            </header>
+
+            @if (ViewModel.VisibleLifeBoards.Count == 0)
+            {
+                <CommunityMobileDirectoryEmptyState />
+            }
+            else
+            {
+                <div class="community-mobile-directory__board-list">
+                    @foreach (var board in ViewModel.VisibleLifeBoards)
+                    {
+                        <a href="@CommunityPageRoutes.BoardsFor(boardKey: board.BoardKey)"
+                           class="community-mobile-directory__board">
+                            <span class="@($"community-mobile-directory__board-icon community-mobile-directory__board-icon--{board.Tone}")">
+                                <MudIcon Icon="@board.Icon" Size="Size.Small" />
+                            </span>
+                            <span>
+                                <strong>@board.DisplayName</strong>
+                                <small>@board.Description</small>
+                            </span>
+                            @if (ViewModel.HasLivePostCounts)
+                            {
+                                <b>@ViewModel.PostCountFor(board.BoardKey)</b>
+                            }
+                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                        </a>
+                    }
+                </div>
+            }
+
+            <aside class="community-mobile-directory__safety">
+                <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" />
+                <span>
+                    <strong>신고·분쟁은 안전센터에서 보호합니다.</strong>
+                    민감한 내용은 공개 게시판과 분리됩니다.
+                </span>
+            </aside>
+        </section>
+    }
+
+    <nav class="community-mobile-directory__shortcuts" aria-label="커뮤니티 바로가기">
+        <a href="@CommunityPageRoutes.RecommendedPosts">
+            <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Size="Size.Small" />
+            <span><strong>추천 글</strong><small>관심 흐름에서 읽을 글</small></span>
+        </a>
+        <a href="@CommunityPageRoutes.BoardManagement">
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="Size.Small" />
+            <span><strong>게시판 관리</strong><small>운영 중인 공간 확인</small></span>
+        </a>
+    </nav>
+</main>
+
+@code {
+    [Parameter]
+    public bool InitialWorkMode { get; set; }
+
+    private CommunityMobileBoardDirectoryViewModel ViewModel { get; set; } = default!;
+    private bool _workMode;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _workMode = InitialWorkMode;
+        ViewModel = new CommunityMobileBoardDirectoryViewModel(
+            cancellationToken => CommunityService.GetBoardSummariesAsync("shipper", cancellationToken));
+        await ViewModel.LoadAsync();
+    }
+
+    private void ToggleMode()
+    {
+        _workMode = !_workMode;
+        ViewModel.UpdateSearch(string.Empty);
+    }
+
+    private void HandleSearchInput(ChangeEventArgs args)
+        => ViewModel.UpdateSearch(args.Value?.ToString());
+
+    private async Task ReloadAsync()
+    {
+        await ViewModel.LoadAsync();
+    }
+}

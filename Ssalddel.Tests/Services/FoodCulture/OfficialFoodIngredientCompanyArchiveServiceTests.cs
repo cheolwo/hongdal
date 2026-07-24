@@ -111,6 +111,55 @@ public sealed class OfficialFoodIngredientCompanyArchiveServiceTests
     }
 
     [Fact]
+    public async Task 중국제조업소권역의_분류근거와확신도를_제품근거에누적한다()
+    {
+        var candidate = Candidate("foreign-cn-1", "QINGDAO VEGETABLE FOODS", "냉동 양파")
+            with
+            {
+                CountryCode = "CN",
+                CountryName = "중국",
+                RelationCode = OfficialFoodIngredientCompanyRelationCodes.ForeignManufacturer,
+                EvidenceCode =
+                    OfficialFoodIngredientCompanyEvidenceCodes.ImportedProductIngredientLabel,
+                ManufacturerRegionCode = ChinaImportedFoodManufacturerRegionCodes.Shandong,
+                ManufacturerRegionName = "산둥성",
+                ManufacturerRegionScope = "산둥성 행정구역 기준 운영 권역입니다.",
+                ManufacturerRegionClassificationMethod =
+                    ChinaImportedFoodManufacturerRegionMethodCodes.OfficialAreaProvince,
+                ManufacturerRegionEvidence = "식약처 해외제조업소 지역명에서 산둥성 확인",
+                ManufacturerRegionConfidence = 1m
+            };
+        await using var fixture = await ArchiveFixture.CreateAsync(query =>
+            ResearchResponse(
+                query,
+                [candidate],
+                OfficialFoodIngredientCompanyResearchStatusCodes.Available));
+        await fixture.AddIngredientAsync("ingredient:onion", "양파");
+
+        await fixture.Service.ResearchAndArchiveAsync(new OfficialFoodIngredientCompanyQuery
+        {
+            IngredientKey = "ingredient:onion",
+            IngredientName = "양파"
+        });
+        var archive = await fixture.Service.GetArchiveAsync("ingredient:onion", null);
+
+        Assert.NotNull(archive);
+        var evidence = Assert.Single(Assert.Single(archive!.Organizations).Evidence);
+        Assert.Equal(
+            ChinaImportedFoodManufacturerRegionCodes.Shandong,
+            evidence.ManufacturerRegionCode);
+        Assert.Equal("산둥성", evidence.ManufacturerRegionName);
+        Assert.Equal(
+            ChinaImportedFoodManufacturerRegionMethodCodes.OfficialAreaProvince,
+            evidence.ManufacturerRegionClassificationMethod);
+        Assert.Equal(1m, evidence.ManufacturerRegionConfidence);
+        Assert.Equal(
+            ChinaImportedFoodManufacturerRegionCodes.Shandong,
+            (await fixture.Db.OfficialFoodIngredientCompanyEvidence.SingleAsync())
+                .ManufacturerRegionCode);
+    }
+
+    [Fact]
     public async Task 성공한원천의_재조사에서사라진근거는_비활성화한다()
     {
         var callCount = 0;

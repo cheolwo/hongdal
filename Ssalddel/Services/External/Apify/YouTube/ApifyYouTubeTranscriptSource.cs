@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Services.External.Apify;
@@ -28,6 +27,8 @@ public sealed class ApifyYouTubeTranscriptSource : IYouTubeTranscriptSource
 
     public bool IsEnabled => _options.Enabled;
 
+    public string Provider => ProviderName;
+
     public async Task<YouTubeTranscriptResponse?> GetAsync(
         YouTubeTranscriptRequest request,
         CancellationToken cancellationToken)
@@ -35,9 +36,9 @@ public sealed class ApifyYouTubeTranscriptSource : IYouTubeTranscriptSource
         ArgumentNullException.ThrowIfNull(request);
         EnsureEnabled();
 
-        var videoId = NormalizeVideoId(request.VideoId);
+        var videoId = YouTubeVideoIdentity.Normalize(request.VideoId, nameof(request.VideoId));
         var languageCode = NormalizeLanguageCode(request.TargetLanguage);
-        var videoUrl = $"https://www.youtube.com/watch?v={videoId}";
+        var videoUrl = YouTubeVideoIdentity.BuildWatchUrl(videoId);
         var input = JsonSerializer.SerializeToElement(new
         {
             videoUrl,
@@ -85,7 +86,7 @@ public sealed class ApifyYouTubeTranscriptSource : IYouTubeTranscriptSource
     {
         foreach (var propertyName in new[] { "transcript", "searchResult", "segments", "captions" })
         {
-            if (!TryGetProperty(item, propertyName, out var collection)
+            if (!ApifyYouTubeDatasetJson.TryGetProperty(item, propertyName, out var collection)
                 || collection.ValueKind != JsonValueKind.Array)
             {
                 continue;
@@ -116,8 +117,8 @@ public sealed class ApifyYouTubeTranscriptSource : IYouTubeTranscriptSource
             return null;
         }
 
-        var text = NormalizeText(
-            GetString(segment, "text", "content"),
+        var text = ApifyYouTubeDatasetJson.NormalizeText(
+            ApifyYouTubeDatasetJson.GetString(segment, "text", "content"),
             Math.Clamp(_options.MaxSegmentTextCharacters, 1, 10_000));
         if (text is null)
         {
@@ -125,85 +126,21 @@ public sealed class ApifyYouTubeTranscriptSource : IYouTubeTranscriptSource
         }
 
         return new YouTubeTranscriptSegmentDto(
-            ParseSeconds(segment, "start", "startTime", "startSeconds"),
-            ParseSeconds(segment, "dur", "duration", "durationSeconds"),
+            ApifyYouTubeDatasetJson.GetNonNegativeDecimal(
+                segment,
+                "start",
+                "startTime",
+                "startSeconds"),
+            ApifyYouTubeDatasetJson.GetNonNegativeDecimal(
+                segment,
+                "dur",
+                "duration",
+                "durationSeconds"),
             text);
     }
 
-    private static string? GetString(JsonElement element, params string[] propertyNames)
-    {
-        foreach (var propertyName in propertyNames)
-        {
-            if (!TryGetProperty(element, propertyName, out var value))
-            {
-                continue;
-            }
-
-            var result = value.ValueKind switch
-            {
-                JsonValueKind.String => value.GetString(),
-                JsonValueKind.Number => value.ToString(),
-                _ => null
-            };
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                return result;
-            }
-        }
-
-        return null;
-    }
-
-    private static decimal? ParseSeconds(JsonElement element, params string[] propertyNames)
-    {
-        var value = GetString(element, propertyNames);
-        return decimal.TryParse(
-                value,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out var seconds)
-            && seconds >= 0
-            ? seconds
-            : null;
-    }
-
-    private static bool TryGetProperty(
-        JsonElement element,
-        string propertyName,
-        out JsonElement value)
-    {
-        if (element.ValueKind == JsonValueKind.Object)
-        {
-            foreach (var property in element.EnumerateObject())
-            {
-                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    value = property.Value;
-                    return true;
-                }
-            }
-        }
-
-        value = default;
-        return false;
-    }
-
-    private static string? NormalizeText(string? value, int maxLength)
-    {
-        var normalized = string.Join(
-            ' ',
-            (value ?? string.Empty).Split(
-                (char[]?)null,
-                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-        return normalized.Length == 0
-            ? null
-            : normalized.Length <= maxLength
-                ? normalized
-                : normalized[..maxLength];
-    }
-
     private static string? LimitText(string value, int maxLength)
-        => NormalizeText(value, maxLength);
+        => ApifyYouTubeDatasetJson.NormalizeText(value, maxLength);
 
     private string NormalizeLanguageCode(string? value)
     {
@@ -217,24 +154,6 @@ public sealed class ApifyYouTubeTranscriptSource : IYouTubeTranscriptSource
         {
             throw new ArgumentException(
                 "YouTube 자막 언어는 ISO 639-1 또는 언어 변형 코드여야 합니다.",
-                nameof(value));
-        }
-
-        return normalized;
-    }
-
-    private static string NormalizeVideoId(string value)
-    {
-        var normalized = value.Trim();
-        if (normalized.Length is < 1 or > 100
-            || normalized.Any(character =>
-                !(character is >= 'A' and <= 'Z')
-                && !(character is >= 'a' and <= 'z')
-                && !(character is >= '0' and <= '9')
-                && character is not '_' and not '-'))
-        {
-            throw new ArgumentException(
-                "YouTube VideoId는 영상 ID 형식이어야 합니다.",
                 nameof(value));
         }
 

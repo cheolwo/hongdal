@@ -10,6 +10,19 @@
     white-space: nowrap;
 }
 
+::deep .platform-community-periodic-label {
+    background: #e8efff;
+    border: 1px solid #c5d5f5;
+    border-radius: 999px;
+    color: #294f86;
+    font-size: 0.68rem;
+    font-style: normal;
+    font-weight: 750;
+    margin-left: 0.35rem;
+    padding: 0.14rem 0.45rem;
+    white-space: nowrap;
+}
+
 ::deep .platform-community-sales-summary {
     background: #f7fbf8;
     border: 1px solid #dce9df;
@@ -62,6 +75,12 @@
 
 @media (max-width: 640px) {
     ::deep .platform-community-sales-label {
+        display: inline-flex;
+        margin-left: 0;
+        margin-top: 0.25rem;
+    }
+
+    ::deep .platform-community-periodic-label {
         display: inline-flex;
         margin-left: 0;
         margin-top: 0.25rem;

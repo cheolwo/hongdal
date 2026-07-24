@@ -1,11 +1,15 @@
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.Services
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject NavigationManager Navigation
+@inject ICommunityPostComposerDraftStore ComposerDraftStore
 
 <section class="food-dish-browser" aria-labelledby="food-dish-browser-title">
     <header class="food-dish-browser__header">
         <div>
-            <span>WORLD FOOD DISCOVERY</span>
+            <span>문화교통 · 음식에서 이동 준비까지</span>
             <h3 id="food-dish-browser-title">여러 나라의 음식부터 둘러보기</h3>
-            <p>음식의 문화적 배경과 공식 레시피 재료를 확인한 뒤, 필요한 재료의 조달 방향을 직접 선택합니다.</p>
+            <p>국가기관의 음식·레시피·가격 자료를 출발점으로 서로의 경험을 나눕니다. 구해보고 싶은 마음이 생겼을 때만 다음 선택지를 엽니다.</p>
         </div>
         <span class="food-dish-browser__boundary">음식 국가 ≠ 상품 출발국</span>
     </header>
@@ -55,7 +59,7 @@
                 {
                     <button type="button"
                             class="@DishClass(dish.DishKey)"
-                            @onclick="@(() => DishSelected.InvokeAsync(dish.DishKey))">
+                            @onclick="@(() => SelectDishAsync(dish.DishKey))">
                         <span>@OfficialFoodIngredientPresentation.CountryName(dish.CountryCode) · @dish.RegionName</span>
                         <strong>@dish.Name</strong>
                         <small>@dish.Category · 공식 변형 @dish.VariantCount.ToString("N0")건</small>
@@ -83,7 +87,7 @@
                                 <button type="button"
                                         class="@IngredientClass(dishIngredient.IngredientKey)"
                                         aria-pressed="@(dishIngredient.IngredientKey == SelectedIngredientKey)"
-                                        @onclick="@(() => IngredientSelected.InvokeAsync(dishIngredient.IngredientKey))">
+                                        @onclick="@(() => SelectIngredientAsync(dishIngredient.IngredientKey))">
                                     <strong>@dishIngredient.CanonicalName</strong>
                                     <span>@dishIngredient.QuantityText</span>
                                 </button>
@@ -125,20 +129,14 @@
                                                            ErrorMessage="@HsMappingErrorMessage"
                                                            MappingRequested="@HsMappingRequested" />
 
-                            <div class="food-dish-browser__routes">
-                                <button type="button"
-                                        class="food-dish-browser__route food-dish-browser__route--domestic"
-                                        @onclick="@(() => StartPurchaseAsync(CommunityIngredientSourcingModeCodes.DomesticGroupPurchase))">
-                                    <strong>국내 공동구매 수요 등록</strong>
-                                    <span>수령 권역과 희망 수량을 직접 입력해 비구속 수요로 모읍니다.</span>
-                                </button>
-                                <button type="button"
-                                        class="food-dish-browser__route food-dish-browser__route--import"
-                                        @onclick="@(() => StartPurchaseAsync(CommunityIngredientSourcingModeCodes.GroupImportReview))">
-                                    <strong>공동수입 관심 수요 등록</strong>
-                                    <span>수요만 먼저 모으며 실제 출발국·통관·HS 코드는 다음 단계에서 확인합니다.</span>
-                                </button>
-                            </div>
+                            <OfficialFoodCultureTransportPanel Dish="@detail"
+                                                              Ingredient="@selectedIngredient"
+                                                              CompanyResearch="@CompanyResearch"
+                                                              HsMapping="@HsMapping"
+                                                              DiscussionRequested="StartDiscussionAsync"
+                                                              IndividualImportDiscussionRequested="StartIndividualImportDiscussionAsync"
+                                                              PurchaseRequested="@PurchaseRequested"
+                                                              DiscussionStatusMessage="@_discussionStatusMessage" />
                         </section>
                     }
 
@@ -159,6 +157,9 @@
 </section>
 
 @code {
+    private const string CommunityComposerAppKey = "shipper";
+    private string? _discussionStatusMessage;
+
     [Parameter, EditorRequired]
     public IReadOnlyList<OfficialFoodCountryOption> Countries { get; set; } = [];
 
@@ -243,11 +244,69 @@
     private Task OnSearchTextChanged(ChangeEventArgs args)
         => SearchTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
 
-    private Task StartPurchaseAsync(string sourcingModeCode)
-        => SelectedDish is null || SelectedIngredient is null
-            ? Task.CompletedTask
-            : PurchaseRequested.InvokeAsync(new(
-                SelectedDish,
-                SelectedIngredient,
-                sourcingModeCode));
+    private Task SelectDishAsync(string dishKey)
+    {
+        _discussionStatusMessage = null;
+        return DishSelected.InvokeAsync(dishKey);
+    }
+
+    private Task SelectIngredientAsync(string ingredientKey)
+    {
+        _discussionStatusMessage = null;
+        return IngredientSelected.InvokeAsync(ingredientKey);
+    }
+
+    private async Task StartDiscussionAsync(OfficialFoodDishIngredientPurchaseSelection selection)
+        => await PrepareCommunityDraftAsync(
+            () => OfficialFoodIngredientPresentation.CreateCultureTransportDraft(
+                selection,
+                CompanyResearch,
+                HsMapping,
+                DateTime.UtcNow),
+            CommunityBoardCatalog.Food);
+
+    private async Task StartIndividualImportDiscussionAsync(OfficialFoodDishIngredientPurchaseSelection selection)
+        => await PrepareCommunityDraftAsync(
+            () => OfficialFoodIngredientPresentation.CreateIndividualImportReviewDraft(
+                selection,
+                CompanyResearch,
+                HsMapping,
+                DateTime.UtcNow),
+            CommunityBoardCatalog.InformationPrices);
+
+    private async Task PrepareCommunityDraftAsync(
+        Func<CommunityPostComposerSnapshot> createDraft,
+        CommunityBoardDefinition board)
+    {
+        _discussionStatusMessage = null;
+        try
+        {
+            var existingDraft = await ComposerDraftStore.LoadAsync(CommunityComposerAppKey);
+            if (HasDraftContent(existingDraft))
+            {
+                _discussionStatusMessage = "작성 중인 커뮤니티 글 초안이 있어 덮어쓰지 않았습니다. 기존 초안을 등록하거나 비운 뒤 다시 시도해 주세요.";
+                return;
+            }
+
+            var draft = createDraft();
+            await ComposerDraftStore.SaveAsync(CommunityComposerAppKey, draft);
+            Navigation.NavigateTo(CommunityPageRoutes.ComposeFor(
+                board.DisplayName,
+                board.Key,
+                "/information/food-ingredients"));
+        }
+        catch (Exception)
+        {
+            _discussionStatusMessage = "공식 근거를 글 초안으로 옮기지 못했습니다. 잠시 후 다시 시도해 주세요.";
+        }
+    }
+
+    private static bool HasDraftContent(CommunityPostComposerSnapshot? draft)
+        => draft is not null
+           && (!string.IsNullOrWhiteSpace(draft.Title)
+               || !string.IsNullOrWhiteSpace(draft.Body)
+               || !string.IsNullOrWhiteSpace(draft.SharedLinkUrl)
+               || !string.IsNullOrWhiteSpace(draft.커뮤니티원장Id)
+               || draft.IsSalesPost);
+
 }

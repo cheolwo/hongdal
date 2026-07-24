@@ -1026,6 +1026,35 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                     b.Property<long>("LastResearchRunId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("ManufacturerRegionClassificationMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ManufacturerRegionCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("ManufacturerRegionConfidence")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<string>("ManufacturerRegionEvidence")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("ManufacturerRegionName")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("ManufacturerRegionScope")
+                        .IsRequired()
+                        .HasMaxLength(800)
+                        .HasColumnType("varchar(800)");
+
                     b.Property<string>("NormalizedOrganizationName")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -1105,6 +1134,8 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
 
                     b.HasIndex("IngredientId", "CandidateKey")
                         .IsUnique();
+
+                    b.HasIndex("CountryCode", "ManufacturerRegionCode", "IsCurrent");
 
                     b.HasIndex("CountryCode", "RelationCode", "IsCurrent");
 

@@ -19,7 +19,7 @@ public sealed class PlatformCommunityPostComposerCompositionTests
         Assert.True(File.ReadLines(pagePath).Count() <= 220);
         Assert.Contains("<PlatformCommunityComposerHeader", source);
         Assert.Contains("<PlatformCommunityComposerFeedback", source);
-        Assert.Contains("<PlatformCommunityComposerBodyFields", source);
+        Assert.Contains("<PlatformCommunityComposerBodyWithPriceHints", source);
         Assert.Contains("<PlatformCommunityComposerSalesEditor", source);
         Assert.Contains("<PlatformCommunityComposerAttachmentTools", source);
         Assert.Contains("<PlatformCommunityComposerContextBar", source);
@@ -34,6 +34,7 @@ public sealed class PlatformCommunityPostComposerCompositionTests
     [Theory]
     [InlineData("PlatformCommunityComposerHeader.razor")]
     [InlineData("PlatformCommunityComposerFeedback.razor")]
+    [InlineData("PlatformCommunityComposerBodyWithPriceHints.razor")]
     [InlineData("PlatformCommunityComposerBodyFields.razor")]
     [InlineData("PlatformCommunityComposerSalesEditor.razor")]
     [InlineData("PlatformCommunityComposerAttachmentTools.razor")]

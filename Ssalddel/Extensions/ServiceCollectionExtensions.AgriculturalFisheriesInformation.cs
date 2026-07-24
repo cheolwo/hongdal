@@ -141,6 +141,10 @@ public static partial class ServiceCollectionExtensions
             OfficialFoodIngredientCompanyResearchService>();
         services.AddScoped<IOfficialFoodIngredientCompanyArchiveService,
             OfficialFoodIngredientCompanyArchiveService>();
+        services.AddScoped<IChinaImportedFoodRegionCommunityPostSource,
+            ChinaImportedFoodRegionCommunityPostSource>();
+        services.AddScoped<IUnitedStatesImportedFoodStateCommunityPostSource,
+            UnitedStatesImportedFoodStateCommunityPostSource>();
         services.AddScoped<IOfficialFoodIngredientHsMappingService,
             OfficialFoodIngredientHsMappingService>();
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();

@@ -105,20 +105,21 @@ flowchart LR
 
 2026-07-17 운영 결정으로 자막 취득 비용과 이용 조건이 별도로 승인될 때까지 이 기능을 활성화하거나 실영상에 실행하지 않는다.
 
-## Apify 자막 기반 식재료·HS 코드 후보화
+## Apify 영상·자막·댓글 통합 수집과 식재료·HS 코드 후보화
 
-> 상태: `ApifyYouTubeTranscript` Adapter를 구현했지만 기본 비활성이다. 관리자 단건 자막 조회와 기존 재료 인지 입력 연결만 제공한다.
+> 상태: 기존 `ApifyYouTubeTranscript` Adapter를 유지하면서 `ApifyYouTubeComments` Adapter와 통합 수집 UseCase를 구현했다. 두 외부 원천은 기본 비활성이며 관리자 단건 실행만 제공한다.
 
-현재 Adapter는 [pintostudio/youtube-transcript-scraper Actor](https://apify.com/pintostudio/youtube-transcript-scraper)를 사용한다. Actor에 `videoUrl`과 `targetLanguage`를 보내고, 서버는 timestamp 세그먼트와 길이 제한된 전사를 반환한다. 모듈 경계와 설정은 [Apify YouTube 자막 Adapter](../Architecture/ApifyYouTubeTranscriptResearch.md)에 정리한다.
+자막은 [pintostudio/youtube-transcript-scraper Actor](https://apify.com/pintostudio/youtube-transcript-scraper), 댓글은 Apify가 유지보수하는 [streamers/youtube-comments-scraper Actor](https://apify.com/streamers/youtube-comments-scraper)를 사용한다. 기존 감시 저장소의 영상 메타데이터와 두 Actor 결과를 한 응답으로 합치며, 상세 경계와 설정은 [Apify YouTube 통합 수집](../Architecture/ApifyYouTubeContentCollection.md)에 정리한다.
 
-향후 처리 흐름은 다음 순서로 제한한다.
+처리 흐름은 다음 순서로 제한한다.
 
-1. 운영자가 분석할 `VideoId`와 자막 언어를 선택하고 자막 취득·분석 가능 여부를 확인한다.
-2. 서버가 `POST /api/v1/admin/content/youtube-food/videos/{videoId}/transcript`로 비밀 저장소의 Apify 토큰과 설정된 Actor ID를 사용해 단건 작업을 실행한다.
-3. 서버가 영상 ID, 자막 언어, 타임스탬프 구간과 정규화된 전사를 반환한다.
-4. LLM이 자막에 명시된 식품·식재료, 가공 상태, 포장·용도 표현을 근거 구간과 함께 구조화한다.
-5. 내부 품목분류 자료를 조회해 `HS 코드 후보`, 후보 근거, 신뢰도와 추가 확인이 필요한 정보를 만든다.
-6. 운영자 또는 관세 전문가가 상품의 성분함량표·제조공정·용도·포장 상태를 확인한 뒤 후보를 승인하거나 수정한다.
+1. 운영자가 감시 저장소에 동기화된 `VideoId`, 자막 언어, 댓글 개수와 정렬을 선택한다.
+2. 서버가 `POST /api/v1/admin/content/youtube-food/videos/{videoId}/collection`로 영상 메타데이터를 읽고 자막·댓글 Actor를 병렬 실행한다.
+3. 서버가 영상, timestamp 자막 구간, 정규화된 댓글과 원천별 성공·실패 상태를 한 응답으로 반환한다.
+4. 한 Actor가 실패해도 다른 수집 결과를 유지하며 실패 원천을 완료로 표시하지 않는다.
+5. LLM이 자막에 명시된 식품·식재료, 가공 상태, 포장·용도 표현을 근거 구간과 함께 구조화한다.
+6. 내부 품목분류 자료를 조회해 `HS 코드 후보`, 후보 근거, 신뢰도와 추가 확인이 필요한 정보를 만든다.
+7. 운영자 또는 관세 전문가가 상품의 성분함량표·제조공정·용도·포장 상태를 확인한 뒤 후보를 승인하거나 수정한다.
 
 LLM이 반환할 최소 항목은 `재료표준명`, `자막근거구간`, `영상시각`, `가공·보존상태`, `HS코드후보`, `분류근거`, `누락정보`, `신뢰도`다. 같은 식재료라도 신선·냉동·건조·분말·조제품 여부와 성분·용도에 따라 분류가 달라질 수 있으므로, 영상 자막만으로 HS 코드를 확정하지 않는다. 관세청도 품목분류 사전심사에 물품설명서, 성분함량표와 제조공정도 등을 요구하므로 최종 코드는 [관세청 품목분류 사전심사](https://www.customs.go.kr/download/_down/SS02_01.pdf) 또는 통관 검토에서 확정한다.
 
@@ -127,7 +128,8 @@ LLM이 반환할 최소 항목은 `재료표준명`, `자막근거구간`, `영�
 - `Enabled=false` 기본값과 관리자 수동 실행만 허용하고 전체 채널 자동 수집은 별도 승인 전 금지
 - Apify 비용과 LLM 비용을 분리 집계하고 월 한도·건당 한도·최대 영상 수 설정
 - Apify 토큰과 LLM 키는 비밀 저장소에만 두고 로그·URL·DB에 기록하지 않음
-- 원문 자막은 기본적으로 영구 저장하지 않고 필요한 최소 근거 구간과 출처·해시만 보관
+- 원문 자막·댓글은 기본적으로 영구 저장하지 않고 필요한 최소 근거 구간과 출처·해시만 보관
+- 댓글 작성자 표시명·본문을 상품 사실, 구매 의사, 신뢰 점수나 자동 집단화 근거로 확정하지 않음
 - 실패 재시도 횟수, 타임아웃, Actor 버전 고정과 결과 스키마 검증 적용
 - YouTube, 자막 권리자, Apify Actor의 이용 조건과 데이터 보관 정책을 도입 시점에 다시 확인
 
@@ -153,6 +155,8 @@ LLM이 반환할 최소 항목은 `재료표준명`, `자막근거구간`, `영�
 | 서버 관리자 | `PUT` | `/api/v1/admin/content/youtube/channels/{channelId}/food-profile` | 채널 분류·점수·조사 근거 설정 |
 | 서버 관리자 | `GET` | `/api/v1/admin/content/youtube-food/product-candidates` | 상품 후보 검수 목록 |
 | 서버 관리자 | `POST` | `/api/v1/admin/content/youtube-food/product-candidates` | 영상에 상품 후보 등록 |
+| 서버 관리자 | `POST` | `/api/v1/admin/content/youtube-food/videos/{videoId}/transcript` | 기존 호환용 Apify 자막 단건 조회 |
+| 서버 관리자 | `POST` | `/api/v1/admin/content/youtube-food/videos/{videoId}/collection` | 기존 영상 메타데이터와 Apify 자막·댓글 통합 수집 |
 | 서버 관리자 | `POST` | `/api/v1/admin/content/youtube-food/videos/{videoId}/ingredient-recognition` | 권한 확인 자막·프레임에서 식재료를 자동 인지해 검수 대기 후보 등록 |
 | 서버 관리자 | `PUT` | `/api/v1/admin/content/youtube-food/product-candidates/{candidateId}/review` | 후보 승인·반려와 협찬·구매 URL 검수 |
 | 인증 주문자 | `GET` | `/api/v1/orderer/youtube-food-discovery/countries` | 한국·미국 등 국가별 음식 채널 집계 |

@@ -1,0 +1,149 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+
+<div class="community-mobile-shell">
+    <header class="community-mobile-shell__appbar">
+        <button type="button"
+                class="community-mobile-shell__icon-button"
+                aria-label="커뮤니티 메뉴 열기"
+                aria-expanded="@_drawerOpen"
+                @onclick="ToggleDrawer">
+            <MudIcon Icon="@Icons.Material.Filled.Menu" />
+        </button>
+        <a class="community-mobile-shell__brand" href="@CommunityPageRoutes.Home">살뜰</a>
+        <span class="community-mobile-shell__spacer"></span>
+        <span class="community-mobile-shell__language">한국어</span>
+        <span class="community-mobile-shell__sync" aria-label="동기화됨">
+            <MudIcon Icon="@Icons.Material.Filled.Sync" Size="Size.Small" />
+        </span>
+        <span class="community-mobile-shell__avatar" aria-label="방문자">방</span>
+    </header>
+
+    @if (_drawerOpen)
+    {
+        <button type="button"
+                class="community-mobile-shell__backdrop"
+                aria-label="커뮤니티 메뉴 닫기"
+                @onclick="CloseDrawer"></button>
+        <aside class="community-mobile-shell__drawer" aria-label="커뮤니티 메뉴">
+            <header>
+                <span>살뜰</span>
+                <button type="button" aria-label="메뉴 닫기" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                </button>
+            </header>
+            <p>생활 이야기에서 공동행동과 원장까지 이어 봅니다.</p>
+            <nav>
+                <a href="@CommunityPageRoutes.Home" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.GridView" />
+                    게시판 모음
+                </a>
+                <a href="@CommunityPageRoutes.Boards" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.ViewList" />
+                    게시판 글 목록
+                </a>
+                <a href="@CommunityPageRoutes.RecommendedPosts" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" />
+                    추천 글
+                </a>
+                <a href="@CommunityMobileBoardPresentation.AllWorkGroupsPath" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Workspaces" />
+                    업무 게시판
+                </a>
+                <a href="@CommunityPageRoutes.Workspace" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Dashboard" />
+                    공동행동 공간
+                </a>
+                <a href="@CommunityPageRoutes.BoardManagement" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Settings" />
+                    게시판 관리
+                </a>
+            </nav>
+            <aside>
+                <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Size="Size.Small" />
+                공개 글과 보호 기록은 분리됩니다.
+            </aside>
+        </aside>
+    }
+
+    <section class="community-mobile-shell__content">
+        @Body
+    </section>
+
+    <footer class="community-mobile-shell__bottom-nav">
+        <a class="@BuildBottomLinkClass(BottomDestination.Community)"
+           href="@CommunityPageRoutes.Home"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Community) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.GridView" Size="Size.Small" />
+            <span>공개 커뮤니티</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Profile)"
+           href="@CommunityPageRoutes.Personal"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Profile) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+            <span>내 정보</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Posts)"
+           href="@($"{CommunityPageRoutes.Personal}?tab=posts")"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Posts) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.Article" Size="Size.Small" />
+            <span>내 글</span>
+        </a>
+        <a class="community-mobile-shell__compose"
+           href="@CommunityPageRoutes.Compose"
+           aria-label="새 글 쓰기">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" />
+        </a>
+    </footer>
+</div>
+
+@code {
+    private bool _drawerOpen;
+
+    protected override void OnInitialized()
+        => Navigation.LocationChanged += HandleLocationChanged;
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    private string CurrentPath
+        => new Uri(Navigation.Uri).AbsolutePath.TrimEnd('/');
+
+    private string CurrentQuery
+        => new Uri(Navigation.Uri).Query;
+
+    private bool IsBottomDestinationActive(BottomDestination destination)
+        => destination switch
+        {
+            BottomDestination.Profile =>
+                string.Equals(CurrentPath, CommunityPageRoutes.Personal, StringComparison.OrdinalIgnoreCase)
+                && !CurrentQuery.Contains("tab=posts", StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Posts =>
+                string.Equals(CurrentPath, CommunityPageRoutes.Personal, StringComparison.OrdinalIgnoreCase)
+                && CurrentQuery.Contains("tab=posts", StringComparison.OrdinalIgnoreCase),
+            _ => CurrentPath.StartsWith("/community", StringComparison.OrdinalIgnoreCase)
+                 && !string.Equals(CurrentPath, CommunityPageRoutes.Personal, StringComparison.OrdinalIgnoreCase)
+        };
+
+    private string BuildBottomLinkClass(BottomDestination destination)
+        => IsBottomDestinationActive(destination)
+            ? "community-mobile-shell__bottom-link community-mobile-shell__bottom-link--active"
+            : "community-mobile-shell__bottom-link";
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        _drawerOpen = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+        => Navigation.LocationChanged -= HandleLocationChanged;
+
+    private enum BottomDestination
+    {
+        Community,
+        Profile,
+        Posts
+    }
+}

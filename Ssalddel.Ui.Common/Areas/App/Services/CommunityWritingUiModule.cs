@@ -19,7 +19,10 @@ internal static class CommunityWritingUiModule
 
         services.TryAddScoped<ICommunityPostClient, CommunityPlatformClient>();
         services.TryAddScoped<ICommunityPostComposerDraftStore, BrowserCommunityPostComposerDraftStore>();
+        services.TryAddScoped<ICommunityPostIngredientPriceHintClient,
+            CommunityPostIngredientPriceHintClient>();
         services.TryAddTransient<CommunityPostComposerViewModel>();
+        services.TryAddTransient<CommunityPostIngredientPriceHintsViewModel>();
 
         return services;
     }

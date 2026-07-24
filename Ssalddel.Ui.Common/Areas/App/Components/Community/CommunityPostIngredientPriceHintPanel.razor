@@ -1,0 +1,116 @@
+@using System.Globalization
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits ViewModelParameterComponentBase<CommunityPostIngredientPriceHintsViewModel>
+
+<aside class="community-ingredient-price-hints" aria-label="본문 재료 가격 힌트" aria-live="polite">
+    <header>
+        <div>
+            <strong>본문 재료 가격</strong>
+            <small>KAMIS 저장 조사값</small>
+        </div>
+        @if (ViewModel.IsLoading)
+        {
+            <MudProgressCircular Size="Size.Small"
+                                 Indeterminate="true"
+                                 aria-label="재료 가격 확인 중" />
+        }
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+    {
+        <div class="community-ingredient-price-hints__status">
+            <span>@ViewModel.StatusMessage</span>
+            <button type="button" @onclick="RetryAsync">다시 확인</button>
+        </div>
+    }
+    else if (ViewModel.Hints.Count > 0)
+    {
+        <div class="community-ingredient-price-hints__list">
+            @foreach (var hint in ViewModel.Hints)
+            {
+                <article class="community-ingredient-price-hints__card">
+                    <div class="community-ingredient-price-hints__title">
+                        <strong>@hint.IngredientName</strong>
+                        @if (hint.RequiresConfirmation)
+                        {
+                            <span>뜻 확인</span>
+                        }
+                    </div>
+                    @if (hint.HasPrice)
+                    {
+                        <p class="community-ingredient-price-hints__price">
+                            @FormatPrice(hint)
+                        </p>
+                        <small>
+                            @hint.MarketStageName · @hint.ReferenceDate?.ToString("yyyy-MM-dd")
+                        </small>
+                        @if (!string.IsNullOrWhiteSpace(hint.VarietySummary))
+                        {
+                            <small>@hint.VarietySummary · 표본 @(hint.SampleCount)개</small>
+                        }
+                    }
+                    else
+                    {
+                        <p class="community-ingredient-price-hints__empty">
+                            감지했지만 저장된 최신 가격은 없습니다.
+                        </p>
+                    }
+                    <small>@hint.InterpretationNote</small>
+                    @if (!string.IsNullOrWhiteSpace(hint.SourceUrl))
+                    {
+                        <a href="@hint.SourceUrl"
+                           target="_blank"
+                           rel="noopener noreferrer">출처 보기</a>
+                    }
+                </article>
+            }
+        </div>
+        <p class="community-ingredient-price-hints__notice">@ViewModel.Notice</p>
+    }
+    else
+    {
+        <p class="community-ingredient-price-hints__guide">
+            본문에 사과, 배, 복숭아 같은 식재료를 쓰면 보관된 최신 공공가격을 찾아 보여 줍니다.
+        </p>
+        @if (ViewModel.HasAnalyzedText)
+        {
+            <small>현재 본문에서는 가격에 연결된 재료를 찾지 못했습니다.</small>
+        }
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public string? Body { get; set; }
+
+    private string _lastBody = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        var body = Body ?? string.Empty;
+        if (string.Equals(body, _lastBody, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _lastBody = body;
+        ViewModel.QueueRefresh(body);
+    }
+
+    private Task RetryAsync()
+        => ViewModel.RefreshNowAsync(Body);
+
+    private static string FormatPrice(CommunityPostIngredientPriceHint hint)
+    {
+        var price = hint.AveragePrice.GetValueOrDefault();
+        var currency = string.Equals(hint.CurrencyCode, "KRW", StringComparison.OrdinalIgnoreCase)
+            ? "원"
+            : hint.CurrencyCode;
+        var unit = string.IsNullOrWhiteSpace(hint.Unit)
+            ? string.Empty
+            : $" / {hint.Unit}";
+        return $"{price.ToString("N0", CultureInfo.GetCultureInfo("ko-KR"))}{currency}{unit}";
+    }
+}

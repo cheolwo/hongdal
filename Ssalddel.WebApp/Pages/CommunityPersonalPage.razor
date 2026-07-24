@@ -22,7 +22,7 @@
     </header>
 
     <nav class="community-personal-tabs" aria-label="내 커뮤니티 메뉴">
-        @foreach (var section in CommunityPersonalRouteContext.Sections)
+        @foreach (var section in CommunityPersonalRouteContext.VisibleNavigationSections)
         {
             <a href="@section.Href"
                class="@BuildSectionClass(section.Key)"

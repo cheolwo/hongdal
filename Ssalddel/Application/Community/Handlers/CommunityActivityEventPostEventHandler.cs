@@ -3,9 +3,9 @@ using Ssalddel.Contracts.Common.Community;
 
 namespace Ssalddel.Application.Community.Handlers;
 
-public sealed class CommunityActivityEventPostHandler<TEvent>(
+public sealed class CommunityActivityEventPostEventHandler<TEvent>(
     ICommunityActivityPostPublisher publisher,
-    ILogger<CommunityActivityEventPostHandler<TEvent>> logger)
+    ILogger<CommunityActivityEventPostEventHandler<TEvent>> logger)
     : INotificationHandler<TEvent>
     where TEvent : INotification
 {

@@ -34,6 +34,9 @@ public partial class PlatformCommunityHome
     public bool UseDedicatedCommunityRoutes { get; set; }
 
     [Parameter]
+    public string? CommunityDirectoryHref { get; set; }
+
+    [Parameter]
     public bool CommunityFeedOnly { get; set; }
 
     [Parameter]

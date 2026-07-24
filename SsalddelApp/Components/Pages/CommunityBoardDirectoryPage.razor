@@ -1,0 +1,14 @@
+@page "/community/boards/directory"
+@layout CommunityMobileLayout
+
+<PageTitle>살뜰 게시판 모음</PageTitle>
+
+<CommunityMobileBoardDirectoryScreen InitialWorkMode="@IsWorkMode" />
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "mode")]
+    public string? Mode { get; set; }
+
+    private bool IsWorkMode
+        => string.Equals(Mode, "work", StringComparison.OrdinalIgnoreCase);
+}

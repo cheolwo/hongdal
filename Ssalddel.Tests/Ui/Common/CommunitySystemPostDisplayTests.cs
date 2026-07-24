@@ -10,6 +10,7 @@ public sealed class CommunitySystemPostDisplayTests
     [InlineData(PlatformCommunitySystemPostKinds.KamisPriceBrief, "정보", "자동 가격 정보")]
     [InlineData(PlatformCommunitySystemPostKinds.Reflection, "성찰", "자동 성찰문")]
     [InlineData(PlatformCommunitySystemPostKinds.ActivityDigest, "요약", "자동 활동 요약")]
+    [InlineData(PlatformCommunitySystemPostKinds.CultureTransport, "문화교통", "공식 근거 문화교통 질문")]
     [InlineData(PlatformCommunitySystemPostKinds.PrajnaContent, "반야", "관리자 선별 반야 자료")]
     public void SystemPostKind_UsesDistinctPublicLabels(
         string kind,

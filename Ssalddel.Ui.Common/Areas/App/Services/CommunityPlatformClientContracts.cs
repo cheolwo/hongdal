@@ -20,6 +20,7 @@ public interface ICommunityPostClient
         string? roleTag = null,
         int page = 1,
         int pageSize = 50,
+        string? periodicVisibility = null,
         CancellationToken cancellationToken = default);
     Task<IReadOnlyList<CommunityBoardSummaryResponse>> GetBoardSummariesAsync(
         string appKey,
