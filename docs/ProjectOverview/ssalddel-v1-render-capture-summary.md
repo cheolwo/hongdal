@@ -1,6 +1,6 @@
-﻿# 살뜰 1.0 렌더링/캡처 검증 요약
+# 살뜰 2.0 운송 렌더링/캡처 검증 요약
 
-> 재분류 안내: 파일명과 기존 캡처 경로는 링크 호환을 위해 유지하지만 이 운송 화면 묶음의 현재 제품 버전은 **2.0**입니다.
+> 재분류 안내: 레거시 파일명과 기존 캡처 경로는 링크 호환을 위해 유지하지만 이 운송 화면 묶음의 현재 제품 버전은 **2.0**입니다.
 
 이 문서는 운송 화면을 README와 상세 문서에 설명할 때 사용할 렌더링 검증 결과와 캡처 자료를 한곳에 모은다. 루트 README에는 핵심 흐름만 두고, 실제 화면이 어느 앱과 어느 단계에서 렌더링되는지는 이 문서를 근거로 삼는다.
 
@@ -16,13 +16,13 @@
 
 `DriverApp`의 `/driver/home`은 처음 검증 때 Blazor 오류 UI가 보였고, `MudButton.OnClick` 수동 렌더링 콜백 타입 문제를 제거한 뒤 다시 23개 라우트가 모두 통과했다.
 
-`SsalddelAdmin-P16`~`SsalddelAdmin-P22` 및 `SsalddelAdmin-P22-1` 화면은 로컬 개발 서버를 메모리 데이터 모드로 실행한 뒤 Chrome headless로 캡처했다. 관리자 화면은 Android 앱 라우트 스모크와 별도로, 1.0 운영 확인에 필요한 8개 웹 라우트(`/dashboard`, `/requests`, `/requests/{RequestId}`, `/dispatch/wait`, `/drivers/operating`, `/transports`, `/transports/{RequestId}`, `/transports/{RequestId}/events`)를 기준으로 문서 캡처를 만들었다.
+`SsalddelAdmin-P16`~`SsalddelAdmin-P22` 및 `SsalddelAdmin-P22-1` 화면은 로컬 개발 서버를 메모리 데이터 모드로 실행한 뒤 Chrome headless로 캡처했다. 관리자 화면은 Android 앱 라우트 스모크와 별도로, 2.0 운영 확인에 필요한 8개 웹 라우트(`/dashboard`, `/requests`, `/requests/{RequestId}`, `/dispatch/wait`, `/drivers/operating`, `/transports`, `/transports/{RequestId}`, `/transports/{RequestId}/events`)를 기준으로 문서 캡처를 만들었다.
 
 2026-07-11에는 당시 존재하던 `SsalddelAdmin` 41개 라우트에 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 다시 캡처했다. 최종 판정은 41 OK / 0 CHECK이며 결과 파일은 [`capture-results.json`](../../artifacts/page-capture-check/SsalddelAdmin-all-pages-final-2026-07-11/capture-results.json)에 둔다. 이후 추가된 `SsalddelAdmin-P40` 개발용 Fake PG/정산 콘솔은 전용 캡처 대기 상태이며, 현재 전체 페이지 현황은 [코드 프로젝트별 전체 페이지 카탈로그](app-page-catalog.md)를 기준으로 한다. 오래 남길 이미지는 `docs/ProjectOverview/assets/app-pages/SsalddelAdmin/` 아래의 페이지 ID 파일명으로 정리했다.
 
 ## 대표 캡처
 
-아래 캡처는 README 본문에 직접 많이 넣기보다는, 살뜰 1.0 필수 페이지 설명에서 필요한 곳에 연결한다. 실제 고객 정보, 주소, 연락처, 계좌, POD 원본은 캡처에 넣지 않는다.
+아래 캡처는 README 본문에 직접 많이 넣기보다는, 살뜰 2.0 필수 페이지 설명에서 필요한 곳에 연결한다. 실제 고객 정보, 주소, 연락처, 계좌, POD 원본은 캡처에 넣지 않는다.
 
 | 앱 | 대표 캡처 | 문서에서 쓰는 용도 |
 | --- | --- | --- |
@@ -33,7 +33,7 @@
 
 ## 상위/하위 페이지 캡처 색인
 
-문서에 오래 남길 이미지는 `docs/ProjectOverview/assets/v1-pages/`로 복사했다. `artifacts/` 아래 파일은 검증 산출물이고, README나 상세 문서에서는 아래 assets 경로를 기준으로 사용한다. 실제 이미지는 [살뜰 1.0 필수 페이지 기준](ssalddel-v1-required-pages.md)의 `상위/하위 페이지별 캡처` 섹션에 직접 첨부한다.
+문서에 오래 남길 이미지는 `docs/ProjectOverview/assets/v1-pages/`로 복사했다. `artifacts/` 아래 파일은 검증 산출물이고, README나 상세 문서에서는 아래 assets 경로를 기준으로 사용한다. 실제 이미지는 [살뜰 2.0 필수 페이지 기준](ssalddel-v1-required-pages.md)의 `상위/하위 페이지별 캡처` 섹션에 직접 첨부한다.
 
 | 번호 | 화면 | 라우트 | 캡처 |
 | --- | --- | --- | --- |
@@ -66,11 +66,11 @@
 
 루트 README는 1페이지 보고서처럼 유지한다. 캡처는 README에 많이 넣지 않고 다음 세 가지만 보여준다.
 
-1. 살뜰 1.0 중심 흐름: `운송 의뢰 -> 기사 추천 -> 수락/거절 -> 상차 -> 하차 -> POD/정산 후보`
-2. 화면 검증 링크: 이 문서와 [살뜰 1.0 필수 페이지 기준](ssalddel-v1-required-pages.md)
+1. 살뜰 2.0 중심 흐름: `운송 의뢰 -> 기사 추천 -> 수락/거절 -> 상차 -> 하차 -> POD/정산 후보`
+2. 화면 검증 링크: 이 문서와 [살뜰 2.0 필수 페이지 기준](ssalddel-v1-required-pages.md)
 3. 현재 검증 상태: `DriverApp`, `SsalddelApp`, `WarehouseManagerApp`의 렌더링 스모크가 통과했다는 요약
 
-상세한 화면 번호, 캡처 예정 경로, 보안/암호화 확인, 페이지 간 상태 반영 관계는 [살뜰 1.0 필수 페이지 기준](ssalddel-v1-required-pages.md)에 둔다.
+상세한 화면 번호, 캡처 예정 경로, 보안/암호화 확인, 페이지 간 상태 반영 관계는 [살뜰 2.0 필수 페이지 기준](ssalddel-v1-required-pages.md)에 둔다.
 
 ## 스테이지별 활용 기준
 

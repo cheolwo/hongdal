@@ -15,7 +15,7 @@
 | 라우트 | /driver/notifications |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/06_Notification/알림함Page.razor](../../../../../DriverApp/Components/Pages/Driver/06_Notification/알림함Page.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [DriverApp-P15 - 알림함](../../../ssalddel-v1-required-pages.md) |
+| 2.0 운송 필수 연결 | [DriverApp-P15 - 알림함](../../../ssalddel-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -26,7 +26,7 @@
 
 주 사용자: 기사 / 보조 참여자: 화주, 관리자, 창고 또는 현장 담당자
 
-이 화면은 살뜰 1.0 국내 화물 운송 워크플로우 안에서 알림함 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
+이 화면은 살뜰 2.0 국내 화물 운송 워크플로우 안에서 알림함 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
 
 ## 화면에서 다루는 일
 
@@ -51,7 +51,7 @@
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 1.0 문서 | - | `api/v1/driver/notifications` | [docs/ProjectOverview/ssalddel-v1-required-pages.md](../../../ssalddel-v1-required-pages.md) | `GET api/v1/driver/notifications/push-token` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs)<br>`PUT api/v1/driver/notifications/push-token` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs)<br>`DELETE api/v1/driver/notifications/push-token` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs)<br>`GET api/v1/driver/notifications/settings` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs) |
+| 2.0 운송 문서 | - | `api/v1/driver/notifications` | [docs/ProjectOverview/ssalddel-v1-required-pages.md](../../../ssalddel-v1-required-pages.md) | `GET api/v1/driver/notifications/push-token` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs)<br>`PUT api/v1/driver/notifications/push-token` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs)<br>`DELETE api/v1/driver/notifications/push-token` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs)<br>`GET api/v1/driver/notifications/settings` [Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs](../../../../../Ssalddel/Controllers/Driver/07_Notification/기사알림Controller.cs) |
 | 클라이언트 서비스 | - | `api/v1/driver/recommendations` | [DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs](../../../../../DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs) | `GET api/v1/driver/recommendations` [Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs](../../../../../Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs)<br>`GET api/v1/driver/recommendations/idle` [Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs](../../../../../Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs)<br>`GET api/v1/driver/recommendations/driving` [Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs](../../../../../Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs)<br>`GET api/v1/driver/recommendations/search` [Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs](../../../../../Ssalddel/Controllers/Driver/02_Recommendation/기사배차추천Controller.cs) |
 | 클라이언트 서비스 | - | `api/v1/driver/reservations` | [DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs](../../../../../DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs) | `GET api/v1/driver/reservations` [Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs](../../../../../Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs)<br>`POST api/v1/driver/reservations` [Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs](../../../../../Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs)<br>`POST api/v1/driver/reservations/{id:long}/cancel` [Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs](../../../../../Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs)<br>`GET api/v1/driver/reservations/{id:long}` [Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs](../../../../../Ssalddel/Controllers/Driver/04_Reservation/기사예약Controller.cs) |
 | 클라이언트 서비스 | - | `api/v1/driver/settlements/current-month` | [DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs](../../../../../DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs) | `GET api/v1/driver/settlements` [Ssalddel/Controllers/Driver/06_Settlement/기사정산Controller.cs](../../../../../Ssalddel/Controllers/Driver/06_Settlement/기사정산Controller.cs)<br>`GET api/v1/driver/settlements/current-month` [Ssalddel/Controllers/Driver/06_Settlement/기사정산Controller.cs](../../../../../Ssalddel/Controllers/Driver/06_Settlement/기사정산Controller.cs) |
@@ -74,5 +74,5 @@
 ## 보완 메모
 
 - 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
+- 화면이 2.0 운송 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
 - 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.

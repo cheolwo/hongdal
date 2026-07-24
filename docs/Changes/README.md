@@ -6,6 +6,13 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-24 | [원천별 주기성 데이터 전용 게시판](2026-07-24-periodic-data-source-boards.md) | KAMIS·MFDS·USDA·관세청 수입단가를 단일 저장 게시판으로 분리하고 관련 게시판은 대표 안내로 `주기성` 목록에 연결, desktop·390px 실제 확인 |
+| 2026-07-24 | [MAUI Community 01 Figma 근접 구현](2026-07-24-maui-community-figma-01.md) | 통합 MAUI 앱의 게시판 모음을 Figma 01의 밝은 모바일 Shell, 생활·업무 토글, 업무 묶음, 하단 내비게이션과 FAB로 구현하고 실제 Windows 렌더 확인 |
+| 2026-07-24 | [업무 게시판 주기성 주제분류](2026-07-24-work-board-periodic-topic-filter.md) | 업무단위 게시판에서 서버 정기 자료를 전체글·일반글·주기성으로 포함·제외·전용 조회하고 desktop·390px 실제 확인 |
+| 2026-07-24 | [게시판별 공공데이터·조사 관계 카탈로그](2026-07-24-community-board-public-data-relations.md) | 화면 없음 — 전체 게시판에 구현·필요 시 조회·배치 준비·연계 예정 원천과 자동 발행·검토·참고 전용 경계를 연결 |
+| 2026-07-24 | [정보·시세 수입식품 중국·미국 분류](2026-07-24-information-prices-country-filters.md) | `정보·시세`에서 전체 정보·중국·미국을 전환하고 선택 국가를 URL과 적용 필터에 복원, desktop·390px 실제 확인 |
+| 2026-07-24 | [미국 수입식품 제조업소 주별 근거 누적](2026-07-24-us-imported-food-states.md) | 화면 없음 — 식약처 미국 기록을 50개 주·D.C.·미국령·미분류로 누적하고 월 1회 `정보·시세` 시스템 글로 멱등 게시 |
+| 2026-07-24 | [중국 수입식품 제조업소 권역 근거 누적](2026-07-24-china-imported-food-regions.md) | 화면 없음 — 식약처 권역 근거를 재료별 RDB 원장에 누적하고 월 1회 `정보·시세` 시스템 글로 멱등 게시 |
 | 2026-07-24 | [Figma 커뮤·업무 모드 토글](2026-07-24-figma-community-mode-toggle.md) | Community 우측 상단에 `업무` OFF/ON 스위치를 추가해 커뮤모드의 생활 게시판과 업무모드의 업무 게시판 상태를 한 section에서 비교 |
 | 2026-07-24 | [Figma Community 생활·업무 게시판 통합](2026-07-24-figma-community-board-consolidation.md) | `01D` 업무단위 게시판을 `01A`에 통합하고 12개 화면을 생활 게시판 6개·업무 게시판 6개로 재배치해 게시판 모음을 두 부류로 단순화 |
 | 2026-07-24 | [Figma 01~05 역할 레이어와 업무단위 게시판](2026-07-24-figma-role-layer-milestone.md) | Figma의 Community·Orderer·Shipper·Driver·Warehouse 화면을 역할별 페이지로 분리하고, 커뮤니티에 6개 업무단위 게시판 화면을 추가한 설계 성과를 실제 PNG로 기록 |

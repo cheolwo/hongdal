@@ -1,4 +1,4 @@
-﻿# SsalddelAdmin-P23 - 관리자 활동 로그
+# SsalddelAdmin-P23 - 관리자 활동 로그
 
 [전체 화면 문서](../../README.md) / [SsalddelAdmin 화면 목록](../README.md) / [앱 전체 카탈로그](../../../app-page-catalog.md)
 
@@ -15,7 +15,7 @@
 | 라우트 | /activity-logs |
 | 소스 파일 | [SsalddelAdmin/Components/Pages/ActivityLogs.razor](../../../../../SsalddelAdmin/Components/Pages/ActivityLogs.razor) |
 | 분류 | 운영 |
-| 1.0 필수 연결 | 직접 연결 없음 |
+| 2.0 운송 필수 연결 | 직접 연결 없음 |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -71,5 +71,5 @@
 ## 보완 메모
 
 - 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
+- 화면이 2.0 운송 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
 - 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.

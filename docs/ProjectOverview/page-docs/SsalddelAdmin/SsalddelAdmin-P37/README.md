@@ -15,7 +15,7 @@
 | 라우트 | /dispatch/ai-review |
 | 소스 파일 | [SsalddelAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor](../../../../../SsalddelAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor) |
 | 분류 | 운영 |
-| 1.0 필수 연결 | 운영 보조 |
+| 2.0 운송 필수 연결 | 운영 보조 |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -73,4 +73,4 @@
 
 - 실제 지도 SDK가 붙으면 문서 캡처에서 좌표, 주소, 기사 위치 마스킹 정책을 다시 확인한다.
 - AI 판단 사례 저장 정책이 바뀌면 [SsalddelAdmin-P39](../SsalddelAdmin-P39/)의 사례 문서와 함께 갱신한다.
-- 이 화면이 1.0 필수 배차 운영 범위로 올라가면 ssalddel-v1-required-pages.md에도 반영한다.
+- 이 화면이 2.0 운송 필수 배차 운영 범위로 올라가면 ssalddel-v1-required-pages.md에도 반영한다.

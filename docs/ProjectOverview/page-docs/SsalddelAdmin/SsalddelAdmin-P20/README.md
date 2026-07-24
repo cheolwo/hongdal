@@ -15,7 +15,7 @@
 | 라우트 | /drivers/operating |
 | 소스 파일 | [SsalddelAdmin/Components/Pages/DriverOperatingView.razor](../../../../../SsalddelAdmin/Components/Pages/DriverOperatingView.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [SsalddelAdmin-P20 - 운행 중 기사 현황](../../../ssalddel-v1-required-pages.md) |
+| 2.0 운송 필수 연결 | [SsalddelAdmin-P20 - 운행 중 기사 현황](../../../ssalddel-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -26,7 +26,7 @@
 
 주 사용자: 관리자, 운영자 / 보조 참여자: 화주, 기사, 파트너, 문서 담당자
 
-이 화면은 살뜰 1.0 국내 화물 운송 워크플로우 안에서 운행 중 기사 현황 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
+이 화면은 살뜰 2.0 국내 화물 운송 워크플로우 안에서 운행 중 기사 현황 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
 
 ## 화면에서 다루는 일
 
@@ -51,7 +51,7 @@
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 1.0 문서 | - | `api/v1/admin/drivers/operating` | [docs/ProjectOverview/ssalddel-v1-required-pages.md](../../../ssalddel-v1-required-pages.md) | ``GET api/v1/admin/drivers/operating`` [Ssalddel/Controllers/Admin/03_진행/기사운행현황Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/기사운행현황Controller.cs)<br>``GET api/v1/admin/drivers`` [Ssalddel/Controllers/Admin/06_관리/기사관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/06_관리/기사관리Controller.cs) |
+| 2.0 운송 문서 | - | `api/v1/admin/drivers/operating` | [docs/ProjectOverview/ssalddel-v1-required-pages.md](../../../ssalddel-v1-required-pages.md) | ``GET api/v1/admin/drivers/operating`` [Ssalddel/Controllers/Admin/03_진행/기사운행현황Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/기사운행현황Controller.cs)<br>``GET api/v1/admin/drivers`` [Ssalddel/Controllers/Admin/06_관리/기사관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/06_관리/기사관리Controller.cs) |
 | 워크플로우 문서 | - | `api/v1/admin/documents` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/admin/documents/policies` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs)<br>`PUT api/v1/admin/documents/policies/{documentCode}` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs)<br>`GET api/v1/admin/documents` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs)<br>`GET api/v1/admin/documents/logs` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs) |
 | 워크플로우 문서 | - | `api/v1/admin/transports` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/admin/transports` [Ssalddel/Controllers/Admin/03_진행/운송진행관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/운송진행관리Controller.cs)<br>`GET api/v1/admin/transports/events` [Ssalddel/Controllers/Admin/03_진행/운송진행관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/운송진행관리Controller.cs) |
 | 워크플로우 문서 | - | `api/v1/transport-events` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/transport-events` [Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs)<br>`GET api/v1/transport-events/{id:long}` [Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs)<br>`POST api/v1/transport-events` [Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs)<br>`PUT api/v1/transport-events/{id:long}` [Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs](../../../../../Ssalddel/Controllers/Admin/03_진행/운송이벤트Controller.cs) |
@@ -71,5 +71,5 @@
 ## 보완 메모
 
 - 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
+- 화면이 2.0 운송 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
 - 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.

@@ -4,7 +4,7 @@
 
 ## 결론
 
-- 현재 기술 릴리스 초점은 `0.0 기반 + 1.0 비구속 수요 집단화 + 1.5 공급·가격·무역 준비`다.
+- 현재 기술 릴리스 초점은 `문화교통 0.0 기반 + 문화교통 1.0 비구속 수요 집단화 + 문화교통 1.5 공급·가격·무역 준비`다.
 - `1.5`는 승인된 1.0 집단에서 관리자 준비 원장과 읽기 전용 주문자 검토 화면까지 이어지는 **통제된 Simulation 베타 후보**다.
 - 실제 계약, 고객 자금 수취, 결제, 구매 확정, 수입 신고, 공급자 자동 선정, 운송 지시와 창고 변경은 범위 밖이며 계속 차단한다.
 - 기술 체크리스트 9/9 완료는 전문 자격자·관계 기관·법률 검토를 대체하지 않는다.
@@ -21,7 +21,7 @@
 | `3.0` | 7 | 7 | 6 | 4 | 5 | **29** | 음식 배달 프로토타입 |
 | `3.5` | 7 | 6 | 5 | 4 | 5 | **27** | 마트 즉시배송 프로토타입 |
 
-`1.5`가 90점 미만인 이유는 실제 MongoDB·API·브라우저 E2E, 스테이징 복구 리허설과 GitHub 호스티드 러너 실행 증적이 아직 없기 때문이다.
+`1.5`가 90점 미만인 이유는 실제 Gmail 발송, 스테이징 복구 리허설과 GitHub 호스티드 러너의 녹색 실행 증적이 아직 없기 때문이다. MySQL·MongoDB·Redis 통합 테스트와 전용 무역 원장 브라우저 E2E는 실행 가능한 게이트로 추가됐지만, 원격 실행 전에는 통과 증적으로 간주하지 않는다.
 
 ## 1.5 완료 근거
 
@@ -32,6 +32,9 @@
 5. 주문자 `/group-purchase/import-review/{ProductId}`는 MFDS 기업 근거와 한국 HSK·미국 HTSUS 후보를 읽기 전용으로 표시한다.
 6. 서버는 관리자 정책, `CustomsAndTradeDataWorkflow`, 승인 인계 ID, `Idempotency-Key`, 기대 Revision과 원출처·확인 시각을 검증한다.
 7. 정책 응답과 원장 블록에서 계약·결제·신고·운송 가능 여부를 항상 `false`로 유지하고 하위 운송·창고 원장을 만들지 않는다.
+8. 개별수입·개별수출·공동수출은 전용 Controller, `I무역확장원장UseCase`, 공용 UI 화면과 Web 경로를 가지며 원천 거래 원본을 복제하지 않는다.
+9. Apify와 수입식품 한글표시사항 HTTP adapter는 코드 탐색 feature key와 요청·응답 계약 테스트로 추적한다.
+10. 커뮤니티 새 글 Gmail 알림은 프로세스 메모리 큐가 아니라 MySQL outbox에서 임대·재시도·완료 상태를 관리한다.
 
 ## 검증 결과
 
@@ -40,12 +43,14 @@
 - 서버, 1.5 관리자 작업대와 최적화 WebAssembly `Release` 게시 산출물 생성 완료.
 - Docker Compose 구성 검사와 `ssalddel:v1.5-readiness` 서버 이미지 빌드 완료.
 - `.github/workflows/release-readiness.yml`이 0.0·1.0·1.5 복원·빌드, 전체 테스트, 게시, Compose와 이미지 빌드를 정의한다.
+- 같은 workflow에 MySQL 8.4·MongoDB 8.0·Redis 7.4 실제 저장소 테스트와 desktop/mobile Chromium E2E가 정의되어 있다.
+- `.github/workflows/staging-readiness.yml`은 보호된 `staging` 환경에서 명시적 확인 후 마이그레이션, 격리된 MySQL·MongoDB 복구와 Redis RDB 기동 검증을 수행하고 비민감 JSON 증적만 업로드한다.
 
 ## 남은 승격 게이트
 
-1. MySQL·MongoDB·Redis를 실제로 띄운 API 통합 테스트에서 승인, 동시 저장, Revision 충돌, 멱등 재시도와 원천·대상 링크를 검증한다.
-2. 주문자 탐색과 관리자 `/trade-readiness`를 실제 브라우저에서 반복하는 E2E를 추가한다.
-3. GitHub 호스티드 러너 첫 녹색 실행과 스테이징 마이그레이션·헬스체크·백업 복구 리허설을 남긴다.
+1. 새 GitHub workflow를 원격에서 실행해 인프라 통합 테스트와 browser E2E의 첫 녹색 TRX·trace 증적을 확보한다.
+2. 보호된 `staging` 환경의 secret·복구 전용 DB를 구성하고 마이그레이션·백업 복구 workflow의 `evidence.json`을 확보한다.
+3. 별도 수신용 Gmail 계정으로 opt-in SMTP 통합 테스트를 실행해 실제 도착과 outbox `Sent` 상태를 검증한다.
 4. 실제 수입 전 한국·미국별 판매자, 수입자, 관세사, 식품 규제 담당자와 계약·개인정보·소비자보호 검토를 별도로 완료한다.
 5. 위 게이트 전 운영 설정은 `GroupPurchaseDemandWorkflow=false`, `CustomsAndTradeDataWorkflow=false`, `SsalddelExecution:Mode=Simulation`을 유지한다.
 

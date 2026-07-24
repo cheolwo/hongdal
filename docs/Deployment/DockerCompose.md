@@ -13,7 +13,9 @@
 - `SSALDDEL_TRANSIENT_STATE_PROVIDER=Redis`: 단일 VM 운영 권장값이다. `redis` Compose 프로필을 함께 실행한다. AOF 볼륨을 사용하므로 컨테이너 재생성 뒤에도 상태를 복구할 수 있다.
 - `SSALDDEL_TRANSIENT_STATE_PROVIDER=Memory`: Redis 없이 개발할 때 사용한다. 애플리케이션 재시작 시 기사 위치, 대기열, 추천 상태와 Push Token 등 임시 상태가 사라진다.
 
-로컬 개발 기동은 ISMS-P 키가 없어도 상태 확인과 일반 API를 점검할 수 있도록 `SSALDDEL_ISMSP_FAIL_WHEN_KEY_MISSING=false`가 기본이다. 운영 배포에서는 반드시 이 값을 `true`로 설정하고 AES-256-GCM 키와 전송 키를 비밀 저장소에서 주입한다.
+ISMS-P AES-256-GCM 키는 개발·운영 모두 필수다. 누락되면 서버가 시작되지 않으며 암호문을 평문처럼 통과시키지 않는다. 실제 키와 hash salt는 Git에서 제외된 `.env`나 배포 비밀 저장소에서 주입한다.
+
+운영 환경은 Data Protection key ring을 `app_data` 볼륨에 유지하고 PFX 인증서로 저장 키를 암호화한다. 인증서 파일은 저장소 루트의 Git 제외 경로인 `secrets/ssalddel-data-protection.pfx`에 두고, `.env`의 `SSALDDEL_DATA_PROTECTION_CERTIFICATE_PATH`와 인증서 비밀번호를 설정한다. 개발 환경에서 인증서를 생략해도 key ring 자체는 같은 볼륨에 유지된다.
 
 기존 MySQL·MongoDB 볼륨을 이미 만든 경우에는 최초 생성 때 사용한 비밀번호를 계속 사용해야 한다. `.env`의 비밀번호와 연결 문자열의 비밀번호가 기존 볼륨과 다르면 컨테이너 환경변수만 바꿔도 DB 계정 비밀번호는 바뀌지 않는다.
 
@@ -36,6 +38,8 @@ docker image inspect ssalddel-app --format 'Id={{.Id}} Created={{.Created}}'
 ## 3. 데이터베이스 초기화
 
 웹 서버가 시작할 때마다 여러 인스턴스에서 마이그레이션하지 않도록 기본값은 `DatabaseInitialization__RunAtStartup=false`다. 이미지 배포 전에 같은 이미지로 초기화 명령을 한 번 실행한다.
+
+최초 관리자 계정이 아직 없으면 `.env`에서 `SSALDDEL_BOOTSTRAP_ADMIN_ENABLED=true`와 아이디·이메일·임시 강력 비밀번호를 설정한 상태로 아래 초기화 명령을 한 번 실행한다. 성공을 확인하면 즉시 Enabled를 `false`로 되돌리고 비밀번호 값을 제거한다. 같은 아이디나 이메일의 일반 계정에 관리자 권한을 자동 승격하지 않는다.
 
 Redis를 사용하는 권장 구성은 다음과 같이 초기화한다.
 

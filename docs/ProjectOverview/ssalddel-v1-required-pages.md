@@ -1,6 +1,6 @@
-﻿# 살뜰 1.0 필수 페이지 기준
+# 살뜰 2.0 운송 필수 페이지 기준
 
-> 재분류 안내: 파일명과 과거 표기는 링크 호환을 위해 유지하지만 이 운송 화면 묶음의 현재 제품 버전은 **2.0**입니다.
+> 재분류 안내: 레거시 파일명은 링크 호환을 위해 유지하지만 이 운송 화면 묶음의 현재 제품 버전은 **2.0**입니다.
 
 이 문서는 국내 화물/용달 운송 워크플로우가 실제 화면에서 끊기지 않기 위해 반드시 필요한 페이지를 정리한다. 목적은 화면을 많이 만드는 것이 아니라, 하나의 운송 의뢰가 `등록 -> 배차대기 -> 추천 -> 수락/거절 -> 상차 -> 하차 -> POD -> 정산`까지 닫히는 데 필요한 최소 화면 경계를 고정하는 것이다.
 
@@ -17,11 +17,11 @@
 | 증빙 확보 | 이 화면이 없으면 사진, POD, 인수증, 서명, 시간 기록 같은 증빙이 남지 않는가 |
 | 예외 복구 | 이 화면이 없으면 실패나 현장 예외가 발생했을 때 다음 행동을 알 수 없는가 |
 
-1.0에서는 한 화면이 여러 일을 처리하지 않도록 한다. 홈과 대시보드는 진입과 요약을 맡고, 실제 상태 변경은 상세, 처리, 증빙, 정산 화면처럼 책임이 분명한 화면에서 수행한다.
+2.0에서는 한 화면이 여러 일을 처리하지 않도록 한다. 홈과 대시보드는 진입과 요약을 맡고, 실제 상태 변경은 상세, 처리, 증빙, 정산 화면처럼 책임이 분명한 화면에서 수행한다.
 
 ## 페이지 번호 체계
 
-1.0 페이지 식별자는 실제 프로젝트명을 접두사로 붙여 `SsalddelApp-P01`, `DriverApp-P06`, `SsalddelAdmin-P22-1`처럼 관리한다. 번호는 화면 이름이 바뀌더라도 유지하고, 실제 라우트나 파일이 바뀌면 이 문서의 코드 연결만 갱신한다.
+2.0 페이지 식별자는 실제 프로젝트명을 접두사로 붙여 `SsalddelApp-P01`, `DriverApp-P06`, `SsalddelAdmin-P22-1`처럼 관리한다. 번호는 화면 이름이 바뀌더라도 유지하고, 실제 라우트나 파일이 바뀌면 이 문서의 코드 연결만 갱신한다.
 
 독립 라우트나 독립 책임을 가진 화면은 `SsalddelApp-P03`처럼 부모 번호를 가진다. 그 안에 들어가는 세부 페이지, 섹션, 탭, 모달, 보조 설정 화면은 `SsalddelApp-P03-1`, `SsalddelApp-P03-2`처럼 부모 번호 아래에 붙인다. 예를 들어 `SsalddelApp-P03 의뢰 상세/타임라인` 안의 결제 안내는 `SsalddelApp-P03-1`, 예외/분쟁 확인은 `SsalddelApp-P03-2`로 관리한다.
 
@@ -55,7 +55,7 @@ SsalddelApp-P01부터 Public-P28까지의 화면 이름과 업무 설명은 한�
 
 보안상 캡처에는 실제 고객 주소, 연락처, 차량번호, 계좌번호, 가상계좌, 결제 식별자, POD 원본, 실제 위치 좌표를 그대로 넣지 않는다. 개발용 샘플 데이터로 찍거나, 민감정보를 마스킹한 뒤 넣는다.
 
-현재 Android 에뮬레이터 기준 렌더링 스모크 결과와 대표 캡처는 [살뜰 1.0 렌더링/캡처 검증 요약](ssalddel-v1-render-capture-summary.md)에 둔다. 2026-07-09 기준 `DriverApp` 23개, `SsalddelApp` 30개, `WarehouseManagerApp` 22개 라우트가 Blazor 오류 UI 없이 렌더링되는 것을 확인했다. 이 결과는 `SsalddelApp-P01`~`SsalddelApp-P03`, `DriverApp-P06`~`DriverApp-P15`, 창고 확장 화면을 README에 설명할 때 근거로 사용한다.
+현재 Android 에뮬레이터 기준 렌더링 스모크 결과와 대표 캡처는 [살뜰 2.0 렌더링/캡처 검증 요약](ssalddel-v1-render-capture-summary.md)에 둔다. 2026-07-09 기준 `DriverApp` 23개, `SsalddelApp` 30개, `WarehouseManagerApp` 22개 라우트가 Blazor 오류 UI 없이 렌더링되는 것을 확인했다. 이 결과는 `SsalddelApp-P01`~`SsalddelApp-P03`, `DriverApp-P06`~`DriverApp-P15`, 창고 확장 화면을 README에 설명할 때 근거로 사용한다.
 
 | 번호 | 캡처 이미지 속성 | 권장 파일 경로 | 캡처 기준 |
 | --- | --- | --- | --- |
@@ -206,7 +206,7 @@ SsalddelApp-P03-1과 SsalddelApp-P03-2는 아직 독립 라우트가 아니라 S
 
 ### DriverApp-P10 배차 처리
 
-- 라우트: `/driver/recommendations/{의뢰Id}/decision`
+- Web 라우트: `/driver/dispatch-decisions/{의뢰Id}`
 - 역할: 수락, 거절, 보류 같은 배차 결정 명령을 서버에 보낸다.
 - 캡처: `assets/v1-pages/P10-배차처리.png`
 
@@ -346,7 +346,7 @@ SsalddelApp-P03-1과 SsalddelApp-P03-2는 아직 독립 라우트가 아니라 S
 - 역할: 하차 완료 후 입금 요청, 입금 완료, 기사 정산 후보를 운송 상세의 정산 관점에서 확인한다.
 - 캡처 예정: `assets/v1-pages/P22-3-운송정산.png`
 
-## 닫혀야 하는 1.0 루프
+## 닫혀야 하는 2.0 루프
 
 ```mermaid
 flowchart LR
@@ -373,13 +373,13 @@ flowchart LR
 | 번호 | 필수 화면 | 현재 라우트/파일 | 주 책임 | 연결 API/상태 | 현재 판정 |
 | --- | --- | --- | --- | --- | --- |
 | SsalddelApp-P01 | 화주 홈/업무 진입 | `/shipper`<br>`SsalddelApp/Components/Pages/Home.razor`<br>`/`는 `UnifiedHome.razor`의 역할 진입점 | 운송 의뢰, 의뢰 타임라인, 창고/판매 업무로 이동 | 서버 상태 요약, 최근 의뢰 | 라우트 확인 |
-| SsalddelApp-P02 | 운송 의뢰 작성 | `/shipper/request` → `/cargo`<br>`/transport`<br>`/procedure`<br>`/review`<br>`SsalddelApp/Components/Pages/ShipperRequest*Page.razor` | 같은 공용 draft로 화물, 상하차, 차량·결제 조건을 단계별 확인해 의뢰 원장 등록을 요청 | `api/v1/shipper/requests` | 1.0 필수 |
+| SsalddelApp-P02 | 운송 의뢰 작성 | `/shipper/request` → `/cargo`<br>`/transport`<br>`/procedure`<br>`/review`<br>`SsalddelApp/Components/Pages/ShipperRequest*Page.razor` | 같은 공용 draft로 화물, 상하차, 차량·결제 조건을 단계별 확인해 의뢰 원장 등록을 요청 | `api/v1/shipper/requests` | 2.0 필수 |
 | SsalddelApp-P02-1 | 운송 의뢰 대량 등록 | `/shipper/request/bulk`<br>`SsalddelApp/Components/Pages/ShipperBulkImport.razor` | 여러 의뢰를 한 번에 등록 | `api/v1/shipper/requests` 대량 등록 후보 | SsalddelApp-P02의 보조 화면 |
-| SsalddelApp-P03 | 의뢰 상세/타임라인 | `/shipper/request/{RequestId}`<br>`SsalddelApp/Components/Pages/ShipperRequestDetail.razor` | 결제, 배차, 수락, 상차, 하차, POD, 정산 상태를 한 화면에서 확인 | `api/v1/shipper/requests`, `api/v1/payments`, 운송 이벤트 | 1.0 필수 |
+| SsalddelApp-P03 | 의뢰 상세/타임라인 | `/shipper/request/{RequestId}`<br>`SsalddelApp/Components/Pages/ShipperRequestDetail.razor` | 결제, 배차, 수락, 상차, 하차, POD, 정산 상태를 한 화면에서 확인 | `api/v1/shipper/requests`, `api/v1/payments`, 운송 이벤트 | 2.0 필수 |
 | SsalddelApp-P03-1 | 결제/입금 안내 | 우선 SsalddelApp-P03 안에 포함 | 운송완료후정산, 가상계좌 입금대기, 1/3/7일 알림 상태 확인 | `api/v1/payments` | 상세 화면 안에서 먼저 닫고, 커지면 분리 |
 | SsalddelApp-P03-2 | 예외/분쟁 확인 | 우선 SsalddelApp-P03 안에 포함 | 상차물건없음, 수량불일치, 하차지부재, 증빙업로드실패 같은 예외를 화주 관점에서 확인 | 운송 이벤트, 관리자 확인 상태 | 상세 화면 안에서 먼저 닫고, 커지면 분리 |
 
-화주 앱에서 가장 먼저 완성해야 할 화면은 `의뢰 상세/타임라인`이다. 의뢰 작성 화면이 있어도 이후 상태가 보이지 않으면 1.0 워크플로우는 사용자가 체감하기 어렵다.
+화주 앱에서 가장 먼저 완성해야 할 화면은 `의뢰 상세/타임라인`이다. 의뢰 작성 화면이 있어도 이후 상태가 보이지 않으면 2.0 워크플로우는 사용자가 체감하기 어렵다.
 
 ## 기사 화면
 
@@ -387,17 +387,17 @@ flowchart LR
 
 | 번호 | 필수 화면 | 현재 라우트/파일 | 주 책임 | 연결 API/상태 | 현재 판정 |
 | --- | --- | --- | --- | --- | --- |
-| DriverApp-P06 | 운행 시작 | `/driver/work/start`<br>`DriverApp/Components/Pages/Driver/01_Work/운행시작Page.razor` | 기사 운행 상태 시작, 위치 송신 조건, 복귀/수익 선호 입력 | `api/v1/driver/work`, `api/v1/driver/shifts` | 1.0 필수 |
+| DriverApp-P06 | 운행 시작 | `/driver/work/start`<br>`DriverApp/Components/Pages/Driver/01_Work/운행시작Page.razor` | 기사 운행 상태 시작, 위치 송신 조건, 복귀/수익 선호 입력 | `api/v1/driver/work`, `api/v1/driver/shifts` | 2.0 필수 |
 | DriverApp-P06-1 | 운행 설정 | `/driver/work/settings`<br>`DriverApp/Components/Pages/Driver/04_Settings/운행설정Page.razor` | 운행 조건과 선호 설정 | 운행 설정 API 후보 | DriverApp-P06의 보조 화면 |
-| DriverApp-P07 | 지도 홈/추천 배너 | `/driver/home`<br>`DriverApp/Components/Pages/Home.razor` | 운행 중 지도, 신규 추천 배너, 현재 운송 진입 | 추천 수신, 위치 heartbeat(주기 송신), 현재 운송 | 1.0 필수 |
+| DriverApp-P07 | 지도 홈/추천 배너 | `/driver/home`<br>`DriverApp/Components/Pages/Home.razor` | 운행 중 지도, 신규 추천 배너, 현재 운송 진입 | 추천 수신, 위치 heartbeat(주기 송신), 현재 운송 | 2.0 필수 |
 | DriverApp-P07-1 | 기사 업무 허브/요약 | `/driver/home/summary`<br>`DriverApp/Components/Pages/Driver/Home/기사홈Page.razor` | 지도 홈에서 들어가는 기사 업무 요약 | 기사 업무 요약 | DriverApp-P07의 보조 화면 |
-| DriverApp-P08 | 추천 목록 | `/driver/recommendations`<br>`DriverApp/Components/Pages/Driver/02_Recommendation/추천목록Page.razor` | 현재 기사에게 노출된 추천 후보 목록 확인 | `api/v1/driver/recommendations` | 1.0 필수 보조 |
-| DriverApp-P09 | 추천 상세 | `/driver/recommendations/{의뢰Id}`<br>`DriverApp/Components/Pages/Driver/02_Recommendation/추천상세Page.razor` | 상차지, 하차지, 운임, 업무 유형, 추가 시간, 경로 이점, 증빙 조건 확인 | `api/v1/driver/recommendations` | 1.0 필수 |
-| DriverApp-P10 | 배차 처리 | `/driver/recommendations/{의뢰Id}/decision`<br>`DriverApp/Components/Pages/Driver/02_Recommendation/배차처리Page.razor` | 수락, 거절, 보류, 수락 취소 같은 결정 명령 전송 | `api/v1/driver/dispatch-actions` | 1.0 필수 |
-| DriverApp-P11 | 진행 중 운송 | `/driver/transports/current`<br>`DriverApp/Components/Pages/Driver/03_Progress/진행중운송Page.razor` | 현재 해야 할 다음 행동과 상차/하차 화면 진입 | `api/v1/driver/transports` | 1.0 필수 |
-| DriverApp-P12 | 상차 화면 | `/driver/transports/{운송Id}/pickup`<br>`DriverApp/Components/Pages/Driver/03_Progress/상차Page.razor` | 상차 완료 사진, 인수증/서명, LCL/FCL 체크, 상차 예외 신고 | `api/v1/driver/transports`, `api/v1/files` | 1.0 필수 |
-| DriverApp-P13 | 하차 화면 | `/driver/transports/{운송Id}/dropoff`<br>`DriverApp/Components/Pages/Driver/03_Progress/하차Page.razor` | 하차 완료 사진, POD, 인수 확인, 하차 예외 신고 | `api/v1/driver/transports`, `api/v1/files` | 1.0 필수 |
-| DriverApp-P14 | 월정산 확인 | `/driver/settlements/current-month`<br>`DriverApp/Components/Pages/Driver/05_Settlement/월정산Page.razor` | 이번 운송이 얼마로, 언제, 어떤 증빙 기준으로 정산되는지 확인 | `api/v1/driver/settlements` | 1.0 신뢰 필수 |
+| DriverApp-P08 | 추천 목록 | `/driver/recommendations`<br>`DriverApp/Components/Pages/Driver/02_Recommendation/추천목록Page.razor` | 현재 기사에게 노출된 추천 후보 목록 확인 | `api/v1/driver/recommendations` | 2.0 필수 보조 |
+| DriverApp-P09 | 추천 상세 | `/driver/recommendations/{의뢰Id}`<br>`DriverApp/Components/Pages/Driver/02_Recommendation/추천상세Page.razor` | 상차지, 하차지, 운임, 업무 유형, 추가 시간, 경로 이점, 증빙 조건 확인 | `api/v1/driver/recommendations` | 2.0 필수 |
+| DriverApp-P10 | 배차 처리 | Web `/driver/dispatch-decisions/{의뢰Id}`<br>`DriverApp/Components/Pages/Driver/02_Recommendation/배차처리Page.razor` | 수락, 거절, 보류, 수락 취소 같은 결정 명령 전송 | `api/v1/driver/dispatch-actions` | 2.0 필수 |
+| DriverApp-P11 | 진행 중 운송 | `/driver/transports/current`<br>`DriverApp/Components/Pages/Driver/03_Progress/진행중운송Page.razor` | 현재 해야 할 다음 행동과 상차/하차 화면 진입 | `api/v1/driver/transports` | 2.0 필수 |
+| DriverApp-P12 | 상차 화면 | `/driver/transports/{운송Id}/pickup`<br>`DriverApp/Components/Pages/Driver/03_Progress/상차Page.razor` | 상차 완료 사진, 인수증/서명, LCL/FCL 체크, 상차 예외 신고 | `api/v1/driver/transports`, `api/v1/files` | 2.0 필수 |
+| DriverApp-P13 | 하차 화면 | `/driver/transports/{운송Id}/dropoff`<br>`DriverApp/Components/Pages/Driver/03_Progress/하차Page.razor` | 하차 완료 사진, POD, 인수 확인, 하차 예외 신고 | `api/v1/driver/transports`, `api/v1/files` | 2.0 필수 |
+| DriverApp-P14 | 월정산 확인 | `/driver/settlements/current-month`<br>`DriverApp/Components/Pages/Driver/05_Settlement/월정산Page.razor` | 이번 운송이 얼마로, 언제, 어떤 증빙 기준으로 정산되는지 확인 | `api/v1/driver/settlements` | 2.0 신뢰 필수 |
 | DriverApp-P14-1 | 이용료/정산 정책 안내 | `/driver/settlements/info`<br>`DriverApp/Components/Pages/Driver/05_Settlement/이용료안내Page.razor` | 이용료, 수수료, 정산 기준을 확인 | 정산 정책, 이용료 안내 | DriverApp-P14의 보조 화면 |
 | DriverApp-P15 | 알림함 | `/driver/notifications`<br>`DriverApp/Components/Pages/Driver/06_Notification/알림함Page.razor` | 추천 수신, 수락 후 안내, 입금 알림, 실패 알림 확인 | `api/v1/driver/notifications` | 보조 필수 |
 | DriverApp-P15-1 | 알림 설정 | `/driver/notifications/settings`<br>`DriverApp/Components/Pages/Driver/04_Settings/알림설정Page.razor` | 알림톡, FCM, 앱 내 알림 수신 기준 설정 | 알림 설정 | DriverApp-P15의 보조 화면 |
@@ -407,23 +407,23 @@ flowchart LR
 
 ## 관리자 화면
 
-관리자 화면은 정상 흐름을 대신 조작하는 화면이 아니라, 상태가 막혔을 때 원인과 책임 경계를 볼 수 있는 화면이다. 1.0에서는 배차대기, 운송 진행, 증빙, 결제/정산, 예외 이벤트가 서로 연결되어야 한다.
+관리자 화면은 정상 흐름을 대신 조작하는 화면이 아니라, 상태가 막혔을 때 원인과 책임 경계를 볼 수 있는 화면이다. 2.0에서는 배차대기, 운송 진행, 증빙, 결제/정산, 예외 이벤트가 서로 연결되어야 한다.
 
 | 번호 | 필수 화면 | 현재 라우트/파일 | 주 책임 | 연결 API/상태 | 현재 판정 |
 | --- | --- | --- | --- | --- | --- |
-| SsalddelAdmin-P16 | 운영 대시보드 | `/dashboard`<br>`SsalddelAdmin/Components/Pages/Dashboard.razor` | 1.0 핵심 지표와 막힌 상태 요약 | `api/v1/admin/dashboard` | 라우트 확인 |
-| SsalddelAdmin-P17 | 의뢰 목록 | `/requests`<br>`SsalddelAdmin/Components/Pages/Requests.razor` | 화주 의뢰 목록과 상세 진입 | `api/v1/shipper/requests` 또는 관리자 조회 | 1.0 필수 |
-| SsalddelAdmin-P18 | 의뢰 상세 | `/requests/{RequestId}`<br>`SsalddelAdmin/Components/Pages/RequestDetail.razor` | 의뢰 원문, 결제 조건, 배차 연결 상태 확인 | 의뢰 원장, 결제 원장 | 1.0 필수 |
-| SsalddelAdmin-P19 | 배차대기 | `/dispatch/wait`<br>`SsalddelAdmin/Components/Pages/DispatchWait.razor` | 배차대기, 추천중, 후보부족, 잠금 상태 확인 | `api/v1/dispatch/wait` | 1.0 필수 |
-| SsalddelAdmin-P20 | 기사 운행 현황 | `/drivers/operating`<br>`SsalddelAdmin/Components/Pages/DriverOperatingView.razor` | 운행 중 기사, 위치 최신성, 추천 가능 상태 확인 | `api/v1/admin/drivers/operating` | 1.0 필수 보조 |
-| SsalddelAdmin-P21 | 운송 목록 | `/transports`<br>`SsalddelAdmin/Components/Pages/Transports.razor` | 진행 중/완료 운송 목록 확인 | `api/v1/admin/transports` | 1.0 필수 |
-| SsalddelAdmin-P22 | 운송 상세 | `/transports/{RequestId}`<br>`SsalddelAdmin/Components/Pages/TransportWorkflowDetail.razor` | 운송 단계, 기사, 화주, 수령자, 현재 상태를 한 화면에서 확인 | `api/v1/admin/transports` | 1.0 필수 |
+| SsalddelAdmin-P16 | 운영 대시보드 | `/dashboard`<br>`SsalddelAdmin/Components/Pages/Dashboard.razor` | 2.0 핵심 지표와 막힌 상태 요약 | `api/v1/admin/dashboard` | 라우트 확인 |
+| SsalddelAdmin-P17 | 의뢰 목록 | `/requests`<br>`SsalddelAdmin/Components/Pages/Requests.razor` | 화주 의뢰 목록과 상세 진입 | `api/v1/shipper/requests` 또는 관리자 조회 | 2.0 필수 |
+| SsalddelAdmin-P18 | 의뢰 상세 | `/requests/{RequestId}`<br>`SsalddelAdmin/Components/Pages/RequestDetail.razor` | 의뢰 원문, 결제 조건, 배차 연결 상태 확인 | 의뢰 원장, 결제 원장 | 2.0 필수 |
+| SsalddelAdmin-P19 | 배차대기 | `/dispatch/wait`<br>`SsalddelAdmin/Components/Pages/DispatchWait.razor` | 배차대기, 추천중, 후보부족, 잠금 상태 확인 | `api/v1/dispatch/wait` | 2.0 필수 |
+| SsalddelAdmin-P20 | 기사 운행 현황 | `/drivers/operating`<br>`SsalddelAdmin/Components/Pages/DriverOperatingView.razor` | 운행 중 기사, 위치 최신성, 추천 가능 상태 확인 | `api/v1/admin/drivers/operating` | 2.0 필수 보조 |
+| SsalddelAdmin-P21 | 운송 목록 | `/transports`<br>`SsalddelAdmin/Components/Pages/Transports.razor` | 진행 중/완료 운송 목록 확인 | `api/v1/admin/transports` | 2.0 필수 |
+| SsalddelAdmin-P22 | 운송 상세 | `/transports/{RequestId}`<br>`SsalddelAdmin/Components/Pages/TransportWorkflowDetail.razor` | 운송 단계, 기사, 화주, 수령자, 현재 상태를 한 화면에서 확인 | `api/v1/admin/transports` | 2.0 필수 |
 | SsalddelAdmin-P22-1 | 운송 이벤트 | `/transports/{RequestId}/events`<br>`SsalddelAdmin/Components/Pages/TransportWorkflowEvents.razor` | 수락, 거절, 만료, 상차, 하차, 예외 이벤트 감사 | `api/v1/transport-events` | SsalddelAdmin-P22의 세부 화면 |
 | SsalddelAdmin-P22-2 | 운송 증빙 | `/transports/{RequestId}/proofs`<br>`SsalddelAdmin/Components/Pages/TransportWorkflowProofs.razor` | 사진, POD, 인수증, 서명, 문서 연결 확인 | `api/v1/admin/documents`, `api/v1/admin/files/pod` | SsalddelAdmin-P22의 세부 화면 |
 | SsalddelAdmin-P22-3 | 운송 정산 | `/transports/{RequestId}/settlement`<br>`SsalddelAdmin/Components/Pages/TransportWorkflowSettlement.razor` | 기사 정산 후보, 화주 입금 상태, 입금 알림 상태 확인 | `api/v1/payments`, 정산 서비스 | SsalddelAdmin-P22의 세부 화면 |
-| SsalddelAdmin-P26 | 결제 목록 | `/payments`<br>`SsalddelAdmin/Components/Pages/Payments.razor` | 가상계좌 입금대기, 입금완료 확인 | `api/v1/payments` | 1.0 필수 |
+| SsalddelAdmin-P26 | 결제 목록 | `/payments`<br>`SsalddelAdmin/Components/Pages/Payments.razor` | 가상계좌 입금대기, 입금완료 확인 | `api/v1/payments` | 2.0 필수 |
 | SsalddelAdmin-P26-1 | 정산 목록 | `/settlements`<br>`SsalddelAdmin/Components/Pages/Settlements.razor` | 기사 정산 예정/완료 확인 | 정산 API | SsalddelAdmin-P26의 보조 화면 |
-| SsalddelAdmin-P27 | 문서 목록 | `/documents`<br>`SsalddelAdmin/Components/Pages/Documents.razor` | POD와 인수증 문서 보관 상태 확인 | `api/v1/admin/documents` | 1.0 필수 보조 |
+| SsalddelAdmin-P27 | 문서 목록 | `/documents`<br>`SsalddelAdmin/Components/Pages/Documents.razor` | POD와 인수증 문서 보관 상태 확인 | `api/v1/admin/documents` | 2.0 필수 보조 |
 | SsalddelAdmin-P27-1 | 문서 업로드 | `/documents/upload`<br>`SsalddelAdmin/Components/Pages/DocumentUpload.razor` | 증빙 문서 업로드 | 문서 업로드 API | SsalddelAdmin-P27의 세부 화면 |
 | SsalddelAdmin-P27-2 | 문서 정책 목록 | `/documents/policies`<br>`SsalddelAdmin/Components/Pages/DocumentPolicies.razor` | 문서 종류별 보관, 서명, 다운로드 정책 확인 | 문서 정책 | SsalddelAdmin-P27의 세부 화면 |
 | SsalddelAdmin-P27-3 | 문서 정책 상세 | `/documents/policies/{DocumentCode}`<br>`SsalddelAdmin/Components/Pages/DocumentPolicyDetail.razor` | 문서 코드별 세부 정책 확인 | 문서 정책 | SsalddelAdmin-P27의 세부 화면 |
@@ -434,7 +434,7 @@ flowchart LR
 
 ## 수령자와 공개 확인 화면
 
-1.0 최소 운영에서는 수령자 전용 앱 화면을 필수 릴리즈 범위로 두지 않아도 된다. 다만 하차 완료와 POD가 분쟁 방지에 중요하므로, 다음 중 하나는 필요하다.
+2.0 최소 운영에서는 수령자 전용 앱 화면을 필수 릴리즈 범위로 두지 않아도 된다. 다만 하차 완료와 POD가 분쟁 방지에 중요하므로, 다음 중 하나는 필요하다.
 
 | 방식 | 화면 | 처리 기준 |
 | --- | --- | --- |
@@ -477,7 +477,7 @@ flowchart LR
 
 | 번호 | 왜 필요한가 | 보안/암호화 확인 | 관계 페이지·유스케이스 |
 | --- | --- | --- | --- |
-| SsalddelApp-P01 | 화주가 1.0 업무로 들어가는 관문이다. 최근 의뢰와 다음 행동을 보여주되 직접 상태 변경은 하지 않는다. | 홈 요약에는 상세 주소, 연락처, 증빙 원본을 노출하지 않는다. 사용자별 의뢰만 조회되는지 확인한다. | SsalddelApp-P02 운송 의뢰 작성, SsalddelApp-P03 의뢰 상세, 운송의뢰조회 |
+| SsalddelApp-P01 | 화주가 2.0 업무로 들어가는 관문이다. 최근 의뢰와 다음 행동을 보여주되 직접 상태 변경은 하지 않는다. | 홈 요약에는 상세 주소, 연락처, 증빙 원본을 노출하지 않는다. 사용자별 의뢰만 조회되는지 확인한다. | SsalddelApp-P02 운송 의뢰 작성, SsalddelApp-P03 의뢰 상세, 운송의뢰조회 |
 | SsalddelApp-P02 | 운송 의뢰 원장을 생성하는 화면이다. 여기서 입력된 화물, 상하차, 결제 조건이 이후 배차와 증빙의 기준이 된다. | 주소, 연락처, 결제 조건, 화물 특이사항은 전송 구간 암호화와 서버 권한 검증이 필요하다. 금액과 결제 조건은 클라이언트 값을 그대로 신뢰하지 않는다. | SsalddelApp-P02-1, SsalddelApp-P03, SsalddelAdmin-P17, SsalddelAdmin-P19, DriverApp-P08/DriverApp-P09, 운송의뢰등록, 배차대기생성 |
 | SsalddelApp-P02-1 | 운송 의뢰를 대량 등록하는 보조 화면이다. 같은 원장 생성 책임을 가지지만 입력 단위가 여러 건이다. | 파일 업로드, 대량 주소, 연락처, 금액 정보가 포함될 수 있으므로 파일 검증과 행별 권한 검증이 필요하다. | SsalddelApp-P02, SsalddelApp-P03, 대량운송의뢰등록 |
 | SsalddelApp-P03 | 화주가 전체 진행 상태를 한 화면에서 확인하는 기준 화면이다. 상태가 보이지 않으면 운송이 진행되어도 신뢰가 생기기 어렵다. | 역할별 마스킹이 필요하다. 기사 연락처, 상세주소, POD, 결제 정보는 화주 권한과 의뢰 소유권을 확인한 뒤 노출한다. | SsalddelApp-P02, SsalddelApp-P03-1, SsalddelApp-P03-2, DriverApp-P10, DriverApp-P12, DriverApp-P13, SsalddelAdmin-P22-3/SsalddelAdmin-P26, 운송상태조회 |
@@ -567,7 +567,7 @@ flowchart LR
 
 ## 페이지 완료 기준
 
-각 페이지는 다음 조건을 만족해야 1.0 워크플로우에 편입된 것으로 본다.
+각 페이지는 다음 조건을 만족해야 2.0 워크플로우에 편입된 것으로 본다.
 
 1. 화면의 주 책임이 하나로 설명된다.
 2. 화면이 읽는 서버 API와 변경하는 서버 Command가 분리되어 있다.
@@ -588,6 +588,6 @@ flowchart LR
 | 기사 추천 화면 | `DriverApp/Components/Pages/Driver/02_Recommendation` |
 | 기사 진행 화면 | `DriverApp/Components/Pages/Driver/03_Progress` |
 | 기사 정산 화면 | `DriverApp/Components/Pages/Driver/05_Settlement` |
-| 관리자 1.0 화면 | `SsalddelAdmin/Components/Pages/DispatchWait.razor`, `Requests.razor`, `RequestDetail.razor`, `Transports.razor`, `TransportWorkflow*.razor`, `Payments.razor`, `Settlements.razor` |
+| 관리자 2.0 화면 | `SsalddelAdmin/Components/Pages/DispatchWait.razor`, `Requests.razor`, `RequestDetail.razor`, `Transports.razor`, `TransportWorkflow*.razor`, `Payments.razor`, `Settlements.razor` |
 | 서버 API | `Ssalddel/Controllers/Shipper/01_Request`, `Ssalddel/Controllers/Driver`, `Ssalddel/Controllers/Admin` |
 | 배차/추천 서버 흐름 | `Ssalddel/Services/Dispatch/Queue`, `Ssalddel/Services/Dispatch/Recommendation`, `Ssalddel/Application/Driver/DispatchAction` |

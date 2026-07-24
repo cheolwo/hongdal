@@ -1,6 +1,6 @@
-# 살뜰 1.0 페이지 검증 순례
+# 살뜰 2.0 운송 페이지 검증 순례
 
-> 재분류 안내: 파일명과 과거 표기는 링크 호환을 위해 유지하지만 이 운송 검증의 현재 제품 버전은 **2.0**입니다.
+> 재분류 안내: 레거시 파일명은 링크 호환을 위해 유지하지만 이 운송 검증의 현재 제품 버전은 **2.0**입니다.
 
 이 문서는 국내 화물/용달 운송을 실제 화면으로 하나씩 검증하기 위한 순서표다. `ssalddel-v1-required-pages.md`가 필요한 화면의 기준을 정한다면, 이 문서는 그 화면들을 어떤 순서로 눌러 보고 무엇을 확인해야 하는지 정리한다.
 
@@ -40,7 +40,7 @@ flowchart LR
 
 ## E2E 스모크 실행 기준
 
-1.0 E2E 스모크는 상세 기능을 모두 검수하기 전, 운송 한 건이 화주, 기사, 관리자 화면을 거쳐 끊기지 않고 닫히는지만 빠르게 확인하는 운영 점검이다. 이 점검에서는 렌더링만 통과하거나 샘플 데이터가 보이는 상태를 성공으로 보지 않는다.
+2.0 E2E 스모크는 상세 기능을 모두 검수하기 전, 운송 한 건이 화주, 기사, 관리자 화면을 거쳐 끊기지 않고 닫히는지만 빠르게 확인하는 운영 점검이다. 이 점검에서는 렌더링만 통과하거나 샘플 데이터가 보이는 상태를 성공으로 보지 않는다.
 
 | 단계 | 필수 조건 | 실패로 보는 경우 |
 | --- | --- | --- |
@@ -53,20 +53,20 @@ flowchart LR
 
 스모크 결과를 기록할 때는 `requestId`, 기사 ID, 운송 ID, 생성된 파일 `ObjectName`, 결제 ID, 정산 조회 월을 함께 남긴다. 민감한 주소, 연락처, 계좌, POD 원본 URL은 문서에는 마스킹해서 적는다.
 
-서버 원장 상태 전파는 `GET api/v1/transport-request-ledgers/{requestId}/events`도 함께 확인한다. 이 응답의 의뢰, 결제, 배차, 정산, 운송 상태가 화주 상세, 기사 현재 운송, 관리자 운송 상세의 표시값과 어긋나면 1.0 스모크 실패로 본다.
+서버 원장 상태 전파는 `GET api/v1/transport-request-ledgers/{requestId}/events`도 함께 확인한다. 이 응답의 의뢰, 결제, 배차, 정산, 운송 상태가 화주 상세, 기사 현재 운송, 관리자 운송 상세의 표시값과 어긋나면 2.0 스모크 실패로 본다.
 
-### SsalddelApp 1.0 E2E 점검 범위
+### SsalddelApp 2.0 E2E 점검 범위
 
-SsalddelApp은 1.0 스모크에서 운송 의뢰를 만들고, 같은 의뢰가 화주 홈과 상세 타임라인에서 다시 조회되는지를 우선 확인한다. 판매채널, HS 검토, 창고 출고 알림처럼 운영 콘솔에 보이는 보조 흐름은 아직 일부 샘플/인메모리 서비스가 남아 있으므로, 아래 표의 핵심 운송 경로와 분리해서 판단한다.
+SsalddelApp은 2.0 스모크에서 운송 의뢰를 만들고, 같은 의뢰가 화주 홈과 상세 타임라인에서 다시 조회되는지를 우선 확인한다. 판매채널, HS 검토, 창고 출고 알림처럼 운영 콘솔에 보이는 보조 흐름은 아직 일부 샘플/인메모리 서비스가 남아 있으므로, 아래 표의 핵심 운송 경로와 분리해서 판단한다.
 
-| 화면/기능 | 1.0 확인 API | 판정 기준 |
+| 화면/기능 | 2.0 확인 API | 판정 기준 |
 | --- | --- | --- |
 | 홈 `/shipper` | `GET api/v1/shipper/requests?shipperId={userId}`, `GET api/v1/warehouse-operations/warehouses` | 최근 의뢰와 타임라인 진입이 서버 의뢰 목록 기준으로 보인다. |
 | 운송 의뢰 작성 `/shipper/request` | `POST api/v1/shipper/requests/recommend-vehicle`, `POST api/v1/shipper/requests/fare-estimate`, `POST api/v1/shipper/requests` | 차량 후보, 기준 운임, 의뢰 생성이 같은 인증 세션으로 이어진다. |
 | 의뢰 상세 `/shipper/request/{requestId}` | `GET api/v1/shipper/requests/{requestId}` | 결제, 배차, 수락, 상차, 하차, 정산 상태가 방금 만든 `requestId`로 다시 보인다. |
 | CSV 일괄등록 `/shipper/request/bulk` | `POST api/v1/shipper/requests/bulk/preview`, `POST api/v1/shipper/requests/bulk/confirm-preview` | 미리보기와 확정 등록이 인메모리 결과가 아니라 서버 파서/검증 결과로 표시된다. |
 | 공개 화물 `/shipper/public-cargo` | `GET api/v1/shipper/requests/public` | 공개 상태 의뢰만 익명 요약으로 조회된다. |
-| 결제 진입 | `POST api/v1/payments/prepare`, `POST api/v1/payments/toss/prepare`, 승인 API | 현재 SsalddelApp은 결제 상태 표시 중심이다. 실제 결제창 준비/승인 호출이 없으면 1.0 결제 E2E 완료로 보지 않는다. |
+| 결제 진입 | `POST api/v1/payments/prepare`, `POST api/v1/payments/toss/prepare`, 승인 API | 현재 SsalddelApp은 결제 상태 표시 중심이다. 실제 결제창 준비/승인 호출이 없으면 2.0 결제 E2E 완료로 보지 않는다. |
 
 ## 필수 화면 검증 표
 
@@ -98,7 +98,7 @@ SsalddelApp은 1.0 스모크에서 운송 의뢰를 만들고, 같은 의뢰가 
 
 ## 운영 보조 화면
 
-아래 화면은 운송 흐름을 직접 전진시키지는 않지만, 1.0 운영에서 막힌 상태를 찾거나 민원/연락처 확인을 돕는다. 필수 화면 검증 뒤에 같이 본다.
+아래 화면은 운송 흐름을 직접 전진시키지는 않지만, 2.0 운영에서 막힌 상태를 찾거나 민원/연락처 확인을 돕는다. 필수 화면 검증 뒤에 같이 본다.
 
 | 페이지 | 라우트 | 검증할 것 |
 | --- | --- | --- |
@@ -106,7 +106,7 @@ SsalddelApp은 1.0 스모크에서 운송 의뢰를 만들고, 같은 의뢰가 
 | `SsalddelAdmin-P32` 기사 목록/관리 | `/drivers` | 기사 연락처, 차량, 최근 배차 내역 확인 |
 | `SsalddelAdmin-P33` 파트너 관리 | `/partners` | 화주 계정과 업체 연락처 확인 |
 | `SsalddelAdmin-P36` 연락처 통합 검색 | `/contact-search` | 전화번호 뒤 8자리로 기사/화주/창고 사용자 정보를 함께 조회 |
-| `SsalddelAdmin-P24` 화면/기능 노출 정책 | `/view-policies` | 1.0 필수 화면이 정책 때문에 숨겨지지 않는지 확인 |
+| `SsalddelAdmin-P24` 화면/기능 노출 정책 | `/view-policies` | 2.0 필수 화면이 정책 때문에 숨겨지지 않는지 확인 |
 | `SsalddelAdmin-P35` 보조 기능 설정 | `/auxiliary-feature-settings` | 알림, 기록, 후속 처리 같은 부가 기능이 정책과 맞는지 확인 |
 
 ## 한 페이지를 검증할 때 남길 기록

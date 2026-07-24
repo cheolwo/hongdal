@@ -8,6 +8,7 @@
 | --- | --- | --- | --- |
 | `CommunityTrustWorkflow` | `0.0` | `true` | 커뮤니티, 참여 동의, 공동 원장과 신뢰 기록 |
 | `GroupPurchaseDemandWorkflow` | `1.0` | `false` | 비구속 수요, 주문자 집단화와 공동구매 모집 원장 |
+| `GroupPurchasePracticeWorkflow` | `1.0` | `true` | 저장 없는 가상 이웃 공동구매 연습과 실제 수요 전환 안내 |
 | `CustomsAndTradeDataWorkflow` | `1.5` | `false` | 공급·가격·HS·HTS·통관 참고 자료와 무역 준비 |
 | `DomesticTransportWorkflow` | `2.0` | `false` | 화주 운송 의뢰, 기사 인계, 배차·증빙·정산 준비 |
 | `WarehouseFulfillmentWorkflow` | `2.5` | `false` | 입고, 재고, 피킹, 포장과 출고 |
@@ -16,7 +17,7 @@
 | `FoodDeliveryWorkflow` | `3.0` | `false` | 음식점 주문, 조리, 픽업과 배송 |
 | `SsalddelMartWorkflow` | `3.5` | `false` | 마트 재고, 피킹, 포장과 도심 즉시배송 |
 
-현재 개발 환경은 `GroupPurchaseDemandWorkflow=true`, `CustomsAndTradeDataWorkflow=true`로 `1.0 → 1.5` 준비 흐름을 검증할 수 있습니다. 운영 환경에서는 별도 승인 전 두 값을 `false`로 유지합니다.
+현재 개발 환경은 `GroupPurchasePracticeWorkflow=true`, `GroupPurchaseDemandWorkflow=true`, `CustomsAndTradeDataWorkflow=true`로 연습부터 `1.0 → 1.5` 준비 흐름까지 검증할 수 있습니다. 운영 환경에서는 저장 없는 연습만 독립적으로 열 수 있고, 별도 승인 전 실수요와 무역 준비 두 값은 `false`로 유지합니다.
 
 ## 운영 예시
 
@@ -24,6 +25,7 @@
 {
   "VersionFeatureFlags": {
     "CommunityTrustWorkflow": true,
+    "GroupPurchasePracticeWorkflow": true,
     "GroupPurchaseDemandWorkflow": false,
     "GroupPurchaseImportWorkflow": false,
     "CustomsAndTradeDataWorkflow": false,

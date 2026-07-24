@@ -15,7 +15,7 @@
 | 라우트 | /contact-search |
 | 소스 파일 | [SsalddelAdmin/Components/Pages/ContactSearch.razor](../../../../../SsalddelAdmin/Components/Pages/ContactSearch.razor) |
 | 분류 | 운영 |
-| 1.0 필수 연결 | 운영 보조 |
+| 2.0 운송 필수 연결 | 운영 보조 |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가

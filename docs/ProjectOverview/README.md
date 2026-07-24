@@ -2,7 +2,7 @@
 
 이 폴더는 루트 `README.md`에서 덜어낸 상세 문서를 모아 둡니다. 처음에는 기술 구조보다 **현재 존재하는 화면과 캡처**를 먼저 봅니다.
 
-루트 README는 0.0 커뮤니티·공공데이터 기반, 1.0 공동구매·주문자 집단화와 현재 1.5 공급·무역 준비 흐름을 먼저 보여 줍니다. 이 폴더에서는 글쓰기와 음식·재료 탐색에서 준비 원장으로 이어지는 통합 클라이언트를 먼저 보고, 코드 프로젝트별 화면과 기술 설명을 뒤에서 확인합니다.
+루트 README는 문화교통 0.0 커뮤니티·공공데이터 기반, 1.0 공동구매·주문자 집단화와 현재 1.5 공급·무역 준비 흐름을 먼저 보여 줍니다. 이 폴더에서는 글쓰기와 음식·재료 탐색에서 준비 원장으로 이어지는 통합 클라이언트를 먼저 보고, 코드 프로젝트별 화면과 기술 설명을 뒤에서 확인합니다.
 
 ## 화면으로 먼저 보기
 
@@ -41,6 +41,7 @@
 | 0.0 | [Ssalddel 0.0](../Versions/v0.0/README.md) | 글쓰기 → 가원장 → 역할 슬롯 → 실원장으로 이어지는 현재 제품 범위 |
 | 00 | [첨부 문서 목차](00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
 | 01 | [page-docs/README.md](page-docs/README.md) | 각 화면별 독립 README와 인라인 캡처, 상세 설명 |
+| 01-A | [community-board-field-focus-guide.md](community-board-field-focus-guide.md) | 배달 현장에서 게시판 하나씩 관찰·검토하기 위한 질문, 근거, 안전·개인정보 경계와 16개 업무 게시판 점검표 |
 | 02 | [unified-community-client.md](unified-community-client.md) | 통합 홈, 역할, 모바일 다이어그램, 사방 이동, 꾸미기 상점 |
 | 03 | [ThreeStageClientNavigation.md](../Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지의 사용자 화면 구조 |
 | 04 | [app-page-catalog.md](app-page-catalog.md) | 코드 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |

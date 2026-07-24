@@ -1,4 +1,4 @@
-# Ssalddel 0.0 Release Checklist
+# 문화교통 0.0 Release Checklist
 
 작업 순서는 [0.0 집중 로드맵](./focus-roadmap.md)의 `0.0-A`부터 `0.0-E`까지를 따릅니다. 이 문서는 각 단계가 실제로 완료되었는지를 판정합니다.
 
