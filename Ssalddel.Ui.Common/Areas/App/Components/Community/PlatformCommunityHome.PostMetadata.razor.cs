@@ -24,6 +24,14 @@ public partial class PlatformCommunityHome
             var categories = new List<string>
             {
                 PlatformCommunityPostCategories.General,
+            };
+            categories.AddRange(
+                CommunityPeriodicDataBoardCatalog.All
+                    .Select(board => CommunityBoardCatalog.Find(board.BoardKey)?.DisplayName)
+                    .Where(displayName => !string.IsNullOrWhiteSpace(displayName))
+                    .Select(displayName => displayName!));
+            categories.AddRange(
+            [
                 PlatformCommunityPostCategories.Sales,
                 "시스템 다이어그램",
                 "운송 실무",
@@ -32,7 +40,7 @@ public partial class PlatformCommunityHome
                 "생활 원장",
                 "개선 제안",
                 "신고/분쟁"
-            };
+            ]);
 
             foreach (var board in approvedBoards)
             {

@@ -1,4 +1,5 @@
 @page "/shipper/sales/channels"
+@layout ShipperMobileLayout
 @inherits MvvmComponentBase<화주판매채널계정PageViewModel>
 @inject NavigationManager Navigation
 
@@ -6,7 +7,8 @@
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-6">
     <MudStack Spacing="3">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <span class="shipper-mobile-screen-code">화주 업무 · 03.15</span>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="shipper-mobile-page-header">
             <MudStack Spacing="0">
                 <MudText Typo="Typo.h4">판매채널 연결</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">

@@ -4,7 +4,15 @@
 
 <PageTitle>개별수출 원장</PageTitle>
 
-<IndividualExportLedgerScreen OrderLedgerId="@OrderLedgerId" />
+<OrdererMobileRouteFrame ScreenCode="02.13"
+                         Title="개별수출 원장"
+                         Description="개별주문 원장의 수출 대상과 물류·규정 상태를 봅니다."
+                         BackHref="@OrdererRoutes.Orders"
+                         BackLabel="주문 원장"
+                         BoundaryMessage="수출 신고 제출, 포워더 전송과 선적 실행은 별도 승인 전까지 차단됩니다.">
+    <IndividualExportLedgerScreen OrderLedgerId="@OrderLedgerId"
+                                  ShowHeading="false" />
+</OrdererMobileRouteFrame>
 
 @code {
     [Parameter] public string? OrderLedgerId { get; set; }

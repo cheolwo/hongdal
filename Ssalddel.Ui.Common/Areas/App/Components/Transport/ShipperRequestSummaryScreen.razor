@@ -3,9 +3,10 @@
 <ShipperRequestDetailScreenFrame State="@State"
                                  Context="@Context"
                                  CurrentScreen="ShipperRequestDetailScreenKind.Summary"
+                                 ScreenCode="@ScreenCode"
                                  Eyebrow="요약"
-                                 Title="운송 의뢰 요약"
-                                 Description="화물, 경로, 비용과 현재 상태를 한 번에 확인합니다."
+                                 Title="@Title"
+                                 Description="@Description"
                                  HomeHref="@HomeHref"
                                  NewRequestHref="@NewRequestHref"
                                  LoginHref="@LoginHref"
@@ -96,6 +97,9 @@
 @code {
     [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
     [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
+    [Parameter] public string? ScreenCode { get; set; }
+    [Parameter] public string Title { get; set; } = "운송 의뢰 요약";
+    [Parameter] public string Description { get; set; } = "화물, 경로, 비용과 현재 상태를 한 번에 확인합니다.";
     [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string NewRequestHref { get; set; } = string.Empty;
     [Parameter] public string LoginHref { get; set; } = "/login";

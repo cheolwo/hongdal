@@ -10,6 +10,20 @@ public sealed record CommunityMobileLifeBoardPresentation(
     string Icon,
     string Tone);
 
+public sealed record CommunityMobilePublicDataBoardPresentation(
+    string BoardKey,
+    string DisplayName,
+    string Provider,
+    string Description,
+    string UpdateCycle,
+    string Icon,
+    string Tone)
+{
+    public string Href => CommunityPageRoutes.BoardsFor(
+        boardKey: BoardKey,
+        listFilter: CommunityPeriodicPostTopicCatalog.PeriodicListFilter);
+}
+
 public sealed record CommunityMobileWorkGroupPresentation(
     string Key,
     string ScreenCode,
@@ -57,6 +71,42 @@ public static class CommunityMobileBoardPresentation
             "가까운 이웃과 나누고 만나는 공간",
             Icons.Material.Filled.Groups,
             "indigo")
+    ];
+
+    public static IReadOnlyList<CommunityMobilePublicDataBoardPresentation> PublicDataBoards { get; } =
+    [
+        new(
+            CommunityBoardKeys.PeriodicDataKamis,
+            "KAMIS 가격",
+            "한국농수산식품유통공사",
+            "농수산물 조사일·품목·등급·단위별 관측",
+            "일별·월별",
+            Icons.Material.Filled.QueryStats,
+            "green"),
+        new(
+            CommunityBoardKeys.PeriodicDataMfds,
+            "MFDS 수입식품",
+            "식품의약품안전처",
+            "수입식품 제조업소의 중국 권역·미국 주별 근거",
+            "주별 조사·월별 게시",
+            Icons.Material.Filled.FactCheck,
+            "blue"),
+        new(
+            CommunityBoardKeys.PeriodicDataUsda,
+            "USDA 가격",
+            "USDA NASS",
+            "미국 전국 생산자 수취가격의 기준월별 관측",
+            "월별",
+            Icons.Material.Filled.Agriculture,
+            "amber"),
+        new(
+            CommunityBoardKeys.PeriodicDataCustomsImportUnitPrice,
+            "관세청 수입단가",
+            "관세청",
+            "품목·국가·기간별 CIF 수입 평균단가",
+            "요청 시·주기화 후보",
+            Icons.Material.Filled.Public,
+            "violet")
     ];
 
     public static IReadOnlyList<CommunityMobileWorkGroupPresentation> WorkGroups { get; } =

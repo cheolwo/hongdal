@@ -1,14 +1,9 @@
-﻿@page "/"
+@page "/"
+@inject NavigationManager Navigation
 
 <PageTitle>살뜰 창고</PageTitle>
 
-<CommunityWorkspaceScreen AppName="살뜰 창고"
-                          RoleLabel="창고 관리자"
-                          AppKey="warehouse-manager"
-                          CargoRequestDraftHrefBase="@WarehouseManagerRoutes.TransportRequestDraft"
-                          WorkspaceOnly="true"
-                          ShowWorkspaceNavigation="true"
-                          UseBaguaRoleTransitionPages="false"
-                          StoreHref="@WarehouseManagerRoutes.MartHome"
-                          QuickActions="@WarehousePlatformHomeNavigationCatalog.QuickActions"
-                          CardinalNavigationOptions="@WarehousePlatformHomeNavigationCatalog.CardinalNavigationOptions" />
+@code {
+    protected override void OnInitialized()
+        => Navigation.NavigateTo(WarehouseManagerRoutes.Warehouse, replace: true);
+}

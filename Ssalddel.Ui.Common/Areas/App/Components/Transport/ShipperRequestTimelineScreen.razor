@@ -3,9 +3,10 @@
 <ShipperRequestDetailScreenFrame State="@State"
                                  Context="@Context"
                                  CurrentScreen="ShipperRequestDetailScreenKind.Timeline"
+                                 ScreenCode="@ScreenCode"
                                  Eyebrow="진행 이력"
-                                 Title="운송 진행 이력"
-                                 Description="결제, 배차, 수락, 상차, 하차와 정산 상태를 원장 순서로 확인합니다."
+                                 Title="@Title"
+                                 Description="@Description"
                                  HomeHref="@HomeHref"
                                  NewRequestHref="@NewRequestHref"
                                  LoginHref="@LoginHref"
@@ -41,6 +42,9 @@
 @code {
     [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
     [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
+    [Parameter] public string? ScreenCode { get; set; }
+    [Parameter] public string Title { get; set; } = "운송 진행 이력";
+    [Parameter] public string Description { get; set; } = "결제, 배차, 수락, 상차, 하차와 정산 상태를 원장 순서로 확인합니다.";
     [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string NewRequestHref { get; set; } = string.Empty;
     [Parameter] public string LoginHref { get; set; } = "/login";

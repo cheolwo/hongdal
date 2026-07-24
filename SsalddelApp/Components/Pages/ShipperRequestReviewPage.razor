@@ -1,12 +1,16 @@
 @page "/shipper/request/review"
 @page "/shipper/request/summary"
+@layout ShipperMobileLayout
 @inject ShipperRequestAuthoringPageViewModel PageModel
 @inject NavigationManager Navigation
 
-<PageTitle>화주 운송 의뢰 - 최종 확인</PageTitle>
+<PageTitle>의뢰 최종 검토</PageTitle>
 
 <ShipperRequestReviewScreen ViewModel="PageModel.State"
                             NavigationContext="RouteContext"
+                            ScreenCode="03.06"
+                            Title="의뢰 최종 검토"
+                            Description="누락과 실행 경계를 확인한 뒤 의뢰 등록을 요청합니다."
                             RegistrationEnabled="PageModel.RegistrationEnabled"
                             RegistrationBoundaryMessage="@PageModel.RegistrationBoundaryMessage"
                             StatusMessage="@PageModel.StatusMessage"

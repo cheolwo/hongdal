@@ -4,16 +4,19 @@ public static class DriverRoutes
 {
     public const string Login = "/login";
     public const string Home = "/driver/home";
+    public const string HomeSummary = "/driver/home/summary";
     public const string Menu = "/driver/menu";
     public const string WorkStart = "/driver/work/start";
     public const string CommunityInquiries = "/driver/work/community-inquiries";
     public const string Recommendations = "/driver/recommendations";
+    public const string ExplorationCampaigns = "/driver/exploration/campaigns";
     public const string Reservations = "/driver/reservations";
     public const string CurrentTransport = "/driver/transports/current";
     public const string DeliveryHistory = "/driver/transports/history";
     public const string CurrentMonthSettlement = "/driver/settlements/current-month";
     public const string SettlementInfo = "/driver/settlements/info";
     public const string BankAccount = "/driver/account/bank";
+    public const string Notifications = "/driver/notifications";
     public const string NotificationSettings = "/driver/notifications/settings";
 
     public static string RecommendationDetail(string requestId) => $"/driver/recommendations/{requestId}";

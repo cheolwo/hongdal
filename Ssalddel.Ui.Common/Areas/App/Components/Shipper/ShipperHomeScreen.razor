@@ -4,14 +4,14 @@
 @using Ssalddel.Contracts.Shipper.Request
 @inject ShipperHomePageViewModel ViewModel
 
-<PageTitle>화주 업무 허브 · Ssalddel</PageTitle>
+<PageTitle>@HomeTitle · Ssalddel</PageTitle>
 
-<main class="shipper-home">
+<main class="@HomeClass">
     <header class="shipper-home__hero">
         <div class="shipper-home__hero-copy">
-            <span>COMMUNITY-FIRST SHIPPER HUB</span>
-            <h1>화주 업무 허브</h1>
-            <p>커뮤니티에서 확인한 필요를 바탕으로, 지금 활성화된 운송·창고·판매·통관 업무만 명시적으로 시작합니다.</p>
+            <span>@HomeEyebrow</span>
+            <h1>@HomeTitle</h1>
+            <p>@HomeDescription</p>
         </div>
         <div class="shipper-home__hero-actions">
             <MudButton Href="@CommunityPageRoutes.Home"
@@ -188,6 +188,19 @@
 
 @code {
     [Parameter]
+    public bool CompactPresentation { get; set; }
+
+    [Parameter]
+    public string? ScreenCode { get; set; }
+
+    [Parameter]
+    public string HomeTitle { get; set; } = "화주 업무 허브";
+
+    [Parameter]
+    public string HomeDescription { get; set; }
+        = "커뮤니티에서 확인한 필요를 바탕으로, 지금 활성화된 운송·창고·판매·통관 업무만 명시적으로 시작합니다.";
+
+    [Parameter]
     public string TransportHref { get; set; } = ShipperHomePageRoutes.DefaultTransportEntry;
 
     [Parameter]
@@ -207,6 +220,16 @@
 
     [Parameter]
     public RenderFragment? AdditionalTools { get; set; }
+
+    private string HomeClass
+        => CompactPresentation
+            ? "shipper-home shipper-home--compact"
+            : "shipper-home";
+
+    private string HomeEyebrow
+        => !string.IsNullOrWhiteSpace(ScreenCode)
+            ? $"화주 업무 · {ScreenCode}"
+            : "COMMUNITY-FIRST SHIPPER HUB";
 
     private ShipperHomeDashboardSnapshot Snapshot => ViewModel.Snapshot;
 

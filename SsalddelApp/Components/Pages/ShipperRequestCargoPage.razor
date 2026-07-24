@@ -1,11 +1,15 @@
 @page "/shipper/request/cargo"
+@layout ShipperMobileLayout
 @inject ShipperRequestAuthoringPageViewModel PageModel
 @inject NavigationManager Navigation
 
-<PageTitle>화주 운송 의뢰 - 화물 정보</PageTitle>
+<PageTitle>화물 조건 입력</PageTitle>
 
 <ShipperRequestCargoScreen ViewModel="PageModel.State"
                            NavigationContext="RouteContext"
+                           ScreenCode="03.03"
+                           Title="화물 조건 입력"
+                           Description="품목·수량·취급 조건을 운송 검토용 초안으로 기록합니다."
                            RootBackHref="@ShipperRoutes.ShipperHome"
                            RootBackLabel="화주 홈"
                            BulkHref="@ShipperRequestPageRoutes.Bulk"

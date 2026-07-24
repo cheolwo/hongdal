@@ -3,4 +3,11 @@
 
 <PageTitle>공동수출 원장</PageTitle>
 
-<GroupExportLedgerScreen />
+<OrdererMobileRouteFrame ScreenCode="02.14"
+                         Title="공동수출 원장"
+                         Description="여러 개별수출의 집하·합포장·인계 후보를 조율합니다."
+                         BackHref="@OrdererRoutes.Orders"
+                         BackLabel="주문 원장"
+                         BoundaryMessage="개별 원장과 수출자별 서류 원본은 유지되며 자동 합포장·선적을 실행하지 않습니다.">
+    <GroupExportLedgerScreen ShowHeading="false" />
+</OrdererMobileRouteFrame>

@@ -1,11 +1,15 @@
 @page "/shipper/request/transport"
+@layout ShipperMobileLayout
 @inject ShipperRequestAuthoringPageViewModel PageModel
 @inject NavigationManager Navigation
 
-<PageTitle>화주 운송 의뢰 - 운송 정보</PageTitle>
+<PageTitle>운송 조건 입력</PageTitle>
 
 <ShipperRequestTransportScreen ViewModel="PageModel.State"
                                NavigationContext="RouteContext"
+                               ScreenCode="03.04"
+                               Title="운송 조건 입력"
+                               Description="출발지·도착지·희망 시간과 현장 요청 조건을 입력합니다."
                                RootBackHref="@ShipperRoutes.ShipperHome"
                                RootBackLabel="화주 홈"
                                Changed="PageModel.AutoSaveAsync" />

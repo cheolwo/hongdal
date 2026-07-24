@@ -67,6 +67,7 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<IDriverExplorationCampaignService>(sp => sp.GetRequiredService<탐색캠페인샘플Service>());
         services.AddSingleton<I공통콘텐츠Service, 샘플공통콘텐츠Service>();
         services.AddSingleton<DriverViewVisibilityService>();
+        services.AddSingleton<IDriverNativeMapNavigator, DriverNativeMapNavigator>();
         services.AddScoped<AuthApiService>();
         services.AddSingleton<IDriverTransportApiService, DriverTransportApiService>();
         services.AddSingleton<HttpDriverTransportCompletionPhotoService>();

@@ -1,11 +1,15 @@
 @page "/shipper/request/{RequestId}/proofs"
+@layout ShipperMobileLayout
 @inject ShipperRequestDetailPageViewModel PageModel
 @implements IDisposable
 
-<PageTitle>운송 의뢰 증빙</PageTitle>
+<PageTitle>증빙 관리</PageTitle>
 
 <ShipperRequestProofsScreen State="@PageModel.State"
                             Context="@RouteContext"
+                            ScreenCode="03.10"
+                            Title="증빙 관리"
+                            Description="문서 과정에서 필요한 증빙의 존재와 검수 상태를 확인합니다."
                             HomeHref="@ShipperRoutes.ShipperHome"
                             NewRequestHref="@ShipperRoutes.Request"
                             RefreshRequested="RefreshAsync" />

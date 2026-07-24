@@ -6,6 +6,13 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-24 | [업무 앱 로그에서 커뮤니티 인연으로 이어지는 장](2026-07-24-community-work-relationships.md) | 02~05에서 생기는 업무 접점을 01 커뮤니티에서 양쪽 당사자가 다시 확인하고 별도 동의로 연결 요청하는 Route 추가, 현재 실제 자동 기록인 기사·화주 배차 인연으로 검증 |
+| 2026-07-24 | [MAUI 01 탐색형·02~05 목적형 역할 홈](2026-07-24-maui-role-purpose-navigation.md) | 기존의 깔끔한 역할별 디자인을 유지하면서 01은 정보 둘러보기, 02~05는 시작·진행·확인·완료 근거의 실제 업무 Route 중심으로 재구성하고 Windows MAUI 5개 화면 확인 |
+| 2026-07-24 | [MAUI Warehouse 05 Figma 근접 구현](2026-07-24-maui-warehouse-figma-05.md) | 별도 창고 관리자 MAUI 앱에 Figma 05의 주황색 모바일 Shell과 `05.01~05.20` 입고·검수·재고·피킹·포장·출고 책임을 적용하고 홈·입고·작업·출고 흐름을 실제 Windows에서 확인 |
+| 2026-07-24 | [MAUI Driver 04 Figma 근접 구현](2026-07-24-maui-driver-figma-04.md) | 별도 기사 MAUI 앱에 Figma 04의 청록색 모바일 Shell과 `04.01~04.15` 기사 업무 책임을 적용하고 홈·추천·운송·정산 및 기존 네이티브 지도 왕복을 실제 Windows에서 확인 |
+| 2026-07-24 | [MAUI Shipper 03 Figma 근접 구현](2026-07-24-maui-shipper-figma-03.md) | 통합 MAUI 앱의 화주 영역에 Figma 03의 밝은 모바일 Shell과 `03.01~03.18` 운송·입고·통관·판매·창고 책임을 적용하고 실제 Windows에서 홈·의뢰·입고·판매 흐름을 확인 |
+| 2026-07-24 | [MAUI 공공데이터 전용 게시판](2026-07-24-maui-public-data-boards.md) | 통합 MAUI 커뮤니티에 KAMIS·MFDS·USDA·관세청 원천 게시판 카드와 drawer 바로가기를 추가하고 같은 canonical 게시판·`주기성` route를 실제 Windows에서 확인 |
+| 2026-07-24 | [MAUI Orderer 02 Figma 근접 구현](2026-07-24-maui-orderer-figma-02.md) | 별도 주문자 MAUI 앱에 Figma 02의 보라색 모바일 Shell, `02.01~02.14` 업무 책임, 홈·재료·원함·원장 내비게이션을 적용하고 기존 로그인·원장 흐름을 실제 Windows에서 확인 |
 | 2026-07-24 | [0.0 커뮤니티 지역 문화·특산물 탐색](2026-07-24-community-regional-culture.md) | 미국의 주와 중국의 현재 성·역사문화권을 구분해 문화 질문·대표 특산물·근거 확인 경계를 보여 주고 커뮤니티 이야기로 연결, desktop·390px 실제 확인 |
 | 2026-07-24 | [원천별 주기성 데이터 전용 게시판](2026-07-24-periodic-data-source-boards.md) | KAMIS·MFDS·USDA·관세청 수입단가를 단일 저장 게시판으로 분리하고 관련 게시판은 대표 안내로 `주기성` 목록에 연결, desktop·390px 실제 확인 |
 | 2026-07-24 | [MAUI Community 01 Figma 근접 구현](2026-07-24-maui-community-figma-01.md) | 통합 MAUI 앱의 게시판 모음을 Figma 01의 밝은 모바일 Shell, 생활·업무 토글, 업무 묶음, 하단 내비게이션과 FAB로 구현하고 실제 Windows 렌더 확인 |

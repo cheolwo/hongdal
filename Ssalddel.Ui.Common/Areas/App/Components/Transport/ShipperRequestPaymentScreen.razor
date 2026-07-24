@@ -3,9 +3,10 @@
 <ShipperRequestDetailScreenFrame State="@State"
                                  Context="@Context"
                                  CurrentScreen="ShipperRequestDetailScreenKind.Payment"
+                                 ScreenCode="@ScreenCode"
                                  Eyebrow="결제"
-                                 Title="운송 결제"
-                                 Description="결제·수납 조건을 확인하고 허용된 개발 환경에서만 FakePG를 실행합니다."
+                                 Title="@Title"
+                                 Description="@Description"
                                  HomeHref="@HomeHref"
                                  NewRequestHref="@NewRequestHref"
                                  LoginHref="@LoginHref"
@@ -133,6 +134,9 @@
 @code {
     [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
     [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
+    [Parameter] public string? ScreenCode { get; set; }
+    [Parameter] public string Title { get; set; } = "운송 결제";
+    [Parameter] public string Description { get; set; } = "결제·수납 조건을 확인하고 허용된 개발 환경에서만 FakePG를 실행합니다.";
     [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string NewRequestHref { get; set; } = string.Empty;
     [Parameter] public string LoginHref { get; set; } = "/login";

@@ -1,0 +1,34 @@
+<section class="shipper-mobile-route">
+    <header class="shipper-mobile-route__header">
+        <span>화주 업무 · @ScreenCode</span>
+        <div>
+            <h1>@Title</h1>
+            @if (!string.IsNullOrWhiteSpace(Badge))
+            {
+                <small>@Badge</small>
+            }
+        </div>
+        <p>@Description</p>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(BoundaryMessage))
+    {
+        <aside class="shipper-mobile-route__boundary">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+            <span>@BoundaryMessage</span>
+        </aside>
+    }
+
+    <div class="shipper-mobile-route__body">
+        @ChildContent
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public string ScreenCode { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter] public string? Badge { get; set; }
+    [Parameter] public string? BoundaryMessage { get; set; }
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+}

@@ -1,80 +1,186 @@
 @inherits LayoutComponentBase
 @implements IDisposable
-@inject NavigationManager NavigationManager
-@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager Navigation
 
-<MudLayout>
-    <MudAppBar Elevation="0" Dense="true">
-        <MudButton Variant="Variant.Text" Color="Color.Inherit" Disabled="@(!CanGoBack)" OnClick="GoBack" Class="back-nav-button">← 뒤로가기</MudButton>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
-        <MudText Typo="Typo.subtitle1" Class="ml-2">살뜰 창고</MudText>
-        <MudSpacer />
-        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">현장 앱</MudChip>
-    </MudAppBar>
+<div class="warehouse-mobile-shell">
+    <header class="warehouse-mobile-shell__appbar">
+        <button type="button"
+                class="warehouse-mobile-shell__icon-button"
+                aria-label="창고 메뉴 열기"
+                aria-expanded="@_drawerOpen"
+                @onclick="ToggleDrawer">
+            <MudIcon Icon="@Icons.Material.Filled.Menu" Size="Size.Small" />
+        </button>
+        <a class="warehouse-mobile-shell__brand" href="@WarehouseManagerRoutes.Warehouse">
+            <strong>살뜰 창고</strong>
+            <small>일반 입출고</small>
+        </a>
+        <span class="warehouse-mobile-shell__spacer"></span>
+        <span class="warehouse-mobile-shell__site">A-01</span>
+        <span class="warehouse-mobile-shell__avatar" aria-label="창고 관리자">W</span>
+    </header>
 
-    <MudDrawer @bind-Open="drawerOpen" Elevation="1" Variant="@DrawerVariant.Responsive" ClipMode="DrawerClipMode.Always">
-        <NavMenu />
-    </MudDrawer>
-
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.False" Class="pa-4">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
-
-@code {
-    private bool drawerOpen = true;
-    private readonly Stack<string> _navigationHistory = new();
-    private string? _currentUri;
-    private bool _isNavigatingBack;
-
-    private bool CanGoBack => _navigationHistory.Count > 0;
-
-    protected override void OnInitialized()
+    @if (_drawerOpen)
     {
-        NavigationManager.LocationChanged += HandleLocationChanged;
-        _currentUri = NavigationManager.Uri;
+        <button type="button"
+                class="warehouse-mobile-shell__backdrop"
+                aria-label="창고 메뉴 닫기"
+                @onclick="CloseDrawer"></button>
+        <aside class="warehouse-mobile-shell__drawer" aria-label="창고 메뉴">
+            <header>
+                <div>
+                    <strong>살뜰 창고</strong>
+                    <span>입고에서 출고 인계까지</span>
+                </div>
+                <button type="button" aria-label="메뉴 닫기" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                </button>
+            </header>
+
+            <nav>
+                @foreach (var item in DrawerItems)
+                {
+                    <a href="@item.Route" @onclick="CloseDrawer">
+                        <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                        <span>@item.Label</span>
+                    </a>
+                }
+            </nav>
+
+            <aside>
+                <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                <span>수량·파손·온도·주소 차이는 숨기지 않고 예외로 남겨 담당자와 근거를 확인한 뒤 처리합니다.</span>
+            </aside>
+        </aside>
     }
 
-    private void ToggleDrawer()
-    {
-        drawerOpen = !drawerOpen;
-    }
-
-    private void GoBack()
-    {
-        if (_navigationHistory.Count == 0)
+    <main class="warehouse-mobile-shell__content">
+        @if (CurrentScreen is not null)
         {
-            return;
+            <header class="warehouse-mobile-shell__screen-header">
+                <span>창고 업무 · @CurrentScreen.ScreenCode</span>
+                <div>
+                    <h1>@CurrentScreen.Title</h1>
+                    <small>@CurrentScreen.Badge</small>
+                </div>
+                <p>@CurrentScreen.Description</p>
+            </header>
         }
 
-        var previousUri = _navigationHistory.Pop();
-        _isNavigatingBack = true;
-        NavigationManager.NavigateTo(previousUri);
-    }
+        <section class="warehouse-mobile-shell__screen-body">
+            @Body
+        </section>
+    </main>
+
+    <footer class="warehouse-mobile-shell__bottom-nav" aria-label="창고 주요 메뉴">
+        <a class="@BuildBottomLinkClass(BottomDestination.Home)"
+           href="@WarehouseManagerRoutes.Warehouse"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Home) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+            <span>홈</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Inbound)"
+           href="@WarehouseManagerRoutes.ExpectedInbounds"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Inbound) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.South" Size="Size.Small" />
+            <span>입고</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Work)"
+           href="@WarehouseManagerRoutes.WorkBoard"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Work) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.GridView" Size="Size.Small" />
+            <span>작업</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Outbound)"
+           href="@WarehouseManagerRoutes.OutboundPlanReview"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Outbound) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.North" Size="Size.Small" />
+            <span>출고</span>
+        </a>
+    </footer>
+</div>
+
+@code {
+    private bool _drawerOpen;
+
+    private string CurrentPath
+        => new Uri(Navigation.Uri).AbsolutePath.TrimEnd('/') is { Length: > 0 } path
+            ? path
+            : "/";
+
+    private WarehouseMobileScreenDefinition? CurrentScreen
+        => WarehouseMobileScreenCatalog.Resolve(CurrentPath);
+
+    private static IReadOnlyList<WarehouseDrawerItem> DrawerItems =>
+    [
+        new("창고 운영 홈", WarehouseManagerRoutes.Warehouse, Icons.Material.Filled.Home),
+        new("창고 작업 보드", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban),
+        new("입고 예정 조회", WarehouseManagerRoutes.ExpectedInbounds, Icons.Material.Filled.EventAvailable),
+        new("스캔 스테이션", WarehouseManagerRoutes.Scan, Icons.Material.Filled.QrCodeScanner),
+        new("입고상품 수령", WarehouseManagerRoutes.InboundProductScan, Icons.Material.Filled.MoveToInbox),
+        new("입고 검수 목록", WarehouseManagerRoutes.InboundInspection, Icons.Material.Filled.FactCheck),
+        new("적재 작업", WarehouseManagerRoutes.PutAwayTask, Icons.Material.Filled.Warehouse),
+        new("일반 재고 현황", WarehouseManagerRoutes.GeneralInventory, Icons.Material.Filled.Inventory),
+        new("피킹 작업 목록", WarehouseManagerRoutes.PickingBatch, Icons.Material.Filled.Inventory2),
+        new("포장 작업", WarehouseManagerRoutes.PackingTask, Icons.Material.Filled.AllInbox),
+        new("출고예정 운송 전 검토", WarehouseManagerRoutes.OutboundPlanReview, Icons.Material.Filled.Rule),
+        new("출고 인계 준비", WarehouseManagerRoutes.GeneralTransportHandoff, Icons.Material.Filled.LocalShipping),
+        new("창고 예외 처리", WarehouseManagerRoutes.WarehouseExceptions, Icons.Material.Filled.ReportProblem),
+        new("창고 작업 이력", WarehouseManagerRoutes.WarehouseHistory, Icons.Material.Filled.History),
+        new("창고 설정", WarehouseManagerRoutes.WarehouseSettings, Icons.Material.Filled.Settings),
+        new("보세·통관 상태", WarehouseManagerRoutes.ImportCustoms, Icons.Material.Filled.FactCheck)
+    ];
+
+    protected override void OnInitialized()
+        => Navigation.LocationChanged += HandleLocationChanged;
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    private bool IsBottomDestinationActive(BottomDestination destination)
+        => destination switch
+        {
+            BottomDestination.Inbound =>
+                CurrentPath.StartsWith("/warehouse/inbounds", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/work/inbound", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/warehouse/import", StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Outbound =>
+                CurrentPath.StartsWith("/work/outbound", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/warehouse/general/outbound", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(WarehouseManagerRoutes.GeneralTransportHandoff, StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Work =>
+                CurrentPath.StartsWith(WarehouseManagerRoutes.WorkBoard, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(WarehouseManagerRoutes.Scan, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(WarehouseManagerRoutes.PickingBatch, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(WarehouseManagerRoutes.GeneralInventory, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(WarehouseManagerRoutes.WarehouseExceptions, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(WarehouseManagerRoutes.WarehouseHistory, StringComparison.OrdinalIgnoreCase),
+            _ => !IsBottomDestinationActive(BottomDestination.Inbound)
+                 && !IsBottomDestinationActive(BottomDestination.Outbound)
+                 && !IsBottomDestinationActive(BottomDestination.Work)
+        };
+
+    private string BuildBottomLinkClass(BottomDestination destination)
+        => IsBottomDestinationActive(destination)
+            ? "warehouse-mobile-shell__bottom-link warehouse-mobile-shell__bottom-link--active"
+            : "warehouse-mobile-shell__bottom-link";
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
     {
-        if (_isNavigatingBack)
-        {
-            _isNavigatingBack = false;
-            _currentUri = args.Location;
-            InvokeAsync(StateHasChanged);
-            return;
-        }
-
-        if (!string.IsNullOrWhiteSpace(_currentUri) && !string.Equals(_currentUri, args.Location, StringComparison.OrdinalIgnoreCase))
-        {
-            _navigationHistory.Push(_currentUri);
-        }
-
-        _currentUri = args.Location;
-        InvokeAsync(StateHasChanged);
+        _drawerOpen = false;
+        _ = InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
+        => Navigation.LocationChanged -= HandleLocationChanged;
+
+    private sealed record WarehouseDrawerItem(string Label, string Route, string Icon);
+
+    private enum BottomDestination
     {
-        NavigationManager.LocationChanged -= HandleLocationChanged;
+        Home,
+        Inbound,
+        Work,
+        Outbound
     }
 }

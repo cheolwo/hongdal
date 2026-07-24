@@ -559,11 +559,22 @@ public partial class NativeDriverHomePage : ContentPage
 
     private async void OnOpenLegacyMenuClicked(object? sender, EventArgs e)
     {
-        await Navigation.PushAsync(new MainPage());
+        await OpenBlazorWorkspaceAsync();
     }
 
     private async void OnOpenCurrentTransportClicked(object? sender, EventArgs e)
     {
+        await OpenBlazorWorkspaceAsync();
+    }
+
+    private async Task OpenBlazorWorkspaceAsync()
+    {
+        if (Navigation.NavigationStack.Count > 1)
+        {
+            await Navigation.PopAsync();
+            return;
+        }
+
         await Navigation.PushAsync(new MainPage());
     }
 }

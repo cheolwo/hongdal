@@ -1,14 +1,16 @@
 @page "/shipper/warehouse/workspace"
+@layout ShipperMobileLayout
 
-<PageTitle>창고 운영 허브</PageTitle>
+<PageTitle>화주 창고 작업공간</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-6">
     <MudStack Spacing="3">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+        <span class="shipper-mobile-screen-code">화주 업무 · 03.18</span>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="shipper-mobile-page-header">
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">창고 운영 허브</MudText>
+                <MudText Typo="Typo.h4">화주 창고 작업공간</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    SsalddelApp은 입고, 재고, 주문 출고, 재위탁 운송 같은 운영 관리 화면만 담당합니다.
+                    화주 관점에서 입고·재고·출고 요청과 현장 인계 상태를 확인합니다.
                 </MudText>
             </MudStack>
             <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">현장 작업은 WarehouseManagerApp</MudChip>

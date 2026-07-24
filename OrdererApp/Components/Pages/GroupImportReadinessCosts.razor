@@ -1,12 +1,13 @@
 @page "/group-purchase/imports/{LedgerId}/costs"
 
-<PageTitle>공동수입 견적과 예상 비용</PageTitle>
+<PageTitle>공동수입 비용 검토</PageTitle>
 
 <GroupImportReadinessRouteFrame LedgerId="@LedgerId"
                                 AutoGroupId="@AutoGroupId"
                                 CurrentSection="GroupImportReadinessSection.Costs"
-                                Title="견적과 예상 비용"
-                                Description="재료별 견적 조건과 예상 도착 비용의 계산 근거를 분리해 확인합니다.">
+                                ScreenCode="02.10"
+                                Title="공동수입 비용 검토"
+                                Description="공통비·개별부담과 계산 근거를 분리해 봅니다.">
     <ChildContent Context="ledger">
         <GroupImportReadinessCostsScreen Ledger="ledger" />
     </ChildContent>

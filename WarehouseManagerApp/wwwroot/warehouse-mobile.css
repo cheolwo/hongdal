@@ -1,0 +1,364 @@
+/* WarehouseManagerApp Figma 05 mobile shell */
+.warehouse-mobile-shell {
+    --mud-palette-primary: #ef6c00;
+    --mud-palette-primary-rgb: 239, 108, 0;
+    --mud-palette-primary-darken: #d85f00;
+    --mud-palette-primary-lighten: #ff8124;
+    --mud-palette-primary-hover: rgba(239, 108, 0, .08);
+    --mud-palette-secondary: #ef6c00;
+    --mud-palette-secondary-rgb: 239, 108, 0;
+    --mud-palette-secondary-darken: #d85f00;
+    --mud-palette-secondary-lighten: #ff8124;
+    --mud-palette-info: #ef6c00;
+    --mud-palette-info-rgb: 239, 108, 0;
+    --mud-palette-info-darken: #d85f00;
+    --mud-palette-info-lighten: #ff8124;
+    --role-purpose-accent: #ef6c00;
+    --role-purpose-soft: #fff0dc;
+    --role-purpose-border: #ead3bd;
+    position: relative;
+    display: grid;
+    grid-template-rows: 56px minmax(0, 1fr) 70px;
+    width: min(100%, 520px);
+    height: 100dvh;
+    min-height: 100dvh;
+    margin: 0 auto;
+    overflow: hidden;
+    color: #26211e;
+    background: #f8f6f3;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    box-shadow: 0 0 34px rgba(70, 48, 30, .13);
+}
+
+.warehouse-mobile-shell__appbar {
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: 0 14px;
+    border-bottom: 1px solid #eadfd5;
+    background: #fff;
+}
+
+.warehouse-mobile-shell__icon-button,
+.warehouse-mobile-shell__drawer header button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #ef6c00;
+    background: transparent;
+    cursor: pointer;
+}
+
+.warehouse-mobile-shell__brand {
+    display: flex;
+    align-items: baseline;
+    gap: .45rem;
+    min-width: 0;
+    color: #26211e;
+    text-decoration: none;
+}
+
+.warehouse-mobile-shell__brand strong {
+    font-size: 1rem;
+}
+
+.warehouse-mobile-shell__brand small {
+    color: #81766e;
+    font-size: .65rem;
+    white-space: nowrap;
+}
+
+.warehouse-mobile-shell__spacer {
+    flex: 1;
+}
+
+.warehouse-mobile-shell__site {
+    color: #ef6c00;
+    font-size: .62rem;
+    font-weight: 800;
+}
+
+.warehouse-mobile-shell__avatar {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: #ef6c00;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.warehouse-mobile-shell__content {
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 16px 16px 24px;
+    overscroll-behavior: contain;
+}
+
+.warehouse-mobile-shell__screen-header {
+    display: grid;
+    gap: .35rem;
+    margin-bottom: .8rem;
+}
+
+.warehouse-mobile-shell__screen-header > span {
+    color: #df6400;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+
+.warehouse-mobile-shell__screen-header > div {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.warehouse-mobile-shell__screen-header h1 {
+    margin: 0;
+    font-size: 1.42rem;
+    line-height: 1.25;
+}
+
+.warehouse-mobile-shell__screen-header h1:focus {
+    outline: none;
+}
+
+.warehouse-mobile-shell__screen-header small {
+    padding: .25rem .65rem;
+    border-radius: 999px;
+    color: #df6400;
+    background: #fff0dc;
+    font-size: .65rem;
+    font-weight: 800;
+}
+
+.warehouse-mobile-shell__screen-header p {
+    margin: 0;
+    color: #7d746d;
+    font-size: .75rem;
+    line-height: 1.5;
+}
+
+.warehouse-mobile-shell__screen-body {
+    min-width: 0;
+}
+
+.warehouse-mobile-shell__bottom-nav {
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid #eadfd5;
+    background: rgba(255, 255, 255, .98);
+}
+
+.warehouse-mobile-shell__bottom-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: .2rem;
+    min-width: 0;
+    color: #91877f;
+    font-size: .68rem;
+    text-decoration: none;
+}
+
+.warehouse-mobile-shell__bottom-link--active {
+    color: #ef6c00;
+    font-weight: 800;
+}
+
+.warehouse-mobile-shell__bottom-link--active::before {
+    position: absolute;
+    top: 0;
+    width: 28px;
+    height: 2px;
+    border-radius: 999px;
+    background: #ef6c00;
+    content: "";
+}
+
+.warehouse-mobile-shell__backdrop {
+    position: absolute;
+    z-index: 40;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(44, 30, 20, .25);
+}
+
+.warehouse-mobile-shell__drawer {
+    position: absolute;
+    z-index: 50;
+    inset: 0 auto 0 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    width: min(86%, 360px);
+    color: #352d28;
+    background: #fff;
+    box-shadow: 18px 0 44px rgba(55, 37, 24, .2);
+}
+
+.warehouse-mobile-shell__drawer > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px 12px;
+    border-bottom: 1px solid #eee2d8;
+}
+
+.warehouse-mobile-shell__drawer > header div {
+    display: grid;
+    gap: .15rem;
+}
+
+.warehouse-mobile-shell__drawer > header span {
+    color: #81766e;
+    font-size: .7rem;
+}
+
+.warehouse-mobile-shell__drawer nav {
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.warehouse-mobile-shell__drawer nav a {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 7px;
+    color: #453a33;
+    font-size: .8rem;
+    text-decoration: none;
+}
+
+.warehouse-mobile-shell__drawer nav a:hover {
+    color: #df6400;
+    background: #fff4e6;
+}
+
+.warehouse-mobile-shell__drawer > aside {
+    display: flex;
+    gap: .5rem;
+    margin: 10px 12px 14px;
+    padding: .75rem;
+    border-radius: 7px;
+    color: #83511f;
+    background: #fff0c9;
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+.warehouse-mobile-shell__screen-body .warehouse-page-header,
+.warehouse-mobile-shell__screen-body .warehouse-page-legacy-header {
+    display: none !important;
+}
+
+.warehouse-mobile-shell__screen-body .mud-container {
+    width: 100%;
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+.warehouse-mobile-shell__screen-body .mud-stack {
+    min-width: 0;
+}
+
+.warehouse-mobile-shell__screen-body .mud-stack-row {
+    flex-wrap: wrap;
+}
+
+.warehouse-mobile-shell__screen-body .mud-grid {
+    width: 100%;
+    margin: 0 !important;
+}
+
+.warehouse-mobile-shell__screen-body .mud-grid-item {
+    max-width: 100% !important;
+    padding: .35rem 0 !important;
+    flex-basis: 100% !important;
+}
+
+.warehouse-mobile-shell__screen-body .mud-paper {
+    border: 1px solid #e5d9cf;
+    border-radius: 7px;
+    background: #fff;
+    box-shadow: none !important;
+}
+
+.warehouse-mobile-shell__screen-body .mud-paper.pa-4,
+.warehouse-mobile-shell__screen-body .mud-paper.pa-5,
+.warehouse-mobile-shell__screen-body .mud-paper.pa-6 {
+    padding: .85rem !important;
+}
+
+.warehouse-mobile-shell__screen-body .mud-typography-h4 {
+    font-size: 1.3rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-typography-h5 {
+    font-size: 1.15rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-typography-h6 {
+    font-size: .98rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-typography-body1,
+.warehouse-mobile-shell__screen-body .mud-typography-body2 {
+    line-height: 1.5;
+}
+
+.warehouse-mobile-shell__screen-body .mud-typography-body2 {
+    font-size: .76rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-button-root {
+    min-height: 40px;
+    border-radius: 6px;
+    font-size: .75rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-input-control {
+    margin-top: .25rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-chip {
+    min-height: 26px;
+    font-size: .66rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-alert {
+    border-radius: 7px;
+    font-size: .72rem;
+}
+
+.warehouse-mobile-shell__screen-body table {
+    width: 100%;
+    font-size: .72rem;
+}
+
+.warehouse-mobile-shell__screen-body .mud-table-container {
+    overflow-x: auto;
+}
+
+@media (min-width: 760px) {
+    body {
+        background: #eee9e4;
+    }
+}

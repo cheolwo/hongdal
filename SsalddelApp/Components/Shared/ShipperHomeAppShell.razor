@@ -3,6 +3,12 @@
 @inject 꾸미기보유권동기화Service 꾸미기보유권동기화Service
 @inject ShipperViewVisibilityService ViewVisibilityService
 
+<RolePurposeJourney RoleName="화주·판매자"
+                    Title="운송 의뢰를 입고와 판매 이행까지 연결합니다"
+                    Description="운송 조건을 작성하고 진행 상태·입고 준비·판매 결과를 같은 업무 흐름에서 확인합니다."
+                    Steps="@PurposeSteps"
+                    BoundaryNote="의뢰 작성과 조회만으로 배차·계약·결제·통관·출고가 자동 확정되지는 않습니다." />
+
 @if (isInitializing)
 {
     <MudPaper Elevation="0" Outlined="true" Class="pa-5">
@@ -19,43 +25,34 @@ else
         <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-3">@initializationWarning</MudAlert>
     }
 
-    <PlatformCommunityHome AppName="살뜰"
-                           RoleLabel="화주"
-                           AppKey="shipper"
-                           CommunityDirectoryHref="@CommunityPageRoutes.Home"
-                           UseBaguaRoleTransitionPages="true"
-                           UseCompactHomeSummary="true"
-                           ShowRealtimeBest="true"
-                           QuickActions="QuickActions">
-        <CommunityModeContent>
-            <ShipperHomeCommunityContent />
-        </CommunityModeContent>
-
-        <WorkModeContent>
-            <ShipperHomeScreen @ref="homeScreen"
-                               TransportHref="@ShipperRoutes.Request"
-                               WarehouseHref="@ShipperRoutes.WarehouseWorkspace"
-                               SalesHref="@ShipperRoutes.SalesOrders"
-                               InternationalHref="@ShipperRoutes.FclLclPlanner">
-                <AnonymousContent>
-                    <ShipperHomeAppLoginPanel OnAuthenticated="HandleAuthenticatedAsync" />
-                </AnonymousContent>
-            </ShipperHomeScreen>
-        </WorkModeContent>
-    </PlatformCommunityHome>
+    <ShipperHomeScreen @ref="homeScreen"
+                       CompactPresentation="true"
+                       ScreenCode="@ScreenCode"
+                       HomeTitle="화주 홈"
+                       HomeDescription="의뢰와 입고·판매 상태를 요약하고 다음 확인 업무로 이동합니다."
+                       TransportHref="@ShipperRoutes.Request"
+                       WarehouseHref="@ShipperRoutes.WarehouseWorkspace"
+                       SalesHref="@ShipperRoutes.SalesOrders"
+                       InternationalHref="@ShipperRoutes.FclLclPlanner">
+        <AnonymousContent>
+            <ShipperHomeAppLoginPanel OnAuthenticated="HandleAuthenticatedAsync" />
+        </AnonymousContent>
+    </ShipperHomeScreen>
 }
 
 @code {
+    [Parameter]
+    public string ScreenCode { get; set; } = "03.01";
+
     private ShipperHomeScreen? homeScreen;
     private bool isInitializing = true;
     private string? initializationWarning;
-
-    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    private static readonly IReadOnlyList<RolePurposeJourneyStep> PurposeSteps =
     [
-        new("운송 업무", "결제, 배차, 운송 상태를 의뢰별로 관리합니다.", ShipperRoutes.TransportWorkspace, Icons.Material.Filled.LocalShipping, Color.Primary),
-        new("운송 의뢰", "화물 운송 의뢰를 새로 등록합니다.", ShipperRoutes.Request, Icons.Material.Filled.AddRoad, Color.Primary),
-        new("창고 작업대", "입고, 재고, 스캔과 출고 작업을 시작합니다.", ShipperRoutes.WarehouseWorkspace, Icons.Material.Filled.Warehouse, Color.Warning),
-        new("판매 주문", "Web과 같은 영속 판매 주문 원장을 확인합니다.", ShipperRoutes.SalesOrders, Icons.Material.Filled.Storefront, Color.Info)
+        new("시작할 일", "운송의뢰 작성", "화물·운송·절차 조건을 검토 가능한 초안으로 만듭니다.", ShipperRoutes.Request, true),
+        new("진행 확인", "운송·입고 상태", "진행 중 의뢰와 창고 입고 준비 상태를 확인합니다.", ShipperRoutes.TransportWorkspace),
+        new("확인 필요", "통관·운송 조건", "HS 검토와 FCL·LCL 계획의 미확인 근거를 봅니다.", ShipperRoutes.CustomsHsReviews),
+        new("완료 근거", "판매주문 이행", "입고된 상품의 출품과 판매주문 처리 결과를 확인합니다.", ShipperRoutes.SalesOrders)
     ];
 
     protected override async Task OnInitializedAsync()

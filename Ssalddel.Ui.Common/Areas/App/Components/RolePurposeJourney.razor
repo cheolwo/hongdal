@@ -1,0 +1,46 @@
+<section class="role-purpose-journey" aria-label="@($"{RoleName} 역할 업무 흐름")">
+    <header>
+        <span>역할 업무 흐름</span>
+        <h2>@Title</h2>
+        <p>@Description</p>
+    </header>
+
+    <nav aria-label="@($"{RoleName} 목적별 이동")">
+        @foreach (var step in Steps)
+        {
+            <a class="@BuildStepClass(step)" href="@step.Href">
+                <span>@step.StateLabel</span>
+                <strong>@step.Title</strong>
+                <p>@step.Description</p>
+                <small>@(step.IsPrimary ? "여기서 시작" : "화면 열기")</small>
+            </a>
+        }
+    </nav>
+
+    <aside>
+        <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+        <span>@BoundaryNote</span>
+    </aside>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string RoleName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<RolePurposeJourneyStep> Steps { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public string BoundaryNote { get; set; } = string.Empty;
+
+    private static string BuildStepClass(RolePurposeJourneyStep step)
+        => step.IsPrimary
+            ? "role-purpose-journey__step role-purpose-journey__step--primary"
+            : "role-purpose-journey__step";
+}

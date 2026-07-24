@@ -1,84 +1,211 @@
 @inherits LayoutComponentBase
 @implements IDisposable
-@inject NavigationManager NavigationManager
-@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager Navigation
+@inject IDriverNativeMapNavigator NativeMapNavigator
 
-<MudLayout>
-    <MudAppBar Dense="true" Fixed="false" Elevation="0" Color="Color.Default" Class="driver-topbar px-4 py-2">
-        <MudButton Variant="Variant.Text"
-                   Color="Color.Inherit"
-                   Disabled="@(!CanGoBack)"
-                   OnClick="GoBack"
-                   Class="back-nav-button">← 뒤로가기</MudButton>
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.subtitle1">기사 홈</MudText>
-            <MudText Typo="Typo.caption" Color="Color.Secondary">운행 중 지금 봐야 할 화면만 먼저 확인한다.</MudText>
-        </MudStack>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle"
-                       Color="Color.Primary"
-                       Class="driver-quick-action"
-                       Size="Size.Medium"
-                       OnClick="GoToMenuPage"
-                       aria-label="메뉴 페이지 열기" />
-    </MudAppBar>
+<div class="driver-mobile-shell">
+    <header class="driver-mobile-shell__appbar">
+        <button type="button"
+                class="driver-mobile-shell__icon-button"
+                aria-label="기사 메뉴 열기"
+                aria-expanded="@_drawerOpen"
+                @onclick="ToggleDrawer">
+            <MudIcon Icon="@Icons.Material.Filled.Menu" Size="Size.Small" />
+        </button>
+        <a class="driver-mobile-shell__brand" href="@DriverRoutes.HomeSummary">
+            <strong>살뜰 기사</strong>
+            <small>운행 업무</small>
+        </a>
+        <span class="driver-mobile-shell__spacer"></span>
+        <a class="driver-mobile-shell__alert-link"
+           href="@DriverRoutes.Notifications"
+           aria-label="알림함 열기">알림</a>
+        <span class="driver-mobile-shell__avatar" aria-label="운송 기사">D</span>
+    </header>
 
-    <MudMainContent Class="driver-main-content pa-4">
-        @Body
-    </MudMainContent>
-</MudLayout>
-
-@code {
-    private readonly Stack<string> _navigationHistory = new();
-    private string? _currentUri;
-    private bool _isNavigatingBack;
-
-    private bool CanGoBack => _navigationHistory.Count > 0;
-
-    protected override void OnInitialized()
+    @if (_drawerOpen)
     {
-        NavigationManager.LocationChanged += HandleLocationChanged;
-        _currentUri = NavigationManager.Uri;
+        <button type="button"
+                class="driver-mobile-shell__backdrop"
+                aria-label="기사 메뉴 닫기"
+                @onclick="CloseDrawer"></button>
+        <aside class="driver-mobile-shell__drawer" aria-label="기사 메뉴">
+            <header>
+                <div>
+                    <strong>살뜰 기사</strong>
+                    <span>추천에서 정산까지</span>
+                </div>
+                <button type="button" aria-label="메뉴 닫기" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                </button>
+            </header>
+
+            <nav>
+                @foreach (var item in DrawerItems)
+                {
+                    <a href="@item.Route" @onclick="CloseDrawer">
+                        <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                        <span>@item.Label</span>
+                    </a>
+                }
+
+                <button type="button" class="driver-mobile-shell__map-link" @onclick="OpenNativeMapAsync">
+                    <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Small" />
+                    <span>네이티브 운행 지도</span>
+                </button>
+            </nav>
+
+            <aside>
+                <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                <span>추천과 참여 의사는 배차 확정이 아닙니다. 위치·연락처·운송 증빙은 필요한 단계에서만 확인합니다.</span>
+            </aside>
+
+            @if (!string.IsNullOrWhiteSpace(_mapError))
+            {
+                <p class="driver-mobile-shell__map-error">@_mapError</p>
+            }
+        </aside>
     }
 
-    private void GoToMenuPage()
-    {
-        NavigationManager.NavigateTo(DriverRoutes.Menu);
-    }
-
-    private void GoBack()
-    {
-        if (_navigationHistory.Count == 0)
+    <main class="driver-mobile-shell__content">
+        @if (CurrentScreen is not null)
         {
-            return;
+            <header class="driver-mobile-shell__screen-header">
+                <span>기사 업무 · @CurrentScreen.ScreenCode</span>
+                <div>
+                    <h1>@CurrentScreen.Title</h1>
+                    <small>@CurrentScreen.Badge</small>
+                </div>
+                <p>@CurrentScreen.Description</p>
+            </header>
         }
 
-        var previousUri = _navigationHistory.Pop();
-        _isNavigatingBack = true;
-        NavigationManager.NavigateTo(previousUri);
+        <section class="driver-mobile-shell__screen-body">
+            @Body
+        </section>
+    </main>
+
+    <footer class="driver-mobile-shell__bottom-nav" aria-label="기사 주요 메뉴">
+        <a class="@BuildBottomLinkClass(BottomDestination.Home)"
+           href="@DriverRoutes.HomeSummary"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Home) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+            <span>홈</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Recommendations)"
+           href="@DriverRoutes.Recommendations"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Recommendations) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.Diamond" Size="Size.Small" />
+            <span>추천</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Transport)"
+           href="@DriverRoutes.CurrentTransport"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Transport) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.LocalShipping" Size="Size.Small" />
+            <span>운송</span>
+        </a>
+        <a class="@BuildBottomLinkClass(BottomDestination.Settlement)"
+           href="@DriverRoutes.CurrentMonthSettlement"
+           aria-current="@(IsBottomDestinationActive(BottomDestination.Settlement) ? "page" : null)">
+            <MudIcon Icon="@Icons.Material.Filled.Payments" Size="Size.Small" />
+            <span>정산</span>
+        </a>
+    </footer>
+</div>
+
+@code {
+    private bool _drawerOpen;
+    private string? _mapError;
+
+    private string CurrentPath
+        => new Uri(Navigation.Uri).AbsolutePath.TrimEnd('/') is { Length: > 0 } path
+            ? path
+            : "/";
+
+    private DriverMobileScreenDefinition? CurrentScreen
+        => DriverMobileScreenCatalog.Resolve(CurrentPath);
+
+    private static IReadOnlyList<DriverDrawerItem> DrawerItems =>
+    [
+        new("기사 홈 요약", DriverRoutes.HomeSummary, Icons.Material.Filled.Home),
+        new("운행 시작", DriverRoutes.WorkStart, Icons.Material.Filled.PlayCircle),
+        new("커뮤니티 개별 의뢰", DriverRoutes.CommunityInquiries, Icons.Material.Filled.Forum),
+        new("운송 추천", DriverRoutes.Recommendations, Icons.Material.Filled.Recommend),
+        new("보낸 탐색 문의함", DriverRoutes.ExplorationCampaigns, Icons.Material.Filled.Outbox),
+        new("진행 중 운송", DriverRoutes.CurrentTransport, Icons.Material.Filled.LocalShipping),
+        new("배달 내역", DriverRoutes.DeliveryHistory, Icons.Material.Filled.ReceiptLong),
+        new("운행 예약", DriverRoutes.Reservations, Icons.Material.Filled.Event),
+        new("월 정산", DriverRoutes.CurrentMonthSettlement, Icons.Material.Filled.Payments),
+        new("계좌 정보", DriverRoutes.BankAccount, Icons.Material.Filled.AccountBalance),
+        new("알림함", DriverRoutes.Notifications, Icons.Material.Filled.Notifications),
+        new("전체 메뉴", DriverRoutes.Menu, Icons.Material.Filled.Settings)
+    ];
+
+    protected override void OnInitialized()
+        => Navigation.LocationChanged += HandleLocationChanged;
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    private async Task OpenNativeMapAsync()
+    {
+        _mapError = null;
+
+        try
+        {
+            await NativeMapNavigator.OpenAsync();
+            CloseDrawer();
+        }
+        catch (Exception exception)
+        {
+            _mapError = exception.Message;
+        }
     }
+
+    private bool IsBottomDestinationActive(BottomDestination destination)
+        => destination switch
+        {
+            BottomDestination.Recommendations =>
+                CurrentPath.StartsWith(DriverRoutes.Recommendations, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(DriverRoutes.CommunityInquiries, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(DriverRoutes.ExplorationCampaigns, StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Transport =>
+                CurrentPath.StartsWith("/driver/transports", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(DriverRoutes.Reservations, StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Settlement =>
+                CurrentPath.StartsWith("/driver/settlements", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/driver/account", StringComparison.OrdinalIgnoreCase),
+            _ => !CurrentPath.StartsWith(DriverRoutes.Recommendations, StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith(DriverRoutes.CommunityInquiries, StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith(DriverRoutes.ExplorationCampaigns, StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith("/driver/transports", StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith(DriverRoutes.Reservations, StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith("/driver/settlements", StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith("/driver/account", StringComparison.OrdinalIgnoreCase)
+        };
+
+    private string BuildBottomLinkClass(BottomDestination destination)
+        => IsBottomDestinationActive(destination)
+            ? "driver-mobile-shell__bottom-link driver-mobile-shell__bottom-link--active"
+            : "driver-mobile-shell__bottom-link";
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
     {
-        if (_isNavigatingBack)
-        {
-            _isNavigatingBack = false;
-            _currentUri = args.Location;
-            InvokeAsync(StateHasChanged);
-            return;
-        }
-
-        if (!string.IsNullOrWhiteSpace(_currentUri) && !string.Equals(_currentUri, args.Location, StringComparison.OrdinalIgnoreCase))
-        {
-            _navigationHistory.Push(_currentUri);
-        }
-
-        _currentUri = args.Location;
-        InvokeAsync(StateHasChanged);
+        _drawerOpen = false;
+        _mapError = null;
+        _ = InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
+        => Navigation.LocationChanged -= HandleLocationChanged;
+
+    private sealed record DriverDrawerItem(string Label, string Route, string Icon);
+
+    private enum BottomDestination
     {
-        NavigationManager.LocationChanged -= HandleLocationChanged;
+        Home,
+        Recommendations,
+        Transport,
+        Settlement
     }
 }

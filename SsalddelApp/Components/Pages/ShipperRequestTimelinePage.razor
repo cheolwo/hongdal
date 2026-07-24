@@ -1,11 +1,15 @@
 @page "/shipper/request/{RequestId}/timeline"
+@layout ShipperMobileLayout
 @inject ShipperRequestDetailPageViewModel PageModel
 @implements IDisposable
 
-<PageTitle>운송 의뢰 진행 이력</PageTitle>
+<PageTitle>운송 타임라인</PageTitle>
 
 <ShipperRequestTimelineScreen State="@PageModel.State"
                               Context="@RouteContext"
+                              ScreenCode="03.09"
+                              Title="운송 타임라인"
+                              Description="배차·수락·상차·하차와 정산 상태를 시간순으로 봅니다."
                               HomeHref="@ShipperRoutes.ShipperHome"
                               NewRequestHref="@ShipperRoutes.Request"
                               RefreshRequested="RefreshAsync" />

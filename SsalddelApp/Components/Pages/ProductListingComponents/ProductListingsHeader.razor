@@ -2,9 +2,9 @@
 
 <header class="product-listings-header">
     <div>
-        <MudText Typo="Typo.overline">SHIPPER · SALES · SIMULATION</MudText>
-        <MudText Typo="Typo.h4">출품 관리</MudText>
-        <MudText Typo="Typo.body2">판매상품과 정확한 채널 계정을 연결해 외부 발행 전 payload와 로컬 원장을 검토합니다.</MudText>
+        <MudText Typo="Typo.overline">@Eyebrow</MudText>
+        <MudText Typo="Typo.h4">@Title</MudText>
+        <MudText Typo="Typo.body2">@Description</MudText>
     </div>
     <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
         <MudButton Variant="Variant.Filled"
@@ -35,6 +35,16 @@
 </MudAlert>
 
 @code {
+    [Parameter]
+    public string Eyebrow { get; set; } = "SHIPPER · SALES · SIMULATION";
+
+    [Parameter]
+    public string Title { get; set; } = "출품 관리";
+
+    [Parameter]
+    public string Description { get; set; }
+        = "판매상품과 정확한 채널 계정을 연결해 외부 발행 전 payload와 로컬 원장을 검토합니다.";
+
     [Parameter]
     public bool IsBusy { get; set; }
 

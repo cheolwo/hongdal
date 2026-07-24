@@ -46,8 +46,16 @@ public sealed class CommunityDirectoryPageViewModelTests
 
         viewModel.UpdateSearch("농수산물");
 
-        var descriptionMatch = Assert.Single(viewModel.VisibleGroups.SelectMany(group => group.Boards));
-        Assert.Equal(CommunityBoardKeys.InformationPrices, descriptionMatch.BoardKey);
+        var descriptionMatches = viewModel.VisibleGroups
+            .SelectMany(group => group.Boards)
+            .ToArray();
+        Assert.Equal(2, descriptionMatches.Length);
+        Assert.Contains(
+            descriptionMatches,
+            board => board.BoardKey == CommunityBoardKeys.InformationPrices);
+        Assert.Contains(
+            descriptionMatches,
+            board => board.BoardKey == CommunityBoardKeys.PeriodicDataKamis);
 
         viewModel.UpdateSearch("함께하는 일");
 

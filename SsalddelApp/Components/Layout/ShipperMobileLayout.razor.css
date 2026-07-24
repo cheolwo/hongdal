@@ -1,0 +1,482 @@
+.shipper-mobile-shell {
+    --mud-palette-primary: #1976d2;
+    --mud-palette-primary-rgb: 25, 118, 210;
+    --mud-palette-primary-darken: #1565c0;
+    --mud-palette-primary-lighten: #42a5f5;
+    --mud-palette-primary-hover: rgba(25, 118, 210, .08);
+    --role-purpose-accent: #1976d2;
+    --role-purpose-soft: #eaf3fd;
+    --role-purpose-border: #cbdcf0;
+    position: relative;
+    display: grid;
+    grid-template-rows: 56px minmax(0, 1fr) 70px;
+    width: min(100%, 520px);
+    height: 100dvh;
+    min-height: 100dvh;
+    margin: 0 auto;
+    overflow: hidden;
+    color: #172033;
+    background: #f4f7fb;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    box-shadow: 0 0 34px rgba(31, 53, 78, .12);
+}
+
+.shipper-mobile-shell__appbar {
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: 0 14px;
+    border-bottom: 1px solid #e3e9f1;
+    background: #fff;
+}
+
+.shipper-mobile-shell__icon-button,
+.shipper-mobile-shell__drawer header button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #1976d2;
+    background: transparent;
+    cursor: pointer;
+}
+
+.shipper-mobile-shell__brand {
+    display: flex;
+    align-items: baseline;
+    gap: .45rem;
+    min-width: 0;
+    color: #172033;
+    text-decoration: none;
+}
+
+.shipper-mobile-shell__brand strong {
+    font-size: 1rem;
+}
+
+.shipper-mobile-shell__brand small {
+    color: #65758a;
+    font-size: .68rem;
+    white-space: nowrap;
+}
+
+.shipper-mobile-shell__spacer {
+    flex: 1;
+}
+
+.shipper-mobile-shell__language {
+    color: #1976d2;
+    font-size: .64rem;
+    font-weight: 800;
+}
+
+.shipper-mobile-shell__avatar {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: #1976d2;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.shipper-mobile-shell__content {
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 16px 16px 24px;
+    overscroll-behavior: contain;
+}
+
+.shipper-mobile-shell__bottom-nav {
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid #dce4ee;
+    background: rgba(255, 255, 255, .98);
+}
+
+.shipper-mobile-shell__bottom-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: .2rem;
+    min-width: 0;
+    color: #8794a6;
+    font-size: .68rem;
+    text-decoration: none;
+}
+
+.shipper-mobile-shell__bottom-link--active {
+    color: #1976d2;
+    font-weight: 800;
+}
+
+.shipper-mobile-shell__bottom-link--active::before {
+    position: absolute;
+    top: 0;
+    width: 28px;
+    height: 2px;
+    border-radius: 999px;
+    background: #1976d2;
+    content: "";
+}
+
+.shipper-mobile-shell__backdrop {
+    position: absolute;
+    z-index: 40;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(15, 23, 42, .24);
+}
+
+.shipper-mobile-shell__drawer {
+    position: absolute;
+    z-index: 50;
+    inset: 0 auto 0 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    width: min(86%, 360px);
+    color: #253348;
+    background: #fff;
+    box-shadow: 18px 0 44px rgba(15, 23, 42, .2);
+}
+
+.shipper-mobile-shell__drawer > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid #e5ebf2;
+}
+
+.shipper-mobile-shell__drawer > header div {
+    display: grid;
+    gap: .15rem;
+}
+
+.shipper-mobile-shell__drawer > header span {
+    color: #6b7b90;
+    font-size: .74rem;
+}
+
+.shipper-mobile-shell__drawer nav {
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.shipper-mobile-shell__drawer nav a {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: center;
+    gap: .55rem;
+    min-height: 44px;
+    padding: 0 10px;
+    border-radius: 8px;
+    color: #334155;
+    font-size: .82rem;
+    text-decoration: none;
+}
+
+.shipper-mobile-shell__drawer nav a:hover,
+.shipper-mobile-shell__drawer nav a:focus-visible {
+    color: #135ea6;
+    background: #eef6ff;
+}
+
+.shipper-mobile-shell__drawer > aside {
+    display: flex;
+    gap: .55rem;
+    margin: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    color: #315875;
+    background: #eaf6fd;
+    font-size: .72rem;
+    line-height: 1.5;
+}
+
+.shipper-mobile-shell__content ::deep .mud-container {
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+.shipper-mobile-shell__content ::deep .mud-grid {
+    max-width: 100%;
+}
+
+.shipper-mobile-shell__content ::deep .mud-paper,
+.shipper-mobile-shell__content ::deep .mud-card {
+    border-radius: 7px;
+    box-shadow: none;
+}
+
+.shipper-mobile-shell__content ::deep .mud-button-root {
+    min-height: 42px;
+    border-radius: 6px;
+    text-transform: none;
+}
+
+.shipper-mobile-shell__content ::deep .mud-input-control {
+    margin-top: .15rem;
+}
+
+.shipper-mobile-shell__content ::deep .mud-typography-h4 {
+    font-size: 1.38rem;
+    line-height: 1.25;
+}
+
+.shipper-mobile-shell__content ::deep .mud-alert {
+    border-radius: 7px;
+    font-size: .75rem;
+    line-height: 1.45;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-screen-code {
+    display: block;
+    margin-bottom: .35rem;
+    color: #1976d2;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-screen,
+.shipper-mobile-shell__content ::deep .shipper-detail-screen,
+.shipper-mobile-shell__content ::deep .order-fulfillment-route,
+.shipper-mobile-shell__content ::deep .product-listings-shell {
+    gap: .75rem;
+    width: 100%;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-screen__header,
+.shipper-mobile-shell__content ::deep .shipper-detail-screen__header,
+.shipper-mobile-shell__content ::deep .order-fulfillment-route-header,
+.shipper-mobile-shell__content ::deep .product-listings-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .6rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-screen__header h2,
+.shipper-mobile-shell__content ::deep .shipper-detail-screen__header h1 {
+    font-size: 1.42rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-screen__header p,
+.shipper-mobile-shell__content ::deep .shipper-detail-screen__header p {
+    color: #69788c;
+    font-size: .78rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-detail-screen__actions,
+.shipper-mobile-shell__content ::deep .order-fulfillment-route-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-detail-screen__actions .mud-button-root:last-child {
+    grid-column: 1 / -1;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .35rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-step-link {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: .28rem;
+    min-height: 68px;
+    padding: .45rem .25rem;
+    text-align: center;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-step-link > span {
+    grid-row: auto;
+    width: 26px;
+    height: 26px;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-step-link strong {
+    overflow: visible;
+    font-size: .68rem;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-request-step-link small {
+    display: none;
+}
+
+.shipper-mobile-shell__content ::deep .ssalddel-account-workspace__table {
+    display: none;
+}
+
+.shipper-mobile-shell__content ::deep .ssalddel-account-workspace__cards {
+    display: block;
+}
+
+.shipper-mobile-shell__content ::deep .product-listings-overview-grid,
+.shipper-mobile-shell__content ::deep .product-listings-draft-grid {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-page-header {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-page-header > .mud-stack {
+    width: 100%;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact {
+    gap: .75rem;
+    width: 100%;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .7rem;
+    padding: 0;
+    border-radius: 0;
+    color: #172033;
+    background: transparent;
+    box-shadow: none;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__hero-copy > span {
+    color: #1976d2;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__hero h1 {
+    font-size: 1.5rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__hero p {
+    margin-top: .35rem;
+    color: #69788c;
+    font-size: .78rem;
+    line-height: 1.5;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__status,
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__latest {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .65rem;
+    padding: .8rem;
+    border-radius: 7px;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__metrics,
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__latest-statuses {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__metrics span,
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__latest-statuses span {
+    min-width: 0;
+    min-height: 58px;
+    padding: .45rem;
+    border: 1px solid #dce6f0;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__workflows,
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__login,
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__additional {
+    padding: .8rem;
+    border-radius: 7px;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home__workflow-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .55rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home-workflow {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: .55rem .75rem;
+    padding: .8rem;
+    border-radius: 7px;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home-workflow header {
+    grid-row: 1 / 3;
+    align-self: start;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home-workflow > .mud-button-root {
+    grid-column: 2;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-home--compact .shipper-home-workflow p {
+    min-height: 0;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-start-grid {
+    display: grid;
+    gap: .65rem;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-start-card {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .7rem;
+    padding: .8rem;
+    border: 1px solid #dbe4ee;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-start-card > span {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 7px;
+    color: #1976d2;
+    background: #e9f4fd;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-start-card div {
+    min-width: 0;
+}
+
+.shipper-mobile-shell__content ::deep .shipper-mobile-start-card p {
+    margin: .2rem 0 0;
+    color: #6a788b;
+    font-size: .74rem;
+}
+
+@media (min-width: 760px) {
+    :global(body) {
+        background: #e9eef5;
+    }
+}

@@ -1,13 +1,12 @@
 @page "/shipper/request/bulk"
+@layout ShipperMobileLayout
 
-<PageTitle>CSV 일괄등록</PageTitle>
+<PageTitle>운송의뢰 일괄등록</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
-    <MudStack Spacing="3">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">CSV 일괄등록</MudText>
-        </MudStack>
-
-        <ShipperBulkImportPanel />
-    </MudStack>
-</MudContainer>
+<ShipperMobileRouteFrame ScreenCode="03.11"
+                         Title="운송의뢰 일괄등록"
+                         Description="여러 의뢰를 CSV로 미리보기하고 유효한 행만 선택해 등록합니다."
+                         Badge="CSV"
+                         BoundaryMessage="파일 선택과 미리보기는 등록이 아닙니다. 검토 결과로 등록 버튼을 눌러야 서버 요청이 발생합니다.">
+    <ShipperBulkImportPanel />
+</ShipperMobileRouteFrame>

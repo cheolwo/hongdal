@@ -3,7 +3,15 @@
 
 <PageTitle>개별주문 원장</PageTitle>
 
-<OrdererIndividualOrderLedgerDetailScreen OrderLedgerId="@OrderLedgerId" />
+<OrdererMobileRouteFrame ScreenCode="02.11"
+                         Title="개별주문 원장"
+                         Description="개별 품목·금액·서명 상태를 기존 원장으로 봅니다."
+                         BackHref="@OrdererRoutes.Orders"
+                         BackLabel="주문 내역"
+                         BoundaryMessage="상태 변경은 서버 권한과 현재 원장을 다시 확인한 뒤에만 이어집니다.">
+    <OrdererIndividualOrderLedgerDetailScreen OrderLedgerId="@OrderLedgerId"
+                                               ShowHeading="false" />
+</OrdererMobileRouteFrame>
 
 @code {
     [Parameter]

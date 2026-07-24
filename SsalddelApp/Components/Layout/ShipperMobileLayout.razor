@@ -1,0 +1,178 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject ShipperLocalizationService L
+
+<CascadingValue Value="L.Language">
+    <div class="shipper-mobile-shell">
+        <header class="shipper-mobile-shell__appbar">
+            <button type="button"
+                    class="shipper-mobile-shell__icon-button"
+                    aria-label="화주 메뉴 열기"
+                    aria-expanded="@_drawerOpen"
+                    @onclick="ToggleDrawer">
+                <MudIcon Icon="@Icons.Material.Filled.Menu" Size="Size.Small" />
+            </button>
+            <a class="shipper-mobile-shell__brand" href="@ShipperRoutes.ShipperHome">
+                <strong>살뜰</strong>
+                <small>화주 · 판매자</small>
+            </a>
+            <span class="shipper-mobile-shell__spacer"></span>
+            <span class="shipper-mobile-shell__language">KO</span>
+            <span class="shipper-mobile-shell__avatar" aria-label="화주">S</span>
+        </header>
+
+        @if (_drawerOpen)
+        {
+            <button type="button"
+                    class="shipper-mobile-shell__backdrop"
+                    aria-label="화주 메뉴 닫기"
+                    @onclick="CloseDrawer"></button>
+            <aside class="shipper-mobile-shell__drawer" aria-label="화주 메뉴">
+                <header>
+                    <div>
+                        <strong>살뜰 화주</strong>
+                        <span>의뢰에서 판매·입고까지</span>
+                    </div>
+                    <button type="button" aria-label="메뉴 닫기" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                    </button>
+                </header>
+                <nav>
+                    <a href="@ShipperRoutes.ShipperHome" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+                        화주 홈
+                    </a>
+                    <a href="@ShipperRoutes.Request" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.AddRoad" Size="Size.Small" />
+                        운송의뢰 시작
+                    </a>
+                    <a href="@ShipperRoutes.RequestBulk" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.UploadFile" Size="Size.Small" />
+                        운송의뢰 일괄등록
+                    </a>
+                    <a href="@ShipperRoutes.InboundDashboard" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.MoveToInbox" Size="Size.Small" />
+                        입고 요청
+                    </a>
+                    <a href="@ShipperRoutes.CustomsHsReviews" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.FactCheck" Size="Size.Small" />
+                        HS 검토
+                    </a>
+                    <a href="@ShipperRoutes.FclLclPlanner" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.DirectionsBoat" Size="Size.Small" />
+                        FCL·LCL 계획
+                    </a>
+                    <a href="@ShipperRoutes.SalesChannels" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" />
+                        판매채널 연결
+                    </a>
+                    <a href="@ShipperRoutes.ProductListings" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" />
+                        상품 출품 후보
+                    </a>
+                    <a href="@ShipperRoutes.OrderFulfillment" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Outbox" Size="Size.Small" />
+                        판매주문 이행
+                    </a>
+                    <a href="@ShipperRoutes.WarehouseWorkspace" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Warehouse" Size="Size.Small" />
+                        화주 창고 작업공간
+                    </a>
+                    <a href="@CommunityPageRoutes.Home" @onclick="CloseDrawer">
+                        <MudIcon Icon="@Icons.Material.Filled.Forum" Size="Size.Small" />
+                        공개 커뮤니티
+                    </a>
+                </nav>
+                <aside>
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                    의뢰 작성과 조회만으로 배차·계약·결제·통관·출고가 자동 확정되지는 않습니다.
+                </aside>
+            </aside>
+        }
+
+        <main class="shipper-mobile-shell__content">
+            @Body
+        </main>
+
+        <footer class="shipper-mobile-shell__bottom-nav" aria-label="화주 주요 메뉴">
+            <a class="@BuildBottomLinkClass(BottomDestination.Home)"
+               href="@ShipperRoutes.ShipperHome"
+               aria-current="@(IsBottomDestinationActive(BottomDestination.Home) ? "page" : null)">
+                <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+                <span>홈</span>
+            </a>
+            <a class="@BuildBottomLinkClass(BottomDestination.Request)"
+               href="@ShipperRoutes.Request"
+               aria-current="@(IsBottomDestinationActive(BottomDestination.Request) ? "page" : null)">
+                <MudIcon Icon="@Icons.Material.Filled.Add" Size="Size.Small" />
+                <span>의뢰</span>
+            </a>
+            <a class="@BuildBottomLinkClass(BottomDestination.Inbound)"
+               href="@ShipperRoutes.InboundDashboard"
+               aria-current="@(IsBottomDestinationActive(BottomDestination.Inbound) ? "page" : null)">
+                <MudIcon Icon="@Icons.Material.Filled.MoveToInbox" Size="Size.Small" />
+                <span>입고</span>
+            </a>
+            <a class="@BuildBottomLinkClass(BottomDestination.Sales)"
+               href="@ShipperRoutes.SalesChannels"
+               aria-current="@(IsBottomDestinationActive(BottomDestination.Sales) ? "page" : null)">
+                <MudIcon Icon="@Icons.Material.Filled.Diamond" Size="Size.Small" />
+                <span>판매</span>
+            </a>
+        </footer>
+    </div>
+</CascadingValue>
+
+@code {
+    private bool _drawerOpen;
+
+    protected override void OnInitialized()
+        => Navigation.LocationChanged += HandleLocationChanged;
+
+    private string CurrentPath
+        => new Uri(Navigation.Uri).AbsolutePath.TrimEnd('/') is { Length: > 0 } path
+            ? path
+            : "/";
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    private void CloseDrawer() => _drawerOpen = false;
+
+    private bool IsBottomDestinationActive(BottomDestination destination)
+        => destination switch
+        {
+            BottomDestination.Request =>
+                CurrentPath.StartsWith(ShipperRoutes.Request, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(ShipperRoutes.TransportWorkspace, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/shipper/customs", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/shipper/international", StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Inbound =>
+                CurrentPath.StartsWith("/shipper/inbound", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith("/shipper/warehouse", StringComparison.OrdinalIgnoreCase),
+            BottomDestination.Sales =>
+                CurrentPath.StartsWith("/shipper/sales", StringComparison.OrdinalIgnoreCase),
+            _ => string.Equals(CurrentPath, ShipperRoutes.ShipperHome, StringComparison.OrdinalIgnoreCase)
+        };
+
+    private string BuildBottomLinkClass(BottomDestination destination)
+        => IsBottomDestinationActive(destination)
+            ? "shipper-mobile-shell__bottom-link shipper-mobile-shell__bottom-link--active"
+            : "shipper-mobile-shell__bottom-link";
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        _drawerOpen = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+        => Navigation.LocationChanged -= HandleLocationChanged;
+
+    private enum BottomDestination
+    {
+        Home,
+        Request,
+        Inbound,
+        Sales
+    }
+}

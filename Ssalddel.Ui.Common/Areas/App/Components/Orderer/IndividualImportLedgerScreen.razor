@@ -2,7 +2,10 @@
 @inject 개별수입원장생성ViewModel ViewModel
 
 <MudStack Spacing="3" Class="pa-4">
-    <MudText Typo="Typo.h4">개별수입 원장</MudText>
+    @if (ShowHeading)
+    {
+        <MudText Typo="Typo.h4">개별수입 원장</MudText>
+    }
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
         개별주문의 상품·수량·가격·서명을 복제하지 않고 수입 준비 상태만 연결합니다.
         이 화면은 계약·결제·수입 신고·운송을 실행하지 않습니다.
@@ -35,6 +38,7 @@
 
 @code {
     [Parameter] public string? OrderLedgerId { get; set; }
+    [Parameter] public bool ShowHeading { get; set; } = true;
 
     protected override void OnParametersSet()
     {

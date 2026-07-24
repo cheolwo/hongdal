@@ -2,7 +2,10 @@
 @inject 개별수출원장생성ViewModel ViewModel
 
 <MudStack Spacing="3" Class="pa-4">
-    <MudText Typo="Typo.h4">개별수출 원장</MudText>
+    @if (ShowHeading)
+    {
+        <MudText Typo="Typo.h4">개별수출 원장</MudText>
+    }
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
         개별주문을 원천으로 수출자·구매자·요건·서류 검토 상태를 기록합니다.
         수출 신고 제출, 포워더 전송과 선적 실행은 별도 승인 전까지 차단됩니다.
@@ -36,6 +39,7 @@
 
 @code {
     [Parameter] public string? OrderLedgerId { get; set; }
+    [Parameter] public bool ShowHeading { get; set; } = true;
 
     protected override void OnParametersSet()
     {

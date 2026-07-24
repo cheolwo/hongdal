@@ -1,17 +1,19 @@
 @page "/shipper/customs/hs-reviews"
+@layout ShipperMobileLayout
 @using SsalddelApp.Models.Shipper
 @using SsalddelApp.Services.Customs
 @inject ICustomsHsReviewService CustomsReviewService
 @inject IHsCodeAgencyCapabilityService HsCodeAgencyCapabilityService
 @inject IShipperOperationsService ShipperOperations
 
-<PageTitle>HS 코드 검토</PageTitle>
+<PageTitle>HS 검토</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-6">
     <MudStack Spacing="3">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <span class="shipper-mobile-screen-code">화주 업무 · 03.13</span>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="shipper-mobile-page-header">
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">HS 코드 검토</MudText>
+                <MudText Typo="Typo.h4">HS 검토</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">수출입 물류 흐름이 감지되면 관세사 검토 요청을 만들고, 후보 HS 코드를 근거와 함께 확인합니다.</MudText>
             </MudStack>
             <MudStack Row="true" Spacing="2">

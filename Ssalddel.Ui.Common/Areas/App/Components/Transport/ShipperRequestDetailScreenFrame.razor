@@ -3,7 +3,7 @@
 <section class="shipper-detail-screen" data-detail-screen="@CurrentScreen.ToString().ToLowerInvariant()">
     <header class="shipper-detail-screen__header">
         <div class="shipper-detail-screen__title">
-            <span>TRANSPORT REQUEST · @Eyebrow</span>
+            <span>@EffectiveEyebrow</span>
             <h1>@Title</h1>
             <p>@Description</p>
         </div>
@@ -101,6 +101,7 @@
     [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
     [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
     [Parameter] public ShipperRequestDetailScreenKind CurrentScreen { get; set; }
+    [Parameter] public string? ScreenCode { get; set; }
     [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
@@ -110,6 +111,11 @@
     [Parameter] public EventCallback RefreshRequested { get; set; }
     [Parameter] public RenderFragment? EmptyContent { get; set; }
     [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+
+    private string EffectiveEyebrow
+        => !string.IsNullOrWhiteSpace(ScreenCode)
+            ? $"화주 업무 · {ScreenCode}"
+            : $"TRANSPORT REQUEST · {Eyebrow}";
 
     private static Severity ResolveSeverity(ShipperRequestDetailMessageTone tone)
         => tone switch

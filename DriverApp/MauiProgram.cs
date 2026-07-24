@@ -32,6 +32,7 @@ public static class MauiProgram
 			SsalddelApiEndpoint.CreateDefaultBaseAddress(),
 			ServiceLifetime.Singleton);
 		builder.Services.AddSsalddelDocumentOutputServices();
+		builder.Services.AddTransient<MainPage>();
 		builder.Services.AddTransient<NativeDriverHomePage>();
 		builder.Services.AddMudServices();
 		builder.Services.AddMauiBlazorWebView();

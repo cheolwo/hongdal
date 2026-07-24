@@ -4,7 +4,8 @@
              xmlns:components="clr-namespace:OrdererApp.Components"
              x:Class="OrdererApp.MainPage">
 
-    <BlazorWebView HostPage="wwwroot/index.html">
+    <BlazorWebView HostPage="wwwroot/index.html"
+                   StartPath="/">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type components:Routes}" />
         </BlazorWebView.RootComponents>

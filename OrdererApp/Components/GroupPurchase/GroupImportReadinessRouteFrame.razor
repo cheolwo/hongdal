@@ -2,7 +2,7 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="py-4 px-0">
     <GroupPurchaseScreenFrame CurrentScreen="@ScreenKind"
-                              Eyebrow="GROUP PURCHASE · 1.5 READ-ONLY"
+                              Eyebrow="@($"주문자 업무 · {EffectiveScreenCode}")"
                               Title="@Title"
                               Description="@Description"
                               BackHref="@GroupPurchasePageRoutes.Root"
@@ -51,6 +51,7 @@
     [Parameter, EditorRequired] public string LedgerId { get; set; } = string.Empty;
     [Parameter] public string? AutoGroupId { get; set; }
     [Parameter] public GroupImportReadinessSection CurrentSection { get; set; }
+    [Parameter] public string? ScreenCode { get; set; }
     [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
     [Parameter, EditorRequired] public RenderFragment<공동수입준비주문자조회응답> ChildContent { get; set; } = default!;
@@ -64,6 +65,13 @@
         GroupImportReadinessSection.Consent => GroupPurchaseScreenKind.ImportConsent,
         _ => GroupPurchaseScreenKind.ImportOverview
     };
+
+    private string EffectiveScreenCode
+        => !string.IsNullOrWhiteSpace(ScreenCode)
+            ? ScreenCode
+            : CurrentSection == GroupImportReadinessSection.Costs
+                ? "02.10"
+                : "02.09";
 
     private Variant ButtonVariant(GroupImportReadinessSection section)
         => section == CurrentSection ? Variant.Filled : Variant.Text;

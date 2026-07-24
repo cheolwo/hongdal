@@ -2,16 +2,16 @@
 
 public partial class App : Application
 {
-	private readonly NativeDriverHomePage _homePage;
+	private readonly MainPage _mainPage;
 
-	public App(NativeDriverHomePage homePage)
+	public App(MainPage mainPage)
 	{
 		InitializeComponent();
-		_homePage = homePage;
+		_mainPage = mainPage;
 	}
 
 	protected override Window CreateWindow(IActivationState? activationState)
 	{
-		return new Window(new NavigationPage(_homePage)) { Title = "살뜰 기사" };
+		return new Window(new NavigationPage(_mainPage)) { Title = "살뜰 기사" };
 	}
 }

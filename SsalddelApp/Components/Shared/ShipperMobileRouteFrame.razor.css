@@ -1,0 +1,61 @@
+.shipper-mobile-route {
+    display: grid;
+    gap: .75rem;
+    min-width: 0;
+}
+
+.shipper-mobile-route__header {
+    display: grid;
+    gap: .28rem;
+}
+
+.shipper-mobile-route__header > span {
+    color: #1976d2;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.shipper-mobile-route__header > div {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.shipper-mobile-route__header h1 {
+    margin: 0;
+    font-size: 1.48rem;
+    line-height: 1.25;
+}
+
+.shipper-mobile-route__header small {
+    padding: .28rem .65rem;
+    border-radius: 999px;
+    color: #1976d2;
+    background: #e7f3fc;
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.shipper-mobile-route__header p {
+    margin: 0;
+    color: #69788c;
+    font-size: .78rem;
+    line-height: 1.5;
+}
+
+.shipper-mobile-route__boundary {
+    display: flex;
+    gap: .55rem;
+    padding: .75rem;
+    border-radius: 7px;
+    color: #315875;
+    background: #e8f5fd;
+    font-size: .73rem;
+    line-height: 1.5;
+}
+
+.shipper-mobile-route__body {
+    display: grid;
+    gap: .75rem;
+    min-width: 0;
+}

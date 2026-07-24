@@ -39,6 +39,15 @@ public sealed class CommunityMobileBoardDirectoryViewModel(
                     .ToArray()))
             .ToArray();
 
+    public IReadOnlyList<CommunityMobilePublicDataBoardPresentation> VisiblePublicDataBoards
+        => CommunityMobileBoardPresentation.PublicDataBoards
+            .Where(board => MatchesSearch(
+                board.DisplayName,
+                board.Description,
+                board.Provider,
+                board.UpdateCycle))
+            .ToArray();
+
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         IsLoading = true;

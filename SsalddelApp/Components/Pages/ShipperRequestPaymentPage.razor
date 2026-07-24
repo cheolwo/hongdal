@@ -1,12 +1,16 @@
 @page "/shipper/request/{RequestId}/payment"
+@layout ShipperMobileLayout
 @using Ssalddel.Contracts.Common.Payments
 @inject ShipperRequestDetailPageViewModel PageModel
 @implements IDisposable
 
-<PageTitle>운송 의뢰 결제</PageTitle>
+<PageTitle>결제 상태</PageTitle>
 
 <ShipperRequestPaymentScreen State="@PageModel.State"
                              Context="@RouteContext"
+                             ScreenCode="03.08"
+                             Title="결제 상태"
+                             Description="결제와 정산의 현재 상태와 개발용 FakePG 경계를 확인합니다."
                              HomeHref="@ShipperRoutes.ShipperHome"
                              NewRequestHref="@ShipperRoutes.Request"
                              RefreshRequested="RefreshAsync"

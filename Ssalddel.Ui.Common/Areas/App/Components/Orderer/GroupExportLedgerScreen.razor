@@ -2,7 +2,10 @@
 @inject 공동수출원장생성ViewModel ViewModel
 
 <MudStack Spacing="3" Class="pa-4">
-    <MudText Typo="Typo.h4">공동수출 원장</MudText>
+    @if (ShowHeading)
+    {
+        <MudText Typo="Typo.h4">공동수출 원장</MudText>
+    }
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
         이미 존재하는 개별수출 원장만 집하·합포장 후보로 묶습니다.
         수출자별 신고와 서류 원본은 개별수출 원장에 그대로 보존됩니다.
@@ -37,6 +40,8 @@
 </MudStack>
 
 @code {
+    [Parameter] public bool ShowHeading { get; set; } = true;
+
     private async Task CreateAsync()
     {
         await ViewModel.생성Async();

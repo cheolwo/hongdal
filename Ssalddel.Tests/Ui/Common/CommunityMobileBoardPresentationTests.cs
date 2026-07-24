@@ -26,6 +26,30 @@ public sealed class CommunityMobileBoardPresentationTests
     }
 
     [Fact]
+    public void 공공데이터묶음은_네전용게시판을_주기성목록으로연결한다()
+    {
+        var boards = CommunityMobileBoardPresentation.PublicDataBoards;
+
+        Assert.Equal(
+            [
+                CommunityBoardKeys.PeriodicDataKamis,
+                CommunityBoardKeys.PeriodicDataMfds,
+                CommunityBoardKeys.PeriodicDataUsda,
+                CommunityBoardKeys.PeriodicDataCustomsImportUnitPrice
+            ],
+            boards.Select(board => board.BoardKey));
+        Assert.All(boards, board =>
+        {
+            Assert.True(CommunityPeriodicDataBoardCatalog.IsDataBoard(board.BoardKey));
+            Assert.Contains("boardKey=", board.Href, StringComparison.Ordinal);
+            Assert.Contains(
+                Uri.EscapeDataString(CommunityPeriodicPostTopicCatalog.PeriodicListFilter),
+                board.Href,
+                StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
+    [Fact]
     public void 업무모드는_다섯탐색묶음으로_열여섯업무단위게시판을빠짐없이보여준다()
     {
         var groups = CommunityMobileBoardPresentation.WorkGroups;
@@ -91,7 +115,24 @@ public sealed class CommunityMobileBoardPresentationTests
         Assert.Contains("공개 커뮤니티", source);
         Assert.Contains("내 정보", source);
         Assert.Contains("내 글", source);
+        Assert.Contains("공공데이터 게시판", source);
         Assert.Contains("CommunityPageRoutes.Compose", source);
+    }
+
+    [Fact]
+    public void Maui기존게시판인덱스도_공공데이터전용catalog를공유한다()
+    {
+        var source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Community",
+            "PlatformCommunityHome.PostMetadata.razor.cs"));
+
+        Assert.Contains("CommunityPeriodicDataBoardCatalog.All", source);
+        Assert.Contains("CommunityBoardCatalog.Find(board.BoardKey)", source);
     }
 
     [Fact]
@@ -115,16 +156,21 @@ public sealed class CommunityMobileBoardPresentationTests
         Assert.Contains("@page \"/community/boards/directory\"", boardDirectorySource);
         Assert.Contains("<CommunityMobileBoardDirectoryScreen", boardDirectorySource);
 
-        foreach (var relativePath in new[]
-                 {
-                     Path.Combine("Components", "Pages", "RoleNeutralHome.razor"),
-                     Path.Combine("Components", "Shared", "ShipperHomeAppShell.razor"),
-                     Path.Combine("Components", "Pages", "WarehouseManagerRoleHome.razor")
-                 })
-        {
-            var source = File.ReadAllText(Path.Combine(root, "SsalddelApp", relativePath));
-            Assert.Contains("CommunityDirectoryHref=\"@CommunityPageRoutes.Home\"", source);
-        }
+        var roleNeutralHomeSource = File.ReadAllText(Path.Combine(
+            root,
+            "SsalddelApp",
+            "Components",
+            "Pages",
+            "RoleNeutralHome.razor"));
+        Assert.Contains("href=\"@CommunityPageRoutes.Home\"", roleNeutralHomeSource);
+
+        var warehouseHomeSource = File.ReadAllText(Path.Combine(
+            root,
+            "SsalddelApp",
+            "Components",
+            "Pages",
+            "WarehouseManagerRoleHome.razor"));
+        Assert.Contains("CommunityDirectoryHref=\"@CommunityPageRoutes.Home\"", warehouseHomeSource);
     }
 
     private static string FindRepositoryRoot()

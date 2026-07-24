@@ -1,10 +1,12 @@
 @page "/shipper/sales/fulfillment"
+@layout ShipperMobileLayout
 @inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
 
-<PageTitle>판매 주문 이행 Simulation 허브</PageTitle>
+<PageTitle>판매주문 이행</PageTitle>
 
-<OrderFulfillmentRouteFrame Title="판매 주문 이행 Simulation"
-                            Description="한 화면의 복합 탭 대신 주문, 재고, 피킹, 포장과 알림 정책을 목표별 화면으로 엽니다."
+<OrderFulfillmentRouteFrame Eyebrow="화주 업무 · 03.17"
+                            Title="판매주문 이행"
+                            Description="주문 확인, 재고 할당, 피킹·포장과 출고 인계를 단계별로 봅니다."
                             Read="@Read"
                             IsBusy="@ViewModel.처리중"
                             RefreshRequested="RefreshAsync">

@@ -1,0 +1,394 @@
+/* DriverApp Figma 04 mobile shell */
+.driver-mobile-shell {
+    --mud-palette-primary: #009688;
+    --mud-palette-primary-rgb: 0, 150, 136;
+    --mud-palette-primary-darken: #00796b;
+    --mud-palette-primary-lighten: #26a69a;
+    --mud-palette-primary-hover: rgba(0, 150, 136, .08);
+    --mud-palette-secondary: #009688;
+    --mud-palette-secondary-rgb: 0, 150, 136;
+    --mud-palette-secondary-darken: #00796b;
+    --mud-palette-secondary-lighten: #26a69a;
+    --mud-palette-success: #009688;
+    --mud-palette-success-rgb: 0, 150, 136;
+    --mud-palette-success-darken: #00796b;
+    --mud-palette-success-lighten: #26a69a;
+    --role-purpose-accent: #009688;
+    --role-purpose-soft: #e4f5f2;
+    --role-purpose-border: #bee4de;
+    position: relative;
+    display: grid;
+    grid-template-rows: 56px minmax(0, 1fr) 70px;
+    width: min(100%, 520px);
+    height: 100dvh;
+    min-height: 100dvh;
+    margin: 0 auto;
+    overflow: hidden;
+    color: #17242b;
+    background: #f2f9f8;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    box-shadow: 0 0 34px rgba(28, 63, 65, .12);
+}
+
+.driver-mobile-shell__appbar {
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: 0 14px;
+    border-bottom: 1px solid #dfeae8;
+    background: #fff;
+}
+
+.driver-mobile-shell__icon-button,
+.driver-mobile-shell__drawer header button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #008f82;
+    background: transparent;
+    cursor: pointer;
+}
+
+.driver-mobile-shell__brand {
+    display: flex;
+    align-items: baseline;
+    gap: .45rem;
+    min-width: 0;
+    color: #17242b;
+    text-decoration: none;
+}
+
+.driver-mobile-shell__brand strong {
+    font-size: 1rem;
+}
+
+.driver-mobile-shell__brand small {
+    color: #6f7e83;
+    font-size: .65rem;
+    white-space: nowrap;
+}
+
+.driver-mobile-shell__spacer {
+    flex: 1;
+}
+
+.driver-mobile-shell__alert-link {
+    color: #008f82;
+    font-size: .64rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.driver-mobile-shell__avatar {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: #009688;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.driver-mobile-shell__content {
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 16px 16px 24px;
+    overscroll-behavior: contain;
+}
+
+.driver-mobile-shell__screen-header {
+    display: grid;
+    gap: .35rem;
+    margin-bottom: .8rem;
+}
+
+.driver-mobile-shell__screen-header > span {
+    color: #008f82;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+
+.driver-mobile-shell__screen-header > div {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.driver-mobile-shell__screen-header h1 {
+    margin: 0;
+    font-size: 1.42rem;
+    line-height: 1.25;
+}
+
+.driver-mobile-shell__screen-header h1:focus {
+    outline: none;
+}
+
+.driver-mobile-shell__screen-header small {
+    padding: .25rem .65rem;
+    border-radius: 999px;
+    color: #00796b;
+    background: #def3f0;
+    font-size: .65rem;
+    font-weight: 800;
+}
+
+.driver-mobile-shell__screen-header p {
+    margin: 0;
+    color: #6a7b80;
+    font-size: .75rem;
+    line-height: 1.5;
+}
+
+.driver-mobile-shell__screen-body {
+    min-width: 0;
+}
+
+.driver-mobile-shell__bottom-nav {
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid #d8e5e3;
+    background: rgba(255, 255, 255, .98);
+}
+
+.driver-mobile-shell__bottom-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: .2rem;
+    min-width: 0;
+    color: #849295;
+    font-size: .68rem;
+    text-decoration: none;
+}
+
+.driver-mobile-shell__bottom-link--active {
+    color: #009688;
+    font-weight: 800;
+}
+
+.driver-mobile-shell__bottom-link--active::before {
+    position: absolute;
+    top: 0;
+    width: 28px;
+    height: 2px;
+    border-radius: 999px;
+    background: #009688;
+    content: "";
+}
+
+.driver-mobile-shell__backdrop {
+    position: absolute;
+    z-index: 40;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(15, 38, 40, .24);
+}
+
+.driver-mobile-shell__drawer {
+    position: absolute;
+    z-index: 50;
+    inset: 0 auto 0 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    width: min(86%, 360px);
+    color: #25383c;
+    background: #fff;
+    box-shadow: 18px 0 44px rgba(15, 42, 43, .2);
+}
+
+.driver-mobile-shell__drawer > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px 12px;
+    border-bottom: 1px solid #e1ecea;
+}
+
+.driver-mobile-shell__drawer > header div {
+    display: grid;
+    gap: .15rem;
+}
+
+.driver-mobile-shell__drawer > header span {
+    color: #728085;
+    font-size: .7rem;
+}
+
+.driver-mobile-shell__drawer nav {
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.driver-mobile-shell__drawer nav a,
+.driver-mobile-shell__map-link {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 7px;
+    color: #34484c;
+    background: transparent;
+    font: inherit;
+    font-size: .8rem;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.driver-mobile-shell__drawer nav a:hover,
+.driver-mobile-shell__map-link:hover {
+    color: #00796b;
+    background: #edf8f6;
+}
+
+.driver-mobile-shell__drawer > aside {
+    display: flex;
+    gap: .5rem;
+    margin: 10px 12px;
+    padding: .75rem;
+    border-radius: 7px;
+    color: #39736d;
+    background: #e4f5f2;
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+.driver-mobile-shell__map-error {
+    margin: 0 12px 12px;
+    color: #b42318;
+    font-size: .7rem;
+}
+
+.driver-mobile-shell__screen-body .driver-page-legacy-header {
+    display: none;
+}
+
+.driver-mobile-shell__screen-body .mud-container {
+    width: 100%;
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+.driver-mobile-shell__screen-body .mud-stack {
+    min-width: 0;
+}
+
+.driver-mobile-shell__screen-body .mud-stack-row {
+    flex-wrap: wrap;
+}
+
+.driver-mobile-shell__screen-body .mud-grid {
+    width: 100%;
+    margin: 0 !important;
+}
+
+.driver-mobile-shell__screen-body .mud-grid-item {
+    max-width: 100% !important;
+    padding: .35rem 0 !important;
+    flex-basis: 100% !important;
+}
+
+.driver-mobile-shell__screen-body .mud-paper {
+    border: 1px solid #d8e5e3;
+    border-radius: 7px;
+    background: #fff;
+    box-shadow: none !important;
+}
+
+.driver-mobile-shell__screen-body .mud-paper.pa-4,
+.driver-mobile-shell__screen-body .mud-paper.pa-5 {
+    padding: .85rem !important;
+}
+
+.driver-mobile-shell__screen-body .mud-typography-h4 {
+    font-size: 1.3rem;
+}
+
+.driver-mobile-shell__screen-body .mud-typography-h5 {
+    font-size: 1.15rem;
+}
+
+.driver-mobile-shell__screen-body .mud-typography-h6 {
+    font-size: .98rem;
+}
+
+.driver-mobile-shell__screen-body .mud-typography-body1,
+.driver-mobile-shell__screen-body .mud-typography-body2 {
+    line-height: 1.5;
+}
+
+.driver-mobile-shell__screen-body .mud-typography-body2 {
+    font-size: .76rem;
+}
+
+.driver-mobile-shell__screen-body .mud-button-root {
+    min-height: 40px;
+    border-radius: 6px;
+    font-size: .75rem;
+}
+
+.driver-mobile-shell__screen-body .mud-input-control {
+    margin-top: .25rem;
+}
+
+.driver-mobile-shell__screen-body .mud-chip {
+    min-height: 26px;
+    font-size: .66rem;
+}
+
+.driver-mobile-shell__screen-body .mud-alert {
+    border-radius: 7px;
+    font-size: .72rem;
+}
+
+.driver-mobile-shell__screen-body .driver-recommendation-card,
+.driver-mobile-shell__screen-body .driver-route-section,
+.driver-mobile-shell__screen-body .driver-warning-badge-group {
+    border-color: #d8e5e3;
+    border-radius: 7px;
+}
+
+.driver-mobile-shell__screen-body .driver-route-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.driver-mobile-shell__screen-body .driver-payment-strip {
+    border-color: #cfe3df;
+    background: #edf7f5;
+}
+
+.driver-mobile-shell__screen-body .driver-recommendation-timeout {
+    border-color: #bee4de;
+    background: #e4f5f2;
+}
+
+.driver-mobile-shell__screen-body table {
+    width: 100%;
+    font-size: .72rem;
+}
+
+@media (min-width: 760px) {
+    body {
+        background: #e7efee;
+    }
+}

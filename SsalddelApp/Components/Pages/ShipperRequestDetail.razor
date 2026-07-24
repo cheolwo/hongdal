@@ -1,12 +1,16 @@
 @page "/shipper/request/{RequestId}"
+@layout ShipperMobileLayout
 @inject ShipperRequestDetailPageViewModel PageModel
 @inject NavigationManager Navigation
 @implements IDisposable
 
-<PageTitle>운송 의뢰 요약</PageTitle>
+<PageTitle>운송의뢰 상세</PageTitle>
 
 <ShipperRequestSummaryScreen State="@PageModel.State"
                              Context="@RouteContext"
+                             ScreenCode="03.07"
+                             Title="운송의뢰 상세"
+                             Description="현재 원장의 화물·경로·비용과 다음 확인 업무를 봅니다."
                              HomeHref="@ShipperRoutes.ShipperHome"
                              NewRequestHref="@ShipperRoutes.Request"
                              RefreshRequested="RefreshAsync"

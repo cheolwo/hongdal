@@ -1,37 +1,16 @@
 html,
 body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background: #f7f8fa;
+    margin: 0;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    background: #edf0f6;
 }
 
-.orderer-main {
-    min-height: 100vh;
-    background: #f7f8fa;
+#app {
+    min-height: 100dvh;
 }
 
 .group-purchase-route-card .mud-button-root {
     min-height: 44px;
-}
-
-@media (max-width: 600px) {
-    .orderer-main {
-        padding-right: 0.75rem !important;
-        padding-left: 0.75rem !important;
-        padding-bottom: 1rem !important;
-    }
-
-    .orderer-app-scope {
-        display: none !important;
-    }
-
-    .orderer-app-title {
-        font-size: 1rem !important;
-    }
-
-    .mud-container {
-        padding-right: 0 !important;
-        padding-left: 0 !important;
-    }
 }
 
 h1:focus {

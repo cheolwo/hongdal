@@ -1,0 +1,103 @@
+.role-purpose-journey {
+    display: grid;
+    gap: .75rem;
+    margin: 0 0 1rem;
+    padding: .9rem;
+    border: 1px solid var(--role-purpose-border, #d8e0e8);
+    border-radius: 8px;
+    color: var(--role-purpose-text, #243041);
+    background: var(--role-purpose-surface, #fff);
+}
+
+.role-purpose-journey > header {
+    display: grid;
+    gap: .25rem;
+}
+
+.role-purpose-journey > header > span {
+    color: var(--role-purpose-accent, #2563eb);
+    font-size: .68rem;
+    font-weight: 850;
+}
+
+.role-purpose-journey h2 {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.role-purpose-journey header p,
+.role-purpose-journey__step p {
+    margin: 0;
+    color: var(--role-purpose-muted, #667085);
+    line-height: 1.45;
+}
+
+.role-purpose-journey header p {
+    font-size: .73rem;
+}
+
+.role-purpose-journey nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .5rem;
+}
+
+.role-purpose-journey__step {
+    display: grid;
+    gap: .24rem;
+    min-width: 0;
+    min-height: 112px;
+    padding: .7rem;
+    border: 1px solid var(--role-purpose-border, #d8e0e8);
+    border-radius: 7px;
+    color: inherit;
+    background: #fff;
+    text-decoration: none;
+}
+
+.role-purpose-journey__step--primary {
+    border-color: var(--role-purpose-accent, #2563eb);
+    background: var(--role-purpose-soft, #eff6ff);
+}
+
+.role-purpose-journey__step > span {
+    color: var(--role-purpose-accent, #2563eb);
+    font-size: .62rem;
+    font-weight: 850;
+}
+
+.role-purpose-journey__step strong {
+    font-size: .78rem;
+    line-height: 1.35;
+}
+
+.role-purpose-journey__step p {
+    font-size: .66rem;
+}
+
+.role-purpose-journey__step small {
+    align-self: end;
+    color: var(--role-purpose-accent, #2563eb);
+    font-size: .62rem;
+    font-weight: 800;
+}
+
+.role-purpose-journey > aside {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .45rem;
+    align-items: start;
+    padding: .65rem;
+    border-radius: 6px;
+    color: var(--role-purpose-accent, #2563eb);
+    background: var(--role-purpose-soft, #eff6ff);
+    font-size: .65rem;
+    line-height: 1.45;
+}
+
+@media (max-width: 390px) {
+    .role-purpose-journey nav {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

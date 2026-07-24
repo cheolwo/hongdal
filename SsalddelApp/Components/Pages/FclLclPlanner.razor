@@ -1,14 +1,16 @@
 @page "/shipper/international/fcl-lcl"
+@layout ShipperMobileLayout
 @using SsalddelApp.Services
 @inject NavigationManager Navigation
 
-<PageTitle>FCL/LCL 판단 및 협의</PageTitle>
+<PageTitle>FCL·LCL 계획</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
     <MudStack Spacing="3">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+        <span class="shipper-mobile-screen-code">화주 업무 · 03.14</span>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="shipper-mobile-page-header">
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">FCL/LCL 판단 및 수입 판매 협의</MudText>
+                <MudText Typo="Typo.h4">FCL·LCL 계획</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
                     구매 전 단계에서 화물량, 팔레트 배송대행 비용, 통관 비용, 예상 판매가를 함께 보고 수입 여부와 커뮤니티 수요 확인 방향을 잡습니다.
                 </MudText>

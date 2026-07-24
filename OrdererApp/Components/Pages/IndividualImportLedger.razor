@@ -4,7 +4,15 @@
 
 <PageTitle>개별수입 원장</PageTitle>
 
-<IndividualImportLedgerScreen OrderLedgerId="@OrderLedgerId" />
+<OrdererMobileRouteFrame ScreenCode="02.12"
+                         Title="개별수입 원장"
+                         Description="개별주문 원장의 상태와 수입 준비 근거를 봅니다."
+                         BackHref="@OrdererRoutes.Orders"
+                         BackLabel="주문 원장"
+                         BoundaryMessage="이 화면은 수입 준비 원장을 작성하며 계약·결제·신고·운송을 실행하지 않습니다.">
+    <IndividualImportLedgerScreen OrderLedgerId="@OrderLedgerId"
+                                  ShowHeading="false" />
+</OrdererMobileRouteFrame>
 
 @code {
     [Parameter] public string? OrderLedgerId { get; set; }

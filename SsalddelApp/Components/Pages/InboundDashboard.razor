@@ -1,9 +1,11 @@
 @page "/shipper/inbound/dashboard"
+@layout ShipperMobileLayout
 
-<PageTitle>입고 대시보드</PageTitle>
+<PageTitle>입고 요청 대시보드</PageTitle>
 
+<span class="shipper-mobile-screen-code">화주 업무 · 03.12</span>
 <SsalddelWarehouseDashboard
-    Title="입고 대시보드"
-    Description="입고 현황, 재고, 재위탁, 판매 등록 흐름의 시작 화면입니다."
+    Title="입고 요청 대시보드"
+    Description="창고 공급자 예정 입고와 검토 상태를 함께 확인합니다."
     InboundRequestsUrl="@ShipperRoutes.InboundRequests"
     InventoryUrl="@ShipperRoutes.WarehouseInventory" />

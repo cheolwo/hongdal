@@ -141,6 +141,56 @@
                 </div>
             }
 
+            <section id="public-data-boards"
+                     class="community-mobile-directory__public-data"
+                     aria-labelledby="public-data-board-heading">
+                <header>
+                    <div>
+                        <span>PUBLIC DATA</span>
+                        <h2 id="public-data-board-heading">공공데이터 전용 게시판</h2>
+                        <p>원천별 정기 글을 한 곳에만 누적하고 관련 게시판에서는 이곳으로 연결합니다.</p>
+                    </div>
+                    <b>@(ViewModel.VisiblePublicDataBoards.Count)개 원천</b>
+                </header>
+
+                @if (ViewModel.VisiblePublicDataBoards.Count == 0)
+                {
+                    <CommunityMobileDirectoryEmptyState />
+                }
+                else
+                {
+                    <div class="community-mobile-directory__data-grid">
+                        @foreach (var board in ViewModel.VisiblePublicDataBoards)
+                        {
+                            <a class="@($"community-mobile-directory__data-card community-mobile-directory__data-card--{board.Tone}")"
+                               data-public-data-board="@board.BoardKey"
+                               href="@board.Href">
+                                <span class="community-mobile-directory__data-icon">
+                                    <MudIcon Icon="@board.Icon" Size="Size.Small" />
+                                </span>
+                                <span class="community-mobile-directory__data-copy">
+                                    <small>@board.Provider</small>
+                                    <strong>@board.DisplayName</strong>
+                                    <em>@board.UpdateCycle</em>
+                                    <p>@board.Description</p>
+                                </span>
+                                <span class="community-mobile-directory__data-meta">
+                                    @if (ViewModel.HasLivePostCounts)
+                                    {
+                                        <b>@ViewModel.PostCountFor(board.BoardKey)개 글</b>
+                                    }
+                                    else
+                                    {
+                                        <b>주기성 자료</b>
+                                    }
+                                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                                </span>
+                            </a>
+                        }
+                    </div>
+                }
+            </section>
+
             <aside class="community-mobile-directory__safety">
                 <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" />
                 <span>
