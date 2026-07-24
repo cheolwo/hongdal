@@ -1,0 +1,311 @@
+.apple-price {
+    --apple-price-accent: #b0442c;
+    --apple-price-accent-soft: #fff5e8;
+    --apple-price-on-accent: #fff;
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    color: #172033;
+}
+
+.apple-price__hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 10px 0 28px;
+    border-bottom: 1px solid #d9e0e8;
+}
+
+.apple-price__hero > div:first-child {
+    min-width: 0;
+}
+
+.apple-price__back {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #526173;
+    font-size: 0.82rem;
+    text-decoration: none;
+}
+
+.apple-price__hero span,
+.apple-price__controls > label > span,
+.apple-price__summary span,
+.apple-price__primary span,
+.apple-price__method span {
+    color: var(--apple-price-accent);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.apple-price__hero h1 {
+    margin: 5px 0 0;
+    max-width: 760px;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.045em;
+}
+
+.apple-price__hero p {
+    margin: 12px 0 0;
+    color: #5c6777;
+    line-height: 1.55;
+}
+
+.apple-price__apple {
+    display: grid;
+    place-items: center;
+    width: 112px;
+    height: 112px;
+    flex: 0 0 auto;
+    border-radius: 30px;
+    background: var(--apple-price-accent-soft);
+    font-size: 4rem;
+    transform: rotate(3deg);
+}
+
+.apple-price__controls {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.3fr) minmax(180px, 0.7fr) minmax(250px, 1fr);
+    gap: 14px;
+    align-items: end;
+    margin: 22px 0 14px;
+    padding: 18px;
+    border: 1px solid #d8dee8;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.apple-price__controls label {
+    display: grid;
+    gap: 8px;
+}
+
+.apple-price__controls label > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.apple-price__controls input {
+    width: 100%;
+    accent-color: var(--apple-price-accent);
+}
+
+.apple-price__controls output {
+    min-width: 54px;
+    font-weight: 800;
+    text-align: right;
+}
+
+.apple-price__controls select {
+    width: 100%;
+    height: 42px;
+    padding: 0 10px;
+    border: 1px solid #b9c4d0;
+    border-radius: 7px;
+    color: #172033;
+    background: #fff;
+    font: inherit;
+}
+
+.apple-price__controls p {
+    margin: 0;
+    color: #647084;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.apple-price__summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    background: #d8dee8;
+}
+
+.apple-price__summary > div {
+    display: grid;
+    gap: 4px;
+    padding: 13px 16px;
+    background: #f8fafc;
+}
+
+.apple-price__summary strong {
+    font-size: 0.95rem;
+}
+
+.apple-price__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.apple-price__card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #d8dee8;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(23, 32, 51, 0.05);
+}
+
+.apple-price__card > header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.apple-price__card > header > span {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    border: 1px solid var(--apple-price-accent);
+    border-radius: 50%;
+    color: var(--apple-price-on-accent);
+    background: var(--apple-price-accent);
+    font-size: 0.76rem;
+    font-weight: 900;
+}
+
+.apple-price__card h2,
+.apple-price__card header p {
+    margin: 0;
+}
+
+.apple-price__card h2 {
+    font-size: 1.05rem;
+}
+
+.apple-price__card header p {
+    margin-top: 2px;
+    color: #667286;
+    font-size: 0.78rem;
+}
+
+.apple-price__primary {
+    display: grid;
+    gap: 4px;
+    margin: 18px 0;
+    padding: 18px;
+    border-radius: 10px;
+    background: var(--apple-price-accent-soft);
+}
+
+.apple-price__primary strong {
+    color: var(--apple-price-accent);
+    font-size: clamp(1.7rem, 4vw, 2.35rem);
+    letter-spacing: -0.035em;
+}
+
+.apple-price__primary small {
+    color: #74594f;
+}
+
+.apple-price__card dl {
+    display: grid;
+    gap: 0;
+    margin: 0;
+}
+
+.apple-price__card dl > div {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #edf0f4;
+    font-size: 0.78rem;
+}
+
+.apple-price__card dt {
+    color: #6b7687;
+}
+
+.apple-price__card dd {
+    margin: 0;
+    color: #273348;
+    overflow-wrap: anywhere;
+}
+
+.apple-price__limitation {
+    margin: 14px 0;
+    color: #6b5a43;
+    font-size: 0.75rem;
+    line-height: 1.45;
+}
+
+.apple-price__card > a {
+    margin-top: auto;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.apple-price__method {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
+    gap: 18px;
+    margin-top: 18px;
+    padding: 18px 20px;
+    border-left: 4px solid var(--apple-price-accent);
+    background: #f7f4ef;
+}
+
+.apple-price__method div {
+    display: grid;
+    gap: 5px;
+}
+
+.apple-price__method strong {
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.apple-price__method p {
+    margin: 0;
+    color: #5d6675;
+    font-size: 0.78rem;
+    line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+    .apple-price__controls,
+    .apple-price__cards {
+        grid-template-columns: 1fr;
+    }
+
+    .apple-price__method {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .apple-price__hero {
+        padding-top: 2px;
+    }
+
+    .apple-price__apple {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        font-size: 2.7rem;
+    }
+
+    .apple-price__summary {
+        grid-template-columns: 1fr;
+    }
+
+    .apple-price__controls,
+    .apple-price__card {
+        padding: 15px;
+    }
+}

@@ -41,6 +41,21 @@
     line-height: 1.5;
 }
 
+.public-data-workspace__apple-link {
+    display: inline-block;
+    margin-top: 12px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid currentColor;
+    color: #9b3824;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.public-data-workspace__apple-link:hover {
+    color: #6f2719;
+}
+
 .public-data-workspace__market-status {
     display: flex;
     gap: 6px;
