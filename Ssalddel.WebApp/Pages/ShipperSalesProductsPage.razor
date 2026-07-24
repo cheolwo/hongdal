@@ -1,0 +1,89 @@
+@page "/shipper/sales/products"
+@inject ShipperSalesProductsPageViewModel ViewModel
+
+<PageTitle>판매상품 원장</PageTitle>
+
+<WebPageHeader Eyebrow="Shipper Web · 2.5"
+               Title="판매상품 원장"
+               Description="입고 재고에서 명시적으로 생성된 내 판매상품만 조회합니다."
+               Badge="조회 전용" />
+
+<MudStack Row="true"
+          Justify="Justify.FlexEnd"
+          Spacing="1"
+          Wrap="Wrap.Wrap"
+          Class="mb-4">
+    <MudButton Href="@ShipperRoutes.WarehouseInventory"
+               Variant="Variant.Outlined"
+               Color="Color.Primary">
+        재고에서 상품 등록
+    </MudButton>
+    <MudButton Href="@ShipperRoutes.ProductListings"
+               Variant="Variant.Filled"
+               Color="Color.Primary">
+        채널 출품 원장
+    </MudButton>
+</MudStack>
+
+@if (ViewModel.IsBusy)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        @ViewModel.ErrorMessage
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Primary"
+                   OnClick="ReloadAsync">
+            다시 조회
+        </MudButton>
+    </MudAlert>
+}
+else if (ViewModel.Products.Count == 0)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        등록된 판매상품이 없습니다. 재고 원장에서 정확한 재고를 선택해 판매상품 등록을 시작해 주세요.
+    </MudAlert>
+}
+else
+{
+    <MudTable Items="ViewModel.Products.OrderByDescending(item => item.Id)"
+              Dense="true"
+              Hover="true"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh>상품 ID</MudTh>
+            <MudTh>재고 ID</MudTh>
+            <MudTh>상품명</MudTh>
+            <MudTh>판매 SKU</MudTh>
+            <MudTh>판매가</MudTh>
+            <MudTh>상태</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="상품 ID">@context.Id</MudTd>
+            <MudTd DataLabel="재고 ID">@context.입고상품Id</MudTd>
+            <MudTd DataLabel="상품명">@context.대표상품명</MudTd>
+            <MudTd DataLabel="판매 SKU">@context.판매SKU</MudTd>
+            <MudTd DataLabel="판매가">@context.판매가.ToString("N0")</MudTd>
+            <MudTd DataLabel="상태">@context.상태</MudTd>
+            <MudTd>
+                <MudButton Href="@ShipperRoutes.SalesListingCreateForProduct(context.Id)"
+                           Variant="Variant.Text"
+                           Color="Color.Primary"
+                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                    채널 출품 준비
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    protected override Task OnInitializedAsync()
+        => ViewModel.LoadAsync();
+
+    private Task ReloadAsync()
+        => ViewModel.LoadAsync();
+}

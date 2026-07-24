@@ -7,7 +7,8 @@
         xmlns:pageModels="clr-namespace:FDriverApp.PageModels"
         xmlns:models="clr-namespace:FDriverApp.Models"
         x:Class="FDriverApp.Pages.Controls.CategoryChart"
-        x:DataType="pageModels:MainPageModel"
+        x:DataType="controls:CategoryChart"
+        BindingContext="{Binding x:DataType='controls:CategoryChart', Source={RelativeSource Self}}"
         HeightRequest="{OnIdiom 300, Phone=200}"
         Margin="0, 12"
         Style="{StaticResource CardStyle}">

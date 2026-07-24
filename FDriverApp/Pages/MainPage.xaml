@@ -230,7 +230,7 @@
                                                                 Padding="10,6"
                                                                 BackgroundColor="#0F766E"
                                                                 TextColor="#FFFFFF"
-                                                                Command="{Binding BindingContext.AcceptBundleCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                                                Command="{Binding x:DataType='pageModels:MainPageModel', Source={RelativeSource AncestorType={x:Type pageModels:MainPageModel}}, Path=AcceptBundleCommand}"
                                                                 CommandParameter="{Binding .}" />
                                                     </VerticalStackLayout>
                                                 </Grid>
@@ -266,15 +266,15 @@
                                                     <Label Text="{Binding DriverPayoutText}" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="End" />
                                                     <Button Text="선택"
                                                             Padding="12,6"
-                                                            Command="{Binding BindingContext.SelectTicketCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                                            Command="{Binding x:DataType='pageModels:MainPageModel', Source={RelativeSource AncestorType={x:Type pageModels:MainPageModel}}, Path=SelectTicketCommand}"
                                                             CommandParameter="{Binding .}" />
                                                     <Button Text="수락"
                                                             Padding="12,6"
                                                             BackgroundColor="#2563EB"
                                                             TextColor="#FFFFFF"
-                                                            Command="{Binding BindingContext.AcceptTicketCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                                            Command="{Binding x:DataType='pageModels:MainPageModel', Source={RelativeSource AncestorType={x:Type pageModels:MainPageModel}}, Path=AcceptTicketCommand}"
                                                             CommandParameter="{Binding .}"
-                                                            IsEnabled="{Binding BindingContext.CanAcceptSelectedTicket, Source={RelativeSource AncestorType={x:Type ContentPage}}}" />
+                                                            IsEnabled="{Binding x:DataType='pageModels:MainPageModel', Source={RelativeSource AncestorType={x:Type pageModels:MainPageModel}}, Path=CanAcceptSelectedTicket}" />
                                                 </VerticalStackLayout>
                                             </Grid>
                                         </Border>

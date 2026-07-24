@@ -1,0 +1,131 @@
+@page "/orders/{OrderNo}"
+@inject I음식점주문DeskService OrderDeskService
+@inject ISsalddelDocumentOutputService DocumentOutputService
+@inject IJSRuntime JS
+
+<PageTitle>음식점 주문 상세</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">음식점 주문 상세</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">정확한 주문번호 한 건을 확인하고 명시적으로 수락합니다.</MudText>
+            </MudStack>
+            <MudButton Href="/orders" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack">
+                수신함
+            </MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        @if (order is null)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                현재 실행 세션에서 수신한 주문을 찾을 수 없습니다. 수신함으로 돌아가 서버 알림을 다시 확인해 주세요.
+            </MudAlert>
+        }
+        else
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h6">@order.주문번호</MudText>
+                        <MudChip T="string" Color="@StatusColor(order.상태)">@order.상태</MudChip>
+                    </MudStack>
+                    <MudDivider />
+                    <MudText Typo="Typo.body1">@order.고객명</MudText>
+                    <MudText Typo="Typo.body2">@order.메뉴요약</MudText>
+                    <MudText Typo="Typo.subtitle1">@order.주문금액.ToString("N0")원</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @order.접수시각.ToLocalTime().ToString("yyyy-MM-dd HH:mm") 수신
+                    </MudText>
+                    @if (!string.IsNullOrWhiteSpace(order.최근메시지))
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@order.최근메시지</MudText>
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">주문 수락과 전표 출력</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        수락하면 서버의 음식 주문 원장을 변경하고 배차 준비 이벤트를 만듭니다.
+                        성공한 응답으로만 전표를 만들며 API 실패를 샘플 주문으로 숨기지 않습니다.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Print"
+                               Disabled="@(!order.수락가능 || isBusy)"
+                               OnClick="AcceptAndPrintAsync">
+                        @(isBusy ? "수락 처리 중" : "주문 수락 후 전표 출력")
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string OrderNo { get; set; } = string.Empty;
+
+    private 음식점주문DeskItem? order;
+    private bool isBusy;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    protected override async Task OnParametersSetAsync()
+        => order = await OrderDeskService.주문조회Async(OrderNo);
+
+    private async Task AcceptAndPrintAsync()
+    {
+        if (order is null || isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        message = null;
+        try
+        {
+            var result = await OrderDeskService.주문수락후전표준비Async(order.주문번호);
+            if (!result.성공 || result.전표Draft is null)
+            {
+                messageSeverity = Severity.Error;
+                message = result.메시지;
+                return;
+            }
+
+            var output = DocumentOutputService.CreateOutboundExpectedItems(result.전표Draft);
+            await JS.InvokeVoidAsync("ssalddelDocumentOutput.printHtml", output.Title, output.Html);
+            await OrderDeskService.전표출력완료Async(order.주문번호);
+            order = await OrderDeskService.주문조회Async(order.주문번호);
+            messageSeverity = Severity.Success;
+            message = $"{OrderNo} 주문을 수락하고 전표 출력 요청을 보냈습니다.";
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = $"주문 수락을 완료하지 못했습니다. {ex.Message}";
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private static Color StatusColor(string status) => status switch
+    {
+        음식점주문Desk상태코드.주문대기 => Color.Error,
+        음식점주문Desk상태코드.수락처리중 => Color.Info,
+        음식점주문Desk상태코드.수락됨 => Color.Primary,
+        음식점주문Desk상태코드.전표출력됨 => Color.Success,
+        음식점주문Desk상태코드.상세조회실패 => Color.Warning,
+        _ => Color.Default
+    };
+}

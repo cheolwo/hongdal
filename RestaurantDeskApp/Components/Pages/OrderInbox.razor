@@ -1,0 +1,151 @@
+@page "/orders"
+@implements IAsyncDisposable
+@inject I음식점주문DeskService OrderDeskService
+@inject I음식점주문SignalRClientService RestaurantRealtimeService
+@inject IOptions<RestaurantDeskOptions> DeskOptions
+
+<PageTitle>신규 주문 수신함</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">신규 주문 수신함</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    서버가 이 음식점으로 보낸 실시간 알림만 조회합니다. 주문 수락은 상세 화면에서 수행합니다.
+                </MudText>
+            </MudStack>
+            <MudChip T="string" Color="@RealtimeStatusColor" Variant="Variant.Outlined">@realtimeStatus</MudChip>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        @if (orders.Count == 0)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-5">
+                <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Icons.Material.Filled.NotificationsNone" Size="Size.Large" Color="Color.Secondary" />
+                    <MudText Typo="Typo.h6">수신한 주문이 없습니다.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        샘플 데이터로 대체하지 않습니다. 연결 상태와 서버의 3.0 기능 플래그를 확인해 주세요.
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else
+        {
+            <MudStack Spacing="2">
+                @foreach (var order in orders)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudStack Spacing="1">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudText Typo="Typo.subtitle1">@order.주문번호</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(order.상태)">@order.상태</MudChip>
+                                </MudStack>
+                                <MudText Typo="Typo.body2">@order.고객명 · @order.메뉴요약</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @order.접수시각.ToLocalTime().ToString("yyyy-MM-dd HH:mm") · @order.주문금액.ToString("N0")원
+                                </MudText>
+                            </MudStack>
+                            <MudButton Href="@($"/orders/{Uri.EscapeDataString(order.주문번호)}")"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       EndIcon="@Icons.Material.Filled.ChevronRight">
+                                상세 보기
+                            </MudButton>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private IReadOnlyList<음식점주문DeskItem> orders = [];
+    private string realtimeStatus = "실시간 연결 대기";
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    private Color RealtimeStatusColor => RestaurantRealtimeService.연결상태 switch
+    {
+        "Connected" => Color.Success,
+        "Reconnecting" => Color.Warning,
+        _ => Color.Default
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        RestaurantRealtimeService.주문수신 += HandleRealtimeOrderReceivedAsync;
+        RestaurantRealtimeService.상태변경 += HandleRealtimeStatusChangedAsync;
+        await ReloadAsync();
+
+        try
+        {
+            await RestaurantRealtimeService.연결Async(DeskOptions.Value.RestaurantId);
+            realtimeStatus = $"실시간 연결됨 · 음식점 {DeskOptions.Value.RestaurantId}";
+        }
+        catch (Exception ex)
+        {
+            realtimeStatus = "실시간 연결 실패";
+            messageSeverity = Severity.Warning;
+            message = $"주문 실시간 연결에 실패했습니다. {ex.Message}";
+        }
+    }
+
+    private async Task HandleRealtimeOrderReceivedAsync(음식점주문수신알림 notification)
+    {
+        await InvokeAsync(async () =>
+        {
+            await OrderDeskService.주문알림수신Async(new 음식점주문수신Payload
+            {
+                주문번호 = notification.주문번호,
+                음식점Id = notification.음식점Id,
+                고객명 = notification.고객명,
+                메뉴요약 = notification.메뉴요약,
+                주문금액 = notification.주문금액,
+                수신시각 = notification.수신시각,
+                제목 = notification.제목,
+                본문 = notification.본문
+            });
+            messageSeverity = Severity.Success;
+            message = $"{notification.주문번호} 주문을 수신했습니다.";
+            await ReloadAsync();
+            StateHasChanged();
+        });
+    }
+
+    private async Task HandleRealtimeStatusChangedAsync(string status)
+    {
+        await InvokeAsync(() =>
+        {
+            realtimeStatus = status;
+            StateHasChanged();
+        });
+    }
+
+    private async Task ReloadAsync()
+        => orders = await OrderDeskService.주문목록조회Async();
+
+    private static Color StatusColor(string status) => status switch
+    {
+        음식점주문Desk상태코드.주문대기 => Color.Error,
+        음식점주문Desk상태코드.수락처리중 => Color.Info,
+        음식점주문Desk상태코드.수락됨 => Color.Primary,
+        음식점주문Desk상태코드.전표출력됨 => Color.Success,
+        음식점주문Desk상태코드.상세조회실패 => Color.Warning,
+        _ => Color.Default
+    };
+
+    public ValueTask DisposeAsync()
+    {
+        RestaurantRealtimeService.주문수신 -= HandleRealtimeOrderReceivedAsync;
+        RestaurantRealtimeService.상태변경 -= HandleRealtimeStatusChangedAsync;
+        return ValueTask.CompletedTask;
+    }
+}

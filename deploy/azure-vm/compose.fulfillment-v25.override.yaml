@@ -1,0 +1,13 @@
+services:
+  app:
+    environment:
+      SsalddelExecution__Mode: Simulation
+      VersionFeatureFlags__CommunityTrustWorkflow: "true"
+      VersionFeatureFlags__GroupPurchaseDemandWorkflow: "true"
+      VersionFeatureFlags__CustomsAndTradeDataWorkflow: "true"
+      VersionFeatureFlags__DomesticTransportWorkflow: "true"
+      VersionFeatureFlags__WarehouseFulfillmentWorkflow: "true"
+      VersionFeatureFlags__SalesChannelFulfillmentWorkflow: "true"
+      VersionFeatureFlags__HrParticipationWorkflow: "true"
+      SalesChannelOrderSync__Enabled: "false"
+      WorkRelationshipSnapshots__Enabled: "false"

@@ -1,0 +1,123 @@
+@page "/shipper/sales/listings/new"
+@inject ShipperSalesListingCreatePageViewModel ViewModel
+
+<PageTitle>채널 출품 준비</PageTitle>
+
+<WebPageHeader Eyebrow="Shipper Web · 2.5"
+               Title="채널 출품 준비"
+               Description="판매상품 한 건과 판매채널 계정 한 건을 직접 선택해 내부 준비 원장을 생성합니다."
+               Badge="외부 발행 없음" />
+
+<MudButton Href="@ShipperRoutes.ProductListings"
+           Variant="Variant.Text"
+           Color="Color.Primary"
+           StartIcon="@Icons.Material.Filled.ArrowBack"
+           Class="mb-3">
+    채널 출품 원장으로
+</MudButton>
+
+@if (ViewModel.IsBusy && ViewModel.Products.Count == 0)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+    {
+        <MudAlert Severity="@(ViewModel.HasError ? Severity.Error : Severity.Success)"
+                  Variant="Variant.Outlined"
+                  Class="mb-4">
+            @ViewModel.StatusMessage
+        </MudAlert>
+    }
+
+    @if (ViewModel.Products.Count == 0 || ViewModel.Accounts.Count == 0)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            판매상품과 판매채널 계정이 모두 있어야 출품 준비 원장을 만들 수 있습니다.
+        </MudAlert>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="mt-3">
+            <MudButton Href="@ShipperRoutes.WarehouseInventory"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary">
+                재고에서 판매상품 등록
+            </MudButton>
+            <MudButton Href="@ShipperRoutes.SalesChannels"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary">
+                판매채널 연결 준비
+            </MudButton>
+        </MudStack>
+    }
+    else
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudSelect T="long?"
+                           Label="판매상품"
+                           @bind-Value="ViewModel.SelectedProductId"
+                           Variant="Variant.Outlined"
+                           Clearable="true">
+                    @foreach (var product in ViewModel.Products)
+                    {
+                        <MudSelectItem T="long?" Value="@product.Id">
+                            @product.대표상품명 (@product.판매SKU)
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudSelect T="long?"
+                           Label="판매채널 계정"
+                           @bind-Value="ViewModel.SelectedAccountId"
+                           Variant="Variant.Outlined"
+                           Clearable="true">
+                    @foreach (var account in ViewModel.Accounts)
+                    {
+                        <MudSelectItem T="long?" Value="@account.Id">
+                            @account.채널종류 · @account.상점명
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    저장 결과는 내부 출품 준비 상태입니다. 외부 채널 인증·상품 발행·주문 동기화는 실행하지 않습니다.
+                </MudAlert>
+
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@ViewModel.IsBusy"
+                               OnClick="CreateAsync">
+                        출품 준비 원장 저장
+                    </MudButton>
+                    <MudButton Href="@ShipperRoutes.ProductListings"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary">
+                        출품 원장 조회
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    }
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "productId")]
+    public long? ProductId { get; set; }
+
+    private bool Initialized;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Initialized)
+        {
+            return;
+        }
+
+        Initialized = true;
+        await ViewModel.LoadAsync(ProductId);
+    }
+
+    private Task CreateAsync()
+        => ViewModel.CreateAsync();
+}

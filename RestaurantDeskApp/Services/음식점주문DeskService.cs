@@ -1,5 +1,7 @@
 using Ssalddel.Contracts.Food;
+using Microsoft.Extensions.Options;
 using RestaurantDeskApp.Models.Restaurant;
+using RestaurantDeskApp.Options;
 
 namespace RestaurantDeskApp.Services;
 
@@ -10,32 +12,36 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
     private readonly I음식주문ApiClient _foodOrderClient;
     private readonly I주문알림Service _orderAlertService;
     private readonly 음식점전표DraftFactory _slipFactory;
+    private readonly RestaurantDeskOptions _options;
     private long _nextId = 1000;
 
     public 음식점주문DeskService(
-        RestaurantDeskSampleService sampleService,
         I음식주문ApiClient foodOrderClient,
         I주문알림Service orderAlertService,
-        음식점전표DraftFactory slipFactory)
+        음식점전표DraftFactory slipFactory,
+        IOptions<RestaurantDeskOptions> options)
     {
         _foodOrderClient = foodOrderClient;
         _orderAlertService = orderAlertService;
         _slipFactory = slipFactory;
-        _orders = sampleService.Get신규주문목록()
-            .Select(x => new 음식점주문DeskItem
-            {
-                Id = x.Id,
-                주문번호 = x.주문번호,
-                음식점Id = x.음식점Id,
-                고객명 = x.고객명,
-                메뉴요약 = x.메뉴요약,
-                주문금액 = x.주문금액,
-                접수시각 = new DateTimeOffset(x.접수시각),
-                상태 = 음식점주문Desk상태코드.주문대기,
-                미확인 = x.미확인,
-                최근메시지 = "실시간 주문 알림 대기"
-            })
-            .ToList();
+        _options = options.Value;
+        _orders = [];
+    }
+
+    public Task<음식점주문DeskItem?> 주문조회Async(
+        string 주문번호,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(주문번호))
+        {
+            return Task.FromResult<음식점주문DeskItem?>(null);
+        }
+
+        lock (_gate)
+        {
+            return Task.FromResult(FindLocked(주문번호.Trim()));
+        }
     }
 
     public Task<IReadOnlyList<음식점주문DeskItem>> 주문목록조회Async(CancellationToken cancellationToken = default)
@@ -54,6 +60,10 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
     {
         ArgumentNullException.ThrowIfNull(payload);
         ArgumentException.ThrowIfNullOrWhiteSpace(payload.주문번호);
+        if (payload.음식점Id != _options.RestaurantId)
+        {
+            throw new InvalidOperationException("현재 음식점과 다른 주문 알림은 수신함에 저장할 수 없습니다.");
+        }
 
         음식점주문DeskItem? item;
         lock (_gate)
@@ -101,7 +111,40 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
             }
         }
 
-        var detail = await _foodOrderClient.주문상세조회Async(주문번호, cancellationToken);
+        음식주문응답? detail;
+        try
+        {
+            detail = await _foodOrderClient.음식점수락Async(
+                주문번호,
+                new 음식점주문수락요청
+                {
+                    처리UserId = $"restaurant:{_options.RestaurantId}",
+                    음식점명 = _options.RestaurantName,
+                    음식점주소 = _options.RestaurantAddress,
+                    음식점상세주소 = _options.RestaurantDetailAddress,
+                    음식점위도 = _options.RestaurantLatitude,
+                    음식점경도 = _options.RestaurantLongitude,
+                    조리예상분 = Math.Clamp(_options.DefaultPreparationMinutes, 1, 180),
+                    즉시픽업가능여부 = false,
+                    수락메모 = "Restaurant Desk에서 수락"
+                },
+                cancellationToken);
+        }
+        catch
+        {
+            lock (_gate)
+            {
+                item = FindLocked(주문번호);
+                if (item is not null)
+                {
+                    item.상태 = 음식점주문Desk상태코드.상세조회실패;
+                    item.최근메시지 = "서버 주문 수락에 실패했습니다. 다시 시도할 수 있습니다.";
+                }
+            }
+
+            throw;
+        }
+
         if (detail is null)
         {
             lock (_gate)
