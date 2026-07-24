@@ -1,59 +1,57 @@
 @page "/driver/transport/proof"
-@inherits MvvmComponentBase<DriverTransportProofPageViewModel>
-@using Ssalddel.WebApp.Pages.DriverTransportProof
-@using Ssalddel.WebApp.ViewModels
+@using Ssalddel.WebApp.Services
 
 <WebPageHeader Eyebrow="Driver Web"
-               Title="상하차 증빙/예외 처리"
-               Description="사진 업로드 응답을 받은 뒤에만 상차 완료와 하차 완료 상태를 서버에 반영하는 흐름을 검증합니다."
-               Badge="증빙 API" />
+               Title="운송 증빙 단계 선택"
+               Description="기존 링크를 전용 상차·하차 화면으로 안전하게 연결하는 읽기 전용 호환 경로입니다."
+               Badge="2.0 · 읽기 전용" />
 
-<MudGrid>
-    <MudItem xs="12" lg="4">
-        <MudStack Spacing="3">
-            <DriverTransportProofTargetPanel Model="@ViewModel" />
+<MudStack Spacing="3">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        이 화면은 사진 업로드나 상태 변경을 실행하지 않습니다. 상차와 하차는 각각 하나의 운송 ID를 사용하는 전용 화면에서 처리합니다.
+    </MudAlert>
 
-            @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
-            {
-                <MudAlert Severity="@ResolveStatusSeverity(ViewModel.StatusTone)" Variant="Variant.Outlined">
-                    @ViewModel.StatusMessage
-                </MudAlert>
-            }
-
-            <DriverTransportProofStatePanel Model="@ViewModel" />
-        </MudStack>
-    </MudItem>
-
-    <MudItem xs="12" lg="8">
+    @if (TransportIdFromQuery is > 0)
+    {
         <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudTabs Rounded="true" Elevation="0">
-                <MudTabPanel Text="상차 증빙">
-                    <DriverPickupProofEditor Model="@ViewModel.Pickup" IsBusy="@ViewModel.IsBusy" />
-                </MudTabPanel>
-                <MudTabPanel Text="하차 증빙">
-                    <DriverDropoffProofEditor Model="@ViewModel.Dropoff" IsBusy="@ViewModel.IsBusy" />
-                </MudTabPanel>
-                <MudTabPanel Text="예외 신고">
-                    <DriverTransportIssueEditor Model="@ViewModel.Issue" IsBusy="@ViewModel.IsBusy" />
-                </MudTabPanel>
-            </MudTabs>
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">운송 #@TransportIdFromQuery</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    현재 현장 단계에 맞는 화면을 선택하세요. 각 화면은 서버가 권한과 선행 상태를 다시 검증합니다.
+                </MudText>
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Href="@DriverRoutes.PickupFor(TransportIdFromQuery.Value)"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.FileUpload">
+                        상차 처리
+                    </MudButton>
+                    <MudButton Href="@DriverRoutes.DropoffFor(TransportIdFromQuery.Value)"
+                               Variant="Variant.Filled"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Flag">
+                        하차 처리
+                    </MudButton>
+                </MudStack>
+            </MudStack>
         </MudPaper>
-    </MudItem>
-</MudGrid>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            운송 ID가 없는 이전 링크입니다. 진행 중 운송을 조회한 뒤 서버가 반환한 운송의 다음 처리 화면으로 이동하세요.
+        </MudAlert>
+    }
+
+    <MudButton Href="@DriverRoutes.CurrentTransport"
+               Variant="Variant.Outlined"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.LocalShipping">
+        진행 중 운송 확인
+    </MudButton>
+</MudStack>
 
 @code {
     [SupplyParameterFromQuery(Name = "transportId")]
     public long? TransportIdFromQuery { get; set; }
-
-    protected override void OnParametersSet()
-        => ViewModel.ConfigureTransportId(TransportIdFromQuery);
-
-    private static Severity ResolveStatusSeverity(DriverTransportProofMessageTone tone)
-        => tone switch
-        {
-            DriverTransportProofMessageTone.Success => Severity.Success,
-            DriverTransportProofMessageTone.Warning => Severity.Warning,
-            DriverTransportProofMessageTone.Error => Severity.Error,
-            _ => Severity.Info
-        };
 }

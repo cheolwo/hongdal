@@ -16,20 +16,22 @@ public sealed class DriverCurrentTransportPageCompositionTests
         Assert.True(File.ReadLines(pagePath).Count() <= 100);
         Assert.Contains("MvvmComponentBase<DriverCurrentTransportPageViewModel>", source);
         Assert.Contains("<DriverCurrentTransportOverview", source);
-        Assert.Contains("<DriverCurrentTransportStatusActions", source);
+        Assert.Contains("<DriverCurrentTransportNextActionPanel", source);
         Assert.Contains("<DriverCurrentTransportNavigation", source);
         Assert.DoesNotContain("기사운송증빙Service", source);
         Assert.DoesNotContain("ITransportRequestLedgerObserver", source);
         Assert.DoesNotContain("PeriodicTimer", source);
         Assert.DoesNotContain("상차지도착Async", source);
         Assert.DoesNotContain("하차지도착Async", source);
+        Assert.DoesNotContain("ArrivePickup", source);
+        Assert.DoesNotContain("ArriveDropoff", source);
     }
 
     [Theory]
     [InlineData("DriverCurrentTransportEmptyState.razor")]
     [InlineData("DriverCurrentTransportOverview.razor")]
     [InlineData("DriverCurrentTransportTimeline.razor")]
-    [InlineData("DriverCurrentTransportStatusActions.razor")]
+    [InlineData("DriverCurrentTransportNextActionPanel.razor")]
     [InlineData("DriverCurrentTransportNavigation.razor")]
     [InlineData("DriverCurrentTransportPresentation.cs")]
     public void 현재_운송_하위_책임은_별도_파일로_존재한다(string fileName)
@@ -48,7 +50,7 @@ public sealed class DriverCurrentTransportPageCompositionTests
 
     [Theory]
     [InlineData("DriverCurrentTransportPageViewModel.cs")]
-    [InlineData("DriverCurrentTransportActionsViewModel.cs")]
+    [InlineData("DriverCurrentTransportRefreshViewModel.cs")]
     [InlineData("DriverCurrentTransportRefreshSession.cs")]
     public void 현재_운송_workflow_책임은_별도_객체로_존재한다(string fileName)
     {

@@ -1,0 +1,67 @@
+@using Ssalddel.WebApp.Pages.DriverTransportProof
+@using Ssalddel.WebApp.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="2">
+        <MudStack Row="true"
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween"
+                  Wrap="Wrap.Wrap">
+            <MudText Typo="Typo.h6">운송 정보</MudText>
+            <MudChip T="string"
+                     Color="@DriverTransportProofPresentation.ResolveTransportStateColor(Model.CurrentTransport?.상태)"
+                     Size="Size.Small">
+                @DriverTransportProofPresentation.Display(Model.CurrentTransport?.상태, "조회 전")
+            </MudChip>
+        </MudStack>
+
+        @if (Model.CurrentTransport is null)
+        {
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                운송 ID @Model.TransportId 정보를 조회합니다.
+            </MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.subtitle2">@Model.CurrentTransport.운송번호</MudText>
+            <MudText Typo="Typo.body2">
+                @DriverTransportProofPresentation.Display(Model.CurrentTransport.출발지, "-")
+                →
+                @DriverTransportProofPresentation.Display(Model.CurrentTransport.도착지, "-")
+            </MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                운임 @DriverTransportProofPresentation.DisplayMoney(Model.CurrentTransport.운임)
+                ·
+                @DriverTransportProofPresentation.Display(Model.CurrentTransport.결제방식, "현장 확인")
+            </MudText>
+            @if (Model.CurrentTransport.관리자확인필요)
+            {
+                <MudChip T="string" Color="Color.Error" Size="Size.Small" Variant="Variant.Outlined">
+                    관리자 확인 필요
+                </MudChip>
+            }
+        }
+
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       Disabled="@Model.IsBusy"
+                       StartIcon="@Icons.Material.Filled.Sync"
+                       OnClick="Model.LoadTransportAsync">
+                새로고침
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Disabled="@Model.IsBusy"
+                       StartIcon="@Icons.Material.Filled.Flag"
+                       OnClick="Model.ArriveDropoffAsync">
+                하차지 도착
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverTransportDropoffPageViewModel Model { get; set; } = default!;
+}

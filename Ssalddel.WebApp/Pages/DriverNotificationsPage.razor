@@ -1,124 +1,66 @@
 @page "/driver/notifications"
 @inject NavigationManager Navigation
 
-<WebPageHeader Eyebrow="Driver Web"
-               Title="알림함"
-               Description="FCM payload, 추천콜, 운송 진행, 정산 알림을 기사 업무 화면으로 연결합니다."
-               Badge="FCM 딥링크" />
+<WebPageHeader Eyebrow="살뜰 2.0 · 기사"
+               Title="알림 연결"
+               Description="실제 수신 payload를 추천·현재 운송·상차·하차·정산의 전용 화면으로 연결합니다."
+               Badge="읽기 전용 딥링크" />
 
 <MudStack Spacing="3">
     @if (HasIncomingPayload)
     {
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                <MudStack Spacing="0">
-                    <MudText Typo="Typo.subtitle2">@IncomingDisplayType</MudText>
-                    <MudText Typo="Typo.caption" Color="Color.Secondary">@IncomingPayloadSummary</MudText>
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">@IncomingDisplayType</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@IncomingPayloadSummary</MudText>
+                    </MudStack>
+                    <MudButton Href="@IncomingHref"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@IncomingActionIcon">
+                        @IncomingActionLabel
+                    </MudButton>
                 </MudStack>
-                <MudButton Href="@IncomingHref"
-                           Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           StartIcon="@IncomingActionIcon">
-                    @IncomingActionLabel
-                </MudButton>
+                <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                    이 화면은 알림을 근거로 상태를 바꾸지 않습니다. 대상 화면의 서버 조회와 권한 검증을 거쳐 다음 행동을 결정합니다.
+                </MudAlert>
             </MudStack>
+        </MudPaper>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            영속 알림 목록 API는 아직 2.0 배포 후보에 연결되지 않았습니다. 실제 알림이 없는 상태에서 샘플 알림을 최근 알림처럼 표시하지 않습니다.
         </MudAlert>
     }
 
-    <MudGrid>
-        <MudItem xs="12" lg="8">
-            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                <MudStack Spacing="3">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                        <MudStack Spacing="0">
-                            <MudText Typo="Typo.h6">최근 알림</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">읽지 않음 @($"{UnreadCount}건") · 전체 @($"{NotificationItems.Count}건")</MudText>
-                        </MudStack>
-                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                            <MudButton Href="/driver/notifications/settings"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Secondary"
-                                       StartIcon="@Icons.Material.Filled.Settings">
-                                알림 설정
-                            </MudButton>
-                            <MudButton Href="/driver/me"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Secondary"
-                                       StartIcon="@Icons.Material.Filled.AccountCircle">
-                                내 정보
-                            </MudButton>
-                        </MudStack>
-                    </MudStack>
-
-                    @foreach (var item in NotificationItems)
-                    {
-                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                <MudStack Spacing="1" Class="flex-grow-1">
-                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
-                                        <MudChip T="string" Size="Size.Small" Color="@ResolveKindColor(item.PayloadType)" Variant="Variant.Filled">
-                                            @DriverNotificationDeepLinkResolver.ResolveDisplayType(item.PayloadType)
-                                        </MudChip>
-                                        @if (!item.IsRead)
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Outlined">미확인</MudChip>
-                                        }
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.OccurredAt.ToLocalTime().ToString("MM-dd HH:mm")</MudText>
-                                    </MudStack>
-                                    <MudText Typo="Typo.subtitle2">@item.Title</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@item.Body</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@BuildPayloadSummary(item.PayloadType, item.RequestId, item.TransportId)</MudText>
-                                </MudStack>
-                                <MudButton Href="@ResolveHref(item)"
-                                           Variant="Variant.Text"
-                                           Color="Color.Primary"
-                                           StartIcon="@ResolveActionIcon(item.PayloadType)">
-                                    @DriverNotificationDeepLinkResolver.ResolveActionLabel(item.PayloadType)
-                                </MudButton>
-                            </MudStack>
-                        </MudPaper>
-                    }
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" lg="4">
-            <MudStack Spacing="3">
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.h6">Payload 점검</MudText>
-                        <MudGrid>
-                            @foreach (var sample in PayloadSamples)
-                            {
-                                <MudItem xs="12">
-                                    <MudButton Href="@sample.Href"
-                                               Variant="Variant.Outlined"
-                                               Color="@sample.Color"
-                                               FullWidth="true"
-                                               StartIcon="@sample.Icon">
-                                        @sample.Label
-                                    </MudButton>
-                                </MudItem>
-                            }
-                        </MudGrid>
-                    </MudStack>
-                </MudPaper>
-
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.h6">라우팅 기준</MudText>
-                        @foreach (var route in RouteRules)
-                        {
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                <MudText Typo="Typo.body2">@route.Type</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">@route.Target</MudText>
-                            </MudStack>
-                        }
-                    </MudStack>
-                </MudPaper>
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">기사 업무로 이동</MudText>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudButton Href="@DriverRoutes.Recommendations"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Route">
+                    추천 목록
+                </MudButton>
+                <MudButton Href="@DriverRoutes.CurrentTransport"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.LocalShipping">
+                    현재 운송
+                </MudButton>
+                <MudButton Href="@DriverRoutes.NotificationSettings"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Settings">
+                    알림 설정
+                </MudButton>
             </MudStack>
-        </MudItem>
-    </MudGrid>
+        </MudStack>
+    </MudPaper>
 </MudStack>
 
 @code {
@@ -135,106 +77,15 @@
     public bool AutoOpen { get; set; }
 
     private bool autoOpened;
-
     private bool HasIncomingPayload => !string.IsNullOrWhiteSpace(PayloadType);
     private string IncomingDisplayType => DriverNotificationDeepLinkResolver.ResolveDisplayType(PayloadType);
     private string IncomingActionLabel => DriverNotificationDeepLinkResolver.ResolveActionLabel(PayloadType);
-    private string IncomingActionIcon => ResolveActionIcon(PayloadType);
+    private string IncomingActionIcon => DriverNotificationPresentation.ResolveActionIcon(PayloadType);
     private string IncomingHref => DriverNotificationDeepLinkResolver.ResolveHref(PayloadType, RequestId, TransportId);
-    private string IncomingPayloadSummary => BuildPayloadSummary(PayloadType, RequestId, TransportId);
-    private int UnreadCount => NotificationItems.Count(x => !x.IsRead);
-
-    private IReadOnlyList<DriverNotificationInboxItem> NotificationItems =>
-    [
-        new(
-            1001,
-            DriverNotificationDeepLinkResolver.Recommendation,
-            "서울 양천구 상차 추천",
-            "냉장식품 추천콜이 도착했습니다. 제한 시간 안에 수락 여부를 선택해야 합니다.",
-            DateTime.Now.AddMinutes(-2),
-            false,
-            "HD-WEB-001",
-            null),
-        new(
-            1002,
-            DriverNotificationDeepLinkResolver.DispatchAccepted,
-            "배차가 확정되었습니다",
-            "수락한 의뢰가 현재 운송으로 전환되었습니다.",
-            DateTime.Now.AddMinutes(-8),
-            false,
-            "HD-WEB-001",
-            null),
-        new(
-            1003,
-            DriverNotificationDeepLinkResolver.PickupReady,
-            "상차지 도착 처리가 필요합니다",
-            "현장 도착 후 상차 사진과 인수증 확인을 진행합니다.",
-            DateTime.Now.AddMinutes(-18),
-            true,
-            "HD-WEB-001",
-            1),
-        new(
-            1004,
-            DriverNotificationDeepLinkResolver.DropoffReady,
-            "하차 확인이 필요합니다",
-            "하차 사진, 수령자, 결제/증빙 확인 후 완료 처리합니다.",
-            DateTime.Now.AddMinutes(-42),
-            true,
-            "HD-WEB-001",
-            1),
-        new(
-            1005,
-            DriverNotificationDeepLinkResolver.Settlement,
-            "이번 달 정산 확인",
-            "배차 건수와 이용료 상한을 확인할 수 있습니다.",
-            DateTime.Now.AddHours(-3),
-            true,
-            null,
-            null)
-    ];
-
-    private IReadOnlyList<PayloadSample> PayloadSamples =>
-    [
-        new(
-            "추천 payload",
-            "/driver/notifications?type=DispatchRecommendation&requestId=HD-WEB-001",
-            Icons.Material.Filled.NotificationsActive,
-            Color.Primary),
-        new(
-            "배차 확정 payload",
-            "/driver/notifications?type=DispatchAccepted&requestId=HD-WEB-001",
-            Icons.Material.Filled.LocalShipping,
-            Color.Success),
-        new(
-            "상차 payload",
-            "/driver/notifications?type=TransportPickupReady&transportId=1",
-            Icons.Material.Filled.FileUpload,
-            Color.Info),
-        new(
-            "하차 payload",
-            "/driver/notifications?type=TransportDropoffReady&transportId=1",
-            Icons.Material.Filled.TaskAlt,
-            Color.Secondary),
-        new(
-            "정산 payload",
-            "/driver/notifications?type=SettlementReady",
-            Icons.Material.Filled.ReceiptLong,
-            Color.Warning)
-    ];
-
-    private static IReadOnlyList<(string Type, string Target)> RouteRules =>
-    [
-        ("DispatchRecommendation", "/driver/recommendations/{requestId}"),
-        ("DispatchAccepted", "/driver/transports/current"),
-        ("TransportPickupReady", "/driver/transports/{transportId}/pickup"),
-        ("TransportDropoffReady", "/driver/transports/{transportId}/dropoff"),
-        ("SettlementReady", "/driver/settlements/current-month")
-    ];
+    private string IncomingPayloadSummary => DriverNotificationPresentation.BuildPayloadSummary(PayloadType, RequestId, TransportId);
 
     protected override void OnParametersSet()
-    {
-        autoOpened = false;
-    }
+        => autoOpened = false;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -246,69 +97,4 @@
 
         return Task.CompletedTask;
     }
-
-    private static string ResolveHref(DriverNotificationInboxItem item)
-        => DriverNotificationDeepLinkResolver.ResolveHref(item.PayloadType, item.RequestId, item.TransportId);
-
-    private static Color ResolveKindColor(string? payloadType)
-    {
-        var type = DriverNotificationDeepLinkResolver.ResolveDisplayType(payloadType);
-        return type switch
-        {
-            "신규 추천" => Color.Primary,
-            "배차 확정" => Color.Success,
-            "상차 요청" => Color.Info,
-            "하차 요청" => Color.Secondary,
-            "정산" => Color.Warning,
-            _ => Color.Default
-        };
-    }
-
-    private static string ResolveActionIcon(string? payloadType)
-    {
-        var type = DriverNotificationDeepLinkResolver.ResolveDisplayType(payloadType);
-        return type switch
-        {
-            "신규 추천" => Icons.Material.Filled.Route,
-            "추천 만료" => Icons.Material.Filled.ListAlt,
-            "배차 확정" => Icons.Material.Filled.LocalShipping,
-            "상차 요청" => Icons.Material.Filled.FileUpload,
-            "하차 요청" => Icons.Material.Filled.TaskAlt,
-            "정산" => Icons.Material.Filled.ReceiptLong,
-            "알림 설정" => Icons.Material.Filled.Settings,
-            _ => Icons.Material.Filled.Notifications
-        };
-    }
-
-    private static string BuildPayloadSummary(string? payloadType, string? requestId, long? transportId)
-    {
-        var parts = new List<string> { $"type={payloadType ?? "-"}" };
-        if (!string.IsNullOrWhiteSpace(requestId))
-        {
-            parts.Add($"requestId={requestId}");
-        }
-
-        if (transportId is > 0)
-        {
-            parts.Add($"transportId={transportId}");
-        }
-
-        return string.Join(" · ", parts);
-    }
-
-    private sealed record DriverNotificationInboxItem(
-        long Id,
-        string PayloadType,
-        string Title,
-        string Body,
-        DateTime OccurredAt,
-        bool IsRead,
-        string? RequestId,
-        long? TransportId);
-
-    private sealed record PayloadSample(
-        string Label,
-        string Href,
-        string Icon,
-        Color Color);
 }

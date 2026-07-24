@@ -55,15 +55,7 @@ public sealed class 기사추천수신Service : I기사추천수신Service
             return 선택추천;
         }
 
-        var sample = 모의추천목록()
-            .FirstOrDefault(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase));
-
-        if (sample is not null)
-        {
-            선택추천설정(sample, "모의 추천");
-        }
-
-        return sample;
+        return null;
     }
 
     public void 선택추천해제(string? requestId = null)

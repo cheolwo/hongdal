@@ -35,38 +35,29 @@ public sealed class DriverCurrentTransportPageViewModel : 조립ViewModelBase
         ITransportRequestLedgerObserver ledgerObserver)
         : this(
             transportService.현재운송조회Async,
-            async (transportId, cancellationToken) =>
-                _ = await transportService.상차지도착Async(transportId, cancellationToken),
-            async (transportId, cancellationToken) =>
-                _ = await transportService.하차지도착Async(transportId, cancellationToken),
             ledgerObserver)
     {
     }
 
     public DriverCurrentTransportPageViewModel(
         Func<CancellationToken, Task<기사운송요약응답>> loadCurrentTransport,
-        Func<long, CancellationToken, Task> arrivePickup,
-        Func<long, CancellationToken, Task> arriveDropoff,
         ITransportRequestLedgerObserver ledgerObserver)
     {
         _loadCurrentTransport = loadCurrentTransport;
-        Actions = 하위ViewModel등록(
-            new DriverCurrentTransportActionsViewModel(
-                () => CurrentTransport,
+        Refresh = 하위ViewModel등록(
+            new DriverCurrentTransportRefreshViewModel(
                 LoadCurrentTransportCoreAsync,
-                arrivePickup,
-                arriveDropoff,
                 SetStatus,
                 _lifetimeCancellation.Token),
             수명소유: true);
         _refreshSession = new DriverCurrentTransportRefreshSession(
             ledgerObserver,
             IsCurrentTransportRequest,
-            () => !Actions.IsBusy && (CurrentTransport is not null || HasAcceptedRequestContext));
+            () => !Refresh.IsBusy && (CurrentTransport is not null || HasAcceptedRequestContext));
         _refreshSession.RefreshRequested += HandleRefreshRequested;
     }
 
-    public DriverCurrentTransportActionsViewModel Actions { get; }
+    public DriverCurrentTransportRefreshViewModel Refresh { get; }
 
     public 기사운송요약응답? CurrentTransport
     {

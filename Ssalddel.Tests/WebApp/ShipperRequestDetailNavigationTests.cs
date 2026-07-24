@@ -41,12 +41,12 @@ public sealed class ShipperRequestDetailNavigationTests
     [Theory]
     [InlineData("/shipper/request/detail")]
     [InlineData("/shipper/request/HD-WEB-001")]
-    public void 상세_진입점은_로그인이_필요한_Simulation_Beta_경계다(string href)
+    public void 상세_진입점은_로그인이_필요한_ReadOnly_Beta_경계다(string href)
     {
         var state = IntegratedBetaCatalog.Resolve(href);
 
         Assert.Equal(IntegratedBetaStage.Beta, state.Stage);
-        Assert.Equal(WebInteractionBoundary.Simulation, state.Boundary);
+        Assert.Equal(WebInteractionBoundary.ReadOnly, state.Boundary);
         Assert.True(state.RequiresAuthentication);
     }
 }

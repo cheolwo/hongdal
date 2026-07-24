@@ -1,0 +1,67 @@
+@page "/driver/dispatch-decisions/{RequestId}"
+@inherits MvvmComponentBase<DriverRecommendationDecisionPageViewModel>
+@using Ssalddel.WebApp.Pages.DriverRecommendationComponents
+@using Ssalddel.WebApp.ViewModels
+
+<PageTitle>배차 추천 수락·거절</PageTitle>
+
+<WebPageHeader Eyebrow="살뜰 2.0 · 기사"
+               Title="배차 판단"
+               Description="추천 한 건의 수락 또는 거절만 명시적으로 처리합니다. 목록 조회와 상세 설명은 앞선 전용 화면이 맡습니다."
+               Badge="상태 변경 전용" />
+
+<MudStack Spacing="3">
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        추천은 후보 정보입니다. 이 화면은 기사 본인의 명시적 선택만 전송하며, 제한 시간이 지나도 브라우저가 자동 거절 Command를 보내지 않습니다.
+    </MudAlert>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+    {
+        <MudAlert Severity="@ResolveStatusSeverity(ViewModel.StatusTone)" Variant="Variant.Outlined">
+            @ViewModel.StatusMessage
+        </MudAlert>
+    }
+
+    @if (ViewModel.IsBusy && ViewModel.Recommendation is null)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (ViewModel.Recommendation is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudText Typo="Typo.h6">판단할 추천을 찾지 못했습니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    추천 목록을 다시 조회해 현재 기사에게 유효한 추천을 선택해 주세요.
+                </MudText>
+                <MudButton Href="@DriverRoutes.Recommendations"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    추천 목록으로
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+    else
+    {
+        <DriverRecommendationDecisionPanel Model="@ViewModel" />
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public string? RequestId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+        => ViewModel.InitializeAsync(RequestId);
+
+    private static Severity ResolveStatusSeverity(
+        DriverRecommendationDecisionMessageTone tone)
+        => tone switch
+        {
+            DriverRecommendationDecisionMessageTone.Success => Severity.Success,
+            DriverRecommendationDecisionMessageTone.Warning => Severity.Warning,
+            DriverRecommendationDecisionMessageTone.Error => Severity.Error,
+            _ => Severity.Info
+        };
+}

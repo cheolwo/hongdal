@@ -6,9 +6,8 @@ namespace Ssalddel.WebApp.Services;
 public sealed class WebPlatformCommunityNodeNavigationResolver
     : IPlatformCommunityNodeNavigationResolver
 {
-    private const string DriverRecommendations = "/driver/recommendations";
-    private const string DriverCurrentTransport = "/driver/transports/current";
-    private const string DriverTransportProof = "/driver/transport/proof";
+    private const string DriverRecommendations = DriverRoutes.Recommendations;
+    private const string DriverCurrentTransport = DriverRoutes.CurrentTransport;
 
     public PlatformCommunityNodeNavigationTarget? Resolve(
         PlatformCommunityNodeNavigationRequest request)
@@ -38,7 +37,7 @@ public sealed class WebPlatformCommunityNodeNavigationResolver
         {
             if (request.TitleContainsAny("운송 하차", "하차 증빙"))
             {
-                return Driver(DriverTransportProof, "상차·하차 증빙 화면");
+                return Driver(DriverCurrentTransport, "현재 운송에서 하차 단계 확인");
             }
 
             if (request.TitleContainsAny("검수"))
@@ -55,7 +54,7 @@ public sealed class WebPlatformCommunityNodeNavigationResolver
         {
             if (request.TitleContainsAny("운송 상차", "운송 하차", "상차 증빙", "하차 증빙"))
             {
-                return Driver(DriverTransportProof, "상차·하차 증빙 화면");
+                return Driver(DriverCurrentTransport, "현재 운송에서 증빙 단계 확인");
             }
 
             if (request.TitleContainsAny("창고 입고"))
@@ -120,7 +119,7 @@ public sealed class WebPlatformCommunityNodeNavigationResolver
 
         return request.IsForm(PlatformDiagramFormKinds.TransportPickupConfirmation)
                || request.IsForm(PlatformDiagramFormKinds.TransportDropoffConfirmation)
-            ? Driver(DriverTransportProof, "상차·하차 증빙 화면")
+            ? Driver(DriverCurrentTransport, "현재 운송에서 증빙 단계 확인")
             : null;
     }
 
@@ -144,7 +143,7 @@ public sealed class WebPlatformCommunityNodeNavigationResolver
 
         if (request.TitleContainsAny("상차", "하차", "수령", "인수", "증빙"))
         {
-            return Driver(DriverTransportProof, "상차·하차 증빙 화면");
+            return Driver(DriverCurrentTransport, "현재 운송에서 증빙 단계 확인");
         }
 
         return request.TitleContainsAny("정산")

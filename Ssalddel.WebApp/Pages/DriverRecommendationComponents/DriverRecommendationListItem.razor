@@ -1,0 +1,52 @@
+@namespace Ssalddel.WebApp.Pages.DriverRecommendationComponents
+@using Ssalddel.Contracts.Driver.Recommendation
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-3">
+    <MudStack Spacing="2">
+        <MudStack Row="true"
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween"
+                  Wrap="Wrap.Wrap">
+            <MudText Typo="Typo.subtitle2">
+                @DriverRecommendationPresentation.DisplayCargo(Item)
+            </MudText>
+            <MudChip T="string" Size="Size.Small" Color="Color.Info">
+                @DriverRecommendationPresentation.DisplayMoney(Item.예상수익)
+            </MudChip>
+        </MudStack>
+
+        <MudText Typo="Typo.body2">
+            @DriverRecommendationPresentation.Display(Item.픽업지, "상차지 미정")
+            →
+            @DriverRecommendationPresentation.Display(Item.하차지, "하차지 미정")
+        </MudText>
+
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">
+                @DriverRecommendationPresentation.DisplayDistance(Item.운송거리Km)
+            </MudChip>
+            @foreach (var badge in Item.배지.Take(2))
+            {
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">
+                    @badge
+                </MudChip>
+            }
+        </MudStack>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   FullWidth="true"
+                   StartIcon="@Icons.Material.Filled.Article"
+                   OnClick="@(() => OpenRequested.InvokeAsync(Item))">
+            상세 조건 확인
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 기사추천수신항목 Item { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<기사추천수신항목> OpenRequested { get; set; }
+}

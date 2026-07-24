@@ -1,13 +1,11 @@
 @page "/driver/work/start"
-@using Ssalddel.Contracts.Driver.Recommendation
 @using Ssalddel.Contracts.Driver.Work
 @inject 기사운행Service 운행Service
-@inject I기사추천수신Service 추천Service
 @inject WebAuthSessionService AuthSession
 
 <WebPageHeader Eyebrow="Driver Web"
                Title="운행 시작"
-               Description="브라우저에서 기사 운행 상태, 서버 위치 갱신, 추천 허브 연동을 먼저 검증합니다."
+               Description="기사 본인이 입력한 시작 조건으로 운행 세션과 서버 위치 갱신만 처리합니다."
                Badge="운행 API" />
 
 <MudGrid>
@@ -32,17 +30,17 @@
 
                 <MudGrid>
                     <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal" @bind-Value="Latitude" Label="위도" Variant="Variant.Outlined" />
+                        <MudNumericField T="decimal?" @bind-Value="Latitude" Label="위도" Variant="Variant.Outlined" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal" @bind-Value="Longitude" Label="경도" Variant="Variant.Outlined" />
+                        <MudNumericField T="decimal?" @bind-Value="Longitude" Label="경도" Variant="Variant.Outlined" />
                     </MudItem>
                 </MudGrid>
 
                 <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Success"
-                               Disabled="@IsBusy"
+                               Disabled="@(IsBusy || !CanStartWork)"
                                StartIcon="@Icons.Material.Filled.PlayArrow"
                                OnClick="StartWorkAsync">
                         운행 시작
@@ -114,35 +112,21 @@
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                 <MudStack Spacing="2">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                        <MudText Typo="Typo.h6">추천 연동</MudText>
-                        <MudChip T="string" Size="Size.Small" Color="@RecommendationConnectionColor">@추천Service.연결상태</MudChip>
+                        <MudText Typo="Typo.h6">위치 갱신</MudText>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Info">위치 API</MudChip>
                     </MudStack>
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        운행을 시작한 뒤 위치를 갱신하면 추천 산정과 추천 수신 흐름으로 이어집니다.
+                        브라우저는 자동 위치 추적을 가장하지 않습니다. 현재 좌표를 확인한 뒤 명시적으로 서버에 갱신하고, 추천 수신은 추천 목록에서 연결합니다.
                     </MudText>
                     <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
                         <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Primary"
-                                   Disabled="@IsBusy"
-                                   StartIcon="@Icons.Material.Filled.Hub"
-                                   OnClick="ConnectRecommendationHubAsync">
-                            추천 허브 연결
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined"
                                    Color="Color.Secondary"
-                                   Disabled="@IsBusy"
+                                   Disabled="@(IsBusy || !HasValidCoordinates)"
                                    StartIcon="@Icons.Material.Filled.MyLocation"
                                    OnClick="SendLocationAsync">
                             위치 갱신
                         </MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Secondary"
-                                   Disabled="@IsBusy"
-                                   StartIcon="@Icons.Material.Filled.LocalShipping"
-                                   OnClick="SendDrivingStatusToHubAsync">
-                            운행중 이벤트
-                        </MudButton>
-                        <MudButton Href="/driver/recommendations"
+                        <MudButton Href="@DriverRoutes.Recommendations"
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    StartIcon="@Icons.Material.Filled.TaskAlt">
@@ -156,10 +140,10 @@
                 <MudStack Spacing="2">
                     <MudText Typo="Typo.h6">다음 행동</MudText>
                     <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                        <MudButton Href="/driver/transports/current" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.LocalShipping">
+                        <MudButton Href="@DriverRoutes.CurrentTransport" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.LocalShipping">
                             현재 운송 보기
                         </MudButton>
-                        <MudButton Href="/driver/home" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Home">
+                        <MudButton Href="@DriverRoutes.Home" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Home">
                             기사 홈으로
                         </MudButton>
                     </MudStack>
@@ -175,10 +159,10 @@
     private const string StartModeReturn = "복귀 운행";
 
     private string StartMode { get; set; } = StartModeImmediate;
-    private string StartLocation { get; set; } = "서울 양천구 목동";
-    private string? ReturnDestination { get; set; } = "서울 강서구 마곡";
-    private decimal Latitude { get; set; } = 37.526m;
-    private decimal Longitude { get; set; } = 126.875m;
+    private string StartLocation { get; set; } = string.Empty;
+    private string? ReturnDestination { get; set; }
+    private decimal? Latitude { get; set; }
+    private decimal? Longitude { get; set; }
     private bool IsBusy { get; set; }
     private string? StatusMessage { get; set; }
     private Severity StatusSeverity { get; set; } = Severity.Info;
@@ -189,7 +173,12 @@
 
     private string WorkStateLabel => Display(CurrentWork?.운행상태, WorkStatus?.Status, LastStartResponse?.Status, "상태 미확인");
     private Color WorkStateColor => ContainsAny(WorkStateLabel, "운행중", "운행") ? Color.Success : Color.Default;
-    private Color RecommendationConnectionColor => 추천Service.연결상태 == "Connected" ? Color.Success : Color.Default;
+    private bool HasValidCoordinates
+        => Latitude is >= -90 and <= 90
+           && Longitude is >= -180 and <= 180;
+    private bool CanStartWork
+        => !string.IsNullOrWhiteSpace(StartLocation)
+           && HasValidCoordinates;
 
     protected override async Task OnInitializedAsync()
     {
@@ -211,6 +200,12 @@
 
     private async Task StartWorkAsync()
     {
+        if (!CanStartWork)
+        {
+            SetStatus("시작 위치와 유효한 위도·경도를 직접 확인해 주세요.", Severity.Warning);
+            return;
+        }
+
         await RunAsync("운행을 시작했습니다. 위치 갱신 후 추천 산정 흐름을 확인할 수 있습니다.", async () =>
         {
             LastStartResponse = await 운행Service.운행시작Async(new 기사운행시작요청
@@ -220,8 +215,8 @@
                 시작위치 = StartLocation,
                 복귀지 = ReturnDestination,
                 오늘의복귀지주소 = ReturnDestination,
-                오늘의복귀지위도 = Latitude,
-                오늘의복귀지경도 = Longitude,
+                오늘의복귀지위도 = Latitude!.Value,
+                오늘의복귀지경도 = Longitude!.Value,
                 기본복귀지사용 = !string.IsNullOrWhiteSpace(ReturnDestination),
                 복귀지출처 = "WebApp",
                 복귀콜선호 = StartMode == StartModeReturn ? "복귀 우선" : "일반"
@@ -243,12 +238,18 @@
 
     private async Task SendLocationAsync()
     {
+        if (!HasValidCoordinates)
+        {
+            SetStatus("서버에 보낼 유효한 위도·경도를 직접 확인해 주세요.", Severity.Warning);
+            return;
+        }
+
         await RunAsync("서버 위치를 갱신했습니다.", async () =>
         {
             LastLocation = await 운행Service.위치갱신Async(new 기사위치갱신요청
             {
-                위도 = Latitude,
-                경도 = Longitude,
+                위도 = Latitude!.Value,
+                경도 = Longitude!.Value,
                 정확도_m = 30,
                 상차접근허용반경Km = 10m,
                 운행상태 = "운행중",
@@ -257,16 +258,6 @@
 
             await LoadWorkStateCoreAsync();
         });
-    }
-
-    private async Task ConnectRecommendationHubAsync()
-    {
-        await RunAsync("추천 허브에 연결했습니다.", async () => await 추천Service.연결Async());
-    }
-
-    private async Task SendDrivingStatusToHubAsync()
-    {
-        await RunAsync("추천 허브에 운행중 상태를 전송했습니다.", async () => await 추천Service.운행중상태전송Async());
     }
 
     private async Task LoadWorkStateAsync()
@@ -310,9 +301,14 @@
     {
         var lat = LastLocation?.현재위도 ?? WorkStatus?.현재위도 ?? CurrentWork?.오늘의복귀지위도 ?? Latitude;
         var lng = LastLocation?.현재경도 ?? WorkStatus?.현재경도 ?? CurrentWork?.오늘의복귀지경도 ?? Longitude;
+        if (!lat.HasValue || !lng.HasValue)
+        {
+            return "아직 수신되지 않음";
+        }
+
         var time = LastLocation?.최근위치수신시각 ?? WorkStatus?.최근위치수신시각 ?? WorkStatus?.UpdatedAt;
         var timeLabel = time.HasValue ? $" · {time.Value.ToLocalTime():MM-dd HH:mm}" : string.Empty;
-        return $"{lat:F6}, {lng:F6}{timeLabel}";
+        return $"{lat.Value:F6}, {lng.Value:F6}{timeLabel}";
     }
 
     private static string Display(params string?[] values)

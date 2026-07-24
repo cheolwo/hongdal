@@ -4,8 +4,8 @@
 
 <WebPageHeader Eyebrow="Driver Web"
                Title="운송 내역"
-               Description="완료/진행 운송 기록과 다음 행동을 확인합니다."
-               Badge="운송 목록" />
+               Description="완료·취소·중단된 과거 운송 기록만 읽기 전용으로 확인합니다."
+               Badge="읽기 전용" />
 
 <MudStack Spacing="3">
     @if (!string.IsNullOrWhiteSpace(StatusMessage))
@@ -15,9 +15,17 @@
 
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
         <MudText Typo="Typo.h6">최근 운송</MudText>
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Disabled="@IsBusy" StartIcon="@Icons.Material.Filled.Sync" OnClick="LoadAsync">
-            새로고침
-        </MudButton>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudButton Href="@DriverRoutes.CurrentTransport"
+                       Variant="Variant.Text"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.LocalShipping">
+                진행 중 운송
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Disabled="@IsBusy" StartIcon="@Icons.Material.Filled.Sync" OnClick="LoadAsync">
+                새로고침
+            </MudButton>
+        </MudStack>
     </MudStack>
 
     @if (Items.Count == 0)
@@ -52,13 +60,6 @@
                                     <MudText Typo="Typo.body2">@item.UpdatedAt.ToLocalTime().ToString("MM-dd HH:mm")</MudText>
                                 </MudItem>
                             </MudGrid>
-
-                            <MudButton Href="@BuildTransportHref(item)"
-                                       Variant="Variant.Text"
-                                       Color="Color.Primary"
-                                       EndIcon="@Icons.Material.Filled.ChevronRight">
-                                상세/다음 행동
-                            </MudButton>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
@@ -114,7 +115,10 @@
     {
         Items.Clear();
         var items = await 증빙Service.목록조회Async();
-        Items.AddRange(items.OrderByDescending(x => x.UpdatedAt));
+        Items.AddRange(
+            items
+                .Where(IsHistorical)
+                .OrderByDescending(x => x.UpdatedAt));
     }
 
     private void SetStatus(string message, Severity severity)
@@ -123,13 +127,8 @@
         StatusSeverity = severity;
     }
 
-    private static string BuildTransportHref(기사운송요약응답 item)
-        => ShouldPickup(item.상태)
-            ? $"/driver/transports/{item.Id}/pickup"
-            : $"/driver/transports/{item.Id}/dropoff";
-
-    private static bool ShouldPickup(string? status)
-        => !ContainsAny(status, "상차완료", "하차", "인수", "완료");
+    private static bool IsHistorical(기사운송요약응답 item)
+        => ContainsAny(item.상태, "완료", "인수", "취소", "중단", "실패", "종료");
 
     private static Color ResolveTransportStateColor(string? status)
     {

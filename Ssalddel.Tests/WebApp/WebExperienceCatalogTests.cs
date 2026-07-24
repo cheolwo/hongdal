@@ -35,4 +35,15 @@ public sealed class WebExperienceCatalogTests
         Assert.Equal("driver", WebExperienceCatalog.Find("DRIVER").Key);
         Assert.Same(WebExperienceCatalog.DefaultRole, WebExperienceCatalog.Find("unknown"));
     }
+
+    [Fact]
+    public void DriverRole_대표_화면은_읽기_허브와_전용_업무_진입점만_노출한다()
+    {
+        var driver = WebExperienceCatalog.Find("driver");
+
+        Assert.Contains(driver.Screens, screen => screen.Href == DriverRoutes.CurrentTransport);
+        Assert.Contains(driver.Screens, screen => screen.Href == DriverRoutes.TransportHistory);
+        Assert.DoesNotContain(driver.Screens, screen => screen.Href == DriverRoutes.ProofStageSelector);
+        Assert.DoesNotContain(driver.Screens, screen => screen.Href.StartsWith(DriverRoutes.DispatchDecisions, StringComparison.Ordinal));
+    }
 }

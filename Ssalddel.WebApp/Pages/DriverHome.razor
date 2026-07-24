@@ -25,7 +25,7 @@
                            aria-label="내 정보" />
         </MudTooltip>
         <MudTooltip Text="현재 운송">
-            <MudIconButton Href="/driver/transports/current"
+            <MudIconButton Href="@DriverRoutes.CurrentTransport"
                            Icon="@Icons.Material.Filled.LocalShipping"
                            Color="Color.Inherit"
                            Variant="Variant.Filled"
@@ -49,8 +49,8 @@
 
     private string RecommendationHref
         => ActiveRecommendation is null
-            ? "/driver/recommendations"
-            : $"/driver/recommendations/{Uri.EscapeDataString(ActiveRecommendation.의뢰Id)}";
+            ? DriverRoutes.Recommendations
+            : DriverRoutes.RecommendationFor(ActiveRecommendation.의뢰Id);
 
     private static string Display(string? value, string fallback)
         => string.IsNullOrWhiteSpace(value) ? fallback : value;

@@ -25,8 +25,8 @@
 
     @if (ViewModel.CurrentTransport is null)
     {
-        <DriverCurrentTransportEmptyState IsBusy="@ViewModel.Actions.IsBusy"
-                                          OnRefresh="ViewModel.Actions.RefreshAsync" />
+        <DriverCurrentTransportEmptyState IsBusy="@ViewModel.Refresh.IsBusy"
+                                          OnRefresh="ViewModel.Refresh.RefreshAsync" />
     }
     else
     {
@@ -37,12 +37,9 @@
 
             <MudItem xs="12" lg="4">
                 <MudStack Spacing="3">
-                    <DriverCurrentTransportStatusActions Transport="@ViewModel.CurrentTransport"
-                                                         IsBusy="@ViewModel.Actions.IsBusy"
-                                                         OnArrivePickup="ViewModel.Actions.ArrivePickupAsync"
-                                                         OnArriveDropoff="ViewModel.Actions.ArriveDropoffAsync" />
-                    <DriverCurrentTransportNavigation IsBusy="@ViewModel.Actions.IsBusy"
-                                                      OnRefresh="ViewModel.Actions.RefreshAsync" />
+                    <DriverCurrentTransportNextActionPanel Transport="@ViewModel.CurrentTransport" />
+                    <DriverCurrentTransportNavigation IsBusy="@ViewModel.Refresh.IsBusy"
+                                                      OnRefresh="ViewModel.Refresh.RefreshAsync" />
                 </MudStack>
             </MudItem>
         </MudGrid>

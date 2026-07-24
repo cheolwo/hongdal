@@ -1,0 +1,93 @@
+@using Ssalddel.Contracts.Driver.Recommendation
+@using Ssalddel.WebApp.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true"
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween"
+                  Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰 @Recommendation.의뢰Id</MudText>
+                <MudText Typo="Typo.h6">@DriverRecommendationPresentation.DisplayCargo(Recommendation)</MudText>
+            </MudStack>
+            <MudChip T="string"
+                     Color="@DriverRecommendationPresentation.ResolveCountdownColor(Model.IsExpired, Model.RemainingSeconds)"
+                     Variant="Variant.Filled">
+                @(Model.IsExpired ? "응답 기한 만료" : $"{Model.RemainingSeconds:N0}초 남음")
+            </MudChip>
+        </MudStack>
+
+        <MudProgressLinear Value="@Model.ProgressPercent"
+                           Color="@DriverRecommendationPresentation.ResolveCountdownColor(Model.IsExpired, Model.RemainingSeconds)"
+                           Rounded="true" />
+
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">경로</MudText>
+                <MudText Typo="Typo.body2">
+                    @DriverRecommendationPresentation.Display(Recommendation.픽업지, "상차지 미정")
+                    →
+                    @DriverRecommendationPresentation.Display(Recommendation.하차지, "하차지 미정")
+                </MudText>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">예상 운임</MudText>
+                <MudText Typo="Typo.body2">@DriverRecommendationPresentation.DisplayMoney(Recommendation.예상수익)</MudText>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">차량 적합</MudText>
+                <MudText Typo="Typo.body2">@(Recommendation.차량적합여부 ? "적합" : "확인 필요")</MudText>
+            </MudItem>
+        </MudGrid>
+
+        @if (!Recommendation.차량적합여부
+             || Recommendation.경고.Length > 0
+             || Recommendation.차량경고.Length > 0
+             || Recommendation.차량부적합사유.Length > 0)
+        {
+            <MudAlert Severity="Severity.Warning" Dense="true" Variant="Variant.Outlined">
+                차량 적합성과 경고를 추천 상세에서 다시 확인한 뒤 결정해 주세요.
+            </MudAlert>
+        }
+
+        <MudTextField T="string"
+                      @bind-Value="Model.RejectReason"
+                      Label="거절 사유"
+                      Lines="2"
+                      Variant="Variant.Outlined"
+                      HelperText="거절할 때만 전송됩니다." />
+
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd">
+            <MudButton Href="@DriverRoutes.RecommendationFor(Recommendation.의뢰Id)"
+                       Variant="Variant.Text"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Article">
+                상세 다시 보기
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       Disabled="@Model.IsBusy"
+                       StartIcon="@Icons.Material.Filled.Cancel"
+                       OnClick="Model.RejectAsync">
+                명시적으로 거절
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       Disabled="@(Model.IsBusy || Model.IsExpired)"
+                       StartIcon="@Icons.Material.Filled.CheckCircle"
+                       OnClick="Model.AcceptAsync">
+                수락
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverRecommendationDecisionPageViewModel Model { get; set; } = default!;
+
+    private 기사추천수신항목 Recommendation
+        => Model.Recommendation
+           ?? throw new InvalidOperationException("배차 판단에는 추천 한 건이 필요합니다.");
+}

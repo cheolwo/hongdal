@@ -1,0 +1,93 @@
+@namespace Ssalddel.WebApp.Pages.DriverRecommendationComponents
+@using Ssalddel.Contracts.Driver.Recommendation
+
+<MudStack Spacing="3">
+    <MudPaper Elevation="0" Outlined="true" Class="driver-recommendation-shell driver-recommendation-shell--page">
+        <div class="driver-recommendation-map">
+            <div class="driver-route-line driver-route-line-primary"></div>
+            <div class="driver-route-line driver-route-line-secondary"></div>
+            <div class="driver-map-pin driver-map-pin-current">현위치</div>
+            <div class="driver-map-pin driver-map-pin-pickup">상차</div>
+            <div class="driver-map-pin driver-map-pin-dropoff">하차</div>
+        </div>
+    </MudPaper>
+
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">운송 조건</MudText>
+                    <MudText Typo="Typo.body2">의뢰 ID: @Recommendation.의뢰Id</MudText>
+                    <MudText Typo="Typo.body2">
+                        @DriverRecommendationPresentation.Display(Recommendation.픽업지, "상차지 미정")
+                        →
+                        @DriverRecommendationPresentation.Display(Recommendation.하차지, "하차지 미정")
+                    </MudText>
+                    <MudText Typo="Typo.body2">화물: @DriverRecommendationPresentation.DisplayCargo(Recommendation)</MudText>
+                    <MudText Typo="Typo.body2">상차 접근: @DriverRecommendationPresentation.DisplayDistance(Recommendation.픽업거리Km)</MudText>
+                    <MudText Typo="Typo.body2">운송 거리: @DriverRecommendationPresentation.DisplayDistance(Recommendation.운송거리Km)</MudText>
+                    <MudText Typo="Typo.body2">추가 시간: @DriverRecommendationPresentation.DisplayMinutes(Recommendation.추가예상시간분)</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">판단 근거</MudText>
+                    <MudText Typo="Typo.body2">예상 운임: @DriverRecommendationPresentation.DisplayMoney(Recommendation.예상수익)</MudText>
+                    <MudText Typo="Typo.body2">예상 비용: @DriverRecommendationPresentation.DisplayMoney(Recommendation.예상총비용)</MudText>
+                    <MudText Typo="Typo.body2">예상 추가 순이익: @DriverRecommendationPresentation.DisplayMoney(Recommendation.예상추가순이익)</MudText>
+                    <MudText Typo="Typo.body2">차량 적합: @(Recommendation.차량적합여부 ? "적합" : "확인 필요")</MudText>
+                    <MudText Typo="Typo.body2">
+                        @DriverRecommendationPresentation.Display(Recommendation.추천사유, "추천 근거를 확인하지 못했습니다.")
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @foreach (var warning in Recommendation.경고
+        .Concat(Recommendation.차량경고)
+        .Concat(Recommendation.차량부적합사유))
+    {
+        <MudAlert Severity="Severity.Warning" Dense="true" Variant="Variant.Outlined">
+            @warning
+        </MudAlert>
+    }
+
+    @if (Detail is not null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">서버 원장 상태</MudText>
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰 상태</MudText>
+                        <MudText Typo="Typo.body2">@DriverRecommendationPresentation.Display(Detail.의뢰상태)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">배차 상태</MudText>
+                        <MudText Typo="Typo.body2">@DriverRecommendationPresentation.Display(Detail.배차상태)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제 상태</MudText>
+                        <MudText Typo="Typo.body2">@DriverRecommendationPresentation.Display(Detail.결제상태)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">정산 상태</MudText>
+                        <MudText Typo="Typo.body2">@DriverRecommendationPresentation.Display(Detail.정산상태)</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public 기사추천수신항목 Recommendation { get; set; } = default!;
+
+    [Parameter]
+    public 기사운송의뢰상세응답? Detail { get; set; }
+}

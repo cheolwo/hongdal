@@ -24,6 +24,8 @@ public sealed class PlatformCommunityNodeNavigationResolverTests
     [Theory]
     [InlineData(CommunityLedgerTemplateKeys.CargoTransport, "운송 의뢰", "work", null, "/shipper/request", PlatformCommunityNodeNavigationArea.Shipper)]
     [InlineData(CommunityLedgerTemplateKeys.CargoTransport, "운송 구간", "delivery", null, "/driver/transports/current", PlatformCommunityNodeNavigationArea.Driver)]
+    [InlineData(CommunityLedgerTemplateKeys.CargoTransport, "상차 증빙", "work", null, "/driver/transports/current", PlatformCommunityNodeNavigationArea.Driver)]
+    [InlineData(CommunityLedgerTemplateKeys.CargoTransport, "상차 확인", "form", PlatformDiagramFormKinds.TransportPickupConfirmation, "/driver/transports/current", PlatformCommunityNodeNavigationArea.Driver)]
     [InlineData(CommunityLedgerTemplateKeys.CargoTransport, "정산", "confirm", null, "/shipper/request/payment-status", PlatformCommunityNodeNavigationArea.Shipper)]
     [InlineData(CommunityLedgerTemplateKeys.WarehouseInbound, "입고 검수", "work", null, "/work/inbound/inspection", PlatformCommunityNodeNavigationArea.Warehouse)]
     [InlineData(CommunityLedgerTemplateKeys.WarehouseOutbound, "피킹", "work", null, "/work/picking-batch", PlatformCommunityNodeNavigationArea.Warehouse)]

@@ -27,43 +27,38 @@ public sealed class DriverCurrentTransportPageViewModelTests
     }
 
     [Fact]
-    public async Task ArrivePickupAsync_현재_운송_ID로_상태를_변경하고_다시_조회한다()
+    public async Task RefreshAsync_현재_운송만_다시_조회한다()
     {
-        long? arrivedTransportId = null;
         var loadCount = 0;
         using var viewModel = CreateViewModel(
             loadCurrentTransport: _ => Task.FromResult(++loadCount == 1
                 ? Transport("REQ-10", "배차확정", id: 10)
-                : Transport("REQ-10", "상차지 도착", id: 10)),
-            arrivePickup: (transportId, _) =>
-            {
-                arrivedTransportId = transportId;
-                return Task.CompletedTask;
-            });
+                : Transport("REQ-10", "상차지 도착", id: 10)));
         await viewModel.InitializeAsync(null);
 
-        await viewModel.Actions.ArrivePickupAsync();
+        await viewModel.Refresh.RefreshAsync();
 
-        Assert.Equal(10, arrivedTransportId);
         Assert.Equal(2, loadCount);
         Assert.Equal("상차지 도착", viewModel.CurrentTransport?.상태);
-        Assert.False(viewModel.Actions.IsBusy);
+        Assert.False(viewModel.Refresh.IsBusy);
         Assert.Equal(DriverCurrentTransportMessageTone.Success, viewModel.StatusTone);
     }
 
     [Fact]
-    public async Task ArriveDropoffAsync_서버_오류를_화면_상태로_격리한다()
+    public async Task RefreshAsync_서버_오류를_화면_상태로_격리한다()
     {
+        var loadCount = 0;
         using var viewModel = CreateViewModel(
-            loadCurrentTransport: _ => Task.FromResult(Transport("REQ-20", "운송중", id: 20)),
-            arriveDropoff: (_, _) => throw new InvalidOperationException("하차 처리 실패"));
+            loadCurrentTransport: _ => ++loadCount == 1
+                ? Task.FromResult(Transport("REQ-20", "운송중", id: 20))
+                : throw new InvalidOperationException("현재 운송 조회 실패"));
         await viewModel.InitializeAsync(null);
 
-        await viewModel.Actions.ArriveDropoffAsync();
+        await viewModel.Refresh.RefreshAsync();
 
-        Assert.False(viewModel.Actions.IsBusy);
+        Assert.False(viewModel.Refresh.IsBusy);
         Assert.Equal(DriverCurrentTransportMessageTone.Error, viewModel.StatusTone);
-        Assert.Equal("하차 처리 실패", viewModel.StatusMessage);
+        Assert.Equal("현재 운송 조회 실패", viewModel.StatusMessage);
     }
 
     [Fact]
@@ -129,13 +124,9 @@ public sealed class DriverCurrentTransportPageViewModelTests
     }
 
     private static DriverCurrentTransportPageViewModel CreateViewModel(
-        Func<CancellationToken, Task<기사운송요약응답>>? loadCurrentTransport = null,
-        Func<long, CancellationToken, Task>? arrivePickup = null,
-        Func<long, CancellationToken, Task>? arriveDropoff = null)
+        Func<CancellationToken, Task<기사운송요약응답>>? loadCurrentTransport = null)
         => new(
             loadCurrentTransport ?? (_ => Task.FromResult(Transport("REQ-1", "배차확정"))),
-            arrivePickup ?? ((_, _) => Task.CompletedTask),
-            arriveDropoff ?? ((_, _) => Task.CompletedTask),
             new TestTransportRequestLedgerObserver());
 
     private static 기사운송요약응답 Transport(string requestId, string status, long id = 1)

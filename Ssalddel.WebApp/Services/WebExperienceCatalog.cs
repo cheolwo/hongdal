@@ -68,13 +68,13 @@ public static class WebExperienceCatalog
             "/images/role-previews/driver.png",
             "운송 기사의 추천 경로 지도 화면",
             Icons.Material.Filled.Route,
-            "/driver/home",
+            DriverRoutes.Home,
             "기사 홈 열기",
             [
-                new("기사 홈", "현재 위치와 진행 중 운송을 중심으로 봅니다.", "/driver/home", Icons.Material.Filled.Route, "운행"),
-                new("추천 운송", "거리, 예상 수익과 상하차 조건을 비교합니다.", "/driver/recommendations", Icons.Material.Filled.TaskAlt, "배차"),
-                new("진행 중 운송", "수락한 운송의 현재 단계와 다음 행동을 확인합니다.", "/driver/transports/current", Icons.Material.Filled.LocalShipping, "운송"),
-                new("운송 증빙", "상차와 하차 사진, 예외 증빙 흐름을 확인합니다.", "/driver/transport/proof", Icons.Material.Filled.AddAPhoto, "증빙")
+                new("기사 홈", "현재 위치와 진행 중 운송을 중심으로 봅니다.", DriverRoutes.Home, Icons.Material.Filled.Route, "운행"),
+                new("추천 운송", "거리, 예상 수익과 상하차 조건을 비교합니다.", DriverRoutes.Recommendations, Icons.Material.Filled.TaskAlt, "배차"),
+                new("진행 중 운송", "현재 단계와 다음 전용 처리 화면을 확인합니다.", DriverRoutes.CurrentTransport, Icons.Material.Filled.LocalShipping, "운송"),
+                new("운송 이력", "완료·중단된 운송의 이력을 읽기 전용으로 확인합니다.", DriverRoutes.TransportHistory, Icons.Material.Filled.History, "이력")
             ]),
         new(
             "warehouse",

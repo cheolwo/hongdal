@@ -1,0 +1,79 @@
+@using Ssalddel.WebApp.ViewModels
+
+<MudStack Spacing="3">
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.h6">하차 완료 증빙</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            하차 사진 업로드와 현장 인계 확인이 모두 끝난 뒤에만 하차 완료 Command를 전송합니다.
+        </MudText>
+    </MudStack>
+
+    <InputFile OnChange="OnPhotoSelectedAsync" accept="image/*" />
+
+    @if (!string.IsNullOrWhiteSpace(Model.Dropoff.PreviewUrl))
+    {
+        <img src="@Model.Dropoff.PreviewUrl"
+             alt="하차 증빙 미리보기"
+             class="driver-proof-preview" />
+        <MudText Typo="Typo.caption" Color="Color.Secondary">
+            첨부 파일: @Model.Dropoff.FileName
+        </MudText>
+    }
+
+    @if (Model.Dropoff.Upload is not null)
+    {
+        <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+            업로드 완료: @Model.Dropoff.Upload.ObjectName
+        </MudAlert>
+    }
+
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudTextField T="string"
+                          @bind-Value="Model.ReceiverName"
+                          Label="수령자/현장 담당자"
+                          Variant="Variant.Outlined" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudSelect T="string"
+                       @bind-Value="Model.PaymentEvidenceMethod"
+                       Label="현장 결제·증빙 확인 방식"
+                       Variant="Variant.Outlined">
+                <MudSelectItem T="string" Value="@("인수증")">인수증</MudSelectItem>
+                <MudSelectItem T="string" Value="@("계좌 확인")">계좌 확인</MudSelectItem>
+                <MudSelectItem T="string" Value="@("카드")">카드</MudSelectItem>
+                <MudSelectItem T="string" Value="@("현금")">현금</MudSelectItem>
+                <MudSelectItem T="string" Value="@("후불 정산")">후불 정산</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+
+    <MudCheckBox T="bool"
+                 @bind-Value="Model.DropoffPlaceConfirmed"
+                 Label="하차지와 주소를 확인했습니다."
+                 Color="Color.Primary" />
+    <MudCheckBox T="bool"
+                 @bind-Value="Model.ReceiverConfirmed"
+                 Label="수령자 또는 현장 담당자에게 화물을 인계했습니다."
+                 Color="Color.Primary" />
+    <MudCheckBox T="bool"
+                 @bind-Value="Model.PaymentEvidenceConfirmed"
+                 Label="현장 결제·증빙 방식을 확인했습니다."
+                 Color="Color.Primary" />
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               Disabled="@(!Model.CanCompleteDropoff)"
+               StartIcon="@Icons.Material.Filled.CheckCircle"
+               OnClick="Model.CompleteDropoffAsync">
+        하차 완료 처리
+    </MudButton>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverTransportDropoffPageViewModel Model { get; set; } = default!;
+
+    private Task OnPhotoSelectedAsync(InputFileChangeEventArgs args)
+        => Model.Dropoff.UploadAsync(args.File);
+}
