@@ -44,13 +44,14 @@
     [Parameter]
     public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
 
-    private bool IsEnglish
-        => DisplayLanguageCodes.Normalize(DisplayLanguageCode) == DisplayLanguageCodes.English;
+    private bool IsKorean
+        => DisplayLanguageCodes.Normalize(DisplayLanguageCode) == DisplayLanguageCodes.Korean;
 
-    private string UiText(string korean, string english) => IsEnglish ? english : korean;
+    private string UiText(string korean, string english)
+        => DisplayLanguageCodes.Select(DisplayLanguageCode, korean, english);
 
     private string DisplayBoardName(string name)
-        => !IsEnglish
+        => IsKorean
             ? name
             : name switch
             {
@@ -78,7 +79,7 @@
             };
 
     private string DisplayBoardDescription(string name, string description)
-        => !IsEnglish
+        => IsKorean
             ? description
             : name switch
             {
@@ -95,7 +96,7 @@
             };
 
     private string DisplayAccessLabel(string label)
-        => !IsEnglish
+        => IsKorean
             ? label
             : label switch
             {

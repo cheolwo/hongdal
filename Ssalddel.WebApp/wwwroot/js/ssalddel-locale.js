@@ -26,8 +26,9 @@ window.ssalddelLocale = {
         this.applyDocumentLanguage(languageCode);
     },
     applyDocumentLanguage: function (languageCode) {
-        document.documentElement.lang = languageCode && languageCode.toLowerCase().startsWith("en")
-            ? "en"
-            : "ko";
+        const normalized = typeof languageCode === "string"
+            ? languageCode.trim()
+            : "";
+        document.documentElement.lang = normalized || "ko-KR";
     }
 };

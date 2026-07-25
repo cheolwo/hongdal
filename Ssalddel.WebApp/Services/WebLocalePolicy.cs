@@ -43,28 +43,30 @@ public static class WebLocalePolicy
         var segment = NormalizePath(relativePath)
             .Split('/', StringSplitOptions.RemoveEmptyEntries)
             .FirstOrDefault();
-        return segment?.ToLowerInvariant() switch
-        {
-            "ko" => DisplayLanguageCodes.Korean,
-            "en" => DisplayLanguageCodes.English,
-            _ => null
-        };
+        return DisplayLanguageCodes.TryFromPathSegment(segment, out var languageCode)
+            ? languageCode
+            : null;
     }
 
     public static string LanguageSegment(string? languageCode)
-        => DisplayLanguageCodes.Normalize(languageCode) == DisplayLanguageCodes.English
-            ? "en"
-            : "ko";
+        => DisplayLanguageCodes.ToPathSegment(languageCode);
 
     public static bool IsCommunityPath(string? relativePath)
     {
-        var path = NormalizePath(relativePath);
-        return path.Equals("community", StringComparison.OrdinalIgnoreCase)
-               || path.StartsWith("community/", StringComparison.OrdinalIgnoreCase)
-               || path.Equals("ko/community", StringComparison.OrdinalIgnoreCase)
-               || path.StartsWith("ko/community/", StringComparison.OrdinalIgnoreCase)
-               || path.Equals("en/community", StringComparison.OrdinalIgnoreCase)
-               || path.StartsWith("en/community/", StringComparison.OrdinalIgnoreCase);
+        var segments = NormalizePath(relativePath)
+            .Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length == 0)
+        {
+            return false;
+        }
+
+        var communityIndex = DisplayLanguageCodes.TryFromPathSegment(segments[0], out _)
+            ? 1
+            : 0;
+        return segments.Length > communityIndex
+               && segments[communityIndex].Equals(
+                   "community",
+                   StringComparison.OrdinalIgnoreCase);
     }
 
     public static string LocalizedCommunityHome(string? languageCode)

@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Services.Localization;
 
-namespace Ssalddel.Controllers.Common;
+namespace Ssalddel.Controllers.Platform;
 
 [SsalddelApiVersion(SsalddelProductVersion.V0_0)]
 [AllowAnonymous]
 [ApiController]
 [Route("api/v1/public/localization")]
-public sealed class PublicLocaleController(
-    IPublicLocaleRecommendationUseCase useCase,
+[SsalddelApiContractName("PublicLocaleController")]
+public sealed class 공개LocaleController(
+    IPublicLocaleRecommendationUseCase 공개Locale추천UseCase,
     IConfiguration configuration) : ControllerBase
 {
     private const string DefaultCountryHeaderName = "X-Ssalddel-Country-Code";
@@ -26,7 +27,7 @@ public sealed class PublicLocaleController(
             ? Request.Headers[countryHeaderName].FirstOrDefault()
             : null;
 
-        return Ok(useCase.Recommend(
+        return Ok(공개Locale추천UseCase.Recommend(
             Request.Headers.AcceptLanguage.ToString(),
             trustedCountryCode));
     }

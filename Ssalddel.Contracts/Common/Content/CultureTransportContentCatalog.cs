@@ -17,11 +17,13 @@ public static class CultureTransportContentCatalog
 
     public const string CultureStoryKey = "culture-story";
     public const string PriceEvidenceKey = "price-evidence";
+    public const string IndividualOrderIntentKey = "individual-order-intent";
     public const string SharedDemandKey = "shared-demand";
     public const string RouteReadinessKey = "route-readiness";
 
     public const string FoodCultureWorkflowTag = "문화교통 · 식문화";
     public const string PriceEvidenceWorkflowTag = "문화교통 · 가격 근거";
+    public const string IndividualOrderIntentWorkflowTag = "문화교통 · 내 주문 의향";
     public const string SharedDemandWorkflowTag = "문화교통 · 함께 구하기";
     public const string RouteReadinessWorkflowTag = "문화교통 · 이동 준비";
 
@@ -44,13 +46,21 @@ public static class CultureTransportContentCatalog
             ["원천", "기준일 또는 기준월", "지역", "시장 단계", "단위", "통화"],
             "관측값을 판매 권고, 확정 공동구매가 또는 서로 다른 시장의 직접 비교값으로 표현하지 않습니다."),
         new(
+            IndividualOrderIntentKey,
+            SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            "내가 구하려는 것",
+            IndividualOrderIntentWorkflowTag,
+            "공개 근거에서 고른 상품의 수량, 수령 권역, 시간·보관 조건과 철회 가능한 주문 의향을 한 사람의 개별 원장으로 설명합니다.",
+            ["상품·재료 근거", "희망 수량", "수령 권역", "시간·보관 조건", "철회 가능 상태"],
+            "개별 원장을 결제·계약·배송 확정으로 표현하거나 공동주문에 자동 포함하지 않습니다."),
+        new(
             SharedDemandKey,
             SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             "함께 구하려는 마음",
             SharedDemandWorkflowTag,
-            "문화와 재료에 대한 관심이 생겼을 때 비구속 수요, 여러 재료, 수령 권역과 역할을 공개적으로 설명합니다.",
-            ["품목", "희망 수량", "수령 권역", "시간·보관 조건", "철회 가능 상태"],
-            "글을 주문·결제·계약으로 해석하지 않고 참여자를 자동 가입시키지 않습니다."),
+            "공동 참여에 동의한 개별주문의 공통 품목, 수령 권역, 시간창과 역할을 집계해 공동주문 후보를 설명합니다.",
+            ["포함된 개별 원장 수", "집계 수량", "수령 권역", "시간·보관 조건", "공동 참여 동의 상태"],
+            "개별 원장을 임의로 합치거나 공동주문 참여를 결제·계약으로 해석하지 않습니다."),
         new(
             RouteReadinessKey,
             SsalddelProductRoadmapCatalog.TradeReadinessVersion,

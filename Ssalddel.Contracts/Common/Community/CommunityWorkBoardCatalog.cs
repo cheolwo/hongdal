@@ -47,12 +47,12 @@ internal static class CommunityWorkBoardCatalog
             ]),
 
         WorkBoard(
-            SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            SsalddelProductRoadmapCatalog.IndividualOrderVersion,
             CommunityActivityBoardKeys.IndividualDemand,
-            "개별 수요·원함",
-            "한 사람의 비구속 원함을 등록·변경·철회하는 업무 게시판",
+            "개별주문·내 원함",
+            "한 사람의 철회 가능한 주문 의향과 개별 원장을 등록·변경·철회하는 업무 게시판",
             CommunityBoardGroupCodes.WorkGroupPurchase,
-            "수요와 공동구매",
+            "개별주문",
             [CommunityActivityBoardKeys.LegacyGroupPurchase],
             [
                 Command(

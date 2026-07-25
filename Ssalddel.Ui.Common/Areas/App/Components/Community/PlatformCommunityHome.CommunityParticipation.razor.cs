@@ -31,7 +31,8 @@ public partial class PlatformCommunityHome
         var parameters = new DialogParameters
         {
             [nameof(CommunityProvisionalLedgerDialog.InterestVoteId)] = voteId,
-            [nameof(CommunityProvisionalLedgerDialog.IntentTypeCode)] = intentTypeCode
+            [nameof(CommunityProvisionalLedgerDialog.IntentTypeCode)] = intentTypeCode,
+            [nameof(CommunityProvisionalLedgerDialog.DisplayLanguageCode)] = DisplayLanguageCode
         };
         var dialog = await DialogService.ShowAsync<CommunityProvisionalLedgerDialog>(
             ProvisionalLedgerDialogTitle(intentTypeCode),

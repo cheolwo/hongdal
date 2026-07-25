@@ -6,30 +6,35 @@
 <MudStack Spacing="1">
     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
         <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">
-            @($"원문 {LanguageLabel(Post.OriginalLanguageCode)}")
+            @($"{UiText("원문", "Original", "原文")} {LanguageLabel(Post.OriginalLanguageCode)}")
         </MudChip>
         @if (IsReportPost)
         {
             <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">
-                개인정보 보호로 자동 번역 제외
+                @UiText(
+                    "개인정보 보호로 자동 번역 제외",
+                    "Automatic translation excluded for privacy",
+                    "プライバシー保護のため自動翻訳の対象外")
             </MudChip>
         }
         else if (isPending)
         {
             <MudProgressCircular Indeterminate="true" Size="Size.Small" />
-            <MudText Typo="Typo.caption">번역하는 중...</MudText>
+            <MudText Typo="Typo.caption">@UiText("번역하는 중...", "Translating...", "翻訳中...")</MudText>
         }
         else if (IsTranslationVisible)
         {
-            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">AI 번역</MudChip>
+            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                @UiText("AI 번역", "AI translation", "AI 翻訳")
+            </MudChip>
             <MudButton Size="Size.Small" Variant="Variant.Text" OnClick="ShowOriginal">
-                원문 보기
+                @UiText("원문 보기", "Show original", "原文を表示")
             </MudButton>
         }
         else if (translation is not null)
         {
             <MudButton Size="Size.Small" Variant="Variant.Text" OnClick="ShowTranslation">
-                번역 보기
+                @UiText("번역 보기", "Show translation", "翻訳を表示")
             </MudButton>
         }
         else
@@ -60,7 +65,10 @@
             <MudText Typo="Typo.body2" Class="platform-community-post-body">@VisibleTranslatedBody</MudText>
         }
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-            AI가 만든 참고용 번역입니다. 가격·수량·통화·HS Code 및 거래 조건은 원문을 함께 확인해 주세요.
+            @UiText(
+                "AI가 만든 참고용 번역입니다. 가격·수량·통화·HS Code 및 거래 조건은 원문을 함께 확인해 주세요.",
+                "This AI translation is for reference. Verify prices, quantities, currencies, HS codes, and transaction terms against the original.",
+                "AIによる参考翻訳です。価格・数量・通貨・HSコード・取引条件は原文でも確認してください。")
         </MudAlert>
     }
     else if (!string.IsNullOrWhiteSpace(VisibleOriginalBody))
@@ -75,6 +83,9 @@
 
     [Parameter]
     public bool IsReportPost { get; set; }
+
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
 
     private PlatformCommunityPostTranslationResponse? translation;
     private bool isPending;
@@ -91,19 +102,46 @@
         => PlatformCommunityPostPresentation.ResolveVisibleBody(translation?.TranslatedBody);
 
     private string TargetLanguageCode
-        => CommunityDisplayLanguageCodes.Normalize(Post.OriginalLanguageCode) == CommunityDisplayLanguageCodes.English
-            ? CommunityDisplayLanguageCodes.Korean
-            : CommunityDisplayLanguageCodes.English;
+    {
+        get
+        {
+            var originalLanguageCode =
+                CommunityDisplayLanguageCodes.Normalize(Post.OriginalLanguageCode);
+            var displayLanguageCode =
+                CommunityDisplayLanguageCodes.Normalize(DisplayLanguageCode);
+            if (!string.Equals(
+                    originalLanguageCode,
+                    displayLanguageCode,
+                    StringComparison.Ordinal))
+            {
+                return displayLanguageCode;
+            }
+
+            return originalLanguageCode == CommunityDisplayLanguageCodes.English
+                ? CommunityDisplayLanguageCodes.Korean
+                : CommunityDisplayLanguageCodes.English;
+        }
+    }
 
     private string TranslationButtonLabel
-        => TargetLanguageCode == CommunityDisplayLanguageCodes.English
-            ? "영어로 번역"
-            : "한국어로 번역";
+        => TargetLanguageCode switch
+        {
+            CommunityDisplayLanguageCodes.Japanese =>
+                UiText("일본어로 번역", "Translate to Japanese", "日本語に翻訳"),
+            CommunityDisplayLanguageCodes.English =>
+                UiText("영어로 번역", "Translate to English", "英語に翻訳"),
+            _ => UiText("한국어로 번역", "Translate to Korean", "韓国語に翻訳")
+        };
 
     private static string LanguageLabel(string? languageCode)
-        => CommunityDisplayLanguageCodes.Normalize(languageCode) == CommunityDisplayLanguageCodes.English
-            ? "English"
-            : "한국어";
+        => DisplayLanguageCodes.NativeName(languageCode);
+
+    private string UiText(string korean, string english, string japanese)
+        => CommunityDisplayLanguageCodes.Select(
+            DisplayLanguageCode,
+            korean,
+            english,
+            japanese);
 
     private async Task TranslateAsync()
     {
@@ -129,17 +167,26 @@
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
         {
             messageSeverity = Severity.Info;
-            message = "번역 기능은 준비되어 있지만 Azure Translator 설정이 아직 비활성 상태입니다.";
+            message = UiText(
+                "번역 기능은 준비되어 있지만 Azure Translator 설정이 아직 비활성 상태입니다.",
+                "Translation is available, but Azure Translator is not enabled yet.",
+                "翻訳機能は準備されていますが、Azure Translator はまだ有効になっていません。");
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
         {
             messageSeverity = Severity.Warning;
-            message = "이 글은 개인정보 보호 정책에 따라 자동 번역할 수 없습니다.";
+            message = UiText(
+                "이 글은 개인정보 보호 정책에 따라 자동 번역할 수 없습니다.",
+                "This post cannot be translated automatically under the privacy policy.",
+                "この投稿はプライバシーポリシーにより自動翻訳できません。");
         }
         catch (Exception ex)
         {
             messageSeverity = Severity.Warning;
-            message = $"게시글을 번역하지 못했습니다: {ex.Message}";
+            message = $"{UiText(
+                "게시글을 번역하지 못했습니다.",
+                "Could not translate the post.",
+                "投稿を翻訳できませんでした。")} {ex.Message}";
         }
         finally
         {

@@ -55,6 +55,7 @@
 
         <CommunityPostTranslationContent @key="Post.Id"
                                          Post="@Post"
+                                         DisplayLanguageCode="@DisplayLanguageCode"
                                          IsReportPost="@IsReportPost" />
 
         <PlatformCommunityPostAttachmentGallery Post="@Post"
@@ -126,6 +127,9 @@
 
     [Parameter, EditorRequired]
     public PlatformCommunityPostEngagementViewModel ViewModel { get; set; } = null!;
+
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
 
     [Parameter]
     public bool CanManagePosts { get; set; }

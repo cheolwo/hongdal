@@ -50,6 +50,7 @@ public static class CommunityActivityProductNames
     public static string ForVersion(string productVersion)
         => productVersion is
             SsalddelProductRoadmapCatalog.FoundationVersion
+            or SsalddelProductRoadmapCatalog.IndividualOrderVersion
             or SsalddelProductRoadmapCatalog.GroupPurchaseVersion
             or SsalddelProductRoadmapCatalog.TradeReadinessVersion
                 ? CultureTransport

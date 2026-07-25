@@ -26,6 +26,7 @@ public sealed class PlatformCommunityPostEngagementViewModel(
     CommunityPostJourneyCollectionViewModel? journeys = null) : ObservableObject
 {
     private string? _selectedSeedPostTitle;
+    private string _displayLanguageCode = CommunityDisplayLanguageCodes.Korean;
 
     public string RecommendationSessionKey { get; } = Guid.NewGuid().ToString("N");
     public Dictionary<long, PlatformCommunityCommentForm> CommentForms { get; } = [];
@@ -40,6 +41,14 @@ public sealed class PlatformCommunityPostEngagementViewModel(
     {
         get => _selectedSeedPostTitle;
         set => SetProperty(ref _selectedSeedPostTitle, value);
+    }
+
+    public string DisplayLanguageCode
+    {
+        get => _displayLanguageCode;
+        set => SetProperty(
+            ref _displayLanguageCode,
+            CommunityDisplayLanguageCodes.Normalize(value));
     }
 
     public PlatformCommunityCommentForm GetCommentForm(long postId)
@@ -121,7 +130,7 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                 postId,
                 new StartCommunityPostParticipationRequest
                 {
-                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+                    DisplayLanguageCode = DisplayLanguageCode,
                     ConfirmExplicitStart = true,
                     ConfirmNonBindingParticipation = true
                 },
@@ -282,7 +291,7 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                 {
                     ProvisionalLedgerId = provisionalLedgerId,
                     ProfessionalRoleCode = roleCode,
-                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+                    DisplayLanguageCode = DisplayLanguageCode,
                     ConfirmProfessionalCapacity = true,
                     ConfirmVoluntaryNonBindingParticipation = true,
                     ConfirmParticipantNotification = true
@@ -329,7 +338,7 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                 {
                     ProvisionalLedgerId = provisionalLedgerId,
                     PartyRoleCode = roleCode,
-                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+                    DisplayLanguageCode = DisplayLanguageCode,
                     ConfirmRoleCapacity = true,
                     ConfirmVoluntaryNonBindingParticipation = true,
                     ConfirmParticipantNotification = true

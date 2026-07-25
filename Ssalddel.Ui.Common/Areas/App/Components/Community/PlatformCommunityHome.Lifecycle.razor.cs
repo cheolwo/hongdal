@@ -20,6 +20,7 @@ public partial class PlatformCommunityHome
     protected override Task OnInitializedAsync()
     {
         ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
+        Engagement.DisplayLanguageCode = DisplayLanguageCode;
         HomeModeState.Changed += HandleModeChanged;
         DiagramPalette.Changed += HandleDiagramPaletteChanged;
         DecorationState.Changed += HandleDecorationStateChanged;
@@ -36,6 +37,7 @@ public partial class PlatformCommunityHome
     protected override void OnParametersSet()
     {
         ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
+        Engagement.DisplayLanguageCode = DisplayLanguageCode;
         ApplyRequestedBoardSelection();
         ApplyRequestedListFilter();
         if (!BoardIndexOnly && !ListOnly)

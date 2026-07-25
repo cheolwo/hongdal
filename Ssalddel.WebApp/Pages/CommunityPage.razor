@@ -4,13 +4,18 @@
 @inject WebLocalePreferenceService Locale
 @inject NavigationManager Navigation
 
-<PageTitle>@Locale.Text("살뜰 생활 게시판", "Ssalddel Community")</PageTitle>
+<PageTitle>@Locale.Text("살뜰 생활 게시판", "Ssalddel Community", "Ssalddel コミュニティ")</PageTitle>
 
 @if (!Locale.IsInitialized || IsBareCommunityRoute)
 {
     <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8" aria-live="polite">
         <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
-        <MudText>@Locale.Text("알맞은 언어의 커뮤니티를 준비하고 있습니다.", "Preparing your community language.")</MudText>
+        <MudText>
+            @Locale.Text(
+                "알맞은 언어의 커뮤니티를 준비하고 있습니다.",
+                "Preparing your community language.",
+                "コミュニティの表示言語を準備しています。")
+        </MudText>
     </MudStack>
 }
 else
@@ -18,7 +23,8 @@ else
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
         @Locale.Text(
             "국가와 화면 언어는 따로 적용됩니다. 게시글 본문은 작성자의 원문을 유지합니다.",
-            "Country context and display language are managed separately. User posts remain in their original language.")
+            "Country context and display language are managed separately. User posts remain in their original language.",
+            "国・地域の設定と表示言語は別々に管理されます。投稿本文は作成者の原文を保持します。")
     </MudAlert>
 
     <PlatformCommunityHome AppName="@LocalizedAppName"
@@ -34,8 +40,8 @@ else
     [Parameter]
     public string? LanguageSegment { get; set; }
 
-    private string LocalizedAppName => Locale.Text("살뜰", "Ssalddel");
-    private string LocalizedRoleLabel => Locale.Text("웹 사용자", "Web visitor");
+    private string LocalizedAppName => Locale.Text("살뜰", "Ssalddel", "Ssalddel");
+    private string LocalizedRoleLabel => Locale.Text("웹 사용자", "Web visitor", "ウェブ利用者");
 
     private bool IsBareCommunityRoute
         => Navigation.ToBaseRelativePath(Navigation.Uri)
@@ -51,8 +57,7 @@ else
     protected override void OnParametersSet()
     {
         if (!string.IsNullOrWhiteSpace(LanguageSegment)
-            && !LanguageSegment.Equals("ko", StringComparison.OrdinalIgnoreCase)
-            && !LanguageSegment.Equals("en", StringComparison.OrdinalIgnoreCase))
+            && !DisplayLanguageCodes.TryFromPathSegment(LanguageSegment, out _))
         {
             Navigation.NavigateTo("/ko/community", replace: true);
         }

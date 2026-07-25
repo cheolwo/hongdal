@@ -9,11 +9,11 @@ public partial class PlatformCommunityHome
 {
     private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체글", "추천글", "공지"];
 
-    private bool IsEnglishDisplay
-        => DisplayLanguageCodes.Normalize(DisplayLanguageCode) == DisplayLanguageCodes.English;
+    private bool IsKoreanDisplay
+        => DisplayLanguageCodes.Normalize(DisplayLanguageCode) == DisplayLanguageCodes.Korean;
 
     private string UiText(string korean, string english)
-        => IsEnglishDisplay ? english : korean;
+        => DisplayLanguageCodes.Select(DisplayLanguageCode, korean, english);
 
     private bool IsDiagramMode => DiagramPalette.IsDiagramMode;
 
@@ -154,9 +154,9 @@ public partial class PlatformCommunityHome
     private string CurrentCommunityBoardTitle
         => string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
             ? UiText("살뜰 게시판", "Ssalddel Community Board")
-            : IsEnglishDisplay
-                ? $"{DisplayCommunityBoardName(selectedBoardFilter)} Board"
-                : $"{selectedBoardFilter} 게시판";
+            : IsKoreanDisplay
+                ? $"{selectedBoardFilter} 게시판"
+                : $"{DisplayCommunityBoardName(selectedBoardFilter)} Board";
 
     private string CurrentCommunityBoardDescription
         => string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
@@ -166,7 +166,7 @@ public partial class PlatformCommunityHome
             : ResolveCommunityBoardDescription(selectedBoardFilter);
 
     private string DisplayCommunityBoardName(string boardName)
-        => !IsEnglishDisplay
+        => IsKoreanDisplay
             ? boardName
             : boardName switch
             {

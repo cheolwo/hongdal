@@ -1,29 +1,29 @@
 @implements IDisposable
 @inject WebLocalePreferenceService Locale
 
-<div class="web-language-switcher" role="group" aria-label="@Locale.Text("화면 언어", "Display language")">
-    <MudButton Variant="@KoreanVariant"
-               Color="Color.Primary"
-               Size="Size.Small"
-               Disabled="@_changing"
-               OnClick="SelectKoreanAsync">
-        한국어
-    </MudButton>
-    <span aria-hidden="true">|</span>
-    <MudButton Variant="@EnglishVariant"
-               Color="Color.Primary"
-               Size="Size.Small"
-               Disabled="@_changing"
-               OnClick="SelectEnglishAsync">
-        English
-    </MudButton>
+<div class="web-language-switcher"
+     role="group"
+     aria-label="@Locale.Text("화면 언어", "Display language", "表示言語")">
+    @foreach (var language in DisplayLanguageCodes.Profiles)
+    {
+        <MudButton @key="language.Code"
+                   Variant="@LanguageVariant(language.Code)"
+                   Color="Color.Primary"
+                   Size="Size.Small"
+                   Disabled="@_changing"
+                   OnClick="@(() => SelectAsync(language.Code))">
+            @language.NativeName
+        </MudButton>
+    }
 </div>
 
 @if (!string.IsNullOrWhiteSpace(Locale.LastPersistenceError))
 {
     <span class="web-language-switcher__error" role="status">
-        @Locale.Text("계정에는 저장하지 못했지만 이 브라우저에는 적용했습니다.",
-            "Applied in this browser, but could not save it to the account.")
+        @Locale.Text(
+            "계정에는 저장하지 못했지만 이 브라우저에는 적용했습니다.",
+            "Applied in this browser, but could not save it to the account.",
+            "アカウントには保存できませんでしたが、このブラウザーには適用しました。")
     </span>
 }
 
@@ -51,14 +51,11 @@
 
 @code {
     private bool _changing;
-    private Variant KoreanVariant => Locale.IsEnglish ? Variant.Text : Variant.Filled;
-    private Variant EnglishVariant => Locale.IsEnglish ? Variant.Filled : Variant.Text;
+    private Variant LanguageVariant(string languageCode)
+        => Locale.LanguageCode == languageCode ? Variant.Filled : Variant.Text;
 
     protected override void OnInitialized()
         => Locale.Changed += HandleLocaleChanged;
-
-    private Task SelectKoreanAsync() => SelectAsync("ko-KR");
-    private Task SelectEnglishAsync() => SelectAsync("en-US");
 
     private async Task SelectAsync(string languageCode)
     {

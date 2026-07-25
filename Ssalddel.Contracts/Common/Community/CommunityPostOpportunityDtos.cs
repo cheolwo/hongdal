@@ -616,9 +616,17 @@ public static class CommunityDisplayLanguageCodes
 {
     public const string Korean = DisplayLanguageCodes.Korean;
     public const string English = DisplayLanguageCodes.English;
+    public const string Japanese = DisplayLanguageCodes.Japanese;
 
     public static IReadOnlyList<string> Supported => DisplayLanguageCodes.Supported;
 
     public static string Normalize(string? value)
         => DisplayLanguageCodes.Normalize(value);
+
+    public static string Select(
+        string? languageCode,
+        string korean,
+        string english,
+        string? japanese = null)
+        => DisplayLanguageCodes.Select(languageCode, korean, english, japanese);
 }

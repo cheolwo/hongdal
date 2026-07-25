@@ -90,6 +90,7 @@ public sealed class CommunityPostTranslationServiceTests
     [Theory]
     [InlineData(null, "같이 장을 봐요", "양파와 감자를 공동구매합니다.", DisplayLanguageCodes.Korean)]
     [InlineData(null, "Local food market", "Let us buy onions together.", DisplayLanguageCodes.English)]
+    [InlineData(null, "地域の食卓", "一緒に食材を買いましょう。", DisplayLanguageCodes.Japanese)]
     [InlineData("en", "한국어 제목", "한국어 본문", DisplayLanguageCodes.English)]
     public void LanguageResolver_UsesExplicitLanguageThenDetectsSupportedScript(
         string? requested,
@@ -120,6 +121,26 @@ public sealed class CommunityPostTranslationServiceTests
         Assert.True(second.Value.IsCached);
         Assert.Equal("Translated title", second.Value.TranslatedTitle);
         Assert.Single(await context.PlatformCommunityPostTranslations.ToListAsync());
+    }
+
+    [Fact]
+    public async Task GetOrCreateAsync_AllowsJapaneseTargetFromDefaultLanguageCatalog()
+    {
+        await using var context = CreateContext();
+        var post = CreatePost();
+        context.PlatformCommunityPosts.Add(post);
+        await context.SaveChangesAsync();
+        var provider = new RecordingTranslationProvider();
+        var service = CreateService(context, provider);
+
+        var result = await service.GetOrCreateAsync(
+            post.Id,
+            DisplayLanguageCodes.Japanese,
+            default);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(DisplayLanguageCodes.Japanese, result.Value.TargetLanguageCode);
+        Assert.Equal(DisplayLanguageCodes.Japanese, provider.LastTargetLanguageCode);
     }
 
     [Fact]
@@ -215,6 +236,7 @@ public sealed class CommunityPostTranslationServiceTests
         public bool IsAvailable => true;
         public int CallCount { get; private set; }
         public string LastBody { get; private set; } = string.Empty;
+        public string LastTargetLanguageCode { get; private set; } = string.Empty;
 
         public Task<CommunityTextTranslationResult> TranslateAsync(
             string title,
@@ -225,6 +247,7 @@ public sealed class CommunityPostTranslationServiceTests
         {
             CallCount++;
             LastBody = body;
+            LastTargetLanguageCode = targetLanguageCode;
             return Task.FromResult(new CommunityTextTranslationResult(
                 "Translated title",
                 "Translated body",

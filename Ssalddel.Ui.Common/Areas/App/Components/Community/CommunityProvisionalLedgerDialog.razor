@@ -69,6 +69,9 @@
     [Parameter, EditorRequired]
     public string IntentTypeCode { get; set; } = CommunityCollectiveIntentTypeCodes.GroupPurchase;
 
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
+
     private string TradeDirectionCode => CommunityTradeDirectionCodes.ExpectedForIntent(IntentTypeCode);
 
     private bool IsCrossBorder => !string.Equals(
@@ -126,7 +129,7 @@
         MudDialog.Close(DialogResult.Ok(new PromoteCommunityPostParticipationRequest
         {
             InterestVoteId = InterestVoteId,
-            DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+            DisplayLanguageCode = CommunityDisplayLanguageCodes.Normalize(DisplayLanguageCode),
             CollectiveIntentTypeCode = IntentTypeCode,
             TradeDirectionCode = TradeDirectionCode,
             OriginCountryCode = origin,

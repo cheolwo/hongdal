@@ -6,13 +6,14 @@ namespace Ssalddel.Tests.Contracts.Common;
 public sealed class CultureTransportContentCatalogTests
 {
     [Fact]
-    public void 문화교통콘텐츠는_0점0부터1점5안에서_문화근거수요이동준비를잇는다()
+    public void 문화교통콘텐츠는_0점0부터1점5안에서_문화근거개별주문공동주문이동준비를잇는다()
     {
         Assert.Equal("문화교통", CultureTransportContentCatalog.ProductName);
         Assert.Equal(
             [
                 CultureTransportContentCatalog.CultureStoryKey,
                 CultureTransportContentCatalog.PriceEvidenceKey,
+                CultureTransportContentCatalog.IndividualOrderIntentKey,
                 CultureTransportContentCatalog.SharedDemandKey,
                 CultureTransportContentCatalog.RouteReadinessKey
             ],
@@ -39,7 +40,8 @@ public sealed class CultureTransportContentCatalogTests
             CultureTransportContentCatalog.All.Select(item => item.PublicationBoundary));
 
         Assert.Contains("판매 권고", combinedBoundary, StringComparison.Ordinal);
-        Assert.Contains("주문·결제·계약", combinedBoundary, StringComparison.Ordinal);
+        Assert.Contains("결제·계약", combinedBoundary, StringComparison.Ordinal);
+        Assert.Contains("자동 포함하지 않습니다", combinedBoundary, StringComparison.Ordinal);
         Assert.Contains("자동 확정하지 않습니다", combinedBoundary, StringComparison.Ordinal);
     }
 }

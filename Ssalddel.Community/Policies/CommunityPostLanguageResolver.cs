@@ -13,6 +13,7 @@ public static class CommunityPostLanguageResolver
 
         var text = string.Concat(title, "\n", body);
         var hangulCount = 0;
+        var japaneseKanaCount = 0;
         var latinCount = 0;
 
         foreach (var character in text)
@@ -23,10 +24,21 @@ public static class CommunityPostLanguageResolver
             {
                 hangulCount++;
             }
+            else if (character is >= '\u3040' and <= '\u30FF'
+                     or >= '\u31F0' and <= '\u31FF')
+            {
+                japaneseKanaCount++;
+            }
             else if (character is >= 'A' and <= 'Z' or >= 'a' and <= 'z')
             {
                 latinCount++;
             }
+        }
+
+        if (japaneseKanaCount > 0
+            && japaneseKanaCount * 4 >= hangulCount + latinCount)
+        {
+            return DisplayLanguageCodes.Japanese;
         }
 
         if (hangulCount > 0 && hangulCount * 4 >= latinCount)

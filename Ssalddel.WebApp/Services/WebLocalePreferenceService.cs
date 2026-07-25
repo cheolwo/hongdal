@@ -23,7 +23,9 @@ public sealed class WebLocalePreferenceService(
     public string LanguageCode { get; private set; } = DisplayLanguageCodes.Korean;
     public string? CountryCode { get; private set; }
     public bool IsInitialized { get; private set; }
+    public bool IsKorean => LanguageCode == DisplayLanguageCodes.Korean;
     public bool IsEnglish => LanguageCode == DisplayLanguageCodes.English;
+    public bool IsJapanese => LanguageCode == DisplayLanguageCodes.Japanese;
     public string? LastPersistenceError { get; private set; }
     public event Action? Changed;
 
@@ -95,8 +97,8 @@ public sealed class WebLocalePreferenceService(
         }
     }
 
-    public string Text(string korean, string english)
-        => IsEnglish ? english : korean;
+    public string Text(string korean, string english, string? japanese = null)
+        => DisplayLanguageCodes.Select(LanguageCode, korean, english, japanese);
 
     private async Task<WebLocaleBrowserSignals> ReadBrowserSignalsAsync(
         CancellationToken cancellationToken)

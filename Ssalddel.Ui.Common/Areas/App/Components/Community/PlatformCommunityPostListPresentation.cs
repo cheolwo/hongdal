@@ -8,10 +8,10 @@ namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 public static class PlatformCommunityPostListPresentation
 {
     public static string UiText(string displayLanguageCode, string korean, string english)
-        => IsEnglishDisplay(displayLanguageCode) ? english : korean;
+        => DisplayLanguageCodes.Select(displayLanguageCode, korean, english);
 
     public static string DisplayFilter(string displayLanguageCode, string filter)
-        => !IsEnglishDisplay(displayLanguageCode)
+        => IsKoreanDisplay(displayLanguageCode)
             ? filter
             : filter switch
             {
@@ -22,7 +22,7 @@ public static class PlatformCommunityPostListPresentation
             };
 
     public static string DisplayBoardName(string displayLanguageCode, string boardName)
-        => !IsEnglishDisplay(displayLanguageCode)
+        => IsKoreanDisplay(displayLanguageCode)
             ? boardName
             : boardName switch
             {
@@ -177,8 +177,8 @@ public static class PlatformCommunityPostListPresentation
             _ => "역할 참여 모집"
         };
 
-    private static bool IsEnglishDisplay(string displayLanguageCode)
-        => DisplayLanguageCodes.Normalize(displayLanguageCode) == DisplayLanguageCodes.English;
+    private static bool IsKoreanDisplay(string displayLanguageCode)
+        => DisplayLanguageCodes.Normalize(displayLanguageCode) == DisplayLanguageCodes.Korean;
 
     private static bool IsYouTubeUrl(string? value)
     {

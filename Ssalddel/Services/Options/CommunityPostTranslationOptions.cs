@@ -20,5 +20,5 @@ public sealed class CommunityPostTranslationOptions
     public string Region { get; set; } = string.Empty;
     public int TimeoutSeconds { get; set; } = 15;
     public bool TranslateReportPosts { get; set; }
-    public List<string> SupportedLanguageCodes { get; set; } = ["ko-KR", "en-US"];
+    public List<string> SupportedLanguageCodes { get; set; } = ["ko-KR", "en-US", "ja-JP"];
 }

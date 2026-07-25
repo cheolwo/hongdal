@@ -125,6 +125,9 @@ public sealed class CommunityActivityBoardCatalogTests
 
         var groupPurchase = Assert.IsType<CommunityActivityBoardBundleDefinition>(
             CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.IndividualDemand));
+        Assert.Equal(
+            SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            groupPurchase.ProductVersion);
         Assert.Contains(
             groupPurchase.Activities,
             activity => activity.SourceName == "공동구매자동수요등록Command"

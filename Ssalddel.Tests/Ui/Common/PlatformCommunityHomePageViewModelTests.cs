@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Localization;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -193,6 +194,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
     public void 게시글상호작용ViewModel은_게시글별입력과펼침상태를분리한다()
     {
         var viewModel = new PlatformCommunityPostEngagementViewModel(CreateService());
+        viewModel.DisplayLanguageCode = DisplayLanguageCodes.Japanese;
 
         var first = viewModel.GetCommentForm(10);
         var same = viewModel.GetCommentForm(10);
@@ -203,6 +205,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
         Assert.NotSame(first, other);
         Assert.True(viewModel.IsCommentsExpanded(10));
         Assert.False(viewModel.IsCommentsExpanded(20));
+        Assert.Equal(DisplayLanguageCodes.Japanese, viewModel.DisplayLanguageCode);
     }
 
     [Fact]

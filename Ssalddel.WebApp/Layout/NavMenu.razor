@@ -9,8 +9,8 @@
         <MudStack Spacing="0" Class="px-4 pt-3 pb-2">
             <MudText Typo="Typo.overline" Color="Color.Secondary">
                 @(IsCommunityMode
-                    ? Locale.Text("통합 베타 · 커뮤니티", "Integrated Beta · Community")
-                    : Locale.Text("통합 베타 · 업무", "Integrated Beta · Work"))
+                    ? Locale.Text("통합 베타 · 커뮤니티", "Integrated Beta · Community", "統合ベータ · コミュニティ")
+                    : Locale.Text("통합 베타 · 업무", "Integrated Beta · Work", "統合ベータ · 業務"))
             </MudText>
             <MudText Typo="Typo.subtitle2">@NavigationIdentityLabel</MudText>
         </MudStack>
@@ -41,7 +41,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Forum"
                            OnClick="OpenCommunityMode">
-                    @Locale.Text("게시판", "Boards")
+                    @Locale.Text("게시판", "Boards", "掲示板")
                 </MudButton>
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
@@ -49,7 +49,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Edit"
                            OnClick="OpenCommunityCompose">
-                    @Locale.Text("글쓰기", "Write")
+                    @Locale.Text("글쓰기", "Write", "投稿")
                 </MudButton>
             </MudStack>
         }
@@ -62,7 +62,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Work"
                            OnClick="OpenBusinessMode">
-                    @Locale.Text("업무", "Work")
+                    @Locale.Text("업무", "Work", "業務")
                 </MudButton>
                 <MudButton Variant="@CommunityModeVariant"
                            Color="Color.Secondary"
@@ -70,7 +70,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Forum"
                            OnClick="OpenCommunityMode">
-                    @Locale.Text("커뮤니티", "Community")
+                    @Locale.Text("커뮤니티", "Community", "コミュニティ")
                 </MudButton>
             </MudStack>
         }
@@ -183,7 +183,7 @@
             : LocalizedRoleLabel;
 
     private string LocalizedRoleLabel
-        => !Locale.IsEnglish
+        => Locale.IsKorean
             ? AuthSession.CurrentTheme.RoleLabel
             : AuthSession.CurrentTheme.RoleLabel switch
             {
@@ -195,7 +195,7 @@
             };
 
     private string StageLabel(string label)
-        => !Locale.IsEnglish
+        => Locale.IsKorean
             ? label
             : label switch
             {
@@ -213,7 +213,7 @@
 
     private string NavigationTitle(WebNavigationItem item)
     {
-        if (!Locale.IsEnglish)
+        if (Locale.IsKorean)
         {
             return item.Title;
         }

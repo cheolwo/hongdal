@@ -8,8 +8,8 @@
     <MudAppBar Elevation="1" Color="Color.Default" Dense="true" Class="web-appbar">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Color="Color.Inherit" OnClick="ToggleDrawer" />
         <MudText Typo="Typo.h6" Class="web-app-title">
-            <span class="web-app-title__full">@Locale.Text("살뜰 통합 베타", "Ssalddel Integrated Beta")</span>
-            <span class="web-app-title__compact">@Locale.Text("살뜰", "Ssalddel")</span>
+            <span class="web-app-title__full">@Locale.Text("살뜰 통합 베타", "Ssalddel Integrated Beta", "Ssalddel 統合ベータ")</span>
+            <span class="web-app-title__compact">@Locale.Text("살뜰", "Ssalddel", "Ssalddel")</span>
         </MudText>
         <MudSpacer />
         <WebLanguageSwitcher />
@@ -30,7 +30,7 @@
                        Color="Color.Inherit"
                        Size="Size.Small"
                        StartIcon="@Icons.Material.Filled.Login">
-                @Locale.Text("로그인", "Sign in")
+                @Locale.Text("로그인", "Sign in", "ログイン")
             </MudButton>
         }
         <MudChip T="string" Class="web-role-chip" Variant="Variant.Filled" Size="Size.Small">@CurrentRoleLabel</MudChip>
@@ -74,8 +74,9 @@
         }
     }
     private string CurrentRoleLabel
-        => Locale.IsEnglish
-            ? CurrentTheme.RoleLabel switch
+        => Locale.IsKorean
+            ? CurrentTheme.RoleLabel
+            : CurrentTheme.RoleLabel switch
             {
                 "방문자" => "Visitor",
                 "화주" => "Shipper",
@@ -84,8 +85,7 @@
                 "주문자" => "Orderer",
                 "관세사" => "Customs broker",
                 _ => CurrentTheme.RoleLabel
-            }
-            : CurrentTheme.RoleLabel;
+            };
 
     protected override void OnInitialized()
     {

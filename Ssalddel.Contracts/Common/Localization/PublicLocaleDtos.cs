@@ -29,6 +29,7 @@ public static class PublicCountryLanguageRecommendation
         {
             "KR" => DisplayLanguageCodes.Korean,
             "US" => DisplayLanguageCodes.English,
+            "JP" => DisplayLanguageCodes.Japanese,
             _ => null
         };
 }

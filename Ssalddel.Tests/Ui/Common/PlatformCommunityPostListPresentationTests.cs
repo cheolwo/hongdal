@@ -27,6 +27,21 @@ public sealed class PlatformCommunityPostListPresentationTests
     }
 
     [Fact]
+    public void 일본어_번역이_없는_목록문구는_영어로_대체한다()
+    {
+        Assert.Equal(
+            "Life & Community",
+            PlatformCommunityPostListPresentation.DisplayBoardName(
+                DisplayLanguageCodes.Japanese,
+                PlatformCommunityPostCategories.General));
+        Assert.Equal(
+            "Recommended",
+            PlatformCommunityPostListPresentation.DisplayFilter(
+                DisplayLanguageCodes.Japanese,
+                "추천글"));
+    }
+
+    [Fact]
     public void 선택_공지_자동글_참여모집_상태는_한_행_class에_함께_표현된다()
     {
         var post = new PlatformCommunityPostResponse
