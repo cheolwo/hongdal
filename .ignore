@@ -1,0 +1,4 @@
+# EF migration history is opt-in. Use `rg --no-ignore` for schema work.
+**/Migrations/**
+**/wwwroot/lib/**
+**/*.map

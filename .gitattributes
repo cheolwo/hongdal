@@ -1,0 +1,3 @@
+**/Migrations/**/*.cs linguist-generated=true
+FDriverApp/Resources/Fonts/FluentUI.cs linguist-generated=true
+**/wwwroot/lib/** linguist-vendored=true

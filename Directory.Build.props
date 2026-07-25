@@ -1,5 +1,5 @@
 <Project>
   <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/bin/**;**/obj/**;**/.codex-build/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/bin/**;**/obj/**;**/.codex-build/**;**/artifacts/**</DefaultItemExcludes>
   </PropertyGroup>
 </Project>
