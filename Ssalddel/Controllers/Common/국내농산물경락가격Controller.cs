@@ -22,13 +22,16 @@ public sealed class 국내농산물경락가격Controller : ControllerBase
 {
     private readonly I국내농산물경락가격조회Service _service;
     private readonly I국내농산물경락가격ArchiveService _archiveService;
+    private readonly I농산물지역가격비교QueryService _comparisonService;
 
     public 국내농산물경락가격Controller(
         I국내농산물경락가격조회Service service,
-        I국내농산물경락가격ArchiveService archiveService)
+        I국내농산물경락가격ArchiveService archiveService,
+        I농산물지역가격비교QueryService comparisonService)
     {
         _service = service;
         _archiveService = archiveService;
+        _comparisonService = comparisonService;
     }
 
     [HttpGet("sources")]
@@ -105,5 +108,57 @@ public sealed class 국내농산물경락가격Controller : ControllerBase
             국내농산물경락가격조회상태Codes.지원하지않는출처 => BadRequest(response),
             _ => Ok(response)
         };
+    }
+
+    [HttpGet("archive/comparison-options")]
+    [SsalddelApiContractName("GetDomesticAgriculturalRegionalPriceComparisonOptions")]
+    public async Task<ActionResult<농산물지역가격비교선택지응답>> 지역가격비교선택지조회(
+        [FromQuery] string? settlementDate = null,
+        [FromQuery] string? itemName = null,
+        [FromQuery] string sourceKey =
+            국내농산물경락가격출처Keys.MafraWholesaleMarketSettlement,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _comparisonService.GetOptionsAsync(
+            new 농산물지역가격비교선택지요청
+            {
+                SourceKey = sourceKey,
+                SettlementDate = settlementDate,
+                ItemName = itemName
+            },
+            cancellationToken);
+        return response.StatusCode is 국내농산물경락가격조회상태Codes.잘못된요청
+            or 국내농산물경락가격조회상태Codes.지원하지않는출처
+            ? BadRequest(response)
+            : Ok(response);
+    }
+
+    [HttpGet("archive/region-comparison")]
+    [SsalddelApiContractName("CompareDomesticAgriculturalPricesByRegion")]
+    public async Task<ActionResult<농산물지역가격비교응답>> 지역가격비교(
+        [FromQuery] string itemName,
+        [FromQuery] string? varietyName = null,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
+        [FromQuery] string regionBasisCode = 농산물지역가격비교기준Codes.원산지,
+        [FromQuery] string sourceKey =
+            국내농산물경락가격출처Keys.MafraWholesaleMarketSettlement,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _comparisonService.CompareAsync(
+            new 농산물지역가격비교요청
+            {
+                SourceKey = sourceKey,
+                ItemName = itemName,
+                VarietyName = varietyName,
+                StartDate = startDate,
+                EndDate = endDate,
+                RegionBasisCode = regionBasisCode
+            },
+            cancellationToken);
+        return response.StatusCode is 국내농산물경락가격조회상태Codes.잘못된요청
+            or 국내농산물경락가격조회상태Codes.지원하지않는출처
+            ? BadRequest(response)
+            : Ok(response);
     }
 }
