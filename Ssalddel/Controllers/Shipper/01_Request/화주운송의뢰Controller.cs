@@ -21,7 +21,7 @@ namespace Ssalddel.Controllers.Shipper.Request01
     [ApiController]
     [Route("api/v1/shipper/requests")]
     [Authorize]
-    public class 화주운송의뢰Controller : ControllerBase
+    public class 화주운송의뢰Controller : ShipperControllerBase
     {
         private readonly I화주운송의뢰UseCase _useCase;
 

@@ -22,11 +22,13 @@ namespace Ssalddel.Controllers.Shipper;
     ContractType = typeof(수입식품한글표시사항조회응답),
     FlowOrder = 10,
     Boundary = "CustomsAndTradeDataWorkflow가 켜진 1.5 Simulation에서 조회만 허용합니다.")]
+[SsalddelApiCapability(SsalddelCapability.TradePreparation)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
 [ApiController]
 [Route("api/v1/shipper/import-food/korean-labels")]
 [Authorize(Roles = 역할명.화주)]
 [RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
-public sealed class 수입식품한글표시사항Controller : ControllerBase
+public sealed class 수입식품한글표시사항Controller : ShipperControllerBase
 {
     private readonly ISender _sender;
 

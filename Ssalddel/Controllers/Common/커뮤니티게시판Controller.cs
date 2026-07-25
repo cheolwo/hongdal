@@ -19,7 +19,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/boards")]
-public sealed class 커뮤니티게시판Controller : ControllerBase
+public sealed class 커뮤니티게시판Controller : CommunityControllerBase
 {
     private readonly I커뮤니티게시판UseCase _useCase;
 
@@ -30,7 +30,8 @@ public sealed class 커뮤니티게시판Controller : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> List(
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(
         [FromQuery] string? appKey,
         CancellationToken cancellationToken)
     {
@@ -44,7 +45,8 @@ public sealed class 커뮤니티게시판Controller : ControllerBase
 
     [HttpGet("requests")]
     [Authorize(Policy = "서버관리자전용")]
-    public async Task<IActionResult> ListRequests(
+    [SsalddelApiContractName("ListRequests")]
+    public async Task<IActionResult> 요청목록조회(
         [FromQuery] string? appKey,
         [FromQuery] string? status,
         CancellationToken cancellationToken)
@@ -59,7 +61,8 @@ public sealed class 커뮤니티게시판Controller : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create(
+    [SsalddelApiContractName("Create")]
+    public async Task<IActionResult> 생성(
         [FromBody] PlatformCommunityBoardCreateRequest request,
         CancellationToken cancellationToken)
     {
@@ -79,12 +82,13 @@ public sealed class 커뮤니티게시판Controller : ControllerBase
             return this.ToActionResult(result);
         }
 
-        return CreatedAtAction(nameof(List), new { appKey = result.Value.AppKey }, result.Value);
+        return CreatedAtAction(nameof(목록조회), new { appKey = result.Value.AppKey }, result.Value);
     }
 
     [HttpPost("{id:long}/approve")]
     [Authorize(Policy = "서버관리자전용")]
-    public async Task<IActionResult> Approve(
+    [SsalddelApiContractName("Approve")]
+    public async Task<IActionResult> 승인(
         long id,
         [FromBody] PlatformCommunityBoardReviewRequest request,
         CancellationToken cancellationToken)
@@ -101,7 +105,8 @@ public sealed class 커뮤니티게시판Controller : ControllerBase
 
     [HttpPost("{id:long}/reject")]
     [Authorize(Policy = "서버관리자전용")]
-    public async Task<IActionResult> Reject(
+    [SsalddelApiContractName("Reject")]
+    public async Task<IActionResult> 거절(
         long id,
         [FromBody] PlatformCommunityBoardReviewRequest request,
         CancellationToken cancellationToken)

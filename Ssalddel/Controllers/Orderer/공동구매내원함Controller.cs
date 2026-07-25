@@ -18,13 +18,13 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/group-purchase-wishes/me")]
-public sealed class 공동구매내원함Controller : ControllerBase
+public sealed class 공동구매내원함Controller : OrdererControllerBase
 {
-    private readonly I공동구매내원함조회UseCase _useCase;
+    private readonly I공동구매내원함조회UseCase _내원함조회UseCase;
 
-    public 공동구매내원함Controller(I공동구매내원함조회UseCase useCase)
+    public 공동구매내원함Controller(I공동구매내원함조회UseCase 내원함조회UseCase)
     {
-        _useCase = useCase;
+        _내원함조회UseCase = 내원함조회UseCase;
     }
 
     [HttpGet]
@@ -39,7 +39,7 @@ public sealed class 공동구매내원함Controller : ControllerBase
             return Unauthorized();
         }
 
-        var response = await _useCase.조회Async(currentUserId, cancellationToken);
+        var response = await _내원함조회UseCase.조회Async(currentUserId, cancellationToken);
         return Ok(response);
     }
 }

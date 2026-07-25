@@ -18,15 +18,16 @@ namespace Ssalddel.Controllers.Admin.Orderer;
 [Route("api/v1/admin/orderer/group-purchase-overseas-shipments")]
 public sealed class 공동구매해외선적추적AdminController : ControllerBase
 {
-    private readonly I공동구매해외선적추적UseCase _useCase;
+    private readonly I공동구매해외선적추적UseCase _해외선적추적UseCase;
 
-    public 공동구매해외선적추적AdminController(I공동구매해외선적추적UseCase useCase)
+    public 공동구매해외선적추적AdminController(I공동구매해외선적추적UseCase 해외선적추적UseCase)
     {
-        _useCase = useCase;
+        _해외선적추적UseCase = 해외선적추적UseCase;
     }
 
     [HttpGet]
-    public async Task<IActionResult> List(
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(
         [FromQuery] string? groupPurchaseId,
         [FromQuery] string? ordererGroupScopeKey,
         [FromQuery] string? documentManagementNumber,
@@ -34,7 +35,7 @@ public sealed class 공동구매해외선적추적AdminController : ControllerBa
         [FromQuery] string? currentStatusCode,
         CancellationToken cancellationToken = default)
     {
-        var result = await _useCase.목록Async(new 공동구매해외선적추적조회조건
+        var result = await _해외선적추적UseCase.목록Async(new 공동구매해외선적추적조회조건
         {
             공동구매Id = groupPurchaseId,
             주문자집단배송권키 = ordererGroupScopeKey,
@@ -47,39 +48,43 @@ public sealed class 공동구매해외선적추적AdminController : ControllerBa
     }
 
     [HttpGet("lookup")]
-    public async Task<IActionResult> Get(
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 상세조회(
         [FromQuery] string documentManagementNumber,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.관리자조회Async(documentManagementNumber, cancellationToken);
+        var result = await _해외선적추적UseCase.관리자조회Async(documentManagementNumber, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upsert(
+    [SsalddelApiContractName("Upsert")]
+    public async Task<IActionResult> 등록또는수정(
         [FromBody] 공동구매해외선적추적저장요청 request,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.저장Async(request, ResolveUserId(), cancellationToken);
+        var result = await _해외선적추적UseCase.저장Async(request, ResolveUserId(), cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpPost("events")]
-    public async Task<IActionResult> AppendEvent(
+    [SsalddelApiContractName("AppendEvent")]
+    public async Task<IActionResult> Event추가(
         [FromQuery] string documentManagementNumber,
         [FromBody] 공동구매해외선적추적이벤트추가요청 request,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.이벤트추가Async(documentManagementNumber, request, ResolveUserId(), cancellationToken);
+        var result = await _해외선적추적UseCase.이벤트추가Async(documentManagementNumber, request, ResolveUserId(), cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpPost("customs-sync")]
-    public async Task<IActionResult> SyncCustoms(
+    [SsalddelApiContractName("SyncCustoms")]
+    public async Task<IActionResult> 세관동기화(
         [FromBody] 공동구매해외선적통관동기화요청 request,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.통관동기화Async(request, ResolveUserId(), cancellationToken);
+        var result = await _해외선적추적UseCase.통관동기화Async(request, ResolveUserId(), cancellationToken);
         return this.ToActionResult(result);
     }
 

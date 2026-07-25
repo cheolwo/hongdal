@@ -17,7 +17,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/diagram-conversations")]
-public sealed class 커뮤니티대화Controller : ControllerBase
+public sealed class 커뮤니티대화Controller : CommunityControllerBase
 {
     private readonly I커뮤니티대화UseCase _useCase;
 
@@ -28,7 +28,8 @@ public sealed class 커뮤니티대화Controller : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> ListDiagramConversations(
+    [SsalddelApiContractName("ListDiagramConversations")]
+    public async Task<IActionResult> 다이어그램대화목록조회(
         [FromQuery] string? communityId,
         [FromQuery] string? ledgerId,
         [FromQuery] string? diagramId,
@@ -48,7 +49,8 @@ public sealed class 커뮤니티대화Controller : ControllerBase
 
     [HttpGet("{roomId}/messages")]
     [AllowAnonymous]
-    public async Task<IActionResult> ListDiagramMessages(
+    [SsalddelApiContractName("ListDiagramMessages")]
+    public async Task<IActionResult> 다이어그램메시지목록조회(
         [FromRoute] string roomId,
         [FromQuery] int limit = 80,
         CancellationToken cancellationToken = default)

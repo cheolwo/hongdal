@@ -10,6 +10,8 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Settlement06
 {
     [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiCapability(SsalddelCapability.Settlement)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/settlements")]

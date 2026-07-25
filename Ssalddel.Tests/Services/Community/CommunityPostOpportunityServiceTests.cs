@@ -666,25 +666,25 @@ public sealed class CommunityPostOpportunityServiceTests
     [Fact]
     public void 조회는_공개이고_시작은_로그인이_필요하다()
     {
-        var controller = typeof(CommunityPostOpportunitiesController);
-        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.Get))!
+        var controller = typeof(커뮤니티게시글참여기회Controller);
+        Assert.NotNull(controller.GetMethod(nameof(커뮤니티게시글참여기회Controller.기회목록조회))!
             .GetCustomAttributes(typeof(AllowAnonymousAttribute), inherit: true).SingleOrDefault());
-        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.StartMeatImportReadiness))!
+        Assert.NotNull(controller.GetMethod(nameof(커뮤니티게시글참여기회Controller.육류수입준비시작))!
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
-        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.StartParticipation))!
+        Assert.NotNull(controller.GetMethod(nameof(커뮤니티게시글참여기회Controller.참여시작))!
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
-        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.PromoteParticipation))!
+        Assert.NotNull(controller.GetMethod(nameof(커뮤니티게시글참여기회Controller.참여승격))!
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
-        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.JoinProfessional))!
+        Assert.NotNull(controller.GetMethod(nameof(커뮤니티게시글참여기회Controller.전문가참여))!
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
-        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.JoinPartyRole))!
+        Assert.NotNull(controller.GetMethod(nameof(커뮤니티게시글참여기회Controller.당사자역할참여))!
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
     }
 
     [Fact]
     public void 컨트롤러는_기능별_좁은_UseCase에_의존한다()
     {
-        var parameterTypes = typeof(CommunityPostOpportunitiesController)
+        var parameterTypes = typeof(커뮤니티게시글참여기회Controller)
             .GetConstructors()
             .Single()
             .GetParameters()

@@ -21,7 +21,8 @@ public sealed class 보조기능설정Controller : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> List(
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(
         [FromQuery] string? userId,
         CancellationToken cancellationToken)
     {
@@ -30,7 +31,8 @@ public sealed class 보조기능설정Controller : ControllerBase
     }
 
     [HttpPut("global/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> UpdateGlobal(
+    [SsalddelApiContractName("UpdateGlobal")]
+    public async Task<IActionResult> 전체설정수정(
         string targetType,
         string targetName,
         string featureName,
@@ -42,7 +44,8 @@ public sealed class 보조기능설정Controller : ControllerBase
     }
 
     [HttpDelete("global/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> ResetGlobal(
+    [SsalddelApiContractName("ResetGlobal")]
+    public async Task<IActionResult> 전체설정초기화(
         string targetType,
         string targetName,
         string featureName,
@@ -53,7 +56,8 @@ public sealed class 보조기능설정Controller : ControllerBase
     }
 
     [HttpPut("users/{userId}/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> UpdateUser(
+    [SsalddelApiContractName("UpdateUser")]
+    public async Task<IActionResult> 사용자설정수정(
         string userId,
         string targetType,
         string targetName,
@@ -66,7 +70,8 @@ public sealed class 보조기능설정Controller : ControllerBase
     }
 
     [HttpDelete("users/{userId}/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> ResetUser(
+    [SsalddelApiContractName("ResetUser")]
+    public async Task<IActionResult> 사용자설정초기화(
         string userId,
         string targetType,
         string targetName,

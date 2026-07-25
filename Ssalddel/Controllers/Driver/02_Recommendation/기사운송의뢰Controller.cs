@@ -8,6 +8,8 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Recommendation02
 {
     [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiCapability(SsalddelCapability.TransportRequest)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/requests")]

@@ -17,12 +17,12 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchasePracticeWorkflow)]
 [Route("api/v1/orderer/group-purchase-practice")]
-public sealed class 공동구매체험Controller(I공동구매체험Service service) : ControllerBase
+public sealed class 공동구매체험Controller(I공동구매체험Service 체험Service) : OrdererControllerBase
 {
     [HttpGet("scenarios")]
     [ProducesResponseType(typeof(IReadOnlyList<공동구매체험시나리오응답>), StatusCodes.Status200OK)]
     public IActionResult 시나리오목록()
-        => Ok(service.시나리오목록());
+        => Ok(체험Service.시나리오목록());
 
     [HttpPost("simulate")]
     [ProducesResponseType(typeof(공동구매체험응답), StatusCodes.Status200OK)]
@@ -31,7 +31,7 @@ public sealed class 공동구매체험Controller(I공동구매체험Service serv
     {
         try
         {
-            return Ok(service.시뮬레이션(request));
+            return Ok(체험Service.시뮬레이션(request));
         }
         catch (InvalidOperationException exception)
         {

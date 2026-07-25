@@ -5,6 +5,7 @@ using Ssalddel.Controllers.Common;
 using Ssalddel.Controllers.Driver.Action03;
 using Ssalddel.Controllers.Driver.Progress05;
 using Ssalddel.Controllers.Driver.Recommendation02;
+using Ssalddel.Controllers.Platform;
 using Ssalddel.Controllers.Shipper.Payment02;
 using Ssalddel.Controllers.Shipper.Request01;
 using Microsoft.AspNetCore.Authorization;
@@ -48,10 +49,10 @@ public sealed class SsalddelV1E2ESmokeContractTests
         AssertHttpMethod<운송원장Controller>(nameof(운송원장Controller.이벤트조회), "GET", "{requestId}/events");
 
         AssertRoute<노드스티커상점Controller>("api/v1/community/node-sticker-store");
-        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.List), "GET", "items");
-        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.Get), "GET", "items/{itemKey}");
-        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.GetMyEntitlements), "GET", "entitlements/me");
-        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.ConfirmFakePg), "POST", "fake-pg/confirm");
+        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.목록조회), "GET", "items");
+        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.상세조회), "GET", "items/{itemKey}");
+        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.내사용권조회), "GET", "entitlements/me");
+        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.모의결제확인), "POST", "fake-pg/confirm");
     }
 
     [Fact]

@@ -11,7 +11,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/node-sticker-store")]
-public sealed class 노드스티커상점Controller : ControllerBase
+public sealed class 노드스티커상점Controller : CommunityControllerBase
 {
     private readonly I노드스티커상점UseCase _useCase;
 
@@ -22,7 +22,8 @@ public sealed class 노드스티커상점Controller : ControllerBase
 
     [HttpGet("items")]
     [AllowAnonymous]
-    public async Task<IActionResult> List(CancellationToken cancellationToken)
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(CancellationToken cancellationToken)
     {
         var result = await _useCase.상품목록Async(cancellationToken);
         return this.ToActionResult(result);
@@ -30,7 +31,8 @@ public sealed class 노드스티커상점Controller : ControllerBase
 
     [HttpGet("items/{itemKey}")]
     [AllowAnonymous]
-    public async Task<IActionResult> Get(
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 상세조회(
         [FromRoute] string itemKey,
         CancellationToken cancellationToken)
     {
@@ -40,7 +42,8 @@ public sealed class 노드스티커상점Controller : ControllerBase
 
     [HttpGet("entitlements/me")]
     [Authorize]
-    public async Task<IActionResult> GetMyEntitlements(CancellationToken cancellationToken)
+    [SsalddelApiContractName("GetMyEntitlements")]
+    public async Task<IActionResult> 내사용권조회(CancellationToken cancellationToken)
     {
         var result = await _useCase.내보유권목록Async(cancellationToken);
         return this.ToActionResult(result);
@@ -48,7 +51,8 @@ public sealed class 노드스티커상점Controller : ControllerBase
 
     [HttpPost("fake-pg/confirm")]
     [Authorize]
-    public async Task<IActionResult> ConfirmFakePg(
+    [SsalddelApiContractName("ConfirmFakePg")]
+    public async Task<IActionResult> 모의결제확인(
         [FromBody] 노드스티커FakePg결제승인Request request,
         CancellationToken cancellationToken)
     {

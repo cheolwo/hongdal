@@ -13,7 +13,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [Route("api/v1/traditional-market-councils")]
-public sealed class 전통시장생활권협의Controller : ControllerBase
+public sealed class 전통시장생활권협의Controller : CommunityControllerBase
 {
     private readonly I전통시장생활권협의Service _service;
 

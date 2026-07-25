@@ -11,10 +11,12 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Shipper.Request01;
 
 [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+[SsalddelApiCapability(SsalddelCapability.TransportRequest)]
+[SsalddelApiOperation(SsalddelOperation.Request)]
 [ApiController]
 [Authorize(Roles = 역할명.화주)]
 [Route("api/v1/shipper/exploration-inbox")]
-public sealed class 화주탐색문의Controller : ControllerBase
+public sealed class 화주탐색문의Controller : ShipperControllerBase
 {
     private readonly ISender _sender;
 

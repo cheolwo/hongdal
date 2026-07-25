@@ -10,7 +10,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/education/courses")]
-public sealed class 교육과정Controller : ControllerBase
+public sealed class 교육과정Controller : CommunityControllerBase
 {
     private readonly I교육과정정의Service _service;
 

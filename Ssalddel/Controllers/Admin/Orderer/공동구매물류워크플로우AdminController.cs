@@ -18,15 +18,16 @@ namespace Ssalddel.Controllers.Admin.Orderer;
 [Route("api/v1/admin/orderer/group-purchase-logistics-workflows")]
 public sealed class 공동구매물류워크플로우AdminController : ControllerBase
 {
-    private readonly I공동구매물류워크플로우저장소 _store;
+    private readonly I공동구매물류워크플로우저장소 _공동구매물류워크플로우Store;
 
-    public 공동구매물류워크플로우AdminController(I공동구매물류워크플로우저장소 store)
+    public 공동구매물류워크플로우AdminController(I공동구매물류워크플로우저장소 공동구매물류워크플로우Store)
     {
-        _store = store;
+        _공동구매물류워크플로우Store = 공동구매물류워크플로우Store;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<공동구매물류워크플로우정의Dto>>> List(
+    [SsalddelApiContractName("List")]
+    public async Task<ActionResult<IReadOnlyList<공동구매물류워크플로우정의Dto>>> 목록조회(
         [FromQuery] string? productCategoryCode,
         [FromQuery] string? temperatureCode,
         [FromQuery] string? logisticsMode,
@@ -35,7 +36,7 @@ public sealed class 공동구매물류워크플로우AdminController : Controlle
         [FromQuery] bool activeOnly = true,
         CancellationToken cancellationToken = default)
     {
-        var items = await _store.ListAsync(new 공동구매물류워크플로우조회조건
+        var items = await _공동구매물류워크플로우Store.ListAsync(new 공동구매물류워크플로우조회조건
         {
             품목분류코드 = productCategoryCode,
             온도코드 = temperatureCode,
@@ -49,30 +50,33 @@ public sealed class 공동구매물류워크플로우AdminController : Controlle
     }
 
     [HttpGet("{workflowId}")]
-    public async Task<IActionResult> Get(
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 상세조회(
         string workflowId,
         [FromQuery] string? version,
         CancellationToken cancellationToken)
     {
-        var item = await _store.GetAsync(workflowId, version, cancellationToken);
+        var item = await _공동구매물류워크플로우Store.GetAsync(workflowId, version, cancellationToken);
         return item is null
             ? this.ToNotFoundProblem("공동주문 물류 흐름 정의를 찾을 수 없습니다.")
             : Ok(item);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upsert(
+    [SsalddelApiContractName("Upsert")]
+    public async Task<IActionResult> 등록또는수정(
         [FromBody] 공동구매물류워크플로우저장요청 request,
         CancellationToken cancellationToken)
     {
-        var item = await _store.UpsertAsync(request, ResolveUserId(), cancellationToken);
+        var item = await _공동구매물류워크플로우Store.UpsertAsync(request, ResolveUserId(), cancellationToken);
         return Ok(item);
     }
 
     [HttpPost("seed-defaults")]
-    public async Task<IActionResult> SeedDefaults(CancellationToken cancellationToken)
+    [SsalddelApiContractName("SeedDefaults")]
+    public async Task<IActionResult> 기본값시드(CancellationToken cancellationToken)
     {
-        await _store.SeedDefaultsAsync(cancellationToken);
+        await _공동구매물류워크플로우Store.SeedDefaultsAsync(cancellationToken);
         return NoContent();
     }
 

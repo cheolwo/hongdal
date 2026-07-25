@@ -22,13 +22,13 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [RequireFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/group-purchase-auto-groups")]
-public sealed class 공동구매자동집단화Controller : ControllerBase
+public sealed class 공동구매자동집단화Controller : OrdererControllerBase
 {
-    private readonly I공동구매자동집단화UseCase _useCase;
+    private readonly I공동구매자동집단화UseCase _자동집단화UseCase;
 
-    public 공동구매자동집단화Controller(I공동구매자동집단화UseCase useCase)
+    public 공동구매자동집단화Controller(I공동구매자동집단화UseCase 자동집단화UseCase)
     {
-        _useCase = useCase;
+        _자동집단화UseCase = 자동집단화UseCase;
     }
 
     [HttpGet]
@@ -41,7 +41,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
         [FromQuery(Name = "transactionType")] string? 거래유형,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.목록조회Async(new 공동구매자동집단조회조건
+        var result = await _자동집단화UseCase.목록조회Async(new 공동구매자동집단조회조건
         {
             상품키 = 상품키,
             배송권키 = 배송권키,
@@ -72,7 +72,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
             command.주문자표시명 = User.Identity?.Name ?? command.주문자키;
         }
 
-        var result = await _useCase.배치미리보기Async(command, cancellationToken);
+        var result = await _자동집단화UseCase.배치미리보기Async(command, cancellationToken);
         if (!result.성공)
         {
             return this.ToProblemActionResult(result.메시지, result.상태코드);
@@ -103,7 +103,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
             command.주문자표시명 = User.Identity?.Name ?? currentUserId;
         }
 
-        var result = await _useCase.비구속수요저장Async(command, cancellationToken);
+        var result = await _자동집단화UseCase.비구속수요저장Async(command, cancellationToken);
         if (!result.성공)
         {
             return this.ToProblemActionResult(result.메시지, result.상태코드);
@@ -125,7 +125,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "expectedWishRevision")] long? 개별원함기대Revision = null)
     {
-        var result = await _useCase.수요철회Async(new 공동구매자동수요철회Command
+        var result = await _자동집단화UseCase.수요철회Async(new 공동구매자동수요철회Command
         {
             수요출처키 = 수요출처키,
             요청멱등키 = 요청멱등키?.Trim() ?? string.Empty,
@@ -163,7 +163,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
             command.주문자표시명 = User.Identity?.Name ?? command.주문자키;
         }
 
-        var result = await _useCase.비구속수요저장Async(command, cancellationToken);
+        var result = await _자동집단화UseCase.비구속수요저장Async(command, cancellationToken);
         if (!result.성공)
         {
             return this.ToProblemActionResult(result.메시지, result.상태코드);

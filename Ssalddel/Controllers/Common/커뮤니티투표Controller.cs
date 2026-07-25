@@ -19,7 +19,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/votes")]
-public sealed class 커뮤니티투표Controller : ControllerBase
+public sealed class 커뮤니티투표Controller : CommunityControllerBase
 {
     private readonly I커뮤니티투표UseCase _useCase;
 
@@ -30,7 +30,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> List(
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(
         [FromQuery] string? appKey,
         [FromQuery] string? communityScope,
         [FromQuery] string? hsCode,
@@ -42,7 +43,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpGet("{voteId:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> Get(Guid voteId, CancellationToken cancellationToken)
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 상세조회(Guid voteId, CancellationToken cancellationToken)
     {
         var result = await _useCase.상세Async(voteId, cancellationToken);
         return this.ToActionResult(result);
@@ -50,7 +52,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<IActionResult> Create(
+    [SsalddelApiContractName("Create")]
+    public async Task<IActionResult> 생성(
         [FromBody] CommunityVoteCreateRequest request,
         CancellationToken cancellationToken)
     {
@@ -66,13 +69,14 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
         var result = await _useCase.생성Async(request, cancellationToken);
         return result.IsSuccess
-            ? CreatedAtAction(nameof(Get), new { voteId = result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(상세조회), new { voteId = result.Value.Id }, result.Value)
             : this.ToActionResult(result);
     }
 
     [HttpPost("{voteId:guid}/votes")]
     [AllowAnonymous]
-    public async Task<IActionResult> CastVote(
+    [SsalddelApiContractName("CastVote")]
+    public async Task<IActionResult> 투표(
         Guid voteId,
         [FromBody] CommunityVoteCastRequest request,
         CancellationToken cancellationToken)
@@ -92,7 +96,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpPost("{voteId:guid}/close")]
     [AllowAnonymous]
-    public async Task<IActionResult> Close(
+    [SsalddelApiContractName("Close")]
+    public async Task<IActionResult> 종료(
         Guid voteId,
         [FromBody] CommunityVoteCloseRequest request,
         CancellationToken cancellationToken)
@@ -103,7 +108,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpPost("{voteId:guid}/resolution-documents")]
     [AllowAnonymous]
-    public async Task<IActionResult> CreateResolutionDraft(
+    [SsalddelApiContractName("CreateResolutionDraft")]
+    public async Task<IActionResult> 결의안초안생성(
         Guid voteId,
         [FromBody] CommunityVoteResolutionDraftRequest request,
         CancellationToken cancellationToken)
@@ -114,7 +120,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpPost("{voteId:guid}/resolution-documents/signatures")]
     [AllowAnonymous]
-    public async Task<IActionResult> SignResolution(
+    [SsalddelApiContractName("SignResolution")]
+    public async Task<IActionResult> 결의안서명(
         Guid voteId,
         [FromBody] CommunityVoteResolutionSignRequest request,
         CancellationToken cancellationToken)
@@ -125,7 +132,8 @@ public sealed class 커뮤니티투표Controller : ControllerBase
 
     [HttpPost("{voteId:guid}/resolution-documents/ready-to-sign")]
     [AllowAnonymous]
-    public async Task<IActionResult> MarkResolutionReadyToSign(
+    [SsalddelApiContractName("MarkResolutionReadyToSign")]
+    public async Task<IActionResult> 결의안서명준비(
         Guid voteId,
         [FromBody] CommunityVoteResolutionReadyToSignRequest request,
         CancellationToken cancellationToken)

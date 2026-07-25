@@ -2,7 +2,7 @@
 
 ## 목적
 
-`SsalddelCodeMetadataAttribute`는 기능 하나가 계약, 화면, API, Application, 저장소와 외부 adapter를 어떻게 통과하는지 소스에서 바로 찾기 위한 코드 지도다. 기존 `SsalddelApiVersion`, `SsalddelApiWorkflow`, `SsalddelUseCase`를 대체하지 않는다. 이들은 제품 버전과 업무 흐름을 설명하고, 코드 메타데이터는 개별 구현 타입의 책임과 부수효과를 설명한다.
+`SsalddelCodeMetadataAttribute`는 기능 하나가 계약, 화면, API, Application, 저장소와 외부 adapter를 어떻게 통과하는지 소스에서 바로 찾기 위한 코드 지도다. [API 업무 의미 분류](ApiBusinessClassification.md)의 업무 영역·사용자·업무 동작·Workflow를 대체하지 않고, 개별 구현 타입의 책임과 부수효과를 더 자세히 설명한다. 제품 버전은 현재 기능 분류가 아니라 최초 도입 이력으로만 해석한다.
 
 ## 필드
 
@@ -27,6 +27,34 @@
 - 순수 계산기는 `Effects = None`으로 두고 순수성 경계를 적는다.
 - 기능을 분리하거나 이름을 바꾸면 특성, reader 검증 테스트와 관련 아키텍처 문서를 함께 갱신한다.
 
+## 코드 명명 언어
+
+이 절은 저장소 코드 명명 언어의 단일 기준이다. 기술 책임을 나타내는 용어는
+영어로 유지하고 업무 의미는 한국어로 적는다.
+
+| 구분 | 표기 | 예 |
+| --- | --- | --- |
+| 기술 책임 | 영어 | `Controller`, `API`, `DTO`, `Command`, `Event`, `Handler`, `UseCase`, `Service`, `Repository`, `Store`, `Client`, `Options`, `Worker`, `Outbox` |
+| 업무 개념 | 한국어 | `공동구매수요`, `생산자연결`, `운송의뢰`, `창고입고`, `재고관리`, `정산` |
+| 외부 표준·고유명 | 원 표기 | `YouTube`, `HSK`, `HTSUS`, `JWT`, `OAuth`, `KAMIS` |
+
+따라서 `DomesticGroupPurchaseNegotiationsController`보다
+`국내공동구매협의Controller`, `PublicDataLookupController`보다
+`공공데이터조회Controller`를 사용한다. 기술 역할을 번역한
+`컨트롤러`, `서비스`, `이벤트처리기` 같은 접미사는 만들지 않는다.
+
+이 기준은 class, method, property, field, parameter와 file 이름에 적용한다.
+`국내공동구매협의Controller`, `생산자후보검색`,
+`_공공데이터조회UseCase`처럼 `한국어 업무명 + 영어 기술 역할`로 조합한다.
+새 코드와 수정하는 코드에는 이 기준을 적용한다. 기존 이름을 넓게 바꾸는 작업은
+기능 단위로 나누고 호출부와 외부·영속 contract의 호환성을 함께 검증한다.
+
+코드 이름 변경이 HTTP Route, query 이름, JSON 필드, Event code, DB 식별자 또는
+원장에 저장된 API 식별자의 변경을 뜻하지는 않는다. 이미 노출된 API metadata 이름은
+`SsalddelApiContractNameAttribute`로 보존하고 새 코드는 한국어 업무 이름을 사용한다.
+attribute, mapping 또는 adapter로 기존 contract를 명시적으로 보존하고 회귀 test를 둔다.
+외부 계약 자체를 바꿔야 할 때는 별도 migration과 호환 기간을 둔다.
+
 ## 탐색 방법
 
 기능 키를 한 번 검색하면 관련 타입과 흐름 순서를 바로 확인할 수 있다.
@@ -49,7 +77,7 @@ rg -n "SsalddelCodeMetadata\(" -g "*.cs" -g "*.razor"
 
 ## 제품 모듈 특성
 
-`SsalddelModuleAttribute`는 여러 타입이 어떤 제품 버전과 릴리즈 단계에 속하는지를 묶는다. 코드 계층과 부수효과를 설명하는 `SsalddelCodeMetadataAttribute`보다 상위 분류다. 커뮤니티 0.0에는 파생 특성인 `[SsalddelCommunityV0Module]`을 사용해 다음 값을 공통으로 고정한다.
+`SsalddelModuleAttribute`는 여러 타입의 출시 묶음과 릴리즈 단계를 기록한다. 현재 업무 책임은 API 업무 의미 분류를 따르고, Module의 제품 버전은 출시 이력으로 사용한다. 커뮤니티 0.0에는 파생 특성인 `[SsalddelCommunityV0Module]`을 사용해 다음 값을 공통으로 고정한다.
 
 - `ProductVersion`: `0.0`
 - `FeatureFlag`: `CommunityTrustWorkflow`

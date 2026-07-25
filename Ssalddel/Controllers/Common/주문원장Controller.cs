@@ -14,7 +14,7 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize]
 [Route("api/v1/community/order-ledgers")]
-public sealed class 주문원장Controller : ControllerBase
+public sealed class 주문원장Controller : CommunityControllerBase
 {
     private readonly I주문원장통합UseCase _useCase;
     private readonly I주문원장서명UseCase _서명UseCase;

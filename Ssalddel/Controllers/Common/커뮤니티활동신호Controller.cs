@@ -11,7 +11,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/activity-signals")]
-public sealed class 커뮤니티활동신호Controller : ControllerBase
+public sealed class 커뮤니티활동신호Controller : CommunityControllerBase
 {
     private readonly I커뮤니티활동신호UseCase _useCase;
 
@@ -22,7 +22,8 @@ public sealed class 커뮤니티활동신호Controller : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> Get(
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 조회(
         [FromQuery] CommunityActivitySignalQuery query,
         CancellationToken cancellationToken)
     {

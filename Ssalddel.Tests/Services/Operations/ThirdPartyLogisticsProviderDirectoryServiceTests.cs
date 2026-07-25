@@ -495,21 +495,21 @@ public sealed class ThirdPartyLogisticsProviderDirectoryServiceTests
     [Fact]
     public void Controller_ReturnsOkForUnitedStatesAndNotFoundForOtherMarkets()
     {
-        var unitedStatesController = new ThirdPartyLogisticsProvidersController(
+        var unitedStatesController = new 제3자물류사업자Controller(
             new UnitedStatesThirdPartyLogisticsProviderDirectoryService());
-        var koreaController = new ThirdPartyLogisticsProvidersController(
+        var koreaController = new 제3자물류사업자Controller(
             new UnavailableThirdPartyLogisticsProviderDirectoryService(
                 new OperatingMarketDeployment(OperatingMarketCodes.Korea)));
 
-        var unitedStatesResult = unitedStatesController.Get(pageSize: 5);
-        var koreaResult = koreaController.Get();
+        var unitedStatesResult = unitedStatesController.목록조회(pageSize: 5);
+        var koreaResult = koreaController.목록조회();
         var unitedStatesCollectivePurchaseResult =
-            unitedStatesController.GetForCollectivePurchase(pageSize: 5);
+            unitedStatesController.공동구매물류조회(pageSize: 5);
         var koreaCollectivePurchaseResult =
-            koreaController.GetForCollectivePurchase();
+            koreaController.공동구매물류조회();
         var unitedStatesBondedToDoorResult =
-            unitedStatesController.GetBondedToDoor(pageSize: 5);
-        var koreaBondedToDoorResult = koreaController.GetBondedToDoor();
+            unitedStatesController.보세창고문앞배송조회(pageSize: 5);
+        var koreaBondedToDoorResult = koreaController.보세창고문앞배송조회();
 
         var ok = Assert.IsType<OkObjectResult>(unitedStatesResult.Result);
         var okResponse = Assert.IsType<ThirdPartyLogisticsProviderDirectoryResponse>(ok.Value);

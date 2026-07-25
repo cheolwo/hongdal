@@ -20,7 +20,7 @@ namespace Ssalddel.Controllers.Orderer;
 [Route("api/v1/orderer/mart/order-requests")]
 public sealed class 마트주문요청Controller(
     I마트주문요청조회UseCase queryUseCase,
-    I마트주문요청작성UseCase commandUseCase) : ControllerBase
+    I마트주문요청작성UseCase commandUseCase) : OrdererControllerBase
 {
     [HttpGet("{orderRequestId:guid}")]
     public async Task<IActionResult> 상세(Guid orderRequestId, CancellationToken cancellationToken)

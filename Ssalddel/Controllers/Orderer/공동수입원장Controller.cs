@@ -18,48 +18,51 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
 [RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [Route("api/v1/orderer/group-purchase-demand-votes/{campaignId:guid}/group-import-ledger")]
-public sealed class 공동수입원장Controller : ControllerBase
+public sealed class 공동수입원장Controller : OrdererControllerBase
 {
-    private readonly I공동수입원장전환Service _service;
+    private readonly I공동수입원장전환Service _원장전환Service;
 
-    public 공동수입원장Controller(I공동수입원장전환Service service)
+    public 공동수입원장Controller(I공동수입원장전환Service 원장전환Service)
     {
-        _service = service;
+        _원장전환Service = 원장전환Service;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get(
-        Guid campaignId,
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 조회(
+        [FromRoute(Name = "campaignId")] Guid 모집Id,
         CancellationToken cancellationToken)
     {
-        var result = await _service.조회Async(campaignId, cancellationToken);
+        var result = await _원장전환Service.조회Async(모집Id, cancellationToken);
         return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost("preview")]
-    public IActionResult Preview(
-        Guid campaignId,
-        [FromBody] CommunityGroupImportLedgerConversionRequest request)
+    [SsalddelApiContractName("Preview")]
+    public IActionResult 미리보기(
+        [FromRoute(Name = "campaignId")] Guid 모집Id,
+        [FromBody] CommunityGroupImportLedgerConversionRequest 요청)
     {
-        request.GroupPurchaseCampaignId = campaignId;
-        return Ok(_service.미리보기(request));
+        요청.GroupPurchaseCampaignId = 모집Id;
+        return Ok(_원장전환Service.미리보기(요청));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Convert(
-        Guid campaignId,
-        [FromBody] CommunityGroupImportLedgerConversionRequest request,
+    [SsalddelApiContractName("Convert")]
+    public async Task<IActionResult> 원장전환(
+        [FromRoute(Name = "campaignId")] Guid 모집Id,
+        [FromBody] CommunityGroupImportLedgerConversionRequest 요청,
         CancellationToken cancellationToken)
     {
         try
         {
-            request.GroupPurchaseCampaignId = campaignId;
-            var result = await _service.전환Async(
-                request,
+            요청.GroupPurchaseCampaignId = 모집Id;
+            var result = await _원장전환Service.전환Async(
+                요청,
                 CurrentUserId(),
                 cancellationToken);
             return result.Created
-                ? CreatedAtAction(nameof(Get), new { campaignId }, result)
+                ? CreatedAtAction(nameof(조회), new { campaignId = 모집Id }, result)
                 : Ok(result);
         }
         catch (ArgumentException exception)

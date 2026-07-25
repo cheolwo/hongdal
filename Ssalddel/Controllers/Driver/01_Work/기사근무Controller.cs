@@ -10,6 +10,8 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Work01
 {
     [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiCapability(SsalddelCapability.DriverWork)]
+    [SsalddelApiOperation(SsalddelOperation.Execute)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/shifts")]

@@ -19,7 +19,7 @@ namespace Ssalddel.Controllers.Orderer;
 [Route("api/v1/orderer/mart/products")]
 public sealed class 마트공개상품Controller(
     I마트공개상품조회UseCase readUseCase,
-    I마트공개상품구매후기UseCase reviewUseCase) : ControllerBase
+    I마트공개상품구매후기UseCase reviewUseCase) : OrdererControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> 목록(

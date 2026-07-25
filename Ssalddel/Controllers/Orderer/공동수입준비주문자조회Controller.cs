@@ -27,13 +27,13 @@ namespace Ssalddel.Controllers.Orderer;
     FlowOrder = 30,
     Effects = SsalddelCodeEffect.PersistentRead,
     Boundary = "인증과 원천 자동집단 참여 검증을 요구하며 조회 외 상태 변경, OS 실행, 외부 전송 또는 거래 실행 API를 노출하지 않습니다.")]
-public sealed class 공동수입준비주문자조회Controller : ControllerBase
+public sealed class 공동수입준비주문자조회Controller : OrdererControllerBase
 {
-    private readonly I공동수입준비주문자조회UseCase _useCase;
+    private readonly I공동수입준비주문자조회UseCase _공동수입준비조회UseCase;
 
-    public 공동수입준비주문자조회Controller(I공동수입준비주문자조회UseCase useCase)
+    public 공동수입준비주문자조회Controller(I공동수입준비주문자조회UseCase 공동수입준비조회UseCase)
     {
-        _useCase = useCase;
+        _공동수입준비조회UseCase = 공동수입준비조회UseCase;
     }
 
     [HttpGet]
@@ -62,7 +62,7 @@ public sealed class 공동수입준비주문자조회Controller : ControllerBase
             return Unauthorized();
         }
 
-        var result = await _useCase.조회Async(
+        var result = await _공동수입준비조회UseCase.조회Async(
             공동수입원장Id,
             자동집단Id,
             currentUserId,

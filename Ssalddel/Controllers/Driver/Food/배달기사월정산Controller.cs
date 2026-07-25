@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ssalddel.Controllers.Driver.Food;
 
 [SsalddelApiVersion(SsalddelProductVersion.V3_0)]
+[SsalddelApiAudience(SsalddelActor.Driver)]
+[SsalddelApiCapability(SsalddelCapability.Settlement)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
 [ApiController]
 [Route("api/v1/drivers/{driverId}/monthly-settlements")]
 [Authorize(Roles = 역할명.기사)]

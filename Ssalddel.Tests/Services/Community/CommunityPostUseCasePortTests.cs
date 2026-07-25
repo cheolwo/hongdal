@@ -88,11 +88,11 @@ public sealed class CommunityPostUseCasePortTests
         var moderationDependencies = ConstructorDependencies<커뮤니티게시글운영Controller>();
         Assert.Equal([typeof(I커뮤니티게시글운영UseCase)], moderationDependencies);
 
-        var scheduleDependencies = ConstructorDependencies<CommunityPostScheduleController>();
+        var scheduleDependencies = ConstructorDependencies<커뮤니티게시글일정Controller>();
         Assert.Contains(typeof(I커뮤니티게시글예약발행UseCase), scheduleDependencies);
         Assert.DoesNotContain(typeof(I커뮤니티게시글UseCase), scheduleDependencies);
 
-        var imageDependencies = ConstructorDependencies<CommunityAuthoringImagesController>();
+        var imageDependencies = ConstructorDependencies<커뮤니티작성이미지Controller>();
         Assert.Contains(typeof(I커뮤니티게시글첨부UseCase), imageDependencies);
         Assert.DoesNotContain(typeof(I커뮤니티게시글UseCase), imageDependencies);
     }
@@ -117,13 +117,13 @@ public sealed class CommunityPostUseCasePortTests
     }
 
     [Theory]
-    [InlineData(typeof(커뮤니티게시글첨부Controller), nameof(커뮤니티게시글첨부Controller.UploadAttachment), "{id:long}/attachments")]
-    [InlineData(typeof(커뮤니티게시글참여Controller), nameof(커뮤니티게시글참여Controller.Recommend), "{id:long}/recommendations")]
-    [InlineData(typeof(커뮤니티게시글참여Controller), nameof(커뮤니티게시글참여Controller.CreateComment), "{id:long}/comments")]
-    [InlineData(typeof(커뮤니티게시글참여Controller), nameof(커뮤니티게시글참여Controller.CreateAttachmentComment), "attachments/{attachmentId:long}/comments")]
-    [InlineData(typeof(커뮤니티게시글운영Controller), nameof(커뮤니티게시글운영Controller.SetOperatorPin), "{id:long}/operator-pin")]
-    [InlineData(typeof(커뮤니티게시글운영Controller), nameof(커뮤니티게시글운영Controller.ReportComment), "comments/{commentId:long}/reports")]
-    [InlineData(typeof(커뮤니티게시글운영Controller), nameof(커뮤니티게시글운영Controller.ReportAttachmentComment), "attachments/comments/{commentId:long}/reports")]
+    [InlineData(typeof(커뮤니티게시글첨부Controller), nameof(커뮤니티게시글첨부Controller.첨부파일업로드), "{id:long}/attachments")]
+    [InlineData(typeof(커뮤니티게시글참여Controller), nameof(커뮤니티게시글참여Controller.추천), "{id:long}/recommendations")]
+    [InlineData(typeof(커뮤니티게시글참여Controller), nameof(커뮤니티게시글참여Controller.댓글생성), "{id:long}/comments")]
+    [InlineData(typeof(커뮤니티게시글참여Controller), nameof(커뮤니티게시글참여Controller.첨부댓글생성), "attachments/{attachmentId:long}/comments")]
+    [InlineData(typeof(커뮤니티게시글운영Controller), nameof(커뮤니티게시글운영Controller.운영자고정설정), "{id:long}/operator-pin")]
+    [InlineData(typeof(커뮤니티게시글운영Controller), nameof(커뮤니티게시글운영Controller.댓글신고), "comments/{commentId:long}/reports")]
+    [InlineData(typeof(커뮤니티게시글운영Controller), nameof(커뮤니티게시글운영Controller.첨부댓글신고), "attachments/comments/{commentId:long}/reports")]
     public void 분리된_Controller는_기존_HTTP_경로를_유지한다(
         Type controllerType,
         string methodName,

@@ -13,7 +13,7 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize]
 [Route("api/v1/community/ledgers/{원장Id}/sharing")]
-public sealed class 커뮤니티원장공유Controller : ControllerBase
+public sealed class 커뮤니티원장공유Controller : CommunityControllerBase
 {
     private readonly I커뮤니티원장공유Service _service;
 
@@ -23,18 +23,21 @@ public sealed class 커뮤니티원장공유Controller : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get(string 원장Id, CancellationToken cancellationToken)
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 조회(string 원장Id, CancellationToken cancellationToken)
         => this.ToActionResult(await _service.설정조회Async(원장Id, CurrentUserId(), cancellationToken));
 
     [HttpPut]
-    public async Task<IActionResult> Update(
+    [SsalddelApiContractName("Update")]
+    public async Task<IActionResult> 수정(
         string 원장Id,
         [FromBody] 커뮤니티원장공개설정변경Request request,
         CancellationToken cancellationToken)
         => this.ToActionResult(await _service.설정변경Async(원장Id, request, CurrentUserId(), cancellationToken));
 
     [HttpPost("reuse")]
-    public async Task<IActionResult> Reuse(
+    [SsalddelApiContractName("Reuse")]
+    public async Task<IActionResult> 재사용(
         string 원장Id,
         [FromBody] 커뮤니티원장재사용Request request,
         CancellationToken cancellationToken)

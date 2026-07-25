@@ -9,6 +9,8 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Orderer;
 
+[SsalddelApiCapability(SsalddelCapability.ProductDiscovery)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
 [ApiController]
 [Authorize]
 [SsalddelApiVersion(
@@ -18,13 +20,13 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/youtube-food-discovery")]
-public sealed class YouTube음식발견Controller : ControllerBase
+public sealed class YouTube음식발견Controller : OrdererControllerBase
 {
-    private readonly IYouTube음식상품발견Service _service;
+    private readonly IYouTube음식상품발견Service _음식상품발견Service;
 
-    public YouTube음식발견Controller(IYouTube음식상품발견Service service)
+    public YouTube음식발견Controller(IYouTube음식상품발견Service 음식상품발견Service)
     {
-        _service = service;
+        _음식상품발견Service = 음식상품발견Service;
     }
 
     [HttpGet("channels")]
@@ -32,12 +34,12 @@ public sealed class YouTube음식발견Controller : ControllerBase
         [FromQuery] string? countryCode,
         [FromQuery] int take = 100,
         CancellationToken cancellationToken = default)
-        => Ok(await _service.음식채널목록조회Async(countryCode, take, cancellationToken));
+        => Ok(await _음식상품발견Service.음식채널목록조회Async(countryCode, take, cancellationToken));
 
     [HttpGet("countries")]
     public async Task<IActionResult> 음식채널국가집계(
         CancellationToken cancellationToken = default)
-        => Ok(await _service.음식채널국가집계조회Async(cancellationToken));
+        => Ok(await _음식상품발견Service.음식채널국가집계조회Async(cancellationToken));
 
     [HttpGet("products")]
     [AllowAnonymous]
@@ -48,7 +50,7 @@ public sealed class YouTube음식발견Controller : ControllerBase
         [FromQuery] int take = 50,
         CancellationToken cancellationToken = default)
     {
-        var candidates = await _service.공개상품후보목록조회Async(
+        var candidates = await _음식상품발견Service.공개상품후보목록조회Async(
             channelId,
             countryCode,
             candidateType,
@@ -64,7 +66,7 @@ public sealed class YouTube음식발견Controller : ControllerBase
         CancellationToken cancellationToken)
     {
         var userId = CurrentUserId();
-        var result = await _service.구매의향등록Async(
+        var result = await _음식상품발견Service.구매의향등록Async(
             candidateId,
             요청,
             userId,

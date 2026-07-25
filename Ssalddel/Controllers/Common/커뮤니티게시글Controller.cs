@@ -21,7 +21,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/posts")]
-public sealed class 커뮤니티게시글Controller : ControllerBase
+public sealed class 커뮤니티게시글Controller : CommunityControllerBase
 {
     private readonly I커뮤니티게시글조회UseCase _readUseCase;
     private readonly I커뮤니티게시글조회수기록UseCase _viewCountUseCase;
@@ -51,7 +51,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> List(
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(
         [FromQuery] string? appKey,
         [FromQuery] string? category,
         [FromQuery] string? boardKey,
@@ -77,7 +78,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet("board-summaries")]
     [AllowAnonymous]
-    public async Task<IActionResult> ListBoardSummaries(
+    [SsalddelApiContractName("ListBoardSummaries")]
+    public async Task<IActionResult> 게시판요약목록조회(
         [FromQuery] string? appKey,
         CancellationToken cancellationToken)
         => this.ToActionResult(await _readUseCase.게시판요약목록Async(appKey, cancellationToken));
@@ -85,19 +87,21 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
-    public async Task<IActionResult> Create(
+    [SsalddelApiContractName("Create")]
+    public async Task<IActionResult> 생성(
         [FromBody] PlatformCommunityPostCreateRequest request,
         CancellationToken cancellationToken)
     {
         var result = await _publishingUseCase.생성Async(request, cancellationToken);
         return result.IsSuccess
-            ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(상세조회), new { id = result.Value.Id }, result.Value)
             : this.ToActionResult(result);
     }
 
     [HttpGet("my-ledgers")]
     [Authorize]
-    public async Task<IActionResult> ListMyLedgers(
+    [SsalddelApiContractName("ListMyLedgers")]
+    public async Task<IActionResult> 내원장목록조회(
         [FromQuery] string? workflowTag,
         CancellationToken cancellationToken)
         => Ok(await _ledgerSelectionService.연결가능원장목록조회Async(
@@ -107,7 +111,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet("shared-ledgers")]
     [AllowAnonymous]
-    public async Task<IActionResult> ListSharedLedgers(
+    [SsalddelApiContractName("ListSharedLedgers")]
+    public async Task<IActionResult> 공유원장목록조회(
         [FromQuery] string? workflowTag,
         CancellationToken cancellationToken)
         => Ok(await _ledgerSelectionService.공유원장목록조회Async(
@@ -117,7 +122,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet("ledgers/{ledgerId}/context")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetLedgerContext(
+    [SsalddelApiContractName("GetLedgerContext")]
+    public async Task<IActionResult> 원장문맥조회(
         string ledgerId,
         CancellationToken cancellationToken)
     {
@@ -130,7 +136,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet("{id:long}")]
     [AllowAnonymous]
-    public async Task<IActionResult> Get(long id, CancellationToken cancellationToken)
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 상세조회(long id, CancellationToken cancellationToken)
     {
         await _viewCountUseCase.조회기록Async(id, cancellationToken);
         return this.ToActionResult(await _readUseCase.상세Async(id, cancellationToken));
@@ -138,7 +145,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpPost("{id:long}/translations/{targetLanguageCode}")]
     [AllowAnonymous]
-    public async Task<IActionResult> Translate(
+    [SsalddelApiContractName("Translate")]
+    public async Task<IActionResult> 번역(
         long id,
         string targetLanguageCode,
         CancellationToken cancellationToken)
@@ -149,7 +157,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet("{id:long}/audio")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAudio(long id, CancellationToken cancellationToken)
+    [SsalddelApiContractName("GetAudio")]
+    public async Task<IActionResult> 음성조회(long id, CancellationToken cancellationToken)
     {
         var audio = await _audioService.조회Async(
             id,
@@ -161,7 +170,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     [HttpGet("{id:long}/audio/segments/{sequence:int}/download")]
     [AllowAnonymous]
-    public async Task<IActionResult> DownloadAudio(
+    [SsalddelApiContractName("DownloadAudio")]
+    public async Task<IActionResult> 음성다운로드(
         long id,
         int sequence,
         CancellationToken cancellationToken)
@@ -180,7 +190,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     [HttpPut("{id:long}")]
     [AllowAnonymous]
     [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
-    public async Task<IActionResult> Update(
+    [SsalddelApiContractName("Update")]
+    public async Task<IActionResult> 수정(
         long id,
         [FromBody] PlatformCommunityPostUpdateRequest request,
         CancellationToken cancellationToken)
@@ -189,7 +200,8 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     [HttpDelete("{id:long}")]
     [AllowAnonymous]
     [EnableRateLimiting(RequestRateLimitPolicyNames.CommunityMutation)]
-    public async Task<IActionResult> Delete(
+    [SsalddelApiContractName("Delete")]
+    public async Task<IActionResult> 삭제(
         long id,
         [FromBody] PlatformCommunityPostPasswordRequest request,
         CancellationToken cancellationToken)

@@ -12,20 +12,20 @@ public sealed class MeatImportReadinessServiceTests
     [Fact]
     public void 공개절차도와_참여자전용작업공간의_인증경계를_분리한다()
     {
-        var controllerType = typeof(MeatImportReadinessController);
-        var diagramAction = controllerType.GetMethod(nameof(MeatImportReadinessController.GetDiagram))!;
+        var controllerType = typeof(육류수입준비Controller);
+        var diagramAction = controllerType.GetMethod(nameof(육류수입준비Controller.절차도조회))!;
         Assert.NotNull(diagramAction.GetCustomAttributes(typeof(AllowAnonymousAttribute), inherit: true).SingleOrDefault());
 
         var protectedActions = new[]
         {
-            nameof(MeatImportReadinessController.ListMine),
-            nameof(MeatImportReadinessController.GetCase),
-            nameof(MeatImportReadinessController.CreateCase),
-            nameof(MeatImportReadinessController.UpdateStepStatus),
-            nameof(MeatImportReadinessController.AddEvidence),
-            nameof(MeatImportReadinessController.AddDiscussion),
-            nameof(MeatImportReadinessController.ResolveDiscussion),
-            nameof(MeatImportReadinessController.AcknowledgeStep)
+            nameof(육류수입준비Controller.내사례목록조회),
+            nameof(육류수입준비Controller.사례조회),
+            nameof(육류수입준비Controller.사례생성),
+            nameof(육류수입준비Controller.단계상태수정),
+            nameof(육류수입준비Controller.근거추가),
+            nameof(육류수입준비Controller.논의추가),
+            nameof(육류수입준비Controller.논의해결),
+            nameof(육류수입준비Controller.단계확인)
         };
         Assert.All(protectedActions, actionName =>
         {

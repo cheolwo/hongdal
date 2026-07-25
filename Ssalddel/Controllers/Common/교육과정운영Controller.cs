@@ -14,7 +14,7 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize(Roles = 역할명.교육과정멘토 + "," + 역할명.서버관리자)]
 [Route("api/v1/education/operations")]
-public sealed class 교육과정운영Controller : ControllerBase
+public sealed class 교육과정운영Controller : CommunityControllerBase
 {
     private readonly I교육과정참여Service _service;
 

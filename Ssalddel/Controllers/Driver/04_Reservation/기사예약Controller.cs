@@ -11,6 +11,9 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Reservation04
 {
     [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiCapability(SsalddelCapability.Reservation)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
+    [SsalddelApiOperation(SsalddelOperation.Manage)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/reservations")]

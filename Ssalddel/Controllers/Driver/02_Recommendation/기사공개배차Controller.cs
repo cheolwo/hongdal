@@ -8,6 +8,9 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Recommendation02
 {
     [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiCapability(SsalddelCapability.Dispatch)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
+    [SsalddelApiOperation(SsalddelOperation.Decide)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/public-dispatches")]

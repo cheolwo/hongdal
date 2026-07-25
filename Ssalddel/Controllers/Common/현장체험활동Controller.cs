@@ -14,7 +14,7 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize]
 [Route("api/v1/education/field-experiences")]
-public sealed class 현장체험활동Controller : ControllerBase
+public sealed class 현장체험활동Controller : CommunityControllerBase
 {
     private readonly I현장체험활동UseCase _useCase;
 

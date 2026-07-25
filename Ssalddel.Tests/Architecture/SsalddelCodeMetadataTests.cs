@@ -22,7 +22,7 @@ public sealed class SsalddelCodeMetadataTests
         Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImagePromptPlanRequest));
         Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImageGeneratorViewModel));
         Assert.Contains(metadata, item => item.ComponentType == typeof(ICommunityAuthoringImageClient));
-        Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImagesController));
+        Assert.Contains(metadata, item => item.ComponentType == typeof(커뮤니티작성이미지Controller));
         Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImagePromptPlanner));
         Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImageService));
         Assert.Contains(metadata, item => item.ComponentType == typeof(KieAiImageGenerationClient));
@@ -51,9 +51,9 @@ public sealed class SsalddelCodeMetadataTests
     }
 
     [Fact]
-    public void CommunityAuthoringImagesController_PreservesRoutesAndCommunityMetadata()
+    public void 커뮤니티작성이미지Controller는_Route와커뮤니티Metadata를유지한다()
     {
-        var controller = typeof(CommunityAuthoringImagesController);
+        var controller = typeof(커뮤니티작성이미지Controller);
         var route = controller.GetCustomAttribute<RouteAttribute>();
         var authorize = controller.GetCustomAttribute<AuthorizeAttribute>();
         var workflow = controller.GetCustomAttribute<SsalddelApiWorkflowAttribute>();
@@ -66,17 +66,17 @@ public sealed class SsalddelCodeMetadataTests
 
         Assert.Equal(
             "prompt-plan",
-            controller.GetMethod(nameof(CommunityAuthoringImagesController.Plan))
+            controller.GetMethod(nameof(커뮤니티작성이미지Controller.생성계획수립))
                 ?.GetCustomAttribute<HttpPostAttribute>()
                 ?.Template);
         Assert.Equal(
             "{jobCode}",
-            controller.GetMethod(nameof(CommunityAuthoringImagesController.Get))
+            controller.GetMethod(nameof(커뮤니티작성이미지Controller.조회))
                 ?.GetCustomAttribute<HttpGetAttribute>()
                 ?.Template);
         Assert.Equal(
             "{jobCode}/post-attachments/{postId:long}",
-            controller.GetMethod(nameof(CommunityAuthoringImagesController.Attach))
+            controller.GetMethod(nameof(커뮤니티작성이미지Controller.게시글첨부))
                 ?.GetCustomAttribute<HttpPostAttribute>()
                 ?.Template);
     }
@@ -86,5 +86,5 @@ public sealed class SsalddelCodeMetadataTests
             SsalddelCodeFeatureKeys.CommunityAuthoringImage,
             typeof(CommunityAuthoringImagePromptPlanRequest).Assembly,
             typeof(CommunityAuthoringImageGeneratorViewModel).Assembly,
-            typeof(CommunityAuthoringImagesController).Assembly);
+            typeof(커뮤니티작성이미지Controller).Assembly);
 }

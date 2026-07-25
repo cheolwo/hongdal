@@ -109,6 +109,7 @@ public sealed class SsalddelUseCaseRelationAttribute : Attribute
 public enum SsalddelProductVersion
 {
     V0_0 = 0,
+    V0_5 = 50,
     V1_0 = 100,
     V1_5 = 150,
     V2_0 = 200,
@@ -263,6 +264,7 @@ public static class SsalddelProductVersionLabels
         return version switch
         {
             SsalddelProductVersion.V0_0 => "0.0",
+            SsalddelProductVersion.V0_5 => "0.5",
             SsalddelProductVersion.V1_0 => "1.0",
             SsalddelProductVersion.V1_5 => "1.5",
             SsalddelProductVersion.V2_0 => "2.0",

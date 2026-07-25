@@ -149,12 +149,12 @@ public sealed class ThirdPartyLogisticsProviderOutreachPreparationServiceTests
     [Fact]
     public void 미리보기API는_서버관리자에게만열리고_발송Action을제공하지않는다()
     {
-        var controller = typeof(ThirdPartyLogisticsProviderOutreachController);
+        var controller = typeof(제3자물류사업자접촉Controller);
         var authorization = Assert.Single(
             controller.GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
                 .Cast<AuthorizeAttribute>());
         var preview = controller.GetMethod(
-            nameof(ThirdPartyLogisticsProviderOutreachController.Preview));
+            nameof(제3자물류사업자접촉Controller.미리보기));
 
         Assert.Equal("서버관리자전용", authorization.Policy);
         Assert.NotNull(preview);

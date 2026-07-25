@@ -24,12 +24,12 @@ public sealed class RequestRateLimitMetadataTests
     }
 
     [Theory]
-    [InlineData(typeof(커뮤니티게시글Controller), "Create")]
-    [InlineData(typeof(커뮤니티게시글Controller), "Update")]
-    [InlineData(typeof(커뮤니티게시글Controller), "Delete")]
-    [InlineData(typeof(커뮤니티게시글첨부Controller), "UploadAttachment")]
-    [InlineData(typeof(커뮤니티게시글참여Controller), "DeleteComment")]
-    [InlineData(typeof(커뮤니티게시글참여Controller), "DeleteAttachmentComment")]
+    [InlineData(typeof(커뮤니티게시글Controller), "생성")]
+    [InlineData(typeof(커뮤니티게시글Controller), "수정")]
+    [InlineData(typeof(커뮤니티게시글Controller), "삭제")]
+    [InlineData(typeof(커뮤니티게시글첨부Controller), "첨부파일업로드")]
+    [InlineData(typeof(커뮤니티게시글참여Controller), "댓글삭제")]
+    [InlineData(typeof(커뮤니티게시글참여Controller), "첨부댓글삭제")]
     public void AnonymousCredentialMutations_UseCommunityMutationRateLimit(
         Type controllerType,
         string actionName)

@@ -18,15 +18,16 @@ namespace Ssalddel.Controllers.Admin.Orderer;
 [Route("api/v1/admin/orderer/group-purchase-commerce-fulfillment-plans")]
 public sealed class 공동구매커머스이행계획AdminController : ControllerBase
 {
-    private readonly I공동구매커머스이행계획UseCase _useCase;
+    private readonly I공동구매커머스이행계획UseCase _공동구매이행계획UseCase;
 
-    public 공동구매커머스이행계획AdminController(I공동구매커머스이행계획UseCase useCase)
+    public 공동구매커머스이행계획AdminController(I공동구매커머스이행계획UseCase 공동구매이행계획UseCase)
     {
-        _useCase = useCase;
+        _공동구매이행계획UseCase = 공동구매이행계획UseCase;
     }
 
     [HttpGet]
-    public async Task<IActionResult> List(
+    [SsalddelApiContractName("List")]
+    public async Task<IActionResult> 목록조회(
         [FromQuery] string? groupPurchaseId,
         [FromQuery] string? ordererGroupScopeKey,
         [FromQuery] string? documentManagementNumber,
@@ -37,7 +38,7 @@ public sealed class 공동구매커머스이행계획AdminController : Controlle
         [FromQuery] bool? usePlatformLogisticsProxy,
         CancellationToken cancellationToken = default)
     {
-        var result = await _useCase.목록조회Async(new 공동구매커머스이행계획조회조건
+        var result = await _공동구매이행계획UseCase.목록조회Async(new 공동구매커머스이행계획조회조건
         {
             공동구매Id = groupPurchaseId,
             주문자집단배송권키 = ordererGroupScopeKey,
@@ -53,27 +54,30 @@ public sealed class 공동구매커머스이행계획AdminController : Controlle
     }
 
     [HttpGet("{planId}")]
-    public async Task<IActionResult> Get(string planId, CancellationToken cancellationToken)
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 상세조회(string planId, CancellationToken cancellationToken)
     {
-        var result = await _useCase.단건조회Async(planId, cancellationToken);
+        var result = await _공동구매이행계획UseCase.단건조회Async(planId, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpGet("by-group-purchase/{groupPurchaseId}")]
-    public async Task<IActionResult> ListByGroupPurchase(
+    [SsalddelApiContractName("ListByGroupPurchase")]
+    public async Task<IActionResult> 공동구매별목록조회(
         string groupPurchaseId,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.공동구매별목록조회Async(groupPurchaseId, cancellationToken);
+        var result = await _공동구매이행계획UseCase.공동구매별목록조회Async(groupPurchaseId, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upsert(
+    [SsalddelApiContractName("Upsert")]
+    public async Task<IActionResult> 등록또는수정(
         [FromBody] 공동구매커머스이행계획저장요청 request,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.저장Async(request, ResolveUserId(), cancellationToken);
+        var result = await _공동구매이행계획UseCase.저장Async(request, ResolveUserId(), cancellationToken);
         return this.ToActionResult(result);
     }
 
@@ -83,7 +87,7 @@ public sealed class 공동구매커머스이행계획AdminController : Controlle
         [FromBody] 공동구매플랫폼국내운송초안요청 request,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.플랫폼국내운송초안생성Async(planId, request, cancellationToken);
+        var result = await _공동구매이행계획UseCase.플랫폼국내운송초안생성Async(planId, request, cancellationToken);
         return this.ToActionResult(result);
     }
 
@@ -93,7 +97,7 @@ public sealed class 공동구매커머스이행계획AdminController : Controlle
         [FromBody] 공동구매플랫폼국내운송초안요청 request,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.플랫폼국내운송배차대기생성Async(planId, request, cancellationToken);
+        var result = await _공동구매이행계획UseCase.플랫폼국내운송배차대기생성Async(planId, request, cancellationToken);
         return this.ToActionResult(result);
     }
 

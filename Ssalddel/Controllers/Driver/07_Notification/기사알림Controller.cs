@@ -9,6 +9,10 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Notification07
 {
     [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiAudience(SsalddelActor.Driver)]
+    [SsalddelApiCapability(SsalddelCapability.Notification)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
+    [SsalddelApiOperation(SsalddelOperation.Manage)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/notifications")]

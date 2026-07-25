@@ -102,7 +102,7 @@ Razor 페이지가 `HttpClient`, URL, 로딩·오류 상태를 직접 다루지 
 
 `창고Api기능모음ViewModel`
 
-- `작업`: `WarehouseOperationsController`의 12개 액션과 요청·응답 타입으로 직접 대응
+- `작업`: `창고작업Controller`의 12개 액션과 요청·응답 타입으로 직접 대응
 - `창고Controllers`, `공통Controllers`
 
 ### 인사

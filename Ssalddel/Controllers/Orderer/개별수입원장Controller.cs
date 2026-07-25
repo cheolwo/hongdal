@@ -22,16 +22,19 @@ namespace Ssalddel.Controllers.Orderer;
     ContractType = typeof(무역확장원장응답),
     FlowOrder = 30,
     Boundary = "외부 계약·결제·신고·운송 실행은 허용하지 않습니다.")]
+[SsalddelApiCapability(SsalddelCapability.TradePreparation)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
+[SsalddelApiOperation(SsalddelOperation.Manage)]
 [ApiController]
 [Authorize]
 [RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [Route("api/v1/orderer")]
-public sealed class 개별수입원장Controller : ControllerBase
+public sealed class 개별수입원장Controller : OrdererControllerBase
 {
-    private readonly I무역확장원장UseCase _useCase;
+    private readonly I무역확장원장UseCase _무역확장원장UseCase;
 
-    public 개별수입원장Controller(I무역확장원장UseCase useCase)
-        => _useCase = useCase;
+    public 개별수입원장Controller(I무역확장원장UseCase 무역확장원장UseCase)
+        => _무역확장원장UseCase = 무역확장원장UseCase;
 
     [HttpPost("order-ledgers/{orderLedgerId}/individual-import-ledger")]
     public async Task<IActionResult> 생성(
@@ -43,7 +46,7 @@ public sealed class 개별수입원장Controller : ControllerBase
         request.요청멱등키 = string.IsNullOrWhiteSpace(idempotencyKey)
             ? request.요청멱등키
             : idempotencyKey.Trim();
-        return this.ToActionResult(await _useCase.개별수입생성Async(
+        return this.ToActionResult(await _무역확장원장UseCase.개별수입생성Async(
             orderLedgerId,
             request,
             CurrentUserId(),
@@ -53,7 +56,7 @@ public sealed class 개별수입원장Controller : ControllerBase
 
     [HttpGet("individual-import-ledgers/{ledgerId}")]
     public async Task<IActionResult> 조회(string ledgerId, CancellationToken cancellationToken)
-        => this.ToActionResult(await _useCase.조회Async(
+        => this.ToActionResult(await _무역확장원장UseCase.조회Async(
             ledgerId,
             CurrentUserId(),
             User.IsInRole(역할명.서버관리자),

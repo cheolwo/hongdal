@@ -9,6 +9,7 @@ using Ssalddel.Controllers.Admin.HumanResources;
 using Ssalddel.Controllers.Admin.Orderer;
 using Ssalddel.Controllers.Common;
 using Ssalddel.Controllers.Orderer;
+using Ssalddel.Controllers.Platform;
 using Ssalddel.Contracts.Common.Versioning;
 using Ssalddel.Filters;
 using Ssalddel.Services.Community;
@@ -24,6 +25,7 @@ public sealed class SsalddelApiVersionAttributeTests
 {
     [Theory]
     [InlineData(SsalddelProductVersion.V0_0, "0.0")]
+    [InlineData(SsalddelProductVersion.V0_5, "0.5")]
     [InlineData(SsalddelProductVersion.V1_0, "1.0")]
     [InlineData(SsalddelProductVersion.V1_5, "1.5")]
     [InlineData(SsalddelProductVersion.V2_0, "2.0")]
@@ -37,7 +39,8 @@ public sealed class SsalddelApiVersionAttributeTests
 
     [Theory]
     [InlineData(SsalddelProductVersion.V0_0, "문화교통", "문화교통 0.0 · 커뮤니티·공공데이터 기반")]
-    [InlineData(SsalddelProductVersion.V1_0, "문화교통", "문화교통 1.0 · 공동구매·주문자 집단화")]
+    [InlineData(SsalddelProductVersion.V0_5, "문화교통", "문화교통 0.5 · 개별주문·개별 원장")]
+    [InlineData(SsalddelProductVersion.V1_0, "문화교통", "문화교통 1.0 · 공동주문·주문자 집단화")]
     [InlineData(SsalddelProductVersion.V1_5, "문화교통", "문화교통 1.5 · 공급·가격·무역 준비")]
     [InlineData(SsalddelProductVersion.V2_0, "살뜰", "살뜰 2.0 · 국내 화물·운송 이행")]
     public void ProductVersionAttribute_UsesRoadmapProductName(
@@ -49,6 +52,19 @@ public sealed class SsalddelApiVersionAttributeTests
 
         Assert.Equal(productName, attribute.ProductName);
         Assert.Equal(displayName, attribute.VersionDisplayName);
+    }
+
+    [Theory]
+    [InlineData(typeof(개별주문관점조회Controller), SsalddelProductVersion.V0_5)]
+    [InlineData(typeof(공동주문관점조회Controller), SsalddelProductVersion.V1_0)]
+    public void 주문관점Api는_개별주문과공동주문의제품단계를구분한다(
+        Type controllerType,
+        SsalddelProductVersion expectedVersion)
+    {
+        var attribute = controllerType.GetCustomAttribute<SsalddelApiVersionAttribute>();
+
+        Assert.NotNull(attribute);
+        Assert.Equal(expectedVersion, attribute.Version);
     }
 
     [Theory]
@@ -340,11 +356,62 @@ public sealed class SsalddelApiVersionAttributeTests
             endpoint.ProductName == "살뜰" &&
             endpoint.ProductVersionDisplayName == "살뜰 2.0 · 국내 화물·운송 이행" &&
             endpoint.FeatureKey == VersionFeatureFlagKeys.DomesticTransportWorkflow &&
+            endpoint.CapabilityNames.Contains("운송 의뢰") &&
+            endpoint.AudienceNames.Contains("화주") &&
+            endpoint.OperationNames.Contains("요청하기") &&
             endpoint.IsEnabled);
         Assert.Contains(response.ApiEndpoints, endpoint =>
             endpoint.EndpointKey == "기사운송진행Controller.상차완료" &&
             endpoint.Method == "POST" &&
             endpoint.RoutePattern == "api/v1/driver/transports/{id:long}/pickup-complete");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "FoodDeliveryDriverController.GetWorkspace" &&
+            endpoint.ControllerName == "FoodDeliveryDriverController" &&
+            endpoint.ActionName == "GetWorkspace" &&
+            endpoint.Method == "GET" &&
+            endpoint.RoutePattern == "api/v1/driver/food-deliveries/workspace");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "WarehouseOperationsController.재고목록" &&
+            endpoint.ControllerName == "WarehouseOperationsController" &&
+            endpoint.ActionName == "재고목록" &&
+            endpoint.Method == "GET" &&
+            endpoint.RoutePattern == "api/v1/warehouse-operations/inventory");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "CommunityPostOpportunitiesController.Get" &&
+            endpoint.ControllerName == "CommunityPostOpportunitiesController" &&
+            endpoint.ActionName == "Get" &&
+            endpoint.Method == "GET" &&
+            endpoint.RoutePattern == "api/v1/community/posts/{postId:long}/opportunities");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "HrEmploymentContractsController.CreateDraft" &&
+            endpoint.ControllerName == "HrEmploymentContractsController" &&
+            endpoint.ActionName == "CreateDraft" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/admin/hr-employment-contracts");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "CommunityAuthoringImagesController.Plan" &&
+            endpoint.ControllerName == "CommunityAuthoringImagesController" &&
+            endpoint.ActionName == "Plan" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/admin/content/information/authoring/images/prompt-plan");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "PublicDataLookupController.SearchAddresses" &&
+            endpoint.ControllerName == "PublicDataLookupController" &&
+            endpoint.ActionName == "SearchAddresses" &&
+            endpoint.Method == "GET" &&
+            endpoint.RoutePattern == "api/v1/orderer/public-data/addresses");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "DomesticGroupPurchaseFulfillmentPlansController.CreateOrderDraft" &&
+            endpoint.ControllerName == "DomesticGroupPurchaseFulfillmentPlansController" &&
+            endpoint.ActionName == "CreateOrderDraft" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern ==
+                "api/v1/orderer/domestic-group-purchases/{campaignId:guid}/fulfillment-plans/order-drafts");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "공동구매수요투표Controller.Create" &&
+            endpoint.ActionName == "Create" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/orderer/group-purchase-demand-votes");
         Assert.Contains(response.ApiEndpoints, endpoint =>
             endpoint.EndpointKey == "커뮤니티게시글Controller.Create" &&
             endpoint.Method == "POST" &&
@@ -453,7 +520,7 @@ public sealed class SsalddelApiVersionAttributeTests
     {
         var cargoFeature = typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)
             .GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true);
-        var warehouseFeature = typeof(WarehouseOperationsController)
+        var warehouseFeature = typeof(창고작업Controller)
             .GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true);
         var foodVersion = typeof(Ssalddel.Controllers.Food.음식주문Controller)
             .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
@@ -501,17 +568,17 @@ public sealed class SsalddelApiVersionAttributeTests
         AddIfMissingWorkflow(typeof(공동구매커머스이행계획AdminController), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
         AddIfMissingWorkflow(typeof(공동구매물류워크플로우AdminController), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
         AddIfMissingWorkflow(typeof(주문자집단운영주체AdminController), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(SocialInsuranceFilingsController), SsalddelWorkflow.HrParticipation, missingWorkflow);
-        AddIfMissingWorkflow(typeof(WarehouseOperationsController), SsalddelWorkflow.WarehouseFulfillment, missingWorkflow);
-        AddIfMissingWorkflow(typeof(SalesChannelsController), SsalddelWorkflow.SalesChannelFulfillment, missingWorkflow);
+        AddIfMissingWorkflow(typeof(사회보험신고Controller), SsalddelWorkflow.HrParticipation, missingWorkflow);
+        AddIfMissingWorkflow(typeof(창고작업Controller), SsalddelWorkflow.WarehouseFulfillment, missingWorkflow);
+        AddIfMissingWorkflow(typeof(판매채널Controller), SsalddelWorkflow.SalesChannelFulfillment, missingWorkflow);
         AddIfMissingWorkflow(
-            typeof(PublicDataLookupController).GetMethod(nameof(PublicDataLookupController.주문자집단배송권검색)),
-            "Ssalddel.Controllers.Orderer.PublicDataLookupController.주문자집단배송권검색",
+            typeof(공공데이터조회Controller).GetMethod(nameof(공공데이터조회Controller.주문자집단배송권검색)),
+            "Ssalddel.Controllers.Orderer.공공데이터조회Controller.주문자집단배송권검색",
             SsalddelWorkflow.GroupPurchaseImport,
             missingWorkflow);
         AddIfMissingWorkflow(
-            typeof(PublicDataLookupController).GetMethod(nameof(PublicDataLookupController.공동주문배송권해결)),
-            "Ssalddel.Controllers.Orderer.PublicDataLookupController.공동주문배송권해결",
+            typeof(공공데이터조회Controller).GetMethod(nameof(공공데이터조회Controller.공동구매배송권해결)),
+            "Ssalddel.Controllers.Orderer.공공데이터조회Controller.공동구매배송권해결",
             SsalddelWorkflow.GroupPurchaseImport,
             missingWorkflow);
 
@@ -528,7 +595,7 @@ public sealed class SsalddelApiVersionAttributeTests
         AddIfMissingCommunityTrack(typeof(커뮤니티투표Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(인연연결Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(감사메시지Controller), missingCommunityTrack);
-        AddIfMissingCommunityTrack(typeof(WorkRelationshipSnapshotsController), missingCommunityTrack);
+        AddIfMissingCommunityTrack(typeof(업무관계SnapshotController), missingCommunityTrack);
         AddIfMissingCommunityTrack(
             typeof(인증Controller).GetMethod("가입온보딩인연후보조회"),
             "Ssalddel.Controllers.Common.인증Controller.가입온보딩인연후보조회",
@@ -574,7 +641,7 @@ public sealed class SsalddelApiVersionAttributeTests
             VersionOf(typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)));
         Assert.Equal(
             SsalddelProductVersion.V2_5,
-            VersionOf(typeof(WarehouseOperationsController)));
+            VersionOf(typeof(창고작업Controller)));
     }
 
     private static SsalddelProductVersion? VersionOf(Type controllerType)

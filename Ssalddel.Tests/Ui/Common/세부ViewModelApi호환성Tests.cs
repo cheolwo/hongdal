@@ -11,8 +11,8 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed partial class 세부ViewModelApi호환성Tests
 {
     [Theory]
-    [InlineData(BaguaBusinessCodes.Warehouse, typeof(WarehouseOperationsController))]
-    [InlineData(BaguaBusinessCodes.Sales, typeof(SalesChannelsController))]
+    [InlineData(BaguaBusinessCodes.Warehouse, typeof(창고작업Controller))]
+    [InlineData(BaguaBusinessCodes.Sales, typeof(판매채널Controller))]
     [InlineData(BaguaBusinessCodes.Order, typeof(주문원장Controller))]
     public void 세부ViewModelApi카탈로그가실제Controller경로와호환된다(
         string businessCode,

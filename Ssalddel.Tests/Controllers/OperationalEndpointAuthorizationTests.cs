@@ -1,5 +1,6 @@
 using System.Reflection;
 using Ssalddel.Controllers.Common;
+using Ssalddel.Controllers.Platform;
 using Ssalddel.Controllers.Shipper.Payment02;
 using Ssalddel.Controllers.Shipper.Request01;
 using Microsoft.AspNetCore.Authorization;
@@ -46,7 +47,7 @@ public sealed class OperationalEndpointAuthorizationTests
     {
         var authorize = GetAuthorizeAttribute(
             typeof(노드스티커상점Controller),
-            nameof(노드스티커상점Controller.ConfirmFakePg));
+            nameof(노드스티커상점Controller.모의결제확인));
 
         Assert.Null(authorize.Policy);
         Assert.Null(authorize.Roles);
@@ -57,7 +58,7 @@ public sealed class OperationalEndpointAuthorizationTests
     {
         var authorize = GetAuthorizeAttribute(
             typeof(노드스티커상점Controller),
-            nameof(노드스티커상점Controller.GetMyEntitlements));
+            nameof(노드스티커상점Controller.내사용권조회));
 
         Assert.Null(authorize.Policy);
         Assert.Null(authorize.Roles);

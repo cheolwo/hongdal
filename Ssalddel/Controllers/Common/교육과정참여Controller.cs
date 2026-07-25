@@ -13,7 +13,7 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize]
 [Route("api/v1/education")]
-public sealed class 교육과정참여Controller : ControllerBase
+public sealed class 교육과정참여Controller : CommunityControllerBase
 {
     private readonly I교육과정참여Service _service;
 

@@ -49,10 +49,10 @@ public sealed class YouTube관리ControllerTests
     [Fact]
     public void 카드반야게시승인은_별도관리자쓰기API다()
     {
-        var authorize = typeof(HongikHakdangCardController).GetCustomAttribute<AuthorizeAttribute>();
-        var action = typeof(HongikHakdangCardController)
+        var authorize = typeof(홍익학당CardController).GetCustomAttribute<AuthorizeAttribute>();
+        var action = typeof(홍익학당CardController)
             .GetMethod(
-                nameof(HongikHakdangCardController.SetCardCommunityPublication),
+                nameof(홍익학당CardController.Card커뮤니티게시설정),
                 BindingFlags.Instance | BindingFlags.Public);
 
         Assert.Equal("서버관리자전용", authorize?.Policy);

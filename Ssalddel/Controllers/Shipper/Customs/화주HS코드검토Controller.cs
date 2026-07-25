@@ -7,6 +7,7 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Shipper.Customs;
 
+[SsalddelApiOperation(SsalddelOperation.Browse)]
 [ApiController]
 [Authorize(Policy = "화주또는판매자전용")]
 [SsalddelApiVersion(
@@ -17,7 +18,7 @@ namespace Ssalddel.Controllers.Shipper.Customs;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Customs)]
 [RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [Route("api/v1/shipper/customs/hs-reviews")]
-public sealed class 화주HS코드검토Controller(I화주HS코드검토조회UseCase useCase) : ControllerBase
+public sealed class 화주HS코드검토Controller(I화주HS코드검토조회UseCase useCase) : ShipperControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> 목록(

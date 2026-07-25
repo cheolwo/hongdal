@@ -10,7 +10,7 @@ public sealed class TraditionalMarketLogisticsHubControllerAuthorizationTests
     public void 공개조회Controller는_익명조회를허용한다()
     {
         var attribute = Assert.Single(
-            typeof(TraditionalMarketLogisticsHubsController)
+            typeof(전통시장물류거점Controller)
                 .GetCustomAttributes(typeof(AllowAnonymousAttribute), true));
 
         Assert.IsType<AllowAnonymousAttribute>(attribute);
@@ -20,7 +20,7 @@ public sealed class TraditionalMarketLogisticsHubControllerAuthorizationTests
     public void 관리Controller는_서버관리자정책을요구한다()
     {
         var attribute = Assert.Single(
-            typeof(TraditionalMarketLogisticsHubsAdminController)
+            typeof(전통시장물류거점AdminController)
                 .GetCustomAttributes(typeof(AuthorizeAttribute), true)
                 .Cast<AuthorizeAttribute>());
 

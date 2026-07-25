@@ -20,7 +20,7 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize]
 [Route("api/v1/connections")]
-public sealed class 인연연결Controller : ControllerBase
+public sealed class 인연연결Controller : CommunityControllerBase
 {
     private readonly ISender _sender;
 

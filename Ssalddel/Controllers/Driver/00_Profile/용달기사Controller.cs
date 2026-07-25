@@ -9,6 +9,10 @@ using Ssalddel.ApiMetadata;
 namespace Ssalddel.Controllers.Driver.Profile01;
 
 [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+[SsalddelApiAudience(SsalddelActor.Driver)]
+[SsalddelApiCapability(SsalddelCapability.DriverWork)]
+[SsalddelApiOperation(SsalddelOperation.Browse)]
+[SsalddelApiOperation(SsalddelOperation.Manage)]
 [ApiController]
 [Route("api/v1/drivers")]
 [Authorize]

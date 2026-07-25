@@ -10,8 +10,8 @@ namespace Ssalddel.Tests.Controllers;
 public sealed class GroupPurchaseDemandVoteControllerTests
 {
     [Theory]
-    [InlineData(nameof(커뮤니티투표Controller.List))]
-    [InlineData(nameof(커뮤니티투표Controller.Get))]
+    [InlineData(nameof(커뮤니티투표Controller.목록조회))]
+    [InlineData(nameof(커뮤니티투표Controller.상세조회))]
     public void GenericCommunityVoteReadEndpoints_AllowAnonymous(string methodName)
     {
         var method = typeof(커뮤니티투표Controller).GetMethod(methodName);
@@ -33,7 +33,7 @@ public sealed class GroupPurchaseDemandVoteControllerTests
     {
         var controller = new 커뮤니티투표Controller(null!);
 
-        var result = await controller.Create(new CommunityVoteCreateRequest
+        var result = await controller.생성(new CommunityVoteCreateRequest
         {
             VoteKind = CommunityVoteKindCodes.GroupPurchaseDemand
         }, CancellationToken.None);

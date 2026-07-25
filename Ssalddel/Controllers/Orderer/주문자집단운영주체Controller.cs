@@ -13,24 +13,27 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/orderer-group-operating-entities")]
-public sealed class 주문자집단운영주체Controller : ControllerBase
+public sealed class 주문자집단운영주체Controller : OrdererControllerBase
 {
-    private readonly I주문자집단운영주체저장소 _store;
+    private readonly I주문자집단운영주체저장소 _운영주체Store;
 
-    public 주문자집단운영주체Controller(I주문자집단운영주체저장소 store)
+    public 주문자집단운영주체Controller(I주문자집단운영주체저장소 운영주체Store)
     {
-        _store = store;
+        _운영주체Store = 운영주체Store;
     }
 
     [HttpGet("{ordererGroupScopeKey}")]
-    public async Task<IActionResult> Get(string ordererGroupScopeKey, CancellationToken cancellationToken)
+    [SsalddelApiContractName("Get")]
+    public async Task<IActionResult> 조회(
+        [FromRoute(Name = "ordererGroupScopeKey")] string 주문자집단배송권키,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var item = await _store.배송권키로조회Async(ordererGroupScopeKey, cancellationToken);
-            return item is null
+            var 항목 = await _운영주체Store.배송권키로조회Async(주문자집단배송권키, cancellationToken);
+            return 항목 is null
                 ? this.ToNotFoundProblem("주문자 집단 운영 주체 프로필을 찾을 수 없습니다.")
-                : Ok(주문자집단운영주체공개변환기.공개Dto로(item));
+                : Ok(주문자집단운영주체공개변환기.공개Dto로(항목));
         }
         catch (InvalidOperationException ex)
         {

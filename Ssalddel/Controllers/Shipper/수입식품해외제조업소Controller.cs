@@ -13,10 +13,11 @@ namespace Ssalddel.Controllers.Shipper
         FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
         WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.CustomsAndTradeData)]
+    [SsalddelApiOperation(SsalddelOperation.Browse)]
     [ApiController]
     [Route("api/v1/shipper/import-food/oversea-manufacturers")]
     [Authorize(Roles = 역할명.화주)]
-    public sealed class 수입식품해외제조업소Controller : ControllerBase
+    public sealed class 수입식품해외제조업소Controller : ShipperControllerBase
     {
         private readonly ISender _sender;
 

@@ -13,37 +13,38 @@ namespace Ssalddel.Controllers.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
 [RequireVersionFeature(VersionFeatureFlagKeys.DomesticTransportWorkflow)]
 [Route("api/v1/orderer/group-purchase-overseas-shipments")]
-public sealed class 공동구매해외선적추적Controller : ControllerBase
+public sealed class 공동구매해외선적추적Controller : OrdererControllerBase
 {
-    private readonly I공동구매해외선적추적UseCase _useCase;
+    private readonly I공동구매해외선적추적UseCase _선적추적UseCase;
 
-    public 공동구매해외선적추적Controller(I공동구매해외선적추적UseCase useCase)
+    public 공동구매해외선적추적Controller(I공동구매해외선적추적UseCase 선적추적UseCase)
     {
-        _useCase = useCase;
+        _선적추적UseCase = 선적추적UseCase;
     }
 
     [HttpGet("lookup")]
-    public async Task<IActionResult> Lookup(
-        [FromQuery] string documentManagementNumber,
+    [SsalddelApiContractName("Lookup")]
+    public async Task<IActionResult> 문서관리번호조회(
+        [FromQuery(Name = "documentManagementNumber")] string 문서관리번호,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.공개조회Async(documentManagementNumber, cancellationToken);
+        var result = await _선적추적UseCase.공개조회Async(문서관리번호, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpGet("import-logistics-references")]
     public IActionResult 수입물류참조검색(
-        [FromQuery] string? keyword,
-        [FromQuery] string? transportMode,
-        [FromQuery] string? codeType,
-        [FromQuery] int pageSize = 20)
+        [FromQuery(Name = "keyword")] string? 검색어,
+        [FromQuery(Name = "transportMode")] string? 운송수단,
+        [FromQuery(Name = "codeType")] string? 코드유형,
+        [FromQuery(Name = "pageSize")] int 페이지크기 = 20)
     {
-        var result = _useCase.수입물류참조검색(new 수입물류참조조회요청
+        var result = _선적추적UseCase.수입물류참조검색(new 수입물류참조조회요청
         {
-            검색어 = keyword,
-            운송수단 = transportMode,
-            코드유형 = codeType,
-            페이지크기 = pageSize
+            검색어 = 검색어,
+            운송수단 = 운송수단,
+            코드유형 = 코드유형,
+            페이지크기 = 페이지크기
         });
 
         return this.ToActionResult(result);
@@ -51,27 +52,28 @@ public sealed class 공동구매해외선적추적Controller : ControllerBase
 
     [HttpPost("import-logistics-normalization-simulation")]
     public IActionResult 수입물류정규화시뮬레이션(
-        [FromBody] 수입물류정규화시뮬레이션요청 request)
+        [FromBody] 수입물류정규화시뮬레이션요청 요청)
     {
-        var result = _useCase.수입물류정규화시뮬레이션(request);
+        var result = _선적추적UseCase.수입물류정규화시뮬레이션(요청);
         return this.ToActionResult(result);
     }
 
     [HttpGet("lookup-normalized")]
-    public async Task<IActionResult> LookupNormalized(
-        [FromQuery] string documentManagementNumber,
-        [FromQuery] string? customsOfficeCode,
-        [FromQuery] string? customsOfficeName,
-        [FromQuery] string? bondedAreaCode,
-        [FromQuery] string? bondedAreaName,
+    [SsalddelApiContractName("LookupNormalized")]
+    public async Task<IActionResult> 원장기반정규화조회(
+        [FromQuery(Name = "documentManagementNumber")] string 문서관리번호,
+        [FromQuery(Name = "customsOfficeCode")] string? 세관코드,
+        [FromQuery(Name = "customsOfficeName")] string? 세관명,
+        [FromQuery(Name = "bondedAreaCode")] string? 보세구역코드,
+        [FromQuery(Name = "bondedAreaName")] string? 보세구역명,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.원장기반정규화시뮬레이션Async(
-            documentManagementNumber,
-            customsOfficeCode,
-            customsOfficeName,
-            bondedAreaCode,
-            bondedAreaName,
+        var result = await _선적추적UseCase.원장기반정규화시뮬레이션Async(
+            문서관리번호,
+            세관코드,
+            세관명,
+            보세구역코드,
+            보세구역명,
             cancellationToken);
 
         return this.ToActionResult(result);
