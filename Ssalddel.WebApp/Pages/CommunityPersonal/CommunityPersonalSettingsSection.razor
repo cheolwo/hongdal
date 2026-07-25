@@ -25,6 +25,7 @@
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => Preferences.SaveAsync())">설정 저장</MudButton>
         <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="@(() => Preferences.ResetAsync())">기본값</MudButton>
     </div>
+    <CommunityCommentCountryPreferencePanel />
 </section>
 
 @code {

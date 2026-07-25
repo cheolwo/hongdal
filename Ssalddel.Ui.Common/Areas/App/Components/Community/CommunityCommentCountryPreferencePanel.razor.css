@@ -1,0 +1,32 @@
+.comment-country-preference {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid #d9e2dd;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.comment-country-preference > div > span {
+    color: #176b4d;
+    font-size: .72rem;
+    font-weight: 850;
+}
+
+.comment-country-preference h2 {
+    margin: 4px 0;
+    font-size: 1.18rem;
+}
+
+.comment-country-preference p {
+    margin: 0;
+    color: #67756e;
+    font-size: .78rem;
+    line-height: 1.5;
+}
+
+.comment-country-preference__boundary {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #f3f6f4;
+}

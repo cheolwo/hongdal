@@ -1,0 +1,91 @@
+@inject Ssalddel.Ui.Common.Areas.App.Services.ICommunityCommentCountryPreferenceService PreferenceService
+
+<section class="comment-country-preference" aria-labelledby="comment-country-preference-title">
+    <div>
+        <span>댓글 공개 기본값</span>
+        <h2 id="comment-country-preference-title">활동 국가 문맥</h2>
+        <p>댓글마다 다시 끌 수 있으며 기존 댓글에는 소급 적용되지 않습니다.</p>
+    </div>
+
+    <MudSwitch T="bool" @bind-Value="_isPublic" Color="Color.Primary"
+               Label="댓글에 활동 국가 표시" Disabled="@_isBusy" />
+
+    @if (_isPublic)
+    {
+        <MudSelect T="string" Label="기본 활동 국가코드" @bind-Value="_countryCode"
+                   Dense="true" Margin="Margin.Dense" Disabled="@_isBusy">
+            @foreach (var country in CommunityDisplayCountryCatalog.Common)
+            {
+                <MudSelectItem T="string" Value="@country.Code">@country.Code · @country.KoreanName</MudSelectItem>
+            }
+        </MudSelect>
+    }
+
+    <p class="comment-country-preference__boundary">
+        국가코드는 활동 문맥일 뿐 국적·민족·원산지·신뢰 점수·참여 자격의 증명이 아닙니다.
+        IP·GPS·브라우저 추정 위치는 저장하지 않습니다.
+    </p>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@_isBusy" OnClick="SaveAsync">
+        댓글 기본값 저장
+    </MudButton>
+
+    @if (!string.IsNullOrWhiteSpace(_message))
+    {
+        <MudText Typo="Typo.caption" Color="@(_saved ? Color.Success : Color.Error)">@_message</MudText>
+    }
+</section>
+
+@code {
+    private bool _isPublic;
+    private string? _countryCode;
+    private bool _isBusy;
+    private bool _saved;
+    private string? _message;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _isBusy = true;
+        StateHasChanged();
+        var preference = await PreferenceService.GetAsync();
+        _isPublic = preference.IsDisplayCountryPublic;
+        _countryCode = preference.CountryCode;
+        _isBusy = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_isPublic && CommunityDisplayCountryCatalog.Find(_countryCode) is null)
+        {
+            _saved = false;
+            _message = "공개할 활동 국가코드를 선택해 주세요.";
+            return;
+        }
+
+        _isBusy = true;
+        _message = null;
+        try
+        {
+            await PreferenceService.SaveAsync(new(
+                _isPublic,
+                _isPublic ? _countryCode : null));
+            _saved = true;
+            _message = "이후 작성하는 댓글의 기본값으로 저장했습니다.";
+        }
+        catch (Exception ex)
+        {
+            _saved = false;
+            _message = $"기본값을 저장하지 못했습니다: {ex.Message}";
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+}
