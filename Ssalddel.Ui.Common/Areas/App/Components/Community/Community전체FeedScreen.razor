@@ -1,0 +1,228 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@inject CommunityPlatformClient CommunityService
+
+<section class="community-whole-feed" aria-labelledby="community-whole-feed-heading">
+    <header class="community-whole-feed__heading">
+        <div>
+            <span>공개 커뮤니티 · 전체 피드</span>
+            <h1 id="community-whole-feed-heading">지금 올라오는 이야기</h1>
+            <p>게시판을 하나씩 고르지 않아도 공개된 생활 이야기와 공공데이터 글을 이어서 볼 수 있습니다.</p>
+        </div>
+        <a href="@CommunityPageRoutes.BoardsFor(viewMode: CommunityBoardNavigationContext.CardViewMode)">
+            글 목록으로 보기
+            <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+        </a>
+    </header>
+
+    @if (ViewModel.IsInitialLoading)
+    {
+        <div class="community-whole-feed__loading" aria-live="polite">
+            @for (var index = 0; index < 3; index++)
+            {
+                <article>
+                    <span></span>
+                    <strong></strong>
+                    <p></p>
+                    <p></p>
+                </article>
+            }
+            <em>공개 글을 불러오는 중입니다.</em>
+        </div>
+    }
+    else if (ViewModel.Items.Count == 0)
+    {
+        <section class="community-whole-feed__empty" aria-live="polite">
+            <MudIcon Icon="@Icons.Material.Filled.DynamicFeed" />
+            <strong>@(ViewModel.ErrorMessage ?? "아직 공개된 글이 없습니다.")</strong>
+            <span>게시판별 공간은 그대로 둘러볼 수 있습니다.</span>
+            <div>
+                <button type="button" @onclick="ReloadAsync">다시 불러오기</button>
+                <a href="@CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeBoardView)">게시판 보기</a>
+            </div>
+        </section>
+    }
+    else
+    {
+        <div class="community-whole-feed__cards" aria-label="커뮤니티 전체 글">
+            @foreach (var post in ViewModel.Items)
+            {
+                var board = CommunityBoardCatalog.Find(post.Category);
+                var image = FirstImage(post);
+                <article class="community-whole-feed-card" data-post-id="@post.Id">
+                    <header>
+                        <a class="community-whole-feed-card__board"
+                           href="@CommunityPageRoutes.BoardsFor(
+                               boardName: board is null ? post.Category : null,
+                               boardKey: board?.Key)">
+                            @(board?.DisplayName ?? post.Category)
+                        </a>
+                        <span>
+                            @if (post.IsPeriodic)
+                            {
+                                <em>주기 데이터</em>
+                            }
+                            else if (post.IsSystemGenerated)
+                            {
+                                <em>공식 정보</em>
+                            }
+                            <time datetime="@post.CreatedAtUtc.ToString("O")">@FormatRelativeTime(post.CreatedAtUtc)</time>
+                        </span>
+                    </header>
+
+                    <a class="community-whole-feed-card__body"
+                       href="@CommunityPageRoutes.PostDetailFor(
+                           post.Id,
+                           boardName: board is null ? post.Category : null,
+                           boardKey: board?.Key,
+                           returnPath: CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeFeedView))">
+                        @if (image is not null)
+                        {
+                            <img src="@image.Url" alt="@($"{post.Title} 첨부 이미지")" loading="lazy" />
+                        }
+                        <div>
+                            <h2>@post.Title</h2>
+                            @if (!string.IsNullOrWhiteSpace(post.Body))
+                            {
+                                <p>@ExcerptFor(post)</p>
+                            }
+                        </div>
+                    </a>
+
+                    @if (post.SalesOffer is { } offer)
+                    {
+                        <aside class="community-whole-feed-card__offer">
+                            <MudIcon Icon="@Icons.Material.Filled.LocalOffer" Size="Size.Small" />
+                            <span>
+                                <strong>@offer.ProductTitle</strong>
+                                <small>@PlatformCommunityPostListPresentation.FormatSalesPrice(offer) / @offer.QuantityUnit</small>
+                            </span>
+                        </aside>
+                    }
+
+                    <footer>
+                        <span class="community-whole-feed-card__author">
+                            <b>@AuthorInitial(post)</b>
+                            <span>
+                                <strong>@PlatformCommunityPostListPresentation.DisplayPostNickname(post)</strong>
+                                <small>@post.WorkflowTag · @post.RoleTag</small>
+                            </span>
+                        </span>
+                        <span class="community-whole-feed-card__metrics" aria-label="글 반응">
+                            <span><MudIcon Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" />@post.ViewCount</span>
+                            <span><MudIcon Icon="@Icons.Material.Filled.ThumbUpOffAlt" Size="Size.Small" />@post.RecommendationCount</span>
+                            <span><MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" />@post.CommentCount</span>
+                        </span>
+                    </footer>
+                </article>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <section class="community-whole-feed__more-error" aria-live="polite">
+                <span>@ViewModel.ErrorMessage</span>
+                <button type="button" disabled="@ViewModel.IsLoadingMore" @onclick="LoadMoreAsync">다시 시도</button>
+            </section>
+        }
+
+        @if (ViewModel.HasMore)
+        {
+            <CommunityFeedScrollSentinel Reached="LoadMoreAsync" />
+            <div class="community-whole-feed__more">
+                @if (ViewModel.IsLoadingMore)
+                {
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                    <span>다음 글을 불러오는 중입니다.</span>
+                }
+                else
+                {
+                    <button type="button" @onclick="LoadMoreAsync">다음 글 더 보기</button>
+                }
+            </div>
+        }
+        else if (string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <p class="community-whole-feed__end">현재 공개된 글을 모두 확인했습니다.</p>
+        }
+    }
+</section>
+
+@code {
+    [Parameter]
+    public string AppKey { get; set; } = "shipper";
+
+    private Community전체FeedViewModel ViewModel { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        ViewModel = new Community전체FeedViewModel(
+            (page, pageSize, cancellationToken) => CommunityService.GetBoardPostsAsync(
+                AppKey,
+                page: page,
+                pageSize: pageSize,
+                periodicVisibility: CommunityPeriodicPostVisibilityModes.All,
+                cancellationToken: cancellationToken));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        await ViewModel.LoadAsync();
+    }
+
+    private async Task LoadMoreAsync()
+    {
+        await ViewModel.LoadMoreAsync();
+    }
+
+    private static PlatformCommunityPostAttachmentResponse? FirstImage(
+        PlatformCommunityPostResponse post)
+        => post.Attachments.FirstOrDefault(attachment =>
+            !string.IsNullOrWhiteSpace(attachment.Url)
+            && attachment.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase));
+
+    private static string ExcerptFor(PlatformCommunityPostResponse post)
+    {
+        var body = PlatformCommunityPostPresentation
+            .ResolveVisibleBody(post.Body)
+            .ReplaceLineEndings(" ")
+            .Trim();
+        return body.Length <= 220 ? body : $"{body[..220].TrimEnd()}…";
+    }
+
+    private static string AuthorInitial(PlatformCommunityPostResponse post)
+    {
+        var nickname = PlatformCommunityPostListPresentation.DisplayPostNickname(post).Trim();
+        return nickname.Length == 0 ? "살" : nickname[..1];
+    }
+
+    private static string FormatRelativeTime(DateTime createdAtUtc)
+    {
+        var elapsed = DateTime.UtcNow - createdAtUtc.ToUniversalTime();
+        if (elapsed < TimeSpan.FromMinutes(1))
+        {
+            return "방금 전";
+        }
+
+        if (elapsed < TimeSpan.FromHours(1))
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalMinutes)}분 전";
+        }
+
+        if (elapsed < TimeSpan.FromDays(1))
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalHours)}시간 전";
+        }
+
+        if (elapsed < TimeSpan.FromDays(7))
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalDays)}일 전";
+        }
+
+        return createdAtUtc.ToLocalTime().ToString("M월 d일");
+    }
+}

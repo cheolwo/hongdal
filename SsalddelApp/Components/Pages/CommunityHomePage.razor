@@ -3,13 +3,54 @@
 
 <PageTitle>살뜰 공개 커뮤니티</PageTitle>
 
-<CommunityIndividualOrderJourneyPanel />
-<CommunityMobileBoardDirectoryScreen InitialWorkMode="@IsWorkMode" />
+<main class="community-home-explore" data-community-explore-view="@(IsFeedView ? "feed" : "boards")">
+    <header class="community-home-explore__header">
+        <div>
+            <span>SSALDDEL COMMUNITY</span>
+            <strong>어떤 방식으로 둘러볼까요?</strong>
+        </div>
+        <nav aria-label="커뮤니티 탐색 방식">
+            <a href="@CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeFeedView)"
+               class="@ExploreLinkClass(IsFeedView)"
+               aria-current="@(IsFeedView ? "page" : null)">
+                <MudIcon Icon="@Icons.Material.Filled.DynamicFeed" Size="Size.Small" />
+                전체 피드
+            </a>
+            <a href="@CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeBoardView, IsWorkMode ? "work" : null)"
+               class="@ExploreLinkClass(!IsFeedView)"
+               aria-current="@(!IsFeedView ? "page" : null)">
+                <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
+                게시판
+            </a>
+        </nav>
+    </header>
+
+    @if (IsFeedView)
+    {
+        <Community전체FeedScreen AppKey="shipper" />
+    }
+    else
+    {
+        <CommunityIndividualOrderJourneyPanel />
+        <CommunityMobileBoardDirectoryScreen InitialWorkMode="@IsWorkMode" />
+    }
+</main>
 
 @code {
+    [Parameter, SupplyParameterFromQuery(Name = "view")]
+    public string? View { get; set; }
+
     [Parameter, SupplyParameterFromQuery(Name = "mode")]
     public string? Mode { get; set; }
 
+    private bool IsFeedView
+        => string.Equals(View, CommunityPageRoutes.HomeFeedView, StringComparison.OrdinalIgnoreCase);
+
     private bool IsWorkMode
         => string.Equals(Mode, "work", StringComparison.OrdinalIgnoreCase);
+
+    private static string ExploreLinkClass(bool active)
+        => active
+            ? "community-home-explore__link community-home-explore__link--active"
+            : "community-home-explore__link";
 }

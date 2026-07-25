@@ -6,6 +6,8 @@ namespace Ssalddel.Contracts.Common.Community;
 public static class CommunityPageRoutes
 {
     public const string Home = "/community";
+    public const string HomeFeedView = "feed";
+    public const string HomeBoardView = "boards";
     public const string Boards = "/community/boards";
     public const string BoardDirectory = "/community/boards/directory";
     public const string Regions = "/community/regions";
@@ -34,6 +36,20 @@ public static class CommunityPageRoutes
     public const string LegacyDecorationProductTemplate = $"{Decorations}/{{ProductKey}}";
     public const string LegacyDecorationCheckoutTemplate = $"{Decorations}/{{ProductKey}}/checkout";
     public const string Diagram = "/diagram";
+
+    public static string HomeFor(
+        string? view = null,
+        string? mode = null)
+        => WithQuery(
+            Home,
+            ("view", string.Equals(view, HomeFeedView, StringComparison.OrdinalIgnoreCase)
+                ? HomeFeedView
+                : string.Equals(view, HomeBoardView, StringComparison.OrdinalIgnoreCase)
+                    ? HomeBoardView
+                    : null),
+            ("mode", string.Equals(mode, "work", StringComparison.OrdinalIgnoreCase)
+                ? "work"
+                : null));
 
     public static string BoardsFor(
         string? boardName = null,

@@ -1,0 +1,80 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div @ref="sentinel"
+     class="community-feed-scroll-sentinel"
+     aria-hidden="true"></div>
+
+@code {
+    [Parameter]
+    public EventCallback Reached { get; set; }
+
+    private ElementReference sentinel;
+    private IJSObjectReference? module;
+    private IJSObjectReference? observer;
+    private DotNetObjectReference<CommunityFeedScrollSentinel>? reference;
+    private bool notifying;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        module = await JS.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/Ssalddel.Ui.Common/js/community-feed-scroll.js");
+        reference = DotNetObjectReference.Create(this);
+        observer = await module.InvokeAsync<IJSObjectReference>("observe", sentinel, reference);
+    }
+
+    [JSInvokable]
+    public async Task NotifyReachedAsync()
+    {
+        if (notifying)
+        {
+            return;
+        }
+
+        notifying = true;
+        try
+        {
+            await Reached.InvokeAsync();
+        }
+        finally
+        {
+            notifying = false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (observer is not null)
+        {
+            try
+            {
+                await observer.InvokeVoidAsync("dispose");
+                await observer.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // 앱 또는 브라우저가 닫히는 중에는 observer 정리 실패를 무시합니다.
+            }
+        }
+
+        if (module is not null)
+        {
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // 앱 또는 브라우저가 닫히는 중에는 module 정리 실패를 무시합니다.
+            }
+        }
+
+        reference?.Dispose();
+    }
+}

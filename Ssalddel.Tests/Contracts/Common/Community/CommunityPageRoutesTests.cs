@@ -5,6 +5,18 @@ namespace Ssalddel.Tests.Contracts.Common.Community;
 public sealed class CommunityPageRoutesTests
 {
     [Fact]
+    public void 커뮤니티홈은_전체피드와게시판탐색상태를보존한다()
+    {
+        Assert.Equal(
+            "/community?view=feed",
+            CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeFeedView));
+        Assert.Equal(
+            "/community?view=boards&mode=work",
+            CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeBoardView, "work"));
+        Assert.Equal(CommunityPageRoutes.Home, CommunityPageRoutes.HomeFor("unknown", "life"));
+    }
+
+    [Fact]
     public void 게시판과글쓰기경로는_선택문맥을encode한다()
     {
         Assert.Equal("/community/boards/directory", CommunityPageRoutes.BoardDirectory);
