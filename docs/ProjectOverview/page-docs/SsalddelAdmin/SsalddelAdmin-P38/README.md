@@ -50,12 +50,12 @@
 - 화면 소스: [SsalddelAdmin/Components/Pages/FoodDeliveryDispatchAIReview.razor](../../../../../SsalddelAdmin/Components/Pages/FoodDeliveryDispatchAIReview.razor)
 - 클라이언트 서비스: [SsalddelAdmin/Services/FoodDeliveryDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/FoodDeliveryDispatchAIReviewAdminService.cs)
 - 서버 계약: [Ssalddel.Contracts/Admin/Dispatch/FoodDeliveryDispatchAIReviewDtos.cs](../../../../../Ssalddel.Contracts/Admin/Dispatch/FoodDeliveryDispatchAIReviewDtos.cs)
-- 서버 컨트롤러: [Ssalddel/Controllers/Admin/Dispatch/FoodDeliveryDispatchAIReviewController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/FoodDeliveryDispatchAIReviewController.cs)
+- 서버 컨트롤러: [Ssalddel/Controllers/Admin/Dispatch/음식배달배차AI검토Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/음식배달배차AI검토Controller.cs)
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 검토 작업공간 | GET | `api/v1/admin/dispatch/food-delivery-ai-review` | [FoodDeliveryDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/FoodDeliveryDispatchAIReviewAdminService.cs) | [FoodDeliveryDispatchAIReviewController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/FoodDeliveryDispatchAIReviewController.cs) |
-| 운영자 판단 기록 | POST | `api/v1/admin/dispatch/food-delivery-ai-review/decisions` | [FoodDeliveryDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/FoodDeliveryDispatchAIReviewAdminService.cs) | [FoodDeliveryDispatchAIReviewController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/FoodDeliveryDispatchAIReviewController.cs) |
+| 검토 작업공간 | GET | `api/v1/admin/dispatch/food-delivery-ai-review` | [FoodDeliveryDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/FoodDeliveryDispatchAIReviewAdminService.cs) | [음식배달배차AI검토Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/음식배달배차AI검토Controller.cs) |
+| 운영자 판단 기록 | POST | `api/v1/admin/dispatch/food-delivery-ai-review/decisions` | [FoodDeliveryDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/FoodDeliveryDispatchAIReviewAdminService.cs) | [음식배달배차AI검토Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/음식배달배차AI검토Controller.cs) |
 
 검증할 때는 배달권, 음식점/고객/F드라이버 위치가 같은 지도형 검토 화면에 표시되고, 승인/보류 판단이 실패 없이 저장되는지 확인한다.
 

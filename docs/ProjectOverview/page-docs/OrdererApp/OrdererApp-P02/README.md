@@ -26,7 +26,8 @@
 | --- | --- | --- |
 | 재료 자동집단화 | `/group-purchase/products` | 재료 카드를 훑고 한 번 클릭해 기존 집단 합류 또는 새 집단 시작 |
 | 상품 근거 상세 | `/group-purchase/products/{ProductId}` | 한 상품의 HS·보관·모집 근거 읽기 |
-| 상세 조건 수요 등록 | `/group-purchase/demands/new/{ProductId}` | 배송권이 없거나 수량·수령 조건을 직접 조정할 때 사용하는 보조 Action |
+| 개별주문 의향 목록·등록 | `/group-purchase/wishes`, `/group-purchase/wishes/new` | 0.5에서 본인의 비구속 의향을 독립 원장으로 저장·조회·철회 |
+| 개별주문 의향 상세 조건 | `/group-purchase/demands/new/{ProductId}` | 상품·배송권·수량·수령 조건을 직접 조정하는 0.5 Action |
 | 수입 원가 참고 | `/group-purchase/import-review/{ProductId}` | 1.5 Simulation 수입 참고값 조회 |
 | 선적 조회 | `/group-purchase/shipments` | 문서관리번호 한 건의 공개 선적 정보 조회 |
 
@@ -36,7 +37,7 @@
 
 ## 보안과 운영 경계
 
-- 1.0 화면은 비구속 수요와 공개 모집까지만 다룹니다.
+- 0.5 화면은 본인의 비구속 개별주문 의향을, 1.0 화면은 동의한 의향의 공동 집계와 공개 모집을 다룹니다.
 - 카드 클릭은 명시적 참여 동의이지만 결제나 주문 확정 동의는 아닙니다.
 - 수요 저장은 결제·계약·수입 신고·재고·배차·운송 요청을 만들지 않습니다.
 - 수입 원가와 선적 화면은 1.5 준비 자산으로 분리하고 운영 효과를 만들지 않습니다.

@@ -50,13 +50,13 @@ AI 배차 판단은 실제 운영자가 승인하거나 수정한 사례를 계�
 - 화면 소스: [SsalddelAdmin/Components/Pages/DispatchAIJudgmentCases.razor](../../../../../SsalddelAdmin/Components/Pages/DispatchAIJudgmentCases.razor)
 - 클라이언트 서비스: [SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs)
 - 서버 계약: [Ssalddel.Contracts/Admin/Dispatch/DispatchAIJudgmentCaseDtos.cs](../../../../../Ssalddel.Contracts/Admin/Dispatch/DispatchAIJudgmentCaseDtos.cs)
-- 서버 컨트롤러: [Ssalddel/Controllers/Admin/Dispatch/DispatchAIJudgmentCasesController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DispatchAIJudgmentCasesController.cs)
+- 서버 컨트롤러: [Ssalddel/Controllers/Admin/Dispatch/배차AI판단사례Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/배차AI판단사례Controller.cs)
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 사례 카탈로그 | GET | `api/v1/admin/dispatch/ai-judgment-cases` | [DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs) | [DispatchAIJudgmentCasesController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DispatchAIJudgmentCasesController.cs) |
-| 직접 사례 생성 | POST | `api/v1/admin/dispatch/ai-judgment-cases` | [DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs) | [DispatchAIJudgmentCasesController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DispatchAIJudgmentCasesController.cs) |
-| 후보 사례 승격 | POST | `api/v1/admin/dispatch/ai-judgment-cases/promote-suggestion` | [DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs) | [DispatchAIJudgmentCasesController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DispatchAIJudgmentCasesController.cs) |
+| 사례 카탈로그 | GET | `api/v1/admin/dispatch/ai-judgment-cases` | [DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs) | [배차AI판단사례Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/배차AI판단사례Controller.cs) |
+| 직접 사례 생성 | POST | `api/v1/admin/dispatch/ai-judgment-cases` | [DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs) | [배차AI판단사례Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/배차AI판단사례Controller.cs) |
+| 후보 사례 승격 | POST | `api/v1/admin/dispatch/ai-judgment-cases/promote-suggestion` | [DispatchAIJudgmentCaseAdminService.cs](../../../../../SsalddelAdmin/Services/DispatchAIJudgmentCaseAdminService.cs) | [배차AI판단사례Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/배차AI판단사례Controller.cs) |
 
 검증할 때는 후보 사례 목록, 직접 입력 폼, 저장/승격 버튼이 모두 렌더링되고, 메모리 데이터 모드에서도 문서용 샘플 사례가 표시되는지 확인한다.
 

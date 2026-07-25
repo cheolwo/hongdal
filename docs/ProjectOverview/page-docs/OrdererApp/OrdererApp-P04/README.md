@@ -51,7 +51,7 @@
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 워크플로우 문서 | - | `api/v1/orderer/restaurant-search-policy` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/orderer/restaurant-search-policy` [Ssalddel/Controllers/Orderer/RestaurantSearchPolicyPublicController.cs](../../../../../Ssalddel/Controllers/Orderer/RestaurantSearchPolicyPublicController.cs) |
+| 워크플로우 문서 | - | `api/v1/orderer/restaurant-search-policy` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/orderer/restaurant-search-policy` [Ssalddel/Controllers/Orderer/음식점탐색공개정책Controller.cs](../../../../../Ssalddel/Controllers/Orderer/음식점탐색공개정책Controller.cs) |
 
 검증할 때는 이 화면이 직접 메모리 데이터만 보는지, 위 API 응답을 받아 상태를 표시하는지, 실패했을 때 사용자가 다음 행동을 알 수 있는지 확인합니다.
 

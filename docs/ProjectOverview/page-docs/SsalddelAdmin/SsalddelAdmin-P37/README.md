@@ -50,12 +50,12 @@
 - 화면 소스: [SsalddelAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor](../../../../../SsalddelAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor)
 - 클라이언트 서비스: [SsalddelAdmin/Services/DomesticCargoDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/DomesticCargoDispatchAIReviewAdminService.cs)
 - 서버 계약: [Ssalddel.Contracts/Admin/Dispatch/DomesticCargoDispatchAIReviewDtos.cs](../../../../../Ssalddel.Contracts/Admin/Dispatch/DomesticCargoDispatchAIReviewDtos.cs)
-- 서버 컨트롤러: [Ssalddel/Controllers/Admin/Dispatch/DomesticCargoDispatchAIReviewController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DomesticCargoDispatchAIReviewController.cs)
+- 서버 컨트롤러: [Ssalddel/Controllers/Admin/Dispatch/국내화물배차AI검토Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/국내화물배차AI검토Controller.cs)
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 검토 작업공간 | GET | `api/v1/admin/dispatch/domestic-cargo-ai-review` | [DomesticCargoDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/DomesticCargoDispatchAIReviewAdminService.cs) | [DomesticCargoDispatchAIReviewController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DomesticCargoDispatchAIReviewController.cs) |
-| 운영자 판단 기록 | POST | `api/v1/admin/dispatch/domestic-cargo-ai-review/decisions` | [DomesticCargoDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/DomesticCargoDispatchAIReviewAdminService.cs) | [DomesticCargoDispatchAIReviewController.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/DomesticCargoDispatchAIReviewController.cs) |
+| 검토 작업공간 | GET | `api/v1/admin/dispatch/domestic-cargo-ai-review` | [DomesticCargoDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/DomesticCargoDispatchAIReviewAdminService.cs) | [국내화물배차AI검토Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/국내화물배차AI검토Controller.cs) |
+| 운영자 판단 기록 | POST | `api/v1/admin/dispatch/domestic-cargo-ai-review/decisions` | [DomesticCargoDispatchAIReviewAdminService.cs](../../../../../SsalddelAdmin/Services/DomesticCargoDispatchAIReviewAdminService.cs) | [국내화물배차AI검토Controller.cs](../../../../../Ssalddel/Controllers/Admin/Dispatch/국내화물배차AI검토Controller.cs) |
 
 검증할 때는 `AdminData:UseMemory=true`에서 샘플 데이터가 먼저 렌더링되고, 실제 API 모드에서는 관리자 인증 토큰이 붙은 요청으로 같은 구조의 DTO를 받는지 확인한다.
 

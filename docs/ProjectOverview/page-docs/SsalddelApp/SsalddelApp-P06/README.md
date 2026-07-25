@@ -51,7 +51,7 @@
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 워크플로우 문서 | - | `api/v1/sales-channels` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/sales-channels/accounts` [Ssalddel/Controllers/Common/SalesChannelsController.cs](../../../../../Ssalddel/Controllers/Common/SalesChannelsController.cs)<br>`POST api/v1/sales-channels/accounts` [Ssalddel/Controllers/Common/SalesChannelsController.cs](../../../../../Ssalddel/Controllers/Common/SalesChannelsController.cs)<br>`GET api/v1/sales-channels/products` [Ssalddel/Controllers/Common/SalesChannelsController.cs](../../../../../Ssalddel/Controllers/Common/SalesChannelsController.cs)<br>`POST api/v1/sales-channels/products` [Ssalddel/Controllers/Common/SalesChannelsController.cs](../../../../../Ssalddel/Controllers/Common/SalesChannelsController.cs) |
+| 워크플로우 문서 | - | `api/v1/sales-channels` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/sales-channels/accounts` [Ssalddel/Controllers/Common/판매채널Controller.cs](../../../../../Ssalddel/Controllers/Common/판매채널Controller.cs)<br>`POST api/v1/sales-channels/accounts` [Ssalddel/Controllers/Common/판매채널Controller.cs](../../../../../Ssalddel/Controllers/Common/판매채널Controller.cs)<br>`GET api/v1/sales-channels/products` [Ssalddel/Controllers/Common/판매채널Controller.cs](../../../../../Ssalddel/Controllers/Common/판매채널Controller.cs)<br>`POST api/v1/sales-channels/products` [Ssalddel/Controllers/Common/판매채널Controller.cs](../../../../../Ssalddel/Controllers/Common/판매채널Controller.cs) |
 
 검증할 때는 이 화면이 직접 메모리 데이터만 보는지, 위 API 응답을 받아 상태를 표시하는지, 실패했을 때 사용자가 다음 행동을 알 수 있는지 확인합니다.
 
