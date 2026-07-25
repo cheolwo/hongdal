@@ -1,0 +1,116 @@
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Content
+
+@if (Region is null)
+{
+    <main class="region-detail region-detail--missing">
+        <span>지역을 찾을 수 없습니다</span>
+        <h1>등록되지 않은 지역 경로예요</h1>
+        <p>지역 목록에서 문화와 특산물을 다시 선택해 주세요.</p>
+        <a href="@RegionalCultureSpecialtyRoutes.Browse">지역 목록으로 돌아가기</a>
+    </main>
+}
+else
+{
+    <main class="@RootClass">
+        <nav class="region-detail__steps" aria-label="문화와 구매 검토 단계">
+            <strong aria-current="step">문화 발견</strong>
+            <span>상품 근거</span>
+            <span>개별 검토</span>
+            <span>공동구매</span>
+            <span>공동수입</span>
+        </nav>
+
+        <header class="region-detail__hero">
+            <img src="@Region.HeroImagePath" alt="@Region.HeroImageAlt" />
+            <div class="region-detail__hero-copy">
+                <span>@Region.CountryName · @Region.RegionType</span>
+                <h1>@Region.RegionName</h1>
+                <p>@Region.CultureSummary</p>
+                <small>지역 문화 이해를 돕기 위한 생성 일러스트</small>
+            </div>
+        </header>
+
+        <section class="region-detail__orientation">
+            <div>
+                <span>현재 위치 문맥</span>
+                <strong>@Region.Geography</strong>
+            </div>
+            <p>@Region.EvidenceBoundary</p>
+        </section>
+
+        <div class="region-detail__columns">
+            <section class="region-detail__culture">
+                <span>생활문화 질문</span>
+                <h2>이 지역을 하나의 이미지로 단정하지 않아요</h2>
+                <ul>
+                    @foreach (var question in Region.CultureQuestions)
+                    {
+                        <li>@question</li>
+                    }
+                </ul>
+                <a href="@CultureConversationHref">지역 게시판에서 이야기 보기</a>
+            </section>
+
+            <section class="region-detail__products">
+                <span>특산물 후보</span>
+                <h2>관심 품목의 실제 근거를 좁혀 보세요</h2>
+                <div>
+                    @foreach (var specialty in Region.Specialties)
+                    {
+                        <article>
+                            <small>@specialty.Category</small>
+                            <h3>@specialty.Name</h3>
+                            <p>@specialty.DiscoveryNote</p>
+                            <dl>
+                                <dt>국가 원산지 문맥</dt>
+                                <dd>@Region.CountryName</dd>
+                                <dt>세부 지역 문맥</dt>
+                                <dd>@Region.RegionName · @Region.Geography</dd>
+                            </dl>
+                            <a href="@RegionalCultureSpecialtyRoutes.PriceComparisonFor(Region.Key, specialty.Key)">
+                                가격·단위 근거 비교
+                            </a>
+                        </article>
+                    }
+                </div>
+                <a class="region-detail__products-all"
+                   href="@RegionalCultureSpecialtyRoutes.ProductsFor(Region.Key)">이 지역의 상품 후보 모아보기</a>
+            </section>
+        </div>
+
+        <aside class="region-detail__boundary">
+            <strong>문화 이미지는 원산지 증명이 아닙니다</strong>
+            <p>
+                실제 상품에서는 국가, 현재 행정구역, 생산자·제조업소, 규격과 기준일을 별도 근거로 확인합니다.
+                가격을 살펴봐도 주문·참여·수입은 자동으로 만들어지지 않습니다.
+            </p>
+        </aside>
+    </main>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string? RegionKey { get; set; }
+
+    [Parameter]
+    public bool CommunityMobilePresentation { get; set; }
+
+    private RegionalCultureSpecialty? Region
+        => RegionalCultureSpecialtyCatalog.Find(RegionKey);
+
+    private string RootClass
+        => CommunityMobilePresentation
+            ? "region-detail region-detail--community-mobile"
+            : "region-detail";
+
+    private string CultureConversationHref
+        => Region is null
+            ? CommunityPageRoutes.Boards
+            : CommunityPageRoutes.BoardsFor(
+                CommunityBoardCatalog.Food.DisplayName,
+                CommunityBoardCatalog.Food.Key,
+                workflowTag: CultureTransportContentCatalog.FoodCultureWorkflowTag,
+                search: Region.RegionName,
+                regionKey: Region.Key);
+}

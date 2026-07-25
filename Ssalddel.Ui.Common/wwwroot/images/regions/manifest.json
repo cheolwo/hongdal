@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAtUtc": "2026-07-25T00:00:00Z",
+  "disclosureKo": "지역 문화 이해를 돕기 위한 생성 일러스트",
+  "reviewPolicy": {
+    "prohibited": [
+      "문자·가격·로고·국기·정치적 상징",
+      "단일 민족·외모·복장·음식으로 지역을 고정하는 표현",
+      "상품 원산지 근거로의 사용"
+    ],
+    "required": [
+      "현재 생활 풍경과 사람의 활동",
+      "대표 품목 2~3개를 보조 요소로 표현",
+      "한국어 대체 텍스트",
+      "국가 원산지와 세부 지역 근거의 별도 표시"
+    ]
+  },
+  "assets": [
+    {
+      "regionKey": "us-maine",
+      "file": "us-maine.png",
+      "reviewVersion": 1,
+      "promptSummaryKo": "대서양 연안 바닷가와 숲, 블루베리·해산물을 함께 나누는 현재의 공동체 풍경",
+      "culturalEvidenceBoundaryKo": "메인 전체 또는 실제 상품 산지를 대표하지 않으며 어획지·재배지·계절·규격을 상품별로 확인한다."
+    },
+    {
+      "regionKey": "us-georgia",
+      "file": "us-georgia.png",
+      "reviewVersion": 1,
+      "promptSummaryKo": "복숭아 과수원과 피칸 나무 곁 장터에서 이웃이 음식을 나누는 현재의 생활 풍경",
+      "culturalEvidenceBoundaryKo": "주의 별칭이나 이미지가 생산량 또는 개별 상품의 원산지를 증명하지 않는다."
+    },
+    {
+      "regionKey": "us-california",
+      "file": "us-california.png",
+      "reviewVersion": 1,
+      "promptSummaryKo": "해안·중앙계곡·장터의 다양한 생활권과 감귤·포도·아몬드를 연결한 현재의 풍경",
+      "culturalEvidenceBoundaryKo": "다양한 기후와 공동체를 하나로 고정하지 않으며 카운티·생산자·상품 근거를 별도로 확인한다."
+    },
+    {
+      "regionKey": "cn-shandong",
+      "file": "cn-shandong.png",
+      "reviewVersion": 1,
+      "promptSummaryKo": "연안 장터와 밀 음식 준비, 마늘·땅콩·수산물이 보이는 현재의 생활 풍경",
+      "culturalEvidenceBoundaryKo": "산둥성 문화 탐색 이미지일 뿐 재배·어획 산지 또는 해외제조업소 소재지를 증명하지 않는다."
+    },
+    {
+      "regionKey": "cn-liaodong",
+      "file": "cn-liaodong.png",
+      "reviewVersion": 1,
+      "promptSummaryKo": "현재 랴오닝성 요동반도의 항구·과수원·장터와 사과·배·해산물을 연결한 풍경",
+      "culturalEvidenceBoundaryKo": "요동은 현재 행정구역명이 아니므로 상품에는 랴오닝성 등 현재 주소와 실제 산지를 표시한다."
+    },
+    {
+      "regionKey": "cn-south-yangtze",
+      "file": "cn-south-yangtze.png",
+      "reviewVersion": 1,
+      "promptSummaryKo": "강변 도시·논·차밭·아열대 장터를 나누어 강남·화남·서남의 하위 탐색을 안내하는 개괄 풍경",
+      "culturalEvidenceBoundaryKo": "장강 이남을 단일 문화나 상품 산지로 표현하지 않고 성·도시·생산자 수준으로 더 좁힌다."
+    }
+  ]
+}

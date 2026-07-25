@@ -1,0 +1,11 @@
+@page "/community/regions/{RegionKey}"
+@using Ssalddel.Ui.Common.Areas.App.Components.Information
+
+<PageTitle>지역 문화와 특산물 · 살뜰</PageTitle>
+
+<RegionalCultureSpecialtyDetail RegionKey="@RegionKey" />
+
+@code {
+    [Parameter]
+    public string? RegionKey { get; set; }
+}

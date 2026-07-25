@@ -38,6 +38,11 @@
         @foreach (var region in VisibleRegions)
         {
             <article class="region-card" id="@region.Key">
+                <a class="region-card__image" href="@RegionalCultureSpecialtyRoutes.DetailFor(region.Key)"
+                   aria-label="@($"{region.RegionName} 문화 허브 열기")">
+                    <img src="@region.HeroImagePath" alt="@region.HeroImageAlt" loading="lazy" />
+                    <span>지역 문화 이해를 돕기 위한 생성 일러스트</span>
+                </a>
                 <header>
                     <span>@region.CountryName · @region.RegionType</span>
                     <h2>@region.RegionName</h2>
@@ -85,8 +90,8 @@
                 <p class="region-card__boundary">@region.EvidenceBoundary</p>
 
                 <footer>
-                    <a href="@CultureConversationHref(region)">이 지역 이야기 보기</a>
-                    <a class="region-card__secondary" href="@SpecialtyEvidenceHref(region)">특산물 근거 찾기</a>
+                    <a href="@RegionalCultureSpecialtyRoutes.DetailFor(region.Key)">문화 허브 열기</a>
+                    <a class="region-card__secondary" href="@CultureConversationHref(region)">지역 이야기 보기</a>
                 </footer>
             </article>
         }
@@ -129,11 +134,6 @@
             CommunityBoardCatalog.Food.DisplayName,
             CommunityBoardCatalog.Food.Key,
             workflowTag: CultureTransportContentCatalog.FoodCultureWorkflowTag,
-            search: region.RegionName);
-
-    private static string SpecialtyEvidenceHref(RegionalCultureSpecialty region)
-        => CommunityPageRoutes.BoardsFor(
-            CommunityBoardCatalog.InformationPrices.DisplayName,
-            CommunityBoardCatalog.InformationPrices.Key,
-            search: region.Specialties[0].Name);
+            search: region.RegionName,
+            regionKey: region.Key);
 }

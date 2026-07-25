@@ -1,0 +1,135 @@
+.regional-products {
+    --leaf: #176b4d;
+    display: grid;
+    gap: 18px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 20px 52px;
+    color: #20372d;
+}
+
+.regional-products__steps {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.regional-products__steps > * {
+    flex: 1 0 110px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    background: #f0f4f1;
+    color: #76847c;
+    font-size: .76rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.regional-products__steps strong {
+    background: var(--leaf);
+    color: #fff;
+}
+
+.regional-products > header {
+    padding: 20px 22px;
+    border-radius: 18px;
+    background: #eaf4ed;
+}
+
+.regional-products > header span {
+    color: var(--leaf);
+    font-size: .74rem;
+    font-weight: 850;
+}
+
+.regional-products h1 {
+    margin: 6px 0;
+}
+
+.regional-products > header p,
+.regional-products__empty p {
+    margin: 0;
+    color: #607068;
+    line-height: 1.6;
+}
+
+.regional-products__table {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(270px, 38%);
+    gap: 13px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x proximity;
+}
+
+.regional-products__table article {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    padding: 18px;
+    border: 1px solid #dce4df;
+    border-radius: 17px;
+    background: #fff;
+    scroll-snap-align: start;
+}
+
+.regional-products__table h2 {
+    margin: 3px 0 0;
+}
+
+.regional-products__table p,
+.regional-products__table dl {
+    margin: 0;
+    color: #66766d;
+    font-size: .78rem;
+    line-height: 1.55;
+}
+
+.regional-products__table dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5px 9px;
+}
+
+.regional-products__table dt {
+    font-weight: 800;
+}
+
+.regional-products__table dd {
+    margin: 0;
+}
+
+.regional-products a {
+    color: var(--leaf);
+    font-weight: 800;
+}
+
+.regional-products > aside {
+    display: grid;
+    gap: 4px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #293f35;
+    color: #fff;
+}
+
+.regional-products > aside span {
+    color: rgba(255,255,255,.75);
+    font-size: .78rem;
+}
+
+.regional-products__empty {
+    min-height: 50vh;
+    align-content: center;
+}
+
+@media (max-width: 650px) {
+    .regional-products {
+        padding: 14px 13px 96px;
+    }
+
+    .regional-products__table {
+        grid-auto-columns: 86%;
+    }
+}

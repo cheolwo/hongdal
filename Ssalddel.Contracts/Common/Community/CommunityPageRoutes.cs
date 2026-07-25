@@ -60,7 +60,8 @@ public static class CommunityPageRoutes
         string? search = null,
         string? listFilter = null,
         string? viewMode = null,
-        string? focusTarget = null)
+        string? focusTarget = null,
+        string? regionKey = null)
         => WithQuery(
             Boards,
             (CommunityBoardNavigationQueryNames.BoardKey, boardKey),
@@ -77,7 +78,8 @@ public static class CommunityPageRoutes
             (CommunityBoardNavigationQueryNames.ViewMode, CommunityBoardNavigationContext.NormalizeViewMode(viewMode) == CommunityBoardNavigationContext.ListViewMode
                 ? null
                 : CommunityBoardNavigationContext.CardViewMode),
-            (PageNavigationQueryNames.FocusTarget, PageNavigationContext.NormalizeFocusTarget(focusTarget)));
+            (PageNavigationQueryNames.FocusTarget, PageNavigationContext.NormalizeFocusTarget(focusTarget)),
+            (CommunityBoardNavigationQueryNames.RegionKey, regionKey));
 
     public static string ComposeFor(
         string? boardName = null,

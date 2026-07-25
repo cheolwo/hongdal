@@ -1,0 +1,70 @@
+@using Ssalddel.Contracts.Common.Content
+
+<main class="regional-products">
+    <nav class="regional-products__steps" aria-label="문화와 구매 검토 단계">
+        <a href="@CultureHref">문화 발견</a>
+        <strong aria-current="step">상품 근거</strong>
+        <span>개별 검토</span>
+        <span>공동구매</span>
+        <span>공동수입</span>
+    </nav>
+
+    @if (Region is null)
+    {
+        <section class="regional-products__empty">
+            <h1>먼저 지역을 선택해 주세요</h1>
+            <p>지역 문화 허브에서 관심 품목과 근거 경계를 확인할 수 있습니다.</p>
+            <a href="@RegionalCultureSpecialtyRoutes.Browse">지역 목록 열기</a>
+        </section>
+    }
+    else
+    {
+        <header>
+            <span>@Region.CountryName · @Region.RegionName</span>
+            <h1>특산물 후보와 확인할 근거</h1>
+            <p>지역 이미지를 상품 원산지 증명으로 사용하지 않고, 품목별 산지·규격·가공·가격 근거를 따로 좁힙니다.</p>
+        </header>
+
+        <section class="regional-products__table" aria-label="@($"{Region.RegionName} 특산물 후보")">
+            @foreach (var specialty in Region.Specialties)
+            {
+                <article>
+                    <div>
+                        <small>@specialty.Category</small>
+                        <h2>@specialty.Name</h2>
+                    </div>
+                    <p>@specialty.DiscoveryNote</p>
+                    <dl>
+                        <dt>국가 문맥</dt>
+                        <dd>@Region.CountryName</dd>
+                        <dt>세부 지역 문맥</dt>
+                        <dd>@Region.RegionName</dd>
+                        <dt>확정 전 확인</dt>
+                        <dd>생산자·현재 행정구역·규격·기준일·검역/표시</dd>
+                    </dl>
+                    <a href="@RegionalCultureSpecialtyRoutes.PriceComparisonFor(Region.Key, specialty.Key)">
+                        가격 근거 비교
+                    </a>
+                </article>
+            }
+        </section>
+
+        <aside>
+            <strong>상품 후보를 보는 것만으로 주문은 생성되지 않습니다.</strong>
+            <span>비용 미리보기와 주문 의향 저장은 다음 단계에서 각각 명시적으로 선택합니다.</span>
+        </aside>
+    }
+</main>
+
+@code {
+    [Parameter]
+    public string? RegionKey { get; set; }
+
+    private RegionalCultureSpecialty? Region
+        => RegionalCultureSpecialtyCatalog.Find(RegionKey);
+
+    private string CultureHref
+        => Region is null
+            ? RegionalCultureSpecialtyRoutes.Browse
+            : RegionalCultureSpecialtyRoutes.DetailFor(Region.Key);
+}

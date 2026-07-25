@@ -1,0 +1,12 @@
+@page "/information/regional-products"
+@layout CommunityMobileLayout
+@using Ssalddel.Ui.Common.Areas.App.Components.Information
+
+<PageTitle>지역 특산물 후보 · 살뜰</PageTitle>
+
+<RegionalProductCandidates RegionKey="@RegionKey" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "regionKey")]
+    public string? RegionKey { get; set; }
+}

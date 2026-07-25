@@ -13,6 +13,18 @@ public sealed class RegionalCultureSpecialtyPageCompositionTests
         Assert.Contains("<RegionalCultureSpecialtyBrowse", source);
     }
 
+    [Theory]
+    [InlineData("Ssalddel.WebApp", "Pages/RegionalCultureSpecialtyDetailPage.razor")]
+    [InlineData("SsalddelApp", "Components/Pages/RegionalCultureSpecialtyDetailPage.razor")]
+    public void 지역문화상세route는_regionKey로_공용허브를조립한다(string project, string relativePath)
+    {
+        var source = File.ReadAllText(Path.Combine(FindRepositoryRoot(), project, relativePath));
+
+        Assert.Contains("@page \"/community/regions/{RegionKey}\"", source);
+        Assert.Contains("<RegionalCultureSpecialtyDetail", source);
+        Assert.Contains("RegionKey=\"@RegionKey\"", source);
+    }
+
     [Fact]
     public void 공용탐색화면은_문화_특산물_근거경계와_후속탐색을함께보여준다()
     {
@@ -44,6 +56,35 @@ public sealed class RegionalCultureSpecialtyPageCompositionTests
 
         Assert.Contains("@layout CommunityMobileLayout", source);
         Assert.Contains("CommunityMobilePresentation=\"true\"", source);
+    }
+
+    [Fact]
+    public void 지역카탈로그는_생성이미지와_안정적인상품key를제공한다()
+    {
+        var catalog = Ssalddel.Contracts.Common.Content.RegionalCultureSpecialtyCatalog.All;
+
+        Assert.Equal(6, catalog.Count);
+        Assert.All(catalog, region =>
+        {
+            Assert.StartsWith("_content/Ssalddel.Ui.Common/images/regions/", region.HeroImagePath);
+            Assert.Contains("생성 일러스트", region.HeroImageAlt);
+            Assert.NotEmpty(region.Specialties);
+            Assert.All(region.Specialties, specialty => Assert.False(string.IsNullOrWhiteSpace(specialty.Key)));
+        });
+    }
+
+    [Fact]
+    public void 지역상세경로와_가격비교경로는_regionKey와_productKey를유지한다()
+    {
+        var routes = typeof(Ssalddel.Contracts.Common.Content.RegionalCultureSpecialtyRoutes);
+
+        Assert.Equal(
+            "/community/regions/cn-shandong",
+            Ssalddel.Contracts.Common.Content.RegionalCultureSpecialtyRoutes.DetailFor("cn-shandong"));
+        Assert.Equal(
+            "/information/produce-price-comparison?regionKey=cn-shandong&productKey=apple",
+            Ssalddel.Contracts.Common.Content.RegionalCultureSpecialtyRoutes.PriceComparisonFor("cn-shandong", "apple"));
+        Assert.NotNull(routes);
     }
 
     private static string FindRepositoryRoot()

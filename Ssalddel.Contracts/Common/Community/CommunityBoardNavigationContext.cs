@@ -26,6 +26,7 @@ public sealed record CommunityBoardNavigationContext
     public string ListFilter { get; init; } = "전체글";
     public string ViewMode { get; init; } = ListViewMode;
     public string? FocusTarget { get; init; }
+    public string? RegionKey { get; init; }
 
     public string ToPath()
         => CommunityPageRoutes.BoardsFor(
@@ -37,7 +38,8 @@ public sealed record CommunityBoardNavigationContext
             SearchText,
             ListFilter,
             ViewMode,
-            FocusTarget);
+            FocusTarget,
+            RegionKey);
 
     public static int NormalizePage(int? page)
         => Math.Clamp(page ?? 1, 1, 10_000);
@@ -93,4 +95,5 @@ public static class CommunityBoardNavigationQueryNames
     public const string Search = "q";
     public const string ListFilter = "filter";
     public const string ViewMode = "view";
+    public const string RegionKey = "regionKey";
 }
