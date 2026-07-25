@@ -41,9 +41,15 @@
     line-height: 1.5;
 }
 
+.public-data-workspace__related-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: 12px;
+}
+
 .public-data-workspace__produce-link {
     display: inline-block;
-    margin-top: 12px;
     padding-bottom: 2px;
     border-bottom: 1px solid currentColor;
     color: #9b3824;

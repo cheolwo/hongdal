@@ -85,6 +85,60 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
         Assert.False(viewModel.IsLoading);
     }
 
+    [Fact]
+    public async Task DomesticComparison_ConvertsKamisStagesToSelectedGramBasis()
+    {
+        var client = new FakePublicDataClient();
+        using var viewModel = new 국내농수산가격조회ViewModel(client);
+
+        await viewModel.조회Async();
+
+        Assert.Equal("100g", viewModel.비교기준Label);
+        Assert.Collection(
+            viewModel.비교항목,
+            auction =>
+            {
+                Assert.Equal("경락가", auction.StageLabel);
+                Assert.False(auction.IsAvailable);
+                Assert.Contains("공식 Open API", auction.AvailabilityNote);
+            },
+            wholesale =>
+            {
+                Assert.Equal("중도매가", wholesale.StageLabel);
+                Assert.Equal(900m, wholesale.DisplayPriceKrw);
+                Assert.Equal(0m, wholesale.DifferenceFromLowestKrw);
+            },
+            retail =>
+            {
+                Assert.Equal("소매가", retail.StageLabel);
+                Assert.Equal(1_200m, retail.DisplayPriceKrw);
+                Assert.Equal(300m, retail.DifferenceFromLowestKrw);
+                Assert.Equal(33.3m, retail.DifferencePercentFromLowest!.Value, 1);
+            });
+    }
+
+    [Fact]
+    public async Task DomesticComparison_SupportsKilogramAndRepresentativeItemWeight()
+    {
+        var client = new FakePublicDataClient();
+        using var viewModel = new 국내농수산가격조회ViewModel(client);
+        await viewModel.조회Async();
+
+        viewModel.비교단위 = 국내가격비교단위.킬로그램;
+
+        Assert.Equal("1kg", viewModel.비교기준Label);
+        Assert.Equal(9_000m, viewModel.비교항목[1].DisplayPriceKrw);
+        Assert.Equal(12_000m, viewModel.비교항목[2].DisplayPriceKrw);
+
+        viewModel.비교단위 = 국내가격비교단위.개수;
+        viewModel.대표개당그램 = 250m;
+
+        Assert.Equal("1개 · 대표 250g", viewModel.비교기준Label);
+        Assert.Equal(2_250m, viewModel.비교항목[1].DisplayPriceKrw);
+        Assert.Equal(3_000m, viewModel.비교항목[2].DisplayPriceKrw);
+        Assert.Contains("추정값", viewModel.개수환산안내);
+    }
+
     [Theory]
     [InlineData(농수산가격비교Section.비교, "한국·미국·호주 가격 비교")]
     [InlineData(농수산가격비교Section.국내, "한국 농수산물 가격")]
@@ -176,11 +230,19 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
                 Price = new AtDomesticFoodPriceLookupResult
                 {
                     Success = true,
+                    Wholesale = new AtDomesticFoodPriceAggregate
+                    {
+                        PriceTypeLabel = "중도매",
+                        AverageKrwPerKg = 9_000m,
+                        LatestSurveyDate = "2026-07-17",
+                        SampleCount = 4
+                    },
                     Retail = new AtDomesticFoodPriceAggregate
                     {
                         PriceTypeLabel = "소매",
                         AverageKrwPerKg = 12_000m,
-                        LatestSurveyDate = "2026-07-17"
+                        LatestSurveyDate = "2026-07-17",
+                        SampleCount = 6
                     }
                 }
             });

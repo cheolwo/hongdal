@@ -7,9 +7,14 @@
             <span>공식 공공데이터</span>
             <h1>한국·미국·호주 농수산물 가격</h1>
             <p>각 국가의 조사값을 통화·단위·유통단계와 함께 비교합니다.</p>
-            <a class="public-data-workspace__produce-link" href="/information/produce-price-comparison">
-                과일·채소 · 국가·지역별 가격 비교
-            </a>
+            <div class="public-data-workspace__related-links">
+                <a class="public-data-workspace__produce-link" href="/information/kamis-domestic-price-comparison">
+                    KAMIS · 국내 유통단계 가격 비교
+                </a>
+                <a class="public-data-workspace__produce-link" href="/information/produce-price-comparison">
+                    과일·채소 · 국가·지역별 가격 비교
+                </a>
+            </div>
         </div>
         <div class="public-data-workspace__market-status" aria-label="지원 시장">
             <span>KR</span>
@@ -69,8 +74,7 @@
                             한국 가격 조회
                         </MudButton>
                     </section>
-                    <국내농수산가격Result Response="@ViewModel.국내.응답"
-                                          ErrorMessage="@ViewModel.국내.오류메시지" />
+                    <국내농수산가격Result ViewModel="@ViewModel.국내" />
                     break;
 
                 case 농수산가격비교Section.미국:
@@ -159,6 +163,9 @@
 </section>
 
 @code {
+    [Parameter]
+    public 농수산가격비교Section InitialSection { get; set; } = 농수산가격비교Section.비교;
+
     private static readonly IReadOnlyList<PriceSectionNavigationItem> SectionNavigationItems =
     [
         new(농수산가격비교Section.비교, "COMPARE", "3개국 비교"),
@@ -175,6 +182,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ViewModel.SelectSection(InitialSection);
         await ViewModel.초기화Async();
     }
 

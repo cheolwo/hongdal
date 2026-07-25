@@ -1,65 +1,159 @@
 @using Ssalddel.Contracts.Common.AgriculturalFisheries
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
 
 <section class="price-result" aria-label="국내 농수산물 가격 조회 결과">
-    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    @if (!string.IsNullOrWhiteSpace(ViewModel.오류메시지))
     {
-        <MudAlert Severity="Severity.Warning" Dense="true">@ErrorMessage</MudAlert>
+        <MudAlert Severity="Severity.Warning" Dense="true">@ViewModel.오류메시지</MudAlert>
     }
-    else if (Response is null)
+    else if (ViewModel.응답 is null)
     {
         <div class="price-result__empty">
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Large" />
             <strong>국내 가격 조회 전</strong>
+            <small>품목을 선택하면 KAMIS 중도매·소매 조사값을 같은 단위로 환산합니다.</small>
         </div>
     }
-    else if (!Response.Success || Response.Price is null)
+    else if (!ViewModel.응답.Success || ViewModel.응답.Price is null)
     {
         <MudAlert Severity="Severity.Warning" Dense="true">
-            @(Response.ErrorMessage ?? Response.Summary)
+            @(ViewModel.응답.ErrorMessage ?? ViewModel.응답.Summary)
         </MudAlert>
     }
     else
     {
         <header class="price-result__header">
             <div>
-                <span>한국농수산식품유통공사(aT)</span>
-                <strong>@(Response.Item?.ProductName ?? Response.Price.ItemName)</strong>
+                <span>KAMIS · 한국 국내용</span>
+                <strong>@(ViewModel.응답.Item?.ProductName ?? ViewModel.응답.Price.ItemName)</strong>
+                <p>경락 → 중도매 → 소매의 가격 흐름을 같은 기준으로 비교합니다.</p>
             </div>
-            <small>HS @Response.HsCode</small>
+            <small>HS @ViewModel.응답.HsCode</small>
         </header>
 
-        <div class="price-result__metrics">
-            @if (Response.Price.Wholesale is { } wholesale)
+        <div class="price-result__unit-controls" aria-label="가격 환산 단위">
+            <div class="price-result__unit-toggle" role="group">
+                @foreach (var unit in Enum.GetValues<국내가격비교단위>())
+                {
+                    <button type="button"
+                            class="@(ViewModel.비교단위 == unit ? "is-selected" : null)"
+                            aria-pressed="@(ViewModel.비교단위 == unit)"
+                            @onclick="() => ViewModel.비교단위 = unit">
+                        @(unit switch
+                        {
+                            국내가격비교단위.그램 => "g 기준",
+                            국내가격비교단위.킬로그램 => "kg 기준",
+                            _ => "개수 기준"
+                        })
+                    </button>
+                }
+            </div>
+
+            @if (ViewModel.비교단위 == 국내가격비교단위.그램)
             {
-                <article>
-                    <span>@wholesale.PriceTypeLabel</span>
-                    <strong>@FormatKrw(wholesale.AverageKrwPerKg)<small>/kg</small></strong>
-                    <small>@wholesale.MinimumKrwPerKg.ToString("N0")~@wholesale.MaximumKrwPerKg.ToString("N0")원 · @wholesale.LatestSurveyDate</small>
-                </article>
+                <label>
+                    <span>비교 중량</span>
+                    <input type="number" min="1" max="10000" step="10" @bind="ViewModel.비교그램" />
+                    <small>g</small>
+                </label>
             }
-            @if (Response.Price.Retail is { } retail)
+            else if (ViewModel.비교단위 == 국내가격비교단위.개수)
             {
-                <article>
-                    <span>@retail.PriceTypeLabel</span>
-                    <strong>@FormatKrw(retail.AverageKrwPerKg)<small>/kg</small></strong>
-                    <small>@retail.MinimumKrwPerKg.ToString("N0")~@retail.MaximumKrwPerKg.ToString("N0")원 · @retail.LatestSurveyDate</small>
-                </article>
+                <label>
+                    <span>대표 1개 중량</span>
+                    <input type="number" min="1" max="10000" step="10" @bind="ViewModel.대표개당그램" />
+                    <small>g</small>
+                </label>
             }
         </div>
 
-        @if (Response.Notices.Count > 0)
+        <div class="price-result__table-wrap">
+            <table class="price-result__table">
+                <caption>@ViewModel.선택품목명 · @ViewModel.비교기준Label 환산 가격</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">유통 단계</th>
+                        <th scope="col">누구의 가격인가</th>
+                        <th scope="col">@ViewModel.비교기준Label 가격</th>
+                        <th scope="col">1kg 기준</th>
+                        <th scope="col">최저 관측값과 차이</th>
+                        <th scope="col">기준일·출처</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewModel.비교항목)
+                    {
+                        <tr class="@(!item.IsAvailable ? "is-unavailable" : null)">
+                            <th scope="row">
+                                <span class="price-result__stage price-result__stage--@item.StageCode.ToLowerInvariant()">
+                                    @item.StageLabel
+                                </span>
+                            </th>
+                            <td>@item.Description</td>
+                            <td class="price-result__primary-price">
+                                @if (item.DisplayPriceKrw is { } displayPrice)
+                                {
+                                    @FormatKrw(displayPrice)
+                                }
+                                else
+                                {
+                                    <span>연동 준비</span>
+                                }
+                            </td>
+                            <td>
+                                @(item.PriceKrwPerKg is { } pricePerKg
+                                    ? $"{FormatKrw(pricePerKg)} / kg"
+                                    : "—")
+                            </td>
+                            <td>
+                                @if (item.DifferenceFromLowestKrw == 0m)
+                                {
+                                    <span class="price-result__lowest">최저 관측값</span>
+                                }
+                                else if (item.DifferenceFromLowestKrw is { } difference
+                                         && item.DifferencePercentFromLowest is { } differencePercent)
+                                {
+                                    <span class="price-result__difference">
+                                        +@FormatKrw(difference)
+                                        <small>+@differencePercent.ToString("N1")%</small>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+                            </td>
+                            <td>
+                                <span>@(string.IsNullOrWhiteSpace(item.ReferenceDate) ? item.AvailabilityNote : item.ReferenceDate)</span>
+                                <a href="@item.SourceUrl" target="_blank" rel="noopener noreferrer">
+                                    KAMIS 원문 ↗
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(ViewModel.개수환산안내))
         {
-            <p class="price-result__notice">@Response.Notices[0]</p>
+            <p class="price-result__notice price-result__notice--assumption">@ViewModel.개수환산안내</p>
+        }
+
+        <p class="price-result__notice">
+            경락가와 중도매가, 소매가는 조사 대상·시장·품질·등급이 서로 다를 수 있으므로 같은 상품의 확정 유통마진으로 해석하지 않습니다.
+        </p>
+
+        @if (ViewModel.응답.Notices.Count > 0)
+        {
+            <p class="price-result__notice">@ViewModel.응답.Notices[0]</p>
         }
     }
 </section>
 
 @code {
-    [Parameter]
-    public AgriculturalFisheriesDomesticPriceResponse? Response { get; set; }
-
-    [Parameter]
-    public string? ErrorMessage { get; set; }
+    [Parameter, EditorRequired]
+    public 국내농수산가격조회ViewModel ViewModel { get; set; } = null!;
 
     private static string FormatKrw(decimal value) => $"{value:N0}원";
 }

@@ -290,6 +290,8 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.ReadOnly, false, "0.0", "출처와 기준 시각을 함께 표시하는 공개 정보 조회 화면입니다."),
         Prefix("public-price-comparison", SsalddelPageAppCodes.IntegratedWeb, "/information/agricultural-fisheries-price-comparison", PageCapabilityStage.Live,
             PageInteractionBoundary.ReadOnly, false, "0.0", "공개 가격 자료의 출처·단위·기준 시각을 비교합니다."),
+        Exact("kamis-domestic-price-comparison", SsalddelPageAppCodes.IntegratedWeb, "/information/kamis-domestic-price-comparison", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "KAMIS 국내 중도매·소매 조사값을 g·kg·대표 개수 기준으로 환산하고 경락가 API 제공 경계를 함께 표시합니다."),
         Exact("official-food-ingredients", SsalddelPageAppCodes.IntegratedWeb, "/information/food-ingredients", PageCapabilityStage.Live,
             PageInteractionBoundary.ReadOnly, false, "0.0", "공식 레시피의 표준 재료, 출처가 확인된 공공가격과 실제 관련 레시피를 조회합니다."),
         Exact("regional-culture-specialties", SsalddelPageAppCodes.IntegratedWeb, RegionalCultureSpecialtyRoutes.Browse, PageCapabilityStage.Live,

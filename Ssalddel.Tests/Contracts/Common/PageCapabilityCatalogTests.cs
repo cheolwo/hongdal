@@ -119,6 +119,23 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
+    public void KAMIS국내가격비교페이지는_0점0공개읽기전용으로분류한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            "/information/kamis-domestic-price-comparison",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("kamis-domestic-price-comparison", capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Live, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.Equal(SsalddelProductRoadmapCatalog.FoundationVersion, capability.IntroducedVersion);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+    }
+
+    [Fact]
     public void 지역문화특산물페이지는_0점0커뮤니티의_공개읽기전용으로분류한다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
