@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -9,40 +10,93 @@ namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
     "게시판 경계를 넘은 공개 커뮤니티 전체 글을 서버 순서대로 page 단위로 이어서 조회",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "보호 속성이나 성사 가능성으로 글을 재정렬하지 않고 API가 반환한 공개 순서와 게시판 출처를 유지합니다.")]
-public sealed class Community전체FeedViewModel(
-    Func<int, int, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts)
+public sealed class Community전체FeedViewModel : PageViewModelBase
 {
     public const int PageSize = 12;
 
     private static readonly TimeSpan LoadTimeout = TimeSpan.FromSeconds(8);
+    private readonly Func<string, int, int, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts;
     private readonly List<PlatformCommunityPostResponse> items = [];
+    private string appKey = "shipper";
+    private int currentPage;
+    private int totalCount;
+    private bool isLoadingMore;
+    private string? pageErrorMessage;
     private bool hasMore;
 
+    public Community전체FeedViewModel(ICommunityPostClient communityPostClient)
+        : this((key, page, pageSize, cancellationToken) =>
+            communityPostClient.GetBoardPostsAsync(
+                key,
+                page: page,
+                pageSize: pageSize,
+                periodicVisibility: CommunityPeriodicPostVisibilityModes.All,
+                cancellationToken: cancellationToken))
+    {
+    }
+
+    public Community전체FeedViewModel(
+        Func<int, int, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts)
+        : this((_, page, pageSize, cancellationToken) =>
+            loadPosts(page, pageSize, cancellationToken))
+    {
+    }
+
+    private Community전체FeedViewModel(
+        Func<string, int, int, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts)
+        => this.loadPosts = loadPosts;
+
     public IReadOnlyList<PlatformCommunityPostResponse> Items => items;
-    public int CurrentPage { get; private set; }
-    public int TotalCount { get; private set; }
-    public bool IsInitialLoading { get; private set; } = true;
-    public bool IsLoadingMore { get; private set; }
-    public string? ErrorMessage { get; private set; }
+    public int CurrentPage
+    {
+        get => currentPage;
+        private set => SetProperty(ref currentPage, value);
+    }
+
+    public int TotalCount
+    {
+        get => totalCount;
+        private set => SetProperty(ref totalCount, value);
+    }
+
+    public bool IsInitialLoading => 처리중 && CurrentPage == 0;
+
+    public bool IsLoadingMore
+    {
+        get => isLoadingMore;
+        private set => SetProperty(ref isLoadingMore, value);
+    }
+
+    public string? ErrorMessage
+    {
+        get => pageErrorMessage;
+        private set => SetProperty(ref pageErrorMessage, value);
+    }
+
     public bool HasMore => hasMore && !IsInitialLoading;
 
-    public async Task LoadAsync(CancellationToken cancellationToken = default)
+    protected override bool 하위ViewModel처리중 => IsLoadingMore;
+
+    public void Configure(string? value)
     {
-        if (IsLoadingMore)
+        var normalized = string.IsNullOrWhiteSpace(value) ? "shipper" : value.Trim();
+        if (string.Equals(appKey, normalized, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
 
+        appKey = normalized;
         items.Clear();
         CurrentPage = 0;
         TotalCount = 0;
         hasMore = false;
         ErrorMessage = null;
-        IsInitialLoading = true;
-
-        await LoadPageAsync(1, cancellationToken);
-        IsInitialLoading = false;
+        OnPropertyChanged(nameof(Items));
+        OnPropertyChanged(nameof(HasMore));
     }
+
+    public Task<bool> LoadAsync(CancellationToken cancellationToken = default)
+        => 새로고침Async(cancellationToken);
 
     public async Task LoadMoreAsync(CancellationToken cancellationToken = default)
     {
@@ -54,6 +108,22 @@ public sealed class Community전체FeedViewModel(
         await LoadPageAsync(CurrentPage + 1, cancellationToken);
     }
 
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
+    {
+        items.Clear();
+        CurrentPage = 0;
+        TotalCount = 0;
+        hasMore = false;
+        ErrorMessage = null;
+        OnPropertyChanged(nameof(Items));
+        OnPropertyChanged(nameof(HasMore));
+        OnPropertyChanged(nameof(IsInitialLoading));
+
+        await LoadPageAsync(1, cancellationToken);
+    }
+
     private async Task LoadPageAsync(int page, CancellationToken cancellationToken)
     {
         IsLoadingMore = true;
@@ -63,7 +133,7 @@ public sealed class Community전체FeedViewModel(
         timeout.CancelAfter(LoadTimeout);
         try
         {
-            var result = await loadPosts(page, PageSize, timeout.Token);
+            var result = await loadPosts(appKey, page, PageSize, timeout.Token);
             var knownIds = items.Select(item => item.Id).ToHashSet();
             items.AddRange(result.Items.Where(item => knownIds.Add(item.Id)));
             CurrentPage = page;
@@ -72,6 +142,8 @@ public sealed class Community전체FeedViewModel(
                       && (result.TotalCount > 0
                           ? items.Count < result.TotalCount
                           : result.Items.Count >= PageSize);
+            OnPropertyChanged(nameof(Items));
+            OnPropertyChanged(nameof(HasMore));
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -92,6 +164,9 @@ public sealed class Community전체FeedViewModel(
             {
                 hasMore = false;
             }
+
+            OnPropertyChanged(nameof(HasMore));
+            OnPropertyChanged(nameof(IsInitialLoading));
         }
     }
 }

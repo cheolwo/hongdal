@@ -12,7 +12,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelCommunityV0Module(
     SsalddelCommunityV0ModuleKeys.Content,
     SsalddelModuleKind.Api,
-    "게시글 이미지 첨부 HTTP 경계",
+    "게시글 미디어 첨부 HTTP 경계",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "첨부 업로드만 연결하며 게시글 발행·댓글·운영 상태는 변경하지 않습니다.")]
 [SsalddelApiVersion(SsalddelProductVersion.V0_0)]
@@ -41,7 +41,7 @@ public sealed class 커뮤니티게시글첨부Controller : CommunityControllerB
     {
         if (request.File is null)
         {
-            return this.ToProblemActionResult("업로드할 이미지 파일을 선택해야 합니다.");
+            return this.ToProblemActionResult("업로드할 미디어 파일을 선택해야 합니다.");
         }
 
         await using var stream = request.File.OpenReadStream();

@@ -31,14 +31,17 @@ public sealed record CommunityPostComposerSaveResult(
     Boundary = "글쓰기는 참여 의사를 공개하는 시작점이며 계약·배차·정산을 자동 확정하지 않습니다.")]
 public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
 {
-    private const long MaxUploadFileBytes = 5 * 1024 * 1024;
+    private const long MaxImageUploadBytes = 5 * 1024 * 1024;
+    private const long MaxVideoUploadBytes = 15 * 1024 * 1024;
     private const int MaxUploadFileCount = 5;
     private static readonly HashSet<string> AllowedUploadContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg",
         "image/png",
         "image/webp",
-        "image/gif"
+        "image/gif",
+        "video/mp4",
+        "video/webm"
     };
     private readonly ICommunityPostClient _communityService;
     private readonly ICommunityPostComposerDraftStore _draftStore;
@@ -225,7 +228,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
         ArgumentNullException.ThrowIfNull(files);
         var candidates = files.ToArray();
         var accepted = candidates
-            .Where(file => file.Size <= MaxUploadFileBytes
+            .Where(file => file.Size <= MaxUploadBytes(file.ContentType)
                            && AllowedUploadContentTypes.Contains(file.ContentType))
             .Take(MaxUploadFileCount)
             .ToArray();
@@ -237,7 +240,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
         if (rejectedCount > 0)
         {
             SetStatus(
-                $"사진 {accepted.Length}개를 선택했습니다. {rejectedCount}개는 5개 제한, 5MB 크기 또는 지원 형식(JPG·PNG·WebP·GIF)을 확인해 주세요.",
+                $"미디어 {accepted.Length}개를 선택했습니다. {rejectedCount}개는 5개 제한, 이미지 5MB·동영상 15MB 크기 또는 지원 형식(JPG·PNG·WebP·GIF·MP4·WebM)을 확인해 주세요.",
                 CommunityComposerMessageKind.Warning);
         }
     }
@@ -251,7 +254,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
         }
 
         OnPropertyChanged(nameof(SelectedFiles));
-        SetStatus("선택한 사진을 첨부 목록에서 뺐습니다.", CommunityComposerMessageKind.Info);
+        SetStatus("선택한 미디어를 첨부 목록에서 뺐습니다.", CommunityComposerMessageKind.Info);
     }
 
     public void ClearFiles()
@@ -263,7 +266,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
 
         SelectedFiles.Clear();
         OnPropertyChanged(nameof(SelectedFiles));
-        SetStatus("첨부할 사진을 모두 비웠습니다.", CommunityComposerMessageKind.Info);
+        SetStatus("첨부할 미디어를 모두 비웠습니다.", CommunityComposerMessageKind.Info);
     }
 
     public void BeginEdit(PlatformCommunityPostResponse post)
@@ -393,7 +396,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
                 SetStatus(
                     SelectedFiles.Count == 0
                         ? "이 브라우저에 임시 저장했습니다. 글 비밀번호는 저장하지 않습니다."
-                        : "이 브라우저에 임시 저장했습니다. 글 비밀번호와 첨부 사진은 저장하지 않습니다.",
+                        : "이 브라우저에 임시 저장했습니다. 글 비밀번호와 첨부 미디어는 저장하지 않습니다.",
                     CommunityComposerMessageKind.Success);
             }
         }
@@ -478,7 +481,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
                         saved.Id,
                         Draft.Password,
                         file,
-                        MaxUploadFileBytes,
+                        MaxUploadBytes(file.ContentType),
                         cancellationToken);
                     uploadedFileCount++;
                 }
@@ -508,7 +511,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
                 : CommunityComposerMessageKind.Warning;
             var message = failedFileNames.Count == 0
                 ? persistenceMessage
-                : $"{persistenceMessage} 다만 사진 {failedFileNames.Count}개를 첨부하지 못했습니다. 글 상세에서 저장 여부를 확인한 뒤 수정으로 다시 첨부해 주세요: {string.Join(", ", failedFileNames.Distinct(StringComparer.OrdinalIgnoreCase))}";
+                : $"{persistenceMessage} 다만 미디어 {failedFileNames.Count}개를 첨부하지 못했습니다. 글 상세에서 저장 여부를 확인한 뒤 수정으로 다시 첨부해 주세요: {string.Join(", ", failedFileNames.Distinct(StringComparer.OrdinalIgnoreCase))}";
             SetStatus(message, messageKind);
             return new(true, wasEditing, saved, message)
             {
@@ -678,4 +681,9 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
             throw new InvalidOperationException("커뮤니티 글쓰기 AppKey가 설정되지 않았습니다.");
         }
     }
+
+    private static long MaxUploadBytes(string contentType)
+        => contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase)
+            ? MaxVideoUploadBytes
+            : MaxImageUploadBytes;
 }

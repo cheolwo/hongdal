@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -28,20 +29,125 @@ public sealed record CommunityBoardPostQuery(
     "Web과 모바일에서 선택한 공개 게시판 문맥과 글 목록의 조회·검색·필터 상태를 관리",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "게시글은 사용자가 선택한 게시판과 명시적 필터로만 좁히며 상대 적합성·성사 가능성으로 순위화하지 않습니다.")]
-public sealed class CommunityBoardPageViewModel(
-    Func<CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries,
-    Func<CommunityBoardPostQuery, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts)
+public sealed class CommunityBoardPageViewModel : PageViewModelBase
 {
     private static readonly TimeSpan LoadTimeout = TimeSpan.FromSeconds(5);
+    private readonly Func<string, CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries;
+    private readonly Func<string, CommunityBoardPostQuery, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts;
+    private readonly Func<long, string?, CancellationToken, Task>? deletePost;
+    private IReadOnlyList<CommunityBoardSummaryResponse> boardSummaries = [];
+    private CommunityBoardSummaryResponse? currentBoard;
+    private PlatformCommunityPostListResponse result = new();
+    private string selectedFilter = "전체글";
+    private string searchText = string.Empty;
+    private CommunityPostViewMode viewMode;
+    private CommunityBoardPageRequest request = new(null, null, null, null, 1);
+    private string appKey = "shipper";
 
-    public IReadOnlyList<CommunityBoardSummaryResponse> BoardSummaries { get; private set; } = [];
-    public CommunityBoardSummaryResponse? CurrentBoard { get; private set; }
-    public PlatformCommunityPostListResponse Result { get; private set; } = new();
-    public string SelectedFilter { get; private set; } = "전체글";
-    public string SearchText { get; private set; } = string.Empty;
-    public CommunityPostViewMode ViewMode { get; private set; }
-    public string? ErrorMessage { get; private set; }
-    public bool IsLoading { get; private set; }
+    public CommunityBoardPageViewModel(ICommunityPostClient communityPostClient)
+        : this(
+            (key, cancellationToken) =>
+                communityPostClient.GetBoardSummariesAsync(key, cancellationToken),
+            (key, query, cancellationToken) =>
+                communityPostClient.GetBoardPostsAsync(
+                    key,
+                    boardKey: query.BoardKey,
+                    category: query.LegacyCategory,
+                    workflowTag: query.WorkflowTag,
+                    roleTag: query.RoleTag,
+                    page: query.Page,
+                    pageSize: query.PageSize,
+                    periodicVisibility: query.PeriodicVisibility,
+                    cancellationToken: cancellationToken),
+            communityPostClient.DeletePostAsync)
+    {
+    }
+
+    public CommunityBoardPageViewModel(
+        Func<CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries,
+        Func<CommunityBoardPostQuery, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts)
+        : this(
+            (_, cancellationToken) => loadBoardSummaries(cancellationToken),
+            (_, query, cancellationToken) => loadPosts(query, cancellationToken),
+            null)
+    {
+    }
+
+    private CommunityBoardPageViewModel(
+        Func<string, CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries,
+        Func<string, CommunityBoardPostQuery, CancellationToken, Task<PlatformCommunityPostListResponse>> loadPosts,
+        Func<long, string?, CancellationToken, Task>? deletePost)
+    {
+        this.loadBoardSummaries = loadBoardSummaries;
+        this.loadPosts = loadPosts;
+        this.deletePost = deletePost;
+    }
+
+    public IReadOnlyList<CommunityBoardSummaryResponse> BoardSummaries
+    {
+        get => boardSummaries;
+        private set => SetProperty(ref boardSummaries, value);
+    }
+
+    public CommunityBoardSummaryResponse? CurrentBoard
+    {
+        get => currentBoard;
+        private set
+        {
+            if (SetProperty(ref currentBoard, value))
+            {
+                OnPropertyChanged(nameof(CurrentBoardName));
+                OnPropertyChanged(nameof(CurrentBoardDescription));
+                OnPropertyChanged(nameof(CanCompose));
+            }
+        }
+    }
+
+    public PlatformCommunityPostListResponse Result
+    {
+        get => result;
+        private set
+        {
+            if (SetProperty(ref result, value))
+            {
+                OnPropertyChanged(nameof(TotalPages));
+                OnPropertyChanged(nameof(VisiblePosts));
+            }
+        }
+    }
+
+    public string SelectedFilter
+    {
+        get => selectedFilter;
+        private set
+        {
+            if (SetProperty(ref selectedFilter, value))
+            {
+                OnPropertyChanged(nameof(VisiblePosts));
+            }
+        }
+    }
+
+    public string SearchText
+    {
+        get => searchText;
+        private set
+        {
+            if (SetProperty(ref searchText, value))
+            {
+                OnPropertyChanged(nameof(VisiblePosts));
+            }
+        }
+    }
+
+    public CommunityPostViewMode ViewMode
+    {
+        get => viewMode;
+        private set => SetProperty(ref viewMode, value);
+    }
+
+    public string? ErrorMessage => 오류메시지;
+    public bool IsLoading => 처리중;
 
     public string CurrentBoardName => CurrentBoard?.DisplayName ?? "전체 글";
     public string CurrentBoardDescription => CurrentBoard?.Description ?? "공개 게시판의 글을 한 번에 봅니다.";
@@ -56,13 +162,36 @@ public sealed class CommunityBoardPageViewModel(
             .Where(MatchesSearch)
             .ToArray();
 
-    public async Task LoadAsync(
+    public void Configure(string? key)
+        => appKey = string.IsNullOrWhiteSpace(key) ? "shipper" : key.Trim();
+
+    public Task<bool> LoadAsync(
         CommunityBoardPageRequest request,
         CancellationToken cancellationToken = default)
     {
+        this.request = request;
         RestoreListState(request.SearchText, request.ListFilter, request.ViewMode);
-        IsLoading = true;
-        ErrorMessage = null;
+        return 새로고침Async(cancellationToken);
+    }
+
+    public async Task DeletePostAsync(
+        long postId,
+        string? password,
+        CancellationToken cancellationToken = default)
+    {
+        if (deletePost is null)
+        {
+            throw new InvalidOperationException("게시글 삭제 client가 구성되지 않았습니다.");
+        }
+
+        await deletePost(postId, password, cancellationToken);
+        await 새로고침Async(cancellationToken);
+    }
+
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
+    {
         BoardSummaries = MergeWithCoreBoards([]);
         CurrentBoard = ResolveCurrentBoard(BoardSummaries, request);
         NormalizePeriodicFilterForCurrentBoard();
@@ -71,7 +200,7 @@ public sealed class CommunityBoardPageViewModel(
         timeout.CancelAfter(LoadTimeout);
         try
         {
-            var serverBoards = await loadBoardSummaries(timeout.Token);
+            var serverBoards = await loadBoardSummaries(appKey, timeout.Token);
             BoardSummaries = MergeWithCoreBoards(serverBoards);
             CurrentBoard = ResolveCurrentBoard(BoardSummaries, request);
             NormalizePeriodicFilterForCurrentBoard();
@@ -82,6 +211,7 @@ public sealed class CommunityBoardPageViewModel(
                 ? request.LegacyBoardName
                 : null;
             Result = await loadPosts(
+                appKey,
                 new CommunityBoardPostQuery(
                     resolvedKey,
                     legacyCategory,
@@ -97,16 +227,19 @@ public sealed class CommunityBoardPageViewModel(
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             Result = new PlatformCommunityPostListResponse();
-            ErrorMessage = "응답이 지연되고 있습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.";
+            throw new TimeoutException(
+                "응답이 지연되고 있습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.");
         }
-        catch (Exception)
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
         {
             Result = new PlatformCommunityPostListResponse();
-            ErrorMessage = "네트워크 상태를 확인한 뒤 다시 시도해 주세요.";
-        }
-        finally
-        {
-            IsLoading = false;
+            throw new InvalidOperationException(
+                "네트워크 상태를 확인한 뒤 다시 시도해 주세요.",
+                exception);
         }
     }
 

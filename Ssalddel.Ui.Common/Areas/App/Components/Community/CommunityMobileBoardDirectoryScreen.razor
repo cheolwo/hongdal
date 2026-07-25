@@ -1,12 +1,12 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
-@inject PlatformCommunityService CommunityService
+@inherits MvvmComponentBase<CommunityMobileBoardDirectoryViewModel>
 
-<main class="community-mobile-directory" data-community-mode="@(_workMode ? "work" : "life")">
+<main class="community-mobile-directory" data-community-mode="@(ViewModel.WorkMode ? "work" : "life")">
     <header class="community-mobile-directory__heading">
         <div>
             <span>공개 커뮤니티 · 01A.01</span>
             <h1>게시판 모음</h1>
-            <p>@(_workMode
+            <p>@(ViewModel.WorkMode
                 ? "하나의 업무를 골라 입력·상태·근거와 다음 인계를 함께 살펴봅니다."
                 : "생활 이야기와 안부를 전할 글을 두 갈래로 찾아봅니다.")</p>
         </div>
@@ -16,8 +16,8 @@
             <button type="button"
                     role="switch"
                     aria-label="업무 게시판 보기"
-                    aria-checked="@_workMode"
-                    class="@(_workMode ? "community-mobile-directory__switch community-mobile-directory__switch--on" : "community-mobile-directory__switch")"
+                    aria-checked="@ViewModel.WorkMode"
+                    class="@(ViewModel.WorkMode ? "community-mobile-directory__switch community-mobile-directory__switch--on" : "community-mobile-directory__switch")"
                     @onclick="ToggleMode">
                 <span></span>
             </button>
@@ -42,7 +42,7 @@
         </section>
     }
 
-    @if (_workMode)
+    @if (ViewModel.WorkMode)
     {
         <section class="community-mobile-directory__section" aria-labelledby="work-board-heading">
             <header>
@@ -217,22 +217,21 @@
     [Parameter]
     public bool InitialWorkMode { get; set; }
 
-    private CommunityMobileBoardDirectoryViewModel ViewModel { get; set; } = default!;
-    private bool _workMode;
+    [Parameter]
+    public string AppKey { get; set; } = "shipper";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ViewModel.Configure(AppKey, InitialWorkMode);
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        _workMode = InitialWorkMode;
-        ViewModel = new CommunityMobileBoardDirectoryViewModel(
-            cancellationToken => CommunityService.GetBoardSummariesAsync("shipper", cancellationToken));
-        await ViewModel.LoadAsync();
+        await ViewModel.초기화Async();
     }
 
-    private void ToggleMode()
-    {
-        _workMode = !_workMode;
-        ViewModel.UpdateSearch(string.Empty);
-    }
+    private void ToggleMode() => ViewModel.ToggleMode();
 
     private void HandleSearchInput(ChangeEventArgs args)
         => ViewModel.UpdateSearch(args.Value?.ToString());

@@ -1,0 +1,67 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+@{
+    var media = Community피드MediaPresentation.Select(Post.Attachments);
+    var isVideo = media.FirstOrDefault()?.Kind == Community피드MediaKind.Video;
+}
+
+@if (media.Count > 0)
+{
+    <section class="@MediaClass(media.Count, isVideo)"
+             aria-label="@($"{Post.Title} 첨부 미디어")">
+        @if (isVideo)
+        {
+            var video = media[0];
+            <div class="community-feed-media__video-frame">
+                <video controls
+                       muted
+                       playsinline
+                       loop
+                       preload="metadata"
+                       data-community-feed-video
+                       aria-label="@($"{Post.Title} 첨부 동영상")">
+                    <source src="@video.Url" type="@video.ContentType" />
+                    이 환경에서는 동영상을 재생할 수 없습니다.
+                </video>
+                <span class="community-feed-media__autoplay-hint">
+                    <MudIcon Icon="@Icons.Material.Filled.VolumeOff" Size="Size.Small" />
+                    화면 중앙에서 음소거 자동 재생
+                </span>
+            </div>
+            <a class="community-feed-media__detail-link" href="@DetailUrl">
+                글과 함께 보기
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+            </a>
+        }
+        else
+        {
+            <a class="community-feed-media__images" href="@DetailUrl">
+                @foreach (var (image, index) in media.Select((item, index) => (item, index)))
+                {
+                    <img src="@image.Url"
+                         alt="@ImageAlt(image, index)"
+                         loading="lazy"
+                         decoding="async" />
+                }
+            </a>
+        }
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityPostResponse Post { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string DetailUrl { get; set; } = string.Empty;
+
+    private string ImageAlt(Community피드MediaItem image, int index)
+        => string.IsNullOrWhiteSpace(image.OriginalFileName)
+            ? $"{Post.Title} 첨부 이미지 {index + 1}"
+            : $"{Post.Title} · {image.OriginalFileName}";
+
+    private static string MediaClass(int count, bool isVideo)
+        => isVideo
+            ? "community-feed-media community-feed-media--video"
+            : $"community-feed-media community-feed-media--images community-feed-media--count-{count}";
+}

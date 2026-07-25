@@ -14,9 +14,9 @@ namespace Ssalddel.Services.Community;
 [SsalddelCommunityV0Module(
     SsalddelCommunityV0ModuleKeys.Content,
     SsalddelModuleKind.Application,
-    "게시글 이미지 첨부의 비밀번호·개수·크기·형식 검증과 객체 저장소 업로드를 처리",
+    "게시글 미디어 첨부의 비밀번호·개수·크기·형식 검증과 객체 저장소 업로드를 처리",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
-    Boundary = "이미지 첨부만 처리하며 게시글 발행, 댓글 참여 또는 운영자 심의를 변경하지 않습니다.")]
+    Boundary = "이미지·동영상 첨부만 처리하며 게시글 발행, 댓글 참여 또는 운영자 심의를 변경하지 않습니다.")]
 public sealed class 커뮤니티게시글첨부UseCase : I커뮤니티게시글첨부UseCase
 {
     private readonly SsalddelContext _db;
@@ -40,7 +40,7 @@ public sealed class 커뮤니티게시글첨부UseCase : I커뮤니티게시글�
     {
         if (command is null || command.Length <= 0)
         {
-            return BadRequest("업로드할 이미지 파일을 선택해야 합니다.");
+            return BadRequest("업로드할 미디어 파일을 선택해야 합니다.");
         }
 
         if (string.IsNullOrWhiteSpace(command.Password))
@@ -70,17 +70,22 @@ public sealed class 커뮤니티게시글첨부UseCase : I커뮤니티게시글�
 
         if (entity.Attachments.Count >= _storageOptions.MaxAttachmentsPerPost)
         {
-            return BadRequest($"게시글당 이미지는 최대 {_storageOptions.MaxAttachmentsPerPost}개까지 업로드할 수 있습니다.");
+            return BadRequest($"게시글당 미디어는 최대 {_storageOptions.MaxAttachmentsPerPost}개까지 업로드할 수 있습니다.");
         }
 
-        if (command.Length > _storageOptions.MaxImageBytes)
+        var isVideo = command.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase);
+        var maxFileBytes = isVideo
+            ? _storageOptions.MaxVideoBytes
+            : _storageOptions.MaxImageBytes;
+        if (command.Length > maxFileBytes)
         {
-            return BadRequest($"이미지 크기는 최대 {_storageOptions.MaxImageBytes / 1024 / 1024}MB까지 허용됩니다.");
+            var mediaLabel = isVideo ? "동영상" : "이미지";
+            return BadRequest($"{mediaLabel} 크기는 최대 {maxFileBytes / 1024 / 1024}MB까지 허용됩니다.");
         }
 
         if (!_storageOptions.AllowedContentTypes.Contains(command.ContentType, StringComparer.OrdinalIgnoreCase))
         {
-            return BadRequest("허용되지 않은 이미지 형식입니다.");
+            return BadRequest("허용되지 않은 미디어 형식입니다.");
         }
 
         var folder = $"{_storageOptions.Folder.Trim().Trim('/')}/{entity.Id}";

@@ -40,6 +40,9 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<ShipperHomePageViewModel>();
         services.TryAddTransient<CommunityScheduledPostListViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();
+        services.TryAddTransient<Community전체FeedViewModel>();
+        services.TryAddTransient<CommunityMobileBoardDirectoryViewModel>();
+        services.TryAddTransient<CommunityBoardPageViewModel>();
         services.TryAddTransient<PlatformCommunityHomeShellViewModel>();
         services.TryAddTransient<PlatformCommunityBoardWorkspaceViewModel>();
         services.TryAddTransient<CommunityPostJourneyCollectionViewModel>();
@@ -88,6 +91,8 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<농수산가격비교PageViewModel>();
         services.TryAddTransient<농산물지역가격비교ViewModel>();
         services.TryAddTransient<OfficialFoodIngredientJourneyViewModel>();
+        services.TryAddTransient<지역문화특산물목록PageViewModel>();
+        services.TryAddTransient<지역문화특산물상세PageViewModel>();
         services.TryAddScoped<CommunityLedgerNodeActionService>();
         services.TryAddScoped<ICommunityLedgerNodeActionService>(provider =>
             provider.GetRequiredService<CommunityLedgerNodeActionService>());

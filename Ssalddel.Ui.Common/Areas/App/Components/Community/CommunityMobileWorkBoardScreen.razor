@@ -1,5 +1,5 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
-@inject PlatformCommunityService CommunityService
+@inherits MvvmComponentBase<CommunityMobileBoardDirectoryViewModel>
 
 <main class="community-mobile-work">
     <header class="community-mobile-work__heading">
@@ -134,7 +134,8 @@
     [Parameter]
     public string? GroupKey { get; set; }
 
-    private CommunityMobileBoardDirectoryViewModel ViewModel { get; set; } = default!;
+    [Parameter]
+    public string AppKey { get; set; } = "shipper";
 
     private bool ShowsAllGroups
         => string.IsNullOrWhiteSpace(GroupKey)
@@ -159,11 +160,15 @@
         => SelectedGroup?.Description
            ?? "관심 있는 업무를 골라 글과 진행 근거를 함께 살펴봅니다.";
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ViewModel.Configure(AppKey, initialWorkMode: true);
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        ViewModel = new CommunityMobileBoardDirectoryViewModel(
-            cancellationToken => CommunityService.GetBoardSummariesAsync("shipper", cancellationToken));
-        await ViewModel.LoadAsync();
+        await ViewModel.초기화Async();
     }
 
     private bool IsSelected(string groupKey)

@@ -42,6 +42,64 @@ public sealed class CommunityPostAttachmentUseCaseTests
     }
 
     [Fact]
+    public async Task MP4_동영상은_별도_용량한도로_검증한뒤_미디어첨부로_저장된다()
+    {
+        await using var db = CreateContext();
+        var post = CreatePost("correct-password");
+        db.PlatformCommunityPosts.Add(post);
+        await db.SaveChangesAsync();
+        var storage = new RecordingStorageService();
+        var useCase = CreateUseCase(db, storage);
+        await using var content = new MemoryStream([1, 2, 3]);
+
+        var result = await useCase.첨부업로드Async(
+            post.Id,
+            new 커뮤니티게시글첨부업로드Command(
+                "correct-password",
+                content,
+                "clip.mp4",
+                "video/mp4",
+                14 * 1024 * 1024),
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("video/mp4", result.Value.ContentType);
+        Assert.Equal(14 * 1024 * 1024, result.Value.FileSizeBytes);
+        Assert.Equal(1, storage.UploadCount);
+    }
+
+    [Theory]
+    [InlineData("image/png", 5242881, "이미지 크기는 최대 5MB")]
+    [InlineData("video/mp4", 15728641, "동영상 크기는 최대 15MB")]
+    public async Task 미디어_유형별_용량한도를_넘으면_업로드하지_않는다(
+        string contentType,
+        long length,
+        string expectedMessage)
+    {
+        await using var db = CreateContext();
+        var post = CreatePost("correct-password");
+        db.PlatformCommunityPosts.Add(post);
+        await db.SaveChangesAsync();
+        var storage = new RecordingStorageService();
+        var useCase = CreateUseCase(db, storage);
+        await using var content = new MemoryStream([1]);
+
+        var result = await useCase.첨부업로드Async(
+            post.Id,
+            new 커뮤니티게시글첨부업로드Command(
+                "correct-password",
+                content,
+                contentType.StartsWith("video/", StringComparison.Ordinal) ? "large.mp4" : "large.png",
+                contentType,
+                length),
+            CancellationToken.None);
+
+        Assert.True(result.IsFailed);
+        Assert.Contains(expectedMessage, result.Errors.Single().Message);
+        Assert.Equal(0, storage.UploadCount);
+    }
+
+    [Fact]
     public async Task 존재하지_않는_게시글과_틀린_비밀번호는_HTTP_오류_의미를_보존한다()
     {
         await using var db = CreateContext();

@@ -137,13 +137,6 @@
     text-decoration: none;
 }
 
-.community-whole-feed-card__body img {
-    aspect-ratio: 16 / 9;
-    border-radius: 16px;
-    object-fit: cover;
-    width: 100%;
-}
-
 .community-whole-feed-card__body > div {
     display: grid;
     gap: 7px;

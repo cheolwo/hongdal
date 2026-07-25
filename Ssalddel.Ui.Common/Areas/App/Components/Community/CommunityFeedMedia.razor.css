@@ -1,0 +1,103 @@
+.community-feed-media {
+    display: grid;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.community-feed-media__video-frame {
+    background: #111522;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+}
+
+.community-feed-media__video-frame video {
+    aspect-ratio: 16 / 9;
+    background: #111522;
+    display: block;
+    max-height: min(72vh, 620px);
+    object-fit: contain;
+    width: 100%;
+}
+
+.community-feed-media__autoplay-hint {
+    align-items: center;
+    backdrop-filter: blur(8px);
+    background: rgba(12, 16, 28, 0.72);
+    border-radius: 999px;
+    bottom: 10px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.68rem;
+    font-weight: 800;
+    gap: 5px;
+    left: 10px;
+    padding: 6px 9px;
+    pointer-events: none;
+    position: absolute;
+}
+
+.community-feed-media__detail-link {
+    align-items: center;
+    color: #4656c5;
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: 800;
+    gap: 4px;
+    justify-self: end;
+    text-decoration: none;
+}
+
+.community-feed-media__images {
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.community-feed-media__images img {
+    aspect-ratio: 16 / 9;
+    background: #edf0f5;
+    border-radius: 10px;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.community-feed-media--count-1 .community-feed-media__images {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.community-feed-media--count-1 .community-feed-media__images img {
+    border-radius: 16px;
+}
+
+.community-feed-media--count-3 .community-feed-media__images img:first-child {
+    grid-row: span 2;
+}
+
+@media (max-width: 520px) {
+    .community-feed-media__video-frame {
+        border-radius: 14px;
+        margin-inline: -14px;
+    }
+
+    .community-feed-media__video-frame video {
+        max-height: 68vh;
+    }
+
+    .community-feed-media__images {
+        margin-inline: -14px;
+    }
+
+    .community-feed-media--count-1 .community-feed-media__images img {
+        border-radius: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .community-feed-media__autoplay-hint {
+        display: none;
+    }
+}

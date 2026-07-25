@@ -6,6 +6,8 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-25 | [01~05 Operational API 세로 슬라이스](2026-07-25-role-app-operational-api-slices.md) | 간접 확인 — 주문자 Catalog, 화주 판매채널 동기화, 기사 알림함 읽음 상태, 창고 작업 진입·입고·피킹을 서버 원장 기본 경로로 전환 |
+| 2026-07-25 | [커뮤니티 전체 피드 미디어와 반응형 동영상 재생](2026-07-25-community-feed-media-autoplay.md) | 간접 확인 — 이미지 grid와 화면 중앙의 동영상 하나만 음소거 자동 재생하는 전체 피드, MP4·WebM 작성·저장 경계를 추가하고 관련 test 29개와 Windows MAUI build 통과 |
 | 2026-07-25 | [주문자 과일·채소 가격 탐색 흐름](2026-07-25-orderer-produce-price-journey.md) | 기존 공개 가격 비교 Route를 유지하면서 `02 Orderer`에 `가격 탐색 → 재료 선택 → 내 원함 → 함께 주문` 흐름과 `02.02A` 화면을 추가 |
 | 2026-07-25 | [USDA 미국 국내 농가가격 비교](2026-07-25-usda-us-domestic-price-comparison.md) | USDA NASS 농가 수취가격을 oz·lb·대표 1개 기준으로 환산하고 원문 단위·지역·기간·한계를 함께 표시하는 미국 가격 비교 화면 추가 |
 | 2026-07-25 | [국내 농산물 공영도매시장 경락가격 서버 모듈](2026-07-25-domestic-agricultural-auction-price-module.md) | 화면 없음 — KAMIS 조사 가격과 구분되는 공영도매시장 경매 정산가격의 비식별 live 조회·멱등 archive·전일 수집 배치 추가 |

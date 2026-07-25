@@ -202,6 +202,27 @@ public sealed class CommunityPostComposerViewModelTests
     }
 
     [Fact]
+    public void 미디어선택은_MP4와_WebM을_허용하고_동영상_용량한도를_따로_검증한다()
+    {
+        using var composer = CreateComposer(new InMemoryDraftStore());
+        composer.Configure("platform", "운영자");
+
+        composer.SetFiles(
+        [
+            new TestBrowserFile("clip.mp4", "video/mp4", 14 * 1024 * 1024),
+            new TestBrowserFile("clip.webm", "video/webm", 1024),
+            new TestBrowserFile("large.mp4", "video/mp4", 16 * 1024 * 1024)
+        ]);
+
+        Assert.Collection(
+            composer.SelectedFiles,
+            file => Assert.Equal("clip.mp4", file.Name),
+            file => Assert.Equal("clip.webm", file.Name));
+        Assert.Equal(CommunityComposerMessageKind.Warning, composer.StatusKind);
+        Assert.Contains("동영상 15MB", composer.StatusMessage);
+    }
+
+    [Fact]
     public async Task 게시글저장뒤_사진업로드만실패하면_중복게시를막도록성공경고를반환한다()
     {
         var handler = new PostThenAttachmentFailureHandler();

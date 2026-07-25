@@ -1,7 +1,7 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<CommunityBoardPageViewModel>
 @implements IAsyncDisposable
-@inject PlatformCommunityService CommunityService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @inject IDialogService DialogService
@@ -220,7 +220,6 @@
         "추천글"
     ];
     private static readonly IReadOnlyList<CommunitySeedPost> NoSeedPosts = [];
-    private CommunityBoardPageViewModel ViewModel { get; set; } = default!;
     private string? lastDataRequestKey;
     private string? normalizedFocusTarget;
     private string? pendingFocusTarget;
@@ -252,24 +251,9 @@
     private IReadOnlyList<string> ListFilters
         => ShowsPeriodicTopicFilters ? WorkBoardListFilters : GeneralListFilters;
 
-    protected override void OnInitialized()
-    {
-        ViewModel = new CommunityBoardPageViewModel(
-            cancellationToken => CommunityService.GetBoardSummariesAsync(AppKey, cancellationToken),
-            (query, cancellationToken) => CommunityService.GetBoardPostsAsync(
-                AppKey,
-                boardKey: query.BoardKey,
-                category: query.LegacyCategory,
-                workflowTag: query.WorkflowTag,
-                roleTag: query.RoleTag,
-                page: query.Page,
-                pageSize: query.PageSize,
-                periodicVisibility: query.PeriodicVisibility,
-                cancellationToken: cancellationToken));
-    }
-
     protected override async Task OnParametersSetAsync()
     {
+        ViewModel.Configure(AppKey);
         normalizedFocusTarget = PageNavigationContext.NormalizeFocusTarget(FocusTarget);
         var request = CurrentRequest();
         var periodicVisibility = CommunityPeriodicPostTopicCatalog.SupportsBoard(
@@ -368,9 +352,8 @@
 
         try
         {
-            await CommunityService.DeletePostAsync(post.Id, dialogResult.Data as string);
+            await ViewModel.DeletePostAsync(post.Id, dialogResult.Data as string);
             Snackbar.Add("게시글을 삭제했습니다.", Severity.Success);
-            await ViewModel.LoadAsync(CurrentRequest());
         }
         catch (HttpRequestException exception)
         {
@@ -482,5 +465,7 @@
                 // 앱 또는 브라우저 종료 중에는 JS 정리 실패를 무시합니다.
             }
         }
+
+        Dispose();
     }
 }

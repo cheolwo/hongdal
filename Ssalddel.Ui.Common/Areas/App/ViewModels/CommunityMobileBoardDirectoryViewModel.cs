@@ -1,6 +1,7 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Ui.Common.Areas.App.Models;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -10,17 +11,65 @@ namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
     "Figma 01 Community의 생활·업무 게시판 탐색과 실제 게시글 수 조회 상태를 관리",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "게시글 수는 중립적인 현황으로만 표시하며 추천·가입·배차·계약 판단에 사용하지 않습니다.")]
-public sealed class CommunityMobileBoardDirectoryViewModel(
-    Func<CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries)
+public sealed class CommunityMobileBoardDirectoryViewModel : PageViewModelBase
 {
     private static readonly TimeSpan LoadTimeout = TimeSpan.FromSeconds(3);
+    private readonly Func<string, CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries;
     private IReadOnlyDictionary<string, CommunityBoardSummaryResponse> boardSummaries =
         new Dictionary<string, CommunityBoardSummaryResponse>(StringComparer.OrdinalIgnoreCase);
+    private string appKey = "shipper";
+    private string searchText = string.Empty;
+    private string? statusMessage;
+    private bool hasLivePostCounts;
+    private bool workMode;
 
-    public string SearchText { get; private set; } = string.Empty;
-    public string? StatusMessage { get; private set; }
-    public bool IsLoading { get; private set; } = true;
-    public bool HasLivePostCounts { get; private set; }
+    public CommunityMobileBoardDirectoryViewModel(ICommunityPostClient communityPostClient)
+        : this((key, cancellationToken) =>
+            communityPostClient.GetBoardSummariesAsync(key, cancellationToken))
+    {
+    }
+
+    public CommunityMobileBoardDirectoryViewModel(
+        Func<CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries)
+        : this((_, cancellationToken) => loadBoardSummaries(cancellationToken))
+    {
+    }
+
+    private CommunityMobileBoardDirectoryViewModel(
+        Func<string, CancellationToken, Task<IReadOnlyList<CommunityBoardSummaryResponse>>> loadBoardSummaries)
+        => this.loadBoardSummaries = loadBoardSummaries;
+
+    public string SearchText
+    {
+        get => searchText;
+        private set
+        {
+            if (SetProperty(ref searchText, value))
+            {
+                NotifyVisibleCollectionsChanged();
+            }
+        }
+    }
+
+    public string? StatusMessage
+    {
+        get => statusMessage;
+        private set => SetProperty(ref statusMessage, value);
+    }
+
+    public bool IsLoading => 처리중;
+
+    public bool HasLivePostCounts
+    {
+        get => hasLivePostCounts;
+        private set => SetProperty(ref hasLivePostCounts, value);
+    }
+
+    public bool WorkMode
+    {
+        get => workMode;
+        private set => SetProperty(ref workMode, value);
+    }
 
     public IReadOnlyList<CommunityMobileLifeBoardPresentation> VisibleLifeBoards
         => CommunityMobileBoardPresentation.LifeBoards
@@ -48,9 +97,25 @@ public sealed class CommunityMobileBoardDirectoryViewModel(
                 board.UpdateCycle))
             .ToArray();
 
-    public async Task LoadAsync(CancellationToken cancellationToken = default)
+    public void Configure(string? key, bool initialWorkMode)
     {
-        IsLoading = true;
+        appKey = string.IsNullOrWhiteSpace(key) ? "shipper" : key.Trim();
+        WorkMode = initialWorkMode;
+    }
+
+    public Task<bool> LoadAsync(CancellationToken cancellationToken = default)
+        => 새로고침Async(cancellationToken);
+
+    public void ToggleMode()
+    {
+        WorkMode = !WorkMode;
+        UpdateSearch(string.Empty);
+    }
+
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
+    {
         StatusMessage = null;
         HasLivePostCounts = false;
 
@@ -58,7 +123,7 @@ public sealed class CommunityMobileBoardDirectoryViewModel(
         timeout.CancelAfter(LoadTimeout);
         try
         {
-            var summaries = await loadBoardSummaries(timeout.Token);
+            var summaries = await loadBoardSummaries(appKey, timeout.Token);
             boardSummaries = summaries
                 .Where(board => !string.IsNullOrWhiteSpace(board.BoardKey))
                 .GroupBy(board => board.BoardKey, StringComparer.OrdinalIgnoreCase)
@@ -80,7 +145,7 @@ public sealed class CommunityMobileBoardDirectoryViewModel(
         }
         finally
         {
-            IsLoading = false;
+            NotifyVisibleCollectionsChanged();
         }
     }
 
@@ -106,4 +171,11 @@ public sealed class CommunityMobileBoardDirectoryViewModel(
 
     private static IReadOnlyDictionary<string, CommunityBoardSummaryResponse> EmptySummaries()
         => new Dictionary<string, CommunityBoardSummaryResponse>(StringComparer.OrdinalIgnoreCase);
+
+    private void NotifyVisibleCollectionsChanged()
+    {
+        OnPropertyChanged(nameof(VisibleLifeBoards));
+        OnPropertyChanged(nameof(VisibleWorkGroups));
+        OnPropertyChanged(nameof(VisiblePublicDataBoards));
+    }
 }

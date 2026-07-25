@@ -1,5 +1,7 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
-@inject CommunityPlatformClient CommunityService
+@inherits MvvmComponentBase<Community전체FeedViewModel>
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <section class="community-whole-feed" aria-labelledby="community-whole-feed-heading">
     <header class="community-whole-feed__heading">
@@ -43,11 +45,17 @@
     }
     else
     {
-        <div class="community-whole-feed__cards" aria-label="커뮤니티 전체 글">
+        <div class="community-whole-feed__cards"
+             aria-label="커뮤니티 전체 글"
+             @ref="feedCards">
             @foreach (var post in ViewModel.Items)
             {
                 var board = CommunityBoardCatalog.Find(post.Category);
-                var image = FirstImage(post);
+                var detailUrl = CommunityPageRoutes.PostDetailFor(
+                    post.Id,
+                    boardName: board is null ? post.Category : null,
+                    boardKey: board?.Key,
+                    returnPath: CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeFeedView));
                 <article class="community-whole-feed-card" data-post-id="@post.Id">
                     <header>
                         <a class="community-whole-feed-card__board"
@@ -69,16 +77,9 @@
                         </span>
                     </header>
 
-                    <a class="community-whole-feed-card__body"
-                       href="@CommunityPageRoutes.PostDetailFor(
-                           post.Id,
-                           boardName: board is null ? post.Category : null,
-                           boardKey: board?.Key,
-                           returnPath: CommunityPageRoutes.HomeFor(CommunityPageRoutes.HomeFeedView))">
-                        @if (image is not null)
-                        {
-                            <img src="@image.Url" alt="@($"{post.Title} 첨부 이미지")" loading="lazy" />
-                        }
+                    <CommunityFeedMedia Post="@post" DetailUrl="@detailUrl" />
+
+                    <a class="community-whole-feed-card__body" href="@detailUrl">
                         <div>
                             <h2>@post.Title</h2>
                             @if (!string.IsNullOrWhiteSpace(post.Body))
@@ -151,22 +152,35 @@
     [Parameter]
     public string AppKey { get; set; } = "shipper";
 
-    private Community전체FeedViewModel ViewModel { get; set; } = default!;
+    private ElementReference feedCards;
+    private IJSObjectReference? mediaModule;
+    private IJSObjectReference? mediaObserver;
 
     protected override void OnInitialized()
     {
-        ViewModel = new Community전체FeedViewModel(
-            (page, pageSize, cancellationToken) => CommunityService.GetBoardPostsAsync(
-                AppKey,
-                page: page,
-                pageSize: pageSize,
-                periodicVisibility: CommunityPeriodicPostVisibilityModes.All,
-                cancellationToken: cancellationToken));
+        base.OnInitialized();
+        ViewModel.Configure(AppKey);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await ViewModel.LoadAsync();
+        await ViewModel.초기화Async();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (ViewModel.Items.Count == 0)
+        {
+            return;
+        }
+
+        mediaModule ??= await JS.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/Ssalddel.Ui.Common/js/community-feed-scroll.js");
+        mediaObserver ??= await mediaModule.InvokeAsync<IJSObjectReference>(
+            "observeMedia",
+            feedCards);
+        await mediaObserver.InvokeVoidAsync("refresh");
     }
 
     private async Task ReloadAsync()
@@ -178,12 +192,6 @@
     {
         await ViewModel.LoadMoreAsync();
     }
-
-    private static PlatformCommunityPostAttachmentResponse? FirstImage(
-        PlatformCommunityPostResponse post)
-        => post.Attachments.FirstOrDefault(attachment =>
-            !string.IsNullOrWhiteSpace(attachment.Url)
-            && attachment.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase));
 
     private static string ExcerptFor(PlatformCommunityPostResponse post)
     {
@@ -224,5 +232,35 @@
         }
 
         return createdAtUtc.ToLocalTime().ToString("M월 d일");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (mediaObserver is not null)
+        {
+            try
+            {
+                await mediaObserver.InvokeVoidAsync("dispose");
+                await mediaObserver.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // 앱 또는 브라우저가 닫히는 중에는 observer 정리 실패를 무시합니다.
+            }
+        }
+
+        if (mediaModule is not null)
+        {
+            try
+            {
+                await mediaModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // 앱 또는 브라우저가 닫히는 중에는 module 정리 실패를 무시합니다.
+            }
+        }
+
+        Dispose();
     }
 }
