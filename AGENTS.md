@@ -6,7 +6,7 @@
 
 1. 시스템/개발자 지침과 현재 스레드의 최신 사용자 요청을 먼저 따른다.
 2. 작업 대상 폴더에 더 가까운 `AGENTS.md`가 있으면 함께 읽고 그 범위에서는 가까운 지침을 우선한다.
-3. 별도 지시가 없으면 [1.0 공동구매 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 기본 우선순위로 삼는다.
+3. 별도 지시가 없으면 [0.0 커뮤니티·공공데이터 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 기본 우선순위로 삼는다.
 4. 문서와 코드가 다르면 실제 route, contract, test, 실행 설정을 확인하고 차이를 알린다. 추측으로 한쪽을 덮지 않는다.
 5. 과거 대화나 오래된 선호보다 현재 저장소 문서와 최신 사용자 요청을 우선한다.
 
@@ -15,6 +15,8 @@
 | 작업 경로 또는 종류 | 먼저 읽을 지침 | 핵심 기준 |
 | --- | --- | --- |
 | `Ssalddel/` server·API·Event | `Ssalddel/AGENTS.md` | HIOPS, Command/Event, metadata |
+| `Ssalddel/Controllers/Common/`, `Ssalddel.Community/`, `Ssalddel.Contracts/Common/Community/` | `Ssalddel/AGENTS.md`, `Ssalddel.Community/AGENTS.md` | Common에 포함되는 커뮤니티 API·contract·규칙 경계 |
+| `Ssalddel/Controllers/Platform/` | `Ssalddel/Controllers/Platform/AGENTS.md` | 업무 공통과 구분되는 플랫폼 기술 API |
 | `Ssalddel.Ui.Common/` 공통 UI | `Ssalddel.Ui.Common/AGENTS.md` | 3단계 navigation, MVVM, render 검증 |
 | `Ssalddel.Tests/` test | `Ssalddel.Tests/AGENTS.md` | filter 우선, 영향 project build |
 | `docs/` 문서·변경 기록 | `docs/AGENTS.md` | 기준 문서 단일화, link·diff 검증 |
@@ -33,7 +35,7 @@
 ## 제품과 운영 경계
 
 - Ssalddel의 중심은 **정보 공개형 커뮤니티**다. 대화와 모집이 공동 원장·다이어그램으로 이어지고 업무 도구는 그 위에 붙는다.
-- `0.0`은 커뮤니티·공공데이터 기반, 기본 개발 집중 범위는 `1.0` 공동구매·주문자 집단화다. `1.5` 이후 자산은 보존하되 명시적 요청 없이 운영 노출이나 외부 효과를 켜지 않는다.
+- 현재 개발과 기본 배포의 집중 범위는 `0.0` 커뮤니티·공공데이터 기반이다. `0.5` 개별주문과 `1.0` 공동주문 이후 자산은 보존하되 명시적 요청이나 전용 검증 profile 없이 기본 노출·외부 효과·신규 확장을 켜지 않는다.
 - 유상 화물 추천, 자동 배차, 계약 중개, 운임 수취, 보관, 정산은 허가·제휴·법률·운영 준비 전 기본 비활성이다.
 - 실행 효과는 `SsalddelExecution:Mode`의 `Simulation`과 `Operational` 경계로만 통제한다. 별도 실행 모드를 화면이나 API마다 만들지 않는다.
 - 개발 검증은 sample data, FakePG, 모의 흐름을 사용한다. 운영 저장이나 API 실패를 sample fallback으로 숨기지 않는다.
@@ -55,12 +57,20 @@
 - 영속 상태는 API/UseCase/Command가 권한과 현재 상태를 검증한 뒤 변경한다. engine은 후보·점수·분류를 반환할 뿐 확정하지 않는다.
 - MongoDB 원장은 유연한 업무 원본, RDB는 권한·조회·정산·보고·안정 투영을 맡는다.
 - Event/Outbox 동기화는 재처리 가능하고 멱등해야 하며 순환 발행을 막는다.
-- 여러 앱이 쓰는 contract는 `Ssalddel.Contracts`, 공통 UI와 workflow는 `Ssalddel.Ui.Common`에 둔다.
+- 여러 앱이 같은 업무 의미로 쓰는 contract는 `Ssalddel.Contracts`, 공통 업무 UI와 workflow는 `Ssalddel.Ui.Common`에 둔다.
+- `Common`은 기술 재사용 집합이 아니라 01~05가 함께 수행하는 업무 경계다. 커뮤니티 탐색, 참여, 공동 원장, 인연, 상품과 신뢰 환류처럼 여러 역할이 같은 업무 의미로 사용하는 API·contract·UI를 포함한다.
+- version·Feature bootstrap, push installation, file transport, 외부 callback처럼 업무 의미 없이 실행 환경을 지원하는 API는 `Controllers/Platform`에 둔다. 여러 앱이 호출한다는 사실만으로 `Common`에 넣지 않는다.
+- 커뮤니티 공개 API는 `Ssalddel/Controllers/Common`, 공유 contract는 `Ssalddel.Contracts/Common/Community`, 저장소와 무관한 커뮤니티 규칙은 `Ssalddel.Community`에 둔다. 물리 project는 의존성 경계를 위해 유지한다.
 - 새 Controller, DTO, Entity, abstraction보다 기존 route, UseCase, metadata, contract, value object, shared component를 먼저 재사용한다.
-- 기술 용어(`API`, `DTO`, `Command`, `Event`, `Handler`, `UseCase`, `Outbox`, `Service`)는 영어, 업무 도메인 용어는 한국어로 쓴다.
 - 개인정보 암복호화는 domain property가 아니라 persistence/infrastructure 경계에서 처리한다.
 
 세부 층위는 [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md), Event 경계는 [Command/Event 리팩토링 원칙](docs/Architecture/CommandEvent리팩토링원칙.md)을 따른다.
+
+## 코드 명명 언어
+
+- 모든 코드에서 기술 역할은 영어, 업무·도메인 의미는 한국어로 쓴다. `국내공동구매협의Controller`, `생산자후보검색`, `_공공데이터조회UseCase`처럼 `한국어 업무명 + 영어 기술 역할`로 조합한다.
+- 상세 용어표, 적용 대상, 외부 표준 예외와 기존 contract 호환 규칙의 단일 기준은 [코드 탐색 메타데이터의 코드 명명 언어](docs/Architecture/SsalddelCodeMetadata.md#코드-명명-언어)다.
+- 새 코드와 수정하는 코드에 기준을 적용하되, 기존 이름의 광범위한 변경은 기능 단위로 나누고 공개 API·직렬화·Event·metadata·저장 데이터의 호환성을 검증한다.
 
 ## 구현 단위
 
@@ -79,7 +89,7 @@
 | --- | --- | --- |
 | 수정 직후 | `powershell -NoProfile -ExecutionPolicy Bypass -File eng/validate-changes.ps1 -Level Fast` | 직접 영향 project와 발견된 관련 test |
 | 작업 완료 전 | 같은 명령의 `-Level Task` | 관련 version slice와 targeted/full fallback test |
-| release 또는 명시 요청 | 같은 명령의 `-Level Release` | `0.0`, `1.0`, `1.5` build와 전체 test |
+| release 또는 명시 요청 | 같은 명령의 `-Level Release` | `0.0`, `0.5`, `1.0`, `1.5` build와 전체 test |
 | 문서·지침만 변경 | 같은 script의 `Fast` | `git diff --check`, build/test 생략 |
 
 - 작업 트리에 다른 스레드 변경이 섞여 있으면 `-Paths <이번 작업 파일들>`로 검증 범위를 명시한다.
@@ -101,7 +111,7 @@
 ## 우선 참고 문서
 
 1. [README](README.md)
-2. [1.0 공동구매 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)
+2. [0.0 커뮤니티·공공데이터 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)
 3. [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md)
 4. [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md)
 5. [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md)

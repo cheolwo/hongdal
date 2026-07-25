@@ -5,9 +5,10 @@
 ## 구조와 재사용
 
 - 새 공용 흐름은 우선 `SsalddelApp`과 `Ssalddel.Ui.Common`에 통합하고, 기존 전문 앱은 명시적 요청 없이 삭제하거나 축소하지 않는다.
+- `Ui.Common`에는 여러 역할 앱이 같은 의미로 수행하는 커뮤니티, 공동 원장, 관계와 업무 workflow를 둔다. 단순 기술 재사용만으로 공통 업무로 분류하지 않는다.
 - 공통 셸은 커뮤니티, 업무, 다이어그램, 정보 흐름을 연결하며 기본 navigation은 `사방괘 -> 다이어그램 -> 구체 데이터 페이지`다.
 - MAUI Blazor는 View, ViewModel, navigation 책임을 나누고 기존 MVVM CommunityToolkit 패턴을 따른다.
-- shared component와 workflow를 먼저 재사용하고 platform 기능만 adapter로 분리한다.
+- shared 업무 component와 workflow를 먼저 재사용하고 rendering·device·storage 같은 platform 기능은 adapter로 분리한다.
 
 ## 사용자 경험과 검증
 

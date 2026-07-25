@@ -10,6 +10,15 @@
 - 새 Controller나 DTO보다 기존 route, UseCase, metadata, contract를 먼저 재사용한다.
 - 하나의 EventHandler는 하나의 후속 관심사만 맡긴다. 원본과 반드시 함께 성공해야 하는 일은 같은 transaction, 재시도 가능한 알림·투영·감사·추천은 분리한다.
 
+## Common과 커뮤니티
+
+- `Controllers/Common`은 여러 역할 앱이 같은 의미로 수행하는 공동 업무 API다. 기술적으로 재사용된다는 이유만으로 배치하지 않는다.
+- 커뮤니티 탐색, 참여, 공동 원장, 인연, 상품과 업무 신뢰 환류처럼 역할을 넘어 이어지는 업무를 포함한다.
+- 공개 커뮤니티 Controller는 `Ssalddel.Controllers.Common` 경계에 두고 `SsalddelCommunityV0Module`, API 업무 분류와 기존 route contract를 유지한다.
+- 공유 DTO와 catalog는 `Ssalddel.Contracts/Common/Community`, DB·UI와 무관한 판정·정책은 `Ssalddel.Community`, 영속 workflow는 `Services/Community`의 UseCase에 둔다.
+- Admin의 커뮤니티 작성·운영 기능은 권한과 운영 책임이 다르므로 `Controllers/Admin`에 유지하고 Common 공개 API와 합치지 않는다.
+- version·Feature bootstrap, push installation, file transport, 외부 callback과 localization bootstrap은 `Controllers/Platform`에 둔다.
+
 ## 영속성과 외부 경계
 
 - MongoDB 원장은 원장 블록·다이어그램·표시 옵션의 업무 원본이고, RDB는 권한·조회·정산·보고·안정 투영을 맡는다.
