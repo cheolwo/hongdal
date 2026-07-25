@@ -168,6 +168,21 @@ public static partial class ServiceCollectionExtensions
     {
         var timeZone = AgriculturalFisheriesBatchSchedule.ResolveTimeZone(options.TimeZoneId);
 
+        if (options.DomesticAuctionDailyEnabled)
+        {
+            var jobKey = new JobKey("DomesticAuctionDailyPriceCollection");
+            quartz.AddJob<DomesticAuctionDailyPriceCollectionJob>(job =>
+                job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("DomesticAuctionDailyPriceCollection-trigger")
+                .WithCronSchedule(
+                    options.DomesticAuctionDailyCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
         if (등록계획.Quartz등록여부(
                 공동구매수요모집Os배치작업코드.Kamis일별가격수집))
         {

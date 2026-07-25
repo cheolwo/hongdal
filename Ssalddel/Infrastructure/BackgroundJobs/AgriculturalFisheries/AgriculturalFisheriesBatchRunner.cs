@@ -7,6 +7,7 @@ namespace Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 public sealed class AgriculturalFisheriesBatchRunner
 {
     private readonly IKamisPriceArchiveService _kamisArchiveService;
+    private readonly I국내농산물경락가격ArchiveService? _domesticAuctionArchiveService;
     private readonly IUsdaNassPriceArchiveService _usdaArchiveService;
     private readonly AgriculturalFisheriesBatchOptions _options;
     private readonly TimeProvider _timeProvider;
@@ -17,9 +18,11 @@ public sealed class AgriculturalFisheriesBatchRunner
         IUsdaNassPriceArchiveService usdaArchiveService,
         IOptions<AgriculturalFisheriesBatchOptions> options,
         TimeProvider timeProvider,
-        ILogger<AgriculturalFisheriesBatchRunner> logger)
+        ILogger<AgriculturalFisheriesBatchRunner> logger,
+        I국내농산물경락가격ArchiveService? domesticAuctionArchiveService = null)
     {
         _kamisArchiveService = kamisArchiveService;
+        _domesticAuctionArchiveService = domesticAuctionArchiveService;
         _usdaArchiveService = usdaArchiveService;
         _options = options.Value;
         _timeProvider = timeProvider;
@@ -98,5 +101,33 @@ public sealed class AgriculturalFisheriesBatchRunner
             result.ExistingCount,
             result.MappingCount,
             result.LatestSourceLoadTimeUtc);
+    }
+
+    public async Task RunDomesticAuctionDailyAsync(
+        CancellationToken cancellationToken)
+    {
+        var localDate = AgriculturalFisheriesBatchSchedule.GetLocalDate(
+            _timeProvider,
+            _options.TimeZoneId);
+        var targetDate = AgriculturalFisheriesBatchSchedule
+            .GetDomesticAuctionDailyTargetDate(localDate, _options);
+        var archiveService = _domesticAuctionArchiveService
+            ?? throw new InvalidOperationException(
+                "국내 경락가격 Archive service가 등록되지 않았습니다.");
+        var result = await archiveService.CollectAsync(
+            targetDate,
+            cancellationToken);
+
+        _logger.LogInformation(
+            "Action={Action} TargetDate={TargetDate} RunId={RunId} Fetched={Fetched} Inserted={Inserted} Updated={Updated} Existing={Existing} Pages={Pages} Truncated={Truncated}",
+            "DomesticAuctionDailyPricesCollected",
+            targetDate,
+            result.CollectionRunId,
+            result.FetchedCount,
+            result.InsertedCount,
+            result.UpdatedCount,
+            result.ExistingCount,
+            result.CompletedPages,
+            result.IsTruncated);
     }
 }

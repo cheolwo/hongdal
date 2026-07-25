@@ -82,6 +82,32 @@ public sealed class UsdaMonthlyPriceCollectionJob : IJob
             _logger);
 }
 
+[DisallowConcurrentExecution]
+public sealed class DomesticAuctionDailyPriceCollectionJob : IJob
+{
+    private readonly AgriculturalFisheriesBatchRunner _runner;
+    private readonly AgriculturalFisheriesBatchOptions _options;
+    private readonly ILogger<DomesticAuctionDailyPriceCollectionJob> _logger;
+
+    public DomesticAuctionDailyPriceCollectionJob(
+        AgriculturalFisheriesBatchRunner runner,
+        IOptions<AgriculturalFisheriesBatchOptions> options,
+        ILogger<DomesticAuctionDailyPriceCollectionJob> logger)
+    {
+        _runner = runner;
+        _options = options.Value;
+        _logger = logger;
+    }
+
+    public Task Execute(IJobExecutionContext context)
+        => AgriculturalFisheriesBatchJobExecution.RunAsync(
+            "DomesticAuctionDailyPriceCollection",
+            _runner.RunDomesticAuctionDailyAsync,
+            context,
+            _options,
+            _logger);
+}
+
 internal static class AgriculturalFisheriesBatchJobExecution
 {
     internal static async Task RunAsync(

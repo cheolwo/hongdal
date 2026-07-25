@@ -24,6 +24,16 @@ public sealed class AgriculturalFisheriesBatchOptions
 
     public int KamisMonthlyLookbackMonths { get; set; } = 12;
 
+    public bool DomesticAuctionDailyEnabled { get; set; } = true;
+
+    public string DomesticAuctionDailyCronExpression { get; set; } = "0 15 7 * * ?";
+
+    public int DomesticAuctionDailyDaysBehind { get; set; } = 1;
+
+    public int DomesticAuctionPageSize { get; set; } = 1000;
+
+    public int DomesticAuctionMaxPagesPerRun { get; set; } = 100;
+
     public bool UsdaMonthlyEnabled { get; set; } = true;
 
     public string UsdaMonthlyCronExpression { get; set; } = "0 30 7 10 * ?";

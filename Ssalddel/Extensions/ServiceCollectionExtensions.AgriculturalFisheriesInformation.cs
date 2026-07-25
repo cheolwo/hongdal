@@ -23,6 +23,22 @@ public static partial class ServiceCollectionExtensions
                 client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
             });
         services
+            .AddHttpClient<Mafra공영도매시장경락가격공급자>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(
+                        options.DomesticAgriculturalAuctionPrices.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                        "Ssalddel-Domestic-Auction-Price-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<I국내농산물경락가격공급자>(serviceProvider =>
+            serviceProvider.GetRequiredService<Mafra공영도매시장경락가격공급자>());
+        services.AddScoped<I국내농산물경락가격조회Service,
+            국내농산물경락가격조회Service>();
+        services
             .AddHttpClient<UsdaNassQuickStats가격공급자>(
                 (serviceProvider, client) =>
                 {

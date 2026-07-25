@@ -29,6 +29,12 @@ internal static class AgriculturalFisheriesBatchSchedule
         return (startDate, completedMonthEnd);
     }
 
+    internal static DateOnly GetDomesticAuctionDailyTargetDate(
+        DateOnly localDate,
+        AgriculturalFisheriesBatchOptions options)
+        => localDate.AddDays(
+            -Math.Clamp(options.DomesticAuctionDailyDaysBehind, 1, 31));
+
     internal static int GetUsdaYearFrom(
         DateOnly localDate,
         AgriculturalFisheriesBatchOptions options)

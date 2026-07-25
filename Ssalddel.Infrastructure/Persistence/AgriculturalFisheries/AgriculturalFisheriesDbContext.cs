@@ -21,6 +21,12 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
 
     public DbSet<KamisPriceObservation> KamisPriceObservations => Set<KamisPriceObservation>();
 
+    public DbSet<국내농산물경락가격수집Run> DomesticAuctionPriceCollectionRuns =>
+        Set<국내농산물경락가격수집Run>();
+
+    public DbSet<국내농산물경락가격관측> DomesticAuctionPriceObservations =>
+        Set<국내농산물경락가격관측>();
+
     public DbSet<OfficialFoodRecipeSource> OfficialFoodRecipeSources => Set<OfficialFoodRecipeSource>();
 
     public DbSet<OfficialFoodDish> OfficialFoodDishes => Set<OfficialFoodDish>();
@@ -65,6 +71,8 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new HsUsdaCommodityMappingConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceObservationConfiguration());
+        modelBuilder.ApplyConfiguration(new 국내농산물경락가격수집RunConfiguration());
+        modelBuilder.ApplyConfiguration(new 국내농산물경락가격관측Configuration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeSourceConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodDishConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeVariantConfiguration());

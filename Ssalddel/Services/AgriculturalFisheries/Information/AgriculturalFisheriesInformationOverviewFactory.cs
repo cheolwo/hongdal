@@ -12,6 +12,15 @@ internal static class AgriculturalFisheriesInformationOverviewFactory
         var dataGoKrConfigured = !string.IsNullOrWhiteSpace(options.DataGoKrServiceKey)
             || !string.IsNullOrWhiteSpace(options.ServiceKey);
         var atConfigured = dataGoKrConfigured || !string.IsNullOrWhiteSpace(options.AtFoodPrices.ServiceKey);
+        var domesticAuctionOptions = options.DomesticAgriculturalAuctionPrices;
+        var domesticAuctionConfigured =
+            !string.IsNullOrWhiteSpace(domesticAuctionOptions.ApiKey)
+            && Uri.TryCreate(
+                domesticAuctionOptions.BaseUrl,
+                UriKind.Absolute,
+                out var domesticAuctionBaseUri)
+            && (domesticAuctionBaseUri.Scheme == Uri.UriSchemeHttps
+                || domesticAuctionOptions.AllowInsecureHttp);
         var customsConfigured = dataGoKrConfigured
             || !string.IsNullOrWhiteSpace(options.CustomsTradeStatistics.ServiceKey);
         var nassConfigured = !string.IsNullOrWhiteSpace(options.UsdaNassQuickStats.ApiKey);
@@ -36,6 +45,15 @@ internal static class AgriculturalFisheriesInformationOverviewFactory
                     atConfigured,
                     "https://www.data.go.kr/data/15156057/openapi.do",
                     "가격은 kg 기준으로 정규화하며 품질·등급·포장 차이를 함께 안내합니다."),
+                Source(
+                    국내농산물경락가격출처Keys.MafraWholesaleMarketSettlement,
+                    "농림축산식품부",
+                    "전국 공영도매시장 경매원천 정산가격",
+                    "정산일자·시장·법인·품목·품종·단위중량·등급·물량·경락단가",
+                    "일간 원천자료",
+                    domesticAuctionConfigured,
+                    options.DomesticAgriculturalAuctionPrices.DocumentationUrl,
+                    "경락·정산 단계의 원/거래단위 가격이며 KAMIS 중도매·소매 조사값과 분리합니다. 출하자·생산자 식별정보는 저장하지 않습니다."),
                 Source(
                     "customs-hs-country-import-statistics",
                     "관세청",
@@ -68,6 +86,11 @@ internal static class AgriculturalFisheriesInformationOverviewFactory
                     "국내 가격 정보",
                     "기준일 주변의 aT 중도매·소매 가격과 최신 조사일을 제공합니다.",
                     "GET /api/v1/agricultural-fisheries/items/{hsCode}/domestic-price"),
+                Capability(
+                    "DomesticAuctionPriceInformation",
+                    "국내 경락가격 정보",
+                    "공영도매시장 경락·정산가격을 시장·법인·거래단위·등급과 함께 조회합니다.",
+                    "GET /api/v1/agricultural-fisheries/domestic-auction-prices"),
                 Capability(
                     "ImportPriceContext",
                     "수입 통계 비교",
@@ -114,6 +137,7 @@ internal static class AgriculturalFisheriesInformationOverviewFactory
                 "미국 NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결 검증",
                 "축산물 등급·도매 유통가격과 aT 가격의 역할 구분",
                 "소비자 체감가격·온라인 가격의 조사 기준과 수집 허용 범위 정리",
+                "경락가격의 단위코드·포장코드·크기코드·등급코드 명칭표와 kg 환산 가능 여부를 검토",
                 "지역·시장·품질·등급·포장단위별 시계열 품질지표 축적"
             ],
             BrokerageReadinessRequirements =

@@ -24,6 +24,9 @@ public sealed class PublicDataOptions
 
     public AtFoodPricesOptions AtFoodPrices { get; set; } = new();
 
+    public DomesticAgriculturalAuctionPricesOptions DomesticAgriculturalAuctionPrices { get; set; } =
+        new();
+
     public KamisOptions Kamis { get; set; } = new();
 
     public UsdaNassQuickStatsOptions UsdaNassQuickStats { get; set; } = new();
@@ -116,6 +119,22 @@ public sealed class AtFoodPricesOptions
     public string DailyPricePath { get; set; } = "/B552845/perDay/price";
 
     public decimal DefaultSimulationFxRateKrwPerUsd { get; set; } = 1350m;
+}
+
+public sealed class DomesticAgriculturalAuctionPricesOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "http://211.237.50.150:7080";
+
+    public bool AllowInsecureHttp { get; set; }
+
+    public string DatasetName { get; set; } = "Grid_20240625000000000655_1";
+
+    public int MaxPageSize { get; set; } = 1000;
+
+    public string DocumentationUrl { get; set; } =
+        "https://data.mafra.go.kr/opendata/data/indexOpenDataDetail.do?data_id=20240625000000002462";
 }
 
 public sealed class KamisOptions
