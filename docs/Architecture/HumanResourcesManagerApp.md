@@ -41,7 +41,7 @@
 
 - HR 업무는 서버에 이미 있는 역할/근무 시간/IP 검증 흐름과 연결될 예정이다.
 - 초기 앱은 실제 API 전체 연결보다 인력 관리자 전용 업무 콘솔과 커뮤니티 흐름을 먼저 잡는다.
-- 이후 `HrRolesController`, `HrEmploymentContractsController` API를 순차 연결한다.
+- 이후 `인사역할Controller`, `고용계약Controller` API를 순차 연결한다.
 
 ## 다음 작업
 

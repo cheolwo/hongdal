@@ -2,7 +2,7 @@
 
 작성일: 2026-07-10
 
-이 문서는 음식점 일반 음식 배달, RestaurantDeskApp, FDriverApp, FoodDeliveryDispatchEngine에 대한 요금과 정산 논의를 보류 메모로 남긴다. 현재 릴리즈 집중 대상은 1.5 공급·가격·무역 준비이므로, 아래 내용은 바로 운영 정책이나 코드 상수로 고정하지 않는다.
+이 문서는 음식점 일반 음식 배달, RestaurantDeskApp, FDriverApp, FoodDeliveryDispatchEngine에 대한 요금과 정산 논의를 보류 메모로 남긴다. 현재 릴리즈 집중 대상은 0.0 커뮤니티·공공데이터 기반이므로, 아래 내용은 바로 운영 정책이나 코드 상수로 고정하지 않는다.
 
 ## 현재 판단
 

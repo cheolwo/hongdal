@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | `CommunityTrustWorkflow` | `0.0` | `true` | 커뮤니티, 참여 동의, 공동 원장과 신뢰 기록 |
 | `GroupPurchaseDemandWorkflow` | `1.0` | `false` | 비구속 수요, 주문자 집단화와 공동구매 모집 원장 |
-| `GroupPurchasePracticeWorkflow` | `1.0` | `true` | 저장 없는 가상 이웃 공동구매 연습과 실제 수요 전환 안내 |
+| `GroupPurchasePracticeWorkflow` | `1.0` | `false` | 저장 없는 가상 이웃 공동구매 연습과 실제 수요 전환 안내 |
 | `CustomsAndTradeDataWorkflow` | `1.5` | `false` | 공급·가격·HS·HTS·통관 참고 자료와 무역 준비 |
 | `DomesticTransportWorkflow` | `2.0` | `false` | 화주 운송 의뢰, 기사 인계, 배차·증빙·정산 준비 |
 | `WarehouseFulfillmentWorkflow` | `2.5` | `false` | 입고, 재고, 피킹, 포장과 출고 |
@@ -17,7 +17,9 @@
 | `FoodDeliveryWorkflow` | `3.0` | `false` | 음식점 주문, 조리, 픽업과 배송 |
 | `SsalddelMartWorkflow` | `3.5` | `false` | 마트 재고, 피킹, 포장과 도심 즉시배송 |
 
-현재 개발 환경은 `GroupPurchasePracticeWorkflow=true`, `GroupPurchaseDemandWorkflow=true`, `CustomsAndTradeDataWorkflow=true`로 연습부터 `1.0 → 1.5` 준비 흐름까지 검증할 수 있습니다. 운영 환경에서는 저장 없는 연습만 독립적으로 열 수 있고, 별도 승인 전 실수요와 무역 준비 두 값은 `false`로 유지합니다.
+`0.5` 제품 단계는 catalog와 API·page metadata에는 등록됐지만 독립 Feature flag는 아직 release gate입니다. 현재 개별 원함 저장 API는 호환상 `GroupPurchaseDemandWorkflow` 안에 있으므로 이 플래그를 켜면 0.5와 1.0 코드가 함께 열릴 수 있습니다. 0.5 독립 배포 전에는 `IndividualOrderWorkflow` 경계를 추가하고 개별 원장 Command를 1.0 집단화 Command와 분리해야 합니다.
+
+현재 기본 개발·배포 환경은 `CommunityTrustWorkflow=true`만 열고 `GroupPurchasePracticeWorkflow`, `GroupPurchaseDemandWorkflow`, `CustomsAndTradeDataWorkflow`를 모두 `false`로 유지합니다. 0.5·1.0·1.5 검증은 해당 version slice와 명시적 test profile에서만 기능을 켭니다.
 
 ## 운영 예시
 
@@ -25,7 +27,7 @@
 {
   "VersionFeatureFlags": {
     "CommunityTrustWorkflow": true,
-    "GroupPurchasePracticeWorkflow": true,
+    "GroupPurchasePracticeWorkflow": false,
     "GroupPurchaseDemandWorkflow": false,
     "GroupPurchaseImportWorkflow": false,
     "CustomsAndTradeDataWorkflow": false,
@@ -42,10 +44,11 @@
 ## 활성화 순서
 
 1. `CommunityTrustWorkflow`로 공개 탐색, 동의와 원장 기반을 유지합니다.
-2. `GroupPurchaseDemandWorkflow`로 결제 없는 수요 수집과 서버 집단화를 검증합니다.
-3. `CustomsAndTradeDataWorkflow`로 공급자·견적·HS·HTS와 수입 준비 자료를 연결합니다.
-4. 운송 책임과 허가 경계가 준비된 환경에서만 `DomesticTransportWorkflow`를 검증합니다.
-5. 실제 입고·재고·판매 이행이 필요할 때 `WarehouseFulfillmentWorkflow`와 `SalesChannelFulfillmentWorkflow`를 검증합니다.
+2. 0.5 전용 경계가 완성되기 전에는 `GroupPurchaseDemandWorkflow`를 제한된 Simulation profile에서만 사용해 개별 원장과 집단화의 분리 여부를 함께 검증합니다.
+3. 0.5 개별 원장을 독립 활성화한 뒤 공동 참여에 동의한 원장에만 1.0 집단화를 적용합니다.
+4. `CustomsAndTradeDataWorkflow`로 공급자·견적·HS·HTS와 수입 준비 자료를 연결합니다.
+5. 운송 책임과 허가 경계가 준비된 환경에서만 `DomesticTransportWorkflow`를 검증합니다.
+6. 실제 입고·재고·판매 이행이 필요할 때 `WarehouseFulfillmentWorkflow`와 `SalesChannelFulfillmentWorkflow`를 검증합니다.
 
 각 단계는 독립적으로 끌 수 있어야 합니다. `CustomsAndTradeDataWorkflow`는 단독으로 켜도 활성화되지 않고 `CommunityTrustWorkflow`와 `GroupPurchaseDemandWorkflow`가 함께 켜져야 합니다. 국내 생산자 공동구매는 통관 기능 없이 `1.0`만으로 검증할 수 있고, 기존 화주의 운송 테스트 자산은 별도 제한 환경에서 보존할 수 있습니다.
 

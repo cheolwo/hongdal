@@ -15,7 +15,7 @@
 | --- | --- |
 | DTO | `Ssalddel.Contracts/Common/Hr/SocialInsuranceFilingDtos.cs` |
 | 서비스 | `Ssalddel/Services/HumanResources/SocialInsuranceFilingService.cs` |
-| 관리자 API | `Ssalddel/Controllers/Admin/HumanResources/SocialInsuranceFilingsController.cs` |
+| 관리자 API | `Ssalddel/Controllers/Admin/HumanResources/사회보험신고Controller.cs` |
 | 테스트 | `Ssalddel.Tests/Services/HumanResources/SocialInsuranceFilingServiceTests.cs` |
 
 ## API

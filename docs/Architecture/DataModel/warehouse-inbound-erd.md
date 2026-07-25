@@ -81,7 +81,7 @@ serializable transaction에서 함께 처리한다.
 입고요청 Entity·index
 └─ WarehouseOperationService
    └─ 창고작업UseCase
-      └─ WarehouseOperationsController
+      └─ 창고작업Controller
          └─ I입출고작업Service
             └─ 입고상품수령PageViewModel
                ├─ 입고상품수령창고ViewModel
@@ -101,7 +101,7 @@ PageViewModel은 공통 `PageViewModelBase`의 `대기 → 불러오는중 → �
 입고상품·재고이력·재고이동 Entity와 index
 └─ WarehouseOperationService
    └─ 창고작업UseCase
-      └─ WarehouseOperationsController
+      └─ 창고작업Controller
          └─ I입고검수페이지Service
             ├─ 입고검수대상목록ViewModel
             │  └─ InboundInspectionListScreen

@@ -4,7 +4,7 @@
 
 문화교통 0.0은 운송 배차나 특정 물류 업무보다 먼저 **음식·재료의 문화와 공개 근거를 살피고, 사람들이 모여 대화하며, 필요한 일을 공동 원장과 다이어그램으로 정리하고, 참여자가 직접 합의한 업무를 기록하는 커뮤니티 기반**을 만듭니다.
 
-문화교통 1.0 공동구매·주문자 집단화와 문화교통 1.5 공급·가격·무역 준비는 이 기반 위에 올라갑니다. 국내 화물/용달 실행은 살뜰 2.0, 창고·판매 이행은 살뜰 2.5 이후 범위입니다. 따라서 커뮤니티는 후속 기능의 보조 레이어가 아니라 모든 공동행동이 의존하는 선행 제품입니다.
+문화교통 0.5 개별주문, 문화교통 1.0 공동주문·주문자 집단화와 문화교통 1.5 공급·가격·무역 준비는 이 기반 위에 올라갑니다. 국내 화물/용달 실행은 살뜰 2.0, 창고·판매 이행은 살뜰 2.5 이후 범위입니다. 따라서 커뮤니티는 후속 기능의 보조 레이어가 아니라 모든 공동행동이 의존하는 선행 제품입니다.
 
 제품 흐름은 다음 순서를 따릅니다.
 
@@ -17,6 +17,26 @@ flowchart LR
 ```
 
 운송, 창고, 공동주문, 음식 주문 같은 업무 흐름은 커뮤니티에서 생긴 필요를 구조화하는 도구입니다. 특정 업무 하나가 살뜰 전체의 정체성이 되지 않습니다.
+
+## Common과 Community 코드 경계
+
+`Common`은 기술 helper의 집합이 아니라 여러 역할 앱이 같은 의미로 수행하는 **공동 업무 경계**입니다. 01 Community에서 시작해 02~05 업무 앱이 함께 사용하는 정보 탐색, 게시글·대화·참여, 공동 원장, 친구 요청·수락과 업무 신뢰 환류를 `Common` 제품 범위에 포함합니다.
+
+반대로 version·Feature bootstrap, push installation, file transport, 외부 callback처럼 사용자의 공동 업무가 아닌 실행 지원 API는 여러 앱이 호출하더라도 `Platform` 경계에 둡니다. 재사용 횟수가 아니라 사용자가 공유하는 업무 의미로 `Common` 여부를 판단합니다.
+
+다만 모든 코드를 하나의 project로 합치지는 않습니다. 역할과 의존 방향은 다음처럼 유지합니다.
+
+| 위치 | 책임 |
+| --- | --- |
+| `Ssalddel/Controllers/Common` | 01~05가 함께 호출하는 공개 커뮤니티 API와 HTTP 경계 |
+| `Ssalddel/Controllers/Platform` | version·Feature, push, file transport, 외부 연동 등 플랫폼 기술 API |
+| `Ssalddel.Contracts/Common/Community` | 여러 앱과 server가 공유하는 DTO, route, catalog |
+| `Ssalddel.Ui.Common` | 앱들이 재사용하는 커뮤니티 화면, navigation과 workflow |
+| `Ssalddel.Community` | DB·UI와 무관한 커뮤니티 판정, 정책과 application module |
+| `Ssalddel/Services/Community` | 권한 검사, 저장, 상태 전이, Event 발행을 수행하는 UseCase |
+| `Ssalddel/Controllers/Admin` | 커뮤니티 작성·운영·심의처럼 관리자 권한이 필요한 API |
+
+호출 방향은 `01~05 화면 -> Common 커뮤니티 Controller API -> UseCase -> 커뮤니티 규칙/Domain -> DB·Event·Outbox`입니다. 따라서 `Ssalddel.Community`라는 별도 project는 Common에서 빠진 별도 제품이 아니라, Common 커뮤니티 기능의 의존성 경계를 지키는 내부 module입니다.
 
 ## 개발 철학
 

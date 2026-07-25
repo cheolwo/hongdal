@@ -5,6 +5,7 @@
 ## 독립 실행
 
 - [ ] `CommunityTrustWorkflow=true`에서 커뮤니티 홈과 API가 정상 동작함
+- [ ] `GroupPurchasePracticeWorkflow=false`, `GroupPurchaseDemandWorkflow=false`, `CustomsAndTradeDataWorkflow=false`에서도 0.0 핵심 흐름이 동작함
 - [ ] `DomesticTransportWorkflow=false`, `CargoYongdalV1=false`에서도 0.0 핵심 흐름이 동작함
 - [ ] 운송·창고·통관·음식·마트 실행 화면이 0.0 기본 사용자에게 노출되지 않음
 

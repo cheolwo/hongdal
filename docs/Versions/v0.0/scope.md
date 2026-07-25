@@ -15,4 +15,4 @@
 | 국내 화물/용달 실행 | 보류 | `SsalddelApp`, `DriverApp`, 운송 서버 | 문화교통 다음 단계인 2.0에서 다룸 |
 | 실제 결제·정산·주선 | 보류 | 결제·배차·정산 서비스 | 허가·제휴·법률·운영 준비 후 별도 판단 |
 
-`CommunityTrustWorkflow=true`, `DomesticTransportWorkflow=false`, `CargoYongdalV1=false`가 0.0의 기준 실행 구성입니다.
+`CommunityTrustWorkflow=true`이며 `GroupPurchasePracticeWorkflow`, `GroupPurchaseDemandWorkflow`, `CustomsAndTradeDataWorkflow`, 운송·창고·판매·음식·마트 Feature가 모두 `false`인 상태가 0.0의 기준 실행 구성입니다.

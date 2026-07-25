@@ -86,7 +86,7 @@ flowchart TB
 - **음식·마트·공동주문:** 수요를 모으고 비용·노동·위험을 함께 확인하는 실행 도구
 - **커뮤니티 환류:** 개인정보를 줄인 완료 사례, 후기와 신뢰 기록 공유
 
-현재 공개 배포 범위는 문화교통 `0.0`의 정보 공개형 커뮤니티입니다. 개발 범위는 문화교통 `1.5`까지 이어지지만, 플랫폼은 거래 상대를 추천·배정하거나 계약과 결제를 대신하지 않습니다. 후속 업무 모듈은 기능 플래그와 `SsalddelExecution:Mode` 경계 안에서만 열립니다.
+현재 공개 배포와 개발 집중 범위는 문화교통 `0.0`의 정보 공개형 커뮤니티·공공데이터 기반입니다. 후속 흐름은 `0.5 개별주문 → 1.0 공동주문 → 1.5 공급·무역 준비`이며, 전용 검증 profile에서만 관련 기능 플래그를 켭니다. 플랫폼은 거래 상대를 추천·배정하거나 계약과 결제를 대신하지 않습니다.
 
 > **배포 비용 안내 · 2026-07-22:** 현재 미리보기는 Azure의 소형 B시리즈 VM 한 대, 기본 디스크·공인 IP와 소규모 Blob Storage를 사용하며, 보유한 구독 크레딧 범위에서 운영해 현금 지출은 사실상 거의 없는 상태입니다. 사이트 방문자에게 Azure 비용이 청구되지 않습니다. 다만 VM·디스크·공인 IP·Blob Storage는 영구 무료가 아니며 Blob은 저장 용량·요청·외부 전송량에 따라 소액이 발생할 수 있습니다. 크레딧 종료나 사용량 증가 전에는 [Azure 비용 분석](https://portal.azure.com/#view/Microsoft_Azure_CostManagement/Menu/~/costanalysis)을 확인하고, 필요하지 않은 미리보기 리소스는 축소하거나 제거합니다. [Azure는 별도 선결제 약정 없이 사용량 기준으로 과금](https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account)하며, [VM을 중지해도 디스크·네트워크 비용은 남을 수 있습니다](https://learn.microsoft.com/en-us/azure/virtual-machines/cost-optimization-plan-to-manage-costs).
 
