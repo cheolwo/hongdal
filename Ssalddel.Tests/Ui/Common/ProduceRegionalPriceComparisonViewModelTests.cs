@@ -45,7 +45,9 @@ public sealed class ProduceRegionalPriceComparisonViewModelTests
         Assert.Equal(3, viewModel.AvailableCountries.Count - 1);
         Assert.Contains(viewModel.Items, item => item.Observation.RegionCode == "US-SC");
         Assert.Contains(viewModel.Items, item => item.Observation.RegionCode == "US-SW");
-        Assert.Contains(viewModel.Items, item => item.Observation.CountryCode == "CN");
+        var china = Assert.Single(viewModel.Items, item => item.Observation.CountryCode == "CN");
+        Assert.StartsWith("중국 · 산둥", china.Observation.RegionName);
+        Assert.Contains("중국산이며 세부 산지", china.Observation.Limitation);
     }
 
     [Fact]
