@@ -84,7 +84,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<미국농수산가격조회ViewModel>();
         services.TryAddTransient<호주농수산가격조회ViewModel>();
         services.TryAddTransient<농수산가격비교PageViewModel>();
-        services.TryAddTransient<사과한개가격비교ViewModel>();
+        services.TryAddTransient<농산물지역가격비교ViewModel>();
         services.TryAddTransient<OfficialFoodIngredientJourneyViewModel>();
         services.TryAddScoped<CommunityLedgerNodeActionService>();
         services.TryAddScoped<ICommunityLedgerNodeActionService>(provider =>

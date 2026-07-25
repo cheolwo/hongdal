@@ -1,0 +1,167 @@
+@inherits MvvmComponentBase<농산물지역가격비교ViewModel>
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="produce-price">
+    <header class="produce-price__hero">
+        <div>
+            <a class="produce-price__back" href="/information/public-data">← 공공데이터 가격</a>
+            <span>과일·채소 · 지역별 가격 비교</span>
+            <h1>같은 농산물도 지역마다 얼마가 다를까?</h1>
+            <p>품목과 지역을 고르면 공식 관측값을 같은 중량과 접속자 통화로 환산합니다.</p>
+        </div>
+        <div class="produce-price__emoji" aria-hidden="true">@ViewModel.SelectedProduct.Emoji</div>
+    </header>
+
+    <section class="produce-price__catalog" aria-label="농산물 품목 선택">
+        <div class="produce-price__category" role="group" aria-label="과일 또는 채소">
+            @foreach (var category in Enum.GetValues<농산물가격분류>())
+            {
+                <button type="button"
+                        class="@(ViewModel.SelectedCategory == category ? "is-selected" : null)"
+                        aria-pressed="@(ViewModel.SelectedCategory == category)"
+                        @onclick="() => ViewModel.SelectedCategory = category">
+                    @(category == 농산물가격분류.과일 ? "과일" : "채소")
+                </button>
+            }
+        </div>
+
+        <div class="produce-price__products">
+            @foreach (var product in ViewModel.AvailableProducts)
+            {
+                <button type="button"
+                        class="@(ViewModel.SelectedProductKey == product.Key ? "is-selected" : null)"
+                        aria-pressed="@(ViewModel.SelectedProductKey == product.Key)"
+                        @onclick="() => ViewModel.SelectedProductKey = product.Key">
+                    <span aria-hidden="true">@product.Emoji</span>
+                    <strong>@product.Name</strong>
+                    <small>@product.DefaultWeightGrams.ToString("0")g 기준</small>
+                </button>
+            }
+        </div>
+    </section>
+
+    <section class="produce-price__controls" aria-label="가격 비교 조건">
+        <label>
+            <span>비교 중량</span>
+            <div>
+                <input type="range"
+                       min="100"
+                       max="1000"
+                       step="10"
+                       @bind="ViewModel.ComparisonWeightGrams" />
+                <output>@ViewModel.WeightLabel</output>
+            </div>
+        </label>
+        <label>
+            <span>내가 보는 통화</span>
+            <select @bind="ViewModel.DisplayCurrency">
+                <option value="@농산물가격표시통화.KRW">원화 · KRW</option>
+                <option value="@농산물가격표시통화.CNY">위안 · CNY</option>
+                <option value="@농산물가격표시통화.USD">달러 · USD</option>
+            </select>
+        </label>
+        <label>
+            <span>국가</span>
+            <select @bind="ViewModel.SelectedCountryCode">
+                @foreach (var option in ViewModel.AvailableCountries)
+                {
+                    <option value="@option.Value">@option.Label</option>
+                }
+            </select>
+        </label>
+        <label>
+            <span>지역</span>
+            <select @bind="ViewModel.SelectedRegionCode">
+                @foreach (var option in ViewModel.AvailableRegions)
+                {
+                    <option value="@option.Value">@option.Label</option>
+                }
+            </select>
+        </label>
+    </section>
+
+    <section class="produce-price__summary" aria-label="@($"{ViewModel.SelectedProduct.Name} 지역 가격 비교")">
+        <div>
+            <span>선택 품목</span>
+            <strong>@ViewModel.SelectedProduct.Emoji @ViewModel.SelectedProduct.Name</strong>
+        </div>
+        <div>
+            <span>비교 기준</span>
+            <strong>@ViewModel.WeightLabel · @ViewModel.DisplayCurrencyLabel</strong>
+        </div>
+        <div>
+            <span>연결된 관측값</span>
+            <strong>@(ViewModel.Items.Count)개 지역</strong>
+        </div>
+    </section>
+
+    @if (ViewModel.Items.Count == 0)
+    {
+        <div class="produce-price__empty">
+            선택한 조건에 연결된 공식 지역 관측값이 없습니다. 국가 또는 지역 범위를 넓혀 주세요.
+        </div>
+    }
+    else
+    {
+        <div class="produce-price__cards">
+            @foreach (var item in ViewModel.Items)
+            {
+                <article class="produce-price__card">
+                    <header>
+                        <span>@item.Observation.CountryCode</span>
+                        <div>
+                            <h2>@item.Observation.RegionName</h2>
+                            <p>@item.Observation.CountryName · @item.Observation.Variety</p>
+                        </div>
+                    </header>
+
+                    <div class="produce-price__primary">
+                        <span>@ViewModel.WeightLabel 환산</span>
+                        <strong>@ViewModel.FormatDisplayPrice(item.DisplayWeightPrice)</strong>
+                        <small>@ViewModel.DisplayCurrencyLabel 기준</small>
+                    </div>
+
+                    <dl>
+                        <div>
+                            <dt>원문 가격</dt>
+                            <dd>@item.Observation.NativePrice.ToString("N2") @item.Observation.NativeCurrency / @item.Observation.NativeUnit</dd>
+                        </div>
+                        <div>
+                            <dt>동일 단위</dt>
+                            <dd>@ViewModel.FormatDisplayPrice(item.DisplayKilogramPrice) / kg</dd>
+                        </div>
+                        <div>
+                            <dt>시장 단계</dt>
+                            <dd>@item.Observation.MarketStage</dd>
+                        </div>
+                        <div>
+                            <dt>지역 코드</dt>
+                            <dd>@item.Observation.RegionCode</dd>
+                        </div>
+                        <div>
+                            <dt>기준일</dt>
+                            <dd>@item.Observation.ReferenceDate</dd>
+                        </div>
+                    </dl>
+
+                    <p class="produce-price__limitation">@item.Observation.Limitation</p>
+                    <a href="@item.Observation.SourceUrl" target="_blank" rel="noreferrer">
+                        @item.Observation.SourceName 원문 보기
+                    </a>
+                </article>
+            }
+        </div>
+    }
+
+    <aside class="produce-price__method">
+        <div>
+            <span>환산 기준</span>
+            <strong>@ViewModel.ExchangeRateReference</strong>
+        </div>
+        <p>
+            원문 가격을 kg으로 맞춘 뒤 @(ViewModel.WeightLabel)로 계산했습니다.
+            지역·품종·등급·시장 단계와 조사일이 다르므로 구매가나 지역 순위로 해석할 수 없습니다.
+            배송비·세금·할인은 포함하지 않습니다.
+        </p>
+    </aside>
+</section>

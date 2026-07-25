@@ -41,7 +41,7 @@
     line-height: 1.5;
 }
 
-.public-data-workspace__apple-link {
+.public-data-workspace__produce-link {
     display: inline-block;
     margin-top: 12px;
     padding-bottom: 2px;
@@ -52,7 +52,7 @@
     text-decoration: none;
 }
 
-.public-data-workspace__apple-link:hover {
+.public-data-workspace__produce-link:hover {
     color: #6f2719;
 }
 
