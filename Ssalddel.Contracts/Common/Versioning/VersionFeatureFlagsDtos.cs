@@ -125,6 +125,18 @@ public sealed class WorkflowApiEndpointDto
 
     public bool IsEnabled { get; init; }
 
+    public IReadOnlyList<string> CapabilityCodes { get; init; } = [];
+
+    public IReadOnlyList<string> CapabilityNames { get; init; } = [];
+
+    public IReadOnlyList<string> AudienceCodes { get; init; } = [];
+
+    public IReadOnlyList<string> AudienceNames { get; init; } = [];
+
+    public IReadOnlyList<string> OperationCodes { get; init; } = [];
+
+    public IReadOnlyList<string> OperationNames { get; init; } = [];
+
     public IReadOnlyList<string> WorkflowCodes { get; init; } = [];
 
     public IReadOnlyList<string> WorkflowNames { get; init; } = [];

@@ -189,18 +189,43 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
     {
         var controllerRoute = controllerType.GetCustomAttribute<RouteAttribute>(inherit: true)?.Template ?? string.Empty;
         var controllerVersion = controllerType.GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
+        var controllerFeature = controllerType.GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true);
+        var controllerCapabilities = controllerType.GetCustomAttributes<SsalddelApiCapabilityAttribute>(inherit: true).ToArray();
+        var controllerAudiences = controllerType.GetCustomAttributes<SsalddelApiAudienceAttribute>(inherit: true).ToArray();
+        var controllerOperations = controllerType.GetCustomAttributes<SsalddelApiOperationAttribute>(inherit: true).ToArray();
+        var controllerClassification = SsalddelApiClassificationReader.Read(controllerType);
         var controllerWorkflows = controllerType.GetCustomAttributes<SsalddelApiWorkflowAttribute>(inherit: true).ToArray();
         var controllerGrowthTracks = controllerType.GetCustomAttributes<SsalddelApiGrowthTrackAttribute>(inherit: true).ToArray();
         var controllerAuthorize = controllerType.GetCustomAttributes<AuthorizeAttribute>(inherit: true).ToArray();
         var controllerAllowsAnonymous = controllerType.GetCustomAttributes<AllowAnonymousAttribute>(inherit: true).Any();
+        var controllerContractName =
+            controllerType.GetCustomAttribute<SsalddelApiContractNameAttribute>(inherit: true)?.Name
+            ?? controllerType.Name;
 
         foreach (var action in GetActionMethods(controllerType))
         {
+            var actionContractName =
+                action.GetCustomAttribute<SsalddelApiContractNameAttribute>(inherit: true)?.Name
+                ?? action.Name;
             var declaredActionVersion = action.GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
             var actionVersion = declaredActionVersion ?? controllerVersion;
-            var featureKey = !string.IsNullOrWhiteSpace(declaredActionVersion?.FeatureKey)
+            var declaredActionFeature = action.GetCustomAttribute<SsalddelApiFeatureAttribute>(inherit: true);
+            var featureKey = !string.IsNullOrWhiteSpace(declaredActionFeature?.FeatureKey)
+                ? declaredActionFeature.FeatureKey
+                : !string.IsNullOrWhiteSpace(controllerFeature?.FeatureKey)
+                    ? controllerFeature.FeatureKey
+                    : !string.IsNullOrWhiteSpace(declaredActionVersion?.FeatureKey)
                 ? declaredActionVersion.FeatureKey
                 : controllerVersion?.FeatureKey;
+            var actionCapabilities = ResolveActionMetadata(
+                action.GetCustomAttributes<SsalddelApiCapabilityAttribute>(inherit: true),
+                controllerCapabilities);
+            var actionAudiences = ResolveActionMetadata(
+                action.GetCustomAttributes<SsalddelApiAudienceAttribute>(inherit: true),
+                controllerAudiences);
+            var actionOperations = ResolveActionMetadata(
+                action.GetCustomAttributes<SsalddelApiOperationAttribute>(inherit: true),
+                controllerOperations);
             var actionWorkflows = action.GetCustomAttributes<SsalddelApiWorkflowAttribute>(inherit: true).DefaultIfEmpty().Where(x => x is not null).Cast<SsalddelApiWorkflowAttribute>().ToArray();
             if (actionWorkflows.Length == 0)
             {
@@ -225,9 +250,9 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
                 {
                     yield return new WorkflowApiEndpointDto
                     {
-                        EndpointKey = $"{controllerType.Name}.{action.Name}",
-                        ControllerName = controllerType.Name,
-                        ActionName = action.Name,
+                        EndpointKey = $"{controllerContractName}.{actionContractName}",
+                        ControllerName = controllerContractName,
+                        ActionName = actionContractName,
                         Method = method,
                         RoutePattern = CombineRoutes(controllerRoute, httpAttribute.Template),
                         ProductVersionCode = actionVersion?.Version.ToString() ?? string.Empty,
@@ -237,6 +262,24 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
                         FeatureKey = featureKey ?? string.Empty,
                         IsEnabled = string.IsNullOrWhiteSpace(featureKey)
                             || flags.TryGetValue(featureKey, out var enabled) && enabled,
+                        CapabilityCodes = actionCapabilities.Length == 0
+                            ? controllerClassification.CapabilityCodes
+                            : actionCapabilities.Select(attribute => attribute.Capability.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
+                        CapabilityNames = actionCapabilities.Length == 0
+                            ? controllerClassification.Capabilities
+                            : actionCapabilities.Select(attribute => attribute.CapabilityLabel).Distinct(StringComparer.Ordinal).ToArray(),
+                        AudienceCodes = actionAudiences.Length == 0
+                            ? controllerClassification.AudienceCodes
+                            : actionAudiences.Select(attribute => attribute.Actor.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
+                        AudienceNames = actionAudiences.Length == 0
+                            ? controllerClassification.Audiences
+                            : actionAudiences.Select(attribute => attribute.ActorLabel).Distinct(StringComparer.Ordinal).ToArray(),
+                        OperationCodes = actionOperations.Length == 0
+                            ? controllerClassification.OperationCodes
+                            : actionOperations.Select(attribute => attribute.Operation.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
+                        OperationNames = actionOperations.Length == 0
+                            ? controllerClassification.Operations
+                            : actionOperations.Select(attribute => attribute.OperationLabel).Distinct(StringComparer.Ordinal).ToArray(),
                         WorkflowCodes = actionWorkflows.Select(attribute => attribute.Workflow.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
                         WorkflowNames = actionWorkflows.Select(attribute => attribute.WorkflowLabel).Distinct(StringComparer.Ordinal).ToArray(),
                         GrowthTrackCodes = actionGrowthTracks.Select(attribute => attribute.Track.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
@@ -248,6 +291,15 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
                 }
             }
         }
+    }
+
+    private static TAttribute[] ResolveActionMetadata<TAttribute>(
+        IEnumerable<TAttribute> actionAttributes,
+        IReadOnlyList<TAttribute> controllerAttributes)
+        where TAttribute : Attribute
+    {
+        var declared = actionAttributes.ToArray();
+        return declared.Length == 0 ? controllerAttributes.ToArray() : declared;
     }
 
     private static IEnumerable<MethodInfo> GetActionMethods(Type controllerType)
