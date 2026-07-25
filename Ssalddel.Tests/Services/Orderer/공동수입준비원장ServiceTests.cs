@@ -36,9 +36,9 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.NotNull(restored);
         Assert.Equal(created.원장Id, restored.원장Id);
         Assert.Equal(1, fixture.LedgerStore.SaveCount);
-        Assert.Equal(created.원장Id, fixture.DemandOperatingSystem.LinkedLedgerId);
-        Assert.Equal("handoff-1", fixture.DemandOperatingSystem.LinkedHandoffId);
-        Assert.Equal(1, fixture.DemandOperatingSystem.LinkCount);
+        Assert.Equal(created.원장Id, fixture.DemandProcessManager.LinkedLedgerId);
+        Assert.Equal("handoff-1", fixture.DemandProcessManager.LinkedHandoffId);
+        Assert.Equal(1, fixture.DemandProcessManager.LinkCount);
 
         var ledger = Assert.Single(fixture.LedgerStore.Items.Values);
         Assert.Equal("1.5", ledger.확장속성["ReadinessWorkflowVersion"]);
@@ -192,7 +192,7 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.True(retried.이미처리됨);
         Assert.Equal(first.Revision, retried.Revision);
         Assert.Equal(1, fixture.LedgerStore.SaveCount);
-        Assert.Equal(2, fixture.DemandOperatingSystem.LinkCount);
+        Assert.Equal(2, fixture.DemandProcessManager.LinkCount);
 
         request.출발국가코드 = "VN";
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -281,7 +281,7 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.True(result.평가.품목분류후보구조완료);
         Assert.True(result.평가.국제운송검토구조완료);
         Assert.Contains(result.평가.경고목록, item => item.Contains("LCL/FCL", StringComparison.Ordinal));
-        Assert.Equal(2, fixture.DemandOperatingSystem.LinkCount);
+        Assert.Equal(2, fixture.DemandProcessManager.LinkCount);
         var ledger = Assert.Single(fixture.LedgerStore.Items.Values);
         Assert.Equal(2, ledger.포함원장목록.Count);
         Assert.Contains(ledger.블록목록, block => block.BlockId == "material-items");
@@ -385,13 +385,13 @@ public sealed class 공동수입준비원장ServiceTests
         }).ToArray();
         var groupStore = new FakeGroupStore(groups);
         var ledgerStore = new FakeLedgerStore();
-        var demandOperatingSystem = new FakeDemandOperatingSystem(states);
+        var demandProcessManager = new FakeDemandProcessManager(states);
         var service = new 공동수입준비원장Service(
             groupStore,
-            demandOperatingSystem,
+            demandProcessManager,
             ledgerStore,
             new FixedTimeProvider(Now));
-        return new Fixture(service, group, ledgerStore, demandOperatingSystem);
+        return new Fixture(service, group, ledgerStore, demandProcessManager);
     }
 
     private static 공동구매자동집단응답 Group()
@@ -553,7 +553,7 @@ public sealed class 공동수입준비원장ServiceTests
         공동수입준비원장Service Service,
         공동구매자동집단응답 Group,
         FakeLedgerStore LedgerStore,
-        FakeDemandOperatingSystem DemandOperatingSystem);
+        FakeDemandProcessManager DemandProcessManager);
 
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
     {
@@ -584,7 +584,7 @@ public sealed class 공동수입준비원장ServiceTests
             => throw new NotSupportedException();
     }
 
-    private sealed class FakeDemandOperatingSystem(IReadOnlyList<공동구매수요모집Os상태응답> states) : I공동구매수요모집OS
+    private sealed class FakeDemandProcessManager(IReadOnlyList<공동구매수요모집Os상태응답> states) : I공동구매수요모집ProcessManager
     {
         public string LinkedHandoffId { get; private set; } = string.Empty;
         public string LinkedLedgerId { get; private set; } = string.Empty;

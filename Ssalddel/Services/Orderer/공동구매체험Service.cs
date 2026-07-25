@@ -16,7 +16,7 @@ public interface I공동구매체험Service
     "체험 공동구매",
     Summary = "가상 이웃과 저장 없는 공동구매 집단화 과정을 게임처럼 연습합니다.")]
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
     "고정된 연습 시나리오와 명시적으로 표시된 가상 참여자를 기존 집단화 진행 계산에 넣어 결과를 반환합니다.",
     ContractType = typeof(I공동구매체험Service),

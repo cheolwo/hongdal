@@ -15,7 +15,7 @@ public interface I공동구매내원함조회UseCase
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
     "로그인 주문자가 소유한 활성·닫힌 개별 원함 원장과 연결 자동집단의 공개 요약을 조회합니다.",
     ContractType = typeof(I공동구매내원함조회UseCase),

@@ -12,8 +12,8 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
     {
         var sequence = new List<string>();
         var store = new ProjectionStore(sequence);
-        var os = new ProjectionDemandOs(store, sequence);
-        var service = new 공동구매개별원함자동집단투영Service(store, os);
+        var processManager = new ProjectionDemandProcessManager(store, sequence);
+        var service = new 공동구매개별원함자동집단투영Service(store, processManager);
         var ledger = IndividualDemandLedger(revision: 7);
 
         var result = await service.투영Async(ledger);
@@ -21,7 +21,7 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
         Assert.NotNull(result.자동집단);
         Assert.Null(result.철회);
         Assert.Equal(["save", "link"], sequence);
-        var command = Assert.Single(os.RegistrationCommands);
+        var command = Assert.Single(processManager.RegistrationCommands);
         Assert.StartsWith("wish-projection-save:", command.요청멱등키);
         Assert.Equal("demand:garlic:orderer-1", command.수요출처키);
         Assert.Equal(공동구매자동수요유형코드.관심표시, command.수요유형);
@@ -36,22 +36,22 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
     public async Task 같은Revision을_재처리하면_같은멱등키와_한수요를사용하고_원장연결을중복하지않는다()
     {
         var store = new ProjectionStore();
-        var os = new ProjectionDemandOs(store);
-        var service = new 공동구매개별원함자동집단투영Service(store, os);
+        var processManager = new ProjectionDemandProcessManager(store);
+        var service = new 공동구매개별원함자동집단투영Service(store, processManager);
         var ledger = IndividualDemandLedger(revision: 11);
 
         var first = await service.투영Async(ledger);
         var retry = await service.투영Async(IndividualDemandLedger(revision: 11));
         await service.투영Async(IndividualDemandLedger(revision: 12));
 
-        Assert.Equal(3, os.RegistrationCommands.Count);
+        Assert.Equal(3, processManager.RegistrationCommands.Count);
         Assert.Equal(
-            os.RegistrationCommands[0].요청멱등키,
-            os.RegistrationCommands[1].요청멱등키);
+            processManager.RegistrationCommands[0].요청멱등키,
+            processManager.RegistrationCommands[1].요청멱등키);
         Assert.NotEqual(
-            os.RegistrationCommands[1].요청멱등키,
-            os.RegistrationCommands[2].요청멱등키);
-        Assert.Equal(2, os.ProcessedRegistrationKeyCount);
+            processManager.RegistrationCommands[1].요청멱등키,
+            processManager.RegistrationCommands[2].요청멱등키);
+        Assert.Equal(2, processManager.ProcessedRegistrationKeyCount);
         Assert.Equal(1, store.LinkCount);
         Assert.Single(first.자동집단!.수요목록);
         Assert.Same(first.자동집단, retry.자동집단);
@@ -65,15 +65,15 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
             state: 커뮤니티원장상태.닫힘);
         var store = new ProjectionStore();
         store.Group = GroupWithDemand(ledger);
-        var os = new ProjectionDemandOs(store);
-        var service = new 공동구매개별원함자동집단투영Service(store, os);
+        var processManager = new ProjectionDemandProcessManager(store);
+        var service = new 공동구매개별원함자동집단투영Service(store, processManager);
 
         var result = await service.투영Async(ledger);
 
         Assert.Same(store.Group, result.자동집단);
         Assert.NotNull(result.철회);
         var withdrawal = result.철회!;
-        var command = Assert.Single(os.WithdrawalCommands);
+        var command = Assert.Single(processManager.WithdrawalCommands);
         Assert.StartsWith("wish-projection-withdraw:", command.요청멱등키);
         Assert.Equal("demand:garlic:orderer-1", command.수요출처키);
         Assert.Equal("orderer-1", command.주문자키);
@@ -85,8 +85,8 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
     public async Task 개별원함_자동집단투영대상이아니면_아무것도변경하지않는다()
     {
         var store = new ProjectionStore();
-        var os = new ProjectionDemandOs(store);
-        var service = new 공동구매개별원함자동집단투영Service(store, os);
+        var processManager = new ProjectionDemandProcessManager(store);
+        var service = new 공동구매개별원함자동집단투영Service(store, processManager);
         var ledger = IndividualDemandLedger(revision: 1);
         ledger.확장속성 = new Dictionary<string, string>
         {
@@ -97,8 +97,8 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
 
         Assert.Null(result.자동집단);
         Assert.Null(result.철회);
-        Assert.Empty(os.RegistrationCommands);
-        Assert.Empty(os.WithdrawalCommands);
+        Assert.Empty(processManager.RegistrationCommands);
+        Assert.Empty(processManager.WithdrawalCommands);
         Assert.Equal(0, store.LinkCount);
         Assert.Equal(0, store.GroupReadCount);
     }
@@ -157,9 +157,9 @@ public sealed class 공동구매개별원함자동집단투영ServiceTests
             ]
         };
 
-    private sealed class ProjectionDemandOs(
+    private sealed class ProjectionDemandProcessManager(
         ProjectionStore store,
-        List<string>? sequence = null) : I공동구매수요모집OS
+        List<string>? sequence = null) : I공동구매수요모집ProcessManager
     {
         private readonly HashSet<string> _processedRegistrationKeys = new(StringComparer.Ordinal);
 

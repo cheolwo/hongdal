@@ -26,7 +26,7 @@ public interface I공동구매개별원함자동집단투영Service
 /// 커뮤니티 원장 자체의 projection lease가 Event/Outbox 재시도와 checkpoint를 담당합니다.
 /// </summary>
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
     "비구속 개별 원함 원장의 현재 Revision과 상태를 자동집단 수요·철회로 투영합니다.",
     ContractType = typeof(I공동구매개별원함자동집단투영Service),
@@ -35,7 +35,8 @@ public interface I공동구매개별원함자동집단투영Service
     Boundary = "IndividualDemand 원장만 원본으로 사용하고 주문·결제·계약·수입·운송을 만들지 않습니다. 원장별 Event/Outbox가 최신 Revision 재처리를 보장합니다.")]
 public sealed class 공동구매개별원함자동집단투영Service(
     I공동구매자동집단화저장소 store,
-    I공동구매수요모집OS demandOs) : I공동구매개별원함자동집단투영Service
+    I공동구매수요모집ProcessManager processManager)
+    : I공동구매개별원함자동집단투영Service
 {
     public bool 투영대상(커뮤니티원장Dto ledger)
         => string.Equals(
@@ -83,7 +84,7 @@ public sealed class 공동구매개별원함자동집단투영Service(
                     });
             }
 
-            var withdrawal = await demandOs.수요철회조율Async(
+            var withdrawal = await processManager.수요철회조율Async(
                 new 공동구매자동수요철회Command
                 {
                     요청멱등키 = 투영멱등키(ledger, "withdraw"),
@@ -96,7 +97,7 @@ public sealed class 공동구매개별원함자동집단투영Service(
             return new(existing, withdrawal);
         }
 
-        var group = await demandOs.수요등록조율Async(command, cancellationToken);
+        var group = await processManager.수요등록조율Async(command, cancellationToken);
         var ownDemand = group.수요목록.FirstOrDefault(item =>
             string.Equals(item.수요출처키, command.수요출처키, StringComparison.Ordinal)
             && string.Equals(item.주문자키, command.주문자키, StringComparison.Ordinal))

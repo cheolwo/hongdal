@@ -18,22 +18,24 @@ namespace Ssalddel.Controllers.Admin.Orderer;
     WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+// 기존 운영 도구와 client의 URL 호환을 위해 route는 유지한다.
 [Route("api/v1/admin/orderer/group-purchase-demand-os")]
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Api,
-    "관리자가 공동구매 모집 OS 상태를 조회하고 마감 재조율 또는 1.5 준비 인계를 명시적으로 승인하게 합니다.",
-    ContractType = typeof(I공동구매수요모집OS),
+    "관리자가 공동구매 모집 프로세스 상태를 조회하고 마감 재조율 또는 1.5 준비 인계를 명시적으로 승인하게 합니다.",
+    ContractType = typeof(I공동구매수요모집ProcessManager),
     FlowOrder = 15,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
     Boundary = "서버 관리자만 접근하며 승인 API도 주문·결제·계약이나 1.5 원장을 자동 생성하지 않습니다.")]
-public sealed class 공동구매수요모집OsAdminController : ControllerBase
+public sealed class 공동구매수요모집ProcessManagerAdminController : ControllerBase
 {
-    private readonly I공동구매수요모집OS _os;
+    private readonly I공동구매수요모집ProcessManager _processManager;
 
-    public 공동구매수요모집OsAdminController(I공동구매수요모집OS os)
+    public 공동구매수요모집ProcessManagerAdminController(
+        I공동구매수요모집ProcessManager processManager)
     {
-        _os = os;
+        _processManager = processManager;
     }
 
     [HttpGet("groups/{autoGroupId}/operating-status")]
@@ -43,9 +45,9 @@ public sealed class 공동구매수요모집OsAdminController : ControllerBase
         [FromRoute(Name = "autoGroupId")] string 자동집단Id,
         CancellationToken cancellationToken)
     {
-        var 상태 = await _os.운영상태조회Async(자동집단Id, cancellationToken);
+        var 상태 = await _processManager.운영상태조회Async(자동집단Id, cancellationToken);
         return 상태 is null
-            ? this.ToNotFoundProblem("공동구매 모집 OS 원장을 찾을 수 없습니다.")
+            ? this.ToNotFoundProblem("공동구매 모집 프로세스 원장을 찾을 수 없습니다.")
             : Ok(상태);
     }
 
@@ -55,7 +57,7 @@ public sealed class 공동구매수요모집OsAdminController : ControllerBase
         [FromRoute(Name = "autoGroupId")] string 자동집단Id,
         CancellationToken cancellationToken)
     {
-        var 결과 = await _os.집단조율Async(
+        var 결과 = await _processManager.집단조율Async(
             자동집단Id,
             공동구매수요모집Os트리거코드.수동재조율,
             cancellationToken: cancellationToken);
@@ -76,7 +78,7 @@ public sealed class 공동구매수요모집OsAdminController : ControllerBase
             요청.요청멱등키 = 요청멱등키.Trim();
         }
 
-        var 결과 = await _os.인계승인Async(
+        var 결과 = await _processManager.인계승인Async(
             자동집단Id,
             요청,
             현재관리자키(),
@@ -90,7 +92,7 @@ public sealed class 공동구매수요모집OsAdminController : ControllerBase
         [FromQuery(Name = "maxItems")] int? 최대건수,
         CancellationToken cancellationToken)
     {
-        var 결과 = await _os.모집마감스캔Async(
+        var 결과 = await _processManager.모집마감스캔Async(
             최대건수: 최대건수,
             cancellationToken: cancellationToken);
         return Ok(결과);

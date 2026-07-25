@@ -45,16 +45,16 @@ public interface I공동구매자동집단화저장소
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Infrastructure,
     "공동구매 모집 상태전이, OS 큐, 점검 시각과 사람 승인 인계를 Mongo 원장에 원자적으로 기록합니다.",
-    ContractType = typeof(I공동구매수요모집Os상태전이Port),
+    ContractType = typeof(I공동구매수요모집ProcessStore),
     FlowOrder = 40,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
     Boundary = "낙관적 동시성과 멱등 키를 검증하며 승인 상태만 기록하고 1.5 원장이나 외부 실행은 생성하지 않습니다.")]
 public sealed class Mongo공동구매자동집단화저장소 :
     I공동구매자동집단화저장소,
-    I공동구매수요모집Os상태전이Port
+    I공동구매수요모집ProcessStore
 {
     private const string 컬렉션명 = "orderer_group_purchase_auto_groups";
     private const int 최대동시성재시도횟수 = 8;

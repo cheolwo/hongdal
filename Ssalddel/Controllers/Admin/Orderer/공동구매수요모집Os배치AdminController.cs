@@ -16,7 +16,7 @@ namespace Ssalddel.Controllers.Admin.Orderer;
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [Route("api/v1/admin/orderer/group-purchase-demand-os/batch-workloads")]
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Api,
     "관리자가 1.0 OS 내부·공유 배치의 등록 상태, 일정, 선행 작업, 출처와 실행 경계를 읽습니다.",
     ContractType = typeof(I공동구매수요모집Os배치Catalog),

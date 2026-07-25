@@ -7,7 +7,7 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Services.Orderer;
 
-public interface I공동구매수요모집OS
+public interface I공동구매수요모집ProcessManager
 {
     Task<공동구매자동집단응답> 수요등록조율Async(
         공동구매자동수요등록Command command,
@@ -45,7 +45,7 @@ public interface I공동구매수요모집OS
         CancellationToken cancellationToken = default);
 }
 
-public interface I공동구매수요모집Os상태전이Port
+public interface I공동구매수요모집ProcessStore
 {
     Task<공동구매수요모집Os조율응답> 운영조율Async(
         string 자동집단Id,
@@ -85,31 +85,31 @@ public interface I공동구매수요모집Os상태전이Port
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
     "수요 변경, 모집 마감, 검토 큐와 사람 승인 인계를 하나의 공동구매 모집 원장 순서로 조율합니다.",
-    ContractType = typeof(I공동구매수요모집OS),
+    ContractType = typeof(I공동구매수요모집ProcessManager),
     FlowOrder = 30,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
     Boundary = "엔진 판단을 직접 확정하지 않고 상태전이 Port에 저장을 위임하며, 승인 뒤에도 1.5 원장이나 외부 실행을 자동 생성하지 않습니다.")]
-internal sealed class 공동구매수요모집OS : I공동구매수요모집OS
+internal sealed class 공동구매수요모집ProcessManager : I공동구매수요모집ProcessManager
 {
     private readonly I공동구매자동집단화저장소 _수요명령Port;
-    private readonly I공동구매수요모집Os상태전이Port _상태전이Port;
+    private readonly I공동구매수요모집ProcessStore _상태전이Port;
     private readonly IVersionFeatureFlagService _기능플래그;
     private readonly ISsalddelExecutionModePolicy _실행모드;
     private readonly TimeProvider _시각;
-    private readonly IOptionsMonitor<GroupPurchaseDemandOsOptions> _options;
-    private readonly ILogger<공동구매수요모집OS> _logger;
+    private readonly IOptionsMonitor<GroupPurchaseDemandProcessManagerOptions> _options;
+    private readonly ILogger<공동구매수요모집ProcessManager> _logger;
 
-    public 공동구매수요모집OS(
+    public 공동구매수요모집ProcessManager(
         I공동구매자동집단화저장소 수요명령Port,
-        I공동구매수요모집Os상태전이Port 상태전이Port,
+        I공동구매수요모집ProcessStore 상태전이Port,
         IVersionFeatureFlagService 기능플래그,
         ISsalddelExecutionModePolicy 실행모드,
         TimeProvider 시각,
-        IOptionsMonitor<GroupPurchaseDemandOsOptions> options,
-        ILogger<공동구매수요모집OS>? logger = null)
+        IOptionsMonitor<GroupPurchaseDemandProcessManagerOptions> options,
+        ILogger<공동구매수요모집ProcessManager>? logger = null)
     {
         _수요명령Port = 수요명령Port;
         _상태전이Port = 상태전이Port;
@@ -117,7 +117,7 @@ internal sealed class 공동구매수요모집OS : I공동구매수요모집OS
         _실행모드 = 실행모드;
         _시각 = 시각;
         _options = options;
-        _logger = logger ?? NullLogger<공동구매수요모집OS>.Instance;
+        _logger = logger ?? NullLogger<공동구매수요모집ProcessManager>.Instance;
     }
 
     public async Task<공동구매자동집단응답> 수요등록조율Async(
@@ -225,7 +225,7 @@ internal sealed class 공동구매수요모집OS : I공동구매수요모집OS
                 결과.실패건수++;
                 _logger.LogWarning(
                     ex,
-                    "공동구매 수요·모집 OS 점검에 실패했습니다. AutoGroupId={AutoGroupId}",
+                    "공동구매 수요·모집 프로세스 점검에 실패했습니다. AutoGroupId={AutoGroupId}",
                     자동집단Id);
             }
         }
@@ -335,26 +335,26 @@ internal sealed class 공동구매수요모집OS : I공동구매수요모집OS
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Infrastructure,
-    "기능 플래그가 켜진 동안 모집 마감과 장기 정체 집단을 주기적으로 OS 점검 큐에 넣습니다.",
+    "기능 플래그가 켜진 동안 모집 마감과 장기 정체 집단을 주기적으로 프로세스 점검 대상으로 조회합니다.",
     FlowOrder = 50,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
     Boundary = "1.0 모집 원장만 재계산하며 주문, 결제, 공급자 선정 또는 1.5 원장을 자동 생성하지 않습니다.")]
-public sealed class 공동구매수요모집OsWorker : BackgroundService
+public sealed class 공동구매수요모집DeadlineScanBackgroundService : BackgroundService
 {
-    private readonly I공동구매수요모집OS _os;
+    private readonly I공동구매수요모집ProcessManager _processManager;
     private readonly IVersionFeatureFlagService _기능플래그;
-    private readonly IOptionsMonitor<GroupPurchaseDemandOsOptions> _options;
-    private readonly ILogger<공동구매수요모집OsWorker> _logger;
+    private readonly IOptionsMonitor<GroupPurchaseDemandProcessManagerOptions> _options;
+    private readonly ILogger<공동구매수요모집DeadlineScanBackgroundService> _logger;
 
-    public 공동구매수요모집OsWorker(
-        I공동구매수요모집OS os,
+    public 공동구매수요모집DeadlineScanBackgroundService(
+        I공동구매수요모집ProcessManager processManager,
         IVersionFeatureFlagService 기능플래그,
-        IOptionsMonitor<GroupPurchaseDemandOsOptions> options,
-        ILogger<공동구매수요모집OsWorker> logger)
+        IOptionsMonitor<GroupPurchaseDemandProcessManagerOptions> options,
+        ILogger<공동구매수요모집DeadlineScanBackgroundService> logger)
     {
-        _os = os;
+        _processManager = processManager;
         _기능플래그 = 기능플래그;
         _options = options;
         _logger = logger;
@@ -370,13 +370,13 @@ public sealed class 공동구매수요모집OsWorker : BackgroundService
                 if (options.Enabled
                     && _기능플래그.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow))
                 {
-                    var result = await _os.모집마감스캔Async(
+                    var result = await _processManager.모집마감스캔Async(
                         최대건수: options.BatchSize,
                         cancellationToken: stoppingToken);
                     if (result.조율건수 > 0 || result.실패건수 > 0)
                     {
                         _logger.LogInformation(
-                            "공동구매 수요·모집 OS 점검 완료. Scanned={Scanned}, Coordinated={Coordinated}, Review={Review}, Closed={Closed}, Failed={Failed}",
+                            "공동구매 수요·모집 프로세스 점검 완료. Scanned={Scanned}, Coordinated={Coordinated}, Review={Review}, Closed={Closed}, Failed={Failed}",
                             result.조회건수,
                             result.조율건수,
                             result.확정검토건수,
@@ -391,7 +391,7 @@ public sealed class 공동구매수요모집OsWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "공동구매 수요·모집 OS background 점검 중 예외가 발생했습니다.");
+                _logger.LogError(ex, "공동구매 수요·모집 background 점검 중 예외가 발생했습니다.");
             }
 
             try

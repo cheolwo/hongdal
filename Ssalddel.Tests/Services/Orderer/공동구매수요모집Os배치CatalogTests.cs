@@ -59,7 +59,7 @@ public sealed class 공동구매수요모집Os배치CatalogTests
             });
         var catalog = new 공동구매수요모집Os배치Catalog(
             plan,
-            new StaticOptionsMonitor<GroupPurchaseDemandOsOptions>(new GroupPurchaseDemandOsOptions
+            new StaticOptionsMonitor<GroupPurchaseDemandProcessManagerOptions>(new GroupPurchaseDemandProcessManagerOptions
             {
                 Enabled = true,
                 ScanIntervalSeconds = 60
@@ -89,7 +89,7 @@ public sealed class 공동구매수요모집Os배치CatalogTests
     {
         var catalog = new 공동구매수요모집Os배치Catalog(
             공동구매수요모집Os배치등록계획.빈계획(),
-            new StaticOptionsMonitor<GroupPurchaseDemandOsOptions>(new GroupPurchaseDemandOsOptions()),
+            new StaticOptionsMonitor<GroupPurchaseDemandProcessManagerOptions>(new GroupPurchaseDemandProcessManagerOptions()),
             new StubFeatureFlagService(enabled: false),
             new StubExecutionModePolicy(SsalddelExecutionMode.Simulation));
 

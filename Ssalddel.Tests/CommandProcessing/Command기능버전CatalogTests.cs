@@ -11,6 +11,10 @@ public sealed class Command기능버전CatalogTests
         Assert.Equal(
             SsalddelProductRoadmapCatalog.CurrentVersion,
             Command기능버전Catalog.CurrentRelease);
+        Assert.Equal(
+            SsalddelProductRoadmapCatalog.DeploymentTargetVersion,
+            Command기능버전Catalog.DeploymentTarget);
+        Assert.Equal("3.5", Command기능버전Catalog.DeploymentTarget);
 
         var current = Command기능버전Catalog.Get(null);
         var foundation = Command기능버전Catalog.Get(

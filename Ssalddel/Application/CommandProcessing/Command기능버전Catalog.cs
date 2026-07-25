@@ -11,6 +11,7 @@ public sealed record Command기능버전정보(
 public static class Command기능버전Catalog
 {
     public const string CurrentRelease = SsalddelProductRoadmapCatalog.CurrentVersion;
+    public const string DeploymentTarget = SsalddelProductRoadmapCatalog.DeploymentTargetVersion;
 
     private static readonly IReadOnlyDictionary<string, Command기능버전정보> Versions =
         SsalddelProductRoadmapCatalog.All.ToDictionary(

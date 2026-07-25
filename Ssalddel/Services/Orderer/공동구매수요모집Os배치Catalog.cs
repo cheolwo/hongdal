@@ -94,7 +94,7 @@ internal sealed class 공동구매수요모집Os배치등록계획
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
     "1.0 내부 점검과 공동구매 판단에 필요한 공유 공공데이터 수집 상태·출처·실행 경계를 OS 카탈로그로 조립합니다.",
     ContractType = typeof(I공동구매수요모집Os배치Catalog),
@@ -106,13 +106,13 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
     private const string QuartzCron안내 = "Quartz cron";
 
     private readonly 공동구매수요모집Os배치등록계획 _등록계획;
-    private readonly IOptionsMonitor<GroupPurchaseDemandOsOptions> _osOptions;
+    private readonly IOptionsMonitor<GroupPurchaseDemandProcessManagerOptions> _osOptions;
     private readonly IVersionFeatureFlagService _기능플래그;
     private readonly ISsalddelExecutionModePolicy _실행모드;
 
     public 공동구매수요모집Os배치Catalog(
         공동구매수요모집Os배치등록계획 등록계획,
-        IOptionsMonitor<GroupPurchaseDemandOsOptions> osOptions,
+        IOptionsMonitor<GroupPurchaseDemandProcessManagerOptions> osOptions,
         IVersionFeatureFlagService 기능플래그,
         ISsalddelExecutionModePolicy 실행모드)
     {
@@ -201,7 +201,7 @@ internal sealed class 공동구매수요모집Os배치Catalog : I공동구매수
     }
 
     private static 공동구매수요모집Os배치작업응답 모집마감점검(
-        GroupPurchaseDemandOsOptions options,
+        GroupPurchaseDemandProcessManagerOptions options,
         bool os활성)
     {
         var interval = Math.Clamp(options.ScanIntervalSeconds, 10, 3600);

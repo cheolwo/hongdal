@@ -34,7 +34,7 @@
 
 | 구분 | 표기 | 예 |
 | --- | --- | --- |
-| 기술 책임 | 영어 | `Controller`, `API`, `DTO`, `Command`, `Event`, `Handler`, `UseCase`, `Service`, `Repository`, `Store`, `Client`, `Options`, `Worker`, `Outbox` |
+| 기술 책임 | 영어 | `Controller`, `API`, `DTO`, `Command`, `Event`, `Handler`, `UseCase`, `ApplicationService`, `ProcessManager`, `WorkflowCoordinator`, `Repository`, `Store`, `Client`, `Options`, `BackgroundService`, `Outbox` |
 | 업무 개념 | 한국어 | `공동구매수요`, `생산자연결`, `운송의뢰`, `창고입고`, `재고관리`, `정산` |
 | 외부 표준·고유명 | 원 표기 | `YouTube`, `HSK`, `HTSUS`, `JWT`, `OAuth`, `KAMIS` |
 
@@ -54,6 +54,33 @@
 `SsalddelApiContractNameAttribute`로 보존하고 새 코드는 한국어 업무 이름을 사용한다.
 attribute, mapping 또는 adapter로 기존 contract를 명시적으로 보존하고 회귀 test를 둔다.
 외부 계약 자체를 바꿔야 할 때는 별도 migration과 호환 기간을 둔다.
+
+### 일반 아키텍처 역할 이름
+
+저장소 고유의 상위 개념을 기술 접미사로 만들지 않는다. `HIOPS`와 `OS`는
+설계 이력이나 호환 식별자에는 남을 수 있지만 새 class, interface, field,
+parameter 또는 file 이름의 기술 역할로 사용하지 않는다. 실제 책임에 따라
+다음 이름을 선택한다.
+
+| 실제 책임 | 기술 역할 |
+| --- | --- |
+| 여러 상태 전이와 장기 실행 업무를 조율 | `ProcessManager`, `Saga` |
+| 여러 UseCase와 외부 adapter의 호출 순서를 조율 | `WorkflowCoordinator`, `Orchestrator` |
+| 일정에 따라 작업을 시작 | `Scheduler`, `BackgroundService`, `Job` |
+| 후보 계획·배분 | `Planner` |
+| 후보 매칭·선택 | `Matcher`, `Selector`, `Strategy` |
+| 수치 계산·추정 | `Calculator`, `Estimator` |
+| 분류·판정 | `Classifier`, `Evaluator` |
+| 외부 AI 호출 | `AiClient`, `AiService` |
+
+`Engine`은 입력을 받아 영속 상태를 바꾸지 않고 계산 결과만 반환하는
+순수 알고리즘 경계에서만 허용한다. DB 저장, 권한 확인, 상태 전이,
+Event/Outbox 발행을 수행하는 타입은 `UseCase`, `ApplicationService`,
+`ProcessManager` 중 실제 책임에 맞는 이름을 사용한다.
+
+기존 route, JSON 필드, 설정 section, Event code와 저장 식별자에 `os` 또는
+`engine`이 들어 있다면 호환 계약으로 분리해 유지할 수 있다. 내부 타입을 먼저
+일반 용어로 바꾸고, 외부 계약 변경은 별도 버전과 호환 기간을 둔다.
 
 ## 탐색 방법
 

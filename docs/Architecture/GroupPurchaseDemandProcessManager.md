@@ -1,10 +1,10 @@
-# 공동구매 수요·모집 OS
+# 공동구매 수요·모집 Process Manager
 
 ## 목적
 
-`공동구매 수요·모집 OS`는 Ssalddel 1.0의 하위 OS다. 0.5에서 사용자가 관리하고 공동 참여에 동의한 개별주문 원장을 품목·배송권·수령 조건과 B2B/B2C 구매 목적별로 안전하게 모으고, 모집 진행과 마감을 조율하며, 사람의 확인을 거쳐 기존 공동수입원장의 `1.5` 공급·무역 준비 블록으로 인계한다.
+`공동구매 수요·모집 Process Manager`는 Ssalddel 1.0의 장기 실행 업무 조율자다. 0.5에서 사용자가 관리하고 공동 참여에 동의한 개별주문 원장을 품목·배송권·수령 조건과 B2B/B2C 구매 목적별로 안전하게 모으고, 모집 진행과 마감을 조율하며, 사람의 확인을 거쳐 기존 공동수입원장의 `1.5` 공급·무역 준비 블록으로 인계한다.
 
-이 OS의 결과는 주문이나 계약이 아니라 **설명 가능한 주문자 집단 후보와 모집 원장**이다.
+이 Process Manager의 결과는 주문이나 계약이 아니라 **설명 가능한 주문자 집단 후보와 모집 원장**이다.
 
 ## 개별성 우선 원장 구조
 
@@ -28,13 +28,13 @@
 ```text
 0.0 커뮤니티·음식·재료 탐색
   → 0.5 개별주문·개별 원장
-  → 1.0 공동주문 수요·모집 OS
-  → 1.5 공동주문 수입 OS / 공급·무역 준비
-  → 2.0 국내 화물 운송 OS
-  → 2.5 창고·판매 이행 OS
+  → 1.0 공동주문 수요·모집 Process Manager
+  → 1.5 공동주문 수입 Workflow / 공급·무역 준비
+  → 2.0 국내 화물 운송 Workflow
+  → 2.5 창고·판매 이행 Workflow
 ```
 
-`공동구매 수요·모집 OS`와 `공동주문 수입 OS`는 같은 OS가 아니다. 전자는 수요와 모집을 책임지고, 후자는 확인된 모집 결과를 받아 공급·가격·HS·수입 준비와 후속 인계를 책임진다.
+`공동구매 수요·모집 Process Manager`와 `공동주문 수입 Workflow`는 같은 프로세스가 아니다. 전자는 수요와 모집을 책임지고, 후자는 확인된 모집 결과를 받아 공급·가격·HS·수입 준비와 후속 인계를 책임진다.
 
 ## 참여자 입장
 
@@ -67,14 +67,14 @@
 
 ## 상태와 큐
 
-| 상태 | OS의 처리 |
+| 상태 | Process Manager의 처리 |
 | --- | --- |
 | `CollectingDemand` | 수요 등록·변경·철회 때 집단화 엔진으로 진행도를 다시 계산한다 |
 | `ReadyToConfirm` | 목표 충족을 표시하되 자동 확정하지 않고 사람의 검토 큐에 올린다 |
 | `RecruitmentClosedTargetNotReached` | 목표 미달 이유와 새 모집 회차·범위·시간창 대안을 표시한다 |
 | `Confirmed` | 호환 코드다. 1.0에서는 주문 확정이 아니라 **모집 결과 인계 승인**으로만 해석한다 |
 
-`1.5` 준비 원장이 실제 생성되면 별도 인계 기록과 대상 원장 ID를 남긴다. 이 상태 변경은 OS가 직접 저장하지 않고 승인 Command와 UseCase가 수행한다.
+`1.5` 준비 원장이 실제 생성되면 별도 인계 기록과 대상 원장 ID를 남긴다. 이 상태 변경은 Process Manager가 직접 저장하지 않고 승인 Command와 UseCase가 수행한다.
 
 런타임 큐 코드는 다음과 같이 원장에 영속한다.
 
@@ -97,7 +97,7 @@
 
 ## 엔진과 실행 경계
 
-OS는 `주문자 집단화 엔진`을 호출해 다음 결과를 받는다.
+Process Manager는 현재 호환 타입인 `주문자 집단화 엔진`을 호출해 다음 결과를 받는다.
 
 - 결정적 자동집단 ID
 - 신규 집단 또는 기존 집단 배치 여부
@@ -110,7 +110,7 @@ OS는 `주문자 집단화 엔진`을 호출해 다음 결과를 받는다.
 
 ## 런타임 조율
 
-`공동구매수요모집OS`는 다음 트리거를 순서 있게 처리한다.
+`공동구매수요모집ProcessManager`는 다음 트리거를 순서 있게 처리한다.
 
 1. `DemandChanged`: 멱등 수요 저장 뒤 Batching 정책을 기록하고 진행 상태와 큐를 다시 계산한다.
 2. `DemandWithdrawn`: 본인 소유 비구속 수요 철회 뒤 남은 참여자·수량과 큐를 다시 계산한다.
@@ -118,20 +118,20 @@ OS는 `주문자 집단화 엔진`을 호출해 다음 결과를 받는다.
 4. `ManualReconcile`: 관리자가 특정 집단을 즉시 재조율한다.
 5. `HandoffApproved`: 서버 관리자 권한과 요청 멱등 키를 검증한 뒤 `Confirmed`와 `HandoffReady`를 기록한다.
 
-각 조율은 Mongo 자동집단 원장에 canonical OS ID, 정책 버전, 현재 큐, 마지막 트리거, 적용 정책, 다음 점검 시각과 인계 상태를 같은 낙관적 동시성 저장으로 남긴다. 수요 Command가 재시도되면 OS 조율 멱등 키도 함께 재사용해 중복 Event를 만들지 않는다.
+각 조율은 Mongo 자동집단 원장에 호환 workflow ID, 정책 버전, 현재 큐, 마지막 트리거, 적용 정책, 다음 점검 시각과 인계 상태를 같은 낙관적 동시성 저장으로 남긴다. 수요 Command가 재시도되면 프로세스 조율 멱등 키도 함께 재사용해 중복 Event를 만들지 않는다.
 
-background worker는 `GroupPurchaseDemandWorkflow`가 켜진 경우에만 동작한다. 기본 설정은 다음과 같으며 환경 변수의 `GroupPurchaseDemandOS__...` 키로 조정할 수 있다.
+`공동구매수요모집DeadlineScanBackgroundService`는 `GroupPurchaseDemandWorkflow`가 켜진 경우에만 동작한다. 기본 설정은 다음과 같으며 기존 배포 호환을 위해 환경 변수의 `GroupPurchaseDemandOS__...` 키를 유지한다.
 
 | 설정 | 기본값 | 의미 |
 | --- | ---: | --- |
-| `Enabled` | `true` | OS 마감·Aging background 점검 사용 여부 |
+| `Enabled` | `true` | Process Manager 마감·Aging background 점검 사용 여부 |
 | `ScanIntervalSeconds` | `60` | 점검 주기 |
 | `BatchSize` | `100` | 한 번에 조율할 최대 집단 수 |
 | `AgingReviewHours` | `24` | 모집중 집단의 장기 정체 재점검 간격 |
 
 ## 1.0 지원 공공데이터 배치 카탈로그
 
-OS는 모집 원장 점검과 공동구매 판단에 필요한 공개 가격·기업 근거의 수집 상태를 작업 카탈로그로 읽는다. 공공 API adapter와 가격 보관 DB의 소유권은 농수축산 정보 모듈에 그대로 둔다. 커뮤니티 글의 선택·작성·게시 일정은 OS가 소유하지 않고 [커뮤니티 자동 정보 발행 배치](CommunityAutomatedEditorialBatch.md)가 맡는다.
+Process Manager는 모집 원장 점검과 공동구매 판단에 필요한 공개 가격·기업 근거의 수집 상태를 작업 카탈로그로 읽는다. 공공 API adapter와 가격 보관 DB의 소유권은 농수축산 정보 모듈에 그대로 둔다. 커뮤니티 글의 선택·작성·게시 일정은 Process Manager가 소유하지 않고 [커뮤니티 자동 정보 발행 배치](CommunityAutomatedEditorialBatch.md)가 맡는다.
 
 | 작업 코드 | 역할 | 기본 등록 | 후속 효과 |
 | --- | --- | --- | --- |
@@ -141,7 +141,7 @@ OS는 모집 원장 점검과 공동구매 판단에 필요한 공개 가격·�
 | `UsdaMonthlyPriceCollection` | USDA NASS 미국 전국 월별 생산자 수취가격 보관 | 비활성 | 검증된 미국 가격 근거 생성 |
 | `OfficialFoodIngredientCompanyResearch` | 음식·재료 탐색용 공식 기업 근거 갱신 | 비활성 | 검토 후보만 보관, 자동 선정·연락 없음 |
 
-가격 수집 성공 뒤 가격 브리프를 게시하도록 설정할 수 있지만, 그 handoff와 독립 Quartz 중복 방지는 `CommunityEditorialBatchRegistrationPlan`이 결정한다. 공동구매 OS 카탈로그에는 게시 작업을 넣지 않는다. 게시 저장은 `sourceKey + periodKey` 시스템 작성자 키를 다시 확인하므로 재시도에도 같은 글을 중복 생성하지 않는다.
+가격 수집 성공 뒤 가격 브리프를 게시하도록 설정할 수 있지만, 그 handoff와 독립 Quartz 중복 방지는 `CommunityEditorialBatchRegistrationPlan`이 결정한다. 공동구매 배치 카탈로그에는 게시 작업을 넣지 않는다. 게시 저장은 `sourceKey + periodKey` 시스템 작성자 키를 다시 확인하므로 재시도에도 같은 글을 중복 생성하지 않는다.
 
 공공가격 수집·자동 게시는 source 자격 증명과 운영 검토가 필요한 외부 효과이므로 기본값을 켜지 않는다. 배포 환경에서 다음 조건을 각각 확인한 뒤 명시적으로 활성화한다.
 
@@ -164,23 +164,23 @@ OS는 모집 원장 점검과 공동구매 판단에 필요한 공개 가격·�
 
 인계 뒤에도 공급자, 수입자, 관세사, 운송사와 창고를 자동 선정하지 않는다.
 
-승인 시점에는 `ApprovedAwaitingGroupPurchaseImport` 인계 요청만 원장에 기록한다. `CustomsAndTradeDataWorkflow`가 꺼져 있으면 후속 준비 블록을 만들지 않는다. 1.0 OS가 별도 1.5 원장을 만들지 않으며, 1.5 준비 Service가 승인 요청을 소비해 기존 `group-import` 공동수입원장에 공급·가격·무역 준비 블록을 멱등하게 추가하고 그 원장 ID를 `대상원장Id`로 되돌려 기록한다. `Simulation`에서도 이 플랫폼 내부 추적 링크만 저장하며 계약·결제·신고·운송 실행은 열지 않는다.
+승인 시점에는 `ApprovedAwaitingGroupPurchaseImport` 인계 요청만 원장에 기록한다. `CustomsAndTradeDataWorkflow`가 꺼져 있으면 후속 준비 블록을 만들지 않는다. 1.0 Process Manager가 별도 1.5 원장을 만들지 않으며, 1.5 준비 Service가 승인 요청을 소비해 기존 `group-import` 공동수입원장에 공급·가격·무역 준비 블록을 멱등하게 추가하고 그 원장 ID를 `대상원장Id`로 되돌려 기록한다. `Simulation`에서도 이 플랫폼 내부 추적 링크만 저장하며 계약·결제·신고·운송 실행은 열지 않는다.
 
 ## 구현 연결
 
 | 책임 | 현재 구현 |
 | --- | --- |
-| OS·워크플로우 카탈로그 | `Ssalddel.ApiMetadata.SsalddelOperatingSystems`, `SsalddelWorkflow.GroupPurchaseDemand` |
+| 호환 workflow 카탈로그 | `Ssalddel.ApiMetadata.SsalddelOperatingSystems`, `SsalddelWorkflow.GroupPurchaseDemand` |
 | 집단화 엔진 | `I공동구매주문자집단화Engine`, `공동구매주문자집단화Engine` |
-| 런타임 OS | `I공동구매수요모집OS`, `공동구매수요모집OS` |
-| 상태전이 Port·Mongo 원장 | `I공동구매수요모집Os상태전이Port`, `Mongo공동구매자동집단화저장소` |
-| 마감·Aging worker | `공동구매수요모집OsWorker` |
-| OS 배치 등록계획·카탈로그 | `공동구매수요모집Os배치등록계획`, `I공동구매수요모집Os배치Catalog` |
+| 장기 실행 조율 | `I공동구매수요모집ProcessManager`, `공동구매수요모집ProcessManager` |
+| 상태 저장 Port·Mongo 원장 | `I공동구매수요모집ProcessStore`, `Mongo공동구매자동집단화저장소` |
+| 마감·Aging 주기 실행 | `공동구매수요모집DeadlineScanBackgroundService` |
+| 호환 배치 등록계획·카탈로그 | `공동구매수요모집Os배치등록계획`, `I공동구매수요모집Os배치Catalog` |
 | 가격 수집·게시 handoff | `AgriculturalFisheriesCommunityPipelineRunner` |
 | 수요 UseCase | `I공동구매자동집단화UseCase`, `공동구매자동집단화UseCase` |
 | 개별 원함 원본 | `I공동구매개별원함원장Service`, `공동구매개별원함원장Service`, `individual-demand` 원장 템플릿 |
 | API | `공동구매자동집단화Controller` |
-| 관리자 운영 API | `공동구매수요모집OsAdminController` |
+| 관리자 운영 API | `공동구매수요모집ProcessManagerAdminController` |
 | 기능 플래그 | `GroupPurchaseDemandWorkflow` |
 | 공개·사용자 계약 | `공동구매자동집단요약응답`, `공동구매자동집단사용자응답`, `공동구매자동집단배치미리보기응답` |
 

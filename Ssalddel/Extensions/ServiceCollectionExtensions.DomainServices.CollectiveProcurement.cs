@@ -20,10 +20,10 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<Mongo공동구매자동집단화저장소>();
         services.AddSingleton<I공동구매자동집단화저장소>(provider =>
             provider.GetRequiredService<Mongo공동구매자동집단화저장소>());
-        services.AddSingleton<I공동구매수요모집Os상태전이Port>(provider =>
+        services.AddSingleton<I공동구매수요모집ProcessStore>(provider =>
             provider.GetRequiredService<Mongo공동구매자동집단화저장소>());
-        services.AddSingleton<I공동구매수요모집OS, 공동구매수요모집OS>();
-        services.AddHostedService<공동구매수요모집OsWorker>();
+        services.AddSingleton<I공동구매수요모집ProcessManager, 공동구매수요모집ProcessManager>();
+        services.AddHostedService<공동구매수요모집DeadlineScanBackgroundService>();
         services.AddScoped<I공동구매수령창고Service, 공동구매수령창고Service>();
         services.AddScoped<I공동구매개별원함원장Service, 공동구매개별원함원장Service>();
         services.AddScoped<I공동구매개별원함자동집단투영Service, 공동구매개별원함자동집단투영Service>();

@@ -43,9 +43,9 @@ public interface I공동구매자동집단화UseCase
     Condition = "구매 의사를 다른 주문자에게 공개해 모집하거나 토론하는 경우",
     Summary = "자동 집단화 후보를 커뮤니티 게시글과 태그 기반 모집 흐름으로 확장합니다.")]
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
-    "사용자 수요 Command를 검증하고 개별 원함 원장을 먼저 저장한 뒤 공동구매 수요·모집 OS 조율 흐름으로 전달합니다.",
+    "사용자 수요 Command를 검증하고 개별 원함 원장을 먼저 저장한 뒤 공동구매 수요·모집 ProcessManager로 전달합니다.",
     ContractType = typeof(I공동구매자동집단화UseCase),
     FlowOrder = 20,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
@@ -57,7 +57,7 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
     private readonly I공동구매개별원함원장Service _개별원함원장Service;
     private readonly I공동구매개별주문원장Service _개별주문원장Service;
     private readonly I공동구매주문자집단화Engine _집단화Engine;
-    private readonly I공동구매수요모집OS? _수요모집OS;
+    private readonly I공동구매수요모집ProcessManager? _수요모집ProcessManager;
     private readonly I공동구매개별원함자동집단투영Service? _원함투영Service;
 
     public 공동구매자동집단화UseCase(
@@ -66,7 +66,7 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
         I공동구매개별원함원장Service 개별원함원장Service,
         I공동구매개별주문원장Service 개별주문원장Service,
         I공동구매주문자집단화Engine 집단화Engine,
-        I공동구매수요모집OS? 수요모집OS = null,
+        I공동구매수요모집ProcessManager? 수요모집ProcessManager = null,
         I공동구매개별원함자동집단투영Service? 원함투영Service = null)
     {
         _저장소 = 저장소;
@@ -74,7 +74,7 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
         _개별원함원장Service = 개별원함원장Service;
         _개별주문원장Service = 개별주문원장Service;
         _집단화Engine = 집단화Engine;
-        _수요모집OS = 수요모집OS;
+        _수요모집ProcessManager = 수요모집ProcessManager;
         _원함투영Service = 원함투영Service;
     }
 
@@ -240,16 +240,16 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
     private Task<공동구매자동집단응답> 수요등록조율Async(
         공동구매자동수요등록Command command,
         CancellationToken cancellationToken)
-        => _수요모집OS is null
+        => _수요모집ProcessManager is null
             ? _저장소.수요등록Async(command, cancellationToken)
-            : _수요모집OS.수요등록조율Async(command, cancellationToken);
+            : _수요모집ProcessManager.수요등록조율Async(command, cancellationToken);
 
     private Task<공동구매자동수요철회응답> 수요철회조율Async(
         공동구매자동수요철회Command command,
         CancellationToken cancellationToken)
-        => _수요모집OS is null
+        => _수요모집ProcessManager is null
             ? _저장소.수요철회Async(command, cancellationToken)
-            : _수요모집OS.수요철회조율Async(command, cancellationToken);
+            : _수요모집ProcessManager.수요철회조율Async(command, cancellationToken);
 
     private async Task<공동구매자동집단응답> 개별원함기반수요등록조율Async(
         공동구매자동수요등록Command command,

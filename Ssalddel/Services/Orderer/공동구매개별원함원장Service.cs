@@ -37,7 +37,7 @@ public interface I공동구매개별원함원장Service
 /// 자동집단은 이 원장의 공통 조건을 읽는 투영이며 주문·결제·계약의 원본이 아닙니다.
 /// </summary>
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,
     "사용자별 비구속 공동구매 원함을 독립 원장으로 먼저 저장하고 자동집단이 참조할 원본 식별자를 제공합니다.",
     ContractType = typeof(I공동구매개별원함원장Service),

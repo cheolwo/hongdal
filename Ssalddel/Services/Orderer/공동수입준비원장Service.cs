@@ -43,18 +43,18 @@ public sealed class 공동수입준비원장Service : I공동수입준비원장S
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly I공동구매자동집단화저장소 _groupStore;
-    private readonly I공동구매수요모집OS _demandOperatingSystem;
+    private readonly I공동구매수요모집ProcessManager _demandProcessManager;
     private readonly I커뮤니티원장저장소 _ledgerStore;
     private readonly TimeProvider _timeProvider;
 
     public 공동수입준비원장Service(
         I공동구매자동집단화저장소 groupStore,
-        I공동구매수요모집OS demandOperatingSystem,
+        I공동구매수요모집ProcessManager demandProcessManager,
         I커뮤니티원장저장소 ledgerStore,
         TimeProvider timeProvider)
     {
         _groupStore = groupStore;
-        _demandOperatingSystem = demandOperatingSystem;
+        _demandProcessManager = demandProcessManager;
         _ledgerStore = ledgerStore;
         _timeProvider = timeProvider;
     }
@@ -70,7 +70,7 @@ public sealed class 공동수입준비원장Service : I공동수입준비원장S
         {
             return null;
         }
-        var operatingState = await _demandOperatingSystem.운영상태조회Async(normalizedGroupId, cancellationToken)
+        var operatingState = await _demandProcessManager.운영상태조회Async(normalizedGroupId, cancellationToken)
                              ?? new 공동구매수요모집Os상태응답 { 자동집단Id = normalizedGroupId };
         var ledger = await 기존공동수입원장조회Async(
             [new 원천수요Context(group, operatingState)],
@@ -612,7 +612,7 @@ public sealed class 공동수입준비원장Service : I공동수입준비원장S
                 ? anchorGroup
                 : await _groupStore.집단조회Async(groupId, cancellationToken)
                   ?? throw new KeyNotFoundException($"재료 품목에 연결한 1.0 수요 집단 '{groupId}'을 찾을 수 없습니다.");
-            var state = await _demandOperatingSystem.운영상태조회Async(groupId, cancellationToken)
+            var state = await _demandProcessManager.운영상태조회Async(groupId, cancellationToken)
                         ?? new 공동구매수요모집Os상태응답 { 자동집단Id = groupId };
             if (승인필수)
             {
@@ -742,7 +742,7 @@ public sealed class 공동수입준비원장Service : I공동수입준비원장S
         var linked = new List<원천수요Context>(sources.Count);
         foreach (var source in sources)
         {
-            var state = await _demandOperatingSystem.후속원장연결Async(
+            var state = await _demandProcessManager.후속원장연결Async(
                 source.Group.자동집단Id,
                 source.OperatingState.인계요청Id,
                 ledgerId,

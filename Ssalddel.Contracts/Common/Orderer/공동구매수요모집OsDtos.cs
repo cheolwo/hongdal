@@ -36,7 +36,7 @@ public static class 공동구매수요모집인계상태코드
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Contract,
     "공동구매 수요·모집 OS의 큐, 정책, 조율 결과와 사람 승인 인계 계약을 정의합니다.",
     FlowOrder = 10,
@@ -122,7 +122,7 @@ public static class 공동구매수요모집Os배치상태코드
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Contract,
     "1.0 공동구매 판단을 돕는 모집 점검, 공공가격과 검토용 근거 수집 작업의 OS 등록 상태를 정의합니다.",
     FlowOrder = 12,

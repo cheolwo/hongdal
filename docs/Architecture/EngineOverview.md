@@ -60,7 +60,7 @@ flowchart TD
 
 코드에서는 `GET /api/v1/version-feature-flags` 응답의 `OperatingSystems` 항목으로 이 OS 목록, 조합 엔진, 스케줄링 정책 카탈로그를 조회할 수 있다.
 
-현재 제품 집중 OS는 `CommunityTrust`다. 공개 정보, 참여 동의, 공동 원장과 완료 사례 환류를 후속 실행 OS 없이 닫는 데 집중한다. [공동구매 수요·모집 OS](GroupPurchaseDemandOS.md)는 1.0, 국내 화물 운송 OS는 2.0 후속 자산으로 보존한다.
+현재 제품 집중 workflow는 `CommunityTrust`다. 공개 정보, 참여 동의, 공동 원장과 완료 사례 환류를 후속 실행 workflow 없이 닫는 데 집중한다. [공동구매 수요·모집 Process Manager](GroupPurchaseDemandProcessManager.md)는 1.0, 국내 화물 운송 workflow는 2.0 후속 자산으로 보존한다.
 
 ## OS별 스케줄링 정책 카탈로그
 

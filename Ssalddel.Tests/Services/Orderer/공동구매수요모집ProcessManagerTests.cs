@@ -6,7 +6,7 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Tests.Services.Orderer;
 
-public sealed class 공동구매수요모집OSTests
+public sealed class 공동구매수요모집ProcessManagerTests
 {
     private static readonly DateTime 기준시각Utc = new(2026, 7, 23, 1, 0, 0, DateTimeKind.Utc);
 
@@ -18,7 +18,7 @@ public sealed class 공동구매수요모집OSTests
         {
             StateByGroupId = { ["auto-group-1"] = 공동구매자동집단상태코드.확정대기 }
         };
-        var os = CreateOs(store, port);
+        var processManager = CreateProcessManager(store, port);
         var command = new 공동구매자동수요등록Command
         {
             요청멱등키 = "demand-command-1",
@@ -29,7 +29,7 @@ public sealed class 공동구매수요모집OSTests
             희망수량 = 3
         };
 
-        var result = await os.수요등록조율Async(command);
+        var result = await processManager.수요등록조율Async(command);
 
         Assert.Equal(1, store.RegisterCount);
         Assert.Equal(공동구매자동집단상태코드.확정대기, result.현재상태);
@@ -51,9 +51,9 @@ public sealed class 공동구매수요모집OSTests
                 ["closed-group"] = 공동구매자동집단상태코드.모집종료목표미달
             }
         };
-        var os = CreateOs(new StubDemandStore(), port);
+        var processManager = CreateProcessManager(new StubDemandStore(), port);
 
-        var result = await os.모집마감스캔Async(기준시각Utc, 10);
+        var result = await processManager.모집마감스캔Async(기준시각Utc, 10);
 
         Assert.Equal(2, result.조회건수);
         Assert.Equal(2, result.조율건수);
@@ -72,13 +72,13 @@ public sealed class 공동구매수요모집OSTests
     public async Task 사람의인계승인은_Simulation과_후속기능정지를_상태전이Port에전달한다()
     {
         var port = new RecordingStateTransitionPort();
-        var os = CreateOs(
+        var processManager = CreateProcessManager(
             new StubDemandStore(),
             port,
             customsWorkflowEnabled: false,
             mode: SsalddelExecutionMode.Simulation);
 
-        var result = await os.인계승인Async(
+        var result = await processManager.인계승인Async(
             "auto-group-1",
             new 공동구매수요모집인계승인요청
             {
@@ -98,12 +98,12 @@ public sealed class 공동구매수요모집OSTests
     public async Task 승인된인계는_1점5_대상원장Id를_상태전이Port에연결한다()
     {
         var port = new RecordingStateTransitionPort();
-        var os = CreateOs(
+        var processManager = CreateProcessManager(
             new StubDemandStore(),
             port,
             customsWorkflowEnabled: true);
 
-        var result = await os.후속원장연결Async(
+        var result = await processManager.후속원장연결Async(
             "auto-group-1",
             "handoff-1",
             "group-import-ledger-1");
@@ -113,7 +113,7 @@ public sealed class 공동구매수요모집OSTests
         Assert.Equal("group-import-ledger-1", result.대상원장Id);
     }
 
-    private static 공동구매수요모집OS CreateOs(
+    private static 공동구매수요모집ProcessManager CreateProcessManager(
         StubDemandStore store,
         RecordingStateTransitionPort port,
         bool customsWorkflowEnabled = false,
@@ -124,7 +124,7 @@ public sealed class 공동구매수요모집OSTests
             new StubFeatureFlags(customsWorkflowEnabled),
             new StubExecutionModePolicy(mode),
             new FixedTimeProvider(new DateTimeOffset(기준시각Utc)),
-            new StaticOptionsMonitor<GroupPurchaseDemandOsOptions>(new GroupPurchaseDemandOsOptions
+            new StaticOptionsMonitor<GroupPurchaseDemandProcessManagerOptions>(new GroupPurchaseDemandProcessManagerOptions
             {
                 BatchSize = 100,
                 AgingReviewHours = 24
@@ -180,7 +180,7 @@ public sealed class 공동구매수요모집OSTests
             => Task.FromResult(Group(자동집단Id, 공동구매자동집단상태코드.수요수집중));
     }
 
-    private sealed class RecordingStateTransitionPort : I공동구매수요모집Os상태전이Port
+    private sealed class RecordingStateTransitionPort : I공동구매수요모집ProcessStore
     {
         public List<string> DueGroupIds { get; init; } = [];
         public Dictionary<string, string> StateByGroupId { get; init; } = new(StringComparer.Ordinal);
