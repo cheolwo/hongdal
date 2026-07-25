@@ -39,24 +39,44 @@ public sealed class YouTubeFoodCommerceModelTests
     }
 
     [Fact]
-    public void Migration과Snapshot은_유튜브음식커머스만추가한다()
+    public void MigrationBaseline과Snapshot은_유튜브음식커머스를포함한다()
     {
         using var context = CreateContext();
-        const string migrationId = "20260717150000_AddYouTubeFoodCommerceDiscovery";
+        const string migrationId = "20260723113440_AddCommunityPostEmailNotificationOutbox";
         Assert.Contains(migrationId, context.Database.GetMigrations());
 
         var migrationsAssembly = context.GetService<IMigrationsAssembly>();
         var migration = migrationsAssembly.CreateMigration(
             migrationsAssembly.Migrations[migrationId],
             context.Database.ProviderName!);
-        var createdTable = Assert.Single(migration.UpOperations.OfType<CreateTableOperation>());
+        var createdTable = Assert.Single(
+            migration.UpOperations.OfType<CreateTableOperation>(),
+            operation => operation.Name == "youtube_video_product_candidates");
         Assert.Equal("youtube_video_product_candidates", createdTable.Name);
-        Assert.Equal(10, migration.UpOperations.OfType<AddColumnOperation>().Count());
+        var expectedColumnNames = new[]
+        {
+            "channel_handle",
+            "country_code",
+            "default_language_code",
+            "food_category_codes",
+            "import_discovery_score",
+            "is_food_channel",
+            "purchase_discovery_score",
+            "research_note",
+            "research_source_url",
+            "research_verified_at_utc"
+        };
+        var addedColumns = migration.UpOperations
+            .OfType<AddColumnOperation>()
+            .Where(operation => operation.Table == "youtube_watched_channels")
+            .Where(operation => expectedColumnNames.Contains(operation.Name, StringComparer.Ordinal))
+            .ToArray();
+        Assert.Equal(expectedColumnNames.Length, addedColumns.Length);
         Assert.All(
-            migration.UpOperations.OfType<AddColumnOperation>(),
+            addedColumns,
             operation => Assert.Equal("youtube_watched_channels", operation.Table));
         var countryColumn = Assert.Single(
-            migration.UpOperations.OfType<AddColumnOperation>(),
+            addedColumns,
             operation => operation.Name == "country_code");
         Assert.False(countryColumn.IsNullable);
         Assert.Equal("ZZ", countryColumn.DefaultValue);

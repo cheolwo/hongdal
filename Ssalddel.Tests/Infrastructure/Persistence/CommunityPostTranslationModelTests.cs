@@ -30,16 +30,21 @@ public sealed class CommunityPostTranslationModelTests
     public void MigrationAndSnapshot_ContainTranslationCache()
     {
         using var context = CreateContext();
-        const string migrationId = "20260717180000_AddCommunityPostTranslations";
+        const string migrationId = "20260723113440_AddCommunityPostEmailNotificationOutbox";
         Assert.Contains(migrationId, context.Database.GetMigrations());
 
         var migrationsAssembly = context.GetService<IMigrationsAssembly>();
         var migration = migrationsAssembly.CreateMigration(
             migrationsAssembly.Migrations[migrationId],
             context.Database.ProviderName!);
-        var table = Assert.Single(migration.UpOperations.OfType<CreateTableOperation>());
+        var table = Assert.Single(
+            migration.UpOperations.OfType<CreateTableOperation>(),
+            operation => operation.Name == "platform_community_post_translations");
         Assert.Equal("platform_community_post_translations", table.Name);
-        var column = Assert.Single(migration.UpOperations.OfType<AddColumnOperation>());
+        var column = Assert.Single(
+            migration.UpOperations.OfType<AddColumnOperation>(),
+            operation => operation.Name == nameof(PlatformCommunityPost.OriginalLanguageCode)
+                && operation.Table == "platform_community_posts");
         Assert.Equal(nameof(PlatformCommunityPost.OriginalLanguageCode), column.Name);
         Assert.Equal("platform_community_posts", column.Table);
 

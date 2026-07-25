@@ -34,12 +34,14 @@ public sealed class HrRoleApplicationModelTests
     public void Migration과Snapshot은_역할지원원장을포함한다()
     {
         using var context = CreateContext();
-        const string migrationId = "20260720180000_AddHrRoleApplications";
+        const string migrationId = "20260723113440_AddCommunityPostEmailNotificationOutbox";
         Assert.Contains(migrationId, context.Database.GetMigrations());
 
         var assembly = context.GetService<IMigrationsAssembly>();
         var migration = assembly.CreateMigration(assembly.Migrations[migrationId], context.Database.ProviderName!);
-        var table = Assert.Single(migration.UpOperations.OfType<CreateTableOperation>());
+        var table = Assert.Single(
+            migration.UpOperations.OfType<CreateTableOperation>(),
+            operation => operation.Name == "hr_role_applications");
         Assert.Equal("hr_role_applications", table.Name);
 
         var snapshotType = typeof(HR역할지원CommandUseCase).Assembly

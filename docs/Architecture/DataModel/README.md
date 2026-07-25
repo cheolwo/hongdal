@@ -29,6 +29,21 @@ flowchart TD
 세 EF Context는 같은 MySQL 연결을 사용하지만 모델과 migration history를 독립적으로 소유한다.
 `IDedicatedDbContextConfiguration`이 붙은 구성은 중앙 Context의 assembly scan에서 제외한다.
 
+## 0.0 migration baseline
+
+0.0 배포 DB가 이미 적용한 마지막 `MigrationId`를 유지하면서 이전 이력을 하나의 baseline으로 합쳤다.
+기존 DB는 같은 ID를 이미 보유하므로 baseline을 다시 실행하지 않고, 새 DB는 합쳐진 `Up`을 한 번 실행한다.
+
+| Context | 0.0 baseline `MigrationId` |
+| --- | --- |
+| `SsalddelContext` | `20260723113440_AddCommunityPostEmailNotificationOutbox` |
+| `AgriculturalFisheriesDbContext` | `20260724053706_AddChinaImportedFoodManufacturerRegions` |
+| `TraditionalMarketDbContext` | `20260714151153_AddTraditionalMarketNeighborhoodCouncil` |
+
+기존 DB의 더 오래된 history 행은 삭제할 필요가 없다. EF는 assembly에 남은 baseline ID와 이후 migration만 비교한다.
+새 migration은 baseline 뒤에 평소와 같이 추가하며, 삭제된 개별 migration을 다시 생성하거나 복원하지 않는다.
+다음 baseline 재정리는 그 시점의 모든 배포 DB가 동일한 마지막 ID를 적용한 뒤에만 수행한다.
+
 ## 관계 분류
 
 Entity의 `...Id` 속성을 발견했다고 곧바로 FK를 만들지 않는다. 먼저 다음 셋 중 하나로 분류한다.

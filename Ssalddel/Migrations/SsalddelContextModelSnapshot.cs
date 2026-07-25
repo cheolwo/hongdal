@@ -5534,6 +5534,10 @@ namespace Ssalddel.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("last_attempted_at");
 
+                    b.Property<DateTime?>("읽은시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("read_at");
+
                     b.Property<string>("발송상태")
                         .IsRequired()
                         .HasMaxLength(50)

@@ -44,26 +44,30 @@ public sealed class CommunityKeywordNotificationModelTests
     public void MigrationAndSnapshot_ContainTheKeywordNotificationFoundation()
     {
         using var context = CreateContext();
-        const string migrationId = "20260715001000_AddCommunityKeywordNotifications";
+        const string migrationId = "20260723113440_AddCommunityPostEmailNotificationOutbox";
         Assert.Contains(migrationId, context.Database.GetMigrations());
 
         var migrationsAssembly = context.GetService<IMigrationsAssembly>();
         var migration = migrationsAssembly.CreateMigration(
             migrationsAssembly.Migrations[migrationId],
             context.Database.ProviderName!);
-        Assert.Equal(
-            [
+        var createdTables = migration.UpOperations
+            .OfType<CreateTableOperation>()
+            .Select(operation => operation.Name)
+            .ToHashSet(StringComparer.Ordinal);
+        Assert.All(
+            new[]
+            {
                 "community_keyword_notification_deliveries",
                 "community_keyword_notifications",
                 "community_keyword_subscriptions",
                 "platform_community_post_keyword_scans"
-            ],
-            migration.UpOperations
-                .OfType<CreateTableOperation>()
-                .Select(operation => operation.Name)
-                .OrderBy(name => name, StringComparer.Ordinal)
-                .ToArray());
-        var addedColumn = Assert.Single(migration.UpOperations.OfType<AddColumnOperation>());
+            },
+            tableName => Assert.Contains(tableName, createdTables));
+        var addedColumn = Assert.Single(
+            migration.UpOperations.OfType<AddColumnOperation>(),
+            operation => operation.Table == "platform_community_posts"
+                && operation.Name == nameof(PlatformCommunityPost.AuthorUserId));
         Assert.Equal("platform_community_posts", addedColumn.Table);
         Assert.Equal(nameof(PlatformCommunityPost.AuthorUserId), addedColumn.Name);
 
@@ -93,10 +97,10 @@ public sealed class CommunityKeywordNotificationModelTests
     }
 
     [Fact]
-    public void MigrationAndSnapshot_ContainOnlyThePostAuthorDisplayCountryColumns()
+    public void MigrationBaselineAndSnapshot_ContainThePostAuthorDisplayCountryColumns()
     {
         using var context = CreateContext();
-        const string migrationId = "20260717134000_AddCommunityPostAuthorDisplayCountry";
+        const string migrationId = "20260723113440_AddCommunityPostEmailNotificationOutbox";
         Assert.Contains(migrationId, context.Database.GetMigrations());
 
         var migrationsAssembly = context.GetService<IMigrationsAssembly>();
@@ -105,6 +109,11 @@ public sealed class CommunityKeywordNotificationModelTests
             context.Database.ProviderName!);
         var addedColumns = migration.UpOperations
             .OfType<AddColumnOperation>()
+            .Where(operation => operation.Table == "platform_community_posts")
+            .Where(operation => operation.Name is
+                nameof(PlatformCommunityPost.AuthorDisplayCountryCode)
+                or nameof(PlatformCommunityPost.AuthorDisplayCountryName)
+                or nameof(PlatformCommunityPost.IsAuthorDisplayCountryPublic))
             .OrderBy(operation => operation.Name, StringComparer.Ordinal)
             .ToArray();
 
@@ -117,8 +126,6 @@ public sealed class CommunityKeywordNotificationModelTests
                 nameof(PlatformCommunityPost.IsAuthorDisplayCountryPublic)
             ],
             addedColumns.Select(operation => operation.Name).ToArray());
-        Assert.DoesNotContain(migration.UpOperations, operation => operation is CreateTableOperation);
-
         var post = context.Model.FindEntityType(typeof(PlatformCommunityPost));
         Assert.Equal(2, post?.FindProperty(nameof(PlatformCommunityPost.AuthorDisplayCountryCode))?.GetMaxLength());
         Assert.Equal(80, post?.FindProperty(nameof(PlatformCommunityPost.AuthorDisplayCountryName))?.GetMaxLength());
