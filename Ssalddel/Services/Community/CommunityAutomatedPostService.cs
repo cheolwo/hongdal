@@ -16,8 +16,14 @@ namespace Ssalddel.Services.Community;
 
 public static class CommunityAutomatedPostSourceKeys
 {
-    public const string KamisPriceBrief = "kamis-price-brief";
-    public const string UsdaNassPriceBrief = "usda-nass-price-brief";
+    public const string KamisPriceBrief =
+        CommunityBoardInformationPublicationSourceKeys.KamisPriceBrief;
+    public const string UsdaNassPriceBrief =
+        CommunityBoardInformationPublicationSourceKeys.UsdaNassPriceBrief;
+    public const string ChinaImportedFoodRegionBrief =
+        CommunityBoardInformationPublicationSourceKeys.ChinaImportedFoodRegionBrief;
+    public const string UnitedStatesImportedFoodStateBrief =
+        CommunityBoardInformationPublicationSourceKeys.UnitedStatesImportedFoodStateBrief;
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
     public const string CultureTransport = "culture-transport";

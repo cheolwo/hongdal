@@ -20,7 +20,8 @@ public sealed class UnitedStatesImportedFoodStateCommunityPostSource(
     : IUnitedStatesImportedFoodStateCommunityPostSource,
         ICommunityAutomatedPostSource
 {
-    public const string SourceKeyValue = "us-imported-food-state-brief";
+    public const string SourceKeyValue =
+        CommunityAutomatedPostSourceKeys.UnitedStatesImportedFoodStateBrief;
 
     public const string OfficialSourceUrl =
         "https://www.data.go.kr/data/15098434/fileData.do?recommendDataYn=Y";

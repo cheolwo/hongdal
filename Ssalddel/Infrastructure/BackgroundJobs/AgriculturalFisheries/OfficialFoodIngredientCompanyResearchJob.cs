@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Quartz;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.FoodCulture;
@@ -7,6 +8,12 @@ using 살뜰.Services.Options;
 
 namespace Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 
+[SsalddelCommunityV0Module(
+    SsalddelCommunityV0ModuleKeys.Authoring,
+    SsalddelModuleKind.BackgroundProcessing,
+    "식약처 수입식품 근거 수집 뒤 중국 권역·미국 주별 월간 요약을 MFDS 주기 데이터 게시판에 작성",
+    ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
+    Boundary = "식약처의 현재 근거가 있고 국가별 발행 설정을 명시적으로 켠 경우에만 작성하며 제조업소 소재지를 원산지나 공급 가능성으로 확정하지 않습니다.")]
 public sealed class OfficialFoodIngredientCompanyBatchRunner(
     IOfficialFoodIngredientCompanyArchiveService archiveService,
     IChinaImportedFoodRegionCommunityPostSource chinaCommunityPostSource,

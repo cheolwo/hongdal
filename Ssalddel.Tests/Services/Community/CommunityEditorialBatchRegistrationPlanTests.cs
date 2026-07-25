@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Services.Community;
 using 살뜰.Services.Options;
 
@@ -5,6 +6,50 @@ namespace Ssalddel.Tests.Services.Community;
 
 public sealed class CommunityEditorialBatchRegistrationPlanTests
 {
+    [Fact]
+    public void 주기데이터게시판의_자동작성Source를_0_0등록계획에모두포함한다()
+    {
+        var plan = CommunityEditorialBatchRegistrationPlan.Create(
+            new AgriculturalFisheriesBatchOptions
+            {
+                Enabled = true,
+                PublishCommunityPriceBriefs = true,
+                KamisDailyEnabled = true,
+                UsdaMonthlyEnabled = true,
+                IngredientCompanyResearchEnabled = true,
+                PublishChinaImportedFoodRegionBriefs = true,
+                PublishUnitedStatesImportedFoodStateBriefs = true
+            },
+            new CommunityEditorialBatchOptions
+            {
+                Enabled = true,
+                KamisPriceBriefEnabled = true,
+                UsdaNassPriceBriefEnabled = true
+            });
+
+        var publicationSources = CommunityPeriodicDataBoardCatalog.All
+            .SelectMany(board => board.PublicationSourceKeys.Select(sourceKey => new
+            {
+                board.BoardKey,
+                SourceKey = sourceKey
+            }))
+            .ToArray();
+
+        Assert.NotEmpty(publicationSources);
+        Assert.All(publicationSources, source =>
+        {
+            var registration = plan.Get(source.SourceKey);
+            Assert.Equal(source.BoardKey, registration.CanonicalBoardKey);
+            Assert.True(
+                registration.QuartzRegistrationEnabled
+                || registration.CollectionHandoffEnabled);
+        });
+        Assert.DoesNotContain(
+            plan.Registrations,
+            registration => registration.CanonicalBoardKey
+                            == CommunityBoardKeys.PeriodicDataCustomsImportUnitPrice);
+    }
+
     [Fact]
     public void 수집후가격게시를사용하면_독립Quartz를막고_편집배치가인계를소유한다()
     {

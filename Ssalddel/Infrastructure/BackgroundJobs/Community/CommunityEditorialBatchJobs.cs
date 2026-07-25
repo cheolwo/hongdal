@@ -1,4 +1,5 @@
 using Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Services.Community;
 using Microsoft.Extensions.Options;
 using Quartz;
@@ -6,6 +7,12 @@ using 살뜰.Services.Options;
 
 namespace Ssalddel.Infrastructure.BackgroundJobs.Community;
 
+[SsalddelCommunityV0Module(
+    SsalddelCommunityV0ModuleKeys.Authoring,
+    SsalddelModuleKind.BackgroundProcessing,
+    "게시판별 공공·공식 데이터 source를 정해진 주기로 글로 작성하고 같은 source·기간의 중복 발행을 방지",
+    ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
+    Boundary = "카탈로그에 등록되고 운영 설정에서 명시적으로 활성화된 source만 실행하며, 검증된 데이터가 없으면 글을 만들지 않습니다.")]
 public sealed class CommunityEditorialBatchRunner
 {
     private readonly IReadOnlyDictionary<string, ICommunityAutomatedPostSource> _sources;

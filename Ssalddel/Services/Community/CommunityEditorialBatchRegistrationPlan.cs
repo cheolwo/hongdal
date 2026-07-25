@@ -1,9 +1,11 @@
+using Ssalddel.Contracts.Common.Community;
 using 살뜰.Services.Options;
 
 namespace Ssalddel.Services.Community;
 
 internal sealed record CommunityEditorialBatchRegistration(
     string SourceKey,
+    string? CanonicalBoardKey,
     bool QuartzRegistrationEnabled,
     bool CollectionHandoffEnabled);
 
@@ -25,6 +27,9 @@ internal sealed class CommunityEditorialBatchRegistrationPlan
 
     public bool ShouldRegisterQuartz(string sourceKey)
         => Get(sourceKey).QuartzRegistrationEnabled;
+
+    public IReadOnlyCollection<CommunityEditorialBatchRegistration> Registrations
+        => _registrations.Values.ToArray();
 
     public static CommunityEditorialBatchRegistrationPlan Create(
         AgriculturalFisheriesBatchOptions agriculturalBatch,
@@ -57,6 +62,20 @@ internal sealed class CommunityEditorialBatchRegistrationPlan
                 && !usdaCollectionHandoff,
                 usdaCollectionHandoff),
             Registration(
+                CommunityAutomatedPostSourceKeys.ChinaImportedFoodRegionBrief,
+                quartzRegistrationEnabled: false,
+                collectionHandoffEnabled:
+                    agriculturalBatch.Enabled
+                    && agriculturalBatch.IngredientCompanyResearchEnabled
+                    && agriculturalBatch.PublishChinaImportedFoodRegionBriefs),
+            Registration(
+                CommunityAutomatedPostSourceKeys.UnitedStatesImportedFoodStateBrief,
+                quartzRegistrationEnabled: false,
+                collectionHandoffEnabled:
+                    agriculturalBatch.Enabled
+                    && agriculturalBatch.IngredientCompanyResearchEnabled
+                    && agriculturalBatch.PublishUnitedStatesImportedFoodStateBriefs),
+            Registration(
                 CommunityAutomatedPostSourceKeys.Reflection,
                 editorialBatch.Enabled && editorialBatch.ReflectionEnabled),
             Registration(
@@ -77,5 +96,9 @@ internal sealed class CommunityEditorialBatchRegistrationPlan
         string sourceKey,
         bool quartzRegistrationEnabled,
         bool collectionHandoffEnabled = false)
-        => new(sourceKey, quartzRegistrationEnabled, collectionHandoffEnabled);
+        => new(
+            sourceKey,
+            CommunityPeriodicDataBoardCatalog.CanonicalBoardKeyForPublicationSource(sourceKey),
+            quartzRegistrationEnabled,
+            collectionHandoffEnabled);
 }

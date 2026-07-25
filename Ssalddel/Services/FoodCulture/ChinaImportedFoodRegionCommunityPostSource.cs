@@ -20,7 +20,8 @@ public sealed class ChinaImportedFoodRegionCommunityPostSource(
     : IChinaImportedFoodRegionCommunityPostSource,
         ICommunityAutomatedPostSource
 {
-    public const string SourceKeyValue = "china-imported-food-region-brief";
+    public const string SourceKeyValue =
+        CommunityAutomatedPostSourceKeys.ChinaImportedFoodRegionBrief;
 
     public const string OfficialSourceUrl =
         "https://www.data.go.kr/data/15098434/fileData.do?recommendDataYn=Y";

@@ -22,7 +22,7 @@
 - `UsdaNassQuickStats가격공급자`: USDA NASS Quick Stats 농산물·양식 수산물 통계 어댑터
 - `미국농수산가격조회Service`: 출처 선택, 요청 정규화, 단기 캐시와 장애 격리
 - `AgriculturalFisheriesInformationService`: 출처 안내, 지원 품목 검색, 국내가격 조회와 주의사항
-- `AgriculturalFisheriesInformationController`: 공개 읽기 전용 API
+- `농수산정보Controller`: 공개 읽기 전용 API
 - `FoodPriceComparisonService`: 정보 모듈의 국내가격 결과를 소비하고 관세청 수입 통계와 비교
 
 의존성 등록은 `AddAgriculturalFisheriesInformationModule()`에 모아 일반 도메인 서비스와 HTTP 클라이언트 등록부에 흩어지지 않게 한다.

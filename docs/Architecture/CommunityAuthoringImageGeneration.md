@@ -57,7 +57,7 @@ flowchart LR
 | `CommunityAuthoringImageContextSegmenter` | 소제목·문단 파싱과 인접 구간 병합, 내부 원문 문맥 보존 |
 | `CommunityAuthoringImagePromptFactory` | 외부 문맥 치환·길이 조정, 시각적 초점과 안전 제약 조립 |
 | `CommunityAuthoringImageService` | 글쓰기 용도·대상 격리, 프롬프트·비율 검증, 화면 DTO와 첨부 파일 제공 |
-| `CommunityAuthoringImagesController` | 서버관리자 권한 아래 계획·생성·조회·게시글 첨부 endpoint 제공 |
+| `커뮤니티작성이미지Controller` | 서버관리자 권한 아래 계획·생성·조회·게시글 첨부 endpoint 제공 |
 | `CommunityAuthoringImageGeneratorViewModel` | 계획과 다중 생성·조회·첨부 순서 조율 |
 | `CommunityAuthoringImagePromptItemViewModel` | 문맥별 프롬프트·비율·생성 상태·오류·첨부 선택 관리 |
 | 공통 Razor 도구 | 문맥 선택, 프롬프트 편집, 종횡비, 대기·실패·완료, 미리보기와 첨부 선택 표시 |
