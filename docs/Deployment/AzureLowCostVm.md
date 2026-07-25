@@ -25,6 +25,18 @@
 7. 같은 서버 이미지로 `--initialize-database`를 한 번 실행한다. 최초 관리자 계정이 없다면 이 실행에만 `SSALDDEL_BOOTSTRAP_ADMIN_ENABLED=true`와 아이디·이메일·임시 강력 비밀번호를 주입하고, 성공 직후 다시 비활성화하고 비밀번호를 제거한다.
 8. 앱과 Caddy를 시작하고 공개 HTTPS URL에서 `/health/live`, `/health/ready`, 게시판과 실제 이미지 첨부를 확인한다.
 
+### 주문자 1.0 미리보기
+
+비구속 공동구매 수요와 주문자 집단화까지만 확인할 때는
+`compose.orderer-v10.override.yaml`을 두 번째 Compose 파일로 사용한다. 기본
+`compose.yaml`은 후속 업무 플래그를 모두 닫으며, 1.0 override만
+`GroupPurchaseDemandWorkflow`를 추가로 활성화한다.
+
+GitHub `Release readiness` workflow가 생성한
+`orderer-v10-deployment-<run-number>` 산출물에는 서버 image, Web 정적 파일,
+Compose와 공통 rollback script가 함께 들어간다. 배포와 확인 절차는
+[문화교통 1.0 배포 준비 절차](../Versions/v1.0/deployment-runbook.md)를 따른다.
+
 ### 주문자 1.5 미리보기
 
 기존 VM의 비밀값·볼륨·보안 설정을 그대로 유지하면서 주문자 1.5 기능을 점검할 때는

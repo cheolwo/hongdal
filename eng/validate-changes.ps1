@@ -332,6 +332,7 @@ try {
             "Release" {
                 $buildTargets = @(
                     "Ssalddel.v0.0.slnx",
+                    "Ssalddel.v0.5.slnx",
                     "Ssalddel.v1.0.slnx",
                     "Ssalddel.v1.5.slnx"
                 )

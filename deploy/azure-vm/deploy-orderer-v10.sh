@@ -7,5 +7,5 @@ script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 exec bash "$script_directory/deploy-preview-profile.sh" \
   "$release_directory" \
-  orderer-v15 \
+  orderer-v10 \
   "$application_root"

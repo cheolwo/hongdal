@@ -45,6 +45,12 @@ jobs:
           --artifacts-path artifacts/build/v0
           --property:Configuration=Release
 
+      - name: Restore version 0.5 slice
+        run: >-
+          dotnet restore Ssalddel.v0.5.slnx
+          --artifacts-path artifacts/build/v05
+          --property:Configuration=Release
+
       - name: Restore version 1.0 slice
         run: >-
           dotnet restore Ssalddel.v1.0.slnx
@@ -61,6 +67,16 @@ jobs:
         run: >-
           dotnet build Ssalddel.v0.0.slnx
           --artifacts-path artifacts/build/v0
+          --configuration Release
+          --no-restore
+          --verbosity minimal
+          -p:ContinuousIntegrationBuild=true
+          -p:UseSharedCompilation=false
+
+      - name: Build version 0.5 slice
+        run: >-
+          dotnet build Ssalddel.v0.5.slnx
+          --artifacts-path artifacts/build/v05
           --configuration Release
           --no-restore
           --verbosity minimal
@@ -137,7 +153,7 @@ jobs:
           retention-days: 14
 
   container-readiness:
-    name: Compose and container build
+    name: Compose, container, and 1.0 deployment bundle
     needs: version-readiness
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -146,11 +162,56 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Validate Compose configuration
-        run: docker compose --env-file docker-compose.env.example config --quiet
-
       - name: Build server container
-        run: docker build --file Ssalddel/Dockerfile --tag ssalddel:release-readiness .
+        run: docker build --file Ssalddel/Dockerfile --tag ssalddel-server:azure-preview .
+
+      - name: Validate Azure 1.0 Compose profile
+        env:
+          SSALDDEL_MYSQL_ROOT_PASSWORD: readiness-root-password
+          SSALDDEL_MYSQL_PASSWORD: readiness-app-password
+          SSALDDEL_MONGO_PASSWORD: readiness-mongo-password
+          SSALDDEL_SITE_HOST: readiness.example.test
+          SSALDDEL_JWT_SECRET_KEY: readiness-jwt-secret-key-with-at-least-32-bytes
+          SSALDDEL_DATA_PROTECTION_CERTIFICATE_PASSWORD: readiness-certificate-password
+          SSALDDEL_ISMS_P_AES_KEY_BASE64: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+          SSALDDEL_ISMS_P_HASH_SALT: readiness-hash-salt
+          SSALDDEL_STORAGE_ACCOUNT_NAME: readinessstorage
+        run: >-
+          docker compose
+          -f deploy/azure-vm/compose.yaml
+          -f deploy/azure-vm/compose.orderer-v10.override.yaml
+          config --quiet
+
+      - name: Download published server and web
+        uses: actions/download-artifact@v4
+        with:
+          name: release-readiness-${{ github.run_number }}
+          path: artifacts/release-readiness
+
+      - name: Package Azure 1.0 deployment bundle
+        run: |
+          set -euo pipefail
+          bundle="artifacts/orderer-v10"
+          test -f artifacts/release-readiness/web/wwwroot/index.html
+          mkdir -p "$bundle"
+          docker save --output "$bundle/ssalddel-server.tar" ssalddel-server:azure-preview
+          tar -C artifacts/release-readiness/web/wwwroot -czf "$bundle/web.tar.gz" .
+          cp deploy/azure-vm/compose.yaml "$bundle/compose.yaml"
+          cp deploy/azure-vm/compose.orderer-v10.override.yaml "$bundle/compose.orderer-v10.override.yaml"
+          cp deploy/azure-vm/Caddyfile "$bundle/Caddyfile"
+          cp deploy/azure-vm/deploy-preview-profile.sh "$bundle/deploy-preview-profile.sh"
+          cp deploy/azure-vm/deploy-orderer-v10.sh "$bundle/deploy-orderer-v10.sh"
+          chmod +x "$bundle/deploy-preview-profile.sh" "$bundle/deploy-orderer-v10.sh"
+          test -s "$bundle/ssalddel-server.tar"
+          test -s "$bundle/web.tar.gz"
+
+      - name: Upload Azure 1.0 deployment bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: orderer-v10-deployment-${{ github.run_number }}
+          path: artifacts/orderer-v10/
+          if-no-files-found: error
+          retention-days: 14
 
   runtime-integration:
     name: MySQL, MongoDB, and Redis integration
