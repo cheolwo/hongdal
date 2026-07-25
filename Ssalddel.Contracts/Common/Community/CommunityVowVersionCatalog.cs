@@ -25,6 +25,8 @@ public static class CommunityVowVersionCatalog
                 SsalddelProductRoadmapCatalog.FoundationVersion,
             ["살뜰 1.0 · 공동구매·주문자 집단화"] =
                 SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            ["문화교통 1.0 · 공동구매·주문자 집단화"] =
+                SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             ["살뜰 1.5 · 공급·가격·무역 준비"] =
                 SsalddelProductRoadmapCatalog.TradeReadinessVersion
         };
@@ -37,13 +39,21 @@ public static class CommunityVowVersionCatalog
             ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.FoundationVersion),
             "글에서 시작한 마음이 참여 의사, 가원장, 역할 합의와 완료 사례로 이어지는 공동체 기반",
             "첫 기반이므로 앞선 제품 버전 없이 독립적으로 실행되고 검증되어야 합니다.",
-            "운송 주선·자동 배차·계약·결제는 확정하지 않고 당사자의 대화와 합의를 기록합니다."),
+            "운송 주선·자동 배차·계약·결제는 확정하지 않고 당사자의 대화와 합의를 기록합니다.",
+            IsCurrentFocus: true),
+        new(
+            SsalddelProductRoadmapCatalog.IndividualOrderVersion,
+            ProductVersionName(SsalddelProductRoadmapCatalog.IndividualOrderVersion),
+            ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.IndividualOrderVersion),
+            "공개 정보에서 고른 상품과 수량·수령 조건을 한 사람의 철회 가능한 주문 의향과 개별 원장으로 관리하는 흐름",
+            "0.0의 공개 데이터, 참여 동의, 원장 식별과 신뢰 기록을 이어받습니다.",
+            "개별 원장은 결제·매매 계약·배송 확정이 아니며 사용자의 명시적 동의 없이 공동주문에 포함하지 않습니다."),
         new(
             SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             ProductVersionName(SsalddelProductRoadmapCatalog.GroupPurchaseVersion),
             ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.GroupPurchaseVersion),
-            "음식과 재료를 탐색한 사람이 비구속 수요를 남기고 서버가 품목·지역·수령 조건별 주문자 집단과 모집 원장을 만드는 흐름",
-            "0.0의 공개 데이터, 참여 동의, 공동 원장과 신뢰 기록을 이어받습니다.",
+            "0.5 개별주문 가운데 공동 참여에 동의한 원장을 품목·지역·수령 조건별 주문자 집단과 공동주문 모집 원장으로 만드는 흐름",
+            "0.5의 개별 원장, 철회 상태와 공동 참여 동의를 이어받습니다.",
             "결제·매매 계약·수입 신고·자동 배차를 확정하지 않고 참여자가 철회할 수 있는 수요와 합의를 기록합니다."),
         new(
             SsalddelProductRoadmapCatalog.TradeReadinessVersion,
@@ -51,8 +61,7 @@ public static class CommunityVowVersionCatalog
             ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.TradeReadinessVersion),
             "공급자와 관련 기업 근거, 견적, 원가, HS·HTS 후보와 공동수입 준비 항목을 수요 집단에 연결하는 흐름",
             "1.0의 주문자 집단과 모집 원장을 공급·가격·무역 검토의 입력으로 이어받습니다.",
-            "품목 분류, 수입 적격성, 신고와 계약 판단은 자격 있는 전문가와 실제 거래 당사자의 확인을 대신하지 않습니다.",
-            IsCurrentFocus: true),
+            "품목 분류, 수입 적격성, 신고와 계약 판단은 자격 있는 전문가와 실제 거래 당사자의 확인을 대신하지 않습니다."),
         new(
             SsalddelProductRoadmapCatalog.TransportVersion,
             ProductVersionName(SsalddelProductRoadmapCatalog.TransportVersion),

@@ -509,10 +509,11 @@ public sealed class CommunityInformationReviewPageViewModelTests
     public void VowVersionCatalog_CoversCurrentRoadmapAndOpenEndedFuture()
     {
         Assert.Equal(
-            ["0.0", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "future"],
+            ["0.0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "future"],
             CommunityVowVersionCatalog.All.Select(version => version.Code));
         Assert.True(CommunityVowVersionCatalog.Current.IsCurrentFocus);
-        Assert.Equal("1.5", CommunityVowVersionCatalog.Current.Code);
+        Assert.Equal("0.0", CommunityVowVersionCatalog.Current.Code);
+        Assert.Single(CommunityVowVersionCatalog.All, version => version.IsCurrentFocus);
         Assert.Equal(
             "1.5",
             CommunityVowVersionCatalog

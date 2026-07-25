@@ -18,7 +18,9 @@ public sealed class Command기능버전CatalogTests
 
         Assert.True(current.IsCurrentRelease);
         Assert.Equal(
-            "문화교통 1.5 · 공급·가격·무역 준비",
+            SsalddelProductRoadmapCatalog
+                .Find(SsalddelProductRoadmapCatalog.FoundationVersion)
+                .FullDisplayName,
             current.DisplayName);
         Assert.Equal(
             "문화교통 0.0 · 커뮤니티·공공데이터 기반",
