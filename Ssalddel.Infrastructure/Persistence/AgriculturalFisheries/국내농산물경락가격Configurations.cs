@@ -76,6 +76,14 @@ internal sealed class 국내농산물경락가격관측Configuration
             x.ItemName
         });
         builder.HasIndex(x => new { x.ItemName, x.VarietyName, x.SettlementDate });
+        builder.HasIndex(x => new { x.ItemName, x.SettlementDate, x.OriginName })
+            .HasDatabaseName("IX_AuctionPrice_Item_Date_Origin");
+        builder.HasIndex(x => new
+        {
+            x.ItemName,
+            x.SettlementDate,
+            x.WholesaleMarketCode
+        }).HasDatabaseName("IX_AuctionPrice_Item_Date_Market");
         builder.HasIndex(x => x.LastSeenAtUtc);
     }
 }
