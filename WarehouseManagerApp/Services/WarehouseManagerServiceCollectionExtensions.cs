@@ -29,9 +29,9 @@ public static class WarehouseManagerServiceCollectionExtensions
         services.AddTransient<창고작업기능ViewModel>();
         services.AddTransient<창고Api기능모음ViewModel>();
 
-        services.TryAddSingleton<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();
-        services.TryAddSingleton<IInboundReceivingWorkflowService, SampleInboundReceivingWorkflowService>();
-        services.TryAddSingleton<IWarehousePickingBatchWorkspaceService, SampleWarehousePickingBatchWorkspaceService>();
+        services.TryAddScoped<IWarehouseWorkEntryGateService, HttpWarehouseWorkEntryGateService>();
+        services.TryAddScoped<IInboundReceivingWorkflowService, HttpInboundReceivingWorkflowService>();
+        services.TryAddScoped<IWarehousePickingBatchWorkspaceService, HttpWarehousePickingBatchWorkspaceService>();
 
         services.TryAddScoped<창고작업세션상태ViewModel>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<I창고작업구성Provider, 일반입출고작업구성Provider>());

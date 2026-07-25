@@ -1,7 +1,7 @@
 services:
   app:
     environment:
-      SsalddelExecution__Mode: Simulation
+      SsalddelExecution__Mode: Operational
       VersionFeatureFlags__CommunityTrustWorkflow: "true"
       VersionFeatureFlags__GroupPurchaseDemandWorkflow: "true"
       VersionFeatureFlags__CustomsAndTradeDataWorkflow: "true"
@@ -9,5 +9,5 @@ services:
       VersionFeatureFlags__WarehouseFulfillmentWorkflow: "true"
       VersionFeatureFlags__SalesChannelFulfillmentWorkflow: "true"
       VersionFeatureFlags__HrParticipationWorkflow: "true"
-      SalesChannelOrderSync__Enabled: "false"
+      SalesChannelOrderSync__Enabled: "true"
       WorkRelationshipSnapshots__Enabled: "false"

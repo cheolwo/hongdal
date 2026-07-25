@@ -1,5 +1,6 @@
 ﻿@page "/driver/notifications"
-@inject IDriverSampleDataService Samples
+@using DriverApp.ViewModels.Driver.Notification
+@inherits DriverApp.Components.MvvmComponentBase<기사알림함PageViewModel>
 
 <PageTitle>알림함</PageTitle>
 
@@ -13,7 +14,7 @@
         </MudPaper>
 
         <MudStack Spacing="2">
-            @foreach (var item in Samples.알림목록.OrderByDescending(x => x.발생시각))
+            @foreach (var item in ViewModel.알림목록)
             {
                 <MudPaper Class="pa-3" Elevation="1" Outlined="true">
                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
@@ -25,6 +26,15 @@
                         <MudStack Row="true" Spacing="1">
                             <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@item.종류</MudChip>
                             <MudChip T="string" Color="@(item.읽음 ? Color.Default : Color.Warning)" Variant="Variant.Filled">@(item.읽음 ? "읽음" : "안읽음")</MudChip>
+                            @if (!item.읽음)
+                            {
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Text"
+                                           Disabled="@ViewModel.처리중"
+                                           OnClick="@(() => ViewModel.읽음처리Async(item.Id))">
+                                    읽음 처리
+                                </MudButton>
+                            }
                         </MudStack>
                     </MudStack>
                 </MudPaper>
@@ -37,3 +47,7 @@
         </MudStack>
     </MudStack>
 </MudContainer>
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
+}

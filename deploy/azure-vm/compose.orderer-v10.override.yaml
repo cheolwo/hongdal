@@ -1,7 +1,7 @@
 services:
   app:
     environment:
-      SsalddelExecution__Mode: Simulation
+      SsalddelExecution__Mode: Operational
       VersionFeatureFlags__CommunityTrustWorkflow: "true"
       VersionFeatureFlags__GroupPurchasePracticeWorkflow: "true"
       VersionFeatureFlags__GroupPurchaseDemandWorkflow: "true"

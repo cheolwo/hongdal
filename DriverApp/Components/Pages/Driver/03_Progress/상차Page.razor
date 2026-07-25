@@ -376,8 +376,8 @@
                                                PreviewUrl="@ViewModel.사진.미리보기Url"
                                                PreviewAlt="상차 완료 사진 미리보기"
                                                FileName="@ViewModel.사진.파일명"
-                                               StatusMessage="@ViewModel.상태.메시지"
-                                               StatusSeverity="@ViewModel.상태.심각도"
+                                               StatusMessage="@ViewModel.작업상태.메시지"
+                                               StatusSeverity="@ViewModel.작업상태.심각도"
                                                HasPhoto="@ViewModel.사진.사진있음"
                                                IsCapturing="@ViewModel.사진.촬영중"
                                                CanComplete="@ViewModel.완료가능"
@@ -401,5 +401,9 @@
     [Parameter]
     public long 운송Id { get; set; }
 
-    protected override void OnParametersSet() => ViewModel.Initialize(운송Id);
+    protected override async Task OnParametersSetAsync()
+    {
+        ViewModel.Initialize(운송Id);
+        await ViewModel.초기화Async();
+    }
 }

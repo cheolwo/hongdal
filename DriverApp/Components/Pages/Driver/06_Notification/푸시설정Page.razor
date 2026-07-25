@@ -1,5 +1,6 @@
 ﻿@page "/driver/notifications/push"
-@inject IDriverSampleDataService Samples
+@using DriverApp.ViewModels.Driver.Notification
+@inherits DriverApp.Components.MvvmComponentBase<기사푸시설정PageViewModel>
 
 <PageTitle>푸시설정</PageTitle>
 
@@ -15,10 +16,14 @@
         <MudPaper Class="pa-4" Elevation="2">
             <MudStack Spacing="2">
                 <MudText Typo="Typo.h6">푸시 상태</MudText>
-                <MudText Typo="Typo.body1">안 읽은 알림: @Samples.알림목록.Count(x => !x.읽음)건</MudText>
+                <MudText Typo="Typo.body1">안 읽은 알림: @ViewModel.안읽은알림수 건</MudText>
                 <MudAlert Severity="Severity.Info">기기 권한 확인 → 토큰 등록 → 테스트 알림 발송 순서로 붙이면 된다.</MudAlert>
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/notifications/settings">알림 설정으로</MudButton>
             </MudStack>
         </MudPaper>
     </MudStack>
 </MudContainer>
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
+}

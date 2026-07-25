@@ -2,6 +2,8 @@ using FluentResults;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Driver.Notification;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using 살뜰.Data;
 using 살뜰.Services;
 
 namespace Ssalddel.Application.Driver.Notification;
@@ -13,6 +15,8 @@ public interface I기사알림UseCase
     Task<Result> 푸시토큰삭제Async(string? 기사Id);
     Task<Result<기사알림설정응답>> 설정조회Async(string? 기사Id);
     Task<Result<기사알림설정응답>> 설정수정Async(string? 기사Id, 기사알림설정수정요청? request);
+    Task<Result<기사알림함목록응답>> 알림함조회Async(string? 기사Id, CancellationToken cancellationToken = default);
+    Task<Result<기사알림함항목응답>> 읽음처리Async(string? 기사Id, long notificationId, CancellationToken cancellationToken = default);
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
@@ -33,14 +37,17 @@ public sealed class 기사알림UseCase : I기사알림UseCase
     private readonly IDriverPushTokenStore _pushTokenStore;
     private readonly IDriverNotificationSettingsStore _notificationSettingsStore;
     private readonly ILogger<기사알림UseCase> _logger;
+    private readonly SsalddelContext _db;
 
     public 기사알림UseCase(
         IDriverPushTokenStore pushTokenStore,
         IDriverNotificationSettingsStore notificationSettingsStore,
+        SsalddelContext db,
         ILogger<기사알림UseCase> logger)
     {
         _pushTokenStore = pushTokenStore;
         _notificationSettingsStore = notificationSettingsStore;
+        _db = db;
         _logger = logger;
     }
 
@@ -112,6 +119,74 @@ public sealed class 기사알림UseCase : I기사알림UseCase
         await _notificationSettingsStore.SetAsync(기사Id, settings);
         로그기록("NotificationSettingsUpdated", 기사Id);
         return 설정응답생성(기사Id, settings);
+    }
+
+    public async Task<Result<기사알림함목록응답>> 알림함조회Async(
+        string? 기사Id,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(기사Id))
+        {
+            return 인증실패<기사알림함목록응답>();
+        }
+
+        var items = await _db.배차추천알림Outbox
+            .AsNoTracking()
+            .Where(item => item.기사Id == 기사Id)
+            .OrderByDescending(item => item.CreatedAt)
+            .Take(100)
+            .Select(item => new 기사알림함항목응답
+            {
+                Id = item.Id,
+                종류 = "배차추천",
+                제목 = item.제목,
+                내용 = item.본문,
+                발생시각 = item.CreatedAt,
+                읽은시각 = item.읽은시각
+            })
+            .ToArrayAsync(cancellationToken);
+
+        return Result.Ok(new 기사알림함목록응답
+        {
+            Items = items,
+            안읽은알림수 = items.Count(item => !item.읽음)
+        });
+    }
+
+    public async Task<Result<기사알림함항목응답>> 읽음처리Async(
+        string? 기사Id,
+        long notificationId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(기사Id))
+        {
+            return 인증실패<기사알림함항목응답>();
+        }
+
+        var item = await _db.배차추천알림Outbox
+            .FirstOrDefaultAsync(
+                candidate => candidate.Id == notificationId && candidate.기사Id == 기사Id,
+                cancellationToken);
+        if (item is null)
+        {
+            return Result.Fail<기사알림함항목응답>(
+                new Error("알림을 찾을 수 없습니다.")
+                    .WithMetadata("StatusCode", StatusCodes.Status404NotFound));
+        }
+
+        item.읽은시각 ??= DateTime.UtcNow;
+        item.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return Result.Ok(new 기사알림함항목응답
+        {
+            Id = item.Id,
+            종류 = "배차추천",
+            제목 = item.제목,
+            내용 = item.본문,
+            발생시각 = item.CreatedAt,
+            읽은시각 = item.읽은시각
+        });
     }
 
     private 기사알림설정응답 설정응답생성(string 기사Id, DriverNotificationSettings settings)

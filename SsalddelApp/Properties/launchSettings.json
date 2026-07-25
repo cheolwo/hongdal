@@ -8,9 +8,9 @@
       "commandName": "Project",
       "nativeDebugging": false,
       "environmentVariables": {
-        "ClientDataMode__AllowSampleFallback": "true",
-        "ClientDataMode__AllowDevelopmentSnapshotFallback": "true",
-        "ClientDataMode__RequireServerLedgerForV1Smoke": "false",
+        "ClientDataMode__AllowSampleFallback": "false",
+        "ClientDataMode__AllowDevelopmentSnapshotFallback": "false",
+        "ClientDataMode__RequireServerLedgerForV1Smoke": "true",
         "ShipperSmoke__StartPath": "/shipper/request/SHP-SMOKE-PAY?openFakePayment=true"
       }
     }

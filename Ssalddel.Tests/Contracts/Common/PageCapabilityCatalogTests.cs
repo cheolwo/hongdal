@@ -12,6 +12,8 @@ public sealed class PageCapabilityCatalogTests
             ["0.0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5"],
             SsalddelProductRoadmapCatalog.All.Select(stage => stage.Version));
         Assert.Equal("0.0", SsalddelProductRoadmapCatalog.CurrentVersion);
+        Assert.Equal("0.0", SsalddelProductRoadmapCatalog.CurrentDeliveryVersion);
+        Assert.Equal("3.5", SsalddelProductRoadmapCatalog.DeploymentTargetVersion);
         Assert.Equal(
             SsalddelProductRoadmapCatalog.FoundationVersion,
             Assert.Single(SsalddelProductRoadmapCatalog.All, stage => stage.IsCurrent).Version);

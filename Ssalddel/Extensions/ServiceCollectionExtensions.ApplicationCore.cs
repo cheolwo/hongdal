@@ -74,6 +74,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I판매채널UseCase, 판매채널UseCase>();
         services.AddScoped<ISalesChannelOrderReadService, SalesChannelOrderReadService>();
         services.AddScoped<I판매채널주문조회UseCase, 판매채널주문조회UseCase>();
+        services.AddScoped<I판매채널주문동기화UseCase, 판매채널주문동기화UseCase>();
         services.AddScoped<I판매페이지Service, 판매페이지Service>();
         services.AddScoped<I판매페이지UseCase, 판매페이지UseCase>();
         services.AddScoped<IView가시성Service, View가시성Service>();
@@ -99,6 +100,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I마트주문요청작성UseCase, 마트주문요청작성UseCase>();
         services.AddScoped<I마트피킹조회UseCase, 마트피킹조회UseCase>();
         services.AddScoped<I공공데이터조회UseCase, 공공데이터조회UseCase>();
+        services.AddSingleton<I공동구매상품CatalogUseCase, 공동구매상품CatalogUseCase>();
         services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
         services.AddScoped<I문서관리UseCase, 문서관리UseCase>();
         services.AddScoped<I파일업로드UseCase, 파일업로드UseCase>();
@@ -131,6 +133,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IIndividualOrderPerspectiveReadService, IndividualOrderPerspectiveReadService>();
         services.AddScoped<IGroupOrderPerspectiveReadService, GroupOrderPerspectiveReadService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
+        services.AddScoped<I창고작업진입UseCase, 창고작업진입UseCase>();
         services.AddScoped<I피킹작업UseCase, 피킹작업UseCase>();
         services.AddScoped<I재고현황UseCase, 재고현황UseCase>();
         services.AddScoped<I적재작업UseCase, 적재작업UseCase>();

@@ -1,31 +1,10 @@
-using System.ComponentModel;
-using Microsoft.AspNetCore.Components;
-
 namespace DriverApp.Components;
 
-public abstract class MvvmComponentBase<TViewModel> : ComponentBase, IDisposable
-    where TViewModel : class, INotifyPropertyChanged
+/// <summary>
+/// 기존 기사 앱 namespace를 유지하면서 공통 MVVM component 수명 구현을 사용합니다.
+/// </summary>
+public abstract class MvvmComponentBase<TViewModel>
+    : Ssalddel.Ui.Common.Areas.App.Components.MvvmComponentBase<TViewModel>
+    where TViewModel : class, System.ComponentModel.INotifyPropertyChanged
 {
-    [Inject]
-    protected TViewModel ViewModel { get; set; } = default!;
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
-    }
-
-    public void Dispose()
-    {
-        ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
-        if (ViewModel is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
-
-        GC.SuppressFinalize(this);
-    }
-
-    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        => _ = InvokeAsync(StateHasChanged);
 }

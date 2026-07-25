@@ -1,7 +1,7 @@
 services:
   app:
     environment:
-      SsalddelExecution__Mode: Simulation
+      SsalddelExecution__Mode: Operational
       VersionFeatureFlags__FoodDeliveryWorkflow: "true"
       VersionFeatureFlags__SsalddelMartWorkflow: "true"
-      SalesChannelOrderSync__Enabled: "false"
+      SalesChannelOrderSync__Enabled: "true"

@@ -1,5 +1,6 @@
 ﻿@page "/driver/settlements/info"
-@inject IDriverSampleDataService Samples
+@using DriverApp.ViewModels.Driver.Settlement
+@inherits DriverApp.Components.MvvmComponentBase<기사이용료안내PageViewModel>
 
 <PageTitle>이용료안내</PageTitle>
 
@@ -25,6 +26,8 @@
 </MudContainer>
 
 @code {
-    private string 정식이용료안내 => string.Format("정식 전환 후에는 건당 500원, 월 최대 {0:0}원 상한으로 표시한다.", Samples.정산요약.월상한);
-    private string 현재정산안내 => string.Format("현재 조회 기준 배차 {0}건 / 이용료 {1:0}원", Samples.정산요약.배차건수, Samples.정산요약.이용료);
+    private string 정식이용료안내 => string.Format("정식 전환 후에는 건당 500원, 월 최대 {0:0}원 상한으로 표시한다.", ViewModel.정산.MonthlyFeeCap);
+    private string 현재정산안내 => string.Format("현재 조회 기준 배차 {0}건 / 이용료 {1:0}원", ViewModel.정산.DispatchCount, ViewModel.정산.UsageFee);
+
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
 }

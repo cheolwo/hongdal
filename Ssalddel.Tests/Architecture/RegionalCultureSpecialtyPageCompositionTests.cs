@@ -42,6 +42,23 @@ public sealed class RegionalCultureSpecialtyPageCompositionTests
         Assert.Contains("EvidenceBoundary", source);
         Assert.Contains("공식 음식·재료 탐색으로 이동", source);
         Assert.Contains("주문·참여·수입이 만들어지지 않습니다", source);
+        Assert.Contains("@inherits MvvmComponentBase<지역문화특산물목록PageViewModel>", source);
+    }
+
+    [Fact]
+    public void 지역문화상세화면은_전용PageViewModel을사용한다()
+    {
+        var source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Information",
+            "RegionalCultureSpecialtyDetail.razor"));
+
+        Assert.Contains("@inherits MvvmComponentBase<지역문화특산물상세PageViewModel>", source);
+        Assert.Contains("ViewModel.Configure(RegionKey)", source);
     }
 
     [Fact]

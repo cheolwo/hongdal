@@ -3,8 +3,8 @@
 ## 배포 의미
 
 이 절차는 `0.0` 커뮤니티 기반에 `1.0` 비구속 공동구매 수요·주문자 집단화를 추가하는
-통제된 `Simulation` 미리보기용이다. 실제 주문, 결제, 계약, 수입 신고, 운송 의뢰,
-자동 배차, 창고 상태 변경과 판매채널 동기화를 허용하지 않는다.
+통제된 `Operational` 검증용이다. 1.0 기능 플래그 범위 밖의 결제, 계약, 수입 신고,
+운송 의뢰, 자동 배차, 창고 상태 변경과 판매채널 동기화는 열지 않는다.
 
 배포 프로필은 `deploy/azure-vm/compose.orderer-v10.override.yaml`이다. 이 프로필은
 `CommunityTrustWorkflow`, `GroupPurchasePracticeWorkflow`,
@@ -20,7 +20,7 @@
 4. VM의 `/opt/ssalddel/.env`와 Data Protection 인증서가 준비되어야 한다.
 5. MySQL·MongoDB backup과 복구 위치를 확인하고 현재 Web 폴더와 서버 image를
    되돌릴 수 있어야 한다.
-6. 운영 전환 승인이 없는 한 `SsalddelExecution:Mode=Simulation`을 바꾸지 않는다.
+6. `SsalddelExecution:Mode=Operational`과 필수 비밀값을 확인하고, 1.0 범위 밖 기능 플래그가 닫혀 있는지 확인한다.
 
 ## 산출물 구성
 

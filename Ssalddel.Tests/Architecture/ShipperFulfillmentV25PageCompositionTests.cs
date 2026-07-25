@@ -86,7 +86,7 @@ public sealed class ShipperFulfillmentV25PageCompositionTests
     }
 
     [Fact]
-    public void Azure2점5override는_Simulation과외부판매동기화비활성을고정한다()
+    public void Azure2점5override는_Operational과외부판매동기화를고정한다()
     {
         var source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
@@ -94,11 +94,11 @@ public sealed class ShipperFulfillmentV25PageCompositionTests
             "azure-vm",
             "compose.fulfillment-v25.override.yaml"));
 
-        Assert.Contains("SsalddelExecution__Mode: Simulation", source);
+        Assert.Contains("SsalddelExecution__Mode: Operational", source);
         Assert.Contains("VersionFeatureFlags__WarehouseFulfillmentWorkflow: \"true\"", source);
         Assert.Contains("VersionFeatureFlags__SalesChannelFulfillmentWorkflow: \"true\"", source);
         Assert.Contains("VersionFeatureFlags__HrParticipationWorkflow: \"true\"", source);
-        Assert.Contains("SalesChannelOrderSync__Enabled: \"false\"", source);
+        Assert.Contains("SalesChannelOrderSync__Enabled: \"true\"", source);
         Assert.Contains("WorkRelationshipSnapshots__Enabled: \"false\"", source);
     }
 

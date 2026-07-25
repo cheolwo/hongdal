@@ -382,7 +382,7 @@ public sealed partial class ProductListingCreateViewModel(
 }
 
 /// <summary>조회, 정확한 선택·검토, 로컬 원장 생성과 같은 ID 재조회 순서만 조립합니다.</summary>
-public sealed class ProductListingsPageViewModel : 조립ViewModelBase
+public sealed class ProductListingsPageViewModel : 화주PageViewModelBase
 {
     public ProductListingsPageViewModel(
         ProductListingReadViewModel read,
@@ -397,22 +397,20 @@ public sealed class ProductListingsPageViewModel : 조립ViewModelBase
     public ProductListingReadViewModel 조회 { get; }
     public ProductListingDraftViewModel 초안 { get; }
     public ProductListingCreateViewModel 생성 { get; }
-    public bool 처리중 => 조회.처리중 || 초안.처리중 || 생성.처리중;
+    protected override bool 하위ViewModel처리중
+        => 조회.처리중 || 초안.처리중 || 생성.처리중;
 
-    public async Task<bool> 새로고침Async(CancellationToken cancellationToken = default)
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
     {
-        if (처리중)
+        if (!await 조회.조회Async(cancellationToken))
         {
-            return false;
+            throw new InvalidOperationException(
+                조회.오류메시지 ?? "상품 출품 후보를 조회하지 못했습니다.");
         }
 
-        var succeeded = await 조회.조회Async(cancellationToken);
-        if (succeeded)
-        {
-            await 초안.선택상태재검증Async(조회.스냅샷, cancellationToken);
-        }
-
-        return succeeded;
+        await 초안.선택상태재검증Async(조회.스냅샷, cancellationToken);
     }
 
     public Task<bool> 상품선택Async(long? productId, CancellationToken cancellationToken = default)

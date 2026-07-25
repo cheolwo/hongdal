@@ -36,8 +36,11 @@
         ? GroupPurchasePageRoutes.ProductDetailFor(Catalog.SelectedProduct.상품카드Id)
         : GroupPurchasePageRoutes.ProductsRoot;
 
-    protected override void OnParametersSet()
-        => _productFound = Catalog.TrySelectProduct(ProductId);
+    protected override async Task OnParametersSetAsync()
+    {
+        _productFound = await Catalog.LoadAsync()
+                        && Catalog.TrySelectProduct(ProductId);
+    }
 
     private Task UpdateDesiredQuantityAsync(decimal quantityKg)
     {

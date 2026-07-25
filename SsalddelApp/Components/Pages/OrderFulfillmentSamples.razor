@@ -1,38 +1,62 @@
 @page "/shipper/sales/fulfillment/samples"
-@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+@using Ssalddel.Contracts.Common.Sales
+@inherits MvvmComponentBase<OrderFulfillmentServerInboxPageViewModel>
 
-<PageTitle>Simulation 샘플 주문 반영</PageTitle>
+<PageTitle>판매채널 주문 동기화</PageTitle>
 
-<OrderFulfillmentRouteFrame Title="샘플 주문 반영"
-                            Description="외부 판매채널을 호출하지 않고 비식별 샘플 주문만 로컬 Simulation 원장에 반영합니다."
+<OrderFulfillmentRouteFrame Title="판매채널 주문 동기화"
+                            Description="연결된 판매채널 계정에서 주문을 가져와 서버 출고 원장으로 투영합니다."
                             BackHref="@OrderFulfillmentSimulationPageRoutes.Root"
-                            Read="@Read"
+                            OperationalLedger="true"
                             IsBusy="@ViewModel.처리중"
                             RefreshRequested="RefreshAsync">
     <MudPaper Elevation="0" Outlined="true" Class="order-fulfillment-sample-action">
-        <MudIcon Icon="@Icons.Material.Filled.Science" Color="Color.Success" Size="Size.Large" />
+        <MudIcon Icon="@Icons.Material.Filled.Sync" Color="Color.Primary" Size="Size.Large" />
         <div>
-            <MudText Typo="Typo.h6">로컬 샘플 주문 준비</MudText>
-            <MudText Typo="Typo.body2">명시적으로 실행하면 샘플 feed의 주문만 `InMemoryShipperStore`에 반영하고 같은 원장을 다시 조회합니다.</MudText>
+            <MudText Typo="Typo.h6">운영 판매채널 주문 수집</MudText>
+            <MudText Typo="Typo.body2">서버가 연결 계정의 주문을 수집하고 재고를 원자적으로 예약한 뒤 같은 출고 원장을 다시 조회합니다.</MudText>
         </div>
 
-        @if (Simulation.오류발생)
+        @if (!string.IsNullOrWhiteSpace(ViewModel.동기화오류))
         {
-            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Simulation.오류메시지</MudAlert>
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.동기화오류</MudAlert>
         }
-        else if (Simulation.성공함)
+        else if (ViewModel.최근동기화결과 is { } result)
         {
             <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
-                @Simulation.성공메시지 처리한 샘플 @Simulation.처리건수.ToString("N0")건을 같은 Simulation 원장에서 다시 조회했습니다.
+                계정 @result.AccountCount.ToString("N0")개에서 @result.FetchedOrderCount.ToString("N0")건을 조회했고,
+                출고 @result.CreatedOutboundCount.ToString("N0")건을 생성했습니다.
             </MudAlert>
         }
 
         <MudButton Variant="Variant.Filled"
-                   Color="Color.Success"
-                   StartIcon="@Icons.Material.Filled.Science"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Sync"
                    Disabled="@ViewModel.처리중"
-                   OnClick="RunSimulationAsync">
-            @(Simulation.처리중 ? "샘플 반영 중" : "샘플 주문 반영")
+                   OnClick="SyncDomesticAsync">
+            @(ViewModel.처리중 ? "동기화 중" : "국내 주문 동기화")
         </MudButton>
     </MudPaper>
+
+    @if (ViewModel.주문없음)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+            서버 출고 원장에 연결된 판매채널 주문이 없습니다.
+        </MudAlert>
+    }
+    else
+    {
+        <MudStack Spacing="2" Class="mt-3">
+            @foreach (var order in ViewModel.주문목록)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                    <MudText Typo="Typo.subtitle1">@order.대표상품명</MudText>
+                    <MudText Typo="Typo.body2">@order.채널종류 · @order.채널주문번호</MudText>
+                    <MudText Typo="Typo.caption">
+                        @order.출고상태 · @order.총수량.ToString("N0")개 · @order.출고창고표시
+                    </MudText>
+                </MudPaper>
+            }
+        </MudStack>
+    }
 </OrderFulfillmentRouteFrame>

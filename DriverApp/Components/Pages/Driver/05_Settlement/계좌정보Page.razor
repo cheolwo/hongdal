@@ -1,5 +1,6 @@
 @page "/driver/account/bank"
-@inject IDriverSampleDataService Samples
+@using DriverApp.ViewModels.Driver.Settlement
+@inherits DriverApp.Components.MvvmComponentBase<기사계좌정보PageViewModel>
 
 <PageTitle>계좌 정보</PageTitle>
 
@@ -30,6 +31,8 @@
         "홍길동 기사님",
         "123-45-678901",
         "확인 완료",
-        Samples.정산요약.배차건수,
-        Samples.정산요약.이용료);
+        ViewModel.정산.DispatchCount,
+        ViewModel.정산.UsageFee);
+
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
 }

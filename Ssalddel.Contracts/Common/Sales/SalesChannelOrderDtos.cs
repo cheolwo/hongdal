@@ -61,3 +61,17 @@ public sealed class 판매채널주문상세응답
     public 판매채널주문요약응답 주문 { get; set; } = new();
     public IReadOnlyList<판매채널주문출고라인응답> 출고라인목록 { get; set; } = [];
 }
+
+public sealed class 판매채널주문동기화요청
+{
+    public string SyncScope { get; set; } = CommerceChannelOrderSyncScopes.Domestic;
+}
+
+public sealed class 판매채널주문동기화응답
+{
+    public string SyncScope { get; set; } = string.Empty;
+    public int AccountCount { get; set; }
+    public int FetchedOrderCount { get; set; }
+    public int CreatedOutboundCount { get; set; }
+    public int SkippedOrderCount { get; set; }
+}

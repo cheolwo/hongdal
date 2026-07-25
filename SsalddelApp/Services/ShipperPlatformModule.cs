@@ -28,10 +28,8 @@ internal static class ShipperPlatformModule
         services.AddSingleton<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();
         services.AddSingleton<ShipperViewVisibilityService>();
         services.AddSingleton<ShipperLocalizationService>();
-        services.AddSingleton<탐색문의샘플Service>();
-        services.AddSingleton<IShipperExplorationInquiryService>(provider =>
-            provider.GetRequiredService<탐색문의샘플Service>());
-        services.AddSingleton<I화주공통콘텐츠Service, 샘플화주공통콘텐츠Service>();
+        services.AddScoped<IShipperExplorationInquiryService, HttpShipperExplorationInquiryService>();
+        services.AddScoped<I화주공통콘텐츠Service, Http화주공통콘텐츠Service>();
         services.AddSingleton<IAppEventPublisher, AppEventPublisher>();
         return services;
     }

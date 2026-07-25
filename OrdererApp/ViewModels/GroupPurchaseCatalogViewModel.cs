@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Orderer;
+using OrdererApp.Services;
 
 namespace OrdererApp.ViewModels;
 
@@ -6,52 +7,54 @@ namespace OrdererApp.ViewModels;
 /// 공동구매 상품 카탈로그와 선택한 수요 초안 값만 소유합니다.
 /// route, 선적, 시세, 배송권과 저장 상태는 각 화면과 업무 컴포넌트가 따로 관리합니다.
 /// </summary>
-public sealed class GroupPurchaseCatalogViewModel
+public sealed class GroupPurchaseCatalogViewModel(
+    IGroupPurchaseProductCatalogService service)
 {
-    private readonly IReadOnlyList<HS먹거리공동구매상품카드> _productCards =
-    [
-        new(
-            상품카드Id: "hs-food-0203-pork-frozen",
-            상품명: "냉동 삼겹살",
-            HS코드: "0203.29",
-            HS표시명: "돼지고기 냉동 기타",
-            온도코드: 공동구매온도코드.냉동,
-            예상물류방식: 공동구매물류방식코드.FCL,
-            SuggestedTargetQuantityKg: 12000m,
-            ExpectedUnitPrice: 8500m),
-        new(
-            상품카드Id: "hs-food-1602-prepared-meat",
-            상품명: "가공육 세트",
-            HS코드: "1602.49",
-            HS표시명: "조제 또는 저장 처리한 육류",
-            온도코드: 공동구매온도코드.냉장,
-            예상물류방식: 공동구매물류방식코드.LCL,
-            SuggestedTargetQuantityKg: 3000m,
-            ExpectedUnitPrice: 7200m),
-        new(
-            상품카드Id: "hs-food-2106-prepared-food",
-            상품명: "간편식 소스",
-            HS코드: "2106.90",
-            HS표시명: "기타 조제 식료품",
-            온도코드: 공동구매온도코드.상온,
-            예상물류방식: 공동구매물류방식코드.국내벌크,
-            SuggestedTargetQuantityKg: 1500m,
-            ExpectedUnitPrice: 3900m,
-            RequiresImportFoodReview: true,
-            RequiresMfdsManufacturerReview: true)
-    ];
-
-    public GroupPurchaseCatalogViewModel()
-    {
-        SelectedProduct = _productCards[0];
-        DesiredQuantityKg = DefaultQuantity(SelectedProduct);
-        DesiredUnitPrice = SelectedProduct.ExpectedUnitPrice;
-    }
+    private IReadOnlyList<HS먹거리공동구매상품카드> _productCards = [];
+    private HS먹거리공동구매상품카드? _selectedProduct;
 
     public IReadOnlyList<HS먹거리공동구매상품카드> ProductCards => _productCards;
-    public HS먹거리공동구매상품카드 SelectedProduct { get; private set; }
+    public HS먹거리공동구매상품카드 SelectedProduct
+        => _selectedProduct ?? throw new InvalidOperationException("공동구매 상품 카탈로그가 아직 준비되지 않았습니다.");
+    public string? SelectedProductId => _selectedProduct?.상품카드Id;
+    public bool IsLoaded { get; private set; }
+    public string? ErrorMessage { get; private set; }
     public decimal DesiredQuantityKg { get; private set; }
     public decimal DesiredUnitPrice { get; private set; }
+
+    public async Task<bool> LoadAsync(
+        bool force = false,
+        CancellationToken cancellationToken = default)
+    {
+        if (IsLoaded && !force)
+        {
+            return true;
+        }
+
+        try
+        {
+            var selectedId = _selectedProduct?.상품카드Id;
+            _productCards = await service.GetProductsAsync(cancellationToken);
+            _selectedProduct = _productCards.FirstOrDefault(item =>
+                                   string.Equals(item.상품카드Id, selectedId, StringComparison.Ordinal))
+                               ?? _productCards.FirstOrDefault();
+            if (_selectedProduct is not null)
+            {
+                DesiredQuantityKg = DefaultQuantity(_selectedProduct);
+                DesiredUnitPrice = _selectedProduct.ExpectedUnitPrice;
+            }
+
+            IsLoaded = true;
+            ErrorMessage = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            IsLoaded = false;
+            return false;
+        }
+    }
 
     public bool TrySelectProduct(string? productId)
     {
@@ -62,12 +65,12 @@ public sealed class GroupPurchaseCatalogViewModel
             return false;
         }
 
-        if (ReferenceEquals(product, SelectedProduct))
+        if (ReferenceEquals(product, _selectedProduct))
         {
             return true;
         }
 
-        SelectedProduct = product;
+        _selectedProduct = product;
         DesiredQuantityKg = DefaultQuantity(product);
         DesiredUnitPrice = product.ExpectedUnitPrice;
         return true;

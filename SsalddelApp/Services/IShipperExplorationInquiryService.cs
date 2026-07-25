@@ -4,7 +4,15 @@ namespace SsalddelApp.Services;
 
 public interface IShipperExplorationInquiryService
 {
-    IReadOnlyList<탐색문의목록항목응답> 목록();
+    Task<IReadOnlyList<탐색문의목록항목응답>> 목록조회Async(
+        CancellationToken cancellationToken = default);
 
-    탐색문의상세응답 상세(long campaignId);
+    Task<탐색문의상세응답?> 상세조회Async(
+        long campaignId,
+        CancellationToken cancellationToken = default);
+
+    Task 응답Async(
+        long campaignId,
+        탐색문의응답요청 request,
+        CancellationToken cancellationToken = default);
 }

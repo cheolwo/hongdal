@@ -34,25 +34,34 @@
             </MudStack>
         </header>
 
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-            이 화면의 변경은 <strong>로컬 메모리 Simulation</strong>에만 남습니다. 외부 주문 수집, 실제 재고 예약·차감, 카카오톡 발송, 출고·운송·결제·정산을 실행하지 않습니다.
-        </MudAlert>
+        @if (OperationalLedger)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                이 화면은 <strong>Operational 서버 원장</strong>을 사용합니다. 주문 동기화는 연결된 판매채널을 조회하고 실제 출고 재고를 예약할 수 있습니다.
+            </MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                이 화면의 변경은 <strong>로컬 메모리 Simulation</strong>에만 남습니다. 외부 주문 수집, 실제 재고 예약·차감, 카카오톡 발송, 출고·운송·결제·정산을 실행하지 않습니다.
+            </MudAlert>
+        }
 
-        @if (Read.초기화됨 && Read.오류발생)
+        @if (Read is not null && Read.초기화됨 && Read.오류발생)
         {
             <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
                 최신 상태를 불러오지 못해 직전 Simulation 화면을 유지합니다. @Read.오류메시지
             </MudAlert>
         }
 
-        @if (!Read.초기화됨)
+        @if (Read is not null && !Read.초기화됨)
         {
             <OrderFulfillmentLoadState Read="@Read"
                                        RetryRequested="RefreshRequested" />
         }
         else
         {
-            @if (Read.처리중)
+            @if (Read is not null && Read.처리중)
             {
                 <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
             }
@@ -78,8 +87,11 @@
     [Parameter]
     public string BackLabel { get; set; } = "이행 허브로";
 
-    [Parameter, EditorRequired]
-    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+    [Parameter]
+    public OrderFulfillmentReadViewModel? Read { get; set; }
+
+    [Parameter]
+    public bool OperationalLedger { get; set; }
 
     [Parameter]
     public bool IsBusy { get; set; }

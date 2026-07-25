@@ -1,9 +1,6 @@
 @page "/group-purchase/products"
 @using Ssalddel.Contracts.Common.Orderer
-@inject GroupPurchaseCatalogViewModel Catalog
-@inject OrdererIngredientCardAutoGroupingViewModel AutoGrouping
-@inject 주문자앱인증ViewModel Authentication
-@inject NavigationManager Navigation
+@inherits MvvmComponentBase<주문자재료후보PageViewModel>
 
 <PageTitle>재료 자동집단화</PageTitle>
 
@@ -14,28 +11,28 @@
                               Description="공동데이터 근거가 있는 여러 재료 후보를 탐색합니다."
                               BackHref="@GroupPurchasePageRoutes.Root">
         <MudButton Href="@GroupPurchasePageRoutes.WishCreate" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Class="mb-3">여러 재료 한 번에 선택</MudButton>
-        @if (Authentication.처리중 && !Authentication.초기화됨)
+        @if (ViewModel.Authentication.처리중 && !ViewModel.Authentication.초기화됨)
         {
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                 <MudProgressCircular Indeterminate="true" Size="Size.Small" />
                 <MudText Typo="Typo.body2">저장된 주문자 로그인과 배송권을 확인하고 있습니다.</MudText>
             </MudStack>
         }
-        else if (!Authentication.로그인됨)
+        else if (!ViewModel.Authentication.로그인됨)
         {
             <Ssalddel공통로그인Panel 제목="카드 집단화 로그인"
                                  설명="재료 탐색은 공개입니다. 비구속 수요를 내 이름으로 저장하고 철회할 때만 로그인합니다."
-                                 상태메시지="@Authentication.오류메시지"
-                                 상태Severity="@AuthenticationSeverity"
+                                 상태메시지="@ViewModel.Authentication.오류메시지"
+                                 상태Severity="@ViewModel.AuthenticationSeverity"
                                  일반로그인표시="true"
                                  소셜로그인표시="false"
                                  일반로그인버튼텍스트="로그인하고 카드에서 집단화"
-                                 IsBusy="@Authentication.처리중"
+                                 IsBusy="@ViewModel.Authentication.처리중"
                                  Elevation="0"
                                  Class="pa-3 mb-3"
-                                 OnPasswordLogin="LoginAsync" />
+                                 OnPasswordLogin="ViewModel.LoginAsync" />
         }
-        else if (AutoGrouping.DeliveryScope is null)
+        else if (ViewModel.AutoGrouping.DeliveryScope is null)
         {
             <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-3">
                 주문자 배송권이 아직 없습니다. 가입 또는 온보딩에서 배송권을 한 번 설정하면 이후에는 카드 클릭만으로 집단화됩니다.
@@ -44,51 +41,23 @@
         else
         {
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3">
-                <b>@AutoGrouping.ScopeDisplayName</b> 배송권으로 자동집단을 찾습니다. 버튼 클릭은 비구속 참여이며 결제나 주문 확정이 아닙니다.
+                <b>@ViewModel.AutoGrouping.ScopeDisplayName</b> 배송권으로 자동집단을 찾습니다. 버튼 클릭은 비구속 참여이며 결제나 주문 확정이 아닙니다.
             </MudAlert>
         }
 
-        <GroupPurchaseProductCatalogPanel Products="Catalog.ProductCards"
-                                          SelectedProductId="Catalog.SelectedProduct.상품카드Id"
+        <GroupPurchaseProductCatalogPanel Products="ViewModel.Catalog.ProductCards"
+                                          SelectedProductId="ViewModel.Catalog.SelectedProductId"
                                           ActionLabel="상품 근거 보기"
-                                          CanAutoGroup="AutoGrouping.CanAutoGroup"
-                                          GroupingStateResolver="AutoGrouping.StateFor"
-                                          SuggestedQuantityResolver="AutoGrouping.SuggestedQuantityFor"
-                                          GroupRequested="JoinGroupAsync"
-                                          GroupWithdrawRequested="WithdrawGroupAsync"
-                                          ProductSelected="OpenProductAsync" />
+                                          CanAutoGroup="ViewModel.AutoGrouping.CanAutoGroup"
+                                          GroupingStateResolver="ViewModel.AutoGrouping.StateFor"
+                                          SuggestedQuantityResolver="ViewModel.AutoGrouping.SuggestedQuantityFor"
+                                          GroupRequested="ViewModel.JoinGroupAsync"
+                                          GroupWithdrawRequested="ViewModel.WithdrawGroupAsync"
+                                          ProductSelected="ViewModel.OpenProductAsync" />
     </GroupPurchaseScreenFrame>
 </MudContainer>
 
 @code {
-    private Severity AuthenticationSeverity
-        => Authentication.오류발생 ? Severity.Error : Severity.Info;
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!Authentication.초기화됨)
-        {
-            await Authentication.복원Async();
-        }
-    }
-
-    private async Task LoginAsync(공통로그인요청 request)
-    {
-        if (await Authentication.로그인Async(request.UserNameOrEmail, request.Password))
-        {
-            AutoGrouping.ClearUserState();
-        }
-    }
-
-    private Task OpenProductAsync(string productId)
-    {
-        Navigation.NavigateTo(GroupPurchasePageRoutes.ProductDetailFor(productId));
-        return Task.CompletedTask;
-    }
-
-    private Task JoinGroupAsync(HS먹거리공동구매상품카드 product)
-        => AutoGrouping.JoinAsync(product);
-
-    private Task WithdrawGroupAsync(HS먹거리공동구매상품카드 product)
-        => AutoGrouping.WithdrawAsync(product);
+    protected override Task OnInitializedAsync()
+        => ViewModel.초기화Async();
 }

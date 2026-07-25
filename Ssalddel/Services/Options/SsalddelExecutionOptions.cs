@@ -12,7 +12,7 @@ public sealed class SsalddelExecutionOptions
 {
     public const string SectionName = "SsalddelExecution";
 
-    public SsalddelExecutionMode Mode { get; set; } = SsalddelExecutionMode.Simulation;
+    public SsalddelExecutionMode Mode { get; set; } = SsalddelExecutionMode.Operational;
 }
 
 public interface ISsalddelExecutionModePolicy

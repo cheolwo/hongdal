@@ -166,7 +166,7 @@ function Get-DirectBuildTargets {
         }
 
         if ($file -match "^(Directory\.(Build|Packages)\.(props|targets)|global\.json)$") {
-            [void] $targets.Add("Ssalddel.v1.5.slnx")
+            [void] $targets.Add("Ssalddel.v3.5.slnx")
         }
     }
 
@@ -175,6 +175,13 @@ function Get-DirectBuildTargets {
 
 function Get-TaskSlice {
     param([string[]] $Files)
+
+    $requiresFullProductSlice = @(
+        $Files | Where-Object {
+            $_ -match "^(DriverApp|WarehouseManagerApp|FDriverApp|RestaurantDeskApp|SsalddelRestaurantDesktop|HumanResourcesManagerApp|Ssalddel\.FoodApi)/" -or
+            $_ -match "(DomesticTransport|Warehouse|Fulfillment|FoodDelivery|Restaurant|SsalddelMart|Mart)"
+        }
+    )
 
     $requiresLaterSlice = @(
         $Files | Where-Object {
@@ -189,7 +196,11 @@ function Get-TaskSlice {
         }
     )
 
-    if ($requiresLaterSlice.Count -gt 0 -or $sharedChange.Count -gt 0) {
+    if ($requiresFullProductSlice.Count -gt 0 -or $sharedChange.Count -gt 0) {
+        return "Ssalddel.v3.5.slnx"
+    }
+
+    if ($requiresLaterSlice.Count -gt 0) {
         return "Ssalddel.v1.5.slnx"
     }
 
@@ -334,7 +345,8 @@ try {
                     "Ssalddel.v0.0.slnx",
                     "Ssalddel.v0.5.slnx",
                     "Ssalddel.v1.0.slnx",
-                    "Ssalddel.v1.5.slnx"
+                    "Ssalddel.v1.5.slnx",
+                    "Ssalddel.v3.5.slnx"
                 )
                 $runTests = $true
                 $runFullTests = $true

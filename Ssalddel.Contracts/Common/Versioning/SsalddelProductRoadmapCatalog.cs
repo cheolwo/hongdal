@@ -30,7 +30,12 @@ public static class SsalddelProductRoadmapCatalog
     public const string FulfillmentVersion = "2.5";
     public const string FoodDeliveryVersion = "3.0";
     public const string MartVersion = "3.5";
-    public const string CurrentVersion = FoundationVersion;
+    public const string CurrentDeliveryVersion = FoundationVersion;
+    public const string DeploymentTargetVersion = MartVersion;
+
+    // 기존 호출부에서 CurrentVersion은 현재 활성 개발 단계를 뜻합니다.
+    // 최종 배포 목표는 DeploymentTargetVersion으로 별도 관리합니다.
+    public const string CurrentVersion = CurrentDeliveryVersion;
 
     public static IReadOnlyList<SsalddelProductRoadmapStage> All { get; } =
     [

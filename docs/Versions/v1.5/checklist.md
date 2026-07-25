@@ -24,7 +24,7 @@
 - 승인 인계·기존 공동수입 원장 병합·멱등·Revision 영속 흐름: `Ssalddel/Services/Orderer/공동수입준비원장Service.cs`
 - 1.5 OS 상태·worker·수동 점검·사람 인계: `Ssalddel/Services/Orderer/공동수입준비OS.cs`
 - 1.5 OS 계약: `Ssalddel.Contracts/Common/Orderer/공동수입준비OsDtos.cs`
-- 원천·대상 양방향 추적: `Ssalddel/Services/Orderer/공동구매수요모집OS.cs`, `Ssalddel/Services/Orderer/공동구매자동집단화저장소.cs`
+- 원천·대상 양방향 추적: `Ssalddel/Services/Orderer/공동구매수요모집ProcessManager.cs`, `Ssalddel/Services/Orderer/공동구매자동집단화저장소.cs`
 - 관리자·기능 플래그 경계: `Ssalddel/Controllers/Admin/Orderer/공동수입준비원장AdminController.cs`
 - 공식 근거 읽기 화면: `OrdererApp/Components/GroupPurchase/GroupPurchaseTradeReadinessEvidencePanel.razor`
 - 관리자 작성·검토 화면: `Ssalddel.Ui.Common/Areas/BackOffice/Components/공동수입준비관리작업대.razor`

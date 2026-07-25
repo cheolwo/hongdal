@@ -32,3 +32,20 @@ public sealed class 기사알림설정수정요청
     public bool 야간알림제한 { get; set; }
     public bool 정차후모아보기 { get; set; }
 }
+
+public sealed class 기사알림함항목응답
+{
+    public long Id { get; set; }
+    public string 종류 { get; set; } = string.Empty;
+    public string 제목 { get; set; } = string.Empty;
+    public string 내용 { get; set; } = string.Empty;
+    public DateTime 발생시각 { get; set; }
+    public DateTime? 읽은시각 { get; set; }
+    public bool 읽음 => 읽은시각.HasValue;
+}
+
+public sealed class 기사알림함목록응답
+{
+    public IReadOnlyList<기사알림함항목응답> Items { get; set; } = [];
+    public int 안읽은알림수 { get; set; }
+}

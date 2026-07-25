@@ -23,6 +23,7 @@ public sealed class 배차추천알림OutboxConfiguration : IEntityTypeConfigura
         builder.Property(x => x.발송상태).HasColumnName("status").HasMaxLength(50).IsRequired();
         builder.Property(x => x.시도횟수).HasColumnName("retry_count");
         builder.Property(x => x.마지막시도시각).HasColumnName("last_attempted_at");
+        builder.Property(x => x.읽은시각).HasColumnName("read_at");
         builder.Property(x => x.CreatedAt).HasColumnName("created_at");
         builder.Property(x => x.UpdatedAt).HasColumnName("updated_at");
 

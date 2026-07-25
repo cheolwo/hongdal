@@ -18,7 +18,7 @@ public sealed class OrdererV10DeploymentBoundaryTests
     {
         var compose = Read("deploy", "azure-vm/compose.yaml");
 
-        Assert.Contains("SsalddelExecution__Mode: Simulation", compose);
+        Assert.Contains("SsalddelExecution__Mode: Operational", compose);
         Assert.Contains("VersionFeatureFlags__CommunityTrustWorkflow: \"true\"", compose);
         Assert.Contains("VersionFeatureFlags__GroupPurchasePracticeWorkflow: \"false\"", compose);
         Assert.Contains("VersionFeatureFlags__GroupPurchaseDemandWorkflow: \"false\"", compose);
@@ -50,7 +50,7 @@ public sealed class OrdererV10DeploymentBoundaryTests
     {
         var compose = Read("deploy", "azure-vm/compose.orderer-v10.override.yaml");
 
-        Assert.Contains("SsalddelExecution__Mode: Simulation", compose);
+        Assert.Contains("SsalddelExecution__Mode: Operational", compose);
         Assert.Contains("VersionFeatureFlags__CommunityTrustWorkflow: \"true\"", compose);
         Assert.Contains("VersionFeatureFlags__GroupPurchasePracticeWorkflow: \"true\"", compose);
         Assert.Contains("VersionFeatureFlags__GroupPurchaseDemandWorkflow: \"true\"", compose);

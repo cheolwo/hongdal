@@ -169,9 +169,17 @@ public sealed class OrdererGroupPurchasePageCompositionTests
             "App",
             "ViewModels",
             "OrdererIngredientCardAutoGroupingViewModel.cs"));
+        var pageViewModel = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "OrdererApp",
+            "ViewModels",
+            "주문자공동구매PageViewModels.cs"));
 
-        Assert.Contains("GroupRequested=\"JoinGroupAsync\"", page);
-        Assert.Contains("GroupWithdrawRequested=\"WithdrawGroupAsync\"", page);
+        Assert.Contains("GroupRequested=\"ViewModel.JoinGroupAsync\"", page);
+        Assert.Contains("GroupWithdrawRequested=\"ViewModel.WithdrawGroupAsync\"", page);
+        Assert.Contains("AutoGrouping.JoinAsync(product)", pageViewModel);
+        Assert.Contains("AutoGrouping.WithdrawAsync(product)", pageViewModel);
+        Assert.DoesNotContain("private Task JoinGroupAsync", page);
         Assert.Contains("이 재료로 집단화", catalog);
         Assert.Contains("참여 철회", catalog);
         Assert.Contains("수요배치미리보기Async", viewModel);

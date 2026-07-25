@@ -495,7 +495,7 @@ public sealed class OrderFulfillmentPackingViewModel(
 }
 
 /// <summary>조회와 네 가지 독립 Command의 실행 후 재조회 순서만 조립합니다.</summary>
-public sealed class OrderFulfillmentPageViewModel : 조립ViewModelBase
+public sealed class OrderFulfillmentPageViewModel : 화주PageViewModelBase
 {
     public OrderFulfillmentPageViewModel(
         OrderFulfillmentReadViewModel read,
@@ -517,18 +517,20 @@ public sealed class OrderFulfillmentPageViewModel : 조립ViewModelBase
     public OrderFulfillmentPickingViewModel 피킹 { get; }
     public OrderFulfillmentPackingViewModel 포장 { get; }
 
-    public bool 처리중
+    protected override bool 하위ViewModel처리중
         => 조회.처리중 || Simulation.처리중 || 입고알림정책.처리중 || 피킹.처리중 || 포장.처리중;
 
-    public async Task<bool> 새로고침Async(CancellationToken cancellationToken = default)
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
     {
-        var success = await 조회.조회Async(cancellationToken);
-        if (success)
+        if (!await 조회.조회Async(cancellationToken))
         {
-            피킹.작업목록설정(조회.스냅샷.피킹작업);
+            throw new InvalidOperationException(
+                조회.오류메시지 ?? "판매주문 이행 원장을 조회하지 못했습니다.");
         }
 
-        return success;
+        피킹.작업목록설정(조회.스냅샷.피킹작업);
     }
 
     public Task<bool> Simulation실행Async(CancellationToken cancellationToken = default)

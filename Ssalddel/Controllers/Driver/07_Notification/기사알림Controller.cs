@@ -60,6 +60,20 @@ namespace Ssalddel.Controllers.Driver.Notification07
             return this.ToActionResult(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> 알림함(CancellationToken cancellationToken)
+        {
+            var result = await _useCase.알림함조회Async(현재기사Id(), cancellationToken);
+            return this.ToActionResult(result);
+        }
+
+        [HttpPut("{notificationId:long}/read")]
+        public async Task<IActionResult> 읽음처리(long notificationId, CancellationToken cancellationToken)
+        {
+            var result = await _useCase.읽음처리Async(현재기사Id(), notificationId, cancellationToken);
+            return this.ToActionResult(result);
+        }
+
         private string? 현재기사Id()
             => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }

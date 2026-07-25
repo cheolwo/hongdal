@@ -24,8 +24,11 @@ public static class MauiProgram
         builder.Services.AddTransient<주문자Controller기능모음ViewModel>();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
         builder.Services.AddTransient<주문자공동구매기능ViewModel>();
+        builder.Services.AddScoped<IGroupPurchaseProductCatalogService, HttpGroupPurchaseProductCatalogService>();
         builder.Services.AddTransient<GroupPurchaseCatalogViewModel>();
         builder.Services.AddScoped<GroupPurchaseWishBatchViewModel>();
+        builder.Services.AddTransient<주문자재료후보PageViewModel>();
+        builder.Services.AddTransient<주문자의향등록PageViewModel>();
         builder.Services.AddTransient<주문자Api기능모음ViewModel>();
         builder.Services.AddSsalddelApiHttpClient(
             SsalddelApiEndpoint.ResolveBaseAddress(

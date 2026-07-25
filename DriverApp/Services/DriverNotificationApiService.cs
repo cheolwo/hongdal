@@ -13,6 +13,8 @@ public interface IDriverNotificationApiService
     Task<기사알림설정응답?> 설정수정Async(
         기사알림설정수정요청 request,
         CancellationToken cancellationToken = default);
+    Task<기사알림함목록응답?> 알림함조회Async(CancellationToken cancellationToken = default);
+    Task<기사알림함항목응답?> 읽음처리Async(long notificationId, CancellationToken cancellationToken = default);
 }
 
 public sealed class DriverNotificationApiService : IDriverNotificationApiService
@@ -59,5 +61,20 @@ public sealed class DriverNotificationApiService : IDriverNotificationApiService
             $"{BasePath}/settings",
             request,
             "기사 알림 설정 수정",
+            cancellationToken);
+
+    public Task<기사알림함목록응답?> 알림함조회Async(CancellationToken cancellationToken = default)
+        => _client.GetAsync<기사알림함목록응답>(
+            BasePath,
+            "기사 알림함 조회",
+            cancellationToken);
+
+    public Task<기사알림함항목응답?> 읽음처리Async(
+        long notificationId,
+        CancellationToken cancellationToken = default)
+        => _client.PutAsync<object, 기사알림함항목응답>(
+            $"{BasePath}/{notificationId}/read",
+            new { },
+            "기사 알림 읽음 처리",
             cancellationToken);
 }

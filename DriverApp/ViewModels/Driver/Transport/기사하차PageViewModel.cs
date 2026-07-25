@@ -1,13 +1,13 @@
-using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DriverApp.Models.Driver.Samples;
 using DriverApp.Services;
+using DriverApp.ViewModels.Driver;
 using MudBlazor;
 
 namespace DriverApp.ViewModels.Driver.Transport;
 
-public sealed partial class 기사하차PageViewModel : ObservableObject
+public sealed partial class 기사하차PageViewModel : 기사PageViewModelBase
 {
     private readonly IDriverSampleDataService _samples;
     private long? _initializedTransportId;
@@ -18,21 +18,18 @@ public sealed partial class 기사하차PageViewModel : ObservableObject
         IDriverTransportExceptionService exceptionService)
     {
         _samples = samples;
-        this.하차완료 = 하차완료;
-
-        상태 = new 기사운송작업상태ViewModel();
-        화물 = new 기사하차화물ViewModel(상태);
-        인계 = new 기사하차인계확인ViewModel();
-        사진 = new 기사운송사진ViewModel("하차", "하차 완료 사진", 상태);
-        예외 = new 기사운송예외신고ViewModel(
+        작업상태 = 하위ViewModel등록(new 기사운송작업상태ViewModel());
+        화물 = 하위ViewModel등록(new 기사하차화물ViewModel(작업상태));
+        인계 = 하위ViewModel등록(new 기사하차인계확인ViewModel());
+        사진 = 하위ViewModel등록(new 기사운송사진ViewModel("하차", "하차 완료 사진", 작업상태));
+        예외 = 하위ViewModel등록(new 기사운송예외신고ViewModel(
             exceptionService,
-            상태,
+            작업상태,
             "하차",
             ["수량 부족", "다른 화물", "바코드 훼손", "수령자 부재", "파손 의심"],
             "수량 부족",
-            ToExceptionCode);
-
-        하위ViewModel관찰(상태, 화물, 인계, 사진, 예외, 하차완료);
+            ToExceptionCode));
+        this.하차완료 = 하위ViewModel등록(하차완료);
     }
 
     [ObservableProperty]
@@ -41,7 +38,7 @@ public sealed partial class 기사하차PageViewModel : ObservableObject
     [ObservableProperty]
     public partial 기사운송샘플항목? 운송 { get; private set; }
 
-    public 기사운송작업상태ViewModel 상태 { get; }
+    public 기사운송작업상태ViewModel 작업상태 { get; }
     public 기사하차화물ViewModel 화물 { get; }
     public 기사하차인계확인ViewModel 인계 { get; }
     public 기사운송사진ViewModel 사진 { get; }
@@ -88,7 +85,7 @@ public sealed partial class 기사하차PageViewModel : ObservableObject
         _initializedTransportId = transportId;
         운송Id = transportId;
         운송 = _samples.운송조회(transportId);
-        상태.초기화();
+        작업상태.초기화();
         화물.운송설정(운송);
         인계.초기화();
         사진.초기화();
@@ -102,13 +99,13 @@ public sealed partial class 기사하차PageViewModel : ObservableObject
     {
         if (!완료가능)
         {
-            상태.설정(완료안내, Severity.Warning);
+            작업상태.설정(완료안내, Severity.Warning);
             return;
         }
 
         try
         {
-            상태.설정($"{인계.결제증빙방식} 확인 후 하차 완료를 처리하는 중입니다.", Severity.Info);
+            작업상태.설정($"{인계.결제증빙방식} 확인 후 하차 완료를 처리하는 중입니다.", Severity.Info);
 
             var request = 사진.완료요청생성(DriverTransportCompletionPhotoKind.Dropoff, 운송Id);
             await 하차완료.처리Command.ExecuteAsync(request);
@@ -117,24 +114,18 @@ public sealed partial class 기사하차PageViewModel : ObservableObject
 
             사진.업로드결과반영(result);
             var objectName = string.IsNullOrWhiteSpace(result.ObjectName) ? string.Empty : $" 저장 경로: {result.ObjectName}";
-            상태.설정($"{result.Message}{objectName}", result.CompletionRecorded ? Severity.Success : Severity.Warning);
+            작업상태.설정($"{result.Message}{objectName}", result.CompletionRecorded ? Severity.Success : Severity.Warning);
         }
         catch (Exception ex)
         {
-            상태.설정($"하차 완료 처리에 실패했습니다. 다시 시도해 주세요. {ex.Message}", Severity.Error);
+            작업상태.설정($"하차 완료 처리에 실패했습니다. 다시 시도해 주세요. {ex.Message}", Severity.Error);
         }
     }
 
-    private void 하위ViewModel관찰(params INotifyPropertyChanged[] children)
-    {
-        foreach (var child in children)
-        {
-            child.PropertyChanged += 하위ViewModel변경;
-        }
-    }
-
-    private void 하위ViewModel변경(object? sender, PropertyChangedEventArgs e)
-        => OnPropertyChanged(string.Empty);
+    protected override Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
+        => Task.CompletedTask;
 
     private static string ToExceptionCode(string issueType)
         => issueType switch

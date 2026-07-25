@@ -1,5 +1,6 @@
 @using Ssalddel.Contracts.Common.Community
 @using Ssalddel.Contracts.Common.Content
+@inherits MvvmComponentBase<지역문화특산물목록PageViewModel>
 
 <main class="@RootClass">
     <header class="region-culture__hero">
@@ -35,7 +36,7 @@
     </section>
 
     <section class="region-culture__grid" aria-live="polite">
-        @foreach (var region in VisibleRegions)
+        @foreach (var region in ViewModel.VisibleRegions)
         {
             <article class="region-card" id="@region.Key">
                 <a class="region-card__image" href="@RegionalCultureSpecialtyRoutes.DetailFor(region.Key)"
@@ -111,21 +112,21 @@
     [Parameter]
     public bool CommunityMobilePresentation { get; set; }
 
-    private string? _selectedCountry;
-
     private string RootClass
         => CommunityMobilePresentation
             ? "region-culture region-culture--community-mobile"
             : "region-culture";
 
-    private IReadOnlyList<RegionalCultureSpecialty> VisibleRegions
-        => RegionalCultureSpecialtyCatalog.ForCountry(_selectedCountry);
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.초기화Async();
+    }
 
     private void SelectCountry(string? countryCode)
-        => _selectedCountry = countryCode;
+        => ViewModel.SelectCountry(countryCode);
 
     private string FilterClass(string? countryCode)
-        => string.Equals(_selectedCountry, countryCode, StringComparison.OrdinalIgnoreCase)
+        => ViewModel.IsCountrySelected(countryCode)
             ? "is-selected"
             : string.Empty;
 

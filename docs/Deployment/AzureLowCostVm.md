@@ -4,7 +4,7 @@
 
 ## 경계
 
-- `SsalddelExecution:Mode=Simulation`을 유지한다.
+- `SsalddelExecution:Mode=Operational`을 사용한다. Toss 비밀키와 각 외부 공급자 자격 증명이 없으면 실패하도록 두며 sample fallback을 사용하지 않는다.
 - MySQL과 MongoDB 포트는 VM 외부에 공개하지 않는다.
 - Caddy만 80·443 포트를 공개하고 WebApp 정적 파일과 API를 같은 출처로 제공한다.
 - 게시글 공개 이미지는 같은 `Korea Central`의 Blob `community-public`, POD·운송 증빙·음성은 비공개 `platform-private`에 저장한다.
@@ -42,8 +42,8 @@ Compose와 공통 rollback script가 함께 들어간다. 배포와 확인 절�
 기존 VM의 비밀값·볼륨·보안 설정을 그대로 유지하면서 주문자 1.5 기능을 점검할 때는
 `compose.orderer-v15.override.yaml`을 두 번째 Compose 파일로 함께 지정한다. 이 override는
 `GroupPurchaseDemandWorkflow`와 `CustomsAndTradeDataWorkflow`만 활성화하며
-`SsalddelExecution:Mode=Simulation`을 다시 고정한다. 계약·결제·신고 제출·포워더 자동
-선정·외부 전송을 운영 모드로 바꾸지 않는다. 현재 미리보기 VM이 인증서 기반 Data
+`SsalddelExecution:Mode=Operational`을 사용한다. 계약·결제·신고 제출·포워더 자동
+선정·외부 전송은 각 기능 플래그와 공급자 자격 증명을 추가로 통과해야 한다. 현재 미리보기 VM이 인증서 기반 Data
 Protection 전환 전이라면 override의 `PersonalDataProtection:RequireCertificate=false`는
 기존 key ring 호환을 위한 임시 설정이다. 인증서 배치와 기존 key ring 복호화 검증을
 마친 뒤에는 기본 구성의 `true`로 복귀해야 한다.
@@ -52,8 +52,8 @@ Protection 전환 전이라면 override의 `PersonalDataProtection:RequireCertif
 
 화주·기사 운송 페이지를 배포 상태에서 점검할 때는 기존 Compose와
 `compose.orderer-v15.override.yaml` 뒤에 `compose.transport-v20.override.yaml`을 추가한다.
-2.0 override는 선행 커뮤니티 기반과 `DomesticTransportWorkflow`를 활성화하지만
-`SsalddelExecution:Mode=Simulation`을 유지한다.
+2.0 override는 선행 커뮤니티 기반과 `DomesticTransportWorkflow`를 활성화하고
+`SsalddelExecution:Mode=Operational`을 사용한다.
 
 페이지 책임은 `화주 작성 → 의뢰별 요약·이력·결제 상태·증빙`,
 `기사 추천 목록 → 추천 상세 → 수락·거절 판단 → 현재 운송 → 상차 → 하차`로 분리한다.

@@ -1,8 +1,6 @@
 @page "/group-purchase/wishes/new"
 @using Ssalddel.Contracts.Common.Orderer
-@inject GroupPurchaseCatalogViewModel Catalog
-@inject GroupPurchaseWishBatchViewModel WishBatch
-@inject 주문자앱인증ViewModel Authentication
+@inherits MvvmComponentBase<주문자의향등록PageViewModel>
 
 <PageTitle>개별주문 의향 등록</PageTitle>
 
@@ -13,27 +11,27 @@
                               Description="커뮤니티에서 발견한 필요를 재료별 독립 원장과 희망 수량으로 기록합니다."
                               BackHref="@GroupPurchasePageRoutes.ProductsRoot"
                               BoundaryMessage="저장 결과는 철회 가능한 개별주문 의향입니다. 공동주문·결제·계약·수입·운송을 자동 실행하지 않습니다.">
-        @if (Authentication.처리중 && !Authentication.초기화됨)
+        @if (ViewModel.Authentication.처리중 && !ViewModel.Authentication.초기화됨)
         {
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                 <MudProgressCircular Indeterminate="true" Size="Size.Small" />
                 <MudText Typo="Typo.body2">저장된 주문자 로그인과 배송권을 확인하고 있습니다.</MudText>
             </MudStack>
         }
-        else if (!Authentication.로그인됨)
+        else if (!ViewModel.Authentication.로그인됨)
         {
             <Ssalddel공통로그인Panel 제목="내 개별주문 저장 로그인"
                                  설명="재료 선택은 공개입니다. 내 개별주문 의향 원장을 저장할 때만 로그인합니다."
-                                 상태메시지="@Authentication.오류메시지"
-                                 상태Severity="@(Authentication.오류발생 ? Severity.Error : Severity.Info)"
+                                 상태메시지="@ViewModel.Authentication.오류메시지"
+                                 상태Severity="@(ViewModel.Authentication.오류발생 ? Severity.Error : Severity.Info)"
                                  일반로그인표시="true"
                                  소셜로그인표시="false"
                                  일반로그인버튼텍스트="로그인하고 개별주문 저장"
-                                 IsBusy="@Authentication.처리중"
+                                 IsBusy="@ViewModel.Authentication.처리중"
                                  Elevation="0"
-                                 OnPasswordLogin="LoginAsync" />
+                                 OnPasswordLogin="ViewModel.LoginAsync" />
         }
-        else if (WishBatch.DeliveryScope is null)
+        else if (ViewModel.WishBatch.DeliveryScope is null)
         {
             <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
                 주문자 배송권이 아직 없습니다. 가입 또는 온보딩에서 배송권을 설정한 뒤 여러 재료를 저장해 주세요.
@@ -42,29 +40,14 @@
         else
         {
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3">
-                <b>@WishBatch.DeliveryScope.DisplayName</b> 배송권에서 재료별 자동집단을 각각 찾습니다.
+                <b>@ViewModel.WishBatch.DeliveryScope.DisplayName</b> 배송권에서 재료별 자동집단을 각각 찾습니다.
             </MudAlert>
-            <GroupPurchaseWishBatchPanel ViewModel="WishBatch" />
+            <GroupPurchaseWishBatchPanel ViewModel="ViewModel.WishBatch" />
         }
     </GroupPurchaseScreenFrame>
 </MudContainer>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        if (!Authentication.초기화됨)
-        {
-            await Authentication.복원Async();
-        }
-        WishBatch.Initialize(Catalog.ProductCards);
-        WishBatch.PrepareForCurrentUser();
-    }
-
-    private async Task LoginAsync(공통로그인요청 request)
-    {
-        if (await Authentication.로그인Async(request.UserNameOrEmail, request.Password))
-        {
-            WishBatch.PrepareForCurrentUser();
-        }
-    }
+    protected override Task OnInitializedAsync()
+        => ViewModel.초기화Async();
 }

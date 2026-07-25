@@ -1,7 +1,7 @@
 @page "/driver/exploration/campaigns"
-@using DriverApp.Services.Samples
+@using DriverApp.ViewModels.Driver.Recommendation
 @using Ssalddel.Contracts.Common.Exploration
-@inject IDriverExplorationCampaignService SampleService
+@inherits DriverApp.Components.MvvmComponentBase<기사탐색캠페인PageViewModel>
 
 <PageTitle>보낸 탐색 문의함</PageTitle>
 
@@ -13,13 +13,16 @@
                     <MudText Typo="Typo.h4">보낸 탐색 문의함</MudText>
                     <MudText Typo="Typo.body2" Color="Color.Secondary">기사님이 먼저 보낸 탐색 캠페인과 응답 흐름을 확인합니다.</MudText>
                 </MudStack>
-                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">{campaigns.Count}건</MudChip>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@ViewModel.캠페인목록.Count 건</MudChip>
             </MudStack>
         </MudPaper>
 
         <MudGrid>
             <MudItem xs="12" md="5">
-                <MudTable Items="campaigns" Hover="true" Dense="true" OnRowClick="@((TableRowClickEventArgs<탐색캠페인목록항목응답> args) => OnRowClick(args))">
+                <MudTable Items="ViewModel.캠페인목록"
+                          Hover="true"
+                          Dense="true"
+                          OnRowClick="@((TableRowClickEventArgs<탐색캠페인목록항목응답> args) => OnRowClick(args))">
                     <HeaderContent>
                         <MudTh>탐색명</MudTh>
                         <MudTh>상태</MudTh>
@@ -37,7 +40,11 @@
             </MudItem>
 
             <MudItem xs="12" md="7">
-                @if (selected is null)
+                @if (ViewModel.선택불러오는중)
+                {
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                }
+                else if (ViewModel.선택캠페인 is null)
                 {
                     <MudAlert Severity="Severity.Info">왼쪽에서 탐색 캠페인을 선택하면 상세와 추천 대상을 볼 수 있습니다.</MudAlert>
                 }
@@ -47,22 +54,22 @@
                         <MudCardContent>
                             <MudStack Spacing="2">
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                    <MudText Typo="Typo.h6">@selected.탐색명</MudText>
-                                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">@selected.탐색상태</MudChip>
+                                    <MudText Typo="Typo.h6">@ViewModel.선택캠페인.탐색명</MudText>
+                                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">@ViewModel.선택캠페인.탐색상태</MudChip>
                                 </MudStack>
 
-                                <MudText Typo="Typo.body2">@selected.출발권역 → @selected.희망도착권역 · @selected.차량종류</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">@($"모집 {selected.모집대상수}명 · 응답 {selected.응답수}건 · 가능 {selected.있음응답수}건")</MudText>
+                                <MudText Typo="Typo.body2">@ViewModel.선택캠페인.출발권역 → @ViewModel.선택캠페인.희망도착권역 · @ViewModel.선택캠페인.차량종류</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@($"모집 {ViewModel.선택캠페인.모집대상수}명 · 응답 {ViewModel.선택캠페인.응답수}건 · 가능 {ViewModel.선택캠페인.있음응답수}건")</MudText>
 
-                                @if (!string.IsNullOrWhiteSpace(selectedDetail?.실행판단사유))
+                                @if (!string.IsNullOrWhiteSpace(ViewModel.선택상세?.실행판단사유))
                                 {
-                                    <MudAlert Severity="Severity.Success">@selectedDetail!.실행판단사유</MudAlert>
+                                    <MudAlert Severity="Severity.Success">@ViewModel.선택상세!.실행판단사유</MudAlert>
                                 }
 
                                 <MudDivider />
                                 <MudText Typo="Typo.subtitle1">선정 대상 현황</MudText>
                                 <MudList T="탐색캠페인대상자응답" Dense="true">
-                                    @foreach (var target in selectedDetail?.대상자목록 ?? [])
+                                    @foreach (var target in ViewModel.선택상세?.대상자목록 ?? [])
                                     {
                                         <MudListItem T="탐색캠페인대상자응답" Value="@target">
                                             <MudStack Spacing="0">
@@ -76,7 +83,7 @@
                                 <MudDivider />
                                 <MudText Typo="Typo.subtitle1">추가 추천 대상</MudText>
                                 <MudGrid>
-                                    @foreach (var rec in recommendations)
+                                    @foreach (var rec in ViewModel.추천대상목록)
                                     {
                                         <MudItem xs="12" md="6">
                                             <MudPaper Class="pa-3" Outlined="true">
@@ -96,34 +103,8 @@
 </MudContainer>
 
 @code {
-    private IReadOnlyList<탐색캠페인목록항목응답> campaigns = [];
-    private IReadOnlyList<탐색캠페인추천대상응답> recommendations = [];
-    private 탐색캠페인목록항목응답? selected;
-    private 탐색캠페인상세응답? selectedDetail;
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
 
-    protected override void OnInitialized()
-    {
-        campaigns = SampleService.캠페인목록();
-        selected = campaigns.FirstOrDefault();
-        LoadDetail();
-    }
-
-    private void OnRowClick(TableRowClickEventArgs<탐색캠페인목록항목응답> args)
-    {
-        selected = args.Item;
-        LoadDetail();
-    }
-
-    private void LoadDetail()
-    {
-        if (selected is null)
-        {
-            selectedDetail = null;
-            recommendations = [];
-            return;
-        }
-
-        selectedDetail = SampleService.상세(selected.Id);
-        recommendations = SampleService.추천대상(selected.Id);
-    }
+    private Task OnRowClick(TableRowClickEventArgs<탐색캠페인목록항목응답> args)
+        => ViewModel.선택Async(args.Item);
 }

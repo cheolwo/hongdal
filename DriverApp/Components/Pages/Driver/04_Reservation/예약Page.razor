@@ -1,5 +1,6 @@
 ﻿@page "/driver/reservations"
-@inject IDriverSampleDataService Samples
+@using DriverApp.ViewModels.Driver.Reservation
+@inherits DriverApp.Components.MvvmComponentBase<기사예약PageViewModel>
 
 <PageTitle>예약</PageTitle>
 
@@ -13,19 +14,18 @@
         </MudPaper>
 
         <MudGrid Spacing="3">
-            @foreach (var item in Samples.예약목록)
+            @foreach (var item in ViewModel.예약목록)
             {
                 <MudItem xs="12" md="4">
                     <MudPaper Class="pa-4 h-100" Elevation="2">
                         <MudStack Spacing="1">
                             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.h6">@item.시작시각.ToString("HH:mm")</MudText>
-                                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@item.상태</MudChip>
+                                <MudText Typo="Typo.h6">@item.StartTime?.ToString("HH:mm")</MudText>
+                                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@(item.IsFuture ? "예약" : "지난 예약")</MudChip>
                             </MudStack>
-                            <MudText Typo="Typo.body2">시작 모드: @item.시작모드</MudText>
-                            <MudText Typo="Typo.body2">시작 위치: @item.시작위치</MudText>
-                            <MudText Typo="Typo.body2">복귀지: @(item.복귀지 ?? "미설정")</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">@item.메모</MudText>
+                            <MudText Typo="Typo.body2">시작 모드: @item.StartMode</MudText>
+                            <MudText Typo="Typo.body2">시작 위치: @item.StartLocation</MudText>
+                            <MudText Typo="Typo.body2">복귀지: @(item.ReturnDestination ?? "미설정")</MudText>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
@@ -38,3 +38,7 @@
         </MudStack>
     </MudStack>
 </MudContainer>
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
+}

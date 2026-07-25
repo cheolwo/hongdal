@@ -24,6 +24,8 @@ public class 배차추천알림Outbox
 
     public DateTime? 마지막시도시각 { get; set; }
 
+    public DateTime? 읽은시각 { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

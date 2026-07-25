@@ -4,7 +4,11 @@ namespace SsalddelApp.Services;
 
 public sealed class 탐색문의샘플Service : IShipperExplorationInquiryService
 {
-    public IReadOnlyList<탐색문의목록항목응답> 목록() =>
+    public Task<IReadOnlyList<탐색문의목록항목응답>> 목록조회Async(
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        IReadOnlyList<탐색문의목록항목응답> items =
     [
         new()
         {
@@ -49,10 +53,20 @@ public sealed class 탐색문의샘플Service : IShipperExplorationInquiryServic
             발송일시 = DateTime.UtcNow.AddHours(-9)
         }
     ];
+        return Task.FromResult(items);
+    }
 
-    public 탐색문의상세응답 상세(long campaignId)
+    public async Task<탐색문의상세응답?> 상세조회Async(
+        long campaignId,
+        CancellationToken cancellationToken = default)
     {
-        var item = 목록().First(x => x.탐색캠페인Id == campaignId);
+        var item = (await 목록조회Async(cancellationToken))
+            .FirstOrDefault(x => x.탐색캠페인Id == campaignId);
+        if (item is null)
+        {
+            return null;
+        }
+
         return new 탐색문의상세응답
         {
             탐색캠페인Id = item.탐색캠페인Id,
@@ -79,5 +93,14 @@ public sealed class 탐색문의샘플Service : IShipperExplorationInquiryServic
             },
             기존응답일시 = item.대상상태 == 탐색캠페인대상상태값.발송됨 ? null : DateTime.UtcNow.AddMinutes(-20)
         };
+    }
+
+    public Task 응답Async(
+        long campaignId,
+        탐색문의응답요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
     }
 }

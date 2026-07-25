@@ -41,11 +41,11 @@ public sealed class FoodDeliveryV30PageCompositionTests
     }
 
     [Fact]
-    public void 음식배달3_0미리보기는_Simulation에서3_5를켜지않는다()
+    public void 음식배달3_0미리보기는_Operational에서3_5를켜지않는다()
     {
         var compose = Read("deploy", "azure-vm/compose.food-delivery-v30.override.yaml");
 
-        Assert.Contains("SsalddelExecution__Mode: Simulation", compose);
+        Assert.Contains("SsalddelExecution__Mode: Operational", compose);
         Assert.Contains("VersionFeatureFlags__FoodDeliveryWorkflow: \"true\"", compose);
         Assert.Contains("VersionFeatureFlags__SsalddelMartWorkflow: \"false\"", compose);
     }

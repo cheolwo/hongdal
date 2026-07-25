@@ -1,7 +1,7 @@
 @page "/shipper/exploration/inbox"
 @using Ssalddel.Contracts.Common.Exploration
 @using SsalddelApp.Services
-@inject IShipperExplorationInquiryService SampleService
+@inject IShipperExplorationInquiryService InquiryService
 
 <PageTitle>받은 탐색 문의함</PageTitle>
 
@@ -10,7 +10,7 @@
         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
             <MudStack Spacing="0">
                 <MudText Typo="Typo.h4">받은 탐색 문의함</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">샘플데이터로 기사님이 먼저 보낸 문의와 화주 응답 화면을 즉시 확인한다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">기사님이 보낸 탐색 문의를 서버에서 확인하고 응답을 저장합니다.</MudText>
             </MudStack>
             <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">문의 @($"{items.Count}건")</MudChip>
         </MudStack>
@@ -58,7 +58,16 @@
                                 <MudNumericField T="decimal?" Label="예상 중량 Kg" @bind-Value="weight" Variant="Variant.Outlined" />
                                 <MudNumericField T="decimal?" Label="예상 부피 Cbm" @bind-Value="cbm" Variant="Variant.Outlined" />
 
-                                <MudAlert Severity="Severity.Success">샘플 모드: 서버 전송 없이 선택한 응답이 화면에 즉시 반영됩니다.</MudAlert>
+                                @if (!string.IsNullOrWhiteSpace(statusMessage))
+                                {
+                                    <MudAlert Severity="@(hasError ? Severity.Error : Severity.Success)">@statusMessage</MudAlert>
+                                }
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Disabled="@(isBusy || selectedResponse is null)"
+                                           OnClick="SaveResponseAsync">
+                                    @(isBusy ? "저장 중" : "응답 보내기")
+                                </MudButton>
                             </MudStack>
                         </MudCardContent>
                     </MudCard>
@@ -75,27 +84,30 @@
     private string? memo;
     private decimal? weight;
     private decimal? cbm;
+    private bool isBusy;
+    private bool hasError;
+    private string? statusMessage;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        items = SampleService.목록();
+        items = await InquiryService.목록조회Async();
         if (items.Count > 0)
         {
-            LoadDetail(items[0].탐색캠페인Id);
+            await LoadDetailAsync(items[0].탐색캠페인Id);
         }
     }
 
-    private void OnRowClick(TableRowClickEventArgs<탐색문의목록항목응답> args)
+    private async Task OnRowClick(TableRowClickEventArgs<탐색문의목록항목응답> args)
     {
         if (args.Item is not null)
         {
-            LoadDetail(args.Item.탐색캠페인Id);
+            await LoadDetailAsync(args.Item.탐색캠페인Id);
         }
     }
 
-    private void LoadDetail(long campaignId)
+    private async Task LoadDetailAsync(long campaignId)
     {
-        selectedDetail = SampleService.상세(campaignId);
+        selectedDetail = await InquiryService.상세조회Async(campaignId);
         if (selectedDetail is null)
         {
             selectedResponse = null;
@@ -109,6 +121,43 @@
         memo = selectedDetail.메모;
         weight = selectedDetail.최대적재중량Kg;
         cbm = selectedDetail.최대적재부피Cbm;
+    }
+
+    private async Task SaveResponseAsync()
+    {
+        if (selectedDetail is null || selectedResponse is null || isBusy)
+        {
+            return;
+        }
+
+        var campaignId = selectedDetail.탐색캠페인Id;
+        isBusy = true;
+        hasError = false;
+        statusMessage = null;
+        try
+        {
+            await InquiryService.응답Async(
+                campaignId,
+                new 탐색문의응답요청
+                {
+                    응답유형 = selectedResponse.Value,
+                    예상중량Kg = weight,
+                    예상부피Cbm = cbm,
+                    메모 = memo
+                });
+            await LoadDetailAsync(campaignId);
+            items = await InquiryService.목록조회Async();
+            statusMessage = "탐색 문의 응답을 서버에 저장하고 같은 문의를 다시 조회했습니다.";
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            statusMessage = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
+        }
     }
 
     private void SelectResponse(운행문의응답유형 response)

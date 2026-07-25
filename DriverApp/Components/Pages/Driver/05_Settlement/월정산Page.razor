@@ -1,5 +1,6 @@
 ﻿@page "/driver/settlements/current-month"
-@inject IDriverSampleDataService Samples
+@using DriverApp.ViewModels.Driver.Settlement
+@inherits DriverApp.Components.MvvmComponentBase<기사월정산PageViewModel>
 
 <PageTitle>월정산</PageTitle>
 
@@ -24,7 +25,7 @@
 
             <MudStack Spacing="2">
                 <MudText Typo="Typo.subtitle2">상세 내역</MudText>
-                @foreach (var item in Samples.정산요약.상세항목)
+                @foreach (var item in 상세항목)
                 {
                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="driver-settlement-line">
                         <MudStack Spacing="0">
@@ -36,8 +37,8 @@
                 }
             </MudStack>
 
-            <MudAlert Class="mt-3" Severity="@(Samples.정산요약.결제완료 ? Severity.Success : Severity.Warning)">
-                @(Samples.정산요약.결제완료 ? "이번 달 정산이 완료되었습니다." : "이번 달 이용료 확인이 필요합니다.")
+            <MudAlert Class="mt-3" Severity="@(ViewModel.정산.IsPaid ? Severity.Success : Severity.Warning)">
+                @(ViewModel.정산.IsPaid ? "이번 달 정산이 완료되었습니다." : "이번 달 이용료 확인이 필요합니다.")
             </MudAlert>
             <MudStack Row="true" Spacing="2" Class="mt-3">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/settlements/info">이용료 안내</MudButton>
@@ -48,10 +49,17 @@
 </MudContainer>
 
 @code {
-    private string 정산월표시 => string.Format("{0}년 {1}월", Samples.정산요약.년도, Samples.정산요약.월);
-    private string 배차건수표시 => string.Format("배차 {0}건", Samples.정산요약.배차건수);
-    private string 이용료표시 => string.Format("이용료 {0:0}원", Samples.정산요약.이용료);
-    private string 월상한표시 => string.Format("월 상한 {0:0}원", Samples.정산요약.월상한);
+    private string 정산월표시 => string.Format("{0}년 {1}월", ViewModel.정산.Year, ViewModel.정산.Month);
+    private string 배차건수표시 => string.Format("배차 {0}건", ViewModel.정산.DispatchCount);
+    private string 이용료표시 => string.Format("이용료 {0:0}원", ViewModel.정산.UsageFee);
+    private string 월상한표시 => string.Format("월 상한 {0:0}원", ViewModel.정산.MonthlyFeeCap);
+    private IReadOnlyList<기사정산표시항목> 상세항목 =>
+    [
+        new("이번 달 이용료", "완료된 배차 기준", -ViewModel.정산.UsageFee),
+        new("월 상한 잔여", "상한 도달 전 남은 금액", ViewModel.정산.RemainingUntilCap)
+    ];
+
+    protected override Task OnInitializedAsync() => ViewModel.초기화Async();
 
     private static string 금액표시(decimal amount)
     {
@@ -62,4 +70,6 @@
 
         return amount > 0 ? $"+{amount:0}원" : $"{amount:0}원";
     }
+
+    private sealed record 기사정산표시항목(string 항목명, string 설명, decimal 금액);
 }

@@ -38,6 +38,7 @@ internal static class ShipperSalesModule
         services.AddTransient<OrderFulfillmentPickingViewModel>();
         services.AddTransient<OrderFulfillmentPackingViewModel>();
         services.AddTransient<OrderFulfillmentPageViewModel>();
+        services.AddTransient<OrderFulfillmentServerInboxPageViewModel>();
         services.AddTransient<ProductListingReadViewModel>();
         services.AddTransient<ProductListingDraftViewModel>();
         services.AddTransient<ProductListingCreateViewModel>();

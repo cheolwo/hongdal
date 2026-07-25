@@ -14,9 +14,16 @@ public interface I판매채널주문읽기Service
         CancellationToken cancellationToken = default);
 }
 
+public interface I판매채널주문동기화Client
+{
+    Task<판매채널주문동기화응답?> 동기화Async(
+        판매채널주문동기화요청 request,
+        CancellationToken cancellationToken = default);
+}
+
 /// <summary>영속된 판매채널 주문 출고 후보의 목록과 정확한 ID 상세만 읽습니다.</summary>
 public sealed class 판매채널주문Client(
-    ISsalddelJsonApiClient client) : I판매채널주문읽기Service
+    ISsalddelJsonApiClient client) : I판매채널주문읽기Service, I판매채널주문동기화Client
 {
     private const string BasePath = "api/v1/sales-channels/orders";
 
@@ -38,6 +45,16 @@ public sealed class 판매채널주문Client(
             "판매채널 주문 출고 후보 상세 조회",
             allowNotFound: true,
             cancellationToken);
+
+    public Task<판매채널주문동기화응답?> 동기화Async(
+        판매채널주문동기화요청 request,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync<판매채널주문동기화요청, 판매채널주문동기화응답>(
+            HttpMethod.Post,
+            $"{BasePath}/sync",
+            request,
+            "판매채널 주문 동기화",
+            cancellationToken: cancellationToken);
 
     private static string BuildListPath(판매채널주문목록조회요청 request)
     {

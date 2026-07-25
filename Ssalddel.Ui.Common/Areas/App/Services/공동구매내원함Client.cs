@@ -10,7 +10,7 @@ public interface I공동구매내원함Client
 }
 
 [SsalddelCodeMetadata(
-    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.ClientAdapter,
     "주문자 화면이 로그인 사용자의 개별 원함과 본인이 참여한 자동집단 공개 요약을 조회합니다.",
     ContractType = typeof(I공동구매내원함Client),

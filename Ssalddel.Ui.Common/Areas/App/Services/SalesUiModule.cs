@@ -17,7 +17,11 @@ internal static class SalesUiModule
         services.TryAddScoped<I판매채널계정읽기Service>(provider =>
             provider.GetRequiredService<I판매채널Client>());
         services.TryAddScoped<I판매채널페이지접근Service, 판매채널페이지접근Service>();
-        services.TryAddScoped<I판매채널주문읽기Service, 판매채널주문Client>();
+        services.TryAddScoped<판매채널주문Client>();
+        services.TryAddScoped<I판매채널주문읽기Service>(provider =>
+            provider.GetRequiredService<판매채널주문Client>());
+        services.TryAddScoped<I판매채널주문동기화Client>(provider =>
+            provider.GetRequiredService<판매채널주문Client>());
         services.TryAddScoped<I상품등록Service>(provider =>
             provider.GetRequiredService<I판매채널Client>());
         services.TryAddScoped<I채널출품Service>(provider =>

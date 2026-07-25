@@ -57,6 +57,9 @@
 
     private bool _productFound;
 
-    protected override void OnParametersSet()
-        => _productFound = Catalog.TrySelectProduct(ProductId);
+    protected override async Task OnParametersSetAsync()
+    {
+        _productFound = await Catalog.LoadAsync()
+                        && Catalog.TrySelectProduct(ProductId);
+    }
 }

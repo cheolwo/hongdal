@@ -34,7 +34,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore .NET workloads
-        run: dotnet workload restore Ssalddel.v1.5.slnx
+        run: dotnet workload restore Ssalddel.v3.5.slnx
 
       - name: Install WebAssembly publish tools
         run: dotnet workload install wasm-tools --skip-manifest-update --verbosity minimal
@@ -61,6 +61,12 @@ jobs:
         run: >-
           dotnet restore Ssalddel.v1.5.slnx
           --artifacts-path artifacts/build/v15
+          --property:Configuration=Release
+
+      - name: Restore version 3.5 deployment target
+        run: >-
+          dotnet restore Ssalddel.v3.5.slnx
+          --artifacts-path artifacts/build/v35
           --property:Configuration=Release
 
       - name: Build version 0.0 slice
@@ -103,10 +109,20 @@ jobs:
           -p:ContinuousIntegrationBuild=true
           -p:UseSharedCompilation=false
 
+      - name: Build version 3.5 deployment target
+        run: >-
+          dotnet build Ssalddel.v3.5.slnx
+          --artifacts-path artifacts/build/v35
+          --configuration Release
+          --no-restore
+          --verbosity minimal
+          -p:ContinuousIntegrationBuild=true
+          -p:UseSharedCompilation=false
+
       - name: Run full test suite
         run: >-
           dotnet test Ssalddel.Tests/Ssalddel.Tests.csproj
-          --artifacts-path artifacts/build/v15
+          --artifacts-path artifacts/build/v35
           --configuration Release
           --no-build
           --no-restore
@@ -116,7 +132,7 @@ jobs:
       - name: Publish server
         run: >-
           dotnet publish Ssalddel/Ssalddel.csproj
-          --artifacts-path artifacts/build/v15
+          --artifacts-path artifacts/build/v35
           --configuration Release
           --no-restore
           --output artifacts/publish/server
@@ -126,16 +142,16 @@ jobs:
       - name: Publish web client
         run: >-
           dotnet publish Ssalddel.WebApp/Ssalddel.WebApp.csproj
-          --artifacts-path artifacts/build/v15
+          --artifacts-path artifacts/build/v35
           --configuration Release
           --no-restore
           --output artifacts/publish/web
           -p:ContinuousIntegrationBuild=true
 
-      - name: Publish 1.5 admin workbench
+      - name: Publish 3.5 admin workbench
         run: >-
           dotnet publish SsalddelAdmin/SsalddelAdmin.csproj
-          --artifacts-path artifacts/build/v15
+          --artifacts-path artifacts/build/v35
           --configuration Release
           --no-restore
           --output artifacts/publish/admin
@@ -153,7 +169,7 @@ jobs:
           retention-days: 14
 
   container-readiness:
-    name: Compose, container, and 1.0 deployment bundle
+    name: Compose, container, and 3.5 deployment bundle
     needs: version-readiness
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -165,7 +181,7 @@ jobs:
       - name: Build server container
         run: docker build --file Ssalddel/Dockerfile --tag ssalddel-server:azure-preview .
 
-      - name: Validate Azure 1.0 Compose profile
+      - name: Validate Azure 3.5 Compose profile
         env:
           SSALDDEL_MYSQL_ROOT_PASSWORD: readiness-root-password
           SSALDDEL_MYSQL_PASSWORD: readiness-app-password
@@ -179,7 +195,7 @@ jobs:
         run: >-
           docker compose
           -f deploy/azure-vm/compose.yaml
-          -f deploy/azure-vm/compose.orderer-v10.override.yaml
+          -f deploy/azure-vm/compose.mart-v35.override.yaml
           config --quiet
 
       - name: Download published server and web
@@ -188,28 +204,28 @@ jobs:
           name: release-readiness-${{ github.run_number }}
           path: artifacts/release-readiness
 
-      - name: Package Azure 1.0 deployment bundle
+      - name: Package Azure 3.5 deployment bundle
         run: |
           set -euo pipefail
-          bundle="artifacts/orderer-v10"
+          bundle="artifacts/mart-v35"
           test -f artifacts/release-readiness/web/wwwroot/index.html
           mkdir -p "$bundle"
           docker save --output "$bundle/ssalddel-server.tar" ssalddel-server:azure-preview
           tar -C artifacts/release-readiness/web/wwwroot -czf "$bundle/web.tar.gz" .
           cp deploy/azure-vm/compose.yaml "$bundle/compose.yaml"
-          cp deploy/azure-vm/compose.orderer-v10.override.yaml "$bundle/compose.orderer-v10.override.yaml"
+          cp deploy/azure-vm/compose.mart-v35.override.yaml "$bundle/compose.mart-v35.override.yaml"
           cp deploy/azure-vm/Caddyfile "$bundle/Caddyfile"
           cp deploy/azure-vm/deploy-preview-profile.sh "$bundle/deploy-preview-profile.sh"
-          cp deploy/azure-vm/deploy-orderer-v10.sh "$bundle/deploy-orderer-v10.sh"
-          chmod +x "$bundle/deploy-preview-profile.sh" "$bundle/deploy-orderer-v10.sh"
+          cp deploy/azure-vm/deploy-mart-v35.sh "$bundle/deploy-mart-v35.sh"
+          chmod +x "$bundle/deploy-preview-profile.sh" "$bundle/deploy-mart-v35.sh"
           test -s "$bundle/ssalddel-server.tar"
           test -s "$bundle/web.tar.gz"
 
-      - name: Upload Azure 1.0 deployment bundle
+      - name: Upload Azure 3.5 deployment bundle
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: orderer-v10-deployment-${{ github.run_number }}
-          path: artifacts/orderer-v10/
+          name: mart-v35-deployment-${{ github.run_number }}
+          path: artifacts/mart-v35/
           if-no-files-found: error
           retention-days: 14
 

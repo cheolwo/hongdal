@@ -6,14 +6,14 @@ namespace Ssalddel.Tests.Services.Execution;
 public sealed class SsalddelExecutionModePolicyTests
 {
     [Fact]
-    public void 기본_실행_모드는_Simulation이다()
+    public void 기본_실행_모드는_Operational이다()
     {
         var options = new SsalddelExecutionOptions();
         var policy = new SsalddelExecutionModePolicy(Options.Create(options));
 
-        Assert.Equal(SsalddelExecutionMode.Simulation, policy.Mode);
-        Assert.True(policy.IsSimulation);
-        Assert.False(policy.IsOperational);
+        Assert.Equal(SsalddelExecutionMode.Operational, policy.Mode);
+        Assert.True(policy.IsOperational);
+        Assert.False(policy.IsSimulation);
     }
 
     [Fact]

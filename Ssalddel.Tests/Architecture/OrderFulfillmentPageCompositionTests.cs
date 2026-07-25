@@ -24,7 +24,7 @@ public sealed class OrderFulfillmentPageCompositionTests
     }
 
     [Theory]
-    [InlineData("OrderFulfillmentSamples.razor", OrderFulfillmentSimulationPageRoutes.Samples, "샘플 주문 반영")]
+    [InlineData("OrderFulfillmentSamples.razor", OrderFulfillmentSimulationPageRoutes.Samples, "판매채널 주문 동기화")]
     [InlineData("OrderFulfillmentOrders.razor", OrderFulfillmentSimulationPageRoutes.Orders, "<OrderFulfillmentOrderListPanel")]
     [InlineData("OrderFulfillmentOrderDetail.razor", OrderFulfillmentSimulationPageRoutes.OrderDetailTemplate, "<OrderFulfillmentOrderDetailPanel")]
     [InlineData("OrderFulfillmentInventory.razor", OrderFulfillmentSimulationPageRoutes.Inventory, "<OrderFulfillmentInventoryPanel")]

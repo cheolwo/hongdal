@@ -16,7 +16,7 @@ case "$application_root" in
 esac
 
 case "$profile_name" in
-  orderer-v10|orderer-v15) ;;
+  orderer-v10|orderer-v15|transport-v20|fulfillment-v25|food-delivery-v30|mart-v35) ;;
   *)
     echo "Unsupported deployment profile: $profile_name" >&2
     exit 1

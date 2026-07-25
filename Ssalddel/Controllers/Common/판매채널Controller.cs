@@ -21,15 +21,18 @@ public sealed class 판매채널Controller : ControllerBase
     private readonly I판매채널UseCase _판매채널UseCase;
     private readonly I판매페이지UseCase _salesPageUseCase;
     private readonly I판매채널주문조회UseCase _orderReadUseCase;
+    private readonly I판매채널주문동기화UseCase _orderSyncUseCase;
 
     public 판매채널Controller(
         I판매채널UseCase 판매채널UseCase,
         I판매페이지UseCase salesPageUseCase,
-        I판매채널주문조회UseCase orderReadUseCase)
+        I판매채널주문조회UseCase orderReadUseCase,
+        I판매채널주문동기화UseCase orderSyncUseCase)
     {
         _판매채널UseCase = 판매채널UseCase;
         _salesPageUseCase = salesPageUseCase;
         _orderReadUseCase = orderReadUseCase;
+        _orderSyncUseCase = orderSyncUseCase;
     }
 
     [HttpGet("product-pages/drafts")]
@@ -138,6 +141,17 @@ public sealed class 판매채널Controller : ControllerBase
         long orderId,
         CancellationToken cancellationToken)
         => this.ToActionResult(await _orderReadUseCase.상세Async(orderId, cancellationToken));
+
+    [HttpPost("orders/sync")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    public async Task<IActionResult> 주문동기화(
+        [FromBody] 판매채널주문동기화요청 request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await _orderSyncUseCase.실행Async(request, cancellationToken));
 
     [HttpGet("products")]
     public async Task<IActionResult> 상품목록(CancellationToken cancellationToken)
