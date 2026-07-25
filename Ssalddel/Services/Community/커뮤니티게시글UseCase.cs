@@ -22,9 +22,9 @@ namespace Ssalddel.Services.Community;
     Summary = "커뮤니티 게시글을 투표와 결의문 작성 흐름으로 확장합니다.")]
 [SsalddelUseCaseRelation(
     SsalddelUseCaseRelationKind.Extend,
-    "인연스냅샷조회UseCase",
+    "업무관계스냅샷조회UseCase",
     Condition = "게시글 작성자 또는 참여자의 업무 관계 신뢰 신호를 함께 보여주는 경우",
-    Summary = "게시글의 역할 태그와 활동 신호를 업무 인연 스냅샷 조회로 확장합니다.")]
+    Summary = "게시글의 역할 태그와 활동 신호를 업무 관계 스냅샷과 친구 요청 후보 조회로 확장합니다.")]
 public sealed partial class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 {
     private readonly I커뮤니티게시글조회UseCase _readUseCase;

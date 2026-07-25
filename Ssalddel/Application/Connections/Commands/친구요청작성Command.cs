@@ -4,7 +4,7 @@ using 살뜰.도메인.사용자;
 
 namespace Ssalddel.Application.Connections.Commands;
 
-public sealed record 인연연결요청작성Command(
+public sealed record 친구요청작성Command(
     string 요청자참여자Id,
     살뜰역할유형 요청자역할,
     string 대상자참여자Id,

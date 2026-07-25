@@ -3,8 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace 살뜰.도메인.사용자;
 
+// 기존 운영 DB와 migration 호환을 위해 물리 테이블명은 유지한다.
 [Table("인연연결요청")]
-public class 인연연결요청
+public class 친구요청
 {
     [Key]
     [Column("id")]
@@ -42,7 +43,7 @@ public class 인연연결요청
     public string 요청메시지 { get; set; } = string.Empty;
 
     [Column("상태")]
-    public 인연연결요청상태 상태 { get; set; } = 인연연결요청상태.대기;
+    public 친구요청상태 상태 { get; set; } = 친구요청상태.대기;
 
     [Column("요청일시")]
     public DateTimeOffset 요청일시 { get; set; } = DateTimeOffset.UtcNow;
@@ -55,7 +56,7 @@ public class 인연연결요청
     public string? 거절사유 { get; set; }
 }
 
-public enum 인연연결요청상태
+public enum 친구요청상태
 {
     대기 = 1,
     수락 = 2,

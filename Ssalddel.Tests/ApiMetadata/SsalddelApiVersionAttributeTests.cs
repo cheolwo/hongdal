@@ -593,12 +593,12 @@ public sealed class SsalddelApiVersionAttributeTests
         AddIfMissingCommunityTrack(typeof(커뮤니티게시글Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(커뮤니티활동신호Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(커뮤니티투표Controller), missingCommunityTrack);
-        AddIfMissingCommunityTrack(typeof(인연연결Controller), missingCommunityTrack);
+        AddIfMissingCommunityTrack(typeof(친구요청Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(감사메시지Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(업무관계SnapshotController), missingCommunityTrack);
         AddIfMissingCommunityTrack(
-            typeof(인증Controller).GetMethod("가입온보딩인연후보조회"),
-            "Ssalddel.Controllers.Common.인증Controller.가입온보딩인연후보조회",
+            typeof(인증Controller).GetMethod("가입온보딩친구후보조회"),
+            "Ssalddel.Controllers.Common.인증Controller.가입온보딩친구후보조회",
             missingCommunityTrack);
 
         Assert.Empty(missingCommunityTrack);

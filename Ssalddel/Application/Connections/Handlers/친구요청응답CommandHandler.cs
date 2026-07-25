@@ -8,25 +8,25 @@ using 살뜰.도메인.설정;
 
 namespace Ssalddel.Application.Connections.Handlers;
 
-public sealed class 인연연결요청응답CommandHandler : IRequestHandler<인연연결요청응답Command, Result<Unit>>
+public sealed class 친구요청응답CommandHandler : IRequestHandler<친구요청응답Command, Result<Unit>>
 {
     private readonly SsalddelContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public 인연연결요청응답CommandHandler(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
+    public 친구요청응답CommandHandler(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
     }
 
-    public async Task<Result<Unit>> Handle(인연연결요청응답Command request, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(친구요청응답Command request, CancellationToken cancellationToken)
     {
-        var entity = await _db.인연연결요청
-            .FirstOrDefaultAsync(x => x.Id == request.인연연결요청Id, cancellationToken);
+        var entity = await _db.친구요청
+            .FirstOrDefaultAsync(x => x.Id == request.친구요청Id, cancellationToken);
 
         if (entity is null)
         {
-            return Result.Fail<Unit>("인연 연결 요청을 찾을 수 없습니다.");
+            return Result.Fail<Unit>("친구 요청을 찾을 수 없습니다.");
         }
 
         if (!string.Equals(entity.대상자참여자Id, _currentUserAccessor.UserId, StringComparison.Ordinal))
@@ -34,28 +34,28 @@ public sealed class 인연연결요청응답CommandHandler : IRequestHandler<인
             return Result.Fail<Unit>("요청 수신자만 응답할 수 있습니다.");
         }
 
-        if (entity.상태 != 인연연결요청상태.대기)
+        if (entity.상태 != 친구요청상태.대기)
         {
-            return Result.Fail<Unit>("이미 처리된 인연 연결 요청입니다.");
+            return Result.Fail<Unit>("이미 처리된 친구 요청입니다.");
         }
 
         var now = DateTimeOffset.UtcNow;
 
         if (request.수락)
         {
-            entity.상태 = 인연연결요청상태.수락;
+            entity.상태 = 친구요청상태.수락;
             entity.응답일시 = now;
 
             if (request.공개동의 is not null)
             {
                 var consent = await _db.연락처공개동의
-                    .FirstOrDefaultAsync(x => x.인연연결요청Id == entity.Id && x.동의자참여자Id == request.공개동의.동의자참여자Id, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.친구요청Id == entity.Id && x.동의자참여자Id == request.공개동의.동의자참여자Id, cancellationToken);
 
                 if (consent is null)
                 {
                     consent = new 연락처공개동의
                     {
-                        인연연결요청Id = entity.Id,
+                        친구요청Id = entity.Id,
                         동의자참여자Id = request.공개동의.동의자참여자Id,
                         동의일시 = now
                     };
@@ -74,7 +74,7 @@ public sealed class 인연연결요청응답CommandHandler : IRequestHandler<인
         }
         else
         {
-            entity.상태 = 인연연결요청상태.거절;
+            entity.상태 = 친구요청상태.거절;
             entity.응답일시 = now;
             entity.거절사유 = request.거절사유?.Trim();
         }
@@ -83,7 +83,8 @@ public sealed class 인연연결요청응답CommandHandler : IRequestHandler<인
 
         _db.Command알림Outbox.Add(new Command알림Outbox
         {
-            CommandName = nameof(인연연결요청응답CommandHandler),
+            CommandName = nameof(친구요청응답CommandHandler),
+            // 기존 Outbox consumer 호환을 위해 EventName은 유지한다.
             EventName = "인연연결요청응답됨",
             FeatureName = "Connection",
             Target = "Participant",

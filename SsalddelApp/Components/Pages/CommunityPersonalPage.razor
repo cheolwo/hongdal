@@ -15,7 +15,7 @@
     <nav aria-label="개인 공간 선택">
         <a class="@(!ShowsPosts ? "active" : null)" href="@CommunityPageRoutes.Personal">내 정보</a>
         <a class="@(ShowsPosts ? "active" : null)" href="@($"{CommunityPageRoutes.Personal}?tab=posts")">내 글</a>
-        <a href="@CommunityPageRoutes.WorkRelationships">업무 인연</a>
+        <a href="@CommunityPageRoutes.WorkRelationships">친구 요청</a>
     </nav>
 
     @if (ShowsPosts)

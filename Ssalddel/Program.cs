@@ -130,7 +130,7 @@ if (executionOptions.Mode == SsalddelExecutionMode.Operational && string.IsNullO
 
 builder.Services.AddSsalddelOptions(builder.Configuration);
 builder.Services.AddSsalddelOperatingMarketServices(builder.Configuration);
-builder.Services.AddScoped<I가입온보딩인연후보Service, 가입온보딩인연후보Service>();
+builder.Services.AddScoped<I가입온보딩친구후보Service, 가입온보딩친구후보Service>();
 
 var dispatchQueueJobOptions = builder.Configuration.GetSection(배차큐배치작업Options.SectionName).Get<배차큐배치작업Options>() ?? new 배차큐배치작업Options();
 var salesOrderSyncOptions = builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName).Get<SalesChannelOrderSyncOptions>() ?? new SalesChannelOrderSyncOptions();

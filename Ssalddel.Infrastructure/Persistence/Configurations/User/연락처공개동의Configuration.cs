@@ -8,7 +8,10 @@ public sealed class 연락처공개동의Configuration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<연락처공개동의> builder)
     {
-        builder.HasIndex(x => new { x.인연연결요청Id, x.동의자참여자Id })
+        builder.Property(x => x.친구요청Id)
+            .HasColumnName("인연연결요청_id");
+
+        builder.HasIndex(x => new { x.친구요청Id, x.동의자참여자Id })
             .IsUnique();
 
         builder.HasIndex(x => new { x.동의자참여자Id, x.동의일시 });

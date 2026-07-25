@@ -49,6 +49,7 @@
 - 절감액과 편익뿐 아니라 비용, 노동, 위험, 담당자와 계산 근거를 함께 드러낸다.
 - 지리적 가까움은 수요 집계와 물류 효율 후보로만 사용하고 자동 가입·알림·상대 선택·배차·계약 확정 근거로 쓰지 않는다.
 - 효율이 낮은 참여자를 숨기거나 배제하지 않고 모집권·시간창·집결 방식·자격 사업자 참여 같은 대안을 표현한다.
+- 업무 로그, 공동 원장, 커뮤니티 이야기, 친구 후보 기록, 친구 요청·수락과 연락처 공개는 서로 분리된 상태로 관리한다. 세부 기준은 [업무 경험에서 친구 요청으로 이어지는 커뮤니티 설계 기준](docs/Architecture/FriendRequestCommunityDesignStandard.md)을 따른다.
 - API key와 secret은 source, tracked config, 로그, capture에 넣지 않는다.
 
 ## 공통 아키텍처
@@ -58,7 +59,7 @@
 - MongoDB 원장은 유연한 업무 원본, RDB는 권한·조회·정산·보고·안정 투영을 맡는다.
 - Event/Outbox 동기화는 재처리 가능하고 멱등해야 하며 순환 발행을 막는다.
 - 여러 앱이 같은 업무 의미로 쓰는 contract는 `Ssalddel.Contracts`, 공통 업무 UI와 workflow는 `Ssalddel.Ui.Common`에 둔다.
-- `Common`은 기술 재사용 집합이 아니라 01~05가 함께 수행하는 업무 경계다. 커뮤니티 탐색, 참여, 공동 원장, 인연, 상품과 신뢰 환류처럼 여러 역할이 같은 업무 의미로 사용하는 API·contract·UI를 포함한다.
+- `Common`은 기술 재사용 집합이 아니라 01~05가 함께 수행하는 업무 경계다. 커뮤니티 탐색, 참여, 공동 원장, 친구 요청·수락, 상품과 신뢰 환류처럼 여러 역할이 같은 업무 의미로 사용하는 API·contract·UI를 포함한다.
 - version·Feature bootstrap, push installation, file transport, 외부 callback처럼 업무 의미 없이 실행 환경을 지원하는 API는 `Controllers/Platform`에 둔다. 여러 앱이 호출한다는 사실만으로 `Common`에 넣지 않는다.
 - 커뮤니티 공개 API는 `Ssalddel/Controllers/Common`, 공유 contract는 `Ssalddel.Contracts/Common/Community`, 저장소와 무관한 커뮤니티 규칙은 `Ssalddel.Community`에 둔다. 물리 project는 의존성 경계를 위해 유지한다.
 - 새 Controller, DTO, Entity, abstraction보다 기존 route, UseCase, metadata, contract, value object, shared component를 먼저 재사용한다.

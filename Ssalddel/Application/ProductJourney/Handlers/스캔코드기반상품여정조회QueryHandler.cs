@@ -93,7 +93,7 @@ public sealed class 스캔코드기반상품여정조회QueryHandler : IRequestH
                     역할 = "판매자",
                     표시명 = 상품.소유자UserId,
                     감사가능 = true,
-                    인연연결가능 = true
+                    친구요청가능 = true
                 }
             ]
         });
@@ -113,7 +113,7 @@ public sealed class 스캔코드기반상품여정조회QueryHandler : IRequestH
                         역할 = "판매자",
                         표시명 = 입고.판매자UserId,
                         감사가능 = true,
-                        인연연결가능 = true
+                        친구요청가능 = true
                     }
                 ]
             });
@@ -134,7 +134,7 @@ public sealed class 스캔코드기반상품여정조회QueryHandler : IRequestH
                         역할 = "판매자",
                         표시명 = 출고.판매자UserId,
                         감사가능 = true,
-                        인연연결가능 = true
+                        친구요청가능 = true
                     }
                 ]
             });
@@ -152,7 +152,7 @@ public sealed class 스캔코드기반상품여정조회QueryHandler : IRequestH
                         역할 = "관세사",
                         표시명 = 통관.확정관세사참여자Id!,
                         감사가능 = true,
-                        인연연결가능 = true
+                        친구요청가능 = true
                     }
                 };
 
@@ -183,7 +183,7 @@ public sealed class 스캔코드기반상품여정조회QueryHandler : IRequestH
                         역할 = "물류처리자",
                         표시명 = g.Key,
                         감사가능 = true,
-                        인연연결가능 = true
+                        친구요청가능 = true
                     })
                     .ToArray()
             });

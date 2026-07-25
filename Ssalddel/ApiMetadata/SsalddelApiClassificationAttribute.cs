@@ -147,7 +147,7 @@ public static class SsalddelCapabilityLabels
         return capability switch
         {
             SsalddelCapability.CommunityInformationDiscovery => "커뮤니티 정보 둘러보기",
-            SsalddelCapability.RelationshipFormation => "인연 형성",
+            SsalddelCapability.RelationshipFormation => "친구 요청·수락",
             SsalddelCapability.CommunityLedger => "공동 원장",
             SsalddelCapability.GroupPurchaseDemand => "공동구매 수요·모집",
             SsalddelCapability.OrderParticipation => "주문 참여",

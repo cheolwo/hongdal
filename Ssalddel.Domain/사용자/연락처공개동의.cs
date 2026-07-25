@@ -10,8 +10,9 @@ public class 연락처공개동의
     [Column("id")]
     public long Id { get; set; }
 
+    // 기존 운영 DB와 migration 호환을 위해 물리 column명은 유지한다.
     [Column("인연연결요청_id")]
-    public long 인연연결요청Id { get; set; }
+    public long 친구요청Id { get; set; }
 
     [Column("동의자_참여자_id")]
     [MaxLength(450)]

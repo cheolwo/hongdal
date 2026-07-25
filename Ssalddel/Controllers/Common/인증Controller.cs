@@ -57,9 +57,9 @@ public class 인증Controller : ControllerBase
     [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
     [Authorize]
     [HttpPost("onboarding/connection-candidates")]
-    public async Task<IActionResult> 가입온보딩인연후보조회([FromBody] 가입인연후보조회요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 가입온보딩친구후보조회([FromBody] 가입친구후보조회요청 request, CancellationToken cancellationToken)
     {
-        var result = await _인증UseCase.가입온보딩인연후보조회Async(request, cancellationToken);
+        var result = await _인증UseCase.가입온보딩친구후보조회Async(request, cancellationToken);
         return this.ToActionResult(result);
     }
 

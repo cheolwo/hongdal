@@ -26,8 +26,8 @@ public sealed class SsalddelApiClassificationTests
     public void RepresentativeAppControllers_ExposeKoreanBusinessMeaning()
     {
         AssertClassification(
-            typeof(인연연결Controller),
-            "인연 형성",
+            typeof(친구요청Controller),
+            "친구 요청·수락",
             "커뮤니티 참여자",
             "요청하기");
         AssertClassification(
@@ -71,7 +71,7 @@ public sealed class SsalddelApiClassificationTests
             typeof(업무관계SnapshotController));
 
         Assert.Contains("업무 활동 신호", metadata.Capabilities);
-        Assert.Contains("인연 형성", metadata.Capabilities);
+        Assert.Contains("친구 요청·수락", metadata.Capabilities);
         Assert.Contains("둘러보기", metadata.Operations);
         Assert.Equal("커뮤니티 신뢰", metadata.Workflow);
         Assert.Equal("0.0", metadata.IntroducedIn);
@@ -137,7 +137,7 @@ public sealed class SsalddelApiClassificationTests
         Assert.NotEmpty(controllers);
         Assert.Contains(typeof(커뮤니티게시글Controller), controllers);
         Assert.Contains(typeof(커뮤니티원장공유Controller), controllers);
-        Assert.Contains(typeof(인연연결Controller), controllers);
+        Assert.Contains(typeof(친구요청Controller), controllers);
         Assert.All(controllers, controller =>
         {
             Assert.Equal("Ssalddel.Controllers.Common", controller.Namespace);
@@ -341,7 +341,7 @@ public sealed class SsalddelApiClassificationTests
     }
 
     private static IEnumerable<Type> GetConcreteControllers()
-        => typeof(인연연결Controller).Assembly
+        => typeof(친구요청Controller).Assembly
             .GetTypes()
             .Where(type =>
                 typeof(ControllerBase).IsAssignableFrom(type) &&

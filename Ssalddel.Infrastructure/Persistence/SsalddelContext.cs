@@ -82,7 +82,7 @@ namespace 살뜰.Data
         public DbSet<HrEmploymentContractRecord> HrEmploymentContracts { get; set; } = null!;
         public DbSet<HrPayrollScheduleRecord> HrPayrollSchedules { get; set; } = null!;
         public DbSet<WorkRelationshipSnapshotRecord> WorkRelationshipSnapshots { get; set; } = null!;
-        public DbSet<인연연결요청> 인연연결요청 { get; set; } = null!;
+        public DbSet<친구요청> 친구요청 { get; set; } = null!;
         public DbSet<연락처공개동의> 연락처공개동의 { get; set; } = null!;
         public DbSet<관세사프로필> 관세사프로필 { get; set; } = null!;
 

@@ -3,8 +3,8 @@ using MediatR;
 
 namespace Ssalddel.Application.Connections.Commands;
 
-public sealed record 인연연결요청응답Command(
-    long 인연연결요청Id,
+public sealed record 친구요청응답Command(
+    long 친구요청Id,
     bool 수락,
     string? 거절사유,
     연락처공개동의입력? 공개동의) : IRequest<Result<Unit>>;

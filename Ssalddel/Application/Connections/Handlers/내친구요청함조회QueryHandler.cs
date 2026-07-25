@@ -5,36 +5,36 @@ using Ssalddel.Application.Connections.Queries;
 
 namespace Ssalddel.Application.Connections.Handlers;
 
-public sealed class 내인연연결요청함조회QueryHandler : IRequestHandler<내인연연결요청함조회Query, IReadOnlyList<인연연결요청항목응답>>
+public sealed class 내친구요청함조회QueryHandler : IRequestHandler<내친구요청함조회Query, IReadOnlyList<친구요청항목응답>>
 {
     private readonly SsalddelContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public 내인연연결요청함조회QueryHandler(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
+    public 내친구요청함조회QueryHandler(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
     }
 
-    public async Task<IReadOnlyList<인연연결요청항목응답>> Handle(내인연연결요청함조회Query request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<친구요청항목응답>> Handle(내친구요청함조회Query request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_currentUserAccessor.UserId))
         {
-            return Array.Empty<인연연결요청항목응답>();
+            return Array.Empty<친구요청항목응답>();
         }
 
         var page = Math.Max(1, request.페이지);
         var pageSize = Math.Clamp(request.페이지크기, 1, 200);
 
-        return await _db.인연연결요청
+        return await _db.친구요청
             .AsNoTracking()
             .Where(x => x.요청자참여자Id == _currentUserAccessor.UserId)
             .OrderByDescending(x => x.요청일시)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(x => new 인연연결요청항목응답
+            .Select(x => new 친구요청항목응답
             {
-                인연연결요청Id = x.Id,
+                친구요청Id = x.Id,
                 요청자참여자Id = x.요청자참여자Id,
                 대상자참여자Id = x.대상자참여자Id,
                 요청자역할 = x.요청자역할.ToString(),

@@ -3,23 +3,23 @@ using 살뜰.도메인.사용자;
 
 namespace Ssalddel.Services.Auth;
 
-public interface I가입온보딩인연후보Service
+public interface I가입온보딩친구후보Service
 {
-    Task<IReadOnlyList<가입인연후보항목응답>> 후보조회Async(가입인연후보조회요청 request, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<가입친구후보항목응답>> 후보조회Async(가입친구후보조회요청 request, CancellationToken cancellationToken = default);
 }
 
-public sealed class 가입온보딩인연후보Service : I가입온보딩인연후보Service
+public sealed class 가입온보딩친구후보Service : I가입온보딩친구후보Service
 {
     private readonly SsalddelContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public 가입온보딩인연후보Service(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
+    public 가입온보딩친구후보Service(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
     }
 
-    public async Task<IReadOnlyList<가입인연후보항목응답>> 후보조회Async(가입인연후보조회요청 request, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<가입친구후보항목응답>> 후보조회Async(가입친구후보조회요청 request, CancellationToken cancellationToken = default)
     {
         var currentUserId = _currentUserAccessor.UserId;
         if (string.IsNullOrWhiteSpace(currentUserId))
@@ -85,7 +85,7 @@ public sealed class 가입온보딩인연후보Service : I가입온보딩인연�
             .Select(x => new { x.Id, x.주문참조번호, x.확정관세사참여자Id })
             .ToArrayAsync(cancellationToken);
 
-        var results = new List<가입인연후보항목응답>();
+        var results = new List<가입친구후보항목응답>();
 
         foreach (var outbound in outboundCandidates)
         {
@@ -203,7 +203,7 @@ public sealed class 가입온보딩인연후보Service : I가입온보딩인연�
     }
 
     private static void AddCandidate(
-        List<가입인연후보항목응답> results,
+        List<가입친구후보항목응답> results,
         string candidateKey,
         string participantId,
         살뜰역할유형 role,
@@ -220,7 +220,7 @@ public sealed class 가입온보딩인연후보Service : I가입온보딩인연�
             return;
         }
 
-        results.Add(new 가입인연후보항목응답
+        results.Add(new 가입친구후보항목응답
         {
             후보키 = candidateKey,
             대상자참여자Id = participantId,
@@ -236,7 +236,7 @@ public sealed class 가입온보딩인연후보Service : I가입온보딩인연�
         });
     }
 
-    private static HashSet<string> BuildIdentityHints(string currentUserId, 가입인연후보조회요청 request)
+    private static HashSet<string> BuildIdentityHints(string currentUserId, 가입친구후보조회요청 request)
     {
         var hints = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -293,7 +293,7 @@ public sealed class 가입온보딩인연후보Service : I가입온보딩인연�
     }
 }
 
-public sealed class 가입인연후보조회요청
+public sealed class 가입친구후보조회요청
 {
     public string 주문참조번호 { get; set; } = string.Empty;
     public string 표시이름 { get; set; } = string.Empty;
@@ -302,7 +302,7 @@ public sealed class 가입인연후보조회요청
     public int 최대건수 { get; set; } = 20;
 }
 
-public sealed class 가입인연후보항목응답
+public sealed class 가입친구후보항목응답
 {
     public string 후보키 { get; init; } = string.Empty;
     public string 대상자참여자Id { get; init; } = string.Empty;

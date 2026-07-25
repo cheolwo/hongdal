@@ -1,35 +1,35 @@
 @using Ssalddel.Contracts.Common.Hr
-@inject 업무인연커뮤니티ViewModel ViewModel
+@inject 업무친구요청ViewModel ViewModel
 
 <main class="community-work-relationships">
     <header class="community-work-relationships__hero">
-        <span>01 Community · 업무에서 다시 만난 인연</span>
-        <h1>함께 일한 기록이 관계의 출발점이 됩니다</h1>
+        <span>01 Community · 업무에서 만난 사람</span>
+        <h1>함께 일한 사람에게 친구 요청을 보낼 수 있습니다</h1>
         <p>
             02 주문자, 03 화주, 04 기사, 05 창고 앱에서 실제 업무 접점이 생기면
-            인연 DB에 익명 기록을 남기고 이곳에서 본인만 다시 확인합니다.
+            업무 관계를 익명 기록으로 남기고 이곳에서 본인만 다시 확인합니다.
         </p>
     </header>
 
-    <section class="community-work-relationships__flow" aria-label="업무 인연 형성 흐름">
+    <section class="community-work-relationships__flow" aria-label="업무 관계에서 친구 요청으로 이어지는 흐름">
         <article><span>1</span><strong>업무 수행</strong><p>각 역할 앱에서 실제 상태 전환을 완료합니다.</p></article>
-        <article><span>2</span><strong>인연 기록</strong><p>허용된 업무 접점만 익명화해 인연 DB에 남깁니다.</p></article>
-        <article><span>3</span><strong>커뮤니티 재회</strong><p>본인이 기록을 확인하고 관계를 이어갈지 선택합니다.</p></article>
-        <article><span>4</span><strong>서로 동의</strong><p>상대 수락 뒤에도 연락처 공개 항목은 따로 정합니다.</p></article>
+        <article><span>2</span><strong>친구 후보 기록</strong><p>허용된 업무 접점만 익명화해 본인 기록으로 남깁니다.</p></article>
+        <article><span>3</span><strong>친구 요청</strong><p>본인이 기록을 확인하고 친구 요청을 보낼지 선택합니다.</p></article>
+        <article><span>4</span><strong>친구 수락</strong><p>상대가 수락해도 연락처 공개 항목은 따로 정합니다.</p></article>
     </section>
 
     <aside class="community-work-relationships__boundary">
         <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Size="Size.Small" />
         <span>
             <strong>업무 로그는 공개 게시글이나 자동 친구 관계가 아닙니다.</strong>
-            업무 이력만으로 사람을 추천·평가·순위화하지 않으며 연결 요청과 연락처 공개는 각각 철회 가능한 동의로 처리합니다.
+            업무 이력만으로 사람을 추천·평가·순위화하지 않으며 친구 요청과 연락처 공개는 각각 철회 가능한 동의로 처리합니다.
         </span>
     </aside>
 
     <section class="community-work-relationships__records" aria-labelledby="work-relationship-records-title">
         <header>
             <div>
-                <span>내 업무 인연</span>
+                <span>내 친구 후보</span>
                 <h2 id="work-relationship-records-title">다시 확인할 업무 접점</h2>
             </div>
             <button type="button" @onclick="ReloadAsync" disabled="@ViewModel.처리중">새로고침</button>
@@ -39,7 +39,7 @@
         {
             <div class="community-work-relationships__state">
                 <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
-                <span>인연 DB에서 내 업무 접점을 확인하고 있습니다.</span>
+                <span>내 업무 접점에서 친구 후보를 확인하고 있습니다.</span>
             </div>
         }
         else if (ViewModel.오류발생)
@@ -55,14 +55,14 @@
         {
             <div class="community-work-relationships__state">
                 <MudIcon Icon="@Icons.Material.Filled.Handshake" />
-                <strong>아직 확인할 업무 인연 기록이 없습니다.</strong>
-                <p>업무가 성공했고 해당 Command의 인연 기록 기능이 켜진 경우에만 이곳에 나타납니다.</p>
+                <strong>아직 확인할 친구 후보 기록이 없습니다.</strong>
+                <p>업무가 성공했고 해당 Command의 친구 후보 기록 기능이 켜진 경우에만 이곳에 나타납니다.</p>
             </div>
         }
         else
         {
             <div class="community-work-relationships__list">
-                @foreach (var item in ViewModel.업무인연목록)
+                @foreach (var item in ViewModel.업무친구후보목록)
                 {
                     <article>
                         <header>
@@ -79,13 +79,13 @@
                             </span>
                         </div>
 
-                        @if (ViewModel.연결요청완료(item.Id))
+                        @if (ViewModel.친구요청완료(item.Id))
                         {
-                            <em>인연 요청을 보냈습니다 · 상대 응답 대기</em>
+                            <em>친구 요청을 보냈습니다 · 상대 응답 대기</em>
                         }
-                        else if (ViewModel.연결요청가능(item))
+                        else if (ViewModel.친구요청가능(item))
                         {
-                            <button type="button" @onclick="@(() => BeginConnection(item))">인연 이어보기</button>
+                            <button type="button" @onclick="@(() => BeginConnection(item))">친구 요청 보내기</button>
                         }
                         else
                         {
@@ -152,7 +152,7 @@
             return;
         }
 
-        if (await ViewModel.연결요청Async(_selected, _purpose, _message))
+        if (await ViewModel.친구요청Async(_selected, _purpose, _message))
         {
             _selected = null;
             _purpose = string.Empty;

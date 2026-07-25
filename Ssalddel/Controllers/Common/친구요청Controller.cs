@@ -20,19 +20,19 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [Authorize]
 [Route("api/v1/connections")]
-public sealed class 인연연결Controller : CommunityControllerBase
+public sealed class 친구요청Controller : CommunityControllerBase
 {
     private readonly ISender _sender;
 
-    public 인연연결Controller(ISender sender)
+    public 친구요청Controller(ISender sender)
     {
         _sender = sender;
     }
 
     [HttpPost("requests")]
-    public async Task<IActionResult> 요청생성([FromBody] 인연연결요청생성요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 요청생성([FromBody] 친구요청생성요청 request, CancellationToken cancellationToken)
     {
-        var command = new 인연연결요청작성Command(
+        var command = new 친구요청작성Command(
             request.요청자참여자Id,
             request.요청자역할,
             request.대상자참여자Id,
@@ -48,13 +48,13 @@ public sealed class 인연연결Controller : CommunityControllerBase
     }
 
     [HttpPost("requests/from-work-relationship/{snapshotId:guid}")]
-    public async Task<IActionResult> 업무인연에서요청생성(
+    public async Task<IActionResult> 업무관계에서친구요청생성(
         Guid snapshotId,
         [FromBody] WorkRelationshipConnectionRequestCreateRequest request,
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new 업무인연연결요청작성Command(
+            new 업무관계친구요청작성Command(
                 snapshotId,
                 request.Purpose,
                 request.Message),
@@ -64,9 +64,9 @@ public sealed class 인연연결Controller : CommunityControllerBase
     }
 
     [HttpPost("requests/{connectionRequestId:long}/respond")]
-    public async Task<IActionResult> 요청응답(long connectionRequestId, [FromBody] 인연연결요청응답요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 요청응답(long connectionRequestId, [FromBody] 친구요청응답요청 request, CancellationToken cancellationToken)
     {
-        var command = new 인연연결요청응답Command(
+        var command = new 친구요청응답Command(
             connectionRequestId,
             request.수락,
             request.거절사유,
@@ -91,20 +91,20 @@ public sealed class 인연연결Controller : CommunityControllerBase
     [HttpGet("requests/sent")]
     public async Task<IActionResult> 내요청함([FromQuery] int page = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        var result = await _sender.Send(new 내인연연결요청함조회Query(page, pageSize), cancellationToken);
+        var result = await _sender.Send(new 내친구요청함조회Query(page, pageSize), cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("requests/received")]
     public async Task<IActionResult> 수신요청함([FromQuery] int page = 1, [FromQuery] int pageSize = 50, CancellationToken cancellationToken = default)
     {
-        var result = await _sender.Send(new 내인연연결수신함조회Query(page, pageSize), cancellationToken);
+        var result = await _sender.Send(new 내친구수신함조회Query(page, pageSize), cancellationToken);
         return Ok(result);
     }
 
 }
 
-public sealed class 인연연결요청생성요청
+public sealed class 친구요청생성요청
 {
     public string 요청자참여자Id { get; set; } = string.Empty;
     public 살뜰역할유형 요청자역할 { get; set; }
@@ -117,7 +117,7 @@ public sealed class 인연연결요청생성요청
     public string 요청메시지 { get; set; } = string.Empty;
 }
 
-public sealed class 인연연결요청응답요청
+public sealed class 친구요청응답요청
 {
     public bool 수락 { get; set; }
     public string? 거절사유 { get; set; }

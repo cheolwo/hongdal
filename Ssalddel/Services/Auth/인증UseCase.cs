@@ -22,7 +22,7 @@ public interface I인증UseCase
     Task<Result<커뮤니티회원가입응답>> 커뮤니티회원가입Async(커뮤니티회원가입요청? request);
     Task<Result<기사회원가입응답>> 기사회원가입Async(기사회원가입요청? request);
     Task<Result<주문자회원가입응답>> 주문자회원가입Async(주문자회원가입요청? request);
-    Task<Result<IReadOnlyList<가입인연후보항목응답>>> 가입온보딩인연후보조회Async(가입인연후보조회요청? request, CancellationToken cancellationToken);
+    Task<Result<IReadOnlyList<가입친구후보항목응답>>> 가입온보딩친구후보조회Async(가입친구후보조회요청? request, CancellationToken cancellationToken);
     Task<Result<주문자집단자동배정응답>> 주문자집단온보딩Async(주문자집단온보딩요청? request, string? userId);
     Task<Result<토큰응답>> 토큰갱신Async(토큰갱신요청? request);
     Task<Result<표시언어설정응답>> 표시언어설정Async(표시언어설정요청? request, string? userId);
@@ -42,7 +42,7 @@ public sealed class 인증UseCase : I인증UseCase
     private readonly INtsBusinessRegistrationService _ntsBusinessRegistrationService;
     private readonly JwtOptions _jwtOptions;
     private readonly I사용자행위로그Service _activityLogService;
-    private readonly I가입온보딩인연후보Service _가입온보딩인연후보Service;
+    private readonly I가입온보딩친구후보Service _가입온보딩친구후보Service;
     private readonly I주문자집단자동배정Service _ordererGroupAutoAssignmentService;
 
     public 인증UseCase(
@@ -51,7 +51,7 @@ public sealed class 인증UseCase : I인증UseCase
         INtsBusinessRegistrationService ntsBusinessRegistrationService,
         IOptions<JwtOptions> jwtOptions,
         I사용자행위로그Service activityLogService,
-        I가입온보딩인연후보Service 가입온보딩인연후보Service,
+        I가입온보딩친구후보Service 가입온보딩친구후보Service,
         I주문자집단자동배정Service ordererGroupAutoAssignmentService)
     {
         _userManager = userManager;
@@ -59,7 +59,7 @@ public sealed class 인증UseCase : I인증UseCase
         _ntsBusinessRegistrationService = ntsBusinessRegistrationService;
         _jwtOptions = jwtOptions.Value;
         _activityLogService = activityLogService;
-        _가입온보딩인연후보Service = 가입온보딩인연후보Service;
+        _가입온보딩친구후보Service = 가입온보딩친구후보Service;
         _ordererGroupAutoAssignmentService = ordererGroupAutoAssignmentService;
     }
 
@@ -373,14 +373,14 @@ public sealed class 인증UseCase : I인증UseCase
         };
     }
 
-    public async Task<Result<IReadOnlyList<가입인연후보항목응답>>> 가입온보딩인연후보조회Async(
-        가입인연후보조회요청? request,
+    public async Task<Result<IReadOnlyList<가입친구후보항목응답>>> 가입온보딩친구후보조회Async(
+        가입친구후보조회요청? request,
         CancellationToken cancellationToken)
     {
-        if (request == null) return Result.Fail<IReadOnlyList<가입인연후보항목응답>>("request body is required");
-        if (string.IsNullOrWhiteSpace(request.주문참조번호)) return Result.Fail<IReadOnlyList<가입인연후보항목응답>>("orderReference is required");
+        if (request == null) return Result.Fail<IReadOnlyList<가입친구후보항목응답>>("request body is required");
+        if (string.IsNullOrWhiteSpace(request.주문참조번호)) return Result.Fail<IReadOnlyList<가입친구후보항목응답>>("orderReference is required");
 
-        return Result.Ok(await _가입온보딩인연후보Service.후보조회Async(request, cancellationToken));
+        return Result.Ok(await _가입온보딩친구후보Service.후보조회Async(request, cancellationToken));
     }
 
     public async Task<Result<주문자집단자동배정응답>> 주문자집단온보딩Async(주문자집단온보딩요청? request, string? userId)

@@ -58,7 +58,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IHR역할검토조회UseCase, HR역할검토조회UseCase>();
         services.AddScoped<IHR역할지원조회UseCase, HR역할지원조회UseCase>();
         services.AddScoped<IHR역할지원CommandUseCase, HR역할지원CommandUseCase>();
-        services.AddScoped<I인연스냅샷조회UseCase, 인연스냅샷조회UseCase>();
+        services.AddScoped<I업무관계스냅샷조회UseCase, 업무관계스냅샷조회UseCase>();
         services.AddScoped<I기사운송상태변경CommandExecutor, 기사운송상태변경CommandExecutor>();
         services.AddScoped<I운송증빙첨부JsonWriter, 운송증빙첨부JsonWriter>();
         services.AddScoped<I운송완료입금요청Service, 운송완료입금요청Service>();
@@ -67,7 +67,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IWorkRelationshipSnapshotCollector, WorkRelationshipSnapshotCollector>();
         services.AddScoped<ICommand후처리Processor, Command감사로그Processor>();
         services.AddScoped<ICommand후처리Processor, Command알림의도Processor>();
-        services.AddScoped<ICommand후처리Processor, Command인연스냅샷Processor>();
+        services.AddScoped<ICommand후처리Processor, Command업무관계스냅샷Processor>();
 
         services.AddScoped<I사용자행위로그Service, 사용자행위로그Service>();
         services.AddScoped<ISalesChannelService, SalesChannelService>();

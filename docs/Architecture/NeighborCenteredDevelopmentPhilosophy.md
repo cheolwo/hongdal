@@ -90,6 +90,7 @@
 ## 관련 문서
 
 - [커뮤니티 0.0 기반 제품 원칙](CommunityFoundationV0Policy.md)
+- [업무 경험에서 친구 요청으로 이어지는 커뮤니티 설계 기준](FriendRequestCommunityDesignStandard.md)
 - [0.0 집중 로드맵](../Versions/v0.0/focus-roadmap.md)
 - [HIOPS Layer Model](HIOPSLayerModel.md)
 - [운영 시장 프로필](OperatingMarketProfiles.md)

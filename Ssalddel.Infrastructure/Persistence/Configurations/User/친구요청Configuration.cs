@@ -4,10 +4,12 @@ using 살뜰.도메인.사용자;
 
 namespace 살뜰.Infrastructure.Persistence.Configurations.User;
 
-public sealed class 인연연결요청Configuration : IEntityTypeConfiguration<인연연결요청>
+public sealed class 친구요청Configuration : IEntityTypeConfiguration<친구요청>
 {
-    public void Configure(EntityTypeBuilder<인연연결요청> builder)
+    public void Configure(EntityTypeBuilder<친구요청> builder)
     {
+        builder.ToTable("인연연결요청");
+
         builder.Property(x => x.요청자역할)
             .HasConversion<int>();
 

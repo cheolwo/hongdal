@@ -19,9 +19,9 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiContractName("WorkRelationshipSnapshotsController")]
 public sealed class 업무관계SnapshotController : CommunityControllerBase
 {
-    private readonly I인연스냅샷조회UseCase _업무관계Snapshot조회UseCase;
+    private readonly I업무관계스냅샷조회UseCase _업무관계Snapshot조회UseCase;
 
-    public 업무관계SnapshotController(I인연스냅샷조회UseCase 업무관계Snapshot조회UseCase)
+    public 업무관계SnapshotController(I업무관계스냅샷조회UseCase 업무관계Snapshot조회UseCase)
     {
         _업무관계Snapshot조회UseCase = 업무관계Snapshot조회UseCase;
     }

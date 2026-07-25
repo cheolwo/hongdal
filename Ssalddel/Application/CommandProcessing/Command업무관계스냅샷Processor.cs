@@ -3,16 +3,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Ssalddel.Application.CommandProcessing;
 
-public sealed class Command인연스냅샷Processor : ICommand후처리Processor
+public sealed class Command업무관계스냅샷Processor : ICommand후처리Processor
 {
     private readonly IWorkRelationshipSnapshotService _snapshotService;
     private readonly IWorkRelationshipSnapshotCollector _snapshotCollector;
-    private readonly ILogger<Command인연스냅샷Processor> _logger;
+    private readonly ILogger<Command업무관계스냅샷Processor> _logger;
 
-    public Command인연스냅샷Processor(
+    public Command업무관계스냅샷Processor(
         IWorkRelationshipSnapshotService snapshotService,
         IWorkRelationshipSnapshotCollector snapshotCollector,
-        ILogger<Command인연스냅샷Processor> logger)
+        ILogger<Command업무관계스냅샷Processor> logger)
     {
         _snapshotService = snapshotService;
         _snapshotCollector = snapshotCollector;

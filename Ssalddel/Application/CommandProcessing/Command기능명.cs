@@ -15,7 +15,7 @@ public static class Command기능명
         return featureName switch
         {
             AuditLog => "감사 로그",
-            WorkRelationshipSnapshot => "인연 스냅샷",
+            WorkRelationshipSnapshot => "친구 후보 기록",
             Sms => "SMS",
             Sns => "SNS",
             Push => "푸시 알림",

@@ -1,7 +1,7 @@
 namespace Ssalddel.Contracts.Admin.Exploration;
 
 [Obsolete("기사화주관계집계응답 사용")]
-public sealed class 기사화주인연집계응답
+public sealed class 기사화주친구관계집계응답
 {
     public long Id { get; set; }
     public string 기사Id { get; set; } = string.Empty;
@@ -13,7 +13,7 @@ public sealed class 기사화주인연집계응답
     public decimal 최근응답률 { get; set; }
     public int 최근30일접점수 { get; set; }
     public decimal 취소율 { get; set; }
-    public decimal 인연점수 { get; set; }
+    public decimal 친구관계점수 { get; set; }
     public DateTime? 최근연락일시 { get; set; }
 }
 

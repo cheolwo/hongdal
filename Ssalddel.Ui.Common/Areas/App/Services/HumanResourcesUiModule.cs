@@ -12,7 +12,7 @@ internal static class HumanResourcesUiModule
 
         services.TryAddScoped<I인사역할검토읽기Service, 인사역할검토Client>();
         services.TryAddScoped<I인사역할지원Service, 인사역할지원Client>();
-        services.TryAddScoped<I업무인연커뮤니티Service, 업무인연커뮤니티Client>();
+        services.TryAddScoped<I업무친구요청Service, 업무친구요청Client>();
         services.TryAddTransient<인사역할검토목록ViewModel>();
         services.TryAddTransient<인사역할검토상세ViewModel>();
         services.TryAddTransient<인사역할검토PageViewModel>();
@@ -20,7 +20,7 @@ internal static class HumanResourcesUiModule
         services.TryAddTransient<인사역할지원작성ViewModel>();
         services.TryAddTransient<인사역할지원철회ViewModel>();
         services.TryAddTransient<인사역할지원PageViewModel>();
-        services.TryAddTransient<업무인연커뮤니티ViewModel>();
+        services.TryAddTransient<업무친구요청ViewModel>();
 
         return services;
     }

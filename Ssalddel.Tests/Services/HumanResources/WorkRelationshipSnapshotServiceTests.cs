@@ -13,7 +13,7 @@ namespace Ssalddel.Tests.Services.HumanResources;
 public sealed class WorkRelationshipSnapshotServiceTests
 {
     [Fact]
-    public async Task 업무양쪽당사자는_같은인연기록을_자기관점의익명상대로조회한다()
+    public async Task 업무양쪽당사자는_같은친구후보기록을_자기관점의익명상대로조회한다()
     {
         await using var context = CreateContext();
         context.WorkRelationshipSnapshots.AddRange(

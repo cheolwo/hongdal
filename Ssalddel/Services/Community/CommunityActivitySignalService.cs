@@ -140,7 +140,7 @@ public static class CommunityActivitySignalProjector
 
         if (route.StartsWith("/api/v1/connections", StringComparison.OrdinalIgnoreCase))
         {
-            return CreateSignal(source, CommunityActivityScopes.CommunityTrust, "Connection", "인연 연결 신호", $"{roleLabel} 사용자가 업무 인연 연결 흐름을 진행했습니다.", ["community", "connection", "trust"]);
+            return CreateSignal(source, CommunityActivityScopes.CommunityTrust, "Connection", "친구 요청 신호", $"{roleLabel} 사용자가 업무 관계에서 친구 요청 흐름을 진행했습니다.", ["community", "connection", "trust"]);
         }
 
         return null;

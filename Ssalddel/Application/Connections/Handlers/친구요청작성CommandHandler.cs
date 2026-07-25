@@ -9,18 +9,18 @@ using 살뜰.도메인.설정;
 
 namespace Ssalddel.Application.Connections.Handlers;
 
-public sealed class 인연연결요청작성CommandHandler : IRequestHandler<인연연결요청작성Command, Result<long>>
+public sealed class 친구요청작성CommandHandler : IRequestHandler<친구요청작성Command, Result<long>>
 {
     private readonly SsalddelContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public 인연연결요청작성CommandHandler(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
+    public 친구요청작성CommandHandler(SsalddelContext db, ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
     }
 
-    public async Task<Result<long>> Handle(인연연결요청작성Command request, CancellationToken cancellationToken)
+    public async Task<Result<long>> Handle(친구요청작성Command request, CancellationToken cancellationToken)
     {
         if (!string.Equals(_currentUserAccessor.UserId, request.요청자참여자Id, StringComparison.Ordinal))
         {
@@ -34,32 +34,32 @@ public sealed class 인연연결요청작성CommandHandler : IRequestHandler<인
 
         if (string.Equals(request.요청자참여자Id, request.대상자참여자Id, StringComparison.Ordinal))
         {
-            return Result.Fail<long>("자기 자신에게는 인연 연결을 요청할 수 없습니다.");
+            return Result.Fail<long>("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
         }
 
-        var duplicated = await _db.인연연결요청
+        var duplicated = await _db.친구요청
             .AnyAsync(x => x.요청자참여자Id == request.요청자참여자Id
                            && x.대상자참여자Id == request.대상자참여자Id
-                           && x.상태 == 인연연결요청상태.대기, cancellationToken);
+                           && x.상태 == 친구요청상태.대기, cancellationToken);
 
         if (duplicated)
         {
-            return Result.Fail<long>("이미 대기 중인 인연 연결 요청이 있습니다.");
+            return Result.Fail<long>("이미 대기 중인 친구 요청이 있습니다.");
         }
 
         var allowedParticipants = await GetAllowedParticipantsAsync(request, cancellationToken);
         if (allowedParticipants.Count == 0)
         {
-            return Result.Fail<long>("인연 연결 대상 검증을 위한 상품/주문/통관 문맥이 필요합니다.");
+            return Result.Fail<long>("친구 요청 대상 검증을 위한 상품/주문/통관 문맥이 필요합니다.");
         }
 
         if (!allowedParticipants.Contains(request.대상자참여자Id))
         {
-            return Result.Fail<long>("해당 상품 여정의 처리 주체에게만 인연 연결을 요청할 수 있습니다.");
+            return Result.Fail<long>("해당 상품 여정의 처리 주체에게만 친구 요청을 보낼 수 있습니다.");
         }
 
         var now = DateTimeOffset.UtcNow;
-        var entity = new 인연연결요청
+        var entity = new 친구요청
         {
             요청자참여자Id = request.요청자참여자Id,
             요청자역할 = request.요청자역할,
@@ -70,21 +70,23 @@ public sealed class 인연연결요청작성CommandHandler : IRequestHandler<인
             통관절차Id = request.통관절차Id,
             요청목적 = request.요청목적.Trim(),
             요청메시지 = request.요청메시지.Trim(),
-            상태 = 인연연결요청상태.대기,
+            상태 = 친구요청상태.대기,
             요청일시 = now
         };
 
-        _db.인연연결요청.Add(entity);
+        _db.친구요청.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
         _db.Command알림Outbox.Add(new Command알림Outbox
         {
-            CommandName = nameof(인연연결요청작성CommandHandler),
+            CommandName = nameof(친구요청작성CommandHandler),
+            // 기존 Outbox consumer 호환을 위해 EventName과 payload key는 유지한다.
             EventName = "인연연결요청생성됨",
             FeatureName = "Connection",
             Target = "Participant",
             PayloadJson = JsonSerializer.Serialize(new
             {
+                friendRequestId = entity.Id,
                 인연연결요청Id = entity.Id,
                 entity.요청자참여자Id,
                 entity.요청자역할,
@@ -104,7 +106,7 @@ public sealed class 인연연결요청작성CommandHandler : IRequestHandler<인
         return Result.Ok(entity.Id);
     }
 
-    private async Task<HashSet<string>> GetAllowedParticipantsAsync(인연연결요청작성Command request, CancellationToken cancellationToken)
+    private async Task<HashSet<string>> GetAllowedParticipantsAsync(친구요청작성Command request, CancellationToken cancellationToken)
     {
         var set = new HashSet<string>(StringComparer.Ordinal);
 

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using FluentResults;
 using Microsoft.Extensions.Logging;
@@ -118,7 +118,7 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
             CounterpartyUserId = dispatchRequest.화주Id,
             CounterpartyRoleCode = "Shipper",
             PrivacyLevel = WorkRelationshipPrivacyCodes.ConnectionRequestEligible,
-            Memo = "기사와 화주가 실제 배차 수락 업무에서 만난 인연 기록입니다."
+            Memo = "기사와 화주가 실제 배차 수락 업무에서 만난 친구 후보 기록입니다."
         });
 
         try

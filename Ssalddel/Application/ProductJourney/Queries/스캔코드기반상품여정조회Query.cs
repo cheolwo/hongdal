@@ -28,5 +28,5 @@ public sealed class 처리주체응답
     public string 역할 { get; init; } = string.Empty;
     public string 표시명 { get; init; } = string.Empty;
     public bool 감사가능 { get; init; }
-    public bool 인연연결가능 { get; init; }
+    public bool 친구요청가능 { get; init; }
 }

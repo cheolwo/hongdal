@@ -10,7 +10,7 @@ Controller를 `0.0`, `1.0`, `2.0` 같은 제품 버전으로 설명하는 대신
 
 | 분류 | 답하는 질문 | 예시 |
 | --- | --- | --- |
-| 업무 영역 | 무슨 일을 위한 기능인가 | 인연 형성, 공동구매 수요·모집, 운송 의뢰, 배차, 창고 이행 |
+| 업무 영역 | 무슨 일을 위한 기능인가 | 친구 요청·수락, 공동구매 수요·모집, 운송 의뢰, 배차, 창고 이행 |
 | 사용자 | 누가 사용하는가 | 커뮤니티 참여자, 주문자, 화주, 기사, 창고 관리자 |
 | 업무 동작 | 무엇을 하는가 | 둘러보기, 요청하기, 판단하기, 실행하기, 기록하기, 관리하기 |
 | 업무 흐름 | 여러 앱 사이에서 어디로 이어지는가 | 공동구매 수요·모집, 국내 화물 운송, 커뮤니티 신뢰 |
@@ -23,7 +23,7 @@ Controller를 `0.0`, `1.0`, `2.0` 같은 제품 버전으로 설명하는 대신
 
 | 앱 | 기본 사용자 | 대표 업무 영역 |
 | --- | --- | --- |
-| 01 Community | 커뮤니티 참여자 | 정보 둘러보기, 공동 원장, 인연 형성 |
+| 01 Community | 커뮤니티 참여자 | 정보 둘러보기, 공동 원장, 친구 요청·수락 |
 | 02 Orderer | 주문자 | 상품·재료 발견, 공동구매 수요·모집, 주문 참여 |
 | 03 Shipper | 화주 | 운송 의뢰, 무역 준비, 결제 |
 | 04 Driver | 기사 | 기사 근무, 배차, 운송 실행, 예약, 정산 |
@@ -31,7 +31,7 @@ Controller를 `0.0`, `1.0`, `2.0` 같은 제품 버전으로 설명하는 대신
 
 역할별 Controller는 공통 기반에서 사용자를 물려받는다. 업무 영역을 명시한 Controller는 그 값을 사용하고, 아직 전환 중인 Controller는 기존 Workflow를 같은 한국어 업무 영역으로 해석한다.
 
-여기서 `Common`은 별도의 06 앱이나 기술 helper 집합이 아니라 01~05가 같은 의미로 수행하는 공동 업무 경계다. 01 Community의 공개 탐색·참여·공동 원장·인연 형성 API는 `Controllers/Common`에 포함하고, Admin 권한이 필요한 커뮤니티 작성·운영 API는 `Controllers/Admin`에 둔다. version·Feature, push installation, file transport와 외부 callback처럼 실행을 지원하는 기술 API는 `Controllers/Platform`에 둔다. 세부 project 경계는 [커뮤니티 0.0 기반 제품 원칙](CommunityFoundationV0Policy.md#common과-community-코드-경계)을 따른다.
+여기서 `Common`은 별도의 06 앱이나 기술 helper 집합이 아니라 01~05가 같은 의미로 수행하는 공동 업무 경계다. 01 Community의 공개 탐색·참여·공동 원장·친구 요청·수락 API는 `Controllers/Common`에 포함하고, Admin 권한이 필요한 커뮤니티 작성·운영 API는 `Controllers/Admin`에 둔다. version·Feature, push installation, file transport와 외부 callback처럼 실행을 지원하는 기술 API는 `Controllers/Platform`에 둔다. 세부 project 경계는 [커뮤니티 0.0 기반 제품 원칙](CommunityFoundationV0Policy.md#common과-community-코드-경계)을 따른다.
 
 ## 전환 원칙
 

@@ -13,7 +13,7 @@
 ## Common과 커뮤니티
 
 - `Controllers/Common`은 여러 역할 앱이 같은 의미로 수행하는 공동 업무 API다. 기술적으로 재사용된다는 이유만으로 배치하지 않는다.
-- 커뮤니티 탐색, 참여, 공동 원장, 인연, 상품과 업무 신뢰 환류처럼 역할을 넘어 이어지는 업무를 포함한다.
+- 커뮤니티 탐색, 참여, 공동 원장, 친구 요청·수락, 상품과 업무 신뢰 환류처럼 역할을 넘어 이어지는 업무를 포함한다.
 - 공개 커뮤니티 Controller는 `Ssalddel.Controllers.Common` 경계에 두고 `SsalddelCommunityV0Module`, API 업무 분류와 기존 route contract를 유지한다.
 - 공유 DTO와 catalog는 `Ssalddel.Contracts/Common/Community`, DB·UI와 무관한 판정·정책은 `Ssalddel.Community`, 영속 workflow는 `Services/Community`의 UseCase에 둔다.
 - Admin의 커뮤니티 작성·운영 기능은 권한과 운영 책임이 다르므로 `Controllers/Admin`에 유지하고 Common 공개 API와 합치지 않는다.

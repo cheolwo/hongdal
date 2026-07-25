@@ -69,7 +69,7 @@ public sealed class 운행탐색추천화주응답
     public string 화주UserId { get; set; } = string.Empty;
     public string 화주명 { get; set; } = string.Empty;
     public string? 연락처마스킹 { get; set; }
-    public decimal 인연점수 { get; set; }
+    public decimal 친구관계점수 { get; set; }
     public decimal 반응가능성점수 { get; set; }
     public decimal 최종추천점수 { get; set; }
     public string 선정사유 { get; set; } = string.Empty;
@@ -82,7 +82,7 @@ public sealed class 운행탐색대상화주응답
 {
     public string 화주UserId { get; set; } = string.Empty;
     public string 화주명 { get; set; } = string.Empty;
-    public decimal 인연점수Snapshot { get; set; }
+    public decimal 친구관계점수Snapshot { get; set; }
     public string 대상상태 { get; set; } = string.Empty;
     public string 선정사유 { get; set; } = string.Empty;
     public DateTime? 마지막응답일시 { get; set; }

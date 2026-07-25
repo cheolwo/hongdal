@@ -5165,7 +5165,7 @@ namespace Ssalddel.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("이메일공개");
 
-                    b.Property<long>("인연연결요청Id")
+                    b.Property<long>("친구요청Id")
                         .HasColumnType("bigint")
                         .HasColumnName("인연연결요청_id");
 
@@ -5199,13 +5199,13 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("동의자참여자Id", "동의일시");
 
-                    b.HasIndex("인연연결요청Id", "동의자참여자Id")
+                    b.HasIndex("친구요청Id", "동의자참여자Id")
                         .IsUnique();
 
                     b.ToTable("연락처공개동의");
                 });
 
-            modelBuilder.Entity("살뜰.도메인.사용자.인연연결요청", b =>
+            modelBuilder.Entity("살뜰.도메인.사용자.친구요청", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
