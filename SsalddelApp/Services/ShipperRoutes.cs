@@ -47,6 +47,7 @@ public static class ShipperRoutes
     public const string ProfileSettings = "/shipper/settings/profile";
     public const string PublicDataInformation = "/information/public-data";
     public const string KamisDomesticPriceComparison = "/information/kamis-domestic-price-comparison";
+    public const string UsdaUnitedStatesPriceComparison = "/information/usda-us-price-comparison";
     public const string CommunityDecorations = CommunityPageRoutes.Decorations;
     public const string CommunityGroupImport = CommunityPageRoutes.GroupImport;
     public const string CommunityDecorationCreate = "/community/decorations/create";

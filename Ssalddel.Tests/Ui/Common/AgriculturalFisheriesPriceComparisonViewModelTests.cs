@@ -41,7 +41,7 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
         Assert.Equal("APPLES", client.UnitedStatesCommodity);
         Assert.Equal(호주식품가격지수Codes.Fruit, client.AustraliaRequest?.IndexCode);
         Assert.Equal(12_000m, viewModel.국내.응답?.Price?.Retail?.AverageKrwPerKg);
-        Assert.Equal("DOLLARS / CWT", viewModel.미국.응답?.Items.Single().Unit);
+        Assert.Equal("DOLLARS / CWT", viewModel.미국.응답?.Items.First().Unit);
         Assert.False(viewModel.호주.응답?.IsActualUnitPrice);
         Assert.Equal("INDEX POINTS", viewModel.호주.응답?.Items.Single().UnitLabel);
     }
@@ -137,6 +137,47 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
         Assert.Equal(2_250m, viewModel.비교항목[1].DisplayPriceKrw);
         Assert.Equal(3_000m, viewModel.비교항목[2].DisplayPriceKrw);
         Assert.Contains("추정값", viewModel.개수환산안내);
+    }
+
+    [Fact]
+    public async Task UnitedStatesComparison_ConvertsCwtToPoundsOuncesAndRepresentativeItem()
+    {
+        var client = new FakePublicDataClient();
+        using var viewModel = new 미국농수산가격조회ViewModel(client);
+
+        await viewModel.조회Async();
+
+        var cwt = viewModel.비교항목.First();
+        Assert.Equal("1 lb", viewModel.비교기준Label);
+        Assert.Equal(0.542m, cwt.PriceUsdPerPound);
+        Assert.Equal(0.542m, cwt.DisplayPriceUsd);
+        Assert.Equal(0m, cwt.DifferenceFromLowestUsd);
+
+        viewModel.비교단위 = 미국가격비교단위.온스;
+        Assert.Equal("1 oz", viewModel.비교기준Label);
+        Assert.Equal(0.033875m, viewModel.비교항목.First().DisplayPriceUsd);
+
+        viewModel.비교단위 = 미국가격비교단위.개수;
+        viewModel.대표개당온스 = 8m;
+        Assert.Equal("1개 · 대표 8 oz", viewModel.비교기준Label);
+        Assert.Equal(0.271m, viewModel.비교항목.First().DisplayPriceUsd);
+        Assert.Contains("추정값", viewModel.개수환산안내);
+    }
+
+    [Fact]
+    public async Task UnitedStatesComparison_KeepsBushelInOfficialUnit()
+    {
+        var client = new FakePublicDataClient();
+        using var viewModel = new 미국농수산가격조회ViewModel(client);
+
+        await viewModel.조회Async();
+
+        var bushel = Assert.Single(
+            viewModel.비교항목,
+            item => item.Observation.Unit == "DOLLARS / BU");
+        Assert.False(bushel.IsWeightConvertible);
+        Assert.Null(bushel.DisplayPriceUsd);
+        Assert.Contains("품목별 표준 중량", bushel.ConversionNote);
     }
 
     [Theory]
@@ -279,7 +320,19 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
                         RawValue = "54.20",
                         NumericValue = 54.20m,
                         Unit = "DOLLARS / CWT",
-                        Year = "2026"
+                        Year = "2026",
+                        AggregationLevel = "NATIONAL",
+                        StatisticCategory = "PRICE RECEIVED"
+                    },
+                    new 미국농수산가격항목
+                    {
+                        Commodity = commodity,
+                        RawValue = "25.00",
+                        NumericValue = 25m,
+                        Unit = "DOLLARS / BU",
+                        Year = "2025",
+                        AggregationLevel = "NATIONAL",
+                        StatisticCategory = "PRICE RECEIVED"
                     }
                 ]
             });

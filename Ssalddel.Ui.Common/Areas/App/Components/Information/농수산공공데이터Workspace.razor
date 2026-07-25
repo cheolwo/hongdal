@@ -11,6 +11,9 @@
                 <a class="public-data-workspace__produce-link" href="/information/kamis-domestic-price-comparison">
                     KAMIS · 국내 유통단계 가격 비교
                 </a>
+                <a class="public-data-workspace__produce-link" href="/information/usda-us-price-comparison">
+                    USDA · 미국 국내 농가가격 비교
+                </a>
                 <a class="public-data-workspace__produce-link" href="/information/produce-price-comparison">
                     과일·채소 · 국가·지역별 가격 비교
                 </a>
@@ -106,8 +109,7 @@
                             미국 가격 조회
                         </MudButton>
                     </section>
-                    <미국농수산가격Result Response="@ViewModel.미국.응답"
-                                          ErrorMessage="@ViewModel.미국.오류메시지" />
+                    <미국농수산가격Result ViewModel="@ViewModel.미국" />
                     break;
 
                 case 농수산가격비교Section.호주:

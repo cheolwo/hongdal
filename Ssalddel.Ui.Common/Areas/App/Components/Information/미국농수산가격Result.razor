@@ -1,89 +1,193 @@
-@using Ssalddel.Contracts.Common.AgriculturalFisheries
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
 
-<section class="price-result" aria-label="미국 농수산물 가격 조회 결과">
-    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+<section class="price-result" aria-label="미국 USDA 국내 농수산물 가격 조회 결과">
+    @if (!string.IsNullOrWhiteSpace(ViewModel.오류메시지))
     {
-        <MudAlert Severity="Severity.Warning" Dense="true">@ErrorMessage</MudAlert>
+        <MudAlert Severity="Severity.Warning" Dense="true">@ViewModel.오류메시지</MudAlert>
     }
-    else if (Response is null)
+    else if (ViewModel.응답 is null)
     {
         <div class="price-result__empty">
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Large" />
             <strong>미국 가격 조회 전</strong>
+            <small>USDA NASS 농가 수취가격을 oz·lb·대표 개수 기준으로 환산합니다.</small>
         </div>
     }
-    else if (!Response.Success)
+    else if (!ViewModel.응답.Success)
     {
         <MudAlert Severity="Severity.Warning" Dense="true">
-            @(Response.ErrorMessage ?? Response.Summary)
+            @(ViewModel.응답.ErrorMessage ?? ViewModel.응답.Summary)
         </MudAlert>
     }
-    else if (Response.Items.Count == 0)
+    else if (ViewModel.응답.Items.Count == 0)
     {
-        <MudAlert Severity="Severity.Info" Dense="true">@Response.Summary</MudAlert>
+        <MudAlert Severity="Severity.Info" Dense="true">@ViewModel.응답.Summary</MudAlert>
     }
     else
     {
         <header class="price-result__header">
             <div>
-                <span>미국 농무부 농업통계청(USDA NASS)</span>
-                <strong>@Response.Query.Commodity</strong>
+                <span>USDA NASS · 미국 국내용</span>
+                <strong>@ViewModel.응답.Query.Commodity</strong>
+                <p>농가 수취가격 관측값을 미국 관습 중량 단위로 비교합니다.</p>
             </div>
-            <small>@Response.Query.YearFrom~@Response.Query.YearTo</small>
+            <small>@ViewModel.응답.Query.YearFrom~@ViewModel.응답.Query.YearTo</small>
         </header>
 
+        <div class="price-result__unit-controls" aria-label="미국 가격 환산 단위">
+            <div class="price-result__unit-toggle" role="group">
+                @foreach (var unit in Enum.GetValues<미국가격비교단위>())
+                {
+                    <button type="button"
+                            class="@(ViewModel.비교단위 == unit ? "is-selected" : null)"
+                            aria-pressed="@(ViewModel.비교단위 == unit)"
+                            @onclick="() => ViewModel.비교단위 = unit">
+                        @(unit switch
+                        {
+                            미국가격비교단위.온스 => "oz 기준",
+                            미국가격비교단위.파운드 => "lb 기준",
+                            _ => "개수 기준"
+                        })
+                    </button>
+                }
+            </div>
+
+            @if (ViewModel.비교단위 == 미국가격비교단위.개수)
+            {
+                <label>
+                    <span>대표 1개 중량</span>
+                    <input type="number"
+                           min="0.1"
+                           max="320"
+                           step="0.5"
+                           @bind="ViewModel.대표개당온스" />
+                    <small>oz</small>
+                </label>
+            }
+        </div>
+
         <div class="price-result__table-wrap">
-            <table>
+            <table class="price-result__table">
+                <caption>@ViewModel.응답.Query.Commodity · @ViewModel.비교기준Label 환산 가격</caption>
                 <thead>
                     <tr>
-                        <th>연도</th>
-                        <th>구분</th>
-                        <th>값</th>
-                        <th>단위</th>
+                        <th scope="col">기준</th>
+                        <th scope="col">가격 의미</th>
+                        <th scope="col">@ViewModel.비교기준Label 가격</th>
+                        <th scope="col">1 lb 기준</th>
+                        <th scope="col">최저 관측값과 차이</th>
+                        <th scope="col">USDA 원문</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in VisibleItems)
+                    @foreach (var item in ViewModel.비교항목)
                     {
-                        <tr>
-                            <td>@item.Year</td>
-                            <td>@ResolveDescription(item)</td>
-                            <td class="price-result__value">@item.RawValue</td>
-                            <td>@item.Unit</td>
+                        <tr class="@(!item.IsWeightConvertible ? "is-unavailable" : null)">
+                            <th scope="row">
+                                <strong>@ResolvePeriod(item.Observation)</strong>
+                                <small>@ResolveRegion(item.Observation)</small>
+                            </th>
+                            <td>
+                                <span class="price-result__stage">농가 수취가</span>
+                                <small>@ResolveDescription(item.Observation)</small>
+                            </td>
+                            <td class="price-result__primary-price">
+                                @if (item.DisplayPriceUsd is { } displayPrice)
+                                {
+                                    @FormatUsd(displayPrice)
+                                }
+                                else
+                                {
+                                    <span>원문 단위 유지</span>
+                                }
+                            </td>
+                            <td>
+                                @(item.PriceUsdPerPound is { } pricePerPound
+                                    ? $"{FormatUsd(pricePerPound)} / lb"
+                                    : "—")
+                            </td>
+                            <td>
+                                @if (item.DifferenceFromLowestUsd == 0m)
+                                {
+                                    <span class="price-result__lowest">최저 관측값</span>
+                                }
+                                else if (item.DifferenceFromLowestUsd is { } difference
+                                         && item.DifferencePercentFromLowest is { } differencePercent)
+                                {
+                                    <span class="price-result__difference">
+                                        +@FormatUsd(difference)
+                                        <small>+@differencePercent.ToString("N1")%</small>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+                            </td>
+                            <td>
+                                <span>@item.Observation.RawValue @item.Observation.Unit</span>
+                                <small>@item.ConversionNote</small>
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
 
-        @if (Response.Notices.Count > 0)
+        @if (!string.IsNullOrWhiteSpace(ViewModel.개수환산안내))
         {
-            <p class="price-result__notice">@Response.Notices[0]</p>
+            <p class="price-result__notice price-result__notice--assumption">@ViewModel.개수환산안내</p>
+        }
+
+        <div class="price-result__source-boundary">
+            <strong>자료 경계</strong>
+            <p>
+                이 화면은 USDA NASS의 생산자 농가 수취가격 통계입니다.
+                도매가나 소비자의 일상 소매가격으로 해석하지 않습니다.
+            </p>
+            <div>
+                <a href="@미국농수산가격조회ViewModel.UsdaNassSourceUrl"
+                   target="_blank"
+                   rel="noopener noreferrer">USDA NASS Quick Stats ↗</a>
+                <a href="@미국농수산가격조회ViewModel.UsdaAmsRetailSourceUrl"
+                   target="_blank"
+                   rel="noopener noreferrer">USDA AMS 소매 광고가격 ↗</a>
+            </div>
+        </div>
+
+        @if (ViewModel.응답.Notices.Count > 0)
+        {
+            <p class="price-result__notice">@ViewModel.응답.Notices[0]</p>
         }
     }
 </section>
 
 @code {
-    [Parameter]
-    public 미국농수산가격조회응답? Response { get; set; }
+    [Parameter, EditorRequired]
+    public 미국농수산가격조회ViewModel ViewModel { get; set; } = null!;
 
-    [Parameter]
-    public string? ErrorMessage { get; set; }
+    private static string ResolvePeriod(Ssalddel.Contracts.Common.AgriculturalFisheries.미국농수산가격항목 item)
+        => string.IsNullOrWhiteSpace(item.ReferencePeriod)
+            ? item.Year
+            : item.ReferencePeriod;
 
-    private IEnumerable<미국농수산가격항목> VisibleItems
-        => Response?.Items
-            .OrderByDescending(item => ParseYear(item.Year))
-            .ThenBy(item => item.Class, StringComparer.Ordinal)
-            .Take(12)
-            ?? [];
+    private static string ResolveRegion(Ssalddel.Contracts.Common.AgriculturalFisheries.미국농수산가격항목 item)
+        => !string.IsNullOrWhiteSpace(item.StateName)
+            ? item.StateName
+            : !string.IsNullOrWhiteSpace(item.StateAlpha)
+                ? item.StateAlpha
+                : string.IsNullOrWhiteSpace(item.AggregationLevel)
+                    ? "미국 전국"
+                    : item.AggregationLevel;
 
-    private static int ParseYear(string value)
-        => int.TryParse(value, out var year) ? year : 0;
-
-    private static string ResolveDescription(미국농수산가격항목 item)
+    private static string ResolveDescription(
+        Ssalddel.Contracts.Common.AgriculturalFisheries.미국농수산가격항목 item)
         => !string.IsNullOrWhiteSpace(item.Class)
             ? item.Class
-            : !string.IsNullOrWhiteSpace(item.ReferencePeriod)
-                ? item.ReferencePeriod
-                : item.StatisticCategory;
+            : item.StatisticCategory;
+
+    private static string FormatUsd(decimal value)
+        => value < 1m
+            ? $"${value:N3}"
+            : $"${value:N2}";
 }
