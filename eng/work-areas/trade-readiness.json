@@ -1,0 +1,15 @@
+{
+  "key": "trade-readiness",
+  "version": "1.5",
+  "solution": "Ssalddel.v1.5.slnx",
+  "readFirst": ["AGENTS.md", "docs/Versions/v0.0/focus-roadmap.md"],
+  "sourceRoots": [
+    "OrdererApp",
+    "Ssalddel.Contracts/Common/Customs",
+    "Ssalddel.Contracts/Common/Orderer",
+    "Ssalddel/Controllers/Common",
+    "Ssalddel/Services/AgriculturalFisheries/ImportReadiness",
+    "Ssalddel.Tests"
+  ],
+  "excludedRoots": ["bin", "obj", ".vs", "artifacts", "DriverApp", "WarehouseManagerApp"]
+}

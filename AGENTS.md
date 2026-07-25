@@ -22,6 +22,12 @@
 | `docs/` 문서·변경 기록 | `docs/AGENTS.md` | 기준 문서 단일화, link·diff 검증 |
 | 여러 project를 통과하는 기능 | `SsalddelCodeMetadataAttribute`, `SsalddelCodeFeatureKeys` 검색 | `FlowOrder`, `Layer`, `Effects`, `Boundary`, `ContractType` |
 | 커뮤니티 0.0 | `[SsalddelCommunityV0Module]` 검색 | module catalog와 `0.0-A~E` |
+| 기능 slice 작업 | `docs/Architecture/FunctionalWorkAreaPartitioning.md`, `eng/work-areas/<slice>.json` | manifest의 `readFirst`, `sourceRoots`, `excludedRoots`만 먼저 읽고 범위를 넓힐 때 이유를 남김 |
+| 지역문화·공공데이터 | `eng/work-areas/regional-culture-public-data.json` | 문화 이미지·지역 key·공식 근거·가격 관측 |
+| 댓글·프로필·공개범위 | `eng/work-areas/community-foundation.json` | 0.0 참여·개인정보·신고 보호 |
+| 개별 의향·비용 검토 | `eng/work-areas/individual-intent.json` | 0.5 비구속 의향, 결제·발주 금지 |
+| 공동구매 | `eng/work-areas/group-purchase.json` | 1.0 별도 동의와 공동 원장 |
+| 공동수입 준비 | `eng/work-areas/trade-readiness.json` | 1.5 전문가 확인과 실행 금지 |
 
 ## 시작과 인계
 

@@ -1,0 +1,23 @@
+{
+  "key": "regional-culture-public-data",
+  "version": "0.0",
+  "solution": "Ssalddel.v0.0.slnx",
+  "readFirst": [
+    "AGENTS.md",
+    "docs/Versions/v0.0/focus-roadmap.md",
+    "Ssalddel.Ui.Common/AGENTS.md",
+    "docs/Architecture/FigmaMauiCompatibilityPolicy.md"
+  ],
+  "sourceRoots": [
+    "Ssalddel.Contracts/Common/Content",
+    "Ssalddel.Contracts/Common/PublicData",
+    "Ssalddel/Services/AgriculturalFisheries/Information",
+    "Ssalddel.Infrastructure/Persistence/AgriculturalFisheries",
+    "Ssalddel.Ui.Common/Areas/App/Components/Information",
+    "Ssalddel.Ui.Common/Areas/App/ViewModels",
+    "SsalddelApp/Components/Pages",
+    "Ssalddel.WebApp/Pages",
+    "Ssalddel.Tests/Services/AgriculturalFisheries"
+  ],
+  "excludedRoots": ["bin", "obj", ".vs", "artifacts", "DriverApp", "WarehouseManagerApp"]
+}

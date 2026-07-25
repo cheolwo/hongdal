@@ -1,0 +1,25 @@
+{
+  "key": "community-foundation",
+  "version": "0.0",
+  "solution": "Ssalddel.v0.0.slnx",
+  "readFirst": [
+    "AGENTS.md",
+    "docs/Versions/v0.0/focus-roadmap.md",
+    "docs/Architecture/CommunityFoundationV0Policy.md",
+    "Ssalddel/AGENTS.md",
+    "Ssalddel.Community/AGENTS.md",
+    "Ssalddel.Ui.Common/AGENTS.md"
+  ],
+  "sourceRoots": [
+    "Ssalddel/Controllers/Common",
+    "Ssalddel/Services/Community",
+    "Ssalddel.Community",
+    "Ssalddel.Contracts/Common/Community",
+    "Ssalddel.Domain/Community",
+    "Ssalddel.Infrastructure/Persistence/Configurations/Community",
+    "Ssalddel.Ui.Common/Areas/App/Components/Community",
+    "Ssalddel.Ui.Common/Areas/App/ViewModels",
+    "Ssalddel.Tests/Services/Community"
+  ],
+  "excludedRoots": ["bin", "obj", ".vs", "artifacts", "OrdererApp", "DriverApp", "WarehouseManagerApp"]
+}

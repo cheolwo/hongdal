@@ -1,0 +1,15 @@
+{
+  "key": "group-purchase",
+  "version": "1.0",
+  "solution": "Ssalddel.v1.0.slnx",
+  "readFirst": ["AGENTS.md", "docs/Versions/v0.0/focus-roadmap.md"],
+  "sourceRoots": [
+    "OrdererApp",
+    "Ssalddel.Contracts/Common/Orderer",
+    "Ssalddel.Contracts/Common/Community",
+    "Ssalddel/Controllers/Common",
+    "Ssalddel/Services/Community",
+    "Ssalddel.Tests"
+  ],
+  "excludedRoots": ["bin", "obj", ".vs", "artifacts", "DriverApp", "WarehouseManagerApp"]
+}

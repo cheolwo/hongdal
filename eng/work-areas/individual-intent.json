@@ -1,0 +1,14 @@
+{
+  "key": "individual-intent",
+  "version": "0.5",
+  "solution": "Ssalddel.v0.5.slnx",
+  "readFirst": ["AGENTS.md", "docs/Versions/v0.0/focus-roadmap.md"],
+  "sourceRoots": [
+    "OrdererApp",
+    "Ssalddel.Contracts/Common/Orderer",
+    "Ssalddel/Controllers/Common",
+    "Ssalddel/Services/Orderer",
+    "Ssalddel.Tests/Services/Orderer"
+  ],
+  "excludedRoots": ["bin", "obj", ".vs", "artifacts", "DriverApp", "WarehouseManagerApp"]
+}
