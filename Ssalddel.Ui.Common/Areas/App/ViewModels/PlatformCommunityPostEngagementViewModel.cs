@@ -9,13 +9,27 @@ public sealed class PlatformCommunityCommentForm : ObservableObject
     private string _nickname = string.Empty;
     private string _password = string.Empty;
     private string _body = string.Empty;
+    private bool _isAuthorDisplayCountryPublic;
+    private string? _authorDisplayCountryCode;
 
     public string Nickname { get => _nickname; set => SetProperty(ref _nickname, value ?? string.Empty); }
     public string Password { get => _password; set => SetProperty(ref _password, value ?? string.Empty); }
     public string Body { get => _body; set => SetProperty(ref _body, value ?? string.Empty); }
+    public bool IsAuthorDisplayCountryPublic
+    {
+        get => _isAuthorDisplayCountryPublic;
+        set => SetProperty(ref _isAuthorDisplayCountryPublic, value);
+    }
+    public string? AuthorDisplayCountryCode
+    {
+        get => _authorDisplayCountryCode;
+        set => SetProperty(ref _authorDisplayCountryCode, CommunityDisplayCountryCatalog.NormalizeCode(value));
+    }
     public bool IsValid => !string.IsNullOrWhiteSpace(Nickname)
                            && !string.IsNullOrWhiteSpace(Password)
-                           && !string.IsNullOrWhiteSpace(Body);
+                           && !string.IsNullOrWhiteSpace(Body)
+                           && (!IsAuthorDisplayCountryPublic
+                               || CommunityDisplayCountryCatalog.Find(AuthorDisplayCountryCode) is not null);
 }
 
 /// <summary>
@@ -429,7 +443,11 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                 {
                     Nickname = form.Nickname,
                     Password = form.Password,
-                    Body = form.Body
+                    Body = form.Body,
+                    IsAuthorDisplayCountryPublic = form.IsAuthorDisplayCountryPublic,
+                    AuthorDisplayCountryCode = form.IsAuthorDisplayCountryPublic
+                        ? form.AuthorDisplayCountryCode
+                        : null
                 },
                 cancellationToken);
             CommentForms.Remove(postId);
@@ -511,7 +529,11 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                 {
                     Nickname = form.Nickname,
                     Password = form.Password,
-                    Body = form.Body
+                    Body = form.Body,
+                    IsAuthorDisplayCountryPublic = form.IsAuthorDisplayCountryPublic,
+                    AuthorDisplayCountryCode = form.IsAuthorDisplayCountryPublic
+                        ? form.AuthorDisplayCountryCode
+                        : null
                 },
                 cancellationToken);
             AttachmentCommentForms.Remove(attachmentId);

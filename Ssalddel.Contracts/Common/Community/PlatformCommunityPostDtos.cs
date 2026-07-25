@@ -433,6 +433,8 @@ public sealed class PlatformCommunityPostCommentCreateRequest
     public string Nickname { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public bool IsAuthorDisplayCountryPublic { get; set; }
+    public string? AuthorDisplayCountryCode { get; set; }
 }
 
 public sealed class PlatformCommunityPostCommentResponse
@@ -440,6 +442,9 @@ public sealed class PlatformCommunityPostCommentResponse
     public long Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public bool IsAuthorDisplayCountryPublic { get; set; }
+    public string? AuthorDisplayCountryCode { get; set; }
+    public string? AuthorDisplayCountryName { get; set; }
     public int ReportCount { get; set; }
     public DateTime CreatedAtUtc { get; set; }
 }
@@ -463,6 +468,8 @@ public sealed class PlatformCommunityPostAttachmentCommentCreateRequest
     public string Nickname { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public bool IsAuthorDisplayCountryPublic { get; set; }
+    public string? AuthorDisplayCountryCode { get; set; }
 }
 
 public sealed class PlatformCommunityPostAttachmentCommentResponse
@@ -471,6 +478,9 @@ public sealed class PlatformCommunityPostAttachmentCommentResponse
     public long AttachmentId { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public bool IsAuthorDisplayCountryPublic { get; set; }
+    public string? AuthorDisplayCountryCode { get; set; }
+    public string? AuthorDisplayCountryName { get; set; }
     public int ReportCount { get; set; }
     public DateTime CreatedAtUtc { get; set; }
 }

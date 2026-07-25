@@ -32,6 +32,8 @@ internal static class CommunityPlatformUiModule
         services.TryAddScoped<ICommunityDynamicDiscoveryClient, CommunityDynamicDiscoveryClient>();
         services.TryAddScoped<ICommunityDecorationSelectionStore, BrowserCommunityDecorationSelectionStore>();
         services.TryAddScoped<ICommunityDecorationPurchaseClient, LocalSimulationCommunityDecorationPurchaseClient>();
+        services.TryAddScoped<ICommunityCommentCountryPreferenceService, CommunityCommentCountryPreferenceService>();
+        services.TryAddScoped<IOperatingMarketProfileClient, OperatingMarketProfileClient>();
         services.TryAddScoped<IShipperHomeDashboardClient, ShipperHomeDashboardClient>();
         services.TryAddSingleton<IPlatformCommunityNodeNavigationResolver, UnsupportedPlatformCommunityNodeNavigationResolver>();
         services.TryAddSingleton<IPlatformHomeWorkspaceNavigationResolver, UnsupportedPlatformHomeWorkspaceNavigationResolver>();

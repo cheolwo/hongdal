@@ -1,6 +1,7 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
 @inject Ssalddel.Ui.Common.Areas.App.Services.ISsalddelAccessTokenProvider AccessTokenProvider
+@inject Ssalddel.Ui.Common.Areas.App.Services.ICommunityCommentCountryPreferenceService CommentCountryPreferenceService
 
 @if (Post.RecentComments.Count > 0 && ViewModel.IsCommentsExpanded(Post.Id))
 {
@@ -13,6 +14,13 @@
                                                   Category="@Post.Category"
                                                   IsMasked="@IsReportPost"
                                                   Compact="true" />
+                @if (HasPublicCommentCountry(comment))
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                             title="@comment.AuthorDisplayCountryName">
+                        @comment.AuthorDisplayCountryCode
+                    </MudChip>
+                }
                 <MudText Typo="Typo.caption">@comment.Body</MudText>
                 <MudButton Variant="Variant.Text"
                            Size="Size.Small"
@@ -96,7 +104,8 @@
 @if (ViewModel.IsCommentsExpanded(Post.Id))
 {
     var commentForm = ViewModel.GetCommentForm(Post.Id);
-    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="platform-community-comment-form">
+    <MudStack Spacing="1" Class="platform-community-comment-form">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
         @if (UsesAutomaticAnonymousNickname)
         {
             <MudTextField T="string" Label="자동 익명 닉네임" Value="@AutomaticAnonymousNicknameDisplay" ReadOnly="true" Margin="Margin.Dense" />
@@ -110,6 +119,26 @@
         <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" OnClick="SaveCommentAsync">
             댓글 등록
         </MudButton>
+        </MudStack>
+        @if (!IsReportPost)
+        {
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                <MudSwitch T="bool" @bind-Value="commentForm.IsAuthorDisplayCountryPublic"
+                           Color="Color.Primary" Label="댓글에 활동 국가 표시" />
+                @if (commentForm.IsAuthorDisplayCountryPublic)
+                {
+                    <MudSelect T="string" Label="기본 활동 국가코드"
+                               @bind-Value="commentForm.AuthorDisplayCountryCode"
+                               Dense="true" Margin="Margin.Dense">
+                        @foreach (var country in CommunityDisplayCountryCatalog.Common)
+                        {
+                            <MudSelectItem T="string" Value="@country.Code">@country.Code · @country.KoreanName</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                <MudText Typo="Typo.caption">이 설정은 활동 문맥이며 국적·신뢰·참여 자격을 뜻하지 않습니다.</MudText>
+            </MudStack>
+        }
     </MudStack>
 }
 
@@ -155,6 +184,25 @@
 
     private string DisplayCommentNickname(string nickname)
         => IsReportPost ? "익명 참여자" : nickname;
+
+    private bool HasPublicCommentCountry(PlatformCommunityPostCommentResponse comment)
+        => !IsReportPost
+           && comment.IsAuthorDisplayCountryPublic
+           && !string.IsNullOrWhiteSpace(comment.AuthorDisplayCountryCode);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || IsReportPost)
+        {
+            return;
+        }
+
+        var preference = await CommentCountryPreferenceService.GetAsync();
+        var form = ViewModel.GetCommentForm(Post.Id);
+        form.IsAuthorDisplayCountryPublic = preference.IsDisplayCountryPublic;
+        form.AuthorDisplayCountryCode = preference.CountryCode;
+        StateHasChanged();
+    }
 
     private async Task RecommendAsync()
         => await CompleteAsync(await ViewModel.RecommendAsync(Post.Id));

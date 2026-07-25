@@ -749,6 +749,10 @@ namespace Ssalddel.Migrations
                     b.Property<long>("AttachmentId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("AuthorDisplayCountryCode")
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -761,6 +765,9 @@ namespace Ssalddel.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsOperatorHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsAuthorDisplayCountryPublic")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Nickname")
@@ -991,6 +998,10 @@ namespace Ssalddel.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("AuthorDisplayCountryCode")
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -1003,6 +1014,9 @@ namespace Ssalddel.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsOperatorHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsAuthorDisplayCountryPublic")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Nickname")

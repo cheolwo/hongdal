@@ -14,6 +14,7 @@ public sealed class PlatformCommunityPostCommentConfiguration : IEntityTypeConfi
 
         builder.Property(x => x.Nickname).HasMaxLength(40).IsRequired();
         builder.Property(x => x.Body).HasMaxLength(1000).IsRequired();
+        builder.Property(x => x.AuthorDisplayCountryCode).HasMaxLength(2);
         builder.Property(x => x.PasswordHash).HasMaxLength(200).IsRequired();
 
         builder.HasIndex(x => new { x.PostId, x.IsDeleted, x.IsOperatorHidden, x.CreatedAtUtc });

@@ -1,6 +1,7 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
 @inject Ssalddel.Ui.Common.Areas.App.Services.ISsalddelAccessTokenProvider AccessTokenProvider
+@inject Ssalddel.Ui.Common.Areas.App.Services.ICommunityCommentCountryPreferenceService CommentCountryPreferenceService
 
 @if (Post.Attachments.Count > 0)
 {
@@ -15,7 +16,7 @@
                         aria-expanded="@isCommentPanelExpanded"
                         aria-controls="@GetCommentPanelId(attachment.Id)"
                         aria-label="@GetImageToggleLabel(attachment.OriginalFileName, attachment.CommentCount, isCommentPanelExpanded)"
-                        @onclick="@(() => ToggleAttachmentComment(attachment.Id))">
+                        @onclick="@(() => ToggleAttachmentCommentAsync(attachment.Id))">
                     <img src="@attachment.Url" alt="@attachment.OriginalFileName" loading="lazy" />
                 </button>
 
@@ -42,6 +43,13 @@
                                                                   Category="@Post.Category"
                                                                   IsMasked="@IsReportPost"
                                                                   Compact="true" />
+                                @if (HasPublicCommentCountry(comment))
+                                {
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                                             title="@comment.AuthorDisplayCountryName">
+                                        @comment.AuthorDisplayCountryCode
+                                    </MudChip>
+                                }
                                 <MudText Typo="Typo.caption">@comment.Body</MudText>
                                 <MudButton Variant="Variant.Text"
                                            Size="Size.Small"
@@ -77,6 +85,24 @@
                             }
                             <MudTextField T="string" Placeholder="비밀번호" @bind-Value="attachmentCommentForm.Password" InputType="InputType.Password" Immediate="true" MaxLength="100" Margin="Margin.Dense" />
                             <MudTextField T="string" Placeholder="사진 댓글" @bind-Value="attachmentCommentForm.Body" Immediate="true" MaxLength="1000" Margin="Margin.Dense" />
+                            @if (!IsReportPost)
+                            {
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                    <MudSwitch T="bool" @bind-Value="attachmentCommentForm.IsAuthorDisplayCountryPublic"
+                                               Color="Color.Primary" Label="댓글에 활동 국가 표시" />
+                                    @if (attachmentCommentForm.IsAuthorDisplayCountryPublic)
+                                    {
+                                        <MudSelect T="string" Label="기본 활동 국가코드"
+                                                   @bind-Value="attachmentCommentForm.AuthorDisplayCountryCode"
+                                                   Dense="true" Margin="Margin.Dense">
+                                            @foreach (var country in CommunityDisplayCountryCatalog.Common)
+                                            {
+                                                <MudSelectItem T="string" Value="@country.Code">@country.Code · @country.KoreanName</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    }
+                                </MudStack>
+                            }
                             <MudButton Variant="Variant.Outlined"
                                        Size="Size.Small"
                                        Color="Color.Primary"
@@ -118,6 +144,11 @@
     private string DisplayCommentNickname(string nickname)
         => IsReportPost ? "익명 참여자" : nickname;
 
+    private bool HasPublicCommentCountry(PlatformCommunityPostAttachmentCommentResponse comment)
+        => !IsReportPost
+           && comment.IsAuthorDisplayCountryPublic
+           && !string.IsNullOrWhiteSpace(comment.AuthorDisplayCountryCode);
+
     protected override void OnParametersSet()
     {
         if (_expandedAttachmentId is long attachmentId
@@ -130,10 +161,23 @@
     private bool IsAttachmentCommentExpanded(long attachmentId)
         => _expandedAttachmentId == attachmentId;
 
-    private void ToggleAttachmentComment(long attachmentId)
-        => _expandedAttachmentId = _expandedAttachmentId == attachmentId
-            ? null
-            : attachmentId;
+    private async Task ToggleAttachmentCommentAsync(long attachmentId)
+    {
+        if (_expandedAttachmentId == attachmentId)
+        {
+            _expandedAttachmentId = null;
+            return;
+        }
+
+        _expandedAttachmentId = attachmentId;
+        if (!IsReportPost)
+        {
+            var preference = await CommentCountryPreferenceService.GetAsync();
+            var form = ViewModel.GetAttachmentCommentForm(attachmentId);
+            form.IsAuthorDisplayCountryPublic = preference.IsDisplayCountryPublic;
+            form.AuthorDisplayCountryCode = preference.CountryCode;
+        }
+    }
 
     private static string GetCommentPanelId(long attachmentId)
         => $"attachment-comment-panel-{attachmentId}";

@@ -65,6 +65,122 @@ public sealed class CommunityPostEngagementUseCaseTests
         Assert.True((await db.PlatformCommunityPostComments.FindAsync(created.Value.Id))!.IsDeleted);
     }
 
+    [Fact]
+    public async Task 댓글_활동국가는_서버카탈로그이름으로_snapshot되고_숨김을선택할수있다()
+    {
+        await using var db = CreateContext();
+        var post = CreatePost();
+        db.PlatformCommunityPosts.Add(post);
+        await db.SaveChangesAsync();
+        var useCase = new 커뮤니티게시글참여UseCase(db, new AnonymousUserAccessor());
+
+        var publicComment = await useCase.댓글작성Async(
+            post.Id,
+            new PlatformCommunityPostCommentCreateRequest
+            {
+                Password = "comment-password",
+                Body = "메인의 생활 방식이 궁금합니다.",
+                IsAuthorDisplayCountryPublic = true,
+                AuthorDisplayCountryCode = "kr"
+            },
+            CancellationToken.None);
+        var hiddenComment = await useCase.댓글작성Async(
+            post.Id,
+            new PlatformCommunityPostCommentCreateRequest
+            {
+                Password = "comment-password",
+                Body = "국가 문맥을 숨깁니다.",
+                IsAuthorDisplayCountryPublic = false,
+                AuthorDisplayCountryCode = "US"
+            },
+            CancellationToken.None);
+
+        Assert.True(publicComment.IsSuccess);
+        Assert.True(publicComment.Value.IsAuthorDisplayCountryPublic);
+        Assert.Equal("KR", publicComment.Value.AuthorDisplayCountryCode);
+        Assert.Equal("대한민국", publicComment.Value.AuthorDisplayCountryName);
+        Assert.False(hiddenComment.Value.IsAuthorDisplayCountryPublic);
+        Assert.Null(hiddenComment.Value.AuthorDisplayCountryCode);
+        Assert.Null(hiddenComment.Value.AuthorDisplayCountryName);
+    }
+
+    [Fact]
+    public async Task 댓글_활동국가는_잘못된코드와_신고게시판공개를거부한다()
+    {
+        await using var db = CreateContext();
+        var normalPost = CreatePost();
+        var reportPost = CreatePost();
+        reportPost.Category = PlatformCommunityPostCategories.ReportDispute;
+        reportPost.IsReportBoardPost = true;
+        db.PlatformCommunityPosts.AddRange(normalPost, reportPost);
+        await db.SaveChangesAsync();
+        var useCase = new 커뮤니티게시글참여UseCase(db, new AnonymousUserAccessor());
+
+        var invalid = await useCase.댓글작성Async(
+            normalPost.Id,
+            new PlatformCommunityPostCommentCreateRequest
+            {
+                Password = "comment-password",
+                Body = "잘못된 코드",
+                IsAuthorDisplayCountryPublic = true,
+                AuthorDisplayCountryCode = "ZZ"
+            },
+            CancellationToken.None);
+        var protectedComment = await useCase.댓글작성Async(
+            reportPost.Id,
+            new PlatformCommunityPostCommentCreateRequest
+            {
+                Nickname = "신고자",
+                Password = "comment-password",
+                Body = "보호되어야 하는 댓글",
+                IsAuthorDisplayCountryPublic = true,
+                AuthorDisplayCountryCode = "KR"
+            },
+            CancellationToken.None);
+
+        Assert.True(invalid.IsFailed);
+        Assert.Contains("ISO 3166-1", invalid.Errors[0].Message);
+        Assert.True(protectedComment.IsSuccess);
+        Assert.False(protectedComment.Value.IsAuthorDisplayCountryPublic);
+        Assert.Null(protectedComment.Value.AuthorDisplayCountryCode);
+    }
+
+    [Fact]
+    public async Task 첨부이미지댓글도_같은활동국가정책을사용한다()
+    {
+        await using var db = CreateContext();
+        var post = CreatePost();
+        var attachment = new PlatformCommunityPostAttachment
+        {
+            Post = post,
+            Url = "/image.jpg",
+            BucketName = "test",
+            ObjectName = "image.jpg",
+            OriginalFileName = "image.jpg",
+            ContentType = "image/jpeg",
+            UploadedAtUtc = DateTime.UtcNow
+        };
+        post.Attachments.Add(attachment);
+        db.PlatformCommunityPosts.Add(post);
+        await db.SaveChangesAsync();
+        var useCase = new 커뮤니티게시글참여UseCase(db, new AnonymousUserAccessor());
+
+        var result = await useCase.첨부댓글작성Async(
+            attachment.Id,
+            new PlatformCommunityPostAttachmentCommentCreateRequest
+            {
+                Password = "comment-password",
+                Body = "사진 속 식재료가 궁금합니다.",
+                IsAuthorDisplayCountryPublic = true,
+                AuthorDisplayCountryCode = "US"
+            },
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("US", result.Value.AuthorDisplayCountryCode);
+        Assert.Equal("미국", result.Value.AuthorDisplayCountryName);
+    }
+
     private static PlatformCommunityPost CreatePost()
         => new()
         {

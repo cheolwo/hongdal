@@ -75,9 +75,12 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
         long id,
         CancellationToken cancellationToken)
     {
-        var exists = await _db.PlatformCommunityPosts
-            .AnyAsync(post => post.Id == id && !post.IsDeleted, cancellationToken);
-        if (!exists)
+        var postContext = await _db.PlatformCommunityPosts
+            .AsNoTracking()
+            .Where(post => post.Id == id && !post.IsDeleted)
+            .Select(post => new { post.IsReportBoardPost, post.Category })
+            .FirstOrDefaultAsync(cancellationToken);
+        if (postContext is null)
         {
             return NotFound<IReadOnlyList<PlatformCommunityPostCommentResponse>>("게시글을 찾을 수 없습니다.");
         }
@@ -89,7 +92,12 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
             .Take(50)
             .ToListAsync(cancellationToken);
         return Result.Ok<IReadOnlyList<PlatformCommunityPostCommentResponse>>(
-            comments.Select(CommunityPostResponseMapper.ToCommentResponse).ToArray());
+            comments
+                .Select(comment => CommunityPostResponseMapper.ToCommentResponse(
+                    comment,
+                    postContext.IsReportBoardPost
+                    || CommunityPostWritePolicy.IsReportCategory(postContext.Category)))
+                .ToArray());
     }
 
     public async Task<Result<PlatformCommunityPostCommentResponse>> 댓글작성Async(
@@ -119,6 +127,11 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
         }
 
         var now = DateTime.UtcNow;
+        var hideCountry = entity.IsReportBoardPost
+                          || CommunityPostWritePolicy.IsReportCategory(entity.Category);
+        var country = !hideCountry && request.IsAuthorDisplayCountryPublic
+            ? CommunityDisplayCountryCatalog.Find(request.AuthorDisplayCountryCode)
+            : null;
         var comment = new PlatformCommunityPostComment
         {
             PostId = id,
@@ -128,6 +141,8 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
                 null,
                 _currentUserAccessor.UserId),
             Body = CommunityPostingIdentityPolicy.Normalize(request.Body, string.Empty, 1000),
+            IsAuthorDisplayCountryPublic = country is not null,
+            AuthorDisplayCountryCode = country?.Code,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             CreatedAtUtc = now,
             UpdatedAtUtc = now
@@ -138,7 +153,7 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
         entity.LastEngagedAtUtc = now;
         entity.UpdatedAtUtc = now;
         await _db.SaveChangesAsync(cancellationToken);
-        return Result.Ok(CommunityPostResponseMapper.ToCommentResponse(comment));
+        return Result.Ok(CommunityPostResponseMapper.ToCommentResponse(comment, hideCountry));
     }
 
     public async Task<Result> 댓글삭제Async(
@@ -183,13 +198,18 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
         long attachmentId,
         CancellationToken cancellationToken)
     {
-        var exists = await _db.PlatformCommunityPostAttachments
-            .AnyAsync(
-                attachment => attachment.Id == attachmentId
-                              && attachment.Post != null
-                              && !attachment.Post.IsDeleted,
-                cancellationToken);
-        if (!exists)
+        var postContext = await _db.PlatformCommunityPostAttachments
+            .AsNoTracking()
+            .Where(attachment => attachment.Id == attachmentId
+                                 && attachment.Post != null
+                                 && !attachment.Post.IsDeleted)
+            .Select(attachment => new
+            {
+                attachment.Post!.IsReportBoardPost,
+                attachment.Post.Category
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+        if (postContext is null)
         {
             return NotFound<IReadOnlyList<PlatformCommunityPostAttachmentCommentResponse>>("첨부 이미지를 찾을 수 없습니다.");
         }
@@ -203,7 +223,12 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
             .Take(50)
             .ToListAsync(cancellationToken);
         return Result.Ok<IReadOnlyList<PlatformCommunityPostAttachmentCommentResponse>>(
-            comments.Select(CommunityPostResponseMapper.ToAttachmentCommentResponse).ToArray());
+            comments
+                .Select(comment => CommunityPostResponseMapper.ToAttachmentCommentResponse(
+                    comment,
+                    postContext.IsReportBoardPost
+                    || CommunityPostWritePolicy.IsReportCategory(postContext.Category)))
+                .ToArray());
     }
 
     public async Task<Result<PlatformCommunityPostAttachmentCommentResponse>> 첨부댓글작성Async(
@@ -238,6 +263,11 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
         }
 
         var now = DateTime.UtcNow;
+        var hideCountry = attachment.Post!.IsReportBoardPost
+                          || CommunityPostWritePolicy.IsReportCategory(attachment.Post.Category);
+        var country = !hideCountry && request.IsAuthorDisplayCountryPublic
+            ? CommunityDisplayCountryCatalog.Find(request.AuthorDisplayCountryCode)
+            : null;
         var comment = new PlatformCommunityPostAttachmentComment
         {
             AttachmentId = attachmentId,
@@ -247,6 +277,8 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
                 null,
                 _currentUserAccessor.UserId),
             Body = CommunityPostingIdentityPolicy.Normalize(request.Body, string.Empty, 1000),
+            IsAuthorDisplayCountryPublic = country is not null,
+            AuthorDisplayCountryCode = country?.Code,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             CreatedAtUtc = now,
             UpdatedAtUtc = now
@@ -257,7 +289,7 @@ public sealed class 커뮤니티게시글참여UseCase : I커뮤니티게시글�
         attachment.Post.LastEngagedAtUtc = now;
         attachment.Post.UpdatedAtUtc = now;
         await _db.SaveChangesAsync(cancellationToken);
-        return Result.Ok(CommunityPostResponseMapper.ToAttachmentCommentResponse(comment));
+        return Result.Ok(CommunityPostResponseMapper.ToAttachmentCommentResponse(comment, hideCountry));
     }
 
     public async Task<Result> 첨부댓글삭제Async(

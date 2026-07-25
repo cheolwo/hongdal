@@ -121,21 +121,30 @@ internal static class CommunityPostResponseMapper
                     .Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden)
                     .OrderByDescending(comment => comment.CreatedAtUtc)
                     .Take(3)
-                    .Select(ToCommentResponse)
+                    .Select(comment => ToCommentResponse(comment, isReportBoardPost))
                     .ToArray()
         };
     }
 
     public static PlatformCommunityPostCommentResponse ToCommentResponse(
-        PlatformCommunityPostComment entity)
-        => new()
+        PlatformCommunityPostComment entity,
+        bool suppressDisplayCountry = false)
+    {
+        var country = !suppressDisplayCountry && entity.IsAuthorDisplayCountryPublic
+            ? CommunityDisplayCountryCatalog.Find(entity.AuthorDisplayCountryCode)
+            : null;
+        return new()
         {
             Id = entity.Id,
             Nickname = entity.Nickname,
             Body = entity.Body,
+            IsAuthorDisplayCountryPublic = country is not null,
+            AuthorDisplayCountryCode = country?.Code,
+            AuthorDisplayCountryName = country?.KoreanName,
             ReportCount = entity.ReportCount,
             CreatedAtUtc = entity.CreatedAtUtc
         };
+    }
 
     public static PlatformCommunityPostAttachmentResponse ToAttachmentResponse(
         PlatformCommunityPostAttachment entity)
@@ -154,21 +163,30 @@ internal static class CommunityPostResponseMapper
                 .Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden)
                 .OrderByDescending(comment => comment.CreatedAtUtc)
                 .Take(3)
-                .Select(ToAttachmentCommentResponse)
+                .Select(comment => ToAttachmentCommentResponse(comment))
                 .ToArray()
         };
 
     public static PlatformCommunityPostAttachmentCommentResponse ToAttachmentCommentResponse(
-        PlatformCommunityPostAttachmentComment entity)
-        => new()
+        PlatformCommunityPostAttachmentComment entity,
+        bool suppressDisplayCountry = false)
+    {
+        var country = !suppressDisplayCountry && entity.IsAuthorDisplayCountryPublic
+            ? CommunityDisplayCountryCatalog.Find(entity.AuthorDisplayCountryCode)
+            : null;
+        return new()
         {
             Id = entity.Id,
             AttachmentId = entity.AttachmentId,
             Nickname = entity.Nickname,
             Body = entity.Body,
+            IsAuthorDisplayCountryPublic = country is not null,
+            AuthorDisplayCountryCode = country?.Code,
+            AuthorDisplayCountryName = country?.KoreanName,
             ReportCount = entity.ReportCount,
             CreatedAtUtc = entity.CreatedAtUtc
         };
+    }
 
     private static PlatformCommunityPostSalesOfferResponse? DeserializeSalesOffer(string? json)
     {

@@ -40,7 +40,10 @@ internal static class CommunityPostingIdentityPolicy
             request.Password,
             request.Body,
             "댓글",
-            requiresSuppliedNickname);
+            requiresSuppliedNickname)
+           ?? ValidateDisplayCountry(
+               request.IsAuthorDisplayCountryPublic,
+               request.AuthorDisplayCountryCode);
 
     public static string? ValidateAttachmentComment(
         PlatformCommunityPostAttachmentCommentCreateRequest request,
@@ -50,7 +53,25 @@ internal static class CommunityPostingIdentityPolicy
             request.Password,
             request.Body,
             "첨부 댓글",
-            requiresSuppliedNickname);
+            requiresSuppliedNickname)
+           ?? ValidateDisplayCountry(
+               request.IsAuthorDisplayCountryPublic,
+               request.AuthorDisplayCountryCode);
+
+    private static string? ValidateDisplayCountry(bool isPublic, string? countryCode)
+    {
+        if (!isPublic)
+        {
+            return null;
+        }
+
+        if (CommunityDisplayCountryCatalog.Find(countryCode) is null)
+        {
+            return "활동 국가 코드는 ISO 3166-1 alpha-2 카탈로그에 있는 영문 두 자리 코드여야 합니다.";
+        }
+
+        return null;
+    }
 
     private static string? Validate(
         string? nickname,
