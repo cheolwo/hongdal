@@ -95,14 +95,90 @@
         </div>
     </section>
 
+    <section class="produce-price__view-options" aria-label="가격 비교 보기 방식">
+        <div>
+            <span>보기 방식</span>
+            <strong>가격 차이는 표로, 세부 근거는 카드로 확인하세요.</strong>
+        </div>
+        <div class="produce-price__view-toggle" role="group">
+            <button type="button"
+                    class="@(ViewModel.ViewMode == 농산물가격보기방식.비교표 ? "is-selected" : null)"
+                    aria-pressed="@(ViewModel.ViewMode == 농산물가격보기방식.비교표)"
+                    @onclick="() => ViewModel.ViewMode = 농산물가격보기방식.비교표">
+                비교표
+            </button>
+            <button type="button"
+                    class="@(ViewModel.ViewMode == 농산물가격보기방식.카드 ? "is-selected" : null)"
+                    aria-pressed="@(ViewModel.ViewMode == 농산물가격보기방식.카드)"
+                    @onclick="() => ViewModel.ViewMode = 농산물가격보기방식.카드">
+                가로 카드
+            </button>
+        </div>
+    </section>
+
     @if (ViewModel.Items.Count == 0)
     {
         <div class="produce-price__empty">
             선택한 조건에 연결된 공식 지역 관측값이 없습니다. 국가 또는 지역 범위를 넓혀 주세요.
         </div>
     }
+    else if (ViewModel.ViewMode == 농산물가격보기방식.비교표)
+    {
+        <div class="produce-price__table-wrap">
+            <table class="produce-price__table">
+                <caption>
+                    @ViewModel.SelectedProduct.Name @ViewModel.WeightLabel 환산 가격 · 낮은 가격 순
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">순서</th>
+                        <th scope="col">국가·지역</th>
+                        <th scope="col">@ViewModel.WeightLabel 가격</th>
+                        <th scope="col">kg 가격</th>
+                        <th scope="col">최저 관측값과 차이</th>
+                        <th scope="col">시장 단계·기준일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var index = 0; index < ViewModel.Items.Count; index++)
+                    {
+                        var item = ViewModel.Items[index];
+                        <tr>
+                            <td><span class="produce-price__rank">@(index + 1)</span></td>
+                            <th scope="row">
+                                <strong>@item.Observation.RegionName</strong>
+                                <small>@item.Observation.CountryName · @item.Observation.Variety</small>
+                            </th>
+                            <td class="produce-price__table-price">
+                                @ViewModel.FormatDisplayPrice(item.DisplayWeightPrice)
+                            </td>
+                            <td>@ViewModel.FormatDisplayPrice(item.DisplayKilogramPrice)</td>
+                            <td>
+                                @if (item.DisplayDifferenceFromLowest == 0m)
+                                {
+                                    <span class="produce-price__gap is-lowest">최저 관측값</span>
+                                }
+                                else
+                                {
+                                    <span class="produce-price__gap">
+                                        +@ViewModel.FormatDisplayPrice(item.DisplayDifferenceFromLowest)
+                                        <small>+@item.DifferencePercentFromLowest.ToString("N1")%</small>
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                <span>@item.Observation.MarketStage</span>
+                                <small>@item.Observation.ReferenceDate · @item.Observation.RegionCode</small>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
     else
     {
+        <p class="produce-price__swipe-hint">카드를 좌우로 넘겨 지역별 세부 근거를 확인하세요. →</p>
         <div class="produce-price__cards">
             @foreach (var item in ViewModel.Items)
             {

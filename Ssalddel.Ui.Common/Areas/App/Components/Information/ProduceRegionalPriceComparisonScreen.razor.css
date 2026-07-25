@@ -208,14 +208,164 @@
     font-size: 0.95rem;
 }
 
-.produce-price__cards {
+.produce-price__view-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.produce-price__view-options > div:first-child {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.produce-price__view-options > div:first-child > span {
+    color: var(--produce-accent);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.produce-price__view-options > div:first-child > strong {
+    font-size: 0.86rem;
+}
+
+.produce-price__view-toggle {
+    display: inline-grid;
+    grid-template-columns: repeat(2, minmax(92px, 1fr));
+    padding: 4px;
+    border-radius: 999px;
+    background: #eef1f5;
+}
+
+.produce-price__view-toggle button {
+    min-height: 38px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 999px;
+    color: #586577;
+    background: transparent;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.produce-price__view-toggle button.is-selected {
+    color: var(--produce-on-accent);
+    background: var(--produce-accent);
+}
+
+.produce-price__table-wrap {
+    overflow-x: auto;
+    border: 1px solid #d8dee8;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(23, 32, 51, 0.05);
+}
+
+.produce-price__table {
+    width: 100%;
+    min-width: 840px;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.produce-price__table caption {
+    padding: 16px 18px;
+    color: #273348;
+    font-size: 0.86rem;
+    font-weight: 800;
+    text-align: left;
+}
+
+.produce-price__table thead {
+    background: #f5f7fa;
+}
+
+.produce-price__table th,
+.produce-price__table td {
+    padding: 13px 14px;
+    border-top: 1px solid #e4e8ee;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.produce-price__table thead th {
+    color: #657186;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.produce-price__table tbody th {
+    min-width: 190px;
+}
+
+.produce-price__table tbody th strong,
+.produce-price__table tbody th small,
+.produce-price__table td > span,
+.produce-price__table td > small {
+    display: block;
+}
+
+.produce-price__table tbody th small,
+.produce-price__table td > small,
+.produce-price__gap small {
+    margin-top: 4px;
+    color: #718095;
+    font-weight: 500;
+}
+
+.produce-price__table-price {
+    color: var(--produce-accent);
+    font-size: 1rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.produce-price__rank {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: var(--produce-on-accent);
+    background: var(--produce-accent);
+    font-weight: 900;
+}
+
+.produce-price__gap {
+    color: #8a3d28;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.produce-price__gap.is-lowest {
+    color: #0f766e;
+}
+
+.produce-price__swipe-hint {
+    margin: 0 0 10px;
+    color: #667286;
+    font-size: 0.78rem;
+}
+
+.produce-price__cards {
+    display: flex;
     gap: 14px;
+    overflow-x: auto;
+    padding: 2px 2px 16px;
+    scroll-padding-inline: 2px;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
 }
 
 .produce-price__card {
-    min-width: 0;
+    width: min(360px, calc(100vw - 64px));
+    min-width: min(360px, calc(100vw - 64px));
+    flex: 0 0 min(360px, calc(100vw - 64px));
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -223,6 +373,8 @@
     border-radius: 14px;
     background: #fff;
     box-shadow: 0 8px 24px rgba(23, 32, 51, 0.05);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .produce-price__card > header {
@@ -356,8 +508,7 @@
 }
 
 @media (max-width: 900px) {
-    .produce-price__controls,
-    .produce-price__cards {
+    .produce-price__controls {
         grid-template-columns: 1fr;
     }
 
@@ -381,6 +532,15 @@
     .produce-price__products,
     .produce-price__summary {
         grid-template-columns: 1fr;
+    }
+
+    .produce-price__view-options {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .produce-price__view-toggle {
+        width: 100%;
     }
 
     .produce-price__controls,

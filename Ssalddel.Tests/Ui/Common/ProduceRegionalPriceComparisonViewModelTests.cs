@@ -49,6 +49,34 @@ public sealed class ProduceRegionalPriceComparisonViewModelTests
     }
 
     [Fact]
+    public void ComparisonTable_IsDefaultAndShowsDifferenceFromLowestObservation()
+    {
+        using var viewModel = new 농산물지역가격비교ViewModel(
+            CultureInfo.GetCultureInfo("ko-KR"));
+
+        Assert.Equal(농산물가격보기방식.비교표, viewModel.ViewMode);
+        Assert.Equal(0m, viewModel.Items[0].DisplayDifferenceFromLowest);
+        Assert.Equal(0m, viewModel.Items[0].DifferencePercentFromLowest);
+        Assert.All(
+            viewModel.Items.Skip(1),
+            item =>
+            {
+                Assert.True(item.DisplayDifferenceFromLowest > 0m);
+                Assert.True(item.DifferencePercentFromLowest > 0m);
+            });
+    }
+
+    [Fact]
+    public void ViewMode_CanSwitchToHorizontalCards()
+    {
+        using var viewModel = new 농산물지역가격비교ViewModel();
+
+        viewModel.ViewMode = 농산물가격보기방식.카드;
+
+        Assert.Equal(농산물가격보기방식.카드, viewModel.ViewMode);
+    }
+
+    [Fact]
     public void CountryAndRegionFilters_NarrowSelectedProduct()
     {
         using var viewModel = new 농산물지역가격비교ViewModel();

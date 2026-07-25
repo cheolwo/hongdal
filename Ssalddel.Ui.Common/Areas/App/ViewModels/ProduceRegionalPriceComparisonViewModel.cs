@@ -15,6 +15,12 @@ public enum 농산물가격분류
     채소
 }
 
+public enum 농산물가격보기방식
+{
+    비교표,
+    카드
+}
+
 public sealed record 농산물가격품목(
     string Key,
     농산물가격분류 Category,
@@ -47,7 +53,9 @@ public sealed record 농산물지역가격비교항목(
     농산물지역가격관측값 Observation,
     decimal NativeWeightPrice,
     decimal DisplayWeightPrice,
-    decimal DisplayKilogramPrice);
+    decimal DisplayKilogramPrice,
+    decimal DisplayDifferenceFromLowest,
+    decimal DifferencePercentFromLowest);
 
 public sealed class 농산물지역가격비교ViewModel : PageViewModelBase
 {
@@ -155,6 +163,7 @@ public sealed class 농산물지역가격비교ViewModel : PageViewModelBase
     private string _selectedRegionCode = AllFilter;
     private decimal _comparisonWeightGrams = 250m;
     private 농산물가격표시통화 _displayCurrency;
+    private 농산물가격보기방식 _viewMode = 농산물가격보기방식.비교표;
 
     public 농산물지역가격비교ViewModel()
         : this(CultureInfo.CurrentUICulture)
@@ -291,6 +300,12 @@ public sealed class 농산물지역가격비교ViewModel : PageViewModelBase
         }
     }
 
+    public 농산물가격보기방식 ViewMode
+    {
+        get => _viewMode;
+        set => SetProperty(ref _viewMode, value);
+    }
+
     public string WeightLabel => $"{ComparisonWeightGrams:0}g";
 
     public string DisplayCurrencyLabel => DisplayCurrency switch
@@ -304,7 +319,10 @@ public sealed class 농산물지역가격비교ViewModel : PageViewModelBase
         => "ECB 기준환율 · 2026-07-22 · EUR 1 = KRW 1,688.78 / CNY 7.7266 / USD 1.1408";
 
     public IReadOnlyList<농산물지역가격비교항목> Items
-        => Observations
+    {
+        get
+        {
+            var converted = Observations
             .Where(observation => observation.ProductKey == SelectedProductKey)
             .Where(observation => SelectedCountryCode == AllFilter
                 || observation.CountryCode == SelectedCountryCode)
@@ -317,10 +335,33 @@ public sealed class 농산물지역가격비교ViewModel : PageViewModelBase
                     observation,
                     nativeWeightPrice,
                     Convert(nativeWeightPrice, observation.NativeCurrency, DisplayCurrency),
-                    Convert(observation.NativeKilogramPrice, observation.NativeCurrency, DisplayCurrency));
+                    Convert(observation.NativeKilogramPrice, observation.NativeCurrency, DisplayCurrency),
+                    0m,
+                    0m);
             })
-            .OrderBy(item => item.DisplayKilogramPrice)
             .ToArray();
+
+            if (converted.Length == 0)
+            {
+                return converted;
+            }
+
+            var lowest = converted.Min(item => item.DisplayWeightPrice);
+            return converted
+                .Select(item =>
+                {
+                    var difference = item.DisplayWeightPrice - lowest;
+                    var percentage = lowest == 0m ? 0m : difference / lowest * 100m;
+                    return item with
+                    {
+                        DisplayDifferenceFromLowest = difference,
+                        DifferencePercentFromLowest = percentage
+                    };
+                })
+                .OrderBy(item => item.DisplayWeightPrice)
+                .ToArray();
+        }
+    }
 
     public string FormatDisplayPrice(decimal value)
         => DisplayCurrency switch
