@@ -4,6 +4,7 @@ public sealed class OrdererMobileFigma02PresentationTests
 {
     [Theory]
     [InlineData("Home.razor", "02.01")]
+    [InlineData("ProducePriceComparison.razor", "02.02A")]
     [InlineData("GroupPurchaseProducts.razor", "02.02")]
     [InlineData("GroupPurchaseWishCreate.razor", "02.03")]
     [InlineData("GroupPurchaseWishDetail.razor", "02.04")]
@@ -17,7 +18,7 @@ public sealed class OrdererMobileFigma02PresentationTests
     [InlineData("IndividualImportLedger.razor", "02.12")]
     [InlineData("IndividualExportLedger.razor", "02.13")]
     [InlineData("GroupExportLedger.razor", "02.14")]
-    public void Figma02의_열네화면은_기존MauiRoute에책임코드를고정한다(
+    public void Figma02화면은_기존MauiRoute에책임코드를고정한다(
         string fileName,
         string screenCode)
     {
@@ -62,9 +63,34 @@ public sealed class OrdererMobileFigma02PresentationTests
 
         Assert.Contains("OrdererRoutes.Food", source);
         Assert.Contains("OrdererRoutes.Mart", source);
+        Assert.Contains("OrdererRoutes.ProducePriceComparison", source);
         Assert.Contains("OrdererRoutes.GroupPurchaseProducts", source);
         Assert.Contains("OrdererRoutes.Orders", source);
         Assert.Contains("개별주문과 공동 실행은 분리됩니다.", source);
+    }
+
+    [Fact]
+    public void 가격비교는_공개Route를보존하고_주문자흐름에서재료와원함으로이어진다()
+    {
+        var root = FindRepositoryRoot();
+        var ordererPage = File.ReadAllText(Path.Combine(
+            root,
+            "OrdererApp",
+            "Components",
+            "Pages",
+            "ProducePriceComparison.razor"));
+        var publicPage = File.ReadAllText(Path.Combine(
+            root,
+            "SsalddelApp",
+            "Components",
+            "Pages",
+            "ProduceRegionalPriceComparison.razor"));
+
+        Assert.Contains("OrdererRoutes.GroupPurchaseProducts", ordererPage);
+        Assert.Contains("OrdererRoutes.GroupPurchaseWishCreate", ordererPage);
+        Assert.Contains("OrdererRoutes.GroupPurchaseGroups", ordererPage);
+        Assert.Contains("비구속 수요", ordererPage);
+        Assert.Contains("@page \"/information/produce-price-comparison\"", publicPage);
     }
 
     [Theory]

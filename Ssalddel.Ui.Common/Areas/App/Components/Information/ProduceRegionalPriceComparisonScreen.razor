@@ -4,7 +4,7 @@
 <section class="produce-price">
     <header class="produce-price__hero">
         <div>
-            <a class="produce-price__back" href="/information/public-data">← 공공데이터 가격</a>
+            <a class="produce-price__back" href="@BackHref">← @BackLabel</a>
             <span>과일·채소 · 지역별 가격 비교</span>
             <h1>같은 농산물도 지역마다 얼마가 다를까?</h1>
             <p>품목과 지역을 고르면 공식 관측값을 같은 중량과 접속자 통화로 환산합니다.</p>
@@ -241,3 +241,11 @@
         </p>
     </aside>
 </section>
+
+@code {
+    [Parameter]
+    public string BackHref { get; set; } = "/information/public-data";
+
+    [Parameter]
+    public string BackLabel { get; set; } = "공공데이터 가격";
+}

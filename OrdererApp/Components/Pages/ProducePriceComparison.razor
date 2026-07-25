@@ -1,0 +1,47 @@
+@page "/group-purchase/produce-prices"
+
+<PageTitle>과일·채소 가격 탐색 · 살뜰 주문</PageTitle>
+
+<main class="orderer-price-journey" data-orderer-screen="02.02A">
+    <header class="orderer-price-journey__heading">
+        <span>주문자 업무 · 02.02A</span>
+        <h1>가격을 비교하고 필요한 재료를 고르세요</h1>
+        <p>공식 관측값을 같은 중량과 통화로 비교한 뒤, 재료 후보와 비구속 개별주문 의향으로 이어갑니다.</p>
+    </header>
+
+    <nav class="orderer-price-journey__steps" aria-label="가격 탐색에서 공동주문까지">
+        <a class="is-current" href="@OrdererRoutes.ProducePriceComparison" aria-current="step">
+            <span>1</span>
+            <strong>가격 탐색</strong>
+            <small>지역·단위 비교</small>
+        </a>
+        <a href="@OrdererRoutes.GroupPurchaseProducts">
+            <span>2</span>
+            <strong>재료 선택</strong>
+            <small>공개 근거 확인</small>
+        </a>
+        <a href="@OrdererRoutes.GroupPurchaseWishCreate">
+            <span>3</span>
+            <strong>내 원함 남기기</strong>
+            <small>비구속 수요</small>
+        </a>
+        <a href="@OrdererRoutes.GroupPurchaseGroups">
+            <span>4</span>
+            <strong>함께 주문</strong>
+            <small>조건 확인</small>
+        </a>
+    </nav>
+
+    <aside class="orderer-price-journey__boundary">
+        가격 비교는 구매 판단을 돕는 정보입니다. 표시 가격만으로 주문·결제·수입이 확정되지 않으며,
+        품종·등급·조사일·배송비 차이는 다음 단계에서 다시 확인합니다.
+    </aside>
+
+    <ProduceRegionalPriceComparisonScreen BackHref="@OrdererRoutes.Home"
+                                          BackLabel="주문자 홈" />
+
+    <footer class="orderer-price-journey__actions">
+        <a class="orderer-price-journey__secondary" href="@OrdererRoutes.Home">주문자 홈</a>
+        <a class="orderer-price-journey__primary" href="@OrdererRoutes.GroupPurchaseProducts">재료 후보 보기 →</a>
+    </footer>
+</main>

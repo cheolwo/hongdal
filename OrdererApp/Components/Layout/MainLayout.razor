@@ -42,6 +42,10 @@
                     <MudIcon Icon="@Icons.Material.Filled.GridView" />
                     재료 후보
                 </a>
+                <a href="@OrdererRoutes.ProducePriceComparison" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.CompareArrows" />
+                    과일·채소 가격
+                </a>
                 <a href="@OrdererRoutes.GroupPurchaseWishCreate" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" />
                     개별주문 의향 등록
@@ -124,7 +128,8 @@
         => destination switch
         {
             BottomDestination.Ingredients =>
-                CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseProducts, StringComparison.OrdinalIgnoreCase)
+                CurrentPath.StartsWith(OrdererRoutes.ProducePriceComparison, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseProducts, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(CurrentPath, OrdererRoutes.GroupPurchaseWishCreate, StringComparison.OrdinalIgnoreCase),
             BottomDestination.Wishes =>
                 (CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseWishes, StringComparison.OrdinalIgnoreCase)

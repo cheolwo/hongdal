@@ -13,6 +13,7 @@ public static class OrdererRoutes
     public const string Cargo = "/cargo";
     public const string GroupPurchase = GroupPurchasePageRoutes.Root;
     public const string GroupPurchasePractice = GroupPurchasePageRoutes.Practice;
+    public const string ProducePriceComparison = "/group-purchase/produce-prices";
     public const string GroupPurchaseProducts = GroupPurchasePageRoutes.ProductsRoot;
     public const string GroupPurchaseWishes = GroupPurchasePageRoutes.WishesRoot;
     public const string GroupPurchaseWishCreate = GroupPurchasePageRoutes.WishCreate;
