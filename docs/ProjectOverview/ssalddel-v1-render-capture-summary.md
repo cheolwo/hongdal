@@ -1,6 +1,6 @@
 # 살뜰 2.0 운송 렌더링/캡처 검증 요약
 
-> 재분류 안내: 레거시 파일명과 기존 캡처 경로는 링크 호환을 위해 유지하지만 이 운송 화면 묶음의 현재 제품 버전은 **2.0**입니다.
+> 재분류 안내: 레거시 파일명은 문서 호환을 위해 유지하지만 이 운송 화면 묶음의 현재 제품 버전은 **2.0**입니다. `artifacts/`의 임시 PNG 캡처는 저장소 용량 정리 과정에서 제거했으며, 장기 보존 화면은 문서 자산 경로에서 관리합니다.
 
 이 문서는 운송 화면을 README와 상세 문서에 설명할 때 사용할 렌더링 검증 결과와 캡처 자료를 한곳에 모은다. 루트 README에는 핵심 흐름만 두고, 실제 화면이 어느 앱과 어느 단계에서 렌더링되는지는 이 문서를 근거로 삼는다.
 
@@ -22,14 +22,14 @@
 
 ## 대표 캡처
 
-아래 캡처는 README 본문에 직접 많이 넣기보다는, 살뜰 2.0 필수 페이지 설명에서 필요한 곳에 연결한다. 실제 고객 정보, 주소, 연락처, 계좌, POD 원본은 캡처에 넣지 않는다.
+대표 앱 캡처는 로컬 검증 산출물로 사용한 뒤 정리했다. 장기 보존 화면은 아래 색인의 문서 자산을 기준으로 확인하며, 실제 고객 정보, 주소, 연락처, 계좌, POD 원본은 캡처에 넣지 않는다.
 
 | 앱 | 대표 캡처 | 문서에서 쓰는 용도 |
 | --- | --- | --- |
-| `DriverApp` | [`DriverApp-after-home-fix.png`](../../artifacts/android-render-check/DriverApp-after-home-fix.png) | 기사 지도 홈에서 Blazor 업무 화면으로 진입한 뒤 홈 허브가 오류 없이 열리는지 설명 |
-| `DriverApp` | [`DriverApp-embedded.png`](../../artifacts/android-render-check/DriverApp-embedded.png) | 네이티브 지도 홈, 추천 배너, 진행 중 운송 하단 흐름의 대표 이미지 |
-| `SsalddelApp` | [`SsalddelApp-embedded.png`](../../artifacts/android-render-check/SsalddelApp-embedded.png) | 화주 업무 진입, 운송 의뢰, 창고/판매/통관 업무로 이어지는 흐름의 대표 이미지 |
-| `WarehouseManagerApp` | [`WarehouseManagerApp-embedded.png`](../../artifacts/android-render-check/WarehouseManagerApp-embedded.png) | 창고 작업 보드, 입고/검수/피킹/포장 흐름의 대표 이미지 |
+| `DriverApp` | 로컬 검증 캡처 정리됨 | 기사 지도 홈에서 Blazor 업무 화면으로 진입한 뒤 홈 허브가 오류 없이 열리는지 설명 |
+| `DriverApp` | 로컬 검증 캡처 정리됨 | 네이티브 지도 홈, 추천 배너, 진행 중 운송 하단 흐름의 대표 이미지 |
+| `SsalddelApp` | 로컬 검증 캡처 정리됨 | 화주 업무 진입, 운송 의뢰, 창고/판매/통관 업무로 이어지는 흐름의 대표 이미지 |
+| `WarehouseManagerApp` | 로컬 검증 캡처 정리됨 | 창고 작업 보드, 입고/검수/피킹/포장 흐름의 대표 이미지 |
 
 ## 상위/하위 페이지 캡처 색인
 
