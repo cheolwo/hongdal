@@ -6,6 +6,7 @@
 erDiagram
     USDA_COLLECTION_RUN ||--o{ USDA_PRICE_OBSERVATION : "Restrict"
     KAMIS_COLLECTION_RUN ||--o{ KAMIS_PRICE_OBSERVATION : "Restrict"
+    DOMESTIC_AUCTION_COLLECTION_RUN ||--o{ DOMESTIC_AUCTION_PRICE_OBSERVATION : "Restrict"
 
     USDA_COLLECTION_RUN {
         long Id PK
@@ -27,6 +28,20 @@ erDiagram
         long FirstCollectionRunId FK
         string RecordKey UK
     }
+    DOMESTIC_AUCTION_COLLECTION_RUN {
+        long Id PK
+        string RunKey UK
+        string SourceKey
+        date SettlementDate
+        string StatusCode
+    }
+    DOMESTIC_AUCTION_PRICE_OBSERVATION {
+        long Id PK
+        long FirstCollectionRunId FK
+        string RecordKey UK
+        date SettlementDate
+        decimal AuctionPriceKrw
+    }
     HS_USDA_COMMODITY_MAPPING {
         long Id PK
         string MappingKey UK
@@ -37,6 +52,8 @@ erDiagram
 관측값의 최초 수집 실행은 출처 이력을 보존해야 하므로 실행 삭제를 `Restrict`한다.
 가격 비교 화면은 이 archive를 직접 표시하는 화면이 아니라 외부 provider query 결과를 사용하며,
 archive는 batch 수집·후보 분석·자동 콘텐츠의 저장 경계다.
+공영도매시장 경락가격 archive는 KAMIS 조사 가격과 별도 관측값으로 유지하고,
+원문에 포함된 출하자·생산자·중도매인 식별정보는 저장하지 않는다.
 
 ## 전통시장과 생활권 협의
 

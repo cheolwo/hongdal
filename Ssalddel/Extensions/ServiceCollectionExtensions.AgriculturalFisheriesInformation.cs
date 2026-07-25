@@ -38,6 +38,8 @@ public static partial class ServiceCollectionExtensions
             serviceProvider.GetRequiredService<Mafra공영도매시장경락가격공급자>());
         services.AddScoped<I국내농산물경락가격조회Service,
             국내농산물경락가격조회Service>();
+        services.AddScoped<I국내농산물경락가격ArchiveService,
+            국내농산물경락가격ArchiveService>();
         services
             .AddHttpClient<UsdaNassQuickStats가격공급자>(
                 (serviceProvider, client) =>

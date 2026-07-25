@@ -73,6 +73,42 @@ public sealed class DomesticAgriculturalAuctionPriceModuleTests
     }
 
     [Fact]
+    public async Task Http원천은_명시적허용없이는_외부호출하지않는다()
+    {
+        var callCount = 0;
+        var client = new HttpClient(new StubHttpMessageHandler(_ =>
+        {
+            callCount++;
+            return JsonResponse(SampleResponse);
+        }))
+        {
+            BaseAddress = new Uri("http://211.237.50.150:7080")
+        };
+        var provider = new Mafra공영도매시장경락가격공급자(
+            client,
+            Options.Create(new PublicDataOptions
+            {
+                DomesticAgriculturalAuctionPrices =
+                    new DomesticAgriculturalAuctionPricesOptions
+                    {
+                        ApiKey = "test-key",
+                        AllowInsecureHttp = false
+                    }
+            }),
+            TimeProvider.System,
+            NullLogger<Mafra공영도매시장경락가격공급자>.Instance);
+
+        var result = await provider.조회Async(new 국내농산물경락가격조회요청
+        {
+            SettlementDate = "2024-05-01"
+        });
+
+        Assert.False(result.Success);
+        Assert.Equal(국내농산물경락가격조회상태Codes.설정안됨, result.StatusCode);
+        Assert.Equal(0, callCount);
+    }
+
+    [Fact]
     public async Task 같은거래를_재수집하면_중복하지않고_변경가격을갱신한다()
     {
         var options = new DbContextOptionsBuilder<AgriculturalFisheriesDbContext>()

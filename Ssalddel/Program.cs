@@ -212,7 +212,6 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddAgriculturalFisheriesInformationModule();
-builder.Services.AddDomesticAgriculturalAuctionPriceArchive();
 builder.Services.AddSsalddelHttpClients();
 builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
 builder.Services.AddApifySocialMediaResearch(builder.Configuration);
