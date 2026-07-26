@@ -142,6 +142,7 @@ public sealed class 음식점탐색조회UseCase(
             Page = page,
             PageSize = pageSize,
             배달권키 = scope.배달권키,
+            적용반경Km = request.반경Km,
             거리기준안내 = DistanceBasis(scope)
         });
     }

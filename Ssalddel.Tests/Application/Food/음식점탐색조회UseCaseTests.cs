@@ -30,6 +30,7 @@ public sealed class 음식점탐색조회UseCaseTests
         Assert.Equal("공개분식", item.상호명);
         Assert.Equal(1, item.공개메뉴수);
         Assert.InRange(item.거리Km!.Value, 0m, 3m);
+        Assert.Equal(3m, result.Value.적용반경Km);
         Assert.Contains("자동 수집하지 않습니다", result.Value.거리기준안내);
     }
 

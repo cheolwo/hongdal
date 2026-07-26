@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Orderer;
+
 namespace Ssalddel.Contracts.Restaurants;
 
 public sealed class 음식점탐색권역응답
@@ -19,7 +21,7 @@ public sealed class 음식점공개목록조회요청
 {
     public string 배달권키 { get; set; } = string.Empty;
 
-    public decimal 반경Km { get; set; } = 7m;
+    public decimal 반경Km { get; set; } = RestaurantSearchPolicyDefaults.DefaultRadiusKm;
 
     public string? 검색어 { get; set; }
 
@@ -41,6 +43,8 @@ public sealed class 음식점공개목록응답
     public int PageSize { get; set; } = 12;
 
     public string 배달권키 { get; set; } = string.Empty;
+
+    public decimal 적용반경Km { get; set; }
 
     public string 거리기준안내 { get; set; } = string.Empty;
 }

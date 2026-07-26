@@ -1,0 +1,256 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1180" viewBox="0 0 1440 1180">
+  <defs>
+    <style>
+      text { font-family: "Malgun Gothic", "Noto Sans KR", "Segoe UI", Arial, sans-serif; fill: #282532; }
+      .title { font-size: 28px; font-weight: 800; }
+      .sub { font-size: 13px; fill: #716d7b; }
+      .h2 { font-size: 18px; font-weight: 800; }
+      .h3 { font-size: 15px; font-weight: 800; }
+      .body { font-size: 13px; font-weight: 600; }
+      .small { font-size: 11px; fill: #716d7b; }
+      .tiny { font-size: 9.5px; fill: #827d8b; }
+      .chip { font-size: 10px; font-weight: 800; }
+      .mono { font-family: Consolas, "Courier New", monospace; }
+      .white { fill: #ffffff; }
+    </style>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="7" stdDeviation="13" flood-color="#3b3550" flood-opacity="0.11"/>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#aca7b5"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="1180" fill="#f3f2f7"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1440" height="92" fill="#ffffff"/>
+  <text x="42" y="42" class="title">음식 주문 ID · 역할 화면 상태 확인</text>
+  <text x="42" y="68" class="sub">한 주문의 상태 변경 뒤 주문자·음식점·기사·원장이 같은 주문번호를 다시 조회했을 때의 화면 변화를 봅니다.</text>
+  <rect x="1050" y="22" width="348" height="48" rx="14" fill="#282532"/>
+  <text x="1070" y="40" class="tiny white">정확한 주문번호</text>
+  <text x="1070" y="61" font-size="15" font-weight="800" class="mono white">FO-20260726-0184</text>
+  <circle cx="1372" cy="46" r="10" fill="#51b97b"/>
+  <path d="M1367 46l4 4 7-9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Reload principle -->
+  <rect x="42" y="112" width="1356" height="58" rx="16" fill="#ece8f8" stroke="#c8bee4"/>
+  <circle cx="70" cy="141" r="16" fill="#6b42a6"/>
+  <path d="M62 141a8 8 0 1 1 3 6M62 141v-6h6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="136" class="h3" fill="#51327e">상태 변경 성공 → 같은 주문번호 재조회</text>
+  <text x="96" y="155" class="small">각 앱이 별도 상태를 확정하지 않고 서버 주문·배차·원장 투영을 다시 읽어 화면을 갱신합니다.</text>
+  <rect x="1228" y="126" width="148" height="30" rx="15" fill="#ffffff"/>
+  <text x="1302" y="146" text-anchor="middle" class="chip" fill="#5d4288">ID 불일치 시 갱신 금지</text>
+
+  <!-- State selector -->
+  <text x="42" y="211" class="h2">상태 단계</text>
+  <text x="130" y="211" class="small">현재 선택: 음식점 수락</text>
+  <line x1="118" y1="252" x2="1314" y2="252" stroke="#c6c1cc" stroke-width="3"/>
+
+  <g>
+    <circle cx="118" cy="252" r="20" fill="#6b42a6"/>
+    <path d="M109 252l6 6 12-14" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="118" y="288" text-anchor="middle" class="body">1. 주문 등록</text>
+    <text x="118" y="306" text-anchor="middle" class="tiny">주문대기</text>
+
+    <circle cx="416" cy="252" r="25" fill="#d7623f" stroke="#ffffff" stroke-width="5"/>
+    <text x="416" y="258" text-anchor="middle" font-size="14" font-weight="900" class="white">2</text>
+    <text x="416" y="288" text-anchor="middle" class="body" fill="#b8472a">음식점 수락</text>
+    <text x="416" y="306" text-anchor="middle" class="tiny">조리중 · 배차대기</text>
+
+    <circle cx="714" cy="252" r="20" fill="#ffffff" stroke="#aaa4b2" stroke-width="3"/>
+    <text x="714" y="258" text-anchor="middle" class="chip">3</text>
+    <text x="714" y="288" text-anchor="middle" class="body">기사 수락</text>
+    <text x="714" y="306" text-anchor="middle" class="tiny">기사배정</text>
+
+    <circle cx="1012" cy="252" r="20" fill="#ffffff" stroke="#aaa4b2" stroke-width="3"/>
+    <text x="1012" y="258" text-anchor="middle" class="chip">4</text>
+    <text x="1012" y="288" text-anchor="middle" class="body">음식 픽업</text>
+    <text x="1012" y="306" text-anchor="middle" class="tiny">픽업완료</text>
+
+    <circle cx="1314" cy="252" r="20" fill="#ffffff" stroke="#aaa4b2" stroke-width="3"/>
+    <text x="1314" y="258" text-anchor="middle" class="chip">5</text>
+    <text x="1314" y="288" text-anchor="middle" class="body">고객 전달</text>
+    <text x="1314" y="306" text-anchor="middle" class="tiny">전달완료</text>
+  </g>
+
+  <!-- Event strip -->
+  <g filter="url(#shadow)">
+    <rect x="42" y="330" width="1356" height="80" rx="18" fill="#ffffff"/>
+  </g>
+  <rect x="42" y="330" width="10" height="80" rx="5" fill="#d7623f"/>
+  <text x="72" y="356" class="tiny">방금 처리된 Command / Event</text>
+  <text x="72" y="384" class="h3">음식점이 20분 예상으로 주문을 수락했습니다.</text>
+  <rect x="510" y="348" width="226" height="42" rx="12" fill="#fff0e9"/>
+  <text x="526" y="365" class="tiny">주문 상태</text>
+  <text x="526" y="383" class="body">주문대기 → 조리중</text>
+  <rect x="752" y="348" width="226" height="42" rx="12" fill="#eef5f4"/>
+  <text x="768" y="365" class="tiny">배차 상태</text>
+  <text x="768" y="383" class="body">미요청 → 배차대기</text>
+  <rect x="994" y="348" width="380" height="42" rx="12" fill="#f3f1f8"/>
+  <text x="1010" y="365" class="tiny">후속 투영</text>
+  <text x="1010" y="383" class="body">주문 원장 갱신 · 운송 배차대기 생성</text>
+
+  <!-- Role cards -->
+  <text x="42" y="450" class="h2">이 단계에서 각 화면은 이렇게 바뀝니다</text>
+
+  <!-- Orderer -->
+  <g filter="url(#shadow)">
+    <rect x="42" y="470" width="324" height="314" rx="20" fill="#ffffff"/>
+  </g>
+  <rect x="42" y="470" width="324" height="52" rx="20" fill="#6b42a6"/>
+  <path d="M42 502h324v20H42Z" fill="#6b42a6"/>
+  <circle cx="70" cy="496" r="13" fill="#ffffff" opacity="0.18"/>
+  <path d="M64 497h12M66 493h8M66 501h8" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+  <text x="92" y="501" class="h3 white">02 주문자 화면</text>
+  <rect x="294" y="485" width="54" height="22" rx="11" fill="#ffffff"/>
+  <text x="321" y="500" text-anchor="middle" class="chip" fill="#5a348e">갱신</text>
+  <text x="64" y="552" class="tiny">내 음식 주문 상세</text>
+  <text x="64" y="577" class="mono h3">FO-20260726-0184</text>
+  <rect x="64" y="594" width="80" height="26" rx="13" fill="#ebe5f6"/>
+  <text x="104" y="611" text-anchor="middle" class="chip" fill="#58378a">조리중</text>
+  <text x="158" y="611" class="small">배차대기</text>
+  <rect x="64" y="638" width="278" height="58" rx="12" fill="#f7f5fa"/>
+  <text x="80" y="658" class="tiny">음식점 처리</text>
+  <text x="80" y="681" class="body">14:52 조리 완료 예정</text>
+  <text x="64" y="723" class="body">화면 변화</text>
+  <text x="64" y="745" class="small">• 주문 접수 → 조리중 표시</text>
+  <text x="64" y="765" class="small">• 예상 완료시각·수락 메모 노출</text>
+
+  <!-- Restaurant -->
+  <g filter="url(#shadow)">
+    <rect x="386" y="470" width="324" height="314" rx="20" fill="#ffffff"/>
+  </g>
+  <rect x="386" y="470" width="324" height="52" rx="20" fill="#d7623f"/>
+  <path d="M386 502h324v20H386Z" fill="#d7623f"/>
+  <circle cx="414" cy="496" r="13" fill="#ffffff" opacity="0.18"/>
+  <path d="M406 498h16c-1 7-4 10-8 10s-7-3-8-10ZM409 494c3-5 7-5 10 0" fill="none" stroke="#fff" stroke-width="1.7"/>
+  <text x="436" y="501" class="h3 white">07 음식점 데스크</text>
+  <rect x="638" y="485" width="54" height="22" rx="11" fill="#ffffff"/>
+  <text x="665" y="500" text-anchor="middle" class="chip" fill="#b8472a">이동</text>
+  <text x="408" y="552" class="tiny">조리 중 주문</text>
+  <text x="408" y="577" class="mono h3">FO-20260726-0184</text>
+  <rect x="408" y="594" width="80" height="26" rx="13" fill="#fff0e9"/>
+  <text x="448" y="611" text-anchor="middle" class="chip" fill="#b8472a">수락됨</text>
+  <text x="502" y="611" class="small">전표 출력 준비</text>
+  <rect x="408" y="638" width="278" height="58" rx="12" fill="#fff8f4"/>
+  <text x="424" y="658" class="tiny">주방 작업</text>
+  <text x="424" y="681" class="body">20분 타이머 · 조리 시작</text>
+  <text x="408" y="723" class="body">화면 변화</text>
+  <text x="408" y="745" class="small">• 접수 대기열에서 조리 중으로 이동</text>
+  <text x="408" y="765" class="small">• 수락 성공 응답으로 전표 생성</text>
+
+  <!-- Driver -->
+  <g filter="url(#shadow)">
+    <rect x="730" y="470" width="324" height="314" rx="20" fill="#ffffff"/>
+  </g>
+  <rect x="730" y="470" width="324" height="52" rx="20" fill="#168c83"/>
+  <path d="M730 502h324v20H730Z" fill="#168c83"/>
+  <circle cx="758" cy="496" r="13" fill="#ffffff" opacity="0.18"/>
+  <path d="M751 500h14l-2-8h-10Z" fill="none" stroke="#fff" stroke-width="1.7"/>
+  <circle cx="754" cy="502" r="2" fill="#fff"/>
+  <circle cx="762" cy="502" r="2" fill="#fff"/>
+  <text x="780" y="501" class="h3 white">04 F드라이버 화면</text>
+  <rect x="982" y="485" width="54" height="22" rx="11" fill="#ffffff"/>
+  <text x="1009" y="500" text-anchor="middle" class="chip" fill="#14776f">대기</text>
+  <text x="752" y="552" class="tiny">음식 배달 후보</text>
+  <text x="752" y="577" class="mono h3">FO-20260726-0184</text>
+  <rect x="752" y="594" width="88" height="26" rx="13" fill="#e5f4f2"/>
+  <text x="796" y="611" text-anchor="middle" class="chip" fill="#14776f">배차대기</text>
+  <text x="854" y="611" class="small">아직 기사 미배정</text>
+  <rect x="752" y="638" width="278" height="58" rx="12" fill="#f1f8f7"/>
+  <text x="768" y="658" class="tiny">추천 판단 근거</text>
+  <text x="768" y="681" class="body">픽업 예정 14:52 · 음식점 위치</text>
+  <text x="752" y="723" class="body">화면 변화</text>
+  <text x="752" y="745" class="small">• 배차대기 생성 뒤 추천 후보가 됨</text>
+  <text x="752" y="765" class="small">• 기사 수락 전에는 확정 운송 아님</text>
+
+  <!-- Ledger -->
+  <g filter="url(#shadow)">
+    <rect x="1074" y="470" width="324" height="314" rx="20" fill="#ffffff"/>
+  </g>
+  <rect x="1074" y="470" width="324" height="52" rx="20" fill="#3f5f8f"/>
+  <path d="M1074 502h324v20H1074Z" fill="#3f5f8f"/>
+  <circle cx="1102" cy="496" r="13" fill="#ffffff" opacity="0.18"/>
+  <path d="M1096 489h12v15h-12zM1099 493h6M1099 497h6M1099 501h4" fill="none" stroke="#fff" stroke-width="1.5"/>
+  <text x="1124" y="501" class="h3 white">공동 원장·운송 투영</text>
+  <rect x="1326" y="485" width="54" height="22" rx="11" fill="#ffffff"/>
+  <text x="1353" y="500" text-anchor="middle" class="chip" fill="#39567f">동기</text>
+  <text x="1096" y="552" class="tiny">원천 참조번호</text>
+  <text x="1096" y="577" class="mono h3">FO-20260726-0184</text>
+  <rect x="1096" y="594" width="108" height="26" rx="13" fill="#e8edf5"/>
+  <text x="1150" y="611" text-anchor="middle" class="chip" fill="#39567f">주문 원장 갱신</text>
+  <text x="1218" y="611" class="small">운송 생성</text>
+  <rect x="1096" y="638" width="278" height="58" rx="12" fill="#f2f5f9"/>
+  <text x="1112" y="658" class="tiny">상태 이력</text>
+  <text x="1112" y="681" class="body">주문대기 → 조리중 · 음식점 수락</text>
+  <text x="1096" y="723" class="body">화면 변화</text>
+  <text x="1096" y="745" class="small">• 음식 주문 원장 현재단계 갱신</text>
+  <text x="1096" y="765" class="small">• 같은 ID로 운송 배차대기 연결</text>
+
+  <!-- State matrix -->
+  <text x="42" y="830" class="h2">상태별 화면 변화표</text>
+  <rect x="42" y="850" width="1356" height="272" rx="18" fill="#ffffff" stroke="#ddd9e2"/>
+
+  <rect x="42" y="850" width="1356" height="42" rx="18" fill="#282532"/>
+  <path d="M42 874h1356v18H42Z" fill="#282532"/>
+  <text x="62" y="877" class="chip white">상태 변경</text>
+  <text x="258" y="877" class="chip white">02 주문자</text>
+  <text x="538" y="877" class="chip white">07 음식점</text>
+  <text x="818" y="877" class="chip white">04 기사</text>
+  <text x="1098" y="877" class="chip white">원장·투영</text>
+
+  <line x1="222" y1="850" x2="222" y2="1122" stroke="#e1dde5"/>
+  <line x1="502" y1="850" x2="502" y2="1122" stroke="#e1dde5"/>
+  <line x1="782" y1="850" x2="782" y2="1122" stroke="#e1dde5"/>
+  <line x1="1062" y1="850" x2="1062" y2="1122" stroke="#e1dde5"/>
+
+  <!-- Row 1 -->
+  <rect x="42" y="892" width="1356" height="46" fill="#faf9fc"/>
+  <text x="62" y="911" class="chip" fill="#5b3a8c">등록 · 주문대기</text>
+  <text x="62" y="928" class="tiny">14:32</text>
+  <text x="242" y="920" class="small">접수 완료 · 상세 열림</text>
+  <text x="522" y="920" class="small">새 주문 알림 · 미확인</text>
+  <text x="802" y="920" class="small">표시 없음</text>
+  <text x="1082" y="920" class="small">주문 등록 이력 생성</text>
+
+  <!-- Row 2 selected -->
+  <rect x="42" y="938" width="1356" height="46" fill="#fff3ed"/>
+  <rect x="42" y="938" width="5" height="46" fill="#d7623f"/>
+  <text x="62" y="957" class="chip" fill="#b8472a">수락 · 조리중</text>
+  <text x="62" y="974" class="tiny">14:32</text>
+  <text x="242" y="966" class="small">조리중 · 예상 14:52</text>
+  <text x="522" y="966" class="small">조리 타이머 · 전표</text>
+  <text x="802" y="966" class="small">배차대기 후보</text>
+  <text x="1082" y="966" class="small">주문 갱신 · 운송 연결</text>
+
+  <!-- Row 3 -->
+  <rect x="42" y="984" width="1356" height="46" fill="#ffffff"/>
+  <text x="62" y="1003" class="chip" fill="#14776f">기사 수락 · 기사배정</text>
+  <text x="62" y="1020" class="tiny">예정</text>
+  <text x="242" y="1012" class="small">기사 배정 · 도착 정보</text>
+  <text x="522" y="1012" class="small">기사 정보 · 픽업 예상</text>
+  <text x="802" y="1012" class="small">현재 배달로 이동</text>
+  <text x="1082" y="1012" class="small">배차 확정 이력</text>
+
+  <!-- Row 4 -->
+  <rect x="42" y="1030" width="1356" height="46" fill="#faf9fc"/>
+  <text x="62" y="1049" class="chip" fill="#14776f">픽업 · 픽업완료</text>
+  <text x="62" y="1066" class="tiny">예정</text>
+  <text x="242" y="1058" class="small">배달중 · 도착 예상</text>
+  <text x="522" y="1058" class="small">픽업 완료 · 주문 보관</text>
+  <text x="802" y="1058" class="small">고객 이동 경로</text>
+  <text x="1082" y="1058" class="small">픽업 완료 이력</text>
+
+  <!-- Row 5 -->
+  <rect x="42" y="1076" width="1356" height="46" rx="0" fill="#ffffff"/>
+  <text x="62" y="1095" class="chip" fill="#3f5f8f">전달 · 전달완료</text>
+  <text x="62" y="1112" class="tiny">예정</text>
+  <text x="242" y="1104" class="small">완료 · 후기 선택</text>
+  <text x="522" y="1104" class="small">완료 주문으로 이동</text>
+  <text x="802" y="1104" class="small">업무 완료 · 정산 근거</text>
+  <text x="1082" y="1104" class="small">전달 완료 · 배달완료</text>
+
+  <circle cx="48" cy="1152" r="5" fill="#d7623f"/>
+  <text x="62" y="1156" class="small">현재 서버에서 명시적으로 확인된 상태 전이는 음식점 수락, 기사 배정, 픽업 완료, 전달 완료입니다. 각 화면은 같은 ID 재조회 결과를 표시합니다.</text>
+</svg>

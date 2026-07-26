@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Restaurants;
 using Microsoft.AspNetCore.Mvc;
 using Ssalddel.FoodApi.Services;
@@ -19,7 +20,7 @@ public sealed class 음식점Controller : ControllerBase
     public ActionResult<음식점목록응답> 가까운조회(
         [FromQuery] decimal? latitude,
         [FromQuery] decimal? longitude,
-        [FromQuery] decimal radiusKm = 7m,
+        [FromQuery] decimal radiusKm = RestaurantSearchPolicyDefaults.DefaultRadiusKm,
         [FromQuery] int limit = 20)
     {
         if (latitude.HasValue != longitude.HasValue)
@@ -35,7 +36,7 @@ public sealed class 음식점Controller : ControllerBase
         return Ok(_store.GetNearbyRestaurants(
             latitude,
             longitude,
-            Math.Clamp(radiusKm, 0.1m, 7m),
+            Math.Clamp(radiusKm, 0.1m, RestaurantSearchPolicyDefaults.DefaultRadiusKm),
             Math.Clamp(limit, 1, 50)));
     }
 

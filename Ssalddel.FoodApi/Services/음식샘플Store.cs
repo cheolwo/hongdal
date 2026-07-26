@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Admin.Restaurants;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.Participants;
 using Ssalddel.Contracts.Food;
 using Ssalddel.Contracts.Restaurants;
@@ -54,7 +55,7 @@ public sealed class 음식샘플Store
     public 음식점목록응답 GetNearbyRestaurants(
         decimal? latitude = null,
         decimal? longitude = null,
-        decimal radiusKm = 7m,
+        decimal radiusKm = RestaurantSearchPolicyDefaults.DefaultRadiusKm,
         int limit = 20)
     {
         if (!latitude.HasValue || !longitude.HasValue)
@@ -68,7 +69,10 @@ public sealed class 음식샘플Store
             };
         }
 
-        var appliedRadius = Math.Clamp(radiusKm, 0.1m, 7m);
+        var appliedRadius = Math.Clamp(
+            radiusKm,
+            0.1m,
+            RestaurantSearchPolicyDefaults.DefaultRadiusKm);
         var items = _restaurants
             .Select(restaurant => new
             {

@@ -1,10 +1,12 @@
+using Ssalddel.Contracts.Common.Orderer;
+
 namespace Ssalddel.Contracts.Restaurants;
 
 public sealed class 음식점가까운조회요청
 {
     public decimal 위도 { get; set; }
     public decimal 경도 { get; set; }
-    public decimal 반경Km { get; set; } = 5m;
+    public decimal 반경Km { get; set; } = RestaurantSearchPolicyDefaults.DefaultRadiusKm;
     public int 최대건수 { get; set; } = 20;
 }
 
