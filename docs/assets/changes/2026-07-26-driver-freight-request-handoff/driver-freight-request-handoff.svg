@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0F172A" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      text { font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif; fill: #18302F; }
+      .title { font-size: 24px; font-weight: 800; }
+      .subtitle { font-size: 12px; fill: #64748B; }
+      .screen-title { font-size: 22px; font-weight: 800; }
+      .section-title { font-size: 14px; font-weight: 800; }
+      .body { font-size: 12px; }
+      .small { font-size: 10px; fill: #64748B; }
+      .label { font-size: 10px; fill: #64748B; }
+      .value { font-size: 17px; font-weight: 800; }
+      .button { font-size: 12px; font-weight: 800; }
+      .nav { font-size: 9px; fill: #64748B; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="1040" fill="#EEF1F5"/>
+  <text x="54" y="48" class="title">04.16 · 일반 운송 기사 · 화주 의뢰에서 배차 확정까지</text>
+  <text x="54" y="73" class="subtitle">DriverApp · 추천은 후보 정보, 기사 본인의 수락과 서버 재검증 뒤에만 배차가 확정됩니다.</text>
+
+  <g transform="translate(54 118)" filter="url(#shadow)">
+    <rect width="390" height="844" rx="18" fill="#F4FAF8"/>
+    <rect width="390" height="58" rx="18" fill="#FFFFFF"/>
+    <rect y="40" width="390" height="18" fill="#FFFFFF"/>
+    <text x="18" y="36" font-size="22" font-weight="700" fill="#008F83">≡</text>
+    <text x="50" y="35" font-size="17" font-weight="800">살뜰 기사</text>
+    <text x="129" y="34" class="small">일반 운송</text>
+    <text x="316" y="34" font-size="10" fill="#008F83">알림 1</text>
+    <circle cx="362" cy="29" r="15" fill="#009688"/>
+    <text x="362" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#FFFFFF">D</text>
+
+    <text x="18" y="94" class="screen-title">새 운송 추천</text>
+    <rect x="291" y="73" width="81" height="28" rx="14" fill="#DDF5F1"/>
+    <text x="331" y="91" text-anchor="middle" font-size="11" font-weight="700" fill="#008F83">응답 04:28</text>
+    <text x="18" y="116" class="subtitle">화주가 등록한 조건과 기사님의 현재 위치를 비교했습니다.</text>
+
+    <rect x="18" y="136" width="354" height="84" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="160" class="label">추천 의뢰</text>
+    <text x="32" y="183" font-size="16" font-weight="800">식자재 8박스 · 420kg</text>
+    <rect x="273" y="151" width="80" height="24" rx="12" fill="#E7F7F3"/>
+    <text x="313" y="167" text-anchor="middle" font-size="10" font-weight="700" fill="#008F83">차량 적합 92%</text>
+    <text x="32" y="205" class="small">일반 화물 · 1톤 카고 · 파손 주의</text>
+
+    <rect x="18" y="232" width="354" height="232" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="258" class="section-title">운송 경로</text>
+    <circle cx="48" cy="294" r="13" fill="#009688"/>
+    <text x="48" y="298" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">상</text>
+    <text x="74" y="286" class="label">상차 · 09:30~10:00</text>
+    <text x="74" y="307" class="body" font-weight="700">성남시 분당구 물류센터 인근</text>
+    <text x="74" y="324" class="small">현재 위치에서 3.2km</text>
+    <line x1="48" y1="309" x2="48" y2="367" stroke="#99D9D0" stroke-width="3" stroke-dasharray="4 4"/>
+    <circle cx="48" cy="382" r="13" fill="#BDEDE5"/>
+    <text x="48" y="386" text-anchor="middle" font-size="10" font-weight="800" fill="#00796F">하</text>
+    <text x="74" y="374" class="label">하차 · 11:00 이전</text>
+    <text x="74" y="395" class="body" font-weight="700">서울시 송파구 매장 인근</text>
+    <text x="74" y="412" class="small">운송 18.4km · 예상 42분</text>
+    <rect x="32" y="428" width="326" height="24" rx="6" fill="#F0F7F6"/>
+    <text x="44" y="444" class="small">상세주소·담당자 연락처는 배차 확정 뒤 필요한 단계에 표시</text>
+
+    <rect x="18" y="476" width="112" height="72" rx="9" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="30" y="498" class="label">예상 지급</text>
+    <text x="30" y="524" class="value">₩48,000</text>
+    <rect x="139" y="476" width="112" height="72" rx="9" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="151" y="498" class="label">예상 비용</text>
+    <text x="151" y="524" class="value">₩9,600</text>
+    <rect x="260" y="476" width="112" height="72" rx="9" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="272" y="498" class="label">예상 수익</text>
+    <text x="272" y="524" class="value" fill="#00796F">₩38,400</text>
+
+    <rect x="18" y="560" width="354" height="77" rx="9" fill="#FFF4D6"/>
+    <text x="32" y="584" font-size="12" font-weight="800" fill="#8A5A00">추천은 배차 확정이 아닙니다</text>
+    <text x="32" y="605" class="small">결제 완료·응답 기한·다른 기사 선점 여부를 수락 시 다시 확인합니다.</text>
+    <text x="32" y="621" class="small">원하지 않으면 거절하거나 추천을 지나갈 수 있습니다.</text>
+
+    <rect x="18" y="655" width="112" height="46" rx="8" fill="#FFFFFF" stroke="#BFCFCD"/>
+    <text x="74" y="683" text-anchor="middle" class="button" fill="#475569">거절</text>
+    <rect x="139" y="655" width="233" height="46" rx="8" fill="#009688"/>
+    <text x="255" y="683" text-anchor="middle" class="button" fill="#FFFFFF">상세 조건 확인</text>
+
+    <rect y="776" width="390" height="68" rx="18" fill="#FFFFFF" stroke="#D9E5E3"/>
+    <rect y="776" width="390" height="16" fill="#FFFFFF"/>
+    <text x="49" y="810" text-anchor="middle" font-size="16" fill="#64748B">⌂</text>
+    <text x="49" y="828" text-anchor="middle" class="nav">홈</text>
+    <text x="147" y="810" text-anchor="middle" font-size="16" fill="#009688">◇</text>
+    <text x="147" y="828" text-anchor="middle" class="nav" fill="#009688">추천</text>
+    <text x="244" y="810" text-anchor="middle" font-size="16" fill="#64748B">▣</text>
+    <text x="244" y="828" text-anchor="middle" class="nav">운송</text>
+    <text x="341" y="810" text-anchor="middle" font-size="16" fill="#64748B">₩</text>
+    <text x="341" y="828" text-anchor="middle" class="nav">정산</text>
+  </g>
+
+  <path d="M460 519 H482" stroke="#75BDB5" stroke-width="3"/>
+  <path d="M476 512 L486 519 L476 526" fill="none" stroke="#75BDB5" stroke-width="3"/>
+
+  <g transform="translate(516 118)" filter="url(#shadow)">
+    <rect width="390" height="844" rx="18" fill="#F4FAF8"/>
+    <rect width="390" height="58" rx="18" fill="#FFFFFF"/>
+    <rect y="40" width="390" height="18" fill="#FFFFFF"/>
+    <text x="18" y="36" font-size="22" font-weight="700" fill="#008F83">‹</text>
+    <text x="50" y="35" font-size="17" font-weight="800">추천 상세</text>
+    <rect x="292" y="15" width="80" height="28" rx="14" fill="#DDF5F1"/>
+    <text x="332" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="#008F83">응답 03:51</text>
+
+    <text x="18" y="94" class="screen-title">조건을 보고 판단해요</text>
+    <text x="18" y="116" class="subtitle">거리·비용·시간·증빙 조건을 확인한 뒤 직접 수락합니다.</text>
+
+    <rect x="18" y="136" width="354" height="116" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="160" class="label">의뢰 TR-20260726-0142</text>
+    <text x="32" y="184" font-size="16" font-weight="800">식자재 8박스 · 420kg</text>
+    <text x="32" y="206" class="body">1톤 카고 · 일반 화물 · 파손 주의</text>
+    <rect x="32" y="219" width="88" height="22" rx="11" fill="#E7F7F3"/>
+    <text x="76" y="234" text-anchor="middle" font-size="10" font-weight="700" fill="#008F83">차량 조건 적합</text>
+    <rect x="128" y="219" width="72" height="22" rx="11" fill="#FFF0CA"/>
+    <text x="164" y="234" text-anchor="middle" font-size="10" font-weight="700" fill="#8A5A00">인수증 필요</text>
+
+    <rect x="18" y="264" width="354" height="170" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="289" class="section-title">경로와 시간</text>
+    <circle cx="45" cy="322" r="10" fill="#009688"/>
+    <text x="64" y="319" class="label">상차 · 09:30~10:00</text>
+    <text x="64" y="339" class="body" font-weight="700">성남시 분당구 물류센터 인근</text>
+    <line x1="45" y1="334" x2="45" y2="379" stroke="#99D9D0" stroke-width="3"/>
+    <circle cx="45" cy="391" r="10" fill="#BDEDE5"/>
+    <text x="64" y="388" class="label">하차 · 11:00 이전</text>
+    <text x="64" y="408" class="body" font-weight="700">서울시 송파구 매장 인근</text>
+    <text x="266" y="332" class="small">상차지 3.2km</text>
+    <text x="266" y="351" class="small">운송 18.4km</text>
+    <text x="266" y="370" class="small">예상 42분</text>
+
+    <rect x="18" y="446" width="354" height="118" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="472" class="section-title">지급·비용 근거</text>
+    <text x="32" y="497" class="body">기사지급 예정 운임</text>
+    <text x="342" y="497" text-anchor="end" class="body" font-weight="800">₩48,000</text>
+    <text x="32" y="520" class="body">예상 연료·톨 비용</text>
+    <text x="342" y="520" text-anchor="end" class="body">- ₩9,600</text>
+    <line x1="32" y1="534" x2="342" y2="534" stroke="#D7E4E2"/>
+    <text x="32" y="553" class="body" font-weight="800">예상 수익</text>
+    <text x="342" y="553" text-anchor="end" class="body" font-weight="800" fill="#00796F">₩38,400</text>
+
+    <rect x="18" y="576" width="354" height="92" rx="9" fill="#E4F6F2"/>
+    <text x="32" y="600" font-size="12" font-weight="800" fill="#00796F">수락하면 이렇게 바뀝니다</text>
+    <text x="32" y="622" class="small">의뢰 ID를 그대로 사용해 배차확정 상태를 다시 조회합니다.</text>
+    <text x="32" y="641" class="small">확정되면 현재 운송이 열리고 상차지 도착·증빙 행동이 활성화됩니다.</text>
+    <text x="32" y="657" class="small">다른 기사가 먼저 수락했으면 확정되지 않고 안내됩니다.</text>
+
+    <rect x="18" y="686" width="112" height="46" rx="8" fill="#FFFFFF" stroke="#BFCFCD"/>
+    <text x="74" y="714" text-anchor="middle" class="button" fill="#475569">거절</text>
+    <rect x="139" y="686" width="233" height="46" rx="8" fill="#009688"/>
+    <text x="255" y="714" text-anchor="middle" class="button" fill="#FFFFFF">이 조건으로 수락</text>
+
+    <rect y="776" width="390" height="68" rx="18" fill="#FFFFFF" stroke="#D9E5E3"/>
+    <rect y="776" width="390" height="16" fill="#FFFFFF"/>
+    <text x="49" y="810" text-anchor="middle" font-size="16" fill="#64748B">⌂</text>
+    <text x="49" y="828" text-anchor="middle" class="nav">홈</text>
+    <text x="147" y="810" text-anchor="middle" font-size="16" fill="#009688">◇</text>
+    <text x="147" y="828" text-anchor="middle" class="nav" fill="#009688">추천</text>
+    <text x="244" y="810" text-anchor="middle" font-size="16" fill="#64748B">▣</text>
+    <text x="244" y="828" text-anchor="middle" class="nav">운송</text>
+    <text x="341" y="810" text-anchor="middle" font-size="16" fill="#64748B">₩</text>
+    <text x="341" y="828" text-anchor="middle" class="nav">정산</text>
+  </g>
+
+  <path d="M922 519 H944" stroke="#75BDB5" stroke-width="3"/>
+  <path d="M938 512 L948 519 L938 526" fill="none" stroke="#75BDB5" stroke-width="3"/>
+
+  <g transform="translate(978 118)" filter="url(#shadow)">
+    <rect width="390" height="844" rx="18" fill="#F4FAF8"/>
+    <rect width="390" height="58" rx="18" fill="#FFFFFF"/>
+    <rect y="40" width="390" height="18" fill="#FFFFFF"/>
+    <text x="18" y="36" font-size="22" font-weight="700" fill="#008F83">≡</text>
+    <text x="50" y="35" font-size="17" font-weight="800">살뜰 기사</text>
+    <text x="129" y="34" class="small">일반 운송</text>
+    <text x="316" y="34" font-size="10" fill="#008F83">알림</text>
+    <circle cx="362" cy="29" r="15" fill="#009688"/>
+    <text x="362" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#FFFFFF">D</text>
+
+    <text x="18" y="94" class="screen-title">현재 운송</text>
+    <rect x="298" y="73" width="74" height="28" rx="14" fill="#CDEFE7"/>
+    <text x="335" y="91" text-anchor="middle" font-size="11" font-weight="800" fill="#00796F">배차확정</text>
+    <text x="18" y="116" class="subtitle">같은 의뢰 ID를 기준으로 화주와 기사 화면이 함께 갱신됩니다.</text>
+
+    <rect x="18" y="136" width="354" height="96" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="159" class="label">운송번호 · TR-20260726-0142</text>
+    <text x="32" y="183" font-size="16" font-weight="800">식자재 8박스 · 420kg</text>
+    <text x="32" y="205" class="body">다음 행동 · 상차지로 이동</text>
+    <rect x="279" y="174" width="74" height="28" rx="14" fill="#E7F7F3"/>
+    <text x="316" y="192" text-anchor="middle" font-size="10" font-weight="700" fill="#008F83">새로고침 완료</text>
+
+    <rect x="18" y="244" width="354" height="148" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="269" class="section-title">운송 상태</text>
+    <line x1="55" y1="314" x2="335" y2="314" stroke="#CFE1DE" stroke-width="4"/>
+    <line x1="55" y1="314" x2="111" y2="314" stroke="#009688" stroke-width="4"/>
+    <circle cx="55" cy="314" r="12" fill="#009688"/>
+    <text x="55" y="318" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">✓</text>
+    <circle cx="111" cy="314" r="12" fill="#009688"/>
+    <text x="111" y="318" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">2</text>
+    <circle cx="167" cy="314" r="10" fill="#FFFFFF" stroke="#A9C8C4" stroke-width="2"/>
+    <circle cx="223" cy="314" r="10" fill="#FFFFFF" stroke="#A9C8C4" stroke-width="2"/>
+    <circle cx="279" cy="314" r="10" fill="#FFFFFF" stroke="#A9C8C4" stroke-width="2"/>
+    <circle cx="335" cy="314" r="10" fill="#FFFFFF" stroke="#A9C8C4" stroke-width="2"/>
+    <text x="55" y="344" text-anchor="middle" class="small">확정</text>
+    <text x="111" y="344" text-anchor="middle" class="small" fill="#00796F">이동</text>
+    <text x="167" y="344" text-anchor="middle" class="small">상차도착</text>
+    <text x="223" y="344" text-anchor="middle" class="small">상차완료</text>
+    <text x="279" y="344" text-anchor="middle" class="small">하차도착</text>
+    <text x="335" y="344" text-anchor="middle" class="small">인수완료</text>
+    <text x="32" y="373" class="small">상태 변경 뒤 서버 원장을 다시 조회해 화주 화면에도 같은 상태를 표시합니다.</text>
+
+    <rect x="18" y="404" width="354" height="180" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="429" class="section-title">상차 안내</text>
+    <text x="32" y="455" class="label">상차지</text>
+    <text x="32" y="476" class="body" font-weight="700">성남시 분당구 물류센터</text>
+    <text x="32" y="495" class="small">배차 확정 후 업무에 필요한 상세주소를 확인할 수 있습니다.</text>
+    <text x="32" y="525" class="label">시간창 · 담당자</text>
+    <text x="32" y="546" class="body">09:30~10:00 · 물류센터 출고 담당</text>
+    <rect x="274" y="515" width="80" height="30" rx="15" fill="#E7F7F3"/>
+    <text x="314" y="534" text-anchor="middle" font-size="10" font-weight="700" fill="#008F83">연락하기</text>
+    <text x="32" y="571" class="small">인수증 필요 · 상차 사진 및 서명 조건 확인</text>
+
+    <rect x="18" y="596" width="354" height="71" rx="9" fill="#FFF4D6"/>
+    <text x="32" y="620" font-size="12" font-weight="800" fill="#8A5A00">현장 문제가 생겼나요?</text>
+    <text x="32" y="641" class="small">상차·하차 단계, 사유, 증빙과 관리자 확인 요청을 남길 수 있습니다.</text>
+    <text x="32" y="657" class="small">문제 신고는 운송 완료 처리와 분리됩니다.</text>
+
+    <rect x="18" y="685" width="112" height="46" rx="8" fill="#FFFFFF" stroke="#BFCFCD"/>
+    <text x="74" y="713" text-anchor="middle" class="button" fill="#475569">문제 신고</text>
+    <rect x="139" y="685" width="233" height="46" rx="8" fill="#009688"/>
+    <text x="255" y="713" text-anchor="middle" class="button" fill="#FFFFFF">상차지 도착 기록</text>
+
+    <rect y="776" width="390" height="68" rx="18" fill="#FFFFFF" stroke="#D9E5E3"/>
+    <rect y="776" width="390" height="16" fill="#FFFFFF"/>
+    <text x="49" y="810" text-anchor="middle" font-size="16" fill="#64748B">⌂</text>
+    <text x="49" y="828" text-anchor="middle" class="nav">홈</text>
+    <text x="147" y="810" text-anchor="middle" font-size="16" fill="#64748B">◇</text>
+    <text x="147" y="828" text-anchor="middle" class="nav">추천</text>
+    <text x="244" y="810" text-anchor="middle" font-size="16" fill="#009688">▣</text>
+    <text x="244" y="828" text-anchor="middle" class="nav" fill="#009688">운송</text>
+    <text x="341" y="810" text-anchor="middle" font-size="16" fill="#64748B">₩</text>
+    <text x="341" y="828" text-anchor="middle" class="nav">정산</text>
+  </g>
+
+  <rect x="54" y="986" width="1314" height="32" rx="8" fill="#DDE8E6"/>
+  <text x="710" y="1007" text-anchor="middle" font-size="11" fill="#486663">화주 등록 → 기사 추천 후보 → 기사 수락·서버 재검증 → 배차확정 → 현재 운송 재조회 → 상차·하차 증빙</text>
+</svg>

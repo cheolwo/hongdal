@@ -7,7 +7,7 @@ namespace Ssalddel.Tests.Services.Dispatch.Recommendation;
 public sealed class 공동구매운송추천표시연결Tests
 {
     [Fact]
-    public void 공동구매_세대배송_국내운송초안은_기사추천에_공동주문과_세대배송범위를_표시한다()
+    public void 공동구매_세대배송_국내운송초안은_기사추천에_같이주문과_세대배송범위를_표시한다()
     {
         var plan = 공동구매플랫폼국내운송계획기.계획(
             CreateFulfillment계획(),
@@ -44,7 +44,7 @@ public sealed class 공동구매운송추천표시연결Tests
         Assert.True(plan.ReadyForDispatchQueue);
         Assert.Equal(공동구매국내운송원천의뢰유형코드.ImportCargoTransport, plan.DispatchQueueDraft.SourceRequestType);
         Assert.Equal("GroupPurchaseCargoTransport", recommendation.운송의뢰유형코드);
-        Assert.Equal("공동주문 운송", recommendation.운송의뢰유형표시);
+        Assert.Equal("같이 주문 운송", recommendation.운송의뢰유형표시);
         Assert.True(recommendation.공동주문운송여부);
         Assert.True(recommendation.세대배송포함여부);
         Assert.Equal(33, recommendation.세대배송건수);
@@ -52,7 +52,7 @@ public sealed class 공동구매운송추천표시연결Tests
     }
 
     [Fact]
-    public void 공동구매_3PL입고_국내운송초안은_공동주문이지만_세대배송은_표시하지_않는다()
+    public void 공동구매_3PL입고_국내운송초안은_같이주문이지만_세대배송은_표시하지_않는다()
     {
         var plan = 공동구매플랫폼국내운송계획기.계획(
             CreateFulfillment계획(),

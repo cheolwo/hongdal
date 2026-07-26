@@ -199,6 +199,7 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
                 대기료 = request.대기료 ?? 0m,
                 수작업비 = request.수작업비 ?? 0m,
                 최종운임 = entity.최종운임 ?? 0m,
+                기사지급예정운임 = request.기사지급예정운임,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -219,7 +220,8 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
            || request.거리운임.HasValue
            || request.최소운임.HasValue
            || request.Km당단가.HasValue
-           || request.예상거리Km.HasValue;
+           || request.예상거리Km.HasValue
+           || request.기사지급예정운임.HasValue;
 
     private static string GetSettlementStatus(정산시점 settlementTime, 증빙방식? evidenceMethod)
     {

@@ -8,7 +8,7 @@ public static class DispatchRecommendationRequestTypeClassifier
     private const string GeneralCargoTransportCode = "GeneralCargoTransport";
     private const string GroupPurchaseCargoTransportCode = "GroupPurchaseCargoTransport";
     private const string GeneralCargoTransportLabel = "일반 화물";
-    private const string GroupPurchaseCargoTransportLabel = "공동주문 운송";
+    private const string GroupPurchaseCargoTransportLabel = "같이 주문 운송";
     private const string GeneralWorkScopeLabel = "상하차";
     private const string GroupPurchaseWorkScopeLabel = "상하차 + 세대배송 범위 확인";
 

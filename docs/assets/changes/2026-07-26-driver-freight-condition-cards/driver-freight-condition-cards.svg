@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1040" viewBox="0 0 1040 1040">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0F172A" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      text { font-family: "Helvetica Neue", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif; fill: #18302F; }
+      .title { font-size: 24px; font-weight: 800; }
+      .subtitle { font-size: 12px; fill: #64748B; }
+      .screen-title { font-size: 22px; font-weight: 800; }
+      .section-title { font-size: 14px; font-weight: 800; }
+      .body { font-size: 12px; }
+      .small { font-size: 10px; fill: #64748B; }
+      .label { font-size: 10px; fill: #64748B; }
+      .value { font-size: 15px; font-weight: 800; }
+      .button { font-size: 11px; font-weight: 800; }
+      .nav { font-size: 9px; fill: #64748B; }
+    </style>
+  </defs>
+
+  <rect width="1040" height="1040" fill="#EEF1F5"/>
+  <text x="54" y="48" class="title">04.17 · 일반 운송 기사 · 상차/하차 조건 카드 목록</text>
+  <text x="54" y="73" class="subtitle">추천 의뢰마다 왼쪽은 상차 조건, 오른쪽은 하차 조건으로 고정해 독차·혼적·당상·당착을 빠르게 비교합니다.</text>
+
+  <g transform="translate(54 118)" filter="url(#shadow)">
+    <rect width="390" height="844" rx="18" fill="#F4FAF8"/>
+    <rect width="390" height="58" rx="18" fill="#FFFFFF"/>
+    <rect y="40" width="390" height="18" fill="#FFFFFF"/>
+    <text x="18" y="36" font-size="22" font-weight="700" fill="#008F83">≡</text>
+    <text x="50" y="35" font-size="17" font-weight="800">살뜰 기사</text>
+    <text x="129" y="34" class="small">일반 운송</text>
+    <text x="316" y="34" font-size="10" fill="#008F83">알림 3</text>
+    <circle cx="362" cy="29" r="15" fill="#009688"/>
+    <text x="362" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#FFFFFF">D</text>
+
+    <text x="18" y="94" class="screen-title">운송 추천</text>
+    <rect x="310" y="73" width="62" height="28" rx="14" fill="#DDF5F1"/>
+    <text x="341" y="91" text-anchor="middle" font-size="11" font-weight="700" fill="#008F83">추천 5건</text>
+    <text x="18" y="116" class="subtitle">상차지까지 가까운 순 · 18:42 위치 갱신</text>
+
+    <rect x="18" y="132" width="53" height="28" rx="14" fill="#009688"/>
+    <text x="44" y="150" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">전체</text>
+    <rect x="78" y="132" width="53" height="28" rx="14" fill="#FFFFFF" stroke="#BFD5D2"/>
+    <text x="104" y="150" text-anchor="middle" font-size="10" font-weight="700">혼적</text>
+    <rect x="138" y="132" width="53" height="28" rx="14" fill="#FFFFFF" stroke="#BFD5D2"/>
+    <text x="164" y="150" text-anchor="middle" font-size="10" font-weight="700">독차</text>
+    <rect x="198" y="132" width="76" height="28" rx="14" fill="#FFFFFF" stroke="#BFD5D2"/>
+    <text x="236" y="150" text-anchor="middle" font-size="10" font-weight="700">당상·당착</text>
+    <rect x="281" y="132" width="91" height="28" rx="14" fill="#FFFFFF" stroke="#BFD5D2"/>
+    <text x="326" y="150" text-anchor="middle" font-size="10" font-weight="700">가까운 순⌄</text>
+
+    <rect x="18" y="174" width="354" height="328" rx="11" fill="#FFFFFF" stroke="#BFD8D4"/>
+    <rect x="18" y="174" width="354" height="7" rx="3" fill="#009688"/>
+    <text x="32" y="207" font-size="15" font-weight="800">냉장식품 · 12박스</text>
+    <text x="340" y="197" text-anchor="end" class="label">예상 수익</text>
+    <text x="340" y="219" text-anchor="end" font-size="16" font-weight="800" fill="#D75B39">₩78,400</text>
+
+    <rect x="32" y="228" width="45" height="23" rx="11" fill="#DDF5F1"/>
+    <text x="54" y="243" text-anchor="middle" font-size="10" font-weight="800" fill="#00796F">혼적</text>
+    <rect x="83" y="228" width="73" height="23" rx="11" fill="#FFF0CA"/>
+    <text x="119" y="243" text-anchor="middle" font-size="10" font-weight="800" fill="#8A5A00">당상·당착</text>
+    <rect x="162" y="228" width="70" height="23" rx="11" fill="#F1F5F9"/>
+    <text x="197" y="243" text-anchor="middle" font-size="10" font-weight="700">1톤 냉동탑</text>
+    <rect x="278" y="228" width="62" height="23" rx="11" fill="#E7F7F3"/>
+    <text x="309" y="243" text-anchor="middle" font-size="10" font-weight="800" fill="#008F83">적합 92%</text>
+
+    <rect x="32" y="263" width="151" height="168" rx="9" fill="#F8FCFB" stroke="#CFE1DE"/>
+    <rect x="32" y="263" width="151" height="31" rx="9" fill="#E2F5F1"/>
+    <rect x="32" y="285" width="151" height="9" fill="#E2F5F1"/>
+    <circle cx="50" cy="279" r="10" fill="#009688"/>
+    <text x="50" y="283" text-anchor="middle" font-size="9" font-weight="800" fill="#FFFFFF">상</text>
+    <text x="67" y="283" font-size="11" font-weight="800" fill="#00796F">상차 조건</text>
+    <text x="44" y="317" class="label">상차지 · 현재 2.8km</text>
+    <text x="44" y="338" class="body" font-weight="700">서울 양천구 목동</text>
+    <text x="44" y="365" class="label">상차시간</text>
+    <text x="44" y="385" class="body" font-weight="700">오늘 19:30 · 당상</text>
+    <text x="44" y="412" class="label">상차방식</text>
+    <text x="44" y="429" class="small">도크 · 지게차 지원</text>
+
+    <rect x="189" y="263" width="151" height="168" rx="9" fill="#F8FCFB" stroke="#CFE1DE"/>
+    <rect x="189" y="263" width="151" height="31" rx="9" fill="#E8F6F3"/>
+    <rect x="189" y="285" width="151" height="9" fill="#E8F6F3"/>
+    <circle cx="207" cy="279" r="10" fill="#61C8B9"/>
+    <text x="207" y="283" text-anchor="middle" font-size="9" font-weight="800" fill="#FFFFFF">하</text>
+    <text x="224" y="283" font-size="11" font-weight="800" fill="#278D82">하차 조건</text>
+    <text x="201" y="317" class="label">하차지 · 운송 34km</text>
+    <text x="201" y="338" class="body" font-weight="700">경기 수원시 영통구</text>
+    <text x="201" y="365" class="label">하차시간</text>
+    <text x="201" y="385" class="body" font-weight="700">오늘 21:00 · 당착</text>
+    <text x="201" y="412" class="label">하차·인수</text>
+    <text x="201" y="429" class="small">수작업 없음 · 인수증 필요</text>
+
+    <rect x="32" y="442" width="308" height="27" rx="6" fill="#F1F6F5"/>
+    <text x="44" y="459" class="small">하차 후 계좌 · 응답 03:42 · 예상 지급 ₩88,000 / 비용 ₩9,600</text>
+    <rect x="32" y="475" width="91" height="19" rx="9" fill="#EEF3F2"/>
+    <text x="77" y="488" text-anchor="middle" font-size="9" fill="#56706D">상세 조건</text>
+    <rect x="248" y="470" width="92" height="25" rx="6" fill="#009688"/>
+    <text x="294" y="487" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">수락/거절</text>
+
+    <rect x="18" y="514" width="354" height="218" rx="11" fill="#FFFFFF" stroke="#BFD8D4"/>
+    <text x="32" y="542" font-size="14" font-weight="800">전자제품 · 4팔레트</text>
+    <text x="340" y="538" text-anchor="end" font-size="14" font-weight="800" fill="#D75B39">₩112,000</text>
+    <rect x="32" y="552" width="45" height="22" rx="11" fill="#DCE9F6"/>
+    <text x="54" y="567" text-anchor="middle" font-size="10" font-weight="800" fill="#315C87">독차</text>
+    <rect x="83" y="552" width="45" height="22" rx="11" fill="#FFF0CA"/>
+    <text x="105" y="567" text-anchor="middle" font-size="10" font-weight="800" fill="#8A5A00">당상</text>
+    <rect x="134" y="552" width="45" height="22" rx="11" fill="#F5ECDC"/>
+    <text x="156" y="567" text-anchor="middle" font-size="10" font-weight="800" fill="#7C5A21">익착</text>
+    <rect x="185" y="552" width="64" height="22" rx="11" fill="#F1F5F9"/>
+    <text x="217" y="567" text-anchor="middle" font-size="10">2.5톤 윙</text>
+
+    <rect x="32" y="585" width="151" height="107" rx="8" fill="#F8FCFB" stroke="#CFE1DE"/>
+    <text x="44" y="607" font-size="10" font-weight="800" fill="#00796F">상차 조건</text>
+    <text x="44" y="629" class="body" font-weight="700">서울 마포구 성산동</text>
+    <text x="44" y="648" class="small">오늘 20:30 · 당상</text>
+    <text x="44" y="668" class="small">상차 5.1km · 지게차</text>
+    <text x="44" y="686" class="small">독차 필수 · 혼적 불가</text>
+    <rect x="189" y="585" width="151" height="107" rx="8" fill="#F8FCFB" stroke="#CFE1DE"/>
+    <text x="201" y="607" font-size="10" font-weight="800" fill="#278D82">하차 조건</text>
+    <text x="201" y="629" class="body" font-weight="700">경기 고양시 덕양구</text>
+    <text x="201" y="648" class="small">내일 08:00 · 익착</text>
+    <text x="201" y="668" class="small">운송 28km · 리프트 필요</text>
+    <text x="201" y="686" class="small">인수자 서명 필수</text>
+    <text x="32" y="717" class="small">응답 05:18 · 예상 지급 ₩132,000 / 예상 비용 ₩20,000</text>
+
+    <rect y="776" width="390" height="68" rx="18" fill="#FFFFFF" stroke="#D9E5E3"/>
+    <rect y="776" width="390" height="16" fill="#FFFFFF"/>
+    <text x="49" y="810" text-anchor="middle" font-size="16" fill="#64748B">⌂</text>
+    <text x="49" y="828" text-anchor="middle" class="nav">홈</text>
+    <text x="147" y="810" text-anchor="middle" font-size="16" fill="#009688">◇</text>
+    <text x="147" y="828" text-anchor="middle" class="nav" fill="#009688">추천</text>
+    <text x="244" y="810" text-anchor="middle" font-size="16" fill="#64748B">▣</text>
+    <text x="244" y="828" text-anchor="middle" class="nav">운송</text>
+    <text x="341" y="810" text-anchor="middle" font-size="16" fill="#64748B">₩</text>
+    <text x="341" y="828" text-anchor="middle" class="nav">정산</text>
+  </g>
+
+  <g transform="translate(516 118)" filter="url(#shadow)">
+    <rect width="390" height="844" rx="18" fill="#F4FAF8"/>
+    <rect width="390" height="58" rx="18" fill="#FFFFFF"/>
+    <rect y="40" width="390" height="18" fill="#FFFFFF"/>
+    <text x="18" y="36" font-size="22" font-weight="700" fill="#008F83">‹</text>
+    <text x="50" y="35" font-size="17" font-weight="800">추천 카드 상세</text>
+    <rect x="306" y="15" width="66" height="28" rx="14" fill="#DDF5F1"/>
+    <text x="339" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="#008F83">표준 보기</text>
+
+    <text x="18" y="94" class="screen-title">상하차 조건 한눈에</text>
+    <text x="18" y="116" class="subtitle">카드 위치는 고정하고 의뢰마다 값만 바꿔 빠르게 비교합니다.</text>
+
+    <rect x="18" y="136" width="354" height="72" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="159" class="label">운송 조건</text>
+    <rect x="32" y="171" width="53" height="25" rx="12" fill="#DDF5F1"/>
+    <text x="58" y="187" text-anchor="middle" font-size="10" font-weight="800" fill="#00796F">혼적</text>
+    <rect x="91" y="171" width="76" height="25" rx="12" fill="#FFF0CA"/>
+    <text x="129" y="187" text-anchor="middle" font-size="10" font-weight="800" fill="#8A5A00">당상·당착</text>
+    <rect x="173" y="171" width="76" height="25" rx="12" fill="#F1F5F9"/>
+    <text x="211" y="187" text-anchor="middle" font-size="10">1톤 냉동탑</text>
+    <rect x="255" y="171" width="101" height="25" rx="12" fill="#E7F7F3"/>
+    <text x="305" y="187" text-anchor="middle" font-size="10" font-weight="800" fill="#008F83">차량 조건 적합</text>
+
+    <rect x="18" y="220" width="169" height="275" rx="10" fill="#FFFFFF" stroke="#BFD8D4"/>
+    <rect x="18" y="220" width="169" height="43" rx="10" fill="#DDF5F1"/>
+    <rect x="18" y="253" width="169" height="10" fill="#DDF5F1"/>
+    <circle cx="43" cy="241" r="12" fill="#009688"/>
+    <text x="43" y="245" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">상</text>
+    <text x="65" y="245" font-size="13" font-weight="800" fill="#00796F">상차 조건</text>
+    <text x="32" y="290" class="label">지역</text>
+    <text x="32" y="312" class="body" font-weight="700">서울 양천구 목동</text>
+    <text x="32" y="340" class="label">기사 위치에서</text>
+    <text x="32" y="362" class="body" font-weight="700">2.8km · 약 9분</text>
+    <text x="32" y="390" class="label">상차 시간</text>
+    <text x="32" y="412" class="body" font-weight="700">오늘 19:30</text>
+    <rect x="32" y="421" width="50" height="21" rx="10" fill="#FFF0CA"/>
+    <text x="57" y="435" text-anchor="middle" font-size="9" font-weight="800" fill="#8A5A00">당상</text>
+    <text x="32" y="469" class="small">도크 · 지게차 지원</text>
+    <text x="32" y="486" class="small">냉장 유지 · 대기 20분 포함</text>
+
+    <rect x="203" y="220" width="169" height="275" rx="10" fill="#FFFFFF" stroke="#BFD8D4"/>
+    <rect x="203" y="220" width="169" height="43" rx="10" fill="#E7F6F3"/>
+    <rect x="203" y="253" width="169" height="10" fill="#E7F6F3"/>
+    <circle cx="228" cy="241" r="12" fill="#61C8B9"/>
+    <text x="228" y="245" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">하</text>
+    <text x="250" y="245" font-size="13" font-weight="800" fill="#278D82">하차 조건</text>
+    <text x="217" y="290" class="label">지역</text>
+    <text x="217" y="312" class="body" font-weight="700">경기 수원시 영통구</text>
+    <text x="217" y="340" class="label">상차지에서</text>
+    <text x="217" y="362" class="body" font-weight="700">34km · 약 52분</text>
+    <text x="217" y="390" class="label">하차 시간</text>
+    <text x="217" y="412" class="body" font-weight="700">오늘 21:00 이전</text>
+    <rect x="217" y="421" width="50" height="21" rx="10" fill="#FFF0CA"/>
+    <text x="242" y="435" text-anchor="middle" font-size="9" font-weight="800" fill="#8A5A00">당착</text>
+    <text x="217" y="469" class="small">수작업 없음 · 주차 가능</text>
+    <text x="217" y="486" class="small">인수증 · 인수자 서명 필요</text>
+
+    <rect x="18" y="507" width="354" height="92" rx="10" fill="#FFFFFF" stroke="#CFE1DE"/>
+    <text x="32" y="531" class="section-title">거리·지급 요약</text>
+    <text x="32" y="555" class="body">총 주행 예상</text>
+    <text x="188" y="555" text-anchor="middle" class="body" font-weight="800">36.8km</text>
+    <text x="340" y="555" text-anchor="end" class="body">예상 61분</text>
+    <line x1="32" y1="568" x2="340" y2="568" stroke="#D7E4E2"/>
+    <text x="32" y="589" class="body">예상 지급 ₩88,000</text>
+    <text x="340" y="589" text-anchor="end" class="body" font-weight="800" fill="#00796F">예상 수익 ₩78,400</text>
+
+    <rect x="18" y="611" width="354" height="110" rx="10" fill="#FFF4D6"/>
+    <text x="32" y="635" font-size="12" font-weight="800" fill="#8A5A00">현장 용어</text>
+    <text x="32" y="658" class="small"><tspan font-weight="800">독차</tspan> · 한 의뢰가 차량을 전용 사용  /  <tspan font-weight="800">혼적</tspan> · 허용 조건 안에서 다른 화물과 함께 운송</text>
+    <text x="32" y="680" class="small"><tspan font-weight="800">당상</tspan> · 오늘 상차  /  <tspan font-weight="800">당착</tspan> · 오늘 하차  /  <tspan font-weight="800">익착</tspan> · 다음 날 하차</text>
+    <text x="32" y="702" class="small">약어만 보여주지 않고 카드의 시간 값과 함께 표시합니다.</text>
+
+    <rect x="18" y="733" width="112" height="43" rx="8" fill="#FFFFFF" stroke="#BFCFCD"/>
+    <text x="74" y="759" text-anchor="middle" class="button" fill="#475569">관심 없음</text>
+    <rect x="139" y="733" width="233" height="43" rx="8" fill="#009688"/>
+    <text x="255" y="759" text-anchor="middle" class="button" fill="#FFFFFF">상세 확인 후 결정</text>
+
+    <rect y="776" width="390" height="68" rx="18" fill="#FFFFFF" stroke="#D9E5E3"/>
+    <rect y="776" width="390" height="16" fill="#FFFFFF"/>
+    <text x="49" y="810" text-anchor="middle" font-size="16" fill="#64748B">⌂</text>
+    <text x="49" y="828" text-anchor="middle" class="nav">홈</text>
+    <text x="147" y="810" text-anchor="middle" font-size="16" fill="#009688">◇</text>
+    <text x="147" y="828" text-anchor="middle" class="nav" fill="#009688">추천</text>
+    <text x="244" y="810" text-anchor="middle" font-size="16" fill="#64748B">▣</text>
+    <text x="244" y="828" text-anchor="middle" class="nav">운송</text>
+    <text x="341" y="810" text-anchor="middle" font-size="16" fill="#64748B">₩</text>
+    <text x="341" y="828" text-anchor="middle" class="nav">정산</text>
+  </g>
+
+  <rect x="54" y="986" width="852" height="32" rx="8" fill="#DDE8E6"/>
+  <text x="480" y="1007" text-anchor="middle" font-size="11" fill="#486663">카드 공통 배치 · 왼쪽 상차 / 오른쪽 하차 · 운송 방식과 시간 조건은 상단 고정 · 지급·비용은 하단 고정</text>
+</svg>

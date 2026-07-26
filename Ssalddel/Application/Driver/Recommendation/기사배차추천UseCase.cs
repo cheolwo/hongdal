@@ -48,7 +48,7 @@ public interface I기사배차추천UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
-[SsalddelUseCase("기사 배차 추천 조회", Summary = "기사에게 일반 화물, 공동주문 운송, 공개 배차, 전국콜 후보를 추천하고 상세를 조회합니다.")]
+[SsalddelUseCase("기사 배차 추천 조회", Summary = "기사에게 일반 화물, 같이 주문 운송, 공개 배차, 전국콜 후보를 추천하고 상세를 조회합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.Driver)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 [SsalddelUseCaseRelation(

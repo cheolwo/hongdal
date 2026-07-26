@@ -37,8 +37,8 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
                 CreateRequest("104", "소형 이사", "독차", "1톤", "카고", "서울 송파구 문정동", "서울 강서구 마곡동", 37.4861m, 127.1226m, 37.5668m, 126.8298m, 118000m, 78m, "긴급추천"),
                 CreateRequest(
                     "GP-201",
-                    "수입 냉장식품 공동주문",
-                    "공동주문 세대배송",
+                    "수입 냉장식품 같이 주문",
+                    "같이 주문 세대배송",
                     "1톤",
                     "냉동탑",
                     "인천항 보세창고",
@@ -51,7 +51,7 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
                     94m,
                     "공동주문추천",
                     requestTypeCode: "GroupPurchaseCargoTransport",
-                    requestTypeLabel: "공동주문 운송",
+                    requestTypeLabel: "같이 주문 운송",
                     isGroupPurchaseTransport: true,
                     includesApartmentUnitDelivery: true,
                     apartmentUnitDeliveryCount: 33,
@@ -202,7 +202,7 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
             예상수익 = expectedProfit,
             추천점수 = score,
             추천사유 = isGroupPurchaseTransport
-                ? "공동주문 수입 화물이며 세대배송 범위와 분류 상태를 확인해야 하는 추천입니다."
+                ? "같이 주문 수입 화물이며 세대배송 범위와 분류 상태를 확인해야 하는 추천입니다."
                 : "현재 운송 하차지 이후 연계하기 좋은 후보입니다.",
             복귀지기준추천여부 = true,
             복귀지출처 = "오늘복귀지",
