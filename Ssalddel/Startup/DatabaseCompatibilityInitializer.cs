@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
+using Ssalddel.Infrastructure.Persistence.SeedData.Content;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Services.Development;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +74,22 @@ internal static class DatabaseCompatibilityInitializer
             await viewVisibilityService.SeedPoliciesAsync();
             var documentService = services.GetRequiredService<I문서관리Service>();
             await documentService.SeedDefaultsAsync();
+            var regionalCulturePromptCount =
+                await 지역문화이미지PromptSeeder.SeedAsync(db);
+            if (regionalCulturePromptCount > 0)
+            {
+                logger.LogInformation(
+                    "Seeded or updated {Count} regional culture image prompt drafts.",
+                    regionalCulturePromptCount);
+            }
+            var regionalCultureInstitutionCount =
+                await 지역문화공공기관SourceSeeder.SeedAsync(db);
+            if (regionalCultureInstitutionCount > 0)
+            {
+                logger.LogInformation(
+                    "Seeded or updated {Count} regional culture public institution sources.",
+                    regionalCultureInstitutionCount);
+            }
             if (environment.IsDevelopment())
             {
                 await SsalddelV1DevelopmentDataSeeder.SeedAsync(services, logger);

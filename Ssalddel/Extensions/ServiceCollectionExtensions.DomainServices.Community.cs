@@ -102,6 +102,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityAuthoringAiDraftService, CommunityAuthoringAiDraftService>();
         services.AddSingleton<ICommunityAuthoringImagePromptPlanner, CommunityAuthoringImagePromptPlanner>();
         services.AddScoped<ICommunityAuthoringImageService, CommunityAuthoringImageService>();
+        services.AddScoped<I지역문화이미지Prompt조회UseCase, 지역문화이미지Prompt조회UseCase>();
+        services.AddScoped<I지역문화공공기관Source조회UseCase, 지역문화공공기관Source조회UseCase>();
         services.AddScoped<IYouTube음식상품발견저장소, EfYouTube음식상품발견저장소>();
         services.AddScoped<IYouTube음식상품발견Service, YouTube음식상품발견Service>();
         services.AddScoped<IYouTube영상재료인지Engine, YouTube영상재료인지Engine>();

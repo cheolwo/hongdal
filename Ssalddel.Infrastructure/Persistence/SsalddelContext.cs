@@ -116,6 +116,8 @@ namespace 살뜰.Data
         public DbSet<HongikHakdangCardDeliveryPreference> HongikHakdangCardDeliveryPreferences { get; set; } = null!;
         public DbSet<HongikHakdangDailyCardSelection> HongikHakdangDailyCardSelections { get; set; } = null!;
         public DbSet<HongikHakdangCardDeliveryOutbox> HongikHakdangCardDeliveryOutbox { get; set; } = null!;
+        public DbSet<지역문화이미지Prompt> 지역문화이미지Prompts { get; set; } = null!;
+        public DbSet<지역문화공공기관Source> 지역문화공공기관Sources { get; set; } = null!;
         public DbSet<Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation> SsalddelMobilePushInstallations { get; set; } = null!;
         public DbSet<교육과정> 교육과정 { get; set; } = null!;
         public DbSet<교육과정과목> 교육과정과목 { get; set; } = null!;
