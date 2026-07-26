@@ -6,6 +6,14 @@ public enum GroupPurchaseScreenKind
     Practice,
     ProductList,
     ProductDetail,
+    OrderModeComparison,
+    DeliveryScopeFinder,
+    DeliveryScopeDetail,
+    TogetherOrderDetail,
+    SupplierRelationshipDetail,
+    SupplierMembership,
+    UrgentHarvestOffer,
+    UrgentHarvestReview,
     DemandCreate,
     WishCreate,
     WishList,
@@ -23,13 +31,30 @@ public enum GroupPurchaseScreenKind
     ShipmentTracking
 }
 
-/// <summary>Web과 주문자 앱이 공유하는 공동구매 List·Detail·Action route입니다.</summary>
+/// <summary>Web과 주문자 앱이 공유하는 같이 주문 List·Detail·Action route입니다.</summary>
 public static class GroupPurchasePageRoutes
 {
     public const string Root = "/group-purchase";
     public const string Practice = $"{Root}/practice";
     public const string ProductsRoot = $"{Root}/products";
     public const string ProductDetailTemplate = $"{ProductsRoot}/{{ProductId}}";
+    public const string OrderModeComparisonRoot = $"{Root}/compare";
+    public const string OrderModeComparisonTemplate = $"{OrderModeComparisonRoot}/{{ProductId}}";
+    public const string DeliveryScopesRoot = $"{Root}/delivery-scopes";
+    public const string DeliveryScopeDetailTemplate = $"{DeliveryScopesRoot}/{{DeliveryScopeKey}}";
+    public const string TogetherOrdersRoot = $"{Root}/together-orders";
+    public const string TogetherOrderDetailTemplate = $"{TogetherOrdersRoot}/{{AutoGroupId}}";
+    public const string SupplierRelationshipsRoot = $"{Root}/supplier-relationships";
+    public const string SupplierRelationshipDetailTemplate =
+        $"{SupplierRelationshipsRoot}/{{SupplierKey}}";
+    public const string SupplierMembershipTemplate =
+        $"{SupplierRelationshipDetailTemplate}/membership";
+    public const string UrgentHarvestOffersRoot =
+        $"{Root}/urgent-harvest-offers";
+    public const string UrgentHarvestOfferTemplate =
+        $"{UrgentHarvestOffersRoot}/{{SupplyOfferDraftId}}";
+    public const string UrgentHarvestReviewTemplate =
+        $"{UrgentHarvestOfferTemplate}/review";
     public const string DemandCreateRoot = $"{Root}/demands/new";
     public const string DemandCreateTemplate = $"{DemandCreateRoot}/{{ProductId}}";
     public const string WishesRoot = $"{Root}/wishes";
@@ -51,6 +76,27 @@ public static class GroupPurchasePageRoutes
 
     public static string ProductDetailFor(string productId)
         => $"{ProductsRoot}/{RequireProductId(productId)}";
+
+    public static string OrderModeComparisonFor(string productId)
+        => $"{OrderModeComparisonRoot}/{RequireProductId(productId)}";
+
+    public static string DeliveryScopeFor(string deliveryScopeKey)
+        => $"{DeliveryScopesRoot}/{RequireSegment(deliveryScopeKey, nameof(deliveryScopeKey), "배송권 Key")}";
+
+    public static string TogetherOrderDetailFor(string autoGroupId)
+        => $"{TogetherOrdersRoot}/{RequireSegment(autoGroupId, nameof(autoGroupId), "같이 주문 ID")}";
+
+    public static string SupplierRelationshipFor(string supplierKey)
+        => $"{SupplierRelationshipsRoot}/{RequireSegment(supplierKey, nameof(supplierKey), "공급자 Key")}";
+
+    public static string SupplierMembershipFor(string supplierKey)
+        => $"{SupplierRelationshipFor(supplierKey)}/membership";
+
+    public static string UrgentHarvestOfferFor(string supplyOfferDraftId)
+        => $"{UrgentHarvestOffersRoot}/{RequireSegment(supplyOfferDraftId, nameof(supplyOfferDraftId), "긴급 수확 제안 초안 ID")}";
+
+    public static string UrgentHarvestReviewFor(string supplyOfferDraftId)
+        => $"{UrgentHarvestOfferFor(supplyOfferDraftId)}/review";
 
     public static string DemandCreateFor(string productId)
         => $"{DemandCreateRoot}/{RequireProductId(productId)}";

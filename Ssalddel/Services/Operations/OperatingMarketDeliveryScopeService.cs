@@ -15,7 +15,7 @@ public interface IOperatingMarketDeliveryScopeService
 }
 
 /// <summary>
-/// 한국 주소를 상세주소가 없는 시·군·구/읍·면·동 단위 공동주문 모집권으로 정규화합니다.
+/// 한국 주소를 상세주소가 없는 시·군·구/읍·면·동 단위 같이 주문 모집권으로 정규화합니다.
 /// 도로명주소와 Kakao/Naver 지역 결과가 없을 때도 주소 구조만으로 후보를 만들되,
 /// 어느 경로에서도 원문 상세주소는 결과나 자동집단 키에 포함하지 않습니다.
 /// </summary>
@@ -63,12 +63,12 @@ public sealed class KoreaDeliveryScopeService : IOperatingMarketDeliveryScopeSer
             marketCode != OperatingMarketCodes.Korea ||
             _deployment.MarketCode != OperatingMarketCodes.Korea)
         {
-            return Failure("이 배포 환경에서는 한국 공동주문 모집권만 계산할 수 있습니다.");
+            return Failure("이 배포 환경에서는 한국 같이 주문 모집권만 계산할 수 있습니다.");
         }
 
         if (string.IsNullOrWhiteSpace(request.Address))
         {
-            return Failure("공동주문 모집권을 확인할 주소를 입력해 주세요.");
+            return Failure("같이 주문 모집권을 확인할 주소를 입력해 주세요.");
         }
 
         var address = request.Address.Trim();
@@ -91,7 +91,7 @@ public sealed class KoreaDeliveryScopeService : IOperatingMarketDeliveryScopeSer
         });
         if (!scopeResponse.Success || scopeResponse.Items.Count == 0)
         {
-            return Failure(scopeResponse.ErrorMessage ?? "주소에서 공동주문 모집권을 찾지 못했습니다.");
+            return Failure(scopeResponse.ErrorMessage ?? "주소에서 같이 주문 모집권을 찾지 못했습니다.");
         }
 
         var level2 = scopeResponse.Items.FirstOrDefault(item => item.IsDefaultScope)

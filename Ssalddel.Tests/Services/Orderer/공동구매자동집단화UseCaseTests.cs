@@ -8,6 +8,45 @@ namespace Ssalddel.Tests.Services.Orderer;
 public sealed class 공동구매자동집단화UseCaseTests
 {
     [Fact]
+    public async Task 상세조회는_자동집단Id로_공개상세원본을조회한다()
+    {
+        var group = new 공동구매자동집단응답
+        {
+            자동집단Id = "auto-group-1",
+            상품키 = "apple-5kg",
+            배송권키 = "kr:11:11470:1147051000"
+        };
+        var useCase = new 공동구매자동집단화UseCase(
+            new StubStore(group),
+            new StubReceivingWarehouseService(),
+            new StubIndividualDemandLedgerService(),
+            new StubIndividualOrderLedgerService(),
+            new 공동구매주문자집단화Engine());
+
+        var result = await useCase.상세조회Async(" auto-group-1 ");
+
+        Assert.True(result.성공);
+        Assert.Same(group, result.값);
+    }
+
+    [Fact]
+    public async Task 상세조회는_없는같이주문을_찾을수없음으로반환한다()
+    {
+        var useCase = new 공동구매자동집단화UseCase(
+            new StubStore(),
+            new StubReceivingWarehouseService(),
+            new StubIndividualDemandLedgerService(),
+            new StubIndividualOrderLedgerService(),
+            new 공동구매주문자집단화Engine());
+
+        var result = await useCase.상세조회Async("missing-group");
+
+        Assert.False(result.성공);
+        Assert.Equal(StatusCodes.Status404NotFound, result.상태코드);
+        Assert.Contains("같이 주문", result.메시지);
+    }
+
+    [Fact]
     public async Task 예약결제_수요는_가상수령창고와_개별주문_입고예정원장을_연결한다()
     {
         var store = new StubStore();

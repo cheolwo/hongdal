@@ -10,6 +10,10 @@ public interface I공동구매자동집단화UseCase
         공동구매자동집단조회조건 조건,
         CancellationToken cancellationToken = default);
 
+    Task<공동구매처리결과<공동구매자동집단응답>> 상세조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken = default);
+
     Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(
         공동구매자동수요등록Command command,
         CancellationToken cancellationToken = default);
@@ -28,7 +32,7 @@ public interface I공동구매자동집단화UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
-[SsalddelUseCase("공동구매 자동 집단화", Summary = "주문자의 구매 의사를 배송권 기준으로 모아 공동구매 집단 후보를 형성합니다.")]
+[SsalddelUseCase("같이 주문 자동 집단화", Summary = "주문자의 구매 의사를 배송권 기준으로 모아 같이 주문 집단 후보를 형성합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.Orderer)]
 [SsalddelUseCaseActor(SsalddelActor.OrdererGroupLeader, SsalddelUseCaseActorRole.Supporting)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
@@ -84,6 +88,23 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
     {
         var items = await _저장소.집단목록조회Async(조건, cancellationToken);
         return 공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>.성공결과(items);
+    }
+
+    public async Task<공동구매처리결과<공동구매자동집단응답>> 상세조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(자동집단Id))
+        {
+            return 공동구매처리결과<공동구매자동집단응답>.잘못된요청(
+                "같이 주문 ID가 필요합니다.");
+        }
+
+        var item = await _저장소.집단조회Async(자동집단Id.Trim(), cancellationToken);
+        return item is null
+            ? 공동구매처리결과<공동구매자동집단응답>.찾을수없음(
+                "같이 주문을 찾을 수 없습니다.")
+            : 공동구매처리결과<공동구매자동집단응답>.성공결과(item);
     }
 
     public async Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(

@@ -24,6 +24,12 @@ public sealed class 공동구매자동집단화ControllerTests
             .GetCustomAttribute<AllowAnonymousAttribute>());
 
     [Fact]
+    public void 공개상세는_비로그인탐색을허용한다()
+        => Assert.NotNull(typeof(공동구매자동집단화Controller)
+            .GetMethod(nameof(공동구매자동집단화Controller.상세))!
+            .GetCustomAttribute<AllowAnonymousAttribute>());
+
+    [Fact]
     public async Task 목록은참여자와결제정보가없는요약만반환한다()
     {
         var useCase = new RecordingUseCase
@@ -51,6 +57,47 @@ public sealed class 공동구매자동집단화ControllerTests
         Assert.DoesNotContain(nameof(공동구매자동수요응답.개별원함원장Id), json, StringComparison.Ordinal);
         Assert.DoesNotContain("wish-ledger-orderer-a", json, StringComparison.Ordinal);
         Assert.DoesNotContain(nameof(공동구매자동집단응답.예약결제합계), json, StringComparison.Ordinal);
+        Assert.DoesNotContain("orderer-a", json, StringComparison.Ordinal);
+        Assert.DoesNotContain("참여자 A", json, StringComparison.Ordinal);
+        Assert.DoesNotContain("address:a", json, StringComparison.Ordinal);
+        Assert.DoesNotContain("10001", json, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 상세는_배송권집계와참여판단만반환하고_개인정보는반환하지않는다()
+    {
+        var detail = Group(
+            Demand("orderer-a", "참여자 A", "address:a", 10_001m),
+            Demand("orderer-b", "참여자 B", "address:b", 20_002m));
+        detail.상품키 = "apple-5kg";
+        detail.배송권키 = "kr:11:11470:1147051000";
+        detail.배송권명 = "서울 양천구 목5동";
+        detail.참여자수 = 5;
+        detail.목표참여자수 = 8;
+        detail.총희망수량 = 7;
+        detail.목표수량 = 10;
+        var useCase = new RecordingUseCase { DetailResult = detail };
+        var controller = Controller(useCase, "viewer");
+
+        var result = await controller.상세("auto-group-1", CancellationToken.None);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<같이주문공개상세응답>(ok.Value);
+        Assert.Equal("같이 주문", response.같이주문표시명);
+        Assert.Equal(3, response.추가필요참여자수);
+        Assert.Equal(3, response.추가필요수량);
+        Assert.True(response.참여가능여부);
+        Assert.True(response.비구속수요만허용);
+        Assert.True(response.자동참여금지);
+        Assert.Equal(
+            "/group-purchase/delivery-scopes/kr%3A11%3A11470%3A1147051000",
+            response.배송권보기경로);
+        Assert.Equal(
+            "/group-purchase/compare/apple-5kg",
+            response.주문방식비교경로);
+
+        var json = JsonSerializer.Serialize(response);
+        Assert.DoesNotContain(nameof(공동구매자동집단응답.수요목록), json, StringComparison.Ordinal);
         Assert.DoesNotContain("orderer-a", json, StringComparison.Ordinal);
         Assert.DoesNotContain("참여자 A", json, StringComparison.Ordinal);
         Assert.DoesNotContain("address:a", json, StringComparison.Ordinal);
@@ -293,6 +340,7 @@ public sealed class 공동구매자동집단화ControllerTests
         public 공동구매자동수요등록Command? LastNonBindingCommand { get; private set; }
         public 공동구매자동수요철회Command? LastWithdrawalCommand { get; private set; }
         public IReadOnlyList<공동구매자동집단응답> Groups { get; set; } = [];
+        public 공동구매자동집단응답? DetailResult { get; set; }
         public 공동구매자동집단응답 RegisterResult { get; set; } = new();
         public 공동구매자동집단응답 NonBindingSaveResult { get; set; } = new();
         public 공동구매자동집단배치미리보기응답 PreviewResult { get; set; } = new();
@@ -303,6 +351,13 @@ public sealed class 공동구매자동집단화ControllerTests
             CancellationToken cancellationToken = default)
             => Task.FromResult(
                 공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>.성공결과(Groups));
+
+        public Task<공동구매처리결과<공동구매자동집단응답>> 상세조회Async(
+            string 자동집단Id,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(DetailResult is null
+                ? 공동구매처리결과<공동구매자동집단응답>.찾을수없음("같이 주문을 찾을 수 없습니다.")
+                : 공동구매처리결과<공동구매자동집단응답>.성공결과(DetailResult));
 
         public Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(
             공동구매자동수요등록Command command,

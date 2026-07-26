@@ -639,7 +639,7 @@ public sealed class Mongo공동구매자동집단화저장소 :
                 변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
                 {
                     이벤트유형 = "GroupPurchaseDemandHandoffApproved",
-                    요약 = "운영자가 모집 결과를 확인하고 공동주문 수입 준비 단계로의 인계를 승인했습니다. 후속 원장은 별도 UseCase가 생성합니다.",
+                    요약 = "운영자가 모집 결과를 확인하고 같이 주문 수입 준비 단계로의 인계를 승인했습니다. 후속 원장은 별도 UseCase가 생성합니다.",
                     발생시각Utc = now
                 });
                 변경문서.수정시각Utc = now;

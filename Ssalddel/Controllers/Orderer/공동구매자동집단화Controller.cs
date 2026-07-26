@@ -60,6 +60,25 @@ public sealed class 공동구매자동집단화Controller : OrdererControllerBas
         return Ok(response);
     }
 
+    [HttpGet("{autoGroupId}")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(같이주문공개상세응답), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> 상세(
+        [FromRoute(Name = "autoGroupId")] string 자동집단Id,
+        CancellationToken cancellationToken)
+    {
+        var result = await _자동집단화UseCase.상세조회Async(자동집단Id, cancellationToken);
+        if (!result.성공)
+        {
+            return this.ToProblemActionResult(result.메시지, result.상태코드);
+        }
+
+        return result.값 is null
+            ? this.ToNotFoundProblem("같이 주문을 찾을 수 없습니다.")
+            : Ok(상세응답으로(result.값));
+    }
+
     [HttpPost("placement-preview")]
     [ProducesResponseType(typeof(공동구매자동집단배치미리보기응답), StatusCodes.Status200OK)]
     public async Task<IActionResult> 배치미리보기(
@@ -79,7 +98,7 @@ public sealed class 공동구매자동집단화Controller : OrdererControllerBas
         }
 
         return result.값 is null
-            ? this.ToNotFoundProblem("공동구매 자동집단 배치 미리보기를 만들 수 없습니다.")
+            ? this.ToNotFoundProblem("같이 주문 배치 미리보기를 만들 수 없습니다.")
             : Ok(result.값);
     }
 
@@ -110,7 +129,7 @@ public sealed class 공동구매자동집단화Controller : OrdererControllerBas
         }
 
         return result.값 is null
-            ? this.ToNotFoundProblem("저장된 공동구매 수요 집단을 찾을 수 없습니다.")
+            ? this.ToNotFoundProblem("저장된 같이 주문 수요 집단을 찾을 수 없습니다.")
             : Ok(사용자응답으로(result.값, currentUserId, command.수요출처키));
     }
 
@@ -139,7 +158,7 @@ public sealed class 공동구매자동집단화Controller : OrdererControllerBas
         }
 
         return result.값 is null
-            ? this.ToNotFoundProblem("철회된 공동구매 수요를 찾을 수 없습니다.")
+            ? this.ToNotFoundProblem("철회된 같이 주문 수요를 찾을 수 없습니다.")
             : Ok(result.값);
     }
 
@@ -171,7 +190,7 @@ public sealed class 공동구매자동집단화Controller : OrdererControllerBas
 
         if (result.값 is null)
         {
-            return this.ToNotFoundProblem("등록된 공동구매 자동집단을 찾을 수 없습니다.");
+            return this.ToNotFoundProblem("등록된 같이 주문 집단을 찾을 수 없습니다.");
         }
 
         return Ok(사용자응답으로(result.값, currentUserId, command.수요출처키));
@@ -184,6 +203,25 @@ public sealed class 공동구매자동집단화Controller : OrdererControllerBas
 
     private static 공동구매자동집단요약응답 요약응답으로(공동구매자동집단응답 source)
         => 요약응답으로<공동구매자동집단요약응답>(source);
+
+    private static 같이주문공개상세응답 상세응답으로(공동구매자동집단응답 source)
+    {
+        var response = 요약응답으로<같이주문공개상세응답>(source);
+        response.참여가능여부 = !source.모집종료여부
+            && string.Equals(
+                source.현재상태,
+                공동구매자동집단상태코드.수요수집중,
+                StringComparison.Ordinal);
+        response.추가필요참여자수 = source.목표참여자수 is null
+            ? null
+            : Math.Max(0, source.목표참여자수.Value - source.참여자수);
+        response.추가필요수량 = source.목표수량 is null
+            ? null
+            : Math.Max(0m, source.목표수량.Value - source.총희망수량);
+        response.배송권보기경로 = GroupPurchasePageRoutes.DeliveryScopeFor(source.배송권키);
+        response.주문방식비교경로 = GroupPurchasePageRoutes.OrderModeComparisonFor(source.상품키);
+        return response;
+    }
 
     private static 공동구매자동집단사용자응답 사용자응답으로(
         공동구매자동집단응답 source,

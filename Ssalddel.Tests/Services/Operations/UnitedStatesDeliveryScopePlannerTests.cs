@@ -156,6 +156,31 @@ public sealed class UnitedStatesDeliveryScopePlannerTests
         Assert.Equal("us-place:2475725", result.RecommendedScopeKey);
     }
 
+    [Fact]
+    public async Task ResolveAsync_RejectsKoreaMarketWithoutAddressLookup()
+    {
+        var addressLookup = new StubAddressLookupService(CreateAddress(
+            "20746",
+            new GeographicAreaSeed(
+                OperatingGeographicAreaTypeCodes.State,
+                "24",
+                "Maryland")));
+        var sut = new UnitedStatesDeliveryScopeService(
+            addressLookup,
+            CreateSut());
+
+        var result = await sut.ResolveAsync(new OperatingMarketDeliveryScopeResolveRequest
+        {
+            MarketCode = OperatingMarketCodes.Korea,
+            Address = "서울특별시 중구 세종대로 110"
+        });
+
+        Assert.False(result.Success);
+        Assert.Equal(OperatingMarketCodes.UnitedStates, result.MarketCode);
+        Assert.Contains("United States operating-market", result.ErrorMessage);
+        Assert.Equal(0, addressLookup.CallCount);
+    }
+
     private static UnitedStatesDeliveryScopePlanner CreateSut()
         => new(Options.Create(new UnitedStatesAddressOptions()));
 
@@ -186,10 +211,14 @@ public sealed class UnitedStatesDeliveryScopePlannerTests
     private sealed class StubAddressLookupService(
         OperatingMarketAddressCandidate candidate) : IOperatingMarketAddressLookupService
     {
+        public int CallCount { get; private set; }
+
         public Task<OperatingMarketAddressSearchResult> SearchAsync(
             OperatingMarketAddressSearchRequest request,
             CancellationToken cancellationToken = default)
-            => Task.FromResult(new OperatingMarketAddressSearchResult
+        {
+            CallCount++;
+            return Task.FromResult(new OperatingMarketAddressSearchResult
             {
                 Success = true,
                 ProviderConfigured = true,
@@ -200,5 +229,6 @@ public sealed class UnitedStatesDeliveryScopePlannerTests
                 TotalCount = 1,
                 Items = [candidate]
             });
+        }
     }
 }

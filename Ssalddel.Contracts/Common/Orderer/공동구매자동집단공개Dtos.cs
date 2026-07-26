@@ -32,6 +32,27 @@ public class 공동구매자동집단요약응답
     public DateTime 수정시각Utc { get; set; }
 }
 
+/// <summary>
+/// 배송권 안에서 진행 중인 같이 주문을 상세 확인할 때 사용하는 공개 집계 응답입니다.
+/// 다른 참여자의 식별자, 상세주소, 개별 수량, 결제와 내부 원장 정보는 포함하지 않습니다.
+/// </summary>
+public sealed class 같이주문공개상세응답 : 공동구매자동집단요약응답
+{
+    public string 같이주문표시명 { get; set; } = 같이주문용어.표시명;
+    public bool 참여가능여부 { get; set; }
+    public int? 추가필요참여자수 { get; set; }
+    public decimal? 추가필요수량 { get; set; }
+    public bool 비구속수요만허용 { get; set; } = true;
+    public bool 자동참여금지 { get; set; } = true;
+    public bool 별도동의필수 { get; set; } = true;
+    public string 공개범위안내 { get; set; } =
+        "배송권과 집계 인원만 공개하며 참여자의 이름, 상세주소와 개별 주문정보는 공개하지 않습니다.";
+    public string 참여안내 { get; set; } =
+        "비용과 대기시간을 확인한 뒤 참여 의향을 직접 선택합니다. 상세 보기만으로 주문·결제·배송이 시작되지 않습니다.";
+    public string 배송권보기경로 { get; set; } = string.Empty;
+    public string 주문방식비교경로 { get; set; } = string.Empty;
+}
+
 public sealed class 공동구매자동집단배치미리보기응답
 {
     public string 정책버전 { get; set; } = 공동구매주문자집단화정책코드.현재버전;

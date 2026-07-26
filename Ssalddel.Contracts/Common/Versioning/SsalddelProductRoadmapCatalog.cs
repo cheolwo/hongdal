@@ -57,10 +57,10 @@ public static class SsalddelProductRoadmapCatalog
         new(
             GroupPurchaseVersion,
             CultureTransportName,
-            "공동주문·주문자 집단화",
+            "같이 주문·주문자 집단화",
             100,
             IndividualOrderVersion,
-            "동의한 개별주문을 품목·지역·수령 조건별로 집단화하고 공동주문 모집 원장으로 보여 줍니다."),
+            "동의한 개별주문을 품목·지역·수령 조건별로 집단화하고 같이 주문 모집 원장으로 보여 줍니다."),
         new(
             TradeReadinessVersion,
             CultureTransportName,

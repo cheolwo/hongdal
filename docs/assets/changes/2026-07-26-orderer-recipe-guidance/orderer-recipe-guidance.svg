@@ -1,0 +1,77 @@
+<svg width="390" height="1213" viewBox="0 0 390 1213" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="390" height="1213" fill="#F6F7FB"/>
+  <rect x="15" y="18" width="360" height="190" rx="24" fill="#1F294A"/>
+  <text x="34" y="48" fill="#FFFFFF" font-family="Noto Sans KR, sans-serif" font-size="12" font-weight="500">살뜰 주문자 · 02.01B</text>
+  <rect x="277" y="35" width="79" height="30" rx="15" fill="#394569"/>
+  <text x="316.5" y="55" text-anchor="middle" fill="#FFFFFF" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">활용 미리보기</text>
+  <text x="34" y="101" fill="#FFFFFF" font-family="Noto Sans KR, sans-serif" font-size="26" font-weight="700">내 몫으로 어떤 음식을</text>
+  <text x="34" y="138" fill="#FFFFFF" font-family="Noto Sans KR, sans-serif" font-size="26" font-weight="700">만들 수 있을까요?</text>
+  <text x="34" y="174" fill="#CCD3E5" font-family="Noto Sans KR, sans-serif" font-size="12">같이 주문 전, 내가 실제로 받을 양의 활용 방법을 확인해요.</text>
+  <text x="34" y="192" fill="#CCD3E5" font-family="Noto Sans KR, sans-serif" font-size="12">레시피를 보아도 자동 참여·결제는 이루어지지 않아요.</text>
+
+  <rect x="15" y="222" width="360" height="112" rx="20" fill="#FFFFFF"/>
+  <rect x="29" y="238" width="97" height="26" rx="13" fill="#EEF0FF"/>
+  <text x="77.5" y="256" text-anchor="middle" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">개인 수령 검토량</text>
+  <rect x="134" y="238" width="83" height="26" rx="13" fill="#E4F8ED"/>
+  <text x="175.5" y="256" text-anchor="middle" fill="#138A52" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">공식 레시피 3</text>
+  <text x="29" y="292" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="18" font-weight="700">충주 감자 · 내 몫 2kg</text>
+  <text x="29" y="317" fill="#7B849B" font-family="Noto Sans KR, sans-serif" font-size="11">같이 주문 전체 40kg이 아니라 내가 받을 2kg 기준이에요.</text>
+
+  <text x="17" y="370" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="19" font-weight="700">이렇게 활용할 수 있어요</text>
+  <rect x="281" y="348" width="92" height="28" rx="14" fill="#FFF2D9"/>
+  <text x="327" y="367" text-anchor="middle" fill="#D98500" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">공식 자료 연결</text>
+
+  <rect x="15" y="390" width="360" height="142" rx="20" fill="#FFFFFF"/>
+  <rect x="29" y="404" width="104" height="104" rx="16" fill="#F0E9FF"/>
+  <circle cx="81" cy="451" r="28" fill="#C9B8F7"/>
+  <path d="M59 464C65 478 97 478 103 464" stroke="#7156B5" stroke-width="5" stroke-linecap="round"/>
+  <path d="M68 438C70 431 76 428 81 428C87 428 93 431 95 438" stroke="#7156B5" stroke-width="4" stroke-linecap="round"/>
+  <text x="149" y="422" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="10" font-weight="600">따뜻한 한 끼</text>
+  <text x="149" y="448" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="17" font-weight="700">감자수프</text>
+  <text x="149" y="471" fill="#5F687D" font-family="Noto Sans KR, sans-serif" font-size="11">감자 300g · 껍질을 벗겨 준비</text>
+  <text x="149" y="493" fill="#7B849B" font-family="Noto Sans KR, sans-serif" font-size="10">식품의약품안전처 공식 레시피</text>
+  <text x="344" y="516" text-anchor="end" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">원문 보기 ›</text>
+
+  <rect x="15" y="544" width="360" height="142" rx="20" fill="#FFFFFF"/>
+  <rect x="29" y="558" width="104" height="104" rx="16" fill="#E4F8ED"/>
+  <circle cx="81" cy="610" r="31" fill="#96DCB5"/>
+  <path d="M57 610H105" stroke="#158956" stroke-width="5" stroke-linecap="round"/>
+  <path d="M63 595C68 585 94 585 99 595" stroke="#158956" stroke-width="4" stroke-linecap="round"/>
+  <text x="149" y="576" fill="#128851" font-family="Noto Sans KR, sans-serif" font-size="10" font-weight="600">간단한 반찬</text>
+  <text x="149" y="602" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="17" font-weight="700">감자전</text>
+  <text x="149" y="625" fill="#5F687D" font-family="Noto Sans KR, sans-serif" font-size="11">감자 400g · 곱게 갈아 준비</text>
+  <text x="149" y="647" fill="#7B849B" font-family="Noto Sans KR, sans-serif" font-size="10">농촌진흥청 향토 음식 자료</text>
+  <text x="344" y="670" text-anchor="end" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">원문 보기 ›</text>
+
+  <rect x="15" y="698" width="360" height="142" rx="20" fill="#FFFFFF"/>
+  <rect x="29" y="712" width="104" height="104" rx="16" fill="#FFF2D9"/>
+  <circle cx="81" cy="764" r="31" fill="#F7CF7D"/>
+  <path d="M57 770C67 782 95 782 105 770" stroke="#C87D00" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="70" cy="757" r="5" fill="#C87D00"/>
+  <circle cx="91" cy="753" r="5" fill="#C87D00"/>
+  <text x="149" y="730" fill="#D98500" font-family="Noto Sans KR, sans-serif" font-size="10" font-weight="600">며칠 두고 먹기</text>
+  <text x="149" y="756" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="17" font-weight="700">감자조림</text>
+  <text x="149" y="779" fill="#5F687D" font-family="Noto Sans KR, sans-serif" font-size="11">감자 500g · 먹기 좋은 크기로 손질</text>
+  <text x="149" y="801" fill="#7B849B" font-family="Noto Sans KR, sans-serif" font-size="10">공식 음식 자료 · 최신 수집일 표시</text>
+  <text x="344" y="824" text-anchor="end" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">원문 보기 ›</text>
+
+  <rect x="15" y="854" width="360" height="106" rx="20" fill="#FFFFFF"/>
+  <text x="29" y="881" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="15" font-weight="700">2kg을 받기 전 함께 확인해요</text>
+  <circle cx="34" cy="905" r="5" fill="#16A05D"/>
+  <text x="48" y="909" fill="#5F687D" font-family="Noto Sans KR, sans-serif" font-size="11">이번 주 조리 횟수와 가족의 실제 소비량</text>
+  <circle cx="34" cy="930" r="5" fill="#16A05D"/>
+  <text x="48" y="934" fill="#5F687D" font-family="Noto Sans KR, sans-serif" font-size="11">보관 공간·보관기한·알레르기와 손질 부담</text>
+  <text x="348" y="934" text-anchor="end" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="11" font-weight="600">보관 도움말 ›</text>
+
+  <rect x="15" y="974" width="360" height="74" rx="18" fill="#EBEDFF"/>
+  <text x="29" y="999" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="13" font-weight="700">정확한 소진 횟수는 단정하지 않아요</text>
+  <text x="29" y="1022" fill="#69738C" font-family="Noto Sans KR, sans-serif" font-size="10">원천마다 재료 단위와 1회 제공량이 달라요. 재료량 표기와</text>
+  <text x="29" y="1038" fill="#69738C" font-family="Noto Sans KR, sans-serif" font-size="10">공식 원문을 확인한 뒤 비용·대기시간과 함께 선택하세요.</text>
+
+  <rect x="15" y="1062" width="360" height="48" rx="14" fill="#4A5BD5"/>
+  <text x="195" y="1092" text-anchor="middle" fill="#FFFFFF" font-family="Noto Sans KR, sans-serif" font-size="14" font-weight="700">같이 주문 조건 검토하기</text>
+  <rect x="15.5" y="1122.5" width="359" height="47" rx="13.5" fill="#FFFFFF" stroke="#D8DDEA"/>
+  <text x="195" y="1152" text-anchor="middle" fill="#202A44" font-family="Noto Sans KR, sans-serif" font-size="13" font-weight="600">개별 주문 계속</text>
+  <text x="16" y="1193" fill="#7B849B" font-family="Noto Sans KR, sans-serif" font-size="9">GET /api/v1/orderer/order-mode-comparisons/recipe-uses</text>
+  <text x="374" y="1193" text-anchor="end" fill="#4A5BD5" font-family="Noto Sans KR, sans-serif" font-size="10" font-weight="600">별도 동의 필수</text>
+</svg>

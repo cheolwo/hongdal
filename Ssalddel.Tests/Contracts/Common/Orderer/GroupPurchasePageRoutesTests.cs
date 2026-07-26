@@ -13,6 +13,25 @@ public sealed class GroupPurchasePageRoutesTests
         Assert.Equal(
             "/group-purchase/products/hs-food-0203-pork-frozen",
             GroupPurchasePageRoutes.ProductDetailFor("hs-food-0203-pork-frozen"));
+        Assert.Equal("/group-purchase/delivery-scopes", GroupPurchasePageRoutes.DeliveryScopesRoot);
+        Assert.Equal(
+            "/group-purchase/delivery-scopes/kr%3A11%3A11470%3A1147051000",
+            GroupPurchasePageRoutes.DeliveryScopeFor("kr:11:11470:1147051000"));
+        Assert.Equal(
+            "/group-purchase/together-orders/auto-group-onion",
+            GroupPurchasePageRoutes.TogetherOrderDetailFor("auto-group-onion"));
+        Assert.Equal(
+            "/group-purchase/supplier-relationships/farm-apple-01",
+            GroupPurchasePageRoutes.SupplierRelationshipFor("farm-apple-01"));
+        Assert.Equal(
+            "/group-purchase/supplier-relationships/farm-apple-01/membership",
+            GroupPurchasePageRoutes.SupplierMembershipFor("farm-apple-01"));
+        Assert.Equal(
+            "/group-purchase/urgent-harvest-offers/urgent-onion-01",
+            GroupPurchasePageRoutes.UrgentHarvestOfferFor("urgent-onion-01"));
+        Assert.Equal(
+            "/group-purchase/urgent-harvest-offers/urgent-onion-01/review",
+            GroupPurchasePageRoutes.UrgentHarvestReviewFor("urgent-onion-01"));
         Assert.Equal(
             "/group-purchase/demands/new/hs-food-0203-pork-frozen",
             GroupPurchasePageRoutes.DemandCreateFor("hs-food-0203-pork-frozen"));
@@ -71,11 +90,27 @@ public sealed class GroupPurchasePageRoutesTests
             "/group-purchase/groups/group%2Fonion",
             GroupPurchasePageRoutes.GroupDetailFor("group/onion"));
         Assert.Equal(
+            "/group-purchase/delivery-scopes/kr%2Fseoul",
+            GroupPurchasePageRoutes.DeliveryScopeFor("kr/seoul"));
+        Assert.Equal(
+            "/group-purchase/together-orders/group%2Fonion",
+            GroupPurchasePageRoutes.TogetherOrderDetailFor("group/onion"));
+        Assert.Equal(
+            "/group-purchase/supplier-relationships/supplier%2F17/membership",
+            GroupPurchasePageRoutes.SupplierMembershipFor("supplier/17"));
+        Assert.Equal(
+            "/group-purchase/urgent-harvest-offers/urgent%2F17/review",
+            GroupPurchasePageRoutes.UrgentHarvestReviewFor("urgent/17"));
+        Assert.Equal(
             "/group-purchase/imports/import%2F17/costs",
             GroupPurchasePageRoutes.ImportCostsFor("import/17"));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.DemandCreateFor(" "));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.WishDetailFor(" "));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.GroupDetailFor(" "));
+        Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.DeliveryScopeFor(" "));
+        Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.TogetherOrderDetailFor(" "));
+        Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.SupplierMembershipFor(" "));
+        Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.UrgentHarvestReviewFor(" "));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.ImportOverviewFor(" "));
     }
 }

@@ -66,13 +66,13 @@ public sealed class InMemoryRestaurantSearchPolicyStore : IRestaurantSearchPolic
     {
         return new RestaurantSearchPolicyDto
         {
-            DefaultRadiusKm = 7,
-            MinRadiusKm = 1,
-            MaxRadiusKm = 10,
-            RadiusStepKm = 0.5,
-            QuickRadiusOptions = [3, 5, 7, 10],
-            RecommendedRadiusKm = 7,
-            DeliveryFeeCautionRadiusKm = 10,
+            DefaultRadiusKm = RestaurantSearchPolicyDefaults.DefaultRadiusKm,
+            MinRadiusKm = RestaurantSearchPolicyDefaults.MinRadiusKm,
+            MaxRadiusKm = RestaurantSearchPolicyDefaults.MaxRadiusKm,
+            RadiusStepKm = RestaurantSearchPolicyDefaults.RadiusStepKm,
+            QuickRadiusOptions = RestaurantSearchPolicyDefaults.CreateQuickRadiusOptions(),
+            RecommendedRadiusKm = RestaurantSearchPolicyDefaults.RecommendedRadiusKm,
+            DeliveryFeeCautionRadiusKm = RestaurantSearchPolicyDefaults.DeliveryFeeCautionRadiusKm,
             UpdatedBy = NormalizeUpdatedBy(updatedBy),
             UpdatedAt = DateTimeOffset.UtcNow
         };

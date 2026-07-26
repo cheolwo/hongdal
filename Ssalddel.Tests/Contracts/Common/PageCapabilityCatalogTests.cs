@@ -6,7 +6,7 @@ namespace Ssalddel.Tests.Contracts.Common;
 public sealed class PageCapabilityCatalogTests
 {
     [Fact]
-    public void 제품로드맵은_개별주문뒤에_공동주문과무역준비를배치한다()
+    public void 제품로드맵은_개별주문뒤에_같이주문과무역준비를배치한다()
     {
         Assert.Equal(
             ["0.0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5"],
@@ -18,7 +18,7 @@ public sealed class PageCapabilityCatalogTests
             SsalddelProductRoadmapCatalog.FoundationVersion,
             Assert.Single(SsalddelProductRoadmapCatalog.All, stage => stage.IsCurrent).Version);
         Assert.Equal("개별주문·개별 원장", SsalddelProductRoadmapCatalog.Find("0.5").DisplayName);
-        Assert.Equal("공동주문·주문자 집단화", SsalddelProductRoadmapCatalog.Find("1.0").DisplayName);
+        Assert.Equal("같이 주문·주문자 집단화", SsalddelProductRoadmapCatalog.Find("1.0").DisplayName);
         Assert.Equal(
             ["0.0", "0.5", "1.0", "1.5"],
             SsalddelProductRoadmapCatalog.All
@@ -673,6 +673,30 @@ public sealed class PageCapabilityCatalogTests
         Assert.True(capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects);
         Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+    }
+
+    [Theory]
+    [InlineData("/group-purchase/delivery-scopes", "orderer-delivery-scope-finder")]
+    [InlineData("/group-purchase/delivery-scopes/kr%3A11%3A11470%3A1147051000", "orderer-delivery-scope-together-orders")]
+    [InlineData("/group-purchase/together-orders/auto-group-onion", "orderer-together-order-public-detail")]
+    public void 배송권과_같이주문공개탐색은_인증없이_개인정보를제외한집계만읽는다(
+        string route,
+        string pageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("GroupPurchaseDemand", capability.WorkflowCodes);
     }
 
     [Theory]
