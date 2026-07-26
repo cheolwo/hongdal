@@ -14,7 +14,7 @@
 
 | 작업 경로 또는 종류 | 먼저 읽을 지침 | 핵심 기준 |
 | --- | --- | --- |
-| `Ssalddel/` server·API·Event | `Ssalddel/AGENTS.md` | HIOPS, Command/Event, metadata |
+| `Ssalddel/` server·API·Event | `Ssalddel/AGENTS.md` | 업무 실행 책임, Command/Event, metadata |
 | `Ssalddel/Controllers/Common/`, `Ssalddel.Community/`, `Ssalddel.Contracts/Common/Community/` | `Ssalddel/AGENTS.md`, `Ssalddel.Community/AGENTS.md` | Common에 포함되는 커뮤니티 API·contract·규칙 경계 |
 | `Ssalddel/Controllers/Platform/` | `Ssalddel/Controllers/Platform/AGENTS.md` | 업무 공통과 구분되는 플랫폼 기술 API |
 | `Ssalddel.Ui.Common/` 공통 UI | `Ssalddel.Ui.Common/AGENTS.md` | 3단계 navigation, MVVM, render 검증 |
@@ -72,7 +72,7 @@
 - 새 Controller, DTO, Entity, abstraction보다 기존 route, UseCase, metadata, contract, value object, shared component를 먼저 재사용한다.
 - 개인정보 암복호화는 domain property가 아니라 persistence/infrastructure 경계에서 처리한다.
 
-세부 층위는 [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md), Event 경계는 [Command/Event 리팩토링 원칙](docs/Architecture/CommandEvent리팩토링원칙.md)을 따른다.
+세부 층위는 [업무 실행 책임 모델](docs/Architecture/BusinessWorkflowResponsibilityModel.md), Event 경계는 [Command/Event 리팩토링 원칙](docs/Architecture/CommandEvent리팩토링원칙.md)을 따른다.
 
 ## 코드 명명 언어
 
@@ -121,5 +121,5 @@
 1. [README](README.md)
 2. [0.0 커뮤니티·공공데이터 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)
 3. [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md)
-4. [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md)
+4. [업무 실행 책임 모델](docs/Architecture/BusinessWorkflowResponsibilityModel.md)
 5. [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md)

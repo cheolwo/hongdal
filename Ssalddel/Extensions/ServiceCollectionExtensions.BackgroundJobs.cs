@@ -27,13 +27,13 @@ public static partial class ServiceCollectionExtensions
         CommunityEditorialBatchOptions communityEditorialBatchOptions,
         SsalddelExecutionOptions executionOptions)
     {
-        var 공동구매Os배치등록계획 = 공동구매수요모집Os배치등록계획.생성(
+        var 공동구매BatchRegistrationPlan = 공동구매수요모집BatchRegistrationPlan.생성(
             agriculturalFisheriesBatchOptions);
         var communityEditorialBatchRegistrationPlan =
             CommunityEditorialBatchRegistrationPlan.Create(
                 agriculturalFisheriesBatchOptions,
                 communityEditorialBatchOptions);
-        services.AddSingleton(공동구매Os배치등록계획);
+        services.AddSingleton(공동구매BatchRegistrationPlan);
         services.AddSingleton(communityEditorialBatchRegistrationPlan);
         services.AddScoped<AgriculturalFisheriesBatchRunner>();
         services.AddScoped<OfficialFoodIngredientCompanyBatchRunner>();
@@ -152,7 +152,7 @@ public static partial class ServiceCollectionExtensions
                 AddAgriculturalFisheriesBatchJobs(
                     q,
                     agriculturalFisheriesBatchOptions,
-                    공동구매Os배치등록계획);
+                    공동구매BatchRegistrationPlan);
             }
 
             if (communityEditorialBatchOptions.Enabled)
@@ -171,7 +171,7 @@ public static partial class ServiceCollectionExtensions
     private static void AddAgriculturalFisheriesBatchJobs(
         IServiceCollectionQuartzConfigurator quartz,
         AgriculturalFisheriesBatchOptions options,
-        공동구매수요모집Os배치등록계획 등록계획)
+        공동구매수요모집BatchRegistrationPlan 등록계획)
     {
         var timeZone = AgriculturalFisheriesBatchSchedule.ResolveTimeZone(options.TimeZoneId);
 

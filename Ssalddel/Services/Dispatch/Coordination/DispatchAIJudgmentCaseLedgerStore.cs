@@ -276,7 +276,7 @@ public sealed class File배차AI판단사례LedgerStore : I배차AI판단사례L
 
         if (string.IsNullOrWhiteSpace(relatedOS))
         {
-            throw new ArgumentException("관련 OS가 필요합니다.");
+            throw new ArgumentException("관련 실행 조율 책임 식별자가 필요합니다.");
         }
 
         if (string.IsNullOrWhiteSpace(situationSummary))

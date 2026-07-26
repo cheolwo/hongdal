@@ -18,6 +18,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<Mongo커뮤니티원장저장소>();
         services.AddSingleton<I커뮤니티원장투영작업저장소, Mongo커뮤니티원장투영작업저장소>();
         services.AddSingleton<I커뮤니티원장저장소, 이벤트발행커뮤니티원장저장소>();
+        services.AddSingleton<IBusinessCaseStore, BusinessCaseStoreAdapter>();
         services.AddSingleton<I커뮤니티원장공유정책저장소, Mongo커뮤니티원장공유정책저장소>();
         services.AddScoped<I커뮤니티원장공유Service, 커뮤니티원장공유Service>();
         services.AddSingleton<ICommunityLedgerRoleAccessPolicyStore, MongoCommunityLedgerRoleAccessPolicyStore>();

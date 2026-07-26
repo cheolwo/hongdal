@@ -11,7 +11,7 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Services.Orderer;
 
-public interface I공동수입준비OS
+public interface I공동수입준비ProcessManager
 {
     Task<공동수입준비Os상태응답?> 운영상태조회Async(
         string 자동집단Id,
@@ -36,7 +36,7 @@ public interface I공동수입준비OS
         CancellationToken cancellationToken = default);
 }
 
-internal static class 공동수입준비Os원장상태저장정책
+internal static class 공동수입준비ProcessManager상태저장정책
 {
     public const string BlockId = "trade-readiness-os-state";
     public const string 준비자료BlockId = "trade-readiness-request";
@@ -44,26 +44,26 @@ internal static class 공동수입준비Os원장상태저장정책
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    public static 공동수입준비Os영속상태 읽기(커뮤니티원장Dto ledger)
+    public static 공동수입준비ProcessManager영속상태 읽기(커뮤니티원장Dto ledger)
     {
         var json = ledger.블록목록
             .FirstOrDefault(block => string.Equals(block.BlockId, BlockId, StringComparison.OrdinalIgnoreCase))?
             .Data.GetValueOrDefault(JsonKey);
         if (string.IsNullOrWhiteSpace(json))
         {
-            return new 공동수입준비Os영속상태();
+            return new 공동수입준비ProcessManager영속상태();
         }
 
         try
         {
-            return JsonSerializer.Deserialize<공동수입준비Os영속상태>(json, JsonOptions)
-                   ?? new 공동수입준비Os영속상태();
+            return JsonSerializer.Deserialize<공동수입준비ProcessManager영속상태>(json, JsonOptions)
+                   ?? new 공동수입준비ProcessManager영속상태();
         }
         catch (JsonException)
         {
-            return new 공동수입준비Os영속상태
+            return new 공동수입준비ProcessManager영속상태
             {
-                마지막오류 = "저장된 1.5 OS 상태를 읽지 못해 원장 근거로 상태를 다시 구성했습니다."
+                마지막오류 = "저장된 1.5 실행 조율 상태를 읽지 못해 원장 근거로 상태를 다시 구성했습니다."
             };
         }
     }
@@ -84,7 +84,7 @@ internal static class 공동수입준비Os원장상태저장정책
 
     public static 커뮤니티원장저장요청 저장요청(
         커뮤니티원장Dto ledger,
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         string 상태코드)
     {
         var blocks = ledger.블록목록
@@ -93,7 +93,7 @@ internal static class 공동수입준비Os원장상태저장정책
             {
                 BlockId = BlockId,
                 BlockType = CommunityLedgerBlockTypes.Generic,
-                Title = "1.5 공동수입 준비 OS 상태",
+                Title = "1.5 공동수입 준비 실행 조율 상태",
                 State = 상태코드,
                 Data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -128,7 +128,7 @@ internal static class 공동수입준비Os원장상태저장정책
     }
 }
 
-internal sealed class 공동수입준비Os영속상태
+internal sealed class 공동수입준비ProcessManager영속상태
 {
     public string 마지막트리거코드 { get; set; } = 공동수입준비Os트리거코드.원장조회;
     public string 마지막조율자표시명 { get; set; } = string.Empty;
@@ -136,18 +136,18 @@ internal sealed class 공동수입준비Os영속상태
     public DateTimeOffset? 다음점검시각Utc { get; set; }
     public string 마지막오류 { get; set; } = string.Empty;
     public 공동수입준비Os전문검토인계기록? 전문검토인계기록 { get; set; }
-    public Dictionary<string, 공동수입준비Os작업실행기록> 작업실행기록 { get; set; } = new(StringComparer.Ordinal);
-    public List<공동수입준비Os명령기록> 최근명령목록 { get; set; } = [];
+    public Dictionary<string, 공동수입준비ProcessManager작업실행기록> 작업실행기록 { get; set; } = new(StringComparer.Ordinal);
+    public List<공동수입준비ProcessManager명령기록> 최근명령목록 { get; set; } = [];
 }
 
-internal sealed class 공동수입준비Os작업실행기록
+internal sealed class 공동수입준비ProcessManager작업실행기록
 {
     public int 시도횟수 { get; set; }
     public DateTimeOffset? 마지막실행시각Utc { get; set; }
     public string 마지막오류 { get; set; } = string.Empty;
 }
 
-internal sealed class 공동수입준비Os명령기록
+internal sealed class 공동수입준비ProcessManager명령기록
 {
     public string 요청멱등키 { get; set; } = string.Empty;
     public string 요청지문 { get; set; } = string.Empty;
@@ -159,35 +159,35 @@ internal sealed class 공동수입준비Os명령기록
     SsalddelCodeFeatureKeys.GroupImportTradeReadiness,
     SsalddelCodeLayer.Application,
     "기존 공동수입 원장의 1.5 준비 블록에서 완성도·최신성·포워더 인계·회신·전문검토 상태를 작업별로 조율합니다.",
-    ContractType = typeof(I공동수입준비OS),
+    ContractType = typeof(I공동수입준비ProcessManager),
     FlowOrder = 32,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
     Boundary = "공유 공공데이터 배치는 등록 상태만 참조하며 포워더 자동 선정, 외부 자동 전송, 계약·결제·신고·운송·창고 실행 또는 별도 공동수입 원장 생성을 수행하지 않습니다.")]
-public sealed class 공동수입준비OS : I공동수입준비OS
+public sealed class 공동수입준비ProcessManager : I공동수입준비ProcessManager
 {
     private const string 수동명령유형 = "WorkloadRun";
     private const string 전문검토인계명령유형 = "QualifiedReviewHandoff";
 
-    private readonly I공동구매자동집단화저장소 _groupStore;
-    private readonly I커뮤니티원장저장소 _ledgerStore;
-    private readonly I공동구매수요모집Os배치Catalog _sharedBatchCatalog;
+    private readonly I공동수입준비SourceGroupReader _sourceGroupReader;
+    private readonly I공동수입준비BusinessCaseStore _businessCaseStore;
+    private readonly I공동수입준비EvidenceBatchReader _evidenceBatchReader;
     private readonly IVersionFeatureFlagService _featureFlags;
     private readonly ISsalddelExecutionModePolicy _executionMode;
     private readonly IOptionsMonitor<GroupImportReadinessOsOptions> _options;
     private readonly TimeProvider _timeProvider;
 
-    public 공동수입준비OS(
-        I공동구매자동집단화저장소 groupStore,
-        I커뮤니티원장저장소 ledgerStore,
-        I공동구매수요모집Os배치Catalog sharedBatchCatalog,
+    public 공동수입준비ProcessManager(
+        I공동수입준비SourceGroupReader sourceGroupReader,
+        I공동수입준비BusinessCaseStore businessCaseStore,
+        I공동수입준비EvidenceBatchReader evidenceBatchReader,
         IVersionFeatureFlagService featureFlags,
         ISsalddelExecutionModePolicy executionMode,
         IOptionsMonitor<GroupImportReadinessOsOptions> options,
         TimeProvider timeProvider)
     {
-        _groupStore = groupStore;
-        _ledgerStore = ledgerStore;
-        _sharedBatchCatalog = sharedBatchCatalog;
+        _sourceGroupReader = sourceGroupReader;
+        _businessCaseStore = businessCaseStore;
+        _evidenceBatchReader = evidenceBatchReader;
         _featureFlags = featureFlags;
         _executionMode = executionMode;
         _options = options;
@@ -224,7 +224,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             : 요청.작업코드.Trim();
         if (!공동수입준비Os작업코드.수동실행지원목록.Contains(workloadCode))
         {
-            throw new ArgumentException($"수동 실행을 지원하지 않는 1.5 OS 작업입니다. WorkloadCode={workloadCode}");
+            throw new ArgumentException($"수동 실행을 지원하지 않는 1.5 준비 작업입니다. WorkloadCode={workloadCode}");
         }
 
         var context = await Context조회Async(자동집단Id.Trim(), cancellationToken)
@@ -248,7 +248,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
         foreach (var targetCode in targetCodes)
         {
             var execution = context.State.작업실행기록.GetValueOrDefault(targetCode)
-                            ?? new 공동수입준비Os작업실행기록();
+                            ?? new 공동수입준비ProcessManager작업실행기록();
             execution.시도횟수++;
             execution.마지막실행시각Utc = now;
             execution.마지막오류 = string.Empty;
@@ -319,7 +319,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             인계시각Utc = now
         };
         var execution = context.State.작업실행기록.GetValueOrDefault(공동수입준비Os작업코드.전문검토인계)
-                        ?? new 공동수입준비Os작업실행기록();
+                        ?? new 공동수입준비ProcessManager작업실행기록();
         execution.시도횟수++;
         execution.마지막실행시각Utc = now;
         execution.마지막오류 = string.Empty;
@@ -345,7 +345,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
         }
 
         var limit = Math.Clamp(최대건수 ?? _options.CurrentValue.BatchSize, 1, 200);
-        var ledgers = await _ledgerStore.원장목록조회Async(
+        var ledgers = await _businessCaseStore.목록조회Async(
             new 커뮤니티원장조회조건
             {
                 원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
@@ -359,7 +359,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             var autoGroupId = ledger.외부참조.GetValueOrDefault("AutoGroupId");
             var hasReadinessSource = ledger.블록목록.Any(block => string.Equals(
                 block.BlockId,
-                공동수입준비Os원장상태저장정책.준비자료BlockId,
+                공동수입준비ProcessManager상태저장정책.준비자료BlockId,
                 StringComparison.OrdinalIgnoreCase));
             if (string.IsNullOrWhiteSpace(autoGroupId) || !hasReadinessSource)
             {
@@ -367,7 +367,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
                 continue;
             }
 
-            var state = 공동수입준비Os원장상태저장정책.읽기(ledger);
+            var state = 공동수입준비ProcessManager상태저장정책.읽기(ledger);
             if (state.다음점검시각Utc.HasValue && state.다음점검시각Utc.Value > now)
             {
                 result.건너뜀건수++;
@@ -385,7 +385,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
                         작업코드 = 공동수입준비Os작업코드.전체준비점검
                     },
                     "system:group-import-readiness-os",
-                    "1.5 공동수입 준비 OS",
+                    "1.5 공동수입 준비 Process Manager",
                     cancellationToken);
                 result.조율건수++;
             }
@@ -402,18 +402,18 @@ public sealed class 공동수입준비OS : I공동수입준비OS
         return result;
     }
 
-    private async Task<공동수입준비OsContext?> Context조회Async(
+    private async Task<공동수입준비ProcessManagerContext?> Context조회Async(
         string 자동집단Id,
         CancellationToken cancellationToken)
     {
-        var group = await _groupStore.집단조회Async(자동집단Id, cancellationToken)
-            ?? throw new InvalidOperationException("1.5 준비 OS의 원천 자동집단을 찾을 수 없습니다.");
-        var ledger = await _ledgerStore.원장조회Async(
+        var group = await _sourceGroupReader.조회Async(자동집단Id, cancellationToken)
+            ?? throw new InvalidOperationException("1.5 준비 Process Manager의 원천 자동집단을 찾을 수 없습니다.");
+        var ledger = await _businessCaseStore.조회Async(
             공동수입준비원장Service.원장Id생성(자동집단Id),
             cancellationToken);
         if (ledger is null && !string.IsNullOrWhiteSpace(group.공동구매주문집계원장Id))
         {
-            var candidates = await _ledgerStore.원장목록조회Async(
+            var candidates = await _businessCaseStore.목록조회Async(
                 new 커뮤니티원장조회조건
                 {
                     원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
@@ -432,28 +432,22 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             return null;
         }
 
-        return new 공동수입준비OsContext(
+        return new 공동수입준비ProcessManagerContext(
             ledger,
             group,
-            공동수입준비Os원장상태저장정책.준비자료읽기(ledger),
-            공동수입준비Os원장상태저장정책.읽기(ledger));
+            공동수입준비ProcessManager상태저장정책.준비자료읽기(ledger),
+            공동수입준비ProcessManager상태저장정책.읽기(ledger));
     }
 
     private 공동수입준비Os상태응답 상태구성(
-        공동수입준비OsContext context,
+        공동수입준비ProcessManagerContext context,
         bool 이미처리됨)
     {
         var now = _timeProvider.GetUtcNow();
         var options = _options.CurrentValue;
         var freshness = TimeSpan.FromDays(Math.Clamp(options.EvidenceFreshnessDays, 1, 365));
         var evaluation = 공동수입준비원장정책.평가(context.Request, context.Group, now);
-        var sharedCatalog = _sharedBatchCatalog.조회();
-        var sharedJobs = sharedCatalog.작업목록
-            .Where(item => !string.Equals(
-                item.작업코드,
-                공동구매수요모집Os배치작업코드.모집마감장기정체점검,
-                StringComparison.Ordinal))
-            .ToArray();
+        var sharedJobs = _evidenceBatchReader.조회();
 
         var materialTransport = 재료묶음운송작업(context.Request, evaluation, context.State);
         var supplier = 공급자작업(context.Request, evaluation, context.State, now, freshness);
@@ -531,7 +525,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     private 공동수입준비Os작업응답 재료묶음운송작업(
         공동수입준비원장저장요청 request,
         공동수입준비원장평가응답 evaluation,
-        공동수입준비Os영속상태 state)
+        공동수입준비ProcessManager영속상태 state)
     {
         var blockers = new List<string>();
         if (!evaluation.재료품목구조완료)
@@ -553,7 +547,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             ? Array.Empty<string>()
             : handoffRecorded
                 ? ["포워더·물류대행업체에 인계한 뒤 LCL/FCL·견적·일정 회신을 기다리고 있습니다."]
-                : ["OS는 외부로 전송하지 않습니다. 사람이 업체를 정해 최소 정보 패키지를 전달하고 인계 사실을 기록해야 합니다."];
+                : ["Process Manager는 외부로 전송하지 않습니다. 사람이 업체를 정해 최소 정보 패키지를 전달하고 인계 사실을 기록해야 합니다."];
         var status = blockers.Count > 0
             ? 공동수입준비Os작업상태코드.차단
             : responseRecorded
@@ -576,17 +570,17 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             state,
             blockers,
             warnings,
-            "FCA 등 Incoterms와 LCL/FCL을 분리하며 OS는 업체 선정·외부 전송·운송 방식 확정·운송 지시를 수행하지 않습니다.");
+            "FCA 등 Incoterms와 LCL/FCL을 분리하며 Process Manager는 업체 선정·외부 전송·운송 방식 확정·운송 지시를 수행하지 않습니다.");
     }
 
     private async Task<공동수입준비Os상태응답> 상태저장Async(
-        공동수입준비OsContext context,
+        공동수입준비ProcessManagerContext context,
         string actorUserId,
         CancellationToken cancellationToken)
     {
         var response = 상태구성(context, 이미처리됨: false);
-        var saved = await _ledgerStore.원장저장Async(
-            공동수입준비Os원장상태저장정책.저장요청(context.Ledger, context.State, response.상태코드),
+        var saved = await _businessCaseStore.저장Async(
+            공동수입준비ProcessManager상태저장정책.저장요청(context.Ledger, context.State, response.상태코드),
             actorUserId,
             cancellationToken);
         var savedContext = context with { Ledger = saved };
@@ -596,7 +590,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     private 공동수입준비Os작업응답 공급자작업(
         공동수입준비원장저장요청 request,
         공동수입준비원장평가응답 evaluation,
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         DateTimeOffset now,
         TimeSpan freshness)
     {
@@ -635,7 +629,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     private 공동수입준비Os작업응답 견적원가작업(
         공동수입준비원장저장요청 request,
         공동수입준비원장평가응답 evaluation,
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         DateTimeOffset now,
         TimeSpan freshness)
     {
@@ -671,7 +665,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     private 공동수입준비Os작업응답 품목규제작업(
         공동수입준비원장저장요청 request,
         공동수입준비원장평가응답 evaluation,
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         DateTimeOffset now,
         TimeSpan freshness)
     {
@@ -724,13 +718,13 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             state,
             blockers,
             warnings,
-            "OS는 HS·HTS를 확정하거나 수입 신고 판단을 대신하지 않습니다.");
+            "Process Manager는 HS·HTS를 확정하거나 수입 신고 판단을 대신하지 않습니다.");
     }
 
     private 공동수입준비Os작업응답 책임작업(
         공동수입준비원장저장요청 request,
         공동수입준비원장평가응답 evaluation,
-        공동수입준비Os영속상태 state)
+        공동수입준비ProcessManager영속상태 state)
     {
         var blockers = evaluation.책임초안구조완료
             ? Array.Empty<string>()
@@ -757,12 +751,12 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             state,
             blockers,
             unconfirmed,
-            "OS가 수입자·관세사·운송 수행자를 지정하거나 계약 당사자로 만들지 않습니다.");
+            "Process Manager가 수입자·관세사·운송 수행자를 지정하거나 계약 당사자로 만들지 않습니다.");
     }
 
     private 공동수입준비Os작업응답 공유공공데이터작업(
         IReadOnlyList<공동구매수요모집Os배치작업응답> sharedJobs,
-        공동수입준비Os영속상태 state)
+        공동수입준비ProcessManager영속상태 state)
     {
         var activeCount = sharedJobs.Count(item => item.Os사용활성여부);
         var warnings = activeCount > 0
@@ -774,9 +768,9 @@ public sealed class 공동수입준비OS : I공동수입준비OS
             "공유배치카탈로그",
             activeCount > 0 ? 공동수입준비Os작업상태코드.준비 : 공동수입준비Os작업상태코드.설정비활성,
             activeCount > 0
-                ? $"공유 배치 {activeCount}개가 OS 사용 상태입니다."
+                ? $"공유 배치 {activeCount}개가 실행 조율 사용 상태입니다."
                 : "공유 배치의 등록 설정을 표시하며 이 점검이 외부 API를 즉시 호출하지는 않습니다.",
-            "1.0 OS 공유 공공데이터 배치 카탈로그",
+            "1.0 실행 조율 공유 공공데이터 배치 카탈로그",
             state,
             [],
             warnings,
@@ -785,7 +779,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     }
 
     private 공동수입준비Os작업응답 전문검토인계작업(
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         bool handoffReady,
         bool reviewCompleted)
     {
@@ -831,7 +825,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
         string status,
         string guidance,
         string source,
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         IReadOnlyList<string> blockers,
         IReadOnlyList<string> warnings,
         string boundary,
@@ -925,13 +919,13 @@ public sealed class 공동수입준비OS : I공동수입준비OS
         => now.AddSeconds(Math.Clamp(_options.CurrentValue.ScanIntervalSeconds, 30, 86400));
 
     private void 명령기록(
-        공동수입준비Os영속상태 state,
+        공동수입준비ProcessManager영속상태 state,
         string idempotencyKey,
         string fingerprint,
         string commandType,
         DateTimeOffset now)
     {
-        state.최근명령목록.Add(new 공동수입준비Os명령기록
+        state.최근명령목록.Add(new 공동수입준비ProcessManager명령기록
         {
             요청멱등키 = idempotencyKey.Trim(),
             요청지문 = fingerprint,
@@ -964,7 +958,7 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new InvalidOperationException("1.5 OS 명령에는 요청 멱등 키가 필요합니다.");
+            throw new InvalidOperationException("1.5 Process Manager 명령에는 요청 멱등 키가 필요합니다.");
         }
         if (value.Trim().Length > 160)
         {
@@ -972,11 +966,11 @@ public sealed class 공동수입준비OS : I공동수입준비OS
         }
     }
 
-    private static void 동일멱등요청검증(공동수입준비Os명령기록 previous, string fingerprint)
+    private static void 동일멱등요청검증(공동수입준비ProcessManager명령기록 previous, string fingerprint)
     {
         if (!string.Equals(previous.요청지문, fingerprint, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("같은 멱등 키를 서로 다른 1.5 OS 명령에 사용할 수 없습니다.");
+            throw new InvalidOperationException("같은 멱등 키를 서로 다른 1.5 Process Manager 명령에 사용할 수 없습니다.");
         }
     }
 
@@ -998,11 +992,11 @@ public sealed class 공동수입준비OS : I공동수입준비OS
                 ? fallback.Trim()
                 : "미지정";
 
-    private sealed record 공동수입준비OsContext(
+    private sealed record 공동수입준비ProcessManagerContext(
         커뮤니티원장Dto Ledger,
         공동구매자동집단응답 Group,
         공동수입준비원장저장요청 Request,
-        공동수입준비Os영속상태 State);
+        공동수입준비ProcessManager영속상태 State);
 }
 
 [SsalddelCodeMetadata(
@@ -1012,18 +1006,18 @@ public sealed class 공동수입준비OS : I공동수입준비OS
     FlowOrder = 36,
     Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
     Boundary = "원장 근거 점검만 실행하며 외부 공공데이터 호출, 게시, 계약, 결제, 신고, 운송 또는 창고 지시를 수행하지 않습니다.")]
-public sealed class 공동수입준비OsWorker : BackgroundService
+public sealed class 공동수입준비정기점검BackgroundService : BackgroundService
 {
-    private readonly I공동수입준비OS _os;
+    private readonly I공동수입준비ProcessManager _processManager;
     private readonly IOptionsMonitor<GroupImportReadinessOsOptions> _options;
-    private readonly ILogger<공동수입준비OsWorker> _logger;
+    private readonly ILogger<공동수입준비정기점검BackgroundService> _logger;
 
-    public 공동수입준비OsWorker(
-        I공동수입준비OS os,
+    public 공동수입준비정기점검BackgroundService(
+        I공동수입준비ProcessManager processManager,
         IOptionsMonitor<GroupImportReadinessOsOptions> options,
-        ILogger<공동수입준비OsWorker> logger)
+        ILogger<공동수입준비정기점검BackgroundService> logger)
     {
-        _os = os;
+        _processManager = processManager;
         _options = options;
         _logger = logger;
     }
@@ -1037,11 +1031,11 @@ public sealed class 공동수입준비OsWorker : BackgroundService
             {
                 if (options.Enabled)
                 {
-                    var result = await _os.정기점검Async(options.BatchSize, stoppingToken);
+                    var result = await _processManager.정기점검Async(options.BatchSize, stoppingToken);
                     if (result.조율건수 > 0 || result.실패건수 > 0)
                     {
                         _logger.LogInformation(
-                            "1.5 공동수입 준비 OS 점검 완료. Scanned={Scanned}, Coordinated={Coordinated}, Skipped={Skipped}, Failed={Failed}",
+                            "1.5 공동수입 준비 정기 점검 완료. Scanned={Scanned}, Coordinated={Coordinated}, Skipped={Skipped}, Failed={Failed}",
                             result.조회건수,
                             result.조율건수,
                             result.건너뜀건수,
@@ -1055,7 +1049,7 @@ public sealed class 공동수입준비OsWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "1.5 공동수입 준비 OS background 점검 중 예외가 발생했습니다.");
+                _logger.LogError(exception, "1.5 공동수입 준비 background 점검 중 예외가 발생했습니다.");
             }
 
             try

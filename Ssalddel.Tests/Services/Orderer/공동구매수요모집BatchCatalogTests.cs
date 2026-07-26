@@ -9,12 +9,12 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Tests.Services.Orderer;
 
-public sealed class 공동구매수요모집Os배치CatalogTests
+public sealed class 공동구매수요모집BatchCatalogTests
 {
     [Fact]
     public void 배치Catalog관리Api_기능이꺼진상태도보는읽기전용Bootstrap이다()
     {
-        var version = typeof(공동구매수요모집Os배치AdminController)
+        var version = typeof(공동구매수요모집BatchCatalogAdminController)
             .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true);
 
         Assert.NotNull(version);
@@ -27,7 +27,7 @@ public sealed class 공동구매수요모집Os배치CatalogTests
     [Fact]
     public void Os등록계획은_공공데이터수집만포함하고_커뮤니티글쓰기작업을소유하지않는다()
     {
-        var plan = 공동구매수요모집Os배치등록계획.생성(
+        var plan = 공동구매수요모집BatchRegistrationPlan.생성(
             new AgriculturalFisheriesBatchOptions
             {
                 Enabled = true,
@@ -47,7 +47,7 @@ public sealed class 공동구매수요모집Os배치CatalogTests
     [Fact]
     public void Catalog_1점0내부작업과가격근거파이프라인을활성상태로노출한다()
     {
-        var plan = 공동구매수요모집Os배치등록계획.생성(
+        var plan = 공동구매수요모집BatchRegistrationPlan.생성(
             new AgriculturalFisheriesBatchOptions
             {
                 Enabled = true,
@@ -57,7 +57,7 @@ public sealed class 공동구매수요모집Os배치CatalogTests
                 UsdaMonthlyEnabled = true,
                 IngredientCompanyResearchEnabled = false
             });
-        var catalog = new 공동구매수요모집Os배치Catalog(
+        var catalog = new 공동구매수요모집BatchCatalog(
             plan,
             new StaticOptionsMonitor<GroupPurchaseDemandProcessManagerOptions>(new GroupPurchaseDemandProcessManagerOptions
             {
@@ -87,8 +87,8 @@ public sealed class 공동구매수요모집Os배치CatalogTests
     [Fact]
     public void Catalog_기본설정에서는공유외부배치를활성화하지않는다()
     {
-        var catalog = new 공동구매수요모집Os배치Catalog(
-            공동구매수요모집Os배치등록계획.빈계획(),
+        var catalog = new 공동구매수요모집BatchCatalog(
+            공동구매수요모집BatchRegistrationPlan.빈계획(),
             new StaticOptionsMonitor<GroupPurchaseDemandProcessManagerOptions>(new GroupPurchaseDemandProcessManagerOptions()),
             new StubFeatureFlagService(enabled: false),
             new StubExecutionModePolicy(SsalddelExecutionMode.Simulation));

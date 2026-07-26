@@ -5,7 +5,7 @@
 ## 호출과 상태 변경
 
 - 기본 호출 방향은 `Controller API -> UseCase/Command -> Domain/Infrastructure -> DB/Event/Outbox`다.
-- OS는 원장과 규칙을 읽어 순서·정책·handoff를 조율한다. 엔진은 후보·점수·분류를 반환할 뿐 영속 상태를 확정하지 않는다.
+- `ProcessManager`와 `WorkflowCoordinator`는 Business Case와 규칙을 읽어 순서·정책·handoff를 조율한다. Engine과 구체적인 판단 도구는 후보·점수·분류를 반환할 뿐 영속 상태를 확정하지 않는다.
 - 상태 전이는 서버가 권한과 현재 상태를 검증하고, client는 성공 응답 또는 server event 뒤 같은 원장을 다시 조회한다.
 - 새 Controller나 DTO보다 기존 route, UseCase, metadata, contract를 먼저 재사용한다.
 - 하나의 EventHandler는 하나의 후속 관심사만 맡긴다. 원본과 반드시 함께 성공해야 하는 일은 같은 transaction, 재시도 가능한 알림·투영·감사·추천은 분리한다.
@@ -34,4 +34,4 @@
 - 상태 전이 변경은 저장, RDB 투영, Event 재처리, 권한, 다른 client의 재조회를 검증한다.
 - 수정 직후에는 `powershell -NoProfile -ExecutionPolicy Bypass -File eng/validate-changes.ps1 -Level Fast`, 완료 전에는 같은 명령의 `-Level Task`를 우선 사용한다.
 
-세부 층위는 `docs/Architecture/HIOPSLayerModel.md`, Event 경계는 `docs/Architecture/CommandEvent리팩토링원칙.md`, metadata 규약은 `docs/Architecture/SsalddelCodeMetadata.md`를 따른다.
+세부 층위는 `docs/Architecture/BusinessWorkflowResponsibilityModel.md`, Event 경계는 `docs/Architecture/CommandEvent리팩토링원칙.md`, metadata 규약은 `docs/Architecture/SsalddelCodeMetadata.md`를 따른다.

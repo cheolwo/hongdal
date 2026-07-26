@@ -9,7 +9,7 @@ using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Tests.Services.Orderer;
 
-public sealed class 공동수입준비OSTests
+public sealed class 공동수입준비ProcessManagerTests
 {
     private static readonly DateTimeOffset Now = new(2026, 7, 23, 3, 0, 0, TimeSpan.Zero);
 
@@ -212,10 +212,10 @@ public sealed class 공동수입준비OSTests
         var group = Group();
         var ledger = Ledger(group, request ?? CompleteRequest());
         var store = new FakeLedgerStore(ledger);
-        var service = new 공동수입준비OS(
-            new FakeGroupStore(group),
+        var service = new 공동수입준비ProcessManager(
+            new FakeSourceGroupReader(group),
             store,
-            new FakeBatchCatalog(),
+            new FakeEvidenceBatchReader(),
             new StubFeatureFlags(enabled: true),
             new StubExecutionModePolicy(SsalddelExecutionMode.Simulation),
             new StaticOptionsMonitor<GroupImportReadinessOsOptions>(new GroupImportReadinessOsOptions
@@ -392,41 +392,33 @@ public sealed class 공동수입준비OSTests
         };
 
     private sealed record Fixture(
-        공동수입준비OS Service,
+        공동수입준비ProcessManager Service,
         공동구매자동집단응답 Group,
         커뮤니티원장Dto Ledger,
         FakeLedgerStore Store);
 
-    private sealed class FakeGroupStore(공동구매자동집단응답 group) : I공동구매자동집단화저장소
+    private sealed class FakeSourceGroupReader(
+        공동구매자동집단응답 group) : I공동수입준비SourceGroupReader
     {
-        public Task<공동구매자동집단응답?> 집단조회Async(string 자동집단Id, CancellationToken cancellationToken = default)
+        public Task<공동구매자동집단응답?> 조회Async(
+            string 자동집단Id,
+            CancellationToken cancellationToken = default)
             => Task.FromResult(string.Equals(자동집단Id, group.자동집단Id, StringComparison.Ordinal)
                 ? group
                 : null);
-
-        public Task<IReadOnlyList<공동구매자동집단응답>> 집단목록조회Async(공동구매자동집단조회조건 조건, CancellationToken cancellationToken = default)
-            => Task.FromResult<IReadOnlyList<공동구매자동집단응답>>([group]);
-
-        public Task<공동구매자동집단응답> 수요등록Async(공동구매자동수요등록Command command, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
-
-        public Task<공동구매자동수요철회응답> 수요철회Async(공동구매자동수요철회Command command, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
-
-        public Task<공동구매자동집단응답> 개별원함원장연결Async(string 자동집단Id, string 수요Id, string 개별원함원장Id, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
-
-        public Task<공동구매자동집단응답> 개별주문원장연결Async(string 자동집단Id, string 수요Id, string 공동구매주문집계원장Id, string 개별주문원장Id, string 입고예정원장Id, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
     }
 
-    private sealed class FakeLedgerStore(커뮤니티원장Dto ledger) : I커뮤니티원장저장소
+    private sealed class FakeLedgerStore(
+        커뮤니티원장Dto ledger) : I공동수입준비BusinessCaseStore
     {
         private 커뮤니티원장Dto _ledger = ledger;
 
         public int SaveCount { get; private set; }
 
-        public Task<커뮤니티원장Dto> 원장저장Async(커뮤니티원장저장요청 request, string updatedBy, CancellationToken cancellationToken = default)
+        public Task<커뮤니티원장Dto> 저장Async(
+            커뮤니티원장저장요청 request,
+            string updatedBy,
+            CancellationToken cancellationToken = default)
         {
             if (request.기대Revision != _ledger.Revision)
             {
@@ -460,41 +452,35 @@ public sealed class 공동수입준비OSTests
             return Task.FromResult(_ledger);
         }
 
-        public Task<커뮤니티원장Dto?> 원장조회Async(string 원장Id, CancellationToken cancellationToken = default)
-            => Task.FromResult(string.Equals(원장Id, _ledger.원장Id, StringComparison.Ordinal)
+        public Task<커뮤니티원장Dto?> 조회Async(
+            string caseId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(string.Equals(caseId, _ledger.원장Id, StringComparison.Ordinal)
                 ? _ledger
                 : null);
 
-        public Task<IReadOnlyList<커뮤니티원장Dto>> 원장목록조회Async(커뮤니티원장조회조건 query, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<커뮤니티원장Dto>> 목록조회Async(
+            커뮤니티원장조회조건 query,
+            CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<커뮤니티원장Dto>>([_ledger]);
-
-        public Task<커뮤니티원장Dto?> 원장상태변경Async(커뮤니티원장상태변경요청 request, string updatedBy, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
     }
 
-    private sealed class FakeBatchCatalog : I공동구매수요모집Os배치Catalog
+    private sealed class FakeEvidenceBatchReader : I공동수입준비EvidenceBatchReader
     {
-        public 공동구매수요모집Os배치Catalog응답 조회()
-            => new()
-            {
-                기능활성여부 = true,
-                OsWorker활성여부 = true,
-                실행모드 = "Simulation",
-                시뮬레이션여부 = true,
-                작업목록 =
-                [
-                    new 공동구매수요모집Os배치작업응답
-                    {
-                        작업코드 = 공동구매수요모집Os배치작업코드.Kamis일별가격수집,
-                        작업명 = "KAMIS 일별 가격 근거 수집",
-                        등록여부 = true,
-                        Os사용활성여부 = true,
-                        공유인프라여부 = true,
-                        상태코드 = 공동구매수요모집Os배치상태코드.Os활성,
-                        데이터출처 = "KAMIS"
-                    }
-                ]
-            };
+        public IReadOnlyList<공동구매수요모집Os배치작업응답> 조회()
+            =>
+            [
+                new 공동구매수요모집Os배치작업응답
+                {
+                    작업코드 = 공동구매수요모집Os배치작업코드.Kamis일별가격수집,
+                    작업명 = "KAMIS 일별 가격 근거 수집",
+                    등록여부 = true,
+                    Os사용활성여부 = true,
+                    공유인프라여부 = true,
+                    상태코드 = 공동구매수요모집Os배치상태코드.Os활성,
+                    데이터출처 = "KAMIS"
+                }
+            ];
     }
 
     private sealed class StubFeatureFlags(bool enabled) : IVersionFeatureFlagService

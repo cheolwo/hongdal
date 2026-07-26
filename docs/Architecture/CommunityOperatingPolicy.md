@@ -44,7 +44,7 @@ This keeps expectations honest. Ssalddel can structure, guide, schedule, recomme
 | 필요한 원장 구성 | 참여자, 장소, 물건, 재고, 상태, 증빙, 정산, 인계 같은 원장 블록 | 다음 행동을 열기 전에 필요한 최소 블록을 표시한다 |
 | 살뜰이 도울 일 | 다음 행동 안내, 상태 변경, 알림, 추천, 보류 판단, 증빙 첨부, 정산 표시 | 시스템이 구조화, 기록, 스케줄링, 추천, handoff로 도울 수 있는 일만 적는다 |
 | 사용자가 직접 해야 할 일 | 실제 약속, 상대방 확인, 현장 확인, 결제 사실, 분쟁 대응, 신고 보완 | 플랫폼이 자동 보증하지 않는 책임을 분리해 적는다 |
-| OS/엔진/API 연결 | 어떤 하위 OS가 흐름을 잡고, 어떤 엔진이 판단을 돕고, 어떤 API가 상태를 바꾸는지 | 실제 실행은 OS가 아니라 API, UseCase, 메시지, application service가 맡는다 |
+| 실행 조율/판단 도구/API 연결 | 어떤 Process Manager나 Coordinator가 흐름을 잡고, 어떤 판단 도구가 후보를 만들며, 어떤 API가 상태를 바꾸는지 | 실제 실행은 API, UseCase, 메시지, application service가 맡는다 |
 
 원장화 판정은 다음 네 가지 중 하나로 둔다.
 
@@ -89,7 +89,7 @@ Community conversations can become lightweight ledgers when participants decide 
 
 The first skeleton keeps ledger creation inside the community posting flow. A user selects a ledger type, receives a role template, and then edits the post body before publishing. This avoids forcing every casual conversation into a rigid workflow while still giving users a path from talk to action.
 
-Community is the center of entry, not the only processor. When a community ledger becomes concrete enough to run as work, the server classifies its character and hands it to the appropriate HIOPS sub-OS. The selected OS is primarily a scheduler and orchestrator: it reads ledger state, applies composition rules, chooses queues or engines, and decides which API or application service should be called next. The actual execution remains in HTTP APIs, controller/use-case boundaries, messages, or internal application service calls.
+Community is the center of entry, not the only processor. When a community Business Case becomes concrete enough to run as work, the server classifies its character and hands it to the appropriate `ProcessManager` or `WorkflowCoordinator`. That coordination responsibility reads current state, applies composition rules, chooses queues or decision tools, and decides which API or application service should be called next. The actual execution remains in HTTP APIs, controller/use-case boundaries, messages, or internal application service calls.
 
 Initial ledger-to-OS routing:
 
@@ -189,18 +189,18 @@ SsalddelMart should be separated from the general warehouse outbound workflow at
 
 Users should not always have to choose the perfect ledger template first. A community post or loose ledger draft can already contain enough shape for AI to suggest which workflow it belongs to. The classifier should look at the ledger title, body, UI sections, action hints, states, flexible attributes, and evidence labels, then return scored candidates rather than silently mutating the ledger.
 
-The first implementation can be deterministic and rule-based. It should compare the draft shape with the ledger template catalog, composition rules, target OS metadata, engine hints, and practical API surfaces. Later, HIOPS AI or an LLM can sit behind the same input/output contract to add richer natural-language interpretation.
+The first implementation can be deterministic and rule-based. It should compare the draft shape with the Business Case template catalog, composition rules, coordination-responsibility metadata, decision-tool hints, and practical API surfaces. Later, an AI classifier or an LLM can sit behind the same input/output contract to add richer natural-language interpretation.
 
 The classifier response should include:
 
-- the primary ledger template candidate and target OS;
+- the primary Business Case template candidate and coordination responsibility;
 - alternative candidates with scores when the shape is ambiguous;
 - matched signals such as `도심 재고`, `포장 완료`, `운송 인계`, or `상차지`;
 - missing required signals from composition rules;
 - related composition rule codes and processing surface hints;
 - a human-review flag when top candidates are too close or the shape is too weak.
 
-This keeps AI in the interpretation layer. The AI may say that a draft looks like a SsalddelMart delivery flow with an immediate-delivery attribute, a warehouse outbound flow, a cargo transport flow, or only a loose community request. It should not directly create relational work records, award experience, or call operational APIs until the ledger is confirmed and handed to the proper OS/API boundary.
+This keeps AI in the interpretation layer. The AI may say that a draft looks like a SsalddelMart delivery flow with an immediate-delivery attribute, a warehouse outbound flow, a cargo transport flow, or only a loose community request. It should not directly create relational work records, award experience, or call operational APIs until the Business Case is confirmed and handed to the proper Policy and execution boundary.
 
 The system should reason about action hints such as state change, evidence attachment, payment marking, completion confirmation, participant invitation, and ledger closing separately from the visible role name. These action hints can guide UI layout and audit messages, but they should not prevent ordinary participation merely because the user picked a different role label.
 
@@ -250,9 +250,9 @@ Evidence is optional by default. A participant may attach an image, memo, or lin
 
 ## Ledger Block Model
 
-A ledger should be treated as a composition of reusable blocks, not as one rigid form. The block is the smallest unit that UI, AI judgment, composition rules, and OS/API handoff can all understand together.
+A Business Case should be treated as a composition of reusable Case Sections, not as one rigid form. A Case Section is the smallest unit that UI, AI judgment, composition rules, and the coordination/API handoff can all understand together.
 
-The full layer boundary between ledger blocks, composition rules, OS, engines, APIs, and stores is defined in [HIOPS Layer Model](HIOPSLayerModel.md). This section applies that layer model to the community-ledger intake surface.
+The full responsibility boundary between Business Case sections, policies, process coordination, decision tools, APIs, and stores is defined in [Business Workflow Responsibility Model](BusinessWorkflowResponsibilityModel.md). This section applies that model to the community intake surface.
 
 Starter block types:
 
@@ -265,9 +265,9 @@ Starter block types:
 | State | progress state, cooking, picking, packing, delivery, close | next available actions and experience-event candidates |
 | Evidence | image, memo, signature, barcode, exception record | proof, dispute review, settlement hold or release |
 | Settlement | payment mark, counterpart confirmation, hold, dispute note | participant-centered settlement status without implying platform custody |
-| Handoff | target OS, engine, API, service hint, external reference | when a ledger becomes executable work and where it should go next |
+| Handoff | coordinator, decision tool, API, service hint, external reference | when a Business Case becomes executable work and where it should go next |
 
-The community ledger template catalog should expose these blocks explicitly. Dynamic UI can render sections from the blocks, the AI classifier can score a ledger by matched block signals, composition rules can decide which blocks must exist before an action opens, and HIOPS can use the handoff block to schedule the proper API or application service call.
+The community Business Case template catalog should expose these Case Sections explicitly. Dynamic UI can render them, the AI classifier can score a Business Case by matched signals, composition rules can decide which sections must exist before an action opens, and a `ProcessManager` or `WorkflowCoordinator` can use the handoff section to schedule the proper API or application service call.
 
 This keeps MongoDB flexible without turning ledgers into unstructured JSON. A ledger may add custom attributes, but the reusable block catalog gives the system a stable vocabulary for AI judgment, UI rendering, RDB projection, and OS scheduling.
 
@@ -297,15 +297,15 @@ The community ledger source of truth should be a MongoDB document, not a fixed r
 
 The recommended primary collection is `community_ledgers`. Each document should keep:
 
-- ledger id, template key, target OS code, current state, and community post/thread references;
+- Business Case id, template key, compatibility coordination code, current state, and community post/thread references;
 - flexible attributes for the selected ledger type such as pickup place, inbound item, menu, warehouse location, sale item, group purchase quantity, or errand details;
 - participant roles and permissions as the user actually configured them, not only the default template;
 - composition-rule satisfaction state;
 - evidence references such as uploaded image object names, links, memo ids, and optional payment marks;
-- OS/API handoff history with route/service hints, request ids, relational entity ids, and timestamps;
+- coordination/API handoff history with route/service hints, request ids, relational entity ids, and timestamps;
 - privacy-safe public summary fields that can be shown back in community.
 
-Relational DB records should be projections or linked work entities, not the flexible ledger source. When a ledger becomes concrete enough, the OS/API may create or update relational records such as:
+Relational DB records should be projections or linked work entities, not the flexible Business Case source. When a Business Case becomes concrete enough, the execution layer may create or update relational records such as:
 
 - transport request and driver transport progress records;
 - food order and restaurant acceptance records;
@@ -315,7 +315,7 @@ Relational DB records should be projections or linked work entities, not the fle
 
 Every relational projection should keep a reverse link such as `CommunityLedgerId` or a domain-specific equivalent. This lets MongoDB preserve the full community-ledger shape while the relational DB keeps the stable data needed for transactional workflows, indexed queries, authorization, settlement, and reporting.
 
-The OS handoff remains conceptual and scheduling-oriented. In code, the handoff can be an HTTP API call, a controller/use-case boundary, a message, or an internal application service call. The ledger template should therefore record both the target OS scheduler and the practical processing surfaces that currently exist.
+The coordination handoff remains conceptual and scheduling-oriented. In code, the handoff can be an HTTP API call, a controller/use-case boundary, a message, or an internal application service call. The Business Case template should therefore record both the responsible `ProcessManager`, `WorkflowCoordinator`, or `Scheduler` and the practical processing surfaces that currently exist.
 
 현재 구현 기준은 다음과 같이 둔다.
 
@@ -332,7 +332,7 @@ Community ledgers should also become a way for people to learn better ways of wo
 
 A best ledger pattern should preserve:
 
-- the ledger type and target OS;
+- the Business Case type and coordination responsibility;
 - the role split that made the work easier;
 - the UI sections that helped participants see the right information;
 - the actions that moved the work forward;
@@ -370,10 +370,10 @@ The shared home uses a workspace catalog to map:
 
 - a visible life-work area such as cargo transport, food order, warehouse inbound, local sale, or errand;
 - the ledger template that defines default roles and permissions;
-- the target OS that should schedule and orchestrate the ledger when it becomes concrete work;
+- the `ProcessManager`, `WorkflowCoordinator`, or `Scheduler` that should coordinate the Business Case when it becomes concrete work;
 - the current route that can open the existing static screen while the dynamic UI engine is still being built.
 
-This lets Ssalddel move from many predetermined client apps toward one community-centered workspace. A user can start from a conversation, choose a ledger shape, fill a draft, and then continue into the current work screen. Over time, app-specific home panels should become dynamic ledger sections rendered from the ledger template and OS metadata, not separate hard-coded product surfaces.
+This lets Ssalddel move from many predetermined client apps toward one community-centered workspace. A user can start from a conversation, choose a Business Case shape, fill a draft, and then continue into the current work screen. Over time, app-specific home panels should become dynamic Case Sections rendered from the Business Case template and coordination metadata, not separate hard-coded product surfaces.
 
 ## Activity Signal Policy
 
