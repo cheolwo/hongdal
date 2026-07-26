@@ -190,7 +190,7 @@ public static class BaguaTransitionCatalog
             "주문의 수령지와 약속 시간을 바탕으로 배송 또는 화물 운송을 요청한다.",
             BaguaTransitionWorkflowKinds.Handoff),
         Transition(BaguaTrigramKeys.Zhen, BaguaTrigramKeys.Gen,
-            "공동구매 · 공동주문 합의",
+            "공동구매 · 같이 주문 합의",
             "여러 참여자의 수요를 모아 품목, 목표 수량, 가격, 픽업 장소를 의결한다.",
             BaguaTransitionWorkflowKinds.Governance,
             opensAgreementFlow: true),

@@ -279,7 +279,7 @@ public static class CommunityBoardCatalog
     public static CommunityBoardDefinition Participation { get; } = Board(
         CommunityBoardKeys.Participation,
         "모집·함께하기",
-        "공동구매·공동주문 수요와 필요한 역할을 모으는 공간",
+        "공동구매·같이 주문 수요와 필요한 역할을 모으는 공간",
         CommunityBoardGroupCodes.CollectiveWork,
         "함께하는 일",
         isUserCreatable: true,

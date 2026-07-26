@@ -42,7 +42,7 @@ public sealed class RoleAdvertisingAudienceCatalog : IRoleAdvertisingAudienceCat
             "검증 가능한 대표 참여 신청",
             true,
             [RoleAdvertisingProviderCodes.Meta, RoleAdvertisingProviderCodes.GoogleAds, RoleAdvertisingProviderCodes.NaverSearchAds],
-            ["공동구매 모집", "아파트 공동구매", "지역 공동주문"],
+            ["같이 주문 모집", "아파트 공동구매", "지역 같이 주문"],
             ["Community Services"],
             ["Community Management"]),
         new(

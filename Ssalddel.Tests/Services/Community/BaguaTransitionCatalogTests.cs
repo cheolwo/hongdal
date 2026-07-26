@@ -85,7 +85,7 @@ public sealed class BaguaTransitionCatalogTests
 
         var groupPurchase = BaguaTransitionCatalog.Find(BaguaTrigramKeys.Zhen, BaguaTrigramKeys.Gen);
         Assert.Equal("order-to-agreement", groupPurchase.TransitionKey);
-        Assert.Equal("공동구매 · 공동주문 합의", groupPurchase.PageTitle);
+        Assert.Equal("공동구매 · 같이 주문 합의", groupPurchase.PageTitle);
         Assert.Contains("픽업 장소", groupPurchase.Purpose);
     }
 

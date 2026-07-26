@@ -156,12 +156,12 @@ public static class CommunityLedgerDevelopmentDataSeeder
             Block("sale-stock", CommunityLedgerBlockTypes.Inventory, "판매 가능 수량", "재고 확보",
                 ("확보수량", "40개"), ("판매자", "살뜰 생활상점")),
             Block("sale-settlement", CommunityLedgerBlockTypes.Settlement, "판매 정산", "주문 합계 대기",
-                ("방식", "공동주문 확정 후 결제 표시"))
+                ("방식", "같이 주문 확정 후 결제 표시"))
         };
 
         var warehouseBlocks = new[]
         {
-            Block("outbound-order", CommunityLedgerBlockTypes.Order, "공동주문 출고 지시", "출고 예정",
+            Block("outbound-order", CommunityLedgerBlockTypes.Order, "같이 주문 출고 지시", "출고 예정",
                 ("상품", "재생 세제 리필 2L"), ("예정수량", "24개")),
             Block("picking", CommunityLedgerBlockTypes.Inventory, "피킹·포장", "작업 대기",
                 ("피킹단위", "6개입 4상자"), ("포장", "누액 방지 완충")),
@@ -172,7 +172,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
         var orderA상세Blocks = new[]
         {
             Block("orderer", CommunityLedgerBlockTypes.Participant, "주문자", "참여 확정",
-                ("표시명", "101동 공동주문 참여자")),
+                ("표시명", "101동 같이 주문 참여자")),
             Block("order-item", CommunityLedgerBlockTypes.Order, "주문 항목", "주문 확인",
                 ("상품", "재생 세제 리필 2L"), ("수량", "12개")),
             Block("fulfillment", CommunityLedgerBlockTypes.State, "주문 이행", "상품 준비",
@@ -182,7 +182,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
         var orderB상세Blocks = new[]
         {
             Block("orderer", CommunityLedgerBlockTypes.Participant, "주문자", "참여 확정",
-                ("표시명", "102동 공동주문 참여자")),
+                ("표시명", "102동 같이 주문 참여자")),
             Block("order-item", CommunityLedgerBlockTypes.Order, "주문 항목", "주문 확인",
                 ("상품", "재생 세제 리필 2L"), ("수량", "12개")),
             Block("fulfillment", CommunityLedgerBlockTypes.State, "주문 이행", "상품 준비",
@@ -195,7 +195,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
                 ("참여동", "101동, 102동"), ("총수량", "24개")),
             Block("group-condition", CommunityLedgerBlockTypes.Decision, "공동 조건", "조건 확정",
                 ("최소수량", "20개"), ("공동수령", "양천 생활물류 거점")),
-            Block("group-progress", CommunityLedgerBlockTypes.State, "공동주문 진행", "판매·출고 준비",
+            Block("group-progress", CommunityLedgerBlockTypes.State, "같이 주문 진행", "판매·출고 준비",
                 ("다음행동", "피킹·포장 후 운송 인계"))
         };
 
@@ -264,7 +264,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
                 "dev-ledger-group-sale",
                 CommunityLedgerTemplateKeys.LocalSale,
                 "살뜰 생활상점 세제 판매",
-                "공동주문 참여자에게 재생 세제를 공급하고 싶어요.",
+                "같이 주문 참여자에게 재생 세제를 공급하고 싶어요.",
                 커뮤니티원장상태.진행중,
                 "재고 확보",
                 CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
@@ -275,8 +275,8 @@ public static class CommunityLedgerDevelopmentDataSeeder
             CreateRequest(
                 "dev-ledger-group-warehouse-outbound",
                 CommunityLedgerTemplateKeys.WarehouseOutbound,
-                "공동주문 세제 출고",
-                "확정된 공동주문 수량을 피킹하고 포장해 운송 담당자에게 넘기고 싶어요.",
+                "같이 주문 세제 출고",
+                "확정된 같이 주문 수량을 피킹하고 포장해 운송 담당자에게 넘기고 싶어요.",
                 커뮤니티원장상태.진행중,
                 "피킹 대기",
                 CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
@@ -321,7 +321,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
             CreateRequest(
                 "dev-ledger-group-purchase",
                 CommunityLedgerTemplateKeys.GroupPurchase,
-                "양천 아파트 재생 세제 공동주문",
+                "양천 아파트 재생 세제 같이 주문",
                 "여러 동의 개별 주문을 묶어 판매, 출고와 운송까지 함께 확인하고 싶어요.",
                 커뮤니티원장상태.진행중,
                 "판매·출고 준비",

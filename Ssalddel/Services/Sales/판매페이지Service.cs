@@ -209,12 +209,12 @@ public sealed class 판매페이지Service : I판매페이지Service
     {
         if (!individualAllowed && !groupAllowed)
         {
-            throw new InvalidOperationException("개별주문 또는 공동주문 중 하나 이상을 허용해야 합니다.");
+            throw new InvalidOperationException("개별주문 또는 같이 주문 중 하나 이상을 허용해야 합니다.");
         }
 
         if (groupAllowed && groupMinimum is <= 1)
         {
-            throw new InvalidOperationException("공동주문 최소 수량은 2개 이상이어야 합니다.");
+            throw new InvalidOperationException("같이 주문 최소 수량은 2개 이상이어야 합니다.");
         }
     }
 

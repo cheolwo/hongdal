@@ -81,6 +81,25 @@ public sealed class SsalddelCodeMetadataTests
                 ?.Template);
     }
 
+    [Fact]
+    public void RegionalCultureImagePrompt_Metadata는_조회와생성을분리한다()
+    {
+        var metadata = SsalddelCodeMetadataReader.ReadFeature(
+            SsalddelCodeFeatureKeys.RegionalCultureImagePrompt,
+            typeof(RegionalCultureImagePromptDto).Assembly,
+            typeof(지역문화이미지PromptController).Assembly);
+
+        Assert.Contains(metadata, item => item.ComponentType == typeof(RegionalCultureImagePromptDto));
+        Assert.Contains(metadata, item => item.ComponentType == typeof(지역문화이미지Prompt조회UseCase));
+        Assert.Contains(metadata, item => item.ComponentType == typeof(지역문화이미지PromptController));
+        Assert.All(metadata, item =>
+        {
+            Assert.False(item.Effects.HasFlag(SsalddelCodeEffect.ThirdPartyApiCall));
+            Assert.False(item.Effects.HasFlag(SsalddelCodeEffect.MayIncurExternalCost));
+            Assert.False(string.IsNullOrWhiteSpace(item.Boundary));
+        });
+    }
+
     private static IReadOnlyList<SsalddelCodeMetadataDescriptor> ReadFeatureMetadata()
         => SsalddelCodeMetadataReader.ReadFeature(
             SsalddelCodeFeatureKeys.CommunityAuthoringImage,

@@ -321,7 +321,7 @@ public sealed class Mongo주문자집단운영주체저장소 : I주문자집단
             new()
             {
                 역할코드 = HrDetailedRoleCodes.OrdererGroupSortingWorker,
-                역할명 = "공동주문 입고 분류 알바",
+                역할명 = "같이 주문 입고 분류 알바",
                 참여자분류 = HrParticipantCategoryCodes.CommunityPartTimeWorker,
                 근로자출처선호 = 주문자집단근로자출처선호코드.입주민우선,
                 입주민우선 = true,
@@ -335,7 +335,7 @@ public sealed class Mongo주문자집단운영주체저장소 : I주문자집단
             new()
             {
                 역할코드 = HrDetailedRoleCodes.OrdererGroupDistributionWorker,
-                역할명 = "공동주문 단지 내 배분 알바",
+                역할명 = "같이 주문 단지 내 배분 알바",
                 참여자분류 = HrParticipantCategoryCodes.CommunityPartTimeWorker,
                 근로자출처선호 = 주문자집단근로자출처선호코드.입주민우선,
                 입주민우선 = true,

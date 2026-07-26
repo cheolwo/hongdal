@@ -148,7 +148,7 @@ public static class PersonalDataFieldProtectionCatalog
             ],
             "시/군/구 단위만 표시",
             "집단 후보 판정 목적 종료 또는 사용자가 소속 해제할 때까지",
-            "공동 주문 모집권 표시에는 상세주소를 포함하지 않음"),
+            "같이 주문 모집권 표시에는 상세주소를 포함하지 않음"),
         Rule(
             PersonalDataFieldKey.DetailedAddress,
             "상세 주소",
@@ -183,7 +183,7 @@ public static class PersonalDataFieldProtectionCatalog
                 PersonalDataProtectionActionCode.RetentionRuleRequired
             ],
             "지역 2단계 또는 승인된 집단명만 표시",
-            "집단 소속 해제 또는 공동 주문 종료 이후 파기/익명화",
+            "집단 소속 해제 또는 같이 주문 종료 이후 파기/익명화",
             "다른 주문자에게는 상세 거주 단서가 아닌 집단 표시명만 공개"),
         Rule(
             PersonalDataFieldKey.BankAccountNumber,

@@ -75,7 +75,7 @@ public sealed class CommunityDynamicDiscoveryViewModelTests
                 Domains =
                 [
                     Domain(CommunityDynamicTopicDomainCodes.Warehouse, "창고", "입고", "출고"),
-                    Domain(CommunityDynamicTopicDomainCodes.Order, "주문", "개별주문", "공동주문"),
+                    Domain(CommunityDynamicTopicDomainCodes.Order, "주문", "개별주문", "같이 주문"),
                     Domain(CommunityDynamicTopicDomainCodes.Sales, "판매", "음식", "화물"),
                     Domain(CommunityDynamicTopicDomainCodes.Transport, "운송", "상차", "하차")
                 ]

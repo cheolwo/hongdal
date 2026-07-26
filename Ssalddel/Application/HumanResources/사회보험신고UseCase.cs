@@ -22,7 +22,7 @@ public interface I사회보험신고UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.HrParticipation)]
-[SsalddelUseCase("사회보험 신고", Summary = "공동주문 참여 고용 흐름에서 건강보험, 국민연금, 고용보험 신고 계획을 평가하고 진행 상태를 관리합니다.")]
+[SsalddelUseCase("사회보험 신고", Summary = "같이 주문 참여 고용 흐름에서 건강보험, 국민연금, 고용보험 신고 계획을 평가하고 진행 상태를 관리합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.EmployerOrOperatingEntity)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 public sealed class 사회보험신고UseCase : I사회보험신고UseCase

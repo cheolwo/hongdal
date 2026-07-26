@@ -247,6 +247,11 @@ public sealed class YouTube음식상품발견ServiceTests
             => Task.FromResult(
                 공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>.성공결과([]));
 
+        public Task<공동구매처리결과<공동구매자동집단응답>> 상세조회Async(
+            string 자동집단Id,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
+
         public Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(
             공동구매자동수요등록Command command,
             CancellationToken cancellationToken = default)

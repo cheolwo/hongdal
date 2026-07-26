@@ -80,7 +80,7 @@ public static class CommunityDynamicTopicCatalog
         new(CommunityDynamicTopicDomainCodes.Order, "주문", CommunityDynamicTopicCodes.IndividualOrder,
             "개별주문", "한 주문자의 개별 주문과 수령 흐름에 관한 글을 모아봅니다.", 30),
         new(CommunityDynamicTopicDomainCodes.Order, "주문", CommunityDynamicTopicCodes.GroupOrder,
-            "공동주문", "여러 개별 주문이 합쳐지는 공동주문·공동구매 흐름의 글을 모아봅니다.", 40),
+            "같이 주문", "여러 개별 주문이 합쳐지는 같이 주문·공동구매 흐름의 글을 모아봅니다.", 40),
         new(CommunityDynamicTopicDomainCodes.Sales, "판매", CommunityDynamicTopicCodes.Food,
             "음식", "음식·식당·식재료 판매에 관한 글과 동의 기반 주변 정보를 모아봅니다.", 50),
         new(CommunityDynamicTopicDomainCodes.Sales, "판매", CommunityDynamicTopicCodes.Cargo,

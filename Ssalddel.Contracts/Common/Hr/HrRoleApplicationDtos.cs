@@ -55,8 +55,8 @@ public static class HrRoleApplicationCatalog
         Option(HrDetailedRoleCodes.WarehouseInventoryOperator, "창고 재고 지원", "재고 확인과 정리 업무를 돕는 역할에 관심을 표시합니다."),
         Option(HrDetailedRoleCodes.WarehouseDispatchOperator, "창고 출고 지원", "피킹·포장·출고 준비를 돕는 역할에 관심을 표시합니다."),
         Option(HrDetailedRoleCodes.ShippingAgencyOperator, "배송대행 운영 지원", "배송대행 운영과 정보 정리를 돕는 역할에 관심을 표시합니다."),
-        Option(HrDetailedRoleCodes.OrdererGroupSortingWorker, "공동주문 분류 지원", "공동주문 물품 분류를 돕는 역할에 관심을 표시합니다.", HrParticipantCategoryCodes.CommunityPartTimeWorker),
-        Option(HrDetailedRoleCodes.OrdererGroupDistributionWorker, "공동주문 배부 지원", "공동주문 물품 배부를 돕는 역할에 관심을 표시합니다.", HrParticipantCategoryCodes.CommunityPartTimeWorker),
+        Option(HrDetailedRoleCodes.OrdererGroupSortingWorker, "같이 주문 분류 지원", "같이 주문 물품 분류를 돕는 역할에 관심을 표시합니다.", HrParticipantCategoryCodes.CommunityPartTimeWorker),
+        Option(HrDetailedRoleCodes.OrdererGroupDistributionWorker, "같이 주문 배부 지원", "같이 주문 물품 배부를 돕는 역할에 관심을 표시합니다.", HrParticipantCategoryCodes.CommunityPartTimeWorker),
         Option(HrDetailedRoleCodes.OrdererGroupParcelAggregationWorker, "택배 취합 지원", "공동 택배 취합과 정리를 돕는 역할에 관심을 표시합니다.", HrParticipantCategoryCodes.CommunityPartTimeWorker),
         Option(HrDetailedRoleCodes.OrdererGroupCommunityFacilityWorker, "공동시설 운영 지원", "공동시설의 일상 운영을 돕는 역할에 관심을 표시합니다.", HrParticipantCategoryCodes.CommunityPartTimeWorker)
     ];

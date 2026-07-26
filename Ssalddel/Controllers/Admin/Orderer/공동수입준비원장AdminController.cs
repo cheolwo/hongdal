@@ -30,14 +30,14 @@ namespace Ssalddel.Controllers.Admin.Orderer;
 public sealed class 공동수입준비원장AdminController : ControllerBase
 {
     private readonly I공동수입준비원장Service _service;
-    private readonly I공동수입준비OS _operatingSystem;
+    private readonly I공동수입준비ProcessManager _processManager;
 
     public 공동수입준비원장AdminController(
         I공동수입준비원장Service service,
-        I공동수입준비OS operatingSystem)
+        I공동수입준비ProcessManager processManager)
     {
         _service = service;
-        _operatingSystem = operatingSystem;
+        _processManager = processManager;
     }
 
     [HttpGet]
@@ -99,7 +99,7 @@ public sealed class 공동수입준비원장AdminController : ControllerBase
         [FromRoute(Name = "autoGroupId")] string 자동집단Id,
         CancellationToken cancellationToken)
     {
-        var result = await _operatingSystem.운영상태조회Async(자동집단Id, cancellationToken);
+        var result = await _processManager.운영상태조회Async(자동집단Id, cancellationToken);
         return result is null
             ? NotFound()
             : Ok(result);
@@ -118,7 +118,7 @@ public sealed class 공동수입준비원장AdminController : ControllerBase
             request.요청멱등키 = idempotencyKey.Trim();
         }
 
-        return ExecuteAsync(async () => Ok(await _operatingSystem.작업실행Async(
+        return ExecuteAsync(async () => Ok(await _processManager.작업실행Async(
             자동집단Id,
             request,
             CurrentUserId(),
@@ -139,7 +139,7 @@ public sealed class 공동수입준비원장AdminController : ControllerBase
             request.요청멱등키 = idempotencyKey.Trim();
         }
 
-        return ExecuteAsync(async () => Ok(await _operatingSystem.전문검토인계Async(
+        return ExecuteAsync(async () => Ok(await _processManager.전문검토인계Async(
             자동집단Id,
             request,
             CurrentUserId(),

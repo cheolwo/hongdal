@@ -15,7 +15,7 @@ public static class 주문원장구성정책
         => !string.IsNullOrWhiteSpace(원장템플릿Key)
            && 주문루트템플릿Keys.Contains(원장템플릿Key.Trim());
 
-    public static bool 공동주문묶음인가(string? 원장템플릿Key)
+    public static bool 같이주문묶음인가(string? 원장템플릿Key)
         => string.Equals(
             원장템플릿Key?.Trim(),
             CommunityLedgerTemplateKeys.GroupOrder,
@@ -53,7 +53,7 @@ public static class 주문원장구성정책
 
     public static bool 통합대상인가(string? 원장템플릿Key)
         => 주문루트인가(원장템플릿Key)
-           || 공동주문묶음인가(원장템플릿Key)
+           || 같이주문묶음인가(원장템플릿Key)
            || 공동구매인가(원장템플릿Key)
            || 공동수입인가(원장템플릿Key)
            || 공동수출인가(원장템플릿Key);
@@ -213,7 +213,7 @@ public static class 주문원장구성정책
         if (공동구매인가(기준원장템플릿Key))
         {
             if (string.Equals(normalizedRole, 주문원장포함역할.주문집계, StringComparison.OrdinalIgnoreCase)
-                && 공동주문묶음인가(하위원장템플릿Key))
+                && 같이주문묶음인가(하위원장템플릿Key))
             {
                 return;
             }
@@ -229,7 +229,7 @@ public static class 주문원장구성정책
                 "공동구매에는 주문집계 원장만 연결하며, 레거시 구조에서는 개별 주문 원장만 연결할 수 있습니다.");
         }
 
-        if (공동주문묶음인가(기준원장템플릿Key))
+        if (같이주문묶음인가(기준원장템플릿Key))
         {
             if (!string.Equals(normalizedRole, 주문원장포함역할.개별주문, StringComparison.OrdinalIgnoreCase)
                 || !주문루트인가(하위원장템플릿Key))

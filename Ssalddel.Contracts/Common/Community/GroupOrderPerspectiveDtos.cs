@@ -2,6 +2,10 @@ using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Contracts.Common.Community;
 
+/// <summary>
+/// 기존 공개 contract 이름은 호환을 위해 유지합니다.
+/// 사용자 표시 용어는 <see cref="같이주문용어Catalog"/>의 "같이 주문"을 사용합니다.
+/// </summary>
 public static class 공동주문관점코드
 {
     public const string 주문자 = "orderer";
@@ -11,7 +15,7 @@ public static class 공동주문관점코드
     public const string 공동원장 = "community-ledger";
 }
 
-/// <summary>개별 주문 원장의 집합으로 계산되는 공동주문 한 건의 역할별 읽기 모델입니다.</summary>
+/// <summary>개별 주문 원장의 집합으로 계산되는 같이 주문 한 건의 역할별 읽기 모델입니다.</summary>
 public sealed class 공동주문관점항목응답
 {
     public string 공동주문원장Id { get; set; } = string.Empty;

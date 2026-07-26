@@ -207,7 +207,7 @@ flowchart TD
 - Admin: Command 기능 설정, Event 후속처리, 알림/정산/노출 정책 제어
 - OrdererApp/주문자 집단: 주소·품목·수령 조건 기반 집단화와 비구속 수요는 1.0, 공급·HS·수입 준비는 1.5, 운송은 2.0, 입고·판매·배분은 2.5로 분리
 
-주문자 집단 공동구매 흐름은 `1.0` 후속 자산입니다. 현재 0.0에서는 커뮤니티 글·참여·동의·공동 원장 흐름만 기본 노출하고, 공동구매 수요와 집단화는 전용 검증 profile에서 확인합니다. 상세 설계와 용어 정의는 [주문자 집단 공동주문/커머스 흐름](../docs/ProjectOverview/orderer-group-commerce-flows.md)에 둡니다.
+주문자 집단 같이 주문 흐름은 `1.0` 후속 자산입니다. 현재 0.0에서는 커뮤니티 글·참여·동의·공동 원장 흐름만 기본 노출하고, 공동구매 수요와 집단화는 전용 검증 profile에서 확인합니다. 상세 설계와 용어 정의는 [주문자 집단 같이 주문/커머스 흐름](../docs/ProjectOverview/orderer-group-commerce-flows.md)에 둡니다.
 
 ## 기사 앱 경계
 
@@ -541,7 +541,7 @@ flowchart TD
 - [ISMS-P 개인정보/계약 준비도](../docs/Compliance/ISMS-P-readiness.md)
 - [배차큐_진행현황_2026-07-02.md](../Docs/DispatchQueue/배차큐_진행현황_2026-07-02.md)
 - [화면 기능 처리 흐름](../docs/ProjectOverview/screen-flows.md)
-- [주문자 집단 공동주문/커머스 흐름](../docs/ProjectOverview/orderer-group-commerce-flows.md)
+- [주문자 집단 같이 주문/커머스 흐름](../docs/ProjectOverview/orderer-group-commerce-flows.md)
 
 ## 개발 원칙
 

@@ -41,7 +41,7 @@ public sealed class 공동수입준비원장AdminControllerTests
             typeof(공동수입준비Os상태응답),
             typeof(공동수입준비원장AdminController),
             typeof(공동수입준비원장Service),
-            typeof(공동수입준비OS)
+            typeof(공동수입준비ProcessManager)
         }
             .SelectMany(SsalddelCodeMetadataReader.Read)
             .Where(item => item.FeatureKey == SsalddelCodeFeatureKeys.GroupImportTradeReadiness)

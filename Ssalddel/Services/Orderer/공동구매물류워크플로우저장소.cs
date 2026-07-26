@@ -360,7 +360,7 @@ public sealed class Mongo공동구매물류워크플로우저장소 : I공동구
         {
             워크플로우Id = "food-cold-chain-domestic-apartment-v1",
             버전 = "1.0",
-            표시명 = "공동주택 국내 판매자 냉장/냉동 먹거리 공동주문 기본 흐름",
+            표시명 = "공동주택 국내 판매자 냉장/냉동 먹거리 같이 주문 기본 흐름",
             품목분류코드 = "FoodColdChain",
             온도코드 = "Frozen",
             물류방식 = "DomesticBulk",
@@ -368,13 +368,13 @@ public sealed class Mongo공동구매물류워크플로우저장소 : I공동구
             주문자집단배송권유형 = "ApartmentComplex",
             활성여부 = true,
             태그목록 = ["orderer-group", "apartment", "cold-chain", "domestic-seller", "responsibility"],
-            메모 = "국내 판매자 공동주문에서 판매자 출고, 국내 기사 운송, 대표 수령, 세대별 배분 책임 구간을 분리한다.",
+            메모 = "국내 판매자 같이 주문에서 판매자 출고, 국내 기사 운송, 대표 수령, 세대별 배분 책임 구간을 분리한다.",
             단계목록 =
             [
                 new()
                 {
                     단계코드 = "GroupOrderConfirmed",
-                    표시명 = "공동주문 확정",
+                    표시명 = "같이 주문 확정",
                     순서 = 10,
                     책임주체코드 = 공동구매물류워크플로우주체코드.플랫폼,
                     설명 = "참여자, 수량, 결제 상태를 확정한다.",
@@ -481,7 +481,7 @@ public sealed class Mongo공동구매물류워크플로우저장소 : I공동구
         {
             워크플로우Id = "food-cold-chain-overseas-apartment-v1",
             버전 = "1.0",
-            표시명 = "공동주택 해외 판매자 냉장/냉동 먹거리 공동주문 기본 흐름",
+            표시명 = "공동주택 해외 판매자 냉장/냉동 먹거리 같이 주문 기본 흐름",
             품목분류코드 = "FoodColdChain",
             온도코드 = "Frozen",
             물류방식 = "InternationalToDomesticBulk",
@@ -489,13 +489,13 @@ public sealed class Mongo공동구매물류워크플로우저장소 : I공동구
             주문자집단배송권유형 = "ApartmentComplex",
             활성여부 = true,
             태그목록 = ["orderer-group", "apartment", "cold-chain", "overseas-seller", "customs", "logistics-proxy", "marketplace", "responsibility"],
-            메모 = "해외 판매자 공동주문은 해외 포장, 국제 운송/통관, 국내 물류대행 입고, 판매채널 출품, 출고 배치 가능 구간을 별도 책임 구간으로 분리한다.",
+            메모 = "해외 판매자 같이 주문은 해외 포장, 국제 운송/통관, 국내 물류대행 입고, 판매채널 출품, 출고 배치 가능 구간을 별도 책임 구간으로 분리한다.",
             단계목록 =
             [
                 new()
                 {
                     단계코드 = "GroupOrderConfirmed",
-                    표시명 = "공동주문 확정",
+                    표시명 = "같이 주문 확정",
                     순서 = 10,
                     책임주체코드 = 공동구매물류워크플로우주체코드.플랫폼,
                     설명 = "참여자, 수량, 결제 상태와 수입 가능 조건을 확정한다.",
@@ -576,7 +576,7 @@ public sealed class Mongo공동구매물류워크플로우저장소 : I공동구
                     표시명 = "스마트스토어/쿠팡 등 판매채널 등록",
                     순서 = 70,
                     책임주체코드 = 공동구매물류워크플로우주체코드.판매채널운영자,
-                    설명 = "공동주문 참여자가 판매할 상품을 판매상품과 채널출품으로 연결하고 판매 가능 상태를 확인한다.",
+                    설명 = "같이 주문 참여자가 판매할 상품을 판매상품과 채널출품으로 연결하고 판매 가능 상태를 확인한다.",
                     필요증빙코드목록 = [공동구매물류증빙코드.판매채널출품스냅샷],
                     오류대응코드목록 = ["ListingRejected", "ChannelProductMappingMissing", "PriceOrComplianceReviewRequired"]
                 },

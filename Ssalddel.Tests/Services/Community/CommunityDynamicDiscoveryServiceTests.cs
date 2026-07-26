@@ -30,7 +30,7 @@ public sealed class CommunityDynamicDiscoveryServiceTests
         Assert.Collection(
             catalog.Domains,
             domain => Assert.Equal(["입고", "출고"], domain.Topics.Select(topic => topic.DisplayName)),
-            domain => Assert.Equal(["개별주문", "공동주문"], domain.Topics.Select(topic => topic.DisplayName)),
+            domain => Assert.Equal(["개별주문", "같이 주문"], domain.Topics.Select(topic => topic.DisplayName)),
             domain => Assert.Equal(["음식", "화물"], domain.Topics.Select(topic => topic.DisplayName)),
             domain => Assert.Equal(["상차", "하차"], domain.Topics.Select(topic => topic.DisplayName)));
     }
@@ -41,7 +41,7 @@ public sealed class CommunityDynamicDiscoveryServiceTests
         var classifier = new CommunityDynamicTopicClassifier();
 
         var matches = classifier.Classify(
-            "공동주문 음식 화물 입고와 출고",
+            "같이 주문 음식 화물 입고와 출고",
             "개별 주문을 합친 뒤 상차하고 하차하여 인수합니다.");
 
         Assert.Equal(8, matches.Select(match => match.TopicKey).Distinct().Count());
@@ -51,6 +51,19 @@ public sealed class CommunityDynamicDiscoveryServiceTests
         Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.GroupOrder);
         Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.TransportLoading);
         Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.TransportUnloading);
+    }
+
+    [Theory]
+    [InlineData("공동주문 참여자를 찾습니다.")]
+    [InlineData("Would you like to Order Together?")]
+    [InlineData("一緒に注文する人を探しています。")]
+    public void 번역된_표시와_예전_공동주문_표현을_같이주문주제로_분류한다(string title)
+    {
+        var classifier = new CommunityDynamicTopicClassifier();
+
+        var matches = classifier.Classify(title, null);
+
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.GroupOrder);
     }
 
     [Fact]

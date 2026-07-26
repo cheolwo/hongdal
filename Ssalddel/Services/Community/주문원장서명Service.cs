@@ -257,7 +257,7 @@ public interface I주문원장서명UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
-[SsalddelUseCase("주문자 서명", Summary = "개별 주문 원장에 주문자 서명 증적을 연결하고 공동주문에서는 상태만 집계합니다.")]
+[SsalddelUseCase("주문자 서명", Summary = "개별 주문 원장에 주문자 서명 증적을 연결하고 같이 주문에서는 상태만 집계합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.CommunityMember)]
 public sealed class 주문원장서명UseCase : I주문원장서명UseCase
 {
@@ -447,7 +447,7 @@ public sealed class 주문원장서명UseCase : I주문원장서명UseCase
 
         if (!주문원장구성정책.주문루트인가(원장.원장템플릿Key))
         {
-            return BadRequest<커뮤니티원장Dto>("서명은 공동주문 묶음이 아닌 개별 주문 원장에만 등록할 수 있습니다.");
+            return BadRequest<커뮤니티원장Dto>("서명은 같이 주문 묶음이 아닌 개별 주문 원장에만 등록할 수 있습니다.");
         }
 
         var 접근가능 = string.Equals(원장.생성자UserId, 현재UserId, StringComparison.OrdinalIgnoreCase)

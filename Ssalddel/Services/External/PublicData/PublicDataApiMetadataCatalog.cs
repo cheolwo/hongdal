@@ -71,7 +71,7 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
             MainResponseFields = ["kaptCode", "kaptName", "hoCnt", "dongCnt", "kaptdWtimebus", "kaptdPcnt"],
             UsageNotes =
             [
-                "공동 주문 목표 수량과 단지 내 분류 규모를 추정할 때 참고 정보로 사용합니다.",
+                "같이 주문 목표 수량과 단지 내 분류 규모를 추정할 때 참고 정보로 사용합니다.",
                 "관리사무소 승인 또는 공식 협약을 대체하는 데이터로 사용하지 않습니다."
             ]
         },

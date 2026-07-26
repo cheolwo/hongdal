@@ -48,7 +48,7 @@ public interface I공공데이터조회UseCase
 
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
-[SsalddelUseCase("공공 데이터 조회", Summary = "주문자 앱에서 주소, 공동주택, 관리비, 통관 평균 단가 데이터를 조회해 공동주문 판단 자료로 사용합니다.")]
+[SsalddelUseCase("공공 데이터 조회", Summary = "주문자 앱에서 주소, 공동주택, 관리비, 통관 평균 단가 데이터를 조회해 같이 주문 판단 자료로 사용합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.Orderer)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase

@@ -83,7 +83,7 @@ public sealed class 주문자집단자동배정Service : I주문자집단자동�
         return new 주문자집단자동배정응답
         {
             ScopeKey = $"apartment-complex:{NormalizeKey(complexCode)}",
-            DisplayName = $"{complexName} 공동주문 집단",
+            DisplayName = $"{complexName} 같이 주문 집단",
             Basis = "ApartmentComplex",
             AddressHint = addressHint.Trim(),
             ApartmentComplexCode = complexCode,

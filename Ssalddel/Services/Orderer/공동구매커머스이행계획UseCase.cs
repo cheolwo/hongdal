@@ -62,7 +62,7 @@ public interface I공동구매커머스이행계획UseCase
     SsalddelUseCaseRelationKind.Extend,
     "HR참여운영UseCase",
     Condition = "단지 내부 분류, 배분, 보조 업무에 참여 인력을 운영하는 경우",
-    Summary = "공동주문 운영 업무를 고용, 계약, 참여 보상 흐름으로 확장합니다.")]
+    Summary = "같이 주문 운영 업무를 고용, 계약, 참여 보상 흐름으로 확장합니다.")]
 public sealed class 공동구매커머스이행계획UseCase : I공동구매커머스이행계획UseCase
 {
     private readonly I공동구매커머스이행계획저장소 _store;
@@ -92,7 +92,7 @@ public sealed class 공동구매커머스이행계획UseCase : I공동구매커�
         {
             var item = await _store.GetAsync(planId, cancellationToken);
             return item is null
-                ? 공동구매처리결과<공동구매커머스이행계획Dto>.찾을수없음("공동주문 커머스 풀필먼트 플랜을 찾을 수 없습니다.")
+                ? 공동구매처리결과<공동구매커머스이행계획Dto>.찾을수없음("같이 주문 커머스 풀필먼트 플랜을 찾을 수 없습니다.")
                 : 공동구매처리결과<공동구매커머스이행계획Dto>.성공결과(item);
         }
         catch (InvalidOperationException ex)

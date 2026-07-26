@@ -47,12 +47,12 @@ public static class CommunityVowVersionCatalog
             ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.IndividualOrderVersion),
             "공개 정보에서 고른 상품과 수량·수령 조건을 한 사람의 철회 가능한 주문 의향과 개별 원장으로 관리하는 흐름",
             "0.0의 공개 데이터, 참여 동의, 원장 식별과 신뢰 기록을 이어받습니다.",
-            "개별 원장은 결제·매매 계약·배송 확정이 아니며 사용자의 명시적 동의 없이 공동주문에 포함하지 않습니다."),
+            "개별 원장은 결제·매매 계약·배송 확정이 아니며 사용자의 명시적 동의 없이 같이 주문에 포함하지 않습니다."),
         new(
             SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             ProductVersionName(SsalddelProductRoadmapCatalog.GroupPurchaseVersion),
             ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.GroupPurchaseVersion),
-            "0.5 개별주문 가운데 공동 참여에 동의한 원장을 품목·지역·수령 조건별 주문자 집단과 공동주문 모집 원장으로 만드는 흐름",
+            "0.5 개별주문 가운데 같이 주문 참여에 동의한 원장을 품목·지역·수령 조건별 주문자 집단과 같이 주문 모집 원장으로 만드는 흐름",
             "0.5의 개별 원장, 철회 상태와 공동 참여 동의를 이어받습니다.",
             "결제·매매 계약·수입 신고·자동 배차를 확정하지 않고 참여자가 철회할 수 있는 수요와 합의를 기록합니다."),
         new(

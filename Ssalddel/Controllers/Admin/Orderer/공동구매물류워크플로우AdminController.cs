@@ -58,7 +58,7 @@ public sealed class 공동구매물류워크플로우AdminController : Controlle
     {
         var item = await _공동구매물류워크플로우Store.GetAsync(workflowId, version, cancellationToken);
         return item is null
-            ? this.ToNotFoundProblem("공동주문 물류 흐름 정의를 찾을 수 없습니다.")
+            ? this.ToNotFoundProblem("같이 주문 물류 흐름 정의를 찾을 수 없습니다.")
             : Ok(item);
     }
 

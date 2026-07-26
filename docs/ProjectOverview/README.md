@@ -53,7 +53,7 @@
 | --- | --- | --- |
 | 08 | [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차와 음식 배달 배차의 경계 |
 | 09 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
-| 10 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 공동주문, 해외 선적/통관, 국내 운송, 판매채널 출고 흐름 |
+| 10 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 같이 주문, 해외 선적/통관, 국내 운송, 판매채널 출고 흐름 |
 | 11 | [version-roadmap.md](version-roadmap.md) | 1.0부터 3.5까지의 단계별 제품 방향 |
 
 ## 기술 참고 문서
@@ -63,9 +63,9 @@
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
 | T-01 | [workflow-api-policy.md](workflow-api-policy.md) | API를 화면과 업무 절차 기준으로 관리하는 기준 |
-| T-02 | [HIOPSLayerModel.md](../Architecture/HIOPSLayerModel.md) | 원장 블록, OS, 엔진, API의 층위와 책임 경계 |
+| T-02 | [BusinessWorkflowResponsibilityModel.md](../Architecture/BusinessWorkflowResponsibilityModel.md) | Business Case, Policy, 실행 조율, 판단 도구와 상태 변경의 책임 경계 |
 | T-03 | [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 국내 화물 운송을 운영하는 내부 기준 |
-| T-04 | [EngineOverview.md](../Architecture/EngineOverview.md) | OS, 워크플로우, 엔진의 관계 |
+| T-04 | [EngineOverview.md](../Architecture/EngineOverview.md) | Process Manager, 워크플로우와 판단 도구의 관계 |
 | T-05 | [HIOPSAI.md](../Architecture/HIOPSAI.md) | 참여자 입장 해석과 배차 조율을 돕는 AI 방향 |
 | T-06 | [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 출고 배치와 피킹 배치 판단 기준 |
 | T-07 | [DispatchQueueResponsibility.md](../Architecture/DispatchQueueResponsibility.md) | 배차 상태 저장과 실행 자료의 책임 경계 |
@@ -75,7 +75,7 @@
 
 ## 관리 원칙
 
-1. 루트 README에는 커뮤니티 0.0 기반, 0.5 개별주문과 1.0 공동주문의 제품 의도·대표 화면을 먼저 두고, 1.5 이후 화면은 후속 모듈로 구분한다.
+1. 루트 README에는 커뮤니티 0.0 기반, 0.5 개별주문과 1.0 같이 주문의 제품 의도·대표 화면을 먼저 두고, 1.5 이후 화면은 후속 모듈로 구분한다.
 2. 화면별 README와 전체 페이지 카탈로그를 첨부 문서의 앞순위에 둔다.
 3. OS, 엔진, AI, API 같은 기술 설명은 뒤쪽 참고 문서로 둔다.
 4. 새 화면을 추가하면 `app-page-catalog.md`, `page-docs/`, 캡처 이미지부터 갱신한다.

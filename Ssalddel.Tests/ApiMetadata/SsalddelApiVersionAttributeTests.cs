@@ -40,7 +40,7 @@ public sealed class SsalddelApiVersionAttributeTests
     [Theory]
     [InlineData(SsalddelProductVersion.V0_0, "문화교통", "문화교통 0.0 · 커뮤니티·공공데이터 기반")]
     [InlineData(SsalddelProductVersion.V0_5, "문화교통", "문화교통 0.5 · 개별주문·개별 원장")]
-    [InlineData(SsalddelProductVersion.V1_0, "문화교통", "문화교통 1.0 · 공동주문·주문자 집단화")]
+    [InlineData(SsalddelProductVersion.V1_0, "문화교통", "문화교통 1.0 · 같이 주문·주문자 집단화")]
     [InlineData(SsalddelProductVersion.V1_5, "문화교통", "문화교통 1.5 · 공급·가격·무역 준비")]
     [InlineData(SsalddelProductVersion.V2_0, "살뜰", "살뜰 2.0 · 국내 화물·운송 이행")]
     public void ProductVersionAttribute_UsesRoadmapProductName(
@@ -57,7 +57,7 @@ public sealed class SsalddelApiVersionAttributeTests
     [Theory]
     [InlineData(typeof(개별주문관점조회Controller), SsalddelProductVersion.V0_5)]
     [InlineData(typeof(공동주문관점조회Controller), SsalddelProductVersion.V1_0)]
-    public void 주문관점Api는_개별주문과공동주문의제품단계를구분한다(
+    public void 주문관점Api는_개별주문과같이주문의제품단계를구분한다(
         Type controllerType,
         SsalddelProductVersion expectedVersion)
     {
@@ -78,7 +78,7 @@ public sealed class SsalddelApiVersionAttributeTests
     [Theory]
     [InlineData(SsalddelWorkflow.DomesticTransport, "국내 화물 운송")]
     [InlineData(SsalddelWorkflow.GroupPurchaseDemand, "공동구매 수요·모집")]
-    [InlineData(SsalddelWorkflow.GroupPurchaseImport, "공동주문 수입")]
+    [InlineData(SsalddelWorkflow.GroupPurchaseImport, "같이 주문 수입")]
     [InlineData(SsalddelWorkflow.WarehouseFulfillment, "창고 입출고")]
     [InlineData(SsalddelWorkflow.SalesChannelFulfillment, "판매채널 출고")]
     [InlineData(SsalddelWorkflow.HrParticipation, "참여 인력 관리")]
@@ -269,7 +269,7 @@ public sealed class SsalddelApiVersionAttributeTests
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(기사배차추천UseCase)));
         Assert.Contains(response.WorkflowRelations, relation =>
             relation.SourceWorkflowName == "공동구매 수요·모집" &&
-            relation.TargetWorkflowName == "공동주문 수입" &&
+            relation.TargetWorkflowName == "같이 주문 수입" &&
             relation.RelationKindName == "인계");
         Assert.Contains(response.OperatingSystems, operatingSystem =>
             operatingSystem.OperatingSystemCode == nameof(SsalddelOperatingSystem.DomesticCargoTransport) &&

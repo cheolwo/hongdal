@@ -53,7 +53,7 @@ public sealed class 공동구매커머스이행계획Controller : OrdererControl
         }, cancellationToken);
 
         return 항목목록.Count == 0
-            ? this.ToNotFoundProblem("문서관리번호에 해당하는 공동주문 커머스 풀필먼트 플랜을 찾을 수 없습니다.")
+            ? this.ToNotFoundProblem("문서관리번호에 해당하는 같이 주문 커머스 풀필먼트 플랜을 찾을 수 없습니다.")
             : Ok(항목목록.Select(공동구매커머스이행계획공개변환기.ToPublicDto).ToArray());
     }
 }

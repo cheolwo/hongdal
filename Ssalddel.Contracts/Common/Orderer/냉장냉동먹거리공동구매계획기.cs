@@ -128,7 +128,7 @@ public static class 냉장냉동먹거리공동구매계획기
             activationPriority,
             suggestedStatus,
             requiredSteps,
-            CommunityCategory: "먹거리 공동주문",
+            CommunityCategory: "먹거리 같이 주문",
             요약: Build요약(draft, progressRate, isFclCandidate));
     }
 
@@ -231,7 +231,7 @@ public static class 냉장냉동먹거리공동구매계획기
         bool isFclCandidate)
     {
         var percent = decimal.Round(progressRate * 100m, 1, MidpointRounding.AwayFromZero);
-        var mode = isFclCandidate ? "FCL 후보" : "대량 공동주문 후보";
+        var mode = isFclCandidate ? "FCL 후보" : "대량 같이 주문 후보";
         return $"{draft.상품명} {draft.TargetQuantityKg:N0}kg 목표, 수요 {percent:N1}% 달성, {mode}";
     }
 }
@@ -323,7 +323,7 @@ public static class 주문자집단개설신청계획기
         주문자집단개설신청초안 draft,
         bool isFoodCandidate)
     {
-        var focus = isFoodCandidate ? "먹거리 공동주문 후보" : "일반 공동주문 후보";
+        var focus = isFoodCandidate ? "먹거리 같이 주문 후보" : "일반 같이 주문 후보";
         return $"{draft.주문자집단배송권명}에서 {draft.상품카드.상품명} {draft.희망수량Kg:N0}kg 구매 의향으로 {focus} 개설을 신청합니다.";
     }
 }

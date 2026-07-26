@@ -160,7 +160,7 @@ public sealed class HR역할검토조회UseCaseTests
             ApplicantUserId = "user-b",
             ParticipantCategory = HrParticipantCategoryCodes.CommunityPartTimeWorker,
             RequestedRoleCode = HrDetailedRoleCodes.OrdererGroupDistributionWorker,
-            RequestedRoleName = "공동주문 배부 지원",
+            RequestedRoleName = "같이 주문 배부 지원",
             ScopeType = HrScopeTypes.Platform,
             ScopeId = HrScopeIds.Global,
             StatusCode = HrRoleApplicationStatusCodes.Submitted,

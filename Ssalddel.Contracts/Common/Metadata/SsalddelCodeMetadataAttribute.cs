@@ -9,6 +9,8 @@ public static class SsalddelCodeFeatureKeys
     public const string GroupPurchaseDemandProcessManager = "group-purchase-demand-process-manager";
     public const string GroupImportTradeReadiness = "group-import-trade-readiness";
     public const string ImportedFoodKoreanLabelIntegration = "imported-food-korean-label-integration";
+    public const string RegionalCultureImagePrompt = "regional-culture-image-prompt";
+    public const string RegionalCulturePublicInstitution = "regional-culture-public-institution";
     public const string TradeLedgerExtensions = "trade-ledger-extensions";
 }
 

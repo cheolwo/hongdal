@@ -502,11 +502,11 @@ public static class SsalddelV1DevelopmentDataSeeder
             shipperId,
             CompletedInboundReference,
             "CN-GP-PORK-202607",
-            "중국 냉장식품 공동주문",
+            "중국 냉장식품 같이 주문",
             입고상태.입고완료,
             now.AddDays(-1),
             now.AddHours(-18),
-            "공동주문 수입 화물이 국내 3PL 냉장 창고에 입고된 검증용 데이터",
+            "같이 주문 수입 화물이 국내 3PL 냉장 창고에 입고된 검증용 데이터",
             now,
             cancellationToken);
 
@@ -516,7 +516,7 @@ public static class SsalddelV1DevelopmentDataSeeder
             shipperId,
             PlannedInboundReference,
             "CN-GP-LIVING-202607",
-            "중국 생활용품 공동주문",
+            "중국 생활용품 같이 주문",
             입고상태.예정,
             now.AddDays(2),
             null,
@@ -635,7 +635,7 @@ public static class SsalddelV1DevelopmentDataSeeder
         task.적재대코드 = rackCode;
         task.보관위치코드 = rackCode;
         task.묶음바코드 = $"BND:{taskKey}";
-        task.할당사유 = "공동주문 입고 원장에서 생성된 개발 검증용 피킹 작업";
+        task.할당사유 = "같이 주문 입고 원장에서 생성된 개발 검증용 피킹 작업";
         task.시작일시Utc = status == 피킹포장작업상태.진행중 ? now.AddMinutes(-15) : null;
         task.완료일시Utc = null;
         task.UpdatedAt = now;
@@ -734,7 +734,7 @@ public static class SsalddelV1DevelopmentDataSeeder
                 통관필요여부 = true,
                 계약시작일 = now.Date.AddMonths(-1),
                 계약종료일 = now.Date.AddMonths(6),
-                계약메모 = "공동주문 수입 화물의 국내 3PL 입고와 출고 배치 검증용 계약",
+                계약메모 = "같이 주문 수입 화물의 국내 3PL 입고와 출고 배치 검증용 계약",
                 입고완료일시 = completedAt,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -766,7 +766,7 @@ public static class SsalddelV1DevelopmentDataSeeder
         inbound.통관필요여부 = true;
         inbound.계약시작일 = now.Date.AddMonths(-1);
         inbound.계약종료일 = now.Date.AddMonths(6);
-        inbound.계약메모 = "공동주문 수입 화물의 국내 3PL 입고와 출고 배치 검증용 계약";
+        inbound.계약메모 = "같이 주문 수입 화물의 국내 3PL 입고와 출고 배치 검증용 계약";
         inbound.입고완료일시 = completedAt;
         inbound.UpdatedAt = now;
         return inbound;
@@ -1100,10 +1100,10 @@ public static class SsalddelV1DevelopmentDataSeeder
         return new 기사개발추천의뢰응답
         {
             의뢰Id = "V1-DEV-GP-201",
-            화물종류 = "수입 냉장식품 공동주문",
-            운송방식 = "공동주문 세대배송",
+            화물종류 = "수입 냉장식품 같이 주문",
+            운송방식 = "같이 주문 세대배송",
             운송의뢰유형코드 = "GroupPurchaseCargoTransport",
-            운송의뢰유형표시 = "공동주문 운송",
+            운송의뢰유형표시 = "같이 주문 운송",
             당일상차필수 = true,
             당일하차필수 = true,
             차량톤수 = "1톤",
@@ -1134,11 +1134,11 @@ public static class SsalddelV1DevelopmentDataSeeder
             예상총비용 = 21200m,
             예상수익 = 176000m,
             추천점수 = 94m,
-            추천사유 = "공동주문 수입 화물이며 세대배송 범위와 분류 상태를 확인해야 하는 추천입니다.",
+            추천사유 = "같이 주문 수입 화물이며 세대배송 범위와 분류 상태를 확인해야 하는 추천입니다.",
             복귀지기준추천여부 = true,
             복귀지출처 = "오늘복귀지",
-            복귀추천사유 = "오늘 복귀지와 공동주문 하차지가 크게 어긋나지 않습니다.",
-            요약설명 = "수입 냉장식품 공동주문 운송, 인천항 보세창고에서 서울 강서구 살뜰아파트까지",
+            복귀추천사유 = "오늘 복귀지와 같이 주문 하차지가 크게 어긋나지 않습니다.",
+            요약설명 = "수입 냉장식품 같이 주문 운송, 인천항 보세창고에서 서울 강서구 살뜰아파트까지",
             상세설명 = "상품정보 스티커, 세대배송 건수, 분류 상태를 확인한 뒤 수락 여부를 결정합니다.",
             상태 = "공동주문추천",
             배차상태 = 상태값.배차상태.대기,

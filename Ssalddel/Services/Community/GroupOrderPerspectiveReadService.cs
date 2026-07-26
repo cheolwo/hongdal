@@ -16,7 +16,7 @@ public interface IGroupOrderPerspectiveReadService
 }
 
 /// <summary>
-/// 공동주문을 독립 입력값이 아닌 개별 주문 원장의 집합으로 읽고,
+/// 같이 주문을 독립 입력값이 아닌 개별 주문 원장의 집합으로 읽고,
 /// 주문자 또는 판매·창고·운송 하위 원장의 실제 참여 관계로 목록 범위를 제한합니다.
 /// </summary>
 public sealed class GroupOrderPerspectiveReadService(
@@ -47,7 +47,7 @@ public sealed class GroupOrderPerspectiveReadService(
         var perspective = Clean(perspectiveCode);
         if (!SupportedPerspective(perspective))
         {
-            return Failure("지원하지 않는 공동주문 관점입니다.", StatusCodes.Status400BadRequest);
+            return Failure("지원하지 않는 같이 주문 관점입니다.", StatusCodes.Status400BadRequest);
         }
 
         Result<IReadOnlyList<GroupOrderCandidate>> candidatesResult;
@@ -228,7 +228,7 @@ public sealed class GroupOrderPerspectiveReadService(
 
         if (!주문원장역할별조회Service.직접접근가능(communityLedger, userId))
         {
-            return CandidateFailure("공동 원장의 생성자 또는 참여자만 공동주문을 조회할 수 있습니다.", StatusCodes.Status403Forbidden);
+            return CandidateFailure("공동 원장의 생성자 또는 참여자만 같이 주문을 조회할 수 있습니다.", StatusCodes.Status403Forbidden);
         }
 
         if (IsGroupOrder(communityLedger))

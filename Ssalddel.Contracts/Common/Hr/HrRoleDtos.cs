@@ -67,7 +67,7 @@ public static class HrParticipantCategoryCodes
             CounterpartyRepresentative => "거래 상대/대표",
             ExternalProfessional => "외부 전문 참여자",
             OrdererGroupMember => "주문자 집단 구성원",
-            CommunityPartTimeWorker => "공동주문 단기 근로자",
+            CommunityPartTimeWorker => "같이 주문 단기 근로자",
             _ => "내부 실무/프로젝트 담당자"
         };
 }

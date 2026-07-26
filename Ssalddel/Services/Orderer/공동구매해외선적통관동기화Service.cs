@@ -42,7 +42,7 @@ public sealed class 공동구매해외선적통관동기화Service : I공동구�
             return new 공동구매해외선적통관동기화결과
             {
                 동기화됨 = false,
-                메시지 = "공동주문 해외 선적 추적 원장을 찾을 수 없습니다.",
+                메시지 = "같이 주문 해외 선적 추적 원장을 찾을 수 없습니다.",
                 조회시각Utc = DateTimeOffset.UtcNow
             };
         }

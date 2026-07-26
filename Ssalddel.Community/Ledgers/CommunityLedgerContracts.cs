@@ -110,7 +110,7 @@ public sealed class 커뮤니티원장상태변경요청
     public string? 메모 { get; set; }
 }
 
-public sealed class 커뮤니티원장Dto
+public sealed partial class 커뮤니티원장Dto
 {
     public string 원장Id { get; set; } = string.Empty;
     public long Revision { get; set; }
@@ -139,7 +139,7 @@ public sealed class 커뮤니티원장Dto
     public DateTime 수정시각Utc { get; set; }
 }
 
-public sealed class 커뮤니티원장블록Dto
+public sealed partial class 커뮤니티원장블록Dto
 {
     public string BlockId { get; set; } = string.Empty;
     public string BlockType { get; set; } = CommunityLedgerBlockTypes.Generic;
@@ -149,7 +149,7 @@ public sealed class 커뮤니티원장블록Dto
     public IReadOnlyDictionary<string, string> Data { get; set; } = new Dictionary<string, string>();
 }
 
-public sealed class 커뮤니티원장블록담당자Dto
+public sealed partial class 커뮤니티원장블록담당자Dto
 {
     public string UserId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = "익명 참여자";
@@ -157,7 +157,7 @@ public sealed class 커뮤니티원장블록담당자Dto
     public string ResponsibilityType { get; set; } = CommunityLedgerBlockResponsibilityTypes.Primary;
 }
 
-public sealed class 커뮤니티원장참여자Dto
+public sealed partial class 커뮤니티원장참여자Dto
 {
     public string? UserId { get; set; }
     public string DisplayName { get; set; } = "익명 참여자";
@@ -175,7 +175,7 @@ public sealed class 커뮤니티포함원장참조Dto
     public int 표시순서 { get; set; }
 }
 
-public sealed class 커뮤니티원장상태이력Dto
+public sealed partial class 커뮤니티원장상태이력Dto
 {
     public string? EventId { get; set; }
     public string 상태 { get; set; } = string.Empty;

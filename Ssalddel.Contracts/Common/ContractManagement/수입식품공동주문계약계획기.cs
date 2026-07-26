@@ -25,7 +25,7 @@ public sealed record 수입식품공동주문계약당사자(
     string PartyId,
     [property: IsmsPProtectedData(
         PersonalDataFieldKey.DisplayName,
-        "수입 식품 공동 주문 계약 당사자 식별",
+        "수입 식품 같이 주문 계약 당사자 식별",
         IsContractData = true,
         ProtectionNote = "계약 목록에서는 역할명과 표시명 중심으로 노출하고 상세 당사자 정보는 권한이 있는 사용자에게만 제공")]
     string DisplayName,
@@ -286,7 +286,7 @@ public static class 수입식품공동주문계약검토계획기
         var protection = draft.ProtectionProfile ?? new 수입식품공동주문계약보호프로필();
 
         return IsmsPReadinessPlanner.Plan(new PersonalDataContractFeatureProfile(
-            FeatureName: "수입 식품 공동 주문 계약서",
+            FeatureName: "수입 식품 같이 주문 계약서",
             Owner: "플랫폼 운영자",
             ProcessesPersonalData: true,
             ProcessesContractData: true,
@@ -348,5 +348,5 @@ public static class 수입식품공동주문계약검토계획기
     private static string Build요약(
         수입식품공동주문계약초안 draft,
         string status)
-        => $"{draft.주문자집단배송권명} {draft.상품카드.상품명} 수입 식품 공동 주문 계약서: {status}";
+        => $"{draft.주문자집단배송권명} {draft.상품카드.상품명} 수입 식품 같이 주문 계약서: {status}";
 }

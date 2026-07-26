@@ -285,7 +285,7 @@ public static class SsalddelOperatingSystemLabels
             SsalddelOperatingSystem.DomesticCargoTransport => "국내 화물 운송 OS",
             SsalddelOperatingSystem.WarehouseCommerceFulfillment => "창고·커머스 이행 OS",
             SsalddelOperatingSystem.GroupPurchaseDemand => "공동구매 수요·모집 OS",
-            SsalddelOperatingSystem.GroupPurchaseImport => "공동주문 수입 OS",
+            SsalddelOperatingSystem.GroupPurchaseImport => "같이 주문 수입",
             SsalddelOperatingSystem.FoodDelivery => "음식 배달 OS",
             SsalddelOperatingSystem.SsalddelMartUrbanLogistics => "알뜰살뜰 마트 도심 물류 OS",
             SsalddelOperatingSystem.CommunityTrust => "커뮤니티 신뢰 OS",
@@ -326,7 +326,7 @@ public static class SsalddelWorkflowLabels
             SsalddelWorkflow.WarehouseFulfillment => "창고 입출고",
             SsalddelWorkflow.CustomsAndTradeData => "통관·무역 데이터",
             SsalddelWorkflow.GroupPurchaseDemand => "공동구매 수요·모집",
-            SsalddelWorkflow.GroupPurchaseImport => "공동주문 수입",
+            SsalddelWorkflow.GroupPurchaseImport => "같이 주문 수입",
             SsalddelWorkflow.SalesChannelFulfillment => "판매채널 출고",
             SsalddelWorkflow.CommunityTrust => "커뮤니티 신뢰",
             SsalddelWorkflow.HrParticipation => "참여 인력 관리",
@@ -344,7 +344,7 @@ public static class SsalddelOperatingSystems
         new(
             SsalddelOperatingSystem.DomesticCargoTransport,
             SsalddelOperatingSystemLabels.GetLabel(SsalddelOperatingSystem.DomesticCargoTransport),
-            "화주 의뢰, 창고 출고품, 공동주문 국내 운송, 음식/마트 배송처럼 실제 이동이 필요한 대상을 기사 추천, 상차, 하차, 증빙, 정산 후보 흐름으로 실행합니다.",
+            "화주 의뢰, 창고 출고품, 같이 주문 국내 운송, 음식/마트 배송처럼 실제 이동이 필요한 대상을 기사 추천, 상차, 하차, 증빙, 정산 후보 흐름으로 실행합니다.",
             [SsalddelWorkflow.DomesticTransport, SsalddelWorkflow.WarehouseFulfillment, SsalddelWorkflow.GroupPurchaseImport, SsalddelWorkflow.SalesChannelFulfillment, SsalddelWorkflow.FoodDelivery, SsalddelWorkflow.SsalddelMart],
             [
                 new(EngineFamilyIds.TransportRequestDispatch, "운송 의뢰 배차 엔진", "운송 의뢰 원천을 분류한 뒤 차량 적합성, 거리, 일정 삽입 가능성, 기사 상태를 기준으로 화물 기사 또는 음식 배달 기사 후보를 조정합니다.")
@@ -564,7 +564,7 @@ public static class SsalddelWorkflowRelations
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.CustomsAndTradeData,
             SsalddelWorkflowRelationKind.References,
-            "공동주문 수입은 HS 코드, BL/AWB, 문서관리번호, 통관 단계, 수출입 단가 데이터를 참조합니다."),
+            "같이 주문 수입은 HS 코드, BL/AWB, 문서관리번호, 통관 단계, 수출입 단가 데이터를 참조합니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.DomesticTransport,
@@ -584,7 +584,7 @@ public static class SsalddelWorkflowRelations
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.HrParticipation,
             SsalddelWorkflowRelationKind.OperatesWith,
-            "공동주문 분류, 배분, 단지 내부 보조 업무가 필요하면 참여 인력 관리와 함께 운영합니다."),
+            "같이 주문 분류, 배분, 단지 내부 보조 업무가 필요하면 참여 인력 관리와 함께 운영합니다."),
         new(
             SsalddelWorkflow.SalesChannelFulfillment,
             SsalddelWorkflow.WarehouseFulfillment,
@@ -711,7 +711,7 @@ public static class SsalddelWorkflowParticipants
             "OrdererGroupLeader",
             "주문자 집단 대표",
             true,
-            "공동주문 개설, 배송 방식 선택, 분배 기준 합의를 이끕니다."),
+            "같이 주문 개설, 배송 방식 선택, 분배 기준 합의를 이끕니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             "Orderer",
@@ -835,7 +835,7 @@ public static class SsalddelWorkflowScreens
             "기사 앱",
             "추천 목록",
             "/driver/recommendations",
-            "기사가 추천된 일반 화물, 공동주문 운송, 배송 의뢰를 구분해 확인합니다."),
+            "기사가 추천된 일반 화물, 같이 주문 운송, 배송 의뢰를 구분해 확인합니다."),
         new(
             SsalddelWorkflow.DomesticTransport,
             "Driver",
@@ -953,9 +953,9 @@ public static class SsalddelWorkflowScreens
             "PlatformOperator",
             "SsalddelAdmin",
             "관리자 앱",
-            "공동주문 운영",
+            "같이 주문 운영",
             "/dashboard",
-            "운영자가 공동주문 원장, 통관 연계, 국내 운송 인계, 예외를 추적합니다."),
+            "운영자가 같이 주문 원장, 통관 연계, 국내 운송 인계, 예외를 추적합니다."),
         new(
             SsalddelWorkflow.SalesChannelFulfillment,
             "Seller",

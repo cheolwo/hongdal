@@ -18,7 +18,7 @@ public interface IHR참여운영UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.HrParticipation)]
-[SsalddelUseCase("HR 참여 운영", Summary = "공동주문 집단이나 운영 주체가 내부 참여자를 고용하고 혜택을 급여/수당 흐름으로 전환합니다.")]
+[SsalddelUseCase("HR 참여 운영", Summary = "같이 주문 집단이나 운영 주체가 내부 참여자를 고용하고 혜택을 급여/수당 흐름으로 전환합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.EmployerOrOperatingEntity)]
 [SsalddelUseCaseActor(SsalddelActor.Worker)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]

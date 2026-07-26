@@ -74,7 +74,7 @@ public sealed class 공동구매해외선적추적UseCase : I공동구매해외�
         {
             var item = await _store.GetBy문서관리번호Async(documentManagementNumber, cancellationToken);
             return item is null
-                ? NotFound<공동구매해외선적공개Dto>("문서관리번호에 해당하는 공동주문 해외 선적 정보를 찾을 수 없습니다.")
+                ? NotFound<공동구매해외선적공개Dto>("문서관리번호에 해당하는 같이 주문 해외 선적 정보를 찾을 수 없습니다.")
                 : Result.Ok(공동구매해외선적추적Projection.ToPublicDto(item));
         }
         catch (InvalidOperationException ex)
@@ -89,7 +89,7 @@ public sealed class 공동구매해외선적추적UseCase : I공동구매해외�
         {
             var item = await _store.GetBy문서관리번호Async(documentManagementNumber, cancellationToken);
             return item is null
-                ? NotFound<공동구매해외선적추적Dto>("공동주문 해외 선적 추적 원장을 찾을 수 없습니다.")
+                ? NotFound<공동구매해외선적추적Dto>("같이 주문 해외 선적 추적 원장을 찾을 수 없습니다.")
                 : Result.Ok(item);
         }
         catch (InvalidOperationException ex)
@@ -178,7 +178,7 @@ public sealed class 공동구매해외선적추적UseCase : I공동구매해외�
         {
             var item = await _store.AppendEventAsync(documentManagementNumber, request, actorUserId, cancellationToken);
             return item is null
-                ? NotFound<공동구매해외선적추적Dto>("공동주문 해외 선적 추적 원장을 찾을 수 없습니다.")
+                ? NotFound<공동구매해외선적추적Dto>("같이 주문 해외 선적 추적 원장을 찾을 수 없습니다.")
                 : Result.Ok(item);
         }
         catch (InvalidOperationException ex)

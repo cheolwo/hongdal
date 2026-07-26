@@ -17,7 +17,7 @@ public interface I판매페이지UseCase
 
 [SsalddelUseCase(
     "판매 페이지 초안 관리",
-    Summary = "일반 판매자, 농가, 제조자와 수출업자가 상품 정보를 편집하고 개별주문 또는 공동주문을 받을 판매 페이지 초안을 준비합니다.")]
+    Summary = "일반 판매자, 농가, 제조자와 수출업자가 상품 정보를 편집하고 개별주문 또는 같이 주문을 받을 판매 페이지 초안을 준비합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.Seller)]
 [SsalddelUseCaseActor(SsalddelActor.Orderer, SsalddelUseCaseActorRole.Supporting)]
 [SsalddelUseCaseRelation(

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Orderer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 살뜰.Data;
@@ -37,7 +38,7 @@ public sealed class CommunityDynamicTopicClassifier : ICommunityDynamicTopicClas
         (CommunityDynamicTopicCodes.IndividualOrder,
             ["개별주문", "개별 주문", "개인주문", "개인 주문", "단독주문", "individual order"]),
         (CommunityDynamicTopicCodes.GroupOrder,
-            ["공동주문", "공동 주문", "공동구매", "공동 구매", "group order", "group purchase"]),
+            같이주문용어Catalog.검색호환용어.ToArray()),
         (CommunityDynamicTopicCodes.Food,
             ["음식", "음식점", "식당", "맛집", "메뉴", "요리", "반찬", "식재료", "배달음식", "food", "restaurant", "recipe"]),
         (CommunityDynamicTopicCodes.Cargo,
@@ -290,7 +291,11 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
                 || post.Title.Contains("individual order")
                 || post.Body.Contains("individual order")),
             CommunityDynamicTopicCodes.GroupOrder => query.Where(post =>
-                post.Title.Contains("공동주문")
+                post.Title.Contains("같이주문")
+                || post.Body.Contains("같이주문")
+                || post.Title.Contains("같이 주문")
+                || post.Body.Contains("같이 주문")
+                || post.Title.Contains("공동주문")
                 || post.Body.Contains("공동주문")
                 || post.Title.Contains("공동 주문")
                 || post.Body.Contains("공동 주문")
@@ -300,8 +305,12 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
                 || post.Body.Contains("공동 구매")
                 || post.Title.Contains("group order")
                 || post.Body.Contains("group order")
+                || post.Title.Contains("order together")
+                || post.Body.Contains("order together")
                 || post.Title.Contains("group purchase")
-                || post.Body.Contains("group purchase")),
+                || post.Body.Contains("group purchase")
+                || post.Title.Contains("一緒に注文")
+                || post.Body.Contains("一緒に注文")),
             CommunityDynamicTopicCodes.Food => query.Where(post =>
                 post.Category == CommunityBoardCatalog.Food.DisplayName
                 || post.Category == "맛집"
