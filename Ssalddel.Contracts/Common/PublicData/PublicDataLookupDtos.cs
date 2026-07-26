@@ -190,7 +190,26 @@ public sealed class ApartmentGroupCommerceOffsetSimulationResult
 
 public sealed class HsCountryMonthlyTradeUnitPriceRequest
 {
+    /// <summary>
+    /// 판매·주문·재고에서 사용하는 내부 상품 식별자입니다.
+    /// HS/HTS 코드는 상품 속성에 따라 바뀔 수 있으므로 내부 상품 코드와 분리해 유지합니다.
+    /// </summary>
+    public string InternalProductCode { get; init; } = string.Empty;
+
+    public string ProductName { get; init; } = string.Empty;
+
     public string HsCode { get; init; } = string.Empty;
+
+    /// <summary>이 조회에 사용한 코드 체계입니다. 한국 관세청 조회는 HS 또는 HSK를 사용합니다.</summary>
+    public string HsCodeScheme { get; init; } = string.Empty;
+
+    /// <summary>미국 HTSUS처럼 수입국이 확장한 국가 세번 체계입니다.</summary>
+    public string NationalTariffCodeScheme { get; init; } = string.Empty;
+
+    /// <summary>
+    /// 국가 세번은 상품과 함께 표시하는 참고 정보이며, 한국 관세청 통계 조회 조건에는 HsCode를 사용합니다.
+    /// </summary>
+    public string NationalTariffCode { get; init; } = string.Empty;
 
     public string CountryCode { get; init; } = string.Empty;
 
@@ -211,11 +230,19 @@ public sealed class HsCountryMonthlyTradeUnitPriceRequest
 
 public sealed class HsCountryMonthlyTradeUnitPriceItem
 {
+    public string InternalProductCode { get; init; } = string.Empty;
+
+    public string ProductName { get; init; } = string.Empty;
+
     public string HsCode { get; init; } = string.Empty;
+
+    public string HsCodeScheme { get; init; } = string.Empty;
 
     public string CountryCode { get; init; } = string.Empty;
 
     public string Month { get; init; } = string.Empty;
+
+    public string QuantityUnit { get; init; } = "kg";
 
     public decimal ImportWeightKg { get; init; }
 
@@ -225,7 +252,24 @@ public sealed class HsCountryMonthlyTradeUnitPriceItem
 
     public decimal? AverageImportUnitValueKrwPerKg { get; init; }
 
+    public decimal ExportWeightKg { get; init; }
+
+    public decimal ExportValueUsd { get; init; }
+
+    public decimal? AverageExportUnitValueUsdPerKg { get; init; }
+
+    public decimal? AverageExportUnitValueKrwPerKg { get; init; }
+
+    public string ImportValueBasis { get; init; } = "CIF customs value";
+
+    public string ExportValueBasis { get; init; } = "FOB declared value";
+
+    public bool IsLandedCost { get; init; }
+
     public string DataSource { get; init; } = "Korea Customs Service import/export statistics";
+
+    public string DataSourceUrl { get; init; } =
+        "https://www.data.go.kr/data/15100475/openapi.do";
 }
 
 public sealed class HsCountryImportUnitPriceSimulationResult
@@ -234,7 +278,17 @@ public sealed class HsCountryImportUnitPriceSimulationResult
 
     public string? ErrorMessage { get; init; }
 
+    public string InternalProductCode { get; init; } = string.Empty;
+
+    public string ProductName { get; init; } = string.Empty;
+
     public string HsCode { get; init; } = string.Empty;
+
+    public string HsCodeScheme { get; init; } = string.Empty;
+
+    public string NationalTariffCodeScheme { get; init; } = string.Empty;
+
+    public string NationalTariffCode { get; init; } = string.Empty;
 
     public string CountryCode { get; init; } = string.Empty;
 
@@ -252,6 +306,33 @@ public sealed class HsCountryImportUnitPriceSimulationResult
 
     public decimal? AverageImportUnitValueKrwPerKg { get; init; }
 
+    public decimal TotalExportWeightKg { get; init; }
+
+    public decimal TotalExportValueUsd { get; init; }
+
+    public decimal? AverageExportUnitValueUsdPerKg { get; init; }
+
+    public decimal? AverageExportUnitValueKrwPerKg { get; init; }
+
+    public string QuantityUnit { get; init; } = "kg";
+
+    public string ImportValueBasis { get; init; } = "CIF customs value";
+
+    public string ExportValueBasis { get; init; } = "FOB declared value";
+
+    public bool IsStatisticalUnitValue { get; init; } = true;
+
+    public bool IsLandedCost { get; init; }
+
+    public string CalculationMethod { get; init; } =
+        "기간 합계 금액을 기간 합계 순중량으로 나눈 가중평균";
+
+    public string DataSource { get; init; } =
+        "Korea Customs Service item-country import/export statistics";
+
+    public string DataSourceUrl { get; init; } =
+        "https://www.data.go.kr/data/15100475/openapi.do";
+
     public decimal? ExpectedLandedCostKrwPerKg { get; init; }
 
     public decimal? ExpectedGrossMarginKrwPerKg { get; init; }
@@ -263,6 +344,12 @@ public sealed class HsCountryImportUnitPriceSimulationResult
     public string PriceSignalCode { get; init; } = "Unknown";
 
     public string Summary { get; init; } = string.Empty;
+
+    public IReadOnlyList<string> Warnings { get; init; } =
+    [
+        "수출입 통계 단가는 시장 견적이나 실제 도착원가가 아닙니다.",
+        "HS·HTS 세번은 원재료, 가공 정도, 용도, 포장과 수입국에 따라 달라질 수 있으므로 신고 전 전문 검토가 필요합니다."
+    ];
 }
 
 public sealed class 주문자집단배송권조회요청

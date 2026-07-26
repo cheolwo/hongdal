@@ -156,6 +156,9 @@ public interface IDomesticGroupPurchaseProducerConnectionService
 
     DomesticGroupPurchaseSupplyCompatibilityPreviewResponse PreviewCompatibility(
         DomesticGroupPurchaseSupplyCompatibilityPreviewRequest request);
+
+    DomesticUrgentHarvestConnectionPreviewResponse PreviewUrgentHarvestConnection(
+        DomesticUrgentHarvestConnectionPreviewRequest request);
 }
 
 public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGroupPurchaseProducerConnectionService
@@ -399,6 +402,8 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
             throw new ArgumentException("농산물 안전 확인 없이는 공급 제안 초안을 만들 수 없습니다.", nameof(request));
         }
 
+        ValidateUrgentHarvestOffer(request);
+
         var draft = new DomesticProducerSupplyOfferDraftResponse
         {
             DraftId = Guid.NewGuid(),
@@ -420,6 +425,27 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
             OfferReasonCode = request.OfferReasonCode.Trim(),
             QualityDisclosure = request.QualityDisclosure.Trim(),
             FoodSafetyConfirmed = true,
+            IsUrgentHarvestConnection = request.IsUrgentHarvestConnection,
+            HarvestDeadlineAtUtc = request.HarvestDeadlineAtUtc,
+            StandingCropBulkTransferRequested =
+                request.StandingCropBulkTransferRequested,
+            EmergencyReasonEvidenceSummary =
+                request.EmergencyReasonEvidenceSummary.Trim(),
+            MinimumProducerSettlementAmountPerUnit =
+                request.MinimumProducerSettlementAmountPerUnit,
+            SettlementCurrencyCode =
+                request.SettlementCurrencyCode.Trim().ToUpperInvariant(),
+            HarvestLaborResponsibilityCode =
+                request.HarvestLaborResponsibilityCode.Trim(),
+            PickupResponsibilityCode =
+                request.PickupResponsibilityCode.Trim(),
+            OwnershipTransferConditionSummary =
+                request.OwnershipTransferConditionSummary.Trim(),
+            WeatherAndYieldRiskDisclosure =
+                request.WeatherAndYieldRiskDisclosure.Trim(),
+            WrittenAgreementRequired = request.WrittenAgreementRequired,
+            AutoPurchaseAllowed = false,
+            AutoPriceReductionAllowed = false,
             Message = request.Message.Trim(),
             StatusCode = DomesticProducerContactRequestStatuses.Draft,
             ContactDetailsDisclosed = false,
@@ -452,6 +478,30 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
                     ["OfferReasonCode"] = saved.OfferReasonCode,
                     ["QualityDisclosure"] = saved.QualityDisclosure,
                     ["FoodSafetyConfirmed"] = saved.FoodSafetyConfirmed.ToString(),
+                    ["IsUrgentHarvestConnection"] =
+                        saved.IsUrgentHarvestConnection.ToString(),
+                    ["HarvestDeadlineAtUtc"] =
+                        saved.HarvestDeadlineAtUtc?.ToString("O") ?? string.Empty,
+                    ["StandingCropBulkTransferRequested"] =
+                        saved.StandingCropBulkTransferRequested.ToString(),
+                    ["EmergencyReasonEvidenceSummary"] =
+                        saved.EmergencyReasonEvidenceSummary,
+                    ["MinimumProducerSettlementAmountPerUnit"] =
+                        saved.MinimumProducerSettlementAmountPerUnit.ToString(),
+                    ["SettlementCurrencyCode"] = saved.SettlementCurrencyCode,
+                    ["HarvestLaborResponsibilityCode"] =
+                        saved.HarvestLaborResponsibilityCode,
+                    ["PickupResponsibilityCode"] =
+                        saved.PickupResponsibilityCode,
+                    ["OwnershipTransferConditionSummary"] =
+                        saved.OwnershipTransferConditionSummary,
+                    ["WeatherAndYieldRiskDisclosure"] =
+                        saved.WeatherAndYieldRiskDisclosure,
+                    ["WrittenAgreementRequired"] =
+                        saved.WrittenAgreementRequired.ToString(),
+                    ["AutoPurchaseAllowed"] = saved.AutoPurchaseAllowed.ToString(),
+                    ["AutoPriceReductionAllowed"] =
+                        saved.AutoPriceReductionAllowed.ToString(),
                     ["Message"] = saved.Message
                 }
             },
@@ -541,6 +591,92 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
         };
     }
 
+    public DomesticUrgentHarvestConnectionPreviewResponse PreviewUrgentHarvestConnection(
+        DomesticUrgentHarvestConnectionPreviewRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var unresolved = new List<string>();
+        var now = DateTimeOffset.UtcNow;
+        var harvestWindowFeasible =
+            request.HarvestDeadlineAtUtc > now &&
+            request.HarvestDeadlineAtUtc <= now.AddDays(14);
+        if (!harvestWindowFeasible)
+        {
+            unresolved.Add("긴급 수확 검토 기한은 현재 이후 14일 이내여야 합니다.");
+        }
+
+        var buyerCapacityFeasible =
+            request.ProducerAvailableQuantity > 0 &&
+            request.ProducerMinimumTakeQuantity > 0 &&
+            request.ProducerMinimumTakeQuantity <=
+                request.ProducerAvailableQuantity &&
+            request.BuyerGroupMaximumAbsorptionQuantity >=
+                request.ProducerMinimumTakeQuantity;
+        if (!buyerCapacityFeasible)
+        {
+            unresolved.Add("주문자 집단의 최대 인수 능력이 생산자의 최소 인수 물량을 충족해야 합니다.");
+        }
+
+        var producerPriceFloorProtected =
+            request.MinimumProducerSettlementAmountPerUnit > 0 &&
+            request.BuyerMaximumAmountPerUnit >=
+                request.MinimumProducerSettlementAmountPerUnit &&
+            !string.IsNullOrWhiteSpace(request.SettlementCurrencyCode);
+        if (!producerPriceFloorProtected)
+        {
+            unresolved.Add("생산자 최소 정산 단가 이상에서만 가격 협의를 시작할 수 있습니다.");
+        }
+
+        var responsibilitiesDefined =
+            IsResolvedLaborResponsibility(
+                request.HarvestLaborResponsibilityCode) &&
+            IsResolvedPickupResponsibility(
+                request.PickupResponsibilityCode) &&
+            !string.IsNullOrWhiteSpace(
+                request.OwnershipTransferConditionSummary) &&
+            !string.IsNullOrWhiteSpace(
+                request.WeatherAndYieldRiskDisclosure);
+        if (!responsibilitiesDefined)
+        {
+            unresolved.Add("수확 노동, 현장 인수, 소유권 이전과 기상·수율 위험 책임을 정해야 합니다.");
+        }
+
+        var evidenceReady =
+            request.ProducerVerified &&
+            request.RepresentativeRoleConfirmed &&
+            request.FoodSafetyConfirmed &&
+            !string.IsNullOrWhiteSpace(
+                request.EmergencyReasonEvidenceSummary);
+        if (!evidenceReady)
+        {
+            unresolved.Add("생산자·대표 역할, 농산물 안전과 폐기 위험 근거 확인이 필요합니다.");
+        }
+
+        var eligible = harvestWindowFeasible &&
+                       buyerCapacityFeasible &&
+                       producerPriceFloorProtected &&
+                       responsibilitiesDefined &&
+                       evidenceReady;
+        return new DomesticUrgentHarvestConnectionPreviewResponse
+        {
+            EligibleForUrgentReview = eligible,
+            HarvestWindowFeasible = harvestWindowFeasible,
+            BuyerCapacityFeasible = buyerCapacityFeasible,
+            ProducerPriceFloorProtected = producerPriceFloorProtected,
+            ResponsibilitiesDefined = responsibilitiesDefined,
+            EvidenceReady = evidenceReady,
+            RequiresWrittenAgreement = true,
+            AutoPurchaseAllowed = false,
+            AutoPriceReductionAllowed = false,
+            UrgencyOverridesConsent = false,
+            UnresolvedConditions = unresolved,
+            Summary = eligible
+                ? "생산자 보호 단가와 역할 조건을 지키면서 주문자 집단의 비구속 검토를 시작할 수 있습니다."
+                : "긴급성만으로 계약하지 않고 미확정 가격·물량·노동·운송·위험 조건을 먼저 조정해야 합니다."
+        };
+    }
+
     private async Task 공동구매원장블록기록Async(
         Guid campaignId,
         커뮤니티원장블록Dto block,
@@ -622,11 +758,103 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
             or DomesticProducerSupplyOfferReasonCodes.OffGrade
             or DomesticProducerSupplyOfferReasonCodes.ShippingDeadline
             or DomesticProducerSupplyOfferReasonCodes.SalesChannelGap
+            or DomesticProducerSupplyOfferReasonCodes.CropDestructionRisk
             or DomesticProducerSupplyOfferReasonCodes.Other))
         {
             throw new ArgumentException("지원하지 않는 공급 제안 사유입니다.", nameof(reasonCode));
         }
     }
+
+    private static void ValidateUrgentHarvestOffer(
+        DomesticProducerSupplyOfferDraftRequest request)
+    {
+        if (!request.IsUrgentHarvestConnection)
+        {
+            return;
+        }
+
+        if (request.HarvestDeadlineAtUtc is null ||
+            request.HarvestDeadlineAtUtc <= DateTimeOffset.UtcNow)
+        {
+            throw new ArgumentException(
+                "긴급 수확 연결에는 현재 이후의 수확·출하 기한이 필요합니다.",
+                nameof(request.HarvestDeadlineAtUtc));
+        }
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            request.EmergencyReasonEvidenceSummary);
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            request.SettlementCurrencyCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            request.WeatherAndYieldRiskDisclosure);
+
+        if (request.MinimumProducerSettlementAmountPerUnit <= 0)
+        {
+            throw new ArgumentException(
+                "생산자를 보호할 최소 정산 단가가 필요합니다.",
+                nameof(request.MinimumProducerSettlementAmountPerUnit));
+        }
+
+        ValidateHarvestLaborResponsibility(
+            request.HarvestLaborResponsibilityCode);
+        ValidatePickupResponsibility(request.PickupResponsibilityCode);
+
+        if (request.StandingCropBulkTransferRequested &&
+            string.IsNullOrWhiteSpace(
+                request.OwnershipTransferConditionSummary))
+        {
+            throw new ArgumentException(
+                "수확 전 일괄 인수에는 소유권 이전 조건이 필요합니다.",
+                nameof(request.OwnershipTransferConditionSummary));
+        }
+
+        if (!request.WrittenAgreementRequired)
+        {
+            throw new ArgumentException(
+                "긴급 수확 연결은 가격·수확·운송·위험 책임을 담은 서면 합의가 필요합니다.",
+                nameof(request.WrittenAgreementRequired));
+        }
+    }
+
+    private static void ValidateHarvestLaborResponsibility(string code)
+    {
+        if (code is not (
+            DomesticUrgentHarvestLaborResponsibilityCodes.Producer
+            or DomesticUrgentHarvestLaborResponsibilityCodes.BuyerGroup
+            or DomesticUrgentHarvestLaborResponsibilityCodes.LicensedContractor
+            or DomesticUrgentHarvestLaborResponsibilityCodes.ToBeAgreed))
+        {
+            throw new ArgumentException(
+                "지원하지 않는 수확 노동 책임 유형입니다.",
+                nameof(code));
+        }
+    }
+
+    private static void ValidatePickupResponsibility(string code)
+    {
+        if (code is not (
+            DomesticUrgentHarvestPickupResponsibilityCodes.Producer
+            or DomesticUrgentHarvestPickupResponsibilityCodes.BuyerGroup
+            or DomesticUrgentHarvestPickupResponsibilityCodes.LogisticsProvider
+            or DomesticUrgentHarvestPickupResponsibilityCodes.ToBeAgreed))
+        {
+            throw new ArgumentException(
+                "지원하지 않는 현장 인수 책임 유형입니다.",
+                nameof(code));
+        }
+    }
+
+    private static bool IsResolvedLaborResponsibility(string code)
+        => code is
+            DomesticUrgentHarvestLaborResponsibilityCodes.Producer
+            or DomesticUrgentHarvestLaborResponsibilityCodes.BuyerGroup
+            or DomesticUrgentHarvestLaborResponsibilityCodes.LicensedContractor;
+
+    private static bool IsResolvedPickupResponsibility(string code)
+        => code is
+            DomesticUrgentHarvestPickupResponsibilityCodes.Producer
+            or DomesticUrgentHarvestPickupResponsibilityCodes.BuyerGroup
+            or DomesticUrgentHarvestPickupResponsibilityCodes.LogisticsProvider;
 
     private static void ValidatePackagingFormCode(string packagingFormCode)
     {

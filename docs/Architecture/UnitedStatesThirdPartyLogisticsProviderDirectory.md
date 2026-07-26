@@ -238,7 +238,22 @@ POST /api/v1/admin/operations/third-party-logistics/outreach/preview
 | Importer customs bond | [CBP Customs Bond 안내](https://www.help.cbp.gov/s/article/Article1072?language=en_US) | 거래별 single-entry 또는 continuous bond 필요 여부와 금액 확인 |
 | FIRMS code | [CBP ACE FIRMS validation 안내](https://www.cbp.gov/sites/default/files/2024-08/Trade_Information%20Notice_ACE%20Validation%20of%20FIRMS%20Codes%20for%20In-bond%20Arrivals508_0.pdf) | 공개 주소가 아니라 ACE에서 현재 인정되는 정확한 시설 code 확인 |
 | Foreign-Trade Zone | [U.S. FTZ Board 안내](https://www.trade.gov/about-ftzs) | FTZ designation과 해당 site의 CBP activation을 분리해 확인 |
+| Indirect Air Carrier | [TSA Air Cargo Security Roadmap](https://www.tsa.gov/sites/default/files/tsa_air_cargo_security_roadmap.pdf) | 항공화물을 간접 주선하는 미국 법인인지와 TSA 규제 대상 역할을 확인. 보안 프로그램의 민감 정보는 플랫폼에 수집하지 않음 |
+| 식품 위생 운송 | [FDA Sanitary Transportation Rule](https://www.fda.gov/food/food-safety-modernization-act-fsma/fsma-final-rule-sanitary-transportation-human-and-animal-food) | 식품의 shipper·loader·motor/rail carrier·receiver 역할, 온도·세척·오염방지·기록·교육 책임을 계약 범위와 함께 확인 |
 | SmartWay 참여 | [EPA SmartWay Partner List](https://www.epa.gov/smartway/smartway-partner-list) | 선택적인 지속가능성 근거로만 사용하며 정부 추천으로 해석하지 않음 |
+
+## 주문자 화면의 미국 역할 선택 기준
+
+미국 화면은 `운송업체`나 `3PL` 하나를 먼저 고르게 하지 않는다. `시장 선택 → 실제 수행 역할 → 역할별 필수 권한 → 공식 근거와 현재 상태 → 조건을 충족한 후보 투표` 순서로 안내한다.
+
+1. 미국 내 육상운송은 `Motor Carrier`, `Property Broker`, `Freight Forwarder`를 서로 다른 역할로 표시한다.
+2. 국제 해상운송은 FMC의 `Ocean Freight Forwarder`와 `NVOCC`를 FMCSA 역할과 섞지 않는다.
+3. 수입 신고를 대리하는 `Customs Broker`, 항공화물을 간접 주선하는 `Indirect Air Carrier`, 창고·풀필먼트 서비스 묶음인 `3PL`을 각각 별도 확인 대상으로 표시한다.
+4. 한 법인이 여러 역할을 수행할 때도 법인명, 공식 식별자, 권한 상태, 확인 기관, 확인 시각을 역할별로 저장한다. 협력업체가 수행하는 역할은 계약 범위와 함께 분리한다.
+5. 필수 권한 근거가 없거나 법인명이 일치하지 않는 후보는 `검토 보류`로 표시하고 우선협상 투표 대상에서 제외한다.
+6. 투표 결과는 우선협상 순위일 뿐 계약·통관 대리·운송 지시·창고 배정이 아니다. 이의·재검토, 결의, 별도 서명과 실행 권한을 거친다.
+
+한국 화면은 미국 역할 코드를 번역해서 재사용하지 않고 「화물자동차 운수사업법」의 화물자동차 운송사업·운송주선사업·운송가맹사업과 국제물류주선업 등 국내 법령 기준을 별도로 적용한다.
 
 ## 업체별 공식 근거
 

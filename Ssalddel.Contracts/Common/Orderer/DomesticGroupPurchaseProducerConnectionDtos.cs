@@ -20,7 +20,24 @@ public static class DomesticProducerSupplyOfferReasonCodes
     public const string OffGrade = "off-grade";
     public const string ShippingDeadline = "shipping-deadline";
     public const string SalesChannelGap = "sales-channel-gap";
+    public const string CropDestructionRisk = "crop-destruction-risk";
     public const string Other = "other";
+}
+
+public static class DomesticUrgentHarvestLaborResponsibilityCodes
+{
+    public const string Producer = "producer";
+    public const string BuyerGroup = "buyer-group";
+    public const string LicensedContractor = "licensed-contractor";
+    public const string ToBeAgreed = "to-be-agreed";
+}
+
+public static class DomesticUrgentHarvestPickupResponsibilityCodes
+{
+    public const string Producer = "producer";
+    public const string BuyerGroup = "buyer-group";
+    public const string LogisticsProvider = "logistics-provider";
+    public const string ToBeAgreed = "to-be-agreed";
 }
 
 public static class DomesticProducePackagingFormCodes
@@ -142,6 +159,19 @@ public sealed class DomesticProducerSupplyOfferDraftRequest
     public string OfferReasonCode { get; set; } = DomesticProducerSupplyOfferReasonCodes.Overproduction;
     public string QualityDisclosure { get; set; } = string.Empty;
     public bool FoodSafetyConfirmed { get; set; }
+    public bool IsUrgentHarvestConnection { get; set; }
+    public DateTimeOffset? HarvestDeadlineAtUtc { get; set; }
+    public bool StandingCropBulkTransferRequested { get; set; }
+    public string EmergencyReasonEvidenceSummary { get; set; } = string.Empty;
+    public decimal MinimumProducerSettlementAmountPerUnit { get; set; }
+    public string SettlementCurrencyCode { get; set; } = "KRW";
+    public string HarvestLaborResponsibilityCode { get; set; } =
+        DomesticUrgentHarvestLaborResponsibilityCodes.ToBeAgreed;
+    public string PickupResponsibilityCode { get; set; } =
+        DomesticUrgentHarvestPickupResponsibilityCodes.ToBeAgreed;
+    public string OwnershipTransferConditionSummary { get; set; } = string.Empty;
+    public string WeatherAndYieldRiskDisclosure { get; set; } = string.Empty;
+    public bool WrittenAgreementRequired { get; set; } = true;
     public string Message { get; set; } = string.Empty;
 }
 
@@ -166,6 +196,19 @@ public sealed class DomesticProducerSupplyOfferDraftResponse
     public string OfferReasonCode { get; set; } = string.Empty;
     public string QualityDisclosure { get; set; } = string.Empty;
     public bool FoodSafetyConfirmed { get; set; }
+    public bool IsUrgentHarvestConnection { get; set; }
+    public DateTimeOffset? HarvestDeadlineAtUtc { get; set; }
+    public bool StandingCropBulkTransferRequested { get; set; }
+    public string EmergencyReasonEvidenceSummary { get; set; } = string.Empty;
+    public decimal MinimumProducerSettlementAmountPerUnit { get; set; }
+    public string SettlementCurrencyCode { get; set; } = string.Empty;
+    public string HarvestLaborResponsibilityCode { get; set; } = string.Empty;
+    public string PickupResponsibilityCode { get; set; } = string.Empty;
+    public string OwnershipTransferConditionSummary { get; set; } = string.Empty;
+    public string WeatherAndYieldRiskDisclosure { get; set; } = string.Empty;
+    public bool WrittenAgreementRequired { get; set; }
+    public bool AutoPurchaseAllowed { get; set; }
+    public bool AutoPriceReductionAllowed { get; set; }
     public string Message { get; set; } = string.Empty;
     public string StatusCode { get; set; } = DomesticProducerContactRequestStatuses.Draft;
     public bool ContactDetailsDisclosed { get; set; }
@@ -195,6 +238,43 @@ public sealed class DomesticGroupPurchaseSupplyCompatibilityPreviewResponse
     public bool BuyerCanAbsorbFullOffer { get; set; }
     public bool SplitShipmentCanResolveVolumeGap { get; set; }
     public bool IsMutuallyFeasible { get; set; }
+    public IReadOnlyList<string> UnresolvedConditions { get; set; } = [];
+    public string Summary { get; set; } = string.Empty;
+}
+
+public sealed class DomesticUrgentHarvestConnectionPreviewRequest
+{
+    public bool ProducerVerified { get; set; }
+    public bool RepresentativeRoleConfirmed { get; set; }
+    public bool FoodSafetyConfirmed { get; set; }
+    public DateTimeOffset HarvestDeadlineAtUtc { get; set; }
+    public decimal ProducerAvailableQuantity { get; set; }
+    public decimal ProducerMinimumTakeQuantity { get; set; }
+    public decimal BuyerGroupMaximumAbsorptionQuantity { get; set; }
+    public decimal MinimumProducerSettlementAmountPerUnit { get; set; }
+    public decimal BuyerMaximumAmountPerUnit { get; set; }
+    public string SettlementCurrencyCode { get; set; } = "KRW";
+    public string HarvestLaborResponsibilityCode { get; set; } =
+        DomesticUrgentHarvestLaborResponsibilityCodes.ToBeAgreed;
+    public string PickupResponsibilityCode { get; set; } =
+        DomesticUrgentHarvestPickupResponsibilityCodes.ToBeAgreed;
+    public string OwnershipTransferConditionSummary { get; set; } = string.Empty;
+    public string WeatherAndYieldRiskDisclosure { get; set; } = string.Empty;
+    public string EmergencyReasonEvidenceSummary { get; set; } = string.Empty;
+}
+
+public sealed class DomesticUrgentHarvestConnectionPreviewResponse
+{
+    public bool EligibleForUrgentReview { get; set; }
+    public bool HarvestWindowFeasible { get; set; }
+    public bool BuyerCapacityFeasible { get; set; }
+    public bool ProducerPriceFloorProtected { get; set; }
+    public bool ResponsibilitiesDefined { get; set; }
+    public bool EvidenceReady { get; set; }
+    public bool RequiresWrittenAgreement { get; set; } = true;
+    public bool AutoPurchaseAllowed { get; set; }
+    public bool AutoPriceReductionAllowed { get; set; }
+    public bool UrgencyOverridesConsent { get; set; }
     public IReadOnlyList<string> UnresolvedConditions { get; set; } = [];
     public string Summary { get; set; } = string.Empty;
 }

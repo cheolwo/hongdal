@@ -52,8 +52,17 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
         var startMonth = AddMonths(endMonth, -(lookbackMonths - 1));
         var body = await ReadStatisticsBodyAsync(hsCode, countryCode, startMonth, endMonth, serviceKey, cancellationToken);
         var monthlyItems = PublicDataParsing.ReadItems(body)
-            .Select(item => ToMonthlyItem(item, hsCode, countryCode, request.ExpectedFxRateKrwPerUsd))
-            .Where(x => x.ImportWeightKg > 0 || x.ImportValueUsd > 0)
+            .Select(item => ToMonthlyItem(
+                item,
+                request,
+                hsCode,
+                countryCode,
+                request.ExpectedFxRateKrwPerUsd))
+            .Where(x =>
+                x.ImportWeightKg > 0
+                || x.ImportValueUsd > 0
+                || x.ExportWeightKg > 0
+                || x.ExportValueUsd > 0)
             .OrderBy(x => x.Month)
             .ToArray();
 
@@ -64,11 +73,22 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
 
         var totalWeight = monthlyItems.Sum(x => x.ImportWeightKg);
         var totalValue = monthlyItems.Sum(x => x.ImportValueUsd);
+        var totalExportWeight = monthlyItems.Sum(x => x.ExportWeightKg);
+        var totalExportValue = monthlyItems.Sum(x => x.ExportValueUsd);
         var averageUsd = totalWeight > 0
             ? decimal.Round(totalValue / totalWeight, 4, MidpointRounding.AwayFromZero)
             : (decimal?)null;
         var averageKrw = averageUsd.HasValue && request.ExpectedFxRateKrwPerUsd is > 0
             ? decimal.Round(averageUsd.Value * request.ExpectedFxRateKrwPerUsd.Value, 0, MidpointRounding.AwayFromZero)
+            : (decimal?)null;
+        var averageExportUsd = totalExportWeight > 0
+            ? decimal.Round(totalExportValue / totalExportWeight, 4, MidpointRounding.AwayFromZero)
+            : (decimal?)null;
+        var averageExportKrw = averageExportUsd.HasValue && request.ExpectedFxRateKrwPerUsd is > 0
+            ? decimal.Round(
+                averageExportUsd.Value * request.ExpectedFxRateKrwPerUsd.Value,
+                0,
+                MidpointRounding.AwayFromZero)
             : (decimal?)null;
         var landedCost = ResolveLandedCost(request, averageKrw);
         var grossMargin = landedCost.HasValue && request.ExpectedSellingUnitPriceKrwPerKg.HasValue
@@ -84,7 +104,12 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
         return new HsCountryImportUnitPriceSimulationResult
         {
             Success = true,
+            InternalProductCode = request.InternalProductCode.Trim(),
+            ProductName = request.ProductName.Trim(),
             HsCode = hsCode,
+            HsCodeScheme = ResolveHsCodeScheme(request.HsCodeScheme, hsCode),
+            NationalTariffCodeScheme = request.NationalTariffCodeScheme.Trim().ToUpperInvariant(),
+            NationalTariffCode = NormalizeTariffCode(request.NationalTariffCode),
             CountryCode = countryCode,
             StartMonth = startMonth,
             EndMonth = endMonth,
@@ -93,12 +118,23 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
             TotalImportValueUsd = totalValue,
             AverageImportUnitValueUsdPerKg = averageUsd,
             AverageImportUnitValueKrwPerKg = averageKrw,
+            TotalExportWeightKg = totalExportWeight,
+            TotalExportValueUsd = totalExportValue,
+            AverageExportUnitValueUsdPerKg = averageExportUsd,
+            AverageExportUnitValueKrwPerKg = averageExportKrw,
             ExpectedLandedCostKrwPerKg = landedCost,
             ExpectedGrossMarginKrwPerKg = grossMargin,
             ExpectedGrossMarginRate = marginRate,
             ExpectedParticipantGrossMarginKrw = participantMargin,
             PriceSignalCode = ResolvePriceSignal(request, averageKrw, landedCost, marginRate),
-            Summary = BuildSummary(averageUsd, averageKrw, landedCost, marginRate, participantMargin)
+            Summary = BuildSummary(
+                averageUsd,
+                averageKrw,
+                averageExportUsd,
+                averageExportKrw,
+                landedCost,
+                marginRate,
+                participantMargin)
         };
     }
 
@@ -138,24 +174,55 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
 
     private static HsCountryMonthlyTradeUnitPriceItem ToMonthlyItem(
         Dictionary<string, string?> source,
+        HsCountryMonthlyTradeUnitPriceRequest request,
         string fallbackHsCode,
         string fallbackCountryCode,
         decimal? fxRate)
     {
-        var month = PublicDataParsing.FirstValue(source, "year", "statKor", "balPaymentsYymm", "yyyymm", "yymm", "trdYymm", "statisYymm") ?? string.Empty;
+        var month = PublicDataParsing.FirstValue(
+            source,
+            "year",
+            "balPaymentsYymm",
+            "yyyymm",
+            "yymm",
+            "trdYymm",
+            "statisYymm") ?? string.Empty;
         month = NormalizeMonth(month) ?? month;
         var weightKg = PublicDataParsing.FirstDecimal(source, "impWgt", "importWeight", "importWgt", "wgt", "netWgt") ?? 0m;
         var importValueUsd = PublicDataParsing.FirstDecimal(source, "impDlr", "importDlr", "importValue", "impAmt", "impUsd") ?? 0m;
+        var exportWeightKg = PublicDataParsing.FirstDecimal(
+            source,
+            "expWgt",
+            "exportWeight",
+            "exportWgt") ?? 0m;
+        var exportValueUsd = PublicDataParsing.FirstDecimal(
+            source,
+            "expDlr",
+            "exportDlr",
+            "exportValue",
+            "expAmt",
+            "expUsd") ?? 0m;
         var unitUsd = weightKg > 0
             ? decimal.Round(importValueUsd / weightKg, 4, MidpointRounding.AwayFromZero)
             : (decimal?)null;
+        var exportUnitUsd = exportWeightKg > 0
+            ? decimal.Round(exportValueUsd / exportWeightKg, 4, MidpointRounding.AwayFromZero)
+            : (decimal?)null;
+        var itemHsCode = NormalizeHsCode(PublicDataParsing.FirstValue(source, "hsSgn", "hsCd", "hsCode"));
 
         return new HsCountryMonthlyTradeUnitPriceItem
         {
-            HsCode = NormalizeHsCode(PublicDataParsing.FirstValue(source, "hsSgn", "hsCd", "hsCode")) is { Length: > 0 } hs
-                ? hs
+            InternalProductCode = request.InternalProductCode.Trim(),
+            ProductName = PublicDataParsing.FirstValue(source, "statKor", "itemName", "productName")
+                ?? request.ProductName.Trim(),
+            HsCode = itemHsCode.Length > 0
+                ? itemHsCode
                 : fallbackHsCode,
-            CountryCode = NormalizeCountryCode(PublicDataParsing.FirstValue(source, "cntyCd", "countryCd", "natCd")) is { Length: > 0 } country
+            HsCodeScheme = ResolveHsCodeScheme(
+                request.HsCodeScheme,
+                itemHsCode.Length > 0 ? itemHsCode : fallbackHsCode),
+            CountryCode = NormalizeCountryCode(
+                PublicDataParsing.FirstValue(source, "cntyCd", "countryCd", "natCd", "statCd")) is { Length: > 0 } country
                 ? country
                 : fallbackCountryCode,
             Month = month,
@@ -164,6 +231,12 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
             AverageImportUnitValueUsdPerKg = unitUsd,
             AverageImportUnitValueKrwPerKg = unitUsd.HasValue && fxRate is > 0
                 ? decimal.Round(unitUsd.Value * fxRate.Value, 0, MidpointRounding.AwayFromZero)
+                : null,
+            ExportWeightKg = exportWeightKg,
+            ExportValueUsd = exportValueUsd,
+            AverageExportUnitValueUsdPerKg = exportUnitUsd,
+            AverageExportUnitValueKrwPerKg = exportUnitUsd.HasValue && fxRate is > 0
+                ? decimal.Round(exportUnitUsd.Value * fxRate.Value, 0, MidpointRounding.AwayFromZero)
                 : null
         };
     }
@@ -209,25 +282,37 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
     private static string BuildSummary(
         decimal? averageUsd,
         decimal? averageKrw,
+        decimal? averageExportUsd,
+        decimal? averageExportKrw,
         decimal? landedCost,
         decimal? marginRate,
         decimal? participantMargin)
     {
-        if (!averageUsd.HasValue)
+        if (!averageUsd.HasValue && !averageExportUsd.HasValue)
         {
-            return "Import statistics were found, but unit price could not be calculated because import weight is missing.";
+            return "Trade statistics were found, but unit values could not be calculated because net weight is missing.";
         }
 
-        var summary = $"Average import unit value is USD {averageUsd.Value:N2}/kg";
-        if (averageKrw.HasValue)
+        var parts = new List<string>();
+        if (averageUsd.HasValue)
         {
-            summary += $" (about KRW {averageKrw.Value:N0}/kg).";
-        }
-        else
-        {
-            summary += ".";
+            var import = $"Average CIF import unit value is USD {averageUsd.Value:N2}/kg";
+            import += averageKrw.HasValue
+                ? $" (about KRW {averageKrw.Value:N0}/kg)."
+                : ".";
+            parts.Add(import);
         }
 
+        if (averageExportUsd.HasValue)
+        {
+            var export = $"Average FOB export unit value is USD {averageExportUsd.Value:N2}/kg";
+            export += averageExportKrw.HasValue
+                ? $" (about KRW {averageExportKrw.Value:N0}/kg)."
+                : ".";
+            parts.Add(export);
+        }
+
+        var summary = string.Join(" ", parts);
         if (landedCost.HasValue)
         {
             summary += $" Expected landed cost is KRW {landedCost.Value:N0}/kg.";
@@ -267,6 +352,19 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
     private static string NormalizeCountryCode(string? value)
         => Regex.Replace(value ?? string.Empty, "[^0-9A-Za-z]", string.Empty).ToUpperInvariant();
 
+    private static string NormalizeTariffCode(string? value)
+        => Regex.Replace(value ?? string.Empty, "[^0-9A-Za-z]", string.Empty).ToUpperInvariant();
+
+    private static string ResolveHsCodeScheme(string? requestedScheme, string hsCode)
+    {
+        if (!string.IsNullOrWhiteSpace(requestedScheme))
+        {
+            return requestedScheme.Trim().ToUpperInvariant();
+        }
+
+        return hsCode.Length == 10 ? "HSK" : "HS";
+    }
+
     private static string? NormalizeMonth(string? value)
     {
         var digits = Regex.Replace(value ?? string.Empty, "[^0-9]", string.Empty);
@@ -288,7 +386,12 @@ public sealed class HsCountryTradeUnitPriceLookupService : IHsCountryTradeUnitPr
         {
             Success = false,
             ErrorMessage = message,
+            InternalProductCode = request.InternalProductCode.Trim(),
+            ProductName = request.ProductName.Trim(),
             HsCode = NormalizeHsCode(request.HsCode),
+            HsCodeScheme = ResolveHsCodeScheme(request.HsCodeScheme, NormalizeHsCode(request.HsCode)),
+            NationalTariffCodeScheme = request.NationalTariffCodeScheme.Trim().ToUpperInvariant(),
+            NationalTariffCode = NormalizeTariffCode(request.NationalTariffCode),
             CountryCode = NormalizeCountryCode(request.CountryCode),
             StartMonth = startMonth ?? string.Empty,
             EndMonth = endMonth ?? NormalizeMonth(request.Month) ?? string.Empty,

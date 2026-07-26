@@ -146,6 +146,21 @@ public sealed class 국내공동구매생산자연결Controller : OrdererControl
         return Ok(_생산자연결Service.PreviewCompatibility(요청));
     }
 
+    [HttpPost("urgent-harvest-compatibility-previews")]
+    [SsalddelApiContractName("PreviewUrgentHarvestConnection")]
+    public IActionResult 긴급수확연결적합성미리보기(
+        [FromRoute(Name = "campaignId")] Guid 모집Id,
+        [FromBody] DomesticUrgentHarvestConnectionPreviewRequest 요청)
+    {
+        if (모집Id == Guid.Empty)
+        {
+            return BadRequest(new { message = "공동구매 캠페인 식별자가 필요합니다." });
+        }
+
+        return Ok(
+            _생산자연결Service.PreviewUrgentHarvestConnection(요청));
+    }
+
     private string CurrentUserId()
         => User.FindFirstValue(ClaimTypes.NameIdentifier)
            ?? User.FindFirstValue("sub")
