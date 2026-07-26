@@ -20,6 +20,9 @@ namespace 살뜰.도메인.운송
 
         public decimal 최종운임 { get; set; }
 
+        // 화주 청구액과 구분되는 기사 지급 약정 금액입니다.
+        public decimal? 기사지급예정운임 { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -48,6 +48,14 @@ namespace 살뜰.Infrastructure.Persistence
                 .Property(x => x.연락처)
                 .HasConversion(v => protector.Protect(v)!, v => protector.Unprotect(v)!);
 
+            modelBuilder.Entity<기사정산계좌>()
+                .Property(x => x.예금주명)
+                .HasConversion(v => protector.Protect(v)!, v => protector.Unprotect(v)!);
+
+            modelBuilder.Entity<기사정산계좌>()
+                .Property(x => x.계좌번호)
+                .HasConversion(v => protector.Protect(v)!, v => protector.Unprotect(v)!);
+
             modelBuilder.Entity<화주운송의뢰>()
                 .Property(x => x.픽업_도로명주소)
                 .HasConversion(v => protector.Protect(v)!, v => protector.Unprotect(v)!);

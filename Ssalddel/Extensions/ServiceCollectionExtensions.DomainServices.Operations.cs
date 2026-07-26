@@ -1,6 +1,8 @@
 using Ssalddel.Application.Driver.Notification;
 using Ssalddel.Application.Driver.Profile;
+using Ssalddel.Application.Driver.Settlement;
 using Ssalddel.Application.Driver.Transport;
+using Ssalddel.Application.Admin.Settlement;
 using Ssalddel.Services.LogisticsProcessing.VehicleLoading;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
 using Ssalddel.Services.Storage.Azure;
@@ -11,6 +13,7 @@ using 살뜰.Services.Dispatch.Queue;
 using 살뜰.Services.Documents;
 using 살뜰.Services.HIOPSAI;
 using 살뜰.Services.Images;
+using 살뜰.Services.Payments;
 using 살뜰.Services.Sales;
 
 namespace Ssalddel.Extensions;
@@ -67,6 +70,11 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I배차추천경로Service, 배차추천경로Service>();
         services.AddScoped<I용달기사프로필UseCase, 용달기사프로필UseCase>();
         services.AddScoped<I기사알림UseCase, 기사알림UseCase>();
+        services.AddScoped<I기사정산계좌UseCase, 기사정산계좌UseCase>();
+        services.AddScoped<I기사지급준비UseCase, 기사지급준비UseCase>();
+        services.AddScoped<I기사지급승인UseCase, 기사지급승인UseCase>();
+        services.AddScoped<I기사지급Gateway, 준비전용기사지급Gateway>();
+        services.AddScoped<I기사지급OutboxService, 기사지급OutboxService>();
         services.AddScoped<I기사운송일정구성Service, 기사운송일정구성Service>();
         services.AddScoped<I운송일정삽입평가Service, 운송일정삽입평가Service>();
         services.AddScoped<I픽업하차경로최적화Service, 픽업하차경로최적화Service>();

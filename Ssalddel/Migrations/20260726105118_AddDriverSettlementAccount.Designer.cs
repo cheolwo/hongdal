@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using 살뜰.Data;
 
@@ -11,9 +12,11 @@ using 살뜰.Data;
 namespace Ssalddel.Migrations
 {
     [DbContext(typeof(SsalddelContext))]
-    partial class SsalddelContextModelSnapshot : ModelSnapshot
+    [Migration("20260726105118_AddDriverSettlementAccount")]
+    partial class AddDriverSettlementAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4237,119 +4240,6 @@ namespace Ssalddel.Migrations
                     b.ToTable("driver_shifts", (string)null);
                 });
 
-            modelBuilder.Entity("살뜰.도메인.기사.기사운송대금지급요청", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<DateTime?>("Simulation검증일시Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("simulation_verified_at_utc");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("기사Id")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("driver_id");
-
-                    b.Property<string>("마지막처리메시지")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("last_result_message");
-
-                    b.Property<string>("마지막처리코드")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("last_result_code");
-
-                    b.Property<string>("멱등키")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("idempotency_key");
-
-                    b.Property<string>("상태코드")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("status_code");
-
-                    b.Property<string>("승인관리자Id")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("approved_by");
-
-                    b.Property<string>("승인사유")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("approval_reason");
-
-                    b.Property<DateTime>("승인일시Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("approved_at_utc");
-
-                    b.Property<string>("실행모드코드")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("execution_mode_code");
-
-                    b.Property<long>("운송Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("transport_id");
-
-                    b.Property<string>("운송번호")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("transport_number");
-
-                    b.Property<string>("의뢰Id")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("request_id");
-
-                    b.Property<decimal>("지급예정금액")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("expected_payout_amount");
-
-                    b.Property<string>("통화코드")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("currency_code");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("멱등키")
-                        .IsUnique();
-
-                    b.HasIndex("운송Id")
-                        .IsUnique();
-
-                    b.HasIndex("기사Id", "승인일시Utc");
-
-                    b.ToTable("기사운송대금지급요청", (string)null);
-                });
-
             modelBuilder.Entity("살뜰.도메인.기사.기사월정산", b =>
                 {
                     b.Property<long>("Id")
@@ -5915,81 +5805,6 @@ namespace Ssalddel.Migrations
                     b.ToTable("결제승인완료_Outbox");
                 });
 
-            modelBuilder.Entity("살뜰.도메인.설정.기사지급Outbox", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("PayloadJson")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("payload_json");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<long>("기사지급요청Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("driver_payout_request_id");
-
-                    b.Property<DateTime?>("다음시도시각Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("next_attempt_at_utc");
-
-                    b.Property<string>("마지막결과코드")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("last_result_code");
-
-                    b.Property<DateTime?>("마지막시도시각Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_attempted_at_utc");
-
-                    b.Property<string>("마지막오류메시지")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("last_error_message");
-
-                    b.Property<string>("멱등키")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("idempotency_key");
-
-                    b.Property<int>("시도횟수")
-                        .HasColumnType("int")
-                        .HasColumnName("attempt_count");
-
-                    b.Property<string>("처리상태")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("status_code");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("기사지급요청Id")
-                        .IsUnique();
-
-                    b.HasIndex("멱등키")
-                        .IsUnique();
-
-                    b.HasIndex("처리상태", "다음시도시각Utc", "CreatedAtUtc");
-
-                    b.ToTable("기사지급_Outbox", (string)null);
-                });
-
             modelBuilder.Entity("살뜰.도메인.설정.배차추천알림Outbox", b =>
                 {
                     b.Property<long>("Id")
@@ -6728,10 +6543,6 @@ namespace Ssalddel.Migrations
                     b.Property<decimal>("기본운임")
                         .HasColumnType("decimal(65,30)")
                         .HasColumnName("기본운임");
-
-                    b.Property<decimal?>("기사지급예정운임")
-                        .HasColumnType("decimal(65,30)")
-                        .HasColumnName("driver_expected_payout");
 
                     b.Property<decimal>("대기료")
                         .HasColumnType("decimal(65,30)")
@@ -10644,17 +10455,6 @@ namespace Ssalddel.Migrations
                         .IsRequired();
 
                     b.Navigation("참여자");
-                });
-
-            modelBuilder.Entity("살뜰.도메인.설정.기사지급Outbox", b =>
-                {
-                    b.HasOne("살뜰.도메인.기사.기사운송대금지급요청", "기사지급요청")
-                        .WithOne()
-                        .HasForeignKey("살뜰.도메인.설정.기사지급Outbox", "기사지급요청Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("기사지급요청");
                 });
 
             modelBuilder.Entity("살뜰.도메인.음식.음식점메뉴", b =>

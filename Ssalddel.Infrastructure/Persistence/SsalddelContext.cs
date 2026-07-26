@@ -46,6 +46,7 @@ namespace 살뜰.Data
         public DbSet<기사근무> 기사근무 { get; set; } = null!;
         public DbSet<기사위치기록> 기사위치기록 { get; set; } = null!;
         public DbSet<기사월정산> 기사월정산 { get; set; } = null!;
+        public DbSet<기사운송대금지급요청> 기사운송대금지급요청 { get; set; } = null!;
         public DbSet<차량제원> 차량제원 { get; set; } = null!;
         public DbSet<탐색캠페인> 탐색캠페인 { get; set; } = null!;
         public DbSet<탐색캠페인대상자> 탐색캠페인대상자 { get; set; } = null!;
@@ -69,6 +70,7 @@ namespace 살뜰.Data
         public DbSet<Command알림Outbox> Command알림Outbox { get; set; } = null!;
         public DbSet<배차추천알림Outbox> 배차추천알림Outbox { get; set; } = null!;
         public DbSet<결제승인완료Outbox> 결제승인완료Outbox { get; set; } = null!;
+        public DbSet<기사지급Outbox> 기사지급Outbox { get; set; } = null!;
         public DbSet<플랫폼View정책> 플랫폼View정책 { get; set; } = null!;
         public DbSet<사용자View설정> 사용자View설정 { get; set; } = null!;
         public DbSet<사용자행위로그> 사용자행위로그 { get; set; } = null!;

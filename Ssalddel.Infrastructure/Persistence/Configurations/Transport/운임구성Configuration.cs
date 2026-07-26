@@ -20,6 +20,7 @@ public sealed class 운임구성Configuration : IEntityTypeConfiguration<운임�
         builder.Property(x => x.대기료).HasColumnName("대기료");
         builder.Property(x => x.수작업비).HasColumnName("수작업비");
         builder.Property(x => x.최종운임).HasColumnName("최종운임");
+        builder.Property(x => x.기사지급예정운임).HasColumnName("driver_expected_payout");
         builder.Property(x => x.CreatedAt).HasColumnName("created_at");
         builder.Property(x => x.UpdatedAt).HasColumnName("updated_at");
     }

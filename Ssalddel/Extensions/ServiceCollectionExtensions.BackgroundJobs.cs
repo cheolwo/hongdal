@@ -79,6 +79,13 @@ public static partial class ServiceCollectionExtensions
                 .WithIdentity("PaymentApprovedOutboxPublish-trigger")
                 .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.결제승인Outbox발행주기초))).RepeatForever()));
 
+            var driverPayoutOutboxJobKey = new JobKey("DriverPayoutOutboxProcess");
+            q.AddJob<기사지급Outbox처리Job>(opts => opts.WithIdentity(driverPayoutOutboxJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(driverPayoutOutboxJobKey)
+                .WithIdentity("DriverPayoutOutboxProcess-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.결제승인Outbox발행주기초))).RepeatForever()));
+
             var customsSyncJobKey = new JobKey("CustomsStatusSync");
             q.AddJob<통관상태동기화Job>(opts => opts.WithIdentity(customsSyncJobKey));
             q.AddTrigger(opts => opts
