@@ -61,7 +61,7 @@
                 <MudNumericField T="decimal" Label="희망 도착 단가" @bind-Value="Draft.희망도착단가" Min="0m" Adornment="Adornment.End" AdornmentText="원" Variant="Variant.Outlined" />
             </MudItem>
             <MudItem xs="12">
-                <MudTextField T="string" Label="희망 원산지 또는 허용 범위" @bind-Value="Draft.희망원산지" Required="@(Draft.공급경로 == 음식점식재료공급경로.공동수입)" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="희망 원산지 또는 허용 범위" @bind-Value="Draft.희망원산지" Required="@(Draft.공급경로 == 음식점식재료공급경로.같이수입)" Variant="Variant.Outlined" />
             </MudItem>
             <MudItem xs="12">
                 <MudTextField T="string" Label="납품 지역" @bind-Value="Draft.납품지역" Required="true" Variant="Variant.Outlined" />

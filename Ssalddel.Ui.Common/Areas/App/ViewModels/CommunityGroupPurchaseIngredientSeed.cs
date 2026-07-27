@@ -77,12 +77,12 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         => SourcingModeCode switch
         {
             CommunityIngredientSourcingModeCodes.DomesticGroupPurchase => "국내 공동구매 검토",
-            CommunityIngredientSourcingModeCodes.GroupImportReview => "공동수입 검토",
+            CommunityIngredientSourcingModeCodes.GroupImportReview => "같이 수입 검토",
             _ => "조달 경로 미정"
         };
 
     public string SuggestedTitle => IsGroupImportReview
-        ? $"{IngredientName} 공동수입 검토 제안"
+        ? $"{IngredientName} 같이 수입 검토 제안"
         : $"{IngredientName} 공동구매 제안";
 
     public string SuggestedProductKey => $"official-ingredient:{IngredientKey}";
@@ -253,7 +253,7 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         lines.Add("※ 공개 가격은 국가·지역·통화·단위·유통단계와 기준일이 서로 달라 실제 구매가나 계약 조건으로 확정되지 않습니다.");
         if (IsGroupImportReview)
         {
-            lines.Add("※ 공동수입 여부는 실제 상품 출발국, 최종 배송국, 통관 상태와 HS 코드를 입력한 뒤 별도 거래경로 판정에서 결정합니다.");
+            lines.Add("※ 같이 수입 여부는 실제 상품 출발국, 최종 배송국, 통관 상태와 HS 코드를 입력한 뒤 별도 거래경로 판정에서 결정합니다.");
         }
         lines.Add("참여자는 목표 수량, 포장 규격, 공급 조건과 수령 방법을 직접 확인하고 합의해 주세요.");
         return string.Join(Environment.NewLine, lines);

@@ -107,8 +107,8 @@
         try
         {
             var companiesTask = ShipmentTrackingService.ResearchCompaniesAsync(Product.상품명);
-            var koreanHsTask = ShipmentTrackingService.GetHsCandidatesAsync(Product.상품명, 공동수입준비국가코드.대한민국);
-            var unitedStatesHsTask = ShipmentTrackingService.GetHsCandidatesAsync(Product.상품명, 공동수입준비국가코드.미국);
+            var koreanHsTask = ShipmentTrackingService.GetHsCandidatesAsync(Product.상품명, 같이수입준비국가코드.대한민국);
+            var unitedStatesHsTask = ShipmentTrackingService.GetHsCandidatesAsync(Product.상품명, 같이수입준비국가코드.미국);
             await Task.WhenAll(companiesTask, koreanHsTask, unitedStatesHsTask);
             _companies = await companiesTask;
             _koreanHs = await koreanHsTask;

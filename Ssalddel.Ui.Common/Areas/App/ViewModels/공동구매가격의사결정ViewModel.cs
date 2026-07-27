@@ -13,7 +13,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
     private readonly I공동구매가격의사결정Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
     private readonly 공동구매거래경로분기ViewModel _분기;
-    private readonly 공동수입전환준비ViewModel _공동수입전환;
+    private readonly 같이수입전환준비ViewModel _같이수입전환;
     private Guid? _입력대상공동구매Id;
     private string _마지막조회조건키 = string.Empty;
 
@@ -21,16 +21,16 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
         I공동구매가격의사결정Service service,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기,
-        공동수입전환준비ViewModel 공동수입전환)
+        같이수입전환준비ViewModel 같이수입전환)
         : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
         _분기 = 분기;
-        _공동수입전환 = 공동수입전환;
+        _같이수입전환 = 같이수입전환;
         _화면상태.PropertyChanged += 화면상태변경;
         _분기.PropertyChanged += 분기변경;
-        _공동수입전환.PropertyChanged += 공동수입전환변경;
+        _같이수입전환.PropertyChanged += 같이수입전환변경;
         선택공동구매동기화();
     }
 
@@ -76,8 +76,8 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
     public string 현재유형코드
         => _분기.국내공동구매활성
             ? 공동구매가격의사결정유형코드.국내공동구매
-            : _분기.공동수입활성
-                ? 공동구매가격의사결정유형코드.공동수입
+            : _분기.같이수입활성
+                ? 공동구매가격의사결정유형코드.같이수입
                 : string.Empty;
 
     public string 적용HS코드
@@ -94,7 +94,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
                 ? campaign.GroupPurchase.HsCode
                 : campaign?.Options.FirstOrDefault(option => !string.IsNullOrWhiteSpace(option.HsCode))?.HsCode;
             return 숫자만(string.IsNullOrWhiteSpace(campaignHsCode)
-                ? _공동수입전환.HS코드
+                ? _같이수입전환.HS코드
                 : campaignHsCode);
         }
     }
@@ -111,7 +111,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
         => !string.IsNullOrWhiteSpace(현재유형코드)
            && 적용HS코드.Length is >= 4 and <= 10
            && 제안단가KrwPerKg is > 0
-           && (현재유형코드 != 공동구매가격의사결정유형코드.공동수입
+           && (현재유형코드 != 공동구매가격의사결정유형코드.같이수입
                || 국가코드정규화(수출국가코드).Length is >= 2 and <= 3);
 
     public bool 가격정보최신
@@ -129,7 +129,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
                 return hasDomesticMarket;
             }
 
-            return 현재유형코드 == 공동구매가격의사결정유형코드.공동수입
+            return 현재유형코드 == 공동구매가격의사결정유형코드.같이수입
                    && hasDomesticMarket
                    && items.Any(item => item.기준코드.StartsWith("import-", StringComparison.Ordinal));
         }
@@ -156,7 +156,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
     {
         if (string.IsNullOrWhiteSpace(현재유형코드))
         {
-            return 유효성실패("국내 공동구매 또는 공동수입 거래경로를 먼저 확정해 주세요.");
+            return 유효성실패("국내 공동구매 또는 같이 수입 거래경로를 먼저 확정해 주세요.");
         }
 
         if (적용HS코드.Length is < 4 or > 10)
@@ -169,10 +169,10 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
             return 유효성실패("공동구매 제안가격과 그 가격이 적용되는 중량(kg)을 0보다 크게 입력해 주세요.");
         }
 
-        if (현재유형코드 == 공동구매가격의사결정유형코드.공동수입
+        if (현재유형코드 == 공동구매가격의사결정유형코드.같이수입
             && 국가코드정규화(수출국가코드).Length is (< 2 or > 3))
         {
-            return 유효성실패("공동수입 가격 비교에는 영문 2~3자리 수출국 코드를 입력해 주세요.");
+            return 유효성실패("같이 수입 가격 비교에는 영문 2~3자리 수출국 코드를 입력해 주세요.");
         }
 
         var requestedKey = 조회조건키();
@@ -206,7 +206,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
     {
         _화면상태.PropertyChanged -= 화면상태변경;
         _분기.PropertyChanged -= 분기변경;
-        _공동수입전환.PropertyChanged -= 공동수입전환변경;
+        _같이수입전환.PropertyChanged -= 같이수입전환변경;
         GC.SuppressFinalize(this);
     }
 
@@ -226,7 +226,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
         입력속성변경알림();
     }
 
-    private void 공동수입전환변경(object? sender, PropertyChangedEventArgs e)
+    private void 같이수입전환변경(object? sender, PropertyChangedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(조회HS코드))
         {

@@ -10,7 +10,7 @@ public static class 공동구매거래경로필터코드
 {
     public const string 전체 = "all";
     public const string 국내공동구매 = "domestic";
-    public const string 공동수입 = "group-import";
+    public const string 같이수입 = "group-import";
     public const string 해외수출 = "overseas-export";
 }
 
@@ -102,7 +102,7 @@ public sealed partial class 공동구매목록ViewModel(
     {
         if (routeFilterCode is not 공동구매거래경로필터코드.전체
             and not 공동구매거래경로필터코드.국내공동구매
-            and not 공동구매거래경로필터코드.공동수입
+            and not 공동구매거래경로필터코드.같이수입
             and not 공동구매거래경로필터코드.해외수출)
         {
             return Task.FromResult(유효성실패("지원하는 공동구매 거래경로 필터를 선택해 주세요."));
@@ -170,7 +170,7 @@ public sealed partial class 공동구매목록ViewModel(
         {
             공동구매거래경로필터코드.국내공동구매
                 => 국내공동구매인가(campaign),
-            공동구매거래경로필터코드.공동수입
+            공동구매거래경로필터코드.같이수입
                 => CommunityVoteWorkflowClassifier.IsGroupImport(campaign),
             공동구매거래경로필터코드.해외수출
                 => 해외수출인가(campaign),
@@ -224,15 +224,15 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
     public 공동구매제안ViewModel(
         I공동구매업무Service service,
         공동구매화면상태ViewModel 화면상태,
-        공동수입전환준비ViewModel 공동수입전환,
+        같이수입전환준비ViewModel 같이수입전환,
         공동구매가격의사결정ViewModel 가격의사결정)
         : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
-        this.공동수입전환 = 공동수입전환;
+        this.같이수입전환 = 같이수입전환;
         this.가격의사결정 = 가격의사결정;
-        this.공동수입전환.PropertyChanged += 하위ViewModel변경;
+        this.같이수입전환.PropertyChanged += 하위ViewModel변경;
         this.가격의사결정.PropertyChanged += 하위ViewModel변경;
     }
 
@@ -248,11 +248,11 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             "지역·공동체의 구매 수요와 수령 조건을 바탕으로 공동구매 대표가 제안합니다.")
     ];
 
-    public 공동수입전환준비ViewModel 공동수입전환 { get; }
+    public 같이수입전환준비ViewModel 같이수입전환 { get; }
 
     public 공동구매가격의사결정ViewModel 가격의사결정 { get; }
 
-    public 공동구매거래경로판정ViewModel 거래경로 => 공동수입전환.거래경로;
+    public 공동구매거래경로판정ViewModel 거래경로 => 같이수입전환.거래경로;
 
     [ObservableProperty]
     public partial string 앱키 { get; set; } = "shipper";
@@ -363,8 +363,8 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
                 await _화면상태.새공동구매적용Async(생성된공동구매, token);
                 OnPropertyChanged(nameof(복구할게시글Id));
             },
-            거래경로.공동수입후보
-                ? "제안 글과 공동수입 후보 수요 투표를 만들었습니다. 계약 확정 전 HS 코드와 통관 정보를 확인해 주세요."
+            거래경로.같이수입후보
+                ? "제안 글과 같이 수입 후보 수요 투표를 만들었습니다. 계약 확정 전 HS 코드와 통관 정보를 확인해 주세요."
                 : "제안 글과 공동구매 수요 투표를 만들었습니다.",
             cancellationToken,
             ex => 생성된게시글 is null
@@ -386,8 +386,8 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
                 ?? "상품의 출발국가와 최종 배송국가를 확인해 주세요.");
         }
 
-        if (!string.IsNullOrWhiteSpace(공동수입전환.HS코드)
-            && !공동수입전환.HS코드유효)
+        if (!string.IsNullOrWhiteSpace(같이수입전환.HS코드)
+            && !같이수입전환.HS코드유효)
         {
             return 유효성실패("HS 코드는 구분기호를 제외한 2~10자리 숫자로 입력해 주세요.");
         }
@@ -483,7 +483,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             MinimumTotalQuantity = 최소총수량,
             PickupPoints = pickupPoints
         };
-        공동수입전환.요청에적용(groupPurchase, option);
+        같이수입전환.요청에적용(groupPurchase, option);
         if (string.IsNullOrWhiteSpace(groupPurchase.HsCode)
             && 가격의사결정.적용HS코드.Length is >= 4 and <= 10)
         {
@@ -526,7 +526,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             $"도착국 통관 상태: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCustomsClearanceStatusCode(거래경로.국내통관상태코드)}",
             $"계약 합의 정책: {CommunityGroupPurchaseAgreementPolicy.PolicyCode}",
             CommunityGroupPurchaseAgreementPolicy.ProposalOriginNotice,
-            거래경로.공동수입후보
+            거래경로.같이수입후보
                 ? CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice
                 : string.Empty,
             string.IsNullOrWhiteSpace(수령소명)
@@ -551,7 +551,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
 
     public void Dispose()
     {
-        공동수입전환.PropertyChanged -= 하위ViewModel변경;
+        같이수입전환.PropertyChanged -= 하위ViewModel변경;
         가격의사결정.PropertyChanged -= 하위ViewModel변경;
         GC.SuppressFinalize(this);
     }
@@ -860,7 +860,7 @@ public sealed class 공동구매모집기능ViewModel : 조립ViewModelBase
 
     public 공동구매목록ViewModel 목록 { get; }
     public 공동구매제안ViewModel 제안 { get; }
-    public 공동수입전환준비ViewModel 공동수입전환 => 제안.공동수입전환;
+    public 같이수입전환준비ViewModel 같이수입전환 => 제안.같이수입전환;
     public 공동구매가격의사결정ViewModel 가격의사결정 => 제안.가격의사결정;
     public 공동구매수요참여ViewModel 수요참여 { get; }
     public 공동구매이의검토ViewModel 이의검토 { get; }

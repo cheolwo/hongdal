@@ -29,15 +29,15 @@ public sealed class RestaurantIngredientSupplyPageViewModelTests
         await sut.초기화Async();
         sut.작성.국내산지초안.품목명 = "감자";
 
-        await sut.공급경로선택Async(음식점식재료공급경로.공동수입);
-        sut.작성.공동수입초안.품목명 = "냉동 브로콜리";
+        await sut.공급경로선택Async(음식점식재료공급경로.같이수입);
+        sut.작성.같이수입초안.품목명 = "냉동 브로콜리";
         await sut.공급경로선택Async(음식점식재료공급경로.국내산지);
 
         Assert.Equal("감자", sut.작성.현재초안.품목명);
         Assert.All(sut.비교.후보목록, candidate =>
             Assert.Equal(음식점식재료공급경로.국내산지, candidate.공급경로));
 
-        await sut.공급경로선택Async(음식점식재료공급경로.공동수입);
+        await sut.공급경로선택Async(음식점식재료공급경로.같이수입);
         Assert.Equal("냉동 브로콜리", sut.작성.현재초안.품목명);
     }
 
@@ -73,12 +73,12 @@ public sealed class RestaurantIngredientSupplyPageViewModelTests
         using var sut = Create(new FakeIngredientSupplyService());
         await sut.초기화Async();
         sut.작성.국내산지초안.품목명 = "변경한 양파";
-        sut.작성.공동수입초안.품목명 = "수입 초안 유지";
+        sut.작성.같이수입초안.품목명 = "수입 초안 유지";
 
         sut.현재공급조건초기화();
 
         Assert.Equal("양파", sut.작성.국내산지초안.품목명);
-        Assert.Equal("수입 초안 유지", sut.작성.공동수입초안.품목명);
+        Assert.Equal("수입 초안 유지", sut.작성.같이수입초안.품목명);
         Assert.Empty(sut.비교.후보목록);
         Assert.Contains("기본값", sut.메시지);
     }
@@ -92,7 +92,7 @@ public sealed class RestaurantIngredientSupplyPageViewModelTests
         var existingCandidateIds = sut.비교.후보목록.Select(candidate => candidate.후보Id).ToArray();
         service.FailCandidateLookups = true;
 
-        var changed = await sut.공급경로선택Async(음식점식재료공급경로.공동수입);
+        var changed = await sut.공급경로선택Async(음식점식재료공급경로.같이수입);
 
         Assert.False(changed);
         Assert.Equal(음식점식재료공급경로.국내산지, sut.작성.공급경로);
@@ -121,7 +121,7 @@ public sealed class RestaurantIngredientSupplyPageViewModelTests
     {
         using var sut = Create(new FakeIngredientSupplyService());
         await sut.초기화Async();
-        await sut.공급경로선택Async(음식점식재료공급경로.공동수입);
+        await sut.공급경로선택Async(음식점식재료공급경로.같이수입);
         sut.작성.현재초안.희망원산지 = string.Empty;
 
         var compared = await sut.조건으로비교Async();
@@ -215,7 +215,7 @@ public sealed class RestaurantIngredientSupplyPageViewModelTests
                 throw new InvalidOperationException("공급 후보 조회 실패");
             }
 
-            var imported = request.공급경로 == 음식점식재료공급경로.공동수입;
+            var imported = request.공급경로 == 음식점식재료공급경로.같이수입;
             IReadOnlyList<음식점식재료공급후보> result =
             [
                 Candidate("candidate-a", request.공급경로, imported, 1800, 200, imported ? 300 : 0, request.현재구매단가),
@@ -257,7 +257,7 @@ public sealed class RestaurantIngredientSupplyPageViewModelTests
             => new(
                 id,
                 route,
-                imported ? "공동수입" : "국내 산지",
+                imported ? "같이수입" : "국내 산지",
                 $"공급 후보 {id}",
                 imported ? "해외" : "국내",
                 "테스트 품목",

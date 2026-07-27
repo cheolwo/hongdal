@@ -644,7 +644,7 @@ public sealed class CommunityAuthoringDiagramViewModel : 조립ViewModelBase
         SelectedOrganizationNodeKey = Steps[0].Key;
         SynchronizeCanvas();
         NotifyOrganizationCandidatesChanged();
-        StatusMessage = $"저장한 공동수입 여정 {Steps.Count:N0}단계와 업체 후보 {OrganizationCandidates.Count:N0}곳을 불러왔습니다.";
+        StatusMessage = $"저장한 같이 수입 여정 {Steps.Count:N0}단계와 업체 후보 {OrganizationCandidates.Count:N0}곳을 불러왔습니다.";
         return true;
     }
 

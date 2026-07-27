@@ -512,7 +512,7 @@ public static class 주문원장포함역할
     };
 }
 
-public static class 공동수입원장관계역할
+public static class 같이수입원장관계역할
 {
     public const string 원천공동구매 = "원천공동구매";
     public const string 국제운송 = "국제운송";

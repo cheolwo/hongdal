@@ -112,7 +112,7 @@ public abstract class 공동구매공급업무ViewModelBase(공동구매화면�
         [공동구매절차코드.거래상대연결, 공동구매절차코드.공급조건협상]);
 }
 
-/// <summary>국내 물류와 공동수입 이행계획이 확장하는 물류 기본 업무입니다.</summary>
+/// <summary>국내 물류와 같이 수입 이행계획이 확장하는 물류 기본 업무입니다.</summary>
 public abstract class 공동구매물류업무ViewModelBase(공동구매화면상태ViewModel 화면상태)
     : 공동구매원장업무ViewModelBase(화면상태, 영역)
 {

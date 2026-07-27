@@ -30,7 +30,7 @@ public static class Controller기능카탈로그
         new("common.warehouse-operations", "창고 운영", "api/v1/warehouse-operations"),
         new("common.work-relationships", "친구 후보 기록", "api/v1/work-relationship-snapshots"),
         new("common.gratitude", "감사 메시지", "api/v1/gratitude"),
-        new("common.customs-hs-codes", "공동수입 HS 코드", "api/v1/customs/hs-codes"),
+        new("common.customs-hs-codes", "같이 수입 HS 코드", "api/v1/customs/hs-codes"),
         new("common.education-courses", "교육 과정", "api/v1/education/courses"),
         new("common.education-operations", "교육 과정 운영", "api/v1/education/operations"),
         new("common.education-participation", "교육 참여", "api/v1/education"),

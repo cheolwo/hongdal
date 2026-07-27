@@ -77,7 +77,7 @@ public sealed class 공동구매공개조회ViewModelTests
     }
 
     [Fact]
-    public async Task 상세ViewModel은_공동수입campaign을_국내공동구매로노출하지않는다()
+    public async Task 상세ViewModel은_같이수입campaign을_국내공동구매로노출하지않는다()
     {
         var campaign = DomesticCampaign(11, DateTime.UtcNow);
         campaign.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate;

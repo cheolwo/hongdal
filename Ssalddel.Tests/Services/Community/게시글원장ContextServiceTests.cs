@@ -364,7 +364,7 @@ public sealed class 게시글원장ContextServiceTests
         {
             원장Id = "group-import-role-scope",
             원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
-            제목 = "공동수입 감귤",
+            제목 = "같이 수입 감귤",
             상태 = 커뮤니티원장상태.진행중,
             현재단계Key = "통관 상태",
             생성자UserId = "buyer-owner",
@@ -377,7 +377,7 @@ public sealed class 게시글원장ContextServiceTests
             다이어그램스냅샷 = new DiagramSnapshotDto
             {
                 DiagramId = "diagram-role-scope",
-                DiagramName = "감귤 공동수입",
+                DiagramName = "감귤 같이수입",
                 LedgerId = "group-import-role-scope",
                 LedgerTemplateKey = CommunityLedgerTemplateKeys.GroupImport,
                 Nodes =

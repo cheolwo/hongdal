@@ -11,9 +11,9 @@ public sealed class CommunityGroupImportLedgerPlanBuilderTests
             CreateRequest(CommunityGroupImportLogisticsRouteCodes.DirectDestination));
 
         Assert.True(result.Ready);
-        Assert.Contains(result.Nodes, x => x.RelationRole == 공동수입원장관계역할.원천공동구매);
-        Assert.Contains(result.Nodes, x => x.RelationRole == 공동수입원장관계역할.국제운송);
-        Assert.Contains(result.Nodes, x => x.RelationRole == 공동수입원장관계역할.국내운송);
+        Assert.Contains(result.Nodes, x => x.RelationRole == 같이수입원장관계역할.원천공동구매);
+        Assert.Contains(result.Nodes, x => x.RelationRole == 같이수입원장관계역할.국제운송);
+        Assert.Contains(result.Nodes, x => x.RelationRole == 같이수입원장관계역할.국내운송);
         Assert.DoesNotContain(result.Nodes, x => x.LedgerTemplateKey == CommunityLedgerTemplateKeys.WarehouseInbound);
         Assert.DoesNotContain(result.Nodes, x => x.LedgerTemplateKey == CommunityLedgerTemplateKeys.WarehouseOutbound);
     }

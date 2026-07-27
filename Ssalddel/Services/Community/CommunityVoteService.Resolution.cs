@@ -269,7 +269,7 @@ public partial class CommunityVoteService
             || tradeRouteDecision.RequiresManualReview)
         {
             throw new InvalidOperationException(
-                "공동수입 계약 확정 전에 상품 출발국가, 국내 배송국가와 통관 상태를 다시 확인해 주세요.");
+                "같이 수입 계약 확정 전에 상품 출발국가, 국내 배송국가와 통관 상태를 다시 확인해 주세요.");
         }
 
         var hasValidHsCode = new[] { settings.HsCode }
@@ -278,7 +278,7 @@ public partial class CommunityVoteService
         if (!hasValidHsCode)
         {
             throw new InvalidOperationException(
-                "공동수입 계약을 확정하려면 검토 가능한 HS 코드가 하나 이상 필요합니다.");
+                "같이 수입 계약을 확정하려면 검토 가능한 HS 코드가 하나 이상 필요합니다.");
         }
     }
 }

@@ -199,7 +199,7 @@ internal static class CommunityPostOpportunityProjection
             ]
             :
             [
-                new(CommunityPostParticipationRoleCodes.Buyer, "구매에 관심 있어요", "공동구매나 공동수입에 참여할 수 있어요."),
+                new(CommunityPostParticipationRoleCodes.Buyer, "구매에 관심 있어요", "공동구매나 같이 수입에 참여할 수 있어요."),
                 new(CommunityPostParticipationRoleCodes.Supplier, "공급할 수 있어요", "상품 공급 가능성을 함께 검토할 수 있어요."),
                 new(CommunityPostParticipationRoleCodes.FreightBroker, "운송 주선 검토로 도울 수 있어요", "관할 면허·등록을 별도로 확인한 뒤 가능한 범위에서 참여할 수 있어요."),
                 new(CommunityPostParticipationRoleCodes.Carrier, "운송할 수 있어요", "운송 업무 제공 가능성을 검토할 수 있어요."),

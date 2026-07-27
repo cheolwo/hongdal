@@ -12,7 +12,7 @@ public static class Command알림FeatureNames
     public const string 운송하차지도착 = "TransportArrivedDropoff";
     public const string 운송인수완료 = "TransportDropoffCompleted";
     public const string 운송현장예외신고 = "TransportFieldIssueReported";
-    public const string 공동수입원장등록 = "CommunityGroupImportRegistered";
+    public const string 같이수입원장등록 = "CommunityGroupImportRegistered";
     public const string 공동구매원장변경 = "CommunityGroupPurchaseLedgerChanged";
 
     public static readonly string[] 발송지원목록 =
@@ -25,7 +25,7 @@ public static class Command알림FeatureNames
         운송하차지도착,
         운송인수완료,
         운송현장예외신고,
-        공동수입원장등록,
+        같이수입원장등록,
         공동구매원장변경
     ];
 }

@@ -8,7 +8,7 @@ namespace Ssalddel.Ui.Common.Areas.App.Services;
 public static class 공동구매가격의사결정유형코드
 {
     public const string 국내공동구매 = "domestic-group-purchase";
-    public const string 공동수입 = "group-import";
+    public const string 같이수입 = "group-import";
 }
 
 public static class 공동구매가격판단신호코드
@@ -86,7 +86,7 @@ public sealed class 공동구매가격의사결정Service(
         ArgumentNullException.ThrowIfNull(request);
         var hsCode = 숫자만(request.HS코드);
         if (request.유형코드 is not 공동구매가격의사결정유형코드.국내공동구매
-            and not 공동구매가격의사결정유형코드.공동수입)
+            and not 공동구매가격의사결정유형코드.같이수입)
         {
             throw new ArgumentException("지원하는 공동구매 가격 의사결정 유형이 아닙니다.", nameof(request));
         }
@@ -104,12 +104,12 @@ public sealed class 공동구매가격의사결정Service(
         }
 
         var countryCode = string.Empty;
-        if (request.유형코드 == 공동구매가격의사결정유형코드.공동수입)
+        if (request.유형코드 == 공동구매가격의사결정유형코드.같이수입)
         {
             countryCode = 국가코드정규화(request.수출국가코드);
             if (countryCode.Length is < 2 or > 3)
             {
-                throw new ArgumentException("공동수입 가격 조회에는 영문 2~3자리 수출국 코드가 필요합니다.", nameof(request));
+                throw new ArgumentException("같이 수입 가격 조회에는 영문 2~3자리 수출국 코드가 필요합니다.", nameof(request));
             }
         }
 
@@ -118,7 +118,7 @@ public sealed class 공동구매가격의사결정Service(
         FoodPriceComparisonResponse? importResponse = null;
         HsCountryImportUnitPriceSimulationResult? importUnitPrice = null;
 
-        if (request.유형코드 == 공동구매가격의사결정유형코드.공동수입)
+        if (request.유형코드 == 공동구매가격의사결정유형코드.같이수입)
         {
             importResponse = await 안전한수입가격비교Async(
                 new FoodPriceComparisonRequest
@@ -461,7 +461,7 @@ public sealed class 공동구매가격의사결정Service(
             parts.Add(market.안내);
         }
 
-        if (request.유형코드 == 공동구매가격의사결정유형코드.공동수입)
+        if (request.유형코드 == 공동구매가격의사결정유형코드.같이수입)
         {
             if (cost is not null)
             {
@@ -505,7 +505,7 @@ public sealed class 공동구매가격의사결정Service(
         notices.AddRange(domestic?.Notices ?? []);
         notices.AddRange(import?.Notices ?? []);
         notices.AddRange(overseas?.Notices ?? []);
-        if (request.유형코드 == 공동구매가격의사결정유형코드.공동수입
+        if (request.유형코드 == 공동구매가격의사결정유형코드.같이수입
             && request.가정환율KrwPerUsd is > 0)
         {
             notices.Add($"수입단가 원화 환산에는 사용자가 확인할 가정 환율 {request.가정환율KrwPerUsd.Value:N0}원/USD를 적용했습니다.");

@@ -217,8 +217,8 @@ public sealed class PlatformCommunityHomePageViewModelTests
             new PlatformCommunityPostLedgerChoiceResponse
             {
                 원장Id = "mine-1",
-                제목 = "공동수입 준비",
-                원장템플릿명 = "공동수입",
+                제목 = "같이 수입 준비",
+                원장템플릿명 = "같이수입",
                 내접근원장여부 = true,
                 수정시각Utc = new DateTime(2026, 7, 17, 1, 0, 0, DateTimeKind.Utc)
             },

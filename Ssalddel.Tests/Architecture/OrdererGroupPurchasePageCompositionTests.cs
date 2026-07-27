@@ -192,7 +192,7 @@ public sealed class OrdererGroupPurchasePageCompositionTests
     }
 
     [Fact]
-    public void 공동수입_검토는_분석컴포넌트_안에서만_공식근거를_조립한다()
+    public void 같이수입_검토는_분석컴포넌트_안에서만_공식근거를_조립한다()
     {
         var repositoryRoot = FindRepositoryRoot();
         var analysisPanelPath = Path.Combine(

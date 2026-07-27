@@ -2,7 +2,7 @@ namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 /// <summary>
 /// 공동구매 페이지가 하나만 주입받아도 공통 모집·합의와
-/// 국내 공동구매·공동수입과 이후 국내 판매·해외 수출 하위 기능을 조립할 수 있는 루트 ViewModel입니다.
+/// 국내 공동구매·같이 수입과 이후 국내 판매·해외 수출 하위 기능을 조립할 수 있는 루트 ViewModel입니다.
 /// 하위 ViewModel은 각각 DI 등록되어 필요한 세부 페이지에서 따로 주입할 수도 있습니다.
 /// </summary>
 public sealed class 공동구매화면ViewModel : 조립ViewModelBase
@@ -13,7 +13,7 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
         공동구매합의기능ViewModel 합의,
         공동구매거래경로분기ViewModel 거래경로분기,
         국내공동구매분기ViewModel 국내공동구매,
-        공동수입분기ViewModel 공동수입,
+        같이수입분기ViewModel 같이수입,
         국내판매ViewModel 국내판매,
         해외수출ViewModel 해외수출,
         공동구매실행기능ViewModel 실행)
@@ -23,7 +23,7 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
         this.합의 = 하위ViewModel등록(합의);
         this.거래경로분기 = 하위ViewModel등록(거래경로분기, 수명소유: false);
         this.국내공동구매 = 하위ViewModel등록(국내공동구매);
-        this.공동수입 = 하위ViewModel등록(공동수입);
+        this.같이수입 = 하위ViewModel등록(같이수입);
         this.국내판매 = 하위ViewModel등록(국내판매);
         this.해외수출 = 하위ViewModel등록(해외수출);
         this.실행 = 하위ViewModel등록(실행);
@@ -67,7 +67,7 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
             [공동구매업무영역코드.합의] = this.합의.세부업무목록,
             [공동구매업무영역코드.공급] = this.공급.세부업무목록,
             [공동구매업무영역코드.물류] = this.물류.세부업무목록,
-            ["group-import"] = this.공동수입.세부업무목록,
+            ["group-import"] = this.같이수입.세부업무목록,
             [공동구매업무영역코드.실행] = this.실행.세부업무목록
         };
         절차세부업무목록 = 절차세부업무영역별목록.Values.SelectMany(items => items).ToArray();
@@ -78,7 +78,7 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
     public 공동구매합의기능ViewModel 합의 { get; }
     public 공동구매거래경로분기ViewModel 거래경로분기 { get; }
     public 국내공동구매분기ViewModel 국내공동구매 { get; }
-    public 공동수입분기ViewModel 공동수입 { get; }
+    public 같이수입분기ViewModel 같이수입 { get; }
     public 국내판매ViewModel 국내판매 { get; }
     public 해외수출ViewModel 해외수출 { get; }
     public 공동구매가격의사결정ViewModel 가격의사결정 => 모집.가격의사결정;
@@ -97,7 +97,7 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
         => 모집.처리중
            || 합의.처리중
            || 국내공동구매.처리중
-           || 공동수입.처리중
+           || 같이수입.처리중
            || 국내판매.처리중
            || 해외수출.처리중
            || 가격의사결정.처리중

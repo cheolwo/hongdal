@@ -81,7 +81,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 | `GET` | `/api/v1/admin/content/information/social-media/sources` | SNS Adapter별 활성화·검색·URL 조사 지원 여부 조회 |
 | `POST` | `/api/v1/admin/content/information/youtube-social-context/workspaces/research` | YouTube 영상을 루트로 SNS 자료와 글쓰기 초안을 MongoDB에 저장 |
 | `GET` | `/api/v1/admin/content/information/youtube-social-context/workspaces/by-video/{videoId}` | 영상별 최신 SNS 하위 자료와 편집 초안 복원 |
-| `PUT` | `/api/v1/admin/content/information/youtube-social-context/workspaces/{workspaceId}/draft` | 운영자가 수정한 글, 공동수입 여정·다이어그램과 단계별 업체 후보를 함께 저장 |
+| `PUT` | `/api/v1/admin/content/information/youtube-social-context/workspaces/{workspaceId}/draft` | 운영자가 수정한 글, 같이 수입 여정·다이어그램과 단계별 업체 후보를 함께 저장 |
 | `POST` | `/api/v1/admin/content/information/youtube-social-context/workspaces/{workspaceId}/publication-links` | 발행된 RDB 게시글 ID 연결 |
 | `POST` | `/api/v1/admin/community-post-schedules` | 서버관리자가 새 글과 UTC 공개 시각을 예약 |
 | `GET` | `/api/v1/admin/community-post-schedules` | 대기·처리·취소·실패 예약 글 조회 |
@@ -130,7 +130,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 - `수집 자료`: 공공데이터·저장 영상 후보를 검색하고, 하나의 자료로 새 초안을 만들거나 여러 자료를 현재 본문에 누적한다.
 - `기간 통계`: 달력 범위와 자료 원천을 선택해 서버 보관 YouTube·KAMIS·USDA 자료 또는 명시 선택한 ABS·수협 자료를 집계하고 기존 근거 그래프로 가져온다. 숫자 계열이 둘 이상이면 품목·지역·조사단계·단위가 같은 계열 하나를 다시 선택해야 평균과 그래프를 만든다.
 - `YouTube·SNS`: 저장된 YouTube 영상을 루트로 선택한 공개 SNS 원천을 조사하고, SNS별 하위 자료·원문 링크·수집 한계·편집 초안을 Mongo 작업공간에 저장한다. 최근 작업 목록에서는 다이어그램 단계 수, 업체 후보 수와 연락 준비 상태를 함께 확인한다.
-- `다이어그램`: 공동수입 원장 여정을 기본으로 불러오고, 직접 단계를 추가·정렬하거나 단계별 업체·기관 후보와 공개 연락처 근거를 연결해 글 초안으로 전환한다.
+- `다이어그램`: 같이 수입 원장 여정을 기본으로 불러오고, 직접 단계를 추가·정렬하거나 단계별 업체·기관 후보와 공개 연락처 근거를 연결해 글 초안으로 전환한다.
 - `LLM 근거 초안`: 운영자가 선택한 수집 자료와 필요할 때만 다시 조회한 YouTube·SNS 자료, 현재 초안·다이어그램·상호 이익·통계 문맥을 서버 allowlist 안에서 조립해 검토용 초안을 만든다. 생성만으로 현재 글을 덮어쓰지 않으며 적용과 다이어그램 단계 가져오기는 각각 별도 명령이다. 세부 경계는 [커뮤니티 글쓰기 LLM 근거 초안](CommunityAuthoringAI.md)에 둔다.
 - `이미지`: 현재 글의 소제목과 문단을 최대 5개 연속 문맥으로 묶어 각각의 프롬프트를 먼저 검토한다. 선택한 문맥마다 명시적으로 Kie.ai GPT Image 작업을 한 건씩 등록하고, 운영자가 선택한 완료 이미지만 글 저장 성공 뒤 문맥 순서대로 기존 사진 첨부 경계에 연결한다. 세부 계약은 [커뮤니티 글쓰기 이미지 생성](CommunityAuthoringImageGeneration.md)에 둔다.
 
@@ -140,7 +140,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 4. 작성 중인 초안이 있으면 자동으로 덮어쓰지 않고 기존 초안 유지 또는 교체를 운영자가 선택한다.
 5. 필요하면 허용된 자료 Adapter와 현재 글쓰기 문맥으로 LLM 검토 초안을 만들고, 출처·비용·확인 질문을 검토한 뒤 명시적으로 현재 글에 적용한다.
 6. 필요하면 현재 초안을 연속 문맥으로 나누고 문맥별 프롬프트를 수정한 뒤, 선택 문맥만 명시적으로 생성해 게시글 사진으로 고른다.
-7. YouTube·SNS 조사 결과와 공동수입 다이어그램을 같은 초안에 반영하고, 각 단계에 해외 공급자·통관·운송·창고 등 업체 후보를 연결한다.
+7. YouTube·SNS 조사 결과와 같이 수입 다이어그램을 같은 초안에 반영하고, 각 단계에 해외 공급자·통관·운송·창고 등 업체 후보를 연결한다.
 8. 글 초안, 여정 단계·연결과 업체 후보를 같은 영상별 Mongo 작업공간 revision에 저장한다.
 9. 운영자가 문맥과 의견을 직접 보완한 뒤 즉시 등록하거나 예약 발행하고, 선택 이미지 첨부와 저장된 RDB 게시글 ID의 Mongo 작업공간 연결을 각각 수행한다.
 
@@ -163,15 +163,15 @@ YouTube 영상과 SNS 공개 자료를 엮은 초안은 정보 공유에서 끝�
 1. 운영자가 원문과 수집 한계를 확인하고 글을 게시한다.
 2. 사용자가 게시글의 `함께하기`에서 구매자·공급자·운송·통관·창고 등의 역할과 관심을 선택한다.
 3. 관심이 충분히 모이면 게시글 작성자 또는 권한 있는 참여자가 비구속적 참여 투표를 명시적으로 시작한다.
-4. 참여자 확인과 비구속성 확인 뒤에만 공동구매 또는 공동수입 검토용 가원장을 만든다.
+4. 참여자 확인과 비구속성 확인 뒤에만 공동구매 또는 같이 수입 검토용 가원장을 만든다.
 
 이 경로에서 YouTube·SNS 수집은 주문·계약·결제·배차·운송 주선을 자동 실행하지 않는다. 게시글의 `WorkflowTag`는 `공동구매`로 제안할 수 있지만, 실제 참여 투표와 가원장 생성은 기존 커뮤니티 게시글 기회 API의 별도 명시 동의 절차를 따른다.
 
-### 영상별 공동수입 여정과 업체 연락 준비
+### 영상별 같이 수입 여정과 업체 연락 준비
 
 운영자가 주로 반복하는 작업 단위는 YouTube 영상 하나를 루트로 둔 조사 묶음이다. `community_youtube_post_workspaces` 문서에는 SNS 하위 자료와 서원 글 초안뿐 아니라 다음 항목을 같이 둔다.
 
-- 선택한 공동수입 원장 템플릿 키
+- 선택한 같이 수입 원장 템플릿 키
 - 수입 절차 다이어그램의 단계와 연결
 - 단계별 업체·기관 후보, 역할과 국가
 - 공식 웹사이트, 공개 업무 이메일과 연락처 근거 URL
@@ -182,7 +182,7 @@ YouTube 영상과 SNS 공개 자료를 엮은 초안은 정보 공유에서 끝�
 ```mermaid
 flowchart LR
     A["YouTube 영상"] --> B["서원 글과 SNS 근거"]
-    B --> C["공동수입 여정·다이어그램"]
+    B --> C["같이 수입 여정·다이어그램"]
     C --> D["단계별 업체 후보"]
     D --> E{"공식 연락처 재검토"}
     E -->|미완료| D
@@ -209,7 +209,7 @@ flowchart LR
 
 ## 다음 연결
 
-현재 관리자 검토 화면은 YouTube 영상을 중심으로 SNS 하위 자료, 편집 초안, 공동수입 여정·다이어그램과 업체 후보를 `community_youtube_post_workspaces`에 저장하고 다시 불러올 수 있다. 다만 후보별 승인·제외 결정, 이메일 초안과 발송 감사 기록은 아직 별도 Command로 영속화해야 한다. 일반 사용자는 선별된 RDB 게시글에서 원 출처를 확인하고 직접 참여를 선택한다. Mongo 작업공간이 공개 게시, 가원장, 관계자 알림 또는 이메일 발송을 직접 생성하지 않는다.
+현재 관리자 검토 화면은 YouTube 영상을 중심으로 SNS 하위 자료, 편집 초안, 같이 수입 여정·다이어그램과 업체 후보를 `community_youtube_post_workspaces`에 저장하고 다시 불러올 수 있다. 다만 후보별 승인·제외 결정, 이메일 초안과 발송 감사 기록은 아직 별도 Command로 영속화해야 한다. 일반 사용자는 선별된 RDB 게시글에서 원 출처를 확인하고 직접 참여를 선택한다. Mongo 작업공간이 공개 게시, 가원장, 관계자 알림 또는 이메일 발송을 직접 생성하지 않는다.
 
 ## 게시판별 정보 원천 관계
 

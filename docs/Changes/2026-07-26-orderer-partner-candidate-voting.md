@@ -22,7 +22,7 @@
 
 - `CommunityVoteCreateRequest`는 일반·구조화 선택지, 복수 선택, 마감, 결의문과 서명 여부를 지원한다.
 - 공동구매 원장 진행 단계에는 `counterparty`, `supply-negotiation`, `objection`, `resolution`, `signature`가 이미 구분되어 있다.
-- `공동수입준비원장Dtos`는 공급자 후보의 공식 식별자·원출처·확인 시각·검토자와 견적의 통화·MOQ·단가·납기·포장·Incoterms 후보를 검증한다.
+- `같이수입준비원장Dtos`는 공급자 후보의 공식 식별자·원출처·확인 시각·검토자와 견적의 통화·MOQ·단가·납기·포장·Incoterms 후보를 검증한다.
 - `CommunityGroupImportLedgerConversionRequest`는 사람이 정한 포워더·물류대행업체명과 회신 근거, 창고 운영자 동의·시설·입고·보관·출고 가능 여부를 받는다.
 - 현재 범용 투표 선택지에는 업체 역할·공식 식별자·견적 근거를 직접 담는 전용 구조가 없다. 화면을 실제 저장 흐름으로 연결할 때에는 범용 투표의 옵션과 검증된 업체 후보 snapshot을 별도 참조로 연결하는 계약이 필요하다.
 

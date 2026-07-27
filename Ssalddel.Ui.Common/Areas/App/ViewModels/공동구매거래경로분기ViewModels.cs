@@ -7,7 +7,7 @@ public static class 공동구매업무분기코드
 {
     public const string 미선택 = "none";
     public const string 국내공동구매 = "domestic-group-purchase";
-    public const string 공동수입 = "group-import";
+    public const string 같이수입 = "group-import";
     public const string 해외수출 = "overseas-export";
     public const string 기타국경간거래 = "other-cross-border";
     public const string 검토필요 = "review-required";
@@ -70,7 +70,7 @@ public sealed class 공동구매거래경로분기ViewModel : 공동구매의사
 
             if (CommunityGroupPurchaseTradeRouteCodes.IsGroupImport(routeCode))
             {
-                return 공동구매업무분기코드.공동수입;
+                return 공동구매업무분기코드.같이수입;
             }
 
             if (string.Equals(
@@ -95,8 +95,8 @@ public sealed class 공동구매거래경로분기ViewModel : 공동구매의사
     public bool 국내공동구매활성
         => 활성분기코드 == 공동구매업무분기코드.국내공동구매;
 
-    public bool 공동수입활성
-        => 활성분기코드 == 공동구매업무분기코드.공동수입;
+    public bool 같이수입활성
+        => 활성분기코드 == 공동구매업무분기코드.같이수입;
 
     public bool 국내판매활성
         => string.Equals(
@@ -118,7 +118,7 @@ public sealed class 공동구매거래경로분기ViewModel : 공동구매의사
         => 활성분기코드 switch
         {
             공동구매업무분기코드.국내공동구매 => "국내 공동구매",
-            공동구매업무분기코드.공동수입 => "공동수입",
+            공동구매업무분기코드.같이수입 => "같이 수입",
             공동구매업무분기코드.해외수출 => "해외 수출",
             공동구매업무분기코드.기타국경간거래 => "기타 국경 간 거래",
             공동구매업무분기코드.검토필요 => "거래경로 검토 필요",
@@ -130,8 +130,8 @@ public sealed class 공동구매거래경로분기ViewModel : 공동구매의사
         {
             공동구매업무분기코드.국내공동구매
                 => "운영 국가 안의 생산자·공동구매 대표 연결, 공급 협상과 이행계획을 사용합니다.",
-            공동구매업무분기코드.공동수입
-                => "해외 판매자 조건, HS 코드, 통관과 공동수입 원장 준비 흐름을 사용합니다.",
+            공동구매업무분기코드.같이수입
+                => "해외 판매자 조건, HS 코드, 통관과 같이 수입 원장 준비 흐름을 사용합니다.",
             공동구매업무분기코드.해외수출
                 => "운영 국가 상품의 해외 출품, 수출 신고, 국제운송과 현지 이행 준비 흐름을 사용합니다.",
             공동구매업무분기코드.기타국경간거래
@@ -298,29 +298,29 @@ public sealed class 국내공동구매분기ViewModel : 조립ViewModelBase
 }
 
 /// <summary>
-/// 공동수입에서만 사용하는 해외 판매자·HS 코드·통관 조건 확인 분기입니다.
+/// 같이 수입에서만 사용하는 해외 판매자·HS 코드·통관 조건 확인 분기입니다.
 /// 실제 원장 생성 전까지는 후보 상태를 유지합니다.
 /// </summary>
-public sealed class 공동수입분기ViewModel : 조립ViewModelBase
+public sealed class 같이수입분기ViewModel : 조립ViewModelBase
 {
     private readonly 공동구매화면상태ViewModel _화면상태;
     private string? _단계오류메시지;
 
-    public 공동수입분기ViewModel(
+    public 같이수입분기ViewModel(
         공동구매거래경로분기ViewModel 분기,
         공동구매화면상태ViewModel 화면상태,
-        공동수입전환준비ViewModel 전환준비,
-        공동수입원장물류ViewModel 원장물류,
-        공동수입선적통관ViewModel 선적통관,
+        같이수입전환준비ViewModel 전환준비,
+        같이수입원장물류ViewModel 원장물류,
+        같이수입선적통관ViewModel 선적통관,
         공동구매가격의사결정ViewModel 가격의사결정,
-        공동수입원장조회ViewModel 원장조회,
-        공동수입원장미리보기ViewModel 원장미리보기,
-        공동수입원장전환ViewModel 원장전환,
-        공동수입선적공개조회ViewModel 선적공개조회,
-        공동수입선적관리목록조회ViewModel 선적관리목록조회,
-        공동수입선적등록ViewModel 선적등록,
-        공동수입선적이벤트등록ViewModel 선적이벤트등록,
-        공동수입통관동기화ViewModel 통관동기화)
+        같이수입원장조회ViewModel 원장조회,
+        같이수입원장미리보기ViewModel 원장미리보기,
+        같이수입원장전환ViewModel 원장전환,
+        같이수입선적공개조회ViewModel 선적공개조회,
+        같이수입선적관리목록조회ViewModel 선적관리목록조회,
+        같이수입선적등록ViewModel 선적등록,
+        같이수입선적이벤트등록ViewModel 선적이벤트등록,
+        같이수입통관동기화ViewModel 통관동기화)
     {
         this.분기 = 하위ViewModel등록(분기, 수명소유: false);
         _화면상태 = 하위ViewModel등록(화면상태, 수명소유: false);
@@ -343,12 +343,12 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
     }
 
     public 공동구매거래경로분기ViewModel 분기 { get; }
-    public 공동수입전환준비ViewModel 전환준비 { get; }
-    public 공동수입원장물류ViewModel 원장물류 { get; }
-    public 공동수입선적통관ViewModel 선적통관 { get; }
+    public 같이수입전환준비ViewModel 전환준비 { get; }
+    public 같이수입원장물류ViewModel 원장물류 { get; }
+    public 같이수입선적통관ViewModel 선적통관 { get; }
     public 공동구매가격의사결정ViewModel 가격의사결정 { get; }
     public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
-    public bool 활성 => 분기.공동수입활성;
+    public bool 활성 => 분기.같이수입활성;
     public bool 처리중 => 원장물류.처리중 || 선적통관.처리중 || 가격의사결정.처리중;
 
     public string 현재HS코드
@@ -423,8 +423,8 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
         {
             공동구매절차코드.거래상대연결 => "해외 판매자와 상품 출발지·공급 조건을 확인할 차례입니다.",
             공동구매절차코드.공급조건협상 => "HS 코드, 통관 책임, 국제운송과 국내 인도 조건을 확정할 차례입니다.",
-            공동구매절차코드.이의검토 => "공동수입 조건을 공개하고 최종 이의를 검토할 차례입니다.",
-            공동구매절차코드.이행계획 => "원천 공동구매와 연결된 공동수입 원장을 준비할 차례입니다.",
+            공동구매절차코드.이의검토 => "같이 수입 조건을 공개하고 최종 이의를 검토할 차례입니다.",
+            공동구매절차코드.이행계획 => "원천 공동구매와 연결된 같이 수입 원장을 준비할 차례입니다.",
             _ => CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice
         };
 
@@ -432,18 +432,18 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
     {
         if (_화면상태.선택된공동구매 is null)
         {
-            return 실패("해외 판매자를 연결할 공동수입을 먼저 선택해 주세요.");
+            return 실패("해외 판매자를 연결할 같이 수입을 먼저 선택해 주세요.");
         }
 
         if (!활성)
         {
-            return 실패("공동수입 분기가 활성화된 경우에만 해외 판매자 연결을 확정할 수 있습니다.");
+            return 실패("같이 수입 분기가 활성화된 경우에만 해외 판매자 연결을 확정할 수 있습니다.");
         }
 
         단계오류메시지 = null;
         await _화면상태.단계도달Async(
             공동구매절차코드.공급조건협상,
-            "해외 판매자 연결을 완료하고 공동수입 조건 협상 단계로 진행했습니다.",
+            "해외 판매자 연결을 완료하고 같이 수입 조건 협상 단계로 진행했습니다.",
             cancellationToken);
         return true;
     }
@@ -452,12 +452,12 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
     {
         if (_화면상태.선택된공동구매 is null)
         {
-            return 실패("수입 조건을 확정할 공동수입을 먼저 선택해 주세요.");
+            return 실패("수입 조건을 확정할 같이 수입을 먼저 선택해 주세요.");
         }
 
         if (!활성)
         {
-            return 실패("공동수입 분기가 활성화된 경우에만 수입 조건을 확정할 수 있습니다.");
+            return 실패("같이 수입 분기가 활성화된 경우에만 수입 조건을 확정할 수 있습니다.");
         }
 
         if (!계약확정준비완료)
@@ -465,13 +465,13 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
             var missing = 계약확정누락정보.Count == 0
                 ? "거래경로와 통관 정보"
                 : string.Join(", ", 계약확정누락정보);
-            return 실패($"공동수입 조건을 확정하려면 {missing}를 확인해 주세요.");
+            return 실패($"같이 수입 조건을 확정하려면 {missing}를 확인해 주세요.");
         }
 
         단계오류메시지 = null;
         await _화면상태.단계도달Async(
             공동구매절차코드.이의검토,
-            "공동수입 조건을 확정하고 최종 이의 검토 단계로 진행했습니다.",
+            "같이 수입 조건을 확정하고 최종 이의 검토 단계로 진행했습니다.",
             cancellationToken);
         return true;
     }
@@ -480,18 +480,18 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
     {
         if (_화면상태.선택된공동구매 is null)
         {
-            return 실패("이의를 검토할 공동수입을 먼저 선택해 주세요.");
+            return 실패("이의를 검토할 같이 수입을 먼저 선택해 주세요.");
         }
 
         if (!활성)
         {
-            return 실패("공동수입 분기가 활성화된 경우에만 최종안을 확정할 수 있습니다.");
+            return 실패("같이 수입 분기가 활성화된 경우에만 최종안을 확정할 수 있습니다.");
         }
 
         단계오류메시지 = null;
         await _화면상태.단계도달Async(
             공동구매절차코드.확정안,
-            "공동수입 최종 이의 검토를 완료했습니다.",
+            "같이 수입 최종 이의 검토를 완료했습니다.",
             cancellationToken);
         return true;
     }

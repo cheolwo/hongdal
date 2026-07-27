@@ -5,7 +5,7 @@
         <MudStack Spacing="2">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.h6">@Ledger.상품명 공동수입 준비</MudText>
+                    <MudText Typo="Typo.h6">@Ledger.상품명 같이 수입 준비</MudText>
                     <MudText Typo="Typo.caption" Color="Color.Secondary">
                         참여 주문자에게 공개된 집계·준비 상태
                     </MudText>
@@ -64,7 +64,7 @@
 </MudStack>
 
 @code {
-    [Parameter, EditorRequired] public 공동수입준비주문자조회응답 Ledger { get; set; } = default!;
+    [Parameter, EditorRequired] public 같이수입준비주문자조회응답 Ledger { get; set; } = default!;
 
     private IReadOnlyList<(string Label, bool Ready)> ReadinessItems =>
     [

@@ -31,8 +31,8 @@ builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedg
 builder.Services.AddSsalddelUiCommonAppServices<관리자인증세션Service>();
 builder.Services.AddTransient<관리자Controller기능모음ViewModel>();
 builder.Services.AddTransient<관리자전체Api기능모음ViewModel>();
-builder.Services.AddScoped<I공동수입준비관리Client, 공동수입준비관리Client>();
-builder.Services.AddTransient<공동수입준비관리ViewModel>();
+builder.Services.AddScoped<I같이수입준비관리Client, 같이수입준비관리Client>();
+builder.Services.AddTransient<같이수입준비관리ViewModel>();
 builder.Services.AddScoped(sp =>
 {
     var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;

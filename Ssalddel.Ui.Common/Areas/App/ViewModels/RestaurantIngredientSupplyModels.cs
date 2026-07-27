@@ -3,7 +3,7 @@ namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 public enum 음식점식재료공급경로
 {
     국내산지,
-    공동수입
+    같이수입
 }
 
 public enum 음식점식재료보관방식

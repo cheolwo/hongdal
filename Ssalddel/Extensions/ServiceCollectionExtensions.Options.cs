@@ -108,7 +108,8 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CommunityKeywordNotificationOptions>(configuration.GetSection(CommunityKeywordNotificationOptions.SectionName));
         services.Configure<CommunityLedgerProjectionOptions>(configuration.GetSection(CommunityLedgerProjectionOptions.SectionName));
         services.Configure<GroupPurchaseDemandProcessManagerOptions>(configuration.GetSection(GroupPurchaseDemandProcessManagerOptions.SectionName));
-        services.Configure<GroupImportReadinessOsOptions>(configuration.GetSection(GroupImportReadinessOsOptions.SectionName));
+        services.Configure<GroupImportReadinessProcessManagerOptions>(
+            configuration.GetSection(GroupImportReadinessProcessManagerOptions.SectionName));
 
         return services;
     }

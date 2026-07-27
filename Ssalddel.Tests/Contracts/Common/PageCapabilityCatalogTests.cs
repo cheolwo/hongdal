@@ -607,7 +607,7 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
-    public void 주문자_공동수입검토는_1점5_읽기전용_무역준비경계다()
+    public void 주문자_같이수입검토는_1점5_읽기전용_무역준비경계다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.Orderer,
@@ -706,7 +706,7 @@ public sealed class PageCapabilityCatalogTests
     [InlineData("/group-purchase/imports/group-import-17/classification")]
     [InlineData("/group-purchase/imports/group-import-17/handoff")]
     [InlineData("/group-purchase/imports/group-import-17/consent?autoGroupId=auto-group-onion")]
-    public void 주문자_공동수입준비현황은_참여자인증된_1점5_읽기전용화면이다(string route)
+    public void 주문자_같이수입준비현황은_참여자인증된_1점5_읽기전용화면이다(string route)
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.Orderer,
@@ -727,7 +727,7 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
-    public void 관리자_공동수입작업대는_1점5_인증저장경계다()
+    public void 관리자_같이수입작업대는_1점5_인증저장경계다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.Admin,

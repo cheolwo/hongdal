@@ -1,7 +1,7 @@
 @using Ssalddel.Contracts.Common.Orderer
 @using Ssalddel.Ui.Common.Areas.App.Services
 @implements IDisposable
-@inject I공동수입준비주문자Client ReadinessClient
+@inject I같이수입준비주문자Client ReadinessClient
 
 @if (string.IsNullOrWhiteSpace(AutoGroupId))
 {
@@ -30,7 +30,7 @@ else if (!string.IsNullOrWhiteSpace(_error))
 else if (_readiness is null)
 {
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-        조회할 수 있는 공동수입 준비 원장이 없습니다. 참여 원장과 준비 상태를 확인해 주세요.
+        조회할 수 있는 같이 수입 준비 원장이 없습니다. 참여 원장과 준비 상태를 확인해 주세요.
     </MudAlert>
 }
 else
@@ -42,12 +42,12 @@ else
     private string? _loadedKey;
     private bool _isLoading;
     private string? _error;
-    private 공동수입준비주문자조회응답? _readiness;
+    private 같이수입준비주문자조회응답? _readiness;
     private CancellationTokenSource? _loadCancellation;
 
     [Parameter, EditorRequired] public string LedgerId { get; set; } = string.Empty;
     [Parameter] public string? AutoGroupId { get; set; }
-    [Parameter, EditorRequired] public RenderFragment<공동수입준비주문자조회응답> ChildContent { get; set; } = default!;
+    [Parameter, EditorRequired] public RenderFragment<같이수입준비주문자조회응답> ChildContent { get; set; } = default!;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -96,7 +96,7 @@ else
         }
         catch (Exception exception)
         {
-            _error = $"공동수입 준비 자료를 불러오지 못했습니다. {exception.Message}";
+            _error = $"같이 수입 준비 자료를 불러오지 못했습니다. {exception.Message}";
         }
         finally
         {

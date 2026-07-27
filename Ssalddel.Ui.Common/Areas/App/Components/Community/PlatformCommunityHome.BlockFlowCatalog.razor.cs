@@ -112,12 +112,12 @@ public partial class PlatformCommunityHome
         if (string.Equals(template.Key, CommunityLedgerTemplateKeys.GroupPurchase, StringComparison.OrdinalIgnoreCase))
         {
             rules.Add("공동구매는 개별 주문 연결 -> 수요·조건 확정 -> 구매 확정 -> 수령 거점 -> 참여자 분배 순서로 배치합니다.");
-            rules.Add("해외 선적이나 통관이 필요한 경우 공동구매 원장에 상태를 섞지 않고 별도의 공동수입 원장을 연결합니다.");
+            rules.Add("해외 선적이나 통관이 필요한 경우 공동구매 원장에 상태를 섞지 않고 별도의 같이 수입 원장을 연결합니다.");
         }
 
         if (string.Equals(template.Key, CommunityLedgerTemplateKeys.GroupImport, StringComparison.OrdinalIgnoreCase))
         {
-            rules.Add("공동수입은 원천 공동구매 연결 -> 수입 결정 -> 해외 선적 -> 통관/반출 -> 3PL 입고 또는 세대 분배 순서로 배치합니다.");
+            rules.Add("같이 수입은 원천 공동구매 연결 -> 수입 결정 -> 해외 선적 -> 통관/반출 -> 3PL 입고 또는 세대 분배 순서로 배치합니다.");
             rules.Add("통관 상태와 국내 반출 조건이 확인되기 전에는 3PL 입고, 국내 운송, 세대 분배 노드를 실제 처리 단계로 열지 않습니다.");
         }
 

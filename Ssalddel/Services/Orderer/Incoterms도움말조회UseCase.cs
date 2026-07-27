@@ -22,15 +22,15 @@ public sealed class Incoterms도움말조회UseCase : IIncoterms도움말조회U
     private static readonly IReadOnlySet<string> 지원코드 =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            공동수입준비Incoterms코드.Fob,
-            공동수입준비Incoterms코드.Cif,
-            공동수입준비Incoterms코드.Ddp
+            같이수입준비Incoterms코드.Fob,
+            같이수입준비Incoterms코드.Cif,
+            같이수입준비Incoterms코드.Ddp
         };
 
     public Incoterms도움말응답 조회(string? 선택코드, string? 언어코드)
     {
         var code = string.IsNullOrWhiteSpace(선택코드)
-            ? 공동수입준비Incoterms코드.Fob
+            ? 같이수입준비Incoterms코드.Fob
             : 선택코드.Trim().ToUpperInvariant();
         if (!지원코드.Contains(code))
         {
@@ -87,7 +87,7 @@ public sealed class Incoterms도움말조회UseCase : IIncoterms도움말조회U
     private static Incoterms도움말항목 Fob(string language)
         => new()
         {
-            코드 = 공동수입준비Incoterms코드.Fob,
+            코드 = 같이수입준비Incoterms코드.Fob,
             영문명 = "Free On Board",
             한줄요약 = 문구(
                 language,
@@ -134,7 +134,7 @@ public sealed class Incoterms도움말조회UseCase : IIncoterms도움말조회U
     private static Incoterms도움말항목 Cif(string language)
         => new()
         {
-            코드 = 공동수입준비Incoterms코드.Cif,
+            코드 = 같이수입준비Incoterms코드.Cif,
             영문명 = "Cost, Insurance and Freight",
             한줄요약 = 문구(
                 language,
@@ -181,7 +181,7 @@ public sealed class Incoterms도움말조회UseCase : IIncoterms도움말조회U
     private static Incoterms도움말항목 Ddp(string language)
         => new()
         {
-            코드 = 공동수입준비Incoterms코드.Ddp,
+            코드 = 같이수입준비Incoterms코드.Ddp,
             영문명 = "Delivered Duty Paid",
             한줄요약 = 문구(
                 language,

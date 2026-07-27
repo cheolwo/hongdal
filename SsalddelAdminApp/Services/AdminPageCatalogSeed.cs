@@ -208,8 +208,8 @@ internal static class AdminPageCatalogSeed
                 previewPath: "/community/group-purchase/11111111-1111-1111-1111-111111111111/fulfillment-draft"),
             Page(
                 "community-group-import", "web-community", "Ssalddel Web", "collective-action", "공동행동",
-                "공동수입", "/community/group-import", "Ssalddel.WebApp/Pages/CommunityGroupImportPage.razor",
-                "수입 수요와 수출자·수입자·통관·물류 역할 슬롯을 구성합니다.", "공동수입 참여자",
+                "같이수입", "/community/group-import", "Ssalddel.WebApp/Pages/CommunityGroupImportPage.razor",
+                "수입 수요와 수출자·수입자·통관·물류 역할 슬롯을 구성합니다.", "같이 수입 참여자",
                 ["구매자", "수출자", "수입자", "관세사", "물류"], lifecycle: AdminPageLifecycle.Preview,
                 execution: AdminPageExecutionMode.Simulation, navigation: AdminPageNavigationState.Contextual),
             Page(

@@ -89,7 +89,7 @@ public sealed class WebPlatformCommunityNodeNavigationResolver
 
         if (request.IsLedgerTemplate(CommunityLedgerTemplateKeys.GroupImport))
         {
-            return Community(CommunityPageRoutes.GroupImport, "공동수입 원장 화면");
+            return Community(CommunityPageRoutes.GroupImport, "같이 수입 원장 화면");
         }
 
         return request.IsNodeKind("warehouse")

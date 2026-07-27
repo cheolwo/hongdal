@@ -329,7 +329,7 @@ public sealed class Mongo주문자집단운영주체저장소 : I주문자집단
                 계약유형 = HrEmploymentContractTypes.PartTime,
                 임금유형 = HrWageTypes.Hourly,
                 지급주기 = HrPaymentCycles.Monthly,
-                업무설명템플릿 = "공동수입 물품 입고 확인, 세대/판매 단위 분류, 수량 검수 보조",
+                업무설명템플릿 = "같이 수입 물품 입고 확인, 세대/판매 단위 분류, 수량 검수 보조",
                 근로전서명계약필요 = true
             },
             new()
@@ -357,7 +357,7 @@ public sealed class Mongo주문자집단운영주체저장소 : I주문자집단
                 계약유형 = HrEmploymentContractTypes.PartTime,
                 임금유형 = HrWageTypes.Hourly,
                 지급주기 = HrPaymentCycles.Monthly,
-                업무설명템플릿 = "단지로 들어오는 택배, 공동구매, 공동수입 물품을 지정 장소에 집합하고 수량/보관 상태를 확인",
+                업무설명템플릿 = "단지로 들어오는 택배, 공동구매, 같이 수입 물품을 지정 장소에 집합하고 수량/보관 상태를 확인",
                 근로전서명계약필요 = true
             },
             new()

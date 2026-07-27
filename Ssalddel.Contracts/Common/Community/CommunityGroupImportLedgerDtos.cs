@@ -121,7 +121,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
             Node(
                 "source-group-purchase",
                 CommunityLedgerTemplateKeys.GroupPurchase,
-                공동수입원장관계역할.원천공동구매,
+                같이수입원장관계역할.원천공동구매,
                 CommunityLedgerRelationTypes.Reference,
                 "원천 공동구매 원장",
                 "공동구매 대표",
@@ -130,7 +130,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
             Node(
                 "international-transport",
                 CommunityLedgerTemplateKeys.CargoTransport,
-                공동수입원장관계역할.국제운송,
+                같이수입원장관계역할.국제운송,
                 CommunityLedgerRelationTypes.Handoff,
                 "해외 선적·국제 운송 원장",
                 "해외 공급자·포워더",
@@ -159,7 +159,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
                 nodes.Add(Node(
                     "domestic-transport-direct",
                     CommunityLedgerTemplateKeys.CargoTransport,
-                    공동수입원장관계역할.국내운송,
+                    같이수입원장관계역할.국내운송,
                     CommunityLedgerRelationTypes.Handoff,
                     "보세구역·항만 → 최종 도착지 직배송 원장",
                     "국내 운송 담당자",
@@ -192,7 +192,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
         nodes.Add(Node(
             $"domestic-transport-to-{prefix}",
             CommunityLedgerTemplateKeys.CargoTransport,
-            공동수입원장관계역할.국내운송,
+            같이수입원장관계역할.국내운송,
             CommunityLedgerRelationTypes.Handoff,
             $"보세구역·항만 → {warehouseLabel} 운송 원장",
             "국내 운송 담당자",
@@ -200,7 +200,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
         nodes.Add(Node(
             $"{prefix}-inbound",
             CommunityLedgerTemplateKeys.WarehouseInbound,
-            공동수입원장관계역할.물류거점입고,
+            같이수입원장관계역할.물류거점입고,
             CommunityLedgerRelationTypes.Handoff,
             $"{warehouseLabel} 입고·검수 원장",
             $"{warehouseLabel} 운영자",
@@ -210,7 +210,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
             nodes.Add(Node(
                 $"{prefix}-outbound",
                 CommunityLedgerTemplateKeys.WarehouseOutbound,
-                공동수입원장관계역할.물류거점출고,
+                같이수입원장관계역할.물류거점출고,
                 CommunityLedgerRelationTypes.Flow,
                 $"{warehouseLabel} 출고·분배 원장",
                 $"{warehouseLabel} 운영자",
@@ -221,7 +221,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
             nodes.Add(Node(
                 $"domestic-transport-from-{prefix}",
                 CommunityLedgerTemplateKeys.CargoTransport,
-                공동수입원장관계역할.국내운송,
+                같이수입원장관계역할.국내운송,
                 CommunityLedgerRelationTypes.Handoff,
                 $"{warehouseLabel} → 최종 도착지 운송 원장",
                 "국내 운송 담당자",
@@ -240,7 +240,7 @@ public static class CommunityGroupImportLedgerPlanBuilder
         }
         if (!CommunityGroupImportLogisticsRouteCodes.All.Contains(request.LogisticsRouteCode?.Trim() ?? string.Empty))
         {
-            warnings.Add("지원되는 공동수입 물류 경로를 선택해 주세요.");
+            warnings.Add("지원되는 같이 수입 물류 경로를 선택해 주세요.");
         }
         if (string.IsNullOrWhiteSpace(request.ProductSummary))
         {

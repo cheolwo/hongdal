@@ -34,7 +34,7 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
     public const string UnitedStatesCountryCode = "US";
 
     public const string GroupImportCandidateNotice =
-        "공동수입 후보 판정은 제안 단계의 물류 경로 분류입니다. 계약 확정 전 상품 출발국가, 운영 국가의 통관 여부와 HS 코드를 다시 확인하고, 확정된 경우에만 원천 공동구매와 연결된 별도 공동수입 원장으로 인계합니다.";
+        "같이 수입 후보 판정은 제안 단계의 물류 경로 분류입니다. 계약 확정 전 상품 출발국가, 운영 국가의 통관 여부와 HS 코드를 다시 확인하고, 확정된 경우에만 원천 공동구매와 연결된 별도 같이 수입 원장으로 인계합니다.";
 
     public static CommunityGroupPurchaseTradeRouteDecision Evaluate(
         CommunityGroupPurchaseTradeRouteInput input)

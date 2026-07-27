@@ -40,7 +40,7 @@ Business Case, Case Section, Policy, 실행 조율, 판단 도구, API/UseCase�
 | 창고 입출고 | `WarehouseFulfillment` | `WarehouseFulfillmentWorkflow` | 입고, 적재, 재고, 포장, 출고 배치, 재위탁 |
 | 통관·무역 데이터 | `CustomsAndTradeData` | `CustomsAndTradeDataWorkflow` | HS 코드, 통관 조회, 관세사 보정, 수출입 단가 데이터 |
 | 공동구매 수요·모집 | `GroupPurchaseDemand` | `GroupPurchaseDemandWorkflow` | 비구속 수요, 자동 집단화 미리보기, 모집 현황, 수요 철회 |
-| 공동수입 준비 | `GroupPurchaseImport` | `CustomsAndTradeDataWorkflow` | 공급·HS 후보 검토, 공동수입 원장, 통관 준비 자료 |
+| 같이 수입 준비 | `GroupPurchaseImport` | `CustomsAndTradeDataWorkflow` | 공급·HS 후보 검토, 같이 수입 원장, 통관 준비 자료 |
 | 판매채널 출고 | `SalesChannelFulfillment` | `SalesChannelFulfillmentWorkflow` | 판매채널 계정, 상품 출품, 주문 수집, 창고 재고 연결, 출고 요청 |
 | 커뮤니티 신뢰 | `CommunityTrust` | `CommunityTrustWorkflow` | 커뮤니티 글, 댓글, 후기, 활동 신호, 투표, 관계 기록 |
 | 참여 인력 관리 | `HrParticipation` | `HrParticipationWorkflow` | 역할, 근로계약, 4대보험 신고 준비, 참여 보상 |
@@ -121,7 +121,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
 - 업무 절차: `비구속 공동구매 수요·집단화`
 - 운영 스위치: `GroupPurchaseDemandWorkflow`
 
-공급·HS·공동수입 준비 API는 `1.5`의 `GroupPurchaseImport` 또는 `CustomsAndTradeDataWorkflow`, 해외 선적은 `2.0`의 `DomesticTransportWorkflow`, 창고 이행은 `2.5`의 `WarehouseFulfillmentWorkflow`로 별도 차단합니다.
+공급·HS·같이 수입 준비 API는 `1.5`의 `GroupPurchaseImport` 또는 `CustomsAndTradeDataWorkflow`, 해외 선적은 `2.0`의 `DomesticTransportWorkflow`, 창고 이행은 `2.5`의 `WarehouseFulfillmentWorkflow`로 별도 차단합니다.
 
 유스케이스는 `SsalddelUseCaseActorAttribute`로 주 액터와 보조 액터를 기록합니다. 이 값은 권한을 강제하는 장치라기보다, 설계 문서와 코드에서 “누가 이 업무를 주로 쓰는가”를 드러내는 메타데이터입니다. 실제 권한 검사는 기존 `Authorize`, 정책, HR 역할 검사와 함께 둡니다.
 
@@ -284,8 +284,8 @@ services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
 | --- | --- | --- | --- |
 | 같이 주문 기반 수입 | 참조 | 통관·무역 데이터 | HS 코드, BL/AWB, 문서관리번호, 통관 단계, 수출입 단가를 조회합니다. |
 | 같이 주문 기반 수입 | 인계 | 국내 화물 운송 | 보세구역 반출 뒤 아파트 직행 배송이나 국내 3PL 이동을 운송 의뢰로 넘깁니다. |
-| 같이 주문 기반 수입 | 인계 | 창고 입출고 | 국내 3PL 입고를 선택하면 공동수입 물품을 입고, 재고, 출고 가능 상태로 넘깁니다. |
-| 같이 주문 기반 수입 | 공급 | 판매채널 출고 | 공동수입 재고를 스마트스토어, 쿠팡, Amazon 같은 판매채널 출품 후보로 공급합니다. |
+| 같이 주문 기반 수입 | 인계 | 창고 입출고 | 국내 3PL 입고를 선택하면 같이 수입 물품을 입고, 재고, 출고 가능 상태로 넘깁니다. |
+| 같이 주문 기반 수입 | 공급 | 판매채널 출고 | 같이 수입 재고를 스마트스토어, 쿠팡, Amazon 같은 판매채널 출품 후보로 공급합니다. |
 | 같이 주문 기반 수입 | 공동 운영 | 참여 인력 관리 | 같이 주문 분류, 배분, 단지 내부 보조 업무에 필요한 인력 역할과 보상을 연결합니다. |
 | 판매채널 출고 | 호출 | 창고 입출고 | 판매채널 주문이 들어오면 재고 확인과 출고 배치를 요청합니다. |
 | 판매채널 출고 | 인계 | 국내 화물 운송 | 출고 뒤 화물 배송이나 재위탁 운송이 필요하면 운송 의뢰로 넘깁니다. |

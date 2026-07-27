@@ -227,13 +227,13 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
     }
 
     [Fact]
-    public async Task 공동수입전환_원천공동구매와전용창고입고물류원장을연결한다()
+    public async Task 같이수입전환_원천공동구매와전용창고입고물류원장을연결한다()
     {
         var campaignId = Guid.NewGuid();
         var campaignStore = new FakeCampaignStore(CreateImportCampaign(campaignId));
         var ledgerStore = new FakeLedgerStore();
         var workflow = new 공동구매원장절차Service(campaignStore, ledgerStore);
-        var service = new 공동수입원장전환Service(campaignStore, workflow, ledgerStore);
+        var service = new 같이수입원장전환Service(campaignStore, workflow, ledgerStore);
         var request = new CommunityGroupImportLedgerConversionRequest
         {
             GroupPurchaseCampaignId = campaignId,
@@ -263,7 +263,7 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
             && x.RelationType == CommunityLedgerRelationTypes.Reference);
         Assert.Contains(created.Nodes, x =>
             x.LedgerTemplateKey == CommunityLedgerTemplateKeys.WarehouseInbound
-            && x.RelationRole == 공동수입원장관계역할.물류거점입고);
+            && x.RelationRole == 같이수입원장관계역할.물류거점입고);
         Assert.DoesNotContain(created.Nodes, x =>
             x.LedgerTemplateKey == CommunityLedgerTemplateKeys.WarehouseOutbound);
 
@@ -286,7 +286,7 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
     }
 
     [Fact]
-    public async Task 공동수입전환은_원천공동구매에이미연결된공동수입원장을재사용하고_준비블록을보존한다()
+    public async Task 같이수입전환은_원천공동구매에이미연결된같이수입원장을재사용하고_준비블록을보존한다()
     {
         var campaignId = Guid.NewGuid();
         var campaignStore = new FakeCampaignStore(CreateImportCampaign(campaignId));
@@ -301,11 +301,11 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
                 원장Id = existingGroupImportId,
                 커뮤니티Id = "platform",
                 원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
-                제목 = "기존 공동수입 원장",
+                제목 = "기존 같이 수입 원장",
                 상태 = 커뮤니티원장상태.진행중,
                 현재단계Key = CommunityGroupImportLedgerStageCodes.ImportDecision,
                 대상OsCode = CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
-                대상OsName = "공동수입 OS",
+                대상OsName = "같이 수입 OS",
                 블록목록 =
                 [
                     new 커뮤니티원장블록Dto
@@ -323,14 +323,14 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
                     {
                         원장Id = source.CommunityLedgerId,
                         원장템플릿Key = CommunityLedgerTemplateKeys.GroupPurchase,
-                        역할 = 공동수입원장관계역할.원천공동구매,
+                        역할 = 같이수입원장관계역할.원천공동구매,
                         관계유형 = CommunityLedgerRelationTypes.Reference,
                         필수여부 = true
                     }
                 ]
             },
             "admin-1");
-        var service = new 공동수입원장전환Service(campaignStore, workflow, ledgerStore);
+        var service = new 같이수입원장전환Service(campaignStore, workflow, ledgerStore);
         var request = new CommunityGroupImportLedgerConversionRequest
         {
             GroupPurchaseCampaignId = campaignId,
@@ -376,8 +376,8 @@ public sealed class CommunityGroupPurchaseLedgerWorkflowTests
             campaignId,
             CommunityVoteKindCodes.GroupPurchaseDemand,
             "platform",
-            "태국산 망고 공동수입",
-            "해외 판매자와 합의한 망고 공동수입",
+            "태국산 망고 같이수입",
+            "해외 판매자와 합의한 망고 같이수입",
             2001,
             "공동구매 대표",
             CommunityVoteStatusCodes.Closed,

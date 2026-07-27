@@ -124,12 +124,12 @@ public sealed class CommunityCollectiveActionPageViewModelTests
     }
 
     [Fact]
-    public void 미국공동수입Snapshot은_배달권과보세부터주소배송까지_여정을조립한다()
+    public void 미국같이수입Snapshot은_배달권과보세부터주소배송까지_여정을조립한다()
     {
         var campaign = new CommunityVoteResponse
         {
             Id = Guid.NewGuid(),
-            Title = "미국 구매자 공동수입",
+            Title = "미국 구매자 같이수입",
             Status = CommunityVoteStatusCodes.Open,
             TotalVoteCount = 12,
             Options =
@@ -218,7 +218,7 @@ public sealed class CommunityCollectiveActionPageViewModelTests
     }
 
     [Fact]
-    public async Task 미국공동수입둘러보기는_PageViewModel의배송하위ViewModel로전달된다()
+    public async Task 미국같이수입둘러보기는_PageViewModel의배송하위ViewModel로전달된다()
     {
         using var page = CreatePage(new FakeSource([]));
         var preview = CommunityCollectiveActionPreviewCatalog.Create()

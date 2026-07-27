@@ -58,7 +58,7 @@ public sealed class RestaurantIngredientSupplySampleService : I음식점식재�
 
         IReadOnlyList<음식점식재료공급후보> candidates = request.공급경로 switch
         {
-            음식점식재료공급경로.공동수입 => BuildImportCandidates(request),
+            음식점식재료공급경로.같이수입 => BuildImportCandidates(request),
             _ => BuildDomesticCandidates(request)
         };
 
@@ -112,7 +112,7 @@ public sealed class RestaurantIngredientSupplySampleService : I음식점식재�
 
     private static IReadOnlyList<음식점식재료공급후보> BuildCandidates(
         음식점식재료공급요청Draft request)
-        => request.공급경로 == 음식점식재료공급경로.공동수입
+        => request.공급경로 == 음식점식재료공급경로.같이수입
             ? BuildImportCandidates(request)
             : BuildDomesticCandidates(request);
 
@@ -198,8 +198,8 @@ public sealed class RestaurantIngredientSupplySampleService : I음식점식재�
         [
             new(
                 "import-shared-fcl",
-                음식점식재료공급경로.공동수입,
-                "공동수입 물량 집계",
+                음식점식재료공급경로.같이수입,
+                "같이 수입 물량 집계",
                 "검증 전 수입자·공장 조건 예시 A",
                 origin,
                 $"{request.품목명} · {request.규격}",
@@ -221,8 +221,8 @@ public sealed class RestaurantIngredientSupplySampleService : I음식점식재�
                 true),
             new(
                 "import-shared-lcl",
-                음식점식재료공급경로.공동수입,
-                "소량 공동수입",
+                음식점식재료공급경로.같이수입,
+                "소량 같이수입",
                 "검증 전 수입자·혼재화물 조건 예시 B",
                 origin,
                 $"{request.품목명} · {request.규격}",

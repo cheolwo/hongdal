@@ -13,7 +13,7 @@ public sealed class OrdererGroupImportReadinessPageCompositionTests
     ];
 
     [Fact]
-    public void 공동수입1_5조회는_원장기준의얇은책임별Route로분리된다()
+    public void 같이수입1_5조회는_원장기준의얇은책임별Route로분리된다()
     {
         var pagesRoot = Path.Combine(FindRepositoryRoot(), "OrdererApp", "Components", "Pages");
 
@@ -40,14 +40,14 @@ public sealed class OrdererGroupImportReadinessPageCompositionTests
         var source = string.Join(Environment.NewLine, files.Select(File.ReadAllText));
 
         Assert.Equal(7, files.Length);
-        Assert.DoesNotContain("I공동수입준비관리Client", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("I같이수입준비관리Client", source, StringComparison.Ordinal);
         Assert.DoesNotContain("준비Os작업실행Async", source, StringComparison.Ordinal);
         Assert.DoesNotContain("전문검토인계Async", source, StringComparison.Ordinal);
         Assert.DoesNotContain("SendAsync", source, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Post", source, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Put", source, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Delete", source, StringComparison.Ordinal);
-        Assert.DoesNotContain("공동수입준비원장응답", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("같이수입준비원장응답", source, StringComparison.Ordinal);
         Assert.DoesNotContain(".준비자료", source, StringComparison.Ordinal);
         Assert.DoesNotContain("정보제공동의근거참조", source, StringComparison.Ordinal);
         Assert.DoesNotContain("기록자표시명", source, StringComparison.Ordinal);

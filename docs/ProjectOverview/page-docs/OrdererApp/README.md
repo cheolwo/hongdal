@@ -14,15 +14,15 @@
 | OrdererApp-P02-1-3 - 내 개별주문 의향 상세 | `/group-purchase/wishes/{WishLedgerId}` | 0.5 | 본인 의향의 수량·거래 문맥과 그 의향에서 이어진 공동 진행 조회·철회 | 재캡처 필요 |
 | OrdererApp-P02-1-4 - 내 개별주문 의향 수량 수정 | `/group-purchase/wishes/{WishLedgerId}/edit` | 0.5 | 본인의 활성 비구속 의향에서 희망 수량만 변경 | 재캡처 필요 |
 | OrdererApp-P02-1-5 - 내 공동 진행 | `/group-purchase/groups` | 1.0 | 본인 원함이 포함된 공동 집계만 목록으로 조회 | 재캡처 필요 |
-| OrdererApp-P02-1-6 - 내 공동 진행 상세 | `/group-purchase/groups/{AutoGroupId}` | 1.0→1.5 | 본인 원함의 집계와 연결된 공동수입 준비 원장 진입점 조회 | 재캡처 필요 |
+| OrdererApp-P02-1-6 - 내 공동 진행 상세 | `/group-purchase/groups/{AutoGroupId}` | 1.0→1.5 | 본인 원함의 집계와 연결된 같이 수입 준비 원장 진입점 조회 | 재캡처 필요 |
 | OrdererApp-P02-2 - 공동구매 상품 근거 상세 | `/group-purchase/products/{ProductId}` | 1.0 | 한 상품의 HS·보관·모집 근거 읽기 | 재캡처 필요 |
 | OrdererApp-P02-3 - 개별주문 의향 상세 조건 | `/group-purchase/demands/new/{ProductId}` | 0.5 | 상품·배송권·희망 수량·수령 조건을 직접 조정하는 비구속 Action | 재캡처 필요 |
 | OrdererApp-P02-4 - 수입 원가 참고 | `/group-purchase/import-review/{ProductId}` | 1.5 준비 | 한 상품의 Simulation 원가 조회 | 재캡처 필요 |
-| OrdererApp-P02-4-1 - 공동수입 준비 현황 | `/group-purchase/imports/{GroupImportLedgerId}?autoGroupId={AutoGroupId}` | 1.5 준비 | 본인이 참여한 집단에 연결된 공동수입 원장의 준비도와 미확인 항목 읽기 | 재캡처 필요 |
-| OrdererApp-P02-4-2 - 공동수입 공급자 근거 | `/group-purchase/imports/{GroupImportLedgerId}/suppliers?autoGroupId={AutoGroupId}` | 1.5 준비 | 공급자 후보·원출처·확인 시각 읽기 | 재캡처 필요 |
-| OrdererApp-P02-4-3 - 공동수입 견적·예상 비용 | `/group-purchase/imports/{GroupImportLedgerId}/costs?autoGroupId={AutoGroupId}` | 1.5 준비 | 재료별 견적 조건과 예상 도착 비용 근거 읽기 | 재캡처 필요 |
-| OrdererApp-P02-4-4 - 공동수입 품목분류·규제 | `/group-purchase/imports/{GroupImportLedgerId}/classification?autoGroupId={AutoGroupId}` | 1.5 준비 | HSK·HTS 후보와 국가별 공식 검토 항목 읽기 | 재캡처 필요 |
-| OrdererApp-P02-4-5 - 공동수입 포워더 인계 | `/group-purchase/imports/{GroupImportLedgerId}/handoff?autoGroupId={AutoGroupId}` | 1.5 준비 | 사람이 인계한 범위와 기록된 LCL/FCL·견적·일정 회신 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-1 - 같이 수입 준비 현황 | `/group-purchase/imports/{GroupImportLedgerId}?autoGroupId={AutoGroupId}` | 1.5 준비 | 본인이 참여한 집단에 연결된 같이 수입 원장의 준비도와 미확인 항목 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-2 - 같이 수입 공급자 근거 | `/group-purchase/imports/{GroupImportLedgerId}/suppliers?autoGroupId={AutoGroupId}` | 1.5 준비 | 공급자 후보·원출처·확인 시각 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-3 - 같이 수입 견적·예상 비용 | `/group-purchase/imports/{GroupImportLedgerId}/costs?autoGroupId={AutoGroupId}` | 1.5 준비 | 재료별 견적 조건과 예상 도착 비용 근거 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-4 - 같이 수입 품목분류·규제 | `/group-purchase/imports/{GroupImportLedgerId}/classification?autoGroupId={AutoGroupId}` | 1.5 준비 | HSK·HTS 후보와 국가별 공식 검토 항목 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-5 - 같이 수입 포워더 인계 | `/group-purchase/imports/{GroupImportLedgerId}/handoff?autoGroupId={AutoGroupId}` | 1.5 준비 | 사람이 인계한 범위와 기록된 LCL/FCL·견적·일정 회신 읽기 | 재캡처 필요 |
 | OrdererApp-P02-4-6 - 정보 제공 근거 | `/group-purchase/imports/{GroupImportLedgerId}/consent?autoGroupId={AutoGroupId}` | 1.5 준비 | 저장된 정보 제공 범위와 별도 동의 근거 확인 상태를 읽기 전용으로 표시 | 재캡처 필요 |
 | OrdererApp-P02-5 - 선적 조회 | `/group-purchase/shipments` | 1.5 준비 | 문서관리번호 한 건 조회 | 재캡처 필요 |
 | [OrdererApp-P03 - 주문자 화물 주문](OrdererApp-P03/) | /cargo | 확장 | 주문자 화물 주문 | 완료 |

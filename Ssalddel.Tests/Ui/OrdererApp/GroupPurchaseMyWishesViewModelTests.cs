@@ -222,7 +222,7 @@ public sealed class GroupPurchaseMyWishesViewModelTests
             배송권명 = "서울 생활권",
             온도코드 = "상온",
             자동집단Id = autoGroupId,
-            공동수입원장Id = groupImportLedgerId,
+            같이수입원장Id = groupImportLedgerId,
             자동집단요약 = summary,
             생성시각Utc = new DateTime(2026, 7, 23, 0, 0, 0, DateTimeKind.Utc),
             수정시각Utc = new DateTime(2026, 7, 23, 0, updatedMinute, 0, DateTimeKind.Utc)

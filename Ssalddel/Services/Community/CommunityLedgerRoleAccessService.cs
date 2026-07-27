@@ -432,12 +432,12 @@ public sealed class CommunityLedgerRoleAccessService : ICommunityLedgerRoleAcces
     {
         if (ledger is null)
         {
-            return Fail<CommunityLedgerRoleAccessSettingsResponse>("공동수입 원장을 찾을 수 없습니다.", 404);
+            return Fail<CommunityLedgerRoleAccessSettingsResponse>("같이 수입 원장을 찾을 수 없습니다.", 404);
         }
 
         if (!CommunityLedgerRoleAccessPolicyEvaluator.IsGroupImport(ledger))
         {
-            return Fail<CommunityLedgerRoleAccessSettingsResponse>("역할별 관세사 권한은 공동수입 원장에서만 설정할 수 있습니다.", 400);
+            return Fail<CommunityLedgerRoleAccessSettingsResponse>("역할별 관세사 권한은 같이 수입 원장에서만 설정할 수 있습니다.", 400);
         }
 
         return CommunityLedgerRoleAccessPolicyEvaluator.CanManage(ledger, userId)

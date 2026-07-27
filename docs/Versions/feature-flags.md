@@ -19,7 +19,7 @@
 
 `0.5` 제품 단계는 catalog와 API·page metadata에는 등록됐지만 독립 Feature flag는 아직 release gate입니다. 현재 개별 원함 저장 API는 호환상 `GroupPurchaseDemandWorkflow` 안에 있으므로 이 플래그를 켜면 0.5와 1.0 코드가 함께 열릴 수 있습니다. 0.5 독립 배포 전에는 `IndividualOrderWorkflow` 경계를 추가하고 개별 원장 Command를 1.0 집단화 Command와 분리해야 합니다.
 
-현재 기본 개발·배포 환경은 `CommunityTrustWorkflow=true`만 열고 `GroupPurchasePracticeWorkflow`, `GroupPurchaseDemandWorkflow`, `CustomsAndTradeDataWorkflow`를 모두 `false`로 유지합니다. 0.5·1.0·1.5 검증은 해당 version slice와 명시적 test profile에서만 기능을 켭니다.
+현재 기본 공개 profile은 `CommunityTrustWorkflow=true`만 열고 `GroupPurchasePracticeWorkflow`, `GroupPurchaseDemandWorkflow`, `CustomsAndTradeDataWorkflow`를 모두 `false`로 유지합니다. 이것은 구현 범위를 제한한다는 뜻이 아닙니다. 0.5부터 3.5까지의 기능은 각 version slice와 test profile에서 계속 구현·검증하고, 준비된 capability만 기본 공개 profile로 승격합니다.
 
 ## 운영 예시
 
@@ -41,14 +41,17 @@
 }
 ```
 
-## 활성화 순서
+## 공개 활성화 순서
+
+아래 순서는 구현 착수 순서가 아니라 기본 공개 profile에 기능을 추가하는 순서입니다.
 
 1. `CommunityTrustWorkflow`로 공개 탐색, 동의와 원장 기반을 유지합니다.
 2. 0.5 전용 경계가 완성되기 전에는 `GroupPurchaseDemandWorkflow`를 제한된 Simulation profile에서만 사용해 개별 원장과 집단화의 분리 여부를 함께 검증합니다.
 3. 0.5 개별 원장을 독립 활성화한 뒤 공동 참여에 동의한 원장에만 1.0 집단화를 적용합니다.
 4. `CustomsAndTradeDataWorkflow`로 공급자·견적·HS·HTS와 수입 준비 자료를 연결합니다.
 5. 운송 책임과 허가 경계가 준비된 환경에서만 `DomesticTransportWorkflow`를 검증합니다.
-6. 실제 입고·재고·판매 이행이 필요할 때 `WarehouseFulfillmentWorkflow`와 `SalesChannelFulfillmentWorkflow`를 검증합니다.
+6. 실제 입고·재고·판매 이행의 책임과 운영 요건이 준비되면 `WarehouseFulfillmentWorkflow`와 `SalesChannelFulfillmentWorkflow`를 제한 공개부터 승격합니다.
+7. 음식점과 마트 capability는 각각의 주문·재고·배달 경계를 검증한 뒤 `FoodDeliveryWorkflow`, `SsalddelMartWorkflow`를 독립적으로 승격합니다.
 
 각 단계는 독립적으로 끌 수 있어야 합니다. `CustomsAndTradeDataWorkflow`는 단독으로 켜도 활성화되지 않고 `CommunityTrustWorkflow`와 `GroupPurchaseDemandWorkflow`가 함께 켜져야 합니다. 국내 생산자 공동구매는 통관 기능 없이 `1.0`만으로 검증할 수 있고, 기존 화주의 운송 테스트 자산은 별도 제한 환경에서 보존할 수 있습니다.
 
@@ -79,7 +82,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
 
 | 기존 키 | 기준 키 | 이전 버전명 |
 | --- | --- | --- |
-| `GroupPurchaseImportWorkflow` | `GroupPurchaseDemandWorkflow` | 공동구매·공동수입 통합 키 |
+| `GroupPurchaseImportWorkflow` | `GroupPurchaseDemandWorkflow` | 공동구매·같이 수입 통합 키 |
 | `OrdererGroupOrderV25` | `GroupPurchaseDemandWorkflow` | 공동구매 `2.5` |
 | `ApartmentGroupOrderV25` | `GroupPurchaseDemandWorkflow` | 공동주택 공동구매 `2.5` |
 | `CustomsHsV20` | `CustomsAndTradeDataWorkflow` | 통관·HS `2.0` |

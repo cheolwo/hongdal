@@ -28,7 +28,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
     private string marketReferenceMonth = DateTime.UtcNow.AddMonths(-2).ToString("yyyyMM", CultureInfo.InvariantCulture);
     private int marketLookbackMonths = 3;
     private decimal marketFxRateKrwPerUsd = 1350m;
-    private string participantDisplayName = "공동수입 참여자";
+    private string participantDisplayName = "같이 수입 참여자";
     private string participantTransactionTypeCode = 공동구매거래유형코드.B2C;
     private string participantPriceBasisCode = 공동구매가격표시기준코드.부가세포함;
     private string participantOrganizationReference = string.Empty;
@@ -115,7 +115,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             catalogResult = new GroupImportHsCodeSearchResponse();
-            ShowStatus(Severity.Warning, "HS 코드 카탈로그를 불러오지 못했습니다. 서버의 공동수입 기능 설정을 확인해 주세요.");
+            ShowStatus(Severity.Warning, "HS 코드 카탈로그를 불러오지 못했습니다. 서버의 같이 수입 기능 설정을 확인해 주세요.");
         }
         finally
         {
@@ -244,11 +244,11 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             selectedOptionIds.Clear();
             selectedCandidates.Clear();
             activeView = GroupImportView.Campaigns;
-            ShowStatus(Severity.Success, "HS 코드 상품 후보를 공동수입 선택안으로 열었습니다.");
+            ShowStatus(Severity.Success, "HS 코드 상품 후보를 같이 수입 선택안으로 열었습니다.");
         }
         catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
-            ShowStatus(Severity.Error, "공동 선택안을 열지 못했습니다. 로그인 상태와 공동수입 기능 설정을 확인해 주세요.");
+            ShowStatus(Severity.Error, "공동 선택안을 열지 못했습니다. 로그인 상태와 같이 수입 기능 설정을 확인해 주세요.");
         }
         finally
         {
@@ -264,7 +264,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
         var memo = string.IsNullOrWhiteSpace(draft.Description)
             ? string.Empty
             : $" {draft.Description.Trim()}";
-        return $"HS 코드 기준 공동수입 상품 선택: {productSummary}.{memo}".Trim();
+        return $"HS 코드 기준 같이 수입 상품 선택: {productSummary}.{memo}".Trim();
     }
 
     private async Task LoadImportCampaignsAsync()
@@ -425,7 +425,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
             selectedOptionIds.Clear();
             ShowStatus(
                 Severity.Success,
-                $"{공동구매거래유형코드.표시명(ParticipantTransactionTypeCode)} 수요를 공동수입 상품 선택에 반영했습니다.");
+                $"{공동구매거래유형코드.표시명(ParticipantTransactionTypeCode)} 수요를 같이 수입 상품 선택에 반영했습니다.");
         }
         catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
@@ -535,7 +535,7 @@ public partial class CommunityGroupImportHsSelectionWorkspace
     {
         public string Title { get; set; } = "함께 들여올 상품을 정해요";
 
-        public string CreatorDisplayName { get; set; } = "공동수입 제안자";
+        public string CreatorDisplayName { get; set; } = "같이 수입 제안자";
 
         public string CommunityScope { get; set; } = "platform";
 

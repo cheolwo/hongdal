@@ -114,7 +114,7 @@ flowchart TD
 | --- | --- | --- | --- | --- |
 | `0.0` | 커뮤니티·공공데이터 기반 안정화 | `Ssalddel.Ui.Common`, 정보·커뮤니티 화면 | 음식·재료 자료, 대화, 참여 동의, 공동 원장, 신고·숙고와 신뢰 기록 | 거래·운송·창고 외부 효과 |
 | `1.0` | 공동구매·주문자 집단화 | 공동구매 공용 UI, `Orderer` API, 자동집단화 엔진 | 비구속 수요, 품목·지역·수령 조건별 집단, 모집·협의 원장 | 결제·계약·신고·자동 배차 |
-| `1.5` | 공급·가격·무역 준비 | 공급자 조사, HS·HTS, 수입 준비 서비스 | 기업 근거, 견적, 예상 총원가, HS·HTS 후보, 공동수입 준비 | 전문 판단·계약·신고 실행 |
+| `1.5` | 공급·가격·무역 준비 | 공급자 조사, HS·HTS, 수입 준비 서비스 | 기업 근거, 견적, 예상 총원가, HS·HTS 후보, 같이 수입 준비 | 전문 판단·계약·신고 실행 |
 | `2.0` | 국내 화물·운송 이행 | `SsalddelApp`, `DriverApp`, 운송 서버 | 운송 의뢰, 수행자 인계, 배차, 상·하차, 인수, 증빙과 정산 후보 | 준비 없는 유상 주선·자동 배차·실정산 |
 | `2.5` | 창고·판매 이행 | `WarehouseManagerApp`, 판매채널·출고 서비스 | 입고, 재고, 피킹, 포장, 판매채널, 최종 배분 | 외부 채널 자동 발행, 책임 주체 없는 보관·판매 |
 | `3.0` | 음식점 일반 음식 배달 운영 | `OrdererApp`, `RestaurantDeskApp`, `FoodDeliveryDispatchEngine`, `FDriverApp` | 음식점 주문, 조리/픽업 상태, 음식 배달 기사 배차, 고객 배송 완료, 묶음 배달 | 알뜰살뜰 마트 도심 즉시배송, 창고형 피킹/포장 배송 |
@@ -537,7 +537,7 @@ flowchart TD
 ## 참고 문서
 
 - [CommandEvent리팩토링원칙.md](../Docs/Architecture/CommandEvent리팩토링원칙.md)
-- [참여자중심설계원칙.md](../Docs/Architecture/참여자중심설계원칙.md)
+- [이웃에서 시작하는 공동행동 개발 철학](../docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md#참여자-식별과-역할-경계)
 - [ISMS-P 개인정보/계약 준비도](../docs/Compliance/ISMS-P-readiness.md)
 - [배차큐_진행현황_2026-07-02.md](../Docs/DispatchQueue/배차큐_진행현황_2026-07-02.md)
 - [화면 기능 처리 흐름](../docs/ProjectOverview/screen-flows.md)

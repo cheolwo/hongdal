@@ -635,7 +635,7 @@ public sealed class SsalddelApiVersionAttributeTests
             VersionOf(typeof(공동구매자동집단화Controller)));
         Assert.Equal(
             SsalddelProductVersion.V1_5,
-            VersionOf(typeof(공동수입원장Controller)));
+            VersionOf(typeof(같이수입원장Controller)));
         Assert.Equal(
             SsalddelProductVersion.V2_0,
             VersionOf(typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)));

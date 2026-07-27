@@ -1,6 +1,6 @@
-# 첨부 문서
+# 프로젝트 화면 안내
 
-이 폴더는 루트 `README.md`에서 덜어낸 상세 문서를 모아 둡니다. 처음에는 기술 구조보다 **현재 존재하는 화면과 캡처**를 먼저 봅니다.
+이 문서는 화면, 캡처, 화면 간 업무 흐름과 코드 위치를 찾는 **ProjectOverview 기준 목차**입니다. 처음에는 기술 구조보다 현재 존재하는 화면과 캡처를 먼저 봅니다. 저장소 전체 문서 분류와 기준 문서는 [살뜰 문서 안내](../README.md)를 따릅니다.
 
 루트 README는 현재 집중 범위인 문화교통 0.0 커뮤니티·공공데이터 기반을 먼저 보여 줍니다. 이 폴더에서는 글쓰기와 음식·재료 탐색, 참여 동의, 공동 원장과 완료 사례로 이어지는 통합 클라이언트를 먼저 보고, 0.5 이후 화면은 후속 자산으로 구분해 확인합니다.
 
@@ -35,7 +35,6 @@
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
 | 0.0 | [Ssalddel 0.0](../Versions/v0.0/README.md) | 글쓰기 → 가원장 → 역할 슬롯 → 실원장으로 이어지는 현재 제품 범위 |
-| 00 | [첨부 문서 목차](00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
 | 01 | [page-docs/README.md](page-docs/README.md) | 각 화면별 독립 README와 인라인 캡처, 상세 설명 |
 | 01-A | [community-board-field-focus-guide.md](community-board-field-focus-guide.md) | 배달 현장에서 게시판 하나씩 관찰·검토하기 위한 질문, 근거, 안전·개인정보 경계와 16개 업무 게시판 점검표 |
 | 02 | [unified-community-client.md](unified-community-client.md) | 통합 홈, 역할, 모바일 다이어그램, 사방 이동, 꾸미기 상점 |
@@ -54,7 +53,7 @@
 | 08 | [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차와 음식 배달 배차의 경계 |
 | 09 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
 | 10 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 같이 주문, 해외 선적/통관, 국내 운송, 판매채널 출고 흐름 |
-| 11 | [version-roadmap.md](version-roadmap.md) | 1.0부터 3.5까지의 단계별 제품 방향 |
+| 11 | [Versions/README.md](../Versions/README.md) | 0.0부터 3.5까지의 단계별 제품 방향과 실행 경계 |
 
 ## 기술 참고 문서
 
@@ -62,8 +61,11 @@
 
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
+| T-00 | [CommunityFoundationV0Policy.md](../Architecture/CommunityFoundationV0Policy.md) | 커뮤니티 선행 기반과 유상 배차·주선 실운영 경계 |
+| T-00-1 | [CultureTransportProductLine.md](../Architecture/CultureTransportProductLine.md) | 문화와 음식 근거에서 공동 수요와 공급·이동 준비로 이어지는 제품 이름과 실행 경계 |
 | T-01 | [workflow-api-policy.md](workflow-api-policy.md) | API를 화면과 업무 절차 기준으로 관리하는 기준 |
 | T-02 | [BusinessWorkflowResponsibilityModel.md](../Architecture/BusinessWorkflowResponsibilityModel.md) | Business Case, Policy, 실행 조율, 판단 도구와 상태 변경의 책임 경계 |
+| T-02-1 | [GroupPurchaseDemandProcessManager.md](../Architecture/GroupPurchaseDemandProcessManager.md) | 0.5 개별주문을 입력으로 받는 1.0 주문자 집단화와 1.5 인계 경계 |
 | T-03 | [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 국내 화물 운송을 운영하는 내부 기준 |
 | T-04 | [EngineOverview.md](../Architecture/EngineOverview.md) | Process Manager, 워크플로우와 판단 도구의 관계 |
 | T-05 | [HIOPSAI.md](../Architecture/HIOPSAI.md) | 참여자 입장 해석과 배차 조율을 돕는 AI 방향 |
@@ -72,6 +74,12 @@
 | T-08 | [hiops-ai-judgment-cases.md](hiops-ai-judgment-cases.md) | AI 판단 보조를 만들기 위한 상황별 판단 사례 |
 | T-09 | [glossary.md](glossary.md) | POD, BL, 3PL, 레그, RAG 같은 주요 용어 정의 |
 | T-10 | [Blazor_Maui_공통화_1차.md](../Architecture/Blazor_Maui_공통화_1차.md) | 네이티브 기능이 꼭 필요한 경우를 제외하고 MudBlazor 컴포넌트 UI를 기본으로 삼는 기준 |
+| T-11 | [ISMS-P-readiness.md](../Compliance/ISMS-P-readiness.md) | 보호 데이터와 인증·보안 준비 항목 |
+| T-12 | [TransportPaymentSettlementPolicy.md](../Architecture/TransportPaymentSettlementPolicy.md) | 운송 안심결제와 조건부 정산의 실행 경계 |
+| T-13 | [CommunityInformationCollection.md](../Architecture/CommunityInformationCollection.md) | 외부 출처 정보를 검토 후보로 모으고 보강 조회하는 경계 |
+| T-14 | [CommunityDynamicTopicDiscovery.md](../Architecture/CommunityDynamicTopicDiscovery.md) | 음식·화물 글을 동적 주제로 투영하고 관련 정보를 연결하는 경계 |
+| T-15 | [UnitedStatesThirdPartyLogisticsProviderDirectory.md](../Architecture/UnitedStatesThirdPartyLogisticsProviderDirectory.md) | 미국 3PL 후보와 규제·제휴·실계약을 분리하는 기준 |
+| T-16 | [ExportLedgerModel.md](../Architecture/ExportLedgerModel.md) | 개별수출과 공동 선적에서 수출자별 원장·서류·실적을 보존하는 기준 |
 
 ## 관리 원칙
 
@@ -81,3 +89,4 @@
 4. 새 화면을 추가하면 `app-page-catalog.md`, `page-docs/`, 캡처 이미지부터 갱신한다.
 5. 화면 간 상태 전파나 시퀀스는 `workflow-app-screen-map.md`에 둔다.
 6. 사용자 내비게이션은 3단계 화면 구조로 먼저 설명하고, 프로젝트별 표는 코드 위치를 찾는 용도로 사용한다.
+7. 날짜별 구현·검증 기록은 `docs/Changes/`, 현재의 장기 기준은 `docs/Architecture/`와 `docs/Versions/`에 둔다.

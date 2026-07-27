@@ -22,7 +22,7 @@ public sealed class CommunityPostComposerViewModelTests
         draft.Category = "자유";
         draft.WorkflowTag = "커뮤니티 신뢰";
         draft.RoleTag = "플랫폼 구성원";
-        draft.Title = "공동수입 참여자를 찾습니다";
+        draft.Title = "같이 수입 참여자를 찾습니다";
         draft.Body = "조건을 먼저 함께 확인하고 싶습니다.";
         draft.IsAuthorDisplayCountryPublic = true;
         draft.AuthorDisplayCountryCode = "K";

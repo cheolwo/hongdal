@@ -77,7 +77,7 @@ public sealed class CommunityPostParticipationUseCase : ICommunityPostParticipat
         }
         if (!CommunityCollectiveIntentTypeCodes.IsSupported(request.CollectiveIntentTypeCode))
         {
-            throw new InvalidOperationException("공동구매, 공동수입 또는 공동수출 검토 의도만 가원장으로 기록할 수 있습니다.");
+            throw new InvalidOperationException("공동구매, 같이 수입 또는 공동수출 검토 의도만 가원장으로 기록할 수 있습니다.");
         }
         string intentTypeCode = CommunityCollectiveIntentTypeCodes.All.First((string code) => string.Equals(code, request.CollectiveIntentTypeCode.Trim(), StringComparison.OrdinalIgnoreCase));
         string tradeDirectionCode = NormalizeTradeDirectionCode(intentTypeCode, request.TradeDirectionCode);
@@ -261,7 +261,7 @@ public sealed class CommunityPostParticipationUseCase : ICommunityPostParticipat
         if (1 == 0)
         {
         }
-        string 원함 = ((intentTypeCode == "GroupImportCandidate") ? "공동수입 가능성과 당사자·통관·운송 조건을 비구속적으로 함께 검토합니다." : ((!(intentTypeCode == "GroupExportCandidate")) ? "공동구매 가능성과 조건을 비구속적으로 함께 검토합니다." : "공동수출 가능성과 당사자·통관·운송 조건을 비구속적으로 함께 검토합니다."));
+        string 원함 = ((intentTypeCode == "GroupImportCandidate") ? "같이 수입 가능성과 당사자·통관·운송 조건을 비구속적으로 함께 검토합니다." : ((!(intentTypeCode == "GroupExportCandidate")) ? "공동구매 가능성과 조건을 비구속적으로 함께 검토합니다." : "공동수출 가능성과 당사자·통관·운송 조건을 비구속적으로 함께 검토합니다."));
         if (1 == 0)
         {
         }

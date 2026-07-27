@@ -130,7 +130,7 @@ public sealed class 공동구매내원함조회UseCaseTests
         Assert.Equal("강남 배송권", active.배송권명);
         Assert.Equal("group-purchase-ledger-1", active.공동구매주문집계원장Id);
         Assert.Equal("individual-order-ledger-1", active.개별주문원장Id);
-        Assert.Equal("group-import-ledger-1", active.공동수입원장Id);
+        Assert.Equal("group-import-ledger-1", active.같이수입원장Id);
         Assert.Equal(7, active.목표참여자수);
         Assert.Equal(110m, active.목표수량);
         Assert.Equal(20m, active.자동집단요약!.총희망수량);

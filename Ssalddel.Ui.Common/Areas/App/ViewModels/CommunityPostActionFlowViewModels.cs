@@ -168,7 +168,7 @@ public sealed class CommunityPostActionFlowViewModel
             return new(
                 CommunityPostPrimaryActionKind.ShowParticipationDetails,
                 "가원장으로 이어갈 만큼 마음이 모였어요",
-                "글 작성자가 공동구매·공동수입·공동수출 중 어떤 방향으로 조건을 모을지 정할 수 있습니다.",
+                "글 작성자가 공동구매·같이수입·공동수출 중 어떤 방향으로 조건을 모을지 정할 수 있습니다.",
                 "가원장 방향 정하기",
                 null);
         }

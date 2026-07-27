@@ -294,8 +294,8 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(공동구매원장절차Client)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(I공동수입원장전환Client)
-            && x.ImplementationType == typeof(공동수입원장전환Client)
+            x.ServiceType == typeof(I같이수입원장전환Client)
+            && x.ImplementationType == typeof(같이수입원장전환Client)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(I판매채널Client)
@@ -532,20 +532,20 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(출고포장ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(공동수입원장물류ViewModel)
-            && x.ImplementationType == typeof(공동수입원장물류ViewModel)
+            x.ServiceType == typeof(같이수입원장물류ViewModel)
+            && x.ImplementationType == typeof(같이수입원장물류ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(I공동수입선적통관Client)
-            && x.ImplementationType == typeof(공동수입선적통관Client)
+            x.ServiceType == typeof(I같이수입선적통관Client)
+            && x.ImplementationType == typeof(같이수입선적통관Client)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(공동수입선적통관ViewModel)
-            && x.ImplementationType == typeof(공동수입선적통관ViewModel)
+            x.ServiceType == typeof(같이수입선적통관ViewModel)
+            && x.ImplementationType == typeof(같이수입선적통관ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(공동수입통관동기화ViewModel)
-            && x.ImplementationType == typeof(공동수입통관동기화ViewModel)
+            x.ServiceType == typeof(같이수입통관동기화ViewModel)
+            && x.ImplementationType == typeof(같이수입통관동기화ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매협상쟁점합의ViewModel)
@@ -645,8 +645,8 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             scopedProvider.GetRequiredService<공동구매협상쟁점합의ViewModel>(),
             groupPurchase.공급.세부업무목록);
         Assert.Contains(
-            scopedProvider.GetRequiredService<공동수입통관동기화ViewModel>(),
-            groupPurchase.공동수입.세부업무목록);
+            scopedProvider.GetRequiredService<같이수입통관동기화ViewModel>(),
+            groupPurchase.같이수입.세부업무목록);
         Assert.Contains(
             scopedProvider.GetRequiredService<공동구매커머스문서조회ViewModel>(),
             groupPurchase.실행.세부업무목록);

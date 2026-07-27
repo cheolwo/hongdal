@@ -42,9 +42,9 @@
                     </MudChip>
                 </MudStack>
                 <MudGrid>
-                    @for (var index = 0; index < 공동수입선적통관ViewModel.선적단계.Count; index++)
+                    @for (var index = 0; index < 같이수입선적통관ViewModel.선적단계.Count; index++)
                     {
-                        var step = 공동수입선적통관ViewModel.선적단계[index];
+                        var step = 같이수입선적통관ViewModel.선적단계[index];
                         var active = string.Equals(step.코드, ViewModel.선적통관.현재선적?.현재상태코드, StringComparison.OrdinalIgnoreCase);
                         <MudItem xs="12" sm="6" lg="4">
                             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="py-1">
@@ -68,7 +68,7 @@
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                    <MudText Typo="Typo.caption" Color="Color.Secondary">공동수입 원장</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">같이 수입 원장</MudText>
                     <MudText Typo="Typo.subtitle1">@(ViewModel.원장물류.저장된원장?.GroupImportLedgerId ?? "-")</MudText>
                 </MudPaper>
             </MudItem>
@@ -88,7 +88,7 @@
         get
         {
             var statusCode = ViewModel.선적통관.현재선적?.현재상태코드;
-            return 공동수입선적통관ViewModel.선적단계.FirstOrDefault(step =>
+            return 같이수입선적통관ViewModel.선적단계.FirstOrDefault(step =>
                        string.Equals(step.코드, statusCode, StringComparison.OrdinalIgnoreCase))?.표시명
                    ?? "선적 문서 대기";
         }

@@ -574,12 +574,12 @@ public static class SsalddelWorkflowRelations
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.WarehouseFulfillment,
             SsalddelWorkflowRelationKind.HandsOffTo,
-            "국내 3PL 입고를 선택하면 공동수입 물품을 창고 입고, 재고, 출고 가능 상태로 넘깁니다."),
+            "국내 3PL 입고를 선택하면 같이 수입 물품을 창고 입고, 재고, 출고 가능 상태로 넘깁니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.SalesChannelFulfillment,
             SsalddelWorkflowRelationKind.Feeds,
-            "공동수입 재고를 스마트스토어, 쿠팡, Amazon 같은 판매채널 출품 후보로 공급합니다."),
+            "같이 수입 재고를 스마트스토어, 쿠팡, Amazon 같은 판매채널 출품 후보로 공급합니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.HrParticipation,
@@ -937,15 +937,15 @@ public static class SsalddelWorkflowScreens
             "Orderer",
             "SsalddelApp",
             "살뜰 앱",
-            "공동수입 상품 선택",
+            "같이 수입 상품 선택",
             "/community/group-import",
-            "주문자가 HS 코드와 통관 주의 태그를 확인하고 공동수입 상품 후보를 선택합니다."),
+            "주문자가 HS 코드와 통관 주의 태그를 확인하고 같이 수입 상품 후보를 선택합니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             "OrdererGroupLeader",
             "SsalddelApp",
             "살뜰 앱",
-            "공동수입 선택안",
+            "같이 수입 선택안",
             "/community/group-import",
             "주문자 집단 대표가 HS 코드 상품 후보, 운송 방식과 공동 선택 조건을 조정합니다."),
         new(

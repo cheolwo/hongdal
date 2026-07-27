@@ -7,7 +7,7 @@ public sealed class 공동주택반입예정PageViewModel : 창고PageViewModelB
 {
     public 공동주택반입예정PageViewModel(
         창고작업세션상태ViewModel 세션,
-        공동수입원장물류ViewModel 원장물류,
+        같이수입원장물류ViewModel 원장물류,
         입고예정조회ViewModel 입고예정조회)
         : base(
             세션,
@@ -19,7 +19,7 @@ public sealed class 공동주택반입예정PageViewModel : 창고PageViewModelB
         this.입고예정조회 = 구성요소등록(입고예정조회);
     }
 
-    public 공동수입원장물류ViewModel 원장물류 { get; }
+    public 같이수입원장물류ViewModel 원장물류 { get; }
     public 입고예정조회ViewModel 입고예정조회 { get; }
     public bool 처리중 => 원장물류.처리중 || 입고예정조회.처리중;
 

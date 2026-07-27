@@ -36,7 +36,7 @@ public static partial class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 공동수입 준비 Process Manager를 등록합니다.
+    /// 같이 수입 준비 Process Manager를 등록합니다.
     /// 앞 단계 집단, Business Case와 공공데이터 배치는 이 모듈이 소유한 Port 구현을 서버가 별도로 제공해야 합니다.
     /// </summary>
     public static IServiceCollection AddSsalddelGroupImportReadinessProcessModule(
@@ -44,13 +44,13 @@ public static partial class ServiceCollectionExtensions
     {
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddSingleton<
-            I공동수입준비ProcessManager,
-            공동수입준비ProcessManager>();
+            I같이수입준비ProcessManager,
+            같이수입준비ProcessManager>();
         return services;
     }
 
     /// <summary>
-    /// 단일 서버 구성에서 공동수입 준비 Port를 기존 Mongo·커뮤니티·배치 구현으로 연결합니다.
+    /// 단일 서버 구성에서 같이 수입 준비 Port를 기존 Mongo·커뮤니티·배치 구현으로 연결합니다.
     /// 서버를 분리할 때는 이 메서드 대신 같은 Port의 HTTP 또는 메시지 Adapter를 등록합니다.
     /// </summary>
     public static IServiceCollection AddSsalddelGroupImportReadinessLocalAdapters(
@@ -58,25 +58,25 @@ public static partial class ServiceCollectionExtensions
     {
         services.AddSsalddelGroupPurchaseDemandLocalInfrastructure();
         services.TryAddSingleton<
-            I공동수입준비SourceGroupReader,
-            공동수입준비LocalSourceGroupReader>();
+            I같이수입준비SourceGroupReader,
+            같이수입준비LocalSourceGroupReader>();
         services.TryAddSingleton<
-            I공동수입준비BusinessCaseStore,
-            공동수입준비LocalBusinessCaseStore>();
+            I같이수입준비BusinessCaseStore,
+            같이수입준비LocalBusinessCaseStore>();
         services.TryAddSingleton<
-            I공동수입준비EvidenceBatchReader,
-            공동수입준비LocalEvidenceBatchReader>();
+            I같이수입준비EvidenceBatchReader,
+            같이수입준비LocalEvidenceBatchReader>();
         return services;
     }
 
     /// <summary>
-    /// 공동수입 준비 정기 점검 BackgroundService를 선택적으로 등록합니다.
+    /// 같이 수입 준비 정기 점검 BackgroundService를 선택적으로 등록합니다.
     /// </summary>
     public static IServiceCollection AddSsalddelGroupImportReadinessBackgroundProcessing(
         this IServiceCollection services)
     {
         services.AddSsalddelGroupImportReadinessProcessModule();
-        services.AddHostedService<공동수입준비정기점검BackgroundService>();
+        services.AddHostedService<같이수입준비정기점검BackgroundService>();
         return services;
     }
 
@@ -133,8 +133,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I공급자관심구독Service, 공급자관심구독Service>();
         services.AddSingleton<ICollectiveProcurementPlanningStore, MongoCollectiveProcurementPlanningStore>();
         services.AddScoped<ICollectiveProcurementPlanningService, CollectiveProcurementPlanningService>();
-        services.AddScoped<I공동수입준비원장Service, 공동수입준비원장Service>();
-        services.AddScoped<I공동수입준비주문자조회UseCase, 공동수입준비주문자조회UseCase>();
+        services.AddScoped<I같이수입준비원장Service, 같이수입준비원장Service>();
+        services.AddScoped<I같이수입준비주문자조회UseCase, 같이수입준비주문자조회UseCase>();
         services.AddSingleton<IIncoterms도움말조회UseCase, Incoterms도움말조회UseCase>();
         services.AddSsalddelGroupImportReadinessLocalAdapters();
         services.AddSsalddelGroupImportReadinessBackgroundProcessing();

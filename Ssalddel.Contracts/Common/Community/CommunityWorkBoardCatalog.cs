@@ -84,7 +84,7 @@ internal static class CommunityWorkBoardCatalog
                     "커뮤니티원장변경됨Event",
                     "activity-collective-ledger-changed",
                     "공동 원장 변경",
-                    "공동구매·공동수입 원장의 공개 가능한 진행 단계가 변경되었습니다.")
+                    "공동구매·같이 수입 원장의 공개 가능한 진행 단계가 변경되었습니다.")
             ],
             [
                 WebPage("공동구매 둘러보기", CommunityPageRoutes.GroupPurchase, "공동구매 목록과 모집 흐름 조회"),
@@ -140,7 +140,7 @@ internal static class CommunityWorkBoardCatalog
                     "화주통관의뢰등록됨Event",
                     "activity-customs-request-created",
                     "통관 의뢰 등록",
-                    "공동수입 준비 과정에서 통관 의뢰가 등록되었습니다."),
+                    "같이 수입 준비 과정에서 통관 의뢰가 등록되었습니다."),
                 Event(
                     "통관조회동의등록됨Event",
                     "activity-customs-consent-recorded",
@@ -153,8 +153,8 @@ internal static class CommunityWorkBoardCatalog
                     "통관 절차를 맡을 전문 역할에 수임 요청이 전달되었습니다.")
             ],
             [
-                WebPage("공동수입 준비", CommunityPageRoutes.GroupImport, "공동수입 원장 준비와 단계 확인"),
-                AppPage("OrdererApp", "공동수입 단계 상세", GroupPurchasePageRoutes.ImportOverviewTemplate, "stable-ID 공동수입 상세")
+                WebPage("같이 수입 준비", CommunityPageRoutes.GroupImport, "같이 수입 원장 준비와 단계 확인"),
+                AppPage("OrdererApp", "같이 수입 단계 상세", GroupPurchasePageRoutes.ImportOverviewTemplate, "stable-ID 같이 수입 상세")
             ]),
 
         WorkBoard(

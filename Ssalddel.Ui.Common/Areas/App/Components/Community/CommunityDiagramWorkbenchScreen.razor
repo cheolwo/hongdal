@@ -710,7 +710,7 @@
         new("export-exchange", CommunityLedgerTemplateKeys.Errand, "수출 교류장", "문화·사용 경험과 서로의 원함, 상호 이익·기여를 먼저 나누고 별도 동의 뒤 개별주문·개별수출로 이어지는 비구속 워크플로우입니다."),
         new("individual-import", CommunityLedgerTemplateKeys.IndividualImport, "개별수입 확장 원장", "개별주문을 원천으로 두고 수입 주체, 해외 판매자, 선적, 통관과 국내 반출만 확장하는 워크플로우입니다."),
         new("individual-export", CommunityLedgerTemplateKeys.IndividualExport, "개별수출 확장 원장", "개별주문을 원천으로 두고 수출자·구매자, 거래조건, 요건·서류, 신고·수리와 적재 실적을 확장하는 워크플로우입니다."),
-        new("group-import", CommunityLedgerTemplateKeys.GroupImport, "공동수입 원장", "원천 공동구매, 수입 결정, 해외 선적, 통관, 3PL 입고 워크플로우입니다."),
+        new("group-import", CommunityLedgerTemplateKeys.GroupImport, "같이 수입 원장", "원천 공동구매, 수입 결정, 해외 선적, 통관, 3PL 입고 워크플로우입니다."),
         new("group-export", CommunityLedgerTemplateKeys.GroupExport, "공동수출 원장", "여러 개별수출의 신고를 보존하면서 집하, 합포장, 포워더 인계와 공동 선적을 조율하는 워크플로우입니다."),
         new("community", CommunityLedgerTemplateKeys.Errand, "생활 요청 원장", "대화, 참여 신청, 역할 나누기, 베스트 원장 후보 워크플로우입니다.")
     ];
@@ -841,13 +841,13 @@
         new("individual-export", "export-feedback-consent", "완료 후 교류 환류 동의", "개별수출 확장", "완료 경험의 공개 범위와 비식별 처리, 철회 상태를 참여자별로 둡니다.", "confirm", Icons.Material.Filled.FactCheck, Color.Info),
         new("individual-export", "export-feedback", "비식별 경험·편익 공유", "개별수출 확장", "동의한 경험과 편익만 원천 교류장에 선택적으로 되돌립니다.", "confirm", Icons.Material.Filled.Share, Color.Info),
 
-        new("group-import", "group-source-purchase", "원천 공동구매", "공동수입", "확정된 공동구매 원장과 수량 합계를 수입 근거로 연결합니다.", "product", Icons.Material.Filled.Hub, Color.Primary),
-        new("group-import", "group-import-decision", "수입 결정", "공동수입", "수입 진행 여부, 가격, FCL/LCL 판단과 공급자 조건을 둡니다.", "confirm", Icons.Material.Filled.TaskAlt, Color.Success),
-        new("group-import", "group-overseas-shipment", "해외 선적", "공동수입", "해외 발송, 선적 문서, 진행 추적 정보를 둡니다.", "delivery", Icons.Material.Filled.Public, Color.Secondary),
-        new("group-import", "group-customs-release", "통관/반출", "공동수입", "통관 상태, 문서관리번호, 국내 반출 가능 상태를 둡니다.", "confirm", Icons.Material.Filled.FactCheck, Color.Info),
-        new("group-import", "group-third-party-inbound", "3PL 입고", "공동수입", "국내 3PL 창고 입고와 검수 연결 지점을 둡니다.", "warehouse", Icons.Material.Filled.Warehouse, Color.Success),
-        new("group-import", "group-household-distribution", "세대 분배", "공동수입", "참여자별 분배, 국내 배송, 수령 확인 흐름을 둡니다.", "delivery", Icons.Material.Filled.LocalShipping, Color.Secondary),
-        new("group-import", "group-settlement-receipt", "정산/수령", "공동수입", "수입 비용 정산, 수령 확인, 남은 이슈 마감을 둡니다.", "confirm", Icons.Material.Filled.Payments, Color.Info),
+        new("group-import", "group-source-purchase", "원천 공동구매", "같이수입", "확정된 공동구매 원장과 수량 합계를 수입 근거로 연결합니다.", "product", Icons.Material.Filled.Hub, Color.Primary),
+        new("group-import", "group-import-decision", "수입 결정", "같이수입", "수입 진행 여부, 가격, FCL/LCL 판단과 공급자 조건을 둡니다.", "confirm", Icons.Material.Filled.TaskAlt, Color.Success),
+        new("group-import", "group-overseas-shipment", "해외 선적", "같이수입", "해외 발송, 선적 문서, 진행 추적 정보를 둡니다.", "delivery", Icons.Material.Filled.Public, Color.Secondary),
+        new("group-import", "group-customs-release", "통관/반출", "같이수입", "통관 상태, 문서관리번호, 국내 반출 가능 상태를 둡니다.", "confirm", Icons.Material.Filled.FactCheck, Color.Info),
+        new("group-import", "group-third-party-inbound", "3PL 입고", "같이수입", "국내 3PL 창고 입고와 검수 연결 지점을 둡니다.", "warehouse", Icons.Material.Filled.Warehouse, Color.Success),
+        new("group-import", "group-household-distribution", "세대 분배", "같이수입", "참여자별 분배, 국내 배송, 수령 확인 흐름을 둡니다.", "delivery", Icons.Material.Filled.LocalShipping, Color.Secondary),
+        new("group-import", "group-settlement-receipt", "정산/수령", "같이수입", "수입 비용 정산, 수령 확인, 남은 이슈 마감을 둡니다.", "confirm", Icons.Material.Filled.Payments, Color.Info),
 
         new("group-export", "group-export-individuals", "개별수출 원장 집합", "공동수출", "원천 주문과 수출자별 신고를 가진 개별수출 원장들을 연결합니다.", "product", Icons.Material.Filled.Hub, Color.Primary),
         new("group-export", "group-export-trade-context", "B2B/B2C 문맥 집계", "공동수출", "B2B/B2C 문맥을 개별 원장에 보존한 채 건수·금액을 구분 집계합니다.", "work", Icons.Material.Filled.Rule, Color.Warning),
@@ -1015,7 +1015,7 @@
         new(
             "group-import",
             "group-import-main",
-            "공동수입 절차",
+            "같이 수입 절차",
             CommunityLedgerTemplateKeys.GroupImport,
             [
                 FindPaletteBlock("group-import", "group-source-purchase"),

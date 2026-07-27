@@ -47,4 +47,4 @@
 
 ## 현재 작업 적용
 
-지역 허브와 상품 근거는 `regional-culture-public-data`, 댓글 국가 공개와 프로필 기본값은 `community-foundation`, 비용 미리보기는 `individual-intent`로 커밋한다. 공동구매·공동수입 연결은 route 문맥만 앞 단계에 둘 수 있지만 상태 생성은 각각 `group-purchase`, `trade-readiness` 영역의 명시적 동의 뒤에서만 수행한다.
+지역 허브와 상품 근거는 `regional-culture-public-data`, 댓글 국가 공개와 프로필 기본값은 `community-foundation`, 비용 미리보기는 `individual-intent`로 커밋한다. 공동구매·같이 수입 연결은 route 문맥만 앞 단계에 둘 수 있지만 상태 생성은 각각 `group-purchase`, `trade-readiness` 영역의 명시적 동의 뒤에서만 수행한다.

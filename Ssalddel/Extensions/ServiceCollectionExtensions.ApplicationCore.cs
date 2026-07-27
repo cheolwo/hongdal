@@ -83,7 +83,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I보조기능설정UseCase, 보조기능설정UseCase>();
         services.AddScoped<IHS코드운영UseCase, HS코드운영UseCase>();
         services.AddScoped<I화주HS코드검토조회UseCase, 화주HS코드검토조회UseCase>();
-        services.AddScoped<I공동수입HS코드조회UseCase, 공동수입HS코드조회UseCase>();
+        services.AddScoped<I같이수입HS코드조회UseCase, 같이수입HS코드조회UseCase>();
         services.AddScoped<I사용자행위로그조회UseCase, 사용자행위로그조회UseCase>();
         services.AddScoped<I공통콘텐츠관리UseCase, 공통콘텐츠관리UseCase>();
         services.AddScoped<IKieAi콜백UseCase, KieAi콜백UseCase>();
@@ -149,7 +149,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<ICommunityVoteStore, MongoCommunityVoteStore>();
         services.AddSingleton<I공동구매원장캠페인Store, CommunityVote공동구매원장캠페인Store>();
         services.AddScoped<I공동구매원장절차Service, 공동구매원장절차Service>();
-        services.AddScoped<I공동수입원장전환Service, 공동수입원장전환Service>();
+        services.AddScoped<I같이수입원장전환Service, 같이수입원장전환Service>();
         services.AddScoped<ICommunityGroupPurchaseDemandOutboxProcessor, CommunityGroupPurchaseDemandOutboxProcessor>();
         services.AddScoped<ICommunityVoteService>(serviceProvider =>
             new CommunityVoteService(

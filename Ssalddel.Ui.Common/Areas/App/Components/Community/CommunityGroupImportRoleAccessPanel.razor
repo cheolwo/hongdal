@@ -3,7 +3,7 @@
 @using Ssalddel.Ui.Common.Areas.App.Services
 @inject PlatformCommunityService CommunityService
 
-<section class="group-import-role-access" aria-label="공동수입 역할별 다이어그램 권한">
+<section class="group-import-role-access" aria-label="같이 수입 역할별 다이어그램 권한">
     <MudExpansionPanels Elevation="0" Outlined="true">
         <MudExpansionPanel Text="관세사 다이어그램 권한 조정" Icon="@Icons.Material.Filled.AdminPanelSettings">
             @if (isLoading)
@@ -41,7 +41,7 @@
                     {
                         <MudSwitch T="bool"
                                    @bind-Value="draft.AccessEnabled"
-                                   Label="이 관세사의 공동수입 원장 접근 허용"
+                                   Label="이 관세사의 같이 수입 원장 접근 허용"
                                    Color="Color.Primary" />
 
                         <MudSelect T="string"
@@ -52,7 +52,7 @@
                                    Disabled="@(!draft.AccessEnabled)">
                             <MudSelectItem Value="@CommunityLedgerNodeViewScopes.RoleOnly">관세사 역할 노드만</MudSelectItem>
                             <MudSelectItem Value="@CommunityLedgerNodeViewScopes.SelectedNodes">구매 측이 선택한 노드만</MudSelectItem>
-                            <MudSelectItem Value="@CommunityLedgerNodeViewScopes.EntireDiagram">전체 공동수입 흐름</MudSelectItem>
+                            <MudSelectItem Value="@CommunityLedgerNodeViewScopes.EntireDiagram">전체 같이 수입 흐름</MudSelectItem>
                         </MudSelect>
 
                         @if (draft.ViewScope == CommunityLedgerNodeViewScopes.SelectedNodes)

@@ -712,7 +712,7 @@ public static class CommunityCollectiveActionPreviewCatalog
         => new()
         {
             Id = Guid.Parse("11111111-1111-4111-8111-111111111111"),
-            Title = "성북 생활모임 올리브오일 공동수입",
+            Title = "성북 생활모임 올리브오일 같이수입",
             Summary = "한 가정이 부담 없이 쓸 수 있는 수량으로 나누고, 남은 적재 여력만큼 추가 참여를 확인하고 있습니다.",
             CommunityScope = "서울 성북 · 한국/스페인",
             CurrentPageKey = CommunityCollectiveActionPageKeys.InProgress,
@@ -820,7 +820,7 @@ public static class CommunityCollectiveActionPreviewCatalog
         return new CommunityCollectiveActionSnapshot
         {
             Id = Guid.Parse("55555555-5555-4555-8555-555555555555"),
-            Title = "뉴욕 생활모임 중국 공장 생활용품 공동수입",
+            Title = "뉴욕 생활모임 중국 공장 생활용품 같이수입",
             Summary = "미국 구매자들이 수량을 모으고 중국 공장에서 개별포장·문서·카톤 작업을 먼저 해 미국 후처리 비용을 줄일 수 있는지 견적을 비교합니다.",
             CommunityScope = "New York city · Census place 배달권",
             CurrentPageKey = CommunityCollectiveActionPageKeys.Party,
@@ -918,7 +918,7 @@ public static class CommunityCollectiveActionPreviewCatalog
         return new CommunityCollectiveActionSnapshot
         {
             Id = Guid.Parse("66666666-6666-4666-8666-666666666666"),
-            Title = "호주산 소고기 공동수입 · 전통시장 정육 배분",
+            Title = "호주산 소고기 같이 수입 · 전통시장 정육 배분",
             Summary = "해외 승인 작업장에서 도축·수출검역된 냉동육을 한국에서 검역·통관한 뒤, 지역 전통시장 정육 사업자가 부위별로 작업하고 동네 냉장배송 사업자가 참여자에게 전달하는 예시입니다.",
             CommunityScope = "서울 전통시장 생활권 · 한국/호주",
             CurrentPageKey = CommunityCollectiveActionPageKeys.Party,

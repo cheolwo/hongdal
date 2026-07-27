@@ -3,7 +3,7 @@
 <div class="group-import-hs-workspace">
     <header class="group-import-hs-header">
         <div>
-            <MudText Typo="Typo.overline" Class="group-import-hs-kicker">공동수입 원장 · 상품 선택</MudText>
+            <MudText Typo="Typo.overline" Class="group-import-hs-kicker">같이 수입 원장 · 상품 선택</MudText>
             <MudText Typo="Typo.h4">HS 코드로 함께 들여올 상품 정하기</MudText>
             <MudText Typo="Typo.body1" Class="group-import-hs-copy">
                 상품 분류와 통관 주의사항을 확인하고, 구매 후보를 모아 공동 선택안으로 엽니다.
@@ -27,10 +27,10 @@
     }
 
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-        이 화면의 상품 선택은 수입 의향을 모으는 단계입니다. 실제 공동수입 원장이 등록되면 승인되고 현재 수임 가능한 수입 전문 관세사에게 HS 코드 검토 알림이 자동으로 전달됩니다.
+        이 화면의 상품 선택은 수입 의향을 모으는 단계입니다. 실제 같이 수입 원장이 등록되면 승인되고 현재 수임 가능한 수입 전문 관세사에게 HS 코드 검토 알림이 자동으로 전달됩니다.
     </MudAlert>
 
-    <nav class="group-import-hs-tabs" role="tablist" aria-label="공동수입 상품 선택 화면">
+    <nav class="group-import-hs-tabs" role="tablist" aria-label="같이 수입 상품 선택 화면">
         <button type="button"
                 role="tab"
                 aria-selected="@(activeView == GroupImportView.Catalog)"
@@ -208,7 +208,7 @@
             <aside class="group-import-hs-selection" aria-labelledby="group-import-hs-selection-title">
                 <div class="group-import-hs-section-heading">
                     <div>
-                        <MudText Typo="Typo.h6" id="group-import-hs-selection-title">공동수입 후보</MudText>
+                        <MudText Typo="Typo.h6" id="group-import-hs-selection-title">같이 수입 후보</MudText>
                         <MudText Typo="Typo.body2" Color="Color.Secondary">@($"{selectedCandidates.Count}개 상품")</MudText>
                     </div>
                 </div>
@@ -262,7 +262,7 @@
                         <MudNumericField T="int" @bind-Value="draft.MinimumParticipantCount" Label="최소 참여자" Min="1" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         <MudNumericField T="int" @bind-Value="draft.MinimumTotalQuantity" Label="최소 총수량" Min="1" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         <MudNumericField T="int" @bind-Value="draft.OpenDays" Label="선택 기간(일)" Min="1" Max="30" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                        <MudTextField @bind-Value="draft.Description" Label="상품 조건과 공동수입 메모" Lines="3" Variant="Variant.Outlined" Class="group-import-hs-form-wide" />
+                        <MudTextField @bind-Value="draft.Description" Label="상품 조건과 같이 수입 메모" Lines="3" Variant="Variant.Outlined" Class="group-import-hs-form-wide" />
                     </div>
 
                     <MudButton Variant="Variant.Filled"
@@ -279,7 +279,7 @@
     }
     else
     {
-        <section class="group-import-hs-campaign-area" aria-label="진행 중인 공동수입 상품 선택">
+        <section class="group-import-hs-campaign-area" aria-label="진행 중인 같이 수입 상품 선택">
             <aside class="group-import-hs-campaign-list">
                 <div class="group-import-hs-section-heading">
                     <div>
@@ -404,7 +404,7 @@
                     }
                     else
                     {
-                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">마감된 선택안입니다. 결과와 후속 공동수입 원장을 확인해 주세요.</MudAlert>
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">마감된 선택안입니다. 결과와 후속 같이 수입 원장을 확인해 주세요.</MudAlert>
                     }
                 }
             </main>

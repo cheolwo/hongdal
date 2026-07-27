@@ -12,11 +12,11 @@ public sealed class Incoterms도움말조회UseCaseTests
     public void Cif는_비용과위험의이전구간을서로다르게표현한다()
     {
         var response = _useCase.조회("cif", DisplayLanguageCodes.Korean);
-        var cif = response.항목목록.Single(item => item.코드 == 공동수입준비Incoterms코드.Cif);
+        var cif = response.항목목록.Single(item => item.코드 == 같이수입준비Incoterms코드.Cif);
         var mainCarriage = cif.그림구간목록.Single(
             section => section.구간코드 == Incoterms도움말구간코드.주운송);
 
-        Assert.Equal(공동수입준비Incoterms코드.Cif, response.선택코드);
+        Assert.Equal(같이수입준비Incoterms코드.Cif, response.선택코드);
         Assert.Equal(Incoterms도움말역할코드.판매자, mainCarriage.비용부담역할코드);
         Assert.Equal(Incoterms도움말역할코드.구매자, mainCarriage.위험부담역할코드);
         Assert.True(cif.판매자보험부보여부);
@@ -31,15 +31,15 @@ public sealed class Incoterms도움말조회UseCaseTests
 
         Assert.Contains(
             "Sea",
-            response.항목목록.Single(item => item.코드 == 공동수입준비Incoterms코드.Fob).적용운송범위,
+            response.항목목록.Single(item => item.코드 == 같이수입준비Incoterms코드.Fob).적용운송범위,
             StringComparison.Ordinal);
         Assert.Contains(
             "Sea",
-            response.항목목록.Single(item => item.코드 == 공동수입준비Incoterms코드.Cif).적용운송범위,
+            response.항목목록.Single(item => item.코드 == 같이수입준비Incoterms코드.Cif).적용운송범위,
             StringComparison.Ordinal);
         Assert.Contains(
             "Any",
-            response.항목목록.Single(item => item.코드 == 공동수입준비Incoterms코드.Ddp).적용운송범위,
+            response.항목목록.Single(item => item.코드 == 같이수입준비Incoterms코드.Ddp).적용운송범위,
             StringComparison.Ordinal);
     }
 

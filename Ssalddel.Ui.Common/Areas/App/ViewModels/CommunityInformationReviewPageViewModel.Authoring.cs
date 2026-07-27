@@ -337,11 +337,11 @@ public sealed partial class CommunityInformationReviewPageViewModel
 
         if (!Diagram.LoadImportJourney(workspace.ImportJourney))
         {
-            StatusMessage = "저장된 여정이 없어 현재 공동수입 기본 흐름을 유지합니다.";
+            StatusMessage = "저장된 여정이 없어 현재 같이 수입 기본 흐름을 유지합니다.";
             return false;
         }
 
-        StatusMessage = "YouTube 영상에 연결해 둔 공동수입 여정과 업체 후보를 불러왔습니다.";
+        StatusMessage = "YouTube 영상에 연결해 둔 같이 수입 여정과 업체 후보를 불러왔습니다.";
         return true;
     }
 

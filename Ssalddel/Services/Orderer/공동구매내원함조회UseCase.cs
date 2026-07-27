@@ -192,7 +192,7 @@ public sealed class 공동구매내원함조회UseCase : I공동구매내원함�
             자동집단Id = 자동집단Id(ledger),
             공동구매주문집계원장Id = groupPurchaseLedgerId,
             개별주문원장Id = ownDemand?.개별주문원장Id ?? string.Empty,
-            공동수입원장Id = isClosed
+            같이수입원장Id = isClosed
                 ? string.Empty
                 : groupImportLedgerIds.GetValueOrDefault(groupPurchaseLedgerId)
                   ?? string.Empty,

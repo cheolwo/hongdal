@@ -7,11 +7,11 @@ public sealed class 음식점식재료공급요청작성ViewModel : 조립ViewMo
     public 음식점식재료공급요청작성ViewModel()
     {
         국내산지초안 = 기본초안(음식점식재료공급경로.국내산지);
-        공동수입초안 = 기본초안(음식점식재료공급경로.공동수입);
+        같이수입초안 = 기본초안(음식점식재료공급경로.같이수입);
     }
 
     public 음식점식재료공급요청Draft 국내산지초안 { get; }
-    public 음식점식재료공급요청Draft 공동수입초안 { get; }
+    public 음식점식재료공급요청Draft 같이수입초안 { get; }
 
     public 음식점식재료공급경로 공급경로
     {
@@ -30,7 +30,7 @@ public sealed class 음식점식재료공급요청작성ViewModel : 조립ViewMo
     public 음식점식재료공급요청Draft 현재초안
         => 공급경로 == 음식점식재료공급경로.국내산지
             ? 국내산지초안
-            : 공동수입초안;
+            : 같이수입초안;
 
     public string 경로명
         => 공급경로 == 음식점식재료공급경로.국내산지
@@ -85,7 +85,7 @@ public sealed class 음식점식재료공급요청작성ViewModel : 조립ViewMo
             errors.Add("희망 납품일은 오늘 이후로 선택해 주세요.");
         }
 
-        if (draft.공급경로 == 음식점식재료공급경로.공동수입)
+        if (draft.공급경로 == 음식점식재료공급경로.같이수입)
         {
             AddRequired(errors, draft.희망원산지, "수입 경로는 희망 원산지 또는 허용 범위를 입력해 주세요.");
         }

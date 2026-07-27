@@ -93,9 +93,9 @@ public sealed class CommunityInformationReviewPageViewModelTests
         {
             원장Id = "ledger-group-import-17",
             원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
-            원장템플릿명 = "공동수입 원장",
-            제목 = "호주 식재료 공동수입 검토",
-            WorkflowTag = "공동수입"
+            원장템플릿명 = "같이 수입 원장",
+            제목 = "호주 식재료 같이 수입 검토",
+            WorkflowTag = "같이수입"
         };
         viewModel.LedgerPicker.ReplaceItems([ledger]);
         viewModel.LedgerPicker.Open(null);

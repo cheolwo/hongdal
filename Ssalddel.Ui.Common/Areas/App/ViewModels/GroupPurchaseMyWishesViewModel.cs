@@ -35,7 +35,7 @@ public sealed class GroupPurchaseMyWishesViewModel(
                     group.Key,
                     primary.자동집단요약,
                     items,
-                    items.Select(item => item.공동수입원장Id)
+                    items.Select(item => item.같이수입원장Id)
                         .FirstOrDefault(id => !string.IsNullOrWhiteSpace(id)) ?? string.Empty);
             })
             .OrderBy(group => group.AllWishesClosed)

@@ -259,14 +259,14 @@ public sealed class CommunityVoteServiceTests
             CancellationToken.None);
         await service.CloseAsync(
             vote.Id,
-            new CommunityVoteCloseRequest { ClosedByDisplayName = "공동수입 대표" },
+            new CommunityVoteCloseRequest { ClosedByDisplayName = "같이 수입 대표" },
             CancellationToken.None);
         var draft = await service.CreateResolutionDraftAsync(
             vote.Id,
             new CommunityVoteResolutionDraftRequest
             {
-                DocumentTitle = "공동수입 확정안",
-                ResolutionText = "해외 출발 상품을 공동수입합니다.",
+                DocumentTitle = "같이 수입 확정안",
+                ResolutionText = "해외 출발 상품을 같이수입합니다.",
                 LegalReviewRequested = true
             },
             CancellationToken.None);
@@ -277,7 +277,7 @@ public sealed class CommunityVoteServiceTests
                 vote.Id,
                 new CommunityVoteResolutionReadyToSignRequest
                 {
-                    ReviewedByDisplayName = "공동수입 운영자"
+                    ReviewedByDisplayName = "같이 수입 운영자"
                 },
                 CancellationToken.None));
 

@@ -147,9 +147,9 @@ Priority modules:
 | 8 | 마트주문 원장 | SsalddelMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
 | 9 | 마트 배송 원장 | SsalddelMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
 | 10 | 공동구매 수요/묶음 원장 | Group purchase ledger | Independent order ledgers are aggregated for domestic purchase confirmation, pickup-point receipt, and participant distribution. |
-| 11 | 공동수입 결정 원장 | Group import ledger | A confirmed group-purchase ledger is linked as the source before import go/no-go, FCL/LCL, price, and quantity are decided. |
-| 12 | 공동수입 선적/통관 원장 | Group import ledger | Overseas shipment, documents, customs, and release state stay outside the domestic group-purchase ledger. |
-| 13 | 공동수입 입고/분배 원장 | Group import ledger | Domestic 3PL inbound and participant distribution coordinate the import ledger's downstream handoffs. |
+| 11 | 같이 수입 결정 원장 | Group import ledger | A confirmed group-purchase ledger is linked as the source before import go/no-go, FCL/LCL, price, and quantity are decided. |
+| 12 | 같이 수입 선적/통관 원장 | Group import ledger | Overseas shipment, documents, customs, and release state stay outside the domestic group-purchase ledger. |
+| 13 | 같이 수입 입고/분배 원장 | Group import ledger | Domestic 3PL inbound and participant distribution coordinate the import ledger's downstream handoffs. |
 | 14 | 결제/정산 표시 원장 | Cargo transport or related work ledger | Payment marks, counterpart confirmation, holds, and notes should remain participant-centered. |
 | 15 | 신고/분쟁 원장 | Errand or generic life-request ledger | Reports and disputes should not pollute ordinary workflow state, but they must remain linked. |
 | 16 | 음식 주문 원장 | Food delivery ledger | Menu order, restaurant acceptance, cooking, and ready state end before delivery begins. |
@@ -169,8 +169,8 @@ Representative ledger relationships:
 | 마트주문 원장 | 피킹/포장 원장 | Requires | `1:N` | Mart order and urban stock are confirmed. |
 | 공동구매 수요/묶음 원장 | 발주 주문 원장 | Contains | `1:N` | Domestic demand, producer conditions, and the fulfillment route are confirmed. |
 | 발주 주문 원장 | 판매·입고·출고·운송 원장 | Contains | `1:N` | The chosen traditional-market hub, 3PL, or direct collection-point route determines which fulfillment ledgers are required. |
-| 공동구매 수요/묶음 원장 | 공동수입 결정 원장 | Handoff | `N:1` | Confirmed demand is intentionally fulfilled through an overseas supplier. |
-| 공동수입 선적/통관 원장 | 공동수입 입고/분배 원장 | Handoff | `1:N` | Customs release opens domestic inbound or distribution. |
+| 공동구매 수요/묶음 원장 | 같이 수입 결정 원장 | Handoff | `N:1` | Confirmed demand is intentionally fulfilled through an overseas supplier. |
+| 같이 수입 선적/통관 원장 | 같이 수입 입고/분배 원장 | Handoff | `1:N` | Customs release opens domestic inbound or distribution. |
 | 피킹/포장 원장 | 마트 배송 원장 | Handoff | `N:1` | Packed mart orders can be bundled into one delivery run. |
 | 마트 배송 원장 | 결제/정산 표시 원장 | Reference | `1:1` | Delivery or receiver confirmation is complete. |
 | 운송진행 원장 | 신고/분쟁 원장 | Reference | `1:N` | Delay, damage, disagreement, or issue report appears. |

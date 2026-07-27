@@ -164,7 +164,7 @@ LLM이 반환할 최소 항목은 `재료표준명`, `자막근거구간`, `영�
 | 인증 주문자 | `GET` | `/api/v1/orderer/youtube-food-discovery/products?countryCode=US` | 지정 국가 채널에서 발견한 승인 상품 후보 목록 |
 | 인증 주문자 | `POST` | `/api/v1/orderer/youtube-food-discovery/products/{candidateId}/intents` | 구매·공동구매·수입검토 의향 등록 |
 
-주문자 API는 `1.0`의 `GroupPurchaseDemandWorkflow` 기능 플래그를 사용한다. 이 단계의 `수입검토` 선택도 구매·신고 실행이 아니라 비구속 관심 신호이며, 실제 공동수입 자료 검토는 `1.5`의 `CustomsAndTradeDataWorkflow`에서 별도로 연다.
+주문자 API는 `1.0`의 `GroupPurchaseDemandWorkflow` 기능 플래그를 사용한다. 이 단계의 `수입검토` 선택도 구매·신고 실행이 아니라 비구속 관심 신호이며, 실제 같이 수입 자료 검토는 `1.5`의 `CustomsAndTradeDataWorkflow`에서 별도로 연다.
 
 ## YouTube 정책과 운영 주의
 

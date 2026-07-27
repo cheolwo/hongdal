@@ -40,7 +40,7 @@ public sealed class 공동구매내원함응답
     public string 자동집단Id { get; set; } = string.Empty;
     public string 공동구매주문집계원장Id { get; set; } = string.Empty;
     public string 개별주문원장Id { get; set; } = string.Empty;
-    public string 공동수입원장Id { get; set; } = string.Empty;
+    public string 같이수입원장Id { get; set; } = string.Empty;
     public 공동구매자동집단요약응답? 자동집단요약 { get; set; }
     public DateTime 생성시각Utc { get; set; }
     public DateTime 수정시각Utc { get; set; }

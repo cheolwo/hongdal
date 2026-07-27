@@ -55,7 +55,7 @@ public sealed class Command알림PayloadTests
     }
 
     [Fact]
-    public void Parse_공동수입원장관세사알림필드를보존한다()
+    public void Parse_같이수입원장관세사알림필드를보존한다()
     {
         const string json = """
             {
@@ -64,7 +64,7 @@ public sealed class Command알림PayloadTests
               "ledgerId": "ledger-1",
               "hsCodes": "2106.90,8543.70",
               "deepLink": "/customs/hs-codes?communityLedgerId=ledger-1",
-              "title": "새 공동수입 원장이 등록되었습니다",
+              "title": "새 같이 수입 원장이 등록되었습니다",
               "body": "검토 요청입니다.",
               "channels": ["Push"]
             }
@@ -72,12 +72,12 @@ public sealed class Command알림PayloadTests
 
         var payload = Command알림Payload.Parse(json);
 
-        Assert.Equal(Command알림FeatureNames.공동수입원장등록, payload.NotificationType);
+        Assert.Equal(Command알림FeatureNames.같이수입원장등록, payload.NotificationType);
         Assert.Equal("broker-1", payload.TargetUserId);
         Assert.Equal("ledger-1", payload.LedgerId);
         Assert.Equal("2106.90,8543.70", payload.HsCodes);
         Assert.Equal("/customs/hs-codes?communityLedgerId=ledger-1", payload.DeepLink);
-        Assert.Contains(Command알림FeatureNames.공동수입원장등록, Command알림FeatureNames.발송지원목록);
+        Assert.Contains(Command알림FeatureNames.같이수입원장등록, Command알림FeatureNames.발송지원목록);
     }
 
     [Fact]

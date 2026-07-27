@@ -5,7 +5,7 @@ namespace Ssalddel.Tests.Contracts.Common.Community;
 public sealed class CommunityGroupPurchaseTradeRoutePolicyTests
 {
     [Fact]
-    public void 해외판매자_해외출발_한국배송_미통관이면_공동수입후보로판정한다()
+    public void 해외판매자_해외출발_한국배송_미통관이면_같이수입후보로판정한다()
     {
         var decision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
             new CommunityGroupPurchaseTradeRouteInput(
@@ -42,7 +42,7 @@ public sealed class CommunityGroupPurchaseTradeRoutePolicyTests
     }
 
     [Fact]
-    public void 국내판매자라도_해외출발_한국배송_미통관이면_공동수입후보로판정한다()
+    public void 국내판매자라도_해외출발_한국배송_미통관이면_같이수입후보로판정한다()
     {
         var decision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
             new CommunityGroupPurchaseTradeRouteInput(
@@ -75,7 +75,7 @@ public sealed class CommunityGroupPurchaseTradeRoutePolicyTests
     }
 
     [Fact]
-    public void 미국운영에서_한국출발_미국배송_미통관이면_공동수입후보로판정한다()
+    public void 미국운영에서_한국출발_미국배송_미통관이면_같이수입후보로판정한다()
     {
         var decision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
             new CommunityGroupPurchaseTradeRouteInput(

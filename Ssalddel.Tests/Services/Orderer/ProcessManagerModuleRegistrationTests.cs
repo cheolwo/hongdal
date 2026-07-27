@@ -8,7 +8,7 @@ namespace Ssalddel.Tests.Services.Orderer;
 public sealed class ProcessManagerModuleRegistrationTests
 {
     [Fact]
-    public void 공동구매_ProcessModule은_공동수입과_BackgroundService를_자동등록하지않는다()
+    public void 공동구매_ProcessModule은_같이수입과_BackgroundService를_자동등록하지않는다()
     {
         var services = new ServiceCollection();
 
@@ -17,65 +17,65 @@ public sealed class ProcessManagerModuleRegistrationTests
         AssertRegistered<I공동구매수요모집ProcessManager>(services);
         AssertRegistered<I공동구매수요모집ProcessStore>(services);
         AssertRegistered<I공동구매수요모집BatchCatalog>(services);
-        AssertNotRegistered<I공동수입준비ProcessManager>(services);
+        AssertNotRegistered<I같이수입준비ProcessManager>(services);
         Assert.Equal(
             0,
             HostedServiceCount<공동구매수요모집DeadlineScanBackgroundService>(services));
     }
 
     [Fact]
-    public void 공동수입_ProcessModule은_Port와_BackgroundService를_서버선택에맡긴다()
+    public void 같이수입_ProcessModule은_Port와_BackgroundService를_서버선택에맡긴다()
     {
         var services = new ServiceCollection();
 
         services.AddSsalddelGroupImportReadinessProcessModule();
 
-        AssertRegistered<I공동수입준비ProcessManager>(services);
-        AssertNotRegistered<I공동수입준비SourceGroupReader>(services);
-        AssertNotRegistered<I공동수입준비BusinessCaseStore>(services);
-        AssertNotRegistered<I공동수입준비EvidenceBatchReader>(services);
+        AssertRegistered<I같이수입준비ProcessManager>(services);
+        AssertNotRegistered<I같이수입준비SourceGroupReader>(services);
+        AssertNotRegistered<I같이수입준비BusinessCaseStore>(services);
+        AssertNotRegistered<I같이수입준비EvidenceBatchReader>(services);
         AssertNotRegistered<I공동구매수요모집ProcessManager>(services);
         Assert.Equal(
             0,
-            HostedServiceCount<공동수입준비정기점검BackgroundService>(services));
+            HostedServiceCount<같이수입준비정기점검BackgroundService>(services));
     }
 
     [Fact]
-    public void 공동수입_LocalAdapter는_앞단계ProcessManager없이_Port만연결한다()
+    public void 같이수입_LocalAdapter는_앞단계ProcessManager없이_Port만연결한다()
     {
         var services = new ServiceCollection();
 
         services.AddSsalddelGroupImportReadinessLocalAdapters();
 
-        AssertRegistered<I공동수입준비SourceGroupReader>(services);
-        AssertRegistered<I공동수입준비BusinessCaseStore>(services);
-        AssertRegistered<I공동수입준비EvidenceBatchReader>(services);
+        AssertRegistered<I같이수입준비SourceGroupReader>(services);
+        AssertRegistered<I같이수입준비BusinessCaseStore>(services);
+        AssertRegistered<I같이수입준비EvidenceBatchReader>(services);
         AssertNotRegistered<I공동구매수요모집ProcessManager>(services);
-        AssertNotRegistered<I공동수입준비ProcessManager>(services);
+        AssertNotRegistered<I같이수입준비ProcessManager>(services);
     }
 
     [Fact]
-    public void 공동수입_서버가제공한_RemoteAdapter는_LocalAdapter가덮어쓰지않는다()
+    public void 같이수입_서버가제공한_RemoteAdapter는_LocalAdapter가덮어쓰지않는다()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<I공동수입준비SourceGroupReader>(_ =>
+        services.AddSingleton<I같이수입준비SourceGroupReader>(_ =>
             throw new NotSupportedException("remote source adapter"));
-        services.AddSingleton<I공동수입준비BusinessCaseStore>(_ =>
+        services.AddSingleton<I같이수입준비BusinessCaseStore>(_ =>
             throw new NotSupportedException("remote business-case adapter"));
-        services.AddSingleton<I공동수입준비EvidenceBatchReader>(_ =>
+        services.AddSingleton<I같이수입준비EvidenceBatchReader>(_ =>
             throw new NotSupportedException("remote evidence adapter"));
 
         services.AddSsalddelGroupImportReadinessLocalAdapters();
 
         Assert.Single(
             services,
-            descriptor => descriptor.ServiceType == typeof(I공동수입준비SourceGroupReader));
+            descriptor => descriptor.ServiceType == typeof(I같이수입준비SourceGroupReader));
         Assert.Single(
             services,
-            descriptor => descriptor.ServiceType == typeof(I공동수입준비BusinessCaseStore));
+            descriptor => descriptor.ServiceType == typeof(I같이수입준비BusinessCaseStore));
         Assert.Single(
             services,
-            descriptor => descriptor.ServiceType == typeof(I공동수입준비EvidenceBatchReader));
+            descriptor => descriptor.ServiceType == typeof(I같이수입준비EvidenceBatchReader));
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public sealed class ProcessManagerModuleRegistrationTests
             HostedServiceCount<공동구매수요모집DeadlineScanBackgroundService>(services));
         Assert.Equal(
             1,
-            HostedServiceCount<공동수입준비정기점검BackgroundService>(services));
+            HostedServiceCount<같이수입준비정기점검BackgroundService>(services));
     }
 
     [Fact]
@@ -104,16 +104,16 @@ public sealed class ProcessManagerModuleRegistrationTests
         services.AddSsalddelDomainServices();
 
         AssertRegistered<I공동구매수요모집ProcessManager>(services);
-        AssertRegistered<I공동수입준비ProcessManager>(services);
-        AssertRegistered<I공동수입준비SourceGroupReader>(services);
-        AssertRegistered<I공동수입준비BusinessCaseStore>(services);
-        AssertRegistered<I공동수입준비EvidenceBatchReader>(services);
+        AssertRegistered<I같이수입준비ProcessManager>(services);
+        AssertRegistered<I같이수입준비SourceGroupReader>(services);
+        AssertRegistered<I같이수입준비BusinessCaseStore>(services);
+        AssertRegistered<I같이수입준비EvidenceBatchReader>(services);
         Assert.Equal(
             1,
             HostedServiceCount<공동구매수요모집DeadlineScanBackgroundService>(services));
         Assert.Equal(
             1,
-            HostedServiceCount<공동수입준비정기점검BackgroundService>(services));
+            HostedServiceCount<같이수입준비정기점검BackgroundService>(services));
     }
 
     private static void AssertRegistered<TService>(IServiceCollection services)

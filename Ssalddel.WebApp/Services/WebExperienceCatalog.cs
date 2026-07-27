@@ -13,7 +13,7 @@ public static class WebExperienceCatalog
             "role-experience--community",
             "COMMUNITY · ORDERER",
             "주문자·커뮤니티",
-            "동네 글을 읽고 공동구매나 공동수입 제안을 구체화하는 화면입니다.",
+            "동네 글을 읽고 공동구매나 같이 수입 제안을 구체화하는 화면입니다.",
             "/images/role-previews/community-orderer.png",
             "모바일 살뜰 게시판 화면",
             Icons.Material.Filled.Groups,
@@ -22,7 +22,7 @@ public static class WebExperienceCatalog
             [
                 new("살뜰 게시판", "동네 글과 댓글, 연결된 업무 원장을 함께 봅니다.", "/community", Icons.Material.Filled.Forum, "커뮤니티"),
                 new("공동구매 제안", "참여자와 수량, 가격, 공급 조건을 맞춥니다.", CommunityPageRoutes.GroupPurchaseCreate, Icons.Material.Filled.GroupAdd, "공동구매"),
-                new("공동수입 검토", "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", "/community/group-import", Icons.Material.Filled.Public, "공동수입"),
+                new("같이 수입 검토", "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", "/community/group-import", Icons.Material.Filled.Public, "같이수입"),
                 new("3개국 농수산물 가격", "한국·미국·호주의 공식 가격 자료를 단위와 조사 단계별로 비교합니다.", "/information/public-data", Icons.Material.Filled.Insights, "공개 정보")
             ]),
         new(

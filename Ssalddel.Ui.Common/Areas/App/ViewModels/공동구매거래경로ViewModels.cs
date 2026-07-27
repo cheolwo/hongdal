@@ -48,7 +48,7 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
 
     public string 거래경로코드 => 판정.RouteCode;
 
-    public bool 공동수입후보 => 판정.IsGroupImportCandidate;
+    public bool 같이수입후보 => 판정.IsGroupImportCandidate;
 
     public bool 해외수출후보
         => 거래경로코드 == CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder
@@ -91,7 +91,7 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
                 => 정규화운영국가코드 == CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode
                     ? "국내 공동구매"
                     : $"{운영국가표시명} 내 공동구매",
-            CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate => "공동수입 후보",
+            CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate => "같이 수입 후보",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder when 해외수출후보 => "해외 수출",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder => "기타 국경 간 거래",
             _ => "거래경로 확인 필요"
@@ -243,7 +243,7 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
     {
         OnPropertyChanged(nameof(판정));
         OnPropertyChanged(nameof(거래경로코드));
-        OnPropertyChanged(nameof(공동수입후보));
+        OnPropertyChanged(nameof(같이수입후보));
         OnPropertyChanged(nameof(해외수출후보));
         OnPropertyChanged(nameof(정규화운영국가코드));
         OnPropertyChanged(nameof(운영국가표시명));
@@ -296,12 +296,12 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
 }
 
 /// <summary>
-/// 공동수입 후보가 계약 확정 단계로 넘어가기 전에 필요한 정보를 관리합니다.
+/// 같이 수입 후보가 계약 확정 단계로 넘어가기 전에 필요한 정보를 관리합니다.
 /// 제안 단계에서는 HS 코드가 없어도 후보를 만들 수 있지만 계약 확정 준비는 완료되지 않습니다.
 /// </summary>
-public sealed partial class 공동수입전환준비ViewModel : 조립ViewModelBase
+public sealed partial class 같이수입전환준비ViewModel : 조립ViewModelBase
 {
-    public 공동수입전환준비ViewModel(공동구매거래경로판정ViewModel 거래경로)
+    public 같이수입전환준비ViewModel(공동구매거래경로판정ViewModel 거래경로)
     {
         this.거래경로 = 하위ViewModel등록(거래경로, 수명소유: false);
     }
@@ -320,10 +320,10 @@ public sealed partial class 공동수입전환준비ViewModel : 조립ViewModelB
 
     public bool HS코드유효 => 정규화HS코드.Length is >= 2 and <= 10;
 
-    public bool 공동수입전환대상 => 거래경로.공동수입후보;
+    public bool 같이수입전환대상 => 거래경로.같이수입후보;
 
     public bool 계약확정준비완료
-        => 공동수입전환대상
+        => 같이수입전환대상
            && !거래경로.검토필요
            && HS코드유효;
 
@@ -332,7 +332,7 @@ public sealed partial class 공동수입전환준비ViewModel : 조립ViewModelB
         get
         {
             var missing = 거래경로.누락정보.ToList();
-            if (공동수입전환대상 && !HS코드유효)
+            if (같이수입전환대상 && !HS코드유효)
             {
                 missing.Add("HS 코드");
             }

@@ -1,12 +1,12 @@
 @page "/group-purchase/imports/{LedgerId}/costs"
 
-<PageTitle>공동수입 비용 검토</PageTitle>
+<PageTitle>같이 수입 비용 검토</PageTitle>
 
 <GroupImportReadinessRouteFrame LedgerId="@LedgerId"
                                 AutoGroupId="@AutoGroupId"
                                 CurrentSection="GroupImportReadinessSection.Costs"
                                 ScreenCode="02.10"
-                                Title="공동수입 비용 검토"
+                                Title="같이 수입 비용 검토"
                                 Description="공통비·개별부담과 계산 근거를 분리해 봅니다.">
     <ChildContent Context="ledger">
         <GroupImportReadinessCostsScreen Ledger="ledger" />

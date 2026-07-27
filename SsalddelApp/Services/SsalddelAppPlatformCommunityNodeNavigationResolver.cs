@@ -52,7 +52,7 @@ public sealed class SsalddelAppPlatformCommunityNodeNavigationResolver
 
         if (request.IsLedgerTemplate(CommunityLedgerTemplateKeys.GroupImport))
         {
-            return Community(CommunityPageRoutes.GroupImport, "공동수입 원장 화면");
+            return Community(CommunityPageRoutes.GroupImport, "같이 수입 원장 화면");
         }
 
         return Community(CommunityPageRoutes.Home, "커뮤니티 원장 화면");

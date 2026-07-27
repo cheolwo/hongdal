@@ -5,7 +5,7 @@ namespace Ssalddel.Tests.Contracts.Common.Community;
 public sealed class CommunityVoteWorkflowClassifierTests
 {
     [Fact]
-    public void HS코드가_있는_상품_선택은_공동수입으로_분류한다()
+    public void HS코드가_있는_상품_선택은_같이수입으로_분류한다()
     {
         var campaign = new CommunityVoteResponse
         {
@@ -23,7 +23,7 @@ public sealed class CommunityVoteWorkflowClassifierTests
     }
 
     [Fact]
-    public void HS코드가_없는_국내_상품_선택은_공동수입으로_분류하지_않는다()
+    public void HS코드가_없는_국내_상품_선택은_같이수입으로_분류하지_않는다()
     {
         var campaign = new CommunityVoteResponse
         {
@@ -40,7 +40,7 @@ public sealed class CommunityVoteWorkflowClassifierTests
     }
 
     [Fact]
-    public void 명시적인_국내거래경로는_HS코드가있어도_공동수입으로분류하지않는다()
+    public void 명시적인_국내거래경로는_HS코드가있어도_같이수입으로분류하지않는다()
     {
         var campaign = new CommunityVoteResponse
         {
@@ -55,7 +55,7 @@ public sealed class CommunityVoteWorkflowClassifierTests
     }
 
     [Fact]
-    public void 명시적인_공동수입후보는_HS코드가없어도_공동수입으로분류한다()
+    public void 명시적인_같이수입후보는_HS코드가없어도_같이수입으로분류한다()
     {
         var campaign = new CommunityVoteResponse
         {

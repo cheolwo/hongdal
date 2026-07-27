@@ -454,7 +454,7 @@ public sealed class CommunityPostOpportunityServiceTests
     }
 
     [Fact]
-    public async Task 미국공동수입은_보세시설부터참여자주소배송까지_역할슬롯과원장참여를연결한다()
+    public async Task 미국같이수입은_보세시설부터참여자주소배송까지_역할슬롯과원장참여를연결한다()
     {
         var store = new InMemoryPostStore(CreateOrdinaryPost());
         var ledgerStore = new InMemoryLedgerStore();

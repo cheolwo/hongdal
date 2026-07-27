@@ -95,7 +95,7 @@ public sealed class YouTubeSocialContextPostComposer : IYouTubeSocialContextPost
         lines.Add("판매자·생산자·구매자·수출입 관계자·운송·통관·창고 중 이 일을 함께 살펴볼 사람과 아직 확인해야 할 업체를 적어 주세요.");
         lines.Add(string.Empty);
         lines.Add("같이 해보고 싶다면 이 글의 ‘함께하기’에서 구매자·공급자·운송·통관·창고 역할 중 가능한 것을 표시해 주세요.");
-        lines.Add("관심이 모이면 공동구매 또는 공동수입 검토를 위한 비구속적 가원장으로 조건을 함께 살펴볼 수 있습니다.");
+        lines.Add("관심이 모이면 공동구매 또는 같이 수입 검토를 위한 비구속적 가원장으로 조건을 함께 살펴볼 수 있습니다.");
         lines.Add("참여 표시는 주문·계약·결제·배차·운송 주선을 확정하지 않습니다.");
         lines.Add("다음 단계는 별도 확인과 동의로 진행합니다.");
         lines.Add(string.Empty);

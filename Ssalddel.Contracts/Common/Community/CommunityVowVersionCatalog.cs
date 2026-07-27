@@ -59,7 +59,7 @@ public static class CommunityVowVersionCatalog
             SsalddelProductRoadmapCatalog.TradeReadinessVersion,
             ProductVersionName(SsalddelProductRoadmapCatalog.TradeReadinessVersion),
             ProductVersionWorkflowTag(SsalddelProductRoadmapCatalog.TradeReadinessVersion),
-            "공급자와 관련 기업 근거, 견적, 원가, HS·HTS 후보와 공동수입 준비 항목을 수요 집단에 연결하는 흐름",
+            "공급자와 관련 기업 근거, 견적, 원가, HS·HTS 후보와 같이 수입 준비 항목을 수요 집단에 연결하는 흐름",
             "1.0의 주문자 집단과 모집 원장을 공급·가격·무역 검토의 입력으로 이어받습니다.",
             "품목 분류, 수입 적격성, 신고와 계약 판단은 자격 있는 전문가와 실제 거래 당사자의 확인을 대신하지 않습니다."),
         new(

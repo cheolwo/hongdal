@@ -184,7 +184,7 @@ public partial class CommunityGroupPurchaseWorkspace
         State.Proposal.Description = IngredientSeed.BuildSuggestedDescription();
         State.StatusSeverity = Severity.Info;
         State.StatusMessage = IngredientSeed.IsGroupImportReview
-            ? "공동수입 검토 의향을 가져왔습니다. 음식의 국가와 실제 상품 출발국은 다를 수 있으므로 거래경로 정보를 별도로 확인해 주세요."
+            ? "같이 수입 검토 의향을 가져왔습니다. 음식의 국가와 실제 상품 출발국은 다를 수 있으므로 거래경로 정보를 별도로 확인해 주세요."
             : "공공 가격과 공식 레시피의 출처를 공동구매 제안 초안으로 가져왔습니다. 수량·포장·지역 조건을 확인해 주세요.";
     }
 

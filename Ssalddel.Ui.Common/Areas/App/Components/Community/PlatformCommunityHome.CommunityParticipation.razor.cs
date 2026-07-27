@@ -143,7 +143,7 @@ public partial class PlatformCommunityHome
     private static string ProvisionalLedgerDialogTitle(string intentTypeCode)
         => intentTypeCode switch
         {
-            CommunityCollectiveIntentTypeCodes.GroupImportCandidate => "공동수입 검토 가원장",
+            CommunityCollectiveIntentTypeCodes.GroupImportCandidate => "같이 수입 검토 가원장",
             CommunityCollectiveIntentTypeCodes.GroupExportCandidate => "공동수출 검토 가원장",
             _ => "공동구매 가원장"
         };

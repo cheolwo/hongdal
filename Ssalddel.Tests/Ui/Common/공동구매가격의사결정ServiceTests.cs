@@ -39,7 +39,7 @@ public sealed class 공동구매가격의사결정ServiceTests
     }
 
     [Fact]
-    public async Task 공동수입_국내시장수입평균도착원가와해외공공가격을함께제공한다()
+    public async Task 같이수입_국내시장수입평균도착원가와해외공공가격을함께제공한다()
     {
         var client = new Fake농수산공공데이터Client
         {
@@ -76,7 +76,7 @@ public sealed class 공동구매가격의사결정ServiceTests
         var service = new 공동구매가격의사결정Service(client);
 
         var result = await service.조회Async(new 공동구매가격의사결정요청(
-            공동구매가격의사결정유형코드.공동수입,
+            공동구매가격의사결정유형코드.같이수입,
             "080810",
             12_000m,
             수출국가코드: "us",
@@ -101,7 +101,7 @@ public sealed class 공동구매가격의사결정ServiceTests
     }
 
     [Fact]
-    public async Task 공동수입_국내품목연결이없어도_HS수입평균단가를별도로조회한다()
+    public async Task 같이수입_국내품목연결이없어도_HS수입평균단가를별도로조회한다()
     {
         var client = new Fake농수산공공데이터Client
         {
@@ -124,7 +124,7 @@ public sealed class 공동구매가격의사결정ServiceTests
         var service = new 공동구매가격의사결정Service(client);
 
         var result = await service.조회Async(new 공동구매가격의사결정요청(
-            공동구매가격의사결정유형코드.공동수입,
+            공동구매가격의사결정유형코드.같이수입,
             "121190",
             11_000m,
             수출국가코드: "CN"));

@@ -37,7 +37,7 @@ public interface I공동구매커머스이행계획UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[SsalddelUseCase("공동구매 커머스 이행 계획", Summary = "공동수입 물품을 국내 운송, 3PL 입고, 판매채널 출고 후보로 연결합니다.")]
+[SsalddelUseCase("공동구매 커머스 이행 계획", Summary = "같이 수입 물품을 국내 운송, 3PL 입고, 판매채널 출고 후보로 연결합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.OrdererGroupLeader)]
 [SsalddelUseCaseActor(SsalddelActor.Orderer, SsalddelUseCaseActorRole.Supporting)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
@@ -47,17 +47,17 @@ public interface I공동구매커머스이행계획UseCase
     SsalddelUseCaseRelationKind.Extend,
     "화주운송의뢰UseCase",
     Condition = "보세구역 반출 후 아파트 직행 배송 또는 국내 3PL 이동 운송을 의뢰하는 경우",
-    Summary = "공동수입 물품을 국내 화물 운송 의뢰 흐름으로 확장합니다.")]
+    Summary = "같이 수입 물품을 국내 화물 운송 의뢰 흐름으로 확장합니다.")]
 [SsalddelUseCaseRelation(
     SsalddelUseCaseRelationKind.Extend,
     "창고작업UseCase",
-    Condition = "공동수입 물품을 국내 3PL 창고에 입고시키는 경우",
-    Summary = "공동수입 물품을 창고 입고, 재고, 출고 가능 상태로 확장합니다.")]
+    Condition = "같이 수입 물품을 국내 3PL 창고에 입고시키는 경우",
+    Summary = "같이 수입 물품을 창고 입고, 재고, 출고 가능 상태로 확장합니다.")]
 [SsalddelUseCaseRelation(
     SsalddelUseCaseRelationKind.Extend,
     "판매채널UseCase",
-    Condition = "공동수입 재고를 스마트스토어, 쿠팡, Amazon 등 판매채널 출품 후보로 전환하는 경우",
-    Summary = "공동수입 재고를 판매채널 출품과 주문 이행 흐름으로 확장합니다.")]
+    Condition = "같이 수입 재고를 스마트스토어, 쿠팡, Amazon 등 판매채널 출품 후보로 전환하는 경우",
+    Summary = "같이 수입 재고를 판매채널 출품과 주문 이행 흐름으로 확장합니다.")]
 [SsalddelUseCaseRelation(
     SsalddelUseCaseRelationKind.Extend,
     "HR참여운영UseCase",

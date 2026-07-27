@@ -3,7 +3,7 @@ const roles = [
     key: "community",
     eyebrow: "COMMUNITY · ORDERER",
     title: "주문자·커뮤니티",
-    description: "동네 글을 읽고 공동구매나 공동수입 제안을 구체적인 업무 흐름으로 연결합니다.",
+    description: "동네 글을 읽고 공동구매나 같이 수입 제안을 구체적인 업무 흐름으로 연결합니다.",
     image: "/assets/images/community-orderer.png",
     imageAlt: "모바일 Ssalddel 생활 게시판 화면",
     accent: "blue",
@@ -12,7 +12,7 @@ const roles = [
       { path: "/community", title: "생활 게시판", description: "동네 글과 댓글, 연결된 업무 원장을 함께 봅니다.", tag: "바로 보기" },
       { path: "/community/write", title: "판매글 작성", description: "사진, 상품명, 수량, 가격과 결제 협의 방법을 게시글에 붙입니다.", tag: "모바일 체험" },
       { path: "/community/group-purchase", title: "공동구매 제안", description: "참여자와 수량, 가격, 공급 조건을 맞춥니다.", tag: "흐름 체험" },
-      { path: "/community/group-import", title: "공동수입 검토", description: "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", tag: "흐름 체험" },
+      { path: "/community/group-import", title: "같이 수입 검토", description: "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", tag: "흐름 체험" },
       { path: "/information/public-data", title: "농수산물 공개 정보", description: "공식 가격 자료와 출처를 비교해 봅니다.", tag: "바로 보기" }
     ]
   },
@@ -93,7 +93,7 @@ for (const role of roles) {
 const roleSamples = {
   community: [
     ["새 공동구매", "여름 제철 복숭아 공동구매", "참여 18명"],
-    ["공동수입", "포르투갈 코르크 생활용품", "검토 중"],
+    ["같이수입", "포르투갈 코르크 생활용품", "검토 중"],
     ["생활 질문", "동네 배송 묶음 제안", "댓글 12개"]
   ],
   global: [

@@ -26,10 +26,10 @@ public sealed class CommunityWorkClassificationCatalogTests
     }
 
     [Fact]
-    public void 공동구매와_공동수입은_서로_다른_업무_분류와_원장을_가진다()
+    public void 공동구매와_같이수입은_서로_다른_업무_분류와_원장을_가진다()
     {
         var groupPurchase = CommunityWorkClassificationCatalog.FindByWorkflowTag("공동구매");
-        var groupImport = CommunityWorkClassificationCatalog.FindByWorkflowTag("공동수입");
+        var groupImport = CommunityWorkClassificationCatalog.FindByWorkflowTag("같이수입");
 
         Assert.NotNull(groupPurchase);
         Assert.NotNull(groupImport);

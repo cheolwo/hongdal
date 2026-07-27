@@ -330,7 +330,7 @@ public sealed class OfficialFoodIngredientJourneyTests
     }
 
     [Fact]
-    public void 음식재료의_공동수입선택은_문화국가와상품출발국을분리한초안을만든다()
+    public void 음식재료의_같이수입선택은_문화국가와상품출발국을분리한초안을만든다()
     {
         var detail = DishDetail();
         var selection = new OfficialFoodDishIngredientPurchaseSelection(
@@ -342,7 +342,7 @@ public sealed class OfficialFoodIngredientJourneyTests
 
         Assert.NotNull(seed);
         Assert.True(seed!.IsGroupImportReview);
-        Assert.Equal("양파 공동수입 검토 제안", seed.SuggestedTitle);
+        Assert.Equal("양파 같이 수입 검토 제안", seed.SuggestedTitle);
         Assert.Equal("JP", seed.FoodCountryCode);
         Assert.Contains("상품 원산지·출발국으로 자동 사용하지 않음", seed.BuildSuggestedDescription(), StringComparison.Ordinal);
         Assert.Contains("실제 상품 출발국", seed.BuildSuggestedDescription(), StringComparison.Ordinal);
@@ -500,7 +500,7 @@ public sealed class OfficialFoodIngredientJourneyTests
         Assert.Contains("문화교통 0.0 · 개별구매 참고", exchangePanel);
         Assert.Contains("문화교통 1.5 · 개별수입 준비", exchangePanel);
         Assert.Contains("문화교통 1.0 · 공동구매", exchangePanel);
-        Assert.Contains("문화교통 1.5 · 공동수입 준비", exchangePanel);
+        Assert.Contains("문화교통 1.5 · 같이 수입 준비", exchangePanel);
         Assert.True(exchangePanel.IndexOf("문화교통 1.5 · 개별수입 준비", StringComparison.Ordinal)
                     < exchangePanel.IndexOf("혼자 거래하기 부담스러울 때", StringComparison.Ordinal));
         Assert.True(exchangePanel.IndexOf("혼자 거래하기 부담스러울 때", StringComparison.Ordinal)

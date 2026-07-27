@@ -30,7 +30,7 @@ public static class Incoterms도움말구간코드
 public sealed class Incoterms도움말응답
 {
     public string 언어코드 { get; init; } = DisplayLanguageCodes.Korean;
-    public string 선택코드 { get; init; } = 공동수입준비Incoterms코드.Fob;
+    public string 선택코드 { get; init; } = 같이수입준비Incoterms코드.Fob;
     public string 화면제목 { get; init; } = string.Empty;
     public string 소개 { get; init; } = string.Empty;
     public string 버전표시 { get; init; } = "Incoterms® 2020";
