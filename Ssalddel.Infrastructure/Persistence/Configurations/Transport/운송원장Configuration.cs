@@ -63,6 +63,9 @@ public sealed class 운송원장Configuration : IEntityTypeConfiguration<운송�
         builder.Property(x => x.CreatedAt).HasColumnName("created_at");
         builder.Property(x => x.UpdatedAt).HasColumnName("updated_at");
 
+        builder.HasIndex(x => x.의뢰Id)
+            .IsUnique()
+            .HasDatabaseName("ux_운송실행투영_request_id");
         builder.HasIndex(x => x.커뮤니티원장Id);
     }
 }

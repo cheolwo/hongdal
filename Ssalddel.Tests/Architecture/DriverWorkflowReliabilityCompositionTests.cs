@@ -1,0 +1,74 @@
+namespace Ssalddel.Tests.Architecture;
+
+public sealed class DriverWorkflowReliabilityCompositionTests
+{
+    [Fact]
+    public void 운행시작화면은_존재하는Route로_다음행동을안내한다()
+    {
+        var source = Read("DriverApp/Components/Pages/Driver/01_Work/운행시작Page.razor");
+
+        Assert.DoesNotContain("/driver/work/status", source);
+        Assert.Contains("DriverRoutes.HomeSummary", source);
+        Assert.Contains("DriverRoutes.Recommendations", source);
+        Assert.Contains("DriverRoutes.CommunityInquiries", source);
+    }
+
+    [Fact]
+    public void 새배차Push는_서버자료를_강제로다시조회한다()
+    {
+        var contract = Read("DriverApp/Services/IDriverSampleDataService.cs");
+        var serverBacked = Read("DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs");
+        var fcm = Read("DriverApp/Platforms/Android/SsalddelFirebaseMessagingService.cs");
+
+        Assert.Contains("bool force = false", contract);
+        Assert.Contains("if (_loaded && !force)", serverBacked);
+        Assert.Contains("RefreshAsync(force: true)", fcm);
+        Assert.Contains("추천의뢰조회(requestId)", fcm);
+        Assert.DoesNotContain("?? sampleData.추천의뢰목록.FirstOrDefault()", fcm);
+    }
+
+    [Fact]
+    public void 기사자료Cache는_인증경계와_동시갱신을보호한다()
+    {
+        var source = Read("DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs");
+
+        Assert.Contains("SemaphoreSlim _refreshGate", source);
+        Assert.Contains("ApplyDisconnectedState();", source);
+        Assert.Contains("_loadedAccessToken = null;", source);
+        Assert.True(
+            source.IndexOf("string.IsNullOrWhiteSpace(accessToken)", StringComparison.Ordinal)
+            < source.IndexOf("if (_loaded && !force)", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void 운행종료는_서버확정뒤_단말위치송신을중지한다()
+    {
+        var source = Read("DriverApp/ViewModels/Driver/Work/기사운행시작PageViewModel.cs");
+        var stopMethod = source[source.IndexOf("private async Task 운행종료Async", StringComparison.Ordinal)..];
+
+        Assert.True(
+            stopMethod.IndexOf("근무기능.운행종료.실행Async", StringComparison.Ordinal)
+            < stopMethod.IndexOf("_위치송신.StopAsync", StringComparison.Ordinal));
+        Assert.Contains("서버 운행은 종료됐지만 단말의 위치 송신 중지 확인에 실패했습니다.", stopMethod);
+    }
+
+    private static string Read(string relativePath)
+        => File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            relativePath.Replace('/', Path.DirectorySeparatorChar)));
+
+    private static string FindRepositoryRoot()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
+             directory is not null;
+             directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "Ssalddel.slnx")))
+            {
+                return directory.FullName;
+            }
+        }
+
+        throw new DirectoryNotFoundException("Ssalddel 저장소 루트를 찾지 못했습니다.");
+    }
+}

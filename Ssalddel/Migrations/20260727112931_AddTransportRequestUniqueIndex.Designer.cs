@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using 살뜰.Data;
 
@@ -11,9 +12,11 @@ using 살뜰.Data;
 namespace Ssalddel.Migrations
 {
     [DbContext(typeof(SsalddelContext))]
-    partial class SsalddelContextModelSnapshot : ModelSnapshot
+    [Migration("20260727112931_AddTransportRequestUniqueIndex")]
+    partial class AddTransportRequestUniqueIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5027,153 +5030,6 @@ namespace Ssalddel.Migrations
                         .IsUnique();
 
                     b.ToTable("마트주문요청");
-                });
-
-            modelBuilder.Entity("살뜰.도메인.배달권.원장배달권투영", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<long>("배달권Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("delivery_zone_id");
-
-                    b.Property<string>("생성근거")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("projection_basis");
-
-                    b.Property<string>("역할코드")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("role_code");
-
-                    b.Property<string>("원장Id")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("ledger_id");
-
-                    b.Property<string>("원장유형코드")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("ledger_type_code");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("배달권Id")
-                        .HasDatabaseName("ix_원장배달권투영_zone");
-
-                    b.HasIndex("원장유형코드", "원장Id", "역할코드")
-                        .IsUnique()
-                        .HasDatabaseName("ux_원장배달권투영_ledger_role");
-
-                    b.ToTable("원장배달권투영", (string)null);
-                });
-
-            modelBuilder.Entity("살뜰.도메인.배달권.플랫폼배달권", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("대표건물명")
-                        .HasMaxLength(160)
-                        .HasColumnType("varchar(160)")
-                        .HasColumnName("representative_building_name");
-
-                    b.Property<string>("대표건물주소")
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("representative_building_address");
-
-                    b.Property<decimal?>("대표경도")
-                        .HasPrecision(10, 7)
-                        .HasColumnType("decimal(10,7)")
-                        .HasColumnName("representative_longitude");
-
-                    b.Property<decimal?>("대표위도")
-                        .HasPrecision(10, 7)
-                        .HasColumnType("decimal(10,7)")
-                        .HasColumnName("representative_latitude");
-
-                    b.Property<string>("배달권명")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("varchar(160)")
-                        .HasColumnName("delivery_zone_name");
-
-                    b.Property<string>("배달권키")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("delivery_zone_key");
-
-                    b.Property<string>("법정동코드")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("legal_district_code");
-
-                    b.Property<string>("시군구명")
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("district_name");
-
-                    b.Property<string>("시도명")
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("province_name");
-
-                    b.Property<string>("인접배달권키Json")
-                        .IsRequired()
-                        .HasColumnType("json")
-                        .HasColumnName("adjacent_zone_keys_json");
-
-                    b.Property<string>("판정방식")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("classification_method");
-
-                    b.Property<bool>("활성")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("배달권키")
-                        .IsUnique()
-                        .HasDatabaseName("ux_플랫폼배달권_key");
-
-                    b.ToTable("플랫폼배달권", (string)null);
                 });
 
             modelBuilder.Entity("살뜰.도메인.배차.기사배차", b =>
@@ -10775,17 +10631,6 @@ namespace Ssalddel.Migrations
                         .IsRequired();
 
                     b.Navigation("마트주문");
-                });
-
-            modelBuilder.Entity("살뜰.도메인.배달권.원장배달권투영", b =>
-                {
-                    b.HasOne("살뜰.도메인.배달권.플랫폼배달권", "배달권")
-                        .WithMany()
-                        .HasForeignKey("배달권Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("배달권");
                 });
 
             modelBuilder.Entity("살뜰.도메인.사용자.HrPayrollScheduleRecord", b =>

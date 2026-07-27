@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Ssalddel.Infrastructure.BackgroundJobs;
 using 살뜰.Data;
 using 살뜰.도메인.공통;
 using 살뜰.Services.Dispatch.Engine;
@@ -12,6 +13,7 @@ namespace 살뜰.Infrastructure.BackgroundJobs.DispatchQueue
     {
         private readonly SsalddelContext _db;
         private readonly I배차대기원장전환Service _원장전환Service;
+        private readonly ISsalddelBackgroundJobActivationPolicy _activationPolicy;
         private readonly 배차큐배치작업Options _options;
         private readonly 배차큐정책Options _queuePolicyOptions;
         private readonly ILogger<배차큐스캔Job> _logger;
@@ -19,12 +21,14 @@ namespace 살뜰.Infrastructure.BackgroundJobs.DispatchQueue
         public 배차큐스캔Job(
             SsalddelContext db,
             I배차대기원장전환Service 원장전환Service,
+            ISsalddelBackgroundJobActivationPolicy activationPolicy,
             Microsoft.Extensions.Options.IOptions<배차큐배치작업Options> options,
             Microsoft.Extensions.Options.IOptions<배차큐정책Options> queuePolicyOptions,
             ILogger<배차큐스캔Job> logger)
         {
             _db = db;
             _원장전환Service = 원장전환Service;
+            _activationPolicy = activationPolicy;
             _options = options.Value;
             _queuePolicyOptions = queuePolicyOptions.Value;
             _logger = logger;
@@ -32,7 +36,21 @@ namespace 살뜰.Infrastructure.BackgroundJobs.DispatchQueue
 
         public async Task Execute(IJobExecutionContext context)
         {
+            var activation = _activationPolicy.Evaluate(
+                SsalddelBackgroundWorkloadKeys.DomesticTransportDispatch);
+            if (!activation.IsEnabled)
+            {
+                _logger.LogDebug(
+                    "Action={Action} ActivationCode={ActivationCode} FeatureKey={FeatureKey}",
+                    "DispatchQueueScanSkipped",
+                    activation.Code,
+                    activation.FeatureKey);
+                return;
+            }
+
             var cancellationToken = context.CancellationToken;
+            var 음식배달재탐색기준시각 = DateTime.UtcNow.AddSeconds(
+                -Math.Max(1, _queuePolicyOptions.음식배달후보재탐색간격초));
             var 자동공개전환Count = await 공개전환기한초과처리Async(cancellationToken);
 
             var plannedIds = await _db.운송원장.AsNoTracking()
@@ -54,10 +72,13 @@ namespace 살뜰.Infrastructure.BackgroundJobs.DispatchQueue
             var recommendWaitingIds = await _db.운송원장.AsNoTracking()
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
                             && x.배차큐단계 == 상태값.배차큐단계.배차추천
-                            && x.배차노출상태 == 상태값.배차노출상태.추천대기
                             && x.현재추천대상기사Id == null
-                            && x.원본의뢰유형 != 운송의뢰배차원천유형.살뜰마트주문
-                            && x.원본의뢰유형 != 운송의뢰배차원천유형.살뜰마트음식주문)
+                            && ((x.배차노출상태 == 상태값.배차노출상태.추천대기
+                                 && x.원본의뢰유형 != 운송의뢰배차원천유형.살뜰마트주문
+                                 && x.원본의뢰유형 != 운송의뢰배차원천유형.살뜰마트음식주문)
+                                || (x.배차업무유형 == 상태값.배차업무유형.음식배달
+                                    && x.배차노출상태 == 상태값.배차노출상태.추천후보없음
+                                    && x.UpdatedAt <= 음식배달재탐색기준시각)))
                 .OrderBy(x => x.UpdatedAt)
                 .Select(x => x.의뢰Id)
                 .Take(_options.처리배치크기)
@@ -79,7 +100,8 @@ namespace 살뜰.Infrastructure.BackgroundJobs.DispatchQueue
                 .CountAsync(x => x.상태 == 상태값.배차대기상태.대기
                                  && x.배차업무유형 == 상태값.배차업무유형.음식배달
                                  && x.배차큐단계 == 상태값.배차큐단계.배차추천
-                                 && x.배차노출상태 == 상태값.배차노출상태.추천대기,
+                                 && (x.배차노출상태 == 상태값.배차노출상태.추천대기
+                                     || x.배차노출상태 == 상태값.배차노출상태.추천후보없음),
                     cancellationToken);
 
             _logger.LogDebug("Action={Action} AutoPublicCount={AutoPublicCount} PlannedCount={PlannedCount} RecommendWaitingCount={RecommendWaitingCount} CargoWaitingCount={CargoWaitingCount} FoodWaitingCount={FoodWaitingCount} OccurredAt={OccurredAt}",

@@ -128,6 +128,51 @@ public sealed class 배차엔진판단감사Tests
     }
 
     [Fact]
+    public async Task 음식배달_후보없음은_공개배차가아닌_재탐색대기로전환한다()
+    {
+        await using var db = new CapturingSsalddelContext(CreateOptions());
+        var queue = CreateQueue();
+        queue.배차업무유형 = 상태값.배차업무유형.음식배달;
+        queue.원본의뢰유형 = 살뜰.Services.Dispatch.Engine.운송의뢰배차원천유형.음식점주문;
+        queue.배차큐단계 = 상태값.배차큐단계.배차추천;
+        queue.배차노출상태 = 상태값.배차노출상태.추천대기;
+        queue.추천라운드 = 5;
+        db.Attach(queue);
+
+        var selection = 배차추천후보선정결과.적격후보없음("현재 조건의 음식배달 기사 없음") with
+        {
+            감사Context = new 배차엔진판단감사Context(
+                "correlation-food-retry",
+                Ssalddel.Contracts.Common.Versioning.OperatingSystemIds.FoodDelivery,
+                Ssalddel.Contracts.Common.Versioning.EngineFamilyIds.TransportRequestDispatch,
+                Ssalddel.Contracts.Common.Versioning.EngineImplementationIds.FoodDeliveryDispatch)
+        };
+        var service = new 배차대기원장전환Service(
+            db,
+            Options.Create(new 배차큐정책Options { 최대추천라운드 = 5 }),
+            new StubCandidateSelectionService(selection),
+            null!,
+            null!,
+            null!);
+
+        var method = typeof(배차대기원장전환Service).GetMethod(
+            "추천거절후다음후보로진행Async",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var task = Assert.IsAssignableFrom<Task<배차대기원장전환결과>>(
+            method!.Invoke(service, [queue, null, CancellationToken.None]));
+        var result = await task;
+
+        Assert.True(result.전환여부);
+        Assert.Equal(배차대기원장전환결과코드.음식배달후보재탐색대기, result.결과코드);
+        Assert.Equal(상태값.배차큐단계.배차추천, queue.배차큐단계);
+        Assert.Equal(상태값.배차노출상태.추천후보없음, queue.배차노출상태);
+        Assert.Null(queue.공개전환시각);
+        var batch = Assert.Single(db.SaveBatches);
+        Assert.Contains(batch, item => item.EntityType == typeof(운송원장) && item.State == EntityState.Modified);
+        Assert.Contains(batch, item => item.EntityType == typeof(운송이벤트) && item.State == EntityState.Added);
+    }
+
+    [Fact]
     public async Task 후보선정_추천시작과_감사이벤트는_같은SaveChanges에포함된다()
     {
         await using var db = new CapturingSsalddelContext(CreateOptions());

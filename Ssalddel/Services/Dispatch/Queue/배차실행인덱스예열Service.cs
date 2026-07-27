@@ -3,6 +3,7 @@ using 살뜰.Data;
 using 살뜰.도메인.공통;
 using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Recommendation;
+using 살뜰.Services.DeliveryZones;
 using 살뜰.Services.Storage.Local;
 
 namespace 살뜰.Services.Dispatch.Queue;
@@ -28,6 +29,7 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
     private readonly IDriverWorkQueueStore _기사근무큐Store;
     private readonly IDriverLocationStore _기사위치Store;
     private readonly I국내화물운송기사상태Store _국내화물운송기사상태Store;
+    private readonly I운송원장배달권연결Service _운송원장배달권연결Service;
     private readonly I배달권실행공간Store _배달권실행공간Store;
 
     public 배차실행인덱스예열Service(
@@ -35,12 +37,14 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
         IDriverWorkQueueStore 기사근무큐Store,
         IDriverLocationStore 기사위치Store,
         I국내화물운송기사상태Store 국내화물운송기사상태Store,
+        I운송원장배달권연결Service 운송원장배달권연결Service,
         I배달권실행공간Store 배달권실행공간Store)
     {
         _db = db;
         _기사근무큐Store = 기사근무큐Store;
         _기사위치Store = 기사위치Store;
         _국내화물운송기사상태Store = 국내화물운송기사상태Store;
+        _운송원장배달권연결Service = 운송원장배달권연결Service;
         _배달권실행공간Store = 배달권실행공간Store;
     }
 
@@ -128,6 +132,12 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
             var 기사배달권 = 국내화물배달권정책.판정(
                 위치 is null ? null : new 배차경로좌표(위치.위도, 위치.경도),
                 기사.주_활동지역);
+            if (string.Equals(기사배달권.배달권키, "unknown", StringComparison.Ordinal))
+            {
+                await _배달권실행공간Store.Remove기사Async(기사.기사Id, cancellationToken);
+                continue;
+            }
+
             await _배달권실행공간Store.Upsert기사Async(
                 기사배달권.배달권키,
                 기사.기사Id,
@@ -142,14 +152,27 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
 
         foreach (var 배차대기 in 미처리운송의뢰목록)
         {
-            var 상차배달권 = 국내화물배달권정책.판정(
-                CreatePoint(배차대기.픽업_위도, 배차대기.픽업_경도),
-                배차대기.픽업_도로명주소);
-            await _배달권실행공간Store.Upsert운송의뢰Async(
-                상차배달권.배달권키,
-                배차대기.의뢰Id,
-                국내행정구역배달권Catalog.인접배달권키조회(상차배달권.배달권키),
+            var 배달권연결 = await _운송원장배달권연결Service.투영추적Async(
+                배차대기,
                 cancellationToken);
+            if (string.Equals(배달권연결.픽업배달권.배달권키, "unknown", StringComparison.Ordinal))
+            {
+                await _배달권실행공간Store.Remove운송의뢰Async(
+                    배차대기.의뢰Id,
+                    cancellationToken);
+                continue;
+            }
+
+            await _배달권실행공간Store.Upsert운송의뢰Async(
+                배달권연결.픽업배달권.배달권키,
+                배차대기.의뢰Id,
+                국내행정구역배달권Catalog.인접배달권키조회(배달권연결.픽업배달권.배달권키),
+                cancellationToken);
+        }
+
+        if (_db.ChangeTracker.HasChanges())
+        {
+            await _db.SaveChangesAsync(cancellationToken);
         }
 
         return new 배차실행인덱스예열결과(
@@ -160,11 +183,6 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
             근무큐예열수,
             미처리운송의뢰목록.Count);
     }
-
-    private static 배차경로좌표? CreatePoint(decimal? latitude, decimal? longitude)
-        => latitude.HasValue && longitude.HasValue
-            ? new 배차경로좌표(latitude.Value, longitude.Value)
-            : null;
 
     private static DateTime AsUtc(DateTime value)
         => value.Kind switch

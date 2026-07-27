@@ -6,6 +6,16 @@ public static class 기사앱식별자
     public const string FoodDeliveryDriverApp = "FoodDeliveryDriverApp";
 }
 
+public static class 기사배차추천알림계약
+{
+    public const string 현재유형 = "DriverDispatchRecommendation";
+    public const string 이전유형 = "DispatchRecommendation";
+
+    public static bool Is배차추천(string? value)
+        => string.Equals(value?.Trim(), 현재유형, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(value?.Trim(), 이전유형, StringComparison.OrdinalIgnoreCase);
+}
+
 public static class 기사도메인구분
 {
     public const string 화물용달 = "CargoYongdal";

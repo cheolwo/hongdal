@@ -10,6 +10,7 @@ using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Dispatch.Notification;
 using 살뜰.Services.Dispatch.Queue;
+using 살뜰.Services.DeliveryZones;
 using 살뜰.Services.Documents;
 using 살뜰.Services.HIOPSAI;
 using 살뜰.Services.Images;
@@ -82,6 +83,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I음식멀티배차조합Service, 음식멀티배차조합Service>();
         services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
         services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
+        services.AddScoped<I원장배달권투영Service, 원장배달권투영Service>();
+        services.AddScoped<I운송원장배달권연결Service, 운송원장배달권연결Service>();
         services.AddSingleton<I배달권실행공간Store, InMemory배달권실행공간Store>();
         services.AddScoped<I배달권기반배차조율계획Service, 배달권기반배차조율계획Service>();
         services.AddScoped<I배달권기반배차조율실행Service, 배달권기반배차조율실행Service>();

@@ -99,7 +99,8 @@ namespace 살뜰.Services.Dispatch.Queue
                     excludeDriverId);
             }
 
-            if (queue.추천라운드 >= _options.최대추천라운드)
+            if (queue.배차업무유형 == 상태값.배차업무유형.용달운송
+                && queue.추천라운드 >= _options.최대추천라운드)
             {
                 return await 공개배차로전환Async(queue.의뢰Id, cancellationToken);
             }
@@ -108,6 +109,24 @@ namespace 살뜰.Services.Dispatch.Queue
             if (selection.공개배차전환허용)
             {
                 var changedAtUtc = DateTime.UtcNow;
+                if (queue.배차업무유형 == 상태값.배차업무유형.음식배달)
+                {
+                    음식배달후보재탐색대기상태적용(queue, changedAtUtc);
+                    var retryResult = 배차대기원장전환결과.전환됨(
+                        queue.의뢰Id,
+                        배차대기원장전환결과코드.음식배달후보재탐색대기,
+                        "현재 적격 음식배달 기사가 없어 공개배차로 전환하지 않고 재탐색을 기다립니다.",
+                        excludeDriverId);
+                    배차판단감사추가(
+                        queue,
+                        selection,
+                        배차엔진후속전환.재추천대기,
+                        retryResult.결과코드,
+                        changedAtUtc);
+                    await _db.SaveChangesAsync(cancellationToken);
+                    return retryResult;
+                }
+
                 공개배차상태적용(queue, changedAtUtc);
                 var result = 배차대기원장전환결과.전환됨(
                     queue.의뢰Id,

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Ssalddel.Contracts.Common.Drivers;
 using 살뜰.Data;
 using 살뜰.도메인.설정;
 using 살뜰.Services.Notifications;
@@ -51,7 +52,7 @@ namespace 살뜰.Services.Dispatch.Notification
             var now = DateTime.UtcNow;
             var dataJson = JsonSerializer.Serialize(new Dictionary<string, string>
             {
-                ["type"] = "DispatchRecommendation",
+                ["type"] = 기사배차추천알림계약.현재유형,
                 ["dispatchWaitingId"] = 배차대기Id.ToString(),
                 ["requestId"] = 의뢰Id,
                 ["recommendationRound"] = 추천라운드.ToString()

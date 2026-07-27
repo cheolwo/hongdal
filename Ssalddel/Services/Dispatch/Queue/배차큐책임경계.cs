@@ -3,6 +3,7 @@ namespace 살뜰.Services.Dispatch.Queue;
 public enum 배차상태저장소역할
 {
     업무원장,
+    업무투영,
     실행인덱스,
     감사로그,
     외부알림
@@ -45,6 +46,14 @@ public static class 배차큐책임경계
             장애시손실허용: false,
             복구원천: "자기 자신",
             "기사 수락 이후 실제 운송 진행 상태의 원장입니다."),
+        new(
+            "원장배달권투영",
+            배차상태저장소역할.업무투영,
+            업무확정근거: false,
+            서버재시작후재구성가능: true,
+            장애시손실허용: false,
+            복구원천: "음식 주문, 마트 주문, 같이 주문, 같이 수입, 운송 원장과 배달권 판정 정책",
+            "여러 원장의 픽업, 배송, 집결, 국내 인계 범위를 같은 배달권으로 조회하기 위한 영속 투영입니다."),
         new(
             "기사위치기록",
             배차상태저장소역할.감사로그,
@@ -118,6 +127,9 @@ public static class 배차큐책임경계
 
     public static IReadOnlyList<배차상태저장소책임> 실행인덱스목록()
         => 전체.Where(x => x.역할 == 배차상태저장소역할.실행인덱스).ToArray();
+
+    public static IReadOnlyList<배차상태저장소책임> 업무투영목록()
+        => 전체.Where(x => x.역할 == 배차상태저장소역할.업무투영).ToArray();
 
     public static bool 업무확정근거인가(string 이름)
         => 전체.Any(x => string.Equals(x.이름, 이름, StringComparison.Ordinal) && x.업무확정근거);

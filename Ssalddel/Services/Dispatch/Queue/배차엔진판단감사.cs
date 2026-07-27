@@ -93,6 +93,7 @@ public static class 배차엔진감사식별자
 public static class 배차엔진후속전환
 {
     public const string 추천시작 = "RecommendationStarted";
+    public const string 재추천대기 = "RecommendationRetryPending";
     public const string 공개배차전환 = "PublicDispatchStarted";
     public const string 보류 = "Held";
     public const string 전환없음 = "NoTransition";

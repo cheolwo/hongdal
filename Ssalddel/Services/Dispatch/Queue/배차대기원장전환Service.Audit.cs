@@ -56,4 +56,15 @@ public sealed partial class 배차대기원장전환Service
         queue.추천만료시각 = null;
         queue.UpdatedAt = changedAtUtc;
     }
+
+    private static void 음식배달후보재탐색대기상태적용(운송원장 queue, DateTime changedAtUtc)
+    {
+        queue.배차큐단계 = 상태값.배차큐단계.배차추천;
+        queue.배차노출상태 = 상태값.배차노출상태.추천후보없음;
+        queue.공개전환시각 = null;
+        queue.현재추천대상기사Id = null;
+        queue.추천시작시각 = null;
+        queue.추천만료시각 = null;
+        queue.UpdatedAt = changedAtUtc;
+    }
 }

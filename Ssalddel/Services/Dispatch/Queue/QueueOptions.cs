@@ -8,6 +8,9 @@ namespace 살뜰.Services.Dispatch.Queue
         // 최대 추천 라운드 수
         public int 최대추천라운드 { get; set; } = 5;
 
+        // 음식배달에서 적격 기사가 없을 때 공개배차로 넘기지 않고 다시 탐색할 간격(초)
+        public int 음식배달후보재탐색간격초 { get; set; } = 30;
+
         // 추천 후 공개 전환까지의 기본 대기시간(초)
         public int 공개전환대기초 { get; set; } = 0;
 

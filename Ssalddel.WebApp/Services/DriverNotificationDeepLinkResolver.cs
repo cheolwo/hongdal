@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Drivers;
+
 namespace Ssalddel.WebApp.Services;
 
 public static class DriverNotificationDeepLinkResolver
@@ -76,9 +78,14 @@ public static class DriverNotificationDeepLinkResolver
             return string.Empty;
         }
 
+        if (기사배차추천알림계약.Is배차추천(payloadType))
+        {
+            return Recommendation;
+        }
+
         return payloadType.Trim() switch
         {
-            "NewRecommendation" or "Recommendation" or "DispatchRecommendation" => Recommendation,
+            "NewRecommendation" or "Recommendation" => Recommendation,
             "RecommendationExpired" or "DispatchRecommendationExpired" => RecommendationExpired,
             "Accepted" or "DispatchAccepted" or "TransportAssigned" => DispatchAccepted,
             "Pickup" or "PickupReminder" or "TransportPickupReady" or "TransportArrivedPickup" => PickupReady,

@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using 살뜰.도메인.공통;
 using 살뜰.도메인.배차;
+using 살뜰.Services.DeliveryZones;
 using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Engine;
-using 살뜰.Services.Dispatch.Recommendation;
 
 namespace 살뜰.Services.Dispatch.Queue;
 
@@ -49,15 +49,18 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
 {
     private readonly SsalddelContext _db;
     private readonly I운송의뢰배차원천분류Service _sourceClassifier;
+    private readonly I운송원장배달권연결Service _운송원장배달권연결Service;
     private readonly I배달권실행공간Store _배달권실행공간Store;
 
     public 운송의뢰배차대기Service(
         SsalddelContext db,
         I운송의뢰배차원천분류Service sourceClassifier,
+        I운송원장배달권연결Service 운송원장배달권연결Service,
         I배달권실행공간Store 배달권실행공간Store)
     {
         _db = db;
         _sourceClassifier = sourceClassifier;
+        _운송원장배달권연결Service = 운송원장배달권연결Service;
         _배달권실행공간Store = 배달권실행공간Store;
     }
 
@@ -70,7 +73,7 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
         var sourceType = ResolveSourceType(options, target);
         var sourceId = NormalizeOptional(options?.원본의뢰Id) ?? NormalizeOptional(target.원천참조번호);
         var shipperId = NormalizeOptional(options?.화주Id) ?? NormalizeOptional(target.판매자UserId);
-        var existing = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+        var existing = await _db.운송원장.SingleOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
         if (existing is not null)
         {
             ApplyExistingMetadata(existing, target, options, requestId, sourceType, sourceId, shipperId);
@@ -161,6 +164,10 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
 
     private async Task Upsert배달권실행공간Async(운송원장 배차대기, CancellationToken cancellationToken)
     {
+        var 배달권연결 = await _운송원장배달권연결Service.투영추적Async(
+            배차대기,
+            cancellationToken);
+
         if (배차대기.상태 != 상태값.배차대기상태.대기
             || 배차대기.배차큐단계 is 상태값.배차큐단계.확정 or 상태값.배차큐단계.종료)
         {
@@ -168,20 +175,18 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
             return;
         }
 
-        var 상차배달권 = 국내화물배달권정책.판정(
-            CreatePoint(배차대기.픽업_위도, 배차대기.픽업_경도),
-            배차대기.픽업_도로명주소);
+        if (string.Equals(배달권연결.픽업배달권.배달권키, "unknown", StringComparison.Ordinal))
+        {
+            await _배달권실행공간Store.Remove운송의뢰Async(배차대기.의뢰Id, cancellationToken);
+            return;
+        }
+
         await _배달권실행공간Store.Upsert운송의뢰Async(
-            상차배달권.배달권키,
+            배달권연결.픽업배달권.배달권키,
             배차대기.의뢰Id,
-            국내행정구역배달권Catalog.인접배달권키조회(상차배달권.배달권키),
+            국내행정구역배달권Catalog.인접배달권키조회(배달권연결.픽업배달권.배달권키),
             cancellationToken);
     }
-
-    private static 배차경로좌표? CreatePoint(decimal? latitude, decimal? longitude)
-        => latitude.HasValue && longitude.HasValue
-            ? new 배차경로좌표(latitude.Value, longitude.Value)
-            : null;
 
     private static string To배차원천유형(string? sourceType)
     {

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Ssalddel.Contracts.Common.Drivers;
 using Ssalddel.Hubs;
 using Microsoft.Extensions.Options;
 using 살뜰.Services.Options;
@@ -84,7 +85,7 @@ namespace 살뜰.Services.Notifications
                 body,
                 new Dictionary<string, string>
                 {
-                    ["type"] = "DriverDispatchRecommendation",
+                    ["type"] = 기사배차추천알림계약.현재유형,
                     ["driverId"] = driverId,
                     ["recommendationCount"] = recommendations.Count.ToString(CultureInfo.InvariantCulture),
                     ["topRequestId"] = top.의뢰Id,

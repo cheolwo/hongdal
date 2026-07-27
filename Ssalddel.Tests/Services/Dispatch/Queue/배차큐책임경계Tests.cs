@@ -43,6 +43,21 @@ public sealed class 배차큐책임경계Tests
     }
 
     [Fact]
+    public void 원장배달권은_플랫폼_영속투영이고_기사실행인덱스와_구분된다()
+    {
+        var projection = Assert.Single(
+            배차큐책임경계.업무투영목록(),
+            x => x.이름 == "원장배달권투영");
+
+        Assert.False(projection.업무확정근거);
+        Assert.True(projection.서버재시작후재구성가능);
+        Assert.False(projection.장애시손실허용);
+        Assert.DoesNotContain(
+            배차큐책임경계.실행인덱스목록(),
+            x => x.이름 == projection.이름);
+    }
+
+    [Fact]
     public void 미처리운송의뢰_재구성기준은_확정과_종료를_제외한다()
     {
         Assert.Contains("배차대기.상태 == 대기", 배차큐책임경계.미처리운송의뢰쿼리기준);

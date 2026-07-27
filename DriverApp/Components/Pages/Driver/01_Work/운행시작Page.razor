@@ -16,6 +16,7 @@
         <MudPaper Class="pa-4" Elevation="2">
             <MudStack Spacing="2">
                 <MudText Typo="Typo.h6">운행 시작 기준</MudText>
+                <MudText Typo="Typo.body1">현재 근무 상태: @ViewModel.운행상태</MudText>
                 <MudText Typo="Typo.body1">시작 모드: @ViewModel.시작모드</MudText>
                 <MudText Typo="Typo.body1">기본 시작 위치: @ViewModel.시작위치</MudText>
                 <MudText Typo="Typo.body1">복귀지: @(ViewModel.복귀지 ?? "미설정")</MudText>
@@ -51,9 +52,9 @@
                            OnClick="@(() => ViewModel.운행종료Command.ExecuteAsync(null))">
                     운행 종료
                 </MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/work/status">근무 상태 보기</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.HomeSummary">기사 홈에서 상태 보기</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Success" Href="@DriverRoutes.Recommendations">추천 운송 보기</MudButton>
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Forum" Href="@DriverRoutes.CommunityInquiries">커뮤니티 개별 의뢰 보기</MudButton>
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/home">기사 홈으로</MudButton>
             </MudStack>
         </MudPaper>
     </MudStack>

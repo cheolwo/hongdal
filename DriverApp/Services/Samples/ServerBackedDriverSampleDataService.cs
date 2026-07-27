@@ -21,7 +21,9 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
     private readonly IDriverWorkApiService _workApi;
     private readonly 기사샘플데이터Service _sampleFallback;
     private readonly IOptions<ClientDataModeOptions> _dataModeOptions;
+    private readonly SemaphoreSlim _refreshGate = new(1, 1);
     private bool _loaded;
+    private string? _loadedAccessToken;
 
     private 기사근무샘플상태 _근무상태 = null!;
     private 기사현재위치샘플 _기사현재위치 = null!;
@@ -52,27 +54,50 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         ApplyEmptyState();
     }
 
-    public async Task RefreshAsync(CancellationToken cancellationToken = default)
+    public async Task RefreshAsync(
+        CancellationToken cancellationToken = default,
+        bool force = false)
     {
-        if (_loaded)
-        {
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
-        {
-            ApplyDisconnectedState();
-            return;
-        }
-
+        await _refreshGate.WaitAsync(cancellationToken);
         try
         {
-            await LoadLiveServerDataAsync(cancellationToken);
-            _loaded = true;
+            var accessToken = _authSession.AccessToken;
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                ApplyDisconnectedState();
+                _loaded = false;
+                _loadedAccessToken = null;
+                return;
+            }
+
+            if (!string.Equals(_loadedAccessToken, accessToken, StringComparison.Ordinal))
+            {
+                ApplyEmptyState();
+                _loaded = false;
+                _loadedAccessToken = null;
+            }
+
+            if (_loaded && !force)
+            {
+                return;
+            }
+
+            try
+            {
+                await LoadLiveServerDataAsync(cancellationToken);
+                _loaded = true;
+                _loadedAccessToken = accessToken;
+            }
+            catch when (CanUseSampleFallback())
+            {
+                ApplySampleFallback();
+                _loaded = false;
+                _loadedAccessToken = null;
+            }
         }
-        catch when (CanUseSampleFallback())
+        finally
         {
-            ApplySampleFallback();
+            _refreshGate.Release();
         }
     }
 

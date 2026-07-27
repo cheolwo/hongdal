@@ -53,9 +53,8 @@ public sealed class SsalddelFirebaseMessagingService : FirebaseMessagingService
             var mapService = services.GetRequiredService<IDriverHomeMapService>();
             var notificationService = services.GetRequiredService<IDriverRecommendationNotificationService>();
 
-            await sampleData.RefreshAsync();
-            var request = sampleData.추천의뢰조회(requestId)
-                ?? sampleData.추천의뢰목록.FirstOrDefault();
+            await sampleData.RefreshAsync(force: true);
+            var request = sampleData.추천의뢰조회(requestId);
             if (request is null)
             {
                 return;
@@ -98,7 +97,7 @@ public sealed class SsalddelFirebaseMessagingService : FirebaseMessagingService
 
     private static bool IsDispatchRecommendation(IDictionary<string, string> data)
         => data.TryGetValue("type", out var type)
-           && string.Equals(type, "DriverDispatchRecommendation", StringComparison.OrdinalIgnoreCase);
+           && 기사배차추천알림계약.Is배차추천(type);
 
     private static string ResolveRequestId(IDictionary<string, string> data)
     {

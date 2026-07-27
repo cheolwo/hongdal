@@ -24,6 +24,7 @@ public sealed class DriverNotificationPageCompositionTests
     }
 
     [Theory]
+    [InlineData("DriverDispatchRecommendation", "REQ 20", null, "/driver/recommendations/REQ%2020")]
     [InlineData("DispatchRecommendation", "REQ 20", null, "/driver/recommendations/REQ%2020")]
     [InlineData("DispatchAccepted", "REQ 20", null, "/driver/transports/current?acceptedRequestId=REQ%2020")]
     [InlineData("TransportPickupReady", null, 31L, "/driver/transports/31/pickup")]

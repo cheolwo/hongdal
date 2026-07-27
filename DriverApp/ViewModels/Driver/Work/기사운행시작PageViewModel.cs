@@ -40,6 +40,7 @@ public sealed partial class 기사운행시작PageViewModel : 기사PageViewMode
     public string 시작모드 => _samples.근무상태.시작모드;
     public string 시작위치 => _samples.근무상태.시작위치;
     public string? 복귀지 => _samples.근무상태.복귀지;
+    public string 운행상태 => _samples.근무상태.운행상태;
     public bool 위치송신중 => _위치송신.IsRunning;
     public bool 운행시작불가 => 처리중 || 위치송신중;
     public bool 운행종료불가 => 처리중 || !위치송신중;
@@ -57,7 +58,7 @@ public sealed partial class 기사운행시작PageViewModel : 기사PageViewMode
     public partial 기사Page메시지종류 상태종류 { get; private set; } = 기사Page메시지종류.안내;
 
     protected override Task 불러오기Async(bool 새로고침, CancellationToken cancellationToken)
-        => 새로고침 ? _samples.RefreshAsync(cancellationToken) : Task.CompletedTask;
+        => _samples.RefreshAsync(cancellationToken, force: 새로고침);
 
     [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task 운행시작Async(CancellationToken cancellationToken)
@@ -134,14 +135,23 @@ public sealed partial class 기사운행시작PageViewModel : 기사PageViewMode
 
         try
         {
-            await _위치송신.StopAsync(cancellationToken);
             await 근무기능.운행종료.실행Async(cancellationToken);
             if (근무기능.운행종료.오류발생)
             {
                 throw new InvalidOperationException(근무기능.운행종료.오류메시지 ?? "운행 종료에 실패했습니다.");
             }
 
-            메시지설정(기사Page메시지종류.안내, "운행을 종료했고, 위치 송신을 중지했습니다.");
+            try
+            {
+                await _위치송신.StopAsync(cancellationToken);
+                메시지설정(기사Page메시지종류.안내, "운행을 종료했고, 위치 송신을 중지했습니다.");
+            }
+            catch (Exception ex)
+            {
+                메시지설정(
+                    기사Page메시지종류.주의,
+                    $"서버 운행은 종료됐지만 단말의 위치 송신 중지 확인에 실패했습니다. 앱을 다시 열어 상태를 확인해 주세요. ({ex.Message})");
+            }
         }
         catch (Exception ex)
         {
@@ -171,6 +181,7 @@ public sealed partial class 기사운행시작PageViewModel : 기사PageViewMode
     private void 상태연쇄알림()
     {
         OnPropertyChanged(nameof(위치송신중));
+        OnPropertyChanged(nameof(운행상태));
         OnPropertyChanged(nameof(처리중));
         OnPropertyChanged(nameof(운행시작불가));
         OnPropertyChanged(nameof(운행종료불가));

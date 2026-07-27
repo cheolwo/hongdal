@@ -46,6 +46,7 @@ namespace 살뜰.Services.Dispatch.Queue
         public const string 공개배차전환됨 = "공개배차전환됨";
         public const string 확정됨 = "확정됨";
         public const string 후보없음 = "후보없음";
+        public const string 음식배달후보재탐색대기 = "음식배달후보재탐색대기";
         public const string 추천준비안됨 = "추천준비안됨";
         public const string 후보선정입력오류 = "후보선정입력오류";
         public const string 배차구성오류 = "배차구성오류";

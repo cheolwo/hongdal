@@ -49,8 +49,11 @@ public sealed class 기사샘플데이터Service : IDriverSampleDataService
             ]);
     }
 
-    public Task RefreshAsync(CancellationToken cancellationToken = default)
+    public Task RefreshAsync(
+        CancellationToken cancellationToken = default,
+        bool force = false)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return Task.CompletedTask;
     }
 
@@ -179,7 +182,7 @@ public sealed class 기사샘플데이터Service : IDriverSampleDataService
             new 기사운송샘플항목(
                 1,
                 "DRV-2026-LCL-001",
-                "공동수입 생활용품 혼재화물",
+                "같이 수입 생활용품 혼재화물",
                 "인천항 보세창고",
                 "서울 송파구 3PL 창고",
                 37.4661m,
