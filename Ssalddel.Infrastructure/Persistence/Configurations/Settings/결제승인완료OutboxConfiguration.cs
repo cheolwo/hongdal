@@ -8,6 +8,7 @@ public sealed class 결제승인완료OutboxConfiguration : IEntityTypeConfigura
 {
     public void Configure(EntityTypeBuilder<결제승인완료Outbox> builder)
     {
+        builder.Property(x => x.처리상태).IsConcurrencyToken();
         builder.HasIndex(x => new { x.처리상태, x.CreatedAt });
         builder.HasIndex(x => x.결제레코드Id).IsUnique();
     }

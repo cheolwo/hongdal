@@ -8,6 +8,7 @@ public sealed class Command알림OutboxConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<Command알림Outbox> builder)
     {
+        builder.Property(x => x.Status).IsConcurrencyToken();
         builder.HasIndex(x => new { x.Status, x.CreatedAt });
     }
 }

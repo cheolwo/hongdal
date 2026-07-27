@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Ssalddel.Infrastructure.BackgroundJobs;
 using 살뜰.Data;
 using 살뜰.도메인.공통;
 using 살뜰.Services.Dispatch.Queue;
@@ -11,23 +12,38 @@ namespace 살뜰.Infrastructure.BackgroundJobs.DispatchQueue
     {
         private readonly SsalddelContext _db;
         private readonly I배차대기원장전환Service _원장전환Service;
+        private readonly ISsalddelBackgroundJobActivationPolicy _activationPolicy;
         private readonly 배차큐배치작업Options _options;
         private readonly ILogger<추천만료정리Job> _logger;
 
         public 추천만료정리Job(
             SsalddelContext db,
             I배차대기원장전환Service 원장전환Service,
+            ISsalddelBackgroundJobActivationPolicy activationPolicy,
             Microsoft.Extensions.Options.IOptions<배차큐배치작업Options> options,
             ILogger<추천만료정리Job> logger)
         {
             _db = db;
             _원장전환Service = 원장전환Service;
+            _activationPolicy = activationPolicy;
             _options = options.Value;
             _logger = logger;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
+            var activation = _activationPolicy.Evaluate(
+                SsalddelBackgroundWorkloadKeys.DomesticTransportDispatch);
+            if (!activation.IsEnabled)
+            {
+                _logger.LogDebug(
+                    "Action={Action} ActivationCode={ActivationCode} FeatureKey={FeatureKey}",
+                    "DispatchRecommendationExpirySkipped",
+                    activation.Code,
+                    activation.FeatureKey);
+                return;
+            }
+
             var cancellationToken = context.CancellationToken;
             var now = DateTime.UtcNow;
 

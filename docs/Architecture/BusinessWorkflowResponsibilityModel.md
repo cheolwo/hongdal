@@ -153,8 +153,9 @@ Process Manager는 다른 Process Manager의 상위·하위 계층이 아니다.
 - 서버가 분리되면 동일한 Port 뒤에 HTTP·메시지·별도 Projection Adapter를 연결한다.
 - Process Manager 등록과 `BackgroundService` 등록을 분리한다.
 - 같은 저장소를 사용하는 BackgroundService를 여러 서버에서 실행할 때는 단일 실행 주체나 분산 lease를 둔다.
+- 외부 조회나 업무 상태 변경을 일으키는 Job은 실행 직전에 공통 활성화 정책으로 `Operational` 모드, workflow 기능 플래그와 작업별 설정을 함께 확인한다.
 
-현재 서버 조립에서는 `AddSsalddelGroupPurchaseDemandProcessModule`과 `AddSsalddelGroupImportReadinessProcessModule`로 핵심 모듈을 선택한다. 정기 실행은 각각의 `BackgroundProcessing` 등록 메서드로 별도 선택하고, 단일 서버 호환 구성은 공동수입 준비 Port를 `AddSsalddelGroupImportReadinessLocalAdapters`로 연결한다.
+현재 서버 조립에서는 `AddSsalddelGroupPurchaseDemandProcessModule`과 `AddSsalddelGroupImportReadinessProcessModule`로 핵심 모듈을 선택한다. 정기 실행은 각각의 `BackgroundProcessing` 등록 메서드로 별도 선택하고, 단일 서버 호환 구성은 같이 수입 준비 Port를 `AddSsalddelGroupImportReadinessLocalAdapters`로 연결한다.
 
 ## 판단 데이터 흐름
 

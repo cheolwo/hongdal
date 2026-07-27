@@ -1,5 +1,6 @@
 using Quartz;
 using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Infrastructure.BackgroundJobs;
 using Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 using Ssalddel.Infrastructure.BackgroundJobs.Community;
 using Ssalddel.Infrastructure.BackgroundJobs.Content;
@@ -7,6 +8,7 @@ using Ssalddel.Infrastructure.BackgroundJobs.SalesOrders;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
 using Ssalddel.Services.Orderer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using 살뜰.Infrastructure.BackgroundJobs.Customs;
 using 살뜰.Infrastructure.BackgroundJobs.DispatchQueue;
 using 살뜰.Infrastructure.BackgroundJobs.Notifications;
@@ -39,6 +41,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<OfficialFoodIngredientCompanyBatchRunner>();
         services.AddScoped<CommunityEditorialBatchRunner>();
         services.AddScoped<AgriculturalFisheriesCommunityPipelineRunner>();
+        services.TryAddSingleton<
+            ISsalddelBackgroundJobActivationPolicy,
+            SsalddelBackgroundJobActivationPolicy>();
         services.AddQuartz(q =>
         {
             if (executionOptions.Mode == SsalddelExecutionMode.Operational)

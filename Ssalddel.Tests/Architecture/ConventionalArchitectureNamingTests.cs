@@ -31,7 +31,7 @@ public sealed class ConventionalArchitectureNamingTests
     }
 
     [Fact]
-    public void 공동수입준비도_ProcessManager와_BackgroundService로_표현한다()
+    public void 같이수입준비도_ProcessManager와_BackgroundService로_표현한다()
     {
         var root = FindRepositoryRoot();
         var sourcePath = Path.Combine(
@@ -39,15 +39,15 @@ public sealed class ConventionalArchitectureNamingTests
             "Ssalddel",
             "Services",
             "Orderer",
-            "공동수입준비ProcessManager.cs");
+            "같이수입준비ProcessManager.cs");
         var source = File.ReadAllText(sourcePath);
 
-        Assert.Contains("interface I공동수입준비ProcessManager", source);
-        Assert.Contains("class 공동수입준비ProcessManager", source);
-        Assert.Contains("class 공동수입준비정기점검BackgroundService", source);
-        Assert.DoesNotContain("interface I공동수입준비OS", source);
-        Assert.DoesNotContain("class 공동수입준비OS", source);
-        Assert.DoesNotContain("class 공동수입준비OsWorker", source);
+        Assert.Contains("interface I같이수입준비ProcessManager", source);
+        Assert.Contains("class 같이수입준비ProcessManager", source);
+        Assert.Contains("class 같이수입준비정기점검BackgroundService", source);
+        Assert.DoesNotContain("interface I같이수입준비OS", source);
+        Assert.DoesNotContain("class 같이수입준비OS", source);
+        Assert.DoesNotContain("class 같이수입준비OsWorker", source);
     }
 
     [Fact]
@@ -73,13 +73,13 @@ public sealed class ConventionalArchitectureNamingTests
             "Controllers",
             "Admin",
             "Orderer",
-            "공동수입준비원장AdminController.cs"));
+            "같이수입준비원장AdminController.cs"));
         var importOptions = File.ReadAllText(Path.Combine(
             root,
             "Ssalddel",
             "Services",
             "Options",
-            "GroupImportReadinessOsOptions.cs"));
+            "GroupImportReadinessProcessManagerOptions.cs"));
 
         Assert.Contains(
             "[Route(\"api/v1/admin/orderer/group-purchase-demand-os\")]",
@@ -89,6 +89,7 @@ public sealed class ConventionalArchitectureNamingTests
             "[Route(\"api/v1/admin/orderer/group-purchase-demand-os/groups/{autoGroupId}/trade-readiness\")]",
             importController);
         Assert.Contains("SectionName = \"GroupImportReadinessOS\"", importOptions);
+        Assert.DoesNotContain("class GroupImportReadinessOsOptions", importOptions);
     }
 
     [Fact]

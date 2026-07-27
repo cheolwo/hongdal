@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Ssalddel.Services.Outbox;
 using 살뜰.Services.Options;
 using 살뜰.Services.Storage.Local;
 
@@ -7,10 +9,6 @@ namespace 살뜰.Services.Notifications;
 
 public sealed class Command알림Outbox발송Service : ICommand알림Outbox발송Service
 {
-    private const string 상태_대기 = "Pending";
-    private const string 상태_성공 = "Succeeded";
-    private const string 상태_실패 = "Failed";
-
     private readonly SsalddelContext _db;
     private readonly I사용자PushTokenStore _userPushTokenStore;
     private readonly IFcmPushService _fcmPushService;
@@ -36,8 +34,14 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
 
     public async Task<int> 대기알림발송Async(int take = 100, CancellationToken cancellationToken = default)
     {
+        var now = DateTime.UtcNow;
+        var retryCutoff = now - OutboxProcessingPolicy.RetryDelay;
+        var leaseCutoff = now - OutboxProcessingPolicy.LeaseTimeout;
         var items = await _db.Command알림Outbox
-            .Where(x => x.Status == 상태_대기
+            .Where(x => ((x.Status == OutboxProcessingStatuses.Pending
+                          && (x.RetryCount == 0 || x.UpdatedAt <= retryCutoff))
+                         || (x.Status == OutboxProcessingStatuses.Processing
+                             && x.UpdatedAt <= leaseCutoff))
                         && ((x.Target == "Shipper"
                              && (x.FeatureName == Command알림FeatureNames.배차수락
                                  || x.FeatureName == Command알림FeatureNames.상차접근
@@ -48,11 +52,11 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
                                  || x.FeatureName == Command알림FeatureNames.운송인수완료
                                  || x.FeatureName == Command알림FeatureNames.운송현장예외신고))
                             || (x.Target == "CustomsBroker"
-                                && x.FeatureName == Command알림FeatureNames.공동수입원장등록)
+                                && x.FeatureName == Command알림FeatureNames.같이수입원장등록)
                             || (x.Target == Command알림TargetNames.공동구매원장관계자
                                 && x.FeatureName == Command알림FeatureNames.공동구매원장변경)))
             .OrderBy(x => x.CreatedAt)
-            .Take(take)
+            .Take(Math.Clamp(take, 1, 500))
             .ToListAsync(cancellationToken);
 
         if (items.Count == 0)
@@ -67,16 +71,30 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
 
             try
             {
+                item.Status = OutboxProcessingStatuses.Processing;
+                item.RetryCount += 1;
+                item.UpdatedAt = now;
+                try
+                {
+                    await _db.SaveChangesAsync(cancellationToken);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    _db.Entry(item).State = EntityState.Detached;
+                    continue;
+                }
+
                 var payload = Command알림Payload.Parse(item.PayloadJson);
-                var now = DateTime.UtcNow;
                 if (payload.IsScheduledForFuture(now))
                 {
+                    item.Status = OutboxProcessingStatuses.Pending;
+                    item.RetryCount = Math.Max(0, item.RetryCount - 1);
+                    item.UpdatedAt = DateTime.UtcNow;
+                    await _db.SaveChangesAsync(cancellationToken);
                     continue;
                 }
 
                 processed++;
-                item.RetryCount += 1;
-                item.UpdatedAt = now;
 
                 var pushRequested = payload.Channels.Contains("Push");
                 var alimTalkRequested = payload.Channels.Contains("AlimTalk");
@@ -86,26 +104,53 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
                                    || !_kakaoOptions.Enabled
                                    || await 알림톡발송Async(item.FeatureName, payload, cancellationToken);
 
-                item.Status = pushSent && alimTalkSent ? 상태_성공 : 상태_실패;
-                if (item.Status == 상태_실패)
+                if (pushSent && alimTalkSent)
                 {
+                    item.Status = OutboxProcessingStatuses.Succeeded;
+                }
+                else
+                {
+                    var retry = OutboxProcessingPolicy.CanRetry(item.RetryCount);
+                    item.Status = retry
+                        ? OutboxProcessingStatuses.Pending
+                        : OutboxProcessingStatuses.Failed;
                     _logger.LogWarning(
-                        "Command 알림 발송 실패. OutboxId={OutboxId} FeatureName={FeatureName} TargetUserId={TargetUserId} PushSent={PushSent} AlimTalkSent={AlimTalkSent}",
+                        "Command 알림 발송 실패. OutboxId={OutboxId} FeatureName={FeatureName} TargetUserId={TargetUserId} PushSent={PushSent} AlimTalkSent={AlimTalkSent} Attempt={Attempt} WillRetry={WillRetry}",
                         item.Id,
                         item.FeatureName,
                         payload.TargetUserId,
                         pushSent,
-                        alimTalkSent);
+                        alimTalkSent,
+                        item.RetryCount,
+                        retry);
                 }
+            }
+            catch (JsonException ex)
+            {
+                item.Status = OutboxProcessingStatuses.Failed;
+                _logger.LogWarning(
+                    ex,
+                    "Command 알림 Outbox payload가 올바르지 않습니다. OutboxId={OutboxId}",
+                    item.Id);
             }
             catch (Exception ex)
             {
-                item.Status = 상태_실패;
-                _logger.LogWarning(ex, "Command 알림 발송 처리 중 예외가 발생했습니다. OutboxId={OutboxId}", item.Id);
+                var retry = OutboxProcessingPolicy.CanRetry(item.RetryCount);
+                item.Status = retry
+                    ? OutboxProcessingStatuses.Pending
+                    : OutboxProcessingStatuses.Failed;
+                _logger.LogWarning(
+                    ex,
+                    "Command 알림 발송 처리 중 예외가 발생했습니다. OutboxId={OutboxId} Attempt={Attempt} WillRetry={WillRetry}",
+                    item.Id,
+                    item.RetryCount,
+                    retry);
             }
+
+            item.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync(cancellationToken);
         }
 
-        await _db.SaveChangesAsync(cancellationToken);
         return processed;
     }
 
