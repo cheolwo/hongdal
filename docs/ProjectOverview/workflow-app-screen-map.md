@@ -6,6 +6,8 @@
 
 운송 이행을 닫기 위한 기존 체크리스트는 레거시 파일명인 [운송 필수 페이지 기준](ssalddel-v1-required-pages.md)에 둔다. 해당 문서의 제품 범위는 2.0이며, 현재 구현 우선순위는 [0.0 집중 로드맵](../Versions/v0.0/focus-roadmap.md)을 따른다.
 
+현재 역할별 앱과 `배달권`·네 가지 주문 원장을 실제 폐쇄 루프로 수렴시키는 순서는 [플랫폼 앱 완성도 수렴 계획](../Versions/platform-app-completion-plan.md)을 따른다.
+
 ## 읽는 방법
 
 | 구분 | 의미 |
