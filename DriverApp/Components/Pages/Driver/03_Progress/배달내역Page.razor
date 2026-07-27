@@ -1,5 +1,6 @@
 @page "/driver/transports/history"
 @inject IDriverSampleDataService Samples
+@inject IAuthSession AuthSession
 
 <PageTitle>배달 내역</PageTitle>
 
@@ -12,37 +13,112 @@
             </MudStack>
         </MudPaper>
 
-        <MudGrid Spacing="2">
-            @foreach (var item in Samples.운송목록.OrderByDescending(x => x.예정시각))
-            {
-                <MudItem xs="12" md="6">
-                    <MudPaper Class="driver-recommendation-card pa-4 h-100" Elevation="0">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
-                                <MudStack Spacing="0">
-                                    <MudText Typo="Typo.subtitle1">@item.화물종류 운송</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@item.의뢰Id</MudText>
+        @if (_데이터로딩중)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">배달 내역을 불러오고 있습니다.</MudText>
+        }
+        else if (!_인증됨)
+        {
+            <MudAlert Severity="Severity.Warning">
+                배달 내역은 기사 로그인 후 확인할 수 있습니다.
+                <MudButton Class="ml-2"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Href="@DriverRoutes.LoginFor(DriverRoutes.DeliveryHistory)">
+                    로그인하고 내역 보기
+                </MudButton>
+            </MudAlert>
+        }
+        else if (!string.IsNullOrWhiteSpace(_데이터오류))
+        {
+            <MudAlert Severity="Severity.Error">
+                @_데이터오류
+                <MudButton Class="ml-2" Variant="Variant.Outlined" Color="Color.Error" OnClick="재조회Async">다시 시도</MudButton>
+            </MudAlert>
+        }
+        else if (Samples.운송목록.Count == 0)
+        {
+            <MudPaper Class="pa-4" Elevation="1">
+                <MudStack Spacing="2" AlignItems="AlignItems.Start">
+                    <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">아직 배달 내역이 없습니다.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">운송을 시작하면 진행 상태와 완료 기록이 여기에 시간순으로 쌓입니다.</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.Recommendations">추천 운송 보기</MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+        else
+        {
+            <MudStack Row="true" Justify="Justify.FlexEnd">
+                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="재조회Async">내역 새로고침</MudButton>
+            </MudStack>
+            <MudGrid Spacing="2">
+                @foreach (var item in Samples.운송목록.OrderByDescending(x => x.예정시각))
+                {
+                    <MudItem xs="12" md="6">
+                        <MudPaper Class="driver-recommendation-card pa-4 h-100" Elevation="0">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.subtitle1">@item.화물종류 운송</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@item.의뢰Id</MudText>
+                                    </MudStack>
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@item.현재단계</MudChip>
                                 </MudStack>
-                                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@item.현재단계</MudChip>
-                            </MudStack>
 
-                            <DriverRoutePaymentSummary PickupTitle="@item.픽업지"
-                                                       PickupSubtitle="@PickupScheduleText(item)"
-                                                       DropoffTitle="@item.하차지"
-                                                       DropoffSubtitle="@TransportDistanceText(item)"
-                                                       PaymentLabel="수익"
-                                                       PaymentItems="@HistoryPaymentItems(item)" />
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            }
-        </MudGrid>
+                                <DriverRoutePaymentSummary PickupTitle="@item.픽업지"
+                                                           PickupSubtitle="@PickupScheduleText(item)"
+                                                           DropoffTitle="@item.하차지"
+                                                           DropoffSubtitle="@TransportDistanceText(item)"
+                                                           PaymentLabel="수익"
+                                                           PaymentItems="@HistoryPaymentItems(item)" />
+                            </MudStack>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
 
         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Menu">사용자 메뉴로</MudButton>
     </MudStack>
 </MudContainer>
 
 @code {
+    private bool _데이터로딩중 = true;
+    private bool _인증됨;
+    private string? _데이터오류;
+
+    protected override Task OnInitializedAsync()
+        => 데이터조회Async(force: false);
+
+    private Task 재조회Async()
+        => 데이터조회Async(force: true);
+
+    private async Task 데이터조회Async(bool force)
+    {
+        _데이터로딩중 = true;
+        _데이터오류 = null;
+
+        try
+        {
+            await AuthSession.RestoreAsync();
+            _인증됨 = AuthSession.IsAuthenticated;
+            if (_인증됨)
+            {
+                await Samples.RefreshAsync(force: force);
+            }
+        }
+        catch
+        {
+            _데이터오류 = "배달 내역을 불러오지 못했습니다. 네트워크와 서버 연결을 확인한 뒤 다시 시도해 주세요.";
+        }
+        finally
+        {
+            _데이터로딩중 = false;
+        }
+    }
+
     private static string PickupScheduleText(기사운송샘플항목 item)
         => $"예정 {item.예정시각:MM-dd HH:mm}";
 

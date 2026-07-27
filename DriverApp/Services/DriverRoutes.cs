@@ -20,6 +20,9 @@ public static class DriverRoutes
     public const string Notifications = "/driver/notifications";
     public const string NotificationSettings = "/driver/notifications/settings";
 
+    public static string LoginFor(string returnRoute)
+        => $"{Login}?returnUrl={Uri.EscapeDataString(returnRoute)}";
+
     public static string RecommendationDetail(string requestId) => $"/driver/recommendations/{requestId}";
 
     public static string RecommendationDecision(string requestId) => $"/driver/recommendations/{requestId}/decision";

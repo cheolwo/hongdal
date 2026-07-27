@@ -11,7 +11,11 @@
         <MudPaper Class="pa-4" Elevation="1">
             <MudStack Spacing="1">
                 <MudText Typo="Typo.h4">기사 로그인</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">지금은 선택적으로 로그인해 배차신청 같은 동작만 확인하고, 홈 화면은 비로그인 상태에서도 바로 볼 수 있다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">배차 추천과 운송 정보를 안전하게 불러오려면 로그인해 주세요.</MudText>
+                @if (!string.IsNullOrWhiteSpace(복귀화면안내))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Primary">로그인 후 @복귀화면안내 화면으로 돌아갑니다.</MudText>
+                }
             </MudStack>
         </MudPaper>
 
@@ -34,8 +38,8 @@
             <MudButton Variant="Variant.Outlined"
                        Color="Color.Secondary"
                        FullWidth="true"
-                       OnClick="GoHome">
-                홈으로 이동
+                       OnClick="GoBackOrHome">
+                @(_isLoggedIn && 안전한복귀경로 is not null ? "요청한 업무로 돌아가기" : "기사 홈으로")
             </MudButton>
 
             @if (_isLoggedIn)
@@ -52,10 +56,13 @@
 </MudContainer>
 
 @code {
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
     private string _loginId = string.Empty;
     private bool _isBusy;
     private bool _isLoggedIn;
-    private string? _statusMessage = "개발 단계에서는 홈을 바로 볼 수 있고, 필요할 때만 여기서 로그인하면 된다.";
+    private string? _statusMessage = "로그인하면 배차 추천, 진행 중 운송, 배달 내역을 서버 상태와 동기화합니다.";
     private Severity _statusSeverity = Severity.Info;
     private static readonly IReadOnlyList<string> DriverLoginHints =
     [
@@ -63,6 +70,16 @@
     ];
 
     private string CurrentUserLabel => AuthSession.UserName ?? "미로그인";
+    private string? 안전한복귀경로 => 내부기사경로인가(ReturnUrl) ? ReturnUrl : null;
+    private string? 복귀화면안내 => 안전한복귀경로 switch
+    {
+        DriverRoutes.Recommendations => "추천 목록",
+        DriverRoutes.CurrentTransport => "진행 중 운송",
+        DriverRoutes.DeliveryHistory => "배달 내역",
+        DriverRoutes.WorkStart => "운행 시작",
+        not null => "요청한 기사 업무",
+        _ => null
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -106,6 +123,7 @@
         await 푸시토큰등록Service.저장토큰등록Async();
         _statusSeverity = Severity.Success;
         _statusMessage = $"{AuthSession.UserName ?? _loginId} 님, 서버 로그인되었습니다.";
+        NavigationManager.NavigateTo(안전한복귀경로 ?? DriverRoutes.HomeSummary);
     }
 
     private Task SocialLoginAsync(공통소셜로그인요청 request)
@@ -123,8 +141,17 @@
         _statusMessage = "로그아웃했습니다.";
     }
 
-    private void GoHome()
+    private void GoBackOrHome()
     {
-        NavigationManager.NavigateTo(DriverRoutes.Home);
+        NavigationManager.NavigateTo(
+            _isLoggedIn && 안전한복귀경로 is { } route
+                ? route
+                : DriverRoutes.HomeSummary);
     }
+
+    private static bool 내부기사경로인가(string? returnUrl)
+        => !string.IsNullOrWhiteSpace(returnUrl)
+            && returnUrl.StartsWith("/driver/", StringComparison.Ordinal)
+            && !returnUrl.StartsWith("//", StringComparison.Ordinal)
+            && !returnUrl.Contains("://", StringComparison.Ordinal);
 }

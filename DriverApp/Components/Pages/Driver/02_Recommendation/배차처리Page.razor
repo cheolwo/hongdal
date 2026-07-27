@@ -1,5 +1,6 @@
 ﻿@page "/driver/recommendations/{의뢰Id}/decision"
 @inject IDriverSampleDataService Samples
+@inject IAuthSession AuthSession
 @inject IDriverRecommendationDecisionService DecisionService
 
 <PageTitle>배차처리</PageTitle>
@@ -15,9 +16,33 @@
 
         <MudPaper Class="pa-4" Elevation="2">
             <MudStack Spacing="2">
-                @if (의뢰 is null)
+                @if (_데이터로딩중)
                 {
-                    <MudAlert Severity="Severity.Warning">배차 처리할 추천 의뢰 정보를 찾지 못했습니다.</MudAlert>
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">처리할 추천 배차를 확인하고 있습니다.</MudText>
+                }
+                else if (!_인증됨)
+                {
+                    <MudAlert Severity="Severity.Warning">
+                        배차 수락과 거절은 기사 로그인 후 처리할 수 있습니다.
+                        <MudButton Class="ml-2"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Href="@DriverRoutes.LoginFor(DriverRoutes.RecommendationDecision(의뢰Id))">
+                            로그인하고 계속
+                        </MudButton>
+                    </MudAlert>
+                }
+                else if (!string.IsNullOrWhiteSpace(_데이터오류))
+                {
+                    <MudAlert Severity="Severity.Error">
+                        @_데이터오류
+                        <MudButton Class="ml-2" Variant="Variant.Outlined" Color="Color.Error" OnClick="재조회Async">다시 시도</MudButton>
+                    </MudAlert>
+                }
+                else if (의뢰 is null)
+                {
+                    <MudAlert Severity="Severity.Warning">배차 처리할 추천 의뢰 정보를 찾지 못했습니다. 추천 목록에서 현재 제안을 다시 확인해 주세요.</MudAlert>
                 }
                 else
                 {
@@ -27,28 +52,31 @@
                     <MudText Typo="Typo.body2">예상수익 @((의뢰.예상수익 ?? 0m).ToString("0"))원 / 추천점수 @((의뢰.추천점수 ?? 0m).ToString("0"))점</MudText>
                     <MudAlert Severity="Severity.Info">서버 배차 처리 API로 수락, 보류, 거절 상태를 갱신합니다.</MudAlert>
                 }
-                <MudAlert Severity="@_처리Severity">@_처리상태</MudAlert>
-                @if (_거절입력표시)
+                @if (_인증됨 && string.IsNullOrWhiteSpace(_데이터오류) && !_데이터로딩중)
                 {
-                    <MudSelect T="string" Label="거절 사유" @bind-Value="_거절사유" Variant="Variant.Outlined">
-                        <MudSelectItem T="string" Value="@("동선이 맞지 않음")">동선이 맞지 않음</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("시간 조건이 맞지 않음")">시간 조건이 맞지 않음</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("차량 조건이 맞지 않음")">차량 조건이 맞지 않음</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("수익성이 낮음")">수익성이 낮음</MudSelectItem>
-                    </MudSelect>
-                }
-                <MudStack Row="true" Spacing="2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(의뢰 is null)" OnClick="배차수락">배차 수락</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(의뢰 is null)" OnClick="배차보류">보류</MudButton>
+                    <MudAlert Severity="@_처리Severity">@_처리상태</MudAlert>
                     @if (_거절입력표시)
                     {
-                        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="배차거절">거절 확정</MudButton>
+                        <MudSelect T="string" Label="거절 사유" @bind-Value="_거절사유" Variant="Variant.Outlined">
+                            <MudSelectItem T="string" Value="@("동선이 맞지 않음")">동선이 맞지 않음</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("시간 조건이 맞지 않음")">시간 조건이 맞지 않음</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("차량 조건이 맞지 않음")">차량 조건이 맞지 않음</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("수익성이 낮음")">수익성이 낮음</MudSelectItem>
+                        </MudSelect>
                     }
-                    else
-                    {
-                        <MudButton Variant="Variant.Outlined" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="@(() => _거절입력표시 = true)">거절</MudButton>
-                    }
-                </MudStack>
+                    <MudStack Row="true" Spacing="2">
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(의뢰 is null)" OnClick="배차수락">배차 수락</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(의뢰 is null)" OnClick="배차보류">보류</MudButton>
+                        @if (_거절입력표시)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="배차거절">거절 확정</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="@(() => _거절입력표시 = true)">거절</MudButton>
+                        }
+                    </MudStack>
+                }
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.RecommendationDetail(의뢰Id)">추천 상세로</MudButton>
             </MudStack>
         </MudPaper>
@@ -64,8 +92,17 @@
     private Severity _처리Severity = Severity.Normal;
     private bool _거절입력표시;
     private string _거절사유 = "동선이 맞지 않음";
+    private bool _데이터로딩중 = true;
+    private bool _인증됨;
+    private string? _데이터오류;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
+    {
+        await 데이터조회Async(force: false);
+        현재결정표시();
+    }
+
+    private void 현재결정표시()
     {
         if (의뢰 is null)
         {
@@ -82,6 +119,33 @@
                 "거절" => Severity.Warning,
                 _ => Severity.Info
             };
+        }
+    }
+
+    private Task 재조회Async()
+        => 데이터조회Async(force: true);
+
+    private async Task 데이터조회Async(bool force)
+    {
+        _데이터로딩중 = true;
+        _데이터오류 = null;
+
+        try
+        {
+            await AuthSession.RestoreAsync();
+            _인증됨 = AuthSession.IsAuthenticated;
+            if (_인증됨)
+            {
+                await Samples.RefreshAsync(force: force);
+            }
+        }
+        catch
+        {
+            _데이터오류 = "추천 배차를 불러오지 못했습니다. 네트워크와 서버 연결을 확인한 뒤 다시 시도해 주세요.";
+        }
+        finally
+        {
+            _데이터로딩중 = false;
         }
     }
 

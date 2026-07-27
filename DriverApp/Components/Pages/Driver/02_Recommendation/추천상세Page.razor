@@ -1,5 +1,6 @@
 ﻿@page "/driver/recommendations/{의뢰Id}"
 @inject IDriverSampleDataService Samples
+@inject IAuthSession AuthSession
 @inject IDriverRecommendationDecisionService DecisionService
 
 <PageTitle>추천상세</PageTitle>
@@ -13,9 +14,36 @@
             </MudStack>
         </MudPaper>
 
-        @if (의뢰 is null)
+        @if (_데이터로딩중)
         {
-            <MudAlert Severity="Severity.Warning">추천 의뢰 정보를 찾지 못했습니다.</MudAlert>
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">추천 상세를 불러오고 있습니다.</MudText>
+        }
+        else if (!_인증됨)
+        {
+            <MudAlert Severity="Severity.Warning">
+                추천 상세는 기사 로그인 후 확인할 수 있습니다.
+                <MudButton Class="ml-2"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Href="@DriverRoutes.LoginFor(DriverRoutes.RecommendationDetail(의뢰Id))">
+                    로그인하고 상세 보기
+                </MudButton>
+            </MudAlert>
+        }
+        else if (!string.IsNullOrWhiteSpace(_데이터오류))
+        {
+            <MudAlert Severity="Severity.Error">
+                @_데이터오류
+                <MudButton Class="ml-2" Variant="Variant.Outlined" Color="Color.Error" OnClick="재조회Async">다시 시도</MudButton>
+            </MudAlert>
+        }
+        else if (의뢰 is null)
+        {
+            <MudAlert Severity="Severity.Warning">
+                추천 의뢰 정보를 찾지 못했습니다. 이미 처리되었거나 추천 목록에서 내려간 의뢰일 수 있습니다.
+                <MudButton Class="ml-2" Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Recommendations">추천 목록으로</MudButton>
+            </MudAlert>
         }
         else
         {
@@ -102,8 +130,17 @@
     private DriverRequestItem? 의뢰 => Samples.추천의뢰조회(의뢰Id);
     private string? _처리상태;
     private Severity _처리Severity = Severity.Info;
+    private bool _데이터로딩중 = true;
+    private bool _인증됨;
+    private string? _데이터오류;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
+    {
+        await 데이터조회Async(force: false);
+        현재결정표시();
+    }
+
+    private void 현재결정표시()
     {
         if (의뢰 is null)
         {
@@ -120,6 +157,33 @@
                 "거절" => Severity.Warning,
                 _ => Severity.Info
             };
+        }
+    }
+
+    private Task 재조회Async()
+        => 데이터조회Async(force: true);
+
+    private async Task 데이터조회Async(bool force)
+    {
+        _데이터로딩중 = true;
+        _데이터오류 = null;
+
+        try
+        {
+            await AuthSession.RestoreAsync();
+            _인증됨 = AuthSession.IsAuthenticated;
+            if (_인증됨)
+            {
+                await Samples.RefreshAsync(force: force);
+            }
+        }
+        catch
+        {
+            _데이터오류 = "추천 상세를 불러오지 못했습니다. 네트워크와 서버 연결을 확인한 뒤 다시 시도해 주세요.";
+        }
+        finally
+        {
+            _데이터로딩중 = false;
         }
     }
 

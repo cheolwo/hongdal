@@ -1,5 +1,6 @@
 ﻿@page "/driver/recommendations"
 @inject IDriverSampleDataService Samples
+@inject IAuthSession AuthSession
 @inject 추천카드표시설정Service CardPreferenceService
 @inject IDriverRecommendationDecisionService DecisionService
 @using DriverApp.Models.Driver
@@ -15,6 +16,42 @@
                 <MudText Typo="Typo.body2" Color="Color.Secondary">기사님 현재 위치에서 가까운 상차지부터 추천콜을 확인한다.</MudText>
             </MudStack>
         </MudPaper>
+
+        @if (_데이터로딩중)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">현재 위치와 추천 배차를 불러오고 있습니다.</MudText>
+        }
+        else if (!_인증됨)
+        {
+            <MudAlert Severity="Severity.Warning">
+                추천 배차는 기사 로그인 후 확인할 수 있습니다.
+                <MudButton Class="ml-2"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Href="@DriverRoutes.LoginFor(DriverRoutes.Recommendations)">
+                    로그인하고 추천 보기
+                </MudButton>
+            </MudAlert>
+        }
+        else if (!string.IsNullOrWhiteSpace(_데이터오류))
+        {
+            <MudAlert Severity="Severity.Error">
+                @_데이터오류
+                <MudButton Class="ml-2" Variant="Variant.Outlined" Color="Color.Error" OnClick="재조회Async">다시 시도</MudButton>
+            </MudAlert>
+        }
+        else
+        {
+            <MudStack Row="true" Justify="Justify.FlexEnd">
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="재조회Async">
+                    새 추천 확인
+                </MudButton>
+            </MudStack>
+        }
 
         <MudPaper Class="pa-4" Elevation="2">
             <MudStack Spacing="2">
@@ -58,11 +95,13 @@
             </MudStack>
         </MudPaper>
 
-        @if (표시목록.Count == 0)
+        @if (!_데이터로딩중 && _인증됨 && string.IsNullOrWhiteSpace(_데이터오류) && 표시목록.Count == 0)
         {
-            <MudAlert Severity="Severity.Info">선택한 반경 안에 추천 의뢰가 없습니다.</MudAlert>
+            <MudAlert Severity="Severity.Info">현재 조건에 맞는 추천 의뢰가 없습니다. 운행 대기 상태와 위치 공유 상태를 확인한 뒤 새 추천을 확인해 주세요.</MudAlert>
         }
-        else if (CardPreferenceService.CalculatePolicy().거리표시 == false && CardPreferenceService.CalculatePolicy().차량조건표시 == false)
+        else if (!_데이터로딩중 && _인증됨 && string.IsNullOrWhiteSpace(_데이터오류)
+                 && CardPreferenceService.CalculatePolicy().거리표시 == false
+                 && CardPreferenceService.CalculatePolicy().차량조건표시 == false)
         {
             <MudStack Spacing="2">
                 @foreach (var item in 표시목록)
@@ -105,7 +144,7 @@
                 }
             </MudStack>
         }
-        else
+        else if (!_데이터로딩중 && _인증됨 && string.IsNullOrWhiteSpace(_데이터오류))
         {
             <MudGrid Spacing="3">
                 @foreach (var item in 표시목록)
@@ -160,6 +199,9 @@
     private string _정렬기준 = "거리";
     private readonly HashSet<string> _자동거절처리중 = new(StringComparer.OrdinalIgnoreCase);
     private CancellationTokenSource? _타이머취소;
+    private bool _데이터로딩중 = true;
+    private bool _인증됨;
+    private string? _데이터오류;
 
     private static readonly IReadOnlyList<반경옵션항목> 반경옵션 =
     [
@@ -212,11 +254,12 @@
         _ => Variant.Outlined
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         DecisionService.Changed += OnDecisionChanged;
         _타이머취소 = new CancellationTokenSource();
         _ = RunTimerAsync(_타이머취소.Token);
+        await 데이터조회Async(force: false);
     }
 
     public void Dispose()
@@ -247,6 +290,11 @@
 
     private async Task 자동미응답거절처리Async(CancellationToken cancellationToken)
     {
+        if (_데이터로딩중 || !_인증됨 || !string.IsNullOrWhiteSpace(_데이터오류))
+        {
+            return;
+        }
+
         foreach (var item in 표시목록)
         {
             var request = item.의뢰;
@@ -275,6 +323,33 @@
     private void OnDecisionChanged()
     {
         _ = InvokeAsync(StateHasChanged);
+    }
+
+    private Task 재조회Async()
+        => 데이터조회Async(force: true);
+
+    private async Task 데이터조회Async(bool force)
+    {
+        _데이터로딩중 = true;
+        _데이터오류 = null;
+
+        try
+        {
+            await AuthSession.RestoreAsync();
+            _인증됨 = AuthSession.IsAuthenticated;
+            if (_인증됨)
+            {
+                await Samples.RefreshAsync(force: force);
+            }
+        }
+        catch
+        {
+            _데이터오류 = "추천 정보를 불러오지 못했습니다. 네트워크와 서버 연결을 확인한 뒤 다시 시도해 주세요.";
+        }
+        finally
+        {
+            _데이터로딩중 = false;
+        }
     }
 
     private RenderFragment 응답제한표시(DriverRequestItem request) => builder =>

@@ -19,6 +19,11 @@ public static class DriverMobileScreenCatalog
 
         return normalizedPath switch
         {
+            DriverRoutes.Login => new(
+                "04.00",
+                "기사 로그인",
+                "배차 추천과 운송 정보를 확인할 기사 세션을 연결합니다.",
+                "계정"),
             DriverRoutes.WorkStart => new(
                 "04.02",
                 "운행 시작",

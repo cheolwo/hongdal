@@ -20,7 +20,9 @@
         <a class="driver-mobile-shell__alert-link"
            href="@DriverRoutes.Notifications"
            aria-label="알림함 열기">알림</a>
-        <span class="driver-mobile-shell__avatar" aria-label="운송 기사">D</span>
+        <a class="driver-mobile-shell__avatar"
+           href="@DriverRoutes.Login"
+           aria-label="기사 로그인과 계정 열기">D</a>
     </header>
 
     @if (_drawerOpen)
@@ -128,6 +130,7 @@
     private static IReadOnlyList<DriverDrawerItem> DrawerItems =>
     [
         new("기사 홈 요약", DriverRoutes.HomeSummary, Icons.Material.Filled.Home),
+        new("로그인 및 계정", DriverRoutes.Login, Icons.Material.Filled.AccountCircle),
         new("운행 시작", DriverRoutes.WorkStart, Icons.Material.Filled.PlayCircle),
         new("커뮤니티 개별 의뢰", DriverRoutes.CommunityInquiries, Icons.Material.Filled.Forum),
         new("운송 추천", DriverRoutes.Recommendations, Icons.Material.Filled.Recommend),
