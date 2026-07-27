@@ -1,0 +1,12 @@
+@page "/group-purchase/recipe-uses/{ProductId}"
+
+<PageTitle>같이 주문 레시피 활용</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <같이주문탐색여정Screen 단계="같이주문여정단계.레시피활용"
+                            문맥키="@ProductId" />
+</MudContainer>
+
+@code {
+    [Parameter] public string ProductId { get; set; } = string.Empty;
+}

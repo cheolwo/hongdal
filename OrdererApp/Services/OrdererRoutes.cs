@@ -15,6 +15,12 @@ public static class OrdererRoutes
     public const string GroupPurchasePractice = GroupPurchasePageRoutes.Practice;
     public const string ProducePriceComparison = "/group-purchase/produce-prices";
     public const string GroupPurchaseProducts = GroupPurchasePageRoutes.ProductsRoot;
+    public const string GroupPurchaseRecipeUses = GroupPurchasePageRoutes.RecipeUsesRoot;
+    public const string GroupPurchaseOrderModeComparison = GroupPurchasePageRoutes.OrderModeComparisonRoot;
+    public const string GroupPurchaseDeliveryScopes = GroupPurchasePageRoutes.DeliveryScopesRoot;
+    public const string GroupPurchaseTogetherOrders = GroupPurchasePageRoutes.TogetherOrdersRoot;
+    public const string GroupPurchaseSupplierRelationships = GroupPurchasePageRoutes.SupplierRelationshipsRoot;
+    public const string GroupPurchaseUrgentHarvestOffers = GroupPurchasePageRoutes.UrgentHarvestOffersRoot;
     public const string GroupPurchaseWishes = GroupPurchasePageRoutes.WishesRoot;
     public const string GroupPurchaseWishCreate = GroupPurchasePageRoutes.WishCreate;
     public const string GroupPurchaseGroups = GroupPurchasePageRoutes.GroupsRoot;

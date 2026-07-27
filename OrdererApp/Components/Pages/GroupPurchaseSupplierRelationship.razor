@@ -1,0 +1,12 @@
+@page "/group-purchase/supplier-relationships/{SupplierKey}"
+
+<PageTitle>공급자 관계 후보</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <같이주문탐색여정Screen 단계="같이주문여정단계.공급자관계"
+                            문맥키="@SupplierKey" />
+</MudContainer>
+
+@code {
+    [Parameter] public string SupplierKey { get; set; } = string.Empty;
+}

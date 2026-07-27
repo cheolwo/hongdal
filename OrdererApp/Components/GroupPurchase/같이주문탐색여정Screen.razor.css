@@ -1,0 +1,433 @@
+.together-journey__stack {
+    display: grid;
+    gap: 12px;
+}
+
+.together-journey__map {
+    display: grid;
+    grid-auto-columns: minmax(76px, 1fr);
+    grid-auto-flow: column;
+    gap: 0;
+    overflow-x: auto;
+    border: 1px solid #bfd2ee;
+    border-radius: 8px;
+    background: #fff;
+    scrollbar-width: thin;
+}
+
+.together-journey__map-item {
+    position: relative;
+    display: grid;
+    gap: 1px;
+    min-height: 54px;
+    padding: 9px 22px 8px 10px;
+    color: #56657a;
+    text-decoration: none;
+}
+
+.together-journey__map-item:not(:last-child)::after {
+    position: absolute;
+    top: 18px;
+    right: 7px;
+    content: "→";
+    color: #8fa8c9;
+}
+
+.together-journey__map-item small {
+    color: #758ba8;
+    font-size: .58rem;
+}
+
+.together-journey__map-item strong {
+    font-size: .67rem;
+    white-space: nowrap;
+}
+
+.together-journey__map-item--current {
+    background: #eaf2ff;
+    color: #0d4fa8;
+}
+
+.together-journey__map-item--current small {
+    color: #1769e0;
+}
+
+.together-journey__map-item--disabled {
+    opacity: .48;
+}
+
+.together-journey__state {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 92px;
+    padding: 14px;
+    border: 1px solid #cbd8e9;
+    border-radius: 8px;
+    background: #fff;
+    color: #526075;
+    font-size: .72rem;
+}
+
+.together-journey__state--error {
+    grid-template-columns: auto minmax(0, 1fr);
+    border-color: #e7b6b6;
+    color: #8a3333;
+}
+
+.together-journey__state--error span {
+    display: grid;
+    gap: 3px;
+}
+
+.together-journey__state--error ::deep .mud-button-root {
+    grid-column: 1 / -1;
+}
+
+.together-journey__hero,
+.together-journey__scope-card,
+.together-journey__profile,
+.together-journey__membership,
+.together-journey__harvest {
+    display: grid;
+    gap: 5px;
+    padding: 15px;
+    border: 1px solid #c6d7ef;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #f8fbff, #eaf2ff);
+}
+
+.together-journey__hero > span,
+.together-journey__scope-card > span,
+.together-journey__profile > span,
+.together-journey__membership > span,
+.together-journey__harvest > span {
+    color: #1769e0;
+    font-size: .64rem;
+    font-weight: 850;
+}
+
+.together-journey__hero > strong,
+.together-journey__scope-card h2,
+.together-journey__profile h2,
+.together-journey__membership > strong,
+.together-journey__harvest > strong {
+    margin: 0;
+    color: #18375f;
+    font-size: 1.35rem;
+    letter-spacing: -.035em;
+}
+
+.together-journey__hero small,
+.together-journey__scope-card small {
+    color: #64748b;
+    font-size: .62rem;
+}
+
+.together-journey__scope-card p,
+.together-journey__profile p,
+.together-journey__membership p,
+.together-journey__harvest p {
+    margin: 0;
+    color: #5f6f83;
+    font-size: .7rem;
+    line-height: 1.55;
+}
+
+.together-journey__cards {
+    display: grid;
+    gap: 9px;
+}
+
+.together-journey__card {
+    display: grid;
+    gap: 6px;
+    padding: 13px;
+    border: 1px solid #cdd9e9;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.together-journey__card > span {
+    color: #1769e0;
+    font-size: .61rem;
+    font-weight: 800;
+}
+
+.together-journey__card h2 {
+    margin: 0;
+    font-size: .95rem;
+}
+
+.together-journey__card p {
+    margin: 0;
+    color: #617086;
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+.together-journey__card dl,
+.together-journey__definition {
+    display: grid;
+    gap: 0;
+    margin: 2px 0 0;
+    border: 1px solid #d8e1ed;
+    border-radius: 6px;
+}
+
+.together-journey__card dl > div,
+.together-journey__definition > div {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 8px;
+    padding: 9px 10px;
+}
+
+.together-journey__card dl > div + div,
+.together-journey__definition > div + div {
+    border-top: 1px solid #e1e7ef;
+}
+
+.together-journey__card dt,
+.together-journey__definition dt {
+    color: #60738b;
+    font-size: .62rem;
+}
+
+.together-journey__card dd,
+.together-journey__definition dd {
+    margin: 0;
+    color: #2e3b4e;
+    font-size: .66rem;
+    line-height: 1.45;
+}
+
+.together-journey__card a {
+    justify-self: end;
+    color: #1769e0;
+    font-size: .68rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.together-journey__card progress,
+.together-journey__progress-card progress {
+    width: 100%;
+    height: 7px;
+    accent-color: #1769e0;
+}
+
+.together-journey__primary,
+.together-journey__secondary {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 850;
+    text-align: center;
+    text-decoration: none;
+}
+
+.together-journey__primary {
+    background: #1769e0;
+    color: #fff;
+}
+
+.together-journey__secondary {
+    border: 1px solid #9dbbe4;
+    background: #fff;
+    color: #1557b0;
+}
+
+.together-journey__notice,
+.together-journey__assumption,
+.together-journey__privacy {
+    margin: 0;
+    padding: 10px 11px;
+    border-radius: 6px;
+    background: #eef5ff;
+    color: #36577f;
+    font-size: .66rem;
+    line-height: 1.5;
+}
+
+.together-journey__assumption {
+    display: grid;
+    gap: 2px;
+}
+
+.together-journey__privacy {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px;
+}
+
+.together-journey__privacy span {
+    display: grid;
+    gap: 2px;
+}
+
+.together-journey__comparison,
+.together-journey__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.together-journey__comparison article,
+.together-journey__metrics article {
+    display: grid;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid #d1dbe8;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.together-journey__comparison article.is-recommended {
+    border-color: #8bb4ee;
+    background: #eef5ff;
+}
+
+.together-journey__comparison span,
+.together-journey__metrics span {
+    color: #62748d;
+    font-size: .62rem;
+}
+
+.together-journey__comparison strong,
+.together-journey__metrics strong {
+    color: #1d3f6b;
+    font-size: .95rem;
+}
+
+.together-journey__comparison small {
+    color: #65758b;
+    font-size: .59rem;
+}
+
+.together-journey__progress-card,
+.together-journey__freight {
+    display: grid;
+    gap: 7px;
+    padding: 13px;
+    border: 1px solid #cbd9eb;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.together-journey__progress-card header {
+    display: flex;
+    justify-content: space-between;
+    color: #2d4564;
+    font-size: .68rem;
+}
+
+.together-journey__progress-card p,
+.together-journey__freight p {
+    margin: 0;
+    color: #5d6d82;
+    font-size: .67rem;
+    line-height: 1.5;
+}
+
+.together-journey__progress-card small {
+    color: #6d7d91;
+    font-size: .6rem;
+}
+
+.together-journey__scope-label {
+    margin: 0;
+    color: #506783;
+    font-size: .66rem;
+    font-weight: 800;
+}
+
+.together-journey__metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.together-journey__metrics article {
+    padding: 10px 7px;
+}
+
+.together-journey__metrics strong {
+    font-size: .76rem;
+}
+
+.together-journey__freight > span {
+    color: #1769e0;
+    font-size: .62rem;
+    font-weight: 850;
+}
+
+.together-journey__review {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding: 13px;
+    border-radius: 7px;
+    background: #fff4d9;
+    color: #6f561d;
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+.together-journey__review span {
+    display: grid;
+    gap: 3px;
+}
+
+.together-journey__checklist {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.together-journey__checklist li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #d2ddea;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.together-journey__checklist li > span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #eaf2ff;
+    color: #1769e0;
+    font-size: .66rem;
+    font-weight: 900;
+}
+
+.together-journey__checklist div {
+    display: grid;
+    gap: 2px;
+}
+
+.together-journey__checklist strong {
+    font-size: .7rem;
+}
+
+.together-journey__checklist small {
+    color: #65758b;
+    font-size: .61rem;
+}
+
+@media (min-width: 700px) {
+    .together-journey__cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

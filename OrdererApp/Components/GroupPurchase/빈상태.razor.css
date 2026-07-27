@@ -1,0 +1,23 @@
+.empty-state {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 88px;
+    padding: 13px;
+    border: 1px dashed #b8c8dc;
+    border-radius: 8px;
+    background: #f9fbfe;
+    color: #627187;
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+.empty-state span {
+    display: grid;
+    gap: 3px;
+}
+
+.empty-state strong {
+    color: #31445d;
+}

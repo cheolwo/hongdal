@@ -2,18 +2,18 @@
 @using Ssalddel.Contracts.Common.Orderer
 @inject GroupPurchaseCatalogViewModel Catalog
 
-<PageTitle>공동구매 상품 근거</PageTitle>
+<PageTitle>같이 주문 상품 근거</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
     <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.ProductDetail"
-                              Eyebrow="GROUP PURCHASE · DETAIL"
+                              Eyebrow="02 ORDERER · 02A2.02"
                               Title="상품 근거 확인"
-                              Description="한 상품의 공개 근거만 읽고, 수요 등록은 별도 Action route에서 시작합니다."
+                              Description="한 상품의 공개 근거와 기준 단위를 읽고, 활용·비교·수요 등록을 각각의 다음 화면에서 시작합니다."
                               BackHref="@GroupPurchasePageRoutes.ProductsRoot">
         @if (!_productFound)
         {
             <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
-                요청한 공동구매 상품을 찾지 못했습니다.
+                요청한 같이 주문 상품을 찾지 못했습니다.
             </MudAlert>
         }
         else
@@ -22,14 +22,32 @@
                 <GroupPurchaseProductEvidencePanel Product="Catalog.SelectedProduct" />
                 <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                     <MudStack Spacing="2">
-                        <MudText Typo="Typo.h6">이 상품의 비구속 수요를 남길까요?</MudText>
+                        <MudText Typo="Typo.h6">이 상품을 어떻게 이용할까요?</MudText>
                         <MudText Typo="Typo.body2" Color="Color.Secondary">
-                            다음 화면에서는 모집권과 희망 수량만 확인합니다. 저장해도 결제나 주문이 확정되지 않습니다.
+                            25kg을 어디에 쓸지 본 뒤 개별 주문과 같이 주문을 비교할 수 있습니다. 수요 저장은 별도 동작입니다.
                         </MudText>
                         <MudGrid Spacing="2">
                             <MudItem xs="12" sm="6">
-                                <MudButton Href="@GroupPurchasePageRoutes.DemandCreateFor(Catalog.SelectedProduct.상품카드Id)"
+                                <MudButton Href="@GroupPurchasePageRoutes.RecipeUseFor(Catalog.SelectedProduct.상품카드Id)"
                                            Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.RestaurantMenu"
+                                           FullWidth="true">
+                                    25kg 활용 보기
+                                </MudButton>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudButton Href="@GroupPurchasePageRoutes.OrderModeComparisonFor(Catalog.SelectedProduct.상품카드Id)"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CompareArrows"
+                                           FullWidth="true">
+                                    주문 방식 비교
+                                </MudButton>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudButton Href="@GroupPurchasePageRoutes.DemandCreateFor(Catalog.SelectedProduct.상품카드Id)"
+                                           Variant="Variant.Outlined"
                                            Color="Color.Primary"
                                            StartIcon="@Icons.Material.Filled.GroupAdd"
                                            FullWidth="true">
@@ -41,7 +59,7 @@
                                            Variant="Variant.Text"
                                            Color="Color.Secondary"
                                            FullWidth="true">
-                                    1.5 수입 검토 참고
+                                    1.5 같이 수입 검토
                                 </MudButton>
                             </MudItem>
                         </MudGrid>

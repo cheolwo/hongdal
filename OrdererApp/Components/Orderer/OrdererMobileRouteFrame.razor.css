@@ -23,7 +23,7 @@
 }
 
 .orderer-mobile-route__header > span {
-    color: #6b35c5;
+    color: #1769e0;
     font-size: .68rem;
     font-weight: 850;
 }
@@ -53,9 +53,9 @@
     line-height: 1.5;
 }
 
-.orderer-mobile-route__boundary--purple {
-    background: #f1e5fb;
-    color: #62427d;
+.orderer-mobile-route__boundary--blue {
+    background: #eaf2ff;
+    color: #315a8f;
 }
 
 .orderer-mobile-route__boundary--warning {

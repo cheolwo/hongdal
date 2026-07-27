@@ -1,0 +1,13 @@
+@page "/group-purchase/delivery-scopes/{DeliveryScopeKey}"
+
+<PageTitle>배송권 공개 범위</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <같이주문탐색여정Screen 단계="같이주문여정단계.배송권상세"
+                            문맥키="@DeliveryScopeKey"
+                            배송권키="@DeliveryScopeKey" />
+</MudContainer>
+
+@code {
+    [Parameter] public string DeliveryScopeKey { get; set; } = string.Empty;
+}

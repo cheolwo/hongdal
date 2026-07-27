@@ -1,0 +1,12 @@
+<section class="empty-state">
+    <MudIcon Icon="@Icons.Material.Filled.Inbox" />
+    <span>
+        <strong>@제목</strong>
+        @설명
+    </span>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public string 제목 { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string 설명 { get; set; } = string.Empty;
+}

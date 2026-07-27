@@ -5,7 +5,17 @@ public sealed class OrdererMobileFigma02PresentationTests
     [Theory]
     [InlineData("Home.razor", "02.01")]
     [InlineData("ProducePriceComparison.razor", "02.02A")]
-    [InlineData("GroupPurchaseProducts.razor", "02.02")]
+    [InlineData("GroupPurchaseProducts.razor", "02A2.01")]
+    [InlineData("GroupPurchaseProductDetail.razor", "02A2.02")]
+    [InlineData("GroupPurchaseRecipeUse.razor", "같이주문여정단계.레시피활용")]
+    [InlineData("GroupPurchaseOrderModeComparison.razor", "같이주문여정단계.주문방식비교")]
+    [InlineData("GroupPurchaseDeliveryScopes.razor", "같이주문여정단계.배송권찾기")]
+    [InlineData("GroupPurchaseTogetherOrders.razor", "같이주문여정단계.같이주문목록")]
+    [InlineData("GroupPurchaseTogetherOrderDetail.razor", "같이주문여정단계.같이주문상세")]
+    [InlineData("GroupPurchaseSupplierRelationship.razor", "같이주문여정단계.공급자관계")]
+    [InlineData("GroupPurchaseSupplierMembership.razor", "같이주문여정단계.공급자Membership")]
+    [InlineData("GroupPurchaseUrgentHarvestOffer.razor", "같이주문여정단계.긴급수확제안")]
+    [InlineData("GroupPurchaseUrgentHarvestReview.razor", "같이주문여정단계.긴급수확검토")]
     [InlineData("GroupPurchaseWishCreate.razor", "02.03")]
     [InlineData("GroupPurchaseWishDetail.razor", "02.04")]
     [InlineData("GroupPurchaseWishEdit.razor", "02.05")]
@@ -44,7 +54,7 @@ public sealed class OrdererMobileFigma02PresentationTests
 
         Assert.Contains("orderer-mobile-shell__appbar", source);
         Assert.Contains("orderer-mobile-shell__bottom-nav", source);
-        Assert.Contains("개별주문 → 공동주문", source);
+        Assert.Contains("개별 주문 → 같이 주문", source);
         Assert.Contains(">홈</span>", source);
         Assert.Contains(">재료</span>", source);
         Assert.Contains(">내 주문</span>", source);
@@ -66,7 +76,37 @@ public sealed class OrdererMobileFigma02PresentationTests
         Assert.Contains("OrdererRoutes.ProducePriceComparison", source);
         Assert.Contains("OrdererRoutes.GroupPurchaseProducts", source);
         Assert.Contains("OrdererRoutes.Orders", source);
-        Assert.Contains("개별주문과 공동 실행은 분리됩니다.", source);
+        Assert.Contains("개별 주문과 같이 주문 실행은 분리됩니다.", source);
+    }
+
+    [Fact]
+    public void Figma02A2여정은_버튼Route와읽기Api를_하나의흐름으로연결한다()
+    {
+        var root = FindRepositoryRoot();
+        var screen = File.ReadAllText(Path.Combine(
+            root,
+            "OrdererApp",
+            "Components",
+            "GroupPurchase",
+            "같이주문탐색여정Screen.razor"));
+        var service = File.ReadAllText(Path.Combine(
+            root,
+            "OrdererApp",
+            "Services",
+            "같이주문여정ReadService.cs"));
+
+        Assert.Contains("together-journey__map", screen);
+        Assert.Contains("RecipeUseFor", screen);
+        Assert.Contains("OrderModeComparisonFor", screen);
+        Assert.Contains("DeliveryScopeFor", screen);
+        Assert.Contains("TogetherOrderDetailFor", screen);
+        Assert.Contains("SupplierRelationshipFor", screen);
+        Assert.Contains("UrgentHarvestReviewFor", screen);
+        Assert.Contains("25kg 상자 환산", screen);
+        Assert.Contains("LCL·FCL은 공급자·포워더 회신 전까지 미판정", screen);
+        Assert.Contains("order-mode-comparisons/recipe-uses", service);
+        Assert.Contains("order-mode-comparisons/preview", service);
+        Assert.Contains("group-purchase-auto-groups", service);
     }
 
     [Fact]

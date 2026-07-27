@@ -25,6 +25,7 @@ public static class MauiProgram
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
         builder.Services.AddTransient<주문자공동구매기능ViewModel>();
         builder.Services.AddScoped<IGroupPurchaseProductCatalogService, HttpGroupPurchaseProductCatalogService>();
+        builder.Services.AddScoped<I같이주문여정ReadService, Http같이주문여정ReadService>();
         builder.Services.AddTransient<GroupPurchaseCatalogViewModel>();
         builder.Services.AddScoped<GroupPurchaseWishBatchViewModel>();
         builder.Services.AddTransient<주문자재료후보PageViewModel>();

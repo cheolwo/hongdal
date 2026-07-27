@@ -13,10 +13,14 @@ public sealed class GroupPurchasePageRoutesTests
         Assert.Equal(
             "/group-purchase/products/hs-food-0203-pork-frozen",
             GroupPurchasePageRoutes.ProductDetailFor("hs-food-0203-pork-frozen"));
+        Assert.Equal(
+            "/group-purchase/recipe-uses/hs-food-0203-pork-frozen",
+            GroupPurchasePageRoutes.RecipeUseFor("hs-food-0203-pork-frozen"));
         Assert.Equal("/group-purchase/delivery-scopes", GroupPurchasePageRoutes.DeliveryScopesRoot);
         Assert.Equal(
             "/group-purchase/delivery-scopes/kr%3A11%3A11470%3A1147051000",
             GroupPurchasePageRoutes.DeliveryScopeFor("kr:11:11470:1147051000"));
+        Assert.Equal("/group-purchase/together-orders", GroupPurchasePageRoutes.TogetherOrdersRoot);
         Assert.Equal(
             "/group-purchase/together-orders/auto-group-onion",
             GroupPurchasePageRoutes.TogetherOrderDetailFor("auto-group-onion"));
@@ -54,7 +58,7 @@ public sealed class GroupPurchasePageRoutesTests
     }
 
     [Fact]
-    public void 공동수입_준비현황_route는_원장별_단일책임화면으로_분리된다()
+    public void 같이수입_준비현황_route는_원장별_단일책임화면으로_분리된다()
     {
         Assert.Equal("/group-purchase/imports", GroupPurchasePageRoutes.ImportsRoot);
         Assert.Equal(
@@ -84,6 +88,9 @@ public sealed class GroupPurchasePageRoutesTests
             "/group-purchase/products/food%2F0203",
             GroupPurchasePageRoutes.ProductDetailFor("food/0203"));
         Assert.Equal(
+            "/group-purchase/recipe-uses/food%2F0203",
+            GroupPurchasePageRoutes.RecipeUseFor("food/0203"));
+        Assert.Equal(
             "/group-purchase/wishes/wish%2F17/edit",
             GroupPurchasePageRoutes.WishEditFor("wish/17"));
         Assert.Equal(
@@ -104,6 +111,7 @@ public sealed class GroupPurchasePageRoutesTests
         Assert.Equal(
             "/group-purchase/imports/import%2F17/costs",
             GroupPurchasePageRoutes.ImportCostsFor("import/17"));
+        Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.RecipeUseFor(" "));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.DemandCreateFor(" "));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.WishDetailFor(" "));
         Assert.Throws<ArgumentException>(() => GroupPurchasePageRoutes.GroupDetailFor(" "));

@@ -6,9 +6,11 @@ public enum GroupPurchaseScreenKind
     Practice,
     ProductList,
     ProductDetail,
+    RecipeUse,
     OrderModeComparison,
     DeliveryScopeFinder,
     DeliveryScopeDetail,
+    TogetherOrderList,
     TogetherOrderDetail,
     SupplierRelationshipDetail,
     SupplierMembership,
@@ -38,6 +40,8 @@ public static class GroupPurchasePageRoutes
     public const string Practice = $"{Root}/practice";
     public const string ProductsRoot = $"{Root}/products";
     public const string ProductDetailTemplate = $"{ProductsRoot}/{{ProductId}}";
+    public const string RecipeUsesRoot = $"{Root}/recipe-uses";
+    public const string RecipeUseTemplate = $"{RecipeUsesRoot}/{{ProductId}}";
     public const string OrderModeComparisonRoot = $"{Root}/compare";
     public const string OrderModeComparisonTemplate = $"{OrderModeComparisonRoot}/{{ProductId}}";
     public const string DeliveryScopesRoot = $"{Root}/delivery-scopes";
@@ -77,6 +81,9 @@ public static class GroupPurchasePageRoutes
     public static string ProductDetailFor(string productId)
         => $"{ProductsRoot}/{RequireProductId(productId)}";
 
+    public static string RecipeUseFor(string productId)
+        => $"{RecipeUsesRoot}/{RequireProductId(productId)}";
+
     public static string OrderModeComparisonFor(string productId)
         => $"{OrderModeComparisonRoot}/{RequireProductId(productId)}";
 
@@ -111,7 +118,7 @@ public static class GroupPurchasePageRoutes
         => $"{GroupsRoot}/{RequireSegment(autoGroupId, nameof(autoGroupId), "자동집단 ID")}";
 
     public static string ImportOverviewFor(string groupImportLedgerId)
-        => $"{ImportsRoot}/{RequireSegment(groupImportLedgerId, nameof(groupImportLedgerId), "공동수입 원장 ID")}";
+        => $"{ImportsRoot}/{RequireSegment(groupImportLedgerId, nameof(groupImportLedgerId), "같이 수입 원장 ID")}";
 
     public static string ImportSuppliersFor(string groupImportLedgerId)
         => $"{ImportOverviewFor(groupImportLedgerId)}/suppliers";

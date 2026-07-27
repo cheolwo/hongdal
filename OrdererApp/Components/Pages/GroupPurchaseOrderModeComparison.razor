@@ -1,0 +1,12 @@
+@page "/group-purchase/compare/{ProductId}"
+
+<PageTitle>개별 주문과 같이 주문 비교</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <같이주문탐색여정Screen 단계="같이주문여정단계.주문방식비교"
+                            문맥키="@ProductId" />
+</MudContainer>
+
+@code {
+    [Parameter] public string ProductId { get; set; } = string.Empty;
+}

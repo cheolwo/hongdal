@@ -10,7 +10,7 @@
 }
 
 .orderer-price-journey__heading > span {
-    color: #6b35c5;
+    color: #1769e0;
     font-size: .7rem;
     font-weight: 850;
 }
@@ -53,8 +53,8 @@
 }
 
 .orderer-price-journey__steps a.is-current {
-    background: #f0e3fb;
-    color: #5d3680;
+    background: #eaf2ff;
+    color: #174f96;
 }
 
 .orderer-price-journey__steps span {
@@ -64,7 +64,7 @@
     width: 25px;
     height: 25px;
     border-radius: 50%;
-    background: #eee2fb;
+    background: #dceaff;
     font-size: .7rem;
     font-weight: 850;
 }
@@ -111,7 +111,7 @@
 }
 
 .orderer-price-journey__primary {
-    background: #6b35c5;
+    background: #1769e0;
     color: #fff;
 }
 

@@ -1,0 +1,606 @@
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Ui.Common.Areas.App.Services
+@inject I같이주문여정ReadService 여정ReadService
+@inject ISsalddel현재사용자Context 현재사용자Context
+
+<GroupPurchaseScreenFrame CurrentScreen="@현재화면"
+                          Eyebrow="@($"02 ORDERER · {화면코드}")"
+                          Title="@제목"
+                          Description="@설명"
+                          BackHref="@이전경로"
+                          BoundaryMessage="@경계안내">
+    <nav class="together-journey__map" aria-label="같이 주문 화면 이동 흐름">
+        @foreach (var item in 여정지도)
+        {
+            var href = 지도경로(item.단계);
+            if (string.IsNullOrWhiteSpace(href))
+            {
+                <span class="together-journey__map-item together-journey__map-item--disabled">
+                    <small>@item.코드</small>
+                    <strong>@item.이름</strong>
+                </span>
+            }
+            else
+            {
+                <a class="@지도Class(item.단계)" href="@href" aria-current="@(item.단계 == 단계 ? "step" : null)">
+                    <small>@item.코드</small>
+                    <strong>@item.이름</strong>
+                </a>
+            }
+        }
+    </nav>
+
+    @if (_불러오는중)
+    {
+        <section class="together-journey__state" aria-live="polite">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+            <span>현재 원장과 공개 근거를 불러오고 있습니다.</span>
+        </section>
+    }
+    else if (!string.IsNullOrWhiteSpace(_오류))
+    {
+        <section class="together-journey__state together-journey__state--error" role="alert">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Small" />
+            <span>
+                <strong>이 화면의 자료를 불러오지 못했습니다.</strong>
+                @_오류
+            </span>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="다시불러오기Async">
+                다시 시도
+            </MudButton>
+        </section>
+    }
+    else
+    {
+        @switch (단계)
+        {
+            case 같이주문여정단계.레시피활용:
+                @레시피활용화면
+                break;
+            case 같이주문여정단계.주문방식비교:
+                @주문방식비교화면
+                break;
+            case 같이주문여정단계.배송권찾기:
+                @배송권찾기화면
+                break;
+            case 같이주문여정단계.배송권상세:
+                @배송권상세화면
+                break;
+            case 같이주문여정단계.같이주문목록:
+                @같이주문목록화면
+                break;
+            case 같이주문여정단계.같이주문상세:
+                @같이주문상세화면
+                break;
+            case 같이주문여정단계.공급자관계:
+                @공급자관계화면
+                break;
+            case 같이주문여정단계.공급자Membership:
+                @공급자Membership화면
+                break;
+            case 같이주문여정단계.긴급수확제안:
+                @긴급수확제안화면
+                break;
+            case 같이주문여정단계.긴급수확검토:
+                @긴급수확검토화면
+                break;
+        }
+    }
+</GroupPurchaseScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public 같이주문여정단계 단계 { get; set; }
+    [Parameter] public string? 문맥키 { get; set; }
+    [Parameter] public string? 배송권키 { get; set; }
+
+    private bool _불러오는중;
+    private string? _오류;
+    private HS먹거리공동구매상품카드? _상품;
+    private 같이주문레시피활용응답? _레시피;
+    private 주문방식비교응답? _비교;
+    private IReadOnlyList<공동구매자동집단요약응답> _같이주문목록 = [];
+    private 같이주문공개상세응답? _같이주문상세;
+
+    private 주문자집단배송권Snapshot? 저장배송권
+        => 현재사용자Context.현재사용자.주문자집단배송권;
+
+    private string? 유효배송권키
+        => !string.IsNullOrWhiteSpace(배송권키)
+            ? 배송권키.Trim()
+            : 저장배송권?.ScopeKey;
+
+    private string 화면코드 => 단계 switch
+    {
+        같이주문여정단계.레시피활용 => "02A2.03",
+        같이주문여정단계.주문방식비교 => "02A2.04",
+        같이주문여정단계.배송권찾기 => "02A2.05",
+        같이주문여정단계.배송권상세 => "02A2.05",
+        같이주문여정단계.같이주문목록 => "02A2.06",
+        같이주문여정단계.같이주문상세 => "02A2.07",
+        같이주문여정단계.공급자관계 => "02A2.08",
+        같이주문여정단계.공급자Membership => "02A2.09",
+        같이주문여정단계.긴급수확제안 => "02A2.10",
+        _ => "02A2.11"
+    };
+
+    private GroupPurchaseScreenKind 현재화면 => 단계 switch
+    {
+        같이주문여정단계.레시피활용 => GroupPurchaseScreenKind.RecipeUse,
+        같이주문여정단계.주문방식비교 => GroupPurchaseScreenKind.OrderModeComparison,
+        같이주문여정단계.배송권찾기 => GroupPurchaseScreenKind.DeliveryScopeFinder,
+        같이주문여정단계.배송권상세 => GroupPurchaseScreenKind.DeliveryScopeDetail,
+        같이주문여정단계.같이주문목록 => GroupPurchaseScreenKind.TogetherOrderList,
+        같이주문여정단계.같이주문상세 => GroupPurchaseScreenKind.TogetherOrderDetail,
+        같이주문여정단계.공급자관계 => GroupPurchaseScreenKind.SupplierRelationshipDetail,
+        같이주문여정단계.공급자Membership => GroupPurchaseScreenKind.SupplierMembership,
+        같이주문여정단계.긴급수확제안 => GroupPurchaseScreenKind.UrgentHarvestOffer,
+        _ => GroupPurchaseScreenKind.UrgentHarvestReview
+    };
+
+    private string 제목 => 단계 switch
+    {
+        같이주문여정단계.레시피활용 => "이 양을 어디에 쓸까요?",
+        같이주문여정단계.주문방식비교 => "개별 주문과 같이 주문 비교",
+        같이주문여정단계.배송권찾기 => "내 배송권 확인",
+        같이주문여정단계.배송권상세 => "배송권 공개 범위",
+        같이주문여정단계.같이주문목록 => "이 배송권의 같이 주문",
+        같이주문여정단계.같이주문상세 => "같이 주문 상세",
+        같이주문여정단계.공급자관계 => "공급자 관계 후보",
+        같이주문여정단계.공급자Membership => "공급자 Membership 검토",
+        같이주문여정단계.긴급수확제안 => "긴급 수확 제안",
+        _ => "긴급 수확 연결 검토"
+    };
+
+    private string 설명 => 단계 switch
+    {
+        같이주문여정단계.레시피활용 => "개인이 받을 25kg을 음식별로 나누어 보고 과잉 주문인지 먼저 판단합니다.",
+        같이주문여정단계.주문방식비교 => "같은 25kg 기준으로 예상 비용, 더 기다리는 시간과 모집 조건을 함께 봅니다.",
+        같이주문여정단계.배송권찾기 => "상세 주소는 공개하지 않고 같이 주문을 묶을 생활권만 확인합니다.",
+        같이주문여정단계.배송권상세 => "배송권 안에서 공개되는 집계와 숨겨지는 개인정보를 구분합니다.",
+        같이주문여정단계.같이주문목록 => "저장된 배송권 안에서 진행 중인 공개 모집을 상품별로 확인합니다.",
+        같이주문여정단계.같이주문상세 => "참여자 식별정보 없이 총수량, 상자 환산과 다음 가격 구간을 확인합니다.",
+        같이주문여정단계.공급자관계 => "같이 주문 원장에서 연결된 공급 후보의 근거와 역할만 먼저 확인합니다.",
+        같이주문여정단계.공급자Membership => "월 비용과 예상 혜택을 비교하되 가입과 주문 동의를 분리합니다.",
+        같이주문여정단계.긴급수확제안 => "남는 수확 물량을 가격, 기한, 운송 책임이 있는 제안 초안으로 읽습니다.",
+        _ => "수량과 역할이 맞는지 확인하고도 자동 계약이나 자동 주문은 실행하지 않습니다."
+    };
+
+    private string 경계안내 => 단계 switch
+    {
+        같이주문여정단계.같이주문상세 =>
+            "25kg 상자 환산은 KAMIS 표시단위를 이해하기 위한 참고입니다. 실제 포장과 LCL·FCL은 공급자·포워더 회신 전까지 미판정입니다.",
+        같이주문여정단계.공급자Membership =>
+            "Membership 관심 등록, 유료 가입과 같이 주문 참여는 서로 다른 동의입니다. 이 화면은 결제나 가입을 실행하지 않습니다.",
+        같이주문여정단계.긴급수확제안 or 같이주문여정단계.긴급수확검토 =>
+            "긴급성만으로 가격·운송·검수 책임을 생략하지 않습니다. 화면 확인만으로 계약, 배차 또는 결제가 시작되지 않습니다.",
+        _ =>
+            "이 흐름은 읽기와 비구속 검토 단계입니다. 화면 이동만으로 같이 주문 참여, 결제, 계약 또는 수입 실행이 시작되지 않습니다."
+    };
+
+    private string? 이전경로 => 단계 switch
+    {
+        같이주문여정단계.레시피활용 when _상품 is not null =>
+            GroupPurchasePageRoutes.ProductDetailFor(_상품.상품카드Id),
+        같이주문여정단계.주문방식비교 when _상품 is not null =>
+            GroupPurchasePageRoutes.RecipeUseFor(_상품.상품카드Id),
+        같이주문여정단계.배송권찾기 when _상품 is not null =>
+            GroupPurchasePageRoutes.OrderModeComparisonFor(_상품.상품카드Id),
+        같이주문여정단계.배송권상세 => GroupPurchasePageRoutes.DeliveryScopesRoot,
+        같이주문여정단계.같이주문목록 when !string.IsNullOrWhiteSpace(유효배송권키) =>
+            GroupPurchasePageRoutes.DeliveryScopeFor(유효배송권키),
+        같이주문여정단계.같이주문상세 when !string.IsNullOrWhiteSpace(_같이주문상세?.배송권키) =>
+            같이주문목록경로(_같이주문상세.배송권키),
+        같이주문여정단계.공급자관계 when !string.IsNullOrWhiteSpace(문맥키) =>
+            GroupPurchasePageRoutes.TogetherOrderDetailFor(공급자원천집단키(문맥키)),
+        같이주문여정단계.공급자Membership when !string.IsNullOrWhiteSpace(문맥키) =>
+            GroupPurchasePageRoutes.SupplierRelationshipFor(문맥키),
+        같이주문여정단계.긴급수확제안 when !string.IsNullOrWhiteSpace(문맥키) =>
+            GroupPurchasePageRoutes.SupplierRelationshipFor(제안원천공급자키(문맥키)),
+        같이주문여정단계.긴급수확검토 when !string.IsNullOrWhiteSpace(문맥키) =>
+            GroupPurchasePageRoutes.UrgentHarvestOfferFor(문맥키),
+        _ => GroupPurchasePageRoutes.ProductsRoot
+    };
+
+    protected override async Task OnParametersSetAsync()
+        => await 불러오기Async();
+
+    private async Task 불러오기Async()
+    {
+        _불러오는중 = 단계 is 같이주문여정단계.레시피활용
+            or 같이주문여정단계.주문방식비교
+            or 같이주문여정단계.같이주문목록
+            or 같이주문여정단계.같이주문상세;
+        _오류 = null;
+        _상품 = null;
+        _레시피 = null;
+        _비교 = null;
+        _같이주문목록 = [];
+        _같이주문상세 = null;
+
+        try
+        {
+            if (단계 is 같이주문여정단계.레시피활용 or 같이주문여정단계.주문방식비교)
+            {
+                if (string.IsNullOrWhiteSpace(문맥키))
+                {
+                    _오류 = "상품 키가 필요합니다.";
+                    return;
+                }
+
+                _상품 = await 여정ReadService.상품조회Async(문맥키);
+                if (_상품 is null)
+                {
+                    _오류 = "요청한 상품 후보를 찾을 수 없습니다.";
+                    return;
+                }
+
+                if (단계 == 같이주문여정단계.레시피활용)
+                {
+                    _레시피 = await 여정ReadService.레시피활용조회Async(_상품);
+                }
+                else
+                {
+                    _비교 = await 여정ReadService.주문방식비교Async(_상품);
+                }
+            }
+            else if (단계 == 같이주문여정단계.같이주문목록
+                     && !string.IsNullOrWhiteSpace(유효배송권키))
+            {
+                _같이주문목록 = await 여정ReadService.같이주문목록조회Async(유효배송권키);
+            }
+            else if (단계 == 같이주문여정단계.같이주문상세)
+            {
+                if (string.IsNullOrWhiteSpace(문맥키))
+                {
+                    _오류 = "같이 주문 ID가 필요합니다.";
+                    return;
+                }
+
+                _같이주문상세 = await 여정ReadService.같이주문상세조회Async(문맥키);
+                if (_같이주문상세 is null)
+                {
+                    _오류 = "요청한 같이 주문을 찾을 수 없습니다.";
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            _오류 = exception.Message;
+        }
+        finally
+        {
+            _불러오는중 = false;
+        }
+    }
+
+    private Task 다시불러오기Async() => 불러오기Async();
+
+    private RenderFragment 레시피활용화면 => @<div class="together-journey__stack">
+        <section class="together-journey__hero">
+            <span>개인 수령 검토량</span>
+            <strong>@(_레시피?.개인수령검토수량.ToString("N0") ?? "25") kg</strong>
+            <small>@(_상품?.상품명 ?? 문맥키) · 같이 주문 전체 수량과 분리</small>
+        </section>
+        @if (_레시피 is null)
+        {
+            <빈상태 제목="연결된 레시피 자료가 없습니다."
+                    설명="상품명과 공식 식재료 색인이 연결되면 이 위치에 활용 음식이 표시됩니다." />
+        }
+        else
+        {
+            <p class="together-journey__notice">@_레시피.안내</p>
+            <div class="together-journey__cards">
+                @foreach (var recipe in _레시피.활용음식)
+                {
+                    <article class="together-journey__card">
+                        <span>@recipe.RegionName · @recipe.Category</span>
+                        <h2>@recipe.DishName</h2>
+                        <p>@recipe.RecipeTitle</p>
+                        <dl>
+                            <div><dt>재료 사용량</dt><dd>@recipe.IngredientQuantityText @recipe.IngredientUnitText</dd></div>
+                            <div><dt>준비</dt><dd>@recipe.PreparationNote</dd></div>
+                            <div><dt>출처</dt><dd>@recipe.SourceProvider</dd></div>
+                        </dl>
+                    </article>
+                }
+            </div>
+        }
+        <a class="together-journey__primary" href="@상품비교경로()">25kg 기준 주문 방식 비교하기</a>
+    </div>;
+
+    private RenderFragment 주문방식비교화면 => @<div class="together-journey__stack">
+        <section class="together-journey__assumption">
+            <strong>비교 입력</strong>
+            <span>25kg · KRW · 25kg 상자 공급 구간 · 화면 검토용 물류비</span>
+        </section>
+        @if (_비교 is not null)
+        {
+            <div class="together-journey__comparison">
+                <article>
+                    <span>개별 주문</span>
+                    <strong>@금액(_비교.개별주문.총예상비용)</strong>
+                    <small>단위당 @금액(_비교.개별주문.단위당예상비용) / kg</small>
+                </article>
+                <article class="is-recommended">
+                    <span>같이 주문 예상</span>
+                    <strong>@금액(_비교.같이주문.총예상비용)</strong>
+                    <small>단위당 @금액(_비교.같이주문.단위당예상비용) / kg</small>
+                </article>
+            </div>
+            <section class="together-journey__progress-card">
+                <header><strong>모집 @(_비교.같이주문모집.모집진척률.ToString("N0"))%</strong><span>@_비교.같이주문모집.현재참여자수 / @(_비교.같이주문모집.목표참여자수)명</span></header>
+                <progress max="100" value="@_비교.같이주문모집.모집진척률"></progress>
+                <p>@_비교.판단.안내</p>
+                <small>예상 절감 @_비교.판단.예상절감률.ToString("N1")% · 추가 대기 @(_비교.판단.추가대기시간Hours?.ToString("N0") ?? "미정")시간</small>
+            </section>
+        }
+        <a class="together-journey__primary" href="@GroupPurchasePageRoutes.DeliveryScopesRoot">내 배송권으로 같이 주문 찾기</a>
+    </div>;
+
+    private RenderFragment 배송권찾기화면 => @<div class="together-journey__stack">
+        @if (저장배송권 is null)
+        {
+            <빈상태 제목="저장된 배송권이 없습니다."
+                    설명="가입 또는 온보딩에서 생활권을 설정하면 상세 주소를 공개하지 않고 같이 주문 후보를 묶을 수 있습니다." />
+            <a class="together-journey__secondary" href="@OrdererRoutes.Home">주문자 홈으로 돌아가기</a>
+        }
+        else
+        {
+            <article class="together-journey__scope-card">
+                <span>현재 배송권</span>
+                <h2>@저장배송권.DisplayName</h2>
+                <p>@저장배송권.Basis</p>
+                <small>공개 key · @저장배송권.ScopeKey</small>
+            </article>
+            <a class="together-journey__primary" href="@GroupPurchasePageRoutes.DeliveryScopeFor(저장배송권.ScopeKey)">이 배송권의 공개 범위 보기</a>
+        }
+        <section class="together-journey__privacy">
+            <MudIcon Icon="@Icons.Material.Filled.LocationOff" Size="Size.Small" />
+            <span><strong>상세 주소는 묶음 기준이 아닙니다.</strong> 배송권 key와 집계만 공개하고 세부 주소는 참여 동의 뒤 필요한 역할에만 전달합니다.</span>
+        </section>
+    </div>;
+
+    private RenderFragment 배송권상세화면 => @<div class="together-journey__stack">
+        <article class="together-journey__scope-card">
+            <span>배송권 key</span>
+            <h2>@문맥키</h2>
+            <p>같은 생활권의 모집을 찾기 위한 공개 집계 범위입니다.</p>
+        </article>
+        <dl class="together-journey__definition">
+            <div><dt>공개</dt><dd>배송권 이름, 상품, 참여자 수, 총 희망 수량, 모집 기한</dd></div>
+            <div><dt>비공개</dt><dd>참여자 이름, 상세 주소, 개인별 수량, 결제 정보</dd></div>
+            <div><dt>자동 처리 안 함</dt><dd>상대 선택, 가입, 배차, 계약 확정</dd></div>
+        </dl>
+        <a class="together-journey__primary" href="@같이주문목록경로(문맥키)">이 배송권의 같이 주문 보기</a>
+    </div>;
+
+    private RenderFragment 같이주문목록화면 => @<div class="together-journey__stack">
+        @if (string.IsNullOrWhiteSpace(유효배송권키))
+        {
+            <빈상태 제목="먼저 배송권을 확인해 주세요."
+                    설명="같이 주문은 상세 주소가 아니라 저장된 배송권 단위로 조회합니다." />
+            <a class="together-journey__primary" href="@GroupPurchasePageRoutes.DeliveryScopesRoot">배송권 확인</a>
+        }
+        else if (_같이주문목록.Count == 0)
+        {
+            <빈상태 제목="현재 공개 모집이 없습니다."
+                    설명="이 배송권에서 새 비구속 수요가 모이면 상품별 같이 주문 후보가 나타납니다." />
+            <a class="together-journey__secondary" href="@GroupPurchasePageRoutes.ProductsRoot">재료 후보 보기</a>
+        }
+        else
+        {
+            <p class="together-journey__scope-label">배송권 · @유효배송권키</p>
+            <div class="together-journey__cards">
+                @foreach (var group in _같이주문목록)
+                {
+                    <article class="together-journey__card">
+                        <span>@group.현재상태 · @group.배송권명</span>
+                        <h2>@group.상품명</h2>
+                        <p>@group.총희망수량.ToString("N0") @group.수량단위 · @(group.참여자수)명 참여</p>
+                        <progress max="100" value="@모집진척률(group)"></progress>
+                        <a href="@GroupPurchasePageRoutes.TogetherOrderDetailFor(group.자동집단Id)">상세 보기 →</a>
+                    </article>
+                }
+            </div>
+        }
+    </div>;
+
+    private RenderFragment 같이주문상세화면 => @<div class="together-journey__stack">
+        @if (_같이주문상세 is not null)
+        {
+            var boxes = Math.Ceiling(_같이주문상세.총희망수량 / 25m);
+            <section class="together-journey__hero">
+                <span>@_같이주문상세.배송권명 · @_같이주문상세.현재상태</span>
+                <strong>@_같이주문상세.상품명</strong>
+                <small>@(_같이주문상세.참여자수)명 · @_같이주문상세.총희망수량.ToString("N0") @_같이주문상세.수량단위</small>
+            </section>
+            <div class="together-journey__metrics">
+                <article><span>총 집계</span><strong>@_같이주문상세.총희망수량.ToString("N0") kg</strong></article>
+                <article><span>25kg 상자 환산</span><strong>약 @(boxes.ToString("N0"))상자</strong></article>
+                <article><span>추가 필요</span><strong>@(_같이주문상세.추가필요수량?.ToString("N0") ?? "0") kg</strong></article>
+            </div>
+            <section class="together-journey__freight">
+                <span>LCL / FCL</span>
+                <strong>아직 미판정</strong>
+                <p>여러 재료의 총중량·부피·상자 규격을 포워더가 확인한 뒤 후보가 정해집니다. 참여가 늘면 공급 가격 구간과 FCL 가능성이 달라질 수 있습니다.</p>
+            </section>
+            <a class="together-journey__primary" href="@GroupPurchasePageRoutes.DemandCreateFor(_같이주문상세.상품키)">내 비구속 수량 검토</a>
+            <a class="together-journey__secondary" href="@공급자후보경로(_같이주문상세.자동집단Id)">연결된 공급자 관계 보기</a>
+        }
+    </div>;
+
+    private RenderFragment 공급자관계화면 => @<div class="together-journey__stack">
+        <article class="together-journey__profile">
+            <span>관계 후보 · 연락처 비공개</span>
+            <h2>@공급자표시명(문맥키)</h2>
+            <p>생산·공급 근거가 같이 주문 원장에 연결된 뒤 역할과 공개 범위를 검토합니다.</p>
+        </article>
+        <dl class="together-journey__definition">
+            <div><dt>먼저 확인</dt><dd>공급 품목, 포장 규격, 출하 가능 시각, 원출처</dd></div>
+            <div><dt>별도 동의</dt><dd>업데이트 구독, 연락처 공개, 유료 Membership</dd></div>
+            <div><dt>관계와 주문</dt><dd>관심 관계가 생겨도 주문이나 계약은 자동으로 확정되지 않음</dd></div>
+        </dl>
+        <a class="together-journey__primary" href="@GroupPurchasePageRoutes.SupplierMembershipFor(문맥키 ?? "pending")">Membership 혜택 비교</a>
+        <a class="together-journey__secondary" href="@GroupPurchasePageRoutes.UrgentHarvestOfferFor(공급자제안키(문맥키))">긴급 수확 제안 보기</a>
+    </div>;
+
+    private RenderFragment 공급자Membership화면 => @<div class="together-journey__stack">
+        <section class="together-journey__membership">
+            <span>예상 월 비용</span>
+            <strong>가입 전 미확정</strong>
+            <p>공급자가 확인한 요율과 이용 조건이 도착해야 손익분기 주문 횟수를 계산합니다.</p>
+        </section>
+        <dl class="together-journey__definition">
+            <div><dt>관심 등록</dt><dd>무료 · 공급 소식 수신 여부만 저장</dd></div>
+            <div><dt>유료 가입</dt><dd>별도 약관과 월 비용 동의 필요</dd></div>
+            <div><dt>같이 주문</dt><dd>Membership과 별도로 매 모집 참여 동의 필요</dd></div>
+        </dl>
+        <p class="together-journey__notice">현재는 혜택 계산 조건을 읽는 화면이며 결제 버튼을 제공하지 않습니다.</p>
+        <a class="together-journey__secondary" href="@GroupPurchasePageRoutes.SupplierRelationshipFor(문맥키 ?? "pending")">공급자 관계로 돌아가기</a>
+    </div>;
+
+    private RenderFragment 긴급수확제안화면 => @<div class="together-journey__stack">
+        <section class="together-journey__harvest">
+            <span>긴급 수확 제안 초안</span>
+            <strong>@문맥키</strong>
+            <p>출하 기한이 짧은 공급 물량을 같이 주문과 연결할 수 있는지 먼저 검토합니다.</p>
+        </section>
+        <dl class="together-journey__definition">
+            <div><dt>수량 단위</dt><dd>kg와 상자 수를 함께 기록하고 상자 규격을 별도 확인</dd></div>
+            <div><dt>필수 근거</dt><dd>수확·출하 기한, 공급 가격, 검수 기준, 운송 책임</dd></div>
+            <div><dt>금지</dt><dd>긴급하다는 이유만으로 자동 배차·계약·가격 확정</dd></div>
+        </dl>
+        <a class="together-journey__primary" href="@GroupPurchasePageRoutes.UrgentHarvestReviewFor(문맥키 ?? "pending")">연결 적합성 검토</a>
+    </div>;
+
+    private RenderFragment 긴급수확검토화면 => @<div class="together-journey__stack">
+        <section class="together-journey__review">
+            <MudIcon Icon="@Icons.Material.Filled.FactCheck" />
+            <span>
+                <strong>현재 판단 · 추가 자료 필요</strong>
+                수량과 배송권만으로는 연결할 수 없습니다. 포장, 출하 기한과 운송 책임을 확인해야 합니다.
+            </span>
+        </section>
+        <ol class="together-journey__checklist">
+            <li><span>1</span><div><strong>공급 물량</strong><small>kg · 25kg 상자 · 실제 포장 규격 대조</small></div></li>
+            <li><span>2</span><div><strong>시간창</strong><small>수확, 상차, 공동 수령 가능 시각</small></div></li>
+            <li><span>3</span><div><strong>책임</strong><small>검수, 폐기 위험, 냉장 운송 담당</small></div></li>
+        </ol>
+        <p class="together-journey__notice">조건이 채워져도 제안은 담당자 검토 상태로 남으며 사용자가 다시 동의해야 합니다.</p>
+        <a class="together-journey__secondary" href="@GroupPurchasePageRoutes.GroupsRoot">내 같이 주문 후보로 돌아가기</a>
+    </div>;
+
+    private static readonly IReadOnlyList<(같이주문여정단계 단계, string 코드, string 이름)> 여정지도 =
+    [
+        (같이주문여정단계.레시피활용, "03", "활용"),
+        (같이주문여정단계.주문방식비교, "04", "비교"),
+        (같이주문여정단계.배송권찾기, "05", "배송권"),
+        (같이주문여정단계.같이주문목록, "06", "목록"),
+        (같이주문여정단계.같이주문상세, "07", "상세"),
+        (같이주문여정단계.공급자관계, "08", "공급자"),
+        (같이주문여정단계.공급자Membership, "09", "혜택"),
+        (같이주문여정단계.긴급수확제안, "10", "수확"),
+        (같이주문여정단계.긴급수확검토, "11", "검토")
+    ];
+
+    private string 지도Class(같이주문여정단계 item)
+        => item == 단계
+            ? "together-journey__map-item together-journey__map-item--current"
+            : "together-journey__map-item";
+
+    private string? 지도경로(같이주문여정단계 item)
+        => item switch
+        {
+            같이주문여정단계.레시피활용 when 상품키() is { Length: > 0 } product =>
+                GroupPurchasePageRoutes.RecipeUseFor(product),
+            같이주문여정단계.주문방식비교 when 상품키() is { Length: > 0 } product =>
+                GroupPurchasePageRoutes.OrderModeComparisonFor(product),
+            같이주문여정단계.배송권찾기 => GroupPurchasePageRoutes.DeliveryScopesRoot,
+            같이주문여정단계.같이주문목록 when !string.IsNullOrWhiteSpace(유효배송권키) =>
+                같이주문목록경로(유효배송권키),
+            같이주문여정단계.같이주문상세 when 같이주문Id() is { Length: > 0 } groupId =>
+                GroupPurchasePageRoutes.TogetherOrderDetailFor(groupId),
+            같이주문여정단계.공급자관계 when 공급자키() is { Length: > 0 } supplier =>
+                GroupPurchasePageRoutes.SupplierRelationshipFor(supplier),
+            같이주문여정단계.공급자Membership when 공급자키() is { Length: > 0 } supplier =>
+                GroupPurchasePageRoutes.SupplierMembershipFor(supplier),
+            같이주문여정단계.긴급수확제안 when 제안키() is { Length: > 0 } offer =>
+                GroupPurchasePageRoutes.UrgentHarvestOfferFor(offer),
+            같이주문여정단계.긴급수확검토 when 제안키() is { Length: > 0 } offer =>
+                GroupPurchasePageRoutes.UrgentHarvestReviewFor(offer),
+            _ => null
+        };
+
+    private string? 상품키()
+        => 단계 is 같이주문여정단계.레시피활용 or 같이주문여정단계.주문방식비교
+            ? 문맥키
+            : _같이주문상세?.상품키;
+
+    private string? 같이주문Id()
+        => 단계 == 같이주문여정단계.같이주문상세
+            ? 문맥키
+            : 단계 == 같이주문여정단계.공급자관계
+                ? 공급자원천집단키(문맥키)
+                : null;
+
+    private string? 공급자키()
+        => 단계 is 같이주문여정단계.공급자관계 or 같이주문여정단계.공급자Membership
+            ? 문맥키
+            : 단계 is 같이주문여정단계.긴급수확제안 or 같이주문여정단계.긴급수확검토
+                ? 제안원천공급자키(문맥키)
+                : null;
+
+    private string? 제안키()
+        => 단계 is 같이주문여정단계.긴급수확제안 or 같이주문여정단계.긴급수확검토
+            ? 문맥키
+            : 단계 == 같이주문여정단계.공급자관계
+                ? 공급자제안키(문맥키)
+                : null;
+
+    private string 상품비교경로()
+        => GroupPurchasePageRoutes.OrderModeComparisonFor(_상품?.상품카드Id ?? 문맥키 ?? "missing");
+
+    private static string 같이주문목록경로(string? scopeKey)
+        => string.IsNullOrWhiteSpace(scopeKey)
+            ? GroupPurchasePageRoutes.TogetherOrdersRoot
+            : $"{GroupPurchasePageRoutes.TogetherOrdersRoot}?scope={Uri.EscapeDataString(scopeKey.Trim())}";
+
+    private static string 공급자후보경로(string groupId)
+        => GroupPurchasePageRoutes.SupplierRelationshipFor($"pending-group:{groupId}");
+
+    private static string 공급자제안키(string? supplierKey)
+        => $"draft:{supplierKey ?? "pending"}";
+
+    private static string 공급자원천집단키(string? supplierKey)
+        => supplierKey?.StartsWith("pending-group:", StringComparison.Ordinal) == true
+            ? supplierKey["pending-group:".Length..]
+            : supplierKey ?? "pending";
+
+    private static string 제안원천공급자키(string? offerKey)
+        => offerKey?.StartsWith("draft:", StringComparison.Ordinal) == true
+            ? offerKey["draft:".Length..]
+            : offerKey ?? "pending";
+
+    private static string 공급자표시명(string? supplierKey)
+        => supplierKey?.StartsWith("pending-group:", StringComparison.Ordinal) == true
+            ? "공급 제안 연결 대기"
+            : supplierKey ?? "공급자 미지정";
+
+    private static decimal 모집진척률(공동구매자동집단요약응답 group)
+    {
+        if (group.목표수량 is > 0m)
+        {
+            return Math.Min(100m, group.총희망수량 / group.목표수량.Value * 100m);
+        }
+
+        if (group.목표참여자수 is > 0)
+        {
+            return Math.Min(100m, (decimal)group.참여자수 / group.목표참여자수.Value * 100m);
+        }
+
+        return 0m;
+    }
+
+    private static string 금액(decimal amount)
+        => $"{amount:N0}원";
+}

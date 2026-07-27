@@ -13,7 +13,7 @@
         </button>
         <a class="orderer-mobile-shell__brand" href="@OrdererRoutes.Home">살뜰 주문</a>
         <span class="orderer-mobile-shell__spacer"></span>
-        <span class="orderer-mobile-shell__scope">개별주문 → 공동주문</span>
+        <span class="orderer-mobile-shell__scope">개별 주문 → 같이 주문</span>
         <span class="orderer-mobile-shell__avatar" aria-label="주문자">O</span>
     </header>
 
@@ -27,7 +27,7 @@
             <header>
                 <div>
                     <strong>살뜰 주문</strong>
-                    <span>내 주문에서 함께 주문까지</span>
+                    <span>내 주문에서 같이 주문까지</span>
                 </div>
                 <button type="button" aria-label="메뉴 닫기" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
@@ -41,6 +41,14 @@
                 <a href="@OrdererRoutes.GroupPurchaseProducts" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.GridView" />
                     재료 후보
+                </a>
+                <a href="@OrdererRoutes.GroupPurchaseDeliveryScopes" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.LocationOn" />
+                    내 배송권
+                </a>
+                <a href="@OrdererRoutes.GroupPurchaseTogetherOrders" @onclick="CloseDrawer">
+                    <MudIcon Icon="@Icons.Material.Filled.Groups" />
+                    배송권의 같이 주문
                 </a>
                 <a href="@OrdererRoutes.ProducePriceComparison" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.CompareArrows" />
@@ -56,7 +64,7 @@
                 </a>
                 <a href="@OrdererRoutes.GroupPurchaseGroups" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.GroupWork" />
-                    공동주문 후보
+                    같이 주문 후보
                 </a>
                 <a href="@OrdererRoutes.Orders" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" />
@@ -73,7 +81,7 @@
             </nav>
             <aside>
                 <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
-                개별주문 의향과 공동주문 후보는 비구속 상태이며, 결제·계약·수입 실행과 분리됩니다.
+                개별 주문 의향과 같이 주문 후보는 비구속 상태이며, 결제·계약·수입 실행과 분리됩니다.
             </aside>
         </aside>
     }
@@ -130,11 +138,17 @@
             BottomDestination.Ingredients =>
                 CurrentPath.StartsWith(OrdererRoutes.ProducePriceComparison, StringComparison.OrdinalIgnoreCase)
                 || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseProducts, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseRecipeUses, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseOrderModeComparison, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseDeliveryScopes, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(CurrentPath, OrdererRoutes.GroupPurchaseWishCreate, StringComparison.OrdinalIgnoreCase),
             BottomDestination.Wishes =>
                 (CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseWishes, StringComparison.OrdinalIgnoreCase)
                  && !string.Equals(CurrentPath, OrdererRoutes.GroupPurchaseWishCreate, StringComparison.OrdinalIgnoreCase))
-                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseGroups, StringComparison.OrdinalIgnoreCase),
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseGroups, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseTogetherOrders, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseSupplierRelationships, StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(OrdererRoutes.GroupPurchaseUrgentHarvestOffers, StringComparison.OrdinalIgnoreCase),
             BottomDestination.Ledgers =>
                 CurrentPath.StartsWith(OrdererRoutes.Orders, StringComparison.OrdinalIgnoreCase)
                 || CurrentPath.StartsWith("/trade", StringComparison.OrdinalIgnoreCase)

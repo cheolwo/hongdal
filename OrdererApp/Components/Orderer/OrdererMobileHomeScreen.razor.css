@@ -6,7 +6,7 @@
 }
 
 .orderer-mobile-home__heading > span {
-    color: #6b35c5;
+    color: #1769e0;
     font-size: .68rem;
     font-weight: 850;
 }
@@ -30,7 +30,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow: hidden;
     border-radius: 4px;
-    background: #f0e3fb;
+    background: #eaf2ff;
 }
 
 .orderer-mobile-home__summary a {
@@ -39,13 +39,13 @@
     gap: 5px;
     min-height: 68px;
     padding: 10px 5px;
-    color: #5d3680;
+    color: #174f96;
     text-align: center;
     text-decoration: none;
 }
 
 .orderer-mobile-home__summary a + a {
-    border-left: 1px solid rgba(107, 53, 197, .13);
+    border-left: 1px solid rgba(23, 105, 224, .16);
 }
 
 .orderer-mobile-home__summary span {
@@ -59,8 +59,8 @@
 .orderer-mobile-home__summary small {
     grid-column: 1 / -1;
     padding: 8px 10px;
-    border-top: 1px solid rgba(107, 53, 197, .13);
-    color: #73538e;
+    border-top: 1px solid rgba(23, 105, 224, .16);
+    color: #42678f;
     font-size: .6rem;
     line-height: 1.45;
     text-align: center;
@@ -111,9 +111,9 @@
     color: #3c8465;
 }
 
-.orderer-mobile-home__shortcut--purple > span:first-child {
-    background: #eee2fb;
-    color: #6b35c5;
+.orderer-mobile-home__shortcut--blue > span:first-child {
+    background: #eaf2ff;
+    color: #1769e0;
 }
 
 .orderer-mobile-home__shortcut > span:nth-child(2) {

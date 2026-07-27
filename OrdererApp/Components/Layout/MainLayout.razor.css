@@ -1,15 +1,15 @@
 .orderer-mobile-shell {
-    --orderer-accent: #6b35c5;
-    --orderer-accent-dark: #5729aa;
+    --orderer-accent: #1769e0;
+    --orderer-accent-dark: #0d4fa8;
     --orderer-surface: #fff;
     --orderer-background: #f6f7fb;
     --orderer-border: #d2d7e2;
     --orderer-muted: #687286;
-    --role-purpose-accent: #6b35c5;
-    --role-purpose-soft: #f2e8fb;
-    --role-purpose-border: #d8c9ec;
-    --mud-palette-primary: #6b35c5;
-    --mud-palette-primary-darken: #5729aa;
+    --role-purpose-accent: #1769e0;
+    --role-purpose-soft: #eaf2ff;
+    --role-purpose-border: #bfd4f2;
+    --mud-palette-primary: #1769e0;
+    --mud-palette-primary-darken: #0d4fa8;
     --mud-palette-primary-text: #fff;
     position: relative;
     display: grid;
@@ -167,7 +167,7 @@
 
 .orderer-mobile-shell__drawer nav a:hover,
 .orderer-mobile-shell__drawer nav a:focus-visible {
-    background: #f0e8fb;
+    background: #eaf2ff;
     color: var(--orderer-accent);
 }
 
@@ -179,8 +179,8 @@
     gap: 8px;
     padding: 10px;
     border-radius: 6px;
-    background: #f2e8fb;
-    color: #654285;
+    background: #eaf2ff;
+    color: #315a8f;
     font-size: .66rem;
     line-height: 1.45;
 }
@@ -276,10 +276,10 @@
 
 .orderer-mobile-shell ::deep .group-purchase-screen__boundary {
     margin: 0;
-    border-color: #dfcef2;
+    border-color: #bfd4f2;
     border-radius: 4px;
-    background: #f2e7fb;
-    color: #60427a;
+    background: #eaf2ff;
+    color: #315a8f;
     font-size: .68rem;
     line-height: 1.45;
 }
