@@ -804,7 +804,8 @@ app.UseMiddleware<IsmsPEncryptedTransportMiddleware>();
 app.UseMiddleware<HrRoleAccessMiddleware>();
 app.UseMiddleware<사용자행위로그Middleware>();
 app.MapControllers();
-app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
+app.MapHub<DispatchRecommendationHub>(
+    Ssalddel.Contracts.Common.Drivers.DriverDispatchRealtimeContract.HubPath);
 app.MapHub<RestaurantOrderHub>("/hubs/restaurant-orders");
 app.MapHub<DiagramCollaborationHub>(DiagramCollaborationHub.HubPath);
 app.MapHealthChecks("/health/live", new HealthCheckOptions

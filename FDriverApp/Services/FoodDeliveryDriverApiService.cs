@@ -27,11 +27,16 @@ public sealed class FoodDeliveryDriverApiService : IFoodDeliveryDriverApiService
 {
     private readonly HttpClient _httpClient;
     private readonly IFDriverAuthSession _session;
+    private readonly FDriverAuthApiService _authApi;
 
-    public FoodDeliveryDriverApiService(HttpClient httpClient, IFDriverAuthSession session)
+    public FoodDeliveryDriverApiService(
+        HttpClient httpClient,
+        IFDriverAuthSession session,
+        FDriverAuthApiService authApi)
     {
         _httpClient = httpClient;
         _session = session;
+        _authApi = authApi;
     }
 
     public Task<FoodDeliveryDriverWorkspaceDto> GetWorkspaceAsync(CancellationToken cancellationToken = default)
@@ -112,8 +117,7 @@ public sealed class FoodDeliveryDriverApiService : IFoodDeliveryDriverApiService
         object? body,
         CancellationToken cancellationToken)
     {
-        using var request = CreateRequest(method, path, body);
-        using var response = await SendCoreAsync(request, cancellationToken);
+        using var response = await SendWithRefreshAsync(method, path, body, cancellationToken);
         var result = await response.Content.ReadFromJsonAsync<T>(cancellationToken);
         return result ?? throw new FDriverApiException("서버 응답을 읽을 수 없습니다.", response.StatusCode);
     }
@@ -124,8 +128,63 @@ public sealed class FoodDeliveryDriverApiService : IFoodDeliveryDriverApiService
         object? body,
         CancellationToken cancellationToken)
     {
+        using var response = await SendWithRefreshAsync(method, path, body, cancellationToken);
+    }
+
+    private async Task<HttpResponseMessage> SendWithRefreshAsync(
+        HttpMethod method,
+        string path,
+        object? body,
+        CancellationToken cancellationToken)
+    {
+        var authenticationError = await _authApi.EnsureAccessTokenAsync(cancellationToken: cancellationToken);
+        if (authenticationError is not null)
+        {
+            throw new FDriverApiException(authenticationError, HttpStatusCode.Unauthorized);
+        }
+
+        var response = await SendOnceAsync(method, path, body, cancellationToken);
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            response.Dispose();
+            authenticationError = await _authApi.EnsureAccessTokenAsync(
+                forceRefresh: true,
+                cancellationToken: cancellationToken);
+            if (authenticationError is not null)
+            {
+                throw new FDriverApiException(authenticationError, HttpStatusCode.Unauthorized);
+            }
+
+            response = await SendOnceAsync(method, path, body, cancellationToken);
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await ThrowApiExceptionAsync(response, cancellationToken);
+        }
+
+        return response;
+    }
+
+    private async Task<HttpResponseMessage> SendOnceAsync(
+        HttpMethod method,
+        string path,
+        object? body,
+        CancellationToken cancellationToken)
+    {
         using var request = CreateRequest(method, path, body);
-        using var response = await SendCoreAsync(request, cancellationToken);
+        try
+        {
+            return await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new FDriverApiException("살뜰 서비스에 연결할 수 없습니다.", null, ex);
+        }
+        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new FDriverApiException("서버 응답 시간이 초과되었습니다.", null, ex);
+        }
     }
 
     private HttpRequestMessage CreateRequest(HttpMethod method, string path, object? body)
@@ -145,36 +204,19 @@ public sealed class FoodDeliveryDriverApiService : IFoodDeliveryDriverApiService
         return request;
     }
 
-    private async Task<HttpResponseMessage> SendCoreAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    private static async Task ThrowApiExceptionAsync(
+        HttpResponseMessage response,
+        CancellationToken cancellationToken)
     {
-        HttpResponseMessage response;
-        try
-        {
-            response = await _httpClient.SendAsync(request, cancellationToken);
-        }
-        catch (HttpRequestException ex)
-        {
-            throw new FDriverApiException("살뜰 서비스에 연결할 수 없습니다.", null, ex);
-        }
-        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
-        {
-            throw new FDriverApiException("서버 응답 시간이 초과되었습니다.", null, ex);
-        }
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync(cancellationToken);
-            var message = response.StatusCode == HttpStatusCode.Unauthorized
-                ? "로그인이 만료되었습니다. 다시 로그인해 주세요."
-                : ReadProblemMessage(content);
-            var statusCode = response.StatusCode;
-            response.Dispose();
-            throw new FDriverApiException(
-                string.IsNullOrWhiteSpace(message) ? "서버 요청을 처리하지 못했습니다." : message,
-                statusCode);
-        }
-
-        return response;
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        var message = response.StatusCode == HttpStatusCode.Unauthorized
+            ? "로그인이 만료되었습니다. 다시 로그인해 주세요."
+            : ReadProblemMessage(content);
+        var statusCode = response.StatusCode;
+        response.Dispose();
+        throw new FDriverApiException(
+            string.IsNullOrWhiteSpace(message) ? "서버 요청을 처리하지 못했습니다." : message,
+            statusCode);
     }
 
     private static string ReadProblemMessage(string content)

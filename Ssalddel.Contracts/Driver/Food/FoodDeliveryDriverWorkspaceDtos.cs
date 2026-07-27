@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Transport;
+
 namespace Ssalddel.Contracts.Driver.Food;
 
 public sealed class FoodDeliveryDriverWorkspaceDto
@@ -32,6 +34,7 @@ public sealed class FoodDeliveryDriverOfferDto
     public decimal? DistanceKm { get; set; }
     public string RecommendationReason { get; set; } = string.Empty;
     public DateTime? ExpiresAtUtc { get; set; }
+    public 운송실행프로필Dto ExecutionProfile { get; set; } = new();
 }
 
 public sealed class FoodDeliveryDriverActiveDeliveryDto
@@ -45,7 +48,17 @@ public sealed class FoodDeliveryDriverActiveDeliveryDto
     public decimal DriverPayout { get; set; }
     public string TransportStatus { get; set; } = string.Empty;
     public string WorkStatus { get; set; } = string.Empty;
+    public 운송실행프로필Dto ExecutionProfile { get; set; } = new();
+    public FoodDeliveryDriverRecipientDto Recipient { get; set; } = new();
     public DateTime UpdatedAtUtc { get; set; }
+}
+
+public sealed class FoodDeliveryDriverRecipientDto
+{
+    public string DisplayName { get; set; } = string.Empty;
+    public string ContactPhone { get; set; } = string.Empty;
+    public string DeliveryInstructions { get; set; } = string.Empty;
+    public bool OrdererIsRecipient { get; set; }
 }
 
 public sealed class FoodDeliveryBundleCandidateDto

@@ -9,6 +9,7 @@ using Ssalddel.Services.Food;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
 using 살뜰.Services.Dispatch.Coordination;
+using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Dispatch.Queue;
 using 살뜰.Services.Settlement;
 using 살뜰.Services.Storage.Local;
@@ -575,7 +576,15 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
             reason,
             status,
             ToOffset(queue.추천만료시각),
-            [order.주문번호]);
+            [order.주문번호],
+            운송실행프로필Factory.Create(queue),
+            isRecommended
+                ? null
+                : new DriverWorkRecipientDto(
+                    order.수령인명,
+                    order.수령인연락처,
+                    order.수령요청사항,
+                    order.주문자본인수령여부));
     }
 
     private static void ApplyFoodOrderState(

@@ -1,5 +1,7 @@
 using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Common.Transport;
 using Ssalddel.Hubs;
+using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Dispatch.Recommendation;
 
 namespace Ssalddel.Tests.Services.Dispatch.Recommendation;
@@ -49,6 +51,8 @@ public sealed class 공동구매운송추천표시연결Tests
         Assert.True(recommendation.세대배송포함여부);
         Assert.Equal(33, recommendation.세대배송건수);
         Assert.Equal("상하차 + 세대 문앞 33건", recommendation.세대배송업무표시);
+        Assert.Equal(운송실행유형코드.화물운송, recommendation.운송실행프로필.실행유형코드);
+        Assert.Equal(운송실행상세유형코드.같이수입국내인계, recommendation.운송실행프로필.상세유형코드);
     }
 
     [Fact]
@@ -81,6 +85,7 @@ public sealed class 공동구매운송추천표시연결Tests
         Assert.False(recommendation.세대배송포함여부);
         Assert.Null(recommendation.세대배송건수);
         Assert.Equal("상하차 + 3PL 입고", recommendation.세대배송업무표시);
+        Assert.Equal(운송실행상세유형코드.같이수입국내인계, recommendation.운송실행프로필.상세유형코드);
     }
 
     [Fact]
@@ -96,6 +101,8 @@ public sealed class 공동구매운송추천표시연결Tests
         Assert.False(recommendation.세대배송포함여부);
         Assert.Null(recommendation.세대배송건수);
         Assert.Equal("상하차", recommendation.세대배송업무표시);
+        Assert.Equal(운송실행유형코드.화물운송, recommendation.운송실행프로필.실행유형코드);
+        Assert.Equal(운송실행상세유형코드.일반화물운송, recommendation.운송실행프로필.상세유형코드);
     }
 
     [Fact]
@@ -115,6 +122,24 @@ public sealed class 공동구매운송추천표시연결Tests
         Assert.True(recommendation.세대배송포함여부);
         Assert.Equal(30, recommendation.세대배송건수);
         Assert.Equal("상하차 + 세대 문앞 30건", recommendation.세대배송업무표시);
+    }
+
+    [Theory]
+    [InlineData(운송의뢰배차원천유형.음식점주문, 운송실행상세유형코드.음식점음식배달, "음식점 픽업 → 고객 전달")]
+    [InlineData(운송의뢰배차원천유형.살뜰마트포장완료주문, 운송실행상세유형코드.마트라스트마일배송, "포장 상품 픽업 → 주문 전달")]
+    public void 음식과_마트추천은_화물상하차용어대신_실행프로필용어를표시한다(
+        string sourceType,
+        string expectedDetailType,
+        string expectedWorkScope)
+    {
+        var recommendation = new DispatchRecommendationDto();
+
+        DispatchRecommendationRequestTypeClassifier.ApplyTo(recommendation, sourceType);
+
+        Assert.Equal(expectedDetailType, recommendation.운송의뢰유형코드);
+        Assert.Equal(운송실행유형코드.음식배달, recommendation.운송실행프로필.실행유형코드);
+        Assert.Equal(expectedDetailType, recommendation.운송실행프로필.상세유형코드);
+        Assert.Equal(expectedWorkScope, recommendation.세대배송업무표시);
     }
 
     private static 공동구매커머스이행계획Dto CreateFulfillment계획()

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Ssalddel.Contracts.Common.Transport;
 
 namespace Ssalddel.Contracts.Common.Drivers;
 
@@ -28,6 +29,12 @@ public sealed record DriverWorkStopDto(
     [property: JsonPropertyName("longitude")] double Longitude,
     [property: JsonPropertyName("targetTime")] DateTimeOffset? TargetTime = null);
 
+public sealed record DriverWorkRecipientDto(
+    [property: JsonPropertyName("displayName")] string DisplayName,
+    [property: JsonPropertyName("contactPhone")] string ContactPhone,
+    [property: JsonPropertyName("deliveryInstructions")] string DeliveryInstructions,
+    [property: JsonPropertyName("ordererIsRecipient")] bool OrdererIsRecipient);
+
 public sealed record DriverWorkOfferDto(
     [property: JsonPropertyName("offerId")] string OfferId,
     [property: JsonPropertyName("appKey")] string AppKey,
@@ -42,7 +49,9 @@ public sealed record DriverWorkOfferDto(
     [property: JsonPropertyName("recommendationReason")] string RecommendationReason,
     [property: JsonPropertyName("status")] string Status = DriverWorkOfferStatus.Recommended,
     [property: JsonPropertyName("expiresAtUtc")] DateTimeOffset? ExpiresAtUtc = null,
-    [property: JsonPropertyName("orderIds")] IReadOnlyList<string>? OrderIds = null);
+    [property: JsonPropertyName("orderIds")] IReadOnlyList<string>? OrderIds = null,
+    [property: JsonPropertyName("executionProfile")] 운송실행프로필Dto? ExecutionProfile = null,
+    [property: JsonPropertyName("recipient")] DriverWorkRecipientDto? Recipient = null);
 
 public sealed class FoodDeliveryDriverActionResponse
 {

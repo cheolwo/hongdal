@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Transport;
 using 살뜰.도메인.공통;
 using 살뜰.도메인.배차;
 using 살뜰.Services.Dispatch.Engine;
@@ -9,7 +10,6 @@ public sealed class 운송의뢰배차원천분류ServiceTests
     private readonly 운송의뢰배차원천분류Service _service = new();
 
     [Theory]
-    [InlineData(운송의뢰배차원천유형.화주운송의뢰)]
     [InlineData(운송의뢰배차원천유형.창고출고연계운송)]
     [InlineData(운송의뢰배차원천유형.판매채널출고)]
     [InlineData(운송의뢰배차원천유형.살뜰마트출고)]
@@ -21,6 +21,23 @@ public sealed class 운송의뢰배차원천분류ServiceTests
         Assert.Equal("창고 출고 연계 운송", result.상위흐름);
         Assert.True(result.출고예정대상여부);
         Assert.True(result.창고선행작업필요);
+        Assert.Equal(운송실행유형코드.화물운송, result.실행프로필.실행유형코드);
+        Assert.Equal(운송실행상세유형코드.창고출고화물운송, result.실행프로필.상세유형코드);
+        Assert.True(result.실행프로필.화물제원필요);
+    }
+
+    [Fact]
+    public void 일반화주운송은_기존출고예정판단과별개로_일반화물상세프로필을쓴다()
+    {
+        var result = _service.분류(CreateQueue(
+            상태값.배차업무유형.용달운송,
+            운송의뢰배차원천유형.화주운송의뢰));
+
+        Assert.True(result.출고예정대상여부);
+        Assert.Equal(운송실행유형코드.화물운송, result.실행프로필.실행유형코드);
+        Assert.Equal(운송실행상세유형코드.일반화물운송, result.실행프로필.상세유형코드);
+        Assert.Equal("화물 상차", result.실행프로필.픽업행동명);
+        Assert.Equal("화물 하차", result.실행프로필.완료행동명);
     }
 
     [Theory]
@@ -35,6 +52,8 @@ public sealed class 운송의뢰배차원천분류ServiceTests
         Assert.Equal("수입/통관 연계 운송", result.상위흐름);
         Assert.True(result.출고예정대상여부);
         Assert.False(result.창고선행작업필요);
+        Assert.Equal(운송실행유형코드.화물운송, result.실행프로필.실행유형코드);
+        Assert.True(result.실행프로필.화물제원필요);
     }
 
     [Theory]
@@ -48,6 +67,12 @@ public sealed class 운송의뢰배차원천분류ServiceTests
         Assert.Equal("음식점 즉시 배달", result.상위흐름);
         Assert.False(result.출고예정대상여부);
         Assert.False(result.창고선행작업필요);
+        Assert.Equal(운송실행유형코드.음식배달, result.실행프로필.실행유형코드);
+        Assert.Equal(운송실행상세유형코드.음식점음식배달, result.실행프로필.상세유형코드);
+        Assert.Equal("음식점 픽업", result.실행프로필.픽업행동명);
+        Assert.Equal("고객 전달", result.실행프로필.완료행동명);
+        Assert.True(result.실행프로필.조리상태필요);
+        Assert.False(result.실행프로필.화물제원필요);
     }
 
     [Theory]
@@ -61,6 +86,27 @@ public sealed class 운송의뢰배차원천분류ServiceTests
         Assert.Equal("알뜰살뜰 마트 즉시배송", result.상위흐름);
         Assert.True(result.출고예정대상여부);
         Assert.True(result.창고선행작업필요);
+        Assert.Equal(운송실행유형코드.음식배달, result.실행프로필.실행유형코드);
+        Assert.Equal(운송실행상세유형코드.마트라스트마일배송, result.실행프로필.상세유형코드);
+        Assert.False(result.실행프로필.조리상태필요);
+        Assert.True(result.실행프로필.창고선행작업필요);
+    }
+
+    [Theory]
+    [InlineData(운송의뢰배차원천유형.공동주문국내운송, 운송실행상세유형코드.같이주문국내배송)]
+    [InlineData(운송의뢰배차원천유형.수입화물운송, 운송실행상세유형코드.같이수입국내인계)]
+    [InlineData(운송의뢰배차원천유형.Fcl연계운송, 운송실행상세유형코드.같이수입국내인계)]
+    [InlineData(운송의뢰배차원천유형.Lcl연계운송, 운송실행상세유형코드.같이수입국내인계)]
+    public void 같이주문과_같이수입은_화물실행을공유하되_상세프로필을구분한다(
+        string sourceType,
+        string expectedDetailType)
+    {
+        var result = _service.분류(CreateQueue(상태값.배차업무유형.용달운송, sourceType));
+
+        Assert.Equal(운송실행유형코드.화물운송, result.실행프로필.실행유형코드);
+        Assert.Equal(expectedDetailType, result.실행프로필.상세유형코드);
+        Assert.True(result.실행프로필.화물제원필요);
+        Assert.False(result.실행프로필.조리상태필요);
     }
 
     [Theory]

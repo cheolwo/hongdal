@@ -3,6 +3,7 @@ using Ssalddel.Contracts.Driver.Food;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
 using 살뜰.Services.Dispatch.Recommendation;
+using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Options;
 using 살뜰.Services.Versioning;
 using 살뜰.도메인.공통;
@@ -119,7 +120,11 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
             DriverPayout = offer.DriverPayout,
             DistanceKm = offer.DistanceKm.HasValue ? (decimal)offer.DistanceKm.Value : null,
             RecommendationReason = offer.RecommendationReason,
-            ExpiresAtUtc = offer.ExpiresAtUtc?.UtcDateTime
+            ExpiresAtUtc = offer.ExpiresAtUtc?.UtcDateTime,
+            ExecutionProfile = offer.ExecutionProfile
+                               ?? 운송실행프로필Factory.Create(
+                                   살뜰.Services.Dispatch.Engine.운송의뢰배차원천유형.음식점주문,
+                                   상태값.배차업무유형.음식배달)
         };
 
     private static FoodDeliveryDriverActiveDeliveryDto ToActiveDelivery(
@@ -136,8 +141,21 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
             DriverPayout = offer.DriverPayout,
             TransportStatus = transport.상태,
             WorkStatus = offer.Status,
+            ExecutionProfile = offer.ExecutionProfile ?? 운송실행프로필Factory.Create(transport),
+            Recipient = ToRecipient(offer.Recipient),
             UpdatedAtUtc = transport.UpdatedAt
         };
+
+    private static FoodDeliveryDriverRecipientDto ToRecipient(DriverWorkRecipientDto? recipient)
+        => recipient is null
+            ? new FoodDeliveryDriverRecipientDto()
+            : new FoodDeliveryDriverRecipientDto
+            {
+                DisplayName = recipient.DisplayName,
+                ContactPhone = recipient.ContactPhone,
+                DeliveryInstructions = recipient.DeliveryInstructions,
+                OrdererIsRecipient = recipient.OrdererIsRecipient
+            };
 
     private static FoodDeliveryDriverStopDto ToStop(DriverWorkStopDto stop)
         => new()

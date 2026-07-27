@@ -116,11 +116,11 @@
 
                                     <MudGrid Spacing="2">
                                         <MudItem xs="12" md="6">
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">음식점 픽업</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@PickupActionLabel(delivery.ExecutionProfile)</MudText>
                                             <MudText Typo="Typo.body2">@StopLabel(delivery.Pickup)</MudText>
                                         </MudItem>
                                         <MudItem xs="12" md="6">
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">고객 전달</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@CompletionActionLabel(delivery.ExecutionProfile)</MudText>
                                             <MudText Typo="Typo.body2">@StopLabel(delivery.Dropoff)</MudText>
                                         </MudItem>
                                         <MudItem xs="6">
@@ -141,7 +141,7 @@
                                                        StartIcon="@Icons.Material.Filled.Restaurant"
                                                        Disabled="@IsActionBusy(delivery.OfferId)"
                                                        OnClick="@(() => CompletePickupAsync(delivery.OfferId))">
-                                                음식점 픽업 완료
+                                                @($"{PickupActionLabel(delivery.ExecutionProfile)} 완료")
                                             </MudButton>
                                         }
                                         @if (CanCompleteDelivery(delivery))
@@ -151,7 +151,7 @@
                                                        StartIcon="@Icons.Material.Filled.TaskAlt"
                                                        Disabled="@IsActionBusy(delivery.OfferId)"
                                                        OnClick="@(() => CompleteDeliveryAsync(delivery.OfferId))">
-                                                고객 전달 완료
+                                                @($"{CompletionActionLabel(delivery.ExecutionProfile)} 완료")
                                             </MudButton>
                                         }
                                     </MudStack>
@@ -228,11 +228,11 @@
 
                                     <MudGrid Spacing="2">
                                         <MudItem xs="12" md="6">
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">픽업</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@PickupActionLabel(offer.ExecutionProfile)</MudText>
                                             <MudText Typo="Typo.body2">@StopLabel(offer.Pickup)</MudText>
                                         </MudItem>
                                         <MudItem xs="12" md="6">
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">전달</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@CompletionActionLabel(offer.ExecutionProfile)</MudText>
                                             <MudText Typo="Typo.body2">@StopLabel(offer.Dropoff)</MudText>
                                         </MudItem>
                                     </MudGrid>
@@ -396,6 +396,12 @@
 
     private static bool CanCompleteDelivery(FoodDeliveryDriverActiveDeliveryDto delivery)
         => delivery.WorkStatus == DriverWorkOfferStatus.MovingToDropoff;
+
+    private static string PickupActionLabel(Ssalddel.Contracts.Common.Transport.운송실행프로필Dto? profile)
+        => string.IsNullOrWhiteSpace(profile?.픽업행동명) ? "음식점 픽업" : profile.픽업행동명.Trim();
+
+    private static string CompletionActionLabel(Ssalddel.Contracts.Common.Transport.운송실행프로필Dto? profile)
+        => string.IsNullOrWhiteSpace(profile?.완료행동명) ? "고객 전달" : profile.완료행동명.Trim();
 
     private static string WorkStatusLabel(string? status) => status switch
     {

@@ -12,6 +12,7 @@ public static class SsalddelCodeFeatureKeys
     public const string PlatformDeliveryZoneLedger = "platform-delivery-zone-ledger";
     public const string RegionalCultureImagePrompt = "regional-culture-image-prompt";
     public const string RegionalCulturePublicInstitution = "regional-culture-public-institution";
+    public const string TransportExecutionProfile = "transport-execution-profile";
     public const string TradeLedgerExtensions = "trade-ledger-extensions";
 }
 

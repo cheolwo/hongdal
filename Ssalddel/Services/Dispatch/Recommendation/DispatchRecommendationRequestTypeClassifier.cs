@@ -1,5 +1,7 @@
 using Ssalddel.Hubs;
 using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Common.Transport;
+using 살뜰.Services.Dispatch.Engine;
 
 namespace 살뜰.Services.Dispatch.Recommendation;
 
@@ -14,22 +16,40 @@ public static class DispatchRecommendationRequestTypeClassifier
 
     public static DispatchRecommendationRequestTypeMetadata Classify(string? sourceType)
     {
+        var executionProfile = 운송실행프로필Factory.Create(sourceType);
         var isGroupPurchase = IsGroupPurchaseCargoTransport(sourceType);
-        return isGroupPurchase
-            ? new DispatchRecommendationRequestTypeMetadata(
+        if (isGroupPurchase)
+        {
+            return new DispatchRecommendationRequestTypeMetadata(
                 GroupPurchaseCargoTransportCode,
                 GroupPurchaseCargoTransportLabel,
                 true,
                 true,
                 null,
-                GroupPurchaseWorkScopeLabel)
-            : new DispatchRecommendationRequestTypeMetadata(
-                GeneralCargoTransportCode,
-                GeneralCargoTransportLabel,
+                GroupPurchaseWorkScopeLabel,
+                executionProfile);
+        }
+
+        if (executionProfile.실행유형코드 == 운송실행유형코드.음식배달)
+        {
+            return new DispatchRecommendationRequestTypeMetadata(
+                executionProfile.상세유형코드,
+                executionProfile.표시명,
                 false,
                 false,
                 null,
-                GeneralWorkScopeLabel);
+                $"{executionProfile.픽업행동명} → {executionProfile.완료행동명}",
+                executionProfile);
+        }
+
+        return new DispatchRecommendationRequestTypeMetadata(
+            GeneralCargoTransportCode,
+            GeneralCargoTransportLabel,
+            false,
+            false,
+            null,
+            GeneralWorkScopeLabel,
+            executionProfile);
     }
 
     public static DispatchRecommendationRequestTypeMetadata Classify(PlatformEntrustedDispatchQueueDraftDto draft)
@@ -107,12 +127,16 @@ public static class DispatchRecommendationRequestTypeClassifier
         target.세대배송포함여부 = metadata.IncludesApartmentUnitDelivery;
         target.세대배송건수 = metadata.ApartmentUnitDeliveryCount;
         target.세대배송업무표시 = metadata.ApartmentUnitDeliveryScopeLabel;
+        target.운송실행프로필 = metadata.ExecutionProfile;
     }
 
     private static bool IsGroupPurchaseCargoTransport(string? sourceType)
-        => string.Equals(sourceType, "ImportCargoTransport", StringComparison.OrdinalIgnoreCase) ||
-           string.Equals(sourceType, "FclCargoTransport", StringComparison.OrdinalIgnoreCase) ||
-           string.Equals(sourceType, "LclCargoTransport", StringComparison.OrdinalIgnoreCase);
+        => 운송의뢰배차원천유형.IsAny(
+            sourceType,
+            운송의뢰배차원천유형.공동주문국내운송,
+            운송의뢰배차원천유형.수입화물운송,
+            운송의뢰배차원천유형.Fcl연계운송,
+            운송의뢰배차원천유형.Lcl연계운송);
 
     private static string BuildGroupPurchaseWorkScopeLabel(
         string? destinationTypeCode,
@@ -142,4 +166,5 @@ public sealed record DispatchRecommendationRequestTypeMetadata(
     bool IsGroupPurchaseTransport,
     bool IncludesApartmentUnitDelivery,
     int? ApartmentUnitDeliveryCount,
-    string ApartmentUnitDeliveryScopeLabel);
+    string ApartmentUnitDeliveryScopeLabel,
+    운송실행프로필Dto ExecutionProfile);

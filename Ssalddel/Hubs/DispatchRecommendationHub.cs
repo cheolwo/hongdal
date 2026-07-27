@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Ssalddel.Contracts.Common.Transport;
 using 살뜰.Data;
 using 살뜰.Services;
 using 살뜰.Services.Dispatch.Queue;
@@ -237,6 +238,7 @@ namespace Ssalddel.Hubs
         }
         public string 상태 { get; set; } = string.Empty;
         public string 배차상태 { get; set; } = string.Empty;
+        public 운송실행프로필Dto 운송실행프로필 { get; set; } = new();
     }
 
     public sealed class DriverStatusUpdateRequest

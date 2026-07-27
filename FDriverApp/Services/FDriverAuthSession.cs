@@ -6,10 +6,15 @@ namespace FDriverApp.Services;
 
 public interface IFDriverAuthSession : ISsalddelAccessTokenProvider
 {
+    DateTime AccessTokenExpiresAtUtc { get; }
+    string? RefreshToken { get; }
+    DateTime RefreshTokenExpiresAtUtc { get; }
     string? UserId { get; }
     string? UserName { get; }
+    IReadOnlyList<string> Roles { get; }
     bool IsAuthenticated { get; }
-    Task RestoreAsync(CancellationToken cancellationToken = default);
+    ClientAuthSessionRestoreState CurrentState { get; }
+    Task<ClientAuthSessionRestoreState> RestoreAsync(CancellationToken cancellationToken = default);
     Task ApplyAsync(ClientAuthTokenSnapshot snapshot, CancellationToken cancellationToken = default);
     Task ClearAsync(CancellationToken cancellationToken = default);
 }
@@ -27,15 +32,34 @@ public sealed class FDriverAuthSession : IFDriverAuthSession
     }
 
     public string? AccessToken { get; private set; }
+    public DateTime AccessTokenExpiresAtUtc { get; private set; }
+    public string? RefreshToken { get; private set; }
+    public DateTime RefreshTokenExpiresAtUtc { get; private set; }
     public string? UserId { get; private set; }
     public string? UserName { get; private set; }
-    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(AccessToken) && !string.IsNullOrWhiteSpace(UserId);
+    public IReadOnlyList<string> Roles { get; private set; } = [];
+    public ClientAuthSessionRestoreState CurrentState
+    {
+        get
+        {
+            var snapshot = CreateSnapshot();
+            if (_sessionGuard.IsAccessTokenUsable(snapshot, DateTime.UtcNow))
+            {
+                return ClientAuthSessionRestoreState.Authenticated;
+            }
 
-    public async Task RestoreAsync(CancellationToken cancellationToken = default)
+            return _sessionGuard.IsRefreshTokenUsable(snapshot, DateTime.UtcNow)
+                ? ClientAuthSessionRestoreState.RefreshRequired
+                : ClientAuthSessionRestoreState.Anonymous;
+        }
+    }
+    public bool IsAuthenticated => CurrentState == ClientAuthSessionRestoreState.Authenticated;
+
+    public async Task<ClientAuthSessionRestoreState> RestoreAsync(CancellationToken cancellationToken = default)
     {
         if (_restored)
         {
-            return;
+            return CurrentState;
         }
 
         _restored = true;
@@ -45,10 +69,11 @@ public sealed class FDriverAuthSession : IFDriverAuthSession
             var snapshot = string.IsNullOrWhiteSpace(json)
                 ? null
                 : JsonSerializer.Deserialize<ClientAuthTokenSnapshot>(json, JsonOptions);
-            if (!_sessionGuard.IsAccessTokenUsable(snapshot, DateTime.UtcNow))
+            if (!_sessionGuard.IsAccessTokenUsable(snapshot, DateTime.UtcNow)
+                && !_sessionGuard.IsRefreshTokenUsable(snapshot, DateTime.UtcNow))
             {
                 await ClearAsync(cancellationToken);
-                return;
+                return ClientAuthSessionRestoreState.Anonymous;
             }
 
             ApplySnapshot(snapshot!);
@@ -57,6 +82,8 @@ public sealed class FDriverAuthSession : IFDriverAuthSession
         {
             await ClearAsync(cancellationToken);
         }
+
+        return CurrentState;
     }
 
     public async Task ApplyAsync(ClientAuthTokenSnapshot snapshot, CancellationToken cancellationToken = default)
@@ -72,8 +99,12 @@ public sealed class FDriverAuthSession : IFDriverAuthSession
     {
         cancellationToken.ThrowIfCancellationRequested();
         AccessToken = null;
+        AccessTokenExpiresAtUtc = default;
+        RefreshToken = null;
+        RefreshTokenExpiresAtUtc = default;
         UserId = null;
         UserName = null;
+        Roles = [];
         SecureStorage.Default.Remove(StorageKey);
         return Task.CompletedTask;
     }
@@ -81,7 +112,23 @@ public sealed class FDriverAuthSession : IFDriverAuthSession
     private void ApplySnapshot(ClientAuthTokenSnapshot snapshot)
     {
         AccessToken = snapshot.AccessToken;
+        AccessTokenExpiresAtUtc = snapshot.AccessTokenExpiresAtUtc;
+        RefreshToken = snapshot.RefreshToken;
+        RefreshTokenExpiresAtUtc = snapshot.RefreshTokenExpiresAtUtc;
         UserId = snapshot.UserId;
         UserName = snapshot.UserName;
+        Roles = snapshot.Roles.ToArray();
     }
+
+    private ClientAuthTokenSnapshot? CreateSnapshot()
+        => string.IsNullOrWhiteSpace(UserId)
+            ? null
+            : new ClientAuthTokenSnapshot(
+                AccessToken ?? string.Empty,
+                AccessTokenExpiresAtUtc,
+                RefreshToken ?? string.Empty,
+                RefreshTokenExpiresAtUtc,
+                UserId,
+                UserName ?? string.Empty,
+                Roles);
 }

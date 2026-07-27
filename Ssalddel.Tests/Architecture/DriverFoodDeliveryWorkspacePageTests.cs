@@ -33,8 +33,10 @@ public sealed class DriverFoodDeliveryWorkspacePageTests
         Assert.Contains("@page \"/\"", rootRedirect);
         Assert.Contains("NavigateTo(DriverRoutes.HomeSummary", rootRedirect);
         Assert.Contains("@page \"/driver/food-deliveries\"", page);
-        Assert.Contains("음식점 픽업 완료", page);
-        Assert.Contains("고객 전달 완료", page);
+        Assert.Contains("PickupActionLabel(delivery.ExecutionProfile)", page);
+        Assert.Contains("CompletionActionLabel(delivery.ExecutionProfile)", page);
+        Assert.Contains("픽업행동명", page);
+        Assert.Contains("완료행동명", page);
         Assert.DoesNotContain("Sample", service, StringComparison.OrdinalIgnoreCase);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Ssalddel.Contracts.Common.Drivers;
 using Ssalddel.Hubs;
 using 살뜰.도메인.기사;
 
@@ -83,7 +84,9 @@ namespace 살뜰.Services.Dispatch.Recommendation
         public virtual async Task SendToDriverAsync(string driverId)
         {
             var recommendations = await GetRecommendationsAsync(driverId);
-            await _hubContext.Clients.Group(BuildDriverGroup(driverId)).SendAsync("ReceiveDispatchRecommendations", recommendations);
+            await _hubContext.Clients
+                .Group(BuildDriverGroup(driverId))
+                .SendAsync(DriverDispatchRealtimeContract.RecommendationsEvent, recommendations);
             await _pushService.SendAsync(driverId, recommendations);
 
             await _logStore.AppendAsync(new DispatchRecommendationLogEntry(

@@ -70,6 +70,7 @@ namespace FDriverApp
                 TimeSpan.FromSeconds(20));
             builder.Services.AddSingleton<FDriverAuthApiService>();
             builder.Services.AddSingleton<IFoodDeliveryDriverApiService, FoodDeliveryDriverApiService>();
+            builder.Services.AddSingleton<IFDriverDispatchRealtimeService, FDriverDispatchRealtimeService>();
             builder.Services.AddSingleton<IFDriverLocationService, FDriverLocationService>();
             builder.Services.AddSingleton<IFDriverWorkspaceNavigator, FDriverWorkspaceNavigator>();
             builder.Services.AddSingleton<MainPageModel>();

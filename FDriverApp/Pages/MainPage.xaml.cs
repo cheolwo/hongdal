@@ -20,17 +20,19 @@ namespace FDriverApp.Pages
             if (BindingContext is MainPageModel model)
             {
                 await model.InitializeAsync();
-                model.StartMonitoring();
-                model.ApplyEntryFocus(_entryFocus);
+                await model.StartMonitoringAsync();
+                var focus = _entryFocus;
+                model.ApplyEntryFocus(focus);
                 _entryFocus = null;
+                await ScrollToEntryFocusAsync(focus);
             }
         }
 
-        protected override void OnDisappearing()
+        protected override async void OnDisappearing()
         {
             if (BindingContext is MainPageModel model)
             {
-                model.StopMonitoring();
+                await model.StopMonitoringAsync();
             }
 
             base.OnDisappearing();
@@ -49,6 +51,32 @@ namespace FDriverApp.Pages
             {
                 await model.SelectTicketByIdAsync(marker.RequestId);
             }
+        }
+
+        private async void OnProfileClicked(object? sender, EventArgs args)
+            => await ScrollToEntryFocusAsync("profile");
+
+        private async void OnCurrentDeliveryClicked(object? sender, EventArgs args)
+            => await ScrollToEntryFocusAsync("delivery");
+
+        private Task ScrollToEntryFocusAsync(string? focus)
+        {
+            if (!WorkspaceScroll.IsVisible)
+            {
+                return Task.CompletedTask;
+            }
+
+            VisualElement? target = focus?.Trim().ToLowerInvariant() switch
+            {
+                "dispatch" or "bundle" => RecommendationSection,
+                "delivery" => ActiveDeliverySection,
+                "settlement" or "profile" or "workspace" => WorkspaceSummarySection,
+                _ => null
+            };
+
+            return target is null
+                ? Task.CompletedTask
+                : WorkspaceScroll.ScrollToAsync(target, ScrollToPosition.Start, true);
         }
     }
 }
