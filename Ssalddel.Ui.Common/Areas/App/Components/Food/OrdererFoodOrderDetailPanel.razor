@@ -87,6 +87,27 @@
                 <SsalddelSensitiveInfoRow Label="조리 예상 완료" Value="@OrdererFoodOrderPresentation.FormatOptionalDate(detail.주문.조리예상완료시각Utc)" />
                 <SsalddelSensitiveInfoRow Label="수락 메모" Value="@OrdererFoodOrderPresentation.ValueOrDash(detail.수락메모)" />
             </MudExpansionPanel>
+            <MudExpansionPanel Text="배달 진행" Expanded="@detail.배달진행.배차요청됨">
+                <MudAlert Severity="@OrdererFoodOrderPresentation.DeliverySeverity(detail.배달진행)"
+                          Variant="Variant.Outlined"
+                          Dense="true">
+                    @detail.배달진행.안내
+                </MudAlert>
+                @if (OrdererFoodOrderPresentation.NeedsDeliveryRecovery(detail.배달진행))
+                {
+                    <MudAlert Severity="Severity.Warning"
+                              Variant="Variant.Filled"
+                              Dense="true">
+                        @OrdererFoodOrderPresentation.DeliveryRecoveryGuide(detail.배달진행)
+                    </MudAlert>
+                }
+                <SsalddelSensitiveInfoRow Label="현재 운송 단계" Value="@OrdererFoodOrderPresentation.DeliveryStatusLabel(detail.배달진행)" />
+                <SsalddelSensitiveInfoRow Label="기사 배정" Value="@(detail.배달진행.기사배정됨 ? "배정됨" : "아직 배정되지 않음")" />
+                <SsalddelSensitiveInfoRow Label="최근 변경" Value="@OrdererFoodOrderPresentation.FormatOptionalDate(detail.배달진행.최근변경시각Utc)" />
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    기사 신원과 상세 위치는 노출하지 않고 주문 이행에 필요한 진행 단계만 표시합니다.
+                </MudText>
+            </MudExpansionPanel>
             <MudExpansionPanel Text="상태 이력">
                 @if (detail.상태이력.Count == 0)
                 {

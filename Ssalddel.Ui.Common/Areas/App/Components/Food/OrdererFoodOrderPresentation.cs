@@ -16,6 +16,32 @@ internal static class OrdererFoodOrderPresentation
             ? "배차 전"
             : $"배차 {value.Trim()}";
 
+    public static string DeliveryStatusLabel(주문자음식배달진행응답 progress)
+        => progress.배차요청됨
+            ? ValueOrDash(progress.현재운송상태)
+            : "배차 전";
+
+    public static Severity DeliverySeverity(주문자음식배달진행응답 progress)
+        => progress.현재운송상태 switch
+        {
+            "인수완료" => Severity.Success,
+            "상차완료" or "운송중" or "하차지도착" => Severity.Info,
+            "배차확정" or "이동중" or "상차지도착" => Severity.Normal,
+            음식주문배차상태코드.배차불가 => Severity.Error,
+            _ => Severity.Warning
+        };
+
+    public static bool NeedsDeliveryRecovery(주문자음식배달진행응답 progress)
+        => progress.현재운송상태 is 음식주문배차상태코드.배차불가
+            or "추천만료"
+            or "수락취소"
+            or "배차취소";
+
+    public static string DeliveryRecoveryGuide(주문자음식배달진행응답 progress)
+        => progress.현재운송상태 == 음식주문배차상태코드.배차불가
+            ? "기사 배정을 완료하지 못한 상태입니다. 주문 취소나 환불이 자동 확정되는 것은 아니며, 음식점과 운영 확인 후 안내됩니다."
+            : "기존 기사 제안이 종료되었습니다. 다른 기사 제안 가능 여부를 다시 확인하며, 주문 취소나 환불은 별도 확인 후 안내됩니다.";
+
     public static Color StatusColor(string? status)
         => 음식주문상태코드.Normalize(status) switch
         {

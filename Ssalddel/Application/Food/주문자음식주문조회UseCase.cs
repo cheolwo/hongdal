@@ -1,10 +1,13 @@
 using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Ssalddel.Application.Driver.Transport;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.Participants;
 using Ssalddel.Contracts.Food;
 using 살뜰.Data;
+using 살뜰.도메인.공통;
+using 살뜰.도메인.운송;
 using 살뜰.도메인.음식;
 
 namespace Ssalddel.Application.Food;
@@ -77,10 +80,15 @@ public sealed class 주문자음식주문조회UseCase(
             .Take(pageSize)
             .Include(item => item.상품목록)
             .ToArrayAsync(cancellationToken);
+        var transports = await LoadLatestTransportsAsync(
+            orders.Select(item => item.주문번호).ToArray(),
+            cancellationToken);
 
         return Result.Ok(new 주문자음식주문목록응답
         {
-            Items = orders.Select(ToSummary).ToArray(),
+            Items = orders
+                .Select(item => ToSummary(item, transports.GetValueOrDefault(item.주문번호)))
+                .ToArray(),
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize
@@ -116,10 +124,58 @@ public sealed class 주문자음식주문조회UseCase(
             return NotFound<주문자음식주문상세응답>();
         }
 
-        return Result.Ok(ToDetail(order));
+        var transport = await LoadLatestTransportAsync(cleanOrderNo, cancellationToken);
+        return Result.Ok(ToDetail(order, transport));
     }
 
-    private static 주문자음식주문요약응답 ToSummary(음식주문 order)
+    private async Task<IReadOnlyDictionary<string, 운송원장>> LoadLatestTransportsAsync(
+        IReadOnlyCollection<string> orderNumbers,
+        CancellationToken cancellationToken)
+    {
+        if (orderNumbers.Count == 0)
+        {
+            return new Dictionary<string, 운송원장>(StringComparer.Ordinal);
+        }
+
+        var transports = await db.운송원장
+            .AsNoTracking()
+            .Where(item =>
+                item.배차업무유형 == 상태값.배차업무유형.음식배달
+                && (orderNumbers.Contains(item.원본의뢰Id) || orderNumbers.Contains(item.의뢰Id)))
+            .OrderByDescending(item => item.UpdatedAt)
+            .ThenByDescending(item => item.Id)
+            .ToArrayAsync(cancellationToken);
+
+        var result = new Dictionary<string, 운송원장>(StringComparer.Ordinal);
+        foreach (var orderNumber in orderNumbers)
+        {
+            var latest = transports.FirstOrDefault(item =>
+                string.Equals(item.원본의뢰Id, orderNumber, StringComparison.Ordinal)
+                || string.Equals(item.의뢰Id, orderNumber, StringComparison.Ordinal));
+            if (latest is not null)
+            {
+                result[orderNumber] = latest;
+            }
+        }
+
+        return result;
+    }
+
+    private async Task<운송원장?> LoadLatestTransportAsync(
+        string orderNumber,
+        CancellationToken cancellationToken)
+        => await db.운송원장
+            .AsNoTracking()
+            .Where(item =>
+                item.배차업무유형 == 상태값.배차업무유형.음식배달
+                && (item.원본의뢰Id == orderNumber || item.의뢰Id == orderNumber))
+            .OrderByDescending(item => item.UpdatedAt)
+            .ThenByDescending(item => item.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+    private static 주문자음식주문요약응답 ToSummary(
+        음식주문 order,
+        운송원장? transport = null)
     {
         var products = order.상품목록.OrderBy(item => item.Id).ToArray();
         return new 주문자음식주문요약응답
@@ -132,16 +188,19 @@ public sealed class 주문자음식주문조회UseCase(
             총수량 = products.Sum(item => item.수량),
             총주문금액 = order.총주문금액,
             상태 = 음식주문상태코드.Normalize(order.상태),
-            배차상태 = order.배차상태,
+            배차상태 = ResolveDispatchStatus(order.배차상태, transport),
             조리예상완료시각Utc = order.조리예상완료시각Utc,
             CreatedAtUtc = order.CreatedAt
         };
     }
 
-    private static 주문자음식주문상세응답 ToDetail(음식주문 order)
+    private static 주문자음식주문상세응답 ToDetail(
+        음식주문 order,
+        운송원장? transport)
         => new()
         {
-            주문 = ToSummary(order),
+            주문 = ToSummary(order, transport),
+            배달진행 = ToDeliveryProgress(order, transport),
             음식점주소 = order.음식점주소,
             음식점상세주소 = order.음식점상세주소,
             수령인정보 = new 음식주문수령인정보Dto
@@ -177,6 +236,97 @@ public sealed class 주문자음식주문조회UseCase(
                     전이시각Utc = item.전이시각Utc
                 })
                 .ToArray()
+        };
+
+    private static 주문자음식배달진행응답 ToDeliveryProgress(
+        음식주문 order,
+        운송원장? transport)
+    {
+        var currentTransportStatus = Clean(transport?.상태)
+                                     ?? Clean(order.배차상태)
+                                     ?? 음식주문배차상태코드.미요청;
+        var dispatchRequested = transport is not null
+                                || currentTransportStatus != 음식주문배차상태코드.미요청;
+        var driverAssigned = !string.IsNullOrWhiteSpace(transport?.확정기사Id)
+                             || IsDriverAssignedStatus(currentTransportStatus);
+
+        return new 주문자음식배달진행응답
+        {
+            배차요청됨 = dispatchRequested,
+            기사배정됨 = driverAssigned,
+            현재운송상태 = currentTransportStatus,
+            안내 = ResolveDeliveryGuide(currentTransportStatus, order.상태),
+            최근변경시각Utc = transport?.UpdatedAt ?? order.배차요청시각Utc
+        };
+    }
+
+    private static string ResolveDispatchStatus(string? foodDispatchStatus, 운송원장? transport)
+    {
+        var transportStatus = Clean(transport?.상태);
+        if (transportStatus is null)
+        {
+            return Clean(foodDispatchStatus) ?? 음식주문배차상태코드.미요청;
+        }
+
+        return transportStatus switch
+        {
+            기사운송상태코드.배차대기 => 음식주문배차상태코드.배차대기,
+            기사운송상태코드.매칭중 => 음식주문배차상태코드.추천중,
+            기사운송상태코드.인수완료 => 음식주문배차상태코드.배달완료,
+            기사운송상태코드.상차완료
+                or 기사운송상태코드.운송중
+                or 기사운송상태코드.하차지도착 => 음식주문배차상태코드.배달중,
+            _ when IsDriverAssignedStatus(transportStatus) => 음식주문배차상태코드.기사배정,
+            _ => transportStatus
+        };
+    }
+
+    private static bool IsDriverAssignedStatus(string? status)
+        => status is 기사운송상태코드.배차확정
+            or 기사운송상태코드.이동중
+            or 기사운송상태코드.상차지도착
+            or 기사운송상태코드.상차완료
+            or 기사운송상태코드.운송중
+            or 기사운송상태코드.하차지도착
+            or 기사운송상태코드.인수완료
+            or 음식주문배차상태코드.기사배정
+            or 음식주문배차상태코드.배달중
+            or 음식주문배차상태코드.배달완료;
+
+    private static string ResolveDeliveryGuide(string transportStatus, string orderStatus)
+        => transportStatus switch
+        {
+            음식주문배차상태코드.미요청 when 음식주문상태코드.CanRestaurantAccept(orderStatus)
+                => "음식점이 주문을 수락하면 배달 기사 배차가 시작됩니다.",
+            음식주문배차상태코드.미요청
+                => "음식점이 조리와 배달 준비를 확인하고 있습니다.",
+            기사운송상태코드.배차대기
+                => "음식점이 주문을 수락해 배달 기사를 찾기 시작했습니다.",
+            기사운송상태코드.매칭중
+                => "배달 기사에게 주문을 제안하고 응답을 기다리고 있습니다.",
+            기사운송상태코드.배차확정
+                => "배달 기사가 주문을 수락했습니다. 음식점에서 픽업을 준비합니다.",
+            기사운송상태코드.이동중
+                => "배달 기사가 음식점으로 이동 중입니다.",
+            기사운송상태코드.상차지도착
+                => "배달 기사가 음식점에 도착했습니다.",
+            기사운송상태코드.상차완료 or 기사운송상태코드.운송중
+                => "음식을 픽업해 수령지로 이동 중입니다.",
+            기사운송상태코드.하차지도착
+                => "배달 기사가 수령지에 도착했습니다.",
+            기사운송상태코드.인수완료
+                => "음식 전달이 완료되었습니다.",
+            음식주문배차상태코드.기사배정
+                => "배달 기사가 배정되어 음식점 픽업을 준비하고 있습니다.",
+            음식주문배차상태코드.배달중
+                => "음식을 픽업해 수령지로 이동 중입니다.",
+            음식주문배차상태코드.배달완료
+                => "음식 전달이 완료되었습니다.",
+            음식주문배차상태코드.배차불가
+                => "현재 기사 배정을 완료하지 못했습니다. 음식점과 운영 담당자가 배달 가능 여부를 확인하고 있습니다.",
+            "추천만료" or "수락취소" or "배차취소"
+                => "기존 기사 제안이 종료되어 다시 배달 가능 여부를 확인하고 있습니다.",
+            _ => "배달 진행 상태를 확인하고 있습니다."
         };
 
     private static string BuildProductSummary(IReadOnlyList<음식주문상품> products)

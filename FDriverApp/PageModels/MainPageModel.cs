@@ -13,12 +13,18 @@ namespace FDriverApp.PageModels;
 public sealed partial class MainPageModel : ObservableObject
 {
     private const string DrivingStatus = "운행중";
+    private static readonly TimeSpan WorkspaceRefreshInterval = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan LocationHeartbeatInterval = TimeSpan.FromMinutes(2);
     private readonly FDriverAppProfile _profile;
     private readonly IFDriverAuthSession _authSession;
     private readonly FDriverAuthApiService _authApi;
     private readonly IFoodDeliveryDriverApiService _api;
     private readonly IFDriverLocationService _locationService;
     private bool _initialized;
+    private bool _monitorRefreshInProgress;
+    private CancellationTokenSource? _monitorCancellation;
+    private Task? _monitorTask;
+    private DateTime? _lastLocationSentAtUtc;
 
     [ObservableProperty] private bool _isRefreshing;
     [ObservableProperty] private bool _isBusy;
@@ -38,6 +44,10 @@ public sealed partial class MainPageModel : ObservableObject
     [ObservableProperty] private string _nextActionGuide = "운행을 시작하면 현재 위치 기준 추천을 확인합니다.";
     [ObservableProperty] private string _settlementText = "이번 달 정산 조회 전";
     [ObservableProperty] private string _routeStatusText = "경로 조회 전";
+    [ObservableProperty] private string _workspaceSyncText = "업무 자동 갱신 대기";
+    [ObservableProperty] private string _locationSyncText = "기사 위치 전송 대기";
+    [ObservableProperty] private bool _dispatchAutomationEnabled;
+    [ObservableProperty] private string _dispatchAutomationNotice = "자동 배차 상태 확인 전";
     [ObservableProperty] private IReadOnlyList<DriverMapMarkerItem> _mapMarkers = [];
     [ObservableProperty] private IReadOnlyList<DriverMapRouteOverlay> _selectedRouteOverlays = [];
     [ObservableProperty] private double _mapCenterLatitude = 37.5665d;
@@ -66,7 +76,7 @@ public sealed partial class MainPageModel : ObservableObject
     public string SignedInUserText => string.IsNullOrWhiteSpace(_authSession.UserName)
         ? DriverRole
         : $"{_authSession.UserName} · {DriverRole}";
-    public string WorkToggleText => IsOnDuty ? "운행 종료" : "운행 시작";
+    public string WorkToggleText => IsOnDuty ? "추천 대기 종료" : "운행 시작";
     public string WorkToggleColor => IsOnDuty ? "#B91C1C" : "#0F766E";
     public ObservableCollection<DeliveryTicketPreview> RecommendedTicketItems { get; } = [];
     public ObservableCollection<ActiveDeliveryPreview> ActiveDeliveryItems { get; } = [];
@@ -96,8 +106,11 @@ public sealed partial class MainPageModel : ObservableObject
     public bool HasActiveWork => ActiveDelivery is not null;
     public bool CanConfirmPickup => !IsBusy && ActiveDelivery?.WorkStatus == DriverWorkOfferStatus.MovingToPickup;
     public bool CanCompleteDelivery => !IsBusy && ActiveDelivery?.WorkStatus == DriverWorkOfferStatus.MovingToDropoff;
-    public bool CanAcceptSelectedTicket => !IsBusy && SelectedTicket is not null && ActiveDeliveryItems.Count < 3;
+    public bool CanAcceptSelectedTicket => !IsBusy
+                                           && SelectedTicket is { IsExpired: false }
+                                           && ActiveDeliveryItems.Count < 3;
     public bool HasBundleCandidates => BundleCandidateItems.Count > 0;
+    public bool HasMultipleActiveDeliveries => ActiveDeliveryItems.Count > 1;
 
     private DriverWorkOfferDto? CurrentRouteOffer
         => ActiveDelivery?.ToDriverWorkOffer(_profile) ?? SelectedTicket?.ToDriverWorkOffer(_profile);
@@ -116,6 +129,26 @@ public sealed partial class MainPageModel : ObservableObject
         {
             await ReloadAsync(updateLocation: true);
         }
+    }
+
+    public void StartMonitoring()
+    {
+        if (!IsAuthenticated || _monitorTask is { IsCompleted: false })
+        {
+            return;
+        }
+
+        _monitorCancellation?.Dispose();
+        _monitorCancellation = new CancellationTokenSource();
+        _monitorTask = MonitorWorkspaceAsync(_monitorCancellation.Token);
+    }
+
+    public void StopMonitoring()
+    {
+        _monitorCancellation?.Cancel();
+        _monitorCancellation?.Dispose();
+        _monitorCancellation = null;
+        _monitorTask = null;
     }
 
     public void ApplyEntryFocus(string? focus)
@@ -156,16 +189,42 @@ public sealed partial class MainPageModel : ObservableObject
         IsAuthenticated = true;
         IsBusy = false;
         await ReloadAsync(updateLocation: true);
+        StartMonitoring();
     }
 
     [RelayCommand]
     private async Task Logout()
     {
-        await _authSession.ClearAsync();
-        IsAuthenticated = false;
-        IsOnDuty = false;
-        ClearWorkspace();
-        StatusMessage = "로그아웃했습니다.";
+        if (IsBusy)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        NotifyCommandState();
+        try
+        {
+            if (IsOnDuty)
+            {
+                await _api.StopWorkAsync();
+            }
+
+            StopMonitoring();
+            await _authSession.ClearAsync();
+            IsAuthenticated = false;
+            IsOnDuty = false;
+            ClearWorkspace();
+            StatusMessage = "추천 대기를 종료하고 로그아웃했습니다.";
+        }
+        catch (FDriverApiException ex)
+        {
+            StatusMessage = $"추천 대기를 종료하지 못해 로그아웃을 보류했습니다. {ShortMessage(ex.Message)}";
+        }
+        finally
+        {
+            IsBusy = false;
+            NotifyCommandState();
+        }
     }
 
     [RelayCommand]
@@ -239,14 +298,47 @@ public sealed partial class MainPageModel : ObservableObject
     public Task SelectTicketByIdAsync(string ticketId)
     {
         var ticket = RecommendedTicketItems.FirstOrDefault(x => string.Equals(x.TicketId, ticketId, StringComparison.Ordinal));
-        return ticket is null ? Task.CompletedTask : SelectTicket(ticket);
+        if (ticket is not null)
+        {
+            return SelectTicket(ticket);
+        }
+
+        var active = ActiveDeliveryItems.FirstOrDefault(
+            x => string.Equals(x.OfferId, ticketId, StringComparison.Ordinal));
+        return active is null ? Task.CompletedTask : SelectActiveDelivery(active);
     }
 
     [RelayCommand]
     private async Task AcceptTicket(DeliveryTicketPreview ticket)
     {
+        if (ticket.IsExpired)
+        {
+            StatusMessage = "응답 시간이 지난 배달권입니다. 새 추천을 확인해 주세요.";
+            return;
+        }
+
         SelectedTicket = ticket;
         await AcceptOfferAsync(ticket.TicketId);
+    }
+
+    [RelayCommand]
+    private async Task RejectTicket(DeliveryTicketPreview ticket)
+    {
+        await RunApiAsync(async () =>
+        {
+            var result = await _api.RejectAsync(ticket.TicketId);
+            StatusMessage = result.Message;
+            await LoadWorkspaceAsync();
+        });
+    }
+
+    [RelayCommand]
+    private async Task SelectActiveDelivery(ActiveDeliveryPreview delivery)
+    {
+        ActiveDelivery = delivery;
+        StatusMessage = $"{delivery.OrderSummary} 진행 배달을 선택했습니다.";
+        SetWorkStage();
+        await RefreshRouteAsync();
     }
 
     [RelayCommand]
@@ -308,6 +400,13 @@ public sealed partial class MainPageModel : ObservableObject
 
     private async Task AcceptOfferAsync(string offerId)
     {
+        var ticket = RecommendedTicketItems.FirstOrDefault(x => x.TicketId == offerId);
+        if (ticket?.IsExpired == true)
+        {
+            StatusMessage = "응답 시간이 지난 배달권입니다. 새 추천을 확인해 주세요.";
+            return;
+        }
+
         await RunApiAsync(async () =>
         {
             var result = await _api.AcceptAsync(offerId);
@@ -332,9 +431,11 @@ public sealed partial class MainPageModel : ObservableObject
         });
     }
 
-    private async Task LoadWorkspaceAsync()
+    private async Task LoadWorkspaceAsync(bool refreshRoute = true)
     {
         var workspace = await _api.GetWorkspaceAsync();
+        var selectedTicketId = SelectedTicket?.TicketId;
+        var activeOfferId = ActiveDelivery?.OfferId;
         RecommendedTicketItems.Clear();
         foreach (var item in workspace.Recommendations)
         {
@@ -353,23 +454,33 @@ public sealed partial class MainPageModel : ObservableObject
             BundleCandidateItems.Add(FoodDeliveryBundlePreview.From(item));
         }
 
-        ActiveDelivery = ActiveDeliveryItems.FirstOrDefault();
-        SelectedTicket = SelectedTicket is null
+        ActiveDelivery = activeOfferId is null
+            ? ActiveDeliveryItems.FirstOrDefault()
+            : ActiveDeliveryItems.FirstOrDefault(x => x.OfferId == activeOfferId)
+              ?? ActiveDeliveryItems.FirstOrDefault();
+        SelectedTicket = selectedTicketId is null
             ? RecommendedTicketItems.FirstOrDefault()
-            : RecommendedTicketItems.FirstOrDefault(x => x.TicketId == SelectedTicket.TicketId)
+            : RecommendedTicketItems.FirstOrDefault(x => x.TicketId == selectedTicketId)
               ?? RecommendedTicketItems.FirstOrDefault();
         PendingDeliveryTickets = RecommendedTicketItems.Count + ActiveDeliveryItems.Count;
         RecommendedTickets = RecommendedTicketItems.Count;
         TodayExpectedPayout = RecommendedTicketItems.Sum(x => x.DriverPayout);
         SettlementText = $"{workspace.Settlement.년도}년 {workspace.Settlement.월}월 · "
                          + $"배차 {workspace.Settlement.배차건수:N0}건 · 이용료 {workspace.Settlement.이용료:N0}원"
-                         + (workspace.Settlement.결제완료 ? " · 납부 완료" : string.Empty);
+                          + (workspace.Settlement.결제완료 ? " · 납부 완료" : string.Empty);
+        DispatchAutomationEnabled = workspace.DispatchAutomationEnabled;
+        DispatchAutomationNotice = workspace.DispatchAutomationNotice;
+        WorkspaceSyncText = $"업무 자동 갱신 {workspace.UpdatedAtUtc.ToLocalTime():HH:mm:ss}";
         MapMarkers = RecommendedTicketItems.Select(ToMapMarker)
             .Concat(ActiveDeliveryItems.Select(ToMapMarker))
             .ToArray();
         SetWorkStage();
         NotifyWorkspaceState();
-        await RefreshRouteAsync();
+        UpdateRecommendationCountdowns();
+        if (refreshRoute)
+        {
+            await RefreshRouteAsync();
+        }
 
         if (string.IsNullOrWhiteSpace(StatusMessage) || StatusMessage.Contains("불러오", StringComparison.Ordinal))
         {
@@ -404,6 +515,8 @@ public sealed partial class MainPageModel : ObservableObject
                 운행상태 = DrivingStatus,
                 기록시각 = location.RecordedAtUtc
             });
+            _lastLocationSentAtUtc = DateTime.UtcNow;
+            LocationSyncText = $"기사 위치 전송 {_lastLocationSentAtUtc.Value.ToLocalTime():HH:mm:ss}";
         }
 
         return location;
@@ -510,6 +623,7 @@ public sealed partial class MainPageModel : ObservableObject
             StatusMessage = ShortMessage(ex.Message);
             if (ex.StatusCode == HttpStatusCode.Unauthorized)
             {
+                StopMonitoring();
                 await _authSession.ClearAsync();
                 IsAuthenticated = false;
                 ClearWorkspace();
@@ -554,6 +668,11 @@ public sealed partial class MainPageModel : ObservableObject
         RecommendedTickets = 0;
         TodayExpectedPayout = 0m;
         SettlementText = "이번 달 정산 조회 전";
+        WorkspaceSyncText = "업무 자동 갱신 대기";
+        LocationSyncText = "기사 위치 전송 대기";
+        DispatchAutomationEnabled = false;
+        DispatchAutomationNotice = "자동 배차 상태 확인 전";
+        _lastLocationSentAtUtc = null;
         NotifyWorkspaceState();
     }
 
@@ -586,6 +705,7 @@ public sealed partial class MainPageModel : ObservableObject
         OnPropertyChanged(nameof(ActiveWorkPayoutText));
         OnPropertyChanged(nameof(HasActiveWork));
         OnPropertyChanged(nameof(HasBundleCandidates));
+        OnPropertyChanged(nameof(HasMultipleActiveDeliveries));
         NotifyCommandState();
     }
 
@@ -601,6 +721,79 @@ public sealed partial class MainPageModel : ObservableObject
         OnPropertyChanged(nameof(PickupPointText));
         OnPropertyChanged(nameof(DropoffPointText));
         OnPropertyChanged(nameof(SelectedRouteText));
+    }
+
+    private async Task MonitorWorkspaceAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        var networkElapsed = TimeSpan.Zero;
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                networkElapsed += TimeSpan.FromSeconds(1);
+                await MainThread.InvokeOnMainThreadAsync(UpdateRecommendationCountdowns);
+                if (networkElapsed < WorkspaceRefreshInterval)
+                {
+                    continue;
+                }
+
+                networkElapsed = TimeSpan.Zero;
+                await MainThread.InvokeOnMainThreadAsync(RefreshWorkspaceFromMonitorAsync);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private async Task RefreshWorkspaceFromMonitorAsync()
+    {
+        if (!IsAuthenticated || IsBusy || _monitorRefreshInProgress)
+        {
+            return;
+        }
+
+        _monitorRefreshInProgress = true;
+        try
+        {
+            if (IsOnDuty
+                && (!_lastLocationSentAtUtc.HasValue
+                    || DateTime.UtcNow - _lastLocationSentAtUtc.Value >= LocationHeartbeatInterval))
+            {
+                await CaptureLocationAsync(sendToServer: true);
+            }
+
+            await LoadWorkspaceAsync(refreshRoute: false);
+        }
+        catch (FDriverApiException ex)
+        {
+            WorkspaceSyncText = $"자동 갱신 지연 · {ShortMessage(ex.Message)}";
+            if (ex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                StopMonitoring();
+                await _authSession.ClearAsync();
+                IsAuthenticated = false;
+                IsOnDuty = false;
+                ClearWorkspace();
+                StatusMessage = "로그인이 만료되었습니다. 다시 로그인해 주세요.";
+            }
+        }
+        finally
+        {
+            _monitorRefreshInProgress = false;
+        }
+    }
+
+    private void UpdateRecommendationCountdowns()
+    {
+        var now = DateTime.UtcNow;
+        foreach (var item in RecommendedTicketItems)
+        {
+            item.UpdateCountdown(now);
+        }
+
+        NotifyCommandState();
     }
 
     private static DriverMapMarkerItem ToMapMarker(DeliveryTicketPreview ticket)
@@ -649,20 +842,81 @@ public sealed partial class MainPageModel : ObservableObject
     }
 }
 
-public sealed record DeliveryTicketPreview(
-    string TicketId,
-    string OrderSummary,
-    string RestaurantName,
-    DriverWorkStopDto Pickup,
-    DriverWorkStopDto Dropoff,
-    double DistanceKm,
-    decimal DriverPayout,
-    string RecommendationReason)
+public sealed class DeliveryTicketPreview : ObservableObject
 {
+    private string _remainingText = "응답시간 확인 중";
+    private bool _isExpired;
+
+    public DeliveryTicketPreview(
+        string ticketId,
+        string orderSummary,
+        string restaurantName,
+        DriverWorkStopDto pickup,
+        DriverWorkStopDto dropoff,
+        double distanceKm,
+        decimal driverPayout,
+        string recommendationReason,
+        DateTime? expiresAtUtc)
+    {
+        TicketId = ticketId;
+        OrderSummary = orderSummary;
+        RestaurantName = restaurantName;
+        Pickup = pickup;
+        Dropoff = dropoff;
+        DistanceKm = distanceKm;
+        DriverPayout = driverPayout;
+        RecommendationReason = recommendationReason;
+        ExpiresAtUtc = expiresAtUtc;
+        UpdateCountdown(DateTime.UtcNow);
+    }
+
+    public string TicketId { get; }
+    public string OrderSummary { get; }
+    public string RestaurantName { get; }
+    public DriverWorkStopDto Pickup { get; }
+    public DriverWorkStopDto Dropoff { get; }
+    public double DistanceKm { get; }
+    public decimal DriverPayout { get; }
+    public string RecommendationReason { get; }
+    public DateTime? ExpiresAtUtc { get; }
     public string RestaurantAddress => Pickup.Address;
     public string DropoffAddress => Dropoff.Address;
     public string DistanceText => $"{DistanceKm.ToString("0.0", CultureInfo.CurrentCulture)}km";
     public string DriverPayoutText => $"{DriverPayout.ToString("N0", CultureInfo.CurrentCulture)}원";
+    public string RemainingText
+    {
+        get => _remainingText;
+        private set => SetProperty(ref _remainingText, value);
+    }
+    public bool IsExpired
+    {
+        get => _isExpired;
+        private set
+        {
+            if (SetProperty(ref _isExpired, value))
+            {
+                OnPropertyChanged(nameof(CanAccept));
+            }
+        }
+    }
+    public bool CanAccept => !IsExpired;
+
+    public void UpdateCountdown(DateTime utcNow)
+    {
+        if (!ExpiresAtUtc.HasValue)
+        {
+            IsExpired = false;
+            RemainingText = "응답시간 확인 중";
+            return;
+        }
+
+        var expiresAtUtc = DateTime.SpecifyKind(ExpiresAtUtc.Value, DateTimeKind.Utc);
+        var remaining = expiresAtUtc - utcNow;
+        IsExpired = remaining <= TimeSpan.Zero;
+        RemainingText = IsExpired
+            ? "응답시간 만료"
+            : $"응답 {Math.Max(1, (int)Math.Ceiling(remaining.TotalSeconds))}초 남음";
+    }
 
     public static DeliveryTicketPreview From(FoodDeliveryDriverOfferDto item)
         => new(
@@ -673,7 +927,8 @@ public sealed record DeliveryTicketPreview(
             ToStop(item.Dropoff),
             (double)(item.DistanceKm ?? 0m),
             item.DriverPayout,
-            item.RecommendationReason);
+            item.RecommendationReason,
+            item.ExpiresAtUtc);
 
     public DriverWorkOfferDto ToDriverWorkOffer(FDriverAppProfile profile)
         => new(

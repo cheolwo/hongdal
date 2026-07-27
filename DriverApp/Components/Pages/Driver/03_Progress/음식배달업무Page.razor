@@ -1,0 +1,430 @@
+@page "/driver/food-deliveries"
+@using Ssalddel.Contracts.Common.Drivers
+@using Ssalddel.Contracts.Driver.Food
+@inject IDriverFoodDeliveryApiService FoodDeliveryApi
+
+<PageTitle>음식 배달 업무</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="driver-page-legacy-header pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <div>
+                        <MudText Typo="Typo.h4">음식 배달 업무</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            음식점 픽업 제안을 수락하고 픽업·고객 전달을 순서대로 완료합니다.
+                        </MudText>
+                    </div>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Refresh"
+                               Disabled="@isBusy"
+                               OnClick="ReloadAsync">
+                        새로고침
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity" Variant="Variant.Outlined">@message</MudAlert>
+        }
+
+        @if (isLoading)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">서버의 음식 배달 제안과 진행 상태를 확인하고 있습니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (workspace is null)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                음식 배달 업무공간을 불러오지 못했습니다. 네트워크와 기사 로그인을 확인한 뒤 다시 시도해 주세요.
+            </MudAlert>
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="6" md="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">새 제안</MudText>
+                        <MudText Typo="Typo.h5">@workspace.Recommendations.Count 건</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">진행 중</MudText>
+                        <MudText Typo="Typo.h5">@workspace.ActiveDeliveries.Count 건</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">이번 달 배차</MudText>
+                        <MudText Typo="Typo.h5">@workspace.Settlement.배차건수 건</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">최근 갱신</MudText>
+                        <MudText Typo="Typo.subtitle1">@FormatDate(workspace.UpdatedAtUtc)</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <div>
+                            <MudText Typo="Typo.h6">진행 중 음식 배달</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                서버가 허용하는 다음 단계만 처리합니다. 완료 후 업무공간을 다시 조회합니다.
+                            </MudText>
+                        </div>
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">
+                            @workspace.ActiveDeliveries.Count 건
+                        </MudChip>
+                    </MudStack>
+
+                    @if (workspace.ActiveDeliveries.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Text">
+                            현재 진행 중인 음식 배달이 없습니다.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        @foreach (var delivery in workspace.ActiveDeliveries)
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                        <div>
+                                            <MudText Typo="Typo.subtitle1">@delivery.RestaurantName</MudText>
+                                            <MudText Typo="Typo.body2">@delivery.OrderSummary</MudText>
+                                        </div>
+                                        <MudChip T="string"
+                                                 Color="@WorkStatusColor(delivery.WorkStatus)"
+                                                 Variant="Variant.Filled">
+                                            @WorkStatusLabel(delivery.WorkStatus)
+                                        </MudChip>
+                                    </MudStack>
+
+                                    <MudGrid Spacing="2">
+                                        <MudItem xs="12" md="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">음식점 픽업</MudText>
+                                            <MudText Typo="Typo.body2">@StopLabel(delivery.Pickup)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" md="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">고객 전달</MudText>
+                                            <MudText Typo="Typo.body2">@StopLabel(delivery.Dropoff)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">운송 상태</MudText>
+                                            <MudText Typo="Typo.body2">@ValueOrDash(delivery.TransportStatus)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 수익</MudText>
+                                            <MudText Typo="Typo.body2">@($"{delivery.DriverPayout:N0}원")</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+
+                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                        @if (CanCompletePickup(delivery))
+                                        {
+                                            <MudButton Variant="Variant.Filled"
+                                                       Color="Color.Primary"
+                                                       StartIcon="@Icons.Material.Filled.Restaurant"
+                                                       Disabled="@IsActionBusy(delivery.OfferId)"
+                                                       OnClick="@(() => CompletePickupAsync(delivery.OfferId))">
+                                                음식점 픽업 완료
+                                            </MudButton>
+                                        }
+                                        @if (CanCompleteDelivery(delivery))
+                                        {
+                                            <MudButton Variant="Variant.Filled"
+                                                       Color="Color.Success"
+                                                       StartIcon="@Icons.Material.Filled.TaskAlt"
+                                                       Disabled="@IsActionBusy(delivery.OfferId)"
+                                                       OnClick="@(() => CompleteDeliveryAsync(delivery.OfferId))">
+                                                고객 전달 완료
+                                            </MudButton>
+                                        }
+                                    </MudStack>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+                </MudStack>
+            </MudPaper>
+
+            @if (workspace.BundleCandidates.Count > 0)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6">함께 처리할 수 있는 제안</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            같은 방향의 제안을 묶어 수락할 수 있습니다. 묶음 수락 전 각 픽업·전달 주소를 확인해 주세요.
+                        </MudText>
+                        @foreach (var bundle in workspace.BundleCandidates)
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Spacing="2">
+                                    <MudText Typo="Typo.subtitle1">@bundle.Title</MudText>
+                                    <MudText Typo="Typo.body2">@bundle.Reason</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        @($"{bundle.OfferIds.Count}건 · 예상 수익 {bundle.TotalPayout:N0}원 · 예상 경로 {bundle.EstimatedRouteKm:0.#}km")
+                                    </MudText>
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Primary"
+                                               Disabled="@isBusy"
+                                               OnClick="@(() => AcceptBundleAsync(bundle.OfferIds))">
+                                        이 묶음 수락
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                </MudPaper>
+            }
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <div>
+                            <MudText Typo="Typo.h6">새 음식 배달 제안</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                제안은 배차 확정이 아닙니다. 수락이 성공한 뒤 진행 중 업무로 이동합니다.
+                            </MudText>
+                        </div>
+                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                            @workspace.Recommendations.Count 건
+                        </MudChip>
+                    </MudStack>
+
+                    @if (workspace.Recommendations.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Text">
+                            현재 확인할 음식 배달 제안이 없습니다.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        @foreach (var offer in workspace.Recommendations)
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                        <div>
+                                            <MudText Typo="Typo.subtitle1">@offer.RestaurantName</MudText>
+                                            <MudText Typo="Typo.body2">@offer.OrderSummary</MudText>
+                                        </div>
+                                        <MudText Typo="Typo.h6" Color="Color.Primary">@($"{offer.DriverPayout:N0}원")</MudText>
+                                    </MudStack>
+
+                                    <MudGrid Spacing="2">
+                                        <MudItem xs="12" md="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">픽업</MudText>
+                                            <MudText Typo="Typo.body2">@StopLabel(offer.Pickup)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" md="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">전달</MudText>
+                                            <MudText Typo="Typo.body2">@StopLabel(offer.Dropoff)</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+
+                                    <MudAlert Severity="Severity.Normal" Dense="true" Variant="Variant.Text">
+                                        @ValueOrDash(offer.RecommendationReason)
+                                    </MudAlert>
+
+                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   Disabled="@IsActionBusy(offer.OfferId)"
+                                                   OnClick="@(() => AcceptOfferAsync(offer.OfferId))">
+                                            수락
+                                        </MudButton>
+                                        <MudButton Variant="Variant.Outlined"
+                                                   Color="Color.Error"
+                                                   Disabled="@IsActionBusy(offer.OfferId)"
+                                                   OnClick="@(() => RejectOfferAsync(offer.OfferId))">
+                                            거절
+                                        </MudButton>
+                                    </MudStack>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.HomeSummary">
+            기사 홈으로
+        </MudButton>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private FoodDeliveryDriverWorkspaceDto? workspace;
+    private readonly HashSet<string> busyOfferIds = new(StringComparer.OrdinalIgnoreCase);
+    private bool isLoading = true;
+    private bool isBusy;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    protected override Task OnInitializedAsync() => ReloadAsync();
+
+    private Task ReloadAsync() => ReloadCoreAsync(clearMessage: true);
+
+    private async Task<bool> ReloadCoreAsync(bool clearMessage)
+    {
+        isLoading = true;
+        if (clearMessage)
+        {
+            message = null;
+        }
+
+        try
+        {
+            workspace = await FoodDeliveryApi.업무공간조회Async();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            workspace = null;
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+            return false;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private Task AcceptOfferAsync(string offerId)
+        => RunOfferActionAsync(
+            offerId,
+            cancellationToken => FoodDeliveryApi.제안수락Async(offerId, cancellationToken));
+
+    private Task RejectOfferAsync(string offerId)
+        => RunOfferActionAsync(
+            offerId,
+            cancellationToken => FoodDeliveryApi.제안거절Async(offerId, cancellationToken));
+
+    private Task CompletePickupAsync(string offerId)
+        => RunOfferActionAsync(
+            offerId,
+            cancellationToken => FoodDeliveryApi.픽업완료Async(offerId, cancellationToken));
+
+    private Task CompleteDeliveryAsync(string offerId)
+        => RunOfferActionAsync(
+            offerId,
+            cancellationToken => FoodDeliveryApi.전달완료Async(offerId, cancellationToken));
+
+    private async Task RunOfferActionAsync(
+        string offerId,
+        Func<CancellationToken, Task<FoodDeliveryDriverActionResponse?>> action)
+    {
+        if (!busyOfferIds.Add(offerId))
+        {
+            return;
+        }
+
+        isBusy = true;
+        message = null;
+        try
+        {
+            var result = await action(CancellationToken.None);
+            if (await ReloadCoreAsync(clearMessage: false))
+            {
+                messageSeverity = Severity.Success;
+                message = result?.Message ?? "음식 배달 상태를 변경했습니다.";
+            }
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+        }
+        finally
+        {
+            busyOfferIds.Remove(offerId);
+            isBusy = busyOfferIds.Count > 0;
+        }
+    }
+
+    private async Task AcceptBundleAsync(IReadOnlyList<string> offerIds)
+    {
+        if (isBusy || offerIds.Count < 2)
+        {
+            return;
+        }
+
+        isBusy = true;
+        message = null;
+        try
+        {
+            var result = await FoodDeliveryApi.묶음수락Async(offerIds);
+            if (await ReloadCoreAsync(clearMessage: false))
+            {
+                messageSeverity = Severity.Success;
+                message = result?.Message ?? "음식 배달 묶음 제안을 수락했습니다.";
+            }
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private bool IsActionBusy(string offerId)
+        => busyOfferIds.Contains(offerId);
+
+    private static bool CanCompletePickup(FoodDeliveryDriverActiveDeliveryDto delivery)
+        => delivery.WorkStatus is DriverWorkOfferStatus.Accepted or DriverWorkOfferStatus.MovingToPickup;
+
+    private static bool CanCompleteDelivery(FoodDeliveryDriverActiveDeliveryDto delivery)
+        => delivery.WorkStatus == DriverWorkOfferStatus.MovingToDropoff;
+
+    private static string WorkStatusLabel(string? status) => status switch
+    {
+        DriverWorkOfferStatus.Accepted => "수락됨",
+        DriverWorkOfferStatus.MovingToPickup => "음식점으로 이동",
+        DriverWorkOfferStatus.PickupConfirmed => "픽업 확인",
+        DriverWorkOfferStatus.MovingToDropoff => "고객에게 이동",
+        DriverWorkOfferStatus.Completed => "전달 완료",
+        _ => ValueOrDash(status)
+    };
+
+    private static Color WorkStatusColor(string? status) => status switch
+    {
+        DriverWorkOfferStatus.Completed => Color.Success,
+        DriverWorkOfferStatus.MovingToDropoff => Color.Info,
+        DriverWorkOfferStatus.Accepted or DriverWorkOfferStatus.MovingToPickup => Color.Primary,
+        _ => Color.Default
+    };
+
+    private static string StopLabel(FoodDeliveryDriverStopDto stop)
+        => string.IsNullOrWhiteSpace(stop.Address)
+            ? ValueOrDash(stop.Label)
+            : $"{ValueOrDash(stop.Label)} · {stop.Address.Trim()}";
+
+    private static string FormatDate(DateTime value)
+        => value == default
+            ? "—"
+            : DateTime.SpecifyKind(value, DateTimeKind.Utc).ToLocalTime().ToString("MM.dd HH:mm");
+
+    private static string ValueOrDash(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "—" : value.Trim();
+}

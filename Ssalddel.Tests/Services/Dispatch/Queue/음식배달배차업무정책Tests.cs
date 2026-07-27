@@ -49,6 +49,37 @@ public sealed class 음식배달배차업무정책Tests
         Assert.Equal("next-driver", candidate!.DriverId);
     }
 
+    [Fact]
+    public async Task 기사가_설정한_상차접근반경_밖의_음식점은_추천하지_않는다()
+    {
+        var now = DateTime.UtcNow;
+        var store = new FakeDriverStateStore(
+        [
+            Snapshot(
+                "near-but-outside-own-radius",
+                기사앱식별자.FoodDeliveryDriverApp,
+                37.518m,
+                127m,
+                now,
+                100m,
+                allowedRadiusKm: 1m),
+            Snapshot(
+                "farther-but-inside-own-radius",
+                기사앱식별자.FoodDeliveryDriverApp,
+                37.527m,
+                127m,
+                now,
+                0m,
+                allowedRadiusKm: 5m)
+        ]);
+        var policy = CreatePolicy(store, new FakeRejectedRequestStore());
+
+        var candidate = await policy.다음후보선정Async(Queue());
+
+        Assert.NotNull(candidate);
+        Assert.Equal("farther-but-inside-own-radius", candidate!.DriverId);
+    }
+
     private static 음식배달배차업무정책 CreatePolicy(
         I국내화물운송기사상태Store store,
         IDriverRejectedRequestStore rejected)
@@ -77,7 +108,8 @@ public sealed class 음식배달배차업무정책Tests
         decimal latitude,
         decimal longitude,
         DateTime receivedAt,
-        decimal aging)
+        decimal aging,
+        decimal? allowedRadiusKm = null)
         => new(
             driverId,
             null,
@@ -96,6 +128,7 @@ public sealed class 음식배달배차업무정책Tests
             "immediate",
             "test",
             null,
+            상차접근허용반경Km: allowedRadiusKm,
             AppKey: appKey);
 
     private sealed class FakeDriverStateStore(

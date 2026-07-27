@@ -7,6 +7,8 @@ public sealed class FoodDeliveryDriverWorkspaceDto
     public IReadOnlyList<FoodDeliveryDriverActiveDeliveryDto> ActiveDeliveries { get; set; } = [];
     public IReadOnlyList<FoodDeliveryBundleCandidateDto> BundleCandidates { get; set; } = [];
     public 배달기사월정산응답 Settlement { get; set; } = new();
+    public bool DispatchAutomationEnabled { get; set; }
+    public string DispatchAutomationNotice { get; set; } = string.Empty;
     public DateTime UpdatedAtUtc { get; set; }
 }
 

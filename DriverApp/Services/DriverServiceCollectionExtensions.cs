@@ -49,6 +49,7 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<IDriverRecommendationApiService, DriverRecommendationApiService>();
         services.AddSingleton<IDriverExplorationCampaignApiService, DriverExplorationCampaignApiService>();
         services.AddSingleton<IDriverDispatchActionApiService, DriverDispatchActionApiService>();
+        services.AddSingleton<IDriverFoodDeliveryApiService, DriverFoodDeliveryApiService>();
         services.AddSingleton<IDriverReservationApiService, DriverReservationApiService>();
         services.AddSingleton<IDriverSettingsApiService, DriverSettingsApiService>();
         services.AddSingleton<IDriverSettlementApiService, DriverSettlementApiService>();

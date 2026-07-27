@@ -51,6 +51,7 @@ public static class 음식주문배차상태코드
     public const string 배차대기 = "배차대기";
     public const string 추천중 = "추천중";
     public const string 기사배정 = "기사배정";
+    public const string 배달중 = "배달중";
     public const string 배달완료 = "배달완료";
     public const string 배차불가 = "배차불가";
 }
@@ -152,6 +153,7 @@ public sealed class 주문자음식주문목록응답
 public sealed class 주문자음식주문상세응답
 {
     public 주문자음식주문요약응답 주문 { get; set; } = new();
+    public 주문자음식배달진행응답 배달진행 { get; set; } = new();
     public string 음식점주소 { get; set; } = string.Empty;
     public string 음식점상세주소 { get; set; } = string.Empty;
     public 음식주문수령인정보Dto 수령인정보 { get; set; } = new();
@@ -161,6 +163,15 @@ public sealed class 주문자음식주문상세응답
     public DateTime? 배차요청시각Utc { get; set; }
     public string? 수락메모 { get; set; }
     public IReadOnlyList<음식주문상태전이기록Dto> 상태이력 { get; set; } = [];
+}
+
+public sealed class 주문자음식배달진행응답
+{
+    public bool 배차요청됨 { get; set; }
+    public bool 기사배정됨 { get; set; }
+    public string 현재운송상태 { get; set; } = 음식주문배차상태코드.미요청;
+    public string 안내 { get; set; } = "음식점이 주문을 수락하면 배달 기사 배차가 시작됩니다.";
+    public DateTime? 최근변경시각Utc { get; set; }
 }
 
 public sealed class 음식주문상태전이기록Dto

@@ -39,6 +39,11 @@ public static class DriverMobileScreenCatalog
                 "보낸 탐색 문의함",
                 "공개 수요에 보낸 질문과 응답 상태를 확인합니다.",
                 "탐색"),
+            DriverRoutes.FoodDeliveries => new(
+                "04.08A",
+                "음식 배달 업무",
+                "음식점 픽업 제안부터 고객 전달 완료까지 한 흐름으로 처리합니다.",
+                "음식 배달"),
             DriverRoutes.CurrentTransport => new(
                 "04.08",
                 "진행 중 운송",

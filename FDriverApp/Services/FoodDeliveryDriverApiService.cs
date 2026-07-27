@@ -16,6 +16,7 @@ public interface IFoodDeliveryDriverApiService
     Task StopWorkAsync(CancellationToken cancellationToken = default);
     Task<기사위치갱신응답?> UpdateLocationAsync(기사위치갱신요청 request, CancellationToken cancellationToken = default);
     Task<FoodDeliveryDriverActionResponse> AcceptAsync(string offerId, CancellationToken cancellationToken = default);
+    Task<FoodDeliveryDriverActionResponse> RejectAsync(string offerId, CancellationToken cancellationToken = default);
     Task<FoodDeliveryDriverActionResponse> AcceptBundleAsync(IReadOnlyList<string> offerIds, CancellationToken cancellationToken = default);
     Task<FoodDeliveryDriverActionResponse> ConfirmPickupAsync(string offerId, CancellationToken cancellationToken = default);
     Task<FoodDeliveryDriverActionResponse> CompleteAsync(string offerId, CancellationToken cancellationToken = default);
@@ -63,6 +64,13 @@ public sealed class FoodDeliveryDriverApiService : IFoodDeliveryDriverApiService
         => SendAsync<FoodDeliveryDriverActionResponse>(
             HttpMethod.Post,
             $"api/v1/driver/food-deliveries/offers/{Uri.EscapeDataString(offerId)}/accept",
+            null,
+            cancellationToken);
+
+    public Task<FoodDeliveryDriverActionResponse> RejectAsync(string offerId, CancellationToken cancellationToken = default)
+        => SendAsync<FoodDeliveryDriverActionResponse>(
+            HttpMethod.Post,
+            $"api/v1/driver/food-deliveries/offers/{Uri.EscapeDataString(offerId)}/reject",
             null,
             cancellationToken);
 

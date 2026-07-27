@@ -80,6 +80,14 @@ public sealed class 음식배달배차업무정책 : I배차업무정책
                 continue;
             }
 
+            var allowedRadiusKm = Math.Min(
+                Math.Max(1m, _options.기사후보검색반경Km),
+                Math.Max(1m, candidate.상차접근허용반경Km ?? _options.기사후보검색반경Km));
+            if (distance.Value > allowedRadiusKm)
+            {
+                continue;
+            }
+
             var distanceScore = Math.Max(0m, 100m - distance.Value * 12m);
             var score = distanceScore + candidate.Aging점수;
             var reason = $"음식점까지 {distance.Value:0.0}km · F드라이버 대기 보정 {candidate.Aging점수:0}";

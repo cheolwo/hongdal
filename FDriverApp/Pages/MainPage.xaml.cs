@@ -20,9 +20,20 @@ namespace FDriverApp.Pages
             if (BindingContext is MainPageModel model)
             {
                 await model.InitializeAsync();
+                model.StartMonitoring();
                 model.ApplyEntryFocus(_entryFocus);
                 _entryFocus = null;
             }
+        }
+
+        protected override void OnDisappearing()
+        {
+            if (BindingContext is MainPageModel model)
+            {
+                model.StopMonitoring();
+            }
+
+            base.OnDisappearing();
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)

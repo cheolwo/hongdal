@@ -132,6 +132,7 @@
         new("커뮤니티 개별 의뢰", DriverRoutes.CommunityInquiries, Icons.Material.Filled.Forum),
         new("운송 추천", DriverRoutes.Recommendations, Icons.Material.Filled.Recommend),
         new("보낸 탐색 문의함", DriverRoutes.ExplorationCampaigns, Icons.Material.Filled.Outbox),
+        new("음식 배달 업무", DriverRoutes.FoodDeliveries, Icons.Material.Filled.DeliveryDining),
         new("진행 중 운송", DriverRoutes.CurrentTransport, Icons.Material.Filled.LocalShipping),
         new("배달 내역", DriverRoutes.DeliveryHistory, Icons.Material.Filled.ReceiptLong),
         new("운행 예약", DriverRoutes.Reservations, Icons.Material.Filled.Event),
@@ -171,6 +172,7 @@
                 || CurrentPath.StartsWith(DriverRoutes.ExplorationCampaigns, StringComparison.OrdinalIgnoreCase),
             BottomDestination.Transport =>
                 CurrentPath.StartsWith("/driver/transports", StringComparison.OrdinalIgnoreCase)
+                || CurrentPath.StartsWith(DriverRoutes.FoodDeliveries, StringComparison.OrdinalIgnoreCase)
                 || CurrentPath.StartsWith(DriverRoutes.Reservations, StringComparison.OrdinalIgnoreCase),
             BottomDestination.Settlement =>
                 CurrentPath.StartsWith("/driver/settlements", StringComparison.OrdinalIgnoreCase)
@@ -179,6 +181,7 @@
                  && !CurrentPath.StartsWith(DriverRoutes.CommunityInquiries, StringComparison.OrdinalIgnoreCase)
                  && !CurrentPath.StartsWith(DriverRoutes.ExplorationCampaigns, StringComparison.OrdinalIgnoreCase)
                  && !CurrentPath.StartsWith("/driver/transports", StringComparison.OrdinalIgnoreCase)
+                 && !CurrentPath.StartsWith(DriverRoutes.FoodDeliveries, StringComparison.OrdinalIgnoreCase)
                  && !CurrentPath.StartsWith(DriverRoutes.Reservations, StringComparison.OrdinalIgnoreCase)
                  && !CurrentPath.StartsWith("/driver/settlements", StringComparison.OrdinalIgnoreCase)
                  && !CurrentPath.StartsWith("/driver/account", StringComparison.OrdinalIgnoreCase)

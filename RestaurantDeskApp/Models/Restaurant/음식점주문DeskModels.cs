@@ -22,6 +22,8 @@ public sealed class 음식점주문수신Payload
 
     public string 메뉴요약 { get; init; } = string.Empty;
 
+    public IReadOnlyList<음식주문상품Dto> 상품목록 { get; init; } = [];
+
     public decimal 주문금액 { get; init; }
 
     public DateTimeOffset 수신시각 { get; init; } = DateTimeOffset.Now;
@@ -43,6 +45,10 @@ public sealed class 음식점주문DeskItem
 
     public string 메뉴요약 { get; set; } = string.Empty;
 
+    public IReadOnlyList<음식주문상품Dto> 상품목록 { get; set; } = [];
+
+    public IReadOnlyList<음식점주문상품조리기준> 상품별조리기준 { get; set; } = [];
+
     public decimal 주문금액 { get; set; }
 
     public DateTimeOffset 접수시각 { get; set; } = DateTimeOffset.Now;
@@ -50,6 +56,14 @@ public sealed class 음식점주문DeskItem
     public DateTimeOffset? 수락시각 { get; set; }
 
     public DateTimeOffset? 전표출력시각 { get; set; }
+
+    public int 추천조리예상분 { get; set; }
+
+    public int? 선택조리예상분 { get; set; }
+
+    public string 배차상태 { get; set; } = 음식주문배차상태코드.미요청;
+
+    public DateTime? 배차요청시각Utc { get; set; }
 
     public string 상태 { get; set; } = 음식점주문Desk상태코드.주문대기;
 
@@ -61,6 +75,12 @@ public sealed class 음식점주문DeskItem
 
     public bool 수락가능 => 상태 is 음식점주문Desk상태코드.주문대기 or 음식점주문Desk상태코드.상세조회실패;
 }
+
+public sealed record 음식점주문상품조리기준(
+    string 상품명,
+    int 수량,
+    int 기본조리분,
+    bool 음식점기본값사용);
 
 public sealed class 음식점주문수락결과
 {

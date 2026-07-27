@@ -88,6 +88,19 @@ public sealed class OrdererFoodOrderWorkspaceCompositionTests
     }
 
     [Fact]
+    public void 음식주문_상세는_배차실패를_자동취소로오인하지않도록안내한다()
+    {
+        var componentDirectory = FindComponentDirectory();
+        var detail = File.ReadAllText(Path.Combine(componentDirectory, "OrdererFoodOrderDetailPanel.razor"));
+        var presentation = File.ReadAllText(Path.Combine(componentDirectory, "OrdererFoodOrderPresentation.cs"));
+
+        Assert.Contains("NeedsDeliveryRecovery", detail);
+        Assert.Contains("DeliveryRecoveryGuide", detail);
+        Assert.Contains("주문 취소나 환불이 자동 확정되는 것은 아니며", presentation);
+        Assert.Contains("추천만료", presentation);
+    }
+
+    [Fact]
     public void 음식주문_화면은_좁은폭에서_로그인과목록과상세를_단일열로전환한다()
     {
         var componentDirectory = FindComponentDirectory();

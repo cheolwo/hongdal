@@ -3,6 +3,8 @@ using Ssalddel.Contracts.Driver.Food;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
 using 살뜰.Services.Dispatch.Recommendation;
+using 살뜰.Services.Options;
+using 살뜰.Services.Versioning;
 using 살뜰.도메인.공통;
 
 namespace Ssalddel.Application.Driver.Food;
@@ -22,15 +24,21 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
     private readonly SsalddelContext _db;
     private readonly I음식배달기사업무Service _driverWork;
     private readonly I배달기사월정산UseCase _settlements;
+    private readonly ISsalddelExecutionModePolicy _executionMode;
+    private readonly IVersionFeatureFlagService _featureFlags;
 
     public FoodDeliveryDriverWorkspaceUseCase(
         SsalddelContext db,
         I음식배달기사업무Service driverWork,
-        I배달기사월정산UseCase settlements)
+        I배달기사월정산UseCase settlements,
+        ISsalddelExecutionModePolicy executionMode,
+        IVersionFeatureFlagService featureFlags)
     {
         _db = db;
         _driverWork = driverWork;
         _settlements = settlements;
+        _executionMode = executionMode;
+        _featureFlags = featureFlags;
     }
 
     public async Task<FoodDeliveryDriverWorkspaceDto> GetAsync(
@@ -71,6 +79,9 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
                 년도 = DateTime.UtcNow.Year,
                 월 = DateTime.UtcNow.Month
             };
+        var dispatchAutomationEnabled = _executionMode.IsOperational
+                                        && _featureFlags.IsEnabled(
+                                            VersionFeatureFlagKeys.DomesticTransportWorkflow);
 
         return new FoodDeliveryDriverWorkspaceDto
         {
@@ -79,8 +90,22 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
             ActiveDeliveries = active,
             BundleCandidates = BuildBundleCandidates(offers),
             Settlement = settlement,
+            DispatchAutomationEnabled = dispatchAutomationEnabled,
+            DispatchAutomationNotice = ResolveDispatchAutomationNotice(dispatchAutomationEnabled),
             UpdatedAtUtc = DateTime.UtcNow
         };
+    }
+
+    private string ResolveDispatchAutomationNotice(bool enabled)
+    {
+        if (enabled)
+        {
+            return "자동 기사 추천이 활성화되어 있습니다.";
+        }
+
+        return !_executionMode.IsOperational
+            ? "시뮬레이션 모드에서는 자동 기사 추천이 실행되지 않습니다."
+            : "국내 운송 기능이 비활성화되어 자동 기사 추천이 실행되지 않습니다.";
     }
 
     private static FoodDeliveryDriverOfferDto ToOffer(DriverWorkOfferDto offer)

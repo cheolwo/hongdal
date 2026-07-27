@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Ssalddel.Application.Food;
 using Ssalddel.Contracts.Food;
+using System.Text.Json;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
+using 살뜰.도메인.공통;
 using 살뜰.도메인.음식;
+using 살뜰.도메인.운송;
 
 namespace Ssalddel.Tests.Application.Food;
 
@@ -69,6 +72,67 @@ public sealed class 주문자음식주문조회UseCaseTests
         Assert.Equal(401, anonymous.Errors.Single().Metadata["StatusCode"]);
         Assert.True(invalidStatus.IsFailed);
         Assert.Contains("상태를 확인", invalidStatus.Errors.Single().Message);
+    }
+
+    [Fact]
+    public async Task 상세는_음식배달운송투영을_읽어_기사수락과진행상태를주문자에게돌려준다()
+    {
+        await using var context = CreateContext();
+        await SeedAsync(context);
+        var updatedAt = new DateTime(2026, 7, 20, 1, 20, 0, DateTimeKind.Utc);
+        context.운송원장.Add(new 운송원장
+        {
+            운송번호 = "FOOD-A-001",
+            의뢰Id = "FOOD-A-001",
+            원본의뢰유형 = "FoodOrder",
+            원본의뢰Id = "FOOD-A-001",
+            배차업무유형 = 상태값.배차업무유형.음식배달,
+            상태 = "배차확정",
+            확정기사Id = "driver-private",
+            UpdatedAt = updatedAt
+        });
+        await context.SaveChangesAsync();
+        var useCase = new 주문자음식주문조회UseCase(context);
+
+        var result = await useCase.상세Async("FOOD-A-001", "user-a", CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(음식주문배차상태코드.기사배정, result.Value.주문.배차상태);
+        Assert.True(result.Value.배달진행.배차요청됨);
+        Assert.True(result.Value.배달진행.기사배정됨);
+        Assert.Equal("배차확정", result.Value.배달진행.현재운송상태);
+        Assert.Equal(updatedAt, result.Value.배달진행.최근변경시각Utc);
+        Assert.Contains("기사가 주문을 수락", result.Value.배달진행.안내);
+        Assert.DoesNotContain("driver-private", JsonSerializer.Serialize(result.Value));
+    }
+
+    [Fact]
+    public async Task 목록은_음식배달운송투영의_완료상태를_기존주문배차상태보다우선한다()
+    {
+        await using var context = CreateContext();
+        await SeedAsync(context);
+        context.운송원장.Add(new 운송원장
+        {
+            운송번호 = "FOOD-A-002",
+            의뢰Id = "FOOD-A-002",
+            원본의뢰유형 = "FoodOrder",
+            원본의뢰Id = "FOOD-A-002",
+            배차업무유형 = 상태값.배차업무유형.음식배달,
+            상태 = "인수완료",
+            확정기사Id = "driver-private",
+            UpdatedAt = new DateTime(2026, 7, 20, 2, 40, 0, DateTimeKind.Utc)
+        });
+        await context.SaveChangesAsync();
+        var useCase = new 주문자음식주문조회UseCase(context);
+
+        var result = await useCase.목록Async(
+            new 주문자음식주문목록조회요청 { PageSize = 10 },
+            "user-a",
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        var order = Assert.Single(result.Value.Items, item => item.주문번호 == "FOOD-A-002");
+        Assert.Equal(음식주문배차상태코드.배달완료, order.배차상태);
     }
 
     private static SsalddelContext CreateContext()

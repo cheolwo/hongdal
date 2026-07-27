@@ -11,6 +11,7 @@ public static class DriverRoutes
     public const string Recommendations = "/driver/recommendations";
     public const string ExplorationCampaigns = "/driver/exploration/campaigns";
     public const string Reservations = "/driver/reservations";
+    public const string FoodDeliveries = "/driver/food-deliveries";
     public const string CurrentTransport = "/driver/transports/current";
     public const string DeliveryHistory = "/driver/transports/history";
     public const string CurrentMonthSettlement = "/driver/settlements/current-month";

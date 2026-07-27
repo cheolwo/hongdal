@@ -315,13 +315,13 @@ flowchart LR
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 공동수입 입고 로트 상세 | `WarehouseManagerApp` | BL/AWB, 통관 단위, 세대 배송 단위, 냉장/냉동 조건을 창고 입고 단위와 연결해야 한다. |
+| 같이 수입 입고 로트 상세 | `WarehouseManagerApp` | BL/AWB, 통관 단위, 세대 배송 단위, 냉장/냉동 조건을 창고 입고 단위와 연결해야 한다. |
 | 출고 배치 상세 | `WarehouseManagerApp` 또는 `SsalddelApp` | 출고 배치 엔진이 어떤 창고와 재고를 선택했는지 사람이 검토할 수 있어야 한다. |
 | 보관 조건 적합성 확인 | `WarehouseManagerApp` | 냉장, 냉동, 상온, 유통기한 조건에 맞는 창고만 선택되도록 보여야 한다. |
 
 ## 판매채널 출고
 
-판매채널 출고는 공동수입 또는 일반 입고 상품을 스마트스토어, 쿠팡, 아마존 같은 판매채널 주문으로 연결하는 흐름이다. 현재는 국내 채널과 출고 배치의 골격을 중심으로 보고, 해외 수출 채널은 관세사 검토와 수출 통관 판단이 붙는 확장 흐름으로 본다.
+판매채널 출고는 같이 수입 또는 일반 입고 상품을 스마트스토어, 쿠팡, 아마존 같은 판매채널 주문으로 연결하는 흐름이다. 현재는 국내 채널과 출고 배치의 골격을 중심으로 보고, 해외 수출 채널은 관세사 검토와 수출 통관 판단이 붙는 확장 흐름으로 본다.
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
@@ -349,13 +349,13 @@ flowchart LR
 | 화주·판매자 | `SsalddelApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 코드 검토, FCL/LCL 판단 |
 | 관세사 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | 관세사 검토와 보정 |
 | 플랫폼 운영자 | `SsalddelAdmin` `/customs/hs-codes` | HS 코드 운영 |
-| 주문자 | `OrdererApp` `/group-purchase/import-review/{ProductId}`, `/group-purchase/shipments` | 공동수입 예상 단가와 문서관리번호별 선적 상태를 서로 다른 화면에서 확인 |
+| 주문자 | `OrdererApp` `/group-purchase/import-review/{ProductId}`, `/group-purchase/shipments` | 같이 수입 예상 단가와 문서관리번호별 선적 상태를 서로 다른 화면에서 확인 |
 
 보완 후보:
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| BL/AWB 조회 상세 | `OrdererApp` 또는 공개 조회 화면 | 주문자가 자신의 공동수입 화물이 어디 있는지 문서관리번호로 확인해야 한다. |
+| BL/AWB 조회 상세 | `OrdererApp` 또는 공개 조회 화면 | 주문자가 자신의 같이 수입 화물이 어디 있는지 문서관리번호로 확인해야 한다. |
 | 항구/공항/세관/보세구역 코드 브라우저 | `SsalddelAdmin` | 공공 데이터를 정규화해 통관 응답값과 연결해야 한다. |
 | 관세사 작업 보드 | `Ssalddel.WebApp` 또는 `SsalddelAdmin` | HS 코드 보정, 수입 가능성 검토, 보류 사유를 관세사 업무 단위로 처리해야 한다. |
 
@@ -397,20 +397,59 @@ flowchart LR
 
 ## 음식 배달
 
-음식 배달은 주문자 앱의 음식 주문과 기사 앱의 픽업/전달 흐름이 국내 운송 구조를 가볍게 호출하는 형태다.
+음식 배달은 주문자, 음식점, 기사와 운영자가 같은 음식 주문·운송 실행 투영을 서로 다른 관점에서 조회하는 흐름이다. 음식 주문 원장은 주문·음식점 수락·조리를 맡고, 운송 실행 투영은 배차대기·기사 수락·픽업·전달을 맡는다.
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
-| 주문자 | `OrdererApp` `/food`, `/food/restaurants` | `api/v1/orderer/restaurant-search-policy` |
-| 기사 | `DriverApp` `/driver/recommendations`, `/driver/transports/current` | 기사 추천, 픽업/전달 |
-| 플랫폼 운영자 | `SsalddelAdmin` `/restaurant-search-policy`, `/food/operations` | 음식점 검색 정책과 운영 상태 |
+| 주문자 | `OrdererApp` `/food`, `/food/restaurants`, `/orders/food` | `GET/POST api/v1/food-orders`, 음식점 탐색 |
+| 음식점 | `RestaurantDeskApp` `/orders`, `/orders/{OrderNo}`, `/settings/preparation-times` | `POST api/v1/food-orders/{orderNo}/restaurant-acceptance` |
+| 기사 | `DriverApp` `/driver/recommendations`, `/driver/recommendations/{의뢰Id}/decision`, `/driver/transports/current` | `api/v1/driver/recommendations`, `api/v1/driver/dispatch-actions`, `api/v1/driver/food-deliveries` |
+| 플랫폼 운영자 | `SsalddelAdmin` `/food/operations`, `/dispatch/wait`, `/dispatch/food-ai-review`, `/transports` | 음식 운영, 배차대기, 판단 검토와 운송 진행 |
 
-보완 후보:
+```mermaid
+sequenceDiagram
+    participant O as "OrdererApp 주문자"
+    participant S as "Ssalddel 서버"
+    participant R as "RestaurantDeskApp 음식점"
+    participant D as "DriverApp 기사"
+    participant A as "SsalddelAdmin 운영자"
+
+    O->>S: 음식 주문
+    S-->>R: 신규 주문 알림
+    R->>S: 조리시간을 확인하고 주문 수락
+    S->>S: 음식 주문 원장 갱신 및 배차대기 생성
+    S-->>D: 배달 추천 노출
+    D->>S: 본인 수락 또는 거절
+    S-->>R: 기사 수락 및 픽업 준비 상태
+    S-->>O: 배차·픽업·운송·도착 진행 상태
+    D->>S: 픽업 완료 및 전달 완료
+    S-->>O: 수령 완료
+    S-->>A: 예외·후보 부족·진행 상태
+```
+
+### 화면 전환과 인계
+
+| 시작 화면 | 사용자 행동 | 다음 화면·상태 | 서버 기준 |
+| --- | --- | --- | --- |
+| `OrdererApp /food/restaurants` | 음식점과 메뉴를 선택해 주문 | `/orders/food?orderNo={주문번호}` | 음식 주문 원장 `주문대기` |
+| `RestaurantDeskApp /orders` | `상세 보기` | `/orders/{OrderNo}` | 정확한 주문번호 재조회 |
+| `RestaurantDeskApp /orders/{OrderNo}` | `조리 N분으로 수락` | 같은 상세의 수락·조리 상태 | 음식점 수락 Event 뒤 배차대기 생성 |
+| `DriverApp /driver/recommendations` | 추천 카드의 `상세 보기` | `/driver/recommendations/{의뢰Id}` | 현재 기사에게 유효한 추천만 조회 |
+| 기사 추천 상세 | `수락/거절 결정` | `/driver/recommendations/{의뢰Id}/decision` | 기사 본인의 명시적 Command |
+| 기사 결정 화면 | `수락` | `/driver/transports/current` | 운송 실행 투영 `배차확정` |
+| 기사 현재 운송 | `픽업 완료`, `전달 완료` | 현재 운송의 다음 단계 | 운송 상태 Event와 원장 동기화 |
+| `OrdererApp /orders/food` | 주문 선택 또는 새로 조회 | 같은 화면의 주문 상세 | 운송 실행 투영을 다시 읽어 배차·픽업·전달 상태 표시 |
+| `SsalddelAdmin /dispatch/wait` | 후보 부족·보류 건 검토 | 음식 배달 AI 검토 또는 운송 상세 | 운영자는 추천을 검토하지만 기사 대신 수락하지 않음 |
+
+주문자 화면은 확정 기사 식별자나 상세 위치를 그대로 노출하지 않는다. `배차대기`, `추천 응답 대기`, `기사 수락`, `음식점 도착`, `픽업 후 이동`, `수령지 도착`, `전달 완료`처럼 주문 이행에 필요한 상태와 최근 변경 시각만 제공한다.
+
+남은 보완 후보:
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 음식점 주문 관리 화면 | 별도 음식점 앱 또는 `SsalddelAdmin` | 조리 상태, 픽업 준비, 품절 처리를 음식점이 입력해야 한다. |
-| 음식 픽업 전용 상세 | `DriverApp` | 일반 화물 상차/하차와 다른 조리 완료, 픽업, 고객 전달 상태가 필요하다. |
+| 음식점 배달 인계 상태 | `RestaurantDeskApp` 주문 상세 | 주문 수락 뒤 기사 찾기, 기사 수락, 음식점 도착을 확인하고 픽업 준비 시점을 맞춰야 한다. |
+| 음식 픽업 전용 상세 | `DriverApp` | 일반 화물 상차/하차와 다른 조리 완료, 픽업 누락, 고객 전달 상태를 더 분명히 구분해야 한다. |
+| 배차 실패 복구 안내 | `OrdererApp`, `RestaurantDeskApp`, `SsalddelAdmin` | 후보 부족, 추천 만료, 기사 수락 취소 때 다음 탐색·취소·환불 책임을 역할별로 안내해야 한다. |
 
 ## 알뜰살뜰 마트
 
@@ -439,7 +478,7 @@ flowchart LR
 | 3 | `SsalddelAdmin` 국내 운송 운영 보드 | 배차 대기, 진행 중, 상차 완료, 하차 완료, 정산 후보를 2.0 운송 중심 상태로 먼저 볼 수 있어야 한다. |
 | 4 | 공동주문 수입 원장 콘솔 | BL/AWB, 통관, 보세구역, 국내 운송, 3PL 입고가 하나의 원장으로 이어져야 한다. |
 | 5 | 공동주문 투표/결정/전자문서 화면 | 주문자 집단의 합의와 책임 경계를 기록해야 이후 분쟁을 줄일 수 있다. |
-| 6 | 창고 입고 로트와 출고 배치 상세 | 공동수입, 냉장/냉동, 판매채널 출고를 창고 작업자가 이해할 수 있어야 한다. |
+| 6 | 창고 입고 로트와 출고 배치 상세 | 같이수입, 냉장/냉동, 판매채널 출고를 창고 작업자가 이해할 수 있어야 한다. |
 | 7 | 통관 코드/보세구역 데이터 브라우저 | BL/AWB 응답값과 플랫폼 내부 원장을 안정적으로 연결해야 한다. |
 | 8 | HR 참여 인력 콘솔 | 주문자 집단의 고용, 보상, 4대보험 준비 상태는 API보다 운영 화면이 먼저 필요하다. |
 

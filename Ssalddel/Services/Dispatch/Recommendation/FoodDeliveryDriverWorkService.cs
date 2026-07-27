@@ -540,6 +540,16 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         var reason = pickupDistance.HasValue
             ? $"음식점까지 {pickupDistance.Value:0.0}km · 픽업 준비 {FormatReadyTime(order.조리예상완료시각Utc)}"
             : $"픽업 준비 {FormatReadyTime(order.조리예상완료시각Utc)}";
+        var isRecommended = status == DriverWorkOfferStatus.Recommended;
+        var dropoffAddress = isRecommended
+            ? ToApproximateAddress(queue.하차_도로명주소)
+            : JoinAddress(queue.하차_도로명주소, queue.하차_상세주소);
+        var dropoffLatitude = isRecommended
+            ? ToApproximateCoordinate(queue.하차_위도)
+            : queue.하차_위도;
+        var dropoffLongitude = isRecommended
+            ? ToApproximateCoordinate(queue.하차_경도)
+            : queue.하차_경도;
 
         return new DriverWorkOfferDto(
             queue.의뢰Id,
@@ -547,7 +557,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
             기사도메인구분.음식배달,
             기사업무유형코드.음식배달,
             menu,
-            $"{order.음식점명} 픽업 · {queue.하차_도로명주소} 전달",
+            $"{order.음식점명} 픽업 · {dropoffAddress} 전달",
             new DriverWorkStopDto(
                 string.IsNullOrWhiteSpace(order.음식점명) ? "음식점" : order.음식점명,
                 JoinAddress(queue.픽업_도로명주소, queue.픽업_상세주소),
@@ -555,10 +565,10 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
                 (double)(queue.픽업_경도 ?? 0m),
                 ToOffset(order.조리예상완료시각Utc)),
             new DriverWorkStopDto(
-                "고객 주소",
-                JoinAddress(queue.하차_도로명주소, queue.하차_상세주소),
-                (double)(queue.하차_위도 ?? 0m),
-                (double)(queue.하차_경도 ?? 0m),
+                isRecommended ? "고객 전달 권역" : "고객 주소",
+                dropoffAddress,
+                (double)(dropoffLatitude ?? 0m),
+                (double)(dropoffLongitude ?? 0m),
                 ToOffset(order.조리예상완료시각Utc?.AddMinutes(42))),
             CalculateDriverPayout(deliveryDistance),
             deliveryDistance.HasValue ? (double)deliveryDistance.Value : null,
@@ -633,6 +643,28 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
 
     private static string JoinAddress(string primary, string detail)
         => string.IsNullOrWhiteSpace(detail) ? primary : $"{primary} {detail}";
+
+    internal static string ToApproximateAddress(string address)
+    {
+        var parts = address.Split(
+            ' ',
+            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var nonNumericParts = parts
+            .Where(part => !part.Any(char.IsDigit))
+            .Take(2)
+            .ToArray();
+        return nonNumericParts.Length switch
+        {
+            0 => "상세 위치는 수락 후 공개",
+            1 => $"{nonNumericParts[0]} 인근",
+            _ => $"{nonNumericParts[0]} {nonNumericParts[1]} 인근"
+        };
+    }
+
+    internal static decimal? ToApproximateCoordinate(decimal? coordinate)
+        => coordinate.HasValue
+            ? Math.Round(coordinate.Value, 2, MidpointRounding.AwayFromZero)
+            : null;
 
     private static FoodDeliveryDriverActionResponse Response(
         string offerId,
