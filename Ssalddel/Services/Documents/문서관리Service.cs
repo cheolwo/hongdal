@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Ssalddel.Contracts.Common.Documents;
 using 살뜰.Infrastructure.Storage.Local;
 
 namespace 살뜰.Services.Documents;
@@ -273,6 +274,7 @@ public sealed class 문서관리Service : I문서관리Service
             new 문서종류정책 { 문서코드 = "환불확인서", 문서명 = "환불확인서", 사용여부 = true, 암호화여부 = true, 다운로드허용여부 = true, 서명필요여부 = false, 자동생성시점 = "환불처리", 조회가능역할목록Json = roles, 보관일수 = 365 * 3, 수정가능여부 = false, 감사로그여부 = true, 생성일시 = now },
             new 문서종류정책 { 문서코드 = "배차확정서", 문서명 = "배차확정서", 사용여부 = true, 암호화여부 = false, 다운로드허용여부 = true, 서명필요여부 = false, 자동생성시점 = "배차확정", 조회가능역할목록Json = roles, 보관일수 = 365 * 3, 수정가능여부 = false, 감사로그여부 = true, 생성일시 = now },
             new 문서종류정책 { 문서코드 = "사고분쟁기록", 문서명 = "사고/분쟁기록", 사용여부 = true, 암호화여부 = true, 다운로드허용여부 = false, 서명필요여부 = false, 자동생성시점 = "사고신고", 조회가능역할목록Json = "[\"서버관리자\"]", 보관일수 = 365 * 5, 수정가능여부 = true, 감사로그여부 = true, 생성일시 = now },
+            new 문서종류정책 { 문서코드 = 원장관행문서정책코드.검토초안, 문서명 = "원장 관행 문서 초안", 사용여부 = true, 암호화여부 = true, 다운로드허용여부 = true, 서명필요여부 = false, 자동생성시점 = "사용자검토후수동보관", 조회가능역할목록Json = "[\"주문자\",\"화주\",\"관세사\",\"서버관리자\"]", 보관일수 = 365 * 3, 수정가능여부 = false, 감사로그여부 = true, 생성일시 = now },
         };
     }
 }

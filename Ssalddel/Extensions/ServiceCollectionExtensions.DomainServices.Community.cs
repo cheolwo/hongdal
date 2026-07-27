@@ -29,6 +29,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I주문원장공개요청저장소, Mongo주문원장공개요청저장소>();
         services.AddScoped<I주문원장통합UseCase, 주문원장통합UseCase>();
         services.AddScoped<I무역확장원장UseCase, 무역확장원장UseCase>();
+        services.AddScoped<I원장관행문서초안UseCase, 원장관행문서초안UseCase>();
+        services.AddScoped<I원장관행문서보관UseCase, 원장관행문서보관UseCase>();
         services.AddScoped<I주문원장서명UseCase, 주문원장서명UseCase>();
         services.AddScoped<I주문원장역할별조회Service, 주문원장역할별조회Service>();
         services.AddScoped<I주문원장공개요청Service, 주문원장공개요청Service>();
@@ -45,7 +47,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityAutomatedPostSource, CommunityActivityDigestSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityCultureTransportPostSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityPrajnaPostSource>();
-        services.AddScoped<I공동수입원장관세사알림Service, 공동수입원장관세사알림Service>();
+        services.AddScoped<I같이수입원장관세사알림Service, 같이수입원장관세사알림Service>();
         services.AddScoped<I공동구매원장관계자알림Service, 공동구매원장관계자알림Service>();
         services.AddScoped<게시글원장선택조회Service>();
         services.AddScoped<I게시글원장선택조회Service>(provider =>
