@@ -65,7 +65,7 @@ public sealed class 판매채널계정페이지ViewModelTests
     }
 
     [Fact]
-    public async Task 연결준비ViewModel은_외부인증정보없이채널과상점명만저장한다()
+    public async Task 연결ViewModel은_선택한채널의자격증명을서버요청에포함한다()
     {
         var service = new StubAccountService();
         var viewModel = new 판매채널계정연결준비ViewModel(service)
@@ -73,6 +73,8 @@ public sealed class 판매채널계정페이지ViewModelTests
             채널종류 = CommerceChannelKeys.Shopify,
             상점명 = "  해외 준비 상점  "
         };
+        viewModel.인증값설정("shopDomain", "my-shop.myshopify.com");
+        viewModel.인증값설정("adminAccessToken", "shpat_secret");
 
         var succeeded = await viewModel.등록Async();
 
@@ -80,7 +82,8 @@ public sealed class 판매채널계정페이지ViewModelTests
         Assert.NotNull(service.LastRequest);
         Assert.Equal(CommerceChannelKeys.Shopify, service.LastRequest.채널종류);
         Assert.Equal("해외 준비 상점", service.LastRequest.상점명);
-        Assert.Empty(service.LastRequest.인증메모);
+        Assert.Equal("my-shop.myshopify.com", service.LastRequest.인증정보["shopDomain"]);
+        Assert.Equal("shpat_secret", service.LastRequest.인증정보["adminAccessToken"]);
         Assert.Equal(91, viewModel.등록된계정?.Id);
     }
 

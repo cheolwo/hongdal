@@ -1,4 +1,5 @@
 using Ssalddel.Application.CommandProcessing;
+using 살뜰.Infrastructure.Security;
 using 살뜰.Services.Sales;
 
 namespace Ssalddel.Tests.Services.Sales;
@@ -14,7 +15,8 @@ public sealed class SalesChannelService사용자경계Tests
         var service = new SalesChannelService(
             null!,
             new TestCurrentUserAccessor(null, null),
-            null!);
+            null!,
+            new TestCredentialEncryptionService());
 
         Func<Task> action = resource switch
         {
@@ -30,4 +32,11 @@ public sealed class SalesChannelService사용자경계Tests
     }
 
     private sealed record TestCurrentUserAccessor(string? UserId, string? Role) : ICurrentUserAccessor;
+
+    private sealed class TestCredentialEncryptionService : ISalesChannelCredentialEncryptionService
+    {
+        public string Protect(string value) => $"test:{value}";
+        public string Unprotect(string protectedValue) => protectedValue["test:".Length..];
+        public bool IsProtected(string value) => value.StartsWith("test:", StringComparison.Ordinal);
+    }
 }

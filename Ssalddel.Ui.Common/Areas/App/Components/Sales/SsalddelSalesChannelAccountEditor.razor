@@ -30,14 +30,26 @@
                       MaxLength="100"
                       @bind-Value="Model.상점명" />
     </MudItem>
+    @foreach (var field in CurrentCredentialFields)
+    {
+        <MudItem xs="12" @key="field.Key">
+            <MudTextField T="string"
+                          Value="@CredentialValue(field.Key)"
+                          ValueChanged="@((string value) => SetCredentialValue(field.Key, value))"
+                          Label="@field.표시명"
+                          HelperText="@($"{field.전달위치} · {field.도움말}")"
+                          Placeholder="@field.Placeholder"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Required="@field.필수"
+                          InputType="@(field.비밀값 ? InputType.Password : InputType.Text)"
+                          MaxLength="2000" />
+        </MudItem>
+    }
     <MudItem xs="12">
-        <MudTextField T="string"
-                      Label="인증 메모"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Lines="3"
-                      MaxLength="500"
-                      @bind-Value="Model.인증메모" />
+        <MudAlert Severity="Severity.Info" Variant="Variant.Text" Dense="true">
+            자격증명은 서버에서 암호화되며 조회 응답에는 마스킹된 설정 여부만 포함됩니다.
+        </MudAlert>
     </MudItem>
 </MudGrid>
 
@@ -50,4 +62,13 @@
 
     [Parameter]
     public bool ChannelLocked { get; set; }
+
+    private IReadOnlyList<판매채널인증필드정의> CurrentCredentialFields
+        => 판매채널인증SchemaCatalog.찾기(Model.채널종류)?.Fields ?? [];
+
+    private string CredentialValue(string key)
+        => Model.인증정보.GetValueOrDefault(key, string.Empty);
+
+    private void SetCredentialValue(string key, string? value)
+        => Model.인증정보[key] = value ?? string.Empty;
 }

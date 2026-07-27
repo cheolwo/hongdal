@@ -33,6 +33,7 @@ public static class InfrastructureServiceCollectionExtensions
                 "IsmsPProtectedData:HashSalt is required.")
             .ValidateOnStart();
         services.AddSingleton<IPersonalDataEncryptionService, DataProtectionPersonalDataEncryptionService>();
+        services.AddSingleton<ISalesChannelCredentialEncryptionService, DataProtectionSalesChannelCredentialEncryptionService>();
         services.AddSingleton<IIsmsPProtectedDataCryptoService, AesGcmIsmsPProtectedDataCryptoService>();
         services.AddSingleton<IIsmsPClientTransportProtectionService, RsaOaepAesGcmClientTransportProtectionService>();
         services.AddScoped<IIsmsPProtectedDataStorePreparationService, IsmsPProtectedDataStorePreparationService>();

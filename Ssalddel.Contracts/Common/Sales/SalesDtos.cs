@@ -9,6 +9,8 @@ public sealed class 판매채널계정항목응답
     public DateTime? 마지막동기화일시 { get; set; }
     public DateTime 등록일시 { get; set; }
     public DateTime 수정일시 { get; set; }
+    public bool 인증정보설정됨 { get; set; }
+    public IReadOnlyList<판매채널인증필드상태> 인증필드상태 { get; set; } = [];
 }
 
 public sealed class 판매채널계정목록응답
@@ -20,7 +22,20 @@ public sealed class 판매채널계정저장요청
 {
     public string 채널종류 { get; set; } = string.Empty;
     public string 상점명 { get; set; } = string.Empty;
+    public Dictionary<string, string> 인증정보 { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [Obsolete("인증정보를 사용하세요. 이 값은 새 연결에서 저장하지 않습니다.")]
     public string 인증메모 { get; set; } = string.Empty;
+}
+
+public sealed class 판매채널인증필드상태
+{
+    public string Key { get; set; } = string.Empty;
+    public string 표시명 { get; set; } = string.Empty;
+    public bool 필수 { get; set; }
+    public bool 비밀값 { get; set; }
+    public bool 설정됨 { get; set; }
+    public string 마스킹값 { get; set; } = string.Empty;
 }
 
 public sealed class 판매상품항목응답

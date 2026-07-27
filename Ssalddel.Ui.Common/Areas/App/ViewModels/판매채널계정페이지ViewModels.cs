@@ -9,17 +9,21 @@ public sealed record 판매채널연결옵션(
     string Name,
     string Market,
     string IntegrationState,
-    string Boundary);
+    string Boundary,
+    IReadOnlyList<판매채널인증필드정의> 인증필드);
 
 public static class 판매채널연결옵션Catalog
 {
     public static IReadOnlyList<판매채널연결옵션> Items { get; } =
-    [
-        new(CommerceChannelKeys.SmartStore, "네이버 스마트스토어", "국내", "외부 인증 미연결", "플랫폼 안에 연결 준비 기록만 저장합니다."),
-        new(CommerceChannelKeys.Coupang, "쿠팡 Wing", "국내", "외부 인증 미연결", "Wing API 자격증명과 주문 수집은 실행하지 않습니다."),
-        new(CommerceChannelKeys.Shopify, "Shopify", "해외", "외부 인증 미연결", "Shopify OAuth와 상품 발행은 실행하지 않습니다."),
-        new(CommerceChannelKeys.Amazon, "Amazon", "해외", "외부 인증 미연결", "SP-API 인증, 출품과 주문 동기화는 실행하지 않습니다.")
-    ];
+        판매채널인증SchemaCatalog.Items
+            .Select(schema => new 판매채널연결옵션(
+                schema.채널종류,
+                schema.표시명,
+                schema.시장,
+                "서버 보안 저장 지원",
+                "자격증명은 서버에 암호화해 저장하며 외부 호출은 채널 모듈이 수행합니다.",
+                schema.Fields))
+            .ToArray();
 
     public static 판매채널연결옵션? 찾기(string? channelCode)
         => Items.FirstOrDefault(item =>
@@ -188,10 +192,14 @@ public sealed partial class 판매채널계정상세PageViewModel(
     }
 }
 
-/// <summary>외부 자격증명 없이 플랫폼 내부 연결 준비 기록을 만드는 입력만 담당합니다.</summary>
+/// <summary>채널별 자격증명을 서버 보안 저장소에 전달하는 입력만 담당합니다.</summary>
 public sealed partial class 판매채널계정연결준비ViewModel(
     I판매채널계정Service service) : 업무작업ViewModelBase
 {
+    private string _credentialChannel = string.Empty;
+    private readonly Dictionary<string, string> _인증정보 =
+        new(StringComparer.OrdinalIgnoreCase);
+
     [ObservableProperty]
     public partial string 채널종류 { get; set; } = CommerceChannelKeys.SmartStore;
 
@@ -200,6 +208,27 @@ public sealed partial class 판매채널계정연결준비ViewModel(
 
     [ObservableProperty]
     public partial 판매채널계정항목응답? 등록된계정 { get; private set; }
+
+    public IReadOnlyList<판매채널인증필드정의> 인증필드목록
+    {
+        get
+        {
+            EnsureCredentialChannel();
+            return 판매채널연결옵션Catalog.찾기(채널종류)?.인증필드 ?? [];
+        }
+    }
+
+    public string 인증값(string key)
+    {
+        EnsureCredentialChannel();
+        return _인증정보.GetValueOrDefault(key, string.Empty);
+    }
+
+    public void 인증값설정(string key, string? value)
+    {
+        EnsureCredentialChannel();
+        _인증정보[key] = value ?? string.Empty;
+    }
 
     public async Task<bool> 등록Async(CancellationToken cancellationToken = default)
     {
@@ -220,11 +249,14 @@ public sealed partial class 판매채널계정연결준비ViewModel(
                 {
                     채널종류 = 채널종류.Trim(),
                     상점명 = 상점명.Trim(),
-                    인증메모 = string.Empty
+                    인증정보 = new Dictionary<string, string>(
+                        _인증정보,
+                        StringComparer.OrdinalIgnoreCase)
                 }, token) ?? throw new InvalidOperationException("판매채널 연결 준비 응답이 비어 있습니다.");
                 상점명 = string.Empty;
+                _인증정보.Clear();
             },
-            "판매채널 연결 준비 기록을 저장했습니다. 외부 인증은 아직 실행되지 않았습니다.",
+            "판매채널 자격증명을 서버에 암호화해 저장했습니다. 외부 연결 확인은 채널 모듈에서 수행합니다.",
             cancellationToken,
             ex => $"판매채널 연결 준비를 저장하지 못했습니다. {ex.Message}");
     }
@@ -233,6 +265,17 @@ public sealed partial class 판매채널계정연결준비ViewModel(
     {
         등록된계정 = null;
         작업상태초기화();
+    }
+
+    private void EnsureCredentialChannel()
+    {
+        if (string.Equals(_credentialChannel, 채널종류, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        _credentialChannel = 채널종류;
+        _인증정보.Clear();
     }
 }
 

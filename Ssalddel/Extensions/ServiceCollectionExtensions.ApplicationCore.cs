@@ -70,7 +70,11 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommand후처리Processor, Command업무관계스냅샷Processor>();
 
         services.AddScoped<I사용자행위로그Service, 사용자행위로그Service>();
-        services.AddScoped<ISalesChannelService, SalesChannelService>();
+        services.AddScoped<SalesChannelService>();
+        services.AddScoped<ISalesChannelService>(provider =>
+            provider.GetRequiredService<SalesChannelService>());
+        services.AddScoped<ISalesChannelCredentialProvider>(provider =>
+            provider.GetRequiredService<SalesChannelService>());
         services.AddScoped<I판매채널UseCase, 판매채널UseCase>();
         services.AddScoped<ISalesChannelOrderReadService, SalesChannelOrderReadService>();
         services.AddScoped<I판매채널주문조회UseCase, 판매채널주문조회UseCase>();

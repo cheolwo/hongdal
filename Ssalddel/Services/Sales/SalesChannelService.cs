@@ -1,22 +1,30 @@
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.Sales;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using 살뜰.Data;
+using 살뜰.Infrastructure.Security;
 using 살뜰.도메인.판매;
 
 namespace 살뜰.Services.Sales;
 
-public sealed class SalesChannelService : ISalesChannelService
+public sealed class SalesChannelService : ISalesChannelService, ISalesChannelCredentialProvider
 {
     private readonly SsalddelContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I판매상품샘플시드Service _productSampleSeedService;
+    private readonly ISalesChannelCredentialEncryptionService _credentialEncryption;
 
-    public SalesChannelService(SsalddelContext db, ICurrentUserAccessor currentUserAccessor, I판매상품샘플시드Service productSampleSeedService)
+    public SalesChannelService(
+        SsalddelContext db,
+        ICurrentUserAccessor currentUserAccessor,
+        I판매상품샘플시드Service productSampleSeedService,
+        ISalesChannelCredentialEncryptionService credentialEncryption)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
         _productSampleSeedService = productSampleSeedService;
+        _credentialEncryption = credentialEncryption;
     }
 
     public async Task<판매채널계정목록응답> GetAccountsAsync(CancellationToken cancellationToken)
@@ -28,21 +36,14 @@ public sealed class SalesChannelService : ISalesChannelService
             query = query.Where(x => x.UserId == userId);
         }
 
-        var items = await query
+        var entities = await query
             .OrderByDescending(x => x.UpdatedAt)
-            .Select(x => new 판매채널계정항목응답
-            {
-                Id = x.Id,
-                채널종류 = x.채널종류,
-                상점명 = x.상점명,
-                연결상태 = x.연결상태,
-                마지막동기화일시 = x.마지막동기화일시,
-                등록일시 = x.CreatedAt,
-                수정일시 = x.UpdatedAt
-            })
             .ToArrayAsync(cancellationToken);
 
-        return new 판매채널계정목록응답 { Items = items };
+        return new 판매채널계정목록응답
+        {
+            Items = entities.Select(ToAccountResponse).ToArray()
+        };
     }
 
     public async Task<판매채널계정항목응답?> GetAccountAsync(
@@ -58,30 +59,24 @@ public sealed class SalesChannelService : ISalesChannelService
             query = query.Where(x => x.UserId == userId);
         }
 
-        return await query
-            .Select(x => new 판매채널계정항목응답
-            {
-                Id = x.Id,
-                채널종류 = x.채널종류,
-                상점명 = x.상점명,
-                연결상태 = x.연결상태,
-                마지막동기화일시 = x.마지막동기화일시,
-                등록일시 = x.CreatedAt,
-                수정일시 = x.UpdatedAt
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        var entity = await query.FirstOrDefaultAsync(cancellationToken);
+        return entity is null ? null : ToAccountResponse(entity);
     }
 
     public async Task<판매채널계정항목응답> CreateAccountAsync(판매채널계정저장요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
+        var credentials = NormalizeCredentials(request.채널종류, request.인증정보);
+        var credentialState = BuildCredentialState(request.채널종류, credentials);
         var entity = new 판매채널계정
         {
             UserId = userId,
             채널종류 = request.채널종류.Trim(),
             상점명 = request.상점명.Trim(),
-            연결상태 = "준비",
-            토큰암호화저장값 = request.인증메모.Trim(),
+            연결상태 = credentialState.AllRequiredConfigured ? "자격증명저장" : "준비",
+            토큰암호화저장값 = credentials.Count == 0
+                ? string.Empty
+                : ProtectCredentials(credentials),
             마지막동기화일시 = null,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -90,16 +85,7 @@ public sealed class SalesChannelService : ISalesChannelService
         _db.판매채널계정.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return new 판매채널계정항목응답
-        {
-            Id = entity.Id,
-            채널종류 = entity.채널종류,
-            상점명 = entity.상점명,
-            연결상태 = entity.연결상태,
-            마지막동기화일시 = entity.마지막동기화일시,
-            등록일시 = entity.CreatedAt,
-            수정일시 = entity.UpdatedAt
-        };
+        return ToAccountResponse(entity);
     }
 
     public async Task<판매채널계정항목응답> UpdateAccountAsync(
@@ -116,12 +102,25 @@ public sealed class SalesChannelService : ISalesChannelService
             throw new InvalidOperationException("판매채널 계정을 수정할 권한이 없습니다.");
         }
 
+        var channelChanged = !string.Equals(
+            entity.채널종류,
+            request.채널종류.Trim(),
+            StringComparison.OrdinalIgnoreCase);
+        var existingCredentials = channelChanged
+            ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            : ReadCredentials(entity.토큰암호화저장값);
+        var credentials = MergeCredentials(
+            request.채널종류,
+            existingCredentials,
+            request.인증정보);
+        var credentialState = BuildCredentialState(request.채널종류, credentials);
+
         entity.채널종류 = request.채널종류.Trim();
         entity.상점명 = request.상점명.Trim();
-        if (!string.IsNullOrWhiteSpace(request.인증메모))
-        {
-            entity.토큰암호화저장값 = request.인증메모.Trim();
-        }
+        entity.토큰암호화저장값 = credentials.Count == 0
+            ? string.Empty
+            : ProtectCredentials(credentials);
+        entity.연결상태 = credentialState.AllRequiredConfigured ? "자격증명저장" : "준비";
         entity.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
@@ -146,6 +145,26 @@ public sealed class SalesChannelService : ISalesChannelService
 
         _db.판매채널계정.Remove(entity);
         await _db.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<판매채널자격증명Set?> GetAsync(
+        long 판매채널계정Id,
+        CancellationToken cancellationToken)
+    {
+        var account = await _db.판매채널계정
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                item => item.Id == 판매채널계정Id,
+                cancellationToken);
+        if (account is null)
+        {
+            return null;
+        }
+
+        return new 판매채널자격증명Set(
+            account.Id,
+            account.채널종류,
+            ReadCredentials(account.토큰암호화저장값));
     }
 
     public async Task<판매상품목록응답> GetProductsAsync(CancellationToken cancellationToken)
@@ -443,8 +462,11 @@ public sealed class SalesChannelService : ISalesChannelService
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    private static 판매채널계정항목응답 ToAccountResponse(판매채널계정 entity)
-        => new()
+    private 판매채널계정항목응답 ToAccountResponse(판매채널계정 entity)
+    {
+        var credentials = ReadCredentials(entity.토큰암호화저장값);
+        var state = BuildCredentialState(entity.채널종류, credentials);
+        return new()
         {
             Id = entity.Id,
             채널종류 = entity.채널종류,
@@ -452,8 +474,118 @@ public sealed class SalesChannelService : ISalesChannelService
             연결상태 = entity.연결상태,
             마지막동기화일시 = entity.마지막동기화일시,
             등록일시 = entity.CreatedAt,
-            수정일시 = entity.UpdatedAt
+            수정일시 = entity.UpdatedAt,
+            인증정보설정됨 = state.AllRequiredConfigured,
+            인증필드상태 = state.Fields
         };
+    }
+
+    private string ProtectCredentials(IReadOnlyDictionary<string, string> credentials)
+    {
+        var protectedValue = _credentialEncryption.Protect(
+            JsonSerializer.Serialize(credentials));
+        if (protectedValue.Length > 2000)
+        {
+            throw new InvalidOperationException(
+                "판매채널 자격증명 전체 길이가 보안 저장 한도를 넘었습니다. 입력값을 확인해 주세요.");
+        }
+
+        return protectedValue;
+    }
+
+    private Dictionary<string, string> ReadCredentials(string? protectedValue)
+    {
+        if (string.IsNullOrWhiteSpace(protectedValue)
+            || !_credentialEncryption.IsProtected(protectedValue))
+        {
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        var json = _credentialEncryption.Unprotect(protectedValue);
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+               ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static Dictionary<string, string> NormalizeCredentials(
+        string channelType,
+        IReadOnlyDictionary<string, string>? input)
+        => MergeCredentials(
+            channelType,
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
+            input);
+
+    private static Dictionary<string, string> MergeCredentials(
+        string channelType,
+        IReadOnlyDictionary<string, string> existing,
+        IReadOnlyDictionary<string, string>? input)
+    {
+        var schema = 판매채널인증SchemaCatalog.찾기(channelType)
+            ?? throw new InvalidOperationException("지원하는 판매채널을 선택해 주세요.");
+        var allowedKeys = schema.Fields
+            .Select(field => field.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<string, string>(existing, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var item in input ?? new Dictionary<string, string>())
+        {
+            if (!allowedKeys.Contains(item.Key))
+            {
+                throw new InvalidOperationException(
+                    $"{schema.표시명}에서 지원하지 않는 인증 필드입니다: {item.Key}");
+            }
+
+            var value = item.Value?.Trim() ?? string.Empty;
+            if (value.Length > 2000)
+            {
+                throw new InvalidOperationException($"{item.Key} 값은 2,000자를 넘을 수 없습니다.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                result[item.Key] = value;
+            }
+        }
+
+        return result;
+    }
+
+    private static (bool AllRequiredConfigured, IReadOnlyList<판매채널인증필드상태> Fields)
+        BuildCredentialState(
+            string channelType,
+            IReadOnlyDictionary<string, string> credentials)
+    {
+        var schema = 판매채널인증SchemaCatalog.찾기(channelType);
+        if (schema is null)
+        {
+            return (false, []);
+        }
+
+        var fields = schema.Fields
+            .Select(field =>
+            {
+                var configured = credentials.TryGetValue(field.Key, out var value)
+                                 && !string.IsNullOrWhiteSpace(value);
+                return new 판매채널인증필드상태
+                {
+                    Key = field.Key,
+                    표시명 = field.표시명,
+                    필수 = field.필수,
+                    비밀값 = field.비밀값,
+                    설정됨 = configured,
+                    마스킹값 = configured ? Mask(value!) : string.Empty
+                };
+            })
+            .ToArray();
+
+        return (
+            fields.Where(field => field.필수).All(field => field.설정됨),
+            fields);
+    }
+
+    private static string Mask(string value)
+        => value.Length <= 4
+            ? "••••"
+            : $"••••{value[^4..]}";
 
     private static 판매상품항목응답 ToProductResponse(판매상품 entity)
         => new()
