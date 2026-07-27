@@ -127,6 +127,88 @@ public sealed class 마트주문요청UseCaseTests
         Assert.Equal(404, otherRead.Errors.Single().Metadata["StatusCode"]);
     }
 
+    [Fact]
+    public async Task 목록은_현재사용자의요청만_상태와검색조건으로조회한다()
+    {
+        await using var context = CreateContext();
+        context.마트공개상품.Add(CreateProduct());
+        await context.SaveChangesAsync();
+        var owner = new TestCurrentUserAccessor("orderer-a");
+        var other = new TestCurrentUserAccessor("orderer-b");
+        await new 마트주문요청작성UseCase(context, owner)
+            .등록Async(CreateRequest(), CancellationToken.None);
+        await new 마트주문요청작성UseCase(context, other)
+            .등록Async(CreateRequest(), CancellationToken.None);
+
+        var result = await new 마트주문요청조회UseCase(context, owner)
+            .목록Async(
+                new 마트주문요청목록조회요청
+                {
+                    상태코드 = 마트주문요청상태코드.제출됨,
+                    Search = "생수",
+                    PageSize = 10
+                },
+                CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1, result.Value.TotalCount);
+        Assert.Single(result.Value.Items);
+        Assert.Equal("동네 생수", result.Value.Items[0].상품명);
+    }
+
+    [Fact]
+    public async Task 제출된비구속요청은_재고차감없이수량을변경하고_철회를멱등처리한다()
+    {
+        await using var context = CreateContext();
+        var product = CreateProduct();
+        context.마트공개상품.Add(product);
+        await context.SaveChangesAsync();
+        var currentUser = new TestCurrentUserAccessor("orderer-a");
+        var useCase = new 마트주문요청작성UseCase(context, currentUser);
+        var created = await useCase.등록Async(CreateRequest(), CancellationToken.None);
+        product.판매가 = 2_000m;
+        await context.SaveChangesAsync();
+
+        var changed = await useCase.수량변경Async(
+            created.Value.주문요청Id,
+            new 마트주문요청수량변경요청
+            {
+                수량 = 3,
+                비구속주문요청확인 = true,
+                안내버전 = 마트주문요청안내.현재버전
+            },
+            CancellationToken.None);
+        var withdrawn = await useCase.철회Async(
+            created.Value.주문요청Id,
+            new 마트주문요청철회요청(),
+            CancellationToken.None);
+        var repeated = await useCase.철회Async(
+            created.Value.주문요청Id,
+            new 마트주문요청철회요청(),
+            CancellationToken.None);
+        var changeAfterWithdrawal = await useCase.수량변경Async(
+            created.Value.주문요청Id,
+            new 마트주문요청수량변경요청
+            {
+                수량 = 4,
+                비구속주문요청확인 = true,
+                안내버전 = 마트주문요청안내.현재버전,
+                기대상태코드 = 마트주문요청상태코드.철회됨
+            },
+            CancellationToken.None);
+
+        Assert.True(changed.IsSuccess);
+        Assert.Equal(3, changed.Value.수량);
+        Assert.Equal(6_000m, changed.Value.합계);
+        Assert.True(withdrawn.IsSuccess);
+        Assert.Equal(마트주문요청상태코드.철회됨, withdrawn.Value.상태코드);
+        Assert.Equal(withdrawn.Value.상태코드, repeated.Value.상태코드);
+        Assert.Equal(409, changeAfterWithdrawal.Errors.Single().Metadata["StatusCode"]);
+        Assert.Equal(12, (await context.마트공개상품.SingleAsync()).판매가능수량);
+        Assert.Empty(context.마트주문);
+        Assert.Empty(context.마트주문상품);
+    }
+
     private static 마트주문요청등록요청 CreateRequest()
         => new()
         {

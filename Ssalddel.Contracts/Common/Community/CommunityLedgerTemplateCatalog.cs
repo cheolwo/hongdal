@@ -376,7 +376,7 @@ public static class CommunityLedgerTemplateCatalog
         new()
         {
             Key = CommunityLedgerTemplateKeys.SsalddelMart,
-            DisplayName = "알뜰살뜰 마트 배송 원장",
+            DisplayName = "살뜰 마트 주문 원장",
             Category = "생활 원장",
             WorkflowTag = "알뜰살뜰 마트",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.SsalddelMartUrbanLogistics,
@@ -411,7 +411,7 @@ public static class CommunityLedgerTemplateCatalog
                 Projection("알뜰살뜰 마트 주문", "SsalddelMartOrder / CommunityLedger", "OrderId + CommunityLedgerId", "주문과 커뮤니티 원장이 연결되면 마트 배송 원장으로 투영합니다."),
                 Projection("도심 재고 피킹", "WarehousePickingTask", "TaskKey + CommunityLedgerId", "도심 재고가 예약되면 알뜰살뜰 마트 전용 피킹 작업으로 투영합니다."),
                 Projection("마트 배송 배차", "DriverDispatchRecommendation / SsalddelMartPackedOrder", "OrderId + CommunityLedgerId", "포장 완료 또는 포장 임박 상태에서 기사 추천과 픽업 대기열로 투영합니다.")),
-            BestLedgerPatternTitle = "도심 재고와 배달 픽업이 맞물리는 알뜰살뜰 마트 배송 원장",
+            BestLedgerPatternTitle = "도심 재고와 배달 픽업이 맞물리는 살뜰 마트 주문 원장",
             BestLedgerPatternSummary = "일반 창고 출고와 분리해 마트 주문, 피킹·포장, 기사 픽업, 고객 전달을 짧은 시간 단위로 이어줍니다. 즉시배송 여부는 배송유형으로 남깁니다.",
             CommunityDiscussionPrompts = ["피킹 중 기사 추천을 언제 열면 좋을까요?", "품절이나 대체 상품은 원장에 어떻게 남길까요?", "포장 완료 뒤 픽업 지연은 누가 확인해야 할까요?"],
             Roles =
@@ -590,7 +590,7 @@ public static class CommunityLedgerTemplateCatalog
                 Projection("주문집계 인계", "GroupOrder / 공동구매주문집계", "CommunityLedgerId + AutomaticGroupId", "합의된 조건으로 확정된 개별 주문 집합을 공동구매 내부 주문집계에 투영합니다.")),
             BestLedgerPatternTitle = "합의와 실행을 분리하는 공동구매 원장",
             BestLedgerPatternSummary = "공동구매 화면에는 모집부터 이행까지 하나의 흐름으로 보이되, 결제·확정된 개별 주문의 집계는 내부 주문집계에 맡깁니다.",
-            CommunityDiscussionPrompts = ["어떤 조건으로 공동구매 주문을 확정할까요?", "개별 주문 확정 기준은 무엇인가요?", "국내 구매와 공동수입 중 어떤 경로가 맞을까요?"],
+            CommunityDiscussionPrompts = ["어떤 조건으로 공동구매 주문을 확정할까요?", "개별 주문 확정 기준은 무엇인가요?", "국내 구매와 같이 수입 중 어떤 경로가 맞을까요?"],
             Roles =
             [
                 Role("제안자", "공동구매 조건과 제안 근거를 남깁니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ChangeState),
@@ -603,9 +603,9 @@ public static class CommunityLedgerTemplateCatalog
         new()
         {
             Key = CommunityLedgerTemplateKeys.GroupOrder,
-            DisplayName = "공동구매 주문집계 원장",
+            DisplayName = "같이 주문 원장",
             Category = "통합 원장",
-            WorkflowTag = "공동구매 주문집계·이행",
+            WorkflowTag = "같이 주문·이행",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
             TargetOperatingSystemName = "커뮤니티 신뢰 OS",
             IsInternalAggregationTemplate = true,
@@ -617,7 +617,7 @@ public static class CommunityLedgerTemplateCatalog
             [
                 Rule(
                     CommunityLedgerCompositionRuleCodes.GroupOrderRequiresIndividualOrders,
-                    "공동구매 주문집계는 확정된 개별 주문의 집합입니다.",
+                    "같이 주문 원장은 확정된 개별 주문의 집합입니다.",
                     "주문집계의 참여자 수, 수량과 금액은 연결된 유효 개별 주문에서 계산하며 독립 값으로 입력하지 않습니다.",
                     requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.Order],
                     requiredUiSectionHints: ["개별 주문 원장", "확정 주문 수", "주문 수량 합계"],
@@ -625,12 +625,12 @@ public static class CommunityLedgerTemplateCatalog
             ],
             ProcessingSurfaces =
             [
-                ApiEndpoint("POST", "공동구매자동집단화Controller", "수요등록", "예약결제된 개별 주문을 공동구매 주문집계에 연결하고 합계를 갱신합니다.", "I공동구매자동집단화UseCase.수요등록Async"),
+                ApiEndpoint("POST", "공동구매자동집단화Controller", "수요등록", "예약결제된 개별 주문을 같이 주문 원장에 연결하고 합계를 갱신합니다.", "I공동구매자동집단화UseCase.수요등록Async"),
                 ApiEndpoint("GET", "주문원장Controller", "통합조회", "주문집계와 연결된 개별 주문들의 이행·서명 상태를 계산합니다.", "I주문원장통합UseCase.조회Async")
             ],
             PersistencePolicy = MongoPolicy(
                 Projection("공동구매 주문집계", "CommunityLedger / GroupOrder", "SourceGroupPurchaseLedgerId + AutomaticGroupId", "개별 주문 연결이 바뀔 때 확정 주문 수, 수량과 금액을 다시 계산합니다.")),
-            BestLedgerPatternTitle = "개별 주문에서 계산되는 공동구매 주문집계",
+            BestLedgerPatternTitle = "개별 주문에서 계산되는 같이 주문 원장",
             BestLedgerPatternSummary = "개인의 계약·결제·수령 조건은 개별 주문에 유지하고 주문집계에는 합계와 공동 물류 관계만 둡니다.",
             CommunityDiscussionPrompts = ["현재 확정된 개별 주문은 몇 건인가요?", "공동 발주 수량은 얼마인가요?", "어떤 수령 창고 기준으로 분배해야 하나요?"],
             Roles =
@@ -644,11 +644,11 @@ public static class CommunityLedgerTemplateCatalog
         new()
         {
             Key = CommunityLedgerTemplateKeys.GroupImport,
-            DisplayName = "공동수입 원장",
+            DisplayName = "같이 수입 원장",
             Category = "통합 원장",
-            WorkflowTag = "공동수입",
+            WorkflowTag = "같이수입",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
-            TargetOperatingSystemName = "공동수입 OS",
+            TargetOperatingSystemName = "같이 수입 OS",
             Summary = "확정된 공동구매 수요를 원천 원장으로 연결하고 해외 공급자 발주, 선적, 통관, 국내 반출과 3PL 입고까지 관리하는 수입 이행 원장입니다.",
             EngineHints = [CommunityLedgerEngineHints.ImportCustoms, CommunityLedgerEngineHints.OutboundBatch, CommunityLedgerEngineHints.TransportDispatch],
             UiSectionHints = ["원천 공동구매 원장", "수입 결정", "해외 선적", "통관 상태", "국내 반출", "3PL 입고", "세대 분배", "정산 표시", "수령 확인"],
@@ -678,22 +678,22 @@ public static class CommunityLedgerTemplateCatalog
             ],
             ProcessingSurfaces =
             [
-                ApiEndpoint("GET", "공동구매물류워크플로우Controller", "Resolve", "공동수입 물류 흐름 정의를 조회합니다.", "I공동구매물류워크플로우저장소.ResolveAsync"),
+                ApiEndpoint("GET", "공동구매물류워크플로우Controller", "Resolve", "같이 수입 물류 흐름 정의를 조회합니다.", "I공동구매물류워크플로우저장소.ResolveAsync"),
                 ApiEndpoint("GET", "공동구매해외선적추적Controller", "Lookup", "공동구매 선적 또는 진행 정보를 조회합니다.", "I공동구매해외선적추적UseCase.공개조회Async"),
-                ApiEndpoint("POST", "공동구매해외선적추적Controller", "통관동기화", "문서관리번호 기준 수입 통관 상태를 공동수입 원장에 동기화합니다.", "I공동구매해외선적추적UseCase.통관동기화Async"),
+                ApiEndpoint("POST", "공동구매해외선적추적Controller", "통관동기화", "문서관리번호 기준 수입 통관 상태를 같이 수입 원장에 동기화합니다.", "I공동구매해외선적추적UseCase.통관동기화Async"),
                 ApiEndpoint("POST", "WarehouseOperationsController", "재위탁운송생성", "국내 분배가 필요하면 운송 의뢰로 넘깁니다.", "I창고작업UseCase.재위탁운송생성Async")
             ],
             PersistencePolicy = MongoPolicy(
-                Projection("공동수입 결정", "GroupPurchaseImportDecision / 공동구매물류워크플로우", "CommunityLedgerId + GroupPurchaseId", "원천 공동구매 원장과 수입 진행 여부, FCL/LCL, 가격, 수량 결정을 투영합니다."),
-                Projection("공동수입 선적", "GroupPurchaseShipment / 공동구매해외선적", "GroupPurchaseId + CommunityLedgerId", "선적 문서나 통관 상태가 연결되면 참조 링크를 남깁니다."),
+                Projection("같이 수입 결정", "GroupPurchaseImportDecision / 공동구매물류워크플로우", "CommunityLedgerId + GroupPurchaseId", "원천 공동구매 원장과 수입 진행 여부, FCL/LCL, 가격, 수량 결정을 투영합니다."),
+                Projection("같이 수입 선적", "GroupPurchaseShipment / 공동구매해외선적", "GroupPurchaseId + CommunityLedgerId", "선적 문서나 통관 상태가 연결되면 참조 링크를 남깁니다."),
                 Projection("국내 3PL 입고", "WarehouseInbound / 공동구매입고", "CommunityLedgerId + DocumentManagementNumber", "통관 뒤 3PL 창고 입고를 선택하면 입고 원장과 연결합니다."),
                 Projection("국내 운송 의뢰", "TransportRequest / 공동구매국내운송", "CommunityLedgerId", "국내 반출 또는 세대 분배가 확정되면 운송 의뢰로 투영합니다.")),
-            BestLedgerPatternTitle = "공동구매 원장에서 분리된 공동수입 이행 원장",
+            BestLedgerPatternTitle = "공동구매 원장에서 분리된 같이 수입 이행 원장",
             BestLedgerPatternSummary = "공동구매 원장을 원천 수요로 참조하되 해외 발주, 선적, 통관, 입고와 국내 운송 상태는 별도 원장으로 추적합니다.",
             CommunityDiscussionPrompts = ["어느 공동구매 원장을 이번 수입의 원천으로 연결할까요?", "수입 방식과 공급자 조건은 무엇으로 확정할까요?", "통관 지연이 생기면 국내 입고와 분배 일정을 어떻게 조정할까요?"],
             Roles =
             [
-                Role("수입 연결자", "확정된 공동구매 원장을 공동수입의 원천으로 연결합니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ChangeState),
+                Role("수입 연결자", "확정된 공동구매 원장을 같이 수입의 원천으로 연결합니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ChangeState),
                 Role("수입 결정자", "수량, 가격, 수입 방식, 진행 여부를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
                 Role("선적/통관 확인자", "해외 선적, 문서관리번호, 통관 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
                 Role("입고/분배 담당자", "3PL 입고 또는 세대 분배 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState),
@@ -931,7 +931,7 @@ public static class CommunityLedgerTemplateCatalog
         Module(
             8,
             CommunityLedgerImplementationModuleCodes.SsalddelMartOrder,
-            "마트주문 원장",
+            "살뜰 마트 주문 원장",
             CommunityLedgerTemplateKeys.SsalddelMart,
             CommunityLedgerOperatingSystemCodes.SsalddelMartUrbanLogistics,
             "알뜰살뜰 마트 도심 물류 OS",
@@ -961,30 +961,30 @@ public static class CommunityLedgerTemplateCatalog
         Module(
             11,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision,
-            "공동수입 결정 원장",
+            "같이 수입 결정 원장",
             CommunityLedgerTemplateKeys.GroupImport,
             CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
-            "공동수입 OS",
+            "같이 수입 OS",
             "모인 수요를 보고 수입 진행 여부, FCL/LCL, 가격, 수량, 진행 조건을 확정하는 원장입니다.",
             ["수입 결정", "FCL/LCL", "가격·수량 결정"],
             ["수입 결정", "투표/결정", "정산 표시"]),
         Module(
             12,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseShipmentCustoms,
-            "공동수입 선적/통관 원장",
+            "같이 수입 선적/통관 원장",
             CommunityLedgerTemplateKeys.GroupImport,
             CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
-            "공동수입 OS",
+            "같이 수입 OS",
             "해외 발주, BL/AWB, 문서관리번호, 통관 상태, 반출 가능 상태를 추적하는 원장입니다.",
             ["해외 선적", "통관 상태", "국내 반출"],
             ["해외 선적", "통관 상태", "국내 반출", "증빙"]),
         Module(
             13,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution,
-            "공동수입 입고/분배 원장",
+            "같이 수입 입고/분배 원장",
             CommunityLedgerTemplateKeys.GroupImport,
             CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
-            "공동수입 OS",
+            "같이 수입 OS",
             "통관 이후 3PL 입고, 국내 운송 인계, 세대 분배, 수령 확인을 관리하는 원장입니다.",
             ["3PL 입고", "세대 분배", "수령 확인"],
             ["3PL 입고", "세대 분배", "수령 확인", "정산 표시"]),
@@ -1041,12 +1041,12 @@ public static class CommunityLedgerTemplateCatalog
         Module(
             19,
             CommunityLedgerImplementationModuleCodes.GroupOrderAggregation,
-            "공동구매 주문집계 원장",
+            "같이 주문 원장",
             CommunityLedgerTemplateKeys.GroupOrder,
             CommunityLedgerOperatingSystemCodes.CommunityTrust,
             "커뮤니티 신뢰 OS",
             "확정된 개별 주문들을 연결하고 주문 수, 수량과 예약결제 금액을 개별 주문의 합으로 계산하는 원장입니다.",
-            ["공동구매 주문집계", "개별 주문 원장", "공동 물류"],
+            ["같이 주문 원장", "개별 주문 원장", "공동 물류"],
             ["확정 주문 수", "주문 수량 합계", "예약결제 합계", "수령 창고 분포"]),
         Module(
             20,
@@ -1271,7 +1271,7 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerRelationCardinality.ManyToOne,
             required: false,
             "확정된 공동구매를 해외 공급자로 이행하기로 선택할 때",
-            "국내에서 이행하는 공동구매는 그대로 닫고, 수입을 선택한 공동구매만 별도의 공동수입 원장으로 인계합니다."),
+            "국내에서 이행하는 공동구매는 그대로 닫고, 수입을 선택한 공동구매만 별도의 같이 수입 원장으로 인계합니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseShipmentCustoms,
@@ -1301,7 +1301,7 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerRelationCardinality.OneToMany,
             required: false,
             "3PL 입고 뒤 창고 피킹/출고가 필요할 때",
-            "공동수입 입고/분배 원장은 창고 출고 원장과 연결될 수 있습니다."),
+            "같이 수입 입고/분배 원장은 창고 출고 원장과 연결될 수 있습니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution,
             CommunityLedgerImplementationModuleCodes.CargoTransport,
@@ -1311,7 +1311,7 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerRelationCardinality.OneToMany,
             required: false,
             "세대 배송 또는 거점 배송이 필요할 때",
-            "공동수입 입고/분배 원장은 국내 운송 의뢰 원장으로 넘어갈 수 있습니다."),
+            "같이 수입 입고/분배 원장은 국내 운송 의뢰 원장으로 넘어갈 수 있습니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.CargoTransport,
             CommunityLedgerImplementationModuleCodes.TransportProgress,
@@ -1406,6 +1406,15 @@ public static class CommunityLedgerTemplateCatalog
 
     public static IReadOnlyList<CommunityLedgerTemplateResponse> All
         => Templates.Select(EnsureLedgerBlocks).ToList();
+
+    public static IReadOnlyList<CommunityLedgerTemplateResponse> 주문원장종류
+        =>
+        [
+            Find(CommunityLedgerTemplateKeys.FoodOrder),
+            Find(CommunityLedgerTemplateKeys.SsalddelMart),
+            Find(CommunityLedgerTemplateKeys.GroupOrder),
+            Find(CommunityLedgerTemplateKeys.GroupImport)
+        ];
 
     public static IReadOnlyList<CommunityLedgerImplementationModuleResponse> PriorityImplementationModules
         => PriorityModules;

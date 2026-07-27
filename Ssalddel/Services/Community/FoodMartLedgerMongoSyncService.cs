@@ -254,7 +254,7 @@ public static class 음식마트원장Mongo동기화Builder
             원장Id = 원장Id,
             커뮤니티Id = "platform",
             원장템플릿Key = templateKey,
-            제목 = isMart ? $"알뜰살뜰 마트 배송 원장 {주문참조번호}" : $"창고 출고 원장 {주문참조번호}",
+            제목 = isMart ? $"살뜰 마트 주문 원장 {주문참조번호}" : $"창고 출고 원장 {주문참조번호}",
             원함 = isMart
                 ? "도심 재고를 피킹/포장해 주문자에게 전달하고 싶습니다."
                 : "창고 출고 품목을 준비하고 운송 인계까지 정리하고 싶습니다.",
@@ -465,7 +465,7 @@ public static class 음식마트원장Mongo동기화Builder
         => new()
         {
             DiagramId = $"{원장Id}:diagram",
-            DiagramName = isMart ? "알뜰살뜰 마트 배송 원장 흐름" : "창고 출고 원장 흐름",
+            DiagramName = isMart ? "살뜰 마트 주문 원장 흐름" : "창고 출고 원장 흐름",
             LedgerId = 원장Id,
             LedgerTemplateKey = templateKey,
             WorkflowModeKey = isMart ? "ssalddel-mart" : "warehouse-outbound",

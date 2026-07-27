@@ -367,7 +367,7 @@ public sealed class CommunityLedgerTemplateCatalogTests
     {
         var mart = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.SsalddelMart);
 
-        Assert.Equal("알뜰살뜰 마트 배송 원장", mart.DisplayName);
+        Assert.Equal("살뜰 마트 주문 원장", mart.DisplayName);
         Assert.Contains("배송유형", mart.Summary);
         Assert.Contains("즉시배송", mart.Summary);
         Assert.DoesNotContain("즉시배송 원장", mart.DisplayName);
@@ -489,13 +489,13 @@ public sealed class CommunityLedgerTemplateCatalogTests
 
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
         Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "주문집계 인계");
-        Assert.DoesNotContain(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동수입 결정");
+        Assert.DoesNotContain(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "같이 수입 결정");
 
         var groupOrder = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupOrder);
         Assert.Contains(groupOrder.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동구매 주문집계");
 
         var groupImport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupImport);
-        Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동수입 결정");
+        Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "같이 수입 결정");
         Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 운송 의뢰");
         Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 3PL 입고");
     }
@@ -568,8 +568,16 @@ public sealed class CommunityLedgerTemplateCatalogTests
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupExportPreservesIndividualDeclarations);
 
         Assert.Equal("공동구매 원장", groupPurchase.DisplayName);
-        Assert.Equal("공동구매 주문집계 원장", groupOrder.DisplayName);
-        Assert.Equal("공동수입 원장", groupImport.DisplayName);
+        Assert.Equal("같이 주문 원장", groupOrder.DisplayName);
+        Assert.Equal("같이 수입 원장", groupImport.DisplayName);
+        Assert.Equal(
+            [
+                "음식 주문 원장",
+                "살뜰 마트 주문 원장",
+                "같이 주문 원장",
+                "같이 수입 원장"
+            ],
+            CommunityLedgerTemplateCatalog.주문원장종류.Select(template => template.DisplayName));
         Assert.Contains(CommunityLedgerTemplateKeys.GroupOrder, groupOrderHandoffRule.RequiredLedgerTemplateKeys);
         Assert.Contains("합의", groupOrderHandoffRule.RequiredUiSectionHints);
         Assert.Contains(CommunityLedgerTemplateKeys.Order, individualOrderRule.RequiredLedgerTemplateKeys);

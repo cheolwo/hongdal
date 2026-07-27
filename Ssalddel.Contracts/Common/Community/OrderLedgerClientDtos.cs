@@ -78,6 +78,84 @@ public sealed class 주문원장역할별조회공개Dto
     public int 상세공개요청필요수 { get; set; }
 }
 
+public static class 주문자원장실행경계코드
+{
+    public const string 실제주문 = "ActualOrder";
+    public const string 운영원장 = "OperationalLedger";
+    public const string 집계원장 = "AggregateLedger";
+    public const string 수입준비 = "TradeReadiness";
+}
+
+public sealed class 주문자원장목록조회요청
+{
+    public string? 원장템플릿Key { get; set; }
+
+    public string? 상태 { get; set; }
+
+    public string? Search { get; set; }
+
+    public int Page { get; set; }
+
+    public int PageSize { get; set; } = 20;
+}
+
+public sealed class 주문자원장목록응답
+{
+    public IReadOnlyList<주문자원장종류요약Dto> 원장종류목록 { get; set; } = [];
+
+    public IReadOnlyList<주문자원장목록항목Dto> Items { get; set; } = [];
+
+    public int TotalCount { get; set; }
+
+    public int Page { get; set; }
+
+    public int PageSize { get; set; }
+}
+
+public sealed class 주문자원장종류요약Dto
+{
+    public int 표시순서 { get; set; }
+
+    public string 원장템플릿Key { get; set; } = string.Empty;
+
+    public string 원장종류명 { get; set; } = string.Empty;
+
+    public string 설명 { get; set; } = string.Empty;
+
+    public string 실행경계코드 { get; set; } = string.Empty;
+
+    public string 실행경계안내 { get; set; } = string.Empty;
+
+    public int 내원장수 { get; set; }
+}
+
+public sealed class 주문자원장목록항목Dto
+{
+    public string 원장Id { get; set; } = string.Empty;
+
+    public long Revision { get; set; }
+
+    public string 원장템플릿Key { get; set; } = string.Empty;
+
+    public string 원장종류명 { get; set; } = string.Empty;
+
+    public string 제목 { get; set; } = string.Empty;
+
+    public string 상태 { get; set; } = string.Empty;
+
+    public string? 현재단계Key { get; set; }
+
+    public string 실행경계코드 { get; set; } = string.Empty;
+
+    public string 실행경계안내 { get; set; } = string.Empty;
+
+    public string 주문자상세조회경로 { get; set; } = string.Empty;
+
+    public DateTime 생성시각Utc { get; set; }
+
+    public DateTime 수정시각Utc { get; set; }
+}
+
 public sealed class 주문역할별원장항목공개Dto
 {
     public string 원장Id { get; set; } = string.Empty;

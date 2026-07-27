@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Application.Community;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Services.Community;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +33,21 @@ public sealed class 주문원장Controller : CommunityControllerBase
         _공개요청Service = 공개요청Service;
         _sender = sender;
     }
+
+    [HttpGet("types")]
+    [ProducesResponseType(typeof(IReadOnlyList<CommunityLedgerTemplateResponse>), StatusCodes.Status200OK)]
+    public IActionResult 원장종류()
+        => Ok(CommunityLedgerTemplateCatalog.주문원장종류);
+
+    [HttpGet("mine")]
+    [ProducesResponseType(typeof(주문자원장목록응답), StatusCodes.Status200OK)]
+    public async Task<IActionResult> 내원장목록(
+        [FromQuery] 주문자원장목록조회요청 request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await _useCase.주문자목록조회Async(
+            CurrentUserId(),
+            request,
+            cancellationToken));
 
     [HttpGet("{주문원장Id}")]
     public async Task<IActionResult> 통합조회(

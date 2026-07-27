@@ -3,11 +3,19 @@ namespace Ssalddel.Contracts.Mart;
 public static class 마트주문요청상태코드
 {
     public const string 제출됨 = "Submitted";
+    public const string 철회됨 = "Withdrawn";
 
     public static string 표시명(string? value)
+        => value switch
+        {
+            제출됨 => "접수 대기",
+            철회됨 => "철회됨",
+            _ => "알 수 없는 상태"
+        };
+
+    public static bool 지원됨(string? value)
         => string.Equals(value, 제출됨, StringComparison.Ordinal)
-            ? "접수 대기"
-            : "알 수 없는 상태";
+           || string.Equals(value, 철회됨, StringComparison.Ordinal);
 }
 
 public static class 마트주문요청안내
@@ -39,6 +47,33 @@ public sealed class 마트주문요청등록요청
     public bool 비구속주문요청확인 { get; set; }
 
     public string 안내버전 { get; set; } = string.Empty;
+}
+
+public sealed class 마트주문요청목록조회요청
+{
+    public string? 상태코드 { get; set; }
+
+    public string? Search { get; set; }
+
+    public int Page { get; set; }
+
+    public int PageSize { get; set; } = 20;
+}
+
+public sealed class 마트주문요청수량변경요청
+{
+    public int 수량 { get; set; }
+
+    public string 기대상태코드 { get; set; } = 마트주문요청상태코드.제출됨;
+
+    public bool 비구속주문요청확인 { get; set; }
+
+    public string 안내버전 { get; set; } = string.Empty;
+}
+
+public sealed class 마트주문요청철회요청
+{
+    public string 기대상태코드 { get; set; } = 마트주문요청상태코드.제출됨;
 }
 
 public sealed class 마트주문요청응답
@@ -74,4 +109,15 @@ public sealed class 마트주문요청응답
     public bool 재고예약됨 { get; set; }
 
     public bool 결제됨 { get; set; }
+}
+
+public sealed class 마트주문요청목록응답
+{
+    public IReadOnlyList<마트주문요청응답> Items { get; set; } = [];
+
+    public int TotalCount { get; set; }
+
+    public int Page { get; set; }
+
+    public int PageSize { get; set; }
 }

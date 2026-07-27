@@ -170,7 +170,7 @@ public sealed class 공동구매개별주문원장Service : I공동구매개별�
                     원장Id = 공동구매주문집계원장Id,
                     커뮤니티Id = sourceLedger.커뮤니티Id,
                     원장템플릿Key = CommunityLedgerTemplateKeys.GroupOrder,
-                    제목 = $"{group.상품명} 공동구매 주문집계",
+                    제목 = $"{group.상품명} 같이 주문 원장",
                     원함 = "확정된 개별 주문들을 집합으로 묶고 수량·금액·수령 창고 분포를 개별 주문에서 계산합니다.",
                     상태 = 커뮤니티원장상태.진행중,
                     현재단계Key = "collecting-confirmed-orders",

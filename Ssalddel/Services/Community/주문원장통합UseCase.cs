@@ -6,6 +6,11 @@ namespace Ssalddel.Services.Community;
 
 public interface I주문원장통합UseCase
 {
+    Task<Result<주문자원장목록응답>> 주문자목록조회Async(
+        string 주문자UserId,
+        주문자원장목록조회요청 request,
+        CancellationToken cancellationToken = default);
+
     Task<Result<주문원장통합Dto>> 조회Async(
         string 주문원장Id,
         CancellationToken cancellationToken = default);
@@ -30,6 +35,14 @@ public interface I주문원장통합UseCase
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 public sealed class 주문원장통합UseCase : I주문원장통합UseCase
 {
+    private static readonly IReadOnlyList<CommunityLedgerTemplateResponse> 주문자원장종류 =
+        CommunityLedgerTemplateCatalog.주문원장종류;
+
+    private static readonly IReadOnlySet<string> 주문자원장템플릿Keys =
+        주문자원장종류
+            .Select(template => template.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
     private readonly I커뮤니티원장저장소 _원장저장소;
     private readonly I주문원장서명저장소 _서명저장소;
 
@@ -44,6 +57,81 @@ public sealed class 주문원장통합UseCase : I주문원장통합UseCase
     {
         _원장저장소 = 원장저장소;
         _서명저장소 = 서명저장소;
+    }
+
+    public async Task<Result<주문자원장목록응답>> 주문자목록조회Async(
+        string 주문자UserId,
+        주문자원장목록조회요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (string.IsNullOrWhiteSpace(주문자UserId))
+        {
+            return Unauthorized<주문자원장목록응답>("로그인 사용자를 확인할 수 없습니다.");
+        }
+
+        var templateKey = string.IsNullOrWhiteSpace(request.원장템플릿Key)
+            ? null
+            : request.원장템플릿Key.Trim();
+        if (templateKey is not null && !주문자원장템플릿Keys.Contains(templateKey))
+        {
+            return BadRequest<주문자원장목록응답>(
+                "주문자 목록은 음식 주문, 살뜰 마트 주문, 같이 주문 또는 같이 수입 원장만 조회할 수 있습니다.");
+        }
+
+        var page = Math.Max(0, request.Page);
+        var pageSize = Math.Clamp(request.PageSize, 1, 100);
+        var ledgers = await _원장저장소.원장목록조회Async(
+            new 커뮤니티원장조회조건
+            {
+                접근UserId = 주문자UserId.Trim(),
+                원장템플릿Key = templateKey,
+                원장템플릿Keys = templateKey is null
+                    ? 주문자원장종류.Select(template => template.Key).ToArray()
+                    : [],
+                상태 = string.IsNullOrWhiteSpace(request.상태) ? null : request.상태.Trim(),
+                Limit = 200
+            },
+            cancellationToken);
+        var search = string.IsNullOrWhiteSpace(request.Search) ? null : request.Search.Trim();
+        var filtered = ledgers
+            .Where(ledger => 주문자원장템플릿Keys.Contains(ledger.원장템플릿Key))
+            .Where(ledger => templateKey is null
+                             || string.Equals(
+                                 ledger.원장템플릿Key,
+                                 templateKey,
+                                 StringComparison.OrdinalIgnoreCase))
+            .Where(ledger => string.IsNullOrWhiteSpace(request.상태)
+                             || string.Equals(ledger.상태, request.상태.Trim(), StringComparison.OrdinalIgnoreCase))
+            .Where(ledger => search is null
+                             || ledger.원장Id.Contains(search, StringComparison.OrdinalIgnoreCase)
+                             || ledger.제목.Contains(search, StringComparison.OrdinalIgnoreCase)
+                             || ledger.상태.Contains(search, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(ledger => ledger.수정시각Utc)
+            .ThenByDescending(ledger => ledger.생성시각Utc)
+            .ToArray();
+        var counts = filtered
+            .GroupBy(ledger => ledger.원장템플릿Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.Count(), StringComparer.OrdinalIgnoreCase);
+        var items = filtered
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .Select(주문자원장항목으로)
+            .ToArray();
+
+        return Result.Ok(new 주문자원장목록응답
+        {
+            원장종류목록 = 주문자원장종류
+                .Select((template, index) => 주문자원장종류요약으로(
+                    template,
+                    index,
+                    counts.GetValueOrDefault(template.Key)))
+                .ToArray(),
+            Items = items,
+            TotalCount = filtered.Length,
+            Page = page,
+            PageSize = pageSize
+        });
     }
 
     public async Task<Result<주문원장통합Dto>> 조회Async(
@@ -186,7 +274,7 @@ public sealed class 주문원장통합UseCase : I주문원장통합UseCase
 
         return 주문원장구성정책.통합대상인가(주문원장.원장템플릿Key)
             ? Result.Ok(주문원장)
-            : BadRequest<커뮤니티원장Dto>("통합 조회 대상은 주문, 공동구매, 공동수입 또는 공동수출 원장이어야 합니다.");
+            : BadRequest<커뮤니티원장Dto>("통합 조회 대상은 주문, 공동구매, 같이 수입 또는 공동수출 원장이어야 합니다.");
     }
 
     private async Task<Result<커뮤니티원장Dto>> 주문원장저장Async(
@@ -291,6 +379,64 @@ public sealed class 주문원장통합UseCase : I주문원장통합UseCase
         };
     }
 
+    private static 주문자원장종류요약Dto 주문자원장종류요약으로(
+        CommunityLedgerTemplateResponse template,
+        int index,
+        int count)
+    {
+        var boundary = 실행경계(template.Key);
+        return new 주문자원장종류요약Dto
+        {
+            표시순서 = index + 1,
+            원장템플릿Key = template.Key,
+            원장종류명 = template.DisplayName,
+            설명 = template.Summary,
+            실행경계코드 = boundary.Code,
+            실행경계안내 = boundary.Message,
+            내원장수 = count
+        };
+    }
+
+    private static 주문자원장목록항목Dto 주문자원장항목으로(커뮤니티원장Dto ledger)
+    {
+        var template = CommunityLedgerTemplateCatalog.Find(ledger.원장템플릿Key);
+        var boundary = 실행경계(ledger.원장템플릿Key);
+        return new 주문자원장목록항목Dto
+        {
+            원장Id = ledger.원장Id,
+            Revision = ledger.Revision,
+            원장템플릿Key = ledger.원장템플릿Key,
+            원장종류명 = template.DisplayName,
+            제목 = ledger.제목,
+            상태 = ledger.상태,
+            현재단계Key = ledger.현재단계Key,
+            실행경계코드 = boundary.Code,
+            실행경계안내 = boundary.Message,
+            주문자상세조회경로 =
+                $"api/v1/community/order-ledgers/{Uri.EscapeDataString(ledger.원장Id)}/views/orderer",
+            생성시각Utc = ledger.생성시각Utc,
+            수정시각Utc = ledger.수정시각Utc
+        };
+    }
+
+    private static (string Code, string Message) 실행경계(string templateKey)
+        => templateKey switch
+        {
+            CommunityLedgerTemplateKeys.FoodOrder =>
+                (주문자원장실행경계코드.실제주문,
+                    "음식 주문은 실제 주문 상태를 기록합니다. 음식점 수락·조리·배달 상태는 음식 주문 API에서 변경하고 이 원장을 다시 조회합니다."),
+            CommunityLedgerTemplateKeys.SsalddelMart =>
+                (주문자원장실행경계코드.운영원장,
+                    "살뜰 마트의 비구속 주문 요청과 실제 피킹·배송 원장은 분리됩니다. 이 원장은 운영 주문이 생성된 뒤의 상태를 표시합니다."),
+            CommunityLedgerTemplateKeys.GroupOrder =>
+                (주문자원장실행경계코드.집계원장,
+                    "같이 주문 원장의 수량과 금액은 연결된 개별 주문에서 계산합니다. 원장 합계를 직접 덮어쓰거나 자동 결제하지 않습니다."),
+            CommunityLedgerTemplateKeys.GroupImport =>
+                (주문자원장실행경계코드.수입준비,
+                    "같이 수입 원장은 비용·LCL/FCL·전문가 인계를 준비합니다. 별도 확인 전에는 발주·계약·수입 신고를 자동 실행하지 않습니다."),
+            _ => (string.Empty, string.Empty)
+        };
+
     private static Result<T> BadRequest<T>(string message)
         => Result.Fail<T>(new Error(message).WithMetadata("StatusCode", StatusCodes.Status400BadRequest));
 
@@ -308,6 +454,9 @@ public sealed class 주문원장통합UseCase : I주문원장통합UseCase
 
     private static Result<주문원장통합Dto> Conflict(string message)
         => Conflict<주문원장통합Dto>(message);
+
+    private static Result<T> Unauthorized<T>(string message)
+        => Result.Fail<T>(new Error(message).WithMetadata("StatusCode", StatusCodes.Status401Unauthorized));
 }
 
 public sealed class 주문하위원장연결요청

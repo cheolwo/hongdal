@@ -243,6 +243,38 @@ public sealed class OrderLedgerIntegrationUseCaseTests
     }
 
     [Fact]
+    public async Task 주문자목록은_기존원장에서_네종류만순서대로분류하고실행경계를표시한다()
+    {
+        var store = new FakeLedgerStore(
+            Ledger("food-1", CommunityLedgerTemplateKeys.FoodOrder),
+            Ledger("mart-1", CommunityLedgerTemplateKeys.SsalddelMart),
+            Ledger("together-1", CommunityLedgerTemplateKeys.GroupOrder),
+            Ledger("import-1", CommunityLedgerTemplateKeys.GroupImport),
+            Ledger("transport-1", CommunityLedgerTemplateKeys.CargoTransport));
+        var useCase = new 주문원장통합UseCase(store);
+
+        var result = await useCase.주문자목록조회Async(
+            "user-1",
+            new 주문자원장목록조회요청 { PageSize = 20 });
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(
+            ["음식 주문 원장", "살뜰 마트 주문 원장", "같이 주문 원장", "같이 수입 원장"],
+            result.Value.원장종류목록.Select(item => item.원장종류명));
+        Assert.Equal(4, result.Value.TotalCount);
+        Assert.DoesNotContain(result.Value.Items, item => item.원장Id == "transport-1");
+        Assert.Equal(
+            주문자원장실행경계코드.실제주문,
+            result.Value.Items.Single(item => item.원장Id == "food-1").실행경계코드);
+        Assert.Equal(
+            주문자원장실행경계코드.집계원장,
+            result.Value.Items.Single(item => item.원장Id == "together-1").실행경계코드);
+        Assert.Equal(
+            주문자원장실행경계코드.수입준비,
+            result.Value.Items.Single(item => item.원장Id == "import-1").실행경계코드);
+    }
+
+    [Fact]
     public async Task Link_rejects_child_from_another_community()
     {
         var root = Ledger("order-1", CommunityLedgerTemplateKeys.Order);
@@ -383,7 +415,7 @@ public sealed class OrderLedgerIntegrationUseCaseTests
 
         var exception = Assert.Throws<InvalidOperationException>(() => 주문원장구성정책.저장요청검증(request));
 
-        Assert.Contains("공동구매 주문집계에서만", exception.Message);
+        Assert.Contains("같이 주문 원장에서만", exception.Message);
     }
 
     [Fact]
@@ -584,7 +616,42 @@ public sealed class OrderLedgerIntegrationUseCaseTests
         public Task<IReadOnlyList<커뮤니티원장Dto>> 원장목록조회Async(
             커뮤니티원장조회조건 query,
             CancellationToken cancellationToken = default)
-            => Task.FromResult<IReadOnlyList<커뮤니티원장Dto>>(_ledgers.Values.ToArray());
+        {
+            var items = _ledgers.Values.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(query.원장템플릿Key))
+            {
+                items = items.Where(item => string.Equals(
+                    item.원장템플릿Key,
+                    query.원장템플릿Key,
+                    StringComparison.OrdinalIgnoreCase));
+            }
+            else if (query.원장템플릿Keys.Count > 0)
+            {
+                var keys = query.원장템플릿Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                items = items.Where(item => keys.Contains(item.원장템플릿Key));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.상태))
+            {
+                items = items.Where(item => string.Equals(
+                    item.상태,
+                    query.상태,
+                    StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.접근UserId))
+            {
+                items = items.Where(item =>
+                    string.Equals(item.생성자UserId, query.접근UserId, StringComparison.OrdinalIgnoreCase)
+                    || item.참여자목록.Any(participant => string.Equals(
+                        participant.UserId,
+                        query.접근UserId,
+                        StringComparison.OrdinalIgnoreCase)));
+            }
+
+            return Task.FromResult<IReadOnlyList<커뮤니티원장Dto>>(
+                items.Take(query.Limit <= 0 ? 50 : query.Limit).ToArray());
+        }
 
         public Task<커뮤니티원장Dto?> 원장상태변경Async(
             커뮤니티원장상태변경요청 request,
