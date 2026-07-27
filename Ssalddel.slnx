@@ -14,6 +14,9 @@
     </Project>
     <Project Path="OrdererApp/OrdererApp.csproj" />
     <Project Path="RestaurantDeskApp/RestaurantDeskApp.csproj" />
+    <Project Path="SellerApp/SellerApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
     <Project Path="SsalddelApp/SsalddelApp.csproj">
       <Deploy Solution="Debug|*" />
     </Project>

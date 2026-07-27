@@ -1,0 +1,69 @@
+@page "/shipper/sales/products"
+@inject SellerProductsPageViewModel ViewModel
+
+<PageTitle>판매상품 원장</PageTitle>
+
+<header class="seller-page-header seller-page-header--actions">
+    <div>
+        <span class="seller-eyebrow">SELLER · PRODUCTS</span>
+        <h1>판매상품 원장</h1>
+        <p>내 재고에 연결된 판매상품, SKU와 내부 판매가를 확인합니다.</p>
+    </div>
+    <MudButton Href="@SellerRoutes.Inventory"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add">
+        재고에서 등록
+    </MudButton>
+</header>
+
+@if (ViewModel.IsBusy)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        @ViewModel.ErrorMessage
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ReloadAsync">다시 조회</MudButton>
+    </MudAlert>
+}
+else if (ViewModel.Products.Count == 0)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        등록된 판매상품이 없습니다. 본인 재고에서 판매상품 등록을 시작해 주세요.
+    </MudAlert>
+}
+else
+{
+    <section class="seller-card-list">
+        @foreach (var product in ViewModel.Products.OrderByDescending(item => item.Id))
+        {
+            <article class="seller-ledger-card">
+                <div class="seller-ledger-card__title">
+                    <div>
+                        <span>판매상품 #@product.Id</span>
+                        <strong>@product.대표상품명</strong>
+                    </div>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@product.상태</MudChip>
+                </div>
+                <dl>
+                    <div><dt>판매 SKU</dt><dd>@product.판매SKU</dd></div>
+                    <div><dt>판매가</dt><dd>@product.판매가.ToString("N0")</dd></div>
+                    <div><dt>연결 재고</dt><dd>#@product.입고상품Id</dd></div>
+                </dl>
+                <MudButton Href="@SellerRoutes.ListingCreateForProduct(product.Id)"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">
+                    채널 출품 준비
+                </MudButton>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.LoadAsync();
+    private Task ReloadAsync() => ViewModel.LoadAsync();
+}

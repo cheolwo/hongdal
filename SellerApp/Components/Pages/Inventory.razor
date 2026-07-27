@@ -1,0 +1,71 @@
+@page "/seller/inventory"
+@inject SellerInventoryPageViewModel ViewModel
+
+<PageTitle>판매 가능 재고</PageTitle>
+
+<header class="seller-page-header seller-page-header--actions">
+    <div>
+        <span class="seller-eyebrow">SELLER · INVENTORY SOURCE</span>
+        <h1>판매 가능 재고</h1>
+        <p>서버 재고 원장에서 판매상품으로 연결할 정확한 재고 한 건을 선택합니다.</p>
+    </div>
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Refresh"
+               Disabled="@ViewModel.IsBusy"
+               OnClick="ReloadAsync">
+        새로고침
+    </MudButton>
+</header>
+
+@if (ViewModel.IsBusy)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        @ViewModel.ErrorMessage
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ReloadAsync">다시 조회</MudButton>
+    </MudAlert>
+}
+else if (ViewModel.Items.Count == 0)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        판매상품으로 연결할 수 있는 내 재고가 없습니다. 입고와 검수를 먼저 완료해 주세요.
+    </MudAlert>
+}
+else
+{
+    <section class="seller-card-list">
+        @foreach (var item in ViewModel.Items)
+        {
+            <article class="seller-ledger-card">
+                <div class="seller-ledger-card__title">
+                    <div>
+                        <span>재고 #@item.입고상품Id</span>
+                        <strong>@item.상품명</strong>
+                    </div>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@item.상태</MudChip>
+                </div>
+                <dl>
+                    <div><dt>SKU</dt><dd>@item.SKU</dd></div>
+                    <div><dt>가용 수량</dt><dd>@item.가용수량</dd></div>
+                    <div><dt>보관 위치</dt><dd>@ValueOrDash(item.보관위치)</dd></div>
+                </dl>
+                <MudButton Href="@SellerRoutes.ProductCreateForInventory(item.입고상품Id)"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">
+                    판매상품으로 연결
+                </MudButton>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.LoadAsync();
+    private Task ReloadAsync() => ViewModel.LoadAsync();
+    private static string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "—" : value;
+}

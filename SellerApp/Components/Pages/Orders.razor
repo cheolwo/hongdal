@@ -1,0 +1,55 @@
+@page "/shipper/sales/orders"
+@implements IAsyncDisposable
+@inject NavigationManager Navigation
+
+<PageTitle>판매 주문 원장</PageTitle>
+
+<header class="seller-page-header">
+    <span class="seller-eyebrow">SELLER · PERSISTED ORDERS</span>
+    <h1>판매 주문 원장</h1>
+    <p>서버에 영속된 판매채널 출고 후보와 창고·운송 인계 상태를 30초 보완 조회로 확인합니다.</p>
+</header>
+
+<div @key="_refreshVersion">
+    <ShipperSalesOrderWorkspace Mode="ShipperSalesOrderWorkspaceMode.List"
+                                InitialSearch="@Context.Search"
+                                InitialSyncScope="@Context.SyncScope"
+                                InitialStatus="@Context.Status"
+                                InitialPage="@Context.Page" />
+</div>
+
+@code {
+    private readonly CancellationTokenSource monitorCancellation = new();
+    private int _refreshVersion;
+    private SalesOrderNavigationContext Context
+        => SalesOrderNavigationContext.Parse(Navigation.Uri);
+
+    protected override void OnInitialized()
+        => _ = MonitorAsync(monitorCancellation.Token);
+
+    private async Task MonitorAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(() =>
+                {
+                    _refreshVersion++;
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        monitorCancellation.Cancel();
+        monitorCancellation.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

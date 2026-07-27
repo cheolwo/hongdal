@@ -18,6 +18,9 @@
     <Project Path="RestaurantDeskApp/RestaurantDeskApp.csproj">
       <Deploy Solution="Debug|*" />
     </Project>
+    <Project Path="SellerApp/SellerApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
     <Project Path="FDriverApp/FDriverApp.csproj">
       <Deploy Solution="Debug|*" />
     </Project>

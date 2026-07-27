@@ -1,0 +1,79 @@
+@page "/shipper/sales/products/new"
+@inject SellerProductCreatePageViewModel ViewModel
+
+<PageTitle>판매상품 등록</PageTitle>
+
+<header class="seller-page-header">
+    <span class="seller-eyebrow">SELLER · PRODUCT CREATE</span>
+    <h1>판매상품 등록</h1>
+    <p>선택한 재고 한 건을 다시 조회해 내부 판매상품 원장으로 연결합니다.</p>
+</header>
+
+@if (ViewModel.IsBusy && ViewModel.Inventory is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+    {
+        <MudAlert Severity="@(ViewModel.HasError ? Severity.Error : Severity.Success)"
+                  Variant="Variant.Outlined"
+                  Class="mb-4">
+            @ViewModel.StatusMessage
+        </MudAlert>
+    }
+
+    @if (ViewModel.Inventory is not null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="seller-form-card">
+            <MudStack Spacing="3">
+                <div class="seller-source-summary">
+                    <span>선택 재고 #@ViewModel.Inventory.입고상품Id</span>
+                    <strong>@ViewModel.Inventory.상품명</strong>
+                    <small>@ViewModel.Inventory.SKU · 가용 @ViewModel.Inventory.가용수량</small>
+                </div>
+                <MudTextField T="string" Label="대표 상품명" @bind-Value="ViewModel.ProductName" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="판매 SKU" @bind-Value="ViewModel.SalesSku" Variant="Variant.Outlined" />
+                <MudNumericField T="decimal" Label="내부 판매가" @bind-Value="ViewModel.Price" Min="0" Variant="Variant.Outlined" />
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    현재 상품 원장은 통화가 분리되지 않았습니다. 서버 계약을 보완하기 전에는 운영시장 통화 기준의 내부 준비 가격으로만 취급합니다.
+                </MudAlert>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Disabled="@ViewModel.IsBusy"
+                           OnClick="CreateAsync">
+                    판매상품 저장
+                </MudButton>
+                @if (ViewModel.CreatedProduct is not null)
+                {
+                    <MudButton Href="@SellerRoutes.ListingCreateForProduct(ViewModel.CreatedProduct.Id)"
+                               Variant="Variant.Outlined"
+                               Color="Color.Success">
+                        이 상품 채널 출품 준비
+                    </MudButton>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "inventoryItemId")]
+    public long? InventoryItemId { get; set; }
+
+    private long? loadedInventoryId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (loadedInventoryId == InventoryItemId)
+        {
+            return;
+        }
+
+        loadedInventoryId = InventoryItemId;
+        await ViewModel.LoadAsync(InventoryItemId);
+    }
+
+    private Task CreateAsync() => ViewModel.CreateAsync();
+}

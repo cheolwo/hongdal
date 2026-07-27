@@ -1,0 +1,105 @@
+@page "/"
+@inject SellerAuthSession Session
+@inject SellerMarketProfileService MarketProfile
+@inject I판매채널페이지접근Service AccessService
+
+<PageTitle>판매자 홈</PageTitle>
+
+<section class="seller-hero">
+    <div>
+        <span class="seller-eyebrow">SELLER WORKSPACE · @MarketProfile.Profile.CountryCode</span>
+        <h1>판매 준비부터 주문 이행까지</h1>
+        <p>
+            판매 페이지, 채널 계정, 재고 기반 판매상품, 출품 준비와 판매 주문을
+            같은 판매자 원장 흐름으로 확인합니다.
+        </p>
+    </div>
+    <MudIcon Icon="@Icons.Material.Filled.Storefront" Class="seller-hero__icon" />
+</section>
+
+@if (!Session.IsSellerOperator)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+        판매자 또는 화주 계정으로 로그인하면 본인이 소유한 판매 원장을 확인할 수 있습니다.
+        <MudButton Href="@SellerRoutes.Login" Variant="Variant.Text" Color="Color.Primary">로그인</MudButton>
+    </MudAlert>
+}
+else if (_featureEnabled is false)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
+        판매채널 출고 기능이 현재 비활성입니다. 준비 원장은 보존되지만 외부 발행·주문 수집·출고 확정은 실행하지 않습니다.
+    </MudAlert>
+}
+
+<section class="seller-market-card">
+    <div>
+        <span>현재 운영 시장</span>
+        <strong>@MarketName</strong>
+        <small>@MarketProfile.Profile.CurrencyCode · @MarketProfile.Profile.WeightUnitCode · @MarketProfile.Profile.DistanceUnitCode</small>
+    </div>
+    <div class="seller-market-channels">
+        @foreach (var channel in MarketProfile.Profile.PreferredCommerceChannelCodes)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@channel</MudChip>
+        }
+    </div>
+</section>
+
+<section class="seller-flow-grid" aria-label="판매자 업무 단계">
+    @foreach (var item in FlowItems)
+    {
+        <a href="@item.Href" class="seller-flow-card">
+            <span class="seller-flow-card__step">@item.Step</span>
+            <MudIcon Icon="@item.Icon" Color="Color.Primary" Size="Size.Large" />
+            <strong>@item.Title</strong>
+            <small>@item.Description</small>
+            <span class="seller-flow-card__action">화면 열기 <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" /></span>
+        </a>
+    }
+</section>
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">
+    채널 자격증명은 서버에 암호화해 저장합니다. 연결 확인·상품 발행·실제 주문 수집은 채널 모듈과 운영 승인이 준비되기 전에는 자동 실행하지 않습니다.
+</MudAlert>
+
+@code {
+    private bool? _featureEnabled;
+
+    private string MarketName
+        => MarketProfile.IsKorea ? "대한민국 국내 판매" : "미국 시장 판매·수출 준비";
+
+    private static readonly SellerFlowItem[] FlowItems =
+    [
+        new("01", "판매 페이지", "상품 설명과 주문 방식을 초안으로 준비합니다.", SellerRoutes.SalesPageComposer, Icons.Material.Filled.Description),
+        new("02", "판매채널", "국내·해외 채널의 API 자격증명을 안전하게 연결합니다.", SellerRoutes.SalesChannels, Icons.Material.Filled.Storefront),
+        new("03", "판매상품", "내 재고에서 판매할 상품과 SKU·가격을 등록합니다.", SellerRoutes.Inventory, Icons.Material.Filled.Inventory2),
+        new("04", "채널 출품", "판매상품과 채널 계정을 연결한 내부 출품 원장을 만듭니다.", SellerRoutes.Listings, Icons.Material.Filled.Sell),
+        new("05", "판매 주문", "서버에 영속된 주문 출고 후보와 창고·운송 인계를 봅니다.", SellerRoutes.Orders, Icons.Material.Filled.ReceiptLong)
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.RestoreAsync();
+        if (!Session.IsSellerOperator)
+        {
+            _featureEnabled = null;
+            return;
+        }
+
+        try
+        {
+            _featureEnabled = await AccessService.기능활성여부Async();
+        }
+        catch
+        {
+            _featureEnabled = null;
+        }
+    }
+
+    private sealed record SellerFlowItem(
+        string Step,
+        string Title,
+        string Description,
+        string Href,
+        string Icon);
+}

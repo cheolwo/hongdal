@@ -1,0 +1,68 @@
+@page "/shipper/sales/listings"
+@inject SellerListingsPageViewModel ViewModel
+
+<PageTitle>채널 출품 원장</PageTitle>
+
+<header class="seller-page-header seller-page-header--actions">
+    <div>
+        <span class="seller-eyebrow">SELLER · LISTINGS</span>
+        <h1>채널 출품 원장</h1>
+        <p>판매상품과 판매채널 계정을 연결한 내부 출품 준비 상태를 확인합니다.</p>
+    </div>
+    <MudButton Href="@SellerRoutes.ListingCreate"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.AddBusiness">
+        출품 준비
+    </MudButton>
+</header>
+
+@if (ViewModel.IsBusy)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        @ViewModel.ErrorMessage
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ReloadAsync">다시 조회</MudButton>
+    </MudAlert>
+}
+else if (ViewModel.Listings.Count == 0)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        저장된 출품 준비 원장이 없습니다. 판매상품과 판매채널 계정을 직접 선택해 주세요.
+    </MudAlert>
+}
+else
+{
+    <section class="seller-card-list">
+        @foreach (var listing in ViewModel.Listings.OrderByDescending(item => item.Id))
+        {
+            <article class="seller-ledger-card">
+                <div class="seller-ledger-card__title">
+                    <div>
+                        <span>출품 #@listing.Id</span>
+                        <strong>@ViewModel.ProductName(listing.판매상품Id)</strong>
+                    </div>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">@listing.출품상태</MudChip>
+                </div>
+                <dl>
+                    <div><dt>판매채널</dt><dd>@ViewModel.AccountName(listing.판매채널계정Id)</dd></div>
+                    <div><dt>채널상품번호</dt><dd>@ValueOrDash(listing.채널상품번호)</dd></div>
+                    <div><dt>동기화</dt><dd>@listing.동기화상태</dd></div>
+                </dl>
+            </article>
+        }
+    </section>
+}
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">
+    이 화면은 내부 준비 원장만 표시합니다. 외부 판매채널 상품 발행은 실행하지 않습니다.
+</MudAlert>
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.LoadAsync();
+    private Task ReloadAsync() => ViewModel.LoadAsync();
+    private static string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "발행 전" : value;
+}

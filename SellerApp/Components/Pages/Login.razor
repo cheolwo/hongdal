@@ -1,0 +1,81 @@
+@page "/login"
+@inject SellerAuthService AuthService
+@inject SellerAuthSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>판매자 로그인</PageTitle>
+
+<section class="seller-auth">
+    <MudPaper Elevation="0" Outlined="true" Class="seller-auth__card">
+        <MudStack Spacing="3">
+            <div>
+                <span class="seller-eyebrow">SELLER SIGN IN</span>
+                <h1>판매자 로그인</h1>
+                <p>판매자·화주 역할과 본인 소유 원장을 서버에서 다시 확인합니다.</p>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
+            }
+
+            <MudTextField T="string"
+                          Label="아이디 또는 이메일"
+                          @bind-Value="_userNameOrEmail"
+                          Variant="Variant.Outlined"
+                          Disabled="@_busy"
+                          InputType="InputType.Email" />
+            <MudTextField T="string"
+                          Label="비밀번호"
+                          @bind-Value="_password"
+                          Variant="Variant.Outlined"
+                          Disabled="@_busy"
+                          InputType="InputType.Password" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="@_busy"
+                       OnClick="LoginAsync">
+                @(_busy ? "로그인 중..." : "판매자 로그인")
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+</section>
+
+@code {
+    private string _userNameOrEmail = string.Empty;
+    private string _password = string.Empty;
+    private string? _error;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.RestoreAsync();
+        if (Session.IsSellerOperator)
+        {
+            Navigation.NavigateTo(SellerRoutes.Home);
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        _busy = true;
+        _error = null;
+        try
+        {
+            var result = await AuthService.LoginAsync(_userNameOrEmail, _password);
+            if (!result.Succeeded)
+            {
+                _error = result.ErrorMessage;
+                return;
+            }
+
+            _password = string.Empty;
+            Navigation.NavigateTo(SellerRoutes.Home);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

@@ -1,0 +1,173 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject SellerAuthSession Session
+@inject SellerAuthService AuthService
+@inject SellerMarketProfileService MarketProfile
+@inject NavigationManager Navigation
+
+<MudLayout Class="seller-shell">
+    <MudAppBar Dense="true" Fixed="true" Elevation="0" Class="seller-appbar">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="ToggleDrawer"
+                       aria-label="판매자 메뉴 열기 또는 닫기" />
+        <MudStack Spacing="0" Class="ml-2">
+            <MudText Typo="Typo.subtitle1" Class="seller-brand">살뜰 판매자</MudText>
+            <MudText Typo="Typo.caption">@MarketProfile.Profile.CountryCode · @MarketProfile.Profile.CurrencyCode</MudText>
+        </MudStack>
+        <MudSpacer />
+        @if (Session.IsSellerOperator)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Inherit">
+                @Session.UserName
+            </MudChip>
+        }
+        else
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Login"
+                           Color="Color.Inherit"
+                           Href="@SellerRoutes.Login"
+                           aria-label="판매자 로그인" />
+        }
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="drawerOpen"
+               Variant="DrawerVariant.Temporary"
+               Elevation="2"
+               ClipMode="DrawerClipMode.Always"
+               Class="seller-drawer">
+        <MudNavMenu Class="pa-3">
+            <MudText Typo="Typo.overline" Class="px-3">판매 업무</MudText>
+            <MudNavLink Href="@SellerRoutes.Home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">판매자 홈</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.SalesChannels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storefront">판매채널</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.SalesPageComposer" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Description">판매 페이지 초안</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.Inventory" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Warehouse">판매 가능 재고</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.Products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory2">판매상품</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.Listings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Sell">채널 출품</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.Orders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ReceiptLong">판매 주문</MudNavLink>
+
+            <MudDivider Class="my-3" />
+            <MudText Typo="Typo.overline" Class="px-3">운영 시장</MudText>
+            <MudButtonGroup FullWidth="true" Size="Size.Small" Class="px-2">
+                <MudButton Variant="@MarketVariant(OperatingMarketCodes.Korea)"
+                           OnClick="@(() => SelectMarket(OperatingMarketCodes.Korea))">
+                    국내
+                </MudButton>
+                <MudButton Variant="@MarketVariant(OperatingMarketCodes.UnitedStates)"
+                           OnClick="@(() => SelectMarket(OperatingMarketCodes.UnitedStates))">
+                    미국
+                </MudButton>
+            </MudButtonGroup>
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="pa-3">
+                시장 선택은 화면의 통화·단위·선호 채널 기준이며 서버 권한이나 외부 채널 연결을 자동 변경하지 않습니다.
+            </MudText>
+
+            <MudDivider Class="my-3" />
+            @if (Session.IsSellerOperator)
+            {
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Logout"
+                           OnClick="LogoutAsync">
+                    로그아웃
+                </MudButton>
+            }
+            else
+            {
+                <MudNavLink Href="@SellerRoutes.Login" Icon="@Icons.Material.Filled.Login">판매자 로그인</MudNavLink>
+            }
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent Class="seller-main">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="seller-page">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+
+    <nav class="seller-bottom-nav" aria-label="판매자 주요 메뉴">
+        <a href="@SellerRoutes.Home" class="@BottomClass(SellerRoutes.Home)">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+            <span>홈</span>
+        </a>
+        <a href="@SellerRoutes.Products" class="@BottomClass(SellerRoutes.Products)">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" />
+            <span>상품</span>
+        </a>
+        <a href="@SellerRoutes.Listings" class="@BottomClass(SellerRoutes.Listings)">
+            <MudIcon Icon="@Icons.Material.Filled.Sell" Size="Size.Small" />
+            <span>출품</span>
+        </a>
+        <a href="@SellerRoutes.Orders" class="@BottomClass(SellerRoutes.Orders)">
+            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Small" />
+            <span>주문</span>
+        </a>
+    </nav>
+</MudLayout>
+
+@code {
+    private bool drawerOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Session.Changed += HandleChanged;
+        MarketProfile.Changed += HandleChanged;
+        Navigation.LocationChanged += HandleLocationChanged;
+        await Session.RestoreAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || Session.CurrentState != ClientAuthSessionRestoreState.RefreshRequired)
+        {
+            return;
+        }
+
+        await AuthService.EnsureAccessTokenAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleDrawer() => drawerOpen = !drawerOpen;
+
+    private Variant MarketVariant(string marketCode)
+        => MarketProfile.MarketCode == marketCode ? Variant.Filled : Variant.Outlined;
+
+    private void SelectMarket(string marketCode)
+    {
+        MarketProfile.SetMarket(marketCode);
+        drawerOpen = false;
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthService.LogoutAsync();
+        drawerOpen = false;
+        Navigation.NavigateTo(SellerRoutes.Login);
+    }
+
+    private string BottomClass(string route)
+    {
+        var current = new Uri(Navigation.Uri).AbsolutePath.TrimEnd('/');
+        var target = route.TrimEnd('/');
+        var active = target.Length == 0
+            ? current.Length == 0 || current == "/"
+            : current.StartsWith(target, StringComparison.OrdinalIgnoreCase);
+        return active ? "seller-bottom-nav__item seller-bottom-nav__item--active" : "seller-bottom-nav__item";
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        drawerOpen = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Session.Changed -= HandleChanged;
+        MarketProfile.Changed -= HandleChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
+    }
+}

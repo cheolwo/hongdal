@@ -1,0 +1,28 @@
+@page "/shipper/sales/orders/{OrderId:long}"
+@inject NavigationManager Navigation
+
+<PageTitle>판매 주문 상세</PageTitle>
+
+<header class="seller-page-header">
+    <MudButton Href="@ReturnPath"
+               Variant="Variant.Text"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ArrowBack">
+        주문 목록
+    </MudButton>
+    <span class="seller-eyebrow">SELLER · ORDER #@OrderId</span>
+    <h1>판매 주문 상세</h1>
+    <p>같은 주문참조번호로 묶인 출고 라인과 창고·운송 인계 상태를 확인합니다.</p>
+</header>
+
+<ShipperSalesOrderWorkspace Mode="ShipperSalesOrderWorkspaceMode.Detail"
+                            OrderId="@OrderId" />
+
+@code {
+    [Parameter]
+    public long OrderId { get; set; }
+
+    private string ReturnPath
+        => SalesOrderNavigationContext.Parse(Navigation.Uri)
+            .ResolveReturnPath(SellerRoutes.Orders);
+}
