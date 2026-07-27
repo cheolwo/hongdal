@@ -18,6 +18,10 @@ namespace Ssalddel.Controllers.Orderer;
 [Route("api/v1/orderer/restaurants")]
 public sealed class 음식점탐색Controller(I음식점탐색조회UseCase 음식점탐색UseCase) : OrdererControllerBase
 {
+    [HttpGet("categories")]
+    public async Task<IActionResult> 카테고리목록(CancellationToken cancellationToken)
+        => this.ToActionResult(await 음식점탐색UseCase.카테고리목록Async(cancellationToken));
+
     [HttpGet("service-areas")]
     public async Task<IActionResult> 권역목록(CancellationToken cancellationToken)
         => this.ToActionResult(await 음식점탐색UseCase.권역목록Async(cancellationToken));

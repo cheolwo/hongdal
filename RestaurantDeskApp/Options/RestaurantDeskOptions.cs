@@ -20,6 +20,8 @@ public sealed class RestaurantDeskOptions
 
     public int DefaultPreparationMinutes { get; set; } = 20;
 
+    public Dictionary<string, int> 상품별기본조리분 { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
     public string ServerBaseUrl { get; set; } = SsalddelApiEndpoint.LocalDevelopmentBaseAddress;
 
     public Uri GetServerBaseAddress()

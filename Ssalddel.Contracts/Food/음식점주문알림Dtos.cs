@@ -10,6 +10,8 @@ public sealed class 음식점주문수신알림
 
     public string 메뉴요약 { get; set; } = string.Empty;
 
+    public IReadOnlyList<음식주문상품Dto> 상품목록 { get; set; } = [];
+
     public decimal 주문금액 { get; set; }
 
     public string 상태 { get; set; } = string.Empty;

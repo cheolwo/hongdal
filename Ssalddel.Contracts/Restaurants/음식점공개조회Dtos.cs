@@ -23,6 +23,8 @@ public sealed class 음식점공개목록조회요청
 
     public decimal 반경Km { get; set; } = RestaurantSearchPolicyDefaults.DefaultRadiusKm;
 
+    public string? 카테고리 { get; set; }
+
     public string? 검색어 { get; set; }
 
     public bool 주문가능만 { get; set; }
@@ -30,6 +32,21 @@ public sealed class 음식점공개목록조회요청
     public int Page { get; set; } = 1;
 
     public int PageSize { get; set; } = 12;
+}
+
+public sealed class 음식점카테고리응답
+{
+    public string 카테고리키 { get; set; } = string.Empty;
+
+    public string 표시명 { get; set; } = string.Empty;
+
+    public string 설명 { get; set; } = string.Empty;
+
+    public string 대표메뉴안내 { get; set; } = string.Empty;
+
+    public int 표시순서 { get; set; }
+
+    public int 공개음식점수 { get; set; }
 }
 
 public sealed class 음식점공개목록응답

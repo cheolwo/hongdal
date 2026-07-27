@@ -26,6 +26,28 @@ public sealed class FoodDeliveryV30PageCompositionTests
         Assert.DoesNotContain("주문수락후전표준비Async", inbox);
         Assert.Contains("@page \"/orders/{OrderNo}\"", detail);
         Assert.Contains("주문수락후전표준비Async", detail);
+        Assert.Contains("이 주문의 조리 대기시간", detail);
+        Assert.Contains("preparationMinutes", detail);
+    }
+
+    [Fact]
+    public void 음식점주문은_상품별기본시간을추천하고_주문별선택시간으로수락한다()
+    {
+        var settings = Read("RestaurantDeskApp", "appsettings.json");
+        var settingsPage = Read("RestaurantDeskApp", "Components/Pages/PreparationTimeSettings.razor");
+        var startup = Read("RestaurantDeskApp", "MauiProgram.cs");
+        var desk = Read("RestaurantDeskApp", "Services/음식점주문DeskService.cs");
+        var notification = Read("Ssalddel.Contracts", "Food/음식점주문알림Dtos.cs");
+
+        Assert.Contains("\"상품별기본조리분\"", settings);
+        Assert.Contains("AddJsonFile", startup);
+        Assert.Contains("@page \"/settings/preparation-times\"", settingsPage);
+        Assert.Contains("음식점 기본시간", settingsPage);
+        Assert.Contains("상품별 기본시간", settingsPage);
+        Assert.Contains("PreparationSettingsService.저장Async", settingsPage);
+        Assert.Contains("음식점조리시간정책.주문추천분", desk);
+        Assert.Contains("조리예상분 = 선택조리예상분", desk);
+        Assert.Contains("상품목록", notification);
     }
 
     [Fact]

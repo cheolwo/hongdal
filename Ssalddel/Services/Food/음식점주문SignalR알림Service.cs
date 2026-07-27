@@ -18,6 +18,12 @@ public sealed class 음식점주문SignalR알림Service(
             음식점Id = order.음식점Id,
             고객명 = order.수령인정보.수령인명,
             메뉴요약 = BuildMenuSummary(order),
+            상품목록 = order.상품목록.Select(item => new 음식주문상품Dto
+            {
+                상품명 = item.상품명,
+                수량 = item.수량,
+                단가 = item.단가
+            }).ToArray(),
             주문금액 = order.총주문금액,
             상태 = order.상태,
             수신시각 = DateTimeOffset.UtcNow,

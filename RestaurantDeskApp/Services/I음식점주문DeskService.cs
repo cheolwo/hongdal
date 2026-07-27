@@ -12,5 +12,10 @@ public interface I음식점주문DeskService
 
     Task<음식점주문수락결과> 주문수락후전표준비Async(string 주문번호, CancellationToken cancellationToken = default);
 
+    Task<음식점주문수락결과> 주문수락후전표준비Async(
+        string 주문번호,
+        int 조리예상분,
+        CancellationToken cancellationToken = default);
+
     Task 전표출력완료Async(string 주문번호, CancellationToken cancellationToken = default);
 }

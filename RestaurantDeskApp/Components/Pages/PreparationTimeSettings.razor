@@ -1,0 +1,170 @@
+@page "/settings/preparation-times"
+@inject I음식점조리시간설정Service PreparationSettingsService
+
+<PageTitle>조리시간 기본값 설정</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">조리시간 기본값 설정</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    신규 주문에는 상품별 기본시간 중 가장 긴 값을 추천하고, 주문 상세에서 다시 바꿀 수 있습니다.
+                </MudText>
+            </MudStack>
+            <MudButton Href="/orders" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack">
+                주문 수신함
+            </MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">음식점 기본시간</MudText>
+                <MudNumericField T="int"
+                                 @bind-Value="restaurantDefaultMinutes"
+                                 Label="상품별 설정이 없을 때 사용할 시간"
+                                 Min="1"
+                                 Max="180"
+                                 Step="1"
+                                 Variant="Variant.Outlined"
+                                 Adornment="Adornment.End"
+                                 AdornmentText="분" />
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">상품별 기본시간</MudText>
+                @if (items.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        등록된 상품이 없습니다. 모든 상품에 음식점 기본시간을 사용합니다.
+                    </MudText>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudTextField T="string"
+                                          @bind-Value="item.상품명"
+                                          Label="상품명"
+                                          Variant="Variant.Outlined" />
+                            <MudNumericField T="int"
+                                             @bind-Value="item.기본조리분"
+                                             Label="기본시간"
+                                             Min="1"
+                                             Max="180"
+                                             Step="1"
+                                             Variant="Variant.Outlined"
+                                             Adornment="Adornment.End"
+                                             AdornmentText="분" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           OnClick="@(() => Remove(item))" />
+                        </MudStack>
+                    }
+                }
+
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="AddProduct">
+                    상품 추가
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   Disabled="@isSaving"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   OnClick="SaveAsync">
+            @(isSaving ? "저장 중" : "기본시간 저장")
+        </MudButton>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private readonly List<상품조리시간편집Item> items = [];
+    private int restaurantDefaultMinutes = 20;
+    private bool isSaving;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    protected override void OnInitialized()
+    {
+        var current = PreparationSettingsService.현재조회();
+        restaurantDefaultMinutes = current.음식점기본조리분;
+        items.AddRange(current.상품별기본조리분
+            .OrderBy(item => item.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(item => new 상품조리시간편집Item
+            {
+                상품명 = item.Key,
+                기본조리분 = item.Value
+            }));
+    }
+
+    private void AddProduct()
+        => items.Add(new 상품조리시간편집Item
+        {
+            상품명 = string.Empty,
+            기본조리분 = restaurantDefaultMinutes
+        });
+
+    private void Remove(상품조리시간편집Item item)
+        => items.Remove(item);
+
+    private async Task SaveAsync()
+    {
+        isSaving = true;
+        message = null;
+        try
+        {
+            var duplicate = items
+                .Where(item => !string.IsNullOrWhiteSpace(item.상품명))
+                .GroupBy(item => item.상품명.Trim(), StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(group => group.Count() > 1);
+            if (duplicate is not null)
+            {
+                messageSeverity = Severity.Warning;
+                message = $"'{duplicate.Key}' 상품이 중복되어 있습니다.";
+                return;
+            }
+
+            var settings = items
+                .Where(item => !string.IsNullOrWhiteSpace(item.상품명))
+                .ToDictionary(
+                    item => item.상품명.Trim(),
+                    item => 음식점조리시간정책.Clamp(item.기본조리분),
+                    StringComparer.OrdinalIgnoreCase);
+
+            restaurantDefaultMinutes = 음식점조리시간정책.Clamp(restaurantDefaultMinutes);
+            await PreparationSettingsService.저장Async(restaurantDefaultMinutes, settings);
+            messageSeverity = Severity.Success;
+            message = "조리시간 기본값을 이 음식점 기기에 저장했습니다. 다음 신규 주문부터 적용됩니다.";
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = $"조리시간 기본값을 저장하지 못했습니다. {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private sealed class 상품조리시간편집Item
+    {
+        public string 상품명 { get; set; } = string.Empty;
+
+        public int 기본조리분 { get; set; }
+    }
+}

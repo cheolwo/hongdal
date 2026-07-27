@@ -11,6 +11,9 @@ namespace Ssalddel.Application.Food;
 
 public interface I음식점탐색조회UseCase
 {
+    Task<Result<IReadOnlyList<음식점카테고리응답>>> 카테고리목록Async(
+        CancellationToken cancellationToken);
+
     Task<Result<IReadOnlyList<음식점탐색권역응답>>> 권역목록Async(
         CancellationToken cancellationToken);
 
@@ -32,6 +35,35 @@ public sealed class 음식점탐색조회UseCase(
     SsalddelContext db,
     IRestaurantSearchPolicyStore policyStore) : I음식점탐색조회UseCase
 {
+    public async Task<Result<IReadOnlyList<음식점카테고리응답>>> 카테고리목록Async(
+        CancellationToken cancellationToken)
+    {
+        var 공개분류별수 = await db.음식점공개프로필
+            .AsNoTracking()
+            .Where(item => item.공개여부 && !string.IsNullOrWhiteSpace(item.카테고리))
+            .GroupBy(item => item.카테고리)
+            .Select(group => new { 카테고리 = group.Key, 공개음식점수 = group.Count() })
+            .ToDictionaryAsync(
+                item => item.카테고리,
+                item => item.공개음식점수,
+                StringComparer.OrdinalIgnoreCase,
+                cancellationToken);
+
+        var items = 음식점카테고리Catalog.전체
+            .Select(item => new 음식점카테고리응답
+            {
+                카테고리키 = item.카테고리키,
+                표시명 = item.표시명,
+                설명 = item.설명,
+                대표메뉴안내 = item.대표메뉴안내,
+                표시순서 = item.표시순서,
+                공개음식점수 = 공개분류별수.GetValueOrDefault(item.카테고리키)
+            })
+            .ToArray();
+
+        return Result.Ok<IReadOnlyList<음식점카테고리응답>>(items);
+    }
+
     public Task<Result<IReadOnlyList<음식점탐색권역응답>>> 권역목록Async(
         CancellationToken cancellationToken)
     {
@@ -87,6 +119,17 @@ public sealed class 음식점탐색조회UseCase(
         if (request.주문가능만)
         {
             query = query.Where(item => item.주문가능여부);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.카테고리))
+        {
+            var category = 음식점카테고리Catalog.찾기(request.카테고리);
+            if (category is null)
+            {
+                return Result.Fail<음식점공개목록응답>("지원하는 음식점 카테고리를 선택해 주세요.");
+            }
+
+            query = query.Where(item => item.카테고리 == category.카테고리키);
         }
 
         if (!string.IsNullOrWhiteSpace(request.검색어))

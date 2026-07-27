@@ -13,7 +13,7 @@ public sealed class 음식점탐색조회UseCaseTests
     public async Task 선택한공개권역기준반경안의공개음식점만반환한다()
     {
         await using var context = CreateContext();
-        var (publicRestaurantId, _, _) = await SeedAsync(context);
+        var (publicRestaurantId, _, _, _) = await SeedAsync(context);
         var useCase = new 음식점탐색조회UseCase(context, new InMemoryRestaurantSearchPolicyStore());
 
         var result = await useCase.목록Async(new()
@@ -25,7 +25,8 @@ public sealed class 음식점탐색조회UseCaseTests
         }, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
-        var item = Assert.Single(result.Value.Items);
+        Assert.Equal(2, result.Value.Items.Count);
+        var item = Assert.Single(result.Value.Items, candidate => candidate.Id == publicRestaurantId);
         Assert.Equal(publicRestaurantId, item.Id);
         Assert.Equal("공개분식", item.상호명);
         Assert.Equal(1, item.공개메뉴수);
@@ -35,10 +36,48 @@ public sealed class 음식점탐색조회UseCaseTests
     }
 
     [Fact]
+    public async Task 카테고리목록은_표준순서와_공개음식점수를제공한다()
+    {
+        await using var context = CreateContext();
+        await SeedAsync(context);
+        var useCase = new 음식점탐색조회UseCase(context, new InMemoryRestaurantSearchPolicyStore());
+
+        var result = await useCase.카테고리목록Async(CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("분식", result.Value[0].카테고리키);
+        Assert.Equal(1, result.Value.Single(item => item.카테고리키 == "분식").공개음식점수);
+        Assert.Equal(1, result.Value.Single(item => item.카테고리키 == "피자").공개음식점수);
+        Assert.Equal(0, result.Value.Single(item => item.카테고리키 == "치킨").공개음식점수);
+    }
+
+    [Fact]
+    public async Task 선택한카테고리의_공개음식점만반환한다()
+    {
+        await using var context = CreateContext();
+        var (_, _, _, pizzaRestaurantId) = await SeedAsync(context);
+        var useCase = new 음식점탐색조회UseCase(context, new InMemoryRestaurantSearchPolicyStore());
+
+        var result = await useCase.목록Async(new()
+        {
+            배달권키 = "bjd-sigungu:11500",
+            반경Km = 3m,
+            카테고리 = "피자",
+            Page = 1,
+            PageSize = 10
+        }, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        var restaurant = Assert.Single(result.Value.Items);
+        Assert.Equal(pizzaRestaurantId, restaurant.Id);
+        Assert.Equal("피자", restaurant.카테고리);
+    }
+
+    [Fact]
     public async Task 정확한상세는공개메뉴만반환하고비공개음식점은404로숨긴다()
     {
         await using var context = CreateContext();
-        var (publicRestaurantId, privateRestaurantId, _) = await SeedAsync(context);
+        var (publicRestaurantId, privateRestaurantId, _, _) = await SeedAsync(context);
         var useCase = new 음식점탐색조회UseCase(context, new InMemoryRestaurantSearchPolicyStore());
 
         var found = await useCase.상세Async(publicRestaurantId, CancellationToken.None);
@@ -80,7 +119,7 @@ public sealed class 음식점탐색조회UseCaseTests
         return new SsalddelContext(options, new DummyPersonalDataEncryptionService());
     }
 
-    private static async Task<(long PublicId, long PrivateId, long FarId)> SeedAsync(SsalddelContext context)
+    private static async Task<(long PublicId, long PrivateId, long FarId, long PizzaId)> SeedAsync(SsalddelContext context)
     {
         var publicRestaurant = new 음식점공개프로필
         {
@@ -120,9 +159,26 @@ public sealed class 음식점탐색조회UseCaseTests
             공개여부 = true,
             주문가능여부 = true
         };
-        context.AddRange(publicRestaurant, privateRestaurant, farRestaurant);
+        var pizzaRestaurant = new 음식점공개프로필
+        {
+            상호명 = "공개피자",
+            카테고리 = "피자",
+            소개 = "권역 안 공개 피자 음식점",
+            공개주소 = "서울특별시 강서구",
+            위도 = 37.556000m,
+            경도 = 126.851000m,
+            최소주문금액 = 18000m,
+            예상조리분 = 25,
+            공개여부 = true,
+            주문가능여부 = true,
+            메뉴목록 =
+            [
+                new 음식점메뉴 { 메뉴명 = "치즈피자", 설명 = "공개 메뉴", 판매가 = 19000m, 공개여부 = true, 표시순서 = 1 }
+            ]
+        };
+        context.AddRange(publicRestaurant, privateRestaurant, farRestaurant, pizzaRestaurant);
         await context.SaveChangesAsync();
-        return (publicRestaurant.Id, privateRestaurant.Id, farRestaurant.Id);
+        return (publicRestaurant.Id, privateRestaurant.Id, farRestaurant.Id, pizzaRestaurant.Id);
     }
 
     private sealed class DummyPersonalDataEncryptionService : IPersonalDataEncryptionService

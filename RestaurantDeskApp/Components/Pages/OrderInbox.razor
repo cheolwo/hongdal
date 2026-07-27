@@ -51,6 +51,9 @@
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">
                                     @order.접수시각.ToLocalTime().ToString("yyyy-MM-dd HH:mm") · @order.주문금액.ToString("N0")원
                                 </MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Primary">
+                                    상품 기본값 기준 조리 예상 @(order.추천조리예상분)분
+                                </MudText>
                             </MudStack>
                             <MudButton Href="@($"/orders/{Uri.EscapeDataString(order.주문번호)}")"
                                        Variant="Variant.Filled"
@@ -108,6 +111,7 @@
                 음식점Id = notification.음식점Id,
                 고객명 = notification.고객명,
                 메뉴요약 = notification.메뉴요약,
+                상품목록 = notification.상품목록,
                 주문금액 = notification.주문금액,
                 수신시각 = notification.수신시각,
                 제목 = notification.제목,

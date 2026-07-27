@@ -87,6 +87,12 @@ public static class FoodOrderSampleData
                 음식점Id = order.음식점Id,
                 고객명 = order.수령인정보.수령인명,
                 메뉴요약 = BuildMenuSummary(order.상품목록),
+                상품목록 = order.상품목록.Select(x => new 음식주문상품Dto
+                {
+                    상품명 = x.상품명,
+                    수량 = x.수량,
+                    단가 = x.단가
+                }).ToArray(),
                 주문금액 = order.총주문금액,
                 상태 = order.상태,
                 수신시각 = new DateTimeOffset(DateTime.SpecifyKind(order.CreatedAt, DateTimeKind.Utc)),
