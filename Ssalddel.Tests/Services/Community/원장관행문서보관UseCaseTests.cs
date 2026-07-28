@@ -51,7 +51,20 @@ public sealed class 원장관행문서보관UseCaseTests
         Assert.Equal(원장관행문서종류코드.구매주문서, result.Value.문서종류코드);
         Assert.Equal(원장관행문서정책코드.검토초안, 문서관리.마지막요청?.문서코드);
         Assert.Equal(원장.원장Id, 문서관리.마지막요청?.의뢰Id);
+        Assert.Equal(원장.Revision, 문서관리.마지막요청?.원천원장Revision);
+        Assert.Equal(원장.원장템플릿Key, 문서관리.마지막요청?.원천원장종류코드);
+        Assert.Equal(원장관행문서종류코드.구매주문서, 문서관리.마지막요청?.원천문서종류코드);
+        Assert.Equal(문서분류코드.거래명세, 문서관리.마지막요청?.문서분류코드);
+        Assert.Equal(문서생명주기상태코드.입력필요, 문서관리.마지막요청?.생명주기상태코드);
         Assert.True(문서관리.마지막요청?.암호화여부);
+        Assert.False(string.IsNullOrWhiteSpace(문서관리.마지막요청?.구조화스냅샷Json));
+        using (var snapshot = System.Text.Json.JsonDocument.Parse(문서관리.마지막요청!.구조화스냅샷Json!))
+        {
+            Assert.False(snapshot.RootElement.TryGetProperty("Html", out _));
+            Assert.False(snapshot.RootElement.TryGetProperty("PlainText", out _));
+            var field = snapshot.RootElement.GetProperty("확인필드목록").EnumerateArray().First();
+            Assert.False(field.TryGetProperty("값", out _));
+        }
         Assert.Contains("DRAFT", 문서관리.마지막내용);
     }
 
@@ -76,6 +89,9 @@ public sealed class 원장관행문서보관UseCaseTests
                 문서명 = request.문서명,
                 파일명 = request.파일명,
                 생성상태 = 문서상태값.생성완료,
+                문서분류코드 = request.문서분류코드 ?? string.Empty,
+                생명주기상태코드 = request.생명주기상태코드 ?? string.Empty,
+                내용Sha256 = "TEST-HASH",
                 암호화됨 = request.암호화여부 == true,
                 다운로드허용여부 = request.다운로드허용여부 == true
             };
@@ -97,10 +113,21 @@ public sealed class 원장관행문서보관UseCaseTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<문서조회요약응답>>([]);
 
+        public Task<문서관계그래프응답> GetRelationshipGraphAsync(
+            string 기준StableId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new 문서관계그래프응답 { 기준StableId = 기준StableId });
+
         public Task<IReadOnlyList<문서조회로그요약응답>> ListLogsAsync(
             long? 문서Id = null,
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<문서조회로그요약응답>>([]);
+
+        public Task<문서조회요약응답?> TransitionLifecycleAsync(
+            long id,
+            문서생명주기변경요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<문서조회요약응답?>(null);
 
         public Task<문서다운로드응답?> DownloadAsync(long id, CancellationToken cancellationToken = default)
             => Task.FromResult<문서다운로드응답?>(null);

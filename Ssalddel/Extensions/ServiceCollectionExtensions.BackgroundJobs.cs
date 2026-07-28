@@ -11,6 +11,7 @@ using Ssalddel.Services.Orderer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using 살뜰.Infrastructure.BackgroundJobs.Customs;
 using 살뜰.Infrastructure.BackgroundJobs.DispatchQueue;
+using 살뜰.Infrastructure.BackgroundJobs.Documents;
 using 살뜰.Infrastructure.BackgroundJobs.Notifications;
 using 살뜰.Infrastructure.BackgroundJobs.Payments;
 using 살뜰.Services.Options;
@@ -83,6 +84,13 @@ public static partial class ServiceCollectionExtensions
                 .ForJob(paymentOutboxJobKey)
                 .WithIdentity("PaymentApprovedOutboxPublish-trigger")
                 .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.결제승인Outbox발행주기초))).RepeatForever()));
+
+            var documentGenerationOutboxJobKey = new JobKey("DocumentGenerationOutboxProcess");
+            q.AddJob<문서생성Outbox처리Job>(opts => opts.WithIdentity(documentGenerationOutboxJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(documentGenerationOutboxJobKey)
+                .WithIdentity("DocumentGenerationOutboxProcess-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(30, jobOptions.문서생성Outbox처리주기초))).RepeatForever()));
 
             var driverPayoutOutboxJobKey = new JobKey("DriverPayoutOutboxProcess");
             q.AddJob<기사지급Outbox처리Job>(opts => opts.WithIdentity(driverPayoutOutboxJobKey));

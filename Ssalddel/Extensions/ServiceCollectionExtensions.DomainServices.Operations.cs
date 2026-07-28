@@ -55,6 +55,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
         services.AddSingleton<I문서관리Store, 문서관리Store>();
         services.AddSingleton<I문서관리Service, 문서관리Service>();
+        services.AddSingleton<I문서생성OutboxService, 문서생성OutboxService>();
         services.AddSingleton<IHIOPSAIUsageBudgetStore, FileHIOPSAIUsageBudgetStore>();
         services.AddSingleton<이미지프롬프트생성기Resolver, 기본이미지프롬프트생성기Resolver>();
         services.AddScoped<I샘플이미지대상ResolverResolver, 샘플이미지대상ResolverResolver>();

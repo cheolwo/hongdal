@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using FluentResults;
 using Ssalddel.Contracts.Common.Documents;
 using Ssalddel.Contracts.Common.Metadata;
@@ -73,7 +74,40 @@ public sealed class 원장관행문서보관UseCase : I원장관행문서보관U
                     ContentType = 초안.ContentType,
                     암호화여부 = true,
                     다운로드허용여부 = true,
-                    생성자 = 현재UserId
+                    생성자 = 현재UserId,
+                    문서분류코드 = 문서분류Resolver.Resolve(문서정책코드, 초안.문서종류코드),
+                    생명주기상태코드 = 초안.상태코드 == 원장관행문서초안상태코드.입력필요
+                        ? 문서생명주기상태코드.입력필요
+                        : 문서생명주기상태코드.검토준비,
+                    원천원장Id = 초안결과.Value.원장Id,
+                    원천원장종류코드 = 초안결과.Value.원장템플릿Key,
+                    원천원장Revision = 초안결과.Value.원장Revision,
+                    원천문서종류코드 = 초안.문서종류코드,
+                    템플릿버전 = "1.0",
+                    생성모드코드 = 초안.생성모드코드,
+                    발급주체코드 = 초안.발급주체코드,
+                    외부발급원본대체가능여부 = 초안.외부발급원본대체가능여부,
+                    구조화스냅샷Json = JsonSerializer.Serialize(new
+                    {
+                        초안.문서종류코드,
+                        초안.초안문서번호,
+                        초안.상태코드,
+                        초안.원천원장Revision,
+                        확인필드목록 = 초안.필드목록.Select(field => new
+                        {
+                            field.필드코드,
+                            field.확인됨
+                        }),
+                        품목행수 = 초안.품목행목록.Count,
+                        필수입력누락수 = 초안.필수입력누락목록.Count,
+                        경고수 = 초안.경고목록.Count
+                    }),
+                    관련StableId목록Json = JsonSerializer.Serialize(
+                        new[]
+                        {
+                            문서StableId.만들기(문서StableId종류코드.커뮤니티원장, 초안결과.Value.원장Id),
+                            문서StableId.만들기(문서StableId종류코드.문서초안, 초안.초안문서번호)
+                        })
                 },
                 stream,
                 cancellationToken);
@@ -91,6 +125,9 @@ public sealed class 원장관행문서보관UseCase : I원장관행문서보관U
                 문서명 = 저장문서.문서명,
                 파일명 = 저장문서.파일명,
                 생성상태 = 저장문서.생성상태,
+                문서분류코드 = 저장문서.문서분류코드,
+                생명주기상태코드 = 저장문서.생명주기상태코드,
+                내용Sha256 = 저장문서.내용Sha256,
                 암호화됨 = 저장문서.암호화됨,
                 다운로드허용여부 = 저장문서.다운로드허용여부
             });

@@ -14,6 +14,31 @@ public static class 문서상태값
     public const string 다운로드 = "다운로드";
 }
 
+public static class 문서생성Outbox상태값
+{
+    public const string 대기 = "Pending";
+    public const string 처리중 = "Processing";
+    public const string 완료 = "Succeeded";
+    public const string 실패 = "Failed";
+}
+
+public sealed class 문서생성Outbox항목
+{
+    public long Id { get; set; }
+    public string 중복방지Key { get; set; } = string.Empty;
+    public string 문서코드 { get; set; } = string.Empty;
+    public string 의뢰Id { get; set; } = string.Empty;
+    public string 요청Json { get; set; } = string.Empty;
+    public string Payload상대경로 { get; set; } = string.Empty;
+    public string PayloadSha256 { get; set; } = string.Empty;
+    public string 처리상태 { get; set; } = 문서생성Outbox상태값.대기;
+    public int 시도횟수 { get; set; }
+    public string 마지막오류 { get; set; } = string.Empty;
+    public DateTime? 마지막시도일시Utc { get; set; }
+    public DateTime 생성일시Utc { get; set; } = DateTime.UtcNow;
+    public DateTime 수정일시Utc { get; set; } = DateTime.UtcNow;
+}
+
 [Table("문서종류정책")]
 public sealed class 문서종류정책
 {
@@ -109,6 +134,60 @@ public sealed class 운송문서
     [MaxLength(100)]
     public string 생성상태 { get; set; } = 문서상태값.생성대기;
 
+    [Column("문서분류코드")]
+    [MaxLength(100)]
+    public string 문서분류코드 { get; set; } = string.Empty;
+
+    [Column("생명주기상태코드")]
+    [MaxLength(100)]
+    public string 생명주기상태코드 { get; set; } = string.Empty;
+
+    [Column("원천원장_id")]
+    [MaxLength(200)]
+    public string 원천원장Id { get; set; } = string.Empty;
+
+    [Column("원천원장종류코드")]
+    [MaxLength(100)]
+    public string 원천원장종류코드 { get; set; } = string.Empty;
+
+    [Column("원천원장_revision")]
+    public long? 원천원장Revision { get; set; }
+
+    [Column("원천문서종류코드")]
+    [MaxLength(100)]
+    public string 원천문서종류코드 { get; set; } = string.Empty;
+
+    [Column("템플릿버전")]
+    [MaxLength(50)]
+    public string 템플릿버전 { get; set; } = string.Empty;
+
+    [Column("생성모드코드")]
+    [MaxLength(100)]
+    public string 생성모드코드 { get; set; } = string.Empty;
+
+    [Column("발급주체코드")]
+    [MaxLength(100)]
+    public string 발급주체코드 { get; set; } = string.Empty;
+
+    [Column("외부발급원본대체가능여부")]
+    public bool 외부발급원본대체가능여부 { get; set; }
+
+    [Column("구조화스냅샷_json")]
+    public string 구조화스냅샷Json { get; set; } = string.Empty;
+
+    [Column("관련_stable_id_목록_json")]
+    public string 관련StableId목록Json { get; set; } = string.Empty;
+
+    [Column("내용_sha256")]
+    [MaxLength(64)]
+    public string 내용Sha256 { get; set; } = string.Empty;
+
+    [Column("이전문서_id")]
+    public long? 이전문서Id { get; set; }
+
+    [Column("대체문서_id")]
+    public long? 대체문서Id { get; set; }
+
     [Column("다운로드허용여부")]
     public bool 다운로드허용여부 { get; set; }
 
@@ -163,6 +242,9 @@ public sealed class 문서조회로그
     [MaxLength(1000)]
     public string UserAgent { get; set; } = string.Empty;
 
+    [Column("metadata_json")]
+    public string MetadataJson { get; set; } = string.Empty;
+
     [Column("생성일시")]
     public DateTime 생성일시 { get; set; } = DateTime.UtcNow;
 }
@@ -176,6 +258,20 @@ public sealed class 문서조회요약응답
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;
     public string 생성상태 { get; set; } = string.Empty;
+    public string 문서분류코드 { get; set; } = string.Empty;
+    public string 생명주기상태코드 { get; set; } = string.Empty;
+    public string 원천원장Id { get; set; } = string.Empty;
+    public string 원천원장종류코드 { get; set; } = string.Empty;
+    public long? 원천원장Revision { get; set; }
+    public string 원천문서종류코드 { get; set; } = string.Empty;
+    public string 템플릿버전 { get; set; } = string.Empty;
+    public string 생성모드코드 { get; set; } = string.Empty;
+    public string 발급주체코드 { get; set; } = string.Empty;
+    public bool 외부발급원본대체가능여부 { get; set; }
+    public IReadOnlyList<string> 관련StableId목록 { get; set; } = [];
+    public string 내용Sha256 { get; set; } = string.Empty;
+    public long? 이전문서Id { get; set; }
+    public long? 대체문서Id { get; set; }
     public bool 암호화됨 { get; set; }
     public bool 다운로드허용여부 { get; set; }
     public bool 수정가능여부 { get; set; }
@@ -211,6 +307,7 @@ public sealed class 문서조회로그요약응답
     public string 역할명 { get; set; } = string.Empty;
     public string ClientIp { get; set; } = string.Empty;
     public string UserAgent { get; set; } = string.Empty;
+    public string MetadataJson { get; set; } = string.Empty;
     public DateTime 생성일시 { get; set; }
 }
 
@@ -238,6 +335,26 @@ public sealed class 문서생성요청
     public bool? 암호화여부 { get; set; }
     public bool? 다운로드허용여부 { get; set; }
     public string? 생성자 { get; set; }
+    public string? 문서분류코드 { get; set; }
+    public string? 생명주기상태코드 { get; set; }
+    public string? 원천원장Id { get; set; }
+    public string? 원천원장종류코드 { get; set; }
+    public long? 원천원장Revision { get; set; }
+    public string? 원천문서종류코드 { get; set; }
+    public string? 템플릿버전 { get; set; }
+    public string? 생성모드코드 { get; set; }
+    public string? 발급주체코드 { get; set; }
+    public bool? 외부발급원본대체가능여부 { get; set; }
+    public string? 구조화스냅샷Json { get; set; }
+    public string? 관련StableId목록Json { get; set; }
+}
+
+public sealed class 문서생명주기변경요청
+{
+    public string 대상상태코드 { get; set; } = string.Empty;
+    public long? 대체문서Id { get; set; }
+    public string 변경사유 { get; set; } = string.Empty;
+    public string 변경자 { get; set; } = string.Empty;
 }
 
 public sealed class 문서다운로드응답

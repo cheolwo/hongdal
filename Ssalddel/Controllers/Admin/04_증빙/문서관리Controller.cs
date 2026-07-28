@@ -69,6 +69,33 @@ public sealed class 문서관리Controller : ControllerBase
             : this.ToActionResult(result);
     }
 
+    [HttpPost("{id:long}/lifecycle")]
+    public async Task<IActionResult> 생명주기변경(
+        long id,
+        [FromBody] 문서생명주기변경요청? request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.생명주기변경Async(
+            new 문서생명주기변경Command(
+                id,
+                request?.대상상태코드,
+                request?.대체문서Id,
+                request?.변경사유,
+                User.Identity?.Name),
+            cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("relationships")]
+    public async Task<IActionResult> 관계그래프조회(
+        [FromQuery] string? stableId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.관계그래프조회Async(stableId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpGet("{id:long}/download")]
     public async Task<IActionResult> 문서다운로드(long id, CancellationToken cancellationToken)
     {

@@ -1,5 +1,6 @@
 using FluentResults;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Contracts.Common.Documents;
 using Ssalddel.Contracts.Common.ViewSettings;
 using Microsoft.AspNetCore.Http;
 using 살뜰.Services.Audit;
@@ -12,8 +13,10 @@ public interface I문서관리UseCase
     Task<Result<IReadOnlyList<문서정책요약응답>>> 정책목록조회Async(CancellationToken cancellationToken);
     Task<Result<문서정책요약응답>> 정책수정Async(string documentCode, 문서정책수정요청? request, CancellationToken cancellationToken);
     Task<Result<IReadOnlyList<문서조회요약응답>>> 목록조회Async(string? documentCode, string? requestId, string? status, CancellationToken cancellationToken);
+    Task<Result<문서관계그래프응답>> 관계그래프조회Async(string? stableId, CancellationToken cancellationToken);
     Task<Result<IReadOnlyList<문서조회로그요약응답>>> 로그목록조회Async(long? documentId, CancellationToken cancellationToken);
     Task<Result<문서조회요약응답>> 업로드Async(문서업로드Command command, CancellationToken cancellationToken);
+    Task<Result<문서조회요약응답>> 생명주기변경Async(문서생명주기변경Command command, CancellationToken cancellationToken);
     Task<Result<문서다운로드응답>> 다운로드Async(long id, 문서다운로드Context context, CancellationToken cancellationToken);
 }
 
@@ -26,6 +29,13 @@ public sealed record 문서업로드Command(
     bool? 암호화여부,
     bool? 다운로드허용여부,
     string? 생성자);
+
+public sealed record 문서생명주기변경Command(
+    long 문서Id,
+    string? 대상상태코드,
+    long? 대체문서Id,
+    string? 변경사유,
+    string? 변경자);
 
 public sealed record 문서다운로드Context(
     string UserId,
@@ -92,6 +102,20 @@ public sealed class 문서관리UseCase : I문서관리UseCase
         return Result.Ok(await _documentService.ListDocumentsAsync(documentCode, requestId, status, cancellationToken));
     }
 
+    public async Task<Result<문서관계그래프응답>> 관계그래프조회Async(
+        string? stableId,
+        CancellationToken cancellationToken)
+    {
+        if (!문서StableId.분석(stableId, out _, out _))
+        {
+            return Result.Fail<문서관계그래프응답>(
+                new Error("종류코드:값 형식의 stableId가 필요합니다.")
+                    .WithMetadata("StatusCode", StatusCodes.Status400BadRequest));
+        }
+
+        return Result.Ok(await _documentService.GetRelationshipGraphAsync(stableId!, cancellationToken));
+    }
+
     public async Task<Result<IReadOnlyList<문서조회로그요약응답>>> 로그목록조회Async(long? documentId, CancellationToken cancellationToken)
     {
         return Result.Ok(await _documentService.ListLogsAsync(documentId, cancellationToken));
@@ -127,6 +151,42 @@ public sealed class 문서관리UseCase : I문서관리UseCase
         catch (InvalidOperationException ex)
         {
             return Result.Fail<문서조회요약응답>(ex.Message);
+        }
+    }
+
+    public async Task<Result<문서조회요약응답>> 생명주기변경Async(
+        문서생명주기변경Command command,
+        CancellationToken cancellationToken)
+    {
+        if (command.문서Id <= 0)
+        {
+            return Result.Fail<문서조회요약응답>("documentId is required");
+        }
+
+        try
+        {
+            var updated = await _documentService.TransitionLifecycleAsync(
+                command.문서Id,
+                new 문서생명주기변경요청
+                {
+                    대상상태코드 = command.대상상태코드 ?? string.Empty,
+                    대체문서Id = command.대체문서Id,
+                    변경사유 = command.변경사유 ?? string.Empty,
+                    변경자 = command.변경자 ?? string.Empty
+                },
+                cancellationToken);
+
+            return updated is null
+                ? Result.Fail<문서조회요약응답>(
+                    new Error("문서를 찾을 수 없습니다.")
+                        .WithMetadata("StatusCode", StatusCodes.Status404NotFound))
+                : Result.Ok(updated);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Result.Fail<문서조회요약응답>(
+                new Error(exception.Message)
+                    .WithMetadata("StatusCode", StatusCodes.Status409Conflict));
         }
     }
 

@@ -112,6 +112,9 @@ public sealed class 원장관행문서보관응답
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;
     public string 생성상태 { get; set; } = string.Empty;
+    public string 문서분류코드 { get; set; } = string.Empty;
+    public string 생명주기상태코드 { get; set; } = string.Empty;
+    public string 내용Sha256 { get; set; } = string.Empty;
     public bool 암호화됨 { get; set; }
     public bool 다운로드허용여부 { get; set; }
 }
