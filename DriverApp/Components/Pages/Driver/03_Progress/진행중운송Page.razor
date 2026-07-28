@@ -1,6 +1,8 @@
 ﻿@page "/driver/transports/current"
 @inject IDriverSampleDataService Samples
 @inject IAuthSession AuthSession
+@using Ssalddel.Client.Infrastructure.Transport
+@implements IDisposable
 
 <PageTitle>진행중 운송</PageTitle>
 
@@ -162,9 +164,9 @@
 
                         <MudExpansionPanel Text="전달받는자 정보">
                             <SsalddelSensitiveInfoRow Label="전달 위치" Value="@현재운송.하차지" />
-                            <SsalddelSensitiveInfoRow Label="담당자" Value="하차지 담당자" />
-                            <SsalddelSensitiveInfoRow Label="연락처" Value="상세 API 연결 시 표시" />
-                            <SsalddelSensitiveInfoRow Label="전달 요청" Value="도착 전 연락 후 하차 완료 사진을 남깁니다." />
+                            <SsalddelSensitiveInfoRow Label="담당자" Value="@RecipientName" />
+                            <SsalddelSensitiveInfoRow Label="연락처" Value="@RecipientPhone" />
+                            <SsalddelSensitiveInfoRow Label="전달 요청" Value="@RecipientDeliveryRequest" />
                         </MudExpansionPanel>
                     </SsalddelSensitiveDisclosureList>
                 </MudStack>
@@ -194,11 +196,42 @@
     private bool _데이터로딩중 = true;
     private bool _인증됨;
     private string? _데이터오류;
+    private CancellationTokenSource? _갱신취소;
 
     private 기사운송샘플항목? 현재운송 => Samples.현재운송조회();
 
-    protected override Task OnInitializedAsync()
-        => 데이터조회Async(force: false);
+    protected override async Task OnInitializedAsync()
+    {
+        await 데이터조회Async(force: false);
+        _갱신취소 = new CancellationTokenSource();
+        _ = 보완조회Async(_갱신취소.Token);
+    }
+
+    public void Dispose()
+    {
+        _갱신취소?.Cancel();
+        _갱신취소?.Dispose();
+    }
+
+    private async Task 보완조회Async(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(
+            TransportRequestLedgerRefreshPolicy.FallbackPollingInterval);
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(async () =>
+                {
+                    await 데이터조회Async(force: true);
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
 
     private Task 재조회Async()
         => 데이터조회Async(force: true);
@@ -268,9 +301,19 @@
             ? $"{현재운송.컨테이너번호} / 봉인 {현재운송.봉인번호}"
             : "해당 없음";
 
-    private string RecipientName => 현재운송 is null ? "-" : $"{현재운송.하차지} 담당자";
+    private string RecipientName => string.IsNullOrWhiteSpace(현재운송?.수령자명)
+        ? "하차지 담당자"
+        : 현재운송.수령자명;
 
-    private string RecipientMaskedPhone => "010-****-2401";
+    private string RecipientPhone => string.IsNullOrWhiteSpace(현재운송?.수령자연락처)
+        ? "연락처 미등록"
+        : 현재운송.수령자연락처;
+
+    private string RecipientMaskedPhone => MaskPhone(현재운송?.수령자연락처);
+
+    private string RecipientDeliveryRequest => string.IsNullOrWhiteSpace(현재운송?.전달요청)
+        ? "도착 전 연락 후 하차 완료 사진을 남깁니다."
+        : 현재운송.전달요청;
 
     private string RecipientPaymentMethod => 현재운송 is null || string.IsNullOrWhiteSpace(현재운송.결제방식)
         ? "인수증 또는 현장 결제 확인"
@@ -279,6 +322,19 @@
     private string RecipientProofHint => 현재운송?.인수증필요 == true
         ? 현재운송.인수증서명필수 ? "상차 인수증 서명 필수 + 하차 사진" : "상차 인수증 서명 선택 + 하차 사진"
         : "하차 사진 + 수령자 확인";
+
+    private static string MaskPhone(string? phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return "연락처 미등록";
+        }
+
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        return digits.Length >= 8
+            ? $"{digits[..3]}-****-{digits[^4..]}"
+            : "연락처 확인";
+    }
 
     private IReadOnlyList<TransportTimelineStep> TransportTimeline =>
     [

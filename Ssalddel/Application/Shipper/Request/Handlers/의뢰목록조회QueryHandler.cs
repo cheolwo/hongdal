@@ -37,7 +37,8 @@ public sealed class 의뢰목록조회QueryHandler : IRequestHandler<의뢰목�
         }
         else
         {
-            query = query.Where(r => r.화주Id == currentUserId || (r.화주Id == string.Empty && r.주문자UserId == currentUserId));
+            query = query.Where(r => r.주문자UserId == currentUserId
+                                     || (r.주문자UserId == string.Empty && r.화주Id == currentUserId));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Status))
@@ -61,6 +62,19 @@ public sealed class 의뢰목록조회QueryHandler : IRequestHandler<의뢰목�
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return items.Select(화주운송의뢰매퍼.To응답).ToList();
+        var executionByRequestId = await 화주운송실행정보조회.조회Async(
+            _db,
+            items.Select(x => x.의뢰Id).ToList(),
+            cancellationToken);
+
+        return items.Select(item =>
+        {
+            executionByRequestId.TryGetValue(item.의뢰Id, out var execution);
+            return 화주운송의뢰매퍼.To응답(
+                item,
+                execution?.운송원장,
+                execution?.기사,
+                execution?.최근위치);
+        }).ToList();
     }
 }

@@ -7,14 +7,17 @@ namespace DriverApp.Services;
 public sealed class DriverRecommendationDecisionService : IDriverRecommendationDecisionService
 {
     private readonly IDriverDispatchActionApiService _dispatchActionApi;
+    private readonly IDriverSampleDataService _driverData;
     private readonly ITransportRequestLedgerObserver _ledgerObserver;
     private readonly Dictionary<string, RecommendationDecisionState> _decisions = new(StringComparer.OrdinalIgnoreCase);
 
     public DriverRecommendationDecisionService(
         IDriverDispatchActionApiService dispatchActionApi,
+        IDriverSampleDataService driverData,
         ITransportRequestLedgerObserver ledgerObserver)
     {
         _dispatchActionApi = dispatchActionApi;
+        _driverData = driverData;
         _ledgerObserver = ledgerObserver;
     }
 
@@ -34,11 +37,18 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     public async Task<RecommendationDecisionState> AcceptAsync(DriverRequestItem request, CancellationToken cancellationToken = default)
     {
-        await _dispatchActionApi.수락Async(request.의뢰Id, cancellationToken);
-        _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.Accepted");
+        var response = await _dispatchActionApi.수락Async(request.의뢰Id, cancellationToken);
+        var verified = await RefreshServerLedgerAsync(
+            request.의뢰Id,
+            "DriverApp.Accepted",
+            cancellationToken);
         return SaveAccepted(
             request,
-            "살뜰 서비스에서 배차 수락 처리되었습니다.");
+            verified
+                ? response?.Message ?? "살뜰 서비스의 최신 원장에서 배차 수락을 확인했습니다."
+                : "배차 수락은 처리됐지만 최신 원장 재조회에 실패했습니다. 새로고침해 상태를 확인해 주세요.",
+            updateRequest: false,
+            observeRequest: false);
     }
 
     public RecommendationDecisionState Hold(DriverRequestItem request)
@@ -66,14 +76,24 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             request.의뢰Id,
             new 기사배차수락취소요청 { 사유 = reason },
             cancellationToken);
-        _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.AcceptanceCanceled");
-        var memo = "살뜰 서비스에서 배차 수락 취소가 접수되었습니다.";
+        var verified = await RefreshServerLedgerAsync(
+            request.의뢰Id,
+            "DriverApp.AcceptanceCanceled",
+            cancellationToken);
+        var memo = verified
+            ? "살뜰 서비스의 최신 원장에서 배차 수락 취소를 확인했습니다."
+            : "배차 수락 취소는 처리됐지만 최신 원장 재조회에 실패했습니다. 새로고침해 상태를 확인해 주세요.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
             memo = $"{memo} 사유: {reason}";
         }
 
-        return SaveAcceptanceCanceled(request, reason, memo);
+        return SaveAcceptanceCanceled(
+            request,
+            reason,
+            memo,
+            updateRequest: false,
+            observeRequest: false);
     }
 
     public RecommendationDecisionState Reject(DriverRequestItem request, string reason)
@@ -90,58 +110,123 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             request.의뢰Id,
             new 기사배차거절요청 { 사유 = reason },
             cancellationToken);
-        _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.Rejected");
-        var memo = "살뜰 서비스에서 배차 거절 처리되었습니다.";
+        var verified = await RefreshServerLedgerAsync(
+            request.의뢰Id,
+            "DriverApp.Rejected",
+            cancellationToken);
+        var memo = verified
+            ? "살뜰 서비스의 최신 원장에서 배차 거절을 확인했습니다."
+            : "배차 거절은 처리됐지만 최신 원장 재조회에 실패했습니다. 새로고침해 상태를 확인해 주세요.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
             memo = $"{memo} 사유: {reason}";
         }
 
-        return SaveRejected(request, reason, memo);
+        return SaveRejected(
+            request,
+            reason,
+            memo,
+            updateRequest: false,
+            observeRequest: false);
     }
 
-    private RecommendationDecisionState SaveAccepted(DriverRequestItem request, string memo)
+    private async Task<bool> RefreshServerLedgerAsync(
+        string requestId,
+        string source,
+        CancellationToken cancellationToken)
     {
-        request.배차상태 = "배차확정";
-        request.상태 = "수락완료";
+        _ledgerObserver.RequestRefresh(requestId, source);
+        try
+        {
+            await _driverData.RefreshAsync(cancellationToken, force: true);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private RecommendationDecisionState SaveAccepted(
+        DriverRequestItem request,
+        string memo,
+        bool updateRequest = true,
+        bool observeRequest = true)
+    {
+        if (updateRequest)
+        {
+            request.배차상태 = "배차확정";
+            request.상태 = "수락완료";
+        }
+
         return Save(
             request,
             DriverRecommendationDecisionCode.Accepted,
             memo,
-            DriverRecommendationDecisionFollowUpPlan.ForAccepted(request.의뢰Id));
+            DriverRecommendationDecisionFollowUpPlan.ForAccepted(request.의뢰Id),
+            observeRequest);
     }
 
-    private RecommendationDecisionState SaveAcceptanceCanceled(DriverRequestItem request, string reason, string memo)
+    private RecommendationDecisionState SaveAcceptanceCanceled(
+        DriverRequestItem request,
+        string reason,
+        string memo,
+        bool updateRequest = true,
+        bool observeRequest = true)
     {
-        request.배차상태 = "수락취소";
-        request.상태 = "재배차필요";
+        if (updateRequest)
+        {
+            request.배차상태 = "수락취소";
+            request.상태 = "재배차필요";
+        }
+
         return Save(
             request,
             DriverRecommendationDecisionCode.AcceptanceCanceled,
             memo,
-            DriverRecommendationDecisionFollowUpPlan.ForAcceptanceCanceled(request.의뢰Id, reason));
+            DriverRecommendationDecisionFollowUpPlan.ForAcceptanceCanceled(request.의뢰Id, reason),
+            observeRequest);
     }
 
-    private RecommendationDecisionState SaveRejected(DriverRequestItem request, string reason, string memo)
+    private RecommendationDecisionState SaveRejected(
+        DriverRequestItem request,
+        string reason,
+        string memo,
+        bool updateRequest = true,
+        bool observeRequest = true)
     {
-        request.배차상태 = "거절";
-        request.상태 = "추천제외";
+        if (updateRequest)
+        {
+            request.배차상태 = "거절";
+            request.상태 = "추천제외";
+        }
+
         return Save(
             request,
             DriverRecommendationDecisionCode.Rejected,
             memo,
-            DriverRecommendationDecisionFollowUpPlan.ForRejected(request.의뢰Id, reason));
+            DriverRecommendationDecisionFollowUpPlan.ForRejected(request.의뢰Id, reason),
+            observeRequest);
     }
 
     private RecommendationDecisionState Save(
         DriverRequestItem request,
         string decision,
         string memo,
-        DriverRecommendationDecisionFollowUpPlan followUpPlan)
+        DriverRecommendationDecisionFollowUpPlan followUpPlan,
+        bool observeRequest = true)
     {
         var state = new RecommendationDecisionState(request.의뢰Id, decision, memo, DateTime.Now, followUpPlan);
         _decisions[request.의뢰Id] = state;
-        Observe(request, $"DriverApp.Decision.{decision}");
+        if (observeRequest)
+        {
+            Observe(request, $"DriverApp.Decision.{decision}");
+        }
+
         Changed?.Invoke();
         return state;
     }

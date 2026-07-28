@@ -34,6 +34,20 @@ internal static class ShipperTransportModule
         services.AddSingleton<SampleShipperOperationsService>();
         services.AddScoped<FakeShipperPaymentService>();
         services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
+        services.AddSingleton(provider =>
+        {
+            var httpClient = provider.GetRequiredService<HttpClient>();
+            var authSession = provider.GetRequiredService<IAuthSession>();
+            return new TransportRequestLedgerRealtimeClient(
+                httpClient.BaseAddress
+                ?? throw new InvalidOperationException("Ssalddel API BaseAddress가 설정되어 있지 않습니다."),
+                async cancellationToken =>
+                {
+                    await authSession.RestoreAsync(cancellationToken);
+                    return authSession.AccessToken;
+                },
+                provider.GetRequiredService<ITransportRequestLedgerObserver>());
+        });
         services.AddScoped<ServerBackedShipperOperationsService>();
         services.AddScoped<IShipperOperationsService, SmokeAwareShipperOperationsService>();
         services.AddSingleton<IAppCommandHandler<AddShipperRequestCommand, bool>, AddShipperRequestCommandHandler>();

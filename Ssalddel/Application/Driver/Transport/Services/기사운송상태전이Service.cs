@@ -1,4 +1,5 @@
 using FluentResults;
+using 살뜰.도메인.공통;
 using 살뜰.도메인.운송;
 
 namespace Ssalddel.Application.Driver.Transport;
@@ -17,6 +18,7 @@ public sealed class 기사운송상태전이Service : I기사운송상태전이S
             기사운송상태코드.배차대기,
             기사운송상태코드.매칭중,
             기사운송상태코드.배차확정,
+            상태값.배차대기상태.확정,
             기사운송상태코드.이동중
         ],
         [기사운송상태코드.상차완료] = [기사운송상태코드.상차지도착],

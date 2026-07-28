@@ -1,9 +1,11 @@
 using System.Text.Json;
 using FluentResults;
 using Ssalddel.Application.CommandProcessing;
+using Ssalddel.Application.Shipper.Payment.Events;
 using Ssalddel.Contracts.Shipper.Payment;
 using Microsoft.Extensions.Hosting;
 using 살뜰.도메인.결제;
+using 살뜰.도메인.설정;
 using 살뜰.Services.Options;
 
 namespace Ssalddel.Application.Shipper.Payment;
@@ -53,6 +55,7 @@ public sealed class 페이크결제승인CommandHandler : IRequestHandler<페이
         var alreadyCompletedPayment = await FindCompletedFakePaymentAsync(requestId, cancellationToken);
         if (shipperRequest.결제상태 == 상태값.결제상태.결제완료 && alreadyCompletedPayment is not null)
         {
+            await EnsurePaymentApprovedOutboxAsync(alreadyCompletedPayment, cancellationToken);
             return Result.Ok(ToResponse(alreadyCompletedPayment, alreadyCompleted: true));
         }
 
@@ -124,10 +127,58 @@ public sealed class 페이크결제승인CommandHandler : IRequestHandler<페이
         shipperRequest.결제예정금액 ??= amount;
         shipperRequest.UpdatedAt = now;
 
+        await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
+
         await _db.결제.AddAsync(payment, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
+        await EnsurePaymentApprovedOutboxAsync(payment, cancellationToken);
+        await tx.CommitAsync(cancellationToken);
 
         return Result.Ok(ToResponse(payment, alreadyCompleted: false));
+    }
+
+    private async Task EnsurePaymentApprovedOutboxAsync(결제 payment, CancellationToken cancellationToken)
+    {
+        if (payment.Id <= 0)
+        {
+            throw new InvalidOperationException("FakePG 결제 레코드가 저장되기 전에 결제완료 Outbox를 생성할 수 없습니다.");
+        }
+
+        var exists = await _db.결제승인완료Outbox
+            .AsNoTracking()
+            .AnyAsync(x => x.결제레코드Id == payment.Id, cancellationToken);
+        if (exists)
+        {
+            return;
+        }
+
+        var approvedAtUtc = payment.승인일시 ?? payment.CreatedAt;
+        var eventPayload = new 결제승인완료Event(
+            payment.Id,
+            payment.결제Id,
+            payment.결제대상유형,
+            payment.대상Id,
+            payment.결제제공자,
+            payment.결제금액,
+            payment.통화,
+            approvedAtUtc);
+
+        _db.결제승인완료Outbox.Add(new 결제승인완료Outbox
+        {
+            결제레코드Id = payment.Id,
+            결제Id = payment.결제Id,
+            결제대상유형 = payment.결제대상유형,
+            대상Id = payment.대상Id,
+            결제제공자 = payment.결제제공자,
+            결제금액 = payment.결제금액,
+            통화 = payment.통화,
+            승인일시Utc = approvedAtUtc,
+            PayloadJson = JsonSerializer.Serialize(eventPayload, JsonOptions),
+            처리상태 = "Pending",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        });
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     private async Task<결제?> FindCompletedFakePaymentAsync(string requestId, CancellationToken cancellationToken)

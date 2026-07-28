@@ -8,6 +8,7 @@ using Ssalddel.Contracts.Driver.Settlement;
 using Ssalddel.Contracts.Driver.Transport;
 using Ssalddel.Contracts.Driver.Work;
 using Microsoft.Extensions.Options;
+using Ssalddel.Client.Infrastructure.Transport;
 
 namespace DriverApp.Services.Samples;
 
@@ -21,6 +22,8 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
     private readonly IDriverWorkApiService _workApi;
     private readonly 기사샘플데이터Service _sampleFallback;
     private readonly IOptions<ClientDataModeOptions> _dataModeOptions;
+    private readonly TransportRequestLedgerRealtimeClient _realtimeClient;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
     private bool _loaded;
     private string? _loadedAccessToken;
@@ -41,7 +44,9 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         IDriverReservationApiService reservationApi,
         IDriverWorkApiService workApi,
         기사샘플데이터Service sampleFallback,
-        IOptions<ClientDataModeOptions> dataModeOptions)
+        IOptions<ClientDataModeOptions> dataModeOptions,
+        TransportRequestLedgerRealtimeClient realtimeClient,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _authSession = authSession;
         _transportApi = transportApi;
@@ -51,6 +56,9 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         _workApi = workApi;
         _sampleFallback = sampleFallback;
         _dataModeOptions = dataModeOptions;
+        _realtimeClient = realtimeClient;
+        _ledgerObserver = ledgerObserver;
+        _ledgerObserver.RefreshRequested += OnLedgerRefreshRequested;
         ApplyEmptyState();
     }
 
@@ -68,6 +76,15 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
                 _loaded = false;
                 _loadedAccessToken = null;
                 return;
+            }
+
+            try
+            {
+                await _realtimeClient.StartAsync(cancellationToken);
+            }
+            catch
+            {
+                // 실시간 연결 실패 시 기존 30초 보완 조회와 수동 새로고침을 유지합니다.
             }
 
             if (!string.Equals(_loadedAccessToken, accessToken, StringComparison.Ordinal))
@@ -100,6 +117,9 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             _refreshGate.Release();
         }
     }
+
+    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest request)
+        => _ = RefreshAsync(force: true);
 
     public 기사근무샘플상태 근무상태 => _근무상태;
 
@@ -144,7 +164,8 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 
     public 기사운송샘플항목? 현재운송조회()
     {
-        return _운송목록.FirstOrDefault();
+        return _운송목록.FirstOrDefault(x =>
+            !string.Equals(x.현재단계, "인수완료", StringComparison.Ordinal));
     }
 
     private async Task LoadLiveServerDataAsync(CancellationToken cancellationToken)
@@ -275,7 +296,12 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             source.인수증필요,
             source.인수증서명필수,
             string.IsNullOrWhiteSpace(source.결제방식) ? "서버 정산" : source.결제방식,
-            ResolveNextTransportAction(source.상태));
+            ResolveNextTransportAction(source.상태))
+        {
+            수령자명 = source.수령자명,
+            수령자연락처 = source.수령자연락처,
+            전달요청 = source.전달요청
+        };
     }
 
     private static 기사예약샘플항목 ToReservationItem(기사예약목록응답 source)

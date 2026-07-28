@@ -68,6 +68,23 @@ public class 기사운송상태전이ServiceTests
     }
 
     [Fact]
+    public void 상태변경_배차대기확정후_상차지도착으로_전이할수있다()
+    {
+        var 변경시각 = new DateTime(2026, 7, 1, 9, 10, 0, DateTimeKind.Utc);
+        var 운송 = new 운송원장
+        {
+            상태 = "확정",
+            UpdatedAt = 변경시각.AddMinutes(-5)
+        };
+
+        var result = _service.상태변경(운송, "상차지도착", 변경시각);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("상차지도착", 운송.상태);
+        Assert.Equal(변경시각, 운송.UpdatedAt);
+    }
+
+    [Fact]
     public void 상태변경_같은상태로_요청하면_UpdatedAt만_갱신한다()
     {
         var 기존출발시각 = new DateTime(2026, 7, 1, 8, 0, 0, DateTimeKind.Utc);

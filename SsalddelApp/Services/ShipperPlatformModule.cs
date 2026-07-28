@@ -18,6 +18,11 @@ internal static class ShipperPlatformModule
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<IAuthSession, AuthSession>();
         services.AddSingleton<ISsalddelMobilePushTokenProvider, NullSsalddelMobilePushTokenProvider>();
+        services.AddSingleton(provider =>
+            new SsalddelMobilePushInstallationClient(
+                provider.GetRequiredService<HttpClient>(),
+                provider.GetRequiredService<ISsalddelMobilePushTokenProvider>(),
+                () => provider.GetRequiredService<IAuthSession>().AccessToken));
         services.AddScoped<AuthApiService>();
         services.AddSingleton<I꾸미기보유권LocalStore, Maui꾸미기보유권LocalStore>();
         services.AddScoped<꾸미기보유권동기화Service>();

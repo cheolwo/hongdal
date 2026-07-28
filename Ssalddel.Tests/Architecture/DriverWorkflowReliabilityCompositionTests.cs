@@ -41,6 +41,40 @@ public sealed class DriverWorkflowReliabilityCompositionTests
     }
 
     [Fact]
+    public void 운송원장SignalR수신은_기사Cache강제재조회와30초보완조회에연결된다()
+    {
+        var service = Read("DriverApp/Services/Samples/ServerBackedDriverSampleDataService.cs");
+        var realtimeClient = Read("Ssalddel.Client.Infrastructure/Transport/TransportRequestLedgerRealtimeClient.cs");
+        var refreshPolicy = Read("Ssalddel.Client.Infrastructure/Transport/TransportRequestLedgerObserver.cs");
+
+        Assert.Contains("_realtimeClient.StartAsync", service);
+        Assert.Contains("_ledgerObserver.RefreshRequested += OnLedgerRefreshRequested", service);
+        Assert.Contains("RefreshAsync(force: true)", service);
+        Assert.Contains("TransportRequestLedgerRealtime.ChangedMethod", realtimeClient);
+        Assert.Contains("_observer.RequestRefresh", realtimeClient);
+        Assert.Contains("TimeSpan.FromSeconds(30)", refreshPolicy);
+    }
+
+    [Fact]
+    public void 배차결정은_서버Command뒤_원장을강제재조회하고_기존추천객체를성공상태로꾸미지않는다()
+    {
+        var source = Read("DriverApp/Services/DriverRecommendationDecisionService.cs");
+        var acceptMethod = source[
+            source.IndexOf("public async Task<RecommendationDecisionState> AcceptAsync", StringComparison.Ordinal)
+            ..source.IndexOf("public RecommendationDecisionState Hold", StringComparison.Ordinal)];
+
+        Assert.True(
+            acceptMethod.IndexOf("_dispatchActionApi.수락Async", StringComparison.Ordinal)
+            < acceptMethod.IndexOf("RefreshServerLedgerAsync", StringComparison.Ordinal));
+        Assert.True(
+            acceptMethod.IndexOf("RefreshServerLedgerAsync", StringComparison.Ordinal)
+            < acceptMethod.IndexOf("SaveAccepted", StringComparison.Ordinal));
+        Assert.Contains("_driverData.RefreshAsync(cancellationToken, force: true)", source);
+        Assert.Contains("updateRequest: false", acceptMethod);
+        Assert.Contains("observeRequest: false", acceptMethod);
+    }
+
+    [Fact]
     public void 운행종료는_서버확정뒤_단말위치송신을중지한다()
     {
         var source = Read("DriverApp/ViewModels/Driver/Work/기사운행시작PageViewModel.cs");

@@ -4,6 +4,7 @@
 @inject 추천카드표시설정Service CardPreferenceService
 @inject IDriverRecommendationDecisionService DecisionService
 @using DriverApp.Models.Driver
+@using Ssalddel.Client.Infrastructure.Transport
 @implements IDisposable
 
 <PageTitle>추천목록</PageTitle>
@@ -272,6 +273,8 @@
     private async Task RunTimerAsync(CancellationToken cancellationToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        var nextServerRefresh = DateTime.UtcNow
+            + TransportRequestLedgerRefreshPolicy.FallbackPollingInterval;
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
@@ -279,6 +282,13 @@
                 await InvokeAsync(async () =>
                 {
                     await 자동미응답거절처리Async(cancellationToken);
+                    if (DateTime.UtcNow >= nextServerRefresh)
+                    {
+                        await 데이터조회Async(force: true);
+                        nextServerRefresh = DateTime.UtcNow
+                            + TransportRequestLedgerRefreshPolicy.FallbackPollingInterval;
+                    }
+
                     StateHasChanged();
                 });
             }

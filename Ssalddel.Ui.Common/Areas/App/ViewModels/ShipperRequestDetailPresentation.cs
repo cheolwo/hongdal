@@ -40,6 +40,14 @@ public sealed record ShipperRequestDetailSnapshot
     public string PaymentStatus { get; init; } = string.Empty;
     public string SettlementStatus { get; init; } = string.Empty;
     public string DispatchStatus { get; init; } = string.Empty;
+    public string TransportStatus { get; init; } = string.Empty;
+    public DateTime? TransportLedgerUpdatedAtUtc { get; init; }
+    public string AssignedDriverId { get; init; } = string.Empty;
+    public string AssignedDriverName { get; init; } = string.Empty;
+    public string AssignedDriverVehicle { get; init; } = string.Empty;
+    public decimal? DriverLatitude { get; init; }
+    public decimal? DriverLongitude { get; init; }
+    public DateTime? DriverLocationRecordedAtUtc { get; init; }
     public string TransportMethod { get; init; } = string.Empty;
     public string VehicleType { get; init; } = string.Empty;
     public string PaymentMethod { get; init; } = string.Empty;
@@ -75,6 +83,14 @@ public sealed record ShipperRequestDetailSnapshot
             PaymentStatus = source.결제상태,
             SettlementStatus = source.정산상태,
             DispatchStatus = source.배차상태,
+            TransportStatus = source.운송상태,
+            TransportLedgerUpdatedAtUtc = source.운송원장갱신일시Utc,
+            AssignedDriverId = source.확정기사Id ?? string.Empty,
+            AssignedDriverName = source.확정기사명 ?? string.Empty,
+            AssignedDriverVehicle = source.확정기사차량 ?? string.Empty,
+            DriverLatitude = source.기사최근위도,
+            DriverLongitude = source.기사최근경도,
+            DriverLocationRecordedAtUtc = source.기사최근위치시각Utc,
             TransportMethod = source.운송방식,
             VehicleType = source.차량종류,
             PaymentMethod = source.결제수단,
@@ -131,6 +147,56 @@ public sealed record ShipperRequestPaymentReceiptPresentation(
 
 public static class ShipperRequestDetailPresentation
 {
+    public static readonly TimeSpan DriverLocationFreshnessWindow = TimeSpan.FromMinutes(10);
+
+    public static string ResolveDriverLocationFreshness(
+        ShipperRequestDetailSnapshot item,
+        DateTime? nowUtc = null)
+    {
+        if (string.IsNullOrWhiteSpace(item.AssignedDriverId))
+        {
+            return "배차 전";
+        }
+
+        if (!item.DriverLocationRecordedAtUtc.HasValue)
+        {
+            return ContainsAny(item.TransportStatus, "하차완료", "인수완료", "완료", "취소")
+                ? "운송 종료 후 비공개"
+                : "위치 미수신";
+        }
+
+        var referenceUtc = nowUtc ?? DateTime.UtcNow;
+        var recordedAtUtc = item.DriverLocationRecordedAtUtc.Value.ToUniversalTime();
+        var age = referenceUtc.ToUniversalTime() - recordedAtUtc;
+        if (age <= DriverLocationFreshnessWindow)
+        {
+            return "최신 위치";
+        }
+
+        var delayedMinutes = Math.Max(1, (int)Math.Floor(age.TotalMinutes));
+        return $"위치 갱신 지연 {delayedMinutes:N0}분";
+    }
+
+    public static bool IsDriverLocationStale(
+        ShipperRequestDetailSnapshot item,
+        DateTime? nowUtc = null)
+    {
+        if (!item.DriverLocationRecordedAtUtc.HasValue)
+        {
+            return false;
+        }
+
+        var referenceUtc = nowUtc ?? DateTime.UtcNow;
+        return referenceUtc.ToUniversalTime()
+               - item.DriverLocationRecordedAtUtc.Value.ToUniversalTime()
+               > DriverLocationFreshnessWindow;
+    }
+
+    public static string ResolveEtaStatus(ShipperRequestDetailSnapshot item)
+        => ContainsAny(item.TransportStatus, "하차완료", "인수완료", "완료")
+            ? "도착 완료"
+            : "미산정 · 경로·교통 정보 연결 전";
+
     public static IReadOnlyList<ShipperRequestTimelineStep> BuildTimeline(ShipperRequestDetailSnapshot item)
         =>
         [

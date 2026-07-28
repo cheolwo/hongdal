@@ -232,6 +232,9 @@ public sealed class 운송상태화주알림EventHandler :
         var request = context.화주운송의뢰;
         var transport = context.운송;
         var now = DateTime.UtcNow;
+        var targetUserId = string.IsNullOrWhiteSpace(request.주문자UserId)
+            ? request.화주Id
+            : request.주문자UserId;
 
         _db.Command알림Outbox.Add(new Command알림Outbox
         {
@@ -242,7 +245,7 @@ public sealed class 운송상태화주알림EventHandler :
             PayloadJson = JsonSerializer.Serialize(new
             {
                 알림유형 = 요청.알림유형,
-                TargetUserId = request.화주Id,
+                TargetUserId = targetUserId,
                 ShipperUserId = request.화주Id,
                 DriverId = 요청.기사Id,
                 RequestId = request.의뢰Id,

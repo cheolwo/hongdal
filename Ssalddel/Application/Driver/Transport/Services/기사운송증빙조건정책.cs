@@ -1,6 +1,12 @@
 namespace Ssalddel.Application.Driver.Transport;
 
-public sealed record 기사운송증빙조건(string 결제수단, string 증빙방식, string 요청사항, string 정산메모)
+public sealed record 기사운송증빙조건(
+    string 결제수단,
+    string 증빙방식,
+    string 요청사항,
+    string 정산메모,
+    string 수령자명 = "",
+    string 수령자연락처 = "")
 {
     public static readonly 기사운송증빙조건 Empty = new(string.Empty, string.Empty, string.Empty, string.Empty);
 }

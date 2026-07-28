@@ -16,6 +16,8 @@ public sealed class AuthSession : IAuthSession
 
     public string? AccessToken { get; private set; }
     public string? RefreshToken { get; private set; }
+    public DateTime AccessTokenExpiresAtUtc { get; private set; }
+    public DateTime RefreshTokenExpiresAtUtc { get; private set; }
     public string? UserId { get; private set; }
     public string? UserName { get; private set; }
     public IReadOnlyList<string> Roles { get; private set; } = Array.Empty<string>();
@@ -55,6 +57,8 @@ public sealed class AuthSession : IAuthSession
     {
         AccessToken = null;
         RefreshToken = null;
+        AccessTokenExpiresAtUtc = default;
+        RefreshTokenExpiresAtUtc = default;
         UserId = null;
         UserName = null;
         Roles = Array.Empty<string>();
@@ -66,6 +70,8 @@ public sealed class AuthSession : IAuthSession
     {
         AccessToken = snapshot.AccessToken;
         RefreshToken = snapshot.RefreshToken;
+        AccessTokenExpiresAtUtc = snapshot.AccessTokenExpiresAtUtc;
+        RefreshTokenExpiresAtUtc = snapshot.RefreshTokenExpiresAtUtc;
         UserId = snapshot.UserId;
         UserName = snapshot.UserName;
         Roles = snapshot.Roles;

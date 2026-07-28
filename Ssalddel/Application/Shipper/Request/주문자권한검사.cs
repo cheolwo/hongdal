@@ -9,6 +9,16 @@ internal static class 주문자권한검사
         return string.Equals(currentUserAccessor.Role, 역할명.서버관리자, StringComparison.OrdinalIgnoreCase);
     }
 
+    internal static string ResolveShipperId(
+        ICurrentUserAccessor currentUserAccessor,
+        string currentUserId,
+        string? requestedShipperId)
+    {
+        return IsServerAdmin(currentUserAccessor) && !string.IsNullOrWhiteSpace(requestedShipperId)
+            ? requestedShipperId.Trim()
+            : currentUserId;
+    }
+
     internal static bool IsOwner(살뜰.도메인.화주.화주운송의뢰 entity, string? currentUserId)
     {
         if (string.IsNullOrWhiteSpace(currentUserId))

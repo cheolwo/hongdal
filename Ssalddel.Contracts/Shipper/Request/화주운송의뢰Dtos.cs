@@ -307,6 +307,24 @@ public sealed class 화주운송의뢰응답
     public string 결제상태 { get; set; } = string.Empty;
     public string 정산상태 { get; set; } = string.Empty;
     public string 배차상태 { get; set; } = string.Empty;
+    public string 운송상태 { get; set; } = string.Empty;
+    public DateTime? 운송원장갱신일시Utc { get; set; }
+    public string? 확정기사Id { get; set; }
+    public string? 확정기사명 { get; set; }
+    public string? 확정기사차량 { get; set; }
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.LocationCoordinate,
+        "배차 확정 후 진행 중인 운송 위치 확인",
+        DomainCode = IsmsPDomainCode.ProtectionSafeguards,
+        ProtectionNote = "운송 종료 전 화주 본인 또는 관리자 조회에서만 노출")]
+    public decimal? 기사최근위도 { get; set; }
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.LocationCoordinate,
+        "배차 확정 후 진행 중인 운송 위치 확인",
+        DomainCode = IsmsPDomainCode.ProtectionSafeguards,
+        ProtectionNote = "운송 종료 전 화주 본인 또는 관리자 조회에서만 노출")]
+    public decimal? 기사최근경도 { get; set; }
+    public DateTime? 기사최근위치시각Utc { get; set; }
     public string 운송방식 { get; set; } = string.Empty;
     public string 차량종류 { get; set; } = string.Empty;
     public string 결제수단 { get; set; } = string.Empty;

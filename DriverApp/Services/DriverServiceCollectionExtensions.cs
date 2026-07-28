@@ -39,6 +39,23 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
         services.AddSingleton<IAuthSession, AuthSession>();
+        services.AddSingleton<AuthApiService>();
+        services.AddSingleton(provider =>
+        {
+            var httpClient = provider.GetRequiredService<HttpClient>();
+            var authSession = provider.GetRequiredService<IAuthSession>();
+            var authApiService = provider.GetRequiredService<AuthApiService>();
+            return new TransportRequestLedgerRealtimeClient(
+                httpClient.BaseAddress
+                ?? throw new InvalidOperationException("Ssalddel API BaseAddress가 설정되어 있지 않습니다."),
+                async cancellationToken =>
+                {
+                    var error = await authApiService.EnsureAccessTokenAsync(
+                        cancellationToken: cancellationToken);
+                    return string.IsNullOrWhiteSpace(error) ? authSession.AccessToken : null;
+                },
+                provider.GetRequiredService<ITransportRequestLedgerObserver>());
+        });
         services.AddSingleton<DriverAccessPolicyService>();
         services.AddSingleton<DriverHomeDisplayPreferenceService>();
         services.AddSingleton<IDriverHomeMapService, DriverHomeMapService>();
@@ -72,7 +89,6 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<I공통콘텐츠Service, Http공통콘텐츠Service>();
         services.AddSingleton<DriverViewVisibilityService>();
         services.AddSingleton<IDriverNativeMapNavigator, DriverNativeMapNavigator>();
-        services.AddScoped<AuthApiService>();
         services.AddSingleton<IDriverTransportApiService, DriverTransportApiService>();
         services.AddSingleton<HttpDriverTransportCompletionPhotoService>();
         services.AddSingleton<IDriverTransportCompletionPhotoService>(sp => sp.GetRequiredService<HttpDriverTransportCompletionPhotoService>());

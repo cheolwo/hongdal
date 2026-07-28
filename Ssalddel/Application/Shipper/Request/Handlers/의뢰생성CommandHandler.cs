@@ -83,14 +83,18 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             return Result.Fail<화주운송의뢰응답>("dropoff.window.startAt must be before endAt");
         }
 
-        var shipperId = string.IsNullOrWhiteSpace(request.화주Id) ? currentUserId : request.화주Id.Trim();
+        var isServerAdmin = 주문자권한검사.IsServerAdmin(_currentUserAccessor);
+        var shipperId = 주문자권한검사.ResolveShipperId(_currentUserAccessor, currentUserId, request.화주Id);
         var clientRequestId = request.클라이언트요청Id?.Trim() ?? string.Empty;
         if (!string.IsNullOrWhiteSpace(clientRequestId))
         {
             var duplicate = await _db.화주운송의뢰
                 .AsNoTracking()
                 .FirstOrDefaultAsync(
-                    r => (r.화주Id == shipperId || (r.화주Id == string.Empty && r.주문자UserId == currentUserId))
+                    r => (isServerAdmin
+                            ? r.화주Id == shipperId
+                            : r.주문자UserId == currentUserId
+                              || (r.주문자UserId == string.Empty && r.화주Id == currentUserId))
                          && r.클라이언트요청Id == clientRequestId,
                     cancellationToken);
             if (duplicate != null)

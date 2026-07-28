@@ -25,7 +25,15 @@ public sealed class 운송상세조회QueryHandler : IRequestHandler<운송상�
         var shipperRequest = await _db.화주운송의뢰
             .AsNoTracking()
             .Where(x => x.의뢰Id == entity.운송번호)
-            .Select(x => new { x.결제수단, x.증빙방식, x.요청사항, x.정산메모 })
+            .Select(x => new
+            {
+                x.결제수단,
+                x.증빙방식,
+                x.요청사항,
+                x.정산메모,
+                x.하차_연락처_이름,
+                x.하차_연락처_전화번호
+            })
             .FirstOrDefaultAsync(cancellationToken);
 
         return new 기사운송상세응답
@@ -40,6 +48,9 @@ public sealed class 운송상세조회QueryHandler : IRequestHandler<운송상�
             도착 = entity.도착,
             운임 = entity.운임,
             결제방식 = shipperRequest?.결제수단 ?? string.Empty,
+            수령자명 = shipperRequest?.하차_연락처_이름 ?? string.Empty,
+            수령자연락처 = shipperRequest?.하차_연락처_전화번호 ?? string.Empty,
+            전달요청 = shipperRequest?.요청사항 ?? string.Empty,
             인수증필요 = 기사운송증빙조건정책.인수증필요(shipperRequest?.증빙방식, shipperRequest?.결제수단),
             인수증서명필수 = 기사운송증빙조건정책.인수증서명필수(shipperRequest?.요청사항, shipperRequest?.정산메모),
             UpdatedAt = entity.UpdatedAt,

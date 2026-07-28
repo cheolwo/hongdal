@@ -6,6 +6,8 @@ namespace DriverApp.Services;
 public interface IAuthSession : ISsalddelAccessTokenProvider
 {
     string? RefreshToken { get; }
+    DateTime AccessTokenExpiresAtUtc { get; }
+    DateTime RefreshTokenExpiresAtUtc { get; }
     string? UserId { get; }
     string? UserName { get; }
     IReadOnlyList<string> Roles { get; }

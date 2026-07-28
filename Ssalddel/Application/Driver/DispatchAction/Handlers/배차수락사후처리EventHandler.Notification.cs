@@ -19,10 +19,13 @@ public sealed partial class 배차수락사후처리EventHandler
         }
 
         var now = DateTime.UtcNow;
+        var targetUserId = string.IsNullOrWhiteSpace(dispatchRequest.주문자UserId)
+            ? notification.화주Id
+            : dispatchRequest.주문자UserId;
         var payloadJson = JsonSerializer.Serialize(new
         {
             알림유형 = "배차수락",
-            TargetUserId = notification.화주Id,
+            TargetUserId = targetUserId,
             ShipperUserId = notification.화주Id,
             DriverId = notification.기사Id,
             RequestId = notification.의뢰Id,

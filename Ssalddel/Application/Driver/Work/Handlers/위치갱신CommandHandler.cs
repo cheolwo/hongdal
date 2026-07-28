@@ -6,6 +6,7 @@ using 살뜰.Services.Dispatch.Queue;
 using 살뜰.Services.Dispatch.Recommendation;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.External.Naver;
+using 살뜰.Services.Transport;
 
 namespace Ssalddel.Application.Driver.Work;
 
@@ -20,6 +21,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
     private readonly I참여자실행권한검사 _권한검사;
     private readonly ICommunityDriverAvailabilityService _communityDriverAvailabilityService;
     private readonly INaverMapsReverseGeocodingService _reverseGeocodingService;
+    private readonly ITransportRequestLedgerRealtimeService _transportLedgerRealtimeService;
     private readonly ILogger<위치갱신CommandHandler> _logger;
 
     public 위치갱신CommandHandler(
@@ -32,6 +34,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         I참여자실행권한검사 권한검사,
         ICommunityDriverAvailabilityService communityDriverAvailabilityService,
         INaverMapsReverseGeocodingService reverseGeocodingService,
+        ITransportRequestLedgerRealtimeService transportLedgerRealtimeService,
         ILogger<위치갱신CommandHandler> logger)
     {
         _db = db;
@@ -43,6 +46,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         _권한검사 = 권한검사;
         _communityDriverAvailabilityService = communityDriverAvailabilityService;
         _reverseGeocodingService = reverseGeocodingService;
+        _transportLedgerRealtimeService = transportLedgerRealtimeService;
         _logger = logger;
     }
 
@@ -99,6 +103,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         });
 
         await _db.SaveChangesAsync(cancellationToken);
+        await PublishActiveTransportLocationAsync(request.기사Id, cancellationToken);
         var osState = await _국내화물운송기사상태Service.위치갱신Async(
             snapshot,
             상차접근허용반경Km: request.상차접근허용반경Km,
@@ -161,5 +166,38 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
             권장위치전송간격초 = 300,
             커뮤니티현재공개지역 = communityDistrictLabel
         });
+    }
+
+    private async Task PublishActiveTransportLocationAsync(
+        string driverId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var requestIds = await _db.운송원장
+                .AsNoTracking()
+                .Where(x => x.확정기사Id == driverId
+                            && x.상태 != 상태값.배차상태.인수완료
+                            && x.상태 != 상태값.배차상태.하차완료
+                            && x.상태 != 상태값.배차상태.취소)
+                .Select(x => x.의뢰Id)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            foreach (var requestId in requestIds)
+            {
+                await _transportLedgerRealtimeService.PublishAsync(
+                    requestId,
+                    "DriverLocationUpdated",
+                    cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "기사 위치 기반 화주 실시간 갱신 알림에 실패했습니다. DriverId={DriverId}",
+                driverId);
+        }
     }
 }

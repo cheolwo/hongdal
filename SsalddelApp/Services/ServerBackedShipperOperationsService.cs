@@ -13,20 +13,27 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly AuthApiService _authApiService;
     private readonly ITransportRequestLedgerObserver _ledgerObserver;
+    private readonly TransportRequestLedgerRealtimeClient _realtimeClient;
 
     public ServerBackedShipperOperationsService(
         HttpClient httpClient,
         IAuthSession authSession,
-        ITransportRequestLedgerObserver ledgerObserver)
+        AuthApiService authApiService,
+        ITransportRequestLedgerObserver ledgerObserver,
+        TransportRequestLedgerRealtimeClient realtimeClient)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _authApiService = authApiService;
         _ledgerObserver = ledgerObserver;
+        _realtimeClient = realtimeClient;
     }
 
     public async Task<IReadOnlyList<ShipperRequestItem>> GetRequestsAsync(CancellationToken cancellationToken = default)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         var userId = ResolveUserId();
         var path = $"api/v1/shipper/requests?shipperId={Uri.EscapeDataString(userId)}";
         var response = await GetAuthorizedJsonAsync<IReadOnlyList<화주운송의뢰응답>>(path, cancellationToken);
@@ -41,6 +48,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 
     public async Task<ShipperRequestItem?> GetRequestAsync(string requestId, CancellationToken cancellationToken = default)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(requestId))
         {
             throw new InvalidOperationException("조회할 의뢰 ID가 없습니다.");
@@ -126,6 +134,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 
     public async Task<ShipperRequestItem> AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         using var httpRequest = CreateAuthorizedRequest(HttpMethod.Post, "api/v1/shipper/requests");
         httpRequest.Content = JsonContent.Create(ToCreateRequest(request));
 
@@ -147,6 +156,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
         ShipperRequestItem request,
         CancellationToken cancellationToken = default)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(request.의뢰Id))
         {
             throw new InvalidOperationException("수정할 의뢰 ID가 없습니다.");
@@ -171,6 +181,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 
     public async Task DeleteRequestAsync(string requestId, CancellationToken cancellationToken = default)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(requestId))
         {
             throw new InvalidOperationException("삭제할 의뢰 ID가 없습니다.");
@@ -189,6 +200,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 
     private async Task<T?> GetAuthorizedJsonAsync<T>(string path, CancellationToken cancellationToken)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         using var request = CreateAuthorizedRequest(HttpMethod.Get, path);
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -201,6 +213,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 
     private async Task<TResponse?> PostAuthorizedJsonAsync<TRequest, TResponse>(string path, TRequest payload, CancellationToken cancellationToken)
     {
+        await EnsureAuthorizedConnectionAsync(cancellationToken);
         using var request = CreateAuthorizedRequest(HttpMethod.Post, path);
         request.Content = JsonContent.Create(payload);
 
@@ -211,6 +224,25 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
         }
 
         return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
+    }
+
+    private async Task EnsureAuthorizedConnectionAsync(CancellationToken cancellationToken)
+    {
+        var authenticationError = await _authApiService.EnsureAccessTokenAsync(
+            cancellationToken: cancellationToken);
+        if (!string.IsNullOrWhiteSpace(authenticationError))
+        {
+            throw new InvalidOperationException(authenticationError);
+        }
+
+        try
+        {
+            await _realtimeClient.StartAsync(cancellationToken);
+        }
+        catch
+        {
+            // 실시간 연결 실패는 30초 보완 조회와 API 호출을 막지 않습니다.
+        }
     }
 
     private HttpRequestMessage CreateAuthorizedRequest(HttpMethod method, string path)
@@ -326,6 +358,14 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             의뢰상태 = source.의뢰상태,
             결제상태 = source.결제상태,
             배차상태 = source.배차상태,
+            운송상태 = source.운송상태,
+            운송원장갱신일시Utc = source.운송원장갱신일시Utc,
+            확정기사Id = source.확정기사Id ?? string.Empty,
+            확정기사명 = source.확정기사명 ?? string.Empty,
+            확정기사차량 = source.확정기사차량 ?? string.Empty,
+            기사최근위도 = source.기사최근위도,
+            기사최근경도 = source.기사최근경도,
+            기사최근위치시각Utc = source.기사최근위치시각Utc,
             정산상태 = source.정산상태,
             운송방식 = source.운송방식,
             차량종류 = source.차량종류,

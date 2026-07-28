@@ -15,20 +15,20 @@ public sealed class 운송상태원장동기화EventHandler :
 {
     private readonly SsalddelContext _db;
     private readonly I운송원장Mongo동기화Service _원장동기화Service;
-    private readonly I음식마트원장Mongo동기화Service _음식마트원장동기화Service;
+    private readonly I음식마트원장동기화OutboxService _음식마트원장동기화OutboxService;
     private readonly I원장다이어그램실시간알림Service _실시간알림Service;
     private readonly ILogger<운송상태원장동기화EventHandler> _logger;
 
     public 운송상태원장동기화EventHandler(
         SsalddelContext db,
         I운송원장Mongo동기화Service 원장동기화Service,
-        I음식마트원장Mongo동기화Service 음식마트원장동기화Service,
+        I음식마트원장동기화OutboxService 음식마트원장동기화OutboxService,
         I원장다이어그램실시간알림Service 실시간알림Service,
         ILogger<운송상태원장동기화EventHandler> logger)
     {
         _db = db;
         _원장동기화Service = 원장동기화Service;
-        _음식마트원장동기화Service = 음식마트원장동기화Service;
+        _음식마트원장동기화OutboxService = 음식마트원장동기화OutboxService;
         _실시간알림Service = 실시간알림Service;
         _logger = logger;
     }
@@ -84,6 +84,7 @@ public sealed class 운송상태원장동기화EventHandler :
             await 관련출고원장동기화Async(
                 운송실행투영,
                 string.IsNullOrWhiteSpace(변경자) ? "system" : 변경자,
+                traceId,
                 cancellationToken);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
@@ -99,6 +100,7 @@ public sealed class 운송상태원장동기화EventHandler :
     private async Task 관련출고원장동기화Async(
         살뜰.도메인.운송.운송원장 운송실행투영,
         string 변경자,
+        string traceId,
         CancellationToken cancellationToken)
     {
         var 의뢰Id = Clean(운송실행투영.의뢰Id);
@@ -136,12 +138,13 @@ public sealed class 운송상태원장동기화EventHandler :
             .FirstOrDefault(x => x is not null)
             ?? ResolveSourceLedgerTemplateKey(운송실행투영.원본의뢰유형);
 
-        await _음식마트원장동기화Service.출고원장동기화Async(
+        await _음식마트원장동기화OutboxService.출고원장예약후즉시처리Async(
             출고목록,
             입고목록,
             변경자,
-            현재단계Key: 운송실행투영.상태,
-            원장템플릿Key: 원장템플릿Key,
+            $"transport-state:{traceId}:{운송실행투영.Id}:{운송실행투영.상태}",
+            currentStageKey: 운송실행투영.상태,
+            ledgerTemplateKey: 원장템플릿Key,
             cancellationToken: cancellationToken);
     }
 

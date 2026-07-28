@@ -220,6 +220,14 @@ public sealed class ShipperRequestDetailPageViewModel : IDisposable
             PaymentStatus = source.결제상태,
             SettlementStatus = source.정산상태,
             DispatchStatus = source.배차상태,
+            TransportStatus = source.운송상태,
+            TransportLedgerUpdatedAtUtc = source.운송원장갱신일시Utc,
+            AssignedDriverId = source.확정기사Id,
+            AssignedDriverName = source.확정기사명,
+            AssignedDriverVehicle = source.확정기사차량,
+            DriverLatitude = source.기사최근위도,
+            DriverLongitude = source.기사최근경도,
+            DriverLocationRecordedAtUtc = source.기사최근위치시각Utc,
             TransportMethod = source.운송방식,
             VehicleType = source.차량종류,
             PaymentMethod = source.결제수단,
@@ -279,7 +287,8 @@ public sealed class ShipperRequestDetailPageViewModel : IDisposable
 
     private async Task RunPollingAsync(CancellationToken cancellationToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(15));
+        using var timer = new PeriodicTimer(
+            TransportRequestLedgerRefreshPolicy.FallbackPollingInterval);
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))

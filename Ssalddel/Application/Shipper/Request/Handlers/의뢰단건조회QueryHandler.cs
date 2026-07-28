@@ -31,6 +31,16 @@ public sealed class 의뢰단건조회QueryHandler : IRequestHandler<의뢰단�
             return null;
         }
 
-        return 화주운송의뢰매퍼.To응답(entity);
+        var executionByRequestId = await 화주운송실행정보조회.조회Async(
+            _db,
+            [entity.의뢰Id],
+            cancellationToken);
+        executionByRequestId.TryGetValue(entity.의뢰Id, out var execution);
+
+        return 화주운송의뢰매퍼.To응답(
+            entity,
+            execution?.운송원장,
+            execution?.기사,
+            execution?.최근위치);
     }
 }

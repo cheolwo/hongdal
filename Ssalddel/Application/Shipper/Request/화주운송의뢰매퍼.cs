@@ -1,10 +1,16 @@
 using ShipRequest = Ssalddel.Contracts.Shipper.Request;
+using 살뜰.도메인.기사;
+using 살뜰.도메인.운송;
 
 namespace Ssalddel.Application.Shipper.Request;
 
 internal static class 화주운송의뢰매퍼
 {
-    internal static ShipRequest.화주운송의뢰응답 To응답(화주운송의뢰 entity)
+    internal static ShipRequest.화주운송의뢰응답 To응답(
+        화주운송의뢰 entity,
+        운송원장? transportLedger = null,
+        용달기사? driver = null,
+        기사위치기록? driverLocation = null)
     {
         ShipRequest.정산시점? settlementTime = Enum.TryParse<ShipRequest.정산시점>(entity.정산시점, ignoreCase: false, out var parsedSettlementTime)
             ? parsedSettlementTime
@@ -25,6 +31,14 @@ internal static class 화주운송의뢰매퍼
             결제상태 = entity.결제상태,
             정산상태 = entity.정산상태,
             배차상태 = entity.배차상태,
+            운송상태 = transportLedger?.상태 ?? string.Empty,
+            운송원장갱신일시Utc = transportLedger?.UpdatedAt,
+            확정기사Id = transportLedger?.확정기사Id,
+            확정기사명 = driver?.기사명,
+            확정기사차량 = driver?.차량,
+            기사최근위도 = driverLocation?.위도,
+            기사최근경도 = driverLocation?.경도,
+            기사최근위치시각Utc = driverLocation?.기록시각,
             운송방식 = entity.운송방식,
             차량종류 = entity.차량종류,
             결제수단 = entity.결제수단,

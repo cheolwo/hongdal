@@ -60,15 +60,18 @@ public sealed class DriverApiClient : IDriverApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly AuthApiService _authApiService;
     private readonly DriverOperatingProfileService _operatingProfileService;
 
     public DriverApiClient(
         HttpClient httpClient,
         IAuthSession authSession,
+        AuthApiService authApiService,
         DriverOperatingProfileService operatingProfileService)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _authApiService = authApiService;
         _operatingProfileService = operatingProfileService;
     }
 
@@ -202,22 +205,35 @@ public sealed class DriverApiClient : IDriverApiClient
         string operationName,
         CancellationToken cancellationToken)
     {
-        await _authSession.RestoreAsync(cancellationToken);
-        if (!string.IsNullOrWhiteSpace(_authSession.AccessToken))
+        var authenticationError = await _authApiService.EnsureAccessTokenAsync(
+            cancellationToken: cancellationToken);
+        if (authenticationError is not null)
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
+            throw new UnauthorizedAccessException(authenticationError);
         }
 
-        if (!request.Headers.Contains(OperatingMarketContextKeys.HeaderName))
-        {
-            request.Headers.TryAddWithoutValidation(
-                OperatingMarketContextKeys.HeaderName,
-                _operatingProfileService.Current.MarketCode);
-        }
+        ApplyRequestHeaders(request);
+        using var retryRequest = await CloneRequestAsync(request, cancellationToken);
 
         try
         {
-            return await _httpClient.SendAsync(request, cancellationToken);
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            if (response.StatusCode != HttpStatusCode.Unauthorized)
+            {
+                return response;
+            }
+
+            response.Dispose();
+            authenticationError = await _authApiService.EnsureAccessTokenAsync(
+                forceRefresh: true,
+                cancellationToken: cancellationToken);
+            if (authenticationError is not null)
+            {
+                throw new UnauthorizedAccessException(authenticationError);
+            }
+
+            ApplyRequestHeaders(retryRequest);
+            return await _httpClient.SendAsync(retryRequest, cancellationToken);
         }
         catch (HttpRequestException ex)
         {
@@ -227,6 +243,48 @@ public sealed class DriverApiClient : IDriverApiClient
         {
             throw new InvalidOperationException($"{operationName} API 응답 시간이 초과되었습니다.", ex);
         }
+    }
+
+    private void ApplyRequestHeaders(HttpRequestMessage request)
+    {
+        request.Headers.Authorization = string.IsNullOrWhiteSpace(_authSession.AccessToken)
+            ? null
+            : new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
+
+        if (!request.Headers.Contains(OperatingMarketContextKeys.HeaderName))
+        {
+            request.Headers.TryAddWithoutValidation(
+                OperatingMarketContextKeys.HeaderName,
+                _operatingProfileService.Current.MarketCode);
+        }
+    }
+
+    private static async Task<HttpRequestMessage> CloneRequestAsync(
+        HttpRequestMessage source,
+        CancellationToken cancellationToken)
+    {
+        var clone = new HttpRequestMessage(source.Method, source.RequestUri)
+        {
+            Version = source.Version,
+            VersionPolicy = source.VersionPolicy
+        };
+
+        foreach (var header in source.Headers)
+        {
+            clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+        if (source.Content is not null)
+        {
+            var bytes = await source.Content.ReadAsByteArrayAsync(cancellationToken);
+            clone.Content = new ByteArrayContent(bytes);
+            foreach (var header in source.Content.Headers)
+            {
+                clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+        }
+
+        return clone;
     }
 
     private static async Task EnsureSuccessAsync(

@@ -84,6 +84,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
         }
 
         request.상태변경전처리?.Invoke(entity, now);
+        await 화주원장상태반영Async(entity, now, cancellationToken);
 
         await _db.SaveChangesAsync(cancellationToken);
         await PublishAfterCommitAsync(request, entity, 이전상태, now, cancellationToken);
@@ -95,6 +96,35 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
             상태 = entity.상태,
             UpdatedAt = entity.UpdatedAt
         });
+    }
+
+    private async Task 화주원장상태반영Async(
+        운송원장 entity,
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        var requestId = !string.IsNullOrWhiteSpace(entity.의뢰Id)
+            ? entity.의뢰Id
+            : entity.운송번호;
+        if (string.IsNullOrWhiteSpace(requestId))
+        {
+            return;
+        }
+
+        var shipperRequest = await _db.화주운송의뢰
+            .FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+        if (shipperRequest is null)
+        {
+            return;
+        }
+
+        shipperRequest.배차상태 = entity.상태 switch
+        {
+            기사운송상태코드.상차완료 => 상태값.배차상태.상차완료,
+            기사운송상태코드.인수완료 => 상태값.배차상태.인수완료,
+            _ => entity.상태
+        };
+        shipperRequest.UpdatedAt = now;
     }
 
     private async Task PublishAfterCommitAsync(

@@ -493,7 +493,8 @@
 
     private async Task RunPollingAsync(CancellationToken cancellationToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(15));
+        using var timer = new PeriodicTimer(
+            TransportRequestLedgerRefreshPolicy.FallbackPollingInterval);
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))

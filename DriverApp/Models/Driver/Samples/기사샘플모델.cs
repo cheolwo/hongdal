@@ -69,6 +69,12 @@ public sealed record 기사운송샘플항목(
 
     public string 상차주의사항 { get; init; } = "상차지, 화물 수량, 외관 상태를 확인합니다.";
 
+    public string 수령자명 { get; init; } = string.Empty;
+
+    public string 수령자연락처 { get; init; } = string.Empty;
+
+    public string 전달요청 { get; init; } = string.Empty;
+
     public IReadOnlyList<기사상차체크항목> 상차체크목록 { get; init; } = [];
 
     public IReadOnlyList<기사상차대상화물> 상차대상화물목록 { get; init; } = [];

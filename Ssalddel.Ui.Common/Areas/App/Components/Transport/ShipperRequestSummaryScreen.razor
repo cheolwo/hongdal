@@ -54,9 +54,36 @@
                         <dl>
                             <div><dt>의뢰</dt><dd>@ShipperRequestDetailPresentation.Display(item.RequestStatus)</dd></div>
                             <div><dt>배차</dt><dd>@ShipperRequestDetailPresentation.Display(item.DispatchStatus)</dd></div>
+                            <div><dt>운송</dt><dd>@ShipperRequestDetailPresentation.Display(item.TransportStatus)</dd></div>
                             <div><dt>결제</dt><dd>@ShipperRequestDetailPresentation.Display(item.PaymentStatus)</dd></div>
                             <div><dt>정산</dt><dd>@ShipperRequestDetailPresentation.Display(item.SettlementStatus)</dd></div>
                         </dl>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__card">
+                        <MudText Typo="Typo.h6">배정 기사·현재 위치</MudText>
+                        <dl>
+                            <div><dt>기사</dt><dd>@AssignedDriver(item)</dd></div>
+                            <div><dt>차량</dt><dd>@ShipperRequestDetailPresentation.Display(item.AssignedDriverVehicle)</dd></div>
+                            <div><dt>최근 위치</dt><dd>@DriverLocation(item)</dd></div>
+                            <div><dt>위치 시각</dt><dd>@DisplayDateTime(item.DriverLocationRecordedAtUtc)</dd></div>
+                            <div><dt>위치 상태</dt><dd>@ShipperRequestDetailPresentation.ResolveDriverLocationFreshness(item)</dd></div>
+                            <div><dt>예상 도착</dt><dd>@ShipperRequestDetailPresentation.ResolveEtaStatus(item)</dd></div>
+                        </dl>
+                        @if (string.IsNullOrWhiteSpace(item.AssignedDriverId))
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">기사가 수락하면 배정 정보가 표시됩니다.</MudText>
+                        }
+                        else if (!item.DriverLocationRecordedAtUtc.HasValue)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">위치가 아직 수신되지 않았거나 운송 종료 정책에 따라 비공개 상태입니다.</MudText>
+                        }
+                        else if (ShipperRequestDetailPresentation.IsDriverLocationStale(item))
+                        {
+                            <MudAlert Severity="Severity.Warning" Dense="true" Variant="Variant.Outlined">
+                                최근 위치가 10분 이상 갱신되지 않았습니다. 기사 위치를 현재 위치로 단정하지 마세요.
+                            </MudAlert>
+                        }
                     </MudPaper>
 
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__card">
@@ -122,4 +149,17 @@
 
     private static string DisplayDateTime(DateTime value)
         => value == default ? "-" : value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+
+    private static string DisplayDateTime(DateTime? value)
+        => value.HasValue ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-";
+
+    private static string AssignedDriver(ShipperRequestDetailSnapshot item)
+        => string.IsNullOrWhiteSpace(item.AssignedDriverName)
+            ? ShipperRequestDetailPresentation.Display(item.AssignedDriverId)
+            : item.AssignedDriverName;
+
+    private static string DriverLocation(ShipperRequestDetailSnapshot item)
+        => item.DriverLatitude.HasValue && item.DriverLongitude.HasValue
+            ? $"{item.DriverLatitude.Value:F5}, {item.DriverLongitude.Value:F5}"
+            : "-";
 }

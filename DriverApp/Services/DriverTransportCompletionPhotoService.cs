@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Ssalddel.Contracts.Driver.Transport;
@@ -75,15 +76,18 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly AuthApiService _authApiService;
     private readonly IDriverTransportApiService _transportApi;
 
     public HttpDriverTransportCompletionPhotoService(
         HttpClient httpClient,
         IAuthSession authSession,
+        AuthApiService authApiService,
         IDriverTransportApiService transportApi)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _authApiService = authApiService;
         _transportApi = transportApi;
     }
 
@@ -137,6 +141,44 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
         DriverTransportCompletionPhoto photo,
         CancellationToken cancellationToken)
     {
+        var authenticationError = await _authApiService.EnsureAccessTokenAsync(
+            cancellationToken: cancellationToken);
+        if (authenticationError is not null)
+        {
+            throw new UnauthorizedAccessException(authenticationError);
+        }
+
+        var response = await UploadPhotoOnceAsync(photo, cancellationToken);
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            response.Dispose();
+            authenticationError = await _authApiService.EnsureAccessTokenAsync(
+                forceRefresh: true,
+                cancellationToken: cancellationToken);
+            if (authenticationError is not null)
+            {
+                throw new UnauthorizedAccessException(authenticationError);
+            }
+
+            response = await UploadPhotoOnceAsync(photo, cancellationToken);
+        }
+
+        using (response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException(await BuildFailureMessageAsync(response, "파일 업로드", cancellationToken));
+            }
+
+            var upload = await response.Content.ReadFromJsonAsync<FileUploadResponse>(cancellationToken: cancellationToken);
+            return upload ?? throw new InvalidOperationException("파일 업로드 응답을 읽지 못했습니다.");
+        }
+    }
+
+    private async Task<HttpResponseMessage> UploadPhotoOnceAsync(
+        DriverTransportCompletionPhoto photo,
+        CancellationToken cancellationToken)
+    {
         using var content = new MultipartFormDataContent();
         using var fileContent = new ByteArrayContent(photo.Bytes);
         fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(photo.ContentType);
@@ -151,14 +193,7 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
         };
         ApplyAuthorization(request);
 
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new InvalidOperationException(await BuildFailureMessageAsync(response, "파일 업로드", cancellationToken));
-        }
-
-        var upload = await response.Content.ReadFromJsonAsync<FileUploadResponse>(cancellationToken: cancellationToken);
-        return upload ?? throw new InvalidOperationException("파일 업로드 응답을 읽지 못했습니다.");
+        return await _httpClient.SendAsync(request, cancellationToken);
     }
 
     private async Task CompleteTransportAsync(

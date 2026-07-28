@@ -1,5 +1,10 @@
 namespace Ssalddel.Client.Infrastructure.Transport;
 
+public static class TransportRequestLedgerRefreshPolicy
+{
+    public static readonly TimeSpan FallbackPollingInterval = TimeSpan.FromSeconds(30);
+}
+
 public sealed record TransportRequestLedgerSnapshot(
     string RequestId,
     string? RequestStatus,

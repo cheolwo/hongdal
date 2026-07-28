@@ -16,6 +16,10 @@ public sealed class ShipperRequestDetailPresentationTests
             결제상태 = "결제완료",
             정산상태 = "정산대기",
             배차상태 = "하차완료",
+            운송상태 = "인수완료",
+            확정기사Id = "driver-1",
+            확정기사명 = "안전기사",
+            확정기사차량 = "1톤 카고",
             인수증번호 = "POD-20260722-1",
             인수증등록일시 = registeredAt,
             세금계산서필요 = true,
@@ -31,6 +35,9 @@ public sealed class ShipperRequestDetailPresentationTests
         Assert.Equal("HD-DETAIL-1", snapshot.RequestId);
         Assert.Equal("식자재", snapshot.CargoType);
         Assert.Equal("1,200 × 800 × 900 mm", snapshot.CargoDimensions);
+        Assert.Equal("인수완료", snapshot.TransportStatus);
+        Assert.Equal("안전기사", snapshot.AssignedDriverName);
+        Assert.Equal("1톤 카고", snapshot.AssignedDriverVehicle);
         Assert.Contains(proofs, proof => proof.Title == "인수증" && proof.State == ShipperRequestProgressState.Completed);
         Assert.Contains(proofs, proof => proof.Title == "세무 증빙 조건" && proof.State == ShipperRequestProgressState.Active);
     }
@@ -66,5 +73,25 @@ public sealed class ShipperRequestDetailPresentationTests
         bool expected)
     {
         Assert.Equal(expected, ShipperRequestDetailPresentation.CanPay(dispatchStatus, paymentStatus));
+    }
+
+    [Fact]
+    public void 기사위치는_10분을넘으면_지연으로표시하고_ETA를임의계산하지않는다()
+    {
+        var now = new DateTime(2026, 7, 28, 3, 0, 0, DateTimeKind.Utc);
+        var snapshot = new ShipperRequestDetailSnapshot
+        {
+            AssignedDriverId = "driver-1",
+            TransportStatus = "운송중",
+            DriverLocationRecordedAtUtc = now.AddMinutes(-12)
+        };
+
+        Assert.True(ShipperRequestDetailPresentation.IsDriverLocationStale(snapshot, now));
+        Assert.Equal(
+            "위치 갱신 지연 12분",
+            ShipperRequestDetailPresentation.ResolveDriverLocationFreshness(snapshot, now));
+        Assert.Equal(
+            "미산정 · 경로·교통 정보 연결 전",
+            ShipperRequestDetailPresentation.ResolveEtaStatus(snapshot));
     }
 }

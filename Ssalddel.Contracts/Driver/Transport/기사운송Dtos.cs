@@ -12,6 +12,9 @@ public class 기사운송요약응답
     public DateTime? 도착 { get; set; }
     public decimal? 운임 { get; set; }
     public string 결제방식 { get; set; } = string.Empty;
+    public string 수령자명 { get; set; } = string.Empty;
+    public string 수령자연락처 { get; set; } = string.Empty;
+    public string 전달요청 { get; set; } = string.Empty;
     public bool 인수증필요 { get; set; }
     public bool 인수증서명필수 { get; set; }
     public bool 예외신고됨 { get; set; }

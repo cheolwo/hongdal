@@ -1,57 +1,20 @@
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-
 namespace DriverApp.Services;
 
 public sealed class ApiClient : IApiClient
 {
-    private readonly HttpClient _httpClient;
-    private readonly IAuthSession _authSession;
+    private readonly IDriverApiClient _driverApiClient;
 
-    public ApiClient(HttpClient httpClient, IAuthSession authSession)
+    public ApiClient(IDriverApiClient driverApiClient)
     {
-        _httpClient = httpClient;
-        _authSession = authSession;
+        _driverApiClient = driverApiClient;
     }
 
-    public async Task<TResponse?> GetJsonAsync<TResponse>(string path)
-    {
-        using var request = CreateRequest(HttpMethod.Get, path);
-        using var response = await _httpClient.SendAsync(request);
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            return default;
-        }
+    public Task<TResponse?> GetJsonAsync<TResponse>(string path)
+        => _driverApiClient.GetAsync<TResponse>(path, "공통 조회");
 
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<TResponse>();
-    }
+    public Task<TResponse?> PostJsonAsync<TRequest, TResponse>(string path, TRequest payload)
+        => _driverApiClient.PostAsync<TRequest, TResponse>(path, payload, "공통 등록");
 
-    public async Task<TResponse?> PostJsonAsync<TRequest, TResponse>(string path, TRequest payload)
-    {
-        using var request = CreateRequest(HttpMethod.Post, path);
-        request.Content = JsonContent.Create(payload);
-        using var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<TResponse>();
-    }
-
-    public async Task PostJsonAsync<TRequest>(string path, TRequest payload)
-    {
-        using var request = CreateRequest(HttpMethod.Post, path);
-        request.Content = JsonContent.Create(payload);
-        using var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-    }
-
-    private HttpRequestMessage CreateRequest(HttpMethod method, string path)
-    {
-        var request = new HttpRequestMessage(method, path);
-        if (!string.IsNullOrWhiteSpace(_authSession.AccessToken))
-        {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
-        }
-
-        return request;
-    }
+    public Task PostJsonAsync<TRequest>(string path, TRequest payload)
+        => _driverApiClient.PostAsync(path, payload, "공통 등록");
 }

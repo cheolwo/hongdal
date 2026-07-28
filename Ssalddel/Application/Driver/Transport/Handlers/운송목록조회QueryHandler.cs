@@ -25,10 +25,25 @@ public sealed class 운송목록조회QueryHandler : IRequestHandler<운송목�
             : await _db.화주운송의뢰
                 .AsNoTracking()
                 .Where(x => requestIds.Contains(x.의뢰Id))
-                .Select(x => new { x.의뢰Id, x.결제수단, x.증빙방식, x.요청사항, x.정산메모 })
+                .Select(x => new
+                {
+                    x.의뢰Id,
+                    x.결제수단,
+                    x.증빙방식,
+                    x.요청사항,
+                    x.정산메모,
+                    x.하차_연락처_이름,
+                    x.하차_연락처_전화번호
+                })
                 .ToDictionaryAsync(
                     x => x.의뢰Id,
-                    x => new 기사운송증빙조건(x.결제수단, x.증빙방식, x.요청사항, x.정산메모),
+                    x => new 기사운송증빙조건(
+                        x.결제수단,
+                        x.증빙방식,
+                        x.요청사항,
+                        x.정산메모,
+                        x.하차_연락처_이름,
+                        x.하차_연락처_전화번호),
                     StringComparer.Ordinal,
                     cancellationToken);
 
@@ -51,6 +66,9 @@ public sealed class 운송목록조회QueryHandler : IRequestHandler<운송목�
                 도착 = x.도착,
                 운임 = x.운임,
                 결제방식 = shipperRequest.결제수단,
+                수령자명 = shipperRequest.수령자명,
+                수령자연락처 = shipperRequest.수령자연락처,
+                전달요청 = shipperRequest.요청사항,
                 인수증필요 = 기사운송증빙조건정책.인수증필요(shipperRequest),
                 인수증서명필수 = 기사운송증빙조건정책.인수증서명필수(shipperRequest),
                 UpdatedAt = x.UpdatedAt
