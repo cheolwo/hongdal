@@ -175,6 +175,7 @@ flowchart LR
 | `DriverApp` | 운행, 추천, 결정, 음식 배달, 현재 운송, 상차·하차, 정산 | 샘플 기반 일반 운송 진행 제거, 원천 유형별 책임·증빙, FDriver와 contract 수렴 |
 | `WarehouseManagerApp` | 입고·검수·스캔·피킹·포장·출고·마트 작업 | 배달권 기반 창고 선택 근거, 포장 완료→운송 인계, 예외·부분 처리 |
 | `SsalddelApp` | 화주 운송·창고·판매·수입 계획 | sample fallback 없는 영속 조회·작성·인계, 운송 완료와 증빙 재조회 |
+| `SsalddelAdminApp` | 모바일 운영 개요, 커뮤니티·콘텐츠, 같이 수입 준비, 운송·기사 현황 | 음식 주문 stable ID에서 배차대기·운송·알림을 추적하는 읽기 상세, 안전한 단건 조정과 모바일 푸시 |
 | `SsalddelAdmin` | 음식 운영, 배차 대기, AI 검토, 운송·문서·정산 | 원천 원장→배달권→운송→알림의 통합 추적, 예외 복구와 감사 |
 
 ## 구현 단위와 검증 방식
@@ -218,6 +219,7 @@ Contract
 ## 함께 보는 기준 문서
 
 - [통합 구축 로드맵](integrated-build-roadmap.md)
+- [모바일 관리자 앱 확장 제안서](mobile-admin-app-proposal.md)
 - [워크플로우 앱 화면 지도](../ProjectOverview/workflow-app-screen-map.md)
 - [전체 로드맵 조화형 페이지 원칙](../Architecture/WholeRoadmapPagePrinciple.md)
 - [배차 큐와 DB 원장 책임 경계](../Architecture/DispatchQueueResponsibility.md)

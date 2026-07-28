@@ -3,6 +3,8 @@ using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Ssalddel.Ui.Common.Areas.BackOffice.ViewModels;
 using Ssalddel.Ui.Common.Areas.BackOffice.Services;
 using SsalddelAdminApp.Services;
+using Ssalddel.Client.Infrastructure.Security;
+using Ssalddel.Client.Infrastructure.Transport;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 
@@ -15,13 +17,28 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>();
 
+        builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         builder.Services.AddSingleton<AdminAuthSession>();
+        builder.Services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
         builder.Services.AddSsalddelUiCommonAppServices<AdminAuthSession>();
         builder.Services.AddTransient<관리자Controller기능모음ViewModel>();
         builder.Services.AddTransient<관리자전체Api기능모음ViewModel>();
         builder.Services.AddSsalddelApiHttpClient(SsalddelApiEndpoint.ResolveBaseAddress(
             builder.Configuration[SsalddelApiEndpoint.ConfigurationKey]));
         builder.Services.AddScoped<AdminAuthService>();
+        builder.Services.AddSingleton(provider =>
+        {
+            var httpClient = provider.GetRequiredService<HttpClient>();
+            var session = provider.GetRequiredService<AdminAuthSession>();
+            return new TransportRequestLedgerRealtimeClient(
+                httpClient.BaseAddress
+                ?? throw new InvalidOperationException("Ssalddel API BaseAddress가 설정되어 있지 않습니다."),
+                _ => Task.FromResult(session.AccessToken),
+                provider.GetRequiredService<ITransportRequestLedgerObserver>());
+        });
+        builder.Services.AddScoped<AdminAuthenticatedApiClient>();
+        builder.Services.AddScoped<AdminDashboardService>();
+        builder.Services.AddScoped<AdminOperationsService>();
         builder.Services.AddScoped<CommunityManagementAdminService>();
         builder.Services.AddScoped<HongikHakdangAdminService>();
         builder.Services.AddScoped<CommunityInformationAdminService>();

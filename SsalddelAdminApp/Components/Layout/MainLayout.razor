@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject AdminAuthSession Session
+@inject AdminAuthService AuthService
 @inject NavigationManager Navigation
 
 <MudLayout>
@@ -12,7 +13,7 @@
                        aria-label="관리자 메뉴 열기 또는 닫기" />
         <MudStack Spacing="0" Class="ml-2">
             <MudText Typo="Typo.subtitle1">살뜰 관리자</MudText>
-            <MudText Typo="Typo.caption">커뮤니티·공급·무역 준비 관리</MudText>
+            <MudText Typo="Typo.caption">플랫폼 모바일 관제</MudText>
         </MudStack>
         <MudSpacer />
         @if (Session.IsServerAdmin)
@@ -23,15 +24,18 @@
 
     <MudDrawer @bind-Open="drawerOpen" Variant="DrawerVariant.Responsive" Elevation="1" ClipMode="DrawerClipMode.Always">
         <MudNavMenu Class="pa-3">
-            <MudNavLink Href="/information-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EditNote">글쓰기 작업대</MudNavLink>
-            <MudNavLink Href="/prajna" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoStories">외부 콘텐츠 검토</MudNavLink>
+            <MudNavLink Href="/overview" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">운영 개요</MudNavLink>
+            <MudNavLink Href="/operations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MonitorHeart">운송·기사 현황</MudNavLink>
             <MudNavGroup Title="공동구매 1.5" Icon="@Icons.Material.Filled.PlaylistAddCheckCircle" Expanded="true">
                 <MudNavLink Href="/trade-readiness" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FactCheck">공급·무역 준비</MudNavLink>
             </MudNavGroup>
+            <MudNavGroup Title="커뮤니티·콘텐츠" Icon="@Icons.Material.Filled.EditNote" Expanded="false">
+                <MudNavLink Href="/community-management" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">커뮤니티 운영</MudNavLink>
+                <MudNavLink Href="/information-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EditNote">글쓰기 작업대</MudNavLink>
+                <MudNavLink Href="/prajna" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoStories">외부 콘텐츠 검토</MudNavLink>
+            </MudNavGroup>
             <MudDivider Class="my-3" />
             <MudNavGroup Title="보조 관리" Icon="@Icons.Material.Filled.Settings" Expanded="false">
-                <MudNavLink Href="/overview" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">관리 개요</MudNavLink>
-                <MudNavLink Href="/community-management" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">커뮤니티 운영</MudNavLink>
                 <MudNavLink Href="/page-catalog" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.WebAsset">페이지 운영</MudNavLink>
             </MudNavGroup>
             <MudDivider Class="my-3" />
@@ -56,12 +60,16 @@
 </MudLayout>
 
 @code {
-    private bool drawerOpen = true;
+    private bool drawerOpen;
 
     protected override async Task OnInitializedAsync()
     {
         Session.Changed += HandleSessionChanged;
         await Session.RestoreAsync();
+        if (!string.IsNullOrWhiteSpace(Session.RefreshToken))
+        {
+            await AuthService.EnsureAccessTokenAsync();
+        }
     }
 
     private void ToggleDrawer() => drawerOpen = !drawerOpen;

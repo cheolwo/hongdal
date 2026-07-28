@@ -1,0 +1,351 @@
+@page "/operations"
+@implements IAsyncDisposable
+@inject AdminAuthSession Session
+@inject AdminAuthService AuthService
+@inject AdminOperationsService OperationsService
+@inject ITransportRequestLedgerObserver LedgerObserver
+@inject TransportRequestLedgerRealtimeClient RealtimeClient
+@inject NavigationManager Navigation
+
+<PageTitle>운송·기사 모바일 관제</PageTitle>
+
+<MudStack Spacing="3">
+    <div class="admin-page-header">
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.overline" Color="Color.Primary">OPERATIONS</MudText>
+            <MudText Typo="Typo.h4">운송·기사 현황</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                실제 운송 원장과 운행 중 기사 상태를 읽기 전용으로 확인합니다. 상태 조정은 안전한 Command가 준비된 뒤 단계적으로 엽니다.
+            </MudText>
+        </MudStack>
+        @if (Session.IsServerAdmin)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="isBusy"
+                       OnClick="@(() => LoadAsync(false))">
+                새로고침
+            </MudButton>
+        }
+    </div>
+
+    @if (!Session.IsServerAdmin)
+    {
+        @if (!string.IsNullOrWhiteSpace(errorMessage)
+             && !string.IsNullOrWhiteSpace(Session.RefreshToken))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                @errorMessage
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Error"
+                           Disabled="isBusy"
+                           OnClick="RetryAuthenticationAsync">
+                    세션 다시 연결
+                </MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="OpenLogin">다시 로그인</MudButton>
+            </MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">
+                서버관리자 로그인이 필요합니다.
+                <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="OpenLogin">로그인</MudButton>
+            </MudAlert>
+        }
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                @errorMessage
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => LoadAsync(false))">다시 시도</MudButton>
+            </MudAlert>
+        }
+
+        @if (isBusy && snapshot is null)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (snapshot is not null)
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="6">
+                    <MetricCard Title="진행 운송"
+                                Value="@snapshot.Transports.Count.ToString("N0")"
+                                Description="서버 운송 목록"
+                                Icon="@Icons.Material.Filled.Route"
+                                AccentColor="Color.Primary" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MetricCard Title="운행 기사"
+                                Value="@snapshot.OperatingDrivers.Count.ToString("N0")"
+                                Description="현재 운행 상태"
+                                Icon="@Icons.Material.Filled.PersonPinCircle"
+                                AccentColor="Color.Success" />
+                </MudItem>
+            </MudGrid>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.subtitle1">확인 필요한 운송</MudText>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">
+                            @(AttentionTransports.Count)건
+                        </MudChip>
+                    </MudStack>
+                    @if (AttentionTransports.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">현재 관리자 확인이 필요한 운송이 없습니다.</MudAlert>
+                    }
+                    else
+                    {
+                        @foreach (var transport in AttentionTransports.Take(10))
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Spacing="1">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start">
+                                        <MudText Typo="Typo.subtitle2">@ValueOrDash(transport.운송번호)</MudText>
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Error">@ValueOrDash(transport.상태)</MudChip>
+                                    </MudStack>
+                                    <MudText Typo="Typo.body2">@ValueOrDash(transport.출발지) → @ValueOrDash(transport.도착지)</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        기사 @ValueOrDash(transport.기사_운송자) · @transport.UpdatedAt.ToLocalTime().ToString("MM-dd HH:mm")
+                                    </MudText>
+                                    @if (!string.IsNullOrWhiteSpace(transport.최근예외메시지))
+                                    {
+                                        <MudText Typo="Typo.caption" Color="Color.Error">@transport.최근예외메시지</MudText>
+                                    }
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.subtitle1">최근 운송</MudText>
+                    @if (snapshot.Transports.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">조회된 운송이 없습니다.</MudText>
+                    }
+                    else
+                    {
+                        @foreach (var transport in snapshot.Transports.OrderByDescending(x => x.UpdatedAt).Take(12))
+                        {
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.body2">@ValueOrDash(transport.운송번호)</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@ValueOrDash(transport.기사_운송자)</MudText>
+                                </MudStack>
+                                <MudChip T="string" Size="Size.Small" Color="@TransportColor(transport)" Variant="Variant.Outlined">
+                                    @ValueOrDash(transport.상태)
+                                </MudChip>
+                            </MudStack>
+                            <MudDivider />
+                        }
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.subtitle1">운행 기사</MudText>
+                    @if (snapshot.OperatingDrivers.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">현재 조회된 운행 기사가 없습니다.</MudText>
+                    }
+                    else
+                    {
+                        @foreach (var driver in snapshot.OperatingDrivers.Take(12))
+                        {
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.body2">@ValueOrDash(driver.기사명)</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        @ValueOrDash(driver.차량) · @ValueOrDash(driver.주_활동지역)
+                                    </MudText>
+                                </MudStack>
+                                <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">
+                                    @ValueOrDash(driver.운행상태)
+                                </MudChip>
+                            </MudStack>
+                            <MudDivider />
+                        }
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                최근 동기화 @snapshot.UpdatedAtUtc.ToLocalTime().ToString("HH:mm:ss")
+            </MudText>
+        }
+    }
+</MudStack>
+
+@code {
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(30);
+    private AdminMobileOperationsSnapshot? snapshot;
+    private bool isBusy;
+    private string? errorMessage;
+    private CancellationTokenSource? monitorCancellation;
+    private Task? monitorTask;
+
+    private IReadOnlyList<운송진행응답> AttentionTransports
+        => snapshot?.Transports
+               .Where(x => x.관리자확인필요 || x.예외신고됨)
+               .OrderByDescending(x => x.UpdatedAt)
+               .ToArray()
+           ?? [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        LedgerObserver.RefreshRequested += OnLedgerRefreshRequested;
+        await Session.RestoreAsync();
+        if (!string.IsNullOrWhiteSpace(Session.RefreshToken))
+        {
+            errorMessage = await AuthService.EnsureAccessTokenAsync();
+        }
+
+        if (Session.IsServerAdmin)
+        {
+            await StartRealtimeQuietlyAsync();
+            await LoadAsync(false);
+            StartMonitor();
+        }
+    }
+
+    private async Task LoadAsync(bool silent)
+    {
+        if (isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        if (!silent)
+        {
+            errorMessage = null;
+        }
+
+        try
+        {
+            snapshot = await OperationsService.GetAsync();
+            errorMessage = null;
+        }
+        catch (AdminApiException ex)
+        {
+            errorMessage = ex.Message;
+            if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                await Session.LogoutAsync();
+                StopMonitor();
+            }
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private void OpenLogin()
+        => Navigation.NavigateTo("/login?returnUrl=%2Foperations");
+
+    private async Task RetryAuthenticationAsync()
+    {
+        if (isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        errorMessage = null;
+        try
+        {
+            errorMessage = await AuthService.EnsureAccessTokenAsync();
+        }
+        finally
+        {
+            isBusy = false;
+        }
+
+        if (errorMessage is null && Session.IsServerAdmin)
+        {
+            await StartRealtimeQuietlyAsync();
+            await LoadAsync(false);
+            StartMonitor();
+        }
+    }
+
+    private void StartMonitor()
+    {
+        if (monitorTask is { IsCompleted: false })
+        {
+            return;
+        }
+
+        monitorCancellation = new CancellationTokenSource();
+        monitorTask = MonitorAsync(monitorCancellation.Token);
+    }
+
+    private void StopMonitor()
+    {
+        monitorCancellation?.Cancel();
+        monitorCancellation?.Dispose();
+        monitorCancellation = null;
+        monitorTask = null;
+    }
+
+    private async Task MonitorAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(RefreshInterval);
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(() => LoadAsync(true));
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private static Color TransportColor(운송진행응답 transport)
+        => transport.관리자확인필요 || transport.예외신고됨
+            ? Color.Error
+            : transport.상태.Contains("완료", StringComparison.OrdinalIgnoreCase)
+                ? Color.Success
+                : Color.Info;
+
+    private static string ValueOrDash(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "-" : value.Trim();
+
+    public ValueTask DisposeAsync()
+    {
+        LedgerObserver.RefreshRequested -= OnLedgerRefreshRequested;
+        StopMonitor();
+        return ValueTask.CompletedTask;
+    }
+
+    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest request)
+        => _ = InvokeAsync(async () =>
+        {
+            await LoadAsync(true);
+            StateHasChanged();
+        });
+
+    private async Task StartRealtimeQuietlyAsync()
+    {
+        try
+        {
+            await RealtimeClient.StartAsync();
+        }
+        catch
+        {
+            // 연결 실패 시 30초 보완 조회를 유지합니다.
+        }
+    }
+}

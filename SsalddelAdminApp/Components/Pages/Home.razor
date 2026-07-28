@@ -1,69 +1,332 @@
+@page "/"
 @page "/overview"
+@implements IAsyncDisposable
+@inject AdminAuthSession Session
+@inject AdminAuthService AuthService
+@inject AdminDashboardService DashboardService
+@inject ITransportRequestLedgerObserver LedgerObserver
+@inject TransportRequestLedgerRealtimeClient RealtimeClient
+@inject NavigationManager Navigation
 
-<PageTitle>관리자 운영 개요</PageTitle>
+<PageTitle>살뜰 모바일 운영 개요</PageTitle>
 
-<PlatformCommunityHome AppName="살뜰 관리자"
-                       RoleLabel="운영 작성자"
-                       AppKey="admin"
-                       UseCompactHomeSummary="true"
-                       ShowRealtimeBest="false"
-                       ShowPrajnaUpayaNavigator="true"
-                       PrajnaHref="/prajna"
-                       QuickActions="QuickActions">
-    <CommunityModeContent>
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-            커뮤니티 자료를 검토하고, 1.0에서 승인된 수요 집단을 1.5 공급·가격·무역 준비 원장으로 연결하는 작업 공간입니다.
-        </MudAlert>
-    </CommunityModeContent>
-    <WorkModeContent>
-        <MudGrid>
-            <MudItem xs="12" md="3">
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-                    <MudIcon Icon="@Icons.Material.Filled.EditNote" Color="Color.Primary" Size="Size.Large" />
-                    <MudText Typo="Typo.h6" Class="mt-2">글 초안</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        게시판·주제·공개 범위를 정하고 임시 저장, 미리보기와 예약 발행을 관리합니다.
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" md="3">
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-                    <MudIcon Icon="@Icons.Material.Filled.FactCheck" Color="Color.Info" Size="Size.Large" />
-                    <MudText Typo="Typo.h6" Class="mt-2">자료 검토</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        공공데이터, YouTube·SNS와 플랫폼 기록을 확인하고 출처가 남은 글감으로 정리합니다.
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" md="3">
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-                    <MudIcon Icon="@Icons.Material.Filled.ScheduleSend" Color="Color.Success" Size="Size.Large" />
-                    <MudText Typo="Typo.h6" Class="mt-2">검토 후 발행</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        자동 수집 자료도 곧바로 게시하지 않고 운영자가 수정·승인한 뒤 즉시 또는 예약 발행합니다.
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" md="3">
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-                    <MudIcon Icon="@Icons.Material.Filled.PlaylistAddCheckCircle" Color="Color.Warning" Size="Size.Large" />
-                    <MudText Typo="Typo.h6" Class="mt-2">1.5 준비 원장</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        승인된 수요에 공급자 근거, 견적, 예상 원가, HS·HTS와 국가별 검토 상태를 연결합니다.
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-        </MudGrid>
-    </WorkModeContent>
-</PlatformCommunityHome>
+<MudStack Spacing="3">
+    <div class="admin-page-header">
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.overline" Color="Color.Primary">MOBILE CONTROL</MudText>
+            <MudText Typo="Typo.h4">플랫폼 운영 개요</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                이동 중에는 전체 정책을 편집하지 않고, 실제 서버의 조정 필요 항목과 진행 상태를 빠르게 확인합니다.
+            </MudText>
+        </MudStack>
+        @if (Session.IsServerAdmin)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="isBusy"
+                       OnClick="@(() => LoadAsync(false))">
+                새로고침
+            </MudButton>
+        }
+    </div>
+
+    @if (!Session.IsServerAdmin)
+    {
+        @if (!string.IsNullOrWhiteSpace(errorMessage)
+             && !string.IsNullOrWhiteSpace(Session.RefreshToken))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                @errorMessage
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Error"
+                           Disabled="isBusy"
+                           OnClick="RetryAuthenticationAsync">
+                    세션 다시 연결
+                </MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="OpenLogin">다시 로그인</MudButton>
+            </MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">
+                실제 운영 현황은 서버관리자 로그인 후 확인할 수 있습니다.
+                <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="OpenLogin">로그인</MudButton>
+            </MudAlert>
+        }
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                @errorMessage
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => LoadAsync(false))">다시 시도</MudButton>
+            </MudAlert>
+        }
+
+        @if (isBusy && summary is null)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">서버 운영 현황을 불러오고 있습니다.</MudText>
+        }
+        else if (summary is not null)
+        {
+            <MudAlert Severity="@AttentionSeverity" Variant="Variant.Outlined">
+                관리자 확인 @(summary.관리자확인필요수)건 · 운송 예외 @(summary.운송예외수)건 · 배차대기 @(summary.배차대기수)건
+            </MudAlert>
+
+            <MudGrid Spacing="2">
+                <MudItem xs="6" md="3">
+                    <MetricCard Title="관리자 확인"
+                                Value="@summary.관리자확인필요수.ToString("N0")"
+                                Description="확인이 필요한 진행 건"
+                                Icon="@Icons.Material.Filled.NotificationImportant"
+                                AccentColor="Color.Error" />
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MetricCard Title="운송 예외"
+                                Value="@summary.운송예외수.ToString("N0")"
+                                Description="예외가 보고된 운송"
+                                Icon="@Icons.Material.Filled.ReportProblem"
+                                AccentColor="Color.Warning" />
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MetricCard Title="배차대기"
+                                Value="@summary.배차대기수.ToString("N0")"
+                                Description="기사 추천·수락 대기"
+                                Icon="@Icons.Material.Filled.Schedule"
+                                AccentColor="Color.Info" />
+                </MudItem>
+                <MudItem xs="6" md="3">
+                    <MetricCard Title="운송 중"
+                                Value="@summary.운송중수.ToString("N0")"
+                                Description="현재 이행 중인 운송"
+                                Icon="@Icons.Material.Filled.LocalShipping"
+                                AccentColor="Color.Success" />
+                </MudItem>
+            </MudGrid>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudText Typo="Typo.subtitle1">오늘의 주문·이행 상태</MudText>
+                <MudGrid Spacing="2" Class="mt-1">
+                    @foreach (var item in TodayMetrics)
+                    {
+                        <MudItem xs="6" sm="4">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Label</MudText>
+                                <MudText Typo="Typo.h6">@(item.Value.ToString("N0"))건</MudText>
+                            </MudStack>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.subtitle1">모바일 관리 바로가기</MudText>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.MonitorHeart"
+                               Href="/operations">
+                        운송·기사 현황 보기
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.AdminPanelSettings"
+                               Href="/community-management">
+                        커뮤니티 운영
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Warning"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.FactCheck"
+                               Href="/trade-readiness">
+                        같이 수입 준비 원장
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                @syncText · 실시간 누락 보정을 위해 30초마다 자동 조회합니다.
+            </MudText>
+        }
+    }
+</MudStack>
 
 @code {
-    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
-    [
-        new("새 글 작성", "자료 조사부터 초안, 예약 발행까지 한 작업대에서 진행합니다.", "/information-review", Icons.Material.Filled.EditNote, Color.Primary),
-        new("외부 콘텐츠 검토", "카드·영상 자료를 확인하고 글감으로 정리합니다.", "/prajna", Icons.Material.Filled.AutoStories, Color.Info),
-        new("커뮤니티 운영", "필요할 때 사용자 활동과 게시글 운영 조치를 확인합니다.", "/community-management", Icons.Material.Filled.ManageAccounts, Color.Secondary),
-        new("1.5 공급·무역 준비", "승인된 수요 집단의 근거와 검토 상태를 한 원장에서 관리합니다.", "/trade-readiness", Icons.Material.Filled.PlaylistAddCheckCircle, Color.Warning),
-        new("관리자 로그인", "서버관리자 권한으로 관리 기능을 엽니다.", "/login", Icons.Material.Filled.AdminPanelSettings, Color.Secondary)
-    ];
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(30);
+    private 관리자대시보드요약응답? summary;
+    private bool isBusy;
+    private string? errorMessage;
+    private string syncText = "동기화 대기";
+    private CancellationTokenSource? monitorCancellation;
+    private Task? monitorTask;
+
+    private Severity AttentionSeverity
+        => summary is { 관리자확인필요수: > 0 } || summary is { 운송예외수: > 0 }
+            ? Severity.Warning
+            : Severity.Success;
+
+    private IReadOnlyList<AdminMetricItem> TodayMetrics
+        => summary is null
+            ? []
+            :
+            [
+                new("오늘 의뢰", summary.오늘의뢰수),
+                new("결제 대기", summary.결제대기수),
+                new("결제 완료", summary.결제완료수),
+                new("배차 확정", summary.배차확정수),
+                new("완료", summary.완료수),
+                new("취소·환불", summary.취소환불수)
+            ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        LedgerObserver.RefreshRequested += OnLedgerRefreshRequested;
+        await Session.RestoreAsync();
+        if (!string.IsNullOrWhiteSpace(Session.RefreshToken))
+        {
+            var authenticationError = await AuthService.EnsureAccessTokenAsync();
+            if (authenticationError is not null)
+            {
+                errorMessage = authenticationError;
+            }
+        }
+
+        if (Session.IsServerAdmin)
+        {
+            await StartRealtimeQuietlyAsync();
+            await LoadAsync(false);
+            StartMonitor();
+        }
+    }
+
+    private async Task LoadAsync(bool silent)
+    {
+        if (isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        if (!silent)
+        {
+            errorMessage = null;
+        }
+
+        try
+        {
+            summary = await DashboardService.GetAsync();
+            syncText = $"최근 동기화 {DateTime.Now:HH:mm:ss}";
+            errorMessage = null;
+        }
+        catch (AdminApiException ex)
+        {
+            errorMessage = ex.Message;
+            syncText = "자동 동기화 지연";
+            if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                await Session.LogoutAsync();
+                StopMonitor();
+            }
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private void StartMonitor()
+    {
+        if (monitorTask is { IsCompleted: false })
+        {
+            return;
+        }
+
+        monitorCancellation = new CancellationTokenSource();
+        monitorTask = MonitorAsync(monitorCancellation.Token);
+    }
+
+    private void StopMonitor()
+    {
+        monitorCancellation?.Cancel();
+        monitorCancellation?.Dispose();
+        monitorCancellation = null;
+        monitorTask = null;
+    }
+
+    private async Task MonitorAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(RefreshInterval);
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(() => LoadAsync(true));
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private void OpenLogin()
+        => Navigation.NavigateTo("/login?returnUrl=%2Foverview");
+
+    private async Task RetryAuthenticationAsync()
+    {
+        if (isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        errorMessage = null;
+        try
+        {
+            errorMessage = await AuthService.EnsureAccessTokenAsync();
+        }
+        finally
+        {
+            isBusy = false;
+        }
+
+        if (errorMessage is null && Session.IsServerAdmin)
+        {
+            await StartRealtimeQuietlyAsync();
+            await LoadAsync(false);
+            StartMonitor();
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        LedgerObserver.RefreshRequested -= OnLedgerRefreshRequested;
+        StopMonitor();
+        return ValueTask.CompletedTask;
+    }
+
+    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest request)
+        => _ = InvokeAsync(async () =>
+        {
+            await LoadAsync(true);
+            StateHasChanged();
+        });
+
+    private async Task StartRealtimeQuietlyAsync()
+    {
+        try
+        {
+            await RealtimeClient.StartAsync();
+        }
+        catch
+        {
+            // 연결 실패 시 30초 보완 조회를 유지합니다.
+        }
+    }
+
+    private sealed record AdminMetricItem(string Label, int Value);
 }
