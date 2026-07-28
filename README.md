@@ -9,6 +9,12 @@
 테스트 배포: [웹사이트 홈](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/) · [커뮤니티 게시판](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/community)
 
 <p align="center">
+  <a href="https://www.figma.com/design/0KhuQLc1MleUBIQnARC21Z/ssalddle?node-id=0-1">
+    <strong>Figma 화면 보기 →</strong>
+  </a>
+</p>
+
+<p align="center">
   <a href="docs/ProjectOverview/page-docs/">
     <img src="docs/assets/changes/2026-07-20-community-forum-restoration/community-board-desktop.png" alt="살뜰 커뮤니티 게시판 글 목록" width="900">
   </a>
