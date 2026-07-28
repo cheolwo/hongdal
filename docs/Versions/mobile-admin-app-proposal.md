@@ -1,7 +1,7 @@
 # 살뜰 모바일 관리자 앱 확장 제안서
 
-작성일: 2026-07-28  
-대상: `SsalddelAdminApp` Android·Windows MAUI Blazor Hybrid  
+작성일: 2026-07-28
+대상: `SsalddelAdminApp` Android·Windows MAUI Blazor Hybrid
 목표: 관리자가 외부에서도 플랫폼 상태를 확인하고, 제한된 운영 조정을 안전하게 수행할 수 있는 모바일 관제 앱
 
 ## 제안 결론
