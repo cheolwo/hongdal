@@ -128,6 +128,7 @@ flowchart TD
 
 - [2026-07-23 배포 준비도 평가](./deployment-readiness-assessment-2026-07-23.md)
 - [통합 구축 로드맵](./integrated-build-roadmap.md)
+- [문서 생명주기 통합과 앱별 배치 제안](./document-lifecycle-app-placement-proposal.md)
 - [릴리즈 게이트](./release-gates.md)
 - [기능 플래그 정책](./feature-flags.md)
 - [주문자 집단 공동구매·커머스 흐름](../ProjectOverview/orderer-group-commerce-flows.md)
