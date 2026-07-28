@@ -9,6 +9,226 @@
     --seller-accent: #f59e0b;
 }
 
+.seller-demand-kind-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.seller-demand-kind {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 4px 10px;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #d8e5e8;
+    border-radius: 18px;
+    color: #214047;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+}
+
+.seller-demand-kind span {
+    font-weight: 800;
+}
+
+.seller-demand-kind strong {
+    color: #155e75;
+    font-size: 1.35rem;
+}
+
+.seller-demand-kind small {
+    grid-column: 2 / 4;
+    color: #668087;
+}
+
+.seller-demand-kind--active {
+    border-color: #155e75;
+    background: #eef8fa;
+    box-shadow: 0 8px 24px rgba(21, 94, 117, .12);
+}
+
+.seller-demand-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.seller-demand-section__heading h2,
+.seller-demand-card h2 {
+    margin: 0;
+}
+
+.seller-demand-section__heading p {
+    margin: 4px 0 14px;
+    color: #668087;
+}
+
+.seller-demand-list {
+    display: grid;
+    gap: 12px;
+}
+
+.seller-demand-card {
+    padding: 18px;
+    border: 1px solid #dce8ea;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(26, 65, 74, .06);
+}
+
+.seller-demand-card__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.seller-demand-card code {
+    display: block;
+    margin-top: 5px;
+    color: #668087;
+    word-break: break-all;
+}
+
+.seller-demand-card dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.seller-demand-card dl div {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #f5f8f8;
+}
+
+.seller-demand-card dt {
+    color: #6d8489;
+    font-size: .75rem;
+}
+
+.seller-demand-card dd {
+    margin: 3px 0 0;
+    color: #213f46;
+    font-weight: 700;
+}
+
+.seller-demand-badge {
+    padding: 5px 9px;
+    border-radius: 999px;
+    color: #155e75;
+    background: #dff3f6;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.seller-demand-badge--bulk {
+    color: #6b4f00;
+    background: #fff1c2;
+}
+
+.seller-demand-badge--clustered {
+    color: #075985;
+    background: #e0f2fe;
+}
+
+.seller-demand-badge--export {
+    color: #4b3f8f;
+    background: #ebe8ff;
+}
+
+.seller-demand-next {
+    margin: 0;
+    color: #486970;
+}
+
+.seller-demand-card--clustered {
+    border-color: #b9dce6;
+    background: linear-gradient(145deg, #ffffff 0%, #f2fbfd 100%);
+}
+
+.seller-demand-privacy {
+    margin-bottom: 12px;
+}
+
+.seller-demand-progress {
+    display: grid;
+    gap: 7px;
+    margin-top: 16px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    background: #eef8fa;
+}
+
+.seller-demand-progress > div,
+.seller-demand-card__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.seller-demand-progress span,
+.seller-demand-progress small {
+    color: #668087;
+    font-size: .78rem;
+}
+
+.seller-demand-progress strong {
+    color: #155e75;
+}
+
+.seller-demand-card__actions {
+    align-items: flex-end;
+}
+
+.seller-demand-card__actions .seller-demand-next {
+    max-width: 620px;
+}
+
+.seller-demand-empty,
+.seller-loading {
+    padding: 28px 18px;
+    border: 1px dashed #c8dadd;
+    border-radius: 16px;
+    color: #668087;
+    text-align: center;
+}
+
+.seller-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 720px) {
+    .seller-demand-kind-grid,
+    .seller-demand-card dl {
+        grid-template-columns: 1fr;
+    }
+
+    .seller-demand-kind small {
+        grid-column: 2 / 4;
+    }
+
+    .seller-demand-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .seller-demand-card__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
 html, body {
     margin: 0;
     min-height: 100%;

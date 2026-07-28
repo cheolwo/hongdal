@@ -14,6 +14,8 @@ public static class SellerRoutes
     public const string Listings = "/shipper/sales/listings";
     public const string ListingCreate = "/shipper/sales/listings/new";
     public const string Orders = SalesOrderPageRoutes.Root;
+    public const string OrdererDemand = "/seller/orderer-demand";
+    public const string ForeignFoodFacilities = "/seller/foreign-food-facilities";
 
     public static string ProductCreateForInventory(long inventoryItemId)
         => $"{ProductCreate}?inventoryItemId={inventoryItemId}";

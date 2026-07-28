@@ -35,6 +35,12 @@ public interface I무역확장원장UseCase
         string actorUserId,
         bool isAdministrator,
         CancellationToken cancellationToken = default);
+
+    Task<Result<판매자수출원장목록응답>> 판매자수출목록조회Async(
+        판매자수출원장목록조회요청 request,
+        string actorUserId,
+        bool isAdministrator,
+        CancellationToken cancellationToken = default);
 }
 
 [SsalddelCodeMetadata(
@@ -287,6 +293,125 @@ public sealed class 무역확장원장UseCase : I무역확장원장UseCase
         }
 
         return Result.Ok(응답(ledger, sources, true));
+    }
+
+    public async Task<Result<판매자수출원장목록응답>> 판매자수출목록조회Async(
+        판매자수출원장목록조회요청 request,
+        string actorUserId,
+        bool isAdministrator,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var actor = actorUserId?.Trim();
+        if (!isAdministrator && string.IsNullOrWhiteSpace(actor))
+        {
+            return Result.Fail<판매자수출원장목록응답>(
+                new Error("로그인 사용자를 확인할 수 없습니다.")
+                    .WithMetadata("StatusCode", StatusCodes.Status401Unauthorized));
+        }
+
+        var ledgers = await _원장저장소.원장목록조회Async(
+            new 커뮤니티원장조회조건
+            {
+                원장템플릿Keys =
+                [
+                    CommunityLedgerTemplateKeys.IndividualExport,
+                    CommunityLedgerTemplateKeys.GroupExport
+                ],
+                상태 = string.IsNullOrWhiteSpace(request.Status) ? null : request.Status.Trim(),
+                Limit = 200
+            },
+            cancellationToken);
+        var search = string.IsNullOrWhiteSpace(request.Search) ? null : request.Search.Trim();
+        var accessible = new List<커뮤니티원장Dto>();
+        foreach (var ledger in ledgers)
+        {
+            if (isAdministrator
+                || 액세스가능(ledger, actor!, false)
+                || await 판매자연결접근가능Async(ledger, actor!, cancellationToken))
+            {
+                accessible.Add(ledger);
+            }
+        }
+
+        var filtered = accessible
+            .Where(ledger => 주문원장구성정책.개별수출인가(ledger.원장템플릿Key)
+                             || 주문원장구성정책.공동수출인가(ledger.원장템플릿Key))
+            .Where(ledger => string.IsNullOrWhiteSpace(request.Status)
+                             || string.Equals(ledger.상태, request.Status.Trim(), StringComparison.OrdinalIgnoreCase))
+            .Where(ledger => search is null
+                             || ledger.원장Id.Contains(search, StringComparison.OrdinalIgnoreCase)
+                             || ledger.제목.Contains(search, StringComparison.OrdinalIgnoreCase)
+                             || ledger.상태.Contains(search, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(ledger => ledger.수정시각Utc)
+            .ThenByDescending(ledger => ledger.생성시각Utc)
+            .ToArray();
+        var page = Math.Max(0, request.Page);
+        var pageSize = Math.Clamp(request.PageSize, 1, 100);
+
+        return Result.Ok(new 판매자수출원장목록응답
+        {
+            Items = filtered
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .Select(요약)
+                .ToArray(),
+            TotalCount = filtered.Length,
+            Page = page,
+            PageSize = pageSize,
+            외부실행발생여부 = false,
+            실행모드 = "Simulation"
+        });
+    }
+
+    private async Task<bool> 판매자연결접근가능Async(
+        커뮤니티원장Dto exportLedger,
+        string actorUserId,
+        CancellationToken cancellationToken)
+    {
+        if (주문원장구성정책.공동수출인가(exportLedger.원장템플릿Key))
+        {
+            foreach (var reference in exportLedger.포함원장목록.Where(reference =>
+                         string.Equals(
+                             reference.원장템플릿Key,
+                             CommunityLedgerTemplateKeys.IndividualExport,
+                             StringComparison.OrdinalIgnoreCase)))
+            {
+                var individualExport = await _원장저장소.원장조회Async(reference.원장Id, cancellationToken);
+                if (individualExport is not null
+                    && await 판매자연결접근가능Async(individualExport, actorUserId, cancellationToken))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if (!주문원장구성정책.개별수출인가(exportLedger.원장템플릿Key)
+            || !exportLedger.외부참조.TryGetValue("SourceOrderLedgerId", out var sourceOrderLedgerId)
+            || string.IsNullOrWhiteSpace(sourceOrderLedgerId))
+        {
+            return false;
+        }
+
+        var order = await _원장저장소.원장조회Async(sourceOrderLedgerId.Trim(), cancellationToken);
+        if (order is null || !주문원장구성정책.주문루트인가(order.원장템플릿Key))
+        {
+            return false;
+        }
+
+        foreach (var saleReference in order.포함원장목록.Where(reference =>
+                     string.Equals(reference.역할, 주문원장포함역할.판매, StringComparison.OrdinalIgnoreCase)))
+        {
+            var saleLedger = await _원장저장소.원장조회Async(saleReference.원장Id, cancellationToken);
+            if (saleLedger is not null && 액세스가능(saleLedger, actorUserId, false))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private async Task<Result<무역확장원장응답>> 개별확장생성Async(

@@ -1,0 +1,480 @@
+@page "/seller/orderer-demand"
+@implements IAsyncDisposable
+@inject SellerAuthSession Session
+@inject I개별주문관점Service IndividualOrderService
+@inject I공동주문관점Service GroupOrderService
+@inject I공동구매실행Service GroupPurchaseDemandService
+@inject SellerExportLedgerService ExportLedgerService
+
+<PageTitle>주문자 수요</PageTitle>
+
+<header class="seller-page-header">
+    <span class="seller-eyebrow">SELLER · SHARED ORDER LEDGERS</span>
+    <h1>주문자 수요</h1>
+    <p>같은 주문 원장을 판매 규모와 국경 간 절차에 따라 나누어 보고, 판매자가 대응할 흐름을 선택합니다.</p>
+</header>
+
+<section class="seller-demand-kind-grid" aria-label="판매 수요 유형">
+    @foreach (var kind in Kinds)
+    {
+        <button type="button"
+                class="@KindClass(kind.Code)"
+                @onclick="@(() => activeKind = kind.Code)">
+            <MudIcon Icon="@kind.Icon" Size="Size.Large" />
+            <span>@kind.Title</span>
+            <strong>@Count(kind.Code)</strong>
+            <small>@kind.Description</small>
+        </button>
+    }
+</section>
+
+<section class="seller-demand-toolbar">
+    <MudTextField @bind-Value="search"
+                  Placeholder="원장 번호, 제목, 상태 검색"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Immediate="true"
+                  OnKeyDown="HandleSearchKeyDown" />
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Refresh"
+               Disabled="loading"
+               OnClick="LoadAsync">
+        새로고침
+    </MudButton>
+</section>
+
+@if (!Session.IsSellerOperator)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        판매자 또는 화주 계정으로 로그인하면 본인이 참여한 주문자 수요를 확인할 수 있습니다.
+        <MudButton Href="@SellerRoutes.Login" Variant="Variant.Text" Color="Color.Primary">로그인</MudButton>
+    </MudAlert>
+}
+else if (loading)
+{
+    <div class="seller-loading">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <span>판매자 관점 원장을 불러오는 중입니다.</span>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4">@errorMessage</MudAlert>
+    }
+
+    @if (activeKind == SellerDemandKinds.Individual)
+    {
+        <section class="seller-demand-section">
+            <div class="seller-demand-section__heading">
+                <h2>개별 판매</h2>
+                <p>한 주문자의 주문에 가격·재고·출고 조건을 맞추는 국내 판매 흐름입니다.</p>
+            </div>
+            <div class="seller-demand-list">
+                @if (individualOrders.Items.Count == 0)
+                {
+                    <p class="seller-demand-empty">대응할 개별 주문이 없습니다.</p>
+                }
+                @foreach (var item in individualOrders.Items)
+                {
+                    <article class="seller-demand-card">
+                        <div class="seller-demand-card__top">
+                            <span class="seller-demand-badge">개별 판매</span>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item.상태</MudChip>
+                        </div>
+                        <h2>@item.제목</h2>
+                        <code>@item.주문원장Id</code>
+                        <dl>
+                            <div><dt>거래 유형</dt><dd>@item.거래문맥.거래유형</dd></div>
+                            <div><dt>관련 업무</dt><dd>@RoleSummary(item.관련원장역할목록)</dd></div>
+                            <div><dt>최근 변경</dt><dd>@LocalTime(item.수정시각Utc)</dd></div>
+                        </dl>
+                        <p class="seller-demand-next">다음 대응: 재고와 공급 가능 수량을 확인하고 판매 조건을 준비합니다.</p>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+    else if (activeKind == SellerDemandKinds.Clustered)
+    {
+        @if (!string.IsNullOrWhiteSpace(clusteredDemandUnavailableMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                @clusteredDemandUnavailableMessage
+            </MudAlert>
+        }
+        <section class="seller-demand-section">
+            <div class="seller-demand-section__heading">
+                <h2>집단 수요</h2>
+                <p>아직 판매자가 참여하기 전이라도 같은 상품과 배송 조건으로 모이고 있는 주문자 수요를 집계 단위로 확인합니다.</p>
+            </div>
+            <MudAlert Severity="Severity.Info"
+                      Variant="Variant.Text"
+                      Dense="true"
+                      Class="seller-demand-privacy">
+                참여자의 이름·상세 주소·개별 주문량은 표시하지 않습니다. 표시 수량은 원천 거래 단위를 그대로 유지합니다.
+            </MudAlert>
+            <div class="seller-demand-list">
+                @if (FilteredClusteredDemands.Count == 0)
+                {
+                    <p class="seller-demand-empty">현재 조건에 맞는 집단 수요가 없습니다.</p>
+                }
+                @foreach (var item in FilteredClusteredDemands)
+                {
+                    <article class="seller-demand-card seller-demand-card--clustered">
+                        <div class="seller-demand-card__top">
+                            <span class="seller-demand-badge seller-demand-badge--clustered">집단 수요</span>
+                            <MudChip T="string"
+                                     Size="Size.Small"
+                                     Color="@DemandStatusColor(item)"
+                                     Variant="Variant.Outlined">
+                                @DemandStatus(item)
+                            </MudChip>
+                        </div>
+                        <h2>@item.상품명</h2>
+                        <code>@item.자동집단Id</code>
+
+                        <div class="seller-demand-progress">
+                            <div>
+                                <span>모인 수요</span>
+                                <strong>@Quantity(item.총희망수량, item.수량단위)</strong>
+                            </div>
+                            <MudProgressLinear Value="@DemandProgress(item)"
+                                               Color="Color.Primary"
+                                               Rounded="true" />
+                            <small>@DemandProgressText(item)</small>
+                        </div>
+
+                        <dl>
+                            <div><dt>참여 규모</dt><dd>@(item.참여자수)명 · @(item.수요건수)건</dd></div>
+                            <div><dt>배송권</dt><dd>@Fallback(item.배송권명, "배송권 협의 중")</dd></div>
+                            <div><dt>모집 마감</dt><dd>@RecruitmentDeadline(item)</dd></div>
+                            <div><dt>거래 유형</dt><dd>@item.거래유형</dd></div>
+                            <div><dt>보관 온도</dt><dd>@Fallback(item.온도코드, "후속 검토")</dd></div>
+                            <div><dt>물류 방식</dt><dd>@LogisticsMode(item.물류방식)</dd></div>
+                        </dl>
+                        <div class="seller-demand-card__actions">
+                            <p class="seller-demand-next">@DemandNextAction(item)</p>
+                            <MudButton Href="@SellerRoutes.SalesPageComposer"
+                                       Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.EditNote">
+                                판매 조건 초안 준비
+                            </MudButton>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+    else if (activeKind == SellerDemandKinds.Bulk)
+    {
+        <section class="seller-demand-section">
+            <div class="seller-demand-section__heading">
+                <h2>대량 판매</h2>
+                <p>여러 개별 주문이 모인 같이 주문을 한 번의 공급·포장 계획으로 검토합니다.</p>
+            </div>
+            <div class="seller-demand-list">
+                @if (groupOrders.Items.Count == 0)
+                {
+                    <p class="seller-demand-empty">대응할 대량 주문이 없습니다.</p>
+                }
+                @foreach (var item in groupOrders.Items)
+                {
+                    <article class="seller-demand-card">
+                        <div class="seller-demand-card__top">
+                            <span class="seller-demand-badge seller-demand-badge--bulk">대량 판매</span>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item.상태</MudChip>
+                        </div>
+                        <h2>@(item.상품명 ?? item.제목)</h2>
+                        <code>@item.공동주문원장Id</code>
+                        <dl>
+                            <div><dt>개별 주문</dt><dd>@item.완료개별주문수 / @item.개별주문수 건 완료</dd></div>
+                            <div><dt>거래 유형</dt><dd>@item.거래문맥.거래유형</dd></div>
+                            <div><dt>서명</dt><dd>@item.서명완료주문수 / @item.서명대상주문수 건</dd></div>
+                        </dl>
+                        <p class="seller-demand-next">다음 대응: 총 수량, 포장 단위, 가격 구간과 공급 마감을 확인합니다.</p>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(exportUnavailableMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                @exportUnavailableMessage
+            </MudAlert>
+        }
+        <section class="seller-demand-section">
+            <div class="seller-demand-section__heading">
+                <h2>수출 판매</h2>
+                <p>해외 구매자 주문에 필요한 개별수출·공동수출 준비 원장입니다. 신고와 외부 전송은 자동 실행하지 않습니다.</p>
+            </div>
+            <div class="seller-demand-list">
+                @if (exportLedgers.Items.Count == 0)
+                {
+                    <p class="seller-demand-empty">참여 중인 수출 준비 원장이 없습니다.</p>
+                }
+                @foreach (var item in exportLedgers.Items)
+                {
+                    <article class="seller-demand-card">
+                        <div class="seller-demand-card__top">
+                            <span class="seller-demand-badge seller-demand-badge--export">@ExportKind(item.원장템플릿Key)</span>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item.상태</MudChip>
+                        </div>
+                        <h2>@item.제목</h2>
+                        <code>@item.원장Id</code>
+                        <dl>
+                            <div><dt>원천 원장</dt><dd>@item.원천원장Ids.Count 건</dd></div>
+                            <div><dt>실행 모드</dt><dd>@exportLedgers.실행모드</dd></div>
+                            <div><dt>외부 실행</dt><dd>@(exportLedgers.외부실행발생여부 ? "발생" : "없음")</dd></div>
+                        </dl>
+                        <p class="seller-demand-next">다음 대응: 구매자·목적국·Incoterms·서류와 규정 검토 근거를 준비합니다.</p>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    private readonly CancellationTokenSource monitorCancellation = new();
+    private 개별주문관점페이지응답 individualOrders = new();
+    private 공동주문관점페이지응답 groupOrders = new();
+    private IReadOnlyList<공동구매자동집단응답> clusteredDemands = [];
+    private 판매자수출원장목록응답 exportLedgers = new();
+    private string activeKind = SellerDemandKinds.Individual;
+    private string search = string.Empty;
+    private string? errorMessage;
+    private string? clusteredDemandUnavailableMessage;
+    private string? exportUnavailableMessage;
+    private bool loading;
+
+    private static readonly SellerDemandKind[] Kinds =
+    [
+        new(SellerDemandKinds.Individual, "개별 판매", "한 주문자에게 판매", Icons.Material.Filled.Person),
+        new(SellerDemandKinds.Clustered, "집단 수요", "모이고 있는 수요 탐색", Icons.Material.Filled.Groups),
+        new(SellerDemandKinds.Bulk, "대량 판매", "같이 주문에 공급", Icons.Material.Filled.Inventory),
+        new(SellerDemandKinds.Export, "수출 판매", "해외 주문에 대응", Icons.Material.Filled.Public)
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.RestoreAsync();
+        if (Session.IsSellerOperator)
+        {
+            await LoadAsync();
+            _ = MonitorAsync(monitorCancellation.Token);
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        errorMessage = null;
+        clusteredDemandUnavailableMessage = null;
+        exportUnavailableMessage = null;
+        try
+        {
+            var individualTask = IndividualOrderService.목록조회Async(
+                개별주문관점코드.판매자,
+                null,
+                new 개별주문관점목록조회요청 { PageSize = 100, Search = search });
+            var groupTask = GroupOrderService.목록조회Async(
+                공동주문관점코드.판매자,
+                null,
+                new 공동주문관점목록조회요청 { PageSize = 100, Search = search });
+
+            individualOrders = await individualTask;
+            groupOrders = await groupTask;
+            try
+            {
+                clusteredDemands = await GroupPurchaseDemandService.자동집단목록조회Async(
+                    new 공동구매자동집단조회조건());
+            }
+            catch (SsalddelApiException exception) when (exception.StatusCode is 403 or 404)
+            {
+                clusteredDemands = [];
+                clusteredDemandUnavailableMessage =
+                    "집단 수요는 1.0 같이 주문·주문자 집단화 기능이 활성화된 환경에서 확인할 수 있습니다.";
+            }
+            try
+            {
+                exportLedgers = await ExportLedgerService.목록조회Async(
+                    new 판매자수출원장목록조회요청 { PageSize = 100, Search = search });
+            }
+            catch (SsalddelApiException exception) when (exception.StatusCode is 403 or 404)
+            {
+                exportLedgers = new();
+                exportUnavailableMessage = "수출 판매는 1.5 무역 준비 기능과 판매자 권한이 활성화된 환경에서 확인할 수 있습니다.";
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task HandleSearchKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task MonitorAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(LoadAsync);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private int Count(string kind)
+        => kind switch
+        {
+            SellerDemandKinds.Individual => individualOrders.TotalCount,
+            SellerDemandKinds.Clustered => FilteredClusteredDemands.Count,
+            SellerDemandKinds.Bulk => groupOrders.TotalCount,
+            SellerDemandKinds.Export => exportLedgers.TotalCount,
+            _ => 0
+        };
+
+    private IReadOnlyList<공동구매자동집단응답> FilteredClusteredDemands
+        => clusteredDemands
+            .Where(item => string.IsNullOrWhiteSpace(search)
+                           || item.자동집단Id.Contains(search, StringComparison.OrdinalIgnoreCase)
+                           || item.상품명.Contains(search, StringComparison.OrdinalIgnoreCase)
+                           || item.상품키.Contains(search, StringComparison.OrdinalIgnoreCase)
+                           || item.배송권명.Contains(search, StringComparison.OrdinalIgnoreCase)
+                           || item.현재상태.Contains(search, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(item => item.모집종료여부)
+            .ThenByDescending(item => item.모집조건충족여부)
+            .ThenByDescending(item => item.수정시각Utc)
+            .ToArray();
+
+    private string KindClass(string kind)
+        => activeKind == kind
+            ? "seller-demand-kind seller-demand-kind--active"
+            : "seller-demand-kind";
+
+    private static string RoleSummary(IReadOnlyList<string> roles)
+        => roles.Count == 0 ? "판매 대응" : string.Join(" · ", roles);
+
+    private static string ExportKind(string templateKey)
+        => templateKey == CommunityLedgerTemplateKeys.GroupExport ? "공동수출" : "개별수출";
+
+    private static string LocalTime(DateTime utc)
+        => utc == default ? "-" : utc.ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+
+    private static string Quantity(decimal quantity, string? unit)
+        => $"{quantity:N0} {Fallback(unit, "단위 미정")}";
+
+    private static string Fallback(string? value, string fallback)
+        => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+
+    private static double DemandProgress(공동구매자동집단응답 item)
+    {
+        if (item.목표수량 is not > 0)
+        {
+            return item.모집조건충족여부 ? 100d : 0d;
+        }
+
+        return Math.Clamp((double)(item.총희망수량 / item.목표수량.Value * 100m), 0d, 100d);
+    }
+
+    private static string DemandProgressText(공동구매자동집단응답 item)
+    {
+        if (item.목표수량 is > 0)
+        {
+            var remaining = Math.Max(0m, item.목표수량.Value - item.총희망수량);
+            return remaining == 0
+                ? $"목표 {Quantity(item.목표수량.Value, item.수량단위)} 충족"
+                : $"목표까지 {Quantity(remaining, item.수량단위)} 필요";
+        }
+
+        if (item.목표참여자수 is > 0)
+        {
+            var remaining = Math.Max(0, item.목표참여자수.Value - item.참여자수);
+            return remaining == 0
+                ? $"목표 {item.목표참여자수.Value}명 충족"
+                : $"목표까지 {remaining}명 필요";
+        }
+
+        return "목표 수량은 모집 원장에서 협의 중입니다.";
+    }
+
+    private static string DemandStatus(공동구매자동집단응답 item)
+        => item.현재상태 switch
+        {
+            공동구매자동집단상태코드.수요수집중 => "수요 수집 중",
+            공동구매자동집단상태코드.확정대기 => "조건 충족 · 확인 대기",
+            공동구매자동집단상태코드.확정 => "집단 확정",
+            공동구매자동집단상태코드.모집종료목표미달 => "모집 종료 · 목표 미달",
+            _ => Fallback(item.현재상태, "상태 확인 중")
+        };
+
+    private static Color DemandStatusColor(공동구매자동집단응답 item)
+        => item.현재상태 switch
+        {
+            공동구매자동집단상태코드.확정대기 => Color.Info,
+            공동구매자동집단상태코드.확정 => Color.Success,
+            공동구매자동집단상태코드.모집종료목표미달 => Color.Warning,
+            _ => Color.Primary
+        };
+
+    private static string RecruitmentDeadline(공동구매자동집단응답 item)
+        => item.모집종료시각Utc == default
+            ? "협의 중"
+            : item.모집종료여부
+                ? $"{item.모집종료시각Utc.ToLocalTime():MM.dd HH:mm} 종료"
+                : $"{item.모집종료시각Utc.ToLocalTime():MM.dd HH:mm}까지";
+
+    private static string LogisticsMode(string? value)
+        => string.Equals(
+            value,
+            공동구매자동수요물류방식코드.후속검토,
+            StringComparison.OrdinalIgnoreCase)
+            ? "수요 집계 후 검토"
+            : Fallback(value, "후속 검토");
+
+    private static string DemandNextAction(공동구매자동집단응답 item)
+        => item.모집조건충족여부
+            ? "다음 대응: 공급 가능 수량·포장 단위·가격 구간을 확인해 판매 조건 초안을 준비합니다."
+            : "다음 대응: 수요 추이를 살펴보고 최소 공급 수량과 가격 구간을 미리 검토합니다.";
+
+    public ValueTask DisposeAsync()
+    {
+        monitorCancellation.Cancel();
+        monitorCancellation.Dispose();
+        return ValueTask.CompletedTask;
+    }
+
+    private sealed record SellerDemandKind(string Code, string Title, string Description, string Icon);
+
+    private static class SellerDemandKinds
+    {
+        public const string Individual = "individual";
+        public const string Clustered = "clustered";
+        public const string Bulk = "bulk";
+        public const string Export = "export";
+    }
+}

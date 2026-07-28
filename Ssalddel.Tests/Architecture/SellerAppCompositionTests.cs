@@ -20,8 +20,10 @@ public sealed class SellerAppCompositionTests
     {
         var layout = Read("SellerApp", "Components/Layout/MainLayout.razor");
         var home = Read("SellerApp", "Components/Pages/Home.razor");
+        var demand = Read("SellerApp", "Components/Pages/OrdererDemand.razor");
         var orders = Read("SellerApp", "Components/Pages/Orders.razor");
 
+        Assert.Contains("주문자 수요", layout);
         Assert.Contains("판매채널", layout);
         Assert.Contains("판매 페이지 초안", layout);
         Assert.Contains("판매 가능 재고", layout);
@@ -29,8 +31,46 @@ public sealed class SellerAppCompositionTests
         Assert.Contains("채널 출품", layout);
         Assert.Contains("판매 주문", layout);
         Assert.Contains("같은 판매자 원장 흐름", home);
+        Assert.Contains("모이고 있는 집단 수요", home);
+        Assert.Contains("개별 판매", demand);
+        Assert.Contains("집단 수요", demand);
+        Assert.Contains("대량 판매", demand);
+        Assert.Contains("수출 판매", demand);
+        Assert.Contains("한국 수입식품 준비", layout);
+        Assert.Contains("ForeignFoodFacilities", home);
+        Assert.Contains("개별주문관점코드.판매자", demand);
+        Assert.Contains("공동주문관점코드.판매자", demand);
+        Assert.Contains("I공동구매실행Service GroupPurchaseDemandService", demand);
+        Assert.Contains("자동집단목록조회Async", demand);
+        Assert.Contains("참여자의 이름·상세 주소·개별 주문량은 표시하지 않습니다", demand);
+        Assert.Contains("수량단위", demand);
+        Assert.DoesNotContain("주문자표시명", demand);
+        Assert.Contains("TimeSpan.FromSeconds(30)", demand);
         Assert.Contains("ShipperSalesOrderWorkspaceMode.List", orders);
         Assert.Contains("TimeSpan.FromSeconds(30)", orders);
+    }
+
+    [Fact]
+    public void 판매자앱은_해외판매자와실제시설과국내수입자를_분리해준비한다()
+    {
+        var page = Read("SellerApp", "Components/Pages/ForeignFoodFacilities.razor");
+        var startup = Read("SellerApp", "MauiProgram.cs");
+        var officialLookupController = Read(
+            "Ssalddel",
+            "Controllers/Shipper/수입식품해외제조업소Controller.cs");
+
+        Assert.Contains("해외 판매자·수출자", page);
+        Assert.Contains("실제 제조·가공·포장 시설", page);
+        Assert.Contains("한국 수입자", page);
+        Assert.Contains("수출국 정부 경로", page);
+        Assert.Contains("식약처 공식 등록 조회", page);
+        Assert.Contains("oversea-manufacturers", Read(
+            "SellerApp",
+            "Services/SellerForeignFoodFacilityService.cs"));
+        Assert.Contains("식약처 등록·수입 신고를 자동 제출", page);
+        Assert.Contains("SellerForeignFoodFacilityService", startup);
+        Assert.Contains("역할명.판매자", officialLookupController);
+        Assert.Contains("RequireVersionFeature", officialLookupController);
     }
 
     [Fact]

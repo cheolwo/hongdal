@@ -4,6 +4,7 @@ using MediatR;
 using Ssalddel.Application.Shipper.ImportFood;
 using Ssalddel.Contracts.Shipper.ImportFood;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Filters;
 using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Shipper
@@ -16,7 +17,8 @@ namespace Ssalddel.Controllers.Shipper
     [SsalddelApiOperation(SsalddelOperation.Browse)]
     [ApiController]
     [Route("api/v1/shipper/import-food/oversea-manufacturers")]
-    [Authorize(Roles = 역할명.화주)]
+    [Authorize(Roles = 역할명.화주 + "," + 역할명.판매자 + "," + 역할명.서버관리자)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
     public sealed class 수입식품해외제조업소Controller : ShipperControllerBase
     {
         private readonly ISender _sender;

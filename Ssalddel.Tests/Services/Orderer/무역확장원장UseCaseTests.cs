@@ -92,6 +92,94 @@ public sealed class 무역확장원장UseCaseTests
         Assert.Equal("false", ledger.확장속성["ExternalTransmissionAllowed"]);
     }
 
+    [Fact]
+    public async Task 판매자수출목록_본인이참여한준비원장만_외부실행없이반환한다()
+    {
+        var store = new FakeLedgerStore(OrderLedger());
+        var sut = new 무역확장원장UseCase(store, new 주문원장통합UseCase(store));
+        var export = await sut.개별수출생성Async(
+            "order-1",
+            new 개별수출원장생성요청
+            {
+                요청멱등키 = "seller-export-1",
+                수출자 = "user-1",
+                해외구매자 = "Overseas Buyer",
+                목적국가코드 = "US"
+            },
+            "user-1",
+            false);
+
+        var own = await sut.판매자수출목록조회Async(
+            new 판매자수출원장목록조회요청 { PageSize = 10 },
+            "user-1",
+            false);
+        var other = await sut.판매자수출목록조회Async(
+            new 판매자수출원장목록조회요청 { PageSize = 10 },
+            "seller-2",
+            false);
+
+        Assert.True(own.IsSuccess);
+        Assert.False(own.Value.외부실행발생여부);
+        Assert.Equal("Simulation", own.Value.실행모드);
+        Assert.Equal(export.Value.원장.원장Id, Assert.Single(own.Value.Items).원장Id);
+        Assert.True(other.IsSuccess);
+        Assert.Empty(other.Value.Items);
+    }
+
+    [Fact]
+    public async Task 판매자수출목록_원천주문의판매원장참여자에게_수출요약을연결한다()
+    {
+        var order = OrderLedger();
+        order.포함원장목록 =
+        [
+            new 커뮤니티포함원장참조Dto
+            {
+                원장Id = "sale-1",
+                원장템플릿Key = CommunityLedgerTemplateKeys.LocalSale,
+                역할 = 주문원장포함역할.판매
+            }
+        ];
+        var sale = new 커뮤니티원장Dto
+        {
+            원장Id = "sale-1",
+            Revision = 1,
+            커뮤니티Id = "platform",
+            원장템플릿Key = CommunityLedgerTemplateKeys.LocalSale,
+            제목 = "판매 대응",
+            생성자UserId = "user-1",
+            참여자목록 =
+            [
+                new 커뮤니티원장참여자Dto
+                {
+                    UserId = "seller-2",
+                    DisplayName = "판매자",
+                    RoleLabel = "판매자"
+                }
+            ]
+        };
+        var store = new FakeLedgerStore(order, sale);
+        var sut = new 무역확장원장UseCase(store, new 주문원장통합UseCase(store));
+        var export = await sut.개별수출생성Async(
+            "order-1",
+            new 개별수출원장생성요청
+            {
+                요청멱등키 = "linked-seller-export",
+                수출자 = "seller-2",
+                해외구매자 = "Overseas Buyer",
+                목적국가코드 = "US"
+            },
+            "user-1",
+            false);
+
+        var result = await sut.판매자수출목록조회Async(
+            new 판매자수출원장목록조회요청(),
+            "seller-2",
+            false);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(export.Value.원장.원장Id, Assert.Single(result.Value.Items).원장Id);
+    }
+
     private static 커뮤니티원장Dto OrderLedger()
         => new()
         {

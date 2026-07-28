@@ -40,12 +40,14 @@
         <MudNavMenu Class="pa-3">
             <MudText Typo="Typo.overline" Class="px-3">판매 업무</MudText>
             <MudNavLink Href="@SellerRoutes.Home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">판매자 홈</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.OrdererDemand" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups">주문자 수요</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.ForeignFoodFacilities" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FactCheck">한국 수입식품 준비</MudNavLink>
             <MudNavLink Href="@SellerRoutes.SalesChannels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storefront">판매채널</MudNavLink>
             <MudNavLink Href="@SellerRoutes.SalesPageComposer" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Description">판매 페이지 초안</MudNavLink>
             <MudNavLink Href="@SellerRoutes.Inventory" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Warehouse">판매 가능 재고</MudNavLink>
             <MudNavLink Href="@SellerRoutes.Products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory2">판매상품</MudNavLink>
             <MudNavLink Href="@SellerRoutes.Listings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Sell">채널 출품</MudNavLink>
-            <MudNavLink Href="@SellerRoutes.Orders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ReceiptLong">판매 주문</MudNavLink>
+            <MudNavLink Href="@SellerRoutes.Orders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ReceiptLong">채널 판매 주문</MudNavLink>
 
             <MudDivider Class="my-3" />
             <MudText Typo="Typo.overline" Class="px-3">운영 시장</MudText>
@@ -99,9 +101,9 @@
             <MudIcon Icon="@Icons.Material.Filled.Sell" Size="Size.Small" />
             <span>출품</span>
         </a>
-        <a href="@SellerRoutes.Orders" class="@BottomClass(SellerRoutes.Orders)">
-            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Small" />
-            <span>주문</span>
+        <a href="@SellerRoutes.OrdererDemand" class="@BottomClass(SellerRoutes.OrdererDemand)">
+            <MudIcon Icon="@Icons.Material.Filled.Groups" Size="Size.Small" />
+            <span>수요</span>
         </a>
     </nav>
 </MudLayout>

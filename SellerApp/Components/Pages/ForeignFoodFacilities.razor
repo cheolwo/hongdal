@@ -1,0 +1,468 @@
+@page "/seller/foreign-food-facilities"
+@inject SellerAuthSession Session
+@inject SellerForeignFoodFacilityService FacilityService
+
+<PageTitle>한국 수입식품 준비</PageTitle>
+
+<header class="seller-page-header">
+    <span class="seller-eyebrow">SELLER · KOREA IMPORTED FOOD READINESS</span>
+    <h1>한국 수입식품 준비</h1>
+    <p>해외 판매자, 실제 제조·가공·포장 시설, 한국 수입자를 분리해 수입 신고 전에 필요한 정보를 준비합니다.</p>
+</header>
+
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
+    판매자나 수출자 사무실이 아니라 실제로 제조·가공·포장하는 시설을 등록해야 합니다.
+    이 화면은 준비도 점검용이며 식약처 등록·수입 신고를 자동 제출하거나 적법성을 확정하지 않습니다.
+</MudAlert>
+
+@if (!Session.IsSellerOperator)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        판매자 또는 화주 계정으로 로그인해야 시설 준비 원장을 관리할 수 있습니다.
+        <MudButton Href="@SellerRoutes.Login" Variant="Variant.Text" Color="Color.Primary">로그인</MudButton>
+    </MudAlert>
+}
+else
+{
+    <MudPaper Class="pa-4 mb-4" Outlined="true">
+        <MudStack Row="true" AlignItems="AlignItems.End" Spacing="2">
+            <MudTextField @bind-Value="profileId"
+                          Label="시설 프로필 ID"
+                          HelperText="영문·숫자·밑줄·하이픈 1~80자"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+            <MudButton Variant="Variant.Outlined" OnClick="LoadAsync" Disabled="loading">불러오기</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync" Disabled="loading">
+                준비 원장 저장
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@messageSeverity" Variant="Variant.Outlined" Class="mb-4">@message</MudAlert>
+    }
+
+    <MudGrid>
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4 seller-readiness-card" Outlined="true">
+                <MudText Typo="Typo.overline">1 · SELLER / EXPORTER</MudText>
+                <MudText Typo="Typo.h6">해외 판매자·수출자</MudText>
+                <MudTextField @bind-Value="model.판매자업체명" Label="업체명 / Company name" />
+                <MudTextField @bind-Value="model.판매자국가코드" Label="국가 코드 / Country code" />
+                <MudTextField @bind-Value="model.판매자현지등록번호" Label="현지 사업자·등록 번호" />
+                <MudTextField @bind-Value="model.판매자담당자명" Label="담당자 / Contact" />
+                <MudTextField @bind-Value="model.판매자이메일" Label="이메일 / Email" />
+                <MudTextField @bind-Value="model.판매자전화번호" Label="전화번호 / Phone" />
+                <MudCheckBox @bind-Value="model.판매자가시설운영자인가"
+                             Label="판매자와 실제 시설 운영자가 동일합니다." />
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4 seller-readiness-card" Outlined="true">
+                <MudText Typo="Typo.overline">2 · ACTUAL FACILITY</MudText>
+                <MudText Typo="Typo.h6">실제 제조·가공·포장 시설</MudText>
+                <MudTextField @bind-Value="model.시설명" Label="시설명 / Facility name" />
+                <MudTextField @bind-Value="model.시설대표자명" Label="대표자 / Representative" />
+                <MudTextField @bind-Value="model.시설주소" Label="시설 주소 / Actual address" Lines="2" />
+                <MudTextField @bind-Value="model.시설국가코드" Label="시설 국가 코드" />
+                <MudTextField @bind-Value="model.시설전화번호" Label="시설 전화번호" />
+                <MudTextField @bind-Value="model.시설이메일" Label="시설 이메일" />
+                <MudTextField @bind-Value="model.기존식약처등록코드" Label="기존 식약처 등록 코드(선택)" />
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           Disabled="facilitySearching"
+                           OnClick="SearchOfficialFacilityAsync">
+                    식약처 공식 등록 조회
+                </MudButton>
+                @if (officialFacilityResult is not null)
+                {
+                    <MudText Typo="Typo.caption" Class="mt-2">
+                        식약처 공식자료 · @officialFacilityResult.조회메타데이터.조회시각Utc.LocalDateTime.ToString("yyyy-MM-dd HH:mm")
+                        · 실시간 재확인 @(officialFacilityResult.조회메타데이터.실시간재확인필요여부 ? "필요" : "불필요")
+                    </MudText>
+                    @foreach (var item in officialFacilityResult.항목목록)
+                    {
+                        <MudPaper Class="pa-2 mt-2" Outlined="true">
+                            <MudText Typo="Typo.subtitle2">@item.제조업소명</MudText>
+                            <MudText Typo="Typo.caption">@item.제조업소주소 · @item.국가명</MudText>
+                            @if (item.주의필요여부)
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Error">@item.주의사유</MudText>
+                            }
+                            <MudButton Size="Size.Small"
+                                       Variant="Variant.Text"
+                                       OnClick="@(() => ApplyOfficialFacility(item))">
+                                이 등록 정보 사용
+                            </MudButton>
+                        </MudPaper>
+                    }
+                }
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4 seller-readiness-card" Outlined="true">
+                <MudText Typo="Typo.overline">3 · KOREAN IMPORTER</MudText>
+                <MudText Typo="Typo.h6">한국 수입자</MudText>
+                <MudTextField @bind-Value="model.국내수입업체명" Label="수입업체명" />
+                <MudTextField @bind-Value="model.국내수입업체주소" Label="주소" Lines="2" />
+                <MudTextField @bind-Value="model.국내수입업체전화번호" Label="전화번호" />
+                <MudTextField @bind-Value="model.국내수입업체이메일" Label="이메일" />
+                <MudTextField @bind-Value="model.국내수입식품영업등록번호" Label="수입식품 영업등록 번호" />
+                <MudCheckBox @bind-Value="model.국내수입업체확인여부"
+                             Label="등록번호와 수입자 지정 상태를 확인했습니다." />
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Class="mt-2">
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Outlined="true">
+                <MudText Typo="Typo.h6">품목과 특수 절차</MudText>
+                @foreach (var option in ProductOptions)
+                {
+                    <MudCheckBox T="bool"
+                                 Value="@Selected(model.생산품목코드목록, option.Code)"
+                                 ValueChanged="@(value => Toggle(model.생산품목코드목록, option.Code, value))"
+                                 Label="@option.Label" />
+                }
+                <MudCheckBox @bind-Value="model.수산물정부경로검토필요여부"
+                             Label="협정·정부 경로가 필요한 수산물인지 별도 검토합니다." />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Outlined="true">
+                <MudText Typo="Typo.h6">시설 업종</MudText>
+                @foreach (var option in BusinessOptions)
+                {
+                    <MudCheckBox T="bool"
+                                 Value="@Selected(model.업종코드목록, option.Code)"
+                                 ValueChanged="@(value => Toggle(model.업종코드목록, option.Code, value))"
+                                 Label="@option.Label" />
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Class="pa-4 mt-4" Outlined="true">
+        <MudText Typo="Typo.h6">신청 유형과 안전관리 체계</MudText>
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudSelect T="string" @bind-Value="model.신청자유형" Label="신청자 유형">
+                    <MudSelectItem Value="@해외판매자식품시설신청자유형코드.해외시설운영자">해외 시설 운영자</MudSelectItem>
+                    <MudSelectItem Value="@해외판매자식품시설신청자유형코드.국내수입자">한국 수입자</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSelect T="string" @bind-Value="model.등록유형" Label="등록 업무">
+                    <MudSelectItem Value="@해외판매자식품시설등록유형코드.신규">신규 등록</MudSelectItem>
+                    <MudSelectItem Value="@해외판매자식품시설등록유형코드.변경">변경 등록</MudSelectItem>
+                    <MudSelectItem Value="@해외판매자식품시설등록유형코드.갱신">유효기간 갱신</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+        <MudText Typo="Typo.subtitle2" Class="mt-3">적용 중인 안전관리 체계</MudText>
+        @foreach (var option in SafetyOptions)
+        {
+            <MudCheckBox T="bool"
+                         Value="@Selected(model.안전관리인증코드목록, option.Code)"
+                         ValueChanged="@(value => Toggle(model.안전관리인증코드목록, option.Code, value))"
+                         Label="@option.Label" />
+        }
+        @if (Selected(model.안전관리인증코드목록, 해외판매자식품시설안전관리코드.기타))
+        {
+            <MudTextField @bind-Value="model.기타안전관리인증명" Label="기타 안전관리 체계명" />
+        }
+    </MudPaper>
+
+    <MudPaper Class="pa-4 mt-4" Outlined="true">
+        <MudText Typo="Typo.h6">증빙과 확인</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            수출국 허가·등록증, 공식 영문 확인, 공증 번역, 안전관리 인증 등의 문서 식별 정보를 남깁니다.
+            실제 파일 업로드와 식약처 제출은 별도 검토 단계입니다.
+        </MudText>
+        <MudGrid>
+            <MudItem xs="12" md="3"><MudTextField @bind-Value="evidence.문서Id" Label="문서 ID" /></MudItem>
+            <MudItem xs="12" md="3"><MudTextField @bind-Value="evidence.문서명" Label="문서명" /></MudItem>
+            <MudItem xs="12" md="3">
+                <MudSelect T="string" @bind-Value="evidence.증빙유형" Label="증빙 유형">
+                    @foreach (var option in EvidenceOptions)
+                    {
+                        <MudSelectItem Value="@option.Code">@option.Label</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="2"><MudTextField @bind-Value="evidence.발급기관" Label="발급기관" /></MudItem>
+            <MudItem xs="12" md="1"><MudTextField @bind-Value="evidence.언어코드" Label="언어" /></MudItem>
+            <MudItem xs="12" md="1">
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddEvidence" />
+            </MudItem>
+        </MudGrid>
+        @foreach (var item in model.증빙목록)
+        {
+            <MudChip T="string" Variant="Variant.Outlined" Class="ma-1"
+                     OnClose="@(() => model.증빙목록.Remove(item))">
+                @item.문서명 · @item.증빙유형 · @item.언어코드
+            </MudChip>
+        }
+        <MudDivider Class="my-3" />
+        <MudCheckBox @bind-Value="model.현지실사동의여부" Label="식약처 현지실사에 동의합니다." />
+        <MudCheckBox @bind-Value="model.정보진실성확인여부" Label="입력 정보와 증빙이 사실임을 확인합니다." />
+        <MudCheckBox @bind-Value="model.시설운영자동의여부" Label="국내 수입자가 신청하는 경우 시설 운영자의 동의를 확보했습니다." />
+    </MudPaper>
+
+    @if (result is not null)
+    {
+        <MudPaper Class="pa-4 mt-4" Outlined="true">
+            <MudText Typo="Typo.overline">READINESS RESULT</MudText>
+            <MudText Typo="Typo.h6">@ProcedureLabel(result.적용절차코드)</MudText>
+            <MudChip T="string" Color="@(result.시설등록준비완료여부 ? Color.Success : Color.Warning)">
+                시설 등록 준비 @(result.시설등록준비완료여부 ? "완료" : "보완 필요")
+            </MudChip>
+            <MudChip T="string" Color="@(result.한국수입준비완료여부 ? Color.Success : Color.Warning)">
+                한국 수입 준비 @(result.한국수입준비완료여부 ? "완료" : "보완 필요")
+            </MudChip>
+            <MudText Typo="Typo.body1" Class="mt-3">@result.다음조치</MudText>
+            @foreach (var blocker in result.차단사유목록)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Text">@blocker</MudAlert>
+            }
+            @foreach (var warning in result.주의사항목록)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Text">@warning</MudAlert>
+            }
+            <MudText Typo="Typo.caption">
+                실행 모드: @result.실행모드 · 외부 신고 발생: @(result.외부신고발생여부 ? "예" : "아니오")
+            </MudText>
+        </MudPaper>
+    }
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">
+        법적 근거:
+        <a href="https://law.go.kr/LSW/lsInfoP.do?lsId=012247" target="_blank">수입식품안전관리 특별법</a>,
+        <a href="https://www.law.go.kr/LSW/lumLsLinkPop.do?chrClsCd=010202&lspttninfSeq=126970" target="_blank">시행규칙 제2조</a>,
+        <a href="https://impfood.mfds.go.kr/CFAAA01F01/" target="_blank">식약처 해외제조업소 안내</a>
+    </MudAlert>
+}
+
+@code {
+    private string profileId = "primary-facility";
+    private 해외판매자식품시설저장요청 model = new();
+    private 해외판매자식품시설증빙요청 evidence = new()
+    {
+        증빙유형 = 해외판매자식품시설증빙유형코드.수출국허가등록증빙
+    };
+    private 해외판매자식품시설응답? result;
+    private 해외제조업소조회화면응답? officialFacilityResult;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+    private bool loading;
+    private bool facilitySearching;
+
+    private static readonly Option[] ProductOptions =
+    [
+        new(해외판매자식품시설품목코드.농산물, "농산물 / Agricultural products"),
+        new(해외판매자식품시설품목코드.가공식품, "가공식품 / Processed foods"),
+        new(해외판매자식품시설품목코드.기구용기포장, "기구·용기·포장"),
+        new(해외판매자식품시설품목코드.수산물, "수산물 / Fishery products"),
+        new(해외판매자식품시설품목코드.식품첨가물, "식품첨가물 / Food additives"),
+        new(해외판매자식품시설품목코드.건강기능식품, "건강기능식품"),
+        new(해외판매자식품시설품목코드.동물성식품, "동물성 식품(수출국 정부 경로)"),
+        new(해외판매자식품시설품목코드.축산물, "축산물(해외작업장·수출국 정부 경로)")
+    ];
+
+    private static readonly Option[] BusinessOptions =
+    [
+        new(해외판매자식품시설업종코드.식품첨가물제조가공, "식품·첨가물 제조·가공"),
+        new(해외판매자식품시설업종코드.기구용기포장제조, "기구·용기·포장 제조"),
+        new(해외판매자식품시설업종코드.농산물포장, "농산물 포장"),
+        new(해외판매자식품시설업종코드.건강기능식품제조, "건강기능식품 제조"),
+        new(해외판매자식품시설업종코드.수산물가공, "수산물 가공"),
+        new(해외판매자식품시설업종코드.어선, "어선"),
+        new(해외판매자식품시설업종코드.양식장, "양식장")
+    ];
+
+    private static readonly Option[] EvidenceOptions =
+    [
+        new(해외판매자식품시설증빙유형코드.수출국허가등록증빙, "수출국 허가·등록 증빙"),
+        new(해외판매자식품시설증빙유형코드.등록확인서대체서식, "등록확인서 대체서식"),
+        new(해외판매자식품시설증빙유형코드.공식영문확인, "공식 영문 확인"),
+        new(해외판매자식품시설증빙유형코드.공증번역, "공증 번역"),
+        new(해외판매자식품시설증빙유형코드.식품안전인증, "식품안전 인증"),
+        new(해외판매자식품시설증빙유형코드.정부경로확인, "수출국 정부 경로 확인")
+    ];
+
+    private static readonly Option[] SafetyOptions =
+    [
+        new(해외판매자식품시설안전관리코드.Haccp, "HACCP"),
+        new(해외판매자식품시설안전관리코드.Iso22000, "ISO 22000"),
+        new(해외판매자식품시설안전관리코드.Gmp, "GMP"),
+        new(해외판매자식품시설안전관리코드.Gfsi, "GFSI"),
+        new(해외판매자식품시설안전관리코드.기타, "기타 / Other")
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.RestoreAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (string.IsNullOrWhiteSpace(profileId))
+        {
+            SetMessage("시설 프로필 ID를 입력하세요.", Severity.Warning);
+            return;
+        }
+
+        loading = true;
+        try
+        {
+            result = await FacilityService.조회Async(profileId);
+            if (result is null)
+            {
+                SetMessage("저장된 준비 원장을 찾지 못했습니다.", Severity.Info);
+                return;
+            }
+
+            model = result.등록정보;
+            model.기대Revision = result.Revision;
+            SetMessage("준비 원장을 불러왔습니다.", Severity.Success);
+        }
+        catch (Exception exception)
+        {
+            SetMessage(exception.Message, Severity.Error);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (string.IsNullOrWhiteSpace(profileId))
+        {
+            SetMessage("시설 프로필 ID를 입력하세요.", Severity.Warning);
+            return;
+        }
+
+        loading = true;
+        try
+        {
+            result = await FacilityService.저장Async(profileId, model);
+            if (result is null)
+            {
+                SetMessage("준비 원장을 저장하지 못했습니다.", Severity.Error);
+                return;
+            }
+
+            model = result.등록정보;
+            model.기대Revision = result.Revision;
+            SetMessage("준비 원장을 저장하고 누락 항목을 다시 판정했습니다.", Severity.Success);
+        }
+        catch (Exception exception)
+        {
+            SetMessage(exception.Message, Severity.Error);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task SearchOfficialFacilityAsync()
+    {
+        if (string.IsNullOrWhiteSpace(model.시설명))
+        {
+            SetMessage("실제 시설명을 먼저 입력하세요.", Severity.Warning);
+            return;
+        }
+
+        facilitySearching = true;
+        try
+        {
+            officialFacilityResult = await FacilityService.공식등록조회Async(model.시설명);
+            if (officialFacilityResult is null || officialFacilityResult.항목목록.Count == 0)
+            {
+                SetMessage(
+                    "일치하는 식약처 공식 등록을 찾지 못했습니다. 명칭·주소를 다시 확인하고 신규 등록 준비를 계속하세요.",
+                    Severity.Info);
+            }
+            else
+            {
+                SetMessage("식약처 공식자료 결과를 불러왔습니다. 실제 시설과 같은지 직접 확인하세요.", Severity.Success);
+            }
+        }
+        catch (Exception exception)
+        {
+            SetMessage(exception.Message, Severity.Error);
+        }
+        finally
+        {
+            facilitySearching = false;
+        }
+    }
+
+    private void ApplyOfficialFacility(해외제조업소조회화면항목 item)
+    {
+        model.기존식약처등록코드 = item.제조업소코드;
+        model.시설명 = item.제조업소명;
+        model.시설주소 = item.제조업소주소;
+        SetMessage(
+            "공식자료의 시설명·주소·등록 코드를 입력했습니다. 국가 코드와 담당자·연락처는 증빙으로 별도 확인하세요.",
+            item.주의필요여부 ? Severity.Warning : Severity.Success);
+    }
+
+    private void AddEvidence()
+    {
+        if (string.IsNullOrWhiteSpace(evidence.문서Id) || string.IsNullOrWhiteSpace(evidence.문서명))
+        {
+            SetMessage("증빙 문서 ID와 문서명을 입력하세요.", Severity.Warning);
+            return;
+        }
+
+        model.증빙목록.Add(evidence);
+        evidence = new 해외판매자식품시설증빙요청
+        {
+            증빙유형 = 해외판매자식품시설증빙유형코드.수출국허가등록증빙
+        };
+    }
+
+    private static bool Selected(IReadOnlyCollection<string> values, string code)
+        => values.Contains(code, StringComparer.OrdinalIgnoreCase);
+
+    private static void Toggle(ICollection<string> values, string code, bool selected)
+    {
+        if (selected && !values.Contains(code, StringComparer.OrdinalIgnoreCase))
+        {
+            values.Add(code);
+        }
+        else if (!selected)
+        {
+            var existing = values.FirstOrDefault(x => string.Equals(x, code, StringComparison.OrdinalIgnoreCase));
+            if (existing is not null)
+            {
+                values.Remove(existing);
+            }
+        }
+    }
+
+    private void SetMessage(string value, Severity severity)
+    {
+        message = value;
+        messageSeverity = severity;
+    }
+
+    private static string ProcedureLabel(string code) => code switch
+    {
+        한국수입식품절차코드.동물성식품수출국정부신청 => "동물성 식품 · 수출국 정부 신청 경로",
+        한국수입식품절차코드.축산물해외작업장수출국정부신청 => "축산물 해외작업장 · 수출국 정부 신청 경로",
+        한국수입식품절차코드.수산물정부경로검토 => "수산물 · 정부 경로 별도 검토",
+        _ => "일반 해외제조업소 등록 준비"
+    };
+
+    private sealed record Option(string Code, string Label);
+}

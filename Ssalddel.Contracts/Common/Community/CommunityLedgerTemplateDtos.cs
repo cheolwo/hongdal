@@ -446,6 +446,7 @@ public static class CommunityLedgerTemplateKeys
     public const string GroupPurchase = "group-purchase";
     public const string GroupImport = "group-import";
     public const string GroupExport = "group-export";
+    public const string ForeignFoodFacilityProfile = "foreign-food-facility-profile";
     public const string MeatImportReadiness = "meat-import-readiness";
     public const string Errand = "errand";
 }

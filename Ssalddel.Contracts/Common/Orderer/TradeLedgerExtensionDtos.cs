@@ -65,6 +65,24 @@ public sealed class 무역확장원장응답
     public string 실행모드 { get; set; } = "Simulation";
 }
 
+public sealed class 판매자수출원장목록조회요청
+{
+    public int Page { get; set; }
+    public int PageSize { get; set; } = 25;
+    public string? Search { get; set; }
+    public string? Status { get; set; }
+}
+
+public sealed class 판매자수출원장목록응답
+{
+    public IReadOnlyList<무역확장원장요약응답> Items { get; set; } = [];
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public bool 외부실행발생여부 { get; set; }
+    public string 실행모드 { get; set; } = "Simulation";
+}
+
 public sealed class 무역확장원장요약응답
 {
     public string 원장Id { get; set; } = string.Empty;

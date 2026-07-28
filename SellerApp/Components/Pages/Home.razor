@@ -10,7 +10,7 @@
         <span class="seller-eyebrow">SELLER WORKSPACE · @MarketProfile.Profile.CountryCode</span>
         <h1>판매 준비부터 주문 이행까지</h1>
         <p>
-            판매 페이지, 채널 계정, 재고 기반 판매상품, 출품 준비와 판매 주문을
+            주문자의 개별·집단·대량·수출 수요, 판매 페이지, 채널 계정, 재고 기반 판매상품과 판매 주문을
             같은 판매자 원장 흐름으로 확인합니다.
         </p>
     </div>
@@ -70,11 +70,13 @@ else if (_featureEnabled is false)
 
     private static readonly SellerFlowItem[] FlowItems =
     [
-        new("01", "판매 페이지", "상품 설명과 주문 방식을 초안으로 준비합니다.", SellerRoutes.SalesPageComposer, Icons.Material.Filled.Description),
-        new("02", "판매채널", "국내·해외 채널의 API 자격증명을 안전하게 연결합니다.", SellerRoutes.SalesChannels, Icons.Material.Filled.Storefront),
-        new("03", "판매상품", "내 재고에서 판매할 상품과 SKU·가격을 등록합니다.", SellerRoutes.Inventory, Icons.Material.Filled.Inventory2),
-        new("04", "채널 출품", "판매상품과 채널 계정을 연결한 내부 출품 원장을 만듭니다.", SellerRoutes.Listings, Icons.Material.Filled.Sell),
-        new("05", "판매 주문", "서버에 영속된 주문 출고 후보와 창고·운송 인계를 봅니다.", SellerRoutes.Orders, Icons.Material.Filled.ReceiptLong)
+        new("01", "주문자 수요", "개별 주문, 모이고 있는 집단 수요, 참여 중인 대량 주문과 수출 준비를 구분해 확인합니다.", SellerRoutes.OrdererDemand, Icons.Material.Filled.Groups),
+        new("02", "한국 수입식품 준비", "해외 판매자·실제 제조시설·국내 수입자를 분리해 등록 전 누락을 확인합니다.", SellerRoutes.ForeignFoodFacilities, Icons.Material.Filled.FactCheck),
+        new("03", "판매 페이지", "상품 설명과 주문 방식을 초안으로 준비합니다.", SellerRoutes.SalesPageComposer, Icons.Material.Filled.Description),
+        new("04", "판매채널", "국내·해외 채널의 API 자격증명을 안전하게 연결합니다.", SellerRoutes.SalesChannels, Icons.Material.Filled.Storefront),
+        new("05", "판매상품", "내 재고에서 판매할 상품과 SKU·가격을 등록합니다.", SellerRoutes.Inventory, Icons.Material.Filled.Inventory2),
+        new("06", "채널 출품", "판매상품과 채널 계정을 연결한 내부 출품 원장을 만듭니다.", SellerRoutes.Listings, Icons.Material.Filled.Sell),
+        new("07", "채널 판매 주문", "외부 판매채널에서 수집한 주문과 창고·운송 인계를 봅니다.", SellerRoutes.Orders, Icons.Material.Filled.ReceiptLong)
     ];
 
     protected override async Task OnInitializedAsync()

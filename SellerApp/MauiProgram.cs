@@ -22,6 +22,8 @@ public static class MauiProgram
             builder.Configuration[SsalddelApiEndpoint.ConfigurationKey]));
         builder.Services.AddSsalddelUiCommonAppServices<SellerAuthSession>();
         builder.Services.AddScoped<SellerAuthService>();
+        builder.Services.AddScoped<SellerExportLedgerService>();
+        builder.Services.AddScoped<SellerForeignFoodFacilityService>();
         builder.Services.AddTransient<SellerInventoryPageViewModel>();
         builder.Services.AddTransient<SellerProductsPageViewModel>();
         builder.Services.AddTransient<SellerProductCreatePageViewModel>();
