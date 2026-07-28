@@ -28,6 +28,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddScoped<ICommunityVoteClient>(provider =>
             provider.GetRequiredService<PlatformCommunityService>());
         services.TryAddScoped<IDiagramOrganizationDirectoryClient, DiagramOrganizationDirectoryClient>();
+        services.TryAddScoped<ICollectivePurchaseLogisticsDirectoryClient, CollectivePurchaseLogisticsDirectoryClient>();
         services.TryAddScoped<YouTubeFoodCommunityDiscoveryService>();
         services.TryAddScoped<ICommunityDynamicDiscoveryClient, CommunityDynamicDiscoveryClient>();
         services.TryAddScoped<ICommunityDecorationSelectionStore, BrowserCommunityDecorationSelectionStore>();

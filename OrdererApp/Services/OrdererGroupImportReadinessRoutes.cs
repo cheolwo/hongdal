@@ -8,6 +8,7 @@ public enum GroupImportReadinessSection
     Suppliers,
     Costs,
     Classification,
+    LogisticsReview,
     Handoff,
     Consent
 }
@@ -18,6 +19,7 @@ public static class OrdererGroupImportReadinessRoutes
     public const string SuppliersTemplate = GroupPurchasePageRoutes.ImportSuppliersTemplate;
     public const string CostsTemplate = GroupPurchasePageRoutes.ImportCostsTemplate;
     public const string ClassificationTemplate = GroupPurchasePageRoutes.ImportClassificationTemplate;
+    public const string LogisticsReviewTemplate = GroupPurchasePageRoutes.ImportLogisticsReviewTemplate;
     public const string HandoffTemplate = GroupPurchasePageRoutes.ImportHandoffTemplate;
     public const string ConsentTemplate = GroupPurchasePageRoutes.ImportConsentTemplate;
 
@@ -34,6 +36,7 @@ public static class OrdererGroupImportReadinessRoutes
             GroupImportReadinessSection.Suppliers => GroupPurchasePageRoutes.ImportSuppliersFor(ledgerId),
             GroupImportReadinessSection.Costs => GroupPurchasePageRoutes.ImportCostsFor(ledgerId),
             GroupImportReadinessSection.Classification => GroupPurchasePageRoutes.ImportClassificationFor(ledgerId),
+            GroupImportReadinessSection.LogisticsReview => GroupPurchasePageRoutes.ImportLogisticsReviewFor(ledgerId),
             GroupImportReadinessSection.Handoff => GroupPurchasePageRoutes.ImportHandoffFor(ledgerId),
             GroupImportReadinessSection.Consent => GroupPurchasePageRoutes.ImportConsentFor(ledgerId),
             _ => GroupPurchasePageRoutes.ImportOverviewFor(ledgerId)

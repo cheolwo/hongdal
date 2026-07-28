@@ -1,0 +1,447 @@
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Contracts.Common.Operations
+@using Ssalddel.Ui.Common.Areas.App.Services
+@inject ICollectivePurchaseLogisticsDirectoryClient LogisticsDirectoryClient
+
+<MudStack Spacing="3">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        식품류는 목록통관 대상이 아니어서 일반 수입신고가 필요하지만, 개인 자가사용이고 물품가격이 미화 150달러 이하라면
+        관세·부가세 면세가 가능할 수 있습니다. 세금과 식품 신고·검역 요건은 별도로 판단합니다.
+        <MudLink Href="@주문자해외구매통관정책.관세청목록통관배제안내Url" Target="_blank">관세청 안내</MudLink>
+        ·
+        <MudLink Href="@주문자해외구매통관정책.식약처수입식품정보Url" Target="_blank">식약처 수입식품 정보</MudLink>
+    </MudAlert>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">이번 물량 조건</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    원장의 구매 목적은 유지하고, 세관 판단에 필요한 금액과 물품 조건만 검토합니다.
+                </MudText>
+            </MudStack>
+
+            <MudTextField T="string"
+                          Label="구매 목적"
+                          Value="@Ledger.통관목적안내.수입목적표시명"
+                          ReadOnly="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+
+            <MudNumericField T="decimal?"
+                             Label="물품가격(USD)"
+                             Value="@_goodsPriceUsd"
+                             ValueChanged="SetGoodsPrice"
+                             Min="0m"
+                             Step="1m"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             HelperText="물품대금과 발송국 내 세금·운임 등 관세청 물품가격 기준으로 입력합니다." />
+
+            <MudCheckBox T="bool"
+                         Value="@_isFood"
+                         ValueChanged="SetFood"
+                         Color="Color.Primary"
+                         Label="식품·건강기능식품 등 목록통관 배제 가능 품목" />
+            <MudSelect T="string"
+                       Label="통관 후 보관 온도"
+                       Value="@_storageTemperatureCode"
+                       ValueChanged="SetStorageTemperatureAsync"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       HelperText="선택한 온도를 실제로 취급할 수 있는 3PL 후보만 표시합니다.">
+                <MudSelectItem T="string" Value="@주문자3PL보관온도코드.상온">상온</MudSelectItem>
+                <MudSelectItem T="string" Value="@주문자3PL보관온도코드.냉장">냉장</MudSelectItem>
+                <MudSelectItem T="string" Value="@주문자3PL보관온도코드.냉동">냉동</MudSelectItem>
+            </MudSelect>
+            <MudCheckBox T="bool"
+                         Value="@_unitedStatesListClearanceEligible"
+                         ValueChanged="SetUnitedStatesListClearance"
+                         Disabled="@_isFood"
+                         Color="Color.Primary"
+                         Label="미국발 목록통관 200달러 조건 충족 후보" />
+
+            @if (_isFood)
+            {
+                <MudText Typo="Typo.caption" Color="Color.Warning">
+                    식품류는 미국발이어도 목록통관 200달러 기준을 적용하지 않고 일반 자가사용 150달러 기준으로 검토합니다.
+                </MudText>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6">@Review.물류3PL권유제목</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@Review.물류3PL권유이유</MudText>
+                </MudStack>
+                <MudChip T="string"
+                         Color="@RecommendationColor"
+                         Variant="Variant.Filled">
+                    @RecommendationLabel
+                </MudChip>
+            </MudStack>
+
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">통관 방식</MudText>
+                    <MudText Typo="Typo.body1">@(Review.일반수입신고필요 ? "일반 수입신고 검토" : "목록통관 가능성 검토")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">세금</MudText>
+                    <MudText Typo="Typo.body1">@(Review.과세검토필요 ? "관세·부가세 계산 필요" : "자가사용 면세 후보")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">식품 요건</MudText>
+                    <MudText Typo="Typo.body1">@(Review.식품수입요건검토필요 ? "신고·검역·성분 확인" : "일반 품목 확인")</MudText>
+                </MudItem>
+            </MudGrid>
+
+            @if (Review.확인할3PL역량목록.Count > 0)
+            {
+                <MudText Typo="Typo.subtitle2">3PL 비교 시 확인할 범위</MudText>
+                @foreach (var item in Review.확인할3PL역량목록)
+                {
+                    <MudText Typo="Typo.body2">· @item</MudText>
+                }
+            }
+
+            @foreach (var warning in Review.주의사항목록)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">@warning</MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">조건에 맞는 3PL 비교 후보</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    공동재고 보관과 @StorageTemperatureLabel 취급 근거를 모두 갖추고, 해당 물품의 취급 불가 제한이 없는 공개 후보만 표시합니다.
+                </MudText>
+            </MudStack>
+
+            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.End" Wrap="Wrap.Wrap">
+                <MudTextField T="string"
+                              Label="업체명 검색"
+                              Value="@_candidateSearchText"
+                              ValueChanged="SetCandidateSearchText"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Immediate="true"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" />
+                <MudButton OnClick="LoadCandidatesAsync"
+                           Disabled="@_candidateLoading"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary">
+                    조건으로 다시 찾기
+                </MudButton>
+            </MudStack>
+
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">
+                    @StorageTemperatureLabel
+                </MudChip>
+                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                    @(_isFood ? "식품 취급" : "일반 상품")
+                </MudChip>
+                <MudChip T="string" Color="Color.Default" Variant="Variant.Outlined">
+                    공동재고 보관
+                </MudChip>
+            </MudStack>
+
+            @if (_candidateLoading)
+            {
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">조건에 맞는 공개 후보를 확인하고 있습니다.</MudText>
+                </MudStack>
+            }
+            else if (!string.IsNullOrWhiteSpace(_candidateError))
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    @_candidateError
+                    조건을 임의로 완화하거나 확인되지 않은 업체를 대신 표시하지 않습니다.
+                </MudAlert>
+            }
+            else if (_eligibleCandidates.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    현재 운영 시장의 공개 자료에서 이 조건을 모두 충족한 3PL 후보를 확인하지 못했습니다.
+                    온도 조건을 낮추지 말고 운영자에게 후보 등록·시설 확인을 요청하세요.
+                </MudAlert>
+            }
+            else
+            {
+                @if (_directoryResponse is not null)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @_directoryResponse.MarketCode 시장 · 카탈로그 @_directoryResponse.CatalogVersion
+                        @if (_directoryResponse.SnapshotReviewedOn is not null)
+                        {
+                            <text> · 자료 검토 @_directoryResponse.SnapshotReviewedOn.Value.ToString("yyyy-MM-dd")</text>
+                        }
+                    </MudText>
+                }
+
+                @foreach (var candidate in _eligibleCandidates)
+                {
+                    var isSelected = string.Equals(
+                        _selectedProviderKey,
+                        candidate.Provider.ProviderKey,
+                        StringComparison.OrdinalIgnoreCase);
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.subtitle1">@candidate.Provider.DisplayName</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        @candidate.Provider.MarketCode · 공개 자료 기반 비교 후보
+                                    </MudText>
+                                </MudStack>
+                                <MudButton OnClick="@(() => SelectCandidate(candidate.Provider.ProviderKey))"
+                                           Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CheckCircle">
+                                    @(isSelected ? "비교 후보로 담김" : "비교 후보로 담기")
+                                </MudButton>
+                            </MudStack>
+
+                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">
+                                    @StorageTemperatureLabel 취급 근거
+                                </MudChip>
+                                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">
+                                    시설 역량 재확인 필요
+                                </MudChip>
+                                <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
+                                    플랫폼 제휴 아님
+                                </MudChip>
+                            </MudStack>
+
+                            <MudText Typo="Typo.body2">
+                                실제 창고의 온도 범위, 식품 취급 가능 여부, 입·출고 작업 범위와 견적은 계약 전에 업체에 직접 확인해야 합니다.
+                            </MudText>
+
+                            <MudLink Href="@candidate.Provider.OfficialWebsiteUrl" Target="_blank">
+                                업체 공식 사이트에서 시설 확인
+                            </MudLink>
+                        </MudStack>
+                    </MudPaper>
+                }
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_selectedProviderKey))
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                    선택은 이 화면의 비교 표시일 뿐이며 업체 배정이나 계약이 아닙니다.
+                    견적, 시설, 허가·등록 상태를 확인한 뒤 별도 동의로 인계해야 합니다.
+                </MudAlert>
+            }
+
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudButton Href="@HandoffHref"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Warehouse">
+                    포워더·3PL 인계 조건 확인
+                </MudButton>
+                <MudButton Href="@CostsHref"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary">
+                    예상 비용 다시 보기
+                </MudButton>
+                <MudButton Href="@주문자해외구매통관정책.관세청예상세액조회Url"
+                           Target="_blank"
+                           Variant="Variant.Text"
+                           Color="Color.Secondary">
+                    관세청 예상세액 조회
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private decimal? _goodsPriceUsd;
+    private bool _isFood;
+    private string _storageTemperatureCode = 주문자3PL보관온도코드.상온;
+    private bool _unitedStatesListClearanceEligible;
+    private string? _initializedLedgerKey;
+    private string? _candidateSearchText;
+    private string? _selectedProviderKey;
+    private bool _candidateLoading;
+    private string? _candidateError;
+    private CollectivePurchaseLogisticsDirectoryResponse? _directoryResponse;
+    private IReadOnlyList<CollectivePurchaseLogisticsProviderCandidate> _eligibleCandidates = [];
+
+    [Parameter, EditorRequired] public 같이수입준비주문자조회응답 Ledger { get; set; } = default!;
+    [Parameter, EditorRequired] public string LedgerId { get; set; } = string.Empty;
+    [Parameter] public string? AutoGroupId { get; set; }
+
+    private 주문자수입물류경로검토응답 Review
+        => 주문자해외구매통관정책.수입물류경로검토(new 주문자수입물류경로검토요청
+        {
+            거래유형 = Ledger.거래유형,
+            물품가격Usd = _goodsPriceUsd,
+            식품류여부 = _isFood,
+            냉장냉동보관필요 =
+                _storageTemperatureCode != 주문자3PL보관온도코드.상온,
+            미국발목록통관조건충족 = _unitedStatesListClearanceEligible
+        });
+
+    private string StorageTemperatureLabel => _storageTemperatureCode switch
+    {
+        주문자3PL보관온도코드.냉장 => "냉장",
+        주문자3PL보관온도코드.냉동 => "냉동",
+        _ => "상온"
+    };
+
+    private Color RecommendationColor => Review.물류3PL권유수준코드 switch
+    {
+        주문자수입3PL권유수준코드.이용권유 => Color.Warning,
+        주문자수입3PL권유수준코드.이용검토 => Color.Info,
+        _ => Color.Success
+    };
+
+    private string RecommendationLabel => Review.물류3PL권유수준코드 switch
+    {
+        주문자수입3PL권유수준코드.이용권유 => "3PL 이용 권유",
+        주문자수입3PL권유수준코드.이용검토 => "3PL 비교 권장",
+        _ => "직접 수령 가능성"
+    };
+
+    private string HandoffHref
+        => OrdererGroupImportReadinessRoutes.For(
+            GroupImportReadinessSection.Handoff,
+            LedgerId,
+            AutoGroupId ?? string.Empty);
+
+    private string CostsHref
+        => OrdererGroupImportReadinessRoutes.For(
+            GroupImportReadinessSection.Costs,
+            LedgerId,
+            AutoGroupId ?? string.Empty);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.Equals(_initializedLedgerKey, LedgerId, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _initializedLedgerKey = LedgerId;
+        _isFood = Ledger.품목분류목록.Any(item => IsFoodHsCandidate(item.품목코드));
+        _storageTemperatureCode = Ledger.품목분류목록.Any(item =>
+            item.분류근거.Contains("냉동", StringComparison.OrdinalIgnoreCase))
+            ? 주문자3PL보관온도코드.냉동
+            : Ledger.품목분류목록.Any(item =>
+                item.분류근거.Contains("냉장", StringComparison.OrdinalIgnoreCase))
+                ? 주문자3PL보관온도코드.냉장
+                : 주문자3PL보관온도코드.상온;
+        await LoadCandidatesAsync();
+    }
+
+    private void SetGoodsPrice(decimal? value)
+        => _goodsPriceUsd = value;
+
+    private async Task SetFood(bool value)
+    {
+        _isFood = value;
+        if (value)
+        {
+            _unitedStatesListClearanceEligible = false;
+        }
+        else if (_storageTemperatureCode != 주문자3PL보관온도코드.상온)
+        {
+            _storageTemperatureCode = 주문자3PL보관온도코드.상온;
+        }
+
+        await LoadCandidatesAsync();
+    }
+
+    private async Task SetStorageTemperatureAsync(string value)
+    {
+        _storageTemperatureCode = 주문자3PL보관온도코드.정규화(value);
+        if (_storageTemperatureCode != 주문자3PL보관온도코드.상온)
+        {
+            _isFood = true;
+            _unitedStatesListClearanceEligible = false;
+        }
+
+        await LoadCandidatesAsync();
+    }
+
+    private void SetUnitedStatesListClearance(bool value)
+        => _unitedStatesListClearanceEligible = !_isFood && value;
+
+    private void SetCandidateSearchText(string value)
+        => _candidateSearchText = value;
+
+    private void SelectCandidate(string providerKey)
+        => _selectedProviderKey = string.Equals(
+            _selectedProviderKey,
+            providerKey,
+            StringComparison.OrdinalIgnoreCase)
+            ? null
+            : providerKey;
+
+    private async Task LoadCandidatesAsync()
+    {
+        _candidateLoading = true;
+        _candidateError = null;
+        try
+        {
+            var condition = new 주문자3PL후보필터조건
+            {
+                식품류여부 = _isFood,
+                보관온도코드 = _storageTemperatureCode
+            };
+            var handlingCode = 주문자3PL후보필터.요구상품취급코드(condition);
+            _directoryResponse = await LogisticsDirectoryClient.SearchAsync(
+                handlingCode,
+                _candidateSearchText);
+
+            if (!_directoryResponse.Success)
+            {
+                _eligibleCandidates = [];
+                _selectedProviderKey = null;
+                _candidateError = _directoryResponse.ErrorMessage
+                    ?? "현재 운영 시장에서 3PL 후보 목록을 사용할 수 없습니다.";
+                return;
+            }
+
+            _eligibleCandidates = 주문자3PL후보필터.적합후보(
+                _directoryResponse.Items,
+                condition);
+            if (_eligibleCandidates.All(candidate => !string.Equals(
+                    candidate.Provider.ProviderKey,
+                    _selectedProviderKey,
+                    StringComparison.OrdinalIgnoreCase)))
+            {
+                _selectedProviderKey = null;
+            }
+        }
+        catch (Exception)
+        {
+            _eligibleCandidates = [];
+            _selectedProviderKey = null;
+            _candidateError = "3PL 후보 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.";
+        }
+        finally
+        {
+            _candidateLoading = false;
+        }
+    }
+
+    private static bool IsFoodHsCandidate(string? hsCode)
+    {
+        var digits = new string((hsCode ?? string.Empty).Where(char.IsDigit).Take(2).ToArray());
+        return int.TryParse(digits, out var chapter) && chapter is >= 1 and <= 24;
+    }
+}

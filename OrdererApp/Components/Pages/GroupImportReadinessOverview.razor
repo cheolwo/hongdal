@@ -9,7 +9,9 @@
                                 Title="같이 수입 준비 개요"
                                 Description="같이 수입 일정과 단계, 참여 역할을 요약합니다.">
     <ChildContent Context="ledger">
-        <GroupImportReadinessOverviewScreen Ledger="ledger" />
+        <GroupImportReadinessOverviewScreen Ledger="ledger"
+                                            LedgerId="@LedgerId"
+                                            AutoGroupId="@AutoGroupId" />
     </ChildContent>
 </GroupImportReadinessRouteFrame>
 

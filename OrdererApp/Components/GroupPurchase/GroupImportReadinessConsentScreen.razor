@@ -6,6 +6,24 @@
         현재 로그인 사용자의 주체·버전·범위·시각을 갖춘 본인 동의 기록이 아닙니다.
     </MudAlert>
 
+    <MudAlert Severity="@(Ledger.통관목적안내.개인통관고유부호입력대상 ? Severity.Info : Severity.Warning)"
+              Variant="Variant.Outlined">
+        @if (Ledger.통관목적안내.개인통관고유부호입력대상)
+        {
+            <span>
+                개인통관고유부호는 실제 개인 자가사용 통관 절차가 생성된 뒤 본인 확인용 전용 입력 단계에서만 받습니다.
+                같이 수입 공동 원장이나 포워더 집계 자료에는 원문을 기록하지 않으며, 입력했다고 면세가 확정되지는 않습니다.
+            </span>
+        }
+        else
+        {
+            <span>
+                사업·판매 목적 수입에는 개인통관고유부호 입력을 요청하지 않습니다.
+                사업자·수입자 정보와 품목별 신고·세금 근거를 별도 수입 절차에서 확인합니다.
+            </span>
+        }
+    </MudAlert>
+
     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
         <MudStack Spacing="2">
             <MudText Typo="Typo.h6">정보 제공 범위</MudText>

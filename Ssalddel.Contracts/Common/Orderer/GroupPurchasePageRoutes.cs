@@ -27,6 +27,7 @@ public enum GroupPurchaseScreenKind
     ImportSuppliers,
     ImportCosts,
     ImportClassification,
+    ImportLogisticsReview,
     ImportHandoff,
     ImportConsent,
     ImportReview,
@@ -72,6 +73,7 @@ public static class GroupPurchasePageRoutes
     public const string ImportSuppliersTemplate = $"{ImportOverviewTemplate}/suppliers";
     public const string ImportCostsTemplate = $"{ImportOverviewTemplate}/costs";
     public const string ImportClassificationTemplate = $"{ImportOverviewTemplate}/classification";
+    public const string ImportLogisticsReviewTemplate = $"{ImportOverviewTemplate}/logistics-review";
     public const string ImportHandoffTemplate = $"{ImportOverviewTemplate}/handoff";
     public const string ImportConsentTemplate = $"{ImportOverviewTemplate}/consent";
     public const string ImportReviewRoot = $"{Root}/import-review";
@@ -128,6 +130,9 @@ public static class GroupPurchasePageRoutes
 
     public static string ImportClassificationFor(string groupImportLedgerId)
         => $"{ImportOverviewFor(groupImportLedgerId)}/classification";
+
+    public static string ImportLogisticsReviewFor(string groupImportLedgerId)
+        => $"{ImportOverviewFor(groupImportLedgerId)}/logistics-review";
 
     public static string ImportHandoffFor(string groupImportLedgerId)
         => $"{ImportOverviewFor(groupImportLedgerId)}/handoff";

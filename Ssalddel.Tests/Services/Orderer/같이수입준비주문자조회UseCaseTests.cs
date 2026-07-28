@@ -74,6 +74,8 @@ public sealed class 같이수입준비주문자조회UseCaseTests
         Assert.Equal("쌀", response.상품명);
         Assert.Equal(20, Assert.Single(response.재료집계목록).모인수요수량);
         Assert.Equal("공개 공급자", Assert.Single(response.공급자근거목록).조직명);
+        Assert.Equal(해외구매통관목적코드.개인자가사용, response.통관목적안내.수입목적코드);
+        Assert.True(response.통관목적안내.개인통관고유부호입력대상);
         Assert.True(response.포워더인계.운영자기록정보제공조건확인여부);
         var json = JsonSerializer.Serialize(response);
         Assert.DoesNotContain("internal-", json, StringComparison.Ordinal);

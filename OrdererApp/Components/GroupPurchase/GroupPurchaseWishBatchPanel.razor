@@ -27,6 +27,10 @@
 
             @if (ViewModel.IsBusinessPurchase)
             {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                    판매·영업에 사용할 물품은 개인통관고유부호나 자가사용 소액면세 경로로 처리하지 않습니다.
+                    HS 코드·원산지·과세가격에 따른 사업 수입 신고와 관세·부가세·품목별 요건을 비용에 반영합니다.
+                </MudAlert>
                 <MudGrid Spacing="2">
                     <MudItem xs="12" md="6">
                         <MudTextField T="string"
@@ -64,9 +68,15 @@
             else
             {
                 <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-                    B2C 원함은 부가세 포함 기준으로 집단화되며 구매 조직이나 세금계산서 조건을 저장하지 않습니다.
+                    개인통관고유부호는 본인 확인 수단이며 면세 보증이 아닙니다. 실제 자가사용·수량·품목·가격 요건을
+                    충족하는지 별도로 확인하고, 같이 주문했다는 이유만으로 참여자별 면세를 가정하지 않습니다.
                 </MudAlert>
             }
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                일반 자가사용 기준은 미화 150달러 이하입니다. 미국발 200달러 기준은 목록통관 대상 등 조건을 충족할 때만 검토합니다.
+                <MudLink Href="@주문자해외구매통관정책.관세청예상세액조회Url" Target="_blank">관세청 예상세액 조회</MudLink>
+            </MudText>
         </MudStack>
     </MudPaper>
 

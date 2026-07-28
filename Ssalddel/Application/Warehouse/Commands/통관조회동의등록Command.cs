@@ -8,6 +8,7 @@ public sealed record 통관조회동의등록Command(
     string 사용자Id,
     long 주문Id,
     long 통관절차Id,
+    string 수입목적코드,
     string 개인통관고유부호,
     string 수취인이름,
     string 휴대폰번호,

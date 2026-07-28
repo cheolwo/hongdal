@@ -9,7 +9,9 @@
                                 Title="같이 수입 비용 검토"
                                 Description="공통비·개별부담과 계산 근거를 분리해 봅니다.">
     <ChildContent Context="ledger">
-        <GroupImportReadinessCostsScreen Ledger="ledger" />
+        <GroupImportReadinessCostsScreen Ledger="ledger"
+                                         LedgerId="@LedgerId"
+                                         AutoGroupId="@AutoGroupId" />
     </ChildContent>
 </GroupImportReadinessRouteFrame>
 

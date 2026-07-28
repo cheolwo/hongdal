@@ -20,6 +20,46 @@
 
     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
         <MudStack Spacing="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.subtitle1">이번 수입의 목적과 통관 경로</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@Ledger.통관목적안내.수입목적표시명</MudText>
+                </MudStack>
+                <MudChip T="string"
+                         Color="@(Ledger.통관목적안내.자가사용소액면세검토대상 ? Color.Info : Color.Warning)"
+                         Variant="Variant.Outlined">
+                    @(Ledger.통관목적안내.자가사용소액면세검토대상 ? "면세 여부 추가 확인" : "사업 수입 비용 검토")
+                </MudChip>
+            </MudStack>
+            <MudAlert Severity="@(Ledger.통관목적안내.자가사용소액면세검토대상 ? Severity.Info : Severity.Warning)"
+                      Variant="Variant.Outlined"
+                      Dense="true">
+                @Ledger.통관목적안내.핵심안내
+            </MudAlert>
+            @foreach (var item in Ledger.통관목적안내.확인사항)
+            {
+                <MudText Typo="Typo.body2">· @item</MudText>
+            }
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                기준 @Ledger.통관목적안내.기준일.ToString("yyyy-MM-dd") ·
+                <MudLink Href="@Ledger.통관목적안내.관세청예상세액조회Url" Target="_blank">관세청 예상세액 조회</MudLink>
+            </MudText>
+            @if (CanOpenLogisticsReview)
+            {
+                <MudButton Href="@LogisticsReviewHref"
+                           Variant="Variant.Filled"
+                           Color="@(Ledger.통관목적안내.관세부가세예상비용검토필요 ? Color.Warning : Color.Primary)"
+                           StartIcon="@Icons.Material.Filled.Warehouse">
+                    @(Ledger.통관목적안내.관세부가세예상비용검토필요
+                        ? "판매용 통관·3PL 경로 확인"
+                        : "금액·식품 조건으로 통관·3PL 확인")
+                </MudButton>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
             <MudText Typo="Typo.subtitle1">함께 준비하는 재료</MudText>
             @foreach (var source in Ledger.재료집계목록)
             {
@@ -65,6 +105,17 @@
 
 @code {
     [Parameter, EditorRequired] public 같이수입준비주문자조회응답 Ledger { get; set; } = default!;
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [Parameter] public string? AutoGroupId { get; set; }
+
+    private bool CanOpenLogisticsReview
+        => !string.IsNullOrWhiteSpace(LedgerId) && !string.IsNullOrWhiteSpace(AutoGroupId);
+
+    private string LogisticsReviewHref
+        => OrdererGroupImportReadinessRoutes.For(
+            GroupImportReadinessSection.LogisticsReview,
+            LedgerId,
+            AutoGroupId ?? string.Empty);
 
     private IReadOnlyList<(string Label, bool Ready)> ReadinessItems =>
     [

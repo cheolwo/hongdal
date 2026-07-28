@@ -19,6 +19,7 @@ public sealed class 같이수입준비주문자조회응답
     public string 상태코드 { get; set; } = 같이수입준비원장상태코드.초안;
     public string 거래유형 { get; set; } = 공동구매거래유형코드.B2C;
     public string 가격표시기준 { get; set; } = 공동구매가격표시기준코드.부가세포함;
+    public 주문자해외구매통관안내 통관목적안내 { get; set; } = new();
     public DateTimeOffset 기준시각Utc { get; set; }
     public IReadOnlyList<같이수입준비주문자재료집계응답> 재료집계목록 { get; set; } = [];
     public 같이수입준비주문자진행상태응답 준비현황 { get; set; } = new();

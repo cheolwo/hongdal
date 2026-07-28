@@ -1,0 +1,21 @@
+@page "/group-purchase/imports/{LedgerId}/logistics-review"
+
+<PageTitle>통관·3PL 경로 검토</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.LogisticsReview"
+                                ScreenCode="02.11"
+                                Title="통관·3PL 경로 검토"
+                                Description="구매 목적, 물품가격과 식품·보관 조건으로 신고·세금·3PL 이용 필요성을 나눠 확인합니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessLogisticsReviewScreen Ledger="ledger"
+                                                   LedgerId="@LedgerId"
+                                                   AutoGroupId="@AutoGroupId" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

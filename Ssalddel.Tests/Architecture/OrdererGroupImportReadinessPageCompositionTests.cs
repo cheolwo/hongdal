@@ -8,6 +8,7 @@ public sealed class OrdererGroupImportReadinessPageCompositionTests
         ("GroupImportReadinessSuppliers.razor", "/group-purchase/imports/{LedgerId}/suppliers", "<GroupImportReadinessSuppliersScreen"),
         ("GroupImportReadinessCosts.razor", "/group-purchase/imports/{LedgerId}/costs", "<GroupImportReadinessCostsScreen"),
         ("GroupImportReadinessClassification.razor", "/group-purchase/imports/{LedgerId}/classification", "<GroupImportReadinessClassificationScreen"),
+        ("GroupImportReadinessLogisticsReview.razor", "/group-purchase/imports/{LedgerId}/logistics-review", "<GroupImportReadinessLogisticsReviewScreen"),
         ("GroupImportReadinessHandoff.razor", "/group-purchase/imports/{LedgerId}/handoff", "<GroupImportReadinessHandoffScreen"),
         ("GroupImportReadinessConsent.razor", "/group-purchase/imports/{LedgerId}/consent", "<GroupImportReadinessConsentScreen")
     ];
@@ -39,7 +40,7 @@ public sealed class OrdererGroupImportReadinessPageCompositionTests
         var files = Directory.GetFiles(componentRoot, "GroupImportReadiness*.razor");
         var source = string.Join(Environment.NewLine, files.Select(File.ReadAllText));
 
-        Assert.Equal(7, files.Length);
+        Assert.Equal(8, files.Length);
         Assert.DoesNotContain("I같이수입준비관리Client", source, StringComparison.Ordinal);
         Assert.DoesNotContain("준비Os작업실행Async", source, StringComparison.Ordinal);
         Assert.DoesNotContain("전문검토인계Async", source, StringComparison.Ordinal);
@@ -75,6 +76,7 @@ public sealed class OrdererGroupImportReadinessPageCompositionTests
         Assert.Contains("GroupPurchaseScreenKind.ImportSuppliers", source);
         Assert.Contains("GroupPurchaseScreenKind.ImportCosts", source);
         Assert.Contains("GroupPurchaseScreenKind.ImportClassification", source);
+        Assert.Contains("GroupPurchaseScreenKind.ImportLogisticsReview", source);
         Assert.Contains("GroupPurchaseScreenKind.ImportHandoff", source);
         Assert.Contains("GroupPurchaseScreenKind.ImportConsent", source);
     }

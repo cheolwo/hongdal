@@ -1,6 +1,28 @@
 @using Ssalddel.Contracts.Common.Orderer
 
 <MudStack Spacing="3">
+    <MudAlert Severity="@(Ledger.통관목적안내.관세부가세예상비용검토필요 ? Severity.Warning : Severity.Info)"
+              Variant="Variant.Outlined">
+        @if (Ledger.통관목적안내.관세부가세예상비용검토필요)
+        {
+            <span>사업·판매 목적 물량입니다. 자가사용 소액면세를 비용에서 빼지 말고 관세·수입 부가세·품목별 신고 비용을 견적 근거와 함께 표시해야 합니다.</span>
+        }
+        else
+        {
+            <span>개인 소비 목적이어도 면세는 확정값이 아닙니다. 실제 자가사용·수량·품목·가격 조건이 확인되기 전에는 관세·세금 항목을 0원으로 확정하지 않습니다.</span>
+        }
+    </MudAlert>
+
+    @if (CanOpenLogisticsReview)
+    {
+        <MudButton Href="@LogisticsReviewHref"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Warehouse">
+            물품가격·식품 조건으로 3PL 이용 판단
+        </MudButton>
+    }
+
     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
         <MudStack Spacing="2">
             <MudStack Spacing="0">
@@ -81,6 +103,17 @@
 
 @code {
     [Parameter, EditorRequired] public 같이수입준비주문자조회응답 Ledger { get; set; } = default!;
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [Parameter] public string? AutoGroupId { get; set; }
+
+    private bool CanOpenLogisticsReview
+        => !string.IsNullOrWhiteSpace(LedgerId) && !string.IsNullOrWhiteSpace(AutoGroupId);
+
+    private string LogisticsReviewHref
+        => OrdererGroupImportReadinessRoutes.For(
+            GroupImportReadinessSection.LogisticsReview,
+            LedgerId,
+            AutoGroupId ?? string.Empty);
 
     private static string DateLabel(DateTimeOffset value)
         => value == default ? "미기록" : value.ToLocalTime().ToString("yyyy-MM-dd");

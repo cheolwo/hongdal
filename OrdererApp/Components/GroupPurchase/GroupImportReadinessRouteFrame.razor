@@ -44,6 +44,7 @@
         (GroupImportReadinessSection.Suppliers, "공급자 근거"),
         (GroupImportReadinessSection.Costs, "견적·예상 비용"),
         (GroupImportReadinessSection.Classification, "품목분류·규제"),
+        (GroupImportReadinessSection.LogisticsReview, "통관·3PL 경로"),
         (GroupImportReadinessSection.Handoff, "포워더 인계"),
         (GroupImportReadinessSection.Consent, "정보 제공")
     ];
@@ -61,6 +62,7 @@
         GroupImportReadinessSection.Suppliers => GroupPurchaseScreenKind.ImportSuppliers,
         GroupImportReadinessSection.Costs => GroupPurchaseScreenKind.ImportCosts,
         GroupImportReadinessSection.Classification => GroupPurchaseScreenKind.ImportClassification,
+        GroupImportReadinessSection.LogisticsReview => GroupPurchaseScreenKind.ImportLogisticsReview,
         GroupImportReadinessSection.Handoff => GroupPurchaseScreenKind.ImportHandoff,
         GroupImportReadinessSection.Consent => GroupPurchaseScreenKind.ImportConsent,
         _ => GroupPurchaseScreenKind.ImportOverview

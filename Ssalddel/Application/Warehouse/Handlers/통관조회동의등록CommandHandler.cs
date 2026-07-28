@@ -1,6 +1,7 @@
 using FluentResults;
 using MediatR;
 using Ssalddel.Application.CommandProcessing;
+using Ssalddel.Contracts.Common.Orderer;
 using 살뜰.Infrastructure.Security;
 using 살뜰.도메인.통관;
 using 살뜰.도메인.사용자;
@@ -47,6 +48,20 @@ public sealed class 통관조회동의등록CommandHandler : IRequestHandler<통
         if (request.실행역할 != 살뜰역할유형.주문자)
         {
             return Result.Fail<Unit>("주문자 역할에서만 통관 조회 동의를 등록할 수 있습니다.");
+        }
+
+        if (!해외구매통관목적코드.지원여부(request.수입목적코드))
+        {
+            return Result.Fail<Unit>("개인 자가사용 또는 사업·판매 목적 중 이번 수입 목적을 먼저 선택해야 합니다.");
+        }
+
+        if (!string.Equals(
+                request.수입목적코드,
+                해외구매통관목적코드.개인자가사용,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return Result.Fail<Unit>(
+                "사업·판매 목적 수입에는 개인통관고유부호를 등록할 수 없습니다. 사업 수입 신고 경로에서 수입자와 세금·품목 요건을 확인해 주세요.");
         }
 
         var 절차 = await _db.통관절차

@@ -704,6 +704,7 @@ public sealed class PageCapabilityCatalogTests
     [InlineData("/group-purchase/imports/group-import-17/suppliers")]
     [InlineData("/group-purchase/imports/group-import-17/costs")]
     [InlineData("/group-purchase/imports/group-import-17/classification")]
+    [InlineData("/group-purchase/imports/group-import-17/logistics-review")]
     [InlineData("/group-purchase/imports/group-import-17/handoff")]
     [InlineData("/group-purchase/imports/group-import-17/consent?autoGroupId=auto-group-onion")]
     public void 주문자_같이수입준비현황은_참여자인증된_1점5_읽기전용화면이다(string route)

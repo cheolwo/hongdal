@@ -21,6 +21,7 @@ internal static class 같이수입준비주문자Projection
             가격표시기준 = 공동구매가격표시기준코드.정규화(
                 source.거래문맥?.가격표시기준,
                 transactionType),
+            통관목적안내 = 주문자해외구매통관정책.안내(transactionType),
             기준시각Utc = source.저장시각Utc,
             재료집계목록 = 재료집계(source, preparation, materialNames),
             준비현황 = new 같이수입준비주문자진행상태응답
