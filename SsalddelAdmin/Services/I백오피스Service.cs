@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.CommonContents;
+using Ssalddel.Contracts.Common.Documents;
 
 namespace SsalddelAdmin.Services;
 
@@ -34,7 +35,9 @@ public interface I백오피스Service
     Task<IReadOnlyList<문서정책요약응답>> 문서정책목록조회Async(CancellationToken cancellationToken = default);
     Task<문서정책요약응답?> 문서정책수정Async(string documentCode, 문서정책수정요청 request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<문서조회요약응답>> 문서목록조회Async(string? documentCode = null, string? requestId = null, string? status = null, CancellationToken cancellationToken = default);
+    Task<문서관계그래프응답> 문서관계그래프조회Async(string stableId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<문서조회로그요약응답>> 문서로그목록조회Async(long? documentId = null, CancellationToken cancellationToken = default);
+    Task<문서조회요약응답?> 문서생명주기변경Async(long documentId, 문서생명주기변경요청 request, CancellationToken cancellationToken = default);
     Task<문서조회요약응답?> 문서업로드Async(Stream fileStream, string fileName, string contentType, string documentCode, string documentName, string requestId, long? transportId = null, bool? encrypt = null, bool? allowDownload = null, string? createdBy = null, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<관리자공통콘텐츠요약응답>> 공통콘텐츠목록조회Async(CancellationToken cancellationToken = default);
     Task<관리자공통콘텐츠상세응답?> 공통콘텐츠상세조회Async(long id, CancellationToken cancellationToken = default);

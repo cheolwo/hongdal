@@ -62,8 +62,19 @@ public sealed partial class 백오피스메모리Service
     public Task<IReadOnlyList<문서조회요약응답>> 문서목록조회Async(string? documentCode = null, string? requestId = null, string? status = null, CancellationToken cancellationToken = default)
         => Task.FromResult(_documentMemory.GetDocuments(documentCode, requestId, status));
 
+    public Task<Ssalddel.Contracts.Common.Documents.문서관계그래프응답> 문서관계그래프조회Async(
+        string stableId,
+        CancellationToken cancellationToken = default)
+        => Task.FromResult(_documentMemory.GetRelationshipGraph(stableId));
+
     public Task<IReadOnlyList<문서조회로그요약응답>> 문서로그목록조회Async(long? documentId = null, CancellationToken cancellationToken = default)
         => Task.FromResult(_documentMemory.GetLogs(documentId));
+
+    public Task<문서조회요약응답?> 문서생명주기변경Async(
+        long documentId,
+        문서생명주기변경요청 request,
+        CancellationToken cancellationToken = default)
+        => Task.FromResult(_documentMemory.TransitionLifecycle(documentId, request));
 
     public async Task<문서조회요약응답?> 문서업로드Async(
         Stream fileStream,

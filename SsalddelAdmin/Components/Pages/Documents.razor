@@ -14,6 +14,7 @@
         </MudStack>
         <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
             <MudButton Href="@관리자문서Routes.업로드" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload">문서 업로드</MudButton>
+            <MudButton Href="@관리자문서Routes.관계" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AccountTree">관계 추적</MudButton>
             <MudButton Href="@관리자문서Routes.정책목록" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Policy">문서 정책</MudButton>
             <MudButton Href="@관리자문서Routes.로그목록" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.History">조회 로그</MudButton>
             <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isLoading" OnClick="LoadAsync">새로고침</MudButton>
@@ -42,6 +43,10 @@
         <MudAlert Severity="@MessageSeverity">@message</MudAlert>
     }
 
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+        확인·서명·발행된 문서는 원천 원장 Revision과 내용 해시가 고정됩니다. 정정할 때는 원본을 덮어쓰지 않고 대체 문서를 연결합니다.
+    </MudAlert>
+
     @if (isLoading)
     {
         <MudAlert Severity="Severity.Info">문서 목록을 불러오는 중입니다...</MudAlert>
@@ -61,29 +66,80 @@
                 }
                 else
                 {
-                    <MudTable Items="@documents" Dense="true" Hover="true" Elevation="0">
+                    <MudTable Items="@documents" Dense="true" Hover="true" Elevation="0" Breakpoint="Breakpoint.Sm">
                         <HeaderContent>
                             <MudTh>시각</MudTh>
                             <MudTh>문서</MudTh>
-                            <MudTh>의뢰</MudTh>
-                            <MudTh>파일명</MudTh>
-                            <MudTh>상태</MudTh>
-                            <MudTh>암호화</MudTh>
-                            <MudTh>다운로드</MudTh>
-                            <MudTh>로그</MudTh>
+                            <MudTh>분류</MudTh>
+                            <MudTh>원천 원장</MudTh>
+                            <MudTh>생명주기</MudTh>
+                            <MudTh>무결성</MudTh>
+                            <MudTh>접근</MudTh>
+                            <MudTh>조치</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="시각">@context.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
-                            <MudTd DataLabel="문서">@context.문서명</MudTd>
-                            <MudTd DataLabel="의뢰">@context.의뢰Id</MudTd>
-                            <MudTd DataLabel="파일명">@context.파일명</MudTd>
-                            <MudTd DataLabel="상태">
-                                <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.생성상태)" Variant="Variant.Filled">@context.생성상태</MudChip>
+                            <MudTd DataLabel="문서">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.body2"><strong>@context.문서명</strong></MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.문서코드 · @context.파일명</MudText>
+                                </MudStack>
                             </MudTd>
-                            <MudTd DataLabel="암호화">@(context.암호화됨 ? "예" : "아니오")</MudTd>
-                            <MudTd DataLabel="다운로드">@(context.다운로드허용여부 ? "허용" : "차단")</MudTd>
-                            <MudTd DataLabel="로그">
-                                <MudButton Href="@DocumentLogHref(context.Id)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">보기</MudButton>
+                            <MudTd DataLabel="분류">
+                                <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">
+                                    @문서분류코드.표시명(context.문서분류코드)
+                                </MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="원천 원장">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.body2">@(string.IsNullOrWhiteSpace(context.원천원장Id) ? context.의뢰Id : context.원천원장Id)</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        @(string.IsNullOrWhiteSpace(context.원천원장종류코드) ? "종류 미지정" : context.원천원장종류코드)
+                                        @if (context.원천원장Revision.HasValue)
+                                        {
+                                            <span> · r@(context.원천원장Revision.Value)</span>
+                                        }
+                                    </MudText>
+                                </MudStack>
+                            </MudTd>
+                            <MudTd DataLabel="생명주기">
+                                <MudStack Spacing="0">
+                                    <MudChip T="string" Size="Size.Small" Color="@LifecycleColor(context.생명주기상태코드)" Variant="Variant.Filled">
+                                        @문서생명주기상태코드.표시명(context.생명주기상태코드)
+                                    </MudChip>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.생성상태</MudText>
+                                </MudStack>
+                            </MudTd>
+                            <MudTd DataLabel="무결성">
+                                <MudTooltip Text="@context.내용Sha256">
+                                    <MudText Typo="Typo.caption">@HashLabel(context.내용Sha256)</MudText>
+                                </MudTooltip>
+                            </MudTd>
+                            <MudTd DataLabel="접근">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.caption">@(context.암호화됨 ? "암호화" : "평문")</MudText>
+                                    <MudText Typo="Typo.caption">@(context.다운로드허용여부 ? "다운로드 허용" : "다운로드 차단")</MudText>
+                                </MudStack>
+                            </MudTd>
+                            <MudTd DataLabel="조치">
+                                <MudStack Row="true" Spacing="1">
+                                    <MudButton Href="@DocumentLogHref(context.Id)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">로그</MudButton>
+                                    @if (context.관련StableId목록.Count > 0)
+                                    {
+                                        <MudButton Href="@관리자문서Routes.관계조회(context.관련StableId목록[0])" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">관계</MudButton>
+                                    }
+                                    @if (NextLifecycleStates(context.생명주기상태코드).Count > 0)
+                                    {
+                                        <MudMenu Label="상태 변경" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">
+                                            @foreach (var nextStatus in NextLifecycleStates(context.생명주기상태코드))
+                                            {
+                                                <MudMenuItem OnClick="@(() => TransitionLifecycleAsync(context.Id, nextStatus))">
+                                                    @문서생명주기상태코드.표시명(nextStatus)
+                                                </MudMenuItem>
+                                            }
+                                        </MudMenu>
+                                    }
+                                </MudStack>
                             </MudTd>
                         </RowTemplate>
                     </MudTable>
@@ -138,4 +194,61 @@
 
     private static string DocumentLogHref(long documentId)
         => 관리자문서Routes.로그(documentId);
+
+    private static Color LifecycleColor(string? status)
+        => status switch
+        {
+            문서생명주기상태코드.입력필요 => Color.Warning,
+            문서생명주기상태코드.검토준비 => Color.Info,
+            문서생명주기상태코드.확인완료
+                or 문서생명주기상태코드.서명완료
+                or 문서생명주기상태코드.발행완료
+                or 문서생명주기상태코드.외부원본등록
+                or 문서생명주기상태코드.전달완료
+                or 문서생명주기상태코드.수령확인 => Color.Success,
+            문서생명주기상태코드.대체됨
+                or 문서생명주기상태코드.취소
+                or 문서생명주기상태코드.폐기 => Color.Error,
+            _ => Color.Default
+        };
+
+    private static string HashLabel(string? hash)
+        => string.IsNullOrWhiteSpace(hash)
+            ? "해시 없음"
+            : $"SHA-256 {hash[..Math.Min(12, hash.Length)]}…";
+
+    private static IReadOnlyList<string> NextLifecycleStates(string? currentStatus)
+        => 문서생명주기Planner.다음상태목록(currentStatus)
+            .Where(status => status != 문서생명주기상태코드.대체됨)
+            .ToArray();
+
+    private async Task TransitionLifecycleAsync(long documentId, string targetStatus)
+    {
+        isLoading = true;
+        message = null;
+        try
+        {
+            var updated = await DataService.문서생명주기변경Async(
+                documentId,
+                new 문서생명주기변경요청
+                {
+                    대상상태코드 = targetStatus,
+                    변경사유 = "관리자 문서 화면에서 변경"
+                });
+            documents = await DataService.문서목록조회Async(documentCodeFilter, requestIdFilter, statusFilter);
+            isError = updated is null;
+            message = updated is null
+                ? "문서 상태를 변경하지 못했습니다."
+                : $"{updated.문서명} 상태를 {문서생명주기상태코드.표시명(updated.생명주기상태코드)}로 변경했습니다.";
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            message = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 }

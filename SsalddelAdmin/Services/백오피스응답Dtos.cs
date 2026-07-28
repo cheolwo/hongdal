@@ -362,6 +362,20 @@ public sealed class 문서조회요약응답
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;
     public string 생성상태 { get; set; } = string.Empty;
+    public string 문서분류코드 { get; set; } = string.Empty;
+    public string 생명주기상태코드 { get; set; } = string.Empty;
+    public string 원천원장Id { get; set; } = string.Empty;
+    public string 원천원장종류코드 { get; set; } = string.Empty;
+    public long? 원천원장Revision { get; set; }
+    public string 원천문서종류코드 { get; set; } = string.Empty;
+    public string 템플릿버전 { get; set; } = string.Empty;
+    public string 생성모드코드 { get; set; } = string.Empty;
+    public string 발급주체코드 { get; set; } = string.Empty;
+    public bool 외부발급원본대체가능여부 { get; set; }
+    public IReadOnlyList<string> 관련StableId목록 { get; set; } = [];
+    public string 내용Sha256 { get; set; } = string.Empty;
+    public long? 이전문서Id { get; set; }
+    public long? 대체문서Id { get; set; }
     public bool 암호화됨 { get; set; }
     public bool 다운로드허용여부 { get; set; }
     public bool 수정가능여부 { get; set; }
@@ -379,6 +393,7 @@ public sealed class 문서조회로그요약응답
     public string 역할명 { get; set; } = string.Empty;
     public string ClientIp { get; set; } = string.Empty;
     public string UserAgent { get; set; } = string.Empty;
+    public string MetadataJson { get; set; } = string.Empty;
     public DateTime 생성일시 { get; set; }
 }
 
@@ -393,6 +408,13 @@ public sealed class 문서생성요청
     public bool? 암호화여부 { get; set; }
     public bool? 다운로드허용여부 { get; set; }
     public string? 생성자 { get; set; }
+}
+
+public sealed class 문서생명주기변경요청
+{
+    public string 대상상태코드 { get; set; } = string.Empty;
+    public long? 대체문서Id { get; set; }
+    public string 변경사유 { get; set; } = string.Empty;
 }
 
 public sealed class 공개화물요약응답

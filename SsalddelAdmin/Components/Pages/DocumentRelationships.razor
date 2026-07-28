@@ -1,0 +1,233 @@
+@page "/documents/relationships"
+@rendermode InteractiveServer
+@inject I백오피스Service DataService
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>문서 관계 추적</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">문서 관계 추적</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">주문부터 입고·출고·운송까지 같은 업무에서 생성된 문서를 확인합니다.</MudText>
+        </MudStack>
+        <MudButton Href="@관리자문서Routes.목록" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.List">문서 목록</MudButton>
+    </MudStack>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.subtitle2">기준 stable ID</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                예: OrderReference:ORDER-SAMPLE-001 또는 TransportRequest:REQ-SAMPLE-001
+            </MudText>
+            <MudGrid Spacing="1">
+                <MudItem xs="12" sm="9">
+                    <MudTextField T="string"
+                                  Label="종류코드:값"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  @bind-Value="searchStableId" />
+                </MudItem>
+                <MudItem xs="12" sm="3">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.AccountTree"
+                               Disabled="@isLoading"
+                               FullWidth="true"
+                               OnClick="LoadAsync">
+                        관계 조회
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@MessageSeverity">@message</MudAlert>
+    }
+
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">문서 관계를 불러오는 중입니다...</MudAlert>
+    }
+    else if (graph is not null)
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="flex-wrap: wrap;">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">@문서StableId.표시명(graph.기준StableId)</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">연결 문서 @graph.문서목록.Count 건 · stable ID @graph.발견StableId목록.Count 개</MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small">한 업무 흐름</MudChip>
+                </MudStack>
+
+                <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                    @foreach (var stableId in graph.발견StableId목록)
+                    {
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Variant="@(string.Equals(stableId, graph.기준StableId, StringComparison.OrdinalIgnoreCase) ? Variant.Filled : Variant.Outlined)"
+                                 Color="Color.Primary"
+                                 OnClick="@(() => SelectStableIdAsync(stableId))">
+                            @문서StableId.표시명(stableId)
+                        </MudChip>
+                    }
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        @if (graph.문서목록.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                이 stable ID와 연결된 문서가 없습니다. 업무 Event가 문서를 생성했는지 확인해 주세요.
+            </MudAlert>
+        }
+        else
+        {
+            <MudStack Spacing="0" Class="document-chain">
+                @for (var index = 0; index < graph.문서목록.Count; index++)
+                {
+                    var position = index + 1;
+                    var document = graph.문서목록[index];
+                    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Stretch" Class="document-chain-row">
+                        <MudStack Spacing="0" AlignItems="AlignItems.Center" Class="document-chain-rail">
+                            <MudAvatar Size="Size.Medium" Color="Color.Primary">@position</MudAvatar>
+                            @if (index < graph.문서목록.Count - 1)
+                            {
+                                <div class="document-chain-line"></div>
+                            }
+                        </MudStack>
+                        <MudPaper Elevation="1" Class="pa-4 mb-3 document-chain-card">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Style="flex-wrap: wrap;">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.h6">@document.문서명</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@document.문서코드 · @document.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudText>
+                                    </MudStack>
+                                    <MudChip T="string" Size="Size.Small" Color="@LifecycleColor(document.생명주기상태코드)" Variant="Variant.Filled">
+                                        @문서생명주기상태코드.표시명(document.생명주기상태코드)
+                                    </MudChip>
+                                </MudStack>
+                                <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">
+                                        @문서분류코드.표시명(document.문서분류코드)
+                                    </MudChip>
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">
+                                        @문서StableId종류코드.표시명(document.원천원장종류코드) · @document.원천원장Id
+                                    </MudChip>
+                                    @if (document.원천원장Revision.HasValue)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">Revision @document.원천원장Revision</MudChip>
+                                    }
+                                </MudStack>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@HashLabel(document.내용Sha256)</MudText>
+                                <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                    @foreach (var stableId in document.연결StableId목록)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text">
+                                            @문서StableId.표시명(stableId)
+                                        </MudChip>
+                                    }
+                                </MudStack>
+                                <MudButton Href="@관리자문서Routes.로그(document.문서Id)" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.History">
+                                    감사 로그 보기
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                    </MudStack>
+                }
+            </MudStack>
+        }
+    }
+</MudStack>
+
+@code {
+    [SupplyParameterFromQuery(Name = "stableId")]
+    public string? StableId { get; set; }
+
+    private string searchStableId = "OrderReference:ORDER-SAMPLE-001";
+    private bool isLoading;
+    private bool isError;
+    private string? message;
+    private 문서관계그래프응답? graph;
+    private Severity MessageSeverity => isError ? Severity.Error : Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!관리자인증세션Service.서버관리자인가)
+        {
+            NavigationManager.NavigateTo(관리자문서Routes.로그인ReturnUrl(관리자문서Routes.관계));
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(StableId))
+        {
+            searchStableId = StableId.Trim();
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (!문서StableId.분석(searchStableId, out _, out _))
+        {
+            isError = true;
+            message = "종류코드:값 형식으로 입력해 주세요.";
+            graph = null;
+            return;
+        }
+
+        isLoading = true;
+        message = null;
+        try
+        {
+            graph = await DataService.문서관계그래프조회Async(searchStableId);
+            isError = false;
+            message = graph.문서목록.Count == 0
+                ? "연결 문서가 아직 생성되지 않았습니다."
+                : "같은 업무 stable ID를 공유하는 문서를 시간순으로 표시했습니다.";
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            message = exception.Message;
+            graph = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SelectStableIdAsync(string stableId)
+    {
+        searchStableId = stableId;
+        await LoadAsync();
+    }
+
+    private static Color LifecycleColor(string? status)
+        => status switch
+        {
+            문서생명주기상태코드.입력필요 => Color.Warning,
+            문서생명주기상태코드.검토준비 => Color.Info,
+            문서생명주기상태코드.확인완료
+                or 문서생명주기상태코드.서명완료
+                or 문서생명주기상태코드.발행완료
+                or 문서생명주기상태코드.전달완료
+                or 문서생명주기상태코드.수령확인 => Color.Success,
+            문서생명주기상태코드.대체됨
+                or 문서생명주기상태코드.취소
+                or 문서생명주기상태코드.폐기 => Color.Error,
+            _ => Color.Default
+        };
+
+    private static string HashLabel(string? hash)
+        => string.IsNullOrWhiteSpace(hash)
+            ? "내용 해시 없음"
+            : $"SHA-256 {hash[..Math.Min(16, hash.Length)]}…";
+}

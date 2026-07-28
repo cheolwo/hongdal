@@ -77,6 +77,21 @@ public sealed partial class 백오피스조회Service
         return result ?? [];
     }
 
+    public async Task<Ssalddel.Contracts.Common.Documents.문서관계그래프응답> 문서관계그래프조회Async(
+        string stableId,
+        CancellationToken cancellationToken = default)
+    {
+        ApplyAuthorizationHeader();
+        var uri = $"api/v1/admin/documents/relationships?stableId={Uri.EscapeDataString(stableId.Trim())}";
+        return await _httpClient.GetFromJsonAsync<Ssalddel.Contracts.Common.Documents.문서관계그래프응답>(
+                   uri,
+                   cancellationToken)
+               ?? new Ssalddel.Contracts.Common.Documents.문서관계그래프응답
+               {
+                   기준StableId = stableId.Trim()
+               };
+    }
+
     public async Task<IReadOnlyList<문서조회로그요약응답>> 문서로그목록조회Async(long? documentId = null, CancellationToken cancellationToken = default)
     {
         ApplyAuthorizationHeader();
@@ -87,6 +102,21 @@ public sealed partial class 백오피스조회Service
 
         var result = await _httpClient.GetFromJsonAsync<List<문서조회로그요약응답>>(query, cancellationToken);
         return result ?? [];
+    }
+
+    public async Task<문서조회요약응답?> 문서생명주기변경Async(
+        long documentId,
+        문서생명주기변경요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        ApplyAuthorizationHeader();
+
+        var response = await _httpClient.PostAsJsonAsync(
+            $"api/v1/admin/documents/{documentId}/lifecycle",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<문서조회요약응답>(cancellationToken: cancellationToken);
     }
 
     public async Task<문서조회요약응답?> 문서업로드Async(Stream fileStream, string fileName, string contentType, string documentCode, string documentName, string requestId, long? transportId = null, bool? encrypt = null, bool? allowDownload = null, string? createdBy = null, CancellationToken cancellationToken = default)

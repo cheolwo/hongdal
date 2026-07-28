@@ -53,13 +53,14 @@
                 }
                 else
                 {
-                    <MudTable Items="@logs" Dense="true" Hover="true" Elevation="0">
+                    <MudTable Items="@logs" Dense="true" Hover="true" Elevation="0" Breakpoint="Breakpoint.Sm">
                         <HeaderContent>
                             <MudTh>시각</MudTh>
                             <MudTh>문서Id</MudTh>
                             <MudTh>행위</MudTh>
                             <MudTh>사용자</MudTh>
                             <MudTh>역할</MudTh>
+                            <MudTh>변경 사유</MudTh>
                             <MudTh>IP</MudTh>
                         </HeaderContent>
                         <RowTemplate>
@@ -68,6 +69,7 @@
                             <MudTd DataLabel="행위">@context.행위</MudTd>
                             <MudTd DataLabel="사용자">@context.사용자명</MudTd>
                             <MudTd DataLabel="역할">@context.역할명</MudTd>
+                            <MudTd DataLabel="변경 사유">@MetadataLabel(context.MetadataJson)</MudTd>
                             <MudTd DataLabel="IP">@context.ClientIp</MudTd>
                         </RowTemplate>
                     </MudTable>
@@ -120,6 +122,30 @@
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private static string MetadataLabel(string? metadataJson)
+    {
+        if (string.IsNullOrWhiteSpace(metadataJson))
+        {
+            return "-";
+        }
+
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(metadataJson);
+            if (document.RootElement.TryGetProperty("reason", out var reason)
+                && !string.IsNullOrWhiteSpace(reason.GetString()))
+            {
+                return reason.GetString()!;
+            }
+
+            return "상세 기록 있음";
+        }
+        catch
+        {
+            return "상세 기록 확인 필요";
         }
     }
 }

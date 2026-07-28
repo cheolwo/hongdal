@@ -6,12 +6,16 @@ public static class 관리자문서Routes
     public const string 업로드 = "/documents/upload";
     public const string 정책목록 = "/documents/policies";
     public const string 로그목록 = "/documents/logs";
+    public const string 관계 = "/documents/relationships";
 
     public static string 정책상세(string documentCode)
         => $"{정책목록}/{Uri.EscapeDataString(documentCode)}";
 
     public static string 로그(long documentId)
         => $"{로그목록}?documentId={documentId}";
+
+    public static string 관계조회(string stableId)
+        => $"{관계}?stableId={Uri.EscapeDataString(stableId)}";
 
     public static string 로그인ReturnUrl(string route)
         => $"/login?returnUrl={Uri.EscapeDataString(route)}";
