@@ -1,5 +1,6 @@
 using FluentResults;
 using Ssalddel.Application.Abstractions;
+using Ssalddel.Contracts.Common.Transport;
 using 살뜰.도메인.사용자;
 
 namespace Ssalddel.Application.Driver.Work;
@@ -19,7 +20,8 @@ public sealed record 운행시작Command : 살뜰CommandBase, IRequest<Result<Ss
         string? 복귀지출처,
         string? 복귀콜선호,
         bool 커뮤니티운행공개,
-        bool 커뮤니티구단위위치공개동의)
+        bool 커뮤니티구단위위치공개동의,
+        string 운송실행유형 = 운송실행유형코드.화물운송)
     {
         기사Id = string.IsNullOrWhiteSpace(driverId) ? string.Empty : driverId;
         this.시작모드 = 시작모드;
@@ -34,6 +36,12 @@ public sealed record 운행시작Command : 살뜰CommandBase, IRequest<Result<Ss
         this.복귀콜선호 = 복귀콜선호;
         this.커뮤니티운행공개 = 커뮤니티운행공개;
         this.커뮤니티구단위위치공개동의 = 커뮤니티구단위위치공개동의;
+        this.운송실행유형 = string.Equals(
+            운송실행유형,
+            운송실행유형코드.음식배달,
+            StringComparison.Ordinal)
+            ? 운송실행유형코드.음식배달
+            : 운송실행유형코드.화물운송;
         참여자Id = 기사Id;
         실행역할 = 살뜰역할유형.기사;
     }
@@ -51,4 +59,5 @@ public sealed record 운행시작Command : 살뜰CommandBase, IRequest<Result<Ss
     public string? 복귀콜선호 { get; init; }
     public bool 커뮤니티운행공개 { get; init; }
     public bool 커뮤니티구단위위치공개동의 { get; init; }
+    public string 운송실행유형 { get; init; } = 운송실행유형코드.화물운송;
 }

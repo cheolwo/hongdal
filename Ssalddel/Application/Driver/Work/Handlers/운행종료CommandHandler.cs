@@ -47,15 +47,12 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         var driver = await _db.용달기사.FirstOrDefaultAsync(x => x.기사Id == request.기사Id, cancellationToken)
             ?? throw new InvalidOperationException("용달기사 정보를 찾을 수 없습니다.");
 
-        await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
-
         driver.운행상태 = 상태값.기사운행상태.대기;
         driver.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
         await _driverWorkQueueStore.RemoveAsync(request.기사Id, cancellationToken);
         await _국내화물운송기사상태Service.운행종료Async(request.기사Id, cancellationToken);
         await _배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
-        await tx.CommitAsync(cancellationToken);
         _communityDriverAvailabilityService.Close(request.기사Id);
 
         _logger.LogInformation(

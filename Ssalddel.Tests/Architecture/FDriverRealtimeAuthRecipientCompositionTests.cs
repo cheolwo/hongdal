@@ -68,6 +68,38 @@ public sealed class FDriverRealtimeAuthRecipientCompositionTests
     }
 
     [Fact]
+    public void 음식배달기사운행은_화물Api가아닌_음식배달Feature경계를사용한다()
+    {
+        var foodApi = Read("FDriverApp", "Services/FoodDeliveryDriverApiService.cs");
+        var foodController = Read("Ssalddel", "Controllers/Driver/Food/음식배달기사업무Controller.cs");
+        var cargoController = Read("Ssalddel", "Controllers/Driver/01_Work/기사운행Controller.cs");
+        var workspaceUseCase = Read("Ssalddel", "Application/Driver/Food/FoodDeliveryDriverWorkspaceUseCase.cs");
+        var startCommand = Read("Ssalddel", "Application/Driver/Work/Commands/운행시작Command.cs");
+        var startHandler = Read("Ssalddel", "Application/Driver/Work/Handlers/운행시작CommandHandler.cs");
+
+        Assert.DoesNotContain("\"api/v1/driver/work/", foodApi);
+        Assert.Contains("api/v1/driver/food-deliveries/work/status", foodApi);
+        Assert.Contains("api/v1/driver/food-deliveries/work/start", foodApi);
+        Assert.Contains("api/v1/driver/food-deliveries/work/stop", foodApi);
+        Assert.Contains("api/v1/driver/food-deliveries/work/location", foodApi);
+        Assert.Contains("시작모드 = \"바로시작\"", foodApi);
+        Assert.DoesNotContain("시작모드 = \"immediate\"", foodApi);
+        Assert.Contains("[HttpPost(\"work/start\")]", foodController);
+        Assert.Contains("[HttpPost(\"work/location\")]", foodController);
+        Assert.Contains("VersionFeatureFlagKeys.FoodDeliveryWorkflow", foodController);
+        Assert.Contains("운송실행유형코드.음식배달", foodController);
+        Assert.Contains("커뮤니티운행공개: false", foodController);
+        Assert.Contains("VersionFeatureFlagKeys.DomesticTransportWorkflow", cargoController);
+        Assert.Contains("VersionFeatureFlagKeys.FoodDeliveryWorkflow", workspaceUseCase);
+        Assert.Contains("운송실행유형코드.화물운송", startCommand);
+        Assert.Contains("request.운송실행유형", startHandler);
+        Assert.Contains("_dispatchRecommendationService.SendToDriverAsync", startHandler);
+        Assert.DoesNotContain(
+            "\"국내 운송 기능이 비활성화되어 자동 기사 추천이 실행되지 않습니다.\"",
+            workspaceUseCase);
+    }
+
+    [Fact]
     public void 실제수령자정보는_배차확정뒤_진행업무에만연결된다()
     {
         var workContract = Read("Ssalddel.Contracts", "Common/Drivers/DriverWorkDtos.cs");

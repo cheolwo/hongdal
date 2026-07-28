@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Driver.Work;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Transport;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Ssalddel.Application.CommandProcessing;
@@ -79,8 +80,6 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             UpdatedAt = DateTime.UtcNow
         };
 
-        await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
-
         driver.운행상태 = 상태값.기사운행상태.운행중;
         driver.UpdatedAt = DateTime.UtcNow;
         _db.기사근무.Add(shift);
@@ -101,7 +100,6 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             shift.오늘의복귀지주소 ?? shift.복귀지,
             기사복귀선호코드.Normalize(request.복귀콜선호),
             cancellationToken);
-        await tx.CommitAsync(cancellationToken);
 
         CommunityDriverAvailabilityPostResponse? communityPost = null;
         if (request.커뮤니티운행공개)
@@ -128,7 +126,13 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             _communityDriverAvailabilityService.Close(request.기사Id);
         }
 
-        await _dispatchRecommendationService.SendToDriverAsync(request.기사Id);
+        if (!string.Equals(
+                request.운송실행유형,
+                운송실행유형코드.음식배달,
+                StringComparison.Ordinal))
+        {
+            await _dispatchRecommendationService.SendToDriverAsync(request.기사Id);
+        }
 
         _logger.LogInformation(
             "Action={Action} DriverId={DriverId} BeforeStatus={BeforeStatus} AfterStatus={AfterStatus} Result={Result} TraceId={TraceId} OccurredAt={OccurredAt}",

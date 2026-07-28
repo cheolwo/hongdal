@@ -43,27 +43,41 @@ public sealed class FoodDeliveryDriverApiService : IFoodDeliveryDriverApiService
         => SendAsync<FoodDeliveryDriverWorkspaceDto>(HttpMethod.Get, "api/v1/driver/food-deliveries/workspace", null, cancellationToken);
 
     public async Task<기사운행상태응답?> GetWorkStatusAsync(CancellationToken cancellationToken = default)
-        => await SendAsync<기사운행상태응답>(HttpMethod.Get, "api/v1/driver/work/status", null, cancellationToken);
+        => await SendAsync<기사운행상태응답>(
+            HttpMethod.Get,
+            "api/v1/driver/food-deliveries/work/status",
+            null,
+            cancellationToken);
 
     public async Task StartWorkAsync(string startLocation, CancellationToken cancellationToken = default)
         => _ = await SendAsync<기사운행시작응답>(
             HttpMethod.Post,
-            "api/v1/driver/work/start",
+            "api/v1/driver/food-deliveries/work/start",
             new 기사운행시작요청
             {
-                시작모드 = "immediate",
+                시작모드 = "바로시작",
                 시작시각 = DateTime.UtcNow,
-                시작위치 = startLocation
+                시작위치 = startLocation,
+                커뮤니티운행공개 = false,
+                커뮤니티구단위위치공개동의 = false
             },
             cancellationToken);
 
     public async Task StopWorkAsync(CancellationToken cancellationToken = default)
-        => await SendNoContentAsync(HttpMethod.Post, "api/v1/driver/work/stop", null, cancellationToken);
+        => await SendNoContentAsync(
+            HttpMethod.Post,
+            "api/v1/driver/food-deliveries/work/stop",
+            null,
+            cancellationToken);
 
     public async Task<기사위치갱신응답?> UpdateLocationAsync(
         기사위치갱신요청 request,
         CancellationToken cancellationToken = default)
-        => await SendAsync<기사위치갱신응답>(HttpMethod.Post, "api/v1/driver/work/location", request, cancellationToken);
+        => await SendAsync<기사위치갱신응답>(
+            HttpMethod.Post,
+            "api/v1/driver/food-deliveries/work/location",
+            request,
+            cancellationToken);
 
     public Task<FoodDeliveryDriverActionResponse> AcceptAsync(string offerId, CancellationToken cancellationToken = default)
         => SendAsync<FoodDeliveryDriverActionResponse>(

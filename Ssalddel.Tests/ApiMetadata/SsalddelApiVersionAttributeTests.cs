@@ -372,6 +372,15 @@ public sealed class SsalddelApiVersionAttributeTests
             endpoint.RoutePattern == "api/v1/driver/food-deliveries/workspace" &&
             endpoint.FeatureKey == VersionFeatureFlagKeys.FoodDeliveryWorkflow);
         Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "FoodDeliveryDriverController.StartWork" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/driver/food-deliveries/work/start" &&
+            endpoint.FeatureKey == VersionFeatureFlagKeys.FoodDeliveryWorkflow);
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/driver/work/start" &&
+            endpoint.FeatureKey == VersionFeatureFlagKeys.DomesticTransportWorkflow);
+        Assert.Contains(response.ApiEndpoints, endpoint =>
             endpoint.EndpointKey == "WarehouseOperationsController.재고목록" &&
             endpoint.ControllerName == "WarehouseOperationsController" &&
             endpoint.ActionName == "재고목록" &&

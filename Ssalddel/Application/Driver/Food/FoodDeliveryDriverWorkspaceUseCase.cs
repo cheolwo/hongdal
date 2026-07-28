@@ -82,7 +82,7 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
             };
         var dispatchAutomationEnabled = _executionMode.IsOperational
                                         && _featureFlags.IsEnabled(
-                                            VersionFeatureFlagKeys.DomesticTransportWorkflow);
+                                            VersionFeatureFlagKeys.FoodDeliveryWorkflow);
 
         return new FoodDeliveryDriverWorkspaceDto
         {
@@ -106,7 +106,7 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
 
         return !_executionMode.IsOperational
             ? "시뮬레이션 모드에서는 자동 기사 추천이 실행되지 않습니다."
-            : "국내 운송 기능이 비활성화되어 자동 기사 추천이 실행되지 않습니다.";
+            : "음식 배달 기능이 비활성화되어 자동 기사 추천이 실행되지 않습니다.";
     }
 
     private static FoodDeliveryDriverOfferDto ToOffer(DriverWorkOfferDto offer)

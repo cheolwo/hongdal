@@ -7,10 +7,13 @@ using FluentResults;
 using Ssalddel.Contracts.Driver.Work;
 using Ssalddel.Application.Driver.Work;
 using Ssalddel.ApiMetadata;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Driver.Work01
 {
-    [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiIntroducedIn(SsalddelProductVersion.V2_0)]
+    [SsalddelApiFeature(VersionFeatureFlagKeys.DomesticTransportWorkflow)]
+    [SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
     [SsalddelApiCapability(SsalddelCapability.TransportExecution)]
     [SsalddelApiOperation(SsalddelOperation.Execute)]
     [ApiController]
