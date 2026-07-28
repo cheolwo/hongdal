@@ -18,61 +18,37 @@
   </a>
 </p>
 
-## 역할별 화면 설계
-
-게시판에서 시작한 생각은 공동 원장에 모이고, 주문·판매·운송·보관·음식 주문·운영 앱이 같은 원장을 역할별로 다시 읽습니다. [Figma 역할 앱 서비스 계층](https://www.figma.com/design/0KhuQLc1MleUBIQnARC21Z/ssalddle?node-id=2427-243)은 `01 Community`부터 `09 Admin Mobile`까지 이 흐름과 인계 경계를 정리합니다.
-
 <p align="center">
-  <a href="docs/Changes/2026-07-28-figma-code-convergence.md">
-    <img src="docs/assets/changes/2026-07-28-figma-code-convergence/overview-role-map.png" alt="01 Community부터 09 Admin Mobile까지 역할 앱이 같은 공동 원장을 다시 읽는 서비스 계층" width="900">
-  </a>
+  <img src="docs/assets/changes/2026-07-24-figma-community-mode-toggle/community-mode-toggle.png" alt="Community 생활 게시판과 업무 게시판 화면" width="900">
 </p>
 
-| 역할 앱 | 주요 책임 |
-| --- | --- |
-| `01 Community` | 공개 정보, 참여 의향, 공동 원장과 명시적 동의의 출발점 |
-| `02 Orderer` | 음식·마트 주문, 같이 주문과 같이 수입 준비 |
-| `03 Shipper` | 화물 운송 의뢰, 견적·계약 검토와 추적 |
-| `04 Driver` | 추천 확인, 수락, 픽업·상차와 전달·하차 |
-| `05 Warehouse` | 입고·검수·적재·피킹·포장과 출고 |
-| `06 Global` | 해외 상품 탐색, 공급자 신청과 수입 요청 |
-| `07 Restaurant` | 음식 주문 수신, 조리와 픽업 준비 |
-| `08 Seller` | 개별·대량·수출 판매, 재고·채널과 주문 |
-| `09 Admin Mobile` | 운송·음식·같이 수입 원장의 운영 관제 |
-
-### 최근 대표 사용자 흐름
-
-#### Orderer · 비교에서 같이 수입 준비까지
-
-Orderer는 상품 발견 뒤 KAMIS의 지역·유통단계 가격과 원래 거래·포장 단위를 확인하고, 개별 주문과 같이 주문을 비교합니다. 같이 주문 참여와 공동 원장 합계 뒤에는 구매 목적, 통관과 온도별 3PL 후보를 검토하되, 전문가 확인과 별도 동의 전에는 실행하지 않습니다.
-
 <p align="center">
-  <a href="docs/Changes/2026-07-28-figma-code-convergence.md">
-    <img src="docs/assets/changes/2026-07-28-figma-code-convergence/orderer-import-3pl.png" alt="Orderer 같이 수입 준비의 구매 목적, 통관과 온도별 3PL 검토 화면" width="900">
-  </a>
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/orderer-import-3pl.png" alt="Orderer 같이 수입 준비 화면" width="900">
 </p>
 
-#### 음식 주문 · 역할 앱 폐쇄 루프
-
-주문자가 음식 주문을 보내면 Restaurant가 수락·조리·준비 상태를 기록하고, FDriver가 배달을 수락해 전달합니다. 각 Command 성공 뒤에는 주문번호를 유지한 채 서버 원장을 다시 조회해 주문자와 Admin도 같은 상태를 봅니다.
-
 <p align="center">
-  <a href="docs/Changes/2026-07-28-figma-code-convergence.md">
-    <img src="docs/assets/changes/2026-07-28-figma-code-convergence/flow-food-closed-loop.png" alt="주문자, Restaurant, FDriver와 Admin이 음식 주문 원장을 다시 조회하는 버튼과 화면 흐름" width="900">
-  </a>
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/shipper-logistics-contract-p1.png" alt="Shipper 물류대행 계약 검토 화면" width="900">
 </p>
 
-#### 화물 운송 · 화주에서 기사 인계까지
-
-Shipper가 운송을 의뢰하면 Driver는 추천을 검토하고 직접 수락합니다. 상차·하차와 POD 이후 Shipper와 Admin이 같은 운송 의뢰 ID로 원장을 다시 조회하며, 추천은 기사 수락 전까지 확정 배차로 표현하지 않습니다.
-
 <p align="center">
-  <a href="docs/Changes/2026-07-28-figma-code-convergence.md">
-    <img src="docs/assets/changes/2026-07-28-figma-code-convergence/flow-freight-closed-loop.png" alt="Shipper 운송 의뢰부터 Driver 수락, 상차, 하차, POD와 Admin 재조회까지의 화면 흐름" width="900">
-  </a>
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/driver-expiry-reconnect-p1.png" alt="Driver 추천과 재연결 화면" width="900">
 </p>
 
-최신 반영 범위와 검증 결과는 [Figma 서버·클라이언트 수렴 기록](docs/Changes/2026-07-28-figma-code-convergence.md)에, Community의 생활·업무 모드 기준은 [커뮤·업무 모드 토글 기록](docs/Changes/2026-07-24-figma-community-mode-toggle.md)에 남겼습니다. Figma 이미지는 route와 상태 계약의 설계 증거이며, 실제 앱 구현이나 렌더링 완료를 뜻하지 않습니다.
+<p align="center">
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/warehouse-destination-handoff-p1.png" alt="Warehouse 하차지 확인과 운송 인계 화면" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/restaurant-recovery-p1.png" alt="Restaurant 주문 복구 화면" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/seller-mobile-srp.png" alt="Seller 모바일 화면" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/assets/changes/2026-07-28-figma-code-convergence/admin-mobile-srp.png" alt="Admin Mobile 화면" width="900">
+</p>
 
 ## 커뮤니티 게시판에서 업무까지
 
