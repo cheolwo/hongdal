@@ -98,6 +98,46 @@ public sealed class 음식주문ControllerTests
         Assert.False(command.AcceptCalled);
     }
 
+    [Fact]
+    public void 음식점수신함은_지원하지않는처리상태를400으로거부한다()
+    {
+        var controller = new 음식주문Controller(null!, null!, new StubRestaurantReadUseCase())
+        {
+            ControllerContext = Context(
+                new Claim(ClaimTypes.NameIdentifier, "restaurant-user"),
+                new Claim(음식점접근ClaimTypes.음식점Id, "101"))
+        };
+
+        var result = controller.음식점수신함(new 음식점주문수신함조회요청
+        {
+            처리상태 = "알수없음"
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task 음식점역할이있어도_음식점범위클레임이없으면수신함과수락을403으로거부한다()
+    {
+        var command = new RecordingCommandUseCase();
+        var controller = new 음식주문Controller(command, null!, new StubRestaurantReadUseCase())
+        {
+            ControllerContext = Context(
+                new Claim(ClaimTypes.NameIdentifier, "restaurant-user"),
+                new Claim(ClaimTypes.Role, "음식점"))
+        };
+
+        var inbox = controller.음식점수신함(new 음식점주문수신함조회요청());
+        var acceptance = await controller.음식점수락(
+            "FOOD-TEST",
+            new 음식점주문수락요청(),
+            CancellationToken.None);
+
+        Assert.IsType<ForbidResult>(inbox.Result);
+        Assert.IsType<ForbidResult>(acceptance.Result);
+        Assert.False(command.AcceptCalled);
+    }
+
     private static ControllerContext Context(params Claim[] claims)
         => new()
         {
@@ -142,7 +182,7 @@ public sealed class 음식주문ControllerTests
 
     private sealed class StubRestaurantReadUseCase : I음식점음식주문조회UseCase
     {
-        public 음식주문목록응답 목록(long 음식점Id) => new();
+        public 음식점주문수신함응답 목록(음식점주문수신함조회요청 request, long 음식점Id) => new();
 
         public 음식주문응답? 상세(string 주문번호, long 음식점Id) => null;
     }

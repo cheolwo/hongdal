@@ -4,12 +4,18 @@ using Ssalddel.Controllers;
 using Ssalddel.Contracts.Driver.Food;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ssalddel.Filters;
 using 살뜰.Services.Dispatch.Recommendation;
+using 살뜰.Services.Versioning;
 using 살뜰.도메인.공통;
 
 namespace Ssalddel.Controllers.Driver.Food;
 
-[SsalddelApiVersion(SsalddelProductVersion.V3_0)]
+[SsalddelApiVersion(
+    SsalddelProductVersion.V3_0,
+    FeatureKey = VersionFeatureFlagKeys.FoodDeliveryWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.FoodDeliveryWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.FoodDeliveryWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.FoodDelivery)]
 [SsalddelApiCapability(SsalddelCapability.FoodDelivery)]
 [SsalddelApiOperation(SsalddelOperation.Execute)]

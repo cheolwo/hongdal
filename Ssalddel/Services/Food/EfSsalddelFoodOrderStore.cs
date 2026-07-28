@@ -269,6 +269,7 @@ public sealed class EfSsalddelFoodOrderStore : ISsalddelFoodOrderStore, I커뮤�
             커뮤니티원장상태 = order.커뮤니티원장상태,
             커뮤니티원장동기화시각Utc = order.커뮤니티원장동기화시각Utc,
             CreatedAt = order.CreatedAt,
+            최근변경시각Utc = order.UpdatedAt,
             상태이력 = order.상태이력
                 .OrderBy(x => x.전이시각Utc)
                 .Select(x => new 음식주문상태전이기록Dto

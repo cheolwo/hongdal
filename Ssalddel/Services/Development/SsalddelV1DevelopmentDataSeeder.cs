@@ -413,6 +413,7 @@ public static class SsalddelV1DevelopmentDataSeeder
         {
             db.운송원장.Add(new 운송원장
             {
+                의뢰Id = transportNumber1,
                 운송번호 = transportNumber1,
                 상태 = "상차지도착",
                 기사_운송자 = driverId,
@@ -430,6 +431,7 @@ public static class SsalddelV1DevelopmentDataSeeder
         {
             db.운송원장.Add(new 운송원장
             {
+                의뢰Id = transportNumber2,
                 운송번호 = transportNumber2,
                 상태 = "인수완료",
                 출발_픽업 = now.AddDays(-2).AddHours(1),

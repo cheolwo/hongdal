@@ -3,10 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Application.Admin.Restaurants;
 using Ssalddel.Contracts.Admin.Restaurants;
+using Ssalddel.Filters;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Admin;
 
-[SsalddelApiVersion(SsalddelProductVersion.V3_0)]
+[SsalddelApiVersion(
+    SsalddelProductVersion.V3_0,
+    FeatureKey = VersionFeatureFlagKeys.FoodDeliveryWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.FoodDeliveryWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.FoodDeliveryWorkflow)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/restaurants/operator-access")]

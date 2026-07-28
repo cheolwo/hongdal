@@ -3,6 +3,7 @@
 @inject I음식점주문DeskService OrderDeskService
 @inject I음식점주문SignalRClientService RestaurantRealtimeService
 @inject IOptions<RestaurantDeskOptions> DeskOptions
+@inject NavigationManager NavigationManager
 
 <PageTitle>신규 주문 수신함</PageTitle>
 
@@ -12,7 +13,7 @@
             <MudStack Spacing="0">
                 <MudText Typo="Typo.h4">신규 주문 수신함</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    서버가 이 음식점으로 보낸 실시간 알림만 조회합니다. 주문 수락은 상세 화면에서 수행합니다.
+                    서버의 미처리 주문을 먼저 복구한 뒤 실시간 알림과 30초 보완 조회를 주문번호로 합칩니다.
                 </MudText>
             </MudStack>
             <MudChip T="string" Color="@RealtimeStatusColor" Variant="Variant.Outlined">@realtimeStatus</MudChip>
@@ -54,6 +55,9 @@
                                 <MudText Typo="Typo.caption" Color="Color.Primary">
                                     상품 기본값 기준 조리 예상 @(order.추천조리예상분)분
                                 </MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @RecoveryLabel(order.복구출처) · @order.최근복구시각.ToLocalTime().ToString("HH:mm:ss")
+                                </MudText>
                             </MudStack>
                             <MudButton Href="@($"/orders/{Uri.EscapeDataString(order.주문번호)}")"
                                        Variant="Variant.Filled"
@@ -76,11 +80,13 @@
     private string realtimeStatus = "실시간 연결 대기";
     private string? message;
     private Severity messageSeverity = Severity.Info;
+    private bool workLocked;
 
     private Color RealtimeStatusColor => RestaurantRealtimeService.연결상태 switch
     {
-        "Connected" => Color.Success,
-        "Reconnecting" => Color.Warning,
+        음식점실시간연결상태.연결됨 => Color.Success,
+        음식점실시간연결상태.재연결중 => Color.Warning,
+        음식점실시간연결상태.인증필요 => Color.Error,
         _ => Color.Default
     };
 
@@ -89,18 +95,30 @@
         RestaurantRealtimeService.주문수신 += HandleRealtimeOrderReceivedAsync;
         RestaurantRealtimeService.주문상태변경 += HandleOrderStatusChangedAsync;
         RestaurantRealtimeService.상태변경 += HandleRealtimeStatusChangedAsync;
-        await ReloadAsync();
+        RestaurantRealtimeService.재연결후재조회요청 += HandleReconnectedRefreshAsync;
+        await TryReloadAsync(음식점주문복구출처.서버재조회);
 
-        try
+        if (!workLocked)
         {
-            await RestaurantRealtimeService.연결Async();
-            realtimeStatus = $"실시간 연결됨 · {DeskOptions.Value.RestaurantName}";
-        }
-        catch (Exception ex)
-        {
-            realtimeStatus = "실시간 연결 실패";
-            messageSeverity = Severity.Warning;
-            message = $"주문 실시간 연결에 실패했습니다. {ex.Message}";
+            try
+            {
+                await RestaurantRealtimeService.연결Async();
+                realtimeStatus = $"실시간 연결됨 · {DeskOptions.Value.RestaurantName}";
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                workLocked = true;
+                realtimeStatus = "로그인 복구 필요";
+                messageSeverity = Severity.Error;
+                message = ex.Message;
+                NavigationManager.NavigateTo("/login", replace: true);
+            }
+            catch (Exception ex)
+            {
+                realtimeStatus = "실시간 연결 실패 · 30초 서버 조회 유지";
+                messageSeverity = Severity.Warning;
+                message = $"주문 실시간 연결에 실패했습니다. {ex.Message}";
+            }
         }
 
         refreshTask = RunPeriodicRefreshAsync(refreshCancellation.Token);
@@ -124,16 +142,37 @@
             });
             messageSeverity = Severity.Success;
             message = $"{notification.주문번호} 주문을 수신했습니다.";
-            await ReloadAsync();
+            await TryReloadAsync(음식점주문복구출처.서버재조회);
             StateHasChanged();
         });
     }
 
-    private async Task HandleRealtimeStatusChangedAsync(string status)
+    private async Task HandleRealtimeStatusChangedAsync(음식점실시간연결상태변경 change)
     {
         await InvokeAsync(() =>
         {
-            realtimeStatus = status;
+            realtimeStatus = change.안내;
+            if (change.상태 == 음식점실시간연결상태.인증필요)
+            {
+                workLocked = true;
+                messageSeverity = Severity.Error;
+                message = change.안내;
+                NavigationManager.NavigateTo("/login", replace: true);
+            }
+            StateHasChanged();
+        });
+    }
+
+    private async Task HandleReconnectedRefreshAsync()
+    {
+        await InvokeAsync(async () =>
+        {
+            var recovered = await TryReloadAsync(음식점주문복구출처.재연결재조회);
+            if (recovered)
+            {
+                messageSeverity = Severity.Success;
+                message = "실시간 재연결 직후 서버 수신함을 다시 확인했습니다.";
+            }
             StateHasChanged();
         });
     }
@@ -142,9 +181,11 @@
     {
         await InvokeAsync(async () =>
         {
-            await ReloadAsync();
-            messageSeverity = Severity.Info;
-            message = $"{notification.주문번호} · {notification.주문상태} / {notification.배차상태} ({notification.변경사유})";
+            if (await TryReloadAsync(음식점주문복구출처.서버재조회))
+            {
+                messageSeverity = Severity.Info;
+                message = $"{notification.주문번호} · {notification.주문상태} / {notification.배차상태} ({notification.변경사유})";
+            }
             StateHasChanged();
         });
     }
@@ -158,7 +199,10 @@
             {
                 await InvokeAsync(async () =>
                 {
-                    await ReloadAsync();
+                    if (!workLocked)
+                    {
+                        await TryReloadAsync(음식점주문복구출처.서버재조회);
+                    }
                     StateHasChanged();
                 });
             }
@@ -168,8 +212,50 @@
         }
     }
 
-    private async Task ReloadAsync()
-        => orders = await OrderDeskService.주문목록조회Async();
+    private async Task<bool> TryReloadAsync(음식점주문복구출처 복구출처)
+    {
+        try
+        {
+            orders = await OrderDeskService.주문목록조회Async(복구출처);
+            return true;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            workLocked = true;
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+            NavigationManager.NavigateTo("/login", replace: true);
+            return false;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            workLocked = true;
+            messageSeverity = Severity.Error;
+            message = "로그인 세션을 복구하지 못했습니다. 다시 로그인해 주세요.";
+            NavigationManager.NavigateTo("/login", replace: true);
+            return false;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            workLocked = true;
+            messageSeverity = Severity.Error;
+            message = "이 계정은 현재 음식점의 주문 수신함을 볼 수 없습니다. 음식점 소유권·운영자 역할을 확인해 주세요.";
+            return false;
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Warning;
+            message = $"서버 수신함을 갱신하지 못했습니다. 마지막 목록을 유지하고 다음 30초 조회에서 다시 시도합니다. {ex.Message}";
+            return false;
+        }
+    }
+
+    private static string RecoveryLabel(음식점주문복구출처 source) => source switch
+    {
+        음식점주문복구출처.실시간 => "실시간 수신",
+        음식점주문복구출처.재연결재조회 => "재연결 복구",
+        _ => "서버 복구"
+    };
 
     private static Color StatusColor(string status) => status switch
     {
@@ -187,6 +273,7 @@
         RestaurantRealtimeService.주문수신 -= HandleRealtimeOrderReceivedAsync;
         RestaurantRealtimeService.주문상태변경 -= HandleOrderStatusChangedAsync;
         RestaurantRealtimeService.상태변경 -= HandleRealtimeStatusChangedAsync;
+        RestaurantRealtimeService.재연결후재조회요청 -= HandleReconnectedRefreshAsync;
         if (refreshTask is not null)
         {
             await refreshTask;

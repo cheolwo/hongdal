@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.ApiMetadata;
 using Ssalddel.Application.Admin.Restaurants;
 using Ssalddel.Contracts.Admin.Restaurants;
 using Ssalddel.Contracts.Food;
 using Ssalddel.Controllers.Admin;
+using Ssalddel.Filters;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
+using 살뜰.Services.Versioning;
 using 살뜰.도메인.음식;
 
 namespace Ssalddel.Tests.Application.Admin.Restaurants;
@@ -74,6 +77,11 @@ public sealed class 음식점운영자접근관리UseCaseTests
         Assert.Equal(
             "api/v1/admin/restaurants/operator-access",
             type.GetCustomAttribute<RouteAttribute>()?.Template);
+        var feature = Assert.Single(type.GetCustomAttributes<RequireVersionFeatureAttribute>());
+        Assert.Equal(VersionFeatureFlagKeys.FoodDeliveryWorkflow, Assert.Single(feature.Arguments!));
+        var version = Assert.Single(type.GetCustomAttributes<SsalddelApiVersionAttribute>());
+        Assert.Equal(SsalddelProductVersion.V3_0, version.Version);
+        Assert.Equal(VersionFeatureFlagKeys.FoodDeliveryWorkflow, version.FeatureKey);
     }
 
     private sealed class Fixture : IAsyncDisposable

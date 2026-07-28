@@ -4,9 +4,14 @@ namespace RestaurantDeskApp.Services;
 
 public interface I음식점주문DeskService
 {
-    Task<IReadOnlyList<음식점주문DeskItem>> 주문목록조회Async(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<음식점주문DeskItem>> 주문목록조회Async(
+        음식점주문복구출처 복구출처 = 음식점주문복구출처.서버재조회,
+        CancellationToken cancellationToken = default);
 
-    Task<음식점주문DeskItem?> 주문조회Async(string 주문번호, CancellationToken cancellationToken = default);
+    Task<음식점주문DeskItem?> 주문조회Async(
+        string 주문번호,
+        음식점주문복구출처 복구출처 = 음식점주문복구출처.서버재조회,
+        CancellationToken cancellationToken = default);
 
     Task<음식점주문DeskItem> 주문알림수신Async(음식점주문수신Payload payload, CancellationToken cancellationToken = default);
 

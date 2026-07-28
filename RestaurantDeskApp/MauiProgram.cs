@@ -30,7 +30,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         builder.Services.AddSingleton<ClientAuthSession>();
         builder.Services.AddSingleton<RestaurantAccessTokenProvider>();
-        builder.Services.AddScoped<RestaurantAuthService>();
+        builder.Services.AddHttpClient<RestaurantAuthService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<IOptions<RestaurantDeskOptions>>().Value;
+            client.BaseAddress = options.GetServerBaseAddress();
+        });
         builder.Services.AddSingleton<RestaurantDeskSampleService>();
         builder.Services.AddSingleton<I음식점식재료공급요청Service, RestaurantIngredientSupplySampleService>();
         builder.Services.AddSingleton<I주문알림Service, 주문알림Service>();

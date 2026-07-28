@@ -143,6 +143,7 @@ public static class FoodOrderSampleData
             커뮤니티원장상태 = source.커뮤니티원장상태,
             커뮤니티원장동기화시각Utc = source.커뮤니티원장동기화시각Utc,
             CreatedAt = source.CreatedAt,
+            최근변경시각Utc = source.최근변경시각Utc,
             상태이력 = source.상태이력.Select(x => new 음식주문상태전이기록Dto
             {
                 이전상태 = x.이전상태,

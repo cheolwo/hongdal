@@ -73,12 +73,19 @@ public sealed class FoodDeliveryV30PageCompositionTests
 
         Assert.Contains("RestaurantMauiSecureTokenStore", startup);
         Assert.Contains("ClientAuthSession", startup);
+        Assert.Contains("AddHttpClient<RestaurantAuthService>", startup);
+        Assert.DoesNotContain("AddScoped<RestaurantAuthService>", startup);
         Assert.Contains("api/v1/auth/refresh", auth);
         Assert.Contains("AuthenticationHeaderValue", client);
         Assert.Contains("/restaurant/inbox", client);
+        Assert.Contains("forceRefresh: true", client);
+        Assert.Contains("response.StatusCode != HttpStatusCode.Unauthorized", client);
         Assert.Contains("AccessTokenProvider", realtime);
         Assert.Contains("JoinRestaurantOrders\", cancellationToken", realtime);
         Assert.Contains("_foodOrderClient.주문목록조회Async", desk);
+        Assert.Contains("_foodOrderClient.주문상세조회Async", desk);
+        Assert.DoesNotContain("payload.음식점Id != _options.RestaurantId", desk);
+        Assert.Contains("_serverInboxGate.WaitAsync", desk);
     }
 
     [Fact]
@@ -123,8 +130,11 @@ public sealed class FoodDeliveryV30PageCompositionTests
         Assert.Contains("주문상태변경알림발송Async", serverNotification);
         Assert.Contains("NotifyRestaurantAsync", driverWork);
         Assert.Contains("음식점주문상태변경알림", realtime);
+        Assert.Contains("재연결후재조회요청", realtime);
+        Assert.Contains("음식점실시간연결상태.재연결중", realtime);
         Assert.Contains("TimeSpan.FromSeconds(30)", inbox);
-        Assert.Contains("await ReloadAsync()", inbox);
+        Assert.Contains("음식점주문복구출처.재연결재조회", inbox);
+        Assert.Contains("다음 30초 조회에서 다시 시도", inbox);
     }
 
     [Fact]

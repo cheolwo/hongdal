@@ -61,7 +61,7 @@ public sealed class FoodDeliveryDriverWorkspaceUseCase : IFoodDeliveryDriverWork
             ? []
             : await _db.운송원장
                 .AsNoTracking()
-                .Where(x => activeIds.Contains(x.의뢰Id)
+                .Where(x => Enumerable.Contains(activeIds, x.의뢰Id)
                             && x.배차업무유형 == 상태값.배차업무유형.음식배달
                             && (x.기사_운송자 == driverId || x.확정기사Id == driverId))
                 .OrderBy(x => x.CreatedAt)

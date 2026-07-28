@@ -56,6 +56,28 @@ public static class 음식주문배차상태코드
     public const string 배차불가 = "배차불가";
 }
 
+public static class 음식점주문수신함처리상태코드
+{
+    public const string 미처리 = "미처리";
+    public const string 완료 = "완료";
+    public const string 전체 = "전체";
+
+    public static IReadOnlyList<string> 전체목록 { get; } = [미처리, 완료, 전체];
+
+    public static string Normalize(string? value)
+        => string.IsNullOrWhiteSpace(value) ? 미처리 : value.Trim() switch
+        {
+            미처리 => 미처리,
+            완료 => 완료,
+            전체 => 전체,
+            _ => throw new ArgumentException("지원하지 않는 음식점 수신함 처리상태입니다.", nameof(value))
+        };
+
+    public static bool 미처리여부(string? 주문상태)
+        => 음식주문상태코드.Normalize(주문상태) is not 음식주문상태코드.전달완료
+            and not 음식주문상태코드.취소;
+}
+
 public sealed class 음식주문상품Dto
 {
     public string 상품명 { get; set; } = string.Empty;
@@ -111,12 +133,30 @@ public sealed class 음식주문응답
     public string? 커뮤니티원장상태 { get; set; }
     public DateTime? 커뮤니티원장동기화시각Utc { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? 최근변경시각Utc { get; set; }
     public IReadOnlyList<음식주문상태전이기록Dto> 상태이력 { get; set; } = [];
 }
 
 public sealed class 음식주문목록응답
 {
     public IReadOnlyList<음식주문응답> Items { get; set; } = [];
+}
+
+public sealed class 음식점주문수신함조회요청
+{
+    public string? 처리상태 { get; set; } = 음식점주문수신함처리상태코드.미처리;
+    public DateTime? UpdatedAfterUtc { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 30;
+}
+
+public sealed class 음식점주문수신함응답
+{
+    public IReadOnlyList<음식주문응답> Items { get; set; } = [];
+    public int TotalCount { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 30;
+    public DateTime ServerTimeUtc { get; set; }
 }
 
 public sealed class 주문자음식주문목록조회요청

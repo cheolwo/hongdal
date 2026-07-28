@@ -369,7 +369,8 @@ public sealed class SsalddelApiVersionAttributeTests
             endpoint.ControllerName == "FoodDeliveryDriverController" &&
             endpoint.ActionName == "GetWorkspace" &&
             endpoint.Method == "GET" &&
-            endpoint.RoutePattern == "api/v1/driver/food-deliveries/workspace");
+            endpoint.RoutePattern == "api/v1/driver/food-deliveries/workspace" &&
+            endpoint.FeatureKey == VersionFeatureFlagKeys.FoodDeliveryWorkflow);
         Assert.Contains(response.ApiEndpoints, endpoint =>
             endpoint.EndpointKey == "WarehouseOperationsController.재고목록" &&
             endpoint.ControllerName == "WarehouseOperationsController" &&

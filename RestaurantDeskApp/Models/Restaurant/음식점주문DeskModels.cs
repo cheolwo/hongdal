@@ -12,6 +12,27 @@ public static class 음식점주문Desk상태코드
     public const string 상세조회실패 = "상세조회실패";
 }
 
+public enum 음식점주문복구출처
+{
+    실시간,
+    서버재조회,
+    재연결재조회
+}
+
+public enum 음식점실시간연결상태
+{
+    연결대기,
+    연결중,
+    연결됨,
+    재연결중,
+    연결끊김,
+    인증필요
+}
+
+public sealed record 음식점실시간연결상태변경(
+    음식점실시간연결상태 상태,
+    string 안내);
+
 public sealed class 음식점주문수신Payload
 {
     public string 주문번호 { get; init; } = string.Empty;
@@ -70,6 +91,10 @@ public sealed class 음식점주문DeskItem
     public bool 미확인 { get; set; } = true;
 
     public string? 최근메시지 { get; set; }
+
+    public 음식점주문복구출처 복구출처 { get; set; } = 음식점주문복구출처.서버재조회;
+
+    public DateTimeOffset 최근복구시각 { get; set; } = DateTimeOffset.Now;
 
     public 음식주문응답? 상세주문 { get; set; }
 

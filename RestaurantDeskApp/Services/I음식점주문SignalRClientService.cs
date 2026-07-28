@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Food;
+using RestaurantDeskApp.Models.Restaurant;
 
 namespace RestaurantDeskApp.Services;
 
@@ -8,9 +9,11 @@ public interface I음식점주문SignalRClientService : IAsyncDisposable
 
     event Func<음식점주문상태변경알림, Task>? 주문상태변경;
 
-    event Func<string, Task>? 상태변경;
+    event Func<음식점실시간연결상태변경, Task>? 상태변경;
 
-    string 연결상태 { get; }
+    event Func<Task>? 재연결후재조회요청;
+
+    음식점실시간연결상태 연결상태 { get; }
 
     Task 연결Async(CancellationToken cancellationToken = default);
 

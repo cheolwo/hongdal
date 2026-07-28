@@ -44,9 +44,10 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var now = DateTime.UtcNow;
         var order = new 음식주문응답
         {
-            주문번호 = $"FOOD-{DateTime.UtcNow:yyyyMMddHHmmssfff}",
+            주문번호 = $"FOOD-{now:yyyyMMddHHmmssfff}",
             음식점Id = request.음식점Id,
             주문자UserId = request.주문자UserId.Trim(),
             수령인정보 = new 음식주문수령인정보Dto
@@ -68,7 +69,8 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             상태 = 음식주문상태코드.주문대기,
             배차상태 = 음식주문배차상태코드.미요청,
             결제수단 = request.결제수단,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = now,
+            최근변경시각Utc = now,
             상태이력 =
             [
                 new 음식주문상태전이기록Dto
@@ -76,7 +78,7 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
                     이전상태 = string.Empty,
                     다음상태 = 음식주문상태코드.주문대기,
                     사유 = "주문 등록",
-                    전이시각Utc = DateTime.UtcNow
+                    전이시각Utc = now
                 }
             ]
         };
@@ -124,6 +126,7 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             order.음식점수락시각Utc = now;
             order.조리예상완료시각Utc = now.AddMinutes(cookingMinutes);
             order.수락메모 = NormalizeOptional(request.수락메모);
+            order.최근변경시각Utc = now;
             order.상태이력 = AppendHistory(order, currentStatus, nextStatus, "음식점 주문 수락", now);
 
             return FoodOrderSampleData.Clone(order);
@@ -143,6 +146,7 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             order.배차상태 = 음식주문배차상태코드.배차대기;
             order.배차대기Id = dispatchWaitId;
             order.배차요청시각Utc = dispatchRequestedAtUtc;
+            order.최근변경시각Utc = DateTime.UtcNow;
 
             return FoodOrderSampleData.Clone(order);
         }
@@ -172,6 +176,7 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             order.커뮤니티원장템플릿Key = ledgerTemplateKey;
             order.커뮤니티원장상태 = ledgerState;
             order.커뮤니티원장동기화시각Utc = syncedAtUtc;
+            order.최근변경시각Utc = DateTime.UtcNow;
 
             return FoodOrderSampleData.Clone(order);
         }

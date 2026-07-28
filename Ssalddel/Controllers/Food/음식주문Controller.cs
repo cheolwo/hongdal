@@ -44,12 +44,21 @@ public sealed class 음식주문Controller(
 
     [HttpGet("restaurant/inbox")]
     [Authorize(Policy = "음식점운영자전용")]
-    public ActionResult<음식주문목록응답> 음식점수신함()
+    public ActionResult<음식점주문수신함응답> 음식점수신함(
+        [FromQuery] 음식점주문수신함조회요청 request)
     {
+        if (!string.IsNullOrWhiteSpace(request.처리상태)
+            && !음식점주문수신함처리상태코드.전체목록.Contains(
+                request.처리상태.Trim(),
+                StringComparer.Ordinal))
+        {
+            return BadRequest(new { message = "처리상태는 미처리, 완료 또는 전체만 사용할 수 있습니다." });
+        }
+
         var restaurantId = 현재음식점Id();
         return restaurantId is null
             ? Forbid()
-            : Ok(restaurantReadUseCase.목록(restaurantId.Value));
+            : Ok(restaurantReadUseCase.목록(request, restaurantId.Value));
     }
 
     [HttpGet("restaurant/inbox/{orderNo}")]

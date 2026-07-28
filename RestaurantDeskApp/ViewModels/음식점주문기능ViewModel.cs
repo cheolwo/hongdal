@@ -22,14 +22,25 @@ public sealed class 음식점주문조회ViewModel : 음식점주문업무ViewMo
         : base("restaurant-order-query", "주문 조회")
     {
         서버주문목록조회 = 하위ViewModel등록(
-            new Api작업ViewModel<IReadOnlyList<음식주문응답>>(api.주문목록조회Async));
+            new Api작업ViewModel<음식점주문수신함응답>(cancellationToken =>
+                api.주문목록조회Async(
+                    new 음식점주문수신함조회요청
+                    {
+                        처리상태 = 음식점주문수신함처리상태코드.미처리,
+                        Page = 1,
+                        PageSize = 100
+                    },
+                    cancellationToken)));
         서버주문상세조회 = 하위ViewModel등록(
             new Api작업ViewModel<string, 음식주문응답?>(api.주문상세조회Async));
         데스크주문목록조회 = 하위ViewModel등록(
-            new Api작업ViewModel<IReadOnlyList<음식점주문DeskItem>>(desk.주문목록조회Async));
+            new Api작업ViewModel<IReadOnlyList<음식점주문DeskItem>>(cancellationToken =>
+                desk.주문목록조회Async(
+                    음식점주문복구출처.서버재조회,
+                    cancellationToken)));
     }
 
-    public Api작업ViewModel<IReadOnlyList<음식주문응답>> 서버주문목록조회 { get; }
+    public Api작업ViewModel<음식점주문수신함응답> 서버주문목록조회 { get; }
     public Api작업ViewModel<string, 음식주문응답?> 서버주문상세조회 { get; }
     public Api작업ViewModel<IReadOnlyList<음식점주문DeskItem>> 데스크주문목록조회 { get; }
 }
@@ -84,7 +95,7 @@ public sealed class 음식점주문기능ViewModel : 조립ViewModelBase
     public 음식점주문접수ViewModel 접수 { get; }
     public 음식점주문이행ViewModel 이행 { get; }
 
-    public Api작업ViewModel<IReadOnlyList<음식주문응답>> 서버주문목록조회 => 조회.서버주문목록조회;
+    public Api작업ViewModel<음식점주문수신함응답> 서버주문목록조회 => 조회.서버주문목록조회;
     public Api작업ViewModel<string, 음식주문응답?> 서버주문상세조회 => 조회.서버주문상세조회;
     public Api작업ViewModel<IReadOnlyList<음식점주문DeskItem>> 데스크주문목록조회 => 조회.데스크주문목록조회;
     public Api작업ViewModel<음식점주문수신Payload, 음식점주문DeskItem> 주문알림수신 => 접수.주문알림수신;
