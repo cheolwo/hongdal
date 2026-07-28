@@ -122,6 +122,8 @@ public sealed class 포장작업UseCase(
         if (request.PackagingQuantity <= 0 || request.PackagingQuantity != item.가용수량)
             return Conflict<포장작업결과응답>("부분 포장 상태를 만들지 않도록 현재 전체 가용수량과 같은 수량을 확인해 주세요.");
 
+        var inbound = await db.입고요청.AsNoTracking()
+            .FirstOrDefaultAsync(candidate => candidate.Id == item.입고요청Id, cancellationToken);
         var now = DateTime.UtcNow;
         item.상태 = $"포장완료-{type}";
         item.UpdatedAt = now;
@@ -130,7 +132,26 @@ public sealed class 포장작업UseCase(
         db.재고이동.Add(new 재고이동 { 창고Id = item.창고Id, 입고상품Id = item.Id, 상품명 = item.상품명, SKU = item.SKU, 이동유형 = "포장", 수량 = request.PackagingQuantity, 입고요청Id = item.입고요청Id, 처리UserId = userId, 메모 = historyMemo, 발생일시 = now });
         await db.SaveChangesAsync(cancellationToken);
         await LogAsync(item, request.PackagingQuantity, type, context, cancellationToken);
-        await publisher.Publish(new 창고포장완료됨Event(context.UserId, context.RoleName, item.Id, request.PackagingQuantity, context.Route, context.TraceId, now, context.AppKey), cancellationToken);
+        await publisher.Publish(
+            new 창고포장완료됨Event(
+                context.UserId,
+                context.RoleName,
+                item.Id,
+                request.PackagingQuantity,
+                context.Route,
+                context.TraceId,
+                now,
+                context.AppKey,
+                item.입고요청Id,
+                item.창고Id,
+                inbound?.출고예정Id,
+                inbound?.주문참조번호 ?? string.Empty,
+                item.상품명,
+                item.SKU,
+                type,
+                item.보관위치,
+                item.커뮤니티원장Id ?? inbound?.커뮤니티원장Id ?? string.Empty),
+            cancellationToken);
         return Result.Ok(ToResult(item, request.PackagingQuantity, type, now, false));
     }
 

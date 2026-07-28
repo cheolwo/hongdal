@@ -284,7 +284,10 @@ public sealed class 출고운송인계완료UseCase(
                 context.Route,
                 context.TraceId,
                 now,
-                context.AppKey),
+                context.AppKey,
+                plan.주문참조번호,
+                plan.입고요청Id,
+                plan.커뮤니티원장Id ?? string.Empty),
             cancellationToken);
         await SyncLedgerAsync(plan, userId, cancellationToken);
 

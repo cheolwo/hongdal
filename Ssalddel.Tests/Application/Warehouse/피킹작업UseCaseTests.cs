@@ -100,7 +100,12 @@ public sealed class 피킹작업UseCaseTests
         Assert.False(first.Value.IdempotentReplay);
         Assert.True(replay.Value.IdempotentReplay);
         Assert.Single(logs.Entries);
-        Assert.IsType<창고피킹완료됨Event>(Assert.Single(publisher.Notifications));
+        var notification = Assert.IsType<창고피킹완료됨Event>(Assert.Single(publisher.Notifications));
+        Assert.Equal("ORDER-PICK-A", notification.주문참조번호);
+        Assert.Equal("LINE-PICK-A", notification.라인Key);
+        Assert.Equal("POTATO-01", notification.SKU);
+        Assert.Equal("RACK-A-01", notification.적재대코드);
+        Assert.Equal("BUNDLE-PICK-A", notification.묶음바코드);
     }
 
     private static 피킹작업UseCase CreateUseCase(

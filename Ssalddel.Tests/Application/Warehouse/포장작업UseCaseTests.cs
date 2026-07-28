@@ -51,7 +51,13 @@ public sealed class 포장작업UseCaseTests
         Assert.True(replay.IsSuccess); Assert.True(replay.Value.IdempotentReplay);
         Assert.Single(await db.재고이력.Where(x => x.입고상품Id == ids.AccessibleId && x.이력유형 == "포장").ToArrayAsync());
         Assert.Single(await db.재고이동.Where(x => x.입고상품Id == ids.AccessibleId && x.이동유형 == "포장").ToArrayAsync());
-        Assert.Single(logs.Entries); Assert.IsType<창고포장완료됨Event>(Assert.Single(publisher.Notifications));
+        Assert.Single(logs.Entries);
+        var notification = Assert.IsType<창고포장완료됨Event>(Assert.Single(publisher.Notifications));
+        Assert.Equal("ORDER-A", notification.주문참조번호);
+        Assert.Equal("감자", notification.상품명);
+        Assert.Equal("POTATO", notification.SKU);
+        Assert.Equal(포장유형코드.냉장포장, notification.포장유형);
+        Assert.Equal("A-02-01", notification.보관위치);
     }
 
     [Fact]

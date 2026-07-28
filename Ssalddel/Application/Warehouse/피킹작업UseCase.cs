@@ -242,7 +242,16 @@ public sealed class 피킹작업UseCase(
                 context.Route,
                 context.TraceId,
                 now,
-                context.AppKey),
+                context.AppKey,
+                task.입고상품Id,
+                task.출고예정Id,
+                task.주문참조번호,
+                task.라인Key,
+                task.상품명,
+                task.SKU,
+                expectedRackCode,
+                task.묶음바코드 ?? string.Empty,
+                task.커뮤니티원장Id ?? string.Empty),
             cancellationToken);
         return Result.Ok(ToResult(task, false));
     }

@@ -145,7 +145,21 @@ public sealed class 출고인계준비UseCase(
         });
         await db.SaveChangesAsync(cancellationToken);
         await LogAsync(row.item, plan, context, cancellationToken);
-        await publisher.Publish(new 창고출고인계준비완료됨Event(context.UserId, context.RoleName, row.item.Id, plan.Id, plan.수량, context.Route, context.TraceId, now, context.AppKey), cancellationToken);
+        await publisher.Publish(
+            new 창고출고인계준비완료됨Event(
+                context.UserId,
+                context.RoleName,
+                row.item.Id,
+                plan.Id,
+                plan.수량,
+                context.Route,
+                context.TraceId,
+                now,
+                context.AppKey,
+                plan.주문참조번호,
+                plan.입고요청Id,
+                plan.커뮤니티원장Id ?? string.Empty),
+            cancellationToken);
         return Result.Ok(ToResult(row.item.Id, plan, now, false));
     }
 
