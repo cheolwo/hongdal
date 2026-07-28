@@ -102,8 +102,11 @@ public sealed class OrdererMobileFigma02PresentationTests
         Assert.Contains("TogetherOrderDetailFor", screen);
         Assert.Contains("SupplierRelationshipFor", screen);
         Assert.Contains("UrgentHarvestReviewFor", screen);
-        Assert.Contains("25kg 상자 환산", screen);
-        Assert.Contains("LCL·FCL은 공급자·포워더 회신 전까지 미판정", screen);
+        Assert.DoesNotContain("25kg 상자 환산", screen);
+        Assert.Contains("같이주문수량Presentation.수량(_같이주문상세.총희망수량", screen);
+        Assert.Contains("같이주문수량Presentation.선택수량(_같이주문상세.추가필요수량", screen);
+        Assert.Contains("원 거래단위를 임의로 kg이나 상자로 바꾸지 않습니다.", screen);
+        Assert.Contains("실제 포장 수와 LCL·FCL은 공급자·포워더 회신 전까지 미판정", screen);
         Assert.Contains("order-mode-comparisons/recipe-uses", service);
         Assert.Contains("order-mode-comparisons/preview", service);
         Assert.Contains("group-purchase-auto-groups", service);

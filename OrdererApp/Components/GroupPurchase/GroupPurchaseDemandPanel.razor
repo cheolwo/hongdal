@@ -506,10 +506,30 @@
                 return;
             }
 
+            var withdrawnGroupId = !string.IsNullOrWhiteSpace(response.자동집단Id)
+                ? response.자동집단Id
+                : _registeredGroup?.자동집단Id;
             _registeredDemandSourceKey = string.Empty;
             _registeredGroup = null;
-            _statusSeverity = Severity.Success;
-            _statusMessage = "비구속 수요를 철회했습니다. 결제·주문·수입·운송 작업은 실행되지 않았습니다.";
+
+            try
+            {
+                var groups = await ShipmentTrackingService.ListGroupsAsync(
+                    Product.상품카드Id,
+                    _groupScopeKey);
+                _registeredGroup = groups?.FirstOrDefault(item =>
+                    string.Equals(item.자동집단Id, withdrawnGroupId, StringComparison.Ordinal));
+
+                _statusSeverity = Severity.Success;
+                _statusMessage = _registeredGroup is null
+                    ? "비구속 수요를 철회하고 서버 원장을 다시 확인했습니다. 이 상품·배송권에는 현재 공개할 자동집단이 없습니다."
+                    : $"비구속 수요를 철회한 뒤 서버 원장을 다시 확인했습니다. 남은 수요 {_registeredGroup.수요건수:N0}건, {_registeredGroup.총희망수량:N0}{_registeredGroup.수량단위}입니다.";
+            }
+            catch (Exception ex) when (ex is SsalddelApiException or InvalidOperationException)
+            {
+                _statusSeverity = Severity.Warning;
+                _statusMessage = "비구속 수요 철회는 완료됐지만 최신 자동집단 원장을 다시 읽지 못했습니다. 새로고침 후 모집 현황을 확인해 주세요.";
+            }
         }
         catch (SsalddelApiException ex)
         {

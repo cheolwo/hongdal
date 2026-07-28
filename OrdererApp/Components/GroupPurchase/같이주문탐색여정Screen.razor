@@ -153,12 +153,12 @@
 
     private string 설명 => 단계 switch
     {
-        같이주문여정단계.레시피활용 => "개인이 받을 25kg을 음식별로 나누어 보고 과잉 주문인지 먼저 판단합니다.",
-        같이주문여정단계.주문방식비교 => "같은 25kg 기준으로 예상 비용, 더 기다리는 시간과 모집 조건을 함께 봅니다.",
+        같이주문여정단계.레시피활용 => "개인이 받을 검토 수량을 음식별로 나누어 보고 과잉 주문인지 먼저 판단합니다.",
+        같이주문여정단계.주문방식비교 => "같은 원 거래단위 기준으로 예상 비용, 더 기다리는 시간과 모집 조건을 함께 봅니다.",
         같이주문여정단계.배송권찾기 => "상세 주소는 공개하지 않고 같이 주문을 묶을 생활권만 확인합니다.",
         같이주문여정단계.배송권상세 => "배송권 안에서 공개되는 집계와 숨겨지는 개인정보를 구분합니다.",
         같이주문여정단계.같이주문목록 => "저장된 배송권 안에서 진행 중인 공개 모집을 상품별로 확인합니다.",
-        같이주문여정단계.같이주문상세 => "참여자 식별정보 없이 총수량, 상자 환산과 다음 가격 구간을 확인합니다.",
+        같이주문여정단계.같이주문상세 => "참여자 식별정보 없이 원 거래단위의 총수량과 다음 가격 구간을 확인합니다.",
         같이주문여정단계.공급자관계 => "같이 주문 원장에서 연결된 공급 후보의 근거와 역할만 먼저 확인합니다.",
         같이주문여정단계.공급자Membership => "월 비용과 예상 혜택을 비교하되 가입과 주문 동의를 분리합니다.",
         같이주문여정단계.긴급수확제안 => "남는 수확 물량을 가격, 기한, 운송 책임이 있는 제안 초안으로 읽습니다.",
@@ -168,7 +168,7 @@
     private string 경계안내 => 단계 switch
     {
         같이주문여정단계.같이주문상세 =>
-            "25kg 상자 환산은 KAMIS 표시단위를 이해하기 위한 참고입니다. 실제 포장과 LCL·FCL은 공급자·포워더 회신 전까지 미판정입니다.",
+            "KAMIS 등 가격 근거의 원 거래단위를 임의로 kg이나 상자로 바꾸지 않습니다. 실제 포장 수와 LCL·FCL은 공급자·포워더 회신 전까지 미판정입니다.",
         같이주문여정단계.공급자Membership =>
             "Membership 관심 등록, 유료 가입과 같이 주문 참여는 서로 다른 동의입니다. 이 화면은 결제나 가입을 실행하지 않습니다.",
         같이주문여정단계.긴급수확제안 or 같이주문여정단계.긴급수확검토 =>
@@ -278,7 +278,7 @@
     private RenderFragment 레시피활용화면 => @<div class="together-journey__stack">
         <section class="together-journey__hero">
             <span>개인 수령 검토량</span>
-            <strong>@(_레시피?.개인수령검토수량.ToString("N0") ?? "25") kg</strong>
+            <strong>@레시피검토수량()</strong>
             <small>@(_상품?.상품명 ?? 문맥키) · 같이 주문 전체 수량과 분리</small>
         </section>
         @if (_레시피 is null)
@@ -305,13 +305,13 @@
                 }
             </div>
         }
-        <a class="together-journey__primary" href="@상품비교경로()">25kg 기준 주문 방식 비교하기</a>
+        <a class="together-journey__primary" href="@상품비교경로()">현재 수량으로 주문 방식 비교하기</a>
     </div>;
 
     private RenderFragment 주문방식비교화면 => @<div class="together-journey__stack">
         <section class="together-journey__assumption">
             <strong>비교 입력</strong>
-            <span>25kg · KRW · 25kg 상자 공급 구간 · 화면 검토용 물류비</span>
+            <span>@비교입력안내()</span>
         </section>
         @if (_비교 is not null)
         {
@@ -319,12 +319,12 @@
                 <article>
                     <span>개별 주문</span>
                     <strong>@금액(_비교.개별주문.총예상비용)</strong>
-                    <small>단위당 @금액(_비교.개별주문.단위당예상비용) / kg</small>
+                    <small>단위당 @금액(_비교.개별주문.단위당예상비용) / @같이주문수량Presentation.단위(_비교.수량단위)</small>
                 </article>
                 <article class="is-recommended">
                     <span>같이 주문 예상</span>
                     <strong>@금액(_비교.같이주문.총예상비용)</strong>
-                    <small>단위당 @금액(_비교.같이주문.단위당예상비용) / kg</small>
+                    <small>단위당 @금액(_비교.같이주문.단위당예상비용) / @같이주문수량Presentation.단위(_비교.수량단위)</small>
                 </article>
             </div>
             <section class="together-journey__progress-card">
@@ -408,21 +408,20 @@
     private RenderFragment 같이주문상세화면 => @<div class="together-journey__stack">
         @if (_같이주문상세 is not null)
         {
-            var boxes = Math.Ceiling(_같이주문상세.총희망수량 / 25m);
             <section class="together-journey__hero">
                 <span>@_같이주문상세.배송권명 · @_같이주문상세.현재상태</span>
                 <strong>@_같이주문상세.상품명</strong>
-                <small>@(_같이주문상세.참여자수)명 · @_같이주문상세.총희망수량.ToString("N0") @_같이주문상세.수량단위</small>
+                <small>@(_같이주문상세.참여자수)명 · @같이주문수량Presentation.수량(_같이주문상세.총희망수량, _같이주문상세.수량단위)</small>
             </section>
             <div class="together-journey__metrics">
-                <article><span>총 집계</span><strong>@_같이주문상세.총희망수량.ToString("N0") kg</strong></article>
-                <article><span>25kg 상자 환산</span><strong>약 @(boxes.ToString("N0"))상자</strong></article>
-                <article><span>추가 필요</span><strong>@(_같이주문상세.추가필요수량?.ToString("N0") ?? "0") kg</strong></article>
+                <article><span>총 집계</span><strong>@같이주문수량Presentation.수량(_같이주문상세.총희망수량, _같이주문상세.수량단위)</strong></article>
+                <article><span>가격·수량 기준</span><strong>@같이주문수량Presentation.원거래단위(_같이주문상세.수량단위)</strong></article>
+                <article><span>추가 필요</span><strong>@같이주문수량Presentation.선택수량(_같이주문상세.추가필요수량, _같이주문상세.수량단위)</strong></article>
             </div>
             <section class="together-journey__freight">
                 <span>LCL / FCL</span>
                 <strong>아직 미판정</strong>
-                <p>여러 재료의 총중량·부피·상자 규격을 포워더가 확인한 뒤 후보가 정해집니다. 참여가 늘면 공급 가격 구간과 FCL 가능성이 달라질 수 있습니다.</p>
+                <p>원 거래단위는 보존하고, 실제 총중량·부피·포장 규격을 공급자와 포워더가 확인한 뒤 후보를 정합니다. 참여가 늘면 공급 가격 구간과 FCL 가능성이 달라질 수 있습니다.</p>
             </section>
             <a class="together-journey__primary" href="@GroupPurchasePageRoutes.DemandCreateFor(_같이주문상세.상품키)">내 비구속 수량 검토</a>
             <a class="together-journey__secondary" href="@공급자후보경로(_같이주문상세.자동집단Id)">연결된 공급자 관계 보기</a>
@@ -603,4 +602,16 @@
 
     private static string 금액(decimal amount)
         => $"{amount:N0}원";
+
+    private string 레시피검토수량()
+        => _레시피 is null
+            ? "검토 수량 미정"
+            : 같이주문수량Presentation.수량(
+                _레시피.개인수령검토수량,
+                _레시피.수량단위);
+
+    private string 비교입력안내()
+        => _비교 is null
+            ? "비교 수량과 원 거래단위를 불러오는 중"
+            : $"{같이주문수량Presentation.수량(_비교.요청수량, _비교.수량단위)} · {_비교.통화코드} · 원 거래단위 가격 구간 · 화면 검토용 물류비";
 }

@@ -79,6 +79,24 @@ public sealed class OrdererGroupImportReadinessPageCompositionTests
         Assert.Contains("GroupPurchaseScreenKind.ImportConsent", source);
     }
 
+    [Fact]
+    public void 같이수입준비Loader는_기존내용을유지하며_30초마다서버원장을다시읽는다()
+    {
+        var loaderPath = Path.Combine(
+            FindRepositoryRoot(),
+            "OrdererApp",
+            "Components",
+            "GroupPurchase",
+            "OrdererGroupImportReadinessLoader.razor");
+        var source = File.ReadAllText(loaderPath);
+
+        Assert.Contains("TimeSpan.FromSeconds(30)", source);
+        Assert.Contains("PeriodicTimer", source);
+        Assert.Contains("preserveCurrentContent: true", source);
+        Assert.Contains("이전에 확인한 내용을 유지합니다.", source);
+        Assert.Contains("@implements IAsyncDisposable", source);
+    }
+
     private static string FindRepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
