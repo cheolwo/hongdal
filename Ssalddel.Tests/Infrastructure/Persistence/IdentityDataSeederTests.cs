@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Contracts.Food;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
 
@@ -22,7 +23,34 @@ public sealed class IdentityDataSeederTests
         var roleManager = assertionScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var db = assertionScope.ServiceProvider.GetRequiredService<SsalddelContext>();
         Assert.True(await roleManager.RoleExistsAsync(역할명.서버관리자));
+        Assert.True(await roleManager.RoleExistsAsync(역할명.음식점));
         Assert.Empty(await db.Users.AsNoTracking().ToArrayAsync());
+    }
+
+    [Fact]
+    public async Task 개발계정시드는_음식점역할과고정된음식점범위를부여한다()
+    {
+        const string password = "StrongSeed123!";
+        await using var fixture = await IdentitySeedFixture.CreateAsync(options =>
+        {
+            options.DevelopmentAccounts.Enabled = true;
+            options.DevelopmentAccounts.AdminPassword = password;
+            options.DevelopmentAccounts.DriverPassword = password;
+            options.DevelopmentAccounts.ShipperPassword = password;
+        });
+
+        await IdentityDataSeeder.SeedAsync(
+            fixture.Services,
+            includeDevelopmentAccounts: true);
+
+        var restaurant = Assert.IsType<ApplicationUser>(
+            await fixture.UserManager.FindByNameAsync("restaurant101"));
+        Assert.True(await fixture.UserManager.IsInRoleAsync(restaurant, 역할명.음식점));
+        var claims = await fixture.UserManager.GetClaimsAsync(restaurant);
+        Assert.Contains(
+            claims,
+            claim => claim.Type == 음식점접근ClaimTypes.음식점Id
+                     && claim.Value == "101");
     }
 
     [Fact]

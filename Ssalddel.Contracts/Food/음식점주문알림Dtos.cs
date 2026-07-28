@@ -22,3 +22,18 @@ public sealed class 음식점주문수신알림
 
     public string 본문 { get; set; } = string.Empty;
 }
+
+public sealed class 음식점주문상태변경알림
+{
+    public string 주문번호 { get; set; } = string.Empty;
+
+    public long 음식점Id { get; set; }
+
+    public string 주문상태 { get; set; } = string.Empty;
+
+    public string 배차상태 { get; set; } = string.Empty;
+
+    public string 변경사유 { get; set; } = string.Empty;
+
+    public DateTimeOffset 변경시각 { get; set; } = DateTimeOffset.UtcNow;
+}

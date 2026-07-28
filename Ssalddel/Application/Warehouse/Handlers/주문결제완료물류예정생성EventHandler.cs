@@ -8,14 +8,14 @@ namespace Ssalddel.Application.Warehouse;
 public sealed class 주문결제완료물류예정생성EventHandler : INotificationHandler<주문결제완료됨Event>
 {
     private readonly SsalddelContext _db;
-    private readonly I음식마트원장Mongo동기화Service _ledgerSync;
+    private readonly I음식마트원장동기화OutboxService _ledgerSyncOutbox;
 
     public 주문결제완료물류예정생성EventHandler(
         SsalddelContext db,
-        I음식마트원장Mongo동기화Service ledgerSync)
+        I음식마트원장동기화OutboxService ledgerSyncOutbox)
     {
         _db = db;
-        _ledgerSync = ledgerSync;
+        _ledgerSyncOutbox = ledgerSyncOutbox;
     }
 
     public async Task Handle(주문결제완료됨Event notification, CancellationToken cancellationToken)
@@ -120,11 +120,12 @@ public sealed class 주문결제완료물류예정생성EventHandler : INotifica
             ? []
             : await _db.입고요청.Where(x => 입고Ids.Contains(x.Id)).ToListAsync(cancellationToken);
 
-        await _ledgerSync.출고원장동기화Async(
+        await _ledgerSyncOutbox.출고원장예약후즉시처리Async(
             출고목록,
             입고목록,
             notification.판매자UserId,
-            "출고 예정",
+            $"paid-order:{notification.TraceId}:{notification.주문참조번호}",
+            currentStageKey: "출고 예정",
             cancellationToken: cancellationToken);
     }
 

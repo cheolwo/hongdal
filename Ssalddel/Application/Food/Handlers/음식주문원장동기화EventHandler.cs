@@ -8,14 +8,14 @@ public sealed class 음식주문원장동기화EventHandler :
     INotificationHandler<음식주문등록됨Event>,
     INotificationHandler<음식점주문수락됨Event>
 {
-    private readonly I음식마트원장Mongo동기화Service _원장동기화Service;
+    private readonly I음식마트원장동기화OutboxService _원장동기화OutboxService;
     private readonly ILogger<음식주문원장동기화EventHandler> _logger;
 
     public 음식주문원장동기화EventHandler(
-        I음식마트원장Mongo동기화Service 원장동기화Service,
+        I음식마트원장동기화OutboxService 원장동기화OutboxService,
         ILogger<음식주문원장동기화EventHandler> logger)
     {
-        _원장동기화Service = 원장동기화Service;
+        _원장동기화OutboxService = 원장동기화OutboxService;
         _logger = logger;
     }
 
@@ -41,7 +41,11 @@ public sealed class 음식주문원장동기화EventHandler :
     {
         try
         {
-            await _원장동기화Service.음식주문동기화Async(주문, 변경자, cancellationToken);
+            await _원장동기화OutboxService.음식주문예약후즉시처리Async(
+                주문,
+                변경자,
+                $"food-event:{eventId}",
+                cancellationToken);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {

@@ -179,7 +179,7 @@ flowchart TD
 | `Ssalddel.Ui.Common` | 공통 UI/백오피스 영역 컴포넌트 | `net10.0` |
 | `SsalddelAdmin` | 관리자 앱(운영 제어) | `net10.0` |
 | `Ssalddel.BackOffice.Client` | 백오피스 클라이언트 계층 | `net10.0` |
-| `Ssalddel.FoodApi` | 음식 도메인 호환 API 영역(메인 `Ssalddel` 서버로 이관 중) | `net10.0` |
+| `Ssalddel.FoodApi` | 과거 음식 도메인 호환 API 참조 프로젝트(3.5 배포 대상 제외) | `net10.0` |
 | `DriverApp` | 기사 앱 (.NET MAUI Android) | `net10.0-android` |
 | `SsalddelApp` | 화주/판매자 앱 (.NET MAUI Android) | `net10.0-android` |
 | `WarehouseManagerApp` | 창고 현장 앱 (.NET MAUI Android) | `net10.0-android` |

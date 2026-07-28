@@ -1,7 +1,11 @@
 using System.Reflection;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Application.Food;
+using Ssalddel.Contracts.Food;
 using Ssalddel.Controllers.Food;
 using Ssalddel.Filters;
 using 살뜰.Services.Versioning;
@@ -33,5 +37,113 @@ public sealed class 음식주문ControllerTests
         Assert.NotNull(method);
         Assert.NotNull(method.GetCustomAttribute<AuthorizeAttribute>());
         Assert.Equal(route, method.GetCustomAttribute<HttpGetAttribute>()?.Template);
+    }
+
+    [Fact]
+    public void 주문등록은_로그인을요구하고_음식점업무는음식점정책을요구한다()
+    {
+        var register = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.등록));
+        var inbox = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점수신함));
+        var detail = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점상세));
+        var accept = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점수락));
+
+        Assert.NotNull(register?.GetCustomAttribute<AuthorizeAttribute>());
+        Assert.Equal("restaurant/inbox", inbox?.GetCustomAttribute<HttpGetAttribute>()?.Template);
+        Assert.Equal("음식점운영자전용", inbox?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+        Assert.Equal("restaurant/inbox/{orderNo}", detail?.GetCustomAttribute<HttpGetAttribute>()?.Template);
+        Assert.Equal("음식점운영자전용", detail?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+        Assert.Equal("음식점운영자전용", accept?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+    }
+
+    [Fact]
+    public async Task 주문등록은_본문의주문자Id대신로그인사용자Id를사용한다()
+    {
+        var command = new RecordingCommandUseCase();
+        var controller = new 음식주문Controller(command, null!, null!)
+        {
+            ControllerContext = Context(
+                new Claim(ClaimTypes.NameIdentifier, "signed-in-orderer"))
+        };
+        var request = new 음식주문등록요청
+        {
+            음식점Id = 101,
+            주문자UserId = "spoofed-orderer",
+            수령인정보 = new() { 주소 = "서울시" },
+            상품목록 = [new() { 상품명 = "비빔밥", 수량 = 1, 단가 = 9000 }]
+        };
+
+        await controller.등록(request, CancellationToken.None);
+
+        Assert.Equal("signed-in-orderer", command.Registered?.주문자UserId);
+    }
+
+    [Fact]
+    public async Task 음식점수락은_클레임범위밖주문을404로숨기고Command를실행하지않는다()
+    {
+        var command = new RecordingCommandUseCase();
+        var restaurantRead = new StubRestaurantReadUseCase();
+        var controller = new 음식주문Controller(command, null!, restaurantRead)
+        {
+            ControllerContext = Context(
+                new Claim(ClaimTypes.NameIdentifier, "restaurant-user"),
+                new Claim(음식점접근ClaimTypes.음식점Id, "101"))
+        };
+
+        var result = await controller.음식점수락(
+            "OTHER-RESTAURANT-ORDER",
+            new 음식점주문수락요청(),
+            CancellationToken.None);
+
+        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.False(command.AcceptCalled);
+    }
+
+    private static ControllerContext Context(params Claim[] claims)
+        => new()
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "test"))
+            }
+        };
+
+    private sealed class RecordingCommandUseCase : I음식주문접수UseCase
+    {
+        public 음식주문등록요청? Registered { get; private set; }
+        public bool AcceptCalled { get; private set; }
+
+        public Task<음식주문응답> 등록Async(
+            음식주문등록요청 request,
+            CancellationToken cancellationToken)
+        {
+            Registered = request;
+            return Task.FromResult(new 음식주문응답
+            {
+                주문번호 = "FOOD-TEST",
+                음식점Id = request.음식점Id,
+                주문자UserId = request.주문자UserId
+            });
+        }
+
+        public Task<음식주문응답?> 음식점수락Async(
+            string orderNo,
+            음식점주문수락요청 request,
+            string? 처리UserId,
+            CancellationToken cancellationToken)
+        {
+            AcceptCalled = true;
+            return Task.FromResult<음식주문응답?>(new 음식주문응답
+            {
+                주문번호 = orderNo,
+                음식점Id = 101
+            });
+        }
+    }
+
+    private sealed class StubRestaurantReadUseCase : I음식점음식주문조회UseCase
+    {
+        public 음식주문목록응답 목록(long 음식점Id) => new();
+
+        public 음식주문응답? 상세(string 주문번호, long 음식점Id) => null;
     }
 }

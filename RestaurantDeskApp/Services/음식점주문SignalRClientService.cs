@@ -1,30 +1,37 @@
 using Ssalddel.Contracts.Food;
+using Ssalddel.Client.Infrastructure.Security;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 using RestaurantDeskApp.Options;
 
 namespace RestaurantDeskApp.Services;
 
-public sealed class 음식점주문SignalRClientService(IOptions<RestaurantDeskOptions> options) : I음식점주문SignalRClientService
+public sealed class 음식점주문SignalRClientService(
+    IOptions<RestaurantDeskOptions> options,
+    RestaurantAuthService authService,
+    ClientAuthSession authSession) : I음식점주문SignalRClientService
 {
     private const string ReceiveRestaurantOrderNotificationMethod = "ReceiveRestaurantOrderNotification";
+    private const string ReceiveRestaurantOrderStatusChangedMethod = "ReceiveRestaurantOrderStatusChanged";
     private HubConnection? _connection;
-    private long _restaurantId;
 
     public event Func<음식점주문수신알림, Task>? 주문수신;
+
+    public event Func<음식점주문상태변경알림, Task>? 주문상태변경;
 
     public event Func<string, Task>? 상태변경;
 
     public string 연결상태 => _connection?.State.ToString() ?? "Disconnected";
 
-    public async Task 연결Async(long restaurantId, CancellationToken cancellationToken = default)
+    public async Task 연결Async(CancellationToken cancellationToken = default)
     {
-        if (restaurantId <= 0)
+        var auth = await authService.EnsureAccessTokenAsync(
+            cancellationToken: cancellationToken);
+        if (!auth.IsSuccess)
         {
-            throw new InvalidOperationException("음식점Id가 필요합니다.");
+            throw new UnauthorizedAccessException(auth.ErrorMessage);
         }
 
-        _restaurantId = restaurantId;
         if (_connection is not null)
         {
             if (_connection.State == HubConnectionState.Connected)
@@ -39,13 +46,25 @@ public sealed class 음식점주문SignalRClientService(IOptions<RestaurantDeskO
         }
 
         _connection = new HubConnectionBuilder()
-            .WithUrl(BuildHubUri())
+            .WithUrl(
+                BuildHubUri(),
+                connectionOptions =>
+                {
+                    connectionOptions.AccessTokenProvider = async () =>
+                    {
+                        var result = await authService.EnsureAccessTokenAsync();
+                        return result.IsSuccess ? authSession.AccessToken : null;
+                    };
+                })
             .WithAutomaticReconnect()
             .Build();
 
         _connection.On<음식점주문수신알림>(
             ReceiveRestaurantOrderNotificationMethod,
             async notification => await Publish주문수신Async(notification));
+        _connection.On<음식점주문상태변경알림>(
+            ReceiveRestaurantOrderStatusChangedMethod,
+            async notification => await Publish주문상태변경Async(notification));
 
         _connection.Reconnecting += async error =>
         {
@@ -95,7 +114,7 @@ public sealed class 음식점주문SignalRClientService(IOptions<RestaurantDeskO
             return;
         }
 
-        await _connection.InvokeAsync("JoinRestaurantOrders", _restaurantId, cancellationToken);
+        await _connection.InvokeAsync("JoinRestaurantOrders", cancellationToken);
     }
 
     private Uri BuildHubUri()
@@ -126,6 +145,20 @@ public sealed class 음식점주문SignalRClientService(IOptions<RestaurantDeskO
         foreach (Func<string, Task> callback in handler.GetInvocationList())
         {
             await callback(message);
+        }
+    }
+
+    private async Task Publish주문상태변경Async(음식점주문상태변경알림 notification)
+    {
+        var handler = 주문상태변경;
+        if (handler is null)
+        {
+            return;
+        }
+
+        foreach (Func<음식점주문상태변경알림, Task> callback in handler.GetInvocationList())
+        {
+            await callback(notification);
         }
     }
 }

@@ -26,7 +26,6 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 builder.Services.Configure<관리자ApiOptions>(builder.Configuration.GetSection(관리자ApiOptions.SectionName));
-builder.Services.Configure<FoodApiOptions>(builder.Configuration.GetSection(FoodApiOptions.SectionName));
 builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
 builder.Services.AddSsalddelUiCommonAppServices<관리자인증세션Service>();
 builder.Services.AddTransient<관리자Controller기능모음ViewModel>();
@@ -71,7 +70,6 @@ builder.Services.AddHttpClient<PlatformCommunityService>((sp, client) =>
 builder.Services.AddSingleton<백오피스메모리Service>();
 builder.Services.AddSingleton<문서관리메모리Service>();
 builder.Services.AddScoped<차량관리Service>();
-builder.Services.AddScoped<음식운영Service>();
 builder.Services.AddScoped<탐색캠페인샘플Service>();
 builder.Services.AddSingleton<FakePaymentSettlementSimulationService>();
 
@@ -120,7 +118,7 @@ builder.Services.AddHttpClient<AuxiliaryFeatureSettingsService>((sp, client) =>
 
 builder.Services.AddHttpClient<음식운영Service>((sp, client) =>
     {
-        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<FoodApiOptions>>().Value;
+        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
         var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", false);
         client.BaseAddress = new Uri(options.BaseUrl);
         if (useMemory)

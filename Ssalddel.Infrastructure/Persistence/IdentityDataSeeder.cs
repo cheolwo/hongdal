@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using Ssalddel.Contracts.Common.Hr;
+using Ssalddel.Contracts.Food;
 using 살뜰.도메인.공통;
 using 살뜰.도메인.기사;
 using 살뜰.도메인.차량;
@@ -27,6 +29,7 @@ namespace 살뜰.Data
             {
                 역할명.커뮤니티회원,
                 역할명.기사,
+                역할명.음식점,
                 역할명.화주,
                 역할명.판매자,
                 역할명.창고관리자,
@@ -117,6 +120,53 @@ namespace 살뜰.Data
                 if (!await userManager.IsInRoleAsync(driverUser, 역할명.기사))
                 {
                     await userManager.AddToRoleAsync(driverUser, 역할명.기사);
+                }
+
+                var restaurantId = 101L;
+                var restaurantUserName = "restaurant101";
+                var restaurantEmail = "restaurant101@ssalddel.local";
+                var restaurantUser = await userManager.FindByNameAsync(restaurantUserName)
+                    ?? await userManager.FindByEmailAsync(restaurantEmail);
+                if (restaurantUser == null)
+                {
+                    restaurantUser = new ApplicationUser
+                    {
+                        UserName = restaurantUserName,
+                        Email = restaurantEmail,
+                        EmailConfirmed = true,
+                        BusinessRegistrationNumber = "101-01-00101",
+                        LockoutEnabled = true
+                    };
+
+                    var createResult = await userManager.CreateAsync(
+                        restaurantUser,
+                        seedOptions.DevelopmentAccounts.ShipperPassword);
+                    if (!createResult.Succeeded)
+                    {
+                        throw IdentityFailure("개발용 음식점 계정을 만들지 못했습니다.", createResult);
+                    }
+                }
+
+                if (!await userManager.IsInRoleAsync(restaurantUser, 역할명.음식점))
+                {
+                    await userManager.AddToRoleAsync(restaurantUser, 역할명.음식점);
+                }
+
+                var restaurantClaims = await userManager.GetClaimsAsync(restaurantUser);
+                var managedRestaurantClaims = restaurantClaims
+                    .Where(claim => claim.Type == 음식점접근ClaimTypes.음식점Id)
+                    .ToArray();
+                if (managedRestaurantClaims.Length != 1
+                    || managedRestaurantClaims[0].Value != restaurantId.ToString())
+                {
+                    if (managedRestaurantClaims.Length > 0)
+                    {
+                        await userManager.RemoveClaimsAsync(restaurantUser, managedRestaurantClaims);
+                    }
+
+                    await userManager.AddClaimAsync(
+                        restaurantUser,
+                        new Claim(음식점접근ClaimTypes.음식점Id, restaurantId.ToString()));
                 }
 
                 var shipperId = "shipper1";

@@ -45,6 +45,7 @@ using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Services.AgriculturalFisheries.Information;
 using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Contracts.Common.Transport;
 using Ssalddel.Services.Content;
 using Ssalddel.Services.Customs;
 using Ssalddel.Services.FoodCulture;
@@ -190,6 +191,8 @@ builder.Services
 
                 if (!string.IsNullOrWhiteSpace(accessToken) &&
                     (path.StartsWithSegments("/hubs/dispatch-recommendations") ||
+                     path.StartsWithSegments("/hubs/restaurant-orders") ||
+                     path.StartsWithSegments(TransportRequestLedgerRealtime.HubPath) ||
                      path.StartsWithSegments(DiagramCollaborationHub.HubPath)))
                 {
                     context.Token = accessToken;
@@ -208,6 +211,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("화주또는판매자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자));
     options.AddPolicy("물류운영사용자전용", policy => policy.RequireRole(역할명.용달기사, 역할명.기사, 역할명.화주, 역할명.창고관리자, 역할명.서버관리자));
     options.AddPolicy("창고관리자전용", policy => policy.RequireRole(역할명.창고관리자, 역할명.서버관리자));
+    options.AddPolicy("음식점운영자전용", policy => policy.RequireRole(역할명.음식점));
     options.AddPolicy("운영사용자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자, 역할명.창고관리자, 역할명.서버관리자));
 });
 
@@ -807,6 +811,7 @@ app.MapControllers();
 app.MapHub<DispatchRecommendationHub>(
     Ssalddel.Contracts.Common.Drivers.DriverDispatchRealtimeContract.HubPath);
 app.MapHub<RestaurantOrderHub>("/hubs/restaurant-orders");
+app.MapHub<TransportRequestLedgerHub>(TransportRequestLedgerRealtime.HubPath);
 app.MapHub<DiagramCollaborationHub>(DiagramCollaborationHub.HubPath);
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {

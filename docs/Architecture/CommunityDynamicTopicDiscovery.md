@@ -32,7 +32,7 @@ flowchart LR
     B --> E["판매: 음식·화물"]
     B --> F["운송: 상차·하차"]
     E --> G{"음식 + 위치 일시 사용 동의"}
-    G -->|동의·좌표 있음| H["Ssalddel.FoodApi 반경 7km 후보"]
+    G -->|동의·좌표 있음| H["메인 서버 공개 음식점 반경 7km 후보"]
     E --> I["운송 OS 공개배차 화물 요약"]
     F --> I
     I --> J["당사자 별도 자격·면허·계약 확인"]
@@ -60,11 +60,11 @@ canonical `topicKey`는 `warehouse-inbound`, `warehouse-outbound`, `order-indivi
 
 ## 음식 후보 경계
 
-- `CommunityContextDiscovery:FoodApiBaseUrl`이 설정된 경우에만 별도 Food API를 호출한다.
-- 현재 Food API 자료는 시각·통합 검증을 위한 샘플이므로 response에 simulation 원천임을 표시한다.
+- 메인 `Ssalddel` 서버의 `음식점공개프로필`과 현재 노출 가능한 `음식점리뷰`를 직접 조회한다.
+- 별도 `Ssalddel.FoodApi`나 샘플 fallback에 의존하지 않으며 response 원천은 `Ssalddel.MainServer`로 표시한다.
 - 음식점 응답은 상호명, 분류, 두 단계 지역 요약, 거리, 평점·리뷰 수와 주문 가능 상태만 포함한다.
 - 상세 주소와 요청자의 현재 좌표는 동적 피드에 넣지 않는다.
-- 운영 음식점 검색으로 전환하려면 출처, 갱신 시각, 영업 상태, 위치 이용 동의와 외부 API 이용 조건을 별도로 검증한다.
+- 현재 위치는 요청 처리 중 거리 계산에만 사용하고 저장하지 않으며, 반경은 최대 7km로 제한한다.
 
 ## 화물 후보와 OS 경계
 

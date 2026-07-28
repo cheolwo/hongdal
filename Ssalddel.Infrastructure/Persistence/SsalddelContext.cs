@@ -74,6 +74,7 @@ namespace 살뜰.Data
         public DbSet<배차추천알림Outbox> 배차추천알림Outbox { get; set; } = null!;
         public DbSet<결제승인완료Outbox> 결제승인완료Outbox { get; set; } = null!;
         public DbSet<기사지급Outbox> 기사지급Outbox { get; set; } = null!;
+        public DbSet<음식마트원장동기화Outbox> 음식마트원장동기화Outbox { get; set; } = null!;
         public DbSet<플랫폼View정책> 플랫폼View정책 { get; set; } = null!;
         public DbSet<사용자View설정> 사용자View설정 { get; set; } = null!;
         public DbSet<사용자행위로그> 사용자행위로그 { get; set; } = null!;
@@ -145,6 +146,8 @@ namespace 살뜰.Data
         public DbSet<음식주문> 음식주문 { get; set; } = null!;
         public DbSet<음식주문상품> 음식주문상품 { get; set; } = null!;
         public DbSet<음식주문상태이력> 음식주문상태이력 { get; set; } = null!;
+        public DbSet<음식점리뷰> 음식점리뷰 { get; set; } = null!;
+        public DbSet<음식운영정책> 음식운영정책 { get; set; } = null!;
         public DbSet<마트공개상품> 마트공개상품 { get; set; } = null!;
         public DbSet<마트주문요청> 마트주문요청 { get; set; } = null!;
         public DbSet<마트주문> 마트주문 { get; set; } = null!;

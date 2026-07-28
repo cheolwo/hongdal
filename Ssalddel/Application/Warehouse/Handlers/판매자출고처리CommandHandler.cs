@@ -8,16 +8,16 @@ public sealed class 판매자출고처리CommandHandler : IRequestHandler<판매
 {
     private readonly SsalddelContext _db;
     private readonly IPublisher _publisher;
-    private readonly I음식마트원장Mongo동기화Service _ledgerSync;
+    private readonly I음식마트원장동기화OutboxService _ledgerSyncOutbox;
 
     public 판매자출고처리CommandHandler(
         SsalddelContext db,
         IPublisher publisher,
-        I음식마트원장Mongo동기화Service ledgerSync)
+        I음식마트원장동기화OutboxService ledgerSyncOutbox)
     {
         _db = db;
         _publisher = publisher;
-        _ledgerSync = ledgerSync;
+        _ledgerSyncOutbox = ledgerSyncOutbox;
     }
 
     public async Task<Result<Unit>> Handle(판매자출고처리Command request, CancellationToken cancellationToken)
@@ -96,11 +96,12 @@ public sealed class 판매자출고처리CommandHandler : IRequestHandler<판매
             ? []
             : await _db.입고요청.Where(x => 입고Ids.Contains(x.Id)).ToListAsync(cancellationToken);
 
-        await _ledgerSync.출고원장동기화Async(
+        await _ledgerSyncOutbox.출고원장예약후즉시처리Async(
             출고목록,
             입고목록,
             request.판매자UserId,
-            "출고 완료",
+            $"seller-outbound:{출고목록.First().주문참조번호}:{출고목록.Max(x => x.UpdatedAt).Ticks}",
+            currentStageKey: "출고 완료",
             cancellationToken: cancellationToken);
 
         return Result.Ok(Unit.Value);

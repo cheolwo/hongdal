@@ -64,6 +64,7 @@ internal static class DatabaseCompatibilityInitializer
         await EnsureHrRoleAssignmentCompatibilityAsync(db, logger);
         await EnsureHrEmploymentContractCompatibilityAsync(db, logger);
         await EnsurePlatformProfitReturnCompatibilityAsync(db, logger);
+        await EnsureFoodMartLedgerSyncOutboxCompatibilityAsync(db, logger);
 
         try
         {
@@ -106,6 +107,73 @@ internal static class DatabaseCompatibilityInitializer
             }
 
             logger.LogWarning(ex, "Initial data seeding failed after database migration.");
+        }
+    }
+
+    private static async Task EnsureFoodMartLedgerSyncOutboxCompatibilityAsync(
+        SsalddelContext db,
+        ILogger logger)
+    {
+        var connection = db.Database.GetDbConnection();
+
+        try
+        {
+            await db.Database.OpenConnectionAsync();
+
+            if (!await TableExistsAsync(connection, "음식마트원장동기화_Outbox"))
+            {
+                await using var createCommand = connection.CreateCommand();
+                createCommand.CommandText = @"
+CREATE TABLE `음식마트원장동기화_Outbox` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `idempotency_key` varchar(200) NOT NULL,
+    `sync_type` varchar(40) NOT NULL,
+    `source_id` varchar(160) NOT NULL,
+    `updated_by` varchar(160) NOT NULL,
+    `payload_json` longtext NOT NULL,
+    `status` varchar(40) NOT NULL,
+    `attempt_count` int NOT NULL,
+    `last_attempted_at_utc` datetime(6) NULL,
+    `last_error` varchar(2000) NOT NULL,
+    `created_at_utc` datetime(6) NOT NULL,
+    `updated_at_utc` datetime(6) NOT NULL,
+    PRIMARY KEY (`id`)
+) CHARACTER SET=utf8mb4;";
+                await createCommand.ExecuteNonQueryAsync();
+                logger.LogWarning("Created missing table 음식마트원장동기화_Outbox.");
+            }
+
+            if (!await IndexExistsAsync(
+                    connection,
+                    "음식마트원장동기화_Outbox",
+                    "IX_음식마트원장동기화_Outbox_idempotency_key"))
+            {
+                await using var uniqueIndexCommand = connection.CreateCommand();
+                uniqueIndexCommand.CommandText = @"
+CREATE UNIQUE INDEX `IX_음식마트원장동기화_Outbox_idempotency_key`
+ON `음식마트원장동기화_Outbox` (`idempotency_key`);";
+                await uniqueIndexCommand.ExecuteNonQueryAsync();
+            }
+
+            if (!await IndexExistsAsync(
+                    connection,
+                    "음식마트원장동기화_Outbox",
+                    "IX_음식마트원장동기화_Outbox_status_updated_at_utc"))
+            {
+                await using var statusIndexCommand = connection.CreateCommand();
+                statusIndexCommand.CommandText = @"
+CREATE INDEX `IX_음식마트원장동기화_Outbox_status_updated_at_utc`
+ON `음식마트원장동기화_Outbox` (`status`, `updated_at_utc`);";
+                await statusIndexCommand.ExecuteNonQueryAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Food/mart ledger sync Outbox schema compatibility check failed.");
+        }
+        finally
+        {
+            await db.Database.CloseConnectionAsync();
         }
     }
 

@@ -162,7 +162,7 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
         var consent = request?.ConfirmTransientLocationUse == true;
         var restaurants = Array.Empty<CommunityNearbyRestaurantCandidateResponse>();
         var restaurantSourceAvailable = false;
-        var simulationRestaurantSource = _options.RestaurantSourceIsSimulation;
+        var simulationRestaurantSource = false;
 
         if (topicKeys.Contains(CommunityDynamicTopicCodes.Food)
             && locationProvided
@@ -190,7 +190,7 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
                     AverageRating = item.평균평점,
                     ReviewCount = item.리뷰수,
                     OrderAvailable = item.주문가능여부,
-                    SourceCode = "Ssalddel.FoodApi"
+                    SourceCode = "Ssalddel.MainServer"
                 })
                 .ToArray();
         }

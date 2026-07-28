@@ -14,6 +14,7 @@ using Ssalddel.Application.CommonContents;
 using Ssalddel.Application.Images;
 using Ssalddel.Application.Driver.Food;
 using Ssalddel.Application.Food;
+using Ssalddel.Application.Admin.Restaurants;
 using Ssalddel.Application.Mart;
 using Ssalddel.Application.PublicData;
 using Ssalddel.Application.Evidence;
@@ -34,6 +35,7 @@ using Ssalddel.Services.LogisticsProcessing.Warehouse;
 using Ssalddel.Services.LogisticsProcessing.VehicleLoading;
 using Ssalddel.Services.Localization;
 using Ssalddel.Application.Driver.Transport;
+using 살뜰.Services.Transport;
 
 namespace Ssalddel.Extensions;
 
@@ -60,6 +62,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IHR역할지원CommandUseCase, HR역할지원CommandUseCase>();
         services.AddScoped<I업무관계스냅샷조회UseCase, 업무관계스냅샷조회UseCase>();
         services.AddScoped<I기사운송상태변경CommandExecutor, 기사운송상태변경CommandExecutor>();
+        services.AddScoped<ITransportRequestLedgerRealtimeService, TransportRequestLedgerRealtimeService>();
         services.AddScoped<I운송증빙첨부JsonWriter, 운송증빙첨부JsonWriter>();
         services.AddScoped<I운송완료입금요청Service, 운송완료입금요청Service>();
         services.AddScoped<ICommand기능설정Resolver, Command기능설정Resolver>();
@@ -76,6 +79,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ISalesChannelCredentialProvider>(provider =>
             provider.GetRequiredService<SalesChannelService>());
         services.AddScoped<I판매채널UseCase, 판매채널UseCase>();
+        services.AddScoped<I해외판매자식품시설UseCase, 해외판매자식품시설UseCase>();
         services.AddScoped<ISalesChannelOrderReadService, SalesChannelOrderReadService>();
         services.AddScoped<I판매채널주문조회UseCase, 판매채널주문조회UseCase>();
         services.AddScoped<I판매채널주문동기화UseCase, 판매채널주문동기화UseCase>();
@@ -97,7 +101,11 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IFoodDeliveryDriverRouteService, FoodDeliveryDriverRouteService>();
         services.AddScoped<I음식주문접수UseCase, 음식주문접수UseCase>();
         services.AddScoped<I주문자음식주문조회UseCase, 주문자음식주문조회UseCase>();
+        services.AddScoped<I음식점음식주문조회UseCase, 음식점음식주문조회UseCase>();
+        services.AddScoped<I음식점운영자접근관리UseCase, 음식점운영자접근관리UseCase>();
         services.AddScoped<I음식점탐색조회UseCase, 음식점탐색조회UseCase>();
+        services.AddScoped<I음식점리뷰UseCase, 음식점리뷰UseCase>();
+        services.AddScoped<I음식운영관리UseCase, 음식운영관리UseCase>();
         services.AddScoped<I마트공개상품조회UseCase, 마트공개상품조회UseCase>();
         services.AddScoped<I마트공개상품구매후기UseCase, 마트공개상품구매후기UseCase>();
         services.AddScoped<I마트주문요청조회UseCase, 마트주문요청조회UseCase>();

@@ -21,11 +21,7 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddSsalddelHttpClients(this IServiceCollection services)
     {
-        services.AddHttpClient<ICommunityNearbyRestaurantDirectory, HttpCommunityNearbyRestaurantDirectory>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CommunityContextDiscoveryOptions>>().Value;
-            client.Timeout = TimeSpan.FromSeconds(Math.Max(3, options.TimeoutSeconds));
-        });
+        services.AddScoped<ICommunityNearbyRestaurantDirectory, MainServerCommunityNearbyRestaurantDirectory>();
         services.AddHttpClient<I교육기관제출전송Service, 교육기관제출전송Service>();
         services.AddHttpClient<ICommunityTextTranslationProvider, AzureCommunityTextTranslationProvider>((sp, client) =>
         {

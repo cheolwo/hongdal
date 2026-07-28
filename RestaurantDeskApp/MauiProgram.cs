@@ -6,7 +6,9 @@ using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using MudBlazor.Services;
 using RestaurantDeskApp.Options;
 using RestaurantDeskApp.Services;
+using RestaurantDeskApp.Services.Security;
 using RestaurantDeskApp.ViewModels;
+using Ssalddel.Client.Infrastructure.Security;
 
 namespace RestaurantDeskApp;
 
@@ -24,12 +26,17 @@ public static class MauiProgram
             reloadOnChange: false);
         builder.Services.Configure<RestaurantDeskOptions>(builder.Configuration.GetSection(RestaurantDeskOptions.SectionName));
         builder.Services.Configure<RestaurantOrderAlertOptions>(builder.Configuration.GetSection(RestaurantOrderAlertOptions.SectionName));
+        builder.Services.AddSingleton<IClientSecureTokenStore, RestaurantMauiSecureTokenStore>();
+        builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
+        builder.Services.AddSingleton<ClientAuthSession>();
+        builder.Services.AddSingleton<RestaurantAccessTokenProvider>();
+        builder.Services.AddScoped<RestaurantAuthService>();
         builder.Services.AddSingleton<RestaurantDeskSampleService>();
         builder.Services.AddSingleton<I음식점식재료공급요청Service, RestaurantIngredientSupplySampleService>();
         builder.Services.AddSingleton<I주문알림Service, 주문알림Service>();
         builder.Services.AddSingleton<I음식점주문SignalRClientService, 음식점주문SignalRClientService>();
         builder.Services.AddSingleton<I음식점조리시간설정Service, 음식점조리시간설정Service>();
-        builder.Services.AddSsalddelUiCommonAppServices();
+        builder.Services.AddSsalddelUiCommonAppServices<RestaurantAccessTokenProvider>();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
         builder.Services.AddTransient<음식점주문조회ViewModel>();
         builder.Services.AddTransient<음식점주문접수ViewModel>();

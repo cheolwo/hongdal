@@ -4,7 +4,8 @@
              xmlns:components="clr-namespace:RestaurantDeskApp.Components"
              x:Class="RestaurantDeskApp.MainPage">
 
-    <BlazorWebView HostPage="wwwroot/index.html">
+    <BlazorWebView HostPage="wwwroot/index.html"
+                   StartPath="/">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type components:Routes}" />
         </BlazorWebView.RootComponents>

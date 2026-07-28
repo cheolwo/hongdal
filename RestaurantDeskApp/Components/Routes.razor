@@ -1,7 +1,9 @@
 <BackOfficeProviders />
 
-<Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+<Router AppAssembly="typeof(MauiProgram).Assembly"
+        NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <RestaurantRouteView RouteData="routeData"
+                             DefaultLayout="typeof(Layout.MainLayout)" />
     </Found>
 </Router>

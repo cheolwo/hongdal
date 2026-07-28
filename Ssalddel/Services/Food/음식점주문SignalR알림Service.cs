@@ -45,6 +45,38 @@ public sealed class 음식점주문SignalR알림Service(
             order.총주문금액);
     }
 
+    public async Task 주문상태변경알림발송Async(
+        음식주문응답 order,
+        string reason,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(order);
+
+        var notification = new 음식점주문상태변경알림
+        {
+            주문번호 = order.주문번호,
+            음식점Id = order.음식점Id,
+            주문상태 = order.상태,
+            배차상태 = order.배차상태,
+            변경사유 = reason,
+            변경시각 = DateTimeOffset.UtcNow
+        };
+
+        await hubContext.Clients
+            .Group(RestaurantOrderHub.BuildRestaurantGroup(order.음식점Id))
+            .SendAsync(
+                RestaurantOrderHub.ReceiveRestaurantOrderStatusChangedMethod,
+                notification,
+                cancellationToken);
+
+        logger.LogInformation(
+            "음식점 주문 상태 변경 SignalR 알림 발송. 주문번호={OrderNo}, 음식점Id={RestaurantId}, 주문상태={OrderState}, 배차상태={DispatchState}",
+            order.주문번호,
+            order.음식점Id,
+            order.상태,
+            order.배차상태);
+    }
+
     private static string BuildMenuSummary(음식주문응답 order)
     {
         return string.Join(", ", order.상품목록.Select(x => $"{x.상품명} {x.수량}"));

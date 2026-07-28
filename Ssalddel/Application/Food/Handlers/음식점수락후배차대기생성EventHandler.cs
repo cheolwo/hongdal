@@ -13,7 +13,8 @@ namespace Ssalddel.Application.Food.Handlers;
 public sealed class 음식점수락후배차대기생성EventHandler(
     I운송의뢰배차대기Service dispatchQueueService,
     I운송원장Mongo동기화Service transportLedgerSync,
-    I음식마트원장Mongo동기화Service foodMartLedgerSync,
+    I음식마트원장동기화OutboxService foodMartLedgerOutbox,
+    I음식점주문실시간알림Service restaurantNotification,
     ISsalddelFoodOrderStore orderStore,
     IKakao좌표변환Service kakaoGeoService,
     SsalddelContext db,
@@ -72,7 +73,12 @@ public sealed class 음식점수락후배차대기생성EventHandler(
         var updatedOrder = orderStore.배차대기반영(order.주문번호, queue.Id, DateTime.UtcNow);
         if (updatedOrder is not null)
         {
-            await foodMartLedgerSync.음식주문동기화Async(updatedOrder, $"restaurant:{order.음식점Id}", cancellationToken);
+            await foodMartLedgerOutbox.음식주문예약후즉시처리Async(
+                updatedOrder,
+                $"restaurant:{order.음식점Id}",
+                $"food-dispatch:{notification.EventId}",
+                cancellationToken);
+            await NotifyRestaurantAsync(updatedOrder, cancellationToken);
         }
 
         logger.LogInformation(
@@ -80,6 +86,26 @@ public sealed class 음식점수락후배차대기생성EventHandler(
             notification.EventId,
             order.주문번호,
             queue.Id);
+    }
+
+    private async Task NotifyRestaurantAsync(
+        음식주문응답 order,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await restaurantNotification.주문상태변경알림발송Async(
+                order,
+                "음식점 수락 후 기사 배차를 시작했습니다.",
+                cancellationToken);
+        }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            logger.LogWarning(
+                ex,
+                "음식점 수락 후 배차 상태 실시간 알림에 실패했습니다. 주문번호={OrderNo}",
+                order.주문번호);
+        }
     }
 
     private async Task<(decimal 위도, decimal 경도)?> ResolveCoordinateAsync(

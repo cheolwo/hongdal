@@ -17,6 +17,7 @@ public sealed class 음식점리뷰관리항목응답
     public bool 사진포함여부 { get; set; }
     public bool 같은음식점기준저평점3회연속여부 { get; set; }
     public bool 사장노출허용여부 { get; set; }
+    public bool 관리자검토필요여부 { get; set; }
     public bool 관리자게시강제여부 { get; set; }
     public bool 현재노출여부 { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -44,4 +45,18 @@ public sealed class 음식점리뷰운영정책수정요청
 {
     public int 기본저평점게시일수 { get; set; }
     public string 수정자UserId { get; set; } = string.Empty;
+}
+
+public sealed class 음식배달요금정책응답
+{
+    public decimal BaseFee { get; set; } = 3000m;
+    public int IncludedDistanceMeters { get; set; } = 1000;
+    public int DistanceUnitMeters { get; set; } = 100;
+    public decimal DistanceUnitFee { get; set; } = 120m;
+    public decimal MinimumFee { get; set; } = 3000m;
+    public decimal DriverBasePayout { get; set; } = 2500m;
+    public decimal DriverDistanceUnitPayout { get; set; } = 90m;
+    public decimal DriverMinimumPayout { get; set; } = 2500m;
+    public DateTime UpdatedAtUtc { get; set; }
+    public string UpdatedByUserId { get; set; } = string.Empty;
 }

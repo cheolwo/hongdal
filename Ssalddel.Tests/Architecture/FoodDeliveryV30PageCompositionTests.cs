@@ -59,7 +59,72 @@ public sealed class FoodDeliveryV30PageCompositionTests
         Assert.DoesNotContain("RestaurantDeskSampleService", client);
         Assert.DoesNotContain("sampleService", desk);
         Assert.Contains("/restaurant-acceptance", client);
-        Assert.Contains("PostAsJsonAsync", client);
+        Assert.Contains("SendAsync", client);
+    }
+
+    [Fact]
+    public void 음식점데스크는_로그인토큰과서버원장복구를사용한다()
+    {
+        var startup = Read("RestaurantDeskApp", "MauiProgram.cs");
+        var auth = Read("RestaurantDeskApp", "Services/RestaurantAuthService.cs");
+        var client = Read("RestaurantDeskApp", "Services/Ssalddel음식주문Client.cs");
+        var realtime = Read("RestaurantDeskApp", "Services/음식점주문SignalRClientService.cs");
+        var desk = Read("RestaurantDeskApp", "Services/음식점주문DeskService.cs");
+
+        Assert.Contains("RestaurantMauiSecureTokenStore", startup);
+        Assert.Contains("ClientAuthSession", startup);
+        Assert.Contains("api/v1/auth/refresh", auth);
+        Assert.Contains("AuthenticationHeaderValue", client);
+        Assert.Contains("/restaurant/inbox", client);
+        Assert.Contains("AccessTokenProvider", realtime);
+        Assert.Contains("JoinRestaurantOrders\", cancellationToken", realtime);
+        Assert.Contains("_foodOrderClient.주문목록조회Async", desk);
+    }
+
+    [Fact]
+    public void 음식점데스크는_모바일크기로시작하고_첫화면을메뉴로가리지않는다()
+    {
+        var app = Read("RestaurantDeskApp", "App.xaml.cs");
+        var mainPage = Read("RestaurantDeskApp", "MainPage.xaml");
+        var layout = Read("RestaurantDeskApp", "Components/Layout/MainLayout.razor");
+        var routes = Read("RestaurantDeskApp", "Components/Routes.razor");
+        var routeView = Read("RestaurantDeskApp", "Components/RestaurantRouteView.razor");
+        var styles = Read("RestaurantDeskApp", "wwwroot/app.css");
+
+        Assert.Contains("Title = \"살뜰 식당\"", app);
+        Assert.Contains("window.Width = 430", app);
+        Assert.Contains("window.Height = 860", app);
+        Assert.Contains("StartPath=\"/\"", mainPage);
+        Assert.Contains("private bool _drawerOpen;", layout);
+        Assert.DoesNotContain("private bool _drawerOpen = true;", layout);
+        Assert.Contains("<RestaurantRouteView", routes);
+        Assert.Contains("RouteData.PageType == typeof(Pages.Login)", routeView);
+        Assert.Contains("AuthService.EnsureAccessTokenAsync", routeView);
+        Assert.Contains("NavigationManager.NavigateTo(\"/login\", replace: true)", routeView);
+        Assert.Contains(".restaurant-navmenu", styles);
+        Assert.Contains("width: 100%;", styles);
+        Assert.DoesNotContain("width: 280px;", styles);
+    }
+
+    [Fact]
+    public void 기사상태변경은_음식점실시간알림과30초서버재조회로수렴한다()
+    {
+        var hub = Read("Ssalddel", "Hubs/RestaurantOrderHub.cs");
+        var serverNotification = Read("Ssalddel", "Services/Food/음식점주문SignalR알림Service.cs");
+        var driverWork = Read(
+            "Ssalddel",
+            "Services/Dispatch/Recommendation/FoodDeliveryDriverWorkService.cs");
+        var realtime = Read(
+            "RestaurantDeskApp",
+            "Services/음식점주문SignalRClientService.cs");
+        var inbox = Read("RestaurantDeskApp", "Components/Pages/OrderInbox.razor");
+
+        Assert.Contains("ReceiveRestaurantOrderStatusChanged", hub);
+        Assert.Contains("주문상태변경알림발송Async", serverNotification);
+        Assert.Contains("NotifyRestaurantAsync", driverWork);
+        Assert.Contains("음식점주문상태변경알림", realtime);
+        Assert.Contains("TimeSpan.FromSeconds(30)", inbox);
+        Assert.Contains("await ReloadAsync()", inbox);
     }
 
     [Fact]

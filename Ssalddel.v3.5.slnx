@@ -37,7 +37,6 @@
   </Folder>
   <Folder Name="/Server Modules/">
     <Project Path="Ssalddel.Community/Ssalddel.Community.csproj" />
-    <Project Path="Ssalddel.FoodApi/Ssalddel.FoodApi.csproj" />
   </Folder>
   <Folder Name="/Server/">
     <Project Path="Ssalddel/Ssalddel.csproj" />

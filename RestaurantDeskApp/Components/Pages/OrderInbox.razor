@@ -70,6 +70,8 @@
 </MudContainer>
 
 @code {
+    private readonly CancellationTokenSource refreshCancellation = new();
+    private Task? refreshTask;
     private IReadOnlyList<음식점주문DeskItem> orders = [];
     private string realtimeStatus = "실시간 연결 대기";
     private string? message;
@@ -85,13 +87,14 @@
     protected override async Task OnInitializedAsync()
     {
         RestaurantRealtimeService.주문수신 += HandleRealtimeOrderReceivedAsync;
+        RestaurantRealtimeService.주문상태변경 += HandleOrderStatusChangedAsync;
         RestaurantRealtimeService.상태변경 += HandleRealtimeStatusChangedAsync;
         await ReloadAsync();
 
         try
         {
-            await RestaurantRealtimeService.연결Async(DeskOptions.Value.RestaurantId);
-            realtimeStatus = $"실시간 연결됨 · 음식점 {DeskOptions.Value.RestaurantId}";
+            await RestaurantRealtimeService.연결Async();
+            realtimeStatus = $"실시간 연결됨 · {DeskOptions.Value.RestaurantName}";
         }
         catch (Exception ex)
         {
@@ -99,6 +102,8 @@
             messageSeverity = Severity.Warning;
             message = $"주문 실시간 연결에 실패했습니다. {ex.Message}";
         }
+
+        refreshTask = RunPeriodicRefreshAsync(refreshCancellation.Token);
     }
 
     private async Task HandleRealtimeOrderReceivedAsync(음식점주문수신알림 notification)
@@ -133,6 +138,36 @@
         });
     }
 
+    private async Task HandleOrderStatusChangedAsync(음식점주문상태변경알림 notification)
+    {
+        await InvokeAsync(async () =>
+        {
+            await ReloadAsync();
+            messageSeverity = Severity.Info;
+            message = $"{notification.주문번호} · {notification.주문상태} / {notification.배차상태} ({notification.변경사유})";
+            StateHasChanged();
+        });
+    }
+
+    private async Task RunPeriodicRefreshAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(async () =>
+                {
+                    await ReloadAsync();
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
     private async Task ReloadAsync()
         => orders = await OrderDeskService.주문목록조회Async();
 
@@ -146,10 +181,17 @@
         _ => Color.Default
     };
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        refreshCancellation.Cancel();
         RestaurantRealtimeService.주문수신 -= HandleRealtimeOrderReceivedAsync;
+        RestaurantRealtimeService.주문상태변경 -= HandleOrderStatusChangedAsync;
         RestaurantRealtimeService.상태변경 -= HandleRealtimeStatusChangedAsync;
-        return ValueTask.CompletedTask;
+        if (refreshTask is not null)
+        {
+            await refreshTask;
+        }
+
+        refreshCancellation.Dispose();
     }
 }

@@ -102,10 +102,7 @@ public static class Controller기능카탈로그
     [
         new("food.orders", "음식 주문", "api/v1/food-orders"),
         new("food.dispatch-address", "음식 배차 주소", "api/v1/food-orders/dispatch/address-form"),
-        new("food.delivery-tickets", "음식 배달권", "api/v1/food-delivery-tickets"),
-        new("food.settlements", "음식 배달 정산", "api/v1/food-delivery-settlements"),
-        new("food.pricing", "음식 배달 요금", "api/v1/food-delivery-pricing"),
-        new("food.restaurants", "음식점", "api/v1/restaurants")
+        new("food.restaurants", "음식점", "api/v1/orderer/restaurants")
     ];
 
     public static IReadOnlyList<Controller기능정의> 음식배달기사 { get; } =

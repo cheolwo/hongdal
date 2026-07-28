@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<ProjectReference Include="..\Ssalddel.Client.Infrastructure\Ssalddel.Client.Infrastructure.csproj" />
 	<ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
 	<ProjectReference Include="..\Ssalddel.BackOffice.Client\Ssalddel.BackOffice.Client.csproj" />
 	<ProjectReference Include="..\Ssalddel.Ui.Common\Ssalddel.Ui.Common.csproj" />

@@ -31,31 +31,36 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
         _orders = [];
     }
 
-    public Task<음식점주문DeskItem?> 주문조회Async(
+    public async Task<음식점주문DeskItem?> 주문조회Async(
         string 주문번호,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(주문번호))
         {
-            return Task.FromResult<음식점주문DeskItem?>(null);
+            return null;
         }
 
-        lock (_gate)
-        {
-            return Task.FromResult(FindLocked(주문번호.Trim()));
-        }
+        var detail = await _foodOrderClient.주문상세조회Async(
+            주문번호.Trim(),
+            cancellationToken);
+        return detail is null ? null : UpsertServerOrder(detail);
     }
 
-    public Task<IReadOnlyList<음식점주문DeskItem>> 주문목록조회Async(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<음식점주문DeskItem>> 주문목록조회Async(CancellationToken cancellationToken = default)
     {
+        var serverOrders = await _foodOrderClient.주문목록조회Async(cancellationToken);
+        foreach (var serverOrder in serverOrders)
+        {
+            UpsertServerOrder(serverOrder);
+        }
+
         lock (_gate)
         {
-            return Task.FromResult<IReadOnlyList<음식점주문DeskItem>>(
-                _orders
-                    .OrderByDescending(x => x.미확인)
-                    .ThenByDescending(x => x.접수시각)
-                    .ToArray());
+            return _orders
+                .OrderByDescending(x => x.미확인)
+                .ThenByDescending(x => x.접수시각)
+                .ToArray();
         }
     }
 
@@ -145,7 +150,6 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
                 주문번호,
                 new 음식점주문수락요청
                 {
-                    처리UserId = $"restaurant:{_options.RestaurantId}",
                     음식점명 = _options.RestaurantName,
                     음식점주소 = _options.RestaurantAddress,
                     음식점상세주소 = _options.RestaurantDetailAddress,
@@ -242,6 +246,27 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
         return _orders.FirstOrDefault(x => string.Equals(x.주문번호, 주문번호, StringComparison.OrdinalIgnoreCase));
     }
 
+    private 음식점주문DeskItem UpsertServerOrder(음식주문응답 detail)
+    {
+        lock (_gate)
+        {
+            var item = FindLocked(detail.주문번호);
+            if (item is null)
+            {
+                item = CreateDeskItem(detail);
+                item.Id = ++_nextId;
+                _orders.Add(item);
+            }
+            else
+            {
+                ApplyDetail(item, detail);
+            }
+
+            ApplyServerStatus(item, detail);
+            return item;
+        }
+    }
+
     private 음식점주문DeskItem CreateDeskItem(음식주문응답 detail)
     {
         var item = new 음식점주문DeskItem
@@ -270,6 +295,30 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
         item.배차상태 = detail.배차상태;
         item.배차요청시각Utc = detail.배차요청시각Utc;
         item.상세주문 = detail;
+    }
+
+    private static void ApplyServerStatus(
+        음식점주문DeskItem item,
+        음식주문응답 detail)
+    {
+        if (detail.상태 == 음식주문상태코드.주문대기)
+        {
+            item.상태 = 음식점주문Desk상태코드.주문대기;
+            item.미확인 = true;
+            item.최근메시지 ??= "서버 주문 원장에서 복구한 신규 주문";
+            return;
+        }
+
+        if (item.상태 != 음식점주문Desk상태코드.전표출력됨)
+        {
+            item.상태 = 음식점주문Desk상태코드.수락됨;
+        }
+
+        item.미확인 = false;
+        item.수락시각 = detail.음식점수락시각Utc.HasValue
+            ? ToLocalOffset(detail.음식점수락시각Utc.Value)
+            : item.수락시각;
+        item.최근메시지 = $"서버 상태 · {detail.상태}";
     }
 
     private static string BuildMenuSummary(음식주문응답 detail)

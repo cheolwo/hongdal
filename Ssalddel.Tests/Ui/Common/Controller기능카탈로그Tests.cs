@@ -43,9 +43,9 @@ public sealed class Controller기능카탈로그Tests
         ];
         var definitions = catalogs.SelectMany(x => x).ToArray();
 
-        Assert.Equal(127, definitions.Length);
-        Assert.Equal(127, definitions.Select(x => x.Key).Distinct(StringComparer.OrdinalIgnoreCase).Count());
-        Assert.Equal(127, definitions.Select(x => x.BasePath).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Equal(124, definitions.Length);
+        Assert.Equal(124, definitions.Select(x => x.Key).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Equal(124, definitions.Select(x => x.BasePath).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 
     [Fact]

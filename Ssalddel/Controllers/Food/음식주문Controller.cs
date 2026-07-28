@@ -5,6 +5,7 @@ using Ssalddel.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Ssalddel.Security;
 using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Food;
@@ -17,7 +18,8 @@ namespace Ssalddel.Controllers.Food;
 [Route("api/v1/food-orders")]
 public sealed class 음식주문Controller(
     I음식주문접수UseCase commandUseCase,
-    I주문자음식주문조회UseCase readUseCase) : ControllerBase
+    I주문자음식주문조회UseCase readUseCase,
+    I음식점음식주문조회UseCase restaurantReadUseCase) : ControllerBase
 {
     [HttpGet]
     [Authorize]
@@ -32,18 +34,61 @@ public sealed class 음식주문Controller(
         => this.ToActionResult(await readUseCase.상세Async(orderNo, 현재사용자Id(), cancellationToken));
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<음식주문응답>> 등록([FromBody] 음식주문등록요청 request, CancellationToken cancellationToken)
     {
+        request.주문자UserId = 현재사용자Id()
+            ?? throw new InvalidOperationException("로그인 사용자 식별자를 확인할 수 없습니다.");
         return Ok(await commandUseCase.등록Async(request, cancellationToken));
     }
 
+    [HttpGet("restaurant/inbox")]
+    [Authorize(Policy = "음식점운영자전용")]
+    public ActionResult<음식주문목록응답> 음식점수신함()
+    {
+        var restaurantId = 현재음식점Id();
+        return restaurantId is null
+            ? Forbid()
+            : Ok(restaurantReadUseCase.목록(restaurantId.Value));
+    }
+
+    [HttpGet("restaurant/inbox/{orderNo}")]
+    [Authorize(Policy = "음식점운영자전용")]
+    public ActionResult<음식주문응답> 음식점상세(string orderNo)
+    {
+        var restaurantId = 현재음식점Id();
+        if (restaurantId is null)
+        {
+            return Forbid();
+        }
+
+        var order = restaurantReadUseCase.상세(orderNo, restaurantId.Value);
+        return order is null ? NotFound() : Ok(order);
+    }
+
     [HttpPost("{orderNo}/restaurant-acceptance")]
+    [Authorize(Policy = "음식점운영자전용")]
     public async Task<ActionResult<음식주문응답>> 음식점수락(
         string orderNo,
         [FromBody] 음식점주문수락요청 request,
         CancellationToken cancellationToken)
     {
-        var order = await commandUseCase.음식점수락Async(orderNo, request, 현재사용자Id() ?? request.처리UserId, cancellationToken);
+        var restaurantId = 현재음식점Id();
+        if (restaurantId is null)
+        {
+            return Forbid();
+        }
+
+        if (restaurantReadUseCase.상세(orderNo, restaurantId.Value) is null)
+        {
+            return NotFound();
+        }
+
+        var order = await commandUseCase.음식점수락Async(
+            orderNo,
+            request,
+            현재사용자Id(),
+            cancellationToken);
         return order is null ? NotFound() : Ok(order);
     }
 
@@ -51,4 +96,7 @@ public sealed class 음식주문Controller(
         => User.FindFirstValue(ClaimTypes.NameIdentifier)
            ?? User.FindFirstValue("sub")
            ?? User.Identity?.Name;
+
+    private long? 현재음식점Id()
+        => 음식점접근범위Resolver.음식점Id조회(User);
 }

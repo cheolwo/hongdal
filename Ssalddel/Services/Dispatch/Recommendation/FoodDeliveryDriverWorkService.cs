@@ -63,8 +63,9 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
     private readonly I배차대기원장전환Service _queueTransitionService;
     private readonly I배달권실행공간Store _deliveryScopeStore;
     private readonly ISsalddelFoodOrderStore _foodOrderStore;
-    private readonly I음식마트원장Mongo동기화Service _foodLedgerSync;
+    private readonly I음식마트원장동기화OutboxService _foodLedgerOutbox;
     private readonly I운송원장Mongo동기화Service _transportLedgerSync;
+    private readonly I음식점주문실시간알림Service _restaurantNotification;
     private readonly I기사월정산Service _settlementService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly ILogger<음식배달기사업무Service> _logger;
@@ -76,8 +77,9 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         I배차대기원장전환Service queueTransitionService,
         I배달권실행공간Store deliveryScopeStore,
         ISsalddelFoodOrderStore foodOrderStore,
-        I음식마트원장Mongo동기화Service foodLedgerSync,
+        I음식마트원장동기화OutboxService foodLedgerOutbox,
         I운송원장Mongo동기화Service transportLedgerSync,
+        I음식점주문실시간알림Service restaurantNotification,
         I기사월정산Service settlementService,
         ICurrentUserAccessor currentUserAccessor,
         ILogger<음식배달기사업무Service> logger)
@@ -88,8 +90,9 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         _queueTransitionService = queueTransitionService;
         _deliveryScopeStore = deliveryScopeStore;
         _foodOrderStore = foodOrderStore;
-        _foodLedgerSync = foodLedgerSync;
+        _foodLedgerOutbox = foodLedgerOutbox;
         _transportLedgerSync = transportLedgerSync;
+        _restaurantNotification = restaurantNotification;
         _settlementService = settlementService;
         _currentUserAccessor = currentUserAccessor;
         _logger = logger;
@@ -254,6 +257,10 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
             await ApplySettlementAsync(driverId, now, cancellationToken);
             await _deliveryScopeStore.Remove운송의뢰Async(queue.의뢰Id, cancellationToken);
             await SyncLedgersAsync(queue, order.주문번호, driverId, cancellationToken);
+            await NotifyRestaurantAsync(
+                order.주문번호,
+                requireBundle ? "기사가 묶음 배달을 수락했습니다." : "기사가 배달을 수락했습니다.",
+                cancellationToken);
         }
 
         return Result.Ok(new FoodDeliveryDriverActionResponse
@@ -302,6 +309,11 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
             order.배차상태 = 음식주문배차상태코드.배차대기;
             order.UpdatedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync(cancellationToken);
+            await SyncFoodLedgerAsync(orderNo, driverId, cancellationToken);
+            await NotifyRestaurantAsync(
+                orderNo,
+                "기사가 제안을 거절해 다른 기사 배차를 계속합니다.",
+                cancellationToken);
         }
 
         return Result.Ok(Response(offerId, orderNo, DriverWorkOfferStatus.Rejected, "음식 배달 제안을 거절했습니다."));
@@ -399,6 +411,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         }
 
         await SyncLedgersAsync(queue, order.주문번호, driverId, cancellationToken);
+        await NotifyRestaurantAsync(order.주문번호, reason, cancellationToken);
         return Result.Ok(Response(offerId, order.주문번호, responseState, $"{reason} 처리했습니다."));
     }
 
@@ -463,12 +476,73 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
             var order = _foodOrderStore.GetOrder(orderNo);
             if (order is not null)
             {
-                await _foodLedgerSync.음식주문동기화Async(order, updatedBy, cancellationToken);
+                await _foodLedgerOutbox.음식주문예약후즉시처리Async(
+                    order,
+                    updatedBy,
+                    BuildFoodLedgerIdempotencyKey(order, updatedBy),
+                    cancellationToken);
             }
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "음식 배달 확정 후 원장 동기화에 실패했습니다. OrderNo={OrderNo}", orderNo);
+        }
+    }
+
+    private async Task SyncFoodLedgerAsync(
+        string orderNo,
+        string updatedBy,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var order = _foodOrderStore.GetOrder(orderNo);
+            if (order is not null)
+            {
+                await _foodLedgerOutbox.음식주문예약후즉시처리Async(
+                    order,
+                    updatedBy,
+                    BuildFoodLedgerIdempotencyKey(order, updatedBy),
+                    cancellationToken);
+            }
+        }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "음식 주문 상태 변경 후 원장 동기화에 실패했습니다. OrderNo={OrderNo}", orderNo);
+        }
+    }
+
+    private static string BuildFoodLedgerIdempotencyKey(
+        음식주문응답 order,
+        string updatedBy)
+    {
+        var latestTransition = order.상태이력
+            .OrderByDescending(x => x.전이시각Utc)
+            .FirstOrDefault()
+            ?.전이시각Utc
+            .Ticks ?? 0L;
+        return $"food-driver:{order.주문번호}:{order.상태}:{order.배차상태}:{updatedBy}:{latestTransition}";
+    }
+
+    private async Task NotifyRestaurantAsync(
+        string orderNo,
+        string reason,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var order = _foodOrderStore.GetOrder(orderNo);
+            if (order is not null)
+            {
+                await _restaurantNotification.주문상태변경알림발송Async(order, reason, cancellationToken);
+            }
+        }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(
+                ex,
+                "음식 배달 상태 변경 후 음식점 실시간 알림에 실패했습니다. OrderNo={OrderNo}",
+                orderNo);
         }
     }
 
