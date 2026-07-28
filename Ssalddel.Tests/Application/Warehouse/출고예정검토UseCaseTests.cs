@@ -4,6 +4,9 @@ using Ssalddel.Application.Warehouse;
 using Ssalddel.Contracts.Common.Inventory;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
+using 살뜰.도메인.기사;
+using 살뜰.도메인.운송;
+using 살뜰.도메인.화주;
 using 살뜰.도메인.창고;
 
 namespace Ssalddel.Tests.Application.Warehouse;
@@ -66,6 +69,29 @@ public sealed class 출고예정검토UseCaseTests
         Assert.Equal(404, hidden.Errors.Single().Metadata["StatusCode"]);
     }
 
+    [Fact]
+    public async Task 운송연결원장은_실제하차지와기사인계상태를같은상세에투영한다()
+    {
+        await using var db = CreateContext();
+        var ids = await SeedAsync(db);
+
+        var result = await CreateUseCase(db, "worker-a").상세Async(ids.LinkedPlanId, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Value.CanStartTransportRequestDraft);
+        Assert.Equal("transport-1", result.Value.TransportRequestId);
+        Assert.Equal("생성됨", result.Value.TransportRequestStatus);
+        Assert.Equal("배차확정", result.Value.DispatchStatus);
+        Assert.Equal("배차확정", result.Value.TransportStatus);
+        Assert.Equal("기사 수락 · 출고 인계 준비", result.Value.HandoffStatus);
+        Assert.Equal("driver-7", result.Value.AssignedDriverId);
+        Assert.Equal("1톤 냉장탑차", result.Value.AssignedDriverVehicle);
+        Assert.True(result.Value.DriverAccepted);
+        Assert.True(result.Value.VehicleConfirmed);
+        Assert.True(result.Value.CanCompleteHandoff);
+        Assert.Equal("서울특별시 송파구 올림픽로 300", result.Value.DestinationAddress);
+    }
+
     private static 출고예정검토UseCase CreateUseCase(SsalddelContext db, string userId)
         => new(db, new FakeCurrentUserAccessor(userId, 역할명.창고관리자));
 
@@ -73,7 +99,7 @@ public sealed class 출고예정검토UseCaseTests
         => new(new DbContextOptionsBuilder<SsalddelContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString("N")).Options, new DummyEncryption());
 
-    private static async Task<(long ReadyPlanId, long HiddenPlanId, long InboundItemId)> SeedAsync(SsalddelContext db)
+    private static async Task<(long ReadyPlanId, long HiddenPlanId, long InboundItemId, long LinkedPlanId)> SeedAsync(SsalddelContext db)
     {
         var now = new DateTime(2026, 7, 20, 12, 0, 0, DateTimeKind.Utc);
         var warehouseA = new 창고 { 소유자UserId = "owner-a", 창고명 = "공동 창고 A", 주소 = "서울시 테스트로 1", IsActive = true, CreatedAt = now, UpdatedAt = now };
@@ -91,11 +117,46 @@ public sealed class 출고예정검토UseCaseTests
         var hidden = new 출고예정 { 출고창고Id = warehouseB.Id, 상품명 = "숨김", SKU = "HIDDEN", 주문참조번호 = "ORDER-B", 수량 = 5, 상태 = 출고상태.준비중, CreatedAt = now, UpdatedAt = now };
         var linked = new 출고예정 { 입고상품Id = inventory.Id, 출고창고Id = warehouseA.Id, 상품명 = "연결됨", SKU = "LINKED", 수량 = 1, 상태 = 출고상태.준비중, 운송의뢰Id = "transport-1", CreatedAt = now, UpdatedAt = now };
         db.출고예정.AddRange(ready, hidden, linked);
+        db.화주운송의뢰.Add(new 화주운송의뢰
+        {
+            의뢰Id = "transport-1",
+            상태 = "생성됨",
+            배차상태 = "배차확정",
+            차량종류 = "1톤 냉장탑차",
+            하차_도로명주소 = "서울특별시 송파구 올림픽로 300",
+            하차_상세주소 = "동문 상차장",
+            CreatedAt = now,
+            UpdatedAt = now
+        });
+        db.용달기사.Add(new 용달기사
+        {
+            기사Id = "driver-7",
+            기사명 = "테스트 기사",
+            차량 = "1톤 냉장탑차",
+            CreatedAt = now,
+            UpdatedAt = now
+        });
+        db.운송의뢰상품연결.Add(new 운송의뢰상품연결
+        {
+            운송의뢰Id = "transport-1",
+            입고상품Id = inventory.Id,
+            할당수량 = 1,
+            CreatedAt = now
+        });
+        db.운송원장.Add(new 운송원장
+        {
+            운송번호 = "transport-1",
+            의뢰Id = "transport-1",
+            상태 = "배차확정",
+            확정기사Id = "driver-7",
+            CreatedAt = now,
+            UpdatedAt = now
+        });
         db.재고이력.AddRange(
             new 재고이력 { 입고상품Id = inventory.Id, 이력유형 = "포장", 변경후수량 = 9, 메모 = "포장 9개 / 냉장포장", 처리일시 = now },
             new 재고이력 { 입고상품Id = inventory.Id, 이력유형 = "출고인계준비", 변경후수량 = 9, 메모 = "출고 인계 준비 9개", 처리일시 = now.AddMinutes(5) });
         await db.SaveChangesAsync();
-        return (ready.Id, hidden.Id, inventory.Id);
+        return (ready.Id, hidden.Id, inventory.Id, linked.Id);
     }
 
     private sealed class FakeCurrentUserAccessor(string? userId, string? role) : ICurrentUserAccessor

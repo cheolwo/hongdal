@@ -55,7 +55,7 @@ public static class WebNavigationCatalog
         new("포장 작업", WarehouseManagerRoutes.PackingTask, Icons.Material.Filled.Inventory2),
         new("출고 인계 준비", WarehouseManagerRoutes.GeneralTransportHandoff, Icons.Material.Filled.LocalShipping),
         new("출고예정 검토", WarehouseManagerRoutes.OutboundPlanReview, Icons.Material.Filled.FactCheck),
-        new("운송의뢰 초안", WarehouseManagerRoutes.TransportRequestDraft, Icons.Material.Filled.EditNote),
+        new("출고 운송의뢰", WarehouseManagerRoutes.TransportRequestDraft, Icons.Material.Filled.LocalShipping),
         new("피킹 작업", WarehouseManagerRoutes.PickingBatch, Icons.Material.Filled.Inventory2)
     ];
 

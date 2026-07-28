@@ -3,9 +3,9 @@
 @inject WebAuthSessionService AuthSession
 @implements IDisposable
 
-<PageTitle>운송의뢰 로컬 초안 · 살뜰</PageTitle>
-<WebPageHeader Eyebrow="Warehouse Web" Title="운송의뢰 로컬 초안" Description="검토를 통과한 출고예정의 하차지·희망 일정·차량 조건만 구성합니다." Badge="Beta · Simulation" />
-@if(!AuthSession.IsLoggedIn){<MudPaper Elevation="0" Outlined="true" Class="pa-6"><MudStack AlignItems="AlignItems.Center" Spacing="2"><MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Large" /><MudText Typo="Typo.h6">운송의뢰 초안에는 로그인이 필요합니다.</MudText><MudText Typo="Typo.body2" Color="Color.Secondary">서버에서 창고 배정과 HR 출고 역할을 확인합니다.</MudText><MudButton Href="/login" Variant="Variant.Filled">로그인</MudButton></MudStack></MudPaper>}
+<PageTitle>출고 운송의뢰 · 살뜰</PageTitle>
+<WebPageHeader Eyebrow="Warehouse Web" Title="출고 운송의뢰" Description="실제 하차지와 운송 조건을 확인해 출고예정에 연결하고 기사 인계 상태를 이어서 봅니다." Badge="출고 원장 연계" />
+@if(!AuthSession.IsLoggedIn){<MudPaper Elevation="0" Outlined="true" Class="pa-6"><MudStack AlignItems="AlignItems.Center" Spacing="2"><MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Large" /><MudText Typo="Typo.h6">출고 운송의뢰에는 로그인이 필요합니다.</MudText><MudText Typo="Typo.body2" Color="Color.Secondary">서버에서 창고 배정과 HR 출고 역할을 확인합니다.</MudText><MudButton Href="/login" Variant="Variant.Filled">로그인</MudButton></MudStack></MudPaper>}
 else{<SsalddelTransportRequestDraftWorkspace OutboundPlanId="@OutboundPlanId" />}
 
 @code {

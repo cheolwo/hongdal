@@ -72,12 +72,16 @@ public sealed class 재고조정요청
 
 public sealed class 재고운송의뢰생성요청
 {
+    public long? 출고예정Id { get; set; }
     public long 입고상품Id { get; set; }
     public int 요청수량 { get; set; }
     public string 하차지주소 { get; set; } = string.Empty;
     public string 하차지상세주소 { get; set; } = string.Empty;
     public string 화물종류 { get; set; } = string.Empty;
     public string 차량종류 { get; set; } = string.Empty;
+    public DateTime? 희망상차일시 { get; set; }
+    public DateTime? 희망도착일시 { get; set; }
+    public string 취급메모 { get; set; } = string.Empty;
 }
 
 public sealed class 재고이동항목응답

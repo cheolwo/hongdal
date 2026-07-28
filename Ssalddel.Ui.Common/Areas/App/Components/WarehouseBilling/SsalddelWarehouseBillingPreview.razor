@@ -27,7 +27,13 @@
             <MudTd DataLabel="@ChargeHeader">
                 <MudStack Spacing="0">
                     <MudText Typo="Typo.body2">@context.Rate.DisplayName</MudText>
-                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Rate.UnitCode</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @context.Rate.UnitCode
+                        @if (!string.IsNullOrWhiteSpace(context.Rate.CalculationDescription))
+                        {
+                            <span> · @context.Rate.CalculationDescription</span>
+                        }
+                    </MudText>
                 </MudStack>
             </MudTd>
             <MudTd DataLabel="@QuantityHeader">
@@ -104,34 +110,34 @@
     public bool Disabled { get; set; }
 
     [Parameter]
-    public string PeriodStartLabel { get; set; } = "Period start";
+    public string PeriodStartLabel { get; set; } = "서비스 시작일";
 
     [Parameter]
-    public string PeriodEndLabel { get; set; } = "Period end";
+    public string PeriodEndLabel { get; set; } = "서비스 종료일";
 
     [Parameter]
-    public string ChargeHeader { get; set; } = "Charge";
+    public string ChargeHeader { get; set; } = "비용 항목";
 
     [Parameter]
-    public string QuantityHeader { get; set; } = "Quantity";
+    public string QuantityHeader { get; set; } = "예상 작업량";
 
     [Parameter]
-    public string UnitPriceHeader { get; set; } = "Unit price";
+    public string UnitPriceHeader { get; set; } = "협의 단가";
 
     [Parameter]
-    public string AmountHeader { get; set; } = "Amount";
+    public string AmountHeader { get; set; } = "예상 금액";
 
     [Parameter]
-    public string SubtotalLabel { get; set; } = "Subtotal";
+    public string SubtotalLabel { get; set; } = "공급가액";
 
     [Parameter]
-    public string TaxLabel { get; set; } = "Tax";
+    public string TaxLabel { get; set; } = "세액";
 
     [Parameter]
-    public string TotalLabel { get; set; } = "Total";
+    public string TotalLabel { get; set; } = "예상 합계";
 
     [Parameter]
-    public string ConfirmButtonText { get; set; } = "Create billing draft";
+    public string ConfirmButtonText { get; set; } = "계약 비용 검토안 만들기";
 
     [Parameter]
     public string? Class { get; set; }

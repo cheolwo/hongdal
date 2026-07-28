@@ -21,6 +21,7 @@ public static class ShipperRoutes
     public const string InboundRequestCreate = InboundRequestPageRoutes.Create;
     public const string WarehouseRegistration = InboundRequestPageRoutes.WarehouseRegistration;
     public const string WarehouseWorkspace = ShipperHomePageRoutes.WarehouseWorkspace;
+    public const string LogisticsServiceContract = "/shipper/warehouse/logistics-contract";
     public const string WarehouseInventory = "/shipper/warehouse/inventory";
     public const string WarehouseScan = "/shipper/warehouse/scan";
     public const string WarehouseInboundWorkStart = "/shipper/warehouse/work/inbound";

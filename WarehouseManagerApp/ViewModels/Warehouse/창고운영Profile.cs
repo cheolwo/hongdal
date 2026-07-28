@@ -216,7 +216,7 @@ public sealed class 일반입출고작업구성Provider : I창고작업구성Pro
         new(창고PageCodes.일반출고, "출고 작업", "피킹과 포장을 처리합니다.", WarehouseManagerRoutes.PickingBatch, 60),
         new(창고PageCodes.일반운송인계, "운송 인계", "출고 화물을 운송 업무로 인계합니다.", WarehouseManagerRoutes.GeneralTransportHandoff, 70),
         new(창고PageCodes.일반출고예정검토, "출고예정 검토", "운송의뢰 생성 전 원장과 필수 입력을 검토합니다.", WarehouseManagerRoutes.OutboundPlanReview, 72),
-        new(창고PageCodes.일반운송의뢰초안, "운송의뢰 초안", "하차지·희망 일정·차량 조건을 로컬에서 검토합니다.", WarehouseManagerRoutes.TransportRequestDraft, 73)
+        new(창고PageCodes.일반운송의뢰초안, "출고 운송의뢰", "실제 하차지와 운송 조건을 저장하고 기사 인계 상태를 확인합니다.", WarehouseManagerRoutes.TransportRequestDraft, 73)
     ];
 }
 

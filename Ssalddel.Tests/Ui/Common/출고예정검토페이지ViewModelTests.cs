@@ -65,5 +65,11 @@ public sealed class 출고예정검토페이지ViewModelTests
             DetailIds.Add(outboundPlanId);
             return Task.FromResult(Detail);
         }
+
+        public Task<출고운송인계완료응답> 인계완료Async(
+            long outboundPlanId,
+            출고운송인계완료요청 request,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
     }
 }

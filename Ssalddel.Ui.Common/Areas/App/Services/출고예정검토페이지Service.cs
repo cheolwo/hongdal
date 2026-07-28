@@ -12,6 +12,11 @@ public interface I출고예정검토페이지Service
     Task<출고예정검토상세응답?> 상세조회Async(
         long outboundPlanId,
         CancellationToken cancellationToken = default);
+
+    Task<출고운송인계완료응답> 인계완료Async(
+        long outboundPlanId,
+        출고운송인계완료요청 request,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class 출고예정검토페이지Service(ISsalddelJsonApiClient client) : I출고예정검토페이지Service
@@ -51,4 +56,16 @@ public sealed class 출고예정검토페이지Service(ISsalddelJsonApiClient cl
             $"{BasePath}/{outboundPlanId.ToString(CultureInfo.InvariantCulture)}",
             "출고예정 운송 전 검토 상세 조회",
             cancellationToken: cancellationToken);
+
+    public async Task<출고운송인계완료응답> 인계완료Async(
+        long outboundPlanId,
+        출고운송인계완료요청 request,
+        CancellationToken cancellationToken = default)
+        => await client.SendAsync<출고운송인계완료요청, 출고운송인계완료응답>(
+               HttpMethod.Post,
+               $"{BasePath}/{outboundPlanId.ToString(CultureInfo.InvariantCulture)}/handoff-complete",
+               request,
+               "출고 운송 인계 완료",
+               cancellationToken: cancellationToken)
+           ?? throw new InvalidOperationException("출고 운송 인계 완료 응답이 비어 있습니다.");
 }

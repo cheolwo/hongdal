@@ -13,7 +13,7 @@ public sealed class WarehousePlatformCommunityNodeNavigationResolver
 
         if (request.IsForm(PlatformDiagramFormKinds.TransportRequest))
         {
-            return Warehouse(WarehouseManagerRoutes.TransportRequestDraft, "운송 의뢰 초안 화면");
+            return Warehouse(WarehouseManagerRoutes.TransportRequestDraft, "출고 운송의뢰 화면");
         }
 
         if (request.IsForm(PlatformDiagramFormKinds.WarehouseOutbound))

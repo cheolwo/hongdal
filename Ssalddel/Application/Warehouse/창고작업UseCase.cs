@@ -315,19 +315,22 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     public async Task<Result<화주운송의뢰응답>> 재위탁운송생성Async(재고운송의뢰생성요청 request, 창고작업요청Context context, CancellationToken cancellationToken)
     {
         var result = await _warehouseOperationService.CreateReconsignmentRequestAsync(request, cancellationToken);
-        await 로그Async("Reconsignment", "Created", context, cancellationToken, metadataJson: $"{{\"requestId\":\"{result.의뢰Id}\",\"inventoryItemId\":{request.입고상품Id},\"quantity\":{request.요청수량}}}");
-        await _publisher.Publish(
-            new 창고재위탁운송생성됨Event(
-                context.UserId,
-                context.RoleName,
-                request.입고상품Id,
-                request.요청수량,
-                result.의뢰Id,
-                context.Route,
-                context.TraceId,
-                DateTime.UtcNow,
-                context.AppKey),
-            cancellationToken);
+        if (!result.멱등재시도여부)
+        {
+            await 로그Async("Reconsignment", "Created", context, cancellationToken, metadataJson: $"{{\"requestId\":\"{result.의뢰Id}\",\"inventoryItemId\":{request.입고상품Id},\"quantity\":{request.요청수량}}}");
+            await _publisher.Publish(
+                new 창고재위탁운송생성됨Event(
+                    context.UserId,
+                    context.RoleName,
+                    request.입고상품Id,
+                    request.요청수량,
+                    result.의뢰Id,
+                    context.Route,
+                    context.TraceId,
+                    DateTime.UtcNow,
+                    context.AppKey),
+                cancellationToken);
+        }
         return result;
     }
 

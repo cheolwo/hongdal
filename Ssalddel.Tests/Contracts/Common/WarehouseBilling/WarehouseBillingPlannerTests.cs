@@ -81,4 +81,47 @@ public sealed class WarehouseBillingPlannerTests
             [new("custom-work", 1)],
             WarehouseBillingRateCatalog.CreateDefaultRates()));
     }
+
+    [Fact]
+    public void DefaultRates_CoverInboundThroughOutboundAndExceptionStages()
+    {
+        var stages = WarehouseBillingRateCatalog.CreateDefaultRates()
+            .Select(rate => rate.ServiceStageCode)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Assert.Contains(물류대행서비스단계코드.입고, stages);
+        Assert.Contains(물류대행서비스단계코드.검수, stages);
+        Assert.Contains(물류대행서비스단계코드.적재, stages);
+        Assert.Contains(물류대행서비스단계코드.보관, stages);
+        Assert.Contains(물류대행서비스단계코드.피킹, stages);
+        Assert.Contains(물류대행서비스단계코드.포장, stages);
+        Assert.Contains(물류대행서비스단계코드.출고, stages);
+        Assert.Contains(물류대행서비스단계코드.예외, stages);
+        Assert.All(
+            WarehouseBillingRateCatalog.CreateDefaultRates(),
+            rate => Assert.False(string.IsNullOrWhiteSpace(rate.EvidenceTypeCode)));
+    }
+
+    [Fact]
+    public void Plan_AppliesNegotiatedMinimumCharge()
+    {
+        var draft = WarehouseBillingPlanner.Plan(
+            "agent-1",
+            "customer-1",
+            new DateOnly(2026, 7, 1),
+            new DateOnly(2026, 7, 1),
+            [new(WarehouseBillingChargeCode.PackingLabor, 1m)],
+            [
+                new(
+                    WarehouseBillingChargeCode.PackingLabor,
+                    "포장 작업",
+                    WarehouseBillingUnitCode.Order,
+                    700m,
+                    MinimumChargeAmount: 5_000m)
+            ],
+            taxRate: 0m);
+
+        Assert.Equal(5_000m, Assert.Single(draft.Lines).Amount);
+        Assert.Equal(5_000m, draft.TotalAmount);
+    }
 }

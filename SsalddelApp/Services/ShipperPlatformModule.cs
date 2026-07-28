@@ -24,6 +24,7 @@ internal static class ShipperPlatformModule
                 provider.GetRequiredService<ISsalddelMobilePushTokenProvider>(),
                 () => provider.GetRequiredService<IAuthSession>().AccessToken));
         services.AddScoped<AuthApiService>();
+        services.AddScoped<LogisticsServiceContractClient>();
         services.AddSingleton<I꾸미기보유권LocalStore, Maui꾸미기보유권LocalStore>();
         services.AddScoped<꾸미기보유권동기화Service>();
         services.AddScoped<ICommunityDecorationPurchaseClient>(provider =>

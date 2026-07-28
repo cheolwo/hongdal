@@ -17,7 +17,7 @@ public static class WarehousePlatformHomeNavigationCatalog
         new("포장 작업", "적재 완료 재고의 출고 준비 포장", WarehouseManagerRoutes.PackingTask, Icons.Material.Filled.Inventory2, Color.Info),
         new("출고 인계 준비", "포장 완료 재고의 출고예정 원장 확인", WarehouseManagerRoutes.GeneralTransportHandoff, Icons.Material.Filled.LocalShipping, Color.Success),
         new("출고예정 검토", "운송의뢰 생성 전 원장과 필수 입력 확인", WarehouseManagerRoutes.OutboundPlanReview, Icons.Material.Filled.FactCheck, Color.Info),
-        new("운송의뢰 초안", "하차지·희망 일정·차량 조건의 로컬 검토", WarehouseManagerRoutes.TransportRequestDraft, Icons.Material.Filled.EditNote, Color.Info),
+        new("출고 운송의뢰", "실제 하차지 확인·운송의뢰 저장·기사 인계 조회", WarehouseManagerRoutes.TransportRequestDraft, Icons.Material.Filled.LocalShipping, Color.Info),
         new("포장 작업", "포장 시작과 출고 연결", WarehouseManagerRoutes.PackingWorkStart, Icons.Material.Filled.Inventory, Color.Success),
         new("스캔 스테이션", "공정 스캔과 현장 확인", WarehouseManagerRoutes.Scan, Icons.Material.Filled.QrCodeScanner, Color.Info),
         new("일반 작업 보드", "대기 중인 창고 작업 확인", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban, Color.Secondary),

@@ -375,13 +375,16 @@ public sealed class 공동구매창고ServiceTests
     }
 
     [Fact]
-    public async Task 출고예정검토는_목록과명시한원장Id의읽기경로만사용한다()
+    public async Task 출고예정검토는_목록상세와기사확인인계완료경로를사용한다()
     {
         var client=new RecordingJsonApiClient{Response=new 출고예정검토목록페이지응답()};var service=new 출고예정검토페이지Service(client);
         await service.목록조회Async(new 출고예정검토목록조회요청{WarehouseId=7,Search="감자",Status=출고예정검토조회상태코드.운송연결,Page=2});
         Assert.Equal(HttpMethod.Get,client.LastMethod);Assert.Contains("api/v1/warehouse-operations/outbound-plan-reviews?",client.LastPath);Assert.Contains("warehouseId=7",client.LastPath);Assert.Contains("page=2",client.LastPath);Assert.False(client.LastAllowNotFound);
         client.Response=new 출고예정검토상세응답{OutboundPlanId=31};var result=await service.상세조회Async(31);
         Assert.Equal(31,result!.OutboundPlanId);Assert.Equal(HttpMethod.Get,client.LastMethod);Assert.Equal("api/v1/warehouse-operations/outbound-plan-reviews/31",client.LastPath);Assert.True(client.LastAllowNotFound);
+        var request=new 출고운송인계완료요청{DriverIdentityConfirmed=true,VehicleConfirmed=true,CargoReleasedConfirmed=true};
+        client.Response=new 출고운송인계완료응답{OutboundPlanId=31};var completed=await service.인계완료Async(31,request);
+        Assert.Equal(31,completed.OutboundPlanId);Assert.Equal(HttpMethod.Post,client.LastMethod);Assert.Equal("api/v1/warehouse-operations/outbound-plan-reviews/31/handoff-complete",client.LastPath);Assert.Same(request,client.LastRequest);
     }
 
     [Fact]

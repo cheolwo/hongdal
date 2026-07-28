@@ -1,0 +1,219 @@
+@page "/shipper/warehouse/logistics-contract"
+@layout ShipperMobileLayout
+@inject LogisticsServiceContractClient ContractClient
+@inject IAuthSession AuthSession
+
+<PageTitle>물류대행 계약 비용 검토</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-6">
+    <MudStack Spacing="3">
+        <span class="shipper-mobile-screen-code">화주 업무 · 물류대행 계약 준비</span>
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.h4">입고부터 출고까지 비용을 먼저 맞춰보세요</MudText>
+            <MudText Typo="Typo.body1" Color="Color.Secondary">
+                개인·판매자·공동행동 운영자 누구든 물건을 맡기는 계약에서는 화주가 될 수 있습니다.
+                화주는 고정 직업이 아니라 이 계약에서 맡는 당사자 역할입니다.
+            </MudText>
+        </MudStack>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            이 화면은 계약 체결 전 검토용입니다. 입력한 단가는 전국 공통 가격이나 대행업체의 확정 견적이 아니며,
+            양측 서명 전에는 입고·보관·정산이 실행되지 않습니다.
+        </MudAlert>
+
+        <MudPaper Elevation="0" Class="pa-4" Style="border:1px solid var(--mud-palette-divider); border-radius:12px;">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6">1. 계약 당사자와 검토 범위</MudText>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_providerName"
+                                      Label="물류대행업체 표시명"
+                                      Variant="Variant.Outlined"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_providerId"
+                                      Label="물류대행업체 식별자"
+                                      HelperText="선택한 업체의 플랫폼 식별자 또는 견적 비교용 임시 식별자"
+                                      Variant="Variant.Outlined"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="string"
+                                   @bind-Value="_requesterPartyType"
+                                   Label="이번 계약의 화주 당사자 유형"
+                                   Variant="Variant.Outlined">
+                            <MudSelectItem Value="@물류대행계약당사자유형코드.개인">개인</MudSelectItem>
+                            <MudSelectItem Value="@물류대행계약당사자유형코드.사업자">사업자·판매자</MudSelectItem>
+                            <MudSelectItem Value="@물류대행계약당사자유형코드.공동행동집단">같이 주문·같이 수입 운영 집단</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="pa-4" Style="border:1px solid var(--mud-palette-divider); border-radius:12px;">
+            <MudStack Spacing="3">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6">2. 표준 비용 항목과 예상 작업량</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        입고·검수·적재·보관·피킹·포장·출고와 예외 작업을 같은 코드·단위·증빙 기준으로 비교합니다.
+                    </MudText>
+                </MudStack>
+                <SsalddelWarehouseBillingPreview LogisticsAgentId="@EffectiveProviderId"
+                                                   CustomerId="@EffectiveRequesterId"
+                                                   Rates="@_rates"
+                                                   BillingConfirmed="CreatePreviewAsync" />
+            </MudStack>
+        </MudPaper>
+
+        @if (_isSubmitting)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
+        }
+
+        @if (_preview is not null)
+        {
+            <MudPaper Elevation="0" Class="pa-4" Style="border:2px solid var(--mud-palette-primary); border-radius:12px;">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">3. 계약 비용 검토안</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                @_preview.ContractDraft.ContractNumber · 요율 @_preview.ContractDraft.RateSnapshot.RateVersion
+                            </MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">서명 전 초안</MudChip>
+                    </MudStack>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">공급가액</MudText>
+                            <MudText Typo="Typo.subtitle1">@금액(_preview.EstimatedBilling.SubtotalAmount)</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 세액</MudText>
+                            <MudText Typo="Typo.subtitle1">@금액(_preview.EstimatedBilling.TaxAmount)</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 합계</MudText>
+                            <MudText Typo="Typo.h6">@금액(_preview.EstimatedBilling.TotalAmount)</MudText>
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudText Typo="Typo.subtitle2">계약 당사자</MudText>
+                    @foreach (var party in _preview.ContractDraft.Parties)
+                    {
+                        <MudPaper Elevation="0" Class="pa-3" Style="border:1px solid var(--mud-palette-divider); border-radius:8px;">
+                            <MudText Typo="Typo.body2">
+                                <strong>@party.DisplayName</strong>
+                                · @(party.RoleCode == 물류대행계약당사자역할코드.화주 ? "화주" : "물류대행업체")
+                                · 계약별 역할 지정
+                            </MudText>
+                        </MudPaper>
+                    }
+
+                    <MudText Typo="Typo.subtitle2">서비스 범위</MudText>
+                    <MudChipSet T="string">
+                        @foreach (var scope in _preview.ContractDraft.ServiceScopes)
+                        {
+                            <MudChip T="string" Value="@scope.ServiceStageCode" Variant="Variant.Outlined">
+                                @scope.DisplayName
+                            </MudChip>
+                        }
+                    </MudChipSet>
+
+                    @foreach (var warning in _preview.Warnings)
+                    {
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">@warning</MudAlert>
+                    }
+
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">
+                        @_preview.ContractDraft.ActivationRequirement
+                    </MudAlert>
+                </MudStack>
+            </MudPaper>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private readonly IReadOnlyList<WarehouseBillingRate> _rates =
+        WarehouseBillingRateCatalog.CreateDefaultRates();
+    private string _providerId = "provider-review-candidate";
+    private string _providerName = "검토 중인 물류대행업체";
+    private string _requesterPartyType = 물류대행계약당사자유형코드.개인;
+    private bool _isSubmitting;
+    private string? _error;
+    private 물류대행비용미리보기응답? _preview;
+
+    private string EffectiveProviderId
+        => string.IsNullOrWhiteSpace(_providerId)
+            ? "provider-review-candidate"
+            : _providerId.Trim();
+
+    private string EffectiveRequesterId
+        => string.IsNullOrWhiteSpace(AuthSession.UserId)
+            ? "authenticated-user"
+            : AuthSession.UserId;
+
+    private async Task CreatePreviewAsync(WarehouseBillingDraft draft)
+    {
+        _isSubmitting = true;
+        _error = null;
+        _preview = null;
+        try
+        {
+            var rates = draft.Lines
+                .Select(line => new WarehouseBillingRate(
+                    line.ChargeCode,
+                    line.DisplayName,
+                    line.UnitCode,
+                    line.UnitPrice,
+                    ServiceStageCode: line.ServiceStageCode,
+                    CalculationDescription: line.CalculationDescription,
+                    EvidenceTypeCode: line.EvidenceTypeCode,
+                    MinimumChargeAmount: line.MinimumChargeAmount))
+                .ToArray();
+            var usages = draft.Lines
+                .Select(line => new WarehouseBillingUsage(
+                    line.ChargeCode,
+                    line.Quantity,
+                    line.StartedOn,
+                    line.EndedOn,
+                    line.ReferenceId,
+                    line.Memo))
+                .ToArray();
+
+            _preview = await ContractClient.CreateCostPreviewAsync(
+                new 물류대행비용미리보기요청
+                {
+                    LogisticsProviderId = EffectiveProviderId,
+                    LogisticsProviderDisplayName = string.IsNullOrWhiteSpace(_providerName)
+                        ? "검토 중인 물류대행업체"
+                        : _providerName.Trim(),
+                    RequesterPartyTypeCode = _requesterPartyType,
+                    ServicePeriodStart = draft.BillingPeriodStart,
+                    ServicePeriodEnd = draft.BillingPeriodEnd,
+                    Currency = draft.Currency,
+                    Rates = rates,
+                    Usages = usages
+                });
+        }
+        catch (Exception exception)
+        {
+            _error = exception.Message;
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private static string 금액(decimal amount) => $"{amount:N0}원";
+}

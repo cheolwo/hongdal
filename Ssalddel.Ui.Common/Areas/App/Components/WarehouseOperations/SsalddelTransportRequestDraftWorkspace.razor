@@ -4,12 +4,12 @@
 
 <MudStack Spacing="3" Class="transport-draft-workspace">
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.EditNote">
-        <MudText Typo="Typo.subtitle2">검토를 통과한 출고예정 한 건의 운송 입력만 구성합니다.</MudText>
-        <MudText Typo="Typo.body2">하차지·희망 일정·차량 조건을 입력하고 서로 맞는지 로컬에서 검토합니다.</MudText>
+        <MudText Typo="Typo.subtitle2">검토를 통과한 출고예정 한 건을 실제 운송의뢰로 연결합니다.</MudText>
+        <MudText Typo="Typo.body2">실제 하차지·희망 일정·차량 조건을 먼저 검토한 뒤 명시적으로 저장합니다.</MudText>
     </MudAlert>
-    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Science">
-        <MudText Typo="Typo.subtitle2">Simulation 로컬 초안 경계</MudText>
-        <MudText Typo="Typo.body2">입력 내용은 서버에 저장하지 않습니다. 재고 예약·운송의뢰 생성·배차·계약·결제·정산은 별도 확정 단계의 책임입니다.</MudText>
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">
+        <MudText Typo="Typo.subtitle2">저장하면 출고 수량이 예약되고 기사 배차 대기로 넘어갑니다.</MudText>
+        <MudText Typo="Typo.body2">주소와 수량을 확인하기 전에는 저장하지 않으며, 배차·계약·결제·정산은 각 후속 단계에서 별도로 확정합니다.</MudText>
     </MudAlert>
 
     @if(!ViewModel.초기화됨 || ViewModel.원장.처리중)
@@ -20,9 +20,88 @@
     {
         <MudPaper Class="draft-empty" Elevation="0" Outlined="true"><MudIcon Icon="@Icons.Material.Filled.FactCheck" Size="Size.Large" /><MudText Typo="Typo.h6">먼저 검토할 출고예정을 선택해 주세요.</MudText><MudText Color="Color.Secondary">출고예정 검토 페이지에서 조건을 확인한 정확한 원장 ID를 이어받습니다.</MudText><MudButton Href="/warehouse/general/outbound-plan-review" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowBack">출고예정 검토로 이동</MudButton></MudPaper>
     }
-    else if(ViewModel.원장.오류발생 || ViewModel.원장.대상없음 || ViewModel.원장.원장 is not{} plan)
+    else if((ViewModel.원장.오류발생 && ViewModel.원장.원장 is null) || ViewModel.원장.대상없음 || ViewModel.원장.원장 is not{} plan)
     {
         <MudPaper Class="draft-empty" Elevation="0" Outlined="true"><MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" /><MudText Typo="Typo.h6">출고예정 원장을 확인할 수 없습니다.</MudText><MudText Color="Color.Secondary">다른 원장으로 자동 대체하지 않습니다.</MudText><MudButton Href="/warehouse/general/outbound-plan-review" Variant="Variant.Outlined">검토 목록으로 돌아가기</MudButton></MudPaper>
+    }
+    else if(!string.IsNullOrWhiteSpace(plan.TransportRequestId))
+    {
+        <MudPaper Class="pa-5 draft-panel" Elevation="0" Outlined="true">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h5">@Display(plan.ProductName)</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">출고예정 #@plan.OutboundPlanId · 운송의뢰 @plan.TransportRequestId</MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Icon="@Icons.Material.Filled.LocalShipping">@Display(plan.HandoffStatus)</MudChip>
+                </MudStack>
+                <MudGrid>
+                    <MudItem xs="12" sm="6"><SsalddelSensitiveInfoRow Label="하차지" Value="@Display(plan.DestinationAddress)" /></MudItem>
+                    <MudItem xs="12" sm="6"><SsalddelSensitiveInfoRow Label="상세 위치" Value="@Display(plan.DestinationAddressDetail)" /></MudItem>
+                    <MudItem xs="12" sm="4"><SsalddelSensitiveInfoRow Label="의뢰 상태" Value="@Display(plan.TransportRequestStatus)" /></MudItem>
+                    <MudItem xs="12" sm="4"><SsalddelSensitiveInfoRow Label="배차 상태" Value="@Display(plan.DispatchStatus)" /></MudItem>
+                    <MudItem xs="12" sm="4"><SsalddelSensitiveInfoRow Label="운송 상태" Value="@Display(plan.TransportStatus)" /></MudItem>
+                    <MudItem xs="12" sm="4"><SsalddelSensitiveInfoRow Label="확정 기사" Value="@Display(plan.AssignedDriverId)" /></MudItem>
+                    <MudItem xs="12" sm="4"><SsalddelSensitiveInfoRow Label="요청 차량" Value="@Display(plan.RequestedVehicleType)" /></MudItem>
+                    <MudItem xs="12" sm="4"><SsalddelSensitiveInfoRow Label="기사 등록 차량" Value="@Display(plan.AssignedDriverVehicle)" /></MudItem>
+                </MudGrid>
+                @if(plan.HandoffCompletedAtUtc.HasValue)
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Inventory">
+                        <MudText Typo="Typo.subtitle2">출고 인계가 완료되었습니다.</MudText>
+                        <MudText Typo="Typo.body2">@FormatDateTime(plan.HandoffCompletedAtUtc) · 기사 @Display(plan.AssignedDriverId) · @Display(plan.AssignedDriverVehicle)</MudText>
+                        <MudText Typo="Typo.caption">Warehouse·Driver·Shipper가 같은 의뢰 ID @(plan.TransportRequestId)를 다시 조회합니다.</MudText>
+                    </MudAlert>
+                }
+                else if(plan.DriverAccepted)
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.HowToReg">
+                        <MudText Typo="Typo.subtitle2">기사가 수락했습니다.</MudText>
+                        <MudText Typo="Typo.body2">기사 식별자 @plan.AssignedDriverId · 등록 차량 @Display(plan.AssignedDriverVehicle)</MudText>
+                        <MudText Typo="Typo.caption">실제 상차 전 기사, 차량, 상품을 현장에서 다시 확인해 주세요.</MudText>
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.HourglassTop">
+                        <MudText Typo="Typo.subtitle2">기사 배차를 기다리고 있습니다.</MudText>
+                        <MudText Typo="Typo.body2">새 운송의뢰가 기사 추천·수락 흐름에 들어갔습니다. 새로고침하면 같은 출고예정 ID의 최신 상태를 조회합니다.</MudText>
+                    </MudAlert>
+                }
+                @if(!plan.HandoffCompletedAtUtc.HasValue && plan.CanCompleteHandoff)
+                {
+                    <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">기사 상차 인계 확인</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">서버가 확인한 기사·차량과 현장 대상을 대조한 뒤에만 예약 재고를 실제 출고로 전환합니다.</MudText>
+                            <MudCheckBox T="bool" Value="@ViewModel.원장.기사신원확인" ValueChanged="SetDriverConfirmed" Label="@($"기사 {Display(plan.AssignedDriverId)}의 신원을 확인했습니다.")" />
+                            <MudCheckBox T="bool" Value="@ViewModel.원장.등록차량확인" ValueChanged="SetVehicleConfirmed" Label="@($"등록 차량 {Display(plan.AssignedDriverVehicle)}을 확인했습니다.")" />
+                            <MudCheckBox T="bool" Value="@ViewModel.원장.상품인계확인" ValueChanged="SetCargoReleasedConfirmed" Label="@($"상품 {plan.Quantity:N0}개의 실제 상차 인계를 확인했습니다.")" />
+                            <MudTextField T="string" Label="인계 메모 (선택)" HelperText="연락처·계좌 등 개인정보는 입력하지 마세요." Value="@ViewModel.원장.인계메모" ValueChanged="SetHandoffMemo" Immediate="true" Lines="2" MaxLength="400" Variant="Variant.Outlined" />
+                            <MudButton FullWidth="true" Size="Size.Large" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Inventory" Disabled="@ViewModel.원장.처리중" OnClick="CompleteHandoffAsync">
+                                @(ViewModel.원장.처리중 ? "출고 인계 처리 중" : "기사·차량 확인 후 출고 인계 완료")
+                            </MudButton>
+                        </MudStack>
+                    </MudPaper>
+                }
+                else if(!plan.HandoffCompletedAtUtc.HasValue)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Lock">
+                        <MudText Typo="Typo.subtitle2">출고 인계가 잠겨 있습니다.</MudText>
+                        <MudText Typo="Typo.body2">기사 본인 수락과 등록 차량이 서버 원장에 확인되면 완료 버튼이 열립니다.</MudText>
+                    </MudAlert>
+                }
+                @if(ViewModel.원장.오류발생)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.원장.오류메시지</MudAlert>
+                }
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@plan.NextStep</MudText>
+                <MudStack Row="true" Spacing="2">
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" OnClick="RefreshStatusAsync">인계 상태 새로고침</MudButton>
+                    <MudButton Href="@($"/warehouse/general/outbound-plan-review?outboundPlanId={plan.OutboundPlanId}")" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.FactCheck">출고 원장 다시 보기</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
     }
     else if(!plan.CanStartTransportRequestDraft)
     {
@@ -45,8 +124,9 @@
             </MudItem>
             <MudItem xs="12" lg="8">
                 <MudPaper Class="pa-4 draft-panel" Elevation="0" Outlined="true"><MudStack Spacing="3">
-                    <MudText Typo="Typo.h6">운송 입력 초안</MudText>
-                    <MudTextField T="string" Label="하차지 요약" HelperText="실제 확정 전 주소와 현장 진입 조건을 다시 확인합니다." Value="@ViewModel.초안.하차지요약" ValueChanged="SetDestination" Immediate="true" MaxLength="200" Variant="Variant.Outlined" />
+                    <MudText Typo="Typo.h6">운송의뢰 입력</MudText>
+                    <MudTextField T="string" Label="실제 하차지 도로명 주소" HelperText="주문자 ID나 권역명이 아닌 실제 차량 도착 주소를 입력합니다." Value="@ViewModel.초안.하차지주소" ValueChanged="SetDestinationAddress" Immediate="true" MaxLength="200" Variant="Variant.Outlined" />
+                    <MudTextField T="string" Label="하차지 상세 위치 (선택)" HelperText="동·층·상차장 입구처럼 기사에게 필요한 위치만 입력합니다." Value="@ViewModel.초안.하차지상세주소" ValueChanged="SetDestinationAddressDetail" Immediate="true" MaxLength="200" Variant="Variant.Outlined" />
                     <MudGrid>
                         <MudItem xs="12" sm="6"><MudDatePicker Label="희망 상차일" Date="@ViewModel.초안.희망상차일" DateChanged="SetPickupDate" Variant="Variant.Outlined" /></MudItem>
                         <MudItem xs="12" sm="6"><MudTimePicker Label="희망 상차시각" Time="@ViewModel.초안.희망상차시각" TimeChanged="SetPickupTime" Variant="Variant.Outlined" /></MudItem>
@@ -57,8 +137,27 @@
                     <MudTextField T="string" Label="취급 메모 (선택)" HelperText="연락처·계좌 등 개인정보는 입력하지 마세요." Value="@ViewModel.초안.취급메모" ValueChanged="SetHandlingNote" Immediate="true" Lines="3" MaxLength="300" Variant="Variant.Outlined" />
                     <MudCheckBox T="bool" Value="@ViewModel.초안.상품수량확인" ValueChanged="SetCargoConfirmed" Label="표시된 상품·포장·출고 수량을 확인했습니다." />
                     @if(!string.IsNullOrWhiteSpace(ViewModel.초안.검증오류)){<MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.초안.검증오류</MudAlert>}
-                    <MudButton FullWidth="true" Size="Size.Large" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Rule" OnClick="ReviewDraft">입력값 로컬 검토</MudButton>
-                    @if(ViewModel.초안.검토결과 is{} result){<MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt"><MudText Typo="Typo.subtitle2">운영 효력 없는 로컬 초안 검토 완료</MudText><MudText Typo="Typo.body2">@result.DraftReference · @result.VehicleType</MudText><MudText Typo="Typo.body2">@result.PickupAt.ToString("yyyy-MM-dd HH:mm") → @result.ArrivalAt.ToString("yyyy-MM-dd HH:mm")</MudText><MudText Typo="Typo.caption">서버 저장과 운송의뢰 ID 생성은 수행하지 않았습니다.</MudText><MudButton Variant="Variant.Text" OnClick="EditAgain">다시 수정</MudButton></MudAlert>}
+                    <MudButton FullWidth="true" Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Rule" OnClick="ReviewDraft">주소·수량·일정 검토</MudButton>
+                    @if(ViewModel.초안.검토결과 is{} result)
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt">
+                            <MudText Typo="Typo.subtitle2">저장 전 검토 완료</MudText>
+                            <MudText Typo="Typo.body2">@result.ReviewReference · @result.VehicleType</MudText>
+                            <MudText Typo="Typo.body2">@result.DestinationAddress @result.DestinationAddressDetail</MudText>
+                            <MudText Typo="Typo.body2">@result.PickupAt.ToString("yyyy-MM-dd HH:mm") → @result.ArrivalAt.ToString("yyyy-MM-dd HH:mm")</MudText>
+                            <MudText Typo="Typo.caption">아직 서버에 저장하지 않았습니다. 아래 버튼을 누르면 출고 수량 예약과 운송의뢰 생성이 함께 실행됩니다.</MudText>
+                            <MudStack Row="true" Spacing="2" Class="mt-2">
+                                <MudButton Variant="Variant.Text" Disabled="@ViewModel.저장.처리중" OnClick="EditAgain">다시 수정</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@ViewModel.저장.처리중" StartIcon="@Icons.Material.Filled.LocalShipping" OnClick="SaveDraftAsync">
+                                    @(ViewModel.저장.처리중 ? "운송의뢰 저장 중" : "운송의뢰 저장")
+                                </MudButton>
+                            </MudStack>
+                        </MudAlert>
+                    }
+                    @if(ViewModel.저장.오류발생)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.저장.오류메시지</MudAlert>
+                    }
                 </MudStack></MudPaper>
             </MudItem>
         </MudGrid>
@@ -70,7 +169,8 @@
     private bool _initialized;
     private long? _loadedId;
     protected override async Task OnParametersSetAsync(){var id=OutboundPlanId is>0?OutboundPlanId:null;if(!_initialized||id!=_loadedId){_initialized=true;_loadedId=id;await ViewModel.초기화Async(id);}}
-    private void SetDestination(string value)=>ViewModel.초안.하차지요약=value??string.Empty;
+    private void SetDestinationAddress(string value)=>ViewModel.초안.하차지주소=value??string.Empty;
+    private void SetDestinationAddressDetail(string value)=>ViewModel.초안.하차지상세주소=value??string.Empty;
     private void SetPickupDate(DateTime? value)=>ViewModel.초안.희망상차일=value;
     private void SetPickupTime(TimeSpan? value)=>ViewModel.초안.희망상차시각=value;
     private void SetArrivalDate(DateTime? value)=>ViewModel.초안.희망도착일=value;
@@ -78,7 +178,19 @@
     private void SetVehicleType(string value)=>ViewModel.초안.차량유형=value??string.Empty;
     private void SetHandlingNote(string value)=>ViewModel.초안.취급메모=value??string.Empty;
     private void SetCargoConfirmed(bool value)=>ViewModel.초안.상품수량확인=value;
+    private void SetDriverConfirmed(bool value)=>ViewModel.원장.기사신원확인=value;
+    private void SetVehicleConfirmed(bool value)=>ViewModel.원장.등록차량확인=value;
+    private void SetCargoReleasedConfirmed(bool value)=>ViewModel.원장.상품인계확인=value;
+    private void SetHandoffMemo(string value)=>ViewModel.원장.인계메모=value??string.Empty;
     private void ReviewDraft()=>ViewModel.초안.입력값검토();
     private void EditAgain()=>ViewModel.초안.다시수정();
+    private async Task SaveDraftAsync()=>await ViewModel.서버저장Async();
+    private async Task CompleteHandoffAsync()=>await ViewModel.서버인계완료Async();
+    private async Task RefreshStatusAsync()
+    {
+        if(ViewModel.원장.조회대상Id is > 0)
+            await ViewModel.초기화Async(ViewModel.원장.조회대상Id);
+    }
     private static string Display(string? value)=>string.IsNullOrWhiteSpace(value)?"-":value;
+    private static string FormatDateTime(DateTime? value)=>value.HasValue?value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm"):"-";
 }

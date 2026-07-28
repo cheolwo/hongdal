@@ -75,6 +75,19 @@ public sealed class 출고예정검토상세응답
     public int Quantity { get; set; }
     public string OutboundStatus { get; set; } = string.Empty;
     public string? TransportRequestId { get; set; }
+    public string TransportRequestStatus { get; set; } = string.Empty;
+    public string DispatchStatus { get; set; } = string.Empty;
+    public string TransportStatus { get; set; } = string.Empty;
+    public string HandoffStatus { get; set; } = string.Empty;
+    public string? AssignedDriverId { get; set; }
+    public string RequestedVehicleType { get; set; } = string.Empty;
+    public string AssignedDriverVehicle { get; set; } = string.Empty;
+    public bool DriverAccepted { get; set; }
+    public bool VehicleConfirmed { get; set; }
+    public bool CanCompleteHandoff { get; set; }
+    public DateTime? HandoffCompletedAtUtc { get; set; }
+    public string DestinationAddress { get; set; } = string.Empty;
+    public string DestinationAddressDetail { get; set; } = string.Empty;
     public int? AvailableQuantity { get; set; }
     public int? ReservedQuantity { get; set; }
     public int? DefectiveQuantity { get; set; }
@@ -89,4 +102,23 @@ public sealed class 출고예정검토상세응답
     public string ReviewStatus { get; set; } = string.Empty;
     public string NextStep { get; set; } = string.Empty;
     public DateTime UpdatedAtUtc { get; set; }
+}
+
+public sealed class 출고운송인계완료요청
+{
+    public bool DriverIdentityConfirmed { get; set; }
+    public bool VehicleConfirmed { get; set; }
+    public bool CargoReleasedConfirmed { get; set; }
+    public string? Memo { get; set; }
+}
+
+public sealed class 출고운송인계완료응답
+{
+    public long OutboundPlanId { get; set; }
+    public string TransportRequestId { get; set; } = string.Empty;
+    public string OutboundStatus { get; set; } = string.Empty;
+    public string AssignedDriverId { get; set; } = string.Empty;
+    public string AssignedDriverVehicle { get; set; } = string.Empty;
+    public DateTime HandoffCompletedAtUtc { get; set; }
+    public bool IdempotentReplay { get; set; }
 }

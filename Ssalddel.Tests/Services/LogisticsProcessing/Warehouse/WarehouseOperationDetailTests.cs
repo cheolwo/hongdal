@@ -5,12 +5,16 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using MediatR;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Application.Warehouse;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Inventory;
+using Ssalddel.Services.Community;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
 using 살뜰.Services.Audit;
+using 살뜰.도메인.운송;
+using 살뜰.도메인.화주;
 using 살뜰.도메인.창고;
 
 namespace Ssalddel.Tests.Services.LogisticsProcessing.Warehouse;
@@ -249,6 +253,83 @@ public sealed class WarehouseOperationDetailTests
         Assert.True(retried.Value.멱등재시도여부);
         Assert.Single(log.Entries);
         Assert.Single(publisher.Notifications);
+    }
+
+    [Fact]
+    public async Task 출고예정운송인계는_같은원장에한번만생성하고_재시도는기존의뢰를반환한다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        await SeedInspectionItemAsync(db);
+        var outbound = await db.출고예정.SingleAsync(x => x.Id == 51);
+        outbound.입고상품Id = 71;
+        outbound.상태 = 출고상태.준비중;
+        await db.SaveChangesAsync();
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            new NoOpTransportLedgerSync());
+        var pickupAt = new DateTime(2026, 7, 29, 9, 0, 0);
+        var arrivalAt = new DateTime(2026, 7, 29, 11, 0, 0);
+        var request = new 재고운송의뢰생성요청
+        {
+            출고예정Id = 51,
+            입고상품Id = 71,
+            요청수량 = 12,
+            하차지주소 = "서울특별시 송파구 올림픽로 300",
+            하차지상세주소 = "동문 상차장",
+            화물종류 = "냉장 감자",
+            차량종류 = "1톤 냉장탑차",
+            희망상차일시 = pickupAt,
+            희망도착일시 = arrivalAt,
+            취급메모 = "냉장 유지"
+        };
+
+        var created = await service.CreateReconsignmentRequestAsync(request, default);
+        var retried = await service.CreateReconsignmentRequestAsync(request, default);
+
+        Assert.False(created.멱등재시도여부);
+        Assert.True(retried.멱등재시도여부);
+        Assert.Equal("warehouse-outbound-51", created.의뢰Id);
+        Assert.Equal(created.의뢰Id, retried.의뢰Id);
+        Assert.Equal(created.의뢰Id, (await db.출고예정.SingleAsync(x => x.Id == 51)).운송의뢰Id);
+        Assert.Equal(1, await db.화주운송의뢰.CountAsync(x => x.의뢰Id == created.의뢰Id));
+        Assert.Equal(1, await db.운송원장.CountAsync(x => x.의뢰Id == created.의뢰Id));
+        Assert.Equal(1, await db.운송의뢰상품연결.CountAsync(x => x.운송의뢰Id == created.의뢰Id));
+        Assert.Equal(1, await db.재고이동.CountAsync(x => x.출고예정Id == 51 && x.운송의뢰Id == created.의뢰Id));
+        var inventory = await db.입고상품.SingleAsync(x => x.Id == 71);
+        Assert.Equal(0, inventory.가용수량);
+        Assert.Equal(12, inventory.예약수량);
+        var transport = await db.화주운송의뢰.SingleAsync(x => x.의뢰Id == created.의뢰Id);
+        Assert.Equal(pickupAt, transport.픽업_시간창_시작일시);
+        Assert.Equal(arrivalAt, transport.하차_시간창_시작일시);
+        Assert.Equal("냉장", transport.화물온도조건);
+    }
+
+    [Fact]
+    public async Task 출고예정운송인계는_식별자문자열을하차주소로허용하지않는다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        await SeedInspectionItemAsync(db);
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            new NoOpTransportLedgerSync());
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateReconsignmentRequestAsync(
+                new 재고운송의뢰생성요청
+                {
+                    입고상품Id = 71,
+                    요청수량 = 1,
+                    하차지주소 = "주문자:orderer-1",
+                    차량종류 = "1톤 카고"
+                },
+                default));
+
+        Assert.Contains("실제 하차지", error.Message);
+        Assert.Empty(await db.화주운송의뢰.ToArrayAsync());
     }
 
     [Fact]
@@ -630,6 +711,26 @@ public sealed class WarehouseOperationDetailTests
                 }
             ]
         };
+
+    private sealed class NoOpTransportLedgerSync : I운송원장Mongo동기화Service
+    {
+        public Task<커뮤니티원장Dto?> 화주운송의뢰동기화Async(
+            화주운송의뢰 의뢰,
+            string updatedBy,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<커뮤니티원장Dto?>(null);
+
+        public Task<커뮤니티원장Dto?> 운송실행투영동기화Async(
+            운송원장 운송실행투영,
+            string updatedBy,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<커뮤니티원장Dto?>(null);
+
+        public Task<운송원장Mongo동기화상태> 상태조회Async(
+            string 의뢰Id,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(운송원장Mongo동기화상태.Empty(의뢰Id, "test"));
+    }
 
     private sealed class FailInventoryHistorySaveInterceptor : SaveChangesInterceptor
     {

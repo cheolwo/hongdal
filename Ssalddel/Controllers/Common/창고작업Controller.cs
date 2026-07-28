@@ -39,6 +39,7 @@ public sealed class 창고작업Controller : ControllerBase
     private readonly I포장작업UseCase _packingTaskUseCase;
     private readonly I출고인계준비UseCase _outboundHandoffUseCase;
     private readonly I출고예정검토UseCase _outboundPlanReviewUseCase;
+    private readonly I출고운송인계완료UseCase _outboundTransportHandoffUseCase;
 
     public 창고작업Controller(
         I창고작업UseCase useCase,
@@ -47,7 +48,8 @@ public sealed class 창고작업Controller : ControllerBase
         I적재작업UseCase putAwayTaskUseCase,
         I포장작업UseCase packingTaskUseCase,
         I출고인계준비UseCase outboundHandoffUseCase,
-        I출고예정검토UseCase outboundPlanReviewUseCase)
+        I출고예정검토UseCase outboundPlanReviewUseCase,
+        I출고운송인계완료UseCase outboundTransportHandoffUseCase)
     {
         _useCase = useCase;
         _pickingTaskUseCase = pickingTaskUseCase;
@@ -56,6 +58,7 @@ public sealed class 창고작업Controller : ControllerBase
         _packingTaskUseCase = packingTaskUseCase;
         _outboundHandoffUseCase = outboundHandoffUseCase;
         _outboundPlanReviewUseCase = outboundPlanReviewUseCase;
+        _outboundTransportHandoffUseCase = outboundTransportHandoffUseCase;
     }
 
     [HttpGet("warehouses")]
@@ -418,6 +421,23 @@ public sealed class 창고작업Controller : ControllerBase
     public async Task<IActionResult> 출고예정검토상세(long outboundPlanId, CancellationToken cancellationToken)
     {
         var result = await _outboundPlanReviewUseCase.상세Async(outboundPlanId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("outbound-plan-reviews/{outboundPlanId:long}/handoff-complete")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 출고운송인계완료(
+        long outboundPlanId,
+        [FromBody] 출고운송인계완료요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _outboundTransportHandoffUseCase.완료Async(
+            outboundPlanId,
+            request,
+            요청Context생성(),
+            cancellationToken);
         return this.ToActionResult(result);
     }
 

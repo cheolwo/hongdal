@@ -5,6 +5,7 @@ using Ssalddel.ApiMetadata;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.Inventory;
 using 살뜰.Data;
+using 살뜰.도메인.공통;
 using 살뜰.도메인.창고;
 
 namespace Ssalddel.Application.Warehouse;
@@ -132,26 +133,97 @@ public sealed class 출고예정검토UseCase(
         var handoff = histories.FirstOrDefault(history => history.이력유형 == "출고인계준비");
         var packagingType = ResolvePackagingType(inventory?.상태, packing?.메모);
         var outboundReady = row.plan.상태 == 출고상태.준비중;
+        var outboundCompleted = row.plan.상태 == 출고상태.출고완료;
         var inventoryLinked = inventory is not null;
         var packagingReady = inventoryLinked && packing is not null;
-        var quantityMatches = inventory is not null && row.plan.수량 > 0 && row.plan.수량 == inventory.가용수량;
         var originReady = row.warehouse.IsActive
                           && !string.IsNullOrWhiteSpace(row.warehouse.창고명)
                           && !string.IsNullOrWhiteSpace(row.warehouse.주소);
         var transportLinked = !string.IsNullOrWhiteSpace(row.plan.운송의뢰Id);
+        var transportRequest = transportLinked
+            ? await db.화주운송의뢰.AsNoTracking()
+                .SingleOrDefaultAsync(item => item.의뢰Id == row.plan.운송의뢰Id, cancellationToken)
+            : null;
+        var transportLedger = transportLinked
+            ? await db.운송원장.AsNoTracking()
+                .SingleOrDefaultAsync(item => item.의뢰Id == row.plan.운송의뢰Id, cancellationToken)
+            : null;
+        var allocation = transportLinked && inventory is not null
+            ? await db.운송의뢰상품연결.AsNoTracking()
+                .SingleOrDefaultAsync(
+                    item => item.운송의뢰Id == row.plan.운송의뢰Id
+                            && item.입고상품Id == inventory.Id,
+                    cancellationToken)
+            : null;
+        var assignedDriverId = transportLedger?.확정기사Id?.Trim();
+        var assignedDriverVehicle = !string.IsNullOrWhiteSpace(assignedDriverId)
+            ? await db.용달기사.AsNoTracking()
+                .Where(item => item.기사Id == assignedDriverId && item.상태 == "활동중")
+                .OrderByDescending(item => item.UpdatedAt)
+                .Select(item => item.차량)
+                .FirstOrDefaultAsync(cancellationToken) ?? string.Empty
+            : string.Empty;
+        var driverAccepted = !string.IsNullOrWhiteSpace(assignedDriverId)
+                             && string.Equals(
+                                 transportRequest?.배차상태,
+                                 상태값.배차상태.배차확정,
+                                 StringComparison.Ordinal);
+        var vehicleConfirmed = driverAccepted
+                               && !string.IsNullOrWhiteSpace(transportRequest?.차량종류)
+                               && string.Equals(
+                                   transportRequest.차량종류.Trim(),
+                                   assignedDriverVehicle.Trim(),
+                                   StringComparison.OrdinalIgnoreCase);
+        var quantityMatches = inventory is not null
+                              && row.plan.수량 > 0
+                              && (transportLinked
+                                  ? allocation?.할당수량 == row.plan.수량
+                                    && (outboundCompleted || inventory.예약수량 >= row.plan.수량)
+                                  : row.plan.수량 == inventory.가용수량);
+        var handoffStatus = ResolveHandoffStatus(
+            row.plan.상태,
+            transportLinked,
+            transportRequest?.상태,
+            transportLedger?.상태,
+            assignedDriverId);
         var canStartDraft = outboundReady && inventoryLinked && packagingReady && quantityMatches && originReady && !transportLinked;
-        var reviewStatus = transportLinked ? "운송 연결됨" : canStartDraft ? "초안 입력 가능" : "원장 보완 필요";
+        var canCompleteHandoff = outboundReady
+                                 && transportLinked
+                                 && inventoryLinked
+                                 && packagingReady
+                                 && quantityMatches
+                                 && originReady
+                                 && driverAccepted
+                                 && vehicleConfirmed;
+        var reviewStatus = outboundCompleted
+            ? "출고 완료"
+            : transportLinked ? "운송 연결됨" : canStartDraft ? "초안 입력 가능" : "원장 보완 필요";
 
         var checks = new List<출고예정검토항목응답>
         {
-            Check("outbound", "출고 원장", outboundReady, $"현재 상태: {row.plan.상태}"),
+            Check("outbound", "출고 원장", outboundReady || outboundCompleted, $"현재 상태: {row.plan.상태}"),
             Check("packing", "포장 근거", packagingReady, packagingReady ? $"{packagingType} 포장 완료 이력 확인" : "포장 완료 이력이 필요합니다."),
-            Check("quantity", "수량 정합성", quantityMatches, inventoryLinked ? $"출고 {row.plan.수량:N0}개 · 가용 {inventory!.가용수량:N0}개" : "연결된 재고가 없습니다."),
+            Check("quantity", "수량 정합성", quantityMatches, inventoryLinked ? $"출고 {row.plan.수량:N0}개 · 가용 {inventory!.가용수량:N0}개 · 예약 {inventory.예약수량:N0}개" : "연결된 재고가 없습니다."),
             Check("origin", "출발 창고", originReady, originReady ? $"{row.warehouse.창고명} · 주소 등록 완료" : "활성 창고와 출발지 주소가 필요합니다."),
             InputCheck("destination", "하차지", transportLinked, transportLinked ? "연결된 운송의뢰에서 확인합니다." : "운송의뢰 작성 단계에서 입력합니다."),
             InputCheck("schedule", "희망 일정", transportLinked, transportLinked ? "연결된 운송의뢰에서 확인합니다." : "픽업·도착 희망 시각을 별도로 입력합니다."),
             InputCheck("transport", "운송의뢰", transportLinked, transportLinked ? $"연결됨: {row.plan.운송의뢰Id}" : "이 검토 페이지에서는 운송의뢰를 생성하지 않습니다.")
         };
+        if (transportLinked)
+        {
+            checks.Add(Check(
+                "driver",
+                "기사 수락",
+                driverAccepted,
+                driverAccepted ? $"확정 기사: {assignedDriverId}" : "기사 본인의 배차 수락을 기다리고 있습니다."));
+            checks.Add(Check(
+                "vehicle",
+                "등록 차량",
+                vehicleConfirmed,
+                vehicleConfirmed
+                    ? $"요청 {transportRequest!.차량종류} · 등록 {assignedDriverVehicle}"
+                    : $"요청 {transportRequest?.차량종류 ?? "-"} · 등록 {(string.IsNullOrWhiteSpace(assignedDriverVehicle) ? "-" : assignedDriverVehicle)}"));
+        }
 
         return Result.Ok(new 출고예정검토상세응답
         {
@@ -167,6 +239,19 @@ public sealed class 출고예정검토UseCase(
             Quantity = row.plan.수량,
             OutboundStatus = row.plan.상태,
             TransportRequestId = row.plan.운송의뢰Id,
+            TransportRequestStatus = transportRequest?.상태 ?? string.Empty,
+            DispatchStatus = transportRequest?.배차상태 ?? string.Empty,
+            TransportStatus = transportLedger?.상태 ?? string.Empty,
+            HandoffStatus = handoffStatus,
+            AssignedDriverId = assignedDriverId,
+            RequestedVehicleType = transportRequest?.차량종류 ?? string.Empty,
+            AssignedDriverVehicle = assignedDriverVehicle,
+            DriverAccepted = driverAccepted,
+            VehicleConfirmed = vehicleConfirmed,
+            CanCompleteHandoff = canCompleteHandoff,
+            HandoffCompletedAtUtc = AsUtc(row.plan.출고처리일시),
+            DestinationAddress = transportRequest?.하차_도로명주소 ?? string.Empty,
+            DestinationAddressDetail = transportRequest?.하차_상세주소 ?? string.Empty,
             AvailableQuantity = inventory?.가용수량,
             ReservedQuantity = inventory?.예약수량,
             DefectiveQuantity = inventory?.불량수량,
@@ -179,8 +264,12 @@ public sealed class 출고예정검토UseCase(
             Checks = checks,
             CanStartTransportRequestDraft = canStartDraft,
             ReviewStatus = reviewStatus,
-            NextStep = transportLinked
-                ? "연결된 운송의뢰 상세에서 배차 전 조건을 확인합니다."
+            NextStep = outboundCompleted
+                ? $"출고 인계가 완료되었습니다. Warehouse·Driver·Shipper가 같은 의뢰 ID {row.plan.운송의뢰Id}를 다시 조회합니다."
+                : transportLinked
+                    ? canCompleteHandoff
+                        ? "기사와 등록 차량을 현장에서 대조한 뒤 상품 인계를 완료합니다."
+                        : "기사 배차 상태를 확인합니다. 이 화면을 다시 열면 같은 출고예정 ID로 최신 상태를 조회합니다."
                 : canStartDraft
                     ? "별도 운송의뢰 작성에서 하차지·희망 일정·차량 조건을 입력합니다."
                     : "출고 원장과 포장·수량·출발 창고 정보를 먼저 보완합니다.",
@@ -224,6 +313,35 @@ public sealed class 출고예정검토UseCase(
         if (separator < 0 || separator == historyMemo.Length - 1) return "포장";
         var type = historyMemo[(separator + 1)..].Split('.', 2)[0].Trim();
         return string.IsNullOrWhiteSpace(type) ? "포장" : type;
+    }
+
+    private static string ResolveHandoffStatus(
+        string outboundStatus,
+        bool transportLinked,
+        string? requestStatus,
+        string? transportStatus,
+        string? assignedDriverId)
+    {
+        if (string.Equals(outboundStatus, 출고상태.출고완료, StringComparison.Ordinal))
+            return "출고 인계 완료";
+        if (!transportLinked) return "운송의뢰 전";
+        if (!string.IsNullOrWhiteSpace(transportStatus)
+            && transportStatus.Contains("완료", StringComparison.Ordinal))
+        {
+            return "운송 완료";
+        }
+
+        if (!string.IsNullOrWhiteSpace(transportStatus)
+            && (transportStatus.Contains("운송중", StringComparison.Ordinal)
+                || transportStatus.Contains("픽업", StringComparison.Ordinal)
+                || transportStatus.Contains("상차", StringComparison.Ordinal)))
+        {
+            return "기사 운송 진행";
+        }
+
+        if (!string.IsNullOrWhiteSpace(assignedDriverId)) return "기사 수락 · 출고 인계 준비";
+        if (!string.IsNullOrWhiteSpace(requestStatus)) return "기사 배차 대기";
+        return "운송 연결 확인 필요";
     }
 
     private string? CurrentUserId()

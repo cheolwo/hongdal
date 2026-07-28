@@ -301,6 +301,7 @@ public static class 화주운송요금정책이벤트코드
 public sealed class 화주운송의뢰응답
 {
     public string 의뢰Id { get; set; } = string.Empty;
+    public bool 멱등재시도여부 { get; set; }
     public string 주문자UserId { get; set; } = string.Empty;
     public string 화주Id { get; set; } = string.Empty;
     public string 의뢰상태 { get; set; } = string.Empty;
