@@ -14,6 +14,9 @@ public class 음식주문
     [MaxLength(100)]
     public string 주문번호 { get; set; } = string.Empty;
 
+    [Column("클라이언트요청_id")]
+    public Guid? 클라이언트요청Id { get; set; }
+
     [Column("음식점_id")]
     public long 음식점Id { get; set; }
 

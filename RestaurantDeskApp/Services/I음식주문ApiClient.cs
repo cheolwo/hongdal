@@ -14,4 +14,9 @@ public interface I음식주문ApiClient
         string 주문번호,
         음식점주문수락요청 request,
         CancellationToken cancellationToken = default);
+
+    Task<음식주문응답?> 음식점진행변경Async(
+        string 주문번호,
+        음식점주문진행변경요청 request,
+        CancellationToken cancellationToken = default);
 }

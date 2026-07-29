@@ -82,16 +82,25 @@ public sealed partial class 주문자음식주문목록ViewModel(
 
 /// <summary>명시적으로 선택한 정확한 orderNo 한 건의 소유자 상세만 담당합니다.</summary>
 public sealed partial class 주문자음식주문상세ViewModel(
-    I주문자음식주문읽기Service service) : 업무작업ViewModelBase
+    I주문자음식주문읽기Service service,
+    I주문자음식주문수령확인Service receiptConfirmationService) : 업무작업ViewModelBase
 {
+    private Guid? _수령확인요청Id;
+
     [ObservableProperty]
     public partial string? 요청OrderNo { get; private set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(수령확인가능))]
     public partial 주문자음식주문상세응답? 상세 { get; private set; }
 
     [ObservableProperty]
     public partial bool 찾을수없음 { get; private set; }
+
+    [ObservableProperty]
+    public partial string 수령확인메모 { get; set; } = string.Empty;
+
+    public bool 수령확인가능 => 상세?.배달진행.수령확인가능 == true;
 
     public Task<bool> 조회Async(string orderNo, CancellationToken cancellationToken = default)
     {
@@ -114,11 +123,52 @@ public sealed partial class 주문자음식주문상세ViewModel(
             ex => $"음식 주문 상세를 불러오지 못했습니다. {ex.Message}");
     }
 
+    public Task<bool> 수령확인Async(CancellationToken cancellationToken = default)
+    {
+        if (!수령확인가능 || string.IsNullOrWhiteSpace(요청OrderNo))
+        {
+            return Task.FromResult(유효성실패("기사 전달 완료 뒤에만 주문 수령을 확인할 수 있습니다."));
+        }
+
+        if (수령확인메모?.Length > 500)
+        {
+            return Task.FromResult(유효성실패("수령 확인 메모는 500자 이내로 입력해 주세요."));
+        }
+
+        if (!_수령확인요청Id.HasValue)
+        {
+            _수령확인요청Id = Guid.NewGuid();
+        }
+
+        return 작업실행Async(
+            async token =>
+            {
+                await receiptConfirmationService.수령확인Async(
+                    요청OrderNo,
+                    new 주문자음식주문수령확인요청
+                    {
+                        클라이언트요청Id = _수령확인요청Id.Value,
+                        확인메모 = 수령확인메모?.Trim() ?? string.Empty
+                    },
+                    token);
+                상세 = await service.상세Async(요청OrderNo, token)
+                    ?? throw new InvalidOperationException("수령 확인한 음식 주문을 다시 조회할 수 없습니다.");
+                찾을수없음 = false;
+                _수령확인요청Id = null;
+                수령확인메모 = string.Empty;
+            },
+            "음식 수령을 확인했습니다.",
+            cancellationToken,
+            ex => $"음식 수령을 확인하지 못했습니다. {ex.Message}");
+    }
+
     public void 선택해제()
     {
         요청OrderNo = null;
         상세 = null;
         찾을수없음 = false;
+        _수령확인요청Id = null;
+        수령확인메모 = string.Empty;
         작업상태초기화();
     }
 }
@@ -234,6 +284,30 @@ public sealed class 주문자음식주문PageViewModel : 조립ViewModelBase
 
     public Task 주문선택Async(string orderNo, CancellationToken cancellationToken = default)
         => 상세.조회Async(orderNo, cancellationToken);
+
+    public async Task<bool> 주문수령확인Async(CancellationToken cancellationToken = default)
+    {
+        if (!await 상세.수령확인Async(cancellationToken))
+        {
+            return false;
+        }
+
+        await 목록.페이지조회Async(Math.Max(1, 목록.현재페이지), cancellationToken);
+        return true;
+    }
+
+    public async Task 주문진행새로고침Async(CancellationToken cancellationToken = default)
+    {
+        var orderNo = 상세.요청OrderNo;
+        if (string.IsNullOrWhiteSpace(orderNo))
+        {
+            return;
+        }
+
+        await Task.WhenAll(
+            상세.조회Async(orderNo, cancellationToken),
+            목록.페이지조회Async(Math.Max(1, 목록.현재페이지), cancellationToken));
+    }
 
     public void 주문선택해제() => 상세.선택해제();
 

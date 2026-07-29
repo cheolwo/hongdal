@@ -10,6 +10,7 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
     private readonly object _gate = new();
     private readonly SemaphoreSlim _serverInboxGate = new(1, 1);
     private readonly List<음식점주문DeskItem> _orders;
+    private readonly Dictionary<string, Guid> _operationRequestIds = new(StringComparer.OrdinalIgnoreCase);
     private readonly I음식주문ApiClient _foodOrderClient;
     private readonly I주문알림Service _orderAlertService;
     private readonly 음식점전표DraftFactory _slipFactory;
@@ -188,6 +189,9 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
                 주문번호,
                 new 음식점주문수락요청
                 {
+                    클라이언트요청Id = GetOperationRequestId(
+                        주문번호,
+                        "acceptance"),
                     음식점명 = _options.RestaurantName,
                     음식점주소 = _options.RestaurantAddress,
                     음식점상세주소 = _options.RestaurantDetailAddress,
@@ -247,10 +251,11 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
 
             ApplyDetail(item, detail);
             item.선택조리예상분 = 선택조리예상분;
-            item.상태 = 음식점주문Desk상태코드.수락됨;
+            item.상태 = 음식주문상태코드.Normalize(detail.상태);
             item.미확인 = false;
             item.수락시각 = DateTimeOffset.Now;
             item.최근메시지 = $"주문 수락 완료 · 조리 예상 {선택조리예상분}분 · 전표 출력 준비";
+            RemoveOperationRequestId(주문번호, "acceptance");
         }
 
         return new 음식점주문수락결과
@@ -262,6 +267,45 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
             전표Draft = draft
         };
     }
+
+    public Task<음식점주문DeskItem?> 주문거절Async(
+        string 주문번호,
+        string 사유,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(사유))
+        {
+            throw new ArgumentException("주문 거절 사유를 입력해 주세요.", nameof(사유));
+        }
+
+        return 진행변경Async(
+            주문번호,
+            음식점주문진행작업코드.거절,
+            조리예상분: null,
+            사유.Trim(),
+            cancellationToken);
+    }
+
+    public Task<음식점주문DeskItem?> 조리시간변경Async(
+        string 주문번호,
+        int 조리예상분,
+        CancellationToken cancellationToken = default)
+        => 진행변경Async(
+            주문번호,
+            음식점주문진행작업코드.조리시간변경,
+            음식점조리시간정책.Clamp(조리예상분),
+            사유: string.Empty,
+            cancellationToken);
+
+    public Task<음식점주문DeskItem?> 픽업준비완료Async(
+        string 주문번호,
+        CancellationToken cancellationToken = default)
+        => 진행변경Async(
+            주문번호,
+            음식점주문진행작업코드.픽업준비,
+            조리예상분: null,
+            사유: string.Empty,
+            cancellationToken);
 
     public Task 전표출력완료Async(string 주문번호, CancellationToken cancellationToken = default)
     {
@@ -351,10 +395,7 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
             return;
         }
 
-        if (item.상태 != 음식점주문Desk상태코드.전표출력됨)
-        {
-            item.상태 = 음식점주문Desk상태코드.수락됨;
-        }
+        item.상태 = 음식주문상태코드.Normalize(detail.상태);
 
         item.미확인 = false;
         item.수락시각 = detail.음식점수락시각Utc.HasValue
@@ -372,10 +413,66 @@ public sealed class 음식점주문DeskService : I음식점주문DeskService
         IEnumerable<음식주문상품Dto> 상품목록)
         => 상품목록.Select(item => new 음식주문상품Dto
         {
+            메뉴Id = item.메뉴Id,
             상품명 = item.상품명,
             수량 = item.수량,
             단가 = item.단가
         }).ToArray();
+
+    private async Task<음식점주문DeskItem?> 진행변경Async(
+        string 주문번호,
+        string 작업,
+        int? 조리예상분,
+        string 사유,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(주문번호);
+
+        var detail = await _foodOrderClient.음식점진행변경Async(
+            주문번호,
+            new 음식점주문진행변경요청
+            {
+                클라이언트요청Id = GetOperationRequestId(주문번호, 작업),
+                작업 = 작업,
+                조리예상분 = 조리예상분,
+                사유 = 사유
+            },
+            cancellationToken);
+        if (detail is null)
+        {
+            return null;
+        }
+
+        RemoveOperationRequestId(주문번호, 작업);
+        return UpsertServerOrder(
+            detail,
+            음식점주문복구출처.서버재조회);
+    }
+
+    private Guid GetOperationRequestId(string orderNo, string operation)
+    {
+        var key = $"{orderNo.Trim()}::{operation}";
+        lock (_gate)
+        {
+            if (_operationRequestIds.TryGetValue(key, out var existing))
+            {
+                return existing;
+            }
+
+            var created = Guid.NewGuid();
+            _operationRequestIds[key] = created;
+            return created;
+        }
+    }
+
+    private void RemoveOperationRequestId(string orderNo, string operation)
+    {
+        var key = $"{orderNo.Trim()}::{operation}";
+        lock (_gate)
+        {
+            _operationRequestIds.Remove(key);
+        }
+    }
 
     private IReadOnlyList<음식점주문상품조리기준> Build상품별조리기준(
         IEnumerable<음식주문상품Dto> 상품목록)

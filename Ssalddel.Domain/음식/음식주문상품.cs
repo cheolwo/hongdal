@@ -13,6 +13,9 @@ public class 음식주문상품
     [Column("음식주문_id")]
     public long 음식주문Id { get; set; }
 
+    [Column("메뉴_id")]
+    public long? 메뉴Id { get; set; }
+
     [Column("상품명")]
     [MaxLength(200)]
     public string 상품명 { get; set; } = string.Empty;

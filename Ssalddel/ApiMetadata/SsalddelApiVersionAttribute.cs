@@ -1021,6 +1021,14 @@ public static class SsalddelWorkflowScreens
             "/driver/recommendations",
             "배달 기사가 음식 픽업·전달 추천 의뢰를 확인합니다."),
         new(
+            SsalddelWorkflow.FoodDelivery,
+            "PlatformOperator",
+            "SsalddelAdmin",
+            "관리자 앱",
+            "음식 주문 운영 추적",
+            "/food/order-trace",
+            "운영자가 음식 주문번호로 배차·추천·운송·Outbox 상관관계와 복구 필요 상태를 확인합니다."),
+        new(
             SsalddelWorkflow.SsalddelMart,
             "MartOperator",
             "WarehouseManagerApp",

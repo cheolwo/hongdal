@@ -22,5 +22,19 @@ public interface I음식점주문DeskService
         int 조리예상분,
         CancellationToken cancellationToken = default);
 
+    Task<음식점주문DeskItem?> 주문거절Async(
+        string 주문번호,
+        string 사유,
+        CancellationToken cancellationToken = default);
+
+    Task<음식점주문DeskItem?> 조리시간변경Async(
+        string 주문번호,
+        int 조리예상분,
+        CancellationToken cancellationToken = default);
+
+    Task<음식점주문DeskItem?> 픽업준비완료Async(
+        string 주문번호,
+        CancellationToken cancellationToken = default);
+
     Task 전표출력완료Async(string 주문번호, CancellationToken cancellationToken = default);
 }

@@ -13,7 +13,8 @@
         </MudStack>
 
         <OrdererRestaurantWorkspace RestaurantId="@RestaurantId"
-                                    RestaurantSelected="OnRestaurantSelectedAsync" />
+                                    RestaurantSelected="OnRestaurantSelectedAsync"
+                                    OrderSubmitted="OnOrderSubmittedAsync" />
     </MudStack>
 </MudContainer>
 
@@ -27,6 +28,12 @@
             ? $"/food/restaurants?restaurantId={restaurantId.Value}"
             : "/food/restaurants";
         Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
+
+    private Task OnOrderSubmittedAsync(string orderNo)
+    {
+        Navigation.NavigateTo($"/orders/food?orderNo={Uri.EscapeDataString(orderNo)}");
         return Task.CompletedTask;
     }
 }

@@ -249,14 +249,32 @@ public sealed class 주문자음식주문조회UseCase(
                                 || currentTransportStatus != 음식주문배차상태코드.미요청;
         var driverAssigned = !string.IsNullOrWhiteSpace(transport?.확정기사Id)
                              || IsDriverAssignedStatus(currentTransportStatus);
+        var normalizedOrderStatus = 음식주문상태코드.Normalize(order.상태);
+        var delivered = normalizedOrderStatus is
+                            음식주문상태코드.전달완료 or
+                            음식주문상태코드.수령확인
+                        || currentTransportStatus is
+                            기사운송상태코드.인수완료 or
+                            음식주문배차상태코드.배달완료;
+        var receiptConfirmed = normalizedOrderStatus == 음식주문상태코드.수령확인;
+        var receiptConfirmedAt = order.상태이력
+            .Where(item => item.다음상태 == 음식주문상태코드.수령확인)
+            .OrderByDescending(item => item.전이시각Utc)
+            .ThenByDescending(item => item.Id)
+            .Select(item => (DateTime?)item.전이시각Utc)
+            .FirstOrDefault();
 
         return new 주문자음식배달진행응답
         {
             배차요청됨 = dispatchRequested,
             기사배정됨 = driverAssigned,
+            기사전달완료 = delivered,
+            주문자수령확인됨 = receiptConfirmed,
+            수령확인가능 = normalizedOrderStatus == 음식주문상태코드.전달완료,
             현재운송상태 = currentTransportStatus,
             안내 = ResolveDeliveryGuide(currentTransportStatus, order.상태),
-            최근변경시각Utc = transport?.UpdatedAt ?? order.배차요청시각Utc
+            최근변경시각Utc = Latest(transport?.UpdatedAt, order.UpdatedAt),
+            수령확인시각Utc = receiptConfirmedAt
         };
     }
 
@@ -294,7 +312,29 @@ public sealed class 주문자음식주문조회UseCase(
             or 음식주문배차상태코드.배달완료;
 
     private static string ResolveDeliveryGuide(string transportStatus, string orderStatus)
-        => transportStatus switch
+    {
+        var normalizedOrderStatus = 음식주문상태코드.Normalize(orderStatus);
+        if (normalizedOrderStatus == 음식주문상태코드.거절)
+        {
+            return "음식점이 주문을 처리할 수 없어 거절했습니다. 상세 상태 이력에서 사유를 확인해 주세요.";
+        }
+
+        if (normalizedOrderStatus == 음식주문상태코드.취소)
+        {
+            return "주문이 취소되어 배달이 진행되지 않습니다.";
+        }
+
+        if (normalizedOrderStatus == 음식주문상태코드.수령확인)
+        {
+            return "기사 전달과 주문자 수령 확인이 모두 완료되었습니다.";
+        }
+
+        if (normalizedOrderStatus == 음식주문상태코드.전달완료)
+        {
+            return "기사가 음식 전달을 완료했습니다. 실제 수령 상태를 확인해 주세요.";
+        }
+
+        return transportStatus switch
         {
             음식주문배차상태코드.미요청 when 음식주문상태코드.CanRestaurantAccept(orderStatus)
                 => "음식점이 주문을 수락하면 배달 기사 배차가 시작됩니다.",
@@ -328,6 +368,22 @@ public sealed class 주문자음식주문조회UseCase(
                 => "기존 기사 제안이 종료되어 다시 배달 가능 여부를 확인하고 있습니다.",
             _ => "배달 진행 상태를 확인하고 있습니다."
         };
+    }
+
+    private static DateTime? Latest(DateTime? first, DateTime? second)
+    {
+        if (!first.HasValue)
+        {
+            return second;
+        }
+
+        if (!second.HasValue)
+        {
+            return first;
+        }
+
+        return first.Value >= second.Value ? first : second;
+    }
 
     private static string BuildProductSummary(IReadOnlyList<음식주문상품> products)
     {

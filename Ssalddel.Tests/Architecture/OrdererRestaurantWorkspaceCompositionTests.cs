@@ -32,6 +32,8 @@ public sealed class OrdererRestaurantWorkspaceCompositionTests
     [InlineData("OrdererRestaurantResultList.razor.css")]
     [InlineData("OrdererRestaurantDetailPanel.razor")]
     [InlineData("OrdererRestaurantDetailPanel.razor.css")]
+    [InlineData("OrdererFoodOrderComposer.razor")]
+    [InlineData("OrdererFoodOrderComposer.razor.css")]
     [InlineData("OrdererRestaurantPresentation.cs")]
     public void 음식점_화면과_표현책임은_전용파일로_존재한다(string fileName)
     {

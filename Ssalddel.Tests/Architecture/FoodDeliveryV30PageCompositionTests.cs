@@ -28,6 +28,9 @@ public sealed class FoodDeliveryV30PageCompositionTests
         Assert.Contains("주문수락후전표준비Async", detail);
         Assert.Contains("이 주문의 조리 대기시간", detail);
         Assert.Contains("preparationMinutes", detail);
+        Assert.Contains("주문거절Async", detail);
+        Assert.Contains("조리시간변경Async", detail);
+        Assert.Contains("픽업준비완료Async", detail);
     }
 
     [Fact]
@@ -59,6 +62,7 @@ public sealed class FoodDeliveryV30PageCompositionTests
         Assert.DoesNotContain("RestaurantDeskSampleService", client);
         Assert.DoesNotContain("sampleService", desk);
         Assert.Contains("/restaurant-acceptance", client);
+        Assert.Contains("/restaurant-progress", client);
         Assert.Contains("SendAsync", client);
     }
 

@@ -41,13 +41,33 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
     }
 
     public 음식주문응답 AddOrder(음식주문등록요청 request)
+        => 멱등등록(request).주문;
+
+    public 음식주문저장결과 멱등등록(음식주문등록요청 request)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        lock (_gate)
+        {
+            if (request.클라이언트요청Id != Guid.Empty)
+            {
+                var existing = _orders.FirstOrDefault(x =>
+                    x.클라이언트요청Id == request.클라이언트요청Id
+                    && string.Equals(x.주문자UserId, request.주문자UserId, StringComparison.Ordinal));
+                if (existing is not null)
+                {
+                    return new 음식주문저장결과(FoodOrderSampleData.Clone(existing), false);
+                }
+            }
+        }
 
         var now = DateTime.UtcNow;
         var order = new 음식주문응답
         {
-            주문번호 = $"FOOD-{now:yyyyMMddHHmmssfff}",
+            주문번호 = $"FOOD-{now:yyyyMMddHHmmssfff}-{Guid.NewGuid().ToString("N")[..6]}",
+            클라이언트요청Id = request.클라이언트요청Id == Guid.Empty
+                ? null
+                : request.클라이언트요청Id,
             음식점Id = request.음식점Id,
             주문자UserId = request.주문자UserId.Trim(),
             수령인정보 = new 음식주문수령인정보Dto
@@ -61,6 +81,7 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             },
             상품목록 = request.상품목록.Select(x => new 음식주문상품Dto
             {
+                메뉴Id = x.메뉴Id,
                 상품명 = x.상품명,
                 수량 = x.수량,
                 단가 = x.단가
@@ -88,10 +109,19 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             _orders.Add(order);
         }
 
-        return FoodOrderSampleData.Clone(order);
+        return new 음식주문저장결과(FoodOrderSampleData.Clone(order), true);
     }
 
     public 음식주문응답? 음식점수락(string orderNo, 음식점주문수락요청 request)
+        => 음식점수락멱등(
+            orderNo,
+            request,
+            NormalizeOptional(request.처리UserId) ?? "restaurant:legacy")?.주문;
+
+    public 음식주문변경결과? 음식점수락멱등(
+        string orderNo,
+        음식점주문수락요청 request,
+        string 처리UserId)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -101,6 +131,12 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             if (order is null)
             {
                 return null;
+            }
+
+            var duplicate = FindDuplicate(order, request.클라이언트요청Id);
+            if (duplicate)
+            {
+                return new 음식주문변경결과(FoodOrderSampleData.Clone(order), false);
             }
 
             var currentStatus = 음식주문상태코드.Normalize(order.상태);
@@ -127,9 +163,106 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             order.조리예상완료시각Utc = now.AddMinutes(cookingMinutes);
             order.수락메모 = NormalizeOptional(request.수락메모);
             order.최근변경시각Utc = now;
-            order.상태이력 = AppendHistory(order, currentStatus, nextStatus, "음식점 주문 수락", now);
+            order.상태이력 = AppendHistory(
+                order,
+                currentStatus,
+                nextStatus,
+                "음식점 주문 수락",
+                now,
+                request.클라이언트요청Id,
+                처리UserId);
 
-            return FoodOrderSampleData.Clone(order);
+            return new 음식주문변경결과(FoodOrderSampleData.Clone(order), true);
+        }
+    }
+
+    public 음식주문변경결과? 음식점진행변경(
+        string orderNo,
+        음식점주문진행변경요청 request,
+        string 처리UserId)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        lock (_gate)
+        {
+            var order = _orders.FirstOrDefault(x =>
+                string.Equals(x.주문번호, orderNo, StringComparison.OrdinalIgnoreCase));
+            if (order is null)
+            {
+                return null;
+            }
+
+            if (FindDuplicate(order, request.클라이언트요청Id))
+            {
+                return new 음식주문변경결과(FoodOrderSampleData.Clone(order), false);
+            }
+
+            var currentStatus = 음식주문상태코드.Normalize(order.상태);
+            var decision = 음식점주문진행Policy.판정(currentStatus, request);
+            var now = DateTime.UtcNow;
+            order.상태 = decision.다음상태;
+            if (decision.조리예상분 is { } cookingMinutes)
+            {
+                order.조리예상완료시각Utc = now.AddMinutes(cookingMinutes);
+            }
+
+            order.최근변경시각Utc = now;
+            order.상태이력 = AppendHistory(
+                order,
+                currentStatus,
+                decision.다음상태,
+                decision.이력사유,
+                now,
+                request.클라이언트요청Id,
+                처리UserId);
+
+            return new 음식주문변경결과(FoodOrderSampleData.Clone(order), true);
+        }
+    }
+
+    public 음식주문변경결과? 주문자수령확인(
+        string orderNo,
+        주문자음식주문수령확인요청 request,
+        string 주문자UserId)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        lock (_gate)
+        {
+            var order = _orders.FirstOrDefault(x =>
+                string.Equals(x.주문번호, orderNo, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(x.주문자UserId, 주문자UserId, StringComparison.Ordinal));
+            if (order is null)
+            {
+                return null;
+            }
+
+            if (FindDuplicate(order, request.클라이언트요청Id)
+                || 음식주문상태코드.Normalize(order.상태) == 음식주문상태코드.수령확인)
+            {
+                return new 음식주문변경결과(FoodOrderSampleData.Clone(order), false);
+            }
+
+            var currentStatus = 음식주문상태코드.Normalize(order.상태);
+            if (currentStatus != 음식주문상태코드.전달완료)
+            {
+                throw new InvalidOperationException(
+                    $"기사 전달 완료 상태에서만 수령을 확인할 수 있습니다. 현재상태={order.상태}");
+            }
+
+            var now = DateTime.UtcNow;
+            order.상태 = 음식주문상태코드.수령확인;
+            order.최근변경시각Utc = now;
+            order.상태이력 = AppendHistory(
+                order,
+                currentStatus,
+                음식주문상태코드.수령확인,
+                BuildReceiptConfirmationReason(request.확인메모),
+                now,
+                request.클라이언트요청Id,
+                주문자UserId);
+
+            return new 음식주문변경결과(FoodOrderSampleData.Clone(order), true);
         }
     }
 
@@ -187,13 +320,17 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
         string previousStatus,
         string nextStatus,
         string reason,
-        DateTime changedAtUtc)
+        DateTime changedAtUtc,
+        Guid clientRequestId = default,
+        string? actorUserId = null)
     {
         return order.상태이력
             .Concat(
             [
                 new 음식주문상태전이기록Dto
                 {
+                    클라이언트요청Id = clientRequestId == Guid.Empty ? null : clientRequestId,
+                    처리UserId = NormalizeOptional(actorUserId),
                     이전상태 = previousStatus,
                     다음상태 = nextStatus,
                     사유 = reason,
@@ -202,6 +339,15 @@ public sealed class InMemorySsalddelFoodOrderStore : ISsalddelFoodOrderStore, I�
             ])
             .ToArray();
     }
+
+    private static bool FindDuplicate(음식주문응답 order, Guid clientRequestId)
+        => clientRequestId != Guid.Empty
+           && order.상태이력.Any(history => history.클라이언트요청Id == clientRequestId);
+
+    private static string BuildReceiptConfirmationReason(string? note)
+        => NormalizeOptional(note) is { } cleanNote
+            ? $"주문자 수령 확인 · {cleanNote}"
+            : "주문자 수령 확인";
 
     private static string? NormalizeOptional(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

@@ -315,10 +315,11 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             x.ServiceType == typeof(판매채널계정PageViewModel)
             && x.ImplementationType == typeof(판매채널계정PageViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
-        Assert.Contains(services, x =>
-            x.ServiceType == typeof(I판매채널주문읽기Service)
-            && x.ImplementationType == typeof(판매채널주문Client)
-            && x.Lifetime == ServiceLifetime.Scoped);
+        var salesOrderReadDescriptor = Assert.Single(
+            services,
+            x => x.ServiceType == typeof(I판매채널주문읽기Service));
+        Assert.NotNull(salesOrderReadDescriptor.ImplementationFactory);
+        Assert.Equal(ServiceLifetime.Scoped, salesOrderReadDescriptor.Lifetime);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(판매채널주문PageViewModel)
             && x.ImplementationType == typeof(판매채널주문PageViewModel)
@@ -340,6 +341,10 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(I주문자음식주문읽기Service)
+            && x.ImplementationType == typeof(주문자음식주문Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I주문자음식주문수령확인Service)
             && x.ImplementationType == typeof(주문자음식주문Client)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>

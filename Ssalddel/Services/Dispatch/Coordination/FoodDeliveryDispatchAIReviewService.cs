@@ -683,7 +683,10 @@ public sealed class FoodDeliveryDispatchAIReviewService : IFoodDeliveryDispatchA
     private static bool IsReviewTarget(음식주문응답 order)
     {
         var status = 음식주문상태코드.Normalize(order.상태);
-        return status is not 음식주문상태코드.전달완료 and not 음식주문상태코드.취소;
+        return status is not 음식주문상태코드.전달완료
+            and not 음식주문상태코드.수령확인
+            and not 음식주문상태코드.거절
+            and not 음식주문상태코드.취소;
     }
 
     private static bool IsDefaultFoodOrderSample(음식주문응답 order)

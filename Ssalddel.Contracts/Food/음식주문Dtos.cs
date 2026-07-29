@@ -10,6 +10,8 @@ public static class 음식주문상태코드
     public const string 기사배정 = "기사배정";
     public const string 픽업완료 = "픽업완료";
     public const string 전달완료 = "전달완료";
+    public const string 수령확인 = "수령확인";
+    public const string 거절 = "거절";
     public const string 취소 = "취소";
 
     public static IReadOnlyList<string> 전체 { get; } =
@@ -20,6 +22,8 @@ public static class 음식주문상태코드
         기사배정,
         픽업완료,
         전달완료,
+        수령확인,
+        거절,
         취소
     ];
 
@@ -33,6 +37,8 @@ public static class 음식주문상태코드
             기사배정 => 기사배정,
             픽업완료 => 픽업완료,
             전달완료 => 전달완료,
+            수령확인 => 수령확인,
+            거절 => 거절,
             취소 => 취소,
             _ => 주문대기
         };
@@ -75,11 +81,36 @@ public static class 음식점주문수신함처리상태코드
 
     public static bool 미처리여부(string? 주문상태)
         => 음식주문상태코드.Normalize(주문상태) is not 음식주문상태코드.전달완료
+            and not 음식주문상태코드.수령확인
+            and not 음식주문상태코드.거절
             and not 음식주문상태코드.취소;
+}
+
+public static class 음식점주문진행작업코드
+{
+    public const string 거절 = "거절";
+    public const string 조리시간변경 = "조리시간변경";
+    public const string 픽업준비 = "픽업준비";
+
+    public static IReadOnlyList<string> 전체 { get; } =
+    [
+        거절,
+        조리시간변경,
+        픽업준비
+    ];
+
+    public static bool 지원여부(string? value)
+        => !string.IsNullOrWhiteSpace(value)
+           && 전체.Contains(value.Trim(), StringComparer.Ordinal);
 }
 
 public sealed class 음식주문상품Dto
 {
+    /// <summary>
+    /// 주문 등록 때 선택한 공개 메뉴 ID입니다.
+    /// 과거 주문 스냅샷 응답은 값이 없을 수 있습니다.
+    /// </summary>
+    public long? 메뉴Id { get; set; }
     public string 상품명 { get; set; } = string.Empty;
     public int 수량 { get; set; }
     public decimal 단가 { get; set; }
@@ -87,6 +118,7 @@ public sealed class 음식주문상품Dto
 
 public sealed class 음식주문등록요청
 {
+    public Guid 클라이언트요청Id { get; set; }
     public long 음식점Id { get; set; }
     public string 주문자UserId { get; set; } = string.Empty;
     public 음식주문수령인정보Dto 수령인정보 { get; set; } = new();
@@ -96,6 +128,7 @@ public sealed class 음식주문등록요청
 
 public sealed class 음식점주문수락요청
 {
+    public Guid 클라이언트요청Id { get; set; }
     public string? 처리UserId { get; set; }
     public string 음식점명 { get; set; } = string.Empty;
     public string 음식점주소 { get; set; } = string.Empty;
@@ -107,9 +140,24 @@ public sealed class 음식점주문수락요청
     public string? 수락메모 { get; set; }
 }
 
+public sealed class 음식점주문진행변경요청
+{
+    public Guid 클라이언트요청Id { get; set; }
+    public string 작업 { get; set; } = string.Empty;
+    public int? 조리예상분 { get; set; }
+    public string 사유 { get; set; } = string.Empty;
+}
+
+public sealed class 주문자음식주문수령확인요청
+{
+    public Guid 클라이언트요청Id { get; set; }
+    public string 확인메모 { get; set; } = string.Empty;
+}
+
 public sealed class 음식주문응답
 {
     public string 주문번호 { get; set; } = string.Empty;
+    public Guid? 클라이언트요청Id { get; set; }
     public long 음식점Id { get; set; }
     public string 음식점명 { get; set; } = string.Empty;
     public string 음식점주소 { get; set; } = string.Empty;
@@ -209,13 +257,19 @@ public sealed class 주문자음식배달진행응답
 {
     public bool 배차요청됨 { get; set; }
     public bool 기사배정됨 { get; set; }
+    public bool 기사전달완료 { get; set; }
+    public bool 주문자수령확인됨 { get; set; }
+    public bool 수령확인가능 { get; set; }
     public string 현재운송상태 { get; set; } = 음식주문배차상태코드.미요청;
     public string 안내 { get; set; } = "음식점이 주문을 수락하면 배달 기사 배차가 시작됩니다.";
     public DateTime? 최근변경시각Utc { get; set; }
+    public DateTime? 수령확인시각Utc { get; set; }
 }
 
 public sealed class 음식주문상태전이기록Dto
 {
+    public Guid? 클라이언트요청Id { get; set; }
+    public string? 처리UserId { get; set; }
     public string 이전상태 { get; set; } = string.Empty;
     public string 다음상태 { get; set; } = string.Empty;
     public string 사유 { get; set; } = string.Empty;

@@ -11,6 +11,7 @@ public sealed class 음식주문상품Configuration : IEntityTypeConfiguration<�
         builder.ToTable("음식주문상품");
 
         builder.HasIndex(x => x.음식주문Id);
+        builder.HasIndex(x => new { x.음식주문Id, x.메뉴Id });
         builder.HasIndex(x => x.상품명);
     }
 }

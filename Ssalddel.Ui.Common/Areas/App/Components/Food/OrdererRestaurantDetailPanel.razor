@@ -62,14 +62,32 @@
                             {
                                 <MudChip T="string" Size="Size.Small" Color="Color.Default">품절</MudChip>
                             }
+                            else
+                            {
+                                <div class="restaurant-menu-quantity" aria-label="@($"{menu.메뉴명} 주문 수량")">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove"
+                                                   Size="Size.Small"
+                                                   Disabled="@(Writer.메뉴수량(menu.Id) == 0 || Writer.처리중)"
+                                                   OnClick="@(() => Writer.메뉴수량변경(menu.Id, -1))"
+                                                   aria-label="@($"{menu.메뉴명} 수량 줄이기")" />
+                                    <span>@Writer.메뉴수량(menu.Id)</span>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                                   Size="Size.Small"
+                                                   Color="Color.Primary"
+                                                   Disabled="@Writer.처리중"
+                                                   OnClick="@(() => Writer.메뉴수량변경(menu.Id, 1))"
+                                                   aria-label="@($"{menu.메뉴명} 수량 늘리기")" />
+                                </div>
+                            }
                         </div>
                     </div>
                 }
             </div>
         }
-        <MudAlert Severity="Severity.Warning" Variant="Variant.Text" Dense="true" Class="mt-3">
-            메뉴 선택과 주문 상세 생성은 다음 P1 페이지에서 연결합니다. 현재 메뉴 조회는 주문 의향이나 결제를 저장하지 않습니다.
-        </MudAlert>
+        <OrdererFoodOrderComposer Authentication="Authentication"
+                                   Writer="Writer"
+                                   LoginRequested="LoginRequested"
+                                   SubmitRequested="SubmitRequested" />
     }
     else
     {
@@ -85,9 +103,21 @@
     [Parameter, EditorRequired]
     public 음식점공개상세ViewModel Detail { get; set; } = null!;
 
+    [Parameter, EditorRequired]
+    public 주문자앱인증ViewModel Authentication { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public 음식주문작성ViewModel Writer { get; set; } = null!;
+
     [Parameter]
     public EventCallback<long> RetryRequested { get; set; }
 
     [Parameter]
     public EventCallback ClearRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<공통로그인요청> LoginRequested { get; set; }
+
+    [Parameter]
+    public EventCallback SubmitRequested { get; set; }
 }

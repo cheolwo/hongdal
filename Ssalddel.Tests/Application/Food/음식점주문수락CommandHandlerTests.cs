@@ -23,6 +23,7 @@ public sealed class 음식점주문수락CommandHandlerTests
                 order.주문번호,
                 new 음식점주문수락요청
                 {
+                    클라이언트요청Id = Guid.NewGuid(),
                     처리UserId = "body-restaurant-user",
                     음식점명 = "살뜰분식",
                     음식점주소 = "서울특별시 마포구 월드컵북로 1",
@@ -38,27 +39,52 @@ public sealed class 음식점주문수락CommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_명령UserId가없으면_요청본문의처리UserId를사용한다()
+    public async Task Handle_인증된처리UserId가없으면_본문UserId를신뢰하지않는다()
     {
         var store = new InMemorySsalddelFoodOrderStore();
         var publisher = new RecordingPublisher();
         var handler = new 음식점주문수락CommandHandler(store, publisher);
         var order = store.AddOrder(CreateOrderRequest());
 
-        await handler.Handle(
-            new 음식점주문수락Command(
+        var command = new 음식점주문수락Command(
                 order.주문번호,
                 new 음식점주문수락요청
                 {
+                    클라이언트요청Id = Guid.NewGuid(),
                     처리UserId = "body-restaurant-user",
                     음식점명 = "살뜰분식",
                     음식점주소 = "서울특별시 마포구 월드컵북로 1"
                 },
-                null),
-            CancellationToken.None);
+                null);
 
-        var notification = Assert.IsType<음식점주문수락됨Event>(Assert.Single(publisher.Notifications));
-        Assert.Equal("body-restaurant-user", notification.처리UserId);
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => handler.Handle(command, CancellationToken.None));
+        Assert.Empty(publisher.Notifications);
+    }
+
+    [Fact]
+    public async Task Handle_같은클라이언트요청Id재시도는_배차이벤트를다시발행하지않는다()
+    {
+        var store = new InMemorySsalddelFoodOrderStore();
+        var publisher = new RecordingPublisher();
+        var handler = new 음식점주문수락CommandHandler(store, publisher);
+        var order = store.AddOrder(CreateOrderRequest());
+        var command = new 음식점주문수락Command(
+            order.주문번호,
+            new 음식점주문수락요청
+            {
+                클라이언트요청Id = Guid.NewGuid(),
+                음식점명 = "살뜰분식",
+                음식점주소 = "서울특별시 마포구 월드컵북로 1",
+                조리예상분 = 20
+            },
+            "restaurant-user");
+
+        var first = await handler.Handle(command, CancellationToken.None);
+        var retried = await handler.Handle(command, CancellationToken.None);
+
+        Assert.Equal(first?.주문번호, retried?.주문번호);
+        Assert.Single(publisher.Notifications);
     }
 
     private static 음식주문등록요청 CreateOrderRequest()

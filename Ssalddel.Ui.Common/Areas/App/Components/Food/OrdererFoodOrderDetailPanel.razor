@@ -104,6 +104,69 @@
                 <SsalddelSensitiveInfoRow Label="현재 운송 단계" Value="@OrdererFoodOrderPresentation.DeliveryStatusLabel(detail.배달진행)" />
                 <SsalddelSensitiveInfoRow Label="기사 배정" Value="@(detail.배달진행.기사배정됨 ? "배정됨" : "아직 배정되지 않음")" />
                 <SsalddelSensitiveInfoRow Label="최근 변경" Value="@OrdererFoodOrderPresentation.FormatOptionalDate(detail.배달진행.최근변경시각Utc)" />
+                <div class="food-order-receipt-steps" aria-label="전달과 수령 확인 단계">
+                    <div class="food-order-receipt-step @(detail.배달진행.기사전달완료 ? "food-order-receipt-step--done" : string.Empty)">
+                        <MudIcon Icon="@(detail.배달진행.기사전달완료 ? Icons.Material.Filled.CheckCircle : Icons.Material.Outlined.RadioButtonUnchecked)"
+                                 Color="@(detail.배달진행.기사전달완료 ? Color.Success : Color.Default)"
+                                 Size="Size.Small" />
+                        <span>
+                            <strong>1. 기사 전달 완료</strong>
+                            <small>@(detail.배달진행.기사전달완료 ? "기사가 전달 완료를 기록했습니다." : "기사의 전달 완료를 기다리고 있습니다.")</small>
+                        </span>
+                    </div>
+                    <div class="food-order-receipt-step @(detail.배달진행.주문자수령확인됨 ? "food-order-receipt-step--done" : string.Empty)">
+                        <MudIcon Icon="@(detail.배달진행.주문자수령확인됨 ? Icons.Material.Filled.Verified : Icons.Material.Outlined.RadioButtonUnchecked)"
+                                 Color="@(detail.배달진행.주문자수령확인됨 ? Color.Success : Color.Default)"
+                                 Size="Size.Small" />
+                        <span>
+                            <strong>2. 주문자 수령 확인</strong>
+                            <small>
+                                @(detail.배달진행.주문자수령확인됨
+                                    ? $"확인 {OrdererFoodOrderPresentation.FormatOptionalDate(detail.배달진행.수령확인시각Utc)}"
+                                    : "실제 음식을 받은 뒤 주문자가 직접 확인합니다.")
+                            </small>
+                        </span>
+                    </div>
+                </div>
+
+                @if (detail.배달진행.수령확인가능)
+                {
+                    <div class="food-order-receipt-action">
+                        <MudTextField T="string"
+                                      @bind-Value="Detail.수령확인메모"
+                                      Label="수령 확인 메모 (선택)"
+                                      Placeholder="예: 문 앞에서 정상 수령"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      MaxLength="500"
+                                      Counter="500"
+                                      Lines="2" />
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                            실제 수령한 뒤 확인해 주세요. 기사 전달 완료와 주문자 수령 확인은 서로 다른 기록으로 보관됩니다.
+                        </MudAlert>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Verified"
+                                   Disabled="@Detail.처리중"
+                                   OnClick="ReceiptConfirmationRequested">
+                            음식 수령 확인
+                        </MudButton>
+                    </div>
+                }
+                else if (detail.배달진행.주문자수령확인됨)
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Dense="true">
+                        기사 전달과 주문자 수령 확인이 모두 완료되었습니다.
+                    </MudAlert>
+                }
+
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@Detail.처리중"
+                           OnClick="@(() => RefreshRequested.InvokeAsync(detail.주문.주문번호))">
+                    진행 상태 새로고침
+                </MudButton>
                 <MudText Typo="Typo.caption" Color="Color.Secondary">
                     기사 신원과 상세 위치는 노출하지 않고 주문 이행에 필요한 진행 단계만 표시합니다.
                 </MudText>
@@ -144,6 +207,12 @@
 
     [Parameter]
     public EventCallback<string> RetryRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<string> RefreshRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ReceiptConfirmationRequested { get; set; }
 
     [Parameter]
     public EventCallback CloseRequested { get; set; }

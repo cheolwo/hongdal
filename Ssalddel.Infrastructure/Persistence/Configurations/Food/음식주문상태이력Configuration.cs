@@ -11,5 +11,7 @@ public sealed class 음식주문상태이력Configuration : IEntityTypeConfigura
         builder.ToTable("음식주문상태이력");
 
         builder.HasIndex(x => new { x.음식주문Id, x.전이시각Utc });
+        builder.HasIndex(x => new { x.음식주문Id, x.클라이언트요청Id })
+            .IsUnique();
     }
 }

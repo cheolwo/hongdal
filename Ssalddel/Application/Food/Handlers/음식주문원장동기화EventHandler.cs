@@ -6,7 +6,9 @@ namespace Ssalddel.Application.Food.Handlers;
 
 public sealed class 음식주문원장동기화EventHandler :
     INotificationHandler<음식주문등록됨Event>,
-    INotificationHandler<음식점주문수락됨Event>
+    INotificationHandler<음식점주문수락됨Event>,
+    INotificationHandler<음식점주문진행변경됨Event>,
+    INotificationHandler<주문자음식주문수령확인됨Event>
 {
     private readonly I음식마트원장동기화OutboxService _원장동기화OutboxService;
     private readonly ILogger<음식주문원장동기화EventHandler> _logger;
@@ -30,6 +32,20 @@ public sealed class 음식주문원장동기화EventHandler :
         => 원장동기화Async(
             notification.주문,
             notification.처리UserId ?? $"restaurant:{notification.주문.음식점Id}",
+            notification.EventId,
+            cancellationToken);
+
+    public Task Handle(음식점주문진행변경됨Event notification, CancellationToken cancellationToken)
+        => 원장동기화Async(
+            notification.주문,
+            notification.처리UserId,
+            notification.EventId,
+            cancellationToken);
+
+    public Task Handle(주문자음식주문수령확인됨Event notification, CancellationToken cancellationToken)
+        => 원장동기화Async(
+            notification.주문,
+            notification.주문자UserId,
             notification.EventId,
             cancellationToken);
 

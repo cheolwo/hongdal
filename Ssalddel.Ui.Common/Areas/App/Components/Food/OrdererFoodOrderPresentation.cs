@@ -45,8 +45,8 @@ internal static class OrdererFoodOrderPresentation
     public static Color StatusColor(string? status)
         => 음식주문상태코드.Normalize(status) switch
         {
-            음식주문상태코드.전달완료 => Color.Success,
-            음식주문상태코드.취소 => Color.Error,
+            음식주문상태코드.전달완료 or 음식주문상태코드.수령확인 => Color.Success,
+            음식주문상태코드.거절 or 음식주문상태코드.취소 => Color.Error,
             음식주문상태코드.조리중 or 음식주문상태코드.픽업대기 => Color.Info,
             음식주문상태코드.기사배정 or 음식주문상태코드.픽업완료 => Color.Primary,
             _ => Color.Warning

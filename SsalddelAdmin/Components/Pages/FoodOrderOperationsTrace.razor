@@ -1,0 +1,318 @@
+@page "/food/order-trace"
+@using Ssalddel.Contracts.Admin.Food
+@inject FoodOrderOperationsTraceAdminService TraceService
+
+<PageTitle>음식 주문 운영 추적</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">음식 주문 운영 추적</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            주문번호 하나로 음식 주문, 배차·추천, 기사 전달, 주문자 수령 확인과 Outbox 상태를 확인합니다.
+        </MudText>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        수령지 주소·연락처·Outbox payload는 이 화면에 표시하지 않습니다. 원장을 직접 수정하지 않고 복구 경로만 안내합니다.
+    </MudAlert>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Row="true" AlignItems="AlignItems.End" Spacing="2" Style="flex-wrap: wrap;">
+            <MudTextField T="string"
+                          Label="음식 주문번호"
+                          Variant="Variant.Outlined"
+                          Placeholder="예: FOOD-20260728-001"
+                          Style="min-width: 280px; flex: 1;"
+                          Immediate="true"
+                          @bind-Value="orderNo"
+                          OnKeyDown="HandleKeyDown" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.ManageSearch"
+                       Disabled="@isLoading"
+                       OnClick="LoadAsync">
+                @(isLoading ? "조회 중" : "운영 상태 조회")
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+    }
+    else if (notFound)
+    {
+        <MudAlert Severity="Severity.Warning">해당 주문번호의 음식 주문을 찾지 못했습니다.</MudAlert>
+    }
+
+    @if (isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (trace is not null)
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Style="flex-wrap: wrap;">
+                    <MudText Typo="Typo.h5">@trace.주문번호</MudText>
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Color="@ResolveColor(trace.전체상태)"
+                             Variant="Variant.Filled">
+                        @trace.전체상태
+                    </MudChip>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@trace.음식점명</MudText>
+                </MudStack>
+
+                <MudGrid Spacing="2">
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">주문 상태</MudText>
+                        <MudText Typo="Typo.subtitle2">@trace.주문상태</MudText>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">배차 상태</MudText>
+                        <MudText Typo="Typo.subtitle2">@trace.배차상태</MudText>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">추천 상태</MudText>
+                        <MudText Typo="Typo.subtitle2">@trace.추천상태 · @trace.추천라운드 회차</MudText>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">운송 상태</MudText>
+                        <MudText Typo="Typo.subtitle2">@DisplayOrDash(trace.운송상태)</MudText>
+                    </MudItem>
+                </MudGrid>
+
+                <MudDivider />
+
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="4">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">배차대기 ID</MudText>
+                        <MudText Typo="Typo.body2">@DisplayId(trace.배차대기Id)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">운송번호</MudText>
+                        <MudText Typo="Typo.body2">@DisplayOrDash(trace.운송번호)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">원본 의뢰</MudText>
+                        <MudText Typo="Typo.body2">@DisplayCorrelation(trace.원본의뢰유형, trace.원본의뢰Id)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">공동 원장</MudText>
+                        <MudText Typo="Typo.body2">@DisplayCorrelation(trace.커뮤니티원장상태, trace.커뮤니티원장Id)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">최근 변경</MudText>
+                        <MudText Typo="Typo.body2">@FormatDate(trace.최근변경시각Utc)</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudStack>
+        </MudPaper>
+
+        @if (trace.경고목록.Count > 0)
+        {
+            <MudStack Spacing="1">
+                @foreach (var warning in trace.경고목록)
+                {
+                    <MudAlert Severity="Severity.Warning" Dense="true">@warning</MudAlert>
+                }
+            </MudStack>
+        }
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" lg="7">
+                <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6">업무 체크포인트</MudText>
+                        @foreach (var checkpoint in trace.체크포인트)
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.subtitle2">@checkpoint.단계명</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@checkpoint.설명</MudText>
+                                        @if (checkpoint.변경시각Utc.HasValue)
+                                        {
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @FormatDate(checkpoint.변경시각Utc.Value)
+                                            </MudText>
+                                        }
+                                    </MudStack>
+                                    <MudChip T="string"
+                                             Size="Size.Small"
+                                             Color="@ResolveColor(checkpoint.상태)"
+                                             Variant="Variant.Outlined">
+                                        @checkpoint.상태
+                                    </MudChip>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" lg="5">
+                <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6">복구 안내</MudText>
+                        @if (trace.복구안내목록.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Success" Dense="true">
+                                현재 운영자가 개입해야 할 복구 안내가 없습니다.
+                            </MudAlert>
+                        }
+                        else
+                        {
+                            @foreach (var guide in trace.복구안내목록)
+                            {
+                                <MudAlert Severity="Severity.Info" Dense="true">@guide</MudAlert>
+                            }
+                        }
+
+                        @if (trace.추천만료시각Utc.HasValue)
+                        {
+                            <MudDivider />
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">추천 만료 시각</MudText>
+                            <MudText Typo="Typo.body2">@FormatDate(trace.추천만료시각Utc.Value)</MudText>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">Outbox 상태</MudText>
+                @if (trace.Outbox목록.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Warning" Dense="true">연결된 Outbox 기록이 없습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="@trace.Outbox목록" Dense="true" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>종류</MudTh>
+                            <MudTh>ID</MudTh>
+                            <MudTh>상태</MudTh>
+                            <MudTh>시도</MudTh>
+                            <MudTh>갱신</MudTh>
+                            <MudTh>판정</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="종류">@context.종류</MudTd>
+                            <MudTd DataLabel="ID">@context.OutboxId</MudTd>
+                            <MudTd DataLabel="상태">@context.상태</MudTd>
+                            <MudTd DataLabel="시도">@context.시도횟수</MudTd>
+                            <MudTd DataLabel="갱신">@FormatDate(context.갱신시각Utc)</MudTd>
+                            <MudTd DataLabel="판정">
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Color="@(context.운영자확인필요 ? Color.Error : context.재시도예정 ? Color.Warning : Color.Success)"
+                                         Variant="Variant.Outlined">
+                                    @(context.운영자확인필요 ? "확인 필요" : context.재시도예정 ? "재시도 예정" : "정상")
+                                </MudChip>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">운송 감사 이벤트</MudText>
+                @if (trace.운송이벤트목록.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">연결된 운송 이벤트가 없습니다.</MudText>
+                }
+                else
+                {
+                    <MudTable Items="@trace.운송이벤트목록" Dense="true" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>이벤트 ID</MudTh>
+                            <MudTh>유형</MudTh>
+                            <MudTh>시각</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="이벤트 ID">@context.이벤트Id</MudTd>
+                            <MudTd DataLabel="유형">@context.이벤트유형</MudTd>
+                            <MudTd DataLabel="시각">@FormatDate(context.이벤트시각Utc)</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
+
+@code {
+    private string orderNo = string.Empty;
+    private 음식주문운영추적응답? trace;
+    private bool isLoading;
+    private bool notFound;
+    private string? errorMessage;
+
+    private async Task LoadAsync()
+    {
+        if (isLoading)
+        {
+            return;
+        }
+
+        isLoading = true;
+        notFound = false;
+        errorMessage = null;
+        trace = null;
+
+        try
+        {
+            trace = await TraceService.조회Async(orderNo);
+            notFound = trace is null;
+        }
+        catch (ArgumentException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"운영 추적 정보를 불러오지 못했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await LoadAsync();
+        }
+    }
+
+    private static Color ResolveColor(string status)
+        => status switch
+        {
+            음식주문운영추적상태코드.완료 or 음식주문운영추적상태코드.정상 => Color.Success,
+            음식주문운영추적상태코드.복구필요 => Color.Error,
+            음식주문운영추적상태코드.주의 => Color.Warning,
+            음식주문운영추적상태코드.종료 or 음식주문운영추적상태코드.해당없음 => Color.Default,
+            _ => Color.Info
+        };
+
+    private static string DisplayOrDash(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private static string DisplayId(long? value)
+        => value.HasValue ? value.Value.ToString() : "—";
+
+    private static string DisplayCorrelation(string? typeOrStatus, string? id)
+        => string.IsNullOrWhiteSpace(typeOrStatus) && string.IsNullOrWhiteSpace(id)
+            ? "—"
+            : $"{DisplayOrDash(typeOrStatus)} · {DisplayOrDash(id)}";
+
+    private static string FormatDate(DateTime value)
+        => value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+}

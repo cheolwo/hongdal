@@ -55,6 +55,12 @@ public partial class OrdererFoodOrderWorkspace
     private Task RetryOrderAsync(string orderNo)
         => ViewModel.주문선택Async(orderNo);
 
+    private Task RefreshOrderAsync(string orderNo)
+        => ViewModel.주문진행새로고침Async();
+
+    private Task ConfirmReceiptAsync()
+        => ViewModel.주문수령확인Async();
+
     private async Task ClearSelectionAsync()
     {
         ViewModel.주문선택해제();

@@ -261,7 +261,11 @@
     {
         음식점주문Desk상태코드.주문대기 => Color.Error,
         음식점주문Desk상태코드.수락처리중 => Color.Info,
-        음식점주문Desk상태코드.수락됨 => Color.Primary,
+        음식점주문Desk상태코드.조리중 => Color.Primary,
+        음식점주문Desk상태코드.픽업대기 => Color.Success,
+        음식점주문Desk상태코드.거절 or 음식점주문Desk상태코드.취소 => Color.Error,
+        음식점주문Desk상태코드.기사배정 or 음식점주문Desk상태코드.픽업완료 => Color.Info,
+        음식점주문Desk상태코드.전달완료 or 음식점주문Desk상태코드.수령확인 => Color.Success,
         음식점주문Desk상태코드.전표출력됨 => Color.Success,
         음식점주문Desk상태코드.상세조회실패 => Color.Warning,
         _ => Color.Default

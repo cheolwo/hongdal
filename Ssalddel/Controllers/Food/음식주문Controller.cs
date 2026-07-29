@@ -42,6 +42,38 @@ public sealed class 음식주문Controller(
         return Ok(await commandUseCase.등록Async(request, cancellationToken));
     }
 
+    [HttpPost("{orderNo}/receipt-confirmation")]
+    [Authorize]
+    public async Task<ActionResult<음식주문응답>> 주문자수령확인(
+        string orderNo,
+        [FromBody] 주문자음식주문수령확인요청 request,
+        CancellationToken cancellationToken)
+    {
+        var ordererUserId = 현재사용자Id();
+        if (string.IsNullOrWhiteSpace(ordererUserId))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var order = await commandUseCase.주문자수령확인Async(
+                orderNo,
+                request,
+                ordererUserId,
+                cancellationToken);
+            return order is null ? NotFound() : Ok(order);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     [HttpGet("restaurant/inbox")]
     [Authorize(Policy = "음식점운영자전용")]
     public ActionResult<음식점주문수신함응답> 음식점수신함(
@@ -83,7 +115,8 @@ public sealed class 음식주문Controller(
         CancellationToken cancellationToken)
     {
         var restaurantId = 현재음식점Id();
-        if (restaurantId is null)
+        var actorUserId = 현재사용자Id();
+        if (restaurantId is null || string.IsNullOrWhiteSpace(actorUserId))
         {
             return Forbid();
         }
@@ -93,12 +126,61 @@ public sealed class 음식주문Controller(
             return NotFound();
         }
 
-        var order = await commandUseCase.음식점수락Async(
-            orderNo,
-            request,
-            현재사용자Id(),
-            cancellationToken);
-        return order is null ? NotFound() : Ok(order);
+        try
+        {
+            var order = await commandUseCase.음식점수락Async(
+                orderNo,
+                request,
+                actorUserId,
+                cancellationToken);
+            return order is null ? NotFound() : Ok(order);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("{orderNo}/restaurant-progress")]
+    [Authorize(Policy = "음식점운영자전용")]
+    public async Task<ActionResult<음식주문응답>> 음식점진행변경(
+        string orderNo,
+        [FromBody] 음식점주문진행변경요청 request,
+        CancellationToken cancellationToken)
+    {
+        var restaurantId = 현재음식점Id();
+        var actorUserId = 현재사용자Id();
+        if (restaurantId is null || string.IsNullOrWhiteSpace(actorUserId))
+        {
+            return Forbid();
+        }
+
+        if (restaurantReadUseCase.상세(orderNo, restaurantId.Value) is null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            var order = await commandUseCase.음식점진행변경Async(
+                orderNo,
+                request,
+                actorUserId,
+                cancellationToken);
+            return order is null ? NotFound() : Ok(order);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     private string? 현재사용자Id()

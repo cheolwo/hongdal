@@ -81,10 +81,13 @@ public sealed class 음식점리뷰UseCase(SsalddelContext db) : I음식점리�
         var order = await db.음식주문
             .AsNoTracking()
             .SingleOrDefaultAsync(item => item.주문번호 == orderNo, cancellationToken);
+        var normalizedOrderStatus = 음식주문상태코드.Normalize(order?.상태);
         if (order is null
             || order.음식점Id != 음식점Id
             || !string.Equals(order.주문자UserId, userId, StringComparison.Ordinal)
-            || 음식주문상태코드.Normalize(order.상태) != 음식주문상태코드.전달완료)
+            || normalizedOrderStatus is not (
+                음식주문상태코드.전달완료 or
+                음식주문상태코드.수령확인))
         {
             return NotFound<음식점리뷰요약응답>(
                 "리뷰를 작성할 수 있는 전달 완료 음식 주문을 찾지 못했습니다.");

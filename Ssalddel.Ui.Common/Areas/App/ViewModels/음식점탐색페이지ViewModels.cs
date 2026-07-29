@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Food;
 using Ssalddel.Contracts.Restaurants;
 using Ssalddel.Ui.Common.Areas.App.Services;
 
@@ -233,23 +234,244 @@ public sealed partial class 음식점공개상세ViewModel(
     }
 }
 
-/// <summary>접근·탐색 기준·목록·정확한 상세 ViewModel을 조립합니다.</summary>
+public sealed record 음식주문선택항목ViewModel(
+    long 메뉴Id,
+    string 메뉴명,
+    int 수량,
+    decimal 단가)
+{
+    public decimal 합계 => 단가 * 수량;
+}
+
+/// <summary>
+/// 정확한 음식점 공개 메뉴의 수량과 수령 정보를 모으고 인증된 음식 주문
+/// 등록 API 한 건만 실행합니다.
+/// </summary>
+public sealed partial class 음식주문작성ViewModel(
+    I주문자음식주문쓰기Service service) : 업무작업ViewModelBase
+{
+    private readonly Dictionary<long, int> _수량목록 = [];
+    private 음식점공개상세응답? _음식점;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(제출가능))]
+    public partial string 수령인명 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(제출가능))]
+    public partial string 연락처 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(제출가능))]
+    public partial string 주소 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 상세주소 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 요청사항 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool 주문자본인수령여부 { get; set; } = true;
+
+    [ObservableProperty]
+    public partial string 결제수단 { get; set; } = "현장결제";
+
+    [ObservableProperty]
+    public partial Guid 클라이언트요청Id { get; private set; } = Guid.NewGuid();
+
+    [ObservableProperty]
+    public partial 음식주문응답? 등록응답 { get; private set; }
+
+    public IReadOnlyList<음식주문선택항목ViewModel> 선택항목목록
+        => _음식점?.메뉴목록
+               .Where(menu => _수량목록.GetValueOrDefault(menu.Id) > 0)
+               .Select(menu => new 음식주문선택항목ViewModel(
+                   menu.Id,
+                   menu.메뉴명,
+                   _수량목록[menu.Id],
+                   menu.판매가))
+               .ToArray()
+           ?? [];
+
+    public decimal 주문금액 => 선택항목목록.Sum(item => item.합계);
+    public decimal 최소주문금액 => _음식점?.음식점.최소주문금액 ?? 0;
+    public bool 최소주문충족 => 주문금액 >= 최소주문금액;
+    public bool 메뉴선택됨 => 선택항목목록.Count > 0;
+    public bool 제출가능
+        => _음식점?.음식점.주문가능여부 == true
+           && 메뉴선택됨
+           && 최소주문충족
+           && !string.IsNullOrWhiteSpace(수령인명)
+           && !string.IsNullOrWhiteSpace(연락처)
+           && !string.IsNullOrWhiteSpace(주소)
+           && !처리중;
+
+    public int 메뉴수량(long menuId) => _수량목록.GetValueOrDefault(menuId);
+
+    public void 음식점설정(음식점공개상세응답? detail)
+    {
+        if (_음식점?.음식점.Id == detail?.음식점.Id)
+        {
+            _음식점 = detail;
+            NotifyOrderChanged();
+            return;
+        }
+
+        _음식점 = detail;
+        새요청준비(clearRecipient: false);
+    }
+
+    public void 메뉴수량변경(long menuId, int delta)
+    {
+        var menu = _음식점?.메뉴목록.FirstOrDefault(item => item.Id == menuId);
+        if (menu is null || menu.품절여부 || delta == 0)
+        {
+            return;
+        }
+
+        var next = Math.Clamp(_수량목록.GetValueOrDefault(menuId) + delta, 0, 100);
+        if (next == 0)
+        {
+            _수량목록.Remove(menuId);
+        }
+        else
+        {
+            _수량목록[menuId] = next;
+        }
+
+        클라이언트요청Id = Guid.NewGuid();
+        등록응답 = null;
+        작업상태초기화();
+        NotifyOrderChanged();
+    }
+
+    public Task<bool> 등록Async(CancellationToken cancellationToken = default)
+    {
+        if (_음식점 is null || _음식점.음식점.Id <= 0)
+        {
+            return Task.FromResult(유효성실패("주문할 음식점을 다시 선택해 주세요."));
+        }
+
+        if (!메뉴선택됨)
+        {
+            return Task.FromResult(유효성실패("주문할 메뉴를 한 개 이상 선택해 주세요."));
+        }
+
+        if (!최소주문충족)
+        {
+            return Task.FromResult(유효성실패(
+                $"최소 주문 금액 {최소주문금액:N0}원을 충족해 주세요."));
+        }
+
+        if (string.IsNullOrWhiteSpace(수령인명)
+            || string.IsNullOrWhiteSpace(연락처)
+            || string.IsNullOrWhiteSpace(주소))
+        {
+            return Task.FromResult(유효성실패("수령인 이름, 연락처와 주소를 입력해 주세요."));
+        }
+
+        return 작업실행Async(
+            async token =>
+            {
+                등록응답 = await service.등록Async(new 음식주문등록요청
+                {
+                    클라이언트요청Id = 클라이언트요청Id,
+                    음식점Id = _음식점.음식점.Id,
+                    주문자UserId = string.Empty,
+                    수령인정보 = new()
+                    {
+                        수령인명 = 수령인명.Trim(),
+                        연락처 = 연락처.Trim(),
+                        주소 = 주소.Trim(),
+                        상세주소 = 상세주소.Trim(),
+                        요청사항 = 요청사항.Trim(),
+                        주문자본인수령여부 = 주문자본인수령여부
+                    },
+                    상품목록 = 선택항목목록.Select(item => new 음식주문상품Dto
+                    {
+                        메뉴Id = item.메뉴Id,
+                        상품명 = item.메뉴명,
+                        수량 = item.수량,
+                        단가 = item.단가
+                    }).ToArray(),
+                    결제수단 = 결제수단
+                }, token);
+            },
+            "음식 주문을 등록했습니다.",
+            cancellationToken,
+            ex => $"음식 주문을 등록하지 못했습니다. {ex.Message}");
+    }
+
+    public void 새요청준비(bool clearRecipient = true)
+    {
+        _수량목록.Clear();
+        클라이언트요청Id = Guid.NewGuid();
+        등록응답 = null;
+        if (clearRecipient)
+        {
+            수령인명 = string.Empty;
+            연락처 = string.Empty;
+            주소 = string.Empty;
+            상세주소 = string.Empty;
+            요청사항 = string.Empty;
+            주문자본인수령여부 = true;
+        }
+
+        작업상태초기화();
+        NotifyOrderChanged();
+    }
+
+    private void NotifyOrderChanged()
+    {
+        OnPropertyChanged(nameof(선택항목목록));
+        OnPropertyChanged(nameof(주문금액));
+        OnPropertyChanged(nameof(최소주문금액));
+        OnPropertyChanged(nameof(최소주문충족));
+        OnPropertyChanged(nameof(메뉴선택됨));
+        OnPropertyChanged(nameof(제출가능));
+    }
+
+    partial void On수령인명Changed(string value) => 요청내용변경됨();
+    partial void On연락처Changed(string value) => 요청내용변경됨();
+    partial void On주소Changed(string value) => 요청내용변경됨();
+    partial void On상세주소Changed(string value) => 요청내용변경됨();
+    partial void On요청사항Changed(string value) => 요청내용변경됨();
+    partial void On주문자본인수령여부Changed(bool value) => 요청내용변경됨();
+    partial void On결제수단Changed(string value) => 요청내용변경됨();
+
+    private void 요청내용변경됨()
+    {
+        if (!처리중 && 등록응답 is null)
+        {
+            클라이언트요청Id = Guid.NewGuid();
+        }
+    }
+}
+
+/// <summary>접근·인증·탐색 기준·목록·정확한 상세·주문 작성을 조립합니다.</summary>
 public sealed class 음식점탐색PageViewModel : 조립ViewModelBase
 {
     public 음식점탐색PageViewModel(
         음식배달페이지접근ViewModel access,
+        주문자앱인증ViewModel authentication,
         음식점탐색기준ViewModel criteria,
         음식점공개목록ViewModel list,
-        음식점공개상세ViewModel detail)
+        음식점공개상세ViewModel detail,
+        음식주문작성ViewModel writer)
     {
         접근 = 하위ViewModel등록(access);
+        인증 = 하위ViewModel등록(authentication);
         기준 = 하위ViewModel등록(criteria);
         목록 = 하위ViewModel등록(list);
         상세 = 하위ViewModel등록(detail);
+        작성 = 하위ViewModel등록(writer);
     }
 
     public 음식배달페이지접근ViewModel 접근 { get; }
+    public 주문자앱인증ViewModel 인증 { get; }
     public 음식점탐색기준ViewModel 기준 { get; }
     public 음식점공개목록ViewModel 목록 { get; }
     public 음식점공개상세ViewModel 상세 { get; }
+    public 음식주문작성ViewModel 작성 { get; }
 }

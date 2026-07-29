@@ -60,6 +60,37 @@
     font-size: .78rem;
 }
 
+.food-order-receipt-steps,
+.food-order-receipt-action {
+    display: grid;
+    gap: .75rem;
+    margin-top: .85rem;
+}
+
+.food-order-receipt-step {
+    display: flex;
+    align-items: flex-start;
+    gap: .65rem;
+    padding: .75rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+    background: var(--mud-palette-background-gray);
+}
+
+.food-order-receipt-step--done {
+    border-color: var(--mud-palette-success);
+    background: color-mix(in srgb, var(--mud-palette-success) 8%, transparent);
+}
+
+.food-order-receipt-step span {
+    display: grid;
+    gap: .15rem;
+}
+
+.food-order-receipt-step small {
+    color: var(--mud-palette-text-secondary);
+}
+
 @media (max-width: 1100px) {
     .food-order-panel {
         position: static;

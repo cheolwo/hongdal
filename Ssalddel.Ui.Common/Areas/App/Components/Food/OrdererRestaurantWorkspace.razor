@@ -10,7 +10,7 @@
     else
     {
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="restaurant-boundary">
-            사용자가 고른 공개 행정권역 기준점으로만 거리를 계산합니다. 현재 위치와 주소를 자동 수집하지 않으며, 이 화면은 주문·결제·조리 접수·기사 배차를 생성하지 않습니다.
+            사용자가 고른 공개 행정권역 기준점으로만 거리를 계산합니다. 현재 위치와 주소를 자동 수집하지 않으며, 공개 탐색 뒤 로그인한 주문자가 선택 메뉴와 수령 정보를 확인해야 주문이 등록됩니다.
         </MudAlert>
 
         <div class="restaurant-layout">
@@ -28,8 +28,12 @@
             </div>
 
             <OrdererRestaurantDetailPanel Detail="@Detail"
+                                          Authentication="@Authentication"
+                                          Writer="@Writer"
                                           RetryRequested="RetryRestaurantAsync"
-                                          ClearRequested="ClearSelectionAsync" />
+                                          ClearRequested="ClearSelectionAsync"
+                                          LoginRequested="LoginAsync"
+                                          SubmitRequested="SubmitOrderAsync" />
         </div>
     }
 </section>

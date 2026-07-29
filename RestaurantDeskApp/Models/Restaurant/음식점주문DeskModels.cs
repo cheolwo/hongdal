@@ -7,7 +7,14 @@ public static class 음식점주문Desk상태코드
 {
     public const string 주문대기 = "주문대기";
     public const string 수락처리중 = "수락처리중";
-    public const string 수락됨 = "수락됨";
+    public const string 조리중 = "조리중";
+    public const string 픽업대기 = "픽업대기";
+    public const string 기사배정 = "기사배정";
+    public const string 픽업완료 = "픽업완료";
+    public const string 전달완료 = "전달완료";
+    public const string 수령확인 = "수령확인";
+    public const string 거절 = "거절";
+    public const string 취소 = "취소";
     public const string 전표출력됨 = "전표출력됨";
     public const string 상세조회실패 = "상세조회실패";
 }
@@ -99,6 +106,8 @@ public sealed class 음식점주문DeskItem
     public 음식주문응답? 상세주문 { get; set; }
 
     public bool 수락가능 => 상태 is 음식점주문Desk상태코드.주문대기 or 음식점주문Desk상태코드.상세조회실패;
+
+    public bool 조리변경가능 => 상태 == 음식점주문Desk상태코드.조리중;
 }
 
 public sealed record 음식점주문상품조리기준(

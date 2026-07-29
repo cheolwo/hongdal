@@ -107,6 +107,7 @@ public static class FoodOrderSampleData
         return new 음식주문응답
         {
             주문번호 = source.주문번호,
+            클라이언트요청Id = source.클라이언트요청Id,
             음식점Id = source.음식점Id,
             음식점명 = source.음식점명,
             음식점주소 = source.음식점주소,
@@ -125,6 +126,7 @@ public static class FoodOrderSampleData
             },
             상품목록 = source.상품목록.Select(x => new 음식주문상품Dto
             {
+                메뉴Id = x.메뉴Id,
                 상품명 = x.상품명,
                 수량 = x.수량,
                 단가 = x.단가
@@ -146,6 +148,8 @@ public static class FoodOrderSampleData
             최근변경시각Utc = source.최근변경시각Utc,
             상태이력 = source.상태이력.Select(x => new 음식주문상태전이기록Dto
             {
+                클라이언트요청Id = x.클라이언트요청Id,
+                처리UserId = x.처리UserId,
                 이전상태 = x.이전상태,
                 다음상태 = x.다음상태,
                 사유 = x.사유,

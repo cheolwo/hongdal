@@ -215,7 +215,11 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
                         $"{id} 제안은 이미 만료되었거나 다른 기사에게 배정되었습니다.");
                 }
 
-                if (음식주문상태코드.Normalize(order.상태) is 음식주문상태코드.취소 or 음식주문상태코드.전달완료)
+                if (음식주문상태코드.Normalize(order.상태) is
+                    음식주문상태코드.거절 or
+                    음식주문상태코드.취소 or
+                    음식주문상태코드.전달완료 or
+                    음식주문상태코드.수령확인)
                 {
                     return Result.Fail<List<FoodDeliveryAssignment>>(
                         $"{id} 주문은 취소되었거나 이미 전달 완료되었습니다.");
@@ -730,7 +734,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
     private static string ResolveOfferStatus(운송원장 queue, 음식주문 order)
     {
         var foodState = 음식주문상태코드.Normalize(order.상태);
-        if (foodState == 음식주문상태코드.전달완료)
+        if (foodState is 음식주문상태코드.전달완료 or 음식주문상태코드.수령확인)
         {
             return DriverWorkOfferStatus.Completed;
         }

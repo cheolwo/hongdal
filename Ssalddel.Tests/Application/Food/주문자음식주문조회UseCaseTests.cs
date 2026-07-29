@@ -135,6 +135,58 @@ public sealed class 주문자음식주문조회UseCaseTests
         Assert.Equal(음식주문배차상태코드.배달완료, order.배차상태);
     }
 
+    [Fact]
+    public async Task 상세는_기사전달완료와주문자수령확인을_서로다른단계로반환한다()
+    {
+        await using var context = CreateContext();
+        await SeedAsync(context);
+        var order = await context.음식주문
+            .Include(item => item.상태이력)
+            .SingleAsync(item => item.주문번호 == "FOOD-A-001");
+        var deliveredAt = new DateTime(2026, 7, 20, 1, 45, 0, DateTimeKind.Utc);
+        order.상태 = 음식주문상태코드.전달완료;
+        order.배차상태 = 음식주문배차상태코드.배달완료;
+        order.UpdatedAt = deliveredAt;
+        order.상태이력.Add(new 음식주문상태이력
+        {
+            이전상태 = 음식주문상태코드.픽업완료,
+            다음상태 = 음식주문상태코드.전달완료,
+            사유 = "고객 전달 완료",
+            전이시각Utc = deliveredAt
+        });
+        await context.SaveChangesAsync();
+        var useCase = new 주문자음식주문조회UseCase(context);
+
+        var delivered = await useCase.상세Async("FOOD-A-001", "user-a", CancellationToken.None);
+
+        Assert.True(delivered.IsSuccess);
+        Assert.True(delivered.Value.배달진행.기사전달완료);
+        Assert.True(delivered.Value.배달진행.수령확인가능);
+        Assert.False(delivered.Value.배달진행.주문자수령확인됨);
+        Assert.Contains("실제 수령 상태", delivered.Value.배달진행.안내);
+
+        var confirmedAt = deliveredAt.AddMinutes(3);
+        order.상태 = 음식주문상태코드.수령확인;
+        order.UpdatedAt = confirmedAt;
+        order.상태이력.Add(new 음식주문상태이력
+        {
+            이전상태 = 음식주문상태코드.전달완료,
+            다음상태 = 음식주문상태코드.수령확인,
+            사유 = "주문자 수령 확인",
+            전이시각Utc = confirmedAt
+        });
+        await context.SaveChangesAsync();
+
+        var confirmed = await useCase.상세Async("FOOD-A-001", "user-a", CancellationToken.None);
+
+        Assert.True(confirmed.IsSuccess);
+        Assert.True(confirmed.Value.배달진행.기사전달완료);
+        Assert.True(confirmed.Value.배달진행.주문자수령확인됨);
+        Assert.False(confirmed.Value.배달진행.수령확인가능);
+        Assert.Equal(confirmedAt, confirmed.Value.배달진행.수령확인시각Utc);
+        Assert.Contains("모두 완료", confirmed.Value.배달진행.안내);
+    }
+
     private static SsalddelContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<SsalddelContext>()

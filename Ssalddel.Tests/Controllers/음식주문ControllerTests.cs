@@ -40,19 +40,27 @@ public sealed class 음식주문ControllerTests
     }
 
     [Fact]
-    public void 주문등록은_로그인을요구하고_음식점업무는음식점정책을요구한다()
+    public void 주문등록과수령확인은_로그인을요구하고_음식점업무는음식점정책을요구한다()
     {
         var register = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.등록));
+        var receipt = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.주문자수령확인));
         var inbox = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점수신함));
         var detail = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점상세));
         var accept = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점수락));
+        var progress = typeof(음식주문Controller).GetMethod(nameof(음식주문Controller.음식점진행변경));
 
         Assert.NotNull(register?.GetCustomAttribute<AuthorizeAttribute>());
+        Assert.NotNull(receipt?.GetCustomAttribute<AuthorizeAttribute>());
+        Assert.Equal(
+            "{orderNo}/receipt-confirmation",
+            receipt?.GetCustomAttribute<HttpPostAttribute>()?.Template);
         Assert.Equal("restaurant/inbox", inbox?.GetCustomAttribute<HttpGetAttribute>()?.Template);
         Assert.Equal("음식점운영자전용", inbox?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
         Assert.Equal("restaurant/inbox/{orderNo}", detail?.GetCustomAttribute<HttpGetAttribute>()?.Template);
         Assert.Equal("음식점운영자전용", detail?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
         Assert.Equal("음식점운영자전용", accept?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+        Assert.Equal("{orderNo}/restaurant-progress", progress?.GetCustomAttribute<HttpPostAttribute>()?.Template);
+        Assert.Equal("음식점운영자전용", progress?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
     }
 
     [Fact]
@@ -75,6 +83,32 @@ public sealed class 음식주문ControllerTests
         await controller.등록(request, CancellationToken.None);
 
         Assert.Equal("signed-in-orderer", command.Registered?.주문자UserId);
+    }
+
+    [Fact]
+    public async Task 수령확인은_로그인사용자Id를Command에전달한다()
+    {
+        var command = new RecordingCommandUseCase();
+        var controller = new 음식주문Controller(command, null!, null!)
+        {
+            ControllerContext = Context(
+                new Claim(ClaimTypes.NameIdentifier, "signed-in-orderer"))
+        };
+        var request = new 주문자음식주문수령확인요청
+        {
+            클라이언트요청Id = Guid.NewGuid(),
+            확인메모 = "정상 수령"
+        };
+
+        var result = await controller.주문자수령확인(
+            "FOOD-RECEIPT",
+            request,
+            CancellationToken.None);
+
+        Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal("signed-in-orderer", command.ReceiptOrdererUserId);
+        Assert.Equal("FOOD-RECEIPT", command.ReceiptOrderNo);
+        Assert.Same(request, command.ReceiptRequest);
     }
 
     [Fact]
@@ -151,6 +185,9 @@ public sealed class 음식주문ControllerTests
     {
         public 음식주문등록요청? Registered { get; private set; }
         public bool AcceptCalled { get; private set; }
+        public string? ReceiptOrderNo { get; private set; }
+        public string? ReceiptOrdererUserId { get; private set; }
+        public 주문자음식주문수령확인요청? ReceiptRequest { get; private set; }
 
         public Task<음식주문응답> 등록Async(
             음식주문등록요청 request,
@@ -176,6 +213,35 @@ public sealed class 음식주문ControllerTests
             {
                 주문번호 = orderNo,
                 음식점Id = 101
+            });
+        }
+
+        public Task<음식주문응답?> 음식점진행변경Async(
+            string orderNo,
+            음식점주문진행변경요청 request,
+            string 처리UserId,
+            CancellationToken cancellationToken)
+            => Task.FromResult<음식주문응답?>(new 음식주문응답
+            {
+                주문번호 = orderNo,
+                음식점Id = 101,
+                상태 = request.작업
+            });
+
+        public Task<음식주문응답?> 주문자수령확인Async(
+            string orderNo,
+            주문자음식주문수령확인요청 request,
+            string 주문자UserId,
+            CancellationToken cancellationToken)
+        {
+            ReceiptOrderNo = orderNo;
+            ReceiptOrdererUserId = 주문자UserId;
+            ReceiptRequest = request;
+            return Task.FromResult<음식주문응답?>(new 음식주문응답
+            {
+                주문번호 = orderNo,
+                주문자UserId = 주문자UserId,
+                상태 = 음식주문상태코드.수령확인
             });
         }
     }

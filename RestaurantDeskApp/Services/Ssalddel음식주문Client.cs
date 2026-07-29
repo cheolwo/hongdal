@@ -77,6 +77,28 @@ public sealed class Ssalddel음식주문Client(
         return await response.Content.ReadFromJsonAsync<음식주문응답>(cancellationToken);
     }
 
+    public async Task<음식주문응답?> 음식점진행변경Async(
+        string 주문번호,
+        음식점주문진행변경요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(주문번호);
+        ArgumentNullException.ThrowIfNull(request);
+
+        using var response = await SendAsync(
+            HttpMethod.Post,
+            $"{BasePath}/{Uri.EscapeDataString(주문번호.Trim())}/restaurant-progress",
+            () => JsonContent.Create(request),
+            cancellationToken);
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        await EnsureSuccessAsync(response, "음식점 주문 진행 변경", cancellationToken);
+        return await response.Content.ReadFromJsonAsync<음식주문응답>(cancellationToken);
+    }
+
     private async Task<HttpResponseMessage> SendAsync(
         HttpMethod method,
         string path,

@@ -159,6 +159,12 @@ builder.Services.AddHttpClient<FoodDeliveryDispatchAIReviewAdminService>((sp, cl
     client.BaseAddress = new Uri(options.BaseUrl);
 });
 
+builder.Services.AddHttpClient<FoodOrderOperationsTraceAdminService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

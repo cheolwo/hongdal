@@ -82,9 +82,29 @@ public sealed class OrdererFoodOrderWorkspaceCompositionTests
         var detail = File.ReadAllText(Path.Combine(componentDirectory, "OrdererFoodOrderDetailPanel.razor"));
 
         Assert.Contains("로그인한 계정이 소유한 영속 음식 주문만 조회", header);
-        Assert.Contains("주문 생성·음식점 수락·결제 승인·배차 상태 전이를 실행하지 않", header);
+        Assert.Contains("주문 생성·음식점 수락·결제 승인·배차 확정은 이 화면에서 실행하지 않", header);
+        Assert.Contains("기사 전달 완료 뒤 실제 수령 확인만 소유 주문에 기록", header);
         Assert.Contains("SsalddelSensitiveDisclosureList", detail);
         Assert.Contains("수령지와 연락처는 주문한 계정에서 필요할 때만 펼쳐 확인", detail);
+    }
+
+    [Fact]
+    public void 음식주문_상세는_기사전달완료와주문자수령확인을_분리한다()
+    {
+        var componentDirectory = FindComponentDirectory();
+        var detail = File.ReadAllText(Path.Combine(componentDirectory, "OrdererFoodOrderDetailPanel.razor"));
+        var client = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Services",
+            "음식주문Client.cs"));
+
+        Assert.Contains("1. 기사 전달 완료", detail);
+        Assert.Contains("2. 주문자 수령 확인", detail);
+        Assert.Contains("ReceiptConfirmationRequested", detail);
+        Assert.Contains("/receipt-confirmation", client);
     }
 
     [Fact]

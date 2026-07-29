@@ -14,21 +14,29 @@ public sealed class 음식점주문수락CommandHandler(
     {
         Validate(request);
 
-        var accepted = orderStore.음식점수락(request.주문번호, request.Payload);
+        var actorUserId = NormalizeUserId(request.처리UserId)
+            ?? throw new ArgumentException("인증된 음식점 처리 사용자 ID가 필요합니다.");
+        var accepted = orderStore.음식점수락멱등(
+            request.주문번호,
+            request.Payload,
+            actorUserId);
         if (accepted is null)
         {
             return null;
         }
 
-        await publisher.Publish(
-            new 음식점주문수락됨Event(
-                accepted,
-                NormalizeUserId(request.처리UserId) ?? NormalizeUserId(request.Payload.처리UserId),
-                DateTime.UtcNow,
-                Guid.NewGuid().ToString("N")),
-            cancellationToken);
+        if (accepted.새로변경됨)
+        {
+            await publisher.Publish(
+                new 음식점주문수락됨Event(
+                    accepted.주문,
+                    actorUserId,
+                    DateTime.UtcNow,
+                    Guid.NewGuid().ToString("N")),
+                cancellationToken);
+        }
 
-        return orderStore.GetOrder(request.주문번호) ?? accepted;
+        return orderStore.GetOrder(request.주문번호) ?? accepted.주문;
     }
 
     private static void Validate(음식점주문수락Command command)
@@ -41,6 +49,11 @@ public sealed class 음식점주문수락CommandHandler(
         if (command.Payload is null)
         {
             throw new ArgumentException("음식점 수락 요청 본문이 필요합니다.");
+        }
+
+        if (command.Payload.클라이언트요청Id == Guid.Empty)
+        {
+            throw new ArgumentException("음식점 주문 수락의 클라이언트 요청 ID가 필요합니다.");
         }
     }
 

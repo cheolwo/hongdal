@@ -1,0 +1,77 @@
+.food-order-composer {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-color: rgba(35, 94, 168, 0.24);
+    background: linear-gradient(180deg, rgba(236, 246, 255, 0.88), #fff 42%);
+}
+
+.food-order-composer__heading,
+.food-order-composer__minimum,
+.food-order-composer__actions,
+.food-order-composer__items > div,
+.food-order-composer__state {
+    display: flex;
+    align-items: center;
+}
+
+.food-order-composer__heading,
+.food-order-composer__minimum,
+.food-order-composer__actions,
+.food-order-composer__items > div {
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.food-order-composer__items {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.food-order-composer__items > div {
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.food-order-composer__minimum {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(35, 94, 168, 0.14);
+    color: #76531b;
+}
+
+.food-order-composer__minimum .is-ready {
+    color: #157347;
+}
+
+.food-order-composer__state {
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 5rem;
+}
+
+.food-order-composer__form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.food-order-composer__wide {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+    .food-order-composer__form {
+        grid-template-columns: 1fr;
+    }
+
+    .food-order-composer__wide {
+        grid-column: auto;
+    }
+
+    .food-order-composer__actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+}

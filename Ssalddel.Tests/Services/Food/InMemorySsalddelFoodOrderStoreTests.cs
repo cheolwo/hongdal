@@ -57,9 +57,108 @@ public sealed class InMemorySsalddelFoodOrderStoreTests
         Assert.Equal(dispatchRequestedAt, updated.배차요청시각Utc);
     }
 
+    [Fact]
+    public void 같은주문자와클라이언트요청Id는_기존주문을반환한다()
+    {
+        var store = new InMemorySsalddelFoodOrderStore();
+        var request = CreateOrderRequest();
+
+        var first = store.AddOrder(request);
+        request.상품목록 =
+        [
+            new 음식주문상품Dto
+            {
+                메뉴Id = 999,
+                상품명 = "재시도에서 바뀐 표시값",
+                수량 = 9,
+                단가 = 1
+            }
+        ];
+        var retried = store.AddOrder(request);
+
+        Assert.Equal(first.주문번호, retried.주문번호);
+        Assert.Equal(first.클라이언트요청Id, retried.클라이언트요청Id);
+        Assert.Equal(2, Assert.Single(retried.상품목록).수량);
+    }
+
+    [Fact]
+    public void 음식점진행은_거절과조리시간변경과픽업준비의허용상태를검증한다()
+    {
+        var store = new InMemorySsalddelFoodOrderStore();
+        var rejectedOrder = store.AddOrder(CreateOrderRequest());
+
+        var rejected = store.음식점진행변경(
+            rejectedOrder.주문번호,
+            new 음식점주문진행변경요청
+            {
+                클라이언트요청Id = Guid.NewGuid(),
+                작업 = 음식점주문진행작업코드.거절,
+                사유 = "재료 품절"
+            },
+            "restaurant-user");
+
+        Assert.Equal(음식주문상태코드.거절, rejected?.주문.상태);
+        Assert.Equal(
+            "restaurant-user",
+            rejected?.주문.상태이력.Last().처리UserId);
+
+        var cookingOrder = store.AddOrder(CreateOrderRequest());
+        store.음식점수락(
+            cookingOrder.주문번호,
+            new 음식점주문수락요청
+            {
+                음식점명 = "살뜰분식",
+                조리예상분 = 20
+            });
+        var changed = store.음식점진행변경(
+            cookingOrder.주문번호,
+            new 음식점주문진행변경요청
+            {
+                클라이언트요청Id = Guid.NewGuid(),
+                작업 = 음식점주문진행작업코드.조리시간변경,
+                조리예상분 = 35
+            },
+            "restaurant-user");
+        var ready = store.음식점진행변경(
+            cookingOrder.주문번호,
+            new 음식점주문진행변경요청
+            {
+                클라이언트요청Id = Guid.NewGuid(),
+                작업 = 음식점주문진행작업코드.픽업준비
+            },
+            "restaurant-user");
+
+        Assert.Equal(음식주문상태코드.조리중, changed?.주문.상태);
+        Assert.Contains("35분", changed?.주문.상태이력.Last().사유);
+        Assert.Equal(음식주문상태코드.픽업대기, ready?.주문.상태);
+    }
+
+    [Fact]
+    public void 음식점진행_같은클라이언트요청Id는_상태이력을중복하지않는다()
+    {
+        var store = new InMemorySsalddelFoodOrderStore();
+        var order = store.AddOrder(CreateOrderRequest());
+        var request = new 음식점주문진행변경요청
+        {
+            클라이언트요청Id = Guid.NewGuid(),
+            작업 = 음식점주문진행작업코드.거절,
+            사유 = "영업 종료"
+        };
+
+        var first = store.음식점진행변경(order.주문번호, request, "restaurant-user");
+        var retried = store.음식점진행변경(order.주문번호, request, "restaurant-user");
+
+        Assert.True(first?.새로변경됨);
+        Assert.False(retried?.새로변경됨);
+        Assert.Single(
+            retried!.주문.상태이력,
+            history => history.클라이언트요청Id == request.클라이언트요청Id);
+    }
+
     private static 음식주문등록요청 CreateOrderRequest()
         => new()
         {
+            클라이언트요청Id = Guid.NewGuid(),
             음식점Id = 42,
             주문자UserId = "orderer-1",
             수령인정보 = new 음식주문수령인정보Dto
@@ -74,6 +173,7 @@ public sealed class InMemorySsalddelFoodOrderStoreTests
             [
                 new 음식주문상품Dto
                 {
+                    메뉴Id = 101,
                     상품명 = "김밥",
                     수량 = 2,
                     단가 = 4500

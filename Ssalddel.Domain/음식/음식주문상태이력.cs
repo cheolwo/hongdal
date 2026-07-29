@@ -13,6 +13,13 @@ public class 음식주문상태이력
     [Column("음식주문_id")]
     public long 음식주문Id { get; set; }
 
+    [Column("클라이언트요청_id")]
+    public Guid? 클라이언트요청Id { get; set; }
+
+    [Column("처리_user_id")]
+    [MaxLength(450)]
+    public string? 처리UserId { get; set; }
+
     [Column("이전상태")]
     [MaxLength(50)]
     public string 이전상태 { get; set; } = string.Empty;
