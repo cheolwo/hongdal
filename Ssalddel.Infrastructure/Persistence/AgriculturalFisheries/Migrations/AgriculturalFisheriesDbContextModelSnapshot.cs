@@ -22,6 +22,207 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.Bls평균소매가격관측", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AreaCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("AreaName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("CanonicalProductKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<DateTime>("FirstCollectedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("FirstCollectionRunId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Footnote")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<bool>("IsValueMissing")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ItemCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ItemNameEn")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<DateTime>("LastSeenAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("OriginalUnit")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<string>("PeriodCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("PeriodName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<decimal?>("PriceUsd")
+                        .HasPrecision(20, 6)
+                        .HasColumnType("decimal(20,6)");
+
+                    b.Property<string>("ProductNameKo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("RawJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("RecordKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<DateOnly>("ReferenceMonth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("SeriesId")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ValueRaw")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FirstCollectionRunId");
+
+                    b.HasIndex("LastSeenAtUtc");
+
+                    b.HasIndex("RecordKey")
+                        .IsUnique();
+
+                    b.HasIndex("CanonicalProductKey", "ReferenceMonth");
+
+                    b.HasIndex("SeriesId", "ReferenceMonth");
+
+                    b.ToTable("agri_bls_average_retail_price_observations", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.Bls평균소매가격수집Run", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<int>("ExistingCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FetchedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InsertedCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("LatestReferenceMonth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("QuerySummary")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<int>("RequestedSeriesCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RunKey")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("SourceMessagesJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTime>("StartedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<int>("UpdatedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearFrom")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearTo")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RunKey")
+                        .IsUnique();
+
+                    b.HasIndex("StatusCode", "StartedAtUtc");
+
+                    b.HasIndex("YearFrom", "YearTo");
+
+                    b.ToTable("agri_bls_average_retail_price_collection_runs", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.HsUsdaCommodityMapping", b =>
                 {
                     b.Property<long>("Id")
@@ -378,7 +579,373 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
 
                     b.HasIndex("SurveyDate", "FrequencyCode", "ProductClassCode", "CategoryCode", "ItemCode");
 
+                    b.HasIndex("ItemCode", "FrequencyCode", "ProductClassCode", "KindCode", "RankCode", "Unit", "SurveyDate", "Id")
+                        .IsDescending(false, false, false, false, false, false, true, true);
+
                     b.ToTable("agri_kamis_price_observations", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.UsdaAms시장가격관측", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Appearance")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("Commodity")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Community")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("Crop")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<DateTime>("FirstCollectedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("FirstCollectionRunId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Grade")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("Group")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<decimal?>("HighPrice")
+                        .HasPrecision(24, 8)
+                        .HasColumnType("decimal(24,8)");
+
+                    b.Property<string>("ItemSize")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<DateTime>("LastSeenAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal?>("LowPrice")
+                        .HasPrecision(24, 8)
+                        .HasColumnType("decimal(24,8)");
+
+                    b.Property<string>("MarketLocationCity")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("MarketLocationName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("MarketLocationState")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("MarketStageCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("MarketType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<decimal?>("MostlyHighPrice")
+                        .HasPrecision(24, 8)
+                        .HasColumnType("decimal(24,8)");
+
+                    b.Property<decimal?>("MostlyLowPrice")
+                        .HasPrecision(24, 8)
+                        .HasColumnType("decimal(24,8)");
+
+                    b.Property<string>("OfficeCity")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("OfficeName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("OfficeState")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Organic")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("OriginalUnit")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Package")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("PublishedDateRaw")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Quality")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("RawJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("RecordKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("Repack")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<DateOnly>("ReportBeginDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("ReportEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("ReportTitle")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("SlugId")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("SlugName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Storage")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<int?>("StoreCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransportationMode")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("UnitSales")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("Variety")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<decimal?>("WeightedAveragePrice")
+                        .HasPrecision(24, 8)
+                        .HasColumnType("decimal(24,8)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FirstCollectionRunId");
+
+                    b.HasIndex("LastSeenAtUtc");
+
+                    b.HasIndex("RecordKey")
+                        .IsUnique();
+
+                    b.HasIndex("Commodity", "ReportBeginDate");
+
+                    b.HasIndex("MarketLocationState", "ReportBeginDate");
+
+                    b.HasIndex("SourceKey", "ReportBeginDate");
+
+                    b.HasIndex("Commodity", "MarketStageCode", "ReportBeginDate");
+
+                    b.ToTable("agri_usda_ams_market_price_observations", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.UsdaAms시장가격수집Run", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("CompletedSliceCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("DateFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DateTo")
+                        .HasColumnType("date");
+
+                    b.Property<int>("DiscoveredReportCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<long>("ExistingCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FetchedCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("InsertedCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateOnly?>("LatestReferenceDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("RequestedMarketTypesJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("RunKey")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("SourceMessagesJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTime>("StartedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RunKey")
+                        .IsUnique();
+
+                    b.HasIndex("DateFrom", "DateTo");
+
+                    b.HasIndex("StatusCode", "StartedAtUtc");
+
+                    b.ToTable("agri_usda_ams_market_price_collection_runs", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.UsdaAms연도상품Catalog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Commodity")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateOnly>("FirstObservedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("LastObservedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Commodity", "Year");
+
+                    b.HasIndex("Year", "Commodity")
+                        .IsUnique();
+
+                    b.ToTable("agri_usda_ams_year_commodity_catalog", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.UsdaNassPriceCollectionRun", b =>
@@ -840,6 +1407,511 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                     b.HasIndex("SourceKey", "SettlementDate", "StatusCode");
 
                     b.ToTable("agri_domestic_auction_price_collection_runs", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.국제농수산가격관측", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BasePeriod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("CanonicalProductKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("CountryName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("DatasetCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime>("FirstCollectedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("FirstCollectionRunId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FrequencyCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("GeographyCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("GeographyName")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<bool>("IsIndex")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsValueMissing")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("LastSeenAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MarketStageCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ObservationStatus")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("OfficialProductCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("OfficialSeriesCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("OriginalUnit")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(24, 8)
+                        .HasColumnType("decimal(24,8)");
+
+                    b.Property<string>("ProductNameOriginal")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("RawJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("RecordKey")
+                        .IsRequired()
+                        .HasMaxLength(180)
+                        .HasColumnType("varchar(180)");
+
+                    b.Property<DateOnly>("ReferenceDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ValueRaw")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FirstCollectionRunId");
+
+                    b.HasIndex("LastSeenAtUtc");
+
+                    b.HasIndex("RecordKey")
+                        .IsUnique();
+
+                    b.HasIndex("SourceKey", "CountryCode", "ReferenceDate");
+
+                    b.HasIndex("SourceKey", "OfficialProductCode", "ReferenceDate");
+
+                    b.ToTable("agri_international_price_observations", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.국제농수산가격수집Run", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<int>("ExistingCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FetchedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InsertedCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("LatestReferenceDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("QuerySummary")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("RunKey")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("SourceMessagesJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTime>("StartedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<int>("UpdatedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearFrom")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearTo")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RunKey")
+                        .IsUnique();
+
+                    b.HasIndex("SourceKey", "StatusCode", "StartedAtUtc");
+
+                    b.HasIndex("SourceKey", "YearFrom", "YearTo");
+
+                    b.ToTable("agri_international_price_collection_runs", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.농수산물포장Fcl분석Snapshot", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AnalysisKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime>("AnalyzedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("AssumptionNote")
+                        .IsRequired()
+                        .HasMaxLength(3000)
+                        .HasColumnType("varchar(3000)");
+
+                    b.Property<string>("CategoryCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("ConfidenceScore")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<string>("ContainerEstimatesJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("EvidenceJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("EvidenceLevelCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("GrossWeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<int>("HeightMm")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsEstimate")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ItemCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("KamisKindNamesJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<string>("KamisPriceComparisonUnitsJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<int>("LengthMm")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxStackLayers")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NetContentWeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<string>("PackageTypeCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("PackageUnitLabel")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("PackingMethodCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("ProfileVersion")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<bool>("RequiresSupplierConfirmation")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("SourceYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Stackable")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("TemperatureCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("UnitCountLabel")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<int?>("UnitsPerPackage")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("WidthMm")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnalysisKey")
+                        .IsUnique();
+
+                    b.HasIndex("AnalyzedAtUtc");
+
+                    b.HasIndex("SourceYear", "EvidenceLevelCode");
+
+                    b.HasIndex("SourceYear", "CategoryCode", "ItemCode");
+
+                    b.ToTable("agri_packaging_fcl_analysis_snapshots", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.주간국가농수산물비교Snapshot", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AvailableObservationCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("GeneratedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PeriodKey")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateOnly>("WeekEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("WeekStartDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PeriodKey")
+                        .IsUnique();
+
+                    b.HasIndex("WeekStartDate", "WeekEndDate");
+
+                    b.ToTable("agri_weekly_country_product_comparison_snapshots", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.주간국가농수산물비교항목", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ComparisonNote")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)");
+
+                    b.Property<string>("CountryNameKo")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("MarketStage")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("OriginalProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(20, 4)
+                        .HasColumnType("decimal(20,4)");
+
+                    b.Property<string>("ProductKey")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ProductNameKo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateOnly?>("ReferenceDate")
+                        .HasColumnType("date");
+
+                    b.Property<long>("SnapshotId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryCode", "ReferenceDate");
+
+                    b.HasIndex("SnapshotId", "ProductKey", "CountryCode")
+                        .IsUnique();
+
+                    b.ToTable("agri_weekly_country_product_comparison_items", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodDish", b =>
@@ -2414,9 +3486,31 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                     b.ToTable("food_official_recipe_variants", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.Bls평균소매가격관측", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.AgriculturalFisheries.Bls평균소매가격수집Run", "FirstCollectionRun")
+                        .WithMany("NewObservations")
+                        .HasForeignKey("FirstCollectionRunId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FirstCollectionRun");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.KamisPriceObservation", b =>
                 {
                     b.HasOne("Ssalddel.Domain.AgriculturalFisheries.KamisPriceCollectionRun", "FirstCollectionRun")
+                        .WithMany("NewObservations")
+                        .HasForeignKey("FirstCollectionRunId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FirstCollectionRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.UsdaAms시장가격관측", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.AgriculturalFisheries.UsdaAms시장가격수집Run", "FirstCollectionRun")
                         .WithMany("NewObservations")
                         .HasForeignKey("FirstCollectionRunId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2445,6 +3539,28 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                         .IsRequired();
 
                     b.Navigation("FirstCollectionRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.국제농수산가격관측", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.AgriculturalFisheries.국제농수산가격수집Run", "FirstCollectionRun")
+                        .WithMany("NewObservations")
+                        .HasForeignKey("FirstCollectionRunId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FirstCollectionRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.주간국가농수산물비교항목", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.AgriculturalFisheries.주간국가농수산물비교Snapshot", "Snapshot")
+                        .WithMany("Items")
+                        .HasForeignKey("SnapshotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Snapshot");
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", b =>
@@ -2583,7 +3699,17 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                     b.Navigation("Source");
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.Bls평균소매가격수집Run", b =>
+                {
+                    b.Navigation("NewObservations");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.KamisPriceCollectionRun", b =>
+                {
+                    b.Navigation("NewObservations");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.UsdaAms시장가격수집Run", b =>
                 {
                     b.Navigation("NewObservations");
                 });
@@ -2596,6 +3722,16 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
             modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.국내농산물경락가격수집Run", b =>
                 {
                     b.Navigation("NewObservations");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.국제농수산가격수집Run", b =>
+                {
+                    b.Navigation("NewObservations");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.AgriculturalFisheries.주간국가농수산물비교Snapshot", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodDish", b =>

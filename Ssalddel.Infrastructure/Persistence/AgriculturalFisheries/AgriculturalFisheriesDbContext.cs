@@ -21,6 +21,36 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
 
     public DbSet<KamisPriceObservation> KamisPriceObservations => Set<KamisPriceObservation>();
 
+    public DbSet<Bls평균소매가격수집Run> BlsAverageRetailPriceCollectionRuns =>
+        Set<Bls평균소매가격수집Run>();
+
+    public DbSet<Bls평균소매가격관측> BlsAverageRetailPriceObservations =>
+        Set<Bls평균소매가격관측>();
+
+    public DbSet<국제농수산가격수집Run> InternationalPriceCollectionRuns =>
+        Set<국제농수산가격수집Run>();
+
+    public DbSet<국제농수산가격관측> InternationalPriceObservations =>
+        Set<국제농수산가격관측>();
+
+    public DbSet<UsdaAms시장가격수집Run> UsdaAmsMarketPriceCollectionRuns =>
+        Set<UsdaAms시장가격수집Run>();
+
+    public DbSet<UsdaAms시장가격관측> UsdaAmsMarketPriceObservations =>
+        Set<UsdaAms시장가격관측>();
+
+    public DbSet<UsdaAms연도상품Catalog> UsdaAmsYearCommodityCatalog =>
+        Set<UsdaAms연도상품Catalog>();
+
+    public DbSet<주간국가농수산물비교Snapshot> WeeklyCountryProductComparisonSnapshots =>
+        Set<주간국가농수산물비교Snapshot>();
+
+    public DbSet<주간국가농수산물비교항목> WeeklyCountryProductComparisonItems =>
+        Set<주간국가농수산물비교항목>();
+
+    public DbSet<농수산물포장Fcl분석Snapshot> PackagingFclAnalysisSnapshots =>
+        Set<농수산물포장Fcl분석Snapshot>();
+
     public DbSet<국내농산물경락가격수집Run> DomesticAuctionPriceCollectionRuns =>
         Set<국내농산물경락가격수집Run>();
 
@@ -71,6 +101,16 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new HsUsdaCommodityMappingConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceObservationConfiguration());
+        modelBuilder.ApplyConfiguration(new Bls평균소매가격수집RunConfiguration());
+        modelBuilder.ApplyConfiguration(new Bls평균소매가격관측Configuration());
+        modelBuilder.ApplyConfiguration(new 국제농수산가격수집RunConfiguration());
+        modelBuilder.ApplyConfiguration(new 국제농수산가격관측Configuration());
+        modelBuilder.ApplyConfiguration(new UsdaAms시장가격수집RunConfiguration());
+        modelBuilder.ApplyConfiguration(new UsdaAms시장가격관측Configuration());
+        modelBuilder.ApplyConfiguration(new UsdaAms연도상품CatalogConfiguration());
+        modelBuilder.ApplyConfiguration(new 주간국가농수산물비교SnapshotConfiguration());
+        modelBuilder.ApplyConfiguration(new 주간국가농수산물비교항목Configuration());
+        modelBuilder.ApplyConfiguration(new 농수산물포장Fcl분석SnapshotConfiguration());
         modelBuilder.ApplyConfiguration(new 국내농산물경락가격수집RunConfiguration());
         modelBuilder.ApplyConfiguration(new 국내농산물경락가격관측Configuration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeSourceConfiguration());

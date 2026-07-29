@@ -15,15 +15,53 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         DateOnly startDate,
         DateOnly endDate,
         CancellationToken cancellationToken = default)
+        => await CollectPeriodPricesCoreAsync(
+            startDate,
+            endDate,
+            itemCodes: null,
+            cancellationToken);
+
+    public async Task<KamisPriceArchiveResult> CollectPeriodPricesForItemCodesAsync(
+        DateOnly startDate,
+        DateOnly endDate,
+        IReadOnlyCollection<string> itemCodes,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(itemCodes);
+        var normalizedItemCodes = itemCodes
+            .Where(itemCode => !string.IsNullOrWhiteSpace(itemCode))
+            .ToHashSet(StringComparer.Ordinal);
+        if (normalizedItemCodes.Count == 0)
+        {
+            throw new ArgumentException(
+                "KAMIS 기간 조회 대상 품목코드가 하나 이상 필요합니다.",
+                nameof(itemCodes));
+        }
+
+        return await CollectPeriodPricesCoreAsync(
+            startDate,
+            endDate,
+            normalizedItemCodes,
+            cancellationToken);
+    }
+
+    private async Task<KamisPriceArchiveResult> CollectPeriodPricesCoreAsync(
+        DateOnly startDate,
+        DateOnly endDate,
+        IReadOnlySet<string>? itemCodes,
+        CancellationToken cancellationToken)
     {
         ValidatePeriod(startDate, endDate);
         EnsureKamisConfigured();
 
+        var itemCodeScope = itemCodes is null
+            ? "전체 공식 품목코드"
+            : $"기존 관측 품목코드 {itemCodes.Count}개";
         var run = new KamisPriceCollectionRun
         {
             RequestedDate = endDate,
             QuerySummary =
-                $"KAMIS 전국 기간 가격 / 도매·소매 / 품목·품종·등급별 / {startDate:yyyy-MM-dd}~{endDate:yyyy-MM-dd} / kg 환산",
+                $"KAMIS 전국 기간 가격 / {itemCodeScope} / 도매·소매 / 품목·품종·등급별 / {startDate:yyyy-MM-dd}~{endDate:yyyy-MM-dd} / kg 환산",
             SourceUrl = SourceUrl,
             StartedAtUtc = DateTime.UtcNow
         };
@@ -39,6 +77,13 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         try
         {
             var queries = await FetchPeriodProductQueriesAsync(cancellationToken);
+            if (itemCodes is not null)
+            {
+                queries = queries
+                    .Where(query => itemCodes.Contains(query.ItemCode))
+                    .ToArray();
+            }
+
             using var concurrency = new SemaphoreSlim(PeriodQueryConcurrency);
             var completedQueryCount = 0;
 
@@ -257,12 +302,11 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
                 ["action"] = query.Action,
                 ["p_startday"] = startDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 ["p_endday"] = endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                ["p_product_cls_code"] = query.ProductClassCode,
-                ["p_item_category_code"] = query.CategoryCode,
-                ["p_item_code"] = query.ItemCode,
-                ["p_kind_code"] = query.KindCode,
-                ["p_product_rank_code"] = query.RankCode,
-                ["p_county_code"] = string.Empty,
+                ["p_itemcategorycode"] = query.CategoryCode,
+                ["p_itemcode"] = query.ItemCode,
+                ["p_kindcode"] = query.KindCode,
+                ["p_productrankcode"] = query.RankCode,
+                ["p_countrycode"] = string.Empty,
                 ["p_convert_kg_yn"] = "Y",
                 ["p_cert_key"] = kamis.CertificationKey,
                 ["p_cert_id"] = kamis.RequesterId,
@@ -300,6 +344,13 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         var resolvedKindName = sourceItems
             .Select(item => ReadString(item, "kindname"))
             .FirstOrDefault(value => value.Length > 0) ?? query.KindName;
+        if (query.ItemName.Length > 0
+            && resolvedItemName.Length > 0
+            && !string.Equals(query.ItemName, resolvedItemName, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"KAMIS 기간 가격 응답의 품목이 요청과 다릅니다. 요청={query.ItemCode}/{query.ItemName}, 응답={resolvedItemName}");
+        }
 
         return sourceItems
             .Where(item => string.Equals(

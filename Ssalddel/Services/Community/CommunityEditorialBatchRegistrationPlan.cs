@@ -61,6 +61,11 @@ internal sealed class CommunityEditorialBatchRegistrationPlan
                 && editorialBatch.UsdaNassPriceBriefEnabled
                 && !usdaCollectionHandoff,
                 usdaCollectionHandoff),
+            new CommunityEditorialBatchRegistration(
+                CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison,
+                CommunityBoardKeys.InformationPrices,
+                editorialBatch.WeeklyCountryProductComparisonEnabled,
+                CollectionHandoffEnabled: false),
             Registration(
                 CommunityAutomatedPostSourceKeys.ChinaImportedFoodRegionBrief,
                 quartzRegistrationEnabled: false,

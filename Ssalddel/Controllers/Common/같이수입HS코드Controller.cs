@@ -89,4 +89,16 @@ public sealed class 같이수입HS코드Controller : ControllerBase
 
         return this.ToActionResult(result);
     }
+
+    [HttpGet("kamis-centered-import-price-references")]
+    [SsalddelApiContractName("GetKamisCenteredImportPriceReferences")]
+    public async Task<IActionResult> 카미스중심가격의사결정정보조회(
+        [FromQuery] Kamis중심같이수입가격Query query,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _useCase.카미스중심가격의사결정정보조회Async(
+            query,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
 }

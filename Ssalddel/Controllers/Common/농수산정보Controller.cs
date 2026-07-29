@@ -16,6 +16,11 @@ namespace Ssalddel.Controllers.Common;
 public sealed class 농수산정보Controller : ControllerBase
 {
     private readonly IAgriculturalFisheriesInformationService _informationService;
+    private readonly IBls평균소매가격ArchiveService _blsAverageRetailPriceService;
+    private readonly I국제농수산가격ArchiveService _internationalPriceArchiveService;
+    private readonly IUsdaAms시장가격ArchiveService _usdaAmsMarketPriceArchiveService;
+    private readonly IKamis중심UsdaAms가격비교QueryService
+        _kamisCenteredUsdaAmsComparisonService;
     private readonly I미국농수산가격조회Service _usPriceService;
     private readonly I호주농수산식품가격조회Service _australiaFoodPriceService;
     private readonly I미국농어업경영체정보원천Service _usOperatorSourceService;
@@ -25,6 +30,11 @@ public sealed class 농수산정보Controller : ControllerBase
 
     public 농수산정보Controller(
         IAgriculturalFisheriesInformationService informationService,
+        IBls평균소매가격ArchiveService blsAverageRetailPriceService,
+        I국제농수산가격ArchiveService internationalPriceArchiveService,
+        IUsdaAms시장가격ArchiveService usdaAmsMarketPriceArchiveService,
+        IKamis중심UsdaAms가격비교QueryService
+            kamisCenteredUsdaAmsComparisonService,
         I미국농수산가격조회Service usPriceService,
         I호주농수산식품가격조회Service australiaFoodPriceService,
         I미국농어업경영체정보원천Service usOperatorSourceService,
@@ -33,6 +43,11 @@ public sealed class 농수산정보Controller : ControllerBase
         IOfficialFoodIngredientCompanyArchiveService companyArchiveService)
     {
         _informationService = informationService;
+        _blsAverageRetailPriceService = blsAverageRetailPriceService;
+        _internationalPriceArchiveService = internationalPriceArchiveService;
+        _usdaAmsMarketPriceArchiveService = usdaAmsMarketPriceArchiveService;
+        _kamisCenteredUsdaAmsComparisonService =
+            kamisCenteredUsdaAmsComparisonService;
         _usPriceService = usPriceService;
         _australiaFoodPriceService = australiaFoodPriceService;
         _usOperatorSourceService = usOperatorSourceService;
@@ -54,6 +69,126 @@ public sealed class 농수산정보Controller : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 30)
         => Ok(_informationService.SearchItems(query, categoryCode, page, pageSize));
+
+    [HttpGet("market-prices/sources")]
+    [SsalddelApiContractName("GetMarketPriceSources")]
+    public ActionResult<농수산시세정보원목록응답> 시세정보원목록조회(
+        [FromQuery] string? countryCode,
+        [FromQuery] string? marketStageCode)
+        => Ok(_informationService.GetMarketPriceSources(
+            countryCode,
+            marketStageCode));
+
+    [HttpGet("international-prices/sources")]
+    [SsalddelApiContractName("GetInternationalPriceSources")]
+    public ActionResult<IReadOnlyList<국제농수산가격Source응답>>
+        국제가격정보원목록조회()
+        => Ok(_internationalPriceArchiveService.GetSources());
+
+    [HttpGet("international-prices/archive")]
+    [SsalddelApiContractName("GetInternationalPriceArchive")]
+    public async Task<ActionResult<국제농수산가격Archive응답>>
+        국제가격Archive조회(
+            [FromQuery] 국제농수산가격ArchiveQuery query,
+            CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return Ok(await _internationalPriceArchiveService.GetArchiveAsync(
+                query,
+                cancellationToken));
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpGet("us-market-news-prices/archive")]
+    [SsalddelApiContractName("GetUsMarketNewsPriceArchive")]
+    public async Task<ActionResult<UsdaAms시장가격Archive응답>>
+        미국MarketNews가격Archive조회(
+            [FromQuery] UsdaAms시장가격ArchiveQuery query,
+            CancellationToken cancellationToken = default)
+        => Ok(await _usdaAmsMarketPriceArchiveService.GetArchiveAsync(
+            query,
+            cancellationToken));
+
+    [HttpGet("market-prices/kamis-centered-usda-ams")]
+    [SsalddelApiContractName("GetKamisCenteredUsdaAmsPriceComparison")]
+    public async Task<ActionResult<Kamis중심UsdaAms가격비교응답>>
+        카미스중심미국농산물가격비교조회(
+            [FromQuery] Kamis중심UsdaAms가격비교Query query,
+            CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return Ok(await _kamisCenteredUsdaAmsComparisonService.GetAsync(
+                query,
+                cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "KAMIS 중심 USDA AMS 가격 비교 조건을 확인해 주세요.",
+                Detail = exception.Message
+            });
+        }
+    }
+
+    [HttpGet("market-prices/comparability")]
+    [SsalddelApiContractName("AssessMarketPriceComparability")]
+    public ActionResult<농수산시세비교판정응답> 시세정보원비교가능성조회(
+        [FromQuery] string? leftSourceKey,
+        [FromQuery] string? rightSourceKey)
+    {
+        var response = _informationService.AssessMarketPriceComparability(
+            leftSourceKey,
+            rightSourceKey);
+        return response.StatusCode switch
+        {
+            농수산시세비교판정Codes.잘못된요청 => BadRequest(response),
+            농수산시세비교판정Codes.정보원없음 => NotFound(response),
+            _ => Ok(response)
+        };
+    }
+
+    [HttpGet("us-retail-average-prices/catalog")]
+    [SsalddelApiContractName("GetUsRetailAveragePriceCatalog")]
+    public ActionResult<IReadOnlyList<Bls평균소매가격Series응답>>
+        미국평균소매가격Series목록조회()
+        => Ok(_blsAverageRetailPriceService.GetSeriesCatalog());
+
+    [HttpGet("us-retail-average-prices/kamis-crosswalk")]
+    [SsalddelApiContractName("GetUsRetailAveragePriceKamisCrosswalk")]
+    public ActionResult<BlsKamis비교Catalog응답> 미국평균소매가격Kamis비교후보조회()
+        => Ok(_blsAverageRetailPriceService.GetKamisComparisonCatalog());
+
+    [HttpGet("us-retail-average-prices/archive")]
+    [SsalddelApiContractName("GetUsRetailAveragePriceArchive")]
+    public async Task<ActionResult<Bls평균소매가격Archive응답>>
+        미국평균소매가격Archive조회(
+            [FromQuery] Bls평균소매가격ArchiveQuery query,
+            CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return Ok(await _blsAverageRetailPriceService.GetArchiveAsync(
+                query,
+                cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "미국 평균 소매가격 조회 조건을 확인해 주세요.",
+                Detail = exception.Message
+            });
+        }
+    }
 
     [HttpGet("food-ingredients")]
     [SsalddelApiContractName("SearchFoodIngredients")]

@@ -76,6 +76,62 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IUsdaNassPriceArchiveService>(serviceProvider =>
             serviceProvider.GetRequiredService<UsdaNassPriceArchiveService>());
         services
+            .AddHttpClient<IUsdaAmsMarketNewsClient, UsdaAmsMarketNewsClient>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider
+                        .GetRequiredService<IOptions<PublicDataOptions>>()
+                        .Value
+                        .UsdaAmsMarketNews;
+                    client.BaseAddress = new Uri(options.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                        "Ssalddel-USDA-AMS-Market-News-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(
+                        Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddScoped<IUsdaAms시장가격ArchiveService,
+            UsdaAms시장가격ArchiveService>();
+        services.AddScoped<IKamis중심UsdaAms가격비교QueryService,
+            Kamis중심UsdaAms가격비교QueryService>();
+        services.AddScoped<IKamis중심같이수입가격QueryService,
+            Kamis중심같이수입가격QueryService>();
+        services
+            .AddHttpClient<Bls평균소매가격ArchiveService>(client =>
+            {
+                client.BaseAddress = new Uri("https://api.bls.gov/");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Ssalddel-BLS-Average-Retail-Price-Collector/0.0");
+                client.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .RemoveAllLoggers();
+        services.AddScoped<IBls평균소매가격ArchiveService>(serviceProvider =>
+            serviceProvider.GetRequiredService<Bls평균소매가격ArchiveService>());
+        services
+            .AddHttpClient<StatCan평균소매가격공급자>(client =>
+            {
+                client.BaseAddress = new Uri("https://www150.statcan.gc.ca/");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Ssalddel-StatCan-Average-Retail-Price-Collector/0.0");
+                client.Timeout = TimeSpan.FromMinutes(3);
+            })
+            .RemoveAllLoggers();
+        services.AddTransient<I국제농수산가격공급자>(serviceProvider =>
+            serviceProvider.GetRequiredService<StatCan평균소매가격공급자>());
+        services
+            .AddHttpClient<Eurostat농산물절대가격공급자>(client =>
+            {
+                client.BaseAddress = new Uri("https://ec.europa.eu/");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Ssalddel-Eurostat-Agricultural-Price-Collector/0.0");
+                client.Timeout = TimeSpan.FromMinutes(2);
+            })
+            .RemoveAllLoggers();
+        services.AddTransient<I국제농수산가격공급자>(serviceProvider =>
+            serviceProvider.GetRequiredService<Eurostat농산물절대가격공급자>());
+        services.AddScoped<I국제농수산가격ArchiveService,
+            국제농수산가격ArchiveService>();
+        services
             .AddHttpClient<IKamisJsonClient, KamisJsonClient>(
                 (serviceProvider, client) =>
                 {
@@ -174,6 +230,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I미국농어업경영체정보원천Service,
             미국농어업경영체정보원천Service>();
         services.AddScoped<IMeatImportReadinessService, MeatImportReadinessService>();
+        services.AddScoped<I농수산물포장Fcl분석Service, 농수산물포장Fcl분석Service>();
         services.AddScoped<IFoodPriceComparisonService, FoodPriceComparisonService>();
 
         return services;

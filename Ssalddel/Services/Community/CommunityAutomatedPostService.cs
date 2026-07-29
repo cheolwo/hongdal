@@ -24,6 +24,8 @@ public static class CommunityAutomatedPostSourceKeys
         CommunityBoardInformationPublicationSourceKeys.ChinaImportedFoodRegionBrief;
     public const string UnitedStatesImportedFoodStateBrief =
         CommunityBoardInformationPublicationSourceKeys.UnitedStatesImportedFoodStateBrief;
+    public const string WeeklyCountryProductComparison =
+        CommunityBoardInformationPublicationSourceKeys.WeeklyCountryProductComparison;
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
     public const string CultureTransport = "culture-transport";
@@ -179,9 +181,51 @@ public sealed class EfCommunityAutomatedPostPublisher : ICommunityAutomatedPostP
             throw new ArgumentException("자동 게시글에는 제목과 본문이 필요합니다.", nameof(draft));
         }
 
-        await using var transaction = _db.Database.IsRelational()
-            ? await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken)
-            : null;
+        CommunityAutomatedPostPublishResult result;
+        if (_db.Database.IsRelational())
+        {
+            var strategy = _db.Database.CreateExecutionStrategy();
+            result = await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _db.Database.BeginTransactionAsync(
+                    IsolationLevel.Serializable,
+                    cancellationToken);
+                var persisted = await PersistIfMissingAsync(draft, cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+                return persisted;
+            });
+        }
+        else
+        {
+            result = await PersistIfMissingAsync(draft, cancellationToken);
+        }
+
+        if (result.Created && draft.PublishCreatedEvent)
+        {
+            try
+            {
+                await _publisher.Publish(
+                    new 커뮤니티게시글등록됨Event(result.PostId),
+                    cancellationToken);
+            }
+            catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning(
+                    exception,
+                    "자동 정보 게시글 후속 작업 신호 발행에 실패했습니다. DB 대기열에서 복구합니다. PostId={PostId} SourceKey={SourceKey} PeriodKey={PeriodKey}",
+                    result.PostId,
+                    draft.SourceKey,
+                    draft.PeriodKey);
+            }
+        }
+
+        return result;
+    }
+
+    private async Task<CommunityAutomatedPostPublishResult> PersistIfMissingAsync(
+        CommunityAutomatedPostDraft draft,
+        CancellationToken cancellationToken)
+    {
         var existingPost = await _db.PlatformCommunityPosts
             .Where(post => !post.IsDeleted && post.AuthorUserId == draft.SystemAuthorKey)
             .FirstOrDefaultAsync(cancellationToken);
@@ -197,11 +241,6 @@ public sealed class EfCommunityAutomatedPostPublisher : ICommunityAutomatedPostP
                 existingPost.Category = canonicalCategory;
                 existingPost.UpdatedAtUtc = _timeProvider.GetUtcNow().UtcDateTime;
                 await _db.SaveChangesAsync(cancellationToken);
-            }
-
-            if (transaction is not null)
-            {
-                await transaction.CommitAsync(cancellationToken);
             }
 
             return new CommunityAutomatedPostPublishResult(existingPost.Id, false);
@@ -235,28 +274,6 @@ public sealed class EfCommunityAutomatedPostPublisher : ICommunityAutomatedPostP
         }
 
         await _db.SaveChangesAsync(cancellationToken);
-        if (transaction is not null)
-        {
-            await transaction.CommitAsync(cancellationToken);
-        }
-
-        if (draft.PublishCreatedEvent)
-        {
-            try
-            {
-                await _publisher.Publish(new 커뮤니티게시글등록됨Event(entity.Id), cancellationToken);
-            }
-            catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogWarning(
-                    exception,
-                    "자동 정보 게시글 후속 작업 신호 발행에 실패했습니다. DB 대기열에서 복구합니다. PostId={PostId} SourceKey={SourceKey} PeriodKey={PeriodKey}",
-                    entity.Id,
-                    draft.SourceKey,
-                    draft.PeriodKey);
-            }
-        }
-
         return new CommunityAutomatedPostPublishResult(entity.Id, true);
     }
 

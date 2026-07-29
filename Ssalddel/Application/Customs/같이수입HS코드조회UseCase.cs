@@ -2,6 +2,7 @@ using FluentResults;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.Customs;
 using Ssalddel.Domain.HsCodes;
+using Ssalddel.Services.AgriculturalFisheries.ImportReadiness;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
 using 살뜰.Services.External.PublicData;
@@ -24,6 +25,10 @@ public interface I같이수입HS코드조회UseCase
     Task<Result<Hs공공데이터묶음응답>> 공공데이터수집Async(
         Hs공공데이터수집요청 request,
         CancellationToken cancellationToken);
+
+    Task<Result<Kamis중심같이수입가격응답>> 카미스중심가격의사결정정보조회Async(
+        Kamis중심같이수입가격Query query,
+        CancellationToken cancellationToken);
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
@@ -34,15 +39,21 @@ public sealed class 같이수입HS코드조회UseCase : I같이수입HS코드조
     private readonly SsalddelContext _db;
     private readonly IFoodPriceComparisonService _foodPriceComparisonService;
     private readonly IHs공공데이터수집Service _publicDataCollectionService;
+    private readonly IKamis중심같이수입가격QueryService
+        _kamisCenteredImportPriceService;
 
     public 같이수입HS코드조회UseCase(
         SsalddelContext db,
         IFoodPriceComparisonService foodPriceComparisonService,
-        IHs공공데이터수집Service publicDataCollectionService)
+        IHs공공데이터수집Service publicDataCollectionService,
+        IKamis중심같이수입가격QueryService
+            kamisCenteredImportPriceService)
     {
         _db = db;
         _foodPriceComparisonService = foodPriceComparisonService;
         _publicDataCollectionService = publicDataCollectionService;
+        _kamisCenteredImportPriceService =
+            kamisCenteredImportPriceService;
     }
 
     public async Task<Result<GroupImportHsCodeSearchResponse>> 검색Async(
@@ -122,6 +133,23 @@ public sealed class 같이수입HS코드조회UseCase : I같이수입HS코드조
 
         var response = await _publicDataCollectionService.수집Async(request, cancellationToken);
         return Result.Ok(response);
+    }
+
+    public async Task<Result<Kamis중심같이수입가격응답>>
+        카미스중심가격의사결정정보조회Async(
+            Kamis중심같이수입가격Query query,
+            CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Result.Ok(await _kamisCenteredImportPriceService.GetAsync(
+                query,
+                cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return Result.Fail<Kamis중심같이수입가격응답>(exception.Message);
+        }
     }
 
     private static GroupImportHsCodeItemResponse Map(HsCodeEntry entry)

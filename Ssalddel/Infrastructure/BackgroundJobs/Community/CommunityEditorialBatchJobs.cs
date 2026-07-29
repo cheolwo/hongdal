@@ -41,6 +41,11 @@ public sealed class CommunityEditorialBatchRunner
     public Task RunUsdaNassPriceBriefAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, cancellationToken);
 
+    public Task RunWeeklyCountryProductComparisonAsync(CancellationToken cancellationToken)
+        => RunSourceAsync(
+            CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison,
+            cancellationToken);
+
     public Task RunReflectionAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.Reflection, cancellationToken);
 
@@ -134,6 +139,32 @@ public sealed class CommunityUsdaNassPriceBriefJob : IJob
         => CommunityEditorialJobExecution.RunAsync(
             "CommunityUsdaNassPriceBrief",
             _runner.RunUsdaNassPriceBriefAsync,
+            context,
+            _options,
+            _logger);
+}
+
+[DisallowConcurrentExecution]
+public sealed class CommunityWeeklyCountryProductComparisonJob : IJob
+{
+    private readonly CommunityEditorialBatchRunner _runner;
+    private readonly CommunityEditorialBatchOptions _options;
+    private readonly ILogger<CommunityWeeklyCountryProductComparisonJob> _logger;
+
+    public CommunityWeeklyCountryProductComparisonJob(
+        CommunityEditorialBatchRunner runner,
+        IOptions<CommunityEditorialBatchOptions> options,
+        ILogger<CommunityWeeklyCountryProductComparisonJob> logger)
+    {
+        _runner = runner;
+        _options = options.Value;
+        _logger = logger;
+    }
+
+    public Task Execute(IJobExecutionContext context)
+        => CommunityEditorialJobExecution.RunAsync(
+            "CommunityWeeklyCountryProductComparison",
+            _runner.RunWeeklyCountryProductComparisonAsync,
             context,
             _options,
             _logger);

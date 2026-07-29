@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using System.Globalization;
 using Ssalddel.Hubs;
 using Ssalddel.Application.Behaviors;
@@ -43,10 +44,16 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
+using Ssalddel.Infrastructure.BackgroundJobs.Community;
+using Ssalddel.Domain.AgriculturalFisheries;
 using Ssalddel.Services.AgriculturalFisheries.Information;
+using Ssalddel.Services.AgriculturalFisheries.ImportReadiness;
+using Ssalddel.Contracts.Common.AgriculturalFisheries;
+using Ssalddel.Contracts.Common.Customs;
 using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Transport;
 using Ssalddel.Services.Content;
+using Ssalddel.Services.Community;
 using Ssalddel.Services.Customs;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Startup;
@@ -233,6 +240,849 @@ builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개�
 var app = builder.Build();
 app.Logger.LogInformation("Ssalddel execution mode: {ExecutionMode}", executionOptions.Mode);
 
+if (args.Any(argument => string.Equals(
+        argument,
+        "--analyze-kamis-packaging-fcl",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var sourceYear = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedSourceYear)
+        ? parsedSourceYear
+        : DateTime.Now.Year;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var analysisService =
+        scope.ServiceProvider.GetRequiredService<I농수산물포장Fcl분석Service>();
+    var result = await analysisService.분석저장Async(sourceYear, CancellationToken.None);
+    var report = await analysisService.조회Async(
+        sourceYear,
+        itemCode: null,
+        categoryCode: null,
+        CancellationToken.None);
+
+    app.Logger.LogInformation(
+        "KAMIS 품목 포장·FCL 분석 DB 저장 완료. SourceYear={SourceYear}, Items={Items}, Inserted={Inserted}, Updated={Updated}, AnalyzedAtUtc={AnalyzedAtUtc}",
+        result.SourceYear,
+        result.ItemCount,
+        result.InsertedCount,
+        result.UpdatedCount,
+        result.AnalyzedAtUtc);
+    Console.WriteLine(JsonSerializer.Serialize(
+        report,
+        new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            WriteIndented = true
+        }));
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--publish-weekly-country-product-comparison",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var runner = scope.ServiceProvider.GetRequiredService<CommunityEditorialBatchRunner>();
+    await runner.RunWeeklyCountryProductComparisonAsync(CancellationToken.None);
+
+    var snapshot = await archiveDb.WeeklyCountryProductComparisonSnapshots
+        .AsNoTracking()
+        .OrderByDescending(item => item.WeekEndDate)
+        .ThenByDescending(item => item.Id)
+        .FirstOrDefaultAsync();
+    var itemCount = snapshot is null
+        ? 0
+        : await archiveDb.WeeklyCountryProductComparisonItems
+            .AsNoTracking()
+            .CountAsync(item => item.SnapshotId == snapshot.Id);
+    var countryBreakdown = snapshot is null
+        ? []
+        : await archiveDb.WeeklyCountryProductComparisonItems
+            .AsNoTracking()
+            .Where(item => item.SnapshotId == snapshot.Id)
+            .GroupBy(item => new { item.CountryCode, item.StatusCode })
+            .Select(group => new
+            {
+                group.Key.CountryCode,
+                group.Key.StatusCode,
+                Count = group.Count()
+            })
+            .OrderBy(item => item.CountryCode)
+            .ThenBy(item => item.StatusCode)
+            .ToListAsync();
+    var postId = snapshot is null
+        ? null
+        : await scope.ServiceProvider.GetRequiredService<SsalddelContext>()
+            .PlatformCommunityPosts
+            .AsNoTracking()
+            .Where(post => !post.IsDeleted
+                           && post.AuthorUserId
+                           == CommunityAutomatedPostPublication.BuildSystemAuthorKey(
+                               CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison,
+                               snapshot.PeriodKey))
+            .Select(post => (long?)post.Id)
+            .FirstOrDefaultAsync();
+    app.Logger.LogInformation(
+        "주간 한미중 농수산물 비교 일회 실행 완료. SnapshotId={SnapshotId}, PeriodKey={PeriodKey}, Available={Available}, Items={Items}, CommunityPostId={CommunityPostId}",
+        snapshot?.Id,
+        snapshot?.PeriodKey,
+        snapshot?.AvailableObservationCount ?? 0,
+        itemCount,
+        postId);
+    app.Logger.LogInformation(
+        "주간 한미중 비교 국가별 저장 현황: {CountryBreakdown}",
+        string.Join(
+            ", ",
+            countryBreakdown.Select(item =>
+                $"{item.CountryCode}/{item.StatusCode}={item.Count}")));
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--inspect-kamis-centered-usda-ams-prices",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var inspectionYear = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedInspectionYear)
+        ? parsedInspectionYear
+        : DateTime.Now.Year;
+    var itemCodeArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--item-code=", StringComparison.OrdinalIgnoreCase));
+    var pageSizeArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--page-size=", StringComparison.OrdinalIgnoreCase));
+    var pageSize = int.TryParse(
+        pageSizeArgument?["--page-size=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedPageSize)
+        ? parsedPageSize
+        : 10;
+    var kamisPointsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--kamis-points=", StringComparison.OrdinalIgnoreCase));
+    var kamisPoints = int.TryParse(
+        kamisPointsArgument?["--kamis-points=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedKamisPoints)
+        ? parsedKamisPoints
+        : 2;
+    var amsPointsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--ams-points=", StringComparison.OrdinalIgnoreCase));
+    var amsPoints = int.TryParse(
+        amsPointsArgument?["--ams-points=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedAmsPoints)
+        ? parsedAmsPoints
+        : 1;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    if (args.Any(argument => string.Equals(
+            argument,
+            "--include-import-prices",
+            StringComparison.OrdinalIgnoreCase)))
+    {
+        var countryCodeArgument = args.FirstOrDefault(argument =>
+            argument.StartsWith(
+                "--country-code=",
+                StringComparison.OrdinalIgnoreCase));
+        var referenceMonthArgument = args.FirstOrDefault(argument =>
+            argument.StartsWith(
+                "--reference-month=",
+                StringComparison.OrdinalIgnoreCase));
+        var hsCodeArgument = args.FirstOrDefault(argument =>
+            argument.StartsWith("--hs-code=", StringComparison.OrdinalIgnoreCase));
+        var importLookbackArgument = args.FirstOrDefault(argument =>
+            argument.StartsWith(
+                "--import-lookback-months=",
+                StringComparison.OrdinalIgnoreCase));
+        var importLookbackMonths = int.TryParse(
+            importLookbackArgument?["--import-lookback-months=".Length..],
+            NumberStyles.None,
+            CultureInfo.InvariantCulture,
+            out var parsedImportLookbackMonths)
+            ? parsedImportLookbackMonths
+            : 3;
+        var fxRateArgument = args.FirstOrDefault(argument =>
+            argument.StartsWith(
+                "--fx-rate-krw-per-usd=",
+                StringComparison.OrdinalIgnoreCase));
+        var fxRateKrwPerUsd = decimal.TryParse(
+            fxRateArgument?["--fx-rate-krw-per-usd=".Length..],
+            NumberStyles.Number,
+            CultureInfo.InvariantCulture,
+            out var parsedFxRate)
+            ? parsedFxRate
+            : (decimal?)null;
+        var hsCandidatesArgument = args.FirstOrDefault(argument =>
+            argument.StartsWith(
+                "--hs-candidates-per-item=",
+                StringComparison.OrdinalIgnoreCase));
+        var hsCandidatesPerItem = int.TryParse(
+            hsCandidatesArgument?["--hs-candidates-per-item=".Length..],
+            NumberStyles.None,
+            CultureInfo.InvariantCulture,
+            out var parsedHsCandidatesPerItem)
+            ? parsedHsCandidatesPerItem
+            : 1;
+
+        var decisionSupportService = scope.ServiceProvider
+            .GetRequiredService<IKamis중심같이수입가격QueryService>();
+        var decisionSupportResponse = await decisionSupportService.GetAsync(
+            new Kamis중심같이수입가격Query
+            {
+                Year = inspectionYear,
+                ItemCode = itemCodeArgument?["--item-code=".Length..],
+                HsCode = hsCodeArgument?["--hs-code=".Length..],
+                OnlyAmsMapped = args.Any(argument => string.Equals(
+                    argument,
+                    "--only-mapped",
+                    StringComparison.OrdinalIgnoreCase)),
+                PageSize = pageSize,
+                KamisPointsPerItem = kamisPoints,
+                AmsPointsPerStage = amsPoints,
+                CountryCode =
+                    countryCodeArgument?["--country-code=".Length..]
+                    ?? "CN",
+                ReferenceMonth =
+                    referenceMonthArgument?["--reference-month=".Length..],
+                ImportLookbackMonths = importLookbackMonths,
+                FxRateKrwPerUsd = fxRateKrwPerUsd,
+                HsPriceCandidatesPerItem = hsCandidatesPerItem
+            });
+        Console.WriteLine(JsonSerializer.Serialize(
+            decisionSupportResponse,
+            new JsonSerializerOptions
+            {
+                WriteIndented = true
+            }));
+        return;
+    }
+
+    var comparisonService = scope.ServiceProvider
+        .GetRequiredService<IKamis중심UsdaAms가격비교QueryService>();
+    var response = await comparisonService.GetAsync(
+        new Kamis중심UsdaAms가격비교Query
+        {
+            Year = inspectionYear,
+            ItemCode = itemCodeArgument?["--item-code=".Length..],
+            OnlyMapped = args.Any(argument => string.Equals(
+                argument,
+                "--only-mapped",
+                StringComparison.OrdinalIgnoreCase)),
+            PageSize = pageSize,
+            KamisPointsPerItem = kamisPoints,
+            AmsPointsPerStage = amsPoints
+        });
+    Console.WriteLine(JsonSerializer.Serialize(
+        response,
+        new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--inspect-agricultural-fisheries-product-codes",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var inspectionYear = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedInspectionYear)
+        ? parsedInspectionYear
+        : DateTime.Now.Year;
+    if (inspectionYear is < 1990 or > 2100)
+    {
+        throw new ArgumentOutOfRangeException(
+            nameof(inspectionYear),
+            "조사 연도는 1990년부터 2100년 사이여야 합니다.");
+    }
+
+    var inspectionStartDate = new DateOnly(inspectionYear, 1, 1);
+    var inspectionEndDateExclusive = inspectionStartDate.AddYears(1);
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    var latestKamisSurveyDate = await archiveDb.KamisPriceObservations
+        .AsNoTracking()
+        .MaxAsync(item => (DateOnly?)item.SurveyDate);
+    var kamisItemCodes = await archiveDb.KamisPriceObservations
+        .AsNoTracking()
+        .Where(item => item.ItemCode != string.Empty)
+        .GroupBy(item => new
+        {
+            item.CategoryCode,
+            item.CategoryName,
+            item.ItemCode,
+            item.ItemName
+        })
+        .Select(group => new
+        {
+            group.Key.CategoryCode,
+            group.Key.CategoryName,
+            group.Key.ItemCode,
+            group.Key.ItemName,
+            LatestSurveyDate = group.Max(item => item.SurveyDate),
+            KindCodeCount = group.Select(item => item.KindCode)
+                .Where(code => code != string.Empty)
+                .Distinct()
+                .Count()
+        })
+        .OrderBy(item => item.CategoryCode)
+        .ThenBy(item => item.ItemCode)
+        .ToListAsync();
+    var focusNames = new[] { "사과", "감자", "양파", "쌀", "콩", "대두", "고등어" };
+    var focusProducts = kamisItemCodes
+        .Where(item => focusNames.Contains(item.ItemName, StringComparer.Ordinal))
+        .ToArray();
+    var kamisCategories = kamisItemCodes
+        .GroupBy(item => new { item.CategoryCode, item.CategoryName })
+        .Select(group => new
+        {
+            group.Key.CategoryCode,
+            group.Key.CategoryName,
+            ItemCodeCount = group.Count()
+        })
+        .OrderBy(item => item.CategoryCode)
+        .ToArray();
+    var kamisConflictingItemCodes = kamisItemCodes
+        .GroupBy(item => item.ItemCode)
+        .Where(group => group.Select(item => item.ItemName).Distinct().Count() > 1)
+        .Select(group => group.Key)
+        .ToList();
+    var kamisCodeNameConflictDetails = await archiveDb.KamisPriceObservations
+        .AsNoTracking()
+        .Where(item => kamisConflictingItemCodes.Contains(item.ItemCode))
+        .GroupBy(item => new
+        {
+            item.ItemCode,
+            item.ItemName,
+            item.KindCode,
+            item.KindName,
+            item.FrequencyCode,
+            item.FirstCollectionRunId
+        })
+        .Select(group => new
+        {
+            group.Key.ItemCode,
+            group.Key.ItemName,
+            group.Key.KindCode,
+            group.Key.KindName,
+            group.Key.FrequencyCode,
+            group.Key.FirstCollectionRunId,
+            ObservationCount = group.Count(),
+            FirstSurveyDate = group.Min(item => item.SurveyDate),
+            LatestSurveyDate = group.Max(item => item.SurveyDate),
+            LatestSeenAtUtc = group.Max(item => item.LastSeenAtUtc)
+        })
+        .OrderBy(item => item.ItemCode)
+        .ThenBy(item => item.ItemName)
+        .ThenBy(item => item.KindCode)
+        .ToListAsync();
+    var kamisCodeNameConflictSampleCandidates = await archiveDb.KamisPriceObservations
+        .AsNoTracking()
+        .Where(item => kamisConflictingItemCodes.Contains(item.ItemCode))
+        .OrderBy(item => item.ItemCode)
+        .ThenBy(item => item.ItemName)
+        .ThenBy(item => item.SurveyDate)
+        .Select(item => new
+        {
+            item.Id,
+            item.FirstCollectionRunId,
+            item.ItemCode,
+            item.ItemName,
+            item.KindCode,
+            item.KindName,
+            item.SurveyDate,
+            item.RawJson
+        })
+        .ToListAsync();
+    var kamisCodeNameConflictSamples = kamisCodeNameConflictSampleCandidates
+        .GroupBy(item => new { item.ItemCode, item.ItemName })
+        .SelectMany(group => group.Take(3))
+        .ToArray();
+    var kamisYearQuery = archiveDb.KamisPriceObservations
+        .AsNoTracking()
+        .Where(item => item.SurveyDate >= inspectionStartDate
+                       && item.SurveyDate < inspectionEndDateExclusive);
+    var kamisYearObservationCount = await kamisYearQuery.CountAsync();
+    var kamisYearPricedObservationCount = await kamisYearQuery
+        .CountAsync(item => item.PriceKrw.HasValue);
+    var kamisYearSurveyDateCount = await kamisYearQuery
+        .Select(item => item.SurveyDate)
+        .Distinct()
+        .CountAsync();
+    var kamisYearFrequencyBreakdown = await kamisYearQuery
+        .GroupBy(item => item.FrequencyCode)
+        .Select(group => new
+        {
+            FrequencyCode = group.Key,
+            ObservationCount = group.Count()
+        })
+        .OrderBy(item => item.FrequencyCode)
+        .ToListAsync();
+    var kamisYearCoverage = await kamisYearQuery
+        .GroupBy(item => new
+        {
+            item.CategoryCode,
+            item.CategoryName,
+            item.ItemCode,
+            item.ItemName
+        })
+        .Select(group => new
+        {
+            group.Key.CategoryCode,
+            group.Key.CategoryName,
+            group.Key.ItemCode,
+            group.Key.ItemName,
+            ObservationCount = group.Count(),
+            PricedObservationCount = group.Count(item => item.PriceKrw.HasValue),
+            MissingPriceObservationCount = group.Count(item => !item.PriceKrw.HasValue),
+            FirstSurveyDate = group.Min(item => item.SurveyDate),
+            LatestSurveyDate = group.Max(item => item.SurveyDate),
+            SurveyDateCount = group.Select(item => item.SurveyDate).Distinct().Count(),
+            KindCodeCount = group.Select(item => item.KindCode).Distinct().Count(),
+            RetailObservationCount = group.Count(item => item.ProductClassCode == "01"),
+            WholesaleObservationCount = group.Count(item => item.ProductClassCode == "02")
+        })
+        .OrderBy(item => item.CategoryCode)
+        .ThenBy(item => item.ItemCode)
+        .ToListAsync();
+    var kamisYearCoverageKeys = kamisYearCoverage
+        .Select(item => (item.CategoryCode, item.ItemCode))
+        .ToHashSet();
+    var kamisCodesWithoutYearObservation = kamisItemCodes
+        .Where(item => !kamisYearCoverageKeys.Contains((item.CategoryCode, item.ItemCode)))
+        .Select(item => new
+        {
+            item.CategoryCode,
+            item.CategoryName,
+            item.ItemCode,
+            item.ItemName
+        })
+        .ToArray();
+
+    var latestAuctionSettlementDate = await archiveDb.DomesticAuctionPriceObservations
+        .AsNoTracking()
+        .MaxAsync(item => (DateOnly?)item.SettlementDate);
+    var auctionObservationCount = await archiveDb.DomesticAuctionPriceObservations
+        .AsNoTracking()
+        .CountAsync();
+    var auctionCorporationItemCodeCount = await archiveDb.DomesticAuctionPriceObservations
+        .AsNoTracking()
+        .Where(item => item.CorporationItemCode != string.Empty)
+        .Select(item => new { item.CorporationCode, item.CorporationItemCode })
+        .Distinct()
+        .CountAsync();
+    var auctionItemNameCount = await archiveDb.DomesticAuctionPriceObservations
+        .AsNoTracking()
+        .Where(item => item.ItemName != string.Empty)
+        .Select(item => item.ItemName)
+        .Distinct()
+        .CountAsync();
+
+    var hsUsdaMappings = await archiveDb.HsCommodityMappings
+        .AsNoTracking()
+        .Where(item => item.IsActive)
+        .OrderBy(item => item.HsCode6)
+        .Select(item => new
+        {
+            item.HsCode6,
+            item.ProductNameKo,
+            item.UsdaCommodityDesc,
+            item.MatchQualityCode,
+            item.ReviewStatusCode
+        })
+        .ToListAsync();
+    var usdaYearQuery = archiveDb.PriceObservations
+        .AsNoTracking()
+        .Where(item => item.Year == inspectionYear);
+    var usdaYearObservationCount = await usdaYearQuery.CountAsync();
+    var usdaYearNumericObservationCount = await usdaYearQuery
+        .CountAsync(item => item.NumericValue.HasValue);
+    var usdaYearSuppressedObservationCount = await usdaYearQuery
+        .CountAsync(item => item.IsSuppressed);
+    var usdaYearCommodityCoverage = await usdaYearQuery
+        .GroupBy(item => item.CommodityDesc)
+        .Select(group => new
+        {
+            CommodityDesc = group.Key,
+            ObservationCount = group.Count(),
+            NumericObservationCount = group.Count(item => item.NumericValue.HasValue),
+            SuppressedObservationCount = group.Count(item => item.IsSuppressed),
+            UnitCount = group.Select(item => item.UnitDesc).Distinct().Count(),
+            ReferencePeriodCount = group.Select(item => item.ReferencePeriodDesc).Distinct().Count(),
+            LatestSourceLoadTimeUtc = group.Max(item => item.SourceLoadTimeUtc)
+        })
+        .OrderBy(item => item.CommodityDesc)
+        .ToListAsync();
+    var usdaYearReferencePeriods = await usdaYearQuery
+        .GroupBy(item => new
+        {
+            item.CommodityDesc,
+            item.ReferencePeriodDesc
+        })
+        .Select(group => new
+        {
+            group.Key.CommodityDesc,
+            group.Key.ReferencePeriodDesc,
+            ObservationCount = group.Count(),
+            NumericObservationCount = group.Count(item => item.NumericValue.HasValue),
+            SuppressedObservationCount = group.Count(item => item.IsSuppressed)
+        })
+        .OrderBy(item => item.CommodityDesc)
+        .ThenBy(item => item.ReferencePeriodDesc)
+        .ToListAsync();
+    var mappedUsdaCommodityNames = hsUsdaMappings
+        .Select(item => item.UsdaCommodityDesc)
+        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    var mappedUsdaCommodityCoverage = usdaYearCommodityCoverage
+        .Where(item => mappedUsdaCommodityNames.Contains(item.CommodityDesc))
+        .ToArray();
+    var usdaYearCoverageByCommodity = usdaYearCommodityCoverage
+        .ToDictionary(item => item.CommodityDesc, StringComparer.OrdinalIgnoreCase);
+    var kamisToUsdaCommodityAliases =
+        new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["쌀"] = ["RICE"],
+            ["콩"] = ["SOYBEANS"],
+            ["감자"] = ["POTATOES"],
+            ["양파"] = ["ONIONS"],
+            ["토마토"] = ["TOMATOES"],
+            ["딸기"] = ["STRAWBERRIES"],
+            ["땅콩"] = ["PEANUTS"],
+            ["브로콜리"] = ["BROCCOLI"],
+            ["오이"] = ["CUCUMBERS"],
+            ["상추"] = ["LETTUCE"],
+            ["멜론"] = ["MELONS"],
+            ["사과"] = ["APPLES"],
+            ["배"] = ["PEARS"],
+            ["복숭아"] = ["PEACHES"],
+            ["포도"] = ["GRAPES"],
+            ["오렌지"] = ["ORANGES"],
+            ["레몬"] = ["LEMONS"],
+            ["소"] = ["CATTLE"],
+            ["돼지"] = ["HOGS"],
+            ["닭"] = ["CHICKENS"],
+            ["계란"] = ["EGGS"],
+            ["우유"] = ["MILK"]
+        };
+    var kamisUsdaCrosswalk = kamisItemCodes
+        .Select(kamisItem =>
+        {
+            var commodityAliases = kamisToUsdaCommodityAliases.TryGetValue(
+                    kamisItem.ItemName,
+                    out var aliases)
+                ? aliases.ToHashSet(StringComparer.OrdinalIgnoreCase)
+                : [];
+
+            var candidateMappings = hsUsdaMappings
+                .Where(mapping =>
+                    string.Equals(
+                        mapping.ProductNameKo,
+                        kamisItem.ItemName,
+                        StringComparison.Ordinal)
+                    || commodityAliases.Contains(mapping.UsdaCommodityDesc))
+                .Select(mapping =>
+                {
+                    usdaYearCoverageByCommodity.TryGetValue(
+                        mapping.UsdaCommodityDesc,
+                        out var commodityCoverage);
+                    return new
+                    {
+                        mapping.HsCode6,
+                        mapping.ProductNameKo,
+                        mapping.UsdaCommodityDesc,
+                        mapping.MatchQualityCode,
+                        mapping.ReviewStatusCode,
+                        UsdaYearObservationCount =
+                            commodityCoverage?.ObservationCount ?? 0,
+                        UsdaYearNumericObservationCount =
+                            commodityCoverage?.NumericObservationCount ?? 0,
+                        ReferencePeriods = usdaYearReferencePeriods
+                            .Where(period => string.Equals(
+                                period.CommodityDesc,
+                                mapping.UsdaCommodityDesc,
+                                StringComparison.OrdinalIgnoreCase))
+                            .ToArray()
+                    };
+                })
+                .ToArray();
+            var usdaCommodityCandidates = commodityAliases
+                .OrderBy(commodityDesc => commodityDesc)
+                .Select(commodityDesc =>
+                {
+                    usdaYearCoverageByCommodity.TryGetValue(
+                        commodityDesc,
+                        out var commodityCoverage);
+                    return new
+                    {
+                        CommodityDesc = commodityDesc,
+                        UsdaYearObservationCount =
+                            commodityCoverage?.ObservationCount ?? 0,
+                        UsdaYearNumericObservationCount =
+                            commodityCoverage?.NumericObservationCount ?? 0,
+                        UsdaYearSuppressedObservationCount =
+                            commodityCoverage?.SuppressedObservationCount ?? 0,
+                        ReferencePeriods = usdaYearReferencePeriods
+                            .Where(period => string.Equals(
+                                period.CommodityDesc,
+                                commodityDesc,
+                                StringComparison.OrdinalIgnoreCase))
+                            .ToArray()
+                    };
+                })
+                .ToArray();
+
+            return new
+            {
+                kamisItem.CategoryCode,
+                kamisItem.CategoryName,
+                kamisItem.ItemCode,
+                kamisItem.ItemName,
+                CandidateMappingCount = candidateMappings.Length,
+                UsdaCommodityCandidateCount = usdaCommodityCandidates.Length,
+                HasUsdaYearObservation = usdaCommodityCandidates.Any(candidate =>
+                    candidate.UsdaYearObservationCount > 0),
+                UsdaCommodityCandidates = usdaCommodityCandidates,
+                CandidateMappings = candidateMappings
+            };
+        })
+        .ToArray();
+
+    var blsArchiveService =
+        scope.ServiceProvider.GetRequiredService<IBls평균소매가격ArchiveService>();
+    var blsKamisComparison = blsArchiveService.GetKamisComparisonCatalog();
+    var blsYearQuery = archiveDb.BlsAverageRetailPriceObservations
+        .AsNoTracking()
+        .Where(item =>
+            item.ReferenceMonth >= inspectionStartDate
+            && item.ReferenceMonth < inspectionEndDateExclusive);
+    var blsYearObservationCount = await blsYearQuery.CountAsync();
+    var blsYearNumericObservationCount =
+        await blsYearQuery.CountAsync(item => item.PriceUsd.HasValue);
+    var blsYearReferenceMonthCount = await blsYearQuery
+        .Select(item => item.ReferenceMonth)
+        .Distinct()
+        .CountAsync();
+    var blsYearLatestReferenceMonth = await blsYearQuery
+        .MaxAsync(item => (DateOnly?)item.ReferenceMonth);
+    var blsYearCoverage = await blsYearQuery
+        .GroupBy(item => new
+        {
+            item.SeriesId,
+            item.ItemCode,
+            item.CanonicalProductKey,
+            item.ProductNameKo,
+            item.OriginalUnit
+        })
+        .Select(group => new
+        {
+            group.Key.SeriesId,
+            group.Key.ItemCode,
+            group.Key.CanonicalProductKey,
+            group.Key.ProductNameKo,
+            group.Key.OriginalUnit,
+            ObservationCount = group.Count(),
+            NumericObservationCount = group.Count(item => item.PriceUsd.HasValue),
+            MissingObservationCount = group.Count(item => !item.PriceUsd.HasValue),
+            FirstReferenceMonth = group.Min(item => item.ReferenceMonth),
+            LatestReferenceMonth = group.Max(item => item.ReferenceMonth)
+        })
+        .OrderBy(item => item.SeriesId)
+        .ToListAsync();
+    var blsYearSeriesIds = blsYearCoverage
+        .Select(item => item.SeriesId)
+        .ToHashSet(StringComparer.Ordinal);
+    var blsSeriesWithoutYearObservation = blsKamisComparison.Items
+        .Where(item => !blsYearSeriesIds.Contains(item.SeriesId))
+        .Select(item => new
+        {
+            item.SeriesId,
+            item.BlsItemCode,
+            item.CanonicalProductKey,
+            item.BlsProductNameKo,
+            item.MappingStatusCode
+        })
+        .ToArray();
+    var blsKamisCandidateRows = blsKamisComparison.Items
+        .SelectMany(series => series.KamisCandidates.Select(candidate => new
+        {
+            series.SeriesId,
+            series.BlsItemCode,
+            series.CanonicalProductKey,
+            series.BlsProductNameKo,
+            series.BlsOriginalUnit,
+            candidate.KamisCategoryCode,
+            candidate.KamisItemCode,
+            candidate.MatchQualityCode,
+            candidate.ReviewStatusCode,
+            candidate.AllowsDirectPriceComparison,
+            candidate.ReviewNote
+        }))
+        .ToArray();
+    var kamisBlsCrosswalk = kamisItemCodes
+        .Select(kamisItem => new
+        {
+            kamisItem.CategoryCode,
+            kamisItem.CategoryName,
+            kamisItem.ItemCode,
+            kamisItem.ItemName,
+            BlsCandidates = blsKamisCandidateRows
+                .Where(candidate =>
+                    candidate.KamisCategoryCode == kamisItem.CategoryCode
+                    && candidate.KamisItemCode == kamisItem.ItemCode)
+                .OrderBy(candidate => candidate.SeriesId)
+                .ToArray()
+        })
+        .Select(item => new
+        {
+            item.CategoryCode,
+            item.CategoryName,
+            item.ItemCode,
+            item.ItemName,
+            CandidateSeriesCount = item.BlsCandidates.Length,
+            HasDirectComparableCandidate = item.BlsCandidates.Any(candidate =>
+                candidate.AllowsDirectPriceComparison),
+            item.BlsCandidates
+        })
+        .ToArray();
+
+    Console.WriteLine(JsonSerializer.Serialize(
+        new
+        {
+            Kamis = new
+            {
+                LatestSurveyDate = latestKamisSurveyDate,
+                ItemCodeCount = kamisItemCodes.Count,
+                Categories = kamisCategories,
+                WeeklyComparisonProducts = focusProducts,
+                AllItemCodes = kamisItemCodes,
+                CodeNameIntegrity = new
+                {
+                    ConflictingItemCodeCount = kamisConflictingItemCodes.Count,
+                    ConflictingItemCodes = kamisConflictingItemCodes,
+                    ConflictDetails = kamisCodeNameConflictDetails,
+                    ConflictSamples = kamisCodeNameConflictSamples
+                },
+                YearCoverage = new
+                {
+                    Year = inspectionYear,
+                    ObservationCount = kamisYearObservationCount,
+                    PricedObservationCount = kamisYearPricedObservationCount,
+                    MissingPriceObservationCount =
+                        kamisYearObservationCount - kamisYearPricedObservationCount,
+                    SurveyDateCount = kamisYearSurveyDateCount,
+                    ItemCodeWithObservationCount = kamisYearCoverage.Count,
+                    ItemCodeWithoutObservationCount = kamisCodesWithoutYearObservation.Length,
+                    FrequencyBreakdown = kamisYearFrequencyBreakdown,
+                    ItemCoverage = kamisYearCoverage,
+                    ItemCodesWithoutObservation = kamisCodesWithoutYearObservation,
+                    UnitBoundary =
+                        "Period 관측은 KAMIS p_convert_kg_yn=Y에 따른 1kg 환산값이며 원 거래단위 관측과 FrequencyCode·Unit으로 구분합니다."
+                }
+            },
+            DomesticAuction = new
+            {
+                LatestSettlementDate = latestAuctionSettlementDate,
+                ObservationCount = auctionObservationCount,
+                CorporationItemCodeCount = auctionCorporationItemCodeCount,
+                ItemNameCount = auctionItemNameCount,
+                CodeBoundary =
+                    "법인품목코드는 도매시장 법인별 코드이며 KAMIS·HS의 전국 공통 품목코드가 아닙니다."
+            },
+            HsUsda = new
+            {
+                MappingCount = hsUsdaMappings.Count,
+                ReviewedCount = hsUsdaMappings.Count(item =>
+                    item.ReviewStatusCode == HsUsdaMappingReviewStatusCodes.Reviewed),
+                Mappings = hsUsdaMappings,
+                YearCoverage = new
+                {
+                    Year = inspectionYear,
+                    ObservationCount = usdaYearObservationCount,
+                    NumericObservationCount = usdaYearNumericObservationCount,
+                    SuppressedObservationCount = usdaYearSuppressedObservationCount,
+                    CommodityCount = usdaYearCommodityCoverage.Count,
+                    CommodityCoverage = usdaYearCommodityCoverage,
+                    ReferencePeriodCoverage = usdaYearReferencePeriods,
+                    CandidateMappedCommodityCoverage = mappedUsdaCommodityCoverage,
+                    KamisItemCodeCrosswalk = new
+                    {
+                        KamisItemCodeCount = kamisUsdaCrosswalk.Length,
+                        CandidateHsMappedKamisItemCodeCount = kamisUsdaCrosswalk.Count(item =>
+                            item.CandidateMappingCount > 0),
+                        DirectCommodityMappedKamisItemCodeCount = kamisUsdaCrosswalk.Count(item =>
+                            item.UsdaCommodityCandidateCount > 0),
+                        KamisItemCodeWithUsdaObservationCount = kamisUsdaCrosswalk.Count(item =>
+                            item.HasUsdaYearObservation),
+                        UnmappedKamisItemCodeCount = kamisUsdaCrosswalk.Count(item =>
+                            item.UsdaCommodityCandidateCount == 0),
+                        Items = kamisUsdaCrosswalk
+                    },
+                    MappingBoundary =
+                        "HS-USDA 매핑은 검토 후보이며 KAMIS 품목코드와 동일한 코드 체계가 아닙니다. KAMIS는 도·소매 관측이고 USDA PRICE RECEIVED는 생산자 수취가격이므로 가격 수준을 직접 비교하지 않습니다."
+                }
+            },
+            BlsAverageRetail = new
+            {
+                blsKamisComparison.BlsCatalogObservedAt,
+                blsKamisComparison.BlsSeriesCount,
+                blsKamisComparison.SeriesWithCandidateCount,
+                blsKamisComparison.DirectComparableCandidateSeriesCount,
+                blsKamisComparison.UniqueKamisItemCodeCount,
+                Crosswalk = blsKamisComparison.Items,
+                blsKamisComparison.ComparisonBoundaries,
+                KamisItemCodeCoverage = new
+                {
+                    KamisItemCodeCount = kamisBlsCrosswalk.Length,
+                    KamisItemCodeWithBlsCandidateCount = kamisBlsCrosswalk.Count(item =>
+                        item.CandidateSeriesCount > 0),
+                    KamisItemCodeWithoutBlsCandidateCount = kamisBlsCrosswalk.Count(item =>
+                        item.CandidateSeriesCount == 0),
+                    Items = kamisBlsCrosswalk
+                },
+                YearCoverage = new
+                {
+                    Year = inspectionYear,
+                    ObservationCount = blsYearObservationCount,
+                    NumericObservationCount = blsYearNumericObservationCount,
+                    ReferenceMonthCount = blsYearReferenceMonthCount,
+                    LatestReferenceMonth = blsYearLatestReferenceMonth,
+                    SeriesWithObservationCount = blsYearCoverage.Count,
+                    SeriesWithoutObservationCount =
+                        blsSeriesWithoutYearObservation.Length,
+                    Items = blsYearCoverage,
+                    SeriesWithoutObservation = blsSeriesWithoutYearObservation,
+                    CollectionBoundary =
+                        "2026년은 진행 중이므로 현재 BLS 공개 월까지만 수집하며 이후 월은 같은 RecordKey 규칙으로 누적합니다."
+                }
+            }
+        },
+        new JsonSerializerOptions { WriteIndented = true }));
+    return;
+}
+
 var youTubeCountrySyncArgument = args.FirstOrDefault(argument =>
     argument.StartsWith("--sync-youtube-country=", StringComparison.OrdinalIgnoreCase));
 if (youTubeCountrySyncArgument is not null)
@@ -262,6 +1112,169 @@ if (youTubeCountrySyncArgument is not null)
 }
 
 if (args.Any(argument =>
+        string.Equals(
+            argument,
+            "--collect-bls-average-retail-prices",
+            StringComparison.OrdinalIgnoreCase)))
+{
+    var yearFromArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year-from=", StringComparison.OrdinalIgnoreCase));
+    var yearFrom = int.TryParse(
+        yearFromArgument?["--year-from=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedYearFrom)
+        ? parsedYearFrom
+        : DateTime.UtcNow.Year;
+    var yearToArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year-to=", StringComparison.OrdinalIgnoreCase));
+    var yearTo = int.TryParse(
+        yearToArgument?["--year-to=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedYearTo)
+        ? parsedYearTo
+        : yearFrom;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService =
+        scope.ServiceProvider.GetRequiredService<IBls평균소매가격ArchiveService>();
+    var archiveResult = await archiveService.CollectAsync(
+        new Bls평균소매가격수집요청
+        {
+            YearFrom = yearFrom,
+            YearTo = yearTo
+        });
+    app.Logger.LogInformation(
+        "BLS 미국 평균 소매가격 DB 저장 완료. Range={YearFrom}-{YearTo}, Series={Series}, RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}, LatestReferenceMonth={LatestReferenceMonth}",
+        archiveResult.YearFrom,
+        archiveResult.YearTo,
+        archiveResult.RequestedSeriesCount,
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.UpdatedCount,
+        archiveResult.ExistingCount,
+        archiveResult.LatestReferenceMonth);
+    return;
+}
+
+if (args.Any(argument =>
+        string.Equals(
+            argument,
+            "--collect-international-agricultural-prices",
+            StringComparison.OrdinalIgnoreCase)))
+{
+    var sourceArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--source=", StringComparison.OrdinalIgnoreCase));
+    var sourceKey = sourceArgument?["--source=".Length..]?.Trim();
+    if (string.IsNullOrWhiteSpace(sourceKey))
+    {
+        throw new InvalidOperationException(
+            "--collect-international-agricultural-prices에는 --source가 필요합니다.");
+    }
+
+    var yearFromArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year-from=", StringComparison.OrdinalIgnoreCase));
+    var yearFrom = int.TryParse(
+        yearFromArgument?["--year-from=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedYearFrom)
+        ? parsedYearFrom
+        : 0;
+    var yearToArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year-to=", StringComparison.OrdinalIgnoreCase));
+    var yearTo = int.TryParse(
+        yearToArgument?["--year-to=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedYearTo)
+        ? parsedYearTo
+        : yearFrom;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider
+        .GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService =
+        scope.ServiceProvider.GetRequiredService<I국제농수산가격ArchiveService>();
+    var archiveResult = await archiveService.CollectAsync(
+        new 국제농수산가격수집요청
+        {
+            SourceKey = sourceKey,
+            YearFrom = yearFrom,
+            YearTo = yearTo
+        });
+    app.Logger.LogInformation(
+        "국제 농수산 가격 DB 저장 완료. Source={SourceKey}, Range={YearFrom}-{YearTo}, RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}, LatestReferenceDate={LatestReferenceDate}",
+        archiveResult.SourceKey,
+        archiveResult.YearFrom,
+        archiveResult.YearTo,
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.UpdatedCount,
+        archiveResult.ExistingCount,
+        archiveResult.LatestReferenceDate);
+    return;
+}
+
+if (args.Any(argument =>
+        string.Equals(
+            argument,
+            "--collect-usda-ams-market-prices",
+            StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var year = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedYear)
+        ? parsedYear
+        : DateTime.UtcNow.Year;
+    var dateToArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--date-to=", StringComparison.OrdinalIgnoreCase));
+    var dateTo = dateToArgument?["--date-to=".Length..];
+    var marketTypes = args
+        .Where(argument =>
+            argument.StartsWith("--market-type=", StringComparison.OrdinalIgnoreCase))
+        .Select(argument => argument["--market-type=".Length..])
+        .Where(value => !string.IsNullOrWhiteSpace(value))
+        .ToArray();
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider
+        .GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService =
+        scope.ServiceProvider.GetRequiredService<IUsdaAms시장가격ArchiveService>();
+    var result = await archiveService.CollectAsync(
+        new UsdaAms시장가격수집요청
+        {
+            Year = year,
+            DateTo = dateTo,
+            MarketTypes = marketTypes
+        });
+    app.Logger.LogInformation(
+        "USDA AMS 시장가격 DB 저장 완료. Range={DateFrom}-{DateTo}, Reports={Reports}, Slices={Slices}, RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Existing={Existing}, LatestReferenceDate={LatestReferenceDate}",
+        result.DateFrom,
+        result.DateTo,
+        result.DiscoveredReportCount,
+        result.CompletedSliceCount,
+        result.CollectionRunId,
+        result.FetchedCount,
+        result.InsertedCount,
+        result.ExistingCount,
+        result.LatestReferenceDate);
+    return;
+}
+
+if (args.Any(argument =>
         string.Equals(argument, "--collect-usda-nass-prices", StringComparison.OrdinalIgnoreCase)))
 {
     var yearFromArgument = args.FirstOrDefault(argument =>
@@ -285,6 +1298,65 @@ if (args.Any(argument =>
         archiveResult.ExistingCount,
         archiveResult.MappingCount,
         archiveResult.LatestSourceLoadTimeUtc);
+    return;
+}
+
+if (args.Any(argument =>
+        string.Equals(argument, "--collect-kamis-price-period", StringComparison.OrdinalIgnoreCase)))
+{
+    var startDateArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--start-date=", StringComparison.OrdinalIgnoreCase));
+    var startDate = DateOnly.TryParseExact(
+        startDateArgument?["--start-date=".Length..],
+        "yyyy-MM-dd",
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out var parsedStartDate)
+        ? parsedStartDate
+        : new DateOnly(DateTime.Now.Year, 1, 1);
+    var endDateArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--end-date=", StringComparison.OrdinalIgnoreCase));
+    var endDate = DateOnly.TryParseExact(
+        endDateArgument?["--end-date=".Length..],
+        "yyyy-MM-dd",
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out var parsedEndDate)
+        ? parsedEndDate
+        : DateOnly.FromDateTime(DateTime.Now);
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var observedItemCodes = await archiveDb.KamisPriceObservations
+        .AsNoTracking()
+        .Where(item => item.ItemCode != string.Empty)
+        .Select(item => item.ItemCode)
+        .Distinct()
+        .OrderBy(itemCode => itemCode)
+        .ToListAsync();
+    if (observedItemCodes.Count == 0)
+    {
+        throw new InvalidOperationException(
+            "KAMIS 기간 전수조사의 기준이 될 기존 관측 품목코드가 없습니다.");
+    }
+
+    var archiveService = scope.ServiceProvider.GetRequiredService<IKamisPriceArchiveService>();
+    var archiveResult = await archiveService.CollectPeriodPricesForItemCodesAsync(
+        startDate,
+        endDate,
+        observedItemCodes);
+    app.Logger.LogInformation(
+        "KAMIS 기존 품목코드 기간 가격 DB 저장 완료. Range={StartDate}~{EndDate}, ItemCodes={ItemCodes}, RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}, LatestSurveyDate={LatestSurveyDate}",
+        startDate,
+        endDate,
+        observedItemCodes.Count,
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.UpdatedCount,
+        archiveResult.ExistingCount,
+        archiveResult.LatestSurveyDate);
     return;
 }
 

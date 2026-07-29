@@ -102,4 +102,23 @@ public sealed class CommunityEditorialBatchRegistrationPlanTests
         Assert.True(registration.QuartzRegistrationEnabled);
         Assert.False(registration.CollectionHandoffEnabled);
     }
+
+    [Fact]
+    public void 주간한미중비교는_다른편집배치가꺼져도_명시적설정으로독립등록한다()
+    {
+        var plan = CommunityEditorialBatchRegistrationPlan.Create(
+            new AgriculturalFisheriesBatchOptions(),
+            new CommunityEditorialBatchOptions
+            {
+                Enabled = false,
+                WeeklyCountryProductComparisonEnabled = true
+            });
+
+        var registration = plan.Get(
+            CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison);
+
+        Assert.True(registration.QuartzRegistrationEnabled);
+        Assert.False(registration.CollectionHandoffEnabled);
+        Assert.Equal(CommunityBoardKeys.InformationPrices, registration.CanonicalBoardKey);
+    }
 }

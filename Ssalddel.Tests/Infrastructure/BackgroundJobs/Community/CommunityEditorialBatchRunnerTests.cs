@@ -63,6 +63,23 @@ public sealed class CommunityEditorialBatchRunnerTests
     }
 
     [Fact]
+    public async Task WeeklyCountryComparisonRun_PublishesOnlyVerifiedWeeklySnapshotDraft()
+    {
+        var source = new RecordingSource(
+            CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison,
+            hasDraft: true);
+        var publisher = new RecordingPublisher();
+        var runner = CreateRunner(source, publisher);
+
+        await runner.RunWeeklyCountryProductComparisonAsync(CancellationToken.None);
+
+        Assert.Equal(1, publisher.CallCount);
+        Assert.Equal(
+            CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison,
+            publisher.Draft?.SourceKey);
+    }
+
+    [Fact]
     public async Task CultureTransportRun_PublishesOnlyTheCultureTransportDraft()
     {
         var source = new RecordingSource(

@@ -22,6 +22,15 @@ public sealed class CommunityEditorialBatchOptions
 
     public int UsdaNassPriceBriefMaxItems { get; set; } = 5;
 
+    public bool WeeklyCountryProductComparisonEnabled { get; set; }
+
+    public string WeeklyCountryProductComparisonCronExpression { get; set; } =
+        "0 30 8 ? * MON";
+
+    public int WeeklyCountryProductComparisonMaxProducts { get; set; } = 6;
+
+    public int WeeklyCountryProductComparisonMaxObservationAgeDays { get; set; } = 62;
+
     public bool ReflectionEnabled { get; set; } = true;
 
     public string ReflectionCronExpression { get; set; } = "0 0 9 ? * MON,THU";

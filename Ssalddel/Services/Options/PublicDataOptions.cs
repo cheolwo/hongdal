@@ -31,6 +31,8 @@ public sealed class PublicDataOptions
 
     public UsdaNassQuickStatsOptions UsdaNassQuickStats { get; set; } = new();
 
+    public UsdaAmsMarketNewsOptions UsdaAmsMarketNews { get; set; } = new();
+
     public AbsConsumerPriceIndexOptions AbsConsumerPriceIndex { get; set; } = new();
 
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
@@ -155,6 +157,17 @@ public sealed class UsdaNassQuickStatsOptions
     public string BaseUrl { get; set; } = "https://quickstats.nass.usda.gov";
 
     public string DataPath { get; set; } = "/api/api_GET/";
+}
+
+public sealed class UsdaAmsMarketNewsOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://marsapi.ams.usda.gov";
+
+    public string ReportsPath { get; set; } = "/services/v1.2/reports";
+
+    public int TimeoutSeconds { get; set; } = 180;
 }
 
 public sealed class AbsConsumerPriceIndexOptions

@@ -19,6 +19,13 @@ public interface IKamisPriceArchiveService
         DateOnly endDate,
         CancellationToken cancellationToken = default);
 
+    Task<KamisPriceArchiveResult> CollectPeriodPricesForItemCodesAsync(
+        DateOnly startDate,
+        DateOnly endDate,
+        IReadOnlyCollection<string> itemCodes,
+        CancellationToken cancellationToken = default)
+        => CollectPeriodPricesAsync(startDate, endDate, cancellationToken);
+
     Task<KamisPriceArchiveResult> CollectMonthlyPricesAsync(
         DateOnly startDate,
         DateOnly endDate,

@@ -95,6 +95,122 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
         return crosswalk is null ? null : MapItem(crosswalk);
     }
 
+    public 농수산시세정보원목록응답 GetMarketPriceSources(
+        string? countryCode,
+        string? marketStageCode)
+    {
+        var normalizedCountryCode = countryCode?.Trim();
+        var normalizedMarketStageCode = marketStageCode?.Trim();
+        var sources = 농수산시세정보Catalog.All
+            .Where(source => string.IsNullOrWhiteSpace(normalizedCountryCode)
+                             || string.Equals(
+                                 source.CountryCode,
+                                 normalizedCountryCode,
+                                 StringComparison.OrdinalIgnoreCase))
+            .Where(source => string.IsNullOrWhiteSpace(normalizedMarketStageCode)
+                             || string.Equals(
+                                 source.MarketStageCode,
+                                 normalizedMarketStageCode,
+                                 StringComparison.OrdinalIgnoreCase))
+            .OrderBy(source => source.CountryCode, StringComparer.Ordinal)
+            .ThenBy(source => source.MarketStageCode, StringComparer.Ordinal)
+            .ThenBy(source => source.SourceKey, StringComparer.Ordinal)
+            .ToArray();
+
+        return new 농수산시세정보원목록응답(
+            DateTime.UtcNow,
+            sources,
+            "시세 관측값은 정보 제공 전용입니다. 시장 단계·규격·지역·기간·단위가 다르면 차액이나 순위를 계산하지 않습니다.");
+    }
+
+    public 농수산시세비교판정응답 AssessMarketPriceComparability(
+        string? leftSourceKey,
+        string? rightSourceKey)
+    {
+        if (string.IsNullOrWhiteSpace(leftSourceKey)
+            || string.IsNullOrWhiteSpace(rightSourceKey))
+        {
+            return new 농수산시세비교판정응답(
+                false,
+                농수산시세비교판정Codes.잘못된요청,
+                leftSourceKey?.Trim() ?? string.Empty,
+                rightSourceKey?.Trim() ?? string.Empty,
+                false,
+                false,
+                "Unavailable",
+                [],
+                ["비교할 왼쪽·오른쪽 시세 정보원 키가 모두 필요합니다."]);
+        }
+
+        var left = 농수산시세정보Catalog.Find(leftSourceKey);
+        var right = 농수산시세정보Catalog.Find(rightSourceKey);
+        if (left is null || right is null)
+        {
+            return new 농수산시세비교판정응답(
+                false,
+                농수산시세비교판정Codes.정보원없음,
+                leftSourceKey.Trim(),
+                rightSourceKey.Trim(),
+                false,
+                false,
+                "Unavailable",
+                [],
+                ["등록되지 않은 시세 정보원입니다. 정보원 목록을 먼저 조회해 주세요."]);
+        }
+
+        var sameSource = string.Equals(
+            left.SourceKey,
+            right.SourceKey,
+            StringComparison.OrdinalIgnoreCase);
+        if (sameSource)
+        {
+            return new 농수산시세비교판정응답(
+                true,
+                농수산시세비교판정Codes.차원검증필요,
+                left.SourceKey,
+                right.SourceKey,
+                true,
+                false,
+                "TrendAfterDimensionMatch",
+                left.RequiredComparisonDimensions,
+                [
+                    "동일 정보원이어도 품목·규격·시장 단계·지역·기간·단위가 일치한 관측값만 증감률을 계산합니다.",
+                    "실제 관측값의 차원 검증을 통과한 뒤에만 차액 계산을 활성화합니다."
+                ]);
+        }
+
+        var stageNotice = string.Equals(
+            left.MarketStageCode,
+            right.MarketStageCode,
+            StringComparison.Ordinal)
+            ? $"시장 단계는 모두 '{left.MarketStageLabel}'이지만 조사·산출 방식이 서로 다릅니다."
+            : $"시장 단계가 '{left.MarketStageLabel}'과(와) '{right.MarketStageLabel}'로 서로 다릅니다.";
+        var countryNotice = string.Equals(
+            left.CountryCode,
+            right.CountryCode,
+            StringComparison.OrdinalIgnoreCase)
+            ? "같은 국가 자료라도 원천별 조사 범위와 산출 방식을 확인해야 합니다."
+            : "국가가 다른 자료는 통화 환산만으로 직접 비교할 수 없습니다.";
+
+        return new 농수산시세비교판정응답(
+            true,
+            농수산시세비교판정Codes.참고병렬표시,
+            left.SourceKey,
+            right.SourceKey,
+            false,
+            false,
+            "SideBySideWithCaveat",
+            left.RequiredComparisonDimensions
+                .Concat(right.RequiredComparisonDimensions)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray(),
+            [
+                stageNotice,
+                countryNotice,
+                "가격 수준의 우열·순위·차액을 계산하지 않고 원래 통화와 단위를 보존해 병렬 표시합니다."
+            ]);
+    }
+
     public async Task<AgriculturalFisheriesDomesticPriceResponse> GetDomesticPriceAsync(
         AgriculturalFisheriesDomesticPriceRequest request,
         CancellationToken cancellationToken = default)

@@ -186,6 +186,25 @@ internal sealed class KamisPriceObservationConfiguration
             x.CategoryCode,
             x.ItemCode
         });
+        builder.HasIndex(x => new
+        {
+            x.ItemCode,
+            x.FrequencyCode,
+            x.ProductClassCode,
+            x.KindCode,
+            x.RankCode,
+            x.Unit,
+            x.SurveyDate,
+            x.Id
+        }).IsDescending(
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true);
         builder.HasIndex(x => new { x.ItemName, x.SurveyDate });
         builder.HasIndex(x => x.LastSeenAtUtc);
     }

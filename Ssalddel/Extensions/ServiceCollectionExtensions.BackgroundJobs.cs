@@ -175,7 +175,8 @@ public static partial class ServiceCollectionExtensions
                     공동구매BatchRegistrationPlan);
             }
 
-            if (communityEditorialBatchOptions.Enabled)
+            if (communityEditorialBatchOptions.Enabled
+                || communityEditorialBatchOptions.WeeklyCountryProductComparisonEnabled)
             {
                 AddCommunityEditorialBatchJobs(
                     q,
@@ -304,6 +305,22 @@ public static partial class ServiceCollectionExtensions
                 .WithIdentity("CommunityUsdaNassPriceBrief-trigger")
                 .WithCronSchedule(
                     options.UsdaNassPriceBriefCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
+        if (registrationPlan.ShouldRegisterQuartz(
+                CommunityAutomatedPostSourceKeys.WeeklyCountryProductComparison))
+        {
+            var jobKey = new JobKey("CommunityWeeklyCountryProductComparison");
+            quartz.AddJob<CommunityWeeklyCountryProductComparisonJob>(job =>
+                job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("CommunityWeeklyCountryProductComparison-trigger")
+                .WithCronSchedule(
+                    options.WeeklyCountryProductComparisonCronExpression,
                     schedule => schedule
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionDoNothing()));

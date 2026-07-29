@@ -78,6 +78,72 @@ public sealed class AgriculturalFisheriesInformationServiceTests
     }
 
     [Fact]
+    public void 시세정보원은_미국_생산자_도매_소매가격을_서로다른시장단계로등록한다()
+    {
+        var service = CreateService(new StubDomesticPriceLookupService());
+
+        var result = service.GetMarketPriceSources("US", null);
+
+        Assert.Contains(result.Sources, source =>
+            source.SourceKey == 농수산시세정보원Keys.UsdaNass생산자수취가격
+            && source.MarketStageCode == 농수산시세시장단계Codes.생산자수취
+            && source.IntegrationStateCode == 농수산시세연동상태Codes.Archive연동됨);
+        Assert.Contains(result.Sources, source =>
+            source.SourceKey == 농수산시세정보원Keys.UsdaAms도매터미널가격
+            && source.MarketStageCode == 농수산시세시장단계Codes.도매터미널
+            && source.RequiresCredential
+            && source.IntegrationStateCode == 농수산시세연동상태Codes.Archive연동됨);
+        Assert.Contains(result.Sources, source =>
+            source.SourceKey == 농수산시세정보원Keys.UsdaAms소매광고가격
+            && source.MarketStageCode == 농수산시세시장단계Codes.소매광고
+            && source.Limitations.Any(limit =>
+                limit.Contains("광고·프로모션 가격", StringComparison.Ordinal)));
+        Assert.Contains(result.Sources, source =>
+            source.SourceKey == 농수산시세정보원Keys.Bls소비자평균소매가격
+            && source.MarketStageCode == 농수산시세시장단계Codes.소비자평균소매
+            && !source.RequiresCredential
+            && source.IntegrationStateCode == 농수산시세연동상태Codes.Archive연동됨);
+        Assert.All(result.Sources, source =>
+            Assert.Equal(
+                농수산시세발행정책Codes.검토후발행,
+                source.PublicationPolicyCode));
+    }
+
+    [Fact]
+    public void 생산자수취가격과_도매터미널가격은_차액계산없이_참고병렬표시한다()
+    {
+        var service = CreateService(new StubDomesticPriceLookupService());
+
+        var result = service.AssessMarketPriceComparability(
+            농수산시세정보원Keys.UsdaNass생산자수취가격,
+            농수산시세정보원Keys.UsdaAms도매터미널가격);
+
+        Assert.True(result.Success);
+        Assert.Equal(농수산시세비교판정Codes.참고병렬표시, result.StatusCode);
+        Assert.False(result.CanBecomeDirectlyComparable);
+        Assert.False(result.AllowsDifferenceCalculation);
+        Assert.Equal("SideBySideWithCaveat", result.DisplayModeCode);
+        Assert.Contains(result.Notices, notice =>
+            notice.Contains("시장 단계", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void 같은정보원도_품목규격지역기간단위검증전에는_차액계산을허용하지않는다()
+    {
+        var service = CreateService(new StubDomesticPriceLookupService());
+
+        var result = service.AssessMarketPriceComparability(
+            농수산시세정보원Keys.UsdaAms소매광고가격,
+            농수산시세정보원Keys.UsdaAms소매광고가격);
+
+        Assert.True(result.Success);
+        Assert.Equal(농수산시세비교판정Codes.차원검증필요, result.StatusCode);
+        Assert.True(result.CanBecomeDirectlyComparable);
+        Assert.False(result.AllowsDifferenceCalculation);
+        Assert.Contains("품종·등급·규격", result.RequiredDimensions);
+    }
+
+    [Fact]
     public async Task 국내가격조회는_HS품목을_aT요청으로변환하고_출처주의를제공한다()
     {
         var lookup = new StubDomesticPriceLookupService
