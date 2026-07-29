@@ -14,6 +14,7 @@ using Ssalddel.Application.CommonContents;
 using Ssalddel.Application.Images;
 using Ssalddel.Application.Driver.Food;
 using Ssalddel.Application.Food;
+using Ssalddel.Application.Admin.Food;
 using Ssalddel.Application.Admin.Restaurants;
 using Ssalddel.Application.Mart;
 using Ssalddel.Application.PublicData;
@@ -23,6 +24,8 @@ using Ssalddel.Application.Orderer;
 using Ssalddel.Application.Settlement;
 using Ssalddel.Application.Versioning;
 using Ssalddel.Application.Security;
+using Ssalddel.Application.ContractManagement;
+using Ssalddel.Security;
 using Ssalddel.Application.Operations;
 using Ssalddel.Services.HumanResources;
 using Ssalddel.Services.Community;
@@ -53,6 +56,9 @@ public static partial class ServiceCollectionExtensions
 
         services.AddSsalddelInfrastructure();
         services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+        services.AddScoped<I공급조직접근Accessor, 공급조직접근Accessor>();
+        services.AddScoped<I플랫폼공급계약관리UseCase, 플랫폼공급계약관리UseCase>();
+        services.AddScoped<I조직개별공급발주UseCase, 조직개별공급발주UseCase>();
         services.AddSingleton<IPublicLocaleRecommendationUseCase, PublicLocaleRecommendationUseCase>();
         services.AddScoped<I참여자실행권한검사, 참여자실행권한검사>();
         services.AddScoped<I사회보험신고UseCase, 사회보험신고UseCase>();
@@ -101,6 +107,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IFoodDeliveryDriverRouteService, FoodDeliveryDriverRouteService>();
         services.AddScoped<I음식주문접수UseCase, 음식주문접수UseCase>();
         services.AddScoped<I주문자음식주문조회UseCase, 주문자음식주문조회UseCase>();
+        services.AddScoped<I음식주문운영추적UseCase, 음식주문운영추적UseCase>();
         services.AddScoped<I음식점음식주문조회UseCase, 음식점음식주문조회UseCase>();
         services.AddScoped<I음식점운영자접근관리UseCase, 음식점운영자접근관리UseCase>();
         services.AddScoped<I음식점탐색조회UseCase, 음식점탐색조회UseCase>();

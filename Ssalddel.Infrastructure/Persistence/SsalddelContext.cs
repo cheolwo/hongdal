@@ -27,6 +27,7 @@ using 살뜰.도메인.통관;
 using 살뜰.도메인.정산;
 using 살뜰.도메인.음식;
 using 살뜰.도메인.마트;
+using 살뜰.도메인.공급중개;
 using 살뜰.Infrastructure.Persistence;
 using 살뜰.Infrastructure.Security;
 
@@ -152,6 +153,10 @@ namespace 살뜰.Data
         public DbSet<마트주문요청> 마트주문요청 { get; set; } = null!;
         public DbSet<마트주문> 마트주문 { get; set; } = null!;
         public DbSet<마트주문상품> 마트주문상품 { get; set; } = null!;
+        public DbSet<플랫폼공급조건계약> 플랫폼공급조건계약 { get; set; } = null!;
+        public DbSet<플랫폼공급조건계약품목> 플랫폼공급조건계약품목 { get; set; } = null!;
+        public DbSet<공급계약이용등록> 공급계약이용등록 { get; set; } = null!;
+        public DbSet<조직개별공급발주> 조직개별공급발주 { get; set; } = null!;
 
         public DbSet<살뜰공통콘텐츠> 살뜰공통콘텐츠 { get; set; } = null!;
         public DbSet<살뜰콘텐츠보상정책> 살뜰콘텐츠보상정책 { get; set; } = null!;
@@ -176,6 +181,8 @@ namespace 살뜰.Data
         public DbSet<PlatformCommunityPostAudioSegment> PlatformCommunityPostAudioSegments { get; set; } = null!;
         public DbSet<PlatformCommunityPostAudioAccessLog> PlatformCommunityPostAudioAccessLogs { get; set; } = null!;
         public DbSet<커뮤니티원장상태이벤트> 커뮤니티원장상태이벤트 { get; set; } = null!;
+        public DbSet<커뮤니티활동공개Projection> 커뮤니티활동공개Projections { get; set; } = null!;
+        public DbSet<커뮤니티활동처리기록> 커뮤니티활동처리기록 { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

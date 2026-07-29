@@ -1284,6 +1284,151 @@ namespace Ssalddel.Migrations
                     b.ToTable("community_ledger_state_events", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동공개Projection", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ActivityCount")
+                        .HasColumnType("int")
+                        .HasColumnName("activity_count");
+
+                    b.Property<string>("ActivityKind")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("activity_kind");
+
+                    b.Property<string>("AggregateKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("aggregate_key");
+
+                    b.Property<string>("AppKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("app_key");
+
+                    b.Property<string>("CommunityScope")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("community_scope");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("PrivacyPolicyVersion")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("privacy_policy_version");
+
+                    b.Property<string>("PublicSummary")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("public_summary");
+
+                    b.Property<DateTime>("TimeBucketEndUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("time_bucket_end_utc");
+
+                    b.Property<DateTime>("TimeBucketStartUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("time_bucket_start_utc");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("title");
+
+                    b.Property<string>("TopicTagsJson")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar(2048)")
+                        .HasColumnName("topic_tags_json");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<string>("VisibilityScope")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("visibility_scope");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AggregateKey")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_activity_public_projection");
+
+                    b.HasIndex("AppKey", "CommunityScope")
+                        .HasDatabaseName("IX_community_activity_public_projection_scope");
+
+                    b.HasIndex("VisibilityScope", "TimeBucketStartUtc", "ActivityCount")
+                        .HasDatabaseName("IX_community_activity_public_projection_browse");
+
+                    b.ToTable("community_activity_public_projections", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동처리기록", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AggregateKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("aggregate_key");
+
+                    b.Property<string>("OccurrenceKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("occurrence_key");
+
+                    b.Property<DateTime>("RecordedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("recorded_at_utc");
+
+                    b.Property<string>("SourceKind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("source_kind");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("source_name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AggregateKey")
+                        .HasDatabaseName("IX_community_activity_processing_receipt_aggregate");
+
+                    b.HasIndex("OccurrenceKey")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_activity_processing_receipt");
+
+                    b.ToTable("community_activity_processing_receipts", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCard", b =>
                 {
                     b.Property<long>("Id")
@@ -3781,6 +3926,481 @@ namespace Ssalddel.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("결제");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.공급계약이용등록", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("개별발주별도확인동의")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("separate_order_confirmation_consent");
+
+                    b.Property<string>("계약문서버전")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("contract_document_version");
+
+                    b.Property<Guid>("공급계약Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("supply_agreement_id");
+
+                    b.Property<bool>("공급계약이용동의")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("agreement_use_consent");
+
+                    b.Property<DateTime>("등록시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("상태코드")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("status_code");
+
+                    b.Property<DateTime>("수정시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<string>("안내버전")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("guidance_version");
+
+                    b.Property<string>("운영자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("operator_user_id");
+
+                    b.Property<string>("조직유형코드")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("organization_type_code");
+
+                    b.Property<string>("조직참조Key")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("organization_reference_key");
+
+                    b.Property<Guid>("클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("client_request_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("공급계약Id", "조직유형코드", "조직참조Key")
+                        .IsUnique();
+
+                    b.HasIndex("조직유형코드", "조직참조Key", "클라이언트요청Id")
+                        .IsUnique();
+
+                    b.ToTable("공급계약이용등록");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.조직개별공급발주", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("SKUSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("sku_snapshot");
+
+                    b.Property<bool>("개별발주확인")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("individual_order_confirmed");
+
+                    b.Property<bool>("결제실행됨")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("payment_executed");
+
+                    b.Property<decimal>("계약단가Snapshot")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("contract_unit_price_snapshot");
+
+                    b.Property<string>("계약문서버전Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("contract_document_version_snapshot");
+
+                    b.Property<string>("계약번호Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("contract_number_snapshot");
+
+                    b.Property<Guid>("공급계약Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("supply_agreement_id");
+
+                    b.Property<Guid>("공급계약이용등록Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("agreement_participation_id");
+
+                    b.Property<Guid>("공급계약품목Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("supply_agreement_item_id");
+
+                    b.Property<string>("공급단위Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("supply_unit_snapshot");
+
+                    b.Property<string>("공급자KeySnapshot")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("supplier_key_snapshot");
+
+                    b.Property<string>("공급자명Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("supplier_name_snapshot");
+
+                    b.Property<decimal?>("공급자수락수량")
+                        .HasColumnType("decimal(18,3)")
+                        .HasColumnName("supplier_accepted_quantity");
+
+                    b.Property<string>("공급자응답근거참조")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("supplier_response_evidence_reference");
+
+                    b.Property<string>("공급자응답기록자UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("supplier_response_recorded_by_user_id");
+
+                    b.Property<DateTime?>("공급자응답시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("supplier_responded_at_utc");
+
+                    b.Property<bool>("공급자판매자확인")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("supplier_is_seller_confirmed");
+
+                    b.Property<string>("구매조직유형코드")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("buyer_organization_type_code");
+
+                    b.Property<string>("구매조직참조Key")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("buyer_organization_reference_key");
+
+                    b.Property<string>("납품지참조Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("delivery_destination_reference_key");
+
+                    b.Property<decimal>("발주금액Snapshot")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("order_amount_snapshot");
+
+                    b.Property<decimal>("발주수량")
+                        .HasColumnType("decimal(18,3)")
+                        .HasColumnName("order_quantity");
+
+                    b.Property<string>("상태코드")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("status_code");
+
+                    b.Property<DateTime>("수정시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<string>("안내버전")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("guidance_version");
+
+                    b.Property<string>("요청자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("requested_by_user_id");
+
+                    b.Property<bool>("입고생성됨")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("inbound_created");
+
+                    b.Property<bool>("재고예약됨")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("inventory_reserved");
+
+                    b.Property<DateTime>("제출시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("submitted_at_utc");
+
+                    b.Property<Guid>("클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("client_request_id");
+
+                    b.Property<string>("통화코드Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)")
+                        .HasColumnName("currency_code_snapshot");
+
+                    b.Property<string>("품목명Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("item_name_snapshot");
+
+                    b.Property<string>("플랫폼역할코드")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)")
+                        .HasColumnName("platform_role_code");
+
+                    b.Property<bool>("플랫폼재판매자여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("platform_is_reseller");
+
+                    b.Property<bool>("플랫폼중개자확인")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("platform_is_broker_confirmed");
+
+                    b.Property<bool>("플랫폼판매자여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("platform_is_seller");
+
+                    b.Property<DateTime>("희망납품일Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("requested_delivery_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("공급계약Id");
+
+                    b.HasIndex("공급계약이용등록Id");
+
+                    b.HasIndex("공급계약품목Id");
+
+                    b.HasIndex("구매조직유형코드", "구매조직참조Key", "클라이언트요청Id")
+                        .IsUnique();
+
+                    b.HasIndex("구매조직유형코드", "구매조직참조Key", "상태코드", "제출시각Utc")
+                        .HasDatabaseName("IX_조직개별공급발주_buyer_organization_type_code_buyer_organization_re~1");
+
+                    b.ToTable("조직개별공급발주");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.플랫폼공급조건계약", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("계약문서버전")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("contract_document_version");
+
+                    b.Property<string>("계약번호")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("contract_number");
+
+                    b.Property<string>("계약체결근거참조")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("contract_evidence_reference");
+
+                    b.Property<string>("공급자Key")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("supplier_key");
+
+                    b.Property<string>("공급자명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("supplier_name");
+
+                    b.Property<string>("반품조건")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("return_terms");
+
+                    b.Property<string>("상태코드")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("status_code");
+
+                    b.Property<DateTime>("생성시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("생성자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<DateTime>("수정시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<DateTime>("유효시작Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("effective_from_utc");
+
+                    b.Property<DateTime>("유효종료Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("effective_until_utc");
+
+                    b.Property<string>("정산조건")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("settlement_terms");
+
+                    b.Property<Guid>("클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("client_request_id");
+
+                    b.Property<string>("통화코드")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)")
+                        .HasColumnName("currency_code");
+
+                    b.Property<string>("플랫폼역할코드")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)")
+                        .HasColumnName("platform_role_code");
+
+                    b.Property<bool>("플랫폼재판매자여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("platform_is_reseller");
+
+                    b.Property<bool>("플랫폼판매자여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("platform_is_seller");
+
+                    b.Property<DateTime?>("활성화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("activated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("계약번호")
+                        .IsUnique();
+
+                    b.HasIndex("생성자UserId", "클라이언트요청Id")
+                        .IsUnique();
+
+                    b.HasIndex("상태코드", "유효시작Utc", "유효종료Utc");
+
+                    b.ToTable("플랫폼공급조건계약");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.플랫폼공급조건계약품목", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("sku");
+
+                    b.Property<decimal>("계약단가")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("contract_unit_price");
+
+                    b.Property<string>("계약품목Key")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("contract_item_key");
+
+                    b.Property<Guid>("공급계약Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("supply_agreement_id");
+
+                    b.Property<string>("공급단위")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("supply_unit");
+
+                    b.Property<string>("보관조건")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("storage_condition");
+
+                    b.Property<string>("원산지표시")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("origin_label");
+
+                    b.Property<decimal?>("최대발주수량")
+                        .HasColumnType("decimal(18,3)")
+                        .HasColumnName("maximum_order_quantity");
+
+                    b.Property<decimal>("최소발주수량")
+                        .HasColumnType("decimal(18,3)")
+                        .HasColumnName("minimum_order_quantity");
+
+                    b.Property<string>("품목명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("item_name");
+
+                    b.Property<string>("허용조직유형Csv")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("allowed_organization_types");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("공급계약Id", "SKU");
+
+                    b.HasIndex("공급계약Id", "계약품목Key")
+                        .IsUnique();
+
+                    b.ToTable("플랫폼공급조건계약품목");
                 });
 
             modelBuilder.Entity("살뜰.도메인.공통.생성이미지작업", b =>
@@ -7486,6 +8106,10 @@ namespace Ssalddel.Migrations
                         .HasColumnType("varchar(120)")
                         .HasColumnName("community_ledger_template_key");
 
+                    b.Property<Guid?>("클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("클라이언트요청_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("배차대기Id");
@@ -7494,6 +8118,9 @@ namespace Ssalddel.Migrations
                         .IsUnique();
 
                     b.HasIndex("커뮤니티원장Id");
+
+                    b.HasIndex("주문자UserId", "클라이언트요청Id")
+                        .IsUnique();
 
                     b.HasIndex("음식점Id", "상태", "CreatedAt");
 
@@ -7537,9 +8164,21 @@ namespace Ssalddel.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("전이시각_utc");
 
+                    b.Property<string>("처리UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("처리_user_id");
+
+                    b.Property<Guid?>("클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("클라이언트요청_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("음식주문Id", "전이시각Utc");
+
+                    b.HasIndex("음식주문Id", "클라이언트요청Id")
+                        .IsUnique();
 
                     b.ToTable("음식주문상태이력", (string)null);
                 });
@@ -7561,6 +8200,10 @@ namespace Ssalddel.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("단가");
 
+                    b.Property<long?>("메뉴Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("메뉴_id");
+
                     b.Property<string>("상품명")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -7580,6 +8223,8 @@ namespace Ssalddel.Migrations
                     b.HasIndex("상품명");
 
                     b.HasIndex("음식주문Id");
+
+                    b.HasIndex("음식주문Id", "메뉴Id");
 
                     b.ToTable("음식주문상품", (string)null);
                 });
@@ -10968,6 +11613,55 @@ namespace Ssalddel.Migrations
                     b.Navigation("Typecast음성");
                 });
 
+            modelBuilder.Entity("살뜰.도메인.공급중개.공급계약이용등록", b =>
+                {
+                    b.HasOne("살뜰.도메인.공급중개.플랫폼공급조건계약", "공급계약")
+                        .WithMany()
+                        .HasForeignKey("공급계약Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("공급계약");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.조직개별공급발주", b =>
+                {
+                    b.HasOne("살뜰.도메인.공급중개.플랫폼공급조건계약", "공급계약")
+                        .WithMany()
+                        .HasForeignKey("공급계약Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("살뜰.도메인.공급중개.공급계약이용등록", "공급계약이용등록")
+                        .WithMany()
+                        .HasForeignKey("공급계약이용등록Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("살뜰.도메인.공급중개.플랫폼공급조건계약품목", "공급계약품목")
+                        .WithMany()
+                        .HasForeignKey("공급계약품목Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("공급계약");
+
+                    b.Navigation("공급계약이용등록");
+
+                    b.Navigation("공급계약품목");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.플랫폼공급조건계약품목", b =>
+                {
+                    b.HasOne("살뜰.도메인.공급중개.플랫폼공급조건계약", "공급계약")
+                        .WithMany("품목목록")
+                        .HasForeignKey("공급계약Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("공급계약");
+                });
+
             modelBuilder.Entity("살뜰.도메인.공통콘텐츠.살뜰공통콘텐츠", b =>
                 {
                     b.HasOne("살뜰.도메인.공통콘텐츠.살뜰콘텐츠보상정책", "보상정책")
@@ -11191,6 +11885,11 @@ namespace Ssalddel.Migrations
                     b.Navigation("용도");
 
                     b.Navigation("지원모델");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.공급중개.플랫폼공급조건계약", b =>
+                {
+                    b.Navigation("품목목록");
                 });
 
             modelBuilder.Entity("살뜰.도메인.마트.마트주문", b =>
