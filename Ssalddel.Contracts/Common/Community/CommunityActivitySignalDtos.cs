@@ -51,6 +51,14 @@ public sealed class CommunityActivitySignalResponse
     public string TimeBucketLabel { get; set; } = string.Empty;
 
     public DateTime OccurredAtUtc { get; set; }
+
+    public string TimePrecision { get; set; } = string.Empty;
+
+    public int AggregationCount { get; set; }
+
+    public string VisibilityScope { get; set; } = string.Empty;
+
+    public string PrivacyPolicyVersion { get; set; } = string.Empty;
 }
 
 public static class CommunityActivityScopes

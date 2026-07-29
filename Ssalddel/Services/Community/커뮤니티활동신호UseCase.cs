@@ -12,14 +12,9 @@ public interface I커뮤니티활동신호UseCase
 }
 
 [SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
-[SsalddelUseCase("커뮤니티 활동 신호 조회", Summary = "업무 로그에서 개인정보 보호 범위 안에 공개 가능한 활동 신호를 조회합니다.")]
+[SsalddelUseCase("커뮤니티 활동 신호 조회", Summary = "허용된 업무 이벤트의 비식별 집계 투영에서 공개 가능한 활동 신호를 조회합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.CommunityMember)]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
-[SsalddelUseCaseRelation(
-    SsalddelUseCaseRelationKind.Include,
-    "사용자행위로그조회UseCase",
-    Condition = "업무 행위 로그를 개인정보 보호 범위 안에서 커뮤니티 신호로 투영하는 경우",
-    Summary = "커뮤니티 활동 신호 조회는 원천 행위 로그 조회와 필터링을 포함합니다.")]
 public sealed class 커뮤니티활동신호UseCase : I커뮤니티활동신호UseCase
 {
     private readonly ICommunityActivitySignalService _signalService;

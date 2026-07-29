@@ -7,12 +7,10 @@ namespace Ssalddel.Tests.Services.Community;
 public sealed class CommunityActivityPostPublisherTests
 {
     [Fact]
-    public async Task PublishAsync_UsesOnlyNonIdentifyingSummaryAndStableOccurrenceKey()
+    public async Task PublishAsync_DelegatesOnlyToPrivacySafeProjectionRecorder()
     {
-        var automatedPublisher = new RecordingAutomatedPostPublisher();
-        var service = new CommunityActivityPostPublisher(
-            automatedPublisher,
-            TimeProvider.System);
+        var recorder = new RecordingProjectionRecorder();
+        var service = new CommunityActivityPostPublisher(recorder);
         var definition = CommunityActivityBoardCatalog.FindSource(
             CommunityActivitySourceKinds.Event,
             nameof(운송상차완료됨Event))!;
@@ -26,45 +24,26 @@ public sealed class CommunityActivityPostPublisherTests
             "상차완료",
             new DateTime(2026, 7, 23, 1, 2, 0, DateTimeKind.Utc),
             "trace-secret",
-            new 운송상차인수증증빙(
-                true,
-                true,
-                "전자서명",
-                "홍길동",
-                "비공개 업체",
-                "recipient-signature",
-                "driver-signature",
-                null,
-                "private-photo.jpg",
-                "https://private.example/photo"));
+            null);
 
         await service.PublishAsync(definition, occurrence);
-        await service.PublishAsync(definition, occurrence);
 
-        var first = automatedPublisher.Drafts[0];
-        var second = automatedPublisher.Drafts[1];
-        Assert.Equal(definition.Board.DisplayName, first.Category);
-        Assert.Equal(first.PeriodKey, second.PeriodKey);
-        Assert.Contains(nameof(운송상차완료됨Event), first.Body);
-        Assert.Contains(definition.PublicActivitySummary, first.Body);
-        Assert.Contains(CommunityActivityBoardCatalog.PrivacyBoundary, first.Body);
-        Assert.DoesNotContain("driver-secret", first.Body);
-        Assert.DoesNotContain("TR-PRIVATE-812", first.Body);
-        Assert.DoesNotContain("비공개 출발지", first.Body);
-        Assert.DoesNotContain("홍길동", first.Body);
-        Assert.DoesNotContain("private-photo.jpg", first.Body);
+        var recorded = Assert.Single(recorder.Records);
+        Assert.Same(definition, recorded.Definition);
+        Assert.Same(occurrence, recorded.Occurrence);
     }
 
-    private sealed class RecordingAutomatedPostPublisher : ICommunityAutomatedPostPublisher
+    private sealed class RecordingProjectionRecorder : I커뮤니티활동공개ProjectionRecorder
     {
-        public List<CommunityAutomatedPostDraft> Drafts { get; } = [];
+        public List<(CommunityActivityBoardDefinition Definition, object Occurrence)> Records { get; } = [];
 
-        public Task<CommunityAutomatedPostPublishResult> PublishIfMissingAsync(
-            CommunityAutomatedPostDraft draft,
+        public Task RecordAsync(
+            CommunityActivityBoardDefinition definition,
+            object occurrence,
             CancellationToken cancellationToken = default)
         {
-            Drafts.Add(draft);
-            return Task.FromResult(new CommunityAutomatedPostPublishResult(Drafts.Count, true));
+            Records.Add((definition, occurrence));
+            return Task.CompletedTask;
         }
     }
 }

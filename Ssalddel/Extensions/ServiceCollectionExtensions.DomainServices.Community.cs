@@ -1,4 +1,5 @@
 using Ssalddel.Application.Community;
+using Ssalddel.Services.AgriculturalFisheries.Information;
 using Ssalddel.Services.Auth;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.Content;
@@ -39,10 +40,13 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityLedgerCompletionPostStore, EfCommunityLedgerCompletionPostStore>();
         services.AddScoped<ICommunityLedgerCompletionPostService, CommunityLedgerCompletionPostService>();
         services.AddScoped<ICommunityAutomatedPostPublisher, EfCommunityAutomatedPostPublisher>();
+        services.AddScoped<I커뮤니티활동공개ProjectionRecorder, 커뮤니티활동공개ProjectionRecorder>();
         services.AddScoped<ICommunityActivityPostPublisher, CommunityActivityPostPublisher>();
         services.AddScoped<ICommunityActivityBoardContentService, CommunityActivityBoardContentService>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityKamisPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityUsdaNassPriceBriefSource>();
+        services.AddScoped<I주간국가농수산물비교SnapshotService, 주간국가농수산물비교SnapshotService>();
+        services.AddScoped<ICommunityAutomatedPostSource, Community주간국가농수산물비교Source>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityReflectionSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityActivityDigestSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityCultureTransportPostSource>();
@@ -155,6 +159,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공동구매수입물류정규화Service, 공동구매수입물류정규화Service>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
         services.AddScoped<ISsalddelFoodOrderStore, EfSsalddelFoodOrderStore>();
+        services.AddScoped<I음식주문메뉴검증Service, 음식주문메뉴검증Service>();
         services.AddSingleton<배차주소Store>();
         services.AddScoped<I음식점주문실시간알림Service, 음식점주문SignalR알림Service>();
 

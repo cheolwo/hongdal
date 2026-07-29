@@ -73,6 +73,8 @@ public static class CommunityBoardInformationPublicationSourceKeys
     public const string UsdaNassPriceBrief = "usda-nass-price-brief";
     public const string ChinaImportedFoodRegionBrief = "china-imported-food-region-brief";
     public const string UnitedStatesImportedFoodStateBrief = "us-imported-food-state-brief";
+    public const string WeeklyCountryProductComparison =
+        "weekly-country-product-comparison";
     public const string CultureTransport = "culture-transport";
     public const string PrajnaCard = "prajna-card";
     public const string Reflection = "reflection";
@@ -710,7 +712,8 @@ public static class CommunityBoardInformationRelationCatalog
                 "일별·월별",
                 CommunityBoardInformationBatchModuleKeys.AgriculturalFisheries,
                 "관측 품목 일부이며 전체 시장 평균·판매 권고가 아닙니다.",
-                CommunityBoardInformationPublicationSourceKeys.KamisPriceBrief),
+                CommunityBoardInformationPublicationSourceKeys.KamisPriceBrief,
+                CommunityBoardInformationPublicationSourceKeys.WeeklyCountryProductComparison),
             Source(
                 CommunityInformationSourceKeys.UsdaNassPriceObservations,
                 "USDA NASS",
@@ -720,7 +723,8 @@ public static class CommunityBoardInformationRelationCatalog
                 "월별",
                 CommunityBoardInformationBatchModuleKeys.AgriculturalFisheries,
                 "미국 전국 생산자 가격이며 소매가·한국 유통가·개별 견적이 아닙니다.",
-                CommunityBoardInformationPublicationSourceKeys.UsdaNassPriceBrief),
+                CommunityBoardInformationPublicationSourceKeys.UsdaNassPriceBrief,
+                CommunityBoardInformationPublicationSourceKeys.WeeklyCountryProductComparison),
             Source(
                 CommunityInformationSourceKeys.AbsFoodPriceIndex,
                 "Australian Bureau of Statistics",
