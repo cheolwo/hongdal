@@ -10,6 +10,7 @@ public static class SsalddelCodeFeatureKeys
     public const string GroupImportTradeReadiness = "group-import-trade-readiness";
     public const string ImportedFoodKoreanLabelIntegration = "imported-food-korean-label-integration";
     public const string PlatformDeliveryZoneLedger = "platform-delivery-zone-ledger";
+    public const string PlatformSupplyBrokerage = "platform-supply-brokerage";
     public const string RegionalCultureImagePrompt = "regional-culture-image-prompt";
     public const string RegionalCulturePublicInstitution = "regional-culture-public-institution";
     public const string TransportExecutionProfile = "transport-execution-profile";
