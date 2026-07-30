@@ -1,12 +1,24 @@
 # 살뜰 (Ssalddel)
 
 <p align="center">
-  <a href="https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/community">
-    <strong>테스트용 커뮤니티 게시판 보기 →</strong>
+  <a href="https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/">
+    <strong>01~05 역할별 상시 체험 포털 열기 →</strong>
   </a>
 </p>
 
-테스트 배포: [웹사이트 홈](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/) · [커뮤니티 게시판](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/community)
+## 상시 체험 WebApp
+
+> 현재 개발 진행 중인 공개 체험 환경입니다. 화면, 기능, 데이터와 권한 정책은 계속
+> 변경될 수 있으며 실제 계약·결제·배차·정산을 실행하는 운영 서비스가 아닙니다.
+
+| 진입점 | 공개 URL |
+| --- | --- |
+| 역할 선택 포털 | [통합 체험 시작](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/) |
+| 01 Community | [커뮤니티 WebApp](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/roles/01/) |
+| 02 Orderer | [주문자 WebApp](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/roles/02/) |
+| 03 Shipper | [화주 WebApp](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/roles/03/) |
+| 04 Driver | [기사 WebApp](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/roles/04/) |
+| 05 Warehouse | [창고 WebApp](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/roles/05/) |
 
 <p align="center">
   <a href="https://www.figma.com/design/0KhuQLc1MleUBIQnARC21Z/ssalddle?node-id=0-1">
