@@ -4,7 +4,7 @@ namespace Ssalddel.Services.AgriculturalFisheries.Information;
 
 public static class UnitedStatesAgriculturalFisheriesOperatorSourceCatalog
 {
-    public static readonly DateOnly SnapshotReviewedOn = new(2026, 7, 18);
+    public static readonly DateOnly SnapshotReviewedOn = new(2026, 7, 29);
 
     public static IReadOnlyList<미국농어업경영체정보원천항목> Sources { get; } =
         Array.AsReadOnly(new[]
@@ -152,8 +152,9 @@ public static class UnitedStatesAgriculturalFisheriesOperatorSourceCatalog
                 미국농어업경영체정보공개범위Codes.PublicBusinessDirectory,
                 "미국 전국",
                 [미국농어업경영체정보접근방식Codes.Api,
+                    미국농어업경영체정보접근방식Codes.CsvDownload,
                     미국농어업경영체정보접근방식Codes.WebDirectory],
-                미국농어업경영체정보통합상태Codes.BulkIntegrationCandidate,
+                미국농어업경영체정보통합상태Codes.IntegratedPublicDirectory,
                 "https://www.ams.usda.gov/services/local-regional/food-directories-listings",
                 "https://www.usdalocalfoodportal.com/fe/datasharing/",
                 "사업자 자율 갱신",

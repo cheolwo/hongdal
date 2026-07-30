@@ -2,7 +2,7 @@
 
 ## 결론
 
-2026년 7월 18일 기준 미국에는 한국의 농어업경영체 등록정보처럼 농장·양식장·어업인·수산업체를 한 번에 조회하는 전국 단일 공개 명부가 없다.
+2026년 7월 29일 기준 미국에는 한국의 농어업경영체 등록정보처럼 농장·양식장·어업인·수산업체를 한 번에 조회하는 전국 단일 공개 명부가 없다.
 
 - USDA NASS 농업총조사와 양식총조사는 지역·품목별 집계만 공개하고 개별 농장·양식장 자료는 공개하지 않는다.
 - USDA 프로그램 참여 과정에서 생산자와 토지 소유자가 제출한 운영·보전·토지 지리정보는 `7 U.S.C. 8791`의 제한을 받는다.
@@ -44,6 +44,34 @@ GET /api/v1/agricultural-fisheries/us-operator-information-sources
     &pageSize=50
 ```
 
+전산화된 USDA AMS Local Food Directory 사업체 후보는 다음 경로에서
+조회한다.
+
+```http
+GET /api/v1/agricultural-fisheries/us-operator-profiles
+    ?directoryTypeCode=FoodHub
+    &stateCode=AR
+    &productKey=seafood
+    &currentOnly=true
+    &page=1
+    &pageSize=30
+```
+
+관리자 수집 API와 서버 직접 실행 명령은 다음과 같다.
+
+```http
+POST /api/v1/admin/content/us-operator-profiles/collections
+Content-Type: application/json
+
+{
+  "directoryTypes": ["FoodHub", "Csa"]
+}
+```
+
+```powershell
+dotnet run --project Ssalddel -- --collect-usda-ams-public-businesses
+```
+
 각 원천은 다음 분류를 유지한다.
 
 - `SectorCode`: 농업, 양식, 자연산 어업, 로컬푸드 유통, 육류·가금·난제품 가공, 수산물 가공·운송
@@ -73,11 +101,29 @@ GET /api/v1/agricultural-fisheries/us-operator-information-sources
 
 ## 실제 데이터 연동 순서
 
-1. USDA Local Food API와 FSIS CSV의 현재 스키마·이용조건·갱신 식별자를 검증한다.
-2. 사업체 단위 최소 필드와 원천 스냅샷 시각을 저장하는 읽기 전용 투영을 만든다.
-3. Organic INTEGRITY의 현재 공개 API 계약을 다시 확인한 뒤 인증 상태 조회 어댑터를 분리한다.
-4. FDA ICSSL 동적 목록과 NOAA 승인시설 문서는 HTML·PDF 변경 감지와 수동 검토 큐를 먼저 둔다.
-5. NOAA Greater Atlantic 허가 CSV는 자연인·주소 필드를 기본 제외하고 지역별 검증 어댑터로 제한한다.
-6. 주별 농업·양식·어업 허가는 한 주와 한 업무 흐름을 선택해 별도 원천으로 확장한다.
+1. USDA Local Food Directory의 공식 bulk download를 정기 수집하고
+   source listing ID 기준으로 멱등 갱신한다. 완료.
+2. 사업체 단위 최소 필드와 원천 스냅샷 시각을 저장하는 읽기 전용
+   투영을 유지한다. 완료.
+3. FSIS CSV의 현재 스키마·이용조건·갱신 식별자를 검증한다.
+4. Organic INTEGRITY의 현재 공개 API 계약을 다시 확인한 뒤 인증 상태 조회 어댑터를 분리한다.
+5. FDA ICSSL 동적 목록과 NOAA 승인시설 문서는 HTML·PDF 변경 감지와 수동 검토 큐를 먼저 둔다.
+6. NOAA Greater Atlantic 허가 CSV는 자연인·주소 필드를 기본 제외하고 지역별 검증 어댑터로 제한한다.
+7. 주별 농업·양식·어업 허가는 한 주와 한 업무 흐름을 선택해 별도 원천으로 확장한다.
 
-지금 구현은 10개 공식 원천의 메타데이터와 활용 경계를 구조화한 단계다. 기존 USDA NASS Quick Stats 집계 조회 외에 사업체 목록을 아직 자동 수집하지 않으며, 운영 실패를 샘플 업체로 숨기지 않는다.
+현재 USDA AMS Local Food Directory의 Agritourism, CSA, Farmers Market,
+Food Hub, On-Farm Market을 공식 bulk 원천에서 수집한다. 2026년 7월
+29일 확인한 원천 건수는 각각 13,569건, 2,002건, 7,148건, 480건,
+4,692건이며 원천이 갱신되면 수치는 달라진다.
+
+저장 필드는 official listing ID, 사업체명, 도시·주, 설립연도,
+법인 성격 표기, 취급품목, 소매·도매·생산자 지원·조달 기능,
+원천 갱신시각과 마지막 관측시각이다. 상세 주소, 좌표, 담당자명,
+전화, 이메일과 원본 JSON은 저장하지 않는다. 목록에서 사라진 항목은
+삭제하지 않고 `IsCurrentlyListed=false`로 남겨 수집 이력을 보존한다.
+
+AMS My Market News 가격 행의 시장명, 보고 사무소, 원산지와 이 사업체
+후보를 자동 연결하지 않는다. 동일 지역·품목이라는 사실은 해당 업체가
+그 가격을 제시했다는 증거가 아니므로, 가격은 지역 의사결정 맥락으로만
+별도 조회한다. 다른 9개 공식 원천은 여전히 메타데이터 또는 공식 조회
+단계이며 운영 실패를 샘플 업체로 숨기지 않는다.

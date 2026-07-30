@@ -33,6 +33,9 @@ public sealed class PublicDataOptions
 
     public UsdaAmsMarketNewsOptions UsdaAmsMarketNews { get; set; } = new();
 
+    public UsdaAmsLocalFoodDirectoryOptions UsdaAmsLocalFoodDirectory { get; set; } =
+        new();
+
     public AbsConsumerPriceIndexOptions AbsConsumerPriceIndex { get; set; } = new();
 
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
@@ -166,6 +169,19 @@ public sealed class UsdaAmsMarketNewsOptions
     public string BaseUrl { get; set; } = "https://marsapi.ams.usda.gov";
 
     public string ReportsPath { get; set; } = "/services/v1.2/reports";
+
+    public int TimeoutSeconds { get; set; } = 180;
+}
+
+public sealed class UsdaAmsLocalFoodDirectoryOptions
+{
+    public string BaseUrl { get; set; } = "https://www.usdalocalfoodportal.com";
+
+    public string BulkDownloadPath { get; set; } =
+        "/api/download_by_directory";
+
+    public string DataSharingUrl { get; set; } =
+        "https://www.usdalocalfoodportal.com/fe/datasharing/";
 
     public int TimeoutSeconds { get; set; } = 180;
 }

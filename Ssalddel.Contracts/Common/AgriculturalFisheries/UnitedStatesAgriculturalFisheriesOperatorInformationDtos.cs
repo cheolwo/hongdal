@@ -43,6 +43,7 @@ public static class 미국농어업경영체정보접근방식Codes
 public static class 미국농어업경영체정보통합상태Codes
 {
     public const string IntegratedAggregateApi = "IntegratedAggregateApi";
+    public const string IntegratedPublicDirectory = "IntegratedPublicDirectory";
     public const string BulkIntegrationCandidate = "BulkIntegrationCandidate";
     public const string OfficialLookupOnly = "OfficialLookupOnly";
     public const string MetadataCataloged = "MetadataCataloged";

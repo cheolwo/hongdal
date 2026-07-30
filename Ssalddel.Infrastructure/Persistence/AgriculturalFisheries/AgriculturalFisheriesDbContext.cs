@@ -42,6 +42,15 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
     public DbSet<UsdaAms연도상품Catalog> UsdaAmsYearCommodityCatalog =>
         Set<UsdaAms연도상품Catalog>();
 
+    public DbSet<UsdaAms공개사업체수집Run> UsdaAmsPublicBusinessCollectionRuns =>
+        Set<UsdaAms공개사업체수집Run>();
+
+    public DbSet<UsdaAms공개사업체Profile> UsdaAmsPublicBusinessProfiles =>
+        Set<UsdaAms공개사업체Profile>();
+
+    public DbSet<UsdaAms공개사업체취급품목> UsdaAmsPublicBusinessProducts =>
+        Set<UsdaAms공개사업체취급품목>();
+
     public DbSet<주간국가농수산물비교Snapshot> WeeklyCountryProductComparisonSnapshots =>
         Set<주간국가농수산물비교Snapshot>();
 
@@ -108,6 +117,9 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new UsdaAms시장가격수집RunConfiguration());
         modelBuilder.ApplyConfiguration(new UsdaAms시장가격관측Configuration());
         modelBuilder.ApplyConfiguration(new UsdaAms연도상품CatalogConfiguration());
+        modelBuilder.ApplyConfiguration(new UsdaAms공개사업체수집RunConfiguration());
+        modelBuilder.ApplyConfiguration(new UsdaAms공개사업체ProfileConfiguration());
+        modelBuilder.ApplyConfiguration(new UsdaAms공개사업체취급품목Configuration());
         modelBuilder.ApplyConfiguration(new 주간국가농수산물비교SnapshotConfiguration());
         modelBuilder.ApplyConfiguration(new 주간국가농수산물비교항목Configuration());
         modelBuilder.ApplyConfiguration(new 농수산물포장Fcl분석SnapshotConfiguration());

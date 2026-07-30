@@ -82,20 +82,27 @@ public sealed class UnitedStatesAgriculturalFisheriesOperatorSourceServiceTests
         Assert.False(response.HasUnifiedPublicOperatorRegistry);
         Assert.True(response.IndividualOperationRecordsGenerallyConfidential);
         Assert.True(response.DiscoveryOnly);
-        Assert.Equal(2, response.TotalCount);
+        Assert.Equal(1, response.TotalCount);
         Assert.Equal(
-            new[]
-            {
-                "usda-fsis-inspection-directory",
-                "usda-local-food-directories"
-            },
-            response.Items.Select(item => item.SourceKey));
+            "usda-fsis-inspection-directory",
+            Assert.Single(response.Items).SourceKey);
         Assert.All(response.Items, item =>
         {
             Assert.True(item.CanDiscoverBusinesses);
             Assert.False(item.CanAutoInvite);
             Assert.False(item.CanAutoSelectForOperations);
         });
+
+        var integrated = service.Search(
+            new 미국농어업경영체정보원천조회요청
+            {
+                IntegrationStatusCode =
+                    미국농어업경영체정보통합상태Codes
+                        .IntegratedPublicDirectory
+            });
+        Assert.Equal(
+            "usda-local-food-directories",
+            Assert.Single(integrated.Items).SourceKey);
     }
 
     [Fact]

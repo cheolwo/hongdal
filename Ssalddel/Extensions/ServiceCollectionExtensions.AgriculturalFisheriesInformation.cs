@@ -92,6 +92,29 @@ public static partial class ServiceCollectionExtensions
             .RemoveAllLoggers();
         services.AddScoped<IUsdaAms시장가격ArchiveService,
             UsdaAms시장가격ArchiveService>();
+        services
+            .AddHttpClient<IUsdaAms공개사업체DirectoryClient,
+                UsdaAms공개사업체DirectoryClient>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider
+                        .GetRequiredService<IOptions<PublicDataOptions>>()
+                        .Value
+                        .UsdaAmsLocalFoodDirectory;
+                    client.BaseAddress = new Uri(options.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        + "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        + "Chrome/136.0.0.0 Safari/537.36 "
+                        + "Ssalddel-USDA-AMS-Directory-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(
+                        Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddScoped<IUsdaAms공개사업체ArchiveService,
+            UsdaAms공개사업체ArchiveService>();
+        services.AddScoped<IUsdaAms공개사업체QueryService,
+            UsdaAms공개사업체QueryService>();
         services.AddScoped<IKamis중심UsdaAms가격비교QueryService,
             Kamis중심UsdaAms가격비교QueryService>();
         services.AddScoped<IKamis중심같이수입가격QueryService,

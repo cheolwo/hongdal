@@ -19,6 +19,8 @@ public sealed class 농수산정보Controller : ControllerBase
     private readonly IBls평균소매가격ArchiveService _blsAverageRetailPriceService;
     private readonly I국제농수산가격ArchiveService _internationalPriceArchiveService;
     private readonly IUsdaAms시장가격ArchiveService _usdaAmsMarketPriceArchiveService;
+    private readonly IUsdaAms공개사업체QueryService
+        _usdaAmsPublicBusinessQueryService;
     private readonly IKamis중심UsdaAms가격비교QueryService
         _kamisCenteredUsdaAmsComparisonService;
     private readonly I미국농수산가격조회Service _usPriceService;
@@ -33,6 +35,7 @@ public sealed class 농수산정보Controller : ControllerBase
         IBls평균소매가격ArchiveService blsAverageRetailPriceService,
         I국제농수산가격ArchiveService internationalPriceArchiveService,
         IUsdaAms시장가격ArchiveService usdaAmsMarketPriceArchiveService,
+        IUsdaAms공개사업체QueryService usdaAmsPublicBusinessQueryService,
         IKamis중심UsdaAms가격비교QueryService
             kamisCenteredUsdaAmsComparisonService,
         I미국농수산가격조회Service usPriceService,
@@ -46,6 +49,8 @@ public sealed class 농수산정보Controller : ControllerBase
         _blsAverageRetailPriceService = blsAverageRetailPriceService;
         _internationalPriceArchiveService = internationalPriceArchiveService;
         _usdaAmsMarketPriceArchiveService = usdaAmsMarketPriceArchiveService;
+        _usdaAmsPublicBusinessQueryService =
+            usdaAmsPublicBusinessQueryService;
         _kamisCenteredUsdaAmsComparisonService =
             kamisCenteredUsdaAmsComparisonService;
         _usPriceService = usPriceService;
@@ -503,4 +508,43 @@ public sealed class 농수산정보Controller : ControllerBase
                 Page = page,
                 PageSize = pageSize
             }));
+
+    [HttpGet("us-operator-profiles")]
+    [SsalddelApiContractName("SearchUsOperatorProfiles")]
+    public async Task<ActionResult<UsdaAms공개사업체조회응답>>
+        미국경영체Profile조회(
+            [FromQuery] string? q = null,
+            [FromQuery] string? directoryTypeCode = null,
+            [FromQuery] string? stateCode = null,
+            [FromQuery] string? productKey = null,
+            [FromQuery] bool currentOnly = true,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 30,
+            CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return Ok(await _usdaAmsPublicBusinessQueryService.SearchAsync(
+                new UsdaAms공개사업체조회요청
+                {
+                    SearchText = q,
+                    DirectoryTypeCode = directoryTypeCode,
+                    StateCode = stateCode,
+                    ProductKey = productKey,
+                    CurrentOnly = currentOnly,
+                    Page = page,
+                    PageSize = pageSize
+                },
+                cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "미국 공개 사업체 조회 조건을 확인해 주세요.",
+                Detail = exception.Message
+            });
+        }
+    }
 }

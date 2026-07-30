@@ -1222,6 +1222,14 @@ if (args.Any(argument =>
     return;
 }
 
+if (await UsdaAms공개사업체CommandLine.TryRunAsync(
+        args,
+        app.Services,
+        app.Logger))
+{
+    return;
+}
+
 if (args.Any(argument =>
         string.Equals(
             argument,
