@@ -34,6 +34,8 @@ public sealed class UsdaAms시장가격ArchiveQuery
 
     public string? MarketType { get; init; }
 
+    public string? MarketStageCode { get; init; }
+
     public string? Commodity { get; init; }
 
     public string? Variety { get; init; }

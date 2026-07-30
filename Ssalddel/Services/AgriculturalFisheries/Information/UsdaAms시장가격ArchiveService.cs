@@ -153,10 +153,16 @@ public sealed class UsdaAms시장가격ArchiveService(
             observations = observations.Where(item => item.MarketType == value);
         }
 
+        if (!string.IsNullOrWhiteSpace(query.MarketStageCode))
+        {
+            var value = query.MarketStageCode.Trim();
+            observations = observations.Where(item => item.MarketStageCode == value);
+        }
+
         if (!string.IsNullOrWhiteSpace(query.Commodity))
         {
             var value = query.Commodity.Trim();
-            observations = observations.Where(item => item.Commodity.Contains(value));
+            observations = observations.Where(item => item.Commodity.StartsWith(value));
         }
 
         if (!string.IsNullOrWhiteSpace(query.Variety))
@@ -188,8 +194,8 @@ public sealed class UsdaAms시장가격ArchiveService(
         var take = Math.Clamp(query.Take, 1, 500);
         var items = await observations
             .OrderByDescending(item => item.ReportBeginDate)
-            .ThenBy(item => item.Commodity)
-            .ThenBy(item => item.MarketLocationName)
+            .ThenByDescending(item => item.Commodity)
+            .ThenByDescending(item => item.MarketLocationName)
             .Take(take)
             .Select(item => new UsdaAms시장가격관측응답(
                 item.RecordKey,

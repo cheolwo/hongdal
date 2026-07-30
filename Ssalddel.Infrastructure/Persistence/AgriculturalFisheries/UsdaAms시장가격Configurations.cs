@@ -99,6 +99,12 @@ internal sealed class UsdaAms시장가격관측Configuration
             item.MarketLocationState,
             item.ReportBeginDate
         });
+        builder.HasIndex(item => new
+        {
+            item.ReportBeginDate,
+            item.Commodity,
+            item.MarketLocationName
+        });
         builder.HasIndex(item => item.LastSeenAtUtc);
     }
 }

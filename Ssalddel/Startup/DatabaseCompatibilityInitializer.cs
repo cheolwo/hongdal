@@ -21,6 +21,9 @@ internal static class DatabaseCompatibilityInitializer
     {
         var traditionalMarketDb = services.GetRequiredService<TraditionalMarketDbContext>();
         var agriculturalFisheriesDb = services.GetRequiredService<AgriculturalFisheriesDbContext>();
+        var agriculturalFisheriesCommandTimeout =
+            agriculturalFisheriesDb.Database.GetCommandTimeout();
+        agriculturalFisheriesDb.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
         var migrationDelays = new[]
         {
             TimeSpan.FromSeconds(2),
@@ -30,33 +33,41 @@ internal static class DatabaseCompatibilityInitializer
             TimeSpan.FromSeconds(30)
         };
 
-        for (var attempt = 0; attempt <= migrationDelays.Length; attempt++)
+        try
         {
-            try
+            for (var attempt = 0; attempt <= migrationDelays.Length; attempt++)
             {
-                await db.Database.MigrateAsync();
-                await traditionalMarketDb.Database.MigrateAsync();
-                await agriculturalFisheriesDb.Database.MigrateAsync();
-                break;
-            }
-            catch (Exception ex) when (attempt < migrationDelays.Length)
-            {
-                var delay = migrationDelays[attempt];
-                logger.LogWarning(ex, "MySQL migration failed on attempt {Attempt}. Retrying in {Delay}.", attempt + 1, delay);
-                await Task.Delay(delay);
-            }
-            catch (Exception ex)
-            {
-                if (failOnError)
+                try
                 {
-                    throw new InvalidOperationException(
-                        $"MySQL migration failed after {attempt + 1} attempts.",
-                        ex);
+                    await db.Database.MigrateAsync();
+                    await traditionalMarketDb.Database.MigrateAsync();
+                    await agriculturalFisheriesDb.Database.MigrateAsync();
+                    break;
                 }
+                catch (Exception ex) when (attempt < migrationDelays.Length)
+                {
+                    var delay = migrationDelays[attempt];
+                    logger.LogWarning(ex, "MySQL migration failed on attempt {Attempt}. Retrying in {Delay}.", attempt + 1, delay);
+                    await Task.Delay(delay);
+                }
+                catch (Exception ex)
+                {
+                    if (failOnError)
+                    {
+                        throw new InvalidOperationException(
+                            $"MySQL migration failed after {attempt + 1} attempts.",
+                            ex);
+                    }
 
-                logger.LogWarning(ex, "MySQL migration failed after {Attempt} attempts. Application will continue without applying migrations at startup.", attempt + 1);
-                return;
+                    logger.LogWarning(ex, "MySQL migration failed after {Attempt} attempts. Application will continue without applying migrations at startup.", attempt + 1);
+                    return;
+                }
             }
+        }
+        finally
+        {
+            agriculturalFisheriesDb.Database.SetCommandTimeout(
+                agriculturalFisheriesCommandTimeout);
         }
 
         await EnsureIdentityCompatibilityAsync(db, logger);

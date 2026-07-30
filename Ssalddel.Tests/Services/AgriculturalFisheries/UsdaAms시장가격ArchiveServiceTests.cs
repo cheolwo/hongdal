@@ -121,13 +121,13 @@ public sealed class UsdaAms시장가격ArchiveServiceTests
         await service.CollectAsync(new UsdaAms시장가격수집요청
         {
             Year = 2026,
-            DateTo = "2026-01-31",
-            MarketTypes = ["Terminal"]
+            DateTo = "2026-01-31"
         });
 
         var result = await service.GetArchiveAsync(new UsdaAms시장가격ArchiveQuery
         {
             Commodity = "Apple",
+            MarketStageCode = 농수산시세시장단계Codes.도매터미널,
             Year = 2026
         });
 
