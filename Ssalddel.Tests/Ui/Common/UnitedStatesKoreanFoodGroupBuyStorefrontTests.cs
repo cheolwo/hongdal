@@ -131,7 +131,7 @@ public sealed class UnitedStatesKoreanFoodGroupBuyStorefrontTests
     }
 
     [Fact]
-    public void 화면구성은_전용경로와비구속가격통관경계를_명시한다()
+    public void 화면구성은_비구속가격통관경계를_명시한다()
     {
         var root = FindRepositoryRoot();
         var component = File.ReadAllText(Path.Combine(
@@ -150,19 +150,12 @@ public sealed class UnitedStatesKoreanFoodGroupBuyStorefrontTests
             "Components",
             "Information",
             "UnitedStatesKoreanFoodGroupBuyStorefront.razor.css"));
-        var webRoute = File.ReadAllText(Path.Combine(
-            root,
-            "Ssalddel.WebApp",
-            "Pages",
-            "UnitedStatesKoreanFoodGroupBuyPage.razor"));
-
         Assert.Contains("Discover Korean food. Pool ingredient demand.", component);
         Assert.Contains("lower final price is a goal, not a guarantee", component);
         Assert.Contains("Not declaration-ready", component);
         Assert.Contains("No payment, purchase order, import declaration, or supply contract", component);
         Assert.Contains("min-height: 44px", css);
         Assert.Contains("@media (max-width: 640px)", css);
-        Assert.Contains("@page \"/us/korean-food-group-buy\"", webRoute);
     }
 
     [Fact]

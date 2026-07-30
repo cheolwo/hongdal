@@ -14,8 +14,11 @@ public static class WebNavigationCatalog
     private static readonly WebNavigationItem RegionalCulture =
         new("지역 문화·특산물", CommunityPageRoutes.Regions, Icons.Material.Filled.TravelExplore, true);
 
-    private static readonly WebNavigationItem UnitedStatesFoodGroupBuy =
-        new("U.S. Korean food group buy", "/us/korean-food-group-buy", Icons.Material.Filled.ShoppingBasket, true);
+    private static readonly WebNavigationItem Orderer =
+        new("02 주문자", WebOrdererRoutes.Home, Icons.Material.Filled.ShoppingCartCheckout, true);
+
+    private static readonly WebNavigationItem Shipper =
+        new("03 화주", ShipperRoutes.Home, Icons.Material.Filled.LocalShipping, true);
 
     private static readonly WebNavigationItem Diagram =
         new("업무 다이어그램", DiagramRoute, Icons.Material.Filled.AccountTree);
@@ -91,8 +94,11 @@ public static class WebNavigationCatalog
 
     public static IReadOnlyList<WebNavigationItem> IntegratedItems { get; } =
     [
-        Community,
-        UnitedStatesFoodGroupBuy
+        new("01 커뮤니티", "/roles/01/", Icons.Material.Filled.Forum, true),
+        new("02 주문자", "/roles/02/", Icons.Material.Filled.ShoppingCartCheckout, true),
+        new("03 화주", "/roles/03/", Icons.Material.Filled.LocalShipping, true),
+        new("04 기사", "/roles/04/", Icons.Material.Filled.Route, true),
+        new("05 창고", "/roles/05/", Icons.Material.Filled.Warehouse, true)
     ];
 
     public static IReadOnlyList<WebNavigationItem> CommunityItems { get; } =

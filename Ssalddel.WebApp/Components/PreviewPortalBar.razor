@@ -1,0 +1,99 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject PreviewBuildManifestService BuildManifestService
+
+<section class="preview-portal-bar"
+         aria-label="Azure 상시 체험 정보"
+         data-testid="preview-portal-bar">
+    <div class="preview-portal-bar__status">
+        <span class="preview-portal-bar__status-dot" aria-hidden="true"></span>
+        <span class="preview-portal-bar__status-copy">
+            <strong>Azure 상시 체험</strong>
+            <small>@CurrentPageState.StageLabel · @CurrentPageState.BoundaryLabel</small>
+        </span>
+    </div>
+
+    <div class="preview-portal-bar__build" data-testid="preview-build-version">
+        <span title="@FullBuildLabel">@BuildLabel</span>
+        @if (BuildManifest.BuiltAtUtc is not null)
+        {
+            <small>@BuildTimeLabel</small>
+        }
+    </div>
+
+    <a class="preview-portal-bar__feedback"
+       href="@FeedbackHref"
+       data-testid="preview-feedback-link">
+        <MudIcon Icon="@Icons.Material.Filled.RateReview" Size="Size.Small" />
+        <span>이 화면 의견</span>
+    </a>
+</section>
+
+@code {
+    private PreviewBuildManifest BuildManifest { get; set; } = PreviewBuildManifest.Local;
+
+    private IntegratedBetaPageState CurrentPageState { get; set; }
+        = IntegratedBetaCatalog.Resolve("/");
+
+    private string FeedbackHref { get; set; }
+        = CommunityPageRoutes.ComposeFor(boardKey: CommunityBoardKeys.ProductFeedback, returnPath: "/");
+
+    private string BuildLabel
+    {
+        get
+        {
+            var commit = string.IsNullOrWhiteSpace(BuildManifest.Commit)
+                ? "working-tree"
+                : BuildManifest.Commit.Trim();
+            var workingTree = commit.EndsWith("-working-tree", StringComparison.OrdinalIgnoreCase);
+            var commitHash = workingTree
+                ? commit[..^"-working-tree".Length]
+                : commit;
+            var shortCommit = commitHash.Length <= 12 ? commitHash : commitHash[..12];
+            var environment = BuildManifest.Environment.Equals(
+                "AzurePreview",
+                StringComparison.OrdinalIgnoreCase)
+                ? "preview"
+                : "local";
+            return workingTree
+                ? $"{environment} · {shortCommit}+work"
+                : $"{environment} · {shortCommit}";
+        }
+    }
+
+    private string FullBuildLabel
+        => $"{BuildManifest.Release} · {BuildManifest.Commit} · {BuildManifest.Branch}";
+
+    private string BuildTimeLabel
+        => BuildManifest.BuiltAtUtc?.ToLocalTime().ToString("MM.dd HH:mm")
+           ?? string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += HandleLocationChanged;
+        UpdateRouteState();
+        BuildManifest = await BuildManifestService.LoadAsync();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+        => _ = InvokeAsync(() =>
+        {
+            UpdateRouteState();
+            StateHasChanged();
+        });
+
+    private void UpdateRouteState()
+    {
+        var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var pathOnly = relative.Split('?', '#')[0].Trim('/');
+        var returnPath = string.IsNullOrWhiteSpace(pathOnly) ? "/" : $"/{pathOnly}";
+
+        CurrentPageState = IntegratedBetaCatalog.Resolve(returnPath);
+        FeedbackHref = CommunityPageRoutes.ComposeFor(
+            boardKey: CommunityBoardKeys.ProductFeedback,
+            returnPath: returnPath);
+    }
+
+    public void Dispose()
+        => Navigation.LocationChanged -= HandleLocationChanged;
+}

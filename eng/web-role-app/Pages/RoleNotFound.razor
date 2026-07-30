@@ -1,0 +1,21 @@
+@page "/not-found"
+@inject RoleWebAppDescriptor Role
+
+<PageTitle>페이지 없음 · @Role.Code @Role.Label</PageTitle>
+
+<WebPageHeader Title="이 역할 앱에서 제공하지 않는 화면입니다"
+               Description="@($"{Role.Code} {Role.Label} 앱에는 이 역할의 화면만 포함됩니다.")"
+               Badge="404"
+               BadgeColor="Color.Warning" />
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.body1">다른 역할의 업무라면 왼쪽 아래의 01~05 앱 전환을 이용하세요.</MudText>
+        <MudButton Href="@Role.ToRelativePath(Role.HomePath)"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Home">
+            @Role.Label 홈으로 이동
+        </MudButton>
+    </MudStack>
+</MudPaper>

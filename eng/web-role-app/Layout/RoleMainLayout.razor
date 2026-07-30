@@ -1,0 +1,225 @@
+@namespace Ssalddel.WebApp.Layout
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject RoleWebAppDescriptor Role
+@inject WebAuthSessionService AuthSession
+@inject WebLocalePreferenceService Locale
+@inject NavigationManager Navigation
+
+<div class="@($"role-shell-frame {Role.AccentClass}")">
+<MudLayout Class="role-shell">
+    <MudAppBar Elevation="0" Class="role-shell__appbar">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Edge="Edge.Start"
+                       Color="Color.Inherit"
+                       Class="role-shell__menu"
+                       OnClick="ToggleDrawer"
+                       aria-label="메뉴 열기" />
+        <div class="role-shell__brand">
+            <strong>@Role.HeaderTitle</strong>
+            @if (!string.IsNullOrWhiteSpace(Role.HeaderSubtitle))
+            {
+                <small>@Role.HeaderSubtitle</small>
+            }
+        </div>
+        <MudSpacer />
+        @if (Role.Code == "01")
+        {
+            <button type="button"
+                    class="role-shell__work-mode"
+                    aria-pressed="@IsCommunityWorkMode"
+                    @onclick="ToggleCommunityWorkMode">
+                <span>업무</span>
+                <i aria-hidden="true"></i>
+            </button>
+        }
+        else if (!string.IsNullOrWhiteSpace(Role.HeaderUtilityLabel))
+        {
+            <a class="role-shell__utility"
+               href="@Role.ToRelativePath(Role.HeaderUtilityPath)">
+                @Role.HeaderUtilityLabel
+            </a>
+        }
+        <a class="role-shell__profile"
+           href="@ProfileHref"
+           aria-label="@(AuthSession.IsLoggedIn ? "내 정보" : "로그인")">
+            @(AuthSession.IsLoggedIn ? "나" : Role.ProfileLabel)
+        </a>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen"
+               ClipMode="DrawerClipMode.Always"
+               Elevation="0"
+               Variant="DrawerVariant.Responsive"
+               Class="role-shell__drawer">
+        <div class="role-shell__identity">
+            <span>@Role.Code · @Role.Label</span>
+            <small>@Role.Description</small>
+        </div>
+
+        <MudNavMenu Class="role-shell__navigation">
+            @foreach (var item in Role.NavigationItems)
+            {
+                <MudNavLink Href="@Role.ToRelativePath(item.Path)"
+                            Match="NavLinkMatch.Prefix"
+                            Icon="@Icons.Material.Filled.ChevronRight">
+                    @item.Label
+                </MudNavLink>
+            }
+        </MudNavMenu>
+
+        <div class="role-shell__switcher" aria-label="역할 앱 전환">
+            @foreach (var app in RoleWebAppDescriptor.Apps)
+            {
+                <a class="@(app.Code == Role.Code ? "is-current" : null)"
+                   href="@app.BasePath">
+                    <strong>@app.Code</strong>
+                    <span>@app.Label</span>
+                </a>
+            }
+        </div>
+    </MudDrawer>
+
+    <MudMainContent Class="role-shell__main">
+        <MudContainer MaxWidth="MaxWidth.False" Class="role-shell__content">
+            @if (_sessionInitialized)
+            {
+                @Body
+            }
+            else
+            {
+                <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8" aria-live="polite">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">@Role.Label 앱을 준비하고 있습니다.</MudText>
+                </MudStack>
+            }
+        </MudContainer>
+    </MudMainContent>
+
+    <nav class="role-shell__bottom-nav" aria-label="@($"{Role.Label} 주요 화면")">
+        @foreach (var item in Role.MobileNavigationItems)
+        {
+            <a class="@(IsMobileNavigationActive(item) ? "is-active" : null)"
+               href="@Role.ToRelativePath(item.Path)"
+               aria-current="@(IsMobileNavigationActive(item) ? "page" : null)">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span>@item.Label</span>
+            </a>
+        }
+        @if (Role.Code == "01")
+        {
+            <a class="role-shell__compose"
+               href="@Role.ToRelativePath("/community/write")"
+               aria-label="새 글 쓰기">
+                <MudIcon Icon="@Icons.Material.Filled.Edit" />
+            </a>
+        }
+    </nav>
+</MudLayout>
+</div>
+
+@code {
+    private bool _drawerOpen;
+    private bool _sessionInitialized;
+
+    private string CurrentPath
+        => "/" + Navigation.ToBaseRelativePath(Navigation.Uri)
+            .Split('?', '#')[0]
+            .Trim('/');
+
+    private bool IsCommunityWorkMode
+        => Role.Code == "01"
+           && (CurrentPath.StartsWith("/community/workspace", StringComparison.OrdinalIgnoreCase)
+               || CurrentPath.StartsWith("/community/actions", StringComparison.OrdinalIgnoreCase));
+
+    private string LoginHref
+    {
+        get
+        {
+            var rolePath = new Uri(Navigation.Uri).PathAndQuery;
+            return $"/roles/01/login?returnUrl={Uri.EscapeDataString(rolePath)}";
+        }
+    }
+
+    private string ProfileHref
+        => AuthSession.IsLoggedIn
+            ? Role.Code switch
+            {
+                "01" => Role.ToRelativePath("/community/me"),
+                "04" => Role.ToRelativePath("/driver/me"),
+                _ => Role.ToRelativePath(Role.HomePath)
+            }
+            : LoginHref;
+
+    protected override void OnInitialized()
+    {
+        AuthSession.Changed += HandleAuthChanged;
+        Locale.Changed += HandleLocaleChanged;
+        Navigation.LocationChanged += HandleLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            await AuthSession.RestoreAsync();
+            await Locale.InitializeAsync();
+        }
+        finally
+        {
+            _sessionInitialized = true;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleDrawer()
+        => _drawerOpen = !_drawerOpen;
+
+    private void ToggleCommunityWorkMode()
+        => Navigation.NavigateTo(
+            Role.ToRelativePath(
+                IsCommunityWorkMode
+                    ? "/community/boards/directory"
+                    : "/community/workspace"));
+
+    private bool IsMobileNavigationActive(RoleWebAppMobileNavigationItem item)
+    {
+        var itemPath = item.Path.TrimEnd('/');
+        if (string.Equals(CurrentPath, itemPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return itemPath.Length > 1
+               && CurrentPath.StartsWith(
+                   itemPath + "/",
+                   StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthSession.ClearAsync();
+        Navigation.NavigateTo(Role.ToRelativePath(Role.HomePath));
+    }
+
+    private void HandleAuthChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    private void HandleLocaleChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        AuthSession.Changed -= HandleAuthChanged;
+        Locale.Changed -= HandleLocaleChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
+    }
+}

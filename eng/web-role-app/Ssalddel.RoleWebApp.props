@@ -1,0 +1,178 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <RootNamespace>Ssalddel.WebApp</RootNamespace>
+    <CompressionEnabled>false</CompressionEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.Client.Infrastructure\Ssalddel.Client.Infrastructure.csproj" />
+    <ProjectReference Include="..\Ssalddel.Ui.Common\Ssalddel.Ui.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\eng\web-role-app\Program.cs" Link="Program.cs" />
+    <Compile Include="..\eng\web-role-app\Services\**\*.cs">
+      <Link>Services\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\Ssalddel.WebApp\Models\**\*.cs">
+      <Link>Models\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\Ssalddel.WebApp\Services\**\*.cs">
+      <Link>Services\Integrated\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\Ssalddel.WebApp\ViewModels\**\*.cs">
+      <Link>ViewModels\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\Ssalddel.WebApp\Pages\**\*.cs">
+      <Link>Pages\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\eng\web-role-app\App.razor" Link="App.razor" />
+    <Content Include="..\eng\web-role-app\_Imports.razor" Link="_Imports.razor" />
+    <Content Include="..\eng\web-role-app\Layout\**\*.razor">
+      <Link>Layout\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\eng\web-role-app\Layout\**\*.razor.css">
+      <Link>Layout\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\eng\web-role-app\Pages\**\*.razor">
+      <Link>Pages\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\eng\web-role-app\Pages\**\*.razor.css">
+      <Link>Pages\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+
+    <Content Include="..\Ssalddel.WebApp\Components\**\*.razor">
+      <Link>Components\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Components\**\*.razor.css">
+      <Link>Components\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Shared\**\*.razor">
+      <Link>Shared\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Shared\**\*.razor.css">
+      <Link>Shared\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\**\*.razor"
+             Exclude="..\Ssalddel.WebApp\Pages\*.razor">
+      <Link>Pages\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\**\*.razor.css"
+             Exclude="..\Ssalddel.WebApp\Pages\*.razor.css">
+      <Link>Pages\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Layout\GlobalTradeLayout.razor"
+             Condition="'$(RoleCode)' == '03'">
+      <Link>Layout\GlobalTradeLayout.razor</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Layout\GlobalTradeLayout.razor.css"
+             Condition="'$(RoleCode)' == '03'">
+      <Link>Layout\GlobalTradeLayout.razor.css</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RoleCode)' == '01'">
+    <Content Include="..\Ssalddel.WebApp\Pages\Community*.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\Community*.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\RegionalCultureSpecialty*.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\RegionalCultureSpecialty*.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\DiagramWorkbenchPage.razor">
+      <Link>Pages\DiagramWorkbenchPage.razor</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\LoginPage.razor">
+      <Link>Pages\LoginPage.razor</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RoleCode)' == '02'">
+    <Content Include="..\Ssalddel.WebApp\Pages\Orderer*.razor;
+                      ..\Ssalddel.WebApp\Pages\OfficialFoodIngredientPage.razor;
+                      ..\Ssalddel.WebApp\Pages\PublicDataInformationPage.razor;
+                      ..\Ssalddel.WebApp\Pages\KamisDomesticPriceComparisonPage.razor;
+                      ..\Ssalddel.WebApp\Pages\IndividualImportLedgerPage.razor;
+                      ..\Ssalddel.WebApp\Pages\IndividualExportLedgerPage.razor;
+                      ..\Ssalddel.WebApp\Pages\GroupExportLedgerPage.razor;
+                      ..\Ssalddel.WebApp\Pages\CommunityGroupPurchase*.razor;
+                      ..\Ssalddel.WebApp\Pages\CommunityGroupImportPage.razor;
+                      ..\Ssalddel.WebApp\Pages\RegionalProductCandidatesPage.razor;
+                      ..\Ssalddel.WebApp\Pages\ExpectedItemDocumentWorkbenchPage.razor;
+                      ..\Ssalddel.WebApp\Pages\IdentifierCodeWorkbenchPage.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\Orderer*.razor.css;
+                      ..\Ssalddel.WebApp\Pages\CommunityGroupPurchase*.razor.css;
+                      ..\Ssalddel.WebApp\Pages\KamisDomesticPriceComparisonPage.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RoleCode)' == '03'">
+    <Content Include="..\Ssalddel.WebApp\Pages\Shipper*.razor;
+                      ..\Ssalddel.WebApp\Pages\Global*.razor;
+                      ..\Ssalddel.WebApp\Pages\ExpectedItemDocumentWorkbenchPage.razor;
+                      ..\Ssalddel.WebApp\Pages\IdentifierCodeWorkbenchPage.razor;
+                      ..\Ssalddel.WebApp\Pages\CommunityGlobalTradeThreadPage.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\Shipper*.razor.css;
+                      ..\Ssalddel.WebApp\Pages\Global*.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RoleCode)' == '04'">
+    <Content Include="..\Ssalddel.WebApp\Pages\Driver*.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\Driver*.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RoleCode)' == '05'">
+    <Content Include="..\Ssalddel.WebApp\Pages\Warehouse*.razor;
+                      ..\Ssalddel.WebApp\Pages\ShipperWarehouse*.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\Warehouse*.razor.css;
+                      ..\Ssalddel.WebApp\Pages\ShipperWarehouse*.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\eng\web-role-app\wwwroot\**\*">
+      <Link>wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\wwwroot\**\*"
+             Exclude="..\Ssalddel.WebApp\wwwroot\index.html;
+                      ..\Ssalddel.WebApp\wwwroot\appsettings*.json;
+                      ..\Ssalddel.WebApp\wwwroot\preview-build.json">
+      <Link>wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+</Project>

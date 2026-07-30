@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <RootNamespace>Ssalddel.WebApp</RootNamespace>
+    <RoleCode>04</RoleCode>
+    <AssemblyName>Ssalddel.Web.DriverApp</AssemblyName>
+  </PropertyGroup>
+
+  <Import Project="..\eng\web-role-app\Ssalddel.RoleWebApp.props" />
+</Project>

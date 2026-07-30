@@ -28,6 +28,13 @@
       <Deploy Solution="Debug|*" />
     </Project>
   </Folder>
+  <Folder Name="/Role WebApps/">
+    <Project Path="Ssalddel.Web.CommunityApp/Ssalddel.Web.CommunityApp.csproj" />
+    <Project Path="Ssalddel.Web.OrdererApp/Ssalddel.Web.OrdererApp.csproj" />
+    <Project Path="Ssalddel.Web.ShipperApp/Ssalddel.Web.ShipperApp.csproj" />
+    <Project Path="Ssalddel.Web.DriverApp/Ssalddel.Web.DriverApp.csproj" />
+    <Project Path="Ssalddel.Web.WarehouseApp/Ssalddel.Web.WarehouseApp.csproj" />
+  </Folder>
   <Folder Name="/Operations/">
     <Project Path="SsalddelAdmin/SsalddelAdmin.csproj" />
     <Project Path="SsalddelAdminApp/SsalddelAdminApp.csproj">

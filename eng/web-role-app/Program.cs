@@ -1,24 +1,29 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
+using MudBlazor.Services;
 using Ssalddel.Client.Infrastructure;
 using Ssalddel.Client.Infrastructure.Security;
 using Ssalddel.Client.Infrastructure.Transport;
 using Ssalddel.Contracts.Driver.Recommendation;
+using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Ssalddel.WebApp;
 using Ssalddel.WebApp.Models;
 using Ssalddel.WebApp.Services;
 using Ssalddel.WebApp.ViewModels;
-using Ssalddel.Ui.Common.Areas.App.Services;
-using Ssalddel.Ui.Common.Areas.App.ViewModels;
-using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+var hostBaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+var originBaseAddress = new Uri(hostBaseAddress.GetLeftPart(UriPartial.Authority) + "/");
 var apiBaseAddress = SsalddelApiEndpoint.ResolveBaseAddress(
     builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
-    new Uri(builder.HostEnvironment.BaseAddress));
+    originBaseAddress);
+
+builder.Services.AddSingleton(RoleWebAppDescriptor.FromAssembly(typeof(App).Assembly.GetName().Name));
 builder.Services.AddSsalddelApiHttpClient(apiBaseAddress);
 builder.Services.Configure<ClientDataModeOptions>(builder.Configuration.GetSection(ClientDataModeOptions.SectionName));
 builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
@@ -65,4 +70,24 @@ builder.Services.AddTransient<DriverTransportDropoffPageViewModel>();
 builder.Services.AddScoped<운송의뢰작성ViewModel>();
 builder.Services.AddMudServices();
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+try
+{
+    await host.RunAsync();
+}
+catch (Exception exception)
+{
+    try
+    {
+        var js = host.Services.GetRequiredService<IJSRuntime>();
+        await js.InvokeVoidAsync(
+            "ssalddelRoleApp.showStartupError",
+            exception.GetBaseException().Message);
+    }
+    catch
+    {
+        // The original startup exception remains the authoritative failure.
+    }
+
+    throw;
+}

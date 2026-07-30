@@ -1,0 +1,20 @@
+@page "/"
+@inject RoleWebAppDescriptor Role
+@inject NavigationManager Navigation
+
+<PageTitle>@Role.Code @Role.Label · 살뜰</PageTitle>
+
+<MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-10" aria-live="polite">
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+    <MudText Typo="Typo.body2">@Role.Label 홈으로 이동하고 있습니다.</MudText>
+</MudStack>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Navigation.NavigateTo(Role.ToRelativePath(Role.HomePath), replace: true);
+        }
+    }
+}

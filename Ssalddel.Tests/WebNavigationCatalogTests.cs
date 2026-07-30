@@ -85,6 +85,23 @@ public sealed class WebNavigationCatalogTests
     }
 
     [Fact]
+    public void IntegratedItems_ExposeFigmaRolePagesWithoutUnitedStatesBuyerPage()
+    {
+        Assert.Equal(
+        [
+            "/roles/01/",
+            "/roles/02/",
+            "/roles/03/",
+            "/roles/04/",
+            "/roles/05/"
+        ],
+            WebNavigationCatalog.IntegratedItems.Select(item => item.Href));
+        Assert.DoesNotContain(
+            WebNavigationCatalog.IntegratedItems,
+            item => item.Href.StartsWith("/us/", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void CommunityItems_ExposePersonalExplorationInsteadOfBusinessFeatures()
     {
         var items = WebNavigationCatalog.CommunityItems;

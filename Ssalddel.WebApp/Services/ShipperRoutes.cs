@@ -12,6 +12,7 @@ public static class ShipperRoutes
     public const string RequestBulk = ShipperRequestPageRoutes.Bulk;
     public const string RequestDetail = ShipperRequestPageRoutes.Root;
     public const string RequestDetailLookup = ShipperRequestDetailPageRoutes.LegacyLookup;
+    public const string RequestReview = "/shipper/request/review";
     public const string PaymentStatus = "/shipper/request/payment-status";
     public const string PublicCargo = "/shipper/public-cargo";
     public const string ExplorationInbox = "/shipper/exploration/inbox";

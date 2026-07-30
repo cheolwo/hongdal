@@ -23,6 +23,22 @@ public sealed class IntegratedBetaCatalogTests
     }
 
     [Theory]
+    [InlineData("/roles/01/")]
+    [InlineData("/roles/02/orderer")]
+    [InlineData("/roles/03/shipper")]
+    [InlineData("/roles/04/driver")]
+    [InlineData("/roles/05/warehouse")]
+    public void 역할별_독립_WebApp_경로는_운영_중인_읽기_전용_진입점이다(string href)
+    {
+        var state = IntegratedBetaCatalog.Resolve(href);
+
+        Assert.True(state.IsCataloged);
+        Assert.Equal(IntegratedBetaStage.Live, state.Stage);
+        Assert.False(state.RequiresAuthentication);
+        Assert.Equal(WebInteractionBoundary.ReadOnly, state.Boundary);
+    }
+
+    [Theory]
     [InlineData("/community/group-purchase", IntegratedBetaStage.Beta, WebInteractionBoundary.ReadOnly)]
     [InlineData("/community/group-import", IntegratedBetaStage.Experience, WebInteractionBoundary.Simulation)]
     [InlineData("/shipper/request", IntegratedBetaStage.Beta, WebInteractionBoundary.PlatformPersistence)]

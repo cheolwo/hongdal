@@ -10,5 +10,10 @@ public sealed record WebExperienceRole(
     string ImageAlt,
     string Icon,
     string StartHref,
+    string AppHref,
     string StartLabel,
-    IReadOnlyList<WebAppPageLink> Screens);
+    IReadOnlyList<WebAppPageLink> Screens)
+{
+    public string HrefFor(string route)
+        => $"{AppHref.TrimEnd('/')}/{route.TrimStart('/')}";
+}

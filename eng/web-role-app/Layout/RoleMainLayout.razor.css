@@ -1,0 +1,299 @@
+.role-shell-frame {
+    --role-accent: #3f51b5;
+    --role-accent-soft: #e8ebff;
+    --role-background: #f6f7fa;
+    --role-text: #1b1e27;
+    --role-muted: #585e6e;
+    --role-border: #c8ccd8;
+    min-height: 100vh;
+    background: var(--role-background);
+    color: var(--role-text);
+    font-family: "Noto Sans KR", "Malgun Gothic", "Segoe UI", sans-serif;
+}
+
+.role-shell--orderer {
+    --role-accent: #2563eb;
+    --role-accent-soft: #dbeafe;
+    --role-background: #f6f7fb;
+    --role-text: #1f2937;
+    --role-muted: #667085;
+    --role-border: #cbd2e0;
+}
+
+.role-shell--shipper {
+    --role-accent: #1976d2;
+    --role-accent-soft: #e3f2fd;
+    --role-background: #f6f8fc;
+    --role-text: #1b2633;
+    --role-muted: #667085;
+    --role-border: #d3dae6;
+}
+
+.role-shell--driver {
+    --role-accent: #00897b;
+    --role-accent-soft: #e0f2f0;
+    --role-background: #f4faf9;
+    --role-text: #132927;
+    --role-muted: #637573;
+    --role-border: #c9dbd9;
+}
+
+.role-shell--warehouse {
+    --role-accent: #ef6c00;
+    --role-accent-soft: #fff3e0;
+    --role-background: #faf9f7;
+    --role-text: #2b211a;
+    --role-muted: #75695e;
+    --role-border: #e0d6c9;
+}
+
+.role-shell-frame ::deep .role-shell {
+    min-height: 100vh;
+    background: var(--role-background);
+    color: var(--role-text);
+    font-family: inherit;
+}
+
+.role-shell-frame ::deep .role-shell__appbar {
+    min-height: 64px;
+    padding-inline: 8px 14px;
+    border-bottom: 1px solid var(--role-border);
+    background: #fff !important;
+    color: var(--role-text) !important;
+}
+
+.role-shell-frame ::deep .role-shell__menu {
+    color: var(--role-accent) !important;
+}
+
+.role-shell__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.role-shell__brand strong {
+    overflow: hidden;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 28px;
+    text-overflow: ellipsis;
+}
+
+.role-shell__brand small {
+    color: var(--role-muted);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+}
+
+.role-shell__utility {
+    padding: 8px 4px;
+    color: var(--role-accent);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.role-shell__profile {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    margin-left: 4px;
+    border-radius: 50%;
+    background: var(--role-accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.role-shell__work-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--role-text);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.role-shell__work-mode i {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 22px;
+    border-radius: 999px;
+    background: #b5bdcc;
+}
+
+.role-shell__work-mode i::after {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    content: "";
+    transition: transform .16s ease;
+}
+
+.role-shell__work-mode[aria-pressed="true"] i {
+    background: var(--role-accent);
+}
+
+.role-shell__work-mode[aria-pressed="true"] i::after {
+    transform: translateX(18px);
+}
+
+.role-shell-frame ::deep .role-shell__drawer {
+    border-right: 1px solid var(--role-border);
+    background: #fff !important;
+}
+
+.role-shell__identity {
+    display: grid;
+    gap: .35rem;
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: .85rem;
+    background: var(--role-accent-soft);
+}
+
+.role-shell__identity span {
+    color: var(--role-accent);
+    font-weight: 800;
+}
+
+.role-shell__identity small {
+    color: var(--role-muted);
+    line-height: 1.45;
+}
+
+.role-shell__navigation {
+    padding: 0 .5rem;
+}
+
+.role-shell__switcher {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: .3rem;
+    margin: 1.2rem .75rem;
+}
+
+.role-shell__switcher a {
+    display: grid;
+    place-items: center;
+    gap: .1rem;
+    min-width: 0;
+    padding: .55rem .15rem;
+    border: 1px solid var(--role-border);
+    border-radius: .6rem;
+    color: var(--role-muted);
+    text-decoration: none;
+    font-size: .68rem;
+}
+
+.role-shell__switcher a.is-current {
+    border-color: var(--role-accent);
+    background: var(--role-accent-soft);
+    color: var(--role-accent);
+}
+
+.role-shell-frame ::deep .role-shell__main {
+    min-height: 100vh;
+    padding-bottom: 76px;
+    background: var(--role-background) !important;
+}
+
+.role-shell-frame ::deep .role-shell__content {
+    padding: 16px;
+}
+
+.role-shell__bottom-nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1200;
+    display: flex;
+    min-height: 68px;
+    align-items: center;
+    border-top: 1px solid var(--role-border);
+    background: #fff;
+}
+
+.role-shell__bottom-nav > a:not(.role-shell__compose) {
+    display: flex;
+    min-width: 0;
+    min-height: 48px;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--role-muted);
+    font-size: 11px;
+    text-decoration: none;
+}
+
+.role-shell__bottom-nav > a.is-active {
+    color: var(--role-accent);
+    font-weight: 700;
+}
+
+.role-shell__bottom-nav .mud-icon-root {
+    font-size: 19px;
+}
+
+.role-shell__compose {
+    display: inline-grid;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    margin: 0 16px 0 6px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--role-accent);
+    color: #fff;
+    text-decoration: none;
+}
+
+@media (min-width: 761px) {
+    .role-shell__bottom-nav {
+        display: none;
+    }
+
+    .role-shell-frame ::deep .role-shell__main {
+        padding-bottom: 0;
+    }
+
+    .role-shell-frame ::deep .role-shell__content {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 390px) {
+    .role-shell__brand {
+        gap: 6px;
+    }
+
+    .role-shell__brand strong {
+        font-size: 17px;
+    }
+
+    .role-shell__brand small {
+        display: none;
+    }
+
+    .role-shell__bottom-nav > a:not(.role-shell__compose) {
+        font-size: 10px;
+    }
+}
