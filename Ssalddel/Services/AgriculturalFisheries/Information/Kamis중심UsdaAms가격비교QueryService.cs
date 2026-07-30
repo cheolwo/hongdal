@@ -497,12 +497,7 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 .ThenByDescending(item => item.Id)
                 .First())
             .GroupBy(item => item.ItemCode, StringComparer.Ordinal)
-            .SelectMany(group => group
-                .OrderBy(item => item.ProductClassCode == "02" ? 0 : 1)
-                .ThenBy(item => item.KindName)
-                .ThenBy(item => item.RankCode)
-                .ThenByDescending(item => item.SurveyDate)
-                .ThenByDescending(item => item.Id)
+            .SelectMany(group => OrderKamis(group)
                 .Take(takePerItem))
             .ToArray();
     }
@@ -510,12 +505,7 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
     private static IReadOnlyList<Kamis중심가격Point응답> BuildKamisPoints(
         IReadOnlyList<KamisLatestObservation> observations,
         int take)
-        => observations
-            .OrderBy(item => item.ProductClassCode == "02" ? 0 : 1)
-            .ThenBy(item => item.KindName)
-            .ThenBy(item => item.RankCode)
-            .ThenByDescending(item => item.SurveyDate)
-            .ThenByDescending(item => item.Id)
+        => OrderKamis(observations)
             .Take(take)
             .Select(item => new Kamis중심가격Point응답(
                 item.FrequencyCode,
@@ -530,6 +520,15 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 item.PriceKrw,
                 item.IsPriceMissing))
             .ToArray();
+
+    private static IOrderedEnumerable<KamisLatestObservation> OrderKamis(
+        IEnumerable<KamisLatestObservation> observations)
+        => observations
+            .OrderBy(item => item.ProductClassCode == "02" ? 0 : 1)
+            .ThenBy(item => item.KindName)
+            .ThenBy(item => item.RankCode)
+            .ThenByDescending(item => item.SurveyDate)
+            .ThenByDescending(item => item.Id);
 
     private async Task<AmsLatestObservation[]> LoadLatestAmsObservationsAsync(
         IReadOnlyList<string> matchedCommodities,
@@ -746,29 +745,12 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                     OriginalUnit = observation.OriginalUnit
                 })
             .ToArrayAsync(cancellationToken);
-        return latestObservations
-            .OrderByDescending(item => item.ReportBeginDate)
-            .ThenBy(item => item.Commodity)
-            .ThenBy(item => item.OriginalUnit)
-            .ThenBy(item => item.Variety)
-            .ThenBy(item => item.Grade)
-            .ThenBy(item => item.Origin)
-            .ThenBy(item => item.MarketLocationName)
-            .ThenBy(item => item.RecordKey)
-            .DistinctBy(item => string.Join(
-                '\u001f',
-                item.Commodity,
-                item.MarketStageCode,
-                item.OriginalUnit,
-                item.Variety,
-                item.Grade,
-                item.Organic,
-                item.Origin,
-                item.MarketLocationName))
-            .GroupBy(item => string.Join(
-                '\u001f',
-                item.Commodity,
-                item.MarketStageCode),
+        return OrderAms(latestObservations)
+            .DistinctBy(item => BuildAmsPointIdentity(
+                item,
+                includeMarketStage: true))
+            .GroupBy(
+                BuildAmsCommodityStageKey,
                 StringComparer.OrdinalIgnoreCase)
             .SelectMany(group => group.Take(takePerCommodityStage))
             .ToArray();
@@ -798,29 +780,15 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 continue;
             }
 
-            var stageObservations = latestObservations
-                .Where(item =>
+            var stageObservations = OrderAms(
+                    latestObservations.Where(item =>
                     item.MarketStageCode == stage.Code
-                    && commodityNames.Contains(item.Commodity))
-                .OrderByDescending(item => item.ReportBeginDate)
-                .ThenBy(item => item.Commodity)
-                .ThenBy(item => item.OriginalUnit)
-                .ThenBy(item => item.Variety)
-                .ThenBy(item => item.Grade)
-                .ThenBy(item => item.Origin)
-                .ThenBy(item => item.MarketLocationName)
-                .ThenBy(item => item.RecordKey)
+                    && commodityNames.Contains(item.Commodity)))
                 .ToArray();
             var points = stageObservations
-                .DistinctBy(item => string.Join(
-                    '\u001f',
-                    item.Commodity,
-                    item.OriginalUnit,
-                    item.Variety,
-                    item.Grade,
-                    item.Organic,
-                    item.Origin,
-                    item.MarketLocationName))
+                .DistinctBy(item => BuildAmsPointIdentity(
+                    item,
+                    includeMarketStage: false))
                 .Take(take)
                 .Select(item => new Kamis중심UsdaAms가격Point응답(
                     item.RecordKey,
@@ -857,4 +825,39 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
 
         return result;
     }
+
+    private static IOrderedEnumerable<AmsLatestObservation> OrderAms(
+        IEnumerable<AmsLatestObservation> observations)
+        => observations
+            .OrderByDescending(item => item.ReportBeginDate)
+            .ThenBy(item => item.Commodity)
+            .ThenBy(item => item.OriginalUnit)
+            .ThenBy(item => item.Variety)
+            .ThenBy(item => item.Grade)
+            .ThenBy(item => item.Origin)
+            .ThenBy(item => item.MarketLocationName)
+            .ThenBy(item => item.RecordKey);
+
+    private static string BuildAmsCommodityStageKey(
+        AmsLatestObservation observation)
+        => string.Join(
+            '\u001f',
+            observation.Commodity,
+            observation.MarketStageCode);
+
+    private static string BuildAmsPointIdentity(
+        AmsLatestObservation observation,
+        bool includeMarketStage)
+        => string.Join(
+            '\u001f',
+            includeMarketStage
+                ? observation.MarketStageCode
+                : string.Empty,
+            observation.Commodity,
+            observation.OriginalUnit,
+            observation.Variety,
+            observation.Grade,
+            observation.Organic,
+            observation.Origin,
+            observation.MarketLocationName);
 }
