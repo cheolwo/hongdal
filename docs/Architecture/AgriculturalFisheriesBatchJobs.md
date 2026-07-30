@@ -47,3 +47,6 @@
 환경 변수로 켤 때는 `AgriculturalFisheriesBatch__Enabled=true`, `AgriculturalFisheriesBatch__IngredientCompanyResearchEnabled=true`를 사용하고 국가별 게시를 `AgriculturalFisheriesBatch__PublishChinaImportedFoodRegionBriefs=true`, `AgriculturalFisheriesBatch__PublishUnitedStatesImportedFoodStateBriefs=true`로 각각 허용한다. Docker Compose에서는 `SSALDDEL_INGREDIENT_COMPANY_RESEARCH_ENABLED`, `SSALDDEL_CHINA_IMPORTED_FOOD_REGION_PUBLICATION_ENABLED`, `SSALDDEL_US_IMPORTED_FOOD_STATE_PUBLICATION_ENABLED`로 주입한다. 가격 글은 기존 `AgriculturalFisheriesBatch__PublishCommunityPriceBriefs=true`로 별도 허용한다. 기본값은 수집과 게시 모두 비활성이며, KAMIS 인증키와 요청자 ID, USDA API 키 및 식약처·공공데이터포털 키는 저장소에 넣지 않고 사용자 비밀 또는 배포 환경의 비밀 저장소에서 주입한다.
 
 Quartz Cron 식과 표준 시간대 ID가 올바르지 않으면 서버 시작 단계에서 설정 오류가 드러난다. 여러 서버 인스턴스가 동시에 실행되는 운영 환경에서는 Quartz 영속 저장소와 클러스터 잠금 구성을 추가해야 인스턴스 간 중복 호출까지 방지할 수 있다.
+
+KAMIS와 USDA AMS 원본 이관, 시장 단계·단위·HS 매핑과 주간 조회 투영의 기준은
+[KAMIS·USDA AMS 핵심 분석과 데이터 이관 기준](KamisAmsCoreAnalysisAndMigration.md)을 따른다.

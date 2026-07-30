@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-30 | [KAMIS·USDA AMS 핵심 분석과 Azure 데이터 이관](2026-07-30-kamis-ams-core-analysis-azure-migration.md) | 화면 없음 — 96개 KAMIS 품목과 AMS·HS·FCL 근거를 분석하고 113만 AMS 관측을 포함한 원장을 Azure로 이관한 뒤 시장 단계 필터·최신일 인덱스와 공개 API 성능을 검증 |
 | 2026-07-30 | [Figma 역할 화면 우선순위 정렬](2026-07-30-role-priority-figma-alignment.md) | 직접 확인 — 01 커뮤니티를 핵심 게시판 홈과 전체 운영 디렉터리로 분리하고, 02 KAMIS·FCL 목표, 04 문의·탐색·예약, 05 입고·예외·이력·설정·통관 화면을 역할별 모바일 흐름으로 정렬 |
 | 2026-07-30 | [01~05 역할 분리 WebApp](2026-07-30-role-separated-webapps.md) | 직접 확인 — JavaScript 없는 선택 포털과 Community·Orderer·Shipper·Driver·Warehouse 5개 WebApp을 독립 배포하고 역할 홈·하위 route·기존 주소 이동을 Azure에서 확인 |
 | 2026-07-30 | [Azure 상시 체험 포털](2026-07-30-azure-preview-portal.md) | 직접 확인 — 기존 Azure VM·Caddy를 재사용하고 Figma `01 Community → 02 Orderer → 03 Shipper`를 WebApp 역할 포털로 구성, 미국 현지 구매자 화면을 제외하고 국내 KAMIS·같이 주문·같이 수입·화주 흐름을 연결 |
