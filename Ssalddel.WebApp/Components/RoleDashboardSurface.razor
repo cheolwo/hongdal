@@ -1,0 +1,120 @@
+@using Ssalddel.WebApp.Models
+
+<PageTitle>@Title · 살뜰</PageTitle>
+
+<main class="role-dashboard" aria-labelledby="@HeadingId">
+    <header class="role-dashboard__heading">
+        <div>
+            <h1 id="@HeadingId">@Title</h1>
+            @if (!string.IsNullOrWhiteSpace(Badge))
+            {
+                <span class="role-dashboard__badge">@Badge</span>
+            }
+        </div>
+        <p>@Description</p>
+    </header>
+
+    @if (IsLoading)
+    {
+        <section class="role-dashboard__loading" aria-live="polite">
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <span>서버 원장 요약을 확인하고 있습니다.</span>
+        </section>
+    }
+
+    <section class="role-dashboard__metrics" aria-label="@($"{Title} 업무 요약")">
+        @foreach (var metric in Metrics)
+        {
+            <article>
+                <span>@metric.Label</span>
+                <strong>@metric.Value</strong>
+                @if (!string.IsNullOrWhiteSpace(metric.Hint))
+                {
+                    <small>@metric.Hint</small>
+                }
+            </article>
+        }
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(BoundaryTitle)
+         && !string.IsNullOrWhiteSpace(BoundaryDescription))
+    {
+        <section class="role-dashboard__boundary">
+            <strong>@BoundaryTitle</strong>
+            <p>@BoundaryDescription</p>
+        </section>
+    }
+
+    @if (Notice is not null)
+    {
+        <section class="role-dashboard__notice">
+            @Notice
+        </section>
+    }
+
+    <section class="role-dashboard__tasks" aria-labelledby="@TasksHeadingId">
+        <h2 id="@TasksHeadingId">지금 할 일</h2>
+        @foreach (var task in Tasks)
+        {
+            <article class="role-dashboard__task">
+                <div>
+                    <strong>@task.Title</strong>
+                    <span>@task.Description</span>
+                </div>
+                <a class="@($"role-dashboard__task-action role-dashboard__task-action--{ToneClass(task.Tone)}")"
+                   href="@task.Href">
+                    @task.ActionLabel
+                </a>
+            </article>
+        }
+    </section>
+
+    @if (Footer is not null)
+    {
+        <footer class="role-dashboard__footer">
+            @Footer
+        </footer>
+    }
+</main>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Badge { get; set; }
+
+    [Parameter]
+    public string? BoundaryTitle { get; set; }
+
+    [Parameter]
+    public string? BoundaryDescription { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<RoleDashboardMetric> Metrics { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<RoleDashboardTask> Tasks { get; set; } = [];
+
+    [Parameter]
+    public RenderFragment? Notice { get; set; }
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    private string HeadingId => $"role-dashboard-{SanitizeId(Title)}";
+    private string TasksHeadingId => $"{HeadingId}-tasks";
+
+    private static string ToneClass(RoleDashboardTone tone)
+        => tone.ToString().ToLowerInvariant();
+
+    private static string SanitizeId(string value)
+        => string.Concat(value.Select(character =>
+            char.IsLetterOrDigit(character) ? character : '-'));
+}

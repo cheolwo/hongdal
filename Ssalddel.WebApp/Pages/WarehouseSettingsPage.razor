@@ -1,0 +1,57 @@
+@page "/warehouse/settings"
+
+<PageTitle>창고 설정 · 살뜰 창고</PageTitle>
+
+<RoleFlowSurface Title="창고 설정"
+                 Badge="설정"
+                 Description="창고 역할별 화면 구성을 검토합니다. 서버 운영 설정 저장은 아직 연결하지 않았습니다."
+                 NoticeTitle="역할별 화면"
+                 NoticeDescription="선택한 유형에 맞는 업무를 미리 살펴보되 기존 원장과 권한은 바꾸지 않습니다. 운영 설정은 별도 권한·감사 기록 API가 준비된 뒤 저장해야 합니다."
+                 Palette="RoleFlowPalette.Warehouse">
+    <ChildContent>
+        <section class="role-flow-card warehouse-settings">
+            <h2>창고 운영 유형</h2>
+            @foreach (var option in Options)
+            {
+                <label class="@OptionClass(option.Code)">
+                    <input type="radio"
+                           name="warehouse-mode"
+                           value="@option.Code"
+                           checked="@(_selectedCode == option.Code)"
+                           @onchange="@(() => _selectedCode = option.Code)" />
+                    <span>
+                        <strong>@option.Label</strong>
+                        <small>@option.Description</small>
+                    </span>
+                </label>
+            }
+        </section>
+        <div class="warehouse-settings__actions">
+            <a href="warehouse">취소</a>
+            <button type="button" disabled>운영 설정 저장 · API 연결 전</button>
+        </div>
+        <a class="warehouse-settings__customs" href="warehouse/bonded-customs">보세·통관 상태 화면 보기 ›</a>
+    </ChildContent>
+</RoleFlowSurface>
+
+@code {
+    private string _selectedCode = "general";
+
+    private static IReadOnlyList<WarehouseModeOption> Options =>
+    [
+        new("general", "일반 입출고 창고", "입고·재고·피킹·출고"),
+        new("bonded", "보세 수입 창고", "보관·반입·반출 상태 기록"),
+        new("mart", "마트 도심 창고", "매장 공급·피킹"),
+        new("housing", "공동주택 물류 거점", "세대 배분·수령")
+    ];
+
+    private string OptionClass(string code)
+        => code == _selectedCode
+            ? "warehouse-settings__option warehouse-settings__option--selected"
+            : "warehouse-settings__option";
+
+    private sealed record WarehouseModeOption(
+        string Code,
+        string Label,
+        string Description);
+}

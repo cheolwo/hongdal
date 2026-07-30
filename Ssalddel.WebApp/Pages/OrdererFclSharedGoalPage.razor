@@ -1,0 +1,202 @@
+@page "/orderer/group-import/fcl-goal"
+@using Ssalddel.Contracts.Common.AgriculturalFisheries
+@inject ISsalddelJsonApiClient ApiClient
+
+<PageTitle>FCL 같이 수입 목표 · 살뜰</PageTitle>
+
+<main class="fcl-goal">
+    <section class="fcl-goal__hero">
+        <span>02 · 같이 수입 준비</span>
+        <h1>FCL 공동 목표</h1>
+        <p>실제 KAMIS 품목 단위와 포장 추정치를 유지한 채, 한 컨테이너를 채우려면 어느 정도 수요가 필요한지 검토합니다.</p>
+    </section>
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            @_errorMessage
+        </MudAlert>
+    }
+    else if (SelectedItem is not null && SelectedContainer is not null)
+    {
+        <section class="fcl-goal__selector">
+            <label>
+                <span>품목</span>
+                <select @bind="SelectedItemCode">
+                    @foreach (var item in _items)
+                    {
+                        <option value="@item.ItemCode">@item.CategoryName · @item.ItemName</option>
+                    }
+                </select>
+            </label>
+            <label>
+                <span>컨테이너</span>
+                <select @bind="SelectedContainerCode">
+                    @foreach (var container in SelectedItem.ContainerEstimates)
+                    {
+                        <option value="@container.ContainerCode">@container.ContainerName</option>
+                    }
+                </select>
+            </label>
+        </section>
+
+        <section class="fcl-goal__summary">
+            <div>
+                <span>목표 품목</span>
+                <strong>@SelectedItem.ItemName</strong>
+                <small>@SourceUnitLabel · 포장 @SelectedItem.RepresentativePackage.NetContentWeightKg:N1 kg</small>
+            </div>
+            <div>
+                <span>FCL 계획 목표</span>
+                <strong>@SelectedContainer.PlanningFclPackageCount.ToString("N0") @PackageCountLabel</strong>
+                <small>순중량 @SelectedContainer.PlanningFclNetWeightKg.ToString("N0") kg</small>
+            </div>
+        </section>
+
+        <section class="fcl-goal__progress">
+            <header>
+                <div>
+                    <span>내 검토 수량을 포함한 목표율</span>
+                    <strong>@PreviewFillRate.ToString("N0")%</strong>
+                </div>
+                <p>공동 수요 원장은 아직 연결하지 않았습니다. 아래 수량은 이 브라우저 화면에서만 계산됩니다.</p>
+            </header>
+            <div class="fcl-goal__track" aria-label="@($"FCL 목표 {PreviewFillRate:N0}%")">
+                <span style="@($"width:{PreviewFillRate:N1}%")"></span>
+            </div>
+            <div class="fcl-goal__legend">
+                <span>원장 확정 <strong>연결 전</strong></span>
+                <span>내 검토 <strong>@_myPackageCount.ToString("N0") @PackageCountLabel</strong></span>
+                <span>남은 목표 <strong>@RemainingPackageCount.ToString("N0") @PackageCountLabel</strong></span>
+            </div>
+        </section>
+
+        <section class="fcl-goal__calculator">
+            <div>
+                <h2>내 수량 추가 검토</h2>
+                <p>계약이나 발주가 아니라 공동 목표에 넣어 볼 수량을 미리 계산합니다.</p>
+            </div>
+            <label>
+                <span>@PackageCountLabel</span>
+                <input type="number" min="0" max="@SelectedContainer.PlanningFclPackageCount" step="1" @bind="_myPackageCount" />
+            </label>
+        </section>
+
+        <section class="fcl-goal__evidence">
+            <h2>포장·적재 추정 근거</h2>
+            <dl>
+                <div><dt>포장 크기</dt><dd>@SelectedItem.RepresentativePackage.LengthMm × @SelectedItem.RepresentativePackage.WidthMm × @SelectedItem.RepresentativePackage.HeightMm mm</dd></div>
+                <div><dt>총중량</dt><dd>@SelectedItem.RepresentativePackage.GrossWeightKg:N1 kg / @PackageCountLabel</dd></div>
+                <div><dt>계획 적재율</dt><dd>@(SelectedContainer.PlanningFillRate * 100):N0%</dd></div>
+                <div><dt>근거 수준</dt><dd>@EvidenceLabel</dd></div>
+            </dl>
+            <p>@SelectedItem.AssumptionNote</p>
+        </section>
+
+        <aside class="fcl-goal__notice">
+            <strong>개인정보와 실행 경계</strong>
+            <p>참여자의 개별 수량·연락처는 공개하지 않고 합계만 공유해야 합니다. 이 값은 포장 가정에 따른 계획 추정치이며 공급자·포워더·관세 전문가 확인 전에는 발주, 계약, 배차를 확정하지 않습니다.</p>
+        </aside>
+
+        <nav class="fcl-goal__actions">
+            <a href="community/group-import">같이 수입 준비 원장</a>
+            <a href="/roles/03/shipper/international/fcl-lcl">03 화주 FCL 검토</a>
+        </nav>
+    }
+</main>
+
+@code {
+    private IReadOnlyList<농수산물포장Fcl분석항목Response> _items = [];
+    private string _selectedItemCode = string.Empty;
+    private string _selectedContainerCode = string.Empty;
+    private int _myPackageCount;
+    private bool _isLoading;
+    private string? _errorMessage;
+
+    private string SelectedItemCode
+    {
+        get => _selectedItemCode;
+        set
+        {
+            _selectedItemCode = value;
+            _selectedContainerCode = SelectedItem?.ContainerEstimates.FirstOrDefault()?.ContainerCode ?? string.Empty;
+            _myPackageCount = 0;
+        }
+    }
+
+    private string SelectedContainerCode
+    {
+        get => _selectedContainerCode;
+        set
+        {
+            _selectedContainerCode = value;
+            _myPackageCount = 0;
+        }
+    }
+
+    private 농수산물포장Fcl분석항목Response? SelectedItem
+        => _items.FirstOrDefault(item => item.ItemCode == _selectedItemCode)
+           ?? _items.FirstOrDefault();
+
+    private 농수산물Fcl적재추정Response? SelectedContainer
+        => SelectedItem?.ContainerEstimates.FirstOrDefault(item => item.ContainerCode == _selectedContainerCode)
+           ?? SelectedItem?.ContainerEstimates.FirstOrDefault();
+
+    private string SourceUnitLabel
+        => !string.IsNullOrWhiteSpace(SelectedItem?.RepresentativePackage.PackageUnitLabel)
+            ? SelectedItem.RepresentativePackage.PackageUnitLabel
+            : SelectedItem?.KamisPriceComparisonUnits.FirstOrDefault() ?? "원자료 단위";
+
+    private string PackageCountLabel
+        => string.IsNullOrWhiteSpace(SelectedItem?.RepresentativePackage.PackageUnitLabel)
+            ? "포장"
+            : SelectedItem.RepresentativePackage.PackageUnitLabel;
+
+    private int RemainingPackageCount
+        => Math.Max(0, (SelectedContainer?.PlanningFclPackageCount ?? 0) - Math.Max(0, _myPackageCount));
+
+    private decimal PreviewFillRate
+        => SelectedContainer?.PlanningFclPackageCount is > 0
+            ? Math.Min(100m, Math.Max(0, _myPackageCount) * 100m / SelectedContainer.PlanningFclPackageCount)
+            : 0;
+
+    private string EvidenceLabel
+        => SelectedItem?.EvidenceLevelCode switch
+        {
+            농수산물포장근거수준코드.공식품목규격 => "공식 품목 규격",
+            농수산물포장근거수준코드.공식대표규격 => "공식 대표 규격",
+            농수산물포장근거수준코드.품목군추론 => "품목군 추론",
+            _ => "공급자 확인 필요"
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            var response = await ApiClient.GetAsync<농수산물포장Fcl분석목록Response>(
+                "api/v1/agricultural-fisheries/packaging-fcl?sourceYear=2026",
+                "2026 농수산물 포장 FCL 분석 조회",
+                allowNotFound: false);
+            _items = response?.Items
+                .Where(item => item.ContainerEstimates.Count > 0)
+                .OrderBy(item => item.CategoryName, StringComparer.Ordinal)
+                .ThenBy(item => item.ItemName, StringComparer.Ordinal)
+                .ToArray() ?? [];
+            _selectedItemCode = _items.FirstOrDefault()?.ItemCode ?? string.Empty;
+            _selectedContainerCode = SelectedItem?.ContainerEstimates.FirstOrDefault()?.ContainerCode ?? string.Empty;
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or HttpRequestException)
+        {
+            _errorMessage = "FCL 포장 분석을 서버에서 불러오지 못했습니다. 운영 데이터 오류를 샘플 값으로 대체하지 않았습니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

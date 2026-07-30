@@ -5,15 +5,19 @@ namespace Ssalddel.Tests.Architecture;
 public sealed class ShipperHomeRouteCompositionTests
 {
     [Fact]
-    public void Web과모바일은_같은화주허브route와공용Screen을사용한다()
+    public void Web홈은_요약을제공하고_전체업무는공용Screen으로분리한다()
     {
         var web = Read("Ssalddel.WebApp", "Pages", "ShipperHome.razor");
+        var webWorkspace = Read("Ssalddel.WebApp", "Pages", "ShipperWorkspacePage.razor");
         var app = Read("SsalddelApp", "Components", "Pages", "Home.razor");
         var appShell = Read("SsalddelApp", "Components", "Shared", "ShipperHomeAppShell.razor");
 
         Assert.Contains($"@page \"{ShipperHomePageRoutes.Root}\"", web);
         Assert.Contains($"@page \"{ShipperHomePageRoutes.Root}\"", app);
-        Assert.Contains("<ShipperHomeScreen", web);
+        Assert.Contains("<RoleDashboardSurface", web);
+        Assert.Contains("@page \"/shipper/workspace\"", webWorkspace);
+        Assert.Contains("<ShipperHomeScreen", webWorkspace);
+        Assert.Contains("전체 화주 업무 보기", web);
         Assert.Contains("<ShipperHomeAppShell", app);
         Assert.Contains("<ShipperHomeScreen", appShell);
         Assert.True(app.Split('\n').Length <= 5);

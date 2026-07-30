@@ -1,0 +1,80 @@
+@page "/warehouse/exceptions"
+@inject IWarehouseWorkspaceService WarehouseService
+
+<PageTitle>창고 예외 처리 · 살뜰 창고</PageTitle>
+
+<RoleFlowSurface Title="창고 예외 처리"
+                 Badge="@($"{ExceptionInbounds.Count:N0}건")"
+                 Description="입고 원장에서 수량·파손·온도·라벨 차이가 표시된 항목을 근거 중심으로 확인합니다."
+                 Metrics="Metrics"
+                 SectionTitle="우선 예외"
+                 Items="Items"
+                 IsLoading="_isLoading"
+                 EmptyMessage="현재 입고 원장에서 확인된 예외가 없습니다."
+                 NoticeTitle="원본 보존"
+                 NoticeDescription="예외 수정 전 최초 측정값·사진·담당자 기록을 보존해야 합니다. 이 화면은 현재 상태 조회이며 자동 수정하지 않습니다."
+                 WarningNotice="true"
+                 Palette="RoleFlowPalette.Warehouse">
+    <ChildContent>
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+                @_statusMessage
+            </MudAlert>
+        }
+    </ChildContent>
+</RoleFlowSurface>
+
+@code {
+    private IReadOnlyList<입고요청항목응답> _inbounds = [];
+    private bool _isLoading;
+    private string? _statusMessage;
+
+    private IReadOnlyList<입고요청항목응답> ExceptionInbounds
+        => _inbounds
+            .Where(item => IsException(item.상태))
+            .OrderByDescending(item => item.CreatedAtUtc)
+            .ToArray();
+
+    private IReadOnlyList<RoleDashboardMetric> Metrics =>
+    [
+        new("신규", $"{ExceptionInbounds.Count(item => ContainsAny(item.상태, "신규", "발견")):N0}건"),
+        new("처리 중", $"{ExceptionInbounds.Count(item => !ContainsAny(item.상태, "완료", "해결")):N0}건"),
+        new("완료", $"{ExceptionInbounds.Count(item => ContainsAny(item.상태, "완료", "해결")):N0}건")
+    ];
+
+    private IReadOnlyList<RoleFlowListItem> Items
+        => ExceptionInbounds
+            .Select(item => new RoleFlowListItem(
+                $"IN-{item.Id:N0} · {item.예정상품명}",
+                $"{item.상태} · {item.공급처명} · {item.예정수량?.ToString("N0") ?? "수량 미정"}",
+                ContainsAny(item.상태, "완료", "해결") ? "완료" : "검토",
+                Tone: ContainsAny(item.상태, "완료", "해결")
+                    ? RoleDashboardTone.Success
+                    : RoleDashboardTone.Warning))
+            .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            _inbounds = (await WarehouseService.GetInboundsAsync())?.Items ?? [];
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or HttpRequestException)
+        {
+            _statusMessage = "창고 예외는 창고 로그인 후 서버 원장에서 확인됩니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static bool IsException(string? status)
+        => ContainsAny(status, "예외", "파손", "보류", "불일치", "보완", "온도");
+
+    private static bool ContainsAny(string? value, params string[] keywords)
+        => !string.IsNullOrWhiteSpace(value)
+           && keywords.Any(keyword => value.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+}

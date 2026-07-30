@@ -1,0 +1,25 @@
+@page "/information/kamis-domestic-price-comparison"
+@using Ssalddel.Ui.Common.Areas.App.Components.Information
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<PageTitle>KAMIS 국내 유통단계 가격 비교 · 살뜰</PageTitle>
+
+<main class="orderer-kamis">
+    <header>
+        <span>02 · 국내 시세</span>
+        <h1>KAMIS 유통단계 가격 비교</h1>
+        <p>국내 농수산물의 소매·도매 관측값을 KAMIS 원자료 단위 그대로 비교합니다. 표시 단위를 임의로 kg으로 바꾸지 않습니다.</p>
+        <nav>
+            <a href="orderer/group-import/fcl-goal">FCL 공동 목표 보기</a>
+            <a href="community/group-purchase">같이 주문 검토</a>
+        </nav>
+    </header>
+
+    <농수산공공데이터Workspace InitialSection="농수산가격비교Section.국내"
+                               DomesticOnly="true" />
+
+    <aside>
+        <strong>가격과 실행의 경계</strong>
+        <p>시세는 판단을 돕는 관측 정보입니다. 실제 공급 조건·품질·포장·운송비는 개별 발주 전 계약 당사자와 다시 확인해야 합니다.</p>
+    </aside>
+</main>

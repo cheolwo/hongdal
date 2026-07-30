@@ -1,84 +1,120 @@
 @page "/orderer"
-@inject OrdererBetaReadinessService ReadinessService
-@inject WebAuthSessionService AuthSession
 
-<WebPageHeader Eyebrow="Orderer Web"
-               Title="주문자 1.5 점검 작업공간"
-               Description="개별 필요에서 시작해 공동구매 수요를 모으고, 수입·수출 준비 원장을 Simulation 경계에서 점검합니다."
-               Badge="문화교통 1.5 베타" />
+<PageTitle>주문 홈 · 살뜰</PageTitle>
 
-@if (_readiness is null)
-{
-    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-        서버 연결 상태를 확인하고 있습니다.
-    </MudAlert>
-}
-else
-{
-    <MudAlert Severity="@(_readiness.IsReady ? Severity.Success : Severity.Warning)"
-              Variant="Variant.Outlined"
-              Class="mb-4">
-        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-            <MudText Typo="Typo.body2">
-                <b>@(_readiness.IsReady ? "점검 서버 연결됨" : "점검 서버 확인 필요")</b>
-                · @_readiness.Message
-            </MudText>
-            <MudButton Size="Size.Small" Variant="Variant.Text" OnClick="RefreshReadinessAsync">
-                다시 확인
-            </MudButton>
-        </MudStack>
-    </MudAlert>
-}
+<main class="orderer-discovery" aria-labelledby="orderer-discovery-title">
+    <div class="orderer-discovery__topbar">
+        <span>주문 홈</span>
+        <span>살뜰 주문자 · 체험</span>
+    </div>
 
-<MudGrid>
-    <MudItem xs="12" lg="8">
-        <WebPageLinkGrid Items="Links" />
-    </MudItem>
-    <MudItem xs="12" lg="4">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudStack Spacing="2">
-                <MudText Typo="Typo.h6">현재 실행 경계</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    주문자의 개별 수요와 주문 원장을 먼저 보존한 뒤, 동의한 정보만 공동구매와 공동수출 집계 원장에 연결합니다.
-                </MudText>
-                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                    계약·결제·신고 제출·포워더 자동 선정·외부 전송은 실행하지 않습니다. 현재 화면은 플랫폼 원장 저장과 검토용입니다.
-                </MudAlert>
-                @if (!AuthSession.IsLoggedIn)
-                {
-                    <MudButton Href="/login?returnUrl=%2Forderer"
-                               Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Login">
-                        로그인해서 원장 점검하기
-                    </MudButton>
-                }
-            </MudStack>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+    <header class="orderer-discovery__hero">
+        <div>
+            <span>내 주변과 지역</span>
+            <a href="information/regional-products">설정</a>
+        </div>
+        <h1 id="orderer-discovery-title">무엇을 주문해볼까요?</h1>
+        <p>문화·산지 이야기 또는 근처 음식점에서 시작하세요.</p>
+        <div class="orderer-discovery__scope">
+            <strong>문화상품</strong>
+            <span>근처 매장</span>
+        </div>
+    </header>
+
+    <nav class="orderer-discovery__filters" aria-label="주문 추천 필터">
+        <a class="is-active" href="orderer">추천</a>
+        <a href="information/regional-products">문화</a>
+        <a href="orderer/mart">근처 음식점</a>
+    </nav>
+
+    <section class="orderer-discovery__products" aria-label="주문 탐색 예시">
+        @foreach (var item in Products)
+        {
+            <article class="orderer-product">
+                <div class="orderer-product__badges">
+                    <span class="@($"orderer-product__kind orderer-product__kind--{item.Tone}")">@item.Kind</span>
+                    <span class="orderer-product__when">@item.When</span>
+                </div>
+                <h2>@item.Title</h2>
+                <p>@item.Description</p>
+                <div class="orderer-product__price">
+                    <strong>@item.Price</strong>
+                    <span>@item.Delivery</span>
+                </div>
+                <div class="orderer-product__progress" aria-label="@($"{item.Progress}% 준비")">
+                    <i style="@($"width:{item.Progress}%")"></i>
+                </div>
+                <div class="orderer-product__action">
+                    <span>@item.Hint</span>
+                    <a href="@item.Href">@item.Action <b>›</b></a>
+                </div>
+            </article>
+        }
+    </section>
+
+    <section class="orderer-discovery__boundary">
+        <strong>먼저 상품을 보고, 주문 방식은 나중에</strong>
+        <p>개별 주문이 기본입니다. 시간이 여유롭고 비용을 줄이고 싶을 때만 같이 주문을 비교합니다.</p>
+    </section>
+
+    <nav class="orderer-discovery__next" aria-label="주문자 다음 단계">
+        <a href="information/kamis-domestic-price-comparison">KAMIS 가격 확인</a>
+        <a href="orderer/group-import/fcl-goal">FCL 공동목표</a>
+        <a href="orderer/workspace">전체 업무 보기</a>
+    </nav>
+</main>
 
 @code {
-    private static readonly IReadOnlyList<WebAppPageLink> Links =
+    private static readonly IReadOnlyList<OrdererDiscoveryProduct> Products =
     [
-        new("공동구매 둘러보기", "공개 모집과 참여 조건을 확인하고 개별 수요가 공동성으로 이어지는 흐름을 살펴봅니다.", WebOrdererRoutes.GroupPurchase, Icons.Material.Filled.GroupWork, "1.0"),
-        new("공동구매 수요 등록", "여러 재료와 배송 조건을 비구속 수요로 남기고 주문자 집단 후보를 기다립니다.", WebOrdererRoutes.GroupPurchaseDemand, Icons.Material.Filled.PlaylistAdd, "1.0"),
-        new("개별수입 원장", "기존 개별주문을 원천으로 수입 주체·판매자·통관 검토 상태를 연결합니다.", WebOrdererRoutes.IndividualImportLedger, Icons.Material.Filled.MoveToInbox, "1.5"),
-        new("개별수출 원장", "개별주문에서 수출자·해외 구매자·요건·서류 검토 상태를 분리해 기록합니다.", WebOrdererRoutes.IndividualExportLedger, Icons.Material.Filled.Outbox, "1.5"),
-        new("공동수출 원장", "여러 개별수출을 집하·합포장·포워더 인계 후보로 묶되 신고 원본은 보존합니다.", WebOrdererRoutes.GroupExportLedger, Icons.Material.Filled.Inventory, "1.5"),
-        new("공식 식재료 정보", "공공 데이터와 출처·확인 시각을 살펴보고 공동구매 재료 후보를 검토합니다.", "/information/food-ingredients", Icons.Material.Filled.MenuBook, "정보"),
-        new("마트 공개 상품", "공개 상품과 투영된 판매 가능 수량을 로그인 없이 확인합니다.", WebOrdererRoutes.Mart, Icons.Material.Filled.Storefront, "마트"),
-        new("마트 주문 요청", "상품을 선택한 뒤 비구속 구매 의향을 서버 원장에 저장합니다.", WebOrdererRoutes.MartOrderRequest, Icons.Material.Filled.AddShoppingCart, "마트"),
-        new("커뮤니티", "같은 품목, 같은 배송권의 사용자 경험을 공유합니다.", "/community", Icons.Material.Filled.Forum, "Common")
+        new(
+            "문화·산지",
+            "오늘",
+            "충주 사과 5kg",
+            "충주 문화 이야기 · 공식 산지 근거 · 개별 배송 검토",
+            "2.7만원",
+            "배송 조건 확인",
+            70,
+            "산지·가격 확인",
+            "상품 보기",
+            "information/regional-products",
+            "blue"),
+        new(
+            "근처 음식점",
+            "근처",
+            "동네 반찬가게 주말 꾸러미",
+            "근처 음식점 · 토요일 수령 · 개별 주문 검토",
+            "1.8만원",
+            "오늘 주문 검토",
+            80,
+            "메뉴·배송 확인",
+            "메뉴 보기",
+            "orderer/mart",
+            "green"),
+        new(
+            "같이 주문",
+            "4일 여유",
+            "지역 생활품 같이 주문",
+            "수령 장소와 공급 조건을 확인한 뒤 비구속 수요를 남겨요",
+            "조건 확인",
+            "수량 선택",
+            66,
+            "개별 주문과 비교",
+            "같이 보기",
+            "community/group-purchase",
+            "blue")
     ];
 
-    private OrdererBetaReadiness? _readiness;
-
-    protected override Task OnInitializedAsync()
-        => RefreshReadinessAsync();
-
-    private async Task RefreshReadinessAsync()
-    {
-        _readiness = await ReadinessService.CheckAsync();
-    }
+    private sealed record OrdererDiscoveryProduct(
+        string Kind,
+        string When,
+        string Title,
+        string Description,
+        string Price,
+        string Delivery,
+        int Progress,
+        string Hint,
+        string Action,
+        string Href,
+        string Tone);
 }

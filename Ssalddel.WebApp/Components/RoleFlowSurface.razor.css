@@ -1,0 +1,210 @@
+.role-flow {
+    --flow-accent: #00897b;
+    --flow-bg: #f4faf9;
+    --flow-border: #c9dbd9;
+    --flow-tint: #e0f2f0;
+    --flow-text: #132927;
+    --flow-muted: #637573;
+    width: min(100%, 430px);
+    min-height: calc(100vh - 132px);
+    margin: 0 auto;
+    padding: 16px;
+    background: var(--flow-bg);
+    color: var(--flow-text);
+    font-family: "Noto Sans KR", "Pretendard", system-ui, sans-serif;
+}
+
+.role-flow--warehouse {
+    --flow-accent: #ef6c00;
+    --flow-bg: #faf9f7;
+    --flow-border: #e0d6c9;
+    --flow-tint: #fff3e0;
+    --flow-text: #2b211a;
+    --flow-muted: #75695e;
+}
+
+.role-flow__heading > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.role-flow__heading h1 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.45;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.role-flow__heading span {
+    min-width: 88px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--flow-tint);
+    color: var(--flow-accent);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.role-flow__heading p {
+    margin: 1px 0 12px;
+    color: var(--flow-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.role-flow__metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.role-flow__metrics article,
+.role-flow__records,
+.role-flow ::deep .role-flow-card {
+    border: 1px solid var(--flow-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.role-flow__metrics article {
+    min-height: 80px;
+    padding: 10px;
+}
+
+.role-flow__metrics small,
+.role-flow__metrics span {
+    display: block;
+    overflow: hidden;
+    color: var(--flow-muted);
+    font-size: 11px;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.role-flow__metrics strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 20px;
+    line-height: 1.45;
+}
+
+.role-flow__records {
+    padding: 14px;
+}
+
+.role-flow__records h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.role-flow__record {
+    display: flex;
+    min-height: 59px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--flow-border);
+    color: inherit;
+    text-decoration: none;
+}
+
+.role-flow__record:first-of-type {
+    border-top: 0;
+}
+
+.role-flow__record > span {
+    min-width: 0;
+}
+
+.role-flow__record strong,
+.role-flow__record small {
+    display: block;
+}
+
+.role-flow__record strong {
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.role-flow__record small {
+    margin-top: 1px;
+    color: var(--flow-muted);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.role-flow__status {
+    flex: 0 0 88px;
+    padding: 7px 8px;
+    border-radius: 999px;
+    background: var(--flow-tint);
+    color: var(--flow-accent);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+}
+
+.role-flow__status--warning {
+    background: #fff0c7;
+    color: #a35900;
+}
+
+.role-flow__status--success {
+    background: #e8f6eb;
+    color: #14733d;
+}
+
+.role-flow__status--default {
+    background: #f4f4f4;
+    color: var(--flow-muted);
+}
+
+.role-flow__empty {
+    margin: 12px 0 4px;
+    color: var(--flow-muted);
+    font-size: 12px;
+}
+
+.role-flow__notice {
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 8px;
+    background: var(--flow-tint);
+    color: var(--flow-text);
+}
+
+.role-flow__notice--warning {
+    background: #fff0c7;
+}
+
+.role-flow__notice strong {
+    color: var(--flow-accent);
+    font-size: 13px;
+}
+
+.role-flow__notice--warning strong {
+    color: #a35900;
+}
+
+.role-flow__notice p {
+    margin: 7px 0 0;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+@media (min-width: 761px) {
+    .role-flow {
+        width: min(100%, 760px);
+        border-radius: 18px;
+    }
+}

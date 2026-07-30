@@ -1,0 +1,78 @@
+@page "/warehouse/history"
+@inject IWarehouseWorkspaceService WarehouseService
+
+<PageTitle>창고 작업 이력 · 살뜰 창고</PageTitle>
+
+<RoleFlowSurface Title="창고 작업 이력"
+                 Badge="이력"
+                 Description="현재는 입고 원장의 생성·완료 시각과 최종 상태를 기준으로 최근 기록을 제공합니다."
+                 Metrics="Metrics"
+                 SectionTitle="최근 입고 원장 기록"
+                 Items="Items"
+                 IsLoading="_isLoading"
+                 EmptyMessage="현재 조회할 입고 원장 기록이 없습니다."
+                 NoticeTitle="감사 추적 범위"
+                 NoticeDescription="전용 작업 사건 이력 API는 아직 연결 전입니다. 상태 변경의 사용자·근거·변경 전후 값까지 확인하는 감사 이력과 현재 원장 최종 상태를 혼동하지 않습니다."
+                 Palette="RoleFlowPalette.Warehouse">
+    <ChildContent>
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+                @_statusMessage
+            </MudAlert>
+        }
+    </ChildContent>
+</RoleFlowSurface>
+
+@code {
+    private IReadOnlyList<입고요청항목응답> _inbounds = [];
+    private bool _isLoading;
+    private string? _statusMessage;
+
+    private IReadOnlyList<RoleDashboardMetric> Metrics =>
+    [
+        new("오늘 생성", $"{_inbounds.Count(item => item.CreatedAtUtc.ToLocalTime().Date == DateTime.Today):N0}건"),
+        new("입고 완료", $"{_inbounds.Count(item => item.입고완료일시.HasValue):N0}건"),
+        new("예외 포함", $"{_inbounds.Count(item => IsException(item.상태)):N0}건")
+    ];
+
+    private IReadOnlyList<RoleFlowListItem> Items
+        => _inbounds
+            .OrderByDescending(item => item.입고완료일시 ?? item.CreatedAtUtc)
+            .Take(30)
+            .Select(item => new RoleFlowListItem(
+                $"IN-{item.Id:N0} · {item.예정상품명}",
+                $"{FormatMoment(item.입고완료일시 ?? item.CreatedAtUtc)} · {item.공급처명} · {item.예정수량?.ToString("N0") ?? "수량 미정"}",
+                string.IsNullOrWhiteSpace(item.상태) ? "기록" : item.상태,
+                Tone: IsException(item.상태)
+                    ? RoleDashboardTone.Warning
+                    : item.입고완료일시.HasValue
+                        ? RoleDashboardTone.Success
+                        : RoleDashboardTone.Primary))
+            .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            _inbounds = (await WarehouseService.GetInboundsAsync())?.Items ?? [];
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or HttpRequestException)
+        {
+            _statusMessage = "창고 원장 이력은 창고 로그인 후 서버에서 확인됩니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static bool IsException(string? status)
+        => !string.IsNullOrWhiteSpace(status)
+           && new[] { "예외", "파손", "보류", "불일치", "보완", "온도" }
+               .Any(keyword => status.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+    private static string FormatMoment(DateTime value)
+        => value.ToLocalTime().ToString("M월 d일 HH:mm");
+}

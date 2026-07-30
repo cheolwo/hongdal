@@ -1,32 +1,91 @@
 @page "/shipper"
-@using Ssalddel.Ui.Common.Areas.App.Components.Shipper
-@inject WebAuthSessionService AuthSession
+@using Ssalddel.Ui.Common.Areas.App.Services
+@inject ShipperHomePageViewModel ViewModel
 
-<ShipperHomeScreen @ref="homeScreen"
-                   TransportHref="@ShipperRoutes.Request"
-                   WarehouseHref="@ShipperRoutes.WarehouseWorkspace"
-                   SalesHref="@ShipperRoutes.SalesOrders"
-                   InternationalHref="@ShipperRoutes.FclLclPlanner"
-                   LoginHref="/login">
-    <AdditionalTools>
-        <ShipperHomeWebToolDirectory />
-    </AdditionalTools>
-</ShipperHomeScreen>
+<RoleDashboardSurface Title="화주 홈"
+                      Badge="오늘"
+                      Description="의뢰와 입고·판매 준비를 한눈에 확인합니다."
+                      Metrics="Metrics"
+                      Tasks="Tasks"
+                      IsLoading="@ViewModel.IsLoading"
+                      BoundaryTitle="운영 경계"
+                      BoundaryDescription="플랫폼은 정보와 합의 과정을 지원하며 자동 배차나 운송계약을 확정하지 않습니다.">
+    <Notice>
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">
+                @ViewModel.ErrorMessage
+            </MudAlert>
+        }
+        @foreach (var warning in Snapshot.Warnings)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                @warning
+            </MudAlert>
+        }
+        @if (!Snapshot.IsAuthenticated)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                공개 업무 구조는 볼 수 있습니다. 개인 의뢰·입고·재고 수치는 로그인 후 서버 원장에서 표시됩니다.
+            </MudAlert>
+        }
+    </Notice>
+    <Footer>
+        <a href="shipper/workspace">전체 화주 업무 보기 ›</a>
+    </Footer>
+</RoleDashboardSurface>
 
 @code {
-    private ShipperHomeScreen? homeScreen;
+    private ShipperHomeDashboardSnapshot Snapshot => ViewModel.Snapshot;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private IReadOnlyList<RoleDashboardMetric> Metrics =>
+    [
+        new("진행 의뢰", $"{Snapshot.ActiveRequestCount:N0}건"),
+        new("입고 대기", $"{Snapshot.PendingInboundCount:N0}건"),
+        new("가용 재고", $"{Snapshot.ActionableInventoryCount:N0}건")
+    ];
+
+    private IReadOnlyList<RoleDashboardTask> Tasks
     {
-        if (!firstRender)
+        get
         {
-            return;
-        }
-
-        await AuthSession.RestoreAsync();
-        if (homeScreen is not null)
-        {
-            await homeScreen.RefreshAsync();
+            var latest = Snapshot.LatestRequest;
+            return
+            [
+                latest is null
+                    ? new(
+                        "새 운송 의뢰 작성",
+                        "화물·운송·절차 조건을 단계별로 입력합니다.",
+                        "작성",
+                        Relative(ShipperRoutes.Request))
+                    : new(
+                        $"의뢰 {latest.RequestId} 검토",
+                        $"의뢰 {latest.RequestStatus} · 배차 {latest.DispatchStatus}",
+                        "확인",
+                        Relative(ShipperRequestDetailPageRoutes.SummaryFor(latest.RequestId))),
+                new(
+                    "입고 요청 확인",
+                    "입고 예정과 창고 응답 상태를 확인합니다.",
+                    "입고",
+                    Relative(ShipperRoutes.InboundDashboard)),
+                new(
+                    "FCL·LCL 물류 검토",
+                    "실제 예약 전 화물량과 비용 조건을 비교합니다.",
+                    "비교",
+                    Relative(ShipperRoutes.FclLclPlanner),
+                    RoleDashboardTone.Warning),
+                new(
+                    "판매 주문 원장",
+                    "국내 판매채널 주문과 출고 연결 상태를 확인합니다.",
+                    "원장",
+                    Relative(ShipperRoutes.SalesOrders))
+            ];
         }
     }
+
+    protected override Task OnInitializedAsync()
+        => ViewModel.LoadAsync();
+
+    private static string Relative(string path)
+        => path.TrimStart('/');
 }

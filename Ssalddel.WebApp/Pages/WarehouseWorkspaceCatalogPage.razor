@@ -1,0 +1,43 @@
+@page "/warehouse/workspace"
+
+<WebPageHeader Eyebrow="Warehouse Web"
+               Title="창고 전체 업무"
+               Description="입고·스캔·피킹·포장·출고 인계 화면을 공정별로 엽니다."
+               Badge="Simulation 경계" />
+
+<MudStack Spacing="3">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">창고 공정</MudText>
+        <WebPageLinkGrid Items="WorkflowLinks" />
+    </MudPaper>
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">도심 마트 풀필먼트</MudText>
+        <WebPageLinkGrid Items="MartLinks" />
+    </MudPaper>
+</MudStack>
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> WorkflowLinks =
+    [
+        new("입고 예정", "서버 원장의 입고 예정과 상태를 확인합니다.", "/warehouse/inbounds/expected", Icons.Material.Filled.EventNote, "05.03"),
+        new("입고 시작", "작업대 바코드와 상품 확인으로 이어갑니다.", WarehouseManagerRoutes.InboundWorkStart, Icons.Material.Filled.MoveToInbox, "창고"),
+        new("입고 상품 확인", "상품 바코드와 예정 상품을 대조합니다.", WarehouseManagerRoutes.InboundProductScan, Icons.Material.Filled.QrCodeScanner, "창고"),
+        new("입고 검수", "수량·파손·유통기한·보관 조건을 검수합니다.", WarehouseManagerRoutes.InboundInspection, Icons.Material.Filled.FactCheck, "창고"),
+        new("재고 현황", "가용·예약 수량과 입고 근거를 확인합니다.", WarehouseManagerRoutes.GeneralInventory, Icons.Material.Filled.Warehouse, "창고"),
+        new("적재 작업", "검수 완료 재고의 보관 위치를 확정합니다.", WarehouseManagerRoutes.PutAwayTask, Icons.Material.Filled.Inventory, "창고"),
+        new("피킹 작업", "배정된 피킹 작업의 시작·완료 상태를 처리합니다.", WarehouseManagerRoutes.PickingBatch, Icons.Material.Filled.Inventory2, "창고"),
+        new("포장 작업", "피킹 완료 재고를 주문 단위로 포장합니다.", WarehouseManagerRoutes.PackingTask, Icons.Material.Filled.Inventory2, "창고"),
+        new("출고예정 검토", "운송의뢰 전 출고예정 원장을 확인합니다.", WarehouseManagerRoutes.OutboundPlanReview, Icons.Material.Filled.FactCheck, "창고"),
+        new("출고 인계", "포장 완료 재고의 기사 인계를 준비합니다.", WarehouseManagerRoutes.GeneralTransportHandoff, Icons.Material.Filled.LocalShipping, "창고"),
+        new("예외 처리", "파손·수량 불일치·보류 항목을 분리합니다.", "/warehouse/exceptions", Icons.Material.Filled.ReportProblem, "05.17"),
+        new("작업 이력", "완료·취소·변경 이력을 확인합니다.", "/warehouse/history", Icons.Material.Filled.History, "05.18")
+    ];
+
+    private static readonly IReadOnlyList<WebAppPageLink> MartLinks =
+    [
+        new("알뜰살뜰 마트 홈", "도심 입고와 주문 피킹·배달 픽업 진입점을 모읍니다.", WarehouseManagerRoutes.MartHome, Icons.Material.Filled.Storefront, "마트"),
+        new("마트 작업 보드", "도심 창고 재고와 배달 픽업을 기준으로 처리합니다.", WarehouseManagerRoutes.MartWorkBoard, Icons.Material.Filled.Dashboard, "마트"),
+        new("도심 입고", "납품·반품·거점 이동 물량을 확인합니다.", WarehouseManagerRoutes.MartInboundWorkStart, Icons.Material.Filled.MoveToInbox, "마트"),
+        new("피킹·포장", "고객 주문별 피킹과 포장 완료를 처리합니다.", WarehouseManagerRoutes.MartPickingWorkStart, Icons.Material.Filled.ShoppingCartCheckout, "마트")
+    ];
+}

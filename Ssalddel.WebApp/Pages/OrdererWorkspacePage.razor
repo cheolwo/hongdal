@@ -1,0 +1,49 @@
+@page "/orderer/workspace"
+@inject OrdererBetaReadinessService ReadinessService
+@inject WebAuthSessionService AuthSession
+
+<WebPageHeader Eyebrow="Orderer Web"
+               Title="주문자 전체 업무"
+               Description="기존 주문·공동구매·수입 원장 점검 기능을 목적별로 엽니다."
+               Badge="Simulation 경계" />
+
+@if (_readiness is null)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+        서버 연결 상태를 확인하고 있습니다.
+    </MudAlert>
+}
+else
+{
+    <MudAlert Severity="@(_readiness.IsReady ? Severity.Success : Severity.Warning)"
+              Variant="Variant.Outlined"
+              Class="mb-4">
+        @(_readiness.IsReady ? "점검 서버 연결됨" : "점검 서버 확인 필요") · @_readiness.Message
+    </MudAlert>
+}
+
+<WebPageLinkGrid Items="Links" />
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> Links =
+    [
+        new("주문 홈", "문화·산지와 근처 상품에서 개별 주문을 먼저 살펴봅니다.", WebOrdererRoutes.Home, Icons.Material.Filled.Home, "02"),
+        new("KAMIS 국내 가격", "국내 유통단계 조사값과 원 거래단위를 확인합니다.", "/information/kamis-domestic-price-comparison", Icons.Material.Filled.PriceCheck, "정보"),
+        new("공동구매 둘러보기", "공개 모집과 참여 조건을 확인합니다.", WebOrdererRoutes.GroupPurchase, Icons.Material.Filled.GroupWork, "1.0"),
+        new("공동구매 수요 등록", "배송 조건을 비구속 수요로 남깁니다.", WebOrdererRoutes.GroupPurchaseDemand, Icons.Material.Filled.PlaylistAdd, "1.0"),
+        new("FCL 공동목표", "포장 규격과 참여 수량으로 FCL 목표 충족률을 검토합니다.", "/orderer/group-import/fcl-goal", Icons.Material.Filled.Inventory2, "1.5"),
+        new("같이 수입 상품 선택", "HS 코드와 수입단가 근거로 후보를 검토합니다.", "/community/group-import", Icons.Material.Filled.Public, "1.5"),
+        new("개별수입 원장", "수입 주체·판매자·통관 검토 상태를 연결합니다.", WebOrdererRoutes.IndividualImportLedger, Icons.Material.Filled.MoveToInbox, "1.5"),
+        new("개별수출 원장", "수출자·구매자·서류 검토 상태를 기록합니다.", WebOrdererRoutes.IndividualExportLedger, Icons.Material.Filled.Outbox, "1.5"),
+        new("공동수출 원장", "여러 원장을 집하·합포장 후보로 묶습니다.", WebOrdererRoutes.GroupExportLedger, Icons.Material.Filled.Inventory, "1.5"),
+        new("마트 공개 상품", "판매 가능 수량과 공급 조건을 확인합니다.", WebOrdererRoutes.Mart, Icons.Material.Filled.Storefront, "마트")
+    ];
+
+    private OrdererBetaReadiness? _readiness;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthSession.RestoreAsync();
+        _readiness = await ReadinessService.CheckAsync();
+    }
+}

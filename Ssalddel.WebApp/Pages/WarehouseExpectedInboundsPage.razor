@@ -1,0 +1,103 @@
+@page "/warehouse/inbounds/expected"
+@inject IWarehouseWorkspaceService WarehouseService
+
+<PageTitle>입고 예정 조회 · 살뜰 창고</PageTitle>
+
+<RoleFlowSurface Title="입고 예정 조회"
+                 Badge="조회"
+                 Description="공급처 코드나 공급처명으로 도착 예정 상품과 준비 상태를 찾습니다."
+                 Metrics="Metrics"
+                 SectionTitle="@ResultTitle"
+                 Items="Items"
+                 IsLoading="_isLoading"
+                 EmptyMessage="검색 조건에 맞는 입고 예정 원장이 없습니다."
+                 NoticeTitle="검색 기준"
+                 NoticeDescription="공급처명·코드·예정일을 함께 확인하고 동일 업체명은 공급처 코드와 원장 ID로 구분합니다."
+                 Palette="RoleFlowPalette.Warehouse">
+    <ChildContent>
+        <section class="role-flow-card warehouse-inbound-search">
+            <strong>거래업체로 입고 예정 조회</strong>
+            <label>
+                <span>업체 코드·업체명</span>
+                <input placeholder="예: 공급처 코드 또는 업체명" @bind="_searchText" @bind:event="oninput" />
+            </label>
+        </section>
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="my-3">
+                @_statusMessage
+            </MudAlert>
+        }
+    </ChildContent>
+</RoleFlowSurface>
+
+@code {
+    private IReadOnlyList<입고요청항목응답> _inbounds = [];
+    private string _searchText = string.Empty;
+    private bool _isLoading;
+    private string? _statusMessage;
+
+    private IReadOnlyList<입고요청항목응답> Filtered
+        => _inbounds
+            .Where(item => !IsClosed(item.상태))
+            .Where(item =>
+                string.IsNullOrWhiteSpace(_searchText)
+                || item.공급처코드.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase)
+                || item.공급처명.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase))
+            .OrderBy(item => item.예정도착일 ?? DateTime.MaxValue)
+            .ToArray();
+
+    private IReadOnlyList<RoleDashboardMetric> Metrics =>
+    [
+        new("입고 예정", $"{_inbounds.Count(item => !IsClosed(item.상태)):N0}건"),
+        new("오늘 도착", $"{_inbounds.Count(item => item.예정도착일?.Date == DateTime.Today):N0}건"),
+        new("보완 확인", $"{_inbounds.Count(item => IsException(item.상태)):N0}건")
+    ];
+
+    private string ResultTitle
+        => string.IsNullOrWhiteSpace(_searchText)
+            ? "전체 입고 예정"
+            : $"“{_searchText.Trim()}” 검색 결과";
+
+    private IReadOnlyList<RoleFlowListItem> Items
+        => Filtered
+            .Select(item => new RoleFlowListItem(
+                $"IN-{item.Id:N0} · {item.예정상품명}",
+                $"{FormatDate(item.예정도착일)} · {item.예정수량?.ToString("N0") ?? "수량 미정"} · {item.공급처명}",
+                StatusLabel(item.상태),
+                Tone: IsException(item.상태) ? RoleDashboardTone.Warning : RoleDashboardTone.Primary))
+            .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            _inbounds = (await WarehouseService.GetInboundsAsync())?.Items ?? [];
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or HttpRequestException)
+        {
+            _statusMessage = "입고 예정은 창고 로그인 후 서버 원장에서 확인됩니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static bool IsClosed(string? status)
+        => ContainsAny(status, "완료", "취소");
+
+    private static bool IsException(string? status)
+        => ContainsAny(status, "예외", "파손", "보류", "불일치", "보완");
+
+    private static bool ContainsAny(string? value, params string[] keywords)
+        => !string.IsNullOrWhiteSpace(value)
+           && keywords.Any(keyword => value.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+    private static string StatusLabel(string? status)
+        => string.IsNullOrWhiteSpace(status) ? "예정" : status;
+
+    private static string FormatDate(DateTime? value)
+        => value?.ToLocalTime().ToString("M월 d일 HH:mm") ?? "도착일 미정";
+}

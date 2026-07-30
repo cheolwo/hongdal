@@ -1,0 +1,92 @@
+@page "/community/home"
+
+<PageTitle>커뮤니티 홈 · 살뜰</PageTitle>
+
+<main class="community-role-home">
+    <header>
+        <div>
+            <span>01 · 공개 커뮤니티</span>
+            <h1>무엇을 같이 알아볼까요?</h1>
+            <p>생활 이야기와 국내 공공정보를 보고, 함께할 일은 별도 공동 원장에서 준비합니다.</p>
+        </div>
+        <label>
+            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
+            <input type="search"
+                   aria-label="커뮤니티 게시판 검색"
+                   placeholder="게시판 이름이나 주제 검색"
+                   @bind="_searchText"
+                   @bind:event="oninput" />
+        </label>
+    </header>
+
+    <section class="community-role-home__boards" aria-label="주요 게시판">
+        @foreach (var board in VisibleBoards)
+        {
+            <a href="@board.Href">
+                <span class="community-role-home__icon">
+                    <MudIcon Icon="@board.Icon" />
+                </span>
+                <span>
+                    <strong>@board.Title</strong>
+                    <small>@board.Description</small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+            </a>
+        }
+        @if (VisibleBoards.Count == 0)
+        {
+            <p class="community-role-home__empty">검색 조건에 맞는 주요 게시판이 없습니다.</p>
+        }
+    </section>
+
+    <section class="community-role-home__next">
+        <div>
+            <strong>대화가 공동행동으로 이어질 때</strong>
+            <p>관심 표시, 개별 의향, 공동 원장, 실제 실행은 각각 별도 동의와 철회 가능한 상태로 관리합니다.</p>
+        </div>
+        <a href="community/actions">공동행동 살펴보기</a>
+    </section>
+
+    <aside>
+        <span><MudIcon Icon="@Icons.Material.Filled.Security" /></span>
+        <div>
+            <strong>개인정보와 거래 안전</strong>
+            <p>연락처·정확한 위치·개별 수량은 공개 글에 적지 말고, 필요한 단계에서 동의 후 공유하세요.</p>
+        </div>
+        <a href="community/safety">안전 안내</a>
+    </aside>
+
+    <a class="community-role-home__directory" href="community/boards/directory">
+        전체 게시판·운영 디렉터리 보기
+        <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+    </a>
+</main>
+
+@code {
+    private string _searchText = string.Empty;
+
+    private static IReadOnlyList<CommunityHomeBoard> Boards =>
+    [
+        new("자유·생활", "지역 이야기와 일상 정보를 편하게 나눕니다.", "community/boards?boardKey=free-life", Icons.Material.Filled.ChatBubbleOutline),
+        new("질문·도움", "생활과 업무의 궁금한 점을 함께 해결합니다.", "community/boards?boardKey=question-help", Icons.Material.Filled.HelpOutline),
+        new("정보·시세", "KAMIS 가격과 국내 공공데이터 근거를 확인합니다.", "community/boards?boardKey=information-prices", Icons.Material.Filled.QueryStats),
+        new("모집·함께하기", "같이 주문하거나 함께 살펴볼 사람을 모집합니다.", "community/boards?boardKey=participation", Icons.Material.Filled.Groups),
+        new("판매·공급", "생산자와 판매자가 상품·수량·공급 조건을 제안합니다.", "community/boards?boardKey=sales-supply", Icons.Material.Filled.Storefront),
+        new("진행·공동 원장", "합의된 단계와 변경 이력을 공개 범위에 맞게 봅니다.", "community/boards?boardKey=ledger-progress", Icons.Material.Filled.AccountTree)
+    ];
+
+    private IReadOnlyList<CommunityHomeBoard> VisibleBoards
+        => string.IsNullOrWhiteSpace(_searchText)
+            ? Boards
+            : Boards
+                .Where(board =>
+                    board.Title.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase)
+                    || board.Description.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+    private sealed record CommunityHomeBoard(
+        string Title,
+        string Description,
+        string Href,
+        string Icon);
+}

@@ -1,0 +1,196 @@
+.community-role-home {
+    width: min(100%, 720px);
+    margin: 0 auto;
+    padding: 16px 16px 92px;
+    color: #1f2430;
+    font-family: "Noto Sans KR", "Pretendard", system-ui, sans-serif;
+}
+
+.community-role-home > header {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid #d8dced;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.community-role-home > header span {
+    color: #3f51b5;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.community-role-home h1 {
+    margin: 5px 0;
+    font-size: 23px;
+}
+
+.community-role-home > header p {
+    margin: 0;
+    color: #646b7d;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.community-role-home > header label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 12px;
+    border: 1px solid #c8ccdc;
+    border-radius: 10px;
+    color: #687086;
+}
+
+.community-role-home > header input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+}
+
+.community-role-home__boards {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.community-role-home__boards > a {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    min-height: 72px;
+    align-items: center;
+    gap: 11px;
+    padding: 12px;
+    border: 1px solid #d8dced;
+    border-radius: 12px;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+}
+
+.community-role-home__icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 12px;
+    background: #e8ebff;
+    color: #3f51b5;
+}
+
+.community-role-home__boards strong,
+.community-role-home__boards small {
+    display: block;
+}
+
+.community-role-home__boards strong {
+    font-size: 14px;
+}
+
+.community-role-home__boards small {
+    margin-top: 3px;
+    color: #646b7d;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.community-role-home__empty {
+    padding: 16px;
+    border-radius: 12px;
+    background: #fff;
+    color: #646b7d;
+    font-size: 12px;
+}
+
+.community-role-home__next,
+.community-role-home > aside {
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.community-role-home__next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #e8ebff;
+}
+
+.community-role-home__next strong {
+    color: #33449a;
+    font-size: 13px;
+}
+
+.community-role-home__next p,
+.community-role-home > aside p {
+    margin: 5px 0 0;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.community-role-home__next a {
+    flex: 0 0 auto;
+    padding: 9px 11px;
+    border-radius: 999px;
+    background: #3f51b5;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.community-role-home > aside {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #efd0cd;
+    background: #fff7f5;
+}
+
+.community-role-home > aside > span {
+    color: #a33f38;
+}
+
+.community-role-home > aside strong {
+    font-size: 13px;
+}
+
+.community-role-home > aside a {
+    color: #a33f38;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.community-role-home__directory {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 12px;
+    color: #3f51b5;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+@media (max-width: 420px) {
+    .community-role-home__next {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .community-role-home > aside {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .community-role-home > aside a {
+        grid-column: 2;
+    }
+}

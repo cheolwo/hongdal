@@ -3,6 +3,11 @@ namespace Ssalddel.WebApp.Services;
 public static class WarehouseManagerRoutes
 {
     public const string Home = "/warehouse";
+    public const string ExpectedInbounds = "/warehouse/inbounds/expected";
+    public const string Exceptions = "/warehouse/exceptions";
+    public const string History = "/warehouse/history";
+    public const string Settings = "/warehouse/settings";
+    public const string BondedCustoms = "/warehouse/bonded-customs";
     public const string InboundWorkStart = "/warehouse/work/inbound";
     public const string OutboundWorkStart = "/warehouse/work/outbound";
     public const string PackingWorkStart = "/warehouse/work/packing";

@@ -6,6 +6,9 @@ public static class DriverRoutes
     public const string WorkStart = "/driver/work/start";
     public const string WorkSettings = "/driver/work/settings";
     public const string Recommendations = "/driver/recommendations";
+    public const string CommunityRequests = "/driver/community-requests";
+    public const string ExplorationCampaigns = "/driver/exploration/campaigns";
+    public const string Reservations = "/driver/reservations";
     public const string DispatchDecisions = "/driver/dispatch-decisions";
     public const string CurrentTransport = "/driver/transports/current";
     public const string TransportHistory = "/driver/transports/history";

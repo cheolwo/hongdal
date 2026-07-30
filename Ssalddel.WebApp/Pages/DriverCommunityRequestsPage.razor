@@ -1,0 +1,86 @@
+@page "/driver/community-requests"
+@inject ISsalddelJsonApiClient ApiClient
+
+<PageTitle>커뮤니티 개별 의뢰 · 살뜰 기사</PageTitle>
+
+<RoleFlowSurface Title="커뮤니티 개별 의뢰"
+                 Badge="문의"
+                 Description="공동행동 원장에서 내게 전달된 운송 문의를 조건과 함께 봅니다."
+                 Metrics="Metrics"
+                 SectionTitle="가까운 문의"
+                 Items="Items"
+                 IsLoading="_isLoading"
+                 EmptyMessage="현재 내게 전달된 커뮤니티 운송 문의가 없습니다."
+                 NoticeTitle="문의와 계약 구분"
+                 NoticeDescription="관심 표시와 문의 응답은 조건 협의를 시작할 뿐 운송계약이나 배차를 확정하지 않습니다."
+                 Palette="RoleFlowPalette.Driver">
+    <ChildContent>
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+                @_statusMessage
+            </MudAlert>
+        }
+    </ChildContent>
+</RoleFlowSurface>
+
+@code {
+    private IReadOnlyList<CommunityDriverInquiryResponse> _inquiries = [];
+    private bool _isLoading;
+    private string? _statusMessage;
+
+    private IReadOnlyList<RoleDashboardMetric> Metrics =>
+    [
+        new("새 문의", $"{_inquiries.Count(item => item.StatusCode == CommunityDriverInquiryStatusCodes.Pending):N0}건"),
+        new("수락", $"{_inquiries.Count(item => item.StatusCode == CommunityDriverInquiryStatusCodes.Accepted):N0}건"),
+        new("종료", $"{_inquiries.Count(item => item.StatusCode is CommunityDriverInquiryStatusCodes.Declined or CommunityDriverInquiryStatusCodes.DriverUnavailable):N0}건")
+    ];
+
+    private IReadOnlyList<RoleFlowListItem> Items
+        => _inquiries
+            .OrderByDescending(item => item.UpdatedAtUtc)
+            .Select(item => new RoleFlowListItem(
+                item.CargoSummary,
+                $"{item.PickupAreaLabel} → {item.DropoffAreaLabel} · {item.QuantitySummary} · {item.RequestedPickupWindow}",
+                StatusLabel(item.StatusCode),
+                Tone: StatusTone(item.StatusCode)))
+            .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            _inquiries = await ApiClient.GetAsync<IReadOnlyList<CommunityDriverInquiryResponse>>(
+                "api/v1/driver/community-inquiries",
+                "기사 커뮤니티 운송 문의 조회",
+                allowNotFound: false) ?? [];
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or HttpRequestException)
+        {
+            _statusMessage = "커뮤니티 운송 문의는 기사 로그인 후 서버 원장에서 확인됩니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static string StatusLabel(string status)
+        => status switch
+        {
+            CommunityDriverInquiryStatusCodes.Pending => "확인",
+            CommunityDriverInquiryStatusCodes.Accepted => "수락",
+            CommunityDriverInquiryStatusCodes.Declined => "거절",
+            CommunityDriverInquiryStatusCodes.DriverUnavailable => "운행 불가",
+            _ => status
+        };
+
+    private static RoleDashboardTone StatusTone(string status)
+        => status switch
+        {
+            CommunityDriverInquiryStatusCodes.Accepted => RoleDashboardTone.Success,
+            CommunityDriverInquiryStatusCodes.Pending => RoleDashboardTone.Warning,
+            _ => RoleDashboardTone.Default
+        };
+}

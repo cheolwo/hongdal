@@ -1,0 +1,79 @@
+@page "/driver/reservations"
+@using Ssalddel.Contracts.Driver.Reservation
+@inject ISsalddelJsonApiClient ApiClient
+
+<PageTitle>운행 예약 · 살뜰 기사</PageTitle>
+
+<RoleFlowSurface Title="운행 예약"
+                 Badge="일정"
+                 Description="확정된 예약과 내가 비워 둔 시간창을 서버 원장 기준으로 구분해 확인합니다."
+                 Metrics="Metrics"
+                 SectionTitle="다가오는 일정"
+                 Items="Items"
+                 IsLoading="_isLoading"
+                 EmptyMessage="현재 등록된 향후 운행 예약이 없습니다."
+                 NoticeTitle="일정과 배차 구분"
+                 NoticeDescription="가능 시간 등록과 예약만으로 운송이 자동 배정되지는 않습니다."
+                 WarningNotice="true"
+                 Palette="RoleFlowPalette.Driver">
+    <ChildContent>
+        <section class="role-flow-card driver-reservation-date">
+            <strong>@DateTime.Today.ToString("yyyy년 M월")</strong>
+            <span>서버에 저장된 향후 일정만 아래에 표시합니다.</span>
+        </section>
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="my-3">
+                @_statusMessage
+            </MudAlert>
+        }
+    </ChildContent>
+</RoleFlowSurface>
+
+@code {
+    private IReadOnlyList<기사예약목록응답> _reservations = [];
+    private bool _isLoading;
+    private string? _statusMessage;
+
+    private IReadOnlyList<기사예약목록응답> FutureReservations
+        => _reservations
+            .Where(item => item.IsFuture)
+            .OrderBy(item => item.StartTime)
+            .ToArray();
+
+    private IReadOnlyList<RoleDashboardMetric> Metrics =>
+    [
+        new("향후 예약", $"{FutureReservations.Count:N0}건"),
+        new("시간 지정", $"{FutureReservations.Count(item => item.StartTime.HasValue):N0}건"),
+        new("즉시 시작", $"{FutureReservations.Count(item => !item.StartTime.HasValue):N0}건")
+    ];
+
+    private IReadOnlyList<RoleFlowListItem> Items
+        => FutureReservations
+            .Select(item => new RoleFlowListItem(
+                item.StartTime?.ToLocalTime().ToString("M월 d일 HH:mm") ?? "시간 협의",
+                $"{item.StartLocation} → {item.ReturnDestination ?? "복귀지 미정"}",
+                item.StartMode == "reserved" ? "예약" : "가능",
+                Tone: item.StartTime.HasValue ? RoleDashboardTone.Success : RoleDashboardTone.Primary))
+            .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            _reservations = await ApiClient.GetAsync<IReadOnlyList<기사예약목록응답>>(
+                "api/v1/driver/reservations",
+                "기사 운행 예약 목록 조회",
+                allowNotFound: false) ?? [];
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or HttpRequestException)
+        {
+            _statusMessage = "운행 예약은 기사 로그인 후 서버 원장에서 확인됩니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

@@ -1,0 +1,13 @@
+.driver-home-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.driver-home-links a {
+    color: var(--role-accent, #00897b);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}

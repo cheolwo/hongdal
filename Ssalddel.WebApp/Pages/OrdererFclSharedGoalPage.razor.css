@@ -1,0 +1,253 @@
+.fcl-goal {
+    width: min(100%, 760px);
+    margin: 0 auto;
+    padding: 16px 16px 92px;
+    color: #172033;
+    font-family: "Noto Sans KR", "Pretendard", system-ui, sans-serif;
+}
+
+.fcl-goal__hero {
+    overflow: hidden;
+    margin-bottom: 14px;
+    padding: 22px 20px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #2563eb, #173f9f);
+    color: #fff;
+    box-shadow: 0 18px 36px rgba(37, 99, 235, .22);
+}
+
+.fcl-goal__hero span,
+.fcl-goal__hero p {
+    color: rgba(255, 255, 255, .82);
+    font-size: 12px;
+}
+
+.fcl-goal__hero h1 {
+    margin: 7px 0;
+    font-size: 26px;
+}
+
+.fcl-goal__hero p {
+    max-width: 36rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.fcl-goal__selector,
+.fcl-goal__summary,
+.fcl-goal__progress,
+.fcl-goal__calculator,
+.fcl-goal__evidence {
+    margin-top: 12px;
+    border: 1px solid #dbe4f4;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.fcl-goal__selector {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+}
+
+.fcl-goal label span,
+.fcl-goal__summary span,
+.fcl-goal__progress span {
+    display: block;
+    color: #68758a;
+    font-size: 11px;
+}
+
+.fcl-goal select,
+.fcl-goal input {
+    width: 100%;
+    margin-top: 6px;
+    padding: 11px;
+    border: 1px solid #ccd8ea;
+    border-radius: 9px;
+    background: #fff;
+    color: #172033;
+    font: inherit;
+}
+
+.fcl-goal__summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fcl-goal__summary > div {
+    padding: 16px;
+}
+
+.fcl-goal__summary > div + div {
+    border-left: 1px solid #dbe4f4;
+}
+
+.fcl-goal__summary strong,
+.fcl-goal__summary small {
+    display: block;
+}
+
+.fcl-goal__summary strong {
+    margin-top: 4px;
+    color: #1e4fbf;
+    font-size: 21px;
+}
+
+.fcl-goal__summary small {
+    margin-top: 3px;
+    color: #68758a;
+    font-size: 11px;
+}
+
+.fcl-goal__progress {
+    padding: 16px;
+}
+
+.fcl-goal__progress header > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fcl-goal__progress header strong {
+    color: #2563eb;
+    font-size: 22px;
+}
+
+.fcl-goal__progress header p,
+.fcl-goal__calculator p,
+.fcl-goal__evidence p {
+    margin: 5px 0 0;
+    color: #68758a;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.fcl-goal__track {
+    overflow: hidden;
+    height: 12px;
+    margin: 13px 0;
+    border-radius: 999px;
+    background: #e8eef9;
+}
+
+.fcl-goal__track span {
+    height: 100%;
+    border-radius: inherit;
+    background: #2563eb;
+    transition: width .2s ease;
+}
+
+.fcl-goal__legend {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.fcl-goal__legend > span {
+    padding: 9px;
+    border-radius: 9px;
+    background: #f6f8fc;
+}
+
+.fcl-goal__legend strong {
+    display: block;
+    margin-top: 2px;
+    color: #172033;
+    font-size: 12px;
+}
+
+.fcl-goal__calculator {
+    display: grid;
+    grid-template-columns: 1fr 138px;
+    gap: 16px;
+    align-items: end;
+    padding: 16px;
+}
+
+.fcl-goal h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.fcl-goal__evidence {
+    padding: 16px;
+}
+
+.fcl-goal__evidence dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.fcl-goal__evidence dl > div {
+    padding: 10px;
+    border-radius: 9px;
+    background: #f6f8fc;
+}
+
+.fcl-goal__evidence dt {
+    color: #68758a;
+    font-size: 10px;
+}
+
+.fcl-goal__evidence dd {
+    margin: 3px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fcl-goal__notice {
+    margin-top: 12px;
+    padding: 15px;
+    border-radius: 14px;
+    background: #eaf1ff;
+}
+
+.fcl-goal__notice strong {
+    color: #1e4fbf;
+    font-size: 13px;
+}
+
+.fcl-goal__notice p {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.fcl-goal__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.fcl-goal__actions a {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #2563eb;
+    border-radius: 10px;
+    color: #1e4fbf;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+
+@media (max-width: 520px) {
+    .fcl-goal__selector,
+    .fcl-goal__summary,
+    .fcl-goal__calculator {
+        grid-template-columns: 1fr;
+    }
+
+    .fcl-goal__summary > div + div {
+        border-top: 1px solid #dbe4f4;
+        border-left: 0;
+    }
+
+    .fcl-goal__legend {
+        grid-template-columns: 1fr;
+    }
+}

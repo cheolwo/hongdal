@@ -1,0 +1,19 @@
+.driver-reservation-date {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 14px;
+    color: #132927;
+}
+
+.driver-reservation-date strong {
+    font-size: 15px;
+}
+
+.driver-reservation-date span {
+    color: #637573;
+    font-size: 11px;
+    text-align: right;
+}

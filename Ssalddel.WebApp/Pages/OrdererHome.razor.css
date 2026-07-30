@@ -1,0 +1,235 @@
+.orderer-discovery {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: min(100%, 430px);
+    margin: 0 auto;
+    color: var(--role-text, #1f2937);
+    font-family: "Noto Sans KR", "Malgun Gothic", "Segoe UI", sans-serif;
+}
+
+.orderer-discovery__topbar {
+    display: flex;
+    min-height: 22px;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--role-muted, #667085);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+}
+
+.orderer-discovery__hero {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 14px;
+    border-radius: 18px;
+    background: #fff;
+}
+
+.orderer-discovery__hero > div:first-child,
+.orderer-discovery__scope,
+.orderer-product__price,
+.orderer-product__action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.orderer-discovery__hero > div:first-child {
+    color: #176b4d;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.orderer-discovery__hero a,
+.orderer-product__action a {
+    color: #2563eb;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.orderer-discovery__hero h1 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 26px;
+    letter-spacing: -.2px;
+}
+
+.orderer-discovery__hero p,
+.orderer-discovery__boundary p,
+.orderer-product p {
+    margin: 0;
+    color: var(--role-muted, #667085);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+}
+
+.orderer-discovery__scope strong {
+    color: #176b4d;
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.orderer-discovery__scope span {
+    color: var(--role-muted, #667085);
+    font-size: 11px;
+}
+
+.orderer-discovery__filters {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.orderer-discovery__filters a {
+    flex: 0 0 auto;
+    padding: 7px 11px;
+    border: 1px solid var(--role-border, #cbd2e0);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--role-muted, #667085);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.orderer-discovery__filters a.is-active {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+.orderer-discovery__products {
+    display: contents;
+}
+
+.orderer-product {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 16px 14px;
+    border-radius: 18px;
+    background: #fff;
+}
+
+.orderer-product__badges {
+    display: flex;
+    gap: 7px;
+}
+
+.orderer-product__badges span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.orderer-product__kind {
+    color: #fff;
+    background: #2563eb;
+}
+
+.orderer-product__kind--green {
+    background: #176b4d;
+}
+
+.orderer-product__when {
+    border: 1px solid var(--role-border, #cbd2e0);
+    color: var(--role-muted, #667085);
+    background: #fff;
+}
+
+.orderer-product h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 26px;
+    letter-spacing: -.2px;
+}
+
+.orderer-product__price strong {
+    color: #176b4d;
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.orderer-product__price span,
+.orderer-product__action span {
+    color: var(--role-muted, #667085);
+    font-size: 11px;
+}
+
+.orderer-product__progress {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e0e5f0;
+}
+
+.orderer-product__progress i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #2563eb;
+}
+
+.orderer-product:nth-of-type(2) .orderer-product__progress i {
+    background: #176b4d;
+}
+
+.orderer-product__action {
+    min-height: 36px;
+}
+
+.orderer-product__action a {
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.orderer-discovery__boundary {
+    display: grid;
+    gap: 6px;
+    padding: 16px 14px;
+    border: 1px solid var(--role-border, #cbd2e0);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.orderer-discovery__boundary strong {
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.orderer-discovery__next {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.orderer-discovery__next a {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #fff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+
+@media (max-width: 370px) {
+    .orderer-discovery__next {
+        grid-template-columns: 1fr;
+    }
+}

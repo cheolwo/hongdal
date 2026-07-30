@@ -1,0 +1,135 @@
+<main class="@RootClass">
+    <header class="role-flow__heading">
+        <div>
+            <h1>@Title</h1>
+            @if (!string.IsNullOrWhiteSpace(Badge))
+            {
+                <span>@Badge</span>
+            }
+        </div>
+        <p>@Description</p>
+    </header>
+
+    @if (Metrics.Count > 0)
+    {
+        <section class="role-flow__metrics" aria-label="@($"{Title} 요약")">
+            @foreach (var metric in Metrics)
+            {
+                <article>
+                    <small>@metric.Label</small>
+                    <strong>@metric.Value</strong>
+                    @if (!string.IsNullOrWhiteSpace(metric.Hint))
+                    {
+                        <span>@metric.Hint</span>
+                    }
+                </article>
+            }
+        </section>
+    }
+
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+
+    @if (!string.IsNullOrWhiteSpace(SectionTitle))
+    {
+        <section class="role-flow__records">
+            <h2>@SectionTitle</h2>
+            @if (IsLoading)
+            {
+                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            }
+            else if (Items.Count == 0)
+            {
+                <p class="role-flow__empty">@EmptyMessage</p>
+            }
+            else
+            {
+                @foreach (var item in Items)
+                {
+                    @if (!string.IsNullOrWhiteSpace(item.Href))
+                    {
+                        <a class="role-flow__record" href="@item.Href">
+                            <span>
+                                <strong>@item.Title</strong>
+                                <small>@item.Description</small>
+                            </span>
+                            <em class="@ToneClass(item.Tone)">@item.StatusLabel</em>
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="role-flow__record">
+                            <span>
+                                <strong>@item.Title</strong>
+                                <small>@item.Description</small>
+                            </span>
+                            <em class="@ToneClass(item.Tone)">@item.StatusLabel</em>
+                        </div>
+                    }
+                }
+            }
+        </section>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(NoticeTitle))
+    {
+        <aside class="@NoticeClass">
+            <strong>@NoticeTitle</strong>
+            <p>@NoticeDescription</p>
+        </aside>
+    }
+</main>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Badge { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public IReadOnlyList<RoleDashboardMetric> Metrics { get; set; } = [];
+
+    [Parameter]
+    public string? SectionTitle { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<RoleFlowListItem> Items { get; set; } = [];
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public string EmptyMessage { get; set; } = "현재 표시할 원장 항목이 없습니다.";
+
+    [Parameter]
+    public string? NoticeTitle { get; set; }
+
+    [Parameter]
+    public string? NoticeDescription { get; set; }
+
+    [Parameter]
+    public bool WarningNotice { get; set; }
+
+    [Parameter]
+    public RoleFlowPalette Palette { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string RootClass
+        => $"role-flow role-flow--{Palette.ToString().ToLowerInvariant()}";
+
+    private string NoticeClass
+        => WarningNotice
+            ? "role-flow__notice role-flow__notice--warning"
+            : "role-flow__notice";
+
+    private static string ToneClass(RoleDashboardTone tone)
+        => $"role-flow__status role-flow__status--{tone.ToString().ToLowerInvariant()}";
+}
