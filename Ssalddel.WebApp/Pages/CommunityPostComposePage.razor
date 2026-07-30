@@ -10,10 +10,10 @@
     <CommunityPostComposeScreen AppName="살뜰"
                                 RoleLabel="웹 사용자"
                                 AppKey="shipper"
-                                CargoRequestDraftHrefBase="/shipper/request"
-                                CloseHref="@RouteContext.BackHref"
-                                UseBaguaRoleTransitionPages="true"
-                                BoardName="@QueryBoardName" />
+                                 CargoRequestDraftHrefBase="/shipper/request"
+                                 CloseHref="@RouteContext.BackHref"
+                                 UseBaguaRoleTransitionPages="true"
+                                 BoardName="@ResolvedBoardName" />
 </CommunityRoutePageFrame>
 
 @code {
@@ -39,4 +39,8 @@
             QueryBoardKey,
             null,
             QueryReturnPath);
+
+    private string? ResolvedBoardName
+        => CommunityBoardCatalog.Find(QueryBoardKey)?.DisplayName
+           ?? QueryBoardName;
 }
