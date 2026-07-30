@@ -37,7 +37,7 @@
 
     <nav class="community-board-page__navigation" aria-label="게시판 선택">
         <a class="@BuildBoardLinkClass(null)" href="@CommunityPageRoutes.Boards">전체</a>
-        @foreach (var board in ViewModel.BoardSummaries)
+        @foreach (var board in ViewModel.VisibleBoardTabs)
         {
             <a class="@BuildBoardLinkClass(board.BoardKey)"
                href="@BoardHref(board.BoardKey)">

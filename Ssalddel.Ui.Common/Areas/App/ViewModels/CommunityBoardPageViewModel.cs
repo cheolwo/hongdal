@@ -89,6 +89,14 @@ public sealed class CommunityBoardPageViewModel : PageViewModelBase
         private set => SetProperty(ref boardSummaries, value);
     }
 
+    public IReadOnlyList<CommunityBoardSummaryResponse> VisibleBoardTabs
+        => BoardSummaries
+            .Where(board => !string.Equals(
+                board.BoardKey,
+                CommunityBoardKeys.Vow,
+                StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
     public CommunityBoardSummaryResponse? CurrentBoard
     {
         get => currentBoard;

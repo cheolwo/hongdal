@@ -138,6 +138,12 @@ public sealed class CommunityBoardPageViewModelTests
         Assert.False(viewModel.IsLoading);
         Assert.False(postsCalled);
         Assert.Equal(CommunityBoardCatalog.PublicBoards.Count, viewModel.BoardSummaries.Count);
+        Assert.Equal(
+            CommunityBoardCatalog.PublicBoards.Count - 1,
+            viewModel.VisibleBoardTabs.Count);
+        Assert.DoesNotContain(
+            viewModel.VisibleBoardTabs,
+            board => board.BoardKey == CommunityBoardKeys.Vow);
         Assert.Equal("서원", viewModel.CurrentBoardName);
         Assert.Equal("네트워크 상태를 확인한 뒤 다시 시도해 주세요.", viewModel.ErrorMessage);
         Assert.Empty(viewModel.VisiblePosts);
