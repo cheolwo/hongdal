@@ -6,6 +6,9 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-30 | [Figma 역할 화면 우선순위 정렬](2026-07-30-role-priority-figma-alignment.md) | 직접 확인 — 01 커뮤니티를 핵심 게시판 홈과 전체 운영 디렉터리로 분리하고, 02 KAMIS·FCL 목표, 04 문의·탐색·예약, 05 입고·예외·이력·설정·통관 화면을 역할별 모바일 흐름으로 정렬 |
+| 2026-07-30 | [01~05 역할 분리 WebApp](2026-07-30-role-separated-webapps.md) | 직접 확인 — JavaScript 없는 선택 포털과 Community·Orderer·Shipper·Driver·Warehouse 5개 WebApp을 독립 배포하고 역할 홈·하위 route·기존 주소 이동을 Azure에서 확인 |
+| 2026-07-30 | [Azure 상시 체험 포털](2026-07-30-azure-preview-portal.md) | 직접 확인 — 기존 Azure VM·Caddy를 재사용하고 Figma `01 Community → 02 Orderer → 03 Shipper`를 WebApp 역할 포털로 구성, 미국 현지 구매자 화면을 제외하고 국내 KAMIS·같이 주문·같이 수입·화주 흐름을 연결 |
 | 2026-07-28 | [음식 주문 운영 추적](2026-07-28-admin-food-order-operations-trace.md) | 모바일 직접 확인·결과 카드 간접 확인 — 주문번호로 음식 주문·배차·추천·운송·Outbox 상관관계와 복구 필요 상태를 조회하고 주소·연락처·payload를 제외 |
 | 2026-07-28 | [기사 전달과 주문자 음식 수령 확인 분리](2026-07-28-orderer-food-receipt-confirmation.md) | 간접 확인 — 기사 전달 완료와 주문자 수령 확인을 별도 상태로 저장하고, 주문자 상세에서 두 단계를 표시한 뒤 소유권·멱등 요청을 검증해 같은 주문번호를 재조회 |
 | 2026-07-28 | [음식점 주문 거절·조리·픽업 준비 상태 전이](2026-07-28-restaurant-order-progress.md) | 로그인 화면 직접 확인·업무 화면 간접 확인 — WebView와 Windows 창에서 로그인 렌더를 재확인했고, 거절 사유·조리시간 변경·픽업 준비 완료는 서버 수신함 원장 기반 멱등 상태 전이로 연결 |

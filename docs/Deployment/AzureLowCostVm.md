@@ -17,13 +17,49 @@
 ## 배포 순서
 
 1. `Ssalddel` 이미지를 `ssalddel-server:azure-preview`로 빌드한다.
-2. `Ssalddel.WebApp`을 Release/Production으로 게시한다.
+2. 정적 역할 선택 포털과 `Ssalddel.Web.CommunityApp`부터
+   `Ssalddel.Web.WarehouseApp`까지 01~05 WebApp을 각각 Release/Production으로 게시한다.
 3. VM에 `deploy/azure-vm`, WebApp 게시 파일과 Docker 이미지를 전송한다.
 4. Storage Account와 공개·비공개 컨테이너를 만들고 VM Managed Identity에 각 컨테이너 범위의 `Storage Blob Data Contributor`를 부여한다.
 5. `.env`의 `SSALDDEL_STORAGE_ACCOUNT_NAME`을 설정한다. 키나 연결 문자열은 넣지 않는다.
 6. MySQL과 MongoDB를 먼저 시작한다.
 7. 같은 서버 이미지로 `--initialize-database`를 한 번 실행한다. 최초 관리자 계정이 없다면 이 실행에만 `SSALDDEL_BOOTSTRAP_ADMIN_ENABLED=true`와 아이디·이메일·임시 강력 비밀번호를 주입하고, 성공 직후 다시 비활성화하고 비밀번호를 제거한다.
 8. 앱과 Caddy를 시작하고 공개 HTTPS URL에서 `/health/live`, `/health/ready`, 게시판과 실제 이미지 첨부를 확인한다.
+
+### WebApp만 갱신
+
+서버 API와 DB를 바꾸지 않고 기존 Azure 미리보기의 브라우저 화면만 갱신할 때는
+다음 스크립트를 사용한다.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File deploy/azure-vm/package-web-preview.ps1
+```
+
+이 명령은 `artifacts/local/azure-web-preview/` 아래에 JavaScript 없는 정적 역할 선택
+포털과 Release/Production 01~05 역할 WebApp, `preview-build.json`,
+`web-preview.tar.gz`와 SHA-256 파일을 만든다. 역할 앱은 `/roles/01/`부터
+`/roles/05/`까지 서로 다른 base path를 사용한다. 작업 트리에 WebApp 또는 공유
+UI·contract 변경이 있으면 공개 빌드 표시에 `working-tree`를 남긴다. scoped stylesheet
+주소에는 release ID를 붙여 기존 방문 세션도 새 화면 CSS를 다시 받게 한다.
+
+묶음과 `deploy/azure-vm/Caddyfile`을 VM으로 전송한 뒤 `deploy-web-preview.sh`에
+archive, SHA-256, 배포 루트와 Caddyfile 경로를 전달한다.
+
+```bash
+sudo bash deploy-web-preview.sh \
+  web-preview.tar.gz \
+  <sha256> \
+  /opt/ssalddel \
+  Caddyfile
+```
+
+스크립트는 `/opt/ssalddel/web`을 타임스탬프 백업으로 이동하고 새 WebApp을 원자적으로
+교체하며, Caddyfile도 별도 타임스탬프 백업 후 Caddy만 다시 만든다. 공개
+`preview-build.json` 확인이 실패하면 새 web을 `web-failed-<timestamp>`로 보존하고
+이전 web과 Caddyfile을 복구한다. API, MySQL, MongoDB, 볼륨과 `.env`는 변경하지 않는다.
+역할 분리 구조와 route 경계는
+[01~05 역할 분리 WebApp](../Architecture/RoleSeparatedWebApps.md)을 따른다.
 
 ### 주문자 1.0 미리보기
 

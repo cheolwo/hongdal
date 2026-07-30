@@ -1,19 +1,78 @@
 {$SSALDDEL_SITE_HOST} {
 	encode zstd gzip
 
-	handle /community-media/* {
-		respond "Community media has moved to Azure Blob Storage." 410
-	}
+	route {
+		handle /community-media/* {
+			respond "Community media has moved to Azure Blob Storage." 410
+		}
 
-	@backend path /api/* /hubs/* /health/*
-	handle @backend {
-		reverse_proxy app:8080
-	}
+		@backend path /api/* /hubs/* /health/*
+		handle @backend {
+			reverse_proxy app:8080
+		}
 
-	handle {
-		root * /srv
-		try_files {path} /index.html
-		file_server
+		redir /roles/01 /roles/01/ 308
+		redir /roles/02 /roles/02/ 308
+		redir /roles/03 /roles/03/ 308
+		redir /roles/04 /roles/04/ 308
+		redir /roles/05 /roles/05/ 308
+
+		handle_path /roles/01/* {
+			root * /srv/roles/01
+			try_files {path} /index.html
+			file_server
+		}
+
+		handle_path /roles/02/* {
+			root * /srv/roles/02
+			try_files {path} /index.html
+			file_server
+		}
+
+		handle_path /roles/03/* {
+			root * /srv/roles/03
+			try_files {path} /index.html
+			file_server
+		}
+
+		handle_path /roles/04/* {
+			root * /srv/roles/04
+			try_files {path} /index.html
+			file_server
+		}
+
+		handle_path /roles/05/* {
+			root * /srv/roles/05
+			try_files {path} /index.html
+			file_server
+		}
+
+		@legacyOrdererCommunity path /community/group-purchase /community/group-purchase/* /community/group-import /community/group-import/*
+		redir @legacyOrdererCommunity /roles/02{uri} 308
+
+		@legacyCommunity path /community /community/* /ko/community /ko/community/* /en/community /en/community/* /ja/community /ja/community/*
+		redir @legacyCommunity /roles/01{uri} 308
+
+		@legacyAccount path /login
+		redir @legacyAccount /roles/01{uri} 308
+
+		@legacyOrderer path /orderer /orderer/* /food /food/* /information /information/* /tools /tools/*
+		redir @legacyOrderer /roles/02{uri} 308
+
+		@legacyShipper path /shipper /shipper/* /global /global/* /dispatch /dispatch/*
+		redir @legacyShipper /roles/03{uri} 308
+
+		@legacyDriver path /driver /driver/*
+		redir @legacyDriver /roles/04{uri} 308
+
+		@legacyWarehouse path /warehouse /warehouse/* /work /work/* /mart /mart/* /scan
+		redir @legacyWarehouse /roles/05{uri} 308
+
+		handle {
+			root * /srv
+			try_files {path} /index.html
+			file_server
+		}
 	}
 
 	header {
