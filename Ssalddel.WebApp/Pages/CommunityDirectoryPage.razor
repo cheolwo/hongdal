@@ -11,9 +11,9 @@
         <div class="community-directory__hero-title">
             <span class="community-directory__mountain" aria-label="간괘, 산">☶</span>
             <div>
-                <span>GEN ☶ · COMMUNITY MOUNTAINS</span>
-                <h1>게시판 산맥</h1>
-                <p>일반 대화 게시판과 Command·Event가 묶인 업무단위 산을 한곳에서 조망합니다. 0.0~3.5 버전은 보조 표지입니다.</p>
+                <span>COMMUNITY BOARDS</span>
+                <h1>게시판 모음</h1>
+                <p>서원, 자유·생활, 지역 문화, 농수산물 가격 네 게시판에 집중합니다.</p>
             </div>
         </div>
         <label class="community-directory__search">
@@ -41,13 +41,6 @@
             </div>
         </MudAlert>
     }
-
-    <a class="community-directory__all" href="@CommunityPageRoutes.Boards">
-        <span class="community-directory__icon"><MudIcon Icon="@Icons.Material.Filled.DynamicFeed" /></span>
-        <span><strong>전체 글</strong><small>공개 게시판의 글을 한 번에 봅니다.</small></span>
-        <b>@ViewModel.TotalPostCount.ToString("N0")</b>
-        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
-    </a>
 
     @if (ViewModel.IsLoading)
     {

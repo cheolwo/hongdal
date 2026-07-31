@@ -90,11 +90,14 @@ public sealed class CommunityBoardPageViewModel : PageViewModelBase
     }
 
     public IReadOnlyList<CommunityBoardSummaryResponse> VisibleBoardTabs
-        => BoardSummaries
-            .Where(board => !string.Equals(
-                board.BoardKey,
-                CommunityBoardKeys.Vow,
-                StringComparison.OrdinalIgnoreCase))
+        => CommunityBoardCatalog.FeaturedBoards
+            .Select(featured => BoardSummaries.FirstOrDefault(board =>
+                string.Equals(
+                    board.BoardKey,
+                    featured.Key,
+                    StringComparison.OrdinalIgnoreCase)))
+            .Where(board => board is not null)
+            .Select(board => board!)
             .ToArray();
 
     public CommunityBoardSummaryResponse? CurrentBoard

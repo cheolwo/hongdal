@@ -43,6 +43,7 @@ public static class CommunityBoardKeys
     public const string NoticeGuide = "notice-guide";
     public const string Vow = "vow";
     public const string FreeLife = "free-life";
+    public const string RegionalCulture = "regional-culture";
     public const string QuestionHelp = "question-help";
     public const string InformationPrices = "information-prices";
     public const string PeriodicDataKamis = "periodic-data-kamis";
@@ -107,6 +108,7 @@ public static class CommunityAnonymousNicknameCatalog
         {
             CommunityBoardKeys.Vow => "서원 적는 이웃",
             CommunityBoardKeys.FreeLife => "지나가는 이웃",
+            CommunityBoardKeys.RegionalCulture => "고장을 살피는 이웃",
             CommunityBoardKeys.QuestionHelp => "궁금한 이웃",
             CommunityBoardKeys.InformationPrices => "시세 살피는 이웃",
             CommunityBoardKeys.Food => "골목 미식가",
@@ -179,6 +181,18 @@ public static class CommunityBoardCatalog
         postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "자유");
 
+    public static CommunityBoardDefinition RegionalCulture { get; } = Board(
+        CommunityBoardKeys.RegionalCulture,
+        "지역 문화",
+        "지역의 생활문화·음식·특산물과 공식 근거를 함께 살피는 공간",
+        CommunityBoardGroupCodes.PeopleAndInformation,
+        "사람과 정보",
+        isUserCreatable: true,
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
+        "지역 문화·특산물",
+        "지역문화");
+
     public static CommunityBoardDefinition QuestionHelp { get; } = Board(
         CommunityBoardKeys.QuestionHelp,
         "질문·도움",
@@ -193,13 +207,14 @@ public static class CommunityBoardCatalog
 
     public static CommunityBoardDefinition InformationPrices { get; } = Board(
         CommunityBoardKeys.InformationPrices,
-        "정보·시세",
-        "농수산물 가격, HS 코드, 전통시장과 공공데이터",
+        "농수산물 가격",
+        "KAMIS를 중심으로 농수산물 가격과 조사 단위·시점·공공 근거를 살피는 공간",
         CommunityBoardGroupCodes.PeopleAndInformation,
         "사람과 정보",
         isUserCreatable: true,
         isPublic: true,
         postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
+        "정보·시세",
         "정보 협업");
 
     public static CommunityBoardDefinition PeriodicDataKamis { get; } = Board(
@@ -353,6 +368,7 @@ public static class CommunityBoardCatalog
         {
             Vow,
             FreeLife,
+            RegionalCulture,
             QuestionHelp,
             InformationPrices,
             PeriodicDataKamis,
@@ -372,6 +388,14 @@ public static class CommunityBoardCatalog
         .Concat(CommunityActivityBoardCatalog.Boards)
         .Append(SafetyReport)
         .ToArray();
+
+    public static IReadOnlyList<CommunityBoardDefinition> FeaturedBoards { get; } =
+    [
+        Vow,
+        FreeLife,
+        RegionalCulture,
+        InformationPrices
+    ];
 
     public static IReadOnlyList<CommunityBoardDefinition> PublicBoards { get; } =
         All.Where(board => board.IsPublic).ToArray();

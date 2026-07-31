@@ -60,16 +60,16 @@ public static class CommunityMobileBoardPresentation
             Icons.Material.Filled.Forum,
             "indigo"),
         new(
-            CommunityBoardKeys.InformationPrices,
-            "정보 · 가격",
-            "공공자료와 가격 비교를 함께 확인",
-            Icons.Material.Filled.QueryStats,
+            CommunityBoardKeys.RegionalCulture,
+            "지역 문화",
+            "지역의 생활문화·음식·특산물을 함께 살펴봅니다.",
+            Icons.Material.Filled.TravelExplore,
             "indigo"),
         new(
-            CommunityBoardKeys.Participation,
-            "동네 나눔 · 모임",
-            "가까운 이웃과 나누고 만나는 공간",
-            Icons.Material.Filled.Groups,
+            CommunityBoardKeys.InformationPrices,
+            "농수산물 가격",
+            "KAMIS 가격과 조사 단위·시점을 확인합니다.",
+            Icons.Material.Filled.QueryStats,
             "indigo")
     ];
 

@@ -66,9 +66,6 @@ public partial class PlatformCommunityHome
              + SeedPosts.Count(post => string.Equals(post.Category, board, StringComparison.OrdinalIgnoreCase));
     }
 
-    private CommunityBoardNavigationItem AllBoardNavigationItem
-        => BuildCommunityBoardNavigationItem("전체");
-
     private IReadOnlyList<CommunityBoardNavigationItem> VisibleBoardIndexItems
         => VisibleBoardIndexOptions
             .Select(BuildCommunityBoardNavigationItem)

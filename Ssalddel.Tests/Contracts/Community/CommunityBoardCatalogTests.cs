@@ -22,6 +22,7 @@ public sealed class CommunityBoardCatalogTests
     public void 공개게시판은_글목적별로구성하고_신고분쟁은제외한다()
     {
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Vow);
+        Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.RegionalCulture);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.InformationPrices);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Participation);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.CompletionReview);
@@ -36,6 +37,22 @@ public sealed class CommunityBoardCatalogTests
         Assert.False(CommunityBoardCatalog.SafetyReport.IsPublic);
         Assert.Equal("신고·분쟁", CommunityBoardCatalog.SafetyReport.DisplayName);
         Assert.True(CommunityBoardCatalog.IsProtectedCategory("신고/분쟁"));
+    }
+
+    [Fact]
+    public void 주요게시판탭은_서원_자유생활_지역문화_농수산물가격만노출한다()
+    {
+        Assert.Equal(
+            [
+                CommunityBoardKeys.Vow,
+                CommunityBoardKeys.FreeLife,
+                CommunityBoardKeys.RegionalCulture,
+                CommunityBoardKeys.InformationPrices
+            ],
+            CommunityBoardCatalog.FeaturedBoards.Select(board => board.Key));
+        Assert.Equal(
+            ["서원", "자유·생활", "지역 문화", "농수산물 가격"],
+            CommunityBoardCatalog.FeaturedBoards.Select(board => board.DisplayName));
     }
 
     [Fact]
@@ -146,6 +163,8 @@ public sealed class CommunityBoardCatalogTests
 
     [Theory]
     [InlineData("발원", CommunityBoardKeys.Vow)]
+    [InlineData("지역 문화·특산물", CommunityBoardKeys.RegionalCulture)]
+    [InlineData("정보·시세", CommunityBoardKeys.InformationPrices)]
     [InlineData("업무 질문", CommunityBoardKeys.QuestionHelp)]
     [InlineData("운송 실무", CommunityBoardKeys.QuestionHelp)]
     [InlineData("공동구매", CommunityBoardKeys.Participation)]

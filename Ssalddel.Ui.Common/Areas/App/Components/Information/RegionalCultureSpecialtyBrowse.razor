@@ -132,8 +132,8 @@
 
     private static string CultureConversationHref(RegionalCultureSpecialty region)
         => CommunityPageRoutes.BoardsFor(
-            CommunityBoardCatalog.Food.DisplayName,
-            CommunityBoardCatalog.Food.Key,
+            CommunityBoardCatalog.RegionalCulture.DisplayName,
+            CommunityBoardCatalog.RegionalCulture.Key,
             workflowTag: CultureTransportContentCatalog.FoodCultureWorkflowTag,
             search: region.RegionName,
             regionKey: region.Key);

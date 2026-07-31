@@ -3,9 +3,9 @@
 <section class="platform-community-board-index" aria-labelledby="community-board-index-title">
     <header class="platform-community-board-index__header">
         <div>
-            <span>GEN ☶ · WORK-UNIT MOUNTAINS</span>
-            <h1 id="community-board-index-title">살뜰 게시판 산맥</h1>
-            <p>간괘의 산처럼 독립된 업무단위 게시판을 보고, 관련 글과 화면으로 이동합니다.</p>
+            <span>COMMUNITY BOARDS</span>
+            <h1 id="community-board-index-title">살뜰 게시판</h1>
+            <p>서원, 자유·생활, 지역 문화, 농수산물 가격 네 공간에 집중합니다.</p>
         </div>
         <label class="platform-community-board-index__search">
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
@@ -16,18 +16,6 @@
                    @oninput="HandleSearchInput" />
         </label>
     </header>
-
-    <a class="platform-community-board-index__all" href="@AllBoard.Href">
-        <span class="platform-community-board-index__icon">
-            <MudIcon Icon="@AllBoard.Icon" />
-        </span>
-        <span>
-            <strong>전체 글</strong>
-            <small>@AllBoard.Description</small>
-        </span>
-        <b>@AllBoard.PostCount</b>
-        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
-    </a>
 
     @if (Boards.Count == 0)
     {
@@ -41,27 +29,13 @@
         <div class="platform-community-board-index__list">
             @foreach (var board in Boards)
             {
-                var activityBundle = CommunityActivityBoardCatalog.FindBundle(board.Name);
-                <a class="@BuildBoardClass(activityBundle)" href="@board.Href">
-                    <span class="@BuildIconClass(activityBundle)" aria-label="@(activityBundle is null ? null : "간괘, 산")">
-                        @if (activityBundle is null)
-                        {
-                            <MudIcon Icon="@board.Icon" />
-                        }
-                        else
-                        {
-                            <span aria-hidden="true">☶</span>
-                        }
+                <a class="platform-community-board-index__item" href="@board.Href">
+                    <span class="platform-community-board-index__icon">
+                        <MudIcon Icon="@board.Icon" />
                     </span>
                     <span>
                         <strong>@board.Name</strong>
                         <small>@board.Description</small>
-                        @if (activityBundle is not null)
-                        {
-                            <span class="platform-community-board-index__activity">
-                                v@activityBundle.ProductVersion · Command @activityBundle.CommandCount · Event @activityBundle.EventCount · 페이지 @activityBundle.Pages.Count
-                            </span>
-                        }
                         <MudChip T="string"
                                  Size="Size.Small"
                                  Variant="Variant.Text"
@@ -78,9 +52,6 @@
 </section>
 
 @code {
-    [Parameter, EditorRequired]
-    public CommunityBoardNavigationItem AllBoard { get; set; } = default!;
-
     [Parameter]
     public IReadOnlyList<CommunityBoardNavigationItem> Boards { get; set; } = [];
 
@@ -93,13 +64,4 @@
     private Task HandleSearchInput(ChangeEventArgs args)
         => SearchTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
 
-    private static string BuildBoardClass(CommunityActivityBoardBundleDefinition? bundle)
-        => bundle is null
-            ? "platform-community-board-index__item"
-            : "platform-community-board-index__item platform-community-board-index__item--activity";
-
-    private static string BuildIconClass(CommunityActivityBoardBundleDefinition? bundle)
-        => bundle is null
-            ? "platform-community-board-index__icon"
-            : "platform-community-board-index__icon platform-community-board-index__icon--mountain";
 }

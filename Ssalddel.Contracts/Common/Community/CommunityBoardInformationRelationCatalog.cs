@@ -170,6 +170,23 @@ public static class CommunityBoardInformationRelationCatalog
                 CommunityBoardInformationPublicationPolicies.AutomatedBrief,
                 "살뜰의 공개·합의·기록 원칙을 짧은 시스템 성찰문으로 제공합니다.")),
         Board(
+            CommunityBoardKeys.RegionalCulture,
+            ["지역 생활문화", "향토음식", "특산물 공식 근거"],
+            "주 1회 후보",
+            "공식 자료도 지역 전체를 대표한다고 단정하지 않고 출처·기준시각·지역 범위와 문화적 한계를 확인한 뒤 편집합니다.",
+            Link(
+                CommunityInformationSourceKeys.RdaLocalFoodRecipes,
+                CommunityBoardInformationPublicationPolicies.EditorialReview,
+                "농촌진흥청 향토음식 자료를 국내 지역 문화·음식 후보로 검토합니다."),
+            Link(
+                CommunityInformationSourceKeys.MaffRegionalCuisineRecipes,
+                CommunityBoardInformationPublicationPolicies.EditorialReview,
+                "일본 농림수산성 향토요리 자료를 해외 지역 문화 비교 후보로 검토합니다."),
+            Link(
+                CommunityBoardInformationSourceKeys.TraditionalMarketStatus,
+                CommunityBoardInformationPublicationPolicies.ReferenceOnly,
+                "전통시장 코드·지역 기준정보를 지역 특산물 이야기의 보조 근거로 연결합니다.")),
+        Board(
             CommunityBoardKeys.QuestionHelp,
             ["공공자료를 활용한 질문 답변"],
             "해당 없음",

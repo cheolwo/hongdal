@@ -139,9 +139,9 @@ public sealed class CommunityBoardPageViewModelTests
         Assert.False(postsCalled);
         Assert.Equal(CommunityBoardCatalog.PublicBoards.Count, viewModel.BoardSummaries.Count);
         Assert.Equal(
-            CommunityBoardCatalog.PublicBoards.Count - 1,
+            CommunityBoardCatalog.FeaturedBoards.Count,
             viewModel.VisibleBoardTabs.Count);
-        Assert.DoesNotContain(
+        Assert.Contains(
             viewModel.VisibleBoardTabs,
             board => board.BoardKey == CommunityBoardKeys.Vow);
         Assert.Equal("서원", viewModel.CurrentBoardName);

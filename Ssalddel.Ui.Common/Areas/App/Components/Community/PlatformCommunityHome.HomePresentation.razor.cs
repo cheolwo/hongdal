@@ -67,8 +67,7 @@ public partial class PlatformCommunityHome
         : Color.Primary;
 
     private IReadOnlyList<string> CommunityBoardOptions
-        => new[] { "전체" }
-            .Concat(BoardCategoryOptions)
+        => BoardCategoryOptions
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -175,7 +174,7 @@ public partial class PlatformCommunityHome
                 "서원·발원" => "Vows & Intentions",
                 "자유·생활" => "Life & Community",
                 "질문·도움" => "Questions & Help",
-                "정보·시세" => "Information & Prices",
+                "정보·시세" or "농수산물 가격" => "Agricultural Prices",
                 "참여·모집" => "Participation",
                 "판매·공급" => "Sales & Supply",
                 "원장·진행" => "Ledgers & Progress",

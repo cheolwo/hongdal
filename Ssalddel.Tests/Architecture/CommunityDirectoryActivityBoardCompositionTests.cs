@@ -3,7 +3,7 @@ namespace Ssalddel.Tests.Architecture;
 public sealed class CommunityDirectoryActivityBoardCompositionTests
 {
     [Fact]
-    public void 게시판모음은_간괘산과_CommandEvent페이지연결을카드에서보여준다()
+    public void 게시판모음은_주요네게시판만안내한다()
     {
         var root = FindRepositoryRoot();
         var page = File.ReadAllText(Path.Combine(
@@ -12,15 +12,19 @@ public sealed class CommunityDirectoryActivityBoardCompositionTests
             "Pages",
             "CommunityDirectoryPage.razor"));
 
-        Assert.Contains("☶", page);
-        Assert.Contains("게시판 산맥", page);
-        Assert.Contains("CommunityActivityBoardCatalog.FindBundle", page);
-        Assert.Contains("Command·Event·페이지 연결 보기", page);
-        Assert.Contains("relatedPage.CanNavigateFromCommunityWeb", page);
+        var viewModel = File.ReadAllText(Path.Combine(
+            root,
+            "Ssalddel.WebApp",
+            "ViewModels",
+            "CommunityDirectoryPageViewModel.cs"));
+
+        Assert.Contains("게시판 모음", page);
+        Assert.Contains("서원, 자유·생활, 지역 문화, 농수산물 가격", page);
+        Assert.Contains("CommunityBoardCatalog.FeaturedBoards", viewModel);
     }
 
     [Fact]
-    public void 공용게시판모음도_활동게시판을간괘카드로표현한다()
+    public void 공용게시판모음도_주요네공간에집중한다()
     {
         var root = FindRepositoryRoot();
         var component = File.ReadAllText(Path.Combine(
@@ -32,10 +36,9 @@ public sealed class CommunityDirectoryActivityBoardCompositionTests
             "Community",
             "PlatformCommunityBoardIndex.razor"));
 
-        Assert.Contains("GEN ☶", component);
-        Assert.Contains("CommunityActivityBoardCatalog.FindBundle", component);
-        Assert.Contains("Command @activityBundle.CommandCount", component);
-        Assert.Contains("페이지 @activityBundle.Pages.Count", component);
+        Assert.Contains("COMMUNITY BOARDS", component);
+        Assert.Contains("서원, 자유·생활, 지역 문화, 농수산물 가격", component);
+        Assert.DoesNotContain("CommunityActivityBoardCatalog.FindBundle", component);
     }
 
     private static string FindRepositoryRoot()

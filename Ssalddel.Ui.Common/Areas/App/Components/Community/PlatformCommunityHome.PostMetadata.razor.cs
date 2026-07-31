@@ -18,41 +18,10 @@ namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 public partial class PlatformCommunityHome
 {
     private IReadOnlyList<string> BoardCategoryOptions
-    {
-        get
-        {
-            var categories = new List<string>
-            {
-                PlatformCommunityPostCategories.General,
-            };
-            categories.AddRange(
-                CommunityPeriodicDataBoardCatalog.All
-                    .Select(board => CommunityBoardCatalog.Find(board.BoardKey)?.DisplayName)
-                    .Where(displayName => !string.IsNullOrWhiteSpace(displayName))
-                    .Select(displayName => displayName!));
-            categories.AddRange(
-            [
-                PlatformCommunityPostCategories.Sales,
-                "시스템 다이어그램",
-                "운송 실무",
-                "업무 질문",
-                "업무 기록",
-                "생활 원장",
-                "개선 제안",
-                "신고/분쟁"
-            ]);
-
-            foreach (var board in approvedBoards)
-            {
-                if (!categories.Contains(board.Title, StringComparer.OrdinalIgnoreCase))
-                {
-                    categories.Add(board.Title);
-                }
-            }
-
-            return categories;
-        }
-    }
+        => CommunityBoardCatalog.FeaturedBoards
+            .Where(board => board.IsUserCreatable)
+            .Select(board => board.DisplayName)
+            .ToArray();
 
     private CommunityWorkClassificationResponse? SelectedWorkClassification
         => CommunityWorkClassificationCatalog.FindByWorkflowTag(form.WorkflowTag);

@@ -79,8 +79,8 @@ public sealed class 지역문화특산물상세PageViewModel : PageViewModelBase
         => Region is null
             ? CommunityPageRoutes.Boards
             : CommunityPageRoutes.BoardsFor(
-                CommunityBoardCatalog.Food.DisplayName,
-                CommunityBoardCatalog.Food.Key,
+                CommunityBoardCatalog.RegionalCulture.DisplayName,
+                CommunityBoardCatalog.RegionalCulture.Key,
                 workflowTag: CultureTransportContentCatalog.FoodCultureWorkflowTag,
                 search: Region.RegionName,
                 regionKey: Region.Key);

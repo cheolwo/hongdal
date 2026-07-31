@@ -61,6 +61,28 @@ public sealed class CommunityBoardInformationRelationCatalogTests
     }
 
     [Fact]
+    public void RegionalCulture_UsesEditorialRegionalSourcesWithoutAutomaticPublication()
+    {
+        var relation = CommunityBoardInformationRelationCatalog.Find(
+            CommunityBoardKeys.RegionalCulture);
+
+        Assert.NotNull(relation);
+        Assert.Contains(
+            relation.Sources,
+            source => source.SourceKey == CommunityInformationSourceKeys.RdaLocalFoodRecipes
+                      && source.PublicationPolicy
+                      == CommunityBoardInformationPublicationPolicies.EditorialReview);
+        Assert.Contains(
+            relation.Sources,
+            source => source.SourceKey
+                      == CommunityBoardInformationSourceKeys.TraditionalMarketStatus
+                      && source.PublicationPolicy
+                      == CommunityBoardInformationPublicationPolicies.ReferenceOnly);
+        Assert.DoesNotContain(relation.Sources, source => source.AllowsAutomaticPublication);
+        Assert.Contains("지역 전체", relation.AutomationBoundary);
+    }
+
+    [Fact]
     public void PlannedSources_AreNeverReportedAsImplementedOrPeriodic()
     {
         var planned = CommunityBoardInformationRelationCatalog.All

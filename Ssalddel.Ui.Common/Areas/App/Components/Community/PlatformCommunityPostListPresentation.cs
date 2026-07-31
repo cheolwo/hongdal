@@ -31,7 +31,7 @@ public static class PlatformCommunityPostListPresentation
                 "서원·발원" => "Vows & Intentions",
                 "자유·생활" => "Life & Community",
                 "질문·도움" => "Questions & Help",
-                "정보·시세" => "Information & Prices",
+                "정보·시세" or "농수산물 가격" => "Agricultural Prices",
                 "참여·모집" => "Participation",
                 "판매·공급" => "Sales & Supply",
                 "원장·진행" => "Ledgers & Progress",

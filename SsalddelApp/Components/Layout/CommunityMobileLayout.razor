@@ -46,41 +46,13 @@
                     <MudIcon Icon="@Icons.Material.Filled.ViewList" />
                     게시판 글 목록
                 </a>
-                <a href="@CommunityPageRoutes.RecommendedPosts" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" />
-                    추천 글
-                </a>
                 <a href="@CommunityPageRoutes.Regions" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.TravelExplore" />
-                    지역 문화·특산물
+                    지역 문화
                 </a>
-                <a href="@($"{CommunityPageRoutes.Home}#public-data-boards")" @onclick="CloseDrawer">
+                <a href="@CommunityPageRoutes.BoardsFor(boardKey: CommunityBoardKeys.InformationPrices)" @onclick="CloseDrawer">
                     <MudIcon Icon="@Icons.Material.Filled.QueryStats" />
-                    공공데이터 게시판
-                </a>
-                <a href="@CommunityMobileBoardPresentation.AllWorkGroupsPath" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.Workspaces" />
-                    업무 게시판
-                </a>
-                <a href="@CommunityPageRoutes.WorkRelationships" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.Handshake" />
-                    친구 요청
-                </a>
-                <a href="@CommunityPageRoutes.IndividualOrders" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" />
-                    내 개별주문
-                </a>
-                <a href="@CommunityPageRoutes.Workspace" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.Dashboard" />
-                    공동행동 공간
-                </a>
-                <a href="/" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.Work" />
-                    역할·업무 선택
-                </a>
-                <a href="@CommunityPageRoutes.BoardManagement" @onclick="CloseDrawer">
-                    <MudIcon Icon="@Icons.Material.Filled.Settings" />
-                    게시판 관리
+                    농수산물 가격
                 </a>
             </nav>
             <aside>

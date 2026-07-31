@@ -74,7 +74,7 @@ public sealed class CommunityDirectoryPageViewModel(
             .Where(board => !string.IsNullOrWhiteSpace(board.BoardKey))
             .GroupBy(board => board.BoardKey, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
-        var merged = CommunityBoardCatalog.PublicBoards
+        var merged = CommunityBoardCatalog.FeaturedBoards
             .Select(board => byKey.TryGetValue(board.Key, out var serverBoard)
                 ? serverBoard
                 : new CommunityBoardSummaryResponse
@@ -89,13 +89,7 @@ public sealed class CommunityDirectoryPageViewModel(
                     PostingAccessDisplayName = board.PostingAccessDisplayName,
                     AllowsAnonymousPosting = board.AllowsAnonymousPosting
                 })
-            .ToList();
-        merged.AddRange(serverBoards
-            .Where(board => board.IsCustom)
-            .Where(board => !merged.Any(existing => string.Equals(
-                existing.BoardKey,
-                board.BoardKey,
-                StringComparison.OrdinalIgnoreCase))));
+            .ToArray();
         return merged;
     }
 

@@ -57,7 +57,7 @@
     </aside>
 
     <a class="community-role-home__directory" href="community/boards/directory">
-        전체 게시판·운영 디렉터리 보기
+        게시판 모음 보기
         <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
     </a>
 </main>
@@ -67,12 +67,10 @@
 
     private static IReadOnlyList<CommunityHomeBoard> Boards =>
     [
+        new("서원", "이루고 싶은 마음과 함께 살펴볼 일을 가볍게 적습니다.", "community/boards?boardKey=vow", Icons.Material.Filled.FavoriteBorder),
         new("자유·생활", "지역 이야기와 일상 정보를 편하게 나눕니다.", "community/boards?boardKey=free-life", Icons.Material.Filled.ChatBubbleOutline),
-        new("질문·도움", "생활과 업무의 궁금한 점을 함께 해결합니다.", "community/boards?boardKey=question-help", Icons.Material.Filled.HelpOutline),
-        new("정보·시세", "KAMIS 가격과 국내 공공데이터 근거를 확인합니다.", "community/boards?boardKey=information-prices", Icons.Material.Filled.QueryStats),
-        new("모집·함께하기", "같이 주문하거나 함께 살펴볼 사람을 모집합니다.", "community/boards?boardKey=participation", Icons.Material.Filled.Groups),
-        new("판매·공급", "생산자와 판매자가 상품·수량·공급 조건을 제안합니다.", "community/boards?boardKey=sales-supply", Icons.Material.Filled.Storefront),
-        new("진행·공동 원장", "합의된 단계와 변경 이력을 공개 범위에 맞게 봅니다.", "community/boards?boardKey=ledger-progress", Icons.Material.Filled.AccountTree)
+        new("지역 문화", "지역의 생활문화·음식·특산물 이야기를 살펴봅니다.", "community/boards?boardKey=regional-culture", Icons.Material.Filled.TravelExplore),
+        new("농수산물 가격", "KAMIS 가격과 조사 단위·시점·공공 근거를 확인합니다.", "community/boards?boardKey=information-prices", Icons.Material.Filled.QueryStats)
     ];
 
     private IReadOnlyList<CommunityHomeBoard> VisibleBoards

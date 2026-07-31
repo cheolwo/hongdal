@@ -15,13 +15,13 @@ public sealed class CommunityMobileBoardPresentationTests
             [
                 CommunityBoardKeys.Vow,
                 CommunityBoardKeys.FreeLife,
-                CommunityBoardKeys.InformationPrices,
-                CommunityBoardKeys.Participation
+                CommunityBoardKeys.RegionalCulture,
+                CommunityBoardKeys.InformationPrices
             ],
             boards.Select(board => board.BoardKey).ToArray());
         Assert.Equal(
-            "동네 나눔 · 모임",
-            boards.Single(board => board.BoardKey == CommunityBoardKeys.Participation).DisplayName);
+            "농수산물 가격",
+            boards.Single(board => board.BoardKey == CommunityBoardKeys.InformationPrices).DisplayName);
         Assert.All(boards, board => Assert.NotNull(CommunityBoardCatalog.Find(board.BoardKey)));
     }
 
@@ -116,10 +116,12 @@ public sealed class CommunityMobileBoardPresentationTests
         Assert.Contains("공개 커뮤니티", source);
         Assert.Contains("내 정보", source);
         Assert.Contains("내 글", source);
-        Assert.Contains("내 개별주문", source);
+        Assert.Contains("내 주문", source);
         Assert.Contains("CommunityPageRoutes.IndividualOrders", source);
-        Assert.Contains("역할·업무 선택", source);
-        Assert.Contains("공공데이터 게시판", source);
+        Assert.Contains("지역 문화", source);
+        Assert.Contains("농수산물 가격", source);
+        Assert.DoesNotContain("업무 게시판", source);
+        Assert.DoesNotContain("공공데이터 게시판", source);
         Assert.Contains("CommunityPageRoutes.Compose", source);
     }
 
@@ -158,7 +160,7 @@ public sealed class CommunityMobileBoardPresentationTests
     }
 
     [Fact]
-    public void Maui기존게시판인덱스도_공공데이터전용catalog를공유한다()
+    public void Maui기존게시판인덱스도_주요네게시판catalog를공유한다()
     {
         var source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
@@ -169,8 +171,8 @@ public sealed class CommunityMobileBoardPresentationTests
             "Community",
             "PlatformCommunityHome.PostMetadata.razor.cs"));
 
-        Assert.Contains("CommunityPeriodicDataBoardCatalog.All", source);
-        Assert.Contains("CommunityBoardCatalog.Find(board.BoardKey)", source);
+        Assert.Contains("CommunityBoardCatalog.FeaturedBoards", source);
+        Assert.Contains("board.DisplayName", source);
     }
 
     [Fact]

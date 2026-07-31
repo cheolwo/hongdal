@@ -6,7 +6,7 @@ namespace Ssalddel.Tests.WebApp;
 public sealed class CommunityDirectoryPageViewModelTests
 {
     [Fact]
-    public async Task LoadAsync_MergesServerCountsWithCoreBoardsAndCustomBoards()
+    public async Task LoadAsync_주요네게시판만_ServerCount와합친다()
     {
         var freeLife = CommunityBoardCatalog.Find(CommunityBoardKeys.FreeLife)!;
         var serverBoards = new CommunityBoardSummaryResponse[]
@@ -31,9 +31,9 @@ public sealed class CommunityDirectoryPageViewModelTests
         var boards = viewModel.VisibleGroups.SelectMany(group => group.Boards).ToArray();
         Assert.False(viewModel.IsLoading);
         Assert.Null(viewModel.StatusMessage);
-        Assert.Equal(CommunityBoardCatalog.PublicBoards.Count + 1, boards.Length);
-        Assert.Equal(17, viewModel.TotalPostCount);
-        Assert.Single(boards, board => board.BoardKey == "neighbors-garden");
+        Assert.Equal(CommunityBoardCatalog.FeaturedBoards.Count, boards.Length);
+        Assert.Equal(12, viewModel.TotalPostCount);
+        Assert.DoesNotContain(boards, board => board.BoardKey == "neighbors-garden");
         Assert.Equal(12, Assert.Single(boards, board => board.BoardKey == CommunityBoardKeys.FreeLife).PostCount);
     }
 
@@ -49,39 +49,24 @@ public sealed class CommunityDirectoryPageViewModelTests
         var descriptionMatches = viewModel.VisibleGroups
             .SelectMany(group => group.Boards)
             .ToArray();
-        Assert.Equal(2, descriptionMatches.Length);
-        Assert.Contains(
-            descriptionMatches,
-            board => board.BoardKey == CommunityBoardKeys.InformationPrices);
-        Assert.Contains(
-            descriptionMatches,
-            board => board.BoardKey == CommunityBoardKeys.PeriodicDataKamis);
+        var priceBoard = Assert.Single(descriptionMatches);
+        Assert.Equal(CommunityBoardKeys.InformationPrices, priceBoard.BoardKey);
 
         viewModel.UpdateSearch("함께하는 일");
 
-        Assert.NotEmpty(viewModel.VisibleGroups);
-        Assert.All(
-            viewModel.VisibleGroups.SelectMany(group => group.Boards),
-            board => Assert.Equal(CommunityBoardGroupCodes.CollectiveWork, board.GroupCode));
+        Assert.Empty(viewModel.VisibleGroups);
     }
 
-    [Theory]
-    [InlineData("운송상차완료됨Event", CommunityActivityBoardKeys.LoadingJourney)]
-    [InlineData("3.5", CommunityActivityBoardKeys.MartFulfillment)]
-    [InlineData("콘텐츠시청완료Command", CommunityActivityBoardKeys.FoundationEvidence)]
-    public async Task UpdateSearch_FindsActivityBoardsBySourceAndVersion(
-        string search,
-        string expectedBoardKey)
+    [Fact]
+    public async Task UpdateSearch_숨긴업무게시판은_검색으로다시노출하지않는다()
     {
         var viewModel = new CommunityDirectoryPageViewModel(
             _ => Task.FromResult<IReadOnlyList<CommunityBoardSummaryResponse>>([]));
         await viewModel.LoadAsync();
 
-        viewModel.UpdateSearch(search);
+        viewModel.UpdateSearch("운송상차완료됨Event");
 
-        Assert.Contains(
-            viewModel.VisibleGroups.SelectMany(group => group.Boards),
-            board => board.BoardKey == expectedBoardKey);
+        Assert.Empty(viewModel.VisibleGroups);
     }
 
     [Fact]
@@ -96,7 +81,7 @@ public sealed class CommunityDirectoryPageViewModelTests
         Assert.Equal(
             "게시글 수를 불러오지 못했습니다. 기본 게시판을 먼저 표시합니다.",
             viewModel.StatusMessage);
-        Assert.Equal(CommunityBoardCatalog.PublicBoards.Count, viewModel.VisibleBoardCount);
+        Assert.Equal(CommunityBoardCatalog.FeaturedBoards.Count, viewModel.VisibleBoardCount);
         Assert.Equal(0, viewModel.TotalPostCount);
     }
 
