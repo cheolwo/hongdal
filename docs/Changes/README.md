@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-31 | [지역문화 이미지 Batch 프롬프트 우선 제작](2026-07-31-regional-culture-batch-prompt-first.md) | 화면 없음 — 서울 10장 프롬프트를 로컬 ResearchDraft 팩으로 문서화하고 공식 근거·고정관념·장면 완결성 검토와 ApprovedForBatch 이전 외부 요청 차단을 추가 |
 | 2026-07-31 | [커뮤니티 게시판 네 탭 집중화](2026-07-31-community-board-tabs-simplification.md) | 직접 확인 — 커뮤니티 홈·글 목록·게시판 모음·글쓰기에서 서원, 자유·생활, 지역 문화, 농수산물 가격 네 게시판만 상시 노출하고 기존 게시판 key와 글은 호환 조회용으로 유지 |
 | 2026-07-30 | [지역문화 3D 애니메이션 이미지 순차 생성](2026-07-30-regional-culture-animation-generation.md) | 화면 없음 — 98개 지역에 10개 생활 장면 목표를 두고, 공식 근거·고정관념 검토 승인 뒤 한 번에 1장씩 생성하는 서버 진행률·중복 방지·비용 제한 흐름과 서울 스타일 샘플을 검증 |
 | 2026-07-30 | [KAMIS·USDA AMS 핵심 분석과 Azure 데이터 이관](2026-07-30-kamis-ams-core-analysis-azure-migration.md) | 화면 없음 — 96개 KAMIS 품목과 AMS·HS·FCL 근거를 분석하고 113만 AMS 관측을 포함한 원장을 Azure로 이관한 뒤 시장 단계 필터·최신일 인덱스와 공개 API 성능을 검증 |
