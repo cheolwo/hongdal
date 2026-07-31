@@ -8,6 +8,7 @@ using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Dispatch.Queue;
 using 살뜰.Services.DeliveryZones;
+using 살뜰.도메인.공통;
 using 살뜰.도메인.운송;
 
 namespace Ssalddel.Tests.Services.Dispatch.Queue;
@@ -48,7 +49,8 @@ public sealed class 운송원장의뢰고유성Tests
             db,
             new 운송의뢰배차원천분류Service(),
             new 운송원장배달권연결Service(new 원장배달권투영Service(db)),
-            new InMemory배달권실행공간Store());
+            new InMemory음식배달권실행공간Store(),
+            new InMemory국내화물배달권실행공간Store());
         var target = new 출고예정운송대상
         {
             원천유형 = 출고예정운송대상원천유형.화주운송의뢰,
@@ -87,7 +89,8 @@ public sealed class 운송원장의뢰고유성Tests
             db,
             new 운송의뢰배차원천분류Service(),
             new 운송원장배달권연결Service(new 원장배달권투영Service(db)),
-            new InMemory배달권실행공간Store());
+            new InMemory음식배달권실행공간Store(),
+            new InMemory국내화물배달권실행공간Store());
         var requestId = $"REQUEST-{expectedLedgerType}";
 
         await service.생성또는조회Async(
@@ -126,12 +129,14 @@ public sealed class 운송원장의뢰고유성Tests
                 .UseInMemoryDatabase($"dispatch-unknown-zone-{Guid.NewGuid():N}")
                 .Options,
             new DummyPersonalDataEncryptionService());
-        var executionStore = new InMemory배달권실행공간Store();
+        var foodExecutionStore = new InMemory음식배달권실행공간Store();
+        var cargoExecutionStore = new InMemory국내화물배달권실행공간Store();
         var service = new 운송의뢰배차대기Service(
             db,
             new 운송의뢰배차원천분류Service(),
             new 운송원장배달권연결Service(new 원장배달권투영Service(db)),
-            executionStore);
+            foodExecutionStore,
+            cargoExecutionStore);
 
         await service.생성또는조회Async(new 출고예정운송대상
         {
@@ -143,7 +148,65 @@ public sealed class 운송원장의뢰고유성Tests
         await db.SaveChangesAsync();
 
         Assert.Equal(2, await db.원장배달권투영.CountAsync());
-        Assert.Empty(await executionStore.SnapshotAsync());
+        Assert.Empty(await foodExecutionStore.SnapshotAsync());
+        Assert.Empty(await cargoExecutionStore.SnapshotAsync());
+    }
+
+    [Fact]
+    public async Task 음식배달과_국내화물은_같은_픽업지점이어도_서로_다른_실행공간에_등록된다()
+    {
+        await using var db = new SsalddelContext(
+            new DbContextOptionsBuilder<SsalddelContext>()
+                .UseInMemoryDatabase($"dispatch-separated-space-{Guid.NewGuid():N}")
+                .Options,
+            new DummyPersonalDataEncryptionService());
+        var foodExecutionStore = new InMemory음식배달권실행공간Store();
+        var cargoExecutionStore = new InMemory국내화물배달권실행공간Store();
+        var service = new 운송의뢰배차대기Service(
+            db,
+            new 운송의뢰배차원천분류Service(),
+            new 운송원장배달권연결Service(new 원장배달권투영Service(db)),
+            foodExecutionStore,
+            cargoExecutionStore);
+
+        await service.생성또는조회Async(
+            new 출고예정운송대상
+            {
+                원천유형 = 출고예정운송대상원천유형.화주운송의뢰,
+                원천참조번호 = "FOOD-SEPARATED-1",
+                운송의뢰Id = "FOOD-SEPARATED-1",
+                판매자UserId = "RESTAURANT-1",
+                상차주소 = "서울특별시 중구 세종대로",
+                하차주소 = "서울특별시 강남구 테헤란로",
+                상차위도 = 37.5665m,
+                상차경도 = 126.9780m
+            },
+            new 운송의뢰배차대기생성옵션
+            {
+                원본의뢰유형 = 운송의뢰배차원천유형.음식주문,
+                원본의뢰Id = "FOOD-ORDER-1",
+                배차업무유형 = 상태값.배차업무유형.음식배달
+            });
+        await service.생성또는조회Async(
+            new 출고예정운송대상
+            {
+                원천유형 = 출고예정운송대상원천유형.화주운송의뢰,
+                원천참조번호 = "CARGO-SEPARATED-1",
+                운송의뢰Id = "CARGO-SEPARATED-1",
+                판매자UserId = "SHIPPER-1",
+                상차주소 = "서울특별시 중구 세종대로",
+                하차주소 = "서울특별시 강남구 테헤란로",
+                상차위도 = 37.5665m,
+                상차경도 = 126.9780m
+            });
+        await db.SaveChangesAsync();
+
+        var foodSpace = Assert.Single(await foodExecutionStore.SnapshotAsync());
+        var cargoSpace = Assert.Single(await cargoExecutionStore.SnapshotAsync());
+        Assert.Equal(["FOOD-SEPARATED-1"], foodSpace.미처리운송의뢰Ids);
+        Assert.Equal(["CARGO-SEPARATED-1"], cargoSpace.미처리운송의뢰Ids);
+        Assert.StartsWith("food-cell:v1:", foodSpace.배달권키, StringComparison.Ordinal);
+        Assert.NotEqual(foodSpace.배달권키, cargoSpace.배달권키);
     }
 
     private sealed class DummyPersonalDataEncryptionService : IPersonalDataEncryptionService

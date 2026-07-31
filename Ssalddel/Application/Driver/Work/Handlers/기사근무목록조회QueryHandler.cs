@@ -26,6 +26,7 @@ public sealed class 기사근무목록조회QueryHandler : IRequestHandler<기�
                 StartMode = x.시작모드,
                 StartTime = x.시작시각,
                 StartLocation = x.시작위치,
+                TransportExecutionType = x.운송실행유형,
                 ReturnDestination = x.복귀지,
                 IsReserved = string.Equals(x.시작모드, "reserved", StringComparison.OrdinalIgnoreCase),
                 IsCurrent = currentShiftId.HasValue && currentShiftId.Value == x.Id,

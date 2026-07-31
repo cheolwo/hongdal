@@ -29,6 +29,7 @@ public sealed class 현재근무조회QueryHandler : IRequestHandler<현재근�
             시작모드 = currentShift?.시작모드 ?? string.Empty,
             시작시각 = currentShift?.시작시각,
             시작위치 = currentShift?.시작위치 ?? string.Empty,
+            운송실행유형 = currentShift?.운송실행유형 ?? string.Empty,
             복귀지 = currentShift?.복귀지,
             오늘의복귀지주소 = currentShift?.오늘의복귀지주소,
             오늘의복귀지위도 = currentShift?.오늘의복귀지위도,

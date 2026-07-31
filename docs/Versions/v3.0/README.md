@@ -25,6 +25,7 @@
 ## 정책 메모
 
 - [음식 배달 요금/정산 임시 분석 노트](./food-delivery-pricing-settlement-notes.md)
+- [음식배달·국내화물 독립 실행공간 검증 제안서](./food-delivery-data-driven-validation-proposal.md)
 
 ## 우선 앱/모듈
 

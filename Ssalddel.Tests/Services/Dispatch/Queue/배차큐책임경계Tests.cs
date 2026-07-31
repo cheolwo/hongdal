@@ -18,7 +18,8 @@ public sealed class 배차큐책임경계Tests
         Assert.True(배차큐책임경계.재구성가능한실행인덱스인가("I국내화물운송기사상태Store"));
         Assert.True(배차큐책임경계.재구성가능한실행인덱스인가("IDriverWorkQueueStore"));
         Assert.True(배차큐책임경계.재구성가능한실행인덱스인가("IDriverLocationStore"));
-        Assert.True(배차큐책임경계.재구성가능한실행인덱스인가("I배달권실행공간Store"));
+        Assert.True(배차큐책임경계.재구성가능한실행인덱스인가("I음식배달권실행공간Store"));
+        Assert.True(배차큐책임경계.재구성가능한실행인덱스인가("I국내화물배달권실행공간Store"));
     }
 
     [Fact]
@@ -33,13 +34,21 @@ public sealed class 배차큐책임경계Tests
     }
 
     [Fact]
-    public void 배달권실행공간은_사전과_해시셋_성격의_실행인덱스다()
+    public void 음식배달과_국내화물_실행공간은_서로_구분된_사전과_해시셋_인덱스다()
     {
-        var item = Assert.Single(배차큐책임경계.실행인덱스목록(), x => x.이름 == "I배달권실행공간Store");
+        var items = 배차큐책임경계.실행인덱스목록()
+            .Where(x => x.이름 is "I음식배달권실행공간Store" or "I국내화물배달권실행공간Store")
+            .ToArray();
 
-        Assert.Contains("사전", item.설명);
-        Assert.Contains("해시셋", item.설명);
-        Assert.False(item.업무확정근거);
+        Assert.Equal(2, items.Length);
+        Assert.All(items, item =>
+        {
+            Assert.Contains("사전", item.설명);
+            Assert.Contains("해시셋", item.설명);
+            Assert.False(item.업무확정근거);
+        });
+        Assert.Contains(items, item => item.설명.Contains("음식배달 셀", StringComparison.Ordinal));
+        Assert.Contains(items, item => item.설명.Contains("화물운송", StringComparison.Ordinal));
     }
 
     [Fact]

@@ -11,6 +11,24 @@ namespace 살뜰.Services.Dispatch.Queue
         // 음식배달에서 적격 기사가 없을 때 공개배차로 넘기지 않고 다시 탐색할 간격(초)
         public int 음식배달후보재탐색간격초 { get; set; } = 30;
 
+        // 같은 음식배달 셀의 후보가 이 수보다 적을 때만 인접 Food 셀을 함께 검토한다.
+        public int 음식배달동일권최소후보기사수 { get; set; } = 3;
+
+        // 같은·인접 Food 셀 후보가 없을 때 Food 물리공간 안에서만 확장할 반경(km)
+        public decimal 음식배달후보검색반경Km { get; set; } = 5m;
+
+        // Food 실행공간의 동일·인접·거리 확장 셀에서 검토할 최대 기사 수
+        public int 음식배달후보최대조회수 { get; set; } = 50;
+
+        // 직선거리 기반 기사 도착시각의 초기 추정 속도(km/h)
+        public decimal 음식배달평균이동속도KmH { get; set; } = 20m;
+
+        // 음식 준비 예상시각보다 이 범위 안에서 일찍 도착하면 적정 픽업창으로 본다.
+        public decimal 음식배달픽업조기도착허용분 { get; set; } = 3m;
+
+        // 음식 준비 예상시각보다 이 범위 안에서 늦게 도착하면 적정 픽업창으로 본다.
+        public decimal 음식배달픽업지연허용분 { get; set; } = 5m;
+
         // 추천 후 공개 전환까지의 기본 대기시간(초)
         public int 공개전환대기초 { get; set; } = 0;
 

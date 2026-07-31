@@ -37,6 +37,7 @@ public sealed class 기사근무상세조회QueryHandler : IRequestHandler<기�
             StartMode = shift.시작모드,
             StartTime = shift.시작시각,
             StartLocation = shift.시작위치,
+            TransportExecutionType = shift.운송실행유형,
             ReturnDestination = shift.복귀지,
             IsReserved = string.Equals(shift.시작모드, "reserved", StringComparison.OrdinalIgnoreCase),
             IsCurrent = currentShiftId.HasValue && currentShiftId.Value == shift.Id,

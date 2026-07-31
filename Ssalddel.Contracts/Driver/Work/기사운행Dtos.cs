@@ -77,6 +77,7 @@ public sealed class 기사현재근무응답
     public string 시작모드 { get; set; } = string.Empty;
     public DateTime? 시작시각 { get; set; }
     public string 시작위치 { get; set; } = string.Empty;
+    public string 운송실행유형 { get; set; } = string.Empty;
     public string? 복귀지 { get; set; }
     public string? 오늘의복귀지주소 { get; set; }
     public decimal? 오늘의복귀지위도 { get; set; }
@@ -91,6 +92,7 @@ public sealed class 기사근무요약응답
     public string StartMode { get; set; } = string.Empty;
     public DateTime? StartTime { get; set; }
     public string StartLocation { get; set; } = string.Empty;
+    public string TransportExecutionType { get; set; } = string.Empty;
     public string? ReturnDestination { get; set; }
     public string? TodayReturnDestination { get; set; }
     public decimal? TodayReturnLatitude { get; set; }

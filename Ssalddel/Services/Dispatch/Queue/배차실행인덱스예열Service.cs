@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Ssalddel.Contracts.Common.Drivers;
+using Ssalddel.Contracts.Common.Transport;
 using 살뜰.Data;
 using 살뜰.도메인.공통;
 using 살뜰.Services.Dispatch.Coordination;
@@ -30,7 +32,8 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
     private readonly IDriverLocationStore _기사위치Store;
     private readonly I국내화물운송기사상태Store _국내화물운송기사상태Store;
     private readonly I운송원장배달권연결Service _운송원장배달권연결Service;
-    private readonly I배달권실행공간Store _배달권실행공간Store;
+    private readonly I음식배달권실행공간Store _음식배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _국내화물배달권실행공간Store;
 
     public 배차실행인덱스예열Service(
         SsalddelContext db,
@@ -38,14 +41,16 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
         IDriverLocationStore 기사위치Store,
         I국내화물운송기사상태Store 국내화물운송기사상태Store,
         I운송원장배달권연결Service 운송원장배달권연결Service,
-        I배달권실행공간Store 배달권실행공간Store)
+        I음식배달권실행공간Store 음식배달권실행공간Store,
+        I국내화물배달권실행공간Store 국내화물배달권실행공간Store)
     {
         _db = db;
         _기사근무큐Store = 기사근무큐Store;
         _기사위치Store = 기사위치Store;
         _국내화물운송기사상태Store = 국내화물운송기사상태Store;
         _운송원장배달권연결Service = 운송원장배달권연결Service;
-        _배달권실행공간Store = 배달권실행공간Store;
+        _음식배달권실행공간Store = 음식배달권실행공간Store;
+        _국내화물배달권실행공간Store = 국내화물배달권실행공간Store;
     }
 
     public async Task<배차실행인덱스예열결과> 예열Async(CancellationToken cancellationToken = default)
@@ -106,6 +111,9 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
                 위치인덱스예열수++;
             }
 
+            var 이전기사상태 = await _국내화물운송기사상태Store.GetAsync(
+                기사.기사Id,
+                cancellationToken);
             var Aging기준시각 = AsUtc(근무?.시작시각 ?? 근무?.CreatedAt ?? 기사.UpdatedAt);
             var 기사상태 = new 국내화물운송기사상태Snapshot(
                 기사.기사Id,
@@ -124,25 +132,44 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
                 후보없음횟수: 0,
                 근무?.시작모드,
                 근무?.시작위치,
-                근무?.오늘의복귀지주소 ?? 근무?.복귀지);
+                근무?.오늘의복귀지주소 ?? 근무?.복귀지,
+                AppKey: ResolveAppKey(근무?.운송실행유형, 이전기사상태?.AppKey));
 
             await _국내화물운송기사상태Store.UpsertAsync(기사상태, cancellationToken);
             기사상태인덱스예열수++;
 
-            var 기사배달권 = 국내화물배달권정책.판정(
-                위치 is null ? null : new 배차경로좌표(위치.위도, 위치.경도),
-                기사.주_활동지역);
+            var 음식배달기사 = string.Equals(
+                기사상태.AppKey,
+                기사앱식별자.FoodDeliveryDriverApp,
+                StringComparison.Ordinal);
+            var 기사좌표 = 위치 is null ? null : new 배차경로좌표(위치.위도, 위치.경도);
+            var 기사배달권 = 음식배달기사
+                ? 음식배달권정책.판정(기사좌표, 기사.주_활동지역)
+                : 국내화물배달권정책.판정(기사좌표, 기사.주_활동지역);
             if (string.Equals(기사배달권.배달권키, "unknown", StringComparison.Ordinal))
             {
-                await _배달권실행공간Store.Remove기사Async(기사.기사Id, cancellationToken);
+                await Remove기사모든실행공간Async(기사.기사Id, cancellationToken);
                 continue;
             }
 
-            await _배달권실행공간Store.Upsert기사Async(
-                기사배달권.배달권키,
-                기사.기사Id,
-                국내행정구역배달권Catalog.인접배달권키조회(기사배달권.배달권키),
-                cancellationToken);
+            if (음식배달기사)
+            {
+                await _국내화물배달권실행공간Store.Remove기사Async(기사.기사Id, cancellationToken);
+                await _음식배달권실행공간Store.Upsert기사Async(
+                    기사배달권.배달권키,
+                    기사.기사Id,
+                    음식배달권정책.인접배달권키조회(기사배달권.배달권키),
+                    cancellationToken);
+            }
+            else
+            {
+                await _음식배달권실행공간Store.Remove기사Async(기사.기사Id, cancellationToken);
+                await _국내화물배달권실행공간Store.Upsert기사Async(
+                    기사배달권.배달권키,
+                    기사.기사Id,
+                    국내행정구역배달권Catalog.인접배달권키조회(기사배달권.배달권키),
+                    cancellationToken);
+            }
         }
 
         var 미처리운송의뢰목록 = await _db.운송원장
@@ -155,19 +182,42 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
             var 배달권연결 = await _운송원장배달권연결Service.투영추적Async(
                 배차대기,
                 cancellationToken);
-            if (string.Equals(배달권연결.픽업배달권.배달권키, "unknown", StringComparison.Ordinal))
+            var 음식배달의뢰 = 배차대기.배차업무유형 == 상태값.배차업무유형.음식배달;
+            var 실행배달권 = 음식배달의뢰
+                ? 음식배달권정책.판정(
+                    CreatePoint(배차대기.픽업_위도, 배차대기.픽업_경도),
+                    배차대기.픽업_도로명주소)
+                : 배달권연결.픽업배달권;
+            if (string.Equals(실행배달권.배달권키, "unknown", StringComparison.Ordinal))
             {
-                await _배달권실행공간Store.Remove운송의뢰Async(
+                await Remove운송의뢰모든실행공간Async(
                     배차대기.의뢰Id,
                     cancellationToken);
                 continue;
             }
 
-            await _배달권실행공간Store.Upsert운송의뢰Async(
-                배달권연결.픽업배달권.배달권키,
-                배차대기.의뢰Id,
-                국내행정구역배달권Catalog.인접배달권키조회(배달권연결.픽업배달권.배달권키),
-                cancellationToken);
+            if (음식배달의뢰)
+            {
+                await _국내화물배달권실행공간Store.Remove운송의뢰Async(
+                    배차대기.의뢰Id,
+                    cancellationToken);
+                await _음식배달권실행공간Store.Upsert운송의뢰Async(
+                    실행배달권.배달권키,
+                    배차대기.의뢰Id,
+                    음식배달권정책.인접배달권키조회(실행배달권.배달권키),
+                    cancellationToken);
+            }
+            else
+            {
+                await _음식배달권실행공간Store.Remove운송의뢰Async(
+                    배차대기.의뢰Id,
+                    cancellationToken);
+                await _국내화물배달권실행공간Store.Upsert운송의뢰Async(
+                    실행배달권.배달권키,
+                    배차대기.의뢰Id,
+                    국내행정구역배달권Catalog.인접배달권키조회(실행배달권.배달권키),
+                    cancellationToken);
+            }
         }
 
         if (_db.ChangeTracker.HasChanges())
@@ -191,4 +241,42 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
             DateTimeKind.Local => value.ToUniversalTime(),
             _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
         };
+
+    private static string ResolveAppKey(string? 운송실행유형, string? 이전AppKey)
+    {
+        if (string.Equals(운송실행유형, 운송실행유형코드.음식배달, StringComparison.Ordinal))
+        {
+            return 기사앱식별자.FoodDeliveryDriverApp;
+        }
+
+        if (string.Equals(운송실행유형, 운송실행유형코드.화물운송, StringComparison.Ordinal))
+        {
+            return 기사앱식별자.CargoYongdalDriverApp;
+        }
+
+        return string.IsNullOrWhiteSpace(이전AppKey)
+            ? 기사앱식별자.CargoYongdalDriverApp
+            : 이전AppKey;
+    }
+
+    private async Task Remove기사모든실행공간Async(
+        string 기사Id,
+        CancellationToken cancellationToken)
+    {
+        await _음식배달권실행공간Store.Remove기사Async(기사Id, cancellationToken);
+        await _국내화물배달권실행공간Store.Remove기사Async(기사Id, cancellationToken);
+    }
+
+    private async Task Remove운송의뢰모든실행공간Async(
+        string 의뢰Id,
+        CancellationToken cancellationToken)
+    {
+        await _음식배달권실행공간Store.Remove운송의뢰Async(의뢰Id, cancellationToken);
+        await _국내화물배달권실행공간Store.Remove운송의뢰Async(의뢰Id, cancellationToken);
+    }
+
+    private static 배차경로좌표? CreatePoint(decimal? latitude, decimal? longitude)
+        => latitude.HasValue && longitude.HasValue
+            ? new 배차경로좌표(latitude.Value, longitude.Value)
+            : null;
 }

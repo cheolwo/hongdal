@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Driver.Reservation;
+using Ssalddel.Contracts.Common.Transport;
 using FluentResults;
 using Ssalddel.Application.CommandProcessing;
 
@@ -42,6 +43,7 @@ public sealed class 예약생성CommandHandler : IRequestHandler<예약생성Com
             시작모드 = request.시작모드,
             시작시각 = request.시작시각,
             시작위치 = request.시작위치,
+            운송실행유형 = 운송실행유형코드.화물운송,
             복귀지 = request.복귀지,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

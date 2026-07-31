@@ -61,7 +61,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
     private readonly IDriverLocationStore _locationStore;
     private readonly I배차추천경로Service _routeService;
     private readonly I배차대기원장전환Service _queueTransitionService;
-    private readonly I배달권실행공간Store _deliveryScopeStore;
+    private readonly I음식배달권실행공간Store _deliveryScopeStore;
     private readonly ISsalddelFoodOrderStore _foodOrderStore;
     private readonly I음식마트원장동기화OutboxService _foodLedgerOutbox;
     private readonly I운송원장Mongo동기화Service _transportLedgerSync;
@@ -75,7 +75,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         IDriverLocationStore locationStore,
         I배차추천경로Service routeService,
         I배차대기원장전환Service queueTransitionService,
-        I배달권실행공간Store deliveryScopeStore,
+        I음식배달권실행공간Store deliveryScopeStore,
         ISsalddelFoodOrderStore foodOrderStore,
         I음식마트원장동기화OutboxService foodLedgerOutbox,
         I운송원장Mongo동기화Service transportLedgerSync,

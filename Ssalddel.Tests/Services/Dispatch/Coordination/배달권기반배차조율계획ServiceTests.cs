@@ -7,7 +7,7 @@ public sealed class 배달권기반배차조율계획ServiceTests
     [Fact]
     public async Task 계획은_주배달권_의뢰와_주변배달권_기사를_묶어_Factory입력대상을_만든다()
     {
-        var store = new InMemory배달권실행공간Store();
+        var store = new InMemory국내화물배달권실행공간Store();
         await store.Upsert운송의뢰Async(
             "bjd-sigungu:11260",
             "REQ-JN-1",
@@ -31,7 +31,7 @@ public sealed class 배달권기반배차조율계획ServiceTests
     [Fact]
     public async Task 계획은_인접배달권_기사포함을_끄면_주배달권_기사만_쓴다()
     {
-        var store = new InMemory배달권실행공간Store();
+        var store = new InMemory국내화물배달권실행공간Store();
         await store.Upsert운송의뢰Async("bjd-sigungu:11260", "REQ-JN-1", ["bjd-sigungu:11215"]);
         await store.Upsert기사Async("bjd-sigungu:11260", "DRV-JN", ["bjd-sigungu:11215"]);
         await store.Upsert기사Async("bjd-sigungu:11215", "DRV-GJ", ["bjd-sigungu:11260"]);
@@ -51,7 +51,7 @@ public sealed class 배달권기반배차조율계획ServiceTests
     [Fact]
     public async Task 실행은_여러_배달권에서_같은_기사가_후보가_되어도_추천잠금수를_넘기지_않는다()
     {
-        var store = new InMemory배달권실행공간Store();
+        var store = new InMemory국내화물배달권실행공간Store();
         await store.Upsert운송의뢰Async("scope-a", "REQ-A", ["scope-driver"]);
         await store.Upsert운송의뢰Async("scope-b", "REQ-B", ["scope-driver"]);
         await store.Upsert기사Async("scope-driver", "DRV-1", ["scope-a", "scope-b"]);

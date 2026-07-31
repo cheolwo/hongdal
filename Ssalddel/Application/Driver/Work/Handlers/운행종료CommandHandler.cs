@@ -11,7 +11,8 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
     private readonly SsalddelContext _db;
     private readonly IDriverWorkQueueStore _driverWorkQueueStore;
     private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
-    private readonly I배달권실행공간Store _배달권실행공간Store;
+    private readonly I음식배달권실행공간Store _음식배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _국내화물배달권실행공간Store;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
     private readonly ICommunityDriverAvailabilityService _communityDriverAvailabilityService;
@@ -21,7 +22,8 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         SsalddelContext db,
         IDriverWorkQueueStore driverWorkQueueStore,
         I국내화물운송기사상태Service 국내화물운송기사상태Service,
-        I배달권실행공간Store 배달권실행공간Store,
+        I음식배달권실행공간Store 음식배달권실행공간Store,
+        I국내화물배달권실행공간Store 국내화물배달권실행공간Store,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
         ICommunityDriverAvailabilityService communityDriverAvailabilityService,
@@ -30,7 +32,8 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         _db = db;
         _driverWorkQueueStore = driverWorkQueueStore;
         _국내화물운송기사상태Service = 국내화물운송기사상태Service;
-        _배달권실행공간Store = 배달권실행공간Store;
+        _음식배달권실행공간Store = 음식배달권실행공간Store;
+        _국내화물배달권실행공간Store = 국내화물배달권실행공간Store;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
         _communityDriverAvailabilityService = communityDriverAvailabilityService;
@@ -52,7 +55,8 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         await _db.SaveChangesAsync(cancellationToken);
         await _driverWorkQueueStore.RemoveAsync(request.기사Id, cancellationToken);
         await _국내화물운송기사상태Service.운행종료Async(request.기사Id, cancellationToken);
-        await _배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
+        await _음식배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
+        await _국내화물배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
         _communityDriverAvailabilityService.Close(request.기사Id);
 
         _logger.LogInformation(

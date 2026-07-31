@@ -1,4 +1,5 @@
 using System;
+using Ssalddel.Contracts.Common.Transport;
 
 namespace 살뜰.도메인.기사
 {
@@ -14,6 +15,8 @@ namespace 살뜰.도메인.기사
         public DateTime? 시작시각 { get; set; }
 
         public string 시작위치 { get; set; } = string.Empty;
+
+        public string 운송실행유형 { get; set; } = 운송실행유형코드.화물운송;
 
         public string? 복귀지 { get; set; }
 

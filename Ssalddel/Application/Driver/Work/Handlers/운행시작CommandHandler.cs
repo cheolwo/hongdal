@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Driver.Work;
+using Ssalddel.Contracts.Common.Drivers;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Transport;
 using FluentResults;
@@ -16,6 +17,8 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
     private readonly I배차추천Service _dispatchRecommendationService;
     private readonly IDriverWorkQueueStore _driverWorkQueueStore;
     private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
+    private readonly I음식배달권실행공간Store _음식배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _국내화물배달권실행공간Store;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
     private readonly ICommunityDriverAvailabilityService _communityDriverAvailabilityService;
@@ -26,6 +29,8 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
         I배차추천Service dispatchRecommendationService,
         IDriverWorkQueueStore driverWorkQueueStore,
         I국내화물운송기사상태Service 국내화물운송기사상태Service,
+        I음식배달권실행공간Store 음식배달권실행공간Store,
+        I국내화물배달권실행공간Store 국내화물배달권실행공간Store,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
         ICommunityDriverAvailabilityService communityDriverAvailabilityService,
@@ -35,6 +40,8 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
         _dispatchRecommendationService = dispatchRecommendationService;
         _driverWorkQueueStore = driverWorkQueueStore;
         _국내화물운송기사상태Service = 국내화물운송기사상태Service;
+        _음식배달권실행공간Store = 음식배달권실행공간Store;
+        _국내화물배달권실행공간Store = 국내화물배달권실행공간Store;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
         _communityDriverAvailabilityService = communityDriverAvailabilityService;
@@ -70,6 +77,7 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             시작모드 = request.시작모드,
             시작시각 = request.시작시각 ?? DateTime.UtcNow,
             시작위치 = request.시작위치,
+            운송실행유형 = request.운송실행유형,
             복귀지 = request.복귀지,
             오늘의복귀지주소 = ResolveTodayReturnAddress(request, driver),
             오늘의복귀지위도 = ResolveTodayReturnLatitude(request, driver),
@@ -91,6 +99,12 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             shift.시작모드,
             shift.시작위치,
             shift.오늘의복귀지주소 ?? shift.복귀지), cancellationToken);
+        var appKey = string.Equals(
+            request.운송실행유형,
+            운송실행유형코드.음식배달,
+            StringComparison.Ordinal)
+            ? 기사앱식별자.FoodDeliveryDriverApp
+            : 기사앱식별자.CargoYongdalDriverApp;
         await _국내화물운송기사상태Service.운행시작Async(
             request.기사Id,
             shift.Id,
@@ -99,7 +113,10 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             shift.시작위치,
             shift.오늘의복귀지주소 ?? shift.복귀지,
             기사복귀선호코드.Normalize(request.복귀콜선호),
+            appKey,
             cancellationToken);
+        await _음식배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
+        await _국내화물배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
 
         CommunityDriverAvailabilityPostResponse? communityPost = null;
         if (request.커뮤니티운행공개)

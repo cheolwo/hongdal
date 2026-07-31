@@ -50,18 +50,21 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
     private readonly SsalddelContext _db;
     private readonly I운송의뢰배차원천분류Service _sourceClassifier;
     private readonly I운송원장배달권연결Service _운송원장배달권연결Service;
-    private readonly I배달권실행공간Store _배달권실행공간Store;
+    private readonly I음식배달권실행공간Store _음식배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _국내화물배달권실행공간Store;
 
     public 운송의뢰배차대기Service(
         SsalddelContext db,
         I운송의뢰배차원천분류Service sourceClassifier,
         I운송원장배달권연결Service 운송원장배달권연결Service,
-        I배달권실행공간Store 배달권실행공간Store)
+        I음식배달권실행공간Store 음식배달권실행공간Store,
+        I국내화물배달권실행공간Store 국내화물배달권실행공간Store)
     {
         _db = db;
         _sourceClassifier = sourceClassifier;
         _운송원장배달권연결Service = 운송원장배달권연결Service;
-        _배달권실행공간Store = 배달권실행공간Store;
+        _음식배달권실행공간Store = 음식배달권실행공간Store;
+        _국내화물배달권실행공간Store = 국내화물배달권실행공간Store;
     }
 
     public async Task<운송원장> 생성또는조회Async(
@@ -171,22 +174,56 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
         if (배차대기.상태 != 상태값.배차대기상태.대기
             || 배차대기.배차큐단계 is 상태값.배차큐단계.확정 or 상태값.배차큐단계.종료)
         {
-            await _배달권실행공간Store.Remove운송의뢰Async(배차대기.의뢰Id, cancellationToken);
+            await Remove모든실행공간Async(배차대기.의뢰Id, cancellationToken);
             return;
         }
 
-        if (string.Equals(배달권연결.픽업배달권.배달권키, "unknown", StringComparison.Ordinal))
+        var 음식배달 = 배차대기.배차업무유형 == 상태값.배차업무유형.음식배달;
+        var 실행배달권 = 음식배달
+            ? 음식배달권정책.판정(
+                CreatePoint(배차대기.픽업_위도, 배차대기.픽업_경도),
+                배차대기.픽업_도로명주소)
+            : 배달권연결.픽업배달권;
+        if (string.Equals(실행배달권.배달권키, "unknown", StringComparison.Ordinal))
         {
-            await _배달권실행공간Store.Remove운송의뢰Async(배차대기.의뢰Id, cancellationToken);
+            await Remove모든실행공간Async(배차대기.의뢰Id, cancellationToken);
             return;
         }
 
-        await _배달권실행공간Store.Upsert운송의뢰Async(
-            배달권연결.픽업배달권.배달권키,
-            배차대기.의뢰Id,
-            국내행정구역배달권Catalog.인접배달권키조회(배달권연결.픽업배달권.배달권키),
-            cancellationToken);
+        if (음식배달)
+        {
+            await _국내화물배달권실행공간Store.Remove운송의뢰Async(
+                배차대기.의뢰Id,
+                cancellationToken);
+            await _음식배달권실행공간Store.Upsert운송의뢰Async(
+                실행배달권.배달권키,
+                배차대기.의뢰Id,
+                음식배달권정책.인접배달권키조회(실행배달권.배달권키),
+                cancellationToken);
+        }
+        else
+        {
+            await _음식배달권실행공간Store.Remove운송의뢰Async(
+                배차대기.의뢰Id,
+                cancellationToken);
+            await _국내화물배달권실행공간Store.Upsert운송의뢰Async(
+                실행배달권.배달권키,
+                배차대기.의뢰Id,
+                국내행정구역배달권Catalog.인접배달권키조회(실행배달권.배달권키),
+                cancellationToken);
+        }
     }
+
+    private async Task Remove모든실행공간Async(string 의뢰Id, CancellationToken cancellationToken)
+    {
+        await _음식배달권실행공간Store.Remove운송의뢰Async(의뢰Id, cancellationToken);
+        await _국내화물배달권실행공간Store.Remove운송의뢰Async(의뢰Id, cancellationToken);
+    }
+
+    private static 배차경로좌표? CreatePoint(decimal? latitude, decimal? longitude)
+        => latitude.HasValue && longitude.HasValue
+            ? new 배차경로좌표(latitude.Value, longitude.Value)
+            : null;
 
     private static string To배차원천유형(string? sourceType)
     {

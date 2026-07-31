@@ -2,9 +2,9 @@ namespace 살뜰.Services.Dispatch.Coordination;
 
 public sealed class 배달권기반배차조율계획Service : I배달권기반배차조율계획Service
 {
-    private readonly I배달권실행공간Store _배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _배달권실행공간Store;
 
-    public 배달권기반배차조율계획Service(I배달권실행공간Store 배달권실행공간Store)
+    public 배달권기반배차조율계획Service(I국내화물배달권실행공간Store 배달권실행공간Store)
     {
         _배달권실행공간Store = 배달권실행공간Store;
     }

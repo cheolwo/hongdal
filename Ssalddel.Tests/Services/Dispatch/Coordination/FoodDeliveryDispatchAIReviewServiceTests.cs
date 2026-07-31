@@ -165,7 +165,7 @@ public sealed class FoodDeliveryDispatchAIReviewServiceTests
         }
     }
 
-    private sealed class ThrowingDeliveryScopeStore : I배달권실행공간Store
+    private sealed class ThrowingDeliveryScopeStore : I음식배달권실행공간Store
     {
         public Task Upsert기사Async(
             string 배달권키,
@@ -187,14 +187,14 @@ public sealed class FoodDeliveryDispatchAIReviewServiceTests
         public Task Remove운송의뢰Async(string 의뢰Id, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<배달권실행공간Snapshot?> GetAsync(string 배달권키, CancellationToken cancellationToken = default)
+        public Task<음식배달권실행공간Snapshot?> GetAsync(string 배달권키, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<배달권실행공간Snapshot>> SnapshotAsync(CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<음식배달권실행공간Snapshot>> SnapshotAsync(CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
     }
 
-    private sealed class EmptyDeliveryScopeStore : I배달권실행공간Store
+    private sealed class EmptyDeliveryScopeStore : I음식배달권실행공간Store
     {
         public Task Upsert기사Async(
             string 배달권키,
@@ -216,11 +216,11 @@ public sealed class FoodDeliveryDispatchAIReviewServiceTests
         public Task Remove운송의뢰Async(string 의뢰Id, CancellationToken cancellationToken = default)
             => Task.CompletedTask;
 
-        public Task<배달권실행공간Snapshot?> GetAsync(string 배달권키, CancellationToken cancellationToken = default)
-            => Task.FromResult<배달권실행공간Snapshot?>(null);
+        public Task<음식배달권실행공간Snapshot?> GetAsync(string 배달권키, CancellationToken cancellationToken = default)
+            => Task.FromResult<음식배달권실행공간Snapshot?>(null);
 
-        public Task<IReadOnlyList<배달권실행공간Snapshot>> SnapshotAsync(CancellationToken cancellationToken = default)
-            => Task.FromResult<IReadOnlyList<배달권실행공간Snapshot>>([]);
+        public Task<IReadOnlyList<음식배달권실행공간Snapshot>> SnapshotAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<음식배달권실행공간Snapshot>>([]);
     }
 
     private sealed class EmptyDriverLocationStore : IDriverLocationStore

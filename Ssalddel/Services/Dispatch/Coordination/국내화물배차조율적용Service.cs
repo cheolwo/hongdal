@@ -21,7 +21,7 @@ public sealed partial class 국내화물배차조율적용Service : I국내화�
     private readonly 배차큐정책Options _options;
     private readonly I배차추천알림Service _알림Service;
     private readonly I국내화물운송기사상태Service _기사상태Service;
-    private readonly I배달권실행공간Store _배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _배달권실행공간Store;
     private readonly ILogger<국내화물배차조율적용Service> _logger;
 
     public 국내화물배차조율적용Service(
@@ -29,7 +29,7 @@ public sealed partial class 국내화물배차조율적용Service : I국내화�
         IOptions<배차큐정책Options> options,
         I배차추천알림Service 알림Service,
         I국내화물운송기사상태Service 기사상태Service,
-        I배달권실행공간Store 배달권실행공간Store,
+        I국내화물배달권실행공간Store 배달권실행공간Store,
         ILogger<국내화물배차조율적용Service> logger)
     {
         _db = db;

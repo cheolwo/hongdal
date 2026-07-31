@@ -32,14 +32,14 @@ public sealed class FoodDeliveryDispatchAIReviewService : IFoodDeliveryDispatchA
 
     private readonly ISsalddelFoodOrderStore _orderStore;
     private readonly I음식멀티배차조합Service _bundleService;
-    private readonly I배달권실행공간Store _deliveryScopeStore;
+    private readonly I음식배달권실행공간Store _deliveryScopeStore;
     private readonly IDriverLocationStore _driverLocationStore;
     private readonly I배차AI판단사례LedgerStore _judgmentLedgerStore;
 
     public FoodDeliveryDispatchAIReviewService(
         ISsalddelFoodOrderStore orderStore,
         I음식멀티배차조합Service bundleService,
-        I배달권실행공간Store deliveryScopeStore,
+        I음식배달권실행공간Store deliveryScopeStore,
         IDriverLocationStore driverLocationStore,
         I배차AI판단사례LedgerStore judgmentLedgerStore)
     {

@@ -1,5 +1,7 @@
-using Ssalddel.Contracts.Common.Drivers;
 using Microsoft.Extensions.Options;
+using Ssalddel.Contracts.Common.Drivers;
+using Ssalddel.Services.Food;
+using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Recommendation;
 using 살뜰.Services.Storage.Local;
 using 살뜰.도메인.공통;
@@ -12,17 +14,23 @@ public sealed class 음식배달배차업무정책 : I배차업무정책
     private readonly I국내화물운송기사상태Store _기사상태Store;
     private readonly IDriverRejectedRequestStore _거절Store;
     private readonly I배차추천경로Service _경로Service;
+    private readonly I음식배달권실행공간Store _음식배달권실행공간Store;
+    private readonly ISsalddelFoodOrderStore _음식주문Store;
     private readonly 배차큐정책Options _options;
 
     public 음식배달배차업무정책(
         I국내화물운송기사상태Store 기사상태Store,
         IDriverRejectedRequestStore 거절Store,
         I배차추천경로Service 경로Service,
+        I음식배달권실행공간Store 음식배달권실행공간Store,
+        ISsalddelFoodOrderStore 음식주문Store,
         IOptions<배차큐정책Options> options)
     {
         _기사상태Store = 기사상태Store;
         _거절Store = 거절Store;
         _경로Service = 경로Service;
+        _음식배달권실행공간Store = 음식배달권실행공간Store;
+        _음식주문Store = 음식주문Store;
         _options = options.Value;
     }
 
@@ -39,24 +47,159 @@ public sealed class 음식배달배차업무정책 : I배차업무정책
         }
 
         var pickup = new 배차경로좌표(queue.픽업_위도.Value, queue.픽업_경도.Value);
-        var candidates = await _기사상태Store.위치반경조회Async(
-            pickup.Latitude,
-            pickup.Longitude,
-            Math.Max(1m, _options.기사후보검색반경Km),
-            Math.Max(1, _options.기사후보최대조회수),
+        var rejectedDriverIds = await _거절Store.GetRejectedDriverIdsAsync(
+            queue.의뢰Id,
             cancellationToken);
-        if (candidates.Count == 0)
+        var now = DateTime.UtcNow;
+        var 조리예상완료시각Utc = Resolve조리예상완료시각Utc(queue);
+        var seenDriverIds = new HashSet<string>(StringComparer.Ordinal);
+        var 평가목록 = new List<음식배달기사항목>();
+        var 주배달권 = 음식배달권정책.판정(pickup, queue.픽업_도로명주소);
+
+        if (!string.Equals(주배달권.배달권키, "unknown", StringComparison.Ordinal))
         {
-            return null;
+            var 주배달권공간 = await _음식배달권실행공간Store.GetAsync(
+                주배달권.배달권키,
+                cancellationToken);
+            평가목록.AddRange(await 평가Async(
+                주배달권공간?.운행중기사Ids ?? [],
+                seenDriverIds,
+                pickup,
+                rejectedDriverIds,
+                제외기사Id,
+                조리예상완료시각Utc,
+                now,
+                공간단계: 0,
+                공간설명: "같은 음식배달권",
+                cancellationToken));
+
+            if (평가목록.Count < Math.Max(1, _options.음식배달동일권최소후보기사수))
+            {
+                var 인접기사Ids = new List<string>();
+                foreach (var 인접배달권키 in 음식배달권정책.인접배달권키조회(주배달권.배달권키))
+                {
+                    var 인접공간 = await _음식배달권실행공간Store.GetAsync(
+                        인접배달권키,
+                        cancellationToken);
+                    if (인접공간 is not null)
+                    {
+                        인접기사Ids.AddRange(인접공간.운행중기사Ids);
+                    }
+                }
+
+                평가목록.AddRange(await 평가Async(
+                    인접기사Ids,
+                    seenDriverIds,
+                    pickup,
+                    rejectedDriverIds,
+                    제외기사Id,
+                    조리예상완료시각Utc,
+                    now,
+                    공간단계: 1,
+                    공간설명: "인접 음식배달권",
+                    cancellationToken));
+            }
         }
 
-        var rejectedDriverIds = await _거절Store.GetRejectedDriverIdsAsync(queue.의뢰Id, cancellationToken);
-        var now = DateTime.UtcNow;
-        배차추천후보? best = null;
-        decimal bestDistance = decimal.MaxValue;
+        if (평가목록.Count == 0)
+        {
+            var 확장기사Ids = new List<string>();
+            foreach (var 확장공간키 in 음식배달권정책.거리확장배달권키조회(
+                         주배달권.배달권키,
+                         _options.음식배달후보검색반경Km))
+            {
+                var 확장공간 = await _음식배달권실행공간Store.GetAsync(
+                    확장공간키,
+                    cancellationToken);
+                if (확장공간 is not null)
+                {
+                    확장기사Ids.AddRange(확장공간.운행중기사Ids);
+                }
+            }
 
+            평가목록.AddRange(await 평가Async(
+                확장기사Ids,
+                seenDriverIds,
+                pickup,
+                rejectedDriverIds,
+                제외기사Id,
+                조리예상완료시각Utc,
+                now,
+                공간단계: 2,
+                공간설명: "제한 음식배달공간 확장",
+                cancellationToken));
+        }
+
+        var best = 평가목록
+            .OrderBy(x => x.픽업시각단계)
+            .ThenBy(x => x.픽업시각차이분)
+            .ThenBy(x => x.공간단계)
+            .ThenByDescending(x => x.추천점수)
+            .ThenBy(x => x.거리Km)
+            .ThenBy(x => x.기사.DriverId, StringComparer.Ordinal)
+            .FirstOrDefault();
+        return best is null
+            ? null
+            : new 배차추천후보(
+                best.기사.DriverId,
+                best.추천점수,
+                $"{best.공간설명} · 음식점까지 {best.거리Km:0.0}km · {best.픽업시각설명} · F드라이버 대기 보정 {best.기사.Aging점수:0}");
+    }
+
+    private async Task<IReadOnlyList<음식배달기사항목>> 평가Async(
+        IReadOnlyList<string> driverIds,
+        HashSet<string> seenDriverIds,
+        배차경로좌표 pickup,
+        IReadOnlySet<string> rejectedDriverIds,
+        string? 제외기사Id,
+        DateTime? 조리예상완료시각Utc,
+        DateTime now,
+        int 공간단계,
+        string 공간설명,
+        CancellationToken cancellationToken)
+    {
+        var uniqueIds = driverIds
+            .Where(id => !string.IsNullOrWhiteSpace(id) && seenDriverIds.Add(id))
+            .Take(Math.Max(1, _options.음식배달후보최대조회수))
+            .ToArray();
+        if (uniqueIds.Length == 0)
+        {
+            return [];
+        }
+
+        var states = await Task.WhenAll(
+            uniqueIds.Select(id => _기사상태Store.GetAsync(id, cancellationToken)));
+        return 평가(
+            states.Where(state => state is not null).Select(state => state!).ToArray(),
+            null,
+            pickup,
+            rejectedDriverIds,
+            제외기사Id,
+            조리예상완료시각Utc,
+            now,
+            공간단계,
+            공간설명);
+    }
+
+    private IReadOnlyList<음식배달기사항목> 평가(
+        IReadOnlyList<국내화물운송기사상태Snapshot> candidates,
+        HashSet<string>? seenDriverIds,
+        배차경로좌표 pickup,
+        IReadOnlySet<string> rejectedDriverIds,
+        string? 제외기사Id,
+        DateTime? 조리예상완료시각Utc,
+        DateTime now,
+        int 공간단계,
+        string 공간설명)
+    {
+        var result = new List<음식배달기사항목>();
         foreach (var candidate in candidates)
         {
+            if (seenDriverIds is not null && !seenDriverIds.Add(candidate.DriverId))
+            {
+                continue;
+            }
+
             if (!string.Equals(candidate.AppKey, 기사앱식별자.FoodDeliveryDriverApp, StringComparison.Ordinal)
                 || !string.Equals(candidate.운행상태, 상태값.기사운행상태.운행중, StringComparison.OrdinalIgnoreCase)
                 || !candidate.Latitude.HasValue
@@ -81,25 +224,90 @@ public sealed class 음식배달배차업무정책 : I배차업무정책
             }
 
             var allowedRadiusKm = Math.Min(
-                Math.Max(1m, _options.기사후보검색반경Km),
-                Math.Max(1m, candidate.상차접근허용반경Km ?? _options.기사후보검색반경Km));
+                Math.Max(1m, _options.음식배달후보검색반경Km),
+                Math.Max(1m, candidate.상차접근허용반경Km ?? _options.음식배달후보검색반경Km));
             if (distance.Value > allowedRadiusKm)
             {
                 continue;
             }
 
+            var 픽업시각 = Calculate픽업시각(distance.Value, 조리예상완료시각Utc, now);
             var distanceScore = Math.Max(0m, 100m - distance.Value * 12m);
-            var score = distanceScore + candidate.Aging점수;
-            var reason = $"음식점까지 {distance.Value:0.0}km · F드라이버 대기 보정 {candidate.Aging점수:0}";
-            if (best is null
-                || score > best.추천점수
-                || (score == best.추천점수 && distance.Value < bestDistance))
-            {
-                best = new 배차추천후보(candidate.DriverId, score, reason);
-                bestDistance = distance.Value;
-            }
+            var timingPenalty = 픽업시각.단계 * 100m + 픽업시각.차이분;
+            result.Add(new 음식배달기사항목(
+                candidate,
+                distance.Value,
+                공간단계,
+                공간설명,
+                픽업시각.단계,
+                픽업시각.차이분,
+                픽업시각.설명,
+                distanceScore + candidate.Aging점수 - timingPenalty));
         }
 
-        return best;
+        return result;
     }
+
+    private (int 단계, decimal 차이분, string 설명) Calculate픽업시각(
+        decimal distanceKm,
+        DateTime? 조리예상완료시각Utc,
+        DateTime now)
+    {
+        if (!조리예상완료시각Utc.HasValue)
+        {
+            return (0, 0m, "조리예정시각 미확정");
+        }
+
+        var speedKmH = Math.Max(1m, _options.음식배달평균이동속도KmH);
+        var estimatedTravelMinutes = distanceKm / speedKmH * 60m;
+        var estimatedArrival = now.AddMinutes((double)estimatedTravelMinutes);
+        var windowStart = 조리예상완료시각Utc.Value.AddMinutes(
+            -(double)Math.Max(0m, _options.음식배달픽업조기도착허용분));
+        var windowEnd = 조리예상완료시각Utc.Value.AddMinutes(
+            (double)Math.Max(0m, _options.음식배달픽업지연허용분));
+
+        if (estimatedArrival < windowStart)
+        {
+            var earlyMinutes = Math.Max(0m, (decimal)(windowStart - estimatedArrival).TotalMinutes);
+            return (1, earlyMinutes, $"조기 도착 대기 약 {earlyMinutes:0}분");
+        }
+
+        if (estimatedArrival > windowEnd)
+        {
+            var lateMinutes = Math.Max(0m, (decimal)(estimatedArrival - windowEnd).TotalMinutes);
+            return (2, lateMinutes, $"픽업창 지연 약 {lateMinutes:0}분");
+        }
+
+        var readyGapMinutes = Math.Abs((decimal)(estimatedArrival - 조리예상완료시각Utc.Value).TotalMinutes);
+        return (0, readyGapMinutes, "적정 픽업창");
+    }
+
+    private DateTime? Resolve조리예상완료시각Utc(운송원장 queue)
+    {
+        var orderId = string.IsNullOrWhiteSpace(queue.원본의뢰Id)
+            ? queue.의뢰Id
+            : queue.원본의뢰Id;
+        var value = _음식주문Store.GetOrder(orderId)?.조리예상완료시각Utc;
+        if (!value.HasValue)
+        {
+            return null;
+        }
+
+        return value.Value.Kind switch
+        {
+            DateTimeKind.Utc => value.Value,
+            DateTimeKind.Local => value.Value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+        };
+    }
+
+    private sealed record 음식배달기사항목(
+        국내화물운송기사상태Snapshot 기사,
+        decimal 거리Km,
+        int 공간단계,
+        string 공간설명,
+        int 픽업시각단계,
+        decimal 픽업시각차이분,
+        string 픽업시각설명,
+        decimal 추천점수);
 }

@@ -13,6 +13,7 @@ public interface I국내화물운송기사상태Service
         string startLocation,
         string? returnDestination,
         string? 복귀콜선호 = null,
+        string? appKey = null,
         CancellationToken cancellationToken = default);
 
     Task<국내화물운송기사상태Snapshot> 위치갱신Async(
@@ -52,6 +53,7 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
         string startLocation,
         string? returnDestination,
         string? 복귀콜선호 = null,
+        string? appKey = null,
         CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -74,7 +76,8 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
             startMode,
             startLocation,
             returnDestination,
-            복귀콜선호: 기사복귀선호코드.Normalize(복귀콜선호));
+            복귀콜선호: 기사복귀선호코드.Normalize(복귀콜선호),
+            AppKey: string.IsNullOrWhiteSpace(appKey) ? null : appKey.Trim());
 
         await _store.UpsertAsync(snapshot, cancellationToken);
         return snapshot;

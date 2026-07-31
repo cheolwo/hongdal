@@ -1,4 +1,6 @@
 using FluentResults;
+using Ssalddel.Contracts.Common.Drivers;
+using Ssalddel.Contracts.Common.Transport;
 using Ssalddel.Application.CommandProcessing;
 using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Notification;
@@ -15,7 +17,8 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
     private readonly SsalddelContext _db;
     private readonly IDriverLocationStore _driverLocationStore;
     private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
-    private readonly I배달권실행공간Store _배달권실행공간Store;
+    private readonly I음식배달권실행공간Store _음식배달권실행공간Store;
+    private readonly I국내화물배달권실행공간Store _국내화물배달권실행공간Store;
     private readonly I상차접근알림Service _상차접근알림Service;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
@@ -28,7 +31,8 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         SsalddelContext db,
         IDriverLocationStore driverLocationStore,
         I국내화물운송기사상태Service 국내화물운송기사상태Service,
-        I배달권실행공간Store 배달권실행공간Store,
+        I음식배달권실행공간Store 음식배달권실행공간Store,
+        I국내화물배달권실행공간Store 국내화물배달권실행공간Store,
         I상차접근알림Service 상차접근알림Service,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
@@ -40,7 +44,8 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         _db = db;
         _driverLocationStore = driverLocationStore;
         _국내화물운송기사상태Service = 국내화물운송기사상태Service;
-        _배달권실행공간Store = 배달권실행공간Store;
+        _음식배달권실행공간Store = 음식배달권실행공간Store;
+        _국내화물배달권실행공간Store = 국내화물배달권실행공간Store;
         _상차접근알림Service = 상차접근알림Service;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
@@ -76,6 +81,20 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
             return Result.Fail<기사위치갱신응답>("운행중 상태에서만 위치를 전송할 수 있습니다.");
         }
 
+        var currentShift = await _db.기사근무
+            .AsNoTracking()
+            .Where(x => x.기사Id == request.기사Id)
+            .OrderByDescending(x => x.시작시각 ?? x.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+        var shiftAppKey = ResolveShiftAppKey(currentShift?.운송실행유형);
+        if (!string.IsNullOrWhiteSpace(shiftAppKey)
+            && !string.IsNullOrWhiteSpace(request.AppKey)
+            && !string.Equals(shiftAppKey, request.AppKey, StringComparison.Ordinal))
+        {
+            return Result.Fail<기사위치갱신응답>(
+                "현재 근무의 운송 실행유형과 위치를 전송한 기사 앱이 일치하지 않습니다.");
+        }
+
         driver.운행상태 = 상태값.기사운행상태.운행중;
         driver.UpdatedAt = DateTime.UtcNow;
 
@@ -107,16 +126,34 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         var osState = await _국내화물운송기사상태Service.위치갱신Async(
             snapshot,
             상차접근허용반경Km: request.상차접근허용반경Km,
-            appKey: request.AppKey,
+            appKey: shiftAppKey ?? request.AppKey,
             cancellationToken: cancellationToken);
-        var 배달권 = 국내화물배달권정책.판정(
-            new 배차경로좌표(snapshot.Latitude, snapshot.Longitude),
-            driver.주_활동지역);
-        await _배달권실행공간Store.Upsert기사Async(
-            배달권.배달권키,
-            request.기사Id,
-            국내행정구역배달권Catalog.인접배달권키조회(배달권.배달권키),
-            cancellationToken);
+        var 음식배달기사 = string.Equals(
+            osState.AppKey,
+            기사앱식별자.FoodDeliveryDriverApp,
+            StringComparison.Ordinal);
+        var 현재좌표 = new 배차경로좌표(snapshot.Latitude, snapshot.Longitude);
+        var 배달권 = 음식배달기사
+            ? 음식배달권정책.판정(현재좌표, null)
+            : 국내화물배달권정책.판정(현재좌표, driver.주_활동지역);
+        if (음식배달기사)
+        {
+            await _국내화물배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
+            await _음식배달권실행공간Store.Upsert기사Async(
+                배달권.배달권키,
+                request.기사Id,
+                음식배달권정책.인접배달권키조회(배달권.배달권키),
+                cancellationToken);
+        }
+        else
+        {
+            await _음식배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
+            await _국내화물배달권실행공간Store.Upsert기사Async(
+                배달권.배달권키,
+                request.기사Id,
+                국내행정구역배달권Catalog.인접배달권키조회(배달권.배달권키),
+                cancellationToken);
+        }
 
         try
         {
@@ -167,6 +204,14 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
             커뮤니티현재공개지역 = communityDistrictLabel
         });
     }
+
+    private static string? ResolveShiftAppKey(string? 운송실행유형)
+        => 운송실행유형 switch
+        {
+            운송실행유형코드.음식배달 => 기사앱식별자.FoodDeliveryDriverApp,
+            운송실행유형코드.화물운송 => 기사앱식별자.CargoYongdalDriverApp,
+            _ => null
+        };
 
     private async Task PublishActiveTransportLocationAsync(
         string driverId,

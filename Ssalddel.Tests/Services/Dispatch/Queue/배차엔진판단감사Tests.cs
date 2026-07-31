@@ -376,6 +376,7 @@ public sealed class 배차엔진판단감사Tests
             string startLocation,
             string? returnDestination,
             string? 복귀콜선호 = null,
+            string? appKey = null,
             CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
