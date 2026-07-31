@@ -8,7 +8,7 @@ using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using 살뜰.Services.External.KieAi;
+using 살뜰.Services.External.Gemini;
 
 namespace Ssalddel.Tests.Architecture;
 
@@ -25,7 +25,7 @@ public sealed class SsalddelCodeMetadataTests
         Assert.Contains(metadata, item => item.ComponentType == typeof(커뮤니티작성이미지Controller));
         Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImagePromptPlanner));
         Assert.Contains(metadata, item => item.ComponentType == typeof(CommunityAuthoringImageService));
-        Assert.Contains(metadata, item => item.ComponentType == typeof(KieAiImageGenerationClient));
+        Assert.Contains(metadata, item => item.ComponentType == typeof(NanoBananaImageGenerationClient));
         Assert.Contains(metadata, item => item.ComponentType.Name == "CommunityAuthoringImageContextSegmenter");
         Assert.Contains(metadata, item => item.ComponentType.Name == "CommunityAuthoringImagePromptFactory");
 
@@ -40,7 +40,7 @@ public sealed class SsalddelCodeMetadataTests
         var metadata = ReadFeatureMetadata();
         var planner = Assert.Single(metadata, item => item.ComponentType == typeof(CommunityAuthoringImagePromptPlanner));
         var imageService = Assert.Single(metadata, item => item.ComponentType == typeof(CommunityAuthoringImageService));
-        var providerClient = Assert.Single(metadata, item => item.ComponentType == typeof(KieAiImageGenerationClient));
+        var providerClient = Assert.Single(metadata, item => item.ComponentType == typeof(NanoBananaImageGenerationClient));
 
         Assert.Equal(SsalddelCodeEffect.None, planner.Effects);
         Assert.True(imageService.Effects.HasFlag(SsalddelCodeEffect.PersistentWrite));
@@ -92,12 +92,22 @@ public sealed class SsalddelCodeMetadataTests
         Assert.Contains(metadata, item => item.ComponentType == typeof(RegionalCultureImagePromptDto));
         Assert.Contains(metadata, item => item.ComponentType == typeof(지역문화이미지Prompt조회UseCase));
         Assert.Contains(metadata, item => item.ComponentType == typeof(지역문화이미지PromptController));
-        Assert.All(metadata, item =>
+        var readOnlyComponents = metadata.Where(item =>
+            item.ComponentType == typeof(RegionalCultureImagePromptDto)
+            || item.ComponentType == typeof(지역문화이미지Prompt조회UseCase)
+            || item.ComponentType == typeof(지역문화이미지PromptController));
+        Assert.All(readOnlyComponents, item =>
         {
             Assert.False(item.Effects.HasFlag(SsalddelCodeEffect.ThirdPartyApiCall));
             Assert.False(item.Effects.HasFlag(SsalddelCodeEffect.MayIncurExternalCost));
             Assert.False(string.IsNullOrWhiteSpace(item.Boundary));
         });
+
+        var generation = Assert.Single(
+            metadata,
+            item => item.ComponentType == typeof(지역문화이미지생성관리UseCase));
+        Assert.True(generation.Effects.HasFlag(SsalddelCodeEffect.ThirdPartyApiCall));
+        Assert.True(generation.Effects.HasFlag(SsalddelCodeEffect.MayIncurExternalCost));
     }
 
     private static IReadOnlyList<SsalddelCodeMetadataDescriptor> ReadFeatureMetadata()

@@ -39,8 +39,16 @@ public sealed class 지역문화이미지Prompt조회UseCaseTests
             Assert.True(item.RequiresEvidenceReview);
             Assert.Equal("16:9", item.AspectRatio);
             Assert.Equal("center-4:3", item.SafeCrop);
+            Assert.Equal(2, item.PromptVersion);
+            Assert.Equal(
+                RegionalCultureAnimationStyleCodes.CinematicStylized3D,
+                item.VisualStyleCode);
+            Assert.Equal(
+                RegionalCultureAnimationStyleCodes.TargetImagesPerRegion,
+                item.TargetImageCount);
             Assert.NotEmpty(item.VisualAnchors);
             Assert.NotEmpty(item.AvoidExpressions);
+            Assert.Contains("스타일라이즈드 3D 애니메이션", item.PromptKo, StringComparison.Ordinal);
             Assert.Contains("생성 전", item.PromptKo, StringComparison.Ordinal);
         });
     }

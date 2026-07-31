@@ -130,6 +130,8 @@ public sealed class 지역문화이미지Prompt조회UseCase(
             entity.RequiresEvidenceReview,
             entity.EvidenceNotesKo,
             entity.PromptVersion,
+            RegionalCultureAnimationStyleCodes.CinematicStylized3D,
+            RegionalCultureAnimationStyleCodes.TargetImagesPerRegion,
             entity.UpdatedAtUtc);
 
     private static IReadOnlyList<string> DeserializeList(string json)

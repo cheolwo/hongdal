@@ -9,6 +9,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSsalddelCollectiveProcurementDomainServices();
         services.AddSsalddelCommunityDomainServices();
         services.AddSsalddelOperationsDomainServices();
+        services.AddSsalddelRegionalCultureDomainServices();
 
         return services;
     }

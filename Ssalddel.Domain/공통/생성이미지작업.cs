@@ -106,6 +106,7 @@ public static class 생성이미지용도
     public const string 주문후기사진 = "주문후기사진";
     public const string 상품상세페이지생성이미지 = "상품상세페이지생성이미지";
     public const string 커뮤니티글쓰기이미지 = "커뮤니티글쓰기이미지";
+    public const string 지역문화애니메이션 = "지역문화애니메이션";
 }
 
 public static class 생성이미지작업상태

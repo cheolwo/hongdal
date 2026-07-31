@@ -72,7 +72,7 @@ public static class 지역문화이미지PromptSeeder
 internal static class 지역문화이미지PromptSeedData
 {
     private static readonly DateTime SeededAtUtc =
-        new(2026, 7, 26, 0, 0, 0, DateTimeKind.Utc);
+        new(2026, 7, 30, 0, 0, 0, DateTimeKind.Utc);
 
     public static IReadOnlyList<지역문화이미지Prompt> All =>
         KoreaRows
@@ -108,7 +108,7 @@ internal static class 지역문화이미지PromptSeedData
             ReviewStatusCode = 지역문화이미지Prompt검토상태Codes.ResearchDraft,
             RequiresEvidenceReview = true,
             EvidenceNotesKo = BuildEvidenceNotes(row),
-            PromptVersion = 1,
+            PromptVersion = 2,
             CreatedAtUtc = SeededAtUtc,
             UpdatedAtUtc = SeededAtUtc
         };
@@ -119,15 +119,20 @@ internal static class 지역문화이미지PromptSeedData
         IReadOnlyList<string> anchors,
         IReadOnlyList<string> avoid)
         => $"""
-            지역 문화 이해를 돕는 따뜻하고 사실적인 현대 편집 일러스트. {row.RegionNameKo}의 현재 생활 장면을 그린다.
+            지역 문화 이해를 돕는 따뜻한 스타일라이즈드 3D 애니메이션 장면. {row.RegionNameKo}의 현재 생활을 장편 애니메이션의 한 장면처럼 그린다.
             지형과 환경: {row.GeographySummaryKo}
             생활문화 장면: {row.CultureSummaryKo}
             핵심 시각 요소: {string.Join(", ", anchors)}.
+            부드럽고 입체적인 형태, 손으로 다듬은 듯한 재질, 전경·중경·배경이 분리된 깊이감,
+            따뜻한 빛과 서늘한 환경색의 균형, 절제된 표정과 자연스러운 동작을 사용한다.
+            실사 사진이나 평면 2D 삽화가 아니라 고품질 3D 애니메이션 필름 스틸처럼 표현하되
+            특정 제작사·작가·기존 캐릭터의 화풍이나 인물을 복제하지 않는다.
             주민은 관광객을 위한 연출이 아니라 실제 생활·작업·공예·음식 준비를 함께하는 모습으로 표현하고,
             연령과 배경이 다양한 사람을 현대의 일상복으로 자연스럽게 배치한다.
             음식과 특산물은 1~2개만 보조 요소로 두며 지역 전체나 상품 원산지의 증명처럼 표현하지 않는다.
             16:9 가로 구도, 중앙 4:3 안전 영역에 핵심 인물과 문화 요소를 모두 배치하고 카드 크롭을 고려해 가장자리에 중요한 대상을 두지 않는다.
             화면 안에 문자, 가격, 로고, 국기, 행정구역 지도, 정치적 상징을 넣지 않는다.
+            우주 구체, 마법 에너지, 판타지 문양처럼 지역 생활과 무관한 장식은 넣지 않는다.
             피해야 할 표현: {string.Join(", ", avoid)}.
             생성 전 해당 지역의 최신 공식 문화·관광 자료와 당사자 공동체 자료로 건축·복식·공예·음식 표현을 재검토한다.
             """;

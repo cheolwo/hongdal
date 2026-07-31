@@ -26,6 +26,8 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CommunityPostStorageOptions>(configuration.GetSection(CommunityPostStorageOptions.SectionName));
         services.Configure<GeminiImageOptions>(
             configuration.GetSection(GeminiImageOptions.SectionName));
+        services.Configure<RegionalCultureImageGenerationOptions>(
+            configuration.GetSection(RegionalCultureImageGenerationOptions.SectionName));
         services.Configure<HIOPSAIOptions>(configuration.GetSection(HIOPSAIOptions.SectionName));
         services.Configure<NaverCloudDirectionsOptions>(configuration.GetSection(NaverCloudDirectionsOptions.SectionName));
         services.Configure<NaverMapsOptions>(configuration.GetSection(NaverMapsOptions.SectionName));
