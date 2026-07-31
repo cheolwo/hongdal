@@ -36,16 +36,25 @@
 ## 승인과 생성 흐름
 
 ```text
-ResearchDraft v2
+지역 조사 ResearchDraft v2
+  -> 지역별 로컬 장면 프롬프트 팩 작성
+  -> 팩 상태 ResearchDraft
   -> 공식 지역 원천 검토
   -> 고정관념 위험 검토
-  -> ApprovedForGeneration
+  -> 팩 상태 ApprovedForBatch
+  -> Nano Banana Batch 초안 생성
+  -> A/B/C 선별
+  -> 필요한 장면만 단건 보정
   -> KR, US, CN 순서로 한 지역 선택
-  -> scene-01 ... scene-10 순차 작업
-  -> 외부 생성
+  -> scene-01 ... scene-10 결과 수집
   -> 저장소 업로드
   -> 완료 URL과 진행률 조회
 ```
+
+장면별 제작 기준은 코드 안의 seed 문장보다
+[`지역문화 Nano Banana Batch 프롬프트 우선 제작 제안서`](RegionalCultureNanoBananaBatchPromptFirstProposal.md)와
+지역별 로컬 프롬프트 팩을 우선한다. 팩이 없거나 `ApprovedForBatch`가 아니면
+Batch 생성 대상으로 보내지 않는다.
 
 승인 API는 공식 원천과 고정관념 위험을 모두 검토했다는 명시적 표시와 20자 이상의 검토 메모를 요구한다. `ResearchDraft`를 자동 승인하지 않으며, 이미 검토된 프롬프트는 seed 갱신으로 덮어쓰지 않는다.
 
