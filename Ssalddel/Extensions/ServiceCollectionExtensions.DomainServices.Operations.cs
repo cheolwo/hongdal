@@ -139,7 +139,6 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I기사월정산Service, 기사월정산Service>();
         services.AddScoped<IPlatformProfitReturnService, PlatformProfitReturnService>();
         services.AddHostedService<배차실행인덱스예열HostedService>();
-        services.AddHostedService<KieAiTaskPollingWorker>();
 
         return services;
     }

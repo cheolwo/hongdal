@@ -20,11 +20,6 @@ public interface I샘플이미지작업UseCase
 [SsalddelApiWorkflow(SsalddelWorkflow.SalesChannelFulfillment)]
 [SsalddelUseCase("샘플 이미지 작업", Summary = "운영자가 샘플 데이터의 누락 이미지를 생성하고 실패한 이미지 작업을 재시도합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator)]
-[SsalddelUseCaseRelation(
-    SsalddelUseCaseRelationKind.Include,
-    "KieAi콜백UseCase",
-    Condition = "외부 이미지 생성 작업의 완료 콜백을 받아 후처리하는 경우",
-    Summary = "샘플 이미지 작업은 외부 Kie AI 콜백 후처리를 포함합니다.")]
 public sealed class 샘플이미지작업UseCase : I샘플이미지작업UseCase
 {
     private readonly I샘플이미지생성Service _sampleImageGenerationService;

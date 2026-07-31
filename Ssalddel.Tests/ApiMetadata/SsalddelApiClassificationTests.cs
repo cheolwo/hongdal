@@ -159,7 +159,6 @@ public sealed class SsalddelApiClassificationTests
             typeof(VersionFeatureFlagsController),
             typeof(MobilePushInstallationsController),
             typeof(SampleImagesController),
-            typeof(KieAi콜백Controller),
             typeof(공공데이터ApiMetadataController),
             typeof(공개LocaleController),
             typeof(파일업로드Controller)

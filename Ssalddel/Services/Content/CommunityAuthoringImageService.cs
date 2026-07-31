@@ -48,18 +48,18 @@ public sealed record CommunityAuthoringGeneratedImageFile(
 public sealed class CommunityAuthoringImageService : ICommunityAuthoringImageService
 {
     private const string TargetType = "CommunityPostDraft";
-    private const string Disclosure = "Kie.ai GPT Image API로 생성한 AI 이미지입니다. 사실 자료나 현장 증빙으로 사용하기 전에 사람이 검토해야 합니다.";
+    private const string Disclosure = "Google Gemini Nano Banana로 생성한 AI 이미지입니다. 사실 자료나 현장 증빙으로 사용하기 전에 사람이 검토해야 합니다.";
 
     private readonly SsalddelContext _db;
     private readonly I샘플이미지생성Service _imageGenerationService;
     private readonly IObjectStorageService _storageService;
-    private readonly KieAiOptions _options;
+    private readonly GeminiImageOptions _options;
 
     public CommunityAuthoringImageService(
         SsalddelContext db,
         I샘플이미지생성Service imageGenerationService,
         IObjectStorageService storageService,
-        IOptions<KieAiOptions> options)
+        IOptions<GeminiImageOptions> options)
     {
         _db = db;
         _imageGenerationService = imageGenerationService;
@@ -169,9 +169,9 @@ public sealed class CommunityAuthoringImageService : ICommunityAuthoringImageSer
         var message = status switch
         {
             CommunityAuthoringImageTaskStatusCodes.Completed => "이미지 생성을 완료했습니다.",
-            CommunityAuthoringImageTaskStatusCodes.Failed => "이미지를 생성하지 못했습니다. Kie.ai 설정과 프롬프트를 확인해 주세요.",
-            CommunityAuthoringImageTaskStatusCodes.Queued => "Kie.ai 이미지 생성 대기열에 등록했습니다.",
-            _ => "Kie.ai에서 이미지를 생성하고 있습니다."
+            CommunityAuthoringImageTaskStatusCodes.Failed => "이미지를 생성하지 못했습니다. Gemini 설정과 프롬프트를 확인해 주세요.",
+            CommunityAuthoringImageTaskStatusCodes.Queued => "Gemini 이미지 생성 대기열에 등록했습니다.",
+            _ => "Gemini에서 이미지를 생성하고 있습니다."
         };
 
         return new CommunityAuthoringImageTaskResponse(

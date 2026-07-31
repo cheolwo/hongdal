@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
 using 살뜰.도메인.공통;
-using 살뜰.Services.External.KieAi;
+using 살뜰.Services.External.Gemini;
 using 살뜰.Services.Options;
 
 namespace 살뜰.Services.Images;
@@ -13,7 +13,6 @@ public interface I샘플이미지생성Service
     Task<IReadOnlyList<생성이미지작업>> 작업목록조회Async(샘플이미지작업조회조건 request, CancellationToken cancellationToken = default);
     Task<생성이미지작업> 작업재시도Async(long 작업Id, CancellationToken cancellationToken = default);
     Task<bool> 작업후처리Async(long 작업Id, string? rawJson = null, CancellationToken cancellationToken = default);
-    Task<int> 미완료작업처리Async(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<생성이미지작업>> 누락샘플이미지생성Async(string 대상타입, string 이미지용도, int maxCount, bool includeFailed, CancellationToken cancellationToken = default);
 }
 
@@ -30,22 +29,22 @@ public sealed class 샘플이미지작업조회조건
 public sealed class 샘플이미지생성Service : I샘플이미지생성Service
 {
     private readonly SsalddelContext _db;
-    private readonly IKieAiImageGenerationClient _kieAiClient;
+    private readonly IImageGenerationProviderClient _imageProviderClient;
     private readonly 이미지프롬프트생성기Resolver _promptResolver;
     private readonly I샘플이미지대상ResolverResolver _targetResolverResolver;
     private readonly IObjectStorageService _objectStorageService;
-    private readonly KieAiOptions _options;
+    private readonly GeminiImageOptions _options;
 
     public 샘플이미지생성Service(
         SsalddelContext db,
-        IKieAiImageGenerationClient kieAiClient,
+        IImageGenerationProviderClient imageProviderClient,
         이미지프롬프트생성기Resolver promptResolver,
         I샘플이미지대상ResolverResolver targetResolverResolver,
         IObjectStorageService objectStorageService,
-        Microsoft.Extensions.Options.IOptions<KieAiOptions> options)
+        Microsoft.Extensions.Options.IOptions<GeminiImageOptions> options)
     {
         _db = db;
-        _kieAiClient = kieAiClient;
+        _imageProviderClient = imageProviderClient;
         _promptResolver = promptResolver;
         _targetResolverResolver = targetResolverResolver;
         _objectStorageService = objectStorageService;
@@ -68,12 +67,10 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
             프롬프트 = prompt,
             종횡비 = request.종횡비,
             해상도 = request.해상도,
-            외부모델명 = _options.Model
+            외부모델명 = _imageProviderClient.Model
         };
 
-        var submitted = await 제출Async(entity, cancellationToken);
-        await TryMarkTargetRequestedAsync(submitted, cancellationToken);
-        return submitted;
+        return await 제출Async(entity, cancellationToken);
     }
 
     public Task<생성이미지작업?> 작업조회Async(long 작업Id, CancellationToken cancellationToken = default)
@@ -154,9 +151,7 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
             재시도횟수 = original.재시도횟수 + 1
         };
 
-        var submitted = await 제출Async(retry, cancellationToken);
-        await TryMarkTargetRequestedAsync(submitted, cancellationToken);
-        return submitted;
+        return await 제출Async(retry, cancellationToken);
     }
 
     public async Task<IReadOnlyList<생성이미지작업>> 누락샘플이미지생성Async(string 대상타입, string 이미지용도, int maxCount, bool includeFailed, CancellationToken cancellationToken = default)
@@ -202,8 +197,7 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
 
     private async Task<생성이미지작업> 제출Async(생성이미지작업 entity, CancellationToken cancellationToken)
     {
-        var callbackUrl = BuildCallbackUrl();
-        entity.콜백Url = callbackUrl;
+        entity.콜백Url = null;
         entity.상태 = 생성이미지작업상태.생성대기;
         entity.생성시각 = DateTime.UtcNow;
         entity.수정시각 = DateTime.UtcNow;
@@ -219,28 +213,69 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
 
         _db.생성이미지작업.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
+        await TryMarkTargetRequestedAsync(entity, cancellationToken);
 
         try
         {
-            var result = await _kieAiClient.CreateTextToImageTaskAsync(
-                new KieAiCreateTaskRequest(
-                    entity.프롬프트,
-                    entity.종횡비,
-                    Quality: null,
-                    CallBackUrl: callbackUrl),
-                cancellationToken);
-
-            entity.외부TaskId = result.TaskId;
-            entity.최근응답원문 = result.RawJson;
-            entity.상태 = 생성이미지작업상태.생성요청됨;
+            entity.상태 = 생성이미지작업상태.생성중;
             entity.수정시각 = DateTime.UtcNow;
             await _db.SaveChangesAsync(cancellationToken);
+
+            var result = await _imageProviderClient.GenerateAsync(
+                new ImageGenerationProviderRequest(
+                    entity.프롬프트,
+                    entity.종횡비,
+                    entity.해상도),
+                cancellationToken);
+
+            entity.외부TaskId = result.ProviderTaskId;
+            entity.외부모델명 = result.Model;
+            entity.최근응답원문 = result.AuditJson;
+            entity.상태 = 생성이미지작업상태.업로드중;
+            entity.수정시각 = DateTime.UtcNow;
+            await _db.SaveChangesAsync(cancellationToken);
+
+            await using var imageStream = new MemoryStream(
+                result.ImageBytes,
+                writable: false);
+            var extension = ResolveFileExtension(result.ContentType);
+            var fileName = $"{entity.작업코드}{extension}";
+            var rootFolder = entity.샘플데이터여부
+                ? "sample-images"
+                : "generated-images";
+            var folder =
+                $"{rootFolder}/{entity.이미지용도}/{entity.대상타입}/{entity.대상식별자}";
+            var storageAccess = entity.이미지용도
+                is 생성이미지용도.기사상차인증사진
+                or 생성이미지용도.기사배차완료인증사진
+                ? ObjectStorageAccess.Private
+                : ObjectStorageAccess.Public;
+            var uploadResult = await _objectStorageService.UploadAsync(
+                imageStream,
+                fileName,
+                result.ContentType,
+                folder,
+                storageAccess,
+                cancellationToken);
+
+            entity.저장Bucket = uploadResult.ContainerName;
+            entity.저장ObjectName = uploadResult.ObjectName;
+            entity.저장Url = uploadResult.Url;
+            entity.상태 = 생성이미지작업상태.완료;
+            entity.완료시각 = DateTime.UtcNow;
+            entity.수정시각 = DateTime.UtcNow;
+            await _db.SaveChangesAsync(cancellationToken);
+            await TryMarkTargetCompletedAsync(
+                entity,
+                uploadResult.Url,
+                cancellationToken);
         }
         catch (Exception ex)
         {
             entity.상태 = 생성이미지작업상태.실패;
             entity.실패사유 = ex.Message;
             entity.최종실패시각 = DateTime.UtcNow;
+            entity.완료시각 = DateTime.UtcNow;
             entity.수정시각 = DateTime.UtcNow;
             await _db.SaveChangesAsync(cancellationToken);
             await TryMarkTargetFailedAsync(entity, ex.Message, cancellationToken);
@@ -253,64 +288,13 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
     public async Task<bool> 작업후처리Async(long 작업Id, string? rawJson = null, CancellationToken cancellationToken = default)
     {
         var entity = await _db.생성이미지작업.FirstOrDefaultAsync(x => x.Id == 작업Id, cancellationToken);
-        if (entity is null || string.IsNullOrWhiteSpace(entity.외부TaskId))
+        if (entity is null)
         {
             return false;
         }
 
-        var detail = await _kieAiClient.GetTaskDetailAsync(entity.외부TaskId, cancellationToken);
-        entity.최근응답원문 = rawJson ?? detail.RawJson;
-        entity.수정시각 = DateTime.UtcNow;
-
-        if (!detail.IsTerminal)
-        {
-            entity.상태 = 생성이미지작업상태.생성중;
-            await _db.SaveChangesAsync(cancellationToken);
-            return false;
-        }
-
-        if (!detail.IsSuccess || string.IsNullOrWhiteSpace(detail.ImageUrl))
-        {
-            entity.상태 = 생성이미지작업상태.실패;
-            entity.실패사유 = detail.RawJson;
-            entity.재시도횟수 += 1;
-            entity.최종실패시각 = DateTime.UtcNow;
-            entity.완료시각 = DateTime.UtcNow;
-            await _db.SaveChangesAsync(cancellationToken);
-            await TryMarkTargetFailedAsync(entity, detail.RawJson, cancellationToken);
-            return true;
-        }
-
-        entity.상태 = 생성이미지작업상태.업로드중;
-        entity.외부원본이미지Url = detail.ImageUrl;
-        await _db.SaveChangesAsync(cancellationToken);
-
-        await using var imageStream = await _kieAiClient.DownloadImageAsync(detail.ImageUrl, cancellationToken);
-        var extension = ResolveFileExtension(detail.ImageUrl);
-        var fileName = $"{entity.작업코드}{extension}";
-        var rootFolder = entity.샘플데이터여부 ? "sample-images" : "generated-images";
-        var folder = $"{rootFolder}/{entity.이미지용도}/{entity.대상타입}/{entity.대상식별자}";
-        var storageAccess = entity.이미지용도 is 생성이미지용도.기사상차인증사진
-            or 생성이미지용도.기사배차완료인증사진
-            ? ObjectStorageAccess.Private
-            : ObjectStorageAccess.Public;
-        var uploadResult = await _objectStorageService.UploadAsync(
-            imageStream,
-            fileName,
-            ResolveContentType(extension),
-            folder,
-            storageAccess,
-            cancellationToken);
-
-        entity.저장Bucket = uploadResult.ContainerName;
-        entity.저장ObjectName = uploadResult.ObjectName;
-        entity.저장Url = uploadResult.Url;
-        entity.상태 = 생성이미지작업상태.완료;
-        entity.완료시각 = DateTime.UtcNow;
-        entity.수정시각 = DateTime.UtcNow;
-        await _db.SaveChangesAsync(cancellationToken);
-        await TryMarkTargetCompletedAsync(entity, uploadResult.Url, cancellationToken);
-        return true;
+        return entity.상태 is 생성이미지작업상태.완료
+            or 생성이미지작업상태.실패;
     }
 
     private async Task TryMarkTargetRequestedAsync(생성이미지작업 entity, CancellationToken cancellationToken)
@@ -325,59 +309,13 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
         }
     }
 
-    public async Task<int> 미완료작업처리Async(CancellationToken cancellationToken = default)
+    private static string ResolveFileExtension(string contentType)
     {
-        var threshold = DateTime.UtcNow.AddMinutes(-Math.Max(1, _options.MaxPollingMinutes));
-        var items = await _db.생성이미지작업
-            .Where(x => x.상태 == 생성이미지작업상태.생성요청됨 || x.상태 == 생성이미지작업상태.생성중)
-            .Where(x => x.생성시각 >= threshold)
-            .OrderBy(x => x.Id)
-            .Take(20)
-            .ToListAsync(cancellationToken);
-
-        var completed = 0;
-        foreach (var item in items)
+        return contentType.Trim().ToLowerInvariant() switch
         {
-            if (await 작업후처리Async(item.Id, null, cancellationToken))
-            {
-                completed++;
-            }
-        }
-
-        return completed;
-    }
-
-    private string? BuildCallbackUrl()
-    {
-        if (string.IsNullOrWhiteSpace(_options.CallbackBaseUrl))
-        {
-            return null;
-        }
-
-        return $"{_options.CallbackBaseUrl.TrimEnd('/')}/api/v1/kie-ai/callback";
-    }
-
-    private static string ResolveFileExtension(string imageUrl)
-    {
-        if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
-        {
-            var extension = Path.GetExtension(uri.AbsolutePath);
-            if (!string.IsNullOrWhiteSpace(extension))
-            {
-                return extension;
-            }
-        }
-
-        return ".png";
-    }
-
-    private static string ResolveContentType(string extension)
-    {
-        return extension.ToLowerInvariant() switch
-        {
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".webp" => "image/webp",
-            _ => "image/png"
+            "image/jpeg" or "image/jpg" => ".jpg",
+            "image/webp" => ".webp",
+            _ => ".png"
         };
     }
 

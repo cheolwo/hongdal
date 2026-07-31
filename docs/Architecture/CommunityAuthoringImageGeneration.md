@@ -2,7 +2,7 @@
 
 ## 목적
 
-관리자가 커뮤니티 글을 작성하면서 현재 제목과 본문을 연속된 문맥으로 나누고, 문맥별 이미지 프롬프트를 검토한 뒤 선택한 항목만 Kie.ai GPT Image API로 생성해 게시글 사진으로 붙일 수 있게 한다. 이미지 생성은 글 저장, 예약 발행, 다이어그램, 원장 또는 업무 상태를 자동으로 변경하지 않는다.
+관리자가 커뮤니티 글을 작성하면서 현재 제목과 본문을 연속된 문맥으로 나누고, 문맥별 이미지 프롬프트를 검토한 뒤 선택한 항목만 Google Gemini Nano Banana로 생성해 게시글 사진으로 붙일 수 있게 한다. 이미지 생성은 글 저장, 예약 발행, 다이어그램, 원장 또는 업무 상태를 자동으로 변경하지 않는다.
 
 ```mermaid
 flowchart LR
@@ -11,16 +11,16 @@ flowchart LR
     C --> D["운영자 프롬프트 검토·선택"]
     D -->|선택 문맥마다 1회| E["관리자 이미지 생성 API"]
     E --> F["공통 생성 이미지 작업 저장"]
-    F --> G["Kie.ai createTask"]
-    G --> H["recordInfo 상태 조회 또는 callback"]
-    H --> I["결과 이미지 다운로드·GCS 보관"]
+    F --> G["Gemini interactions 이미지 생성"]
+    G --> H["Base64 결과 크기·형식 검증"]
+    H --> I["결과 이미지 GCS 보관"]
     I --> J["운영자 미리보기·첨부 선택"]
     J -->|글 저장 성공 뒤 문맥 순서| K["기존 게시글 첨부 UseCase"]
 ```
 
 ## 문맥 분할과 프롬프트 설계
 
-`CommunityAuthoringImagePromptPlanner`는 외부 LLM이나 Kie.ai를 호출하지 않는 결정적 planner다. 하위 `ContextSegmenter`가 Markdown 제목, 빈 줄 앞의 짧은 소제목, 빈 줄로 구분된 일반 문단 순서로 원문 구간을 찾고, `PromptFactory`가 외부 전송용 문맥과 표현 제약을 조립한다. 구간이 요청한 이미지 수보다 많으면 누락하거나 순서를 바꾸지 않고 인접 구간을 앞에서부터 고르게 묶는다. 게시글 첨부 한도에 맞춰 한 글에서 계획할 수 있는 이미지는 1~5개다.
+`CommunityAuthoringImagePromptPlanner`는 외부 LLM이나 Gemini를 호출하지 않는 결정적 planner다. 하위 `ContextSegmenter`가 Markdown 제목, 빈 줄 앞의 짧은 소제목, 빈 줄로 구분된 일반 문단 순서로 원문 구간을 찾고, `PromptFactory`가 외부 전송용 문맥과 표현 제약을 조립한다. 구간이 요청한 이미지 수보다 많으면 누락하거나 순서를 바꾸지 않고 인접 구간을 앞에서부터 고르게 묶는다. 게시글 첨부 한도에 맞춰 한 글에서 계획할 수 있는 이미지는 1~5개다.
 
 각 프롬프트에는 다음 내용이 들어간다.
 
@@ -34,25 +34,25 @@ flowchart LR
 
 계획 결과의 프롬프트는 화면에서 문맥별로 수정할 수 있다. 프롬프트나 비율을 수정하면 해당 항목의 이전 생성 결과와 첨부 선택을 해제해 서로 다른 내용의 이미지를 잘못 붙이지 않게 한다. `선택 문맥 생성`은 아직 작업이 없는 선택 항목만 문맥 순서대로 호출하며, 완료·진행 중 항목을 자동 재생성하지 않는다. 개별 `다시 생성`은 운영자가 비용을 인지하고 명시적으로 실행하는 별도 명령이다.
 
-## Kie.ai 계약
+## Gemini Nano Banana 계약
 
-서버는 Kie.ai Market API 계약에 맞춰 다음 endpoint만 호출한다.
+서버는 Google Gemini Interactions API 계약에 맞춰 다음 endpoint를 호출한다.
 
 | 동작 | Method·Path | 주요 계약 |
 | --- | --- | --- |
-| 생성 작업 등록 | `POST /api/v1/jobs/createTask` | model `gpt-image-2-text-to-image`, `input.prompt`, `input.aspect_ratio`, 선택적 `callBackUrl` |
-| 작업 상태 조회 | `GET /api/v1/jobs/recordInfo?taskId={taskId}` | `state`, `failMsg`, 문자열 또는 객체형 `resultJson.resultUrls` |
+| 이미지 생성 | `POST /v1beta/interactions` | `model`, text `input`, image `response_format` |
+| 결과 추출 | 같은 응답의 `steps[].content[]` | `type=image`, `mime_type`, Base64 `data` |
 
-공식 계약은 [GPT Image 2 Text-to-Image](https://docs.kie.ai/market/gpt/gpt-image-2-text-to-image)와 [통합 작업 상세 조회](https://docs.kie.ai/market/common/get-task-detail)를 기준으로 한다. 응답의 `waiting`, `queuing`, `generating`은 진행 중, `success`는 완료, `fail`은 실패로 정규화한다. 이전 Adapter가 반환할 수 있는 `completed`, `succeeded`, `failed`, `error`도 호환 상태로 읽는다.
+서버는 API key를 `x-goog-api-key` 헤더로 전달하고 설정된 Nano Banana 모델을 명시한다. 응답 이미지의 형식과 크기를 검증하고, Base64 원문 대신 모델·형식·크기·비율·해상도만 감사 JSON으로 남긴다.
 
-생성 결과 URL은 외부 임시 URL로만 노출하지 않는다. 서버가 HTTP(S) 주소인지 검증해 내려받고 기존 `생성이미지작업`에 원본 응답과 상태를 남긴 뒤 Google Cloud Storage에 보관한다. 게시글에는 보관된 파일만 기존 첨부 UseCase를 통해 등록한다.
+생성 결과는 외부 응답에만 의존하지 않는다. 서버가 기존 `생성이미지작업`의 상태를 갱신한 뒤 Google Cloud Storage에 보관하며, 게시글에는 보관된 파일만 기존 첨부 UseCase를 통해 등록한다.
 
 ## 서버와 화면 경계
 
 | 계층 | 책임 |
 | --- | --- |
-| `KieAiImageGenerationClient` | Bearer 인증, Market 요청·응답 직렬화, 결과 URL 추출과 다운로드 |
-| `샘플이미지생성Service` | 공통 작업 영속화, polling·callback 후처리, GCS 업로드 |
+| `NanoBananaImageGenerationClient` | API key 인증, Interactions 요청 직렬화, Base64 이미지 추출 |
+| `샘플이미지생성Service` | 공통 작업 영속화, 동기식 생성 결과 검증, GCS 업로드 |
 | `CommunityAuthoringImagePromptPlanner` | 입력 검증과 문맥 계획 결과 조율 |
 | `CommunityAuthoringImageContextSegmenter` | 소제목·문단 파싱과 인접 구간 병합, 내부 원문 문맥 보존 |
 | `CommunityAuthoringImagePromptFactory` | 외부 문맥 치환·길이 조정, 시각적 초점과 안전 제약 조립 |
@@ -62,18 +62,18 @@ flowchart LR
 | `CommunityAuthoringImagePromptItemViewModel` | 문맥별 프롬프트·비율·생성 상태·오류·첨부 선택 관리 |
 | 공통 Razor 도구 | 문맥 선택, 프롬프트 편집, 종횡비, 대기·실패·완료, 미리보기와 첨부 선택 표시 |
 
-각 타입에는 `community-authoring-image` 기능 키의 `SsalddelCodeMetadataAttribute`를 붙인다. `SsalddelCodeMetadataReader`로 계약부터 Kie.ai adapter까지 `FlowOrder` 순서로 조회할 수 있으며, 세부 규약은 [코드 탐색 메타데이터](SsalddelCodeMetadata.md)를 따른다.
+각 타입에는 `community-authoring-image` 기능 키의 `SsalddelCodeMetadataAttribute`를 붙인다. `SsalddelCodeMetadataReader`로 계약부터 Gemini adapter까지 `FlowOrder` 순서로 조회할 수 있으며, 세부 규약은 [코드 탐색 메타데이터](SsalddelCodeMetadata.md)를 따른다.
 
-지원 비율은 `auto`, `1:1`, `3:2`, `2:3`으로 제한한다. 프롬프트는 10자 이상 4,000자 이하이며, 초안에서 문맥과 프롬프트를 계획하는 행위는 외부 API를 호출하지 않는다. 선택한 문맥마다 `생성`을 실행할 때만 별도의 Kie.ai 작업과 비용이 발생할 수 있다.
+지원 비율은 `auto`, `1:1`, `3:2`, `2:3`으로 제한한다. 프롬프트는 10자 이상 4,000자 이하이며, 초안에서 문맥과 프롬프트를 계획하는 행위는 외부 API를 호출하지 않는다. 선택한 문맥마다 `생성`을 실행할 때만 별도의 Gemini 요청과 비용이 발생할 수 있다.
 
 게시글 저장과 이미지 첨부는 의도적으로 분리한다. 글 저장에 성공한 뒤 저장 시 사용한 비밀번호로 선택 이미지를 문맥 순서대로 기존 첨부 UseCase에 전달한다. 한 이미지가 실패해도 나머지 첨부를 계속하고 실패 항목의 선택은 유지한다. 현재 게시글 계약은 본문 중간의 정확한 위치가 아니라 순서 있는 사진 첨부 목록을 제공하므로 문맥 순서를 보존하되 inline 배치는 하지 않는다. 생성 작업 코드는 글쓰기 전용 대상·용도와 함께 조회해 다른 이미지 작업을 첨부할 수 없게 한다.
 
 ## 설정과 운영 경계
 
-- `KieAi:ApiKey`는 tracked 설정에 넣지 않고 `appsettings.Local.json`, user secrets 또는 `KieAi__ApiKey` 환경 변수로 주입한다.
-- 기본 Base URL은 `https://api.kie.ai`, 요청 제한 시간은 60초다.
-- 외부 callback을 사용할 때만 공개 HTTPS `KieAi:CallbackBaseUrl`을 설정한다. callback이 없어도 화면 상태 조회와 기존 미완료 작업 처리가 같은 후처리를 수행한다.
-- 생성 결과에는 Kie.ai GPT Image API 사용과 사람 검토 필요 문구를 항상 표시한다.
+- `GeminiImage:ApiKey`는 tracked 설정에 넣지 않고 `appsettings.Local.json`, user secrets 또는 `GeminiImage__ApiKey` 환경 변수로 주입한다.
+- 기본 Base URL은 `https://generativelanguage.googleapis.com/v1beta/`, 기본 모델은 `gemini-3.1-flash-image`, 요청 제한 시간은 180초다.
+- 생성 호출은 동기식으로 결과를 받아 object storage에 저장한다. Base64 원본은 로그와 DB에 남기지 않고 크기·형식·모델 등 감사 정보만 기록한다.
+- 생성 결과에는 Google Gemini Nano Banana 사용과 사람 검토 필요 문구를 항상 표시한다.
 - 생성 이미지는 실제 상품, 현장, 통계, 계약, 통관 또는 품질 증빙이 아니다. 공식 로고·인증표시·수치·문서를 사실처럼 만들도록 프롬프트를 보강하지 않는다.
 - 운영자가 결과를 선택하고 글 저장이 성공하기 전에는 게시글이나 원장과 연결하지 않는다.
 
@@ -88,8 +88,8 @@ flowchart LR
 
 ## 검증 기준
 
-- 생성 요청에는 공식 model·prompt·aspect ratio만 전달하고 이전 `resolution` 필드는 보내지 않는다.
-- 작업 상세의 문자열형 `resultJson`에서 결과 URL을 읽고 `fail`을 종료 실패로 처리한다.
+- 생성 요청에는 model, text input, image response format을 전달하고 허용된 비율과 해상도만 사용한다.
+- 응답의 model output에서 이미지 Base64를 읽고 허용 형식·최대 크기를 검증한다.
 - API key가 없으면 외부 호출 전에 실패하고 비밀값을 응답이나 로그에 포함하지 않는다.
 - 완료되지 않았거나 글쓰기 용도가 아닌 작업은 게시글에 첨부할 수 없다.
 - 원문 구간이 이미지 한도보다 많아도 앞뒤 순서를 유지한 채 인접 구간을 묶고 내용을 조용히 누락하지 않는다.

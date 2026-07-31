@@ -96,7 +96,7 @@ rg -n "SsalddelCodeFeatureKeys.CommunityAuthoringImage" Ssalddel.Contracts Ssald
 rg -n "SsalddelCodeMetadata\(" -g "*.cs" -g "*.razor"
 ```
 
-런타임 또는 테스트에서는 `SsalddelCodeMetadataReader.ReadFeature`에 관련 assembly를 전달하면 `FlowOrder` 순서의 descriptor를 얻는다. 현재 기준 구현인 `community-authoring-image`는 `View -> ViewModel -> client port -> 관리자 HTTP adapter -> API -> 문맥 planner -> 생성 orchestration -> Kie.ai adapter`로 이어진다.
+런타임 또는 테스트에서는 `SsalddelCodeMetadataReader.ReadFeature`에 관련 assembly를 전달하면 `FlowOrder` 순서의 descriptor를 얻는다. 현재 기준 구현인 `community-authoring-image`는 `View -> ViewModel -> client port -> 관리자 HTTP adapter -> API -> 문맥 planner -> 생성 orchestration -> Gemini Nano Banana adapter`로 이어진다.
 
 ## 경계
 

@@ -7,7 +7,7 @@ namespace Ssalddel.Services.Content;
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.CommunityAuthoringImage,
     SsalddelCodeLayer.Application,
-    "문맥 그룹을 Kie.ai용 편집 이미지 프롬프트로 변환하고 연락처를 제거",
+    "문맥 그룹을 Gemini Nano Banana용 편집 이미지 프롬프트로 변환하고 연락처를 제거",
     FlowOrder = 42,
     Boundary = "URL, 이메일, 한국·북미 전화번호를 외부 프롬프트에서 제거합니다.")]
 internal static class CommunityAuthoringImagePromptFactory

@@ -1,7 +1,7 @@
 using 살뜰.Services.Dispatch.Notification;
 using 살뜰.Services.External.Customs;
 using 살뜰.Services.External.Google;
-using 살뜰.Services.External.KieAi;
+using 살뜰.Services.External.Gemini;
 using 살뜰.Services.External.PublicData;
 using 살뜰.Services.HIOPSAI;
 using 살뜰.Services.Notifications;
@@ -86,11 +86,11 @@ public static partial class ServiceCollectionExtensions
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<TossPaymentsOptions>>().Value;
             client.BaseAddress = new Uri(options.BaseUrl);
         });
-        services.AddHttpClient<IKieAiImageGenerationClient, KieAiImageGenerationClient>((sp, client) =>
+        services.AddHttpClient<IImageGenerationProviderClient, NanoBananaImageGenerationClient>((sp, client) =>
         {
-            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<KieAiOptions>>().Value;
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GeminiImageOptions>>().Value;
             client.BaseAddress = new Uri($"{options.BaseUrl.TrimEnd('/')}/");
-            client.Timeout = TimeSpan.FromSeconds(Math.Max(10, options.TimeoutSeconds));
+            client.Timeout = TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 10, 600));
         });
         services.AddHttpClient<INaverMapsReverseGeocodingService, NaverMapsReverseGeocodingService>((sp, client) =>
         {

@@ -6,7 +6,6 @@ using 살뜰.Infrastructure.BackgroundJobs.DispatchQueue;
 using 살뜰.Services.Dispatch.Queue;
 using 살뜰.Services.Documents;
 using 살뜰.Services.External.Customs;
-using 살뜰.Services.External.KieAi;
 using 살뜰.Services.External.PublicData;
 using 살뜰.Services.HIOPSAI;
 using 살뜰.Services.Notifications;
@@ -25,7 +24,8 @@ public static partial class ServiceCollectionExtensions
         services.Configure<ObjectStorageOptions>(configuration.GetSection(ObjectStorageOptions.SectionName));
         services.Configure<AzureBlobStorageOptions>(configuration.GetSection(AzureBlobStorageOptions.SectionName));
         services.Configure<CommunityPostStorageOptions>(configuration.GetSection(CommunityPostStorageOptions.SectionName));
-        services.Configure<KieAiOptions>(configuration.GetSection(KieAiOptions.SectionName));
+        services.Configure<GeminiImageOptions>(
+            configuration.GetSection(GeminiImageOptions.SectionName));
         services.Configure<HIOPSAIOptions>(configuration.GetSection(HIOPSAIOptions.SectionName));
         services.Configure<NaverCloudDirectionsOptions>(configuration.GetSection(NaverCloudDirectionsOptions.SectionName));
         services.Configure<NaverMapsOptions>(configuration.GetSection(NaverMapsOptions.SectionName));

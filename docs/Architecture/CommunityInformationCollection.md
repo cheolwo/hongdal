@@ -74,8 +74,8 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 | `GET` | `/api/v1/admin/content/official-food-recipes/dishes/{dishKey}/variants` | 한 음식의 출처별 재료·조리 단계와 수집 당시 권리 snapshot 조회 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/collections` | 명시한 원천을 제한된 페이지·항목 수로 DB에 수집 |
 | `POST` | `/api/v1/admin/content/information/authoring/ai-drafts` | 허용된 자료 Adapter와 현재 글쓰기 문맥으로 검토 전용 LLM 초안 생성 |
-| `POST` | `/api/v1/admin/content/information/authoring/images/prompt-plan` | 현재 글을 연속 문맥으로 나누고 문맥별 Kie.ai 프롬프트 계획 생성. 외부 이미지 API는 호출하지 않음 |
-| `POST` | `/api/v1/admin/content/information/authoring/images` | Kie.ai GPT Image 글쓰기 이미지 작업 등록 |
+| `POST` | `/api/v1/admin/content/information/authoring/images/prompt-plan` | 현재 글을 연속 문맥으로 나누고 문맥별 Gemini 프롬프트 계획 생성. 외부 이미지 API는 호출하지 않음 |
+| `POST` | `/api/v1/admin/content/information/authoring/images` | Gemini Nano Banana 글쓰기 이미지 생성 요청 |
 | `GET` | `/api/v1/admin/content/information/authoring/images/{jobCode}` | 이미지 생성 상태 조회와 결과 보관 상태 갱신 |
 | `POST` | `/api/v1/admin/content/information/authoring/images/{jobCode}/post-attachments/{postId}` | 운영자가 선택한 완료 이미지를 저장된 게시글 사진으로 첨부 |
 | `GET` | `/api/v1/admin/content/information/social-media/sources` | SNS Adapter별 활성화·검색·URL 조사 지원 여부 조회 |
@@ -132,7 +132,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 - `YouTube·SNS`: 저장된 YouTube 영상을 루트로 선택한 공개 SNS 원천을 조사하고, SNS별 하위 자료·원문 링크·수집 한계·편집 초안을 Mongo 작업공간에 저장한다. 최근 작업 목록에서는 다이어그램 단계 수, 업체 후보 수와 연락 준비 상태를 함께 확인한다.
 - `다이어그램`: 같이 수입 원장 여정을 기본으로 불러오고, 직접 단계를 추가·정렬하거나 단계별 업체·기관 후보와 공개 연락처 근거를 연결해 글 초안으로 전환한다.
 - `LLM 근거 초안`: 운영자가 선택한 수집 자료와 필요할 때만 다시 조회한 YouTube·SNS 자료, 현재 초안·다이어그램·상호 이익·통계 문맥을 서버 allowlist 안에서 조립해 검토용 초안을 만든다. 생성만으로 현재 글을 덮어쓰지 않으며 적용과 다이어그램 단계 가져오기는 각각 별도 명령이다. 세부 경계는 [커뮤니티 글쓰기 LLM 근거 초안](CommunityAuthoringAI.md)에 둔다.
-- `이미지`: 현재 글의 소제목과 문단을 최대 5개 연속 문맥으로 묶어 각각의 프롬프트를 먼저 검토한다. 선택한 문맥마다 명시적으로 Kie.ai GPT Image 작업을 한 건씩 등록하고, 운영자가 선택한 완료 이미지만 글 저장 성공 뒤 문맥 순서대로 기존 사진 첨부 경계에 연결한다. 세부 계약은 [커뮤니티 글쓰기 이미지 생성](CommunityAuthoringImageGeneration.md)에 둔다.
+- `이미지`: 현재 글의 소제목과 문단을 최대 5개 연속 문맥으로 묶어 각각의 프롬프트를 먼저 검토한다. 선택한 문맥마다 명시적으로 Gemini Nano Banana 생성을 한 건씩 실행하고, 운영자가 선택한 완료 이미지만 글 저장 성공 뒤 문맥 순서대로 기존 사진 첨부 경계에 연결한다. 세부 계약은 [커뮤니티 글쓰기 이미지 생성](CommunityAuthoringImageGeneration.md)에 둔다.
 
 1. 서버관리자가 원천, 국가, 검토 상태와 검색어로 후보를 조회한다.
 2. 후보의 제공기관, 기준일, 수집 시각, 국가·언어, 원문, 출처 설명과 해석 한계를 확인한다.

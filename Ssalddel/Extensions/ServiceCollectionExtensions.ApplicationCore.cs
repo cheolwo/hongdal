@@ -100,7 +100,6 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I같이수입HS코드조회UseCase, 같이수입HS코드조회UseCase>();
         services.AddScoped<I사용자행위로그조회UseCase, 사용자행위로그조회UseCase>();
         services.AddScoped<I공통콘텐츠관리UseCase, 공통콘텐츠관리UseCase>();
-        services.AddScoped<IKieAi콜백UseCase, KieAi콜백UseCase>();
         services.AddScoped<I샘플이미지작업UseCase, 샘플이미지작업UseCase>();
         services.AddScoped<I배달기사월정산UseCase, 배달기사월정산UseCase>();
         services.AddScoped<IFoodDeliveryDriverWorkspaceUseCase, FoodDeliveryDriverWorkspaceUseCase>();

@@ -48,7 +48,7 @@ public sealed class CommunityAuthoringImagePromptPlanner : ICommunityAuthoringIm
             contextPlan.SourceSectionCount,
             segments,
             PromptVersion,
-            "문맥 나누기는 비용이 들지 않습니다. 선택한 문맥마다 별도의 Kie.ai 이미지 생성 작업이 한 건씩 등록되므로 프롬프트를 검토한 뒤 생성하세요.");
+            "문맥 나누기는 비용이 들지 않습니다. 선택한 문맥마다 별도의 Gemini Nano Banana 이미지 생성 요청이 한 건씩 실행되므로 프롬프트를 검토한 뒤 생성하세요.");
     }
 
     private static string NormalizeTitle(string? title)
