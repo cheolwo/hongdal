@@ -3,6 +3,7 @@ using Ssalddel.Contracts.Common.AgriculturalFisheries;
 using Ssalddel.Domain.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Services.AgriculturalFisheries.Information;
+using 살뜰.Services.External.PublicData;
 
 namespace Ssalddel.Tests.Services.AgriculturalFisheries;
 
@@ -49,7 +50,8 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
         await db.SaveChangesAsync();
         var service = new Kamis중심UsdaAms가격비교QueryService(
             db,
-            new FixedTimeProvider(Now));
+            new FixedTimeProvider(Now),
+            new FoodPriceCrosswalkCatalog());
 
         var result = await service.GetAsync(
             new Kamis중심UsdaAms가격비교Query
@@ -72,7 +74,11 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
         Assert.Equal(["Apples"], apple.MatchedAmsCommodities);
         Assert.False(apple.AllowsDirectPriceDifference);
         Assert.Equal("02", apple.KamisPricePoints[0].ProductClassCode);
-        Assert.Equal("1kg", apple.KamisPricePoints[0].Unit);
+        Assert.Contains(apple.KamisPricePoints, point => point.Unit == "1kg");
+        Assert.Contains(
+            apple.KamisPricePoints,
+            point => point.SourcePackageLabel == "10개"
+                     && point.ComparisonUnit == "1kg");
         Assert.Contains(apple.KamisPricePoints, point => point.PriceKrw == 5900m);
         Assert.DoesNotContain(apple.KamisPricePoints, point => point.PriceKrw == 9999m);
         Assert.Equal(
@@ -93,6 +99,36 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
         var retail = apple.AmsMarketStages.Single(stage =>
             stage.MarketStageCode == 농수산시세시장단계Codes.소매광고);
         Assert.Equal(1.99m, Assert.Single(retail.PricePoints).WeightedAveragePrice);
+
+        Assert.Equal("kamis:400:411", apple.ProductCodeConnection.InternalProductKey);
+        Assert.Contains(
+            apple.ProductCodeConnection.HsClassificationCandidates,
+            candidate => candidate.CodeScheme == "HS6"
+                         && candidate.Code == "080810");
+        Assert.Contains(
+            apple.ProductCodeConnection.NationalTariffReviews,
+            review => review.CodeScheme == "HTSUS10"
+                      && review.RelationStatusCode
+                         == Kamis중심상품코드연결상태Codes.전문가검토필요
+                      && review.Code is null);
+
+        var koreaWholesale = apple.DistributionStagePriceBands.Single(band =>
+            band.CountryCode == "KR"
+            && band.ComparisonStageCode == 농수산유통비교단계Codes.도매
+            && band.OriginalUnit == "1kg");
+        Assert.Equal(4300m, koreaWholesale.LowObservedPrice);
+        Assert.Equal(40000m, koreaWholesale.HighObservedPrice);
+        Assert.Equal("1kg", koreaWholesale.OriginalUnit);
+        Assert.Contains("10개", koreaWholesale.SourcePackageLabels);
+        Assert.Equal(
+            KamisPriceUnitProvenanceParser.SourceKilogramConversionCode,
+            koreaWholesale.PriceNormalizationCode);
+        var usTerminal = apple.DistributionStagePriceBands.Single(band =>
+            band.CountryCode == "US"
+            && band.SourceMarketStageCode == 농수산시세시장단계Codes.도매터미널);
+        Assert.Equal(32m, usTerminal.LowObservedPrice);
+        Assert.Equal(36m, usTerminal.HighObservedPrice);
+        Assert.False(usTerminal.AllowsDirectComparison);
     }
 
     [Fact]
@@ -103,7 +139,8 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
         await db.SaveChangesAsync();
         var service = new Kamis중심UsdaAms가격비교QueryService(
             db,
-            new FixedTimeProvider(Now));
+            new FixedTimeProvider(Now),
+            new FoodPriceCrosswalkCatalog());
 
         var mapped = await service.GetAsync(
             new Kamis중심UsdaAms가격비교Query
@@ -143,6 +180,16 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
             Kamis(kamisRun, "100", "식량작물", "152", "감자", "02", 2600m),
             Kamis(kamisRun, "400", "과일류", "411", "사과", "01", 5900m),
             Kamis(kamisRun, "400", "과일류", "411", "사과", "02", 4300m),
+            Kamis(
+                kamisRun,
+                "400",
+                "과일류",
+                "411",
+                "사과",
+                "02",
+                40000m,
+                sourcePackageLabel: "10개",
+                kindCode: "01"),
             Kamis(
                 kamisRun,
                 "400",
@@ -206,11 +253,14 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
         string itemName,
         string productClassCode,
         decimal price,
-        DateOnly? surveyDate = null)
+        DateOnly? surveyDate = null,
+        string unit = "1kg",
+        string sourcePackageLabel = "1kg",
+        string kindCode = "00")
         => new()
         {
             FirstCollectionRun = run,
-            RecordKey = $"{itemCode}-{productClassCode}-{surveyDate:yyyyMMdd}",
+            RecordKey = $"{itemCode}-{productClassCode}-{kindCode}-{unit}-{surveyDate:yyyyMMdd}",
             ProductClassCode = productClassCode,
             ProductClassName = productClassCode == "02" ? "도매" : "소매",
             CategoryCode = categoryCode,
@@ -220,11 +270,17 @@ public sealed class Kamis중심UsdaAms가격비교QueryServiceTests
             FrequencyCode = "Daily",
             ItemCode = itemCode,
             ItemName = itemName,
-            KindCode = "00",
+            KindCode = kindCode,
             KindName = "대표",
             RankCode = "04",
             RankName = "상품",
-            Unit = "1kg",
+            Unit = unit,
+            SourcePackageLabel = sourcePackageLabel,
+            ComparisonUnit = unit,
+            PriceNormalizationCode =
+                KamisPriceUnitProvenanceParser.SourceKilogramConversionCode,
+            PriceNormalizationBasis =
+                KamisPriceUnitProvenanceParser.SourceKilogramConversionBasis,
             PriceKrw = price,
             PriceRaw = price.ToString(),
             RawJson = "{}"

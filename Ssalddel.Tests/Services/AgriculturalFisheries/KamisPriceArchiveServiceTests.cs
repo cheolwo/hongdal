@@ -11,6 +11,25 @@ namespace Ssalddel.Tests.Services.AgriculturalFisheries;
 public sealed class KamisPriceArchiveServiceTests
 {
     [Theory]
+    [InlineData("쓰가루(아오리)(10개)", "10개")]
+    [InlineData("후지(1kg)", "1kg")]
+    [InlineData("닭고기(1마리)", "1마리")]
+    [InlineData("감자(수미)", "")]
+    public void 종류명의마지막수량표시를_원포장표시로분리한다(
+        string kindName,
+        string expectedSourcePackage)
+    {
+        var result = KamisPriceUnitProvenanceParser.FromKindName(kindName);
+
+        Assert.Equal(expectedSourcePackage, result.SourcePackageLabel);
+        Assert.Equal("1kg", result.ComparisonUnit);
+        Assert.Equal(
+            KamisPriceUnitProvenanceParser.SourceKilogramConversionCode,
+            result.PriceNormalizationCode);
+        Assert.Contains("p_convert_kg_yn=Y", result.PriceNormalizationBasis);
+    }
+
+    [Theory]
     [InlineData("당일 (07/15)", "2026-07-15", "2026-07-15")]
     [InlineData("당일 (12/31)", "2026-01-01", "2025-12-31")]
     [InlineData("2026-07-14", "2026-07-15", "2026-07-14")]

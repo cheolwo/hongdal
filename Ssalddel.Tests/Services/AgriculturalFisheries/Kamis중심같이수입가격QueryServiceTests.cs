@@ -172,6 +172,16 @@ public sealed class Kamis중심같이수입가격QueryServiceTests
             "단위 확인 필요",
             AllowsDirectPriceDifference: false,
             [],
+            [],
+            new Kamis중심상품코드연결응답(
+                $"kamis:{(itemCode.StartsWith('4') ? "400" : "200")}:{itemCode}",
+                itemCode.StartsWith('4') ? "400" : "200",
+                itemCode,
+                Kamis중심상품코드연결상태Codes.확인됨,
+                amsCommodities,
+                Kamis중심상품코드연결상태Codes.후보,
+                [],
+                []),
             []);
 
     private sealed class FakeMarketPriceService(

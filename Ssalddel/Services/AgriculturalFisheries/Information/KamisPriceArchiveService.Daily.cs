@@ -211,7 +211,8 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         var kindCode = ReadString(source, "kind_code", "kindcode");
         var rankName = ReadString(source, "rank");
         var rankCode = ReadString(source, "rank_code", "rankcode");
-        var unit = ConvertedKilogramUnit;
+        var unitProvenance = KamisPriceUnitProvenanceParser.FromKindName(kindName);
+        var unit = unitProvenance.ComparisonUnit;
         var priceRaw = ReadString(source, "dpr1");
         var priceKrw = ParsePrice(priceRaw);
         var surveyDate = ParseSurveyDate(ReadString(source, "day1"), requestedDate);
@@ -245,6 +246,10 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
             RankName = rankName,
             RankCode = rankCode,
             Unit = unit,
+            SourcePackageLabel = unitProvenance.SourcePackageLabel,
+            ComparisonUnit = unitProvenance.ComparisonUnit,
+            PriceNormalizationCode = unitProvenance.PriceNormalizationCode,
+            PriceNormalizationBasis = unitProvenance.PriceNormalizationBasis,
             PriceRaw = priceRaw,
             PriceKrw = priceKrw,
             PreviousDayLabel = ReadString(source, "day2"),

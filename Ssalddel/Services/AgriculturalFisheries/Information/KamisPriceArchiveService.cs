@@ -11,7 +11,6 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
     private const string SourceUrl = "https://www.kamis.or.kr/service/price/xml.do";
     private const string NationwideCode = "ALL";
     private const string NationwideName = "전국";
-    private const string ConvertedKilogramUnit = "1kg";
     private const int PeriodQueryBatchSize = 12;
     private const int PeriodQueryConcurrency = 2;
     private const int MonthlyQueryBatchSize = 20;
@@ -146,6 +145,10 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
            || stored.KindName != incoming.KindName
            || stored.RankName != incoming.RankName
            || stored.Unit != incoming.Unit
+           || stored.SourcePackageLabel != incoming.SourcePackageLabel
+           || stored.ComparisonUnit != incoming.ComparisonUnit
+           || stored.PriceNormalizationCode != incoming.PriceNormalizationCode
+           || stored.PriceNormalizationBasis != incoming.PriceNormalizationBasis
            || stored.PriceRaw != incoming.PriceRaw
            || stored.PriceKrw != incoming.PriceKrw
            || stored.IsPriceMissing != incoming.IsPriceMissing;
@@ -160,6 +163,10 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         stored.KindName = incoming.KindName;
         stored.RankName = incoming.RankName;
         stored.Unit = incoming.Unit;
+        stored.SourcePackageLabel = incoming.SourcePackageLabel;
+        stored.ComparisonUnit = incoming.ComparisonUnit;
+        stored.PriceNormalizationCode = incoming.PriceNormalizationCode;
+        stored.PriceNormalizationBasis = incoming.PriceNormalizationBasis;
         stored.PriceRaw = incoming.PriceRaw;
         stored.PriceKrw = incoming.PriceKrw;
         stored.IsPriceMissing = incoming.IsPriceMissing;
@@ -174,6 +181,10 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
            || stored.KindName != incoming.KindName
            || stored.RankName != incoming.RankName
            || stored.Unit != incoming.Unit
+           || stored.SourcePackageLabel != incoming.SourcePackageLabel
+           || stored.ComparisonUnit != incoming.ComparisonUnit
+           || stored.PriceNormalizationCode != incoming.PriceNormalizationCode
+           || stored.PriceNormalizationBasis != incoming.PriceNormalizationBasis
            || stored.PriceRaw != incoming.PriceRaw
            || stored.PriceKrw != incoming.PriceKrw
            || stored.PreviousDayLabel != incoming.PreviousDayLabel
@@ -199,6 +210,10 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         stored.KindName = incoming.KindName;
         stored.RankName = incoming.RankName;
         stored.Unit = incoming.Unit;
+        stored.SourcePackageLabel = incoming.SourcePackageLabel;
+        stored.ComparisonUnit = incoming.ComparisonUnit;
+        stored.PriceNormalizationCode = incoming.PriceNormalizationCode;
+        stored.PriceNormalizationBasis = incoming.PriceNormalizationBasis;
         stored.PriceRaw = incoming.PriceRaw;
         stored.PriceKrw = incoming.PriceKrw;
         stored.PreviousDayLabel = incoming.PreviousDayLabel;

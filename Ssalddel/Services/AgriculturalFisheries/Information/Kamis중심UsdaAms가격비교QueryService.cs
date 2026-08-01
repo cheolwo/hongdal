@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Ssalddel.Contracts.Common.AgriculturalFisheries;
 using Ssalddel.Domain.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
+using 살뜰.Services.External.PublicData;
 
 namespace Ssalddel.Services.AgriculturalFisheries.Information;
 
@@ -14,7 +15,8 @@ public interface IKamis중심UsdaAms가격비교QueryService
 
 public sealed class Kamis중심UsdaAms가격비교QueryService(
     AgriculturalFisheriesDbContext db,
-    TimeProvider timeProvider) : IKamis중심UsdaAms가격비교QueryService
+    TimeProvider timeProvider,
+    IFoodPriceCrosswalkCatalog crosswalkCatalog) : IKamis중심UsdaAms가격비교QueryService
 {
     private sealed record KamisAnchor(
         string CategoryCode,
@@ -54,6 +56,14 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
         public string RankName { get; init; } = string.Empty;
 
         public string Unit { get; init; } = string.Empty;
+
+        public string SourcePackageLabel { get; init; } = string.Empty;
+
+        public string ComparisonUnit { get; init; } = string.Empty;
+
+        public string PriceNormalizationCode { get; init; } = string.Empty;
+
+        public string PriceNormalizationBasis { get; init; } = string.Empty;
 
         public decimal? PriceKrw { get; init; }
 
@@ -251,6 +261,12 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 latestAmsObservations,
                 amsPointLimit,
                 cancellationToken);
+            var productCodeConnection = BuildProductCodeConnection(
+                item,
+                crosswalkCatalog.GetAll());
+            var distributionStagePriceBands = BuildDistributionStagePriceBands(
+                kamisPoints,
+                amsStages);
             items.Add(new Kamis중심UsdaAms품목가격응답(
                 item.Anchor.CategoryCode,
                 item.Anchor.CategoryName,
@@ -264,7 +280,9 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 item.Mapping.ReviewNote,
                 AllowsDirectPriceDifference: false,
                 kamisPoints,
-                amsStages));
+                amsStages,
+                productCodeConnection,
+                distributionStagePriceBands));
         }
 
         return new Kamis중심UsdaAms가격비교응답(
@@ -285,8 +303,227 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 "KAMIS 가격은 저장된 원화·거래단위를 그대로 표시하고 USDA AMS 가격은 USD·원 포장단위를 보존합니다.",
                 "산지 출하·도매 터미널·소매 광고 가격은 서로 다른 시장 단계이므로 단계별로 분리합니다.",
                 "환율·중량·포장·품종·등급·원산지·관측일이 일치하기 전에는 가격 차액이나 우열을 계산하지 않습니다.",
+                "국제 HS 후보와 한국 HSK·미국 HTSUS 국가 세번을 분리하며, 국가 세번은 전문가 검토 전까지 확정 코드로 표시하지 않습니다.",
                 "USDA AMS 전문청과 보고서에 없는 곡물·축산·수산 KAMIS 품목은 후보 없음으로 유지합니다."
             ]);
+    }
+
+    private static Kamis중심상품코드연결응답 BuildProductCodeConnection(
+        PreparedAnchor item,
+        IReadOnlyList<FoodPriceCrosswalk> crosswalks)
+    {
+        var hsCandidates = crosswalks
+            .Where(crosswalk => string.Equals(
+                crosswalk.AtItemCode,
+                item.Anchor.ItemCode,
+                StringComparison.Ordinal))
+            .OrderBy(crosswalk => crosswalk.HsPrefix, StringComparer.Ordinal)
+            .Select(crosswalk => new Kamis중심Hs분류후보응답(
+                crosswalk.HsPrefix.Length == 6 ? "HS6" : $"HS{crosswalk.HsPrefix.Length}",
+                crosswalk.HsPrefix,
+                crosswalk.ProductName,
+                Kamis중심상품코드연결상태Codes.후보,
+                crosswalk.MatchQualityCode,
+                crosswalk.MatchQualityLabel,
+                $"{crosswalk.Note} 상품의 재질·가공도·용도에 따라 세번이 달라질 수 있습니다."))
+            .ToArray();
+
+        return new Kamis중심상품코드연결응답(
+            $"kamis:{item.Anchor.CategoryCode}:{item.Anchor.ItemCode}",
+            item.Anchor.CategoryCode,
+            item.Anchor.ItemCode,
+            Kamis중심상품코드연결상태Codes.확인됨,
+            item.Mapping.MatchedCommodities,
+            item.Mapping.MatchedCommodities.Count > 0
+                ? Kamis중심상품코드연결상태Codes.후보
+                : Kamis중심상품코드연결상태Codes.후보없음,
+            hsCandidates,
+            [
+                new Kamis중심국가세번검토응답(
+                    "KR",
+                    "HSK10",
+                    null,
+                    Kamis중심상품코드연결상태Codes.전문가검토필요,
+                    "한국 수입 신고 세번은 국제 HS 후보를 출발점으로 품목 속성과 관세율표를 확인해야 합니다."),
+                new Kamis중심국가세번검토응답(
+                    "US",
+                    "HTSUS10",
+                    null,
+                    Kamis중심상품코드연결상태Codes.전문가검토필요,
+                    "미국 수입 세번은 국제 HS 후보를 출발점으로 HTSUS와 품목 속성을 확인해야 합니다.")
+            ]);
+    }
+
+    private static IReadOnlyList<Kamis중심유통단계가격대응답>
+        BuildDistributionStagePriceBands(
+            IReadOnlyList<Kamis중심가격Point응답> kamisPoints,
+            IReadOnlyList<Kamis중심UsdaAms시장단계가격응답> amsStages)
+    {
+        var result = new List<Kamis중심유통단계가격대응답>();
+        result.AddRange(BuildKamisPriceBands(
+            kamisPoints,
+            productClassCode: "02",
+            stageOrder: 20,
+            농수산유통비교단계Codes.도매,
+            "도매"));
+        result.AddRange(BuildKamisPriceBands(
+            kamisPoints,
+            productClassCode: "01",
+            stageOrder: 30,
+            농수산유통비교단계Codes.소매,
+            "소매"));
+
+        foreach (var stage in amsStages)
+        {
+            var (stageOrder, comparisonStageCode, comparisonStageLabel) =
+                stage.MarketStageCode switch
+                {
+                    농수산시세시장단계Codes.산지출하 =>
+                        (10, 농수산유통비교단계Codes.산지, "산지·출하"),
+                    농수산시세시장단계Codes.도매터미널 =>
+                        (20, 농수산유통비교단계Codes.도매, "도매"),
+                    _ => (30, 농수산유통비교단계Codes.소매, "소매")
+                };
+            var groups = stage.PricePoints.Count == 0
+                ? new[] { Array.Empty<Kamis중심UsdaAms가격Point응답>() }
+                : stage.PricePoints
+                    .GroupBy(point => new
+                    {
+                        point.SourceKey,
+                        point.CurrencyCode,
+                        point.OriginalUnit
+                    })
+                    .Select(group => group.ToArray())
+                    .ToArray();
+            foreach (var points in groups)
+            {
+                var prices = points
+                    .SelectMany(point => new[]
+                    {
+                        point.LowPrice ?? point.WeightedAveragePrice,
+                        point.HighPrice ?? point.WeightedAveragePrice
+                    })
+                    .Where(price => price.HasValue)
+                    .Select(price => price!.Value)
+                    .ToArray();
+                var first = points.FirstOrDefault();
+                result.Add(new Kamis중심유통단계가격대응답(
+                    stageOrder,
+                    comparisonStageCode,
+                    comparisonStageLabel,
+                    "US",
+                    "미국",
+                    first?.SourceKey ?? string.Empty,
+                    stage.MarketStageCode,
+                    stage.MarketStageLabel,
+                    prices.Length > 0
+                        ? 농수산유통가격대상태Codes.관측값있음
+                        : 농수산유통가격대상태Codes.관측값없음,
+                    points
+                        .Select(point => (DateOnly?)point.ReferenceDate)
+                        .DefaultIfEmpty()
+                        .Max(),
+                    first?.CurrencyCode ?? string.Empty,
+                    first?.OriginalUnit ?? string.Empty,
+                    string.IsNullOrWhiteSpace(first?.OriginalUnit)
+                        ? []
+                        : [first!.OriginalUnit],
+                    "SourceUnitPreserved",
+                    "USDA AMS 원 통화·포장 단위를 보존하고 서버에서 중량이나 통화를 환산하지 않았습니다.",
+                    prices.Length > 0 ? prices.Min() : null,
+                    prices.Length > 0 ? prices.Max() : null,
+                    points.Length,
+                    AllowsDirectComparison: false,
+                    "미국 AMS의 원 통화·포장 단위와 시장 단계가 같은 관측끼리만 가격대를 묶었습니다."));
+            }
+        }
+
+        return result
+            .OrderBy(item => item.StageOrder)
+            .ThenBy(item => item.CountryCode, StringComparer.Ordinal)
+            .ThenBy(item => item.OriginalUnit, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static IReadOnlyList<Kamis중심유통단계가격대응답>
+        BuildKamisPriceBands(
+        IReadOnlyList<Kamis중심가격Point응답> kamisPoints,
+        string productClassCode,
+        int stageOrder,
+        string comparisonStageCode,
+        string comparisonStageLabel)
+    {
+        var points = kamisPoints
+            .Where(point => point.ProductClassCode == productClassCode)
+            .ToArray();
+        var groups = points.Length == 0
+            ? new[] { Array.Empty<Kamis중심가격Point응답>() }
+            : points
+                .GroupBy(
+                    point => string.IsNullOrWhiteSpace(point.ComparisonUnit)
+                        ? point.Unit
+                        : point.ComparisonUnit,
+                    StringComparer.Ordinal)
+                .Select(group => group.ToArray())
+                .ToArray();
+
+        return groups
+            .Select(group =>
+            {
+                var prices = group
+                    .Where(point => point.PriceKrw.HasValue && !point.IsPriceMissing)
+                    .Select(point => point.PriceKrw!.Value)
+                    .ToArray();
+                var first = group.FirstOrDefault();
+                var unit = string.IsNullOrWhiteSpace(first?.ComparisonUnit)
+                    ? first?.Unit ?? string.Empty
+                    : first.ComparisonUnit;
+                var sourcePackageLabels = group
+                    .Select(point => point.SourcePackageLabel)
+                    .Where(label => !string.IsNullOrWhiteSpace(label))
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(label => label, StringComparer.Ordinal)
+                    .ToArray();
+                var normalizationCode = group
+                    .Select(point => point.PriceNormalizationCode)
+                    .FirstOrDefault(code => !string.IsNullOrWhiteSpace(code))
+                    ?? "Unverified";
+                var normalizationBasis = string.Join(
+                    " ",
+                    group
+                        .Select(point => point.PriceNormalizationBasis)
+                        .Where(basis => !string.IsNullOrWhiteSpace(basis))
+                        .Distinct(StringComparer.Ordinal));
+                return new Kamis중심유통단계가격대응답(
+                    stageOrder,
+                    comparisonStageCode,
+                    comparisonStageLabel,
+                    "KR",
+                    "한국",
+                    "KAMIS",
+                    productClassCode,
+                    productClassCode == "02" ? "한국 도매" : "한국 소매",
+                    prices.Length > 0
+                        ? 농수산유통가격대상태Codes.관측값있음
+                        : 농수산유통가격대상태Codes.관측값없음,
+                    group
+                        .Select(point => (DateOnly?)point.SurveyDate)
+                        .DefaultIfEmpty()
+                        .Max(),
+                    prices.Length > 0 ? "KRW" : string.Empty,
+                    unit,
+                    sourcePackageLabels,
+                    normalizationCode,
+                    normalizationBasis,
+                    prices.Length > 0 ? prices.Min() : null,
+                    prices.Length > 0 ? prices.Max() : null,
+                    group.Length,
+                    AllowsDirectComparison: false,
+                    group.Length == 0
+                        ? "해당 KAMIS 유통 단계의 관측값이 없습니다."
+                        : "KAMIS의 같은 비교 단위와 유통 구분 안에서만 관측 가격대를 묶었고 원 포장 표시는 별도로 보존했습니다.");
+            })
+            .ToArray();
     }
 
     private static bool MatchesQuery(
@@ -368,6 +605,10 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                           ranked.RankCode,
                           ranked.RankName,
                           ranked.Unit,
+                          ranked.SourcePackageLabel,
+                          ranked.ComparisonUnit,
+                          ranked.PriceNormalizationCode,
+                          ranked.PriceNormalizationBasis,
                           ranked.PriceKrw,
                           ranked.IsPriceMissing
                       FROM (
@@ -398,6 +639,10 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                                   observation.RankCode,
                                   observation.RankName,
                                   observation.Unit,
+                                  observation.SourcePackageLabel,
+                                  observation.ComparisonUnit,
+                                  observation.PriceNormalizationCode,
+                                  observation.PriceNormalizationBasis,
                                   observation.PriceKrw,
                                   observation.IsPriceMissing,
                                   ROW_NUMBER() OVER (
@@ -478,6 +723,10 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 RankCode = item.RankCode,
                 RankName = item.RankName,
                 Unit = item.Unit,
+                SourcePackageLabel = item.SourcePackageLabel,
+                ComparisonUnit = item.ComparisonUnit,
+                PriceNormalizationCode = item.PriceNormalizationCode,
+                PriceNormalizationBasis = item.PriceNormalizationBasis,
                 PriceKrw = item.PriceKrw,
                 IsPriceMissing = item.IsPriceMissing
             })
@@ -517,6 +766,10 @@ public sealed class Kamis중심UsdaAms가격비교QueryService(
                 item.RankCode,
                 item.RankName,
                 item.Unit,
+                item.SourcePackageLabel,
+                item.ComparisonUnit,
+                item.PriceNormalizationCode,
+                item.PriceNormalizationBasis,
                 item.PriceKrw,
                 item.IsPriceMissing))
             .ToArray();

@@ -387,6 +387,7 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
 
         var priceRaw = ReadString(source, "price");
         var priceKrw = ParsePrice(priceRaw);
+        var unitProvenance = KamisPriceUnitProvenanceParser.FromKindName(kindName);
         var identity = string.Join(
             '\u001f',
             query.ProductClassCode,
@@ -396,7 +397,7 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
             query.ItemCode,
             query.KindCode,
             query.RankCode,
-            ConvertedKilogramUnit);
+            unitProvenance.ComparisonUnit);
 
         return new KamisPriceObservation
         {
@@ -416,7 +417,11 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
             KindCode = query.KindCode,
             RankName = query.RankName,
             RankCode = query.RankCode,
-            Unit = ConvertedKilogramUnit,
+            Unit = unitProvenance.ComparisonUnit,
+            SourcePackageLabel = unitProvenance.SourcePackageLabel,
+            ComparisonUnit = unitProvenance.ComparisonUnit,
+            PriceNormalizationCode = unitProvenance.PriceNormalizationCode,
+            PriceNormalizationBasis = unitProvenance.PriceNormalizationBasis,
             PriceRaw = priceRaw,
             PriceKrw = priceKrw,
             IsPriceMissing = priceKrw is null,

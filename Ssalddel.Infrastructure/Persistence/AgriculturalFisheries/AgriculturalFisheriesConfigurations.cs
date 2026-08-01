@@ -155,6 +155,10 @@ internal sealed class KamisPriceObservationConfiguration
         builder.Property(x => x.RankName).HasMaxLength(30).IsRequired();
         builder.Property(x => x.RankCode).HasMaxLength(20).IsRequired();
         builder.Property(x => x.Unit).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.SourcePackageLabel).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.ComparisonUnit).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.PriceNormalizationCode).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.PriceNormalizationBasis).HasMaxLength(500).IsRequired();
         builder.Property(x => x.PriceRaw).HasMaxLength(40).IsRequired();
         builder.Property(x => x.PriceKrw).HasPrecision(20, 4);
         builder.Property(x => x.PreviousDayLabel).HasMaxLength(40).IsRequired();

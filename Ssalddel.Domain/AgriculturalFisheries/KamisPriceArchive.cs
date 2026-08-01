@@ -83,6 +83,14 @@ public sealed class KamisPriceObservation
 
     public string Unit { get; set; } = string.Empty;
 
+    public string SourcePackageLabel { get; set; } = string.Empty;
+
+    public string ComparisonUnit { get; set; } = string.Empty;
+
+    public string PriceNormalizationCode { get; set; } = string.Empty;
+
+    public string PriceNormalizationBasis { get; set; } = string.Empty;
+
     public string PriceRaw { get; set; } = string.Empty;
 
     public decimal? PriceKrw { get; set; }
