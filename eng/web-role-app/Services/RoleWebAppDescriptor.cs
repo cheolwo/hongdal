@@ -138,7 +138,7 @@ public sealed record RoleWebAppDescriptor(
                 "/community/home",
                 "role-shell--community",
                 [
-                    new("커뮤니티 홈", "/community/home"),
+                    new("세계 지도", "/community/home"),
                     new("게시판 전체", "/community/boards/directory"),
                     new("지역 문화·특산물", "/community/regions"),
                     new("공동행동", "/community/actions"),

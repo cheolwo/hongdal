@@ -1,0 +1,109 @@
+using Ssalddel.Contracts.Common.Metadata;
+
+namespace Ssalddel.Contracts.Common.PublicData;
+
+public static class RegionalAgriculturalMapCountryCodes
+{
+    public const string Korea = "KR";
+    public const string UnitedStates = "US";
+
+    public static IReadOnlyList<string> All { get; } = [Korea, UnitedStates];
+}
+
+public static class RegionalAgriculturalMapRegionTypeCodes
+{
+    public const string StateProvince = "StateProvince";
+    public const string CountyMunicipality = "CountyMunicipality";
+    public const string ShippingDistrict = "ShippingDistrict";
+}
+
+public static class RegionalAgriculturalMapCodeSchemeCodes
+{
+    public const string KoreaMoisAdministrative = "KR-MOIS-ADMIN";
+    public const string KoreaMafraOrigin = "KR-MAFRA-ORIGIN";
+    public const string UnitedStatesCensusGeoid = "US-CENSUS-GEOID";
+    public const string UnitedStatesPostalState = "US-USPS-STATE";
+    public const string UnitedStatesAmsShippingDistrict = "US-AMS-SHIPPING-DISTRICT";
+}
+
+public static class RegionalAgriculturalMapRelationTypeCodes
+{
+    public const string ConfirmedOrigin = "ConfirmedOrigin";
+    public const string ShippingPointOrPortOfEntry = "ShippingPointOrPortOfEntry";
+    public const string MarketObservation = "MarketObservation";
+
+    public static IReadOnlyList<string> All { get; } =
+        [ConfirmedOrigin, ShippingPointOrPortOfEntry, MarketObservation];
+}
+
+public static class RegionalAgriculturalMapConfidenceCodes
+{
+    public const string OfficialCodeCrosswalk = "OfficialCodeCrosswalk";
+    public const string OfficialNameCrosswalk = "OfficialNameCrosswalk";
+    public const string CuratedCrosswalk = "CuratedCrosswalk";
+}
+
+public sealed class RegionalAgriculturalMapMarkerQuery
+{
+    public string CountryCode { get; init; } = string.Empty;
+
+    public string? RelationTypeCode { get; init; }
+
+    public string? ProductName { get; init; }
+
+    public DateOnly? FromDate { get; init; }
+
+    public DateOnly? ToDate { get; init; }
+
+    public int MaxItems { get; init; } = 200;
+}
+
+public sealed record RegionalAgriculturalMapMarkerSourceDto(
+    string DataSourceKey,
+    string CodeScheme,
+    string ExternalCode,
+    string ExternalName,
+    string CrosswalkConfidenceCode,
+    DateTime CrosswalkVerifiedAtUtc,
+    int ObservationCount,
+    DateOnly EarliestObservedDate,
+    DateOnly LatestObservedDate);
+
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.RegionalAgriculturalMap,
+    SsalddelCodeLayer.Contract,
+    "한국·미국 농수산물 가격 관측과 검증된 행정구역 마커의 관계를 전달",
+    FlowOrder = 10,
+    Boundary = "원산지, Shipping Point·항구, 시장 관측지를 서로 교환하지 않으며 미해결 코드는 마커로 추정하지 않습니다.")]
+public sealed record RegionalAgriculturalMapMarkerDto(
+    string MarkerKey,
+    string RegionKey,
+    string CountryCode,
+    string RegionTypeCode,
+    string DisplayNameKo,
+    string DisplayNameEn,
+    string DisplayNameLocal,
+    decimal Latitude,
+    decimal Longitude,
+    string AnchorSourceKey,
+    string AnchorSourceVintage,
+    string AnchorSourceUrl,
+    DateTime AnchorVerifiedAtUtc,
+    string RelationTypeCode,
+    int ObservationCount,
+    DateOnly EarliestObservedDate,
+    DateOnly LatestObservedDate,
+    IReadOnlyList<RegionalAgriculturalMapMarkerSourceDto> Sources);
+
+public sealed record RegionalAgriculturalMapMarkerListResponse(
+    string CountryCode,
+    IReadOnlyList<string> RelationTypeCodes,
+    string? ProductName,
+    DateOnly? FromDate,
+    DateOnly? ToDate,
+    int TotalMarkerCount,
+    int ReturnedMarkerCount,
+    int UnresolvedObservationCount,
+    int MissingAnchorRegionCount,
+    IReadOnlyList<string> Notices,
+    IReadOnlyList<RegionalAgriculturalMapMarkerDto> Items);

@@ -5,6 +5,7 @@ using Ssalddel.Domain.Content;
 using Ssalddel.Domain.Education;
 using Ssalddel.Domain.HumanResources;
 using Ssalddel.Domain.HsCodes;
+using Ssalddel.Domain.Geography;
 using Ssalddel.Domain.Speech;
 using Ssalddel.Infrastructure.Persistence;
 using 살뜰.도메인.기사;
@@ -125,6 +126,10 @@ namespace 살뜰.Data
         public DbSet<HongikHakdangCardDeliveryOutbox> HongikHakdangCardDeliveryOutbox { get; set; } = null!;
         public DbSet<지역문화이미지Prompt> 지역문화이미지Prompts { get; set; } = null!;
         public DbSet<지역문화공공기관Source> 지역문화공공기관Sources { get; set; } = null!;
+        public DbSet<지역농수산Map행정구역> 지역농수산Map행정구역들 { get; set; } = null!;
+        public DbSet<지역농수산Map행정구역CodeAssignment> 지역농수산Map행정구역CodeAssignments { get; set; } = null!;
+        public DbSet<지역농수산Map행정구역Boundary> 지역농수산Map행정구역Boundaries { get; set; } = null!;
+        public DbSet<지역농수산Map지역Crosswalk> 지역농수산Map지역Crosswalks { get; set; } = null!;
         public DbSet<Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation> SsalddelMobilePushInstallations { get; set; } = null!;
         public DbSet<교육과정> 교육과정 { get; set; } = null!;
         public DbSet<교육과정과목> 교육과정과목 { get; set; } = null!;

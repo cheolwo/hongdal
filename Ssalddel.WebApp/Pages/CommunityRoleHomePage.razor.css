@@ -1,196 +1,523 @@
-.community-role-home {
-    width: min(100%, 720px);
+.world-community-home {
+    --world-ink: #1c2926;
+    --world-muted: #60706b;
+    --world-leaf: #176b4d;
+    --world-leaf-dark: #0f4f39;
+    --world-sea: #eaf4f2;
+    display: grid;
+    gap: 18px;
+    width: min(100%, 1180px);
     margin: 0 auto;
-    padding: 16px 16px 92px;
-    color: #1f2430;
+    padding: 0 0 96px;
+    color: var(--world-ink);
     font-family: "Noto Sans KR", "Pretendard", system-ui, sans-serif;
 }
 
-.community-role-home > header {
+.world-community-home > *,
+.world-community-home__map-panel,
+.world-community-home__results {
+    min-width: 0;
+}
+
+.world-community-home__hero {
     display: grid;
-    gap: 14px;
-    padding: 18px;
-    border: 1px solid #d8dced;
-    border-radius: 14px;
-    background: #fff;
-}
-
-.community-role-home > header span {
-    color: #3f51b5;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.community-role-home h1 {
-    margin: 5px 0;
-    font-size: 23px;
-}
-
-.community-role-home > header p {
-    margin: 0;
-    color: #646b7d;
-    font-size: 12px;
-    line-height: 1.55;
-}
-
-.community-role-home > header label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 12px;
-    border: 1px solid #c8ccdc;
-    border-radius: 10px;
-    color: #687086;
-}
-
-.community-role-home > header input {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    font: inherit;
-}
-
-.community-role-home__boards {
-    display: grid;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-.community-role-home__boards > a {
-    display: grid;
-    grid-template-columns: 42px minmax(0, 1fr) auto;
-    min-height: 72px;
-    align-items: center;
-    gap: 11px;
-    padding: 12px;
-    border: 1px solid #d8dced;
-    border-radius: 12px;
-    background: #fff;
-    color: inherit;
-    text-decoration: none;
-}
-
-.community-role-home__icon {
-    display: grid;
-    width: 42px;
-    height: 42px;
-    place-items: center;
-    border-radius: 12px;
-    background: #e8ebff;
-    color: #3f51b5;
-}
-
-.community-role-home__boards strong,
-.community-role-home__boards small {
-    display: block;
-}
-
-.community-role-home__boards strong {
-    font-size: 14px;
-}
-
-.community-role-home__boards small {
-    margin-top: 3px;
-    color: #646b7d;
-    font-size: 11px;
-    line-height: 1.45;
-}
-
-.community-role-home__empty {
-    padding: 16px;
-    border-radius: 12px;
-    background: #fff;
-    color: #646b7d;
-    font-size: 12px;
-}
-
-.community-role-home__next,
-.community-role-home > aside {
-    margin-top: 12px;
-    padding: 14px;
-    border-radius: 12px;
-}
-
-.community-role-home__next {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    background: #e8ebff;
-}
-
-.community-role-home__next strong {
-    color: #33449a;
-    font-size: 13px;
-}
-
-.community-role-home__next p,
-.community-role-home > aside p {
-    margin: 5px 0 0;
-    font-size: 11px;
-    line-height: 1.5;
-}
-
-.community-role-home__next a {
-    flex: 0 0 auto;
-    padding: 9px 11px;
-    border-radius: 999px;
-    background: #3f51b5;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 28px;
+    padding: clamp(24px, 5vw, 48px);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at 84% 18%, rgba(128, 207, 171, .24), transparent 28%),
+        linear-gradient(135deg, #173f35 0%, #0f2d27 100%);
     color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    text-decoration: none;
+    box-shadow: 0 22px 48px rgba(13, 47, 39, .16);
 }
 
-.community-role-home > aside {
+.world-community-home__hero > div > span,
+.world-community-home__map-panel > header span,
+.world-community-home__results > header span {
+    color: #75d2aa;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+}
+
+.world-community-home__hero h1 {
+    margin: 8px 0 12px;
+    font-size: clamp(1.8rem, 4vw, 3.35rem);
+    line-height: 1.13;
+    letter-spacing: -.045em;
+}
+
+.world-community-home__hero p {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(255, 255, 255, .76);
+    font-size: .95rem;
+    line-height: 1.7;
+}
+
+.world-community-home__hero nav {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 10px;
-    border: 1px solid #efd0cd;
-    background: #fff7f5;
+    min-width: 190px;
+    gap: 8px;
 }
 
-.community-role-home > aside > span {
-    color: #a33f38;
-}
-
-.community-role-home > aside strong {
-    font-size: 13px;
-}
-
-.community-role-home > aside a {
-    color: #a33f38;
-    font-size: 11px;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.community-role-home__directory {
-    display: flex;
+.world-community-home__hero nav a {
+    display: inline-flex;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 12px;
-    padding: 12px;
-    color: #3f51b5;
-    font-size: 12px;
-    font-weight: 700;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, .38);
+    border-radius: 12px;
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 800;
     text-decoration: none;
 }
 
-@media (max-width: 420px) {
-    .community-role-home__next {
+.world-community-home__hero nav .world-community-home__primary-link {
+    border-color: #fff;
+    background: #fff;
+    color: var(--world-leaf-dark);
+}
+
+.world-community-home__map-panel,
+.world-community-home__results {
+    padding: clamp(18px, 3vw, 30px);
+    border: 1px solid #d7e2de;
+    border-radius: 22px;
+    background: #fff;
+}
+
+.world-community-home__map-panel > header,
+.world-community-home__results > header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.world-community-home__map-panel h2,
+.world-community-home__results h2 {
+    margin: 4px 0 0;
+    font-size: clamp(1.28rem, 2.4vw, 1.9rem);
+    letter-spacing: -.025em;
+}
+
+.world-community-home__legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    color: var(--world-muted);
+    font-size: .72rem;
+}
+
+.world-community-home__legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.world-community-home__legend i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.world-community-home__legend i.is-ready {
+    background: #ef8f3c;
+    box-shadow: 0 0 0 4px rgba(239, 143, 60, .14);
+}
+
+.world-community-home__legend i.is-preparing {
+    background: #a9b6b1;
+}
+
+.world-community-home__map-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-radius: 18px;
+    outline-offset: 3px;
+}
+
+.world-community-home__map-scroll:focus-visible {
+    outline: 3px solid rgba(23, 107, 77, .24);
+}
+
+.world-community-home__map {
+    position: relative;
+    min-width: 720px;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    border: 1px solid #cfe0dc;
+    border-radius: 18px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, .74), rgba(255, 255, 255, .12)),
+        var(--world-sea);
+}
+
+.world-community-home__map svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.world-community-home__graticule path {
+    fill: none;
+    stroke: rgba(57, 111, 98, .09);
+    stroke-width: 1;
+}
+
+.world-community-home__continents path {
+    fill: #c9d9d2;
+    stroke: #afc5bc;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.world-community-home__preparing-labels text {
+    fill: #6e827a;
+    font-size: 12px;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.world-community-home__hotspot {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    min-width: 102px;
+    justify-items: center;
+    gap: 1px;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 0;
+    background: transparent;
+    color: #173f35;
+    font: inherit;
+    cursor: pointer;
+}
+
+.world-community-home__hotspot > span {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin-bottom: 3px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #ef8f3c;
+    box-shadow: 0 3px 10px rgba(70, 62, 34, .28), 0 0 0 4px rgba(239, 143, 60, .2);
+}
+
+.world-community-home__hotspot strong,
+.world-community-home__hotspot small {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .9);
+    box-shadow: 0 2px 8px rgba(41, 72, 63, .1);
+}
+
+.world-community-home__hotspot strong {
+    font-size: .76rem;
+}
+
+.world-community-home__hotspot small {
+    color: #60706b;
+    font-size: .61rem;
+    font-weight: 700;
+}
+
+.world-community-home__hotspot:hover > span,
+.world-community-home__hotspot:focus-visible > span,
+.world-community-home__hotspot.is-selected > span {
+    background: var(--world-leaf);
+    box-shadow: 0 3px 10px rgba(23, 107, 77, .32), 0 0 0 6px rgba(23, 107, 77, .18);
+}
+
+.world-community-home__hotspot:focus-visible {
+    outline: 3px solid rgba(23, 107, 77, .32);
+    outline-offset: 5px;
+}
+
+.world-community-home__hotspot--us { left: 20%; top: 34%; }
+.world-community-home__hotspot--cn { left: 75%; top: 35%; }
+.world-community-home__hotspot--kr { left: 84%; top: 42%; }
+.world-community-home__hotspot--au { left: 82%; top: 70%; }
+
+.world-community-home__map-note {
+    margin: 12px 2px 0;
+    color: var(--world-muted);
+    font-size: .7rem;
+    line-height: 1.55;
+}
+
+.world-community-home__results > header p {
+    max-width: 720px;
+    margin: 6px 0 0;
+    color: var(--world-muted);
+    font-size: .82rem;
+    line-height: 1.55;
+}
+
+.world-community-home__results > header > button,
+.world-community-home__country-card > button {
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--world-leaf);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--world-leaf);
+    font: inherit;
+    font-size: .74rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.world-community-home__country-grid,
+.world-community-home__region-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.world-community-home__country-card,
+.world-community-home__region-card {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: 18px;
+    border: 1px solid #d9e3df;
+    border-radius: 16px;
+    background: #fbfdfc;
+}
+
+.world-community-home__country-card header span,
+.world-community-home__region-card header span {
+    color: var(--world-leaf);
+    font-size: .68rem;
+    font-weight: 900;
+}
+
+.world-community-home__country-card h3,
+.world-community-home__region-card h3 {
+    margin: 3px 0 0;
+    font-size: 1.08rem;
+}
+
+.world-community-home__country-card > p,
+.world-community-home__region-card > p {
+    margin: 0;
+    color: var(--world-muted);
+    font-size: .78rem;
+    line-height: 1.55;
+}
+
+.world-community-home__country-card dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+}
+
+.world-community-home__country-card dl > div {
+    padding: 10px;
+    border-radius: 10px;
+    background: #eef5f2;
+}
+
+.world-community-home__country-card dt {
+    color: var(--world-muted);
+    font-size: .65rem;
+}
+
+.world-community-home__country-card dd {
+    margin: 3px 0 0;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.world-community-home__country-card > button {
+    justify-self: start;
+}
+
+.world-community-home__region-card header small {
+    display: block;
+    margin-top: 4px;
+    color: var(--world-muted);
+    font-size: .68rem;
+}
+
+.world-community-home__specialties {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #eef5f2;
+}
+
+.world-community-home__specialties span {
+    color: var(--world-muted);
+    font-size: .65rem;
+}
+
+.world-community-home__specialties strong {
+    font-size: .75rem;
+    line-height: 1.5;
+}
+
+.world-community-home__region-card footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.world-community-home__region-card footer a,
+.world-community-home__price-panel > a,
+.world-community-home__culture-pending > a {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border: 1px solid var(--world-leaf);
+    border-radius: 10px;
+    background: var(--world-leaf);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.world-community-home__region-card footer a.world-community-home__price-link {
+    background: #fff;
+    color: var(--world-leaf);
+}
+
+.world-community-home__culture-pending,
+.world-community-home__price-panel,
+.world-community-home__boundary {
+    display: grid;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+}
+
+.world-community-home__culture-pending {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    border: 1px dashed #b8c9c2;
+    background: #f7faf9;
+}
+
+.world-community-home__culture-pending > span {
+    color: var(--world-leaf);
+}
+
+.world-community-home__culture-pending p,
+.world-community-home__price-panel p,
+.world-community-home__boundary p {
+    margin: 4px 0 0;
+    color: var(--world-muted);
+    font-size: .73rem;
+    line-height: 1.5;
+}
+
+.world-community-home__price-panel {
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin-top: 14px;
+    background: #173f35;
+    color: #fff;
+}
+
+.world-community-home__price-panel span {
+    color: #75d2aa;
+    font-size: .68rem;
+    font-weight: 900;
+}
+
+.world-community-home__price-panel p {
+    color: rgba(255, 255, 255, .7);
+}
+
+.world-community-home__price-panel > a {
+    gap: 6px;
+    border-color: #fff;
+    background: #fff;
+    color: var(--world-leaf-dark);
+}
+
+.world-community-home__boundary {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    border: 1px solid #eadbc3;
+    background: #fff9ef;
+    color: #5d451f;
+}
+
+.world-community-home__boundary > a {
+    color: #77541d;
+    font-size: .74rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+@media (max-width: 760px) {
+    .world-community-home__hero {
+        grid-template-columns: 1fr;
+    }
+
+    .world-community-home__hero nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .world-community-home__country-grid,
+    .world-community-home__region-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .world-community-home {
+        gap: 12px;
+    }
+
+    .world-community-home__hero,
+    .world-community-home__map-panel,
+    .world-community-home__results {
+        border-radius: 18px;
+    }
+
+    .world-community-home__hero nav {
+        grid-template-columns: 1fr;
+    }
+
+    .world-community-home__map-panel > header,
+    .world-community-home__results > header {
         align-items: flex-start;
         flex-direction: column;
     }
 
-    .community-role-home > aside {
+    .world-community-home__legend {
+        justify-content: flex-start;
+    }
+
+    .world-community-home__culture-pending,
+    .world-community-home__price-panel,
+    .world-community-home__boundary {
         grid-template-columns: auto minmax(0, 1fr);
     }
 
-    .community-role-home > aside a {
-        grid-column: 2;
+    .world-community-home__culture-pending > a,
+    .world-community-home__price-panel > a,
+    .world-community-home__boundary > a {
+        grid-column: 1 / -1;
+        width: 100%;
     }
 }

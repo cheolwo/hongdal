@@ -42,6 +42,10 @@ public static partial class ServiceCollectionExtensions
             국내농산물경락가격ArchiveService>();
         services.AddScoped<I농산물지역가격비교QueryService,
             농산물지역가격비교QueryService>();
+        services.AddScoped<지역농수산Map가격관측Reader>();
+        services.AddScoped<지역농수산Map지역Resolver>();
+        services.AddScoped<I지역농수산MapMarker조회UseCase,
+            지역농수산MapMarker조회UseCase>();
         services
             .AddHttpClient<UsdaNassQuickStats가격공급자>(
                 (serviceProvider, client) =>

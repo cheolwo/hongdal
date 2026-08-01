@@ -13,6 +13,7 @@ public static class SsalddelCodeFeatureKeys
     public const string PlatformSupplyBrokerage = "platform-supply-brokerage";
     public const string RegionalCultureImagePrompt = "regional-culture-image-prompt";
     public const string RegionalCulturePublicInstitution = "regional-culture-public-institution";
+    public const string RegionalAgriculturalMap = "regional-agricultural-map";
     public const string TransportExecutionProfile = "transport-execution-profile";
     public const string TradeLedgerExtensions = "trade-ledger-extensions";
 }

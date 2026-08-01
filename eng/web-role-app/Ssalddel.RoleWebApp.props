@@ -103,6 +103,16 @@
     <Content Include="..\Ssalddel.WebApp\Pages\DiagramWorkbenchPage.razor">
       <Link>Pages\DiagramWorkbenchPage.razor</Link>
     </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\PublicDataInformationPage.razor;
+                      ..\Ssalddel.WebApp\Pages\KamisDomesticPriceComparisonPage.razor;
+                      ..\Ssalddel.WebApp\Pages\ProduceRegionalPriceComparisonPage.razor;
+                      ..\Ssalddel.WebApp\Pages\UsdaUnitedStatesPriceComparisonPage.razor;
+                      ..\Ssalddel.WebApp\Pages\RegionalProductCandidatesPage.razor">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Pages\KamisDomesticPriceComparisonPage.razor.css">
+      <Link>Pages\%(Filename)%(Extension)</Link>
+    </Content>
     <Content Include="..\Ssalddel.WebApp\Pages\LoginPage.razor">
       <Link>Pages\LoginPage.razor</Link>
     </Content>

@@ -1,90 +1,282 @@
 @page "/community/home"
+@using Ssalddel.Contracts.Common.Content
 
-<PageTitle>커뮤니티 홈 · 살뜰</PageTitle>
+<PageTitle>세계 지역 문화와 농수산물 가격 · 살뜰</PageTitle>
 
-<main class="community-role-home">
-    <header>
+<main class="world-community-home">
+    <header class="world-community-home__hero">
         <div>
             <span>01 · 공개 커뮤니티</span>
-            <h1>무엇을 같이 알아볼까요?</h1>
-            <p>생활 이야기와 국내 공공정보를 보고, 함께할 일은 별도 공동 원장에서 준비합니다.</p>
+            <h1>세계 지도를 보며<br />지역의 삶과 가격을 알아봐요</h1>
+            <p>
+                지도의 지역을 고르면 생활문화와 특산물을 먼저 이해하고,
+                농수산물 가격은 출처·기준 시각·통화·거래 단위를 함께 확인할 수 있습니다.
+            </p>
         </div>
-        <label>
-            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
-            <input type="search"
-                   aria-label="커뮤니티 게시판 검색"
-                   placeholder="게시판 이름이나 주제 검색"
-                   @bind="_searchText"
-                   @bind:event="oninput" />
-        </label>
+        <nav aria-label="커뮤니티 바로가기">
+            <a class="world-community-home__primary-link" href="@AppRelative(RegionalCultureSpecialtyRoutes.Browse)">
+                지역 자료 전체 보기
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+            </a>
+            <a href="@AppRelative(CommunityPageRoutes.BoardDirectory)">커뮤니티 대화 보기</a>
+        </nav>
     </header>
 
-    <section class="community-role-home__boards" aria-label="주요 게시판">
-        @foreach (var board in VisibleBoards)
+    <section class="world-community-home__map-panel" aria-labelledby="world-map-heading">
+        <header>
+            <div>
+                <span>WORLD EXPLORER</span>
+                <h2 id="world-map-heading">어느 지역을 들여다볼까요?</h2>
+            </div>
+            <div class="world-community-home__legend" aria-label="지도 자료 상태">
+                <span><i class="is-ready" aria-hidden="true"></i>자료 연결</span>
+                <span><i class="is-preparing" aria-hidden="true"></i>자료 준비 중</span>
+            </div>
+        </header>
+
+        <div class="world-community-home__map-scroll" tabindex="0" aria-label="세계 지도. 작은 화면에서는 좌우로 이동할 수 있습니다.">
+            <div class="world-community-home__map">
+                <svg viewBox="0 0 1000 500"
+                     role="img"
+                     aria-labelledby="world-map-title world-map-description"
+                     preserveAspectRatio="xMidYMid meet">
+                    <title id="world-map-title">지역 문화와 농수산물 가격 탐색 세계 지도</title>
+                    <desc id="world-map-description">대한민국, 미국, 중국, 호주에 자료가 연결되어 있으며 다른 지역은 준비 중입니다.</desc>
+                    <g class="world-community-home__graticule" aria-hidden="true">
+                        <path d="M0 125 H1000 M0 250 H1000 M0 375 H1000" />
+                        <path d="M200 0 V500 M400 0 V500 M600 0 V500 M800 0 V500" />
+                    </g>
+                    <g class="world-community-home__continents" aria-hidden="true">
+                        <path d="M64 94 L128 52 L221 58 L286 95 L274 128 L235 147 L222 190 L180 212 L142 188 L110 146 L77 133 Z" />
+                        <path d="M225 217 L282 226 L312 270 L295 331 L268 392 L241 423 L226 370 L205 315 L198 260 Z" />
+                        <path d="M424 104 L467 85 L514 98 L526 126 L498 144 L456 140 L427 123 Z" />
+                        <path d="M447 154 L516 156 L555 214 L539 286 L501 357 L461 330 L434 264 L421 201 Z" />
+                        <path d="M516 91 L603 63 L707 78 L785 112 L875 120 L920 168 L882 210 L805 206 L755 179 L702 194 L643 170 L590 180 L548 145 Z" />
+                        <path d="M760 306 L825 287 L884 309 L897 353 L866 388 L795 381 L753 345 Z" />
+                        <path d="M341 39 L389 18 L431 40 L415 75 L365 78 Z" />
+                    </g>
+                    <g class="world-community-home__preparing-labels" aria-hidden="true">
+                        <text x="255" y="305">남아메리카 · 준비 중</text>
+                        <text x="471" y="256">아프리카 · 준비 중</text>
+                        <text x="475" y="116">유럽 · 준비 중</text>
+                    </g>
+                </svg>
+
+                @foreach (var country in MapCountries)
+                {
+                    <button type="button"
+                            class="@MapHotspotClass(country)"
+                            aria-pressed="@IsSelected(country.Code)"
+                            aria-controls="world-map-results"
+                            @onclick="() => SelectCountry(country.Code)">
+                        <span aria-hidden="true"></span>
+                        <strong>@country.Name</strong>
+                        <small>@country.DataLabel</small>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <p class="world-community-home__map-note">
+            지도는 자료를 찾기 위한 개략도이며 국경·영유권 판단의 기준이 아닙니다.
+            활성 지역도 모든 품목을 뜻하지 않으며, 연결된 공식 관측 범위만 보여줍니다.
+        </p>
+    </section>
+
+    <section id="world-map-results"
+             class="world-community-home__results"
+             aria-labelledby="world-map-results-heading"
+             aria-live="polite">
+        <header>
+            <div>
+                <span>@(SelectedCountry is null ? "연결된 지역" : SelectedCountry.Continent)</span>
+                <h2 id="world-map-results-heading">
+                    @(SelectedCountry is null ? "현재 살펴볼 수 있는 지역" : $"{SelectedCountry.Name} 자료")
+                </h2>
+                <p>
+                    @(SelectedCountry is null
+                        ? "문화 자료와 가격 관측의 준비 상태를 지역별로 확인하세요."
+                        : SelectedCountry.Summary)
+                </p>
+            </div>
+            @if (SelectedCountry is not null)
+            {
+                <button type="button" @onclick="ShowAllCountries">세계 전체 보기</button>
+            }
+        </header>
+
+        @if (SelectedCountry is null)
         {
-            <a href="@board.Href">
-                <span class="community-role-home__icon">
-                    <MudIcon Icon="@board.Icon" />
-                </span>
-                <span>
-                    <strong>@board.Title</strong>
-                    <small>@board.Description</small>
-                </span>
-                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
-            </a>
+            <div class="world-community-home__country-grid">
+                @foreach (var country in MapCountries)
+                {
+                    <article class="world-community-home__country-card">
+                        <header>
+                            <span>@country.Code · @country.Continent</span>
+                            <h3>@country.Name</h3>
+                        </header>
+                        <p>@country.Summary</p>
+                        <dl>
+                            <div>
+                                <dt>문화 자료</dt>
+                                <dd>@(country.Regions.Count > 0 ? $"{country.Regions.Count}개 지역" : "커뮤니티 수집 중")</dd>
+                            </div>
+                            <div>
+                                <dt>가격 근거</dt>
+                                <dd>@country.PriceSource</dd>
+                            </div>
+                        </dl>
+                        <button type="button" @onclick="() => SelectCountry(country.Code)">
+                            지도에서 자세히 보기
+                        </button>
+                    </article>
+                }
+            </div>
         }
-        @if (VisibleBoards.Count == 0)
+        else if (SelectedCountry.Regions.Count > 0)
         {
-            <p class="community-role-home__empty">검색 조건에 맞는 주요 게시판이 없습니다.</p>
+            <div class="world-community-home__region-grid">
+                @foreach (var region in SelectedCountry.Regions)
+                {
+                    <article class="world-community-home__region-card">
+                        <header>
+                            <span>@region.RegionType · @region.CountryName</span>
+                            <h3>@region.RegionName</h3>
+                            <small>@region.Geography</small>
+                        </header>
+                        <p>@region.CultureSummary</p>
+                        <div class="world-community-home__specialties">
+                            <span>대표 탐색 품목</span>
+                            <strong>@string.Join(" · ", region.Specialties.Select(item => item.Name))</strong>
+                        </div>
+                        <footer>
+                            <a href="@AppRelative(RegionalCultureSpecialtyRoutes.DetailFor(region.Key))">문화·특산물 보기</a>
+                            <a class="world-community-home__price-link" href="@SelectedCountry.PriceHref">
+                                @SelectedCountry.PriceActionLabel
+                            </a>
+                        </footer>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="world-community-home__culture-pending">
+                <span><MudIcon Icon="@Icons.Material.Filled.TravelExplore" /></span>
+                <div>
+                    <strong>@SelectedCountry.Name 문화 자료는 커뮤니티에서 모으는 중입니다.</strong>
+                    <p>지역을 한 이름으로 단순화하지 않고, 생활권·행정구역·문화적 맥락과 근거를 확인한 뒤 공개합니다.</p>
+                </div>
+                <a href="@AppRelative(CultureConversationHref(SelectedCountry))">지역 문화 대화 보기</a>
+            </div>
+        }
+
+        @if (SelectedCountry is not null)
+        {
+            <aside class="world-community-home__price-panel">
+                <div>
+                    <span>@SelectedCountry.PriceSource</span>
+                    <strong>@SelectedCountry.Name 농수산물 가격 자료</strong>
+                    <p>가격은 구매가가 아니라 관측 정보입니다. 기준일·원 거래단위·통화·시장 단계를 함께 확인하세요.</p>
+                </div>
+                <a href="@SelectedCountry.PriceHref">
+                    @SelectedCountry.PriceActionLabel
+                    <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+                </a>
+            </aside>
         }
     </section>
 
-    <section class="community-role-home__next">
+    <aside class="world-community-home__boundary">
+        <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" />
         <div>
-            <strong>대화가 공동행동으로 이어질 때</strong>
-            <p>관심 표시, 개별 의향, 공동 원장, 실제 실행은 각각 별도 동의와 철회 가능한 상태로 관리합니다.</p>
+            <strong>알아보는 일과 거래하는 일은 분리합니다.</strong>
+            <p>이 화면의 지역 선택은 조회 조건일 뿐 자동 가입·상대 추천·주문·수입·배차를 만들지 않습니다.</p>
         </div>
-        <a href="community/actions">공동행동 살펴보기</a>
-    </section>
-
-    <aside>
-        <span><MudIcon Icon="@Icons.Material.Filled.Security" /></span>
-        <div>
-            <strong>개인정보와 거래 안전</strong>
-            <p>연락처·정확한 위치·개별 수량은 공개 글에 적지 말고, 필요한 단계에서 동의 후 공유하세요.</p>
-        </div>
-        <a href="community/safety">안전 안내</a>
+        <a href="@AppRelative(CommunityPageRoutes.BoardDirectory)">게시판 모음</a>
     </aside>
-
-    <a class="community-role-home__directory" href="community/boards/directory">
-        게시판 모음 보기
-        <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
-    </a>
 </main>
 
 @code {
-    private string _searchText = string.Empty;
+    private string? _selectedCountryCode;
 
-    private static IReadOnlyList<CommunityHomeBoard> Boards =>
+    private static readonly IReadOnlyList<CommunityMapCountry> MapCountries =
     [
-        new("서원", "이루고 싶은 마음과 함께 살펴볼 일을 가볍게 적습니다.", "community/boards?boardKey=vow", Icons.Material.Filled.FavoriteBorder),
-        new("자유·생활", "지역 이야기와 일상 정보를 편하게 나눕니다.", "community/boards?boardKey=free-life", Icons.Material.Filled.ChatBubbleOutline),
-        new("지역 문화", "지역의 생활문화·음식·특산물 이야기를 살펴봅니다.", "community/boards?boardKey=regional-culture", Icons.Material.Filled.TravelExplore),
-        new("농수산물 가격", "KAMIS 가격과 조사 단위·시점·공공 근거를 확인합니다.", "community/boards?boardKey=information-prices", Icons.Material.Filled.QueryStats)
+        new(
+            "US",
+            "미국",
+            "북아메리카",
+            "Maine·Georgia·California 문화 자료와 USDA 가격 관측을 연결합니다.",
+            "지역 문화 + 가격",
+            "USDA NASS",
+            "information/usda-us-price-comparison",
+            "미국 가격 확인",
+            RegionalCultureSpecialtyCatalog.ForCountry(RegionalCultureSpecialtyCatalog.UnitedStatesCountryCode)),
+        new(
+            "CN",
+            "중국",
+            "동아시아",
+            "산둥·랴오둥·강남을 행정구역과 문화권으로 구분해 살펴봅니다.",
+            "지역 문화 + 가격",
+            "공식 연결 관측",
+            "information/produce-price-comparison",
+            "중국 연결 가격 확인",
+            RegionalCultureSpecialtyCatalog.ForCountry(RegionalCultureSpecialtyCatalog.ChinaCountryCode)),
+        new(
+            "KR",
+            "대한민국",
+            "동아시아",
+            "KAMIS 국내 유통단계 가격을 원문 품목과 거래 단위 그대로 확인합니다.",
+            "가격 자료 연결",
+            "KAMIS · aT",
+            "information/kamis-domestic-price-comparison",
+            "KAMIS 가격 확인",
+            []),
+        new(
+            "AU",
+            "호주",
+            "오세아니아",
+            "ABS 식품 물가지수를 지역·측정 기준과 함께 확인합니다.",
+            "가격 자료 연결",
+            "호주 ABS",
+            "information/public-data",
+            "호주 가격 확인",
+            [])
     ];
 
-    private IReadOnlyList<CommunityHomeBoard> VisibleBoards
-        => string.IsNullOrWhiteSpace(_searchText)
-            ? Boards
-            : Boards
-                .Where(board =>
-                    board.Title.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase)
-                    || board.Description.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+    private CommunityMapCountry? SelectedCountry
+        => MapCountries.FirstOrDefault(country => country.Code == _selectedCountryCode);
 
-    private sealed record CommunityHomeBoard(
-        string Title,
-        string Description,
-        string Href,
-        string Icon);
+    private void SelectCountry(string countryCode)
+        => _selectedCountryCode = countryCode;
+
+    private void ShowAllCountries()
+        => _selectedCountryCode = null;
+
+    private bool IsSelected(string countryCode)
+        => string.Equals(_selectedCountryCode, countryCode, StringComparison.Ordinal);
+
+    private string MapHotspotClass(CommunityMapCountry country)
+        => $"world-community-home__hotspot world-community-home__hotspot--{country.Code.ToLowerInvariant()}"
+           + (IsSelected(country.Code) ? " is-selected" : string.Empty);
+
+    private static string CultureConversationHref(CommunityMapCountry country)
+        => CommunityPageRoutes.BoardsFor(
+            boardName: "지역 문화",
+            boardKey: "regional-culture",
+            search: country.Name);
+
+    private static string AppRelative(string path)
+        => path.TrimStart('/');
+
+    private sealed record CommunityMapCountry(
+        string Code,
+        string Name,
+        string Continent,
+        string Summary,
+        string DataLabel,
+        string PriceSource,
+        string PriceHref,
+        string PriceActionLabel,
+        IReadOnlyList<RegionalCultureSpecialty> Regions);
 }
