@@ -32,8 +32,7 @@ public sealed class AdminFoodOrderOperationsTraceCompositionTests
             "Services",
             "AdminV1NavigationPolicy.cs"));
 
-        Assert.Contains("new(\"음식 주문 추적\", \"/food/order-trace\"", navigation);
-        Assert.Contains("\"/food/order-trace\"", navigation);
+        Assert.Contains("\"/admin/food-delivery/order-trace\"", navigation);
     }
 
     [Fact]

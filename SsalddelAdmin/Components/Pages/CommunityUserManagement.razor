@@ -1,0 +1,269 @@
+@page "/community/users"
+@rendermode InteractiveServer
+@using Ssalddel.Contracts.Admin.Community
+@inject CommunityManagementService CommunityManagementService
+@inject 관리자인증세션Service AdminSession
+@inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+
+<PageTitle>커뮤니티 사용자·콘텐츠 관리</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.overline">커뮤니티 안전과 운영</MudText>
+        <MudText Typo="Typo.h4">사용자·콘텐츠 관리</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            정확한 사용자 ID로 작성 콘텐츠를 확인하고, 필요한 범위만 사유와 함께 조치합니다.
+        </MudText>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        사용자 ID는 신고나 지원 요청에서 확인된 값만 사용하세요. 이메일·전화번호는 이 화면에서 마스킹하며 검색 키로 사용하지 않습니다.
+    </MudAlert>
+
+    @if (!CanManage)
+    {
+        <MudAlert Severity="Severity.Error">커뮤니티 운영은 서버관리자 권한이 필요합니다.</MudAlert>
+    }
+    else
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudGrid Spacing="2">
+                <MudItem xs="12" md="7">
+                    <MudTextField Label="사용자 ID"
+                                  Placeholder="개발 샘플: sample-community-user"
+                                  Variant="Variant.Outlined"
+                                  Immediate="true"
+                                  @bind-Value="userId" />
+                </MudItem>
+                <MudItem xs="12" md="5">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               FullWidth="true"
+                               Disabled="@isLoading"
+                               OnClick="SearchAsync">
+                        사용자와 콘텐츠 조회
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        @if (isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (user is not null && !user.AccountExists)
+        {
+            <MudAlert Severity="Severity.Info">해당 사용자 계정과 작성 콘텐츠를 찾지 못했습니다.</MudAlert>
+        }
+        else if (user is not null)
+        {
+            <MudPaper Elevation="1" Class="pa-4">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">계정 확인</MudText>
+                    <MudText Typo="Typo.body2">표시 이름: @user.UserName</MudText>
+                    <MudText Typo="Typo.body2">이메일: @MaskEmail(user.Email)</MudText>
+                    <MudText Typo="Typo.body2">전화번호: @MaskPhone(user.PhoneNumber)</MudText>
+                    <MudText Typo="Typo.body2">역할: @(user.Roles.Count == 0 ? "없음" : string.Join(", ", user.Roles))</MudText>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-4">
+                <MudTextField Label="조치 사유"
+                              HelperText="숨김·복구 전에 2자 이상 입력해야 하며 감사 기록에 남습니다."
+                              Variant="Variant.Outlined"
+                              Lines="2"
+                              Immediate="true"
+                              @bind-Value="actionReason" />
+            </MudPaper>
+
+            @if (user.Posts.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info">이 사용자가 작성한 게시글이 없습니다.</MudAlert>
+            }
+            else
+            {
+                @foreach (var post in user.Posts)
+                {
+                    <MudPaper Elevation="1" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Style="flex-wrap:wrap;">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.h6">@post.Title</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        게시글 #@post.Id · @post.Category · @post.UpdatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                    </MudText>
+                                </MudStack>
+                                <MudText Typo="Typo.body2" Color="@(post.IsDeleted ? Color.Error : Color.Success)">
+                                    @(post.IsDeleted ? "숨김" : "공개")
+                                </MudText>
+                            </MudStack>
+
+                            <MudText Typo="Typo.body2" Style="white-space:pre-wrap;max-height:180px;overflow:auto;">@post.Body</MudText>
+
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="@(post.IsDeleted ? Color.Success : Color.Warning)"
+                                       Disabled="@(!CanApplyAction || post.IsSystemGenerated || isApplying)"
+                                       OnClick="@(() => SetPostVisibilityAsync(post))">
+                                @(post.IsDeleted ? "게시글 복구" : "게시글 숨김")
+                            </MudButton>
+
+                            @if (post.IsSystemGenerated)
+                            {
+                                <MudAlert Severity="Severity.Info" Dense="true">원장 완료 등 시스템 기록은 운영자가 숨기거나 수정할 수 없습니다.</MudAlert>
+                            }
+
+                            @foreach (var comment in post.Comments)
+                            {
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="flex-wrap:wrap;">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.body2">@comment.Body</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                댓글 #@comment.Id · 신고 @comment.ReportCount 건 · @(comment.IsOperatorHidden ? "운영자 숨김" : "공개")
+                                            </MudText>
+                                        </MudStack>
+                                        <MudButton Size="Size.Small"
+                                                   Variant="Variant.Text"
+                                                   Color="@(comment.IsOperatorHidden ? Color.Success : Color.Warning)"
+                                                   Disabled="@(!CanApplyAction || isApplying)"
+                                                   OnClick="@(() => SetCommentVisibilityAsync(comment))">
+                                            @(comment.IsOperatorHidden ? "댓글 복구" : "댓글 숨김")
+                                        </MudButton>
+                                    </MudStack>
+                                </MudPaper>
+                            }
+
+                            @foreach (var attachmentComment in post.Attachments.SelectMany(attachment => attachment.Comments))
+                            {
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="flex-wrap:wrap;">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.body2">첨부 댓글: @attachmentComment.Body</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                첨부 댓글 #@attachmentComment.Id · 신고 @attachmentComment.ReportCount 건 · @(attachmentComment.IsOperatorHidden ? "운영자 숨김" : "공개")
+                                            </MudText>
+                                        </MudStack>
+                                        <MudButton Size="Size.Small"
+                                                   Variant="Variant.Text"
+                                                   Color="@(attachmentComment.IsOperatorHidden ? Color.Success : Color.Warning)"
+                                                   Disabled="@(!CanApplyAction || isApplying)"
+                                                   OnClick="@(() => SetAttachmentCommentVisibilityAsync(attachmentComment))">
+                                            @(attachmentComment.IsOperatorHidden ? "첨부 댓글 복구" : "첨부 댓글 숨김")
+                                        </MudButton>
+                                    </MudStack>
+                                </MudPaper>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                }
+            }
+        }
+    }
+</MudStack>
+
+@code {
+    private string userId = string.Empty;
+    private string actionReason = string.Empty;
+    private string message = string.Empty;
+    private Severity messageSeverity = Severity.Info;
+    private bool isLoading;
+    private bool isApplying;
+    private CommunityManagementUserResponse? user;
+
+    private bool CanManage => Configuration.GetValue("AdminData:UseMemory", false) || AdminSession.서버관리자인가;
+    private bool CanApplyAction => actionReason.Trim().Length is >= 2 and <= 1000;
+
+    protected override void OnInitialized()
+    {
+        if (!Configuration.GetValue("AdminData:UseMemory", false) && !AdminSession.로그인됨)
+        {
+            NavigationManager.NavigateTo("/login?returnUrl=%2Fcommunity%2Fusers");
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            ShowMessage("사용자 ID를 입력해 주세요.", Severity.Warning);
+            return;
+        }
+
+        isLoading = true;
+        message = string.Empty;
+        try
+        {
+            user = await CommunityManagementService.GetUserAsync(userId);
+        }
+        catch (Exception ex)
+        {
+            user = null;
+            ShowMessage($"사용자 콘텐츠를 불러오지 못했습니다: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SetPostVisibilityAsync(CommunityManagementPostResponse post)
+        => await ApplyActionAsync(() => CommunityManagementService.SetPostVisibilityAsync(post.Id, !post.IsDeleted, actionReason));
+
+    private async Task SetCommentVisibilityAsync(CommunityManagementCommentResponse comment)
+        => await ApplyActionAsync(() => CommunityManagementService.SetCommentVisibilityAsync(comment.Id, !comment.IsOperatorHidden, actionReason));
+
+    private async Task SetAttachmentCommentVisibilityAsync(CommunityManagementAttachmentCommentResponse comment)
+        => await ApplyActionAsync(() => CommunityManagementService.SetAttachmentCommentVisibilityAsync(comment.Id, !comment.IsOperatorHidden, actionReason));
+
+    private async Task ApplyActionAsync(Func<Task<CommunityManagementActionResponse>> action)
+    {
+        if (!CanApplyAction || isApplying)
+        {
+            ShowMessage("조치 사유를 2자 이상 입력해 주세요.", Severity.Warning);
+            return;
+        }
+
+        isApplying = true;
+        try
+        {
+            var result = await action();
+            ShowMessage(result.Message, result.Succeeded ? Severity.Success : Severity.Warning);
+            await SearchAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowMessage($"운영 조치를 적용하지 못했습니다: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isApplying = false;
+        }
+    }
+
+    private void ShowMessage(string value, Severity severity)
+    {
+        message = value;
+        messageSeverity = severity;
+    }
+
+    private static string MaskEmail(string value)
+    {
+        var separator = value.IndexOf('@');
+        return separator <= 0
+            ? "미등록"
+            : $"{value[0]}***{value[separator..]}";
+    }
+
+    private static string MaskPhone(string value)
+    {
+        var digits = new string(value.Where(char.IsDigit).ToArray());
+        return digits.Length < 4 ? "미등록" : $"***-****-{digits[^4..]}";
+    }
+}

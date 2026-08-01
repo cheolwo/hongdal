@@ -1,0 +1,129 @@
+@page "/community"
+@using Ssalddel.Contracts.Common.Community
+
+<PageTitle>커뮤니티 운영</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.overline">문화교통 0.0</MudText>
+        <MudText Typo="Typo.h4">커뮤니티 운영</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Secondary">
+            공개 게시판과 참여가 안전하게 이어지도록 콘텐츠, 사용자 조치, 공개 정보와 감사 기록을 관리합니다.
+        </MudText>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        관심·참여·연락처 공개·원장·실행은 서로 다른 동의 상태입니다. 운영 조치는 자동 계약이나 자동 상대 선택으로 이어지지 않습니다.
+    </MudAlert>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">등록 게시판</MudText>
+                <MudText Typo="Typo.h4">@Boards.Count</MudText>
+                <MudText Typo="Typo.body2">고정 게시판과 활동 게시판 전체</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">공개 게시판</MudText>
+                <MudText Typo="Typo.h4">@Boards.Count(board => board.IsPublic)</MudText>
+                <MudText Typo="Typo.body2">비회원도 탐색할 수 있는 범위</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">사용자 개설 가능</MudText>
+                <MudText Typo="Typo.h4">@Boards.Count(board => board.IsUserCreatable)</MudText>
+                <MudText Typo="Typo.body2">명시적 작성 조건이 있는 게시판</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">안전·신고 게시판</MudText>
+                <MudText Typo="Typo.h4">@Boards.Count(board => board.GroupCode == CommunityBoardGroupCodes.Safety)</MudText>
+                <MudText Typo="Typo.body2">신고·분쟁과 운영 보호 경로</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">사용자·콘텐츠 조치</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        사용자 ID로 작성 콘텐츠와 신고 수를 확인하고, 사유를 남겨 게시글·댓글을 숨김 또는 복구합니다.
+                    </MudText>
+                    <MudButton Href="/community/users" Variant="Variant.Filled" Color="Color.Primary">
+                        커뮤니티 사용자 관리
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">공개 정보·자동 작성</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        출처와 기준 시각이 있는 공공 콘텐츠 및 주기 게시물의 운영 상태를 확인합니다.
+                    </MudText>
+                    <MudButton Href="/common-contents" Variant="Variant.Outlined" Color="Color.Primary">
+                        공통 콘텐츠 관리
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">운영 감사 기록</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        숨김·복구·연락 조치와 관리자 활동의 추적 기록을 확인합니다.
+                    </MudText>
+                    <MudButton Href="/activity-logs" Variant="Variant.Outlined" Color="Color.Primary">
+                        활동 로그 보기
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">공개 범위 정책</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        화면과 기능의 공개 범위가 커뮤니티 0.0 경계를 벗어나지 않는지 확인합니다.
+                    </MudText>
+                    <MudButton Href="/view-policies" Variant="Variant.Outlined" Color="Color.Primary">
+                        화면 정책 보기
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">게시판 구성</MudText>
+        <MudTable Items="@Boards" Dense="true" Hover="true" Elevation="0" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>게시판</MudTh>
+                <MudTh>그룹</MudTh>
+                <MudTh>작성 조건</MudTh>
+                <MudTh>공개</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="게시판">
+                    <MudText Typo="Typo.body2"><strong>@context.DisplayName</strong></MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Description</MudText>
+                </MudTd>
+                <MudTd DataLabel="그룹">@context.GroupDisplayName</MudTd>
+                <MudTd DataLabel="작성 조건">@context.PostingAccessDisplayName</MudTd>
+                <MudTd DataLabel="공개">@(context.IsPublic ? "공개" : "비공개")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private static IReadOnlyList<CommunityBoardDefinition> Boards => CommunityBoardCatalog.All;
+}

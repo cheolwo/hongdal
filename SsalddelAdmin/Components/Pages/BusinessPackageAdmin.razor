@@ -1,0 +1,60 @@
+@page "/admin/food-delivery"
+@page "/admin/freight-delivery"
+@page "/admin/order-warehouse"
+@using Ssalddel.Contracts.Admin.BusinessPackages
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Definition.DisplayName 관리자</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.overline">살뜰 업무 패키지</MudText>
+        <MudText Typo="Typo.h4">@Definition.DisplayName 관리자</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Secondary">@Definition.Description</MudText>
+    </MudStack>
+
+    @if (!string.IsNullOrWhiteSpace(Definition.CompletedOutboundHandoffPackageCode))
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            완료 출고는 <strong>@BusinessPackageCatalog.GetRequired(Definition.CompletedOutboundHandoffPackageCode).DisplayName</strong>
+            패키지로 인계합니다. 이 화면에서는 기존 관리자 원장으로 인계 상태만 확인합니다.
+        </MudAlert>
+    }
+
+    <MudGrid Spacing="3">
+        @foreach (var workflow in Definition.Workflows)
+        {
+            <MudItem xs="12" md="6">
+                <MudPaper Elevation="1" Class="pa-4" Style="height:100%;">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6">@workflow.Label</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@workflow.Description</MudText>
+                        <MudButton Href="@workflow.AdminPath"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   EndIcon="@Icons.Material.Filled.ArrowForward">
+                            기존 관리자 화면 열기
+                        </MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+</MudStack>
+
+@code {
+    private BusinessPackageDefinition Definition
+        => BusinessPackageCatalog.GetRequired(ResolvePackageCode());
+
+    private string ResolvePackageCode()
+    {
+        var path = new Uri(NavigationManager.Uri).AbsolutePath.TrimEnd('/');
+        return path.ToLowerInvariant() switch
+        {
+            업무패키지관리Routes.FoodDeliveryAdminRoot => BusinessPackageCatalog.FoodDelivery,
+            업무패키지관리Routes.FreightDeliveryAdminRoot => BusinessPackageCatalog.FreightDelivery,
+            업무패키지관리Routes.OrderWarehouseAdminRoot => BusinessPackageCatalog.OrderWarehouse,
+            _ => throw new InvalidOperationException($"지원하지 않는 업무 패키지 관리자 경로입니다: {path}")
+        };
+    }
+}
