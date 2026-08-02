@@ -13,6 +13,8 @@ public sealed class SsalddelExecutionOptions
     public const string SectionName = "SsalddelExecution";
 
     public SsalddelExecutionMode Mode { get; set; } = SsalddelExecutionMode.Operational;
+
+    public bool DevelopmentReadOnly { get; set; }
 }
 
 public interface ISsalddelExecutionModePolicy

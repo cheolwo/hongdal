@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Options;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Contracts.Common.ViewSettings;
 using 살뜰.Services.Audit;
+using 살뜰.Services.Options;
 
 namespace Ssalddel.Middleware;
 
@@ -12,16 +14,38 @@ public sealed class 사용자행위로그Middleware : IMiddleware
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I사용자행위로그Service _activityLogService;
+    private readonly IHostEnvironment _environment;
+    private readonly ISsalddelExecutionModePolicy _executionMode;
+    private readonly SsalddelExecutionOptions _executionOptions;
 
-    public 사용자행위로그Middleware(ICurrentUserAccessor currentUserAccessor, I사용자행위로그Service activityLogService)
+    public 사용자행위로그Middleware(
+        ICurrentUserAccessor currentUserAccessor,
+        I사용자행위로그Service activityLogService,
+        IHostEnvironment environment,
+        ISsalddelExecutionModePolicy executionMode,
+        IOptions<SsalddelExecutionOptions> executionOptions)
     {
         _currentUserAccessor = currentUserAccessor;
         _activityLogService = activityLogService;
+        _environment = environment;
+        _executionMode = executionMode;
+        _executionOptions = executionOptions.Value;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (!context.Request.Path.StartsWithSegments("/api/v1", StringComparison.OrdinalIgnoreCase))
+        {
+            await next(context);
+            return;
+        }
+
+        if (ShouldSkipDevelopmentMapReadAudit(
+                _environment.IsDevelopment(),
+                _executionMode.IsSimulation,
+                _executionOptions.DevelopmentReadOnly,
+                context.Request.Method,
+                context.Request.Path))
         {
             await next(context);
             return;
@@ -77,6 +101,19 @@ public sealed class 사용자행위로그Middleware : IMiddleware
             }
         }
     }
+
+    internal static bool ShouldSkipDevelopmentMapReadAudit(
+        bool isDevelopment,
+        bool isSimulation,
+        bool developmentReadOnly,
+        string method,
+        PathString path)
+        => isDevelopment
+           && isSimulation
+           && developmentReadOnly
+           && HttpMethods.IsGet(method)
+           && (path.Equals(new PathString("/api/v1/platform/runtime/google-maps"))
+               || path.Equals(new PathString("/api/v1/community/world-map/observations")));
 
     private static string ResolveActionType(string method, PathString path)
     {

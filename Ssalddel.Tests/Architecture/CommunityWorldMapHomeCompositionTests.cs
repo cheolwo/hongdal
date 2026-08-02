@@ -204,6 +204,22 @@ public sealed class CommunityWorldMapHomeCompositionTests
     }
 
     [Fact]
+    public void 개발ReadOnlySimulation은_지도요청감사쓰기와_HostedService를비활성화한다()
+    {
+        var programSource = ReadRepositoryFile("Ssalddel", "Program.cs");
+        var middlewareSource = ReadRepositoryFile(
+            "Ssalddel",
+            "Middleware",
+            "사용자행위로그Middleware.cs");
+
+        Assert.Contains("executionOptions.DevelopmentReadOnly", programSource);
+        Assert.Contains("builder.Services.RemoveAll<IHostedService>()", programSource);
+        Assert.Contains("ShouldSkipDevelopmentMapReadAudit", middlewareSource);
+        Assert.Contains("/api/v1/platform/runtime/google-maps", middlewareSource);
+        Assert.Contains("/api/v1/community/world-map/observations", middlewareSource);
+    }
+
+    [Fact]
     public void Google지도BrowserKey는_배포산출물에만주입하고_허용Origin에서만소비한다()
     {
         var indexSource = ReadRepositoryFile(

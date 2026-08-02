@@ -6,11 +6,18 @@ namespace Ssalddel.WebApp.Services;
 public sealed class GoogleMapsBrowserRuntimeClient(HttpClient httpClient)
 {
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(5);
+    private Task<GoogleMapsBrowserRuntimeResponse?>? _runtimeSettingsTask;
 
-    public async Task<GoogleMapsBrowserRuntimeResponse?> TryGetAsync(
+    public Task<GoogleMapsBrowserRuntimeResponse?> TryGetAsync(
         CancellationToken cancellationToken = default)
     {
-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _runtimeSettingsTask ??= FetchAsync();
+        return _runtimeSettingsTask.WaitAsync(cancellationToken);
+    }
+
+    private async Task<GoogleMapsBrowserRuntimeResponse?> FetchAsync()
+    {
+        using var timeout = new CancellationTokenSource();
         timeout.CancelAfter(Timeout);
 
         try
@@ -26,7 +33,7 @@ public sealed class GoogleMapsBrowserRuntimeClient(HttpClient httpClient)
             return await response.Content.ReadFromJsonAsync<GoogleMapsBrowserRuntimeResponse>(
                 cancellationToken: timeout.Token);
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException)
         {
             return null;
         }

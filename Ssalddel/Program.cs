@@ -235,6 +235,13 @@ builder.Services.AddApifyYouTubeContentCollection(builder.Configuration);
 builder.Services.AddFreeSocialMediaResearch(builder.Configuration);
 builder.Services.AddYouTubeSocialContextWorkspace(builder.Configuration);
 builder.Services.AddSsalddelDomainServices();
+var developmentReadOnly = builder.Environment.IsDevelopment()
+                          && executionOptions.Mode == SsalddelExecutionMode.Simulation
+                          && executionOptions.DevelopmentReadOnly;
+if (developmentReadOnly)
+{
+    builder.Services.RemoveAll<IHostedService>();
+}
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.Replace(ServiceDescriptor.Singleton<IObjectStorageService, DevelopmentLocalStorageService>());
@@ -244,6 +251,10 @@ builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개�
 
 var app = builder.Build();
 app.Logger.LogInformation("Ssalddel execution mode: {ExecutionMode}", executionOptions.Mode);
+if (developmentReadOnly)
+{
+    app.Logger.LogInformation("Development read-only mode is active; application hosted services are disabled.");
+}
 
 if (await AppContextImageBatchCommandLine.TryRunAsync(
         args,
