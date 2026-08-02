@@ -368,11 +368,22 @@ internal static class CommunityWorkBoardCatalog
             SsalddelProductRoadmapCatalog.FoodDeliveryVersion,
             CommunityActivityBoardKeys.FoodDeliveryHandoff,
             "음식 배달 인계",
-            "조리 완료 뒤 기사 픽업과 고객 인계 Command 경계를 보완할 업무 게시판",
+            "조리 완료 뒤 기사 배정·픽업과 고객 인계, 주문자의 수령 확인까지 점검하는 업무 게시판",
             CommunityBoardGroupCodes.WorkFoodDelivery,
             "음식 주문·배달",
             [],
-            [],
+            [
+                Event(
+                    "음식배달인계상태변경됨Event",
+                    "activity-food-delivery-handoff-status-changed",
+                    "음식 배달 인계 상태 변경",
+                    "음식 배달의 기사 배정·픽업·고객 인계 상태가 변경되었습니다."),
+                Event(
+                    "주문자음식주문수령확인됨Event",
+                    "activity-food-delivery-received",
+                    "음식 배달 수령 확인",
+                    "주문자가 음식 배달 수령을 확인해 주문·배달 흐름이 완료되었습니다.")
+            ],
             [
                 AppPage("RestaurantDeskApp", "음식점 주문 상세", "/orders/{OrderNo}", "조리 완료·기사 인계 진입"),
                 AppPage("FDriverApp", "배달기사 홈", "home", "픽업·배송 기사 업무 진입")

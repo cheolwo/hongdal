@@ -26,7 +26,7 @@ namespace Ssalddel.Controllers.Common;
 [SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 [ApiController]
 [AllowAnonymous]
-[Route("api/v1/community/regional-map/markers")]
+[Route(RegionalAgriculturalMapRoutes.MarkerApi)]
 [SsalddelApiContractName("RegionalAgriculturalMapMarkersController")]
 public sealed class 지역농수산MapController(
     I지역농수산MapMarker조회UseCase useCase) : ControllerBase

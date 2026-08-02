@@ -8,6 +8,7 @@ public static class RegionalCultureSpecialtyRoutes
     public const string DetailTemplate = $"{Browse}/{{RegionKey}}";
     public const string RegionalProducts = "/information/regional-products";
     public const string ProducePriceComparison = "/information/produce-price-comparison";
+    public const string ApplePriceComparison = "/information/apple-price-comparison";
 
     public static string DetailFor(string regionKey)
         => $"{Browse}/{EscapeKey(regionKey)}";

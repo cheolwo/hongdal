@@ -2,12 +2,31 @@ using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Contracts.Common.PublicData;
 
+public static class RegionalAgriculturalMapRoutes
+{
+    public const string RegionalMap = "/information/regional-agricultural-map";
+    public const string KoreaMap = "/information/korea-agricultural-map";
+    public const string MarkerApi = "api/v1/community/regional-map/markers";
+
+    public static string ForCountry(string countryCode)
+        => $"{RegionalMap}?country={Uri.EscapeDataString(
+            RegionalAgriculturalMapCountryCodes.NormalizeOrDefault(countryCode))}";
+}
+
 public static class RegionalAgriculturalMapCountryCodes
 {
     public const string Korea = "KR";
     public const string UnitedStates = "US";
 
     public static IReadOnlyList<string> All { get; } = [Korea, UnitedStates];
+
+    public static string NormalizeOrDefault(string? countryCode)
+    {
+        var normalized = countryCode?.Trim().ToUpperInvariant();
+        return All.Contains(normalized, StringComparer.Ordinal)
+            ? normalized!
+            : Korea;
+    }
 }
 
 public static class RegionalAgriculturalMapRegionTypeCodes

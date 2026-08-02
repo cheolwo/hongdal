@@ -1,0 +1,355 @@
+@using System.Globalization
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.PublicData
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<지역농수산MapPageViewModel>
+
+<main class="korea-agri-map" data-country="@ViewModel.CountryCode">
+    <header class="korea-agri-map__hero">
+        <div>
+            <span>문화교통 0.0 · 한국·미국 공개 데이터 지도</span>
+            <h1>@ViewModel.CountryName 농수산물 데이터 지도</h1>
+            <p>
+                가격 관측의 지역 코드를 검토된 행정구역 기준점에 연결해 국가와 관계 레이어별로 살펴봅니다.
+                마커는 실제 농장·창고·개인의 위치가 아니라 공개 가능한 지역 대표점입니다.
+            </p>
+        </div>
+        <nav aria-label="관련 정보 화면">
+            <a href="@RelatedPriceHref">@ViewModel.CountryDataSourceName 가격 비교</a>
+            <a href="@PriceBoardHref">가격 게시판</a>
+        </nav>
+    </header>
+
+    <section class="korea-agri-map__explorer-controls" aria-label="지도 국가와 데이터 레이어 선택">
+        <div class="korea-agri-map__country-switch" role="group" aria-label="국가 선택">
+            @foreach (var country in CountryOptions)
+            {
+                <button type="button"
+                        class="@(ViewModel.CountryCode == country.Code ? "is-active" : null)"
+                        aria-pressed="@(ViewModel.CountryCode == country.Code)"
+                        disabled="@ViewModel.처리중"
+                        @onclick="@(() => SelectCountryAsync(country.Code))">
+                    <span>@country.Code</span>
+                    <strong>@country.Name</strong>
+                </button>
+            }
+        </div>
+        <div class="korea-agri-map__layer-switch" role="group" aria-label="지도 관계 레이어 선택">
+            @foreach (var layer in LayerOptions)
+            {
+                <button type="button"
+                        class="@(IsSelectedLayer(layer.Code) ? "is-active" : null)"
+                        aria-pressed="@IsSelectedLayer(layer.Code)"
+                        disabled="@ViewModel.처리중"
+                        @onclick="@(() => SelectLayerAsync(layer.Code))">
+                    <i class="@layer.MarkerClass" aria-hidden="true"></i>
+                    <span>@layer.Name</span>
+                </button>
+            }
+        </div>
+    </section>
+
+    <form class="korea-agri-map__filters" @onsubmit="SearchAsync" @onsubmit:preventDefault>
+        <label>
+            <span>품목으로 좁혀 보기</span>
+            <input type="search"
+                   placeholder="예: 사과, 배추"
+                   autocomplete="off"
+                   @bind="ViewModel.ProductName" />
+        </label>
+        <button type="submit" disabled="@ViewModel.처리중">
+            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
+            지도 조회
+        </button>
+    </form>
+
+    @if (ViewModel.Response is { } response)
+    {
+        <section class="korea-agri-map__summary" aria-label="지도 조회 요약">
+            <article><span>표시 지역</span><strong>@response.ReturnedMarkerCount</strong></article>
+            <article><span>연결 전 관측</span><strong>@response.UnresolvedObservationCount</strong></article>
+            <article><span>기준점 미확인</span><strong>@response.MissingAnchorRegionCount</strong></article>
+            <article><span>검색 품목</span><strong>@(response.ProductName ?? "전체")</strong></article>
+        </section>
+    }
+
+    @if (ViewModel.상태 == PageViewModel상태.실패)
+    {
+        <section class="korea-agri-map__state korea-agri-map__state--error" role="alert">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" />
+            <div>
+                <strong>지역 데이터를 불러오지 못했습니다.</strong>
+                <p>@ViewModel.오류메시지</p>
+            </div>
+            <button type="button" @onclick="RetryAsync">다시 시도</button>
+        </section>
+    }
+    else
+    {
+        <section class="korea-agri-map__workspace" aria-busy="@ViewModel.처리중">
+            <div class="korea-agri-map__map-panel">
+                <header>
+                    <div>
+                        <span>@ViewModel.CountryCode · 검증된 지역 기준점</span>
+                        <h2>@SelectedLayerName</h2>
+                    </div>
+                    @if (ViewModel.처리중)
+                    {
+                        <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Success" />
+                    }
+                </header>
+
+                <div class="korea-agri-map__canvas" aria-label="@($"{ViewModel.CountryName} 농수산물 가격 관측 지역 개략도")">
+                    @if (ViewModel.CountryCode == RegionalAgriculturalMapCountryCodes.UnitedStates)
+                    {
+                        <svg viewBox="0 0 620 390" role="img" aria-labelledby="us-map-title us-map-description">
+                            <title id="us-map-title">미국 농수산물 가격 관측 지역 개략도</title>
+                            <desc id="us-map-description">미국 본토와 알래스카·하와이 보조 영역에 검증된 지역 대표 마커를 표시합니다.</desc>
+                            <defs>
+                                <linearGradient id="us-land-gradient" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0" stop-color="#e8f0f8" />
+                                    <stop offset="1" stop-color="#bed2e5" />
+                                </linearGradient>
+                            </defs>
+                            <path class="korea-agri-map__sea-line" d="M42 82 C176 28 452 34 581 104 M34 260 C194 222 446 231 592 278" />
+                            <path class="korea-agri-map__land korea-agri-map__land--us"
+                                  d="M72 92 L127 65 L196 69 L244 55 L302 70 L356 61 L417 83 L477 78 L545 112 L563 157 L535 181 L505 217 L470 225 L436 263 L390 279 L342 268 L302 286 L253 269 L216 239 L168 230 L139 198 L101 181 L82 146 Z" />
+                            <path class="korea-agri-map__inset" d="M57 287 L119 272 L152 296 L130 337 L77 345 L43 319 Z" />
+                            <path class="korea-agri-map__inset" d="M189 326 C212 314 236 318 254 337 C230 347 208 347 189 326 Z" />
+                            <text class="korea-agri-map__inset-label" x="72" y="367">Alaska</text>
+                            <text class="korea-agri-map__inset-label" x="194" y="367">Hawaii</text>
+                        </svg>
+                    }
+                    else
+                    {
+                        <svg viewBox="0 0 420 610" role="img" aria-labelledby="korea-map-title korea-map-description">
+                            <title id="korea-map-title">대한민국 농수산물 가격 관측 지역 개략도</title>
+                            <desc id="korea-map-description">검증된 행정구역 대표 기준점에 가격 관측 마커를 표시합니다.</desc>
+                            <defs>
+                                <linearGradient id="korea-land-gradient" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0" stop-color="#e7f3e9" />
+                                    <stop offset="1" stop-color="#bdd8c2" />
+                                </linearGradient>
+                            </defs>
+                            <path class="korea-agri-map__sea-line" d="M55 128 C104 80 318 62 363 132 M44 286 C112 241 319 242 375 290 M63 454 C131 416 296 421 357 463" />
+                            <path class="korea-agri-map__land"
+                                  d="M181 35 C238 39 278 75 276 121 C273 166 303 201 291 239 C281 273 310 310 284 342 C258 373 270 410 238 438 C212 462 209 503 169 523 C132 542 112 505 124 466 C138 421 109 390 122 348 C135 307 105 271 120 232 C136 193 107 155 133 120 C154 92 143 55 181 35 Z" />
+                            <ellipse class="korea-agri-map__land" cx="141" cy="567" rx="46" ry="17" />
+                            <circle class="korea-agri-map__island" cx="93" cy="526" r="7" />
+                            <circle class="korea-agri-map__island" cx="322" cy="302" r="6" />
+                        </svg>
+                    }
+
+                    @foreach (var marker in ViewModel.Markers)
+                    {
+                        <button type="button"
+                                class="@MarkerClass(marker)"
+                                style="@MarkerStyle(marker)"
+                                aria-pressed="@(ViewModel.SelectedMarker?.MarkerKey == marker.MarkerKey)"
+                                aria-label="@($"{marker.DisplayNameKo}, 관측 {marker.ObservationCount}건")"
+                                @onclick="@(() => ViewModel.마커선택(marker))">
+                            <i aria-hidden="true"></i>
+                            <span>@marker.DisplayNameKo</span>
+                        </button>
+                    }
+                </div>
+
+                <div class="korea-agri-map__legend" aria-label="마커 의미">
+                    <span><i class="is-origin" aria-hidden="true"></i>산지 원천</span>
+                    <span><i class="is-shipping" aria-hidden="true"></i>출하·선적</span>
+                    <span><i class="is-market" aria-hidden="true"></i>시장 관측</span>
+                </div>
+                <p class="korea-agri-map__map-boundary">
+                    이 도형은 자료 탐색을 위한 개략도이며 공식 행정경계가 아닙니다. 위치는 서버에 검증된 대표 기준점만 사용하고, 미국 Shipping Point는 원산지로 단정하지 않습니다.
+                </p>
+            </div>
+
+            <aside class="korea-agri-map__detail" aria-live="polite">
+                @if (!ViewModel.처리중 && ViewModel.Markers.Count == 0)
+                {
+                    <div class="korea-agri-map__empty">
+                        <MudIcon Icon="@Icons.Material.Filled.LocationOff" />
+                        <strong>현재 표시할 검증된 지역 마커가 없습니다.</strong>
+                        <p>가격 관측과 행정구역 교차표, 공개 가능한 기준점이 모두 연결되면 이 지도에 나타납니다. 이름이 비슷하다는 이유로 위치를 추정해서 표시하지 않습니다.</p>
+                    </div>
+                }
+                else if (ViewModel.SelectedMarker is { } selected)
+                {
+                    <header>
+                        <span>@selected.RegionKey · @RelationName(selected.RelationTypeCode)</span>
+                        <h2>@selected.DisplayNameKo</h2>
+                        <p>@selected.DisplayNameLocal · @selected.DisplayNameEn</p>
+                    </header>
+                    <dl>
+                        <div><dt>가격 관측</dt><dd>@selected.ObservationCount 건</dd></div>
+                        <div><dt>관측 기간</dt><dd>@selected.EarliestObservedDate.ToString("yyyy-MM-dd") – @selected.LatestObservedDate.ToString("yyyy-MM-dd")</dd></div>
+                        <div><dt>기준점</dt><dd>@selected.Latitude.ToString("0.0000", CultureInfo.InvariantCulture), @selected.Longitude.ToString("0.0000", CultureInfo.InvariantCulture)</dd></div>
+                        <div><dt>경계 근거</dt><dd>@selected.AnchorSourceKey · @selected.AnchorSourceVintage</dd></div>
+                    </dl>
+                    @if (IsPublicHttpUrl(selected.AnchorSourceUrl))
+                    {
+                        <a class="korea-agri-map__source-link" href="@selected.AnchorSourceUrl" target="_blank" rel="noopener noreferrer">기준점 공식 근거 열기</a>
+                    }
+                    <section class="korea-agri-map__sources">
+                        <h3>연결된 관측 원천</h3>
+                        @foreach (var source in selected.Sources)
+                        {
+                            <article>
+                                <strong>@source.ExternalName</strong>
+                                <span>@source.DataSourceKey · @source.CodeScheme · @source.ExternalCode</span>
+                                <small>@source.ObservationCount 건 · @source.EarliestObservedDate.ToString("yyyy-MM-dd") – @source.LatestObservedDate.ToString("yyyy-MM-dd")</small>
+                            </article>
+                        }
+                    </section>
+                }
+                else
+                {
+                    <div class="korea-agri-map__empty">
+                        <strong>지도를 불러오는 중입니다.</strong>
+                    </div>
+                }
+            </aside>
+        </section>
+    }
+
+    @if (ViewModel.Notices.Count > 0)
+    {
+        <aside class="korea-agri-map__notices">
+            <strong>지도를 읽을 때 확인할 점</strong>
+            <ul>
+                @foreach (var notice in ViewModel.Notices)
+                {
+                    <li>@notice</li>
+                }
+            </ul>
+        </aside>
+    }
+</main>
+
+@code {
+    [Parameter]
+    public string? InitialCountryCode { get; set; }
+
+    private const decimal MinLatitude = 33.0m;
+    private const decimal MaxLatitude = 38.7m;
+    private const decimal MinLongitude = 124.5m;
+    private const decimal MaxLongitude = 130.2m;
+
+    private static string PriceBoardHref
+        => CommunityPageRoutes.BoardsFor(boardKey: CommunityBoardKeys.InformationPrices).TrimStart('/');
+
+    private string RelatedPriceHref
+        => ViewModel.CountryCode == RegionalAgriculturalMapCountryCodes.UnitedStates
+            ? "information/usda-us-price-comparison"
+            : "information/kamis-domestic-price-comparison";
+
+    private static readonly IReadOnlyList<MapCountryOption> CountryOptions =
+    [
+        new(RegionalAgriculturalMapCountryCodes.Korea, "대한민국"),
+        new(RegionalAgriculturalMapCountryCodes.UnitedStates, "미국")
+    ];
+
+    private static readonly IReadOnlyList<MapLayerOption> LayerOptions =
+    [
+        new(null, "전체 관계", "is-all"),
+        new(RegionalAgriculturalMapRelationTypeCodes.ConfirmedOrigin, "산지 원천", "is-origin"),
+        new(RegionalAgriculturalMapRelationTypeCodes.ShippingPointOrPortOfEntry, "출하·선적", "is-shipping"),
+        new(RegionalAgriculturalMapRelationTypeCodes.MarketObservation, "시장 관측", "is-market")
+    ];
+
+    private string SelectedLayerName
+        => LayerOptions.First(option => IsSelectedLayer(option.Code)).Name;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ViewModel.초기국가설정(InitialCountryCode);
+        await ViewModel.초기화Async();
+    }
+
+    private async Task SearchAsync()
+        => await ViewModel.검색Async();
+
+    private async Task RetryAsync()
+        => await ViewModel.새로고침Async();
+
+    private async Task SelectCountryAsync(string countryCode)
+        => await ViewModel.국가선택Async(countryCode);
+
+    private async Task SelectLayerAsync(string? relationTypeCode)
+        => await ViewModel.관계선택Async(relationTypeCode);
+
+    private bool IsSelectedLayer(string? relationTypeCode)
+        => string.Equals(ViewModel.RelationTypeCode, relationTypeCode, StringComparison.Ordinal);
+
+    private string MarkerClass(RegionalAgriculturalMapMarkerDto marker)
+    {
+        var relationClass = marker.RelationTypeCode switch
+        {
+            RegionalAgriculturalMapRelationTypeCodes.ConfirmedOrigin => "is-origin",
+            RegionalAgriculturalMapRelationTypeCodes.ShippingPointOrPortOfEntry => "is-shipping",
+            RegionalAgriculturalMapRelationTypeCodes.MarketObservation => "is-market",
+            _ => "is-unclassified"
+        };
+        var selectedClass = ViewModel.SelectedMarker?.MarkerKey == marker.MarkerKey
+            ? " is-selected"
+            : string.Empty;
+        return $"korea-agri-map__marker {relationClass}{selectedClass}";
+    }
+
+    private string MarkerStyle(RegionalAgriculturalMapMarkerDto marker)
+    {
+        if (ViewModel.CountryCode == RegionalAgriculturalMapCountryCodes.UnitedStates)
+        {
+            return UnitedStatesMarkerStyle(marker);
+        }
+
+        var horizontal = Normalize(marker.Longitude, MinLongitude, MaxLongitude);
+        var vertical = 1m - Normalize(marker.Latitude, MinLatitude, MaxLatitude);
+        var left = 10m + horizontal * 80m;
+        var top = 5m + vertical * 90m;
+        return $"left:{left.ToString("0.##", CultureInfo.InvariantCulture)}%;top:{top.ToString("0.##", CultureInfo.InvariantCulture)}%;";
+    }
+
+    private static string UnitedStatesMarkerStyle(RegionalAgriculturalMapMarkerDto marker)
+    {
+        decimal left;
+        decimal top;
+        if (marker.Latitude > 50m && marker.Longitude < -130m)
+        {
+            left = 7m + Normalize(marker.Longitude, -170m, -130m) * 17m;
+            top = 70m + (1m - Normalize(marker.Latitude, 50m, 72m)) * 17m;
+        }
+        else if (marker.Latitude < 24m && marker.Longitude < -150m)
+        {
+            left = 31m + Normalize(marker.Longitude, -161m, -154m) * 10m;
+            top = 80m + (1m - Normalize(marker.Latitude, 18m, 23m)) * 9m;
+        }
+        else
+        {
+            left = 10m + Normalize(marker.Longitude, -125m, -66m) * 80m;
+            top = 10m + (1m - Normalize(marker.Latitude, 24m, 50m)) * 62m;
+        }
+
+        return $"left:{left.ToString("0.##", CultureInfo.InvariantCulture)}%;top:{top.ToString("0.##", CultureInfo.InvariantCulture)}%;";
+    }
+
+    private static string RelationName(string relationTypeCode)
+        => relationTypeCode switch
+        {
+            RegionalAgriculturalMapRelationTypeCodes.ConfirmedOrigin => "산지 원천에 명시",
+            RegionalAgriculturalMapRelationTypeCodes.ShippingPointOrPortOfEntry => "출하·선적 지역",
+            RegionalAgriculturalMapRelationTypeCodes.MarketObservation => "거래·가격 관측 지역",
+            _ => relationTypeCode
+        };
+
+    private static decimal Normalize(decimal value, decimal minimum, decimal maximum)
+        => Math.Clamp((value - minimum) / (maximum - minimum), 0m, 1m);
+
+    private static bool IsPublicHttpUrl(string? value)
+        => Uri.TryCreate(value, UriKind.Absolute, out var uri)
+           && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp);
+
+    private sealed record MapCountryOption(string Code, string Name);
+
+    private sealed record MapLayerOption(string? Code, string Name, string MarkerClass);
+}

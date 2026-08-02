@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 
@@ -11,9 +12,11 @@ using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 namespace Ssalddel.Infrastructure.Persistence.TraditionalMarkets.Migrations
 {
     [DbContext(typeof(TraditionalMarketDbContext))]
-    partial class TraditionalMarketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260802074827_AddTraditionalMarketMapAnchors")]
+    partial class AddTraditionalMarketMapAnchors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

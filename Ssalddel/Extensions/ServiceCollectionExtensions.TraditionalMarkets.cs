@@ -34,6 +34,7 @@ public static partial class ServiceCollectionExtensions
             });
         services.AddScoped<ITraditionalMarketCatalogService, TraditionalMarketCatalogService>();
         services.AddScoped<ITraditionalMarketLogisticsHubService, TraditionalMarketLogisticsHubService>();
+        services.AddScoped<I전통시장MapMarkerReader, 전통시장MapMarkerReader>();
         services.AddScoped<I전통시장생활권협의Service, 전통시장생활권협의Service>();
         return services;
     }

@@ -44,6 +44,7 @@ public sealed class TraditionalMarketLogisticsHubResponse
     public bool HasOperatorConsent { get; set; }
     public DateTime? OperatorConsentedAtUtc { get; set; }
     public DateTime? SiteVerifiedAtUtc { get; set; }
+    public TraditionalMarketMapAnchorResponse? MapAnchor { get; set; }
     public string StatusReason { get; set; } = string.Empty;
     public long Revision { get; set; }
     public DateTime CreatedAtUtc { get; set; }
@@ -67,7 +68,58 @@ public sealed class TraditionalMarketLogisticsHubUpsertRequest
     public string OperatingNotes { get; set; } = string.Empty;
     public bool HasOperatorConsent { get; set; }
     public bool IsSiteVerified { get; set; }
+    public TraditionalMarketMapAnchorUpsertRequest? MapAnchor { get; set; }
     public long? ExpectedRevision { get; set; }
+}
+
+public sealed class TraditionalMarketMapAnchorUpsertRequest
+{
+    public decimal Latitude { get; set; }
+    public decimal Longitude { get; set; }
+    public string LocationPrecisionCode { get; set; } = TraditionalMarketMapLocationPrecisionCodes.MarketAddressGeocoded;
+    public string SourceName { get; set; } = string.Empty;
+    public string SourceHref { get; set; } = string.Empty;
+    public bool ConfirmCoordinateVerification { get; set; }
+}
+
+public sealed class TraditionalMarketMapAnchorResponse
+{
+    public decimal Latitude { get; set; }
+    public decimal Longitude { get; set; }
+    public string LocationPrecisionCode { get; set; } = string.Empty;
+    public string SourceName { get; set; } = string.Empty;
+    public string SourceHref { get; set; } = string.Empty;
+    public DateTime VerifiedAtUtc { get; set; }
+}
+
+public sealed class TraditionalMarketMapMarkerResponse
+{
+    public string MarketCode { get; set; } = string.Empty;
+    public string MarketName { get; set; } = string.Empty;
+    public string CommunityScopeKey { get; set; } = string.Empty;
+    public string HubReferenceKey { get; set; } = string.Empty;
+    public string Province { get; set; } = string.Empty;
+    public string CityCounty { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public decimal ServiceRadiusKm { get; set; }
+    public int DailyGroupPurchaseCapacity { get; set; }
+    public bool SupportsResidentPickup { get; set; }
+    public bool SupportsLastMileDelivery { get; set; }
+    public bool SupportsRefrigeratedStorage { get; set; }
+    public bool SupportsFrozenStorage { get; set; }
+    public TraditionalMarketMapAnchorResponse MapAnchor { get; set; } = new();
+}
+
+public static class TraditionalMarketMapLocationPrecisionCodes
+{
+    public const string MarketAddressGeocoded = "MarketAddressGeocoded";
+    public const string MarketSiteRepresentative = "TraditionalMarketSiteRepresentative";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.Ordinal)
+    {
+        MarketAddressGeocoded,
+        MarketSiteRepresentative
+    };
 }
 
 public sealed class TraditionalMarketLogisticsHubStatusChangeRequest

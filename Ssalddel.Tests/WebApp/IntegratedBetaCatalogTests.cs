@@ -39,6 +39,19 @@ public sealed class IntegratedBetaCatalogTests
     }
 
     [Theory]
+    [InlineData("/information/produce-price-comparison")]
+    [InlineData("/information/apple-price-comparison")]
+    public void 지역별_농산물가격비교경로는_운영중인_읽기전용정보다(string href)
+    {
+        var state = IntegratedBetaCatalog.Resolve(href);
+
+        Assert.True(state.IsCataloged);
+        Assert.Equal(IntegratedBetaStage.Live, state.Stage);
+        Assert.False(state.RequiresAuthentication);
+        Assert.Equal(WebInteractionBoundary.ReadOnly, state.Boundary);
+    }
+
+    [Theory]
     [InlineData("/community/group-purchase", IntegratedBetaStage.Beta, WebInteractionBoundary.ReadOnly)]
     [InlineData("/community/group-import", IntegratedBetaStage.Experience, WebInteractionBoundary.Simulation)]
     [InlineData("/shipper/request", IntegratedBetaStage.Beta, WebInteractionBoundary.PlatformPersistence)]

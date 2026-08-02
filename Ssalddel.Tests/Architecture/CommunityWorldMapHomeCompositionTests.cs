@@ -1,7 +1,43 @@
+using Ssalddel.Contracts.Common.Community;
+
 namespace Ssalddel.Tests.Architecture;
 
 public sealed class CommunityWorldMapHomeCompositionTests
 {
+    [Fact]
+    public void 커뮤니티Web시작화면은_공통메뉴없이_전체화면지도와지도조작패널만표시한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var pageStyleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+        var layoutSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Layout",
+            "MapOnlyLayout.razor");
+
+        Assert.Contains("@layout MapOnlyLayout", pageSource);
+        Assert.Contains("world-community-home__map-fallback", pageSource);
+        Assert.Contains("preserveAspectRatio=\"xMidYMid meet\"", pageSource);
+        Assert.Contains("@Body", layoutSource);
+        Assert.DoesNotContain("NavMenu", layoutSource);
+        Assert.DoesNotContain("MudAppBar", layoutSource);
+        Assert.Contains("height: 100dvh", pageStyleSource);
+        Assert.Contains("world-community-home__map-controls", pageSource);
+        Assert.Contains("지도 데이터와 레이어 조작", pageSource);
+        Assert.Contains("HasSelectedCountry ? \"is-open\"", pageSource);
+        Assert.Contains("선택한 지역 상세 닫기", pageSource);
+        Assert.Contains(".world-community-home__results", pageStyleSource);
+        Assert.Contains(".world-community-home__results.is-open", pageStyleSource);
+        Assert.Contains(".world-community-home__boundary", pageStyleSource);
+        Assert.Contains("display: none", pageStyleSource);
+        Assert.Contains("border-radius: 0", pageStyleSource);
+    }
+
     [Fact]
     public void 커뮤니티Web시작화면은_세계지도에서_지역자료를선택한다()
     {
@@ -15,6 +51,45 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("aria-controls=\"world-map-results\"", source);
         Assert.Contains("RegionalCultureSpecialtyCatalog.ForCountry", source);
         Assert.Contains("지도는 자료를 찾기 위한 개략도", source);
+    }
+
+    [Fact]
+    public void 세계지도는_Google실제지도조작과_지도형Fallback지형표현을제공한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+        var scriptSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "js",
+            "community-world-google-map.js");
+
+        Assert.Contains("world-community-home__ocean", pageSource);
+        Assert.Contains("world-community-home__country-boundaries", pageSource);
+        Assert.Contains("world-community-home__water-labels", pageSource);
+        Assert.Contains("world-community-home__coordinate-labels", pageSource);
+        Assert.Contains("world-community-home__compass", pageSource);
+        Assert.Contains("world-community-home__scale", pageSource);
+        Assert.Contains("지도형 개략도 표시", pageSource);
+        Assert.Contains("url(#world-map-land)", styleSource);
+        Assert.Contains(".world-community-home--night .world-community-home__ocean", styleSource);
+
+        Assert.Contains("mapTypeId: \"roadmap\"", scriptSource);
+        Assert.Contains("mapTypeControl: true", scriptSource);
+        Assert.Contains("[\"roadmap\", \"terrain\", \"satellite\"]", scriptSource);
+        Assert.Contains("scaleControl: true", scriptSource);
+        Assert.Contains("streetViewControl: true", scriptSource);
+        Assert.Contains("zoomControl: true", scriptSource);
+        Assert.Contains("gestureHandling: \"greedy\"", scriptSource);
+        Assert.Contains("mapViewportPadding", scriptSource);
+        Assert.Contains("selectedScale", scriptSource);
+        Assert.DoesNotContain("case \"public-price\":\n            return { color: \"#ef8f3c\", path: \"M 0,-10 10,0 0,10 -10,0 z\" };", scriptSource);
     }
 
     [Fact]
@@ -48,6 +123,8 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("KamisDomesticPriceComparisonPage.razor", source);
         Assert.Contains("ProduceRegionalPriceComparisonPage.razor", source);
         Assert.Contains("UsdaUnitedStatesPriceComparisonPage.razor", source);
+        Assert.Contains("Layout\\MapOnlyLayout.razor", source);
+        Assert.Contains("Layout\\MapOnlyLayout.razor.css", source);
     }
 
     [Fact]
@@ -125,7 +202,67 @@ public sealed class CommunityWorldMapHomeCompositionTests
     }
 
     [Fact]
-    public void 세계지도는_분야별Layer와_사용자승인형새자료대기열을제공한다()
+    public void Google지도BrowserKey는_배포산출물에만주입하고_허용Origin에서만소비한다()
+    {
+        var indexSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "index.html");
+        var runtimeConfigSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "runtime-config.js");
+        var mapScriptSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "js",
+            "community-world-google-map.js");
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var injectionScriptSource = ReadRepositoryFile(
+            "eng",
+            "inject-web-runtime-config.ps1");
+
+        var runtimeConfigIndex = indexSource.IndexOf("runtime-config.js", StringComparison.Ordinal);
+        var blazorBootIndex = indexSource.IndexOf("_framework/blazor.webassembly", StringComparison.Ordinal);
+
+        Assert.True(runtimeConfigIndex >= 0);
+        Assert.True(blazorBootIndex > runtimeConfigIndex);
+        Assert.Contains("strict-origin-when-cross-origin", indexSource);
+        Assert.Contains("ssalddelRuntimeConfig ??= {}", runtimeConfigSource);
+        Assert.DoesNotContain("googleMapsBrowserApiKey", runtimeConfigSource);
+        Assert.DoesNotContain("AIza", runtimeConfigSource);
+
+        Assert.Contains("consumeRuntimeValue", mapScriptSource);
+        Assert.Contains("googleMapsAllowedOrigins", mapScriptSource);
+        Assert.Contains("blocked-origin", mapScriptSource);
+        Assert.True(
+            mapScriptSource.IndexOf("isRuntimeOriginAllowed()", StringComparison.Ordinal)
+            < mapScriptSource.IndexOf("consumeRuntimeValue(\"googleMapsBrowserApiKey\")", StringComparison.Ordinal));
+        Assert.Contains("delete runtimeConfig[configName]", mapScriptSource);
+        Assert.DoesNotContain("ssalddel-google-maps-browser-key", mapScriptSource);
+        Assert.DoesNotContain("document.querySelector(`meta", mapScriptSource);
+        Assert.Contains("strict-origin-when-cross-origin", mapScriptSource);
+        Assert.Contains("script.remove()", mapScriptSource);
+        Assert.Contains("GoogleMapState.BlockedOrigin", pageSource);
+
+        Assert.Contains("SSALDDEL_GOOGLE_MAPS_BROWSER_API_KEY", injectionScriptSource);
+        Assert.Contains("GoogleMaps:BrowserApiKey", injectionScriptSource);
+        Assert.DoesNotContain("GoogleMaps:UnifiedApiKey", injectionScriptSource);
+        Assert.Contains("Refusing to inject", injectionScriptSource);
+        Assert.Contains("AllowLoopback", injectionScriptSource);
+        Assert.Contains("Do not mix loopback and remote origins", injectionScriptSource);
+        Assert.Contains("must not contain user information", injectionScriptSource);
+        Assert.Contains("UriSchemeHttps", injectionScriptSource);
+        Assert.Contains("uri.IsLoopback", injectionScriptSource);
+        Assert.Contains("ConvertTo-Json -Compress", injectionScriptSource);
+        Assert.Contains("runtime-config.js?v=", injectionScriptSource);
+    }
+
+    [Fact]
+    public void 세계지도는_분야별Layer와_화면이동없는자동자료갱신을제공한다()
     {
         var pageSource = ReadRepositoryFile(
             "Ssalddel.WebApp",
@@ -138,13 +275,148 @@ public sealed class CommunityWorldMapHomeCompositionTests
             "community-world-google-map.js");
 
         Assert.Contains("지도에 표시할 분야", pageSource);
-        Assert.Contains("새 자료 지도에 반영", pageSource);
         Assert.Contains("PollMapSnapshotsAsync", pageSource);
         Assert.Contains("TimeSpan.FromSeconds(30)", pageSource);
-        Assert.Contains("_pendingSnapshot", pageSource);
+        Assert.Contains("preserveViewport: true", pageSource);
+        Assert.DoesNotContain("_pendingSnapshot", pageSource);
+        Assert.Contains("preserveViewport = false", scriptSource);
+        Assert.Contains("!preserveViewport", scriptSource);
         Assert.Contains("markerStyleFor", scriptSource);
         Assert.Contains("regional-culture", scriptSource);
+        Assert.Contains("wholesale-market", scriptSource);
+        Assert.Contains("traditional-market-hub", scriptSource);
         Assert.Contains("scripture-classics", scriptSource);
+    }
+
+    [Fact]
+    public void 세계지도하단은_업무영역별원장Template내부절차를_접고펼친다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+
+        Assert.Contains("id=\"world-map-layer-diagrams\"", pageSource);
+        Assert.Contains("aria-controls=\"world-map-layer-diagram-content\"", pageSource);
+        Assert.Contains("_isDiagramPanelExpanded", pageSource);
+        Assert.Contains("ActiveLayerDiagrams", pageSource);
+        Assert.Contains("원장 업무흐름 다이어그램", pageSource);
+        Assert.Contains("레이어 알아차림 다이어그램", pageSource);
+        Assert.Contains("현재 켜진 레이어가 없습니다", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.RegionalCulture", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.PublicPrice", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.WholesaleMarket", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.TraditionalMarketHub", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.LearningChannel", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.ScriptureAndClassics", pageSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.LocalSale", pageSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.GroupPurchase", pageSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.GroupImport", pageSource);
+        Assert.Contains("CommunityLedgerTemplateCatalog.Find", pageSource);
+        Assert.Contains("template.LedgerBlocks", pageSource);
+        Assert.Contains("template.BlockRelations", pageSource);
+        Assert.Contains("template.CompositionRules", pageSource);
+        Assert.Contains("업무 영역별 기준 원장 투영", pageSource);
+        Assert.DoesNotContain("new(\"04\", \"가원장\"", pageSource);
+        Assert.Contains("공개 채널", pageSource);
+        Assert.Contains("공개 목록", pageSource);
+
+        foreach (var templateKey in new[]
+                 {
+                     CommunityLedgerTemplateKeys.LocalSale,
+                     CommunityLedgerTemplateKeys.GroupPurchase,
+                     CommunityLedgerTemplateKeys.GroupImport
+                 })
+        {
+            var template = CommunityLedgerTemplateCatalog.Find(templateKey);
+            Assert.NotEmpty(template.LedgerBlocks);
+            Assert.NotEmpty(template.BlockRelations);
+        }
+
+        Assert.Contains(".world-community-home__diagram-panel", styleSource);
+        Assert.Contains(".world-community-home__diagram-panel.is-expanded", styleSource);
+        Assert.Contains(".world-community-home__diagram-track", styleSource);
+        Assert.Contains(".world-community-home__diagram-panel.has-results", styleSource);
+        Assert.Contains("prefers-reduced-motion: reduce", styleSource);
+    }
+
+    [Fact]
+    public void 세계지도좌우Panel은_업무영역과선택지역을_같은원장Template에연결한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+
+        Assert.Contains("업무 영역과 원장 연결", pageSource);
+        Assert.Contains("world-community-home__layer-option-copy", pageSource);
+        Assert.Contains("world-community-home__layer-ledger-summary", pageSource);
+        Assert.Contains("{layerDiagram.DisplayName} 연결", pageSource);
+        Assert.Contains("SelectedDayLedgerDiagrams", pageSource);
+        Assert.Contains("선택 지역의 업무 영역별 원장 연결", pageSource);
+        Assert.Contains("업무 영역별 원장", pageSource);
+        Assert.Contains("원장을 만들기 전에 살펴보는 판단 자료", pageSource);
+        Assert.Contains("ledger.Nodes.Take(3)", pageSource);
+        Assert.Contains("하단에서 원장 전체 절차 보기", pageSource);
+        Assert.Contains("OpenDiagramPanel", pageSource);
+        Assert.Contains(".Select(BuildLedgerWorkflowDiagram)", pageSource);
+        Assert.Contains("availableLayerCodes.Contains(layer.Code)", pageSource);
+
+        Assert.Contains(".world-community-home__layer-option-copy", styleSource);
+        Assert.Contains(".world-community-home__layer-ledger-summary", styleSource);
+        Assert.Contains(".world-community-home__selected-ledgers", styleSource);
+        Assert.Contains(".world-community-home__selected-ledger-list", styleSource);
+    }
+
+    [Fact]
+    public void 세계지도는_한국미국개별도매시장을_좌표정밀도와공식출처경계로표시한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+        var scriptSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "js",
+            "community-world-google-map.js");
+
+        Assert.Equal(18, 커뮤니티도매시장MapCatalog.All.Count);
+        Assert.Equal(6, 커뮤니티도매시장MapCatalog.ForCountry("KR").Count);
+        Assert.Equal(12, 커뮤니티도매시장MapCatalog.ForCountry("US").Count);
+        Assert.All(커뮤니티도매시장MapCatalog.ForCountry("KR"), market =>
+            Assert.Equal(커뮤니티도매시장위치정밀도Codes.시장대표점, market.LocationPrecisionCode));
+        Assert.All(커뮤니티도매시장MapCatalog.ForCountry("US"), market =>
+            Assert.Equal(커뮤니티도매시장위치정밀도Codes.도시중심점, market.LocationPrecisionCode));
+        Assert.StartsWith("https://", 커뮤니티도매시장MapCatalog.KoreaSourceHref, StringComparison.Ordinal);
+        Assert.StartsWith("https://", 커뮤니티도매시장MapCatalog.UnitedStatesSourceHref, StringComparison.Ordinal);
+
+        Assert.Contains("GoogleMapMarker.ForMarket", pageSource);
+        Assert.Contains("MapHotspotStyle", pageSource);
+        Assert.Contains("aria-label=\"@($\"{country.Name} · {country.DataLabel}\")\"", pageSource);
+        Assert.Contains("world-community-home__market-metadata", pageSource);
+        Assert.Contains("공식 출처", pageSource);
+        Assert.Contains("ConsolidateLedgerDiagrams", pageSource);
+        Assert.Contains(".world-community-home__hotspot--market", styleSource);
+        Assert.Contains(".world-community-home__layer-shape--market", styleSource);
+        Assert.Contains("case \"wholesale-market\"", scriptSource);
+        Assert.Contains("case \"traditional-market-hub\"", scriptSource);
+        Assert.Contains("? first.Id", pageSource);
+        Assert.Contains("SelectMapFeatureFromGoogleMap", scriptSource);
+        Assert.Contains("selectedMarkerId", scriptSource);
+        Assert.Contains("focusSelection(instance)", scriptSource);
     }
 
     [Fact]

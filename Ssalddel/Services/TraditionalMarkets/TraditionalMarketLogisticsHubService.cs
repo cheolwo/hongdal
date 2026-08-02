@@ -211,6 +211,10 @@ public sealed class TraditionalMarketLogisticsHubService : ITraditionalMarketLog
         hub.SiteVerifiedByUserId = request.IsSiteVerified
             ? wasVerified ? hub.SiteVerifiedByUserId : NormalizeActor(actorUserId)
             : string.Empty;
+        if (request.MapAnchor is not null)
+        {
+            ApplyMapAnchor(hub, request.MapAnchor, actorUserId, now);
+        }
         hub.UpdatedByUserId = NormalizeActor(actorUserId);
         hub.UpdatedAtUtc = now;
         hub.Revision++;
@@ -319,6 +323,7 @@ public sealed class TraditionalMarketLogisticsHubService : ITraditionalMarketLog
             HasOperatorConsent = hub.HasOperatorConsent,
             OperatorConsentedAtUtc = hub.OperatorConsentedAtUtc,
             SiteVerifiedAtUtc = hub.SiteVerifiedAtUtc,
+            MapAnchor = ToMapAnchorResponse(hub),
             StatusReason = hub.StatusReason,
             Revision = hub.Revision,
             CreatedAtUtc = hub.CreatedAtUtc,
@@ -353,7 +358,69 @@ public sealed class TraditionalMarketLogisticsHubService : ITraditionalMarketLog
         {
             throw new InvalidOperationException("운영 메모는 2000자를 넘을 수 없습니다.");
         }
+
+        if (request.MapAnchor is not null)
+        {
+            ValidateMapAnchor(request.MapAnchor);
+        }
     }
+
+    private static void ValidateMapAnchor(TraditionalMarketMapAnchorUpsertRequest anchor)
+    {
+        if (anchor.Latitude is < -90 or > 90 || anchor.Longitude is < -180 or > 180)
+        {
+            throw new InvalidOperationException("지도 좌표의 위도 또는 경도 범위가 올바르지 않습니다.");
+        }
+
+        if (!TraditionalMarketMapLocationPrecisionCodes.All.Contains(anchor.LocationPrecisionCode))
+        {
+            throw new InvalidOperationException("지원하지 않는 전통시장 지도 위치 정밀도입니다.");
+        }
+
+        if (string.IsNullOrWhiteSpace(anchor.SourceName)
+            || anchor.SourceName.Length > 160
+            || !Uri.TryCreate(anchor.SourceHref, UriKind.Absolute, out var sourceUri)
+            || sourceUri.Scheme != Uri.UriSchemeHttps
+            || anchor.SourceHref.Length > 1000)
+        {
+            throw new InvalidOperationException("지도 좌표에는 160자 이하의 출처명과 HTTPS 출처 주소가 필요합니다.");
+        }
+
+        if (!anchor.ConfirmCoordinateVerification)
+        {
+            throw new InvalidOperationException("지도 좌표와 시장 주소가 일치함을 확인해야 합니다.");
+        }
+    }
+
+    private static void ApplyMapAnchor(
+        TraditionalMarketLogisticsHub hub,
+        TraditionalMarketMapAnchorUpsertRequest anchor,
+        string actorUserId,
+        DateTime now)
+    {
+        hub.MapLatitude = anchor.Latitude;
+        hub.MapLongitude = anchor.Longitude;
+        hub.MapLocationPrecisionCode = anchor.LocationPrecisionCode;
+        hub.MapLocationSourceName = anchor.SourceName.Trim();
+        hub.MapLocationSourceHref = anchor.SourceHref.Trim();
+        hub.MapLocationVerifiedAtUtc = now;
+        hub.MapLocationVerifiedByUserId = NormalizeActor(actorUserId);
+    }
+
+    private static TraditionalMarketMapAnchorResponse? ToMapAnchorResponse(TraditionalMarketLogisticsHub hub)
+        => hub.MapLatitude.HasValue
+           && hub.MapLongitude.HasValue
+           && hub.MapLocationVerifiedAtUtc.HasValue
+            ? new TraditionalMarketMapAnchorResponse
+            {
+                Latitude = hub.MapLatitude.Value,
+                Longitude = hub.MapLongitude.Value,
+                LocationPrecisionCode = hub.MapLocationPrecisionCode,
+                SourceName = hub.MapLocationSourceName,
+                SourceHref = hub.MapLocationSourceHref,
+                VerifiedAtUtc = hub.MapLocationVerifiedAtUtc.Value
+            }
+            : null;
 
     private static void EnsureRevision(TraditionalMarketLogisticsHub hub, long? expectedRevision)
     {

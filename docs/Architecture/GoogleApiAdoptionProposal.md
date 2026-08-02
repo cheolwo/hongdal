@@ -27,7 +27,7 @@
 
 | Google 기능 | 현재 코드와 설정 | 현재 판정 | 우선 조치 |
 | --- | --- | --- | --- |
-| Maps JavaScript API | `CommunityRoleHomePage.razor`, `community-world-google-map.js`, `커뮤니티세계지도조회UseCase` | 단일 지도, 낮·밤 dataset, 분야별 marker 모양·색, stable revision 기반 새 자료 대기열 구현. 승인된 브라우저 키가 없어 실제 Google tile은 미검증 | Web origin·Maps JS 전용 제한 키를 런타임 주입하고 fallback을 유지 |
+| Maps JavaScript API | `CommunityRoleHomePage.razor`, `community-world-google-map.js`, `커뮤니티세계지도조회UseCase` | 단일 지도, 낮·밤 dataset, 분야별 marker 모양·색과 화면 이동 없는 자동 자료 갱신 구현. 사용자 비밀 키의 임시 로컬 주입으로 실제 Google tile·Data marker·선택 상세를 확인했으나 배포 runtime 연결은 아직 없음 | Web origin·Maps JS 전용 제한 키를 배포 runtime에 연결하고 fallback을 유지. custom diamond scale과 내장 밤 catalog 필터 결함을 먼저 수정 |
 | Maps SDK for Android | `DriverNativeMapViewHandler.Android.cs`, Android manifest placeholder | Google/Naver renderer와 marker·polyline 구현 | Android package + SHA 인증서 제한 키를 별도 발급하고 실제 미국 profile 검증 |
 | Geocoding API | `GoogleGeocodingService` | server adapter·DI 등록. `GoogleGeocodingApiKey`가 비어 있으면 미사용 | typed options, cancellation, 오류 코드, 국가별 provider 정책 추가 |
 | Distance Matrix API | `GoogleRouteDistanceService` | legacy endpoint 사용. Geocoding과 같은 key 이름 공유 | Routes API `ComputeRoutes`/`ComputeRouteMatrix` adapter로 교체 |
@@ -65,7 +65,7 @@
 #### Maps JavaScript API
 
 - 지금 만든 지도 한 개를 유지하고 낮·밤·선택 국가를 Data 레이어로 갱신한다.
-- client key는 source가 아닌 배포 runtime에서 주입하고 Web origin + Maps JavaScript API restriction을 적용한다.
+- client key는 source가 아닌 배포 runtime에서 주입하고 Web origin + Maps JavaScript API restriction을 적용한다. 구체적인 분리·주입·회전·검증 절차는 [Google Maps 브라우저 키 배포 보안](../Deployment/GoogleMapsBrowserKey.md)을 따른다.
 - Google 로드 실패, quota 초과, 동의 거부 또는 네트워크 단절 시 SVG fallback과 목록 탐색을 유지한다.
 - 지도 위치는 데이터 출처의 지역 맥락이며 종교·국적·경제력 기반 사용자 분류에 사용하지 않는다.
 - Google 공식 문서는 유효한 API key가 있어야 Maps JavaScript API를 로드할 수 있고 비동기 로딩을 권장한다. [Maps JavaScript API 로딩](https://developers.google.com/maps/documentation/javascript/load-maps-js-api)

@@ -10,6 +10,65 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed class 농수산공공데이터ClientTests
 {
     [Fact]
+    public async Task 한국지역Map조회는_국가품목기간과표시개수를_읽기전용Query로전송한다()
+    {
+        Uri? requestedUri = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "countryCode": "KR",
+                      "relationTypeCodes": ["ConfirmedOrigin"],
+                      "productName": "사과 배",
+                      "fromDate": "2026-07-01",
+                      "toDate": "2026-07-31",
+                      "totalMarkerCount": 0,
+                      "returnedMarkerCount": 0,
+                      "unresolvedObservationCount": 0,
+                      "missingAnchorRegionCount": 0,
+                      "notices": [],
+                      "items": []
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new 농수산공공데이터Client(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ssalddel.test/")
+        });
+
+        var result = await client.지역MapMarker조회Async(
+            new RegionalAgriculturalMapMarkerQuery
+            {
+                CountryCode = RegionalAgriculturalMapCountryCodes.Korea,
+                RelationTypeCode = RegionalAgriculturalMapRelationTypeCodes.ConfirmedOrigin,
+                ProductName = "사과 배",
+                FromDate = new DateOnly(2026, 7, 1),
+                ToDate = new DateOnly(2026, 7, 31),
+                MaxItems = 900
+            });
+
+        Assert.Equal("KR", result.CountryCode);
+        Assert.NotNull(requestedUri);
+        Assert.Equal(
+            $"/{RegionalAgriculturalMapRoutes.MarkerApi}",
+            requestedUri!.AbsolutePath);
+        var query = Uri.UnescapeDataString(requestedUri.Query);
+        Assert.Contains("countryCode=KR", query, StringComparison.Ordinal);
+        Assert.Contains("relationTypeCode=ConfirmedOrigin", query, StringComparison.Ordinal);
+        Assert.Contains("productName=사과 배", query, StringComparison.Ordinal);
+        Assert.Contains("fromDate=2026-07-01", query, StringComparison.Ordinal);
+        Assert.Contains("toDate=2026-07-31", query, StringComparison.Ordinal);
+        Assert.Contains("maxItems=500", query, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task 미국가격조회는_공식필터를전송하고_503응답본문도보존한다()
     {
         Uri? requestedUri = null;

@@ -208,6 +208,11 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
 
     private sealed class FakePublicDataClient : I농수산공공데이터Client
     {
+        public Task<RegionalAgriculturalMapMarkerListResponse> 지역MapMarker조회Async(
+            RegionalAgriculturalMapMarkerQuery query,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
+
         public bool FailOverview { get; init; }
 
         public bool FailUnitedStatesPrice { get; init; }

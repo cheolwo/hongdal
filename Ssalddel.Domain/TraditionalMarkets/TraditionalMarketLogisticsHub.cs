@@ -22,6 +22,13 @@ public sealed class TraditionalMarketLogisticsHub
     public DateTime? OperatorConsentedAtUtc { get; set; }
     public DateTime? SiteVerifiedAtUtc { get; set; }
     public string SiteVerifiedByUserId { get; set; } = string.Empty;
+    public decimal? MapLatitude { get; set; }
+    public decimal? MapLongitude { get; set; }
+    public string MapLocationPrecisionCode { get; set; } = string.Empty;
+    public string MapLocationSourceName { get; set; } = string.Empty;
+    public string MapLocationSourceHref { get; set; } = string.Empty;
+    public DateTime? MapLocationVerifiedAtUtc { get; set; }
+    public string MapLocationVerifiedByUserId { get; set; } = string.Empty;
     public string StatusReason { get; set; } = string.Empty;
     public string UpdatedByUserId { get; set; } = string.Empty;
     public long Revision { get; set; }

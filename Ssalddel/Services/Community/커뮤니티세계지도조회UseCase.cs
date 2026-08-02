@@ -3,6 +3,8 @@ using System.Text;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Contracts.Common.TraditionalMarkets;
+using Ssalddel.Services.TraditionalMarkets;
 
 namespace Ssalddel.Services.Community;
 
@@ -27,7 +29,8 @@ public interface I커뮤니티세계지도조회UseCase
     FlowOrder = 20,
     Effects = SsalddelCodeEffect.None,
     Boundary = "조회 결과는 지도 탐색 근거이며 결제·주문·계약·배차를 실행하지 않습니다.")]
-public sealed class 커뮤니티세계지도조회UseCase : I커뮤니티세계지도조회UseCase
+public sealed class 커뮤니티세계지도조회UseCase(
+    I전통시장MapMarkerReader 전통시장MapMarkerReader) : I커뮤니티세계지도조회UseCase
 {
     private static readonly IReadOnlyDictionary<string, (double Latitude, double Longitude)> CountryCenters
         = new Dictionary<string, (double, double)>(StringComparer.Ordinal)
@@ -52,7 +55,7 @@ public sealed class 커뮤니티세계지도조회UseCase : I커뮤니티세계�
             ["cn-south-yangtze"] = (27.6, 113.9)
         };
 
-    public Task<커뮤니티세계지도SnapshotDto> 조회Async(
+    public async Task<커뮤니티세계지도SnapshotDto> 조회Async(
         string? datasetCode,
         CancellationToken cancellationToken = default)
     {
@@ -63,15 +66,15 @@ public sealed class 커뮤니티세계지도조회UseCase : I커뮤니티세계�
                 CommunityPageRoutes.WorldMapNightLearningDataset,
                 StringComparison.Ordinal)
             ? BuildNightObservations()
-            : BuildDayObservations();
+            : await BuildDayObservationsAsync(cancellationToken);
         var layers = 커뮤니티세계지도LayerCatalog.ForDataset(normalizedDataset);
 
-        return Task.FromResult(new 커뮤니티세계지도SnapshotDto(
+        return new 커뮤니티세계지도SnapshotDto(
             normalizedDataset,
             ComputeRevision(observations),
             DateTimeOffset.UtcNow,
             layers,
-            observations));
+            observations);
     }
 
     private static string NormalizeDataset(string? datasetCode)
@@ -91,7 +94,8 @@ public sealed class 커뮤니티세계지도조회UseCase : I커뮤니티세계�
         throw new ArgumentException("지도 dataset은 day-work 또는 night-learning이어야 합니다.", nameof(datasetCode));
     }
 
-    private static IReadOnlyList<커뮤니티세계지도ObservationDto> BuildDayObservations()
+    private async Task<IReadOnlyList<커뮤니티세계지도ObservationDto>> BuildDayObservationsAsync(
+        CancellationToken cancellationToken)
     {
         var culture = RegionalCultureSpecialtyCatalog.All.Select(region =>
         {
@@ -122,7 +126,70 @@ public sealed class 커뮤니티세계지도조회UseCase : I커뮤니티세계�
             Price("AU", "호주", "식품 물가지수 관측", "호주 ABS", "/information/public-data")
         };
 
+        var wholesaleMarkets = 커뮤니티도매시장MapCatalog.All.Select(market =>
+            new 커뮤니티세계지도ObservationDto(
+                $"wholesale-market:{market.Key}",
+                CommunityPageRoutes.WorldMapDayWorkDataset,
+                커뮤니티세계지도LayerCodes.WholesaleMarket,
+                market.CountryCode,
+                market.CountryName,
+                market.Latitude,
+                market.Longitude,
+                market.MarketName,
+                market.LocationPrecisionCode == 커뮤니티도매시장위치정밀도Codes.도시중심점
+                    ? $"{market.RegionName}의 USDA 터미널 도매시장 보고 위치입니다. 도시 중심 대표점이며 단일 시설·출입구·배송 주소가 아닙니다. {market.UpdateCycle} 갱신입니다."
+                    : $"{market.RegionName}의 공영도매시장 대표 위치입니다. 지도 탐색용 대표점이며 출입구·배송 주소가 아닙니다. {market.UpdateCycle} 자료와 연결합니다.",
+                market.SourceName,
+                market.EvidenceAsOfUtc,
+                커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked,
+                market.DetailHref,
+                market.SourceHref,
+                market.LocationPrecisionCode,
+                market.MarketStageCode));
+
+        var traditionalMarketHubs = (await 전통시장MapMarkerReader.공개Marker조회Async(cancellationToken))
+            .Select(hub =>
+            {
+                var capabilities = new[]
+                    {
+                        hub.SupportsResidentPickup ? "주민 수령" : null,
+                        hub.SupportsLastMileDelivery ? "근거리 배송" : null,
+                        hub.SupportsRefrigeratedStorage ? "냉장 보관" : null,
+                        hub.SupportsFrozenStorage ? "냉동 보관" : null
+                    }
+                    .Where(value => value is not null);
+                var capabilityLabel = string.Join(" · ", capabilities.OfType<string>());
+                return new 커뮤니티세계지도ObservationDto(
+                    hub.HubReferenceKey,
+                    CommunityPageRoutes.WorldMapDayWorkDataset,
+                    커뮤니티세계지도LayerCodes.TraditionalMarketHub,
+                    "KR",
+                    "대한민국",
+                    (double)hub.MapAnchor.Latitude,
+                    (double)hub.MapAnchor.Longitude,
+                    hub.MarketName,
+                    $"{hub.Province} {hub.CityCounty}의 검증된 전통시장 공동 입고·수령 거점입니다. "
+                    + $"생활권 {hub.ServiceRadiusKm:0.##}km · 일일 처리 {hub.DailyGroupPurchaseCapacity:N0}건"
+                    + (string.IsNullOrWhiteSpace(capabilityLabel) ? string.Empty : $" · {capabilityLabel}"),
+                    hub.MapAnchor.SourceName,
+                    new DateTimeOffset(DateTime.SpecifyKind(hub.MapAnchor.VerifiedAtUtc, DateTimeKind.Utc)),
+                    커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked,
+                    CommunityPageRoutes.BoardsFor(
+                        boardName: "전통시장",
+                        boardKey: "traditional-market",
+                        search: hub.MarketName),
+                    hub.MapAnchor.SourceHref,
+                    hub.MapAnchor.LocationPrecisionCode,
+                    null,
+                    hub.Status,
+                    hub.ServiceRadiusKm,
+                    hub.DailyGroupPurchaseCapacity,
+                    hub.CommunityScopeKey);
+            });
+
         return culture.Concat(prices)
+            .Concat(wholesaleMarkets)
+            .Concat(traditionalMarketHubs)
             .OrderBy(item => item.StableId, StringComparer.Ordinal)
             .ToArray();
     }
@@ -191,7 +258,14 @@ public sealed class 커뮤니티세계지도조회UseCase : I커뮤니티세계�
                 item.Summary,
                 item.SourceName,
                 item.EvidenceAsOfUtc?.ToUniversalTime().ToString("O") ?? string.Empty,
-                item.DetailHref)));
+                item.DetailHref,
+                item.SourceHref,
+                item.LocationPrecisionCode,
+                item.MarketStageCode,
+                item.MarkerStatusCode,
+                item.ServiceRadiusKm,
+                item.DailyCapacity,
+                item.CommunityScopeKey)));
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(canonical));
         return Convert.ToHexString(hash)[..16].ToLowerInvariant();
     }

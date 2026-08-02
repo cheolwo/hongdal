@@ -20,12 +20,19 @@ public sealed class TraditionalMarketLogisticsHubConfiguration
         builder.Property(x => x.PickupWindow).HasMaxLength(160);
         builder.Property(x => x.OperatingNotes).HasMaxLength(2000);
         builder.Property(x => x.SiteVerifiedByUserId).HasMaxLength(450);
+        builder.Property(x => x.MapLatitude).HasPrecision(10, 7);
+        builder.Property(x => x.MapLongitude).HasPrecision(10, 7);
+        builder.Property(x => x.MapLocationPrecisionCode).HasMaxLength(40);
+        builder.Property(x => x.MapLocationSourceName).HasMaxLength(160);
+        builder.Property(x => x.MapLocationSourceHref).HasMaxLength(1000);
+        builder.Property(x => x.MapLocationVerifiedByUserId).HasMaxLength(450);
         builder.Property(x => x.StatusReason).HasMaxLength(500);
         builder.Property(x => x.UpdatedByUserId).HasMaxLength(450);
         builder.Property(x => x.Revision).IsConcurrencyToken();
 
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => new { x.Status, x.UpdatedAtUtc });
+        builder.HasIndex(x => new { x.Status, x.MapLocationVerifiedAtUtc });
 
         builder.HasOne<TraditionalMarket>()
             .WithOne()

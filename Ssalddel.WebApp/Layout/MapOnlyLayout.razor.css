@@ -1,0 +1,6 @@
+.map-only-layout {
+    width: 100%;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: #eaf4f2;
+}

@@ -85,6 +85,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddSingleton<IBaguaTargetWorkspaceResolver, DefaultBaguaTargetWorkspaceResolver>();
         services.TryAddTransient<BaguaRoleTransitionPageViewModel>();
         services.TryAddScoped<I농수산공공데이터Client, 농수산공공데이터Client>();
+        services.TryAddTransient<지역농수산MapPageViewModel>();
         services.TryAddScoped<IOfficialFoodIngredientDiscoveryClient, OfficialFoodIngredientDiscoveryClient>();
         services.TryAddTransient<국내농수산가격조회ViewModel>();
         services.TryAddTransient<미국농수산가격조회ViewModel>();

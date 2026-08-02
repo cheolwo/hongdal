@@ -6,6 +6,10 @@ namespace Ssalddel.Ui.Common.Areas.App.Services;
 
 public interface I농수산공공데이터Client
 {
+    Task<RegionalAgriculturalMapMarkerListResponse> 지역MapMarker조회Async(
+        RegionalAgriculturalMapMarkerQuery query,
+        CancellationToken cancellationToken = default);
+
     Task<AgriculturalFisheriesInformationOverviewResponse> 개요조회Async(
         CancellationToken cancellationToken = default);
 

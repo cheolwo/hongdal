@@ -13,6 +13,8 @@ public static class 커뮤니티세계지도LayerCodes
 {
     public const string RegionalCulture = "regional-culture";
     public const string PublicPrice = "public-price";
+    public const string WholesaleMarket = "wholesale-market";
+    public const string TraditionalMarketHub = "traditional-market-hub";
     public const string LearningChannel = "learning-channel";
     public const string ScriptureAndClassics = "scripture-classics";
 }
@@ -51,7 +53,14 @@ public sealed record 커뮤니티세계지도ObservationDto(
     string SourceName,
     DateTimeOffset? EvidenceAsOfUtc,
     string EvidenceStatusCode,
-    string DetailHref);
+    string DetailHref,
+    string? SourceHref = null,
+    string? LocationPrecisionCode = null,
+    string? MarketStageCode = null,
+    string? MarkerStatusCode = null,
+    decimal? ServiceRadiusKm = null,
+    int? DailyCapacity = null,
+    string? CommunityScopeKey = null);
 
 public sealed record 커뮤니티세계지도SnapshotDto(
     string DatasetCode,
@@ -78,6 +87,20 @@ public static class 커뮤니티세계지도LayerCatalog
             "공식 가격 관측과 원 거래 단위",
             "#ef8f3c",
             "diamond"),
+        new(
+            커뮤니티세계지도LayerCodes.WholesaleMarket,
+            CommunityPageRoutes.WorldMapDayWorkDataset,
+            "도매시장",
+            "한국 공영도매시장과 미국 USDA 터미널 시장 보고 위치",
+            "#2f6fab",
+            "market"),
+        new(
+            커뮤니티세계지도LayerCodes.TraditionalMarketHub,
+            CommunityPageRoutes.WorldMapDayWorkDataset,
+            "전통시장 거점",
+            "운영 동의·현장 확인·지도 좌표 검증이 끝난 공동 입고·수령 거점",
+            "#8a4b24",
+            "hub"),
         new(
             커뮤니티세계지도LayerCodes.LearningChannel,
             CommunityPageRoutes.WorldMapNightLearningDataset,

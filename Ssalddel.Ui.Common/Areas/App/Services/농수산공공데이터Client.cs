@@ -10,6 +10,27 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
 {
     private const string BasePath = "api/v1/agricultural-fisheries";
 
+    public Task<RegionalAgriculturalMapMarkerListResponse> 지역MapMarker조회Async(
+        RegionalAgriculturalMapMarkerQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentException.ThrowIfNullOrWhiteSpace(query.CountryCode);
+        var parameters = new List<string>
+        {
+            $"countryCode={Uri.EscapeDataString(query.CountryCode.Trim())}",
+            $"maxItems={Math.Clamp(query.MaxItems, 1, 500)}"
+        };
+        AddParameter(parameters, "relationTypeCode", query.RelationTypeCode);
+        AddParameter(parameters, "productName", query.ProductName);
+        AddDateParameter(parameters, "fromDate", query.FromDate);
+        AddDateParameter(parameters, "toDate", query.ToDate);
+
+        return GetAsync<RegionalAgriculturalMapMarkerListResponse>(
+            $"{RegionalAgriculturalMapRoutes.MarkerApi}?{string.Join('&', parameters)}",
+            cancellationToken);
+    }
+
     public Task<AgriculturalFisheriesInformationOverviewResponse> 개요조회Async(
         CancellationToken cancellationToken = default)
         => GetAsync<AgriculturalFisheriesInformationOverviewResponse>(BasePath, cancellationToken);
@@ -175,6 +196,17 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
         if (value is > 0)
         {
             parameters.Add($"{name}={value.Value.ToString(CultureInfo.InvariantCulture)}");
+        }
+    }
+
+    private static void AddDateParameter(
+        List<string> parameters,
+        string name,
+        DateOnly? value)
+    {
+        if (value is { } date)
+        {
+            parameters.Add($"{name}={date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}");
         }
     }
 }

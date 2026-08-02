@@ -1,0 +1,307 @@
+.korea-agri-map {
+    --map-ink: #1f3329;
+    --map-muted: #607167;
+    --map-green: #176b4d;
+    display: grid;
+    gap: 18px;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    padding: 26px 22px 48px;
+    color: var(--map-ink);
+}
+
+.korea-agri-map__hero {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #103c2c, #1f7351 62%, #b77935);
+    color: #fff;
+    box-shadow: 0 18px 44px rgba(24, 66, 47, .17);
+}
+
+.korea-agri-map__hero > div { max-width: 760px; }
+.korea-agri-map__hero span,
+.korea-agri-map__map-panel > header span {
+    font-size: .72rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+}
+.korea-agri-map__hero h1 {
+    margin: 7px 0;
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    line-height: 1.24;
+    word-break: keep-all;
+}
+.korea-agri-map__hero p { margin: 0; color: rgba(255,255,255,.82); line-height: 1.65; }
+.korea-agri-map__hero nav { display: grid; gap: 8px; flex: 0 0 auto; }
+.korea-agri-map__hero a,
+.korea-agri-map__source-link {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 11px;
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.korea-agri-map__explorer-controls {
+    display: grid;
+    grid-template-columns: minmax(260px, .7fr) minmax(0, 1.3fr);
+    gap: 12px;
+}
+.korea-agri-map__country-switch,
+.korea-agri-map__layer-switch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #d8e4dc;
+    border-radius: 15px;
+    background: #fff;
+}
+.korea-agri-map__country-switch button,
+.korea-agri-map__layer-switch button {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: #f2f6f3;
+    color: var(--map-ink);
+    cursor: pointer;
+    font: inherit;
+    font-size: .75rem;
+}
+.korea-agri-map__country-switch button { flex: 1; }
+.korea-agri-map__country-switch button span { color: var(--map-muted); font-size: .66rem; font-weight: 850; }
+.korea-agri-map__country-switch button.is-active,
+.korea-agri-map__layer-switch button.is-active {
+    border-color: var(--map-green);
+    background: #e9f4ed;
+    color: #0f543c;
+}
+.korea-agri-map__country-switch button:disabled,
+.korea-agri-map__layer-switch button:disabled { cursor: wait; opacity: .58; }
+.korea-agri-map__layer-switch button i,
+.korea-agri-map__legend i {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 auto;
+    border: 2px solid #fff;
+    background: #7d8f85;
+    box-shadow: 0 0 0 1px rgba(31, 51, 41, .18);
+}
+.korea-agri-map__layer-switch .is-all { border-radius: 4px 50% 50%; background: linear-gradient(135deg, #27815d 0 34%, #2183a5 34% 67%, #325c9e 67%); }
+.korea-agri-map__layer-switch .is-origin,
+.korea-agri-map__legend .is-origin { border-radius: 50%; background: #27815d; }
+.korea-agri-map__layer-switch .is-shipping,
+.korea-agri-map__legend .is-shipping { clip-path: polygon(25% 7%, 75% 7%, 100% 50%, 75% 93%, 25% 93%, 0 50%); background: #2183a5; }
+.korea-agri-map__layer-switch .is-market,
+.korea-agri-map__legend .is-market { border-radius: 2px; background: #325c9e; }
+
+.korea-agri-map__filters {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid #d8e4dc;
+    border-radius: 16px;
+    background: #fff;
+}
+.korea-agri-map__filters label { display: grid; flex: 1; gap: 6px; }
+.korea-agri-map__filters label span { font-size: .74rem; font-weight: 800; }
+.korea-agri-map__filters input {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #c8d5cc;
+    border-radius: 10px;
+    font: inherit;
+}
+.korea-agri-map__filters button,
+.korea-agri-map__state button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 17px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--map-green);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+}
+.korea-agri-map__filters button:disabled { cursor: wait; opacity: .55; }
+
+.korea-agri-map__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+.korea-agri-map__summary article {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid #dbe4dd;
+    border-radius: 13px;
+    background: #f8fbf9;
+}
+.korea-agri-map__summary span { color: var(--map-muted); font-size: .7rem; }
+.korea-agri-map__summary strong { overflow-wrap: anywhere; font-size: 1rem; }
+
+.korea-agri-map__workspace {
+    display: grid;
+    grid-template-columns: minmax(360px, .9fr) minmax(0, 1.1fr);
+    gap: 18px;
+}
+.korea-agri-map__map-panel,
+.korea-agri-map__detail {
+    min-width: 0;
+    border: 1px solid #d7e1da;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(39, 73, 54, .07);
+}
+.korea-agri-map__map-panel { padding: 18px; }
+.korea-agri-map__map-panel > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.korea-agri-map__map-panel h2 { margin: 3px 0 0; }
+
+.korea-agri-map__canvas {
+    position: relative;
+    min-height: 560px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: radial-gradient(circle at 50% 45%, #eef8f4, #dceee8 72%, #cde4df);
+}
+.korea-agri-map__canvas svg { position: absolute; inset: 3%; width: 94%; height: 94%; }
+.korea-agri-map__land { fill: url(#korea-land-gradient); stroke: #6c9c7a; stroke-width: 4; }
+.korea-agri-map__land--us { fill: url(#us-land-gradient); stroke: #6d8faa; }
+.korea-agri-map__island { fill: #c6dec9; stroke: #6c9c7a; stroke-width: 3; }
+.korea-agri-map__inset { fill: #c8d9e8; stroke: #6d8faa; stroke-width: 3; stroke-dasharray: 6 4; }
+.korea-agri-map__inset-label { fill: #547088; font-size: 13px; font-weight: 750; }
+.korea-agri-map__sea-line { fill: none; stroke: rgba(78, 139, 126, .17); stroke-width: 2; }
+.korea-agri-map__marker {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    min-width: 48px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #29483a;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+}
+.korea-agri-map__marker i {
+    width: 17px;
+    height: 17px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #7d8f85;
+    box-shadow: 0 2px 8px rgba(38, 60, 48, .34);
+}
+.korea-agri-map__marker.is-origin i { border-radius: 50%; background: #27815d; }
+.korea-agri-map__marker.is-shipping i { border-radius: 0; clip-path: polygon(25% 7%, 75% 7%, 100% 50%, 75% 93%, 25% 93%, 0 50%); background: #2183a5; }
+.korea-agri-map__marker.is-market i { border-radius: 2px; background: #325c9e; }
+.korea-agri-map__marker span {
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: rgba(255,255,255,.91);
+    font-size: .66rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+.korea-agri-map__marker.is-selected i { outline: 3px solid #f1ad42; outline-offset: 2px; transform: scale(1.28); }
+.korea-agri-map__marker:focus-visible { outline: 3px solid #2456c7; outline-offset: 4px; }
+.korea-agri-map__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px 14px;
+    margin-top: 12px;
+    color: var(--map-muted);
+    font-size: .68rem;
+}
+.korea-agri-map__legend span { display: inline-flex; align-items: center; gap: 5px; }
+.korea-agri-map__map-boundary {
+    margin: 12px 2px 0;
+    color: var(--map-muted);
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+.korea-agri-map__detail { display: grid; align-content: start; gap: 16px; padding: 22px; }
+.korea-agri-map__detail > header span { color: var(--map-green); font-size: .72rem; font-weight: 850; }
+.korea-agri-map__detail h2 { margin: 6px 0 2px; font-size: 1.8rem; }
+.korea-agri-map__detail > header p { margin: 0; color: var(--map-muted); }
+.korea-agri-map__detail dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
+.korea-agri-map__detail dl div { padding: 12px; border-radius: 10px; background: #f3f7f4; }
+.korea-agri-map__detail dt { color: var(--map-muted); font-size: .68rem; }
+.korea-agri-map__detail dd { margin: 4px 0 0; font-size: .78rem; font-weight: 750; overflow-wrap: anywhere; }
+.korea-agri-map__source-link { justify-self: start; border-color: var(--map-green); color: var(--map-green); }
+.korea-agri-map__sources { display: grid; gap: 8px; }
+.korea-agri-map__sources h3 { margin: 4px 0; font-size: 1rem; }
+.korea-agri-map__sources article { display: grid; gap: 3px; padding: 12px; border: 1px solid #dbe4dd; border-radius: 11px; }
+.korea-agri-map__sources span,
+.korea-agri-map__sources small { color: var(--map-muted); font-size: .68rem; overflow-wrap: anywhere; }
+
+.korea-agri-map__state,
+.korea-agri-map__empty {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px;
+    border: 1px solid #dce4df;
+    border-radius: 16px;
+    background: #f8faf9;
+}
+.korea-agri-map__state > div,
+.korea-agri-map__empty { flex: 1; }
+.korea-agri-map__state p,
+.korea-agri-map__empty p { margin: 4px 0 0; color: var(--map-muted); font-size: .78rem; line-height: 1.55; }
+.korea-agri-map__state--error { border-color: #e7c9c5; background: #fff7f6; }
+.korea-agri-map__empty { display: grid; align-content: center; justify-items: start; min-height: 260px; }
+
+.korea-agri-map__notices { padding: 17px 19px; border-radius: 15px; background: #eef5f0; }
+.korea-agri-map__notices ul { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 20px; color: var(--map-muted); font-size: .74rem; line-height: 1.5; }
+
+@media (max-width: 800px) {
+    .korea-agri-map { padding: 16px 13px 108px; }
+    .korea-agri-map__hero { display: grid; padding: 22px 18px; }
+    .korea-agri-map__hero nav { grid-template-columns: 1fr 1fr; }
+    .korea-agri-map__explorer-controls { grid-template-columns: 1fr; }
+    .korea-agri-map__summary { grid-template-columns: 1fr 1fr; }
+    .korea-agri-map__workspace { grid-template-columns: 1fr; }
+    .korea-agri-map__canvas { min-height: 500px; }
+}
+
+@media (max-width: 520px) {
+    .korea-agri-map__country-switch,
+    .korea-agri-map__layer-switch { display: grid; grid-template-columns: 1fr 1fr; }
+    .korea-agri-map__filters { display: grid; }
+    .korea-agri-map__filters button { width: 100%; }
+    .korea-agri-map__canvas { min-height: 450px; }
+    .korea-agri-map__detail dl { grid-template-columns: 1fr; }
+    .korea-agri-map__state { align-items: start; flex-wrap: wrap; }
+}
