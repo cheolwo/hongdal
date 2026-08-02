@@ -49,8 +49,43 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("@page \"/community/home\"", source);
         Assert.Contains("<svg viewBox=\"0 0 1000 500\"", source);
         Assert.Contains("aria-controls=\"world-map-results\"", source);
+        Assert.Contains("Google 지도 마커 키보드 선택", source);
+        Assert.Contains("@onchange=\"SelectMapFeatureFromKeyboard\"", source);
+        Assert.Contains("@onkeydown=\"HandleResultsPanelKeyDown\"", source);
+        Assert.Contains("_pendingFocusElementId = \"world-map-results\"", source);
+        Assert.Contains("focusElement", ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "js",
+            "community-world-google-map.js"));
         Assert.Contains("RegionalCultureSpecialtyCatalog.ForCountry", source);
         Assert.Contains("지도는 자료를 찾기 위한 개략도", source);
+    }
+
+    [Fact]
+    public void 지도마커상세는_공개출처와신선도를즉시표시하고_가격진입을가격마커로제한한다()
+    {
+        var source = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+
+        Assert.Contains("world-community-home__selection-summary", source);
+        Assert.Contains("ObservationStatusLabel(selectedObservation)", source);
+        Assert.Contains("EvidenceFreshnessLabel(selectedObservation.EvidenceAsOfUtc)", source);
+        Assert.Contains("원장·참여·주문·계약·배차를 만들지 않습니다", source);
+        Assert.Contains("SelectedObservation?.LayerCode ?? SelectedMapMarker?.LayerCode", source);
+        Assert.Contains("SelectedCountry is not null && IsPriceMarketSelection", source);
+        Assert.Contains("@if (IsPriceMarketSelection)", source);
+        Assert.Contains("가격·시장 출처", source);
+        Assert.Contains("KAMIS와 USDA AMS 출처별 보기", source);
+        Assert.Contains("USDA Agricultural Marketing Service (AMS)", source);
+        Assert.Contains("USD · 원 포장단위", source);
+        Assert.Contains("_isPriceMarketCatalogOpen || IsPriceMarketSelection", source);
+        Assert.Contains("서로 다른 국가·시장 단계의 관측을 합산하지 않습니다", source);
+        Assert.Contains("SelectedMapMarkerSummary", source);
+        Assert.Contains("공개 시장 대표 위치와 시장 단계", source);
+        Assert.Contains("market.SourceName", source);
     }
 
     [Fact]
@@ -128,22 +163,19 @@ public sealed class CommunityWorldMapHomeCompositionTests
     }
 
     [Fact]
-    public void 세계지도는_낮업무와_밤배움의_서로다른데이터셋을선택한다()
+    public void 통합Web지도는_생활업무공개정보만노출한다()
     {
         var source = ReadRepositoryFile(
             "Ssalddel.WebApp",
             "Pages",
             "CommunityRoleHomePage.razor");
 
-        Assert.Contains("낮 · 생활과 업무", source);
-        Assert.Contains("밤 · 알아차림과 성찰", source);
-        Assert.Contains("가볍게 알아차려봐요", source);
-        Assert.DoesNotContain("무엇이 있는지", source);
-        Assert.Contains("알아차린 사실을 관심·동의로 간주하지 않으며", source);
-        Assert.Contains("YouTube지식성찰채널Catalog.항목", source);
-        Assert.Contains("ScriptureDecorationCatalog.Definitions", source);
-        Assert.Contains("WorldMapNightLearningDataset", source);
-        Assert.Contains("종교·철학·국적은 사용자 점수나 추천 순위에 쓰지 않습니다", source);
+        Assert.Contains("생활·업무 통합 지도", source);
+        Assert.Contains("생활·업무 공개정보", source);
+        Assert.Contains("private bool IsNightLearning => false", source);
+        Assert.Contains("var requestedMode = MapDatasetMode.DayWork", source);
+        Assert.DoesNotContain("class=\"world-community-home__dataset-switch\"", source);
+        Assert.DoesNotContain("@onclick=\"ToggleDatasetAsync\"", source);
     }
 
     [Fact]
@@ -173,12 +205,10 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("min-width: 0", source);
         Assert.Contains(".world-community-home__map-scroll", source);
         Assert.Contains("overflow-x: auto", source);
-        Assert.Contains(".world-community-home--night", source);
-        Assert.Contains(".world-community-home__learning-grid", source);
     }
 
     [Fact]
-    public void 세계지도는_Google지도한개에서_낮밤데이터레이어만교체한다()
+    public void 세계지도는_Google지도한개에서_생활업무데이터레이어를교체한다()
     {
         var pageSource = ReadRepositoryFile(
             "Ssalddel.WebApp",
@@ -280,26 +310,15 @@ public sealed class CommunityWorldMapHomeCompositionTests
     }
 
     [Fact]
-    public void 지도낮밤선택은_현재상태를표시하는_단일Toggle이다()
+    public void 통합Web지도는_맥락없는낮밤Toggle을노출하지않는다()
     {
         var pageSource = ReadRepositoryFile(
             "Ssalddel.WebApp",
             "Pages",
             "CommunityRoleHomePage.razor");
-        var styleSource = ReadRepositoryFile(
-            "Ssalddel.WebApp",
-            "Pages",
-            "CommunityRoleHomePage.razor.css");
-
-        Assert.Equal(1, CountOccurrences(pageSource, "class=\"world-community-home__dataset-switch\""));
-        Assert.Contains("@onclick=\"ToggleDatasetAsync\"", pageSource);
-        Assert.Contains("aria-label=\"@DatasetToggleAriaLabel\"", pageSource);
-        Assert.Contains("현재 낮 · 생활과 업무", pageSource);
-        Assert.Contains("현재 밤 · 알아차림과 성찰", pageSource);
-        Assert.Contains("SelectDataset(IsNightLearning ? MapDatasetMode.DayWork : MapDatasetMode.NightLearning)", pageSource);
-        Assert.DoesNotContain("@onclick=\"() => SelectDataset(MapDatasetMode.DayWork)\"", pageSource);
-        Assert.DoesNotContain("@onclick=\"() => SelectDataset(MapDatasetMode.NightLearning)\"", pageSource);
-        Assert.Contains("grid-template-columns: 1fr", styleSource);
+        Assert.DoesNotContain("class=\"world-community-home__dataset-switch\"", pageSource);
+        Assert.DoesNotContain("aria-label=\"@DatasetToggleAriaLabel\"", pageSource);
+        Assert.Contains("IsNightLearning => false", pageSource);
     }
 
     [Fact]

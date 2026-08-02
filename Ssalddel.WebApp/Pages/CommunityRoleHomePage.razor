@@ -9,27 +9,18 @@
 @inject 커뮤니티세계지도Client WorldMapClient
 @inject GoogleMapsBrowserRuntimeClient GoogleMapsRuntimeClient
 
-<PageTitle>@(IsNightLearning ? "밤의 알아차림 지도" : "낮의 생활·업무 지도") · 살뜰</PageTitle>
+<PageTitle>생활·업무 통합 지도 · 살뜰</PageTitle>
 
 <main class="@RootClass">
     <header class="world-community-home__hero">
         <div>
-            <span>01 · @(IsNightLearning ? "밤의 가벼운 알아차림" : "낮의 생활·업무")</span>
-            <h1>세계 지도를 보며<br />@(IsNightLearning ? "가볍게 알아차려봐요" : "지역의 삶과 일을 알아봐요")</h1>
-            <p>
-                @if (IsNightLearning)
-                {
-                    <text>밤 지도는 관심사나 학습 목표를 먼저 정하지 않아도 철학·심리·윤리·마음챙김·경전 관련 공개 자료를 가볍게 알아차릴 수 있게 보여줍니다. 지도 위치는 자료 제공 채널의 국가 맥락이며 사상·경전의 기원이나 우열을 뜻하지 않습니다.</text>
-                }
-                else
-                {
-                    <text>낮 지도는 지역 문화·가격·유통 근거처럼 생활과 업무 판단에 필요한 자료를 보여줍니다. 가격 자료는 출처·기준 시각·통화·거래 단위를 함께 표시하고, 조회와 실제 주문·계약·배차는 계속 분리합니다.</text>
-                }
-            </p>
+            <span>01 · 생활·업무 공개정보</span>
+            <h1>세계 지도를 보며<br />지역의 삶과 일을 알아봐요</h1>
+            <p>지역 문화·가격·유통 근거처럼 생활과 업무 판단에 필요한 공개 자료를 보여줍니다. 가격 자료는 출처·기준 시각·통화·거래 단위를 함께 표시하고, 조회와 실제 주문·계약·배차는 계속 분리합니다.</p>
         </div>
         <nav aria-label="커뮤니티 바로가기">
-            <a class="world-community-home__primary-link" href="@(IsNightLearning ? "#world-map-results" : AppRelative(RegionalCultureSpecialtyRoutes.Browse))">
-                @(IsNightLearning ? "지도 가볍게 둘러보기" : "지역 자료 전체 보기")
+            <a class="world-community-home__primary-link" href="@AppRelative(RegionalCultureSpecialtyRoutes.Browse)">
+                지역 자료 전체 보기
                 <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
             </a>
             <a href="@AppRelative(CommunityPageRoutes.BoardDirectory)">커뮤니티 대화 보기</a>
@@ -38,21 +29,10 @@
 
     <section class="world-community-home__map-panel" aria-labelledby="world-map-heading">
         <aside class="world-community-home__map-controls" aria-label="지도 데이터와 레이어 조작">
-        <div class="world-community-home__dataset-switch" role="group" aria-label="지도 데이터셋 선택">
-            <button type="button"
-                    class="is-active"
-                    aria-pressed="@IsNightLearning"
-                    aria-label="@DatasetToggleAriaLabel"
-                    @onclick="ToggleDatasetAsync">
-                <span aria-hidden="true">@(IsNightLearning ? "☾" : "☀")</span>
-                <strong>@(IsNightLearning ? "밤 · 알아차림과 성찰" : "낮 · 생활과 업무")</strong>
-                <small>@(IsNightLearning ? "생각·마음·경전 자료" : "지역·가격·유통 근거")</small>
-            </button>
-        </div>
         <header>
             <div>
-                <span>@(IsNightLearning ? "NIGHT AWARENESS ATLAS" : "DAY WORK EXPLORER")</span>
-                <h2 id="world-map-heading">@(IsNightLearning ? "어느 지역의 이야기를 가볍게 알아차려볼까요?" : "어느 지역의 업무 근거를 들여다볼까요?")</h2>
+                <span>PUBLIC DATA WORK EXPLORER</span>
+                <h2 id="world-map-heading">어느 지역의 업무 근거를 들여다볼까요?</h2>
             </div>
             <div class="world-community-home__legend" aria-label="지도 자료 상태">
                 <span><i class="is-ready" aria-hidden="true"></i>자료 연결</span>
@@ -82,6 +62,17 @@
                         </span>
                     </button>
                 }
+                <button type="button"
+                        class="world-community-home__price-source-button @(ShowPriceMarketCatalog ? "is-active" : null)"
+                        aria-pressed="@ShowPriceMarketCatalog.ToString().ToLowerInvariant()"
+                        aria-controls="world-map-results"
+                        @onclick="OpenPriceMarketCatalog">
+                    <MudIcon Icon="@Icons.Material.Filled.PriceCheck" Size="Size.Small" />
+                    <span class="world-community-home__layer-option-copy">
+                        <strong>가격·시장 출처</strong>
+                        <small>KAMIS · USDA AMS</small>
+                    </span>
+                </button>
             </div>
             @if (!IsNightLearning)
             {
@@ -107,7 +98,10 @@
             </p>
         }
 
-        <div class="world-community-home__map-scroll" tabindex="0" aria-label="세계 지도. 작은 화면에서는 좌우로 이동할 수 있습니다.">
+        <div id="world-map-focus-target"
+             class="world-community-home__map-scroll"
+             tabindex="0"
+             aria-label="세계 지도. 작은 화면에서는 좌우로 이동할 수 있습니다.">
             <div class="world-community-home__map">
                 <div id="community-world-google-map"
                      class="world-community-home__google-map @(_googleMapState == GoogleMapState.Ready ? "is-ready" : null)"
@@ -115,6 +109,23 @@
                      aria-hidden="@(_googleMapState == GoogleMapState.Ready ? "false" : "true")"
                      aria-label="@(IsNightLearning ? "Google 지도에서 밤의 공개 자료 알아차리기" : "Google 지도에서 낮의 생활·업무 자료 지역 선택")">
                 </div>
+
+                @if (_googleMapState == GoogleMapState.Ready)
+                {
+                    <label class="world-community-home__keyboard-markers">
+                        <span>키보드 마커 선택</span>
+                        <select aria-label="Google 지도 마커 키보드 선택"
+                                aria-controls="world-map-results"
+                                value="@_selectedObservationId"
+                                @onchange="SelectMapFeatureFromKeyboard">
+                            <option value="">마커를 선택하세요</option>
+                            @foreach (var marker in CurrentMapMarkers)
+                            {
+                                <option value="@marker.Id">@marker.Name · @marker.DataLabel</option>
+                            }
+                        </select>
+                    </label>
+                }
 
                 @if (_googleMapState != GoogleMapState.Ready)
                 {
@@ -323,9 +334,12 @@
 
     <section id="world-map-results"
              class="world-community-home__results @(HasSelectedCountry ? "is-open" : null)"
+             role="region"
+             tabindex="-1"
              aria-labelledby="world-map-results-heading"
              aria-hidden="@(!HasSelectedCountry)"
-             aria-live="polite">
+             aria-live="polite"
+             @onkeydown="HandleResultsPanelKeyDown">
         <header>
             <div>
                 <span>@ResultEyebrow</span>
@@ -334,11 +348,86 @@
                 </h2>
                 <p>@ResultSummary</p>
             </div>
-            @if (_selectedCountryCode is not null)
+            @if (HasSelectedCountry)
             {
                 <button type="button" aria-label="선택한 지역 상세 닫기" @onclick="ShowAllCountries">상세 닫기</button>
             }
         </header>
+
+        @if (SelectedObservation is { } selectedObservation)
+        {
+            var selectedLayer = LayerFor(selectedObservation.LayerCode);
+            <section class="world-community-home__selection-summary" aria-label="선택한 지도 마커의 공개 정보">
+                <dl>
+                    <div><dt>유형</dt><dd>@(selectedLayer?.DisplayName ?? selectedObservation.LayerCode)</dd></div>
+                    <div><dt>상태</dt><dd>@ObservationStatusLabel(selectedObservation)</dd></div>
+                    <div><dt>자료 기준</dt><dd>@EvidenceFreshnessLabel(selectedObservation.EvidenceAsOfUtc)</dd></div>
+                    <div><dt>출처</dt><dd>@selectedObservation.SourceName</dd></div>
+                </dl>
+                <p>이 마커 선택은 공개 자료 조회만 수행하며 원장·참여·주문·계약·배차를 만들지 않습니다.</p>
+                <div>
+                    @if (!string.IsNullOrWhiteSpace(selectedObservation.SourceHref))
+                    {
+                        <a href="@selectedObservation.SourceHref" target="_blank" rel="noopener noreferrer">공식 출처</a>
+                    }
+                    @if (IsPriceMarketSelection)
+                    {
+                        <a href="@ObservationHref(selectedObservation)"
+                           target="@(IsExternalHref(selectedObservation.DetailHref) ? "_blank" : null)"
+                           rel="@(IsExternalHref(selectedObservation.DetailHref) ? "noopener noreferrer" : null)">
+                            가격·시장 상세 보기
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+        else if (SelectedMapMarker is { } selectedMarker)
+        {
+            var selectedMarkerLayer = LayerFor(selectedMarker.LayerCode);
+            <section class="world-community-home__selection-summary" aria-label="선택한 지도 마커의 공개 카탈로그 정보">
+                <dl>
+                    <div><dt>유형</dt><dd>@(selectedMarkerLayer?.DisplayName ?? selectedMarker.LayerCode)</dd></div>
+                    <div><dt>상태</dt><dd>@selectedMarker.DataLabel</dd></div>
+                    <div><dt>자료 기준</dt><dd>@EvidenceFreshnessLabel(selectedMarker.EvidenceAsOfUtc)</dd></div>
+                    <div><dt>출처</dt><dd>@(selectedMarker.SourceName ?? "검토된 공개 카탈로그")</dd></div>
+                </dl>
+                <p>대표 위치와 공개 출처만 표시하며 개인 주소·실시간 위치·미확인 물류 후보·개인 연락처는 포함하지 않습니다.</p>
+                @if (!string.IsNullOrWhiteSpace(selectedMarker.SourceHref))
+                {
+                    <div><a href="@selectedMarker.SourceHref" target="_blank" rel="noopener noreferrer">공식 출처</a></div>
+                }
+            </section>
+        }
+
+        @if (ShowPriceMarketCatalog)
+        {
+            <section class="world-community-home__price-sources" aria-label="가격·시장 공개 출처 선택">
+                <header>
+                    <span>서로 다른 국가·시장 단계의 관측을 합산하지 않습니다.</span>
+                    <strong>KAMIS와 USDA AMS 출처별 보기</strong>
+                </header>
+                <div>
+                    @foreach (var source in PriceMarketSources)
+                    {
+                        <article>
+                            <header><span>@source.Country</span><strong>@source.Name</strong></header>
+                            <dl>
+                                <div><dt>시장 단계</dt><dd>@source.MarketStage</dd></div>
+                                <div><dt>품목</dt><dd>@source.CommodityScope</dd></div>
+                                <div><dt>통화·단위</dt><dd>@source.CurrencyAndUnit</dd></div>
+                                <div><dt>기준일·신선도</dt><dd>@source.Freshness</dd></div>
+                            </dl>
+                            <p>@source.Boundary</p>
+                            <a href="@source.Href"
+                               target="@(IsExternalHref(source.Href) ? "_blank" : null)"
+                               rel="@(IsExternalHref(source.Href) ? "noopener noreferrer" : null)">
+                                @source.ActionLabel
+                            </a>
+                        </article>
+                    }
+                </div>
+            </section>
+        }
 
         @if (!IsNightLearning && SelectedCountry is not null)
         {
@@ -495,7 +584,7 @@
                 </div>
             }
         }
-        else if (SelectedCountry is null)
+        else if (!_isPriceMarketCatalogOpen && SelectedCountry is null)
         {
             <div class="world-community-home__country-grid">
                 @foreach (var country in MapCountries)
@@ -527,7 +616,7 @@
                 }
             </div>
         }
-        else if (SelectedCountry.Regions.Count > 0)
+        else if (!_isPriceMarketCatalogOpen && SelectedCountry is { Regions.Count: > 0 })
         {
             <div class="world-community-home__region-grid">
                 @foreach (var region in SelectedCountry.Regions)
@@ -545,15 +634,18 @@
                         </div>
                         <footer>
                             <a href="@AppRelative(RegionalCultureSpecialtyRoutes.DetailFor(region.Key))">문화·특산물 보기</a>
-                            <a class="world-community-home__price-link" href="@SelectedCountry.PriceHref">
-                                @SelectedCountry.PriceActionLabel
-                            </a>
+                            @if (IsPriceMarketSelection)
+                            {
+                                <a class="world-community-home__price-link" href="@SelectedCountry.PriceHref">
+                                    @SelectedCountry.PriceActionLabel
+                                </a>
+                            }
                         </footer>
                     </article>
                 }
             </div>
         }
-        else
+        else if (!_isPriceMarketCatalogOpen && SelectedCountry is not null)
         {
             <div class="world-community-home__culture-pending">
                 <span><MudIcon Icon="@Icons.Material.Filled.TravelExplore" /></span>
@@ -565,7 +657,7 @@
             </div>
         }
 
-        @if (SelectedCountry is not null)
+        @if (SelectedCountry is not null && IsPriceMarketSelection)
         {
             <aside class="world-community-home__price-panel">
                 <div>
@@ -607,6 +699,8 @@
     private DotNetObjectReference<CommunityRoleHomePage>? _googleMapCallback;
     private bool _pendingGoogleMapUpdate = true;
     private bool _preserveGoogleMapViewport;
+    private string? _pendingFocusElementId;
+    private bool _isPriceMarketCatalogOpen;
     private bool _isDiagramPanelExpanded;
     private readonly HashSet<string> _selectedLayerCodes = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim _snapshotRefreshGate = new(1, 1);
@@ -660,14 +754,33 @@
             [])
     ];
 
+    private static readonly IReadOnlyList<PriceMarketSource> PriceMarketSources =
+    [
+        new(
+            "대한민국",
+            "aT KAMIS",
+            "국내 산지·도매·소매 유통단계",
+            "KAMIS 원문 품목·등급",
+            "KRW · 원자료 거래단위",
+            "각 관측 기준일과 확인 시각을 상세에서 표시",
+            "미국 자료와 환산·합산하지 않으며 실제 구매가가 아닙니다.",
+            커뮤니티세계지도Routes.KoreaPriceDetail,
+            "KAMIS 가격 자료 열기"),
+        new(
+            "미국",
+            "USDA Agricultural Marketing Service (AMS)",
+            "산지 출하·도매 터미널·소매 광고",
+            "전문청과 등 AMS 보고서 원문 품목",
+            "USD · 원 포장단위",
+            "보고서별 기준일·수집 시각을 보존",
+            "KAMIS와 직접 비교값을 만들지 않으며 국가·시장 단계·품목·단위가 다른 별도 관측입니다.",
+            "https://www.ams.usda.gov/market-news",
+            "USDA AMS 공식 Market News 열기")
+    ];
+
     private static readonly IReadOnlyList<LearningMapCountry> LearningMapCountries = BuildLearningMapCountries();
 
-    private bool IsNightLearning => _datasetMode == MapDatasetMode.NightLearning;
-
-    private string DatasetToggleAriaLabel
-        => IsNightLearning
-            ? "현재 밤 · 알아차림과 성찰. 누르면 낮 · 생활과 업무로 전환"
-            : "현재 낮 · 생활과 업무. 누르면 밤 · 알아차림과 성찰로 전환";
+    private bool IsNightLearning => false;
 
     private IReadOnlyList<커뮤니티세계지도LayerDto> CurrentLayers
         => _appliedSnapshot?.Layers
@@ -776,40 +889,44 @@
             : null;
 
     private bool HasSelectedCountry
-        => SelectedCountry is not null || SelectedLearningCountry is not null;
+        => SelectedCountry is not null || SelectedLearningCountry is not null || _isPriceMarketCatalogOpen;
 
     private string ResultEyebrow
-        => IsNightLearning
+        => _isPriceMarketCatalogOpen
+            ? "PRICE & MARKET SOURCES"
+            : IsNightLearning
             ? SelectedLearningCountry?.Continent ?? "가볍게 둘러보는 지역"
             : SelectedCountry?.Continent ?? "연결된 업무 지역";
 
     private string ResultTitle
-        => IsNightLearning
+        => _isPriceMarketCatalogOpen
+            ? "가격·시장 출처 선택"
+            : IsNightLearning
             ? SelectedLearningCountry is null
                 ? "지금 알아차릴 수 있는 공개 자료"
                 : $"{SelectedLearningCountry.Name}에서 알아차리는 공개 자료"
             : SelectedObservation is not null
                 ? SelectedObservation.Title
+                : SelectedMapMarker is not null
+                    ? SelectedMapMarker.Name
                 : SelectedCountry is null
                 ? "현재 살펴볼 수 있는 생활·업무 자료"
                 : $"{SelectedCountry.Name} 업무 근거";
 
     private string ResultSummary
-        => IsNightLearning
+        => _isPriceMarketCatalogOpen
+            ? "국가·시장 단계·품목·단위·통화·기준일이 다른 KAMIS와 USDA AMS를 출처별로 따로 확인합니다."
+            : IsNightLearning
             ? SelectedLearningCountry?.Summary
               ?? "관심사나 학습 목표로 정하기 전에 지도에 놓인 생각·마음·경전 관련 공개 자료를 가볍게 둘러보세요."
             : SelectedObservation?.Summary
+              ?? SelectedMapMarkerSummary
               ?? SelectedCountry?.Summary
               ?? "지역 문화와 가격·유통 관측의 준비 상태를 업무 판단 근거로 확인하세요.";
 
     protected override void OnParametersSet()
     {
-        var requestedMode = string.Equals(
-            Dataset,
-            CommunityPageRoutes.WorldMapNightLearningDataset,
-            StringComparison.OrdinalIgnoreCase)
-            ? MapDatasetMode.NightLearning
-            : MapDatasetMode.DayWork;
+        var requestedMode = MapDatasetMode.DayWork;
         if (_datasetMode != requestedMode)
         {
             _datasetMode = requestedMode;
@@ -867,6 +984,13 @@
                 _selectedCountryCode,
                 _selectedObservationId,
                 preserveViewport);
+        }
+
+        if (_pendingFocusElementId is not null && _googleMapModule is not null)
+        {
+            var elementId = _pendingFocusElementId;
+            _pendingFocusElementId = null;
+            await _googleMapModule.InvokeVoidAsync("focusElement", elementId);
         }
     }
 
@@ -1214,23 +1338,61 @@
 
     private async Task SelectCountry(string countryCode)
     {
+        _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = countryCode;
         _selectedObservationId = null;
+        _pendingFocusElementId = "world-map-results";
+        await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
     }
 
     private async Task SelectMapFeature(string countryCode, string observationId)
     {
+        _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = countryCode;
         _selectedObservationId = observationId;
+        _pendingFocusElementId = "world-map-results";
+        await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
     }
 
     private async Task ShowAllCountries()
     {
+        _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = null;
         _selectedObservationId = null;
+        _pendingFocusElementId = "world-map-focus-target";
+        await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
+    }
+
+    private async Task OpenPriceMarketCatalog()
+    {
+        _selectedCountryCode = null;
+        _selectedObservationId = null;
+        _isPriceMarketCatalogOpen = true;
+        _pendingFocusElementId = "world-map-results";
+        await InvokeAsync(StateHasChanged);
+        await UpdateGoogleMapSelectionAsync();
+    }
+
+    private async Task SelectMapFeatureFromKeyboard(ChangeEventArgs args)
+    {
+        var markerId = args.Value?.ToString();
+        var marker = CurrentMapMarkers.FirstOrDefault(item =>
+            string.Equals(item.Id, markerId, StringComparison.Ordinal));
+        if (marker is not null)
+        {
+            await SelectMapFeature(marker.Code, marker.Id);
+        }
+    }
+
+    private async Task HandleResultsPanelKeyDown(KeyboardEventArgs args)
+    {
+        if (string.Equals(args.Key, "Escape", StringComparison.Ordinal))
+        {
+            await ShowAllCountries();
+        }
     }
 
     [JSInvokable]
@@ -1322,6 +1484,51 @@
             ? null
             : _appliedSnapshot?.Observations.FirstOrDefault(observation =>
                 string.Equals(observation.StableId, _selectedObservationId, StringComparison.Ordinal));
+
+    private GoogleMapMarker? SelectedMapMarker
+        => _selectedObservationId is null
+            ? null
+            : CurrentMapMarkers.FirstOrDefault(marker =>
+                string.Equals(marker.Id, _selectedObservationId, StringComparison.Ordinal));
+
+    private string? SelectedMapMarkerSummary
+        => SelectedMapMarker is not { } marker
+            ? null
+            : marker.LayerCode switch
+            {
+                커뮤니티세계지도LayerCodes.WholesaleMarket =>
+                    $"{marker.Name}의 공개 시장 대표 위치와 시장 단계입니다. 길찾기 좌표나 개별 사업자의 거래·재고 정보가 아닙니다.",
+                커뮤니티세계지도LayerCodes.TraditionalMarketHub =>
+                    $"{marker.Name}의 검증된 공개 거점 상태입니다. 확인·동의 전 후보를 실제 거점이나 계약으로 취급하지 않습니다.",
+                커뮤니티세계지도LayerCodes.PublicPrice =>
+                    $"{marker.Name}의 가격·시장 공개 관측입니다. 출처별 원 통화·거래단위·기준일을 함께 확인하세요.",
+                _ => $"{marker.Name}의 공개 지역 자료입니다. 대표 위치는 개인 또는 사업장의 정밀 위치가 아닙니다."
+            };
+
+    private bool IsPriceMarketSelection
+        => (SelectedObservation?.LayerCode ?? SelectedMapMarker?.LayerCode)
+            == 커뮤니티세계지도LayerCodes.PublicPrice;
+
+    private bool ShowPriceMarketCatalog
+        => _isPriceMarketCatalogOpen || IsPriceMarketSelection;
+
+    private static string ObservationStatusLabel(커뮤니티세계지도ObservationDto observation)
+        => observation.LayerCode switch
+        {
+            커뮤니티세계지도LayerCodes.WholesaleMarket => MarketStageLabel(observation.MarketStageCode),
+            커뮤니티세계지도LayerCodes.TraditionalMarketHub => TraditionalMarketHubStatusLabel(observation.MarkerStatusCode),
+            _ => observation.EvidenceStatusCode switch
+            {
+                커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked => "공식 출처 연결",
+                커뮤니티세계지도EvidenceStatusCodes.Curated => "공개 자료 검토",
+                _ => "공개 자료"
+            }
+        };
+
+    private static string EvidenceFreshnessLabel(DateTimeOffset? evidenceAsOfUtc)
+        => evidenceAsOfUtc is null
+            ? "확인 시각 미제공"
+            : $"{evidenceAsOfUtc.Value:yyyy-MM-dd} 기준";
 
     private static string MarketStageLabel(string? code)
         => code switch
@@ -1444,7 +1651,10 @@
         string DataLabel,
         double Latitude,
         double Longitude,
-        string LayerCode)
+        string LayerCode,
+        string? SourceName = null,
+        string? SourceHref = null,
+        DateTimeOffset? EvidenceAsOfUtc = null)
     {
         public static GoogleMapMarker FromObservation(커뮤니티세계지도ObservationDto observation)
             => new(
@@ -1456,7 +1666,10 @@
                 observation.Title,
                 observation.Latitude,
                 observation.Longitude,
-                observation.LayerCode);
+                observation.LayerCode,
+                observation.SourceName,
+                observation.SourceHref,
+                observation.EvidenceAsOfUtc);
 
         public static GoogleMapMarker ForMarket(커뮤니티도매시장MapDefinition market)
             => new(
@@ -1466,7 +1679,10 @@
                 market.MarketStageLabel,
                 market.Latitude,
                 market.Longitude,
-                커뮤니티세계지도LayerCodes.WholesaleMarket);
+                커뮤니티세계지도LayerCodes.WholesaleMarket,
+                market.SourceName,
+                market.SourceHref,
+                market.EvidenceAsOfUtc);
 
         public static GoogleMapMarker For(
             string id,
@@ -1490,6 +1706,17 @@
             return new(id, code, name, dataLabel, latitude, longitude, layerCode);
         }
     }
+
+    private sealed record PriceMarketSource(
+        string Country,
+        string Name,
+        string MarketStage,
+        string CommodityScope,
+        string CurrencyAndUnit,
+        string Freshness,
+        string Boundary,
+        string Href,
+        string ActionLabel);
 
     private enum MapDatasetMode
     {

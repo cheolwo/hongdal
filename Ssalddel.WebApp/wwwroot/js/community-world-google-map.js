@@ -149,6 +149,12 @@ export function updateSelection(elementId, selectedCode, selectedMarkerId) {
     focusSelection(instance);
 }
 
+export function focusElement(elementId) {
+    globalThis.requestAnimationFrame(() => {
+        document.getElementById(elementId)?.focus({ preventScroll: true });
+    });
+}
+
 export function dispose(elementId) {
     const instance = instances.get(elementId);
     if (!instance) {

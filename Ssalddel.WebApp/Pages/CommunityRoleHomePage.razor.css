@@ -1754,6 +1754,181 @@
 
 .world-community-home__results > header > button {
     flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.world-community-home__selection-summary {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 18px;
+    padding: 14px;
+    border: 1px solid rgba(23, 107, 77, .18);
+    border-radius: 14px;
+    background: rgba(234, 244, 242, .7);
+}
+
+.world-community-home__selection-summary dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+}
+
+.world-community-home__selection-summary dl > div {
+    display: grid;
+    gap: 2px;
+}
+
+.world-community-home__selection-summary dt {
+    color: var(--world-muted);
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.world-community-home__selection-summary dd {
+    margin: 0;
+    font-size: .8rem;
+    font-weight: 800;
+}
+
+.world-community-home__selection-summary p {
+    margin: 0;
+    color: var(--world-muted);
+    font-size: .74rem;
+    line-height: 1.55;
+}
+
+.world-community-home__selection-summary > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.world-community-home__selection-summary a {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    padding: 7px 10px;
+    border: 1px solid rgba(23, 107, 77, .28);
+    border-radius: 10px;
+    color: var(--world-leaf-dark);
+    font-size: .72rem;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.world-community-home__keyboard-markers {
+    position: absolute;
+    z-index: 5;
+    left: 16px;
+    bottom: 16px;
+    display: grid;
+    width: min(300px, calc(100% - 32px));
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 8px 24px rgba(17, 40, 35, .16);
+}
+
+.world-community-home__keyboard-markers > span {
+    color: var(--world-muted);
+    font-size: .66rem;
+    font-weight: 900;
+}
+
+.world-community-home__keyboard-markers select {
+    width: 100%;
+    min-height: 38px;
+    padding: 6px 30px 6px 8px;
+    border: 1px solid rgba(23, 107, 77, .25);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--world-ink);
+    font: inherit;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.world-community-home__price-source-button {
+    border-style: dashed !important;
+}
+
+.world-community-home__price-sources {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.world-community-home__price-sources > header {
+    display: grid;
+    gap: 3px;
+}
+
+.world-community-home__price-sources > header span {
+    color: var(--world-muted);
+    font-size: .72rem;
+}
+
+.world-community-home__price-sources > div {
+    display: grid;
+    gap: 10px;
+}
+
+.world-community-home__price-sources article {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #d7e2de;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.world-community-home__price-sources article > header {
+    display: grid;
+    gap: 2px;
+}
+
+.world-community-home__price-sources article > header span {
+    color: var(--world-leaf);
+    font-size: .68rem;
+    font-weight: 900;
+}
+
+.world-community-home__price-sources dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+}
+
+.world-community-home__price-sources dl > div {
+    display: grid;
+    gap: 2px;
+}
+
+.world-community-home__price-sources dt {
+    color: var(--world-muted);
+    font-size: .66rem;
+    font-weight: 800;
+}
+
+.world-community-home__price-sources dd,
+.world-community-home__price-sources p {
+    margin: 0;
+    font-size: .74rem;
+    line-height: 1.5;
+}
+
+.world-community-home__price-sources p {
+    color: var(--world-muted);
+}
+
+.world-community-home__price-sources article > a {
+    justify-self: start;
+    color: var(--world-leaf-dark);
+    font-size: .75rem;
+    font-weight: 900;
 }
 
 .world-community-home__results .world-community-home__country-grid,
@@ -1821,5 +1996,13 @@
         width: auto;
         max-height: 56dvh;
         border-radius: 18px;
+    }
+
+    .world-community-home__selection-summary dl {
+        grid-template-columns: 1fr;
+    }
+
+    .world-community-home__price-sources dl {
+        grid-template-columns: 1fr;
     }
 }
