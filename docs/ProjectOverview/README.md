@@ -34,6 +34,7 @@
 
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
+| 마무리 | [SsalddelProjectClosureProposal.md](SsalddelProjectClosureProposal.md) | 커뮤니티·공공데이터 공개 프리뷰와 0.5~3.5 시제품 자산을 구분해 프로젝트를 마무리하는 범위·순서·종료 기준 |
 | 0.0 | [Ssalddel 0.0](../Versions/v0.0/README.md) | 글쓰기 → 가원장 → 역할 슬롯 → 실원장으로 이어지는 현재 제품 범위 |
 | 01 | [page-docs/README.md](page-docs/README.md) | 각 화면별 독립 README와 인라인 캡처, 상세 설명 |
 | 01-A | [community-board-field-focus-guide.md](community-board-field-focus-guide.md) | 배달 현장에서 게시판 하나씩 관찰·검토하기 위한 질문, 근거, 안전·개인정보 경계와 16개 업무 게시판 점검표 |
@@ -43,7 +44,8 @@
 | 05 | [ssalddel-v1-required-pages.md](ssalddel-v1-required-pages.md) | 레거시 파일명으로 보존된 살뜰 2.0 운송 흐름의 화주, 기사, 관리자 화면 |
 | 06 | [ssalddel-v1-page-validation-walkthrough.md](ssalddel-v1-page-validation-walkthrough.md) | 레거시 파일명으로 보존된 2.0 운송 페이지 검증 순서와 확인 항목 |
 | 07 | [ssalddel-v1-render-capture-summary.md](ssalddel-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
-| 08 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 코드 프로젝트의 화면이 하나의 업무 흐름을 완성하는 관계를 설명 |
+| 08 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 페이지-워크플로우-UseCase·ProcessManager·API의 현재 연결, 화면 미연결 간극과 앱 간 인계를 설명 |
+| 08-A | [business-process-page-map.md](business-process-page-map.md) | 업무 프로세스를 시작·처리·확인·인계로 나누고 관련 현재 페이지와 화면 간극을 순서대로 연결 |
 | 09 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 노드 행동, 모드 전환이 다음 행동으로 이어지는 흐름 |
 
 ## 업무 흐름 문서
@@ -81,6 +83,7 @@
 | T-15 | [UnitedStatesThirdPartyLogisticsProviderDirectory.md](../Architecture/UnitedStatesThirdPartyLogisticsProviderDirectory.md) | 미국 3PL 후보와 규제·제휴·실계약을 분리하는 기준 |
 | T-16 | [ExportLedgerModel.md](../Architecture/ExportLedgerModel.md) | 개별수출과 공동 선적에서 수출자별 원장·서류·실적을 보존하는 기준 |
 | T-17 | [GoogleApiAdoptionProposal.md](../Architecture/GoogleApiAdoptionProposal.md) | 현재 Google 지도·YouTube·FCM·Gemini·Storage 연동을 페이지·업무 프로세스에 연결하고 API별 도입·보류·보안·비용 단계를 정리한 제안 |
+| T-18 | [ContractRelationshipMapVisualizationProposal.md](../Architecture/ContractRelationshipMapVisualizationProposal.md) | 현재 계약·양측 합의·발주·운송·고용 데이터를 공개·당사자·운영자 경계로 나누고 한 개 지도에 점·선·면·상태 배지로 조화롭게 투영하는 제안 |
 
 ## 관리 원칙
 

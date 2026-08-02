@@ -6,7 +6,10 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
-| 2026-08-02 | [낮 업무·밤 알아차림 커뮤니티 세계지도](2026-08-02-day-night-community-map.md) | 지도 한 개에 분야별 레이어와 stable revision 기반 새 자료 대기열을 연결하고 Google Maps 키가 없을 때의 SVG 대체 화면까지 직접 확인 |
+| 2026-08-02 | [낮 업무·밤 알아차림 커뮤니티 세계지도](2026-08-02-day-night-community-map.md) | 지도 한 개에 분야별 레이어, 한국 6개·미국 12개 도매시장과 검증된 전통시장 공동입고 거점 마커를 연결하고 exact marker 상세·stable revision·SVG 대체 화면을 직접 확인 |
+| 2026-08-02 | [한국·미국 공통 농수산물 데이터 지도](2026-08-02-korea-us-regional-agricultural-map.md) | 직접 확인 — 공통 route에서 한국·미국 국가 선택과 산지·출하/선적·시장 관측 레이어를 전환하고 미국 SVG fallback을 실제 렌더링; marker 응답은 기존 DB migration 오류로 미확인 |
+| 2026-08-01 | [한국 농수산물 데이터 지도](2026-08-01-korea-agricultural-map.md) | 직접 확인 — 서버의 검증된 지역 대표점 API를 Web·MAUI 공통 지도 화면에 연결하고, 품목 검색·지역 마커·출처·가격 게시판 진입과 390px 오류·재시도 상태를 실제 렌더링 |
+| 2026-08-01 | [DB·Object Storage 기반 앱 문맥 이미지 갤러리](2026-08-01-app-context-image-asset-wall.md) | 직접 확인 — 13개 앱 팩의 650장을 Object Storage URL·DB metadata로 게시하고 공개 API와 공통 갤러리로 관리자 화면에 8개 장면을 실제 표시 |
 | 2026-08-01 | [커뮤니티 웹 세계지도 시작 화면](2026-08-01-community-world-map-home.md) | 직접 확인 — 01 커뮤니티 WebApp 시작을 세계지도 탐색으로 바꾸고 미국·중국 문화 자료, 한국·미국·중국·호주 가격 근거와 자료 준비 상태를 지역 선택 결과로 연결 |
 | 2026-07-31 | [지역문화 이미지 Batch 프롬프트 우선 제작](2026-07-31-regional-culture-batch-prompt-first.md) | 화면 없음 — 서울 10장 프롬프트를 로컬 ResearchDraft 팩으로 문서화하고 공식 근거·고정관념·장면 완결성 검토와 ApprovedForBatch 이전 외부 요청 차단을 추가 |
 | 2026-07-31 | [커뮤니티 게시판 네 탭 집중화](2026-07-31-community-board-tabs-simplification.md) | 직접 확인 — 커뮤니티 홈·글 목록·게시판 모음·글쓰기에서 서원, 자유·생활, 지역 문화, 농수산물 가격 네 게시판만 상시 노출하고 기존 게시판 key와 글은 호환 조회용으로 유지 |

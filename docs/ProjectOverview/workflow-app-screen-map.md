@@ -8,6 +8,53 @@
 
 현재 역할별 앱과 `배달권`·네 가지 주문 원장을 실제 폐쇄 루프로 수렴시키는 순서는 [플랫폼 앱 완성도 수렴 계획](../Versions/platform-app-completion-plan.md)을 따른다.
 
+## 현재 코드 기준 페이지-프로세스 색인
+
+이 절은 기획상 후보가 아니라 현재 코드에서 확인되는 연결을 빠르게 찾기 위한 양방향 색인이다. 전체 `@page` 목록은 [코드 프로젝트별 전체 페이지 카탈로그](app-page-catalog.md), 페이지별 단계·기능·실행 경계는 `SsalddelPageCapabilityCatalog`, 대표 화면·UseCase·ProcessManager·API는 `GET /api/v1/version-feature-flags`를 기준으로 한다.
+
+상위 워크플로우 안의 세부 작업을 시작·처리·확인·인계 페이지 순서로 찾을 때는 [업무 프로세스별 페이지 지도](business-process-page-map.md)를 먼저 본다.
+
+페이지와 서버 타입이 같은 워크플로우 코드로 묶였다는 사실은 **업무상 관련**을 뜻한다. 특정 버튼이 특정 API를 직접 호출한다는 증거는 해당 Razor/Screen, ViewModel, Client adapter까지 별도로 추적해야 한다.
+
+| 워크플로우 코드 | 대표 현재 페이지 | 서버 실행 축 | 현재 연결 판정 |
+| --- | --- | --- | --- |
+| `CommunityTrust` | `Ssalddel.WebApp` `/community`, `/community/posts/{PostId}`, `/community/write`; 역할 앱 `/community` | `커뮤니티게시글UseCase`, `커뮤니티활동신호UseCase`, `커뮤니티활동상세구매ProcessManager`; `api/v1/community/posts`, `api/v1/community/activity-signals`, `api/v1/community/activity-paid-details` | 글·활동 신호 페이지는 연결됨. 유료 상세는 API·원장·ProcessManager까지만 있고 전용 페이지와 Client adapter는 아직 없다. |
+| `GroupPurchaseDemand` | `Ssalddel.WebApp` `/community/group-purchase`, `/community/group-purchase/demand`; `OrdererApp` `/group-purchase`, `/group-purchase/demands/new/{ProductId}`, `/group-purchase/groups/{AutoGroupId}` | `공동구매자동집단화UseCase`, `공동구매수요모집ProcessManager`; 공동구매 자동집단·수요·투표 API | 페이지와 장기 모집 조율이 같은 워크플로우로 연결됨. 수요는 비구속이며 다음 원장을 자동 생성하지 않는다. |
+| `GroupPurchaseImport` | `Ssalddel.WebApp` `/community/group-import`; `OrdererApp` `/group-purchase/imports/{LedgerId}` 계열; `SsalddelAdmin` `/trade-readiness` | `같이수입준비주문자조회UseCase`, `공동구매커머스이행계획UseCase`, `같이수입준비ProcessManager`; 같이 수입·선적·준비 원장 API | 주문자 조회와 관리자 준비 조율이 연결됨. 결제·계약·신고·운송 실행은 기본 금지다. |
+| `CustomsAndTradeData` | `SsalddelApp` `/shipper/customs/hs-reviews`; `SsalddelAdmin` `/customs/hs-codes` | HS 코드 검토·통관연동 Controller와 관련 UseCase | 조회·검토 중심. `GroupPurchaseImport`가 근거를 참조하지만 자동 통관 신고는 하지 않는다. |
+| `DomesticTransport` | `SsalddelApp` `/shipper/request` 계열; `DriverApp` `/driver/recommendations`, `/driver/transports/current`; `SsalddelAdmin` `/dispatch/wait`, `/transports` | `화주운송의뢰UseCase`, `기사배차추천UseCase`, 운송·증빙·정산 API | 화면과 UseCase 기반으로 연결됨. 현재 별도 `ProcessManager` 메타데이터는 없다. 운영 외부 효과는 실행 모드와 기능 플래그를 확인해야 한다. |
+| `WarehouseFulfillment` | `WarehouseManagerApp` `/work-board`, `/work/inbound/inspection`, `/scan`; `SsalddelApp` `/shipper/warehouse/inventory` | `창고작업UseCase`, `피킹작업UseCase`, `포장작업UseCase`, 출고 인계 UseCase | 입고-재고-피킹-포장-출고 화면이 UseCase 단위로 연결됨. 별도 `ProcessManager`는 없다. |
+| `SalesChannelFulfillment` | `SsalddelApp` `/shipper/sales/channels`, `/shipper/sales/orders`, `/shipper/sales/fulfillment` | `판매채널UseCase`, `판매채널주문조회UseCase`, 판매채널 API | 판매자 화면과 조회·출고 준비가 연결됨. 외부 채널 변경은 현재 실행 경계를 별도 확인해야 한다. |
+| `HrParticipation` | `Ssalddel.WebApp` `/community/roles/apply`; `SsalddelAdmin` `/dashboard` | 인사 역할·계약·사회보험 준비 API와 UseCase | 참여 의사와 운영 검토가 같은 워크플로우에 속함. 역할 배정·채용·신고 확정은 자동 실행하지 않는다. |
+| `FoodDelivery` | `OrdererApp` `/food`, `/food/restaurants`, `/orders/food`; `DriverApp` `/driver/food-deliveries`; `SsalddelAdmin` `/food/order-trace` | 음식 주문·기사 업무·운영 추적 UseCase와 API | 주문 원장과 운송 실행 투영이 역할별 페이지에 연결됨. 국내 운송으로 인계되는 구간은 별도 상태 전파를 확인한다. |
+| `SsalddelMart` | `OrdererApp` `/food/mart`; `WarehouseManagerApp` `/mart`, `/mart/picking`, `/mart/work-board` | 마트 상품·주문 요청·피킹 UseCase | 주문자와 창고 작업 페이지가 연결됨. 포장 뒤 운송 인계는 `DomesticTransport`와의 관계다. |
+
+### 커뮤니티 활동 유료 상세의 현재 위치
+
+현재 구현된 흐름은 다음과 같다.
+
+`게시글별 유료 상세 미리보기 조회` → `구매자 명시 확인` → `FakePG 승인` → `열람권 발급` → `구매 후 본문 재조회`
+
+| 구간 | 구현 근거 | 상태 |
+| --- | --- | --- |
+| 공개 미리보기·게시글별 조회 | `커뮤니티활동유료상세Controller`, `커뮤니티활동유료상세UseCase` | 구현됨 |
+| 구매 상태 조율 | `커뮤니티활동상세구매ProcessManager` | `요청됨 → 결제승인됨 → 열람권발급됨` 상태 전이와 멱등 구매가 구현됨 |
+| 결제 경계 | `POST api/v1/community/activity-paid-details/{detailId}/fake-pg/confirm` | Simulation 또는 Development의 FakePG만 허용하며 실제 카드 승인·판매자 정산은 하지 않음 |
+| 구매 후 열람 | `GET api/v1/community/activity-paid-details/{detailId}/content` | 인증 사용자 열람권 확인 뒤 본문 반환 |
+| 사용자 페이지 | 기존 `/community/posts/{PostId}`는 존재하지만 위 API를 호출하는 Client adapter·구매 UI는 없음 | **화면 미연결** |
+
+따라서 다음 화면 작업은 새 결제 원장을 만들기보다 기존 게시글 상세에서 미리보기와 가격을 보여주고, 명시적 구매 확인 뒤 같은 게시글 상세를 재조회하는 세로 연결이어야 한다. 운영 PG나 정산은 별도 승인과 운영 준비 없이는 이 화면 범위에 포함하지 않는다.
+
+### 코드에서 연결을 검증하는 순서
+
+1. `SsalddelPageCapabilityCatalog`에서 `PageKey`, 앱, route, `WorkflowCodes`, 기능 플래그와 실행 경계를 확인한다.
+2. `SsalddelWorkflowScreens`에서 같은 워크플로우의 대표 역할 화면을 확인한다.
+3. `GET /api/v1/version-feature-flags`의 `Workflows[].UseCases`, `Workflows[].ProcessManagers`, `ApiEndpoints[]`를 같은 워크플로우 코드로 묶는다.
+4. 직접 호출 여부가 필요한 페이지는 Razor/Screen → ViewModel → Client → Controller 순으로 실제 참조를 확인한다.
+5. 상태 변경 화면은 성공 뒤 같은 원장을 재조회하는지, Simulation·Operational 경계와 권한을 지키는지 테스트한다.
+
+메타데이터 검증은 페이지 capability에 선언된 모든 워크플로우 코드가 런타임 `Workflows`에 노출되는지 확인하고, 장기 상태 조율 타입은 `ProcessManagers`에 책임·효과·경계와 함께 노출한다. 문서 표는 탐색용 요약이며, 런타임 메타데이터와 실제 호출 경로가 최종 근거다.
+
 ## 읽는 방법
 
 | 구분 | 의미 |
