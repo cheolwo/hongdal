@@ -1,0 +1,564 @@
+{
+    "schemaVersion":  1,
+    "packId":  "community-shipper",
+    "status":  "ApprovedForBatch",
+    "promptVersion":  2,
+    "model":  "gemini-3.1-flash-lite-image",
+    "expectedSceneCount":  45,
+    "sceneNumberStart":  6,
+    "basePromptKo":  "세계 지역의 문화와 농수산물을 서로 배우는 정보 공개형 커뮤니티를 위한 따뜻하고 현대적인 editorial illustration으로 표현한다. 현실적인 재료와 조명, 절제된 색감, 다양한 사람이 동등하게 참여하는 안정적인 구도를 사용한다. 이미지 자체는 순수한 시각 자산으로 만들고 제목판, 설명문, 표, 앱 화면, 대시보드 UI를 합성하지 않는다.",
+    "contextChecklist":  [
+                             "SsalddelApp과 Web 커뮤니티 호스트의 공용 crop을 확인한다.",
+                             "지역 문화를 단순화하거나 국적·인종·경제력을 신뢰의 대리 지표로 표현하지 않는다.",
+                             "농수산물 가격과 생산지는 실제 공공데이터 증거가 아닌 상징적 문맥으로만 표현한다.",
+                             "이미지에 읽을 수 있는 글자·숫자·가상 UI가 없는지 확인한다."
+                         ],
+    "avoidExpressions":  [
+                             "국기, 민족 의상, 관광 엽서만으로 지역을 단순화하는 고정관념",
+                             "실제 가격표, 거래명세서, 원산지증명, 공공기관 보증처럼 보이는 요소",
+                             "특정 지역·직업·언어 사용자를 비효율적이거나 덜 신뢰할 수 있는 사람으로 표현하는 구도",
+                             "제목, 캡션, 단계 번호, 가상 앱 화면, 대시보드, 표와 읽을 수 있는 문자"
+                         ],
+    "scenes":  [
+                   {
+                       "sequence":  6,
+                       "code":  "world-map-community-hero-wide-context",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 넓은 생활·업무 환경",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  7,
+                       "code":  "world-map-community-hero-hands-materials",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 손과 재료의 세부",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  8,
+                       "code":  "world-map-community-hero-role-handoff",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 역할 간 안전한 인계",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  9,
+                       "code":  "world-map-community-hero-mobile-focus",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 모바일 세로형 중심 장면",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  10,
+                       "code":  "world-map-community-hero-quiet-state",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 차분한 대기 상태",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  11,
+                       "code":  "world-map-community-hero-exception-review",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 예외 상황 공동 검토",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  12,
+                       "code":  "world-map-community-hero-time-sequence",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  13,
+                       "code":  "world-map-community-hero-inclusive-access",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 누구나 참여 가능한 장면",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  14,
+                       "code":  "world-map-community-hero-evidence-boundary",
+                       "titleKo":  "세계지도 커뮤니티 시작 히어로 · 실물과 정보 표현의 분리",
+                       "promptKo":  "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  15,
+                       "code":  "regional-culture-discovery-wide-context",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 넓은 생활·업무 환경",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  16,
+                       "code":  "regional-culture-discovery-hands-materials",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 손과 재료의 세부",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  17,
+                       "code":  "regional-culture-discovery-role-handoff",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 역할 간 안전한 인계",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  18,
+                       "code":  "regional-culture-discovery-mobile-focus",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 모바일 세로형 중심 장면",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  19,
+                       "code":  "regional-culture-discovery-quiet-state",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 차분한 대기 상태",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  20,
+                       "code":  "regional-culture-discovery-exception-review",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 예외 상황 공동 검토",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  21,
+                       "code":  "regional-culture-discovery-time-sequence",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  22,
+                       "code":  "regional-culture-discovery-inclusive-access",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 누구나 참여 가능한 장면",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  23,
+                       "code":  "regional-culture-discovery-evidence-boundary",
+                       "titleKo":  "지역 문화와 특산물 탐색 · 실물과 정보 표현의 분리",
+                       "promptKo":  "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/regions",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  24,
+                       "code":  "agricultural-price-comparison-wide-context",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 넓은 생활·업무 환경",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  25,
+                       "code":  "agricultural-price-comparison-hands-materials",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 손과 재료의 세부",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  26,
+                       "code":  "agricultural-price-comparison-role-handoff",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 역할 간 안전한 인계",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  27,
+                       "code":  "agricultural-price-comparison-mobile-focus",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 모바일 세로형 중심 장면",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  28,
+                       "code":  "agricultural-price-comparison-quiet-state",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 차분한 대기 상태",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  29,
+                       "code":  "agricultural-price-comparison-exception-review",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 예외 상황 공동 검토",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  30,
+                       "code":  "agricultural-price-comparison-time-sequence",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  31,
+                       "code":  "agricultural-price-comparison-inclusive-access",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 누구나 참여 가능한 장면",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  32,
+                       "code":  "agricultural-price-comparison-evidence-boundary",
+                       "titleKo":  "농수산물 가격 비교 도우미 · 실물과 정보 표현의 분리",
+                       "promptKo":  "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/boards",
+                                         "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  33,
+                       "code":  "shared-ledger-collaboration-wide-context",
+                       "titleKo":  "대화에서 공동 원장으로 · 넓은 생활·업무 환경",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  34,
+                       "code":  "shared-ledger-collaboration-hands-materials",
+                       "titleKo":  "대화에서 공동 원장으로 · 손과 재료의 세부",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  35,
+                       "code":  "shared-ledger-collaboration-role-handoff",
+                       "titleKo":  "대화에서 공동 원장으로 · 역할 간 안전한 인계",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  36,
+                       "code":  "shared-ledger-collaboration-mobile-focus",
+                       "titleKo":  "대화에서 공동 원장으로 · 모바일 세로형 중심 장면",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  37,
+                       "code":  "shared-ledger-collaboration-quiet-state",
+                       "titleKo":  "대화에서 공동 원장으로 · 차분한 대기 상태",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  38,
+                       "code":  "shared-ledger-collaboration-exception-review",
+                       "titleKo":  "대화에서 공동 원장으로 · 예외 상황 공동 검토",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  39,
+                       "code":  "shared-ledger-collaboration-time-sequence",
+                       "titleKo":  "대화에서 공동 원장으로 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  40,
+                       "code":  "shared-ledger-collaboration-inclusive-access",
+                       "titleKo":  "대화에서 공동 원장으로 · 누구나 참여 가능한 장면",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  41,
+                       "code":  "shared-ledger-collaboration-evidence-boundary",
+                       "titleKo":  "대화에서 공동 원장으로 · 실물과 정보 표현의 분리",
+                       "promptKo":  "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community/workspace",
+                                         "/diagram"
+                                     ]
+                   },
+                   {
+                       "sequence":  42,
+                       "code":  "mobile-empty-discovery-wide-context",
+                       "titleKo":  "모바일 탐색 빈 상태 · 넓은 생활·업무 환경",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  43,
+                       "code":  "mobile-empty-discovery-hands-materials",
+                       "titleKo":  "모바일 탐색 빈 상태 · 손과 재료의 세부",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  44,
+                       "code":  "mobile-empty-discovery-role-handoff",
+                       "titleKo":  "모바일 탐색 빈 상태 · 역할 간 안전한 인계",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  45,
+                       "code":  "mobile-empty-discovery-mobile-focus",
+                       "titleKo":  "모바일 탐색 빈 상태 · 모바일 세로형 중심 장면",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  46,
+                       "code":  "mobile-empty-discovery-quiet-state",
+                       "titleKo":  "모바일 탐색 빈 상태 · 차분한 대기 상태",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  47,
+                       "code":  "mobile-empty-discovery-exception-review",
+                       "titleKo":  "모바일 탐색 빈 상태 · 예외 상황 공동 검토",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  48,
+                       "code":  "mobile-empty-discovery-time-sequence",
+                       "titleKo":  "모바일 탐색 빈 상태 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  49,
+                       "code":  "mobile-empty-discovery-inclusive-access",
+                       "titleKo":  "모바일 탐색 빈 상태 · 누구나 참여 가능한 장면",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   },
+                   {
+                       "sequence":  50,
+                       "code":  "mobile-empty-discovery-evidence-boundary",
+                       "titleKo":  "모바일 탐색 빈 상태 · 실물과 정보 표현의 분리",
+                       "promptKo":  "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/community",
+                                         "/community/regions"
+                                     ]
+                   }
+               ]
+}

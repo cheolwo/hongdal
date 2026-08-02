@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "seller",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "판매자가 상품, 재고, 주문, 판매채널과 식품 근거를 투명하게 관리하는 앱의 절제된 product editorial illustration. 실제 상표와 인증을 만들지 않고 상품 원형과 포장 상태를 자연스럽게 보여 준다.",
+  "contextChecklist": ["상품 등록·게시·주문·출고 상태를 구분한다.", "식품 제조업소·원산지 정보를 허위 인증으로 보이게 하지 않는다."],
+  "avoidExpressions": ["허위 브랜드, 인증 마크, 과장 효능과 가격 표시", "실제 고객 주소, 주문번호, 세금계산서와 공급 계약"],
+  "scenes": [
+    { "sequence": 1, "code": "seller-home", "titleKo": "판매자 운영 홈", "promptKo": "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/", "/shipper/sales/products"] },
+    { "sequence": 2, "code": "product-catalog", "titleKo": "상품 목록·등록", "promptKo": "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/shipper/sales/products", "/shipper/sales/products/new"] },
+    { "sequence": 3, "code": "inventory-order", "titleKo": "재고와 주문", "promptKo": "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/seller/inventory", "/shipper/sales/orders"] },
+    { "sequence": 4, "code": "food-facility-evidence", "titleKo": "식품 제조업소 근거 확인", "promptKo": "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/seller/foreign-food-facilities"] },
+    { "sequence": 5, "code": "seller-empty", "titleKo": "판매 상품 빈 상태", "promptKo": "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/shipper/sales/listings", "/shipper/sales/products"] }
+  ]
+}

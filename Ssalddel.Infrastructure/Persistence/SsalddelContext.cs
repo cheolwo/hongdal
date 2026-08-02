@@ -81,6 +81,7 @@ namespace 살뜰.Data
         public DbSet<사용자View설정> 사용자View설정 { get; set; } = null!;
         public DbSet<사용자행위로그> 사용자행위로그 { get; set; } = null!;
         public DbSet<생성이미지작업> 생성이미지작업 { get; set; } = null!;
+        public DbSet<앱문맥이미지자산> 앱문맥이미지자산들 { get; set; } = null!;
 
         public DbSet<주문자프로필> 주문자프로필 { get; set; } = null!;
         public DbSet<살뜰참여자> 살뜰참여자 { get; set; } = null!;
@@ -188,6 +189,10 @@ namespace 살뜰.Data
         public DbSet<커뮤니티원장상태이벤트> 커뮤니티원장상태이벤트 { get; set; } = null!;
         public DbSet<커뮤니티활동공개Projection> 커뮤니티활동공개Projections { get; set; } = null!;
         public DbSet<커뮤니티활동처리기록> 커뮤니티활동처리기록 { get; set; } = null!;
+        public DbSet<커뮤니티활동유료상세> 커뮤니티활동유료상세목록 { get; set; } = null!;
+        public DbSet<커뮤니티활동상세열람권> 커뮤니티활동상세열람권목록 { get; set; } = null!;
+        public DbSet<커뮤니티활동상세구매> 커뮤니티활동상세구매목록 { get; set; } = null!;
+        public DbSet<커뮤니티활동상세구매상태이력> 커뮤니티활동상세구매상태이력목록 { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

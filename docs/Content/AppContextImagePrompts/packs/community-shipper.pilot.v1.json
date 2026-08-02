@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "packId": "community-shipper",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "세계 지역의 문화와 농수산물을 서로 배우는 정보 공개형 커뮤니티를 위한 따뜻하고 현대적인 editorial illustration으로 표현한다. 현실적인 재료와 조명, 절제된 색감, 다양한 사람이 동등하게 참여하는 안정적인 구도를 사용한다.",
+  "contextChecklist": [
+    "SsalddelApp과 Web 커뮤니티 호스트의 공용 crop을 확인한다.",
+    "지역 문화를 단순화하거나 국적·인종·경제력을 신뢰의 대리 지표로 표현하지 않는다.",
+    "농수산물 가격과 생산지는 실제 공공데이터 증거가 아닌 상징적 문맥으로만 표현한다."
+  ],
+  "avoidExpressions": [
+    "국기, 민족 의상, 관광 엽서만으로 지역을 단순화하는 고정관념",
+    "실제 가격표, 거래명세서, 원산지증명, 공공기관 보증처럼 보이는 요소",
+    "특정 지역·직업·언어 사용자를 비효율적이거나 덜 신뢰할 수 있는 사람으로 표현하는 구도"
+  ],
+  "scenes": [
+    {
+      "sequence": 1,
+      "code": "world-map-community-hero",
+      "titleKo": "세계지도 커뮤니티 시작 히어로",
+      "promptKo": "온화한 색의 세계지도를 높은 시점에서 보여 주고, 여러 대륙의 생활권에 곡물, 채소, 과일, 수산물을 추상화한 작은 마커가 고르게 배치된다. 지도 주변에서 다양한 연령의 사람들이 서로 같은 정보를 들여다보는 평등한 커뮤니티 분위기를 만든다.",
+      "aspectRatio": "16:9",
+      "resolution": "1K",
+      "routeRefs": [
+        "/community",
+        "Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor"
+      ]
+    },
+    {
+      "sequence": 2,
+      "code": "regional-culture-discovery",
+      "titleKo": "지역 문화와 특산물 탐색",
+      "promptKo": "해안, 평야, 산지, 도시 외곽이 하나의 연속된 풍경으로 이어지고, 각 생활권에서 사람들이 현지 식재료를 손질하거나 요리하며 서로의 방식을 존중하는 장면을 표현한다. 특정 나라를 대표하는 상징 대신 일상의 도구와 재료의 차이를 자연스럽게 보여 준다.",
+      "aspectRatio": "4:3",
+      "resolution": "1K",
+      "routeRefs": [
+        "/community/regions",
+        "Ssalddel.Ui.Common/Areas/App/Components/Information/RegionalCultureSpecialtyBrowse.razor"
+      ]
+    },
+    {
+      "sequence": 3,
+      "code": "agricultural-price-comparison",
+      "titleKo": "농수산물 가격 비교 도우미",
+      "promptKo": "서로 다른 지역에서 온 같은 종류의 채소와 수산물이 균일한 크기의 상자에 담겨 있고, 배송 거리, 품질 등급, 거래 단위, 기준 시각의 차이를 문자 없는 색상과 도형으로만 비교한다. 특정 상품을 더 우수하게 보이게 하지 않고 비교 조건을 이해하는 느낌을 준다.",
+      "aspectRatio": "4:3",
+      "resolution": "1K",
+      "routeRefs": [
+        "/community/boards",
+        "Ssalddel.Ui.Common/Areas/App/Components/Information/KamisDomesticPriceComparison.razor"
+      ]
+    },
+    {
+      "sequence": 4,
+      "code": "shared-ledger-collaboration",
+      "titleKo": "대화에서 공동 원장으로",
+      "promptKo": "마을 회의실과 작은 생산지 작업 공간이 연결된 상황에서 참여자들이 가운데의 빈 원형 보드에 역할, 시간, 비용, 위험을 상징하는 간단한 카드를 스스로 놓는다. 누군가가 자동으로 배정되거나 계약이 확정된 느낌 없이, 동의와 철회가 가능한 협의 과정을 부드럽게 보여 준다.",
+      "aspectRatio": "16:9",
+      "resolution": "1K",
+      "routeRefs": [
+        "/community/workspace",
+        "/diagram"
+      ]
+    },
+    {
+      "sequence": 5,
+      "code": "mobile-empty-discovery",
+      "titleKo": "모바일 탐색 빈 상태",
+      "promptKo": "맑은 배경 중앙에 작은 지구본과 빈 농산물 장바구니, 새로운 정보를 기다리는 작은 씨앗을 배치해 아직 결과가 없지만 다시 탐색할 수 있는 분위기를 만든다. 모바일 세로형 crop에서 중앙 대상과 상하 여백이 안정적으로 남도록 구성한다.",
+      "aspectRatio": "3:4",
+      "resolution": "1K",
+      "routeRefs": [
+        "/community",
+        "/community/regions"
+      ]
+    }
+  ]
+}

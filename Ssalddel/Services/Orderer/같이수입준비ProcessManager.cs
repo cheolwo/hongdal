@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Orderer;
@@ -155,6 +156,7 @@ internal sealed class 같이수입준비ProcessManager명령기록
     public DateTimeOffset 처리시각Utc { get; set; }
 }
 
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.GroupImportTradeReadiness,
     SsalddelCodeLayer.Application,

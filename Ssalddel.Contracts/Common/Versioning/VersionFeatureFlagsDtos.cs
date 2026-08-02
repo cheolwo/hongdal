@@ -32,6 +32,8 @@ public sealed class WorkflowFlagStateDto
     public IReadOnlyList<WorkflowScreenDto> Screens { get; init; } = [];
 
     public IReadOnlyList<WorkflowUseCaseDto> UseCases { get; init; } = [];
+
+    public IReadOnlyList<WorkflowProcessManagerDto> ProcessManagers { get; init; } = [];
 }
 
 public sealed class WorkflowParticipantDto
@@ -99,6 +101,23 @@ public sealed class WorkflowUseCaseRelationDto
     public string Condition { get; init; } = string.Empty;
 
     public string Summary { get; init; } = string.Empty;
+}
+
+public sealed class WorkflowProcessManagerDto
+{
+    public string ProcessManagerCode { get; init; } = string.Empty;
+
+    public string ContractCode { get; init; } = string.Empty;
+
+    public string FeatureKey { get; init; } = string.Empty;
+
+    public string Responsibility { get; init; } = string.Empty;
+
+    public string Boundary { get; init; } = string.Empty;
+
+    public int FlowOrder { get; init; }
+
+    public IReadOnlyList<string> EffectCodes { get; init; } = [];
 }
 
 public sealed class WorkflowApiEndpointDto

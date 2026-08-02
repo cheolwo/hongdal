@@ -1,0 +1,535 @@
+{
+    "schemaVersion":  1,
+    "packId":  "food-delivery-admin",
+    "status":  "ApprovedForBatch",
+    "promptVersion":  2,
+    "model":  "gemini-3.1-flash-lite-image",
+    "expectedSceneCount":  45,
+    "sceneNumberStart":  6,
+    "basePromptKo":  "음식점 주문, 조리, 픽업, 기사 배정 검토, 배달 상태를 운영하는 신규 업무 패키지 관리자 호스트의 operational illustration. 현재 공용 landing과 legacy 업무 route를 사용하므로 5장 파일럿 이상 생성하지 않는다. 이미지 자체는 순수한 시각 자산으로 만들고 제목판, 설명문, 표, 앱 화면, 대시보드 UI를 합성하지 않는다.",
+    "contextChecklist":  [
+                             "현재 호스트가 통합관리자 BusinessPackageAdmin과 legacy route를 재사용함을 표시한다.",
+                             "음식점·기사·주문자 개인정보와 실제 배달 증빙을 넣지 않는다.",
+                             "이미지에 읽을 수 있는 글자·숫자·가상 UI가 없는지 확인한다."
+                         ],
+    "avoidExpressions":  [
+                             "실제 주문번호, 주소, 전화번호, 영수증과 전달 사진",
+                             "AI 배차 후보를 자동 확정된 기사로 표현하는 장면",
+                             "제목, 캡션, 단계 번호, 가상 앱 화면, 대시보드, 표와 읽을 수 있는 문자"
+                         ],
+    "scenes":  [
+                   {
+                       "sequence":  6,
+                       "code":  "food-admin-package-home-wide-context",
+                       "titleKo":  "음식 배달 패키지 홈 · 넓은 생활·업무 환경",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  7,
+                       "code":  "food-admin-package-home-hands-materials",
+                       "titleKo":  "음식 배달 패키지 홈 · 손과 재료의 세부",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  8,
+                       "code":  "food-admin-package-home-role-handoff",
+                       "titleKo":  "음식 배달 패키지 홈 · 역할 간 안전한 인계",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  9,
+                       "code":  "food-admin-package-home-mobile-focus",
+                       "titleKo":  "음식 배달 패키지 홈 · 모바일 세로형 중심 장면",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  10,
+                       "code":  "food-admin-package-home-quiet-state",
+                       "titleKo":  "음식 배달 패키지 홈 · 차분한 대기 상태",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  11,
+                       "code":  "food-admin-package-home-exception-review",
+                       "titleKo":  "음식 배달 패키지 홈 · 예외 상황 공동 검토",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  12,
+                       "code":  "food-admin-package-home-time-sequence",
+                       "titleKo":  "음식 배달 패키지 홈 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  13,
+                       "code":  "food-admin-package-home-inclusive-access",
+                       "titleKo":  "음식 배달 패키지 홈 · 누구나 참여 가능한 장면",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  14,
+                       "code":  "food-admin-package-home-evidence-boundary",
+                       "titleKo":  "음식 배달 패키지 홈 · 실물과 정보 표현의 분리",
+                       "promptKo":  "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  15,
+                       "code":  "food-operations-wide-context",
+                       "titleKo":  "음식 운영 현황 · 넓은 생활·업무 환경",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  16,
+                       "code":  "food-operations-hands-materials",
+                       "titleKo":  "음식 운영 현황 · 손과 재료의 세부",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  17,
+                       "code":  "food-operations-role-handoff",
+                       "titleKo":  "음식 운영 현황 · 역할 간 안전한 인계",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  18,
+                       "code":  "food-operations-mobile-focus",
+                       "titleKo":  "음식 운영 현황 · 모바일 세로형 중심 장면",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  19,
+                       "code":  "food-operations-quiet-state",
+                       "titleKo":  "음식 운영 현황 · 차분한 대기 상태",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  20,
+                       "code":  "food-operations-exception-review",
+                       "titleKo":  "음식 운영 현황 · 예외 상황 공동 검토",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  21,
+                       "code":  "food-operations-time-sequence",
+                       "titleKo":  "음식 운영 현황 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  22,
+                       "code":  "food-operations-inclusive-access",
+                       "titleKo":  "음식 운영 현황 · 누구나 참여 가능한 장면",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  23,
+                       "code":  "food-operations-evidence-boundary",
+                       "titleKo":  "음식 운영 현황 · 실물과 정보 표현의 분리",
+                       "promptKo":  "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  24,
+                       "code":  "food-order-trace-wide-context",
+                       "titleKo":  "주문·Outbox 추적 · 넓은 생활·업무 환경",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  25,
+                       "code":  "food-order-trace-hands-materials",
+                       "titleKo":  "주문·Outbox 추적 · 손과 재료의 세부",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  26,
+                       "code":  "food-order-trace-role-handoff",
+                       "titleKo":  "주문·Outbox 추적 · 역할 간 안전한 인계",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  27,
+                       "code":  "food-order-trace-mobile-focus",
+                       "titleKo":  "주문·Outbox 추적 · 모바일 세로형 중심 장면",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  28,
+                       "code":  "food-order-trace-quiet-state",
+                       "titleKo":  "주문·Outbox 추적 · 차분한 대기 상태",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  29,
+                       "code":  "food-order-trace-exception-review",
+                       "titleKo":  "주문·Outbox 추적 · 예외 상황 공동 검토",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  30,
+                       "code":  "food-order-trace-time-sequence",
+                       "titleKo":  "주문·Outbox 추적 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  31,
+                       "code":  "food-order-trace-inclusive-access",
+                       "titleKo":  "주문·Outbox 추적 · 누구나 참여 가능한 장면",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  32,
+                       "code":  "food-order-trace-evidence-boundary",
+                       "titleKo":  "주문·Outbox 추적 · 실물과 정보 표현의 분리",
+                       "promptKo":  "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/order-trace"
+                                     ]
+                   },
+                   {
+                       "sequence":  33,
+                       "code":  "food-dispatch-review-wide-context",
+                       "titleKo":  "음식 배달 배차 검토 · 넓은 생활·업무 환경",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  34,
+                       "code":  "food-dispatch-review-hands-materials",
+                       "titleKo":  "음식 배달 배차 검토 · 손과 재료의 세부",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  35,
+                       "code":  "food-dispatch-review-role-handoff",
+                       "titleKo":  "음식 배달 배차 검토 · 역할 간 안전한 인계",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  36,
+                       "code":  "food-dispatch-review-mobile-focus",
+                       "titleKo":  "음식 배달 배차 검토 · 모바일 세로형 중심 장면",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  37,
+                       "code":  "food-dispatch-review-quiet-state",
+                       "titleKo":  "음식 배달 배차 검토 · 차분한 대기 상태",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  38,
+                       "code":  "food-dispatch-review-exception-review",
+                       "titleKo":  "음식 배달 배차 검토 · 예외 상황 공동 검토",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  39,
+                       "code":  "food-dispatch-review-time-sequence",
+                       "titleKo":  "음식 배달 배차 검토 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  40,
+                       "code":  "food-dispatch-review-inclusive-access",
+                       "titleKo":  "음식 배달 배차 검토 · 누구나 참여 가능한 장면",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  41,
+                       "code":  "food-dispatch-review-evidence-boundary",
+                       "titleKo":  "음식 배달 배차 검토 · 실물과 정보 표현의 분리",
+                       "promptKo":  "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery/dispatch-ai-review"
+                                     ]
+                   },
+                   {
+                       "sequence":  42,
+                       "code":  "food-admin-empty-wide-context",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 넓은 생활·업무 환경",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  43,
+                       "code":  "food-admin-empty-hands-materials",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 손과 재료의 세부",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  44,
+                       "code":  "food-admin-empty-role-handoff",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 역할 간 안전한 인계",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  45,
+                       "code":  "food-admin-empty-mobile-focus",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 모바일 세로형 중심 장면",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  46,
+                       "code":  "food-admin-empty-quiet-state",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 차분한 대기 상태",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  47,
+                       "code":  "food-admin-empty-exception-review",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 예외 상황 공동 검토",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  48,
+                       "code":  "food-admin-empty-time-sequence",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  49,
+                       "code":  "food-admin-empty-inclusive-access",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 누구나 참여 가능한 장면",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   },
+                   {
+                       "sequence":  50,
+                       "code":  "food-admin-empty-evidence-boundary",
+                       "titleKo":  "음식 배달 예외 빈 상태 · 실물과 정보 표현의 분리",
+                       "promptKo":  "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/admin/food-delivery",
+                                         "/admin/food-delivery/operations"
+                                     ]
+                   }
+               ]
+}

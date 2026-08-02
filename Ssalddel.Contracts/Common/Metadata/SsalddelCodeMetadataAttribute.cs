@@ -5,7 +5,10 @@ namespace Ssalddel.Contracts.Common.Metadata;
 public static class SsalddelCodeFeatureKeys
 {
     public const string ApifyActorIntegration = "apify-actor-integration";
+    public const string AppContextImageBatch = "app-context-image-batch";
+    public const string AppContextImageAsset = "app-context-image-asset";
     public const string CommunityAuthoringImage = "community-authoring-image";
+    public const string CommunityActivityPaidDetail = "community-activity-paid-detail";
     public const string CommunityWorldMapObservation = "community-world-map-observation";
     public const string GroupPurchaseDemandProcessManager = "group-purchase-demand-process-manager";
     public const string GroupImportTradeReadiness = "group-import-trade-readiness";

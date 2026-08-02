@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "freight-delivery-admin",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "화물 의뢰, 배차 대기, 기사·차량 후보, 운송 이벤트와 예외을 운영하는 신규 화물 배송 관리자 호스트의 operational illustration. 현재 공용 landing과 legacy route를 사용하므로 5장 파일럿 이상 생성하지 않는다.",
+  "contextChecklist": ["추천·검토·배차 확정·운송 실행 상태를 구분한다.", "유상 주선, 자동 배차, 운임 수취를 준비 없이 표현하지 않는다."],
+  "avoidExpressions": ["기사를 자동 배정하거나 저효율 참여자를 숨기는 표현", "실제 차량번호, 주소, 운송장, 운임, 정산과 배송 증빙"],
+  "scenes": [
+    { "sequence": 1, "code": "freight-admin-package-home", "titleKo": "화물 배송 패키지 홈", "promptKo": "화물 의뢰, 배차 대기, 기사, 차량, 운송 상태를 상징하는 구역이 한 화면에 연결되고 운영자가 안전과 재처리 필요 항목을 우선 확인하는 패키지 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/admin/freight-delivery", "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"] },
+    { "sequence": 2, "code": "freight-request-queue", "titleKo": "화물 의뢰·배차 대기", "promptKo": "적재물 종류, 차량 조건, 상하차 시간창, 지역 범위를 상징하는 의뢰 카드가 접수·검토·추가 정보 필요 상태로 나뉘어 있고 운영자가 누락 조건을 확인하는 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/admin/freight-delivery/requests", "/admin/freight-delivery/dispatch-wait"] },
+    { "sequence": 3, "code": "freight-dispatch-review", "titleKo": "화물 배차 검토", "promptKo": "차량 적합성, 기사 가용 시간, 거리, 휴식, 상하차 제약을 상징하는 중립 도형으로 여러 후보를 비교하고 운영자가 AI 판단의 근거와 예외를 검토하는 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/admin/freight-delivery/dispatch-ai-review", "/admin/freight-delivery/drivers"] },
+    { "sequence": 4, "code": "freight-control", "titleKo": "운송 관제·예외", "promptKo": "운송 시작, 상차, 이동, 하차, 예외, 완료 후보 상태가 재처리 가능한 흐름으로 연결되고 운영자가 중단·지연·증빙 누락 후보를 신중하게 확인하는 관제 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/admin/freight-delivery/transports", "/admin/freight-delivery/vehicles"] },
+    { "sequence": 5, "code": "freight-admin-empty", "titleKo": "화물 배차 대기 빈 상태", "promptKo": "세로형 관리 화면 중앙에 빈 화물 파레트와 주차된 차량, 안전 점검 도구를 배치해 현재 배차가 필요한 의뢰가 없고 차량을 점검하는 차분한 상태를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/admin/freight-delivery/dispatch-wait", "/admin/freight-delivery"] }
+  ]
+}

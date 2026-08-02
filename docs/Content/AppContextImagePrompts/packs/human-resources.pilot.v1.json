@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "human-resources",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "인력 운영자가 역할, 일정, 교육, 안전과 지원 요청을 사람 중심으로 조율하는 앱의 차분하고 포용적인 editorial illustration. 현재 실제 화면이 홈 하나이므로 상세 증빙이 아닌 향후 화면 시각 후보로만 제작한다.",
+  "contextChecklist": ["현재 HumanResourcesManagerApp은 홈 화면만 존재하므로 5장 파일럿 이상 생성하지 않는다.", "연령·국적·언어·성별·가족형태·경제력을 평가와 자격의 대리 지표로 쓰지 않는다."],
+  "avoidExpressions": ["사람을 순위화하는 점수, 외모·배경으로 직무 능력을 추정하는 표현", "실제 직원 사진, 인사기록, 연봉, 연락처와 전자서명"],
+  "scenes": [
+    { "sequence": 1, "code": "hr-home-reserve", "titleKo": "인력 운영 홈 후보", "promptKo": "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/", "HumanResourcesManagerApp/Components/Pages/Home.razor"] },
+    { "sequence": 2, "code": "role-schedule-reserve", "titleKo": "역할·일정 조율 후보", "promptKo": "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/", "HumanResourcesManagerApp"] },
+    { "sequence": 3, "code": "training-safety-reserve", "titleKo": "교육·안전 지원 후보", "promptKo": "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/", "HumanResourcesManagerApp"] },
+    { "sequence": 4, "code": "support-request-reserve", "titleKo": "지원 요청 후보", "promptKo": "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/", "HumanResourcesManagerApp"] },
+    { "sequence": 5, "code": "hr-empty-reserve", "titleKo": "인사 알림 빈 상태 후보", "promptKo": "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/", "HumanResourcesManagerApp"] }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "food-delivery-admin",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "음식점 주문, 조리, 픽업, 기사 배정 검토, 배달 상태를 운영하는 신규 업무 패키지 관리자 호스트의 operational illustration. 현재 공용 landing과 legacy 업무 route를 사용하므로 5장 파일럿 이상 생성하지 않는다.",
+  "contextChecklist": ["현재 호스트가 통합관리자 BusinessPackageAdmin과 legacy route를 재사용함을 표시한다.", "음식점·기사·주문자 개인정보와 실제 배달 증빙을 넣지 않는다."],
+  "avoidExpressions": ["실제 주문번호, 주소, 전화번호, 영수증과 전달 사진", "AI 배차 후보를 자동 확정된 기사로 표현하는 장면"],
+  "scenes": [
+    { "sequence": 1, "code": "food-admin-package-home", "titleKo": "음식 배달 패키지 홈", "promptKo": "음식점 주문, 조리, 픽업, 배차 검토, 전달 상태를 상징하는 다섯 구역이 안전한 흐름으로 연결되고 운영자가 재처리가 필요한 후보를 확인하는 패키지 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/admin/food-delivery", "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"] },
+    { "sequence": 2, "code": "food-operations", "titleKo": "음식 운영 현황", "promptKo": "새 주문, 조리 중, 픽업 대기, 배달 중, 예외 검토 카드가 시간 흐름에 따라 배치되고 운영자가 상태 변경 이력을 확인하는 운영 관제 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/admin/food-delivery/operations"] },
+    { "sequence": 3, "code": "food-order-trace", "titleKo": "주문·Outbox 추적", "promptKo": "하나의 음식 주문이 접수, 배차 후보, 조리, 픽업, 전달, 상태 이벤트로 연결되고 재처리 가능한 항목과 중복 방지 상태를 운영자가 살펴보는 기술적 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/admin/food-delivery/order-trace"] },
+    { "sequence": 4, "code": "food-dispatch-review", "titleKo": "음식 배달 배차 검토", "promptKo": "음식점과 전달 구역, 조리 예상 시간, 기사 휴식 상태, 묶음 가능성을 상징하는 중립 도형을 비교하고 운영자가 AI 후보의 근거와 제외 사유를 검토하는 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/admin/food-delivery/dispatch-ai-review"] },
+    { "sequence": 5, "code": "food-admin-empty", "titleKo": "음식 배달 예외 빈 상태", "promptKo": "세로형 관리 화면 중앙에 빈 주문 트레이와 정상 상태를 상징하는 작은 녹색 원, 청결한 보온 가방을 배치해 현재 처리할 예외가 없는 안정적 상태를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/admin/food-delivery", "/admin/food-delivery/operations"] }
+  ]
+}

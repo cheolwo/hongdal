@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "restaurant-desk",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "음식점이 주문 접수, 조리, 포장, 배달 인계와 식재료 요청을 안정적으로 관리하는 데스크 앱의 따뜻한 operational illustration. 청결한 조리 환경과 현실적인 주방 동선을 사용한다.",
+  "contextChecklist": ["주문 접수·확인·조리·전달 상태를 구분한다.", "식재료 요청을 실제 발주·계약 완료로 오인하지 않는다."],
+  "avoidExpressions": ["비위생적인 조리, 뜨거운 용기의 위험한 취급", "실제 주문번호, 고객 정보, 영수증과 공급 계약"],
+  "scenes": [
+    { "sequence": 1, "code": "restaurant-order-inbox", "titleKo": "음식점 주문 접수", "promptKo": "밝고 청결한 카운터에서 음식점 운영자가 새 주문, 조리 중, 포장 준비, 전달 대기 상태를 색상 카드로 한눈에 확인하는 업무 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/", "/orders"] },
+    { "sequence": 2, "code": "order-preparation", "titleKo": "조리·포장 진행", "promptKo": "조리사가 위생 모자와 장갑을 착용하고 조리된 음식을 안정적인 용기에 담아 밀봉하며, 각 주문의 요청 사항을 문자 없는 구분 카드로 확인하는 안전한 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/orders/{OrderNo}", "/settings/preparation-times"] },
+    { "sequence": 3, "code": "ingredient-supply", "titleKo": "식재료 공급 요청 초안", "promptKo": "주방 선반의 남은 채소, 육류, 곡물을 살펴보며 운영자가 필요 수량과 희망 날짜를 초안 카드로 정리하는 상황을, 공급자 선정이나 발주 확정 없이 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/ingredients/supply-request"] },
+    { "sequence": 4, "code": "driver-handoff", "titleKo": "배달 기사 인계", "promptKo": "음식점의 지정된 픽업 선반에 밀봉된 보온 포장이 정돈되고 운영자와 기사가 수량과 포장 상태를 함께 살펴보는 인계 장면을 실제 전달 증빙으로 보이지 않게 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/dispatch/address-form", "/orders/{OrderNo}"] },
+    { "sequence": 5, "code": "restaurant-empty", "titleKo": "주문 대기 빈 상태", "promptKo": "세로형 화면 중앙에 깔끔한 빈 주문 클립과 작은 허브 화분, 정돈된 주방 도구를 배치해 현재 주문이 없고 재료와 작업대를 점검하는 차분한 시간을 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/orders", "/"] }
+  ]
+}

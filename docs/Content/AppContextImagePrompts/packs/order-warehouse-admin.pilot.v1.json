@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "order-warehouse-admin",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "주문, 출고 요청, 창고 완료, 운송 인계와 문서 원장을 운영하는 신규 주문·창고 관리자 호스트의 operational illustration. 현재 공용 landing과 legacy route를 사용하므로 5장 파일럿 이상 생성하지 않는다.",
+  "contextChecklist": ["창고 작업 완료와 운송 의뢰 인계를 별도 상태로 표현한다.", "재고·피킹·포장·증빙을 실제 완료로 허위 표현하지 않는다."],
+  "avoidExpressions": ["위험한 적재, 가드 없는 지게차, 사람 아래의 행거", "실제 바코드, 주소, 출고증, 서명, 운송장과 문서 원문"],
+  "scenes": [
+    { "sequence": 1, "code": "order-warehouse-package-home", "titleKo": "주문·창고 패키지 홈", "promptKo": "주문 접수, 출고 준비, 피킹·포장, 운송 인계, 문서 원장 구역이 안전한 순서로 연결되고 운영자가 오늘의 누락과 지연 후보를 확인하는 패키지 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/admin/order-warehouse", "SsalddelAdmin/Components/Pages/BusinessPackageAdmin.razor"] },
+    { "sequence": 2, "code": "outbound-dashboard", "titleKo": "주문·출고 운영 현황", "promptKo": "주문 준비, 재고 확인, 피킹, 포장, 출고 대기 상태를 상징하는 카드가 균형 있게 배치되고 운영자가 창고 실물 확인이 필요한 후보를 분리하는 현황 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/admin/order-warehouse/dashboard", "/admin/order-warehouse/outbound-requests"] },
+    { "sequence": 3, "code": "warehouse-handoff", "titleKo": "창고 완료·운송 인계", "promptKo": "포장 완료 후보 상자가 출고 대기 구역에 정돈되고 창고 담당자가 수량과 상태를 확인한 뒤 운송 패키지로 인계 후보를 보내는 경계 장면을 서명 없이 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/admin/order-warehouse/outbound-handoff", "/admin/order-warehouse/outbound-transports"] },
+    { "sequence": 4, "code": "document-ledger", "titleKo": "증빙·문서 원장", "promptKo": "입고, 피킹, 포장, 출고, 운송 인계에서 생긴 문서 상태를 원문 대신 중립적 상징 카드로 연결하고 누락, 검토, 승인, 보존 상태를 운영자가 확인하는 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/admin/order-warehouse/documents"] },
+    { "sequence": 5, "code": "order-warehouse-empty", "titleKo": "출고 요청 빈 상태", "promptKo": "세로형 관리 화면 중앙에 빈 출고 파레트와 정돈된 포장 도구, 작은 녹색 상태 등을 배치해 현재 처리할 출고 요청이 없고 창고가 안정적으로 대기하는 느낌을 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/admin/order-warehouse/outbound-requests", "/admin/order-warehouse"] }
+  ]
+}

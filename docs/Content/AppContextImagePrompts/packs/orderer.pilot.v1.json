@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "orderer",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "음식재료와 생활 상품을 조건·단위·출처를 비교해 스스로 주문하는 사용자 앱의 밝고 신뢰감 있는 editorial illustration. 생산물 원래 형태와 거래 단위 차이를 숨기지 않는다.",
+  "contextChecklist": ["원본 거래 단위와 비교 단위를 구분한다.", "의향·주문·공동구매·수입 준비 상태를 섞지 않는다."],
+  "avoidExpressions": ["허위 할인율, 가격표, 결제 영수증과 계약 확정", "특정 참여자를 자동 가입시키거나 제외하는 표현"],
+  "scenes": [
+    { "sequence": 1, "code": "orderer-home", "titleKo": "주문자 탐색 홈", "promptKo": "주방 작업대에 채소, 곡물, 수산물과 생활 상품이 정돈되어 있고 사용자가 음식 주문, 화물 요청, 가격 비교, 주문 이력 여정을 차분히 선택하는 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/", "/food"] },
+    { "sequence": 2, "code": "produce-price-compare", "titleKo": "생산물 가격·단위 비교", "promptKo": "동일한 작물이 상자, 망, 단, 포대 등 다른 원본 거래 단위로 배치되고 조사 시점과 지역 차이를 문자 없는 색상과 측정 도구로 비교하는 공정한 정보 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/group-purchase/produce-prices", "/group-purchase/products"] },
+    { "sequence": 3, "code": "group-purchase-intent", "titleKo": "공동구매 참여 의향", "promptKo": "서로 다른 수량과 수령 방법을 원하는 참여자들이 빈 공동 바구니 주변에서 자신의 의향 카드를 스스로 놓고, 철회와 미정 조건이 남아 있는 비구속 협의 상태를 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/group-purchase", "/group-purchase/wishes/new"] },
+    { "sequence": 4, "code": "individual-order-ledger", "titleKo": "개별 주문 원장", "promptKo": "한 사용자가 스스로 선택한 상품, 수량, 수령 방법, 변경 이력이 간결한 카드 흐름으로 연결되어 있고 타인의 주문과 분리된 개별 원장 개념을 문자 없이 보여 준다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/orders", "/orders/{OrderLedgerId}"] },
+    { "sequence": 5, "code": "orderer-empty", "titleKo": "주문 이력 빈 상태", "promptKo": "세로형 모바일 구도에 빈 장바구니와 작은 요리 도구, 지역 정보를 탐색하는 부드러운 나침반을 배치해 주문이 없을 때도 정보를 먼저 둘러볼 수 있는 편안한 상태를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/orders", "/food/mart"] }
+  ]
+}

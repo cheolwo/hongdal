@@ -1,0 +1,553 @@
+{
+    "schemaVersion":  1,
+    "packId":  "seller",
+    "status":  "ApprovedForBatch",
+    "promptVersion":  2,
+    "model":  "gemini-3.1-flash-lite-image",
+    "expectedSceneCount":  45,
+    "sceneNumberStart":  6,
+    "basePromptKo":  "판매자가 상품, 재고, 주문, 판매채널과 식품 근거를 투명하게 관리하는 앱의 절제된 product editorial illustration. 실제 상표와 인증을 만들지 않고 상품 원형과 포장 상태를 자연스럽게 보여 준다. 이미지 자체는 순수한 시각 자산으로 만들고 제목판, 설명문, 표, 앱 화면, 대시보드 UI를 합성하지 않는다.",
+    "contextChecklist":  [
+                             "상품 등록·게시·주문·출고 상태를 구분한다.",
+                             "식품 제조업소·원산지 정보를 허위 인증으로 보이게 하지 않는다.",
+                             "이미지에 읽을 수 있는 글자·숫자·가상 UI가 없는지 확인한다."
+                         ],
+    "avoidExpressions":  [
+                             "허위 브랜드, 인증 마크, 과장 효능과 가격 표시",
+                             "실제 고객 주소, 주문번호, 세금계산서와 공급 계약",
+                             "제목, 캡션, 단계 번호, 가상 앱 화면, 대시보드, 표와 읽을 수 있는 문자"
+                         ],
+    "scenes":  [
+                   {
+                       "sequence":  6,
+                       "code":  "seller-home-wide-context",
+                       "titleKo":  "판매자 운영 홈 · 넓은 생활·업무 환경",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  7,
+                       "code":  "seller-home-hands-materials",
+                       "titleKo":  "판매자 운영 홈 · 손과 재료의 세부",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  8,
+                       "code":  "seller-home-role-handoff",
+                       "titleKo":  "판매자 운영 홈 · 역할 간 안전한 인계",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  9,
+                       "code":  "seller-home-mobile-focus",
+                       "titleKo":  "판매자 운영 홈 · 모바일 세로형 중심 장면",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  10,
+                       "code":  "seller-home-quiet-state",
+                       "titleKo":  "판매자 운영 홈 · 차분한 대기 상태",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  11,
+                       "code":  "seller-home-exception-review",
+                       "titleKo":  "판매자 운영 홈 · 예외 상황 공동 검토",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  12,
+                       "code":  "seller-home-time-sequence",
+                       "titleKo":  "판매자 운영 홈 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  13,
+                       "code":  "seller-home-inclusive-access",
+                       "titleKo":  "판매자 운영 홈 · 누구나 참여 가능한 장면",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  14,
+                       "code":  "seller-home-evidence-boundary",
+                       "titleKo":  "판매자 운영 홈 · 실물과 정보 표현의 분리",
+                       "promptKo":  "깔끔한 작업대에 판매 준비 상품, 재고 상자, 주문 포장, 여러 판매채널을 상징하는 간단한 도형이 정돈되고 판매자가 오늘의 작업을 선택하는 시작 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  15,
+                       "code":  "product-catalog-wide-context",
+                       "titleKo":  "상품 목록·등록 · 넓은 생활·업무 환경",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  16,
+                       "code":  "product-catalog-hands-materials",
+                       "titleKo":  "상품 목록·등록 · 손과 재료의 세부",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  17,
+                       "code":  "product-catalog-role-handoff",
+                       "titleKo":  "상품 목록·등록 · 역할 간 안전한 인계",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  18,
+                       "code":  "product-catalog-mobile-focus",
+                       "titleKo":  "상품 목록·등록 · 모바일 세로형 중심 장면",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  19,
+                       "code":  "product-catalog-quiet-state",
+                       "titleKo":  "상품 목록·등록 · 차분한 대기 상태",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  20,
+                       "code":  "product-catalog-exception-review",
+                       "titleKo":  "상품 목록·등록 · 예외 상황 공동 검토",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  21,
+                       "code":  "product-catalog-time-sequence",
+                       "titleKo":  "상품 목록·등록 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  22,
+                       "code":  "product-catalog-inclusive-access",
+                       "titleKo":  "상품 목록·등록 · 누구나 참여 가능한 장면",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  23,
+                       "code":  "product-catalog-evidence-boundary",
+                       "titleKo":  "상품 목록·등록 · 실물과 정보 표현의 분리",
+                       "promptKo":  "서로 다른 농수산물과 가공식품이 동일한 조명과 배경에서 균형 있게 배치되고 판매자가 상품 상태와 포장 단위를 확인하는 카탈로그 제작 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/products",
+                                         "/shipper/sales/products/new"
+                                     ]
+                   },
+                   {
+                       "sequence":  24,
+                       "code":  "inventory-order-wide-context",
+                       "titleKo":  "재고와 주문 · 넓은 생활·업무 환경",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  25,
+                       "code":  "inventory-order-hands-materials",
+                       "titleKo":  "재고와 주문 · 손과 재료의 세부",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  26,
+                       "code":  "inventory-order-role-handoff",
+                       "titleKo":  "재고와 주문 · 역할 간 안전한 인계",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  27,
+                       "code":  "inventory-order-mobile-focus",
+                       "titleKo":  "재고와 주문 · 모바일 세로형 중심 장면",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  28,
+                       "code":  "inventory-order-quiet-state",
+                       "titleKo":  "재고와 주문 · 차분한 대기 상태",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  29,
+                       "code":  "inventory-order-exception-review",
+                       "titleKo":  "재고와 주문 · 예외 상황 공동 검토",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  30,
+                       "code":  "inventory-order-time-sequence",
+                       "titleKo":  "재고와 주문 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  31,
+                       "code":  "inventory-order-inclusive-access",
+                       "titleKo":  "재고와 주문 · 누구나 참여 가능한 장면",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  32,
+                       "code":  "inventory-order-evidence-boundary",
+                       "titleKo":  "재고와 주문 · 실물과 정보 표현의 분리",
+                       "promptKo":  "창고 선반의 상품 상자와 포장 대기 주문을 분리해 배치하고 판매자가 실물 재고를 확인한 뒤 주문 처리 후보를 결정하는, 허위 출고 확정이 없는 안전한 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/inventory",
+                                         "/shipper/sales/orders"
+                                     ]
+                   },
+                   {
+                       "sequence":  33,
+                       "code":  "food-facility-evidence-wide-context",
+                       "titleKo":  "식품 제조업소 근거 확인 · 넓은 생활·업무 환경",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  34,
+                       "code":  "food-facility-evidence-hands-materials",
+                       "titleKo":  "식품 제조업소 근거 확인 · 손과 재료의 세부",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  35,
+                       "code":  "food-facility-evidence-role-handoff",
+                       "titleKo":  "식품 제조업소 근거 확인 · 역할 간 안전한 인계",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  36,
+                       "code":  "food-facility-evidence-mobile-focus",
+                       "titleKo":  "식품 제조업소 근거 확인 · 모바일 세로형 중심 장면",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  37,
+                       "code":  "food-facility-evidence-quiet-state",
+                       "titleKo":  "식품 제조업소 근거 확인 · 차분한 대기 상태",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  38,
+                       "code":  "food-facility-evidence-exception-review",
+                       "titleKo":  "식품 제조업소 근거 확인 · 예외 상황 공동 검토",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  39,
+                       "code":  "food-facility-evidence-time-sequence",
+                       "titleKo":  "식품 제조업소 근거 확인 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  40,
+                       "code":  "food-facility-evidence-inclusive-access",
+                       "titleKo":  "식품 제조업소 근거 확인 · 누구나 참여 가능한 장면",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  41,
+                       "code":  "food-facility-evidence-evidence-boundary",
+                       "titleKo":  "식품 제조업소 근거 확인 · 실물과 정보 표현의 분리",
+                       "promptKo":  "판매자가 식품 포장과 제조 시설을 상징하는 중립적 사진 카드를 비교하고 출처 확인 후보와 추가 검토 필요 상태를 구분하는 연구 장면을, 공식 인증서 없이 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/seller/foreign-food-facilities"
+                                     ]
+                   },
+                   {
+                       "sequence":  42,
+                       "code":  "seller-empty-wide-context",
+                       "titleKo":  "판매 상품 빈 상태 · 넓은 생활·업무 환경",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  43,
+                       "code":  "seller-empty-hands-materials",
+                       "titleKo":  "판매 상품 빈 상태 · 손과 재료의 세부",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  44,
+                       "code":  "seller-empty-role-handoff",
+                       "titleKo":  "판매 상품 빈 상태 · 역할 간 안전한 인계",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  45,
+                       "code":  "seller-empty-mobile-focus",
+                       "titleKo":  "판매 상품 빈 상태 · 모바일 세로형 중심 장면",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  46,
+                       "code":  "seller-empty-quiet-state",
+                       "titleKo":  "판매 상품 빈 상태 · 차분한 대기 상태",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  47,
+                       "code":  "seller-empty-exception-review",
+                       "titleKo":  "판매 상품 빈 상태 · 예외 상황 공동 검토",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  48,
+                       "code":  "seller-empty-time-sequence",
+                       "titleKo":  "판매 상품 빈 상태 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  49,
+                       "code":  "seller-empty-inclusive-access",
+                       "titleKo":  "판매 상품 빈 상태 · 누구나 참여 가능한 장면",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   },
+                   {
+                       "sequence":  50,
+                       "code":  "seller-empty-evidence-boundary",
+                       "titleKo":  "판매 상품 빈 상태 · 실물과 정보 표현의 분리",
+                       "promptKo":  "세로형 화면 중앙에 빈 상품 선반과 작은 싹, 사진 촬영을 준비하는 중립색 배경을 배치해 아직 등록된 상품이 없고 첫 상품을 준비할 수 있는 차분한 상태를 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/shipper/sales/listings",
+                                         "/shipper/sales/products"
+                                     ]
+                   }
+               ]
+}

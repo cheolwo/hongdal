@@ -143,6 +143,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티활동신호UseCase, 커뮤니티활동신호UseCase>();
         services.AddScoped<I커뮤니티세계지도조회UseCase, 커뮤니티세계지도조회UseCase>();
         services.AddScoped<I노드스티커상점UseCase, 노드스티커상점UseCase>();
+        services.AddScoped<I커뮤니티활동상세구매ProcessManager, 커뮤니티활동상세구매ProcessManager>();
+        services.AddScoped<I커뮤니티활동유료상세UseCase, 커뮤니티활동유료상세UseCase>();
         services.AddScoped<ICommunityExperienceAwardService, CommunityExperienceAwardService>();
         services.AddScoped<ICommunityExperienceEventRecorder, CommunityExperienceEventRecorder>();
         services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();

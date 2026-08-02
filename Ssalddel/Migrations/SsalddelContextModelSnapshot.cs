@@ -1381,6 +1381,271 @@ namespace Ssalddel.Migrations
                     b.ToTable("community_activity_public_projections", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세구매", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("결제Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("payment_id");
+
+                    b.Property<string>("구매Id")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("purchase_id");
+
+                    b.Property<string>("구매자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("buyer_user_id");
+
+                    b.Property<string>("멱등성Key")
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("idempotency_key");
+
+                    b.Property<string>("상세Id")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("detail_id");
+
+                    b.Property<string>("열람권Id")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("entitlement_id");
+
+                    b.Property<DateTime?>("완료일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("completed_at_utc");
+
+                    b.Property<int>("요청금액")
+                        .HasColumnType("int")
+                        .HasColumnName("requested_amount");
+
+                    b.Property<DateTime>("요청일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("requested_at_utc");
+
+                    b.Property<string>("통화Code")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)")
+                        .HasColumnName("currency_code");
+
+                    b.Property<string>("판매자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("seller_user_id");
+
+                    b.Property<string>("현재상태")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("current_status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("결제Id")
+                        .IsUnique();
+
+                    b.HasIndex("구매Id")
+                        .IsUnique();
+
+                    b.HasIndex("멱등성Key")
+                        .IsUnique();
+
+                    b.HasIndex("열람권Id")
+                        .IsUnique();
+
+                    b.HasIndex("상세Id", "구매자UserId")
+                        .IsUnique();
+
+                    b.ToTable("community_activity_detail_purchases", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세구매상태이력", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("구매Id")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("purchase_id");
+
+                    b.Property<DateTime>("기록일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("recorded_at_utc");
+
+                    b.Property<string>("사유Code")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("reason_code");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("status");
+
+                    b.Property<int>("순서")
+                        .HasColumnType("int")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("구매Id", "순서")
+                        .IsUnique();
+
+                    b.ToTable("community_activity_detail_purchase_status_history", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세열람권", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("결제Id")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("payment_id");
+
+                    b.Property<string>("구매자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("buyer_user_id");
+
+                    b.Property<DateTime>("발급일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("granted_at_utc");
+
+                    b.Property<string>("상세Id")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("detail_id");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("열람권Id")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("entitlement_id");
+
+                    b.Property<DateTime?>("철회일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("revoked_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("결제Id")
+                        .IsUnique();
+
+                    b.HasIndex("열람권Id")
+                        .IsUnique();
+
+                    b.HasIndex("상세Id", "구매자UserId")
+                        .IsUnique();
+
+                    b.ToTable("community_activity_detail_entitlements", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동유료상세", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<int>("가격금액")
+                        .HasColumnType("int")
+                        .HasColumnName("price_amount");
+
+                    b.Property<long>("게시글Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("post_id");
+
+                    b.Property<string>("공개미리보기")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("public_preview");
+
+                    b.Property<string>("상세Id")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("detail_id");
+
+                    b.Property<string>("상세내용")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("detail_content");
+
+                    b.Property<string>("통화Code")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)")
+                        .HasColumnName("currency_code");
+
+                    b.Property<string>("판매상태")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("sale_status");
+
+                    b.Property<string>("판매자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("seller_user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("게시글Id")
+                        .IsUnique();
+
+                    b.HasIndex("상세Id")
+                        .IsUnique();
+
+                    b.HasIndex("판매자UserId", "판매상태", "CreatedAtUtc");
+
+                    b.ToTable("community_activity_paid_details", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동처리기록", b =>
                 {
                     b.Property<long>("Id")
@@ -2242,6 +2507,115 @@ namespace Ssalddel.Migrations
                     b.HasIndex("신규업로드여부", "공유상태", "최초감지일시Utc");
 
                     b.ToTable("youtube_channel_videos", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.앱문맥이미지자산", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("content_type");
+
+                    b.Property<int>("PromptVersion")
+                        .HasColumnType("int")
+                        .HasColumnName("prompt_version");
+
+                    b.Property<string>("RouteRefsJson")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("route_refs_json");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("char(64)")
+                        .HasColumnName("sha256")
+                        .IsFixedLength();
+
+                    b.Property<string>("StorageContainer")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("storage_container");
+
+                    b.Property<string>("StorageObjectName")
+                        .IsRequired()
+                        .HasMaxLength(700)
+                        .HasColumnType("varchar(700)")
+                        .HasColumnName("storage_object_name");
+
+                    b.Property<string>("대체Text")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("alt_text");
+
+                    b.Property<DateTimeOffset>("생성시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("수정시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("앱PackId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("app_pack_id");
+
+                    b.Property<string>("이미지Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("image_url");
+
+                    b.Property<string>("장면Key")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("scene_key");
+
+                    b.Property<int>("장면번호")
+                        .HasColumnType("int")
+                        .HasColumnName("scene_number");
+
+                    b.Property<string>("제목")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("title");
+
+                    b.Property<int>("품질상태")
+                        .HasColumnType("int")
+                        .HasColumnName("quality_status");
+
+                    b.Property<string>("화면비율")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("aspect_ratio");
+
+                    b.Property<bool>("활성화여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("장면Key")
+                        .IsUnique();
+
+                    b.HasIndex("앱PackId", "활성화여부", "장면번호");
+
+                    b.ToTable("app_context_image_assets", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Content.지역문화공공기관Source", b =>
@@ -11687,6 +12061,53 @@ namespace Ssalddel.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세구매", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Community.커뮤니티활동유료상세", "상세")
+                        .WithMany("구매목록")
+                        .HasForeignKey("상세Id")
+                        .HasPrincipalKey("상세Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("상세");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세구매상태이력", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Community.커뮤니티활동상세구매", "구매")
+                        .WithMany("상태이력")
+                        .HasForeignKey("구매Id")
+                        .HasPrincipalKey("구매Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("구매");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세열람권", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Community.커뮤니티활동유료상세", "상세")
+                        .WithMany("열람권목록")
+                        .HasForeignKey("상세Id")
+                        .HasPrincipalKey("상세Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("상세");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동유료상세", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "게시글")
+                        .WithMany()
+                        .HasForeignKey("게시글Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("게시글");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollectionItem", b =>
                 {
                     b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
@@ -12170,6 +12591,18 @@ namespace Ssalddel.Migrations
                     b.Navigation("AccessLogs");
 
                     b.Navigation("Segments");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동상세구매", b =>
+                {
+                    b.Navigation("상태이력");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.커뮤니티활동유료상세", b =>
+                {
+                    b.Navigation("구매목록");
+
+                    b.Navigation("열람권목록");
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCard", b =>

@@ -1,0 +1,562 @@
+{
+    "schemaVersion":  1,
+    "packId":  "human-resources",
+    "status":  "ApprovedForBatch",
+    "promptVersion":  2,
+    "model":  "gemini-3.1-flash-lite-image",
+    "expectedSceneCount":  45,
+    "sceneNumberStart":  6,
+    "basePromptKo":  "인력 운영자가 역할, 일정, 교육, 안전과 지원 요청을 사람 중심으로 조율하는 앱의 차분하고 포용적인 editorial illustration. 현재 실제 화면이 홈 하나이므로 상세 증빙이 아닌 향후 화면 시각 후보로만 제작한다. 이미지 자체는 순수한 시각 자산으로 만들고 제목판, 설명문, 표, 앱 화면, 대시보드 UI를 합성하지 않는다.",
+    "contextChecklist":  [
+                             "현재 HumanResourcesManagerApp은 홈 화면만 존재하므로 5장 파일럿 이상 생성하지 않는다.",
+                             "연령·국적·언어·성별·가족형태·경제력을 평가와 자격의 대리 지표로 쓰지 않는다.",
+                             "이미지에 읽을 수 있는 글자·숫자·가상 UI가 없는지 확인한다."
+                         ],
+    "avoidExpressions":  [
+                             "사람을 순위화하는 점수, 외모·배경으로 직무 능력을 추정하는 표현",
+                             "실제 직원 사진, 인사기록, 연봉, 연락처와 전자서명",
+                             "제목, 캡션, 단계 번호, 가상 앱 화면, 대시보드, 표와 읽을 수 있는 문자"
+                         ],
+    "scenes":  [
+                   {
+                       "sequence":  6,
+                       "code":  "hr-home-reserve-wide-context",
+                       "titleKo":  "인력 운영 홈 후보 · 넓은 생활·업무 환경",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  7,
+                       "code":  "hr-home-reserve-hands-materials",
+                       "titleKo":  "인력 운영 홈 후보 · 손과 재료의 세부",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  8,
+                       "code":  "hr-home-reserve-role-handoff",
+                       "titleKo":  "인력 운영 홈 후보 · 역할 간 안전한 인계",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  9,
+                       "code":  "hr-home-reserve-mobile-focus",
+                       "titleKo":  "인력 운영 홈 후보 · 모바일 세로형 중심 장면",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  10,
+                       "code":  "hr-home-reserve-quiet-state",
+                       "titleKo":  "인력 운영 홈 후보 · 차분한 대기 상태",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  11,
+                       "code":  "hr-home-reserve-exception-review",
+                       "titleKo":  "인력 운영 홈 후보 · 예외 상황 공동 검토",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  12,
+                       "code":  "hr-home-reserve-time-sequence",
+                       "titleKo":  "인력 운영 홈 후보 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  13,
+                       "code":  "hr-home-reserve-inclusive-access",
+                       "titleKo":  "인력 운영 홈 후보 · 누구나 참여 가능한 장면",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  14,
+                       "code":  "hr-home-reserve-evidence-boundary",
+                       "titleKo":  "인력 운영 홈 후보 · 실물과 정보 표현의 분리",
+                       "promptKo":  "서로 다른 역할의 사람들이 동등한 크기로 배치되고 중앙에 일정, 교육, 안전, 지원 요청을 상징하는 카드가 열려 있는 포용적인 업무 시작 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp/Components/Pages/Home.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  15,
+                       "code":  "role-schedule-reserve-wide-context",
+                       "titleKo":  "역할·일정 조율 후보 · 넓은 생활·업무 환경",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  16,
+                       "code":  "role-schedule-reserve-hands-materials",
+                       "titleKo":  "역할·일정 조율 후보 · 손과 재료의 세부",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  17,
+                       "code":  "role-schedule-reserve-role-handoff",
+                       "titleKo":  "역할·일정 조율 후보 · 역할 간 안전한 인계",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  18,
+                       "code":  "role-schedule-reserve-mobile-focus",
+                       "titleKo":  "역할·일정 조율 후보 · 모바일 세로형 중심 장면",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  19,
+                       "code":  "role-schedule-reserve-quiet-state",
+                       "titleKo":  "역할·일정 조율 후보 · 차분한 대기 상태",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  20,
+                       "code":  "role-schedule-reserve-exception-review",
+                       "titleKo":  "역할·일정 조율 후보 · 예외 상황 공동 검토",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  21,
+                       "code":  "role-schedule-reserve-time-sequence",
+                       "titleKo":  "역할·일정 조율 후보 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  22,
+                       "code":  "role-schedule-reserve-inclusive-access",
+                       "titleKo":  "역할·일정 조율 후보 · 누구나 참여 가능한 장면",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  23,
+                       "code":  "role-schedule-reserve-evidence-boundary",
+                       "titleKo":  "역할·일정 조율 후보 · 실물과 정보 표현의 분리",
+                       "promptKo":  "팀원들이 스스로 가능한 시간과 필요한 지원을 빈 일정 보드에 카드로 놓고 관리자가 중첩과 휴식 필요를 확인하는, 일방적 배정이 아닌 협의 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  24,
+                       "code":  "training-safety-reserve-wide-context",
+                       "titleKo":  "교육·안전 지원 후보 · 넓은 생활·업무 환경",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  25,
+                       "code":  "training-safety-reserve-hands-materials",
+                       "titleKo":  "교육·안전 지원 후보 · 손과 재료의 세부",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  26,
+                       "code":  "training-safety-reserve-role-handoff",
+                       "titleKo":  "교육·안전 지원 후보 · 역할 간 안전한 인계",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  27,
+                       "code":  "training-safety-reserve-mobile-focus",
+                       "titleKo":  "교육·안전 지원 후보 · 모바일 세로형 중심 장면",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  28,
+                       "code":  "training-safety-reserve-quiet-state",
+                       "titleKo":  "교육·안전 지원 후보 · 차분한 대기 상태",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  29,
+                       "code":  "training-safety-reserve-exception-review",
+                       "titleKo":  "교육·안전 지원 후보 · 예외 상황 공동 검토",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  30,
+                       "code":  "training-safety-reserve-time-sequence",
+                       "titleKo":  "교육·안전 지원 후보 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  31,
+                       "code":  "training-safety-reserve-inclusive-access",
+                       "titleKo":  "교육·안전 지원 후보 · 누구나 참여 가능한 장면",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  32,
+                       "code":  "training-safety-reserve-evidence-boundary",
+                       "titleKo":  "교육·안전 지원 후보 · 실물과 정보 표현의 분리",
+                       "promptKo":  "창고, 운송, 음식점, 사무 환경의 안전 도구가 정돈된 교육 공간에서 참여자들이 직접 질문하고 실습하는 상호적 교육 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  33,
+                       "code":  "support-request-reserve-wide-context",
+                       "titleKo":  "지원 요청 후보 · 넓은 생활·업무 환경",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  34,
+                       "code":  "support-request-reserve-hands-materials",
+                       "titleKo":  "지원 요청 후보 · 손과 재료의 세부",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  35,
+                       "code":  "support-request-reserve-role-handoff",
+                       "titleKo":  "지원 요청 후보 · 역할 간 안전한 인계",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  36,
+                       "code":  "support-request-reserve-mobile-focus",
+                       "titleKo":  "지원 요청 후보 · 모바일 세로형 중심 장면",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  37,
+                       "code":  "support-request-reserve-quiet-state",
+                       "titleKo":  "지원 요청 후보 · 차분한 대기 상태",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  38,
+                       "code":  "support-request-reserve-exception-review",
+                       "titleKo":  "지원 요청 후보 · 예외 상황 공동 검토",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  39,
+                       "code":  "support-request-reserve-time-sequence",
+                       "titleKo":  "지원 요청 후보 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  40,
+                       "code":  "support-request-reserve-inclusive-access",
+                       "titleKo":  "지원 요청 후보 · 누구나 참여 가능한 장면",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  41,
+                       "code":  "support-request-reserve-evidence-boundary",
+                       "titleKo":  "지원 요청 후보 · 실물과 정보 표현의 분리",
+                       "promptKo":  "여러 직무의 참여자가 장비, 교육, 일정 조정, 휴식을 상징하는 카드 중 필요한 항목을 스스로 선택하고 관리자가 지원 상태를 확인하는 평등한 지원 흐름을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  42,
+                       "code":  "hr-empty-reserve-wide-context",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 넓은 생활·업무 환경",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  43,
+                       "code":  "hr-empty-reserve-hands-materials",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 손과 재료의 세부",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  44,
+                       "code":  "hr-empty-reserve-role-handoff",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 역할 간 안전한 인계",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  45,
+                       "code":  "hr-empty-reserve-mobile-focus",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 모바일 세로형 중심 장면",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  46,
+                       "code":  "hr-empty-reserve-quiet-state",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 차분한 대기 상태",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  47,
+                       "code":  "hr-empty-reserve-exception-review",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 예외 상황 공동 검토",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  48,
+                       "code":  "hr-empty-reserve-time-sequence",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  49,
+                       "code":  "hr-empty-reserve-inclusive-access",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 누구나 참여 가능한 장면",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   },
+                   {
+                       "sequence":  50,
+                       "code":  "hr-empty-reserve-evidence-boundary",
+                       "titleKo":  "인사 알림 빈 상태 후보 · 실물과 정보 표현의 분리",
+                       "promptKo":  "세로형 화면 중앙에 빈 일정표와 작은 식물, 편안한 휴게 의자를 배치해 새로운 인사 요청이 없고 팀이 안정적으로 운영되는 차분한 빈 상태 후보를 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "HumanResourcesManagerApp"
+                                     ]
+                   }
+               ]
+}

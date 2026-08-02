@@ -10,6 +10,7 @@ using Ssalddel.Controllers.Admin.Orderer;
 using Ssalddel.Controllers.Common;
 using Ssalddel.Controllers.Orderer;
 using Ssalddel.Controllers.Platform;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Versioning;
 using Ssalddel.Filters;
 using Ssalddel.Services.Community;
@@ -261,6 +262,22 @@ public sealed class SsalddelApiVersionAttributeTests
                     relation.TargetUseCaseCode == "공공데이터조회UseCase")) &&
             !string.IsNullOrWhiteSpace(workflow.BoundarySummary));
         Assert.Contains(response.Workflows, workflow =>
+            workflow.WorkflowCode == nameof(SsalddelWorkflow.GroupPurchaseDemand) &&
+            workflow.ProcessManagers.Any(processManager =>
+                processManager.ProcessManagerCode == "공동구매수요모집ProcessManager" &&
+                processManager.ContractCode == "I공동구매수요모집ProcessManager" &&
+                processManager.EffectCodes.Contains(nameof(SsalddelCodeEffect.PersistentWrite)) &&
+                !string.IsNullOrWhiteSpace(processManager.Boundary)));
+        Assert.Contains(response.Workflows, workflow =>
+            workflow.WorkflowCode == nameof(SsalddelWorkflow.GroupPurchaseImport) &&
+            workflow.ProcessManagers.Any(processManager =>
+                processManager.ProcessManagerCode == nameof(같이수입준비ProcessManager)));
+        Assert.Contains(response.Workflows, workflow =>
+            workflow.WorkflowCode == nameof(SsalddelWorkflow.CommunityTrust) &&
+            workflow.ProcessManagers.Any(processManager =>
+                processManager.ProcessManagerCode == nameof(커뮤니티활동상세구매ProcessManager) &&
+                processManager.FeatureKey == SsalddelCodeFeatureKeys.CommunityActivityPaidDetail));
+        Assert.Contains(response.Workflows, workflow =>
             workflow.WorkflowCode == nameof(SsalddelWorkflow.DomesticTransport) &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(화주운송의뢰UseCase) &&
                 useCase.Relations.Any(relation =>
@@ -336,6 +353,13 @@ public sealed class SsalddelApiVersionAttributeTests
             !capability.RequiresAuthentication &&
             !capability.HasExternalEffects &&
             !capability.IsFeatureEnabled);
+
+        var exposedWorkflowCodes = response.Workflows
+            .Select(workflow => workflow.WorkflowCode)
+            .ToHashSet(StringComparer.Ordinal);
+        Assert.All(
+            response.PageCapabilities.SelectMany(capability => capability.WorkflowCodes).Distinct(),
+            workflowCode => Assert.Contains(workflowCode, exposedWorkflowCodes));
     }
 
     [Fact]

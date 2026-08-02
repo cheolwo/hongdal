@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packId": "freight-driver",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "화물 기사가 안전하고 차분하게 운송 상태를 판단하는 현장 중심 editorial illustration. 청록과 주황 계열의 절제된 조명, 실제 화물차와 상하차 도구의 안전한 사용, 모바일 crop에서도 읽히는 단순한 실루엣을 사용한다.",
+  "contextChecklist": [
+    "기사 추천·수락과 실제 운행 상태를 구분한다.",
+    "상차·하차·운전 안전수칙을 지킨다."
+  ],
+  "avoidExpressions": [
+    "주행 중 휴대전화 조작, 무보호 적재, 과적과 위험한 속도감",
+    "실제 운송장, 서명, 차량번호판, 주소와 정산 증빙"
+  ],
+  "scenes": [
+    { "sequence": 1, "code": "driver-home-hero", "titleKo": "화물 기사 업무 홈", "promptKo": "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/driver/home", "/driver/home/summary"] },
+    { "sequence": 2, "code": "recommendation-card", "titleKo": "배차 추천 비교", "promptKo": "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/driver/recommendations", "/driver/recommendations/{의뢰Id}"] },
+    { "sequence": 3, "code": "safe-pickup-dropoff", "titleKo": "안전한 상하차", "promptKo": "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/driver/transports/{운송Id:long}/pickup", "/driver/transports/{운송Id:long}/dropoff"] },
+    { "sequence": 4, "code": "current-transport", "titleKo": "진행 중 운송", "promptKo": "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/driver/transports/current", "/driver/transports/history"] },
+    { "sequence": 5, "code": "driver-empty-mobile", "titleKo": "운송 후보 빈 상태", "promptKo": "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/driver/recommendations", "/driver/notifications"] }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "food-driver",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "음식점 픽업과 고객 전달을 안전하게 잇는 배달 기사 앱의 현대적인 editorial illustration. 따뜻한 오렌지와 청록 색조, 위생적인 보온 가방, 도로교통법규를 준수하는 장면을 사용한다.",
+  "contextChecklist": ["음식점·기사·주문자의 역할을 구분한다.", "음식 위생과 안전한 주행·전달을 확인한다."],
+  "avoidExpressions": ["주행 중 휴대전화 조작과 인도 주행", "실제 고객 주소, 전화번호, 영수증과 주문 증빙"],
+  "scenes": [
+    { "sequence": 1, "code": "food-driver-home", "titleKo": "음식 배달 기사 홈", "promptKo": "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/", "FDriverApp/Components/Pages/FDriverHome.razor"] },
+    { "sequence": 2, "code": "food-dispatch", "titleKo": "배달 배차 후보", "promptKo": "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/food-delivery/open/dispatch"] },
+    { "sequence": 3, "code": "bundle-route", "titleKo": "묶음 배달 경로", "promptKo": "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/food-delivery/open/bundle", "/food-delivery/open/route"] },
+    { "sequence": 4, "code": "contactless-handoff", "titleKo": "안전한 음식 전달", "promptKo": "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/food-delivery/open/delivery", "/food-delivery/open/customer"] },
+    { "sequence": 5, "code": "food-driver-empty", "titleKo": "배달 없음 모바일 상태", "promptKo": "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/", "/food-delivery/open/dispatch"] }
+  ]
+}

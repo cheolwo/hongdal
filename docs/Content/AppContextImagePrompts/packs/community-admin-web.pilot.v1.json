@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "community-admin-web",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "공개 커뮤니티의 게시판, 사용자 보호, 공공데이터 근거, 신고와 운영 이력을 투명하게 관리하는 Web 관리자 앱의 sober editorial illustration. 감시 또는 검열보다 설명, 보호, 이의 처리와 감사 기록을 강조한다.",
+  "contextChecklist": ["기존 통합 관리자의 중심 책임을 커뮤니티 관리로 유지한다.", "신고·숨김·고정·이의 처리에 감사 기록과 복구 가능성을 표현한다."],
+  "avoidExpressions": ["사용자를 위험 점수로 순위화하거나 배경 특성을 제재 근거로 삼는 표현", "실제 계정, 연락처, IP, 주소, 신고 원문과 운영자 신원"],
+  "scenes": [
+    { "sequence": 1, "code": "community-admin-dashboard", "titleKo": "커뮤니티 운영 현황", "promptKo": "게시판 활동, 신고 검토, 공공데이터 출처, 이의 처리, 복구 후보를 상징하는 카드가 균형 있게 배치되고 운영자가 긴급도와 상태를 차분히 살펴보는 시작 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/community", "SsalddelAdmin/Components/Pages/CommunityAdminDashboard.razor"] },
+    { "sequence": 2, "code": "board-moderation", "titleKo": "게시판·콘텐츠 검토", "promptKo": "운영자가 게시글 원문 대신 중립적 상징 카드를 보며 출처 유무, 개인정보 위험, 중복 게시, 이의 가능성을 검토하고 임시 조치와 최종 조치를 구분하는 신중한 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/common-contents", "/community"] },
+    { "sequence": 3, "code": "community-user-protection", "titleKo": "사용자 보호·이의 처리", "promptKo": "서로 다른 사용자를 동일한 크기의 익명 실루엣으로 보여 주고 차단, 제재, 이의, 복구 상태가 일방향이 아닌 검토 흐름으로 연결된 공정한 보호 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/community/users", "/activity-logs"] },
+    { "sequence": 4, "code": "public-data-review", "titleKo": "공공데이터 근거 검토", "promptKo": "가격, 지역, 단위, 기준 시각, 출처 상태를 상징하는 독립 카드가 하나의 자료 주변에 배치되고 운영자가 출처 누락과 갱신 한계를 확인하는 편집 검토 장면을 표현한다.", "aspectRatio": "16:9", "resolution": "1K", "routeRefs": ["/common-contents", "/community"] },
+    { "sequence": 5, "code": "admin-empty-queue", "titleKo": "검토 대기열 빈 상태", "promptKo": "세로형 관리 화면 중앙에 빈 검토 함과 작은 보호 방패, 정돈된 감사 카드를 배치해 현재 처리할 신고가 없고 운영 상태가 안정적임을 절제된 분위기로 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/community", "/activity-logs"] }
+  ]
+}

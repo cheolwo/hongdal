@@ -10,6 +10,7 @@ public static class 결제공통정의
         public const int 회원구독 = 40;
         public const int 후원 = 50;
         public const int 노드스티커팩 = 60;
+        public const int 커뮤니티활동상세열람 = 70;
     }
 
     public static class 결제제공자

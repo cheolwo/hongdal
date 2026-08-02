@@ -92,6 +92,12 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri($"{options.BaseUrl.TrimEnd('/')}/");
             client.Timeout = TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 10, 600));
         });
+        services.AddHttpClient<IAppContextImageBatchProviderClient, NanoBananaImageBatchClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GeminiImageBatchOptions>>().Value;
+            client.BaseAddress = new Uri($"{options.BaseUrl.TrimEnd('/')}/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 10, 900));
+        });
         services.AddHttpClient<INaverMapsReverseGeocodingService, NaverMapsReverseGeocodingService>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<NaverMapsOptions>>().Value;

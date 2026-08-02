@@ -26,6 +26,8 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CommunityPostStorageOptions>(configuration.GetSection(CommunityPostStorageOptions.SectionName));
         services.Configure<GeminiImageOptions>(
             configuration.GetSection(GeminiImageOptions.SectionName));
+        services.Configure<GeminiImageBatchOptions>(
+            configuration.GetSection(GeminiImageBatchOptions.SectionName));
         services.Configure<RegionalCultureImageGenerationOptions>(
             configuration.GetSection(RegionalCultureImageGenerationOptions.SectionName));
         services.Configure<HIOPSAIOptions>(configuration.GetSection(HIOPSAIOptions.SectionName));

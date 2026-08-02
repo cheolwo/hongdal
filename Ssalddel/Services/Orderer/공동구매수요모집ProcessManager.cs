@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Orderer;
 using 살뜰.Services.Options;
@@ -84,6 +85,7 @@ public interface I공동구매수요모집ProcessStore
         CancellationToken cancellationToken);
 }
 
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.GroupPurchaseDemandProcessManager,
     SsalddelCodeLayer.Application,

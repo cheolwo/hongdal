@@ -1,0 +1,104 @@
+{
+    "schemaVersion":  1,
+    "provider":  "GoogleGemini",
+    "model":  "gemini-3.1-flash-lite-image",
+    "resolution":  "1K",
+    "packCount":  13,
+    "scenesPerPack":  45,
+    "totalScenes":  585,
+    "sceneNumberStart":  6,
+    "status":  "ApprovedForBatch",
+    "packs":  [
+                  {
+                      "packId":  "community-shipper",
+                      "targetApp":  "SsalddelApp",
+                      "path":  "packs/community-shipper.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "freight-driver",
+                      "targetApp":  "DriverApp",
+                      "path":  "packs/freight-driver.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "food-driver",
+                      "targetApp":  "FDriverApp",
+                      "path":  "packs/food-driver.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "orderer",
+                      "targetApp":  "OrdererApp",
+                      "path":  "packs/orderer.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "warehouse",
+                      "targetApp":  "WarehouseManagerApp",
+                      "path":  "packs/warehouse.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "restaurant-desk",
+                      "targetApp":  "RestaurantDeskApp",
+                      "path":  "packs/restaurant-desk.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "seller",
+                      "targetApp":  "SellerApp",
+                      "path":  "packs/seller.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "human-resources",
+                      "targetApp":  "HumanResourcesManagerApp",
+                      "path":  "packs/human-resources.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "community-admin-web",
+                      "targetApp":  "SsalddelAdmin",
+                      "path":  "packs/community-admin-web.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "community-admin-mobile",
+                      "targetApp":  "SsalddelAdminApp",
+                      "path":  "packs/community-admin-mobile.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "food-delivery-admin",
+                      "targetApp":  "SsalddelAdmin",
+                      "path":  "packs/food-delivery-admin.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "freight-delivery-admin",
+                      "targetApp":  "SsalddelAdmin",
+                      "path":  "packs/freight-delivery-admin.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  },
+                  {
+                      "packId":  "order-warehouse-admin",
+                      "targetApp":  "SsalddelAdmin",
+                      "path":  "packs/order-warehouse-admin.expansion.v2.json",
+                      "sceneNumberStart":  6,
+                      "sceneCount":  45
+                  }
+              ]
+}

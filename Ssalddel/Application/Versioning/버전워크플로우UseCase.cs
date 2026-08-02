@@ -1,5 +1,6 @@
 using System.Reflection;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -100,7 +101,42 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
             BoundarySummary = SsalddelWorkflowParticipants.GetBoundarySummary(workflow),
             Participants = SsalddelWorkflowParticipants.GetByWorkflow(workflow).Select(ToParticipantDto).ToArray(),
             Screens = SsalddelWorkflowScreens.GetByWorkflow(workflow).Select(ToScreenDto).ToArray(),
-            UseCases = BuildUseCases(workflow)
+            UseCases = BuildUseCases(workflow),
+            ProcessManagers = BuildProcessManagers(workflow)
+        };
+    }
+
+    private static IReadOnlyList<WorkflowProcessManagerDto> BuildProcessManagers(SsalddelWorkflow workflow)
+    {
+        return typeof(버전워크플로우UseCase).Assembly
+            .GetTypes()
+            .Where(type => type is { IsClass: true, IsAbstract: false })
+            .Where(type => type.Name.EndsWith("ProcessManager", StringComparison.Ordinal))
+            .Where(type => type
+                .GetCustomAttributes<SsalddelApiWorkflowAttribute>(inherit: true)
+                .Any(attribute => attribute.Workflow == workflow))
+            .SelectMany(type => SsalddelCodeMetadataReader.Read(type))
+            .Select(ToProcessManagerDto)
+            .OrderBy(processManager => processManager.FlowOrder)
+            .ThenBy(processManager => processManager.ProcessManagerCode, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static WorkflowProcessManagerDto ToProcessManagerDto(
+        SsalddelCodeMetadataDescriptor metadata)
+    {
+        return new WorkflowProcessManagerDto
+        {
+            ProcessManagerCode = metadata.ComponentType.Name,
+            ContractCode = metadata.ContractType?.Name ?? string.Empty,
+            FeatureKey = metadata.FeatureKey,
+            Responsibility = metadata.Responsibility,
+            Boundary = metadata.Boundary,
+            FlowOrder = metadata.FlowOrder,
+            EffectCodes = Enum.GetValues<SsalddelCodeEffect>()
+                .Where(effect => effect != SsalddelCodeEffect.None && metadata.Effects.HasFlag(effect))
+                .Select(effect => effect.ToString())
+                .ToArray()
         };
     }
 

@@ -1,0 +1,553 @@
+{
+    "schemaVersion":  1,
+    "packId":  "food-driver",
+    "status":  "ApprovedForBatch",
+    "promptVersion":  2,
+    "model":  "gemini-3.1-flash-lite-image",
+    "expectedSceneCount":  45,
+    "sceneNumberStart":  6,
+    "basePromptKo":  "음식점 픽업과 고객 전달을 안전하게 잇는 배달 기사 앱의 현대적인 editorial illustration. 따뜻한 오렌지와 청록 색조, 위생적인 보온 가방, 도로교통법규를 준수하는 장면을 사용한다. 이미지 자체는 순수한 시각 자산으로 만들고 제목판, 설명문, 표, 앱 화면, 대시보드 UI를 합성하지 않는다.",
+    "contextChecklist":  [
+                             "음식점·기사·주문자의 역할을 구분한다.",
+                             "음식 위생과 안전한 주행·전달을 확인한다.",
+                             "이미지에 읽을 수 있는 글자·숫자·가상 UI가 없는지 확인한다."
+                         ],
+    "avoidExpressions":  [
+                             "주행 중 휴대전화 조작과 인도 주행",
+                             "실제 고객 주소, 전화번호, 영수증과 주문 증빙",
+                             "제목, 캡션, 단계 번호, 가상 앱 화면, 대시보드, 표와 읽을 수 있는 문자"
+                         ],
+    "scenes":  [
+                   {
+                       "sequence":  6,
+                       "code":  "food-driver-home-wide-context",
+                       "titleKo":  "음식 배달 기사 홈 · 넓은 생활·업무 환경",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  7,
+                       "code":  "food-driver-home-hands-materials",
+                       "titleKo":  "음식 배달 기사 홈 · 손과 재료의 세부",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  8,
+                       "code":  "food-driver-home-role-handoff",
+                       "titleKo":  "음식 배달 기사 홈 · 역할 간 안전한 인계",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  9,
+                       "code":  "food-driver-home-mobile-focus",
+                       "titleKo":  "음식 배달 기사 홈 · 모바일 세로형 중심 장면",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  10,
+                       "code":  "food-driver-home-quiet-state",
+                       "titleKo":  "음식 배달 기사 홈 · 차분한 대기 상태",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  11,
+                       "code":  "food-driver-home-exception-review",
+                       "titleKo":  "음식 배달 기사 홈 · 예외 상황 공동 검토",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  12,
+                       "code":  "food-driver-home-time-sequence",
+                       "titleKo":  "음식 배달 기사 홈 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  13,
+                       "code":  "food-driver-home-inclusive-access",
+                       "titleKo":  "음식 배달 기사 홈 · 누구나 참여 가능한 장면",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  14,
+                       "code":  "food-driver-home-evidence-boundary",
+                       "titleKo":  "음식 배달 기사 홈 · 실물과 정보 표현의 분리",
+                       "promptKo":  "저녁 시간의 밝은 음식점가에서 헬멧과 보온 가방을 준비한 기사가 배차, 묶음 배달, 경로, 정산 선택을 차분히 바라보는 시작 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "FDriverApp/Components/Pages/FDriverHome.razor"
+                                     ]
+                   },
+                   {
+                       "sequence":  15,
+                       "code":  "food-dispatch-wide-context",
+                       "titleKo":  "배달 배차 후보 · 넓은 생활·업무 환경",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  16,
+                       "code":  "food-dispatch-hands-materials",
+                       "titleKo":  "배달 배차 후보 · 손과 재료의 세부",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  17,
+                       "code":  "food-dispatch-role-handoff",
+                       "titleKo":  "배달 배차 후보 · 역할 간 안전한 인계",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  18,
+                       "code":  "food-dispatch-mobile-focus",
+                       "titleKo":  "배달 배차 후보 · 모바일 세로형 중심 장면",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  19,
+                       "code":  "food-dispatch-quiet-state",
+                       "titleKo":  "배달 배차 후보 · 차분한 대기 상태",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  20,
+                       "code":  "food-dispatch-exception-review",
+                       "titleKo":  "배달 배차 후보 · 예외 상황 공동 검토",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  21,
+                       "code":  "food-dispatch-time-sequence",
+                       "titleKo":  "배달 배차 후보 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  22,
+                       "code":  "food-dispatch-inclusive-access",
+                       "titleKo":  "배달 배차 후보 · 누구나 참여 가능한 장면",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  23,
+                       "code":  "food-dispatch-evidence-boundary",
+                       "titleKo":  "배달 배차 후보 · 실물과 정보 표현의 분리",
+                       "promptKo":  "가까운 음식점과 전달 구역, 예상 조리 완료, 기사의 현재 휴식 상태를 간결한 도형으로 비교하고 기사가 수락 여부를 선택하는 평등한 화면을 연출한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  24,
+                       "code":  "bundle-route-wide-context",
+                       "titleKo":  "묶음 배달 경로 · 넓은 생활·업무 환경",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  25,
+                       "code":  "bundle-route-hands-materials",
+                       "titleKo":  "묶음 배달 경로 · 손과 재료의 세부",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  26,
+                       "code":  "bundle-route-role-handoff",
+                       "titleKo":  "묶음 배달 경로 · 역할 간 안전한 인계",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  27,
+                       "code":  "bundle-route-mobile-focus",
+                       "titleKo":  "묶음 배달 경로 · 모바일 세로형 중심 장면",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  28,
+                       "code":  "bundle-route-quiet-state",
+                       "titleKo":  "묶음 배달 경로 · 차분한 대기 상태",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  29,
+                       "code":  "bundle-route-exception-review",
+                       "titleKo":  "묶음 배달 경로 · 예외 상황 공동 검토",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  30,
+                       "code":  "bundle-route-time-sequence",
+                       "titleKo":  "묶음 배달 경로 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  31,
+                       "code":  "bundle-route-inclusive-access",
+                       "titleKo":  "묶음 배달 경로 · 누구나 참여 가능한 장면",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  32,
+                       "code":  "bundle-route-evidence-boundary",
+                       "titleKo":  "묶음 배달 경로 · 실물과 정보 표현의 분리",
+                       "promptKo":  "두 개의 음식점 픽업과 여러 전달지를 무리하지 않은 하나의 경로로 연결하고, 보온 가방 내부의 음식이 넘치지 않게 구분된 안전한 묶음 배달 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/bundle",
+                                         "/food-delivery/open/route"
+                                     ]
+                   },
+                   {
+                       "sequence":  33,
+                       "code":  "contactless-handoff-wide-context",
+                       "titleKo":  "안전한 음식 전달 · 넓은 생활·업무 환경",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  34,
+                       "code":  "contactless-handoff-hands-materials",
+                       "titleKo":  "안전한 음식 전달 · 손과 재료의 세부",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  35,
+                       "code":  "contactless-handoff-role-handoff",
+                       "titleKo":  "안전한 음식 전달 · 역할 간 안전한 인계",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  36,
+                       "code":  "contactless-handoff-mobile-focus",
+                       "titleKo":  "안전한 음식 전달 · 모바일 세로형 중심 장면",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  37,
+                       "code":  "contactless-handoff-quiet-state",
+                       "titleKo":  "안전한 음식 전달 · 차분한 대기 상태",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  38,
+                       "code":  "contactless-handoff-exception-review",
+                       "titleKo":  "안전한 음식 전달 · 예외 상황 공동 검토",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  39,
+                       "code":  "contactless-handoff-time-sequence",
+                       "titleKo":  "안전한 음식 전달 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  40,
+                       "code":  "contactless-handoff-inclusive-access",
+                       "titleKo":  "안전한 음식 전달 · 누구나 참여 가능한 장면",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  41,
+                       "code":  "contactless-handoff-evidence-boundary",
+                       "titleKo":  "안전한 음식 전달 · 실물과 정보 표현의 분리",
+                       "promptKo":  "주택 공용 현관의 지정된 표시 공간에 밀봉된 음식 포장을 안정적으로 놓고 기사가 거리를 두는 접촉 최소화 장면을, 실제 전달 증빙으로 보이지 않게 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/food-delivery/open/delivery",
+                                         "/food-delivery/open/customer"
+                                     ]
+                   },
+                   {
+                       "sequence":  42,
+                       "code":  "food-driver-empty-wide-context",
+                       "titleKo":  "배달 없음 모바일 상태 · 넓은 생활·업무 환경",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  43,
+                       "code":  "food-driver-empty-hands-materials",
+                       "titleKo":  "배달 없음 모바일 상태 · 손과 재료의 세부",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  44,
+                       "code":  "food-driver-empty-role-handoff",
+                       "titleKo":  "배달 없음 모바일 상태 · 역할 간 안전한 인계",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  45,
+                       "code":  "food-driver-empty-mobile-focus",
+                       "titleKo":  "배달 없음 모바일 상태 · 모바일 세로형 중심 장면",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  46,
+                       "code":  "food-driver-empty-quiet-state",
+                       "titleKo":  "배달 없음 모바일 상태 · 차분한 대기 상태",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  47,
+                       "code":  "food-driver-empty-exception-review",
+                       "titleKo":  "배달 없음 모바일 상태 · 예외 상황 공동 검토",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  48,
+                       "code":  "food-driver-empty-time-sequence",
+                       "titleKo":  "배달 없음 모바일 상태 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  49,
+                       "code":  "food-driver-empty-inclusive-access",
+                       "titleKo":  "배달 없음 모바일 상태 · 누구나 참여 가능한 장면",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   },
+                   {
+                       "sequence":  50,
+                       "code":  "food-driver-empty-evidence-boundary",
+                       "titleKo":  "배달 없음 모바일 상태 · 실물과 정보 표현의 분리",
+                       "promptKo":  "세로형 화면 중앙에 깔끔한 보온 가방과 작은 새싹 화분, 대기 중인 자전거를 배치해 새 배달이 없을 때 안전하게 쉬며 기다리는 편안한 빈 상태를 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/",
+                                         "/food-delivery/open/dispatch"
+                                     ]
+                   }
+               ]
+}

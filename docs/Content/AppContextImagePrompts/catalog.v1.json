@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "provider": "GoogleGemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "resolution": "1K",
+  "packCount": 13,
+  "pilotScenesPerPack": 5,
+  "totalPilotScenes": 65,
+  "fullTargetScenesPerPack": 50,
+  "fullTargetScenes": 650,
+  "status": "ApprovedForBatch",
+  "packs": [
+    { "packId": "community-shipper", "targetApp": "SsalddelApp", "path": "packs/community-shipper.pilot.v1.json" },
+    { "packId": "freight-driver", "targetApp": "DriverApp", "path": "packs/freight-driver.pilot.v1.json" },
+    { "packId": "food-driver", "targetApp": "FDriverApp", "path": "packs/food-driver.pilot.v1.json" },
+    { "packId": "orderer", "targetApp": "OrdererApp", "path": "packs/orderer.pilot.v1.json" },
+    { "packId": "warehouse", "targetApp": "WarehouseManagerApp", "path": "packs/warehouse.pilot.v1.json" },
+    { "packId": "restaurant-desk", "targetApp": "RestaurantDeskApp", "path": "packs/restaurant-desk.pilot.v1.json" },
+    { "packId": "seller", "targetApp": "SellerApp", "path": "packs/seller.pilot.v1.json" },
+    { "packId": "human-resources", "targetApp": "HumanResourcesManagerApp", "path": "packs/human-resources.pilot.v1.json" },
+    { "packId": "community-admin-web", "targetApp": "SsalddelAdmin", "path": "packs/community-admin-web.pilot.v1.json" },
+    { "packId": "community-admin-mobile", "targetApp": "SsalddelAdminApp", "path": "packs/community-admin-mobile.pilot.v1.json" },
+    { "packId": "food-delivery-admin", "targetApp": "SsalddelAdmin", "path": "packs/food-delivery-admin.pilot.v1.json" },
+    { "packId": "freight-delivery-admin", "targetApp": "SsalddelAdmin", "path": "packs/freight-delivery-admin.pilot.v1.json" },
+    { "packId": "order-warehouse-admin", "targetApp": "SsalddelAdmin", "path": "packs/order-warehouse-admin.pilot.v1.json" }
+  ]
+}

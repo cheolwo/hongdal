@@ -5,6 +5,7 @@ using Ssalddel.Application.Driver.Transport;
 using Ssalddel.Application.Admin.Settlement;
 using Ssalddel.Services.LogisticsProcessing.VehicleLoading;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
+using Ssalddel.Services.Content;
 using Ssalddel.Services.Storage.Azure;
 using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Engine;
@@ -40,6 +41,7 @@ public static partial class ServiceCollectionExtensions
                 _ => throw new InvalidOperationException($"Unsupported ObjectStorage provider: {provider}")
             };
         });
+        services.AddScoped<I앱문맥이미지자산조회UseCase, 앱문맥이미지자산조회UseCase>();
         services.AddScoped<I국내화물운송기사상태Service, 국내화물운송기사상태Service>();
         services.AddSingleton<ICommandFileStoragePathResolver, CommandFileStoragePathResolver>();
         services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();

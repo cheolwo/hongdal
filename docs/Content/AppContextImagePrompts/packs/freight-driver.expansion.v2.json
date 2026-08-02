@@ -1,0 +1,562 @@
+{
+    "schemaVersion":  1,
+    "packId":  "freight-driver",
+    "status":  "ApprovedForBatch",
+    "promptVersion":  2,
+    "model":  "gemini-3.1-flash-lite-image",
+    "expectedSceneCount":  45,
+    "sceneNumberStart":  6,
+    "basePromptKo":  "화물 기사가 안전하고 차분하게 운송 상태를 판단하는 현장 중심 editorial illustration. 청록과 주황 계열의 절제된 조명, 실제 화물차와 상하차 도구의 안전한 사용, 모바일 crop에서도 읽히는 단순한 실루엣을 사용한다. 이미지 자체는 순수한 시각 자산으로 만들고 제목판, 설명문, 표, 앱 화면, 대시보드 UI를 합성하지 않는다.",
+    "contextChecklist":  [
+                             "기사 추천·수락과 실제 운행 상태를 구분한다.",
+                             "상차·하차·운전 안전수칙을 지킨다.",
+                             "이미지에 읽을 수 있는 글자·숫자·가상 UI가 없는지 확인한다."
+                         ],
+    "avoidExpressions":  [
+                             "주행 중 휴대전화 조작, 무보호 적재, 과적과 위험한 속도감",
+                             "실제 운송장, 서명, 차량번호판, 주소와 정산 증빙",
+                             "제목, 캡션, 단계 번호, 가상 앱 화면, 대시보드, 표와 읽을 수 있는 문자"
+                         ],
+    "scenes":  [
+                   {
+                       "sequence":  6,
+                       "code":  "driver-home-hero-wide-context",
+                       "titleKo":  "화물 기사 업무 홈 · 넓은 생활·업무 환경",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  7,
+                       "code":  "driver-home-hero-hands-materials",
+                       "titleKo":  "화물 기사 업무 홈 · 손과 재료의 세부",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  8,
+                       "code":  "driver-home-hero-role-handoff",
+                       "titleKo":  "화물 기사 업무 홈 · 역할 간 안전한 인계",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  9,
+                       "code":  "driver-home-hero-mobile-focus",
+                       "titleKo":  "화물 기사 업무 홈 · 모바일 세로형 중심 장면",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  10,
+                       "code":  "driver-home-hero-quiet-state",
+                       "titleKo":  "화물 기사 업무 홈 · 차분한 대기 상태",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  11,
+                       "code":  "driver-home-hero-exception-review",
+                       "titleKo":  "화물 기사 업무 홈 · 예외 상황 공동 검토",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  12,
+                       "code":  "driver-home-hero-time-sequence",
+                       "titleKo":  "화물 기사 업무 홈 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  13,
+                       "code":  "driver-home-hero-inclusive-access",
+                       "titleKo":  "화물 기사 업무 홈 · 누구나 참여 가능한 장면",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  14,
+                       "code":  "driver-home-hero-evidence-boundary",
+                       "titleKo":  "화물 기사 업무 홈 · 실물과 정보 표현의 분리",
+                       "promptKo":  "주차된 화물차 옆에서 기사가 오늘의 운송 후보와 휴식 시간을 차분히 확인하며, 배경에는 도시·산지·항만 경로가 상징적으로 연결된 안전한 출발 전 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/home",
+                                         "/driver/home/summary"
+                                     ]
+                   },
+                   {
+                       "sequence":  15,
+                       "code":  "recommendation-card-wide-context",
+                       "titleKo":  "배차 추천 비교 · 넓은 생활·업무 환경",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  16,
+                       "code":  "recommendation-card-hands-materials",
+                       "titleKo":  "배차 추천 비교 · 손과 재료의 세부",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  17,
+                       "code":  "recommendation-card-role-handoff",
+                       "titleKo":  "배차 추천 비교 · 역할 간 안전한 인계",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  18,
+                       "code":  "recommendation-card-mobile-focus",
+                       "titleKo":  "배차 추천 비교 · 모바일 세로형 중심 장면",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  19,
+                       "code":  "recommendation-card-quiet-state",
+                       "titleKo":  "배차 추천 비교 · 차분한 대기 상태",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  20,
+                       "code":  "recommendation-card-exception-review",
+                       "titleKo":  "배차 추천 비교 · 예외 상황 공동 검토",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  21,
+                       "code":  "recommendation-card-time-sequence",
+                       "titleKo":  "배차 추천 비교 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  22,
+                       "code":  "recommendation-card-inclusive-access",
+                       "titleKo":  "배차 추천 비교 · 누구나 참여 가능한 장면",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  23,
+                       "code":  "recommendation-card-evidence-boundary",
+                       "titleKo":  "배차 추천 비교 · 실물과 정보 표현의 분리",
+                       "promptKo":  "세 개의 화물 운송 후보를 거리, 차량 적합성, 시간창, 휴식 상태를 문자 없는 도형으로 비교하고, 기사가 최종 선택권을 가진 신중한 추천 화면을 연출한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/recommendations/{의뢰Id}"
+                                     ]
+                   },
+                   {
+                       "sequence":  24,
+                       "code":  "safe-pickup-dropoff-wide-context",
+                       "titleKo":  "안전한 상하차 · 넓은 생활·업무 환경",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  25,
+                       "code":  "safe-pickup-dropoff-hands-materials",
+                       "titleKo":  "안전한 상하차 · 손과 재료의 세부",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  26,
+                       "code":  "safe-pickup-dropoff-role-handoff",
+                       "titleKo":  "안전한 상하차 · 역할 간 안전한 인계",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  27,
+                       "code":  "safe-pickup-dropoff-mobile-focus",
+                       "titleKo":  "안전한 상하차 · 모바일 세로형 중심 장면",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  28,
+                       "code":  "safe-pickup-dropoff-quiet-state",
+                       "titleKo":  "안전한 상하차 · 차분한 대기 상태",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  29,
+                       "code":  "safe-pickup-dropoff-exception-review",
+                       "titleKo":  "안전한 상하차 · 예외 상황 공동 검토",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  30,
+                       "code":  "safe-pickup-dropoff-time-sequence",
+                       "titleKo":  "안전한 상하차 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  31,
+                       "code":  "safe-pickup-dropoff-inclusive-access",
+                       "titleKo":  "안전한 상하차 · 누구나 참여 가능한 장면",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  32,
+                       "code":  "safe-pickup-dropoff-evidence-boundary",
+                       "titleKo":  "안전한 상하차 · 실물과 정보 표현의 분리",
+                       "promptKo":  "조명이 충분한 상하차 구역에서 안전조끼와 장갑을 착용한 작업자가 적재물을 고정하고 기사가 주변 안전을 확인하는, 증빙 사진이 아닌 절차 안내용 장면을 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/{운송Id:long}/pickup",
+                                         "/driver/transports/{운송Id:long}/dropoff"
+                                     ]
+                   },
+                   {
+                       "sequence":  33,
+                       "code":  "current-transport-wide-context",
+                       "titleKo":  "진행 중 운송 · 넓은 생활·업무 환경",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  34,
+                       "code":  "current-transport-hands-materials",
+                       "titleKo":  "진행 중 운송 · 손과 재료의 세부",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  35,
+                       "code":  "current-transport-role-handoff",
+                       "titleKo":  "진행 중 운송 · 역할 간 안전한 인계",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  36,
+                       "code":  "current-transport-mobile-focus",
+                       "titleKo":  "진행 중 운송 · 모바일 세로형 중심 장면",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  37,
+                       "code":  "current-transport-quiet-state",
+                       "titleKo":  "진행 중 운송 · 차분한 대기 상태",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  38,
+                       "code":  "current-transport-exception-review",
+                       "titleKo":  "진행 중 운송 · 예외 상황 공동 검토",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  39,
+                       "code":  "current-transport-time-sequence",
+                       "titleKo":  "진행 중 운송 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  40,
+                       "code":  "current-transport-inclusive-access",
+                       "titleKo":  "진행 중 운송 · 누구나 참여 가능한 장면",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  41,
+                       "code":  "current-transport-evidence-boundary",
+                       "titleKo":  "진행 중 운송 · 실물과 정보 표현의 분리",
+                       "promptKo":  "안전한 휴게 공간에 정차한 차량과 다음 경로, 예상 도착 구간, 이상 상태 신고 선택을 색상과 실루엣으로 보여 주며 운전 중 조작을 유도하지 않는 구도를 사용한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/transports/current",
+                                         "/driver/transports/history"
+                                     ]
+                   },
+                   {
+                       "sequence":  42,
+                       "code":  "driver-empty-mobile-wide-context",
+                       "titleKo":  "운송 후보 빈 상태 · 넓은 생활·업무 환경",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 주요 행동이 일어나는 주변 생활권과 작업 환경을 넓게 함께 보여 주되, 간판이나 표지판, 화면 글자 없이 사람과 사물의 관계만으로 맥락이 이해되게 구성한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  43,
+                       "code":  "driver-empty-mobile-hands-materials",
+                       "titleKo":  "운송 후보 빈 상태 · 손과 재료의 세부",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 손, 농수산물, 포장 재료와 업무 도구의 질감을 가까이 보여 주고, 얼굴이나 문서보다 실제 행동과 재료가 중심이 되도록 절제된 구도로 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  44,
+                       "code":  "driver-empty-mobile-role-handoff",
+                       "titleKo":  "운송 후보 빈 상태 · 역할 간 안전한 인계",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 서로 다른 역할의 두세 사람이 물품이나 빈 상자를 안전하게 인계하며 함께 확인하는 순간을 보여 주고, 자동 확정이나 위계가 아니라 상호 확인의 분위기를 만든다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  45,
+                       "code":  "driver-empty-mobile-mobile-focus",
+                       "titleKo":  "운송 후보 빈 상태 · 모바일 세로형 중심 장면",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 모바일 세로 crop에 맞춰 핵심 인물과 사물을 중앙에 두고 상하 여백을 확보한다. 휴대기기 화면, 버튼, 숫자, 글자는 보이지 않게 하고 행동 자체로 의미가 전달되게 한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  46,
+                       "code":  "driver-empty-mobile-quiet-state",
+                       "titleKo":  "운송 후보 빈 상태 · 차분한 대기 상태",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 사람이 많지 않은 차분한 공간에 다음 행동을 기다리는 도구와 물품을 배치해 빈 상태나 대기 상태를 표현하고, 경고 문구나 텍스트 없이 다시 시작할 수 있는 안정감을 준다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "3:4",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  47,
+                       "code":  "driver-empty-mobile-exception-review",
+                       "titleKo":  "운송 후보 빈 상태 · 예외 상황 공동 검토",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 참여자들이 문제가 생긴 물품이나 절차를 함께 살펴보고 선택 가능한 대안을 비교한다. 붉은 경고문이나 책임 추궁 대신 색과 거리, 사물 배치로 신중한 검토를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  48,
+                       "code":  "driver-empty-mobile-time-sequence",
+                       "titleKo":  "운송 후보 빈 상태 · 시간 흐름이 보이는 과정",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 하나의 넓은 화면 안에서 준비, 진행, 인계의 시간 흐름이 자연스러운 공간 변화로 읽히게 한다. 화살표, 단계 번호, 캡션 없이 사람의 움직임과 물품 위치로 순서를 표현한다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  49,
+                       "code":  "driver-empty-mobile-inclusive-access",
+                       "titleKo":  "운송 후보 빈 상태 · 누구나 참여 가능한 장면",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 다양한 연령과 이동 방식의 사람이 동등한 눈높이에서 참여하도록 통로와 작업 높이, 거리감을 배려해 구성하고, 특정 외모나 배경을 역할 능력과 연결하지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "4:3",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   },
+                   {
+                       "sequence":  50,
+                       "code":  "driver-empty-mobile-evidence-boundary",
+                       "titleKo":  "운송 후보 빈 상태 · 실물과 정보 표현의 분리",
+                       "promptKo":  "세로형 모바일 화면 중앙에 정차된 화물차와 휴식을 상징하는 따뜻한 커피잔, 새 후보를 기다리는 부드러운 경로선을 배치해 안전한 대기 상태를 표현한다. 실제 농수산물이나 업무 물품은 자연스럽게 묘사하고, 정보는 글자 없는 단순한 색면과 기하 도형으로만 암시한다. 증명서, 가격표, 계약서나 공공기관 보증처럼 보이는 요소는 넣지 않는다. 이미지 안에는 제목, 캡션, 글자, 숫자, 로고, 화면 인터페이스를 그리지 않는다.",
+                       "aspectRatio":  "16:9",
+                       "resolution":  "1K",
+                       "routeRefs":  [
+                                         "/driver/recommendations",
+                                         "/driver/notifications"
+                                     ]
+                   }
+               ]
+}

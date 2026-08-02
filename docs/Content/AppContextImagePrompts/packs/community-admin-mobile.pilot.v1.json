@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packId": "community-admin-mobile",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 5,
+  "basePromptKo": "이동 중에도 커뮤니티 운영 현황, 정보 검토, 업무 알림을 안전하게 확인하는 모바일 관리자 앱의 compact editorial illustration. 작은 화면에서 핵심 대상 하나와 충분한 여백을 유지한다.",
+  "contextChecklist": ["Web 통합 관리자의 커뮤니티 책임을 모바일 요약으로 연결한다.", "중요 조치는 상세 근거 확인 전에 자동 확정되지 않는다."],
+  "avoidExpressions": ["신고 한 번으로 즉시 처벌되는 표현과 사용자 순위", "실제 계정, 신고 내용, 주소, 연락처와 운영자 신원"],
+  "scenes": [
+    { "sequence": 1, "code": "mobile-admin-overview", "titleKo": "모바일 운영 개요", "promptKo": "세로형 화면 중앙에 커뮤니티 활동, 정보 검토, 운영 알림을 상징하는 세 개의 카드가 간결하게 쌓여 있고 관리자가 하나의 우선 항목을 선택하는 모바일 시작 장면을 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/", "/overview"] },
+    { "sequence": 2, "code": "mobile-community-review", "titleKo": "커뮤니티 검토", "promptKo": "한 개의 중립적 게시글 카드 주변에 출처 확인, 개인정보 보호, 임시 조치, 이의 가능성을 상징하는 작은 도형을 배치해 작은 화면에서도 신중한 검토 흐름이 보이게 한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/community-management"] },
+    { "sequence": 3, "code": "mobile-information-review", "titleKo": "공공정보 검토", "promptKo": "농수산물 상자와 지역 마커, 기준 시각, 출처 상태를 상징하는 간단한 도형을 하나의 정보 카드에 배치하고 관리자가 게시 전 근거 완전성을 확인하는 장면을 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/information-review"] },
+    { "sequence": 4, "code": "mobile-operations", "titleKo": "운영 알림·인계", "promptKo": "운영 알림, 담당 후보, 확인 대기, 완료 기록을 상징하는 카드가 순서대로 연결되고 중요한 조치는 Web 상세 검토로 인계되는 보수적인 모바일 운영 장면을 표현한다.", "aspectRatio": "4:3", "resolution": "1K", "routeRefs": ["/operations", "/page-catalog"] },
+    { "sequence": 5, "code": "mobile-admin-empty", "titleKo": "모바일 알림 빈 상태", "promptKo": "세로형 화면 중앙에 빈 알림 종과 작은 보호 방패, 신선한 식물을 배치해 현재 긴급한 운영 요청이 없고 커뮤니티가 안정적으로 운영되는 느낌을 표현한다.", "aspectRatio": "3:4", "resolution": "1K", "routeRefs": ["/overview", "/operations"] }
+  ]
+}

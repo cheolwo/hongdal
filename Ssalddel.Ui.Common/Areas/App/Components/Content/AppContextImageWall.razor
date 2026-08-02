@@ -1,0 +1,111 @@
+@using Ssalddel.Contracts.Common.Content
+@using Ssalddel.Ui.Common.Areas.App.Services
+@inject AppContextImageAssetClient ImageClient
+
+<section class="app-context-wall" aria-label="@Title">
+    <div class="app-context-wall__heading">
+        <div>
+            <p class="app-context-wall__eyebrow">APP STORIES</p>
+            <h2>@Title</h2>
+        </div>
+        @if (items.Count > 0)
+        {
+            <span>@(items.Count)개의 장면</span>
+        }
+    </div>
+
+    @if (loading)
+    {
+        <div class="app-context-wall__state">이미지 이야기를 불러오는 중입니다.</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="app-context-wall__state app-context-wall__state--error">
+            @error
+            <button type="button" @onclick="LoadAsync">다시 시도</button>
+        </div>
+    }
+    else if (items.Count == 0)
+    {
+        <div class="app-context-wall__state">아직 공개된 이미지 장면이 없습니다.</div>
+    }
+    else
+    {
+        <div class="app-context-wall__grid">
+            @foreach (var item in items)
+            {
+                <article class="app-context-wall__card">
+                    <img src="@item.ImageUrl"
+                         alt="@item.AltText"
+                         loading="lazy" />
+                    <div>
+                        <span>@item.SceneNumber.ToString("00")</span>
+                        <h3>@item.Title</h3>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string AppPackId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Title { get; set; } = "이 앱에서 이어지는 이야기";
+
+    [Parameter]
+    public int MaxItems { get; set; } = 8;
+
+    private IReadOnlyList<AppContextImageAssetDto> items = [];
+    private bool loading;
+    private string? error;
+    private string? loadedPackId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.Equals(loadedPackId, AppPackId, StringComparison.Ordinal))
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        error = null;
+        try
+        {
+            var result = await ImageClient.GetPackAsync(AppPackId);
+            items = result.Take(Math.Clamp(MaxItems, 1, 50)).ToArray();
+            loadedPackId = AppPackId;
+        }
+        catch (Exception)
+        {
+            items = [];
+            error = "이미지 이야기를 불러오지 못했습니다.";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}
+
+<style>
+    .app-context-wall { margin: 1.5rem 0; padding: 1.25rem; border-radius: 24px; background: linear-gradient(145deg, #fffdf7, #eef5ef); color: #24342d; }
+    .app-context-wall__heading { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+    .app-context-wall__heading h2 { margin: .15rem 0 0; font-size: clamp(1.35rem, 3vw, 2rem); }
+    .app-context-wall__heading > span, .app-context-wall__eyebrow { color: #61756a; font-size: .78rem; letter-spacing: .08em; }
+    .app-context-wall__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .9rem; }
+    .app-context-wall__card { overflow: hidden; border-radius: 18px; background: #fff; box-shadow: 0 8px 24px rgba(35,52,45,.09); }
+    .app-context-wall__card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #e7ece8; }
+    .app-context-wall__card div { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .65rem; padding: .8rem .9rem 1rem; }
+    .app-context-wall__card span { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: #e2efe5; font-size: .75rem; }
+    .app-context-wall__card h3 { margin: 0; font-size: .96rem; line-height: 1.35; }
+    .app-context-wall__state { padding: 1.5rem; border: 1px dashed #aebcb4; border-radius: 16px; text-align: center; }
+    .app-context-wall__state--error { color: #8b3e35; }
+    .app-context-wall__state button { margin-left: .75rem; }
+    @@media (max-width: 640px) { .app-context-wall { padding: 1rem; border-radius: 18px; } .app-context-wall__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .app-context-wall__card h3 { font-size: .82rem; } }
+</style>

@@ -74,6 +74,12 @@ if (builder.Environment.IsDevelopment())
     builder.Configuration.AddUserSecrets<Program>(optional: true);
 }
 
+// appsettings.Local.json is intentionally local-only, while deployment and
+// one-off maintenance commands must still be able to override it safely.
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddCommandLine(args);
+
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
@@ -238,6 +244,26 @@ builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개�
 
 var app = builder.Build();
 app.Logger.LogInformation("Ssalddel execution mode: {ExecutionMode}", executionOptions.Mode);
+
+if (await AppContextImageBatchCommandLine.TryRunAsync(
+        args,
+        app.Services,
+        app.Environment.ContentRootPath,
+        app.Logger,
+        CancellationToken.None))
+{
+    return;
+}
+
+if (await AppContextImageAssetPublishCommandLine.TryRunAsync(
+        args,
+        app.Services,
+        app.Environment.ContentRootPath,
+        app.Logger,
+        CancellationToken.None))
+{
+    return;
+}
 
 if (args.Any(argument => string.Equals(
         argument,
