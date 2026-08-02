@@ -36,14 +36,20 @@ public sealed class AdminBusinessPackageCompositionTests
     }
 
     [Fact]
-    public void 분리실행앱의공통화면은_루트경로와단일카탈로그를사용한다()
+    public void 세업무패키지는_별도실행프로젝트없이_통합관리자에서제공한다()
     {
-        var page = Read("Ssalddel.BusinessPackages.AdminUi", "PackageAdminApp.razor");
+        var repositoryRoot = FindRepositoryRoot();
+        var solution = Read("Ssalddel.v3.5.slnx");
+        var adminProject = Read("SsalddelAdmin", "SsalddelAdmin.csproj");
 
-        Assert.Contains("@page \"/\"", page);
-        Assert.Contains("BusinessPackageCatalog.GetRequired", page);
-        Assert.Contains("workflow.AdminPath", page);
-        Assert.DoesNotContain("LegacyAdminPath", page);
+        Assert.False(File.Exists(Path.Combine(repositoryRoot, "Ssalddel.FoodDelivery.Admin", "Ssalddel.FoodDelivery.Admin.csproj")));
+        Assert.False(File.Exists(Path.Combine(repositoryRoot, "Ssalddel.FreightDelivery.Admin", "Ssalddel.FreightDelivery.Admin.csproj")));
+        Assert.False(File.Exists(Path.Combine(repositoryRoot, "Ssalddel.OrderWarehouse.Admin", "Ssalddel.OrderWarehouse.Admin.csproj")));
+        Assert.False(File.Exists(Path.Combine(repositoryRoot, "Ssalddel.BusinessPackages.AdminUi", "Ssalddel.BusinessPackages.AdminUi.csproj")));
+        Assert.DoesNotContain("Ssalddel.FoodDelivery.Admin", solution);
+        Assert.DoesNotContain("Ssalddel.FreightDelivery.Admin", solution);
+        Assert.DoesNotContain("Ssalddel.OrderWarehouse.Admin", solution);
+        Assert.DoesNotContain("Ssalddel.BusinessPackages.AdminUi", adminProject);
     }
 
     private static string Read(params string[] path)

@@ -88,6 +88,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(RoleCode)' == '01'">
+    <Content Include="..\Ssalddel.WebApp\Layout\MapOnlyLayout.razor">
+      <Link>Layout\MapOnlyLayout.razor</Link>
+    </Content>
+    <Content Include="..\Ssalddel.WebApp\Layout\MapOnlyLayout.razor.css">
+      <Link>Layout\MapOnlyLayout.razor.css</Link>
+    </Content>
     <Content Include="..\Ssalddel.WebApp\Pages\Community*.razor">
       <Link>Pages\%(Filename)%(Extension)</Link>
     </Content>
@@ -105,6 +111,7 @@
     </Content>
     <Content Include="..\Ssalddel.WebApp\Pages\PublicDataInformationPage.razor;
                       ..\Ssalddel.WebApp\Pages\KamisDomesticPriceComparisonPage.razor;
+                      ..\Ssalddel.WebApp\Pages\KoreaAgriculturalMapPage.razor;
                       ..\Ssalddel.WebApp\Pages\ProduceRegionalPriceComparisonPage.razor;
                       ..\Ssalddel.WebApp\Pages\UsdaUnitedStatesPriceComparisonPage.razor;
                       ..\Ssalddel.WebApp\Pages\RegionalProductCandidatesPage.razor">

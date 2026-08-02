@@ -42,9 +42,21 @@
     </MudGrid>
 </MudStack>
 
+<AppContextImageWall AppPackId="@ImagePackId"
+                     Title="@($"{Definition.DisplayName} 현장 이야기")" />
+
 @code {
     private BusinessPackageDefinition Definition
         => BusinessPackageCatalog.GetRequired(ResolvePackageCode());
+
+    private string ImagePackId
+        => ResolvePackageCode() switch
+        {
+            BusinessPackageCatalog.FoodDelivery => "food-delivery-admin",
+            BusinessPackageCatalog.FreightDelivery => "freight-delivery-admin",
+            BusinessPackageCatalog.OrderWarehouse => "order-warehouse-admin",
+            _ => throw new InvalidOperationException("지원하지 않는 이미지 팩입니다.")
+        };
 
     private string ResolvePackageCode()
     {

@@ -36,9 +36,6 @@
     <Project Path="Ssalddel.Web.WarehouseApp/Ssalddel.Web.WarehouseApp.csproj" />
   </Folder>
   <Folder Name="/Operations/">
-    <Project Path="Ssalddel.FoodDelivery.Admin/Ssalddel.FoodDelivery.Admin.csproj" />
-    <Project Path="Ssalddel.FreightDelivery.Admin/Ssalddel.FreightDelivery.Admin.csproj" />
-    <Project Path="Ssalddel.OrderWarehouse.Admin/Ssalddel.OrderWarehouse.Admin.csproj" />
     <Project Path="SsalddelAdmin/SsalddelAdmin.csproj" />
     <Project Path="SsalddelAdminApp/SsalddelAdminApp.csproj">
       <Deploy Solution="Debug|*" />
@@ -53,7 +50,6 @@
   </Folder>
   <Folder Name="/Shared/">
     <Project Path="Ssalddel.BackOffice.Client/Ssalddel.BackOffice.Client.csproj" />
-    <Project Path="Ssalddel.BusinessPackages.AdminUi/Ssalddel.BusinessPackages.AdminUi.csproj" />
     <Project Path="Ssalddel.Client.Infrastructure/Ssalddel.Client.Infrastructure.csproj" />
     <Project Path="Ssalddel.Contracts/Ssalddel.Contracts.csproj" />
     <Project Path="Ssalddel.Domain/Ssalddel.Domain.csproj" />
