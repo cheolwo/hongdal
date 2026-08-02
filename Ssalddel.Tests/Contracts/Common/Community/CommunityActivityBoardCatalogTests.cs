@@ -118,9 +118,9 @@ public sealed class CommunityActivityBoardCatalogTests
     public void Catalog_SeparatesWorkflowRelationshipsFromPublicActivityProjection()
     {
         Assert.Equal(27, CommunityActivityBoardCatalog.Bundles.Sum(bundle => bundle.CommandCount));
-        Assert.Equal(25, CommunityActivityBoardCatalog.Bundles.Sum(bundle => bundle.EventCount));
+        Assert.Equal(27, CommunityActivityBoardCatalog.Bundles.Sum(bundle => bundle.EventCount));
         Assert.Equal(
-            28,
+            30,
             CommunityActivityBoardCatalog.All.Count(activity => activity.PublishesActivityPost));
 
         var groupPurchase = Assert.IsType<CommunityActivityBoardBundleDefinition>(
@@ -146,14 +146,21 @@ public sealed class CommunityActivityBoardCatalogTests
     }
 
     [Fact]
-    public void Catalog_ExposesMissingFoodDeliveryBoundaryInsteadOfHidingItInVersionBoard()
+    public void Catalog_MapsFoodDeliveryReceiptToDedicatedHandoffBoard()
     {
         var handoff = Assert.IsType<CommunityActivityBoardBundleDefinition>(
             CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.FoodDeliveryHandoff));
 
-        Assert.Empty(handoff.Activities);
+        Assert.Contains(
+            handoff.Activities,
+            activity => activity.SourceName == "음식배달인계상태변경됨Event"
+                        && activity.PublishesActivityPost);
+        Assert.Contains(
+            handoff.Activities,
+            activity => activity.SourceName == "주문자음식주문수령확인됨Event"
+                        && activity.PublishesActivityPost);
         Assert.NotEmpty(handoff.Pages);
-        Assert.Contains("보완", handoff.Board.Description);
+        Assert.Contains("수령 확인", handoff.Board.Description);
     }
 
     [Theory]

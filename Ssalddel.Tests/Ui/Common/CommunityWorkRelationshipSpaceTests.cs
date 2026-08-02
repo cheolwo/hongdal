@@ -7,7 +7,7 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed class CommunityWorkRelationshipSpaceTests
 {
     [Fact]
-    public void 커뮤니티01은_업무앱의친구후보기록을확인하는독립Route를제공한다()
+    public void 커뮤니티01은_업무앱의친구후보기록을확인하는독립Route와_내정보진입점을제공한다()
     {
         var routes = Read(
             "Ssalddel.Contracts",
@@ -19,16 +19,17 @@ public sealed class CommunityWorkRelationshipSpaceTests
             "Components",
             "Pages",
             "CommunityWorkRelationshipsPage.razor");
-        var layout = Read(
+        var personalPage = Read(
             "SsalddelApp",
             "Components",
-            "Layout",
-            "CommunityMobileLayout.razor");
+            "Pages",
+            "CommunityPersonalPage.razor");
 
         Assert.Contains("WorkRelationships = \"/community/relationships\"", routes);
         Assert.Contains("@layout CommunityMobileLayout", page);
         Assert.Contains("<CommunityWorkRelationshipSpace />", page);
-        Assert.Contains("친구 요청", layout);
+        Assert.Contains("href=\"@CommunityPageRoutes.WorkRelationships\"", personalPage);
+        Assert.Contains("친구 요청", personalPage);
     }
 
     [Fact]

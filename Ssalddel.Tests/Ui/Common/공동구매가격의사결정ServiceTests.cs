@@ -178,6 +178,11 @@ public sealed class 공동구매가격의사결정ServiceTests
 
     private sealed class Fake농수산공공데이터Client : I농수산공공데이터Client
     {
+        public Task<RegionalAgriculturalMapMarkerListResponse> 지역MapMarker조회Async(
+            RegionalAgriculturalMapMarkerQuery query,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
+
         public AgriculturalFisheriesDomesticPriceResponse 국내가격응답 { get; set; } = new();
         public FoodPriceComparisonResponse 식품가격비교응답 { get; set; } = new();
         public 미국농수산가격조회응답 미국가격응답 { get; set; } = new();

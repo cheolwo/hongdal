@@ -3,17 +3,16 @@ namespace Ssalddel.Tests.Architecture;
 public sealed class WarehousePlatformHomeSrpCompositionTests
 {
     [Fact]
-    public void 창고_플랫폼홈은_공용업무허브만_조립한다()
+    public void 창고_루트는_실제운영홈으로위임하고_업무화면을조립하지않는다()
     {
         var homePath = WarehousePage("Home.razor");
         var source = File.ReadAllText(homePath);
 
         Assert.True(File.ReadLines(homePath).Count() <= 20);
-        Assert.Contains("<CommunityWorkspaceScreen", source);
-        Assert.Contains("WorkspaceOnly=\"true\"", source);
-        Assert.Contains("ShowWorkspaceNavigation=\"true\"", source);
-        Assert.Contains("WarehousePlatformHomeNavigationCatalog.QuickActions", source);
-        Assert.Contains("WarehousePlatformHomeNavigationCatalog.CardinalNavigationOptions", source);
+        Assert.Contains("@page \"/\"", source);
+        Assert.Contains("@inject NavigationManager Navigation", source);
+        Assert.Contains("Navigation.NavigateTo(WarehouseManagerRoutes.Warehouse, replace: true)", source);
+        Assert.DoesNotContain("<CommunityWorkspaceScreen", source);
         Assert.DoesNotContain("<PlatformCommunityHome", source);
         Assert.DoesNotContain("<CommunityBoardListScreen", source);
         Assert.DoesNotContain("<CommunityBoardManagementScreen", source);
