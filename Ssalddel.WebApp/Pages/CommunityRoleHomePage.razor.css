@@ -1823,3 +1823,187 @@
         border-radius: 18px;
     }
 }
+
+.world-community-home__simulation {
+    position: absolute;
+    z-index: 7;
+    bottom: 16px;
+    left: 16px;
+    width: min(430px, calc(100% - 32px));
+    max-height: min(48dvh, 440px);
+    padding: 12px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, .82);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .93);
+    box-shadow: 0 14px 34px rgba(17, 40, 35, .2);
+    backdrop-filter: blur(14px);
+}
+
+.world-community-home__simulation > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.world-community-home__simulation > header div {
+    display: grid;
+    gap: 2px;
+}
+
+.world-community-home__simulation > header span {
+    color: #9f1239;
+    font-size: .68rem;
+    font-weight: 850;
+    letter-spacing: .05em;
+}
+
+.world-community-home__simulation > header strong {
+    color: #142d27;
+    font-size: .93rem;
+}
+
+.world-community-home__simulation-motion {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: 36px;
+    gap: 4px;
+    padding: 6px 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    color: #334155;
+    background: #fff;
+    font-size: .76rem;
+    font-weight: 800;
+}
+
+.world-community-home__simulation-warning,
+.world-community-home__simulation-error {
+    margin: 8px 0;
+    color: #7f1d1d;
+    font-size: .75rem;
+    line-height: 1.45;
+}
+
+.world-community-home__simulation-error {
+    padding: 7px 8px;
+    border-radius: 8px;
+    background: #fff1f2;
+}
+
+.world-community-home__simulation-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.world-community-home__simulation-toggles button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid #d5dde7;
+    border-radius: 999px;
+    color: #475569;
+    background: rgba(248, 250, 252, .96);
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.world-community-home__simulation-toggles button i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #cbd5e1;
+}
+
+.world-community-home__simulation-toggles button.is-active {
+    border-color: var(--simulation-color);
+    color: #142d27;
+    box-shadow: inset 0 0 0 1px var(--simulation-color);
+}
+
+.world-community-home__simulation-toggles button.is-active i {
+    background: var(--simulation-color);
+}
+
+.world-community-home__simulation details {
+    margin-top: 8px;
+    color: #475569;
+    font-size: .72rem;
+}
+
+.world-community-home__simulation summary {
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.world-community-home__simulation ul {
+    display: grid;
+    gap: 7px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.world-community-home__simulation li {
+    display: grid;
+    gap: 2px;
+    padding-top: 7px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.world-community-home__simulation li strong {
+    color: #334155;
+}
+
+.world-community-home__simulation-fallback {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.world-community-home__simulation-route {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-dasharray: 8 7;
+    opacity: .78;
+}
+
+.world-community-home__simulation-vehicle {
+    stroke: #fff;
+    stroke-width: 2;
+    filter: drop-shadow(0 3px 5px rgba(15, 23, 42, .32));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .world-community-home__simulation-vehicle {
+        transition: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .world-community-home__simulation {
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        width: auto;
+        max-height: 38dvh;
+        padding: 10px;
+    }
+
+    .world-community-home__simulation > header span {
+        font-size: .62rem;
+    }
+
+    .world-community-home__simulation details {
+        display: none;
+    }
+}

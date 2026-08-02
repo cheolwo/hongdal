@@ -99,6 +99,58 @@
         </div>
         </aside>
 
+        @if (!IsNightLearning)
+        {
+            <section class="world-community-home__simulation" aria-labelledby="transport-simulation-heading">
+                <header>
+                    <div>
+                        <span>SIMULATED · 시뮬레이션/교육용/비실시간</span>
+                        <strong id="transport-simulation-heading">물류·항공·해상 흐름</strong>
+                    </div>
+                    <button type="button"
+                            class="world-community-home__simulation-motion"
+                            aria-pressed="@_simulationAnimationEnabled.ToString().ToLowerInvariant()"
+                            @onclick="ToggleSimulationAnimation">
+                        <MudIcon Icon="@(_simulationAnimationEnabled ? Icons.Material.Filled.Pause : Icons.Material.Filled.PlayArrow)" Size="Size.Small" />
+                        @(_simulationAnimationEnabled ? "움직임 끄기" : "움직임 켜기")
+                    </button>
+                </header>
+                <p class="world-community-home__simulation-warning">
+                    실제 운행 추적·배차 확정·개인 위치·타 조직 운영정보가 아닙니다.
+                </p>
+                <div class="world-community-home__simulation-toggles" role="group" aria-label="교육용 이동 레이어 선택">
+                    @foreach (var modeCode in SimulationModeCodes)
+                    {
+                        <button type="button"
+                                class="@(_enabledSimulationModeCodes.Contains(modeCode) ? "is-active" : null)"
+                                style="--simulation-color: @SimulationColor(modeCode)"
+                                aria-pressed="@_enabledSimulationModeCodes.Contains(modeCode).ToString().ToLowerInvariant()"
+                                @onclick="() => ToggleSimulationMode(modeCode)">
+                            <i aria-hidden="true"></i>
+                            @SimulationModeDisplayName(modeCode)
+                        </button>
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_simulationOverlayMessage))
+                {
+                    <p class="world-community-home__simulation-error" role="status">@_simulationOverlayMessage</p>
+                }
+                <details>
+                    <summary>고정 예시의 상태·출처·기준 보기</summary>
+                    <ul>
+                        @foreach (var scenario in SimulationRoutes)
+                        {
+                            <li>
+                                <strong>@scenario.DisplayName · @scenario.SimulationMark</strong>
+                                <span>@scenario.StatusLabel · @scenario.SourceName</span>
+                                <span>기준 @scenario.BasisAtUtc.ToString("yyyy-MM-dd") · @scenario.FreshnessLabel</span>
+                            </li>
+                        }
+                    </ul>
+                </details>
+            </section>
+        }
+
         @if (!string.IsNullOrWhiteSpace(_snapshotConnectionMessage))
         {
             <div class="world-community-home__freshness world-community-home__freshness--warning" role="status">
@@ -199,6 +251,45 @@
                             <text x="99" y="16">5,000 km</text>
                         </g>
                     </svg>
+
+                    @if (!IsNightLearning && VisibleSimulationRoutes.Count > 0)
+                    {
+                        <svg class="world-community-home__simulation-fallback"
+                             viewBox="0 0 1000 500"
+                             role="img"
+                             aria-label="실제 위치가 아닌 교육용 화물·항공·해상 시뮬레이션 경로">
+                            @foreach (var scenario in VisibleSimulationRoutes)
+                            {
+                                <path class="world-community-home__simulation-route"
+                                      d="@FallbackSimulationPath(scenario)"
+                                      stroke="@scenario.Color" />
+                                <g class="world-community-home__simulation-vehicle world-community-home__simulation-vehicle--@scenario.ModeCode"
+                                   fill="@scenario.Color"
+                                   transform="@FallbackSimulationStaticTransform(scenario)">
+                                    @if (scenario.ModeCode == 운송시뮬레이션ModeCodes.Aviation)
+                                    {
+                                        <path d="M13 0 L-7 -6 L-3 0 L-7 6 Z" />
+                                    }
+                                    else if (scenario.ModeCode == 운송시뮬레이션ModeCodes.Maritime)
+                                    {
+                                        <path d="M11 0 L5 7 L-10 5 L-12 -5 L5 -7 Z" />
+                                    }
+                                    else
+                                    {
+                                        <rect x="-11" y="-7" width="17" height="12" rx="3" />
+                                        <rect x="6" y="-4" width="7" height="9" rx="2" />
+                                    }
+                                    @if (_simulationAnimationEnabled)
+                                    {
+                                        <animateMotion dur="@($"{scenario.AnimationCycleSeconds:F0}s")"
+                                                       repeatCount="indefinite"
+                                                       rotate="auto"
+                                                       path="@FallbackSimulationPath(scenario)" />
+                                    }
+                                </g>
+                            }
+                        </svg>
+                    }
 
                     @foreach (var country in FallbackMapMarkers)
                     {
@@ -621,6 +712,21 @@
     private Task? _pollingTask;
     private DateTimeOffset? _lastSnapshotCheckedAt;
     private string? _snapshotConnectionMessage;
+    private string? _simulationOverlayMessage;
+    private bool _simulationAnimationEnabled = true;
+    private readonly HashSet<string> _enabledSimulationModeCodes = new(
+        SimulationModeCodes,
+        StringComparer.Ordinal);
+
+    private static readonly IReadOnlyList<string> SimulationModeCodes =
+    [
+        운송시뮬레이션ModeCodes.GroundCargo,
+        운송시뮬레이션ModeCodes.Aviation,
+        운송시뮬레이션ModeCodes.Maritime
+    ];
+
+    private static readonly IReadOnlyList<운송시뮬레이션RouteDto> SimulationRoutes =
+        운송시뮬레이션MapFixtureCatalog.Routes;
 
     private static readonly IReadOnlyList<CommunityMapCountry> MapCountries =
     [
@@ -673,6 +779,14 @@
     private IReadOnlyList<커뮤니티세계지도LayerDto> CurrentLayers
         => _appliedSnapshot?.Layers
            ?? 커뮤니티세계지도LayerCatalog.ForDataset(DatasetCode);
+
+    private IReadOnlyList<운송시뮬레이션RouteDto> VisibleSimulationRoutes
+        => IsNightLearning
+            ? []
+            : SimulationRoutes
+                .Where(route => _enabledSimulationModeCodes.Contains(route.ModeCode))
+                .Take(12)
+                .ToArray();
 
     private IReadOnlyList<MapLayerDiagram> ActiveLayerDiagrams
         => ConsolidateLedgerDiagrams(CurrentLayers
@@ -829,6 +943,10 @@
             _googleMapModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import",
                 "./js/community-world-google-map.js");
+            if (await _googleMapModule.InvokeAsync<bool>("prefersReducedMotion"))
+            {
+                _simulationAnimationEnabled = false;
+            }
             _googleMapCallback = DotNetObjectReference.Create(this);
             var status = await _googleMapModule.InvokeAsync<string>(
                 "initialize",
@@ -846,6 +964,7 @@
                 "blocked-origin" => GoogleMapState.BlockedOrigin,
                 _ => GoogleMapState.Unconfigured
             };
+            await UpdateTransportSimulationLayerAsync();
             _pendingGoogleMapUpdate = false;
             _pollingCts = new CancellationTokenSource();
             _pollingTask = PollMapSnapshotsAsync(_pollingCts.Token);
@@ -866,6 +985,7 @@
                 _selectedCountryCode,
                 _selectedObservationId,
                 preserveViewport);
+            await UpdateTransportSimulationLayerAsync();
         }
     }
 
@@ -903,6 +1023,49 @@
         }
 
         _pendingGoogleMapUpdate = true;
+    }
+
+    private async Task ToggleSimulationMode(string modeCode)
+    {
+        if (!_enabledSimulationModeCodes.Add(modeCode))
+        {
+            _enabledSimulationModeCodes.Remove(modeCode);
+        }
+
+        await UpdateTransportSimulationLayerAsync();
+    }
+
+    private async Task ToggleSimulationAnimation()
+    {
+        _simulationAnimationEnabled = !_simulationAnimationEnabled;
+        await UpdateTransportSimulationLayerAsync();
+    }
+
+    private async Task UpdateTransportSimulationLayerAsync()
+    {
+        if (_googleMapState != GoogleMapState.Ready || _googleMapModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _googleMapModule.InvokeVoidAsync(
+                "updateTransportSimulationLayer",
+                "community-world-google-map",
+                VisibleSimulationRoutes,
+                new
+                {
+                    animationEnabled = _simulationAnimationEnabled,
+                    maxVisibleObjects = 12,
+                    rendererKind = "google-overlay-canvas"
+                });
+            _simulationOverlayMessage = null;
+        }
+        catch (JSException)
+        {
+            _simulationOverlayMessage = "Google 지도 시뮬레이션 overlay를 표시하지 못했습니다. 고정 예시 정보는 계속 확인할 수 있습니다.";
+        }
     }
 
     private void ToggleDiagramPanel()
@@ -1266,6 +1429,43 @@
         var top = (90d - marker.Latitude) / 180d * 100d;
         return FormattableString.Invariant($"--marker-left: {left:F3}%; --marker-top: {top:F3}%;");
     }
+
+    private static string SimulationModeDisplayName(string modeCode)
+        => modeCode switch
+        {
+            운송시뮬레이션ModeCodes.GroundCargo => "화물",
+            운송시뮬레이션ModeCodes.Aviation => "항공",
+            운송시뮬레이션ModeCodes.Maritime => "해상",
+            _ => "교육 흐름"
+        };
+
+    private static string SimulationColor(string modeCode)
+        => SimulationRoutes.First(route => route.ModeCode == modeCode).Color;
+
+    private static string FallbackSimulationPath(운송시뮬레이션RouteDto scenario)
+        => string.Join(
+            " ",
+            scenario.Route.Select((point, index) =>
+            {
+                var (x, y) = FallbackSimulationPoint(point);
+                return FormattableString.Invariant($"{(index == 0 ? "M" : "L")} {x:F2} {y:F2}");
+            }));
+
+    private string? FallbackSimulationStaticTransform(운송시뮬레이션RouteDto scenario)
+    {
+        if (_simulationAnimationEnabled || scenario.Route.Count == 0)
+        {
+            return null;
+        }
+
+        var (x, y) = FallbackSimulationPoint(scenario.Route[0]);
+        return FormattableString.Invariant($"translate({x:F2} {y:F2})");
+    }
+
+    private static (double X, double Y) FallbackSimulationPoint(운송시뮬레이션RoutePointDto point)
+        => (
+            (point.Longitude + 180d) / 360d * 1000d,
+            (90d - point.Latitude) / 180d * 500d);
 
     private static string CultureConversationHref(CommunityMapCountry country)
         => CommunityPageRoutes.BoardsFor(

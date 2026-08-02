@@ -1,5 +1,6 @@
 const instances = new Map();
 let googleMapsLoadPromise;
+let transportSimulationModulePromise;
 
 const dayMapStyle = [];
 const nightMapStyle = [
@@ -141,6 +142,29 @@ export function updateSelection(elementId, selectedCode, selectedMarkerId) {
     focusSelection(instance);
 }
 
+export async function updateTransportSimulationLayer(elementId, scenarios, options) {
+    const instance = instances.get(elementId);
+    if (!instance) {
+        return;
+    }
+
+    transportSimulationModulePromise ??= import("./transport-simulation-map-layer.js");
+    const simulationModule = await transportSimulationModulePromise;
+    if (!instance.transportSimulationLayer) {
+        instance.transportSimulationLayer = simulationModule.createTransportSimulationLayer(
+            instance.map,
+            scenarios,
+            options);
+        return;
+    }
+
+    instance.transportSimulationLayer.update(scenarios, options);
+}
+
+export function prefersReducedMotion() {
+    return globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+}
+
 export function dispose(elementId) {
     const instance = instances.get(elementId);
     if (!instance) {
@@ -150,6 +174,7 @@ export function dispose(elementId) {
     if (instance.clickListener) {
         instance.clickListener.remove();
     }
+    instance.transportSimulationLayer?.dispose();
     google.maps.event.clearInstanceListeners(instance.map);
     instances.delete(elementId);
 }

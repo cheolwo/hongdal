@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-08-02 | [지도형 홈 운송 시뮬레이션 레이어](2026-08-02-transport-simulation-map-layer.md) | 직접 확인 — 실제 위치가 아닌 고정 교육 fixture의 화물·항공·해상 경로, 레이어 toggle·움직임 정지·출처/기준/신선도와 Google 미설정 SVG fallback을 데스크톱·390px에서 검증 |
 | 2026-08-02 | [낮 업무·밤 알아차림 커뮤니티 세계지도](2026-08-02-day-night-community-map.md) | 지도 한 개에 분야별 레이어, 한국 6개·미국 12개 도매시장과 검증된 전통시장 공동입고 거점 마커를 연결하고 exact marker 상세·stable revision·SVG 대체 화면을 직접 확인 |
 | 2026-08-02 | [한국·미국 공통 농수산물 데이터 지도](2026-08-02-korea-us-regional-agricultural-map.md) | 직접 확인 — 공통 route에서 한국·미국 국가 선택과 산지·출하/선적·시장 관측 레이어를 전환하고 미국 SVG fallback을 실제 렌더링; marker 응답은 기존 DB migration 오류로 미확인 |
 | 2026-08-01 | [한국 농수산물 데이터 지도](2026-08-01-korea-agricultural-map.md) | 직접 확인 — 서버의 검증된 지역 대표점 API를 Web·MAUI 공통 지도 화면에 연결하고, 품목 검색·지역 마커·출처·가격 게시판 진입과 390px 오류·재시도 상태를 실제 렌더링 |
