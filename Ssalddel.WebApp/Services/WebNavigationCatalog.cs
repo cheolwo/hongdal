@@ -11,6 +11,9 @@ public static class WebNavigationCatalog
     private static readonly WebNavigationItem Community =
         new("공개 커뮤니티", "/community", Icons.Material.Filled.Forum, true);
 
+    private static readonly WebNavigationItem WorldMap =
+        new("통합 지도", CommunityPageRoutes.WorldMap, Icons.Material.Filled.Public, true);
+
     private static readonly WebNavigationItem RegionalCulture =
         new("지역 문화·특산물", CommunityPageRoutes.Regions, Icons.Material.Filled.TravelExplore, true);
 
@@ -94,6 +97,7 @@ public static class WebNavigationCatalog
 
     public static IReadOnlyList<WebNavigationItem> IntegratedItems { get; } =
     [
+        WorldMap,
         new("01 커뮤니티", "/roles/01/", Icons.Material.Filled.Forum, true),
         new("02 주문자", "/roles/02/", Icons.Material.Filled.ShoppingCartCheckout, true),
         new("03 화주", "/roles/03/", Icons.Material.Filled.LocalShipping, true),
@@ -115,6 +119,7 @@ public static class WebNavigationCatalog
 
     public static IReadOnlyList<WebNavigationItem> VisibleCommunityNavigationItems { get; } =
     [
+        WorldMap,
         Community,
         RegionalCulture,
         CommunityItems[0],

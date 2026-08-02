@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.WebApp.Services;
 
 namespace Ssalddel.Tests;
@@ -89,6 +90,7 @@ public sealed class WebNavigationCatalogTests
     {
         Assert.Equal(
         [
+            CommunityPageRoutes.WorldMap,
             "/roles/01/",
             "/roles/02/",
             "/roles/03/",
@@ -131,6 +133,7 @@ public sealed class WebNavigationCatalogTests
 
         Assert.Equal(
         [
+            ("통합 지도", CommunityPageRoutes.WorldMap),
             ("공개 커뮤니티", "/community"),
             ("지역 문화·특산물", "/community/regions"),
             ("내 정보", "/community/me"),
