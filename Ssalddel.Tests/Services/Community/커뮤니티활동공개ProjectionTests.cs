@@ -108,6 +108,36 @@ public sealed class 커뮤니티활동공개ProjectionTests
             receipt => Assert.DoesNotContain("secret", receipt.OccurrenceKey));
     }
 
+    [Fact]
+    public async Task RecordAsync_WhenDeliveryActivityReachesPrivacyThreshold_PublishesOneSafeBoardPostDraft()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var publisher = new RecordingAutomatedPostPublisher();
+        var recorder = new 커뮤니티활동공개ProjectionRecorder(
+            database.Context,
+            TimeProvider.System,
+            publisher);
+        var definition = FindDefinition();
+
+        for (var index = 1; index <= 커뮤니티활동공개Policy.최소공개활동수; index++)
+        {
+            await recorder.RecordAsync(definition, CreateOccurrence(index));
+        }
+
+        var draft = Assert.Single(publisher.Drafts);
+        Assert.Equal(CommunityAutomatedPostSourceKeys.ActivityDigest, draft.SourceKey);
+        Assert.Equal(definition.Board.DisplayName, draft.Category);
+        Assert.Contains(definition.PublicActivitySummary, draft.Body);
+        Assert.Contains("비식별 집계", draft.Body);
+        Assert.DoesNotContain("driver-secret", draft.Body);
+        Assert.DoesNotContain("TR-PRIVATE", draft.Body);
+        Assert.DoesNotContain("서울시 비공개", draft.Body);
+
+        await recorder.RecordAsync(definition, CreateOccurrence(6));
+
+        Assert.Single(publisher.Drafts);
+    }
+
     private static CommunityActivityBoardDefinition FindDefinition()
         => CommunityActivityBoardCatalog.FindSource(
             CommunityActivitySourceKinds.Event,
@@ -164,5 +194,18 @@ public sealed class 커뮤니티활동공개ProjectionTests
         public string? Protect(string? value) => value;
 
         public string? Unprotect(string? value) => value;
+    }
+
+    private sealed class RecordingAutomatedPostPublisher : ICommunityAutomatedPostPublisher
+    {
+        public List<CommunityAutomatedPostDraft> Drafts { get; } = [];
+
+        public Task<CommunityAutomatedPostPublishResult> PublishIfMissingAsync(
+            CommunityAutomatedPostDraft draft,
+            CancellationToken cancellationToken = default)
+        {
+            Drafts.Add(draft);
+            return Task.FromResult(new CommunityAutomatedPostPublishResult(Drafts.Count, true));
+        }
     }
 }

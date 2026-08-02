@@ -7,6 +7,7 @@ using MediatR;
 using 살뜰.도메인.공통;
 using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Dispatch.Queue;
+using 살뜰.Services.Transport;
 
 namespace Ssalddel.Application.Food.Handlers;
 
@@ -15,6 +16,7 @@ public sealed class 음식점수락후배차대기생성EventHandler(
     I운송원장Mongo동기화Service transportLedgerSync,
     I음식마트원장동기화OutboxService foodMartLedgerOutbox,
     I음식점주문실시간알림Service restaurantNotification,
+    ITransportRequestLedgerRealtimeService transportLedgerRealtimeService,
     ISsalddelFoodOrderStore orderStore,
     IKakao좌표변환Service kakaoGeoService,
     SsalddelContext db,
@@ -77,6 +79,10 @@ public sealed class 음식점수락후배차대기생성EventHandler(
                 updatedOrder,
                 $"restaurant:{order.음식점Id}",
                 $"food-dispatch:{notification.EventId}",
+                cancellationToken);
+            await transportLedgerRealtimeService.PublishAsync(
+                order.주문번호,
+                nameof(음식점주문수락됨Event),
                 cancellationToken);
             await NotifyRestaurantAsync(updatedOrder, cancellationToken);
         }

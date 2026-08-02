@@ -1,11 +1,13 @@
 using FluentResults;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Application.Driver.DispatchAction;
+using Ssalddel.Application.Food.Events;
 using Ssalddel.Contracts.Common.Drivers;
 using Ssalddel.Contracts.Common.Operations;
 using Ssalddel.Contracts.Food;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.Food;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
 using 살뜰.Services.Dispatch.Coordination;
@@ -67,6 +69,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
     private readonly I운송원장Mongo동기화Service _transportLedgerSync;
     private readonly I음식점주문실시간알림Service _restaurantNotification;
     private readonly I기사월정산Service _settlementService;
+    private readonly IPublisher _publisher;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly ILogger<음식배달기사업무Service> _logger;
 
@@ -81,6 +84,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         I운송원장Mongo동기화Service transportLedgerSync,
         I음식점주문실시간알림Service restaurantNotification,
         I기사월정산Service settlementService,
+        IPublisher publisher,
         ICurrentUserAccessor currentUserAccessor,
         ILogger<음식배달기사업무Service> logger)
     {
@@ -94,6 +98,7 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         _transportLedgerSync = transportLedgerSync;
         _restaurantNotification = restaurantNotification;
         _settlementService = settlementService;
+        _publisher = publisher;
         _currentUserAccessor = currentUserAccessor;
         _logger = logger;
     }
@@ -280,6 +285,12 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
                 assignment.OrderNo,
                 requireBundle ? "기사가 묶음 배달을 수락했습니다." : "기사가 배달을 수락했습니다.",
                 cancellationToken);
+            await PublishCommunityActivityAsync(
+                assignment.Queue.의뢰Id,
+                assignment.OrderNo,
+                "기사배정",
+                assignment.Queue.UpdatedAt,
+                cancellationToken);
         }
 
         return Result.Ok(new FoodDeliveryDriverActionResponse
@@ -449,6 +460,12 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
         {
             await SyncLedgersAsync(stateChange.Queue, stateChange.OrderNo, driverId, cancellationToken);
             await NotifyRestaurantAsync(stateChange.OrderNo, reason, cancellationToken);
+            await PublishCommunityActivityAsync(
+                stateChange.Queue.의뢰Id,
+                stateChange.OrderNo,
+                nextOrderState,
+                stateChange.Queue.UpdatedAt,
+                cancellationToken);
         }
 
         return Result.Ok(stateChange.Response);
@@ -590,6 +607,34 @@ public sealed class 음식배달기사업무Service : I음식배달기사업무S
                 ex,
                 "음식 배달 상태 변경 후 음식점 실시간 알림에 실패했습니다. OrderNo={OrderNo}",
                 orderNo);
+        }
+    }
+
+    private async Task PublishCommunityActivityAsync(
+        string deliveryId,
+        string orderNo,
+        string status,
+        DateTime occurredAtUtc,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _publisher.Publish(
+                new 음식배달인계상태변경됨Event(
+                    deliveryId,
+                    orderNo,
+                    status,
+                    occurredAtUtc,
+                    $"food-delivery:{deliveryId}:{status}:{occurredAtUtc.Ticks}"),
+                cancellationToken);
+        }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(
+                ex,
+                "음식 배달 상태 변경 후 커뮤니티 활동 신호 발행에 실패했습니다. OrderNo={OrderNo}, Status={Status}",
+                orderNo,
+                status);
         }
     }
 

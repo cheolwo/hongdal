@@ -75,6 +75,19 @@ public sealed class PlatformLedgerRefreshPolicyCompositionTests
         Assert.Contains("ShipperUserId = notification.화주Id", source);
     }
 
+    [Fact]
+    public void 음식점수락후생성된배차대기는_관련자원장실시간재조회신호를발행한다()
+    {
+        var source = Read(
+            "Ssalddel",
+            "Application/Food/Handlers/음식점수락후배차대기생성EventHandler.cs");
+
+        Assert.Contains("ITransportRequestLedgerRealtimeService transportLedgerRealtimeService", source);
+        Assert.Contains("transportLedgerRealtimeService.PublishAsync(", source);
+        Assert.Contains("order.주문번호", source);
+        Assert.Contains("nameof(음식점주문수락됨Event)", source);
+    }
+
     private static string Read(string project, string relativePath)
         => File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),

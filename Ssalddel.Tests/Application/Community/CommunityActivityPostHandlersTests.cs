@@ -6,7 +6,9 @@ using Ssalddel.Application.CommonContents.Commands;
 using Ssalddel.Application.Community;
 using Ssalddel.Application.Community.Handlers;
 using Ssalddel.Application.Driver.Transport;
+using Ssalddel.Application.Food.Events;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Food;
 using Ssalddel.Contracts.CommonContents;
 
 namespace Ssalddel.Tests.Application.Community;
@@ -50,6 +52,48 @@ public sealed class CommunityActivityPostHandlersTests
         await handler.Handle(new UnselectedEvent(), CancellationToken.None);
 
         Assert.Empty(publisher.Publications);
+    }
+
+    [Fact]
+    public async Task EventHandler_PublishesFoodDeliveryReceiptToHandoffBoard()
+    {
+        var publisher = new RecordingActivityPublisher();
+        var handler = new CommunityActivityEventPostEventHandler<주문자음식주문수령확인됨Event>(
+            publisher,
+            NullLogger<CommunityActivityEventPostEventHandler<주문자음식주문수령확인됨Event>>.Instance);
+        var notification = new 주문자음식주문수령확인됨Event(
+            new 음식주문응답 { 주문번호 = "FOOD-PRIVATE" },
+            "orderer-private",
+            "문 앞 수령",
+            DateTime.UtcNow,
+            "event-private");
+
+        await handler.Handle(notification, CancellationToken.None);
+
+        var publication = Assert.Single(publisher.Publications);
+        Assert.Equal(CommunityActivityBoardKeys.FoodDeliveryHandoff, publication.Definition.Board.Key);
+        Assert.Same(notification, publication.Occurrence);
+    }
+
+    [Fact]
+    public async Task EventHandler_PublishesFoodDeliveryHandoffStatusChange()
+    {
+        var publisher = new RecordingActivityPublisher();
+        var handler = new CommunityActivityEventPostEventHandler<음식배달인계상태변경됨Event>(
+            publisher,
+            NullLogger<CommunityActivityEventPostEventHandler<음식배달인계상태변경됨Event>>.Instance);
+        var notification = new 음식배달인계상태변경됨Event(
+            "delivery-41",
+            "order-41",
+            "픽업완료",
+            DateTime.UtcNow,
+            "event-41");
+
+        await handler.Handle(notification, CancellationToken.None);
+
+        var publication = Assert.Single(publisher.Publications);
+        Assert.Equal(CommunityActivityBoardKeys.FoodDeliveryHandoff, publication.Definition.Board.Key);
+        Assert.Same(notification, publication.Occurrence);
     }
 
     [Fact]

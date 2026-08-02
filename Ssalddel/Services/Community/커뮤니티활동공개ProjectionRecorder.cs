@@ -19,7 +19,8 @@ public interface I커뮤니티활동공개ProjectionRecorder
 
 public sealed class 커뮤니티활동공개ProjectionRecorder(
     SsalddelContext db,
-    TimeProvider timeProvider) : I커뮤니티활동공개ProjectionRecorder
+    TimeProvider timeProvider,
+    ICommunityAutomatedPostPublisher? automatedPostPublisher = null) : I커뮤니티활동공개ProjectionRecorder
 {
     private static readonly JsonSerializerOptions IdentityJsonOptions =
         new(JsonSerializerDefaults.Web);
@@ -106,6 +107,11 @@ public sealed class 커뮤니티활동공개ProjectionRecorder(
             try
             {
                 await db.SaveChangesAsync(cancellationToken);
+                await PublishAggregatePostIfEligibleAsync(
+                    definition,
+                    projection,
+                    bucketStartUtc,
+                    cancellationToken);
                 return;
             }
             catch (DbUpdateException) when (attempt == 0)
@@ -113,6 +119,56 @@ public sealed class 커뮤니티활동공개ProjectionRecorder(
                 DetachProjectionEntries(db);
             }
         }
+    }
+
+    private async Task PublishAggregatePostIfEligibleAsync(
+        CommunityActivityBoardDefinition definition,
+        커뮤니티활동공개Projection projection,
+        DateTime bucketStartUtc,
+        CancellationToken cancellationToken)
+    {
+        if (automatedPostPublisher is null
+            || projection.ActivityCount != 커뮤니티활동공개Policy.최소공개활동수)
+        {
+            return;
+        }
+
+        await automatedPostPublisher.PublishIfMissingAsync(
+            BuildAggregatePostDraft(definition, bucketStartUtc),
+            cancellationToken);
+    }
+
+    internal static CommunityAutomatedPostDraft BuildAggregatePostDraft(
+        CommunityActivityBoardDefinition definition,
+        DateTime bucketStartUtc)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+
+        var normalizedBucketStartUtc = 커뮤니티활동공개Policy.주간시작Utc(bucketStartUtc);
+        var occurrenceKey = Hash(string.Join(
+            "\n",
+            definition.Board.Key,
+            definition.SourceKind,
+            definition.SourceName,
+            normalizedBucketStartUtc.ToString("O")));
+        var body = string.Join(
+            Environment.NewLine,
+            "[자동 활동 요약]",
+            definition.PublicActivitySummary,
+            $"기준 주간: {커뮤니티활동공개Policy.주간표시(normalizedBucketStartUtc)}",
+            $"동일 활동이 공개 최소 기준 {커뮤니티활동공개Policy.최소공개활동수}건을 충족해 자동으로 게시했습니다.",
+            "이 글은 업무 흐름을 알리는 비식별 집계이며, 참여자, 업체, 연락처, 상세 주소, 위치, 금액, 주문·운송 식별자와 원본 payload를 포함하지 않습니다.",
+            "개별 주문·배차·운송의 진행 상황은 권한 있는 업무 화면과 알림에서만 확인합니다.");
+
+        return new CommunityAutomatedPostDraft(
+            CommunityAutomatedPostSourceKeys.ActivityDigest,
+            $"activity-{normalizedBucketStartUtc:yyyyMMdd}-{occurrenceKey}",
+            definition.Board.DisplayName,
+            definition.ProductName,
+            "비식별 활동 집계",
+            $"[자동 활동 요약] {definition.ActivityDisplayName}",
+            body,
+            "살뜰 활동 요약봇");
     }
 
     private DateTime ResolveOccurredAtUtc(object occurrence)
