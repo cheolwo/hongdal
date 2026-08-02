@@ -5,11 +5,12 @@
              xmlns:components="clr-namespace:SsalddelApp.Components"
              x:Class="SsalddelApp.MainPage">
 
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+    <BlazorWebView x:Name="blazorWebView"
+                   HostPage="wwwroot/index.html"
+                   StartPath="/community">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app"
-                           ComponentType="{x:Type components:Routes}"
-                           StartPath="/community" />
+                           ComponentType="{x:Type components:Routes}" />
         </BlazorWebView.RootComponents>
     </BlazorWebView>
 
