@@ -32,6 +32,7 @@ builder.Services.AddScoped<WebAuthSessionService>();
 builder.Services.AddScoped<I주문자앱인증Service, WebOrdererAuthenticationService>();
 builder.Services.AddScoped<CommunityPersonalPreferenceService>();
 builder.Services.AddScoped<커뮤니티세계지도Client>();
+builder.Services.AddScoped<GoogleMapsBrowserRuntimeClient>();
 builder.Services.AddScoped<OrdererBetaReadinessService>();
 builder.Services.AddScoped<PreviewBuildManifestService>();
 builder.Services.AddTransient<CommunityPersonalPageViewModel>();

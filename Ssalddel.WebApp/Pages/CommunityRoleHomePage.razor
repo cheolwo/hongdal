@@ -7,6 +7,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @inject 커뮤니티세계지도Client WorldMapClient
+@inject GoogleMapsBrowserRuntimeClient GoogleMapsRuntimeClient
 
 <PageTitle>@(IsNightLearning ? "밤의 알아차림 지도" : "낮의 생활·업무 지도") · 살뜰</PageTitle>
 
@@ -39,20 +40,13 @@
         <aside class="world-community-home__map-controls" aria-label="지도 데이터와 레이어 조작">
         <div class="world-community-home__dataset-switch" role="group" aria-label="지도 데이터셋 선택">
             <button type="button"
-                    class="@(!IsNightLearning ? "is-active" : null)"
-                    aria-pressed="@(!IsNightLearning)"
-                    @onclick="() => SelectDataset(MapDatasetMode.DayWork)">
-                <span aria-hidden="true">☀</span>
-                <strong>낮 · 생활과 업무</strong>
-                <small>지역·가격·유통 근거</small>
-            </button>
-            <button type="button"
-                    class="@(IsNightLearning ? "is-active" : null)"
+                    class="is-active"
                     aria-pressed="@IsNightLearning"
-                    @onclick="() => SelectDataset(MapDatasetMode.NightLearning)">
-                <span aria-hidden="true">☾</span>
-                <strong>밤 · 알아차림과 성찰</strong>
-                <small>생각·마음·경전 자료</small>
+                    aria-label="@DatasetToggleAriaLabel"
+                    @onclick="ToggleDatasetAsync">
+                <span aria-hidden="true">@(IsNightLearning ? "☾" : "☀")</span>
+                <strong>@(IsNightLearning ? "밤 · 알아차림과 성찰" : "낮 · 생활과 업무")</strong>
+                <small>@(IsNightLearning ? "생각·마음·경전 자료" : "지역·가격·유통 근거")</small>
             </button>
         </div>
         <header>
@@ -670,6 +664,11 @@
 
     private bool IsNightLearning => _datasetMode == MapDatasetMode.NightLearning;
 
+    private string DatasetToggleAriaLabel
+        => IsNightLearning
+            ? "현재 밤 · 알아차림과 성찰. 누르면 낮 · 생활과 업무로 전환"
+            : "현재 낮 · 생활과 업무. 누르면 밤 · 알아차림과 성찰로 전환";
+
     private IReadOnlyList<커뮤니티세계지도LayerDto> CurrentLayers
         => _appliedSnapshot?.Layers
            ?? 커뮤니티세계지도LayerCatalog.ForDataset(DatasetCode);
@@ -830,6 +829,7 @@
                 "import",
                 "./js/community-world-google-map.js");
             _googleMapCallback = DotNetObjectReference.Create(this);
+            var runtimeSettings = await GoogleMapsRuntimeClient.TryGetAsync();
             var status = await _googleMapModule.InvokeAsync<string>(
                 "initialize",
                 "community-world-google-map",
@@ -837,7 +837,8 @@
                 DatasetCode,
                 _selectedCountryCode,
                 _selectedObservationId,
-                _googleMapCallback);
+                _googleMapCallback,
+                runtimeSettings);
 
             _googleMapState = status switch
             {
@@ -890,6 +891,9 @@
             replace: true);
         await RefreshMapSnapshotAsync(applyImmediately: true, CancellationToken.None);
     }
+
+    private Task ToggleDatasetAsync()
+        => SelectDataset(IsNightLearning ? MapDatasetMode.DayWork : MapDatasetMode.NightLearning);
 
     private void ToggleLayer(string layerCode)
     {

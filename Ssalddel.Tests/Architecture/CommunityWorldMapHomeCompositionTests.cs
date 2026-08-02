@@ -198,6 +198,8 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("instance.map.data", scriptSource);
         Assert.Contains("auth_referrer_policy", scriptSource);
         Assert.Contains("ssalddelRuntimeConfig", scriptSource);
+        Assert.Contains("suppliedRuntimeConfig", scriptSource);
+        Assert.Contains("GoogleMapsRuntimeClient.TryGetAsync", pageSource);
         Assert.DoesNotContain("AIza", scriptSource);
     }
 
@@ -239,8 +241,8 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("googleMapsAllowedOrigins", mapScriptSource);
         Assert.Contains("blocked-origin", mapScriptSource);
         Assert.True(
-            mapScriptSource.IndexOf("isRuntimeOriginAllowed()", StringComparison.Ordinal)
-            < mapScriptSource.IndexOf("consumeRuntimeValue(\"googleMapsBrowserApiKey\")", StringComparison.Ordinal));
+            mapScriptSource.IndexOf("isRuntimeOriginAllowed(runtimeConfig)", StringComparison.Ordinal)
+            < mapScriptSource.IndexOf("consumeRuntimeValue(runtimeConfig", StringComparison.Ordinal));
         Assert.Contains("delete runtimeConfig[configName]", mapScriptSource);
         Assert.DoesNotContain("ssalddel-google-maps-browser-key", mapScriptSource);
         Assert.DoesNotContain("document.querySelector(`meta", mapScriptSource);
@@ -259,6 +261,29 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("uri.IsLoopback", injectionScriptSource);
         Assert.Contains("ConvertTo-Json -Compress", injectionScriptSource);
         Assert.Contains("runtime-config.js?v=", injectionScriptSource);
+    }
+
+    [Fact]
+    public void 지도낮밤선택은_현재상태를표시하는_단일Toggle이다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+
+        Assert.Equal(1, CountOccurrences(pageSource, "class=\"world-community-home__dataset-switch\""));
+        Assert.Contains("@onclick=\"ToggleDatasetAsync\"", pageSource);
+        Assert.Contains("aria-label=\"@DatasetToggleAriaLabel\"", pageSource);
+        Assert.Contains("현재 낮 · 생활과 업무", pageSource);
+        Assert.Contains("현재 밤 · 알아차림과 성찰", pageSource);
+        Assert.Contains("SelectDataset(IsNightLearning ? MapDatasetMode.DayWork : MapDatasetMode.NightLearning)", pageSource);
+        Assert.DoesNotContain("@onclick=\"() => SelectDataset(MapDatasetMode.DayWork)\"", pageSource);
+        Assert.DoesNotContain("@onclick=\"() => SelectDataset(MapDatasetMode.NightLearning)\"", pageSource);
+        Assert.Contains("grid-template-columns: 1fr", styleSource);
     }
 
     [Fact]

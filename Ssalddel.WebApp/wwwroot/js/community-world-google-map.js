@@ -18,13 +18,21 @@ const nightMapStyle = [
     { featureType: "water", elementType: "geometry", stylers: [{ color: "#17172f" }] }
 ];
 
-export async function initialize(elementId, markers, datasetCode, selectedCode, selectedMarkerId, dotNetReference) {
-    if (!isRuntimeOriginAllowed()) {
+export async function initialize(
+    elementId,
+    markers,
+    datasetCode,
+    selectedCode,
+    selectedMarkerId,
+    dotNetReference,
+    suppliedRuntimeConfig) {
+    const runtimeConfig = suppliedRuntimeConfig ?? globalThis.ssalddelRuntimeConfig;
+    if (!isRuntimeOriginAllowed(runtimeConfig)) {
         return "blocked-origin";
     }
 
     const googleMapsAlreadyLoaded = Boolean(globalThis.google?.maps?.importLibrary);
-    const apiKey = googleMapsAlreadyLoaded ? "" : consumeRuntimeValue("googleMapsBrowserApiKey");
+    const apiKey = googleMapsAlreadyLoaded ? "" : consumeRuntimeValue(runtimeConfig, "browserApiKey", "googleMapsBrowserApiKey");
     if (!googleMapsAlreadyLoaded && !apiKey) {
         return "unconfigured";
     }
@@ -235,8 +243,8 @@ function mapViewportPadding(instance) {
     };
 }
 
-function consumeRuntimeValue(configName) {
-    const runtimeConfig = globalThis.ssalddelRuntimeConfig;
+function consumeRuntimeValue(runtimeConfig, primaryName, legacyName) {
+    const configName = typeof runtimeConfig?.[primaryName] === "string" ? primaryName : legacyName;
     const runtimeValue = runtimeConfig?.[configName];
     if (typeof runtimeValue === "string" && runtimeValue.trim()) {
         const value = runtimeValue.trim();
@@ -255,7 +263,7 @@ function consumeRuntimeValue(configName) {
     return "";
 }
 
-function isRuntimeOriginAllowed() {
+function isRuntimeOriginAllowed(runtimeConfig) {
     const currentOrigin = globalThis.location?.origin;
     const hostname = globalThis.location?.hostname?.toLowerCase();
     const isLocalDevelopment = (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1")
@@ -268,7 +276,7 @@ function isRuntimeOriginAllowed() {
         return false;
     }
 
-    const allowedOrigins = globalThis.ssalddelRuntimeConfig?.googleMapsAllowedOrigins;
+    const allowedOrigins = runtimeConfig?.allowedOrigins ?? runtimeConfig?.googleMapsAllowedOrigins;
     return typeof currentOrigin === "string"
         && Array.isArray(allowedOrigins)
         && allowedOrigins.some(origin => origin === currentOrigin);
