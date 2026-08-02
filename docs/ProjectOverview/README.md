@@ -80,6 +80,7 @@
 | T-14 | [CommunityDynamicTopicDiscovery.md](../Architecture/CommunityDynamicTopicDiscovery.md) | 음식·화물 글을 동적 주제로 투영하고 관련 정보를 연결하는 경계 |
 | T-15 | [UnitedStatesThirdPartyLogisticsProviderDirectory.md](../Architecture/UnitedStatesThirdPartyLogisticsProviderDirectory.md) | 미국 3PL 후보와 규제·제휴·실계약을 분리하는 기준 |
 | T-16 | [ExportLedgerModel.md](../Architecture/ExportLedgerModel.md) | 개별수출과 공동 선적에서 수출자별 원장·서류·실적을 보존하는 기준 |
+| T-17 | [GoogleApiAdoptionProposal.md](../Architecture/GoogleApiAdoptionProposal.md) | 현재 Google 지도·YouTube·FCM·Gemini·Storage 연동을 페이지·업무 프로세스에 연결하고 API별 도입·보류·보안·비용 단계를 정리한 제안 |
 
 ## 관리 원칙
 
