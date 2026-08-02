@@ -1,21 +1,32 @@
 @page "/community/home"
 @using Ssalddel.Contracts.Common.Content
+@using Ssalddel.Ui.Common.Areas.App.Services
+@implements IAsyncDisposable
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject 커뮤니티세계지도Client WorldMapClient
 
-<PageTitle>세계 지역 문화와 농수산물 가격 · 살뜰</PageTitle>
+<PageTitle>@(IsNightLearning ? "밤의 알아차림 지도" : "낮의 생활·업무 지도") · 살뜰</PageTitle>
 
-<main class="world-community-home">
+<main class="@RootClass">
     <header class="world-community-home__hero">
         <div>
-            <span>01 · 공개 커뮤니티</span>
-            <h1>세계 지도를 보며<br />지역의 삶과 가격을 알아봐요</h1>
+            <span>01 · @(IsNightLearning ? "밤의 가벼운 알아차림" : "낮의 생활·업무")</span>
+            <h1>세계 지도를 보며<br />@(IsNightLearning ? "가볍게 알아차려봐요" : "지역의 삶과 일을 알아봐요")</h1>
             <p>
-                지도의 지역을 고르면 생활문화와 특산물을 먼저 이해하고,
-                농수산물 가격은 출처·기준 시각·통화·거래 단위를 함께 확인할 수 있습니다.
+                @if (IsNightLearning)
+                {
+                    <text>밤 지도는 관심사나 학습 목표를 먼저 정하지 않아도 철학·심리·윤리·마음챙김·경전 관련 공개 자료를 가볍게 알아차릴 수 있게 보여줍니다. 지도 위치는 자료 제공 채널의 국가 맥락이며 사상·경전의 기원이나 우열을 뜻하지 않습니다.</text>
+                }
+                else
+                {
+                    <text>낮 지도는 지역 문화·가격·유통 근거처럼 생활과 업무 판단에 필요한 자료를 보여줍니다. 가격 자료는 출처·기준 시각·통화·거래 단위를 함께 표시하고, 조회와 실제 주문·계약·배차는 계속 분리합니다.</text>
+                }
             </p>
         </div>
         <nav aria-label="커뮤니티 바로가기">
-            <a class="world-community-home__primary-link" href="@AppRelative(RegionalCultureSpecialtyRoutes.Browse)">
-                지역 자료 전체 보기
+            <a class="world-community-home__primary-link" href="@(IsNightLearning ? "#world-map-results" : AppRelative(RegionalCultureSpecialtyRoutes.Browse))">
+                @(IsNightLearning ? "지도 가볍게 둘러보기" : "지역 자료 전체 보기")
                 <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
             </a>
             <a href="@AppRelative(CommunityPageRoutes.BoardDirectory)">커뮤니티 대화 보기</a>
@@ -23,10 +34,28 @@
     </header>
 
     <section class="world-community-home__map-panel" aria-labelledby="world-map-heading">
+        <div class="world-community-home__dataset-switch" role="group" aria-label="지도 데이터셋 선택">
+            <button type="button"
+                    class="@(!IsNightLearning ? "is-active" : null)"
+                    aria-pressed="@(!IsNightLearning)"
+                    @onclick="() => SelectDataset(MapDatasetMode.DayWork)">
+                <span aria-hidden="true">☀</span>
+                <strong>낮 · 생활과 업무</strong>
+                <small>지역·가격·유통 근거</small>
+            </button>
+            <button type="button"
+                    class="@(IsNightLearning ? "is-active" : null)"
+                    aria-pressed="@IsNightLearning"
+                    @onclick="() => SelectDataset(MapDatasetMode.NightLearning)">
+                <span aria-hidden="true">☾</span>
+                <strong>밤 · 알아차림과 성찰</strong>
+                <small>생각·마음·경전 자료</small>
+            </button>
+        </div>
         <header>
             <div>
-                <span>WORLD EXPLORER</span>
-                <h2 id="world-map-heading">어느 지역을 들여다볼까요?</h2>
+                <span>@(IsNightLearning ? "NIGHT AWARENESS ATLAS" : "DAY WORK EXPLORER")</span>
+                <h2 id="world-map-heading">@(IsNightLearning ? "어느 지역의 이야기를 가볍게 알아차려볼까요?" : "어느 지역의 업무 근거를 들여다볼까요?")</h2>
             </div>
             <div class="world-community-home__legend" aria-label="지도 자료 상태">
                 <span><i class="is-ready" aria-hidden="true"></i>자료 연결</span>
@@ -34,52 +63,115 @@
             </div>
         </header>
 
-        <div class="world-community-home__map-scroll" tabindex="0" aria-label="세계 지도. 작은 화면에서는 좌우로 이동할 수 있습니다.">
-            <div class="world-community-home__map">
-                <svg viewBox="0 0 1000 500"
-                     role="img"
-                     aria-labelledby="world-map-title world-map-description"
-                     preserveAspectRatio="xMidYMid meet">
-                    <title id="world-map-title">지역 문화와 농수산물 가격 탐색 세계 지도</title>
-                    <desc id="world-map-description">대한민국, 미국, 중국, 호주에 자료가 연결되어 있으며 다른 지역은 준비 중입니다.</desc>
-                    <g class="world-community-home__graticule" aria-hidden="true">
-                        <path d="M0 125 H1000 M0 250 H1000 M0 375 H1000" />
-                        <path d="M200 0 V500 M400 0 V500 M600 0 V500 M800 0 V500" />
-                    </g>
-                    <g class="world-community-home__continents" aria-hidden="true">
-                        <path d="M64 94 L128 52 L221 58 L286 95 L274 128 L235 147 L222 190 L180 212 L142 188 L110 146 L77 133 Z" />
-                        <path d="M225 217 L282 226 L312 270 L295 331 L268 392 L241 423 L226 370 L205 315 L198 260 Z" />
-                        <path d="M424 104 L467 85 L514 98 L526 126 L498 144 L456 140 L427 123 Z" />
-                        <path d="M447 154 L516 156 L555 214 L539 286 L501 357 L461 330 L434 264 L421 201 Z" />
-                        <path d="M516 91 L603 63 L707 78 L785 112 L875 120 L920 168 L882 210 L805 206 L755 179 L702 194 L643 170 L590 180 L548 145 Z" />
-                        <path d="M760 306 L825 287 L884 309 L897 353 L866 388 L795 381 L753 345 Z" />
-                        <path d="M341 39 L389 18 L431 40 L415 75 L365 78 Z" />
-                    </g>
-                    <g class="world-community-home__preparing-labels" aria-hidden="true">
-                        <text x="255" y="305">남아메리카 · 준비 중</text>
-                        <text x="471" y="256">아프리카 · 준비 중</text>
-                        <text x="475" y="116">유럽 · 준비 중</text>
-                    </g>
-                </svg>
-
-                @foreach (var country in MapCountries)
+        <div class="world-community-home__layer-bar" aria-label="지도 분야 레이어 선택">
+            <div>
+                <strong>지도에 표시할 분야</strong>
+                <small>여러 분야를 함께 켜도 지도는 한 개만 유지됩니다.</small>
+            </div>
+            <div class="world-community-home__layer-options">
+                @foreach (var layer in CurrentLayers)
                 {
                     <button type="button"
-                            class="@MapHotspotClass(country)"
-                            aria-pressed="@IsSelected(country.Code)"
-                            aria-controls="world-map-results"
-                            @onclick="() => SelectCountry(country.Code)">
-                        <span aria-hidden="true"></span>
-                        <strong>@country.Name</strong>
-                        <small>@country.DataLabel</small>
+                            class="@(IsLayerSelected(layer.Code) ? "is-active" : null)"
+                            style="--layer-color: @layer.Color"
+                            aria-pressed="@IsLayerSelected(layer.Code).ToString().ToLowerInvariant()"
+                            title="@layer.Description"
+                            @onclick="() => ToggleLayer(layer.Code)">
+                        <i class="world-community-home__layer-shape world-community-home__layer-shape--@layer.MarkerShape" aria-hidden="true"></i>
+                        @layer.DisplayName
                     </button>
+                }
+            </div>
+        </div>
+
+        @if (_pendingSnapshot is not null)
+        {
+            <div class="world-community-home__freshness world-community-home__freshness--pending" role="status">
+                <div>
+                    <strong>새 지도 자료가 도착했습니다.</strong>
+                    <span>@(_newObservationCount > 0 ? $"새 항목 {_newObservationCount}건" : "기존 항목의 내용·근거 변경") · 현재 지도 위치는 유지 중</span>
+                </div>
+                <button type="button" @onclick="ApplyPendingSnapshot">새 자료 지도에 반영</button>
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(_snapshotConnectionMessage))
+        {
+            <div class="world-community-home__freshness world-community-home__freshness--warning" role="status">
+                <strong>자동 갱신 연결 안 됨</strong>
+                <span>@_snapshotConnectionMessage</span>
+            </div>
+        }
+        else if (_lastSnapshotCheckedAt is not null)
+        {
+            <p class="world-community-home__refresh-note">
+                공개 자료 자동 확인 · 마지막 확인 @_lastSnapshotCheckedAt.Value.ToLocalTime().ToString("HH:mm:ss")
+            </p>
+        }
+
+        <div class="world-community-home__map-scroll" tabindex="0" aria-label="세계 지도. 작은 화면에서는 좌우로 이동할 수 있습니다.">
+            <div class="world-community-home__map">
+                <div id="community-world-google-map"
+                     class="world-community-home__google-map @(_googleMapState == GoogleMapState.Ready ? "is-ready" : null)"
+                     role="application"
+                     aria-hidden="@(_googleMapState == GoogleMapState.Ready ? "false" : "true")"
+                     aria-label="@(IsNightLearning ? "Google 지도에서 밤의 공개 자료 알아차리기" : "Google 지도에서 낮의 생활·업무 자료 지역 선택")">
+                </div>
+
+                @if (_googleMapState != GoogleMapState.Ready)
+                {
+                    <svg viewBox="0 0 1000 500"
+                         role="img"
+                         aria-labelledby="world-map-title world-map-description"
+                         preserveAspectRatio="xMidYMid meet">
+                        <title id="world-map-title">@(IsNightLearning ? "생각·성찰·경전 공개 자료 알아차림 세계 지도" : "생활·업무 근거 탐색 세계 지도")</title>
+                        <desc id="world-map-description">@(IsNightLearning ? "공개 자료 채널의 제공 국가를 기준으로 가볍게 알아차립니다." : "대한민국, 미국, 중국, 호주에 생활·업무 판단 자료가 연결되어 있습니다.")</desc>
+                        <g class="world-community-home__graticule" aria-hidden="true">
+                            <path d="M0 125 H1000 M0 250 H1000 M0 375 H1000" />
+                            <path d="M200 0 V500 M400 0 V500 M600 0 V500 M800 0 V500" />
+                        </g>
+                        <g class="world-community-home__continents" aria-hidden="true">
+                            <path d="M64 94 L128 52 L221 58 L286 95 L274 128 L235 147 L222 190 L180 212 L142 188 L110 146 L77 133 Z" />
+                            <path d="M225 217 L282 226 L312 270 L295 331 L268 392 L241 423 L226 370 L205 315 L198 260 Z" />
+                            <path d="M424 104 L467 85 L514 98 L526 126 L498 144 L456 140 L427 123 Z" />
+                            <path d="M447 154 L516 156 L555 214 L539 286 L501 357 L461 330 L434 264 L421 201 Z" />
+                            <path d="M516 91 L603 63 L707 78 L785 112 L875 120 L920 168 L882 210 L805 206 L755 179 L702 194 L643 170 L590 180 L548 145 Z" />
+                            <path d="M760 306 L825 287 L884 309 L897 353 L866 388 L795 381 L753 345 Z" />
+                            <path d="M341 39 L389 18 L431 40 L415 75 L365 78 Z" />
+                        </g>
+                        <g class="world-community-home__preparing-labels" aria-hidden="true">
+                            <text x="255" y="305">남아메리카 · 준비 중</text>
+                            <text x="471" y="256">아프리카 · 준비 중</text>
+                            <text x="475" y="116">유럽 · 준비 중</text>
+                        </g>
+                    </svg>
+
+                    @foreach (var country in FallbackMapMarkers)
+                    {
+                        <button type="button"
+                                class="@MapHotspotClass(country.Code)"
+                                aria-pressed="@IsSelected(country.Code)"
+                                aria-controls="world-map-results"
+                                @onclick="() => SelectCountry(country.Code)">
+                            <span aria-hidden="true"></span>
+                            <strong>@country.Name</strong>
+                            <small>@country.DataLabel</small>
+                        </button>
+                    }
+
+                    <span class="world-community-home__map-provider-status">
+                        @(_googleMapState == GoogleMapState.Failed
+                            ? "Google 지도 연결 실패 · 개략도 표시"
+                            : "Google 지도 설정 전 · 개략도 표시")
+                    </span>
                 }
             </div>
         </div>
 
         <p class="world-community-home__map-note">
             지도는 자료를 찾기 위한 개략도이며 국경·영유권 판단의 기준이 아닙니다.
-            활성 지역도 모든 품목을 뜻하지 않으며, 연결된 공식 관측 범위만 보여줍니다.
+            @(IsNightLearning
+                ? "밤 지도의 위치는 자료 제공자의 국가 맥락일 뿐, 사상·경전의 기원이나 신앙 분류가 아닙니다."
+                : "활성 지역도 모든 품목을 뜻하지 않으며, 연결된 공식 관측 범위만 보여줍니다.")
         </p>
     </section>
 
@@ -89,23 +181,107 @@
              aria-live="polite">
         <header>
             <div>
-                <span>@(SelectedCountry is null ? "연결된 지역" : SelectedCountry.Continent)</span>
+                <span>@ResultEyebrow</span>
                 <h2 id="world-map-results-heading">
-                    @(SelectedCountry is null ? "현재 살펴볼 수 있는 지역" : $"{SelectedCountry.Name} 자료")
+                    @ResultTitle
                 </h2>
-                <p>
-                    @(SelectedCountry is null
-                        ? "문화 자료와 가격 관측의 준비 상태를 지역별로 확인하세요."
-                        : SelectedCountry.Summary)
-                </p>
+                <p>@ResultSummary</p>
             </div>
-            @if (SelectedCountry is not null)
+            @if (_selectedCountryCode is not null)
             {
                 <button type="button" @onclick="ShowAllCountries">세계 전체 보기</button>
             }
         </header>
 
-        @if (SelectedCountry is null)
+        @if (VisibleObservations.Count > 0)
+        {
+            <div class="world-community-home__observation-grid" aria-label="선택한 분야의 공개 지도 자료">
+                @foreach (var observation in VisibleObservations)
+                {
+                    var layer = LayerFor(observation.LayerCode);
+                    <article class="world-community-home__observation-card" style="--layer-color: @(layer?.Color ?? "#60706b")">
+                        <header>
+                            <span>@(layer?.DisplayName ?? observation.LayerCode) · @observation.CountryName</span>
+                            <h3>@observation.Title</h3>
+                        </header>
+                        <p>@observation.Summary</p>
+                        <footer>
+                            <small>
+                                @observation.SourceName
+                                · @(observation.EvidenceAsOfUtc is null ? "확인 시각은 상세에서 확인" : $"{observation.EvidenceAsOfUtc.Value:yyyy-MM-dd} 확인")
+                            </small>
+                            <a href="@ObservationHref(observation)"
+                               target="@(IsExternalHref(observation.DetailHref) ? "_blank" : null)"
+                               rel="@(IsExternalHref(observation.DetailHref) ? "noopener noreferrer" : null)">
+                                상세 근거 보기
+                            </a>
+                        </footer>
+                    </article>
+                }
+            </div>
+        }
+
+        @if (IsNightLearning)
+        {
+            @if (SelectedLearningCountry is null)
+            {
+                <div class="world-community-home__country-grid">
+                    @foreach (var country in LearningMapCountries)
+                    {
+                        <article class="world-community-home__country-card world-community-home__country-card--learning">
+                            <header>
+                                <span>@country.Code · @country.Continent</span>
+                                <h3>@country.Name</h3>
+                            </header>
+                            <p>@country.Summary</p>
+                            <dl>
+                                <div><dt>공개 채널</dt><dd>@country.Channels.Count 개</dd></div>
+                                <div><dt>자료 갈래</dt><dd>@country.TopicCount 개</dd></div>
+                            </dl>
+                            <button type="button" @onclick="() => SelectCountry(country.Code)">밤 지도에서 가볍게 알아차리기</button>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="world-community-home__learning-grid">
+                    @foreach (var channel in SelectedLearningCountry.Channels)
+                    {
+                        <article class="world-community-home__learning-card">
+                            <header>
+                                <span>@channel.국가코드 · @channel.기본언어코드.ToUpperInvariant()</span>
+                                <h3>@channel.표시이름</h3>
+                                <small>@channel.관점표시</small>
+                            </header>
+                            <p>@string.Join(" · ", channel.주제코드목록.Select(TopicName))</p>
+                            <small>자료 확인 @channel.자료확인일시Utc.ToString("yyyy-MM-dd")</small>
+                            <a href="@channel.공식출처Url" target="_blank" rel="noopener noreferrer">
+                                공개 채널 가볍게 둘러보기
+                                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
+                            </a>
+                        </article>
+                    }
+                    @foreach (var scripture in SelectedLearningCountry.Scriptures)
+                    {
+                        <article class="world-community-home__learning-card world-community-home__learning-card--scripture">
+                            <header>
+                                <span>@scripture.TraditionLabel · 경전·고전</span>
+                                <h3><b>@scripture.Symbol</b> @scripture.ScriptureTitle</h3>
+                                <small>@scripture.PackTitle</small>
+                            </header>
+                            <p>@scripture.Summary</p>
+                            <small>공개 재생목록 @(scripture.Playlists.Count)개 연결</small>
+                            <a href="@scripture.Playlists[0].Url" target="_blank" rel="noopener noreferrer">
+                                관련 공개 강의 보기
+                                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
+                            </a>
+                        </article>
+                    }
+                </div>
+            }
+        }
+        else if (SelectedCountry is null)
         {
             <div class="world-community-home__country-grid">
                 @foreach (var country in MapCountries)
@@ -188,17 +364,38 @@
     </section>
 
     <aside class="world-community-home__boundary">
-        <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" />
+        <MudIcon Icon="@(IsNightLearning ? Icons.Material.Filled.AutoStories : Icons.Material.Filled.VerifiedUser)" />
         <div>
-            <strong>알아보는 일과 거래하는 일은 분리합니다.</strong>
-            <p>이 화면의 지역 선택은 조회 조건일 뿐 자동 가입·상대 추천·주문·수입·배차를 만들지 않습니다.</p>
+            <strong>@(IsNightLearning ? "알아차림과 신앙·관점의 강요를 분리합니다." : "알아보는 일과 거래하는 일은 분리합니다.")</strong>
+            <p>
+                @(IsNightLearning
+                    ? "종교·철학·국적은 사용자 점수나 추천 순위에 쓰지 않습니다. 자료를 알아차린 사실을 관심·동의로 간주하지 않으며 진리·권위·공식 제휴도 보증하지 않습니다."
+                    : "이 화면의 지역 선택은 조회 조건일 뿐 자동 가입·상대 추천·주문·수입·배차를 만들지 않습니다.")
+            </p>
         </div>
         <a href="@AppRelative(CommunityPageRoutes.BoardDirectory)">게시판 모음</a>
     </aside>
 </main>
 
 @code {
+    [SupplyParameterFromQuery(Name = "dataset")]
+    public string? Dataset { get; set; }
+
     private string? _selectedCountryCode;
+    private MapDatasetMode _datasetMode = MapDatasetMode.DayWork;
+    private GoogleMapState _googleMapState = GoogleMapState.Loading;
+    private IJSObjectReference? _googleMapModule;
+    private DotNetObjectReference<CommunityRoleHomePage>? _googleMapCallback;
+    private bool _pendingGoogleMapUpdate = true;
+    private readonly HashSet<string> _selectedLayerCodes = new(StringComparer.Ordinal);
+    private readonly SemaphoreSlim _snapshotRefreshGate = new(1, 1);
+    private 커뮤니티세계지도SnapshotDto? _appliedSnapshot;
+    private 커뮤니티세계지도SnapshotDto? _pendingSnapshot;
+    private CancellationTokenSource? _pollingCts;
+    private Task? _pollingTask;
+    private DateTimeOffset? _lastSnapshotCheckedAt;
+    private string? _snapshotConnectionMessage;
+    private int _newObservationCount;
 
     private static readonly IReadOnlyList<CommunityMapCountry> MapCountries =
     [
@@ -209,8 +406,8 @@
             "Maine·Georgia·California 문화 자료와 USDA 가격 관측을 연결합니다.",
             "지역 문화 + 가격",
             "USDA NASS",
-            "information/usda-us-price-comparison",
-            "미국 가격 확인",
+            커뮤니티세계지도Routes.UnitedStatesPriceDetail,
+            "미국 가격 화면 보기",
             RegionalCultureSpecialtyCatalog.ForCountry(RegionalCultureSpecialtyCatalog.UnitedStatesCountryCode)),
         new(
             "CN",
@@ -229,8 +426,8 @@
             "KAMIS 국내 유통단계 가격을 원문 품목과 거래 단위 그대로 확인합니다.",
             "가격 자료 연결",
             "KAMIS · aT",
-            "information/kamis-domestic-price-comparison",
-            "KAMIS 가격 확인",
+            커뮤니티세계지도Routes.KoreaPriceDetail,
+            "한국 가격 화면 보기",
             []),
         new(
             "AU",
@@ -244,21 +441,351 @@
             [])
     ];
 
+    private static readonly IReadOnlyList<LearningMapCountry> LearningMapCountries = BuildLearningMapCountries();
+
+    private bool IsNightLearning => _datasetMode == MapDatasetMode.NightLearning;
+
+    private IReadOnlyList<커뮤니티세계지도LayerDto> CurrentLayers
+        => _appliedSnapshot?.Layers
+           ?? 커뮤니티세계지도LayerCatalog.ForDataset(DatasetCode);
+
+    private IReadOnlyList<GoogleMapMarker> CurrentMapMarkers
+        => _appliedSnapshot is null
+            ? BuildCatalogFallbackMarkers()
+            : _appliedSnapshot.Observations
+                .Where(observation => IsLayerSelected(observation.LayerCode))
+                .Select(GoogleMapMarker.FromObservation)
+                .ToArray();
+
+    private IReadOnlyList<GoogleMapMarker> FallbackMapMarkers
+        => CurrentMapMarkers
+            .GroupBy(marker => marker.Code, StringComparer.Ordinal)
+            .Select(group =>
+            {
+                var first = group.First();
+                return first with
+                {
+                    Id = $"fallback:{first.Code}",
+                    DataLabel = group.Count() == 1 ? first.DataLabel : $"자료 {group.Count()}건"
+                };
+            })
+            .ToArray();
+
+    private IReadOnlyList<커뮤니티세계지도ObservationDto> VisibleObservations
+        => _appliedSnapshot?.Observations
+            .Where(observation => IsLayerSelected(observation.LayerCode))
+            .Where(observation => _selectedCountryCode is null
+                                  || string.Equals(observation.CountryCode, _selectedCountryCode, StringComparison.Ordinal))
+            .OrderBy(observation => observation.CountryName, StringComparer.Ordinal)
+            .ThenBy(observation => observation.Title, StringComparer.Ordinal)
+            .ToArray()
+           ?? [];
+
+    private string RootClass
+        => IsNightLearning
+            ? "world-community-home world-community-home--night"
+            : "world-community-home world-community-home--day";
+
     private CommunityMapCountry? SelectedCountry
-        => MapCountries.FirstOrDefault(country => country.Code == _selectedCountryCode);
+        => IsNightLearning
+            ? null
+            : MapCountries.FirstOrDefault(country => country.Code == _selectedCountryCode);
 
-    private void SelectCountry(string countryCode)
-        => _selectedCountryCode = countryCode;
+    private LearningMapCountry? SelectedLearningCountry
+        => IsNightLearning
+            ? LearningMapCountries.FirstOrDefault(country => country.Code == _selectedCountryCode)
+            : null;
 
-    private void ShowAllCountries()
-        => _selectedCountryCode = null;
+    private string ResultEyebrow
+        => IsNightLearning
+            ? SelectedLearningCountry?.Continent ?? "가볍게 둘러보는 지역"
+            : SelectedCountry?.Continent ?? "연결된 업무 지역";
+
+    private string ResultTitle
+        => IsNightLearning
+            ? SelectedLearningCountry is null
+                ? "지금 알아차릴 수 있는 공개 자료"
+                : $"{SelectedLearningCountry.Name}에서 알아차리는 공개 자료"
+            : SelectedCountry is null
+                ? "현재 살펴볼 수 있는 생활·업무 자료"
+                : $"{SelectedCountry.Name} 업무 근거";
+
+    private string ResultSummary
+        => IsNightLearning
+            ? SelectedLearningCountry?.Summary
+              ?? "관심사나 학습 목표로 정하기 전에 지도에 놓인 생각·마음·경전 관련 공개 자료를 가볍게 둘러보세요."
+            : SelectedCountry?.Summary
+              ?? "지역 문화와 가격·유통 관측의 준비 상태를 업무 판단 근거로 확인하세요.";
+
+    protected override void OnParametersSet()
+    {
+        var requestedMode = string.Equals(
+            Dataset,
+            CommunityPageRoutes.WorldMapNightLearningDataset,
+            StringComparison.OrdinalIgnoreCase)
+            ? MapDatasetMode.NightLearning
+            : MapDatasetMode.DayWork;
+        if (_datasetMode != requestedMode)
+        {
+            _datasetMode = requestedMode;
+            _selectedCountryCode = null;
+            _pendingGoogleMapUpdate = true;
+            ResetSnapshotForDataset();
+        }
+
+        EnsureDefaultLayersSelected();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _googleMapModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./js/community-world-google-map.js");
+            _googleMapCallback = DotNetObjectReference.Create(this);
+            var status = await _googleMapModule.InvokeAsync<string>(
+                "initialize",
+                "community-world-google-map",
+                CurrentMapMarkers,
+                DatasetCode,
+                _selectedCountryCode,
+                _googleMapCallback);
+
+            _googleMapState = status switch
+            {
+                "ready" => GoogleMapState.Ready,
+                "failed" => GoogleMapState.Failed,
+                _ => GoogleMapState.Unconfigured
+            };
+            _pendingGoogleMapUpdate = false;
+            _pollingCts = new CancellationTokenSource();
+            _pollingTask = PollMapSnapshotsAsync(_pollingCts.Token);
+            StateHasChanged();
+            return;
+        }
+
+        if (_googleMapState == GoogleMapState.Ready && _pendingGoogleMapUpdate && _googleMapModule is not null)
+        {
+            _pendingGoogleMapUpdate = false;
+            await _googleMapModule.InvokeVoidAsync(
+                "updateDataset",
+                "community-world-google-map",
+                CurrentMapMarkers,
+                DatasetCode,
+                _selectedCountryCode);
+        }
+    }
+
+    private async Task SelectDataset(MapDatasetMode mode)
+    {
+        if (_datasetMode == mode)
+        {
+            return;
+        }
+
+        _datasetMode = mode;
+        _selectedCountryCode = null;
+        _pendingGoogleMapUpdate = true;
+        ResetSnapshotForDataset();
+        EnsureDefaultLayersSelected();
+        var dataset = IsNightLearning
+            ? CommunityPageRoutes.WorldMapNightLearningDataset
+            : null;
+        Navigation.NavigateTo(
+            Navigation.GetUriWithQueryParameter("dataset", dataset),
+            replace: true);
+        await RefreshMapSnapshotAsync(applyImmediately: true, CancellationToken.None);
+    }
+
+    private void ToggleLayer(string layerCode)
+    {
+        if (!_selectedLayerCodes.Add(layerCode))
+        {
+            _selectedLayerCodes.Remove(layerCode);
+        }
+
+        _pendingGoogleMapUpdate = true;
+    }
+
+    private bool IsLayerSelected(string layerCode)
+        => _selectedLayerCodes.Contains(layerCode);
+
+    private 커뮤니티세계지도LayerDto? LayerFor(string layerCode)
+        => CurrentLayers.FirstOrDefault(layer => string.Equals(layer.Code, layerCode, StringComparison.Ordinal));
+
+    private void EnsureDefaultLayersSelected()
+    {
+        if (_selectedLayerCodes.Count > 0)
+        {
+            return;
+        }
+
+        foreach (var layer in 커뮤니티세계지도LayerCatalog.ForDataset(DatasetCode))
+        {
+            _selectedLayerCodes.Add(layer.Code);
+        }
+    }
+
+    private void ResetSnapshotForDataset()
+    {
+        _appliedSnapshot = null;
+        _pendingSnapshot = null;
+        _newObservationCount = 0;
+        _selectedLayerCodes.Clear();
+        _snapshotConnectionMessage = null;
+    }
+
+    private async Task PollMapSnapshotsAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await RefreshMapSnapshotAsync(applyImmediately: false, cancellationToken);
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+        }
+    }
+
+    private async Task RefreshMapSnapshotAsync(bool applyImmediately, CancellationToken cancellationToken)
+    {
+        var requestedDataset = DatasetCode;
+        try
+        {
+            await _snapshotRefreshGate.WaitAsync(cancellationToken);
+            try
+            {
+                var snapshot = await WorldMapClient.조회Async(requestedDataset, cancellationToken);
+                if (!string.Equals(requestedDataset, DatasetCode, StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                await InvokeAsync(() =>
+                {
+                    _lastSnapshotCheckedAt = DateTimeOffset.Now;
+                    _snapshotConnectionMessage = null;
+                    if (applyImmediately || _appliedSnapshot is null)
+                    {
+                        ApplySnapshot(snapshot);
+                    }
+                    else if (!string.Equals(_appliedSnapshot.Revision, snapshot.Revision, StringComparison.Ordinal))
+                    {
+                        var appliedIds = _appliedSnapshot.Observations
+                            .Select(observation => observation.StableId)
+                            .ToHashSet(StringComparer.Ordinal);
+                        _newObservationCount = snapshot.Observations.Count(observation => !appliedIds.Contains(observation.StableId));
+                        _pendingSnapshot = snapshot;
+                    }
+
+                    StateHasChanged();
+                });
+            }
+            finally
+            {
+                _snapshotRefreshGate.Release();
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await InvokeAsync(() =>
+            {
+                _snapshotConnectionMessage = _appliedSnapshot is null
+                    ? "서버 snapshot을 가져오지 못해 현재 내장 공개 카탈로그를 표시합니다."
+                    : "서버 snapshot을 다시 확인하지 못해 마지막으로 연결된 자료를 유지합니다.";
+                StateHasChanged();
+            });
+        }
+    }
+
+    private void ApplyPendingSnapshot()
+    {
+        if (_pendingSnapshot is not null)
+        {
+            ApplySnapshot(_pendingSnapshot);
+        }
+    }
+
+    private void ApplySnapshot(커뮤니티세계지도SnapshotDto snapshot)
+    {
+        _appliedSnapshot = snapshot;
+        _pendingSnapshot = null;
+        _newObservationCount = 0;
+        _pendingGoogleMapUpdate = true;
+        EnsureDefaultLayersSelected();
+    }
+
+    private IReadOnlyList<GoogleMapMarker> BuildCatalogFallbackMarkers()
+        => IsNightLearning
+            ? LearningMapCountries
+                .Where(_ => IsLayerSelected(커뮤니티세계지도LayerCodes.LearningChannel)
+                            || IsLayerSelected(커뮤니티세계지도LayerCodes.ScriptureAndClassics))
+                .Select(country => GoogleMapMarker.For(
+                    $"catalog:{country.Code}",
+                    country.Code,
+                    country.Name,
+                    country.DataLabel,
+                    커뮤니티세계지도LayerCodes.LearningChannel))
+                .ToArray()
+            : MapCountries
+                .Where(country => (country.Regions.Count > 0 && IsLayerSelected(커뮤니티세계지도LayerCodes.RegionalCulture))
+                                  || IsLayerSelected(커뮤니티세계지도LayerCodes.PublicPrice))
+                .Select(country => GoogleMapMarker.For(
+                    $"catalog:{country.Code}",
+                    country.Code,
+                    country.Name,
+                    country.DataLabel,
+                    country.Regions.Count > 0
+                        ? 커뮤니티세계지도LayerCodes.RegionalCulture
+                        : 커뮤니티세계지도LayerCodes.PublicPrice))
+                .ToArray();
+
+    private async Task SelectCountry(string countryCode)
+    {
+        _selectedCountryCode = countryCode;
+        await UpdateGoogleMapSelectionAsync();
+    }
+
+    private async Task ShowAllCountries()
+    {
+        _selectedCountryCode = null;
+        await UpdateGoogleMapSelectionAsync();
+    }
+
+    [JSInvokable]
+    public Task SelectCountryFromGoogleMap(string countryCode)
+        => SelectCountry(countryCode);
+
+    private async Task UpdateGoogleMapSelectionAsync()
+    {
+        if (_googleMapState == GoogleMapState.Ready && _googleMapModule is not null)
+        {
+            await _googleMapModule.InvokeVoidAsync(
+                "updateSelection",
+                "community-world-google-map",
+                _selectedCountryCode);
+        }
+    }
 
     private bool IsSelected(string countryCode)
         => string.Equals(_selectedCountryCode, countryCode, StringComparison.Ordinal);
 
-    private string MapHotspotClass(CommunityMapCountry country)
-        => $"world-community-home__hotspot world-community-home__hotspot--{country.Code.ToLowerInvariant()}"
-           + (IsSelected(country.Code) ? " is-selected" : string.Empty);
+    private string MapHotspotClass(string countryCode)
+        => $"world-community-home__hotspot world-community-home__hotspot--{countryCode.ToLowerInvariant()}"
+           + (IsSelected(countryCode) ? " is-selected" : string.Empty);
 
     private static string CultureConversationHref(CommunityMapCountry country)
         => CommunityPageRoutes.BoardsFor(
@@ -268,6 +795,76 @@
 
     private static string AppRelative(string path)
         => path.TrimStart('/');
+
+    private static bool IsExternalHref(string href)
+        => Uri.TryCreate(href, UriKind.Absolute, out var uri)
+           && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp);
+
+    private static string ObservationHref(커뮤니티세계지도ObservationDto observation)
+        => IsExternalHref(observation.DetailHref)
+            ? observation.DetailHref
+            : AppRelative(observation.DetailHref);
+
+    private string DatasetCode
+        => IsNightLearning
+            ? CommunityPageRoutes.WorldMapNightLearningDataset
+            : CommunityPageRoutes.WorldMapDayWorkDataset;
+
+    private static IReadOnlyList<LearningMapCountry> BuildLearningMapCountries()
+        => YouTube지식성찰채널Catalog.항목
+            .GroupBy(channel => channel.국가코드, StringComparer.Ordinal)
+            .Select(group =>
+            {
+                var channels = group.ToArray();
+                var scriptures = string.Equals(group.Key, "KR", StringComparison.Ordinal)
+                    ? ScriptureDecorationCatalog.Definitions
+                    : [];
+                var perspectives = string.Join(" · ", channels.Select(channel => channel.관점표시).Distinct(StringComparer.Ordinal));
+                return new LearningMapCountry(
+                    group.Key,
+                    CountryName(group.Key),
+                    ContinentName(group.Key),
+                    $"{perspectives} 공개 자료가 있다는 사실부터 가볍게 알아차립니다. 이를 관심·동의나 추천 신호로 기록하지 않습니다.",
+                    $"채널 {channels.Length} · 주제 {channels.SelectMany(channel => channel.주제코드목록).Distinct(StringComparer.Ordinal).Count()}",
+                    channels,
+                    scriptures);
+            })
+            .OrderBy(country => country.Code == "KR" ? 0 : 1)
+            .ThenBy(country => country.Name, StringComparer.Ordinal)
+            .ToArray();
+
+    private static string CountryName(string countryCode)
+        => countryCode switch
+        {
+            "KR" => "대한민국",
+            "US" => "미국",
+            "GB" => "영국",
+            "FR" => "프랑스",
+            "IN" => "인도",
+            _ => countryCode
+        };
+
+    private static string ContinentName(string countryCode)
+        => countryCode switch
+        {
+            "KR" or "IN" => "아시아",
+            "US" => "북아메리카",
+            "GB" or "FR" => "유럽",
+            _ => "세계"
+        };
+
+    private static string TopicName(string topicCode)
+        => topicCode switch
+        {
+            YouTube지식성찰주제코드.자기계발 => "자기계발",
+            YouTube지식성찰주제코드.철학 => "철학",
+            YouTube지식성찰주제코드.심리 => "심리",
+            YouTube지식성찰주제코드.윤리 => "윤리",
+            YouTube지식성찰주제코드.마음챙김 => "마음챙김",
+            YouTube지식성찰주제코드.종교교육 => "종교교육",
+            YouTube지식성찰주제코드.아이디어 => "아이디어",
+            _ => topicCode
+        };
 
     private sealed record CommunityMapCountry(
         string Code,
@@ -279,4 +876,107 @@
         string PriceHref,
         string PriceActionLabel,
         IReadOnlyList<RegionalCultureSpecialty> Regions);
+
+    private sealed record LearningMapCountry(
+        string Code,
+        string Name,
+        string Continent,
+        string Summary,
+        string DataLabel,
+        IReadOnlyList<YouTube지식성찰채널Catalog항목> Channels,
+        IReadOnlyList<ScriptureDecorationDefinition> Scriptures)
+    {
+        public int TopicCount
+            => Channels.SelectMany(channel => channel.주제코드목록).Distinct(StringComparer.Ordinal).Count();
+    }
+
+    private sealed record GoogleMapMarker(
+        string Id,
+        string Code,
+        string Name,
+        string DataLabel,
+        double Latitude,
+        double Longitude,
+        string LayerCode)
+    {
+        public static GoogleMapMarker FromObservation(커뮤니티세계지도ObservationDto observation)
+            => new(
+                observation.StableId,
+                observation.CountryCode,
+                observation.CountryName,
+                observation.Title,
+                observation.Latitude,
+                observation.Longitude,
+                observation.LayerCode);
+
+        public static GoogleMapMarker For(
+            string id,
+            string code,
+            string name,
+            string dataLabel,
+            string layerCode)
+        {
+            var (latitude, longitude) = code switch
+            {
+                "US" => (39.8283, -98.5795),
+                "CN" => (35.8617, 104.1954),
+                "KR" => (36.5, 127.8),
+                "AU" => (-25.2744, 133.7751),
+                "GB" => (54.0, -2.0),
+                "FR" => (46.2276, 2.2137),
+                "IN" => (20.5937, 78.9629),
+                _ => (0.0, 0.0)
+            };
+
+            return new(id, code, name, dataLabel, latitude, longitude, layerCode);
+        }
+    }
+
+    private enum MapDatasetMode
+    {
+        DayWork,
+        NightLearning
+    }
+
+    private enum GoogleMapState
+    {
+        Loading,
+        Ready,
+        Unconfigured,
+        Failed
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_pollingCts is not null)
+        {
+            await _pollingCts.CancelAsync();
+            if (_pollingTask is not null)
+            {
+                try
+                {
+                    await _pollingTask;
+                }
+                catch (OperationCanceledException)
+                {
+                }
+            }
+
+            _pollingCts.Dispose();
+        }
+
+        if (_googleMapModule is not null)
+        {
+            try
+            {
+                await _googleMapModule.InvokeVoidAsync("dispose", "community-world-google-map");
+                await _googleMapModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        _googleMapCallback?.Dispose();
+    }
 }

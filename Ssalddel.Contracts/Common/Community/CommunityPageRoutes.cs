@@ -6,6 +6,9 @@ namespace Ssalddel.Contracts.Common.Community;
 public static class CommunityPageRoutes
 {
     public const string Home = "/community";
+    public const string WorldMap = "/community/home";
+    public const string WorldMapDayWorkDataset = "day-work";
+    public const string WorldMapNightLearningDataset = "night-learning";
     public const string HomeFeedView = "feed";
     public const string HomeBoardView = "boards";
     public const string Boards = "/community/boards";
@@ -49,6 +52,13 @@ public static class CommunityPageRoutes
                     : null),
             ("mode", string.Equals(mode, "work", StringComparison.OrdinalIgnoreCase)
                 ? "work"
+                : null));
+
+    public static string WorldMapFor(string? dataset = null)
+        => WithQuery(
+            WorldMap,
+            ("dataset", string.Equals(dataset, WorldMapNightLearningDataset, StringComparison.OrdinalIgnoreCase)
+                ? WorldMapNightLearningDataset
                 : null));
 
     public static string BoardsFor(
