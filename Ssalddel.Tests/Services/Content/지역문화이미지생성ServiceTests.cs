@@ -103,6 +103,7 @@ public sealed class 지역문화이미지생성ServiceTests
         await using var db = CreateContext();
         await db.Database.EnsureCreatedAsync();
         await 지역문화이미지PromptSeeder.SeedAsync(db);
+        await 지역문화공공기관SourceSeeder.SeedAsync(db);
         var useCase = new 지역문화이미지생성관리UseCase(
             db,
             new StubSequenceService(),
@@ -115,7 +116,27 @@ public sealed class 지역문화이미지생성ServiceTests
                 {
                     OfficialSourcesReviewed = true,
                     StereotypeRiskReviewed = false,
+                    ReviewedSourceKeys =
+                    [
+                        "kr-mcst-regional-culture-policy",
+                        "kr-regional-culture-promotion-agency"
+                    ],
                     ReviewNoteKo = "공식 기관 근거를 확인했지만 고정관념 검토는 아직 하지 않았습니다."
+                }));
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            useCase.생성승인Async(
+                "kr-seoul",
+                new RegionalCultureImageGenerationApprovalRequest
+                {
+                    OfficialSourcesReviewed = true,
+                    StereotypeRiskReviewed = true,
+                    ReviewedSourceKeys =
+                    [
+                        "us-nea-state-regional-arts-organizations",
+                        "us-nps-state-historic-preservation-offices"
+                    ],
+                    ReviewNoteKo = "다른 국가의 원천으로 서울 지역 이미지를 승인하지 못하도록 확인하는 검토 메모입니다."
                 }));
 
         var approval = await useCase.생성승인Async(
@@ -124,6 +145,11 @@ public sealed class 지역문화이미지생성ServiceTests
             {
                 OfficialSourcesReviewed = true,
                 StereotypeRiskReviewed = true,
+                ReviewedSourceKeys =
+                [
+                    "kr-mcst-regional-culture-policy",
+                    "kr-regional-culture-promotion-agency"
+                ],
                 ReviewNoteKo = "서울의 공식 문화기관 자료와 생활문화 표현을 확인하고 단일 관광 상징으로 고정하지 않았습니다."
             });
         db.생성이미지작업.Add(CreateJob(

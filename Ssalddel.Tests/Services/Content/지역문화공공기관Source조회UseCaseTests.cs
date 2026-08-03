@@ -14,7 +14,7 @@ namespace Ssalddel.Tests.Services.Content;
 public sealed class 지역문화공공기관Source조회UseCaseTests
 {
     [Fact]
-    public async Task Seed는_한국과미국의공식기관원천을저장한다()
+    public async Task Seed는_한국미국중국의공식기관원천을저장한다()
     {
         await using var db = CreateContext();
         await db.Database.EnsureCreatedAsync();
@@ -24,18 +24,24 @@ public sealed class 지역문화공공기관Source조회UseCaseTests
         var all = await useCase.목록조회Async(null, null);
         var korea = await useCase.목록조회Async("kr", null);
         var unitedStates = await useCase.목록조회Async("US", null);
+        var china = await useCase.목록조회Async("cn", null);
 
-        Assert.Equal(12, changed);
-        Assert.Equal(12, all.TotalCount);
+        Assert.Equal(16, changed);
+        Assert.Equal(16, all.TotalCount);
         Assert.Equal(6, korea.TotalCount);
         Assert.Equal(6, unitedStates.TotalCount);
+        Assert.Equal(4, china.TotalCount);
         Assert.All(all.Items, item =>
         {
             Assert.StartsWith("https://", item.OfficialPageUrl, StringComparison.Ordinal);
             Assert.StartsWith("https://", item.DataUrl, StringComparison.Ordinal);
             Assert.True(item.RequiresRegionalVerification);
             Assert.NotEmpty(item.LimitationsKo);
-            Assert.Equal(new DateTime(2026, 7, 26, 0, 0, 0, DateTimeKind.Utc), item.EvidenceCheckedAtUtc);
+            Assert.Equal(
+                item.CountryCode == RegionalCulturePublicInstitutionCountryCodes.China
+                    ? new DateTime(2026, 8, 3, 0, 0, 0, DateTimeKind.Utc)
+                    : new DateTime(2026, 7, 26, 0, 0, 0, DateTimeKind.Utc),
+                item.EvidenceCheckedAtUtc);
         });
     }
 
@@ -71,11 +77,11 @@ public sealed class 지역문화공공기관Source조회UseCaseTests
         var useCase = new 지역문화공공기관Source조회UseCase(db);
 
         var countryException = await Assert.ThrowsAsync<ArgumentException>(
-            () => useCase.목록조회Async("CN", null));
+            () => useCase.목록조회Async("JP", null));
         var levelException = await Assert.ThrowsAsync<ArgumentException>(
             () => useCase.목록조회Async("KR", "VillageOffice"));
 
-        Assert.Contains("KR, US", countryException.Message, StringComparison.Ordinal);
+        Assert.Contains("KR, US, CN", countryException.Message, StringComparison.Ordinal);
         Assert.Contains("JurisdictionLevelCode", levelException.Message, StringComparison.Ordinal);
     }
 

@@ -16,7 +16,7 @@ public interface I지역문화공공기관Source조회UseCase
 [SsalddelCommunityV0Module(
     SsalddelCommunityV0ModuleKeys.Content,
     SsalddelModuleKind.Application,
-    "한국과 미국의 지역문화 공공기관·공식 디렉터리 근거를 영속 DB에서 조회",
+    "한국·미국·중국의 지역문화 공공기관·공식 디렉터리 근거를 영속 DB에서 조회",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "공식 원천을 안내할 뿐 기관의 현재 담당 범위나 지역문화 대표성을 확정하지 않습니다.")]
 [SsalddelCodeMetadata(

@@ -277,7 +277,79 @@ internal static class 지역문화공공기관SourceSeedData
             RegionalCulturePublicInstitutionDataFormats.File,
             true,
             "Annual",
-            "도서관은 지방정부 부서, 독립 district 또는 다른 운영형태일 수 있습니다. 문화행정기관 여부와 서비스권역을 별도 확인합니다.")
+            "도서관은 지방정부 부서, 독립 district 또는 다른 운영형태일 수 있습니다. 문화행정기관 여부와 서비스권역을 별도 확인합니다."),
+        Create(
+            "cn-mct-intangible-cultural-heritage-department",
+            "CN",
+            RegionalCulturePublicInstitutionJurisdictionLevels.National,
+            RegionalCulturePublicInstitutionSourceKinds.GovernmentOffice,
+            "중국 문화여유부 비물질문화유산사",
+            "Ministry of Culture and Tourism, Department of Intangible Cultural Heritage",
+            "중화인민공화국 문화여유부",
+            "국가 비물질문화유산 보호 정책·조사·기록·대표목록과 전승 업무를 담당하는 중앙 행정부서입니다.",
+            "cn-*",
+            "GB/T 2260 and ISO 3166-2:CN subdivision codes",
+            "https://www.mct.gov.cn/gywhb/jgsz/bjg_jgsz/202205/t20220512_932945.htm",
+            "https://www.mct.gov.cn/whzx/bnsj/fwzwhycs/",
+            RegionalCulturePublicInstitutionDataFormats.WebPage,
+            false,
+            "OnChange",
+            "중앙부처 업무와 정책은 개별 성급 지역의 현재 생활문화·민족 공동체 표현을 직접 검증하지 않습니다. 생성 전 성급 문화여유 부서와 현지 기관 자료를 추가 확인합니다.",
+            new DateTime(2026, 8, 3, 0, 0, 0, DateTimeKind.Utc)),
+        Create(
+            "cn-ihchina-national-register",
+            "CN",
+            RegionalCulturePublicInstitutionJurisdictionLevels.StateProvince,
+            RegionalCulturePublicInstitutionSourceKinds.OfficialDirectory,
+            "중국 비물질문화유산망 국가급 대표항목 명록",
+            "China Intangible Cultural Heritage National Representative List",
+            "중화인민공화국 문화여유부·중국예술연구원",
+            "국가급 비물질문화유산 대표항목을 성·자치구·직할시와 항목 유형별로 확인하는 공식 명록입니다.",
+            "cn-{province-code}",
+            "GB/T 2260 and province-level application region",
+            "https://www.ihchina.cn/",
+            "https://www.ihchina.cn/project",
+            RegionalCulturePublicInstitutionDataFormats.WebPage,
+            false,
+            "Periodic",
+            "국가급 명록에 포함된 항목만 다루며 한 항목이 해당 성 전체의 현재 생활문화를 대표하지 않습니다. 보호단위와 실제 전승 지역도 개별 항목에서 확인합니다.",
+            new DateTime(2026, 8, 3, 0, 0, 0, DateTimeKind.Utc)),
+        Create(
+            "cn-state-council-local-government-directory",
+            "CN",
+            RegionalCulturePublicInstitutionJurisdictionLevels.StateProvince,
+            RegionalCulturePublicInstitutionSourceKinds.OfficialDirectory,
+            "중국정부망 성급 지방정부 웹사이트 디렉터리",
+            "State Council Provincial-level Local Government Website Directory",
+            "중화인민공화국 국무원",
+            "31개 성·자치구·직할시의 공식 인민정부 사이트로 연결해 성급 문화여유 부서와 공개자료를 재확인하는 출발점입니다.",
+            "cn-{province-code}",
+            "GB/T 2260 and provincial government jurisdiction",
+            "https://www.gov.cn/home/2023-03/29/content_5748954.htm",
+            "https://gjzwfw.www.gov.cn/",
+            RegionalCulturePublicInstitutionDataFormats.WebPage,
+            false,
+            "OnChange",
+            "지방정부 사이트 디렉터리는 문화 담당 부서·박물관·전승 공동체의 구체 근거가 아닙니다. 각 지역의 최신 조직과 원문 자료를 다시 확인해야 합니다.",
+            new DateTime(2026, 8, 3, 0, 0, 0, DateTimeKind.Utc)),
+        Create(
+            "cn-ncha-public-information-service",
+            "CN",
+            RegionalCulturePublicInstitutionJurisdictionLevels.MultiLevelDirectory,
+            RegionalCulturePublicInstitutionSourceKinds.OfficialDataset,
+            "중국 국가문물국 공공정보 서비스",
+            "National Cultural Heritage Administration Public Information Service",
+            "중국 국가문물국",
+            "전국 중점문물보호단위, 역사문화도시·진·촌·거리와 박물관 명록을 성별로 확인하는 공식 정보 서비스입니다.",
+            "cn-{province-code}-{locality}",
+            "Province and locality names in national cultural heritage registers",
+            "https://www.ncha.gov.cn/",
+            "https://www.ncha.gov.cn/col/col2262/index.html",
+            RegionalCulturePublicInstitutionDataFormats.WebPage,
+            false,
+            "Periodic",
+            "문물·박물관 명록은 현재 주민 생활이나 모든 문화 활동을 대표하지 않습니다. 건축·유산 표현은 지정 범위·시대·현재 용도를 항목별로 확인합니다.",
+            new DateTime(2026, 8, 3, 0, 0, 0, DateTimeKind.Utc))
     ];
 
     private static 지역문화공공기관Source Create(
@@ -296,7 +368,8 @@ internal static class 지역문화공공기관SourceSeedData
         string dataFormatCode,
         bool isMachineReadable,
         string refreshCycleCode,
-        string limitationsKo)
+        string limitationsKo,
+        DateTime? evidenceCheckedAtUtc = null)
         => new()
         {
             SourceKey = sourceKey,
@@ -316,9 +389,9 @@ internal static class 지역문화공공기관SourceSeedData
             RefreshCycleCode = refreshCycleCode,
             RequiresRegionalVerification = true,
             LimitationsKo = limitationsKo,
-            EvidenceCheckedAtUtc = CheckedAtUtc,
+            EvidenceCheckedAtUtc = evidenceCheckedAtUtc ?? CheckedAtUtc,
             SourceVersion = 1,
-            CreatedAtUtc = CheckedAtUtc,
-            UpdatedAtUtc = CheckedAtUtc
+            CreatedAtUtc = evidenceCheckedAtUtc ?? CheckedAtUtc,
+            UpdatedAtUtc = evidenceCheckedAtUtc ?? CheckedAtUtc
         };
 }

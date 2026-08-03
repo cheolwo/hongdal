@@ -86,6 +86,16 @@ API key, Base64 이미지 원문과 전체 외부 응답은 DB·로그·문서�
 - `ResearchDraft`는 Batch 요청으로 컴파일되지 않도록 했다.
 - 외부 API 호출과 비용 발생은 하지 않았다.
 
+## 98개 지역 생성 준비 manifest
+
+한국 17개 시·도, 미국 50개 주, 중국 31개 성급 지역의 생성 전 범위는 [`research-readiness.v1.json`](../Content/RegionalCultureImagePrompts/research-readiness.v1.json)으로 고정한다.
+
+- 총 98개 `RegionKey`와 국가별 공식 원천 key를 seed와 대조한다.
+- 모든 지역의 기본 상태는 `ResearchDraft`, `generationAuthorized=false`다.
+- 한 지역을 승인하려면 같은 국가의 등록된 공식 원천 key를 최소 2개 실제로 검토하고 검토 메모를 남긴다.
+- 국가 공통 원천은 조사 시작점일 뿐이다. 성·주·시도별 원문과 현재 생활문화 표현을 확인하기 전에는 승인하지 않는다.
+- 이미지 생성, Batch 제출, 외부 작업 등록은 이번 준비 단계에 포함하지 않는다.
+
 ## 공식 참고
 
 - [Gemini Batch API](https://ai.google.dev/gemini-api/docs/batch-api)

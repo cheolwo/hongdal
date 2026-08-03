@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "asOfUtc": "2026-08-03T00:00:00Z",
+  "generationAuthorized": false,
+  "defaultReviewStatus": "ResearchDraft",
+  "targetImagesPerRegion": 10,
+  "regionTotal": 98,
+  "approvalRequirements": [
+    "해당 국가의 등록된 공식 원천 source key를 최소 2개 검토",
+    "성·주·시도별 공식 기관 원문과 현재 생활문화 표현을 재확인",
+    "단일 랜드마크·복식·민족·음식으로 지역 전체를 고정하지 않는지 검토",
+    "서로 다른 시대·지역·공동체 요소의 무근거 혼합을 검토",
+    "장면 01~10의 행동·시간대·구도 중복을 검토",
+    "사람이 검토 메모와 source key를 남기기 전에는 생성 승인 금지"
+  ],
+  "countries": [
+    {
+      "countryCode": "KR",
+      "expectedRegionCount": 17,
+      "officialSourceKeys": [
+        "kr-mcst-regional-culture-policy",
+        "kr-regional-culture-promotion-agency",
+        "kr-mois-administrative-agency-jurisdiction",
+        "kr-national-museum-art-museum-standard-data",
+        "kr-national-cultural-festival-standard-data",
+        "kr-khs-national-heritage-portal"
+      ],
+      "regionKeys": [
+        "kr-seoul", "kr-busan", "kr-daegu", "kr-incheon", "kr-gwangju",
+        "kr-daejeon", "kr-ulsan", "kr-sejong", "kr-gyeonggi", "kr-gangwon",
+        "kr-chungbuk", "kr-chungnam", "kr-jeonbuk", "kr-jeonnam",
+        "kr-gyeongbuk", "kr-gyeongnam", "kr-jeju"
+      ]
+    },
+    {
+      "countryCode": "US",
+      "expectedRegionCount": 50,
+      "officialSourceKeys": [
+        "us-nea-state-regional-arts-organizations",
+        "us-nps-state-historic-preservation-offices",
+        "us-census-geographic-information",
+        "us-census-government-units",
+        "us-usa-gov-local-governments",
+        "us-imls-public-libraries-survey"
+      ],
+      "regionKeys": [
+        "us-alabama", "us-alaska", "us-arizona", "us-arkansas", "us-california",
+        "us-colorado", "us-connecticut", "us-delaware", "us-florida", "us-georgia",
+        "us-hawaii", "us-idaho", "us-illinois", "us-indiana", "us-iowa", "us-kansas",
+        "us-kentucky", "us-louisiana", "us-maine", "us-maryland", "us-massachusetts",
+        "us-michigan", "us-minnesota", "us-mississippi", "us-missouri", "us-montana",
+        "us-nebraska", "us-nevada", "us-new-hampshire", "us-new-jersey", "us-new-mexico",
+        "us-new-york", "us-north-carolina", "us-north-dakota", "us-ohio", "us-oklahoma",
+        "us-oregon", "us-pennsylvania", "us-rhode-island", "us-south-carolina",
+        "us-south-dakota", "us-tennessee", "us-texas", "us-utah", "us-vermont",
+        "us-virginia", "us-washington", "us-west-virginia", "us-wisconsin", "us-wyoming"
+      ]
+    },
+    {
+      "countryCode": "CN",
+      "expectedRegionCount": 31,
+      "officialSourceKeys": [
+        "cn-mct-intangible-cultural-heritage-department",
+        "cn-ihchina-national-register",
+        "cn-state-council-local-government-directory",
+        "cn-ncha-public-information-service"
+      ],
+      "regionKeys": [
+        "cn-beijing", "cn-tianjin", "cn-hebei", "cn-shanxi", "cn-inner-mongolia",
+        "cn-liaoning", "cn-jilin", "cn-heilongjiang", "cn-shanghai", "cn-jiangsu",
+        "cn-zhejiang", "cn-anhui", "cn-fujian", "cn-jiangxi", "cn-shandong",
+        "cn-henan", "cn-hubei", "cn-hunan", "cn-guangdong", "cn-guangxi", "cn-hainan",
+        "cn-chongqing", "cn-sichuan", "cn-guizhou", "cn-yunnan", "cn-tibet",
+        "cn-shaanxi", "cn-gansu", "cn-qinghai", "cn-ningxia", "cn-xinjiang"
+      ]
+    }
+  ]
+}

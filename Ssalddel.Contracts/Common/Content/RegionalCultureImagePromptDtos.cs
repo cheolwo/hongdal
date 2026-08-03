@@ -99,6 +99,8 @@ public sealed class RegionalCultureImageGenerationApprovalRequest
 
     public bool StereotypeRiskReviewed { get; set; }
 
+    public IReadOnlyList<string> ReviewedSourceKeys { get; set; } = [];
+
     public string ReviewNoteKo { get; set; } = string.Empty;
 }
 

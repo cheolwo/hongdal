@@ -122,6 +122,18 @@ public sealed class 지역문화이미지생성관리UseCase(
                 nameof(request));
         }
 
+        var reviewedSourceKeys = request.ReviewedSourceKeys
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .Select(key => key.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        if (reviewedSourceKeys.Count < 2)
+        {
+            throw new ArgumentException(
+                "생성 승인에는 해당 국가의 공식 원천 source key가 최소 2개 필요합니다.",
+                nameof(request));
+        }
+
         if (reviewNote.Length is < 20 or > 2000)
         {
             throw new ArgumentException(
@@ -146,12 +158,25 @@ public sealed class 지역문화이미지생성관리UseCase(
                 "3D 애니메이션 스타일 v2 프롬프트로 갱신한 뒤 생성 승인해야 합니다.");
         }
 
+        var verifiedSourceKeys = await db.지역문화공공기관Sources
+            .AsNoTracking()
+            .Where(source => source.CountryCode == entity.CountryCode
+                             && reviewedSourceKeys.Contains(source.SourceKey))
+            .Select(source => source.SourceKey)
+            .ToArrayAsync(cancellationToken);
+        if (verifiedSourceKeys.Length != reviewedSourceKeys.Count)
+        {
+            throw new ArgumentException(
+                "검토한 source key가 지역 국가와 일치하는 공식 원천 카탈로그에 모두 등록되어 있어야 합니다.",
+                nameof(request));
+        }
+
         var now = DateTime.UtcNow;
         entity.ReviewStatusCode = 지역문화이미지Prompt검토상태Codes.ApprovedForGeneration;
         entity.RequiresEvidenceReview = false;
         entity.EvidenceNotesKo =
             $"{entity.EvidenceNotesKo.Trim()}\n\n"
-            + $"[{now:yyyy-MM-dd} 생성 승인 검토] {reviewNote}";
+            + $"[{now:yyyy-MM-dd} 생성 승인 검토 · {string.Join(", ", reviewedSourceKeys)}] {reviewNote}";
         entity.UpdatedAtUtc = now;
         await db.SaveChangesAsync(cancellationToken);
 

@@ -6,8 +6,9 @@ public static class RegionalCulturePublicInstitutionCountryCodes
 {
     public const string Korea = "KR";
     public const string UnitedStates = "US";
+    public const string China = "CN";
 
-    public static IReadOnlyList<string> All { get; } = [Korea, UnitedStates];
+    public static IReadOnlyList<string> All { get; } = [Korea, UnitedStates, China];
 }
 
 public static class RegionalCulturePublicInstitutionJurisdictionLevels
@@ -38,7 +39,7 @@ public static class RegionalCulturePublicInstitutionDataFormats
 [SsalddelCodeMetadata(
     SsalddelCodeFeatureKeys.RegionalCulturePublicInstitution,
     SsalddelCodeLayer.Contract,
-    "한국과 미국의 지역문화 공공기관 및 공식 디렉터리 근거를 전달",
+    "한국·미국·중국의 지역문화 공공기관 및 공식 디렉터리 근거를 전달",
     FlowOrder = 10,
     Boundary = "기관 디렉터리는 문화 대표성이나 현재 담당 부서를 보장하지 않으며 표시 전 공식 원천을 다시 확인합니다.")]
 public sealed record RegionalCulturePublicInstitutionSourceDto(

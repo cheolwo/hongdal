@@ -276,6 +276,16 @@ if (await AppContextImageAssetPublishCommandLine.TryRunAsync(
     return;
 }
 
+if (await 지역문화이미지자산PublishCommandLine.TryRunAsync(
+        args,
+        app.Services,
+        app.Environment.ContentRootPath,
+        app.Logger,
+        CancellationToken.None))
+{
+    return;
+}
+
 if (args.Any(argument => string.Equals(
         argument,
         "--analyze-kamis-packaging-fcl",

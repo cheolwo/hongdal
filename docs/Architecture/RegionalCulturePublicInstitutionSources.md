@@ -2,7 +2,7 @@
 
 ## 목적
 
-지역문화 화면과 이미지 생성 프롬프트가 관광 홍보 문구나 일반 검색 결과에만 의존하지 않도록, 한국과 미국의 중앙·지역 정부기관 및 공식 데이터 디렉터리를 공통 지역 key와 연결한다.
+지역문화 화면과 이미지 생성 프롬프트가 관광 홍보 문구나 일반 검색 결과에만 의존하지 않도록, 한국·미국·중국의 중앙·지역 정부기관 및 공식 데이터 디렉터리를 공통 지역 key와 연결한다.
 
 이 자료는 기관에 민원을 자동 제출하거나 기관의 보증을 표시하기 위한 것이 아니다. 화면과 작성 도구가 지역 문화의 공식 근거를 찾아가고, 마지막 확인 시각과 한계를 함께 보여 주기 위한 읽기 전용 기반이다.
 
@@ -12,6 +12,7 @@
 | --- | --- | --- | --- |
 | 한국 | 중앙부처·관계기관 → 시·도 → 시·군·구 → 읍·면·동 행정기관 | 행정안전부 주민등록 행정기관 코드, 법정동·지자체 코드 | 행정동과 법정동은 목적이 다르며 주민센터 실제 정보는 지자체 원천으로 재확인한다. |
 | 미국 | 연방기관 → 주기관 → county·municipal·township·special district → 시설·프로그램 | Census GEOID·FIPS·정부 단위 코드, 주 약어 | 한국의 행정복지센터와 일대일 대응하지 않는다. 주마다 지방정부 종류와 문화업무 소유 기관이 다르다. |
+| 중국 | 중앙 문화여유·문물 기관 → 성·자치구·직할시 → 시·현 → 보호단위·박물관·공동체 | GB/T 2260·ISO 3166-2:CN 성급 코드, 공식 명록의 신청 지역·보호단위 | 성급 행정구역과 민족·역사·생활문화권은 일대일 관계가 아니다. 중앙 명록만으로 현재 주민 생활이나 지역 전체의 대표성을 확정하지 않는다. |
 
 ## 초기 등록 원천
 
@@ -37,6 +38,17 @@
 | `us-usa-gov-local-governments` | [USA.gov 지방정부 디렉터리](https://www.usa.gov/local-governments) | 지방정부 공식 사이트와 문화·공원·도서관 부서 탐색 |
 | `us-imls-public-libraries-survey` | [IMLS 공공도서관 조사](https://www.imls.gov/research-evaluation/surveys/public-libraries-survey-pls) | 지역 문화 거점인 공공도서관 시스템과 분관 연결 |
 
+### 중국
+
+| source key | 기관·원천 | 활용 |
+| --- | --- | --- |
+| `cn-mct-intangible-cultural-heritage-department` | [중국 문화여유부 비물질문화유산사](https://www.mct.gov.cn/gywhb/jgsz/bjg_jgsz/202205/t20220512_932945.htm) | 비물질문화유산 조사·기록·대표목록·전승을 담당하는 중앙 책임 확인 |
+| `cn-ihchina-national-register` | [중국 비물질문화유산망 국가급 대표항목 명록](https://www.ihchina.cn/project) | 31개 성급 지역과 항목 유형별 공식 비물질문화유산·보호단위 확인 |
+| `cn-state-council-local-government-directory` | [중국정부망 지방정부 사이트](https://www.gov.cn/home/2023-03/29/content_5748954.htm)·[국가정무서비스플랫폼](https://gjzwfw.www.gov.cn/) | 성급 인민정부와 지역 문화여유 부서의 원문 자료로 이어지는 시작점 |
+| `cn-ncha-public-information-service` | [중국 국가문물국 공공정보 서비스](https://www.ncha.gov.cn/col/col2262/index.html) | 문물보호단위, 역사문화도시·진·촌·거리와 박물관을 성별로 교차 확인 |
+
+중국 비물질문화유산 명록은 31개 성급 지역으로 필터링할 수 있지만, 명록 포함 항목이 해당 지역 전체를 대표한다는 뜻은 아니다. 이미지 검토자는 항목의 신청 지역·보호단위와 현재 생활 맥락을 함께 확인한다.
+
 ## 서버 계약
 
 `regional_culture_public_institution_sources`는 다음을 보관한다.
@@ -49,11 +61,14 @@
 - 갱신 주기, 근거 확인 시각과 지역별 재확인 필요 상태
 - 일대일 대응이 불가능하거나 최신성을 보장할 수 없는 한계
 
-공개 조회는 `GET /api/v1/community/regional-culture/public-institutions`를 사용하며 `countryCode=KR|US`, `jurisdictionLevelCode`로 필터링한다. 조회는 저장된 근거만 반환하고 외부 사이트를 실시간 호출하지 않는다.
+공개 조회는 `GET /api/v1/community/regional-culture/public-institutions`를 사용하며 `countryCode=KR|US|CN`, `jurisdictionLevelCode`로 필터링한다. 조회는 저장된 근거만 반환하고 외부 사이트를 실시간 호출하지 않는다.
+
+이미지 생성 승인은 `OfficialSourcesReviewed` 체크만으로 통과하지 않는다. 같은 국가로 등록된 공식 원천의 `ReviewedSourceKeys`를 최소 2개 제출하고, 고정관념 검토와 사람이 작성한 검토 메모를 함께 남겨야 한다. 이 등록 자체는 어떤 지역도 자동 승인하지 않는다.
 
 ## 다음 확장 단위
 
 1. 한국 행정기관 코드와 지자체 공개자료를 합쳐 실제 행정복지센터·문화부서 주소를 지역 key에 연결한다.
 2. 미국 Census Government Units와 USA.gov를 합쳐 county·city별 문화·공원·도서관 담당 부서를 등록한다.
-3. 각 기관 원천을 문화 이미지 프롬프트의 `RegionKey`와 연결하고, [지역문화 3D 애니메이션 이미지 순차 생성](RegionalCultureAnimationImageGeneration.md)의 생성 승인 전에 최소 한 개의 지역 기관 근거를 요구한다.
-4. 폐지·통합·명칭 변경을 이력으로 남기고 화면에는 마지막 확인 시각과 직접 확인 링크를 함께 표시한다.
+3. 중국 31개 성급 지역마다 성급 문화여유 부서·박물관·관련 공동체 원천을 최소 하나씩 추가한다.
+4. 각 기관 원천을 문화 이미지 프롬프트의 `RegionKey`와 연결하고, [지역문화 3D 애니메이션 이미지 순차 생성](RegionalCultureAnimationImageGeneration.md)의 생성 승인 전에 지역별 원문 근거를 요구한다.
+5. 폐지·통합·명칭 변경을 이력으로 남기고 화면에는 마지막 확인 시각과 직접 확인 링크를 함께 표시한다.
