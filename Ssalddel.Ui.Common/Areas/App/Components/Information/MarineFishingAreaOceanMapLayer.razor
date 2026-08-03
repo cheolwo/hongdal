@@ -1,0 +1,127 @@
+@using System.Globalization
+@using Ssalddel.Contracts.Common.PublicData
+
+<section class="marine-ocean-map" aria-live="polite">
+    <header>
+        <span>2. 수산 레이어 · @Response.DatasetVersion</span>
+        <h2>공식 어획구역 바다 타일</h2>
+        <p>원천의 ‘바다’ 분류를 집계한 세계 해양 개략도입니다.</p>
+    </header>
+
+    <div class="marine-ocean-map__summary" aria-label="어획구역 수집 요약">
+        <article><span>수집 원문 행</span><strong>@Response.SourceRowCount</strong></article>
+        <article><span>타일 연결 구역</span><strong>@Response.MappedFishingAreaCount</strong></article>
+        <article><span>제외 행</span><strong>@Response.ExcludedRowCount</strong></article>
+        <article><span>수집 시각</span><strong>@Response.CollectedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</strong></article>
+    </div>
+
+    <div class="marine-ocean-map__workspace">
+        <div class="marine-ocean-map__map-panel">
+            <div class="marine-ocean-map__canvas" aria-label="해양수산부 어획구역의 바다별 개략 타일 지도">
+                <svg viewBox="0 0 800 440" role="img" aria-labelledby="marine-map-title marine-map-description">
+                    <title id="marine-map-title">세계 바다별 어획구역 개략도</title>
+                    <desc id="marine-map-description">공식 원문에 좌표가 없어 세계 해양의 개략 위치에 바다별 집계 타일을 배치합니다.</desc>
+                    <path class="marine-ocean-map__grid" d="M0 110 H800 M0 220 H800 M0 330 H800 M200 0 V440 M400 0 V440 M600 0 V440" />
+                    <path class="marine-ocean-map__land" d="M72 90 L151 61 L233 82 L260 132 L224 172 L178 166 L151 220 L112 210 L89 157 Z" />
+                    <path class="marine-ocean-map__land" d="M214 235 L264 228 L291 271 L278 343 L239 389 L213 324 Z" />
+                    <path class="marine-ocean-map__land" d="M384 89 L452 59 L558 69 L631 112 L697 126 L716 177 L660 211 L586 197 L540 234 L472 213 L432 176 L391 163 Z" />
+                    <path class="marine-ocean-map__land" d="M444 218 L505 218 L540 271 L516 354 L471 376 L438 316 Z" />
+                    <path class="marine-ocean-map__land" d="M659 288 L716 279 L750 318 L720 356 L665 345 Z" />
+                    <path class="marine-ocean-map__land marine-ocean-map__land--ice" d="M82 407 C254 381 548 381 724 407 L694 432 H108 Z" />
+                </svg>
+
+                @foreach (var tile in Response.Items)
+                {
+                    <button type="button"
+                            class="@TileClass(tile)"
+                            style="@TileStyle(tile)"
+                            aria-pressed="@(SelectedTile?.TileKey == tile.TileKey)"
+                            aria-label="@($"{tile.SourceSeaName}, 어획구역 {tile.FishingAreaCount}개")"
+                            @onclick="@(() => TileSelected.InvokeAsync(tile))">
+                        <span class="marine-ocean-map__tile-wake" aria-hidden="true"></span>
+                        <strong>@tile.SourceSeaName</strong>
+                        <small>@tile.FishingAreaCount 개 구역</small>
+                    </button>
+                }
+            </div>
+            <p class="marine-ocean-map__boundary">
+                이 세계 도형과 타일 위치는 탐색용 개략도입니다. 공식 원문에는 좌표와 경계가 없으며, 애니메이션도 실시간 변화나 이동을 뜻하지 않습니다.
+            </p>
+        </div>
+
+        <aside class="marine-ocean-map__detail" aria-live="polite">
+            @if (SelectedTile is { } selectedTile)
+            {
+                <header>
+                    <span>@selectedTile.TileKey · @Response.GeometryBasisCode</span>
+                    <h2>@selectedTile.SourceSeaName</h2>
+                    <p>@selectedTile.DisplayNameEn</p>
+                </header>
+                <dl>
+                    <div><dt>공식 분류 구역</dt><dd>@selectedTile.FishingAreaCount 개</dd></div>
+                    <div><dt>원천 버전</dt><dd>@Response.DatasetVersion</dd></div>
+                    <div><dt>위치 의미</dt><dd>개략 타일 기준점</dd></div>
+                    <div><dt>원문 해시</dt><dd>@ShortContentHash</dd></div>
+                </dl>
+                <section class="marine-ocean-map__sources">
+                    <h3>포함 구역 예시</h3>
+                    @foreach (var area in selectedTile.ExampleFishingAreas)
+                    {
+                        <article><strong>@area</strong></article>
+                    }
+                </section>
+                @if (IsPublicHttpUrl(Response.SourceUrl))
+                {
+                    <a class="marine-ocean-map__source-link" href="@Response.SourceUrl" target="_blank" rel="noopener noreferrer">해양수산부 공식 원천 열기</a>
+                }
+            }
+            else
+            {
+                <div class="marine-ocean-map__empty">
+                    <strong>표시할 바다 타일이 없습니다.</strong>
+                </div>
+            }
+        </aside>
+    </div>
+
+    @if (Response.Notices.Count > 0)
+    {
+        <aside class="marine-ocean-map__notices">
+            <strong>바다 타일을 읽을 때 확인할 점</strong>
+            <ul>
+                @foreach (var notice in Response.Notices)
+                {
+                    <li>@notice</li>
+                }
+            </ul>
+        </aside>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public MarineFishingAreaOceanTileResponse Response { get; set; } = default!;
+
+    [Parameter]
+    public MarineFishingAreaOceanTileDto? SelectedTile { get; set; }
+
+    [Parameter]
+    public EventCallback<MarineFishingAreaOceanTileDto> TileSelected { get; set; }
+
+    private string ShortContentHash
+        => Response.ContentSha256[..Math.Min(12, Response.ContentSha256.Length)];
+
+    private string TileClass(MarineFishingAreaOceanTileDto tile)
+        => SelectedTile?.TileKey == tile.TileKey
+            ? "marine-ocean-map__tile is-selected"
+            : "marine-ocean-map__tile";
+
+    private static string TileStyle(MarineFishingAreaOceanTileDto tile)
+        => $"left:{tile.AnchorLeftPercent.ToString("0.##", CultureInfo.InvariantCulture)}%;"
+           + $"top:{tile.AnchorTopPercent.ToString("0.##", CultureInfo.InvariantCulture)}%;"
+           + $"--ocean-delay:{tile.AnimationDelayMilliseconds}ms;";
+
+    private static bool IsPublicHttpUrl(string? value)
+        => Uri.TryCreate(value, UriKind.Absolute, out var uri)
+           && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp);
+}

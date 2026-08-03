@@ -7,19 +7,51 @@
 <main class="korea-agri-map" data-country="@ViewModel.CountryCode">
     <header class="korea-agri-map__hero">
         <div>
-            <span>문화교통 0.0 · 한국·미국 공개 데이터 지도</span>
-            <h1>@ViewModel.CountryName 농수산물 데이터 지도</h1>
+            <span>문화교통 0.0 · 공개 정보 지도 레이어</span>
+            <h1>@MapTitle</h1>
             <p>
-                가격 관측의 지역 코드를 검토된 행정구역 기준점에 연결해 국가와 관계 레이어별로 살펴봅니다.
-                마커는 실제 농장·창고·개인의 위치가 아니라 공개 가능한 지역 대표점입니다.
+                @if (ViewModel.IsAgriculturalLivingInformationLayer)
+                {
+                    <text>가격 관측의 지역 코드를 검토된 행정구역 기준점에 연결해 국가와 관계 레이어별로 살펴봅니다. 마커는 실제 농장·창고·개인의 위치가 아니라 공개 가능한 지역 대표점입니다.</text>
+                }
+                else if (ViewModel.IsMarineFishingAreaLayer)
+                {
+                    <text>해양수산부 어획구역 카탈로그를 바다별로 수집해 개략 타일에 표시합니다. 타일의 움직임은 탐색 보조 표현이며 실제 어획량·수온 변화나 조업 위치가 아닙니다.</text>
+                }
+                else
+                {
+                    <text>철학·영상 콘텐츠는 농수산물 데이터와 독립된 레이어입니다. 검증된 공개 지리 기록과 원천이 함께 있을 때만 비개인적 범위를 표시합니다.</text>
+                }
             </p>
         </div>
         <nav aria-label="관련 정보 화면">
-            <a href="@RelatedPriceHref">@ViewModel.CountryDataSourceName 가격 비교</a>
+            @if (ViewModel.IsAgriculturalLivingInformationLayer)
+            {
+                <a href="@RelatedPriceHref">@ViewModel.CountryDataSourceName 가격 비교</a>
+            }
             <a href="@PriceBoardHref">가격 게시판</a>
         </nav>
     </header>
 
+    <section class="korea-agri-map__content-layer-switch" aria-label="지도 콘텐츠 레이어 계층">
+        <span>1. 콘텐츠 레이어</span>
+        <div role="group" aria-label="지도 콘텐츠 레이어 선택">
+            @foreach (var contentLayer in ContentLayerOptions)
+            {
+                <button type="button"
+                        class="@(ViewModel.ContentLayerKey == contentLayer.Key ? "is-active" : null)"
+                        aria-pressed="@(ViewModel.ContentLayerKey == contentLayer.Key)"
+                        disabled="@ViewModel.처리중"
+                        @onclick="@(() => SelectContentLayerAsync(contentLayer.Key))">
+                    <strong>@contentLayer.Name</strong>
+                    <small>@contentLayer.ContextLabel</small>
+                </button>
+            }
+        </div>
+    </section>
+
+    @if (ViewModel.IsAgriculturalLivingInformationLayer)
+    {
     <section class="korea-agri-map__explorer-controls" aria-label="지도 국가와 데이터 레이어 선택">
         <div class="korea-agri-map__country-switch" role="group" aria-label="국가 선택">
             @foreach (var country in CountryOptions)
@@ -224,11 +256,104 @@
             </ul>
         </aside>
     }
+    }
+    else if (ViewModel.IsHongikAcademyLayer)
+    {
+        <section class="korea-agri-map__hongik-layer" aria-busy="@ViewModel.처리중" aria-live="polite">
+            @if (ViewModel.상태 == PageViewModel상태.실패)
+            {
+                <div class="korea-agri-map__state korea-agri-map__state--error" role="alert">
+                    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" />
+                    <div>
+                        <strong>홍익학당 레이어 정보를 불러오지 못했습니다.</strong>
+                        <p>@ViewModel.오류메시지</p>
+                    </div>
+                    <button type="button" @onclick="RetryAsync">다시 시도</button>
+                </div>
+            }
+            else if (ViewModel.HongikAcademyResponse is { } hongikLayer)
+            {
+                <header>
+                    <span>2. 주제 레이어 · @hongikLayer.ViewingContextLabel</span>
+                    <h2>@hongikLayer.DisplayName</h2>
+                    <p>@hongikLayer.GeographicScopeLabel</p>
+                </header>
+                <div class="korea-agri-map__hongik-summary">
+                    <article><span>검증 지리 기록</span><strong>@hongikLayer.VerifiedGeographicRecordCount</strong></article>
+                    <article><span>지리 범위</span><strong>@hongikLayer.GeographicScopeLabel</strong></article>
+                    <article><span>확인 시각</span><strong>@hongikLayer.CheckedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</strong></article>
+                </div>
+                <div class="korea-agri-map__empty">
+                    <MudIcon Icon="@Icons.Material.Filled.LocationOff" />
+                    <strong>현재 표시할 검증된 홍익학당 지리 기록이 없습니다.</strong>
+                    <p>이 레이어는 야간 사유·영상 탐색의 맥락을 제공하지만, 테마 전환만으로 농수산물 지도와 데이터를 섞지 않습니다. 개인 주소, 촬영지·행사장, 설명에서 유추한 장소는 표시하지 않습니다.</p>
+                </div>
+                <section class="korea-agri-map__sources">
+                    <h3>원천·검증 상태</h3>
+                    @foreach (var source in hongikLayer.Sources)
+                    {
+                        <article>
+                            <strong>@source.DisplayName</strong>
+                            <span>@source.SourceKey · @source.ProvenanceStatusCode</span>
+                            <small>@source.Limitations</small>
+                        </article>
+                    }
+                </section>
+                @if (ViewModel.Notices.Count > 0)
+                {
+                    <aside class="korea-agri-map__notices">
+                        <strong>이 레이어의 공개 경계</strong>
+                        <ul>
+                            @foreach (var notice in ViewModel.Notices)
+                            {
+                                <li>@notice</li>
+                            }
+                        </ul>
+                    </aside>
+                }
+            }
+            else
+            {
+                <div class="korea-agri-map__empty">
+                    <strong>홍익학당 레이어 정보를 불러오는 중입니다.</strong>
+                </div>
+            }
+        </section>
+    }
+    else
+    {
+        @if (ViewModel.상태 == PageViewModel상태.실패)
+        {
+            <section class="korea-agri-map__state korea-agri-map__state--error" role="alert">
+                <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" />
+                <div>
+                    <strong>공식 어획구역 데이터를 수집하지 못했습니다.</strong>
+                    <p>@ViewModel.오류메시지</p>
+                </div>
+                <button type="button" @onclick="RetryAsync">다시 시도</button>
+            </section>
+        }
+        else if (ViewModel.OceanTileResponse is { } oceanResponse)
+        {
+            <MarineFishingAreaOceanMapLayer Response="oceanResponse"
+                                            SelectedTile="ViewModel.SelectedOceanTile"
+                                            TileSelected="ViewModel.바다Tile선택" />
+        }
+        else
+        {
+            <section class="korea-agri-map__empty" aria-busy="@ViewModel.처리중" aria-live="polite">
+                <strong>공식 어획구역을 수집하는 중입니다.</strong>
+            </section>
+        }
+    }
 </main>
 
 @code {
     [Parameter]
     public string? InitialCountryCode { get; set; }
+
+    [Parameter]
+    public string? InitialContentLayerKey { get; set; }
 
     private const decimal MinLatitude = 33.0m;
     private const decimal MaxLatitude = 38.7m;
@@ -243,10 +368,24 @@
             ? "information/usda-us-price-comparison"
             : "information/kamis-domestic-price-comparison";
 
+    private string MapTitle
+        => ViewModel.IsAgriculturalLivingInformationLayer
+            ? $"{ViewModel.CountryName} 농수산물 데이터 지도"
+            : ViewModel.IsMarineFishingAreaLayer
+                ? "해양수산 어획구역 바다 지도"
+                : "홍익학당 철학·영상 지도 레이어";
+
     private static readonly IReadOnlyList<MapCountryOption> CountryOptions =
     [
         new(RegionalAgriculturalMapCountryCodes.Korea, "대한민국"),
         new(RegionalAgriculturalMapCountryCodes.UnitedStates, "미국")
+    ];
+
+    private static readonly IReadOnlyList<MapContentLayerOption> ContentLayerOptions =
+    [
+        new(RegionalAgriculturalMapContentLayerKeys.AgriculturalLivingInformation, "농수산물·생활 정보", "낮 시간 정보 탐색"),
+        new(RegionalAgriculturalMapContentLayerKeys.MarineFishingAreas, "수산·바다 구역", "공식 어획구역 타일"),
+        new(RegionalAgriculturalMapContentLayerKeys.HongikAcademyPhilosophyVideo, "홍익학당 철학·영상", "야간 사유·영상 탐색")
     ];
 
     private static readonly IReadOnlyList<MapLayerOption> LayerOptions =
@@ -263,6 +402,7 @@
     protected override async Task OnInitializedAsync()
     {
         ViewModel.초기국가설정(InitialCountryCode);
+        ViewModel.초기콘텐츠레이어설정(InitialContentLayerKey);
         await ViewModel.초기화Async();
     }
 
@@ -274,6 +414,9 @@
 
     private async Task SelectCountryAsync(string countryCode)
         => await ViewModel.국가선택Async(countryCode);
+
+    private async Task SelectContentLayerAsync(string contentLayerKey)
+        => await ViewModel.콘텐츠레이어선택Async(contentLayerKey);
 
     private async Task SelectLayerAsync(string? relationTypeCode)
         => await ViewModel.관계선택Async(relationTypeCode);
@@ -350,6 +493,8 @@
            && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp);
 
     private sealed record MapCountryOption(string Code, string Name);
+
+    private sealed record MapContentLayerOption(string Key, string Name, string ContextLabel);
 
     private sealed record MapLayerOption(string? Code, string Name, string MarkerClass);
 }

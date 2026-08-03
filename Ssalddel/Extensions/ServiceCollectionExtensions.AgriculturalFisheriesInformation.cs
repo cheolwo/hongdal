@@ -47,6 +47,24 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I지역농수산MapMarker조회UseCase,
             지역농수산MapMarker조회UseCase>();
         services
+            .AddHttpClient<Mof어획구역CatalogSource>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider
+                        .GetRequiredService<IOptions<PublicDataOptions>>()
+                        .Value;
+                    client.BaseAddress = new Uri(options.MofFishingAreas.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                        "Ssalddel-MOF-Fishing-Area-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(
+                        Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<IMof어획구역CatalogSource>(serviceProvider =>
+            serviceProvider.GetRequiredService<Mof어획구역CatalogSource>());
+        services.AddScoped<I해양수산Map바다Tile조회UseCase,
+            해양수산Map바다Tile조회UseCase>();
+        services
             .AddHttpClient<UsdaNassQuickStats가격공급자>(
                 (serviceProvider, client) =>
                 {

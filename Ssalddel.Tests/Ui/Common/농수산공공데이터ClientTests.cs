@@ -10,6 +10,50 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed class 농수산공공데이터ClientTests
 {
     [Fact]
+    public async Task 해양수산Map조회는_공식어획구역바다TileRoute를호출한다()
+    {
+        Uri? requestedUri = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "sourceKey": "mof-fishing-area-catalog",
+                      "sourceName": "해양수산부 공동활용체계 어획구역",
+                      "sourceUrl": "https://www.data.go.kr/data/15147444/fileData.do",
+                      "datasetVersion": "20211230",
+                      "collectedAtUtc": "2026-08-02T00:00:00Z",
+                      "contentSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                      "sourceRowCount": 169,
+                      "mappedFishingAreaCount": 167,
+                      "excludedRowCount": 2,
+                      "geometryBasisCode": "SchematicOceanCatalogLayout",
+                      "notices": [],
+                      "items": []
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new 농수산공공데이터Client(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ssalddel.test/")
+        });
+
+        var result = await client.해양수산Map바다Tile조회Async();
+
+        Assert.Equal(169, result.SourceRowCount);
+        Assert.Equal(167, result.MappedFishingAreaCount);
+        Assert.Equal(
+            $"/{RegionalAgriculturalMapRoutes.OceanTileApi}",
+            requestedUri?.AbsolutePath);
+    }
+
+    [Fact]
     public async Task 한국지역Map조회는_국가품목기간과표시개수를_읽기전용Query로전송한다()
     {
         Uri? requestedUri = null;

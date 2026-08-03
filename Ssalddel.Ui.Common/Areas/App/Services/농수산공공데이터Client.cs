@@ -31,6 +31,12 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
             cancellationToken);
     }
 
+    public Task<MarineFishingAreaOceanTileResponse> 해양수산Map바다Tile조회Async(
+        CancellationToken cancellationToken = default)
+        => GetAsync<MarineFishingAreaOceanTileResponse>(
+            RegionalAgriculturalMapRoutes.OceanTileApi,
+            cancellationToken);
+
     public Task<AgriculturalFisheriesInformationOverviewResponse> 개요조회Async(
         CancellationToken cancellationToken = default)
         => GetAsync<AgriculturalFisheriesInformationOverviewResponse>(BasePath, cancellationToken);

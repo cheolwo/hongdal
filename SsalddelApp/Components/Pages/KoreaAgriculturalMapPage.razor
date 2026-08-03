@@ -4,9 +4,13 @@
 
 <PageTitle>한국·미국 농수산물 데이터 지도 · 살뜰</PageTitle>
 
-<KoreaAgriculturalMapWorkspace InitialCountryCode="@CountryCode" />
+<KoreaAgriculturalMapWorkspace InitialCountryCode="@CountryCode"
+                               InitialContentLayerKey="@ContentLayerKey" />
 
 @code {
     [SupplyParameterFromQuery(Name = "country")]
     public string? CountryCode { get; set; }
+
+    [SupplyParameterFromQuery(Name = "layer")]
+    public string? ContentLayerKey { get; set; }
 }
