@@ -1,6 +1,7 @@
 using System.Net;
 using Ssalddel.Services.AgriculturalFisheries.Information;
 using Ssalddel.Services.AgriculturalFisheries.ImportReadiness;
+using Ssalddel.Services.Community;
 using Ssalddel.Services.FoodCulture;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -46,6 +47,20 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<지역농수산Map지역Resolver>();
         services.AddScoped<I지역농수산MapMarker조회UseCase,
             지역농수산MapMarker조회UseCase>();
+        services.TryAddSingleton<I경기데이터드림가축사육MapSnapshotStore,
+            경기데이터드림가축사육MapSnapshotStore>();
+        services.AddScoped<I경기데이터드림가축사육MapProjectionRefresher,
+            경기데이터드림가축사육MapProjectionRefresher>();
+        services.AddScoped<I경기데이터드림가축사육MapMarkerReader,
+            경기데이터드림가축사육MapMarkerReader>();
+        services.AddHostedService<경기데이터드림가축사육MapProjectionRefreshService>();
+        services.TryAddSingleton<I선택공공데이터MapSnapshotStore,
+            선택공공데이터MapSnapshotStore>();
+        services.AddScoped<I선택공공데이터MapProjectionRefresher,
+            선택공공데이터MapProjectionRefresher>();
+        services.AddScoped<I선택공공데이터MapMarkerReader,
+            선택공공데이터MapMarkerReader>();
+        services.AddHostedService<선택공공데이터MapProjectionRefreshService>();
         services
             .AddHttpClient<Mof어획구역CatalogSource>(
                 (serviceProvider, client) =>

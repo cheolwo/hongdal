@@ -11,7 +11,10 @@ public sealed class 커뮤니티세계지도조회UseCaseTests
 {
     private readonly 커뮤니티세계지도조회UseCase _useCase = new(
         new Stub전통시장MapMarkerReader(),
-        new Stub해외제조업소MapMarkerReader());
+        new Stub해외제조업소MapMarkerReader(),
+        null,
+        new Stub경기데이터드림가축사육MapMarkerReader(),
+        new Stub선택공공데이터MapMarkerReader());
 
     [Fact]
     public async Task 낮Snapshot은_문화와가격을_서로다른Layer로제공한다()
@@ -24,9 +27,21 @@ public sealed class 커뮤니티세계지도조회UseCaseTests
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.WholesaleMarket);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.TraditionalMarketHub);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.OverseasManufacturer);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.TourismPublicEvidence);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.KosisStatisticalContext);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.ProcurementHandoff);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.ImportReadiness);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.TransportHandoff);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.WarehouseInboundHandoff);
         Assert.Contains(snapshot.Observations, item => item.StableId == "culture:us-maine");
         Assert.Contains(snapshot.Observations, item => item.StableId == "price:kr");
         Assert.Contains(snapshot.Observations, item => item.StableId == "overseas-manufacturer:us-california");
+        Assert.Contains(snapshot.Observations, item => item.StableId == "gyeonggi-livestock:kr-gyeonggi");
+        Assert.Contains(snapshot.Observations, item => item.StableId == "tourism:1001");
+        Assert.Contains(snapshot.Observations, item => item.StableId == "online-price:kr-catalog");
+        Assert.Contains(snapshot.Observations, item => item.StableId == "kosis-cpi:kr:58");
         Assert.All(snapshot.Observations, item => Assert.False(string.IsNullOrWhiteSpace(item.SourceName)));
     }
 
@@ -230,5 +245,67 @@ public sealed class 커뮤니티세계지도조회UseCaseTests
         public Task<IReadOnlyList<지역문화이미지MapMarker>> 공개Marker조회Async(
             CancellationToken cancellationToken = default)
             => Task.FromResult(markers);
+    }
+
+    private sealed class Stub경기데이터드림가축사육MapMarkerReader
+        : I경기데이터드림가축사육MapMarkerReader
+    {
+        public Task<IReadOnlyList<커뮤니티세계지도ObservationDto>> 공개Marker조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<커뮤니티세계지도ObservationDto>>(
+            [
+                new(
+                    "gyeonggi-livestock:kr-gyeonggi",
+                    CommunityPageRoutes.WorldMapDayWorkDataset,
+                    커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence,
+                    "KR",
+                    "대한민국",
+                    37.2562,
+                    127.2050,
+                    "경기도 가축사육업 인허가 집계",
+                    "공개 행정범위·영업상태 집계이며 실제 농장 위치가 아닙니다.",
+                    "경기데이터드림 · Natural Earth admin-1 대표점",
+                    null,
+                    커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked,
+                    "https://data.gg.go.kr/",
+                    "https://data.gg.go.kr/",
+                    커뮤니티세계지도위치정밀도Codes.AdministrativeRegionRepresentative,
+                    SourceDatasetKey: 경기데이터드림가축사육MapMarkerReader.DatasetKey,
+                    CollectedAtUtc: new DateTimeOffset(2026, 8, 3, 0, 0, 0, TimeSpan.Zero),
+                    FreshnessCode: 커뮤니티세계지도FreshnessCodes.Fresh,
+                    BoundaryNotice: "경기도 행정구역 대표점이며 실제 농장 위치가 아닙니다.",
+                    Metrics: [new("total", "전체 인허가 원문", 21696, "건")])
+            ]);
+    }
+
+    private sealed class Stub선택공공데이터MapMarkerReader : I선택공공데이터MapMarkerReader
+    {
+        public Task<IReadOnlyList<커뮤니티세계지도ObservationDto>> 공개Marker조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<커뮤니티세계지도ObservationDto>>(
+            [
+                Observation("tourism:1001", 커뮤니티세계지도LayerCodes.TourismPublicEvidence, "관광지"),
+                Observation("online-price:kr-catalog", 커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence, "온라인가격"),
+                Observation("kosis-cpi:kr:58", 커뮤니티세계지도LayerCodes.KosisStatisticalContext, "KOSIS")
+            ]);
+
+        private static 커뮤니티세계지도ObservationDto Observation(
+            string stableId,
+            string layerCode,
+            string title)
+            => new(
+                stableId,
+                CommunityPageRoutes.WorldMapDayWorkDataset,
+                layerCode,
+                "KR",
+                "대한민국",
+                36.5,
+                127.8,
+                title,
+                "공개 근거 요약",
+                "공공데이터포털",
+                null,
+                커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked,
+                "https://www.data.go.kr/");
     }
 }
