@@ -110,6 +110,34 @@ public sealed class ApartmentManagementFeeSnapshotRequest
     public string Month { get; init; } = string.Empty;
 }
 
+public sealed class SelectedApartmentPublicDataArchiveRequest
+{
+    public string Month { get; init; } = string.Empty;
+}
+
+public sealed class SelectedApartmentPublicDataArchiveResponse
+{
+    public string StatusCode { get; init; } = string.Empty;
+
+    public long? RunId { get; init; }
+
+    public long? SnapshotId { get; init; }
+
+    public string ComplexCode { get; init; } = string.Empty;
+
+    public string ComplexName { get; init; } = string.Empty;
+
+    public string Month { get; init; } = string.Empty;
+
+    public string? ContentSha256 { get; init; }
+
+    public DateTime? CollectedAtUtc { get; init; }
+
+    public bool ReusedExistingSnapshot { get; init; }
+
+    public string? ErrorMessage { get; init; }
+}
+
 public sealed class ApartmentManagementFeeSnapshotItem
 {
     public string ComplexCode { get; init; } = string.Empty;

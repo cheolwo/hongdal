@@ -96,6 +96,17 @@ public sealed class ApartmentManagementFeeOptions
     public string IndividualUsageFeePath { get; set; } = "/1613000/AptIndvdlzManageCostService/getHsmpIndvdlzManageCostInfo";
 
     public string LongTermRepairReservePath { get; set; } = "/1613000/AptLongTermRepairReserveService/getHsmpLongTermRepairReserveInfo";
+
+    public ApartmentPublicDataArchiveOptions Archive { get; set; } = new();
+}
+
+public sealed class ApartmentPublicDataArchiveOptions
+{
+    public bool Enabled { get; set; }
+
+    public int MaxComplexesPerRun { get; set; } = 1;
+
+    public int MaxRequestsPerComplex { get; set; } = 5;
 }
 
 public sealed class CustomsTradeStatisticsOptions

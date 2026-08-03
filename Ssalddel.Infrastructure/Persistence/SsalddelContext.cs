@@ -7,6 +7,7 @@ using Ssalddel.Domain.HumanResources;
 using Ssalddel.Domain.HsCodes;
 using Ssalddel.Domain.Geography;
 using Ssalddel.Domain.Speech;
+using Ssalddel.Domain.PublicData;
 using Ssalddel.Infrastructure.Persistence;
 using 살뜰.도메인.기사;
 using 살뜰.도메인.업체;
@@ -131,6 +132,8 @@ namespace 살뜰.Data
         public DbSet<지역농수산Map행정구역CodeAssignment> 지역농수산Map행정구역CodeAssignments { get; set; } = null!;
         public DbSet<지역농수산Map행정구역Boundary> 지역농수산Map행정구역Boundaries { get; set; } = null!;
         public DbSet<지역농수산Map지역Crosswalk> 지역농수산Map지역Crosswalks { get; set; } = null!;
+        public DbSet<공동주택공공정보수집Run> 공동주택공공정보수집Runs { get; set; } = null!;
+        public DbSet<공동주택공공정보Snapshot> 공동주택공공정보Snapshots { get; set; } = null!;
         public DbSet<Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation> SsalddelMobilePushInstallations { get; set; } = null!;
         public DbSet<교육과정> 교육과정 { get; set; } = null!;
         public DbSet<교육과정과목> 교육과정과목 { get; set; } = null!;

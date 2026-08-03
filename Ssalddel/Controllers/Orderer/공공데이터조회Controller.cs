@@ -3,6 +3,9 @@ using Ssalddel.Contracts.Common.Operations;
 using Ssalddel.Filters;
 using Ssalddel.Application.PublicData;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Ssalddel.Contracts.Common.Orderer;
 using 살뜰.Services.Versioning;
 using Ssalddel.ApiMetadata;
 
@@ -126,6 +129,35 @@ public sealed class 공공데이터조회Controller : OrdererControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _공공데이터조회UseCase.관리비스냅샷조회Async(단지코드, 기준월, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [Authorize]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+    [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+    [HttpPost("apartment-complexes/selected/public-data-snapshots")]
+    [SsalddelApiContractName("ArchiveSelectedApartmentPublicDataSnapshot")]
+    public async Task<IActionResult> 선택단지공공정보적재(
+        [FromBody] SelectedApartmentPublicDataArchiveRequest 요청,
+        CancellationToken cancellationToken)
+    {
+        var scopeKey = User.FindFirstValue(주문자집단배송권ClaimTypes.ScopeKey);
+        var complexCode = User.FindFirstValue(주문자집단배송권ClaimTypes.ApartmentComplexCode);
+        var complexName = User.FindFirstValue(주문자집단배송권ClaimTypes.ApartmentComplexName);
+        if (string.IsNullOrWhiteSpace(scopeKey)
+            || string.IsNullOrWhiteSpace(complexCode)
+            || string.IsNullOrWhiteSpace(complexName))
+        {
+            return Forbid();
+        }
+
+        var result = await _공공데이터조회UseCase.선택단지공공정보적재Async(
+            scopeKey,
+            complexCode,
+            complexName,
+            요청.Month,
+            cancellationToken);
         return this.ToActionResult(result);
     }
 

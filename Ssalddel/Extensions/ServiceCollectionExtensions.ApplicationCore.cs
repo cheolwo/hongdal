@@ -31,6 +31,7 @@ using Ssalddel.Services.HumanResources;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Services.Content;
+using 살뜰.Services.External.PublicData;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
 using 살뜰.Infrastructure;
 using 살뜰.Services.Audit;
@@ -120,6 +121,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I마트주문요청작성UseCase, 마트주문요청작성UseCase>();
         services.AddScoped<I마트피킹조회UseCase, 마트피킹조회UseCase>();
         services.AddScoped<I공공데이터조회UseCase, 공공데이터조회UseCase>();
+        services.AddScoped<I공동주택공공정보ArchiveService, 공동주택공공정보ArchiveService>();
         services.AddSingleton<I공동구매상품CatalogUseCase, 공동구매상품CatalogUseCase>();
         services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
         services.AddScoped<I문서관리UseCase, 문서관리UseCase>();

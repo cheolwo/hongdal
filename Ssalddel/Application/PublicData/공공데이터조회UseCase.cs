@@ -37,6 +37,13 @@ public interface I공공데이터조회UseCase
         string month,
         CancellationToken cancellationToken);
 
+    Task<Result<SelectedApartmentPublicDataArchiveResponse>> 선택단지공공정보적재Async(
+        string scopeKey,
+        string complexCode,
+        string complexName,
+        string month,
+        CancellationToken cancellationToken);
+
     Task<Result<ApartmentGroupCommerceOffsetSimulationResult>> 공동커머스관리비상쇄시뮬레이션Async(
         ApartmentGroupCommerceOffsetSimulationRequest request,
         CancellationToken cancellationToken);
@@ -56,6 +63,7 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
     private readonly IRoadAddressLookupService _roadAddressLookupService;
     private readonly IApartmentComplexLookupService _apartmentComplexLookupService;
     private readonly IApartmentManagementFeeLookupService _apartmentManagementFeeLookupService;
+    private readonly I공동주택공공정보ArchiveService _apartmentPublicDataArchiveService;
     private readonly I주문자집단배송권조회Service _ordererGroupScopeLookupService;
     private readonly IOperatingMarketDeliveryScopeService _operatingMarketDeliveryScopeService;
     private readonly IHsCountryTradeUnitPriceLookupService _hsCountryTradeUnitPriceLookupService;
@@ -64,6 +72,7 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
         IRoadAddressLookupService roadAddressLookupService,
         IApartmentComplexLookupService apartmentComplexLookupService,
         IApartmentManagementFeeLookupService apartmentManagementFeeLookupService,
+        I공동주택공공정보ArchiveService apartmentPublicDataArchiveService,
         I주문자집단배송권조회Service ordererGroupScopeLookupService,
         IOperatingMarketDeliveryScopeService operatingMarketDeliveryScopeService,
         IHsCountryTradeUnitPriceLookupService hsCountryTradeUnitPriceLookupService)
@@ -71,6 +80,7 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
         _roadAddressLookupService = roadAddressLookupService;
         _apartmentComplexLookupService = apartmentComplexLookupService;
         _apartmentManagementFeeLookupService = apartmentManagementFeeLookupService;
+        _apartmentPublicDataArchiveService = apartmentPublicDataArchiveService;
         _ordererGroupScopeLookupService = ordererGroupScopeLookupService;
         _operatingMarketDeliveryScopeService = operatingMarketDeliveryScopeService;
         _hsCountryTradeUnitPriceLookupService = hsCountryTradeUnitPriceLookupService;
@@ -139,6 +149,22 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
             Month = month
         }, cancellationToken);
 
+        return Result.Ok(result);
+    }
+
+    public async Task<Result<SelectedApartmentPublicDataArchiveResponse>> 선택단지공공정보적재Async(
+        string scopeKey,
+        string complexCode,
+        string complexName,
+        string month,
+        CancellationToken cancellationToken)
+    {
+        var result = await _apartmentPublicDataArchiveService.수집Async(
+            scopeKey,
+            complexCode,
+            complexName,
+            month,
+            cancellationToken);
         return Result.Ok(result);
     }
 
