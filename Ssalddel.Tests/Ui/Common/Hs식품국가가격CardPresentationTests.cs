@@ -21,6 +21,11 @@ public sealed class Hs식품국가가격CardPresentationTests
         Assert.Contains("Hs식품국가가격Card조회Async", card, StringComparison.Ordinal);
         Assert.Contains("국가 가격 불러오는 중", card, StringComparison.Ordinal);
         Assert.Contains("ComparisonBoundaries", card, StringComparison.Ordinal);
+        Assert.Contains("hs-country-card__range-chart", card, StringComparison.Ordinal);
+        Assert.Contains("hs-country-card__country-comparison", card, StringComparison.Ordinal);
+        Assert.Contains("TrendPoints", card, StringComparison.Ordinal);
+        Assert.Contains("SparklinePoints", card, StringComparison.Ordinal);
+        Assert.Contains("HS6은 국제 공통", card, StringComparison.Ordinal);
         Assert.DoesNotContain("@onclick=\"LoadAsync\"", card, StringComparison.Ordinal);
     }
 

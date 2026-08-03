@@ -1,3 +1,4 @@
+@using System.Globalization
 @using Ssalddel.Contracts.Common.AgriculturalFisheries
 @inject I농수산공공데이터Client PublicDataClient
 
@@ -50,12 +51,93 @@
         }
         else
         {
-            @if (SafeImageUrl(card.RepresentativeImageUrl) is string imageUrl)
+            var domesticObservations = DomesticPriceObservations(card);
+            var comparableImports = ComparableImportPrices(card);
+            var imageUrl = SafeImageUrl(card.RepresentativeImageUrl);
+
+            <div class="hs-country-card__product">
+                @if (imageUrl is not null)
+                {
+                    <figure class="hs-country-card__image">
+                        <img src="@imageUrl" alt="@card.ProductName 대표 이미지" loading="lazy" decoding="async" />
+                        <figcaption>AI 생성 대표 이미지 · @ImageReviewLabel(card.ImageReviewStatusCode)</figcaption>
+                    </figure>
+                }
+                <section class="hs-country-card__classification" aria-label="상품과 HS 분류 정보">
+                    <span>PRODUCT CLASSIFICATION</span>
+                    <strong>@card.ProductName</strong>
+                    <div>
+                        <code>@card.HsCodeScheme @card.HsCode</code>
+                        <small>@ReferenceMonthLabel(card.ReferenceMonth) 기준 · 최근 @(card.LookbackMonths)개월</small>
+                    </div>
+                    <p>HS6은 국제 공통 6단위 품목 분류입니다. 실제 한국 수입신고 코드는 성분·가공상태·용도에 따라 HSK 10단위 확인이 필요합니다.</p>
+                </section>
+            </div>
+
+            @if (domesticObservations.Count > 0 || comparableImports.Count > 0)
             {
-                <figure class="hs-country-card__image">
-                    <img src="@imageUrl" alt="@card.ProductName 대표 이미지" loading="lazy" decoding="async" />
-                    <figcaption>AI 생성 대표 이미지 · @ImageReviewLabel(card.ImageReviewStatusCode)</figcaption>
-                </figure>
+                <div class="hs-country-card__visuals" aria-label="상품의 유통단계와 국가별 가격 그래프">
+                    @if (domesticObservations.Count > 0)
+                    {
+                        var domesticMaximum = PriceScaleMaximum(domesticObservations.Select(item => item.Observation));
+                        <section class="hs-country-card__visual hs-country-card__range-chart">
+                            <header>
+                                <div>
+                                    <span>유통단계별 가격</span>
+                                    <strong>한국 도매·소매 조사 범위</strong>
+                                </div>
+                                <small>@domesticObservations[0].Observation.Unit</small>
+                            </header>
+                            <div class="hs-country-card__chart-rows">
+                                @foreach (var item in domesticObservations)
+                                {
+                                    <div class="hs-country-card__range-row">
+                                        <span>@item.Observation.MarketStageLabel</span>
+                                        <div class="hs-country-card__range-track"
+                                             style="@RangeStyle(item.Observation, domesticMaximum)"
+                                             role="img"
+                                             aria-label="@RangeAriaLabel(item.Observation)">
+                                            <i></i>
+                                            <b></b>
+                                        </div>
+                                        <strong>@FormatAverage(item.Observation)</strong>
+                                    </div>
+                                }
+                            </div>
+                            <p>막대는 최저~최고, 점은 평균입니다. 도매와 소매는 서로 다른 유통단계입니다.</p>
+                        </section>
+                    }
+
+                    @if (comparableImports.Count > 0)
+                    {
+                        var importMaximum = comparableImports.Max(item => item.Observation.AveragePrice ?? 0m);
+                        <section class="hs-country-card__visual hs-country-card__country-comparison">
+                            <header>
+                                <div>
+                                    <span>국가별 한눈에 보기</span>
+                                    <strong>원산국별 한국 수입신고 단가</strong>
+                                </div>
+                                <small>@comparableImports[0].Observation.Unit</small>
+                            </header>
+                            <div class="hs-country-card__chart-rows">
+                                @foreach (var item in comparableImports)
+                                {
+                                    <div class="hs-country-card__bar-row">
+                                        <span>@CountryFlag(item.CountryCode) @item.CountryName</span>
+                                        <div class="hs-country-card__bar-track"
+                                             style="@BarStyle(item.Observation.AveragePrice ?? 0m, importMaximum)"
+                                             role="img"
+                                             aria-label="@($"{item.CountryName} {FormatAverage(item.Observation)}")">
+                                            <i></i>
+                                        </div>
+                                        <strong>@FormatAverage(item.Observation)</strong>
+                                    </div>
+                                }
+                            </div>
+                            <p>국가 순위가 아니라 동일 HS6·기간·통화·중량 산식의 공개 통계단가 비교입니다.</p>
+                        </section>
+                    }
+                </div>
             }
 
             <div class="hs-country-card__countries">
@@ -74,13 +156,44 @@
                         {
                             @foreach (var observation in country.PriceObservations)
                             {
-                                <dl>
-                                    <div><dt>가격</dt><dd>@FormatPrice(observation)</dd></div>
-                                    <div><dt>기준</dt><dd>@observation.ReferencePeriod</dd></div>
-                                    <div><dt>단계</dt><dd>@observation.MarketStageLabel</dd></div>
-                                    <div><dt>출처</dt><dd>@observation.SourceName</dd></div>
-                                </dl>
-                                <p>@observation.Note</p>
+                                <article class="hs-country-card__observation">
+                                    <div class="hs-country-card__price">
+                                        <span>@observation.MarketStageLabel</span>
+                                        <strong>@FormatAverage(observation)</strong>
+                                        <small>@FormatRange(observation)</small>
+                                    </div>
+                                    @if (observation.TrendPoints is { Count: > 1 } trendPoints)
+                                    {
+                                        var sparkPoints = TrendChartPoints(trendPoints);
+                                        <figure class="hs-country-card__trend">
+                                            <figcaption>
+                                                <strong>월별 추세</strong>
+                                                <span>@PeriodLabel(trendPoints[0].Period)~@PeriodLabel(trendPoints[^1].Period)</span>
+                                            </figcaption>
+                                            <svg viewBox="0 0 240 84"
+                                                 preserveAspectRatio="none"
+                                                 role="img"
+                                                 aria-label="@($"{country.CountryName} {observation.MarketStageLabel} 월별 가격 추세")">
+                                                <polyline points="@SparklinePoints(sparkPoints)" />
+                                                @foreach (var point in sparkPoints)
+                                                {
+                                                    <circle cx="@SvgNumber(point.X)" cy="@SvgNumber(point.Y)" r="3">
+                                                        <title>@($"{PeriodLabel(point.Period)} {point.Value:N2} {observation.Unit}")</title>
+                                                    </circle>
+                                                }
+                                            </svg>
+                                        </figure>
+                                    }
+                                    <dl>
+                                        <div><dt>기준</dt><dd>@observation.ReferencePeriod</dd></div>
+                                        <div><dt>표본</dt><dd>@observation.ObservationCount.ToString("N0")건</dd></div>
+                                    </dl>
+                                    <p>@observation.Note</p>
+                                    @if (SafeImageUrl(observation.SourceUrl) is string sourceUrl)
+                                    {
+                                        <a href="@sourceUrl" target="_blank" rel="noreferrer">@observation.SourceName 원문</a>
+                                    }
+                                </article>
                             }
                         }
                     </section>
@@ -128,7 +241,9 @@
         _errorMessage = null;
         try
         {
-            _card = await PublicDataClient.Hs식품국가가격Card조회Async(NormalizedHsCode);
+            _card = await PublicDataClient.Hs식품국가가격Card조회Async(
+                NormalizedHsCode,
+                lookbackMonths: 6);
         }
         catch (Exception)
         {
@@ -141,20 +256,129 @@
         }
     }
 
-    private static string FormatPrice(Hs식품국가가격관측응답 observation)
+    private static string FormatAverage(Hs식품국가가격관측응답 observation)
     {
         if (observation.AveragePrice is not { } average)
         {
             return ObservationStatusLabel(observation.DataStatusCode);
         }
 
-        var range = observation.MinimumPrice is { } minimum
-            && observation.MaximumPrice is { } maximum
-            && (minimum != average || maximum != average)
-                ? $" ({minimum:N2}~{maximum:N2})"
-                : string.Empty;
-        return $"{average:N2}{range} {observation.CurrencyCode}/{observation.Unit}";
+        return $"{average:N2} {observation.Unit}";
     }
+
+    private static string FormatRange(Hs식품국가가격관측응답 observation)
+        => observation.MinimumPrice is { } minimum
+           && observation.MaximumPrice is { } maximum
+           && (minimum != observation.AveragePrice || maximum != observation.AveragePrice)
+            ? $"관측 범위 {minimum:N2}~{maximum:N2} {observation.Unit}"
+            : $"{observation.ReferencePeriod} 관측";
+
+    private static IReadOnlyList<PriceChartItem> DomesticPriceObservations(
+        Hs식품국가가격Card응답 card)
+        => card.Countries
+            .Where(country => country.CountryCode == "KR")
+            .SelectMany(country => country.PriceObservations.Select(observation => new PriceChartItem(
+                country.CountryCode,
+                country.CountryName,
+                observation)))
+            .Where(item => item.Observation.PriceContextCode == Hs식품국가가격맥락Codes.국내시장조사가격
+                           && item.Observation.AveragePrice.HasValue)
+            .ToArray();
+
+    private static IReadOnlyList<PriceChartItem> ComparableImportPrices(
+        Hs식품국가가격Card응답 card)
+    {
+        var candidates = card.Countries
+            .Where(country => country.CountryCode != "KR")
+            .SelectMany(country => country.PriceObservations.Select(observation => new PriceChartItem(
+                country.CountryCode,
+                country.CountryName,
+                observation)))
+            .Where(item => item.Observation.PriceContextCode == Hs식품국가가격맥락Codes.수입통계단가
+                           && item.Observation.AllowsComparisonWithinGroup
+                           && item.Observation.AveragePrice.HasValue)
+            .ToArray();
+        if (candidates.Length == 0)
+        {
+            return [];
+        }
+
+        var anchor = candidates[0].Observation;
+        return candidates
+            .Where(item => item.Observation.ComparisonGroupCode == anchor.ComparisonGroupCode
+                           && item.Observation.CurrencyCode == anchor.CurrencyCode
+                           && item.Observation.Unit == anchor.Unit)
+            .ToArray();
+    }
+
+    private static decimal PriceScaleMaximum(IEnumerable<Hs식품국가가격관측응답> observations)
+        => observations
+            .Select(observation => observation.MaximumPrice
+                ?? observation.AveragePrice
+                ?? 0m)
+            .DefaultIfEmpty(1m)
+            .Max();
+
+    private static string RangeStyle(
+        Hs식품국가가격관측응답 observation,
+        decimal maximum)
+    {
+        var average = observation.AveragePrice ?? 0m;
+        var minimum = observation.MinimumPrice ?? average;
+        var observedMaximum = observation.MaximumPrice ?? average;
+        return $"--range-start:{Percent(minimum, maximum)};"
+               + $"--range-end:{Percent(observedMaximum, maximum)};"
+               + $"--average:{Percent(average, maximum)}";
+    }
+
+    private static string BarStyle(decimal value, decimal maximum)
+        => $"--bar-size:{Percent(value, maximum)}";
+
+    private static string Percent(decimal value, decimal maximum)
+        => maximum <= 0
+            ? "0%"
+            : $"{Math.Clamp(value / maximum * 100m, 0m, 100m).ToString("0.##", CultureInfo.InvariantCulture)}%";
+
+    private static string RangeAriaLabel(Hs식품국가가격관측응답 observation)
+        => $"{observation.MarketStageLabel} 평균 {FormatAverage(observation)}, {FormatRange(observation)}";
+
+    private static IReadOnlyList<SparkChartPoint> TrendChartPoints(
+        IReadOnlyList<Hs식품가격시계열Point응답> source)
+    {
+        var points = source.OrderBy(point => point.Period, StringComparer.Ordinal).ToArray();
+        if (points.Length == 0)
+        {
+            return [];
+        }
+
+        var minimum = points.Min(point => point.Value);
+        var maximum = points.Max(point => point.Value);
+        var span = maximum - minimum;
+        return points.Select((point, index) => new SparkChartPoint(
+                point.Period,
+                point.Value,
+                points.Length == 1 ? 120d : 8d + index * (224d / (points.Length - 1)),
+                span == 0m
+                    ? 42d
+                    : 8d + (double)((maximum - point.Value) / span) * 68d))
+            .ToArray();
+    }
+
+    private static string SparklinePoints(IReadOnlyList<SparkChartPoint> points)
+        => string.Join(" ", points.Select(point => $"{SvgNumber(point.X)},{SvgNumber(point.Y)}"));
+
+    private static string SvgNumber(double value)
+        => value.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private static string PeriodLabel(string value)
+        => value.Length == 6
+           && int.TryParse(value[..4], out var year)
+           && int.TryParse(value[4..], out var month)
+            ? $"{year}.{month:00}"
+            : value;
+
+    private static string ReferenceMonthLabel(string value)
+        => PeriodLabel(value);
 
     private static string ObservationStatusLabel(string statusCode)
         => statusCode switch
@@ -173,7 +397,10 @@
         };
 
     private static string ImageReviewLabel(string statusCode)
-        => string.Equals(statusCode, "사용가능", StringComparison.Ordinal) ? "검토 완료" : "검토 중";
+        => string.Equals(statusCode, "Available", StringComparison.Ordinal)
+           || string.Equals(statusCode, "사용가능", StringComparison.Ordinal)
+            ? "검토 완료"
+            : "검토 중";
 
     private static string CountryFlag(string countryCode)
         => countryCode switch
@@ -190,4 +417,15 @@
             && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp)
                 ? uri.ToString()
                 : null;
+
+    private sealed record PriceChartItem(
+        string CountryCode,
+        string CountryName,
+        Hs식품국가가격관측응답 Observation);
+
+    private sealed record SparkChartPoint(
+        string Period,
+        decimal Value,
+        double X,
+        double Y);
 }
