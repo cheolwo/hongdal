@@ -21,10 +21,28 @@ public sealed class RegionalAgriculturalMapPresentationTests
         Assert.Contains("@page \"/information/korea-agricultural-map\"", webPage);
         Assert.Contains("@page \"/information/regional-agricultural-map\"", webPage);
         Assert.Contains("<KoreaAgriculturalMapWorkspace InitialCountryCode=", webPage);
+        Assert.Contains("InitialContentLayerKey=", webPage);
+        Assert.Contains("SupplyParameterFromQuery(Name = \"layer\")", webPage);
         Assert.Contains("@page \"/information/korea-agricultural-map\"", appPage);
         Assert.Contains("@page \"/information/regional-agricultural-map\"", appPage);
         Assert.Contains("<KoreaAgriculturalMapWorkspace InitialCountryCode=", appPage);
-        Assert.Contains("한국·미국 공개 데이터 지도", component);
+        Assert.Contains("InitialContentLayerKey=", appPage);
+        Assert.Contains("SupplyParameterFromQuery(Name = \"layer\")", appPage);
+        Assert.Contains("공개 정보 지도 레이어", component);
+        Assert.Contains("지도 콘텐츠 레이어 계층", component);
+        Assert.Contains("홍익학당 철학·영상", component);
+        Assert.Contains("검증된 홍익학당 지리 기록이 없습니다", component);
+        Assert.Contains("수산·바다 구역", component);
+        Assert.Contains("공식 어획구역 바다 타일", component);
+        Assert.Contains("korea-agri-map__ocean-tile", component);
+        Assert.Contains("애니메이션도 실시간 변화나 이동을 뜻하지 않습니다", component);
+        Assert.Contains("prefers-reduced-motion", Read(
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Information",
+            "KoreaAgriculturalMapWorkspace.razor.css"));
         Assert.Contains("RegionalAgriculturalMapCountryCodes.UnitedStates", component);
         Assert.Contains("관계 레이어 선택", component);
         Assert.Contains("Shipping Point는 원산지로 단정하지 않습니다", component);

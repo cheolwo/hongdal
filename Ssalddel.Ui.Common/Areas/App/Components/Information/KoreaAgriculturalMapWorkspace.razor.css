@@ -52,6 +52,40 @@
     text-decoration: none;
 }
 
+.korea-agri-map__content-layer-switch {
+    display: grid;
+    gap: 9px;
+    padding: 15px 16px;
+    border: 1px solid #d8e4dc;
+    border-radius: 16px;
+    background: #fff;
+}
+.korea-agri-map__content-layer-switch > span {
+    color: var(--map-muted);
+    font-size: .72rem;
+    font-weight: 850;
+    letter-spacing: .04em;
+}
+.korea-agri-map__content-layer-switch > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.korea-agri-map__content-layer-switch button {
+    display: grid;
+    min-width: min(100%, 220px);
+    min-height: 56px;
+    justify-items: start;
+    gap: 2px;
+    padding: 10px 13px;
+    border: 1px solid #cbd9cf;
+    border-radius: 11px;
+    background: #f8fbf9;
+    color: var(--map-ink);
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+.korea-agri-map__content-layer-switch button small { color: var(--map-muted); font-size: .68rem; }
+.korea-agri-map__content-layer-switch button.is-active { border-color: var(--map-green); background: #e9f4ed; color: #0f543c; }
+.korea-agri-map__content-layer-switch button:disabled { cursor: wait; opacity: .58; }
+
 .korea-agri-map__explorer-controls {
     display: grid;
     grid-template-columns: minmax(260px, .7fr) minmax(0, 1.3fr);
@@ -286,12 +320,133 @@
 .korea-agri-map__notices { padding: 17px 19px; border-radius: 15px; background: #eef5f0; }
 .korea-agri-map__notices ul { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 20px; color: var(--map-muted); font-size: .74rem; line-height: 1.5; }
 
+.korea-agri-map__hongik-layer {
+    display: grid;
+    gap: 16px;
+    padding: 22px;
+    border: 1px solid #d7e1da;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #fbfcff, #f1f5fb);
+    box-shadow: 0 10px 30px rgba(39, 73, 54, .07);
+}
+.korea-agri-map__hongik-layer > header span { color: #415f91; font-size: .72rem; font-weight: 850; }
+.korea-agri-map__hongik-layer h2 { margin: 5px 0; }
+.korea-agri-map__hongik-layer > header p { margin: 0; color: var(--map-muted); }
+.korea-agri-map__hongik-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.korea-agri-map__hongik-summary article { display: grid; gap: 4px; padding: 14px 16px; border: 1px solid #dbe4dd; border-radius: 13px; background: #fff; }
+.korea-agri-map__hongik-summary span { color: var(--map-muted); font-size: .7rem; }
+.korea-agri-map__hongik-summary strong { overflow-wrap: anywhere; font-size: .9rem; }
+
+.korea-agri-map__marine-layer {
+    display: grid;
+    gap: 16px;
+    padding: 22px;
+    border: 1px solid #b9d8de;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #f7fcfd, #e7f4f6);
+    box-shadow: 0 10px 30px rgba(31, 85, 98, .09);
+}
+.korea-agri-map__marine-layer > header span { color: #116d80; font-size: .72rem; font-weight: 850; }
+.korea-agri-map__marine-layer h2 { margin: 5px 0; }
+.korea-agri-map__marine-layer > header p { margin: 0; color: var(--map-muted); }
+.korea-agri-map__marine-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+.korea-agri-map__marine-summary article {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid #cce2e6;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .9);
+}
+.korea-agri-map__marine-summary span { color: var(--map-muted); font-size: .7rem; }
+.korea-agri-map__marine-summary strong { overflow-wrap: anywhere; font-size: .9rem; }
+.korea-agri-map__marine-workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(300px, .85fr);
+    gap: 18px;
+}
+.korea-agri-map__marine-map-panel {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #c4dce1;
+    border-radius: 20px;
+    background: #fff;
+}
+.korea-agri-map__marine-canvas {
+    position: relative;
+    min-height: 540px;
+    overflow: hidden;
+    border-radius: 17px;
+    background:
+        radial-gradient(circle at 76% 38%, rgba(147, 225, 230, .5), transparent 26%),
+        radial-gradient(circle at 31% 62%, rgba(112, 205, 218, .4), transparent 32%),
+        linear-gradient(160deg, #b9e5eb, #6ebdcc 54%, #3c91a7);
+}
+.korea-agri-map__marine-canvas svg { position: absolute; inset: 3%; width: 94%; height: 94%; }
+.korea-agri-map__marine-grid { fill: none; stroke: rgba(255, 255, 255, .22); stroke-width: 1; }
+.korea-agri-map__marine-land { fill: rgba(223, 235, 220, .94); stroke: rgba(68, 112, 91, .52); stroke-width: 2; }
+.korea-agri-map__marine-land--ice { fill: rgba(241, 248, 246, .88); }
+.korea-agri-map__ocean-tile {
+    --ocean-delay: 0ms;
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    min-width: 108px;
+    justify-items: center;
+    gap: 1px;
+    padding: 10px 13px;
+    border: 1px solid rgba(255, 255, 255, .74);
+    border-radius: 18px;
+    background: rgba(8, 83, 108, .84);
+    box-shadow: 0 9px 24px rgba(4, 58, 77, .25);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    transform: translate(-50%, -50%);
+    animation: korea-agri-ocean-float 5.8s ease-in-out infinite;
+    animation-delay: var(--ocean-delay);
+    backdrop-filter: blur(5px);
+}
+.korea-agri-map__ocean-tile strong { font-size: .76rem; }
+.korea-agri-map__ocean-tile small { color: #d7f4f7; font-size: .63rem; }
+.korea-agri-map__ocean-tile-wake {
+    position: absolute;
+    inset: -8px;
+    z-index: -1;
+    border: 2px solid rgba(232, 253, 255, .64);
+    border-radius: 25px;
+    animation: korea-agri-ocean-wake 3.4s ease-out infinite;
+    animation-delay: var(--ocean-delay);
+}
+.korea-agri-map__ocean-tile.is-selected {
+    outline: 3px solid #ffd166;
+    outline-offset: 3px;
+    background: rgba(4, 70, 96, .96);
+}
+.korea-agri-map__ocean-tile:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+@keyframes korea-agri-ocean-float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-7px); }
+}
+@keyframes korea-agri-ocean-wake {
+    0% { opacity: .65; transform: scale(.82); }
+    75%, 100% { opacity: 0; transform: scale(1.32); }
+}
+
 @media (max-width: 800px) {
     .korea-agri-map { padding: 16px 13px 108px; }
     .korea-agri-map__hero { display: grid; padding: 22px 18px; }
     .korea-agri-map__hero nav { grid-template-columns: 1fr 1fr; }
     .korea-agri-map__explorer-controls { grid-template-columns: 1fr; }
     .korea-agri-map__summary { grid-template-columns: 1fr 1fr; }
+    .korea-agri-map__hongik-summary { grid-template-columns: 1fr; }
+    .korea-agri-map__marine-summary { grid-template-columns: 1fr 1fr; }
+    .korea-agri-map__marine-workspace { grid-template-columns: 1fr; }
     .korea-agri-map__workspace { grid-template-columns: 1fr; }
     .korea-agri-map__canvas { min-height: 500px; }
 }
@@ -304,4 +459,12 @@
     .korea-agri-map__canvas { min-height: 450px; }
     .korea-agri-map__detail dl { grid-template-columns: 1fr; }
     .korea-agri-map__state { align-items: start; flex-wrap: wrap; }
+    .korea-agri-map__marine-summary { grid-template-columns: 1fr; }
+    .korea-agri-map__marine-canvas { min-height: 470px; }
+    .korea-agri-map__ocean-tile { min-width: 88px; padding: 8px 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .korea-agri-map__ocean-tile,
+    .korea-agri-map__ocean-tile-wake { animation: none; }
 }

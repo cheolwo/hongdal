@@ -1,0 +1,182 @@
+.marine-ocean-map {
+    display: grid;
+    gap: 16px;
+    padding: 22px;
+    border: 1px solid #b9d8de;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #f7fcfd, #e7f4f6);
+    box-shadow: 0 10px 30px rgba(31, 85, 98, .09);
+}
+
+.marine-ocean-map > header span { color: #116d80; font-size: .72rem; font-weight: 850; }
+.marine-ocean-map h2 { margin: 5px 0; }
+.marine-ocean-map > header p { margin: 0; color: var(--map-muted); }
+
+.marine-ocean-map__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.marine-ocean-map__summary article {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid #cce2e6;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .9);
+}
+
+.marine-ocean-map__summary span { color: var(--map-muted); font-size: .7rem; }
+.marine-ocean-map__summary strong { overflow-wrap: anywhere; font-size: .9rem; }
+
+.marine-ocean-map__workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(300px, .85fr);
+    gap: 18px;
+}
+
+.marine-ocean-map__map-panel,
+.marine-ocean-map__detail {
+    min-width: 0;
+    border: 1px solid #c4dce1;
+    border-radius: 20px;
+    background: #fff;
+}
+
+.marine-ocean-map__map-panel { padding: 18px; }
+
+.marine-ocean-map__canvas {
+    position: relative;
+    min-height: 540px;
+    overflow: hidden;
+    border-radius: 17px;
+    background:
+        radial-gradient(circle at 76% 38%, rgba(147, 225, 230, .5), transparent 26%),
+        radial-gradient(circle at 31% 62%, rgba(112, 205, 218, .4), transparent 32%),
+        linear-gradient(160deg, #b9e5eb, #6ebdcc 54%, #3c91a7);
+}
+
+.marine-ocean-map__canvas svg { position: absolute; inset: 3%; width: 94%; height: 94%; }
+.marine-ocean-map__grid { fill: none; stroke: rgba(255, 255, 255, .22); stroke-width: 1; }
+.marine-ocean-map__land { fill: rgba(223, 235, 220, .94); stroke: rgba(68, 112, 91, .52); stroke-width: 2; }
+.marine-ocean-map__land--ice { fill: rgba(241, 248, 246, .88); }
+
+.marine-ocean-map__tile {
+    --ocean-delay: 0ms;
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    min-width: 108px;
+    justify-items: center;
+    gap: 1px;
+    padding: 10px 13px;
+    border: 1px solid rgba(255, 255, 255, .74);
+    border-radius: 18px;
+    background: rgba(8, 83, 108, .84);
+    box-shadow: 0 9px 24px rgba(4, 58, 77, .25);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    transform: translate(-50%, -50%);
+    animation: marine-ocean-float 5.8s ease-in-out infinite;
+    animation-delay: var(--ocean-delay);
+    backdrop-filter: blur(5px);
+}
+
+.marine-ocean-map__tile strong { font-size: .76rem; }
+.marine-ocean-map__tile small { color: #d7f4f7; font-size: .63rem; }
+
+.marine-ocean-map__tile-wake {
+    position: absolute;
+    inset: -8px;
+    z-index: -1;
+    border: 2px solid rgba(232, 253, 255, .64);
+    border-radius: 25px;
+    animation: marine-ocean-wake 3.4s ease-out infinite;
+    animation-delay: var(--ocean-delay);
+}
+
+.marine-ocean-map__tile.is-selected {
+    outline: 3px solid #ffd166;
+    outline-offset: 3px;
+    background: rgba(4, 70, 96, .96);
+}
+
+.marine-ocean-map__tile:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+.marine-ocean-map__boundary {
+    margin: 12px 2px 0;
+    color: var(--map-muted);
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+.marine-ocean-map__detail { display: grid; align-content: start; gap: 16px; padding: 22px; }
+.marine-ocean-map__detail > header span { color: #116d80; font-size: .72rem; font-weight: 850; }
+.marine-ocean-map__detail h2 { margin: 6px 0 2px; font-size: 1.8rem; }
+.marine-ocean-map__detail > header p { margin: 0; color: var(--map-muted); }
+.marine-ocean-map__detail dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
+.marine-ocean-map__detail dl div { padding: 12px; border-radius: 10px; background: #eef7f8; }
+.marine-ocean-map__detail dt { color: var(--map-muted); font-size: .68rem; }
+.marine-ocean-map__detail dd { margin: 4px 0 0; font-size: .78rem; font-weight: 750; overflow-wrap: anywhere; }
+
+.marine-ocean-map__sources { display: grid; gap: 8px; }
+.marine-ocean-map__sources h3 { margin: 4px 0; font-size: 1rem; }
+.marine-ocean-map__sources article { display: grid; gap: 3px; padding: 12px; border: 1px solid #d1e5e8; border-radius: 11px; }
+
+.marine-ocean-map__source-link {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    padding: 8px 14px;
+    border: 1px solid #116d80;
+    border-radius: 11px;
+    color: #116d80;
+    font-size: .76rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.marine-ocean-map__empty {
+    display: grid;
+    min-height: 260px;
+    align-content: center;
+    justify-items: start;
+    padding: 22px;
+    border: 1px solid #dce4df;
+    border-radius: 16px;
+    background: #f8faf9;
+}
+
+.marine-ocean-map__notices { padding: 17px 19px; border-radius: 15px; background: #e5f2f4; }
+.marine-ocean-map__notices ul { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 20px; color: var(--map-muted); font-size: .74rem; line-height: 1.5; }
+
+@keyframes marine-ocean-float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-7px); }
+}
+
+@keyframes marine-ocean-wake {
+    0% { opacity: .65; transform: scale(.82); }
+    75%, 100% { opacity: 0; transform: scale(1.32); }
+}
+
+@media (max-width: 800px) {
+    .marine-ocean-map__summary { grid-template-columns: 1fr 1fr; }
+    .marine-ocean-map__workspace { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+    .marine-ocean-map__summary { grid-template-columns: 1fr; }
+    .marine-ocean-map__canvas { min-height: 470px; }
+    .marine-ocean-map__tile { min-width: 88px; padding: 8px 9px; }
+    .marine-ocean-map__detail dl { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marine-ocean-map__tile,
+    .marine-ocean-map__tile-wake { animation: none; }
+}

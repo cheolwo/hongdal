@@ -228,6 +228,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddAgriculturalFisheriesInformationModule();
+builder.Services.AddHongikAcademyContentMapModule();
 builder.Services.AddSsalddelHttpClients();
 builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
 builder.Services.AddApifySocialMediaResearch(builder.Configuration);

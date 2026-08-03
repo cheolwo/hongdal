@@ -10,6 +10,10 @@ public interface I농수산공공데이터Client
         RegionalAgriculturalMapMarkerQuery query,
         CancellationToken cancellationToken = default);
 
+    Task<MarineFishingAreaOceanTileResponse> 해양수산Map바다Tile조회Async(
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException();
+
     Task<AgriculturalFisheriesInformationOverviewResponse> 개요조회Async(
         CancellationToken cancellationToken = default);
 
