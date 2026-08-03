@@ -105,6 +105,25 @@ internal sealed class UsdaAms시장가격관측Configuration
             item.Commodity,
             item.MarketLocationName
         });
+        // 지도 기본 조회는 품목·기간을 생략할 수 있으므로 100만 건 이상인 AMS 원장도
+        // 시장/Shipping Point별 집계를 테이블 행을 다시 읽지 않고 수행할 수 있어야 한다.
+        builder.HasIndex(item => new
+        {
+            item.SourceKey,
+            item.MarketLocationState,
+            item.MarketLocationName,
+            item.MarketType,
+            item.ReportBeginDate,
+            item.ReportEndDate
+        }).HasDatabaseName("IX_agri_ams_map_market_lookup");
+        builder.HasIndex(item => new
+        {
+            item.MarketType,
+            item.SourceKey,
+            item.District,
+            item.ReportBeginDate,
+            item.ReportEndDate
+        }).HasDatabaseName("IX_agri_ams_map_shipping_lookup");
         builder.HasIndex(item => item.LastSeenAtUtc);
     }
 }

@@ -19,6 +19,21 @@ namespace Ssalddel.Tests.Services.AgriculturalFisheries;
 public sealed class RegionalAgriculturalMapMarkerQueryTests
 {
     [Fact]
+    public void AMS기본지도집계에필요한CoveringIndex를_보존한다()
+    {
+        using var priceDb = CreatePriceDb();
+        var entity = priceDb.Model.FindEntityType(typeof(UsdaAms시장가격관측));
+
+        Assert.NotNull(entity);
+        var indexNames = entity!.GetIndexes()
+            .Select(index => index.GetDatabaseName())
+            .ToArray();
+
+        Assert.Contains("IX_agri_ams_map_market_lookup", indexNames);
+        Assert.Contains("IX_agri_ams_map_shipping_lookup", indexNames);
+    }
+
+    [Fact]
     public async Task MAFRA산지는_검토된교차표와기준점이있을때만_산지Marker로반환한다()
     {
         await using var geographyDb = CreateGeographyDb();
