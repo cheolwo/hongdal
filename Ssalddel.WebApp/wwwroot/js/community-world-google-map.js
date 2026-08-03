@@ -204,6 +204,14 @@ function markerStyleFor(layerCode, night) {
             return { color: "#8a4b24", path: "M -9,-2 -6,-8 6,-8 9,-2 7,0 7,9 -7,9 -7,0 z", scale: .72, selectedScale: .96 };
         case "overseas-manufacturer":
             return { color: "#7b4ab0", path: "M -9,-2 -5,-2 -5,-9 -2,-9 -2,-2 2,-5 2,-1 8,-5 8,9 -9,9 z", scale: .72, selectedScale: .96 };
+        case "gyeonggi-livestock-public-evidence":
+            return { color: "#c87924", path: "M 0,-10 8,-5 8,5 0,10 -8,5 -8,-5 z", scale: .78, selectedScale: 1.02 };
+        case "tourism-public-evidence":
+            return { color: "#148a8a", path: "M 0,-10 C 5,-10 9,-6 9,-1 C 9,5 0,11 0,11 C 0,11 -9,5 -9,-1 C -9,-6 -5,-10 0,-10 z", scale: .72, selectedScale: .96 };
+        case "online-price-public-evidence":
+            return { color: "#d05c42", path: "M -10,-7 7,-7 10,-4 10,7 -10,7 z M -4,-7 -4,7", scale: .7, selectedScale: .94 };
+        case "kosis-statistical-context":
+            return { color: "#5d63b8", path: "M -10,8 -10,2 -5,2 -5,8 z M -3,8 -3,-4 2,-4 2,8 z M 4,8 4,-9 9,-9 9,8 z", scale: .72, selectedScale: .96 };
         case "learning-channel":
             return { color: "#6750a4", path: google.maps.SymbolPath.CIRCLE, scale: 8, selectedScale: 11 };
         case "scripture-classics":

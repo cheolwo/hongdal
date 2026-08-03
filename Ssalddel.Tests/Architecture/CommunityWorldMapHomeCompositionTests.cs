@@ -5,6 +5,61 @@ namespace Ssalddel.Tests.Architecture;
 public sealed class CommunityWorldMapHomeCompositionTests
 {
     [Fact]
+    public void 세계지도는_로그인역할에맞는Layer를기본활성화하고_다른공개Layer선택도유지한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+
+        Assert.Contains("@inject WebAuthSessionService AuthSession", pageSource);
+        Assert.Contains("커뮤니티세계지도RoleLayerProfileCatalog.Resolve(AuthSession.PrimaryRole)", pageSource);
+        Assert.Contains("ActiveRoleProfile.RecommendedLayerCodes", pageSource);
+        Assert.Contains("역할 기본 레이어 복원", pageSource);
+        Assert.Contains("추가 공개 자료", pageSource);
+        Assert.Contains("world-community-home__role-profile", pageSource);
+        Assert.Contains(".world-community-home__role-profile", styleSource);
+        Assert.Contains(".is-role-optional", styleSource);
+    }
+
+    [Fact]
+    public void 세계지도는_원장구조에서고른공개인계관점을_기존공식Marker에중복없이연결한다()
+    {
+        var contractSource = ReadRepositoryFile(
+            "Ssalddel.Contracts",
+            "Common",
+            "Community",
+            "커뮤니티세계지도Dtos.cs");
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+
+        Assert.Contains("ProcurementHandoff = \"procurement-handoff\"", contractSource);
+        Assert.Contains("ImportReadiness = \"import-readiness\"", contractSource);
+        Assert.Contains("TransportHandoff = \"transport-handoff\"", contractSource);
+        Assert.Contains("WarehouseInboundHandoff = \"warehouse-inbound-handoff\"", contractSource);
+        Assert.Contains("ObservationSourceLayerCodes", contractSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.MeatImportReadiness", contractSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.CargoTransport", contractSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.WarehouseInbound", contractSource);
+        Assert.Contains("IsObservationSourceLayerVisible", pageSource);
+        Assert.Contains("LayerHasVisibleSource", pageSource);
+        Assert.Contains("layer.LedgerTemplateKey ?? (layer.Code switch", pageSource);
+        Assert.Contains("원장 관점 · 공개 레이어", pageSource);
+        Assert.Contains(".world-community-home__layer-shape--route", styleSource);
+        Assert.Contains(".world-community-home__layer-shape--warehouse", styleSource);
+    }
+
+    [Fact]
     public void 세계지도는_해외제조업소를_행정권역집계Layer와공장형Marker로표시한다()
     {
         var contractSource = ReadRepositoryFile(
@@ -399,6 +454,9 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("regional-culture", scriptSource);
         Assert.Contains("wholesale-market", scriptSource);
         Assert.Contains("traditional-market-hub", scriptSource);
+        Assert.Contains("tourism-public-evidence", scriptSource);
+        Assert.Contains("online-price-public-evidence", scriptSource);
+        Assert.Contains("kosis-statistical-context", scriptSource);
         Assert.Contains("scripture-classics", scriptSource);
     }
 
@@ -425,6 +483,9 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("커뮤니티세계지도LayerCodes.PublicPrice", pageSource);
         Assert.Contains("커뮤니티세계지도LayerCodes.WholesaleMarket", pageSource);
         Assert.Contains("커뮤니티세계지도LayerCodes.TraditionalMarketHub", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.TourismPublicEvidence", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence", pageSource);
+        Assert.Contains("커뮤니티세계지도LayerCodes.KosisStatisticalContext", pageSource);
         Assert.Contains("커뮤니티세계지도LayerCodes.LearningChannel", pageSource);
         Assert.Contains("커뮤니티세계지도LayerCodes.ScriptureAndClassics", pageSource);
         Assert.Contains("CommunityLedgerTemplateKeys.LocalSale", pageSource);
@@ -482,12 +543,28 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("하단에서 원장 전체 절차 보기", pageSource);
         Assert.Contains("OpenDiagramPanel", pageSource);
         Assert.Contains(".Select(BuildLedgerWorkflowDiagram)", pageSource);
-        Assert.Contains("availableLayerCodes.Contains(layer.Code)", pageSource);
+        Assert.Contains("LayerHasVisibleSource(layer, availableLayerCodes)", pageSource);
 
         Assert.Contains(".world-community-home__layer-option-copy", styleSource);
         Assert.Contains(".world-community-home__layer-ledger-summary", styleSource);
         Assert.Contains(".world-community-home__selected-ledgers", styleSource);
         Assert.Contains(".world-community-home__selected-ledger-list", styleSource);
+    }
+
+    [Fact]
+    public void 원장연결Marker를선택하면_하단업무흐름Diagram을자동으로연다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+
+        Assert.Contains("OpenLedgerDiagramForMapFeature(observationId)", pageSource);
+        Assert.Contains("private void OpenLedgerDiagramForMapFeature", pageSource);
+        Assert.Contains("marker.LayerCode", pageSource);
+        Assert.Contains("LayerHasVisibleSource(layer, availableSourceLayerCodes)", pageSource);
+        Assert.Contains("if (hasSelectedLedgerLayer)", pageSource);
+        Assert.Contains("_isDiagramPanelExpanded = true", pageSource);
     }
 
     [Fact]
