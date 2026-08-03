@@ -17,6 +17,13 @@ public sealed class RegionalAgriculturalMapPresentationTests
             "Components",
             "Information",
             "KoreaAgriculturalMapWorkspace.razor");
+        var marineComponent = Read(
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Information",
+            "MarineFishingAreaOceanMapLayer.razor");
 
         Assert.Contains("@page \"/information/korea-agricultural-map\"", webPage);
         Assert.Contains("@page \"/information/regional-agricultural-map\"", webPage);
@@ -34,8 +41,8 @@ public sealed class RegionalAgriculturalMapPresentationTests
         Assert.Contains("검증된 홍익학당 지리 기록이 없습니다", component);
         Assert.Contains("수산·바다 구역", component);
         Assert.Contains("공식 어획구역 바다 타일", component);
-        Assert.Contains("korea-agri-map__ocean-tile", component);
-        Assert.Contains("애니메이션도 실시간 변화나 이동을 뜻하지 않습니다", component);
+        Assert.Contains("marine-ocean-map__tile", marineComponent);
+        Assert.Contains("애니메이션도 실시간 변화나 이동을 뜻하지 않습니다", marineComponent);
         Assert.Contains("prefers-reduced-motion", Read(
             "Ssalddel.Ui.Common",
             "Areas",
