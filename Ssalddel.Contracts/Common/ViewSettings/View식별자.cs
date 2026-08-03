@@ -2,6 +2,7 @@ namespace Ssalddel.Contracts.Common.ViewSettings;
 
 public static class App식별자
 {
+    public const string OrdererApp = "OrdererApp";
     public const string DriverApp = "DriverApp";
     public const string CargoYongdalDriverApp = "CargoYongdalDriverApp";
     public const string FoodDeliveryDriverApp = "FoodDeliveryDriverApp";

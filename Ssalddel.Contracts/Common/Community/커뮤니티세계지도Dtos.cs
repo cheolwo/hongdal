@@ -5,8 +5,37 @@ namespace Ssalddel.Contracts.Common.Community;
 public static class 커뮤니티세계지도Routes
 {
     public const string ObservationApi = "api/v1/community/world-map/observations";
+    public const string RoleDetailEntryApi = "api/v1/community/world-map/role-detail-entry";
     public const string KoreaPriceDetail = "/information/kamis-domestic-price-comparison";
     public const string UnitedStatesPriceDetail = "/information/usda-us-price-comparison";
+}
+
+public static class 커뮤니티세계지도SourceTypeCodes
+{
+    public const string Content = "content";
+    public const string PublicData = "public-data";
+    public const string PublicOperationalAggregate = "public-operational-aggregate";
+    public const string PublicEvidenceComposite = "public-evidence-composite";
+}
+
+public static class 커뮤니티세계지도DisclosureScopeCodes
+{
+    public const string PublicEvidence = "public-evidence";
+    public const string PublicAggregated = "public-aggregated";
+}
+
+public static class 커뮤니티세계지도ExecutionBoundaryCodes
+{
+    public const string PublicReadOnly = "public-read-only";
+    public const string RoleAppAuthorizedDetail = "role-app-authorized-detail";
+}
+
+public static class 커뮤니티세계지도RoleDetailEntryCodes
+{
+    public const string GroupPurchase = "group-purchase";
+    public const string ImportReadiness = "import-readiness";
+    public const string Transport = "transport";
+    public const string WarehouseInbound = "warehouse-inbound";
 }
 
 public static class 커뮤니티세계지도LayerCodes
@@ -192,7 +221,66 @@ public sealed record 커뮤니티세계지도LayerDto(
     string Color,
     string MarkerShape,
     string? LedgerTemplateKey = null,
-    IReadOnlyList<string>? ObservationSourceLayerCodes = null);
+    IReadOnlyList<string>? ObservationSourceLayerCodes = null)
+{
+    public string SourceTypeCode => 커뮤니티세계지도LayerScopeCatalog.SourceTypeFor(Code);
+
+    public string DisclosureScopeCode => 커뮤니티세계지도LayerScopeCatalog.DisclosureScopeFor(Code);
+
+    public string ExecutionBoundaryCode => RoleDetailEntryCode is null
+        ? 커뮤니티세계지도ExecutionBoundaryCodes.PublicReadOnly
+        : 커뮤니티세계지도ExecutionBoundaryCodes.RoleAppAuthorizedDetail;
+
+    public string? RoleDetailEntryCode => 커뮤니티세계지도LayerScopeCatalog.RoleDetailEntryFor(Code);
+}
+
+public static class 커뮤니티세계지도LayerScopeCatalog
+{
+    public static string SourceTypeFor(string layerCode)
+        => layerCode switch
+        {
+            커뮤니티세계지도LayerCodes.RegionalCulture
+                or 커뮤니티세계지도LayerCodes.LearningChannel
+                or 커뮤니티세계지도LayerCodes.ScriptureAndClassics
+                => 커뮤니티세계지도SourceTypeCodes.Content,
+            커뮤니티세계지도LayerCodes.TraditionalMarketHub
+                => 커뮤니티세계지도SourceTypeCodes.PublicOperationalAggregate,
+            커뮤니티세계지도LayerCodes.ProcurementHandoff
+                or 커뮤니티세계지도LayerCodes.ImportReadiness
+                or 커뮤니티세계지도LayerCodes.TransportHandoff
+                or 커뮤니티세계지도LayerCodes.WarehouseInboundHandoff
+                => 커뮤니티세계지도SourceTypeCodes.PublicEvidenceComposite,
+            _ => 커뮤니티세계지도SourceTypeCodes.PublicData
+        };
+
+    public static string DisclosureScopeFor(string layerCode)
+        => layerCode == 커뮤니티세계지도LayerCodes.TraditionalMarketHub
+            ? 커뮤니티세계지도DisclosureScopeCodes.PublicAggregated
+            : 커뮤니티세계지도DisclosureScopeCodes.PublicEvidence;
+
+    public static string? RoleDetailEntryFor(string layerCode)
+        => layerCode switch
+        {
+            커뮤니티세계지도LayerCodes.ProcurementHandoff
+                => 커뮤니티세계지도RoleDetailEntryCodes.GroupPurchase,
+            커뮤니티세계지도LayerCodes.ImportReadiness
+                => 커뮤니티세계지도RoleDetailEntryCodes.ImportReadiness,
+            커뮤니티세계지도LayerCodes.TransportHandoff
+                => 커뮤니티세계지도RoleDetailEntryCodes.Transport,
+            커뮤니티세계지도LayerCodes.WarehouseInboundHandoff
+                => 커뮤니티세계지도RoleDetailEntryCodes.WarehouseInbound,
+            _ => null
+        };
+}
+
+public sealed record 커뮤니티세계지도RoleDetailEntryRequest(string EntryCode);
+
+public sealed record 커뮤니티세계지도RoleDetailEntryResponse(
+    string EntryCode,
+    string AppKey,
+    string Route,
+    string ExecutionBoundaryCode,
+    string AuthorizationNotice);
 
 public sealed record 커뮤니티세계지도MetricDto(
     string Code,
