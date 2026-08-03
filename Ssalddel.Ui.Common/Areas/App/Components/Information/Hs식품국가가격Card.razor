@@ -1,0 +1,193 @@
+@using Ssalddel.Contracts.Common.AgriculturalFisheries
+@inject I농수산공공데이터Client PublicDataClient
+
+<article class="hs-country-card" aria-labelledby="@TitleId">
+    <header class="hs-country-card__header">
+        <div>
+            <span>HS @NormalizedHsCode</span>
+            <h6 id="@TitleId">@(_card?.ProductName ?? ProductName ?? "국가별 가격 자료")</h6>
+        </div>
+        @if (_card is not null)
+        {
+            <small>@StatusLabel(_card.StatusCode)</small>
+        }
+    </header>
+
+    @if (_card is null && string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="hs-country-card__request">
+            <p>한국·미국·일본·중국의 공개 가격 관측을 한 카드에서 확인합니다.</p>
+            <데이터조회Button IsLoading="@_loading"
+                             Disabled="@(!HasValidHsCode)"
+                             LoadingText="국가 가격 불러오는 중"
+                             StartIcon="@Icons.Material.Filled.Public"
+                             OnClick="LoadAsync">
+                국가별 가격 보기
+            </데이터조회Button>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="hs-country-card__state hs-country-card__state--error" role="alert">
+            <strong>국가 가격 자료를 불러오지 못했습니다.</strong>
+            <span>@_errorMessage</span>
+            <데이터조회Button IsLoading="@_loading"
+                             LoadingText="다시 불러오는 중"
+                             StartIcon="@Icons.Material.Filled.Refresh"
+                             OnClick="LoadAsync">
+                다시 시도
+            </데이터조회Button>
+        </div>
+    }
+    else if (_card is { } card)
+    {
+        @if (card.StatusCode == Hs식품국가가격Card상태Codes.품목없음)
+        {
+            <div class="hs-country-card__state" role="status">
+                <strong>이 HS6의 가격 카드는 준비 중입니다.</strong>
+                <span>분류 후보는 유지하되 대표 이미지와 국가별 관측이 연결되기 전까지 가격값을 표시하지 않습니다.</span>
+            </div>
+        }
+        else
+        {
+            @if (SafeImageUrl(card.RepresentativeImageUrl) is string imageUrl)
+            {
+                <figure class="hs-country-card__image">
+                    <img src="@imageUrl" alt="@card.ProductName 대표 이미지" loading="lazy" decoding="async" />
+                    <figcaption>AI 생성 대표 이미지 · @ImageReviewLabel(card.ImageReviewStatusCode)</figcaption>
+                </figure>
+            }
+
+            <div class="hs-country-card__countries">
+                @foreach (var country in card.Countries.OrderBy(item => item.DisplayOrder))
+                {
+                    <section class="hs-country-card__country">
+                        <header>
+                            <strong>@CountryFlag(country.CountryCode) @country.CountryName</strong>
+                            <span>@ObservationStatusLabel(country.DataStatusCode)</span>
+                        </header>
+                        @if (country.PriceObservations.Count == 0)
+                        {
+                            <p>@country.Summary</p>
+                        }
+                        else
+                        {
+                            @foreach (var observation in country.PriceObservations)
+                            {
+                                <dl>
+                                    <div><dt>가격</dt><dd>@FormatPrice(observation)</dd></div>
+                                    <div><dt>기준</dt><dd>@observation.ReferencePeriod</dd></div>
+                                    <div><dt>단계</dt><dd>@observation.MarketStageLabel</dd></div>
+                                    <div><dt>출처</dt><dd>@observation.SourceName</dd></div>
+                                </dl>
+                                <p>@observation.Note</p>
+                            }
+                        }
+                    </section>
+                }
+            </div>
+
+            <footer class="hs-country-card__boundaries" role="note">
+                <strong>비교 경계</strong>
+                <ul>
+                    @foreach (var boundary in card.ComparisonBoundaries)
+                    {
+                        <li>@boundary</li>
+                    }
+                </ul>
+            </footer>
+        }
+    }
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public string HsCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? ProductName { get; set; }
+
+    private Hs식품국가가격Card응답? _card;
+    private bool _loading;
+    private string? _errorMessage;
+
+    private string NormalizedHsCode
+        => new(HsCode.Where(char.IsDigit).Take(6).ToArray());
+
+    private bool HasValidHsCode => NormalizedHsCode.Length == 6;
+    private string TitleId => $"hs-country-price-{NormalizedHsCode}";
+
+    private async Task LoadAsync(MouseEventArgs _)
+    {
+        if (!HasValidHsCode || _loading)
+        {
+            return;
+        }
+
+        _loading = true;
+        _errorMessage = null;
+        try
+        {
+            _card = await PublicDataClient.Hs식품국가가격Card조회Async(NormalizedHsCode);
+        }
+        catch (Exception)
+        {
+            _card = null;
+            _errorMessage = "공개 데이터 연결 상태를 확인한 뒤 다시 시도해 주세요.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static string FormatPrice(Hs식품국가가격관측응답 observation)
+    {
+        if (observation.AveragePrice is not { } average)
+        {
+            return ObservationStatusLabel(observation.DataStatusCode);
+        }
+
+        var range = observation.MinimumPrice is { } minimum
+            && observation.MaximumPrice is { } maximum
+            && (minimum != average || maximum != average)
+                ? $" ({minimum:N2}~{maximum:N2})"
+                : string.Empty;
+        return $"{average:N2}{range} {observation.CurrencyCode}/{observation.Unit}";
+    }
+
+    private static string ObservationStatusLabel(string statusCode)
+        => statusCode switch
+        {
+            Hs식품국가가격관측상태Codes.관측됨 => "관측됨",
+            Hs식품국가가격관측상태Codes.자료없음 => "자료 없음",
+            _ => "조회 불가"
+        };
+
+    private static string StatusLabel(string statusCode)
+        => statusCode switch
+        {
+            Hs식품국가가격Card상태Codes.완료 => "자료 연결",
+            Hs식품국가가격Card상태Codes.품목없음 => "준비 중",
+            _ => "일부 자료"
+        };
+
+    private static string ImageReviewLabel(string statusCode)
+        => string.Equals(statusCode, "사용가능", StringComparison.Ordinal) ? "검토 완료" : "검토 중";
+
+    private static string CountryFlag(string countryCode)
+        => countryCode switch
+        {
+            "KR" => "🇰🇷",
+            "US" => "🇺🇸",
+            "JP" => "🇯🇵",
+            "CN" => "🇨🇳",
+            _ => "🌐"
+        };
+
+    private static string? SafeImageUrl(string? value)
+        => Uri.TryCreate(value, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp)
+                ? uri.ToString()
+                : null;
+}

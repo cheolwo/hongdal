@@ -18,6 +18,7 @@
 
 - `FoodPriceCrosswalkCatalog`: HS 코드와 aT 조사품목 사이의 검토된 연결표
 - `AtDomesticFoodPriceLookupService`: aT 일별 가격 API 어댑터
+- `KamisDomesticPriceArchiveQueryService`: 실시간 aT 조회를 사용할 수 없을 때 서버에 저장된 공식 KAMIS 일별 관측을 같은 품목·품종·기간·1kg 기준으로 조회
 - `I미국농수산가격공급자`: 미국 공식 가격 원천을 교체·추가하기 위한 공급자 경계
 - `UsdaNassQuickStats가격공급자`: USDA NASS Quick Stats 농산물·양식 수산물 통계 어댑터
 - `미국농수산가격조회Service`: 출처 선택, 요청 정규화, 단기 캐시와 장애 격리
@@ -55,6 +56,10 @@
 | 한국 육류 수입 준비 절차도 조회 | `GET /api/v1/agricultural-fisheries/import-readiness/diagram` | 없음 |
 
 국내가격 조회는 지원하지 않는 HS 코드에 `MappingRequired`, 잘못된 요청에 `InvalidRequest`, 외부 자료를 얻지 못한 경우 `DataUnavailable`을 반환한다. 연결되지 않은 품목을 임의의 유사 품목으로 자동 대체하지 않는다.
+
+실시간 aT 조회가 실패해도 같은 HS-aT 연결표에 해당하는 공식 KAMIS 일별 관측이 서버 원장에 있으면 `CompleteFromArchive`로 반환한다. 이때 응답은 저장 원장 사용 사실과 최신 조사일 확인 안내를 먼저 표시하며, sample data로 성공을 가장하지 않는다. 실시간 조회와 저장 원장 모두 자료가 없을 때만 `DataUnavailable`을 유지한다.
+
+KAMIS 품종코드는 같은 품목이어도 도매와 소매에서 다를 수 있다. 연결표는 공통 코드와 별도로 단계별 허용 코드를 둘 수 있으며, 고등어는 도매 `01`·`02`, 소매 `05`를 사용하고 수입 표본은 기존 명칭 제외 규칙으로 걸러 낸다.
 
 ## 미국 가격 공급자
 

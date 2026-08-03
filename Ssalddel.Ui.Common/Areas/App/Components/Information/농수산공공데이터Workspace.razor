@@ -83,13 +83,13 @@
                                 }
                             </select>
                         </label>
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Success"
-                                   StartIcon="@Icons.Material.Filled.Search"
-                                   Disabled="ViewModel.IsLoading"
-                                   OnClick="@(() => ViewModel.LoadDomesticAsync())">
+                        <데이터조회Button ButtonColor="Color.Success"
+                                        StartIcon="@Icons.Material.Filled.Search"
+                                        IsLoading="ViewModel.IsLoading"
+                                        LoadingText="한국 가격 불러오는 중"
+                                        OnClick="@(() => ViewModel.LoadDomesticAsync())">
                             한국 가격 조회
-                        </MudButton>
+                        </데이터조회Button>
                     </section>
                     <국내농수산가격Result ViewModel="@ViewModel.국내" />
                     break;
@@ -115,13 +115,13 @@
                                 <option value="CENSUS">CENSUS</option>
                             </select>
                         </label>
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Error"
-                                   StartIcon="@Icons.Material.Filled.Search"
-                                   Disabled="ViewModel.IsLoading"
-                                   OnClick="@(() => ViewModel.LoadUnitedStatesAsync())">
+                        <데이터조회Button ButtonColor="Color.Error"
+                                        StartIcon="@Icons.Material.Filled.Search"
+                                        IsLoading="ViewModel.IsLoading"
+                                        LoadingText="미국 가격 불러오는 중"
+                                        OnClick="@(() => ViewModel.LoadUnitedStatesAsync())">
                             미국 가격 조회
-                        </MudButton>
+                        </데이터조회Button>
                     </section>
                     <미국농수산가격Result ViewModel="@ViewModel.미국" />
                     break;
@@ -155,13 +155,13 @@
                                 }
                             </select>
                         </label>
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Info"
-                                   StartIcon="@Icons.Material.Filled.Search"
-                                   Disabled="ViewModel.IsLoading"
-                                   OnClick="@(() => ViewModel.LoadAustraliaAsync())">
+                        <데이터조회Button ButtonColor="Color.Info"
+                                        StartIcon="@Icons.Material.Filled.Search"
+                                        IsLoading="ViewModel.IsLoading"
+                                        LoadingText="호주 지수 불러오는 중"
+                                        OnClick="@(() => ViewModel.LoadAustraliaAsync())">
                             호주 지수 조회
-                        </MudButton>
+                        </데이터조회Button>
                     </section>
                     <호주농수산가격Result Response="@ViewModel.호주.응답"
                                           ErrorMessage="@ViewModel.호주.오류메시지" />

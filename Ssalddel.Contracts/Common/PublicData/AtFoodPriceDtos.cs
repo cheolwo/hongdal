@@ -12,6 +12,10 @@ public sealed class AtDomesticFoodPriceRequest
 
     public IReadOnlyList<string> VarietyCodes { get; init; } = [];
 
+    public IReadOnlyList<string> WholesaleVarietyCodes { get; init; } = [];
+
+    public IReadOnlyList<string> RetailVarietyCodes { get; init; } = [];
+
     public IReadOnlyList<string> ExcludedNameTokens { get; init; } = [];
 }
 

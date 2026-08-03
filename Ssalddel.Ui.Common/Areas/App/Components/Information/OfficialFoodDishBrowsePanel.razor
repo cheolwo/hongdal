@@ -33,7 +33,13 @@
                    value="@SearchText"
                    @oninput="OnSearchTextChanged"
                    placeholder="예: 전골, rice, curry" />
-            <button type="submit" disabled="@Busy">음식 찾기</button>
+            <데이터조회Button ButtonType="ButtonType.Submit"
+                             IsLoading="@Busy"
+                             Disabled="@Busy"
+                             LoadingText="음식 찾는 중"
+                             StartIcon="@Icons.Material.Filled.Search">
+                음식 찾기
+            </데이터조회Button>
         </div>
     </form>
 

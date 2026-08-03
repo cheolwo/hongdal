@@ -65,6 +65,30 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
         return GetAsync<AgriculturalFisheriesDomesticPriceResponse>(path, cancellationToken);
     }
 
+    public Task<Hs식품국가가격Card응답> Hs식품국가가격Card조회Async(
+        string hsCode,
+        string? month = null,
+        int lookbackMonths = 3,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(hsCode);
+        var normalizedHsCode = new string(hsCode.Where(char.IsDigit).Take(6).ToArray());
+        if (normalizedHsCode.Length != 6)
+        {
+            throw new ArgumentException("HS 코드는 숫자 6자리 이상이어야 합니다.", nameof(hsCode));
+        }
+
+        var parameters = new List<string>
+        {
+            $"lookbackMonths={Math.Clamp(lookbackMonths, 1, 12)}"
+        };
+        AddParameter(parameters, "month", month);
+        return GetAsync<Hs식품국가가격Card응답>(
+            $"{BasePath}/items/{Uri.EscapeDataString(normalizedHsCode)}/country-price-card"
+            + $"?{string.Join('&', parameters)}",
+            cancellationToken);
+    }
+
     public Task<미국농수산가격조회응답> 미국가격조회Async(
         string commodity,
         string program,

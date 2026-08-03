@@ -21,7 +21,9 @@ public sealed record FoodPriceCrosswalk(
     string DomesticOriginStatusCode,
     string DomesticOriginStatusLabel,
     string Note,
-    IReadOnlyList<string> ExcludedNameTokens);
+    IReadOnlyList<string> ExcludedNameTokens,
+    IReadOnlyList<string>? AtWholesaleVarietyCodes = null,
+    IReadOnlyList<string>? AtRetailVarietyCodes = null);
 
 public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
 {
@@ -73,7 +75,17 @@ public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
         Representative("020713", "닭고기", "500", "515", "닭고기", ["02"], DomesticMarket(), "도계 가격을 닭고기 대표가격으로 사용합니다."),
         Representative("020714", "닭고기", "500", "515", "닭고기", ["02"], DomesticMarket(), "도계 가격을 닭고기 대표가격으로 사용합니다."),
         Representative("040721", "계란", "500", "516", "계란", ["00", "02", "03", "04", "05", "07"], DomesticVariant(), "수입란을 제외한 국내 조사 계란 가격입니다."),
-        Exact("030354", "고등어", "600", "611", "고등어", ["05", "06"], DomesticVariant(), "국산 냉장·냉동 고등어 가격입니다."),
+        Exact(
+            "030354",
+            "고등어",
+            "600",
+            "611",
+            "고등어",
+            ["05", "06"],
+            DomesticVariant(),
+            "국산 냉장·냉동 고등어 가격입니다.",
+            wholesaleVarietyCodes: ["01", "02"],
+            retailVarietyCodes: ["05"]),
         Exact("030742", "오징어", "600", "619", "물오징어", ["03", "04"], DomesticVariant(), "연근해 오징어 가격입니다."),
         Exact("030743", "오징어", "600", "619", "물오징어", ["03", "04"], DomesticVariant(), "연근해 오징어 가격입니다."),
         Exact("030711", "굴", "600", "644", "굴", ["00"], DomesticMarket(), "굴 대표가격을 사용합니다."),
@@ -113,7 +125,9 @@ public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
         string itemName,
         IReadOnlyList<string> varietyCodes,
         OriginStatus origin,
-        string note)
+        string note,
+        IReadOnlyList<string>? wholesaleVarietyCodes = null,
+        IReadOnlyList<string>? retailVarietyCodes = null)
         => Create(
             hsPrefix,
             productName,
@@ -124,7 +138,9 @@ public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
             "ExactCommodity",
             "동일 품목",
             origin,
-            note);
+            note,
+            wholesaleVarietyCodes,
+            retailVarietyCodes);
 
     private static FoodPriceCrosswalk Representative(
         string hsPrefix,
@@ -157,7 +173,9 @@ public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
         string matchQualityCode,
         string matchQualityLabel,
         OriginStatus origin,
-        string note)
+        string note,
+        IReadOnlyList<string>? wholesaleVarietyCodes = null,
+        IReadOnlyList<string>? retailVarietyCodes = null)
         => new(
             hsPrefix,
             productName,
@@ -170,7 +188,9 @@ public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
             origin.Code,
             origin.Label,
             note,
-            ImportedNameTokens);
+            ImportedNameTokens,
+            wholesaleVarietyCodes,
+            retailVarietyCodes);
 
     private static OriginStatus DomesticVariant()
         => new("DomesticVariant", "국산 품종 확인");

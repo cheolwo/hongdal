@@ -5,9 +5,13 @@
             <h5 id="ingredient-company-title">@IngredientName 관련 국내외 기업 조사</h5>
             <p>공식 제품 원재료 보고와 수입식품 표시 이력에서 관계 근거가 있는 사업체만 확인합니다.</p>
         </div>
-        <button type="button" disabled="@Busy" @onclick="ResearchRequested">
+        <데이터조회Button IsLoading="@Busy"
+                         Disabled="@Busy"
+                         LoadingText="공식 자료 조회 중"
+                         StartIcon="@Icons.Material.Filled.DomainVerification"
+                         OnClick="RequestResearchAsync">
             @(Research is null ? "관련 기업 조사" : "공식 자료 다시 조회")
-        </button>
+        </데이터조회Button>
     </header>
 
     @if (Busy)
@@ -163,6 +167,9 @@
 
     [Parameter]
     public EventCallback ResearchRequested { get; set; }
+
+    private Task RequestResearchAsync(MouseEventArgs _)
+        => ResearchRequested.InvokeAsync();
 
     private static string SourceStatusClass(string statusCode)
         => statusCode switch

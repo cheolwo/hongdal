@@ -23,6 +23,8 @@ public sealed class 농수산정보Controller : ControllerBase
         _usdaAmsPublicBusinessQueryService;
     private readonly IKamis중심UsdaAms가격비교QueryService
         _kamisCenteredUsdaAmsComparisonService;
+    private readonly IHs식품국가가격CardQueryService
+        _hsFoodCountryPriceCardService;
     private readonly I미국농수산가격조회Service _usPriceService;
     private readonly I호주농수산식품가격조회Service _australiaFoodPriceService;
     private readonly I미국농어업경영체정보원천Service _usOperatorSourceService;
@@ -38,6 +40,7 @@ public sealed class 농수산정보Controller : ControllerBase
         IUsdaAms공개사업체QueryService usdaAmsPublicBusinessQueryService,
         IKamis중심UsdaAms가격비교QueryService
             kamisCenteredUsdaAmsComparisonService,
+        IHs식품국가가격CardQueryService hsFoodCountryPriceCardService,
         I미국농수산가격조회Service usPriceService,
         I호주농수산식품가격조회Service australiaFoodPriceService,
         I미국농어업경영체정보원천Service usOperatorSourceService,
@@ -53,6 +56,7 @@ public sealed class 농수산정보Controller : ControllerBase
             usdaAmsPublicBusinessQueryService;
         _kamisCenteredUsdaAmsComparisonService =
             kamisCenteredUsdaAmsComparisonService;
+        _hsFoodCountryPriceCardService = hsFoodCountryPriceCardService;
         _usPriceService = usPriceService;
         _australiaFoodPriceService = australiaFoodPriceService;
         _usOperatorSourceService = usOperatorSourceService;
@@ -158,6 +162,35 @@ public sealed class 농수산정보Controller : ControllerBase
             농수산시세비교판정Codes.정보원없음 => NotFound(response),
             _ => Ok(response)
         };
+    }
+
+    [HttpGet("items/{hsCode}/country-price-card")]
+    [SsalddelApiContractName("GetHsFoodCountryPriceCard")]
+    public async Task<ActionResult<Hs식품국가가격Card응답>>
+        Hs식품국가가격Card조회(
+            string hsCode,
+            [FromQuery] Hs식품국가가격CardQuery query,
+            CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _hsFoodCountryPriceCardService.GetAsync(
+                hsCode,
+                query,
+                cancellationToken);
+            return response.StatusCode == Hs식품국가가격Card상태Codes.품목없음
+                ? NotFound(response)
+                : Ok(response);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "HS 식품 국가별 가격 카드 조건을 확인해 주세요.",
+                Detail = exception.Message
+            });
+        }
     }
 
     [HttpGet("us-retail-average-prices/catalog")]

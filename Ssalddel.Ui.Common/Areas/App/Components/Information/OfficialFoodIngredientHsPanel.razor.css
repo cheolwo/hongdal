@@ -11,6 +11,8 @@
 .ingredient-hs__header > div,
 .ingredient-hs__candidates,
 .ingredient-hs__candidates article,
+.ingredient-hs__price-cards,
+.ingredient-hs__price-cards > header,
 .ingredient-hs__state,
 .ingredient-hs__warning {
     display: grid;
@@ -36,22 +38,6 @@
 .ingredient-hs__candidates p,
 .ingredient-hs__notices {
     margin: 0;
-}
-
-.ingredient-hs__header button {
-    min-height: 44px;
-    padding: 0.65rem 0.9rem;
-    border: 0;
-    border-radius: 0.8rem;
-    color: var(--mud-palette-primary-text);
-    background: var(--mud-palette-primary);
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.ingredient-hs__header button:disabled {
-    opacity: 0.6;
-    cursor: wait;
 }
 
 .ingredient-hs__state,
@@ -121,6 +107,27 @@
 
 .ingredient-hs__notices {
     padding-left: 1.2rem;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.85rem;
+}
+
+.ingredient-hs__price-cards {
+    padding-top: 0.35rem;
+}
+
+.ingredient-hs__price-cards > header span {
+    color: var(--mud-palette-secondary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.ingredient-hs__price-cards > header h6,
+.ingredient-hs__price-cards > header p {
+    margin: 0;
+}
+
+.ingredient-hs__price-cards > header p {
     color: var(--mud-palette-text-secondary);
     font-size: 0.85rem;
 }

@@ -186,6 +186,9 @@ public sealed class AgriculturalFisheriesInformationServiceTests
         Assert.Equal("20260701", lookup.LastRequest.StartDate);
         Assert.Equal("20260714", lookup.LastRequest.EndDate);
         Assert.Contains("05", lookup.LastRequest.VarietyCodes);
+        Assert.Contains("01", lookup.LastRequest.WholesaleVarietyCodes);
+        Assert.Contains("02", lookup.LastRequest.WholesaleVarietyCodes);
+        Assert.Equal(["05"], lookup.LastRequest.RetailVarietyCodes);
         Assert.Contains(result.Notices, notice => notice.Contains("주문·매입·운송 견적이 아닙니다", StringComparison.Ordinal));
     }
 
@@ -208,13 +211,56 @@ public sealed class AgriculturalFisheriesInformationServiceTests
         Assert.Contains("연결", result.ErrorMessage, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task 실시간키가없어도_저장된Kamis수산물관측으로_국내가격을완성한다()
+    {
+        var liveLookup = new StubDomesticPriceLookupService();
+        var archiveLookup = new StubKamisArchiveQueryService
+        {
+            Result = new AtDomesticFoodPriceLookupResult
+            {
+                Success = true,
+                CategoryCode = "600",
+                ItemCode = "611",
+                ItemName = "고등어",
+                Retail = new AtDomesticFoodPriceAggregate
+                {
+                    PriceTypeCode = "01",
+                    LatestSurveyDate = "20260801",
+                    AverageKrwPerKg = 11_000m,
+                    SampleCount = 2
+                },
+                DataSource = "한국농수산식품유통공사 KAMIS Open API 저장 원장"
+            }
+        };
+        var service = CreateService(liveLookup, archiveLookup: archiveLookup);
+
+        var result = await service.GetDomesticPriceAsync(
+            new AgriculturalFisheriesDomesticPriceRequest
+            {
+                HsCode = "0303540000",
+                ReferenceDate = "20260802"
+            });
+
+        Assert.True(result.Success);
+        Assert.Equal("CompleteFromArchive", result.StatusCode);
+        Assert.Equal(11_000m, result.Price?.Retail?.AverageKrwPerKg);
+        Assert.Equal("600", archiveLookup.LastRequest?.CategoryCode);
+        Assert.Equal("611", archiveLookup.LastRequest?.ItemCode);
+        Assert.Contains("01", archiveLookup.LastRequest!.WholesaleVarietyCodes);
+        Assert.Equal(["05"], archiveLookup.LastRequest.RetailVarietyCodes);
+        Assert.Contains("저장된 공식 KAMIS", result.Notices[0], StringComparison.Ordinal);
+    }
+
     private static AgriculturalFisheriesInformationService CreateService(
         StubDomesticPriceLookupService lookup,
-        PublicDataOptions? options = null)
+        PublicDataOptions? options = null,
+        IKamisDomesticPriceArchiveQueryService? archiveLookup = null)
         => new(
             new FoodPriceCrosswalkCatalog(),
             lookup,
-            Options.Create(options ?? new PublicDataOptions()));
+            Options.Create(options ?? new PublicDataOptions()),
+            archiveLookup);
 
     private sealed class StubDomesticPriceLookupService : IAtDomesticFoodPriceLookupService
     {
@@ -223,6 +269,21 @@ public sealed class AgriculturalFisheriesInformationServiceTests
             Success = false,
             ErrorMessage = "not configured"
         };
+
+        public AtDomesticFoodPriceRequest? LastRequest { get; private set; }
+
+        public Task<AtDomesticFoodPriceLookupResult> LookupAsync(
+            AtDomesticFoodPriceRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            LastRequest = request;
+            return Task.FromResult(Result);
+        }
+    }
+
+    private sealed class StubKamisArchiveQueryService : IKamisDomesticPriceArchiveQueryService
+    {
+        public AtDomesticFoodPriceLookupResult Result { get; init; } = new();
 
         public AtDomesticFoodPriceRequest? LastRequest { get; private set; }
 

@@ -121,6 +121,10 @@ public static partial class ServiceCollectionExtensions
             UsdaAms공개사업체QueryService>();
         services.AddScoped<IKamis중심UsdaAms가격비교QueryService,
             Kamis중심UsdaAms가격비교QueryService>();
+        services.AddScoped<IHs식품가격CardCatalogReader,
+            Hs식품가격CardCatalogReader>();
+        services.AddScoped<IHs식품국가가격CardQueryService,
+            Hs식품국가가격CardQueryService>();
         services.AddScoped<IKamis중심같이수입가격QueryService,
             Kamis중심같이수입가격QueryService>();
         services
@@ -171,6 +175,8 @@ public static partial class ServiceCollectionExtensions
                 })
             .RemoveAllLoggers();
         services.AddScoped<IKamisPriceArchiveService, KamisPriceArchiveService>();
+        services.AddScoped<IKamisDomesticPriceArchiveQueryService,
+            KamisDomesticPriceArchiveQueryService>();
         services
             .AddHttpClient<MfdsCookRecipeRemoteSource>(
                 (serviceProvider, client) =>

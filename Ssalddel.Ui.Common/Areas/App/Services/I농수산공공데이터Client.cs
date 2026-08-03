@@ -24,6 +24,13 @@ public interface I농수산공공데이터Client
         int lookbackDays = 14,
         CancellationToken cancellationToken = default);
 
+    Task<Hs식품국가가격Card응답> Hs식품국가가격Card조회Async(
+        string hsCode,
+        string? month = null,
+        int lookbackMonths = 3,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException();
+
     Task<미국농수산가격조회응답> 미국가격조회Async(
         string commodity,
         string program,

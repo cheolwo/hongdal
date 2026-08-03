@@ -26,15 +26,21 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
     private readonly IFoodPriceCrosswalkCatalog _crosswalkCatalog;
     private readonly IAtDomesticFoodPriceLookupService _domesticPriceLookupService;
     private readonly PublicDataOptions _options;
+    private readonly IKamisDomesticPriceArchiveQueryService? _kamisArchiveQueryService;
+    private readonly ILogger<AgriculturalFisheriesInformationService>? _logger;
 
     public AgriculturalFisheriesInformationService(
         IFoodPriceCrosswalkCatalog crosswalkCatalog,
         IAtDomesticFoodPriceLookupService domesticPriceLookupService,
-        IOptions<PublicDataOptions> options)
+        IOptions<PublicDataOptions> options,
+        IKamisDomesticPriceArchiveQueryService? kamisArchiveQueryService = null,
+        ILogger<AgriculturalFisheriesInformationService>? logger = null)
     {
         _crosswalkCatalog = crosswalkCatalog;
         _domesticPriceLookupService = domesticPriceLookupService;
         _options = options.Value;
+        _kamisArchiveQueryService = kamisArchiveQueryService;
+        _logger = logger;
     }
 
     public AgriculturalFisheriesInformationOverviewResponse GetOverview()
@@ -246,6 +252,8 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
             StartDate = startDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture),
             EndDate = referenceDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture),
             VarietyCodes = crosswalk.AtVarietyCodes,
+            WholesaleVarietyCodes = crosswalk.AtWholesaleVarietyCodes ?? crosswalk.AtVarietyCodes,
+            RetailVarietyCodes = crosswalk.AtRetailVarietyCodes ?? crosswalk.AtVarietyCodes,
             ExcludedNameTokens = crosswalk.ExcludedNameTokens
         };
 
@@ -271,17 +279,51 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
             };
         }
 
-        var notices = BuildPriceNotices(crosswalk);
+        var servedFromArchive = false;
+        if (!price.Success && _kamisArchiveQueryService is not null)
+        {
+            try
+            {
+                var archivedPrice = await _kamisArchiveQueryService.LookupAsync(
+                    lookupRequest,
+                    cancellationToken);
+                if (archivedPrice.Success)
+                {
+                    price = archivedPrice;
+                    servedFromArchive = true;
+                }
+            }
+            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+            {
+                _logger?.LogWarning(
+                    ex,
+                    "저장된 KAMIS 국내가격 조회에 실패했습니다. CategoryCode={CategoryCode}, ItemCode={ItemCode}",
+                    lookupRequest.CategoryCode,
+                    lookupRequest.ItemCode);
+            }
+        }
+
+        var notices = BuildPriceNotices(crosswalk).ToList();
+        if (servedFromArchive)
+        {
+            notices.Insert(
+                0,
+                "실시간 조회 대신 서버에 저장된 공식 KAMIS 관측값을 표시합니다. 최신 조사일을 확인해 주세요.");
+        }
         return new AgriculturalFisheriesDomesticPriceResponse
         {
             Success = price.Success,
-            StatusCode = price.Success ? "Complete" : "DataUnavailable",
+            StatusCode = price.Success
+                ? servedFromArchive ? "CompleteFromArchive" : "Complete"
+                : "DataUnavailable",
             ErrorMessage = price.ErrorMessage,
             HsCode = hsCode,
             Item = item,
             Price = price,
             Summary = price.Success
-                ? $"{item.ProductName}의 최근 국내 중도매·소매 조사 가격입니다."
+                ? servedFromArchive
+                    ? $"{item.ProductName}의 저장된 공식 KAMIS 중도매·소매 조사 가격입니다."
+                    : $"{item.ProductName}의 최근 국내 중도매·소매 조사 가격입니다."
                 : $"{item.ProductName}의 국내가격 자료를 현재 확인하지 못했습니다.",
             Notices = notices
         };
@@ -297,6 +339,8 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
             AtItemCode = crosswalk.AtItemCode,
             AtItemName = crosswalk.AtItemName,
             AtVarietyCodes = crosswalk.AtVarietyCodes,
+            AtWholesaleVarietyCodes = crosswalk.AtWholesaleVarietyCodes ?? crosswalk.AtVarietyCodes,
+            AtRetailVarietyCodes = crosswalk.AtRetailVarietyCodes ?? crosswalk.AtVarietyCodes,
             MatchQualityCode = crosswalk.MatchQualityCode,
             MatchQualityLabel = crosswalk.MatchQualityLabel,
             DomesticOriginStatusCode = crosswalk.DomesticOriginStatusCode,

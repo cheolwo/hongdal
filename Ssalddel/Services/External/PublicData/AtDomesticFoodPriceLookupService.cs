@@ -2,15 +2,13 @@ using System.Globalization;
 using Ssalddel.Contracts.Common.PublicData;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Ssalddel.Services.AgriculturalFisheries.Information;
 using 살뜰.Services.Options;
 
 namespace 살뜰.Services.External.PublicData;
 
 public sealed class AtDomesticFoodPriceLookupService : IAtDomesticFoodPriceLookupService
 {
-    private const string RetailCode = "01";
-    private const string WholesaleCode = "02";
-
     private readonly HttpClient _httpClient;
     private readonly PublicDataOptions _options;
 
@@ -45,24 +43,21 @@ public sealed class AtDomesticFoodPriceLookupService : IAtDomesticFoodPriceLooku
         }
 
         var body = await ReadPriceBodyAsync(request, startDate, endDate, serviceKey, cancellationToken);
-        var allowedVarieties = request.VarietyCodes
-            .Where(code => !string.IsNullOrWhiteSpace(code))
-            .Select(code => code.Trim())
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var excludedTokens = request.ExcludedNameTokens
-            .Where(token => !string.IsNullOrWhiteSpace(token))
-            .Select(token => token.Trim())
-            .ToArray();
-
         var observations = PublicDataParsing.ReadItems(body)
             .Select(ToObservation)
             .Where(item => item.PriceKrwPerKg > 0)
-            .Where(item => allowedVarieties.Count == 0 || allowedVarieties.Contains(item.VarietyCode))
-            .Where(item => !ContainsExcludedToken(item, excludedTokens))
             .ToArray();
 
-        var wholesale = Aggregate(observations, WholesaleCode, "국내 중도매가격");
-        var retail = Aggregate(observations, RetailCode, "국내 소매가격");
+        var wholesale = Kamis국내가격Aggregation.Aggregate(
+            observations,
+            request,
+            Kamis국내가격Aggregation.WholesaleCode,
+            "국내 중도매가격");
+        var retail = Kamis국내가격Aggregation.Aggregate(
+            observations,
+            request,
+            Kamis국내가격Aggregation.RetailCode,
+            "국내 소매가격");
         if (wholesale is null && retail is null)
         {
             return Fail(request, "선택한 HS 품목에 대응하는 최근 국내가격 자료가 없습니다.", startDate, endDate);
@@ -113,67 +108,19 @@ public sealed class AtDomesticFoodPriceLookupService : IAtDomesticFoodPriceLooku
         return body;
     }
 
-    private static AtPriceObservation ToObservation(Dictionary<string, string?> source)
+    private static Kamis국내가격Observation ToObservation(Dictionary<string, string?> source)
         => new(
             NormalizeDate(PublicDataParsing.FirstValue(source, "exmn_ymd", "surveyDate")),
             PublicDataParsing.FirstValue(source, "se_cd", "priceTypeCode") ?? string.Empty,
             PublicDataParsing.FirstValue(source, "item_nm", "itemName") ?? string.Empty,
             PublicDataParsing.FirstValue(source, "vrty_cd", "varietyCode") ?? string.Empty,
-            PublicDataParsing.FirstValue(source, "vrty_nm", "varietyName") ?? string.Empty,
-            PublicDataParsing.FirstValue(source, "grd_nm", "gradeName") ?? string.Empty,
-            PublicDataParsing.FirstValue(source, "mrkt_nm", "marketName") ?? string.Empty,
+            string.Join(
+                ' ',
+                PublicDataParsing.FirstValue(source, "item_nm", "itemName"),
+                PublicDataParsing.FirstValue(source, "vrty_nm", "varietyName"),
+                PublicDataParsing.FirstValue(source, "grd_nm", "gradeName"),
+                PublicDataParsing.FirstValue(source, "mrkt_nm", "marketName")),
             PublicDataParsing.FirstDecimal(source, "exmn_dd_cnvs_prc", "convertedPricePerKg") ?? 0m);
-
-    private static AtDomesticFoodPriceAggregate? Aggregate(
-        IReadOnlyList<AtPriceObservation> observations,
-        string priceTypeCode,
-        string priceTypeLabel)
-    {
-        var candidates = observations
-            .Where(item => string.Equals(item.PriceTypeCode, priceTypeCode, StringComparison.OrdinalIgnoreCase))
-            .ToArray();
-        var latestDate = candidates
-            .Select(item => item.SurveyDate)
-            .Where(date => !string.IsNullOrWhiteSpace(date))
-            .OrderByDescending(date => date, StringComparer.Ordinal)
-            .FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(latestDate))
-        {
-            return null;
-        }
-
-        var latestPrices = candidates
-            .Where(item => string.Equals(item.SurveyDate, latestDate, StringComparison.Ordinal))
-            .Select(item => item.PriceKrwPerKg)
-            .Where(price => price > 0)
-            .ToArray();
-        if (latestPrices.Length == 0)
-        {
-            return null;
-        }
-
-        return new AtDomesticFoodPriceAggregate
-        {
-            PriceTypeCode = priceTypeCode,
-            PriceTypeLabel = priceTypeLabel,
-            LatestSurveyDate = latestDate,
-            AverageKrwPerKg = decimal.Round(latestPrices.Average(), 0, MidpointRounding.AwayFromZero),
-            MinimumKrwPerKg = latestPrices.Min(),
-            MaximumKrwPerKg = latestPrices.Max(),
-            SampleCount = latestPrices.Length
-        };
-    }
-
-    private static bool ContainsExcludedToken(AtPriceObservation item, IReadOnlyList<string> excludedTokens)
-    {
-        if (excludedTokens.Count == 0)
-        {
-            return false;
-        }
-
-        var searchable = string.Join(' ', item.ItemName, item.VarietyName, item.GradeName, item.MarketName);
-        return excludedTokens.Any(token => searchable.Contains(token, StringComparison.OrdinalIgnoreCase));
-    }
 
     private string ResolveServiceKey()
     {
@@ -218,14 +165,4 @@ public sealed class AtDomesticFoodPriceLookupService : IAtDomesticFoodPriceLooku
             StartDate = startDate ?? NormalizeDate(request.StartDate),
             EndDate = endDate ?? NormalizeDate(request.EndDate)
         };
-
-    private sealed record AtPriceObservation(
-        string SurveyDate,
-        string PriceTypeCode,
-        string ItemName,
-        string VarietyCode,
-        string VarietyName,
-        string GradeName,
-        string MarketName,
-        decimal PriceKrwPerKg);
 }

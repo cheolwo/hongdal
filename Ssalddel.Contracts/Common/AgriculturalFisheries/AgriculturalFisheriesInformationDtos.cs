@@ -98,6 +98,10 @@ public sealed class AgriculturalFisheriesItemResponse
 
     public IReadOnlyList<string> AtVarietyCodes { get; init; } = [];
 
+    public IReadOnlyList<string> AtWholesaleVarietyCodes { get; init; } = [];
+
+    public IReadOnlyList<string> AtRetailVarietyCodes { get; init; } = [];
+
     public string MatchQualityCode { get; init; } = string.Empty;
 
     public string MatchQualityLabel { get; init; } = string.Empty;
