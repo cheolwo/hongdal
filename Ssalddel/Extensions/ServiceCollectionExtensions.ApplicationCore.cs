@@ -29,6 +29,8 @@ using Ssalddel.Security;
 using Ssalddel.Application.Operations;
 using Ssalddel.Services.HumanResources;
 using Ssalddel.Services.Community;
+using Ssalddel.Services.FoodCulture;
+using Ssalddel.Services.Content;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
 using 살뜰.Infrastructure;
 using 살뜰.Services.Audit;
@@ -141,6 +143,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티게시글운영UseCase, 커뮤니티게시글운영UseCase>();
         services.AddScoped<I커뮤니티투표UseCase, 커뮤니티투표UseCase>();
         services.AddScoped<I커뮤니티활동신호UseCase, 커뮤니티활동신호UseCase>();
+        services.AddScoped<I해외제조업소MapMarkerReader, 해외제조업소MapMarkerReader>();
+        services.AddScoped<I지역문화이미지MapMarkerReader, 지역문화이미지MapMarkerReader>();
         services.AddScoped<I커뮤니티세계지도조회UseCase, 커뮤니티세계지도조회UseCase>();
         services.AddScoped<I노드스티커상점UseCase, 노드스티커상점UseCase>();
         services.AddScoped<I커뮤니티활동상세구매ProcessManager, 커뮤니티활동상세구매ProcessManager>();

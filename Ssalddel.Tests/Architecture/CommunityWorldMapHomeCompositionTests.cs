@@ -5,6 +5,60 @@ namespace Ssalddel.Tests.Architecture;
 public sealed class CommunityWorldMapHomeCompositionTests
 {
     [Fact]
+    public void 세계지도는_해외제조업소를_행정권역집계Layer와공장형Marker로표시한다()
+    {
+        var contractSource = ReadRepositoryFile(
+            "Ssalddel.Contracts",
+            "Common",
+            "Community",
+            "커뮤니티세계지도Dtos.cs");
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+        var scriptSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "js",
+            "community-world-google-map.js");
+
+        Assert.Contains("OverseasManufacturer = \"overseas-manufacturer\"", contractSource);
+        Assert.Contains("행정권역 대표점", pageSource);
+        Assert.Contains("재료 관계 근거", pageSource);
+        Assert.Contains("CommunityLedgerTemplateKeys.GroupImport", pageSource);
+        Assert.Contains(".world-community-home__layer-shape--factory", styleSource);
+        Assert.Contains("case \"overseas-manufacturer\"", scriptSource);
+    }
+
+    [Fact]
+    public void 지역마커선택Panel은_지역설명과검토상태가있는생성이미지를함께표시한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var styleSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor.css");
+
+        Assert.Contains("@inject 지역문화이미지Client RegionalImageClient", pageSource);
+        Assert.Contains("regional-culture-one-each-v1", pageSource);
+        Assert.Contains("SelectedRegionImage", pageSource);
+        Assert.Contains("AI 생성 이미지", pageSource);
+        Assert.Contains("공식 기록·원산지·거래 근거가 아닙니다", pageSource);
+        Assert.Contains("지역 이미지를 불러오지 못했습니다", pageSource);
+        Assert.Contains("다시 시도", pageSource);
+        Assert.Contains(".world-community-home__region-visual", styleSource);
+        Assert.Contains("aspect-ratio: 16 / 9", styleSource);
+        Assert.Contains("width: min(440px", styleSource);
+    }
+
+    [Fact]
     public void 커뮤니티Web시작화면은_공통메뉴없이_전체화면지도와지도조작패널만표시한다()
     {
         var pageSource = ReadRepositoryFile(

@@ -202,6 +202,8 @@ function markerStyleFor(layerCode, night) {
             return { color: "#2f6fab", path: "M -8,-5 -5,-9 5,-9 8,-5 8,8 -8,8 z", scale: .72, selectedScale: .94 };
         case "traditional-market-hub":
             return { color: "#8a4b24", path: "M -9,-2 -6,-8 6,-8 9,-2 7,0 7,9 -7,9 -7,0 z", scale: .72, selectedScale: .96 };
+        case "overseas-manufacturer":
+            return { color: "#7b4ab0", path: "M -9,-2 -5,-2 -5,-9 -2,-9 -2,-2 2,-5 2,-1 8,-5 8,9 -9,9 z", scale: .72, selectedScale: .96 };
         case "learning-channel":
             return { color: "#6750a4", path: google.maps.SymbolPath.CIRCLE, scale: 8, selectedScale: 11 };
         case "scripture-classics":

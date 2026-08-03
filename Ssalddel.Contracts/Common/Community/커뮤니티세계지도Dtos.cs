@@ -15,6 +15,7 @@ public static class 커뮤니티세계지도LayerCodes
     public const string PublicPrice = "public-price";
     public const string WholesaleMarket = "wholesale-market";
     public const string TraditionalMarketHub = "traditional-market-hub";
+    public const string OverseasManufacturer = "overseas-manufacturer";
     public const string LearningChannel = "learning-channel";
     public const string ScriptureAndClassics = "scripture-classics";
 }
@@ -60,7 +61,15 @@ public sealed record 커뮤니티세계지도ObservationDto(
     string? MarkerStatusCode = null,
     decimal? ServiceRadiusKm = null,
     int? DailyCapacity = null,
-    string? CommunityScopeKey = null);
+    string? CommunityScopeKey = null,
+    int? OrganizationCount = null,
+    int? EvidenceCount = null);
+
+public static class 커뮤니티세계지도위치정밀도Codes
+{
+    public const string AdministrativeRegionRepresentative =
+        "administrative-region-representative";
+}
 
 public sealed record 커뮤니티세계지도SnapshotDto(
     string DatasetCode,
@@ -101,6 +110,13 @@ public static class 커뮤니티세계지도LayerCatalog
             "운영 동의·현장 확인·지도 좌표 검증이 끝난 공동 입고·수령 거점",
             "#8a4b24",
             "hub"),
+        new(
+            커뮤니티세계지도LayerCodes.OverseasManufacturer,
+            CommunityPageRoutes.WorldMapDayWorkDataset,
+            "해외제조업소",
+            "식약처 해외제조업소 근거를 검증된 행정권역 대표점에 집계",
+            "#7b4ab0",
+            "factory"),
         new(
             커뮤니티세계지도LayerCodes.LearningChannel,
             CommunityPageRoutes.WorldMapNightLearningDataset,

@@ -8,6 +8,7 @@
 @inject IJSRuntime JS
 @inject 커뮤니티세계지도Client WorldMapClient
 @inject GoogleMapsBrowserRuntimeClient GoogleMapsRuntimeClient
+@inject 지역문화이미지Client RegionalImageClient
 
 <PageTitle>생활·업무 통합 지도 · 살뜰</PageTitle>
 
@@ -58,7 +59,7 @@
                         <i class="world-community-home__layer-shape world-community-home__layer-shape--@layer.MarkerShape" aria-hidden="true"></i>
                         <span class="world-community-home__layer-option-copy">
                             <strong>@layer.DisplayName</strong>
-                            <small>@(IsNightLearning ? "알아차림 자료" : $"{layerDiagram.DisplayName} 연결")</small>
+                            <small>@LayerOptionCaption(layer, layerDiagram)</small>
                         </span>
                     </button>
                 }
@@ -354,6 +355,48 @@
             }
         </header>
 
+        @if (HasRegionalVisualSelection)
+        {
+            <section class="world-community-home__region-visual" aria-label="선택한 지역의 생성 이미지">
+                @if (_regionImagesLoading)
+                {
+                    <div class="world-community-home__region-visual-state" role="status">
+                        <MudIcon Icon="@Icons.Material.Filled.ImageSearch" />
+                        <span>지역 이미지를 불러오는 중입니다.</span>
+                    </div>
+                }
+                else if (SelectedRegionImage is { } regionImage)
+                {
+                    <figure>
+                        <img src="@regionImage.ImageUrl"
+                             alt="@regionImage.AltText"
+                             loading="eager"
+                             decoding="async" />
+                        <figcaption>
+                            <span>AI 생성 이미지 · @ImageQualityLabel(regionImage.QualityStatus)</span>
+                            <strong>@(SelectedObservation?.Title ?? regionImage.Title)</strong>
+                            <small>지역의 생활문화 맥락을 돕는 참고 이미지이며 공식 기록·원산지·거래 근거가 아닙니다.</small>
+                        </figcaption>
+                    </figure>
+                }
+                else if (!string.IsNullOrWhiteSpace(_regionImagesError))
+                {
+                    <div class="world-community-home__region-visual-state is-error" role="alert">
+                        <MudIcon Icon="@Icons.Material.Filled.BrokenImage" />
+                        <span>@_regionImagesError</span>
+                        <button type="button" @onclick="LoadRegionalImagesAsync">다시 시도</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="world-community-home__region-visual-state" role="status">
+                        <MudIcon Icon="@Icons.Material.Filled.ImageNotSupported" />
+                        <span>이 마커에 연결된 지역 이미지는 아직 준비 중입니다.</span>
+                    </div>
+                }
+            </section>
+        }
+
         @if (SelectedObservation is { } selectedObservation)
         {
             var selectedLayer = LayerFor(selectedObservation.LayerCode);
@@ -363,6 +406,12 @@
                     <div><dt>상태</dt><dd>@ObservationStatusLabel(selectedObservation)</dd></div>
                     <div><dt>자료 기준</dt><dd>@EvidenceFreshnessLabel(selectedObservation.EvidenceAsOfUtc)</dd></div>
                     <div><dt>출처</dt><dd>@selectedObservation.SourceName</dd></div>
+                    @if (selectedObservation.LayerCode == 커뮤니티세계지도LayerCodes.OverseasManufacturer)
+                    {
+                        <div><dt>제조업소</dt><dd>@(selectedObservation.OrganizationCount ?? 0)개</dd></div>
+                        <div><dt>재료 관계 근거</dt><dd>@(selectedObservation.EvidenceCount ?? 0)건</dd></div>
+                        <div><dt>위치 기준</dt><dd>행정권역 대표점</dd></div>
+                    }
                 </dl>
                 <p>이 마커 선택은 공개 자료 조회만 수행하며 원장·참여·주문·계약·배차를 만들지 않습니다.</p>
                 <div>
@@ -598,7 +647,7 @@
                         <dl>
                             <div>
                                 <dt>문화 자료</dt>
-                                <dd>@(country.Regions.Count > 0 ? $"{country.Regions.Count}개 지역" : "커뮤니티 수집 중")</dd>
+                                <dd>@RegionalCultureMarkerCountLabel(country.Code)</dd>
                             </div>
                             <div>
                                 <dt>가격 근거</dt>
@@ -709,14 +758,19 @@
     private Task? _pollingTask;
     private DateTimeOffset? _lastSnapshotCheckedAt;
     private string? _snapshotConnectionMessage;
+    private IReadOnlyList<AppContextImageAssetDto> _regionalImages = [];
+    private bool _regionImagesLoading = true;
+    private string? _regionImagesError;
+
+    private const string RegionalCultureImagePackId = "regional-culture-one-each-v1";
 
     private static readonly IReadOnlyList<CommunityMapCountry> MapCountries =
     [
         new(
             "US",
-            "미국",
-            "북아메리카",
-            "Maine·Georgia·California 문화 자료와 USDA 가격 관측을 연결합니다.",
+              "미국",
+              "북아메리카",
+              "50개 주의 생활문화 이미지 마커와 USDA 가격 관측을 연결합니다.",
             "지역 문화 + 가격",
             "USDA NASS",
             커뮤니티세계지도Routes.UnitedStatesPriceDetail,
@@ -724,9 +778,9 @@
             RegionalCultureSpecialtyCatalog.ForCountry(RegionalCultureSpecialtyCatalog.UnitedStatesCountryCode)),
         new(
             "CN",
-            "중국",
-            "동아시아",
-            "산둥·랴오둥·강남을 행정구역과 문화권으로 구분해 살펴봅니다.",
+              "중국",
+              "동아시아",
+              "31개 성급 행정구역의 생활문화 이미지 마커와 가격 관측을 구분해 살펴봅니다.",
             "지역 문화 + 가격",
             "공식 연결 관측",
             "information/produce-price-comparison",
@@ -734,10 +788,10 @@
             RegionalCultureSpecialtyCatalog.ForCountry(RegionalCultureSpecialtyCatalog.ChinaCountryCode)),
         new(
             "KR",
-            "대한민국",
-            "동아시아",
-            "KAMIS 국내 유통단계 가격을 원문 품목과 거래 단위 그대로 확인합니다.",
-            "가격 자료 연결",
+              "대한민국",
+              "동아시아",
+              "서울을 제외한 16개 시도의 생활문화 이미지와 KAMIS 가격 관측을 함께 확인합니다.",
+              "지역 문화 + 가격",
             "KAMIS · aT",
             커뮤니티세계지도Routes.KoreaPriceDetail,
             "한국 가격 화면 보기",
@@ -922,7 +976,10 @@
             : SelectedObservation?.Summary
               ?? SelectedMapMarkerSummary
               ?? SelectedCountry?.Summary
-              ?? "지역 문화와 가격·유통 관측의 준비 상태를 업무 판단 근거로 확인하세요.";
+               ?? "지역 문화와 가격·유통 관측의 준비 상태를 업무 판단 근거로 확인하세요.";
+
+    protected override async Task OnInitializedAsync()
+        => await LoadRegionalImagesAsync();
 
     protected override void OnParametersSet()
     {
@@ -1045,6 +1102,27 @@
     private 커뮤니티세계지도LayerDto? LayerFor(string layerCode)
         => CurrentLayers.FirstOrDefault(layer => string.Equals(layer.Code, layerCode, StringComparison.Ordinal));
 
+    private string LayerOptionCaption(
+        커뮤니티세계지도LayerDto layer,
+        MapLayerDiagram layerDiagram)
+    {
+        if (IsNightLearning)
+        {
+            return "알아차림 자료";
+        }
+
+        if (layer.Code != 커뮤니티세계지도LayerCodes.OverseasManufacturer)
+        {
+            return $"{layerDiagram.DisplayName} 연결";
+        }
+
+        var markerCount = _appliedSnapshot?.Observations.Count(observation =>
+            observation.LayerCode == 커뮤니티세계지도LayerCodes.OverseasManufacturer);
+        return markerCount.HasValue
+            ? $"{markerCount.Value:N0}개 권역 · {layerDiagram.DisplayName}"
+            : $"서버 연결 후 집계 · {layerDiagram.DisplayName}";
+    }
+
     private MapLayerDiagram BuildLayerDiagram(커뮤니티세계지도LayerDto layer)
         => IsNightLearning
             ? BuildAwarenessLayerDiagram(layer)
@@ -1059,6 +1137,7 @@
                 && !string.Equals(_selectedCountryCode, "KR", StringComparison.Ordinal) => CommunityLedgerTemplateKeys.GroupImport,
             커뮤니티세계지도LayerCodes.WholesaleMarket => CommunityLedgerTemplateKeys.GroupPurchase,
             커뮤니티세계지도LayerCodes.TraditionalMarketHub => CommunityLedgerTemplateKeys.GroupPurchase,
+            커뮤니티세계지도LayerCodes.OverseasManufacturer => CommunityLedgerTemplateKeys.GroupImport,
             커뮤니티세계지도LayerCodes.PublicPrice when _selectedCountryCode is not null
                 && !string.Equals(_selectedCountryCode, "KR", StringComparison.Ordinal) => CommunityLedgerTemplateKeys.GroupImport,
             커뮤니티세계지도LayerCodes.PublicPrice => CommunityLedgerTemplateKeys.GroupPurchase,
@@ -1457,6 +1536,14 @@
         return count > 0 ? $"{count}개" : "준비 중";
     }
 
+    private string RegionalCultureMarkerCountLabel(string countryCode)
+    {
+        var count = _appliedSnapshot?.Observations.Count(observation =>
+            observation.LayerCode == 커뮤니티세계지도LayerCodes.RegionalCulture
+            && string.Equals(observation.CountryCode, countryCode, StringComparison.Ordinal)) ?? 0;
+        return count > 0 ? $"{count}개 지역" : "불러오는 중";
+    }
+
     private static string LocationPrecisionLabel(string? code)
         => code switch
         {
@@ -1476,8 +1563,10 @@
         };
 
     private static bool IsIndividualLocationLayer(string layerCode)
-        => layerCode is 커뮤니티세계지도LayerCodes.WholesaleMarket
-            or 커뮤니티세계지도LayerCodes.TraditionalMarketHub;
+        => layerCode is 커뮤니티세계지도LayerCodes.RegionalCulture
+            or 커뮤니티세계지도LayerCodes.WholesaleMarket
+            or 커뮤니티세계지도LayerCodes.TraditionalMarketHub
+            or 커뮤니티세계지도LayerCodes.OverseasManufacturer;
 
     private 커뮤니티세계지도ObservationDto? SelectedObservation
         => _selectedObservationId is null
@@ -1491,6 +1580,67 @@
             : CurrentMapMarkers.FirstOrDefault(marker =>
                 string.Equals(marker.Id, _selectedObservationId, StringComparison.Ordinal));
 
+    private bool HasRegionalVisualSelection
+        => (SelectedObservation?.LayerCode ?? SelectedMapMarker?.LayerCode) is
+            커뮤니티세계지도LayerCodes.RegionalCulture
+            or 커뮤니티세계지도LayerCodes.WholesaleMarket
+            or 커뮤니티세계지도LayerCodes.TraditionalMarketHub
+            or 커뮤니티세계지도LayerCodes.OverseasManufacturer;
+
+    private AppContextImageAssetDto? SelectedRegionImage
+    {
+        get
+        {
+            var markerId = SelectedObservation?.StableId ?? SelectedMapMarker?.Id;
+            if (string.IsNullOrWhiteSpace(markerId))
+            {
+                return null;
+            }
+
+            var normalizedMarkerId = markerId.StartsWith("culture:", StringComparison.Ordinal)
+                ? markerId["culture:".Length..]
+                : markerId;
+            return _regionalImages
+                .Select(image => new
+                {
+                    Image = image,
+                    RegionKey = image.SceneKey.EndsWith("--scene-01", StringComparison.Ordinal)
+                        ? image.SceneKey[..^"--scene-01".Length]
+                        : image.SceneKey
+                })
+                .Where(candidate => normalizedMarkerId.Contains(
+                    candidate.RegionKey,
+                    StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(candidate => candidate.RegionKey.Length)
+                .Select(candidate => candidate.Image)
+                .FirstOrDefault();
+        }
+    }
+
+    private async Task LoadRegionalImagesAsync()
+    {
+        _regionImagesLoading = true;
+        _regionImagesError = null;
+        try
+        {
+            _regionalImages = await RegionalImageClient.팩조회Async(RegionalCultureImagePackId);
+        }
+        catch (Exception)
+        {
+            _regionalImages = [];
+            _regionImagesError = "지역 이미지를 불러오지 못했습니다.";
+        }
+        finally
+        {
+            _regionImagesLoading = false;
+        }
+    }
+
+    private static string ImageQualityLabel(string qualityStatus)
+        => string.Equals(qualityStatus, "사용가능", StringComparison.Ordinal)
+            ? "검토 완료"
+            : "검토 중";
+
     private string? SelectedMapMarkerSummary
         => SelectedMapMarker is not { } marker
             ? null
@@ -1500,6 +1650,8 @@
                     $"{marker.Name}의 공개 시장 대표 위치와 시장 단계입니다. 길찾기 좌표나 개별 사업자의 거래·재고 정보가 아닙니다.",
                 커뮤니티세계지도LayerCodes.TraditionalMarketHub =>
                     $"{marker.Name}의 검증된 공개 거점 상태입니다. 확인·동의 전 후보를 실제 거점이나 계약으로 취급하지 않습니다.",
+                커뮤니티세계지도LayerCodes.OverseasManufacturer =>
+                    $"{marker.Name}의 식약처 해외제조업소 근거를 행정권역 대표점에 집계했습니다. 개별 공장 좌표나 현재 거래 가능 업체 목록이 아닙니다.",
                 커뮤니티세계지도LayerCodes.PublicPrice =>
                     $"{marker.Name}의 가격·시장 공개 관측입니다. 출처별 원 통화·거래단위·기준일을 함께 확인하세요.",
                 _ => $"{marker.Name}의 공개 지역 자료입니다. 대표 위치는 개인 또는 사업장의 정밀 위치가 아닙니다."
@@ -1517,6 +1669,8 @@
         {
             커뮤니티세계지도LayerCodes.WholesaleMarket => MarketStageLabel(observation.MarketStageCode),
             커뮤니티세계지도LayerCodes.TraditionalMarketHub => TraditionalMarketHubStatusLabel(observation.MarkerStatusCode),
+            커뮤니티세계지도LayerCodes.OverseasManufacturer =>
+                $"공식 코드 확인 · {(observation.OrganizationCount ?? 0):N0}개 업소",
             _ => observation.EvidenceStatusCode switch
             {
                 커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked => "공식 출처 연결",

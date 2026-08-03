@@ -5,6 +5,8 @@ using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.TraditionalMarkets;
 using Ssalddel.Services.TraditionalMarkets;
+using Ssalddel.Services.FoodCulture;
+using Ssalddel.Services.Content;
 
 namespace Ssalddel.Services.Community;
 
@@ -30,7 +32,9 @@ public interface I커뮤니티세계지도조회UseCase
     Effects = SsalddelCodeEffect.None,
     Boundary = "조회 결과는 지도 탐색 근거이며 결제·주문·계약·배차를 실행하지 않습니다.")]
 public sealed class 커뮤니티세계지도조회UseCase(
-    I전통시장MapMarkerReader 전통시장MapMarkerReader) : I커뮤니티세계지도조회UseCase
+    I전통시장MapMarkerReader 전통시장MapMarkerReader,
+    I해외제조업소MapMarkerReader 해외제조업소MapMarkerReader,
+    I지역문화이미지MapMarkerReader? 지역문화이미지MapMarkerReader = null) : I커뮤니티세계지도조회UseCase
 {
     private static readonly IReadOnlyDictionary<string, (double Latitude, double Longitude)> CountryCenters
         = new Dictionary<string, (double, double)>(StringComparer.Ordinal)
@@ -97,24 +101,28 @@ public sealed class 커뮤니티세계지도조회UseCase(
     private async Task<IReadOnlyList<커뮤니티세계지도ObservationDto>> BuildDayObservationsAsync(
         CancellationToken cancellationToken)
     {
-        var culture = RegionalCultureSpecialtyCatalog.All.Select(region =>
-        {
-            var center = RegionCenters[region.Key];
-            return new 커뮤니티세계지도ObservationDto(
-                $"culture:{region.Key}",
-                CommunityPageRoutes.WorldMapDayWorkDataset,
-                커뮤니티세계지도LayerCodes.RegionalCulture,
-                region.CountryCode,
-                region.CountryName,
-                center.Latitude,
-                center.Longitude,
-                $"{region.RegionName} 문화·특산물",
-                region.CultureSummary,
-                "살뜰 지역문화 공개 카탈로그",
-                null,
-                커뮤니티세계지도EvidenceStatusCodes.Curated,
-                RegionalCultureSpecialtyRoutes.DetailFor(region.Key));
-        });
+        var culture = 지역문화이미지MapMarkerReader is null
+            ? BuildLegacyCultureObservations()
+            : (await 지역문화이미지MapMarkerReader.공개Marker조회Async(cancellationToken))
+                .Select(marker => new 커뮤니티세계지도ObservationDto(
+                    $"culture:{marker.RegionKey}",
+                    CommunityPageRoutes.WorldMapDayWorkDataset,
+                    커뮤니티세계지도LayerCodes.RegionalCulture,
+                    marker.CountryCode,
+                    marker.CountryName,
+                    marker.Latitude,
+                    marker.Longitude,
+                    $"{marker.RegionName} 생활문화",
+                    $"{marker.CultureSummary} {지역문화행정구역대표점Catalog.LocationBoundary} 생성 이미지는 생활문화 이해를 위한 참고 자료이며 공식 기록이 아닙니다.",
+                    지역문화행정구역대표점Catalog.SourceName,
+                    marker.ImageUpdatedAtUtc,
+                    커뮤니티세계지도EvidenceStatusCodes.Curated,
+                    CommunityPageRoutes.BoardsFor(
+                        boardName: "지역문화",
+                        boardKey: "regional-culture",
+                        search: marker.RegionName),
+                    지역문화행정구역대표점Catalog.SourceUrl,
+                    커뮤니티세계지도위치정밀도Codes.AdministrativeRegionRepresentative));
 
         var prices = new[]
         {
@@ -187,12 +195,55 @@ public sealed class 커뮤니티세계지도조회UseCase(
                     hub.CommunityScopeKey);
             });
 
+        var overseasManufacturers = (await 해외제조업소MapMarkerReader
+                .공개Marker조회Async(cancellationToken))
+            .Select(marker => new 커뮤니티세계지도ObservationDto(
+                $"overseas-manufacturer:{marker.StableRegionKey}",
+                CommunityPageRoutes.WorldMapDayWorkDataset,
+                커뮤니티세계지도LayerCodes.OverseasManufacturer,
+                marker.CountryCode,
+                marker.CountryName,
+                marker.Latitude,
+                marker.Longitude,
+                $"{marker.RegionName} 해외제조업소 근거",
+                $"식약처 해외제조업소 코드가 확인된 제조업소 {marker.OrganizationCount:N0}개와 재료 관계 근거 {marker.EvidenceCount:N0}건을 지역별로 집계했습니다. "
+                + $"{marker.RegionBoundary} 제조업소 소재지는 원재료의 재배·어획 산지나 현재 공급 가능성을 뜻하지 않습니다.",
+                marker.AnchorSourceName,
+                marker.LastObservedAtUtc,
+                커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked,
+                "/information/food-ingredients",
+                marker.AnchorSourceUrl,
+                커뮤니티세계지도위치정밀도Codes.AdministrativeRegionRepresentative,
+                OrganizationCount: marker.OrganizationCount,
+                EvidenceCount: marker.EvidenceCount));
+
         return culture.Concat(prices)
             .Concat(wholesaleMarkets)
             .Concat(traditionalMarketHubs)
+            .Concat(overseasManufacturers)
             .OrderBy(item => item.StableId, StringComparer.Ordinal)
             .ToArray();
     }
+
+    private static IEnumerable<커뮤니티세계지도ObservationDto> BuildLegacyCultureObservations()
+        => RegionalCultureSpecialtyCatalog.All.Select(region =>
+        {
+            var center = RegionCenters[region.Key];
+            return new 커뮤니티세계지도ObservationDto(
+                $"culture:{region.Key}",
+                CommunityPageRoutes.WorldMapDayWorkDataset,
+                커뮤니티세계지도LayerCodes.RegionalCulture,
+                region.CountryCode,
+                region.CountryName,
+                center.Latitude,
+                center.Longitude,
+                $"{region.RegionName} 문화·특산물",
+                region.CultureSummary,
+                "살뜰 지역문화 공개 카탈로그",
+                null,
+                커뮤니티세계지도EvidenceStatusCodes.Curated,
+                RegionalCultureSpecialtyRoutes.DetailFor(region.Key));
+        });
 
     private static 커뮤니티세계지도ObservationDto Price(
         string countryCode,

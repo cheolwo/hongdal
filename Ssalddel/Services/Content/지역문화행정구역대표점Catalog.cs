@@ -1,0 +1,122 @@
+namespace Ssalddel.Services.Content;
+
+public sealed record 지역문화행정구역대표점(
+    string RegionKey,
+    double Latitude,
+    double Longitude,
+    string? FallbackRegionName = null);
+
+/// <summary>
+/// Natural Earth admin-1의 대표 label point를 지역 이미지 key와 연결한 지도 탐색용 좌표입니다.
+/// 시설·원산지·배송 주소로 사용하지 않습니다.
+/// </summary>
+public static class 지역문화행정구역대표점Catalog
+{
+    public const string SourceName = "Natural Earth admin-1 대표점";
+    public const string SourceUrl = "https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_10m_admin_1_states_provinces.geojson";
+    public const string LocationBoundary = "행정구역 대표점이며 시설·행사장·원산지·배송 주소가 아닙니다.";
+    public static readonly DateTimeOffset AccessedAtUtc = new(2026, 8, 3, 0, 0, 0, TimeSpan.Zero);
+
+    public static IReadOnlyList<지역문화행정구역대표점> All { get; } =
+    [
+        new("kr-busan", 35.1928, 129.0820, "부산광역시"),
+        new("kr-daegu", 35.9034, 128.6310, "대구광역시"),
+        new("kr-daejeon", 36.3563, 127.4010, "대전광역시"),
+        new("kr-gangwon", 37.7951, 128.2200, "강원특별자치도"),
+        new("kr-gwangju", 35.1989, 126.9290, "광주광역시"),
+        new("kr-gyeonggi", 37.2562, 127.2050, "경기도"),
+        new("kr-incheon", 37.4983, 126.5070, "인천광역시"),
+        new("kr-jeju", 33.3741, 126.5570, "제주특별자치도"),
+        new("kr-chungbuk", 36.7476, 127.6680, "충청북도"),
+        new("kr-gyeongbuk", 36.3396, 128.7080, "경상북도"),
+        new("kr-jeonbuk", 35.6790, 127.0810, "전북특별자치도"),
+        new("kr-sejong", 36.4974, 127.2290, "세종특별자치시"),
+        new("kr-chungnam", 36.4602, 126.8740, "충청남도"),
+        new("kr-gyeongnam", 35.3192, 128.2170, "경상남도"),
+        new("kr-jeonnam", 34.8166, 126.8840, "전라남도"),
+        new("kr-ulsan", 35.4997, 129.2320, "울산광역시"),
+
+        new("us-alabama", 32.8551, -86.7184),
+        new("us-alaska", 65.3609, -151.6040),
+        new("us-arizona", 34.3046, -111.9350),
+        new("us-arkansas", 34.7563, -92.1428),
+        new("us-california", 36.7496, -119.5910),
+        new("us-colorado", 38.9998, -105.5430),
+        new("us-connecticut", 41.6486, -72.7594),
+        new("us-delaware", 38.8657, -75.4112),
+        new("us-florida", 28.1568, -81.6228),
+        new("us-georgia", 32.8547, -83.4078),
+        new("us-hawaii", 21.4919, -157.9990),
+        new("us-idaho", 43.7825, -114.1330),
+        new("us-illinois", 39.9460, -89.1991),
+        new("us-indiana", 39.8874, -86.1396),
+        new("us-iowa", 42.0423, -93.3891),
+        new("us-kansas", 38.5000, -98.3309),
+        new("us-kentucky", 37.3994, -85.5729),
+        new("us-louisiana", 30.5274, -91.9991),
+        new("us-maine", 45.1480, -69.1973),
+        new("us-maryland", 39.3874, -77.0454),
+        new("us-massachusetts", 42.3739, -71.9993),
+        new("us-michigan", 43.4343, -84.9479),
+        new("us-minnesota", 46.0592, -93.3640),
+        new("us-mississippi", 32.8657, -89.7189),
+        new("us-missouri", 38.5487, -92.4460),
+        new("us-montana", 46.9965, -110.0440),
+        new("us-nebraska", 41.5002, -99.6855),
+        new("us-nevada", 39.4299, -117.0200),
+        new("us-new-hampshire", 43.5993, -71.6301),
+        new("us-new-jersey", 40.0449, -74.4653),
+        new("us-new-mexico", 34.5002, -106.0240),
+        new("us-new-york", 43.1988, -75.3242),
+        new("us-north-carolina", 35.6152, -78.8660),
+        new("us-north-dakota", 47.4675, -100.3020),
+        new("us-ohio", 40.0924, -82.6719),
+        new("us-oklahoma", 35.4520, -97.1309),
+        new("us-oregon", 43.8333, -120.3860),
+        new("us-pennsylvania", 40.8601, -77.6094),
+        new("us-rhode-island", 41.6242, -71.5082),
+        new("us-south-carolina", 33.8578, -80.6471),
+        new("us-south-dakota", 44.4711, -100.2550),
+        new("us-tennessee", 35.7514, -86.3415),
+        new("us-texas", 31.1310, -98.7607),
+        new("us-utah", 39.5007, -111.5440),
+        new("us-vermont", 44.0886, -72.7317),
+        new("us-virginia", 37.7403, -78.2431),
+        new("us-washington", 47.4865, -120.3610),
+        new("us-west-virginia", 38.6422, -80.7128),
+        new("us-wisconsin", 44.3709, -89.5831),
+        new("us-wyoming", 42.9999, -107.5520),
+
+        new("cn-anhui", 31.9537, 117.2530),
+        new("cn-beijing", 39.9488, 116.3890),
+        new("cn-chongqing", 30.0173, 107.7300),
+        new("cn-fujian", 26.4080, 118.1780),
+        new("cn-gansu", 38.7393, 100.7350),
+        new("cn-guangdong", 23.7924, 113.7200),
+        new("cn-guangxi", 23.7451, 108.7560),
+        new("cn-guizhou", 26.8033, 106.5590),
+        new("cn-hainan", 19.1865, 109.8250),
+        new("cn-hebei", 38.5205, 115.3140),
+        new("cn-heilongjiang", 46.8451, 127.9700),
+        new("cn-henan", 33.9055, 113.4840),
+        new("cn-hubei", 30.9857, 112.2640),
+        new("cn-hunan", 27.6667, 111.7120),
+        new("cn-inner-mongolia", 41.5938, 111.6230),
+        new("cn-jiangsu", 32.9844, 119.9420),
+        new("cn-jiangxi", 27.6397, 116.0170),
+        new("cn-jilin", 43.2978, 126.4660),
+        new("cn-liaoning", 41.3860, 123.0700),
+        new("cn-ningxia", 37.1762, 106.0380),
+        new("cn-qinghai", 35.2652, 96.2377),
+        new("cn-shaanxi", 33.7713, 108.3630),
+        new("cn-shandong", 36.3271, 118.1140),
+        new("cn-shanghai", 31.0909, 121.4090),
+        new("cn-shanxi", 37.7586, 112.3890),
+        new("cn-sichuan", 30.5431, 102.3840),
+        new("cn-tianjin", 39.3708, 117.3470),
+        new("cn-tibet", 31.4515, 88.4137),
+        new("cn-xinjiang", 41.1220, 85.4253),
+        new("cn-yunnan", 24.4603, 101.6610),
+        new("cn-zhejiang", 29.1084, 119.9700)
+    ];
+}
