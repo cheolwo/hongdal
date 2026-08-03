@@ -40,6 +40,13 @@ public static partial class ServiceCollectionExtensions
         services.Configure<수입식품한글표시사항조회Options>(configuration.GetSection(수입식품한글표시사항조회Options.SectionName));
         var 공공데이터기본서비스키 = configuration[$"{PublicDataOptions.SectionName}:DataGoKrServiceKey"]
             ?? configuration[$"{PublicDataOptions.SectionName}:ServiceKey"];
+        services.PostConfigure<NtsBusinessRegistrationOptions>(options =>
+        {
+            if (string.IsNullOrWhiteSpace(options.ServiceKey))
+            {
+                options.ServiceKey = 공공데이터기본서비스키 ?? string.Empty;
+            }
+        });
         services.PostConfigure<해외제조업소조회Options>(options =>
         {
             if (string.IsNullOrWhiteSpace(options.ServiceKey))

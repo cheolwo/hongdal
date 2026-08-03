@@ -1,9 +1,14 @@
 using Ssalddel.Contracts.Common.PublicData;
+using Microsoft.Extensions.Configuration;
 
 namespace 살뜰.Services.External.PublicData;
 
 public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
 {
+    private const string ExplicitRetryPolicy = "자동 재시도 없음. 호출자가 오류 유형을 확인한 뒤 명시적으로 다시 실행합니다.";
+    private const string ExplicitErrorPolicy = "키 누락, HTTP 비성공, 응답 파싱 실패를 구분하고 운영 데이터를 sample fallback으로 대체하지 않습니다.";
+    private readonly IConfiguration? _configuration;
+
     private static readonly IReadOnlyList<PublicDataApiMetadataItem> Catalog =
     [
         new()
@@ -74,6 +79,136 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
                 "같이 주문 목표 수량과 단지 내 분류 규모를 추정할 때 참고 정보로 사용합니다.",
                 "관리사무소 승인 또는 공식 협약을 대체하는 데이터로 사용하지 않습니다."
             ]
+        },
+        new()
+        {
+            Key = "kapt-apartment-operations-module",
+            Provider = "국토교통부",
+            DisplayName = "공동주택 운영 공개정보 모듈",
+            Purpose = "유지관리, 입찰, 수의계약과 에너지 사용 공개정보를 서비스별 허용 경로로 조회합니다.",
+            Domain = "ApartmentComplex",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr",
+            RequiresServiceKey = true,
+            ContainsResidentialData = true,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "kaptCode", "pageNo", "numOfRows", "searchDate"],
+            MainResponseFields = ["단지코드", "공고일", "계약일", "유지관리일", "에너지사용량"],
+            UsageNotes =
+            [
+                "단지 단위 공개 정보만 취급하고 세대나 거주자 식별자로 확장하지 않습니다.",
+                "입찰·계약 공지는 현재 계약 권한이나 거래 가능성을 자동 확정하지 않습니다."
+            ]
+        },
+        new()
+        {
+            Key = "mof-fisheries-distribution-module",
+            Provider = "해양수산부",
+            DisplayName = "수협 유통 공개정보 모듈",
+            Purpose = "산지조합, 위판장, 창고, 재고, 입출고와 위탁판매 공개 원문을 분리 조회합니다.",
+            Domain = "FisheriesDistribution",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows", "type"],
+            MainResponseFields = ["조합", "위판장", "창고", "품목", "재고", "입출고", "위탁판매"],
+            UsageNotes =
+            [
+                "재고와 입출고 값은 원천의 공개 관측값으로 보존하고 현재 가용 재고로 단정하지 않습니다.",
+                "매출처와 위탁판매 정보는 거래 권한, 계약 관계 또는 추천 근거로 자동 사용하지 않습니다."
+            ]
+        },
+        new()
+        {
+            Key = "tourapi-korean-tourism",
+            Provider = "한국관광공사",
+            DisplayName = "국문 관광정보 서비스",
+            Purpose = "지역·위치·키워드 기반 관광정보와 상세·이미지 정보를 조회합니다.",
+            Domain = "RegionalCulture",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/B551011/KorService2",
+            DocumentationUrl = "https://www.data.go.kr/data/15101578/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "MobileOS", "MobileApp", "contentTypeId", "areaCode", "sigunguCode", "contentId"],
+            MainResponseFields = ["contentid", "title", "addr1", "mapx", "mapy", "firstimage", "cpyrhtDivCd"],
+            UsageNotes =
+            [
+                "관광정보와 이미지는 원천 출처와 공공누리 유형을 함께 보존합니다.",
+                "지역문화 대표성이나 지역 주민의 추천을 자동 확정하는 근거로 사용하지 않습니다."
+            ]
+        },
+        new()
+        {
+            Key = "online-collected-prices",
+            Provider = "국가데이터처",
+            DisplayName = "온라인 수집 가격 정보",
+            Purpose = "온라인 수집 품목 목록과 일별 상품 가격 관측값을 조회합니다.",
+            Domain = "PriceObservation",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/1240000/bpp_openapi",
+            DocumentationUrl = "https://www.data.go.kr/data/15080757/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "ServiceKey", "pageNo", "numOfRows", "itemCode", "startDate", "endDate"],
+            MainResponseFields = ["품목코드", "품목명", "수집일", "가격"],
+            UsageNotes =
+            [
+                "웹 수집가격은 배송비, 규격, 판매조건과 수집시점을 함께 보존합니다.",
+                "KOSIS 또는 다른 가격 원천과 품목·단위가 정렬되기 전 절감액이나 순위를 계산하지 않습니다."
+            ]
+        },
+        new()
+        {
+            Key = "kosis-indicator-info",
+            Provider = "국가데이터처",
+            DisplayName = "KOSIS 지표정보 조회 서비스",
+            Purpose = "지표명, 고유번호와 수록주기로 KOSIS 지표 목록과 상세를 조회합니다.",
+            Domain = "PriceComparisonContext",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/1240000/IndicatorService",
+            DocumentationUrl = "https://www.data.go.kr/data/15127763/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows", "STAT_JIPYO_NM", "STAT_JIPYO_ID", "format"],
+            MainResponseFields = ["statJipyoId", "statJipyoNm", "prdSeName", "strtPrdDe", "endPrdDe", "unit", "areaTypeName"],
+            UsageNotes = ["집계 지표는 가격 비교의 배경자료로만 사용하며 개인, 가구 또는 참여자 평가에 사용하지 않습니다."]
+        },
+        new()
+        {
+            Key = "kosis-statistics-data",
+            Provider = "국가데이터처",
+            DisplayName = "KOSIS 통계자료 조회 서비스",
+            Purpose = "통계표 ID, 분류와 항목 코드를 기준으로 KOSIS 통계표 수치자료를 조회합니다.",
+            Domain = "PriceComparisonContext",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/1240000/statisticsData",
+            DocumentationUrl = "https://www.data.go.kr/data/15127755/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows", "orgId", "tblId", "objL1", "itmId", "prdSe", "newEstPrdCnt", "format"],
+            MainResponseFields = ["DT", "ORG_ID", "TBL_ID", "TBL_NM", "ITM_ID", "ITM_NM", "UNIT_NM", "PRD_SE", "PRD_DE"],
+            UsageNotes = ["통계표, 항목, 단위, 수록주기와 시점을 보존하며 온라인 상품가격과 직접 동일시하지 않습니다."]
         },
         new()
         {
@@ -327,12 +462,124 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
                 "HS 코드와 aT 품목코드는 직접 호환되지 않으므로 검토된 교차 연결표와 매칭 품질을 함께 반환합니다.",
                 "국산 품종을 구분할 수 없는 품목은 국내시장 조사값으로 표시하고 국산 확정 가격으로 표현하지 않습니다."
             ]
+        },
+        new()
+        {
+            Key = "kapt-apartment-management-fees",
+            Provider = "국토교통부",
+            DisplayName = "공동주택 관리비 정보",
+            Purpose = "공용관리비, 개별사용료, 장기수선충당금의 월별 단지 관측값을 조회합니다.",
+            Domain = "ApartmentComplex",
+            VersionScope = "2.5",
+            ApiType = "REST",
+            DataFormat = "XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15059160/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = true,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "kaptCode", "searchDate"],
+            MainResponseFields = ["kaptCode", "searchDate", "commonManageCost", "individualUseCost", "longTermRepairReserve"],
+            UsageNotes = ["단지 단위 공개 통계만 사용하며 세대별 관리비나 거주자 정보로 확장하지 않습니다."]
+        },
+        new()
+        {
+            Key = "fish-cooperative-general-statistics",
+            Provider = "금융위원회",
+            DisplayName = "수협 일반현황 통계",
+            Purpose = "수협의 조직·임직원 일반현황을 지역 수산업 기준정보 후보로 조회합니다.",
+            Domain = "Fisheries",
+            VersionScope = "0.0",
+            ApiType = "REST",
+            DataFormat = "XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15061340/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows"],
+            MainResponseFields = ["title", "basYm", "fncoCd", "fncoNm", "xcsmCnt", "xcsmDcdNm"],
+            UsageNotes = ["기관 일반현황이며 개별 어업인 또는 거래처 자격을 증명하지 않습니다."]
+        },
+        new()
+        {
+            Key = "mof-fishing-area-file",
+            Provider = "해양수산부",
+            DisplayName = "어획구역 기준 파일",
+            Purpose = "수산물 어획구역 코드와 명칭을 지도 기준정보로 갱신합니다.",
+            Domain = "Fisheries",
+            VersionScope = "0.0",
+            ApiType = "File",
+            DataFormat = "CSV",
+            BaseUrl = "https://www.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15147444/fileData.do",
+            RequiresServiceKey = false,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["datasetVersion"],
+            MainResponseFields = ["어획구역코드", "어획구역명"],
+            UsageNotes = ["파일 버전과 다운로드 시각을 함께 저장하고 최신 해역 경계를 보장하는 실시간 데이터로 표현하지 않습니다."]
+        },
+        new()
+        {
+            Key = "nts-business-registration-status",
+            Provider = "국세청",
+            DisplayName = "사업자등록 상태 조회",
+            Purpose = "사업자등록번호의 계속·휴업·폐업 및 과세유형 상태를 확인합니다.",
+            Domain = "BusinessRegistration",
+            VersionScope = "1.0",
+            ApiType = "REST",
+            DataFormat = "JSON",
+            BaseUrl = "https://api.odcloud.kr/api/nts-businessman/v1",
+            DocumentationUrl = "https://www.data.go.kr/data/15081808/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = true,
+            MainParameters = ["serviceKey", "b_no"],
+            MainResponseFields = ["b_no", "b_stt", "b_stt_cd", "tax_type", "end_dt"],
+            UsageNotes = ["사업자번호는 공개 지도나 공동 원장에 그대로 노출하지 않고 권한이 있는 검증 흐름에서만 사용합니다."]
         }
     ];
 
+    private static readonly IReadOnlyDictionary<string, RuntimeBinding> RuntimeBindings =
+        new Dictionary<string, RuntimeBinding>(StringComparer.Ordinal)
+        {
+            ["juso-road-address-search"] = new("RoadAddressLookupService", ["PublicData:RoadAddress:ConfirmKey"], ["/addrlink/addrLinkApi.do"], "요청 시점 실시간 조회", ExplicitRetryPolicy),
+            ["kapt-apartment-complex-list"] = new("ApartmentComplexLookupService", PublicDataKeyPaths("ApartmentComplex"), ["/1613000/AptListService3/getLegaldongAptList"], "요청 시점 조회; 응답 기준시각 기록", ExplicitRetryPolicy),
+            ["kapt-apartment-complex-basic"] = new("ApartmentComplexLookupService", PublicDataKeyPaths("ApartmentComplex"), ["/1613000/AptBasisInfoServiceV4/getAphusBassInfo"], "요청 시점 조회; 응답 기준시각 기록", ExplicitRetryPolicy),
+            ["kapt-apartment-management-fees"] = new("ApartmentManagementFeeLookupService", PublicDataKeyPaths("ApartmentManagementFee"), ["/1613000/AptPublicManageCostService/getHsmpPublicManageCostInfo", "/1613000/AptIndvdlzManageCostService/getHsmpIndvdlzManageCostInfo", "/1613000/AptLongTermRepairReserveService/getHsmpLongTermRepairReserveInfo"], "월별 관측값; 조회일과 대상월 기록", ExplicitRetryPolicy),
+            ["kapt-apartment-operations-module"] = new("공동주택운영공공데이터Client", PublicDataKeyPaths("ApartmentComplex"), ["/1613000/ApHusMntMngHistInfoOfferServiceV2/", "/1613000/ApHusBidResultNoticeInfoOfferServiceV2/", "/1613000/ApHusPrvCntrNoticeInfoOfferServiceV2/", "/1613000/ApHusBidPblAncInfoOfferServiceV2/", "/1613000/ApHusEnergyUseInfoOfferServiceV2/"], "요청 시점 공개 원문 조회; 기준일과 조회시각 기록", ExplicitRetryPolicy),
+            ["mof-fisheries-distribution-module"] = new("수협유통공공데이터Client", PublicDataKeyPaths("FishCooperativeStatistics"), ["/1192000/select0010List/", "/1192000/select0020List/", "/1192000/select0030List/", "/1192000/select0040List/", "/1192000/select0060List/", "/1192000/select0120List/", "/1192000/select0130List/", "/1192000/select0140List/", "/1192000/select0150List/", "/1192000/select0160List/", "/1192000/select0170List/"], "원천 기준일과 조회시각 기록", ExplicitRetryPolicy),
+            ["tourapi-korean-tourism"] = new("국문관광정보공공데이터Client", PublicDataKeyPaths("TourApi"), ["/B551011/KorService2/"], "원천 수정일과 조회시각 기록", ExplicitRetryPolicy),
+            ["online-collected-prices"] = new("온라인가격공공데이터Client", PublicDataKeyPaths("OnlinePrices"), ["/1240000/bpp_openapi/getPriceItemList", "/1240000/bpp_openapi/getPriceInfo"], "수집일과 조회시각 기록", ExplicitRetryPolicy),
+            ["kosis-indicator-info"] = new("Kosis비교자료공공데이터Client", PublicDataKeyPaths("Kosis"), ["/1240000/IndicatorService/"], "지표 수록시점과 조회시각 기록", ExplicitRetryPolicy),
+            ["kosis-statistics-data"] = new("Kosis비교자료공공데이터Client", PublicDataKeyPaths("Kosis"), ["/1240000/statisticsData/getStatisticsData"], "통계표 수록시점과 조회시각 기록", ExplicitRetryPolicy),
+            ["semas-traditional-market-status"] = new("TraditionalMarketPublicDataClient", PublicDataKeyPaths("TraditionalMarket"), ["/api/15052837/v1/uddi:1fd54eb7-0565-4755-8ec7-a70931b6dc77"], "연간 기준자료; SourceReferenceDate 기록", ExplicitRetryPolicy),
+            ["mfds-imported-food-product-db"] = new("수입식품제품조회Service", ["수입식품제품조회:ServiceKey", "PublicData:DataGoKrServiceKey", "PublicData:ServiceKey"], ["/getIprtFoodPrdtDBInq02"], "요청 시점 조회; 조회시각 기록", ExplicitRetryPolicy),
+            ["mfds-imported-food-overseas-manufacturer"] = new("해외제조업소조회Service", ["해외제조업소조회:ServiceKey", "PublicData:DataGoKrServiceKey", "PublicData:ServiceKey"], ["/getIprtFoodOvseaMnftBsshInfoInq02"], "요청 시점 조회; 인증·중단 상태의 조회시각 기록", ExplicitRetryPolicy),
+            ["mfds-imported-food-korean-label"] = new("수입식품한글표시사항조회Service", ["수입식품한글표시사항조회:ServiceKey", "PublicData:DataGoKrServiceKey", "PublicData:ServiceKey"], ["/getIprtFoodPrdtKoreanLabelingItem"], "요청 시점 조회; 처리일시와 조회시각 기록", ExplicitRetryPolicy),
+            ["customs-cargo-tracking"] = new("Unipass화물통관진행조회Service", ["Customs:ApiKey"], ["/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo"], "요청 시점 실시간 조회", ExplicitRetryPolicy),
+            ["customs-hs-country-import-statistics"] = new("HsCountryTradeUnitPriceLookupService", PublicDataKeyPaths("CustomsTradeStatistics"), ["/1220000/nitemtrade/getNitemtradeList"], "월별 통계; 대상기간과 조회시각 기록", ExplicitRetryPolicy),
+            ["customs-confirmation-requirements"] = new("세관장확인대상물품공공데이터수집기", PublicDataKeyPaths("CustomsRequirements"), ["/1220000/retrieveCcctLworCd/getRetrieveCcctLworCd"], "요청 시점 조회; 적용시작일과 조회시각 기록", ExplicitRetryPolicy),
+            ["customs-weekly-exchange-rate"] = new("관세환율공공데이터수집기", PublicDataKeyPaths("CustomsExchangeRate"), ["/1220000/retrieveTrifFxrtInfo/getRetrieveTrifFxrtInfo"], "주간 환율; 적용시작일 기록", ExplicitRetryPolicy),
+            ["at-daily-wholesale-retail-food-price"] = new("AtDomesticFoodPriceLookupService", PublicDataKeyPaths("AtFoodPrices"), ["/B552845/perDay/price"], "일별 가격; 조사일과 조회시각 기록", ExplicitRetryPolicy),
+            ["fish-cooperative-general-statistics"] = new("FishCooperativeStatisticsClient", PublicDataKeyPaths("FishCooperativeStatistics"), ["/1160100/service/GetFishCoopInfoService/getFishCoopGeneInfo"], "공표 기준일과 조회시각 기록", ExplicitRetryPolicy),
+            ["mof-fishing-area-file"] = new("Mof어획구역CatalogSource", [], ["/cmm/cmm/fileDownload.do"], "파일 버전과 다운로드 시각 기록; 기본 캐시 24시간", ExplicitRetryPolicy, false),
+            ["nts-business-registration-status"] = new("NtsBusinessRegistrationService", ["NtsBusinessRegistration:ServiceKey", "PublicData:DataGoKrServiceKey", "PublicData:ServiceKey"], ["/status"], "원천은 약 30분 주기 갱신; 신규 개업은 1~2일 지연 가능; 확인시각 기록", ExplicitRetryPolicy)
+        };
+
+    public PublicDataApiMetadataCatalog()
+    {
+    }
+
+    public PublicDataApiMetadataCatalog(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     public PublicDataApiMetadataResponse GetCatalog(PublicDataApiMetadataQuery query)
     {
-        IEnumerable<PublicDataApiMetadataItem> items = Catalog;
+        IEnumerable<PublicDataApiMetadataItem> items = Catalog.Select(ApplyRuntimeMetadata);
 
         if (!string.IsNullOrWhiteSpace(query.Domain))
         {
@@ -349,6 +596,14 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
             items = items.Where(item => item.ContainsResidentialData == query.ContainsResidentialData.Value);
         }
 
+        if (!string.IsNullOrWhiteSpace(query.ImplementationStatusCode))
+        {
+            items = items.Where(item => string.Equals(
+                item.ImplementationStatusCode,
+                query.ImplementationStatusCode,
+                StringComparison.OrdinalIgnoreCase));
+        }
+
         return new PublicDataApiMetadataResponse
         {
             Items = items
@@ -358,4 +613,50 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
                 .ToArray()
         };
     }
+
+    private PublicDataApiMetadataItem ApplyRuntimeMetadata(PublicDataApiMetadataItem item)
+    {
+        if (!RuntimeBindings.TryGetValue(item.Key, out var binding))
+        {
+            return item with
+            {
+                ImplementationStatusCode = PublicDataApiImplementationStatusCodes.ReferenceOnly,
+                FreshnessPolicy = "기준 파일 또는 문서의 버전과 반영시각을 기록합니다.",
+                ErrorPolicy = "파일 또는 문서 검증 실패를 반영 성공으로 처리하지 않습니다.",
+                RetryPolicy = "자동 호출 대상이 아닙니다."
+            };
+        }
+
+        var keyConfigured = !binding.RequiresConfiguredKey || binding.ConfigurationPaths.Any(path =>
+            !string.IsNullOrWhiteSpace(_configuration?[path]));
+
+        return item with
+        {
+            ImplementationStatusCode = keyConfigured
+                ? PublicDataApiImplementationStatusCodes.Connected
+                : PublicDataApiImplementationStatusCodes.NeedsServiceKey,
+            IsServiceKeyConfigured = keyConfigured && binding.RequiresConfiguredKey,
+            ClientType = binding.ClientType,
+            ConfigurationPaths = binding.ConfigurationPaths,
+            EndpointPaths = binding.EndpointPaths,
+            FreshnessPolicy = binding.FreshnessPolicy,
+            ErrorPolicy = ExplicitErrorPolicy,
+            RetryPolicy = binding.RetryPolicy
+        };
+    }
+
+    private static IReadOnlyList<string> PublicDataKeyPaths(string subsection) =>
+    [
+        $"PublicData:{subsection}:ServiceKey",
+        "PublicData:DataGoKrServiceKey",
+        "PublicData:ServiceKey"
+    ];
+
+    private sealed record RuntimeBinding(
+        string ClientType,
+        IReadOnlyList<string> ConfigurationPaths,
+        IReadOnlyList<string> EndpointPaths,
+        string FreshnessPolicy,
+        string RetryPolicy,
+        bool RequiresConfiguredKey = true);
 }

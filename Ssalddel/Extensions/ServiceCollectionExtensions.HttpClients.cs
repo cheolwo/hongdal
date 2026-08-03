@@ -140,6 +140,55 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri(options.ApartmentManagementFee.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
+        services.AddHttpClient<I수협유통공공데이터Client, 수협유통공공데이터Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.DataGoKrBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I공동주택운영공공데이터Client, 공동주택운영공공데이터Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.DataGoKrBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I국문관광정보공공데이터Client, 국문관광정보공공데이터Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.DataGoKrBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I온라인가격공공데이터Client, 온라인가격공공데이터Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.DataGoKrBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IKosis비교자료공공데이터Client, Kosis비교자료공공데이터Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.DataGoKrBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I수산물산지위판가격Client, Mafra수산물산지위판가격Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.FisheriesAuction.BaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I경기데이터드림ApiClient, 경기데이터드림ApiClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.GyeonggiDataDream.ApiBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I경기데이터드림CatalogClient, 경기데이터드림CatalogClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.GyeonggiDataDream.PortalBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddScoped<I경기데이터드림가축사육집계Client, 경기데이터드림가축사육집계Client>();
         services.AddHttpClient<IHsCountryTradeUnitPriceLookupService, HsCountryTradeUnitPriceLookupService>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;

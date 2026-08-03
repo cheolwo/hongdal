@@ -7,10 +7,26 @@ public static class RegionalAgriculturalMapRoutes
     public const string RegionalMap = "/information/regional-agricultural-map";
     public const string KoreaMap = "/information/korea-agricultural-map";
     public const string MarkerApi = "api/v1/community/regional-map/markers";
+    public const string OceanTileApi = "api/v1/community/regional-map/ocean-tiles";
 
     public static string ForCountry(string countryCode)
         => $"{RegionalMap}?country={Uri.EscapeDataString(
             RegionalAgriculturalMapCountryCodes.NormalizeOrDefault(countryCode))}";
+}
+
+public static class RegionalAgriculturalMapContentLayerKeys
+{
+    public const string AgriculturalLivingInformation = "agricultural-living-information";
+    public const string MarineFishingAreas = "marine-fishing-areas";
+    public const string HongikAcademyPhilosophyVideo = "hongik-academy-philosophy-video";
+
+    public static IReadOnlyList<string> All { get; } =
+        [AgriculturalLivingInformation, MarineFishingAreas, HongikAcademyPhilosophyVideo];
+
+    public static string NormalizeOrDefault(string? contentLayerKey)
+        => All.Contains(contentLayerKey?.Trim(), StringComparer.Ordinal)
+            ? contentLayerKey!.Trim()
+            : AgriculturalLivingInformation;
 }
 
 public static class RegionalAgriculturalMapCountryCodes
@@ -126,3 +142,38 @@ public sealed record RegionalAgriculturalMapMarkerListResponse(
     int MissingAnchorRegionCount,
     IReadOnlyList<string> Notices,
     IReadOnlyList<RegionalAgriculturalMapMarkerDto> Items);
+
+public static class MarineFishingAreaGeometryBasisCodes
+{
+    public const string SchematicOceanCatalogLayout = "SchematicOceanCatalogLayout";
+}
+
+public sealed record MarineFishingAreaOceanTileDto(
+    string TileKey,
+    string SourceSeaName,
+    string DisplayNameEn,
+    int FishingAreaCount,
+    decimal AnchorLeftPercent,
+    decimal AnchorTopPercent,
+    int AnimationDelayMilliseconds,
+    IReadOnlyList<string> ExampleFishingAreas);
+
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.RegionalAgriculturalMap,
+    SsalddelCodeLayer.Contract,
+    "해양수산부 어획구역 카탈로그를 바다별 개략 타일로 전달",
+    FlowOrder = 12,
+    Boundary = "원천 파일에는 좌표와 경계 도형이 없으므로 타일 위치는 탐색용 개략 배치이며 실제 조업 위치나 어획량을 뜻하지 않습니다.")]
+public sealed record MarineFishingAreaOceanTileResponse(
+    string SourceKey,
+    string SourceName,
+    string SourceUrl,
+    string DatasetVersion,
+    DateTime CollectedAtUtc,
+    string ContentSha256,
+    int SourceRowCount,
+    int MappedFishingAreaCount,
+    int ExcludedRowCount,
+    string GeometryBasisCode,
+    IReadOnlyList<string> Notices,
+    IReadOnlyList<MarineFishingAreaOceanTileDto> Items);

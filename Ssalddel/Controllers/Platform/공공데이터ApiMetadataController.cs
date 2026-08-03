@@ -22,13 +22,15 @@ public sealed class 공공데이터ApiMetadataController : ControllerBase
     public ActionResult<PublicDataApiMetadataResponse> Get(
         [FromQuery] string? domain,
         [FromQuery] string? versionScope,
-        [FromQuery] bool? containsResidentialData)
+        [FromQuery] bool? containsResidentialData,
+        [FromQuery] string? implementationStatusCode)
     {
         var response = _공공데이터ApiMetadataCatalog.GetCatalog(new PublicDataApiMetadataQuery
         {
             Domain = domain,
             VersionScope = versionScope,
-            ContainsResidentialData = containsResidentialData
+            ContainsResidentialData = containsResidentialData,
+            ImplementationStatusCode = implementationStatusCode
         });
 
         return Ok(response);

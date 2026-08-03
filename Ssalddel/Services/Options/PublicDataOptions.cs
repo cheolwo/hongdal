@@ -8,6 +8,8 @@ public sealed class PublicDataOptions
 
     public string DataGoKrServiceKey { get; set; } = string.Empty;
 
+    public string DataGoKrBaseUrl { get; set; } = "https://apis.data.go.kr";
+
     public int TimeoutSeconds { get; set; } = 20;
 
     public RoadAddressOptions RoadAddress { get; set; } = new();
@@ -41,6 +43,14 @@ public sealed class PublicDataOptions
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
 
     public FishCooperativeStatisticsOptions FishCooperativeStatistics { get; set; } = new();
+
+    public GyeonggiDataDreamOptions GyeonggiDataDream { get; set; } = new();
+
+    public SelectedPublicDataMapOptions SelectedPublicDataMap { get; set; } = new();
+
+    public MafraFisheriesAuctionOptions FisheriesAuction { get; set; } = new();
+
+    public MofFishingAreaCatalogOptions MofFishingAreas { get; set; } = new();
 
     public MfdsCookRecipeOptions MfdsCookRecipe { get; set; } = new();
 
@@ -220,6 +230,71 @@ public sealed class FishCooperativeStatisticsOptions
     public string GeneralStatisticsTitle { get; set; } = "수협_일반현황_임직원현황";
 
     public int PageSize { get; set; } = 1000;
+}
+
+public sealed class GyeonggiDataDreamOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string ApiBaseUrl { get; set; } = "https://openapi.gg.go.kr";
+
+    public string PortalBaseUrl { get; set; } = "https://data.gg.go.kr";
+
+    public int PageSize { get; set; } = 1000;
+
+    public bool MapProjectionEnabled { get; set; }
+
+    public int MapProjectionRefreshHours { get; set; } = 12;
+}
+
+public sealed class SelectedPublicDataMapOptions
+{
+    public bool TourismEnabled { get; set; }
+
+    public bool OnlinePriceEnabled { get; set; }
+
+    public bool KosisEnabled { get; set; }
+
+    public int RefreshHours { get; set; } = 24;
+
+    public int TourismMarkerLimit { get; set; } = 50;
+
+    public string KosisIndicatorSearchName { get; set; } = "소비자물가";
+
+    public string KosisIndicatorName { get; set; } = "소비자물가지수";
+
+    public int KosisRecentPeriodCount { get; set; } = 3;
+}
+
+public sealed class MafraFisheriesAuctionOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "http://211.237.50.150:7080";
+
+    public bool AllowInsecureHttp { get; set; }
+
+    public string DatasetName { get; set; } = "Grid_20151125000000000310_1";
+
+    public int MaxPageSize { get; set; } = 1000;
+
+    public string DocumentationUrl { get; set; }
+        = "https://www.data.go.kr/data/15109239/openapi.do";
+}
+
+public sealed class MofFishingAreaCatalogOptions
+{
+    public string BaseUrl { get; set; } = "https://www.data.go.kr";
+
+    public string DownloadPath { get; set; }
+        = "/cmm/cmm/fileDownload.do?atchFileId=FILE_000000003229245&fileDetailSn=1&insertDataPrcus=N";
+
+    public string SourceUrl { get; set; }
+        = "https://www.data.go.kr/data/15147444/fileData.do";
+
+    public string DatasetVersion { get; set; } = "20211230";
+
+    public int CacheHours { get; set; } = 24;
 }
 
 public sealed class MfdsCookRecipeOptions

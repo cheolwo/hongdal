@@ -18,6 +18,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
+        services.AddSingleton<I공공데이터포털활용ApiModuleCatalog, 공공데이터포털활용ApiModuleCatalog>();
         services.AddScoped<IHs공공데이터수집Service, Hs공공데이터수집Service>();
         services.AddScoped<IHs공공데이터수집기, Hs수입평균단가공공데이터수집기>();
         services.AddScoped<IHs공공데이터수집기>(sp =>
