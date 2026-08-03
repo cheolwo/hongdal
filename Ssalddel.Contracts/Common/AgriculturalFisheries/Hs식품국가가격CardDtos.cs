@@ -27,6 +27,12 @@ public sealed class Hs식품국가가격CardQuery
     public int LookbackMonths { get; init; } = 3;
 }
 
+public sealed record Hs식품가격시계열Point응답(
+    string Period,
+    decimal Value,
+    decimal? Quantity = null,
+    string? QuantityUnit = null);
+
 public sealed record Hs식품국가가격관측응답(
     string PriceContextCode,
     string PriceContextLabel,
@@ -46,7 +52,8 @@ public sealed record Hs식품국가가격관측응답(
     string SourceName,
     string SourceUrl,
     string CalculationBasis,
-    string Note);
+    string Note,
+    IReadOnlyList<Hs식품가격시계열Point응답>? TrendPoints = null);
 
 public sealed record Hs식품국가가격응답(
     int DisplayOrder,

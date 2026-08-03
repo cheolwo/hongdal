@@ -301,6 +301,15 @@ public sealed class Hs식품국가가격CardQueryService(
 
         var observedMonths = result.MonthlyItems
             .Where(item => item.ImportWeightKg > 0 && item.ImportValueUsd > 0)
+            .OrderBy(item => item.Month, StringComparer.Ordinal)
+            .ToArray();
+        var trendPoints = observedMonths
+            .Where(item => item.AverageImportUnitValueUsdPerKg.HasValue)
+            .Select(item => new Hs식품가격시계열Point응답(
+                item.Month,
+                item.AverageImportUnitValueUsdPerKg!.Value,
+                item.ImportWeightKg,
+                item.QuantityUnit))
             .ToArray();
         var observation = new Hs식품국가가격관측응답(
             Hs식품국가가격맥락Codes.수입통계단가,
@@ -325,7 +334,8 @@ public sealed class Hs식품국가가격CardQueryService(
             "관세청 품목·국가별 수출입실적",
             result.DataSourceUrl,
             result.CalculationMethod,
-            "시장 견적이나 도착원가가 아니라 신고금액을 순중량으로 나눈 통계 단가입니다.");
+            "시장 견적이나 도착원가가 아니라 신고금액을 순중량으로 나눈 통계 단가입니다.",
+            trendPoints);
         return new Hs식품국가가격응답(
             country.DisplayOrder,
             country.Code,

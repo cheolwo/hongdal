@@ -48,6 +48,15 @@ public sealed class Hs식품국가가격CardQueryServiceTests
             Assert.Equal("USD/kg", observation.Unit);
             Assert.StartsWith("KcsHs6ImportCifUsdPerKg-", observation.ComparisonGroupCode);
             Assert.True(observation.AllowsComparisonWithinGroup);
+            var trendPoints = Assert.IsAssignableFrom<
+                IReadOnlyList<Hs식품가격시계열Point응답>>(observation.TrendPoints);
+            Assert.Equal(["202606", "202607"], trendPoints.Select(point => point.Period));
+            Assert.All(trendPoints, point =>
+            {
+                Assert.True(point.Value > 0);
+                Assert.True(point.Quantity > 0);
+                Assert.Equal("kg", point.QuantityUnit);
+            });
         });
         Assert.Equal(["US", "JP", "CN"], trade.RequestedCountries);
         Assert.All(trade.Requests, request =>
