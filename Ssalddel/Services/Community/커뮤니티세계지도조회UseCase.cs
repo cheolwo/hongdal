@@ -34,7 +34,10 @@ public interface I커뮤니티세계지도조회UseCase
 public sealed class 커뮤니티세계지도조회UseCase(
     I전통시장MapMarkerReader 전통시장MapMarkerReader,
     I해외제조업소MapMarkerReader 해외제조업소MapMarkerReader,
-    I지역문화이미지MapMarkerReader? 지역문화이미지MapMarkerReader = null) : I커뮤니티세계지도조회UseCase
+    I지역문화이미지MapMarkerReader? 지역문화이미지MapMarkerReader = null,
+    I경기데이터드림가축사육MapMarkerReader? 경기데이터드림가축사육MapMarkerReader = null,
+    I선택공공데이터MapMarkerReader? 선택공공데이터MapMarkerReader = null)
+    : I커뮤니티세계지도조회UseCase
 {
     private static readonly IReadOnlyDictionary<string, (double Latitude, double Longitude)> CountryCenters
         = new Dictionary<string, (double, double)>(StringComparer.Ordinal)
@@ -217,10 +220,21 @@ public sealed class 커뮤니티세계지도조회UseCase(
                 OrganizationCount: marker.OrganizationCount,
                 EvidenceCount: marker.EvidenceCount));
 
+        var gyeonggiLivestock = 경기데이터드림가축사육MapMarkerReader is null
+            ? []
+            : await 경기데이터드림가축사육MapMarkerReader
+                .공개Marker조회Async(cancellationToken);
+        var selectedPublicData = 선택공공데이터MapMarkerReader is null
+            ? []
+            : await 선택공공데이터MapMarkerReader
+                .공개Marker조회Async(cancellationToken);
+
         return culture.Concat(prices)
             .Concat(wholesaleMarkets)
             .Concat(traditionalMarketHubs)
             .Concat(overseasManufacturers)
+            .Concat(gyeonggiLivestock)
+            .Concat(selectedPublicData)
             .OrderBy(item => item.StableId, StringComparer.Ordinal)
             .ToArray();
     }
@@ -300,7 +314,7 @@ public sealed class 커뮤니티세계지도조회UseCase(
 
     private static string ComputeRevision(IReadOnlyList<커뮤니티세계지도ObservationDto> observations)
     {
-        var canonical = string.Join("\n", observations
+        var canonicalRows = observations
             .OrderBy(item => item.StableId, StringComparer.Ordinal)
             .Select(item => string.Join("|",
                 item.StableId,
@@ -316,10 +330,24 @@ public sealed class 커뮤니티세계지도조회UseCase(
                 item.MarkerStatusCode,
                 item.ServiceRadiusKm,
                 item.DailyCapacity,
-                item.CommunityScopeKey)));
+                item.CommunityScopeKey,
+                item.SourceDatasetKey,
+                item.SourceUpdatedAtUtc?.ToUniversalTime().ToString("O") ?? string.Empty,
+                item.CollectedAtUtc?.ToUniversalTime().ToString("O") ?? string.Empty,
+                item.UpdateCycle,
+                item.FreshnessCode,
+                item.BoundaryNotice,
+                MetricRevision(item.Metrics)));
+        var canonical = string.Join("\n", canonicalRows);
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(canonical));
         return Convert.ToHexString(hash)[..16].ToLowerInvariant();
     }
+
+    private static string MetricRevision(IReadOnlyList<커뮤니티세계지도MetricDto>? metrics)
+        => metrics is null
+            ? string.Empty
+            : string.Join(",", metrics.Select(metric =>
+                $"{metric.Code}:{metric.Value}:{metric.Unit}"));
 
     private static string CountryName(string countryCode)
         => countryCode switch
