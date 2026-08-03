@@ -10,6 +10,55 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed class 농수산공공데이터ClientTests
 {
     [Fact]
+    public async Task HS식품국가가격Card조회는_HS6과조회월을_읽기전용Query로전송한다()
+    {
+        Uri? requestedUri = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "statusCode": "PartialData",
+                      "generatedAtUtc": "2026-08-03T00:00:00Z",
+                      "hsCode": "080810",
+                      "hsCodeScheme": "HS6",
+                      "productName": "사과",
+                      "representativeImageUrl": "https://example.test/apple.jpg",
+                      "imageReviewStatusCode": "미검토",
+                      "referenceMonth": "2026-07",
+                      "lookbackMonths": 12,
+                      "countries": [],
+                      "comparisonBoundaries": [],
+                      "informationOnly": true
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new 농수산공공데이터Client(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ssalddel.test/")
+        });
+
+        var result = await client.Hs식품국가가격Card조회Async(
+            "0808.10-0000",
+            "2026-07",
+            99);
+
+        Assert.Equal("080810", result.HsCode);
+        Assert.NotNull(requestedUri);
+        Assert.Equal(
+            "/api/v1/agricultural-fisheries/items/080810/country-price-card",
+            requestedUri!.AbsolutePath);
+        Assert.Contains("month=2026-07", requestedUri.Query, StringComparison.Ordinal);
+        Assert.Contains("lookbackMonths=12", requestedUri.Query, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task 해양수산Map조회는_공식어획구역바다TileRoute를호출한다()
     {
         Uri? requestedUri = null;
