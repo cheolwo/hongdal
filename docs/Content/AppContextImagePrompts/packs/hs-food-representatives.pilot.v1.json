@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "packId": "hs-food-representatives-pilot",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 20,
+  "basePromptKo": "HS 식품 코드 탐색 카드에 사용할 프리미엄 3D 애니메이션풍 editorial product illustration로 표현한다. 실제 식재료의 형태와 질감은 알아보기 쉽게 유지하고, 따뜻한 햇빛과 청량한 청록색 주변광, 깨끗하고 밝은 공기감, 부드럽지만 정교한 입체감, 중앙의 단일 대표 상품군, 여유 있는 정사각형 구도를 사용한다. 어린이용 캐릭터처럼 단순화하지 않고 신선하고 차분한 상업용 카탈로그 품질로 완성한다.",
+  "contextChecklist": [
+    "HS6 한 코드의 대표 상품군을 보여 주되 국내 HSK10 세번이나 실제 판매상품을 확정한 것처럼 표현하지 않는다.",
+    "식재료의 생물종, 가공 상태, 냉장·냉동 여부처럼 코드명에 명시된 조건만 시각화한다.",
+    "정사각형 상품 카드와 모바일 목록의 중앙 crop에서 주 피사체가 잘리지 않는지 확인한다.",
+    "생성 이미지는 분류 탐색용 대표 삽화이며 원산지, 등급, 검역, 인증, 수입 가능성의 증거가 아니다."
+  ],
+  "avoidExpressions": [
+    "읽을 수 있는 문자, 숫자, HS 코드, 가격표, 포장 라벨, 브랜드, 로고, 국기, 인증 마크, 바코드, QR 코드",
+    "특정 국가의 원산지나 공공기관 인증을 암시하는 배경, 도장, 서류, 지도",
+    "실제 판매 포장처럼 보이는 상표 제품, 과도한 광고 문구, 비현실적인 색상과 식재료 형태",
+    "동물 도축 장면, 피, 잔혹한 표현, 식품 위생을 해치는 오염이나 부패 표현"
+  ],
+  "scenes": [
+    {
+      "sequence": 1,
+      "code": "hs-020120-bone-in-beef-cuts",
+      "titleKo": "HS 020120 뼈째 절단한 쇠고기",
+      "promptKo": "깨끗한 식품 촬영대 위에 신선하거나 냉장된 뼈째 쇠고기 절단육 몇 점을 정돈해 놓고, 붉은 살과 흰 지방 및 뼈의 구조가 자연스럽고 비잔혹적으로 구분되게 표현한다. 완성 요리나 도축 장면 없이 원물 상품군을 중심으로 보여 준다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=020120", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 2,
+      "code": "hs-030235-bluefin-tuna",
+      "titleKo": "HS 030235 참다랑어",
+      "promptKo": "선명한 청록빛 얼음 진열대 위에 대서양 또는 태평양 참다랑어의 유선형 몸체와 두툼한 붉은 살 단면을 함께 배치한다. 생선 종의 특징은 사실적으로 유지하되 항구, 국기, 어선이나 특정 산지를 암시하지 않는 깨끗한 수산물 카탈로그 장면으로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=030235", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 3,
+      "code": "hs-040210-low-fat-milk-powder",
+      "titleKo": "HS 040210 저지방 분유",
+      "promptKo": "무광 흰 도자기 그릇에 고운 우유 분말을 담고 작은 스푼과 부드럽게 흩어진 분말 입자를 배치한다. 지방 함량 수치나 영양표시는 넣지 않고, 건조 고체 상태의 유제품이라는 점이 맑고 위생적인 질감으로 이해되게 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=040210", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 4,
+      "code": "hs-070200-fresh-tomatoes",
+      "titleKo": "HS 070200 신선·냉장 토마토",
+      "promptKo": "막 씻은 붉은 토마토 여러 개와 반으로 자른 토마토 하나를 잎이 달린 채 깨끗한 돌 상판에 놓는다. 물방울과 과육의 신선한 질감을 섬세하게 살리고 조리되거나 통조림으로 가공된 모습은 제외한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=070200", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 5,
+      "code": "hs-070310-onions-shallots",
+      "titleKo": "HS 070310 양파와 샬롯",
+      "promptKo": "황색 양파와 자주색 샬롯을 함께 놓고 하나씩 절단해 겹겹의 단면과 껍질 질감이 분명히 보이게 한다. 농장이나 국가 배경 대신 밝은 주방 준비대의 중립적인 식재료 카탈로그 구도로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=070310", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 6,
+      "code": "hs-070320-garlic",
+      "titleKo": "HS 070320 마늘",
+      "promptKo": "껍질이 온전히 붙은 마늘 통과 분리된 마늘쪽, 얇게 벗겨진 한 쪽을 중앙에 정돈한다. 마늘의 종이 같은 껍질과 단단한 흰 속살을 따뜻한 빛으로 사실감 있게 보여 주되 약효나 기능성을 암시하지 않는다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=070320", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 7,
+      "code": "hs-080450-tropical-fruits",
+      "titleKo": "HS 080450 구아바·망고·망고스틴",
+      "promptKo": "구아바, 잘 익은 망고, 보라색 망고스틴을 서로 구분되게 한 장면에 놓고 각 과일 하나는 단면을 보여 준다. 열대 관광지나 국적 상징 없이 과피와 과육의 색과 형태 차이를 청량한 과일 상품군 삽화로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=080450", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 8,
+      "code": "hs-080550-lemons-limes",
+      "titleKo": "HS 080550 레몬과 라임",
+      "promptKo": "노란 레몬과 초록 라임을 함께 배치하고 일부는 반으로 잘라 투명한 과즙과 촘촘한 과육이 보이게 한다. 잎과 작은 물방울을 절제해 더하고 음료 완제품이나 원산지 표시는 넣지 않는다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=080550", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 9,
+      "code": "hs-100620-brown-rice",
+      "titleKo": "HS 100620 현미",
+      "promptKo": "나무 그릇에 갈색 쌀겨층이 남은 현미 낟알을 담고 주변에 소량을 흩어 낟알의 색과 길이가 잘 보이게 한다. 논이나 특정 품종을 암시하지 않고 도정 전후 비교표 없이 현미 자체만 정갈하게 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=100620", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 10,
+      "code": "hs-110100-wheat-flour",
+      "titleKo": "HS 110100 밀가루",
+      "promptKo": "밝은 도자기 그릇에 부드러운 밀가루를 담고 밀 이삭 몇 개와 작은 반죽 조각을 보조적으로 배치한다. 포대, 상표, 등급 숫자 없이 고운 분말 상태와 원료 곡물의 관계가 직관적으로 보이게 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=110100", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 11,
+      "code": "hs-130231-agar",
+      "titleKo": "HS 130231 한천",
+      "promptKo": "투명하고 탄력 있는 한천 젤 조각과 가는 한천 막대, 무향의 투명 젤리 단면을 깨끗한 유리 접시에 정돈한다. 완성 디저트의 화려한 장식보다 식품 원료로서의 투명한 질감과 응고 형태를 중심으로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=130231", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 12,
+      "code": "hs-150410-fish-liver-oil",
+      "titleKo": "HS 150410 어류 간유",
+      "promptKo": "상표 없는 작은 유리병과 투명한 스푼에 옅은 황금빛 어류 간유를 담고, 옆에 단순한 생선 형태의 중립적 식재료 단서를 배치한다. 의약품, 건강기능식품, 캡슐, 치료 효능을 암시하지 않는 식품 원료 카탈로그 장면으로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=150410", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 13,
+      "code": "hs-160100-sausages",
+      "titleKo": "HS 160100 소시지류",
+      "promptKo": "여러 형태의 소시지와 한 개의 절단면을 깨끗한 식품 촬영대에 정돈해 육류 조제품의 균일한 조직과 케이싱을 보여 준다. 브랜드 포장, 완성 식사, 곤충이나 피를 직접 묘사하지 않고 일반적인 소시지 상품군으로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=160100", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 14,
+      "code": "hs-170220-maple-sugar-syrup",
+      "titleKo": "HS 170220 단풍당과 단풍당시럽",
+      "promptKo": "상표 없는 투명 유리병의 호박색 단풍당시럽과 작은 그릇의 결정형 단풍당을 함께 놓는다. 나뭇잎은 식물 단서로만 절제해 사용하고 국기, 국가 상징, 팬케이크 광고 장면 없이 두 제형의 차이가 보이게 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=170220", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 15,
+      "code": "hs-180100-cocoa-beans",
+      "titleKo": "HS 180100 코코아두",
+      "promptKo": "익은 코코아 열매 하나를 열어 흰 과육 속 코코아두가 보이게 하고, 옆에는 건조하거나 볶은 갈색 코코아두를 소량 배치한다. 초콜릿 브랜드나 생산국 풍경 없이 원료의 생 것과 가공 전후 형태를 차분하게 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=180100", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 16,
+      "code": "hs-180631-filled-chocolate",
+      "titleKo": "HS 180631 속을 채운 초콜릿",
+      "promptKo": "상표 없는 작은 초콜릿 조각들과 반으로 자른 한 조각을 배치해 겉의 초콜릿층과 부드러운 내부 충전물이 분명히 보이게 한다. 선물 포장이나 문구 없이 식품 분류용 대표 단면에 초점을 맞춘 고급스러운 제품 삽화로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=180631", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 17,
+      "code": "hs-190120-bakery-mix-dough",
+      "titleKo": "HS 190120 베이커리 혼합물·가루반죽",
+      "promptKo": "무표시 그릇의 베이커리용 곡물 혼합분과 매끈하게 반죽된 생지를 나란히 놓고, 작은 나무 스푼과 밀 이삭만 보조적으로 사용한다. 완성 빵보다 제조 전 혼합물과 가루반죽의 상태 차이가 명확히 보이게 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=190120", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 18,
+      "code": "hs-200520-prepared-potatoes",
+      "titleKo": "HS 200520 조제·보존 감자",
+      "promptKo": "껍질을 벗긴 감자 원물과 조리 또는 보존 처리된 감자 조각을 상표 없는 중립 용기에 나란히 배치한다. 식초나 냉동 상태를 단정하지 않고 감자가 단순 원물에서 조제 식품이 된 상품군임을 깨끗한 질감으로 표현한다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=200520", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 19,
+      "code": "hs-210120-tea-extract-preparations",
+      "titleKo": "HS 210120 차·마테 추출물과 조제품",
+      "promptKo": "찻잎과 마테 잎, 짙은 호박색 추출액, 고운 농축 분말을 각각 작은 무표시 용기에 구분해 놓는다. 특정 차 브랜드나 건강 효능, 완성 음료 광고 없이 추출물·에센스·농축물 상품군의 형태 차이를 보여 준다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=210120", "/information/food-ingredients"]
+    },
+    {
+      "sequence": 20,
+      "code": "hs-220210-flavored-sweetened-water",
+      "titleKo": "HS 220210 감미·향 첨가 음료수",
+      "promptKo": "상표와 문자가 전혀 없는 투명한 유리병과 잔에 맑고 은은한 색의 탄산 또는 향 첨가 물을 담고, 작은 기포와 레몬 껍질 같은 비특정 향미 단서를 절제해 배치한다. 에너지음료나 건강 효능을 암시하지 않는다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": ["/shipper/customs/hs-reviews?query=220210", "/information/food-ingredients"]
+    }
+  ]
+}

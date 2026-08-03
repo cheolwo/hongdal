@@ -1,0 +1,623 @@
+{
+  "schemaVersion": 1,
+  "packId": "hs-food-representatives-all-02",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 50,
+  "basePromptKo": "HS 식품 코드 탐색 카드에 사용할 프리미엄 3D 애니메이션풍 editorial product illustration로 표현한다. 관세 품목명이 가리키는 대표 식품 원물 또는 가공품을 실제 형태와 질감이 알아보기 쉽게 중앙에 배치한다. 따뜻한 햇빛과 청량한 청록색 주변광, 깨끗하고 밝은 공기감, 부드럽지만 정교한 입체감, 여유 있는 정사각형 구도를 사용한다. 어린이용 캐릭터처럼 단순화하지 않고 신선하고 차분한 상업용 카탈로그 품질로 완성한다.",
+  "contextChecklist": [
+    "HS6 한 코드의 대표 상품군을 보여 주되 국내 HSK10 세번이나 실제 판매상품을 확정한 것처럼 표현하지 않는다.",
+    "품목명에 명시된 원재료, 생물종, 가공 상태, 냉장·냉동 여부만 시각화하고 모호한 세부 조건은 단정하지 않는다.",
+    "정사각형 상품 카드와 모바일 목록의 중앙 crop에서 주 피사체가 잘리지 않는지 확인한다.",
+    "생성 이미지는 분류 탐색용 대표 삽화이며 원산지, 등급, 검역, 인증, 수입 가능성의 증거가 아니다."
+  ],
+  "avoidExpressions": [
+    "읽을 수 있는 문자, 숫자, HS 코드, 가격표, 포장 라벨, 브랜드, 로고, 국기, 인증 마크, 바코드, QR 코드",
+    "특정 국가의 원산지나 공공기관 인증을 암시하는 배경, 도장, 서류, 지도",
+    "실제 판매 포장처럼 보이는 상표 제품, 과도한 광고 문구, 비현실적인 색상과 식재료 형태",
+    "동물 도축 장면, 피, 잔혹한 표현, 식품 위생을 해치는 오염이나 부패 표현"
+  ],
+  "scenes": [
+    {
+      "sequence": 1,
+      "code": "hs-030443",
+      "titleKo": "HS 030443 넙치류[플루로넥티대(Pleuronectidae)과ㆍ바디대(Bothidae)과ㆍ사이노글로시대(Cynoglossidae)과ㆍ솔레이대(Soleidae)과ㆍ스코프탈미대(Scophthalmidae)과ㆍ시타리대(Citharidae)과]",
+      "promptKo": "관세 품목명 '넙치류[플루로넥티대(Pleuronectidae)과ㆍ바디대(Bothidae)과ㆍ사이노글로시대(Cynoglossidae)과ㆍ솔레이대(Soleidae)과ㆍ스코프탈미대(Scophthalmidae)과ㆍ시타리대(Citharidae)과]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '넙치류[플루로넥티대(Pleuronectidae)과ㆍ바디대(Bothidae)과ㆍ사이노글로시대(Cynoglossidae)과ㆍ솔레이대(Soleidae)과ㆍ스코프탈미대(Scophthalmidae)과ㆍ시타리대(Citharidae)과] / Flat fish (Pleuronectidae, Bothidae, Cynoglossidae, Soleidae, Scophthalmidae and Citharidae)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030443",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 2,
+      "code": "hs-030449",
+      "titleKo": "HS 030449 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030449",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 3,
+      "code": "hs-030451",
+      "titleKo": "HS 030451 틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속]",
+      "promptKo": "관세 품목명 '틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속] / Tilapias (Oreochromis spp.), catfish (Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.), carp (Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.), eels (Anguilla spp.), Nile perch (Lates niloticus) and snakeheads (Channa spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030451",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 4,
+      "code": "hs-030457",
+      "titleKo": "HS 030457 가오리와 홍어[라지대(Rajidae)과]",
+      "promptKo": "관세 품목명 '가오리와 홍어[라지대(Rajidae)과]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '가오리와 홍어[라지대(Rajidae)과] / Rays and skates (Rajidae)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030457",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 5,
+      "code": "hs-030459",
+      "titleKo": "HS 030459 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030459",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 6,
+      "code": "hs-030483",
+      "titleKo": "HS 030483 넙치류[플루로넥티대(Pleuronectidae)과ㆍ바디대(Bothidae)과ㆍ사이노글로시대(Cynoglossidae)과ㆍ솔레이대(Soleidae)과ㆍ스코프탈미대(Scophthal midae)과ㆍ시타리대(Citharidae)과]",
+      "promptKo": "관세 품목명 '넙치류[플루로넥티대(Pleuronectidae)과ㆍ바디대(Bothidae)과ㆍ사이노글로시대(Cynoglossidae)과ㆍ솔레이대(Soleidae)과ㆍ스코프탈미대(Scophthal midae)과ㆍ시타리대(Citharidae)과]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '넙치류[플루로넥티대(Pleuronectidae)과ㆍ바디대(Bothidae)과ㆍ사이노글로시대(Cynoglossidae)과ㆍ솔레이대(Soleidae)과ㆍ스코프탈미대(Scophthal midae)과ㆍ시타리대(Citharidae)과] / Flat fish (Pleuronectidae, Bothidae, Cynoglossidae, Soleidae, Scophthalmidae and Citharidae)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030483",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 7,
+      "code": "hs-030487",
+      "titleKo": "HS 030487 다랑어[터너스(Thunnus)속의 것으로 한정한다]ㆍ가다랑어(줄무늬 버니토)[카추워누스 펠라미스(Katsuwonus pelamis)]",
+      "promptKo": "관세 품목명 '다랑어[터너스(Thunnus)속의 것으로 한정한다]ㆍ가다랑어(줄무늬 버니토)[카추워누스 펠라미스(Katsuwonus pelamis)]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '다랑어[터너스(Thunnus)속의 것으로 한정한다]ㆍ가다랑어(줄무늬 버니토)[카추워누스 펠라미스(Katsuwonus pelamis)] / Tunas (of the genus Tunnus), skipjack tuna (stripe-bellied bonito) (Katsuwonus pelamis)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030487",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 8,
+      "code": "hs-030488",
+      "titleKo": "HS 030488 곱상어, 그 밖의 상어, 가오리와 홍어[라지대(Rajidae)과]",
+      "promptKo": "관세 품목명 '곱상어, 그 밖의 상어, 가오리와 홍어[라지대(Rajidae)과]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '곱상어, 그 밖의 상어, 가오리와 홍어[라지대(Rajidae)과] / Dogfish, other sharks, rays and skates (Rajidae)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030488",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 9,
+      "code": "hs-030489",
+      "titleKo": "HS 030489 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030489",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 10,
+      "code": "hs-030491",
+      "titleKo": "HS 030491 황새치[자이피어스 글래디어스(Xiphias gladius)]",
+      "promptKo": "관세 품목명 '황새치[자이피어스 글래디어스(Xiphias gladius)]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '황새치[자이피어스 글래디어스(Xiphias gladius)] / Swordfish (Xiphias gladius)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030491",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 11,
+      "code": "hs-030492",
+      "titleKo": "HS 030492 이빨고기[디소스티쿠스(Dissostichus)속]",
+      "promptKo": "관세 품목명 '이빨고기[디소스티쿠스(Dissostichus)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '이빨고기[디소스티쿠스(Dissostichus)속] / Toothfish (Dissostichus spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030492",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 12,
+      "code": "hs-030493",
+      "titleKo": "HS 030493 틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속]",
+      "promptKo": "관세 품목명 '틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속] / Tilapias (Oreochromis spp.), catfish (Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.), carp (Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.), eels (Anguilla spp.), Nile perch (Lates niloticus) and snakeheads (Channa spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030493",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 13,
+      "code": "hs-030494",
+      "titleKo": "HS 030494 명태[테라그라 찰코그라마(Theragra chalcogramma)]",
+      "promptKo": "관세 품목명 '명태[테라그라 찰코그라마(Theragra chalcogramma)]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '명태[테라그라 찰코그라마(Theragra chalcogramma)] / Alaska Pollock (Theragra chalcogramma)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030494",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 14,
+      "code": "hs-030495",
+      "titleKo": "HS 030495 브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류[명태(테라그라 찰코그라마(Theragra chalcogramma)는 제외한다]",
+      "promptKo": "관세 품목명 '브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류[명태(테라그라 찰코그라마(Theragra chalcogramma)는 제외한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류[명태(테라그라 찰코그라마(Theragra chalcogramma)는 제외한다] / Fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae, other than Alaska Pollock (Theragra chalcogramma)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030495",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 15,
+      "code": "hs-030499",
+      "titleKo": "HS 030499 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030499",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 16,
+      "code": "hs-030520",
+      "titleKo": "HS 030520 어류의 간ㆍ어란(魚卵)ㆍ어백(魚白)(건조한 것ㆍ훈제한 것ㆍ염장이나 염수장한 것으로 한정한다)",
+      "promptKo": "관세 품목명 '어류의 간ㆍ어란(魚卵)ㆍ어백(魚白)(건조한 것ㆍ훈제한 것ㆍ염장이나 염수장한 것으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '어류의 간ㆍ어란(魚卵)ㆍ어백(魚白)(건조한 것ㆍ훈제한 것ㆍ염장이나 염수장한 것으로 한정한다) / Livers, roes and milt of fish, dried, smoked, salted or in brine'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030520",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 17,
+      "code": "hs-030531",
+      "titleKo": "HS 030531 틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속]",
+      "promptKo": "관세 품목명 '틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '틸라피아[오레오크로미스(Oreochromis)속], 메기[판가시우스(Pangasius)속ㆍ실루러스(Silurus)속ㆍ클라리아스(Clarias)속ㆍ익타루러스(Ictalurus)속], 잉어[사이프리너스(Cyprinus)속ㆍ카라시우스(Carassius)속ㆍ크테노파린고돈 이델루스(Ctenopharyngodon idellus)ㆍ하이포프탈미크티스(Hypophthalmichthys)속ㆍ시리누스(Cirrhinus)속ㆍ마일로파린고돈 피세우스(Mylopharyngodon piceus)ㆍ카틀라 카틀라(Catla catla)ㆍ라베오(Labeo)속ㆍ오스테오킬루스 하셀티(Osteochilus hasselti)ㆍ렙토바르부스 호에베니(Leptobarbus hoeveni)ㆍ메갈로브라마(Megalobrama)속], 뱀장어[앙귈라(Anguilla)속], 나일 퍼치[라테스 니로티쿠스(Lates niloticus)], 가물치[카나(Channa)속] / Tilapias (Oreochromis spp.), catfish (Pangasius spp., Silurus spp., Clarias spp., Ictalurus spp.), carp (Cyprinus spp., Carassius spp., Ctenopharyngodon idellus, Hypophthalmichthys spp., Cirrhinus spp., Mylopharyngodon piceus, Catla catla, Labeo spp., Osteochilus hasselti, Leptobarbus hoeveni, Megalobrama spp.), eels (Anguilla spp.), Nile perch (Lates niloticus) and snakeheads (Channa spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030531",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 18,
+      "code": "hs-030532",
+      "titleKo": "HS 030532 브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류",
+      "promptKo": "관세 품목명 '브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류 / Fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030532",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 19,
+      "code": "hs-030539",
+      "titleKo": "HS 030539 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030539",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 20,
+      "code": "hs-030549",
+      "titleKo": "HS 030549 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030549",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 21,
+      "code": "hs-030553",
+      "titleKo": "HS 030553 대구[가두스 모르화(Gadus morhua)ㆍ가두스 오각(Gadus ogac)ㆍ가두스 마크로세팔루스(Gadus macrocephalus)] 이외의 브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류",
+      "promptKo": "관세 품목명 '대구[가두스 모르화(Gadus morhua)ㆍ가두스 오각(Gadus ogac)ㆍ가두스 마크로세팔루스(Gadus macrocephalus)] 이외의 브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '대구[가두스 모르화(Gadus morhua)ㆍ가두스 오각(Gadus ogac)ㆍ가두스 마크로세팔루스(Gadus macrocephalus)] 이외의 브레그마세로티대(Bregmacerotidae)과ㆍ유클리티대(Euclichthyidae)과ㆍ가디대(Gadidae)과ㆍ마크로우리대(Macrouridae)과ㆍ멜라노니대(Melanonidae)과ㆍ메르루치대(Merlucciidae)과ㆍ모리대(Moridae)과ㆍ무라에놀레피디대(Muraenolepididae)과의 어류 / Fish of the families Bregmacerotidae, Euclichthyidae, Gadidae, Macrouridae, Melanonidae, Merlucciidae, Moridae and Muraenolepididae, other than cod (Gadus morhua, Gadus ogac, Gadus macrocephalus)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030553",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 22,
+      "code": "hs-030554",
+      "titleKo": "HS 030554 청어[클루페아 하렌구스(Clupea harengus)ㆍ클루페아 팔라시(Clupea pallasii)], 멸치[엔그라울리스(Engraulis)속], 정어리[사르디나 필차르두스(Sardina pilchardus)ㆍ사르디노프스(Sardinops)속], 사르디넬라[사르디넬라(Sardinella)속], 브리스링(brisling)이나 스프랫(sprats)[스프라투스 스프라투스(Sprattus sprattus)], 고등어[스콤버 스콤브루스(Scomber scombrus)ㆍ스콤버 오스트랄라시쿠스(Scomber australasicus)ㆍ스콤버 자포니쿠스(Scomber japonicus)], 줄무늬 고등어(Indian mackerels)[라스트렐리거(Rastrelliger)속], 삼치[스콤버로모러스(Scomberomorus)속], 전갱이[트라커러스(Trachurus)속], 줄전갱이류[카랑크스(Caranx)속], 날쌔기[라키센트론 카나둠(Rachycentron canadum)], 병어[팜푸스(Pamp",
+      "promptKo": "관세 품목명 '청어[클루페아 하렌구스(Clupea harengus)ㆍ클루페아 팔라시(Clupea pallasii)], 멸치[엔그라울리스(Engraulis)속], 정어리[사르디나 필차르두스(Sardina pilchardus)ㆍ사르디노프스(Sardinops)속], 사르디넬라[사르디넬라(Sardinella)속], 브리스링(brisling)이나 스프랫(sprats)[스프라투스 스프라투스(Sprattus sprattus)], 고등어[스콤버 스콤브루스(Scomber scombrus)ㆍ스콤버 오스트랄라시쿠스(Scomber australasicus)ㆍ스콤버 자포니쿠스(Scomber japonicus)], 줄무늬 고등어(Indian mackerels)[라스트렐리거(Rastrelliger)속], 삼치[스콤버로모러스(Scomberomorus)속], 전갱이[트라커러스(Trachurus)속], 줄전갱이류[카랑크스(Caranx)속], 날쌔기[라키센트론 카나둠(Rachycentron canadum)], 병어[팜푸스(Pamp'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '청어[클루페아 하렌구스(Clupea harengus)ㆍ클루페아 팔라시(Clupea pallasii)], 멸치[엔그라울리스(Engraulis)속], 정어리[사르디나 필차르두스(Sardina pilchardus)ㆍ사르디노프스(Sardinops)속], 사르디넬라[사르디넬라(Sardinella)속], 브리스링(brisling)이나 스프랫(sprats)[스프라투스 스프라투스(Sprattus sprattus)], 고등어[스콤버 스콤브루스(Scomber scombrus)ㆍ스콤버 오스트랄라시쿠스(Scomber australasicus)ㆍ스콤버 자포니쿠스(Scomber japonicus)], 줄무늬 고등어(Indian mackerels)[라스트렐리거(Rastrelliger)속], 삼치[스콤버로모러스(Scomberomorus)속], 전갱이[트라커러스(Trachurus)속], 줄전갱이류[카랑크스(Caranx)속], 날쌔기[라키센트론 카나둠(Rachycentron canadum)], 병어[팜푸스(Pampus)속], 꽁치[콜로라비스 사이라(Cololabis saira)], 가라지[데캅테러스(Decapterus)속], 열빙어[말로투스 빌로서스(Mallotus villosus)]... / Herrings (Clupea harengus, Clupea pallasii), anchovies (Engraulis spp.), sardines (Sardina pilchardus, Sardinops spp.), sardinella (Sardinella spp.), brisling or sprats (Sprattus sprattus), mackerel (Scomber scombrus, Scomber australasicus, Scomber japonicus), Indian mackerels (Rastrelliger spp.), seerfishes (Scomberomorus spp.), jack and horse mackerel (Trachurus spp.), jacks, crevalles (Caranx spp.), cobia (Rachycentron canadum), silver pomfrets (Pampus spp.), Pacific saury (Cololabis saira), scads (Decapterus spp.), capelin (Mallotus villosus), swordfish (Xiphias gladius), Kawakawa (Euthynnus affinis), bonitos (Sarda spp.), marlins, sailfishes, spearfish (Istiophoridae)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030554",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 23,
+      "code": "hs-030559",
+      "titleKo": "HS 030559 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030559",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 24,
+      "code": "hs-030563",
+      "titleKo": "HS 030563 멸치[엔그라울리스(Engraulis)속]",
+      "promptKo": "관세 품목명 '멸치[엔그라울리스(Engraulis)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '멸치[엔그라울리스(Engraulis)속] / Anchovies (Engraulis spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030563",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 25,
+      "code": "hs-030569",
+      "titleKo": "HS 030569 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030569",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 26,
+      "code": "hs-030571",
+      "titleKo": "HS 030571 상어 지느러미",
+      "promptKo": "관세 품목명 '상어 지느러미'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '상어 지느러미 / Shark fins'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030571",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 27,
+      "code": "hs-030611",
+      "titleKo": "HS 030611 닭새우류[팔리누루스(Palinurus)속ㆍ파누리루스(Panulirus)속ㆍ자수스(Jasus)속]",
+      "promptKo": "관세 품목명 '닭새우류[팔리누루스(Palinurus)속ㆍ파누리루스(Panulirus)속ㆍ자수스(Jasus)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '닭새우류[팔리누루스(Palinurus)속ㆍ파누리루스(Panulirus)속ㆍ자수스(Jasus)속] / Rock lobster and other sea crawfish (Palinurus spp., Panulirus spp., Jasus spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030611",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 28,
+      "code": "hs-030612",
+      "titleKo": "HS 030612 바닷가재[호마루스(Homarus)속]",
+      "promptKo": "관세 품목명 '바닷가재[호마루스(Homarus)속]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '바닷가재[호마루스(Homarus)속] / Lobsters (Homarus spp.)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030612",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 29,
+      "code": "hs-030614",
+      "titleKo": "HS 030614 게",
+      "promptKo": "관세 품목명 '게'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '게 / Crabs'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030614",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 30,
+      "code": "hs-030615",
+      "titleKo": "HS 030615 노르웨이 바닷가재[네프로프스 노르베지쿠스(Nephrops norvegicus)]",
+      "promptKo": "관세 품목명 '노르웨이 바닷가재[네프로프스 노르베지쿠스(Nephrops norvegicus)]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '노르웨이 바닷가재[네프로프스 노르베지쿠스(Nephrops norvegicus)] / Norway lobsters (Nephrops norvegicus)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030615",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 31,
+      "code": "hs-030616",
+      "titleKo": "HS 030616 냉수성(冷水性) 새우류[판달러스(Pandalus)속ㆍ크란곤 크란곤(Crangon crangon)]",
+      "promptKo": "관세 품목명 '냉수성(冷水性) 새우류[판달러스(Pandalus)속ㆍ크란곤 크란곤(Crangon crangon)]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '냉수성(冷水性) 새우류[판달러스(Pandalus)속ㆍ크란곤 크란곤(Crangon crangon)] / Cold-water shrimps and prawns (Pandalus spp., Crangon crangon)'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030616",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 32,
+      "code": "hs-030617",
+      "titleKo": "HS 030617 그 밖의 새우류",
+      "promptKo": "관세 품목명 '그 밖의 새우류'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '그 밖의 새우류 / Other shrimps and prawns'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030617",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 33,
+      "code": "hs-030619",
+      "titleKo": "HS 030619 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030619",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 34,
+      "code": "hs-030633",
+      "titleKo": "HS 030633 게",
+      "promptKo": "관세 품목명 '게'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '게 / Crabs'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030633",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 35,
+      "code": "hs-030695",
+      "titleKo": "HS 030695 새우류",
+      "promptKo": "관세 품목명 '새우류'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '새우류 / Shrimps and prawns'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030695",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 36,
+      "code": "hs-030699",
+      "titleKo": "HS 030699 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030699",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 37,
+      "code": "hs-030711",
+      "titleKo": "HS 030711 살아 있는 것, 신선한 것, 냉장한 것",
+      "promptKo": "관세 품목명 '살아 있는 것, 신선한 것, 냉장한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '살아 있는 것, 신선한 것, 냉장한 것 / Live, fresh or chilled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030711",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 38,
+      "code": "hs-030719",
+      "titleKo": "HS 030719 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030719",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 39,
+      "code": "hs-030721",
+      "titleKo": "HS 030721 살아 있는 것, 신선한 것, 냉장한 것",
+      "promptKo": "관세 품목명 '살아 있는 것, 신선한 것, 냉장한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '살아 있는 것, 신선한 것, 냉장한 것 / Live, fresh or chilled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030721",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 40,
+      "code": "hs-030722",
+      "titleKo": "HS 030722 냉동한 것",
+      "promptKo": "관세 품목명 '냉동한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '냉동한 것 / Frozen'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030722",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 41,
+      "code": "hs-030729",
+      "titleKo": "HS 030729 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030729",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 42,
+      "code": "hs-030739",
+      "titleKo": "HS 030739 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030739",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 43,
+      "code": "hs-030742",
+      "titleKo": "HS 030742 살아있는 것, 신선한 것, 냉장한 것",
+      "promptKo": "관세 품목명 '살아있는 것, 신선한 것, 냉장한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '살아있는 것, 신선한 것, 냉장한 것 / Live, fresh or chilled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030742",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 44,
+      "code": "hs-030743",
+      "titleKo": "HS 030743 냉동한 것",
+      "promptKo": "관세 품목명 '냉동한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '냉동한 것 / Frozen'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030743",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 45,
+      "code": "hs-030749",
+      "titleKo": "HS 030749 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030749",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 46,
+      "code": "hs-030751",
+      "titleKo": "HS 030751 살아 있는 것, 신선한 것, 냉장한 것",
+      "promptKo": "관세 품목명 '살아 있는 것, 신선한 것, 냉장한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '살아 있는 것, 신선한 것, 냉장한 것 / Live, fresh or chilled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030751",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 47,
+      "code": "hs-030752",
+      "titleKo": "HS 030752 냉동한 것",
+      "promptKo": "관세 품목명 '냉동한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '냉동한 것 / Frozen'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030752",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 48,
+      "code": "hs-030759",
+      "titleKo": "HS 030759 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030759",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 49,
+      "code": "hs-030771",
+      "titleKo": "HS 030771 살아 있는 것, 신선한 것, 냉장한 것",
+      "promptKo": "관세 품목명 '살아 있는 것, 신선한 것, 냉장한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '살아 있는 것, 신선한 것, 냉장한 것 / Live, fresh or chilled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030771",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 50,
+      "code": "hs-030772",
+      "titleKo": "HS 030772 냉동한 것",
+      "promptKo": "관세 품목명 '냉동한 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '냉동한 것 / Frozen'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=030772",
+        "/information/food-ingredients"
+      ]
+    }
+  ]
+}

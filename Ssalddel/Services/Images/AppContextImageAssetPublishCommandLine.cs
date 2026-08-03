@@ -12,6 +12,7 @@ namespace 살뜰.Services.Images;
 public static class AppContextImageAssetPublishCommandLine
 {
     private const string PublishCommand = "--app-context-images-publish";
+    private const string PackIdArgument = "--app-context-images-pack-id=";
 
     public static async Task<bool> TryRunAsync(
         string[] args,
@@ -47,7 +48,9 @@ public static class AppContextImageAssetPublishCommandLine
             "Content",
             "AppContextImagePrompts",
             "packs");
-        var sceneMetadata = LoadSceneMetadata(promptRoot);
+        var requestedPackId = ReadArgument(args, PackIdArgument);
+        var promptCatalog = LoadSceneMetadata(promptRoot, requestedPackId);
+        var sceneMetadata = promptCatalog.Scenes;
         var files = Directory.EnumerateFiles(
                 sourceRoot,
                 "*.jpg",
@@ -56,12 +59,20 @@ public static class AppContextImageAssetPublishCommandLine
                 new DirectoryInfo(Path.GetDirectoryName(path)!).Name,
                 "images",
                 StringComparison.OrdinalIgnoreCase))
+            .Where(path => !string.Equals(
+                Path.GetFileName(path),
+                "contact-sheet.jpg",
+                StringComparison.OrdinalIgnoreCase))
+            .Where(path => requestedPackId is null
+                || Path.GetFileNameWithoutExtension(path).StartsWith(
+                    $"{requestedPackId}--scene-",
+                    StringComparison.Ordinal))
             .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
             .ToArray();
-        if (files.Length != 650)
+        if (files.Length != promptCatalog.ExpectedSceneCount)
         {
             throw new InvalidOperationException(
-                $"게시 대상 앱 문맥 이미지는 정확히 650장이어야 합니다. 현재 {files.Length}장입니다.");
+                $"게시 대상 앱 문맥 이미지는 정확히 {promptCatalog.ExpectedSceneCount}장이어야 합니다. 현재 {files.Length}장입니다.");
         }
 
         await using var scope = services.CreateAsyncScope();
@@ -135,8 +146,8 @@ public static class AppContextImageAssetPublishCommandLine
                 앱PackId = metadata.PackId,
                 장면번호 = metadata.Sequence,
                 PromptVersion = metadata.PromptVersion,
-                제목 = metadata.TitleKo,
-                대체Text = $"{metadata.TitleKo}를 설명하는 AI 생성 이미지",
+                제목 = Truncate(metadata.TitleKo, 240),
+                대체Text = $"{Truncate(metadata.TitleKo, 470)}를 설명하는 AI 생성 이미지",
                 이미지Url = uploaded.Url,
                 StorageContainer = uploaded.ContainerName,
                 StorageObjectName = uploaded.ObjectName,
@@ -165,16 +176,19 @@ public static class AppContextImageAssetPublishCommandLine
             uploadedCount,
             skippedCount,
             totalCount = files.Length,
+            packId = requestedPackId,
             storage = storage.GetType().Name,
             secretLogged = false
         }, new JsonSerializerOptions { WriteIndented = true }));
         return true;
     }
 
-    private static Dictionary<string, SceneMetadata> LoadSceneMetadata(
-        string promptRoot)
+    private static SceneMetadataCatalog LoadSceneMetadata(
+        string promptRoot,
+        string? requestedPackId)
     {
         var result = new Dictionary<string, SceneMetadata>(StringComparer.Ordinal);
+        var expectedSceneCount = 0;
         foreach (var path in Directory.EnumerateFiles(
                      promptRoot,
                      "*.json",
@@ -182,6 +196,13 @@ public static class AppContextImageAssetPublishCommandLine
         {
             var pack = 앱문맥이미지BatchPromptPackCompiler.Parse(
                 File.ReadAllText(path));
+            if (requestedPackId is not null
+                && !string.Equals(pack.PackId, requestedPackId, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            expectedSceneCount += pack.ExpectedSceneCount;
             foreach (var scene in pack.Scenes)
             {
                 var key = $"{pack.PackId}--scene-{scene.Sequence:00}";
@@ -199,8 +220,44 @@ public static class AppContextImageAssetPublishCommandLine
             }
         }
 
-        return result;
+        if (requestedPackId is not null && expectedSceneCount == 0)
+        {
+            throw new InvalidOperationException(
+                $"프롬프트 pack을 찾을 수 없습니다: {requestedPackId}");
+        }
+
+        return new SceneMetadataCatalog(
+            result,
+            requestedPackId is null ? 650 : expectedSceneCount);
     }
+
+    private static string? ReadArgument(string[] args, string prefix)
+    {
+        var argument = args.FirstOrDefault(value => value.StartsWith(
+            prefix,
+            StringComparison.OrdinalIgnoreCase));
+        if (argument is null)
+        {
+            return null;
+        }
+
+        var value = argument[prefix.Length..].Trim();
+        if (string.IsNullOrWhiteSpace(value)
+            || value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+            || value.Contains(Path.DirectorySeparatorChar)
+            || value.Contains(Path.AltDirectorySeparatorChar))
+        {
+            throw new InvalidOperationException(
+                $"유효한 앱 이미지 pack id가 필요합니다: {argument}");
+        }
+
+        return value;
+    }
+
+    private static string Truncate(string value, int maximumLength)
+        => value.Length <= maximumLength
+            ? value
+            : value[..maximumLength];
 
     private static string FindRepositoryRoot(string contentRootPath)
     {
@@ -225,4 +282,8 @@ public static class AppContextImageAssetPublishCommandLine
         string TitleKo,
         string AspectRatio,
         IReadOnlyList<string> RouteRefs);
+
+    private sealed record SceneMetadataCatalog(
+        IReadOnlyDictionary<string, SceneMetadata> Scenes,
+        int ExpectedSceneCount);
 }

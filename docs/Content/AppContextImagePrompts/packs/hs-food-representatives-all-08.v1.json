@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "packId": "hs-food-representatives-all-08",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 27,
+  "basePromptKo": "HS 식품 코드 탐색 카드에 사용할 프리미엄 3D 애니메이션풍 editorial product illustration로 표현한다. 관세 품목명이 가리키는 대표 식품 원물 또는 가공품을 실제 형태와 질감이 알아보기 쉽게 중앙에 배치한다. 따뜻한 햇빛과 청량한 청록색 주변광, 깨끗하고 밝은 공기감, 부드럽지만 정교한 입체감, 여유 있는 정사각형 구도를 사용한다. 어린이용 캐릭터처럼 단순화하지 않고 신선하고 차분한 상업용 카탈로그 품질로 완성한다.",
+  "contextChecklist": [
+    "HS6 한 코드의 대표 상품군을 보여 주되 국내 HSK10 세번이나 실제 판매상품을 확정한 것처럼 표현하지 않는다.",
+    "품목명에 명시된 원재료, 생물종, 가공 상태, 냉장·냉동 여부만 시각화하고 모호한 세부 조건은 단정하지 않는다.",
+    "정사각형 상품 카드와 모바일 목록의 중앙 crop에서 주 피사체가 잘리지 않는지 확인한다.",
+    "생성 이미지는 분류 탐색용 대표 삽화이며 원산지, 등급, 검역, 인증, 수입 가능성의 증거가 아니다."
+  ],
+  "avoidExpressions": [
+    "읽을 수 있는 문자, 숫자, HS 코드, 가격표, 포장 라벨, 브랜드, 로고, 국기, 인증 마크, 바코드, QR 코드",
+    "특정 국가의 원산지나 공공기관 인증을 암시하는 배경, 도장, 서류, 지도",
+    "실제 판매 포장처럼 보이는 상표 제품, 과도한 광고 문구, 비현실적인 색상과 식재료 형태",
+    "동물 도축 장면, 피, 잔혹한 표현, 식품 위생을 해치는 오염이나 부패 표현"
+  ],
+  "scenes": [
+    {
+      "sequence": 1,
+      "code": "hs-220422",
+      "titleKo": "HS 220422 2리터 초과 10리터 이하의 용기에 넣은 것",
+      "promptKo": "관세 품목명 '2리터 초과 10리터 이하의 용기에 넣은 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '2리터 초과 10리터 이하의 용기에 넣은 것 / In containers holding more than 2 ℓ but not more than 10 ℓ'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220422",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 2,
+      "code": "hs-220429",
+      "titleKo": "HS 220429 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220429",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 3,
+      "code": "hs-220600",
+      "titleKo": "HS 220600 그 밖의 발효주[예: 사과술ㆍ배술ㆍ미드(mead)ㆍ청주(saké)], 따로 분류되지 않은 발효주의 혼합물, 발효주와 알코올을 함유하지 않은 음료와의 혼합물",
+      "promptKo": "관세 품목명 '그 밖의 발효주[예: 사과술ㆍ배술ㆍ미드(mead)ㆍ청주(saké)], 따로 분류되지 않은 발효주의 혼합물, 발효주와 알코올을 함유하지 않은 음료와의 혼합물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '그 밖의 발효주[예: 사과술ㆍ배술ㆍ미드(mead)ㆍ청주(saké)], 따로 분류되지 않은 발효주의 혼합물, 발효주와 알코올을 함유하지 않은 음료와의 혼합물 / Other fermented beverages (for example, cider, perry, mead, saké); mixtures of fermented beverages and mixtures of fermented beverages and non-alcoholic beverages, not elsewhere specified or included.'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220600",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 4,
+      "code": "hs-220710",
+      "titleKo": "HS 220710 변성하지 않은 에틸알코올(알코올의 용량이 전 용량의 100분의 80 이상인 것으로 한정한다)",
+      "promptKo": "관세 품목명 '변성하지 않은 에틸알코올(알코올의 용량이 전 용량의 100분의 80 이상인 것으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '변성하지 않은 에틸알코올(알코올의 용량이 전 용량의 100분의 80 이상인 것으로 한정한다) / Undenatured ethyl alcohol of an alcoholic strength by volume of 80 % vol or higher'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220710",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 5,
+      "code": "hs-220820",
+      "titleKo": "HS 220820 포도주나 포도즙을 짜낸 찌꺼기에서 얻은 증류주",
+      "promptKo": "관세 품목명 '포도주나 포도즙을 짜낸 찌꺼기에서 얻은 증류주'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '포도주나 포도즙을 짜낸 찌꺼기에서 얻은 증류주 / Spirits obtained by distilling grape wine or grape marc'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220820",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 6,
+      "code": "hs-220830",
+      "titleKo": "HS 220830 위스키류",
+      "promptKo": "관세 품목명 '위스키류'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '위스키류 / Whiskies'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220830",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 7,
+      "code": "hs-220870",
+      "titleKo": "HS 220870 리큐르(liqueur)류와 코디얼(cordial)",
+      "promptKo": "관세 품목명 '리큐르(liqueur)류와 코디얼(cordial)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '리큐르(liqueur)류와 코디얼(cordial) / Liqueurs and cordials'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220870",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 8,
+      "code": "hs-220890",
+      "titleKo": "HS 220890 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220890",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 9,
+      "code": "hs-220900",
+      "titleKo": "HS 220900 식초와 초산으로 만든 식초 대용물",
+      "promptKo": "관세 품목명 '식초와 초산으로 만든 식초 대용물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '식초와 초산으로 만든 식초 대용물 / Vinegar and substitutes for vinegar obtained from acetic acid.'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220900",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 10,
+      "code": "hs-230110",
+      "titleKo": "HS 230110 육이나 설육(屑肉)의 고운 가루ㆍ거친 가루ㆍ펠릿(pellet)과 수지박",
+      "promptKo": "관세 품목명 '육이나 설육(屑肉)의 고운 가루ㆍ거친 가루ㆍ펠릿(pellet)과 수지박'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '육이나 설육(屑肉)의 고운 가루ㆍ거친 가루ㆍ펠릿(pellet)과 수지박 / Flours, meals and pellets, of meat or meat offal; greaves'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230110",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 11,
+      "code": "hs-230120",
+      "titleKo": "HS 230120 어류ㆍ갑각류ㆍ연체동물이나 그 밖의 수생(水生) 무척추동물의 고운 가루ㆍ거친 가루ㆍ펠릿(pellet)",
+      "promptKo": "관세 품목명 '어류ㆍ갑각류ㆍ연체동물이나 그 밖의 수생(水生) 무척추동물의 고운 가루ㆍ거친 가루ㆍ펠릿(pellet)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '어류ㆍ갑각류ㆍ연체동물이나 그 밖의 수생(水生) 무척추동물의 고운 가루ㆍ거친 가루ㆍ펠릿(pellet) / Flours, meals and pellets, of fish or of crustaceans, molluscs or other aquatic invertebrates'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230120",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 12,
+      "code": "hs-230240",
+      "titleKo": "HS 230240 그 밖의 곡물에서 나온 것",
+      "promptKo": "관세 품목명 '그 밖의 곡물에서 나온 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '그 밖의 곡물에서 나온 것 / Of other cereals'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230240",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 13,
+      "code": "hs-230330",
+      "titleKo": "HS 230330 양조하거나 증류할 때 생기는 박과 웨이스트(waste)",
+      "promptKo": "관세 품목명 '양조하거나 증류할 때 생기는 박과 웨이스트(waste)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '양조하거나 증류할 때 생기는 박과 웨이스트(waste) / Brewing or distilling dregs and waste'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230330",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 14,
+      "code": "hs-230690",
+      "titleKo": "HS 230690 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230690",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 15,
+      "code": "hs-230800",
+      "titleKo": "HS 230800 사료용 식물성 물질ㆍ식물성 웨이스트(waste)ㆍ식물성 박(residue)류와 부산물[펠릿(pellet) 모양인지에 상관없으며 따로 분류되지 않은 것으로 한정한다]",
+      "promptKo": "관세 품목명 '사료용 식물성 물질ㆍ식물성 웨이스트(waste)ㆍ식물성 박(residue)류와 부산물[펠릿(pellet) 모양인지에 상관없으며 따로 분류되지 않은 것으로 한정한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '사료용 식물성 물질ㆍ식물성 웨이스트(waste)ㆍ식물성 박(residue)류와 부산물[펠릿(pellet) 모양인지에 상관없으며 따로 분류되지 않은 것으로 한정한다] / Vegetable materials and vegetable waste, vegetable residues and by-products, whether or not in the form of pellets, of a kind used in animal feeding, not elsewhere specified or included.'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230800",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 16,
+      "code": "hs-230910",
+      "titleKo": "HS 230910 개나 고양이용 사료(소매용으로 한정한다)",
+      "promptKo": "관세 품목명 '개나 고양이용 사료(소매용으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '개나 고양이용 사료(소매용으로 한정한다) / Dog or cat food, put up for retail sale'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230910",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 17,
+      "code": "hs-230990",
+      "titleKo": "HS 230990 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=230990",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 18,
+      "code": "hs-240110",
+      "titleKo": "HS 240110 잎담배[주맥(主脈)을 제거하지 않은 것으로 한정한다]",
+      "promptKo": "관세 품목명 '잎담배[주맥(主脈)을 제거하지 않은 것으로 한정한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '잎담배[주맥(主脈)을 제거하지 않은 것으로 한정한다] / Tobacco, not stemmed/stripped'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240110",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 19,
+      "code": "hs-240120",
+      "titleKo": "HS 240120 잎담배[주맥(主脈)을 일부나 전부 제거한 것으로 한정한다]",
+      "promptKo": "관세 품목명 '잎담배[주맥(主脈)을 일부나 전부 제거한 것으로 한정한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '잎담배[주맥(主脈)을 일부나 전부 제거한 것으로 한정한다] / Tobacco, partly or wholly stemmed/stripped'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240120",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 20,
+      "code": "hs-240130",
+      "titleKo": "HS 240130 담배 부산물",
+      "promptKo": "관세 품목명 '담배 부산물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '담배 부산물 / Tobacco refuse'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240130",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 21,
+      "code": "hs-240210",
+      "titleKo": "HS 240210 시가(cigar)ㆍ셔루트(cheroot)ㆍ시가릴로(cigarillo)(담배를 함유한 것으로 한정한다)",
+      "promptKo": "관세 품목명 '시가(cigar)ㆍ셔루트(cheroot)ㆍ시가릴로(cigarillo)(담배를 함유한 것으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '시가(cigar)ㆍ셔루트(cheroot)ㆍ시가릴로(cigarillo)(담배를 함유한 것으로 한정한다) / Cigars, cheroots, and cigarillos containing tobacco'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240210",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 22,
+      "code": "hs-240220",
+      "titleKo": "HS 240220 궐련(담배를 함유한 것으로 한정한다)",
+      "promptKo": "관세 품목명 '궐련(담배를 함유한 것으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '궐련(담배를 함유한 것으로 한정한다) / Cigarettes containing tobacco'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240220",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 23,
+      "code": "hs-240319",
+      "titleKo": "HS 240319 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240319",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 24,
+      "code": "hs-240391",
+      "titleKo": "HS 240391 균질화하거나 재구성한 담배",
+      "promptKo": "관세 품목명 '균질화하거나 재구성한 담배'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '균질화하거나 재구성한 담배 / Homogenised or “reconstituted” tobacco'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240391",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 25,
+      "code": "hs-240399",
+      "titleKo": "HS 240399 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240399",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 26,
+      "code": "hs-240412",
+      "titleKo": "HS 240412 기타(니코틴을 함유한 것으로 한정한다)",
+      "promptKo": "관세 품목명 '기타(니코틴을 함유한 것으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타(니코틴을 함유한 것으로 한정한다) / Other, containing nicotine'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240412",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 27,
+      "code": "hs-240419",
+      "titleKo": "HS 240419 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=240419",
+        "/information/food-ingredients"
+      ]
+    }
+  ]
+}

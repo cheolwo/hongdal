@@ -1,0 +1,623 @@
+{
+  "schemaVersion": 1,
+  "packId": "hs-food-representatives-all-07",
+  "status": "ApprovedForBatch",
+  "promptVersion": 1,
+  "model": "gemini-3.1-flash-lite-image",
+  "expectedSceneCount": 50,
+  "basePromptKo": "HS 식품 코드 탐색 카드에 사용할 프리미엄 3D 애니메이션풍 editorial product illustration로 표현한다. 관세 품목명이 가리키는 대표 식품 원물 또는 가공품을 실제 형태와 질감이 알아보기 쉽게 중앙에 배치한다. 따뜻한 햇빛과 청량한 청록색 주변광, 깨끗하고 밝은 공기감, 부드럽지만 정교한 입체감, 여유 있는 정사각형 구도를 사용한다. 어린이용 캐릭터처럼 단순화하지 않고 신선하고 차분한 상업용 카탈로그 품질로 완성한다.",
+  "contextChecklist": [
+    "HS6 한 코드의 대표 상품군을 보여 주되 국내 HSK10 세번이나 실제 판매상품을 확정한 것처럼 표현하지 않는다.",
+    "품목명에 명시된 원재료, 생물종, 가공 상태, 냉장·냉동 여부만 시각화하고 모호한 세부 조건은 단정하지 않는다.",
+    "정사각형 상품 카드와 모바일 목록의 중앙 crop에서 주 피사체가 잘리지 않는지 확인한다.",
+    "생성 이미지는 분류 탐색용 대표 삽화이며 원산지, 등급, 검역, 인증, 수입 가능성의 증거가 아니다."
+  ],
+  "avoidExpressions": [
+    "읽을 수 있는 문자, 숫자, HS 코드, 가격표, 포장 라벨, 브랜드, 로고, 국기, 인증 마크, 바코드, QR 코드",
+    "특정 국가의 원산지나 공공기관 인증을 암시하는 배경, 도장, 서류, 지도",
+    "실제 판매 포장처럼 보이는 상표 제품, 과도한 광고 문구, 비현실적인 색상과 식재료 형태",
+    "동물 도축 장면, 피, 잔혹한 표현, 식품 위생을 해치는 오염이나 부패 표현"
+  ],
+  "scenes": [
+    {
+      "sequence": 1,
+      "code": "hs-180620",
+      "titleKo": "HS 180620 그 밖의 조제 식료품[무게가 2킬로그램을 초과하는 것으로서 블록 모양ㆍ슬래브 모양ㆍ막대(bar) 모양인 것과 용기에 들어 있거나 내용물에 직접 접하여 포장된 것으로서 내용물의 무게가 2킬로그램을 초과하는 액체ㆍ페이스트(paste)ㆍ가루ㆍ알갱이나 그 밖의 벌크 상태인 것으로 한정한다]",
+      "promptKo": "관세 품목명 '그 밖의 조제 식료품[무게가 2킬로그램을 초과하는 것으로서 블록 모양ㆍ슬래브 모양ㆍ막대(bar) 모양인 것과 용기에 들어 있거나 내용물에 직접 접하여 포장된 것으로서 내용물의 무게가 2킬로그램을 초과하는 액체ㆍ페이스트(paste)ㆍ가루ㆍ알갱이나 그 밖의 벌크 상태인 것으로 한정한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '그 밖의 조제 식료품[무게가 2킬로그램을 초과하는 것으로서 블록 모양ㆍ슬래브 모양ㆍ막대(bar) 모양인 것과 용기에 들어 있거나 내용물에 직접 접하여 포장된 것으로서 내용물의 무게가 2킬로그램을 초과하는 액체ㆍ페이스트(paste)ㆍ가루ㆍ알갱이나 그 밖의 벌크 상태인 것으로 한정한다] / Other preparations in blocks, slabs or bars weighing more than 2 kg or in liquid, paste, powder, granular or other bulk form in containers or immediate packings, of a content exceeding 2 kg'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=180620",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 2,
+      "code": "hs-180632",
+      "titleKo": "HS 180632 속을 채우지 않은 것",
+      "promptKo": "관세 품목명 '속을 채우지 않은 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '속을 채우지 않은 것 / Not filled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=180632",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 3,
+      "code": "hs-180690",
+      "titleKo": "HS 180690 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=180690",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 4,
+      "code": "hs-190110",
+      "titleKo": "HS 190110 영유아ㆍ어린이용 조제 식료품(소매용으로 한정한다)",
+      "promptKo": "관세 품목명 '영유아ㆍ어린이용 조제 식료품(소매용으로 한정한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '영유아ㆍ어린이용 조제 식료품(소매용으로 한정한다) / Preparations suitable for infants or young children, put up for retail sale'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190110",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 5,
+      "code": "hs-190190",
+      "titleKo": "HS 190190 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190190",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 6,
+      "code": "hs-190211",
+      "titleKo": "HS 190211 새의 알을 넣은 것",
+      "promptKo": "관세 품목명 '새의 알을 넣은 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '새의 알을 넣은 것 / Containing eggs'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190211",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 7,
+      "code": "hs-190219",
+      "titleKo": "HS 190219 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190219",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 8,
+      "code": "hs-190230",
+      "titleKo": "HS 190230 그 밖의 파스타",
+      "promptKo": "관세 품목명 '그 밖의 파스타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '그 밖의 파스타 / Other pasta'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190230",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 9,
+      "code": "hs-190300",
+      "titleKo": "HS 190300 타피오카와 전분으로 조제한 타피오카 대용물[플레이크(flake) 모양ㆍ낱알 모양ㆍ진주 모양ㆍ무거리 모양ㆍ그 밖에 이와 유사한 모양의 것으로 한정한다]",
+      "promptKo": "관세 품목명 '타피오카와 전분으로 조제한 타피오카 대용물[플레이크(flake) 모양ㆍ낱알 모양ㆍ진주 모양ㆍ무거리 모양ㆍ그 밖에 이와 유사한 모양의 것으로 한정한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '타피오카와 전분으로 조제한 타피오카 대용물[플레이크(flake) 모양ㆍ낱알 모양ㆍ진주 모양ㆍ무거리 모양ㆍ그 밖에 이와 유사한 모양의 것으로 한정한다] / Tapioca and substitutes therefor prepared from starch, in the form of flakes, grains, pearls, siftings or in similar forms.'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190300",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 10,
+      "code": "hs-190410",
+      "titleKo": "HS 190410 곡물이나 곡물가공품을 팽창시키거나 볶아서 얻은 조제 식료품",
+      "promptKo": "관세 품목명 '곡물이나 곡물가공품을 팽창시키거나 볶아서 얻은 조제 식료품'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '곡물이나 곡물가공품을 팽창시키거나 볶아서 얻은 조제 식료품 / Prepared foods obtained by the swelling or roasting of cereals or cereal products'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190410",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 11,
+      "code": "hs-190420",
+      "titleKo": "HS 190420 볶지 않은 곡물 플레이크(flake)의 조제 식료품ㆍ볶지 않은 곡물 플레이크(flake)와 볶은 곡물 플레이크(flake)나 팽창된 곡물의 혼합물로 만든 조제 식료품",
+      "promptKo": "관세 품목명 '볶지 않은 곡물 플레이크(flake)의 조제 식료품ㆍ볶지 않은 곡물 플레이크(flake)와 볶은 곡물 플레이크(flake)나 팽창된 곡물의 혼합물로 만든 조제 식료품'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '볶지 않은 곡물 플레이크(flake)의 조제 식료품ㆍ볶지 않은 곡물 플레이크(flake)와 볶은 곡물 플레이크(flake)나 팽창된 곡물의 혼합물로 만든 조제 식료품 / Prepared foods obtained from unroasted cereal flakes or from mixtures of unroasted cereal flakes and roasted cereal flakes or swelled cereals'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190420",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 12,
+      "code": "hs-190490",
+      "titleKo": "HS 190490 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190490",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 13,
+      "code": "hs-190590",
+      "titleKo": "HS 190590 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=190590",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 14,
+      "code": "hs-200190",
+      "titleKo": "HS 200190 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200190",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 15,
+      "code": "hs-200290",
+      "titleKo": "HS 200290 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200290",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 16,
+      "code": "hs-200310",
+      "titleKo": "HS 200310 아가리쿠스(Agaricus)속의 버섯",
+      "promptKo": "관세 품목명 '아가리쿠스(Agaricus)속의 버섯'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '아가리쿠스(Agaricus)속의 버섯 / Mushrooms of the genus Agaricus'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200310",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 17,
+      "code": "hs-200390",
+      "titleKo": "HS 200390 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200390",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 18,
+      "code": "hs-200490",
+      "titleKo": "HS 200490 그 밖의 채소와 채소의 혼합물",
+      "promptKo": "관세 품목명 '그 밖의 채소와 채소의 혼합물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '그 밖의 채소와 채소의 혼합물 / Other vegetables and mixtures of vegetables'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200490",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 19,
+      "code": "hs-200510",
+      "titleKo": "HS 200510 균질화한 채소",
+      "promptKo": "관세 품목명 '균질화한 채소'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '균질화한 채소 / Homogenised vegetables'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200510",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 20,
+      "code": "hs-200551",
+      "titleKo": "HS 200551 꼬투리를 벗긴 콩",
+      "promptKo": "관세 품목명 '꼬투리를 벗긴 콩'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '꼬투리를 벗긴 콩 / Beans, shelled'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200551",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 21,
+      "code": "hs-200559",
+      "titleKo": "HS 200559 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200559",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 22,
+      "code": "hs-200599",
+      "titleKo": "HS 200599 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200599",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 23,
+      "code": "hs-200600",
+      "titleKo": "HS 200600 설탕으로 보존처리한 채소ㆍ과실ㆍ견과류ㆍ과피와 식물의 그 밖의 부분[드레인한(drained) 것, 설탕을 입히거나 설탕에 절인 것]",
+      "promptKo": "관세 품목명 '설탕으로 보존처리한 채소ㆍ과실ㆍ견과류ㆍ과피와 식물의 그 밖의 부분[드레인한(drained) 것, 설탕을 입히거나 설탕에 절인 것]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '설탕으로 보존처리한 채소ㆍ과실ㆍ견과류ㆍ과피와 식물의 그 밖의 부분[드레인한(drained) 것, 설탕을 입히거나 설탕에 절인 것] / Vegetables, fruit, nuts, fruit-peel and other parts of plants, preserved by sugar (drained, glacé or crystallised).'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200600",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 24,
+      "code": "hs-200791",
+      "titleKo": "HS 200791 감귤류의 과실",
+      "promptKo": "관세 품목명 '감귤류의 과실'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '감귤류의 과실 / Citrus fruit'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200791",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 25,
+      "code": "hs-200799",
+      "titleKo": "HS 200799 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200799",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 26,
+      "code": "hs-200811",
+      "titleKo": "HS 200811 땅콩",
+      "promptKo": "관세 품목명 '땅콩'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '땅콩 / Ground-nuts'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200811",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 27,
+      "code": "hs-200819",
+      "titleKo": "HS 200819 기타(혼합물을 포함한다)",
+      "promptKo": "관세 품목명 '기타(혼합물을 포함한다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타(혼합물을 포함한다) / Other, including mixtures'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200819",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 28,
+      "code": "hs-200830",
+      "titleKo": "HS 200830 감귤류 과실",
+      "promptKo": "관세 품목명 '감귤류 과실'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '감귤류 과실 / Citrus fruit'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200830",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 29,
+      "code": "hs-200870",
+      "titleKo": "HS 200870 복숭아[넥터린(nectarine)을 포함한다]",
+      "promptKo": "관세 품목명 '복숭아[넥터린(nectarine)을 포함한다]'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '복숭아[넥터린(nectarine)을 포함한다] / Peaches, including nectarines'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200870",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 30,
+      "code": "hs-200897",
+      "titleKo": "HS 200897 혼합물",
+      "promptKo": "관세 품목명 '혼합물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '혼합물 / Mixtures'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200897",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 31,
+      "code": "hs-200899",
+      "titleKo": "HS 200899 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200899",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 32,
+      "code": "hs-200931",
+      "titleKo": "HS 200931 브릭스(Brix) 값이 20 이하인 것",
+      "promptKo": "관세 품목명 '브릭스(Brix) 값이 20 이하인 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '브릭스(Brix) 값이 20 이하인 것 / Of a Brix value not exceeding 20'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200931",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 33,
+      "code": "hs-200939",
+      "titleKo": "HS 200939 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200939",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 34,
+      "code": "hs-200989",
+      "titleKo": "HS 200989 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200989",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 35,
+      "code": "hs-200990",
+      "titleKo": "HS 200990 혼합 주스",
+      "promptKo": "관세 품목명 '혼합 주스'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '혼합 주스 / Mixtures of juices'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=200990",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 36,
+      "code": "hs-210111",
+      "titleKo": "HS 210111 추출물(extract)ㆍ에센스(essence)ㆍ농축물",
+      "promptKo": "관세 품목명 '추출물(extract)ㆍ에센스(essence)ㆍ농축물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '추출물(extract)ㆍ에센스(essence)ㆍ농축물 / Extracts, essences and concentrates'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210111",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 37,
+      "code": "hs-210112",
+      "titleKo": "HS 210112 추출물(extract)ㆍ에센스(essence)ㆍ농축물을 기본 재료로 하거나 커피를 기본 재료로 한 조제품",
+      "promptKo": "관세 품목명 '추출물(extract)ㆍ에센스(essence)ㆍ농축물을 기본 재료로 하거나 커피를 기본 재료로 한 조제품'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '추출물(extract)ㆍ에센스(essence)ㆍ농축물을 기본 재료로 하거나 커피를 기본 재료로 한 조제품 / Preparations with a basis of extracts, essences or concentrates or with a basis of coffee'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210112",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 38,
+      "code": "hs-210130",
+      "titleKo": "HS 210130 볶은 치커리(chicory)ㆍ그 밖의 볶은 커피 대용물과 이들의 추출물(extract)ㆍ에센스(essence)ㆍ농축물",
+      "promptKo": "관세 품목명 '볶은 치커리(chicory)ㆍ그 밖의 볶은 커피 대용물과 이들의 추출물(extract)ㆍ에센스(essence)ㆍ농축물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '볶은 치커리(chicory)ㆍ그 밖의 볶은 커피 대용물과 이들의 추출물(extract)ㆍ에센스(essence)ㆍ농축물 / Roasted chicory and other roasted coffee substitutes, and extracts, essences and concentrates thereof'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210130",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 39,
+      "code": "hs-210210",
+      "titleKo": "HS 210210 활성 효모",
+      "promptKo": "관세 품목명 '활성 효모'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '활성 효모 / Active yeasts'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210210",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 40,
+      "code": "hs-210220",
+      "titleKo": "HS 210220 불활성 효모와 그 밖의 죽은 단세포 미생물",
+      "promptKo": "관세 품목명 '불활성 효모와 그 밖의 죽은 단세포 미생물'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '불활성 효모와 그 밖의 죽은 단세포 미생물 / Inactive yeasts; other single-cell micro-organisms, dead'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210220",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 41,
+      "code": "hs-210320",
+      "titleKo": "HS 210320 토마토 케첩과 그 밖의 토마토 소스",
+      "promptKo": "관세 품목명 '토마토 케첩과 그 밖의 토마토 소스'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '토마토 케첩과 그 밖의 토마토 소스 / Tomato ketchup and other tomato sauces'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210320",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 42,
+      "code": "hs-210330",
+      "titleKo": "HS 210330 겨자의 고운 가루ㆍ거친 가루와 조제한 겨자",
+      "promptKo": "관세 품목명 '겨자의 고운 가루ㆍ거친 가루와 조제한 겨자'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '겨자의 고운 가루ㆍ거친 가루와 조제한 겨자 / Mustard flour and meal and prepared mustard'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210330",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 43,
+      "code": "hs-210390",
+      "titleKo": "HS 210390 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210390",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 44,
+      "code": "hs-210410",
+      "titleKo": "HS 210410 수프ㆍ브로드(broth)와 수프ㆍ브로드(broth)용 조제품",
+      "promptKo": "관세 품목명 '수프ㆍ브로드(broth)와 수프ㆍ브로드(broth)용 조제품'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '수프ㆍ브로드(broth)와 수프ㆍ브로드(broth)용 조제품 / Soups and broths and preparations therefor'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210410",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 45,
+      "code": "hs-210500",
+      "titleKo": "HS 210500 아이스크림과 그 밖의 빙과류(코코아를 함유했는지에 상관없다)",
+      "promptKo": "관세 품목명 '아이스크림과 그 밖의 빙과류(코코아를 함유했는지에 상관없다)'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '아이스크림과 그 밖의 빙과류(코코아를 함유했는지에 상관없다) / Ice cream and other edible ice, whether or not containing cocoa.'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210500",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 46,
+      "code": "hs-210610",
+      "titleKo": "HS 210610 단백질 농축물과 텍스처화한(textured) 단백질계 물질",
+      "promptKo": "관세 품목명 '단백질 농축물과 텍스처화한(textured) 단백질계 물질'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '단백질 농축물과 텍스처화한(textured) 단백질계 물질 / Protein concentrates and textured protein substances'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210610",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 47,
+      "code": "hs-210690",
+      "titleKo": "HS 210690 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=210690",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 48,
+      "code": "hs-220190",
+      "titleKo": "HS 220190 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220190",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 49,
+      "code": "hs-220299",
+      "titleKo": "HS 220299 기타",
+      "promptKo": "관세 품목명 '기타'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '기타 / Other'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220299",
+        "/information/food-ingredients"
+      ]
+    },
+    {
+      "sequence": 50,
+      "code": "hs-220421",
+      "titleKo": "HS 220421 2리터 이하의 용기에 넣은 것",
+      "promptKo": "관세 품목명 '2리터 이하의 용기에 넣은 것'이 가리키는 대표 식품 상품군을 한눈에 구분할 수 있게 표현한다. 품목 설명 '2리터 이하의 용기에 넣은 것 / In containers holding 2 ℓ or less'의 범위를 벗어나는 재료나 가공 상태를 임의로 추가하지 않는다. 서로 다른 품목이 함께 열거된 경우에는 가장 대표적인 2~3개를 정돈된 한 장면에 배치하고, 포장 문구 없이 원물이나 내용물의 형태와 질감에 초점을 맞춘다.",
+      "aspectRatio": "1:1",
+      "resolution": "1K",
+      "routeRefs": [
+        "/shipper/customs/hs-reviews?query=220421",
+        "/information/food-ingredients"
+      ]
+    }
+  ]
+}
