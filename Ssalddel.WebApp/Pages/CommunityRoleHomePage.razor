@@ -6,6 +6,7 @@
 @implements IAsyncDisposable
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject WebAuthSessionService AuthSession
 @inject 커뮤니티세계지도Client WorldMapClient
 @inject GoogleMapsBrowserRuntimeClient GoogleMapsRuntimeClient
 @inject 지역문화이미지Client RegionalImageClient
@@ -41,17 +42,32 @@
             </div>
         </header>
 
+        <section class="world-community-home__role-profile" aria-label="현재 역할별 지도 관점" aria-live="polite">
+            <div>
+                <span>ROLE LENS</span>
+                <strong>@ActiveRoleProfile.DisplayName</strong>
+            </div>
+            <p>@ActiveRoleProfile.Description</p>
+            <small>@ActiveRoleProfile.Boundary</small>
+            @if (_layersCustomized)
+            {
+                <button type="button" @onclick="ResetLayersForActiveRole">
+                    역할 기본 레이어 복원
+                </button>
+            }
+        </section>
+
         <div class="world-community-home__layer-bar" aria-label="지도 분야 레이어 선택">
             <div>
                 <strong>@(IsNightLearning ? "지도에 표시할 분야" : "업무 영역과 원장 연결")</strong>
                 <small>@(IsNightLearning ? "여러 분야를 함께 켜도 지도는 한 개만 유지됩니다." : "업무 영역을 켜면 대응 원장과 지도 근거가 함께 표시됩니다.")</small>
             </div>
             <div class="world-community-home__layer-options">
-                @foreach (var layer in CurrentLayers)
+                @foreach (var layer in RoleOrderedLayers)
                 {
                     var layerDiagram = BuildLayerDiagram(layer);
                     <button type="button"
-                            class="@(IsLayerSelected(layer.Code) ? "is-active" : null)"
+                            class="@LayerOptionClass(layer.Code)"
                             style="--layer-color: @layer.Color"
                             aria-pressed="@IsLayerSelected(layer.Code).ToString().ToLowerInvariant()"
                             title="@layer.Description"
@@ -84,6 +100,58 @@
             }
         </div>
         </aside>
+
+        @if (!IsNightLearning)
+        {
+            <section class="world-community-home__simulation" aria-labelledby="transport-simulation-heading">
+                <header>
+                    <div>
+                        <span>SIMULATED · 시뮬레이션/교육용/비실시간</span>
+                        <strong id="transport-simulation-heading">물류·항공·해상 흐름</strong>
+                    </div>
+                    <button type="button"
+                            class="world-community-home__simulation-motion"
+                            aria-pressed="@_simulationAnimationEnabled.ToString().ToLowerInvariant()"
+                            @onclick="ToggleSimulationAnimation">
+                        <MudIcon Icon="@(_simulationAnimationEnabled ? Icons.Material.Filled.Pause : Icons.Material.Filled.PlayArrow)" Size="Size.Small" />
+                        @(_simulationAnimationEnabled ? "움직임 끄기" : "움직임 켜기")
+                    </button>
+                </header>
+                <p class="world-community-home__simulation-warning">
+                    실제 운행 추적·배차 확정·개인 위치·타 조직 운영정보가 아닙니다.
+                </p>
+                <div class="world-community-home__simulation-toggles" role="group" aria-label="교육용 이동 레이어 선택">
+                    @foreach (var modeCode in SimulationModeCodes)
+                    {
+                        <button type="button"
+                                class="@(_enabledSimulationModeCodes.Contains(modeCode) ? "is-active" : null)"
+                                style="--simulation-color: @SimulationColor(modeCode)"
+                                aria-pressed="@_enabledSimulationModeCodes.Contains(modeCode).ToString().ToLowerInvariant()"
+                                @onclick="() => ToggleSimulationMode(modeCode)">
+                            <i aria-hidden="true"></i>
+                            @SimulationModeDisplayName(modeCode)
+                        </button>
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_simulationOverlayMessage))
+                {
+                    <p class="world-community-home__simulation-error" role="status">@_simulationOverlayMessage</p>
+                }
+                <details>
+                    <summary>고정 예시의 상태·출처·기준 보기</summary>
+                    <ul>
+                        @foreach (var scenario in SimulationRoutes)
+                        {
+                            <li>
+                                <strong>@scenario.DisplayName · @scenario.SimulationMark</strong>
+                                <span>@scenario.StatusLabel · @scenario.SourceName</span>
+                                <span>기준 @scenario.BasisAtUtc.ToString("yyyy-MM-dd") · @scenario.FreshnessLabel</span>
+                            </li>
+                        }
+                    </ul>
+                </details>
+            </section>
+        }
 
         @if (!string.IsNullOrWhiteSpace(_snapshotConnectionMessage))
         {
@@ -205,6 +273,46 @@
                             <text x="99" y="16">5,000 km</text>
                         </g>
                     </svg>
+
+                    @if (!IsNightLearning && VisibleSimulationRoutes.Count > 0)
+                    {
+                        <svg class="world-community-home__simulation-fallback"
+                             viewBox="0 0 1000 500"
+                             role="img"
+                             aria-label="실제 위치가 아닌 교육용 화물·항공·해상 시뮬레이션 경로">
+                            @foreach (var scenario in VisibleSimulationRoutes)
+                            {
+                                <path class="world-community-home__simulation-route"
+                                      d="@FallbackSimulationPath(scenario)"
+                                      stroke="@scenario.Color" />
+                                <g class="world-community-home__simulation-vehicle world-community-home__simulation-vehicle--@scenario.ModeCode"
+                                   fill="@scenario.Color"
+                                   transform="@FallbackSimulationStaticTransform(scenario)">
+                                    @if (scenario.ModeCode == 운송시뮬레이션ModeCodes.Aviation)
+                                    {
+                                        <path d="M13 0 L-7 -6 L-3 0 L-7 6 Z" />
+                                    }
+                                    else if (scenario.ModeCode == 운송시뮬레이션ModeCodes.Maritime)
+                                    {
+                                        <path class="world-community-home__simulation-wake" d="M-12 -4 L-24 0 L-12 4" />
+                                        <path d="M11 0 L5 7 L-10 5 L-12 -5 L5 -7 Z" />
+                                    }
+                                    else
+                                    {
+                                        <rect x="-11" y="-7" width="17" height="12" rx="3" />
+                                        <rect x="6" y="-4" width="7" height="9" rx="2" />
+                                    }
+                                    @if (_simulationAnimationEnabled)
+                                    {
+                                        <animateMotion dur="@($"{scenario.AnimationCycleSeconds:F0}s")"
+                                                       repeatCount="indefinite"
+                                                       rotate="auto"
+                                                       path="@FallbackSimulationPath(scenario)" />
+                                    }
+                                </g>
+                            }
+                        </svg>
+                    }
 
                     @foreach (var country in FallbackMapMarkers)
                     {
@@ -406,14 +514,38 @@
                     <div><dt>상태</dt><dd>@ObservationStatusLabel(selectedObservation)</dd></div>
                     <div><dt>자료 기준</dt><dd>@EvidenceFreshnessLabel(selectedObservation.EvidenceAsOfUtc)</dd></div>
                     <div><dt>출처</dt><dd>@selectedObservation.SourceName</dd></div>
+                    @if (!string.IsNullOrWhiteSpace(selectedObservation.SourceDatasetKey))
+                    {
+                        <div><dt>원자료</dt><dd>@selectedObservation.SourceDatasetKey</dd></div>
+                    }
+                    @if (selectedObservation.CollectedAtUtc is { } collectedAtUtc)
+                    {
+                        <div><dt>수집</dt><dd>@($"{collectedAtUtc:yyyy-MM-dd HH:mm} UTC · {DataFreshnessLabel(selectedObservation.FreshnessCode)}")</dd></div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(selectedObservation.UpdateCycle))
+                    {
+                        <div><dt>갱신 주기</dt><dd>@selectedObservation.UpdateCycle</dd></div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(selectedObservation.LocationPrecisionCode))
+                    {
+                        <div><dt>위치 기준</dt><dd>@LocationPrecisionLabel(selectedObservation.LocationPrecisionCode)</dd></div>
+                    }
                     @if (selectedObservation.LayerCode == 커뮤니티세계지도LayerCodes.OverseasManufacturer)
                     {
                         <div><dt>제조업소</dt><dd>@(selectedObservation.OrganizationCount ?? 0)개</dd></div>
                         <div><dt>재료 관계 근거</dt><dd>@(selectedObservation.EvidenceCount ?? 0)건</dd></div>
                         <div><dt>위치 기준</dt><dd>행정권역 대표점</dd></div>
                     }
+                    @if (selectedObservation.Metrics is { Count: > 0 } selectedMetrics)
+                    {
+                        @foreach (var metric in selectedMetrics)
+                        {
+                            <div><dt>@metric.DisplayName</dt><dd>@MetricValueLabel(metric)</dd></div>
+                        }
+                    }
                 </dl>
-                <p>이 마커 선택은 공개 자료 조회만 수행하며 원장·참여·주문·계약·배차를 만들지 않습니다.</p>
+                <p>@(selectedObservation.BoundaryNotice
+                     ?? "이 마커 선택은 공개 자료 조회만 수행하며 원장·참여·주문·계약·배차를 만들지 않습니다.")</p>
                 <div>
                     @if (!string.IsNullOrWhiteSpace(selectedObservation.SourceHref))
                     {
@@ -550,6 +682,21 @@
                                 <div><dt>생활권 반경</dt><dd>@(observation.ServiceRadiusKm is null ? "확인 중" : $"{observation.ServiceRadiusKm:0.##} km")</dd></div>
                                 <div><dt>일일 처리</dt><dd>@(observation.DailyCapacity is null ? "확인 중" : $"{observation.DailyCapacity:N0}건")</dd></div>
                             </dl>
+                        }
+                        else if (IsPublicDataEvidenceLayer(observation.LayerCode))
+                        {
+                            <dl class="world-community-home__market-metadata">
+                                <div><dt>위치 기준</dt><dd>@LocationPrecisionLabel(observation.LocationPrecisionCode)</dd></div>
+                                <div><dt>수집 상태</dt><dd>@DataFreshnessLabel(observation.FreshnessCode)</dd></div>
+                                @foreach (var metric in observation.Metrics ?? [])
+                                {
+                                    <div><dt>@metric.DisplayName</dt><dd>@MetricValueLabel(metric)</dd></div>
+                                }
+                            </dl>
+                            @if (!string.IsNullOrWhiteSpace(observation.BoundaryNotice))
+                            {
+                                <small class="world-community-home__observation-boundary">@observation.BoundaryNotice</small>
+                            }
                         }
                         <footer>
                             <small>
@@ -758,11 +905,27 @@
     private Task? _pollingTask;
     private DateTimeOffset? _lastSnapshotCheckedAt;
     private string? _snapshotConnectionMessage;
+    private string? _simulationOverlayMessage;
+    private bool _simulationAnimationEnabled = true;
+    private readonly HashSet<string> _enabledSimulationModeCodes = new(
+        SimulationModeCodes,
+        StringComparer.Ordinal);
     private IReadOnlyList<AppContextImageAssetDto> _regionalImages = [];
     private bool _regionImagesLoading = true;
     private string? _regionImagesError;
+    private bool _layersCustomized;
 
     private const string RegionalCultureImagePackId = "regional-culture-one-each-v1";
+
+    private static readonly IReadOnlyList<string> SimulationModeCodes =
+    [
+        운송시뮬레이션ModeCodes.GroundCargo,
+        운송시뮬레이션ModeCodes.Aviation,
+        운송시뮬레이션ModeCodes.Maritime
+    ];
+
+    private static readonly IReadOnlyList<운송시뮬레이션RouteDto> SimulationRoutes =
+        운송시뮬레이션MapFixtureCatalog.Routes;
 
     private static readonly IReadOnlyList<CommunityMapCountry> MapCountries =
     [
@@ -840,6 +1003,23 @@
         => _appliedSnapshot?.Layers
            ?? 커뮤니티세계지도LayerCatalog.ForDataset(DatasetCode);
 
+    private IReadOnlyList<운송시뮬레이션RouteDto> VisibleSimulationRoutes
+        => IsNightLearning
+            ? []
+            : SimulationRoutes
+                .Where(route => _enabledSimulationModeCodes.Contains(route.ModeCode))
+                .Take(12)
+                .ToArray();
+
+    private 커뮤니티세계지도RoleLayerProfile ActiveRoleProfile
+        => 커뮤니티세계지도RoleLayerProfileCatalog.Resolve(AuthSession.PrimaryRole);
+
+    private IReadOnlyList<커뮤니티세계지도LayerDto> RoleOrderedLayers
+        => CurrentLayers
+            .OrderBy(layer => RoleLayerOrder(layer.Code))
+            .ThenBy(layer => layer.DisplayName, StringComparer.Ordinal)
+            .ToArray();
+
     private IReadOnlyList<MapLayerDiagram> ActiveLayerDiagrams
         => ConsolidateLedgerDiagrams(CurrentLayers
             .Where(layer => IsLayerSelected(layer.Code))
@@ -849,7 +1029,7 @@
         => _appliedSnapshot is null
             ? BuildCatalogFallbackMarkers()
             : _appliedSnapshot.Observations
-                .Where(observation => IsLayerSelected(observation.LayerCode))
+                .Where(observation => IsObservationSourceLayerVisible(observation.LayerCode))
                 .Select(GoogleMapMarker.FromObservation)
                 .ToArray();
 
@@ -875,7 +1055,7 @@
 
     private IReadOnlyList<커뮤니티세계지도ObservationDto> VisibleObservations
         => _appliedSnapshot?.Observations
-            .Where(observation => IsLayerSelected(observation.LayerCode))
+            .Where(observation => IsObservationSourceLayerVisible(observation.LayerCode))
             .Where(observation => _selectedCountryCode is null
                                   || string.Equals(observation.CountryCode, _selectedCountryCode, StringComparison.Ordinal))
             .Where(observation => _selectedObservationId is null
@@ -912,7 +1092,7 @@
             }
 
             return ConsolidateLedgerDiagrams(CurrentLayers
-                .Where(layer => IsLayerSelected(layer.Code) && availableLayerCodes.Contains(layer.Code))
+                .Where(layer => IsLayerSelected(layer.Code) && LayerHasVisibleSource(layer, availableLayerCodes))
                 .Select(BuildLedgerWorkflowDiagram));
         }
     }
@@ -979,7 +1159,11 @@
                ?? "지역 문화와 가격·유통 관측의 준비 상태를 업무 판단 근거로 확인하세요.";
 
     protected override async Task OnInitializedAsync()
-        => await LoadRegionalImagesAsync();
+    {
+        await Task.WhenAll(
+            AuthSession.RestoreAsync(),
+            LoadRegionalImagesAsync());
+    }
 
     protected override void OnParametersSet()
     {
@@ -1002,6 +1186,10 @@
             _googleMapModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import",
                 "./js/community-world-google-map.js");
+            if (await _googleMapModule.InvokeAsync<bool>("prefersReducedMotion"))
+            {
+                _simulationAnimationEnabled = false;
+            }
             _googleMapCallback = DotNetObjectReference.Create(this);
             var runtimeSettings = await GoogleMapsRuntimeClient.TryGetAsync();
             var status = await _googleMapModule.InvokeAsync<string>(
@@ -1021,6 +1209,7 @@
                 "blocked-origin" => GoogleMapState.BlockedOrigin,
                 _ => GoogleMapState.Unconfigured
             };
+            await UpdateTransportSimulationLayerAsync();
             _pendingGoogleMapUpdate = false;
             _pollingCts = new CancellationTokenSource();
             _pollingTask = PollMapSnapshotsAsync(_pollingCts.Token);
@@ -1041,6 +1230,7 @@
                 _selectedCountryCode,
                 _selectedObservationId,
                 preserveViewport);
+            await UpdateTransportSimulationLayerAsync();
         }
 
         if (_pendingFocusElementId is not null && _googleMapModule is not null)
@@ -1081,13 +1271,74 @@
         if (!_selectedLayerCodes.Add(layerCode))
         {
             _selectedLayerCodes.Remove(layerCode);
-            if (SelectedObservation?.LayerCode == layerCode)
-            {
-                _selectedObservationId = null;
-            }
         }
 
+        if (SelectedObservation is not null
+            && !IsObservationSourceLayerVisible(SelectedObservation.LayerCode))
+        {
+            _selectedObservationId = null;
+        }
+
+        _layersCustomized = true;
         _pendingGoogleMapUpdate = true;
+    }
+
+    private void ResetLayersForActiveRole()
+    {
+        _selectedLayerCodes.Clear();
+        AddActiveRoleDefaultLayers();
+        if (SelectedObservation is not null
+            && !IsObservationSourceLayerVisible(SelectedObservation.LayerCode))
+        {
+            _selectedObservationId = null;
+        }
+
+        _layersCustomized = false;
+        _pendingGoogleMapUpdate = true;
+    }
+
+    private async Task ToggleSimulationMode(string modeCode)
+    {
+        if (!_enabledSimulationModeCodes.Add(modeCode))
+        {
+            _enabledSimulationModeCodes.Remove(modeCode);
+        }
+
+        await UpdateTransportSimulationLayerAsync();
+    }
+
+    private async Task ToggleSimulationAnimation()
+    {
+        _simulationAnimationEnabled = !_simulationAnimationEnabled;
+        await UpdateTransportSimulationLayerAsync();
+    }
+
+    private async Task UpdateTransportSimulationLayerAsync()
+    {
+        if (_googleMapState != GoogleMapState.Ready || _googleMapModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _googleMapModule.InvokeVoidAsync(
+                "updateTransportSimulationLayer",
+                "community-world-google-map",
+                VisibleSimulationRoutes,
+                new
+                {
+                    animationEnabled = _simulationAnimationEnabled,
+                    maxVisibleObjects = 12,
+                    rendererKind = "google-overlay-canvas"
+                });
+            _simulationOverlayMessage = null;
+        }
+        catch (JSException exception)
+        {
+            Console.Error.WriteLine($"Transport simulation overlay failed: {exception.Message}");
+            _simulationOverlayMessage = "Google 지도 시뮬레이션 overlay를 표시하지 못했습니다. 고정 예시 정보는 계속 확인할 수 있습니다.";
+        }
     }
 
     private void ToggleDiagramPanel()
@@ -1098,6 +1349,35 @@
 
     private bool IsLayerSelected(string layerCode)
         => _selectedLayerCodes.Contains(layerCode);
+
+    private bool IsRoleRecommendedLayer(string layerCode)
+        => ActiveRoleProfile.RecommendedLayerCodes.Contains(layerCode, StringComparer.Ordinal);
+
+    private bool IsObservationSourceLayerVisible(string sourceLayerCode)
+        => IsLayerSelected(sourceLayerCode)
+           || CurrentLayers.Any(layer =>
+               IsLayerSelected(layer.Code)
+               && layer.ObservationSourceLayerCodes?.Contains(sourceLayerCode, StringComparer.Ordinal) == true);
+
+    private static bool LayerHasVisibleSource(
+        커뮤니티세계지도LayerDto layer,
+        IReadOnlySet<string> availableSourceLayerCodes)
+        => availableSourceLayerCodes.Contains(layer.Code)
+           || layer.ObservationSourceLayerCodes?.Any(availableSourceLayerCodes.Contains) == true;
+
+    private string LayerOptionClass(string layerCode)
+        => (IsLayerSelected(layerCode) ? "is-active" : string.Empty)
+           + (IsRoleRecommendedLayer(layerCode) ? " is-role-recommended" : " is-role-optional");
+
+    private int RoleLayerOrder(string layerCode)
+    {
+        var index = ActiveRoleProfile.RecommendedLayerCodes
+            .Select((code, order) => (code, order))
+            .FirstOrDefault(item => string.Equals(item.code, layerCode, StringComparison.Ordinal));
+        return index.code is null
+            ? ActiveRoleProfile.RecommendedLayerCodes.Count + 100
+            : index.order;
+    }
 
     private 커뮤니티세계지도LayerDto? LayerFor(string layerCode)
         => CurrentLayers.FirstOrDefault(layer => string.Equals(layer.Code, layerCode, StringComparison.Ordinal));
@@ -1111,16 +1391,24 @@
             return "알아차림 자료";
         }
 
+        if (layer.ObservationSourceLayerCodes is { Count: > 0 })
+        {
+            return $"원장 관점 · 공개 레이어 {layer.ObservationSourceLayerCodes.Count}개 연결";
+        }
+
         if (layer.Code != 커뮤니티세계지도LayerCodes.OverseasManufacturer)
         {
-            return $"{layerDiagram.DisplayName} 연결";
+            return IsRoleRecommendedLayer(layer.Code)
+                ? $"역할 기본 · {layerDiagram.DisplayName} 연결"
+                : $"추가 공개 자료 · {layerDiagram.DisplayName} 연결";
         }
 
         var markerCount = _appliedSnapshot?.Observations.Count(observation =>
             observation.LayerCode == 커뮤니티세계지도LayerCodes.OverseasManufacturer);
+        var prefix = IsRoleRecommendedLayer(layer.Code) ? "역할 기본" : "추가 공개 자료";
         return markerCount.HasValue
-            ? $"{markerCount.Value:N0}개 권역 · {layerDiagram.DisplayName}"
-            : $"서버 연결 후 집계 · {layerDiagram.DisplayName}";
+            ? $"{prefix} · {markerCount.Value:N0}개 권역"
+            : $"{prefix} · 서버 연결 후 집계";
     }
 
     private MapLayerDiagram BuildLayerDiagram(커뮤니티세계지도LayerDto layer)
@@ -1130,7 +1418,7 @@
 
     private MapLayerDiagram BuildLedgerWorkflowDiagram(커뮤니티세계지도LayerDto layer)
     {
-        var templateKey = layer.Code switch
+        var templateKey = layer.LedgerTemplateKey ?? (layer.Code switch
         {
             커뮤니티세계지도LayerCodes.RegionalCulture => CommunityLedgerTemplateKeys.LocalSale,
             커뮤니티세계지도LayerCodes.WholesaleMarket when _selectedCountryCode is not null
@@ -1142,7 +1430,7 @@
                 && !string.Equals(_selectedCountryCode, "KR", StringComparison.Ordinal) => CommunityLedgerTemplateKeys.GroupImport,
             커뮤니티세계지도LayerCodes.PublicPrice => CommunityLedgerTemplateKeys.GroupPurchase,
             _ => CommunityLedgerTemplateKeys.Errand
-        };
+        });
 
         var template = CommunityLedgerTemplateCatalog.Find(templateKey);
         var nodes = template.LedgerBlocks
@@ -1282,9 +1570,20 @@
             return;
         }
 
-        foreach (var layer in 커뮤니티세계지도LayerCatalog.ForDataset(DatasetCode))
+        AddActiveRoleDefaultLayers();
+    }
+
+    private void AddActiveRoleDefaultLayers()
+    {
+        var availableLayerCodes = CurrentLayers
+            .Select(layer => layer.Code)
+            .ToHashSet(StringComparer.Ordinal);
+        foreach (var layerCode in ActiveRoleProfile.RecommendedLayerCodes)
         {
-            _selectedLayerCodes.Add(layer.Code);
+            if (availableLayerCodes.Contains(layerCode))
+            {
+                _selectedLayerCodes.Add(layerCode);
+            }
         }
     }
 
@@ -1293,6 +1592,7 @@
         _appliedSnapshot = null;
         _selectedObservationId = null;
         _selectedLayerCodes.Clear();
+        _layersCustomized = false;
         _snapshotConnectionMessage = null;
     }
 
@@ -1398,8 +1698,8 @@
         }
 
         var countryMarkers = MapCountries
-            .Where(country => (country.Regions.Count > 0 && IsLayerSelected(커뮤니티세계지도LayerCodes.RegionalCulture))
-                              || IsLayerSelected(커뮤니티세계지도LayerCodes.PublicPrice))
+            .Where(country => (country.Regions.Count > 0 && IsObservationSourceLayerVisible(커뮤니티세계지도LayerCodes.RegionalCulture))
+                              || IsObservationSourceLayerVisible(커뮤니티세계지도LayerCodes.PublicPrice))
             .Select(country => GoogleMapMarker.For(
                     $"catalog:{country.Code}",
                     country.Code,
@@ -1408,7 +1708,7 @@
                     country.Regions.Count > 0
                         ? 커뮤니티세계지도LayerCodes.RegionalCulture
                         : 커뮤니티세계지도LayerCodes.PublicPrice));
-        var marketMarkers = IsLayerSelected(커뮤니티세계지도LayerCodes.WholesaleMarket)
+        var marketMarkers = IsObservationSourceLayerVisible(커뮤니티세계지도LayerCodes.WholesaleMarket)
             ? 커뮤니티도매시장MapCatalog.All.Select(GoogleMapMarker.ForMarket)
             : Enumerable.Empty<GoogleMapMarker>();
 
@@ -1430,9 +1730,37 @@
         _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = countryCode;
         _selectedObservationId = observationId;
+        OpenLedgerDiagramForMapFeature(observationId);
         _pendingFocusElementId = "world-map-results";
         await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
+    }
+
+    private void OpenLedgerDiagramForMapFeature(string observationId)
+    {
+        if (IsNightLearning)
+        {
+            return;
+        }
+
+        var marker = CurrentMapMarkers.FirstOrDefault(candidate =>
+            string.Equals(candidate.Id, observationId, StringComparison.Ordinal));
+        if (marker is null)
+        {
+            return;
+        }
+
+        var availableSourceLayerCodes = new HashSet<string>(StringComparer.Ordinal)
+        {
+            marker.LayerCode
+        };
+        var hasSelectedLedgerLayer = CurrentLayers.Any(layer =>
+            IsLayerSelected(layer.Code)
+            && LayerHasVisibleSource(layer, availableSourceLayerCodes));
+        if (hasSelectedLedgerLayer)
+        {
+            _isDiagramPanelExpanded = true;
+        }
     }
 
     private async Task ShowAllCountries()
@@ -1512,6 +1840,43 @@
         return FormattableString.Invariant($"--marker-left: {left:F3}%; --marker-top: {top:F3}%;");
     }
 
+    private static string SimulationModeDisplayName(string modeCode)
+        => modeCode switch
+        {
+            운송시뮬레이션ModeCodes.GroundCargo => "화물",
+            운송시뮬레이션ModeCodes.Aviation => "항공",
+            운송시뮬레이션ModeCodes.Maritime => "해상",
+            _ => "교육 흐름"
+        };
+
+    private static string SimulationColor(string modeCode)
+        => SimulationRoutes.First(route => route.ModeCode == modeCode).Color;
+
+    private static string FallbackSimulationPath(운송시뮬레이션RouteDto scenario)
+        => string.Join(
+            " ",
+            scenario.Route.Select((point, index) =>
+            {
+                var (x, y) = FallbackSimulationPoint(point);
+                return FormattableString.Invariant($"{(index == 0 ? "M" : "L")} {x:F2} {y:F2}");
+            }));
+
+    private string? FallbackSimulationStaticTransform(운송시뮬레이션RouteDto scenario)
+    {
+        if (_simulationAnimationEnabled || scenario.Route.Count == 0)
+        {
+            return null;
+        }
+
+        var (x, y) = FallbackSimulationPoint(scenario.Route[0]);
+        return FormattableString.Invariant($"translate({x:F2} {y:F2})");
+    }
+
+    private static (double X, double Y) FallbackSimulationPoint(운송시뮬레이션RoutePointDto point)
+        => (
+            (point.Longitude + 180d) / 360d * 1000d,
+            (90d - point.Latitude) / 180d * 500d);
+
     private static string CultureConversationHref(CommunityMapCountry country)
         => CommunityPageRoutes.BoardsFor(
             boardName: "지역 문화",
@@ -1551,7 +1916,24 @@
             커뮤니티도매시장위치정밀도Codes.도시중심점 => "보고 도시 중심점 · 단일 시설 아님",
             TraditionalMarketMapLocationPrecisionCodes.MarketAddressGeocoded => "시장 주소 지오코딩 · 입구 좌표 아님",
             TraditionalMarketMapLocationPrecisionCodes.MarketSiteRepresentative => "현장 확인 대표점 · 배송 주소 아님",
+            커뮤니티세계지도위치정밀도Codes.AdministrativeRegionRepresentative => "행정구역 대표점 · 실제 농장 위치 아님",
+            커뮤니티세계지도위치정밀도Codes.CountryRepresentative => "전국 집계 표시용 대표점",
+            커뮤니티세계지도위치정밀도Codes.OfficialPoint => "공식 공개 지점 좌표",
             _ => "공개 자료 대표 위치"
+        };
+
+    private static string MetricValueLabel(커뮤니티세계지도MetricDto metric)
+        => metric.Value == decimal.Truncate(metric.Value)
+            ? $"{metric.Value:N0}{metric.Unit}"
+            : $"{metric.Value:N2}{metric.Unit}";
+
+    private static string DataFreshnessLabel(string? code)
+        => code switch
+        {
+            커뮤니티세계지도FreshnessCodes.Fresh => "최근 수집",
+            커뮤니티세계지도FreshnessCodes.Stale => "갱신 필요",
+            커뮤니티세계지도FreshnessCodes.Expired => "만료",
+            _ => "수집 시각 미확인"
         };
 
     private static string TraditionalMarketHubStatusLabel(string? code)
@@ -1566,7 +1948,15 @@
         => layerCode is 커뮤니티세계지도LayerCodes.RegionalCulture
             or 커뮤니티세계지도LayerCodes.WholesaleMarket
             or 커뮤니티세계지도LayerCodes.TraditionalMarketHub
-            or 커뮤니티세계지도LayerCodes.OverseasManufacturer;
+            or 커뮤니티세계지도LayerCodes.OverseasManufacturer
+            or 커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence
+            or 커뮤니티세계지도LayerCodes.TourismPublicEvidence;
+
+    private static bool IsPublicDataEvidenceLayer(string layerCode)
+        => layerCode is 커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence
+            or 커뮤니티세계지도LayerCodes.TourismPublicEvidence
+            or 커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence
+            or 커뮤니티세계지도LayerCodes.KosisStatisticalContext;
 
     private 커뮤니티세계지도ObservationDto? SelectedObservation
         => _selectedObservationId is null
@@ -1652,6 +2042,8 @@
                     $"{marker.Name}의 검증된 공개 거점 상태입니다. 확인·동의 전 후보를 실제 거점이나 계약으로 취급하지 않습니다.",
                 커뮤니티세계지도LayerCodes.OverseasManufacturer =>
                     $"{marker.Name}의 식약처 해외제조업소 근거를 행정권역 대표점에 집계했습니다. 개별 공장 좌표나 현재 거래 가능 업체 목록이 아닙니다.",
+                커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence =>
+                    $"{marker.Name}의 경기데이터드림 인허가 원문을 시군 대표점에 집계했습니다. 실제 농장·축사 위치나 현재 공급 가능 업체 목록이 아닙니다.",
                 커뮤니티세계지도LayerCodes.PublicPrice =>
                     $"{marker.Name}의 가격·시장 공개 관측입니다. 출처별 원 통화·거래단위·기준일을 함께 확인하세요.",
                 _ => $"{marker.Name}의 공개 지역 자료입니다. 대표 위치는 개인 또는 사업장의 정밀 위치가 아닙니다."
@@ -1671,6 +2063,8 @@
             커뮤니티세계지도LayerCodes.TraditionalMarketHub => TraditionalMarketHubStatusLabel(observation.MarkerStatusCode),
             커뮤니티세계지도LayerCodes.OverseasManufacturer =>
                 $"공식 코드 확인 · {(observation.OrganizationCount ?? 0):N0}개 업소",
+            커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence =>
+                $"공식 원문 집계 · {(observation.Metrics?.FirstOrDefault(metric => metric.Code == "total")?.Value ?? 0):N0}건",
             _ => observation.EvidenceStatusCode switch
             {
                 커뮤니티세계지도EvidenceStatusCodes.OfficialSourceLinked => "공식 출처 연결",
