@@ -20,6 +20,14 @@ namespace Ssalddel.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .OldAnnotation("MySql:CharSet", "utf8mb4");
 
+            // Older projections could be created before a source request was
+            // linked. Empty request IDs must not make the new uniqueness
+            // boundary reject otherwise independent historical projections.
+            migrationBuilder.Sql(@"
+UPDATE `운송실행투영`
+SET `request_id` = CONCAT('legacy-unlinked-transport-', `id`)
+WHERE TRIM(`request_id`) = '';");
+
             migrationBuilder.CreateIndex(
                 name: "ux_운송실행투영_request_id",
                 table: "운송실행투영",
