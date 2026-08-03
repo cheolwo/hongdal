@@ -66,6 +66,12 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
     public DbSet<국내농산물경락가격관측> DomesticAuctionPriceObservations =>
         Set<국내농산물경락가격관측>();
 
+    public DbSet<Mof어획구역Catalog수집Run> MofFishingAreaCollectionRuns =>
+        Set<Mof어획구역Catalog수집Run>();
+
+    public DbSet<Mof어획구역Catalog영속Snapshot> MofFishingAreaSnapshots =>
+        Set<Mof어획구역Catalog영속Snapshot>();
+
     public DbSet<OfficialFoodRecipeSource> OfficialFoodRecipeSources => Set<OfficialFoodRecipeSource>();
 
     public DbSet<OfficialFoodDish> OfficialFoodDishes => Set<OfficialFoodDish>();
@@ -125,6 +131,8 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new 농수산물포장Fcl분석SnapshotConfiguration());
         modelBuilder.ApplyConfiguration(new 국내농산물경락가격수집RunConfiguration());
         modelBuilder.ApplyConfiguration(new 국내농산물경락가격관측Configuration());
+        modelBuilder.ApplyConfiguration(new Mof어획구역Catalog수집RunConfiguration());
+        modelBuilder.ApplyConfiguration(new Mof어획구역Catalog영속SnapshotConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeSourceConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodDishConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeVariantConfiguration());

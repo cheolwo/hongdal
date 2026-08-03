@@ -295,6 +295,10 @@ public sealed class MofFishingAreaCatalogOptions
     public string DatasetVersion { get; set; } = "20211230";
 
     public int CacheHours { get; set; } = 24;
+
+    public bool PersistenceEnabled { get; set; }
+
+    public bool CollectAtStartup { get; set; }
 }
 
 public sealed class MfdsCookRecipeOptions

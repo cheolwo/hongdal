@@ -1,5 +1,6 @@
 using System.Net;
 using Ssalddel.Services.AgriculturalFisheries.Information;
+using Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 using Ssalddel.Services.AgriculturalFisheries.ImportReadiness;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.FoodCulture;
@@ -79,6 +80,9 @@ public static partial class ServiceCollectionExtensions
             serviceProvider.GetRequiredService<Mof어획구역CatalogSource>());
         services.AddScoped<I해양수산Map바다Tile조회UseCase,
             해양수산Map바다Tile조회UseCase>();
+        services.AddScoped<IMof어획구역CatalogArchiveService,
+            Mof어획구역CatalogArchiveService>();
+        services.AddHostedService<Mof어획구역CatalogCollectionHostedService>();
         services
             .AddHttpClient<UsdaNassQuickStats가격공급자>(
                 (serviceProvider, client) =>
