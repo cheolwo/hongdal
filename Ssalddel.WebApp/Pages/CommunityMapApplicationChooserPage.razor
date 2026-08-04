@@ -1,0 +1,90 @@
+@page "/community/map-application-chooser"
+@using Ssalddel.WebApp.Services
+@inject NavigationManager Navigation
+
+<main class="map-application-chooser">
+    <h1>지도 신청 업무 선택</h1>
+    <p>선택한 지도 위치에서 바로 시작할 업무를 고르세요.</p>
+
+    @if (HasMapContext)
+    {
+        <section class="map-application-chooser__info">
+            <h2>@(MarkerTitle ?? "지도 신청 대상")</h2>
+            <p>@($"{MarkerLayer} · {CountryCode}")</p>
+        </section>
+
+        <nav class="map-application-chooser__options" aria-label="지도 신청 업무 선택">
+            @foreach (var option in Options)
+            {
+                <a href="@option.Href" class="map-application-chooser__option" aria-label="@option.Label">
+                    <strong>@option.Label</strong>
+                    <small>@option.Description</small>
+                </a>
+            }
+        </nav>
+
+        <a href="@ReturnPath" class="map-application-chooser__back">지도 화면으로 돌아가기</a>
+    }
+    else
+    {
+        <p>지도 대상 정보가 없어 선택 화면을 열지 못했습니다.</p>
+        <a href="@CommunityMapApplicationRoutes.ReturnPath">지도 화면으로 돌아가기</a>
+    }
+</main>
+
+@code {
+    [SupplyParameterFromQuery(Name = "sourceMarkerId")]
+    public string? SourceMarkerId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "markerTitle")]
+    public string? MarkerTitle { get; set; }
+
+    [SupplyParameterFromQuery(Name = "markerLayer")]
+    public string? MarkerLayer { get; set; }
+
+    [SupplyParameterFromQuery(Name = "country")]
+    public string? CountryCode { get; set; }
+
+    [SupplyParameterFromQuery(Name = "action")]
+    public string? Action { get; set; }
+
+    [SupplyParameterFromQuery(Name = "returnTo")]
+    public string? ReturnTo { get; set; }
+
+    [SupplyParameterFromQuery(Name = "source")]
+    public string? Source { get; set; }
+
+    private IReadOnlyList<CommunityMapApplicationOption> Options
+        => HasMapContext && string.Equals(Source, CommunityMapApplicationRoutes.SourceCode, StringComparison.OrdinalIgnoreCase)
+            ? CommunityMapApplicationRoutes.ForMarker(
+                SourceMarkerId ?? string.Empty,
+                MarkerTitle ?? string.Empty,
+                MarkerLayer ?? string.Empty,
+                CountryCode ?? string.Empty)
+            : [];
+
+    private bool HasMapContext
+        => string.Equals(Source, CommunityMapApplicationRoutes.SourceCode, StringComparison.OrdinalIgnoreCase)
+           && !string.IsNullOrWhiteSpace(SourceMarkerId);
+
+    private string ReturnPath
+        => !string.IsNullOrWhiteSpace(ReturnTo)
+            ? ReturnTo
+            : CommunityMapApplicationRoutes.ReturnPath;
+
+    protected override void OnParametersSet()
+    {
+        if (!HasMapContext || string.IsNullOrWhiteSpace(Action))
+        {
+            return;
+        }
+
+        var target = Options.FirstOrDefault(option => string.Equals(option.Code, Action, StringComparison.OrdinalIgnoreCase));
+        if (target is null)
+        {
+            return;
+        }
+
+        Navigation.NavigateTo(target.Href, replace: true);
+    }
+}

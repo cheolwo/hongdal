@@ -128,11 +128,11 @@ else
         return attempt.Succeeded;
     }
 
-    private async Task LinkSubmittedLedgerAsync(string sourceType, string sourceId)
+    private async Task<string?> LinkSubmittedLedgerAsync(string sourceType, string sourceId)
     {
         if (!RequiresMapPrivacyConsent || _provisionalLedger is null)
         {
-            return;
+            return null;
         }
 
         var attempt = await MapApplicationLedgerClient.TryMarkSubmittedAsync(
@@ -149,6 +149,13 @@ else
         _ledgerError = attempt.Error is null
             ? null
             : $"운송 의뢰는 저장됐지만 원장 연결이 보류되었습니다. 의뢰를 다시 제출하지 말고 원장 연결을 재시도해 주세요. {attempt.Error}";
+        return attempt.Succeeded && _provisionalLedger is not null
+            ? CommunityMapApplicationRoutes.ReturnToMarker(
+                RouteContext.SourceMarkerId ?? string.Empty,
+                RouteContext.NodeKind ?? string.Empty,
+                RouteContext.CountryCode ?? string.Empty,
+                _provisionalLedger.원장Id)
+            : null;
     }
 
     private Task AcceptPrivacyAsync(신청개인정보동의증적Response evidence)

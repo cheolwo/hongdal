@@ -10,6 +10,7 @@ public static class CommunityWorldMapDeepLink
     public const string ObservationQueryKey = CommunityWorldMapNavigationQueryNames.Observation;
     public const string SnapshotRevisionQueryKey = CommunityWorldMapNavigationQueryNames.SnapshotRevision;
     public const string SourceVersionQueryKey = CommunityWorldMapNavigationQueryNames.SourceVersion;
+    public const string LedgerQueryKey = CommunityWorldMapNavigationQueryNames.Ledger;
     public const string NoLayersValue = "none";
     public const string SourceVersionMatched = "source-version-matched";
     public const string SourceVersionMatchedSnapshotUpdated =

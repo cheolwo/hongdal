@@ -17,6 +17,38 @@ public sealed class CommunityMapApplicationLedgerClient(
 {
     private const string Path = "api/v1/community/map-applications/provisional-ledger";
 
+    public async Task<IReadOnlyList<지도신청가원장Response>> FindByMapMarkerAsync(
+        string markerId,
+        string? ledgerId = null,
+        CancellationToken cancellationToken = default)
+    {
+        await authSession.RestoreAsync(cancellationToken);
+        if (!authSession.IsLoggedIn || string.IsNullOrWhiteSpace(authSession.AccessToken))
+        {
+            return [];
+        }
+
+        var query = $"markerId={Uri.EscapeDataString(markerId)}";
+        if (!string.IsNullOrWhiteSpace(ledgerId))
+        {
+            query += $"&ledgerId={Uri.EscapeDataString(ledgerId)}";
+        }
+
+        using var message = new HttpRequestMessage(HttpMethod.Get, $"{Path}/by-map-marker?{query}");
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authSession.AccessToken);
+        using var response = await httpClient.SendAsync(message, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
+                ? $"지도 마커의 내 원장을 조회하지 못했습니다. HTTP {(int)response.StatusCode}"
+                : $"지도 마커의 내 원장을 조회하지 못했습니다. HTTP {(int)response.StatusCode}: {body}");
+        }
+
+        return await response.Content.ReadFromJsonAsync<지도신청가원장Response[]>(cancellationToken)
+               ?? [];
+    }
+
     public async Task<지도신청가원장Response?> FindByOperationalSourceAsync(
         string workCode,
         string operationalSourceType,
@@ -109,7 +141,15 @@ public sealed class CommunityMapApplicationLedgerClient(
     {
         try
         {
-            return new(await MarkSubmittedAsync(ledgerId, request, cancellationToken), null);
+            await MarkSubmittedAsync(ledgerId, request, cancellationToken);
+            var refreshed = await FindByOperationalSourceAsync(
+                request.업무Code,
+                request.운영원본종류,
+                request.운영원본Id,
+                cancellationToken);
+            return refreshed is null
+                ? new(null, "원장 제출은 반영됐지만 최신 원장을 다시 조회하지 못했습니다.")
+                : new(refreshed, null);
         }
         catch (Exception ex)
         {

@@ -1,4 +1,5 @@
 const instances = new Map();
+const applicationInteractionInstances = new Map();
 let googleMapsLoadPromise;
 let transportSimulationModulePromise;
 
@@ -81,8 +82,15 @@ export async function initialize(
             selectedMarkerId,
             datasetCode,
             clickListener: map.data.addListener("click", event => {
-                const countryCode = event.feature.getProperty("code");
                 const markerId = event.feature.getProperty("markerId");
+                if (instance.suppressClickMarkerId === markerId) {
+                    globalThis.clearTimeout(instance.suppressClickTimer);
+                    instance.suppressClickMarkerId = undefined;
+                    instance.suppressClickTimer = undefined;
+                    return;
+                }
+
+                const countryCode = event.feature.getProperty("code");
                 if (countryCode && markerId && instance.dotNetReference) {
                     instance.dotNetReference.invokeMethodAsync("SelectMapFeatureFromGoogleMap", countryCode, markerId);
                 }
@@ -110,6 +118,43 @@ export async function initialize(
                 clientX,
                 clientY);
         });
+        const cancelLongPress = () => {
+            globalThis.clearTimeout(instance.longPressTimer);
+            instance.longPressTimer = undefined;
+        };
+        instance.longPressStartListener = map.data.addListener("mousedown", event => {
+            cancelLongPress();
+            const countryCode = event.feature.getProperty("code");
+            const markerId = event.feature.getProperty("markerId");
+            if (!countryCode || !markerId || !instance.dotNetReference) {
+                return;
+            }
+
+            instance.longPressTimer = globalThis.setTimeout(() => {
+                instance.longPressTimer = undefined;
+                instance.suppressClickMarkerId = markerId;
+                globalThis.clearTimeout(instance.suppressClickTimer);
+                instance.suppressClickTimer = globalThis.setTimeout(() => {
+                    instance.suppressClickMarkerId = undefined;
+                    instance.suppressClickTimer = undefined;
+                }, 1000);
+                const clientX = Number.isFinite(event.domEvent?.clientX)
+                    ? event.domEvent.clientX
+                    : globalThis.innerWidth / 2;
+                const clientY = Number.isFinite(event.domEvent?.clientY)
+                    ? event.domEvent.clientY
+                    : globalThis.innerHeight / 2;
+                instance.dotNetReference.invokeMethodAsync(
+                    "OpenMapApplicationsFromGoogleMap",
+                    countryCode,
+                    markerId,
+                    clientX,
+                    clientY);
+            }, 650);
+        });
+        instance.longPressEndListener = map.data.addListener("mouseup", cancelLongPress);
+        instance.longPressOutListener = map.data.addListener("mouseout", cancelLongPress);
+        instance.dragStartListener = map.addListener("dragstart", cancelLongPress);
 
         instances.set(elementId, instance);
         updateDataset(elementId, markers, datasetCode, selectedCode, selectedMarkerId, false);
@@ -201,6 +246,106 @@ export function focusElement(elementId) {
     });
 }
 
+export function enableApplicationInteractions(elementId, dotNetReference) {
+    disableApplicationInteractions(elementId);
+    const element = document.getElementById(elementId);
+    if (!element) {
+        return;
+    }
+
+    const interaction = {
+        element,
+        dotNetReference,
+        longPressTimer: undefined,
+        longPressTarget: undefined,
+        suppressClickTarget: undefined
+    };
+
+    interaction.keydown = event => {
+        const isApplicationMenuKey = (event.shiftKey && event.key === "F10")
+            || event.key === "ContextMenu";
+        if (!isApplicationMenuKey) {
+            return;
+        }
+
+        event.preventDefault();
+        const markerElement = event.target?.closest?.("[data-map-application-marker-id]");
+        const rect = markerElement?.getBoundingClientRect?.() ?? event.target?.getBoundingClientRect?.();
+        const clientX = rect ? rect.left + rect.width / 2 : globalThis.innerWidth / 2;
+        const clientY = rect ? rect.top + rect.height / 2 : globalThis.innerHeight / 2;
+        if (markerElement?.dataset.mapApplicationMarkerId && markerElement?.dataset.mapApplicationCountryCode) {
+            // The fallback marker's Blazor key handler owns the invocation.
+            // This capture listener only suppresses the browser context menu.
+            return;
+        }
+
+        dotNetReference.invokeMethodAsync("OpenSelectedMapApplicationsFromKeyboard", clientX, clientY);
+    };
+    interaction.pointerdown = event => {
+        const markerElement = event.target?.closest?.("[data-map-application-marker-id]");
+        if (!markerElement || event.pointerType === "mouse") {
+            return;
+        }
+
+        globalThis.clearTimeout(interaction.longPressTimer);
+        interaction.longPressTarget = markerElement;
+        interaction.longPressTimer = globalThis.setTimeout(() => {
+            interaction.longPressTimer = undefined;
+            interaction.suppressClickTarget = markerElement;
+            globalThis.clearTimeout(interaction.suppressClickTimer);
+            interaction.suppressClickTimer = globalThis.setTimeout(() => {
+                interaction.suppressClickTarget = undefined;
+                interaction.suppressClickTimer = undefined;
+            }, 1000);
+            const rect = markerElement.getBoundingClientRect();
+            dotNetReference.invokeMethodAsync(
+                "OpenMapApplicationsFromGoogleMap",
+                markerElement.dataset.mapApplicationCountryCode,
+                markerElement.dataset.mapApplicationMarkerId,
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2);
+        }, 650);
+    };
+    interaction.cancelLongPress = () => {
+        globalThis.clearTimeout(interaction.longPressTimer);
+        interaction.longPressTimer = undefined;
+        interaction.longPressTarget = undefined;
+    };
+    interaction.click = event => {
+        const markerElement = event.target?.closest?.("[data-map-application-marker-id]");
+        if (markerElement && markerElement === interaction.suppressClickTarget) {
+            event.preventDefault();
+            event.stopPropagation();
+            interaction.suppressClickTarget = undefined;
+        }
+    };
+
+    element.addEventListener("keydown", interaction.keydown);
+    element.addEventListener("pointerdown", interaction.pointerdown);
+    element.addEventListener("pointerup", interaction.cancelLongPress);
+    element.addEventListener("pointercancel", interaction.cancelLongPress);
+    element.addEventListener("pointermove", interaction.cancelLongPress);
+    element.addEventListener("click", interaction.click, true);
+    applicationInteractionInstances.set(elementId, interaction);
+}
+
+export function disableApplicationInteractions(elementId) {
+    const interaction = applicationInteractionInstances.get(elementId);
+    if (!interaction) {
+        return;
+    }
+
+    globalThis.clearTimeout(interaction.longPressTimer);
+    globalThis.clearTimeout(interaction.suppressClickTimer);
+    interaction.element.removeEventListener("keydown", interaction.keydown);
+    interaction.element.removeEventListener("pointerdown", interaction.pointerdown);
+    interaction.element.removeEventListener("pointerup", interaction.cancelLongPress);
+    interaction.element.removeEventListener("pointercancel", interaction.cancelLongPress);
+    interaction.element.removeEventListener("pointermove", interaction.cancelLongPress);
+    interaction.element.removeEventListener("click", interaction.click, true);
+    applicationInteractionInstances.delete(elementId);
+}
+
 export function dispose(elementId) {
     const instance = instances.get(elementId);
     if (!instance) {
@@ -211,6 +356,12 @@ export function dispose(elementId) {
         instance.clickListener.remove();
     }
     instance.contextMenuListener?.remove();
+    globalThis.clearTimeout(instance.longPressTimer);
+    globalThis.clearTimeout(instance.suppressClickTimer);
+    instance.longPressStartListener?.remove();
+    instance.longPressEndListener?.remove();
+    instance.longPressOutListener?.remove();
+    instance.dragStartListener?.remove();
     instance.transportSimulationLayer?.dispose();
     google.maps.event.clearInstanceListeners(instance.map);
     instances.delete(elementId);

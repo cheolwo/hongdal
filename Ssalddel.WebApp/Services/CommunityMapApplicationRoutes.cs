@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Inbound;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Mart;
 using Ssalddel.Contracts.Shipper.Request;
 
@@ -23,6 +24,7 @@ public sealed record CommunityMapApplicationOption(
 /// </summary>
 public static class CommunityMapApplicationRoutes
 {
+    public const string ChooserPageRoute = "/community/map-application-chooser";
     public const string SourceCode = "community-map";
     public const string ReturnPath = "/community/home";
 
@@ -41,6 +43,45 @@ public static class CommunityMapApplicationRoutes
         }
 
         return string.Equals(source, SourceCode, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static string BuildChooserPath(
+        string markerId,
+        string markerName,
+        string layerCode,
+        string countryCode,
+        string? action = null,
+        string? returnTo = null)
+    {
+        var context = new MarkerContext(
+            Normalize(markerId, 160, nameof(markerId)),
+            Normalize(markerName, 160, nameof(markerName)),
+            Normalize(layerCode, 80, nameof(layerCode)),
+            Normalize(countryCode, 8, nameof(countryCode)).ToUpperInvariant());
+
+        var query = new List<(string Key, string Value)>
+        {
+            ("source", SourceCode),
+            ("sourceMarkerId", context.Id),
+            ("markerTitle", context.Name),
+            ("markerLayer", context.LayerCode),
+            ("country", context.CountryCode)
+        };
+
+        if (!string.IsNullOrWhiteSpace(action))
+        {
+            query.Add(("action", action));
+        }
+
+        if (!string.IsNullOrWhiteSpace(returnTo))
+        {
+            query.Add(("returnTo", returnTo));
+        }
+
+        var queryString = string.Join(
+            "&",
+            query.Select(item => $"{item.Key}={Uri.EscapeDataString(item.Value)}"));
+        return $"{ChooserPageRoute}?{queryString}";
     }
 
     public static IReadOnlyList<CommunityMapApplicationOption> ForMarker(
@@ -75,10 +116,23 @@ public static class CommunityMapApplicationRoutes
         ];
     }
 
+    public static string ReturnToMarker(
+        string markerId,
+        string layerCode,
+        string countryCode,
+        string? ledgerId = null)
+        => CommunityPageRoutes.WorldMapFor(
+            countryCode: Normalize(countryCode, 8, nameof(countryCode)).ToUpperInvariant(),
+            layerCodes: Normalize(layerCode, 80, nameof(layerCode)),
+            markerId: Normalize(markerId, 160, nameof(markerId)),
+            ledgerId: string.IsNullOrWhiteSpace(ledgerId)
+                ? null
+                : Normalize(ledgerId, 200, nameof(ledgerId)));
+
     private static string BuildLogisticsProxyPath(MarkerContext marker)
         => new InboundRequestNavigationContext
         {
-            From = ReturnPath,
+            From = ReturnToMarker(marker.Id, marker.LayerCode, marker.CountryCode),
             Source = SourceCode,
             SourceMarkerId = marker.Id,
             NodeTitle = marker.Name,
@@ -95,14 +149,14 @@ public static class CommunityMapApplicationRoutes
             NodeTitle = marker.Name,
             NodeKind = marker.LayerCode,
             CountryCode = marker.CountryCode,
-            ReturnPath = ReturnPath
+            ReturnPath = ReturnToMarker(marker.Id, marker.LayerCode, marker.CountryCode)
         }.RootPath;
 
     private static string BuildIndividualOrderPath(MarkerContext marker)
     {
         var values = new (string Key, string Value)[]
         {
-            ("from", ReturnPath),
+            ("from", ReturnToMarker(marker.Id, marker.LayerCode, marker.CountryCode)),
             ("source", SourceCode),
             ("sourceMarkerId", marker.Id),
             ("markerTitle", marker.Name),
@@ -130,7 +184,8 @@ public static class CommunityMapApplicationRoutes
     private static bool IsApplicationPath(string path)
     {
         var normalized = path.TrimEnd('/');
-        return string.Equals(normalized, InboundRequestPageRoutes.Create, StringComparison.OrdinalIgnoreCase)
+        return string.Equals(normalized, ChooserPageRoute, StringComparison.OrdinalIgnoreCase)
+               || string.Equals(normalized, InboundRequestPageRoutes.Create, StringComparison.OrdinalIgnoreCase)
                || normalized.StartsWith($"{InboundRequestPageRoutes.Root}/", StringComparison.OrdinalIgnoreCase)
                || string.Equals(normalized, ShipperRequestPageRoutes.Root, StringComparison.OrdinalIgnoreCase)
                || normalized.StartsWith($"{ShipperRequestPageRoutes.Root}/", StringComparison.OrdinalIgnoreCase)

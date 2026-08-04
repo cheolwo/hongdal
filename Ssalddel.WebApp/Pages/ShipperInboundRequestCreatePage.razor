@@ -69,7 +69,17 @@ else
         var inboundId = await ViewModel.CreateInboundAsync();
         if (inboundId is > 0)
         {
-            await LinkSubmittedLedgerAsync("WarehouseInboundRequest", inboundId.Value.ToString());
+            var linked = await LinkSubmittedLedgerAsync("WarehouseInboundRequest", inboundId.Value.ToString());
+            if (linked && _provisionalLedger is not null)
+            {
+                Navigation.NavigateTo(CommunityMapApplicationRoutes.ReturnToMarker(
+                    Context.SourceMarkerId ?? string.Empty,
+                    Context.NodeGroup ?? string.Empty,
+                    Context.Scope ?? string.Empty,
+                    _provisionalLedger.원장Id));
+                return;
+            }
+
             Navigation.NavigateTo((Context with { Created = true }).PathFor(InboundRequestScreenKind.Detail, inboundId));
         }
     }
@@ -98,11 +108,11 @@ else
         return attempt.Succeeded;
     }
 
-    private async Task LinkSubmittedLedgerAsync(string sourceType, string sourceId)
+    private async Task<bool> LinkSubmittedLedgerAsync(string sourceType, string sourceId)
     {
         if (!RequiresMapPrivacyConsent || _provisionalLedger is null)
         {
-            return;
+            return false;
         }
 
         var attempt = await MapApplicationLedgerClient.TryMarkSubmittedAsync(
@@ -119,6 +129,7 @@ else
         _ledgerError = attempt.Error is null
             ? null
             : $"입고 신청은 저장됐지만 원장 연결이 보류되었습니다. 신청을 다시 제출하지 말고 원장 연결을 재시도해 주세요. {attempt.Error}";
+        return attempt.Succeeded;
     }
 
     private Task AcceptPrivacyAsync(신청개인정보동의증적Response evidence)

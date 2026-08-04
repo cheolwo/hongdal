@@ -123,9 +123,14 @@ else if (_ledger is not null)
         try
         {
             await ConsentClient.WithdrawAsync(_ledger.신청개인정보동의증적Id, _reason);
-            _ledger = await LedgerClient.MarkConsentWithdrawnAsync(
+            await LedgerClient.MarkConsentWithdrawnAsync(
                 _ledger.원장Id,
                 _ledger.신청개인정보동의증적Id);
+            _ledger = await LedgerClient.FindByOperationalSourceAsync(
+                WorkCode,
+                OperationalSourceType,
+                OperationalSourceId)
+                ?? throw new InvalidOperationException("동의 철회 후 최신 원장을 다시 조회하지 못했습니다.");
             _actionSeverity = Severity.Success;
             _actionMessage = Ui(
                 "개인정보 동의를 철회하고 원장을 보류했습니다. 운영 신청은 자동 취소하지 않았습니다.",

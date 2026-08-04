@@ -200,7 +200,7 @@ public sealed class ShipperRequestAuthoringPageViewModel
     public Task SubmitAsync()
         => SubmitAsync(null);
 
-    public async Task SubmitAsync(Func<string, Task>? afterCreated)
+    public async Task SubmitAsync(Func<string, Task<string?>>? afterCreated)
     {
         await SaveAsync();
         if (RegistrationEnabled != true)
@@ -234,7 +234,12 @@ public sealed class ShipperRequestAuthoringPageViewModel
             StatusMessage = $"서버 운송 의뢰를 등록했습니다. 의뢰 ID: {created.의뢰Id}";
             if (afterCreated is not null)
             {
-                await afterCreated(created.의뢰Id);
+                var returnPath = await afterCreated(created.의뢰Id);
+                if (!string.IsNullOrWhiteSpace(returnPath))
+                {
+                    _navigation.NavigateTo(returnPath);
+                    return;
+                }
             }
             var detailPath = ShipperRoutes.CreatedRequestDetailFor(created.의뢰Id);
             if (string.Equals(

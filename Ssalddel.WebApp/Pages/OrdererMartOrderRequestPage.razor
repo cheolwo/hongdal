@@ -116,7 +116,16 @@ else
     {
         if (requestId.HasValue)
         {
-            await LinkSubmittedLedgerAsync("MartOrderRequest", requestId.Value.ToString("D"));
+            var linked = await LinkSubmittedLedgerAsync("MartOrderRequest", requestId.Value.ToString("D"));
+            if (linked && _provisionalLedger is not null)
+            {
+                Navigation.NavigateTo(CommunityMapApplicationRoutes.ReturnToMarker(
+                    SourceMarkerId ?? string.Empty,
+                    MarkerLayer ?? string.Empty,
+                    CountryCode ?? string.Empty,
+                    _provisionalLedger.원장Id));
+                return;
+            }
         }
 
         var target = EffectiveProductId is > 0
@@ -166,11 +175,11 @@ else
         return attempt.Succeeded;
     }
 
-    private async Task LinkSubmittedLedgerAsync(string sourceType, string sourceId)
+    private async Task<bool> LinkSubmittedLedgerAsync(string sourceType, string sourceId)
     {
         if (!RequiresMapPrivacyConsent || _provisionalLedger is null)
         {
-            return;
+            return false;
         }
 
         var attempt = await MapApplicationLedgerClient.TryMarkSubmittedAsync(
@@ -187,5 +196,6 @@ else
         _ledgerError = attempt.Error is null
             ? null
             : $"주문 요청은 저장됐지만 원장 연결이 보류되었습니다. 요청을 다시 제출하지 말고 원장 연결을 재시도해 주세요. {attempt.Error}";
+        return attempt.Succeeded;
     }
 }

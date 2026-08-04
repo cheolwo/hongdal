@@ -140,10 +140,15 @@ else if (_ledger is not null)
         {
             if (IsTransportReview)
             {
-                _ledger = await LedgerClient.RequestTransportCancellationReviewAsync(
+                await LedgerClient.RequestTransportCancellationReviewAsync(
                     _ledger.원장Id,
                     OperationalSourceId,
                     _reason);
+                _ledger = await LedgerClient.FindByOperationalSourceAsync(
+                    WorkCode,
+                    OperationalSourceType,
+                    OperationalSourceId)
+                    ?? throw new InvalidOperationException("취소 검토 요청 후 최신 원장을 다시 조회하지 못했습니다.");
                 _severity = Severity.Success;
                 _message = Ui(
                     "운송 의뢰를 삭제하지 않고 관리자 취소·환불 검토를 요청했습니다.",
@@ -159,10 +164,15 @@ else if (_ledger is not null)
                 return;
             }
 
-            _ledger = await LedgerClient.MarkOperationalCancelledAsync(
+            await LedgerClient.MarkOperationalCancelledAsync(
                 _ledger.원장Id,
                 OperationalSourceType,
                 OperationalSourceId);
+            _ledger = await LedgerClient.FindByOperationalSourceAsync(
+                WorkCode,
+                OperationalSourceType,
+                OperationalSourceId)
+                ?? throw new InvalidOperationException("운영 신청 취소 후 최신 원장을 다시 조회하지 못했습니다.");
             _severity = Severity.Success;
             _message = Ui(
                 "운영 신청을 취소하고 원장을 닫았습니다.",

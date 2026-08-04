@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using Ssalddel.Contracts.Common.Platform;
 
 namespace Ssalddel.WebApp.Services;
@@ -38,6 +39,14 @@ public sealed class GoogleMapsBrowserRuntimeClient(HttpClient httpClient)
             return null;
         }
         catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+        catch (NotSupportedException)
         {
             return null;
         }
