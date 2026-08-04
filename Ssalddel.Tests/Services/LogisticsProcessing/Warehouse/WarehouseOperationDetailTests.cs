@@ -22,6 +22,33 @@ namespace Ssalddel.Tests.Services.LogisticsProcessing.Warehouse;
 public sealed class WarehouseOperationDetailTests
 {
     [Fact]
+    public async Task 입고취소는_같은요청을재시도해도_취소상태를유지한다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        db.입고요청.Add(new 입고요청
+        {
+            Id = 42,
+            창고Id = 7,
+            주문자UserId = "orderer-1",
+            판매자UserId = "seller-1",
+            공급처코드 = "SUP-02",
+            공급처명 = "취소 대상 공급사",
+            상태 = 입고상태코드.예정
+        });
+        await db.SaveChangesAsync();
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            null!);
+
+        await service.CancelInboundAsync(42, default);
+        await service.CancelInboundAsync(42, default);
+
+        Assert.Equal(입고상태코드.취소, (await db.입고요청.SingleAsync(x => x.Id == 42)).상태);
+    }
+
+    [Fact]
     public async Task 입고상세는_접근가능한같은Id와예정상품을투영한다()
     {
         await using var db = CreateContext();

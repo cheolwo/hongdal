@@ -554,6 +554,10 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         var entity = await 접근가능입고Query(userId)
             .FirstOrDefaultAsync(x => x.Id == inboundId, cancellationToken)
             ?? throw new InvalidOperationException("입고요청을 찾을 수 없거나 접근할 수 없습니다.");
+        if (entity.상태 == 입고상태.취소)
+        {
+            return;
+        }
         if (entity.상태 != 입고상태.예정)
         {
             throw new InvalidOperationException("입고 예정 상태에서만 입고요청을 취소할 수 있습니다.");
