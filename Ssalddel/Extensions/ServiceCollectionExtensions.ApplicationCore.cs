@@ -29,6 +29,7 @@ using Ssalddel.Security;
 using Ssalddel.Application.Operations;
 using Ssalddel.Services.HumanResources;
 using Ssalddel.Services.Community;
+using Ssalddel.Services.Privacy;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Services.Content;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
@@ -146,6 +147,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I해외제조업소MapMarkerReader, 해외제조업소MapMarkerReader>();
         services.AddScoped<I지역문화이미지MapMarkerReader, 지역문화이미지MapMarkerReader>();
         services.AddScoped<I커뮤니티세계지도조회UseCase, 커뮤니티세계지도조회UseCase>();
+        services.AddScoped<I커뮤니티세계지도뉴스후보UseCase, 커뮤니티세계지도뉴스후보UseCase>();
+        services.AddScoped<I커뮤니티세계지도질문UseCase, 커뮤니티세계지도질문UseCase>();
         services.AddScoped<I노드스티커상점UseCase, 노드스티커상점UseCase>();
         services.AddScoped<I커뮤니티활동상세구매ProcessManager, 커뮤니티활동상세구매ProcessManager>();
         services.AddScoped<I커뮤니티활동유료상세UseCase, 커뮤니티활동유료상세UseCase>();
@@ -174,6 +177,10 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IWorkRelationshipSnapshotService, WorkRelationshipSnapshotService>();
         services.AddScoped<ICommunityActivitySignalService, CommunityActivitySignalService>();
         services.AddSingleton<ICommunityVoteStore, MongoCommunityVoteStore>();
+        services.AddSingleton<I공식뉴스검토원장Store, Mongo공식뉴스검토원장Store>();
+        services.AddScoped<I공식뉴스검토원장Service, 공식뉴스검토원장Service>();
+        services.AddSingleton<I신청개인정보동의증적Store, Mongo신청개인정보동의증적Store>();
+        services.AddScoped<I신청개인정보동의증적Service, 신청개인정보동의증적Service>();
         services.AddSingleton<I공동구매원장캠페인Store, CommunityVote공동구매원장캠페인Store>();
         services.AddScoped<I공동구매원장절차Service, 공동구매원장절차Service>();
         services.AddScoped<I같이수입원장전환Service, 같이수입원장전환Service>();

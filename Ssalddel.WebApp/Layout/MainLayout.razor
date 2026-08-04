@@ -4,6 +4,26 @@
 @inject WebLocalePreferenceService Locale
 @inject NavigationManager Navigation
 
+@if (IsMapApplicationStandalone)
+{
+    <div class="map-application-standalone">
+        <main class="map-application-standalone__main">
+            @if (_sessionInitialized)
+            {
+                @Body
+            }
+            else
+            {
+                <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8" aria-live="polite">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">로그인 상태를 확인하는 중입니다.</MudText>
+                </MudStack>
+            }
+        </main>
+    </div>
+}
+else
+{
 <MudLayout Class="@CurrentTheme.ShellClass">
     <MudAppBar Elevation="1" Color="Color.Default" Dense="true" Class="web-appbar">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Color="Color.Inherit" OnClick="ToggleDrawer" />
@@ -58,11 +78,14 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+}
 
 @code {
     private bool _drawerOpen = true;
     private bool _sessionInitialized;
     private WebRoleTheme CurrentTheme => AuthSession.CurrentTheme;
+    private bool IsMapApplicationStandalone
+        => CommunityMapApplicationRoutes.UsesStandaloneApplicationLayout(Navigation.Uri);
     private string LoginHref
     {
         get
@@ -138,7 +161,11 @@
         => _ = InvokeAsync(StateHasChanged);
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
-        => _ = InvokeAsync(() => Locale.InitializeAsync());
+        => _ = InvokeAsync(async () =>
+        {
+            await Locale.InitializeAsync();
+            StateHasChanged();
+        });
 
     public void Dispose()
     {

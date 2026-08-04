@@ -88,6 +88,28 @@ export async function initialize(
                 }
             })
         };
+        instance.contextMenuListener = map.data.addListener("contextmenu", event => {
+            const countryCode = event.feature.getProperty("code");
+            const markerId = event.feature.getProperty("markerId");
+            if (!countryCode || !markerId || !instance.dotNetReference) {
+                return;
+            }
+
+            event.domEvent?.preventDefault?.();
+            event.stop?.();
+            const clientX = Number.isFinite(event.domEvent?.clientX)
+                ? event.domEvent.clientX
+                : globalThis.innerWidth / 2;
+            const clientY = Number.isFinite(event.domEvent?.clientY)
+                ? event.domEvent.clientY
+                : globalThis.innerHeight / 2;
+            instance.dotNetReference.invokeMethodAsync(
+                "OpenMapApplicationsFromGoogleMap",
+                countryCode,
+                markerId,
+                clientX,
+                clientY);
+        });
 
         instances.set(elementId, instance);
         updateDataset(elementId, markers, datasetCode, selectedCode, selectedMarkerId, false);
@@ -188,6 +210,7 @@ export function dispose(elementId) {
     if (instance.clickListener) {
         instance.clickListener.remove();
     }
+    instance.contextMenuListener?.remove();
     instance.transportSimulationLayer?.dispose();
     google.maps.event.clearInstanceListeners(instance.map);
     instances.delete(elementId);
@@ -237,6 +260,8 @@ function markerStyleFor(layerCode, night) {
             return { color: "#d05c42", path: "M -10,-7 7,-7 10,-4 10,7 -10,7 z M -4,-7 -4,7", scale: .7, selectedScale: .94 };
         case "kosis-statistical-context":
             return { color: "#5d63b8", path: "M -10,8 -10,2 -5,2 -5,8 z M -3,8 -3,-4 2,-4 2,8 z M 4,8 4,-9 9,-9 9,8 z", scale: .72, selectedScale: .96 };
+        case "news-publisher":
+            return { color: "#334e68", path: "M -10,-8 10,-8 10,8 -10,8 z M -7,-4 0,-4 0,1 -7,1 z M 3,-4 7,-4 M 3,0 7,0 M -7,4 7,4", scale: .72, selectedScale: .96 };
         case "learning-channel":
             return { color: "#6750a4", path: google.maps.SymbolPath.CIRCLE, scale: 8, selectedScale: 11 };
         case "scripture-classics":

@@ -80,7 +80,6 @@ public sealed class CommunityWorldMapHomeCompositionTests
             "wwwroot",
             "js",
             "community-world-google-map.js");
-
         Assert.Contains("OverseasManufacturer = \"overseas-manufacturer\"", contractSource);
         Assert.Contains("행정권역 대표점", pageSource);
         Assert.Contains("재료 관계 근거", pageSource);
@@ -169,6 +168,34 @@ public sealed class CommunityWorldMapHomeCompositionTests
             "community-world-google-map.js"));
         Assert.Contains("RegionalCultureSpecialtyCatalog.ForCountry", source);
         Assert.Contains("지도는 자료를 찾기 위한 개략도", source);
+    }
+
+    [Fact]
+    public void 세계지도선택은_국가_레이어_마커_관측StableId를Url로복원한다()
+    {
+        var source = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var deepLink = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Services",
+            "CommunityWorldMapDeepLink.cs");
+
+        Assert.Contains("CommunityWorldMapDeepLink.CountryQueryKey", source);
+        Assert.Contains("CommunityWorldMapDeepLink.LayersQueryKey", source);
+        Assert.Contains("CommunityWorldMapDeepLink.MarkerQueryKey", source);
+        Assert.Contains("CommunityWorldMapDeepLink.ObservationQueryKey", source);
+        Assert.Contains("CommunityWorldMapDeepLink.SnapshotRevisionQueryKey", source);
+        Assert.Contains("CommunityWorldMapDeepLink.SourceVersionQueryKey", source);
+        Assert.Contains("ApplyDeepLinkParameters", source);
+        Assert.Contains("SyncDeepLinkToUrl", source);
+        Assert.Contains("Navigation.GetUriWithQueryParameters", source);
+        Assert.Contains("SyncDeepLinkToUrl(replace: true)", source);
+        Assert.Contains("public const string NoLayersValue = \"none\"", deepLink);
+        Assert.Contains("NormalizeStableId", deepLink);
+        Assert.Contains("EvidenceVersionNotice", source);
+        Assert.Contains("게시 이후 공개 근거 갱신", source);
     }
 
     [Fact]
@@ -611,6 +638,50 @@ public sealed class CommunityWorldMapHomeCompositionTests
     }
 
     [Fact]
+    public void 지도마커오른쪽클릭은_세신청화면으로_후보문맥만전달한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var scriptSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "wwwroot",
+            "js",
+            "community-world-google-map.js");
+        var routeSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Services",
+            "CommunityMapApplicationRoutes.cs");
+        var inboundSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "ShipperInboundRequestCreatePage.razor");
+        var transportSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "ShipperRequestPage.razor");
+        var orderSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "OrdererMartOrderRequestPage.razor");
+
+        Assert.Contains("@oncontextmenu:preventDefault", pageSource);
+        Assert.Contains("지도 마커 신청 업무 선택", pageSource);
+        Assert.Contains("MapApplicationOptions", pageSource);
+        Assert.Contains("물류대행 신청", routeSource);
+        Assert.Contains("운송대행 신청", routeSource);
+        Assert.Contains("개별 주문 신청", routeSource);
+        Assert.Contains("addListener(\"contextmenu\"", scriptSource);
+        Assert.DoesNotContain("addListener(\"rightclick\"", scriptSource);
+        Assert.Contains("OpenMapApplicationsFromGoogleMap", scriptSource);
+        Assert.Contains("CommunityMapApplicationRoutes.SourceCode", inboundSource);
+        Assert.Contains("CommunityMapApplicationRoutes.SourceCode", transportSource);
+        Assert.Contains("CommunityMapApplicationRoutes.SourceCode", orderSource);
+        Assert.Contains("비구속 주문 의향", orderSource);
+    }
+
+    [Fact]
     public void 세계지도관측Api는_개인위치나업무실행없이_안정Revision을제공한다()
     {
         var contractSource = ReadRepositoryFile(
@@ -630,6 +701,34 @@ public sealed class CommunityWorldMapHomeCompositionTests
         Assert.Contains("EvidenceAsOfUtc", contractSource);
         Assert.Contains("SHA256.HashData", useCaseSource);
         Assert.Contains("결제·주문·계약·배차를 실행하지 않습니다", useCaseSource);
+    }
+
+    [Fact]
+    public void 뉴스출처마커는_언론사Feed상태와_별도공식Rss후보를구분한다()
+    {
+        var pageSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityRoleHomePage.razor");
+        var clientSource = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Services",
+            "커뮤니티세계지도Client.cs");
+        var controllerSource = ReadRepositoryFile(
+            "Ssalddel",
+            "Controllers",
+            "Common",
+            "커뮤니티세계지도뉴스후보Controller.cs");
+
+        Assert.Contains("RSS REVIEW · 자동 게시 없음", pageSource);
+        Assert.Contains("이 뉴스 출처의 기사 수집 상태", pageSource);
+        Assert.Contains("같은 국가의 별도 공식뉴스 RSS 선택", pageSource);
+        Assert.Contains("외부 실패를 빈 기사 목록으로 숨기지 않습니다", pageSource);
+        Assert.Contains("뉴스후보조회Async", clientSource);
+        Assert.Contains("sourceKey", clientSource);
+        Assert.Contains("news-candidates", controllerSource);
+        Assert.Contains("SsalddelCodeEffect.PersistentRead", controllerSource);
+        Assert.Contains("운영 검토 원장에서 승인된 snapshot만 조회", controllerSource);
     }
 
     private static int CountOccurrences(string source, string value)

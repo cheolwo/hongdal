@@ -6,6 +6,19 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-08-04 | [공식뉴스 검토 결정 영속 원장](2026-08-04-official-news-review-ledger.md) | 간접 확인 — 공식뉴스 후보의 승인·제외 snapshot과 멱등 결정 이력을 MongoDB 원장에 저장하고, 공개 지도는 외부 RSS 대신 승인된 원장 projection만 조회 |
+| 2026-08-04 | [지도 뉴스 출처별 RSS 검토 후보 연결](2026-08-04-community-map-news-rss-candidates.md) | 간접 확인 — 언론사 자체 feed 지원 상태와 같은 국가의 별도 정부기관 RSS를 구분하고, 공개 지도에서는 사용자가 원천을 선택할 때 승인 원장 후보만 조회하며 자동 게시는 차단 |
+| 2026-08-04 | [지도 관측·게시글 근거 재조회 완결](2026-08-04-community-map-post-evidence-roundtrip.md) | 간접 확인 — 지도 관측의 stable ID·snapshot·source version을 질문 초안과 게시글에 영속하고, 게시글에서 정확한 지도 deep link로 돌아가 게시 당시와 현재 근거 version 차이를 확인 |
+| 2026-08-04 | [커뮤니티 지도 선택 stable deep link](2026-08-04-community-map-deep-link-state.md) | 직접 확인 — 국가·활성 레이어·마커·관측 stable ID를 URL에 기록하고 공유·새로고침·뒤로가기에서 같은 대한민국 지도 상세과 레이어 선택을 복원 |
+| 2026-08-04 | [선택 공공데이터 지도 snapshot 재시작 복원](2026-08-04-selected-public-data-map-persistent-snapshot.md) | 간접 확인 — 관광·온라인가격·KOSIS 마지막 성공본을 versioned JSON snapshot으로 원자 저장·재시작 복원하고 지도 상세 API와 화면에 source version을 표시; 로컬 Data Protection 키 불일치로 실제 렌더는 미확인 |
+| 2026-08-04 | [지도 신청 개인정보 동의 철회·운영 취소와 원장 보류](2026-08-04-map-application-consent-withdrawal.md) | 간접 확인 — 본인 원장 역조회와 법적 안내 상자, 동의 철회 보류, 입고·개별주문 명시 취소, 운송 취소 관리자 검토 대기·승인·거절을 연결하고 물리 삭제형 DELETE와 Operational 환불은 차단 |
+| 2026-08-04 | [지도 마커 출발 신청 단독 페이지](2026-08-04-community-map-application-standalone-page.md) | 직접 확인 — 지도 마커에서 시작한 물류대행·운송대행·개별 주문 신청만 상단·좌측 메뉴와 체험 바를 제거하고, 일반 직접 접근에는 기존 통합 메뉴를 유지 |
+| 2026-08-04 | [커뮤니티 관심 철회와 가원장 명시 동의](2026-08-04-community-provisional-ledger-consent.md) | 직접 확인 — 동일 계정 중복 집계를 막고 관심 철회 이력을 남기며, 서로 다른 참여자 2명과 세 필수 확인 뒤에만 비구속적 가원장을 생성하도록 연결 |
+| 2026-08-04 | [커뮤니티 게시글 상세 공개 근거 패널](2026-08-04-community-post-source-evidence-panel.md) | 직접 확인 — 지도 observation stable ID·snapshot·공식 원문·한계를 참여 패널보다 먼저 표시하고, 두 필수 확인을 거쳐야 비구속적 관심 모집을 시작하도록 보완 |
+| 2026-08-04 | [지도 출발 신청 개인정보 동의 관문](2026-08-04-map-application-privacy-consent.md) | 직접 확인 — 한국·영문 목적·항목·기간과 법적 안내를 제공하고, 영문판은 FTC Act·COPPA·조건부 CCPA/CPRA 참조 및 관할 판정이 아님을 명시한 뒤 필수 동의 후 신청 양식을 공개 |
+| 2026-08-04 | [지도 마커 오른쪽 클릭 신청 메뉴](2026-08-04-community-map-marker-application-menu.md) | 직접 확인 — 마커 오른쪽 클릭에서 물류대행·운송대행·개별 주문 신청을 선택하고 기존 신청 화면으로 공개 마커 문맥만 안전하게 전달 |
+| 2026-08-04 | [국가별 언론·뉴스 출처 마커](2026-08-04-community-map-news-publisher-markers.md) | 직접 확인 — 한국·미국·중국·호주의 대표 언론·뉴스 출처를 국가 대표점 마커로 표시하고 매체 성격·공식 소개·홈페이지·자동 기사 수집 없음 경계를 상세 패널에서 확인 |
+| 2026-08-04 | [공식뉴스 RSS 검토 후보 파이프라인](2026-08-04-official-news-rss-review-pipeline.md) | 화면 없음 — 농식품부 보도·설명자료와 식약처 보도자료를 명시 선택할 때만 공식 도메인 기사 메타데이터로 수집하고 자동 게시 없이 검토 대기로 반환 |
 | 2026-08-03 | [커뮤니티 지도 운송 시뮬레이션 통합](2026-08-03-community-map-transport-simulation.md) | 직접 확인 — 실제 위치가 아닌 고정 교육 fixture의 화물·항공·해상 경로를 Google OverlayView Canvas와 SVG fallback으로 통합하고 이동·정지·해상 toggle·390px 반응형을 검증 |
 | 2026-08-03 | [관광·온라인가격·KOSIS 공공데이터 지도 레이어](2026-08-03-selected-public-data-map-layers.md) | 간접 확인 — 관광 공개 좌표, 온라인가격 품목 범위, KOSIS 소비자물가지수를 단위·기준월·출처 경계로 분리해 공개 세계지도에 추가 |
 | 2026-08-03 | [커뮤니티 지도 역할·원장 관점 레이어](2026-08-03-community-map-role-layer-profile.md) | 직접 확인 — 로그인 역할에 맞춰 공개 관측을 우선 배열하고, 공동 조달·수입 준비·운송 인계·공동 입고 원장 관점으로 기존 마커를 묶어 표시 |

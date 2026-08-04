@@ -320,9 +320,12 @@
                                 class="@MapHotspotClass(country)"
                                 style="@MapHotspotStyle(country)"
                                 aria-label="@($"{country.Name} · {country.DataLabel}")"
+                                title="왼쪽 클릭: 자료 보기 · 오른쪽 클릭: 신청 업무 선택"
                                 aria-pressed="@IsSelectedMarker(country)"
                                 aria-controls="world-map-results"
-                                @onclick="() => SelectMapFeature(country.Code, country.Id)">
+                                @onclick="() => SelectMapFeature(country.Code, country.Id)"
+                                @oncontextmenu="args => OpenMapApplicationsAsync(args, country)"
+                                @oncontextmenu:preventDefault>
                             <span aria-hidden="true"></span>
                             <strong>@country.Name</strong>
                             <small>@country.DataLabel</small>
@@ -341,6 +344,35 @@
                 }
             </div>
         </div>
+
+        @if (_mapApplicationMarker is { } applicationMarker)
+        {
+            <section class="world-community-home__application-menu"
+                     style="@MapApplicationMenuStyle"
+                     role="dialog"
+                     aria-modal="false"
+                     aria-label="지도 마커 신청 업무 선택">
+                <header>
+                    <div>
+                        <span>마커에서 신청하기</span>
+                        <strong>@applicationMarker.Name</strong>
+                    </div>
+                    <button type="button"
+                            aria-label="신청 메뉴 닫기"
+                            @onclick="CloseMapApplications">×</button>
+                </header>
+                <p>공개 마커는 신청의 출발 문맥만 제공합니다. 실제 상품·창고·상하차지와 상대방은 다음 화면에서 직접 확인하세요.</p>
+                <nav aria-label="신청 업무">
+                    @foreach (var option in MapApplicationOptions)
+                    {
+                        <a href="@option.Href">
+                            <strong>@option.Label</strong>
+                            <small>@option.Description</small>
+                        </a>
+                    }
+                </nav>
+            </section>
+        }
 
         <p class="world-community-home__map-note">
             지도는 자료를 찾기 위한 개략도이며 국경·영유권 판단의 기준이 아닙니다.
@@ -518,6 +550,10 @@
                     {
                         <div><dt>원자료</dt><dd>@selectedObservation.SourceDatasetKey</dd></div>
                     }
+                    @if (!string.IsNullOrWhiteSpace(selectedObservation.SourceVersion))
+                    {
+                        <div><dt>자료 버전</dt><dd class="world-community-home__source-version">@selectedObservation.SourceVersion</dd></div>
+                    }
                     @if (selectedObservation.CollectedAtUtc is { } collectedAtUtc)
                     {
                         <div><dt>수집</dt><dd>@($"{collectedAtUtc:yyyy-MM-dd HH:mm} UTC · {DataFreshnessLabel(selectedObservation.FreshnessCode)}")</dd></div>
@@ -536,6 +572,12 @@
                         <div><dt>재료 관계 근거</dt><dd>@(selectedObservation.EvidenceCount ?? 0)건</dd></div>
                         <div><dt>위치 기준</dt><dd>행정권역 대표점</dd></div>
                     }
+                    @if (selectedObservation.LayerCode == 커뮤니티세계지도LayerCodes.NewsPublisher)
+                    {
+                        <div><dt>매체 성격</dt><dd>@NewsPublisherTypeLabel(selectedObservation.MarkerStatusCode)</dd></div>
+                        <div><dt>지도 위치</dt><dd>국가 대표점</dd></div>
+                        <div><dt>기사 수집</dt><dd>공식 홈페이지 연결만 제공</dd></div>
+                    }
                     @if (selectedObservation.Metrics is { Count: > 0 } selectedMetrics)
                     {
                         @foreach (var metric in selectedMetrics)
@@ -544,6 +586,13 @@
                         }
                     }
                 </dl>
+                @if (EvidenceVersionNotice is { } versionNotice)
+                {
+                    <p class="world-community-home__evidence-version @versionNotice.CssClass" role="status">
+                        <strong>@versionNotice.Title</strong>
+                        <span>@versionNotice.Message</span>
+                    </p>
+                }
                 <p>@(selectedObservation.BoundaryNotice
                      ?? "이 마커 선택은 공개 자료 조회만 수행하며 원장·참여·주문·계약·배차를 만들지 않습니다.")</p>
                 <div>
@@ -559,7 +608,200 @@
                             가격·시장 상세 보기
                         </a>
                     }
+                    else if (selectedObservation.LayerCode == 커뮤니티세계지도LayerCodes.NewsPublisher)
+                    {
+                        <a href="@selectedObservation.DetailHref" target="_blank" rel="noopener noreferrer">
+                            뉴스 홈페이지 열기
+                        </a>
+                    }
                 </div>
+            </section>
+
+            @if (selectedObservation.LayerCode == 커뮤니티세계지도LayerCodes.NewsPublisher)
+            {
+                <section class="world-community-home__news-review" aria-label="뉴스 RSS 연결과 검토 후보">
+                    <header>
+                        <div>
+                            <span>RSS REVIEW · 자동 게시 없음</span>
+                            <strong>이 뉴스 출처의 기사 수집 상태</strong>
+                        </div>
+                        @if (_newsCandidates is null)
+                        {
+                            <button type="button"
+                                    disabled="@_newsCandidatesLoading"
+                                    @onclick="() => LoadNewsCandidatesAsync(null)">
+                                @(_newsCandidatesLoading ? "확인 중…" : "RSS 연결 상태 확인")
+                            </button>
+                        }
+                    </header>
+
+                    @if (!string.IsNullOrWhiteSpace(_newsCandidatesError))
+                    {
+                        <p class="world-community-home__news-review-status is-error" role="alert">
+                            @_newsCandidatesError
+                        </p>
+                    }
+                    @if (_newsCandidates is { } newsCandidates
+                         && string.Equals(newsCandidates.ObservationStableId, selectedObservation.StableId, StringComparison.Ordinal))
+                    {
+                        <div class="world-community-home__news-feed-status">
+                            <span>@newsCandidates.PublisherFeedStatus.Label</span>
+                            <p>@newsCandidates.PublisherFeedStatus.Notice</p>
+                            <a href="@newsCandidates.PublisherFeedStatus.EvidenceHref"
+                               target="_blank"
+                               rel="noopener noreferrer">판정 근거 확인</a>
+                        </div>
+                        <p class="world-community-home__news-relation-notice">@newsCandidates.RelationNotice</p>
+
+                        @if (newsCandidates.RelatedOfficialSources.Count > 0)
+                        {
+                            <div class="world-community-home__news-source-options" aria-label="같은 국가의 별도 공식뉴스 RSS 선택">
+                                @foreach (var source in newsCandidates.RelatedOfficialSources)
+                                {
+                                    <button type="button"
+                                            disabled="@_newsCandidatesLoading"
+                                            aria-pressed="@string.Equals(newsCandidates.SelectedSourceKey, source.SourceKey, StringComparison.OrdinalIgnoreCase).ToString().ToLowerInvariant()"
+                                            @onclick="() => LoadNewsCandidatesAsync(source.SourceKey)">
+                                        <strong>@source.DisplayName</strong>
+                                        <small>@source.UpdateCycle · 승인된 후보만</small>
+                                    </button>
+                                }
+                            </div>
+                        }
+
+                        @if (_newsCandidatesLoading)
+                        {
+                            <p class="world-community-home__news-review-status" role="status">검토 원장에서 승인된 후보를 확인하고 있습니다.</p>
+                        }
+                        else if (newsCandidates.SelectedSourceKey is not null
+                                 && newsCandidates.Failures.Count > 0)
+                        {
+                            <p class="world-community-home__news-review-status is-error" role="alert">
+                                @newsCandidates.Failures[0].Message 외부 실패를 빈 기사 목록으로 숨기지 않습니다.
+                            </p>
+                        }
+                        else if (newsCandidates.SelectedSourceKey is not null
+                                 && newsCandidates.Items.Count == 0)
+                        {
+                            <p class="world-community-home__news-review-status" role="status">
+                                현재 승인된 검토 후보가 없습니다. 운영 검토 전이거나 제외된 후보는 공개 지도에 표시하지 않습니다.
+                            </p>
+                        }
+                        else if (newsCandidates.Items.Count > 0)
+                        {
+                            <div class="world-community-home__news-candidates">
+                                @foreach (var candidate in newsCandidates.Items)
+                                {
+                                    <article>
+                                        <div>
+                                            <span>검토 승인 · @candidate.Provider · @NewsCandidateTimestamp(candidate)</span>
+                                            <strong>@candidate.Title</strong>
+                                        </div>
+                                        <p>@candidate.Summary</p>
+                                        <small>@candidate.SourceNotice</small>
+                                        <a href="@candidate.OriginalUrl" target="_blank" rel="noopener noreferrer">공식 원문 확인</a>
+                                    </article>
+                                }
+                            </div>
+                        }
+                        <p class="world-community-home__news-boundary">@newsCandidates.BoundaryNotice</p>
+                    }
+                </section>
+            }
+
+            <section class="world-community-home__question-entry" aria-label="선택한 공개 근거로 커뮤니티 글 작성">
+                <header>
+                    <div>
+                        <span>지도에서 커뮤니티로</span>
+                        <strong>이 자료를 보고 무엇을 나누고 싶나요?</strong>
+                    </div>
+                    <small>초안 생성은 저장되지 않습니다. 게시 버튼을 눌러야 질문 글 하나만 만들어집니다.</small>
+                </header>
+                <div class="world-community-home__question-purposes">
+                    <button type="button"
+                            disabled="@_questionDraftLoading"
+                            @onclick="() => OpenQuestionComposerAsync(QuestionPurpose.Question)">
+                        질문하기
+                    </button>
+                    <button type="button"
+                            disabled="@_questionDraftLoading"
+                            @onclick="() => OpenQuestionComposerAsync(QuestionPurpose.Proposal)">
+                        아이디어 제안하기
+                    </button>
+                    <button type="button"
+                            disabled="@_questionDraftLoading"
+                            @onclick="() => OpenQuestionComposerAsync(QuestionPurpose.Gathering)">
+                        함께 확인할 사람 모으기
+                    </button>
+                </div>
+
+                @if (_questionDraftLoading)
+                {
+                    <p class="world-community-home__question-status" role="status">공개 근거를 붙인 초안을 준비하고 있습니다.</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(_questionComposerError))
+                {
+                    <p class="world-community-home__question-status is-error" role="alert">@_questionComposerError</p>
+                }
+                @if (_questionDraft is { } questionDraft
+                     && string.Equals(questionDraft.Evidence.ObservationStableId, selectedObservation.StableId, StringComparison.Ordinal))
+                {
+                    <div class="world-community-home__question-composer">
+                        <div class="world-community-home__question-evidence">
+                            <span>함께 저장할 공개 근거</span>
+                            <strong>@questionDraft.Evidence.SourceName · @EvidenceFreshnessLabel(questionDraft.Evidence.EvidenceAsOfUtc)</strong>
+                            @if (!string.IsNullOrWhiteSpace(questionDraft.Evidence.SourceVersion))
+                            {
+                                <small class="world-community-home__source-version">source version · @questionDraft.Evidence.SourceVersion</small>
+                            }
+                            <small>@questionDraft.BoundaryNotice</small>
+                        </div>
+                        <label>
+                            <span>제목</span>
+                            <input maxlength="160" @bind="_questionTitle" />
+                        </label>
+                        <label>
+                            <span>내용</span>
+                            <textarea maxlength="4000" rows="7" @bind="_questionBody"></textarea>
+                        </label>
+                        <div class="world-community-home__question-identity">
+                            <label>
+                                <span>작성자 이름</span>
+                                <input maxlength="40" autocomplete="nickname" @bind="_questionNickname" />
+                            </label>
+                            <label>
+                                <span>글 비밀번호</span>
+                                <input type="password" minlength="4" maxlength="100" autocomplete="new-password" @bind="_questionPassword" />
+                            </label>
+                        </div>
+                        <label class="world-community-home__question-confirm">
+                            <input type="checkbox" @bind="_confirmSourceReference" />
+                            <span>출처·기준 시각·자료 한계가 글에 함께 저장되는 것을 확인했습니다.</span>
+                        </label>
+                        @if (!AuthSession.IsLoggedIn)
+                        {
+                            <p class="world-community-home__question-login">
+                                초안은 지금 편집할 수 있습니다. 게시하려면 <a href="@LoginHref">로그인</a>해 주세요.
+                            </p>
+                        }
+                        <div class="world-community-home__question-actions">
+                            <button type="button" class="is-secondary" @onclick="CloseQuestionComposer">닫기</button>
+                            <button type="button"
+                                    disabled="@(!CanPublishQuestion)"
+                                    @onclick="PublishQuestionAsync">
+                                @(_questionPublishing ? "게시 중…" : "출처와 함께 게시")
+                            </button>
+                        </div>
+                    </div>
+                }
+                @if (_publishedQuestion is { } publishedQuestion)
+                {
+                    <div class="world-community-home__question-published" role="status">
+                        <strong>커뮤니티 글을 게시했습니다.</strong>
+                        <span>@publishedQuestion.NextActionNotice</span>
+                        <a href="@publishedQuestion.PostHref">작성한 글 보기</a>
+                    </div>
+                }
             </section>
         }
         else if (SelectedMapMarker is { } selectedMarker)
@@ -698,12 +940,25 @@
                                 <small class="world-community-home__observation-boundary">@observation.BoundaryNotice</small>
                             }
                         }
+                        else if (observation.LayerCode == 커뮤니티세계지도LayerCodes.NewsPublisher)
+                        {
+                            <dl class="world-community-home__market-metadata">
+                                <div><dt>매체 성격</dt><dd>@NewsPublisherTypeLabel(observation.MarkerStatusCode)</dd></div>
+                                <div><dt>좌표 기준</dt><dd>@LocationPrecisionLabel(observation.LocationPrecisionCode)</dd></div>
+                                <div><dt>수집 범위</dt><dd>공식 홈페이지 연결</dd></div>
+                            </dl>
+                            <small class="world-community-home__observation-boundary">@observation.BoundaryNotice</small>
+                        }
                         <footer>
                             <small>
                                 @observation.SourceName
                                 · @(observation.EvidenceAsOfUtc is null ? "확인 시각은 상세에서 확인" : $"{observation.EvidenceAsOfUtc.Value:yyyy-MM-dd} 확인")
                             </small>
                             <span class="world-community-home__observation-links">
+                                <button type="button"
+                                        @onclick="() => SelectMapFeature(observation.CountryCode, observation.StableId)">
+                                    이 근거로 글 시작
+                                </button>
                                 @if (!string.IsNullOrWhiteSpace(observation.SourceHref))
                                 {
                                     <a href="@observation.SourceHref" target="_blank" rel="noopener noreferrer">공식 출처</a>
@@ -887,8 +1142,32 @@
     [SupplyParameterFromQuery(Name = "dataset")]
     public string? Dataset { get; set; }
 
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.CountryQueryKey)]
+    public string? Country { get; set; }
+
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.LayersQueryKey)]
+    public string? Layers { get; set; }
+
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.MarkerQueryKey)]
+    public string? Marker { get; set; }
+
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.ObservationQueryKey)]
+    public string? Observation { get; set; }
+
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.SnapshotRevisionQueryKey)]
+    public string? RequestedSnapshotRevision { get; set; }
+
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.SourceVersionQueryKey)]
+    public string? RequestedSourceVersion { get; set; }
+
     private string? _selectedCountryCode;
+    private string? _selectedMarkerId;
     private string? _selectedObservationId;
+    private string? _requestedSnapshotRevision;
+    private string? _requestedSourceVersion;
+    private GoogleMapMarker? _mapApplicationMarker;
+    private double _mapApplicationClientX;
+    private double _mapApplicationClientY;
     private MapDatasetMode _datasetMode = MapDatasetMode.DayWork;
     private GoogleMapState _googleMapState = GoogleMapState.Loading;
     private IJSObjectReference? _googleMapModule;
@@ -914,6 +1193,20 @@
     private bool _regionImagesLoading = true;
     private string? _regionImagesError;
     private bool _layersCustomized;
+    private bool _questionDraftLoading;
+    private bool _questionPublishing;
+    private 커뮤니티세계지도질문초안Response? _questionDraft;
+    private 커뮤니티세계지도질문게시Response? _publishedQuestion;
+    private QuestionPurpose _questionPurpose;
+    private string _questionTitle = string.Empty;
+    private string _questionBody = string.Empty;
+    private string _questionNickname = string.Empty;
+    private string _questionPassword = string.Empty;
+    private bool _confirmSourceReference;
+    private string? _questionComposerError;
+    private bool _newsCandidatesLoading;
+    private 커뮤니티세계지도뉴스후보Response? _newsCandidates;
+    private string? _newsCandidatesError;
 
     private const string RegionalCultureImagePackId = "regional-culture-one-each-v1";
 
@@ -1023,6 +1316,7 @@
     private IReadOnlyList<MapLayerDiagram> ActiveLayerDiagrams
         => ConsolidateLedgerDiagrams(CurrentLayers
             .Where(layer => IsLayerSelected(layer.Code))
+            .Where(layer => !IsEditorialContextLayer(layer.Code))
             .Select(BuildLayerDiagram));
 
     private IReadOnlyList<GoogleMapMarker> CurrentMapMarkers
@@ -1092,7 +1386,9 @@
             }
 
             return ConsolidateLedgerDiagrams(CurrentLayers
-                .Where(layer => IsLayerSelected(layer.Code) && LayerHasVisibleSource(layer, availableLayerCodes))
+                .Where(layer => IsLayerSelected(layer.Code)
+                                && !IsEditorialContextLayer(layer.Code)
+                                && LayerHasVisibleSource(layer, availableLayerCodes))
                 .Select(BuildLedgerWorkflowDiagram));
         }
     }
@@ -1172,11 +1468,108 @@
         {
             _datasetMode = requestedMode;
             _selectedCountryCode = null;
+            _selectedMarkerId = null;
             _pendingGoogleMapUpdate = true;
             ResetSnapshotForDataset();
         }
 
-        EnsureDefaultLayersSelected();
+        ApplyDeepLinkParameters();
+    }
+
+    private void ApplyDeepLinkParameters()
+    {
+        var previousCountry = _selectedCountryCode;
+        var previousMarker = _selectedMarkerId;
+        var previousObservation = _selectedObservationId;
+        var previousLayers = _selectedLayerCodes.ToHashSet(StringComparer.Ordinal);
+
+        _selectedCountryCode = CommunityWorldMapDeepLink.NormalizeCountryCode(
+            Country,
+            MapCountries.Select(country => country.Code));
+        _selectedMarkerId = CommunityWorldMapDeepLink.NormalizeStableId(Marker);
+        _selectedObservationId = CommunityWorldMapDeepLink.NormalizeStableId(Observation);
+        _requestedSnapshotRevision = CommunityWorldMapDeepLink.NormalizeStableId(
+            RequestedSnapshotRevision);
+        _requestedSourceVersion = CommunityWorldMapDeepLink.NormalizeStableId(
+            RequestedSourceVersion);
+        if (_selectedMarkerId is null && _selectedObservationId is not null)
+        {
+            _selectedMarkerId = _selectedObservationId;
+        }
+
+        var requestedLayers = CommunityWorldMapDeepLink.ParseLayerCodes(
+            Layers,
+            CurrentLayers.Select(layer => layer.Code));
+        _selectedLayerCodes.Clear();
+        if (requestedLayers is null)
+        {
+            AddActiveRoleDefaultLayers();
+            _layersCustomized = false;
+        }
+        else
+        {
+            _selectedLayerCodes.UnionWith(requestedLayers);
+            _layersCustomized = !HasActiveRoleDefaultLayers();
+        }
+
+        var selectionChanged = !string.Equals(
+                                   previousCountry,
+                                   _selectedCountryCode,
+                                   StringComparison.Ordinal)
+                               || !string.Equals(
+                                   previousMarker,
+                                   _selectedMarkerId,
+                                   StringComparison.Ordinal)
+                               || !string.Equals(
+                                   previousObservation,
+                                   _selectedObservationId,
+                                   StringComparison.Ordinal);
+        if (selectionChanged)
+        {
+            ResetQuestionComposer();
+            ResetNewsCandidates();
+        }
+
+        if (selectionChanged || !previousLayers.SetEquals(_selectedLayerCodes))
+        {
+            _pendingGoogleMapUpdate = true;
+        }
+    }
+
+    private bool HasActiveRoleDefaultLayers()
+    {
+        var available = CurrentLayers
+            .Select(layer => layer.Code)
+            .ToHashSet(StringComparer.Ordinal);
+        var defaults = ActiveRoleProfile.RecommendedLayerCodes
+            .Where(available.Contains)
+            .ToHashSet(StringComparer.Ordinal);
+        return defaults.SetEquals(_selectedLayerCodes);
+    }
+
+    private void SyncDeepLinkToUrl(bool replace = false)
+    {
+        var orderedLayerCodes = CurrentLayers.Select(layer => layer.Code).ToArray();
+        var uri = Navigation.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["dataset"] = IsNightLearning
+                ? CommunityPageRoutes.WorldMapNightLearningDataset
+                : null,
+            [CommunityWorldMapDeepLink.CountryQueryKey] = _selectedCountryCode,
+            [CommunityWorldMapDeepLink.LayersQueryKey] =
+                CommunityWorldMapDeepLink.SerializeLayerCodes(
+                    _selectedLayerCodes,
+                    orderedLayerCodes),
+            [CommunityWorldMapDeepLink.MarkerQueryKey] = _selectedMarkerId,
+            [CommunityWorldMapDeepLink.ObservationQueryKey] = _selectedObservationId,
+            [CommunityWorldMapDeepLink.SnapshotRevisionQueryKey] =
+                SelectedObservation is null ? null : _appliedSnapshot?.Revision,
+            [CommunityWorldMapDeepLink.SourceVersionQueryKey] = SelectedObservation?.SourceVersion
+        });
+        if (!string.Equals(uri, Navigation.Uri, StringComparison.Ordinal))
+        {
+            Navigation.NavigateTo(uri, replace);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -1198,7 +1591,7 @@
                 CurrentMapMarkers,
                 DatasetCode,
                 _selectedCountryCode,
-                _selectedObservationId,
+                SelectedMarkerId,
                 _googleMapCallback,
                 runtimeSettings);
 
@@ -1228,7 +1621,7 @@
                 CurrentMapMarkers,
                 DatasetCode,
                 _selectedCountryCode,
-                _selectedObservationId,
+                SelectedMarkerId,
                 preserveViewport);
             await UpdateTransportSimulationLayerAsync();
         }
@@ -1250,16 +1643,14 @@
 
         _datasetMode = mode;
         _selectedCountryCode = null;
+        _selectedMarkerId = null;
         _selectedObservationId = null;
+        ResetQuestionComposer();
+        ResetNewsCandidates();
         _pendingGoogleMapUpdate = true;
         ResetSnapshotForDataset();
         EnsureDefaultLayersSelected();
-        var dataset = IsNightLearning
-            ? CommunityPageRoutes.WorldMapNightLearningDataset
-            : null;
-        Navigation.NavigateTo(
-            Navigation.GetUriWithQueryParameter("dataset", dataset),
-            replace: true);
+        SyncDeepLinkToUrl(replace: true);
         await RefreshMapSnapshotAsync(applyImmediately: true, CancellationToken.None);
     }
 
@@ -1276,11 +1667,17 @@
         if (SelectedObservation is not null
             && !IsObservationSourceLayerVisible(SelectedObservation.LayerCode))
         {
+            if (string.Equals(_selectedMarkerId, _selectedObservationId, StringComparison.Ordinal))
+            {
+                _selectedMarkerId = null;
+            }
             _selectedObservationId = null;
+            ResetQuestionComposer();
         }
 
         _layersCustomized = true;
         _pendingGoogleMapUpdate = true;
+        SyncDeepLinkToUrl();
     }
 
     private void ResetLayersForActiveRole()
@@ -1290,11 +1687,17 @@
         if (SelectedObservation is not null
             && !IsObservationSourceLayerVisible(SelectedObservation.LayerCode))
         {
+            if (string.Equals(_selectedMarkerId, _selectedObservationId, StringComparison.Ordinal))
+            {
+                _selectedMarkerId = null;
+            }
             _selectedObservationId = null;
+            ResetQuestionComposer();
         }
 
         _layersCustomized = false;
         _pendingGoogleMapUpdate = true;
+        SyncDeepLinkToUrl();
     }
 
     private async Task ToggleSimulationMode(string modeCode)
@@ -1391,6 +1794,11 @@
             return "알아차림 자료";
         }
 
+        if (layer.Code == 커뮤니티세계지도LayerCodes.NewsPublisher)
+        {
+            return "공식 홈페이지 · 기사 자동 수집 없음";
+        }
+
         if (layer.ObservationSourceLayerCodes is { Count: > 0 })
         {
             return $"원장 관점 · 공개 레이어 {layer.ObservationSourceLayerCodes.Count}개 연결";
@@ -1414,7 +1822,28 @@
     private MapLayerDiagram BuildLayerDiagram(커뮤니티세계지도LayerDto layer)
         => IsNightLearning
             ? BuildAwarenessLayerDiagram(layer)
-            : BuildLedgerWorkflowDiagram(layer);
+            : layer.Code == 커뮤니티세계지도LayerCodes.NewsPublisher
+                ? BuildNewsSourceLayerDiagram(layer)
+                : BuildLedgerWorkflowDiagram(layer);
+
+    private static MapLayerDiagram BuildNewsSourceLayerDiagram(커뮤니티세계지도LayerDto layer)
+        => new(
+            layer.Code,
+            layer.DisplayName,
+            layer.DisplayName,
+            layer.Color,
+            layer.MarkerShape,
+            "EDITORIAL CONTEXT",
+            null,
+            [
+                AwarenessNode("01", "국가 선택", "국가 대표점"),
+                AwarenessNode("02", "조직 성격", "통신사·협동조합·공영미디어"),
+                AwarenessNode("03", "공식 페이지", "홈페이지·소개"),
+                AwarenessNode("04", "기사 확인", "사용자가 직접 선택", null)
+            ],
+            3,
+            "대표 조직 마커는 국가 전체 언론을 대표하거나 기사 신뢰도·정치적 중립성을 보증하지 않습니다.",
+            ["기사 자동 게시 없음", "본사 좌표 아님", "정부 RSS와 별도"]);
 
     private MapLayerDiagram BuildLedgerWorkflowDiagram(커뮤니티세계지도LayerDto layer)
     {
@@ -1590,7 +2019,9 @@
     private void ResetSnapshotForDataset()
     {
         _appliedSnapshot = null;
+        _selectedMarkerId = null;
         _selectedObservationId = null;
+        ResetQuestionComposer();
         _selectedLayerCodes.Clear();
         _layersCustomized = false;
         _snapshotConnectionMessage = null;
@@ -1670,15 +2101,63 @@
     private void ApplySnapshot(커뮤니티세계지도SnapshotDto snapshot, bool preserveViewport = false)
     {
         _appliedSnapshot = snapshot;
-        if (_selectedObservationId is not null
-            && !snapshot.Observations.Any(observation =>
-                string.Equals(observation.StableId, _selectedObservationId, StringComparison.Ordinal)))
+        var selectionChanged = false;
+        var selectedObservation = _selectedObservationId is null
+            ? null
+            : snapshot.Observations.FirstOrDefault(observation =>
+                string.Equals(observation.StableId, _selectedObservationId, StringComparison.Ordinal));
+        if (_selectedObservationId is not null && selectedObservation is null)
         {
+            if (string.Equals(_selectedMarkerId, _selectedObservationId, StringComparison.Ordinal))
+            {
+                _selectedMarkerId = null;
+            }
             _selectedObservationId = null;
+            ResetQuestionComposer();
+            selectionChanged = true;
+        }
+        else if (selectedObservation is not null)
+        {
+            if (!string.Equals(_selectedCountryCode, selectedObservation.CountryCode, StringComparison.Ordinal))
+            {
+                _selectedCountryCode = selectedObservation.CountryCode;
+                selectionChanged = true;
+            }
+
+            if (!string.Equals(_selectedMarkerId, selectedObservation.StableId, StringComparison.Ordinal))
+            {
+                _selectedMarkerId = selectedObservation.StableId;
+                selectionChanged = true;
+            }
+
+            if (_selectedLayerCodes.Add(selectedObservation.LayerCode))
+            {
+                _layersCustomized = true;
+                selectionChanged = true;
+            }
+        }
+        else if (_selectedMarkerId is not null)
+        {
+            var markerObservation = snapshot.Observations.FirstOrDefault(observation =>
+                string.Equals(observation.StableId, _selectedMarkerId, StringComparison.Ordinal));
+            if (markerObservation is not null)
+            {
+                _selectedObservationId = markerObservation.StableId;
+                _selectedCountryCode = markerObservation.CountryCode;
+                if (_selectedLayerCodes.Add(markerObservation.LayerCode))
+                {
+                    _layersCustomized = true;
+                }
+                selectionChanged = true;
+            }
         }
         _pendingGoogleMapUpdate = true;
         _preserveGoogleMapViewport = preserveViewport;
         EnsureDefaultLayersSelected();
+        if (selectionChanged)
+        {
+            SyncDeepLinkToUrl(replace: true);
+        }
     }
 
     private IReadOnlyList<GoogleMapMarker> BuildCatalogFallbackMarkers()
@@ -1719,7 +2198,10 @@
     {
         _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = countryCode;
+        _selectedMarkerId = null;
         _selectedObservationId = null;
+        ResetQuestionComposer();
+        SyncDeepLinkToUrl();
         _pendingFocusElementId = "world-map-results";
         await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
@@ -1727,14 +2209,170 @@
 
     private async Task SelectMapFeature(string countryCode, string observationId)
     {
+        _mapApplicationMarker = null;
         _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = countryCode;
-        _selectedObservationId = observationId;
-        OpenLedgerDiagramForMapFeature(observationId);
+        _selectedMarkerId = observationId;
+        _selectedObservationId = _appliedSnapshot?.Observations.Any(observation =>
+            string.Equals(observation.StableId, observationId, StringComparison.Ordinal)) == true
+            ? observationId
+            : null;
+        ResetQuestionComposer();
+        ResetNewsCandidates();
+        if (_selectedObservationId is not null)
+        {
+            OpenLedgerDiagramForMapFeature(observationId);
+        }
+        SyncDeepLinkToUrl();
         _pendingFocusElementId = "world-map-results";
         await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
     }
+
+    private async Task LoadNewsCandidatesAsync(string? sourceKey)
+    {
+        if (SelectedObservation is not { LayerCode: 커뮤니티세계지도LayerCodes.NewsPublisher } observation
+            || _newsCandidatesLoading)
+        {
+            return;
+        }
+
+        _newsCandidatesLoading = true;
+        _newsCandidatesError = null;
+        try
+        {
+            _newsCandidates = await WorldMapClient.뉴스후보조회Async(
+                observation.StableId,
+                sourceKey);
+        }
+        catch (Exception exception)
+        {
+            _newsCandidatesError = exception.Message;
+        }
+        finally
+        {
+            _newsCandidatesLoading = false;
+        }
+    }
+
+    private void ResetNewsCandidates()
+    {
+        _newsCandidatesLoading = false;
+        _newsCandidates = null;
+        _newsCandidatesError = null;
+    }
+
+    private static string NewsCandidateTimestamp(CommunityInformationCandidateDto candidate)
+        => (candidate.PublishedAtUtc ?? candidate.CollectedAtUtc).ToLocalTime()
+            .ToString("yyyy-MM-dd HH:mm");
+
+    private async Task OpenQuestionComposerAsync(QuestionPurpose purpose)
+    {
+        if (SelectedObservation is not { } observation || _questionDraftLoading)
+        {
+            return;
+        }
+
+        _questionDraftLoading = true;
+        _questionComposerError = null;
+        _publishedQuestion = null;
+        _questionPurpose = purpose;
+        try
+        {
+            var draft = await WorldMapClient.질문초안생성Async(
+                observation.StableId,
+                new 커뮤니티세계지도질문초안Request
+                {
+                    DatasetCode = DatasetCode,
+                    QuestionFocus = QuestionFocus(observation.Title, purpose)
+                });
+            _questionDraft = draft;
+            _questionTitle = draft.SuggestedPost.Title;
+            _questionBody = draft.SuggestedPost.Body;
+            _questionNickname = AuthSession.UserName ?? string.Empty;
+            _questionPassword = string.Empty;
+            _confirmSourceReference = false;
+        }
+        catch (Exception exception)
+        {
+            _questionDraft = null;
+            _questionComposerError = exception.Message;
+        }
+        finally
+        {
+            _questionDraftLoading = false;
+        }
+    }
+
+    private async Task PublishQuestionAsync()
+    {
+        if (!CanPublishQuestion
+            || SelectedObservation is not { } observation
+            || _questionDraft is not { } draft
+            || AuthSession.AccessToken is not { Length: > 0 } accessToken)
+        {
+            return;
+        }
+
+        _questionPublishing = true;
+        _questionComposerError = null;
+        try
+        {
+            _publishedQuestion = await WorldMapClient.질문게시Async(
+                observation.StableId,
+                new 커뮤니티세계지도질문게시Request
+                {
+                    DatasetCode = DatasetCode,
+                    Title = _questionTitle.Trim(),
+                    Body = _questionBody.Trim(),
+                    OriginalLanguageCode = draft.SuggestedPost.OriginalLanguageCode,
+                    IsInterestGatheringEnabled = _questionPurpose == QuestionPurpose.Gathering,
+                    Nickname = _questionNickname.Trim(),
+                    Password = _questionPassword,
+                    ConfirmSourceReference = _confirmSourceReference
+                },
+                accessToken);
+            _questionDraft = null;
+            _questionPassword = string.Empty;
+            _confirmSourceReference = false;
+        }
+        catch (Exception exception)
+        {
+            _questionComposerError = exception.Message;
+        }
+        finally
+        {
+            _questionPublishing = false;
+        }
+    }
+
+    private void CloseQuestionComposer()
+        => ResetQuestionComposer(clearPublished: false);
+
+    private void ResetQuestionComposer(bool clearPublished = true)
+    {
+        _questionDraft = null;
+        _questionDraftLoading = false;
+        _questionPublishing = false;
+        _questionTitle = string.Empty;
+        _questionBody = string.Empty;
+        _questionNickname = string.Empty;
+        _questionPassword = string.Empty;
+        _confirmSourceReference = false;
+        _questionComposerError = null;
+        if (clearPublished)
+        {
+            _publishedQuestion = null;
+        }
+    }
+
+    private static string QuestionFocus(string observationTitle, QuestionPurpose purpose)
+        => purpose switch
+        {
+            QuestionPurpose.Proposal => $"{observationTitle} 자료를 바탕으로 아이디어를 나눠요",
+            QuestionPurpose.Gathering => $"{observationTitle} 공개 근거를 함께 확인할 분을 찾습니다",
+            _ => $"{observationTitle}에 대해 궁금한 점이 있어요"
+        };
 
     private void OpenLedgerDiagramForMapFeature(string observationId)
     {
@@ -1767,7 +2405,10 @@
     {
         _isPriceMarketCatalogOpen = false;
         _selectedCountryCode = null;
+        _selectedMarkerId = null;
         _selectedObservationId = null;
+        ResetQuestionComposer();
+        SyncDeepLinkToUrl();
         _pendingFocusElementId = "world-map-focus-target";
         await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
@@ -1776,8 +2417,11 @@
     private async Task OpenPriceMarketCatalog()
     {
         _selectedCountryCode = null;
+        _selectedMarkerId = null;
         _selectedObservationId = null;
+        ResetQuestionComposer();
         _isPriceMarketCatalogOpen = true;
+        SyncDeepLinkToUrl();
         _pendingFocusElementId = "world-map-results";
         await InvokeAsync(StateHasChanged);
         await UpdateGoogleMapSelectionAsync();
@@ -1806,6 +2450,54 @@
     public Task SelectMapFeatureFromGoogleMap(string countryCode, string observationId)
         => SelectMapFeature(countryCode, observationId);
 
+    [JSInvokable]
+    public async Task OpenMapApplicationsFromGoogleMap(
+        string countryCode,
+        string observationId,
+        double clientX,
+        double clientY)
+    {
+        var marker = CurrentMapMarkers.FirstOrDefault(item =>
+            string.Equals(item.Id, observationId, StringComparison.Ordinal));
+        if (marker is null)
+        {
+            return;
+        }
+
+        await SelectMapFeature(countryCode, observationId);
+        OpenMapApplications(marker, clientX, clientY);
+    }
+
+    private async Task OpenMapApplicationsAsync(MouseEventArgs args, GoogleMapMarker marker)
+    {
+        await SelectMapFeature(marker.Code, marker.Id);
+        OpenMapApplications(marker, args.ClientX, args.ClientY);
+    }
+
+    private void OpenMapApplications(GoogleMapMarker marker, double clientX, double clientY)
+    {
+        _mapApplicationMarker = marker;
+        _mapApplicationClientX = Math.Max(16d, clientX);
+        _mapApplicationClientY = Math.Max(16d, clientY);
+        StateHasChanged();
+    }
+
+    private void CloseMapApplications()
+        => _mapApplicationMarker = null;
+
+    private string MapApplicationMenuStyle
+        => FormattableString.Invariant(
+            $"--map-application-x: {_mapApplicationClientX:F0}px; --map-application-y: {_mapApplicationClientY:F0}px;");
+
+    private IReadOnlyList<CommunityMapApplicationOption> MapApplicationOptions
+        => _mapApplicationMarker is not { } marker
+            ? []
+            : CommunityMapApplicationRoutes.ForMarker(
+                marker.Id,
+                marker.Name,
+                marker.LayerCode,
+                marker.Code);
+
     private async Task UpdateGoogleMapSelectionAsync()
     {
         if (_googleMapState == GoogleMapState.Ready && _googleMapModule is not null)
@@ -1814,13 +2506,16 @@
                 "updateSelection",
                 "community-world-google-map",
                 _selectedCountryCode,
-                _selectedObservationId);
+                SelectedMarkerId);
         }
     }
 
+    private string? SelectedMarkerId
+        => _selectedMarkerId ?? _selectedObservationId;
+
     private bool IsSelectedMarker(GoogleMapMarker marker)
-        => _selectedObservationId is not null
-            ? string.Equals(_selectedObservationId, marker.Id, StringComparison.Ordinal)
+        => _selectedMarkerId is not null
+            ? string.Equals(_selectedMarkerId, marker.Id, StringComparison.Ordinal)
             : string.Equals(_selectedCountryCode, marker.Code, StringComparison.Ordinal);
 
     private string MapHotspotClass(GoogleMapMarker marker)
@@ -1944,13 +2639,27 @@
             _ => "공개 준비"
         };
 
+    private static string NewsPublisherTypeLabel(string? code)
+        => code switch
+        {
+            커뮤니티세계지도뉴스출처유형Codes.NewsAgency => "뉴스통신사",
+            커뮤니티세계지도뉴스출처유형Codes.NewsCooperative => "비영리 뉴스 협동조합",
+            커뮤니티세계지도뉴스출처유형Codes.StateNewsAgency => "국가통신사",
+            커뮤니티세계지도뉴스출처유형Codes.PublicServiceMedia => "공영미디어 뉴스",
+            _ => "뉴스 조직"
+        };
+
+    private static bool IsEditorialContextLayer(string layerCode)
+        => layerCode == 커뮤니티세계지도LayerCodes.NewsPublisher;
+
     private static bool IsIndividualLocationLayer(string layerCode)
         => layerCode is 커뮤니티세계지도LayerCodes.RegionalCulture
             or 커뮤니티세계지도LayerCodes.WholesaleMarket
             or 커뮤니티세계지도LayerCodes.TraditionalMarketHub
             or 커뮤니티세계지도LayerCodes.OverseasManufacturer
             or 커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence
-            or 커뮤니티세계지도LayerCodes.TourismPublicEvidence;
+            or 커뮤니티세계지도LayerCodes.TourismPublicEvidence
+            or 커뮤니티세계지도LayerCodes.NewsPublisher;
 
     private static bool IsPublicDataEvidenceLayer(string layerCode)
         => layerCode is 커뮤니티세계지도LayerCodes.GyeonggiLivestockPublicEvidence
@@ -1964,11 +2673,54 @@
             : _appliedSnapshot?.Observations.FirstOrDefault(observation =>
                 string.Equals(observation.StableId, _selectedObservationId, StringComparison.Ordinal));
 
+    private EvidenceVersionNoticeView? EvidenceVersionNotice
+    {
+        get
+        {
+            if (SelectedObservation is not { } observation
+                || (_requestedSnapshotRevision is null && _requestedSourceVersion is null))
+            {
+                return null;
+            }
+
+            return CommunityWorldMapDeepLink.ResolveEvidenceVersionStatus(
+                _requestedSnapshotRevision,
+                _requestedSourceVersion,
+                _appliedSnapshot?.Revision,
+                observation.SourceVersion) switch
+            {
+                CommunityWorldMapDeepLink.SourceVersionMatched => new EvidenceVersionNoticeView(
+                    "게시 당시 source version 일치",
+                    "게시글에 저장된 지도 snapshot과 현재 선택한 공개 근거가 같습니다.",
+                    "is-matched"),
+                CommunityWorldMapDeepLink.SourceVersionMatchedSnapshotUpdated => new EvidenceVersionNoticeView(
+                    "게시 당시 source version 일치",
+                    "지도 전체 snapshot은 갱신됐지만 이 관측의 source version은 게시 당시와 같습니다.",
+                    "is-matched"),
+                CommunityWorldMapDeepLink.SourceVersionUpdated => new EvidenceVersionNoticeView(
+                    "게시 이후 공개 근거 갱신",
+                    "같은 관측 stable ID를 다시 찾았지만 source version이 달라졌습니다. 게시 당시 근거와 현재 근거를 구분해 확인하세요.",
+                    "is-updated"),
+                CommunityWorldMapDeepLink.SnapshotRevisionMatched => new EvidenceVersionNoticeView(
+                    "게시 당시 snapshot 일치",
+                    "게시글에 저장된 지도 snapshot에서 같은 관측 stable ID를 다시 확인했습니다.",
+                    "is-matched"),
+                CommunityWorldMapDeepLink.SnapshotRevisionUpdated => new EvidenceVersionNoticeView(
+                    "지도 snapshot 갱신",
+                    "같은 관측 stable ID는 유지되지만 지도 snapshot이 게시 이후 갱신됐습니다.",
+                    "is-updated"),
+                _ => null
+            };
+        }
+    }
+
     private GoogleMapMarker? SelectedMapMarker
-        => _selectedObservationId is null
+        => _selectedMarkerId is null
             ? null
             : CurrentMapMarkers.FirstOrDefault(marker =>
-                string.Equals(marker.Id, _selectedObservationId, StringComparison.Ordinal));
+                string.Equals(marker.Id, _selectedMarkerId, StringComparison.Ordinal))
+              ?? FallbackMapMarkers.FirstOrDefault(marker =>
+                  string.Equals(marker.Id, _selectedMarkerId, StringComparison.Ordinal));
 
     private bool HasRegionalVisualSelection
         => (SelectedObservation?.LayerCode ?? SelectedMapMarker?.LayerCode) is
@@ -2090,6 +2842,26 @@
         => IsNightLearning
             ? CommunityPageRoutes.WorldMapNightLearningDataset
             : CommunityPageRoutes.WorldMapDayWorkDataset;
+
+    private bool CanPublishQuestion
+        => AuthSession.IsLoggedIn
+           && !_questionPublishing
+           && _questionDraft is not null
+           && !string.IsNullOrWhiteSpace(_questionTitle)
+           && !string.IsNullOrWhiteSpace(_questionBody)
+           && !string.IsNullOrWhiteSpace(_questionNickname)
+           && _questionPassword.Trim().Length is >= 4 and <= 100
+           && _confirmSourceReference;
+
+    private string LoginHref
+    {
+        get
+        {
+            var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+            var returnUrl = string.IsNullOrWhiteSpace(relative) ? "/" : $"/{relative}";
+            return $"/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        }
+    }
 
     private static IReadOnlyList<LearningMapCountry> BuildLearningMapCountries()
         => YouTube지식성찰채널Catalog.항목
@@ -2266,10 +3038,22 @@
         string Href,
         string ActionLabel);
 
+    private sealed record EvidenceVersionNoticeView(
+        string Title,
+        string Message,
+        string CssClass);
+
     private enum MapDatasetMode
     {
         DayWork,
         NightLearning
+    }
+
+    private enum QuestionPurpose
+    {
+        Question,
+        Proposal,
+        Gathering
     }
 
     private enum GoogleMapState

@@ -24,6 +24,26 @@ h1:focus {
     background: var(--web-bg);
 }
 
+.map-application-standalone {
+    min-height: 100dvh;
+    background:
+        radial-gradient(circle at top left, rgba(31, 122, 85, 0.10), transparent 34rem),
+        #f7fbf8;
+}
+
+.map-application-standalone__main {
+    width: min(1180px, 100%);
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+}
+
+@media (max-width: 720px) {
+    .map-application-standalone__main {
+        padding: 16px 12px 32px;
+    }
+}
+
 .web-shell {
     --web-bg: #f8fafc;
     --web-surface: #ffffff;
