@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-08-04 | [지도 신청 메뉴 입력 접근성](2026-08-04-community-map-application-accessibility.md) | 직접 확인 — fallback 마커의 `Shift+F10`, 상세 panel 버튼, dialog 초점 이동·복귀와 390×844 화면 내 배치를 검증하고 touch long-press와 Google Data marker는 공통 callback 경계로 연결 |
 | 2026-08-04 | [공식뉴스 검토 결정 영속 원장](2026-08-04-official-news-review-ledger.md) | 간접 확인 — 공식뉴스 후보의 승인·제외 snapshot과 멱등 결정 이력을 MongoDB 원장에 저장하고, 공개 지도는 외부 RSS 대신 승인된 원장 projection만 조회 |
 | 2026-08-04 | [지도 뉴스 출처별 RSS 검토 후보 연결](2026-08-04-community-map-news-rss-candidates.md) | 간접 확인 — 언론사 자체 feed 지원 상태와 같은 국가의 별도 정부기관 RSS를 구분하고, 공개 지도에서는 사용자가 원천을 선택할 때 승인 원장 후보만 조회하며 자동 게시는 차단 |
 | 2026-08-04 | [지도 관측·게시글 근거 재조회 완결](2026-08-04-community-map-post-evidence-roundtrip.md) | 간접 확인 — 지도 관측의 stable ID·snapshot·source version을 질문 초안과 게시글에 영속하고, 게시글에서 정확한 지도 deep link로 돌아가 게시 당시와 현재 근거 version 차이를 확인 |

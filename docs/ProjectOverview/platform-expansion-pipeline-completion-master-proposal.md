@@ -129,6 +129,8 @@ Workspace에는 다음이 함께 보인다.
 
 ### 4.1 데이터 수집·근거 발행 Pipeline
 
+모든 사용자 입력, 공식·공공 데이터, RSS·파일·외부 API, 내부 Event와 AI 파생값에 공통으로 적용할 처리 범위·동의·보존·공개·외부 효과 기준은 [입력·데이터 수집 처리 파이프라인 정형화 제안서](../Architecture/DataInputCollectionProcessingPipelineProposal.md)를 단일 기준으로 삼는다.
+
 ```text
 Source Registry
   → Acquire
