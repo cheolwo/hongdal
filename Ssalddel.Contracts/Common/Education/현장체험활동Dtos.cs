@@ -99,7 +99,7 @@ public sealed class 현장체험제출상태응답
 
 public static class 현장체험활동원장상수
 {
-    public const string 원장템플릿Key = "education-field-experience";
+    public const string 원장템플릿Key = Ssalddel.Contracts.Common.Community.CommunityLedgerTemplateKeys.EducationFieldExperience;
     public const string 대상OsCode = OperatingSystemIds.EducationFieldExperience;
     public const string 대상OsName = "교육 현장 체험 지원 OS";
 
