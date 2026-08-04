@@ -5,6 +5,7 @@ namespace Ssalddel.Contracts.Common.Community;
 public static class 커뮤니티세계지도Routes
 {
     public const string ObservationApi = "api/v1/community/world-map/observations";
+    public const string LedgerProjectionApi = "api/v1/community/world-map/ledger-projections";
     public const string KoreaPriceDetail = "/information/kamis-domestic-price-comparison";
     public const string UnitedStatesPriceDetail = "/information/usda-us-price-comparison";
 }

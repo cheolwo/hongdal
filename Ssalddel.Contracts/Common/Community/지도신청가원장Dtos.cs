@@ -16,6 +16,8 @@ public sealed class 지도신청가원장생성Request
 public sealed class 지도신청가원장Response
 {
     public string 원장Id { get; set; } = string.Empty;
+    public string MapMarkerId { get; set; } = string.Empty;
+    public string 업무Code { get; set; } = string.Empty;
     public Guid 신청개인정보동의증적Id { get; set; }
     public long Revision { get; set; }
     public string 원장템플릿Key { get; set; } = string.Empty;
@@ -81,6 +83,8 @@ public static class 지도신청가원장정책
     public const string 신청취소효과Code = "ApplicationCancelled";
     public const string 운영원본종류Key = "OperationalSourceType";
     public const string 운영원본IdKey = "OperationalSourceId";
+    public const string 지도MarkerIdKey = "MapMarkerId";
+    public const string 신청업무CodeKey = "ApplicationWorkCode";
     public const string 개인정보동의철회Key = "PrivacyConsentWithdrawn";
     public const string 운송취소검토상태Key = "TransportCancellationReviewState";
     public const string 운송취소검토사유Key = "TransportCancellationReviewReason";
@@ -96,6 +100,15 @@ public static class 지도신청가원장정책
             신청개인정보업무Codes.운송대행 => CommunityLedgerTemplateKeys.CargoTransport,
             신청개인정보업무Codes.개별주문 => CommunityLedgerTemplateKeys.Order,
             _ => throw new ArgumentOutOfRangeException(nameof(업무Code), 업무Code, "지원하지 않는 지도 신청 업무입니다.")
+        };
+
+    public static string 업무Code(string? 원장템플릿Key)
+        => 원장템플릿Key?.Trim() switch
+        {
+            CommunityLedgerTemplateKeys.WarehouseInbound => 신청개인정보업무Codes.물류대행,
+            CommunityLedgerTemplateKeys.CargoTransport => 신청개인정보업무Codes.운송대행,
+            CommunityLedgerTemplateKeys.Order => 신청개인정보업무Codes.개별주문,
+            _ => throw new ArgumentOutOfRangeException(nameof(원장템플릿Key), 원장템플릿Key, "지원하지 않는 지도 신청 원장입니다.")
         };
 
     public static string 신청자역할(string 업무Code)

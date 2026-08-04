@@ -61,7 +61,8 @@ public static class CommunityPageRoutes
         string? markerId = null,
         string? observationStableId = null,
         string? snapshotRevision = null,
-        string? sourceVersion = null)
+        string? sourceVersion = null,
+        string? ledgerId = null)
         => WithQuery(
             WorldMap,
             (CommunityWorldMapNavigationQueryNames.Dataset,
@@ -73,7 +74,8 @@ public static class CommunityPageRoutes
             (CommunityWorldMapNavigationQueryNames.Marker, markerId),
             (CommunityWorldMapNavigationQueryNames.Observation, observationStableId),
             (CommunityWorldMapNavigationQueryNames.SnapshotRevision, snapshotRevision),
-            (CommunityWorldMapNavigationQueryNames.SourceVersion, sourceVersion));
+            (CommunityWorldMapNavigationQueryNames.SourceVersion, sourceVersion),
+            (CommunityWorldMapNavigationQueryNames.Ledger, ledgerId));
 
     public static string BoardsFor(
         string? boardName = null,
@@ -263,4 +265,5 @@ public static class CommunityWorldMapNavigationQueryNames
     public const string Observation = "observation";
     public const string SnapshotRevision = "snapshot";
     public const string SourceVersion = "sourceVersion";
+    public const string Ledger = "ledger";
 }
