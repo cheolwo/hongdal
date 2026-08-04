@@ -8,6 +8,12 @@ namespace Ssalddel.Services.Community;
 
 public interface I지도신청가원장UseCase
 {
+    Task<IReadOnlyList<지도신청가원장Response>> 내마커원장조회Async(
+        string markerId,
+        string? ledgerId,
+        string actorUserId,
+        CancellationToken cancellationToken = default);
+
     Task<지도신청가원장Response> 생성Async(
         지도신청가원장생성Request request,
         string actorUserId,
@@ -65,6 +71,51 @@ public sealed class 지도신청가원장UseCase(
     I신청개인정보동의증적Service consentService,
     I커뮤니티원장저장소 ledgerStore) : I지도신청가원장UseCase
 {
+    private static readonly IReadOnlyList<string> 지도신청원장템플릿Keys =
+    [
+        CommunityLedgerTemplateKeys.WarehouseInbound,
+        CommunityLedgerTemplateKeys.CargoTransport,
+        CommunityLedgerTemplateKeys.Order
+    ];
+
+    public async Task<IReadOnlyList<지도신청가원장Response>> 내마커원장조회Async(
+        string markerId,
+        string? ledgerId,
+        string actorUserId,
+        CancellationToken cancellationToken = default)
+    {
+        var actor = Require(actorUserId, "로그인한 신청자 정보가 필요합니다.");
+        var normalizedMarkerId = RequireIdentifier(markerId, 160, "지도 마커 ID가 올바르지 않습니다.");
+        var normalizedLedgerId = string.IsNullOrWhiteSpace(ledgerId)
+            ? null
+            : RequireIdentifier(ledgerId, 200, "원장 ID가 올바르지 않습니다.");
+        var candidates = await ledgerStore.원장목록조회Async(
+            new 커뮤니티원장조회조건
+            {
+                원장템플릿Keys = 지도신청원장템플릿Keys,
+                접근UserId = actor,
+                외부참조조건 = new Dictionary<string, string>
+                {
+                    [지도신청가원장정책.지도MarkerIdKey] = normalizedMarkerId
+                },
+                Limit = 20
+            },
+            cancellationToken);
+
+        return candidates
+            .Where(candidate => string.Equals(candidate.생성자UserId, actor, StringComparison.Ordinal)
+                                && (normalizedLedgerId is null
+                                    || string.Equals(candidate.원장Id, normalizedLedgerId, StringComparison.Ordinal))
+                                && 지도신청원장템플릿Keys.Contains(candidate.원장템플릿Key, StringComparer.Ordinal)
+                                && candidate.외부참조.TryGetValue(지도신청가원장정책.지도MarkerIdKey, out var savedMarkerId)
+                                && string.Equals(savedMarkerId, normalizedMarkerId, StringComparison.Ordinal))
+            .Select(candidate => ToResponse(
+                candidate,
+                CommunityLedgerTemplateCatalog.Find(candidate.원장템플릿Key).DisplayName,
+                reused: true))
+            .ToArray();
+    }
+
     public async Task<지도신청가원장Response> 생성Async(
         지도신청가원장생성Request request,
         string actorUserId,
@@ -151,13 +202,13 @@ public sealed class 지도신청가원장UseCase(
                 {
                     ["ApplicationPrivacyConsentEvidenceId"] = request.신청개인정보동의증적Id.ToString("D"),
                     ["ApplicationSourceCode"] = sourceCode,
-                    ["MapMarkerId"] = Clean(request.MarkerId)
+                    [지도신청가원장정책.지도MarkerIdKey] = Clean(request.MarkerId)
                 },
                 확장속성 = new Dictionary<string, string>
                 {
                     [CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey] = CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
                     [CommunityPostProvisionalLedgerPolicy.BindingEffectAttributeKey] = CommunityPostProvisionalLedgerPolicy.NonBindingEffectCode,
-                    ["ApplicationWorkCode"] = workCode,
+                    [지도신청가원장정책.신청업무CodeKey] = workCode,
                     ["OperationalHandoffAllowed"] = bool.FalseString,
                     ["ExternalExecutionOccurred"] = bool.FalseString
                 }
@@ -361,7 +412,7 @@ public sealed class 지도신청가원장UseCase(
         {
             throw new InvalidOperationException("원장에 연결된 운영 신청과 취소 결과가 일치하지 않습니다.");
         }
-        var workCode = ledger.확장속성.GetValueOrDefault("ApplicationWorkCode", string.Empty);
+        var workCode = ledger.확장속성.GetValueOrDefault(지도신청가원장정책.신청업무CodeKey, string.Empty);
         if (!string.Equals(sourceType, 지도신청가원장정책.운영원본종류(workCode), StringComparison.Ordinal))
         {
             throw new InvalidOperationException("원장의 신청 업무와 운영 원본 종류가 일치하지 않습니다.");
@@ -714,6 +765,8 @@ public sealed class 지도신청가원장UseCase(
         => new()
         {
             원장Id = ledger.원장Id,
+            MapMarkerId = ledger.외부참조.GetValueOrDefault(지도신청가원장정책.지도MarkerIdKey, string.Empty),
+            업무Code = 지도신청가원장정책.업무Code(ledger.원장템플릿Key),
             신청개인정보동의증적Id = ReadEvidenceId(ledger),
             Revision = ledger.Revision,
             원장템플릿Key = ledger.원장템플릿Key,
@@ -752,6 +805,17 @@ public sealed class 지도신청가원장UseCase(
 
     private static string Require(string? value, string message)
         => !string.IsNullOrWhiteSpace(value) ? value.Trim() : throw new InvalidOperationException(message);
+
+    private static string RequireIdentifier(string? value, int maximumLength, string message)
+    {
+        var normalized = Require(value, message);
+        if (normalized.Length > maximumLength || normalized.Any(char.IsControl))
+        {
+            throw new InvalidOperationException(message);
+        }
+
+        return normalized;
+    }
 
     private static string Clean(string? value)
         => string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();

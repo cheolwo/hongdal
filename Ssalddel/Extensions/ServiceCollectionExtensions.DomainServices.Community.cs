@@ -78,6 +78,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityPostParticipationUseCase, CommunityPostParticipationUseCase>();
         services.AddScoped<ICommunityPostOpportunityService, CommunityPostOpportunityService>();
         services.AddScoped<I지도신청가원장UseCase, 지도신청가원장UseCase>();
+        services.AddSingleton<I커뮤니티세계지도원장ProjectionCache, 커뮤니티세계지도원장ProjectionCache>();
+        services.AddScoped<I커뮤니티세계지도원장ProjectionUseCase, 커뮤니티세계지도원장ProjectionUseCase>();
         services.AddScoped<I지도신청운송취소검토AdminWorkflow, 지도신청운송취소검토AdminWorkflow>();
         services.AddScoped<I원장다이어그램실시간알림Service, 원장다이어그램SignalR알림Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();

@@ -16,6 +16,27 @@ public sealed class 지도신청가원장Controller(
     I지도신청가원장UseCase useCase,
     I지도신청운송취소검토AdminWorkflow adminWorkflow) : CommunityControllerBase
 {
+    [HttpGet("by-map-marker")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> 내마커원장조회(
+        [FromQuery] string markerId,
+        [FromQuery] string? ledgerId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await useCase.내마커원장조회Async(
+                markerId,
+                ledgerId,
+                CurrentUserId(),
+                cancellationToken));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ProblemDetails { Title = "지도 마커의 내 신청 원장을 조회할 수 없습니다.", Detail = ex.Message });
+        }
+    }
+
     [HttpGet("by-operational-source")]
     public async Task<IActionResult> 운영원본조회(
         [FromQuery] string workCode,
