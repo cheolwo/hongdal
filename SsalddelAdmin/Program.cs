@@ -72,6 +72,11 @@ builder.Services.AddHttpClient<CommunityManagementService>((sp, client) =>
     var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl);
 });
+builder.Services.AddHttpClient<지도신청운송취소검토AdminService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
 builder.Services.AddSingleton<백오피스메모리Service>();
 builder.Services.AddSingleton<문서관리메모리Service>();
 builder.Services.AddScoped<차량관리Service>();

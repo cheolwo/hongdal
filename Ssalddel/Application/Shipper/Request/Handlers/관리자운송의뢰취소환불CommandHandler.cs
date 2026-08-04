@@ -59,6 +59,14 @@ public sealed class 관리자운송의뢰취소환불CommandHandler
             return Result.Fail<화주운송의뢰응답>("의뢰를 찾을 수 없습니다.");
         }
 
+        if (string.Equals(entity.상태, 상태값.의뢰상태.취소, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(entity.배차상태, 상태값.배차상태.취소, StringComparison.OrdinalIgnoreCase)
+            && (string.Equals(entity.결제상태, 상태값.결제상태.결제취소, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(entity.결제상태, 상태값.결제상태.환불됨, StringComparison.OrdinalIgnoreCase)))
+        {
+            return Result.Ok(화주운송의뢰매퍼.To응답(entity));
+        }
+
         var decision = 관리자운송의뢰취소환불정책.평가(
             entity.상태,
             entity.결제상태,

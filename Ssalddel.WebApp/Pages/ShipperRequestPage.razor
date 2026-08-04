@@ -1,9 +1,19 @@
 @page "/shipper/request"
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Privacy
 @inject ShipperRequestAuthoringPageViewModel PageModel
 @inject NavigationManager Navigation
+@inject CommunityMapApplicationLedgerClient MapApplicationLedgerClient
 
 <PageTitle>운송 의뢰 작성</PageTitle>
 
+@if (RequiresMapPrivacyConsent && !_privacyConsentAccepted)
+{
+    <ApplicationPrivacyConsentPanel ApplicationKind="@신청개인정보업무Codes.운송대행"
+                                    Accepted="AcceptPrivacyAsync" />
+}
+else
+{
 <ShipperRequestAuthoringScreen ViewModel="PageModel.State"
                                NavigationContext="RouteContext"
                                VehicleTypes="PageModel.VehicleTypes"
@@ -18,9 +28,26 @@
                                Changed="PageModel.AutoSaveAsync"
                                SaveRequested="PageModel.SaveAsync"
                                ResetRequested="PageModel.ResetAsync"
-                               SubmitRequested="PageModel.SubmitAsync"
+                               SubmitRequested="SubmitAsync"
                                RetryRegistrationCheck="PageModel.LoadTransportRegistrationAvailabilityAsync">
     <BeforeContent>
+        @if (string.Equals(RouteContext.Source, CommunityMapApplicationRoutes.SourceCode, StringComparison.OrdinalIgnoreCase))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                지도 마커 <strong>@(RouteContext.NodeTitle ?? "선택 항목")</strong>에서 시작했습니다.
+                마커는 공개 탐색 문맥이며 실제 화물·상하차지·운송 상대를 뜻하지 않습니다. 아래에서 조건을 직접 입력해야 운송 의뢰 초안이 됩니다.
+            </MudAlert>
+            @if (_provisionalLedger is not null)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-4">
+                    비구속 가원장 <strong>@_provisionalLedger.원장Id</strong>을 먼저 만들었습니다. 실제 운송 의뢰와 배차는 별도 단계입니다.
+                </MudAlert>
+            }
+            @if (!string.IsNullOrWhiteSpace(_ledgerError))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4">@_ledgerError</MudAlert>
+            }
+        }
         @if (RouteContext.SourcePostId is > 0)
         {
             <ShipperRequestSourcePostImportPanel PageModel="PageModel"
@@ -29,10 +56,21 @@
         }
     </BeforeContent>
 </ShipperRequestAuthoringScreen>
+}
 
 @code {
+    private bool _privacyConsentAccepted;
+    private 지도신청가원장Response? _provisionalLedger;
+    private string? _ledgerError;
+
     private ShipperRequestNavigationContext RouteContext
         => ShipperRequestNavigationContext.Parse(Navigation.Uri);
+
+    private bool RequiresMapPrivacyConsent
+        => string.Equals(
+            RouteContext.Source,
+            CommunityMapApplicationRoutes.SourceCode,
+            StringComparison.OrdinalIgnoreCase);
 
     private string CommunityConsultationHref
         => CommunityPageRoutes.ComposeFor(
@@ -54,6 +92,69 @@
     private Task RefreshAsync()
     {
         StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (RequiresMapPrivacyConsent && !await EnsureProvisionalLedgerAsync())
+        {
+            return;
+        }
+
+        await PageModel.SubmitAsync(
+            requestId => LinkSubmittedLedgerAsync("CargoTransportRequest", requestId));
+    }
+
+    private async Task<bool> EnsureProvisionalLedgerAsync()
+    {
+        if (_provisionalLedger is not null)
+        {
+            return true;
+        }
+
+        var attempt = await MapApplicationLedgerClient.TryCreateAsync(new 지도신청가원장생성Request
+        {
+            신청개인정보동의증적Id = PageModel.ApplicationPrivacyConsentEvidenceId ?? Guid.Empty,
+            업무Code = 신청개인정보업무Codes.운송대행,
+            신청출처Code = PageModel.ApplicationSourceCode,
+            MarkerId = RouteContext.SourceMarkerId ?? string.Empty,
+            MarkerName = RouteContext.NodeTitle ?? string.Empty,
+            LayerCode = RouteContext.NodeKind ?? string.Empty,
+            CountryCode = RouteContext.CountryCode ?? string.Empty
+        });
+        _provisionalLedger = attempt.Ledger;
+        _ledgerError = attempt.Error;
+        return attempt.Succeeded;
+    }
+
+    private async Task LinkSubmittedLedgerAsync(string sourceType, string sourceId)
+    {
+        if (!RequiresMapPrivacyConsent || _provisionalLedger is null)
+        {
+            return;
+        }
+
+        var attempt = await MapApplicationLedgerClient.TryMarkSubmittedAsync(
+            _provisionalLedger.원장Id,
+            new 지도신청실원장전환Request
+            {
+                신청개인정보동의증적Id = PageModel.ApplicationPrivacyConsentEvidenceId ?? Guid.Empty,
+                업무Code = 신청개인정보업무Codes.운송대행,
+                신청출처Code = PageModel.ApplicationSourceCode,
+                운영원본종류 = sourceType,
+                운영원본Id = sourceId
+            });
+        _provisionalLedger = attempt.Ledger ?? _provisionalLedger;
+        _ledgerError = attempt.Error is null
+            ? null
+            : $"운송 의뢰는 저장됐지만 원장 연결이 보류되었습니다. 의뢰를 다시 제출하지 말고 원장 연결을 재시도해 주세요. {attempt.Error}";
+    }
+
+    private Task AcceptPrivacyAsync(신청개인정보동의증적Response evidence)
+    {
+        PageModel.SetApplicationPrivacyConsent(evidence);
+        _privacyConsentAccepted = true;
         return Task.CompletedTask;
     }
 }

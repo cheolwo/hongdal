@@ -5,6 +5,9 @@ using Ssalddel.Application.Mart;
 using Ssalddel.Contracts.Mart;
 using Ssalddel.Filters;
 using 살뜰.Services.Versioning;
+using System.Security.Claims;
+using Ssalddel.Contracts.Common.Privacy;
+using Ssalddel.Services.Privacy;
 
 namespace Ssalddel.Controllers.Orderer;
 
@@ -20,7 +23,8 @@ namespace Ssalddel.Controllers.Orderer;
 [Route("api/v1/orderer/mart/order-requests")]
 public sealed class 마트주문요청Controller(
     I마트주문요청조회UseCase queryUseCase,
-    I마트주문요청작성UseCase commandUseCase) : OrdererControllerBase
+    I마트주문요청작성UseCase commandUseCase,
+    I신청개인정보동의증적Service applicationPrivacyConsent) : OrdererControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> 목록(
@@ -36,7 +40,26 @@ public sealed class 마트주문요청Controller(
     public async Task<IActionResult> 등록(
         [FromBody] 마트주문요청등록요청 request,
         CancellationToken cancellationToken)
-        => this.ToActionResult(await commandUseCase.등록Async(request, cancellationToken));
+    {
+        try
+        {
+            await applicationPrivacyConsent.유효한동의요구Async(
+                request.신청개인정보동의증적Id,
+                신청개인정보업무Codes.개별주문,
+                request.신청출처Code,
+                User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? User.FindFirstValue("sub")
+                ?? User.Identity?.Name
+                ?? string.Empty,
+                cancellationToken);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ProblemDetails { Title = "개인정보 동의를 확인할 수 없습니다.", Detail = ex.Message });
+        }
+
+        return this.ToActionResult(await commandUseCase.등록Async(request, cancellationToken));
+    }
 
     [HttpPut("{orderRequestId:guid}/quantity")]
     public async Task<IActionResult> 수량변경(

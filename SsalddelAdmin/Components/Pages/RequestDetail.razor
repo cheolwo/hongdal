@@ -1,12 +1,14 @@
 @page "/requests/{RequestId}"
 @using Ssalddel.Client.Infrastructure.Transport
 @using Ssalddel.Contracts.Admin.Transport
+@using Ssalddel.Contracts.Common.Community
 @using Ssalddel.Ui.Common.Areas.App.Services
 @using Ssalddel.Ui.Common.Areas.BackOffice.ViewModels
 @inject I백오피스Service DataService
 @inject 관리자인증세션Service AdminSession
 @inject ICommunityProcurementClient WorkflowMetadata
 @inject ITransportRequestLedgerObserver LedgerObserver
+@inject 지도신청운송취소검토AdminService CancellationReviewService
 @inject IConfiguration Configuration
 @inject NavigationManager NavigationManager
 @implements IDisposable
@@ -180,9 +182,31 @@
 
         <MudPaper Elevation="1" Class="pa-4">
             <MudStack Spacing="2">
-                <MudText Typo="Typo.h6">취소·환불 상태 기록</MudText>
+                <MudText Typo="Typo.h6">@(cancellationReview is null ? "취소·환불 상태 기록" : "지도 신청 운송 취소 검토")</MudText>
 
-                @if (!CancellationDecision.처리가능)
+                @if (cancellationReview is not null)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                        <MudText Typo="Typo.subtitle2">사용자 취소 사유</MudText>
+                        <MudText Typo="Typo.body2">@cancellationReview.운송취소검토사유</MudText>
+                        <MudText Typo="Typo.caption">공동 원장 @cancellationReview.원장Id · Revision @cancellationReview.Revision</MudText>
+                    </MudAlert>
+                }
+
+                @if (cancellationReview is not null && !showCancellationConfirmation)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                        승인하면 Simulation 운송 취소·환불 명령을 실행하고, 거절하면 운송 신청을 유지합니다. 서버가 현재 상태를 다시 검증합니다.
+                    </MudAlert>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Warning"
+                               StartIcon="@Icons.Material.Filled.FactCheck"
+                               Disabled="@isSaving"
+                               OnClick="OpenCancellationConfirmation">
+                        관리자 검토 시작
+                    </MudButton>
+                }
+                else if (cancellationReview is null && !CancellationDecision.처리가능)
                 {
                     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@CancellationDecision.안내문구</MudAlert>
                 }
@@ -232,8 +256,17 @@
                                    StartIcon="@Icons.Material.Filled.Cancel"
                                    Disabled="@(!CanSubmitCancellation)"
                                    OnClick="CancelAsync">
-                            @(isSaving ? "처리 중" : CancellationDecision.처리명)
+                            @(isSaving ? "처리 중" : cancellationReview is null ? CancellationDecision.처리명 : "취소·환불 승인")
                         </MudButton>
+                        @if (cancellationReview is not null)
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Disabled="@(!CanSubmitReviewDecision)"
+                                       OnClick="RejectCancellationReviewAsync">
+                                취소 요청 거절
+                            </MudButton>
+                        }
                     </MudStack>
                 }
             </MudStack>
@@ -246,6 +279,9 @@
 
     [Parameter]
     public string RequestId { get; set; } = string.Empty;
+
+    [SupplyParameterFromQuery(Name = "reviewLedgerId")]
+    public string? ReviewLedgerId { get; set; }
 
     private bool isLoading;
     private bool isSaving;
@@ -262,6 +298,7 @@
     private string? confirmationRequestId;
     private Severity messageSeverity = Severity.Info;
     private 화주운송의뢰응답? request;
+    private 지도신청가원장Response? cancellationReview;
     private CancellationTokenSource? pollingCts;
 
     private string LoginHref => $"/login?returnUrl={Uri.EscapeDataString($"/requests/{RequestId}")}";
@@ -294,6 +331,11 @@
            && CancellationDecision.처리가능
            && ConfirmationError is null;
 
+    private bool CanSubmitReviewDecision
+        => !isSaving
+           && cancellationReview is not null
+           && ConfirmationError is null;
+
     protected override async Task OnParametersSetAsync()
     {
         isMemoryMode = Configuration.GetValue("AdminData:UseMemory", false);
@@ -324,6 +366,7 @@
 
         EnsureObserverStarted();
         await LoadAsync();
+        await LoadCancellationReviewAsync();
     }
 
     private Task LoadAsync() => LoadAsync(showMessage: true);
@@ -453,10 +496,22 @@
 
         try
         {
-            await DataService.의뢰취소환불처리Async(
-                requestId,
-                confirmationRequestId!,
-                cancellationReason!);
+            if (cancellationReview is null)
+            {
+                await DataService.의뢰취소환불처리Async(
+                    requestId,
+                    confirmationRequestId!,
+                    cancellationReason!);
+            }
+            else
+            {
+                await CancellationReviewService.처리Async(
+                    cancellationReview.원장Id,
+                    approve: true,
+                    confirmationRequestId!,
+                    cancellationReason!);
+                cancellationReview = null;
+            }
 
             CloseCancellationConfirmation();
             isSaving = false;
@@ -475,6 +530,70 @@
         finally
         {
             isSaving = false;
+        }
+    }
+
+    private async Task RejectCancellationReviewAsync()
+    {
+        if (request is null || cancellationReview is null || !CanSubmitReviewDecision)
+        {
+            return;
+        }
+
+        isSaving = true;
+        message = null;
+        errorMessage = null;
+        try
+        {
+            await CancellationReviewService.처리Async(
+                cancellationReview.원장Id,
+                approve: false,
+                confirmationRequestId!,
+                cancellationReason!);
+            cancellationReview = null;
+            CloseCancellationConfirmation();
+            messageSeverity = Severity.Success;
+            message = "운송 취소 요청을 거절하고 신청을 유지했습니다.";
+            await LoadAsync(showMessage: false);
+        }
+        catch (Exception ex)
+        {
+            requiresLogin = IsAuthenticationFailure(ex);
+            messageSeverity = Severity.Error;
+            message = requiresLogin
+                ? "로그인 상태가 만료되었습니다. 다시 로그인해 주세요."
+                : "취소 검토 결과를 기록하지 못했습니다. 최신 원장 상태를 확인해 주세요.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task LoadCancellationReviewAsync()
+    {
+        cancellationReview = null;
+        if (string.IsNullOrWhiteSpace(ReviewLedgerId) || !AdminSession.서버관리자인가)
+        {
+            return;
+        }
+
+        try
+        {
+            var reviews = await CancellationReviewService.목록Async();
+            cancellationReview = reviews.FirstOrDefault(item =>
+                string.Equals(item.원장Id, ReviewLedgerId, StringComparison.Ordinal)
+                && string.Equals(item.운영원본Id, RequestId, StringComparison.Ordinal));
+            if (cancellationReview is null)
+            {
+                messageSeverity = Severity.Info;
+                message = "해당 공동 원장은 더 이상 운송 취소 검토 대기 상태가 아닙니다.";
+            }
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = $"운송 취소 검토 원장을 조회하지 못했습니다. {ex.Message}";
         }
     }
 

@@ -38,6 +38,10 @@ public static class 마트주문요청안내
 
 public sealed class 마트주문요청등록요청
 {
+    public Guid? 신청개인정보동의증적Id { get; set; }
+
+    public string 신청출처Code { get; set; } = string.Empty;
+
     public Guid 클라이언트요청Id { get; set; }
 
     public long 공개상품Id { get; set; }

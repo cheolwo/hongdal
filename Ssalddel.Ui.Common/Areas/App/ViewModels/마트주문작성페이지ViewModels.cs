@@ -22,6 +22,9 @@ public sealed partial class 마트주문작성ViewModel(
     [ObservableProperty]
     public partial 마트주문요청응답? 등록응답 { get; private set; }
 
+    public Guid? 신청개인정보동의증적Id { get; set; }
+    public string 신청출처Code { get; set; } = string.Empty;
+
     public bool 제출가능 => 수량 is >= 1 and <= 100 && 비구속주문요청확인 && !처리중;
 
     public Task<bool> 등록Async(long productId, CancellationToken cancellationToken = default)
@@ -46,6 +49,8 @@ public sealed partial class 마트주문작성ViewModel(
             {
                 등록응답 = await service.등록Async(new 마트주문요청등록요청
                 {
+                    신청개인정보동의증적Id = 신청개인정보동의증적Id,
+                    신청출처Code = 신청출처Code,
                     클라이언트요청Id = 클라이언트요청Id,
                     공개상품Id = productId,
                     수량 = 수량,

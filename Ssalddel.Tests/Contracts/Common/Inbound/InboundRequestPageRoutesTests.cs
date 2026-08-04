@@ -19,6 +19,7 @@ public sealed class InboundRequestPageRoutesTests
         {
             From = "/diagram?node=inbound",
             Source = "diagram-warehouse-proxy",
+            SourceMarkerId = "warehouse:9",
             WarehouseId = 9,
             WarehouseName = "도심 생활물류센터",
             SupplierCode = "SUP-9",
@@ -35,6 +36,7 @@ public sealed class InboundRequestPageRoutesTests
 
         Assert.StartsWith("/shipper/inbound/requests/new?", path, StringComparison.Ordinal);
         Assert.Equal(context.From, restored.From);
+        Assert.Equal(context.SourceMarkerId, restored.SourceMarkerId);
         Assert.Equal(context.WarehouseId, restored.WarehouseId);
         Assert.Equal(context.SupplierName, restored.SupplierName);
         Assert.Equal(context.ExpectedArrivalDate, restored.ExpectedArrivalDate);

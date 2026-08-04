@@ -22,7 +22,11 @@ public sealed class 화주운송의뢰등록Service
         _ledgerObserver = ledgerObserver;
     }
 
-    public async Task<화주운송의뢰응답> 등록Async(운송의뢰작성ViewModel viewModel, CancellationToken cancellationToken = default)
+    public async Task<화주운송의뢰응답> 등록Async(
+        운송의뢰작성ViewModel viewModel,
+        Guid? applicationPrivacyConsentEvidenceId = null,
+        string applicationSourceCode = "",
+        CancellationToken cancellationToken = default)
     {
         await _authSession.RestoreAsync(cancellationToken);
         if (!_authSession.IsLoggedIn || string.IsNullOrWhiteSpace(_authSession.AccessToken))
@@ -38,7 +42,11 @@ public sealed class 화주운송의뢰등록Service
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/shipper/requests");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
-        request.Content = JsonContent.Create(ToCreateRequest(viewModel, _authSession.UserId));
+        request.Content = JsonContent.Create(ToCreateRequest(
+            viewModel,
+            _authSession.UserId,
+            applicationPrivacyConsentEvidenceId,
+            applicationSourceCode));
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -76,7 +84,11 @@ public sealed class 화주운송의뢰등록Service
             "Ssalddel.WebApp.RequestCreated");
     }
 
-    private static 화주운송의뢰생성요청 ToCreateRequest(운송의뢰작성ViewModel source, string? userId)
+    private static 화주운송의뢰생성요청 ToCreateRequest(
+        운송의뢰작성ViewModel source,
+        string? userId,
+        Guid? applicationPrivacyConsentEvidenceId,
+        string applicationSourceCode)
     {
         var now = DateTime.UtcNow;
         var 결제수단값 = Map결제수단(source.결제수단);
@@ -86,6 +98,8 @@ public sealed class 화주운송의뢰등록Service
 
         return new 화주운송의뢰생성요청
         {
+            신청개인정보동의증적Id = applicationPrivacyConsentEvidenceId,
+            신청출처Code = applicationSourceCode,
             화주Id = string.IsNullOrWhiteSpace(userId) ? "shipper-web-demo" : userId,
             운송방식 = source.운송방식,
             차량종류 = source.차량종류,

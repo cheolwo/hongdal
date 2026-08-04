@@ -31,6 +31,8 @@ public sealed class InboundRequestPageState
 
 public sealed class InboundRequestCreateDraft
 {
+    public Guid? ApplicationPrivacyConsentEvidenceId { get; set; }
+    public string ApplicationSourceCode { get; set; } = string.Empty;
     public long? WarehouseId { get; set; }
     public string FlowType { get; set; } = 입고흐름유형코드.계약기반입고;
     public string SupplierCode { get; set; } = string.Empty;
@@ -251,6 +253,8 @@ public sealed class InboundRequestPageViewModel(IWarehouseWorkspaceService wareh
             var flowType = requestedFlowType;
             var response = await warehouseService.CreateInboundAsync(new 입고요청저장요청
             {
+                신청개인정보동의증적Id = CreateDraft.ApplicationPrivacyConsentEvidenceId,
+                신청출처Code = CreateDraft.ApplicationSourceCode,
                 창고Id = CreateDraft.WarehouseId.Value,
                 입고흐름유형 = flowType,
                 입고생성경로 = BuildInboundSourceLabel(flowType),

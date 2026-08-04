@@ -1,9 +1,37 @@
 @page "/shipper/inbound/requests/new"
 @using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Privacy
 @inject InboundRequestPageViewModel ViewModel
 @inject NavigationManager Navigation
+@inject CommunityMapApplicationLedgerClient MapApplicationLedgerClient
 
 <PageTitle>입고 요청 등록</PageTitle>
+
+@if (RequiresMapPrivacyConsent && !_privacyConsentAccepted)
+{
+    <ApplicationPrivacyConsentPanel ApplicationKind="@신청개인정보업무Codes.물류대행"
+                                    Accepted="AcceptPrivacyAsync" />
+}
+else
+{
+    @if (RequiresMapPrivacyConsent)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+            지도 마커 <strong>@(Context.NodeTitle ?? "선택 항목")</strong>에서 시작했습니다.
+            이 마커를 창고나 공급자로 확정하지 않습니다. 실제 창고·공급처·도착 조건을 아래에서 별도로 선택하고 검토하세요.
+        </MudAlert>
+        @if (_provisionalLedger is not null)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-4">
+                비구속 가원장 <strong>@_provisionalLedger.원장Id</strong>을 먼저 만들었습니다. 이 원장은 계약·결제·배차를 확정하지 않습니다.
+            </MudAlert>
+        }
+        @if (!string.IsNullOrWhiteSpace(_ledgerError))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4">@_ledgerError</MudAlert>
+        }
+    }
 
 <InboundRequestCreateScreen State="@ViewModel.State"
                             Draft="@ViewModel.CreateDraft"
@@ -11,9 +39,19 @@
                             HomeHref="@ShipperRoutes.WarehouseWorkspace"
                             RefreshWarehousesRequested="RefreshWarehousesAsync"
                             CreateRequested="CreateAsync" />
+}
 
 @code {
     private InboundRequestNavigationContext Context { get; set; } = new();
+    private bool _privacyConsentAccepted;
+    private 지도신청가원장Response? _provisionalLedger;
+    private string? _ledgerError;
+
+    private bool RequiresMapPrivacyConsent
+        => string.Equals(
+            Context.Source,
+            CommunityMapApplicationRoutes.SourceCode,
+            StringComparison.OrdinalIgnoreCase);
 
     protected override async Task OnInitializedAsync()
     {
@@ -23,12 +61,71 @@
 
     private async Task CreateAsync()
     {
+        if (RequiresMapPrivacyConsent && !await EnsureProvisionalLedgerAsync())
+        {
+            return;
+        }
+
         var inboundId = await ViewModel.CreateInboundAsync();
         if (inboundId is > 0)
         {
+            await LinkSubmittedLedgerAsync("WarehouseInboundRequest", inboundId.Value.ToString());
             Navigation.NavigateTo((Context with { Created = true }).PathFor(InboundRequestScreenKind.Detail, inboundId));
         }
     }
 
     private Task RefreshWarehousesAsync() => ViewModel.RefreshWarehousesAsync();
+
+    private async Task<bool> EnsureProvisionalLedgerAsync()
+    {
+        if (_provisionalLedger is not null)
+        {
+            return true;
+        }
+
+        var attempt = await MapApplicationLedgerClient.TryCreateAsync(new 지도신청가원장생성Request
+        {
+            신청개인정보동의증적Id = ViewModel.CreateDraft.ApplicationPrivacyConsentEvidenceId ?? Guid.Empty,
+            업무Code = 신청개인정보업무Codes.물류대행,
+            신청출처Code = ViewModel.CreateDraft.ApplicationSourceCode,
+            MarkerId = Context.SourceMarkerId ?? string.Empty,
+            MarkerName = Context.NodeTitle ?? string.Empty,
+            LayerCode = Context.NodeGroup ?? string.Empty,
+            CountryCode = Context.Scope ?? string.Empty
+        });
+        _provisionalLedger = attempt.Ledger;
+        _ledgerError = attempt.Error;
+        return attempt.Succeeded;
+    }
+
+    private async Task LinkSubmittedLedgerAsync(string sourceType, string sourceId)
+    {
+        if (!RequiresMapPrivacyConsent || _provisionalLedger is null)
+        {
+            return;
+        }
+
+        var attempt = await MapApplicationLedgerClient.TryMarkSubmittedAsync(
+            _provisionalLedger.원장Id,
+            new 지도신청실원장전환Request
+            {
+                신청개인정보동의증적Id = ViewModel.CreateDraft.ApplicationPrivacyConsentEvidenceId ?? Guid.Empty,
+                업무Code = 신청개인정보업무Codes.물류대행,
+                신청출처Code = ViewModel.CreateDraft.ApplicationSourceCode,
+                운영원본종류 = sourceType,
+                운영원본Id = sourceId
+            });
+        _provisionalLedger = attempt.Ledger ?? _provisionalLedger;
+        _ledgerError = attempt.Error is null
+            ? null
+            : $"입고 신청은 저장됐지만 원장 연결이 보류되었습니다. 신청을 다시 제출하지 말고 원장 연결을 재시도해 주세요. {attempt.Error}";
+    }
+
+    private Task AcceptPrivacyAsync(신청개인정보동의증적Response evidence)
+    {
+        ViewModel.CreateDraft.ApplicationPrivacyConsentEvidenceId = evidence.증적Id;
+        ViewModel.CreateDraft.ApplicationSourceCode = evidence.출처Code;
+        _privacyConsentAccepted = true;
+        return Task.CompletedTask;
+    }
 }

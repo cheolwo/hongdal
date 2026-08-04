@@ -89,6 +89,25 @@ public sealed class 관리자운송의뢰취소환불CommandHandlerTests
     }
 
     [Fact]
+    public async Task 같은_관리자취소환불을_재시도하면_이벤트를중복기록하지않는다()
+    {
+        await using var db = CreateContext();
+        var entity = NewRequest("REQ-IDEMPOTENT", "결제대기", "미시작");
+        db.Add(entity);
+        await db.SaveChangesAsync();
+
+        var handler = CreateHandler(db, 역할명.서버관리자, SsalddelExecutionMode.Simulation);
+        var command = new 관리자운송의뢰취소환불Command(entity.의뢰Id, entity.의뢰Id, "사용자 취소 검토 승인");
+
+        var first = await handler.Handle(command, CancellationToken.None);
+        var retried = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(first.IsSuccess);
+        Assert.True(retried.IsSuccess);
+        Assert.Single(db.운송이벤트);
+    }
+
+    [Fact]
     public async Task 운송중인_의뢰는_서버에서_거부한다()
     {
         await using var db = CreateContext();

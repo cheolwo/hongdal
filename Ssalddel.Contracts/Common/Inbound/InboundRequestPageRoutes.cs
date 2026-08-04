@@ -41,6 +41,7 @@ public sealed record InboundRequestNavigationContext
     public bool Created { get; init; }
     public string? From { get; init; }
     public string? Source { get; init; }
+    public string? SourceMarkerId { get; init; }
     public long? WarehouseId { get; init; }
     public string? WarehouseName { get; init; }
     public string? ProxyType { get; init; }
@@ -90,6 +91,7 @@ public sealed record InboundRequestNavigationContext
             Created = ParseBool(query, "created"),
             From = SafeLocalOrNull(Get(query, "from")),
             Source = Get(query, "source"),
+            SourceMarkerId = Get(query, "sourceMarkerId"),
             WarehouseId = ParseLong(query, "warehouseId"),
             WarehouseName = Get(query, "warehouseName"),
             ProxyType = Get(query, "proxyType"),
@@ -126,6 +128,7 @@ public sealed record InboundRequestNavigationContext
         Add(values, "created", includeCreated && Created ? "true" : null);
         Add(values, "from", SafeLocalOrNull(From));
         Add(values, "source", Source);
+        Add(values, "sourceMarkerId", SourceMarkerId);
         if (!includeDraft)
         {
             return values.Count == 0 ? path : $"{path}?{string.Join('&', values)}";

@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ssalddel.ApiMetadata;
 using 살뜰.Services.Versioning;
+using System.Security.Claims;
+using Ssalddel.Contracts.Common.Privacy;
+using Ssalddel.Services.Privacy;
 
 namespace Ssalddel.Controllers.Shipper.Request01
 {
@@ -24,10 +27,14 @@ namespace Ssalddel.Controllers.Shipper.Request01
     public class 화주운송의뢰Controller : ShipperControllerBase
     {
         private readonly I화주운송의뢰UseCase _useCase;
+        private readonly I신청개인정보동의증적Service _applicationPrivacyConsent;
 
-        public 화주운송의뢰Controller(I화주운송의뢰UseCase useCase)
+        public 화주운송의뢰Controller(
+            I화주운송의뢰UseCase useCase,
+            I신청개인정보동의증적Service applicationPrivacyConsent)
         {
             _useCase = useCase;
+            _applicationPrivacyConsent = applicationPrivacyConsent;
         }
 
         [HttpGet]
@@ -68,8 +75,27 @@ namespace Ssalddel.Controllers.Shipper.Request01
         }
 
         [HttpPost]
-        public async Task<IActionResult> 의뢰생성([FromBody] 화주운송의뢰생성요청 req)
+        public async Task<IActionResult> 의뢰생성(
+            [FromBody] 화주운송의뢰생성요청 req,
+            CancellationToken cancellationToken)
         {
+            try
+            {
+                await _applicationPrivacyConsent.유효한동의요구Async(
+                    req.신청개인정보동의증적Id,
+                    신청개인정보업무Codes.운송대행,
+                    req.신청출처Code,
+                    User.FindFirstValue(ClaimTypes.NameIdentifier)
+                    ?? User.FindFirstValue("sub")
+                    ?? User.Identity?.Name
+                    ?? string.Empty,
+                    cancellationToken);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ProblemDetails { Title = "개인정보 동의를 확인할 수 없습니다.", Detail = ex.Message });
+            }
+
             var result = await _useCase.의뢰생성Async(req);
             return result.IsSuccess
                 ? CreatedAtAction(nameof(의뢰단건조회), new { requestId = result.Value.의뢰Id }, result.Value)

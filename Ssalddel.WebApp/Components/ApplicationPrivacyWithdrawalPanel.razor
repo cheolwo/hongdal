@@ -1,0 +1,149 @@
+@using Ssalddel.Contracts.Common.Community
+@inject CommunityMapApplicationLedgerClient LedgerClient
+@inject ApplicationPrivacyConsentClient ConsentClient
+@inject WebLocalePreferenceService Locale
+
+@if (_loadError is not null)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="my-4">
+        @_loadError
+    </MudAlert>
+}
+else if (_ledger is not null)
+{
+    <MudPaper Outlined="true" Class="pa-4 my-4">
+        <MudText Typo="Typo.h6">@Ui("개인정보 동의 관리", "Privacy consent management")</MudText>
+        <MudText Typo="Typo.body2" Class="mt-2">
+            @Ui(
+                $"지도 신청 원장 {_ledger.원장Id}에 연결된 동의 증적을 관리합니다.",
+                $"Manage the consent evidence linked to map-application ledger {_ledger.원장Id}.")
+        </MudText>
+
+        @if (_ledger.동의철회보류)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+                @Ui(
+                    "개인정보 동의가 철회되어 원장의 후속 처리가 보류되었습니다. 이미 제출된 신청은 자동 취소되지 않았습니다.",
+                    "Consent was withdrawn and further ledger processing is on hold. The submitted request was not automatically cancelled.")
+            </MudAlert>
+        }
+        else
+        {
+            <div class="application-privacy-consent__legal mt-3">
+                <label for="@NoticeId">@Ui("철회 영향 및 법적 안내", "Withdrawal effect and legal notice")</label>
+                <textarea id="@NoticeId" rows="8" readonly aria-readonly="true">@WithdrawalNotice</textarea>
+            </div>
+
+            <MudTextField @bind-Value="_reason"
+                          Label="@Ui("철회 사유(선택)", "Reason for withdrawal (optional)")"
+                          Variant="Variant.Outlined"
+                          Lines="2"
+                          Class="mt-3" />
+            <MudCheckBox T="bool" @bind-Value="_effectConfirmed"
+                         Label="@Ui("동의 철회와 운영 신청 취소는 별도 절차임을 확인했습니다.", "I understand that withdrawing consent and cancelling the operational request are separate actions.")"
+                         Class="mt-2" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Warning"
+                       Disabled="@(!_effectConfirmed || _saving)"
+                       OnClick="WithdrawAsync"
+                       Class="mt-3">
+                @(_saving ? Ui("철회 반영 중…", "Applying withdrawal…") : Ui("개인정보 동의 철회", "Withdraw privacy consent"))
+            </MudButton>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_actionMessage))
+        {
+            <MudAlert Severity="@_actionSeverity" Variant="Variant.Outlined" Class="mt-3">
+                @_actionMessage
+            </MudAlert>
+        }
+    </MudPaper>
+}
+
+@code {
+    [Parameter, EditorRequired] public string WorkCode { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string OperationalSourceType { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string OperationalSourceId { get; set; } = string.Empty;
+
+    private 지도신청가원장Response? _ledger;
+    private string? _loadedKey;
+    private string? _loadError;
+    private string _reason = string.Empty;
+    private string _actionMessage = string.Empty;
+    private Severity _actionSeverity = Severity.Info;
+    private bool _effectConfirmed;
+    private bool _saving;
+
+    private string NoticeId => $"privacy-withdrawal-{OperationalSourceType}-{OperationalSourceId}";
+
+    private string WithdrawalNotice => Ui(
+        "[철회 영향] 철회 시 이 동의에 근거한 원장의 새로운 개인정보 처리와 업무 인계를 보류합니다.\n\n[운영 신청] 이미 제출된 입고·운송·주문 신청은 자동 취소되지 않습니다. 해당 신청을 취소하려면 각 신청의 철회·취소 절차를 별도로 이용해야 합니다.\n\n[보존] 중복 방지, 분쟁 대응 또는 관계 법령상 보존 의무가 있는 최소 기록은 다른 개인정보와 분리하여 필요한 기간 동안 보관될 수 있습니다.\n\n[법률 검토] 실제 파기·보존 집행과 정보주체 권리 처리 절차는 운영 전 개인정보 처리방침 및 법률 검토와 일치시켜야 합니다.",
+        "[EFFECT] Withdrawal places new processing and operational handoff based on this consent on hold.\n\n[OPERATIONAL REQUEST] A previously submitted inbound, transportation, or order request is not automatically cancelled. Use that request's separate cancellation or withdrawal process.\n\n[RETENTION] Minimum records may be retained separately where needed for duplicate prevention, disputes, or applicable legal obligations.\n\n[LEGAL REVIEW] Production deletion, retention, and data-subject request procedures must match the actual privacy notice and applicable U.S. federal and state requirements. This notice is a product draft, not legal advice.");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = $"{WorkCode}|{OperationalSourceType}|{OperationalSourceId}";
+        if (string.Equals(_loadedKey, key, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedKey = key;
+        _ledger = null;
+        _loadError = null;
+        if (string.IsNullOrWhiteSpace(WorkCode)
+            || string.IsNullOrWhiteSpace(OperationalSourceType)
+            || string.IsNullOrWhiteSpace(OperationalSourceId))
+        {
+            return;
+        }
+
+        try
+        {
+            _ledger = await LedgerClient.FindByOperationalSourceAsync(
+                WorkCode,
+                OperationalSourceType,
+                OperationalSourceId);
+        }
+        catch (Exception ex)
+        {
+            _loadError = ex.Message;
+        }
+    }
+
+    private async Task WithdrawAsync()
+    {
+        if (_ledger is null || _ledger.신청개인정보동의증적Id == Guid.Empty || !_effectConfirmed || _saving)
+        {
+            return;
+        }
+
+        _saving = true;
+        _actionMessage = string.Empty;
+        try
+        {
+            await ConsentClient.WithdrawAsync(_ledger.신청개인정보동의증적Id, _reason);
+            _ledger = await LedgerClient.MarkConsentWithdrawnAsync(
+                _ledger.원장Id,
+                _ledger.신청개인정보동의증적Id);
+            _actionSeverity = Severity.Success;
+            _actionMessage = Ui(
+                "개인정보 동의를 철회하고 원장을 보류했습니다. 운영 신청은 자동 취소하지 않았습니다.",
+                "Consent was withdrawn and the ledger was placed on hold. The operational request was not automatically cancelled.");
+        }
+        catch (Exception ex)
+        {
+            _actionSeverity = Severity.Error;
+            _actionMessage = Ui(
+                $"철회 또는 원장 보류 반영을 완료하지 못했습니다. 운영 신청을 다시 제출하지 말고 이 작업을 재시도해 주세요. {ex.Message}",
+                $"The withdrawal or ledger hold could not be fully applied. Do not resubmit the operational request; retry this action. {ex.Message}");
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private string Ui(string korean, string english)
+        => Locale.IsEnglish ? english : korean;
+}

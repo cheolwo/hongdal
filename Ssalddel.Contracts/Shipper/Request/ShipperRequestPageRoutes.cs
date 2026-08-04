@@ -41,9 +41,11 @@ public sealed record ShipperRequestNavigationContext
 {
     public long? SourcePostId { get; init; }
     public string? Source { get; init; }
+    public string? SourceMarkerId { get; init; }
     public string? LedgerTemplateKey { get; init; }
     public string? NodeTitle { get; init; }
     public string? NodeKind { get; init; }
+    public string? CountryCode { get; init; }
     public string? ReturnPath { get; init; }
 
     public string RootPath => BuildPath(ShipperRequestPageRoutes.Root);
@@ -60,9 +62,11 @@ public sealed record ShipperRequestNavigationContext
         {
             SourcePostId = TryPositiveLong(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.SourcePostId)),
             Source = NormalizeValue(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.Source), 80),
+            SourceMarkerId = NormalizeValue(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.SourceMarkerId), 160),
             LedgerTemplateKey = NormalizeValue(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.LedgerTemplateKey), 100),
             NodeTitle = NormalizeValue(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.NodeTitle), 200),
             NodeKind = NormalizeValue(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.NodeKind), 80),
+            CountryCode = NormalizeValue(values.GetValueOrDefault(ShipperRequestNavigationQueryNames.CountryCode), 8),
             ReturnPath = PageNavigationContext.NormalizeReturnPath(
                 values.GetValueOrDefault(PageNavigationQueryNames.ReturnPath))
         };
@@ -74,9 +78,11 @@ public sealed record ShipperRequestNavigationContext
         {
             (ShipperRequestNavigationQueryNames.SourcePostId, SourcePostId is > 0 ? SourcePostId.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : null),
             (ShipperRequestNavigationQueryNames.Source, NormalizeValue(Source, 80)),
+            (ShipperRequestNavigationQueryNames.SourceMarkerId, NormalizeValue(SourceMarkerId, 160)),
             (ShipperRequestNavigationQueryNames.LedgerTemplateKey, NormalizeValue(LedgerTemplateKey, 100)),
             (ShipperRequestNavigationQueryNames.NodeTitle, NormalizeValue(NodeTitle, 200)),
             (ShipperRequestNavigationQueryNames.NodeKind, NormalizeValue(NodeKind, 80)),
+            (ShipperRequestNavigationQueryNames.CountryCode, NormalizeValue(CountryCode, 8)),
             (PageNavigationQueryNames.ReturnPath, PageNavigationContext.NormalizeReturnPath(ReturnPath))
         };
 
@@ -183,7 +189,9 @@ public static class ShipperRequestNavigationQueryNames
 {
     public const string SourcePostId = "sourcePostId";
     public const string Source = "source";
+    public const string SourceMarkerId = "sourceMarkerId";
     public const string LedgerTemplateKey = "ledgerTemplateKey";
     public const string NodeTitle = "nodeTitle";
     public const string NodeKind = "nodeKind";
+    public const string CountryCode = "country";
 }

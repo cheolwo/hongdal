@@ -16,10 +16,19 @@ public partial class OrdererMartOrderRequestWorkspace
     public Guid? RequestId { get; set; }
 
     [Parameter]
+    public Guid? ApplicationPrivacyConsentEvidenceId { get; set; }
+
+    [Parameter]
+    public string ApplicationSourceCode { get; set; } = string.Empty;
+
+    [Parameter]
     public string CatalogHref { get; set; } = MartProductPageRoutes.Root;
 
     [Parameter]
     public EventCallback<Guid?> RequestSelected { get; set; }
+
+    [Parameter]
+    public Func<Task<bool>>? BeforeSubmit { get; set; }
 
     private 주문자앱인증ViewModel Authentication => ViewModel.인증;
     private 마트공개상품상세ViewModel Product => ViewModel.상품;
@@ -102,6 +111,13 @@ public partial class OrdererMartOrderRequestWorkspace
 
     private async Task SubmitAsync()
     {
+        if (BeforeSubmit is not null && !await BeforeSubmit())
+        {
+            return;
+        }
+
+        Writer.신청개인정보동의증적Id = ApplicationPrivacyConsentEvidenceId;
+        Writer.신청출처Code = ApplicationSourceCode;
         if (Product.상세 is not { 판매가능여부: true } product
             || !await Writer.등록Async(product.Id)
             || Writer.등록응답 is not { } response)

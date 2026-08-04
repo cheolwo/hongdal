@@ -156,6 +156,8 @@ public sealed class 입고요청페이지응답
 
 public sealed class 입고요청저장요청
 {
+    public Guid? 신청개인정보동의증적Id { get; set; }
+    public string 신청출처Code { get; set; } = string.Empty;
     public long 창고Id { get; set; }
     public string 입고흐름유형 { get; set; } = 입고흐름유형코드.계약기반입고;
     public string 입고생성경로 { get; set; } = string.Empty;

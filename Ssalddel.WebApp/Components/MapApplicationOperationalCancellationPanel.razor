@@ -1,0 +1,186 @@
+@using Ssalddel.Contracts.Common.Community
+@inject CommunityMapApplicationLedgerClient LedgerClient
+@inject MapApplicationOperationalCancellationClient CancellationClient
+@inject WebLocalePreferenceService Locale
+
+@if (_loadError is not null)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="my-4">@_loadError</MudAlert>
+}
+else if (_ledger is not null)
+{
+    <MudPaper Outlined="true" Class="pa-4 my-4">
+        <MudText Typo="Typo.h6">@Ui("운영 신청 취소", "Cancel operational request")</MudText>
+
+        @if (_ledger.운영신청취소됨)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
+                @Ui("운영 신청이 명시적으로 취소되었고 원장이 닫혔습니다.", "The operational request was explicitly cancelled and the ledger was closed.")
+            </MudAlert>
+        }
+        else if (string.Equals(
+                     _ledger.운송취소검토상태Code,
+                     지도신청가원장정책.운송취소검토요청됨Code,
+                     StringComparison.Ordinal))
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+                @Ui(
+                    $"운송 의뢰 물리 삭제 없이 관리자 취소·환불 검토를 요청했습니다. 사유: {_ledger.운송취소검토사유}",
+                    $"An administrator cancellation and refund review was requested without physically deleting the transportation request. Reason: {_ledger.운송취소검토사유}")
+            </MudAlert>
+        }
+        else
+        {
+            <div class="application-privacy-consent__legal mt-3">
+                <label for="@NoticeId">@Ui("취소 영향 확인", "Cancellation effect")</label>
+                <textarea id="@NoticeId" rows="7" readonly aria-readonly="true">@CancellationNotice</textarea>
+            </div>
+            @if (IsTransportReview)
+            {
+                <MudTextField @bind-Value="_reason"
+                              Label="@Ui("관리자 검토 사유(필수)", "Administrator review reason (required)")"
+                              Variant="Variant.Outlined"
+                              Lines="2"
+                              Class="mt-3" />
+            }
+            <MudCheckBox T="bool"
+                         @bind-Value="_confirmed"
+                         Label="@ConfirmationLabel"
+                         Class="mt-2" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Error"
+                       Disabled="@(!CanSubmit || _saving)"
+                       OnClick="CancelAsync"
+                       Class="mt-3">
+                @(_saving ? Ui("처리 중…", "Processing…") : ActionLabel)
+            </MudButton>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <MudAlert Severity="@_severity" Variant="Variant.Outlined" Class="mt-3">@_message</MudAlert>
+        }
+    </MudPaper>
+}
+
+@code {
+    [Parameter, EditorRequired] public string WorkCode { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string OperationalSourceType { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string OperationalSourceId { get; set; } = string.Empty;
+
+    private 지도신청가원장Response? _ledger;
+    private string? _loadedKey;
+    private string? _loadError;
+    private string _message = string.Empty;
+    private Severity _severity = Severity.Info;
+    private bool _confirmed;
+    private bool _saving;
+    private string _reason = string.Empty;
+
+    private bool IsTransportReview
+        => string.Equals(WorkCode, Ssalddel.Contracts.Common.Privacy.신청개인정보업무Codes.운송대행, StringComparison.Ordinal);
+
+    private bool CanSubmit => _confirmed && (!IsTransportReview || !string.IsNullOrWhiteSpace(_reason));
+
+    private string ActionLabel => IsTransportReview
+        ? Ui("관리자 취소 검토 요청", "Request administrator cancellation review")
+        : Ui("운영 신청 취소", "Cancel operational request");
+
+    private string ConfirmationLabel => IsTransportReview
+        ? Ui("물리 삭제 없이 관리자 취소·환불 검토를 요청합니다.", "Request administrator cancellation and refund review without physical deletion.")
+        : Ui("동의 철회와 별개로 이 운영 신청을 취소합니다.", "I want to cancel this operational request separately from privacy-consent withdrawal.");
+
+    private string NoticeId => $"operational-cancellation-{OperationalSourceType}-{OperationalSourceId}";
+
+    private string CancellationNotice => Ui(
+        "[별도 절차] 개인정보 동의 철회만으로 운영 신청은 취소되지 않습니다. 입고·개별주문은 연결된 취소 API를 호출하고, 운송은 물리 삭제 없이 관리자 검토를 요청합니다.\n\n[허용 범위] 입고 요청은 입고 예정 상태에서만 취소할 수 있습니다. 개별 주문 요청은 비구속 주문 의향을 철회합니다. 운송은 배차·운송·결제 진행 여부를 관리자가 확인해야 합니다.\n\n[후속 효과] 성공 후 원장은 닫히며 결제·계약·배차를 새로 만들지 않습니다. 이미 발생한 정산·배송·보관 등 후속 효과가 있다면 별도 운영 검토가 필요합니다.",
+        "[SEPARATE ACTION] Withdrawing privacy consent does not cancel the operational request. Inbound and individual-order flows call their cancellation endpoints; transportation requests enter administrator review without physical deletion.\n\n[SCOPE] An inbound request can be cancelled only while scheduled. An individual order request withdraws non-binding intent. Transportation requires administrator review of dispatch, transport, and payment progress.\n\n[AFTEREFFECTS] The ledger is closed only after cancellation succeeds. No new payment, contract, or dispatch is created. Existing settlement, delivery, storage, or other effects require separate operational review.");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = $"{WorkCode}|{OperationalSourceType}|{OperationalSourceId}";
+        if (string.Equals(_loadedKey, key, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedKey = key;
+        _ledger = null;
+        _loadError = null;
+        if (string.IsNullOrWhiteSpace(WorkCode)
+            || string.IsNullOrWhiteSpace(OperationalSourceType)
+            || string.IsNullOrWhiteSpace(OperationalSourceId))
+        {
+            return;
+        }
+
+        try
+        {
+            _ledger = await LedgerClient.FindByOperationalSourceAsync(
+                WorkCode,
+                OperationalSourceType,
+                OperationalSourceId);
+        }
+        catch (Exception ex)
+        {
+            _loadError = ex.Message;
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        if (_ledger is null || !CanSubmit || _saving)
+        {
+            return;
+        }
+
+        _saving = true;
+        _message = string.Empty;
+        try
+        {
+            if (IsTransportReview)
+            {
+                _ledger = await LedgerClient.RequestTransportCancellationReviewAsync(
+                    _ledger.원장Id,
+                    OperationalSourceId,
+                    _reason);
+                _severity = Severity.Success;
+                _message = Ui(
+                    "운송 의뢰를 삭제하지 않고 관리자 취소·환불 검토를 요청했습니다.",
+                    "Administrator cancellation and refund review was requested without deleting the transportation request.");
+                return;
+            }
+
+            var result = await CancellationClient.CancelAsync(WorkCode, OperationalSourceId);
+            if (!result.Cancelled)
+            {
+                _severity = Severity.Warning;
+                _message = result.Message;
+                return;
+            }
+
+            _ledger = await LedgerClient.MarkOperationalCancelledAsync(
+                _ledger.원장Id,
+                OperationalSourceType,
+                OperationalSourceId);
+            _severity = Severity.Success;
+            _message = Ui(
+                "운영 신청을 취소하고 원장을 닫았습니다.",
+                "The operational request was cancelled and the ledger was closed.");
+        }
+        catch (Exception ex)
+        {
+            _severity = Severity.Error;
+            _message = Ui(
+                $"운영 신청 취소 또는 원장 반영을 완료하지 못했습니다. 신청을 다시 만들지 말고 이 취소 작업만 재시도해 주세요. {ex.Message}",
+                $"The operational cancellation or ledger update did not fully complete. Do not recreate the request; retry only this cancellation action. {ex.Message}");
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private string Ui(string korean, string english)
+        => Locale.IsEnglish ? english : korean;
+}

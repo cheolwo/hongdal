@@ -66,6 +66,8 @@ public sealed class 화주운송정산조건DTO
 
 public sealed class 화주운송의뢰생성요청
 {
+    public Guid? 신청개인정보동의증적Id { get; set; }
+    public string 신청출처Code { get; set; } = string.Empty;
     public string? 화주Id { get; set; }
     public string? 운송방식 { get; set; }
     public string? 차량종류 { get; set; }

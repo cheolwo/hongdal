@@ -2,6 +2,7 @@
 @page "/shipper/request/{RequestId}"
 @inject ShipperRequestDetailPageViewModel PageModel
 @inject NavigationManager Navigation
+@using Ssalddel.Contracts.Common.Privacy
 
 <PageTitle>운송 의뢰 요약</PageTitle>
 
@@ -12,6 +13,16 @@
                              LoginHref="/login"
                              RefreshRequested="RefreshAsync"
                              LookupRequested="OpenRequest" />
+
+@if (!string.IsNullOrWhiteSpace(EffectiveRequestId))
+{
+    <ApplicationPrivacyWithdrawalPanel WorkCode="@신청개인정보업무Codes.운송대행"
+                                       OperationalSourceType="CargoTransportRequest"
+                                       OperationalSourceId="@EffectiveRequestId" />
+    <MapApplicationOperationalCancellationPanel WorkCode="@신청개인정보업무Codes.운송대행"
+                                                OperationalSourceType="CargoTransportRequest"
+                                                OperationalSourceId="@EffectiveRequestId" />
+}
 
 @code {
     [Parameter] public string? RequestId { get; set; }

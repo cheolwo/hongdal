@@ -10,6 +10,8 @@ using Ssalddel.Security;
 using System.Security.Claims;
 using Ssalddel.Controllers;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Contracts.Common.Privacy;
+using Ssalddel.Services.Privacy;
 using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Common;
@@ -40,6 +42,7 @@ public sealed class 창고작업Controller : ControllerBase
     private readonly I출고인계준비UseCase _outboundHandoffUseCase;
     private readonly I출고예정검토UseCase _outboundPlanReviewUseCase;
     private readonly I출고운송인계완료UseCase _outboundTransportHandoffUseCase;
+    private readonly I신청개인정보동의증적Service _applicationPrivacyConsent;
 
     public 창고작업Controller(
         I창고작업UseCase useCase,
@@ -49,7 +52,8 @@ public sealed class 창고작업Controller : ControllerBase
         I포장작업UseCase packingTaskUseCase,
         I출고인계준비UseCase outboundHandoffUseCase,
         I출고예정검토UseCase outboundPlanReviewUseCase,
-        I출고운송인계완료UseCase outboundTransportHandoffUseCase)
+        I출고운송인계완료UseCase outboundTransportHandoffUseCase,
+        I신청개인정보동의증적Service applicationPrivacyConsent)
     {
         _useCase = useCase;
         _pickingTaskUseCase = pickingTaskUseCase;
@@ -59,6 +63,7 @@ public sealed class 창고작업Controller : ControllerBase
         _outboundHandoffUseCase = outboundHandoffUseCase;
         _outboundPlanReviewUseCase = outboundPlanReviewUseCase;
         _outboundTransportHandoffUseCase = outboundTransportHandoffUseCase;
+        _applicationPrivacyConsent = applicationPrivacyConsent;
     }
 
     [HttpGet("warehouses")]
@@ -180,6 +185,20 @@ public sealed class 창고작업Controller : ControllerBase
         HrDetailedRoleCodes.WarehouseInboundOperator)]
     public async Task<IActionResult> 입고생성([FromBody] 입고요청저장요청 request, CancellationToken cancellationToken)
     {
+        try
+        {
+            await _applicationPrivacyConsent.유효한동의요구Async(
+                request.신청개인정보동의증적Id,
+                신청개인정보업무Codes.물류대행,
+                request.신청출처Code,
+                현재UserId(),
+                cancellationToken);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ProblemDetails { Title = "개인정보 동의를 확인할 수 없습니다.", Detail = ex.Message });
+        }
+
         var result = await _useCase.입고생성Async(request, 요청Context생성(), cancellationToken);
         return this.ToActionResult(result);
     }
@@ -507,5 +526,11 @@ public sealed class 창고작업Controller : ControllerBase
             HttpContext.TraceIdentifier,
             HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
             Request.Headers.UserAgent.ToString());
+
+    private string 현재UserId()
+        => User.FindFirstValue(ClaimTypes.NameIdentifier)
+           ?? User.FindFirstValue("sub")
+           ?? User.Identity?.Name
+           ?? string.Empty;
 
 }

@@ -1,5 +1,6 @@
 @page "/shipper/inbound/requests/{InboundId:long}"
 @using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Contracts.Common.Privacy
 @inject InboundRequestPageViewModel ViewModel
 @inject NavigationManager Navigation
 
@@ -10,6 +11,13 @@
                             InboundId="@InboundId"
                             HomeHref="@ShipperRoutes.WarehouseWorkspace"
                             RefreshRequested="RefreshAsync" />
+
+<ApplicationPrivacyWithdrawalPanel WorkCode="@신청개인정보업무Codes.물류대행"
+                                   OperationalSourceType="WarehouseInboundRequest"
+                                   OperationalSourceId="@InboundId.ToString()" />
+<MapApplicationOperationalCancellationPanel WorkCode="@신청개인정보업무Codes.물류대행"
+                                            OperationalSourceType="WarehouseInboundRequest"
+                                            OperationalSourceId="@InboundId.ToString()" />
 
 @code {
     [Parameter] public long InboundId { get; set; }

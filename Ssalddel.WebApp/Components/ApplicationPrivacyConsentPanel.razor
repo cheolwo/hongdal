@@ -1,0 +1,176 @@
+@using Ssalddel.Contracts.Common.Privacy
+@using Ssalddel.WebApp.Services
+@implements IDisposable
+@inject WebLocalePreferenceService Locale
+@inject ApplicationPrivacyConsentClient ConsentClient
+@inject NavigationManager Navigation
+
+<section class="application-privacy-consent" aria-labelledby="@HeadingId">
+    <header>
+        <span>@Ui("개인정보 동의 · 필수", "PRIVACY NOTICE · REQUIRED")</span>
+        <h2 id="@HeadingId">@Ui($"{KoreanNotice.업무명} 개인정보 안내", $"{EnglishNotice.WorkName} privacy notice")</h2>
+        <p>@Ui(
+            "신청서에 이름·연락처·주소가 포함될 수 있어, 작성 전에 수집·이용 범위를 확인합니다.",
+            "This request may include names, contact details, and addresses. Review how the information will be collected and used before continuing.")</p>
+    </header>
+
+    <dl>
+        <div><dt>@Ui("수집·이용 목적", "Purpose of collection and use")</dt><dd>@Ui(KoreanNotice.수집이용목적, EnglishNotice.CollectionUsePurpose)</dd></div>
+        <div>
+            <dt>@Ui("수집 항목", "Information categories")</dt>
+            <dd>@string.Join(" · ", IsEnglish ? EnglishNotice.CollectionItems : KoreanNotice.수집항목)</dd>
+        </div>
+        <div><dt>@Ui("보유·이용 기간", "Retention period")</dt><dd>@Ui(KoreanNotice.보유이용기간, EnglishNotice.RetentionPeriod)</dd></div>
+        <div><dt>@Ui("거부 권리와 영향", "Right to decline and effect")</dt><dd>@Ui(KoreanNotice.동의거부안내, EnglishNotice.RefusalNotice)</dd></div>
+    </dl>
+
+    <div class="application-privacy-consent__legal">
+        <label for="@LegalTextBoxId">@Ui("법적 안내 전문", "Legal reference notice")</label>
+        <textarea id="@LegalTextBoxId"
+                  rows="14"
+                  readonly
+                  aria-readonly="true"
+                  aria-describedby="@LegalTextBoxHelpId">@LegalNoticeText</textarea>
+        <small id="@LegalTextBoxHelpId">@Ui(
+            "읽기 전용 텍스트 상자입니다. 내용을 스크롤해 확인할 수 있습니다.",
+            "Read-only text box. Scroll to review the complete notice and official-source URLs.")</small>
+    </div>
+
+    <label class="application-privacy-consent__check">
+        <input type="checkbox" @bind="_collectionUseAccepted" />
+        <span><strong>@Ui("[필수]", "[REQUIRED]")</strong> @Ui(
+            "위 개인정보 수집·이용 목적, 항목, 보유 기간과 동의 거부 영향을 확인하고 동의합니다.",
+            "I have reviewed and agree to the stated purpose, information categories, retention period, and effect of declining.")</span>
+    </label>
+    <label class="application-privacy-consent__check">
+        <input type="checkbox" @bind="_ageRequirementConfirmed" />
+        <span><strong>@Ui("[필수]", "[REQUIRED]")</strong> @Ui(
+            "만 14세 이상이며 본인 명의로 신청합니다.",
+            "I am at least 14 years old and am submitting this request in my own name.")</span>
+    </label>
+
+    <div class="application-privacy-consent__actions">
+        <button type="button"
+                class="application-privacy-consent__accept"
+                disabled="@(!CanContinue || _isSaving)"
+                @onclick="AcceptAsync">
+            @(_isSaving
+                ? Ui("동의 증적 기록 중…", "Recording consent evidence…")
+                : Ui("동의하고 신청서 열기", "Agree and open request form"))
+        </button>
+        <a href="@LoginHref">@Ui("로그인 후 동의 기록하기", "Sign in to record consent")</a>
+        <a href="/community/home">@Ui("동의하지 않고 지도로 돌아가기", "Decline and return to map")</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <p role="alert" class="application-privacy-consent__error">@_errorMessage</p>
+    }
+
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string ApplicationKind { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<신청개인정보동의증적Response> Accepted { get; set; }
+
+    private bool _collectionUseAccepted;
+    private bool _ageRequirementConfirmed;
+    private bool _isSaving;
+    private string _errorMessage = string.Empty;
+    private readonly Guid _evidenceId = Guid.NewGuid();
+
+    private 신청개인정보동의안내 KoreanNotice
+        => 신청개인정보동의정책.For(ApplicationKind);
+
+    private ApplicationPrivacyConsentNotice EnglishNotice
+        => 신청개인정보동의정책.ForEnglish(ApplicationKind);
+
+    private bool IsEnglish => Locale.IsEnglish;
+
+    private string HeadingId => $"application-privacy-{ApplicationKind}-heading";
+
+    private string LegalTextBoxId => $"application-privacy-{ApplicationKind}-legal";
+
+    private string LegalTextBoxHelpId => $"{LegalTextBoxId}-help";
+
+    private string LoginHref
+        => $"/login?returnUrl={Uri.EscapeDataString(new Uri(Navigation.Uri).PathAndQuery)}";
+
+    private string LegalNoticeText
+        => IsEnglish ? EnglishLegalNoticeText : KoreanLegalNoticeText;
+
+    private string KoreanLegalNoticeText
+        => string.Join(
+            Environment.NewLine + Environment.NewLine,
+            "[법적 근거] 개인정보 보호법 제15조·제17조·제22조·제28조의8 기준 검토안",
+            $"[제3자 제공] {KoreanNotice.제3자제공안내}",
+            $"[국외 이전] {KoreanNotice.국외이전안내}",
+            "[입력 금지] 주민등록번호·여권번호·건강정보·종교·생체정보 등 고유식별정보와 민감정보는 신청 메모에 입력하지 마세요.",
+            "[만 14세 미만] 법정대리인 동의 확인 절차가 준비되기 전에는 이 신청을 제출할 수 없습니다.",
+            $"[안내 버전] {신청개인정보동의정책.현재버전}",
+            "[운영 전 확인] 이 안내는 법률 검토안입니다. 실제 제공받는 자와 국외 이전 조건, 보유기간 집행·파기 및 만 14세 미만 절차가 완성되기 전에는 운영 준수 완료를 의미하지 않습니다.");
+
+    private string EnglishLegalNoticeText
+        => string.Join(
+            Environment.NewLine + Environment.NewLine,
+            "[U.S. LEGAL REFERENCE] Draft informed by Section 5 of the FTC Act (15 U.S.C. § 45), the Children's Online Privacy Protection Act and Rule (COPPA, 16 C.F.R. Part 312), and—only where their coverage requirements are met—the California Consumer Privacy Act as amended by the CPRA (Cal. Civ. Code § 1798.100 et seq.). U.S. state privacy laws vary. Selecting English does not determine jurisdiction or establish that a particular law applies.",
+            "[NOTICE AT COLLECTION] Where the CCPA applies, notice at or before collection must address the categories collected, purposes, whether information is sold or shared, and the intended retention period or criteria. The summary above is a product draft and must be matched to actual production data flows.",
+            $"[DISCLOSURE / SALE / SHARING] {EnglishNotice.ThirdPartyDisclosureNotice}",
+            $"[CROSS-BORDER PROCESSING] {EnglishNotice.CrossBorderTransferNotice}",
+            "[DO NOT ENTER] Do not enter Social Security, passport, health, religious, biometric, or other sensitive or government-identification information in request notes.",
+            "[CHILDREN] COPPA may require parental notice and verifiable parental consent before covered services collect personal information online from a child under 13. This workflow has no parental-consent mechanism and uses a stricter product gate of age 14 or older; users under 14 cannot proceed.",
+            "[FTC ACT] Privacy statements must accurately reflect actual practices. Material omissions, deceptive promises, or unreasonable security practices may create risk under FTC Act Section 5.",
+            "[OFFICIAL SOURCES] https://www.ftc.gov/business-guidance/privacy-security | https://www.ftc.gov/business-guidance/resources/complying-coppa-frequently-asked-questions | https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.100. | https://oag.ca.gov/privacy/ccpa",
+            $"[NOTICE VERSION] {신청개인정보동의정책.현재버전}",
+            "[BEFORE PRODUCTION] This is a legal-review draft, not legal advice or a compliance certification. Retention enforcement, deletion and broader data-subject request handling, service-provider contracts, security controls, actual recipients, state-law coverage, child-user procedures, and cross-border conditions remain to be completed and reviewed by qualified counsel.");
+
+    private bool CanContinue
+        => _collectionUseAccepted && _ageRequirementConfirmed;
+
+    private async Task AcceptAsync()
+    {
+        if (!CanContinue || _isSaving)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        _errorMessage = string.Empty;
+        try
+        {
+            var evidence = await ConsentClient.RecordAsync(new 신청개인정보동의기록Request
+            {
+                증적Id = _evidenceId,
+                업무Code = ApplicationKind,
+                출처Code = 신청개인정보출처Codes.커뮤니티지도,
+                동의문버전 = 신청개인정보동의정책.현재버전,
+                수집이용동의 = _collectionUseAccepted,
+                연령요건확인 = _ageRequirementConfirmed
+            });
+            await Accepted.InvokeAsync(evidence);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private string Ui(string korean, string english)
+        => IsEnglish ? english : korean;
+
+    protected override void OnInitialized()
+        => Locale.Changed += HandleLocaleChanged;
+
+    private void HandleLocaleChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+        => Locale.Changed -= HandleLocaleChanged;
+}

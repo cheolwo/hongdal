@@ -1,0 +1,93 @@
+@using Ssalddel.Contracts.Common.Community
+@inject 지도신청운송취소검토AdminService ReviewService
+@inject 관리자인증세션Service AdminSession
+
+<MudPaper Elevation="1" Class="pa-4">
+    <MudStack Spacing="2">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="flex-wrap: wrap;">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">지도 신청 운송 취소 검토</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">사용자가 공동 원장에 남긴 취소 사유를 운송 의뢰 상세에서 확인합니다.</MudText>
+            </MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudChip T="string" Color="@(_reviews.Count > 0 ? Color.Warning : Color.Success)" Variant="Variant.Outlined">
+                    대기 @_reviews.Count 건
+                </MudChip>
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Primary" Disabled="@_loading" OnClick="LoadAsync" />
+            </MudStack>
+        </MudStack>
+
+        @if (_loading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
+        }
+        else if (_reviews.Count == 0)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">현재 검토 대기 건이 없습니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable T="지도신청가원장Response" Items="@_reviews" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>운송 의뢰</MudTh>
+                    <MudTh>사용자 사유</MudTh>
+                    <MudTh>원장 Revision</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="운송 의뢰">@context.운영원본Id</MudTd>
+                    <MudTd DataLabel="사용자 사유">@context.운송취소검토사유</MudTd>
+                    <MudTd DataLabel="원장 Revision">@context.Revision</MudTd>
+                    <MudTd>
+                        <MudButton Href="@DetailHref(context)" Size="Size.Small" Variant="Variant.Filled" Color="Color.Warning">
+                            상세 검토
+                        </MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    private IReadOnlyList<지도신청가원장Response> _reviews = [];
+    private bool _loading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AdminSession.서버관리자인가)
+        {
+            _loading = false;
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _reviews = await ReviewService.목록Async();
+        }
+        catch (Exception ex)
+        {
+            _reviews = [];
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static string DetailHref(지도신청가원장Response review)
+        => $"/requests/{Uri.EscapeDataString(review.운영원본Id)}?reviewLedgerId={Uri.EscapeDataString(review.원장Id)}";
+}

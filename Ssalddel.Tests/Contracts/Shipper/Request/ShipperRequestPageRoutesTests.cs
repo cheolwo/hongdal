@@ -21,7 +21,7 @@ public sealed class ShipperRequestPageRoutesTests
     {
         var source =
             "https://localhost/shipper/request?sourcePostId=73&source=diagram-node&ledgerTemplateKey=cargo-transport" +
-            "&nodeTitle=%EC%9A%B4%EC%86%A1%20%EC%9D%98%EB%A2%B0&nodeKind=delivery" +
+            "&sourceMarkerId=marker-73&nodeTitle=%EC%9A%B4%EC%86%A1%20%EC%9D%98%EB%A2%B0&nodeKind=delivery&country=KR" +
             "&from=%2Fdiagram%3FledgerTemplate%3Dcargo-transport%26node%3D%25EC%259A%25B4%25EC%2586%25A1%2520%25EC%259D%2598%25EB%25A2%25B0%26zoom%3D120";
 
         var context = ShipperRequestNavigationContext.Parse(source);
@@ -29,9 +29,11 @@ public sealed class ShipperRequestPageRoutesTests
 
         Assert.Equal(73, context.SourcePostId);
         Assert.Equal("diagram-node", context.Source);
+        Assert.Equal("marker-73", context.SourceMarkerId);
         Assert.Equal("cargo-transport", context.LedgerTemplateKey);
         Assert.Equal("운송 의뢰", context.NodeTitle);
         Assert.Equal("delivery", context.NodeKind);
+        Assert.Equal("KR", context.CountryCode);
         Assert.StartsWith("/shipper/request/transport?", next);
         Assert.Contains("sourcePostId=73", next);
         Assert.Contains("nodeTitle=%EC%9A%B4%EC%86%A1%20%EC%9D%98%EB%A2%B0", next);

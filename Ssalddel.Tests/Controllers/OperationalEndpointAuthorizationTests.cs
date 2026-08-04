@@ -1,5 +1,6 @@
 using System.Reflection;
 using Ssalddel.Controllers.Common;
+using Ssalddel.Controllers.Admin.Community;
 using Ssalddel.Controllers.Platform;
 using Ssalddel.Controllers.Shipper.Payment02;
 using Ssalddel.Controllers.Shipper.Request01;
@@ -39,6 +40,26 @@ public sealed class OperationalEndpointAuthorizationTests
             typeof(화주운송의뢰Controller),
             nameof(화주운송의뢰Controller.관리자취소환불));
 
+        Assert.Equal("서버관리자전용", authorize.Policy);
+    }
+
+    [Theory]
+    [InlineData(nameof(지도신청가원장Controller.관리자운송취소검토목록))]
+    [InlineData(nameof(지도신청가원장Controller.관리자운송취소검토처리))]
+    public void MapTransportCancellationReviewEndpoints_RequireServerAdminPolicy(string methodName)
+    {
+        var authorize = GetAuthorizeAttribute(typeof(지도신청가원장Controller), methodName);
+
+        Assert.Equal("서버관리자전용", authorize.Policy);
+    }
+
+    [Fact]
+    public void CanonicalMapTransportCancellationReviewAdminController_RequiresServerAdminPolicy()
+    {
+        var authorize = typeof(지도신청운송취소검토AdminController)
+            .GetCustomAttribute<AuthorizeAttribute>();
+
+        Assert.NotNull(authorize);
         Assert.Equal("서버관리자전용", authorize.Policy);
     }
 
