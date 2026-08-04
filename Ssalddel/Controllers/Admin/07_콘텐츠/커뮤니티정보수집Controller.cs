@@ -28,15 +28,18 @@ public sealed class 커뮤니티정보수집Controller : ControllerBase
     private readonly ICommunityInformationCollectionService _커뮤니티정보수집Service;
     private readonly IYouTubeSocialContextWorkspaceService _socialContextWorkspaceService;
     private readonly ICommunityAuthoringAiDraftService _aiDraftService;
+    private readonly I공식뉴스검토원장Service _공식뉴스검토원장Service;
 
     public 커뮤니티정보수집Controller(
         ICommunityInformationCollectionService 커뮤니티정보수집Service,
         IYouTubeSocialContextWorkspaceService socialContextWorkspaceService,
-        ICommunityAuthoringAiDraftService aiDraftService)
+        ICommunityAuthoringAiDraftService aiDraftService,
+        I공식뉴스검토원장Service 공식뉴스검토원장Service)
     {
         _커뮤니티정보수집Service = 커뮤니티정보수집Service;
         _socialContextWorkspaceService = socialContextWorkspaceService;
         _aiDraftService = aiDraftService;
+        _공식뉴스검토원장Service = 공식뉴스검토원장Service;
     }
 
     [HttpGet("sources")]
@@ -72,6 +75,59 @@ public sealed class 커뮤니티정보수집Controller : ControllerBase
         [FromQuery] CommunityInformationCollectionQuery query,
         CancellationToken cancellationToken)
         => Ok(await _커뮤니티정보수집Service.ReadAsync(query, cancellationToken));
+
+    [HttpGet("official-news/review-ledgers")]
+    [SsalddelApiContractName("GetOfficialNewsReviewLedgers")]
+    public async Task<ActionResult<공식뉴스검토원장목록Response>> 공식뉴스검토원장목록조회(
+        [FromQuery] string? sourceKey,
+        [FromQuery] string? reviewState,
+        [FromQuery] int take = 50,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var items = await _공식뉴스검토원장Service.목록Async(
+                string.IsNullOrWhiteSpace(sourceKey) ? null : [sourceKey.Trim()],
+                reviewState,
+                take,
+                cancellationToken);
+            return Ok(new 공식뉴스검토원장목록Response(sourceKey, reviewState, items));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateOfficialNewsProblem(400, exception.Message));
+        }
+    }
+
+    [HttpPost("official-news/candidates/{candidateKey}/review-decisions")]
+    [SsalddelApiContractName("RecordOfficialNewsReviewDecision")]
+    public async Task<ActionResult<공식뉴스검토원장Dto>> 공식뉴스검토결정기록(
+        string candidateKey,
+        [FromBody] 공식뉴스검토결정Request request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await _공식뉴스검토원장Service.결정기록Async(
+                candidateKey,
+                request,
+                CurrentUserId(),
+                CurrentDisplayName(),
+                cancellationToken));
+        }
+        catch (공식뉴스검토원장ConcurrencyException exception)
+        {
+            return Conflict(CreateOfficialNewsProblem(409, exception.Message));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(CreateOfficialNewsProblem(404, exception.Message));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateOfficialNewsProblem(400, exception.Message));
+        }
+    }
 
     [HttpPost("authoring/ai-drafts")]
     [SsalddelApiContractName("GenerateAiDraft")]
@@ -206,6 +262,20 @@ public sealed class 커뮤니티정보수집Controller : ControllerBase
                 400 => "글쓰기 요청을 확인해 주세요",
                 409 => "작업공간 변경 충돌",
                 _ => "작업공간을 찾을 수 없음"
+            },
+            Detail = detail
+        };
+
+    private static ProblemDetails CreateOfficialNewsProblem(int status, string detail)
+        => new()
+        {
+            Status = status,
+            Title = status switch
+            {
+                400 => "공식뉴스 검토 요청을 확인해 주세요",
+                404 => "공식뉴스 후보를 찾을 수 없음",
+                409 => "공식뉴스 검토 원장 변경 충돌",
+                _ => "공식뉴스 검토 요청 실패"
             },
             Detail = detail
         };

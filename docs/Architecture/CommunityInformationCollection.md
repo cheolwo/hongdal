@@ -12,6 +12,7 @@ flowchart LR
     B5["식약처 중국 수입식품 제조업소 권역 조사"] --> C
     B6["식약처 미국 수입식품 제조업소 주별 조사"] --> C
     B4["각국 정부 공식 음식 레시피 수집"] --> C
+    B7["농식품부·식약처 공식 RSS"] -->|원천 명시 선택 시 조회| D
     C --> D["공통 정보 후보 조회"]
     B3["ABS 식품 소비자물가지수"] -->|명시 선택 시 조회| D
     B2["수산업협동조합 월별 통계"] -->|명시 선택 시 조회| D
@@ -36,6 +37,7 @@ flowchart LR
 | ABS Consumer Price Index | 선택 기간의 호주 전국 월별 식품 소비자물가지수 | 사용자가 원천을 명시 선택하고 식품 지수 항목을 검색한 경우 | 실제 A$/kg 단가가 아닌 지수다. 같은 지수·측정방식·지역·기준시점 계열만 비교한다. |
 | 금융위원회 금융통계 수산업협동조합정보 | 사용자가 선택한 최대 13개월의 조합별 임직원 일반현황 | 기준년월, 조합명, 임직원 구분과 인원수가 있는 공식 관측값 | 같은 조합·같은 임직원 구분만 비교한다. 현재 영업상태, 제휴, 재무건전성 또는 물류 수행능력으로 해석하지 않는다. |
 | Reddit·X·Instagram·Facebook 공개 게시물 | 관리자 요청에 따른 Apify Actor dataset 결과 또는 Reddit 공개 RSS/Atom 피드 | YouTube 영상의 핵심·인접 주제와 연결된 공개 게시물 후보 | 원문 링크와 짧은 발췌만 검수 대기로 반환하며 자동 게시하지 않는다. Adapter와 비용·권한 경계는 [Apify SNS 공개 자료 조사 모듈](ApifySocialMediaResearch.md)에 둔다. |
+| 농림축산식품부·식품의약품안전처 공식 뉴스 RSS | 농식품부 보도자료·설명자료와 식약처 보도자료의 제목·300자 이하 요약·발행 시각·원문 링크 | 운영자가 세 원천 key 중 하나를 명시해 조회하고 기관 공식 도메인의 기사 링크가 확인된 항목 | `PendingReview` 후보만 반환한다. 기사 제목을 가격·재고·공급 가능성·지역 사실로 바꾸거나 자동 게시하지 않는다. |
 | 식약처·농촌진흥청·일본 MAFF·영국 NHS 공식 음식 레시피 | 권리 정책과 함께 보관한 대표 음식 후보·출처별 레시피 변형 | freshness가 유효하고 자동 수집이 허용된 DB 원문 | 모두 검토 대기로만 제공한다. 구조화 재료 중 명확한 원재료만 보관 KAMIS·USDA 가격과 연결하며 서로 다른 통화·단위·시장 단계를 합치지 않는다. 이미지 파일은 저장하지 않고 후보 thumbnail도 반환하지 않는다. 세부 기준은 [각국 정부 공식 음식 레시피 아카이브](OfficialGovernmentFoodRecipeArchive.md)에 둔다. |
 
 YouTube 업로드 확인은 채널의 업로드 재생목록과 `playlistItems.list`를 사용한다. 일반 검색 결과를 반복 수집하는 크롤러로 운영하지 않는다. 공식 구현 기준은 [YouTube PlaylistItems: list](https://developers.google.com/youtube/v3/docs/playlistItems/list)와 [YouTube API 개발자 정책](https://developers.google.com/youtube/terms/developer-policies)을 따른다.
@@ -54,6 +56,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 
 - 안정 후보 키와 원천 키
 - 제공기관, 제목, 짧은 설명과 원본 URL
+- RSS 원천인 경우 원본 피드 URL
 - 원 게시 시각, 자료 기준일과 살뜰 수집 시각
 - 월·분기 자료의 기준기간 종료일
 - 수집 국가, 언어, 통화와 단위
@@ -81,6 +84,8 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 | `GET` | `/api/v1/admin/content/information/social-media/sources` | SNS Adapter별 활성화·검색·URL 조사 지원 여부 조회 |
 | `POST` | `/api/v1/admin/content/information/youtube-social-context/workspaces/research` | YouTube 영상을 루트로 SNS 자료와 글쓰기 초안을 MongoDB에 저장 |
 | `GET` | `/api/v1/admin/content/information/youtube-social-context/workspaces/by-video/{videoId}` | 영상별 최신 SNS 하위 자료와 편집 초안 복원 |
+| `GET` | `/api/v1/admin/content/information/official-news/review-ledgers` | 공식뉴스 후보의 승인·제외 원장과 revision·결정 이력 조회 |
+| `POST` | `/api/v1/admin/content/information/official-news/candidates/{candidateKey}/review-decisions` | 원천 후보를 다시 확인한 뒤 멱등 승인·제외 결정을 MongoDB 원장에 기록 |
 | `PUT` | `/api/v1/admin/content/information/youtube-social-context/workspaces/{workspaceId}/draft` | 운영자가 수정한 글, 같이 수입 여정·다이어그램과 단계별 업체 후보를 함께 저장 |
 | `POST` | `/api/v1/admin/content/information/youtube-social-context/workspaces/{workspaceId}/publication-links` | 발행된 RDB 게시글 ID 연결 |
 | `POST` | `/api/v1/admin/community-post-schedules` | 서버관리자가 새 글과 UTC 공개 시각을 예약 |
@@ -88,6 +93,8 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 | `DELETE` | `/api/v1/admin/community-post-schedules/{postId}` | 아직 선점되지 않은 대기 예약 취소 |
 
 관리자 정보 수집 API는 `서버관리자전용` 정책을 사용한다. 한 원천의 보관 DB 조회가 실패하면 다른 원천 결과는 유지하되 `Failures`에 실패 원천을 명시한다. 외부 API 오류를 샘플 후보로 숨기지 않는다.
+
+공식뉴스 RSS는 `OfficialNewsRss:Enabled=true`일 때만 외부 요청을 허용한다. 기본값은 `false`이며 전체 후보 조회에서는 호출하지 않는다. 활성화한 뒤에도 `sourceKey`로 원천을 명시해야 하며, 응답의 `ETag`와 `Last-Modified`가 있으면 다음 요청에 조건부 조회 헤더로 전달한다. 관리자의 승인·제외 결정은 후보 metadata snapshot, revision, idempotency key와 결정 이력을 `official_news_review_ledgers` MongoDB 원장에 저장한다. 공개 지도는 RSS를 직접 호출하지 않고 이 원장에서 승인된 snapshot만 읽는다. 반복 수집 Worker와 자동 게시 schedule은 아직 포함하지 않는다.
 
 ## 초기 운영자의 자료 검토와 글쓰기
 

@@ -63,10 +63,7 @@ public sealed class CommunityInformationCollectionService : ICommunityInformatio
 
         var selectedSources = string.IsNullOrWhiteSpace(query.SourceKey)
             ? _sources.Values
-                .Where(source => !string.Equals(
-                    source.Source.CollectionMode,
-                    CommunityInformationCollectionModes.OnDemandPublicDataQuery,
-                    StringComparison.Ordinal))
+                .Where(source => !IsExplicitQueryOnly(source.Source.CollectionMode))
                 .ToArray()
             : _sources.TryGetValue(query.SourceKey.Trim(), out var selected)
                 ? [selected]
@@ -183,4 +180,14 @@ public sealed class CommunityInformationCollectionService : ICommunityInformatio
 
         return candidate.CollectedAtUtc;
     }
+
+    private static bool IsExplicitQueryOnly(string collectionMode)
+        => string.Equals(
+               collectionMode,
+               CommunityInformationCollectionModes.OnDemandPublicDataQuery,
+               StringComparison.Ordinal)
+           || string.Equals(
+               collectionMode,
+               CommunityInformationCollectionModes.OnDemandOfficialNewsQuery,
+               StringComparison.Ordinal);
 }

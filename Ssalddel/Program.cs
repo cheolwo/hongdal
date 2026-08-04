@@ -234,6 +234,7 @@ builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
 builder.Services.AddApifySocialMediaResearch(builder.Configuration);
 builder.Services.AddApifyYouTubeContentCollection(builder.Configuration);
 builder.Services.AddFreeSocialMediaResearch(builder.Configuration);
+builder.Services.AddOfficialNewsRss(builder.Configuration);
 builder.Services.AddYouTubeSocialContextWorkspace(builder.Configuration);
 builder.Services.AddSsalddelDomainServices();
 var developmentReadOnly = builder.Environment.IsDevelopment()

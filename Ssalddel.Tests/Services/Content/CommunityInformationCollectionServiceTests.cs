@@ -103,6 +103,28 @@ public sealed class CommunityInformationCollectionServiceTests
     }
 
     [Fact]
+    public async Task Collection_DoesNotCallOfficialNewsRssUntilSourceIsExplicitlySelected()
+    {
+        var onDemand = new StubSource(
+            Descriptor(
+                CommunityInformationSourceKeys.MafraPressReleases,
+                CommunityInformationCollectionModes.OnDemandOfficialNewsQuery),
+            [],
+            new InvalidOperationException("should only run when selected"));
+        var service = CreateService(onDemand);
+
+        var allSourcesResponse = await service.ReadAsync(new CommunityInformationCollectionQuery());
+        var selectedSourceResponse = await service.ReadAsync(new CommunityInformationCollectionQuery
+        {
+            SourceKey = CommunityInformationSourceKeys.MafraPressReleases
+        });
+
+        Assert.Empty(allSourcesResponse.Failures);
+        var failure = Assert.Single(selectedSourceResponse.Failures);
+        Assert.Equal(CommunityInformationSourceKeys.MafraPressReleases, failure.SourceKey);
+    }
+
+    [Fact]
     public async Task Collection_FiltersCandidatesByInclusiveReferenceDateRange()
     {
         var source = Source(

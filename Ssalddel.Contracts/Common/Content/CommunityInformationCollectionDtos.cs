@@ -13,6 +13,9 @@ public static class CommunityInformationSourceKeys
     public const string NhsHealthierFamiliesRecipes = "nhs-healthier-families-recipes";
     public const string RedditPublicPosts = "reddit-public-posts";
     public const string RedditRssPublicPosts = "reddit-rss-public-posts";
+    public const string MafraPressReleases = "mafra-press-releases-rss";
+    public const string MafraExplanations = "mafra-explanations-rss";
+    public const string MfdsPressReleases = "mfds-press-releases-rss";
     public const string XPublicPosts = "x-public-posts";
     public const string InstagramPublicPosts = "instagram-public-posts";
     public const string FacebookPublicPosts = "facebook-public-posts";
@@ -23,6 +26,7 @@ public static class CommunityInformationSourceTypes
     public const string Video = "Video";
     public const string PublicData = "PublicData";
     public const string SocialMedia = "SocialMedia";
+    public const string OfficialNews = "OfficialNews";
 }
 
 public static class CommunityInformationCollectionModes
@@ -30,6 +34,7 @@ public static class CommunityInformationCollectionModes
     public const string ScheduledArchive = "ScheduledArchive";
     public const string OnDemandExternalResearch = "OnDemandExternalResearch";
     public const string OnDemandPublicDataQuery = "OnDemandPublicDataQuery";
+    public const string OnDemandOfficialNewsQuery = "OnDemandOfficialNewsQuery";
 }
 
 public static class CommunityInformationReviewStates
@@ -76,7 +81,8 @@ public sealed record CommunityInformationCandidateDto(
     string? MetricLabel = null,
     string? MetricSeriesKey = null,
     DateOnly? ReferencePeriodEndDate = null,
-    string? MetricSeriesLabel = null);
+    string? MetricSeriesLabel = null,
+    string? SourceFeedUrl = null);
 
 public sealed class CommunityInformationCollectionQuery
 {
