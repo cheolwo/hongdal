@@ -75,6 +75,45 @@ public sealed class 선택공공데이터MapProjectionTests
     }
 
     [Fact]
+    public void 저장된Snapshot은_재시작뒤같은Version과마지막성공본으로복원된다()
+    {
+        var directory = Path.Combine(
+            Path.GetTempPath(),
+            "ssalddel-selected-map-snapshot-tests",
+            Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(directory, "snapshot.v1.json");
+        try
+        {
+            var firstStore = new 선택공공데이터MapSnapshotStore(
+                path,
+                new FixedTimeProvider(CollectedAt.AddMinutes(1)));
+            firstStore.Replace(new 선택공공데이터MapSnapshot(
+                new 국문관광정보MapSnapshot(
+                    CollectedAt,
+                    1,
+                    [new("1001", "12", "관광지 A", 37.5, 127.1, CollectedAt.AddDays(-1))]),
+                null,
+                null));
+
+            var persisted = firstStore.Read();
+            var restartedStore = new 선택공공데이터MapSnapshotStore(path);
+            var restored = restartedStore.Read();
+
+            Assert.StartsWith("selected-public-data-map.v1:sha256:", persisted.SnapshotVersion);
+            Assert.Equal(persisted.SnapshotVersion, restored.SnapshotVersion);
+            Assert.Equal(CollectedAt.AddMinutes(1), restored.PersistedAtUtc);
+            Assert.Equal("1001", restored.Tourism?.Items.Single().ContentId);
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public async Task 지도투영은_관광주소연락처를제외하고온라인가격과Kosis단위를분리한다()
     {
         var store = new 선택공공데이터MapSnapshotStore();
@@ -117,6 +156,8 @@ public sealed class 선택공공데이터MapProjectionTests
         Assert.Contains("직접 가격차", kosis.Summary, StringComparison.Ordinal);
         Assert.All(observations, observation =>
             Assert.Equal(커뮤니티세계지도FreshnessCodes.Fresh, observation.FreshnessCode));
+        Assert.All(observations, observation =>
+            Assert.StartsWith("selected-public-data-map.v1:sha256:", observation.SourceVersion));
     }
 
     private static 선택공공데이터MapProjectionRefresher CreateRefresher(

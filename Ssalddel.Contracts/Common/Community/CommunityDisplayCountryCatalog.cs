@@ -42,7 +42,9 @@ public static class CommunityDisplayCountryCatalog
 
     public static IReadOnlyList<CommunityDisplayCountry> Common { get; } =
         CommonCountryCodes
-            .Select(code => Countries[code])
+            .Select(code => Countries.TryGetValue(code, out var country)
+                ? country
+                : new CommunityDisplayCountry(code, KoreanName(code, code), EnglishName(code)))
             .ToArray();
 
     public static CommunityDisplayCountry? Find(string? countryCode)
@@ -77,5 +79,22 @@ public static class CommunityDisplayCountryCatalog
             "VN" => "베트남",
             "TH" => "태국",
             _ => fallback
+        };
+
+    private static string EnglishName(string code)
+        => code switch
+        {
+            "KR" => "South Korea",
+            "US" => "United States",
+            "CN" => "China",
+            "JP" => "Japan",
+            "CA" => "Canada",
+            "GB" => "United Kingdom",
+            "AU" => "Australia",
+            "DE" => "Germany",
+            "FR" => "France",
+            "VN" => "Vietnam",
+            "TH" => "Thailand",
+            _ => code
         };
 }

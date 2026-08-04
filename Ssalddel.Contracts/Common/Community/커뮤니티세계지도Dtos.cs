@@ -20,6 +20,7 @@ public static class 커뮤니티세계지도LayerCodes
     public const string TourismPublicEvidence = "tourism-public-evidence";
     public const string OnlinePricePublicEvidence = "online-price-public-evidence";
     public const string KosisStatisticalContext = "kosis-statistical-context";
+    public const string NewsPublisher = "news-publisher";
     public const string ProcurementHandoff = "procurement-handoff";
     public const string ImportReadiness = "import-readiness";
     public const string TransportHandoff = "transport-handoff";
@@ -42,6 +43,14 @@ public static class 커뮤니티세계지도FreshnessCodes
     public const string Unknown = "unknown";
 }
 
+public static class 커뮤니티세계지도뉴스출처유형Codes
+{
+    public const string NewsAgency = "news-agency";
+    public const string NewsCooperative = "news-cooperative";
+    public const string StateNewsAgency = "state-news-agency";
+    public const string PublicServiceMedia = "public-service-media";
+}
+
 public static class 커뮤니티세계지도RolePerspectiveCodes
 {
     public const string Community = "community";
@@ -51,6 +60,58 @@ public static class 커뮤니티세계지도RolePerspectiveCodes
     public const string WarehouseManager = "warehouse-manager";
     public const string CustomsSpecialist = "customs-specialist";
     public const string PlatformOperator = "platform-operator";
+}
+
+public static class 커뮤니티세계지도역할분류
+{
+    public static string ResolveProfileCode(string? role)
+    {
+        var normalized = Normalize(role);
+        if (ContainsAny(normalized, "서버관리자", "관리", "운영", "admin", "operator"))
+        {
+            return 커뮤니티세계지도RolePerspectiveCodes.PlatformOperator;
+        }
+
+        if (ContainsAny(normalized, "기사", "용달기사", "배달기사", "driver", "transport"))
+        {
+            return 커뮤니티세계지도RolePerspectiveCodes.TransportOperator;
+        }
+
+        if (ContainsAny(normalized, "화주", "판매자", "shipper", "seller"))
+        {
+            return 커뮤니티세계지도RolePerspectiveCodes.SellerAndShipper;
+        }
+
+        if (ContainsAny(normalized, "창고", "warehouse"))
+        {
+            return 커뮤니티세계지도RolePerspectiveCodes.WarehouseManager;
+        }
+
+        if (ContainsAny(normalized, "주문", "구매", "orderer", "buyer"))
+        {
+            return 커뮤니티세계지도RolePerspectiveCodes.Orderer;
+        }
+
+        if (ContainsAny(normalized, "관세", "통관", "customs"))
+        {
+            return 커뮤니티세계지도RolePerspectiveCodes.CustomsSpecialist;
+        }
+
+        return 커뮤니티세계지도RolePerspectiveCodes.Community;
+    }
+
+    public static bool ContainsAny(string text, params string[] candidates)
+        => candidates.Any(candidate => text.Contains(
+            Normalize(candidate),
+            StringComparison.OrdinalIgnoreCase));
+
+    public static string Normalize(string? text)
+        => string.IsNullOrWhiteSpace(text)
+            ? string.Empty
+            : text.Replace(" ", string.Empty, StringComparison.Ordinal)
+                .Replace("_", string.Empty, StringComparison.Ordinal)
+                .Replace("-", string.Empty, StringComparison.Ordinal)
+                .Trim();
 }
 
 public sealed record 커뮤니티세계지도RoleLayerProfile(
@@ -76,7 +137,8 @@ public static class 커뮤니티세계지도RoleLayerProfileCatalog
                 커뮤니티세계지도LayerCodes.RegionalCulture,
                 커뮤니티세계지도LayerCodes.TourismPublicEvidence,
                 커뮤니티세계지도LayerCodes.PublicPrice,
-                커뮤니티세계지도LayerCodes.KosisStatisticalContext
+                커뮤니티세계지도LayerCodes.KosisStatisticalContext,
+                커뮤니티세계지도LayerCodes.NewsPublisher
             ],
             "둘러본 사실을 관심·가입·거래 의사로 기록하지 않습니다."),
         new(
@@ -142,6 +204,7 @@ public static class 커뮤니티세계지도RoleLayerProfileCatalog
                 커뮤니티세계지도LayerCodes.TourismPublicEvidence,
                 커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence,
                 커뮤니티세계지도LayerCodes.KosisStatisticalContext,
+                커뮤니티세계지도LayerCodes.NewsPublisher,
                 커뮤니티세계지도LayerCodes.ProcurementHandoff,
                 커뮤니티세계지도LayerCodes.ImportReadiness,
                 커뮤니티세계지도LayerCodes.TransportHandoff,
@@ -152,36 +215,10 @@ public static class 커뮤니티세계지도RoleLayerProfileCatalog
 
     public static 커뮤니티세계지도RoleLayerProfile Resolve(string? role)
     {
-        var normalized = Normalize(role);
-        var profileCode = ContainsAny(normalized, "서버관리자", "관리", "운영", "admin", "operator")
-            ? 커뮤니티세계지도RolePerspectiveCodes.PlatformOperator
-            : ContainsAny(normalized, "기사", "용달기사", "배달기사", "driver", "transport")
-                ? 커뮤니티세계지도RolePerspectiveCodes.TransportOperator
-                : ContainsAny(normalized, "화주", "판매자", "shipper", "seller")
-                    ? 커뮤니티세계지도RolePerspectiveCodes.SellerAndShipper
-                    : ContainsAny(normalized, "창고", "warehouse")
-                        ? 커뮤니티세계지도RolePerspectiveCodes.WarehouseManager
-                        : ContainsAny(normalized, "주문", "구매", "orderer", "buyer")
-                            ? 커뮤니티세계지도RolePerspectiveCodes.Orderer
-                            : ContainsAny(normalized, "관세", "통관", "customs")
-                                ? 커뮤니티세계지도RolePerspectiveCodes.CustomsSpecialist
-                                : 커뮤니티세계지도RolePerspectiveCodes.Community;
+        var profileCode = 커뮤니티세계지도역할분류.ResolveProfileCode(role);
 
         return All.First(profile => string.Equals(profile.Code, profileCode, StringComparison.Ordinal));
     }
-
-    private static bool ContainsAny(string text, params string[] candidates)
-        => candidates.Any(candidate => text.Contains(
-            Normalize(candidate),
-            StringComparison.OrdinalIgnoreCase));
-
-    private static string Normalize(string? text)
-        => string.IsNullOrWhiteSpace(text)
-            ? string.Empty
-            : text.Replace(" ", string.Empty, StringComparison.Ordinal)
-                .Replace("_", string.Empty, StringComparison.Ordinal)
-                .Replace("-", string.Empty, StringComparison.Ordinal)
-                .Trim();
 }
 
 public sealed record 커뮤니티세계지도LayerDto(
@@ -236,7 +273,8 @@ public sealed record 커뮤니티세계지도ObservationDto(
     string? UpdateCycle = null,
     string? FreshnessCode = null,
     string? BoundaryNotice = null,
-    IReadOnlyList<커뮤니티세계지도MetricDto>? Metrics = null);
+    IReadOnlyList<커뮤니티세계지도MetricDto>? Metrics = null,
+    string? SourceVersion = null);
 
 public static class 커뮤니티세계지도위치정밀도Codes
 {
@@ -322,6 +360,13 @@ public static class 커뮤니티세계지도LayerCatalog
             "전국 소비자물가지수를 기준월·단위와 함께 표시",
             "#5d63b8",
             "statistics"),
+        new(
+            커뮤니티세계지도LayerCodes.NewsPublisher,
+            CommunityPageRoutes.WorldMapDayWorkDataset,
+            "언론·뉴스 출처",
+            "국가별 대표 뉴스 조직의 공식 홈페이지와 조직 성격을 국가 대표점에 표시",
+            "#334e68",
+            "news"),
         new(
             커뮤니티세계지도LayerCodes.ProcurementHandoff,
             CommunityPageRoutes.WorldMapDayWorkDataset,

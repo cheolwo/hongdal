@@ -1,0 +1,113 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+@if (Post.SourceEvidence is { } evidence)
+{
+    var mapHref = ResolveMapHref(evidence);
+    <MudAlert Severity="Severity.Info"
+              Variant="Variant.Outlined"
+              Dense="true"
+              Icon="@Icons.Material.Filled.FactCheck">
+        <MudStack Spacing="1">
+            <MudStack Row="true"
+                      AlignItems="AlignItems.Center"
+                      Justify="Justify.SpaceBetween"
+                      Wrap="Wrap.Wrap"
+                      Spacing="1">
+                <strong>지도 공개 근거에서 시작한 글</strong>
+                <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                        @evidence.DatasetCode
+                    </MudChip>
+                    @if (!string.IsNullOrWhiteSpace(evidence.CountryName))
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
+                            @evidence.CountryName
+                        </MudChip>
+                    }
+                </MudStack>
+            </MudStack>
+
+            <MudText Typo="Typo.subtitle2">@evidence.Title</MudText>
+            @if (!string.IsNullOrWhiteSpace(evidence.Summary))
+            {
+                <MudText Typo="Typo.body2">@evidence.Summary</MudText>
+            }
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                출처 · @evidence.SourceName · 기준 @FormatTimestamp(evidence.EvidenceAsOfUtc) · 수집 @FormatTimestamp(evidence.CollectedAtUtc)
+            </MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                관측 ID · @evidence.ObservationStableId · snapshot @evidence.SnapshotRevision
+            </MudText>
+            @if (!string.IsNullOrWhiteSpace(evidence.SourceVersion))
+            {
+                <MudText Typo="Typo.caption" Color="Color.Secondary" Style="overflow-wrap:anywhere;">
+                    source version · @evidence.SourceVersion
+                </MudText>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(evidence.BoundaryNotice))
+            {
+                <MudText Typo="Typo.caption" Color="Color.Warning">
+                    @evidence.BoundaryNotice
+                </MudText>
+            }
+
+            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                @if (!string.IsNullOrWhiteSpace(mapHref))
+                {
+                    <MudButton Href="@mapHref"
+                               Variant="Variant.Outlined"
+                               Color="Color.Info"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Map">
+                        지도 근거 다시 보기
+                    </MudButton>
+                }
+                @if (!string.IsNullOrWhiteSpace(evidence.DetailHref)
+                     && !string.Equals(evidence.DetailHref, mapHref, StringComparison.Ordinal))
+                {
+                    <MudButton Href="@evidence.DetailHref"
+                               Variant="Variant.Text"
+                               Color="Color.Info"
+                               Size="Size.Small">
+                        연결 자료 상세
+                    </MudButton>
+                }
+                @if (!string.IsNullOrWhiteSpace(evidence.SourceHref))
+                {
+                    <a href="@evidence.SourceHref"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="mud-link mud-link-underline-hover mud-primary-text">
+                        공식 원문 열기
+                    </a>
+                }
+            </MudStack>
+
+            <MudText Typo="Typo.caption">
+                이 근거를 확인하는 것만으로 참여·주문·계약·배차가 생성되지 않습니다. 아래에서 별도로 관심과 참여 의사를 선택합니다.
+            </MudText>
+        </MudStack>
+    </MudAlert>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityPostResponse Post { get; set; } = null!;
+
+    private static string FormatTimestamp(DateTimeOffset? value)
+        => value?.ToLocalTime().ToString("yyyy-MM-dd HH:mm zzz") ?? "미표시";
+
+    private static string ResolveMapHref(커뮤니티세계지도EvidenceReferenceDto evidence)
+        => !string.IsNullOrWhiteSpace(evidence.MapHref)
+            ? evidence.MapHref
+            : CommunityPageRoutes.WorldMapFor(
+                evidence.DatasetCode,
+                evidence.CountryCode,
+                evidence.LayerCode,
+                evidence.ObservationStableId,
+                evidence.ObservationStableId,
+                evidence.SnapshotRevision,
+                evidence.SourceVersion);
+}

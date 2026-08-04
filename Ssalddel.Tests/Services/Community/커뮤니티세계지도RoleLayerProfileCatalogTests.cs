@@ -28,16 +28,31 @@ public sealed class 커뮤니티세계지도RoleLayerProfileCatalogTests
     [Fact]
     public void 역할별기본Layer는_업무에필요한공개근거만우선한다()
     {
+        var community = 커뮤니티세계지도RoleLayerProfileCatalog.Resolve(null);
         var orderer = 커뮤니티세계지도RoleLayerProfileCatalog.Resolve("Orderer");
         var driver = 커뮤니티세계지도RoleLayerProfileCatalog.Resolve("Driver");
         var customs = 커뮤니티세계지도RoleLayerProfileCatalog.Resolve("CustomsBroker");
 
+        Assert.Equal(
+            [
+                커뮤니티세계지도LayerCodes.RegionalCulture,
+                커뮤니티세계지도LayerCodes.TourismPublicEvidence,
+                커뮤니티세계지도LayerCodes.PublicPrice,
+                커뮤니티세계지도LayerCodes.KosisStatisticalContext,
+                커뮤니티세계지도LayerCodes.NewsPublisher
+            ],
+            community.RecommendedLayerCodes);
         Assert.Contains(커뮤니티세계지도LayerCodes.ProcurementHandoff, orderer.RecommendedLayerCodes);
+        Assert.Contains(커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence, orderer.RecommendedLayerCodes);
+        Assert.Contains(커뮤니티세계지도LayerCodes.KosisStatisticalContext, orderer.RecommendedLayerCodes);
         Assert.Equal(
             [커뮤니티세계지도LayerCodes.TransportHandoff],
             driver.RecommendedLayerCodes);
         Assert.Contains(커뮤니티세계지도LayerCodes.ImportReadiness, customs.RecommendedLayerCodes);
         Assert.DoesNotContain(커뮤니티세계지도LayerCodes.RegionalCulture, customs.RecommendedLayerCodes);
+        Assert.Contains(
+            커뮤니티세계지도LayerCodes.NewsPublisher,
+            커뮤니티세계지도RoleLayerProfileCatalog.Resolve("서버 관리자").RecommendedLayerCodes);
     }
 
     [Fact]

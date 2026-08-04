@@ -228,6 +228,8 @@ public sealed class 커뮤니티세계지도조회UseCase(
             ? []
             : await 선택공공데이터MapMarkerReader
                 .공개Marker조회Async(cancellationToken);
+        var newsPublishers = 국가별뉴스출처MapCatalog.All
+            .Select(국가별뉴스출처MapCatalog.ToObservation);
 
         return culture.Concat(prices)
             .Concat(wholesaleMarkets)
@@ -235,6 +237,7 @@ public sealed class 커뮤니티세계지도조회UseCase(
             .Concat(overseasManufacturers)
             .Concat(gyeonggiLivestock)
             .Concat(selectedPublicData)
+            .Concat(newsPublishers)
             .OrderBy(item => item.StableId, StringComparer.Ordinal)
             .ToArray();
     }

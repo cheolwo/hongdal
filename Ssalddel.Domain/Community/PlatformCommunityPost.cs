@@ -11,6 +11,10 @@ public sealed class PlatformCommunityPost
     public string Body { get; set; } = string.Empty;
     public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
+    public string? SourceObservationStableId { get; set; }
+    public string? SourceDatasetCode { get; set; }
+    public string? SourceSnapshotRevision { get; set; }
+    public string? SourceEvidenceJson { get; set; }
     public string? SalesOfferJson { get; set; }
     public bool IsInterestGatheringEnabled { get; set; }
     public string? 커뮤니티원장Id { get; set; }

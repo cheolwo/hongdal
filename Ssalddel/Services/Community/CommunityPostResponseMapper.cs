@@ -43,6 +43,9 @@ internal static class CommunityPostResponseMapper
                     entity.Title,
                     entity.Body),
             SharedLinkUrl = isReportBoardPost ? null : entity.SharedLinkUrl,
+            SourceEvidence = isReportBoardPost
+                ? null
+                : DeserializeSourceEvidence(entity.SourceEvidenceJson),
             SalesOffer = isReportBoardPost ? null : DeserializeSalesOffer(entity.SalesOfferJson),
             IsInterestGatheringEnabled = !isReportBoardPost
                                          && CommunityPostInterestGatheringPolicy.IsEnabledFor(
@@ -198,6 +201,23 @@ internal static class CommunityPostResponseMapper
         try
         {
             return JsonSerializer.Deserialize<PlatformCommunityPostSalesOfferResponse>(json, JsonOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    private static 커뮤니티세계지도EvidenceReferenceDto? DeserializeSourceEvidence(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<커뮤니티세계지도EvidenceReferenceDto>(json, JsonOptions);
         }
         catch (JsonException)
         {

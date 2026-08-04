@@ -17,9 +17,9 @@
 
 | 관점 | 기본 레이어 |
 | --- | --- |
-| 생활·커뮤니티 참여자 | 지역 문화, 가격·시장 |
-| 주문자·구매 담당 | 공동 조달·수령, 지역 문화 |
-| 판매자·화주 | 공동 조달·수령, 수입 준비 근거, 운송 인계 거점 |
+| 생활·커뮤니티 참여자 | 지역 문화, 관광 공개지점, 가격·시장, KOSIS 물가 맥락 |
+| 주문자·구매 담당 | 공동 조달·수령, 경기 축산 공개근거, 온라인 수집가격, KOSIS 물가 맥락, 지역 문화 |
+| 판매자·화주 | 공동 조달·수령, 경기 축산 공개근거, 수입 준비 근거, 운송 인계 거점 |
 | 기사·운송 담당 | 운송 인계 거점 |
 | 창고·거점 관리자 | 공동 입고 인계, 운송 인계 거점 |
 | 통관·무역 전문 역할 | 수입 준비 근거, 공동 조달·수령 |
@@ -39,15 +39,19 @@
 ## 검증
 
 - `Ssalddel.WebApp` 단일 빌드: 경고 0개, 오류 0개
-- 역할 profile catalog, 세계지도 구성, 조회 UseCase 테스트: 43개 통과
-- 실제 렌더링: `http://localhost:5241/community/home`
-- 방문자 관점에서 지역 문화·가격 레이어 2개가 기본 활성화되는 것을 확인했습니다.
+- 역할 profile catalog, 세계지도 구성, 조회 UseCase, 선택 공공데이터 투영, 운송 시뮬레이션 테스트: 49개 통과
+- 현재 checkout 실제 렌더링: `http://127.0.0.1:5247/community/home`
+- 방문자 관점에서 지역 문화·관광 공개지점·가격·시장·KOSIS 물가 맥락 4개가 기본 활성화되는 것을 확인했습니다.
+- Google 지도와 `SIMULATED` 운송 레이어가 같은 화면에서 렌더되고 browser console 오류가 없음을 확인했습니다.
 - 공동 조달·수령 레이어를 선택하면 기존 한국 6개·미국 12개 도매시장 마커가 추가되고 레이어 버튼이 선택 상태로 바뀌는 것을 확인했습니다.
 - 선택 레이어 추가 뒤 복원 버튼이 나타나고, 복원 뒤 추가 레이어가 다시 비활성화되는 것을 확인했습니다.
 - 이 변경은 Web 전용 전체화면 지도 구성 변경이며 MAUI route나 Figma frame 구조는 변경하지 않았습니다.
+- 현재 standalone WebApp 검증은 레이어 control과 통합 렌더를 확인한 것입니다. 관광·온라인가격·KOSIS의 실제 marker payload는 server snapshot과 source별 활성화 설정이 필요하므로 고정 fixture 투영 test와 구분합니다.
 
 ## 화면
 
 ![역할별 공개 지도 레이어](../assets/changes/2026-08-03-community-map-role-layer-profile.png)
 
 ![원장 구조 기반 지도 레이어](../assets/changes/2026-08-03-community-map-ledger-layers.png)
+
+![선택 공공데이터와 역할 기본 레이어 통합](../assets/changes/2026-08-03-community-map-role-layer-public-data-integration.png)

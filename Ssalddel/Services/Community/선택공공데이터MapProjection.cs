@@ -1,5 +1,9 @@
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Metadata;
@@ -39,7 +43,10 @@ public sealed record Kosis소비자물가MapSnapshot(
 public sealed record 선택공공데이터MapSnapshot(
     국문관광정보MapSnapshot? Tourism,
     온라인가격MapSnapshot? OnlinePrice,
-    Kosis소비자물가MapSnapshot? Kosis)
+    Kosis소비자물가MapSnapshot? Kosis,
+    string SnapshotVersion = "",
+    DateTimeOffset? PersistedAtUtc = null,
+    int SchemaVersion = 선택공공데이터MapSnapshotStore.CurrentSchemaVersion)
 {
     public static 선택공공데이터MapSnapshot Empty { get; } = new(null, null, null);
 }
@@ -53,7 +60,60 @@ public interface I선택공공데이터MapSnapshotStore
 
 public sealed class 선택공공데이터MapSnapshotStore : I선택공공데이터MapSnapshotStore
 {
+    public const int CurrentSchemaVersion = 1;
+
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
+    private readonly object _gate = new();
+    private readonly string? _snapshotPath;
+    private readonly TimeProvider _timeProvider;
+    private readonly ILogger<선택공공데이터MapSnapshotStore>? _logger;
     private 선택공공데이터MapSnapshot _current = 선택공공데이터MapSnapshot.Empty;
+
+    public 선택공공데이터MapSnapshotStore()
+        : this((string?)null, TimeProvider.System, null)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public 선택공공데이터MapSnapshotStore(
+        IHostEnvironment environment,
+        TimeProvider timeProvider,
+        ILogger<선택공공데이터MapSnapshotStore> logger)
+        : this(
+            Path.Combine(
+                environment.ContentRootPath,
+                "App_Data",
+                "public-data-map",
+                "selected-sources-map-snapshot.v1.json"),
+            timeProvider,
+            logger)
+    {
+    }
+
+    public 선택공공데이터MapSnapshotStore(
+        string snapshotPath,
+        TimeProvider? timeProvider = null)
+        : this(snapshotPath, timeProvider ?? TimeProvider.System, null)
+    {
+    }
+
+    private 선택공공데이터MapSnapshotStore(
+        string? snapshotPath,
+        TimeProvider timeProvider,
+        ILogger<선택공공데이터MapSnapshotStore>? logger)
+    {
+        _snapshotPath = string.IsNullOrWhiteSpace(snapshotPath)
+            ? null
+            : Path.GetFullPath(snapshotPath);
+        _timeProvider = timeProvider;
+        _logger = logger;
+        _current = LoadPersistedSnapshot();
+    }
 
     public 선택공공데이터MapSnapshot Read()
         => Volatile.Read(ref _current);
@@ -61,7 +121,96 @@ public sealed class 선택공공데이터MapSnapshotStore : I선택공공데이�
     public void Replace(선택공공데이터MapSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
-        Volatile.Write(ref _current, snapshot);
+        var persisted = Version(snapshot);
+        lock (_gate)
+        {
+            Persist(persisted);
+            Volatile.Write(ref _current, persisted);
+        }
+    }
+
+    private 선택공공데이터MapSnapshot LoadPersistedSnapshot()
+    {
+        if (_snapshotPath is null || !File.Exists(_snapshotPath))
+        {
+            return 선택공공데이터MapSnapshot.Empty;
+        }
+
+        try
+        {
+            var snapshot = JsonSerializer.Deserialize<선택공공데이터MapSnapshot>(
+                File.ReadAllText(_snapshotPath),
+                JsonOptions);
+            if (snapshot is null
+                || snapshot.SchemaVersion != CurrentSchemaVersion
+                || string.IsNullOrWhiteSpace(snapshot.SnapshotVersion)
+                || snapshot.PersistedAtUtc is null)
+            {
+                throw new InvalidDataException(
+                    $"지원하지 않거나 불완전한 지도 snapshot 형식입니다. schema={snapshot?.SchemaVersion}");
+            }
+
+            return snapshot;
+        }
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException
+                                          or JsonException
+                                          or InvalidDataException)
+        {
+            _logger?.LogWarning(
+                exception,
+                "저장된 선택 공공데이터 지도 snapshot을 복원하지 못했습니다. Path={SnapshotPath}",
+                _snapshotPath);
+            return 선택공공데이터MapSnapshot.Empty;
+        }
+    }
+
+    private 선택공공데이터MapSnapshot Version(선택공공데이터MapSnapshot snapshot)
+    {
+        var versionInput = snapshot with
+        {
+            SnapshotVersion = string.Empty,
+            PersistedAtUtc = null,
+            SchemaVersion = CurrentSchemaVersion
+        };
+        var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(versionInput, JsonOptions));
+        var digest = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+        return versionInput with
+        {
+            SnapshotVersion = $"selected-public-data-map.v{CurrentSchemaVersion}:sha256:{digest}",
+            PersistedAtUtc = _timeProvider.GetUtcNow()
+        };
+    }
+
+    private void Persist(선택공공데이터MapSnapshot snapshot)
+    {
+        if (_snapshotPath is null)
+        {
+            return;
+        }
+
+        var directory = Path.GetDirectoryName(_snapshotPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var temporaryPath = $"{_snapshotPath}.{Environment.ProcessId}.tmp";
+        try
+        {
+            File.WriteAllText(
+                temporaryPath,
+                JsonSerializer.Serialize(snapshot, JsonOptions),
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            File.Move(temporaryPath, _snapshotPath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+            {
+                File.Delete(temporaryPath);
+            }
+        }
     }
 }
 
@@ -611,7 +760,8 @@ public sealed class 선택공공데이터MapMarkerReader(
                 CollectedAtUtc: tourism.CollectedAtUtc,
                 UpdateCycle: "실시간 API · snapshot 24시간",
                 FreshnessCode: Freshness(tourism.CollectedAtUtc, now),
-                BoundaryNotice: "공개 관광지 좌표이며 이용자·주민 위치, 상업 가용성 또는 지역문화 대표성을 뜻하지 않습니다.")));
+                BoundaryNotice: "공개 관광지 좌표이며 이용자·주민 위치, 상업 가용성 또는 지역문화 대표성을 뜻하지 않습니다.",
+                SourceVersion: snapshot.SnapshotVersion)));
         }
 
         if (snapshot.OnlinePrice is { } onlinePrice)
@@ -644,7 +794,8 @@ public sealed class 선택공공데이터MapMarkerReader(
                         "품목코드",
                         onlinePrice.ItemCatalogCount,
                         "건")
-                ]));
+                ],
+                SourceVersion: snapshot.SnapshotVersion));
         }
 
         if (snapshot.Kosis is { } kosis)
@@ -677,7 +828,8 @@ public sealed class 선택공공데이터MapMarkerReader(
                         kosis.IndicatorName,
                         kosis.Value,
                         kosis.Unit)
-                ]));
+                ],
+                SourceVersion: snapshot.SnapshotVersion));
         }
 
         return Task.FromResult<IReadOnlyList<커뮤니티세계지도ObservationDto>>(

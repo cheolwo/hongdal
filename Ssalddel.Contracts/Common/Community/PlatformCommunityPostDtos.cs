@@ -63,6 +63,7 @@ public sealed class PlatformCommunityPostResponse
     public string Body { get; set; } = string.Empty;
     public string OriginalLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
     public string? SharedLinkUrl { get; set; }
+    public 커뮤니티세계지도EvidenceReferenceDto? SourceEvidence { get; set; }
     public PlatformCommunityPostSalesOfferResponse? SalesOffer { get; set; }
     public bool IsInterestGatheringEnabled { get; set; }
     public string? 커뮤니티원장Id { get; set; }

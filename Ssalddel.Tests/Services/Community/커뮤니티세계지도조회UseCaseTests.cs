@@ -31,6 +31,7 @@ public sealed class 커뮤니티세계지도조회UseCaseTests
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.TourismPublicEvidence);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.OnlinePricePublicEvidence);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.KosisStatisticalContext);
+        Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.NewsPublisher);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.ProcurementHandoff);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.ImportReadiness);
         Assert.Contains(snapshot.Layers, layer => layer.Code == 커뮤니티세계지도LayerCodes.TransportHandoff);
@@ -42,6 +43,7 @@ public sealed class 커뮤니티세계지도조회UseCaseTests
         Assert.Contains(snapshot.Observations, item => item.StableId == "tourism:1001");
         Assert.Contains(snapshot.Observations, item => item.StableId == "online-price:kr-catalog");
         Assert.Contains(snapshot.Observations, item => item.StableId == "kosis-cpi:kr:58");
+        Assert.Contains(snapshot.Observations, item => item.StableId == "news-publisher:kr-yonhap");
         Assert.All(snapshot.Observations, item => Assert.False(string.IsNullOrWhiteSpace(item.SourceName)));
     }
 
@@ -154,6 +156,38 @@ public sealed class 커뮤니티세계지도조회UseCaseTests
         Assert.Contains("개별 제조업소 주소가 아닙니다", marker.Summary, StringComparison.Ordinal);
         Assert.Contains("원재료의 재배·어획 산지", marker.Summary, StringComparison.Ordinal);
         Assert.StartsWith("https://", marker.SourceHref, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 낮Snapshot은_네국가의대표뉴스조직을_국가대표점Marker로제공한다()
+    {
+        var snapshot = await _useCase.조회Async(CommunityPageRoutes.WorldMapDayWorkDataset);
+
+        var markers = snapshot.Observations
+            .Where(item => item.LayerCode == 커뮤니티세계지도LayerCodes.NewsPublisher)
+            .ToArray();
+
+        Assert.Equal(4, markers.Length);
+        Assert.Equal(
+            ["AU", "CN", "KR", "US"],
+            markers.Select(item => item.CountryCode).OrderBy(code => code, StringComparer.Ordinal).ToArray());
+        Assert.Contains(markers, item => item.Title == "연합뉴스"
+                                        && item.MarkerStatusCode == 커뮤니티세계지도뉴스출처유형Codes.NewsAgency);
+        Assert.Contains(markers, item => item.Title == "Associated Press"
+                                        && item.MarkerStatusCode == 커뮤니티세계지도뉴스출처유형Codes.NewsCooperative);
+        Assert.Contains(markers, item => item.Title == "Xinhua News Agency"
+                                        && item.MarkerStatusCode == 커뮤니티세계지도뉴스출처유형Codes.StateNewsAgency);
+        Assert.Contains(markers, item => item.Title == "ABC News Australia"
+                                        && item.MarkerStatusCode == 커뮤니티세계지도뉴스출처유형Codes.PublicServiceMedia);
+        Assert.All(markers, item =>
+        {
+            Assert.Equal(커뮤니티세계지도위치정밀도Codes.CountryRepresentative, item.LocationPrecisionCode);
+            Assert.Equal(국가별뉴스출처MapCatalog.DatasetKey, item.SourceDatasetKey);
+            Assert.Contains("본사·취재국·기사 발생 위치가 아닙니다", item.Summary, StringComparison.Ordinal);
+            Assert.Contains("국가 전체 언론을 대표", item.BoundaryNotice, StringComparison.Ordinal);
+            Assert.StartsWith("https://", item.DetailHref, StringComparison.Ordinal);
+            Assert.StartsWith("https://", item.SourceHref, StringComparison.Ordinal);
+        });
     }
 
     [Fact]

@@ -6,6 +6,7 @@ using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Domain.Community;
 using MediatR;
 using 살뜰.Data;
+using System.Text.Json;
 
 namespace Ssalddel.Services.Community;
 
@@ -17,6 +18,7 @@ namespace Ssalddel.Services.Community;
     Boundary = "호출자가 지정한 즉시 또는 예약 발행 시점만 반영하며 예약 취소와 기존 게시글 수정은 수행하지 않습니다.")]
 public sealed class 커뮤니티게시글생성Service
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly SsalddelContext _db;
     private readonly I커뮤니티게시글음성작업예약Service _audioQueue;
     private readonly ICommunityKeywordNotificationQueue _keywordQueue;
@@ -52,6 +54,17 @@ public sealed class 커뮤니티게시글생성Service
     public async Task<Result<PlatformCommunityPostResponse>> CreateAsync(
         PlatformCommunityPostCreateRequest? request,
         DateTime? scheduledPublishAtUtc,
+        CancellationToken cancellationToken)
+        => await CreateAsync(
+            request,
+            scheduledPublishAtUtc,
+            sourceEvidence: null,
+            cancellationToken);
+
+    public async Task<Result<PlatformCommunityPostResponse>> CreateAsync(
+        PlatformCommunityPostCreateRequest? request,
+        DateTime? scheduledPublishAtUtc,
+        커뮤니티세계지도EvidenceReferenceDto? sourceEvidence,
         CancellationToken cancellationToken)
     {
         if (request is null)
@@ -142,6 +155,18 @@ public sealed class 커뮤니티게시글생성Service
                 title,
                 body),
             SharedLinkUrl = CommunityPostWritePolicy.NormalizeOptionalUrl(request.SharedLinkUrl),
+            SourceObservationStableId = CommunityPostWritePolicy.NormalizeOptional(
+                sourceEvidence?.ObservationStableId,
+                200),
+            SourceDatasetCode = CommunityPostWritePolicy.NormalizeOptional(
+                sourceEvidence?.DatasetCode,
+                80),
+            SourceSnapshotRevision = CommunityPostWritePolicy.NormalizeOptional(
+                sourceEvidence?.SnapshotRevision,
+                128),
+            SourceEvidenceJson = sourceEvidence is null
+                ? null
+                : JsonSerializer.Serialize(sourceEvidence, JsonOptions),
             SalesOfferJson = CommunityPostWritePolicy.SerializeSalesOffer(request.SalesOffer),
             IsInterestGatheringEnabled = CommunityPostInterestGatheringPolicy.ResolveEnabled(
                 category,

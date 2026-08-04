@@ -54,12 +54,26 @@ public static class CommunityPageRoutes
                 ? "work"
                 : null));
 
-    public static string WorldMapFor(string? dataset = null)
+    public static string WorldMapFor(
+        string? dataset = null,
+        string? countryCode = null,
+        string? layerCodes = null,
+        string? markerId = null,
+        string? observationStableId = null,
+        string? snapshotRevision = null,
+        string? sourceVersion = null)
         => WithQuery(
             WorldMap,
-            ("dataset", string.Equals(dataset, WorldMapNightLearningDataset, StringComparison.OrdinalIgnoreCase)
+            (CommunityWorldMapNavigationQueryNames.Dataset,
+                string.Equals(dataset, WorldMapNightLearningDataset, StringComparison.OrdinalIgnoreCase)
                 ? WorldMapNightLearningDataset
-                : null));
+                : null),
+            (CommunityWorldMapNavigationQueryNames.Country, countryCode?.ToUpperInvariant()),
+            (CommunityWorldMapNavigationQueryNames.Layers, layerCodes),
+            (CommunityWorldMapNavigationQueryNames.Marker, markerId),
+            (CommunityWorldMapNavigationQueryNames.Observation, observationStableId),
+            (CommunityWorldMapNavigationQueryNames.SnapshotRevision, snapshotRevision),
+            (CommunityWorldMapNavigationQueryNames.SourceVersion, sourceVersion));
 
     public static string BoardsFor(
         string? boardName = null,
@@ -238,4 +252,15 @@ public static class CommunityPageRoutes
             ? path
             : $"{path}?{string.Join("&", query)}";
     }
+}
+
+public static class CommunityWorldMapNavigationQueryNames
+{
+    public const string Dataset = "dataset";
+    public const string Country = "country";
+    public const string Layers = "layers";
+    public const string Marker = "marker";
+    public const string Observation = "observation";
+    public const string SnapshotRevision = "snapshot";
+    public const string SourceVersion = "sourceVersion";
 }

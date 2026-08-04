@@ -20,6 +20,10 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.Body).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.OriginalLanguageCode).HasMaxLength(16);
         builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
+        builder.Property(x => x.SourceObservationStableId).HasMaxLength(200);
+        builder.Property(x => x.SourceDatasetCode).HasMaxLength(80);
+        builder.Property(x => x.SourceSnapshotRevision).HasMaxLength(128);
+        builder.Property(x => x.SourceEvidenceJson).HasColumnType("longtext");
         builder.Property(x => x.SalesOfferJson).HasColumnType("longtext");
         builder.Property(x => x.IsInterestGatheringEnabled).HasDefaultValue(false);
         builder.Property(x => x.커뮤니티원장Id).HasMaxLength(120);
@@ -48,6 +52,12 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.HasIndex(x => new { x.IsReportBoardPost, x.IsDeleted, x.CreatedAtUtc });
         builder.HasIndex(x => x.커뮤니티원장Id);
         builder.HasIndex(x => x.AuthorUserId);
+        builder.HasIndex(x => new
+        {
+            x.SourceDatasetCode,
+            x.SourceObservationStableId,
+            x.IsDeleted
+        }).HasDatabaseName("IX_platform_community_posts_source_observation");
         builder.HasIndex(x => new
         {
             x.PublicationStatusCode,
