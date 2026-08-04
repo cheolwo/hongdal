@@ -31,6 +31,9 @@ public sealed class 지도신청가원장UseCaseTests
             "지도 신청자");
 
         Assert.Equal(expectedTemplateKey, result.원장템플릿Key);
+        Assert.Equal("news-us-1", result.MapMarkerId);
+        Assert.Equal(workCode, result.업무Code);
+        Assert.Equal(지도신청가원장정책.신청접수단계, result.현재단계Key);
         Assert.Equal(커뮤니티원장상태.초안, result.상태);
         Assert.False(result.외부실행발생);
         Assert.False(result.기존가원장재사용);
@@ -46,6 +49,52 @@ public sealed class 지도신청가원장UseCaseTests
         Assert.Equal(bool.FalseString, saved.확장속성["OperationalHandoffAllowed"]);
         Assert.Equal(evidenceId.ToString("D"), saved.외부참조["ApplicationPrivacyConsentEvidenceId"]);
         Assert.Equal("news-us-1", Assert.Single(saved.블록목록).Data["MarkerId"]);
+    }
+
+    [Fact]
+    public async Task 마커별내원장조회는_본인의정확한마커원장만_반환한다()
+    {
+        var store = new RecordingLedgerStore();
+        var useCase = new 지도신청가원장UseCase(new RecordingConsentService(), store);
+        var own = await useCase.생성Async(
+            Request(신청개인정보업무Codes.운송대행, Guid.NewGuid()),
+            "user-1",
+            "신청자");
+        var otherMarkerRequest = Request(신청개인정보업무Codes.개별주문, Guid.NewGuid());
+        otherMarkerRequest.MarkerId = "news-us-2";
+        await useCase.생성Async(otherMarkerRequest, "user-1", "신청자");
+        await useCase.생성Async(
+            Request(신청개인정보업무Codes.물류대행, Guid.NewGuid()),
+            "user-2",
+            "다른 신청자");
+
+        var result = await useCase.내마커원장조회Async("news-us-1", null, "user-1");
+
+        var ledger = Assert.Single(result);
+        Assert.Equal(own.원장Id, ledger.원장Id);
+        Assert.Equal("news-us-1", ledger.MapMarkerId);
+        Assert.Equal(신청개인정보업무Codes.운송대행, ledger.업무Code);
+        Assert.True(ledger.기존가원장재사용);
+    }
+
+    [Fact]
+    public async Task 마커와원장Id가불일치하면_내원장조회가노출하지않는다()
+    {
+        var store = new RecordingLedgerStore();
+        var useCase = new 지도신청가원장UseCase(new RecordingConsentService(), store);
+        var markerOne = await useCase.생성Async(
+            Request(신청개인정보업무Codes.운송대행, Guid.NewGuid()),
+            "user-1",
+            "신청자");
+        var markerTwoRequest = Request(신청개인정보업무Codes.개별주문, Guid.NewGuid());
+        markerTwoRequest.MarkerId = "news-us-2";
+        var markerTwo = await useCase.생성Async(markerTwoRequest, "user-1", "신청자");
+
+        var mismatch = await useCase.내마커원장조회Async("news-us-1", markerTwo.원장Id, "user-1");
+        var match = await useCase.내마커원장조회Async("news-us-1", markerOne.원장Id, "user-1");
+
+        Assert.Empty(mismatch);
+        Assert.Equal(markerOne.원장Id, Assert.Single(match).원장Id);
     }
 
     [Fact]
@@ -185,6 +234,52 @@ public sealed class 지도신청가원장UseCaseTests
         var ledger = await store.원장조회Async(provisional.원장Id) ?? throw new InvalidOperationException();
         Assert.False(커뮤니티원장업무투영동기화Service.업무투영허용(ledger));
         Assert.Equal(bool.FalseString, ledger.확장속성["OperationalApplicationAutomaticallyCancelled"]);
+    }
+
+    [Fact]
+    public async Task 다른Client재조회는_동의철회후_같은원장의최신상태를본다()
+    {
+        var consent = new RecordingConsentService();
+        var store = new RecordingLedgerStore();
+        var useCase = new 지도신청가원장UseCase(consent, store);
+        var evidenceId = Guid.NewGuid();
+        var provisional = await useCase.생성Async(
+            Request(신청개인정보업무Codes.개별주문, evidenceId),
+            "user-1",
+            "신청자");
+        await useCase.신청제출반영Async(
+            provisional.원장Id,
+            new 지도신청실원장전환Request
+            {
+                신청개인정보동의증적Id = evidenceId,
+                업무Code = 신청개인정보업무Codes.개별주문,
+                신청출처Code = 신청개인정보출처Codes.커뮤니티지도,
+                운영원본종류 = "MartOrderRequest",
+                운영원본Id = "order-refresh-1"
+            },
+            "user-1");
+        var before = Assert.Single(await useCase.내마커원장조회Async(
+            "news-us-1",
+            provisional.원장Id,
+            "user-1"));
+        consent.EvidenceState = 신청개인정보동의상태Codes.철회;
+        consent.EvidenceWorkCode = 신청개인정보업무Codes.개별주문;
+
+        await useCase.동의철회반영Async(
+            provisional.원장Id,
+            new 지도신청동의철회반영Request { 신청개인정보동의증적Id = evidenceId },
+            "user-1");
+        var after = Assert.Single(await useCase.내마커원장조회Async(
+            "news-us-1",
+            provisional.원장Id,
+            "user-1"));
+
+        Assert.Equal(커뮤니티원장상태.진행중, before.상태);
+        Assert.False(before.동의철회보류);
+        Assert.Equal(커뮤니티원장상태.보류, after.상태);
+        Assert.True(after.동의철회보류);
+        Assert.Equal(지도신청가원장정책.동의철회확인단계, after.현재단계Key);
+        Assert.True(after.Revision > before.Revision);
     }
 
     [Fact]

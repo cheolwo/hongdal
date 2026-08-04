@@ -86,6 +86,34 @@ public sealed class ApplicationPrivacyConsentCompositionTests
         Assert.Contains(".map-application-standalone__main", css);
     }
 
+    [Fact]
+    public void 지도신청상태변경은_Command성공뒤_같은원장을다시조회한다()
+    {
+        var client = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Services",
+            "CommunityMapApplicationLedgerClient.cs");
+        var withdrawal = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Components",
+            "ApplicationPrivacyWithdrawalPanel.razor");
+        var cancellation = ReadRepositoryFile(
+            "Ssalddel.WebApp",
+            "Components",
+            "MapApplicationOperationalCancellationPanel.razor");
+
+        Assert.Contains("await MarkSubmittedAsync", client);
+        Assert.Contains("var refreshed = await FindByOperationalSourceAsync", client);
+        Assert.Contains("await LedgerClient.MarkConsentWithdrawnAsync", withdrawal);
+        Assert.Contains("_ledger = await LedgerClient.FindByOperationalSourceAsync", withdrawal);
+        Assert.Contains("await LedgerClient.RequestTransportCancellationReviewAsync", cancellation);
+        Assert.Contains("await LedgerClient.MarkOperationalCancelledAsync", cancellation);
+        Assert.Equal(3, CountOccurrences(cancellation, "_ledger = await LedgerClient.FindByOperationalSourceAsync"));
+    }
+
+    private static int CountOccurrences(string source, string value)
+        => source.Split(value, StringSplitOptions.None).Length - 1;
+
     private static string ReadRepositoryFile(params string[] relativePath)
         => File.ReadAllText(Path.Combine([FindRepositoryRoot(), .. relativePath]));
 

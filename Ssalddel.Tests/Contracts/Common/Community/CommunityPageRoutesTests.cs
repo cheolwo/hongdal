@@ -5,7 +5,7 @@ namespace Ssalddel.Tests.Contracts.Common.Community;
 public sealed class CommunityPageRoutesTests
 {
     [Fact]
-    public void 세계지도관측경로는_국가_레이어_StableId와게시당시Version을보존한다()
+    public void 세계지도관측경로는_국가_레이어_StableId_원장과게시당시Version을보존한다()
     {
         var route = CommunityPageRoutes.WorldMapFor(
             CommunityPageRoutes.WorldMapDayWorkDataset,
@@ -14,7 +14,8 @@ public sealed class CommunityPageRoutesTests
             "kosis:cpi:kr",
             "kosis:cpi:kr",
             "snapshot-revision-1",
-            "source-version-1");
+            "source-version-1",
+            "map-application:ledger-1");
 
         Assert.Equal(
             "/community/home?country=KR"
@@ -22,7 +23,8 @@ public sealed class CommunityPageRoutesTests
             + "&marker=kosis%3Acpi%3Akr"
             + "&observation=kosis%3Acpi%3Akr"
             + "&snapshot=snapshot-revision-1"
-            + "&sourceVersion=source-version-1",
+            + "&sourceVersion=source-version-1"
+            + "&ledger=map-application%3Aledger-1",
             route);
     }
 

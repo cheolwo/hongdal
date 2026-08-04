@@ -25,6 +25,20 @@ public sealed class GoogleMapsBrowserRuntimeClientTests
         Assert.Equal(1, handler.RequestCount);
     }
 
+    [Fact]
+    public async Task Runtime설정대신_Html이반환되면_미설정으로처리한다()
+    {
+        var httpClient = new HttpClient(new HtmlHandler())
+        {
+            BaseAddress = new Uri("http://localhost:5238/")
+        };
+        var client = new GoogleMapsBrowserRuntimeClient(httpClient);
+
+        var result = await client.TryGetAsync();
+
+        Assert.Null(result);
+    }
+
     private sealed class CountingHandler : HttpMessageHandler
     {
         public int RequestCount { get; private set; }
@@ -43,5 +57,16 @@ public sealed class GoogleMapsBrowserRuntimeClientTests
                 })
             });
         }
+    }
+
+    private sealed class HtmlHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+            => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("<html><body>SPA fallback</body></html>")
+            });
     }
 }
