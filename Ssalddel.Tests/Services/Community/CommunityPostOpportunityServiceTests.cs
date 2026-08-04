@@ -222,6 +222,53 @@ public sealed class CommunityPostOpportunityServiceTests
     }
 
     [Fact]
+    public async Task 같은로그인계정은_브라우저키가달라도_서로다른두참여자로집계하지않는다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var ledgerStore = new InMemoryLedgerStore();
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, ledgerStore, voteService);
+        var started = await service.StartParticipationAsync(
+            72,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람");
+        var options = started.InterestVote.Options.Take(2).ToArray();
+
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "same-member",
+                VoterKey = "session-a",
+                VoterDisplayName = "같은 참여자",
+                OptionIds = [options[0].OptionId]
+            },
+            CancellationToken.None);
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "same-member",
+                VoterKey = "session-b",
+                VoterDisplayName = "같은 참여자",
+                OptionIds = [options[1].OptionId]
+            },
+            CancellationToken.None);
+
+        var reloaded = await service.GetAsync(72, "ko-KR");
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PromoteParticipationAsync(
+            72,
+            CreatePromotionRequest(started.InterestVote.Id),
+            "author-2",
+            "작성자"));
+
+        Assert.Equal(1, reloaded!.Participation.ParticipantCount);
+        Assert.Contains("2명 이상", exception.Message, StringComparison.Ordinal);
+        Assert.Equal(0, ledgerStore.Count);
+    }
+
+    [Fact]
     public async Task 두사람이_모이기전에는_가원장을_만들수없다()
     {
         var store = new InMemoryPostStore(CreateOrdinaryPost());
@@ -299,6 +346,7 @@ public sealed class CommunityPostOpportunityServiceTests
         var retried = await service.PromoteParticipationAsync(72, request, "author-2", "작성자");
         var ledger = ledgerStore.Get(promoted.ProvisionalLedger.LedgerId);
         var vote = await voteService.GetAsync(started.InterestVote.Id, CancellationToken.None);
+        var reloaded = await service.GetAsync(72, "ko-KR");
 
         Assert.False(promoted.ReusedExistingProvisionalLedger);
         Assert.True(retried.ReusedExistingProvisionalLedger);
@@ -341,6 +389,10 @@ public sealed class CommunityPostOpportunityServiceTests
             slot.RoleCode == CommunityPostPartyRoleCodes.OceanFreightForwarder && slot.IsRecommended);
         Assert.Equal(0, promoted.Participation.PartyFormation.RepresentedRequiredRoleSlotCount);
         Assert.False(promoted.Participation.PartyFormation.IsReadyForRealLedgerReview);
+        Assert.Equal(promoted.ProvisionalLedger.LedgerId, reloaded!.Participation.ProvisionalLedgerId);
+        Assert.Equal(CommunityPostParticipationStateCodes.ProvisionalLedgerCreated, reloaded.Participation.StateCode);
+        Assert.Equal(2, reloaded.Participation.ParticipantCount);
+        Assert.Equal(promoted.ProvisionalLedger.LedgerId, reloaded.Journey.ProvisionalLedgerId);
     }
 
     [Fact]

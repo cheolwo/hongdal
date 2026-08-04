@@ -94,6 +94,20 @@ public sealed class CommunityVoteCastRequest
     public bool AllowNearbyPickupPointFallback { get; set; }
 }
 
+public sealed class CommunityVoteWithdrawRequest
+{
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.DisplayName,
+        "커뮤니티 투표 철회자 표시",
+        ProtectionNote = "공개 응답에는 철회자 표시명이나 계정 식별자를 노출하지 않고 집계만 제공")]
+    public string VoterDisplayName { get; set; } = string.Empty;
+
+    public string VoterKey { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public string? AuthenticatedUserId { get; set; }
+}
+
 public sealed class CommunityInterestVotePromotionSnapshot
 {
     public Guid VoteId { get; set; }
@@ -282,6 +296,8 @@ public sealed class CommunityVoteResponse
     public DateTime? ClosedAtUtc { get; set; }
 
     public int TotalVoteCount { get; set; }
+
+    public int WithdrawalCount { get; set; }
 
     public IReadOnlyList<CommunityVoteOptionResponse> Options { get; set; } = [];
 

@@ -449,6 +449,30 @@ public static class CommunityLedgerTemplateKeys
     public const string ForeignFoodFacilityProfile = "foreign-food-facility-profile";
     public const string MeatImportReadiness = "meat-import-readiness";
     public const string Errand = "errand";
+    public const string EducationFieldExperience = "education-field-experience";
+
+    public static IReadOnlyList<string> All { get; } =
+    [
+        IndividualDemand,
+        Order,
+        IndividualImport,
+        IndividualExport,
+        GroupOrder,
+        CargoTransport,
+        FoodOrder,
+        FoodDelivery,
+        SsalddelMart,
+        WarehouseOutbound,
+        WarehouseInbound,
+        LocalSale,
+        GroupPurchase,
+        GroupImport,
+        GroupExport,
+        ForeignFoodFacilityProfile,
+        MeatImportReadiness,
+        Errand,
+        EducationFieldExperience
+    ];
 }
 
 public static class CommunityLedgerImplementationModuleCodes
@@ -586,6 +610,7 @@ public static class CommunityLedgerOperatingSystemCodes
     public const string SsalddelMartUrbanLogistics = OperatingSystemIds.SsalddelMartUrbanLogistics;
     public const string WarehouseCommerceFulfillment = OperatingSystemIds.WarehouseCommerceFulfillment;
     public const string GroupPurchaseImport = OperatingSystemIds.GroupPurchaseImport;
+    public const string EducationFieldExperience = OperatingSystemIds.EducationFieldExperience;
 }
 
 public static class CommunityLedgerOperatingSystemRoleCodes

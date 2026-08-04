@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Ssalddel.Contracts.Common.Community;
 
 namespace Ssalddel.Services.Community;
 
@@ -29,6 +30,11 @@ public sealed class 커뮤니티원장업무투영동기화Service : I커뮤니�
 
     public async Task 갱신Async(커뮤니티원장Dto 원장, CancellationToken cancellationToken = default)
     {
+        if (!업무투영허용(원장))
+        {
+            return;
+        }
+
         var failures = new List<Exception>();
         foreach (var handler in _handlers)
         {
@@ -65,5 +71,25 @@ public sealed class 커뮤니티원장업무투영동기화Service : I커뮤니�
         {
             throw new AggregateException("커뮤니티 원장 업무 투영 중 하나 이상의 처리기가 실패했습니다.", failures);
         }
+    }
+
+    public static bool 업무투영허용(커뮤니티원장Dto 원장)
+    {
+        ArgumentNullException.ThrowIfNull(원장);
+        var provisional = 원장.확장속성.TryGetValue(
+                              CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey,
+                              out var maturity)
+                          && string.Equals(
+                              maturity,
+                              CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
+                              StringComparison.OrdinalIgnoreCase);
+        var nonBinding = 원장.확장속성.TryGetValue(
+                             CommunityPostProvisionalLedgerPolicy.BindingEffectAttributeKey,
+                             out var bindingEffect)
+                         && string.Equals(
+                             bindingEffect,
+                             CommunityPostProvisionalLedgerPolicy.NonBindingEffectCode,
+                             StringComparison.OrdinalIgnoreCase);
+        return !provisional && !nonBinding;
     }
 }

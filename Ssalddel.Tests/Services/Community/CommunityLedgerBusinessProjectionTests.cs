@@ -9,6 +9,26 @@ namespace Ssalddel.Tests.Services.Community;
 
 public sealed class CommunityLedgerBusinessProjectionTests
 {
+    [Theory]
+    [InlineData(CommunityLedgerTemplateKeys.CargoTransport)]
+    [InlineData(CommunityLedgerTemplateKeys.WarehouseInbound)]
+    [InlineData(CommunityLedgerTemplateKeys.Order)]
+    public void 비구속가원장은_업무실행Rdb투영대상이아니다(string templateKey)
+    {
+        var ledger = new 커뮤니티원장Dto
+        {
+            원장Id = $"provisional:{templateKey}",
+            원장템플릿Key = templateKey,
+            확장속성 = new Dictionary<string, string>
+            {
+                [CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey] = CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
+                [CommunityPostProvisionalLedgerPolicy.BindingEffectAttributeKey] = CommunityPostProvisionalLedgerPolicy.NonBindingEffectCode
+            }
+        };
+
+        Assert.False(커뮤니티원장업무투영동기화Service.업무투영허용(ledger));
+    }
+
     [Fact]
     public void Transport_snapshot_maps_coordination_data_without_confirming_dispatch()
     {

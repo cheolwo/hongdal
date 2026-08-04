@@ -1,0 +1,68 @@
+@using Ssalddel.Contracts.Common.Community
+@using MudBlazor
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                이 단계는 게시글에서 관심 있는 사람을 모으는 비구속적 기록입니다. 주문·계약·결제·배차·운송 주선이나 연락처 공개는 시작되지 않습니다.
+            </MudAlert>
+
+            <MudCheckBox T="bool"
+                         @bind-Value="explicitStartConfirmed"
+                         Color="Color.Primary">
+                [필수] 이 게시글에서 관심 모집을 시작하도록 직접 선택합니다.
+            </MudCheckBox>
+            <MudCheckBox T="bool"
+                         @bind-Value="nonBindingConfirmed"
+                         Color="Color.Primary">
+                [필수] 관심 표시는 비구속적이며 가원장·실행·계약은 별도 확인이라는 점을 이해했습니다.
+            </MudCheckBox>
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                동의하지 않으면 대화와 공개 근거 조회만 계속 이용할 수 있습니다.
+            </MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">취소</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.GroupAdd"
+                   Disabled="@(!CanSubmit)"
+                   OnClick="Submit">
+            동의하고 관심 모집 시작
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool explicitStartConfirmed;
+    private bool nonBindingConfirmed;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
+
+    private bool CanSubmit => explicitStartConfirmed && nonBindingConfirmed;
+
+    private void Submit()
+    {
+        if (!CanSubmit)
+        {
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok(new StartCommunityPostParticipationRequest
+        {
+            DisplayLanguageCode = CommunityDisplayLanguageCodes.Normalize(DisplayLanguageCode),
+            ConfirmExplicitStart = explicitStartConfirmed,
+            ConfirmNonBindingParticipation = nonBindingConfirmed
+        }));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

@@ -25,6 +25,11 @@ public interface I커뮤니티투표UseCase
         CommunityVoteCastRequest? request,
         CancellationToken cancellationToken);
 
+    Task<Result<CommunityVoteResponse>> 투표철회Async(
+        Guid voteId,
+        CommunityVoteWithdrawRequest? request,
+        CancellationToken cancellationToken);
+
     Task<Result<CommunityVoteResponse>> 마감Async(
         Guid voteId,
         CommunityVoteCloseRequest? request,
@@ -123,6 +128,15 @@ public sealed class 커뮤니티투표UseCase : I커뮤니티투표UseCase
         => GuardNullableRequest(
             request,
             () => _voteService.CastVoteAsync(voteId, request!, cancellationToken),
+            "커뮤니티 투표를 찾을 수 없습니다.");
+
+    public Task<Result<CommunityVoteResponse>> 투표철회Async(
+        Guid voteId,
+        CommunityVoteWithdrawRequest? request,
+        CancellationToken cancellationToken)
+        => GuardNullableRequest(
+            request,
+            () => _voteService.WithdrawVoteAsync(voteId, request!, cancellationToken),
             "커뮤니티 투표를 찾을 수 없습니다.");
 
     public Task<Result<CommunityVoteResponse>> 마감Async(

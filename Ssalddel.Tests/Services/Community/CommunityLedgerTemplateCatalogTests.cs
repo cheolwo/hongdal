@@ -26,13 +26,34 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(CommunityLedgerTemplateKeys.GroupExport, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.MeatImportReadiness, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.Errand, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.ForeignFoodFacilityProfile, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.EducationFieldExperience, keys);
+        Assert.Equal(
+            CommunityLedgerTemplateKeys.All.OrderBy(x => x, StringComparer.OrdinalIgnoreCase),
+            keys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
     }
 
     [Fact]
-    public void Find_UnknownKey_PreservesOrderLedgerFallback()
+    public void Find_EmptyKey_PreservesExplicitOrderLedgerDefault_ButUnknownKeyFails()
     {
         Assert.Equal(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateCatalog.Find(null).Key);
-        Assert.Equal(CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateCatalog.Find("unknown-template").Key);
+        Assert.Throws<KeyNotFoundException>(() => CommunityLedgerTemplateCatalog.Find("unknown-template"));
+        Assert.False(CommunityLedgerTemplateCatalog.TryFind("unknown-template", out _));
+    }
+
+    [Fact]
+    public void PersistedExtensionLedgerKeys_ResolveToTheirOwnTemplates()
+    {
+        var foodFacility = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.ForeignFoodFacilityProfile);
+        var education = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.EducationFieldExperience);
+
+        Assert.Equal("해외 식품시설 준비 원장", foodFacility.DisplayName);
+        Assert.Equal("현장체험활동 원장", education.DisplayName);
+        Assert.NotEqual(CommunityLedgerTemplateKeys.Order, foodFacility.Key);
+        Assert.NotEqual(CommunityLedgerTemplateKeys.Order, education.Key);
+        Assert.Equal(
+            CommunityLedgerTemplateKeys.EducationFieldExperience,
+            Ssalddel.Contracts.Common.Education.현장체험활동원장상수.원장템플릿Key);
     }
 
     [Fact]

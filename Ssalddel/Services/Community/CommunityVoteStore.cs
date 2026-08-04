@@ -668,6 +668,7 @@ internal sealed class CommunityVoteRecord
     public DateTime? ClosedAtUtc { get; set; }
     public IReadOnlyList<CommunityVoteOptionRecord> Options { get; set; } = [];
     public List<CommunityVoteCastRecord> Votes { get; set; } = [];
+    public List<CommunityVoteWithdrawalRecord> Withdrawals { get; set; } = [];
     public List<CommunityVoteDemandHandoffOutboxRecord> DemandHandoffOutbox { get; set; } = [];
     public CommunityGroupPurchaseVoteSettingsRecord? GroupPurchase { get; set; }
     public CommunityVoteResolutionDocumentRecord? ResolutionDocument { get; set; }
@@ -730,6 +731,14 @@ internal sealed class CommunityVoteCastRecord
     public string? PickupPointId { get; set; }
     public bool AllowNearbyPickupPointFallback { get; set; }
     public DateTime VotedAtUtc { get; set; }
+}
+
+internal sealed class CommunityVoteWithdrawalRecord
+{
+    public string VoterHash { get; set; } = string.Empty;
+    public string? VoterUserId { get; set; }
+    public string VoterDisplayName { get; set; } = string.Empty;
+    public DateTime WithdrawnAtUtc { get; set; }
 }
 
 internal sealed class CommunityGroupPurchaseVoteSettingsRecord

@@ -131,8 +131,11 @@ public sealed class PlatformCommunityPostEngagementViewModel(
 
     public async Task<PlatformCommunityCommandResult> StartParticipationAsync(
         long postId,
+        StartCommunityPostParticipationRequest request,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         if (!PendingPostParticipationIds.Add(postId))
         {
             return new(false);
@@ -145,15 +148,18 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                 new StartCommunityPostParticipationRequest
                 {
                     DisplayLanguageCode = DisplayLanguageCode,
-                    ConfirmExplicitStart = true,
-                    ConfirmNonBindingParticipation = true
+                    Title = request.Title,
+                    ClosesAtUtc = request.ClosesAtUtc,
+                    ConfirmExplicitStart = request.ConfirmExplicitStart,
+                    ConfirmNonBindingParticipation = request.ConfirmNonBindingParticipation
                 },
                 cancellationToken);
             await RefreshOpportunityAsync(postId, cancellationToken);
             return new(
                 true,
                 "게시글에서 비구속적 관심 모집을 시작했습니다.",
-                CommunityComposerMessageKind.Success);
+                CommunityComposerMessageKind.Success,
+                RefreshPosts: true);
         }
         catch (HttpRequestException ex) when (
             ex.StatusCode is System.Net.HttpStatusCode.Unauthorized
@@ -191,23 +197,10 @@ public sealed class PlatformCommunityPostEngagementViewModel(
         }
 
         var selected = GetParticipationOptionSelection(postId);
-        var wasSelected = selected.Contains(role.OptionId);
-        if (wasSelected && selected.Count == 1)
-        {
-            PendingPostParticipationIds.Remove(postId);
-            return new(
-                false,
-                "관심 역할은 하나 이상 남겨야 합니다.",
-                CommunityComposerMessageKind.Info);
-        }
-
-        if (wasSelected)
+        var previousSelection = selected.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (!selected.Add(role.OptionId))
         {
             selected.Remove(role.OptionId);
-        }
-        else
-        {
-            selected.Add(role.OptionId);
         }
 
         try
@@ -216,31 +209,41 @@ public sealed class PlatformCommunityPostEngagementViewModel(
                               && !string.IsNullOrWhiteSpace(commentForm.Nickname)
                 ? commentForm.Nickname.Trim()
                 : "관심 참여자";
-            await communityService.CastCommunityVoteAsync(
-                voteId,
-                new CommunityVoteCastRequest
-                {
-                    VoterKey = $"community-interest:{RecommendationSessionKey}",
-                    VoterDisplayName = displayName,
-                    OptionIds = selected.ToArray()
-                },
-                cancellationToken);
+            if (selected.Count == 0)
+            {
+                await communityService.WithdrawCommunityVoteAsync(
+                    voteId,
+                    new CommunityVoteWithdrawRequest
+                    {
+                        VoterKey = $"community-interest:{RecommendationSessionKey}",
+                        VoterDisplayName = displayName
+                    },
+                    cancellationToken);
+            }
+            else
+            {
+                await communityService.CastCommunityVoteAsync(
+                    voteId,
+                    new CommunityVoteCastRequest
+                    {
+                        VoterKey = $"community-interest:{RecommendationSessionKey}",
+                        VoterDisplayName = displayName,
+                        OptionIds = selected.ToArray()
+                    },
+                    cancellationToken);
+            }
             await RefreshOpportunityAsync(postId, cancellationToken);
             return new(
                 true,
-                "가능한 참여 역할을 반영했습니다.",
+                selected.Count == 0
+                    ? "비구속적 관심 참여를 철회했습니다. 주문·계약·결제는 발생하지 않았습니다."
+                    : "가능한 참여 역할을 반영했습니다.",
                 CommunityComposerMessageKind.Success);
         }
         catch (Exception ex)
         {
-            if (wasSelected)
-            {
-                selected.Add(role.OptionId);
-            }
-            else
-            {
-                selected.Remove(role.OptionId);
-            }
+            selected.Clear();
+            selected.UnionWith(previousSelection);
 
             return new(
                 false,

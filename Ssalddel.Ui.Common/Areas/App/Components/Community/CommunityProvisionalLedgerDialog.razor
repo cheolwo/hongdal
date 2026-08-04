@@ -39,6 +39,24 @@
                 <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
                     가원장은 관심과 역할 구성을 기록하는 비구속적 초안입니다. 주문·계약·결제·배차·운송 주선은 확정되지 않습니다.
                 </MudAlert>
+                <MudCheckBox T="bool"
+                             @bind-Value="provisionalLedgerConfirmed"
+                             Color="Color.Primary">
+                    [필수] 서로 다른 참여자들의 현재 관심을 가원장으로 기록하는 데 동의합니다.
+                </MudCheckBox>
+                <MudCheckBox T="bool"
+                             @bind-Value="nonBindingEvidenceConfirmed"
+                             Color="Color.Primary">
+                    [필수] 이 기록이 비구속적 증빙이며 주문·계약·결제가 아니라는 점을 확인했습니다.
+                </MudCheckBox>
+                <MudCheckBox T="bool"
+                             @bind-Value="participantNotificationsConfirmed"
+                             Color="Color.Primary">
+                    [필수] 가원장 생성 사실을 현재 참여자에게 알리도록 요청합니다.
+                </MudCheckBox>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    관심 철회는 가원장 생성 전까지 가능하며, 생성 뒤 역할 수락·연락처 공개·실행은 각각 별도 확인입니다.
+                </MudText>
             </MudStack>
         </MudForm>
     </DialogContent>
@@ -47,6 +65,7 @@
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.Description"
+                   Disabled="@(!CanSubmit)"
                    OnClick="SubmitAsync">
             가원장 만들기
         </MudButton>
@@ -59,6 +78,9 @@
     private string destinationCountryCode = string.Empty;
     private IReadOnlyCollection<string> selectedTransportModes = [];
     private string validationMessage = string.Empty;
+    private bool provisionalLedgerConfirmed;
+    private bool nonBindingEvidenceConfirmed;
+    private bool participantNotificationsConfirmed;
 
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
@@ -79,6 +101,11 @@
         CommunityTradeDirectionCodes.Domestic,
         StringComparison.OrdinalIgnoreCase);
 
+    private bool CanSubmit
+        => provisionalLedgerConfirmed
+           && nonBindingEvidenceConfirmed
+           && participantNotificationsConfirmed;
+
     protected override void OnParametersSet()
     {
         if (!IsCrossBorder && !selectedTransportModes.Any())
@@ -90,6 +117,12 @@
     private async Task SubmitAsync()
     {
         validationMessage = string.Empty;
+        if (!CanSubmit)
+        {
+            validationMessage = "가원장 생성·비구속성·참여자 알림을 모두 직접 확인해 주세요.";
+            return;
+        }
+
         if (form is not null)
         {
             await form.ValidateAsync();
@@ -137,9 +170,9 @@
             TransportModeCodes = selectedTransportModes
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray(),
-            ConfirmProvisionalLedger = true,
-            ConfirmNonBindingEvidence = true,
-            ConfirmParticipantNotifications = true
+            ConfirmProvisionalLedger = provisionalLedgerConfirmed,
+            ConfirmNonBindingEvidence = nonBindingEvidenceConfirmed,
+            ConfirmParticipantNotifications = participantNotificationsConfirmed
         }));
     }
 

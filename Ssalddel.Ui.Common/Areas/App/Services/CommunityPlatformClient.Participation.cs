@@ -87,4 +87,18 @@ public partial class CommunityPlatformClient
         return await response.Content.ReadFromJsonAsync<CommunityVoteResponse>(
             cancellationToken: cancellationToken);
     }
+
+    public async Task<CommunityVoteResponse?> WithdrawCommunityVoteAsync(
+        Guid voteId,
+        CommunityVoteWithdrawRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/votes/{voteId}/votes/withdraw",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResponse>(
+            cancellationToken: cancellationToken);
+    }
 }

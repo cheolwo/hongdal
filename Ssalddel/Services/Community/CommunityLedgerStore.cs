@@ -300,6 +300,22 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             }
         }
 
+        foreach (var pair in query.외부참조조건)
+        {
+            var key = pair.Key?.Trim();
+            var value = pair.Value?.Trim();
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+            {
+                continue;
+            }
+            if (key.Contains('.', StringComparison.Ordinal) || key.StartsWith('$'))
+            {
+                throw new InvalidOperationException("외부참조 조회 키가 올바르지 않습니다.");
+            }
+
+            filter &= builder.Eq($"외부참조.{key}", value);
+        }
+
         return filter;
     }
 
@@ -360,6 +376,10 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
     {
         if (string.IsNullOrWhiteSpace(request.커뮤니티Id)) throw new InvalidOperationException("커뮤니티Id is required.");
         if (string.IsNullOrWhiteSpace(request.원장템플릿Key)) throw new InvalidOperationException("원장템플릿Key is required.");
+        if (!CommunityLedgerTemplateCatalog.TryFind(request.원장템플릿Key, out _))
+        {
+            throw new InvalidOperationException($"등록되지 않은 원장템플릿Key입니다. Key={request.원장템플릿Key.Trim()}");
+        }
         if (string.IsNullOrWhiteSpace(request.제목)) throw new InvalidOperationException("제목 is required.");
         주문원장구성정책.저장요청검증(request);
     }

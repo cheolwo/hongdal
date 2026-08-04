@@ -778,6 +778,44 @@ public static class CommunityLedgerTemplateCatalog
         },
         new()
         {
+            Key = CommunityLedgerTemplateKeys.ForeignFoodFacilityProfile,
+            DisplayName = "해외 식품시설 준비 원장",
+            Category = "무역 준비 원장",
+            WorkflowTag = "해외 식품시설 등록 준비",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            TargetOperatingSystemName = "무역 준비 OS",
+            Summary = "해외 판매자, 실제 제조시설과 국내 수입자를 분리해 한국 수입식품 신고 전 준비 상태와 공식 근거를 기록하는 원장입니다. 외부 등록·신고·검사·통관을 자동 실행하지 않습니다.",
+            IsExtensionTemplate = true,
+            EngineHints = [CommunityLedgerEngineHints.ImportCustoms],
+            UiSectionHints = ["해외 판매자", "실제 제조시설", "국내 수입자", "제품과 제조국", "식약처 등록 정보", "공식 근거", "사람 검토", "외부 제출 경계"],
+            ActionHints = ["시설 정보 저장", "공식 근거 첨부", "누락 정보 확인", "사람 검토 요청", "검토 결과 기록", "보류 표시"],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.RequestAndParticipantBeforeProgress,
+                    "거래 당사자와 실제 제조시설을 먼저 구분합니다.",
+                    "해외 판매자, 실제 제조시설과 국내 수입자를 확인하고 공식 근거를 첨부한 뒤 사람 검토를 요청합니다. 플랫폼은 적법성 확정이나 외부 제출을 대신하지 않습니다.",
+                    requiredUiSectionHints: ["해외 판매자", "실제 제조시설", "국내 수입자", "공식 근거"],
+                    gatedActionHints: ["사람 검토 요청", "검토 결과 기록"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("GET", "해외판매자식품시설Controller", "목록/조회", "판매자 또는 관리자가 접근 가능한 해외 식품시설 준비 원장을 조회합니다.", "I해외판매자식품시설UseCase.목록Async/조회Async"),
+                ApiEndpoint("PUT", "해외판매자식품시설Controller", "저장", "시설 준비 정보와 검토 상태를 원장에 저장하되 외부 기관에는 전송하지 않습니다.", "I해외판매자식품시설UseCase.저장Async")
+            ],
+            PersistencePolicy = MongoPolicy(),
+            BestLedgerPatternTitle = "판매자·제조시설·수입자를 분리한 식품시설 준비 원장",
+            BestLedgerPatternSummary = "등록 준비 정보와 공식 근거를 한 원장에 모으되 외부 제출 여부와 사람 검토 결과를 별도 상태로 남깁니다.",
+            CommunityDiscussionPrompts = ["실제 제조시설과 판매자가 같은 주체인가요?", "국내 수입 책임 주체는 누구인가요?", "최신 공식 근거와 사람 검토가 필요한 항목은 무엇인가요?"],
+            Roles =
+            [
+                Role("해외 판매자", "판매자와 실제 제조시설 정보를 구분해 제공합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("국내 수입자", "국내 수입 책임과 준비 정보를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("전문 검토자", "공식 근거와 누락 사항을 검토하되 등록·신고를 자동 확정하지 않습니다.", CommunityLedgerPermissionCodes.AttachEvidence, CommunityLedgerPermissionCodes.ConfirmCompletion)
+            ]
+        },
+        new()
+        {
             Key = CommunityLedgerTemplateKeys.MeatImportReadiness,
             DisplayName = "육류 수입 준비도 원장",
             Category = "정보 협업 원장",
@@ -813,6 +851,44 @@ public static class CommunityLedgerTemplateCatalog
                 Role("한국 측 참여자", "국내 수입 요건과 공식 결과 참조를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence, CommunityLedgerPermissionCodes.ConfirmCompletion),
                 Role("해외 측 참여자", "제품, 작업장, 수출증명 관련 정보와 근거를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence, CommunityLedgerPermissionCodes.ConfirmCompletion),
                 Role("지원 참여자", "필요한 질문과 설명을 남기되 당사자 대신 결정을 확정하지 않습니다.", CommunityLedgerPermissionCodes.AttachEvidence)
+            ]
+        },
+        new()
+        {
+            Key = CommunityLedgerTemplateKeys.EducationFieldExperience,
+            DisplayName = "현장체험활동 원장",
+            Category = "교육 활동 원장",
+            WorkflowTag = "교육 현장 체험 지원",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.EducationFieldExperience,
+            TargetOperatingSystemName = "교육 현장 체험 지원 OS",
+            Summary = "학생의 계획, 실제 활동 기록, 보호자 승인, 현장 확인과 학교 제출·결정을 서로 구분해 기록하는 교육 활동 원장입니다.",
+            EngineHints = [CommunityLedgerEngineHints.CommunityActivitySignal],
+            UiSectionHints = ["학생 계획", "활동 계획", "활동 기록", "보호자 승인", "현장 확인", "학교 제출", "학교 결정"],
+            ActionHints = ["활동 계획 작성", "활동 기록 추가", "보호자 승인", "현장 확인", "학교 제출", "학교 결정 기록"],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.RequestAndParticipantBeforeProgress,
+                    "학생 계획과 보호자 확인 관계가 먼저 필요합니다.",
+                    "활동 목표·장소·일정과 보호자를 확인한 뒤 실제 활동 기록과 학교 제출 단계로 진행합니다. 학교의 출석 인정 결정은 원장 기록과 분리된 학교 권한으로 남깁니다.",
+                    requiredUiSectionHints: ["학생 계획", "활동 계획", "보호자 승인"],
+                    gatedActionHints: ["활동 기록 추가", "학교 제출"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("POST", "현장체험활동Controller", "생성", "학생 계획과 보호자 관계를 확인해 현장체험활동 원장을 생성합니다.", "I현장체험활동UseCase.생성Async"),
+                ApiEndpoint("POST", "현장체험활동Controller", "활동/승인/제출/결정", "역할별 권한에 따라 활동 기록, 승인, 제출과 학교 결정을 갱신합니다.", "I현장체험활동UseCase")
+            ],
+            PersistencePolicy = MongoPolicy(),
+            BestLedgerPatternTitle = "계획·활동·승인·학교 결정을 분리한 현장체험 원장",
+            BestLedgerPatternSummary = "학생 활동의 사실 기록과 보호자 승인, 학교의 출석 인정 결정을 한 원장에서 연결하되 각 역할의 권한과 근거를 구분합니다.",
+            CommunityDiscussionPrompts = ["학생이 달성하려는 활동 목표는 무엇인가요?", "보호자와 현장 확인자는 어떤 범위를 확인하나요?", "학교 제출에 필요한 최소 기록과 증빙은 무엇인가요?"],
+            Roles =
+            [
+                Role("학생", "계획과 실제 활동 기록을 작성합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("보호자", "활동 계획과 제출 전 내용을 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("현장체험 지도자", "실제 활동 여부와 확인 내용을 기록합니다.", CommunityLedgerPermissionCodes.AttachEvidence, CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("학교 담당자", "제출 자료를 검토하고 학교 결정을 기록합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.CloseLedger)
             ]
         },
         new()
@@ -1444,19 +1520,35 @@ public static class CommunityLedgerTemplateCatalog
 
     public static CommunityLedgerTemplateResponse Find(string? key)
     {
-        CommunityLedgerTemplateResponse template;
-
         if (string.IsNullOrWhiteSpace(key))
         {
-            template = Templates.First(x => x.Key == CommunityLedgerTemplateKeys.Order);
-        }
-        else
-        {
-            template = Templates.FirstOrDefault(x => string.Equals(x.Key, key.Trim(), StringComparison.OrdinalIgnoreCase))
-                       ?? Templates.First(x => x.Key == CommunityLedgerTemplateKeys.Order);
+            return EnsureLedgerBlocks(Templates.First(x => x.Key == CommunityLedgerTemplateKeys.Order));
         }
 
-        return EnsureLedgerBlocks(template);
+        if (TryFind(key, out var template))
+        {
+            return template;
+        }
+
+        throw new KeyNotFoundException($"등록되지 않은 커뮤니티 원장 템플릿입니다. Key={key.Trim()}");
+    }
+
+    public static bool TryFind(string? key, out CommunityLedgerTemplateResponse template)
+    {
+        template = null!;
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return false;
+        }
+
+        var found = Templates.FirstOrDefault(x => string.Equals(x.Key, key.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (found is null)
+        {
+            return false;
+        }
+
+        template = EnsureLedgerBlocks(found);
+        return true;
     }
 
     public static string BuildDraftBody(string? key, string? appName, string? roleLabel)

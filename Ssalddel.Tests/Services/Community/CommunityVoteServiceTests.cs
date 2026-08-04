@@ -34,6 +34,40 @@ public sealed class CommunityVoteServiceTests
     }
 
     [Fact]
+    public async Task WithdrawVote_SameAuthenticatedUser_RemovesActiveVoteAndKeepsAggregateHistory()
+    {
+        var service = new InMemoryCommunityVoteService();
+        var vote = await service.CreateAsync(CreateVoteRequest(), CancellationToken.None);
+
+        await service.CastVoteAsync(vote.Id, new CommunityVoteCastRequest
+        {
+            AuthenticatedUserId = "member-1",
+            VoterDisplayName = "참여자 A",
+            VoterKey = "browser-session-a",
+            OptionIds = ["option-1"]
+        }, CancellationToken.None);
+
+        var withdrawn = await service.WithdrawVoteAsync(vote.Id, new CommunityVoteWithdrawRequest
+        {
+            AuthenticatedUserId = "member-1",
+            VoterDisplayName = "참여자 A",
+            VoterKey = "different-browser-session"
+        }, CancellationToken.None);
+        var retried = await service.WithdrawVoteAsync(vote.Id, new CommunityVoteWithdrawRequest
+        {
+            AuthenticatedUserId = "member-1",
+            VoterDisplayName = "참여자 A",
+            VoterKey = "third-browser-session"
+        }, CancellationToken.None);
+
+        Assert.NotNull(withdrawn);
+        Assert.Equal(0, withdrawn.TotalVoteCount);
+        Assert.Equal(1, withdrawn.WithdrawalCount);
+        Assert.Equal(0, retried!.TotalVoteCount);
+        Assert.Equal(1, retried.WithdrawalCount);
+    }
+
+    [Fact]
     public async Task ListAsync_HsCode_NormalizesFormattingAndMatchesHierarchyPrefix()
     {
         var service = new InMemoryCommunityVoteService();

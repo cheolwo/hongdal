@@ -33,6 +33,8 @@ public interface ICommunityVoteService
 
     Task<CommunityVoteResponse?> CastVoteAsync(Guid voteId, CommunityVoteCastRequest request, CancellationToken cancellationToken);
 
+    Task<CommunityVoteResponse?> WithdrawVoteAsync(Guid voteId, CommunityVoteWithdrawRequest request, CancellationToken cancellationToken);
+
     Task<CommunityVoteResponse?> CloseAsync(Guid voteId, CommunityVoteCloseRequest request, CancellationToken cancellationToken);
 
     Task<CommunityVoteResolutionDocumentResponse?> CreateResolutionDraftAsync(

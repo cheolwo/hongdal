@@ -271,9 +271,10 @@ public partial class CommunityVoteService : ICommunityVoteService
             }
 
         var authenticatedUserId = NormalizeOptional(request.AuthenticatedUserId);
-        var voterIdentity = authenticatedUserId is null
-            ? Normalize(request.VoterKey, request.VoterDisplayName)
-            : $"authenticated-user:{authenticatedUserId}";
+        var voterIdentity = ResolveVoterIdentity(
+            authenticatedUserId,
+            request.VoterKey,
+            request.VoterDisplayName);
         var voterHash = Hash(voterIdentity);
         var groupPurchaseParticipation = ValidateGroupPurchaseParticipation(vote, request, voterHash);
         vote.Votes.RemoveAll(x => string.Equals(x.VoterHash, voterHash, StringComparison.Ordinal));
@@ -308,6 +309,43 @@ public partial class CommunityVoteService : ICommunityVoteService
             vote = await _store.GetAsync(vote.Id, cancellationToken) ?? vote;
         }
 
+        return ToResponse(vote);
+    }
+
+    public async Task<CommunityVoteResponse?> WithdrawVoteAsync(
+        Guid voteId,
+        CommunityVoteWithdrawRequest request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var vote = await _store.GetAsync(voteId, cancellationToken);
+        if (vote is null)
+        {
+            return null;
+        }
+
+        EnsureOpen(vote);
+        var authenticatedUserId = NormalizeOptional(request.AuthenticatedUserId);
+        var voterHash = Hash(ResolveVoterIdentity(
+            authenticatedUserId,
+            request.VoterKey,
+            request.VoterDisplayName));
+        if (vote.Votes.RemoveAll(cast => string.Equals(
+                cast.VoterHash,
+                voterHash,
+                StringComparison.Ordinal)) == 0)
+        {
+            return ToResponse(vote);
+        }
+
+        vote.Withdrawals.Add(new CommunityVoteWithdrawalRecord
+        {
+            VoterHash = voterHash,
+            VoterUserId = authenticatedUserId,
+            VoterDisplayName = Normalize(request.VoterDisplayName, "익명 참여자"),
+            WithdrawnAtUtc = DateTime.UtcNow
+        });
+        await SaveMutationAsync(vote, cancellationToken);
         return ToResponse(vote);
     }
 
@@ -393,6 +431,7 @@ public partial class CommunityVoteService : ICommunityVoteService
             ClosesAtUtc = vote.ClosesAtUtc,
             ClosedAtUtc = vote.ClosedAtUtc,
             TotalVoteCount = vote.Votes.Count,
+            WithdrawalCount = vote.Withdrawals.Count,
             Options = vote.Options.Select(x =>
             {
                 counts.TryGetValue(x.OptionId, out var count);
@@ -421,6 +460,14 @@ public partial class CommunityVoteService : ICommunityVoteService
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value.Trim()));
         return Convert.ToHexString(bytes).ToLowerInvariant();
     }
+
+    private static string ResolveVoterIdentity(
+        string? authenticatedUserId,
+        string? voterKey,
+        string? voterDisplayName)
+        => authenticatedUserId is null
+            ? Normalize(voterKey, voterDisplayName)
+            : $"authenticated-user:{authenticatedUserId}";
 
     private static string Normalize(string? value, string fallback)
         => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();

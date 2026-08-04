@@ -1,5 +1,6 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject IDialogService DialogService
 
 @if (CommunityPostInterestGatheringPolicy.IsEnabledFor(
          Post.Category,
@@ -215,7 +216,29 @@
 
     private async Task StartParticipationAsync()
     {
-        var result = await ViewModel.StartParticipationAsync(Post.Id);
+        var parameters = new DialogParameters
+        {
+            [nameof(CommunityParticipationStartConsentDialog.DisplayLanguageCode)] = ViewModel.DisplayLanguageCode
+        };
+        var dialog = await DialogService.ShowAsync<CommunityParticipationStartConsentDialog>(
+            "비구속적 관심 모으기",
+            parameters,
+            new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true,
+                CloseButton = true,
+                CloseOnEscapeKey = true
+            });
+        var dialogResult = await dialog.Result;
+        if (dialogResult is null
+            || dialogResult.Canceled
+            || dialogResult.Data is not StartCommunityPostParticipationRequest request)
+        {
+            return;
+        }
+
+        var result = await ViewModel.StartParticipationAsync(Post.Id, request);
         if (result.Succeeded)
         {
             _detailsExpanded = true;

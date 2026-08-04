@@ -94,6 +94,26 @@ public sealed class 커뮤니티투표Controller : CommunityControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpPost("{voteId:guid}/votes/withdraw")]
+    [AllowAnonymous]
+    [SsalddelApiContractName("WithdrawVote")]
+    public async Task<IActionResult> 투표철회(
+        Guid voteId,
+        [FromBody] CommunityVoteWithdrawRequest request,
+        CancellationToken cancellationToken)
+    {
+        var existing = await _useCase.상세Async(voteId, cancellationToken);
+        if (existing.IsSuccess && existing.Value.VoteKind == CommunityVoteKindCodes.GroupPurchaseDemand)
+        {
+            return BadRequest("공동구매 수요 철회는 주문자 공동구매 투표 API를 사용해야 합니다.");
+        }
+
+        request.AuthenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                                      ?? User.FindFirstValue("sub");
+        var result = await _useCase.투표철회Async(voteId, request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpPost("{voteId:guid}/close")]
     [AllowAnonymous]
     [SsalddelApiContractName("Close")]

@@ -132,6 +132,10 @@ public interface ICommunityParticipationClient
         Guid voteId,
         CommunityVoteCastRequest request,
         CancellationToken cancellationToken = default);
+    Task<CommunityVoteResponse?> WithdrawCommunityVoteAsync(
+        Guid voteId,
+        CommunityVoteWithdrawRequest request,
+        CancellationToken cancellationToken = default);
 }
 
 public interface ICommunityLedgerClient
