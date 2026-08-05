@@ -8,11 +8,11 @@ namespace Ssalddel.Tests.Services.Community;
 public sealed class CommunityMapApplicationRoutesTests
 {
     [Fact]
-    public void 吏?꾨쭏而ㅻ뒗_?멸?吏湲곗〈?좎껌?붾㈃?쇰줈_?덉쟾?쒕Ц留μ쓣?꾨떖?쒕떎()
+    public void 지도마커는_세가지기존신청화면으로_안전한문맥을전달한다()
     {
         var options = CommunityMapApplicationRoutes.ForMarker(
             "news-publisher:kr-yonhap",
-            "?고빀?댁뒪",
+            "연합뉴스",
             "news-publisher",
             "kr");
 
@@ -33,7 +33,7 @@ public sealed class CommunityMapApplicationRoutesTests
         Assert.StartsWith(InboundRequestPageRoutes.Create, options[0].Href, StringComparison.Ordinal);
         Assert.Equal(CommunityMapApplicationRoutes.SourceCode, logistics.Source);
         Assert.Equal("news-publisher:kr-yonhap", logistics.SourceMarkerId);
-        Assert.Equal("?고빀?댁뒪", logistics.NodeTitle);
+        Assert.Equal("연합뉴스", logistics.NodeTitle);
         Assert.Equal("news-publisher", logistics.NodeGroup);
         Assert.Equal("KR", logistics.Scope);
         Assert.Equal(expectedReturnPath, logistics.From);
@@ -44,7 +44,7 @@ public sealed class CommunityMapApplicationRoutesTests
         Assert.StartsWith(ShipperRequestPageRoutes.Root, options[1].Href, StringComparison.Ordinal);
         Assert.Equal(CommunityMapApplicationRoutes.SourceCode, transport.Source);
         Assert.Equal("news-publisher:kr-yonhap", transport.SourceMarkerId);
-        Assert.Equal("?고빀?댁뒪", transport.NodeTitle);
+        Assert.Equal("연합뉴스", transport.NodeTitle);
         Assert.Equal("news-publisher", transport.NodeKind);
         Assert.Equal("KR", transport.CountryCode);
         Assert.Equal(expectedReturnPath, transport.ReturnPath);
@@ -57,7 +57,24 @@ public sealed class CommunityMapApplicationRoutesTests
     }
 
     [Fact]
-    public void ?쒖텧?깃났蹂듦?寃쎈줈??媛숈?援???덉씠?대쭏而ㅼ??먯옣Id瑜쇰낫議댄븳??)
+    public void 신청선택경로는_지도문맥과복귀경로를보존한다()
+    {
+        var path = CommunityMapApplicationRoutes.BuildChooserPath(
+            "news-publisher:kr-yonhap",
+            "연합뉴스",
+            "news-publisher",
+            "kr",
+            returnTo: "/community/home?country=KR");
+
+        Assert.StartsWith("/community/map-application-chooser?", path, StringComparison.Ordinal);
+        Assert.Contains("source=community-map", path, StringComparison.Ordinal);
+        Assert.Contains("sourceMarkerId=news-publisher%3Akr-yonhap", path, StringComparison.Ordinal);
+        Assert.Contains("markerTitle=%EC%97%B0%ED%95%A9%EB%89%B4%EC%8A%A4", path, StringComparison.Ordinal);
+        Assert.Contains("returnTo=%2Fcommunity%2Fhome%3Fcountry%3DKR", path, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void 지도복귀경로는_선택한원장Id를보존한다()
     {
         var path = CommunityMapApplicationRoutes.ReturnToMarker(
             "news-publisher:kr-yonhap",
@@ -73,38 +90,11 @@ public sealed class CommunityMapApplicationRoutesTests
             path);
     }
 
-    [Fact]
-    public void BuildChooserPath_IncludesCommunityMapApplicationContext()
-    {
-        var path = CommunityMapApplicationRoutes.BuildChooserPath(
-            "news-publisher:kr-yonhap",
-            "연합뉴스",
-            "news-publisher",
-            "kr",
-            action: CommunityMapApplicationActionCodes.TransportProxy,
-            returnTo: "/community/home?country=KR");
-
-        Assert.StartsWith("/community/map-application-chooser?", path, StringComparison.Ordinal);
-        Assert.Contains("source=community-map", path, StringComparison.Ordinal);
-        Assert.Contains("sourceMarkerId=news-publisher%3Akr-yonhap", path, StringComparison.Ordinal);
-        Assert.Contains("markerTitle=%EC%97%B0%ED%95%A9%EB%89%B4%EC%8A%A4", path, StringComparison.Ordinal);
-        Assert.Contains("markerLayer=news-publisher", path, StringComparison.Ordinal);
-        Assert.Contains("country=KR", path, StringComparison.Ordinal);
-        Assert.Contains("action=transport-proxy", path, StringComparison.Ordinal);
-        Assert.Contains("returnTo=%2Fcommunity%2Fhome%3Fcountry%3DKR", path, StringComparison.Ordinal);
-    }
-
-    [Theory]
-    [InlineData("https://localhost/community/map-application-chooser?source=community-map", true)]
-    public void UsesStandaloneApplicationLayout_IncludesChooserRoute(string uri, bool expected)
-        => Assert.Equal(expected, CommunityMapApplicationRoutes.UsesStandaloneApplicationLayout(uri));
-
-
     [Theory]
     [InlineData("", "name", "layer", "KR")]
     [InlineData("marker", "bad\nname", "layer", "KR")]
     [InlineData("marker", "name", "layer", "")]
-    public void 鍮꾩뼱?덇굅?섏젣?대Ц?먭??덈뒗_吏?꾨Ц留μ?嫄곕??쒕떎(
+    public void 비어있거나제어문자가있는_지도문맥은거부한다(
         string markerId,
         string markerName,
         string layerCode,
@@ -124,15 +114,16 @@ public sealed class CommunityMapApplicationRoutesTests
     [InlineData("https://localhost/shipper/request/request-123?created=true&source=community-map", true)]
     [InlineData("https://localhost/shipper/inbound/requests/42?source=community-map", true)]
     [InlineData("https://localhost/orderer/mart/order?source=community-map", true)]
+    [InlineData("https://localhost/community/map-application-chooser?source=community-map", true)]
     [InlineData("https://localhost/shipper/request", false)]
     [InlineData("https://localhost/shipper/request?source=community-post", false)]
     [InlineData("https://localhost/login?source=community-map", false)]
     [InlineData("https://localhost/community/home?source=community-map", false)]
-    public void 吏?꾩텧諛쒖떊泥?꼍濡쒕쭔_硫붾돱?녿뒗?⑤룆Layout?꾩궗?⑺븳??string uri, bool expected)
+    public void 지도출발신청경로만_메뉴없는단독Layout을사용한다(string uri, bool expected)
         => Assert.Equal(expected, CommunityMapApplicationRoutes.UsesStandaloneApplicationLayout(uri));
 
     [Fact]
-    public void ?섎せ?쏲ueryEncoding?_?⑤룆Layout?쇰줈?ㅼ씤?섏??딅뒗??)
+    public void 잘못된QueryEncoding은_단독Layout으로오인하지않는다()
         => Assert.False(CommunityMapApplicationRoutes.UsesStandaloneApplicationLayout(
             "https://localhost/shipper/request?source=%ZZcommunity-map"));
 }

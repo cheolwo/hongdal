@@ -10,6 +10,7 @@
 @inject 커뮤니티세계지도Client WorldMapClient
 @inject GoogleMapsBrowserRuntimeClient GoogleMapsRuntimeClient
 @inject 지역문화이미지Client RegionalImageClient
+@inject CommunityMapApplicationLedgerClient MapApplicationLedgerClient
 
 <PageTitle>생활·업무 통합 지도 · 살뜰</PageTitle>
 
@@ -345,35 +346,6 @@
             </div>
         </div>
 
-        @if (_mapApplicationMarker is { } applicationMarker)
-        {
-            <section class="world-community-home__application-menu"
-                     style="@MapApplicationMenuStyle"
-                     role="dialog"
-                     aria-modal="false"
-                     aria-label="지도 마커 신청 업무 선택">
-                <header>
-                    <div>
-                        <span>마커에서 신청하기</span>
-                        <strong>@applicationMarker.Name</strong>
-                    </div>
-                    <button type="button"
-                            aria-label="신청 메뉴 닫기"
-                            @onclick="CloseMapApplications">×</button>
-                </header>
-                <p>공개 마커는 신청의 출발 문맥만 제공합니다. 실제 상품·창고·상하차지와 상대방은 다음 화면에서 직접 확인하세요.</p>
-                <nav aria-label="신청 업무">
-                    @foreach (var option in MapApplicationOptions)
-                    {
-                        <a href="@option.Href">
-                            <strong>@option.Label</strong>
-                            <small>@option.Description</small>
-                        </a>
-                    }
-                </nav>
-            </section>
-        }
-
         <p class="world-community-home__map-note">
             지도는 자료를 찾기 위한 개략도이며 국경·영유권 판단의 기준이 아닙니다.
             @(IsNightLearning
@@ -494,6 +466,52 @@
                 <button type="button" aria-label="선택한 지역 상세 닫기" @onclick="ShowAllCountries">상세 닫기</button>
             }
         </header>
+
+        @if (AuthSession.IsLoggedIn && SelectedMapMarker is { } selectedLedgerMarker)
+        {
+            <p class="world-community-home__selected-marker-ledger">
+                <span>@selectedLedgerMarker.Name</span>
+                <small>@selectedLedgerMarker.DataLabel</small>
+            </p>
+
+            <section class="world-community-home__my-ledgers" aria-label="지도 마커의 내 신청 원장">
+                <header>
+                    <div>
+                        <span>내 원장</span>
+                        <strong>@selectedLedgerMarker.Name</strong>
+                    </div>
+                    <button type="button" @onclick="RefreshSelectedMapLedgersAsync">최신 상태 확인</button>
+                </header>
+
+                @if (_myMapLedgersLoading)
+                {
+                    <p class="world-community-home__my-ledger-status" role="status">내 신청 원장을 확인하고 있습니다.</p>
+                }
+                else if (!string.IsNullOrWhiteSpace(_myMapLedgersError))
+                {
+                    <p class="world-community-home__my-ledger-status is-error" role="alert">@_myMapLedgersError</p>
+                }
+                else if (_myMapLedgers.Count == 0)
+                {
+                    <p class="world-community-home__my-ledger-status" role="status">이 마커에서 시작한 내 신청 원장이 없습니다.</p>
+                }
+                else
+                {
+                    <div>
+                        @foreach (var ledger in _myMapLedgers)
+                        {
+                            var badge = CommunityMapApplicationLedgerPresentation.For(ledger);
+                            <article class="@(string.Equals(ledger.원장Id, _selectedLedgerId, StringComparison.Ordinal) ? "is-selected" : null)">
+                                <span class="world-community-home__my-ledger-badge">@badge.KindLabel</span>
+                                <strong>@badge.WorkLabel</strong>
+                                <small>@badge.StateLabel · @badge.StepLabel</small>
+                                <button type="button" @onclick="() => SelectMapLedger(ledger.원장Id)">@badge.ActionLabel</button>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+        }
 
         @if (HasRegionalVisualSelection)
         {
@@ -1160,14 +1178,19 @@
     [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.SourceVersionQueryKey)]
     public string? RequestedSourceVersion { get; set; }
 
+    [SupplyParameterFromQuery(Name = CommunityWorldMapDeepLink.LedgerQueryKey)]
+    public string? LedgerId { get; set; }
+
     private string? _selectedCountryCode;
     private string? _selectedMarkerId;
     private string? _selectedObservationId;
     private string? _requestedSnapshotRevision;
     private string? _requestedSourceVersion;
-    private GoogleMapMarker? _mapApplicationMarker;
-    private double _mapApplicationClientX;
-    private double _mapApplicationClientY;
+    private string? _selectedLedgerId;
+    private IReadOnlyList<지도신청가원장Response> _myMapLedgers = [];
+    private bool _myMapLedgersLoading;
+    private bool _pendingMyMapLedgersRefresh;
+    private string? _myMapLedgersError;
     private MapDatasetMode _datasetMode = MapDatasetMode.DayWork;
     private GoogleMapState _googleMapState = GoogleMapState.Loading;
     private IJSObjectReference? _googleMapModule;
@@ -1481,6 +1504,7 @@
         var previousCountry = _selectedCountryCode;
         var previousMarker = _selectedMarkerId;
         var previousObservation = _selectedObservationId;
+        var previousLedgerId = _selectedLedgerId;
         var previousLayers = _selectedLayerCodes.ToHashSet(StringComparer.Ordinal);
 
         _selectedCountryCode = CommunityWorldMapDeepLink.NormalizeCountryCode(
@@ -1492,6 +1516,7 @@
             RequestedSnapshotRevision);
         _requestedSourceVersion = CommunityWorldMapDeepLink.NormalizeStableId(
             RequestedSourceVersion);
+        _selectedLedgerId = CommunityWorldMapDeepLink.NormalizeStableId(LedgerId);
         if (_selectedMarkerId is null && _selectedObservationId is not null)
         {
             _selectedMarkerId = _selectedObservationId;
@@ -1528,6 +1553,12 @@
         {
             ResetQuestionComposer();
             ResetNewsCandidates();
+            _myMapLedgers = [];
+            _pendingMyMapLedgersRefresh = true;
+        }
+        else if (!string.Equals(previousLedgerId, _selectedLedgerId, StringComparison.Ordinal))
+        {
+            _pendingMyMapLedgersRefresh = true;
         }
 
         if (selectionChanged || !previousLayers.SetEquals(_selectedLayerCodes))
@@ -1564,7 +1595,8 @@
             [CommunityWorldMapDeepLink.ObservationQueryKey] = _selectedObservationId,
             [CommunityWorldMapDeepLink.SnapshotRevisionQueryKey] =
                 SelectedObservation is null ? null : _appliedSnapshot?.Revision,
-            [CommunityWorldMapDeepLink.SourceVersionQueryKey] = SelectedObservation?.SourceVersion
+            [CommunityWorldMapDeepLink.SourceVersionQueryKey] = SelectedObservation?.SourceVersion,
+            [CommunityWorldMapDeepLink.LedgerQueryKey] = _selectedLedgerId
         });
         if (!string.Equals(uri, Navigation.Uri, StringComparison.Ordinal))
         {
@@ -2021,6 +2053,9 @@
         _appliedSnapshot = null;
         _selectedMarkerId = null;
         _selectedObservationId = null;
+        _selectedLedgerId = null;
+        _myMapLedgers = [];
+        _pendingMyMapLedgersRefresh = true;
         ResetQuestionComposer();
         _selectedLayerCodes.Clear();
         _layersCustomized = false;
@@ -2032,6 +2067,10 @@
         while (!cancellationToken.IsCancellationRequested)
         {
             await RefreshMapSnapshotAsync(applyImmediately: false, cancellationToken);
+            if (_pendingMyMapLedgersRefresh)
+            {
+                await RefreshMyMapLedgersAsync(cancellationToken);
+            }
             try
             {
                 await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
@@ -2040,6 +2079,62 @@
             {
                 break;
             }
+        }
+    }
+
+    private async Task RefreshSelectedMapLedgersAsync()
+    {
+        _pendingMyMapLedgersRefresh = true;
+        await RefreshMyMapLedgersAsync(CancellationToken.None);
+    }
+
+    private async Task RefreshMyMapLedgersAsync(CancellationToken cancellationToken)
+    {
+        var markerId = SelectedMarkerId;
+        if (string.IsNullOrWhiteSpace(markerId))
+        {
+            _myMapLedgers = [];
+            _myMapLedgersLoading = false;
+            _myMapLedgersError = null;
+            _pendingMyMapLedgersRefresh = false;
+            return;
+        }
+
+        _myMapLedgersLoading = true;
+        _myMapLedgersError = null;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            var ledgers = await MapApplicationLedgerClient.FindByMapMarkerAsync(
+                markerId,
+                _selectedLedgerId,
+                cancellationToken);
+            if (!string.Equals(markerId, SelectedMarkerId, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _myMapLedgers = ledgers;
+            if (!string.IsNullOrWhiteSpace(_selectedLedgerId)
+                && ledgers.All(ledger => !string.Equals(ledger.원장Id, _selectedLedgerId, StringComparison.Ordinal)))
+            {
+                _selectedLedgerId = null;
+                SyncDeepLinkToUrl(replace: true);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            _myMapLedgers = [];
+            _myMapLedgersError = exception.Message;
+        }
+        finally
+        {
+            _myMapLedgersLoading = false;
+            _pendingMyMapLedgersRefresh = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -2200,6 +2295,7 @@
         _selectedCountryCode = countryCode;
         _selectedMarkerId = null;
         _selectedObservationId = null;
+        ClearSelectedMapLedgers();
         ResetQuestionComposer();
         SyncDeepLinkToUrl();
         _pendingFocusElementId = "world-map-results";
@@ -2209,10 +2305,15 @@
 
     private async Task SelectMapFeature(string countryCode, string observationId)
     {
-        _mapApplicationMarker = null;
         _isPriceMarketCatalogOpen = false;
+        if (!string.Equals(_selectedMarkerId, observationId, StringComparison.Ordinal))
+        {
+            _selectedLedgerId = null;
+            _myMapLedgers = [];
+        }
         _selectedCountryCode = countryCode;
         _selectedMarkerId = observationId;
+        _pendingMyMapLedgersRefresh = true;
         _selectedObservationId = _appliedSnapshot?.Observations.Any(observation =>
             string.Equals(observation.StableId, observationId, StringComparison.Ordinal)) == true
             ? observationId
@@ -2407,6 +2508,7 @@
         _selectedCountryCode = null;
         _selectedMarkerId = null;
         _selectedObservationId = null;
+        ClearSelectedMapLedgers();
         ResetQuestionComposer();
         SyncDeepLinkToUrl();
         _pendingFocusElementId = "world-map-focus-target";
@@ -2419,6 +2521,7 @@
         _selectedCountryCode = null;
         _selectedMarkerId = null;
         _selectedObservationId = null;
+        ClearSelectedMapLedgers();
         ResetQuestionComposer();
         _isPriceMarketCatalogOpen = true;
         SyncDeepLinkToUrl();
@@ -2465,38 +2568,53 @@
         }
 
         await SelectMapFeature(countryCode, observationId);
-        OpenMapApplications(marker, clientX, clientY);
+        OpenMapApplicationChooser(marker);
     }
 
     private async Task OpenMapApplicationsAsync(MouseEventArgs args, GoogleMapMarker marker)
     {
         await SelectMapFeature(marker.Code, marker.Id);
-        OpenMapApplications(marker, args.ClientX, args.ClientY);
+        OpenMapApplicationChooser(marker);
     }
 
-    private void OpenMapApplications(GoogleMapMarker marker, double clientX, double clientY)
+    [JSInvokable]
+    public Task OpenSelectedMapApplicationsFromKeyboard(double clientX, double clientY)
     {
-        _mapApplicationMarker = marker;
-        _mapApplicationClientX = Math.Max(16d, clientX);
-        _mapApplicationClientY = Math.Max(16d, clientY);
-        StateHasChanged();
+        var marker = CurrentMapMarkers.FirstOrDefault(item =>
+            string.Equals(item.Id, SelectedMarkerId, StringComparison.Ordinal));
+        if (marker is not null)
+        {
+            OpenMapApplicationChooser(marker);
+        }
+
+        return Task.CompletedTask;
     }
 
-    private void CloseMapApplications()
-        => _mapApplicationMarker = null;
-
-    private string MapApplicationMenuStyle
-        => FormattableString.Invariant(
-            $"--map-application-x: {_mapApplicationClientX:F0}px; --map-application-y: {_mapApplicationClientY:F0}px;");
-
-    private IReadOnlyList<CommunityMapApplicationOption> MapApplicationOptions
-        => _mapApplicationMarker is not { } marker
-            ? []
-            : CommunityMapApplicationRoutes.ForMarker(
+    private void OpenMapApplicationChooser(GoogleMapMarker marker)
+        => Navigation.NavigateTo(CommunityMapApplicationRoutes.BuildChooserPath(
+            marker.Id,
+            marker.Name,
+            marker.LayerCode,
+            marker.Code,
+            returnTo: CommunityMapApplicationRoutes.ReturnToMarker(
                 marker.Id,
-                marker.Name,
                 marker.LayerCode,
-                marker.Code);
+                marker.Code,
+                _selectedLedgerId)));
+
+    private void SelectMapLedger(string ledgerId)
+    {
+        _selectedLedgerId = ledgerId;
+        SyncDeepLinkToUrl();
+    }
+
+    private void ClearSelectedMapLedgers()
+    {
+        _selectedLedgerId = null;
+        _myMapLedgers = [];
+        _myMapLedgersError = null;
+        _pendingMyMapLedgersRefresh = true;
+    }
 
     private async Task UpdateGoogleMapSelectionAsync()
     {

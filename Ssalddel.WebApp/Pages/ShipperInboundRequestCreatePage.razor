@@ -11,6 +11,7 @@
 @if (RequiresMapPrivacyConsent && !_privacyConsentAccepted)
 {
     <ApplicationPrivacyConsentPanel ApplicationKind="@신청개인정보업무Codes.물류대행"
+                                    ReturnHref="@Context.From"
                                     Accepted="AcceptPrivacyAsync" />
 }
 else

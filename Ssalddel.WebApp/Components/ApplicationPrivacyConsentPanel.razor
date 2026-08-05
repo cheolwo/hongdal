@@ -59,7 +59,7 @@
                 : Ui("동의하고 신청서 열기", "Agree and open request form"))
         </button>
         <a href="@LoginHref">@Ui("로그인 후 동의 기록하기", "Sign in to record consent")</a>
-        <a href="/community/home">@Ui("동의하지 않고 지도로 돌아가기", "Decline and return to map")</a>
+        <a href="@SafeReturnHref">@Ui("동의하지 않고 지도로 돌아가기", "Decline and return to map")</a>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(_errorMessage))
@@ -75,6 +75,9 @@
 
     [Parameter]
     public EventCallback<신청개인정보동의증적Response> Accepted { get; set; }
+
+    [Parameter]
+    public string? ReturnHref { get; set; }
 
     private bool _collectionUseAccepted;
     private bool _ageRequirementConfirmed;
@@ -98,6 +101,13 @@
 
     private string LoginHref
         => $"/login?returnUrl={Uri.EscapeDataString(new Uri(Navigation.Uri).PathAndQuery)}";
+
+    private string SafeReturnHref
+        => !string.IsNullOrWhiteSpace(ReturnHref)
+           && ReturnHref.StartsWith("/", StringComparison.Ordinal)
+           && !ReturnHref.StartsWith("//", StringComparison.Ordinal)
+            ? ReturnHref
+            : CommunityMapApplicationRoutes.ReturnPath;
 
     private string LegalNoticeText
         => IsEnglish ? EnglishLegalNoticeText : KoreanLegalNoticeText;
