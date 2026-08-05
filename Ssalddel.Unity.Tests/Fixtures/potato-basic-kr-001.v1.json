@@ -1,0 +1,203 @@
+{
+  "package": {
+    "manifest": {
+      "scenarioKey": "scenario:potato-basic-kr-001",
+      "scenarioVersion": "1.0.0",
+      "schemaVersion": "1.0.0",
+      "ruleSetKey": "ruleset:farming-basic",
+      "ruleSetVersion": "1.0.0",
+      "defaultRandomSeed": 20260805,
+      "expectedDataHash": "dd705a21fc401e5fcfccdb2ade622ad4b15841fe093a41514c7615a1d136911a",
+      "mode": "SIMULATED"
+    },
+    "crop": {
+      "cropKey": "crop:kr:potato",
+      "varietyKey": "crop-variety:kr:potato:sumi",
+      "baseDailyGrowthPoint": 15,
+      "harvestGrowthPoint": 80,
+      "baseYieldKg": 100,
+      "optimalTemperatureMinC": 16,
+      "optimalTemperatureMaxC": 24,
+      "minimumMoistureRatio": 0.35,
+      "maximumMoistureRatio": 0.8
+    },
+    "growthStages": [
+      { "stageKey": "growth-stage:seed", "minimumGrowthPoint": 0 },
+      { "stageKey": "growth-stage:sprout", "minimumGrowthPoint": 20 },
+      { "stageKey": "growth-stage:growing", "minimumGrowthPoint": 50 },
+      { "stageKey": "growth-stage:harvestable", "minimumGrowthPoint": 80 }
+    ],
+    "soil": {
+      "soilKey": "soil:loam",
+      "initialMoistureRatio": 0.6,
+      "rainRetentionRatioPerMillimeter": 0.02,
+      "dailyMoistureLossRatio": 0.12
+    },
+    "weather": [
+      {
+        "gameDay": 1,
+        "meanTemperatureC": 18,
+        "rainfallMm": 0,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-1", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-1", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-01T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 18, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 18, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-1"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-1", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-1", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-01T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 0, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 0, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-1"
+        }
+      },
+      {
+        "gameDay": 2,
+        "meanTemperatureC": 20,
+        "rainfallMm": 5,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-2", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-2", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-02T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 20, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 20, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-2"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-2", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-2", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-02T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 5, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 5, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-2"
+        }
+      },
+      {
+        "gameDay": 3,
+        "meanTemperatureC": 22,
+        "rainfallMm": 0,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-3", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-3", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-03T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 22, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 22, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-3"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-3", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-3", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-03T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 0, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 0, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-3"
+        }
+      },
+      {
+        "gameDay": 4,
+        "meanTemperatureC": 21,
+        "rainfallMm": 0,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-4", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-4", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-04T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 21, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 21, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-4"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-4", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-4", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-04T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 0, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 0, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-4"
+        }
+      },
+      {
+        "gameDay": 5,
+        "meanTemperatureC": 23,
+        "rainfallMm": 10,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-5", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-5", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-05T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 23, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 23, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-5"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-5", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-5", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-05T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 10, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 10, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-5"
+        }
+      },
+      {
+        "gameDay": 6,
+        "meanTemperatureC": 25,
+        "rainfallMm": 0,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-6", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-6", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-06T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 25, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 25, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-6"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-6", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-6", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-06T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 0, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 0, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-6"
+        }
+      },
+      {
+        "gameDay": 7,
+        "meanTemperatureC": 22,
+        "rainfallMm": 0,
+        "temperatureEvidence": {
+          "evidenceId": "evidence:weather:temperature:day-7", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "temperature-day-7", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-07T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 22, "originalUnit": "degC", "currencyCode": "", "normalizedValue": 22, "normalizedUnit": "degC", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-temperature-day-7"
+        },
+        "rainfallEvidence": {
+          "evidenceId": "evidence:weather:rainfall:day-7", "sourceType": "Fixture", "sourceKey": "source:weather:fixture", "sourceRecordId": "rainfall-day-7", "datasetKey": "dataset:weather:fixture", "datasetVersion": "1.0.0", "observedAt": "2026-07-07T06:00:00+09:00", "ingestedAt": "2026-08-05T00:00:00+09:00", "regionKey": "region:kr:41", "marketStageKey": "", "originalValue": 0, "originalUnit": "mm", "currencyCode": "", "normalizedValue": 0, "normalizedUnit": "mm", "qualityCode": "Fixture", "freshnessCode": "Fixture", "licenseOrTermsReference": "internal-educational-fixture", "limitations": ["not-an-actual-weather-observation"], "payloadHash": "fixture-rainfall-day-7"
+        }
+      }
+    ],
+    "costs": [
+      { "costKey": "cost:seed", "triggerCode": "Planting", "amountKrw": 5000 },
+      { "costKey": "cost:daily-care", "triggerCode": "DailyCare", "amountKrw": 700 },
+      { "costKey": "cost:watering", "triggerCode": "Watering", "amountKrw": 800 },
+      { "costKey": "cost:harvest", "triggerCode": "Harvest", "amountKrw": 4000 }
+    ],
+    "marketObservation": {
+      "observationKey": "observation:kamis:potato:fixture-001",
+      "cropKey": "crop:kr:potato",
+      "priceKrwPerKg": 2600,
+      "evidence": {
+        "evidenceId": "evidence:market:kamis:fixture-001",
+        "sourceType": "Fixture",
+        "sourceKey": "source:kamis:fixture",
+        "sourceRecordId": "fixture-potato-price-001",
+        "datasetKey": "dataset:kamis-price:fixture",
+        "datasetVersion": "1.0.0",
+        "observedAt": "2026-07-07T00:00:00+09:00",
+        "ingestedAt": "2026-08-05T00:00:00+09:00",
+        "regionKey": "region:kr:national",
+        "marketStageKey": "market-stage:wholesale",
+        "originalValue": 2600,
+        "originalUnit": "KRW/kg",
+        "currencyCode": "KRW",
+        "normalizedValue": 2600,
+        "normalizedUnit": "KRW/kg",
+        "qualityCode": "Fixture",
+        "freshnessCode": "Fixture",
+        "licenseOrTermsReference": "kamis-open-api-terms-review-required",
+        "limitations": [
+          "educational-fixture-not-an-actual-kamis-observation",
+          "observed-price-is-not-a-sale-quote"
+        ],
+        "payloadHash": "fixture-kamis-potato-price-001"
+      }
+    },
+    "salesChannels": [
+      {
+        "salesChannelKey": "GeneralSale",
+        "priceFactor": 0.88,
+        "saleableQuantityFactor": 0.95,
+        "additionalCostKrw": 12000,
+        "laborDisclosureCodes": ["individual-sorting", "individual-shipping"],
+        "riskDisclosureCodes": ["price-fluctuation", "unsold-quantity"]
+      },
+      {
+        "salesChannelKey": "CollectiveSale",
+        "priceFactor": 1.02,
+        "saleableQuantityFactor": 0.97,
+        "additionalCostKrw": 25000,
+        "laborDisclosureCodes": ["shared-sorting", "shared-packing", "coordination"],
+        "riskDisclosureCodes": ["target-not-reached", "role-vacancy", "schedule-coordination"]
+      }
+    ],
+    "externalMappings": [
+      {
+        "mappingKey": "mapping:kamis:potato:fixture-001",
+        "mappingVersion": "1.0.0",
+        "externalSourceKey": "source:kamis:fixture",
+        "externalCode": "fixture-potato",
+        "gameDataKey": "crop:kr:potato",
+        "qualityCode": "Valid",
+        "evidenceReference": "evidence:market:kamis:fixture-001"
+      }
+    ]
+  },
+  "commands": [
+    { "commandId": "command:plant:001", "commandCode": "PlantCrop", "gameDay": 0, "amount": 0 },
+    { "commandId": "command:advance:001", "commandCode": "AdvanceDay", "gameDay": 0, "amount": 0 },
+    { "commandId": "command:advance:002", "commandCode": "AdvanceDay", "gameDay": 1, "amount": 0 },
+    { "commandId": "command:advance:003", "commandCode": "AdvanceDay", "gameDay": 2, "amount": 0 },
+    { "commandId": "command:water:001", "commandCode": "WaterTile", "gameDay": 3, "amount": 0.3 },
+    { "commandId": "command:advance:004", "commandCode": "AdvanceDay", "gameDay": 3, "amount": 0 },
+    { "commandId": "command:advance:005", "commandCode": "AdvanceDay", "gameDay": 4, "amount": 0 },
+    { "commandId": "command:advance:006", "commandCode": "AdvanceDay", "gameDay": 5, "amount": 0 },
+    { "commandId": "command:water:002", "commandCode": "WaterTile", "gameDay": 6, "amount": 0.25 },
+    { "commandId": "command:advance:007", "commandCode": "AdvanceDay", "gameDay": 6, "amount": 0 },
+    { "commandId": "command:harvest:001", "commandCode": "HarvestCrop", "gameDay": 7, "amount": 0 },
+    { "commandId": "command:compare-sales:001", "commandCode": "CompareSales", "gameDay": 7, "amount": 0 }
+  ],
+  "expected": {
+    "finalStateHash": "4669e73dac070632bc5eadfd3136363c2e49119908207320997c13d342f71dd6",
+    "eventCount": 33,
+    "productionCostKrw": 15500,
+    "harvestQuantityKg": 100,
+    "generalExpectedProfitKrw": 189860,
+    "collectiveExpectedProfitKrw": 216744
+  }
+}
