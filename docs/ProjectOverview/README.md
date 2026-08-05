@@ -84,6 +84,8 @@
 | T-16 | [ExportLedgerModel.md](../Architecture/ExportLedgerModel.md) | 개별수출과 공동 선적에서 수출자별 원장·서류·실적을 보존하는 기준 |
 | T-17 | [GoogleApiAdoptionProposal.md](../Architecture/GoogleApiAdoptionProposal.md) | 현재 Google 지도·YouTube·FCM·Gemini·Storage 연동을 페이지·업무 프로세스에 연결하고 API별 도입·보류·보안·비용 단계를 정리한 제안 |
 | T-18 | [ContractRelationshipMapVisualizationProposal.md](../Architecture/ContractRelationshipMapVisualizationProposal.md) | 현재 계약·양측 합의·발주·운송·고용 데이터를 공개·당사자·운영자 경계로 나누고 한 개 지도에 점·선·면·상태 배지로 조화롭게 투영하는 제안 |
+| T-19 | [UnityCooperativeExperiencePlatformProposal.md](../Architecture/UnityCooperativeExperiencePlatformProposal.md) | 생산·유통·협력 도메인, 권위 서버, REST·SignalR, 협동조합 격리와 재사용 Prefab·design system을 묶은 Unity 상위 제안 |
+| T-20 | [UnityAgricultureDistributionSimulationProposal.md](../Architecture/UnityAgricultureDistributionSimulationProposal.md) | Unity 데이터 계약, provenance, 결정적 계산과 감자 golden 시나리오의 세부 설계·현재 구현 상태 |
 
 ## 관리 원칙
 
