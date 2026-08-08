@@ -1,0 +1,21 @@
+{
+  "name": "Ssalddel.Unity.TraditionalMarketHub.Sample.Editor",
+  "rootNamespace": "Ssalddel.Unity.Samples.TraditionalMarketHub.Editor",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.TraditionalMarketHub.Sample",
+    "VContainer",
+    "VContainer.Unity"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

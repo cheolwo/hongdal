@@ -11,5 +11,42 @@
   ],
   "author": {
     "name": "Ssalddel"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Urban Market Primitive Vertical Slice",
+      "description": "A simulated three-shelf urban market with SceneController, View sockets, product selection, provenance, and an Editor scene builder.",
+      "path": "Samples~/UrbanMarket"
+    },
+    {
+      "displayName": "Traditional Market Hub Primitive Vertical Slice",
+      "description": "A public-projection-shaped traditional market and logistics hub sample with provenance, location precision, capabilities, and an Editor scene builder.",
+      "path": "Samples~/TraditionalMarketHub"
+    },
+    {
+      "displayName": "Zone NPC Movement Sockets",
+      "description": "Semantic waypoint, NavMeshAgent, Animator, and stable-ID NPC movement sockets that never complete canonical server work on arrival.",
+      "path": "Samples~/NpcMovement"
+    },
+    {
+      "displayName": "Urban Logistics Center Primitive Vertical Slice",
+      "description": "A transporter perspective, semantic waypoint, and NavMesh NPC wired into one primitive logistics-center Zone.",
+      "path": "Samples~/UrbanLogisticsCenter"
+    },
+    {
+      "displayName": "Public Data Hall Primitive Vertical Slice",
+      "description": "Public world-map observations rendered as stable-ID markers with provenance, freshness, incremental refresh, and last-success retention.",
+      "path": "Samples~/PublicDataHall"
+    },
+    {
+      "displayName": "Community Market Square Primitive Vertical Slice",
+      "description": "Public boards, post summaries, privacy-safe activity signals, and permission-filtered ledger summaries rendered with stable-ID reconciliation.",
+      "path": "Samples~/CommunityMarketSquare"
+    },
+    {
+      "displayName": "Authorized Warehouse World Primitive Vertical Slice",
+      "description": "Manager-authorized inventory, put-away and picking tasks rendered as pallets, task markers, DockWorker and Picker NPC sockets.",
+      "path": "Samples~/WarehouseWorld"
+    }
+  ]
 }

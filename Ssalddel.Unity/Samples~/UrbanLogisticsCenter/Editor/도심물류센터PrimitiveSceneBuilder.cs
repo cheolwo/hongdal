@@ -1,0 +1,313 @@
+using System.IO;
+using Ssalddel.Unity.Samples.NpcMovement;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.SceneManagement;
+
+namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
+{
+    public static class 도심물류센터PrimitiveSceneBuilder
+    {
+        private const string SceneDirectory = "Assets/Ssalddel/Scenes";
+        private const string ScenePath = SceneDirectory + "/UrbanLogisticsCenterPrimitive.unity";
+
+        [MenuItem("Ssalddel/Samples/Create Urban Logistics Center Primitive Scene")]
+        public static void CreateScene()
+        {
+            if (!CanReplaceCurrentScene())
+            {
+                return;
+            }
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var root = new GameObject("UrbanLogisticsCenterZone");
+            CreateGround(root.transform);
+            CreateDock("InboundDock", root.transform, new Vector3(-6f, 0.5f, 3f), new Color(0.25f, 0.46f, 0.62f));
+            CreateDock("SortingZone", root.transform, new Vector3(0f, 0.5f, 3f), new Color(0.52f, 0.48f, 0.26f));
+            CreateDock("OutboundDock", root.transform, new Vector3(6f, 0.5f, 3f), new Color(0.32f, 0.58f, 0.34f));
+
+            var roleTargets = new[]
+            {
+                CreateRoleTarget("Transport_71", "transport:71", root.transform, new Vector3(0f, 0.8f, -2f), new Vector3(3.4f, 1.4f, 1.8f)),
+                CreateRoleTarget("PickupStop_71", "transport-stop:71.pickup", root.transform, new Vector3(0f, 0.25f, 0f), new Vector3(2.6f, 0.5f, 2.6f)),
+                CreateRoleTarget("DropoffStop_71", "transport-stop:71.dropoff", root.transform, new Vector3(7f, 0.25f, -3f), new Vector3(2.6f, 0.5f, 2.6f)),
+            };
+
+            var waypointRegistry = CreateWaypoints(root.transform);
+            var npcView = CreateTransporterNpc(root.transform, waypointRegistry);
+            var npcController = root.AddComponent<ZoneNpcMovementController>();
+            npcController.Configure(new[] { npcView });
+            var interactionPanel = CreateInteractionPanel(root.transform);
+
+            var zoneView = root.AddComponent<도심물류센터View>();
+            zoneView.Configure(roleTargets, interactionPanel, npcController);
+            root.AddComponent<도심물류센터SceneController>();
+            var tokenProvider = root.AddComponent<RuntimeSessionAccessTokenProvider>();
+            var lifetimeScope = root.AddComponent<도심물류센터LifetimeScope>();
+            lifetimeScope.ConfigureSimulationApi(tokenProvider);
+
+            CreateCamera();
+            CreateLight();
+            Directory.CreateDirectory(SceneDirectory);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AssetDatabase.SaveAssets();
+            Selection.activeGameObject = root;
+            Debug.Log("Created urban logistics center primitive scene. Bake NavMesh before movement validation: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/Samples/Validate Urban Logistics Center Primitive Scene")]
+        public static void ValidateGeneratedScene()
+        {
+            if (!File.Exists(ScenePath))
+            {
+                throw new FileNotFoundException("Urban logistics center scene was not generated.", ScenePath);
+            }
+
+            if (!CanReplaceCurrentScene())
+            {
+                return;
+            }
+
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            var view = Object.FindFirstObjectByType<도심물류센터View>();
+            var controller = Object.FindFirstObjectByType<도심물류센터SceneController>();
+            var scope = Object.FindFirstObjectByType<도심물류센터LifetimeScope>();
+            var tokenProvider = Object.FindFirstObjectByType<RuntimeSessionAccessTokenProvider>();
+            var npc = Object.FindFirstObjectByType<NpcMovementView>();
+            if (view == null || controller == null || scope == null || tokenProvider == null
+                || npc == null || !view.ValidateWiring())
+            {
+                throw new MissingReferenceException("Urban logistics center wiring is invalid after scene reload.");
+            }
+
+            Debug.Log("Validated urban logistics center Role View, waypoint, and NPC wiring. NavMesh bake remains a project step.");
+        }
+
+        private static ZoneNpcWaypointRegistry CreateWaypoints(Transform parent)
+        {
+            var registryRoot = new GameObject("NpcWaypoints");
+            registryRoot.transform.SetParent(parent, false);
+            var values = new[]
+            {
+                CreateWaypoint("VehicleGate", "logistics.vehicle-gate", registryRoot.transform, new Vector3(-7f, 0.1f, -5f)),
+                CreateWaypoint("LoadingBay", "logistics.loading-bay", registryRoot.transform, new Vector3(0f, 0.1f, -1f)),
+                CreateWaypoint("VehicleExit", "logistics.vehicle-exit", registryRoot.transform, new Vector3(7f, 0.1f, -5f)),
+            };
+            var registry = registryRoot.AddComponent<ZoneNpcWaypointRegistry>();
+            registry.Configure(values);
+            return registry;
+        }
+
+        private static NpcWaypointView CreateWaypoint(
+            string name,
+            string key,
+            Transform parent,
+            Vector3 position)
+        {
+            var marker = Primitive(name, parent, position, new Vector3(0.4f, 0.2f, 0.4f), new Color(0.95f, 0.65f, 0.12f));
+            var view = marker.AddComponent<NpcWaypointView>();
+            view.Configure(key);
+            return view;
+        }
+
+        private static NpcMovementView CreateTransporterNpc(
+            Transform parent,
+            ZoneNpcWaypointRegistry registry)
+        {
+            var root = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            root.name = "TransporterNpc_71";
+            root.transform.SetParent(parent, false);
+            root.transform.position = new Vector3(-7f, 1f, -5f);
+            root.GetComponent<Renderer>().sharedMaterial = CreateMaterial("TransporterNpcMaterial", new Color(0.15f, 0.45f, 0.8f));
+            var agent = root.AddComponent<NavMeshAgent>();
+            agent.speed = 3.5f;
+            agent.acceleration = 8f;
+            agent.angularSpeed = 360f;
+            agent.stoppingDistance = 0.2f;
+            var animator = root.AddComponent<Animator>();
+            var view = root.AddComponent<NpcMovementView>();
+            view.Configure(
+                "npc:transport-driver.71",
+                agent,
+                animator,
+                registry,
+                new NpcActionAnimationBinding[0]);
+            return view;
+        }
+
+        private static LogisticsRoleTargetView CreateRoleTarget(
+            string name,
+            string stableId,
+            Transform parent,
+            Vector3 position,
+            Vector3 scale)
+        {
+            var root = Primitive(name, parent, position, scale, new Color(0.38f, 0.4f, 0.42f));
+            var badge = Primitive(
+                "RoleBadge",
+                root.transform,
+                new Vector3(0f, 1.1f, 0f),
+                new Vector3(1.8f, 0.35f, 0.18f),
+                Color.gray,
+                true);
+            var text = CreateText(
+                "RoleLabel",
+                badge.transform,
+                string.Empty,
+                new Vector3(0f, 0f, -0.7f),
+                0.025f,
+                Color.white,
+                true);
+            var view = root.AddComponent<LogisticsRoleTargetView>();
+            view.Configure(stableId, badge, text, badge.GetComponent<Renderer>());
+            badge.SetActive(false);
+            return view;
+        }
+
+        private static LogisticsInteractionPanelView CreateInteractionPanel(Transform parent)
+        {
+            var root = Primitive(
+                "InteractionPanel",
+                parent,
+                new Vector3(-7f, 2f, 4.8f),
+                new Vector3(4f, 3.2f, 0.3f),
+                new Color(0.12f, 0.16f, 0.2f));
+            var text = CreateText(
+                "InteractionText",
+                root.transform,
+                "TRANSPORTER ACTIONS",
+                new Vector3(0f, 0f, -0.7f),
+                0.025f,
+                Color.white,
+                true);
+            var view = root.AddComponent<LogisticsInteractionPanelView>();
+            view.Configure(text);
+            return view;
+        }
+
+        private static void CreateGround(Transform parent)
+        {
+            var ground = Primitive(
+                "Ground",
+                parent,
+                new Vector3(0f, -0.25f, 0f),
+                new Vector3(20f, 0.5f, 14f),
+                new Color(0.62f, 0.64f, 0.66f));
+            ground.isStatic = true;
+        }
+
+        private static void CreateDock(string name, Transform parent, Vector3 position, Color color)
+        {
+            Primitive(name, parent, position, new Vector3(4.5f, 1f, 3f), color);
+            CreateText(name + "Label", parent, name, position + new Vector3(0f, 1.1f, 0f), 0.035f, Color.white);
+        }
+
+        private static void CreateCamera()
+        {
+            var cameraObject = new GameObject("Main Camera");
+            cameraObject.tag = "MainCamera";
+            var camera = cameraObject.AddComponent<Camera>();
+            camera.orthographic = true;
+            camera.orthographicSize = 9f;
+            cameraObject.transform.position = new Vector3(0f, 15f, -17f);
+            cameraObject.transform.LookAt(Vector3.zero);
+        }
+
+        private static void CreateLight()
+        {
+            var lightObject = new GameObject("Directional Light");
+            var light = lightObject.AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.intensity = 1.1f;
+            lightObject.transform.rotation = Quaternion.Euler(45f, -35f, 0f);
+        }
+
+        private static GameObject Primitive(
+            string name,
+            Transform parent,
+            Vector3 position,
+            Vector3 scale,
+            Color color,
+            bool local = false)
+        {
+            var value = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            value.name = name;
+            value.transform.SetParent(parent, false);
+            if (local)
+            {
+                value.transform.localPosition = position;
+            }
+            else
+            {
+                value.transform.position = position;
+            }
+
+            value.transform.localScale = scale;
+            value.GetComponent<Renderer>().sharedMaterial = CreateMaterial(name + "Material", color);
+            return value;
+        }
+
+        private static TextMesh CreateText(
+            string name,
+            Transform parent,
+            string value,
+            Vector3 position,
+            float size,
+            Color color,
+            bool local = false)
+        {
+            var root = new GameObject(name);
+            root.transform.SetParent(parent, false);
+            if (local)
+            {
+                root.transform.localPosition = position;
+            }
+            else
+            {
+                root.transform.position = position;
+            }
+
+            var text = root.AddComponent<TextMesh>();
+            text.text = value;
+            text.anchor = TextAnchor.MiddleCenter;
+            text.alignment = TextAlignment.Center;
+            text.fontSize = 64;
+            text.characterSize = size;
+            text.color = color;
+            return text;
+        }
+
+        private static Material CreateMaterial(string name, Color color)
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            return new Material(shader)
+            {
+                name = name,
+                color = color,
+            };
+        }
+
+        private static bool CanReplaceCurrentScene()
+        {
+            if (!Application.isBatchMode)
+            {
+                return EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+            }
+
+            for (var index = 0; index < SceneManager.sceneCount; index++)
+            {
+                var scene = SceneManager.GetSceneAt(index);
+                if (scene.isDirty)
+                {
+                    throw new System.InvalidOperationException(
+                        "Batch mode refuses to replace a modified scene: " + scene.name);
+                }
+            }
+
+            return true;
+        }
+    }
+}

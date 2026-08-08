@@ -1,0 +1,20 @@
+{
+  "name": "Ssalddel.Unity.PublicDataHall.Sample.Editor",
+  "rootNamespace": "Ssalddel.Unity.Samples.PublicDataHall.Editor",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.PublicDataHall.Sample",
+    "VContainer"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

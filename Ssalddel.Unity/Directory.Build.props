@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\artifacts\local\dotnet\Ssalddel.Unity\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\artifacts\local\dotnet\Ssalddel.Unity\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

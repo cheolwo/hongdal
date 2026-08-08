@@ -8,4 +8,8 @@
     <RootNamespace>Ssalddel.Unity.Data</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Samples~\**\*.cs" />
+  </ItemGroup>
+
 </Project>
