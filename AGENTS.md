@@ -2,6 +2,19 @@
 
 이 파일은 모든 AI 도구와 스레드가 항상 알아야 하는 공통 경계와 작업 routing만 정의한다. 폴더별 세부 규칙은 가까운 `AGENTS.md`와 기준 문서에서 필요한 부분만 읽는다.
 
+## AI 공용 컨텍스트
+
+GPT Chat과 Codex는 대화 기록이 아니라 저장소 문서를 공용 기억으로 사용한다. 작업을 시작할 때 다음 순서로 현재 상태를 확인한다.
+
+1. [공용 프로젝트 컨텍스트](docs/ProjectOverview/GptProjectContext.md)
+2. [확정 결정](docs/AI/DECISIONS.md)
+3. [현재 작업](docs/AI/CURRENT_WORK.md)
+4. 작업 경로에 가까운 `AGENTS.md`와 관련 Architecture 문서
+
+Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전체 Ssalddel 도메인을 `World`, `Data`, `Object`, `Interaction`, `Simulation` 관점에서 다루되, 실제 구현은 검증 가능한 좁은 vertical slice로 진행한다. 서버는 운영 상태의 최종 권위이며 Unity의 simulation과 operational data를 명확히 구분한다.
+
+의미 있는 구현이나 설계 작업을 마치면 `docs/AI/CURRENT_WORK.md`를 누적 일지가 아닌 최신 snapshot으로 갱신한다. 변경 파일, 검증한 범위, runtime 검증 여부와 남은 문제를 사실대로 기록한다. 장기간 유지할 결정이 바뀌면 `docs/AI/DECISIONS.md`에 새 결정이나 대체 관계를 기록하고 과거 결정을 조용히 덮어쓰지 않는다.
+
 ## 우선순위와 적용 범위
 
 1. 시스템/개발자 지침과 현재 스레드의 최신 사용자 요청을 먼저 따른다.

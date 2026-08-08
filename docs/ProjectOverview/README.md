@@ -4,6 +4,8 @@
 
 루트 README는 현재 집중 범위인 문화교통 0.0 커뮤니티·공공데이터 기반을 먼저 보여 줍니다. 이 폴더에서는 글쓰기와 음식·재료 탐색, 참여 동의, 공동 원장과 완료 사례로 이어지는 통합 클라이언트를 먼저 보고, 0.5 이후 화면은 후속 자산으로 구분해 확인합니다.
 
+GPT Chat과 Codex에서 프로젝트 전체와 Unity World Projection 작업을 시작할 때는 [Ssalddel AI 공용 프로젝트 컨텍스트](GptProjectContext.md)를 먼저 확인합니다. 이 문서는 제품 위치, 서버·Web·Unity 책임, 현재 구현·사용자 보고·계획의 구분과 AI 작업 규칙을 한 곳에서 요약합니다. 현재 인계 상태와 장기 결정은 각각 [CURRENT_WORK](../AI/CURRENT_WORK.md)와 [DECISIONS](../AI/DECISIONS.md)를 따릅니다.
+
 ## 화면으로 먼저 보기
 
 첨부 문서도 기술 구조보다 화면을 먼저 봅니다. 장기 보존 화면은 `docs/ProjectOverview/assets/`와 `docs/assets/changes/`를 기준으로 관리합니다. `artifacts/community-sales-preview/`의 로컬 검증 캡처는 저장소 용량 정리 과정에서 제거했습니다.
@@ -86,6 +88,9 @@
 | T-18 | [ContractRelationshipMapVisualizationProposal.md](../Architecture/ContractRelationshipMapVisualizationProposal.md) | 현재 계약·양측 합의·발주·운송·고용 데이터를 공개·당사자·운영자 경계로 나누고 한 개 지도에 점·선·면·상태 배지로 조화롭게 투영하는 제안 |
 | T-19 | [UnityCooperativeExperiencePlatformProposal.md](../Architecture/UnityCooperativeExperiencePlatformProposal.md) | 생산·유통·협력 도메인, 권위 서버, REST·SignalR, 협동조합 격리와 재사용 Prefab·design system을 묶은 Unity 상위 제안 |
 | T-20 | [UnityAgricultureDistributionSimulationProposal.md](../Architecture/UnityAgricultureDistributionSimulationProposal.md) | Unity 데이터 계약, provenance, 결정적 계산과 감자 golden 시나리오의 세부 설계·현재 구현 상태 |
+| T-21 | [UnityWorldLedgerProjectionArchitectureProposal.md](../Architecture/UnityWorldLedgerProjectionArchitectureProposal.md) | WorldManager·DataManager·UseCase·원장 projection·GameObject 표현 책임을 분리하고 기존 살뜰 업무 도메인을 Unity World에 투영하는 기준 |
+| T-22 | [UnityClientLayeredArchitecture.md](../Architecture/UnityClientLayeredArchitecture.md) | Unity API Client·Mapper·Repository·UseCase·Presenter·SceneController·View·Prefab·Inspector와 Editor·AI 자동화 경계를 정의한 클라이언트 구조 기준 |
+| T-23 | [UnityServerStateToWorldProjectionDesign.md](../Architecture/UnityServerStateToWorldProjectionDesign.md) | 실제 EF DbSet·Mongo 원장을 전수 조사하고 서버 실체를 aggregate projection·UseCase·Zone Controller·View로 변환하는 기준 |
 
 ## 관리 원칙
 

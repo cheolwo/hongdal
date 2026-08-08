@@ -6,6 +6,8 @@
 >
 > 상위 제품·네트워크·Prefab 기준: [살뜰 Unity 생산·유통·협력 경험 플랫폼 종합 제안서](UnityCooperativeExperiencePlatformProposal.md)
 >
+> WorldManager·DataManager·UseCase·원장·GameObject 책임 기준: [살뜰 비즈니스 도메인의 Unity World·원장 투영 아키텍처](UnityWorldLedgerProjectionArchitectureProposal.md)
+>
 > 우선 기준: [0.0 집중 로드맵](../Versions/v0.0/focus-roadmap.md), [커뮤니티 0.0 기반 제품 원칙](CommunityFoundationV0Policy.md), [업무 실행 책임 모델](BusinessWorkflowResponsibilityModel.md), [입력·데이터 수집 처리 파이프라인](DataInputCollectionProcessingPipelineProposal.md)
 
 ## 0. 현재 구현 상태

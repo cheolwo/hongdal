@@ -24,6 +24,8 @@
 
 > **살뜰의 공공 근거와 공동 원장을 바탕으로 생산·유통·협력을 함께 경험하는 데이터 기반 가상세계**
 
+World 상태, 사용자 데이터, UseCase, 원장 projection과 GameObject 표현의 세부 책임은 [살뜰 비즈니스 도메인의 Unity World·원장 투영 아키텍처](UnityWorldLedgerProjectionArchitectureProposal.md)를 기준으로 한다.
+
 ## 2. 현재 구현과 목표의 경계
 
 | 영역 | 현재 저장소 | 이 제안의 목표 |
