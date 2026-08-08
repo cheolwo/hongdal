@@ -58,6 +58,8 @@ public sealed class PublicDataOptions
 
     public RdaLocalFoodOptions RdaLocalFood { get; set; } = new();
 
+    public NongsaroOpenApiOptions Nongsaro { get; set; } = new();
+
     public MaffRegionalCuisineOptions MaffRegionalCuisine { get; set; } = new();
 
     public JapanRegionalDataOptions Japan { get; set; } = new();
@@ -332,6 +334,13 @@ public sealed class RdaLocalFoodOptions
     public string DetailPath { get; set; } = "/service/nvpcFdCkry/fdNmDtl";
 
     public int PageSize { get; set; } = 100;
+}
+
+public sealed class NongsaroOpenApiOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://api.nongsaro.go.kr";
 }
 
 public sealed class MaffRegionalCuisineOptions

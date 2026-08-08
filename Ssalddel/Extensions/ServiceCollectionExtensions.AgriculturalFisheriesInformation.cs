@@ -47,6 +47,29 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<지역농수산Map지역Resolver>();
         services.AddScoped<I지역농수산MapMarker조회UseCase,
             지역농수산MapMarker조회UseCase>();
+        services
+            .AddHttpClient<INongsaroOpenApiClient, NongsaroOpenApiClient>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider
+                        .GetRequiredService<IOptions<PublicDataOptions>>()
+                        .Value;
+                    client.BaseAddress = new Uri(options.Nongsaro.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                        "Ssalddel-Nongsaro-Public-Data-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(
+                        Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<I농사로작목기술Module, 농사로작목기술Module>();
+        services.AddScoped<I작물기준정보분류조회UseCase,
+            작물기준정보분류조회UseCase>();
+        services.AddTransient<I농사로농작업일정Module, 농사로농작업일정Module>();
+        services.AddTransient<I농사로농작물재해예방Module,
+            농사로농작물재해예방Module>();
+        services.AddTransient<I농사로품종정보Module, 농사로품종정보Module>();
+        services.AddTransient<I농사로지역문화Module, 농사로지역문화Module>();
+        services.AddTransient<I농사로표준사료Module, 농사로표준사료Module>();
         services.TryAddSingleton<I경기데이터드림가축사육MapSnapshotStore,
             경기데이터드림가축사육MapSnapshotStore>();
         services.AddScoped<I경기데이터드림가축사육MapProjectionRefresher,

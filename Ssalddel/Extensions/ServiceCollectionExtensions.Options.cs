@@ -81,6 +81,18 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CommandFileStorageOptions>(configuration.GetSection(CommandFileStorageOptions.SectionName));
         services.Configure<CustomsOptions>(configuration.GetSection(CustomsOptions.SectionName));
         services.Configure<PublicDataOptions>(configuration.GetSection(PublicDataOptions.SectionName));
+        services.PostConfigure<PublicDataOptions>(options =>
+        {
+            if (string.IsNullOrWhiteSpace(options.Nongsaro.ApiKey))
+            {
+                options.Nongsaro.ApiKey = options.RdaLocalFood.ApiKey;
+            }
+
+            if (string.IsNullOrWhiteSpace(options.RdaLocalFood.ApiKey))
+            {
+                options.RdaLocalFood.ApiKey = options.Nongsaro.ApiKey;
+            }
+        });
         services.Configure<AgriculturalFisheriesBatchOptions>(configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName));
         services.Configure<CommunityEditorialBatchOptions>(configuration.GetSection(CommunityEditorialBatchOptions.SectionName));
         services.Configure<CommunityActivityBoardContentOptions>(
