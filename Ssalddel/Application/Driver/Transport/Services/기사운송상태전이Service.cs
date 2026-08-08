@@ -9,7 +9,7 @@ public interface I기사운송상태전이Service
     Result 상태변경(운송원장 운송, string 목표상태, DateTime 변경시각);
 }
 
-public sealed class 기사운송상태전이Service : I기사운송상태전이Service
+public static class 기사운송상태전이Policy
 {
     private static readonly IReadOnlyDictionary<string, string[]> 허용전이 = new Dictionary<string, string[]>
     {
@@ -26,6 +26,17 @@ public sealed class 기사운송상태전이Service : I기사운송상태전이S
         [기사운송상태코드.인수완료] = [기사운송상태코드.하차지도착]
     };
 
+    public static bool 가능한가(string 현재상태, string 목표상태)
+    {
+        return string.Equals(현재상태, 목표상태, StringComparison.Ordinal)
+            || (허용전이.TryGetValue(목표상태, out var 이전상태목록)
+                && 이전상태목록.Contains(현재상태, StringComparer.Ordinal));
+    }
+}
+
+public sealed class 기사운송상태전이Service : I기사운송상태전이Service
+{
+
     public Result 상태변경(운송원장 운송, string 목표상태, DateTime 변경시각)
     {
         if (string.Equals(운송.상태, 목표상태, StringComparison.Ordinal))
@@ -39,8 +50,7 @@ public sealed class 기사운송상태전이Service : I기사운송상태전이S
             return Result.Fail("이미 완료된 운송입니다.");
         }
 
-        if (!허용전이.TryGetValue(목표상태, out var 이전상태목록)
-            || !이전상태목록.Contains(운송.상태, StringComparer.Ordinal))
+        if (!기사운송상태전이Policy.가능한가(운송.상태, 목표상태))
         {
             return Result.Fail($"현재 상태({운송.상태})에서는 {목표상태} 처리할 수 없습니다.");
         }

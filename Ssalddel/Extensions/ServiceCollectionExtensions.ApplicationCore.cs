@@ -144,6 +144,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티게시글운영UseCase, 커뮤니티게시글운영UseCase>();
         services.AddScoped<I커뮤니티투표UseCase, 커뮤니티투표UseCase>();
         services.AddScoped<I커뮤니티활동신호UseCase, 커뮤니티활동신호UseCase>();
+        services.AddScoped<I커뮤니티시장광장조회UseCase, 커뮤니티시장광장조회UseCase>();
         services.AddScoped<I해외제조업소MapMarkerReader, 해외제조업소MapMarkerReader>();
         services.AddScoped<I지역문화이미지MapMarkerReader, 지역문화이미지MapMarkerReader>();
         services.AddScoped<I커뮤니티세계지도조회UseCase, 커뮤니티세계지도조회UseCase>();
@@ -165,6 +166,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I물류대행계약계획UseCase, 물류대행계약계획UseCase>();
         services.AddScoped<I피킹작업UseCase, 피킹작업UseCase>();
         services.AddScoped<I재고현황UseCase, 재고현황UseCase>();
+        services.AddScoped<I창고WorldSnapshot조회UseCase, 창고WorldSnapshot조회UseCase>();
         services.AddScoped<I적재작업UseCase, 적재작업UseCase>();
         services.AddScoped<I포장작업UseCase, 포장작업UseCase>();
         services.AddScoped<I출고인계준비UseCase, 출고인계준비UseCase>();
