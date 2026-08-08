@@ -98,12 +98,14 @@ authorized warehouse snapshot
 - Unity 6에서 Warehouse World compile, primitive scene 생성과 reload wiring 검증 완료
 - 기존 화물 인계 API의 `InTransit` 상태를 transport corridor와 TruckView로 투영하는 Unity core 구현
 - 도심 물류센터 sample에 물류센터→창고 waypoint, NavMeshAgent truck과 cargo VisualRoot 배선
+- 기존 마트 공개 상품 aggregate를 Unity operational ApiModel·Mapper·Repository·UseCase로 연결
+- 도심마트 LifetimeScope의 simulation/operational 명시적 분기와 읽기 전용 주문자 상품 관점 구현
 
 ## 검증 상태
 
 | 검증 | 상태 | 근거 또는 제한 |
 | --- | --- | --- |
-| `Ssalddel.Unity.Tests` | 76/76 통과 | 2026-08-08 headless .NET test; 공공 관측·커뮤니티 광장·창고 World·운송 회랑 mapping과 증분 갱신·실패 유지 정책 포함 |
+| `Ssalddel.Unity.Tests` | 79/79 통과 | 2026-08-08 headless .NET test; 공공 관측·커뮤니티 광장·창고 World·운송 회랑·도심마트 operational mapping 포함 |
 | 커뮤니티 시장 광장 server tests | 4/4 통과 | 공개 aggregate mapping·정보 최소화·고정 route·하위 조회 실패 전파 |
 | 창고 World server tests | 4/4 통과 | 권한 조회 결합·정보 최소화·관리자 route·잘못된 창고 ID 차단 |
 | 농사로·작물 서버 targeted tests | 9/9 통과 | Nongsaro module 6개 + CropReference typed projection 3개 |
@@ -116,8 +118,8 @@ authorized warehouse snapshot
 | Unity PlayMode | 미실행 | 현재 요청 범위에서 제외 |
 | built player | 미실행 | Windows·Android runtime 미검증 |
 | 실제 Unity Scene | 현재 체크아웃에서 미검증 | 사용자 보고 P2 runtime 소스 위치 확인 필요 |
-| Urban Market sample compile | 통과 | 임시 Unity 6 project에서 package·sample script compile 확인 |
-| Urban Market scene wiring | 통과 | Editor builder 생성 후 별도 scene reload에서 View wiring·3상품 fixture 확인 |
+| Urban Market sample compile | 통과 | 임시 Unity 6 project에서 operational HTTP adapter, VContainer 분기와 sample script compile 확인 |
+| Urban Market scene wiring | 통과 | Editor builder 생성 후 별도 scene reload에서 View wiring·3상품 simulation fixture 확인 |
 | Traditional Market Hub sample compile | 통과 | 임시 Unity 6 project에서 package sample import·script compile 확인 |
 | Traditional Market Hub scene wiring | 통과 | Editor builder 생성 후 scene reload에서 View wiring·fixture 확인 |
 | VContainer composition | 통과 | Unity 6 + VContainer 1.18.0에서 두 sample compile, LifetimeScope 포함 Scene 생성·reload 확인 |
@@ -134,7 +136,7 @@ authorized warehouse snapshot
 
 ## 현재 작업
 
-P0의 저장소 내 구현 가능 범위와 P1 공공데이터 정보관, P2 커뮤니티·시장 광장, P3 창고·재고, P4 운송 World 연결의 server API→Unity primitive 코드 경로가 완료됐다. 실제 제품 Unity 프로젝트 runtime이 준비되기 전 다음 코드 우선순위는 P5 도심마트 operational aggregate와 주문자 관점이다.
+P0의 저장소 내 구현 가능 범위와 P1 공공데이터 정보관, P2 커뮤니티·시장 광장, P3 창고·재고, P4 운송 World 연결, P5 도심마트 operational aggregate와 읽기 전용 주문자 관점의 server API→Unity primitive 코드 경로가 완료됐다. 실제 제품 Unity 프로젝트 runtime이 준비되기 전 다음 코드 우선순위는 P6 주거공동체 공동수령 Role Perspective다.
 
 ## 다음 구현 후보
 
@@ -143,10 +145,9 @@ P0의 저장소 내 구현 가능 범위와 P1 공공데이터 정보관, P2 커
 3. 실제 공개 세계지도 API로 Public Data Hall runtime marker 확인
 4. 실제 공개 커뮤니티 광장 API로 게시판·활동·원장 primitive runtime 확인
 5. 실제 창고 World API로 팔레트·작업·picker/dock NPC runtime 확인
-6. 도심마트 operational aggregate와 주문자 관점
-7. 주거공동체 공동수령 Role Perspective
-8. Farm·Plot·Cultivation·Sensor canonical server contract와 생산자 관점
-9. 협동조합·공동원장 공간 뒤 Synty 최소 팩 검증
+6. 주거공동체 공동수령 Role Perspective
+7. Farm·Plot·Cultivation·Sensor canonical server contract와 생산자 관점
+8. 협동조합·공동원장 공간 뒤 Synty 최소 팩 검증
 
 ## 미해결
 

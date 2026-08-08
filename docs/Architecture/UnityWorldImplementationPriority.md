@@ -112,6 +112,8 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 - 주문자 Role target과 상세 panel
 - 주문 생성은 확인 panel → server UseCase → canonical 재조회
 
+2026-08-08 현재 기존 공개 aggregate `GET api/v1/orderer/mart/products`를 Unity ApiModel·Mapper·Repository·operational UseCase로 연결했다. 서버가 공개한 판매가·판매 가능 수량·재고 기준시각을 그대로 사용하고 내부 창고 원문을 추론하지 않는다. 주문자 관점은 판매 가능 상품 탐색과 읽기 전용 상세 panel까지만 허용하며 주문 Command는 포함하지 않는다. VContainer에서 simulation/operational 모드를 명시적으로 선택하고 operational 실패를 fixture로 대체하지 않는다. 임시 Unity 6 프로젝트에서 operational adapter compile, primitive scene 생성과 reload wiring을 확인했으며 실제 API runtime 표시는 남아 있다.
+
 ### P6. 주거공동체 수령
 
 주문자와 운송자가 같은 장소를 다르게 보는 첫 개인정보 민감 slice다. 다른 세대 정보, 상세 주소와 연락처가 client 필터에 의존하지 않도록 server projection을 먼저 고정한다.

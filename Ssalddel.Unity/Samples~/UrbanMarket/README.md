@@ -10,9 +10,11 @@
 - 상품상자, 가격표, 재고 상태와 정보 키오스크 View socket
 - 상품 선택 시 상세 정보 panel
 - `Simulated도심마트조회UseCase`를 사용하는 명시적 simulation fixture
+- 기존 공개 aggregate `GET api/v1/orderer/mart/products`용 operational ApiClient·Mapper·Repository·UseCase
+- VContainer에서 simulation과 operational 구성을 명시적으로 선택하는 LifetimeScope
 - primitive scene을 생성하고 Inspector reference를 연결하는 Editor builder
 
-실제 서버 API, operational 재고, 결제, 주문과 외부 asset은 포함하지 않는다.
+결제, 주문 Command와 외부 asset은 포함하지 않는다. operational 모드는 서버가 공개 가능하다고 판정한 상품·판매가·판매 가능 수량·재고 기준시각만 읽으며 내부 창고 재고, 주소, 연락처, 결제·계약 정보는 요청하지 않는다.
 
 ## 사용
 
@@ -28,4 +30,4 @@ Unity -batchmode -quit -projectPath <UnityProject> \
   -executeMethod Ssalddel.Unity.Samples.UrbanMarket.Editor.도심마트PrimitiveSceneBuilder.CreateScene
 ```
 
-실제 API를 연결할 때는 `도심마트LifetimeScope`의 `I도심마트조회UseCase` 등록을 Repository·Mapper 기반 구현으로 교체한다. DTO와 Repository를 View 또는 Controller에 전달하지 않는다.
+실제 API를 연결할 때는 `도심마트LifetimeScope.ConfigureOperationalApi()` 또는 Inspector에서 operational 모드와 API origin을 지정한다. API 실패를 simulation fixture로 대체하지 않으며 DTO와 Repository를 View 또는 Controller에 전달하지 않는다. 상품 선택은 읽기 전용 상세 panel만 열고, 주문은 별도 확인 panel → server UseCase → canonical 재조회가 구현되기 전까지 실행하지 않는다.
