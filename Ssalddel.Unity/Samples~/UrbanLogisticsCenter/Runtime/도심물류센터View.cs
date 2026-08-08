@@ -2,6 +2,7 @@ using System;
 using Ssalddel.Unity.Npcs;
 using Ssalddel.Unity.Perspectives;
 using Ssalddel.Unity.Samples.NpcMovement;
+using Ssalddel.Unity.Transport;
 using UnityEngine;
 
 namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
@@ -17,14 +18,19 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
         [SerializeField]
         private ZoneNpcMovementController npcMovementController = null!;
 
+        [SerializeField]
+        private TransportCorridorTruckView corridorTruck = null!;
+
         public void Configure(
             LogisticsRoleTargetView[] targets,
             LogisticsInteractionPanelView panel,
-            ZoneNpcMovementController movementController)
+            ZoneNpcMovementController movementController,
+            TransportCorridorTruckView truck)
         {
             roleTargets = targets ?? Array.Empty<LogisticsRoleTargetView>();
             interactionPanel = panel;
             npcMovementController = movementController;
+            corridorTruck = truck;
         }
 
         public IRolePerspectiveTarget[] GetRoleTargets()
@@ -48,14 +54,27 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             return npcMovementController.ApplySnapshots(new[] { snapshot });
         }
 
+        public void ApplyTransportCorridor(TransportCorridorSnapshot? snapshot, TruckMovementApplicator applicator)
+        {
+            if (snapshot == null)
+            {
+                corridorTruck.Hide();
+                return;
+            }
+
+            applicator.Apply(snapshot, corridorTruck);
+        }
+
         public bool ValidateWiring()
         {
             if (roleTargets == null
                 || roleTargets.Length != 3
                 || interactionPanel == null
                 || npcMovementController == null
+                || corridorTruck == null
                 || !interactionPanel.ValidateWiring()
-                || !npcMovementController.ValidateWiring())
+                || !npcMovementController.ValidateWiring()
+                || !corridorTruck.ValidateWiring())
             {
                 return false;
             }

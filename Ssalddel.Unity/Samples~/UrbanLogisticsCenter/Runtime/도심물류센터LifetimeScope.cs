@@ -1,5 +1,6 @@
 using Ssalddel.Unity.Npcs;
 using Ssalddel.Unity.Perspectives;
+using Ssalddel.Unity.Transport;
 using System;
 using UnityEngine;
 using VContainer;
@@ -71,6 +72,9 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
                 .As<ICargoWarehouseHandoffRepository>();
             builder.Register<CargoWarehouseHandoffQueryUseCase>(Lifetime.Scoped);
             builder.Register<CargoWarehouseHandoffApplicator>(Lifetime.Scoped);
+            builder.Register<TransportCorridorProjector>(Lifetime.Scoped);
+            builder.Register<TransportCorridorQueryUseCase>(Lifetime.Scoped);
+            builder.Register<TruckMovementApplicator>(Lifetime.Scoped);
 
             builder.RegisterComponentInHierarchy<도심물류센터View>();
             builder.RegisterComponentInHierarchy<도심물류센터SceneController>();

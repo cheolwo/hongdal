@@ -39,10 +39,12 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
             var npcView = CreateTransporterNpc(root.transform, waypointRegistry);
             var npcController = root.AddComponent<ZoneNpcMovementController>();
             npcController.Configure(new[] { npcView });
+            var corridorRegistry = CreateTransportCorridorWaypoints(root.transform);
+            var truckView = CreateTransportTruck(root.transform, corridorRegistry);
             var interactionPanel = CreateInteractionPanel(root.transform);
 
             var zoneView = root.AddComponent<도심물류센터View>();
-            zoneView.Configure(roleTargets, interactionPanel, npcController);
+            zoneView.Configure(roleTargets, interactionPanel, npcController, truckView);
             root.AddComponent<도심물류센터SceneController>();
             var tokenProvider = root.AddComponent<RuntimeSessionAccessTokenProvider>();
             var lifetimeScope = root.AddComponent<도심물류센터LifetimeScope>();
@@ -77,13 +79,14 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
             var scope = Object.FindFirstObjectByType<도심물류센터LifetimeScope>();
             var tokenProvider = Object.FindFirstObjectByType<RuntimeSessionAccessTokenProvider>();
             var npc = Object.FindFirstObjectByType<NpcMovementView>();
+            var truck = Object.FindFirstObjectByType<TransportCorridorTruckView>(FindObjectsInactive.Include);
             if (view == null || controller == null || scope == null || tokenProvider == null
-                || npc == null || !view.ValidateWiring())
+                || npc == null || truck == null || !truck.ValidateWiring() || !view.ValidateWiring())
             {
                 throw new MissingReferenceException("Urban logistics center wiring is invalid after scene reload.");
             }
 
-            Debug.Log("Validated urban logistics center Role View, waypoint, and NPC wiring. NavMesh bake remains a project step.");
+            Debug.Log("Validated urban logistics center Role View, waypoint, NPC, and transport-corridor truck wiring. NavMesh bake remains a project step.");
         }
 
         private static ZoneNpcWaypointRegistry CreateWaypoints(Transform parent)
@@ -135,6 +138,62 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
                 animator,
                 registry,
                 new NpcActionAnimationBinding[0]);
+            return view;
+        }
+
+        private static ZoneNpcWaypointRegistry CreateTransportCorridorWaypoints(Transform parent)
+        {
+            var root = new GameObject("TransportCorridorWaypoints");
+            root.transform.SetParent(parent, false);
+            var values = new[]
+            {
+                CreateWaypoint("NetworkLogisticsCenter", "network.logistics-center", root.transform, new Vector3(-9f, 0.1f, 6f)),
+                CreateWaypoint("NetworkWarehouse", "network.warehouse", root.transform, new Vector3(9f, 0.1f, 6f)),
+            };
+            var registry = root.AddComponent<ZoneNpcWaypointRegistry>();
+            registry.Configure(values);
+            return registry;
+        }
+
+        private static TransportCorridorTruckView CreateTransportTruck(
+            Transform parent,
+            ZoneNpcWaypointRegistry registry)
+        {
+            var root = Primitive(
+                "TransportTruck_71",
+                parent,
+                new Vector3(-9f, 0.7f, 6f),
+                new Vector3(2.4f, 1.2f, 1.3f),
+                new Color(0.18f, 0.38f, 0.72f));
+            var cargo = Primitive(
+                "CargoVisualRoot",
+                root.transform,
+                new Vector3(-0.15f, 0.65f, 0f),
+                new Vector3(0.8f, 0.55f, 0.8f),
+                new Color(0.72f, 0.48f, 0.2f),
+                true);
+            var label = CreateText(
+                "TruckStatus",
+                root.transform,
+                "SIMULATED TRUCK",
+                new Vector3(0f, 1.35f, 0f),
+                0.025f,
+                Color.white);
+            var agent = root.AddComponent<NavMeshAgent>();
+            agent.speed = 5f;
+            agent.acceleration = 8f;
+            agent.angularSpeed = 240f;
+            agent.stoppingDistance = 0.3f;
+            var animator = root.AddComponent<Animator>();
+            var view = root.AddComponent<TransportCorridorTruckView>();
+            view.Configure(
+                "truck-projection:cargo:transport-71",
+                agent,
+                animator,
+                registry,
+                cargo.transform,
+                label);
+            root.SetActive(false);
             return view;
         }
 

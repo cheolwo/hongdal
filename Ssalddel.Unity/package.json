@@ -30,7 +30,7 @@
     },
     {
       "displayName": "Urban Logistics Center Primitive Vertical Slice",
-      "description": "A transporter perspective, semantic waypoint, and NavMesh NPC wired into one primitive logistics-center Zone.",
+      "description": "A transporter perspective, worker NPC, and cargo handoff-driven NavMesh truck corridor wired into one primitive logistics-center Zone.",
       "path": "Samples~/UrbanLogisticsCenter"
     },
     {

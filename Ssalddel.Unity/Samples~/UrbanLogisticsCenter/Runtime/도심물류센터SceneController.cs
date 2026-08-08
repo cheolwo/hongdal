@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Ssalddel.Unity.Npcs;
 using Ssalddel.Unity.Perspectives;
 using Ssalddel.Unity.WorldProjection;
+using Ssalddel.Unity.Transport;
 using UnityEngine;
 using VContainer;
 
@@ -14,16 +15,22 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
         private RoleExperienceCoordinator roleCoordinator = null!;
         private NpcMovementQueryUseCase npcMovementQuery = null!;
         private 도심물류센터View zoneView = null!;
+        private TransportCorridorQueryUseCase corridorQuery = null!;
+        private TruckMovementApplicator truckApplicator = null!;
         private CancellationTokenSource? lifetime;
 
         [Inject]
         public void Construct(
             RoleExperienceCoordinator coordinator,
             NpcMovementQueryUseCase movementQuery,
+            TransportCorridorQueryUseCase transportCorridorQuery,
+            TruckMovementApplicator movementApplicator,
             도심물류센터View view)
         {
             roleCoordinator = coordinator;
             npcMovementQuery = movementQuery;
+            corridorQuery = transportCorridorQuery;
+            truckApplicator = movementApplicator;
             zoneView = view;
         }
 
@@ -71,6 +78,10 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
                         Debug.LogWarning("표현할 NPC View가 없습니다: " + string.Join(", ", unresolved), this);
                     }
                 }
+
+                zoneView.ApplyTransportCorridor(
+                    await corridorQuery.실행Async(lifetime.Token),
+                    truckApplicator);
             }
             catch (OperationCanceledException) when (lifetime?.IsCancellationRequested == true)
             {

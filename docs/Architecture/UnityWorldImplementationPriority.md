@@ -102,6 +102,8 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 - canonical 재조회와 stale 처리
 - 주소·연락처는 배정 업무에 필요한 서버 projection 범위만 사용
 
+2026-08-08 현재 기존 `warehouse-handoff` API의 `InTransit` 상태와 Transporter movement를 재사용해 `TransportCorridorSnapshot`으로 투영한다. `TruckMovementApplicator`는 truck stable ID와 revision을 검사하고, 도심 물류센터 sample은 `network.logistics-center`에서 `network.warehouse`로 향하는 NavMeshAgent TruckView와 cargo VisualRoot를 제공한다. 도착·입고 완료는 Unity가 확정하지 않으며 서버 handoff 재조회 결과가 운송중이 아니면 TruckView를 숨긴다. 임시 Unity 6 프로젝트에서 script compile, primitive scene 생성과 scene reload 후 truck wiring을 확인했다. 실제 제품 Unity 프로젝트의 NavMesh bake와 operational runtime 검증은 남아 있다.
+
 ### P5. 도심마트 operational + 주문자 관점
 
 현재 primitive View를 살리되 상품·가격·재고를 각각 독립 API로 조립하지 않고 공개 가능한 마트 aggregate를 먼저 정의한다.

@@ -1,6 +1,6 @@
 # Urban Logistics Center Primitive Vertical Slice
 
-도심 물류센터의 공유 World, 운송자 Role Perspective와 실제 `NavMeshAgent` NPC 이동 socket을 한 Scene에 배선하는 sample이다.
+도심 물류센터의 공유 World, 운송자 Role Perspective, 작업자 NPC와 물류 거점 사이를 이동하는 Truck projection을 한 Scene에 배선하는 sample이다.
 
 ## 포함 범위
 
@@ -8,7 +8,9 @@
 - `transport:71`, pickup·dropoff stable-ID Role View socket
 - `vehicle-gate`, `loading-bay`, `vehicle-exit` semantic waypoint
 - `npc:transport-driver.71` 운송자 NPC와 NavMeshAgent
-- Role Perspective와 NPC movement simulated API client
+- `network.logistics-center` → `network.warehouse` 운송 회랑 waypoint
+- `truck-projection:cargo:transport-71` TruckView와 cargo VisualRoot
+- Role Perspective, NPC movement와 cargo handoff simulated API client
 - VContainer composition root
 - primitive Scene Builder와 저장 후 wiring validator
 
@@ -19,4 +21,4 @@ Ssalddel/Samples/Create Urban Logistics Center Primitive Scene
 Ssalddel/Samples/Validate Urban Logistics Center Primitive Scene
 ```
 
-simulation fixture는 operational data가 아니다. 실제 연결 시 LifetimeScope의 두 simulated API client를 UnityWebRequest adapter로 교체한다. NPC 도착은 animation만 실행하며 상차 완료 endpoint를 호출하지 않는다.
+simulation fixture는 operational data가 아니다. 실제 연결 시 LifetimeScope의 simulated API client를 UnityWebRequest adapter로 교체한다. 서버가 `InTransit`으로 판정한 화물 인계만 Truck movement로 투영하며, 도착 후에는 canonical handoff를 다시 조회해 TruckView를 숨긴다. NPC나 트럭의 Unity 도착은 animation만 실행하며 상차·하차·입고 완료 endpoint를 호출하지 않는다.
