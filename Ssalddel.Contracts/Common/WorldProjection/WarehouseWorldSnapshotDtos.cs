@@ -20,6 +20,7 @@ public sealed class WarehouseWorldSnapshotResponse
     public IReadOnlyList<WarehouseWorldInventoryItemResponse> InventoryItems { get; set; } = [];
     public IReadOnlyList<WarehouseWorldTaskResponse> Tasks { get; set; } = [];
     public IReadOnlyList<WarehouseWorldNpcResponse> Npcs { get; set; } = [];
+    public IReadOnlyList<CargoWarehouseHandoffResponse> InboundHandoffs { get; set; } = [];
 }
 
 public sealed class WarehouseWorldInventoryItemResponse
@@ -43,6 +44,7 @@ public sealed class WarehouseWorldTaskResponse
     public string StableId { get; set; } = string.Empty;
     public string WarehouseStableId { get; set; } = string.Empty;
     public string InventoryItemStableId { get; set; } = string.Empty;
+    public string CanonicalTaskStableId { get; set; } = string.Empty;
     public string TaskKind { get; set; } = string.Empty;
     public string ProductName { get; set; } = string.Empty;
     public string Sku { get; set; } = string.Empty;

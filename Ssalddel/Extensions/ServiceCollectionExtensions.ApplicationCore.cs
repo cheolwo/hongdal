@@ -8,6 +8,7 @@ using Ssalddel.Application.HumanResources;
 using Ssalddel.Application.Sales;
 using Ssalddel.Application.ViewSettings;
 using Ssalddel.Application.Warehouse;
+using Ssalddel.Application.WorldProjection;
 using Ssalddel.Application.Customs;
 using Ssalddel.Application.Audit;
 using Ssalddel.Application.CommonContents;
@@ -159,6 +160,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IWarehousePerspectiveReadService, WarehousePerspectiveReadService>();
         services.AddScoped<ILoadingPerspectiveReadService, LoadingPerspectiveReadService>();
         services.AddScoped<IUnloadingPerspectiveReadService, UnloadingPerspectiveReadService>();
+        services.AddScoped<IResidentialPickupPerspectiveUseCase, ResidentialPickupPerspectiveUseCase>();
+        services.AddScoped<IFarmProducerPerspectiveUseCase, FarmProducerPerspectiveUseCase>();
         services.AddScoped<IIndividualOrderPerspectiveReadService, IndividualOrderPerspectiveReadService>();
         services.AddScoped<IGroupOrderPerspectiveReadService, GroupOrderPerspectiveReadService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
@@ -167,6 +170,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I피킹작업UseCase, 피킹작업UseCase>();
         services.AddScoped<I재고현황UseCase, 재고현황UseCase>();
         services.AddScoped<I창고WorldSnapshot조회UseCase, 창고WorldSnapshot조회UseCase>();
+        services.AddScoped<I창고입고화물인계조회UseCase, 창고입고화물인계조회UseCase>();
         services.AddScoped<I적재작업UseCase, 적재작업UseCase>();
         services.AddScoped<I포장작업UseCase, 포장작업UseCase>();
         services.AddScoped<I출고인계준비UseCase, 출고인계준비UseCase>();

@@ -29,6 +29,7 @@ using 살뜰.도메인.정산;
 using 살뜰.도메인.음식;
 using 살뜰.도메인.마트;
 using 살뜰.도메인.공급중개;
+using 살뜰.도메인.농업;
 using 살뜰.Infrastructure.Persistence;
 using 살뜰.Infrastructure.Security;
 
@@ -193,6 +194,12 @@ namespace 살뜰.Data
         public DbSet<커뮤니티활동상세열람권> 커뮤니티활동상세열람권목록 { get; set; } = null!;
         public DbSet<커뮤니티활동상세구매> 커뮤니티활동상세구매목록 { get; set; } = null!;
         public DbSet<커뮤니티활동상세구매상태이력> 커뮤니티활동상세구매상태이력목록 { get; set; } = null!;
+        public DbSet<농장> 농장 { get; set; } = null!;
+        public DbSet<농장구획> 농장구획 { get; set; } = null!;
+        public DbSet<재배작기> 재배작기 { get; set; } = null!;
+        public DbSet<농업센서> 농업센서 { get; set; } = null!;
+        public DbSet<농업센서관측> 농업센서관측 { get; set; } = null!;
+        public DbSet<농장작업> 농장작업 { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

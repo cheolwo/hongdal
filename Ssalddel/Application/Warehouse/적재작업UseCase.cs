@@ -62,6 +62,7 @@ public sealed class 적재작업UseCase(
                 select new 적재작업목록항목응답
                 {
                     InboundItemId = item.Id,
+                    InboundId = item.입고요청Id,
                     WarehouseId = item.창고Id,
                     WarehouseName = warehouse.창고명,
                     ProductName = item.상품명,

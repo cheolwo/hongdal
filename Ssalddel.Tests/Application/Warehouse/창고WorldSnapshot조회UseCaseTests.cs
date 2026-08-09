@@ -20,7 +20,8 @@ public sealed class 창고WorldSnapshot조회UseCaseTests
         var inventory = new 재고현황Fake();
         var putAway = new 적재작업Fake();
         var picking = new 피킹작업Fake();
-        var useCase = new 창고WorldSnapshot조회UseCase(inventory, putAway, picking);
+        var handoffs = new 입고화물인계Fake();
+        var useCase = new 창고WorldSnapshot조회UseCase(inventory, putAway, picking, handoffs);
 
         var result = await useCase.조회Async(7, default);
 
@@ -31,12 +32,16 @@ public sealed class 창고WorldSnapshot조회UseCaseTests
         Assert.Equal(2, snapshot.InventoryItems.Count);
         Assert.Equal(2, snapshot.Tasks.Count);
         Assert.Equal(2, snapshot.Npcs.Count);
+        Assert.Single(snapshot.InboundHandoffs);
+        Assert.Equal("inbound-task:91", snapshot.Tasks.Single(task => task.TaskKind == "PutAway").CanonicalTaskStableId);
+        Assert.Equal("inbound-task:91", snapshot.InboundHandoffs[0].InboundTaskStableId);
         Assert.Contains(snapshot.Npcs, npc => npc.RoleCode == "DockWorker" && npc.DestinationWaypointKey == "warehouse.storage-zone");
         Assert.Contains(snapshot.Npcs, npc => npc.RoleCode == "Picker" && npc.DestinationWaypointKey == "warehouse.outbound-staging");
         Assert.Equal(7, inventory.LastRequest?.WarehouseId);
         Assert.Equal(50, inventory.LastRequest?.PageSize);
         Assert.Equal(7, putAway.LastRequest?.WarehouseId);
         Assert.Equal(7, picking.LastRequest?.WarehouseId);
+        Assert.Equal(7, handoffs.LastWarehouseId);
     }
 
     [Fact]
@@ -114,6 +119,67 @@ public sealed class 창고WorldSnapshot조회UseCaseTests
             => Task.FromResult(Result.Fail<창고재고현황상세응답>("unused"));
     }
 
+    private sealed class 입고화물인계Fake : I창고입고화물인계조회UseCase
+    {
+        public long? LastWarehouseId { get; private set; }
+
+        public Task<IReadOnlyList<CargoWarehouseHandoffResponse>> 조회Async(
+            long warehouseId,
+            CancellationToken cancellationToken)
+        {
+            LastWarehouseId = warehouseId;
+            var generatedAt = new DateTimeOffset(2026, 8, 8, 1, 3, 0, TimeSpan.Zero);
+            return Task.FromResult<IReadOnlyList<CargoWarehouseHandoffResponse>>(
+            [
+                new CargoWarehouseHandoffResponse
+                {
+                    StableId = "cargo-handoff:transport-71.inbound-91",
+                    Revision = 10,
+                    HandoffStateCode = CargoHandoffStateCodes.ArrivedAtWarehouse,
+                    CargoStableId = "cargo:transport-71",
+                    TransportTaskStableId = "transport-task:71",
+                    InboundTaskStableId = "inbound-task:91",
+                    GeneratedAt = generatedAt,
+                    Movements =
+                    [
+                        new NpcMovementResponse
+                        {
+                            StableId = "npc-movement:transporter.transport-71.inbound-91",
+                            Revision = 10,
+                            NpcStableId = "npc:transport-driver.71",
+                            ActorRoleCode = "Transporter",
+                            WorldZoneCode = "warehouse",
+                            RouteCode = "warehouse-transporter-dropoff",
+                            CurrentWaypointKey = "warehouse.approach",
+                            DestinationWaypointKey = "warehouse.inbound-dock",
+                            MovementStateCode = NpcMovementStateCodes.Moving,
+                            ArrivalActionCode = "open-cargo-door",
+                            SourceTypeCode = NpcMovementSourceTypeCodes.OperationalProjection,
+                            CanonicalTaskStableId = "transport-task:71",
+                            GeneratedAt = generatedAt,
+                        },
+                        new NpcMovementResponse
+                        {
+                            StableId = "npc-movement:inbound-worker.transport-71.inbound-91",
+                            Revision = 10,
+                            NpcStableId = "npc:warehouse-inbound-worker.91",
+                            ActorRoleCode = "WarehouseInboundWorker",
+                            WorldZoneCode = "warehouse",
+                            RouteCode = "warehouse-inbound-worker-handoff",
+                            CurrentWaypointKey = "warehouse.staff-entry",
+                            DestinationWaypointKey = "warehouse.inbound-dock",
+                            MovementStateCode = NpcMovementStateCodes.Moving,
+                            ArrivalActionCode = "unload-cargo",
+                            SourceTypeCode = NpcMovementSourceTypeCodes.OperationalProjection,
+                            CanonicalTaskStableId = "inbound-task:91",
+                            GeneratedAt = generatedAt,
+                        },
+                    ],
+                },
+            ]);
+        }
+    }
+
     private sealed class 적재작업Fake : I적재작업UseCase
     {
         public 적재작업목록조회요청? LastRequest { get; private set; }
@@ -126,7 +192,7 @@ public sealed class 창고WorldSnapshot조회UseCaseTests
                 [
                     new 적재작업목록항목응답
                     {
-                        InboundItemId = 32, WarehouseId = 7, WarehouseName = "도심 창고", ProductName = "양파",
+                        InboundItemId = 32, InboundId = 91, WarehouseId = 7, WarehouseName = "도심 창고", ProductName = "양파",
                         Sku = "ONION-10", AvailableQuantity = 4, InventoryStatus = "검수완료", CanPutAway = true,
                         UpdatedAtUtc = new DateTime(2026, 8, 8, 1, 1, 0, DateTimeKind.Utc),
                     },

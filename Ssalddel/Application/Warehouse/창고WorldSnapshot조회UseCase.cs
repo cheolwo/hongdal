@@ -14,12 +14,33 @@ public interface I창고WorldSnapshot조회UseCase
         CancellationToken cancellationToken);
 }
 
-public sealed class 창고WorldSnapshot조회UseCase(
-    I재고현황UseCase inventoryReader,
-    I적재작업UseCase putAwayReader,
-    I피킹작업UseCase pickingReader) : I창고WorldSnapshot조회UseCase
+public sealed class 창고WorldSnapshot조회UseCase : I창고WorldSnapshot조회UseCase
 {
     private const int MaximumItems = 50;
+    private readonly I재고현황UseCase inventoryReader;
+    private readonly I적재작업UseCase putAwayReader;
+    private readonly I피킹작업UseCase pickingReader;
+    private readonly I창고입고화물인계조회UseCase handoffReader;
+
+    public 창고WorldSnapshot조회UseCase(
+        I재고현황UseCase inventoryReader,
+        I적재작업UseCase putAwayReader,
+        I피킹작업UseCase pickingReader)
+        : this(inventoryReader, putAwayReader, pickingReader, new EmptyHandoffReader())
+    {
+    }
+
+    public 창고WorldSnapshot조회UseCase(
+        I재고현황UseCase inventoryReader,
+        I적재작업UseCase putAwayReader,
+        I피킹작업UseCase pickingReader,
+        I창고입고화물인계조회UseCase handoffReader)
+    {
+        this.inventoryReader = inventoryReader;
+        this.putAwayReader = putAwayReader;
+        this.pickingReader = pickingReader;
+        this.handoffReader = handoffReader;
+    }
 
     public async Task<Result<WarehouseWorldSnapshotResponse>> 조회Async(
         long? warehouseId,
@@ -65,13 +86,16 @@ public sealed class 창고WorldSnapshot조회UseCase(
             .Where(task => task.Status is not "완료")
             .Select(MapNpc)
             .ToArray();
+        var handoffs = warehouseId is > 0
+            ? await handoffReader.조회Async(warehouseId.Value, cancellationToken)
+            : [];
 
         return Result.Ok(new WarehouseWorldSnapshotResponse
         {
             StableId = warehouseId.HasValue
                 ? $"warehouse-zone:{warehouseId.Value}"
                 : "warehouse-zone:authorized",
-            Revision = ComputeRevision(inventory, tasks),
+            Revision = ComputeRevision(inventory, tasks, handoffs),
             GeneratedAtUtc = DateTimeOffset.UtcNow,
             TotalAvailableQuantity = inventoryResult.Value.TotalAvailableQuantity,
             TotalReservedQuantity = inventoryResult.Value.TotalReservedQuantity,
@@ -79,6 +103,7 @@ public sealed class 창고WorldSnapshot조회UseCase(
             InventoryItems = inventory,
             Tasks = tasks,
             Npcs = npcs,
+            InboundHandoffs = handoffs,
         });
     }
 
@@ -105,6 +130,9 @@ public sealed class 창고WorldSnapshot조회UseCase(
             StableId = $"warehouse-putaway:{source.InboundItemId}",
             WarehouseStableId = $"warehouse:{source.WarehouseId}",
             InventoryItemStableId = $"warehouse-inventory:{source.InboundItemId}",
+            CanonicalTaskStableId = source.InboundId > 0
+                ? $"inbound-task:{source.InboundId}"
+                : string.Empty,
             TaskKind = "PutAway",
             ProductName = source.ProductName,
             Sku = source.Sku,
@@ -158,10 +186,12 @@ public sealed class 창고WorldSnapshot조회UseCase(
 
     private static string ComputeRevision(
         IReadOnlyList<WarehouseWorldInventoryItemResponse> inventory,
-        IReadOnlyList<WarehouseWorldTaskResponse> tasks)
+        IReadOnlyList<WarehouseWorldTaskResponse> tasks,
+        IReadOnlyList<CargoWarehouseHandoffResponse> handoffs)
     {
         var values = inventory.Select(item => $"{item.StableId}:{item.AvailableQuantity}:{item.ReservedQuantity}:{item.StorageLocation}:{item.Status}:{item.UpdatedAtUtc:O}")
             .Concat(tasks.Select(item => $"{item.StableId}:{item.Status}:{item.LocationCode}:{item.UpdatedAtUtc:O}"))
+            .Concat(handoffs.Select(item => $"{item.StableId}:{item.Revision}:{item.HandoffStateCode}:{item.InboundTaskStableId}"))
             .OrderBy(value => value, StringComparer.Ordinal);
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join("|", values))))
             .ToLowerInvariant();
@@ -169,4 +199,12 @@ public sealed class 창고WorldSnapshot조회UseCase(
 
     private static Result<WarehouseWorldSnapshotResponse> Failure(IEnumerable<IError> errors)
         => Result.Fail<WarehouseWorldSnapshotResponse>(string.Join(", ", errors.Select(error => error.Message)));
+
+    private sealed class EmptyHandoffReader : I창고입고화물인계조회UseCase
+    {
+        public Task<IReadOnlyList<CargoWarehouseHandoffResponse>> 조회Async(
+            long warehouseId,
+            CancellationToken cancellationToken)
+            => Task.FromResult<IReadOnlyList<CargoWarehouseHandoffResponse>>([]);
+    }
 }

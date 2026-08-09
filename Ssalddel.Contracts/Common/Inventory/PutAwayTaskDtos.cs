@@ -27,6 +27,7 @@ public sealed class 적재작업목록조회요청
 public sealed class 적재작업목록항목응답
 {
     public long InboundItemId { get; set; }
+    public long InboundId { get; set; }
     public long WarehouseId { get; set; }
     public string WarehouseName { get; set; } = string.Empty;
     public string ProductName { get; set; } = string.Empty;
