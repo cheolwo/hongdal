@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Ssalddel.Unity.Farm;
 using UnityEditor;
@@ -12,6 +13,7 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
     {
         private const string SceneDirectory = "Assets/SsalddelGenerated/Farm";
         private const string ScenePath = SceneDirectory + "/FarmPrimitive.unity";
+        private const string TillingScenePath = SceneDirectory + "/FarmTillingVerticalSlice.unity";
 
         [MenuItem("Ssalddel/Samples/Create Farm Primitive Scene")]
         public static void CreateScene()
@@ -24,6 +26,7 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
                 new Vector3(18f, 0.5f, 14f), new Color(0.35f, 0.28f, 0.18f));
             var status = Text("ZoneStatus", root.transform,
                 "FARM · SERVER-AUTHORIZED CONDITION", new Vector3(0f, 4.8f, 4.5f), 0.03f);
+            CreateSoilTileGrid(root.transform);
 
             var plotObject = Primitive("FarmTile", root.transform, new Vector3(0f, 0.1f, 0f),
                 new Vector3(10f, 0.35f, 7f), new Color(0.42f, 0.28f, 0.15f));
@@ -85,6 +88,49 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
             Debug.Log("Created farm primitive scene: " + ScenePath);
         }
 
+        [MenuItem("Ssalddel/FARM-2/Create Tilling Vertical Slice Scene")]
+        public static void CreateTillingVerticalSliceScene()
+        {
+            if (!CanReplaceCurrentScene()) return;
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var root = new GameObject("FARM-2 Tilling Vertical Slice");
+            Primitive("Farm Ground", root.transform, new Vector3(2.4f, .05f, 0f),
+                new Vector3(13f, .1f, 10f), new Color(.18f, .28f, .15f));
+            var grid = CreateSoilTileGrid(root.transform);
+            var controller = grid.GetComponent<FarmSoilTileSimulationController>();
+            controller.Initialize();
+            grid.SelectTileForTests("farm-soil-tile:sim.potato.0.0");
+
+            CreateTillingCamera();
+            CreateLight();
+            Directory.CreateDirectory(SceneDirectory);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, TillingScenePath);
+            AssetDatabase.SaveAssets();
+            Selection.activeGameObject = root;
+            Debug.Log("Created FARM-2 tilling vertical slice: " + TillingScenePath);
+        }
+
+        [MenuItem("Ssalddel/FARM-2/Validate Tilling Vertical Slice Scene")]
+        public static void ValidateTillingVerticalSliceScene()
+        {
+            if (!File.Exists(TillingScenePath))
+                throw new FileNotFoundException("FARM-2 scene was not generated.", TillingScenePath);
+            if (!CanReplaceCurrentScene()) return;
+
+            EditorSceneManager.OpenScene(TillingScenePath, OpenSceneMode.Single);
+            var grid = Object.FindAnyObjectByType<FarmSoilTileGridView>();
+            var controller = Object.FindAnyObjectByType<FarmSoilTileSimulationController>();
+            if (grid == null || !grid.ValidateWiring() || controller == null
+                || Object.FindObjectsByType<FarmSoilTileActionButtonView>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None).Length != 3)
+            {
+                throw new MissingReferenceException("FARM-2 tilling wiring is invalid.");
+            }
+            Debug.Log("Validated FARM-2 selection, Preview, Confirm and Simulation Tick wiring.");
+        }
+
         [MenuItem("Ssalddel/Samples/Validate Farm Primitive Scene")]
         public static void ValidateGeneratedScene()
         {
@@ -93,7 +139,11 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
 
             EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
             var view = Object.FindAnyObjectByType<FarmView>();
-            if (view == null || !view.ValidateWiring())
+            var soilTileGrid = Object.FindAnyObjectByType<FarmSoilTileGridView>();
+            var soilTileController = Object.FindAnyObjectByType<FarmSoilTileSimulationController>();
+            if (view == null || !view.ValidateWiring()
+                || soilTileGrid == null || !soilTileGrid.ValidateWiring()
+                || soilTileController == null)
                 throw new MissingReferenceException("Farm View socket is invalid.");
             if (Object.FindAnyObjectByType<FarmSceneController>() == null)
                 throw new MissingReferenceException("Farm Controller is missing.");
@@ -101,8 +151,96 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
                 throw new MissingReferenceException("Farm LifetimeScope is missing.");
             if (Object.FindAnyObjectByType<FarmSessionTokenProvider>() == null)
                 throw new MissingReferenceException("Farm token provider is missing.");
-            Debug.Log("Validated FarmTile, Crop, Sensor, FarmWorker and VContainer wiring.");
+            Debug.Log("Validated FarmTile, 6x6 SoilTileGrid, Crop, Sensor, FarmWorker and VContainer wiring.");
         }
+
+        public static FarmSoilTileGridView CreateSoilTileGridForTests()
+        {
+            var root = new GameObject("FarmSoilTileGridTestRoot");
+            return CreateSoilTileGrid(root.transform);
+        }
+
+        private static FarmSoilTileGridView CreateSoilTileGrid(Transform parent)
+        {
+            var snapshot = FarmPotatoSoilTileSimulationFixture.Create();
+            var root = new GameObject("SimulationSoilTileGrid");
+            root.transform.SetParent(parent, false);
+            var cells = new List<FarmSoilTileCellView>(snapshot.Tiles.Length);
+            const float spacing = 1.18f;
+            var originX = -(snapshot.GridWidth - 1) * spacing * .5f;
+            var originZ = -(snapshot.GridHeight - 1) * spacing * .5f;
+            foreach (var tile in snapshot.Tiles)
+            {
+                var value = Primitive(
+                    "SoilTile [" + tile.GridX + "," + tile.GridZ + "]",
+                    root.transform,
+                    new Vector3(originX + tile.GridX * spacing, .38f,
+                        originZ + tile.GridZ * spacing),
+                    new Vector3(1.05f, .22f, 1.05f),
+                    new Color(.34f, .22f, .12f));
+                var cell = value.AddComponent<FarmSoilTileCellView>();
+                cell.Configure(tile.StableId, value.GetComponent<Renderer>());
+                cells.Add(cell);
+            }
+
+            var mode = Text("SoilTileMode", root.transform, "SOIL TILE MAP · SIMULATION",
+                new Vector3(0f, .8f, 4.2f), .018f);
+            var title = Text("SelectedTileTitle", root.transform, "토양 타일을 선택하세요",
+                new Vector3(5.8f, .7f, 1.5f), .02f);
+            var detail = Text("SelectedTileDetail", root.transform,
+                "토양·경작 상태를 확인한 뒤 작업을 검토합니다.",
+                new Vector3(5.8f, .7f, -.3f), .016f);
+            var actionStatus = Text("TillingActionStatus", root.transform, "SELECT TILE",
+                new Vector3(5.8f, .72f, -2.45f), .018f);
+            var view = root.AddComponent<FarmSoilTileGridView>();
+            view.Configure(
+                cells.ToArray(),
+                new[]
+                {
+                    SoilTileMaterial(FarmSoilTileColorTokens.Untilled, new Color(.34f, .22f, .12f)),
+                    SoilTileMaterial(FarmSoilTileColorTokens.Tilled, new Color(.48f, .30f, .14f)),
+                    SoilTileMaterial(FarmSoilTileColorTokens.Sown, new Color(.22f, .48f, .18f)),
+                    SoilTileMaterial(FarmSoilTileColorTokens.Selected, new Color(.92f, .72f, .18f)),
+                },
+                mode,
+                title,
+                detail,
+                actionStatus);
+            ActionButton(root.transform, view, FarmSoilTileActionCode.Preview,
+                "1 PREVIEW", new Vector3(4.05f, .42f, -3.25f), new Color(.24f, .48f, .72f));
+            ActionButton(root.transform, view, FarmSoilTileActionCode.Confirm,
+                "2 CONFIRM", new Vector3(5.8f, .42f, -3.25f), new Color(.76f, .58f, .16f));
+            ActionButton(root.transform, view, FarmSoilTileActionCode.SimulationTick,
+                "3 TICK", new Vector3(7.55f, .42f, -3.25f), new Color(.28f, .66f, .34f));
+            root.AddComponent<FarmSoilTileSimulationController>().Configure(view);
+            return view;
+        }
+
+        private static void ActionButton(
+            Transform parent,
+            FarmSoilTileGridView grid,
+            FarmSoilTileActionCode action,
+            string label,
+            Vector3 position,
+            Color color)
+        {
+            var button = Primitive(
+                "Tilling " + action,
+                parent,
+                position,
+                new Vector3(1.55f, .25f, .72f),
+                color);
+            button.AddComponent<FarmSoilTileActionButtonView>().Configure(grid, action);
+            Text(label + " Label", parent, label,
+                position + new Vector3(0f, .16f, 0f), .012f);
+        }
+
+        private static FarmSoilTileMaterialBinding SoilTileMaterial(string token, Color color)
+            => new FarmSoilTileMaterialBinding
+            {
+                ColorToken = token,
+                Material = Material("FarmSoilTile" + token.Replace(".", string.Empty), color),
+            };
 
         private static GameObject Primitive(
             string name, Transform parent, Vector3 position, Vector3 scale, Color color, bool local = false)
@@ -160,6 +298,18 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
             camera.backgroundColor = new Color(0.12f, 0.17f, 0.13f);
         }
 
+        private static void CreateTillingCamera()
+        {
+            var value = new GameObject("Main Camera");
+            value.tag = "MainCamera";
+            var camera = value.AddComponent<Camera>();
+            camera.transform.position = new Vector3(2.4f, 11.8f, -10.8f);
+            camera.transform.rotation = Quaternion.Euler(47f, 0f, 0f);
+            camera.fieldOfView = 34f;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.08f, 0.12f, 0.09f);
+        }
+
         private static void CreateLight()
         {
             var value = new GameObject("Directional Light");
@@ -171,7 +321,8 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
 
         private static bool CanReplaceCurrentScene()
         {
-            if (!Application.isBatchMode) return EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+            if (!UnityEngine.Application.isBatchMode)
+                return EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
             for (var index = 0; index < SceneManager.sceneCount; index++)
             {
                 var scene = SceneManager.GetSceneAt(index);
