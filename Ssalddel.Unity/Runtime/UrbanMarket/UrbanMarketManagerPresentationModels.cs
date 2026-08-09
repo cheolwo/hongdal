@@ -15,24 +15,6 @@ namespace Ssalddel.Unity.UrbanMarket
         public const string ReviewReplenishment = "ReviewReplenishment";
     }
 
-    public static class 마트관리자QueueCodes
-    {
-        public const string UrgentActions = "UrgentActions";
-        public const string PendingActions = "PendingActions";
-        public const string InProgress = "InProgress";
-        public const string DataAttention = "DataAttention";
-        public const string NoActionNeeded = "NoActionNeeded";
-    }
-
-    public static class 마트관리자PriorityReasonCodes
-    {
-        public const string DataIntegrityAttention = "DataIntegrityAttention";
-        public const string ShelfEmpty = "ShelfEmpty";
-        public const string InboundReviewRequired = "InboundReviewRequired";
-        public const string ReplenishmentReady = "ReplenishmentReady";
-        public const string TaskProgressReview = "TaskProgressReview";
-    }
-
     public static class 마트관리자InteractionIntentCodes
     {
         public const string ReviewDataAttention = "ReviewDataAttention";
@@ -43,27 +25,31 @@ namespace Ssalddel.Unity.UrbanMarket
 
     public static class 마트관리자PerspectiveVersions
     {
-        public const string Contract = "urban-market-manager-perspective.v1";
-        public const string Rule = "urban-market-manager-priority.v1";
-        public const string PresentationContract = "urban-market-manager-surface.v1";
-        public const string VisualRule = "urban-market-manager-primitive-visual.v1";
+        public const string Contract = "urban-market-manager-perspective.v2";
+        public const string Rule = "urban-market-manager-context.v2";
+        public const string PresentationContract = "urban-market-manager-surface.v2";
+        public const string VisualRule = "urban-market-manager-primitive-visual.v2";
     }
 
-    public sealed class 마트관리자업무QueueItem
+    /// <summary>
+    /// Shared Interpretation의 진열 상태를 관리자 문맥에 맞게 보존합니다.
+    /// 우선순위나 업무 queue를 만들지 않으며 원본 NeedCode와 차단 사유를 유지합니다.
+    /// </summary>
+    public sealed class 마트관리자진열상태
     {
-        public string QueueCode { get; set; } = string.Empty;
-        public int PriorityScore { get; set; }
-        public string[] PriorityReasonCodes { get; set; } = Array.Empty<string>();
-        public string RuleRevision { get; set; } = string.Empty;
         public WorldStableId ShelfWorldId { get; set; }
         public WorldStableId ProductWorldId { get; set; }
         public string NeedCode { get; set; } = string.Empty;
         public int DisplayQuantity { get; set; }
+        public int DisplayCapacity { get; set; }
         public int TargetQuantity { get; set; }
         public int CandidateQuantity { get; set; }
         public string QuantityUnit { get; set; } = string.Empty;
         public bool CanPreviewRequest { get; set; }
+        public bool IsSourcePlanComplete { get; set; }
+        public string[] BlockReasonCodes { get; set; } = Array.Empty<string>();
         public string[] AllowedInteractionIntentCodes { get; set; } = Array.Empty<string>();
+        public string RuleRevision { get; set; } = string.Empty;
         public WorldStableId[] SourceWorldIds { get; set; } = Array.Empty<WorldStableId>();
         public 도심마트진열보충SourcePlanSegment[] SourcePlan { get; set; } = Array.Empty<도심마트진열보충SourcePlanSegment>();
     }
@@ -72,21 +58,10 @@ namespace Ssalddel.Unity.UrbanMarket
     {
         public 도심마트운영업무WorldState SharedWorld { get; set; } = null!;
         public InterpretationPerspectiveContext Context { get; set; } = null!;
-        public 마트관리자업무QueueItem[] UrgentActions { get; set; } = Array.Empty<마트관리자업무QueueItem>();
-        public 마트관리자업무QueueItem[] PendingActions { get; set; } = Array.Empty<마트관리자업무QueueItem>();
-        public 마트관리자업무QueueItem[] InProgress { get; set; } = Array.Empty<마트관리자업무QueueItem>();
-        public 마트관리자업무QueueItem[] DataAttention { get; set; } = Array.Empty<마트관리자업무QueueItem>();
-        public int NoActionNeededCount { get; set; }
+        public 마트관리자진열상태[] ShelfStates { get; set; } = Array.Empty<마트관리자진열상태>();
         public WorldStableId[] FocusWorldIds { get; set; } = Array.Empty<WorldStableId>();
         public WorldRelation[] FocusRelations { get; set; } = Array.Empty<WorldRelation>();
         public string PerspectiveInterpretationRevision { get; set; } = string.Empty;
-
-        public 마트관리자업무QueueItem[] ActionQueue
-            => DataAttention
-                .Concat(UrgentActions)
-                .Concat(PendingActions)
-                .Concat(InProgress)
-                .ToArray();
     }
 
     public sealed class 마트관리자PerspectiveInterpreter :
@@ -113,8 +88,9 @@ namespace Ssalddel.Unity.UrbanMarket
                 && !world.SharedWorld.Graph.NodesById.ContainsKey(context.FocusWorldId.Value))
                 throw new InvalidOperationException("UrbanMarketManagerFocusUnknown:" + context.FocusWorldId.Value.Value);
 
-            var items = world.Replenishments
-                .Select(Classify)
+            var shelfStates = world.Replenishments
+                .Select(ProjectState)
+                .OrderBy(value => value.ShelfWorldId)
                 .ToArray();
             var focusWorldIds = ResolveFocusWorldIds(world, context.FocusWorldId);
             var focusSet = focusWorldIds.ToHashSet();
@@ -131,7 +107,7 @@ namespace Ssalddel.Unity.UrbanMarket
                 context.ZoneCode,
                 context.FocusWorldId?.Value ?? string.Empty,
                 context.Mode.ToString(),
-                string.Join(",", items.Select(value => value.QueueCode + ":" + value.ShelfWorldId.Value)),
+                string.Join(",", shelfStates.Select(value => value.ShelfWorldId.Value + ":" + value.NeedCode)),
             });
             var revision = WorldDataFlowRevisionCalculator.CalculateInterpretation(
                 world.Lineage.Inputs,
@@ -143,87 +119,43 @@ namespace Ssalddel.Unity.UrbanMarket
             {
                 SharedWorld = world,
                 Context = context,
-                DataAttention = Queue(items, 마트관리자QueueCodes.DataAttention),
-                UrgentActions = Queue(items, 마트관리자QueueCodes.UrgentActions),
-                PendingActions = Queue(items, 마트관리자QueueCodes.PendingActions),
-                InProgress = Queue(items, 마트관리자QueueCodes.InProgress),
-                NoActionNeededCount = items.Count(value => value.QueueCode == 마트관리자QueueCodes.NoActionNeeded),
+                ShelfStates = shelfStates,
                 FocusWorldIds = focusWorldIds,
                 FocusRelations = focusRelations,
                 PerspectiveInterpretationRevision = revision,
             };
         }
 
-        private static 마트관리자업무QueueItem Classify(도심마트진열보충WorldState source)
+        private static 마트관리자진열상태 ProjectState(도심마트진열보충WorldState source)
         {
-            string queueCode;
-            int score;
-            var reasons = new List<string>();
             var intents = new List<string>();
             if (source.NeedCode == 도심마트ReplenishmentNeedCodes.DataInsufficient)
-            {
-                queueCode = 마트관리자QueueCodes.DataAttention;
-                score = 400;
-                reasons.Add(마트관리자PriorityReasonCodes.DataIntegrityAttention);
-                reasons.AddRange(source.BlockReasonCodes);
                 intents.Add(마트관리자InteractionIntentCodes.ReviewDataAttention);
-            }
-            else if (source.DisplayQuantity == 0
-                     || source.NeedCode == 도심마트ReplenishmentNeedCodes.InboundRequired)
-            {
-                queueCode = 마트관리자QueueCodes.UrgentActions;
-                score = 300;
-                if (source.DisplayQuantity == 0) reasons.Add(마트관리자PriorityReasonCodes.ShelfEmpty);
-                if (source.NeedCode == 도심마트ReplenishmentNeedCodes.InboundRequired)
-                {
-                    reasons.Add(마트관리자PriorityReasonCodes.InboundReviewRequired);
-                    intents.Add(마트관리자InteractionIntentCodes.ReviewInbound);
-                }
-                if (source.CanPreviewRequest)
-                {
-                    reasons.Add(마트관리자PriorityReasonCodes.ReplenishmentReady);
-                    intents.Add(마트관리자InteractionIntentCodes.PreviewShelfReplenishment);
-                }
-                reasons.AddRange(source.BlockReasonCodes);
-            }
-            else if (source.NeedCode == 도심마트ReplenishmentNeedCodes.ReplenishmentCandidate)
-            {
-                queueCode = 마트관리자QueueCodes.PendingActions;
-                score = 200;
-                reasons.Add(마트관리자PriorityReasonCodes.ReplenishmentReady);
-                reasons.AddRange(source.BlockReasonCodes);
-                if (source.CanPreviewRequest)
-                    intents.Add(마트관리자InteractionIntentCodes.PreviewShelfReplenishment);
-            }
-            else if (source.NeedCode == 도심마트ReplenishmentNeedCodes.TaskAlreadyActive)
-            {
-                queueCode = 마트관리자QueueCodes.InProgress;
-                score = 100;
-                reasons.Add(마트관리자PriorityReasonCodes.TaskProgressReview);
-                reasons.AddRange(source.BlockReasonCodes);
+            if (source.NeedCode == 도심마트ReplenishmentNeedCodes.InboundRequired)
+                intents.Add(마트관리자InteractionIntentCodes.ReviewInbound);
+            if (source.NeedCode == 도심마트ReplenishmentNeedCodes.TaskAlreadyActive)
                 intents.Add(마트관리자InteractionIntentCodes.ReviewTaskProgress);
-            }
-            else
-            {
-                queueCode = 마트관리자QueueCodes.NoActionNeeded;
-                score = 0;
-            }
+            if (source.CanPreviewRequest)
+                intents.Add(마트관리자InteractionIntentCodes.PreviewShelfReplenishment);
 
-            return new 마트관리자업무QueueItem
+            return new 마트관리자진열상태
             {
-                QueueCode = queueCode,
-                PriorityScore = score,
-                PriorityReasonCodes = reasons.Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToArray(),
-                RuleRevision = source.RuleRevision,
                 ShelfWorldId = source.ShelfWorldId,
                 ProductWorldId = source.ProductWorldId,
                 NeedCode = source.NeedCode,
                 DisplayQuantity = source.DisplayQuantity,
+                DisplayCapacity = source.DisplayCapacity,
                 TargetQuantity = source.TargetQuantity,
                 CandidateQuantity = source.CandidateQuantity,
                 QuantityUnit = source.QuantityUnit,
                 CanPreviewRequest = source.CanPreviewRequest,
-                AllowedInteractionIntentCodes = intents.Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToArray(),
+                IsSourcePlanComplete = source.IsSourcePlanComplete,
+                BlockReasonCodes = source.BlockReasonCodes,
+                AllowedInteractionIntentCodes = intents
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(value => value, StringComparer.Ordinal)
+                    .ToArray(),
+                RuleRevision = source.RuleRevision,
                 SourceWorldIds = source.SourceWorldIds
                     .Append(source.ShelfWorldId)
                     .Append(source.ProductWorldId)
@@ -234,21 +166,12 @@ namespace Ssalddel.Unity.UrbanMarket
             };
         }
 
-        private static 마트관리자업무QueueItem[] Queue(
-            IEnumerable<마트관리자업무QueueItem> items,
-            string queueCode)
-            => items
-                .Where(value => value.QueueCode == queueCode)
-                .OrderByDescending(value => value.PriorityScore)
-                .ThenBy(value => value.ShelfWorldId)
-                .ToArray();
-
         private static WorldStableId[] ResolveFocusWorldIds(
             도심마트운영업무WorldState world,
             WorldStableId? focusWorldId)
         {
             if (!focusWorldId.HasValue) return Array.Empty<WorldStableId>();
-            var related = world.Replenishments
+            return world.Replenishments
                 .Where(value => value.ShelfWorldId == focusWorldId.Value
                                 || value.ProductWorldId == focusWorldId.Value
                                 || value.SourceWorldIds.Contains(focusWorldId.Value))
@@ -259,7 +182,6 @@ namespace Ssalddel.Unity.UrbanMarket
                 .Distinct()
                 .OrderBy(value => value)
                 .ToArray();
-            return related;
         }
     }
 
@@ -267,36 +189,6 @@ namespace Ssalddel.Unity.UrbanMarket
     {
         public string LocaleCode { get; set; } = "ko-KR";
         public string QualityTierCode { get; set; } = "Primitive";
-    }
-
-    public sealed class 도심마트ManagerSummarySurface
-    {
-        public PresentationStableId StableId { get; set; }
-        public string PresentationRevision { get; set; } = string.Empty;
-        public string SummaryText { get; set; } = string.Empty;
-        public int RefreshIntervalSeconds { get; set; }
-        public int UrgentCount { get; set; }
-        public int PendingCount { get; set; }
-        public int InProgressCount { get; set; }
-        public int DataAttentionCount { get; set; }
-        public int HiddenNoActionCount { get; set; }
-        public string ModeCode { get; set; } = string.Empty;
-    }
-
-    public sealed class 도심마트PriorityQueueSurfaceItem
-    {
-        public PresentationStableId StableId { get; set; }
-        public PresentationIdentityLineage Identity { get; set; } = null!;
-        public string PresentationRevision { get; set; } = string.Empty;
-        public string QueueCode { get; set; } = string.Empty;
-        public int PriorityScore { get; set; }
-        public string[] PriorityReasonCodes { get; set; } = Array.Empty<string>();
-        public string RuleRevision { get; set; } = string.Empty;
-        public string TitleText { get; set; } = string.Empty;
-        public string SummaryText { get; set; } = string.Empty;
-        public string ColorCode { get; set; } = string.Empty;
-        public bool IsFocused { get; set; }
-        public string[] AllowedInteractionIntentCodes { get; set; } = Array.Empty<string>();
     }
 
     public sealed class 도심마트ShelfSurfaceItem
@@ -310,6 +202,7 @@ namespace Ssalddel.Unity.UrbanMarket
         public string VisualStateCode { get; set; } = string.Empty;
         public string ColorCode { get; set; } = string.Empty;
         public bool IsHighlighted { get; set; }
+        public string[] AllowedInteractionIntentCodes { get; set; } = Array.Empty<string>();
     }
 
     public sealed class 도심마트TaskMarkerSurfaceItem
@@ -348,8 +241,6 @@ namespace Ssalddel.Unity.UrbanMarket
     public sealed class 도심마트PresentationSnapshot
     {
         public string PresentationRevision { get; set; } = string.Empty;
-        public 도심마트ManagerSummarySurface ManagerSummary { get; set; } = null!;
-        public 도심마트PriorityQueueSurfaceItem[] PriorityQueue { get; set; } = Array.Empty<도심마트PriorityQueueSurfaceItem>();
         public 도심마트ShelfSurfaceItem[] Shelves { get; set; } = Array.Empty<도심마트ShelfSurfaceItem>();
         public 도심마트TaskMarkerSurfaceItem[] TaskMarkers { get; set; } = Array.Empty<도심마트TaskMarkerSurfaceItem>();
         public 도심마트SourcePlanSurfaceItem[] SourcePlans { get; set; } = Array.Empty<도심마트SourcePlanSurfaceItem>();
@@ -358,12 +249,12 @@ namespace Ssalddel.Unity.UrbanMarket
 
     public sealed class 도심마트ManagerVisualPolicy
     {
-        public string Color(string queueCode)
+        public string Color(string needCode)
         {
-            if (queueCode == 마트관리자QueueCodes.DataAttention) return "Red";
-            if (queueCode == 마트관리자QueueCodes.UrgentActions) return "Orange";
-            if (queueCode == 마트관리자QueueCodes.PendingActions) return "Yellow";
-            if (queueCode == 마트관리자QueueCodes.InProgress) return "Blue";
+            if (needCode == 도심마트ReplenishmentNeedCodes.DataInsufficient) return "Red";
+            if (needCode == 도심마트ReplenishmentNeedCodes.InboundRequired) return "Orange";
+            if (needCode == 도심마트ReplenishmentNeedCodes.ReplenishmentCandidate) return "Yellow";
+            if (needCode == 도심마트ReplenishmentNeedCodes.TaskAlreadyActive) return "Blue";
             return "Green";
         }
 
@@ -385,7 +276,6 @@ namespace Ssalddel.Unity.UrbanMarket
         {
             if (perspective == null) throw new ArgumentNullException(nameof(perspective));
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var queue = perspective.ActionQueue;
             var products = perspective.SharedWorld.SharedWorld.Nodes
                 .OfType<도심마트운영상품WorldNode>()
                 .ToDictionary(value => value.StableId);
@@ -405,10 +295,8 @@ namespace Ssalddel.Unity.UrbanMarket
             return new 도심마트PresentationSnapshot
             {
                 PresentationRevision = revision,
-                ManagerSummary = Summary(perspective, context),
-                PriorityQueue = queue.Select(value => QueueSurface(value, products[value.ProductWorldId], perspective, context)).ToArray(),
-                Shelves = perspective.SharedWorld.Replenishments
-                    .Select(value => ShelfSurface(value, QueueForShelf(queue, value.ShelfWorldId), focus, perspective, context))
+                Shelves = perspective.ShelfStates
+                    .Select(value => ShelfSurface(value, focus, perspective, context))
                     .ToArray(),
                 TaskMarkers = tasks
                     .Where(value => value.TaskKindCode == 도심마트TaskKindCodes.ShelfReplenishment
@@ -416,97 +304,42 @@ namespace Ssalddel.Unity.UrbanMarket
                     .OrderBy(value => value.StableId)
                     .Select(value => TaskSurface(value, products[value.ProductWorldId], focus, perspective, context))
                     .ToArray(),
-                SourcePlans = queue
+                SourcePlans = perspective.ShelfStates
                     .SelectMany(value => value.SourcePlan.Select((segment, index) =>
                         SourcePlanSurface(value, segment, index, locations, perspective, context)))
                     .ToArray(),
-                Details = FocusedQueueItems(queue, perspective.Context.FocusWorldId)
+                Details = FocusedShelfStates(perspective.ShelfStates, perspective.Context.FocusWorldId)
                     .Select(value => DetailSurface(value, products[value.ProductWorldId], perspective, context))
                     .ToArray(),
             };
         }
 
-        private static 도심마트ManagerSummarySurface Summary(
-            마트관리자PerspectiveWorldState source,
-            도심마트ManagerPresentationContext context)
-        {
-            var id = new PresentationStableId("urban-market-manager-summary:" + source.SharedWorld.SharedWorld.StableId.Value);
-            return new 도심마트ManagerSummarySurface
-            {
-                StableId = id,
-                PresentationRevision = ItemRevision("summary", source, context,
-                    source.UrgentActions.Length.ToString(CultureInfo.InvariantCulture),
-                    source.PendingActions.Length.ToString(CultureInfo.InvariantCulture),
-                    source.InProgress.Length.ToString(CultureInfo.InvariantCulture),
-                    source.DataAttention.Length.ToString(CultureInfo.InvariantCulture),
-                    source.NoActionNeededCount.ToString(CultureInfo.InvariantCulture)),
-                SummaryText = "긴급 " + source.UrgentActions.Length
-                              + " · 대기 " + source.PendingActions.Length
-                              + " · 진행 " + source.InProgress.Length
-                              + " · Data 확인 " + source.DataAttention.Length,
-                RefreshIntervalSeconds = 30,
-                UrgentCount = source.UrgentActions.Length,
-                PendingCount = source.PendingActions.Length,
-                InProgressCount = source.InProgress.Length,
-                DataAttentionCount = source.DataAttention.Length,
-                HiddenNoActionCount = source.NoActionNeededCount,
-                ModeCode = source.Context.Mode.ToString(),
-            };
-        }
-
-        private 도심마트PriorityQueueSurfaceItem QueueSurface(
-            마트관리자업무QueueItem source,
-            도심마트운영상품WorldNode product,
-            마트관리자PerspectiveWorldState perspective,
-            도심마트ManagerPresentationContext context)
-        {
-            var id = new PresentationStableId("urban-market-manager-queue:" + source.ShelfWorldId.Value);
-            var focused = perspective.Context.FocusWorldId.HasValue
-                          && source.SourceWorldIds.Contains(perspective.Context.FocusWorldId.Value);
-            return new 도심마트PriorityQueueSurfaceItem
-            {
-                StableId = id,
-                Identity = new PresentationIdentityLineage(id, source.SourceWorldIds),
-                PresentationRevision = ItemRevision("queue", perspective, context,
-                    source.ShelfWorldId.Value, source.QueueCode, source.PriorityScore.ToString(CultureInfo.InvariantCulture),
-                    string.Join(",", source.PriorityReasonCodes), source.RuleRevision, focused.ToString()),
-                QueueCode = source.QueueCode,
-                PriorityScore = source.PriorityScore,
-                PriorityReasonCodes = source.PriorityReasonCodes,
-                RuleRevision = source.RuleRevision,
-                TitleText = product.상품명 + " 진열",
-                SummaryText = source.DisplayQuantity + "/" + source.TargetQuantity + " " + source.QuantityUnit
-                              + (source.CandidateQuantity > 0 ? " · 보충 " + source.CandidateQuantity : string.Empty),
-                ColorCode = visualPolicy.Color(source.QueueCode),
-                IsFocused = focused,
-                AllowedInteractionIntentCodes = source.AllowedInteractionIntentCodes,
-            };
-        }
-
         private 도심마트ShelfSurfaceItem ShelfSurface(
-            도심마트진열보충WorldState source,
-            마트관리자업무QueueItem? queue,
+            마트관리자진열상태 source,
             ISet<WorldStableId> focus,
             마트관리자PerspectiveWorldState perspective,
             도심마트ManagerPresentationContext context)
         {
             var id = new PresentationStableId("urban-market-shelf:" + source.ShelfWorldId.Value);
-            var queueCode = queue?.QueueCode ?? 마트관리자QueueCodes.NoActionNeeded;
             var highlighted = focus.Contains(source.ShelfWorldId) || focus.Contains(source.ProductWorldId);
-            var lineage = source.SourceWorldIds.Append(source.ShelfWorldId).Append(source.ProductWorldId).Distinct().ToArray();
             return new 도심마트ShelfSurfaceItem
             {
                 StableId = id,
                 ShelfWorldId = source.ShelfWorldId,
-                Identity = new PresentationIdentityLineage(id, lineage),
+                Identity = new PresentationIdentityLineage(id, source.SourceWorldIds),
                 PresentationRevision = ItemRevision("shelf", perspective, context,
-                    source.ShelfWorldId.Value, source.DisplayQuantity.ToString(CultureInfo.InvariantCulture),
-                    source.DisplayCapacity.ToString(CultureInfo.InvariantCulture), queueCode, highlighted.ToString()),
+                    source.ShelfWorldId.Value,
+                    source.DisplayQuantity.ToString(CultureInfo.InvariantCulture),
+                    source.DisplayCapacity.ToString(CultureInfo.InvariantCulture),
+                    source.NeedCode,
+                    string.Join(",", source.BlockReasonCodes),
+                    highlighted.ToString()),
                 DisplayBoxCount = visualPolicy.DisplayBoxCount(source.DisplayQuantity),
                 QuantityText = source.DisplayQuantity + "/" + source.DisplayCapacity + " " + source.QuantityUnit,
-                VisualStateCode = queueCode,
-                ColorCode = visualPolicy.Color(queueCode),
+                VisualStateCode = source.NeedCode,
+                ColorCode = visualPolicy.Color(source.NeedCode),
                 IsHighlighted = highlighted,
+                AllowedInteractionIntentCodes = source.AllowedInteractionIntentCodes,
             };
         }
 
@@ -525,7 +358,10 @@ namespace Ssalddel.Unity.UrbanMarket
                 StableId = id,
                 Identity = new PresentationIdentityLineage(id, lineage),
                 PresentationRevision = ItemRevision("task", perspective, context,
-                    source.StableId.Value, source.StateCode, source.Quantity.ToString(CultureInfo.InvariantCulture), highlighted.ToString()),
+                    source.StableId.Value,
+                    source.StateCode,
+                    source.Quantity.ToString(CultureInfo.InvariantCulture),
+                    highlighted.ToString()),
                 StateCode = source.StateCode,
                 LabelText = product.상품명 + " " + source.Quantity + " " + source.QuantityUnit,
                 IsHighlighted = highlighted,
@@ -533,33 +369,35 @@ namespace Ssalddel.Unity.UrbanMarket
         }
 
         private static 도심마트SourcePlanSurfaceItem SourcePlanSurface(
-            마트관리자업무QueueItem queue,
+            마트관리자진열상태 shelfState,
             도심마트진열보충SourcePlanSegment source,
             int index,
             IReadOnlyDictionary<WorldStableId, 도심마트위치WorldNode> locations,
             마트관리자PerspectiveWorldState perspective,
             도심마트ManagerPresentationContext context)
         {
-            var id = new PresentationStableId("urban-market-source-plan:" + queue.ShelfWorldId.Value + ":" + source.InventoryWorldId.Value);
-            var lineage = new[] { queue.ShelfWorldId, queue.ProductWorldId, source.InventoryWorldId, source.LocationWorldId };
+            var id = new PresentationStableId("urban-market-source-plan:" + shelfState.ShelfWorldId.Value + ":" + source.InventoryWorldId.Value);
+            var lineage = new[] { shelfState.ShelfWorldId, shelfState.ProductWorldId, source.InventoryWorldId, source.LocationWorldId };
             return new 도심마트SourcePlanSurfaceItem
             {
                 StableId = id,
                 Identity = new PresentationIdentityLineage(id, lineage),
                 PresentationRevision = ItemRevision("source-plan", perspective, context,
-                    queue.ShelfWorldId.Value, source.InventoryWorldId.Value,
-                    source.Quantity.ToString(CultureInfo.InvariantCulture), source.QuantityUnit),
+                    shelfState.ShelfWorldId.Value,
+                    source.InventoryWorldId.Value,
+                    source.Quantity.ToString(CultureInfo.InvariantCulture),
+                    source.QuantityUnit),
                 Sequence = index + 1,
                 QuantityText = source.Quantity + " " + source.QuantityUnit,
                 FromLabelText = locations.TryGetValue(source.LocationWorldId, out var location)
                     ? location.이름
                     : source.LocationWorldId.Value,
-                ToLabelText = queue.ShelfWorldId.Value,
+                ToLabelText = shelfState.ShelfWorldId.Value,
             };
         }
 
         private static 도심마트DetailPanelSurfaceItem DetailSurface(
-            마트관리자업무QueueItem source,
+            마트관리자진열상태 source,
             도심마트운영상품WorldNode product,
             마트관리자PerspectiveWorldState perspective,
             도심마트ManagerPresentationContext context)
@@ -570,26 +408,24 @@ namespace Ssalddel.Unity.UrbanMarket
                 StableId = id,
                 Identity = new PresentationIdentityLineage(id, source.SourceWorldIds),
                 PresentationRevision = ItemRevision("detail", perspective, context,
-                    source.ShelfWorldId.Value, source.QueueCode, string.Join(",", source.PriorityReasonCodes), source.RuleRevision),
+                    source.ShelfWorldId.Value,
+                    source.NeedCode,
+                    string.Join(",", source.BlockReasonCodes),
+                    source.RuleRevision),
                 TitleText = product.상품명 + " 진열 상세",
                 QuantityText = "진열 " + source.DisplayQuantity + "/목표 " + source.TargetQuantity + " " + source.QuantityUnit,
-                ReasonText = string.Join(", ", source.PriorityReasonCodes),
+                ReasonText = string.Join(", ", source.BlockReasonCodes),
                 RuleText = source.RuleRevision,
                 BoundaryText = "후보와 표시만 제공하며 서버 재고·작업을 변경하지 않습니다.",
             };
         }
 
-        private static 마트관리자업무QueueItem? QueueForShelf(
-            IEnumerable<마트관리자업무QueueItem> queue,
-            WorldStableId shelfWorldId)
-            => queue.FirstOrDefault(value => value.ShelfWorldId == shelfWorldId);
-
-        private static IEnumerable<마트관리자업무QueueItem> FocusedQueueItems(
-            IEnumerable<마트관리자업무QueueItem> queue,
+        private static IEnumerable<마트관리자진열상태> FocusedShelfStates(
+            IEnumerable<마트관리자진열상태> states,
             WorldStableId? focusWorldId)
         {
-            if (!focusWorldId.HasValue) return Array.Empty<마트관리자업무QueueItem>();
-            var items = queue.ToArray();
+            if (!focusWorldId.HasValue) return Array.Empty<마트관리자진열상태>();
+            var items = states.ToArray();
             var direct = items.Where(value => value.ShelfWorldId == focusWorldId.Value
                                               || value.ProductWorldId == focusWorldId.Value)
                 .ToArray();

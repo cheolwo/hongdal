@@ -11,8 +11,6 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
     public sealed class 도심마트ManagerSurfaceView : MonoBehaviour
     {
         [SerializeField] private TextMesh statusText = null!;
-        [SerializeField] private TextMesh summaryText = null!;
-        [SerializeField] private TextMesh queueText = null!;
         [SerializeField] private TextMesh taskText = null!;
         [SerializeField] private TextMesh sourcePlanText = null!;
         [SerializeField] private TextMesh detailText = null!;
@@ -24,16 +22,12 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
 
         public void Configure(
             TextMesh status,
-            TextMesh summary,
-            TextMesh queue,
             TextMesh tasks,
             TextMesh sourcePlans,
             TextMesh details,
             도심마트ManagerShelfView[] shelves)
         {
             statusText = status;
-            summaryText = summary;
-            queueText = queue;
             taskText = tasks;
             sourcePlanText = sourcePlans;
             detailText = details;
@@ -56,13 +50,6 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
             if (result.Changes == null) return;
 
             var presentation = result.Presentation;
-            if (result.Changes.ManagerSummary.Added.Length > 0
-                || result.Changes.ManagerSummary.Updated.Length > 0)
-                summaryText.text = presentation.ManagerSummary.SummaryText;
-
-            if (Changed(result.Changes.PriorityQueue))
-                queueText.text = Join(presentation.PriorityQueue.Select(value =>
-                    value.TitleText + "\n" + value.SummaryText + " · " + string.Join(", ", value.PriorityReasonCodes)));
             if (Changed(result.Changes.TaskMarkers))
                 taskText.text = Join(presentation.TaskMarkers.Select(value => value.LabelText + " · " + value.StateCode));
             if (Changed(result.Changes.SourcePlans))
@@ -77,8 +64,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
 
         public bool ValidateWiring()
         {
-            if (statusText == null || summaryText == null || queueText == null
-                || taskText == null || sourcePlanText == null || detailText == null
+            if (statusText == null || taskText == null || sourcePlanText == null || detailText == null
                 || shelfViews == null || shelfViews.Length == 0)
                 return false;
             if (shelfViews.Any(value => value == null || !value.ValidateWiring())) return false;
@@ -108,8 +94,6 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
 
         private void ClearAll()
         {
-            summaryText.text = string.Empty;
-            queueText.text = string.Empty;
             taskText.text = string.Empty;
             sourcePlanText.text = string.Empty;
             detailText.text = string.Empty;

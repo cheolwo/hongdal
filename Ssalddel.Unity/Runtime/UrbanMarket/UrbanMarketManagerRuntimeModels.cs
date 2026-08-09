@@ -21,8 +21,6 @@ namespace Ssalddel.Unity.UrbanMarket
 
     public sealed class 도심마트ManagerSurfaceChangeSet
     {
-        public StableIdChangeSet<도심마트ManagerSummarySurface> ManagerSummary { get; set; } = new StableIdChangeSet<도심마트ManagerSummarySurface>();
-        public StableIdChangeSet<도심마트PriorityQueueSurfaceItem> PriorityQueue { get; set; } = new StableIdChangeSet<도심마트PriorityQueueSurfaceItem>();
         public StableIdChangeSet<도심마트ShelfSurfaceItem> Shelves { get; set; } = new StableIdChangeSet<도심마트ShelfSurfaceItem>();
         public StableIdChangeSet<도심마트TaskMarkerSurfaceItem> TaskMarkers { get; set; } = new StableIdChangeSet<도심마트TaskMarkerSurfaceItem>();
         public StableIdChangeSet<도심마트SourcePlanSurfaceItem> SourcePlans { get; set; } = new StableIdChangeSet<도심마트SourcePlanSurfaceItem>();
@@ -50,18 +48,6 @@ namespace Ssalddel.Unity.UrbanMarket
             if (incoming == null) throw new ArgumentNullException(nameof(incoming));
             return new 도심마트ManagerSurfaceChangeSet
             {
-                ManagerSummary = Reconcile(
-                    current?.ManagerSummary == null
-                        ? Array.Empty<도심마트ManagerSummarySurface>()
-                        : new[] { current.ManagerSummary },
-                    new[] { incoming.ManagerSummary },
-                    value => value.StableId.Value,
-                    value => value.PresentationRevision),
-                PriorityQueue = Reconcile(
-                    current?.PriorityQueue ?? Array.Empty<도심마트PriorityQueueSurfaceItem>(),
-                    incoming.PriorityQueue,
-                    value => value.StableId.Value,
-                    value => value.PresentationRevision),
                 Shelves = Reconcile(
                     current?.Shelves ?? Array.Empty<도심마트ShelfSurfaceItem>(),
                     incoming.Shelves,

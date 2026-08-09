@@ -40,7 +40,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
             shelfWorldId = surface.ShelfWorldId;
             selected = onSelected ?? throw new ArgumentNullException(nameof(onSelected));
             quantityText.text = surface.QuantityText;
-            shelfRenderer.material.color = ColorToken(surface.ColorCode, surface.IsHighlighted);
+            ApplyColor(shelfRenderer, ColorToken(surface.ColorCode, surface.IsHighlighted));
             for (var index = 0; index < displayBoxes.Length; index++)
                 displayBoxes[index].SetActive(index < surface.DisplayBoxCount);
             selectionSocket.Selected -= HandleSelected;
@@ -81,6 +81,18 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
                 default: color = Color.gray; break;
             }
             return highlighted ? Color.Lerp(color, Color.white, 0.35f) : color;
+        }
+
+        private static void ApplyColor(Renderer target, Color color)
+        {
+            var block = new MaterialPropertyBlock();
+            target.GetPropertyBlock(block);
+            var material = target.sharedMaterial;
+            if (material != null && material.HasProperty("_BaseColor"))
+                block.SetColor("_BaseColor", color);
+            else
+                block.SetColor("_Color", color);
+            target.SetPropertyBlock(block);
         }
     }
 }

@@ -4,6 +4,7 @@
   "references": [
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.UrbanMarket.Sample",
+    "Unity.AI.Navigation",
     "VContainer",
     "VContainer.Unity"
   ],

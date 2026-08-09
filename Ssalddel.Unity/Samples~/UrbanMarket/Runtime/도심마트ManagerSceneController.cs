@@ -59,7 +59,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
             var result = await runtime.RefreshAsync(configuration.DataContext, lifetime.Token);
             view.Apply(result);
             nextRefreshAt = Time.unscaledTime
-                            + Math.Max(1, result.Presentation?.ManagerSummary.RefreshIntervalSeconds ?? 30);
+                            + configuration.RefreshIntervalSeconds;
         }
 
         private void HandleShelfSelected(WorldStableId shelfWorldId)

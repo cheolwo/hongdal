@@ -30,6 +30,8 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
         [SerializeField] private NavMeshAgent movementAgent = null!;
         [SerializeField] private Animator animator = null!;
         [SerializeField] private TextMesh dialogueText = null!;
+        [SerializeField] private GameObject visualRoot = null!;
+        [SerializeField] private Collider selectionCollider = null!;
         [SerializeField] private 공동주택대표WaypointBinding[] waypoints =
             Array.Empty<공동주택대표WaypointBinding>();
         [SerializeField] private 공동주택대표ActionBinding[] actions =
@@ -39,7 +41,30 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
         private NpcMovementPresentationModel? current;
         private bool arrivalApplied;
 
+        public event Action<string>? Selected;
+
         public string NpcStableId => npcStableId;
+        public GameObject VisualRoot => visualRoot;
+
+        public void Configure(
+            string stableId,
+            NavMeshAgent agent,
+            Animator targetAnimator,
+            TextMesh dialogue,
+            GameObject visual,
+            Collider collider,
+            공동주택대표WaypointBinding[] waypointBindings,
+            공동주택대표ActionBinding[] actionBindings)
+        {
+            npcStableId = stableId?.Trim() ?? string.Empty;
+            movementAgent = agent;
+            animator = targetAnimator;
+            dialogueText = dialogue;
+            visualRoot = visual;
+            selectionCollider = collider;
+            waypoints = waypointBindings ?? Array.Empty<공동주택대표WaypointBinding>();
+            actions = actionBindings ?? Array.Empty<공동주택대표ActionBinding>();
+        }
 
         public void ApplyMovementPresentation(NpcMovementPresentationModel model)
         {
@@ -68,9 +93,12 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
 
         public bool ValidateWiring()
             => !string.IsNullOrWhiteSpace(npcStableId) && movementAgent != null
-                && animator != null && dialogueText != null && waypoints.Length > 0
+                && animator != null && dialogueText != null && visualRoot != null
+                && selectionCollider != null && waypoints.Length > 0
                 && waypoints.All(value => value != null
                     && !string.IsNullOrWhiteSpace(value.WaypointKey) && value.Target != null);
+
+        private void OnMouseDown() => Selected?.Invoke(npcStableId);
 
         private void Update()
         {

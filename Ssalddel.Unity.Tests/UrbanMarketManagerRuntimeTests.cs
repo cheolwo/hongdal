@@ -8,7 +8,7 @@ namespace Ssalddel.Unity.Tests;
 public sealed class UrbanMarketManagerRuntimeTests
 {
     [Fact]
-    public async Task 첫Refresh는_모든ManagerSurface를Added로반환한다()
+    public async Task 첫Refresh는_Queue없이_진열작업계획Surface를Added로반환한다()
     {
         var fixture = await Fixture.CreateAsync();
 
@@ -16,9 +16,7 @@ public sealed class UrbanMarketManagerRuntimeTests
 
         Assert.Equal(ZoneRuntimeStateCode.Ready, result.Status.StateCode);
         Assert.NotNull(result.Presentation);
-        Assert.Single(result.Changes!.ManagerSummary.Added);
-        Assert.Equal(result.Presentation!.PriorityQueue.Length, result.Changes.PriorityQueue.Added.Length);
-        Assert.Equal(result.Presentation.Shelves.Length, result.Changes.Shelves.Added.Length);
+        Assert.Equal(result.Presentation!.Shelves.Length, result.Changes!.Shelves.Added.Length);
         Assert.Equal(result.Presentation.TaskMarkers.Length, result.Changes.TaskMarkers.Added.Length);
         Assert.Equal(result.Presentation.SourcePlans.Length, result.Changes.SourcePlans.Added.Length);
         Assert.Empty(result.Changes.Details.Added);

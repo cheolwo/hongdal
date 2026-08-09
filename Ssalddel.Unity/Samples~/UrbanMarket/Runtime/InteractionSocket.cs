@@ -20,12 +20,15 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
             return interactionCollider != null;
         }
 
-        private void OnMouseDown()
+        public void SelectForTests()
         {
             if (interactionCollider != null && interactionCollider.enabled)
-            {
                 Selected?.Invoke();
-            }
+        }
+
+        private void OnMouseDown()
+        {
+            SelectForTests();
         }
     }
 }

@@ -87,6 +87,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
             builder.Register<도심마트ManagerVisualPolicy>(Lifetime.Scoped);
             builder.Register<도심마트PresentationProjector>(Lifetime.Scoped);
             builder.Register<도심마트PresentationChangeSetCalculator>(Lifetime.Scoped);
+            builder.RegisterInstance(new 도심마트ManagerPresentationContext());
             builder.Register<SelectionStateStore>(Lifetime.Scoped);
             builder.Register<도심마트ManagerRuntime>(Lifetime.Scoped);
             builder.RegisterComponentInHierarchy<도심마트ManagerSurfaceView>();
@@ -113,9 +114,15 @@ namespace Ssalddel.Unity.Samples.UrbanMarket
 
     public sealed class 도심마트ManagerRuntimeConfiguration
     {
-        public 도심마트ManagerRuntimeConfiguration(WorldDataQueryContext dataContext)
-            => DataContext = dataContext ?? throw new ArgumentNullException(nameof(dataContext));
+        public 도심마트ManagerRuntimeConfiguration(
+            WorldDataQueryContext dataContext,
+            int refreshIntervalSeconds = 30)
+        {
+            DataContext = dataContext ?? throw new ArgumentNullException(nameof(dataContext));
+            RefreshIntervalSeconds = Math.Max(1, refreshIntervalSeconds);
+        }
 
         public WorldDataQueryContext DataContext { get; }
+        public int RefreshIntervalSeconds { get; }
     }
 }
