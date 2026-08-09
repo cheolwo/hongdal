@@ -218,6 +218,40 @@ namespace Ssalddel.Unity.Npcs
     public sealed class NpcMovementApplicator
     {
         public string[] Apply(
+            IReadOnlyList<NpcMovementPresentationModel> models,
+            IReadOnlyList<INpcMovementPresentationTarget> targets)
+        {
+            if (models == null) throw new ArgumentNullException(nameof(models));
+            if (targets == null) throw new ArgumentNullException(nameof(targets));
+
+            var targetMap = new Dictionary<string, INpcMovementPresentationTarget>(StringComparer.Ordinal);
+            foreach (var target in targets)
+            {
+                if (target == null || !StableDataId.IsValid(target.NpcStableId))
+                    throw new InvalidOperationException("NpcMovementPresentationTargetInvalid");
+                if (!targetMap.TryAdd(target.NpcStableId, target))
+                    throw new InvalidOperationException("DuplicateNpcMovementPresentationTarget:" + target.NpcStableId);
+            }
+
+            var unresolved = new List<string>();
+            var appliedNpcIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var model in models)
+            {
+                if (model == null) throw new InvalidOperationException("NpcMovementPresentationMissing");
+                if (!appliedNpcIds.Add(model.NpcStableId))
+                    throw new InvalidOperationException("DuplicateNpcMovementPresentation:" + model.NpcStableId);
+
+                if (targetMap.TryGetValue(model.NpcStableId, out var target))
+                    target.ApplyMovementPresentation(model);
+                else
+                    unresolved.Add(model.NpcStableId);
+            }
+
+            return unresolved.OrderBy(value => value, StringComparer.Ordinal).ToArray();
+        }
+
+        /// <summary>DIP4 이전 Snapshot 기반 target을 위한 호환 경로입니다.</summary>
+        public string[] Apply(
             IReadOnlyList<NpcMovementSnapshot> snapshots,
             IReadOnlyList<INpcMovementTarget> targets)
         {

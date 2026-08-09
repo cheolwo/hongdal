@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 {
-    public sealed class LogisticsInteractionPanelView : MonoBehaviour, IRoleInteractionSink
+    public sealed class LogisticsInteractionPanelView : MonoBehaviour, IRoleInteractionSink, IRolePresentationInteractionSink
     {
         [SerializeField]
         private TextMesh interactionText = null!;
@@ -16,6 +16,20 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
         }
 
         public void ReplaceAllowedInteractions(IReadOnlyList<역할허용Interaction> interactions)
+        {
+            var builder = new StringBuilder("TRANSPORTER ACTIONS");
+            foreach (var interaction in interactions)
+            {
+                builder.Append('\n')
+                    .Append(interaction.InteractionCode)
+                    .Append(" · ")
+                    .Append(interaction.EffectCode);
+            }
+
+            interactionText.text = builder.ToString();
+        }
+
+        public void ReplaceAllowedInteractions(IReadOnlyList<RoleInteractionPresentationModel> interactions)
         {
             var builder = new StringBuilder("TRANSPORTER ACTIONS");
             foreach (var interaction in interactions)

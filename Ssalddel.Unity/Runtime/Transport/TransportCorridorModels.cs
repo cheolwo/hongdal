@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace Ssalddel.Unity.Transport
         public long Revision { get; set; }
         public TruckMovementSnapshot Truck { get; set; } = null!;
         public DateTimeOffset GeneratedAt { get; set; }
+        public InterpretationLineage Lineage { get; set; } = null!;
     }
 
     public sealed class TransportCorridorProjector
@@ -45,11 +47,33 @@ namespace Ssalddel.Unity.Transport
             if (!string.Equals(movement.MovementStateCode, NpcMovementStateCodes.Moving, StringComparison.Ordinal))
                 throw new InvalidOperationException("TransportCorridorMovementStateInvalid");
 
+            var inputs = new DataRevisionSet(new[]
+            {
+                new DataRevisionReference(
+                    handoff.StableId,
+                    handoff.Revision.ToString(CultureInfo.InvariantCulture),
+                    handoff.GeneratedAt),
+                new DataRevisionReference(
+                    movement.StableId,
+                    movement.Revision.ToString(CultureInfo.InvariantCulture),
+                    movement.GeneratedAt),
+            });
+            var interpretationRevision = WorldDataFlowRevisionCalculator.CalculateInterpretation(
+                inputs,
+                TransportCorridorPresentationVersions.InterpreterContract,
+                TransportCorridorPresentationVersions.RuleSet,
+                movement.RouteCode + "|" + movement.CurrentWaypointKey + "|" + movement.DestinationWaypointKey);
+
             return new TransportCorridorSnapshot
             {
                 StableId = "transport-corridor:" + handoff.CargoStableId,
                 Revision = handoff.Revision,
                 GeneratedAt = handoff.GeneratedAt,
+                Lineage = new InterpretationLineage(
+                    inputs,
+                    TransportCorridorPresentationVersions.InterpreterContract,
+                    TransportCorridorPresentationVersions.RuleSet,
+                    interpretationRevision),
                 Truck = new TruckMovementSnapshot
                 {
                     StableId = "truck-projection:" + handoff.CargoStableId,
@@ -86,6 +110,21 @@ namespace Ssalddel.Unity.Transport
     public sealed class TruckMovementApplicator
     {
         private long lastRevision = -1;
+
+        public bool Apply(
+            TruckMovementPresentationModel model,
+            ITruckMovementPresentationTarget target)
+        {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (target == null || !string.Equals(target.TruckStableId, model.TruckStableId, StringComparison.Ordinal))
+                throw new InvalidOperationException("TruckMovementPresentationTargetMismatch");
+            if (model.DataRevision < lastRevision) return false;
+            target.ApplyTruckMovementPresentation(model);
+            lastRevision = model.DataRevision;
+            return true;
+        }
+
+        /// <summary>DIP4 이전 Snapshot 기반 target을 위한 호환 경로입니다.</summary>
         public bool Apply(TransportCorridorSnapshot snapshot, ITruckMovementTarget target)
         {
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));

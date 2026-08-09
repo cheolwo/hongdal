@@ -1,5 +1,6 @@
 using System;
 using Ssalddel.Unity.Warehouse;
+using Ssalddel.Unity.Npcs;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -18,8 +19,12 @@ namespace Ssalddel.Unity.Samples.WarehouseWorld
                 builder.Register<OperationalWarehouseWorldApiClient>(Lifetime.Scoped).As<IWarehouseWorldApiClient>();
             }
             else builder.Register<SimulatedWarehouseWorldApiClient>(Lifetime.Scoped).As<IWarehouseWorldApiClient>();
-            builder.Register<WarehouseWorldMapper>(Lifetime.Scoped); builder.Register<WarehouseWorldApiRepository>(Lifetime.Scoped).As<IWarehouseWorldRepository>();
+            builder.Register<NpcMovementMapper>(Lifetime.Scoped); builder.Register<CargoWarehouseHandoffMapper>(Lifetime.Scoped);
+            builder.Register<WarehouseDataMapper>(Lifetime.Scoped); builder.Register<WarehouseApiDataRepository>(Lifetime.Scoped).As<IWarehouseDataRepository>();
+            builder.Register<WarehouseInboundHandoffInterpreter>(Lifetime.Scoped); builder.Register<WarehouseWorldInterpreter>(Lifetime.Scoped); builder.Register<WarehouseWorldMapper>(Lifetime.Scoped); builder.Register<WarehouseWorldApiRepository>(Lifetime.Scoped).As<IWarehouseWorldRepository>();
             builder.Register<WarehouseWorldQueryUseCase>(Lifetime.Scoped); builder.Register<WarehouseWorldReconciler>(Lifetime.Scoped); builder.Register<WarehouseWorldLoadCoordinator>(Lifetime.Scoped);
+            builder.Register<WarehouseLocationResolver>(Lifetime.Scoped); builder.Register<WarehouseRelationResolver>(Lifetime.Scoped); builder.Register<WarehousePresenter>(Lifetime.Scoped);
+            builder.Register<WarehouseLocationCatalog>(Lifetime.Scoped); builder.Register<WarehouseWorldSelectionService>(Lifetime.Scoped);
             builder.RegisterComponentInHierarchy<WarehouseWorldView>(); builder.RegisterComponentInHierarchy<WarehouseWorldSceneController>();
         }
         public void ConfigureSimulation() => useOperationalApi = false;

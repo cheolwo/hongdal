@@ -1,0 +1,19 @@
+{
+  "name": "Ssalddel.Unity.ResidentialPickup.Sample.Editor",
+  "rootNamespace": "Ssalddel.Unity.Samples.ResidentialPickup.Editor",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.ResidentialPickup.Sample",
+    "VContainer",
+    "VContainer.Unity"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

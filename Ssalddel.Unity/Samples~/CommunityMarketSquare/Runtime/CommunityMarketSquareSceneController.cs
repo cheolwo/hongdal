@@ -10,14 +10,18 @@ namespace Ssalddel.Unity.Samples.CommunityMarketSquare
     public sealed class CommunityMarketSquareSceneController : MonoBehaviour
     {
         [SerializeField] private CommunityMarketSquareView squareView = null!;
-        private CommunityMarketSquareLoadCoordinator coordinator = null!;
+        private CommunitySquareDataFlowLoadCoordinator coordinator = null!;
+        private CommunitySquarePresenter presenter = null!;
         private CancellationTokenSource lifetime = null!;
         private Task? inFlight;
 
         [Inject]
-        public void Construct(CommunityMarketSquareLoadCoordinator loadCoordinator, CommunityMarketSquareView view)
+        public void Construct(
+            CommunitySquareDataFlowLoadCoordinator loadCoordinator,
+            CommunitySquarePresenter squarePresenter,
+            CommunityMarketSquareView view)
         {
-            coordinator = loadCoordinator; squareView = view;
+            coordinator = loadCoordinator; presenter = squarePresenter; squareView = view;
         }
 
         private void Awake() => lifetime = new CancellationTokenSource();
@@ -39,7 +43,7 @@ namespace Ssalddel.Unity.Samples.CommunityMarketSquare
             squareView.ShowState(squareView.ItemCount == 0
                 ? CommunityMarketSquareLoadStateCodes.Loading
                 : CommunityMarketSquareLoadStateCodes.Refreshing);
-            squareView.Render(await coordinator.LoadAsync(lifetime.Token));
+            squareView.Render(presenter.Present(await coordinator.LoadAsync(lifetime.Token)));
         }
 
         private void OnDestroy()

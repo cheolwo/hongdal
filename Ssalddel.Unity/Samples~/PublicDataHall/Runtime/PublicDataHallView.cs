@@ -41,30 +41,63 @@ namespace Ssalddel.Unity.Samples.PublicDataHall
             statusLabel.text = stateCode + (string.IsNullOrWhiteSpace(message) ? string.Empty : "\n" + message);
         }
 
-        public void Render(PublicDataHallLoadResult result)
+        public void Apply(PublicDataHallSurfaceChangeSet changes)
         {
-            if (result == null)
+            if (changes == null)
             {
-                throw new ArgumentNullException(nameof(result));
+                throw new ArgumentNullException(nameof(changes));
             }
 
-            if (result.Changes != null)
+            foreach (var removed in changes.Markers.Removed)
             {
-                foreach (var observation in result.Changes.Removed)
+                var stableId = removed.StableId.Value;
+                if (markers.TryGetValue(stableId, out var marker))
                 {
-                    if (markers.TryGetValue(observation.StableId, out var marker))
+                    markers.Remove(stableId);
+                    Destroy(marker.gameObject);
+                }
+            }
+
+            foreach (var observation in changes.Markers.Updated)
+            {
+                RenderExisting(observation);
+            }
+
+            foreach (var observation in changes.Markers.Added)
+            {
+                var stableId = observation.StableId.Value;
+                var marker = Instantiate(markerTemplate, markerRoot);
+                marker.name = "Observation_" + stableId.Replace(':', '_');
+                markers.Add(stableId, marker);
+                marker.Render(observation, Project(observation.Latitude, observation.Longitude));
+            }
+        }
+
+        [Obsolete("Use Apply(PublicDataHallSurfaceChangeSet).")]
+        public void Render(PublicDataHallPresentationModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (model.Changes != null)
+            {
+                foreach (var stableId in model.Changes.RemovedStableIds)
+                {
+                    if (markers.TryGetValue(stableId, out var marker))
                     {
-                        markers.Remove(observation.StableId);
+                        markers.Remove(stableId);
                         Destroy(marker.gameObject);
                     }
                 }
 
-                foreach (var observation in result.Changes.Updated)
+                foreach (var observation in model.Changes.Updated)
                 {
                     RenderExisting(observation);
                 }
 
-                foreach (var observation in result.Changes.Added)
+                foreach (var observation in model.Changes.Added)
                 {
                     var marker = Instantiate(markerTemplate, markerRoot);
                     marker.name = "Observation_" + observation.StableId.Replace(':', '_');
@@ -73,11 +106,7 @@ namespace Ssalddel.Unity.Samples.PublicDataHall
                 }
             }
 
-            var count = result.Snapshot?.Observations.Length ?? 0;
-            var message = result.Error == null
-                ? count + " observations"
-                : "마지막 성공 데이터 유지 · " + result.Error.GetType().Name;
-            ShowState(result.StateCode, message);
+            ShowState(model.StateCode, model.StatusMessage);
         }
 
         public bool ValidateWiring()
@@ -90,7 +119,18 @@ namespace Ssalddel.Unity.Samples.PublicDataHall
                 && worldSize.y > 0f;
         }
 
-        private void RenderExisting(PublicWorldMapObservation observation)
+        private void RenderExisting(PublicMapMarkerPresentationItem observation)
+        {
+            var stableId = observation.StableId.Value;
+            if (!markers.TryGetValue(stableId, out var marker))
+            {
+                throw new InvalidOperationException("PublicObservationMarkerMissing:" + stableId);
+            }
+
+            marker.Render(observation, Project(observation.Latitude, observation.Longitude));
+        }
+
+        private void RenderExisting(PublicObservationPresentationModel observation)
         {
             if (!markers.TryGetValue(observation.StableId, out var marker))
             {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ssalddel.Unity.Data;
+using Ssalddel.Unity.PresentationContracts.Reconciliation;
 
 namespace Ssalddel.Unity.Community
 {
@@ -107,79 +108,13 @@ namespace Ssalddel.Unity.Community
         public string Revision { get; set; } = string.Empty;
         public DateTimeOffset GeneratedAtUtc { get; set; }
         public CommunitySquareWorldItem[] Items { get; set; } = Array.Empty<CommunitySquareWorldItem>();
+        public InterpretationLineage? Lineage { get; set; }
     }
 
     public sealed class CommunityMarketSquareMapper
     {
         public CommunityMarketSquareSnapshot Map(CommunityMarketSquareSnapshotApiModel source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            RequireStableId(source.StableId);
-            Require(source.Revision, "CommunitySquareRevisionMissing");
-            if (source.GeneratedAtUtc == default) throw new InvalidOperationException("CommunitySquareGeneratedAtMissing");
-            if (source.Boards == null || source.Posts == null || source.ActivitySignals == null || source.Ledgers == null)
-                throw new InvalidOperationException("CommunitySquareCollectionsMissing");
-
-            RejectNullOrDuplicate(source.Boards.Select(item => item?.StableId), "CommunitySquareBoard");
-            RejectNullOrDuplicate(source.Posts.Select(item => item?.StableId), "CommunitySquarePost");
-            RejectNullOrDuplicate(source.ActivitySignals.Select(item => item?.StableId), "CommunitySquareActivity");
-            RejectNullOrDuplicate(source.Ledgers.Select(item => item?.StableId), "CommunitySquareLedger");
-
-            var postIds = new HashSet<string>(source.Posts.Select(item => item.StableId), StringComparer.Ordinal);
-            foreach (var ledger in source.Ledgers)
-            {
-                if (!postIds.Contains(ledger.SourcePostStableId))
-                    throw new InvalidOperationException("CommunitySquareLedgerPostUnknown:" + ledger.StableId);
-                if (!ledger.DetailAvailable && !string.IsNullOrWhiteSpace(ledger.DetailHref))
-                    throw new InvalidOperationException("CommunitySquareLedgerDetailScopeInvalid:" + ledger.StableId);
-            }
-
-            var items = source.Boards.Select(item => Item(item.StableId, "Board", item.DisplayName, item.Description, item.PostingAccessCode, string.Empty, item.PostCount, item.LatestPostAtUtc))
-                .Concat(source.Posts.Select(item => Item(item.StableId, "Post", item.Title, item.Excerpt, item.Category, item.DetailHref, item.CommentCount, item.PublishedAtUtc)))
-                .Concat(source.ActivitySignals.Select(item => Item(item.StableId, "Activity", item.Title, item.Summary, item.ActivityKind, string.Empty, item.AggregationCount, item.OccurredAtUtc)))
-                .Concat(source.Ledgers.Select(item => Item(item.StableId, "Ledger", item.Title, item.TemplateName, item.State + "/" + item.CurrentStage, item.DetailAvailable ? item.DetailHref : string.Empty, 0, null)))
-                .ToArray();
-            RejectNullOrDuplicate(items.Select(item => item.StableId), "CommunitySquareWorldItem");
-
-            return new CommunityMarketSquareSnapshot
-            {
-                StableId = source.StableId.Trim(),
-                Revision = source.Revision.Trim(),
-                GeneratedAtUtc = source.GeneratedAtUtc,
-                Items = items,
-            };
-        }
-
-        private static CommunitySquareWorldItem Item(string id, string kind, string title, string summary, string status, string href, int count, DateTimeOffset? asOf)
-        {
-            RequireStableId(id);
-            Require(title, "CommunitySquareTitleMissing:" + id);
-            return new CommunitySquareWorldItem
-            {
-                StableId = id.Trim(), Kind = kind, Title = title.Trim(),
-                Summary = summary?.Trim() ?? string.Empty, Status = status?.Trim() ?? string.Empty,
-                DetailHref = href?.Trim() ?? string.Empty, Count = count, AsOfUtc = asOf,
-            };
-        }
-
-        private static void RejectNullOrDuplicate(IEnumerable<string?> values, string kind)
-        {
-            if (values.Any(value => string.IsNullOrWhiteSpace(value))) throw new InvalidOperationException(kind + "StableIdMissing");
-            var duplicate = values.Where(value => value != null)
-                .GroupBy(value => value!, StringComparer.Ordinal)
-                .FirstOrDefault(group => group.Count() > 1);
-            if (duplicate != null) throw new InvalidOperationException("Duplicate" + kind + ":" + duplicate.Key);
-        }
-
-        private static void RequireStableId(string value)
-        {
-            if (!StableDataId.IsValid(value)) throw new InvalidOperationException("CommunitySquareStableIdInvalid:" + value);
-        }
-
-        private static void Require(string value, string error)
-        {
-            if (string.IsNullOrWhiteSpace(value)) throw new InvalidOperationException(error);
-        }
+            => new CommunitySquareWorldInterpreter().Interpret(new CommunitySquareDataMapper().Map(source));
     }
 
     public interface ICommunityMarketSquareApiClient
@@ -225,29 +160,32 @@ namespace Ssalddel.Unity.Community
 
     public sealed class CommunityMarketSquareReconciler
     {
+        private static readonly StableIdReconciler<CommunitySquareWorldItem> Reconciler =
+            new StableIdReconciler<CommunitySquareWorldItem>(
+                new StableIdReconciliationPolicy<CommunitySquareWorldItem>(
+                    item => item.StableId,
+                    presentationEquivalent: Equivalent));
+
         public CommunityMarketSquareChangeSet Reconcile(IReadOnlyList<CommunitySquareWorldItem> current, IReadOnlyList<CommunitySquareWorldItem> incoming)
         {
-            var before = Index(current); var after = Index(incoming);
-            var added = new List<CommunitySquareWorldItem>(); var updated = new List<CommunitySquareWorldItem>(); var unchanged = new List<CommunitySquareWorldItem>();
-            foreach (var pair in after)
+            try
             {
-                if (!before.TryGetValue(pair.Key, out var old)) added.Add(pair.Value);
-                else if (Equivalent(old, pair.Value)) unchanged.Add(old);
-                else updated.Add(pair.Value);
+                var changes = Reconciler.Reconcile(current, incoming);
+                return new CommunityMarketSquareChangeSet
+                {
+                    Added = changes.Added,
+                    Updated = changes.Updated,
+                    Unchanged = changes.Unchanged,
+                    Removed = changes.Removed,
+                };
             }
-            return new CommunityMarketSquareChangeSet
+            catch (StableIdReconciliationException error)
+                when (error.ErrorCode == "StableIdReconcileItemMissing"
+                      || error.ErrorCode == "StableIdInvalid"
+                      || error.ErrorCode == "DuplicateStableId")
             {
-                Added = added.ToArray(), Updated = updated.ToArray(), Unchanged = unchanged.ToArray(),
-                Removed = before.Where(pair => !after.ContainsKey(pair.Key)).Select(pair => pair.Value).ToArray(),
-            };
-        }
-
-        private static Dictionary<string, CommunitySquareWorldItem> Index(IReadOnlyList<CommunitySquareWorldItem> values)
-        {
-            if (values == null) throw new ArgumentNullException(nameof(values));
-            var result = new Dictionary<string, CommunitySquareWorldItem>(StringComparer.Ordinal);
-            foreach (var item in values) if (item == null || !result.TryAdd(item.StableId, item)) throw new InvalidOperationException("CommunitySquareSnapshotInvalid");
-            return result;
+                throw new InvalidOperationException("CommunitySquareSnapshotInvalid", error);
+            }
         }
 
         private static bool Equivalent(CommunitySquareWorldItem left, CommunitySquareWorldItem right)

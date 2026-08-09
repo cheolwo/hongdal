@@ -24,8 +24,14 @@ namespace Ssalddel.Unity.Samples.CommunityMarketSquare
             builder.Register<CommunityMarketSquareMapper>(Lifetime.Scoped);
             builder.Register<CommunityMarketSquareApiRepository>(Lifetime.Scoped).As<ICommunityMarketSquareRepository>();
             builder.Register<CommunityMarketSquareQueryUseCase>(Lifetime.Scoped);
+            builder.Register<CommunitySquareDataMapper>(Lifetime.Scoped);
+            builder.Register<CommunitySquareApiDataRepository>(Lifetime.Scoped).As<ICommunitySquareDataRepository>();
+            builder.Register<CommunitySquareWorldInterpreter>(Lifetime.Scoped);
+            builder.Register<CommunitySquareDataFlowQueryUseCase>(Lifetime.Scoped);
             builder.Register<CommunityMarketSquareReconciler>(Lifetime.Scoped);
             builder.Register<CommunityMarketSquareLoadCoordinator>(Lifetime.Scoped);
+            builder.Register<CommunitySquareDataFlowLoadCoordinator>(Lifetime.Scoped);
+            builder.Register<CommunitySquarePresenter>(Lifetime.Scoped);
             builder.RegisterComponentInHierarchy<CommunityMarketSquareView>();
             builder.RegisterComponentInHierarchy<CommunityMarketSquareSceneController>();
         }

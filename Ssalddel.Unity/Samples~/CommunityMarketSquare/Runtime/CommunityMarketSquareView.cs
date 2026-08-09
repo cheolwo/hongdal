@@ -27,39 +27,37 @@ namespace Ssalddel.Unity.Samples.CommunityMarketSquare
         public void ShowState(string stateCode, string message = "")
             => statusLabel.text = stateCode + (string.IsNullOrWhiteSpace(message) ? string.Empty : "\n" + message);
 
-        public void Render(CommunityMarketSquareLoadResult result)
+        public void Render(CommunitySquarePresentationModel model)
         {
-            if (result == null) throw new ArgumentNullException(nameof(result));
-            if (result.Changes != null)
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (model.Changes != null)
             {
-                foreach (var removed in result.Changes.Removed)
+                foreach (var stableId in model.Changes.RemovedStableIds)
                 {
-                    if (items.TryGetValue(removed.StableId, out var view))
+                    if (items.TryGetValue(stableId, out var view))
                     {
-                        items.Remove(removed.StableId);
+                        items.Remove(stableId);
                         Destroy(view.gameObject);
                     }
                 }
-                foreach (var updated in result.Changes.Updated) RenderExisting(updated);
-                foreach (var added in result.Changes.Added)
+                foreach (var updated in model.Changes.Updated) RenderExisting(updated);
+                foreach (var added in model.Changes.Added)
                 {
                     var view = Instantiate(itemTemplate, itemRoot);
                     view.name = "SquareItem_" + added.StableId.Replace(':', '_');
                     items.Add(added.StableId, view);
                 }
-                Reflow(result.Snapshot?.Items ?? Array.Empty<CommunitySquareWorldItem>());
+                Reflow(model.Items);
             }
 
-            var count = result.Snapshot?.Items.Length ?? 0;
-            var message = result.Error == null ? count + " public items" : "마지막 성공 데이터 유지 · " + result.Error.GetType().Name;
-            ShowState(result.StateCode, message);
+            ShowState(model.StateCode, model.StatusMessage);
         }
 
         public bool ValidateWiring()
             => itemRoot != null && itemTemplate != null && itemTemplate.ValidateWiring()
                 && statusLabel != null && columns > 0 && spacing.x > 0f && spacing.y > 0f;
 
-        private void Reflow(IReadOnlyList<CommunitySquareWorldItem> ordered)
+        private void Reflow(IReadOnlyList<CommunitySquareItemPresentationModel> ordered)
         {
             for (var index = 0; index < ordered.Count; index++)
             {
@@ -71,7 +69,7 @@ namespace Ssalddel.Unity.Samples.CommunityMarketSquare
             }
         }
 
-        private void RenderExisting(CommunitySquareWorldItem item)
+        private void RenderExisting(CommunitySquareItemPresentationModel item)
         {
             if (!items.ContainsKey(item.StableId))
                 throw new InvalidOperationException("CommunitySquareItemMissing:" + item.StableId);

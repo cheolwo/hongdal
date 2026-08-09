@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 {
-    public sealed class LogisticsRoleTargetView : MonoBehaviour, IRolePerspectiveTarget
+    public sealed class LogisticsRoleTargetView : MonoBehaviour, IRolePerspectiveTarget, IRolePresentationTarget
     {
         [SerializeField]
         private string stableId = string.Empty;
@@ -37,6 +37,11 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             roleBadgeRoot.SetActive(false);
         }
 
+        public void ClearRolePresentation()
+        {
+            ClearRolePerspective();
+        }
+
         public void ApplyRolePerspective(역할Object관점 perspective)
         {
             if (!string.Equals(perspective.TargetStableId, stableId, StringComparison.Ordinal))
@@ -46,6 +51,18 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 
             roleLabel.text = perspective.Label;
             roleIndicator.material.color = ResolveColor(perspective.EmphasisCode);
+            roleBadgeRoot.SetActive(true);
+        }
+
+        public void ApplyRolePresentation(RoleObjectPresentationModel model)
+        {
+            if (!string.Equals(model.TargetStableId, stableId, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("다른 World Object의 Role Presentation입니다.");
+            }
+
+            roleLabel.text = model.LabelText;
+            roleIndicator.material.color = ResolveColor(model.EmphasisCode);
             roleBadgeRoot.SetActive(true);
         }
 

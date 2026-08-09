@@ -86,6 +86,44 @@ public sealed class WarehouseWorldVerticalSliceTests
         Assert.Equal(4, refreshed.Changes.Removed.Length);
     }
 
+    [Fact]
+    public void 위치Catalog는_보관코드를Rack에_빈값과미지원값을Unassigned에_투영한다()
+    {
+        var catalog = new WarehouseLocationCatalog();
+
+        var rack = catalog.Resolve("A-01");
+        var missing = catalog.Resolve(string.Empty);
+        var unsupported = catalog.Resolve("A/01");
+
+        Assert.Equal(WarehouseLocationSocketKeys.RackZone, rack.SocketKey);
+        Assert.True(rack.IsAssigned);
+        Assert.True(rack.IsKnown);
+        Assert.Equal(WarehouseLocationSocketKeys.UnassignedArea, missing.SocketKey);
+        Assert.False(missing.IsAssigned);
+        Assert.True(missing.IsKnown);
+        Assert.Equal(WarehouseLocationSocketKeys.UnassignedArea, unsupported.SocketKey);
+        Assert.False(unsupported.IsKnown);
+    }
+
+    [Fact]
+    public void 선택은_명시적StableId관계만_재고에서작업과Npc까지_추적한다()
+    {
+        var snapshot = new WarehouseWorldMapper().Map(Snapshot("revision-1"));
+        var service = new WarehouseWorldSelectionService();
+
+        var inventory = service.Select(snapshot, "warehouse-inventory:31");
+        var npc = service.Select(snapshot, "warehouse-npc:dock-worker:31");
+
+        Assert.Equal(12, inventory.Selected.Quantity);
+        Assert.Equal(3, inventory.Selected.ReservedQuantity);
+        Assert.Equal("A-01", inventory.Selected.LocationCode);
+        Assert.Equal(new[] { "warehouse-putaway:31", "warehouse-npc:dock-worker:31" },
+            inventory.Related.Select(item => item.StableId));
+        Assert.Equal(new[] { "warehouse-inventory:31", "warehouse-putaway:31" },
+            npc.Related.Select(item => item.StableId).OrderBy(value => value));
+        Assert.DoesNotContain(inventory.Related, item => item.StableId == "warehouse-picking:abcdef");
+    }
+
     private static WarehouseWorldQueryUseCase UseCase(IWarehouseWorldApiClient client)
         => new(new WarehouseWorldApiRepository(client, new WarehouseWorldMapper()));
 

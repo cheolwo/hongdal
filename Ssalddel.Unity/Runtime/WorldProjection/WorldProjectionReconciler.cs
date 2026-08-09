@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ssalddel.Unity.Data;
+using Ssalddel.Unity.PresentationContracts.Reconciliation;
 
 namespace Ssalddel.Unity.WorldProjection
 {
@@ -18,84 +19,44 @@ namespace Ssalddel.Unity.WorldProjection
 
     public sealed class WorldProjectionReconciler
     {
+        private static readonly StableIdReconciler<WorldObjectProjection> Reconciler =
+            new StableIdReconciler<WorldObjectProjection>(
+                new StableIdReconciliationPolicy<WorldObjectProjection>(
+                    projection => projection.StableId,
+                    presentationEquivalent: (current, incoming) => !HasPresentationChange(current, incoming),
+                    dataRevisionComparison: (incoming, current) => incoming.Revision.CompareTo(current.Revision)));
+
         public WorldProjectionChangeSet Reconcile(
             IEnumerable<WorldObjectProjection> current,
             IEnumerable<WorldObjectProjection> incoming)
         {
-            if (current == null)
+            StableIdChangeSet<WorldObjectProjection> changes;
+            try
             {
-                throw new ArgumentNullException(nameof(current));
+                changes = Reconciler.Reconcile(current, incoming);
             }
-
-            if (incoming == null)
+            catch (StableIdReconciliationException error)
+                when (error.ErrorCode == "LowerDataRevision")
             {
-                throw new ArgumentNullException(nameof(incoming));
+                throw new InvalidOperationException(
+                    "LowerRevision:" + error.StableId,
+                    error);
             }
-
-            var currentById = Index(current, nameof(current));
-            var incomingById = Index(incoming, nameof(incoming));
-            var added = new List<WorldObjectProjection>();
-            var updated = new List<WorldObjectProjection>();
-            var unchanged = new List<WorldObjectProjection>();
-
-            foreach (var pair in incomingById.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+            catch (StableIdReconciliationException error)
+                when (error.ErrorCode == "DuplicateStableId")
             {
-                if (!currentById.TryGetValue(pair.Key, out var existing))
-                {
-                    added.Add(pair.Value);
-                    continue;
-                }
-
-                if (pair.Value.Revision < existing.Revision)
-                {
-                    throw new InvalidOperationException($"LowerRevision:{pair.Key}");
-                }
-
-                if (HasPresentationChange(existing, pair.Value))
-                {
-                    updated.Add(pair.Value);
-                }
-                else
-                {
-                    unchanged.Add(existing);
-                }
+                throw new InvalidOperationException(
+                    "DuplicateStableId:" + error.StableId,
+                    error);
             }
-
-            var removed = currentById
-                .Where(pair => !incomingById.ContainsKey(pair.Key))
-                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
-                .Select(pair => pair.Value)
-                .ToArray();
 
             return new WorldProjectionChangeSet
             {
-                Added = added.ToArray(),
-                Updated = updated.ToArray(),
-                Removed = removed,
-                Unchanged = unchanged.ToArray(),
+                Added = changes.Added,
+                Updated = changes.Updated,
+                Removed = changes.Removed,
+                Unchanged = changes.Unchanged,
             };
-        }
-
-        private static Dictionary<string, WorldObjectProjection> Index(
-            IEnumerable<WorldObjectProjection> projections,
-            string parameterName)
-        {
-            var result = new Dictionary<string, WorldObjectProjection>(StringComparer.Ordinal);
-            foreach (var projection in projections)
-            {
-                if (projection == null)
-                {
-                    throw new ArgumentException("ProjectionNull", parameterName);
-                }
-
-                StableDataId.EnsureValid(projection.StableId, parameterName);
-                if (!result.TryAdd(projection.StableId, projection))
-                {
-                    throw new InvalidOperationException($"DuplicateStableId:{projection.StableId}");
-                }
-            }
-
-            return result;
         }
 
         private static bool HasPresentationChange(

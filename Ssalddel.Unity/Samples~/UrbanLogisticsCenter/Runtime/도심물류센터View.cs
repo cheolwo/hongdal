@@ -33,9 +33,9 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             corridorTruck = truck;
         }
 
-        public IRolePerspectiveTarget[] GetRoleTargets()
+        public IRolePresentationTarget[] GetRolePresentationTargets()
         {
-            var values = new IRolePerspectiveTarget[roleTargets.Length];
+            var values = new IRolePresentationTarget[roleTargets.Length];
             for (var index = 0; index < roleTargets.Length; index++)
             {
                 values[index] = roleTargets[index];
@@ -44,25 +44,25 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             return values;
         }
 
-        public IRoleInteractionSink GetInteractionSink()
+        public IRolePresentationInteractionSink GetRolePresentationInteractionSink()
         {
             return interactionPanel;
         }
 
-        public string[] ApplyNpcMovement(NpcMovementSnapshot snapshot)
+        public string[] ApplyNpcMovement(NpcMovementPresentationModel model)
         {
-            return npcMovementController.ApplySnapshots(new[] { snapshot });
+            return npcMovementController.ApplyPresentations(new[] { model });
         }
 
-        public void ApplyTransportCorridor(TransportCorridorSnapshot? snapshot, TruckMovementApplicator applicator)
+        public void ApplyTransportCorridor(TruckMovementPresentationModel? model, TruckMovementApplicator applicator)
         {
-            if (snapshot == null)
+            if (model == null)
             {
                 corridorTruck.Hide();
                 return;
             }
 
-            applicator.Apply(snapshot, corridorTruck);
+            applicator.Apply(model, corridorTruck);
         }
 
         public bool ValidateWiring()

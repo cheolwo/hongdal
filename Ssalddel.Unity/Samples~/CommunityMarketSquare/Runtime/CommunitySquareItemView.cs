@@ -18,13 +18,13 @@ namespace Ssalddel.Unity.Samples.CommunityMarketSquare
             detailLabel = detail;
         }
 
-        public void Render(CommunitySquareWorldItem item, Vector3 localPosition)
+        public void Render(CommunitySquareItemPresentationModel item, Vector3 localPosition)
         {
             StableId = item.StableId;
             transform.localPosition = localPosition;
-            titleLabel.text = item.Title;
-            detailLabel.text = item.Status + (item.Count > 0 ? " · " + item.Count : string.Empty);
-            visual.material.color = ColorFor(item.Kind);
+            titleLabel.text = item.TitleText;
+            detailLabel.text = item.DetailText;
+            visual.material.color = ColorFor(item.VisualStateCode);
             gameObject.SetActive(true);
         }
 

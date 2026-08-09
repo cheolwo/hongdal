@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 {
-    public sealed class TransportCorridorTruckView : MonoBehaviour, ITruckMovementTarget
+    public sealed class TransportCorridorTruckView : MonoBehaviour, ITruckMovementTarget, ITruckMovementPresentationTarget
     {
         [SerializeField]
         private string truckStableId = string.Empty;
@@ -46,13 +46,30 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 
         public void ApplyTruckMovement(TruckMovementSnapshot movement)
         {
-            if (!string.Equals(movement.StableId, truckStableId, StringComparison.Ordinal))
+            ApplyTruckMovementPresentation(new TruckMovementPresentationModel
+            {
+                TruckStableId = movement.StableId,
+                CargoStableId = movement.CargoStableId,
+                CanonicalTaskStableId = movement.CanonicalTaskStableId,
+                RouteCode = movement.RouteCode,
+                CurrentNodeKey = movement.CurrentNodeKey,
+                DestinationNodeKey = movement.DestinationNodeKey,
+                MovementStateCode = movement.MovementStateCode,
+                ArrivalAnimationCode = movement.ArrivalActionCode,
+                DataRevision = movement.Revision,
+                StatusLabelText = movement.CargoStableId + "\n" + movement.CurrentNodeKey + " → " + movement.DestinationNodeKey,
+            });
+        }
+
+        public void ApplyTruckMovementPresentation(TruckMovementPresentationModel model)
+        {
+            if (!string.Equals(model.TruckStableId, truckStableId, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException("TruckStableIdMismatch");
             }
 
-            if (!waypointRegistry.TryResolve(movement.CurrentNodeKey, out var current)
-                || !waypointRegistry.TryResolve(movement.DestinationNodeKey, out var destination))
+            if (!waypointRegistry.TryResolve(model.CurrentNodeKey, out var current)
+                || !waypointRegistry.TryResolve(model.DestinationNodeKey, out var destination))
             {
                 throw new InvalidOperationException("TransportCorridorWaypointMissing");
             }
@@ -81,7 +98,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             }
 
             cargoVisualRoot.gameObject.SetActive(true);
-            statusLabel.text = movement.CargoStableId + "\n" + movement.CurrentNodeKey + " → " + movement.DestinationNodeKey;
+            statusLabel.text = model.StatusLabelText;
         }
 
         public void Hide()

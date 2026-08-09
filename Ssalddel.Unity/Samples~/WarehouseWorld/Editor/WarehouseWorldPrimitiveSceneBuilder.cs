@@ -38,15 +38,22 @@ namespace Ssalddel.Unity.Samples.WarehouseWorld.Editor
             var storage = Waypoint("StorageZone", root.transform, new Vector3(-4, 0, -4));
             var rack = Waypoint("RackZone", root.transform, new Vector3(4, 0, -4));
             var outbound = Waypoint("OutboundStaging", root.transform, new Vector3(7, 0, 4));
+            var approach = Waypoint("InboundApproach", root.transform, new Vector3(-9, 0, 6));
+            var staffEntry = Waypoint("StaffEntry", root.transform, new Vector3(-2, 0, 6));
+            var inspection = Waypoint("InspectionZone", root.transform, new Vector3(-6, 0, 0));
+            var vehicleExit = Waypoint("VehicleExit", root.transform, new Vector3(9, 0, 6));
+            var unassigned = Waypoint("UnassignedArea", root.transform, new Vector3(0, 0, 4));
             for (var i = 0; i < 4; i++) Cube("Rack_" + i, root.transform, new Vector3(-3f + i * 2f, 1.2f, -1f), new Vector3(1.2f, 2.4f, 4f), new Color(.35f, .38f, .42f));
             var objectRoot = new GameObject("WorldObjects").transform; objectRoot.SetParent(root.transform, false); objectRoot.localPosition = new Vector3(-5, 0, 3);
             var objectTemplateRoot = Cube("WorldObjectTemplate", root.transform, new Vector3(0, -20, 0), new Vector3(2.2f, .8f, 1.6f), Color.gray);
             var objectTemplate = objectTemplateRoot.AddComponent<WarehouseWorldObjectView>(); objectTemplate.Configure(objectTemplateRoot.GetComponent<Renderer>(), Text("Label", objectTemplateRoot.transform, new Vector3(0, .7f, 0), .16f)); objectTemplateRoot.SetActive(false);
             var npcTemplateRoot = GameObject.CreatePrimitive(PrimitiveType.Capsule); npcTemplateRoot.name = "NpcTemplate"; npcTemplateRoot.transform.SetParent(root.transform, false); npcTemplateRoot.transform.position = new Vector3(0, -20, 0);
             var agent = npcTemplateRoot.AddComponent<NavMeshAgent>(); agent.speed = 2.5f; agent.stoppingDistance = .2f;
-            var animator = npcTemplateRoot.AddComponent<Animator>(); var npcTemplate = npcTemplateRoot.AddComponent<WarehouseNpcView>(); npcTemplate.Configure(agent, animator, Text("NpcLabel", npcTemplateRoot.transform, new Vector3(0, 1.5f, 0), .12f)); npcTemplateRoot.SetActive(false);
+            var animator = npcTemplateRoot.AddComponent<Animator>(); var npcTemplate = npcTemplateRoot.AddComponent<WarehouseNpcView>(); npcTemplate.Configure(agent, animator, npcTemplateRoot.GetComponent<Renderer>(), Text("NpcLabel", npcTemplateRoot.transform, new Vector3(0, 1.5f, 0), .12f)); npcTemplateRoot.SetActive(false);
             var status = Text("Status", root.transform, new Vector3(0, .1f, 6), .24f); status.text = "Idle";
-            view.Configure(objectRoot, objectTemplate, npcTemplate, status, inbound, storage, rack, outbound);
+            var detailPanel = Cube("DetailPanel", root.transform, new Vector3(6.5f, .15f, -5.5f), new Vector3(5.5f, .15f, 2.5f), new Color(.92f, .9f, .78f));
+            var detail = Text("DetailText", detailPanel.transform, new Vector3(0, .55f, 0), .13f); detail.text = "선택한 재고·작업·NPC 상세"; detailPanel.SetActive(false);
+            view.Configure(objectRoot, objectTemplate, npcTemplate, status, detail, detailPanel, inbound, storage, rack, outbound, approach, staffEntry, inspection, vehicleExit, unassigned);
             var cameraObject = new GameObject("Main Camera"); cameraObject.tag = "MainCamera"; var camera = cameraObject.AddComponent<Camera>(); camera.orthographic = true; camera.orthographicSize = 9; cameraObject.transform.position = new Vector3(0, 15, -11); cameraObject.transform.rotation = Quaternion.Euler(55, 0, 0);
             var light = new GameObject("Directional Light"); light.AddComponent<Light>().type = LightType.Directional; light.transform.rotation = Quaternion.Euler(50, -30, 0);
         }

@@ -19,11 +19,21 @@ namespace Ssalddel.Unity.Samples.PublicDataHall
             titleLabel = label;
         }
 
-        public void Render(PublicWorldMapObservation observation, Vector3 worldPosition)
+        public void Render(PublicMapMarkerPresentationItem observation, Vector3 worldPosition)
+        {
+            StableId = observation.StableId.Value;
+            transform.localPosition = worldPosition;
+            titleLabel.text = observation.LabelText;
+            markerRenderer.enabled = true;
+            gameObject.SetActive(true);
+        }
+
+        [System.Obsolete("Use Render(PublicMapMarkerPresentationItem, Vector3).")]
+        public void Render(PublicObservationPresentationModel observation, Vector3 worldPosition)
         {
             StableId = observation.StableId;
             transform.localPosition = worldPosition;
-            titleLabel.text = observation.Title + "\n" + observation.SourceName;
+            titleLabel.text = observation.MarkerLabelText;
             markerRenderer.enabled = true;
             gameObject.SetActive(true);
         }

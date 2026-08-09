@@ -12,24 +12,36 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 {
     public sealed class 도심물류센터SceneController : MonoBehaviour
     {
-        private RoleExperienceCoordinator roleCoordinator = null!;
+        private AuthorizedRoleProjectionQuery authorizedRoleQuery = null!;
+        private RolePresentationPerspectiveCoordinator rolePresentationCoordinator = null!;
         private NpcMovementQueryUseCase npcMovementQuery = null!;
+        private NpcMovementInterpreter npcMovementInterpreter = null!;
+        private NpcMovementPresenter npcMovementPresenter = null!;
         private 도심물류센터View zoneView = null!;
         private TransportCorridorQueryUseCase corridorQuery = null!;
+        private TransportCorridorPresenter corridorPresenter = null!;
         private TruckMovementApplicator truckApplicator = null!;
         private CancellationTokenSource? lifetime;
 
         [Inject]
         public void Construct(
-            RoleExperienceCoordinator coordinator,
+            AuthorizedRoleProjectionQuery roleQuery,
+            RolePresentationPerspectiveCoordinator presentationCoordinator,
             NpcMovementQueryUseCase movementQuery,
+            NpcMovementInterpreter movementInterpreter,
+            NpcMovementPresenter movementPresenter,
             TransportCorridorQueryUseCase transportCorridorQuery,
+            TransportCorridorPresenter transportCorridorPresenter,
             TruckMovementApplicator movementApplicator,
             도심물류센터View view)
         {
-            roleCoordinator = coordinator;
+            authorizedRoleQuery = roleQuery;
+            rolePresentationCoordinator = presentationCoordinator;
             npcMovementQuery = movementQuery;
+            npcMovementInterpreter = movementInterpreter;
+            npcMovementPresenter = movementPresenter;
             corridorQuery = transportCorridorQuery;
+            corridorPresenter = transportCorridorPresenter;
             truckApplicator = movementApplicator;
             zoneView = view;
         }
@@ -54,15 +66,16 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
 
             try
             {
-                await roleCoordinator.SwitchAsync(
+                var authorizedRole = await authorizedRoleQuery.ExecuteAsync(
                     new 역할관점조회Request
                     {
                         RequestedRoleCode = RolePerspectiveCodes.Transporter,
                         WorldZoneCode = WorldZoneCodes.UrbanLogisticsCenter,
-                    },
-                    zoneView.GetRoleTargets(),
-                    zoneView.GetInteractionSink(),
-                    lifetime!.Token);
+                    }, lifetime!.Token);
+                rolePresentationCoordinator.Apply(
+                    authorizedRole,
+                    zoneView.GetRolePresentationTargets(),
+                    zoneView.GetRolePresentationInteractionSink());
 
                 var movement = await npcMovementQuery.실행Async(
                     new NpcMovementQuery
@@ -72,7 +85,9 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
                     lifetime.Token);
                 if (movement != null)
                 {
-                    var unresolved = zoneView.ApplyNpcMovement(movement);
+                    var movementModel = npcMovementPresenter.Present(
+                        npcMovementInterpreter.Interpret(movement));
+                    var unresolved = zoneView.ApplyNpcMovement(movementModel);
                     if (unresolved.Length > 0)
                     {
                         Debug.LogWarning("표현할 NPC View가 없습니다: " + string.Join(", ", unresolved), this);
@@ -80,7 +95,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
                 }
 
                 zoneView.ApplyTransportCorridor(
-                    await corridorQuery.실행Async(lifetime.Token),
+                    corridorPresenter.Present(await corridorQuery.실행Async(lifetime.Token)),
                     truckApplicator);
             }
             catch (OperationCanceledException) when (lifetime?.IsCancellationRequested == true)

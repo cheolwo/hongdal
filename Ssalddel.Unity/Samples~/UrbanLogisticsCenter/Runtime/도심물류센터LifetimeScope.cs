@@ -62,11 +62,17 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             builder.Register<역할관점조회UseCase>(Lifetime.Scoped);
             builder.Register<RolePerspectiveApplicator>(Lifetime.Scoped);
             builder.Register<RoleExperienceCoordinator>(Lifetime.Scoped);
+            builder.Register<AuthorizedRoleProjectionQuery>(Lifetime.Scoped);
+            builder.Register<RolePresentationPresenter>(Lifetime.Scoped);
+            builder.Register<RolePresentationApplicator>(Lifetime.Scoped);
+            builder.Register<RolePresentationPerspectiveCoordinator>(Lifetime.Scoped);
 
             builder.Register<NpcMovementMapper>(Lifetime.Scoped);
             builder.Register<NpcMovementApiRepository>(Lifetime.Scoped)
                 .As<INpcMovementRepository>();
             builder.Register<NpcMovementQueryUseCase>(Lifetime.Scoped);
+            builder.Register<NpcMovementInterpreter>(Lifetime.Scoped);
+            builder.Register<NpcMovementPresenter>(Lifetime.Scoped);
             builder.Register<CargoWarehouseHandoffMapper>(Lifetime.Scoped);
             builder.Register<CargoWarehouseHandoffApiRepository>(Lifetime.Scoped)
                 .As<ICargoWarehouseHandoffRepository>();
@@ -74,6 +80,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             builder.Register<CargoWarehouseHandoffApplicator>(Lifetime.Scoped);
             builder.Register<TransportCorridorProjector>(Lifetime.Scoped);
             builder.Register<TransportCorridorQueryUseCase>(Lifetime.Scoped);
+            builder.Register<TransportCorridorPresenter>(Lifetime.Scoped);
             builder.Register<TruckMovementApplicator>(Lifetime.Scoped);
 
             builder.RegisterComponentInHierarchy<도심물류센터View>();

@@ -27,6 +27,17 @@ namespace Ssalddel.Unity.Samples.NpcMovement
             return applicator.Apply(snapshots, targets);
         }
 
+        public string[] ApplyPresentations(NpcMovementPresentationModel[] models)
+        {
+            var targets = new INpcMovementPresentationTarget[npcViews.Length];
+            for (var index = 0; index < npcViews.Length; index++)
+            {
+                targets[index] = npcViews[index];
+            }
+
+            return applicator.Apply(models, targets);
+        }
+
         public bool ValidateWiring()
         {
             if (npcViews == null || npcViews.Length == 0)

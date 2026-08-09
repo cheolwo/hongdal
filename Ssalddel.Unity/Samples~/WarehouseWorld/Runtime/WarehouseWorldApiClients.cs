@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Ssalddel.Unity.Warehouse;
+using Ssalddel.Unity.Npcs;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -33,13 +34,28 @@ namespace Ssalddel.Unity.Samples.WarehouseWorld
                 },
                 Tasks = new[]
                 {
-                    new WarehouseWorldTaskApiModel { StableId = "warehouse-putaway:32", WarehouseStableId = "warehouse:" + warehouseId, InventoryItemStableId = "warehouse-inventory:32", TaskKind = "PutAway", ProductName = "양파", Sku = "ONION-10", Quantity = 4, Status = "검수완료", CanExecute = true, UpdatedAtUtc = time },
+                    new WarehouseWorldTaskApiModel { StableId = "warehouse-putaway:32", WarehouseStableId = "warehouse:" + warehouseId, InventoryItemStableId = "warehouse-inventory:32", CanonicalTaskStableId = "inbound-task:91", TaskKind = "PutAway", ProductName = "양파", Sku = "ONION-10", Quantity = 4, Status = "검수완료", CanExecute = true, UpdatedAtUtc = time },
                     new WarehouseWorldTaskApiModel { StableId = "warehouse-picking:fixture", WarehouseStableId = "warehouse:" + warehouseId, TaskKind = "Picking", ProductName = "감자", Sku = "POTATO-20", Quantity = 3, LocationCode = "A-01", Status = "대기", CanExecute = true, UpdatedAtUtc = time },
                 },
                 Npcs = new[]
                 {
                     new WarehouseWorldNpcApiModel { StableId = "warehouse-npc:dock-worker:fixture", WarehouseStableId = "warehouse:" + warehouseId, SourceTaskStableId = "warehouse-putaway:32", RoleCode = "DockWorker", RouteCode = "warehouse.inbound-to-storage", CurrentWaypointKey = "warehouse.inbound-dock", DestinationWaypointKey = "warehouse.storage-zone", ActivityCode = "PutAway" },
                     new WarehouseWorldNpcApiModel { StableId = "warehouse-npc:picker:fixture", WarehouseStableId = "warehouse:" + warehouseId, SourceTaskStableId = "warehouse-picking:fixture", RoleCode = "Picker", RouteCode = "warehouse.rack-to-outbound", CurrentWaypointKey = "warehouse.rack-zone", DestinationWaypointKey = "warehouse.outbound-staging", ActivityCode = "Picking" },
+                },
+                InboundHandoffs = new[]
+                {
+                    new CargoWarehouseHandoffApiModel
+                    {
+                        StableId = "cargo-handoff:transport-71.inbound-91", Revision = 1,
+                        HandoffStateCode = CargoHandoffStateCodes.ArrivedAtWarehouse,
+                        CargoStableId = "cargo:transport-71", TransportTaskStableId = "transport-task:71",
+                        InboundTaskStableId = "inbound-task:91", GeneratedAt = time,
+                        Movements = new[]
+                        {
+                            new NpcMovementApiModel { StableId = "npc-movement:transporter.transport-71.inbound-91", Revision = 1, NpcStableId = "npc:transport-driver.71", ActorRoleCode = "Transporter", WorldZoneCode = "warehouse", RouteCode = "warehouse-transporter-dropoff", CurrentWaypointKey = "warehouse.approach", DestinationWaypointKey = "warehouse.inbound-dock", MovementStateCode = NpcMovementStateCodes.Moving, ArrivalActionCode = "open-cargo-door", SourceTypeCode = NpcMovementSourceTypeCodes.OperationalProjection, CanonicalTaskStableId = "transport-task:71", GeneratedAt = time },
+                            new NpcMovementApiModel { StableId = "npc-movement:inbound-worker.transport-71.inbound-91", Revision = 1, NpcStableId = "npc:warehouse-inbound-worker.91", ActorRoleCode = "WarehouseInboundWorker", WorldZoneCode = "warehouse", RouteCode = "warehouse-inbound-worker-handoff", CurrentWaypointKey = "warehouse.staff-entry", DestinationWaypointKey = "warehouse.inbound-dock", MovementStateCode = NpcMovementStateCodes.Moving, ArrivalActionCode = "unload-cargo", SourceTypeCode = NpcMovementSourceTypeCodes.OperationalProjection, CanonicalTaskStableId = "inbound-task:91", GeneratedAt = time },
+                        },
+                    },
                 },
             });
         }
@@ -70,8 +86,8 @@ namespace Ssalddel.Unity.Samples.WarehouseWorld
     [Serializable] internal sealed class WarehouseWorldSnapshotWire
     {
         public string stableId = string.Empty, revision = string.Empty, generatedAtUtc = string.Empty; public int totalAvailableQuantity, totalReservedQuantity, unassignedLocationCount;
-        public WarehouseInventoryWire[] inventoryItems = Array.Empty<WarehouseInventoryWire>(); public WarehouseTaskWire[] tasks = Array.Empty<WarehouseTaskWire>(); public WarehouseNpcWire[] npcs = Array.Empty<WarehouseNpcWire>();
-        public WarehouseWorldSnapshotApiModel ToApiModel() => new WarehouseWorldSnapshotApiModel { StableId = stableId, Revision = revision, GeneratedAtUtc = Parse(generatedAtUtc), TotalAvailableQuantity = totalAvailableQuantity, TotalReservedQuantity = totalReservedQuantity, UnassignedLocationCount = unassignedLocationCount, InventoryItems = Array.ConvertAll(inventoryItems, value => value.ToApiModel()), Tasks = Array.ConvertAll(tasks, value => value.ToApiModel()), Npcs = Array.ConvertAll(npcs, value => value.ToApiModel()) };
+        public WarehouseInventoryWire[] inventoryItems = Array.Empty<WarehouseInventoryWire>(); public WarehouseTaskWire[] tasks = Array.Empty<WarehouseTaskWire>(); public WarehouseNpcWire[] npcs = Array.Empty<WarehouseNpcWire>(); public WarehouseHandoffWire[] inboundHandoffs = Array.Empty<WarehouseHandoffWire>();
+        public WarehouseWorldSnapshotApiModel ToApiModel() => new WarehouseWorldSnapshotApiModel { StableId = stableId, Revision = revision, GeneratedAtUtc = Parse(generatedAtUtc), TotalAvailableQuantity = totalAvailableQuantity, TotalReservedQuantity = totalReservedQuantity, UnassignedLocationCount = unassignedLocationCount, InventoryItems = Array.ConvertAll(inventoryItems, value => value.ToApiModel()), Tasks = Array.ConvertAll(tasks, value => value.ToApiModel()), Npcs = Array.ConvertAll(npcs, value => value.ToApiModel()), InboundHandoffs = Array.ConvertAll(inboundHandoffs, value => value.ToApiModel()) };
         internal static DateTimeOffset Parse(string value) { if (!DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result)) throw new InvalidOperationException("WarehouseWorldDateInvalid"); return result; }
     }
     [Serializable] internal sealed class WarehouseInventoryWire
@@ -81,12 +97,22 @@ namespace Ssalddel.Unity.Samples.WarehouseWorld
     }
     [Serializable] internal sealed class WarehouseTaskWire
     {
-        public string stableId = string.Empty, warehouseStableId = string.Empty, inventoryItemStableId = string.Empty, taskKind = string.Empty, productName = string.Empty, sku = string.Empty, locationCode = string.Empty, status = string.Empty, updatedAtUtc = string.Empty; public int quantity; public bool canExecute;
-        public WarehouseWorldTaskApiModel ToApiModel() => new WarehouseWorldTaskApiModel { StableId = stableId, WarehouseStableId = warehouseStableId, InventoryItemStableId = inventoryItemStableId, TaskKind = taskKind, ProductName = productName, Sku = sku, Quantity = quantity, LocationCode = locationCode, Status = status, CanExecute = canExecute, UpdatedAtUtc = WarehouseWorldSnapshotWire.Parse(updatedAtUtc) };
+        public string stableId = string.Empty, warehouseStableId = string.Empty, inventoryItemStableId = string.Empty, canonicalTaskStableId = string.Empty, taskKind = string.Empty, productName = string.Empty, sku = string.Empty, locationCode = string.Empty, status = string.Empty, updatedAtUtc = string.Empty; public int quantity; public bool canExecute;
+        public WarehouseWorldTaskApiModel ToApiModel() => new WarehouseWorldTaskApiModel { StableId = stableId, WarehouseStableId = warehouseStableId, InventoryItemStableId = inventoryItemStableId, CanonicalTaskStableId = canonicalTaskStableId, TaskKind = taskKind, ProductName = productName, Sku = sku, Quantity = quantity, LocationCode = locationCode, Status = status, CanExecute = canExecute, UpdatedAtUtc = WarehouseWorldSnapshotWire.Parse(updatedAtUtc) };
     }
     [Serializable] internal sealed class WarehouseNpcWire
     {
         public string stableId = string.Empty, warehouseStableId = string.Empty, sourceTaskStableId = string.Empty, roleCode = string.Empty, routeCode = string.Empty, currentWaypointKey = string.Empty, destinationWaypointKey = string.Empty, activityCode = string.Empty;
         public WarehouseWorldNpcApiModel ToApiModel() => new WarehouseWorldNpcApiModel { StableId = stableId, WarehouseStableId = warehouseStableId, SourceTaskStableId = sourceTaskStableId, RoleCode = roleCode, RouteCode = routeCode, CurrentWaypointKey = currentWaypointKey, DestinationWaypointKey = destinationWaypointKey, ActivityCode = activityCode };
+    }
+    [Serializable] internal sealed class WarehouseHandoffWire
+    {
+        public string stableId = string.Empty, handoffStateCode = string.Empty, cargoStableId = string.Empty, transportTaskStableId = string.Empty, inboundTaskStableId = string.Empty, generatedAt = string.Empty; public long revision; public WarehouseNpcMovementWire[] movements = Array.Empty<WarehouseNpcMovementWire>();
+        public CargoWarehouseHandoffApiModel ToApiModel() => new CargoWarehouseHandoffApiModel { StableId = stableId, Revision = revision, HandoffStateCode = handoffStateCode, CargoStableId = cargoStableId, TransportTaskStableId = transportTaskStableId, InboundTaskStableId = inboundTaskStableId, Movements = Array.ConvertAll(movements, value => value.ToApiModel()), GeneratedAt = WarehouseWorldSnapshotWire.Parse(generatedAt) };
+    }
+    [Serializable] internal sealed class WarehouseNpcMovementWire
+    {
+        public string stableId = string.Empty, npcStableId = string.Empty, actorRoleCode = string.Empty, worldZoneCode = string.Empty, routeCode = string.Empty, currentWaypointKey = string.Empty, destinationWaypointKey = string.Empty, movementStateCode = string.Empty, arrivalActionCode = string.Empty, sourceTypeCode = string.Empty, canonicalTaskStableId = string.Empty, generatedAt = string.Empty; public long revision;
+        public NpcMovementApiModel ToApiModel() => new NpcMovementApiModel { StableId = stableId, Revision = revision, NpcStableId = npcStableId, ActorRoleCode = actorRoleCode, WorldZoneCode = worldZoneCode, RouteCode = routeCode, CurrentWaypointKey = currentWaypointKey, DestinationWaypointKey = destinationWaypointKey, MovementStateCode = movementStateCode, ArrivalActionCode = arrivalActionCode, SourceTypeCode = sourceTypeCode, CanonicalTaskStableId = canonicalTaskStableId, GeneratedAt = WarehouseWorldSnapshotWire.Parse(generatedAt) };
     }
 }

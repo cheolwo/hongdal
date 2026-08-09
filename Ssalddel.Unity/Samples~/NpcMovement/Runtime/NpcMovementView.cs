@@ -13,7 +13,7 @@ namespace Ssalddel.Unity.Samples.NpcMovement
         public string AnimatorTrigger = string.Empty;
     }
 
-    public sealed class NpcMovementView : MonoBehaviour, INpcMovementTarget
+    public sealed class NpcMovementView : MonoBehaviour, INpcMovementTarget, INpcMovementPresentationTarget
     {
         [SerializeField]
         private string npcStableId = string.Empty;
@@ -33,7 +33,7 @@ namespace Ssalddel.Unity.Samples.NpcMovement
         [SerializeField]
         private NpcActionAnimationBinding[] actionBindings = Array.Empty<NpcActionAnimationBinding>();
 
-        private NpcMovementSnapshot? current;
+        private NpcMovementPresentationModel? current;
         private bool arrivalPresentationApplied;
 
         public string NpcStableId => npcStableId;
@@ -59,27 +59,48 @@ namespace Ssalddel.Unity.Samples.NpcMovement
                 throw new ArgumentNullException(nameof(snapshot));
             }
 
-            if (!string.Equals(snapshot.NpcStableId, npcStableId, StringComparison.Ordinal))
+            ApplyMovementPresentation(new NpcMovementPresentationModel
+            {
+                StableId = snapshot.StableId,
+                DataRevision = snapshot.Revision,
+                NpcStableId = snapshot.NpcStableId,
+                RouteCode = snapshot.RouteCode,
+                CurrentWaypointKey = snapshot.CurrentWaypointKey,
+                DestinationWaypointKey = snapshot.DestinationWaypointKey,
+                MovementStateCode = snapshot.MovementStateCode,
+                ArrivalAnimationCode = snapshot.ArrivalActionCode,
+                CanonicalTaskStableId = snapshot.CanonicalTaskStableId,
+            });
+        }
+
+        public void ApplyMovementPresentation(NpcMovementPresentationModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (!string.Equals(model.NpcStableId, npcStableId, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException("다른 NPC의 이동 snapshot을 적용할 수 없습니다.");
             }
 
-            current = snapshot;
+            current = model;
             arrivalPresentationApplied = false;
 
-            if (string.Equals(snapshot.MovementStateCode, NpcMovementStateCodes.Moving, StringComparison.Ordinal))
+            if (string.Equals(model.MovementStateCode, NpcMovementStateCodes.Moving, StringComparison.Ordinal))
             {
-                MoveTo(snapshot.DestinationWaypointKey);
+                MoveTo(model.DestinationWaypointKey);
                 return;
             }
 
             StopMovement();
             if (string.Equals(
-                snapshot.MovementStateCode,
+                model.MovementStateCode,
                 NpcMovementStateCodes.PerformingAction,
                 StringComparison.Ordinal))
             {
-                ApplyArrivalPresentation(snapshot.ArrivalActionCode);
+                ApplyArrivalPresentation(model.ArrivalAnimationCode);
             }
         }
 
@@ -113,7 +134,7 @@ namespace Ssalddel.Unity.Samples.NpcMovement
             }
 
             StopMovement();
-            ApplyArrivalPresentation(current.ArrivalActionCode);
+            ApplyArrivalPresentation(current.ArrivalAnimationCode);
         }
 
         private void MoveTo(string waypointKey)
