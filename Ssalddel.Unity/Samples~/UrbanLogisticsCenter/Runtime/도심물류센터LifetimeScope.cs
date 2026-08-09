@@ -82,6 +82,8 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             builder.Register<TransportCorridorQueryUseCase>(Lifetime.Scoped);
             builder.Register<TransportCorridorPresenter>(Lifetime.Scoped);
             builder.Register<TruckMovementApplicator>(Lifetime.Scoped);
+            builder.Register<LogisticsFacilityOverviewProjector>(Lifetime.Scoped);
+            builder.Register<UrbanLogisticsCenterPresentationQueryUseCase>(Lifetime.Scoped);
 
             builder.RegisterComponentInHierarchy<도심물류센터View>();
             builder.RegisterComponentInHierarchy<도심물류센터SceneController>();

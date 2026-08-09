@@ -42,9 +42,10 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
             var corridorRegistry = CreateTransportCorridorWaypoints(root.transform);
             var truckView = CreateTransportTruck(root.transform, corridorRegistry);
             var interactionPanel = CreateInteractionPanel(root.transform);
+            var facilityOverview = CreateFacilityOverview(root.transform);
 
             var zoneView = root.AddComponent<도심물류센터View>();
-            zoneView.Configure(roleTargets, interactionPanel, npcController, truckView);
+            zoneView.Configure(roleTargets, interactionPanel, npcController, truckView, facilityOverview);
             root.AddComponent<도심물류센터SceneController>();
             var tokenProvider = root.AddComponent<RuntimeSessionAccessTokenProvider>();
             var lifetimeScope = root.AddComponent<도심물류센터LifetimeScope>();
@@ -80,13 +81,21 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
             var tokenProvider = Object.FindFirstObjectByType<RuntimeSessionAccessTokenProvider>();
             var npc = Object.FindFirstObjectByType<NpcMovementView>();
             var truck = Object.FindFirstObjectByType<TransportCorridorTruckView>(FindObjectsInactive.Include);
+            var facility = Object.FindFirstObjectByType<LogisticsFacilityOverviewView>();
             if (view == null || controller == null || scope == null || tokenProvider == null
-                || npc == null || truck == null || !truck.ValidateWiring() || !view.ValidateWiring())
+                || npc == null || truck == null || facility == null
+                || !truck.ValidateWiring() || !facility.ValidateWiring() || !view.ValidateWiring())
             {
                 throw new MissingReferenceException("Urban logistics center wiring is invalid after scene reload.");
             }
 
             Debug.Log("Validated urban logistics center Role View, waypoint, NPC, and transport-corridor truck wiring. NavMesh bake remains a project step.");
+        }
+
+        public static LogisticsFacilityOverviewView CreateFacilityOverviewForTests()
+        {
+            var root = new GameObject("LogisticsFacilityOverviewTestRoot");
+            return CreateFacilityOverview(root.transform);
         }
 
         private static ZoneNpcWaypointRegistry CreateWaypoints(Transform parent)
@@ -247,6 +256,92 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
             return view;
         }
 
+        private static LogisticsFacilityOverviewView CreateFacilityOverview(Transform parent)
+        {
+            var root = new GameObject("LogisticsFacilityOverview");
+            root.transform.SetParent(parent, false);
+            var building = Primitive(
+                "WarehouseBuildingVisualRoot",
+                root.transform,
+                new Vector3(0f, 2.8f, 5.4f),
+                new Vector3(18f, 4.2f, 1.2f),
+                new Color(0.28f, 0.31f, 0.34f));
+            var summary = CreateText(
+                "FacilitySummary",
+                building.transform,
+                "LOGISTICS FACILITY",
+                new Vector3(0f, 0.22f, -0.65f),
+                0.02f,
+                Color.white,
+                true);
+            var boundary = CreateText(
+                "FacilityBoundary",
+                building.transform,
+                string.Empty,
+                new Vector3(0f, -0.22f, -0.65f),
+                0.012f,
+                Color.white,
+                true);
+            var areas = new[]
+            {
+                FacilityArea(root.transform, "VehicleGate", Ssalddel.Unity.Transport.LogisticsFacilityAreaCodes.VehicleGate, new Vector3(-6.6f, .35f, 4.2f)),
+                FacilityArea(root.transform, "InboundDock", Ssalddel.Unity.Transport.LogisticsFacilityAreaCodes.InboundDock, new Vector3(-2.2f, .35f, 4.2f)),
+                FacilityArea(root.transform, "Inspection", Ssalddel.Unity.Transport.LogisticsFacilityAreaCodes.Inspection, new Vector3(2.2f, .35f, 4.2f)),
+                FacilityArea(root.transform, "Storage", Ssalddel.Unity.Transport.LogisticsFacilityAreaCodes.Storage, new Vector3(6.6f, .35f, 4.2f)),
+            };
+            var cargo = Primitive(
+                "FacilityCargoVisualRoot",
+                root.transform,
+                areas[0].CargoAnchor.position + new Vector3(0f, .7f, 0f),
+                new Vector3(.8f, .8f, .8f),
+                new Color(.72f, .48f, .2f));
+            var view = root.AddComponent<LogisticsFacilityOverviewView>();
+            view.Configure(
+                building,
+                cargo,
+                summary,
+                boundary,
+                areas,
+                new[]
+                {
+                    StateMaterial(Ssalddel.Unity.Transport.LogisticsFacilityAreaStateCodes.Idle, new Color(.28f, .3f, .32f)),
+                    StateMaterial(Ssalddel.Unity.Transport.LogisticsFacilityAreaStateCodes.Next, new Color(.68f, .52f, .18f)),
+                    StateMaterial(Ssalddel.Unity.Transport.LogisticsFacilityAreaStateCodes.Active, new Color(.12f, .62f, .76f)),
+                    StateMaterial(Ssalddel.Unity.Transport.LogisticsFacilityAreaStateCodes.Completed, new Color(.22f, .58f, .3f)),
+                });
+            return view;
+        }
+
+        private static LogisticsFacilityAreaBinding FacilityArea(
+            Transform parent,
+            string name,
+            string areaCode,
+            Vector3 position)
+        {
+            var visual = Primitive(name + "VisualRoot", parent, position,
+                new Vector3(3.6f, .7f, 2.2f), Color.gray);
+            var anchor = new GameObject(name + "CargoAnchor");
+            anchor.transform.SetParent(parent, false);
+            anchor.transform.position = position + new Vector3(0f, .7f, 0f);
+            var label = CreateText(name + "Status", visual.transform, string.Empty,
+                new Vector3(0f, .65f, -.65f), .018f, Color.white, true);
+            return new LogisticsFacilityAreaBinding
+            {
+                AreaCode = areaCode,
+                VisualRoot = visual,
+                CargoAnchor = anchor.transform,
+                StatusRenderer = visual.GetComponent<Renderer>(),
+                StatusLabel = label,
+            };
+        }
+
+        private static LogisticsFacilityStateMaterialBinding StateMaterial(string state, Color color)
+            => new LogisticsFacilityStateMaterialBinding
+            {
+                StateCode = state,
+                Material = CreateMaterial("LogisticsFacility" + state, color),
+            };
+
         private static void CreateGround(Transform parent)
         {
             var ground = Primitive(
@@ -351,7 +446,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
 
         private static bool CanReplaceCurrentScene()
         {
-            if (!Application.isBatchMode)
+            if (!UnityEngine.Application.isBatchMode)
             {
                 return EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
             }

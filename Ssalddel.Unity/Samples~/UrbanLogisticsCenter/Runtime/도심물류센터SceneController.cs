@@ -18,8 +18,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
         private NpcMovementInterpreter npcMovementInterpreter = null!;
         private NpcMovementPresenter npcMovementPresenter = null!;
         private 도심물류센터View zoneView = null!;
-        private TransportCorridorQueryUseCase corridorQuery = null!;
-        private TransportCorridorPresenter corridorPresenter = null!;
+        private UrbanLogisticsCenterPresentationQueryUseCase logisticsPresentationQuery = null!;
         private TruckMovementApplicator truckApplicator = null!;
         private CancellationTokenSource? lifetime;
 
@@ -30,8 +29,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             NpcMovementQueryUseCase movementQuery,
             NpcMovementInterpreter movementInterpreter,
             NpcMovementPresenter movementPresenter,
-            TransportCorridorQueryUseCase transportCorridorQuery,
-            TransportCorridorPresenter transportCorridorPresenter,
+            UrbanLogisticsCenterPresentationQueryUseCase presentationQuery,
             TruckMovementApplicator movementApplicator,
             도심물류센터View view)
         {
@@ -40,8 +38,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             npcMovementQuery = movementQuery;
             npcMovementInterpreter = movementInterpreter;
             npcMovementPresenter = movementPresenter;
-            corridorQuery = transportCorridorQuery;
-            corridorPresenter = transportCorridorPresenter;
+            logisticsPresentationQuery = presentationQuery;
             truckApplicator = movementApplicator;
             zoneView = view;
         }
@@ -94,9 +91,9 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
                     }
                 }
 
-                zoneView.ApplyTransportCorridor(
-                    corridorPresenter.Present(await corridorQuery.실행Async(lifetime.Token)),
-                    truckApplicator);
+                var logistics = await logisticsPresentationQuery.ExecuteAsync(lifetime.Token);
+                zoneView.ApplyFacilityOverview(logistics.Facility);
+                zoneView.ApplyTransportCorridor(logistics.Truck, truckApplicator);
             }
             catch (OperationCanceledException) when (lifetime?.IsCancellationRequested == true)
             {

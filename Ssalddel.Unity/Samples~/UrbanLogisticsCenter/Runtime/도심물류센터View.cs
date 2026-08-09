@@ -21,16 +21,21 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
         [SerializeField]
         private TransportCorridorTruckView corridorTruck = null!;
 
+        [SerializeField]
+        private LogisticsFacilityOverviewView facilityOverview = null!;
+
         public void Configure(
             LogisticsRoleTargetView[] targets,
             LogisticsInteractionPanelView panel,
             ZoneNpcMovementController movementController,
-            TransportCorridorTruckView truck)
+            TransportCorridorTruckView truck,
+            LogisticsFacilityOverviewView overview)
         {
             roleTargets = targets ?? Array.Empty<LogisticsRoleTargetView>();
             interactionPanel = panel;
             npcMovementController = movementController;
             corridorTruck = truck;
+            facilityOverview = overview;
         }
 
         public IRolePresentationTarget[] GetRolePresentationTargets()
@@ -65,6 +70,11 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
             applicator.Apply(model, corridorTruck);
         }
 
+        public void ApplyFacilityOverview(LogisticsFacilityOverviewPresentationModel? model)
+        {
+            facilityOverview.Apply(model);
+        }
+
         public bool ValidateWiring()
         {
             if (roleTargets == null
@@ -72,12 +82,15 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter
                 || interactionPanel == null
                 || npcMovementController == null
                 || corridorTruck == null
+                || facilityOverview == null
                 || !interactionPanel.ValidateWiring()
                 || !npcMovementController.ValidateWiring()
                 || !corridorTruck.ValidateWiring())
             {
                 return false;
             }
+
+            if (!facilityOverview.ValidateWiring()) return false;
 
             foreach (var target in roleTargets)
             {

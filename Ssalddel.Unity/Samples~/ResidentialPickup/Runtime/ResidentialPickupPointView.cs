@@ -39,13 +39,13 @@ namespace Ssalddel.Unity.Samples.ResidentialPickup
                 + "\n" + point.RoleLabel
                 + "\n" + point.ProductLabel + " × " + point.Quantity
                 + "\n" + point.StatusCode;
-            bodyRenderer.material.color = StatusColor(point.StatusCode);
-            roleBadge.GetComponent<Renderer>().material.color = string.Equals(
+            ApplyColor(bodyRenderer, StatusColor(point.StatusCode));
+            ApplyColor(roleBadge.GetComponent<Renderer>(), string.Equals(
                 authorizedRoleCode,
                 ResidentialPickupRoleCodes.Orderer,
                 System.StringComparison.Ordinal)
                 ? new Color(0.25f, 0.58f, 0.92f)
-                : new Color(0.95f, 0.58f, 0.18f);
+                : new Color(0.95f, 0.58f, 0.18f));
             roleBadge.SetActive(true);
         }
 
@@ -75,6 +75,18 @@ namespace Ssalddel.Unity.Samples.ResidentialPickup
             }
 
             return new Color(0.6f, 0.62f, 0.65f);
+        }
+
+        private static void ApplyColor(Renderer target, Color color)
+        {
+            var block = new MaterialPropertyBlock();
+            target.GetPropertyBlock(block);
+            var material = target.sharedMaterial;
+            if (material != null && material.HasProperty("_BaseColor"))
+                block.SetColor("_BaseColor", color);
+            else
+                block.SetColor("_Color", color);
+            target.SetPropertyBlock(block);
         }
     }
 }
