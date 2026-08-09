@@ -6,6 +6,13 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-08-09 | [Unity Farm·City 그래픽 배경 Showcase](2026-08-09-unity-farm-city-graphical-showcase.md) | 직접 확인 — 기존 공급망 wiring을 유지하고 별도 Scene에 Farm 263·City 88 환경 Wrapper를 배치해 6×6 밭·농장 경관·농촌 도로·도심 거리 배경을 보강; Test Runner 고착으로 최종 Overview 재캡처와 전체 테스트는 미완료 |
+| 2026-08-09 | [Unity FARM-2 밭갈이 폐루프](2026-08-09-unity-farm-2-tilling.md) | 직접 확인 — 6×6 타일 선택 뒤 Preview·Confirm·Simulation Tick을 각각 명시적으로 실행하고 revision 2의 Tilled snapshot과 primitive Dirt Row reconcile을 Game View로 검증 |
+| 2026-08-09 | [Unity City·Farm WORLD-5 품질·성능 Gate](2026-08-09-unity-city-farm-world-5.md) | 직접 확인 — Zone 구도와 Cargo Journey HUD를 최종 정리하고 shader·vendor prefab·Console·기본 profiling·PC/Mobile URP 차이를 기록한 뒤 Visual 확장을 중단 |
+| 2026-08-09 | [Unity City·Farm Cargo Journey](2026-08-09-unity-city-farm-world-4.md) | 직접 확인 — 동일 `cargo:transport-71`과 6개 source lineage를 Farm Yard→Transport→Logistics→Market 네 anchor에 연결하고, 물류센터 도착 근거만 있으므로 Market을 Planned로 유지 |
+| 2026-08-09 | [Unity City·Farm 기존 업무 View 통합](2026-08-09-unity-city-farm-world-3.md) | 직접 확인 — Farm 36 Tile, 물류 handoff 4영역, Market shelf/Concept Card, 공동수령 View를 Synty wrapper에 연결하고 primitive fallback에서도 stable ID·선택 wiring이 유지됨을 검증 |
+| 2026-08-09 | [Unity City·Farm Synty Presentation Catalog](2026-08-09-unity-city-farm-world-2.md) | 직접 확인 — vendor-neutral VisualKey와 Farm·Urban·Transition Catalog를 통해 실제 City/Farm prefab을 별도 공급망 Scene에 연결하고 공통 조명·Global Volume 아래 Overview/Farm/Logistics/Market을 검증 |
+| 2026-08-09 | [Unity City·Farm 공급망 Macro World Blockout](2026-08-09-unity-city-farm-world-blockout.md) | 직접 확인 — Farm Production부터 공동주택 수령까지 6개 Zone과 5개 route를 하나의 Perspective 3/4 Game View에 배치하고 Farm·Logistics·Market Focus와 전경 cutaway를 검증 |
 | 2026-08-04 | [지도 신청 메뉴 입력 접근성](2026-08-04-community-map-application-accessibility.md) | 직접 확인 — fallback 마커의 `Shift+F10`, 상세 panel 버튼, dialog 초점 이동·복귀와 390×844 화면 내 배치를 검증하고 touch long-press와 Google Data marker는 공통 callback 경계로 연결 |
 | 2026-08-04 | [공식뉴스 검토 결정 영속 원장](2026-08-04-official-news-review-ledger.md) | 간접 확인 — 공식뉴스 후보의 승인·제외 snapshot과 멱등 결정 이력을 MongoDB 원장에 저장하고, 공개 지도는 외부 RSS 대신 승인된 원장 projection만 조회 |
 | 2026-08-04 | [지도 뉴스 출처별 RSS 검토 후보 연결](2026-08-04-community-map-news-rss-candidates.md) | 간접 확인 — 언론사 자체 feed 지원 상태와 같은 국가의 별도 정부기관 RSS를 구분하고, 공개 지도에서는 사용자가 원천을 선택할 때 승인 원장 후보만 조회하며 자동 게시는 차단 |
@@ -225,3 +232,5 @@
 3. 검증 중간 산출물, 브라우저 프로필과 캐시는 `artifacts/`에만 두고 Git에 포함하지 않습니다.
 4. API·DB 중심 커밋은 화면을 억지로 만들지 않고 `화면 없음`을 명시한 뒤 가장 가까운 후속 UI를 연결합니다.
 5. 실제 사용자 정보, 주소, 연락처, 결제·계좌 정보와 운송 증빙 원본은 캡처에 포함하지 않습니다.
+6. Unity Scene·prefab·material·camera·UI 변경은 최종 Play/Edit 상태의 실제 Game View PNG를 필수 시각 증거로 남깁니다. Scene View 캡처는 배선·배치 설명을 위한 보조 자료로만 사용합니다.
+7. Unity 대표 PNG와 변경 기록은 관련 코드·Scene 변경과 같은 맥락의 커밋에 포함합니다. 탐색 중간 캡처는 `artifacts/local/`에 두고, 최종 대표 화면만 장기 보존 경로로 옮깁니다.

@@ -34,34 +34,64 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 | 도심 물류센터 운송자 | 인증된 현재 배정 운송 기반 server Role/NPC API 구현 | 실제 UnityWebRequest adapter, NavMesh bake와 runtime 확인 |
 | NPC | Zone route catalog, NavMeshAgent·Animator socket, stable-ID 적용 구현 | Zone별 canonical API 확대와 실제 Animator Controller |
 | 작물 | 농사로 기준정보 server→Unity read-only 흐름 구현 | Farm·Plot·Cultivation·Sensor canonical 운영 contract |
-| Synty | 미도입 | placeholder 계약과 성능 기준 확정 후 최소 팩 검증 |
+| Synty | WORLD-5 뒤 사용자 요청의 별도 Farm·City 그래픽 Showcase Scene 구현 | Test Runner 복구·최종 증거 뒤 Visual 범위 재중단 |
+| Farm 밭갈이 | FARM-2 Preview→Confirm→Tick→새 snapshot·reconcile 완료 | FARM-3 농부 작업 Presentation |
 
 ## 3. 현재 활성 개발 순서
 
-현재 즉시 실행 순서는 cross-zone P0~P9 목록과 별도로 다음처럼 고정한다.
+기존 SS0~SS1, UM5-B, SC0~SC5, RG1~RG4, CC0~CC3-A와 FARM-0~FARM-1 기반은 유지한다. [Unity 입체 탑다운 City·Farm World 구성 제안](UnityCityFarmPackWorldCompositionProposal.md)의 WORLD-0~WORLD-5와 FARM-2를 닫은 뒤, 2026-08-09 사용자 요청에 따라 기존 Farm·City Pack만 사용하는 한정 Showcase 보강을 진행했다. 이 예외는 완료 증거를 남긴 뒤 다시 중단하고 FARM-3로 복귀한다.
 
-| 순서 | 작업 | 이유 |
-| --- | --- | --- |
-| 완료 | SS0~SS1 별도 Simulation 서버 기반 | 운영 서버 비침범, session·seed·revision·멱등 Tick 경계 |
-| 완료 | UM5-B manager surface applicator·sample wiring | 실제 Unity 프로젝트 sample compile·EditMode 16/16; Scene·Game View는 별도 검증 |
-| 완료 | SC0 공급·수요·주문 Data 계약 | 독립 revision·lineage와 운영 경계·참조·단위·합계 검증 |
-| 완료 | SC1-A 감자·3공급처 fixture | 10 node·15 relation의 deterministic 공급 graph |
-| 완료 | SC1-B 인구→잠재수요→Demand Scenario | 공공 basis와 명시적 4주 수요 가정 계보 분리 |
-| 완료 | RG0 기존 서버 재사용 조사 | individual-demand·GroupPurchase·Order·GroupOrder·ResidentialPickup·공급중개 경계 |
-| 완료 | SC1-C 기본 방문 Demand→Order Stream | 4주 56건, 기대수요 합계·same-seed·기한·lineage 보존 |
-| 완료 | RG1~RG3 공동주택 fixture·대표 NPC identity·typed graph·수요 합성 | 사회적 context와 권한 분리, 의향과 group-order 확정 분리 |
-| 완료 | SC2 4주 주문·공급 Engine | 합성 수요의 할당·충족·재고·현금·폐기·노동 인과관계 |
-| 완료 | RG4 역할별 Perspective | 주민 본인·대표 집계·마트 공급 검토 projection과 inquiry/dialogue 권한 경계 |
-| 완료 | RG4-NPC-A + SC3~SC5 headless | 두 Zone route leg·visit state, 공급 위험과 주문/계약 surface 입력 모델 |
-| 코드 완료 | RG4-NPC-B + SC5 Unity binding | 대표 View, dialogue coordinator, 서버 계산 surface mapper/applicator와 package core compile |
-| 완료 | CC0 Concept Card 방향 확정 | 네 카드 책임, 공통 계층, asset 중립성과 첫 대표 NPC deck |
-| 완료 | CC1 카드 계약·Projector | 공통 identity·revision·mode·lineage 검증과 미승인 Action 제거 |
-| 완료 | CC2 대표 NPC 7-card deck | RG4·SC3~SC5 값을 재계산 없이 source별 Presentation으로 투영 |
-| 1 | CC3 + RG4-NPC-C Unity runtime wiring | imported sample 갱신, 카드 View·skin, Scene·NavMesh·Animator·manager desk 검증 |
-| 2 | SC6~SC7 confirm·tick·UM4·대표 결과 전달 | Action Card와 Command 분리, 10분 playable과 하류 결과 완결 |
-| 3 | RG5~RG7 + SC9 Operational | 기존 공동구매 Projection·ResidentialPickup·공급 Command 폐루프 |
+| 우선순위 | 구현 묶음 | 재사용하거나 추가할 핵심 | 완료 Gate |
+| --- | --- | --- | --- |
+| P0 | 사전 조사와 기준선 고정 | 실제 Unity project·Scene, City/Farm prefab allowlist, URP Asset·Renderer·Quality, 기존 View·builder·VContainer wiring, baseline test·Console | 중복 생성 금지 목록, 수정 대상 목록, 선택 asset과 현재 오류가 기록됨 |
+| P1 | WORLD-0 Camera Prototype | 기존 Camera가 없을 때만 `DioramaTopDownCameraRig`, World/Zone/Object focus anchor와 coordinator, pan·zoom·90도 회전, 최소 roof/foreground occlusion | primitive Farm·Logistics·Market에서 focus와 가림을 Game View로 확인 |
+| P2 | WORLD-1 Macro World Blockout | 하나의 Bootstrap과 Farm→Farm Yard→Transport→Logistics→Market→Residential Zone root, route와 vehicle/focus anchor | text 없이 생산→수령 방향이 읽히며 interior·장식은 아직 없음 |
+| P3 | WORLD-2 Presentation Catalog·Synty 품질 | 실제 inventory 기반 Farm/Urban/Transition VisualKey·catalog, wrapper scale·pivot 보정, 공통 lighting·Volume·URP Renderer 영향 확인 | Overview/Farm/Logistics/Market 비교 화면에서 두 Pack이 한 World로 읽힘 |
+| P4 | WORLD-3 기존 업무 View 연결 | `FarmSoilTileCellView`, `TransportCorridorTruckView`, `LogisticsFacilityOverviewView`, 도심마트 surface/Card, Residential pickup의 기존 `VisualRoot` | Synty 외형을 primitive로 되돌려도 stable ID·선택·Presentation test가 유지됨 |
+| P5 | WORLD-4 Cargo Handoff | prefab 중립 cargo stable ID·lineage PresentationModel, Zone anchor와 Zone별 VisualKey, Farm Yard→차량→물류센터→마트 표현 | 같은 감자 cargo의 lineage가 전 구간에서 유지되고 도착 event는 상태를 확정하지 않음 |
+| P6 | WORLD-5 품질·성능·증거 Gate | Console·shader·prefab 검사, renderer·Animator·FX·draw range와 기본 profiling, PC target과 Android 후보 분리, 대표 Game View 4종 | `docs/Changes`와 `docs/assets/changes`에 최종 PNG·측정·제한을 기록하고 Visual 확장을 중단 |
+| P7 | FARM-2 밭갈이 폐루프 | 기존 FARM-0~FARM-1 6×6 snapshot·Projector·View 위에 Preview, explicit Confirm, Simulation Command/Tick, 새 snapshot과 reconcile | 선택→Preview→Confirm→Tick→Dirt Row가 실제 state 변화로 왕복하고 animation·NPC는 권위를 갖지 않음 |
+| P7.5 | 사용자 요청 Farm·City 그래픽 Showcase | 기존 WORLD-5를 보존한 별도 Scene, Presentation 전용 Environment key/catalog, Farm·City vendor prefab의 전경·중경·원경 배치 | 최종 테스트·Console·Overview/Farm/Logistics/Market·profiling 증거를 남기고 범위를 다시 중단 |
+| P8 | FARM-3~FARM-5 생산 표현 | 농부 semantic waypoint·최소 animation, 파종·S/M/L 생육, 수확·감자 cargo | deterministic seed·rule revision과 cargo lineage를 보존한 작은 vertical slice별 test |
+| P9 | FARM-6 이후 공급망 폐루프 | 농장 출하→운송→입고→후방재고→진열→공동수령, 이후 필요한 Operational projection | Simulation과 Operational을 섞지 않고 각 canonical 재조회·권한·오류 경계를 검증 |
 
-세부 계약과 완료 기준은 [도심마트 공급 계약 경영 Simulation 설계](UrbanMarketSupplyManagementSimulationDesign.md)와 [도심마트 공동주택 주문자 집단 통합 설계](UrbanMarketResidentialOrdererGroupIntegrationDesign.md)를 따른다. 이 순서는 제품 0.0 기본 공개 순서를 바꾸거나 실제 계약·발주·결제를 활성화하지 않는다.
+### P0에서 반드시 남길 작업 분류
+
+```text
+재사용
+  Farm 6×6 Tile·선택·Projector
+  Logistics facility·truck VisualRoot
+  Urban Market surface·Concept Card
+  Residential pickup View
+
+새 구현 후보
+  통합 Diorama camera/focus
+  Macro World Bootstrap과 Zone anchor
+  asset inventory 기반 Presentation catalog
+  cross-zone cargo lineage presentation
+
+후속으로 유지
+  FARM-2 Confirm/Tick
+  NPC animation 완성
+  Android 최적화
+  Operational command 연결
+```
+
+P0~P6은 시각적 World 기반을 닫는 작업이며 Domain·Simulation 구조를 asset에 맞게 바꾸지 않는다. P6 완료 뒤 계절·낮밤·대규모 날씨·streaming·추가 interior를 시작하지 않고 P7 FARM-2로 이동한다. 도심마트 Simulation과 공동주택 세부 계약은 [도심마트 공급 계약 경영 Simulation 설계](UrbanMarketSupplyManagementSimulationDesign.md)와 [도심마트 공동주택 주문자 집단 통합 설계](UrbanMarketResidentialOrdererGroupIntegrationDesign.md)를 계속 따른다.
+
+### 현재 Gate 상태
+
+- P0 완료: [City·Farm World P0 기준선과 Asset Inventory](UnityCityFarmWorldP0Inventory.md)에 실제 Unity project·Scene·City/Farm allowlist·URP/Renderer/Quality·Console 기준선을 기록했다.
+- P1 WORLD-0 완료: asset-neutral camera state, Perspective rig, World/Zone/Object focus, pan·zoom·90도 회전과 명시적으로 표시된 foreground cutaway를 구현했다. 저장하지 않은 primitive prototype에서 Overview/Farm/Logistics/Market Game View를 확인했고 Unity EditMode 전체 29/29가 통과했다.
+- P2 WORLD-1 완료: 별도 `CityFarmMacroWorldBlockout` Scene에 Farm Production→Farm Yard→Transport→Logistics→Market→Residential 6개 Presentation Zone과 5개 route, World/Zone focus anchor를 저장했다. Farm Production과 Farm Yard는 기존 canonical `farm`을 공유하며 Presentation 공간만 분리한다. 대표 Game View 4종을 확인했고 Unity EditMode 전체 33/33이 통과했다.
+- P3 WORLD-2 완료: Farm·Urban·Transition `WorldVisualCatalog`와 vendor-neutral VisualKey, `WorldVisualInstanceView/VisualRoot` wrapper를 추가하고 별도 `CityFarmSyntyWorldPrototype` Scene에 allowlist 21종을 연결했다. 전용 Global Volume profile을 사용하되 기존 PC/Mobile URP Asset·Renderer는 수정하지 않았다. 대표 Game View 4종과 shader/prefab reference를 확인했고 Unity EditMode 전체 36/36이 통과했다.
+- P4 WORLD-3 완료: 별도 `CityFarmBusinessViewIntegration` Scene에서 기존 Farm 6×6 Tile, Logistics facility, Urban Market shelf·Concept Card, Residential pickup View를 WORLD-2 wrapper에 연결했다. `WorldPresentationFallbackView`는 Synty child와 primitive만 교체하며 업무 View와 stable ID는 유지한다. 전용 5/5와 Unity EditMode 전체 41/41이 통과했다.
+- P5 WORLD-4 완료: 별도 `CityFarmCargoJourney` Scene에서 기존 handoff의 `cargo:transport-71`을 Farm Yard·Transport·Urban Logistics·Urban Market 네 anchor가 공유한다. origin·product·cargo·handoff·transport task·inbound task의 6개 source lineage를 보존하며, handoff가 물류센터 도착까지만 증명하므로 Market은 `Planned`로 유지한다. 전용 6/6과 Unity EditMode 전체 47/47이 통과했다.
+- P6 WORLD-5 완료: 별도 `CityFarmVisualQualityGate` Scene에서 Zone distance를 Game View 비교 근거로 26으로 확정하고, 읽히지 않는 3D evidence text를 숨긴 뒤 동일 Cargo Journey를 읽는 camera-space HUD로 대체했다. shader·vendor prefab·missing script 검사, 대표 PNG 4종, PC/Mobile URP 차이와 Editor 기본 profiling을 기록했다. 전용 5/5와 Unity EditMode 전체 52/52가 통과했다.
+- Visual 강제 중단 예외: 사용자 요청으로 기존 Farm·City Pack만 사용하는 P7.5를 한정 수행했다. 계절·낮밤·날씨·streaming·추가 interior·새 Zone은 여전히 시작하지 않는다.
+- P7 FARM-2 완료: 기존 6×6 snapshot·Projector·stable-ID View를 재사용해 선택→Preview→명시적 Confirm→Simulation Tick→새 Snapshot→Reconcile→Dirt Row를 연결했다. Preview·Confirm은 revision 1을 유지하고 Tick만 revision 2의 새 snapshot과 `Tilled` 상태를 반환한다. core 10/10, Farm View 6/6, Unity EditMode 전체 55/55가 통과했다.
+- P7.5 진행: 별도 `FarmCityGraphicalShowcase` Scene과 Environment Catalog에 Farm 263·City 88 Wrapper를 배치했다. 빌더 검증·컴파일·생성 직후 Console Error 0은 확인했으나 Test Runner가 도메인 재로드 뒤 고착되어 최종 전체 테스트·Overview 재캡처·profiling은 남아 있다.
+- 다음 Gate: P7.5 검증 복구 뒤 P8의 첫 slice인 FARM-3. Simulation Task를 semantic waypoint와 농부 이동·정지·회전·최소 animation adapter로 표현하되 도착·animation 완료는 상태 확정 권위를 갖지 않는다.
 
 ## 4. 통합 구현 우선순위
 
@@ -169,16 +199,20 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 
 ### P7. 농장·생산자 관점
 
-시각적 중요도는 높지만 현재 서버에 Farm·Plot·Cultivation·Sensor canonical 운영 모델이 없으므로 추정 DTO를 먼저 만들지 않는다.
+운영 Farm·Plot·Cultivation·Sensor Projection은 실제 농장 관측과 작업 권위를 유지한다. 타일 기반 농사 playable은 이 계약을 좌표 격자로 변형하지 않고 별도 `Simulation` snapshot으로 구성한다.
 
-1. canonical aggregate와 stable ID를 결정한다.
-2. 작물 기준정보와 실제 재배 상태를 분리한다.
-3. Farm/Sensor API, Repository와 생산자 ScreenModel을 연결한다.
-4. FarmTile, CropView, SensorView와 생산자 NPC를 적용한다.
+1. FARM-0: 타일 stable ID·좌표·토양 profile·수분 관측 상태·경작 상태·작업 참조 계약과 무결성 검증
+2. FARM-1: 6×6 asset-neutral 토양 Grid, stable-ID 선택과 Projector 결정 color token·상세 설명
+3. FARM-2: 밭갈이 Preview → 명시적 Confirm → 작업 생성 → Simulation Tick → 타일 상태 갱신
+4. FARM-3: 기존 생산자 NPC waypoint·NavMeshAgent에 밭갈이 작업 표현 연결. NPC 도착은 완료 권위가 아님
+5. FARM-4: SeedLot 재고, 파종 Preview·Confirm과 경작·수량 무결성
+6. FARM-5: scenario seed·rule revision 기반 발아·생육·관수·수확 결정적 Tick
+7. FARM-6: 수확물 → 농장 포장장 → 화물 → 물류센터 handoff 연결
+8. FARM-7: Farm asset `VisualRoot`, Humanoid Animator, 실제 Scene·Game View와 성능 검증
 
-canonical contract 전에는 명확히 표시된 simulation vertical slice만 허용한다.
+공공·운영 토양 관측을 Simulation 수확량으로 직접 환산하지 않는다. Operational API 실패 시 Simulation fixture fallback도 금지한다.
 
-2026-08-08 현재 `농장` root 아래 `농장구획`, `재배작기`, `농업센서`, `농업센서관측`과 `농장작업` canonical aggregate 및 EF migration을 추가했다. 생산자 API는 인증 사용자가 소유한 농장만 반환하며 공개 작물 기준 ID·출처와 실제 생육 상태를 분리한다. 센서는 원시값·단위·기준시각과 서버 판정 상태·규칙 revision·근거 card·한계를 함께 제공하고 위치·주소·소유자 ID는 제외한다. Unity에는 Repository·UseCase, FarmTile·Crop·Sensor View, canonical 농장작업을 참조하는 생산자 NavMeshAgent socket과 VContainer primitive sample을 연결했다. 임시 Unity 6 프로젝트에서 compile, scene 생성과 reload wiring을 확인했다. 실제 sensor ingestion, 운영 DB migration 적용, 인증 API runtime, NavMesh bake와 Animator Controller는 남아 있다.
+2026-08-09 현재 `농장` root 아래 `농장구획`, `재배작기`, `농업센서`, `농업센서관측`과 `농장작업` canonical aggregate 및 EF migration을 추가했다. 생산자 API는 인증 사용자가 소유한 농장만 반환하며 공개 작물 기준 ID·출처와 실제 생육 상태를 분리한다. 센서는 원시값·단위·기준시각과 서버 판정 상태·규칙 revision·근거 card·한계를 함께 제공하고 위치·주소·소유자 ID는 제외한다. Unity에는 Repository·UseCase, FarmTile·Crop·Sensor View, canonical 농장작업을 참조하는 생산자 NavMeshAgent socket과 VContainer primitive sample을 연결했다. FARM-0~FARM-1에서 별도 감자 Simulation 6×6 토양 타일 계약·무결성·Projector와 선택 View를 추가하고 실제 imported sample EditMode를 검증했다. 실제 sensor ingestion, 운영 DB migration 적용, 인증 API runtime, 밭갈이 작업 폐루프, NavMesh bake와 Animator Controller는 남아 있다.
 
 ### P8. 협동조합·공동원장 공간
 

@@ -5,13 +5,13 @@
 ## Snapshot
 
 - 기준일: 2026-08-09
-- 현재 작업 축: CC2 대표 NPC 7-card deck 완료 뒤 CC3 + RG4-NPC-C Unity View·Scene runtime wiring
+- 현재 작업 축: FARM-2 완료 뒤 사용자 요청으로 Farm·City 환경 Showcase를 한정 보강, 검증 복구 후 FARM-3 농부 작업 Presentation
 - 제품 공개 기본값: 0.0 커뮤니티·공공데이터
 - Unity 개발 범위: 제품 버전 순서에 종속되지 않는 전체 Ssalddel 도메인
 
 ## 현재 목표
 
-기존 `Ssalddel` 운영 서버는 실제 사용자·조직·공동구매·개별 주문·계약·발주·입고·재고·결제의 권위를 유지하고, 별도 `Ssalddel.Simulation.Server`가 게임 session·scenario lineage·seed·가상 Tick·revision을 소유한다. 도심마트 UM5, SC0~SC5와 RG1~RG4·RG4-NPC-A/B code까지 완료됐고 CC2에서 대표 NPC 7-card deck adapter를 구현했다. 다음은 `ConceptCardView`·visual skin을 기존 Unity project sample과 manager desk Scene에 연결하고 NavMesh·Animator와 함께 검증하는 CC3 + RG4-NPC-C다. Simulation 주문·계약 확정은 실제 주문·계약·발주·결제·입고를 만들지 않는다.
+기존 `Ssalddel` 운영 서버는 실제 사용자·조직·공동구매·개별 주문·계약·발주·입고·재고·결제와 농장 관측·작업의 권위를 유지하고, 별도 Simulation 경계가 scenario lineage·seed·가상 Tick·revision을 소유한다. 구매·import한 Synty City·Farm Pack은 이 경계를 변경하지 않고 실제 업무 object의 `VisualRoot`와 별도 Environment root에서만 사용한다. WORLD-0~WORLD-5의 Farm→Farm Yard→Rural Road→Logistics→Market→Residential 시각 증거와 FARM-2의 Preview→명시적 Confirm→Simulation Tick→새 snapshot→reconcile→Dirt Row 폐루프를 유지한다. 2026-08-09 사용자 요청으로 Visual 중단을 한정 해제해 별도 `FarmCityGraphicalShowcase` Scene에 Farm 263·City 88 환경 Wrapper를 추가했다. 원본 WORLD-5 Scene, vendor prefab/material, Simulation·Operational 계약은 바꾸지 않았다. Unity Test Runner가 도메인 재로드 뒤 고착되어 최종 전체 테스트·Overview 재캡처·profiling은 남아 있으며, 이를 복구한 뒤 Simulation Task를 농부 이동·정지·회전·최소 animation으로 표현하는 FARM-3로 복귀한다. 환경 object와 NPC·animation은 업무 stable ID나 상태 확정 권위를 소유하지 않는다.
 
 ```text
 Authorized market operation data
@@ -70,15 +70,15 @@ External source
 - 진열 보충 결과는 `CanPreviewRequest` 후보일 뿐 Command나 canonical 재고 변경을 수행하지 않도록 고정
 - UM3 계산을 재검토해 같은 상품의 다른 진열대 작업이 점유한 재고를 차감하지 못하는 초과 추천 위험과 단일 `SourceInventoryStableId`의 다중 위치 계획 한계를 확인
 - UM4보다 UM3R을 먼저 두고 원천 재고별 `OnHand / Allocated / Available`, 작업 allocation, 다중 원천 SourcePlan과 integrity blocker를 구현하도록 설계 보강
-- 관리자 Perspective는 무결성 검증 뒤 `UrgentActions / PendingActions / InProgress / DataAttention` 30초 queue를 만들며, 판매속도 Data 없이 `곧 품절`을 추론하지 않도록 결정
+- 관리자 Perspective는 모든 진열 상태의 `NeedCode`·차단 사유·허용 interaction·SourcePlan을 보존하며, 근거 Data가 없는 업무 우선순위 점수나 queue와 `곧 품절` 추론을 만들지 않도록 결정
 - UM3R-A 구현: `도심마트재고가용성WorldState`에서 원천 재고별 OnHand·모든 비종료 작업 Allocated·Available과 할당 task lineage를 계산
 - 다른 진열대의 작업 점유량도 현재 후보에서 차감하고 할당 합이 원천 수량을 넘으면 `InventoryOversubscribed`로 preview를 차단
 - UM3R-B 구현: 명시적 작업 allocation Data·typed World node와 legacy 단일 source 정규화 경로 추가
 - 여러 후방 위치의 Available 수량을 deterministic SourcePlan으로 배분하고 합계가 후보 수량과 일치할 때만 preview 허용
 - UM3R-C 검증: 다중 원천, 완료·해제 할당 제외, 명시적 allocation 우선, 수량 합계·단위·원천·중복 Stable ID 거부
-- UM4 구현: `마트관리자PerspectiveInterpreter`가 무결성 오류, 진열 0·입고 검토, 완전한 보충 후보와 활성 작업을 4개 관리자 queue로 분류하고 같은 우선순위에서만 Stable ID tie-breaker 사용
-- UM4 구현: priority reason·rule revision·source lineage, focus 관련 World와 허용 interaction intent를 보존하고 판매속도 없이 품절 예상시간·매출 영향 점수를 만들지 않음
-- UM4 구현: 30초 ManagerSummary와 priority queue·shelf·task·detail·source-plan 독립 surface를 `도심마트PresentationProjector`에서 생성하고 새 surface 경로의 색·상자 수·문구 판단을 Projector가 소유; 기존 compatibility View 전환은 UM5로 유지
+- UM4 재정비: `마트관리자PerspectiveInterpreter`가 모든 진열 상태를 Stable ID 결정적 순서로 보존하고 `NeedCode`, 차단 사유, 허용 interaction, rule revision·source lineage와 focus 관계를 전달
+- UM4 재정비: `PriorityScore`, priority reason, 30초 ManagerSummary와 priority queue를 제거하고 shelf·task·detail·source-plan 독립 surface만 `도심마트PresentationProjector`에서 생성
+- UM4 재정비: Stable ID 순서는 업무 우선순위가 아니며 판매속도·기한·SLA 같은 authoritative Data가 생기기 전에는 품절 예상시간·매출 영향·긴급도를 추론하지 않음
 - UM5-B 구현: 기존 공개 상품 Controller/View는 compatibility 경로로 보존하고 별도 manager Controller·surface/shelf View·LifetimeScope가 stable-ID change set과 선택 focus를 적용
 - UM5-B 구현: manager primitive builder는 별도 Scene을 대상으로 하며, 실제 Unity 프로젝트에는 sample과 VContainer 1.18.0을 가져와 compile·EditMode를 검증하되 builder 실행·Scene 저장은 하지 않음
 - SC0 구현: 공급처·Offer·계약안, 수요 시나리오, synthetic 주문·주문 재고할당을 세 독립 Simulation snapshot으로 추가하고 각 DataRevision·source lineage·mode 경계를 보존
@@ -242,6 +242,37 @@ External source
 - opt-in 전용 live verifier로 실제 응답을 production Runtime, private local object storage와 SQLite Run→Raw→Normalized lineage에 통과
 - live verifier가 test 0건을 성공으로 오인하지 않도록 ASCII Trait filter와 TRX executed/passed count 검증 추가
 
+- Synty City Pack을 실제 Unity 프로젝트 원본 폴더에 import하고, 전용 builder가 canonical primitive sample 뒤 `VisualRoot`만 교체하도록 구성
+- 도심마트 저장 Scene에 상점·공동주택·대표·관리자·책상·진열대를, 물류센터 저장 Scene에 시설·차량·pallet·상자를 배치하고 두 builder validation·Game View·Play Mode를 확인
+- City Pack 캐릭터의 Humanoid Avatar와 `Synty/Generic_Basic` URP shader를 검증하고, Play Mode에서 발견한 마트 `PresentationContext` VContainer 등록 누락을 보완
+- City Pack에는 농장 토양·작물과 실제 AnimationClip·AnimatorController가 없음을 확인해 FARM-2~FARM-5와 walk/work animation은 별도 asset-neutral 후속으로 유지
+- Unity Scene·prefab·material·camera·UI 변경은 최종 Game View PNG를 다시 캡처하고 관련 코드·Scene·변경 기록과 같은 맥락의 커밋에 포함하도록 시각 증거 원칙을 보강
+- [입체 탑다운 City·Farm World 구성 제안](../Architecture/UnityCityFarmPackWorldCompositionProposal.md)을 POLYGON Farm Showcase 네 장의 목표 화면에 맞춰 개정: 살아 있는 농촌 경관, 전경·핵심 공간·중경·배경, 환경 농지 안의 실제 감자 6×6, Produce Stand/Farm Yard, Semi-Urban Transition과 강화된 WORLD-2 시각 완료 기준을 명시하고 기존 VisualRoot·stable ID·Simulation 권위 경계는 유지
+- [Unity World 구현 현황과 우선순위](../Architecture/UnityWorldImplementationPriority.md)의 현재 실행열을 P0 사전 조사부터 P6 WORLD-5 증거 Gate, P7 FARM-2 폐루프와 후속 P8~P9로 분리하고 각 단계의 재사용 대상과 완료 Gate를 고정
+- [City·Farm World P0 기준선과 Asset Inventory](../Architecture/UnityCityFarmWorldP0Inventory.md)에 실제 Unity 6000.5.6f1 project·열린 물류센터 Scene·Farm 498/City 335 prefab·최소 allowlist·PC/Mobile URP와 PC SSAO Renderer Feature·Console 기준선을 기록
+- WORLD-0 구현: product Unity project에 asset-neutral `DioramaCameraStateMachine`, `DioramaTopDownCameraRig`, World/Zone/Object focus, pan·zoom·90도 회전과 명시적 foreground cutaway, 저장하지 않는 primitive builder와 EditMode test를 추가
+- WORLD-0 runtime 확인: unsaved prototype에서 Overview/Farm/Logistics/Market focus와 Market 90도 회전을 캡처한 뒤 기존 물류센터 Scene으로 복귀; 제품 Scene·vendor asset·URP 설정은 저장·수정하지 않음
+- WORLD-1 구현: product Unity project의 별도 `CityFarmMacroWorldBlockout` Scene에 Farm Production·Farm Yard·Transport·Logistics·Market·Residential 6개 Presentation Zone, 5개 route와 World/Zone focus anchor를 저장하고 canonical Zone code와 Presentation subzone code를 분리
+- WORLD-1 저장 보정: Unity 직렬화를 위해 Zone/Route `MonoBehaviour`를 타입명과 일치하는 파일로 분리하고, 저장 Scene 재로드 test에서 6개 Zone·5개 route·camera reference를 검증
+- WORLD-1 Game View: 전용 primitive blockout material로 Text 없는 생산→수령 흐름과 Farm 6×6·Logistics cutaway·Market·Residential occlusion을 확인하고 [시각 변경 기록](../Changes/2026-08-09-unity-city-farm-world-blockout.md)에 Overview/Farm/Logistics/Market PNG를 보존
+- WORLD-2 Catalog: vendor 이름을 포함하지 않는 Farm·Urban·Transition VisualKey 21개와 prefab·position/rotation/scale 보정만 보유하는 `WorldVisualCatalog`, `WorldVisualInstanceView/VisualRoot` wrapper를 추가
+- WORLD-2 Synty Scene: WORLD-1을 보존한 별도 `CityFarmSyntyWorldPrototype` Scene에 Dirt Row·감자 S/M/L·Barn·Silo·Farmer·Tractor·Potato Box와 City Station·Shop·Apartment·Van·Pallet·Box·Shelf·Desk·road를 실제 prefab reference로 연결
+- WORLD-2 URP 경계: 기존 PC/Mobile RP Asset과 Renderer/SSAO를 변경하지 않고 Color Adjustments·Neutral Tonemapping·낮은 Bloom만 가진 전용 Global Volume profile과 camera post-processing을 Scene에 연결
+- WORLD-2 Game View: 공통 3/4 Perspective와 조명 아래 Overview/Farm/Logistics/Market을 재캡처하고 [시각 변경 기록](../Changes/2026-08-09-unity-city-farm-world-2.md)에 보존
+- WORLD-3 기존 View 연결: 별도 `CityFarmBusinessViewIntegration` Scene에 기존 Farm 36 Tile·Logistics facility·Urban Market shelf/Concept Card·Residential pickup View를 연결하고 stable ID와 선택 callback을 Scene 재로드 뒤에도 복구
+- WORLD-3 fallback 경계: `WorldPresentationFallbackView`가 Synty `VisualRoot`와 primitive 외형만 전환하며 Farm tile·Market shelf·Residential pickup 업무 View와 stable ID를 wrapper에 유지
+- WORLD-3 material 보정: Market/Residential Sample의 상태 색을 Edit Mode 임시 material 생성 대신 `MaterialPropertyBlock`으로 적용하고 원본 vendor material은 수정하지 않음
+- WORLD-3 Game View: Overview/Farm/Logistics/Market을 재캡처하고 [시각 변경 기록](../Changes/2026-08-09-unity-city-farm-world-3.md)에 보존
+- WORLD-4 cargo 계약: 기존 `CargoWarehouseHandoffSnapshot`을 prefab 중립 `CargoJourneyPresentationModel`로 투영하고 origin·product·cargo·handoff·transport task·inbound task 6개 source lineage를 보존
+- WORLD-4 Scene: WORLD-3을 보존한 별도 `CityFarmCargoJourney` Scene에서 같은 `cargo:transport-71`을 Farm Yard potato box·Transport cargo box·Logistics pallet·Market backroom 예정 box에 연결
+- WORLD-4 권위 경계: `ArrivedAtWarehouse`의 현재 Zone은 Urban Logistics로 두고 Market은 실제 도착 근거가 없으므로 `Planned`로 유지하며, 낮은 revision·cargo identity 변경을 View에서 차단
+- WORLD-4 Game View: Overview/Farm Yard/Logistics/Market을 재캡처하고 [시각 변경 기록](../Changes/2026-08-09-unity-city-farm-world-4.md)에 보존
+- WORLD-5 품질 Scene: WORLD-4를 보존한 별도 `CityFarmVisualQualityGate` Scene에 Game View 비교로 선택한 Zone distance 26과 screen-space camera HUD를 저장
+- WORLD-5 가독성: 멀리서 읽히지 않던 3D `TextMesh` evidence를 최종 Gate Scene에서 숨기고, 기존 Cargo Journey만 읽는 Farm Yard→Transport→Logistics→Market 상태 bar와 Presentation 비권위 문구로 대체
+- WORLD-5 reference Gate: 모든 `WorldVisualInstanceView`의 catalog/prefab 연결, vendor prefab source, material/shader, missing MonoBehaviour script를 Scene 재로드 뒤 검사
+- WORLD-5 PC/Android 분리: 현재 PC RP Asset의 render scale 1.0·2048 shadow·4 cascade·SSAO와 Mobile RP Asset의 0.8·1024 shadow·1 cascade·SSAO 없음 차이를 읽기 전용으로 기록하고, Android Player 실측 전 추가 축소 수치는 확정하지 않음
+- WORLD-5 Game View: Overview/Farm/Logistics/Market 최종 PNG를 [시각 변경 기록](../Changes/2026-08-09-unity-city-farm-world-5.md)에 보존하고 Visual 확장 중단 조건을 적용
+
 ## 검증 상태
 
 | 검증 | 상태 | 근거 또는 제한 |
@@ -315,7 +346,7 @@ External source
 | UrbanMarket UM0~UM3 targeted | 28/28 통과 | 공개/관리자 graph, dangling relation, deterministic revision, 진열 보충 후보·입고 필요·활성 작업·capability·불충분 data 포함; TRX `artifacts/local/validation/urban-market-um03/urban-market-um03.trx` |
 | Unity core UM0~UM3 | 157/157 통과 | `Ssalddel.Unity` netstandard build와 전체 headless tests; TRX `artifacts/local/validation/urban-market-um03-full/unity-core-um03.trx` |
 | UrbanMarket UM0~UM3 scoped Fast | 통과 | Unity core·test project build와 `git diff --check`; tests는 위 전용 실행으로 별도 검증, log `20260809-095316` |
-| UrbanMarket UM3R 재설계 문서 | 통과 | 전역 allocation·다중 원천 SourcePlan·관리자 30초 queue 순서 보강; docs-only Fast에서 build·test 생략, `git diff --check` 통과, log `20260809-101425` |
+| UrbanMarket UM3R 재설계 문서 | 통과 | 전역 allocation·다중 원천 SourcePlan을 관리자 Perspective보다 먼저 검증하도록 순서 보강; docs-only Fast에서 build·test 생략, `git diff --check` 통과, log `20260809-101425` |
 | UrbanMarket UM3R-A targeted | 9/9 통과 | 다른 진열대 전역 할당 차감, 초과 할당 차단, 물리 재고 없음과 전량 할당 구분 포함; TRX `artifacts/local/validation/urban-market-um3r-a/urban-market-um3r-a.trx` |
 | Unity core UM3R-A | 160/160 통과 | `Ssalddel.Unity` netstandard build와 전체 headless tests; TRX `artifacts/local/validation/urban-market-um3r-a-full/unity-core-um3r-a.trx` |
 | UrbanMarket UM3R-A scoped Fast | 통과 | Unity core·test project build와 `git diff --check`; tests는 위 전용 실행으로 별도 검증, log `20260809-102503` |
@@ -337,8 +368,11 @@ External source
 | UrbanMarket demand·order redesign docs | 통과 | 수요·주문 기준 문서, D-028, 지역 인구 handoff와 SC0~SC7 재정렬; docs-only Fast log `20260809-115208`, 코드·runtime 구현 아님 |
 | UrbanMarket UM5-B headless | 184/184 통과 | manager View 입력 계약을 포함한 `Ssalddel.Unity` 전체 회귀; TRX `artifacts/local/validation/urban-market-um5b/unity-um5b.trx` |
 | 실제 Unity project UM5-B core/sample | 각 16/16 통과 | `C:\Users\user\ssalddel` local UPM core와 imported Urban Market sample compile·EditMode; VContainer 1.18.0 구성 누락 보완 |
-| UrbanMarket UM5-B Scene·Game View | 미실행 | 별도 manager builder 코드는 추가했으나 Scene 생성·저장·PlayMode는 수행하지 않음 |
+| UrbanMarket UM5-B Scene·Game View | City Pack builder·Play Mode 통과 | manager primitive builder를 기반으로 저장 Scene을 생성하고 View 교체 뒤 Runtime 시작과 Console error 0건 확인 |
 | UrbanMarket UM5-B scoped Fast / Task | Fast·Task build 통과, Task 비관련 실패 | Fast log `20260809-120408`; Task에서 v0.0 build 통과 후 4,465/4,472 통과와 기존 metadata/naming/CSS 7건 실패, log `20260809-120420` |
+| UrbanMarket manager Queue 제거 targeted | 15/15 통과 | 평면 ShelfState Perspective, queue 없는 surface change set, focus·last-success 회귀; TRX `artifacts/local/validation/urban-market-manager-no-queue/urban-market-manager-no-queue.trx` |
+| Unity core manager Queue 제거 | 216/216 통과 | `Ssalddel.Unity` 전체 headless 회귀; TRX `artifacts/local/validation/urban-market-manager-no-queue-full/unity-manager-no-queue-full.trx` |
+| UrbanMarket manager Queue 제거 scoped Fast | 통과 | 관련 Unity core·test project build와 `git diff --check`; log `20260809-151049` |
 | Supply Management SC0 contracts | 집중 11/11, Simulation 전체 22/22 통과 | 독립 snapshot revision·lineage, 운영 분리, 공급·수요·주문·allocation 무결성; TRX `artifacts/local/validation/urban-market-sc0/sc0-all-final.trx` |
 | Supply Management SC0 scoped Fast / Task | Fast·Task build 통과, Task 비관련 실패 | Fast log `20260809-120850`; Task에서 v0.0 build 통과 후 4,465/4,472 통과와 기존 7건 실패, log `20260809-120901` |
 | Supply Management SC1-A | 집중 7/7, Simulation 전체 29/29 통과 | 감자·3공급처 fixture, 10 node·15 relation, relation semantic·dangling·duplicate·결정성; TRX `artifacts/local/validation/urban-market-sc1a/sc1a-all.trx` |
@@ -370,48 +404,83 @@ External source
 | Concept Card CC2 | 관련 집중 25/25, Unity core 전체 217/217 통과 | 7-card 순서, 385/2,105/75 source 분리, reason evidence, 권한 Action, mode·visit·unit·privacy 경계; TRX `artifacts/local/validation/concept-card-cc2/` |
 | 실제 Unity project CC2 core compile | 통과 | Unity 6000.5.6f1 local package 재임포트·script compile 뒤 `Exiting batchmode successfully now!`; log `artifacts/local/validation/concept-card-cc2/unity-compile.log`; Card View·Scene runtime은 미구현 |
 | Concept Card CC2 scoped Fast | 통과 | Unity core/tests project build와 `git diff --check`; log `20260809-141802` |
+| Concept Card CC3-A asset readiness | Unity EditMode 3/3 통과 | 실제 imported sample에서 대표 NPC·7장 카드·선택·NavMeshData·Mecanim parameter 검증; Scene 저장 없음, XML `artifacts/local/validation/urban-market-cc3-preasset/urban-market-cc3-editmode.xml` |
+| Concept Card CC3-A Unity core | 217/217 통과 | engine-independent 전체 회귀, TRX `artifacts/local/validation/urban-market-cc3-preasset/unity-core/unity-cc3-preasset.trx` |
+| Logistics facility overview core | 집중 6/6, Unity core 222/222 통과 | canonical cargo handoff를 차량 접근·입고 Dock·검수·보관 4영역에 투영하며 알 수 없는 상태와 가상 handoff 생성을 거부; TRX `artifacts/local/validation/logistics-facility-overview/` |
+| Logistics facility overview Unity EditMode | 3/3 통과 | imported sample의 건물·4영역·화물 `VisualRoot` 회귀와 City Pack 저장 Scene·Game View를 함께 확인 |
+| Farm soil tile FARM-0~FARM-1 core | 신규 6/6, 기존 Farm 포함 집중 10/10, Unity core 228/228 통과 | 6×6 좌표·stable ID·Simulation 경계, 중복·누락·재배 참조 불일치, 선택·color token 검증; TRX `artifacts/local/validation/farm-soil-tile/` |
+| Farm soil tile FARM-0~FARM-1 Unity EditMode | 3/3 통과 | 실제 imported Farm sample에서 36개 cell, 무선택 초기 상태, stable-ID 선택 상세와 Selected material을 임시 Scene으로 검증; 저장된 Scene·Game View는 미실행 |
+| WORLD-0 Diorama camera 집중 | 4/4 통과 | focus level, pitch·zoom clamp, 90도 회전, Perspective rig와 명시적 foreground cutaway |
+| WORLD-0 Unity EditMode 전체 | 29/29 통과 | product 20, Farm 3, Logistics 3, Market 3; 최종 recompile 성공과 Console error 0 |
+| WORLD-0 primitive Game View | 확인 | Overview/Farm/Logistics/Market focus와 Market 90도 회전 raw capture `C:\Users\user\ssalddel\artifacts\WORLD-0\`; Scene 저장 없음 |
+| WORLD-1 공급망 계약·Scene 집중 | 4/4 통과 | 6개 순차 Presentation Zone, Farm canonical 공유, 중복·단절 거부, 저장 Scene의 Zone·route·camera reference 재로드 |
+| WORLD-1 Unity EditMode 전체 | 33/33 통과 | product 24, Farm 3, Logistics 3, Market 3; WORLD-0과 기존 Operational 실패 비대체 회귀 포함 |
+| WORLD-1 Game View·기본 수량 | 확인 | Overview/Farm/Logistics/Market 대표 PNG, renderer 69·Animator 0·FX 0; 최종 recompile up-to-date, Console error 0, Scene dirty false |
+| WORLD-2 Catalog·저장 Scene 집중 | 3/3 통과 | vendor-neutral key, allowlist 21종 prefab·shader, 저장 Scene의 catalog wrapper·vendor prefab connection·Global Volume reload |
+| WORLD-2 Unity EditMode 전체 | 36/36 통과 | product 27, Farm 3, Logistics 3, Market 3; WORLD-0~WORLD-1과 Operational 실패 비대체 회귀 포함 |
+| WORLD-2 Game View·기본 수량 | 확인 | Overview/Farm/Logistics/Market 대표 PNG, renderer 142·Animator 1·FX 0; 최종 recompile up-to-date, Console error 0, Scene dirty false |
+| WORLD-3 기존 업무 View·fallback 집중 | 5/5 통과 | 저장 Scene 재로드, Farm stable-ID 선택, Market shelf/Card 선택, primitive fallback, Simulation Tick·LifetimeScope 부재 |
+| WORLD-3 Unity EditMode 전체 | 41/41 통과 | WORLD-0~WORLD-2와 Farm·Logistics·Market Sample 회귀 포함 |
+| WORLD-3 Game View·기본 수량 | 확인 | Overview/Farm/Logistics/Market 대표 PNG, active renderer 200·Animator 1·FX 0·fallback socket 41; 최종 recompile 성공, Console error 0, Scene dirty false |
+| WORLD-4 cargo journey 계약 | 4/4 통과 | 네 Zone의 동일 cargo identity, handoff 상태별 현재 Zone, Market 도착 비발명, 명시적 origin/product stable source 검증 |
+| WORLD-4 Scene 집중 / Unity EditMode 전체 | 6/6·47/47 통과 | Scene 재로드, 4 anchor·6 source lineage, Market Planned, revision·identity, primitive fallback, Simulation authority 부재와 전체 회귀 |
+| WORLD-4 Game View·기본 수량 | 확인 | Overview/Farm Yard/Logistics/Market PNG, active MeshRenderer 211·Animator 1·ParticleSystem 0·cargo anchor 4·fallback 44; Editor 순간값 draw call 59·set pass 14·triangle 15,162·vertex 28,000, Console error 0 |
+| WORLD-5 품질 Gate 집중 / Unity EditMode 전체 | 5/5·52/52 통과 | 저장 Scene 재로드, HUD 4단계, Zone distance 26, 3D text 억제, shader·vendor prefab·missing script, 범위 확장·업무 권위 부재와 전체 회귀 |
+| WORLD-5 Game View·기본 수량 | 확인 | Overview/Farm/Logistics/Market 1600×900 PNG, active MeshRenderer 191·Animator 1·ParticleSystem 0·VisualInstance 106·cargo anchor 4·fallback 44, camera far clip 300 |
+| WORLD-5 Editor profiling | 제한적 확인 | 4개 focus 모두 draw call 59·set pass 14·triangle 15,162·vertex 28,000; CPU frame 순간값 0.71~6.32ms, GPU timing 0으로 미수집. Editor/Pipeline 상태이므로 Player FPS·메모리 기준 아님 |
+| WORLD-5 PC/Mobile URP 기준선 | 읽기 전용 확인 | PC render scale 1.0, shadow 50/2048, 4 cascade, soft High, SSAO 1개; Mobile 0.8, 50/1024, 1 cascade, soft Medium, SSAO 없음. 기존 Asset 수정 없음 |
+| FARM-2 core / Farm View / Unity EditMode 전체 | 10/10·6/6·55/55 통과 | Preview·Confirm 원본 불변, forged/stale command 거부, explicit Tick만 revision 2 `Tilled`, 6×6 stable-ID reconcile와 primitive Dirt Row 형상 검증 |
+| FARM-2 저장 Scene·Game View | 확인 | `FarmTillingVerticalSlice` validator와 선택·Preview·Confirm·적용 1600×900 PNG, 최종 직접 조회 `tick:2:Tilled:row=(1.05, 0.34, 0.76)` |
+| Synty City Pack market integration | builder validation·Play Mode 통과 | 저장 Scene, Humanoid Avatar, View/Animator socket, URP shader, manager Runtime 시작과 Console error 0건 확인; Game View `Assets/artifacts/citypack-market-playmode-final.png` |
+| Synty City Pack logistics integration | builder validation·Play Mode 통과 | 저장 Scene, facility/vehicle/cargo VisualRoot, URP shader와 Console error 0건 확인; Game View `Assets/artifacts/citypack-logistics-playmode-final.png` |
+| City Pack 관련 Unity 회귀 | core 228/228·마트 3/3·물류센터 3/3 통과 | core TRX `artifacts/local/validation/citypack-adoption/citypack-core.trx`; imported sample은 열린 Unity 6000.5.6f1 Editor의 Pipeline Test Runner; Android 성능은 미실행 |
+| City Pack scoped Fast | 통과 | Unity core build와 `git diff --check`; 최종 log `artifacts/local/validation/20260809-163642` |
 
 ## 현재 작업
 
 운영 서버를 변경하거나 Unity core를 이동하지 않고 `Ssalddel.Simulation.Contracts`, `Ssalddel.Simulation.Domain`, `Ssalddel.Simulation.Server`를 별도 dependency island로 추가했다. 첫 API는 session 생성·조회·Tick 진행이며 client request·command 멱등성, expected revision, scenario data revision, seed와 rule revision을 보존한다. API는 기본 비활성이고 `SsalddelExecution:Mode=Simulation`에서만 시작한다. 현재 저장소는 process-local in-memory이므로 개발 fixture 외의 save 권위로 사용하지 않는다.
 
-Unity의 P0~P7·DIP5R 공통 기반과 외부·공공 데이터 P6-B 결과는 유지한다. DIP6 도심마트 UM0~UM4에 이어 UM5에서 `도심마트ManagerRuntime`과 별도 manager surface sample을 추가했다. Runtime은 manager role이 승인된 `AuthorizedUserWorld` Data context만 받고, Data refresh 뒤 Shared World에 남아 있는 선택만 focus로 유지하며, summary·queue·shelf·task·source-plan·detail을 각각 stable-ID change set으로 반환한다. refresh 실패는 마지막 성공 Presentation과 선택을 유지하고 session·World·authorization 경계 변경은 둘 다 폐기한다. View는 Projector가 결정한 문구·색 token·상자 수만 적용한다.
+Unity의 P0~P7·DIP5R 공통 기반과 외부·공공 데이터 P6-B 결과는 유지한다. DIP6 도심마트 UM0~UM4에 이어 UM5에서 `도심마트ManagerRuntime`과 별도 manager surface sample을 추가했다. Runtime은 manager role이 승인된 `AuthorizedUserWorld` Data context만 받고, Data refresh 뒤 Shared World에 남아 있는 선택만 focus로 유지하며, shelf·task·source-plan·detail을 각각 stable-ID change set으로 반환한다. 업무 우선순위 점수·summary·queue는 만들지 않는다. refresh 실패는 마지막 성공 Presentation과 선택을 유지하고 session·World·authorization 경계 변경은 둘 다 폐기한다. View는 Projector가 결정한 문구·색 token·상자 수만 적용한다.
 
-RG1~RG4, RG4-NPC-A/B와 SC0~SC5는 집단 수요·대표 identity·4주 Engine·Perspective·두 Zone 방문·공급 위험/Presentation과 Unity mapper/applicator/View source까지 구현했다. CC1~CC2는 공통 Concept Card 계약·Projector와 대표 전용 7-card adapter까지 구현했지만 Card View는 아직 없다. 첫 Engine은 검수·입고·진열 판매가능 전환 작업을 하나의 명시적 Tick capacity로 합산하며, 별도 직원 task·진열 surface는 SC7에서 UM4와 연결한다. 신규 View는 package sample source에 있고 실제 project의 기존 imported sample과 Scene에는 아직 반영하지 않았다.
+RG1~RG4, RG4-NPC-A/B와 SC0~SC5는 집단 수요·대표 identity·4주 Engine·Perspective·두 Zone 방문·공급 위험/Presentation과 Unity mapper/applicator/View source까지 구현했다. CC1~CC2의 공통 계약·Projector·대표 7-card adapter에 이어 CC3-A에서 `ConceptCardView`·deck·4종 visual skin, 대표 선택, manager desk, 임시 NavMesh와 Mecanim parameter를 연결했다. 도심 물류센터 sample에는 한 handoff 조회로 Truck과 시설 overview를 함께 만들고 차량 접근·입고 Dock·검수·보관을 보여주는 View를 추가했다. 첫 Engine은 검수·입고·진열 판매가능 전환 작업을 하나의 명시적 Tick capacity로 합산하며, 별도 직원 task·진열 surface는 SC7에서 UM4와 연결한다. 실제 Unity project에는 City Pack 원본을 유지한 채 두 전용 builder와 저장 Scene을 추가했고, 마트·물류센터 Game View와 Play Mode를 확인했다. 구매 asset은 View에만 머물며 canonical Data·stable ID·Command 경계는 기존 Ssalddel 코드가 소유한다.
 
 `도심마트: 계약이 진열대를 만든다`는 지역 기본 수요와 기존 같이 주문 집단 수요를 source별로 보존한다. 공공 인구·세대 사실은 잠재수요 Interpretation까지만 제공하고, 비구속 `GroupIntentDemand`는 공급 문의 신호로만 표시한다. 주민별 기존 개별 주문을 합산한 `GroupOrder`만 `GroupConfirmedDemand`가 된다. Operational 연결은 RG5~RG7+SC9에서 기존 authorized Projection·대표 capability·ResidentialPickup·공급중개 UseCase를 통과할 때만 수행한다.
 
+World 실행열은 WORLD-5에서 시각 확장을 중단했고 FARM-2 밭갈이 폐루프까지 완료했다. 기존 6×6 snapshot·validator·Projector·stable-ID View를 재사용해 선택→Preview→명시적 Confirm→Simulation Tick→revision 2 새 Snapshot→Reconcile→`Tilled`를 연결했다. Preview와 Confirm은 revision 1 snapshot을 변경하지 않고 Tick만 새 snapshot을 반환한다. 타일 선택, NPC 도착, animation·FX 완료는 Confirm이나 Tick을 자동 발생시키지 않는다. 별도 `FarmTillingVerticalSlice` Scene과 선택·Preview·Confirm·적용 Game View를 저장했으며 다음 Gate는 FARM-3 농부 작업 Presentation이다.
+
 ## 다음 구현 후보
 
-1. CC3 + RG4-NPC-C: ConceptCardView·skin, Unity imported sample 갱신과 대표 View·manager desk·NavMesh/Animator Scene wiring
-2. SC6~SC7: Action Card confirm/tick 폐루프와 납품·재고·진열·UM4·대표 결과 전달
-3. RG5~RG7 + SC9: 기존 공동구매 Projection·ResidentialPickup·공급 Command 운영 폐루프
+1. FARM-3: Simulation Task를 semantic waypoint와 농부 이동·정지·회전·최소 animation adapter로 표현
+2. FARM-4~FARM-5: SeedLot·파종과 결정적 발아·생육·관수·수확 Simulation
+3. FARM-6~SC7: 농장 출하 cargo를 운송·물류센터·마트 재고·진열·공동주택 결과에 연결
 
 ## 미해결
 
 - Farm canonical schema와 API contract는 추가됐지만 migration은 실제 DB에 적용하지 않았고 sensor ingestion·판정 rule 실행 경로와 운영 seed가 없음
+- Farm Pack의 감자 S/M/L·감자 상자·Dirt Row·Humanoid 농부와 농기계를 확인하고 6×6 Tile View·VisualRoot·primitive fallback과 Farm Game View를 연결했다. 밭갈이 Confirm/Tick 폐루프는 완료했지만 실제 Synty Dirt Row 교체, SeedLot·파종·생육과 농부 작업 animation은 아직 없음
 - Role Perspective server aggregate는 기사/도심 물류센터·공동수령·생산자 농장까지 확장됐지만 협동조합과 다른 Zone은 미구현
-- NPC route, Zone Scene 배선과 compile은 검증됐지만 실제 Unity NavMesh bake, Animator Controller와 이동 재생은 미검증
+- 도심마트 대표 wrapper·NavMeshData·Humanoid socket과 Play Mode 시작은 검증했지만 City Pack에 AnimationClip·AnimatorController가 없어 실제 walk/work animation 재생은 미검증
 - Warehouse W1 operational API와 UnityWebRequest refresh는 검증됐지만 선택·highlight 클릭 상호작용의 실제 Game View 확인은 미검증
 - 로컬 DB의 기존 계정 password hash가 현재 개발 설정과 일치하지 않고 기존 암호화 데이터의 Data Protection key도 현재 key ring에 없어 정상 개발 로그인과 startup seed는 별도 환경 정리가 필요함
 - 사용자 보고 P2 runtime과 현재 `Ssalddel.Unity` core의 결합 방식 확인 필요
 - Unity project를 monorepo에 둘지 별도 repository로 둘지 ADR 필요
 - 실제 제품 Unity project의 전체 presentation assembly와 application composition root는 미확인이나, 도심마트 sample은 `C:\Users\user\ssalddel`에 import해 VContainer 조립과 EditMode compile을 확인함
 - 도심마트 `api/v1/orderer/mart/products`는 주문자용 공개 판매 가능 수량만 제공하며 관리자용 진열대·위치별 재고·진열 보충 작업·직원 배정 canonical source와 authorized API는 없음
-- 도심마트 UM5 manager Runtime·surface applicator·selection·last-success는 구현·compile됐지만 manager builder Scene 생성·Game View 상호작용은 미검증
+- 도심마트 UM5 manager Runtime·surface applicator·selection·last-success와 City Pack manager Scene 생성·Game View·Play Mode 시작은 검증했지만 실제 클릭 선택과 이동 완료 전 과정은 미검증
 - 도심마트 UM3R은 명시적 allocation과 다중 원천 SourcePlan을 구현했지만 operational server에는 canonical 진열대·위치별 재고·작업·allocation Projection이 아직 없음
 - Simulation 서버 기반은 구현했지만 process-local in-memory store이며 인증·사용자별 session scope·영속 save/replay와 Unity HTTP repository는 미구현
-- 공급 계약 경영 Simulation은 SC0~SC5와 RG1~RG4·RG4-NPC-A/B의 공급/집단 graph·Engine·Perspective·Presentation·NPC route/visit·Unity binding code까지 구현했으며 imported sample·Scene runtime wiring은 아직 미구현
-- Concept Card는 CC2 대표 7-card adapter까지 구현했으며 View·visual skin과 Unity Scene runtime은 아직 미구현
+- 공급 계약 경영 Simulation은 SC0~SC5와 RG1~RG4·RG4-NPC-A/B의 공급/집단 graph·Engine·Perspective·Presentation·NPC route/visit·Unity binding과 City Pack 저장 Scene까지 연결했지만 SC6 Confirm/Tick과 SC7 운영 결과 폐루프는 미구현
+- Concept Card는 CC3-A View·visual skin·대표 선택에 City Pack 대표/관리자 `VisualRoot`와 저장 Scene·Game View를 연결했지만 실제 카드 클릭별 스냅샷 검증은 미실행
+- 물류센터 overview는 City Pack 시설·차량·화물 `VisualRoot`, 저장 Scene·Game View와 imported sample EditMode를 검증했지만 독립 검수 진행 canonical 상태와 Play Mode role action은 아직 없음
 - 공동주택 집단의 기존 서버 재사용 설계는 완료했지만 마트 관리자 privacy-safe 집계 Projection, 대표의 특정 집단 마트 문의 capability, group-order source revision Projection은 아직 없음
-- 주민자치 대표의 두 route·visit state·`공동주택대표NpcView` source와 대화 coordinator는 구현했지만 기존 imported sample 갱신, Scene/NavMesh/Animator와 실제 Game View는 아직 미구현
+- 주민자치 대표의 City Pack Humanoid Avatar·wrapper socket·저장 Scene·Game View와 마트 Play Mode 시작은 검증했지만 실제 walk clip과 방문 왕복 animation은 미검증
 - 현재 `ResidentialPickup`은 `residential-pickup:{출고예정Id}`와 canonical unloading task를 제공하지만 별도 pickup-point canonical reference는 직접 보존하지 않아 RG6 검토가 필요함
 - 지역 인구·잠재수요·Demand Scenario→기본 Simulation 주문 handoff는 fixture로 구현했지만 실제 공공 Data provider와 운영 주문 Projection은 아직 없음
 - 기존 플랫폼 공급중개 원장은 단가·최소/최대 발주수량과 문자열 정산·반품 조건을 보존하지만 첫 Playable의 납품 주기·lead time·결제 일수·품질 수명 canonical 필드는 없으므로 SC9 전까지 운영 계약에서 추정하지 않음
-- Synty asset 미도입; 구매·license·URP·모바일 성능 미검증
+- Synty City·Farm Pack 구매·import와 공통 `Synty/Generic_Basic` PC URP shader는 확인했고 City 첫 Scene 교체까지 검증했지만 Farm 제품 Scene, license/seat 운영 기록, Android material·draw call·메모리는 미검증
 - 전체 test suite의 비관련 실패 7건이 남아 있어 전체 green 상태는 아님
 - 지역 인구·수요 Layer는 제안만 작성됐고 공급자 key·이용 조건·지역 geometry·운영 집계 policy·API·Unity 코드는 아직 미구현
-- DIP3~DIP5 core는 headless와 열린 Unity Editor package import를 검증했지만 DIP4 `Samples~/UrbanLogisticsCenter`와 DIP5 `Samples~/PublicDataHall`·`Samples~/CommunityMarketSquare` 별도 sample assembly·Scene refresh는 재검증하지 않았다. DIP6 도심마트 UM0~UM5와 SC0는 headless 및 sample compile 범위까지 완료했으며 manager Scene·Game View와 SC1 이후는 미구현
+- DIP3~DIP5 core는 headless와 열린 Unity Editor package import를 검증했고 DIP4 `Samples~/UrbanLogisticsCenter`는 overview와 City Pack 저장 Scene·Game View까지 확인했다. DIP5 `Samples~/PublicDataHall`·`Samples~/CommunityMarketSquare` 별도 sample assembly·Scene refresh는 재검증하지 않았다. DIP6 도심마트 UM0~UM5는 manager City Pack Scene·Play Mode까지 확인했으며 SC6 이후 Confirm/Tick 폐루프는 미구현
 - DIP5R identity·typed graph와 Shared/Perspective Runtime/Selection 계약은 구현했고 Warehouse selection과 PublicData sample은 새 adapter를 소비하지만 Community adapter와 계층 의존 architecture test는 아직 미구현
 - PublicData Marker·Legend·Heatmap·Detail surface 계약과 sample Controller 코드는 구현했지만 Unity Editor sample assembly compile·Scene wiring·Game View는 이번 작업에서 미검증
 - Data Context core와 PublicData Global scope pilot은 구현했지만 실제 로그인 bootstrap, 서버의 World authorization 확인 endpoint와 VContainer dynamic SessionScope·WorldScope composition은 아직 미구현

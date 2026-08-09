@@ -33,7 +33,7 @@ Presentation Layer
 | DIP4 | 구현·headless 검증 | P0·P4 authorized role query와 Presentation Perspective 분리, NPC route와 transport corridor Interpreter lineage·Presenter·Presentation target 추가 |
 | DIP5 | 구현·headless 검증 | P1 PublicData와 P2 Community의 Data Snapshot·World Interpreter·Presentation Model을 분리하고 sample Controller/View 입력 전환 |
 | DIP5R | 진행 중·headless 검증 | identity·typed graph/index, Shared/Perspective Interpretation Runtime과 Selection store 구현 완료; surface별 pilot은 후속 |
-| DIP6 이후 | 진행 중·headless 검증 | 도심마트 UM0~UM4 Data·typed graph·전역 할당·다중 원천 SourcePlan·관리자 queue와 독립 surface 완료; UM5 이후와 공동수령·농장 migration은 미구현 |
+| DIP6 이후 | 진행 중·headless 검증 | 도심마트 UM0~UM5 Data·typed graph·전역 할당·다중 원천 SourcePlan·평면 관리자 Perspective와 독립 surface 완료; manager Scene·Game View와 공동수령·농장 migration은 미검증·미구현 |
 
 ## 2. 최상위 원칙
 
@@ -908,7 +908,7 @@ DIP5R Data Context 보강으로 `UserSessionContext`, `WorldContext`, `DataAutho
 
 구현 상태(2026-08-09): 도심마트 UM0~UM1에서 공개 주문자 route의 `ApiModel → 도심마트공개상품DataSnapshot` 경로, Data validator, operational repository와 simulation query를 추가했다. Data 계약은 `OrdererPublic` audience와 `ProjectedSaleAvailability` 수량 의미를 강제하고 보관·진열·예약 재고를 만들지 않는다. 기존 ScreenModel 경로는 compatibility adapter로 유지했다.
 
-UM2는 공개 상품 World에 물리 재고·진열대 node를 만들지 않고, 별도 관리자 Simulation Data에서만 상품·위치·재고·진열대·작업 typed graph를 구성한다. UM3 `도심마트진열보충Interpreter`는 목표 진열률과 rule revision을 입력으로 보충 후보 수량, 입고 필요, 활성 작업 중복, 데이터 불충분과 server capability 차단을 계산하되 Command를 호출하지 않는다. UM3R은 모든 비종료 allocation을 원천 재고별로 집계해 `OnHand / Allocated / Available`을 만들고, 명시적 allocation이 없는 기존 작업은 legacy 한 건으로 정규화한다. 다중 원천 SourcePlan과 완료·해제 제외, 수량·단위·원천·중복 검증을 포함한 targeted 22건과 Unity core 전체 168건이 통과했다. 다음은 무결성 검증된 Shared World만 소비하는 UM4 관리자 30초 queue와 surface Presentation이다.
+UM2는 공개 상품 World에 물리 재고·진열대 node를 만들지 않고, 별도 관리자 Simulation Data에서만 상품·위치·재고·진열대·작업 typed graph를 구성한다. UM3 `도심마트진열보충Interpreter`는 목표 진열률과 rule revision을 입력으로 보충 후보 수량, 입고 필요, 활성 작업 중복, 데이터 불충분과 server capability 차단을 계산하되 Command를 호출하지 않는다. UM3R은 모든 비종료 allocation을 원천 재고별로 집계해 `OnHand / Allocated / Available`을 만들고, 명시적 allocation이 없는 기존 작업은 legacy 한 건으로 정규화한다. UM4는 무결성 검증된 Shared World의 모든 진열 상태를 `NeedCode`·차단 사유·허용 interaction·SourcePlan과 함께 보존하며 우선순위 점수나 업무 queue를 만들지 않는다. UM5 Runtime은 shelf·task·source-plan·detail surface를 stable-ID change set으로 갱신하고 refresh 실패 시 마지막 성공 화면을 유지한다.
 
 ### 이후 기능 순서
 

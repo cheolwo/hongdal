@@ -181,7 +181,8 @@ ConceptCardActionItem
 | CC0 | 공통 카드 문법과 결정 확정 | 이 문서와 D-031이 기준 문서에 연결됨 |
 | CC1 완료 | 공통 deck/card/evidence/action 계약과 Projector helper | identity, revision, mode, lineage와 권한 제거 집중 9건·Unity core 전체 207건 통과 |
 | CC2 완료 | 대표 NPC 7-card deck adapter | RG4·SC3~SC5의 집단 수요·브리핑 값을 재계산 없이 카드로 투영; 집중 25건·Unity core 전체 217건 통과 |
-| CC3 + RG4-NPC-C | `ConceptCardView`, skin adapter, imported sample과 Scene wiring | 대표 NPC 선택부터 관련 카드 탐색까지 Game View 검증 |
+| CC3-A + RG4-NPC-C1 완료 | `ConceptCardView`, asset-neutral skin, imported sample과 임시 Scene wiring | 실제 Unity EditMode 3/3에서 대표 NPC·7장 카드·선택·NavMeshData·Mecanim parameter 검증; Scene 저장 없음 |
+| CC3-B + RG4-NPC-C2 | City Pack `VisualRoot`·Humanoid Animator 교체와 실제 Scene wiring | 대표 NPC 선택부터 관련 카드 탐색과 이동까지 Game View 검증 |
 | SC6~SC7 | Action Card의 Preview·Confirm·Tick과 UM4 하류 연결 | 명시 확인, 멱등성, canonical/simulation 재조회와 결과 카드 갱신 |
 | CC4 | 진열대·공급처·Dock 및 다른 World 확장 | 같은 문법으로 확장하고 도메인별 권한·출처 회귀 없음 |
 

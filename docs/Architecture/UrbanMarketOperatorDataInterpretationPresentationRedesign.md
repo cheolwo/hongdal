@@ -2,7 +2,7 @@
 
 ## 1. 문서 상태와 목적
 
-- 상태: UM0~UM3R 구현·headless 검증, UM4 이후 미구현
+- 상태: UM0~UM5 구현·headless 검증, manager Scene·Game View 미검증
 - 기준일: 2026-08-09
 - 대상: `Ssalddel.Unity/Runtime/UrbanMarket`, `Ssalddel.Unity/Samples~/UrbanMarket`과 향후 마트 운영 Projection
 - 첫 업무 slice: **진열 보충**
@@ -286,23 +286,17 @@ Focus  = 선택 상품·진열대·작업
 Mode   = Operational | Simulation
 ```
 
-첫 slice 출력인 `마트관리자PerspectiveWorldState`는 관리자가 출근 후 30초 안에 확인할 수 있는 운영 문제 queue를 만든다.
+첫 slice 출력인 `마트관리자PerspectiveWorldState`는 Shared World의 모든 진열대 상태를 숨기지 않고 전달한다.
 
-- `UrgentActions`: 현재 진열 수량이 0이거나 후방 가용재고가 없어 입고 검토가 필요한 항목
-- `PendingActions`: 전역 가용재고와 완전한 SourcePlan이 있어 보충 검토 가능한 항목
-- `InProgress`: 이미 작업·할당이 존재해 새 요청보다 진행 확인이 필요한 항목
-- `DataAttention`: 중복·단위·관계·할당 오류로 판단할 수 없는 항목
-- `NoActionNeeded`: 정상 상태이며 기본 작업 queue에서는 숨기는 항목
+- `NeedCode`: 보충 후보, 입고 검토, 진행 작업, 데이터 불충분, 조치 불필요라는 현재 의미
+- `DisplayQuantity / TargetQuantity / CandidateQuantity`: 판단에 사용한 수량
+- `BlockReasonCodes`: 실행 검토를 막는 이유
+- `AllowedInteractionIntentCodes`: 서버 capability 안에서 허용된 다음 검토 행동
+- `SourcePlan`: 어느 원천 위치에서 얼마를 가져올 수 있는지에 대한 계획
 - 현재 focus와 graph로 연결된 상품·재고·위치·작업·직원
-- 서버가 허용한 interaction intent
+- `RuleRevision`과 source lineage
 
-각 문제에는 `PriorityClass`, `PriorityScore`, `PriorityReasonCodes`, `RuleRevision`과 source lineage를 둔다. Stable ID는 같은 우선순위 안에서만 결정적 tie-breaker로 사용한다. 우선순위는 최소한 다음 순서를 따른다.
-
-1. 데이터 무결성 오류와 할당 초과: 잘못된 실행을 막기 위한 확인 대상
-2. 진열 품절 또는 후방 가용재고 없음: 입고·대체 업무 검토 대상
-3. 가용재고와 SourcePlan이 있는 진열 보충 후보: 실행 검토 대상
-4. 진행 중 작업: 지연 여부를 아직 판단하지 않는 모니터링 대상
-5. 정상 상태: action queue에서 제외
+첫 slice는 관리자 업무를 점수화하거나 `Urgent / Pending / InProgress` queue로 재분류하지 않는다. `ShelfWorldId` 정렬은 refresh 간 결과를 안정화하기 위한 결정적 순서일 뿐 업무 우선순위가 아니다. 실제 우선순위는 판매속도, 업무 기한, SLA, 담당자와 지연시간 같은 authoritative Data와 명시적 rule이 마련된 뒤 별도 Interpretation으로 추가한다.
 
 판매속도·수요 시간창이 없는 상태에서 `곧 품절`, `몇 시간 후 품절` 또는 매출 영향 점수를 만들지 않는다. 해당 해석은 서버의 판매 시계열과 `DemandWindow`, 계산 rule이 추가된 뒤 별도 `StockoutRiskWorldState`로 확장한다. 유통기한·폐기, 재고 실사 차이도 별도 canonical Data가 생기기 전에는 추론하지 않는다.
 
@@ -316,8 +310,6 @@ Presentation Projector는 다음 surface를 만든다.
 
 ```text
 도심마트PresentationSnapshot
-├─ ManagerSummarySurface
-├─ PriorityQueueSurface
 ├─ ShelfSurface
 ├─ ProductCrateSurface
 ├─ TaskMarkerSurface
@@ -441,20 +433,20 @@ Operational 진열 보충을 시작하기 전에 서버에서 다음을 확정�
 
 ### UM4. 관리자 Perspective와 Presentation — 완료
 
-- 30초 요약과 `UrgentActions / PendingActions / InProgress / DataAttention` queue
-- rule·reason·lineage가 있는 관리자 우선순위
+- 모든 진열대의 `NeedCode`·차단 사유·허용 interaction·lineage를 보존하는 평면 Perspective
+- Stable ID 결정적 정렬만 사용하고 업무 우선순위 점수·queue를 만들지 않음
 - shelf/task/detail surface projector
 - 원천 위치별 수량 계획 surface
 - View의 색·상자 수·문구 판단 제거
 
-구현은 `마트관리자PerspectiveInterpreter`와 `도심마트PresentationProjector`에 두었다. 첫 slice는 Simulation/read-only이며 `DataAttention → UrgentActions → PendingActions → InProgress` 순서로 action queue를 만들고, 같은 priority 안에서만 Stable ID를 tie-breaker로 사용한다. `ManagerSummary`, priority queue, shelf, task, detail과 source-plan surface는 각각 Presentation Stable ID와 source World lineage를 보존한다. 기존 `도심마트SceneController`와 View의 실제 surface 적용 전환은 UM5로 남긴다.
+구현은 `마트관리자PerspectiveInterpreter`와 `도심마트PresentationProjector`에 두었다. 첫 slice는 Simulation/read-only이며 Shared Interpretation의 `NeedCode`, 차단 사유, 허용 interaction, SourcePlan과 focus 관계를 변경하지 않고 전달한다. shelf, task, detail과 source-plan surface는 각각 Presentation Stable ID와 source World lineage를 보존한다. 관리자 summary와 priority queue surface는 제거했다.
 
 ### UM5. Runtime·reconcile 전환
 
 - **UM5-A 완료**: `WorldReadRuntime`과 `AuthorizedUserWorld` context-scoped query 사용
 - **UM5-A 완료**: initial/refresh 오류와 last-success 회귀 검증
 - **UM5-A 완료**: selection 유지·해제와 surface별 change set
-- **UM5-B 완료**: 기존 공개 상품 compatibility Controller/View는 유지하고 별도 manager Controller/View가 summary·queue·shelf·task·source-plan·detail change set을 적용하도록 전환
+- **UM5-B 완료**: 기존 공개 상품 compatibility Controller/View는 유지하고 별도 manager Controller/View가 shelf·task·source-plan·detail change set을 적용하도록 전환
 - **UM5-B 완료**: manager shelf selection을 `도심마트ManagerRuntime` focus로 되돌리고 refresh 실패 시 마지막 성공 surface를 유지
 - **UM5-B 검증 경계**: 실제 Unity 프로젝트에 sample과 VContainer 1.18.0을 가져와 EditMode compile·16/16을 확인했으며, manager Scene builder 실행·Scene 저장·Game View는 수행하지 않음
 
@@ -500,7 +492,7 @@ UM0~UM5는 기존 route를 깨지 않는 Unity migration이다. UM5 뒤 공급 �
 | Shared Interpretation | 진열 충분, 보충 후보, 보관 재고 없음, 전역 활성 작업 차감, stale data |
 | Allocation | 같은 상품·여러 진열대, 여러 원천 위치, 초과 할당, 단위 불일치, 불완전 SourcePlan |
 | Graph | unknown node·중복 relation 거부, 정·역방향 탐색 |
-| Perspective | 관리자 intent별 우선순위, focus relation, authorization 비확대 |
+| Perspective | 모든 진열 상태 보존, intent·blocker, focus relation, authorization 비확대 |
 | Presentation | 색·문구·표시 수량이 View 밖에서 결정됨, item revision 안정성 |
 | Runtime | initial error, refresh last-success, cancellation, scope 변경 시 cache·selection 폐기 |
 | Command | expected revision, 중복 Command 멱등성, 서버 거부 뒤 화면 미변경, 성공 후 canonical 재조회 |
