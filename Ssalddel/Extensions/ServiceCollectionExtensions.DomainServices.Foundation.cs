@@ -1,4 +1,7 @@
 using Ssalddel.Services.Content;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Ssalddel.Domain.PublicData;
+using Ssalddel.Infrastructure.Persistence.PublicData;
 using 살뜰.Services.External.Customs;
 using 살뜰.Services.External.PublicData;
 using 살뜰.Services.Options;
@@ -18,6 +21,19 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
+        services.AddSingleton<IExternalDataSourceCatalog, ExternalDataSourceCatalog>();
+        services.AddSingleton<IExternalDataCredentialProvider, ConfigurationExternalDataCredentialProvider>();
+        services.AddSingleton<IExternalDataCollectionPolicy, ConfigurationExternalDataCollectionPolicy>();
+        services.AddSingleton<IExternalDataRetryDelay, SystemExternalDataRetryDelay>();
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<IExternalDataRawStorage, ExternalDataRawObjectStorage>();
+        services.AddScoped<EfExternalDataIngestionStore>();
+        services.AddScoped<I외부데이터수집Store>(provider =>
+            provider.GetRequiredService<EfExternalDataIngestionStore>());
+        services.AddScoped<I외부지역MappingStore>(provider =>
+            provider.GetRequiredService<EfExternalDataIngestionStore>());
+        services.AddScoped<IExternalDataIngestionRuntime, ExternalDataIngestionRuntime>();
+        services.AddAgriculturalExternalDataProviders();
         services.AddSingleton<I공공데이터포털활용ApiModuleCatalog, 공공데이터포털활용ApiModuleCatalog>();
         services.AddScoped<IHs공공데이터수집Service, Hs공공데이터수집Service>();
         services.AddScoped<IHs공공데이터수집기, Hs수입평균단가공공데이터수집기>();

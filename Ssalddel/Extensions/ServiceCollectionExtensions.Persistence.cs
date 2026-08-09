@@ -27,6 +27,7 @@ public static partial class ServiceCollectionExtensions
 
         services.AddTraditionalMarketModule(connectionString);
         services.AddAgriculturalFisheriesPersistence(connectionString);
+        services.AddPublicDataIngestionPersistence(connectionString);
         services.AddSsalddelTransientState(configuration);
 
         var mongoOptions = configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();

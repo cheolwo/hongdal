@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
+using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Infrastructure.Persistence.SeedData.Content;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Services.Development;
@@ -21,6 +22,7 @@ internal static class DatabaseCompatibilityInitializer
     {
         var traditionalMarketDb = services.GetRequiredService<TraditionalMarketDbContext>();
         var agriculturalFisheriesDb = services.GetRequiredService<AgriculturalFisheriesDbContext>();
+        var publicDataIngestionDb = services.GetRequiredService<PublicDataIngestionDbContext>();
         var agriculturalFisheriesCommandTimeout =
             agriculturalFisheriesDb.Database.GetCommandTimeout();
         agriculturalFisheriesDb.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
@@ -42,6 +44,7 @@ internal static class DatabaseCompatibilityInitializer
                     await db.Database.MigrateAsync();
                     await traditionalMarketDb.Database.MigrateAsync();
                     await agriculturalFisheriesDb.Database.MigrateAsync();
+                    await publicDataIngestionDb.Database.MigrateAsync();
                     break;
                 }
                 catch (Exception ex) when (attempt < migrationDelays.Length)
