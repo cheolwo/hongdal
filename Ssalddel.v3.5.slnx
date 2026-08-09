@@ -47,6 +47,12 @@
   </Folder>
   <Folder Name="/Server/">
     <Project Path="Ssalddel/Ssalddel.csproj" />
+    <Project Path="Ssalddel.Simulation.Server/Ssalddel.Simulation.Server.csproj" />
+  </Folder>
+  <Folder Name="/Simulation/">
+    <Project Path="Ssalddel.Simulation.Contracts/Ssalddel.Simulation.Contracts.csproj" />
+    <Project Path="Ssalddel.Simulation.Domain/Ssalddel.Simulation.Domain.csproj" />
+    <Project Path="Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj" />
   </Folder>
   <Folder Name="/Shared/">
     <Project Path="Ssalddel.BackOffice.Client/Ssalddel.BackOffice.Client.csproj" />
