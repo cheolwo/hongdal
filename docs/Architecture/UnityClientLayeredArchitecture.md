@@ -9,6 +9,8 @@
 > World·원장 책임 기준: [Unity World·원장 투영 아키텍처](UnityWorldLedgerProjectionArchitectureProposal.md)
 >
 > 데이터·시뮬레이션 기준: [Unity 농업·유통 시뮬레이션](UnityAgricultureDistributionSimulationProposal.md)
+>
+> Unity 읽기 데이터의 기본 변환 기준: [Unity Data·Interpretation·Presentation 기준 아키텍처](UnityDataInterpretationPresentationArchitecture.md)
 
 ## 1. 목적
 
@@ -18,7 +20,7 @@ Ssalddel Unity의 제품 지위는 일반적인 독립 농장 게임이나 Web �
 
 > **연구자료와 실제 데이터를 서버에서 권위 있게 관리하고, Unity에서 그 상태와 관계를 공간·센서·업무 오브젝트로 체험하게 하는 World Projection Client**
 
-Unity는 서버 응답을 GameObject에 직접 넣지 않는다. transport, mapping, repository, UseCase, presentation model, scene orchestration과 View를 단계적으로 통과시킨다. View는 외부 3D asset을 연결하는 명시적 socket 계약을 제공하며, 향후 Editor Script와 Unity CLI가 반복적인 Prefab 생성·배선·검사를 수행할 수 있게 한다.
+Unity는 서버 응답을 GameObject에 직접 넣지 않는다. transport, mapping, repository, UseCase, interpretation, presentation model, scene orchestration과 View를 단계적으로 통과시킨다. 구체적인 읽기 변환은 `Data → Interpretation → Presentation`을 기본으로 하고 Query/Command Application은 그 옆에서 흐름을 조율한다. View는 외부 3D asset을 연결하는 명시적 socket 계약을 제공하며, 향후 Editor Script와 Unity CLI가 반복적인 Prefab 생성·배선·검사를 수행할 수 있게 한다.
 
 ## 2. 현재 저장소 적용 상태
 
@@ -455,6 +457,8 @@ canonical task or explicit simulation fixture
 | 개인 공간 | 없음 | 자동 NPC를 기본 배치하지 않음 |
 
 `NpcMovementView.Update()`는 이동 속도와 도착 animation만 처리한다. 도착 event 또는 Animator event에서 서버 Command를 호출하지 않는다. 운영 상태 전이는 별도 interaction Controller가 명시적 확인을 받고 서버 성공 뒤 canonical snapshot을 다시 조회한다.
+
+공동주택 같이 주문의 RG4-NPC에서는 기존 표의 주거공동체를 `ResidentialGroupRepresentative` actor까지 확장한다. 사회적 표시명은 주민자치 대표·입주자대표회의 대표·관리사무소 조정자일 수 있지만 canonical 권한은 기존 `GroupPurchaseRepresentative` 역할 검증에서만 나온다. 주거공동체 `community office → community board → departure point`와 도심마트 `entrance → manager desk → exit`를 별도 route leg로 두고 상위 representative visit state로 연결한다. 이 항목은 설계 확정이며 현재 `ZoneNpcRouteCatalog`, View, Scene·NavMesh·Animator 구현 완료를 뜻하지 않는다. 상세 기준은 [도심마트 공동주택 주문자 집단 통합 설계](UrbanMarketResidentialOrdererGroupIntegrationDesign.md)를 따른다.
 
 ### Player
 

@@ -16,28 +16,32 @@ Web route는 Unity navigation과 panel handoff를 찾는 보조 자료다. World
 
 | 저장 경계 | 명시적 객체 수 | 위치 | 비고 |
 | --- | ---: | --- | --- |
-| `SsalddelContext` | 142 DbSet | `Ssalddel.Infrastructure/Persistence/SsalddelContext.cs` | Identity 기반 주 업무 RDB Context |
+| `SsalddelContext` | 148 DbSet | `Ssalddel.Infrastructure/Persistence/SsalddelContext.cs` | Identity 기반 주 업무 RDB Context |
 | `AgriculturalFisheriesDbContext` | 33 DbSet | `Ssalddel.Infrastructure/Persistence/AgriculturalFisheries/AgriculturalFisheriesDbContext.cs` | 농수산 가격·공식 음식·재료 연구 데이터 |
 | `TraditionalMarketDbContext` | 5 DbSet | `Ssalddel.Infrastructure/Persistence/TraditionalMarkets/TraditionalMarketDbContext.cs` | 전통시장·물류 거점·생활권 협의 |
 | MongoDB store | 27 물리 collection | `Ssalddel/Services/**` | 공동 원장, 대화, 투표, 공동구매 초안·계획, 증적과 내부 log |
 
-명시적 EF `DbSet`은 총 **180개**다. `ApplicationUser`와 ASP.NET Core Identity의 내부 table은 이 숫자에 포함하지 않는다.
+명시적 EF `DbSet`은 총 **186개**다. `ApplicationUser`와 ASP.NET Core Identity의 내부 table은 이 숫자에 포함하지 않는다.
 
-### 현재 발견되지 않은 canonical 객체
+### P7에서 추가된 농장 canonical 객체
 
-다음 이름의 서버 `DbSet`, Entity 또는 Mongo document는 현재 체크아웃에서 발견되지 않았다.
+초기 조사 시점에는 농장·센서·작물 운영 객체가 없었으나 2026-08-08 P7 slice에서 다음 canonical aggregate와 migration이 추가됐다.
 
-- 농장 또는 Farm
-- 센서 또는 Sensor
-- 작물 또는 Crop
+- `농장`
+- `농장구획`
+- `재배작기`
+- `농업센서`
+- `농업센서관측`
+- `농장작업`
 
-현재 sensor 상태 모델은 `Ssalddel.Unity/Runtime/Sensors`의 engine-independent client core에만 있다. 따라서 `SensorView`, `FarmTile`과 `CropView`를 operational data에 연결하기 전에는 다음 중 하나를 명시적으로 선택해야 한다.
+생산자 관점 API는 인증 사용자가 소유한 농장만 반환하고 Unity `FarmTileView`, `CropView`, `SensorView`와 `FarmWorkerView`에 연결된다. 다만 다음 운영 경계는 아직 남아 있다.
 
-1. canonical server Entity·contract·API를 새 vertical slice로 만든다.
-2. 기존 공공 관측이나 다른 서버 projection을 출처가 보존된 sensor-like observation으로 변환한다.
-3. `SimulatedFixture`로만 동작시키고 operational 연결로 표현하지 않는다.
+1. 생성된 migration을 실제 운영 DB에 적용한다.
+2. 실제 sensor ingestion과 보정·최신성 정책을 연결한다.
+3. 승인 rule이 판정 상태·rule revision·근거 card와 한계를 생성하게 한다.
+4. 농장작업 Command와 실제 인증 API runtime을 검증한다.
 
-농사로 작목기술·품종·농작업일정은 `작물 기준정보`의 공개 근거로 사용할 수 있지만, 특정 농장의 현재 재배상태를 뜻하지 않는다. `api/v1/agriculture/crops/reference-categories`는 현재 공식적으로 검증된 작목기술 주분류만 typed projection으로 반환하며, Farm·Plot·Cultivation canonical source를 대체하지 않는다.
+농사로 작목기술·품종·농작업일정은 여전히 `작물 기준정보`의 공개 근거일 뿐 특정 농장의 현재 재배상태를 뜻하지 않는다. `재배작기`는 공개 작물 기준 stable ID·source key와 실제 생육 상태를 별도 필드로 유지한다.
 
 ## 3. 변환 단위
 

@@ -1,6 +1,6 @@
 # Ssalddel Research-Grounded World Projection Project Structure
 
-> Unity API Client·Repository·UseCase·Presenter·SceneController·View·Prefab·Inspector의 단일 기준은 [Unity 클라이언트 계층 구조 설계](../docs/Architecture/UnityClientLayeredArchitecture.md)다. 이 문서는 package-local 구조와 현재 구현 상태만 요약한다.
+> Unity API Client·Repository·UseCase·Presenter·SceneController·View·Prefab·Inspector의 단일 기준은 [Unity 클라이언트 계층 구조 설계](../docs/Architecture/UnityClientLayeredArchitecture.md)다. 읽기 변환의 `Data → Interpretation → Presentation` 책임과 migration 기준은 [Unity Data·Interpretation·Presentation 기준 아키텍처](../docs/Architecture/UnityDataInterpretationPresentationArchitecture.md)를 따른다. 이 문서는 package-local 구조와 현재 구현 상태만 요약한다.
 
 ## 제품 정의
 
@@ -44,6 +44,8 @@ Unity presentation assembly
 현재 체크아웃에는 engine-independent core가 있다. 사용자가 확인한 P2 `UnityWebRequest → Repository → UseCase → Scene Controller → Presenter → WorldBootstrapScene` 소스는 이 체크아웃에서 발견되지 않았으므로, 이 구조는 그 코드를 대체하지 않고 결합 지점을 제공한다. DTO 호환성 판정은 Repository에 섞지 않고 기존의 명시적 Mapper에 유지한다.
 
 ## Runtime 폴더 책임
+
+현재 package는 feature 폴더를 유지하면서 Warehouse W1부터 논리적 세 층을 분리한다. `.meta`와 public type 호환성을 보존하기 위해 전체 폴더를 한 번에 이동하지 않는다.
 
 | 폴더 | 책임 | 금지 |
 | --- | --- | --- |

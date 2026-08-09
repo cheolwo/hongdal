@@ -8,6 +8,7 @@
 - API model을 game model로 바꾸는 명시적 Mapper
 - stable ID, schema, 단위, provenance, 품목 mapping과 package hash 검증
 - `Live`, `Cached`, `Fixture`, `Invalid`, `Failed`를 구분하는 `DataManager`
+- source별 `DataRevisionSet`, interpretation rule lineage와 presentation revision을 분리하는 공통 데이터 흐름 계약
 - 같은 scenario package와 Command로 같은 결과를 만드는 농업 simulation engine
 - 성장, 수분, 생산비, 수확과 일반판매·공동판매 비교
 - 실제 주문·참여·서버 원장을 만들지 않는 `SIMULATED` 경계
@@ -22,6 +23,7 @@
 - `Samples~/TraditionalMarketHub`의 시장 건물·물류거점 View socket과 primitive scene builder
 - 농사로 작목기술 주분류 API를 받는 작물 기준정보 ApiModel·Mapper·Repository port·UseCase
 - 같은 World Object에 생산자·주문자·운송자 관점을 겹치는 Role Perspective ApiModel·Mapper·Repository·UseCase·applicator
+- 생산자 소유 농장·구획·재배작기·센서 관점을 보존하는 Farm Repository·UseCase와 FarmTile·Crop·Sensor View socket
 - Zone별 semantic waypoint와 operational/simulation 경계를 가진 NPC 이동 snapshot·route catalog·applicator
 - `Samples~/NpcMovement`의 NavMeshAgent·Animator Presentation socket
 - `Samples~/UrbanLogisticsCenter`의 Role target·waypoint·운송자 NPC primitive builder와 VContainer scope
@@ -34,6 +36,7 @@
 - 광장 World Item stable-ID 증분 갱신과 마지막 성공 유지 정책을 적용한 primitive sample
 - 권한 필터된 재고·적재·피킹을 결합하는 Warehouse World ApiModel·Mapper·Repository·UseCase
 - 팔레트·작업 표식과 DockWorker·Picker NavMeshAgent socket을 가진 authorized Warehouse World sample
+- Warehouse W1의 `ApiModel → DataSnapshot → WorldInterpreter → Presenter → View` migration pilot과 기존 Mapper·Repository 호환 facade
 
 ## 구조
 
@@ -57,6 +60,9 @@ Runtime/
 Samples~/UrbanMarket/
   Runtime/      SceneController와 마트·진열대·가격·재고 View socket
   Editor/       primitive scene 생성과 wiring 검사
+Samples~/Farm/
+  Runtime/      생산자 농장 operational/simulation API, Controller, FarmTile·Crop·Sensor View와 VContainer scope
+  Editor/       농장 primitive scene 생성과 wiring 검사
 Samples~/TraditionalMarketHub/
   Runtime/      SceneController와 시장 건물·물류거점 View socket
   Editor/       primitive scene 생성과 wiring 검사
@@ -105,4 +111,4 @@ dotnet test Ssalddel.Unity.Tests/Ssalddel.Unity.Tests.csproj
 
 golden fixture는 `Ssalddel.Unity.Tests/Fixtures/potato-basic-kr-001.v1.json`에 있다. 이 값은 KAMIS나 기상청의 실제 관측값이 아니라 실제 contract 형태를 검증하는 교육용 `Fixture`다.
 
-현재 저장소에는 실제 Unity project가 없다. `Samples~` 아래 항목은 local package에서 import하는 presentation sample이다. Urban Market, Traditional Market Hub, Urban Logistics Center, Public Data Hall, Community Market Square와 Warehouse World sample은 임시 Unity 6 project에서 script compile, primitive scene 생성과 scene reload 후 wiring 검사를 확인했다. 화물 인계 World router, View socket과 operational HTTP adapter도 Unity 6 script compile을 확인했다. Urban Logistics Center에는 기존 화물 인계 snapshot의 `InTransit` 상태를 물류센터→창고 TruckView 이동으로 투영하는 transport corridor가 포함된다. Urban Market은 기존 공개 상품 aggregate를 operational ApiModel·Mapper·Repository·UseCase로 연결하며 API 실패를 simulation으로 대체하지 않는다. core headless test는 79/79 통과했다. NavMesh bake·Animator Controller, 실제 인증 session과 PlayMode 검증은 수행 범위에서 제외했다.
+현재 저장소에는 실제 Unity project가 없다. `Samples~` 아래 항목은 local package에서 import하는 presentation sample이다. Urban Market, Traditional Market Hub, Urban Logistics Center, Residential Pickup, Farm, Public Data Hall, Community Market Square와 Warehouse World sample은 임시 Unity 6 project에서 script compile, primitive scene 생성과 scene reload 후 wiring 검사를 확인했다. 화물 인계 World router, View socket과 operational HTTP adapter도 Unity 6 script compile을 확인했다. Urban Logistics Center에는 기존 화물 인계 snapshot의 `InTransit` 상태를 물류센터→창고 TruckView 이동으로 투영하는 transport corridor가 포함된다. Warehouse W2는 같은 handoff를 `inbound-task` canonical relation으로 받아 Approach·Dock·Storage·VehicleExit의 차량·화물·NPC 점유로 표현한다. Urban Market은 기존 공개 상품 aggregate를 operational ApiModel·Mapper·Repository·UseCase로 연결하며 API 실패를 simulation으로 대체하지 않는다. Residential Pickup은 같은 공동수령 object를 서버가 승인한 주문자 또는 운송자 관점으로 표시하며 주소·연락처·사용자 ID·주문번호를 계약에서 제외한다. Farm은 소유자 필터된 운영 재배·센서 판정과 canonical 농장작업 기반 생산자 NPC를 표현한다. core headless test는 101/101 통과했고 Warehouse VContainer 조립 EditMode test는 2/2 통과했다. NavMesh bake·Animator Controller, 활성 운영 handoff의 Game View 확인과 PlayMode 검증은 수행 범위에서 제외했다.

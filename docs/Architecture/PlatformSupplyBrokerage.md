@@ -67,3 +67,13 @@
 이 API는 `WarehouseFulfillmentWorkflow`가 활성화된 검증 profile에서만 노출한다. 음식점과
 살들마트 접근 범위는 각각 서버가 발급한 음식점 ID Claim과 살들마트 ID Claim으로
 결정하며 요청 본문에서 임의 조직 ID를 받지 않는다.
+
+## Unity 경영 Simulation과의 경계
+
+[도심마트 공급 계약 경영 Simulation](UrbanMarketSupplyManagementSimulationDesign.md)은 이 원장을 운영 계약의 기준으로 재사용하지만, 첫 Playable에서는 실제 계약이나 개별 발주를 만들지 않는다.
+
+- Simulation 공급처·Offer·계약안·수요·납품·현금은 별도 DataSnapshot과 stable ID를 사용한다.
+- `ConfirmSimulationContract`는 플랫폼 공급계약 활성화나 조직 개별 발주 제출이 아니다.
+- 운영 연결은 authorized Projection과 기존 계약 이용등록·개별 발주 UseCase를 통과한다.
+- 운영 계약의 문자열 정산·반품 조건을 Simulation의 결제 일수·품질 수명으로 추정하지 않는다.
+- Simulation 이행 점수를 실제 공급자 신뢰도나 계약 자격으로 승격하지 않는다.

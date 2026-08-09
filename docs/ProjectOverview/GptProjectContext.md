@@ -23,7 +23,8 @@ Unity의 첫 목표는 전체 로드맵을 한 번에 구현하는 것이 아니
 
 | 영역 | 책임 | 포함하지 않는 것 |
 | --- | --- | --- |
-| 서버 | 권한, 공개 범위, 검증, 실제 상태, 원장, revision, Command, Event·Outbox | Prefab, Animator, Material, Scene 배치 |
+| 운영 서버 | 실제 사용자·조직의 권한, 공개 범위, 검증, 계약·발주·입고·재고·결제 원장, revision, Command, Event·Outbox | 게임 session, 가상 시간, save·replay, Prefab·Scene |
+| Simulation 서버 | 가상 scenario·seed·session·Tick·save·replay와 게임 전용 결과 | 실제 계약·발주·결제·입고 효과, 운영 DB·entity 공유 |
 | Web | 긴 입력, 표, 검색, 관리자 기능, 주소·계좌·결제·증빙 등 민감하거나 정밀한 업무 | 공간 체험을 위한 3D 표현 |
 | Unity | 공간 탐색, 실제 상태의 시각화, 관계와 흐름 표현, preview와 확인, 서버 확정 상태 재표시 | 독자적인 운영 원장과 GameObject만으로 확정한 업무 성공 |
 

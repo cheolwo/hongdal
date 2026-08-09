@@ -4,6 +4,12 @@
 
 이 문서는 서버 상태를 Unity World로 투영하는 현재 구현을 한곳에 모으고, 다음 작업을 **기술 의존성**, **현재 slice 완결 비용**, **제품 공개 우선순위**, **권한·개인정보 위험**을 기준으로 정렬한다.
 
+P0~P7의 기본 배선 이후 각 공간의 현실 업무·상태 변화·NPC·interaction을 깊게 구현하는 순서와 첫 창고 slice는 [Unity Zone 업무 심화 설계](UnityZoneDomainDeepeningDesign.md)를 따른다.
+
+새 데이터 종류를 더 연결하기 전 읽기 변환은 [Unity Data·Interpretation·Presentation 기준 아키텍처](UnityDataInterpretationPresentationArchitecture.md)에 따라 분리한다. 현재 W1을 첫 migration pilot으로 삼고 기존 route·JSON·stable ID·refresh 동작을 보존한 뒤 W2로 진행한다.
+
+사용자가 World에서 낯선 업무 의미를 학습하는 공통 진입 문법은 [Unity 개념 카드 Presentation 패턴](UnityConceptCardPresentationPattern.md)을 따른다. Scene asset 연결 전에 `Concept / Status / Reason / Action` 계약과 Projector를 먼저 안정화한다.
+
 장소와 역할은 별도 Scene 복제 기준이 아니다.
 
 ```text
@@ -22,7 +28,7 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 | 영역 | 현재 상태 | 다음 완결 조건 |
 | --- | --- | --- |
 | 공통 데이터 계층 | stable ID, revision, provenance, Repository, UseCase, reconcile 구현 | 실제 제품 Unity 프로젝트의 HTTP adapter와 composition root 연결 |
-| 도심마트 | simulated ScreenModel, Controller, View socket, primitive builder 구현 | 공개 가능한 operational 마트 aggregate API |
+| 도심마트 | UM0~UM5, SC0~SC5와 RG0~RG4·RG4-NPC-A/B code, CC0~CC2 완료 | CC3 + RG4-NPC-C Card View·Scene runtime wiring |
 | 전통시장·공개 물류거점 | 공개 위치·출처 기반 simulated slice와 primitive builder 구현 | 기존 공개 세계지도 aggregate와 연결 |
 | Role Perspective | 생산자·주문자·운송자 공통 계약과 applicator 구현 | 생산자·주문자 server aggregate 추가 |
 | 도심 물류센터 운송자 | 인증된 현재 배정 운송 기반 server Role/NPC API 구현 | 실제 UnityWebRequest adapter, NavMesh bake와 runtime 확인 |
@@ -30,7 +36,34 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 | 작물 | 농사로 기준정보 server→Unity read-only 흐름 구현 | Farm·Plot·Cultivation·Sensor canonical 운영 contract |
 | Synty | 미도입 | placeholder 계약과 성능 기준 확정 후 최소 팩 검증 |
 
-## 3. 통합 구현 우선순위
+## 3. 현재 활성 개발 순서
+
+현재 즉시 실행 순서는 cross-zone P0~P9 목록과 별도로 다음처럼 고정한다.
+
+| 순서 | 작업 | 이유 |
+| --- | --- | --- |
+| 완료 | SS0~SS1 별도 Simulation 서버 기반 | 운영 서버 비침범, session·seed·revision·멱등 Tick 경계 |
+| 완료 | UM5-B manager surface applicator·sample wiring | 실제 Unity 프로젝트 sample compile·EditMode 16/16; Scene·Game View는 별도 검증 |
+| 완료 | SC0 공급·수요·주문 Data 계약 | 독립 revision·lineage와 운영 경계·참조·단위·합계 검증 |
+| 완료 | SC1-A 감자·3공급처 fixture | 10 node·15 relation의 deterministic 공급 graph |
+| 완료 | SC1-B 인구→잠재수요→Demand Scenario | 공공 basis와 명시적 4주 수요 가정 계보 분리 |
+| 완료 | RG0 기존 서버 재사용 조사 | individual-demand·GroupPurchase·Order·GroupOrder·ResidentialPickup·공급중개 경계 |
+| 완료 | SC1-C 기본 방문 Demand→Order Stream | 4주 56건, 기대수요 합계·same-seed·기한·lineage 보존 |
+| 완료 | RG1~RG3 공동주택 fixture·대표 NPC identity·typed graph·수요 합성 | 사회적 context와 권한 분리, 의향과 group-order 확정 분리 |
+| 완료 | SC2 4주 주문·공급 Engine | 합성 수요의 할당·충족·재고·현금·폐기·노동 인과관계 |
+| 완료 | RG4 역할별 Perspective | 주민 본인·대표 집계·마트 공급 검토 projection과 inquiry/dialogue 권한 경계 |
+| 완료 | RG4-NPC-A + SC3~SC5 headless | 두 Zone route leg·visit state, 공급 위험과 주문/계약 surface 입력 모델 |
+| 코드 완료 | RG4-NPC-B + SC5 Unity binding | 대표 View, dialogue coordinator, 서버 계산 surface mapper/applicator와 package core compile |
+| 완료 | CC0 Concept Card 방향 확정 | 네 카드 책임, 공통 계층, asset 중립성과 첫 대표 NPC deck |
+| 완료 | CC1 카드 계약·Projector | 공통 identity·revision·mode·lineage 검증과 미승인 Action 제거 |
+| 완료 | CC2 대표 NPC 7-card deck | RG4·SC3~SC5 값을 재계산 없이 source별 Presentation으로 투영 |
+| 1 | CC3 + RG4-NPC-C Unity runtime wiring | imported sample 갱신, 카드 View·skin, Scene·NavMesh·Animator·manager desk 검증 |
+| 2 | SC6~SC7 confirm·tick·UM4·대표 결과 전달 | Action Card와 Command 분리, 10분 playable과 하류 결과 완결 |
+| 3 | RG5~RG7 + SC9 Operational | 기존 공동구매 Projection·ResidentialPickup·공급 Command 폐루프 |
+
+세부 계약과 완료 기준은 [도심마트 공급 계약 경영 Simulation 설계](UrbanMarketSupplyManagementSimulationDesign.md)와 [도심마트 공동주택 주문자 집단 통합 설계](UrbanMarketResidentialOrdererGroupIntegrationDesign.md)를 따른다. 이 순서는 제품 0.0 기본 공개 순서를 바꾸거나 실제 계약·발주·결제를 활성화하지 않는다.
+
+## 4. 통합 구현 우선순위
 
 ### P0. 현재 도심 물류센터 slice를 실제 연결까지 닫기
 
@@ -63,6 +96,8 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 ### P1. 공공데이터 정보관
 
 제품의 기본 공개 범위인 0.0과 가장 잘 맞고 개인정보 위험이 낮다. 기존 `community/world-map/observations` aggregate와 123개 마커 검증 경험을 재사용한다.
+
+지역 인구·실제 수요·물류 접근성을 별도 Layer로 확장하는 계약과 순서는 [지역 인구·수요 World Layer 제안](RegionalPopulationDemandWorldLayerProposal.md)을 따른다. 인구통계와 운영 주문을 같은 의미로 합치지 않고, 운영 수요는 권한과 개인정보 집계를 통과한 별도 Projection으로 둔다.
 
 - 공개 관측 ScreenModel과 Repository adapter
 - marker freshness·source·기준시각 표현
@@ -123,6 +158,15 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 - 운송자의 현재 배정 하차 대상
 - 배송 증빙과 완료 Command의 권한·revision 검증
 
+2026-08-08 현재 기존 `unloading-perspectives`의 주문자 본인·운송담당자 배정 관계 필터를 재사용하고, Unity에는 공동수령 point·상품 요약·상태·canonical task만 제공하는 `ResidentialPickupPerspective`를 추가했다. 주문자와 운송자는 역할 선택 파라미터가 없는 별도 인증 route를 사용한다. 주소·상세주소·연락처·사용자 ID·주문번호·결제·계약 정보는 계약에서 제외했다. Unity는 같은 point를 `내 수령 상품` 또는 `내 하차 대상`으로 표현하며 현재 interaction은 읽기 전용이다. 임시 Unity 6 프로젝트에서 operational adapter compile, 역할 전환 socket, primitive scene 생성과 reload wiring을 확인했다. 실제 API runtime과 수령 확인·하차 완료 Command는 남아 있다.
+
+공동주택 같이 주문 playable에서는 P6 앞단에 `ResidentialGroupRepresentative` NPC를 추가한다. 이는 주민자치 대표 등 사회적 context의 표현이며 기존 `공동구매 대표` 역할 검증을 대체하지 않는다. 현재 route catalog에는 해당 actor가 없으므로 RG4-NPC에서 다음 두 leg를 additive하게 추가한다.
+
+- 주거공동체: `community office → community board → departure point`
+- 도심마트: `market entrance → manager desk → exit`
+
+두 Zone을 하나의 `NpcMovementSnapshot` route로 합치지 않고 representative visit state가 leg를 연결한다. 도착·대화·Animator event는 문의·주문·계약·발주·수령 Command를 실행하지 않는다.
+
 ### P7. 농장·생산자 관점
 
 시각적 중요도는 높지만 현재 서버에 Farm·Plot·Cultivation·Sensor canonical 운영 모델이 없으므로 추정 DTO를 먼저 만들지 않는다.
@@ -134,6 +178,8 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 
 canonical contract 전에는 명확히 표시된 simulation vertical slice만 허용한다.
 
+2026-08-08 현재 `농장` root 아래 `농장구획`, `재배작기`, `농업센서`, `농업센서관측`과 `농장작업` canonical aggregate 및 EF migration을 추가했다. 생산자 API는 인증 사용자가 소유한 농장만 반환하며 공개 작물 기준 ID·출처와 실제 생육 상태를 분리한다. 센서는 원시값·단위·기준시각과 서버 판정 상태·규칙 revision·근거 card·한계를 함께 제공하고 위치·주소·소유자 ID는 제외한다. Unity에는 Repository·UseCase, FarmTile·Crop·Sensor View, canonical 농장작업을 참조하는 생산자 NavMeshAgent socket과 VContainer primitive sample을 연결했다. 임시 Unity 6 프로젝트에서 compile, scene 생성과 reload wiring을 확인했다. 실제 sensor ingestion, 운영 DB migration 적용, 인증 API runtime, NavMesh bake와 Animator Controller는 남아 있다.
+
 ### P8. 협동조합·공동원장 공간
 
 커뮤니티에서 형성된 공동행동을 원장 보드와 회의 테이블로 투영한다. 참여 의향, 가원장, 실원장과 실행 권한을 한 상태로 합치지 않는다.
@@ -142,14 +188,15 @@ canonical contract 전에는 명확히 표시된 simulation vertical slice만 �
 
 모든 주요 View는 `VisualRoot`, `Animator`, `Renderer`, 장착점 같은 socket을 유지한다. 최소 환경·캐릭터 팩으로 URP, 스케일, Windows·Android 성능을 검증한 뒤 placeholder 외형만 교체한다.
 
-## 4. 병렬로 보지 말아야 할 두 순서
+## 5. 병렬로 보지 말아야 할 세 순서
 
 - **개발 완결 순서**는 P0 도심 물류센터가 먼저다. 이미 구현된 server→Unity→NPC 흐름을 실제 adapter와 runtime까지 닫아 공통 패턴을 증명한다.
+- **현재 도심마트 playable 순서**는 SC1-C → RG1~RG3 → SC2 → RG4+SC3~SC5 → SC6~SC7이다. Operational은 그 뒤 RG5~RG7+SC9에서 기존 원장을 재사용한다.
 - **제품 공개 순서**는 P1 공공데이터 정보관과 P2 커뮤니티 광장이 먼저다. 현재 0.0 공개 범위와 제품 중심에 맞기 때문이다.
 
 따라서 물류센터를 먼저 기술적으로 완결한다고 해서 3.5 기능을 기본 공개하거나 유상 운송·자동 배차를 활성화하는 것은 아니다.
 
-## 5. 공통 완료 기준
+## 6. 공통 완료 기준
 
 - server가 권한·공개 범위·canonical 상태의 최종 권위다.
 - Unity API model은 server DTO assembly를 직접 공유하지 않는다.
