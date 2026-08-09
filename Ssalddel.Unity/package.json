@@ -15,7 +15,7 @@
   "samples": [
     {
       "displayName": "Urban Market Primitive Vertical Slice",
-      "description": "A three-shelf urban market with simulated or operational aggregate data, read-only orderer product selection, provenance, and an Editor scene builder.",
+      "description": "Compatibility orderer shelves plus a manager Runtime surface sample with stable-ID changes, selection, last-success refresh, and separate Editor scene builders.",
       "path": "Samples~/UrbanMarket"
     },
     {
@@ -32,6 +32,16 @@
       "displayName": "Urban Logistics Center Primitive Vertical Slice",
       "description": "A transporter perspective, worker NPC, and cargo handoff-driven NavMesh truck corridor wired into one primitive logistics-center Zone.",
       "path": "Samples~/UrbanLogisticsCenter"
+    },
+    {
+      "displayName": "Residential Pickup Primitive Vertical Slice",
+      "description": "A privacy-safe shared pickup Zone that renders the same server-authorized object for orderer or transporter read-only perspectives.",
+      "path": "Samples~/ResidentialPickup"
+    },
+    {
+      "displayName": "Farm Producer Primitive Vertical Slice",
+      "description": "An owner-filtered farm, cultivation and sensor projection with server-assessed condition, evidence and primitive View sockets.",
+      "path": "Samples~/Farm"
     },
     {
       "displayName": "Public Data Hall Primitive Vertical Slice",

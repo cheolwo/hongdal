@@ -97,7 +97,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket.Editor
 
         private static bool CanReplaceCurrentScene()
         {
-            if (!Application.isBatchMode)
+            if (!UnityEngine.Application.isBatchMode)
             {
                 return EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
             }

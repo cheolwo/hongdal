@@ -13,6 +13,9 @@
 - 기존 공개 aggregate `GET api/v1/orderer/mart/products`용 operational ApiClient·Mapper·Repository·UseCase
 - VContainer에서 simulation과 operational 구성을 명시적으로 선택하는 LifetimeScope
 - primitive scene을 생성하고 Inspector reference를 연결하는 Editor builder
+- `도심마트ManagerRuntime`의 summary·queue·shelf·task·source-plan·detail change set을 적용하는 관리자 View
+- 관리자 shelf 선택을 World selection으로 되돌리고 30초 refresh에서 last-success를 유지하는 Controller
+- 공개 상품 compatibility Scene과 분리된 `UrbanMarketManagerPrimitive` Editor builder
 
 결제, 주문 Command와 외부 asset은 포함하지 않는다. operational 모드는 서버가 공개 가능하다고 판정한 상품·판매가·판매 가능 수량·재고 기준시각만 읽으며 내부 창고 재고, 주소, 연락처, 결제·계약 정보는 요청하지 않는다.
 
@@ -22,6 +25,8 @@
 2. Unity 메뉴에서 `Ssalddel/Samples/Create Urban Market Primitive Scene`을 실행한다.
 3. 생성된 `Assets/Ssalddel/Scenes/UrbanMarketPrimitive.unity`를 연다.
 4. PlayMode에서 진열대 3개, 상품·가격·재고·출처 표시와 상품 선택 panel을 확인한다.
+
+관리자 surface sample은 Unity 메뉴 `Ssalddel/Samples/Create Urban Market Manager Primitive Scene`에서 별도 Scene으로 만든다. 이 Scene은 manager role이 승인된 `AuthorizedUserWorld` Simulation context, 두 진열대, 30초 summary·queue·task·SourcePlan·detail surface를 사용한다. 기존 공개 상품 Scene을 덮어쓰지 않는다.
 
 CLI에서는 Unity project 경로를 지정하여 다음 Editor method를 실행할 수 있다.
 

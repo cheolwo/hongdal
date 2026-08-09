@@ -70,51 +70,28 @@ namespace Ssalddel.Unity.UrbanMarket
 
     public sealed class Simulated도심마트조회UseCase : I도심마트조회UseCase
     {
-        private static readonly DateTimeOffset FixtureAsOf =
-            DateTimeOffset.Parse("2026-08-08T09:00:00+09:00");
+        private readonly I도심마트공개상품DataQuery dataQuery;
+        private readonly 도심마트공개상품ScreenModelAdapter screenAdapter;
 
-        public Task<도심마트ScreenModel> 조회Async(CancellationToken cancellationToken = default)
+        public Simulated도심마트조회UseCase()
+            : this(
+                new Simulated도심마트공개상품DataQuery(),
+                new 도심마트공개상품ScreenModelAdapter())
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return Task.FromResult(new 도심마트ScreenModel
-            {
-                StableId = "market:urban-demo-001",
-                Revision = 1,
-                마트명 = "살뜰 도심 마트",
-                SourceTypeCode = 도심마트SourceTypeCodes.SimulatedFixture,
-                GeneratedAt = FixtureAsOf,
-                상품목록 = new[]
-                {
-                    Product("product:potato-20kg", "감자", "20kg", 35000m, 12, 재고상태Codes.InStock),
-                    Product("product:rice-10kg", "쌀", "10kg", 42000m, 8, 재고상태Codes.InStock),
-                    Product("product:onion-10kg", "양파", "10kg", 18000m, 4, 재고상태Codes.LowStock),
-                },
-            });
         }
 
-        private static 도심마트상품ScreenModel Product(
-            string stableId,
-            string name,
-            string packageLabel,
-            decimal price,
-            int stockQuantity,
-            string stockStateCode)
+        public Simulated도심마트조회UseCase(
+            I도심마트공개상품DataQuery dataQuery,
+            도심마트공개상품ScreenModelAdapter screenAdapter)
         {
-            return new 도심마트상품ScreenModel
-            {
-                StableId = stableId,
-                상품명 = name,
-                포장표시 = packageLabel,
-                가격 = price,
-                통화Code = "KRW",
-                재고수량 = stockQuantity,
-                재고단위 = "상자",
-                재고상태Code = stockStateCode,
-                SourceName = "SIMULATED urban-market fixture",
-                EvidenceAsOf = FixtureAsOf,
-                EvidenceStatusCode = "Simulated",
-            };
+            this.dataQuery = dataQuery ?? throw new ArgumentNullException(nameof(dataQuery));
+            this.screenAdapter = screenAdapter ?? throw new ArgumentNullException(nameof(screenAdapter));
+        }
+
+        public async Task<도심마트ScreenModel> 조회Async(CancellationToken cancellationToken = default)
+        {
+            var data = await dataQuery.조회Async(cancellationToken).ConfigureAwait(false);
+            return screenAdapter.Map(data);
         }
     }
 
