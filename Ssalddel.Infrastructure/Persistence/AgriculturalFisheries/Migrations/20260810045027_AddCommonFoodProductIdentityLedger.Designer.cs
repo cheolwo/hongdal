@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 
@@ -11,9 +12,11 @@ using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
 {
     [DbContext(typeof(AgriculturalFisheriesDbContext))]
-    partial class AgriculturalFisheriesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260810045027_AddCommonFoodProductIdentityLedger")]
+    partial class AddCommonFoodProductIdentityLedger
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1510,8 +1513,8 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                     b.HasIndex("RelationStableId")
                         .IsUnique();
 
-                    b.HasIndex("ProductIdentityId", "SourceKey", "CodeScheme", "ExternalCode")
-                        .HasDatabaseName("IX_cfpr_product_source_scheme_code");
+                    b.HasIndex("ProductIdentityId", "SourceKey", "CodeScheme")
+                        .IsUnique();
 
                     b.HasIndex("SourceKey", "CodeScheme", "ExternalCode", "IsActive");
 

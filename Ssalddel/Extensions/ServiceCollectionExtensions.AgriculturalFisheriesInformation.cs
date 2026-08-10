@@ -64,6 +64,10 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient<I농사로작목기술Module, 농사로작목기술Module>();
         services.AddScoped<I작물기준정보분류조회UseCase,
             작물기준정보분류조회UseCase>();
+        services.AddScoped<I공통식품품목Identity조회UseCase,
+            공통식품품목Identity조회UseCase>();
+        services.AddScoped<I공통식품품목기존Data대조UseCase,
+            공통식품품목기존Data대조UseCase>();
         services.AddTransient<I농사로농작업일정Module, 농사로농작업일정Module>();
         services.AddTransient<I농사로농작물재해예방Module,
             농사로농작물재해예방Module>();

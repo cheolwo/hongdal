@@ -19,6 +19,7 @@ public static class SsalddelCodeFeatureKeys
     public const string RegionalCulturePublicInstitution = "regional-culture-public-institution";
     public const string RegionalAgriculturalMap = "regional-agricultural-map";
     public const string CropReferenceInformation = "crop-reference-information";
+    public const string CommonFoodProductIdentity = "common-food-product-identity";
     public const string HongikAcademyContentMap = "hongik-academy-content-map";
     public const string TransportExecutionProfile = "transport-execution-profile";
     public const string WorldRolePerspective = "world-role-perspective";

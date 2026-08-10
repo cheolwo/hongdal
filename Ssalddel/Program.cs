@@ -548,6 +548,71 @@ if (args.Any(argument => string.Equals(
 
 if (args.Any(argument => string.Equals(
         argument,
+        "--confirm-common-food-product-candidates",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var hashArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--expected-preview-hash=", StringComparison.OrdinalIgnoreCase));
+    var confirmedByArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--confirmed-by=", StringComparison.OrdinalIgnoreCase));
+    var promotionYear = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedPromotionYear)
+        ? parsedPromotionYear
+        : DateTime.Now.Year;
+    var expectedPreviewHash = hashArgument?["--expected-preview-hash=".Length..]
+        ?? throw new ArgumentException("--expected-preview-hash is required.");
+    var confirmedBy = confirmedByArgument?["--confirmed-by=".Length..]
+        ?? throw new ArgumentException("--confirmed-by is required.");
+    await using var scope = app.Services.CreateAsyncScope();
+    var promotionUseCase = scope.ServiceProvider
+        .GetRequiredService<I공통식품품목기존Data대조UseCase>();
+    var promotion = await promotionUseCase.PromoteCandidatesAsync(
+        promotionYear,
+        expectedPreviewHash,
+        confirmedBy);
+    Console.WriteLine(JsonSerializer.Serialize(
+        promotion,
+        new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--preview-common-food-product-reconciliation",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var previewYear = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.None,
+        CultureInfo.InvariantCulture,
+        out var parsedPreviewYear)
+        ? parsedPreviewYear
+        : DateTime.Now.Year;
+    await using var scope = app.Services.CreateAsyncScope();
+    var previewUseCase = scope.ServiceProvider
+        .GetRequiredService<I공통식품품목기존Data대조UseCase>();
+    var preview = await previewUseCase.PreviewAsync(previewYear);
+    Console.WriteLine(JsonSerializer.Serialize(
+        preview,
+        new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
         "--inspect-agricultural-fisheries-product-codes",
         StringComparison.OrdinalIgnoreCase)))
 {

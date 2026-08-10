@@ -17,6 +17,15 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
 
     public DbSet<HsUsdaCommodityMapping> HsCommodityMappings => Set<HsUsdaCommodityMapping>();
 
+    public DbSet<공통식품품목Identity> CommonFoodProductIdentities =>
+        Set<공통식품품목Identity>();
+
+    public DbSet<공통식품품목Code관계> CommonFoodProductCodeRelations =>
+        Set<공통식품품목Code관계>();
+
+    public DbSet<공통식품품목Code관계검토이력> CommonFoodProductCodeRelationReviews =>
+        Set<공통식품품목Code관계검토이력>();
+
     public DbSet<KamisPriceCollectionRun> KamisCollectionRuns => Set<KamisPriceCollectionRun>();
 
     public DbSet<KamisPriceObservation> KamisPriceObservations => Set<KamisPriceObservation>();
@@ -108,6 +117,9 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new UsdaNassPriceCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new UsdaNassPriceObservationConfiguration());
         modelBuilder.ApplyConfiguration(new HsUsdaCommodityMappingConfiguration());
+        modelBuilder.ApplyConfiguration(new 공통식품품목IdentityConfiguration());
+        modelBuilder.ApplyConfiguration(new 공통식품품목Code관계Configuration());
+        modelBuilder.ApplyConfiguration(new 공통식품품목Code관계검토이력Configuration());
         modelBuilder.ApplyConfiguration(new KamisPriceCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceObservationConfiguration());
         modelBuilder.ApplyConfiguration(new Bls평균소매가격수집RunConfiguration());
