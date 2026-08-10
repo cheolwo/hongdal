@@ -352,3 +352,29 @@ Action Card는 권한을 만들거나 즉시 Command를 실행하지 않는다. 
 현재 Data에는 판매속도, 업무 기한, SLA, 담당자와 지연시간처럼 관리자 업무의 실제 긴급도를 판정할 근거가 충분하지 않다. 따라서 UM4는 `UrgentActions / PendingActions / InProgress / DataAttention` 30초 queue, `PriorityScore`, priority reason과 manager summary surface를 만들지 않는다.
 
 `마트관리자PerspectiveWorldState`는 Shared World의 모든 진열 상태를 Stable ID 결정적 순서로 보존하고 `NeedCode`, 차단 사유, 허용 interaction, SourcePlan, focus 관계, rule revision과 source lineage만 전달한다. Stable ID 순서는 업무 우선순위가 아니다. 실제 우선순위는 authoritative 운영 Data와 명시적 rule이 추가될 때 별도 Interpretation으로 설계한다.
+
+## D-036 공통 상품 stable ID와 출처별 품목코드를 분리한다
+
+- 상태: Accepted
+- 결정일: 2026-08-10
+- 관계: D-021의 공공데이터 정규화 경계와 감자생산유통 World를 구체화하며 기존 외부 코드를 대체하지 않음
+
+KAMIS 품목코드, 국제 HS·한국 HSK, USDA AMS `Commodity`, 농사로 품목구분Code는 서로 다른 기관·분류 목적의 코드다. 이들을 같은 값으로 변환하거나 한 외부 코드를 Ssalddel 도메인 authority로 사용하지 않고, 서버 내부 `CanonicalProductStableId` 아래에 출처별 code relation을 둔다.
+
+relation은 `Confirmed`, `Candidate`, `Unlinked`를 구분하고 source key, code scheme, code, 상위 code, label, match quality와 근거를 함께 보존한다. `Candidate`는 검색·표시 후보일 뿐 가격 직접 비교, 세관 신고, 계약, 재고 또는 운영 상태 확정에 사용할 수 없다. 공식 코드 근거가 없으면 이름으로 추정하지 않고 `Unlinked`로 남긴다.
+
+첫 항목은 기존 `product:potato`를 재사용한다. KAMIS 식량작물 `100/152`는 확인된 source relation, HS4 `0701`과 USDA AMS `Potatoes`는 후보 relation이며 농사로 품목구분Code는 공식 근거를 확인할 때까지 미연결이다. `공통식품품목Identity`, `공통식품품목Code관계`, `공통식품품목Code관계검토이력`을 별도 영속 원장으로 두고 공개 API는 이 DB projection만 읽는다. 코드 catalog는 초기 seed와 World 상수의 bootstrap 근거로만 남기며 다품목 추가·관계 승격은 revision과 검토 이력을 함께 기록해야 한다.
+
+기존 공공데이터 전수 대조는 KAMIS 분류·품목코드를 정렬 기준으로 사용할 수 있지만 이를 canonical 상품 생성 권한으로 사용하지 않는다. HS·AMS 후보가 있어도 내부 상품이 없으면 `CandidateOnly`, 후보가 없으면 `Unmapped`, 같은 KAMIS code에 이름 충돌이 있으면 `SourceConflict`로 둔다. Preview는 read-only이며 새 상품과 relation의 생성·승격은 별도 검토 Command에서만 수행한다.
+
+## D-037 다품목 승격과 Farm asset 대응을 별도 검토 축으로 유지한다
+
+- 상태: Accepted
+- 결정일: 2026-08-10
+- 관계: D-036의 다품목 추가 절차와 D-007의 외부 시각 asset 경계를 구체화함
+
+다품목 확대는 현재 관측을 다시 계산한 `PreviewHash`와 명시적 확인 주체가 일치하는 maintenance Command에서만 수행한다. Ssalddel이 발급하는 새 식별자는 `product:food:{KAMIS분류Code}:{KAMIS품목Code}` 형식을 사용하지만, 이 형식은 생성 시점의 충돌 없는 원천 key를 보존하기 위한 내부 식별 규칙일 뿐 KAMIS가 상품 업무의 최종 권위라는 뜻은 아니다. 재실행은 이미 Confirmed인 KAMIS 관계를 기준으로 멱등이어야 한다.
+
+승격 시 KAMIS 분류·품목 관계만 `Confirmed`로 기록한다. HS와 USDA AMS의 복수 후보는 각 관계를 `Candidate`로 보존하고, 농사로는 공식 품목구분Code crosswalk가 없으면 `Unlinked`로 둔다. 한 품목에 여러 HS·AMS 후보가 존재할 수 있으므로 원장은 source별 단일 관계를 강제하지 않고 relation stable ID와 검토 이력으로 각각 식별한다.
+
+Unity의 Farm asset 대응은 이 source-code 검토와 별도다. 모든 canonical 상품을 `Direct`, `Representative`, `Unmapped` 중 하나로 분류하고 `CanonicalProductStableId → semantic VisualKey → prefab reference` 순서로 연결한다. `Representative`는 유사 외형일 뿐 동일 품종·가격·HS 관계를 뜻하지 않으며, `Unmapped`는 Wheat·Potato·Onion 같은 다른 prefab으로 임의 대체하지 않는다. prefab 이름과 `Assets/` 경로는 서버 DTO·Domain·Simulation에 들어가지 않는다.
