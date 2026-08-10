@@ -4,14 +4,14 @@
 
 ## Snapshot
 
-- 기준일: 2026-08-09
-- 현재 작업 축: FARM-2 완료 뒤 사용자 요청으로 Farm·City 환경 Showcase를 한정 보강, 검증 복구 후 FARM-3 농부 작업 Presentation
+- 기준일: 2026-08-10
+- 현재 작업 축: CP0 Showcase 기준선·CP1 공통 계약·CMP2 실측·CMP3 도로/Gate·CMP4 최소 거점·CMP4-A 공용 animation·CMP5 세 Region/Hub Journey·ART1 도로변·지형 굴곡 1차·NMR4 야간 약탈 Presentation Slice·ART0~ART4 Farm Hero·TOD0~TOD1 시간 Presentation 구현 → 지형 blending/모바일 profiling 또는 TCS1 24개 contact sheet
 - 제품 공개 기본값: 0.0 커뮤니티·공공데이터
 - Unity 개발 범위: 제품 버전 순서에 종속되지 않는 전체 Ssalddel 도메인
 
 ## 현재 목표
 
-기존 `Ssalddel` 운영 서버는 실제 사용자·조직·공동구매·개별 주문·계약·발주·입고·재고·결제와 농장 관측·작업의 권위를 유지하고, 별도 Simulation 경계가 scenario lineage·seed·가상 Tick·revision을 소유한다. 구매·import한 Synty City·Farm Pack은 이 경계를 변경하지 않고 실제 업무 object의 `VisualRoot`와 별도 Environment root에서만 사용한다. WORLD-0~WORLD-5의 Farm→Farm Yard→Rural Road→Logistics→Market→Residential 시각 증거와 FARM-2의 Preview→명시적 Confirm→Simulation Tick→새 snapshot→reconcile→Dirt Row 폐루프를 유지한다. 2026-08-09 사용자 요청으로 Visual 중단을 한정 해제해 별도 `FarmCityGraphicalShowcase` Scene에 Farm 263·City 88 환경 Wrapper를 추가했다. 원본 WORLD-5 Scene, vendor prefab/material, Simulation·Operational 계약은 바꾸지 않았다. Unity Test Runner가 도메인 재로드 뒤 고착되어 최종 전체 테스트·Overview 재캡처·profiling은 남아 있으며, 이를 복구한 뒤 Simulation Task를 농부 이동·정지·회전·최소 animation으로 표현하는 FARM-3로 복귀한다. 환경 object와 NPC·animation은 업무 stable ID나 상태 확정 권위를 소유하지 않는다.
+기존 `Ssalddel` 운영 서버와 별도 Simulation 경계의 권위를 유지한 채 CP0에서 저장된 Showcase와 Farm 24개 Composition이 남아 있음을 확인하고 테스트·캡처·profiling 기준선을 복구했다. CP1에서는 기존 Farm asset을 다시 저장하지 않고 공통 Composition descriptor·connector·socket·pack/source/detail/journey code, A/B/C signature validator와 Farm adapter를 additive로 구현했다. ANIM0 inventory는 실제 Synty clip/controller 부재, Humanoid rig 5개, Town missing controller 8개와 FX 수를 코드로 검출한다. CMP2에서는 세 Pack source 42개의 실제 좌표와 5m grid·Farm adapter offset을 고정했고, CMP3에서는 도로 12개와 Region/Hub Gate 10개를 A형 prefab으로 생성해 사람·차량·농기계·화물 connector를 분리했다. CMP4에서는 실제 감자 6×6 필지·타운 기본주택·시티 공동주택 가로형·지역 물류허브 Dock A형 각 1종을 만들고 CMP3 connector에 연결했다. CMP4-A/ANIM1에서는 공용 Idle/Walk 계약·catalog·adapter를 추가했고 ANIM2는 세 Pack 대표 actor의 route 이동과 procedural fallback 기준선까지만 닫았다. CMP5에서는 세 Region·Hub와 사람 Journey 2개, Farm·Town origin 화물 2개를 조립했다. 기존 감자 cargo는 Hub 보관에서 멈추고 명시적 allocation이 있는 Town sample cargo만 City outbound로 움직인다. ART0~ART3 1차 미술 패스에서는 Region별 색면, 연속 도로, 환경 군집, 공통 태양·ambient와 overview 카메라를 적용하고 가는 `DataRoute_*`와 숨긴 World Text로 데이터 표현을 정리했다. 세 Region 간격 패스에서는 기존 X/Z 좌표를 6.8배 확장해 Farm–Town과 Hub–City를 약 286~292m, Hub 연결 구간을 약 342~362m로 벌리고, 구간 성격에 맞춘 풍차·우물·급수탑·버스 정류장·벤치·가로등·물류 Station 등 18개 이상 조형물과 World/Region 초점 카메라를 추가했다. Farm Hero Slice는 기존 multi-region Showcase를 바꾸지 않고 Farm 전용 Scene에 97개 Presentation wrapper, 농장 초기 포커스, 따뜻한 soft-shadow·fog·절제된 후처리를 적용했다. ART4에서는 59개 작물·해바라기에 위상 분산 저진폭 흔들림을 적용하고 작업 트랙터 한 대를 짧은 Presentation 경로로 순환시켰다. TOD0~TOD1에서는 Dawn·Morning·Midday·Afternoon·GoldenDusk·Night 여섯 미술 앵커와 자정 연속 보간을 추가하고 태양·soft shadow·Ambient·Fog·카메라 배경·surface tint/brightness를 Presentation으로 적용했다. TCS0는 Farm 8 family×A/B/C 24개 catalog entry의 시간 반응 renderer/material slot과 semantic surface 종류를 측정한다. 같은 Game View의 여섯 시간대 PNG와 집중 EditMode 12/12, Farm/카메라 회귀 8/8 통과를 남겼다. 실제 Synty clip 리타기팅, 24개 contact sheet, Town/City 표면 inventory, 야간 emissive, 데이터 상태 미술과 모바일 profiling은 아직 완료되지 않았다. 환경 object와 NPC·차량·animation·시간 Presenter는 업무 stable ID나 상태 확정 권위를 소유하지 않는다.
 
 ```text
 Authorized market operation data
@@ -53,6 +53,15 @@ External source
 - sensor model을 단일 물리 장비 projection으로 정리
 - 운영 interaction의 preview, 명시적 확인과 canonical 재조회 계약 작성
 - Unity 계층 구조와 package-local 프로젝트 구조 문서 작성
+- [Unity 외부 Reference Pattern 선별 도입 제안](../Architecture/UnityExternalReferencePatternAdoptionProposal.md)에 다섯 외부 프로젝트의 채택·비채택 범위, `SyntyCharacterVisualAdapter`·`NpcMovementPresenter`·`SyntyVehicleVisualAdapter`, spatial mapping, source/license inventory와 snapshot-driven Sandbox Gate를 정의
+- [Unity World Visual Art Direction·ART Pass 제안](../Architecture/UnityVisualArtDirectionAndPassProposal.md)에 현재 CMP5 Game View의 시각 한계, `ART0~ART7` 순서, Region별 구도·색·조명·분위기·움직임·데이터 미술·카메라/성능 Gate와 같은 카메라 Before/After 증거 기준을 정의
+- [Unity World 시간대별 미술·색감 전환 제안](../Architecture/UnityWorldTimeOfDayVisualDirectionProposal.md)에 Dawn·Day·GoldenHour·Night 네 앵커, 연속 보간, 고정·preview·Simulation·운영 관측 시간 source 경계, Region별 인공조명, 데이터 색 보호, 모바일 비용과 `TOD0~TOD6` 구현·검증 Gate를 정의
+- [Unity City·Town·Farm Composition Set 시간 순차 시각 변화 제안](../Architecture/UnityCompositionSetTimeSequenceVisualProposal.md)에 현재 구현된 Farm 8종×A/B/C 24개를 첫 기준으로 여섯 시각의 그림자→밝기→표면·텍스처 반응→emissive 적용 순서, semantic surface binding, 원본 material 비수정, contact sheet와 `TCS0~TCS6` 확장 Gate를 정의
+- Unity `FarmHeroShowcase`에 TOD0~TOD1을 구현해 여섯 시간 앵커와 연속 보간, 태양·그림자·Ambient·Fog·카메라 배경·비파괴 `MaterialPropertyBlock` 표면 반응을 적용하고 같은 Game View의 시간대별 PNG 6장을 남김. TCS0에서는 Farm 24개 Composition의 시간 반응 material slot과 semantic surface inventory를 측정했으며 집중 EditMode 12/12를 통과함
+- Unity `ThreeRegionHubJourney`에 ART0~ART3 1차 미술 패스를 적용해 Farm·Town·Hub·City 색면, 연속 도로 5개, Synty 환경 군집, 따뜻한 soft-shadow 태양과 top-down 카메라를 표준화하고 1600×900 결과 PNG 및 전용 EditMode 10/10 검증을 남김
+- Unity `ThreeRegionHubJourney`의 X/Z 배치를 6.8배 확장해 주요 인접 구간을 약 286~292m로 벌리고, Farm–Town·Farm–Hub·Town–Hub·Town–City·Hub–City 성격에 맞춘 Synty 조형물 18개 이상과 World/Region 카메라 초점을 추가함. 전체/Hub Play Mode PNG와 전용·카메라 EditMode 15/15 검증을 남김
+- [Unity 야간 몬스터 화물트럭 약탈 Simulation 제안](../Architecture/UnityNightMonsterCargoRaidSimulationProposal.md)의 첫 vertical slice를 `ThreeRegionHubJourney`에 구현함. 5개 도로변에 독립 주택 10채·수목 View 30개 이상, Farm/Town/Hub/City 성격의 로우폴리 지형 굴곡 14개를 추가함. Hub–City 도로에서 19:45 blue-hour에 Synty skeleton 3명이 출모하고 2명이 상자를 운반한다. `SourceMode=Simulation`이며 약탈 전후 화물 stage·source lineage는 불변이다. 전용 EditMode 13/13과 terrain/roadside/day/night Play Mode PNG 3장을 남겼으며, 실제 화물 결과·운영 신고·배차·결제는 여전히 미구현·비활성이다
+- Unity `FarmHeroShowcase`를 별도 Scene으로 추가해 농가·필지·사일로·도로·수목을 Farm 전용 3/4 구도로 재구성하고, 97개 Presentation wrapper와 따뜻한 조명·절제된 fog/후처리를 적용함. ART4에서 59개 작물·해바라기 저진폭 흔들림과 작업 트랙터 Presentation 경로를 추가하고 1600×900 Play Mode PNG 및 전용·회귀 EditMode 12/12 검증을 남김
 - GPT Chat과 Codex가 함께 읽는 공용 컨텍스트·결정·현재 작업 문서 체계 구성
 - EF DbSet 180개와 MongoDB 물리 collection 27개의 persistence inventory 조사
 - DbSet 1개당 Controller를 만들지 않고 aggregate projection과 Zone Controller로 묶는 설계 작성
@@ -248,8 +257,20 @@ External source
 - City Pack에는 농장 토양·작물과 실제 AnimationClip·AnimatorController가 없음을 확인해 FARM-2~FARM-5와 walk/work animation은 별도 asset-neutral 후속으로 유지
 - Unity Scene·prefab·material·camera·UI 변경은 최종 Game View PNG를 다시 캡처하고 관련 코드·Scene·변경 기록과 같은 맥락의 커밋에 포함하도록 시각 증거 원칙을 보강
 - [입체 탑다운 City·Farm World 구성 제안](../Architecture/UnityCityFarmPackWorldCompositionProposal.md)을 POLYGON Farm Showcase 네 장의 목표 화면에 맞춰 개정: 살아 있는 농촌 경관, 전경·핵심 공간·중경·배경, 환경 농지 안의 실제 감자 6×6, Produce Stand/Farm Yard, Semi-Urban Transition과 강화된 WORLD-2 시각 완료 기준을 명시하고 기존 VisualRoot·stable ID·Simulation 권위 경계는 유지
+- product Unity project에 감자밭 두렁·혼합 작물밭·헛간 작업마당·농기계 대기장·농산물 직판장·수확물 집하장·농로 교차로·수목 완충지 8종×A/B/C의 `농장풍경CompositionSet` 24개를 생성하고, 실제 Synty nested prefab·footprint·한국어 세트명·상태 socket을 catalog와 저장 preview Scene으로 연결
 - [Unity World 구현 현황과 우선순위](../Architecture/UnityWorldImplementationPriority.md)의 현재 실행열을 P0 사전 조사부터 P6 WORLD-5 증거 Gate, P7 FARM-2 폐루프와 후속 P8~P9로 분리하고 각 단계의 재사용 대상과 완료 Gate를 고정
 - [City·Farm World P0 기준선과 Asset Inventory](../Architecture/UnityCityFarmWorldP0Inventory.md)에 실제 Unity 6000.5.6f1 project·열린 물류센터 Scene·Farm 498/City 335 prefab·최소 allowlist·PC/Mobile URP와 PC SSAO Renderer Feature·Console 기준선을 기록
+- [POLYGON Farm 식품 Asset·HS·가격 연결 조사](../Architecture/UnityPolygonFarmFoodAssetHsPriceCrosswalk.md)에 식별 가능한 29개 식품 품목군·177개 prefab을 현재 `FoodPriceCrosswalkCatalog`와 대조하고, 직접 10개·대표가격 2개·추가 판정 17개 및 가격 조사 품목의 시각 공백을 분리 기록; Unity·서버 구현은 변경하지 않음
+- [Unity Farm 상품·가격 카드 상호작용 흐름](../Architecture/UnityFarmProductPriceCardInteractionFlow.md)에 배치 Object 선택→상품 stable ID→HS mapping→국내/국가별 가격 조회→Concept Card Deck 흐름, direct·representative·candidate gate, loading·partial·stale·오류 상태와 FPC0~FPC3 구현 Gate를 정의; 현재 Farm 가격 adapter·Scene wiring은 미구현
+- [POLYGON City 반복 배치 Composition Set 조사](../Architecture/UnityPolygonCityCompositionSetResearch.md)에 실제 335개 prefab을 건물 76·환경 65·소품 174·차량 9·캐릭터 9·FX 2개로 분류하고, 첫 12종×A/B/C와 후속 6종의 한국어 세트명·source family·socket·반복 규칙·Farm→City 연결·구현 전 Gate를 정의; Unity 구현은 수행하지 않음
+- [City 주거단지·십자형 도로 Modular Composition 설계](../Architecture/UnityCityResidentialRoadModularCompositionDesign.md)에 실제 5m Road·Sidewalk cell과 약 5m Apartment module을 기준으로 도로 6종·공동주택 8종×A/B/C, connector graph, 십자형 생활권·저층 주거 가로·공동수령 recipe와 RR0~RR4 Gate를 정의; City Pack에는 단독주택 family가 없음을 명시하고 구현은 수행하지 않음
+- [Farm 시설하우스·밭·논 단지 Modular Composition 설계](../Architecture/UnityFarmGreenhouseFieldPaddyModularCompositionDesign.md)에 실제 Greenhouse 2종·Dirt Row·Vege Row·농로 9종·관수 asset을 근거로 농로 6종·시설하우스 6종·밭 8종과 단지 recipe·socket·GF0~GF5 Gate를 정의; Rice·담수면·논둑·농수로 전용 asset이 없어 논은 Blockout으로 분리하고 구현은 수행하지 않음
+- 실제 product Unity project에 import된 POLYGON Town 1.9.1의 702 prefab·25 material을 확인하고 [Town 반복 배치 Composition Set 조사](../Architecture/UnityPolygonTownCompositionSetResearch.md)에 5m 도로 grid, 도로 6종·생활권 12종×A/B/C, House interior 후보·privacy·TOWN0~TOWN4 Gate를 정의; Unity 구현은 수행하지 않음
+- [Farm·Town·City 혼합 Composition 조화 설계](../Architecture/UnityFarmTownCityCompositionHarmonyDesign.md)에 Farm 생산·Town 저밀도 생활·City 고밀도 유통 책임, Farm↔Town 6종·Town↔City 6종·세 Pack 관통 4개 recipe, dominant/support/accent·도로·높이·palette·cargo·NPC·MIX0~MIX4 Gate를 정의; 혼합 prefab·Scene은 미구현
+- [Farm·Town·City Composition 통합 구현 순서](../Architecture/UnityCompositionSetIntegratedImplementationSequence.md)에 이미 구현된 WORLD-0~5·FARM-2·농장풍경 24개와 문서 상태의 Composition·가격 Card를 구분하고, CP0 기준선 복구→CP1 공통 계약·실측·도로/Gate→CP2 최소 Region·Hub·공용 locomotion·Journey→CP3 감자 가격 카드와 FARM-3→CP4 검증된 subset 확장→CP5 논·Interior·최종 품질 순서를 고정; 이번 작업은 문서화만 수행
+- [Farm·Town·City 3개 독립 Region Map 구성 설계](../Architecture/UnityFarmTownCityThreeRegionMapLayoutDesign.md)에 Farm 북서·City 북동·Town 남서와 Town·City 사이 Regional Logistics Hub, 세 Region의 독립 확장 root·Gate, Farm↔Town·Town↔City 사람 route와 Farm/Town→Hub→City 화물 route, Stateful Journey와 Ambient Traffic 분리, Follow와 Scene 분리 Gate를 정의; 구현은 수행하지 않음
+- [Farm·Town·City 지역 물류허브 Map·Flow 설계](../Architecture/UnityFarmTownCityRegionalLogisticsHubDesign.md)에 여러 Farm·Town origin의 inbound Gate·Dock·검수·보관·분류·outbound allocation, Hub→City 재출하, passenger/freight 동선 분리와 직송 예외 Gate를 정의하고 D-034로 고정; 구현은 수행하지 않음
+- [Synty Animation·FX 재사용과 리타기팅 설계](../Architecture/UnitySyntyAnimationReuseAndRetargetDesign.md)에 실제 Synty `.anim`·controller·embedded clip 부재, 세 Pack Humanoid rig, Town character 8개의 missing controller 참조와 Farm 11·City 2·Generic 17 ParticleSystem을 기록하고 `SyntyProvided→Retargeted→Procedural→Fallback`, ANIM0~ANIM6과 CMP4-A 위치를 정의; Unity 구현은 수행하지 않음
 - WORLD-0 구현: product Unity project에 asset-neutral `DioramaCameraStateMachine`, `DioramaTopDownCameraRig`, World/Zone/Object focus, pan·zoom·90도 회전과 명시적 foreground cutaway, 저장하지 않는 primitive builder와 EditMode test를 추가
 - WORLD-0 runtime 확인: unsaved prototype에서 Overview/Farm/Logistics/Market focus와 Market 90도 회전을 캡처한 뒤 기존 물류센터 Scene으로 복귀; 제품 Scene·vendor asset·URP 설정은 저장·수정하지 않음
 - WORLD-1 구현: product Unity project의 별도 `CityFarmMacroWorldBlockout` Scene에 Farm Production·Farm Yard·Transport·Logistics·Market·Residential 6개 Presentation Zone, 5개 route와 World/Zone focus anchor를 저장하고 canonical Zone code와 Presentation subzone code를 분리
@@ -410,6 +431,25 @@ External source
 | Logistics facility overview Unity EditMode | 3/3 통과 | imported sample의 건물·4영역·화물 `VisualRoot` 회귀와 City Pack 저장 Scene·Game View를 함께 확인 |
 | Farm soil tile FARM-0~FARM-1 core | 신규 6/6, 기존 Farm 포함 집중 10/10, Unity core 228/228 통과 | 6×6 좌표·stable ID·Simulation 경계, 중복·누락·재배 참조 불일치, 선택·color token 검증; TRX `artifacts/local/validation/farm-soil-tile/` |
 | Farm soil tile FARM-0~FARM-1 Unity EditMode | 3/3 통과 | 실제 imported Farm sample에서 36개 cell, 무선택 초기 상태, stable-ID 선택 상세와 Selected material을 임시 Scene으로 검증; 저장된 Scene·Game View는 미실행 |
+| 농장 풍경 Composition Library | 집중 5/5, 기본 Unity EditMode 32/32 통과 | 8종×A/B/C 24 prefab, 실제 Synty nested source, 실제감자밭·농부·차량·농기계·화물·상호작용 socket, Simulation/Operational 권위 부재와 저장 preview Scene을 검증 |
+| POLYGON Farm 식품 Asset·HS·가격 조사 | 통과 | 실제 prefab 파일명 29개 품목군·177개와 현재 HS·KAMIS code catalog를 대조; docs-only Fast `git diff --check` 통과, log `20260809-212630`; live 가격·Unity runtime은 범위 밖 |
+| Unity Farm 상품·가격 카드 흐름 | 통과 | 기존 선택·Concept Card·국내/국가별 가격 계약을 재사용하는 FPC0~FPC3 설계와 직접·대표·후보·오류 Gate 문서화; docs-only Fast 통과, log `20260809-213144`; adapter·Scene·runtime은 미구현 |
+| POLYGON City Composition Set 조사 | 통과 | 실제 City prefab 335개 재집계, 첫 12종×A/B/C와 후속 6종의 한국어 세트·source·socket·반복 규칙 문서화; docs-only Fast 통과, log `20260809-213731`; Unity asset·Scene은 미구현 |
+| City 주거단지·십자형 도로 Modular 설계 | 통과 | 실제 collider 기준 5m cell, 도로 6종·주거 block 8종과 십자형 생활권 recipe·connector graph·단독주택 asset 공백 문서화; docs-only Fast 통과, log `20260809-220737`; RR0~RR4 구현은 미수행 |
+| Farm 시설하우스·밭·논 단지 Modular 설계 | 통과 | Greenhouse 2종·Dirt/Vege Row·농로 9종·관수 source를 대조해 농로 6종·시설하우스 6종·밭 8종과 논 Blockout Gate 문서화; docs-only Fast 통과, log `20260809-221337`; GF0~GF5 구현은 미수행 |
+| POLYGON Town Composition Set 조사 | 통과 | 실제 Town prefab 702개·material 25개를 재집계하고 5m 도로 6종·생활권 12종×A/B/C와 선택적 내부 세트를 문서화; docs-only Fast 통과, log `20260809-222620`; TOWN0~TOWN4 구현은 미수행 |
+| Farm·Town·City 혼합 Composition 조화 설계 | 통과 | Pack별 생산·저밀도 생활·고밀도 유통 책임과 Farm↔Town 6종·Town↔City 6종·세 Pack 관통 4개 recipe를 문서화; docs-only Fast 통과, log `20260809-222620`; MIX0~MIX4 구현은 미수행 |
+| Farm·Town·City Composition 통합 구현 순서 | 통과 | 이미 구현된 WORLD·FARM-2·농장풍경 24개와 미구현 Composition·가격 Card를 분리하고 CMP0~CMP11, 첫날 CMP0~CMP3 권장 절단선과 FARM-3 복귀 조건을 문서화; docs-only Fast 통과, log `20260809-223153`; Unity 구현은 미수행 |
+| Farm·Town·City 3개 독립 Region Map 설계 | 통과 | Farm 북서·City 북동·Town 남서의 독립 Region과 Town·City 사이 Hub, passenger/freight Gate·Route, 사람·Cargo Stateful Journey와 ambient traffic, 독립 root·additive Scene 후속 Gate를 문서화; D-033은 세 Region, D-034는 Hub freight topology로 구체화; Unity 구현은 미수행 |
+| Farm·Town·City 지역 물류허브 설계 | 통과 | 여러 Farm·Town origin→Hub inbound→검수·보관·allocation→Hub→City outbound, passenger/freight 분리, split·merge 보존식과 직송 예외를 문서화하고 D-034로 고정; docs-only Fast 통과, log `20260809-230430`; Unity 구현은 미수행 |
+| Composition 우선순위·Synty animation 보강 | 통과 | CP0~CP5 실행 등급, CMP4-A, ANIM0~ANIM6, 실제 clip/controller 부재·Humanoid retarget·Town missing controller·FX inventory를 문서화하고 D-035로 고정; 9개 문서 link 0건 누락·trailing whitespace 0건, docs-only Fast 통과, log `20260809-232128`; Unity 구현은 미수행 |
+| Composition CP0 기준선 복구 | 통과, CLI 종료 crash 1회 | 저장 Showcase 전용 4/4·기존 전체 64/64, Pipeline validation·Console Error 0·Scene dirty false, 대표 PNG 4종과 351 instance·370 renderer·370 shadow caster·7 transparent·Animator/Particle 0; CLI 결과 저장 뒤 Unity InputSystem/TextCore native crash는 열린 Editor 재검증으로 분리 |
+| Composition CMP1·ANIM0 | 집중 8/8, 전체 72/72 통과 | 공통 descriptor·connector·socket·source/detail/journey·A/B/C signature validator, 기존 Farm 24개 adapter, Synty clip/controller·Humanoid·missing controller·FX inventory 검사; 새 Town·City·Hub prefab은 아직 생성하지 않음 |
+| Composition CMP2 source 실측 | 집중 4/4, 전체 76/76 통과 | 세 Pack source 42개 측정, Town·City 5m grid 확인, Farm Dirt Road 11.9106m·10m 접속 오차 1.9106m·adapter offset `(0, 0, -0.9553)`, LODGroup 0·공통 shader `Synty/Generic_Basic`; Town House 문 방향 12개는 결합 mesh 한계로 `unknown` 유지 |
+| Composition CMP3 도로·Gate A형 | 집중 6/6, 전체 82/82 통과 | 세 Pack 도로 12개·Gate 10개, 사람·차량 경계 4쌍·화물 3쌍, builder 2회 `22 → 22`, 90도 회전·tile 중첩·Farm offset·nested prefab 검사, Console Error 0·Preview dirty false·Game View 확인 |
+| Composition CMP4 최소 거점 A형 | 집중 6/6, 전체 88/88 통과 | 실제 감자 6×6 필지·타운 기본주택·시티 공동주택 가로형·지역 물류허브 Dock 4종, CMP3 도로/Gate 방향·노선 접속, source/설계 출입구·회전반경·occlusion·상태 socket·권위 부재 검사, builder `4 → 4 → 4`, Preview dirty false·Game View 확인 |
+| Composition CMP4-A·ANIM1/ANIM2 fallback | 집중 6/6, 전체 94/94 통과 | 공용 Idle/Walk key·intent·source kind·catalog·adapter, Farm/Town/City 대표 Humanoid route follower, root motion 비활성, 실제 clip/controller 0·Town missing controller 8 진단, procedural fallback Play Mode Game View 확인; 실제 clip retarget은 미완료 |
+| Composition CMP5 세 Region·Hub Journey | 집중 7/7, 전체 101/101 통과 | Farm·Town·City·Hub A형 anchor 4개, Gate 10개, 사람 Journey 2개, Farm/Town 화물 2개; 기존 감자 cargo·6 lineage Hub 보관, allocation 있는 Town cargo만 City outbound, 위치 tick의 업무 상태 비변경과 Play Mode Overview 확인 |
 | WORLD-0 Diorama camera 집중 | 4/4 통과 | focus level, pitch·zoom clamp, 90도 회전, Perspective rig와 명시적 foreground cutaway |
 | WORLD-0 Unity EditMode 전체 | 29/29 통과 | product 20, Farm 3, Logistics 3, Market 3; 최종 recompile 성공과 Console error 0 |
 | WORLD-0 primitive Game View | 확인 | Overview/Farm/Logistics/Market focus와 Market 90도 회전 raw capture `C:\Users\user\ssalddel\artifacts\WORLD-0\`; Scene 저장 없음 |
@@ -450,16 +490,16 @@ World 실행열은 WORLD-5에서 시각 확장을 중단했고 FARM-2 밭갈이 
 
 ## 다음 구현 후보
 
-1. FARM-3: Simulation Task를 semantic waypoint와 농부 이동·정지·회전·최소 animation adapter로 표현
-2. FARM-4~FARM-5: SeedLot·파종과 결정적 발아·생육·관수·수확 Simulation
-3. FARM-6~SC7: 농장 출하 cargo를 운송·물류센터·마트 재고·진열·공동주택 결과에 연결
+1. CMP6: 감자 상품·가격 카드 한 품목을 Farm·Hub·City anchor에 연결
+2. FARM-3: 감자 카드 수직 슬라이스 뒤 농부 작업 Presentation 한 종류로 복귀
+3. 검증된 Idle/Walk clip을 확보하면 ANIM2 retarget 품질 Gate를 별도 통과하고 procedural fallback을 교체
 
 ## 미해결
 
 - Farm canonical schema와 API contract는 추가됐지만 migration은 실제 DB에 적용하지 않았고 sensor ingestion·판정 rule 실행 경로와 운영 seed가 없음
 - Farm Pack의 감자 S/M/L·감자 상자·Dirt Row·Humanoid 농부와 농기계를 확인하고 6×6 Tile View·VisualRoot·primitive fallback과 Farm Game View를 연결했다. 밭갈이 Confirm/Tick 폐루프는 완료했지만 실제 Synty Dirt Row 교체, SeedLot·파종·생육과 농부 작업 animation은 아직 없음
 - Role Perspective server aggregate는 기사/도심 물류센터·공동수령·생산자 농장까지 확장됐지만 협동조합과 다른 Zone은 미구현
-- 도심마트 대표 wrapper·NavMeshData·Humanoid socket과 Play Mode 시작은 검증했지만 City Pack에 AnimationClip·AnimatorController가 없어 실제 walk/work animation 재생은 미검증
+- Farm·Town·City character FBX의 Humanoid rig는 확인했지만 Synty standalone·embedded AnimationClip은 없고 Town character prefab 8개는 대응 asset 없는 controller GUID를 참조한다. missing-reference validator는 구현했으며 실제 walk/work 재생과 공용 리타기팅은 미구현
 - Warehouse W1 operational API와 UnityWebRequest refresh는 검증됐지만 선택·highlight 클릭 상호작용의 실제 Game View 확인은 미검증
 - 로컬 DB의 기존 계정 password hash가 현재 개발 설정과 일치하지 않고 기존 암호화 데이터의 Data Protection key도 현재 key ring에 없어 정상 개발 로그인과 startup seed는 별도 환경 정리가 필요함
 - 사용자 보고 P2 runtime과 현재 `Ssalddel.Unity` core의 결합 방식 확인 필요
