@@ -49,6 +49,10 @@
     <Project Path="Ssalddel.Simulation.Domain/Ssalddel.Simulation.Domain.csproj" />
     <Project Path="Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj" />
   </Folder>
+  <Folder Name="/Workflow Rules/">
+    <Project Path="Ssalddel.WorkflowRules.Contracts/Ssalddel.WorkflowRules.Contracts.csproj" />
+    <Project Path="Ssalddel.WorkflowRules/Ssalddel.WorkflowRules.csproj" />
+  </Folder>
   <Folder Name="/Shared/">
     <Project Path="Ssalddel.BackOffice.Client/Ssalddel.BackOffice.Client.csproj">
       <Build Solution="Debug|*" Project="false" />

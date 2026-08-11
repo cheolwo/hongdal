@@ -31,6 +31,8 @@
     <ProjectReference Include="..\Ssalddel.Client.Infrastructure\Ssalddel.Client.Infrastructure.csproj" />
     <ProjectReference Include="..\Ssalddel.Ui.Common\Ssalddel.Ui.Common.csproj" />
     <ProjectReference Include="..\Ssalddel.WebApp\Ssalddel.WebApp.csproj" />
+    <ProjectReference Include="..\Ssalddel.WorkflowRules.Contracts\Ssalddel.WorkflowRules.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.WorkflowRules\Ssalddel.WorkflowRules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
