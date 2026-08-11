@@ -7,6 +7,7 @@ builder.Services.AddHealthChecks();
 builder.Services.Configure<SimulationServerOptions>(
     builder.Configuration.GetSection(SimulationServerOptions.SectionName));
 builder.Services.AddSingleton<I경영SimulationSessionStore, InMemory경영SimulationSessionStore>();
+builder.Services.AddSingleton<ISimulationSessionSaveStore, InMemorySimulationSessionSaveStore>();
 builder.Services.AddSingleton<경영SimulationSessionService>();
 
 var executionMode = builder.Configuration["SsalddelExecution:Mode"];

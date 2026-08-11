@@ -20,6 +20,14 @@ public sealed class 경영SimulationSessionTests
         Assert.False(result.IsOperationalState);
         Assert.Equal(0, result.CurrentTick);
         Assert.Equal(0, result.Revision);
+        Assert.Equal("faction:sim.borderland-1", result.WorldContext.FactionStableId);
+        Assert.Equal("territory:sim.borderland-1", result.WorldContext.TerritoryStableId);
+        Assert.Equal("settlement:sim.border-town-1", result.WorldContext.SettlementStableId);
+        Assert.Equal(0, result.WorldContext.WorldTick);
+        Assert.Equal(0, result.WorldContext.WorldRevision);
+        Assert.Equal(new DateTimeOffset(2026, 4, 1, 0, 0, 0, TimeSpan.Zero),
+            result.WorldContext.GameDate);
+        Assert.Equal("OneTickOneDay", result.WorldContext.CalendarRuleCode);
     }
 
     [Fact]
@@ -64,6 +72,10 @@ public sealed class 경영SimulationSessionTests
         Assert.Equal(7, advanced.CurrentTick);
         Assert.Equal(1, advanced.Revision);
         Assert.False(advanced.IsCompleted);
+        Assert.Equal(advanced.CurrentTick, advanced.WorldContext.WorldTick);
+        Assert.Equal(advanced.Revision, advanced.WorldContext.WorldRevision);
+        Assert.Equal(new DateTimeOffset(2026, 4, 8, 0, 0, 0, TimeSpan.Zero),
+            advanced.WorldContext.GameDate);
     }
 
     [Fact]
@@ -140,11 +152,67 @@ public sealed class 경영SimulationSessionTests
         };
         var first = service.Advance(session.SessionStableId, command);
         first.CurrentTick = 99;
+        first.WorldContext.SettlementStableId = "settlement:sim.mutated-outside";
+        first.WorldContext.WorldTick = 99;
 
         var retry = service.Advance(session.SessionStableId, command);
 
         Assert.Equal(1, retry.CurrentTick);
         Assert.Equal(1, retry.Revision);
+        Assert.Equal("settlement:sim.border-town-1", retry.WorldContext.SettlementStableId);
+        Assert.Equal(1, retry.WorldContext.WorldTick);
+        Assert.Equal(new DateTimeOffset(2026, 4, 2, 0, 0, 0, TimeSpan.Zero),
+            retry.WorldContext.GameDate);
+    }
+
+    [Fact]
+    public void WorldTick은_연도경계에서도_하루단위GameDate를결정한다()
+    {
+        var service = Service();
+        var request = CreateRequest();
+        request.WorldContext.GameDateStartsOn =
+            new DateTimeOffset(2026, 12, 30, 0, 0, 0, TimeSpan.Zero);
+        var session = service.Create(request);
+
+        var advanced = service.Advance(session.SessionStableId, new 경영SimulationTick진행Request
+        {
+            CommandId = "command:advance-across-year",
+            ExpectedRevision = 0,
+            TickCount = 3,
+        });
+
+        Assert.Equal(3, advanced.WorldContext.WorldTick);
+        Assert.Equal(new DateTimeOffset(2027, 1, 2, 0, 0, 0, TimeSpan.Zero),
+            advanced.WorldContext.GameDate);
+    }
+
+    [Fact]
+    public void WorldContext가다른같은ClientRequest는_충돌로거부한다()
+    {
+        var service = Service();
+        var request = CreateRequest();
+        service.Create(request);
+        request.WorldContext.SettlementStableId = "settlement:sim.other-town";
+
+        var error = Assert.Throws<SimulationConflictException>(() => service.Create(request));
+
+        Assert.Equal("SimulationCreateRequestPayloadConflict", error.ErrorCode);
+    }
+
+    [Theory]
+    [InlineData("Faction")]
+    [InlineData("Territory")]
+    [InlineData("Settlement")]
+    [InlineData("GameDate")]
+    public void WorldContext필수값이없으면_Session생성을거부한다(string missing)
+    {
+        var request = CreateRequest();
+        if (missing == "Faction") request.WorldContext.FactionStableId = string.Empty;
+        if (missing == "Territory") request.WorldContext.TerritoryStableId = string.Empty;
+        if (missing == "Settlement") request.WorldContext.SettlementStableId = string.Empty;
+        if (missing == "GameDate") request.WorldContext.GameDateStartsOn = default;
+
+        Assert.Throws<SimulationContractException>(() => Service().Create(request));
     }
 
     [Fact]
@@ -201,5 +269,12 @@ public sealed class 경영SimulationSessionTests
             ScenarioSeed = 240809,
             RuleRevision = "supply-management-rule:1",
             DurationTicks = 28,
+            WorldContext = new SimulationWorldContext생성Request
+            {
+                FactionStableId = "faction:sim.borderland-1",
+                TerritoryStableId = "territory:sim.borderland-1",
+                SettlementStableId = "settlement:sim.border-town-1",
+                GameDateStartsOn = new DateTimeOffset(2026, 4, 1, 0, 0, 0, TimeSpan.Zero),
+            },
         };
 }
