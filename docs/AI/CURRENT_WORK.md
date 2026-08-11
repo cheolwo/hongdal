@@ -43,6 +43,7 @@ External source
 - simulation fixture와 operational data를 schema, 상태와 UI에서 구분한다.
 - sensor는 일반 관측 상태와 물리 장비 표현을 연결하는 단일 projection이다.
 - 외부 asset보다 placeholder와 View socket 계약을 먼저 검증한다.
+- Unity 감자 생산·유통 연구 Scene 9개와 `신티에셋연구소`의 주요 정보 Panel에 Presentation 전용 `접기`, `펼치기`, `닫기`, `다시 열기` 상태를 공통 구현했다. 9개 업무 Scene은 Builder 재생성·wiring 검증을 통과했고 연구소는 기존 Scene에 좁게 적용했다. 이어 감자 이동 연결 Scene 2개를 포함한 관련 Scene 12개를 `감자생산유통`, `생산자판로`, `에셋연구` 세 폴더로 AssetDatabase 이동하고 Builder 경로를 단일 catalog로 모았다. Unity 재컴파일 오류 0건, 공통 상태 전이 EditMode 1/1, Scene 경로·GUID 보존 EditMode 12/12, 10개 Scene 직렬화 연결, 연구소 Play Mode·Game View를 확인했다. 기존 연구소 전체 Builder의 catalog 재생성 뒤 Presenter wiring 오류와 `ScreenSpaceOverlay`를 포함하지 않는 Pipeline 카메라 캡처 한계는 별도 미해결로 남겼다. 서버·Simulation 상태, 운영 API, provider 호출은 수행하지 않았다.
 
 ## 최근 완료
 
