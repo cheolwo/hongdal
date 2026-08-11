@@ -97,6 +97,8 @@ namespace Ssalddel.Simulation.Domain
                 var foodDelivery = PrepareFoodDelivery(request.Preview);
                 var foodDeliveryReceipt = PrepareFoodDeliveryReceipt(request.Preview);
                 var marketConsumption = PrepareMarketConsumption(request.Preview);
+                var exportPreparation = Prepare수출준비(request.Preview, preview);
+                var exportCargoPreparation = Prepare수출Cargo준비(request.Preview, preview);
 
                 var effectValues = includeExpectedCostsAsEffects
                     ? decision.ExpectedCosts.Concat(decision.ExpectedEffects)
@@ -133,6 +135,8 @@ namespace Ssalddel.Simulation.Domain
                 ScheduleFoodDelivery(foodDelivery, decision, task);
                 ScheduleFoodDeliveryReceipt(foodDeliveryReceipt, decision, task);
                 ScheduleMarketConsumption(marketConsumption, decision, task);
+                Schedule수출준비(exportPreparation);
+                Schedule수출Cargo준비(exportCargoPreparation);
 
                 Revision++;
                 appendCommand(request);
@@ -163,6 +167,8 @@ namespace Ssalddel.Simulation.Domain
                     ApplyGroupOrderForTask(task, task.ExpectedEndTick);
                     AdvanceFoodDeliveryForTask(task, task.ExpectedEndTick);
                     ApplyMarketConsumptionForTask(task, task.ExpectedEndTick);
+                    Advance수출준비ForTask(task, task.ExpectedEndTick);
+                    Advance수출Cargo준비ForTask(task, task.ExpectedEndTick);
                     task.StateCode = SimulationTaskStateCodes.Completed;
                     task.Revision++;
                     task.ActualEndTick = task.ExpectedEndTick;
@@ -180,6 +186,7 @@ namespace Ssalddel.Simulation.Domain
                 {
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     AdvanceFoodDeliveryForTask(task, currentTick);
+                    Advance수출준비ForTask(task, currentTick);
                     task.StateCode = SimulationTaskStateCodes.InProgress;
                     task.Revision++;
                 }
@@ -187,6 +194,7 @@ namespace Ssalddel.Simulation.Domain
                 {
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     AdvanceFoodDeliveryForTask(task, currentTick);
+                    Advance수출준비ForTask(task, currentTick);
                 }
             }
         }

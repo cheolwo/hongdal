@@ -71,6 +71,10 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationIndividualOrderSnapshot>();
         public SimulationStockReservationSnapshot[] StockReservations { get; set; }
             = Array.Empty<SimulationStockReservationSnapshot>();
+        public Simulation수출준비Snapshot[] ExportPreparations { get; set; }
+            = Array.Empty<Simulation수출준비Snapshot>();
+        public Simulation수출Cargo준비Snapshot[] ExportCargoPreparations { get; set; }
+            = Array.Empty<Simulation수출Cargo준비Snapshot>();
         public SimulationSettlementEconomySnapshot? Settlement { get; set; }
     }
 

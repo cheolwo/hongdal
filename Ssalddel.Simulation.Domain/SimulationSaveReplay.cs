@@ -257,6 +257,8 @@ namespace Ssalddel.Simulation.Domain
                 || package.Snapshot.MarketConsumptions == null
                 || package.Snapshot.IndividualOrders == null
                 || package.Snapshot.StockReservations == null
+                || package.Snapshot.ExportPreparations == null
+                || package.Snapshot.ExportCargoPreparations == null
                 || package.CommandLog == null)
             {
                 throw new SimulationContractException("SimulationSavePackageInvalid");
@@ -460,7 +462,79 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.StockReservations.Length);
             foreach (var reservation in value.StockReservations)
                 AddStockReservation(target, reservation);
+            Add(target, value.ExportPreparations.Length);
+            foreach (var preparation in value.ExportPreparations)
+                Add수출준비(target, preparation);
+            Add(target, value.ExportCargoPreparations.Length);
+            foreach (var preparation in value.ExportCargoPreparations)
+                Add수출Cargo준비(target, preparation);
             AddSettlement(target, value.Settlement);
+        }
+
+        private static void Add수출준비(
+            StringBuilder target,
+            Simulation수출준비Snapshot value)
+        {
+            Add(target, value.PreparationStableId);
+            Add(target, value.RootPreparationStableId);
+            Add(target, value.PreviousPreparationStableId ?? string.Empty);
+            Add(target, value.AttemptNumber);
+            Add(target, value.IsReworkAttempt);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.Quantity);
+            Add(target, value.UnitCode);
+            Add(target, value.PackingFacilityStableId);
+            Add(target, value.HandoffFacilityStableId);
+            Add(target, value.PackageLotCandidateStableId);
+            Add(target, value.HandoffCandidateStableId);
+            Add(target, value.InspectionOutcomeCode);
+            Add(target, value.FailureReasonCode ?? string.Empty);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.PackagingTicks);
+            Add(target, value.InspectionTicks);
+            Add(target, value.ReservedTick);
+            Add(target, value.PackagedTick ?? -1);
+            Add(target, value.InspectedTick ?? -1);
+            Add(target, value.HandoffCandidateReadyTick ?? -1);
+            Add(target, value.CanRetry);
+            Add(target, value.CargoPreparationStableId ?? string.Empty);
+            Add(target, value.CargoStableId ?? string.Empty);
+            AddStrings(target, value.SourceStableIds);
+        }
+
+        private static void Add수출Cargo준비(
+            StringBuilder target,
+            Simulation수출Cargo준비Snapshot value)
+        {
+            Add(target, value.CargoPreparationStableId);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.SourceExportPreparationStableId);
+            Add(target, value.RootExportPreparationStableId);
+            Add(target, value.ExportPreparationAttemptNumber);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.PackageLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.Quantity);
+            Add(target, value.UnitCode);
+            Add(target, value.CargoStableId);
+            Add(target, value.CargoRevision);
+            Add(target, value.RouteStableId);
+            Add(target, value.OriginFacilityStableId);
+            Add(target, value.DestinationFacilityStableId);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.RequiredPreparationTicks);
+            Add(target, value.ScheduledTick);
+            Add(target, value.ReadyForHandoffTick ?? -1);
+            AddStrings(target, value.BoundaryCodes);
+            AddStrings(target, value.SourceStableIds);
         }
 
         private static void AddIndividualOrder(

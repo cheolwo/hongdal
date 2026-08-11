@@ -173,6 +173,8 @@ namespace Ssalddel.Simulation.Domain
                 MarketConsumptions = CreateMarketConsumptionSnapshots(),
                 IndividualOrders = CreateIndividualOrderSnapshots(),
                 StockReservations = CreateStockReservationSnapshots(),
+                ExportPreparations = Create수출준비Snapshots(),
+                ExportCargoPreparations = Create수출Cargo준비Snapshots(),
                 Settlement = CreateSettlementSnapshot(),
             };
 
@@ -212,6 +214,9 @@ namespace Ssalddel.Simulation.Domain
                 MarketConsumptions = source.MarketConsumptions.Select(CloneMarketConsumption).ToArray(),
                 IndividualOrders = source.IndividualOrders.Select(CloneIndividualOrder).ToArray(),
                 StockReservations = source.StockReservations.Select(CloneStockReservation).ToArray(),
+                ExportPreparations = source.ExportPreparations.Select(Clone수출준비).ToArray(),
+                ExportCargoPreparations = source.ExportCargoPreparations
+                    .Select(Clone수출Cargo준비).ToArray(),
                 Settlement = CloneSettlementSnapshot(source.Settlement),
             };
 
@@ -526,5 +531,47 @@ namespace Ssalddel.Simulation.Domain
             => (store.Find(sessionStableId)
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
                 .ConfirmHarvestDispositionImpact(request);
+
+        public Simulation수출준비PreviewSnapshot Preview수출준비(
+            string sessionStableId,
+            Simulation수출준비PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출준비(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출준비(
+            string sessionStableId,
+            Simulation수출준비ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출준비(request);
+
+        public Simulation수출준비PreviewSnapshot Preview수출재작업(
+            string sessionStableId,
+            Simulation수출재작업PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출재작업(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출재작업(
+            string sessionStableId,
+            Simulation수출재작업ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출재작업(request);
+
+        public Simulation수출Cargo준비PreviewSnapshot Preview수출Cargo준비(
+            string sessionStableId,
+            Simulation수출Cargo준비PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출Cargo준비(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출Cargo준비(
+            string sessionStableId,
+            Simulation수출Cargo준비ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출Cargo준비(request);
     }
 }
