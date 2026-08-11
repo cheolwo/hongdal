@@ -34,6 +34,7 @@ public static partial class ServiceCollectionExtensions
             provider.GetRequiredService<EfExternalDataIngestionStore>());
         services.AddScoped<IExternalDataIngestionRuntime, ExternalDataIngestionRuntime>();
         services.AddAgriculturalExternalDataProviders();
+        services.AddKoreaAdministrativeRegionPublicDataProviders();
         services.AddSingleton<I공공데이터포털활용ApiModuleCatalog, 공공데이터포털활용ApiModuleCatalog>();
         services.AddScoped<IHs공공데이터수집Service, Hs공공데이터수집Service>();
         services.AddScoped<IHs공공데이터수집기, Hs수입평균단가공공데이터수집기>();

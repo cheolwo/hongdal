@@ -42,6 +42,7 @@ using Ssalddel.Services.Security;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
+using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Infrastructure.BackgroundJobs.Community;
 using Ssalddel.Domain.AgriculturalFisheries;
@@ -56,6 +57,8 @@ using Ssalddel.Services.Community;
 using Ssalddel.Services.Customs;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Startup;
+using 살뜰.Services.External.PublicData;
+using 살뜰.Services.External.PublicData.Korea;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CustomsWebCorsPolicy = "SsalddelWebCustoms";
@@ -285,6 +288,62 @@ if (await 지역문화이미지자산PublishCommandLine.TryRunAsync(
         app.Logger,
         CancellationToken.None))
 {
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--collect-korea-legal-dong-codes",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var ingestionDb = scope.ServiceProvider.GetRequiredService<PublicDataIngestionDbContext>();
+    await ingestionDb.Database.MigrateAsync();
+    var runtime = scope.ServiceProvider.GetRequiredService<IExternalDataIngestionRuntime>();
+    var result = await runtime.IngestAsync(new ExternalDataIngestionRequest
+    {
+        SourceId = 대한민국법정동CodeDataset.SourceId,
+        DatasetId = 대한민국법정동CodeDataset.DatasetId,
+        RunKey = $"korea-legal-dong:{DateTimeOffset.UtcNow:yyyyMMddHHmmssfff}",
+        Timeout = TimeSpan.FromMinutes(2),
+        MaxAttempts = 2,
+        ForceReprocess = args.Any(argument => string.Equals(
+            argument,
+            "--force-reprocess",
+            StringComparison.OrdinalIgnoreCase)),
+    });
+
+    app.Logger.LogInformation(
+        "대한민국 법정동코드 수집 완료. Status={Status}, Fetched={Fetched}, Normalized={Normalized}, Rejected={Rejected}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}, Revision={Revision}",
+        result.StatusCode,
+        result.FetchedCount,
+        result.NormalizedCount,
+        result.RejectedCount,
+        result.InsertedCount,
+        result.UpdatedCount,
+        result.ExistingCount,
+        result.DataRevision);
+
+    if (string.Equals(result.StatusCode, Ssalddel.Domain.PublicData.외부데이터수집StatusCodes.Success, StringComparison.Ordinal)
+        && args.Any(argument => string.Equals(
+            argument,
+            "--promote-regions",
+            StringComparison.OrdinalIgnoreCase)))
+    {
+        var geographyDb = scope.ServiceProvider.GetRequiredService<SsalddelContext>();
+        await geographyDb.Database.MigrateAsync();
+        var promotion = scope.ServiceProvider
+            .GetRequiredService<대한민국법정동행정구역원장승격Service>();
+        var promoted = await promotion.승격Async();
+        app.Logger.LogInformation(
+            "대한민국 법정동 행정구역 원장 승격 완료. Active={Active}, Added={Added}, Updated={Updated}, CodeAssignments={Assignments}, MissingParents={MissingParents}, Revision={Revision}",
+            promoted.현행정규화Record수,
+            promoted.행정구역추가수,
+            promoted.행정구역갱신수,
+            promoted.CodeAssignment추가수,
+            promoted.상위구역미확인수,
+            promoted.DataRevision);
+    }
     return;
 }
 

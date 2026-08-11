@@ -49,6 +49,8 @@ public static class RegionalAgriculturalMapRegionTypeCodes
 {
     public const string StateProvince = "StateProvince";
     public const string CountyMunicipality = "CountyMunicipality";
+    public const string TownshipNeighborhood = "TownshipNeighborhood";
+    public const string Village = "Village";
     public const string ShippingDistrict = "ShippingDistrict";
 }
 

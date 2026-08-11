@@ -23,6 +23,7 @@ appsettings.*.local.json
 *.secret.json
 /Ssalddel/App_Data/
 /Ssalddel/.local-storage/
+/Ssalddel/.local-private-storage/
 *.secrets.json
 secrets.json
 secrets.*.json
