@@ -62,6 +62,12 @@ SimulationWorldShell의 Farm·Logistics·Market·Town 구역에 배치
 
 아직 구현하지 않은 부분은 시뮬레이션 서버에서 통합 전시관 상태 사본을 실제 HTTP로 조회하는 저장소, 로딩·재시도·취소 처리, 서버 개정 번호가 뒤바뀌었을 때 기존 화면을 보존하는 처리다. 이번 리팩토링은 이를 연결할 주입 경계까지만 준비했으며 실운영 API 호출이나 업무 확정 기능은 추가하지 않았다.
 
+`UNITY-CLIENT-SIM-LOAD-1`에서는 위 경계의 다음 단계를 구현했다. Unity의 `통합전시관SimulationSessionRepository`가 기존 `GET /api/simulation/v1/sessions/{sessionStableId}`에서 세션 고유 식별자, 시나리오, 세션·World 개정 번호, WorldTick, 게임 날짜와 실행 모드를 읽는다. 응답이 Simulation이 아니거나 실운영 상태를 포함하면 거부한다. 모판의 정적 구성과 서버 세션 상태는 하나의 기준 원장처럼 합치지 않고 `통합전시관ServerBoundSnapshot` 안에서 표시 상태 사본과 세션 연결 상태로 분리한다.
+
+조회 조율 계층은 취소된 응답을 화면에 적용하지 않고, 이미 채택한 세션 개정 번호보다 낮은 응답을 거부한다. 새로고침이 실패하면 마지막으로 성공한 상태 사본과 개정 번호를 유지하고 `RefreshError` 상태를 남기므로 사용자가 명시적으로 다시 조회할 수 있다. Presenter는 이 서버 연결 상태 봉투를 주입받을 수 있으며 세션 개정 번호를 별도로 보존한다.
+
+아직 저장된 통합 전시관 Scene에는 이 조율 계층을 만드는 Composition Root가 연결되지 않았다. 따라서 이번 단계는 저장소·조회 조율·Presenter 주입 계약까지의 코드 검증이며, 실제 Play Mode HTTP 호출 증거는 아니다. 다음 단계는 `UnityClientRuntimeSettings`, 세션 선택과 생명주기 `CancellationToken`을 Composition Root에 연결하고, 서버가 꺼진 상태와 실행 중인 상태를 각각 Game View와 Console로 검증하는 것이다.
+
 ## 5. O6 실제 World 배치 검증 완료 모듈 7개
 
 이 표의 배치 객체는 모판 미리보기와 별도로 `SimulationWorldShell` 배치까지 검증됐다.
@@ -155,7 +161,8 @@ EXH-5 업무 흐름과 음식배달 상태 계보는 구현되어 있지만, 다
 - Unity Scene 배치 검증: 7/7
 - 기존 `SimulationWorldShell` 회귀: 10/10
 - `UNITY-CLIENT-REFACTOR-1` 집중 검증: 통합 전시관 책임 분리 7/7, 두 서버 Client 독립 설정과 World 초기화 7/7
-- Unity 전체 EditMode 회귀: 264개 중 263개 통과. 실패 1개는 연구 Scene 파일 수를 27개로 고정한 기존 테스트와 실제 29개 Scene의 불일치이며, 이번 Client 리팩토링 경로의 실패는 아니다
+- `UNITY-CLIENT-SIM-LOAD-1` 집중 검증: 세션 조회·Simulation 경계·개정 번호 역행·취소·새로고침 보존 5/5
+- Unity 전체 EditMode 회귀: 269개 중 268개 통과. 실패 1개는 연구 Scene 파일 수를 27개로 고정한 기존 테스트와 실제 29개 Scene의 불일치이며, 이번 Client 리팩토링 경로의 실패는 아니다
 - 서버 조회 결과 생성기 집중 테스트: 24/24
 - Unity용 변환기 집중 테스트: 25/25
 - Unity 스크립트 재컴파일: 오류 0건
