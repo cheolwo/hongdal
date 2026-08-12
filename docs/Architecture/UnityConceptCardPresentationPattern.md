@@ -167,6 +167,8 @@ ConceptCardActionItem
 
 이 확장은 공통 카드 View를 복제하는 작업이 아니라 각 도메인의 Interpretation과 Projector가 같은 Presentation 문법을 사용하는 작업이다.
 
+Farm 작물·수확물·상자를 선택해 상품과 공공 가격을 확인하는 구체적인 anchor·상태·카드 구성은 [Unity Farm 상품·가격 카드 상호작용 흐름](UnityFarmProductPriceCardInteractionFlow.md)에 정의한다.
+
 ## 9. 개인정보와 설명 가능성
 
 - 마트 관리자와 대표 deck에 다른 주민의 이름, 사용자 ID, 연락처, 상세주소, 동·호수, 주민별 수량과 결제 상세를 넣지 않는다.

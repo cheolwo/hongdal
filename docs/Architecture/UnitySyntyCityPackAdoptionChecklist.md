@@ -31,8 +31,8 @@ City Pack은 Ssalddel 업무 모델이 아니라 교체 가능한 Unity Presenta
 
 저장 Scene:
 
-- `Assets/Ssalddel/Experiments/SyntyCityPackIntegration/UrbanMarketCityPackVerticalSlice.unity`
-- `Assets/Ssalddel/Experiments/SyntyCityPackIntegration/UrbanLogisticsCityPackVerticalSlice.unity`
+- `Assets/Ssalddel/Experiments - 연구/SyntyCityPackIntegration/도심마트도시팩적용연구.unity`
+- `Assets/Ssalddel/Experiments - 연구/SyntyCityPackIntegration/도심물류센터도시팩적용연구.unity`
 
 ## 구매 후 첫 교체 범위
 

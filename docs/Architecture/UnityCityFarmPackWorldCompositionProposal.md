@@ -2,7 +2,7 @@
 
 ## 1. 제안의 중심
 
-Ssalddel Unity World는 **따뜻하고 풍성한 농장 경영 게임 화면에서 시작해, 카메라가 이동할수록 농장 출하장·농촌 도로·물류센터·도심마트·공동주택으로 자연스럽게 확장되는 입체 탑다운 World**로 구성한다. 공급망 기능을 구역별로 늘어놓은 도식이 아니라, 실제 농촌 마을과 도시 생활권 안에 생산·운송·물류·판매·공동수령 기능이 자연스럽게 녹아 있어야 한다.
+Ssalddel Unity World는 **따뜻하고 풍성한 Farm, 저밀도 생활권 Town, 고밀도 물류·시장 City가 각각 독립적으로 발전하고 사람과 화물차량이 세 Region 사이를 오가는 입체 탑다운 World**로 구성한다. 공급망 기능을 일렬로 늘어놓은 도식이 아니라, 각 Region의 생활과 경영이 독립적으로 읽히면서 이동망을 통해 생산·운송·물류·판매·공동수령이 연결되어야 한다.
 
 완전한 수직 탑다운 지도도 아니고, NPC 눈높이의 3인칭 World도 아니다. 기본 카메라는 건물의 높이, 밭의 이랑, 차량의 이동과 작업 공간의 깊이를 읽을 수 있는 3/4 시점이다.
 
@@ -11,17 +11,20 @@ Ssalddel Unity World는 **따뜻하고 풍성한 농장 경영 게임 화면에�
                             ↘
                       pitch 45~55°
 
-[농장] → [출하장] → [운송 회랑] → [물류센터] → [도심마트] → [공동주택]
- 생산       포장          이동           입고·검수       판매·보충       주문·수령
+ [Farm Region] ── 집하 ─┐
+       │                 ▼
+       │ 생활이동 [Regional Logistics Hub] ── 배송 ─→ [City Region]
+       │                 ▲                               ▲
+ [Town Region] ── 집배송 ┘────── 주민·통근 이동 ─────────┘
 ```
 
-구매한 `POLYGON Farm`은 생산 공간의 시각 언어와 첫 화면의 정서적 중심을, `POLYGON City`는 도시 생활과 유통 공간의 시각 언어를 맡는다. 두 Pack은 감자 상자·팔레트·차량·도로·Dock처럼 실제 업무가 넘어가는 지점에서 결합하되, 농장 옆에 도시가 갑자기 붙지 않도록 Farm Yard·Rural Road·Semi-Urban Transition을 거쳐 점진적으로 전환한다.
+구매·import한 `POLYGON Farm`은 생산 공간과 첫 화면의 정서적 중심을, `POLYGON Town`은 단독주택·정원·동네상점·생활배송으로 저밀도 생활권을, `POLYGON City`는 고밀도 도시 생활과 유통 공간을 맡는다. 각 Pack은 Region 내부에서 주된 정체성을 유지하고, 혼합 asset은 Farm↔Town·Town↔City 사람 Gate와 Farm/Town→Hub·Hub→City 화물 Gate의 진입부에서만 제한적으로 사용한다.
 
 먼저 전체 World의 배경과 주요 object anchor를 배치하고 카메라에서 읽히는 공간 구조를 확정한다. 그 뒤 FARM-2 밭갈이부터 코드 vertical slice로 돌아간다.
 
 ### 1.1 초기 Visual Prototype의 품질 목표
 
-WORLD 단계는 단순히 prefab이 깨지지 않고 배치되는지를 확인하는 단계가 아니다. 구매한 두 Pack이 제공하는 shader·material·palette·FX를 적극 활용해, 실제 Game View를 처음 보는 사람도 완성될 게임의 분위기와 공간적 매력을 이해할 수 있는 수준의 대표 화면을 먼저 만든다.
+WORLD 단계는 단순히 prefab이 깨지지 않고 배치되는지를 확인하는 단계가 아니다. 구매한 세 Pack이 제공하는 shader·material·palette·FX를 적극 활용해, 실제 Game View를 처음 보는 사람도 완성될 게임의 분위기와 공간적 매력을 이해할 수 있는 수준의 대표 화면을 먼저 만든다.
 
 ```text
 안전한 asset 연결
@@ -62,24 +65,19 @@ Farm 대표 화면에는 다음 요소를 한두 개씩 고립해 놓지 않고,
 
 ## 2. 플레이어가 보게 될 World
 
-기본 화면은 공급망 전체를 조망하는 전략 화면이다.
+기본 화면은 독립적으로 발전하는 Farm·Town·City 세 Region과 그 사이의 이동망을 조망하는 전략 화면이다.
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│  산·수목 배경                                                │
+│ [Farm Region] ── 집하 ─┐           ┌── 배송 ─→ [City Region] │
+│ 밭·시설·Farm Yard      ▼           │          마트·공동주택  │
+│       │        [Regional Logistics Hub]                      │
+│       │        입고·검수·보관·출고                           │
+│       ▼                  ▲                                   │
+│ [Town Region] ── 집배송 ─┘──── 주민·통근도로 ───────────────▶│
+│ 주택·중심가·지역 배송                                       │
 │                                                              │
-│  [농촌 경관과 여러 작물밭]                                           │
-│       └─ [실제 감자밭 6×6] ─ [작업장·Produce Stand] ─┐       │
-│               농부·Tractor      출하 상자             │       │
-│                                      농촌 도로         │       │
-│                                [소규모 상점·창고·주택] │       │
-│                                                     ▼       │
-│                                              [물류센터]      │
-│                                            Dock·검수·보관    │
-│                                                     │       │
-│                                                     ▼       │
-│                 [공동주택] ← 주민·공동수령 ← [도심마트]      │
-│                                             후방·진열대      │
+│ 세 Region은 독립 발전하고 화물은 중간 Hub를 기본 경유함     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -101,6 +99,8 @@ Farm 대표 화면에는 다음 요소를 한두 개씩 고립해 놓지 않고,
   → 물류센터 처리 계획
   → 농장 출하와 다음 작기 검토
 ```
+
+플레이어는 한 Region의 내부 발전만 보는 것이 아니라 사람과 화물차량을 선택해 Region 사이의 Journey를 따라갈 수 있다. 이동 actor의 도착은 Presentation이며 주문·계약·입고·검수·수령을 자동 확정하지 않는다.
 
 ## 3. 카메라는 핵심 인터페이스다
 
@@ -188,14 +188,15 @@ Object Focus + Concept/Status/Reason/Action Card
 
 ## 4. 실제 구매 Asset 상태
 
-Unity 프로젝트 `C:\Users\user\ssalddel`에서 두 Pack의 실제 Import를 확인했다.
+Unity 프로젝트 `C:\Users\user\ssalddel`에서 Farm·Town·City Pack의 실제 Import를 확인했다.
 
 | Pack | 경로 | Prefab 구성 |
 | --- | --- | --- |
 | POLYGON City | `Assets/Synty/PolygonCity` | 건물 76, 캐릭터 9, 환경 65, 소품 174, 차량 9 |
 | POLYGON Farm | `Assets/Synty/PolygonFarm` | 건물 17, 캐릭터·부착물 14, 환경 67, FX 11, 식물 173, 소품 166, 차량 11 |
+| POLYGON Town | `Assets/Synty/PolygonTown` | Prefab 702개, Material 25개; 세부 Composition 분류는 Town 조사 문서 기준 |
 
-두 Pack의 대표 건물·캐릭터·작물은 현재 프로젝트에서 `Synty/Generic_Basic` shader를 사용한다. Farm 농부와 City 인물은 Humanoid Avatar를 제공한다.
+세 Pack의 대표 건물·캐릭터·작물은 현재 프로젝트에서 Synty 계열 shader와 palette를 사용한다. Farm·Town·City character FBX는 Humanoid rig를 제공한다.
 
 감자 playable에 필요한 Farm asset도 실제로 존재한다.
 
@@ -207,7 +208,7 @@ Unity 프로젝트 `C:\Users\user\ssalddel`에서 두 Pack의 실제 Import를 �
 - Tractor, Plough, Planter, Harvester와 trailer
 - Barn, Farmhouse, Garage, Greenhouse, Silo, Produce Stand
 
-두 Pack에는 실제 `.anim`과 Animator Controller가 없다. 외형과 Humanoid rig는 사용할 수 있지만 걷기·밭갈이·파종·수확 동작은 별도 animation adapter가 필요하다.
+현재 Synty 폴더에는 standalone `.anim`·`.controller`가 없고 각 Pack character FBX도 embedded clip import가 꺼져 있다. Town character prefab 8개에는 대응 asset을 찾지 못한 controller GUID가 남아 있다. 따라서 외형과 Humanoid rig는 재사용하되 걷기·밭갈이·파종·수확 동작은 검증된 clip의 리타기팅과 별도 animation adapter가 필요하다.
 
 ## 5. Pack별 공간 책임
 
@@ -232,40 +233,53 @@ Farm의 모든 시각 object가 stable ID를 가질 필요는 없다. 실제 상
 - 관리자, 공동주택 대표와 도시 운송자 외형
 - van과 도시 차량
 
-### 두 Pack의 결합부
+### Town Pack — 저밀도 생활·지역 연결 World
 
-| 연결 지점 | Farm 측 | City 측 | 공유 의미 |
+- 단독주택·차고·정원과 뒷마당
+- Town Neighborhood와 Main Street
+- 동네상점·놀이터·생활 커뮤니티 공간
+- 생활택배 거점과 지역 배송차량
+- Farm 방문과 City 통근·시장 방문을 표현할 주민·대표 외형
+- Farm↔Town 생활도로와 Town↔City 지역 간선도로의 Gate
+
+### 세 Pack의 연결부
+
+| 연결 지점 | 출발·도착 | 대표 이동 | 공유 의미 |
 | --- | --- | --- | --- |
-| 농장 출하 | 감자 상자·Produce Stand | pallet·차량 | Cargo/handoff |
-| 운송 회랑 | Farm gate·농촌 도로 | 소규모 상점·창고·주택을 거친 도시 진입로 | Transport route와 점진적 시각 전환 |
-| 물류센터 | 출하 상자 | Dock·검수·보관 | Inbound handoff |
-| 마트 입고 | 감자 cargo | 후방재고·진열대 | Inventory/source plan |
-| 공동수령 | 생산자 origin | 공동주택 pickup | Fulfillment |
+| Farm↔Town 생활도로 | Farm Yard·Produce Stand↔Town Neighborhood | 농부·주민·Pickup | 방문·직판·생활배송 Presentation |
+| Town↔City 사람 간선도로 | Town Main Street↔City Residential·Market | 주민·대표·Bus | 통근·시장방문 Presentation |
+| Farm/Town→Hub inbound | Origin Gate↔Hub Inbound Dock | 집하·집배송 화물차량·Cargo | Cargo/handoff·Inbound Journey |
+| Hub→City outbound | Hub Outbound↔City Distribution Gate | 배송차량·pallet·Cargo | allocation·Outbound Journey |
+| City 내부 공급 | Distribution Gate↔Market↔Residential Pickup | Van·pallet·주민 | Inventory·fulfillment Presentation |
 
-Farm 상자나 City pallet이 canonical cargo가 되는 것은 아니다. Ssalddel World의 cargo stable ID가 기준이고, 각 Zone의 View가 같은 cargo를 적절한 외형으로 표현한다.
+Farm 상자나 City pallet이 canonical cargo가 되는 것은 아니다. Ssalddel World의 cargo stable ID가 기준이고, 각 Region의 View가 같은 cargo를 적절한 외형으로 표현한다. NPC와 차량 도착도 업무 상태를 자동 확정하지 않는다.
 
 ## 6. 탑다운 맵 배치 원칙
 
-### 6.1 생산에서 소비 방향을 고정한다
+### 6.1 세 Region과 안쪽 Gate를 고정한다
 
-기본 회전에서 Farm을 화면 좌상단, City를 우하단에 두어 시선이 생산에서 소비로 자연스럽게 흐르게 한다.
+기본 회전에서 Farm을 북서쪽, City를 북동쪽, Town을 남서쪽, Regional Logistics Hub를 Town과 City 사이 중앙~동쪽에 둔다. 세 Region의 바깥쪽은 독립 확장에 사용하고, 서로 마주보는 안쪽 면에는 Gate와 지역 간 Route를 고정한다.
 
 ```text
-좌상단                                                               우하단
-Farm Core → Farm Yard / Produce Stand → Rural Road
-           → Semi-Urban Transition → Urban Logistics → Urban Market → Residential
+ Farm Region ── 집하 ─┐
+      │                ▼
+      │ 생활도로  Regional Logistics Hub ── 배송 ─→ City Region
+      │                ▲                                ▲
+ Town Region ── 집배송 ┘────── 사람·통근도로 ───────────┘
 ```
 
-90도 회전 후에도 Zone 입구와 도로 연결이 읽혀야 한다. 건물을 예쁘게 정면 배치하는 것보다 route와 작업 anchor가 가려지지 않는 것이 우선이다.
+90도 회전 후에도 세 Region, 각 Gate와 도로 연결이 읽혀야 한다. 건물을 예쁘게 정면 배치하는 것보다 route와 작업 anchor가 가려지지 않는 것이 우선이다.
 
-### 6.2 Zone 사이에는 설명 가능한 전환 공간을 둔다
+### 6.2 Region 내부와 Corridor를 구분한다
 
-- 각 Zone은 바닥 재질, 도로, fence와 높이 차이로 구분한다.
+- 각 Region은 바닥 재질, 도로, fence와 높이 차이로 독립된 정체성을 가진다.
 - Farm 내부는 기능별 빈칸으로 분리하지 않고 밭·농로·울타리·식생·작업 소품으로 자연스럽게 연결한다.
-- 카메라가 Zone을 선택했을 때 해당 구역만 한 화면에 들어오는 여백을 둔다.
-- Farm과 City 사이의 운송 회랑은 장식 배경이 아니라 실제 상태 이동을 보여주는 공간으로 남긴다.
-- Rural Road 주변에 작은 상점·창고·주택을 섞어 Farm palette와 City palette가 점진적으로 교차하는 Semi-Urban Transition을 만든다.
+- 카메라가 Region을 선택했을 때 해당 영역과 주요 Gate가 한 화면에 들어오는 여백을 둔다.
+- Farm↔Town 생활도로와 Town↔City 통근도로, Farm/Town→Hub inbound와 Hub→City outbound route는 장식 배경이 아니라 사람·차량 Journey를 보여주는 공간으로 남긴다.
+- 혼합 Composition은 Region 전체가 아니라 Gate·진입부에 집중한다. Town은 Farm과 City 사이의 장식 Transition이 아니라 독립 생활권으로 유지한다.
 - 빈 공간은 무조건 채우지 않지만, 남겨 둘 때는 차량 회전·작업 안전·밭 접근·시야 확보처럼 공간의 이유가 읽혀야 한다.
+
+구체적인 Region footprint·Gate·Route·Journey 구조는 [Farm·Town·City 3개 독립 Region Map 구성 설계](UnityFarmTownCityThreeRegionMapLayoutDesign.md), 허브 입고·검수·보관·출고와 다중 origin 기준은 [지역 물류허브 Map·Flow 설계](UnityFarmTownCityRegionalLogisticsHubDesign.md)를 따른다.
 
 ### 6.3 주요 object는 실루엣으로 식별한다
 
@@ -282,64 +296,43 @@ Overview에서는 text를 읽지 않아도 각 Zone을 구분할 수 있어야 �
 모든 asset을 한 대형 Scene에 넣지 않는다. 공통 카메라·조명·Runtime과 Zone 표현을 분리한다.
 
 ```text
-WorldBootstrap
+ThreeRegionWorldShell
 ├─ IsometricCameraRig
 ├─ GlobalLightingAndVolume
 ├─ SharedPresentationCanvas
 ├─ WorldSelectionCoordinator
-├─ ZoneFocusCoordinator
+├─ RegionAndJourneyFocusCoordinator
+├─ RegionRegistry
+├─ FarmRegionRoot
+│  ├─ FarmProduction
+│  ├─ FarmYard
+│  └─ FarmRegionGates
+├─ TownRegionRoot
+│  ├─ TownNeighborhood
+│  ├─ TownMainStreet
+│  └─ TownRegionGates
+├─ RegionalLogisticsHubRoot
+│  ├─ InboundDockDistrict
+│  ├─ InspectionAndStorageDistrict
+│  ├─ OutboundStagingDistrict
+│  └─ HubGates
+├─ CityRegionRoot
+│  ├─ UrbanLastMileDistribution
+│  ├─ UrbanMarket
+│  ├─ ResidentialCommunity
+│  └─ CityRegionGates
+├─ InterRegionRouteRoot
+│  ├─ FarmTownLocalRoute
+│  ├─ TownCityPassengerRoute
+│  ├─ FarmHubInboundRoute
+│  ├─ TownHubCollectionRoute
+│  └─ HubCityOutboundRoute
+├─ StatefulJourneyRoot
+├─ AmbientTrafficRoot
 └─ RuntimeCompositionRoot
-
-Zone_FarmProduction
-├─ EnvironmentRoot
-│  ├─ SurroundingCropFields
-│  ├─ FarmRoadsAndFences
-│  ├─ TreesAndVegetation
-│  └─ FarmLifeProps
-└─ SimulationRoot
-   ├─ PotatoField_6x6
-   ├─ FarmWorkerArea
-   ├─ IrrigationArea
-   └─ SensorArea
-
-Zone_FarmYard
-├─ Barn
-├─ ProduceStand
-├─ PackingArea
-├─ PotatoCargoHandoff
-└─ FarmVehicleBay
-
-Zone_TransportCorridor
-├─ FarmGate
-├─ RuralRoad
-├─ SemiUrbanTransition
-│  ├─ SmallShop
-│  ├─ SmallWarehouse
-│  └─ RuralHousing
-├─ CityEntry
-└─ VehiclePresentationRoute
-
-Zone_UrbanLogistics
-├─ VehicleApproach
-├─ InboundDock
-├─ InspectionArea
-├─ StorageArea
-└─ DistributionExit
-
-Zone_UrbanMarket
-├─ MarketExterior
-├─ RoofCutawayRoot
-├─ BackroomInventory
-├─ ShelfArea
-└─ ManagerDesk
-
-Zone_ResidentialCommunity
-├─ ApartmentExterior
-├─ RepresentativeStart
-└─ ResidentialPickupPoint
 ```
 
-초기에는 복잡한 streaming framework를 만들지 않는다. 각 Zone을 독립 Scene 또는 명시적 root로 만들고 카메라·stable ID·route 경계를 먼저 검증한다. 실제 메모리 요구가 확인된 뒤 additive loading을 확장한다.
+초기에는 복잡한 streaming framework를 만들지 않는다. 한 Integration Scene 안에서 세 Region을 명시적 root로 분리하고 Gate·Route·camera를 먼저 검증한다. 계약이 안정되면 World Shell과 Farm·Town·City Region Scene을 additive 구조로 분리할 수 있다.
 
 ## 8. 감자 6×6 밭의 입체 표현
 
@@ -426,6 +419,42 @@ catalog에는 prefab reference, scale, rotation, pivot/anchor와 material varian
 
 원본 Synty prefab은 수정하지 않는다. Ssalddel wrapper의 `VisualRoot` 아래에 scene instance 또는 project prefab variant를 배치한다.
 
+### 10.1 반복 가능한 농장 풍경 Composition Set
+
+단일 Synty prefab과 최종 Farm Zone 사이에 반복 배치 가능한 `농장풍경CompositionSet` 계층을 둔다. 세트는 원본 prefab을 중첩 참조하는 Presentation 전용 prefab이며, 환경 경관과 실제 상태 object가 연결될 socket을 분리한다.
+
+```text
+Synty 단일 prefab
+  → 농장풍경CompositionSet A/B/C
+  → Farm Zone 배치
+  → 상태가 필요한 socket에만 VisualRoot 연결
+```
+
+첫 library는 다음 8종을 각각 A/B/C 세 변형으로 제공한다.
+
+| 풍경 세트 | 주된 역할 | 상태 연결 socket 후보 |
+| --- | --- | --- |
+| 감자밭 두렁 | 실제 6×6 감자밭 주변 울타리·식생·경계 | 실제감자밭 |
+| 혼합 작물밭 | 옥수수·밀·채소가 만드는 환경 농지 | 없음 |
+| 헛간 작업마당 | Barn·농기계·건초·도구 작업 군집 | 농부·차량·화물 |
+| 농기계 대기장 | Garage/Shelter와 Tractor attachment 군집 | 차량·농기계 |
+| 농산물 직판장 | Produce Stand·상자·간판·판매 소품 | 농부·화물·상호작용 |
+| 수확물 집하장 | pallet crate·상자·grain bag·wheelbarrow | 화물·차량 |
+| 농로 교차로 | 교차·T·곡선 농로와 표지·울타리·식생 | 차량 |
+| 수목 완충지 | 수목·과수·꽃·풀·바위의 전경·배경 군집 | 없음 |
+
+세트 이름과 변형은 한국어 업무·경관 의미로 탐색하고, 개별 vendor 파일명은 builder와 catalog의 Presentation 내부에만 남긴다. 세트 prefab 전체에 stable ID를 부여하지 않으며, 실제 감자밭·농부·차량·화물처럼 canonical 또는 Simulation 상태를 표현하는 대상만 socket 아래에서 별도 View와 stable ID를 가진다.
+
+초기 구현은 `농장풍경CompositionSetBuilder`가 실제 Synty prefab 83종을 조합해 24개 prefab, catalog asset과 library preview Scene을 재현 가능하게 생성한다. 최종 Farm World에는 catalog에서 필요한 세트만 선택해 배치하고, 같은 세트를 반복할 때는 A/B/C 변형·90도 회전·전후 반전을 조합하되 업무 route와 camera occlusion을 다시 검증한다.
+
+현재 8종 풍경 세트 아래에서 시설하우스·밭·논을 실제 단지처럼 조립하기 위한 하위 module 기준은 [Unity Farm 시설하우스·밭·논 단지 Modular Composition 설계](UnityFarmGreenhouseFieldPaddyModularCompositionDesign.md)를 따른다. 시설하우스와 밭은 실제 Farm prefab으로 구성 가능하지만, 논은 Rice·담수면·논둑·농수로 asset이 없어 전용 Visual Gate 전까지 `논 단지 Blockout`으로만 다룬다.
+
+### 10.2 반복 가능한 도시 풍경 Composition Set 후보
+
+City Pack도 단일 건물·도로·소품을 최종 Zone에 직접 나열하지 않고, `도시풍경CompositionSet` 후보 계층을 둔다. 첫 후보는 농촌도시 전환 상가·도시 진입 교차로·물류센터 입고장·물류센터 적치출하장·도심마트 앞마당·도심마트 매장 내부·먹거리 상점 골목·공동주택 생활마당·공동수령 장소·사무공공정보관 앞·대중교통 정류장·도시 공원 쉼터 12종이며 각 A/B/C를 검토한다.
+
+현재는 조사·설계 상태이고 City 세트 prefab, catalog, builder와 preview Scene을 구현하지 않았다. 실제 335개 prefab inventory, 세트별 source family·socket·반복 규칙·한계와 구현 전 Gate는 [Unity POLYGON City 반복 배치 Composition Set 조사](UnityPolygonCityCompositionSetResearch.md)를 기준으로 한다.
+
 금지 사항:
 
 - Data contract에 Synty prefab 이름 저장
@@ -477,6 +506,18 @@ catalog에는 prefab reference, scale, rotation, pivot/anchor와 material varian
 - Overview에서는 FX 밀도를 줄이고 Zone/Object Focus에서 필요한 효과를 강화한다.
 - FX 완료 event가 Simulation Tick이나 operational Command를 확정하지 않는다.
 
+### Animation
+
+- Synty가 실제 제공한 clip·controller가 확인되면 source와 license를 기록하고 가장 먼저 재사용한다.
+- 현재 import에서는 Synty animation clip이 확인되지 않았으므로 Farm·Town·City Humanoid Avatar에 검증된 in-place Idle/Walk clip을 공용 adapter로 리타기팅한다.
+- `SyntyProvided`, `Retargeted`, `Procedural`, `Fallback`을 catalog에서 구분하며 리타기팅 결과를 Synty 제공 animation으로 오표기하지 않는다.
+- 사람 Journey의 위치는 NavMesh/route follower가 소유하고 root motion은 기본적으로 끈다. 농기계·차량·문·Dock 설비는 절차형 이동·회전부터 구현한다.
+- Town의 해소되지 않은 Animator Controller 참조는 validator가 오류로 검출하고 원본 vendor prefab은 직접 수정하지 않는다.
+- 공용 Idle/Walk는 도로·Gate와 actor socket이 검증된 직후 구현하고, 밭갈이·파종·수확·하역·진열 보충은 해당 업무 vertical slice에서 한 동작씩 추가한다.
+- animation event·도착·전환 완료는 Simulation Tick이나 operational Command를 확정하지 않는다.
+
+세부 inventory, source policy, Region별 intent와 `ANIM0~ANIM6` Gate는 [Synty Animation·FX 재사용과 리타기팅 설계](UnitySyntyAnimationReuseAndRetargetDesign.md)를 따른다.
+
 ### Scale
 
 - 캐릭터를 공통 기준으로 건물·차량·밭의 상대 scale을 맞춘다.
@@ -497,7 +538,9 @@ catalog에는 prefab reference, scale, rotation, pivot/anchor와 material varian
 - Tractor와 농부 NPC는 장식용 정지 표본이 아니라 현재 작업 또는 이동 상태를 표현하되 Simulation 완료 권위를 갖지 않는다.
 - UI와 Card를 숨긴 상태에서도 화면의 중심, 깊이, 이동 방향과 생활감이 유지되어야 한다.
 
-## 12. 배경·Object 선배치 구현 순서
+## 12. 기존 WORLD-0~5 기준선과 후속 Region 재구성
+
+WORLD-0~WORLD-5는 현재 구현된 선형 공급망 기준선의 이력이다. 이를 삭제하거나 같은 Scene에서 무리하게 변형하지 않는다. 후속 Composition Track은 기존 Scene·test·Cargo Journey를 보존한 별도 Integration Preview에서 3개 독립 Region Map을 검증한다.
 
 ### WORLD-0 — Camera Prototype
 
@@ -509,7 +552,7 @@ catalog에는 prefab reference, scale, rotation, pivot/anchor와 material varian
 
 ### WORLD-1 — Macro World Blockout
 
-- Farm Core→Farm Yard→Rural Road→Semi-Urban Transition→Logistics→Market→Residential의 위치와 높이를 배치한다.
+- 현재 구현된 선형 기준선에서는 Farm Core→Farm Yard→Rural Road→Semi-Urban Transition→Logistics→Market→Residential의 위치와 높이를 배치한다.
 - 도로, Zone 입구, 차량 route와 camera focus anchor를 먼저 만든다.
 - 건물 내부와 장식물은 아직 최소화한다.
 
@@ -574,9 +617,19 @@ Farm 대표 Game View의 완료 기준은 다음과 같다.
 
 완료 기준: 저장소의 [커밋별 시각 변경 기록](../Changes/README.md)에 Overview/Farm/Logistics/Market의 게임 화면 수준 대표 PNG, 품질 판단과 성능 측정 기록이 있고 배경 확장을 중단할 수 있다. 대표 PNG는 `docs/assets/changes/`에 둔다.
 
+### CMP-REGION — Farm·Town·City 3개 독립 Region 재구성
+
+- 기존 WORLD-5와 Cargo Journey를 보존한다.
+- 별도 Preview에서 Farm·Town·City Region root, Regional Logistics Hub와 passenger·freight Route·Gate를 배치한다.
+- Farm→Hub에는 기존 감자 Cargo Journey를, Hub→City에는 명시적 outbound Journey를, Town↔City에는 대표 주민 Journey를 연결한다.
+- Farm↔Town에는 상태 없는 ambient 이동과 첫 생활방문 후보를 구분한다.
+- 검증 뒤에만 Region별 Scene 분리와 A/B/C 확장을 진행한다.
+
+상세 순서는 [Composition 통합 구현 순서](UnityCompositionSetIntegratedImplementationSequence.md), Map 계약은 [3개 독립 Region Map 구성 설계](UnityFarmTownCityThreeRegionMapLayoutDesign.md)를 따른다.
+
 ## 13. 배경 구성 뒤 코드 복귀 순서
 
-WORLD-5가 끝나면 추가 장식 배치를 멈추고 다음 코드 순서로 복귀한다.
+WORLD-5와 FARM-2는 완료됐다. 최신 사용자 요청에 따른 제한된 Composition Track을 다음 순서에 삽입하고 합의된 Gate 뒤 생산 Simulation으로 복귀한다.
 
 1. **FARM-2 밭갈이 폐루프**
    - tile 선택
@@ -586,23 +639,30 @@ WORLD-5가 끝나면 추가 장식 배치를 멈추고 다음 코드 순서로 �
    - 새 snapshot
    - Dirt에서 Dirt Row로 표현 갱신
 
-2. **FARM-3 농부 NPC 작업 표현**
+2. **Farm·Town·City 3 Region Composition Track**
+   - Region·Gate·Route 계약과 실측
+   - 세 Region 최소 A형
+   - Farm↔Town·Town↔City 사람 이동망과 Farm/Town→Hub→City 화물망
+   - 사람·Cargo Journey와 감자 상품가격 Card
+   - 사용처가 검증된 subset만 A/B/C 확장
+
+3. **FARM-3 농부 NPC 작업 표현**
    - task target tile
    - semantic waypoint
    - 이동·정지·회전
    - animation은 Presentation이며 Tick 권위가 아님
 
-3. **FARM-4 파종·생육**
+4. **FARM-4 파종·생육**
    - SeedLot
    - Seeded→S→M→L
    - deterministic seed와 rule revision
 
-4. **FARM-5 수확·출하**
+5. **FARM-5 수확·출하**
    - Harvest Preview/Confirm/Tick
    - potato box cargo
    - Farm Yard handoff
 
-5. **FARM-6~SC7 공급망 연결**
+6. **FARM-6~SC7 공급망 연결**
    - 농장 출하
    - 운송
    - 물류센터 입고
@@ -643,11 +703,11 @@ WORLD-5가 끝나면 추가 장식 배치를 멈추고 다음 코드 순서로 �
 ## 16. 첫 완료 기준
 
 1. 첫 Farm Game View가 UI 없이도 따뜻하고 풍성한 농장 경영 게임 화면으로 읽힌다.
-2. 기본 카메라에서 Farm부터 Residential까지 전체 공급망이 한 방향으로 읽힌다.
+2. 기본 카메라에서 Farm·Town·City 세 Region과 세 지역 간 Route가 동시에 읽힌다.
 3. World/Zone/Object Focus가 일관된 pan·zoom·90도 회전 규칙을 사용한다.
-4. Farm Core, Farm Yard, Rural Road, Semi-Urban Transition, Logistics, Market, Residential을 실루엣과 공간 밀도로 구분할 수 있다.
+4. Farm·Town·City가 각각 독립 Region으로 구분되고 내부 핵심 공간과 Gate가 읽힌다.
 5. 감자 6×6 밭이 더 넓은 환경 농지 안에 포함되며 Untilled/Tilled/S/M/L/Harvested 표현이 기존 상태 계약과 대응한다.
-6. 감자 cargo가 Farm에서 Market까지 같은 lineage로 이어진다.
+6. 감자 cargo가 Farm→Hub 입고와 Hub→City 출고에서 같은 lineage로 이어지고 사람 Journey가 Farm↔Town 또는 Town↔City에서 보인다.
 7. Produce Stand/Farm Yard가 생산·출하·현장 판매의 시각적 연결점으로 읽힌다.
 8. 지붕과 전경 object가 선택한 업무 공간을 가리지 않는다.
 9. City/Farm asset 이름이 Data·Simulation·server contract에 나타나지 않는다.
@@ -657,6 +717,9 @@ WORLD-5가 끝나면 추가 장식 배치를 멈추고 다음 코드 순서로 �
 13. Overview/Farm/Logistics/Market 대표 화면이 조명·그림자·material·FX와 레이어드 구도를 포함한 게임 화면 수준으로 읽힌다.
 14. 대표 Zone별 최종 Game View PNG와 시각 품질 판단이 변경 기록에 포함된다.
 15. PC 목표 품질과 Android quality tier 후보가 측정 근거로 분리된다.
-16. WORLD-5 뒤 실제 우선순위가 FARM-2 밭갈이 코드로 돌아간다.
+16. 제한된 3 Region Composition Track의 합의된 Gate 뒤 실제 우선순위가 FARM-3 생산 표현으로 돌아간다.
+17. Synty 제공·리타기팅·절차형·fallback animation이 source별로 구분되고 Farm·Town·City 대표 actor가 공용 locomotion 계약으로 이동한다.
 
 최종 목표는 Farm Scene과 City Scene을 따로 감상하거나 공급망을 도식처럼 공간화하는 것이 아니다. 플레이어가 먼저 실제로 들어가 보고 싶은 농촌과 도시 World를 경험하고, 그 세계 자체를 따라가며 감자가 밭에서 생산되어 출하·운송·입고·진열·주민 수령으로 이어지는 원인과 결과를 이해하고 조작하게 만드는 것이다.
+
+WORLD 기반 위에 아직 문서 상태인 Town·City 주거도로·Farm 농업단지·상품가격 카드와 혼합 경관을 실제 구현하는 순서는 [Unity Farm·Town·City Composition 통합 구현 순서](UnityCompositionSetIntegratedImplementationSequence.md)를 따른다. 사람·차량·설비 동작의 source와 적용 순서는 [Synty Animation·FX 재사용과 리타기팅 설계](UnitySyntyAnimationReuseAndRetargetDesign.md)를 따른다.

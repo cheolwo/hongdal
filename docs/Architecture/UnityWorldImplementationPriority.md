@@ -1,5 +1,29 @@
 # Unity World 구현 현황과 우선순위
 
+## 0. 2026-08-10 Simulation World Shell 우선순위 부록
+
+기존 P0~P9와 Composition Track은 지금까지 완료한 기반과 검증 이력으로 보존한다. 현재 활성 순서는 개별 기능 Scene을 더 늘리는 대신 [Unity Simulation World Shell·정착지 Scene 기반 재정렬 제안서](UnityWorldShellSettlementSceneFoundationProposal.md)를 따른다.
+
+```text
+읽기 전용 Presentation 선행 — 완료
+[WORLD-SHELL-0]
+  → [SETTLEMENT-SCENE-0]
+
+서버 권위 복귀 — 완료
+[SETTLEMENT-ECONOMY-1]
+
+첫 playable 조립
+[WORLD-SETTLEMENT-NAV-0] — 완료
+  → [BRANCH-ADAPTER-1] — 완료
+  → [SETTLEMENT-VISUAL-BASE-0] — 완료
+  → [SETTLEMENT-INTERACTION-0] — 완료
+  → LOGISTICS-MOVEMENT-1
+```
+
+Shell과 첫 정착지 Scene 완료 뒤 `SETTLEMENT-ECONOMY-1`로 수확 Lot 단일 allocation과 완료 Tick의 경제 반영을 구현하고, navigation·branch adapter·visual base를 거쳐 `SETTLEMENT-INTERACTION-0`에서 HarvestLot 선택→네 판로 Preview→Confirm→Task 예약→WorldTick→Effect→새 snapshot reconcile을 닫았다. Production repository는 공식 Simulation API 경로와 expected revision을 사용하며 Game View fixture는 명시적으로 분리된다. 이제 활성 Gate는 `LOGISTICS-MOVEMENT-1`이고, Unity adapter, NPC·차량 animation이나 Scene object는 계속 Task 완료와 수량 권위를 갖지 않는다.
+
+기존 공공데이터 `WorldBootstrapScene`은 공개지도 surface로 유지했다. Simulation용 Scene은 별도 `SimulationWorldShell`로 추가하고, 첫 버전은 하나의 Scene 안에서 `WorldMapRoot`와 `SettlementInteriorRoot`를 전환해 같은 Tick 12·Revision 12 보존을 증명했다. 실제 additive Scene loading은 콘텐츠 규모가 필요성을 증명한 뒤 shell 뒤의 loader로 추가한다.
+
 ## 1. 목적
 
 이 문서는 서버 상태를 Unity World로 투영하는 현재 구현을 한곳에 모으고, 다음 작업을 **기술 의존성**, **현재 slice 완결 비용**, **제품 공개 우선순위**, **권한·개인정보 위험**을 기준으로 정렬한다.
@@ -37,9 +61,9 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 | Synty | WORLD-5 뒤 사용자 요청의 별도 Farm·City 그래픽 Showcase Scene 구현 | Test Runner 복구·최종 증거 뒤 Visual 범위 재중단 |
 | Farm 밭갈이 | FARM-2 Preview→Confirm→Tick→새 snapshot·reconcile 완료 | FARM-3 농부 작업 Presentation |
 
-## 3. 현재 활성 개발 순서
+## 3. 기존 World 기반의 구현·검증 순서
 
-기존 SS0~SS1, UM5-B, SC0~SC5, RG1~RG4, CC0~CC3-A와 FARM-0~FARM-1 기반은 유지한다. [Unity 입체 탑다운 City·Farm World 구성 제안](UnityCityFarmPackWorldCompositionProposal.md)의 WORLD-0~WORLD-5와 FARM-2를 닫은 뒤, 2026-08-09 사용자 요청에 따라 기존 Farm·City Pack만 사용하는 한정 Showcase 보강을 진행했다. 이 예외는 완료 증거를 남긴 뒤 다시 중단하고 FARM-3로 복귀한다.
+기존 SS0~SS1, UM5-B, SC0~SC5, RG1~RG4, CC0~CC3-A와 FARM-0~FARM-1 기반은 유지한다. [Unity 입체 탑다운 City·Farm World 구성 제안](UnityCityFarmPackWorldCompositionProposal.md)의 WORLD-0~WORLD-5와 FARM-2를 닫은 뒤, 2026-08-09 사용자 요청에 따라 기존 Farm·City Pack만 사용하는 한정 Showcase와 [Farm·Town·City Composition 통합 구현 순서](UnityCompositionSetIntegratedImplementationSequence.md)의 Composition Track, FARM-3 이후 생애주기 slice를 진행했다. 아래 표는 그 구현·검증 이력을 보존하며 현재 다음 순서는 위 0절의 Simulation World Shell 부록이 우선한다.
 
 | 우선순위 | 구현 묶음 | 재사용하거나 추가할 핵심 | 완료 Gate |
 | --- | --- | --- | --- |
@@ -52,6 +76,7 @@ Zone Controller는 장소의 현재 상태를 조율하고, Role Experience는 �
 | P6 | WORLD-5 품질·성능·증거 Gate | Console·shader·prefab 검사, renderer·Animator·FX·draw range와 기본 profiling, PC target과 Android 후보 분리, 대표 Game View 4종 | `docs/Changes`와 `docs/assets/changes`에 최종 PNG·측정·제한을 기록하고 Visual 확장을 중단 |
 | P7 | FARM-2 밭갈이 폐루프 | 기존 FARM-0~FARM-1 6×6 snapshot·Projector·View 위에 Preview, explicit Confirm, Simulation Command/Tick, 새 snapshot과 reconcile | 선택→Preview→Confirm→Tick→Dirt Row가 실제 state 변화로 왕복하고 animation·NPC는 권위를 갖지 않음 |
 | P7.5 | 사용자 요청 Farm·City 그래픽 Showcase | 기존 WORLD-5를 보존한 별도 Scene, Presentation 전용 Environment key/catalog, Farm·City vendor prefab의 전경·중경·원경 배치 | 최종 테스트·Console·Overview/Farm/Logistics/Market·profiling 증거를 남기고 범위를 다시 중단 |
+| P7.6 | Farm·Town·City Composition Track | 기존 Farm 24개와 WORLD 기반을 유지하고 `CMP0` 기준선→공통 계약·실측→도로/Gate A형→Pack·Hub 최소 A형→공용 Humanoid locomotion→다중 origin Journey→감자 가격 카드 순으로 구현 | 후보 전체 일괄 생성 없이 Farm/Town→Hub→City 물류와 사람 이동을 분리한 수직 슬라이스를 닫음 |
 | P8 | FARM-3~FARM-5 생산 표현 | 농부 semantic waypoint·최소 animation, 파종·S/M/L 생육, 수확·감자 cargo | deterministic seed·rule revision과 cargo lineage를 보존한 작은 vertical slice별 test |
 | P9 | FARM-6 이후 공급망 폐루프 | 농장 출하→운송→입고→후방재고→진열→공동수령, 이후 필요한 Operational projection | Simulation과 Operational을 섞지 않고 각 canonical 재조회·권한·오류 경계를 검증 |
 
@@ -90,8 +115,14 @@ P0~P6은 시각적 World 기반을 닫는 작업이며 Domain·Simulation 구조
 - P6 WORLD-5 완료: 별도 `CityFarmVisualQualityGate` Scene에서 Zone distance를 Game View 비교 근거로 26으로 확정하고, 읽히지 않는 3D evidence text를 숨긴 뒤 동일 Cargo Journey를 읽는 camera-space HUD로 대체했다. shader·vendor prefab·missing script 검사, 대표 PNG 4종, PC/Mobile URP 차이와 Editor 기본 profiling을 기록했다. 전용 5/5와 Unity EditMode 전체 52/52가 통과했다.
 - Visual 강제 중단 예외: 사용자 요청으로 기존 Farm·City Pack만 사용하는 P7.5를 한정 수행했다. 계절·낮밤·날씨·streaming·추가 interior·새 Zone은 여전히 시작하지 않는다.
 - P7 FARM-2 완료: 기존 6×6 snapshot·Projector·stable-ID View를 재사용해 선택→Preview→명시적 Confirm→Simulation Tick→새 Snapshot→Reconcile→Dirt Row를 연결했다. Preview·Confirm은 revision 1을 유지하고 Tick만 revision 2의 새 snapshot과 `Tilled` 상태를 반환한다. core 10/10, Farm View 6/6, Unity EditMode 전체 55/55가 통과했다.
-- P7.5 진행: 별도 `FarmCityGraphicalShowcase` Scene과 Environment Catalog에 Farm 263·City 88 Wrapper를 배치했다. 빌더 검증·컴파일·생성 직후 Console Error 0은 확인했으나 Test Runner가 도메인 재로드 뒤 고착되어 최종 전체 테스트·Overview 재캡처·profiling은 남아 있다.
-- 다음 Gate: P7.5 검증 복구 뒤 P8의 첫 slice인 FARM-3. Simulation Task를 semantic waypoint와 농부 이동·정지·회전·최소 animation adapter로 표현하되 도착·animation 완료는 상태 확정 권위를 갖지 않는다.
+- P7.5 완료: 별도 `FarmCityGraphicalShowcase` Scene과 Environment Catalog의 Farm 263·City 88 Wrapper를 다시 열어 검증했다. 전용 4/4·기존 전체 64/64, 대표 캡처 4종, Environment 351 instance·370 renderer와 Console Error 0·Scene dirty false를 확인했다.
+- P7.6 CMP1·ANIM0 완료: additive 공통 Composition descriptor·connector·socket·A/B/C signature validator와 기존 Farm adapter를 추가하고, Synty clip/controller 0·Humanoid rig 5·Town missing controller 8·FX 11/2/17을 코드로 검출했다. 집중 8/8과 열린 Editor 전체 EditMode 72/72가 통과했다.
+- P7.6 CMP2 완료: Town House 12개를 포함한 세 Pack source 42개의 bounds·pivot·긴 축·문 방향·shader·scale·collider·LOD를 Editor 검사기로 측정했다. Town·City는 5m grid를 확인했고 Farm Dirt Road 직선 11.9106m를 10m grid에 연결할 때 오차 1.9106m와 중심 adapter offset `(0, 0, -0.9553)`을 기록했다. 결합 mesh에서 문 방향을 확인할 수 없는 Town House 12개는 `unknown`으로 보존했다. 집중 4/4와 전체 EditMode 76/76이 통과했다.
+- P7.6 CMP3 완료: 세 Pack 도로 12개와 Region/Hub Gate 10개, 총 A형 prefab 22개를 생성했다. 사람·차량 경계 4쌍과 Farm/Town→Hub→City 화물 3쌍을 route signature로 분리하고, builder 2회 실행 `22 → 22`, 90도 회전·tile 중첩·nested Synty prefab·Farm offset을 검증했다. 집중 6/6·전체 EditMode 82/82, Console Error 0과 Preview Game View를 확인했다.
+- P7.6 CMP4 완료: Farm 실제 감자 6×6 필지·Town 기본주택·City 공동주택 가로형·Regional Logistics Hub Dock A형 각 1종을 생성하고 CMP3 도로/Gate와 반대 방향·동일 route signature로 접속했다. 실제 감자밭은 environment 36칸과 simulation-target socket만 가지며 기존 상태 View를 복제하지 않는다. 출입구 원본/설계 방향, 차량 회전반경, occlusion root, actor·vehicle·cargo·interaction socket을 고정했고 builder 3회 결과 `4 → 4 → 4`, 집중 6/6·전체 EditMode 88/88과 Preview Game View를 확인했다.
+- P7.6 CMP4-A·ANIM1 및 ANIM2 fallback 기준선 완료: asset-neutral Idle/Walk key·intent·source kind·fallback catalog와 adapter를 추가했다. Farm·Town·City 대표 Humanoid 각 1명은 같은 계약으로 별도 route follower를 따라 이동하며 root motion은 꺼져 있다. 실제 clip/controller 0과 Town missing controller 8개를 진단하고 procedural fallback을 명시했으므로 이를 검증된 Synty clip 리타기팅으로 간주하지 않는다. 집중 6/6·전체 EditMode 94/94, Console Error 0과 Play Mode Game View를 확인했다.
+- P7.6 CMP5·ANIM4 차량 이동 기준선 완료: Farm·Town·City·Hub A형 anchor 4개와 CMP3 Gate 10개, 사람 Journey 2개, 화물 Journey 2개를 한 저장 Scene에 조립했다. 기존 감자 cargo identity와 6개 lineage는 Hub 보관까지 재사용하고, 별도 Town cargo만 명시적 outbound allocation source가 있을 때 City 차량 이동을 허용한다. 위치·animation tick은 stage나 lineage를 바꾸지 않는다. 집중 7/7·전체 EditMode 101/101과 Play Mode Overview를 확인했으며 최종 경관 밀도·연속 도로 품질은 아직 미완료다.
+- 다음 Gate: `CMP6`에서 실제 감자 한 품목만 선택해 Farm·Hub·City anchor의 상품·가격 Concept Card를 연결한다. prefab은 가격·수량을 계산하지 않으며 source·시각·단위·통화·mapping 상태를 API projection에서 받아야 한다.
 
 ## 4. 통합 구현 우선순위
 

@@ -16,7 +16,7 @@
 | 항목 | 확인 결과 |
 | --- | --- |
 | Editor 상태 | ready, compile·domain reload 없음, Play Mode stopped |
-| 활성 Scene | `Assets/Ssalddel/Experiments/SyntyCityPackIntegration/UrbanLogisticsCityPackVerticalSlice.unity` |
+| 활성 Scene | `Assets/Ssalddel/Experiments - 연구/SyntyCityPackIntegration/도심물류센터도시팩적용연구.unity` |
 | Scene dirty | false |
 | Console error | 0 |
 | 현재 Camera | `Main Camera`의 고정 Transform, 전용 camera rig 없음 |
@@ -31,8 +31,8 @@
 - `Assets/Ssalddel/Scenes/WorldBootstrapScene.unity`
 - `Assets/Ssalddel/Scenes/UrbanLogisticsCenterPrimitive.unity`
 - `Assets/Ssalddel/Scenes/UrbanMarketManagerPrimitive.unity`
-- `Assets/Ssalddel/Experiments/SyntyCityPackIntegration/UrbanLogisticsCityPackVerticalSlice.unity`
-- `Assets/Ssalddel/Experiments/SyntyCityPackIntegration/UrbanMarketCityPackVerticalSlice.unity`
+- `Assets/Ssalddel/Experiments - 연구/SyntyCityPackIntegration/도심물류센터도시팩적용연구.unity`
+- `Assets/Ssalddel/Experiments - 연구/SyntyCityPackIntegration/도심마트도시팩적용연구.unity`
 
 재사용 대상:
 
@@ -51,6 +51,7 @@
 | --- | ---: | ---: | --- |
 | POLYGON Farm | 498 | 24 | asset·lighting 분석에만 사용하고 제품 Scene으로 복사하지 않음 |
 | POLYGON City | 335 | 25 | asset·lighting 분석에만 사용하고 제품 Scene으로 복사하지 않음 |
+| POLYGON Town | 702 | 25 | asset·lighting 분석과 Composition 후보 조사에만 사용하고 제품 Scene으로 복사하지 않음 |
 
 WORLD-0~WORLD-2 첫 allowlist 후보:
 
@@ -79,7 +80,66 @@ WORLD-0~WORLD-2 첫 allowlist 후보:
 - Manager desk: `SM_Prop_ShopInterior_Desk_01`
 - Residential: `SM_Bld_Apartment_01`
 
+### Town·Low-density Residential·Transition
+
+- House: `SM_Bld_House_Preset_01`
+- Garage house: `SM_Bld_House_Preset_Garage_01`
+- Shop: `SM_Bld_Shop_01`
+- Road: `SM_Env_Road_01`
+- Sidewalk: `SM_Env_Sidewalk_Straight_01`
+- Driveway: `SM_Env_Driveway_01`
+- Delivery vehicle: `SM_Veh_Truck_Delivery_01`
+- Pickup: `SM_Veh_Pickup_01`
+- Playground: `SM_Prop_Playground_01`
+- Garden: `SM_Env_Garden_Straight_01`
+
 이 파일명은 Presentation catalog 입력 후보일 뿐 Data·Simulation·Operational contract나 stable ID가 아니다.
+
+Farm Pack 식품 prefab과 현재 HS·KAMIS 가격 연결표의 대응 여부는 [Unity POLYGON Farm 식품 Asset·HS·가격 연결 조사](UnityPolygonFarmFoodAssetHsPriceCrosswalk.md)에 별도로 정리했다. asset 이름이 비슷하다는 이유만으로 상품 HS나 가격을 확정하지 않는다.
+
+Town Pack 702개 prefab의 단독주택·도로·생활상권 Composition 후보는 [Unity POLYGON Town 반복 배치 Composition Set 조사](UnityPolygonTownCompositionSetResearch.md), Farm→Town→City 혼합 기준은 [Unity Farm·Town·City 혼합 Composition 조화 설계](UnityFarmTownCityCompositionHarmonyDesign.md)에 정리했다. 두 문서 모두 설계 상태이며 Town·혼합 prefab과 Scene은 아직 생성하지 않았다. 이미 구현한 기반과 이 미구현 범위를 합친 실제 착수 순서는 [Farm·Town·City Composition 통합 구현 순서](UnityCompositionSetIntegratedImplementationSequence.md)를 따른다.
+
+### Animation·Avatar·FX 실측
+
+`Assets/Synty` 전체를 파일과 FBX `.meta` 기준으로 추가 조사했다.
+
+| 항목 | 확인 결과 |
+| --- | --- |
+| Synty `.anim`·`.controller`·`.overrideController` | 모두 0개 |
+| Farm·Town·City·Generic·Starter character FBX | 모두 Humanoid `animationType: 3`, `clipAnimations: []`, `importAnimation: 0` |
+| Town character prefab | 8개가 대응 asset을 찾지 못한 controller GUID를 참조 |
+| 실제 ParticleSystem prefab | Farm 11개, City 2개, Generic 17개 |
+
+따라서 현재 Pack은 사용할 Humanoid 외형·Avatar와 FX는 제공하지만 걷기·밭갈이·파종·수확·하역 clip을 제공한다고 확인할 수 없다. 구현에서는 실제 Synty 제공 source, 검증된 Humanoid 리타기팅, 절차형 차량·설비 동작과 fallback을 구분한다. 상세 source 정책과 `ANIM0~ANIM6` Gate는 [Synty Animation·FX 재사용과 리타기팅 설계](UnitySyntyAnimationReuseAndRetargetDesign.md)를 따른다.
+
+### 반복 배치용 농장 풍경 Composition Library
+
+실제 product Unity project `C:\Users\user\ssalddel`에는 단일 allowlist 위에 다음 재사용 계층을 구현했다.
+
+| 항목 | 구현 상태 |
+| --- | --- |
+| 풍경 종류 | 감자밭 두렁, 혼합 작물밭, 헛간 작업마당, 농기계 대기장, 농산물 직판장, 수확물 집하장, 농로 교차로, 수목 완충지 8종 |
+| 변형 | 각 A/B/C, 총 24개 prefab |
+| source | POLYGON Farm 실제 nested prefab 83종 |
+| catalog | `농장풍경CompositionCatalog.asset` |
+| 생성기 | `농장풍경CompositionSetBuilder` |
+| 상태 경계 | 실제감자밭·농부·차량·농기계·화물·상호작용 socket만 제공하고 상태나 stable ID는 소유하지 않음 |
+| preview | `농장풍경조합모음미리보기.unity`, 24개 prefab과 Perspective camera 저장 |
+
+생성 경로:
+
+- source: `Assets/Ssalddel/Presentation/World/농장풍경Composition*.cs`
+- builder: `Assets/Ssalddel/Editor/농장풍경CompositionSetBuilder.cs`
+- prefab: `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/Farm/`
+- catalog: `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset`
+
+이 library preview는 반복 가능한 조합과 원본 prefab 연결을 검증하는 편집용 배열이다. 최종 Farm Game View의 구도·밀도·scale 완료 증거는 아니며 실제 Zone 배치 뒤 다시 캡처한다.
+
+### 반복 배치용 도시 풍경 Composition 후보
+
+POLYGON City 335개 prefab을 건물 76·환경 65·소품 174·차량 9·캐릭터 9·FX 2개로 다시 분류하고, 첫 도시 세트 12종×A/B/C와 후속 6종 후보를 [Unity POLYGON City 반복 배치 Composition Set 조사](UnityPolygonCityCompositionSetResearch.md)에 정리했다.
+
+이는 문서 조사 결과다. `도시풍경CompositionSet` prefab, catalog, builder와 preview Scene은 아직 생성하지 않았다.
 
 ## 5. URP와 Quality 기준선
 
