@@ -6,6 +6,52 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-08-11 | [Unity 턴 카드 모판 정리와 화면](2026-08-11-unity-turn-card-seedbed.md) | 직접 확인 — 철학·학당·지역문화 후보를 C0~C6 Gate로 분리하고 실제 게임 덱·턴 authority와 분리된 한국어 모판 Scene에서 단계·출처·차단 사유를 표시 |
+| 2026-08-11 | [Unity 턴 카드 실제 Simulation 서버 연결](2026-08-11-unity-turn-card-server-connection.md) | 직접 확인 — 서버 context·Preview·Confirm·canonical 재조회로 서울 문화 카드 턴을 넘기고 WorldShell을 4월 13일·Tick 1·Revision 1·`LocalContextAwareness`로 갱신 |
+| 2026-08-11 | [Unity 감자 토양 모판과 공공자료 출처표](2026-08-11-unity-asset-soil-seedbed.md) | 직접 확인 — 밭고랑·감자 재배체·수확 상자·스프링클러를 한 모판에 전시하고 자료 단계·공식 자료 ID·공간·시간 기준과 실제 관측 미수집 경계를 한국어 카드로 표시 |
+| 2026-08-11 | [Simulation 문화 턴 카드](2026-08-11-simulation-culture-turn-card.md) | 직접 확인 — 지역·기간·공식 원천·달력·효과 규칙이 완전한 서울 생활문화 질문 카드를 Preview하고 Confirm 뒤 다음 턴 `LocalContextAwareness`로 전환 |
+| 2026-08-11 | [Simulation 경영일 턴 마감](2026-08-11-simulation-turn-closing.md) | 직접 확인 — WorldShell에서 Fixture 철학 카드 0~1장을 선택해 Preview한 뒤 명시적 Confirm에서만 Day 14·Tick 13·Revision 13과 다음 턴 효과로 전환 |
+| 2026-08-11 | [Unity HarvestLot 다중 원장 선택](2026-08-11-unity-harvest-route-multi-lot.md) | 생산자 카드에 화면 object와 원장 HarvestLot의 명시적 연결을 표시하고 선택 Lot의 Task만 격리 |
+| 2026-08-11 | [Unity 학습 카드 게시·출처 계약](2026-08-11-unity-learning-card-publication-contract.md) | 화면 없음 — 승인·음성 대조·Blob 계보·효과 revision이 완전한 immutable snapshot만 Unity가 해시 검증 후 소비하며 현재 실제 게시물은 0건 |
+| 2026-08-11 | [Unity HarvestLot 예약 작업 재개](2026-08-11-unity-harvest-route-resume.md) | 재접속한 온라인 직판 카드에 서버 Task stable ID와 남은 2 Tick을 복원하고 명시적 계속 진행을 제공 |
+| 2026-08-11 | [Unity HarvestLot 판로 재접속 갱신](2026-08-11-unity-harvest-route-refresh.md) | 재접속 뒤 외부 교역 운송 중 단계·출고 예약 수량·최신 revision을 같은 카드에 복원 |
+| 2026-08-11 | [Unity HarvestLot 판로 결과 카드](2026-08-11-unity-harvest-route-outcome-card.md) | 기존 생산자 카드에 선택·진행·비축·수출 성공/손실 결과를 서버 projection 기반 한국어 상태로 표시 |
+| 2026-08-11 | [Simulation HarvestLot 네 판로 결과 통합 projection](2026-08-11-simulation-harvest-route-outcome.md) | 화면 없음 — 조합·직판·보관·외부 교역의 선택 여부와 실제 진행·수량·재정·위험 결과를 한 조회 모델로 통합 |
+| 2026-08-11 | [Simulation 수출 출항·운송·성공/손실 정산](2026-08-11-simulation-export-shipment-execution.md) | 화면 없음 — 선택한 계획을 seed 기반 가상 결과로 실행하고 성공·손실 수량과 재정 차액을 한 번만 반영하되 운영 선적은 생성하지 않음 |
+| 2026-08-11 | [Unity 저녁 학당 업무 Preview 보강](2026-08-11-unity-evening-hakdang-business-preview-enrichment.md) | 화면 없음 — 실제 항만 인수 JSON wire를 검증해 바보는 미확인 질문, 전차는 물류 milestone만 보강하고 상품·300kg·계보·허용 intent는 그대로 유지 |
+| 2026-08-11 | [Simulation 수출 목적 시장·선적 계획 비교](2026-08-11-simulation-export-shipment-plan.md) | 화면 없음 — 해상·항공안의 예상 수익·비용·기간·위험을 비교해 하나의 계획 후보를 선택하되 재정·예약·운영 선적은 변경하지 않음 |
+| 2026-08-11 | [Simulation 수출 서류·검사 준비성 검토](2026-08-11-simulation-export-readiness.md) | 화면 없음 — 항만 인수 Cargo의 자기 진술형 준비 여부를 검토하고 보완·재검토 계보를 남기되 운영 신고·승인은 생성하지 않음 |
+| 2026-08-11 | [Simulation 수출 Cargo 항만 준비시설 인수](2026-08-11-simulation-export-port-receiving.md) | 화면 없음 — 도착한 수출 Cargo를 별도 Confirm/Tick으로 인수하되 수출신고·공식 검사·통관·선적은 다음 결정으로 유지 |
+| 2026-08-11 | [Simulation 수출 Cargo 물류 이동 연결](2026-08-11-simulation-export-logistics.md) | 화면 없음 — 배송대행지 Simulation 인계 Cargo를 기존 예약량 중복 없이 물류 이동에 연결하고 항만 준비시설 도착 후보까지 WorldTick 진행 |
+| 2026-08-11 | [Simulation 수출 Cargo 배송대행지 인계](2026-08-11-simulation-export-cargo-handoff.md) | 화면 없음 — 준비 완료 Cargo를 별도 Confirm/Tick으로 Simulation 인계하되 배차·차량 출발·물류 이동은 다음 결정으로 유지 |
+| 2026-08-11 | [Simulation 수출 Cargo 준비 후보](2026-08-11-simulation-export-cargo-preparation.md) | 화면 없음 — 검사 통과 최신 시도의 기존 예약량을 승계해 Lot·Cargo·경로 입력을 준비하되 배송대행지 인계·배차·차량 출발은 생성하지 않음 |
+| 2026-08-11 | [Simulation 수출 재작업·재검사 계보](2026-08-11-simulation-export-rework.md) | 화면 없음 — 검사 실패 원장을 보존한 채 새 stable ID·시도 번호로 재작업하고, 재검사 결과에 따라 인계 후보 또는 다음 재작업 가능 상태로 전이 |
+| 2026-08-11 | [Simulation 수출 준비 포장·검사·인계 후보 원장](2026-08-11-simulation-export-preparation.md) | 화면 없음 — 수출 대행 판로 배분을 포장·모의 검사로 진행하고 통과분만 배송대행지 인계 후보로, 실패분은 재작업 상태와 반환 수량으로 기록 |
+| 2026-08-11 | [Simulation 시장 주문·주민 소비·잔여재고 수렴](2026-08-11-simulation-market-consumption.md) | 화면 없음 — 감자 주문 20kg 이행으로 시장재고를 한 번만 280kg로 줄이고 별도 소비 Confirm/Tick 뒤 주민 소비 누계 20kg와 함께 표시 |
+| 2026-08-11 | [Simulation 음식배달 조리·픽업·전달·수령 확인 원장](2026-08-11-simulation-food-delivery.md) | 화면 없음 — 가상 주문 Confirm 뒤 조리부터 전달까지 WorldTick으로 진행하고 주문자 수령은 별도 Confirm/Tick에서만 확정 |
+| 2026-08-11 | [Simulation 같이주문 명시적 의향·모집 결과 원장](2026-08-11-simulation-group-order.md) | 화면 없음 — 참여자별 동의·의향 수량을 보존하고 모집 결과 Confirm 뒤 목표 충족은 확정, 미달은 모집종료목표미달로 WorldTick 전이 |
+| 2026-08-11 | [Simulation 화물운송 의뢰·배차·상하차·인수 원장](2026-08-11-simulation-freight-transport.md) | 화면 없음 — 기존 Cargo 300kg 이동에 가상 운송 의뢰·배차 후보·차량 용량·상차·운송·하차 도착을 결합하고 별도 인수 Confirm/Tick 뒤에만 인수완료로 전이 |
+| 2026-08-11 | [운영 업무 규칙과 Simulation 개별주문 기반](2026-08-11-workflow-simulation-order-core.md) | 화면 없음 — 음식배달·화물운송·개별주문·같이주문의 공통 상태·전이·수량 보존 규칙과 감자 20kg 주문·재고예약·포장·수령준비·완료 전 취소를 운영 효과 없이 Simulation World에 연결 |
+| 2026-08-11 | [Simulation 물류 이동과 정착지 재고 예약](2026-08-11-simulation-logistics-movement.md) | 직접 확인 — 감자 Cargo 300kg을 공통 Decision·Task·WorldTick으로 출발·진행·도착시키고 원재고 예약·Lot lineage·도착 후 검수 대기 경계를 보존 |
+| 2026-08-10 | [Unity 정착지 HarvestLot 판로 상호작용](2026-08-10-unity-settlement-interaction.md) | 직접 확인 — 감자 300kg Lot에서 네 판로 Preview·Confirm·Task 예약·WorldTick·Effect와 HUD reconcile을 연결하고 비축 후보와 적용 완료 Game View를 검증 |
+| 2026-08-10 | [Unity 정착지 1차 시각 기반](2026-08-10-unity-settlement-visual-base.md) | 직접 확인 — 같은 Tick 12·Revision 12 snapshot에 Farm·Market·Storage·Logistics·Residential의 semantic VisualKey 기반 Synty 시각을 적용하고 Overview·Farm·Market Game View와 Console 오류 0건을 검증 |
+| 2026-08-10 | [Unity 수확 판로 공통 Branch Adapter](2026-08-10-unity-harvest-branch-adapter.md) | 화면 없음 — 조합·직판·수출 준비·비축 네 판로의 기존 Decision·HarvestLot stable ID와 lineage를 서버 Preview 입력·후보 Task 의미로 연결하고 정책·Effect는 서버 재계산으로 고정 |
+| 2026-08-10 | [Unity World·정착지 관찰 규모 Navigation](2026-08-10-unity-world-settlement-navigation.md) | 직접 확인 — 같은 Tick 12·Revision 12에서 World Map→Settlement→Farm District→감자 HarvestLot Object와 Back을 연결하고 Zone/Object Game View를 검증 |
+| 2026-08-10 | [Simulation 정착지 경제 원장 적용](2026-08-10-simulation-settlement-economy.md) | 화면 없음 — 판로 Confirm의 수확 Lot 단일 allocation과 labor·treasury·storage 예약, 완료 Tick의 비용·Simulation 수입·시장/비축 반영, 중복 차단과 save/replay를 구현 |
+| 2026-08-10 | [Unity WORLD-SHELL-0·SETTLEMENT-SCENE-0 구현](2026-08-10-unity-world-shell-settlement-implementation.md) | 직접 확인 — 별도 SimulationWorldShell에서 같은 Tick 12·Revision 12 snapshot을 World Map과 첫 정착지 내부가 공유하고 Farm·Town·Market·Storage·Logistics·Residential와 Gate·Garrison placeholder를 3/4 Play Mode Game View로 검증 |
+| 2026-08-10 | [Unity World Shell·정착지 Scene 우선순위 재정렬](2026-08-10-unity-world-shell-settlement-priority.md) | 화면 없음 — 다음 서버 권위 Gate는 SETTLEMENT-ECONOMY-1로 유지하되 먼저 읽기 전용 WorldShell과 첫 정착지 blockout을 만들고 같은 Simulation snapshot을 World Map·정착지 내부가 공유하도록 구현 순서와 D-042를 확정 |
+| 2026-08-10 | [HARVEST-IMPACT-1·STORAGE-1 수확 판로 영향과 비축 후보](2026-08-10-simulation-harvest-impact-storage.md) | 화면 없음 — 기존 조합·직판·수출 선택과 새 비축 선택을 서버 정책 영향 Preview로 연결하고 창고 capacity·감모·FoodSecurityDays 후보를 만들되 실제 정착지 원장은 다음 Gate까지 불변 |
+| 2026-08-10 | [SETTLEMENT-CORE-1 정착지 graph·경제·식량 snapshot](2026-08-10-simulation-settlement-core.md) | 화면 없음 — scenario 입력으로 District·Facility와 재정·노동·storage·시장·비축·주민/주둔군 수요를 만들고 Fixture FoodSecurityDays를 계산 |
+| 2026-08-10 | [SAVE-REPLAY-0 versioned save·Command replay](2026-08-10-simulation-save-replay.md) | 화면 없음 — `simulation-save.v1` snapshot과 append-only Command log를 저장하고 새 aggregate에서 replay한 SHA-256 hash가 같을 때만 session을 복원 |
+| 2026-08-10 | [DECISION-WORK-0 공통 Decision·Task·Effect 인과 원장](2026-08-10-simulation-decision-work.md) | 화면 없음 — Preview 예상값은 상태를 바꾸지 않고 Confirm은 Decision·Scheduled Task·Pending Effect를 분리하며 Tick만 작업 완료와 Effect 적용 기록을 진행 |
+| 2026-08-10 | [SIM-WORLD-0 공통 Simulation World 문맥과 날짜](2026-08-10-simulation-world-context.md) | 화면 없음 — Simulation session에 세력·영지·정착지 identity와 `WorldTick·WorldRevision·GameDate`를 추가하고 기존 CurrentTick·Revision과 결정적으로 동기화 |
+| 2026-08-10 | [실시간 정착지 경제·영지 경영·분쟁 Simulation 우선순위 재정렬](2026-08-10-realtime-territory-simulation-reprioritization.md) | 화면 없음 — 기존 감자 판로·Cargo·Hub·마트 기반을 보존하면서 EXPORT·전투 확장보다 공통 Simulation World, Decision·Task·Effect, save/replay와 정착지 경제 폐루프를 먼저 구현하도록 제안서와 D-038 갱신 |
+| 2026-08-10 | [Unity 생산자 온라인 직접 판매 준비](2026-08-10-unity-direct-online-sale-lifecycle.md) | 직접 확인 — 온라인 직판을 선택한 300kg HarvestLot을 5kg 소포장 60개로 보존하고, 상품 공개·가격·주문·결제·택배 없이 비공개 등록 초안만 여는 Play Mode Game View 추가 |
+| 2026-08-10 | [Unity 생산자 조합 출하 인수](2026-08-10-unity-cooperative-intake-lifecycle.md) | 직접 확인 — 조합 출하로 결정된 300kg HarvestLot을 Preview·Confirm·Tick으로 인수하고, PackageLot·Cargo·정산 없이 기존 CARGO-1 포장 검토만 여는 Play Mode Game View 추가 |
+| 2026-08-10 | [Unity 수확물 판로 선택 카드](2026-08-10-unity-harvest-disposition-choice.md) | 직접 확인 — FARM-3의 300kg HarvestLot 상호작용으로 조합 출하·온라인 직판·수출대행 준비를 선택하고, Confirm·Tick 뒤 실제 거래 효과 없이 하나의 후속 업무 후보만 만드는 Play Mode Game View 추가 |
+| 2026-08-10 | [Unity 감자 여정 Farm→Hub 관계 Gate](2026-08-10-unity-potato-journey-hub-route.md) | 직접 확인 — 감자 Farm 카드에 cyan Farm→Hub route와 Synty Van을 연결하되 `SIMULATION` cargo stable ID와 canonical 관계 부재를 함께 표시하고 Play Mode로 확인 |
+| 2026-08-10 | [Unity 감자 여정 Farm 수직 슬라이스](2026-08-10-unity-potato-journey-farm-vertical-slice.md) | 직접 확인 — 감자 서버 read projection을 Unity Data·Interpretation과 실제 POLYGON Farm 감자밭·상자 선택 카드에 연결하고 `SimulationLinked`·가격 관측·source lineage·읽기 전용 경계를 Play Mode Game View로 확인 |
+| 2026-08-09 | [Unity 농장 풍경 Composition Set Library](2026-08-09-unity-farm-composition-set-library.md) | 직접 확인 — POLYGON Farm 실제 prefab을 조합한 한국어 풍경 8종×A/B/C 24개 reusable prefab과 catalog·상태 socket·library preview Scene을 생성하고 Game View로 배열을 확인 |
 | 2026-08-09 | [Unity Farm·City 그래픽 배경 Showcase](2026-08-09-unity-farm-city-graphical-showcase.md) | 직접 확인 — 기존 공급망 wiring을 유지하고 별도 Scene에 Farm 263·City 88 환경 Wrapper를 배치해 6×6 밭·농장 경관·농촌 도로·도심 거리 배경을 보강; Test Runner 고착으로 최종 Overview 재캡처와 전체 테스트는 미완료 |
 | 2026-08-09 | [Unity FARM-2 밭갈이 폐루프](2026-08-09-unity-farm-2-tilling.md) | 직접 확인 — 6×6 타일 선택 뒤 Preview·Confirm·Simulation Tick을 각각 명시적으로 실행하고 revision 2의 Tilled snapshot과 primitive Dirt Row reconcile을 Game View로 검증 |
 | 2026-08-09 | [Unity City·Farm WORLD-5 품질·성능 Gate](2026-08-09-unity-city-farm-world-5.md) | 직접 확인 — Zone 구도와 Cargo Journey HUD를 최종 정리하고 shader·vendor prefab·Console·기본 profiling·PC/Mobile URP 차이를 기록한 뒤 Visual 확장을 중단 |

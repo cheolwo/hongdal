@@ -2,7 +2,7 @@
 
 ## 결과
 
-제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 기존 Scene을 덮어쓰지 않는 별도 `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmMacroWorldBlockout.unity` Scene을 저장했다. Text 없이 Farm Production→Farm Yard→Transport Corridor→Urban Logistics→Urban Market→Residential Community 흐름이 읽히도록 6개 Presentation Zone과 5개 연결 route를 배치했다.
+제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 기존 Scene을 덮어쓰지 않는 별도 `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시공간배치초안.unity` Scene을 저장했다. Text 없이 Farm Production→Farm Yard→Transport Corridor→Urban Logistics→Urban Market→Residential Community 흐름이 읽히도록 6개 Presentation Zone과 5개 연결 route를 배치했다.
 
 Farm Production과 Farm Yard는 기존 canonical `farm` Zone을 공유하되 Presentation subzone과 focus anchor만 나눈다. 카메라 focus, route, NPC·차량 placeholder는 Presentation이며 Simulation Tick이나 Operational Command를 발생시키지 않는다.
 

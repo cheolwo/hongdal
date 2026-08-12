@@ -2,7 +2,7 @@
 
 ## 결과
 
-제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-3 Scene을 보존한 별도 `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmCargoJourney.unity` Scene을 저장했다.
+제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-3 Scene을 보존한 별도 `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시화물이동.unity` Scene을 저장했다.
 
 기존 `CargoWarehouseHandoffSnapshot`을 새 Presentation projector가 해석하며, 네 공간의 외형은 달라도 모두 같은 `cargo:transport-71`을 참조한다.
 

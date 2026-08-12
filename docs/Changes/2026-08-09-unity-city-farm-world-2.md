@@ -2,7 +2,7 @@
 
 ## 결과
 
-제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-1 primitive Scene을 보존한 별도 `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmSyntyWorldPrototype.unity` Scene을 저장했다. Farm·Urban·Transition `WorldVisualCatalog` asset이 vendor-neutral VisualKey 21개를 실제 Synty prefab reference와 position·rotation·scale 보정으로 해석한다.
+제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-1 primitive Scene을 보존한 별도 `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시신티월드시제품.unity` Scene을 저장했다. Farm·Urban·Transition `WorldVisualCatalog` asset이 vendor-neutral VisualKey 21개를 실제 Synty prefab reference와 position·rotation·scale 보정으로 해석한다.
 
 Scene hierarchy는 `공급망WorldZoneView → VisualRoot → WorldVisualInstanceView → VisualRoot → Synty prefab instance` 경계를 유지한다. Synty prefab 이름은 Data·Simulation·Operational contract나 stable ID로 사용하지 않는다.
 

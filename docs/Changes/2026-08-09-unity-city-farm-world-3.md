@@ -2,7 +2,7 @@
 
 ## 결과
 
-제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-2 Scene을 보존한 별도 `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmBusinessViewIntegration.unity` Scene을 저장했다.
+제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-2 Scene을 보존한 별도 `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시업무화면통합.unity` Scene을 저장했다.
 
 새 Domain·Simulation View를 만들지 않고 다음 기존 구현을 재사용했다.
 

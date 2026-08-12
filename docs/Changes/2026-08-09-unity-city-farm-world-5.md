@@ -2,7 +2,7 @@
 
 ## 결과
 
-제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-4 Scene을 보존한 별도 `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmVisualQualityGate.unity` Scene을 저장했다.
+제품 Unity 프로젝트 `C:\Users\user\ssalddel`에 WORLD-4 Scene을 보존한 별도 `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시시각품질검증.unity` Scene을 저장했다.
 
 이번 단계는 콘텐츠를 추가하는 단계가 아니라 최종 Visual Prototype의 읽기 규칙과 증거를 닫는 Gate다.
 
