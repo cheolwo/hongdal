@@ -93,6 +93,14 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 - 상세 용어표, 적용 대상, 외부 표준 예외와 기존 contract 호환 규칙의 단일 기준은 [코드 탐색 메타데이터의 코드 명명 언어](docs/Architecture/SsalddelCodeMetadata.md#코드-명명-언어)다.
 - 새 코드와 수정하는 코드에 기준을 적용하되, 기존 이름의 광범위한 변경은 기능 단위로 나누고 공개 API·직렬화·Event·metadata·저장 데이터의 호환성을 검증한다.
 
+## 사람이 읽는 Unity 용어와 출력 언어
+
+- Unity·서버 통합 작업의 문서, README, 주석, 진행·완료 보고와 검증 설명은 [Unity 프로젝트 한국어 중심 용어·출력 지침](docs/AI/UnityKoreanTerminologyGuide.md)을 따른다.
+- 프로젝트 개념은 `구성 대장`, `업무 흐름`, `배치 객체`, `고유 식별자`, `데이터 연결`, `상태 사본`, `관점별 조회 결과`, `데이터 계보`, `인계`, `배치 검증 기록`처럼 한국어를 먼저 쓴다.
+- Unity·C#·표준 고유 기술명과 기존 클래스명·고유 식별자·API 계약·JSON 필드·저장 값은 유지한다. 처음 한 번 의미 설명이 필요할 때만 영어를 병기한다.
+- O0~O6은 코드만 단독 보고하지 않고 후보, 준비, 모판 실행 검증, 실제 World 배치 검증의 의미를 함께 적는다.
+- 서버의 최종 사실, 역할별 해석 결과, Unity 표현을 분리해 설명한다. Unity 화면이나 애니메이션을 실제 업무 완료 근거로 표현하지 않는다.
+
 ## 구현 단위
 
 - 원장 또는 업무 node 하나를 골라 저장, 상태 전이, Event, API, UI, test까지 세로로 완성한다.
@@ -124,7 +132,7 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 - commit과 push는 사용자가 명시적으로 요청한 경우에만 수행한다.
 - commit은 feature, refactor, fix, test, docs처럼 되돌릴 수 있는 맥락으로 나누고 다른 스레드 변경을 섞지 않는다.
 - stage 전 이번 작업의 `git diff`와 `git status`를 다시 확인한다.
-- 화면 변경은 [커밋별 시각 변경 기록](docs/Changes/README.md)에 실제 PNG와 함께 기록한다. 화면이 없으면 `화면 없음` 또는 `간접 확인`으로 남긴다.
+- 화면 변경은 [커밋별 시각 변경 기록](docs/Changes/README.md)에 실제 PNG와 함께 기록한다. Unity Scene·prefab·material·camera·UI처럼 Game View 결과가 달라지는 변경은 최종 상태를 Editor/Pipeline에서 다시 캡처하고, 대표 Game View PNG와 변경 기록을 해당 코드·Scene과 같은 맥락의 커밋에 포함한다. Scene View는 보조 증거일 뿐 Game View를 대신하지 않는다. 화면이 없으면 `화면 없음` 또는 `간접 확인`으로 남긴다.
 - 임시 log, browser profile, raw capture, test result는 `artifacts/local/`에 두고 commit하지 않는다.
 - 새 worktree는 가능하면 저장소 바깥의 sibling 경로에 만든다. `artifacts/worktrees/`는 탐색·검증 대상에서 제외한다.
 - 장기 보존할 대표 화면만 `docs/assets/changes/`로 옮긴다.
