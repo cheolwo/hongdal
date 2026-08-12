@@ -17,6 +17,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string DecisionConfirm = "DecisionConfirm";
         public const string HarvestDispositionImpactConfirm = "HarvestDispositionImpactConfirm";
         public const string LogisticsMovementConfirm = "LogisticsMovementConfirm";
+        public const string TurnClosingConfirm = "TurnClosingConfirm";
         public const string TickAdvance = "TickAdvance";
     }
 
@@ -41,6 +42,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationDecisionConfirmRequest? DecisionConfirmRequest { get; set; }
         public SimulationHarvestDispositionImpactConfirmRequest? HarvestDispositionImpactConfirmRequest { get; set; }
         public SimulationLogisticsMovementConfirmRequest? LogisticsMovementConfirmRequest { get; set; }
+        public SimulationTurnClosingConfirmRequest? TurnClosingConfirmRequest { get; set; }
     }
 
     public sealed class SimulationSessionSavePackage

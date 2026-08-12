@@ -6,6 +6,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string Scheduled = "Scheduled";
         public const string ReadyForHandoff = "ReadyForHandoff";
+        public const string HandoffScheduled = "HandoffScheduled";
+        public const string HandedOffInSimulation = "HandedOffInSimulation";
     }
 
     public sealed class Simulation수출Cargo준비PreviewRequest
@@ -77,6 +79,8 @@ namespace Ssalddel.Simulation.Contracts
         public int RequiredPreparationTicks { get; set; }
         public int ScheduledTick { get; set; }
         public int? ReadyForHandoffTick { get; set; }
+        public string? HandoffStableId { get; set; }
+        public int? HandoffCompletedTick { get; set; }
         public string[] BoundaryCodes { get; set; } = Array.Empty<string>();
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
     }

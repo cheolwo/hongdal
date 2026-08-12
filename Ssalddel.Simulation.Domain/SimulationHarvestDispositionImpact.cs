@@ -30,7 +30,8 @@ namespace Ssalddel.Simulation.Domain
             ValidateHarvestDispositionImpactConfirmRequest(request);
             lock (gate)
             {
-                if (appliedCommands.ContainsKey(request.CommandId))
+                if (appliedCommands.ContainsKey(request.CommandId)
+                    || appliedTurnClosingCommands.ContainsKey(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 var payloadKey = BuildHarvestDispositionImpactPayloadKey(request.Impact);
                 if (appliedHarvestImpactCommands.TryGetValue(request.CommandId, out var applied))

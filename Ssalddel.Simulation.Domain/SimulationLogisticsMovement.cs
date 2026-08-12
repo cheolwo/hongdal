@@ -41,7 +41,8 @@ namespace Ssalddel.Simulation.Domain
                 }
                 if (appliedCommands.ContainsKey(commandId)
                     || appliedDecisionCommands.ContainsKey(commandId)
-                    || appliedHarvestImpactCommands.ContainsKey(commandId))
+                    || appliedHarvestImpactCommands.ContainsKey(commandId)
+                    || appliedTurnClosingCommands.ContainsKey(commandId))
                 {
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 }
@@ -75,14 +76,24 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException("SimulationFreightTransportStableIdConflict");
 
                 var allocation = harvestLotAllocations[preview.SourceAllocationStableId];
-                allocation.OutboundReservedQuantity += preview.Quantity;
-                allocation.AvailableQuantity = allocation.Quantity - allocation.OutboundReservedQuantity;
+                var exportHandoff = Find수출Cargo인계(request.Movement.SourceExportCargoHandoffStableId);
+                if (exportHandoff == null)
+                {
+                    allocation.OutboundReservedQuantity += preview.Quantity;
+                    allocation.AvailableQuantity = allocation.Quantity - allocation.OutboundReservedQuantity;
+                }
 
                 var movement = CreateLogisticsMovementSnapshot(request.Movement, preview);
                 logisticsMovements.Add(movement.CargoStableId, movement);
                 logisticsMovementSourceAllocations.Add(
                     movement.SourceAllocationStableId,
                     movement.CargoStableId);
+                if (exportHandoff != null)
+                {
+                    exportHandoff.LogisticsMovementCargoStableId = movement.CargoStableId;
+                    exportHandoff.LogisticsMovementTaskStableId = movement.TaskStableId;
+                    exportHandoff.Revision++;
+                }
                 if (request.Movement.FreightTransport != null)
                 {
                     var freight = CreateFreightTransportSnapshot(request.Movement, movement);
@@ -109,10 +120,12 @@ namespace Ssalddel.Simulation.Domain
             SimulationLogisticsMovementPreviewRequest request)
         {
             var commonRequest = CreateLogisticsMovementDecisionRequest(request);
+            var exportHandoff = Find수출Cargo인계(request.SourceExportCargoHandoffStableId);
             return new SimulationLogisticsMovementPreviewSnapshot
             {
                 CargoStableId = request.CargoStableId.Trim(),
                 CargoRevision = request.CargoRevision,
+                SourceExportCargoHandoffStableId = exportHandoff?.HandoffStableId,
                 SourceAllocationStableId = request.SourceAllocationStableId.Trim(),
                 RouteStableId = request.RouteStableId.Trim(),
                 OriginFacilityStableId = request.OriginFacilityStableId.Trim(),
@@ -122,14 +135,23 @@ namespace Ssalddel.Simulation.Domain
                 RequiredRouteTicks = request.RequiredRouteTicks,
                 IsCandidateOnly = true,
                 DoesNotApplySettlementState = true,
+                ReusesExistingOutboundReservation = exportHandoff != null,
                 DestinationStockCandidateStableId = DestinationCandidateId(request.CargoStableId),
                 BoundaryCodes = new[]
-                {
-                    "CandidateOnly",
-                    "NoOperationalDispatch",
-                    "VehicleAnimationIsPresentationOnly",
-                    "DestinationStockRequiresReceivingDecision",
-                },
+                    {
+                        "CandidateOnly",
+                        "NoOperationalDispatch",
+                        "VehicleAnimationIsPresentationOnly",
+                        "DestinationStockRequiresReceivingDecision",
+                    }
+                    .Concat(exportHandoff == null
+                        ? Array.Empty<string>()
+                        : new[]
+                        {
+                            "ExportHandoffLineageVerified",
+                            "ExistingOutboundReservationReused",
+                        })
+                    .ToArray(),
                 CommonDecisionPreview = CreateDecisionPreview(commonRequest),
             };
         }
@@ -141,6 +163,7 @@ namespace Ssalddel.Simulation.Domain
                 ?? throw new SimulationContractException("SimulationSettlementRequiredForLogisticsMovement");
             var sourceAllocationId = request.SourceAllocationStableId.Trim();
             var blocks = new List<string>();
+            var exportHandoff = Find수출Cargo인계(request.SourceExportCargoHandoffStableId);
             if (!harvestLotAllocations.TryGetValue(sourceAllocationId, out var allocation))
             {
                 blocks.Add("SourceAllocationNotFound");
@@ -155,8 +178,41 @@ namespace Ssalddel.Simulation.Domain
                 {
                     blocks.Add("SourceAllocationLineageMismatch");
                 }
-                if (allocation.AvailableQuantity < request.Quantity)
-                    blocks.Add("SourceAllocationQuantityExceeded");
+                if (exportHandoff == null)
+                {
+                    if (allocation.AvailableQuantity < request.Quantity)
+                        blocks.Add("SourceAllocationQuantityExceeded");
+                }
+                else if (allocation.OutboundReservedQuantity < request.Quantity)
+                {
+                    blocks.Add("SourceAllocationReservedQuantityExceeded");
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(request.SourceExportCargoHandoffStableId))
+            {
+                if (exportHandoff == null)
+                {
+                    blocks.Add("SourceExportCargoHandoffNotFound");
+                }
+                else
+                {
+                    if (exportHandoff.StateCode
+                        != Simulation수출Cargo인계상태Codes.HandedOffInSimulation)
+                        blocks.Add("SourceExportCargoHandoffNotCompleted");
+                    if (exportHandoff.SourceAllocationStableId != sourceAllocationId
+                        || exportHandoff.CargoStableId != request.CargoStableId.Trim()
+                        || exportHandoff.HarvestLotStableId != request.HarvestLotStableId.Trim()
+                        || exportHandoff.PackageLotStableId != request.PackageLotStableId.Trim()
+                        || exportHandoff.ProductStableId != request.ProductStableId.Trim()
+                        || exportHandoff.Quantity != request.Quantity
+                        || exportHandoff.UnitCode != request.UnitCode.Trim())
+                        blocks.Add("SourceExportCargoHandoffLineageMismatch");
+                    if (exportHandoff.ReceivingFacilityStableId
+                        != request.OriginFacilityStableId.Trim())
+                        blocks.Add("SourceExportCargoHandoffOriginMismatch");
+                    if (!string.IsNullOrWhiteSpace(exportHandoff.LogisticsMovementTaskStableId))
+                        blocks.Add("SourceExportCargoHandoffAlreadyScheduled");
+                }
             }
             if (logisticsMovements.ContainsKey(request.CargoStableId.Trim()))
                 blocks.Add("CargoAlreadyScheduled");
@@ -187,10 +243,16 @@ namespace Ssalddel.Simulation.Domain
                     sourceAllocationId,
                     request.RouteStableId.Trim(),
                 })
+                .Concat(exportHandoff == null
+                    ? Array.Empty<string>()
+                    : new[] { exportHandoff.HandoffStableId })
                 .Distinct(StringComparer.Ordinal)
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray();
-            var availableBefore = allocation?.AvailableQuantity ?? 0m;
+            var availableBefore = exportHandoff == null
+                ? allocation?.AvailableQuantity ?? 0m
+                : allocation?.OutboundReservedQuantity ?? 0m;
+            var reservationDelta = exportHandoff == null ? -request.Quantity : 0m;
             return new SimulationDecisionPreviewRequest
             {
                 DecisionStableId = "decision:logistics:" + request.CargoStableId.Trim(),
@@ -216,11 +278,13 @@ namespace Ssalddel.Simulation.Domain
                     },
                     new SimulationValueProjection
                     {
-                        ValueTypeCode = "SourceStockReservation",
+                        ValueTypeCode = exportHandoff == null
+                            ? "SourceStockReservation"
+                            : "ExistingSourceStockReservationReused",
                         TargetLedgerStableId = sourceAllocationId,
                         BeforeValue = availableBefore,
-                        Delta = -request.Quantity,
-                        AfterValue = availableBefore - request.Quantity,
+                        Delta = reservationDelta,
+                        AfterValue = availableBefore + reservationDelta,
                         UnitCode = request.UnitCode.Trim(),
                         SourceStableIds = sources,
                     },
@@ -256,6 +320,7 @@ namespace Ssalddel.Simulation.Domain
             {
                 CargoStableId = preview.CargoStableId,
                 CargoRevision = request.CargoRevision,
+                SourceExportCargoHandoffStableId = request.SourceExportCargoHandoffStableId?.Trim(),
                 StateCode = SimulationLogisticsMovementStateCodes.Reserved,
                 Revision = 1,
                 SourceAllocationStableId = preview.SourceAllocationStableId,
@@ -316,6 +381,7 @@ namespace Ssalddel.Simulation.Domain
             {
                 CargoStableId = source.CargoStableId,
                 CargoRevision = source.CargoRevision,
+                SourceExportCargoHandoffStableId = source.SourceExportCargoHandoffStableId,
                 StateCode = source.StateCode,
                 Revision = source.Revision,
                 SourceAllocationStableId = source.SourceAllocationStableId,
@@ -336,6 +402,8 @@ namespace Ssalddel.Simulation.Domain
                 DepartedTick = source.DepartedTick,
                 ArrivedTick = source.ArrivedTick,
                 DestinationStockCandidateStableId = source.DestinationStockCandidateStableId,
+                DestinationReceiptStableId = source.DestinationReceiptStableId,
+                DestinationReceiptCompletedTick = source.DestinationReceiptCompletedTick,
                 SourceStableIds = Copy(source.SourceStableIds),
             };
 
@@ -345,6 +413,7 @@ namespace Ssalddel.Simulation.Domain
             {
                 request.CargoStableId.Trim(),
                 request.CargoRevision.ToString(CultureInfo.InvariantCulture),
+                request.SourceExportCargoHandoffStableId?.Trim() ?? string.Empty,
                 request.SourceAllocationStableId.Trim(),
                 request.HarvestLotStableId.Trim(),
                 request.PackageLotStableId.Trim(),
@@ -382,6 +451,9 @@ namespace Ssalddel.Simulation.Domain
             RequireStableId(request.CargoStableId, "SimulationCargoStableIdInvalid");
             if (request.CargoRevision <= 0)
                 throw new SimulationContractException("SimulationCargoRevisionInvalid");
+            if (!string.IsNullOrWhiteSpace(request.SourceExportCargoHandoffStableId))
+                RequireStableId(request.SourceExportCargoHandoffStableId,
+                    "SimulationExportCargoHandoffStableIdInvalid");
             RequireStableId(request.SourceAllocationStableId, "SimulationSourceAllocationStableIdInvalid");
             RequireStableId(request.HarvestLotStableId, "SimulationHarvestLotStableIdInvalid");
             RequireStableId(request.PackageLotStableId, "SimulationPackageLotStableIdInvalid");
@@ -416,6 +488,14 @@ namespace Ssalddel.Simulation.Domain
 
         private static string DestinationCandidateId(string cargoStableId)
             => "stock-candidate:arrival:" + cargoStableId.Trim();
+
+        private Simulation수출Cargo인계Snapshot? Find수출Cargo인계(string? handoffStableId)
+        {
+            if (string.IsNullOrWhiteSpace(handoffStableId)) return null;
+            return 수출Cargo인계원장.TryGetValue(handoffStableId.Trim(), out var handoff)
+                ? handoff
+                : null;
+        }
 
         private sealed class AppliedLogisticsMovementCommand
         {

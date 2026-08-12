@@ -105,6 +105,7 @@ namespace Ssalddel.Simulation.Domain
 
                 CurrentTick += request.TickCount;
                 AdvanceDecisionWork(CurrentTick);
+                ExpireActiveTurnCardEffects();
                 Revision++;
                 AppendTickCommand(request);
                 var snapshot = CreateSnapshot();
@@ -175,6 +176,13 @@ namespace Ssalddel.Simulation.Domain
                 StockReservations = CreateStockReservationSnapshots(),
                 ExportPreparations = Create수출준비Snapshots(),
                 ExportCargoPreparations = Create수출Cargo준비Snapshots(),
+                ExportCargoHandoffs = Create수출Cargo인계Snapshots(),
+                ExportPortReceipts = Create수출항만인수Snapshots(),
+                ExportReadinessReviews = Create수출준비성검토Snapshots(),
+                ExportShipmentPlans = Create수출선적계획Snapshots(),
+                ExportShipmentExecutions = Create수출선적실행Snapshots(),
+                TurnClosings = CreateTurnClosingSnapshots(),
+                ActiveTurnCardEffects = CreateActiveTurnCardEffectSnapshots(),
                 Settlement = CreateSettlementSnapshot(),
             };
 
@@ -217,6 +225,19 @@ namespace Ssalddel.Simulation.Domain
                 ExportPreparations = source.ExportPreparations.Select(Clone수출준비).ToArray(),
                 ExportCargoPreparations = source.ExportCargoPreparations
                     .Select(Clone수출Cargo준비).ToArray(),
+                ExportCargoHandoffs = source.ExportCargoHandoffs
+                    .Select(Clone수출Cargo인계).ToArray(),
+                ExportPortReceipts = source.ExportPortReceipts
+                    .Select(Clone수출항만인수).ToArray(),
+                ExportReadinessReviews = source.ExportReadinessReviews
+                    .Select(Clone수출준비성검토).ToArray(),
+                ExportShipmentPlans = source.ExportShipmentPlans
+                    .Select(Clone수출선적계획).ToArray(),
+                ExportShipmentExecutions = source.ExportShipmentExecutions
+                    .Select(Clone수출선적실행).ToArray(),
+                TurnClosings = source.TurnClosings.Select(CloneTurnClosing).ToArray(),
+                ActiveTurnCardEffects = source.ActiveTurnCardEffects
+                    .Select(CloneActiveTurnCardEffect).ToArray(),
                 Settlement = CloneSettlementSnapshot(source.Settlement),
             };
 
@@ -349,6 +370,26 @@ namespace Ssalddel.Simulation.Domain
             => (store.Find(sessionStableId)
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
                 .Advance(request);
+
+        public SimulationTurnClosingContextSnapshot GetTurnClosingContext(
+            string sessionStableId)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .GetTurnClosingContext();
+
+        public SimulationTurnClosingPreviewSnapshot PreviewTurnClosing(
+            string sessionStableId,
+            SimulationTurnClosingPreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .PreviewTurnClosing(request);
+
+        public 경영SimulationSessionSnapshot ConfirmTurnClosing(
+            string sessionStableId,
+            SimulationTurnClosingConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .ConfirmTurnClosing(request);
 
         public SimulationDecisionPreviewSnapshot PreviewDecision(
             string sessionStableId,
@@ -573,5 +614,87 @@ namespace Ssalddel.Simulation.Domain
             => (store.Find(sessionStableId)
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
                 .Confirm수출Cargo준비(request);
+
+        public Simulation수출Cargo인계PreviewSnapshot Preview수출Cargo인계(
+            string sessionStableId,
+            Simulation수출Cargo인계PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출Cargo인계(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출Cargo인계(
+            string sessionStableId,
+            Simulation수출Cargo인계ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출Cargo인계(request);
+
+        public Simulation수출항만인수PreviewSnapshot Preview수출항만인수(
+            string sessionStableId,
+            Simulation수출항만인수PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출항만인수(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출항만인수(
+            string sessionStableId,
+            Simulation수출항만인수ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출항만인수(request);
+
+        public Simulation수출준비성검토PreviewSnapshot Preview수출준비성검토(
+            string sessionStableId,
+            Simulation수출준비성검토PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출준비성검토(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출준비성검토(
+            string sessionStableId,
+            Simulation수출준비성검토ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출준비성검토(request);
+
+        public Simulation수출선적계획PreviewSnapshot Preview수출선적계획(
+            string sessionStableId,
+            Simulation수출선적계획PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출선적계획(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출선적계획(
+            string sessionStableId,
+            Simulation수출선적계획ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출선적계획(request);
+
+        public Simulation수출선적실행PreviewSnapshot Preview수출선적실행(
+            string sessionStableId,
+            Simulation수출선적실행PreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Preview수출선적실행(request);
+
+        public 경영SimulationSessionSnapshot Confirm수출선적실행(
+            string sessionStableId,
+            Simulation수출선적실행ConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Confirm수출선적실행(request);
+
+        public Simulation수확판로결과Snapshot Get수확판로결과(
+            string sessionStableId,
+            string harvestLotStableId)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Get수확판로결과(harvestLotStableId);
+
+        public Simulation수확판로결과Snapshot[] Get수확판로결과목록(string sessionStableId)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .Get수확판로결과목록();
     }
 }

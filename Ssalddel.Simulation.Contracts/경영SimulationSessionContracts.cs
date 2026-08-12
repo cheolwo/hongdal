@@ -75,6 +75,20 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<Simulation수출준비Snapshot>();
         public Simulation수출Cargo준비Snapshot[] ExportCargoPreparations { get; set; }
             = Array.Empty<Simulation수출Cargo준비Snapshot>();
+        public Simulation수출Cargo인계Snapshot[] ExportCargoHandoffs { get; set; }
+            = Array.Empty<Simulation수출Cargo인계Snapshot>();
+        public Simulation수출항만인수Snapshot[] ExportPortReceipts { get; set; }
+            = Array.Empty<Simulation수출항만인수Snapshot>();
+        public Simulation수출준비성검토Snapshot[] ExportReadinessReviews { get; set; }
+            = Array.Empty<Simulation수출준비성검토Snapshot>();
+        public Simulation수출선적계획Snapshot[] ExportShipmentPlans { get; set; }
+            = Array.Empty<Simulation수출선적계획Snapshot>();
+        public Simulation수출선적실행Snapshot[] ExportShipmentExecutions { get; set; }
+            = Array.Empty<Simulation수출선적실행Snapshot>();
+        public SimulationTurnClosingSnapshot[] TurnClosings { get; set; }
+            = Array.Empty<SimulationTurnClosingSnapshot>();
+        public SimulationActiveTurnCardEffectSnapshot[] ActiveTurnCardEffects { get; set; }
+            = Array.Empty<SimulationActiveTurnCardEffectSnapshot>();
         public SimulationSettlementEconomySnapshot? Settlement { get; set; }
     }
 

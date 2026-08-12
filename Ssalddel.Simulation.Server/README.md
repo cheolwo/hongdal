@@ -2,6 +2,8 @@
 
 Unity 경영 Simulation의 session, scenario clock와 deterministic command 권위를 기존 운영 서버에서 분리하는 별도 ASP.NET Core host다.
 
+이 서버는 실제 운영 전 게임 세계와 업무 규칙을 반복 검증하는 예행연습 서버 역할을 함께 맡는다. 개발 기본 주소는 `http://localhost:5204`이며, 기존 `Ssalddel` 운영 서버의 개발 주소와 분리한다. 예행연습 결과는 실제 운영 원장으로 자동 승격하지 않는다.
+
 현재 첫 slice는 다음만 제공한다.
 
 - Simulation session 생성·조회

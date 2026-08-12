@@ -44,7 +44,8 @@ namespace Ssalddel.Simulation.Domain
             bool includeExpectedCostsAsEffects,
             Action<SimulationDecisionConfirmRequest> appendCommand)
         {
-                if (appliedCommands.ContainsKey(request.CommandId))
+                if (appliedCommands.ContainsKey(request.CommandId)
+                    || appliedTurnClosingCommands.ContainsKey(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 var payloadKey = BuildDecisionPayloadKey(request.Preview);
                 if (appliedDecisionCommands.TryGetValue(request.CommandId, out var applied))
@@ -99,6 +100,11 @@ namespace Ssalddel.Simulation.Domain
                 var marketConsumption = PrepareMarketConsumption(request.Preview);
                 var exportPreparation = Prepare수출준비(request.Preview, preview);
                 var exportCargoPreparation = Prepare수출Cargo준비(request.Preview, preview);
+                var exportCargoHandoff = Prepare수출Cargo인계(request.Preview, preview);
+                var exportPortReceipt = Prepare수출항만인수(request.Preview, preview);
+                var exportReadinessReview = Prepare수출준비성검토(request.Preview, preview);
+                var exportShipmentPlan = Prepare수출선적계획(request.Preview, preview);
+                var exportShipmentExecution = Prepare수출선적실행(request.Preview, preview);
 
                 var effectValues = includeExpectedCostsAsEffects
                     ? decision.ExpectedCosts.Concat(decision.ExpectedEffects)
@@ -137,6 +143,11 @@ namespace Ssalddel.Simulation.Domain
                 ScheduleMarketConsumption(marketConsumption, decision, task);
                 Schedule수출준비(exportPreparation);
                 Schedule수출Cargo준비(exportCargoPreparation);
+                Schedule수출Cargo인계(exportCargoHandoff);
+                Schedule수출항만인수(exportPortReceipt);
+                Schedule수출준비성검토(exportReadinessReview);
+                Schedule수출선적계획(exportShipmentPlan);
+                Schedule수출선적실행(exportShipmentExecution);
 
                 Revision++;
                 appendCommand(request);
@@ -169,6 +180,11 @@ namespace Ssalddel.Simulation.Domain
                     ApplyMarketConsumptionForTask(task, task.ExpectedEndTick);
                     Advance수출준비ForTask(task, task.ExpectedEndTick);
                     Advance수출Cargo준비ForTask(task, task.ExpectedEndTick);
+                    Advance수출Cargo인계ForTask(task, task.ExpectedEndTick);
+                    Advance수출항만인수ForTask(task, task.ExpectedEndTick);
+                    Advance수출준비성검토ForTask(task, task.ExpectedEndTick);
+                    Advance수출선적계획ForTask(task, task.ExpectedEndTick);
+                    Advance수출선적실행ForTask(task, task.ExpectedEndTick);
                     task.StateCode = SimulationTaskStateCodes.Completed;
                     task.Revision++;
                     task.ActualEndTick = task.ExpectedEndTick;
@@ -187,6 +203,7 @@ namespace Ssalddel.Simulation.Domain
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     AdvanceFoodDeliveryForTask(task, currentTick);
                     Advance수출준비ForTask(task, currentTick);
+                    Advance수출선적실행ForTask(task, currentTick);
                     task.StateCode = SimulationTaskStateCodes.InProgress;
                     task.Revision++;
                 }
@@ -195,6 +212,7 @@ namespace Ssalddel.Simulation.Domain
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     AdvanceFoodDeliveryForTask(task, currentTick);
                     Advance수출준비ForTask(task, currentTick);
+                    Advance수출선적실행ForTask(task, currentTick);
                 }
             }
         }
@@ -202,7 +220,8 @@ namespace Ssalddel.Simulation.Domain
         private bool HasAppliedDecisionCommand(string commandId)
             => appliedDecisionCommands.ContainsKey(commandId)
                 || HasAppliedHarvestDispositionImpactCommand(commandId)
-                || appliedLogisticsMovementCommands.ContainsKey(commandId);
+                || appliedLogisticsMovementCommands.ContainsKey(commandId)
+                || appliedTurnClosingCommands.ContainsKey(commandId);
 
         private SimulationDecisionPreviewSnapshot CreateDecisionPreview(
             SimulationDecisionPreviewRequest request)

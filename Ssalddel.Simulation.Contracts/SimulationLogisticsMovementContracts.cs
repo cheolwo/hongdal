@@ -13,6 +13,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string CargoStableId { get; set; } = string.Empty;
         public long CargoRevision { get; set; }
+        public string? SourceExportCargoHandoffStableId { get; set; }
         public string SourceAllocationStableId { get; set; } = string.Empty;
         public string HarvestLotStableId { get; set; } = string.Empty;
         public string PackageLotStableId { get; set; } = string.Empty;
@@ -40,6 +41,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string CargoStableId { get; set; } = string.Empty;
         public long CargoRevision { get; set; }
+        public string? SourceExportCargoHandoffStableId { get; set; }
         public string SourceAllocationStableId { get; set; } = string.Empty;
         public string RouteStableId { get; set; } = string.Empty;
         public string OriginFacilityStableId { get; set; } = string.Empty;
@@ -49,6 +51,7 @@ namespace Ssalddel.Simulation.Contracts
         public int RequiredRouteTicks { get; set; }
         public bool IsCandidateOnly { get; set; }
         public bool DoesNotApplySettlementState { get; set; }
+        public bool ReusesExistingOutboundReservation { get; set; }
         public string DestinationStockCandidateStableId { get; set; } = string.Empty;
         public string[] BoundaryCodes { get; set; } = Array.Empty<string>();
         public SimulationDecisionPreviewSnapshot CommonDecisionPreview { get; set; }
@@ -59,6 +62,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string CargoStableId { get; set; } = string.Empty;
         public long CargoRevision { get; set; }
+        public string? SourceExportCargoHandoffStableId { get; set; }
         public string StateCode { get; set; } = SimulationLogisticsMovementStateCodes.Reserved;
         public long Revision { get; set; }
         public string SourceAllocationStableId { get; set; } = string.Empty;
@@ -79,6 +83,8 @@ namespace Ssalddel.Simulation.Contracts
         public int? DepartedTick { get; set; }
         public int? ArrivedTick { get; set; }
         public string DestinationStockCandidateStableId { get; set; } = string.Empty;
+        public string? DestinationReceiptStableId { get; set; }
+        public int? DestinationReceiptCompletedTick { get; set; }
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
     }
 }

@@ -117,6 +117,17 @@ namespace Ssalddel.Simulation.Domain
                     SimulationSaveReplayCloner.CloneLogisticsMovementConfirmRequest(request),
             });
 
+        private void AppendTurnClosingCommand(SimulationTurnClosingConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.TurnClosingConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                TurnClosingConfirmRequest =
+                    SimulationSaveReplayCloner.CloneTurnClosingConfirmRequest(request),
+            });
+
         private 경영SimulationSession생성Request CreateSessionRequest()
             => new 경영SimulationSession생성Request
             {
@@ -165,7 +176,8 @@ namespace Ssalddel.Simulation.Domain
                 {
                     if (entry.DecisionConfirmRequest == null || entry.TickRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmDecision(
                         SimulationSaveReplayCloner.CloneConfirmRequest(entry.DecisionConfirmRequest));
@@ -174,7 +186,8 @@ namespace Ssalddel.Simulation.Domain
                 {
                     if (entry.HarvestDispositionImpactConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmHarvestDispositionImpact(
                         SimulationSaveReplayCloner.CloneHarvestDispositionImpactConfirmRequest(
@@ -184,17 +197,30 @@ namespace Ssalddel.Simulation.Domain
                 {
                     if (entry.LogisticsMovementConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
-                        || entry.HarvestDispositionImpactConfirmRequest != null)
+                        || entry.HarvestDispositionImpactConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmLogisticsMovement(
                         SimulationSaveReplayCloner.CloneLogisticsMovementConfirmRequest(
                             entry.LogisticsMovementConfirmRequest));
                 }
+                else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TurnClosingConfirm)
+                {
+                    if (entry.TurnClosingConfirmRequest == null || entry.TickRequest != null
+                        || entry.DecisionConfirmRequest != null
+                        || entry.HarvestDispositionImpactConfirmRequest != null
+                        || entry.LogisticsMovementConfirmRequest != null)
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                    aggregate.ConfirmTurnClosing(
+                        SimulationSaveReplayCloner.CloneTurnClosingConfirmRequest(
+                            entry.TurnClosingConfirmRequest));
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.Advance(
                         SimulationSaveReplayCloner.CloneTickRequest(entry.TickRequest));
@@ -259,6 +285,11 @@ namespace Ssalddel.Simulation.Domain
                 || package.Snapshot.StockReservations == null
                 || package.Snapshot.ExportPreparations == null
                 || package.Snapshot.ExportCargoPreparations == null
+                || package.Snapshot.ExportCargoHandoffs == null
+                || package.Snapshot.ExportPortReceipts == null
+                || package.Snapshot.ExportReadinessReviews == null
+                || package.Snapshot.ExportShipmentPlans == null
+                || package.Snapshot.ExportShipmentExecutions == null
                 || package.CommandLog == null)
             {
                 throw new SimulationContractException("SimulationSavePackageInvalid");
@@ -285,7 +316,8 @@ namespace Ssalddel.Simulation.Domain
                 {
                     if (entry.DecisionConfirmRequest == null || entry.TickRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateDecisionConfirm(
                         entry.DecisionConfirmRequest);
@@ -294,7 +326,8 @@ namespace Ssalddel.Simulation.Domain
                 {
                     if (entry.HarvestDispositionImpactConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateHarvestDispositionImpactConfirmRequestForReplay(
                         entry.HarvestDispositionImpactConfirmRequest);
@@ -303,16 +336,28 @@ namespace Ssalddel.Simulation.Domain
                 {
                     if (entry.LogisticsMovementConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
-                        || entry.HarvestDispositionImpactConfirmRequest != null)
+                        || entry.HarvestDispositionImpactConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateLogisticsMovementConfirmRequestForReplay(
                         entry.LogisticsMovementConfirmRequest);
+                }
+                else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TurnClosingConfirm)
+                {
+                    if (entry.TurnClosingConfirmRequest == null || entry.TickRequest != null
+                        || entry.DecisionConfirmRequest != null
+                        || entry.HarvestDispositionImpactConfirmRequest != null
+                        || entry.LogisticsMovementConfirmRequest != null)
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                    경영SimulationSessionAggregate.ValidateTurnClosingConfirmRequest(
+                        entry.TurnClosingConfirmRequest);
                 }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateAdvance(entry.TickRequest);
                 }
@@ -381,6 +426,13 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, entry.LogisticsMovementConfirmRequest.ExpectedRevision);
                     Add(canonical, 경영SimulationSessionAggregate.BuildLogisticsMovementPayloadKey(
                         entry.LogisticsMovementConfirmRequest.Movement));
+                }
+                if (entry.TurnClosingConfirmRequest != null)
+                {
+                    Add(canonical, entry.TurnClosingConfirmRequest.CommandId);
+                    Add(canonical, entry.TurnClosingConfirmRequest.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate.BuildTurnClosingPayloadKey(
+                        entry.TurnClosingConfirmRequest.Preview));
                 }
             }
 
@@ -468,7 +520,77 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.ExportCargoPreparations.Length);
             foreach (var preparation in value.ExportCargoPreparations)
                 Add수출Cargo준비(target, preparation);
+            Add(target, value.ExportCargoHandoffs.Length);
+            foreach (var handoff in value.ExportCargoHandoffs)
+                Add수출Cargo인계(target, handoff);
+            Add(target, value.ExportPortReceipts.Length);
+            foreach (var receipt in value.ExportPortReceipts)
+                Add수출항만인수(target, receipt);
+            Add(target, value.ExportReadinessReviews.Length);
+            foreach (var review in value.ExportReadinessReviews)
+                Add수출준비성검토(target, review);
+            Add(target, value.ExportShipmentPlans.Length);
+            foreach (var plan in value.ExportShipmentPlans)
+                Add수출선적계획(target, plan);
+            Add(target, value.ExportShipmentExecutions.Length);
+            foreach (var execution in value.ExportShipmentExecutions)
+                Add수출선적실행(target, execution);
+            if (value.TurnClosings.Length > 0 || value.ActiveTurnCardEffects.Length > 0)
+            {
+                Add(target, "TurnClosingExtensionV1");
+                Add(target, value.TurnClosings.Length);
+                foreach (var closing in value.TurnClosings)
+                {
+                    Add(target, closing.TurnClosingStableId);
+                    Add(target, closing.ClosedTurnNumber);
+                    Add(target, closing.ClosedGameDate.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture));
+                    Add(target, closing.ResultingWorldTick);
+                    Add(target, closing.ResultingRevision);
+                    Add(target, closing.SelectedCards.Length);
+                    foreach (var card in closing.SelectedCards)
+                        AddTurnCard(target, card);
+                }
+                Add(target, value.ActiveTurnCardEffects.Length);
+                foreach (var effect in value.ActiveTurnCardEffects)
+                {
+                    Add(target, effect.CardStableId);
+                    Add(target, effect.CardRevision);
+                    Add(target, effect.CardKindCode);
+                    Add(target, effect.EffectCode);
+                    Add(target, effect.TargetStatCode);
+                    Add(target, effect.StatDelta);
+                    Add(target, effect.ActiveTurnNumber);
+                    Add(target, effect.SourceTurnClosingStableId);
+                    Add(target, effect.SourceStableId);
+                    Add(target, effect.RegionKey);
+                    Add(target, effect.CalendarRevision);
+                    Add(target, effect.EffectRuleRevision);
+                    Add(target, effect.SourceUrl);
+                    Add(target, effect.EvidenceCheckedAtUtc?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty);
+                }
+            }
             AddSettlement(target, value.Settlement);
+        }
+
+        private static void AddTurnCard(StringBuilder target, SimulationTurnCardSnapshot card)
+        {
+            Add(target, card.CardStableId);
+            Add(target, card.CardRevision);
+            Add(target, card.CardKindCode);
+            Add(target, card.Title);
+            Add(target, card.Summary);
+            Add(target, card.EffectTimingCode);
+            Add(target, card.EffectCode);
+            Add(target, card.TargetStatCode);
+            Add(target, card.StatDelta);
+            Add(target, card.SourceStableId);
+            Add(target, card.RegionKey);
+            Add(target, card.AvailableFromGameDate?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty);
+            Add(target, card.AvailableThroughGameDate?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty);
+            Add(target, card.CalendarRevision);
+            Add(target, card.EffectRuleRevision);
+            Add(target, card.SourceUrl);
+            Add(target, card.EvidenceCheckedAtUtc?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty);
         }
 
         private static void Add수출준비(
@@ -533,6 +655,181 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.RequiredPreparationTicks);
             Add(target, value.ScheduledTick);
             Add(target, value.ReadyForHandoffTick ?? -1);
+            Add(target, value.HandoffStableId ?? string.Empty);
+            Add(target, value.HandoffCompletedTick ?? -1);
+            AddStrings(target, value.BoundaryCodes);
+            AddStrings(target, value.SourceStableIds);
+        }
+
+        private static void Add수출Cargo인계(
+            StringBuilder target,
+            Simulation수출Cargo인계Snapshot value)
+        {
+            Add(target, value.HandoffStableId);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.SourceCargoPreparationStableId);
+            Add(target, value.SourceExportPreparationStableId);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.PackageLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.CargoStableId);
+            Add(target, value.Quantity);
+            Add(target, value.UnitCode);
+            Add(target, value.ReceivingFacilityStableId);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.RequiredHandoffTicks);
+            Add(target, value.ScheduledTick);
+            Add(target, value.CompletedTick ?? -1);
+            Add(target, value.LogisticsMovementCargoStableId ?? string.Empty);
+            Add(target, value.LogisticsMovementTaskStableId ?? string.Empty);
+            AddStrings(target, value.BoundaryCodes);
+            AddStrings(target, value.SourceStableIds);
+        }
+
+        private static void Add수출항만인수(
+            StringBuilder target,
+            Simulation수출항만인수Snapshot value)
+        {
+            Add(target, value.ReceiptStableId);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.CargoStableId);
+            Add(target, value.SourceExportCargoHandoffStableId);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.PackageLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.Quantity);
+            Add(target, value.UnitCode);
+            Add(target, value.ReceivingFacilityStableId);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.RequiredReceivingTicks);
+            Add(target, value.ScheduledTick);
+            Add(target, value.CompletedTick ?? -1);
+            AddStrings(target, value.BoundaryCodes);
+            AddStrings(target, value.SourceStableIds);
+        }
+
+        private static void Add수출선적실행(
+            StringBuilder target,
+            Simulation수출선적실행Snapshot value)
+        {
+            Add(target, value.ExecutionStableId);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.OutcomeCode);
+            Add(target, value.OutcomeRoll ?? -1);
+            Add(target, value.SourceShipmentPlanStableId);
+            Add(target, value.SourceReadinessReviewStableId);
+            Add(target, value.SourcePortReceiptStableId);
+            Add(target, value.CargoStableId);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.PackageLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.Quantity);
+            Add(target, value.DeliveredQuantity);
+            Add(target, value.LostQuantity);
+            Add(target, value.UnitCode);
+            Add(target, value.DestinationCountryCode);
+            Add(target, value.DestinationMarketStableId);
+            Add(target, value.TransportModeCode);
+            Add(target, value.ExecutionFacilityStableId);
+            Add(target, value.EstimatedTransitTicks);
+            Add(target, value.RiskScore);
+            Add(target, value.SuccessProbabilityPercent);
+            Add(target, value.ExpectedGrossRevenue);
+            Add(target, value.ExpectedTotalCost);
+            Add(target, value.PreviouslyRecognizedProjectedRevenue);
+            Add(target, value.SuccessTreasuryDeltaCandidate);
+            Add(target, value.LossTreasuryDeltaCandidate);
+            Add(target, value.RequiredLossCapacityReservation);
+            Add(target, value.AppliedTreasuryDelta ?? 0m);
+            Add(target, value.TreasuryBeforeApplication ?? 0m);
+            Add(target, value.TreasuryAfterApplication ?? 0m);
+            Add(target, value.CurrencyCode);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.ScheduledTick);
+            Add(target, value.DepartedTick ?? -1);
+            Add(target, value.CompletedTick ?? -1);
+            AddStrings(target, value.BoundaryCodes);
+            AddStrings(target, value.SourceStableIds);
+        }
+
+        private static void Add수출준비성검토(
+            StringBuilder target,
+            Simulation수출준비성검토Snapshot value)
+        {
+            Add(target, value.ReviewStableId);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.SourcePortReceiptStableId);
+            Add(target, value.ParentReviewStableId ?? string.Empty);
+            Add(target, value.AttemptNumber);
+            Add(target, value.CargoStableId);
+            Add(target, value.SourceExportCargoHandoffStableId);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.PackageLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.Quantity);
+            Add(target, value.UnitCode);
+            Add(target, value.ReviewingFacilityStableId);
+            Add(target, value.DocumentsPrepared);
+            Add(target, value.InspectionPreparationReady);
+            Add(target, value.OutcomeCode);
+            AddStrings(target, value.MissingRequirementCodes);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.RequiredReviewTicks);
+            Add(target, value.ScheduledTick);
+            Add(target, value.CompletedTick ?? -1);
+            AddStrings(target, value.BoundaryCodes);
+            AddStrings(target, value.SourceStableIds);
+        }
+
+        private static void Add수출선적계획(
+            StringBuilder target,
+            Simulation수출선적계획Snapshot value)
+        {
+            Add(target, value.PlanStableId);
+            Add(target, value.StateCode);
+            Add(target, value.Revision);
+            Add(target, value.SourceReadinessReviewStableId);
+            Add(target, value.SourcePortReceiptStableId);
+            Add(target, value.CargoStableId);
+            Add(target, value.SourceAllocationStableId);
+            Add(target, value.HarvestLotStableId);
+            Add(target, value.PackageLotStableId);
+            Add(target, value.ProductStableId);
+            Add(target, value.Quantity);
+            Add(target, value.UnitCode);
+            Add(target, value.DestinationCountryCode);
+            Add(target, value.DestinationMarketStableId);
+            Add(target, value.TransportModeCode);
+            Add(target, value.PlanningFacilityStableId);
+            Add(target, value.ExpectedGrossRevenue);
+            Add(target, value.ExpectedInternationalLogisticsCost);
+            Add(target, value.ExpectedHandlingCost);
+            Add(target, value.ExpectedOtherCost);
+            Add(target, value.ExpectedTotalCost);
+            Add(target, value.ExpectedNetRevenue);
+            Add(target, value.CurrencyCode);
+            Add(target, value.EstimatedTransitTicks);
+            Add(target, value.RiskScore);
+            Add(target, value.RiskLevelCode);
+            Add(target, value.DecisionStableId);
+            Add(target, value.TaskStableId);
+            Add(target, value.RequiredPlanningTicks);
+            Add(target, value.ScheduledTick);
+            Add(target, value.CompletedTick ?? -1);
+            Add(target, value.ExecutionStableId ?? string.Empty);
+            Add(target, value.ExecutionCompletedTick ?? -1);
             AddStrings(target, value.BoundaryCodes);
             AddStrings(target, value.SourceStableIds);
         }
@@ -593,6 +890,7 @@ namespace Ssalddel.Simulation.Domain
         {
             Add(target, value.CargoStableId);
             Add(target, value.CargoRevision);
+            Add(target, value.SourceExportCargoHandoffStableId ?? string.Empty);
             Add(target, value.StateCode);
             Add(target, value.Revision);
             Add(target, value.SourceAllocationStableId);
@@ -613,6 +911,8 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.DepartedTick ?? -1);
             Add(target, value.ArrivedTick ?? -1);
             Add(target, value.DestinationStockCandidateStableId);
+            Add(target, value.DestinationReceiptStableId ?? string.Empty);
+            Add(target, value.DestinationReceiptCompletedTick ?? -1);
             AddStrings(target, value.SourceStableIds);
         }
 
@@ -1012,6 +1312,22 @@ namespace Ssalddel.Simulation.Domain
                 LogisticsMovementConfirmRequest = source.LogisticsMovementConfirmRequest == null
                     ? null
                     : CloneLogisticsMovementConfirmRequest(source.LogisticsMovementConfirmRequest),
+                TurnClosingConfirmRequest = source.TurnClosingConfirmRequest == null
+                    ? null
+                    : CloneTurnClosingConfirmRequest(source.TurnClosingConfirmRequest),
+            };
+
+        public static SimulationTurnClosingConfirmRequest CloneTurnClosingConfirmRequest(
+            SimulationTurnClosingConfirmRequest source)
+            => new SimulationTurnClosingConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                Preview = new SimulationTurnClosingPreviewRequest
+                {
+                    ExpectedRevision = source.Preview.ExpectedRevision,
+                    SelectedCardStableIds = source.Preview.SelectedCardStableIds.ToArray(),
+                },
             };
 
         public static 경영SimulationTick진행Request CloneTickRequest(
@@ -1066,6 +1382,8 @@ namespace Ssalddel.Simulation.Domain
                 {
                     CargoStableId = source.Movement.CargoStableId,
                     CargoRevision = source.Movement.CargoRevision,
+                    SourceExportCargoHandoffStableId =
+                        source.Movement.SourceExportCargoHandoffStableId,
                     SourceAllocationStableId = source.Movement.SourceAllocationStableId,
                     HarvestLotStableId = source.Movement.HarvestLotStableId,
                     PackageLotStableId = source.Movement.PackageLotStableId,

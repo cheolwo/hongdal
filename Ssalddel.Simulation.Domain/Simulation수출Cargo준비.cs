@@ -276,6 +276,8 @@ namespace Ssalddel.Simulation.Domain
                 RequiredPreparationTicks = source.RequiredPreparationTicks,
                 ScheduledTick = source.ScheduledTick,
                 ReadyForHandoffTick = source.ReadyForHandoffTick,
+                HandoffStableId = source.HandoffStableId,
+                HandoffCompletedTick = source.HandoffCompletedTick,
                 BoundaryCodes = Copy(source.BoundaryCodes),
                 SourceStableIds = Copy(source.SourceStableIds),
             };

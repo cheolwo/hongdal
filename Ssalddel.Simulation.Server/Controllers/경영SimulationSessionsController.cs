@@ -31,6 +31,28 @@ public sealed class 경영SimulationSessionsController(
         [FromBody] 경영SimulationTick진행Request request)
         => Execute(() => Ok(service.Advance(sessionStableId, request)));
 
+    [HttpGet("{sessionStableId}/turn-closing-context")]
+    [ProducesResponseType(typeof(SimulationTurnClosingContextSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<SimulationTurnClosingContextSnapshot> GetTurnClosingContext(
+        string sessionStableId)
+        => ExecuteTurnClosingContext(() => Ok(
+            service.GetTurnClosingContext(sessionStableId)));
+
+    [HttpPost("{sessionStableId}/turn-closing-previews")]
+    [ProducesResponseType(typeof(SimulationTurnClosingPreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<SimulationTurnClosingPreviewSnapshot> PreviewTurnClosing(
+        string sessionStableId,
+        [FromBody] SimulationTurnClosingPreviewRequest request)
+        => ExecuteTurnClosingPreview(() => Ok(
+            service.PreviewTurnClosing(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/turn-closings/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmTurnClosing(
+        string sessionStableId,
+        [FromBody] SimulationTurnClosingConfirmRequest request)
+        => Execute(() => Ok(service.ConfirmTurnClosing(sessionStableId, request)));
+
     [HttpPost("{sessionStableId}/decision-previews")]
     [ProducesResponseType(typeof(SimulationDecisionPreviewSnapshot), StatusCodes.Status200OK)]
     public ActionResult<SimulationDecisionPreviewSnapshot> PreviewDecision(
@@ -116,6 +138,93 @@ public sealed class 경영SimulationSessionsController(
         string sessionStableId,
         [FromBody] Simulation수출Cargo준비ConfirmRequest request)
         => Execute(() => Ok(service.Confirm수출Cargo준비(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-cargo-handoff-previews")]
+    [ProducesResponseType(typeof(Simulation수출Cargo인계PreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수출Cargo인계PreviewSnapshot> 수출Cargo인계Preview(
+        string sessionStableId,
+        [FromBody] Simulation수출Cargo인계PreviewRequest request)
+        => Execute수출Cargo인계(() => Ok(service.Preview수출Cargo인계(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-cargo-handoffs/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> 수출Cargo인계Confirm(
+        string sessionStableId,
+        [FromBody] Simulation수출Cargo인계ConfirmRequest request)
+        => Execute(() => Ok(service.Confirm수출Cargo인계(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-port-receipt-previews")]
+    [ProducesResponseType(typeof(Simulation수출항만인수PreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수출항만인수PreviewSnapshot> 수출항만인수Preview(
+        string sessionStableId,
+        [FromBody] Simulation수출항만인수PreviewRequest request)
+        => Execute수출항만인수(() => Ok(service.Preview수출항만인수(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-port-receipts/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> 수출항만인수Confirm(
+        string sessionStableId,
+        [FromBody] Simulation수출항만인수ConfirmRequest request)
+        => Execute(() => Ok(service.Confirm수출항만인수(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-readiness-review-previews")]
+    [ProducesResponseType(typeof(Simulation수출준비성검토PreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수출준비성검토PreviewSnapshot> 수출준비성검토Preview(
+        string sessionStableId,
+        [FromBody] Simulation수출준비성검토PreviewRequest request)
+        => Execute수출준비성검토(() => Ok(
+            service.Preview수출준비성검토(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-readiness-reviews/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> 수출준비성검토Confirm(
+        string sessionStableId,
+        [FromBody] Simulation수출준비성검토ConfirmRequest request)
+        => Execute(() => Ok(service.Confirm수출준비성검토(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-shipment-plan-previews")]
+    [ProducesResponseType(typeof(Simulation수출선적계획PreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수출선적계획PreviewSnapshot> 수출선적계획Preview(
+        string sessionStableId,
+        [FromBody] Simulation수출선적계획PreviewRequest request)
+        => Execute수출선적계획(() => Ok(
+            service.Preview수출선적계획(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-shipment-plans/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> 수출선적계획Confirm(
+        string sessionStableId,
+        [FromBody] Simulation수출선적계획ConfirmRequest request)
+        => Execute(() => Ok(service.Confirm수출선적계획(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-shipment-execution-previews")]
+    [ProducesResponseType(typeof(Simulation수출선적실행PreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수출선적실행PreviewSnapshot> 수출선적실행Preview(
+        string sessionStableId,
+        [FromBody] Simulation수출선적실행PreviewRequest request)
+        => Execute수출선적실행(() => Ok(
+            service.Preview수출선적실행(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/export-shipment-executions/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> 수출선적실행Confirm(
+        string sessionStableId,
+        [FromBody] Simulation수출선적실행ConfirmRequest request)
+        => Execute(() => Ok(service.Confirm수출선적실행(sessionStableId, request)));
+
+    [HttpGet("{sessionStableId}/harvest-route-outcomes")]
+    [ProducesResponseType(typeof(Simulation수확판로결과Snapshot[]), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수확판로결과Snapshot[]> 수확판로결과목록(
+        string sessionStableId)
+        => Execute수확판로결과목록(() => Ok(service.Get수확판로결과목록(sessionStableId)));
+
+    [HttpGet("{sessionStableId}/harvest-route-outcomes/{harvestLotStableId}")]
+    [ProducesResponseType(typeof(Simulation수확판로결과Snapshot), StatusCodes.Status200OK)]
+    public ActionResult<Simulation수확판로결과Snapshot> 수확판로결과(
+        string sessionStableId,
+        string harvestLotStableId)
+        => Execute수확판로결과(() => Ok(
+            service.Get수확판로결과(sessionStableId, harvestLotStableId)));
 
     [HttpPost("{sessionStableId}/logistics-movement-previews")]
     [ProducesResponseType(
@@ -297,6 +406,48 @@ public sealed class 경영SimulationSessionsController(
         }
     }
 
+    private ActionResult<SimulationTurnClosingContextSnapshot> ExecuteTurnClosingContext(
+        Func<ActionResult<SimulationTurnClosingContextSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<SimulationTurnClosingPreviewSnapshot> ExecuteTurnClosingPreview(
+        Func<ActionResult<SimulationTurnClosingPreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
     private ActionResult<Simulation수출준비PreviewSnapshot> Execute수출준비(
         Func<ActionResult<Simulation수출준비PreviewSnapshot>> action)
     {
@@ -320,6 +471,27 @@ public sealed class 경영SimulationSessionsController(
 
     private ActionResult<Simulation수출Cargo준비PreviewSnapshot> Execute수출Cargo준비(
         Func<ActionResult<Simulation수출Cargo준비PreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수출Cargo인계PreviewSnapshot> Execute수출Cargo인계(
+        Func<ActionResult<Simulation수출Cargo인계PreviewSnapshot>> action)
     {
         try
         {
@@ -446,6 +618,132 @@ public sealed class 경영SimulationSessionsController(
 
     private ActionResult<SimulationLogisticsMovementPreviewSnapshot> ExecuteLogisticsMovement(
         Func<ActionResult<SimulationLogisticsMovementPreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수출항만인수PreviewSnapshot> Execute수출항만인수(
+        Func<ActionResult<Simulation수출항만인수PreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수출준비성검토PreviewSnapshot> Execute수출준비성검토(
+        Func<ActionResult<Simulation수출준비성검토PreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수출선적계획PreviewSnapshot> Execute수출선적계획(
+        Func<ActionResult<Simulation수출선적계획PreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수출선적실행PreviewSnapshot> Execute수출선적실행(
+        Func<ActionResult<Simulation수출선적실행PreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수확판로결과Snapshot> Execute수확판로결과(
+        Func<ActionResult<Simulation수확판로결과Snapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<Simulation수확판로결과Snapshot[]> Execute수확판로결과목록(
+        Func<ActionResult<Simulation수확판로결과Snapshot[]>> action)
     {
         try
         {
