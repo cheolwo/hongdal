@@ -13,8 +13,10 @@ public static class SsalddelCodeFeatureKeys
     public const string GroupPurchaseDemandProcessManager = "group-purchase-demand-process-manager";
     public const string GroupImportTradeReadiness = "group-import-trade-readiness";
     public const string ImportedFoodKoreanLabelIntegration = "imported-food-korean-label-integration";
+    public const string IntegratedSeedbedExhibition = "integrated-seedbed-exhibition";
     public const string PlatformDeliveryZoneLedger = "platform-delivery-zone-ledger";
     public const string PlatformSupplyBrokerage = "platform-supply-brokerage";
+    public const string PotatoProductionDistributionWorld = "potato-production-distribution-world";
     public const string RegionalCultureImagePrompt = "regional-culture-image-prompt";
     public const string RegionalCulturePublicInstitution = "regional-culture-public-institution";
     public const string RegionalAgriculturalMap = "regional-agricultural-map";

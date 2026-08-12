@@ -162,6 +162,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IUnloadingPerspectiveReadService, UnloadingPerspectiveReadService>();
         services.AddScoped<IResidentialPickupPerspectiveUseCase, ResidentialPickupPerspectiveUseCase>();
         services.AddScoped<IFarmProducerPerspectiveUseCase, FarmProducerPerspectiveUseCase>();
+        services.AddScoped<감자생산유통WorldProjector>();
+        services.AddScoped<I감자생산유통World조회UseCase, 감자생산유통World조회UseCase>();
         services.AddScoped<IIndividualOrderPerspectiveReadService, IndividualOrderPerspectiveReadService>();
         services.AddScoped<IGroupOrderPerspectiveReadService, GroupOrderPerspectiveReadService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
