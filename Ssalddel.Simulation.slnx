@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/Simulation/">
+    <Project Path="Ssalddel.Simulation.Application/Ssalddel.Simulation.Application.csproj" />
     <Project Path="Ssalddel.Simulation.Contracts/Ssalddel.Simulation.Contracts.csproj" />
     <Project Path="Ssalddel.Simulation.Domain/Ssalddel.Simulation.Domain.csproj" />
+    <Project Path="Ssalddel.Simulation.Infrastructure/Ssalddel.Simulation.Infrastructure.csproj" />
     <Project Path="Ssalddel.Simulation.Server/Ssalddel.Simulation.Server.csproj" />
   </Folder>
   <Folder Name="/Workflow Rules/">

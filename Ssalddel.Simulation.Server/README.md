@@ -4,6 +4,15 @@ Unity 경영 Simulation의 session, scenario clock와 deterministic command 권�
 
 이 서버는 실제 운영 전 게임 세계와 업무 규칙을 반복 검증하는 예행연습 서버 역할을 함께 맡는다. 개발 기본 주소는 `http://localhost:5204`이며, 기존 `Ssalddel` 운영 서버의 개발 주소와 분리한다. 예행연습 결과는 실제 운영 원장으로 자동 승격하지 않는다.
 
+코드 책임은 다음 프로젝트 경계로 분리한다.
+
+- `Ssalddel.Simulation.Domain`: Aggregate, 순수 규칙, 상태 전이와 저장 자료 재현
+- `Ssalddel.Simulation.Application`: 세션 조회와 미리보기·확정·저장·복원 업무 조율, 저장소 계약
+- `Ssalddel.Simulation.Infrastructure`: 메모리 저장소와 이후 영속 저장소 구현
+- `Ssalddel.Simulation.Server`: HTTP, 실행 설정과 의존성 조립
+
+Domain은 Application·Infrastructure·Server를 참조하지 않는다. Application은 저장 구현을 직접 생성하지 않고 두 저장소 계약을 생성자에서 반드시 받는다.
+
 현재 첫 slice는 다음만 제공한다.
 
 - Simulation session 생성·조회
@@ -77,4 +86,4 @@ save package는 session 생성 요청, 저장 시점 snapshot과 Confirm/Tick Co
 
 같이주문 Preview는 각 참여자의 명시적 동의와 의향 수량을 보존하고 목표 충족 여부를 계산하지만 상태를 바꾸지 않는다. 모집 결과 Confirm은 공통 Task를 만들고, 완료 WorldTick에서만 목표 충족 모집을 `확정`, 미달 모집을 `모집종료목표미달`로 전이한다. 같은 참여자의 중복 의향은 차단하고 실제 주문·결제·자동 동의는 수행하지 않는다.
 
-다음 slice는 `SIM-FOOD-DELIVERY-1`로, 조리·픽업·전달·수령 확인을 실제 주소·기사·결제 없이 Simulation 주문 원장과 WorldTick에 연결한다. 그 뒤 `MARKET-CONSUMPTION-1`로 진행한다. 인증된 session scope, scenario package validator, 외부 durable save adapter와 migration은 별도 후속 Gate다.
+다음 구조 우선순위는 비동기·취소·기대 개정 번호를 보존하는 영속 저장 계약과 외부 저장 구현이다. 인증된 세션 범위, 시나리오 묶음 검증기와 migration은 별도 후속 통과 조건이다.

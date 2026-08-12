@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,40 +8,6 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Domain
 {
-    public interface ISimulationSessionSaveStore
-    {
-        SimulationSessionSavePackage SaveOrGet(SimulationSessionSavePackage package);
-        SimulationSessionSavePackage? Find(string saveStableId);
-    }
-
-    public sealed class InMemorySimulationSessionSaveStore : ISimulationSessionSaveStore
-    {
-        private readonly ConcurrentDictionary<string, SimulationSessionSavePackage> saves =
-            new ConcurrentDictionary<string, SimulationSessionSavePackage>(StringComparer.Ordinal);
-
-        public SimulationSessionSavePackage SaveOrGet(SimulationSessionSavePackage package)
-        {
-            if (package == null) throw new ArgumentNullException(nameof(package));
-            var candidate = SimulationSaveReplayCloner.ClonePackage(package);
-            var saved = saves.GetOrAdd(candidate.SaveStableId, candidate);
-            if (!string.Equals(saved.SessionStableId, candidate.SessionStableId, StringComparison.Ordinal)
-                || !string.Equals(saved.ReplayHash, candidate.ReplayHash, StringComparison.Ordinal))
-            {
-                throw new SimulationConflictException("SimulationSaveStableIdConflict");
-            }
-
-            return SimulationSaveReplayCloner.ClonePackage(saved);
-        }
-
-        public SimulationSessionSavePackage? Find(string saveStableId)
-        {
-            if (string.IsNullOrWhiteSpace(saveStableId)) return null;
-            return saves.TryGetValue(saveStableId, out var package)
-                ? SimulationSaveReplayCloner.ClonePackage(package)
-                : null;
-        }
-    }
-
     public sealed partial class 경영SimulationSessionAggregate
     {
         private readonly List<SimulationCommandLogEntrySnapshot> commandLog =
@@ -156,7 +121,7 @@ namespace Ssalddel.Simulation.Domain
         }
     }
 
-    internal static class SimulationSessionReplay
+    public static class SimulationSessionReplay
     {
         public static 경영SimulationSessionAggregate Restore(SimulationSessionSavePackage package)
         {
@@ -1256,7 +1221,7 @@ namespace Ssalddel.Simulation.Domain
         }
     }
 
-    internal static class SimulationSaveReplayCloner
+    public static class SimulationSaveReplayCloner
     {
         public static SimulationSessionSavePackage ClonePackage(SimulationSessionSavePackage source)
             => new SimulationSessionSavePackage

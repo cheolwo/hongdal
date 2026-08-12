@@ -254,7 +254,9 @@ public sealed class SimulationDecisionWorkTests
     }
 
     private static 경영SimulationSessionService Service()
-        => new(new InMemory경영SimulationSessionStore());
+        => new(
+            new InMemory경영SimulationSessionStore(),
+            new InMemorySimulationSessionSaveStore());
 
     private static 경영SimulationSessionSnapshot CreateSession(
         경영SimulationSessionService service)

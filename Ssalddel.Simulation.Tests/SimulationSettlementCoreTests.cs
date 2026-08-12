@@ -237,7 +237,9 @@ public sealed class SimulationSettlementCoreTests
     }
 
     private static 경영SimulationSessionService Service()
-        => new(new InMemory경영SimulationSessionStore());
+        => new(
+            new InMemory경영SimulationSessionStore(),
+            new InMemorySimulationSessionSaveStore());
 
     private static 경영SimulationSession생성Request CreateRequest(Guid? clientRequestId = null)
         => new()

@@ -16,12 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Simulation.Application\Ssalddel.Simulation.Application.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Contracts\Ssalddel.Simulation.Contracts.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Domain\Ssalddel.Simulation.Domain.csproj" />
+    <ProjectReference Include="..\Ssalddel.Simulation.Infrastructure\Ssalddel.Simulation.Infrastructure.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Server\Ssalddel.Simulation.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="Ssalddel.Simulation.Application" />
+    <Using Include="Ssalddel.Simulation.Infrastructure" />
     <Using Include="Xunit" />
   </ItemGroup>
 

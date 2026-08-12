@@ -312,7 +312,9 @@ public sealed class SimulationTurnClosingTests
     }
 
     private static 경영SimulationSessionService Service()
-        => new(new InMemory경영SimulationSessionStore());
+        => new(
+            new InMemory경영SimulationSessionStore(),
+            new InMemorySimulationSessionSaveStore());
 
     private static SimulationTurnClosingPreviewRequest PreviewRequest(
         long revision,
