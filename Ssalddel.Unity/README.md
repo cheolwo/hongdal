@@ -24,6 +24,15 @@
 - 농사로 작목기술 주분류 API를 받는 작물 기준정보 ApiModel·Mapper·Repository port·UseCase
 - 같은 World Object에 생산자·주문자·운송자 관점을 겹치는 Role Perspective ApiModel·Mapper·Repository·UseCase·applicator
 - 생산자 소유 농장·구획·재배작기·센서 관점을 보존하는 Farm Repository·UseCase와 FarmTile·Crop·Sensor View socket
+- canonical 감자의 지역·작형별 재배 달력 fixture와 게임 생육 rule을 분리하고, 기존 6×6 타일에서 파종 Preview/Confirm→날짜 진행→HarvestReady→수확 Confirm→300kg 수확 Lot lineage를 만드는 FARM-3 Simulation core
+- FARM-3의 300kg HarvestLot 상호작용으로 생산자 조합 출하·온라인 마켓 직접 판매·수출대행 준비를 Preview/Confirm/Tick하고, 실제 거래 효과 없이 각각 조합 인수·생산자 포장·수출 준비 후속 업무 후보만 만드는 HARVEST-CHOICE-1 core
+- 조합 출하로 결정된 300kg HarvestLot만 인수 Preview/Confirm/Tick을 허용해 조합 인수 Lot과 CARGO-1 포장 검토 후보를 만들고, 같은 lineage를 가진 CARGO-1 초기 snapshot을 열되 PackageLot·Cargo·정산·운송은 만들지 않는 COOP-1 core
+- 온라인 직판으로 결정된 300kg HarvestLot만 생산자 소포장 Preview/Confirm/Tick을 허용해 Fixture 기준 5kg 상자 60개와 온라인 상품 등록 후보를 만들고, 비공개·가격 미설정·주문 0의 등록 초안까지만 여는 DIRECT-1 core
+- 300kg HarvestLot을 명시적 포장·상차 Preview/Confirm/Tick으로 20kg 상자 15개와 400kg 용량의 Simulation Cargo에 연결하고 수량 보존·차량 용량·Harvest→Package→Cargo lineage를 검증하는 CARGO-1 core
+- CARGO-1의 동일 Loaded Cargo snapshot을 PVS6 Farm→Hub route에 투영하고 cargo ID·15개 상자·300kg·전체 lineage를 보존하되 Van 이동은 상태 전이가 아닌 Presentation으로 제한하는 WORLD-6 adapter
+- 명시적 Dispatch Preview/Confirm/Tick과 3회 route Tick으로 `Loaded → InTransit → ArrivedAtHub`를 전이하고 게임 날짜·Cargo revision을 올리면서 동일 Cargo ID·300kg·Harvest/Package lineage를 보존하는 JOURNEY-1 Simulation core
+- Hub 도착 Cargo를 Receiving·Inspection Preview/Confirm/Tick으로 처리하고 300kg을 288kg 합격·12kg 손실과 `DamageFixture` 이유로 보존하되 합격 결과를 재고나 판매로 자동 승격하지 않는 HUB-1 core
+- HUB-1 검수 결과를 288kg `AcceptedForOutbound` Lot과 12kg `LossRecorded` Lot으로 분리하고, 합격 Lot만 288kg Hub→City `CandidateOnly`의 source가 되도록 하되 출발 Cargo·Hub 재고·City 입고는 만들지 않는 HUB-2/WORLD-8 core
 - Zone별 semantic waypoint와 operational/simulation 경계를 가진 NPC 이동 snapshot·route catalog·applicator
 - `Samples~/NpcMovement`의 NavMeshAgent·Animator Presentation socket
 - `Samples~/UrbanLogisticsCenter`의 Role target·waypoint·운송자 NPC primitive builder와 VContainer scope
@@ -57,6 +66,7 @@ Runtime/
   Npcs/         NPC 이동 ApiModel·Mapper, Zone route catalog와 stable-ID 적용 계약
   Community/    공개 커뮤니티 시장 광장 ApiModel·Mapper·Repository·UseCase와 reconcile
   Warehouse/    권한 적용 재고·적재·피킹·NPC ApiModel·Mapper·Repository·UseCase와 reconcile
+  Farm/         생산자 관점과 6×6 토양 타일, canonical 품목 재배 달력·생육·수확 Lot·포장·Cargo lifecycle
 Samples~/UrbanMarket/
   Runtime/      SceneController와 마트·진열대·가격·재고 View socket
   Editor/       primitive scene 생성과 wiring 검사

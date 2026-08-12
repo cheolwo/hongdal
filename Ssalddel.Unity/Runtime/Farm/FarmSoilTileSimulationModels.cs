@@ -20,9 +20,10 @@ namespace Ssalddel.Unity.Farm
         public const string Untilled = "Untilled";
         public const string Tilled = "Tilled";
         public const string Sown = "Sown";
+        public const string Harvested = "Harvested";
 
         internal static bool IsKnown(string value)
-            => value == Untilled || value == Tilled || value == Sown;
+            => value == Untilled || value == Tilled || value == Sown || value == Harvested;
     }
 
     public static class FarmSoilTileWorkStateCodes
@@ -40,6 +41,7 @@ namespace Ssalddel.Unity.Farm
         public const string Untilled = "Soil.Untilled";
         public const string Tilled = "Soil.Tilled";
         public const string Sown = "Soil.Sown";
+        public const string Harvested = "Soil.Harvested";
         public const string Selected = "Soil.Selected";
     }
 
@@ -450,6 +452,7 @@ namespace Ssalddel.Unity.Farm
                 FarmSoilTileCultivationStateCodes.Untilled => FarmSoilTileColorTokens.Untilled,
                 FarmSoilTileCultivationStateCodes.Tilled => FarmSoilTileColorTokens.Tilled,
                 FarmSoilTileCultivationStateCodes.Sown => FarmSoilTileColorTokens.Sown,
+                FarmSoilTileCultivationStateCodes.Harvested => FarmSoilTileColorTokens.Harvested,
                 _ => throw new InvalidOperationException("FarmSoilTileCultivationStateInvalid:" + state),
             };
 
