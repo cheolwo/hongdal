@@ -157,6 +157,7 @@ namespace Ssalddel.Simulation.Domain
                 RequestedTick = CurrentTick,
                 DispatchedTick = CurrentTick,
                 RuleRevision = workflow.RuleRevision,
+                DispatchDecision = CloneFreightDispatchDecision(binding.DispatchDecision),
                 ExcludedOperationalEffectCodes = Copy(workflow.Simulation제외운영효과코드목록),
                 SourceStableIds = sources,
                 StateHistory = new[]
@@ -375,6 +376,7 @@ namespace Ssalddel.Simulation.Domain
                 ArrivedAtDropoffTick = source.ArrivedAtDropoffTick,
                 ReceivedTick = source.ReceivedTick,
                 RuleRevision = source.RuleRevision,
+                DispatchDecision = CloneFreightDispatchDecision(source.DispatchDecision),
                 ExcludedOperationalEffectCodes = Copy(source.ExcludedOperationalEffectCodes),
                 SourceStableIds = Copy(source.SourceStableIds),
                 StateHistory = source.StateHistory.Select(value => Transition(
@@ -395,6 +397,7 @@ namespace Ssalddel.Simulation.Domain
                 VehicleStableId = source.VehicleStableId,
                 VehicleCapacity = source.VehicleCapacity,
                 VehicleCapacityUnitCode = source.VehicleCapacityUnitCode,
+                DispatchDecision = CloneFreightDispatchDecision(source.DispatchDecision),
             };
 
         private static void ValidateFreightTransportPreviewRequest(
@@ -422,6 +425,53 @@ namespace Ssalddel.Simulation.Domain
             RequireText(request.VehicleCapacityUnitCode, "SimulationFreightVehicleCapacityUnitCodeMissing");
             if (!string.Equals(request.VehicleCapacityUnitCode.Trim(), unitCode.Trim(), StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationFreightVehicleCapacityUnitMismatch");
+            ValidateFreightDispatchDecision(request);
+        }
+
+        private static void ValidateFreightDispatchDecision(
+            SimulationFreightTransportBindingRequest binding)
+        {
+            var decision = binding.DispatchDecision;
+            if (decision == null) return;
+            RequireStableId(decision.DispatchOfferStableId,
+                "SimulationFreightDispatchOfferStableIdInvalid");
+            RequireStableId(decision.TransportRequestStableId,
+                "SimulationFreightTransportStableIdInvalid");
+            RequireText(decision.RuleRevision, "SimulationFreightDispatchRuleRevisionMissing");
+            if (!string.Equals(decision.DispatchOfferStableId, binding.DispatchOfferStableId,
+                    StringComparison.Ordinal)
+                || !string.Equals(decision.TransportRequestStableId,
+                    binding.TransportRequestStableId, StringComparison.Ordinal)
+                || !string.Equals(decision.SelectedCarrierCandidateStableId,
+                    binding.CarrierCandidateStableId, StringComparison.Ordinal)
+                || !string.Equals(decision.SelectedVehicleStableId,
+                    binding.VehicleStableId, StringComparison.Ordinal))
+                throw new SimulationContractException("SimulationFreightDispatchDecisionBindingMismatch");
+            ValidateIds(decision.SourceStableIds, true,
+                "SimulationFreightDispatchSourceStableIdsInvalid");
+            if (decision.CandidateEvaluations == null || decision.CandidateEvaluations.Length == 0)
+                throw new SimulationContractException("SimulationFreightDispatchCandidateEvaluationsMissing");
+            var selected = decision.CandidateEvaluations.Where(value => value.IsSelected).ToArray();
+            if (selected.Length != 1
+                || !selected[0].IsEligible
+                || !string.Equals(selected[0].CarrierCandidateStableId,
+                    binding.CarrierCandidateStableId, StringComparison.Ordinal)
+                || !string.Equals(selected[0].VehicleStableId,
+                    binding.VehicleStableId, StringComparison.Ordinal))
+                throw new SimulationContractException("SimulationFreightDispatchSelectionInvalid");
+            foreach (var candidate in decision.CandidateEvaluations)
+            {
+                RequireStableId(candidate.CarrierCandidateStableId,
+                    "SimulationFreightCarrierCandidateStableIdInvalid");
+                RequireStableId(candidate.VehicleStableId,
+                    "SimulationFreightVehicleStableIdInvalid");
+                RequireText(candidate.VehicleCapacityUnitCode,
+                    "SimulationFreightVehicleCapacityUnitCodeMissing");
+                ValidateIds(candidate.BlockReasonCodes, false,
+                    "SimulationFreightDispatchBlockReasonCodesInvalid");
+                if (candidate.Score == null)
+                    throw new SimulationContractException("SimulationFreightDispatchScoreMissing");
+            }
         }
 
         private static void ValidateFreightReceiptRequest(SimulationFreightReceiptPreviewRequest request)

@@ -9,9 +9,10 @@ Unity 경영 Simulation의 session, scenario clock와 deterministic command 권�
 - `Ssalddel.Simulation.Domain`: Aggregate, 순수 규칙, 상태 전이와 저장 자료 재현
 - `Ssalddel.Simulation.Application`: 세션 조회와 미리보기·확정·저장·복원 업무 조율, 저장소 계약
 - `Ssalddel.Simulation.Infrastructure`: 메모리 저장소와 이후 영속 저장소 구현
+- `Ssalddel.Simulation.Persistence`: 운영 DB의 공공데이터를 읽는 전용 EF 연결 구현
 - `Ssalddel.Simulation.Server`: HTTP, 실행 설정과 의존성 조립
 
-Domain은 Application·Infrastructure·Server를 참조하지 않는다. Application은 저장 구현을 직접 생성하지 않고 두 저장소 계약을 생성자에서 반드시 받는다.
+Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않는다. Application은 저장 구현이나 EF를 직접 생성하지 않고 저장소 계약과 공공데이터 조회 포트만 정의한다. Server는 운영 `Ssalddel.Infrastructure`를 직접 참조하지 않고 Persistence 연결 모듈만 조립한다.
 
 현재 첫 slice는 다음만 제공한다.
 
@@ -43,13 +44,22 @@ Domain은 Application·Infrastructure·Server를 참조하지 않는다. Applica
 - 수령준비 전 주문 취소의 원래 Task/Effect 취소와 재고·노동 예약 반환
 - 최대 duration을 넘는 Tick 차단
 
-이 서버는 `Ssalddel`, `Ssalddel.Contracts`, `Ssalddel.Domain`, `Ssalddel.Infrastructure`와 `Ssalddel.Unity`를 참조하지 않는다. 실제 계약·발주·결제·입고·재고를 만들지 않으며 두 서버 사이에 공유 DB도 없다.
+이 서버는 운영 업무용 `SsalddelContext`를 등록하지 않으며 실제 계약·발주·결제·입고·재고를 만들지 않는다. 다만 운영 서버가 외부에서 수집해 둔 공공데이터는 같은 MySQL DB의 `AgriculturalFisheriesDbContext`를 읽기 전용으로 등록해 함께 사용한다. 공공데이터 조회에는 `AsNoTracking`을 적용하고 `SaveChanges`를 차단한다. 수집기, migration, 초기화 작업과 운영 업무 원장은 등록하지 않는다. Simulation session·가상 재고·save는 이 공공데이터 DB에 저장하지 않는다.
 
 API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationServer:Enabled=true`로 켜며 `SsalddelExecution:Mode=Simulation`이 아니면 host 시작을 거부한다. 현재 session store와 save store는 모두 프로세스 수명에 한정된 in-memory 구현이다. restore port는 구현됐지만 외부 durable adapter를 연결하지 않은 현재 host는 실제 프로세스 재시작 뒤 save를 읽을 수 없다.
+
+공공데이터 공유 조회도 기본 비활성이다. 개발 설정에서는 `SimulationSharedPublicData:Enabled=true`이며 `ConnectionStrings:SharedPublicData`를 먼저 사용하고, 개발 설정에 명시된 `FallbackConnectionStringName=DefaultConnection`이 있을 때만 대체 연결 문자열을 사용한다. 배포 기본 설정에는 대체 이름이 없으므로 `SharedPublicData`가 반드시 필요하다. 배포 환경에서는 같은 DB와 스키마를 가리키되 `SELECT`만 허용한 별도 DB 계정을 사용한다. 연결 문자열은 환경 변수나 서버 측 secret 저장소에서 제공하며 source에 기록하지 않는다. 설정을 켰는데 허용된 연결 문자열이 없으면 host 시작을 거부한다.
+
+로컬에서는 Simulation 서버 전용 User Secrets에 같은 DB를 가리키는 연결 문자열을 등록한다. 운영 서버의 secret 값 자체를 source나 작업 보고에 복사하지 않는다.
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:SharedPublicData" "<같은 DB의 읽기 전용 연결 문자열>" --project Ssalddel.Simulation.Server
+```
 
 ```text
 POST /api/simulation/v1/sessions
 GET  /api/simulation/v1/sessions/{sessionStableId}
+GET  /api/simulation/v1/public-data/kamis-price-observations?itemName=감자&limit=20
 POST /api/simulation/v1/sessions/{sessionStableId}/ticks
 POST /api/simulation/v1/sessions/{sessionStableId}/decision-previews
 POST /api/simulation/v1/sessions/{sessionStableId}/decisions/confirm
@@ -71,6 +81,8 @@ POST /api/simulation/v1/sessions/{sessionStableId}/saves
 POST /api/simulation/v1/sessions/restores
 GET  /health
 ```
+
+첫 공공데이터 관점별 조회 결과는 KAMIS 가격 관측이다. 품목, 조사일, 규격 단위, 원화 가격, 결측 여부, 출처와 마지막 확인 시각을 반환하며 원문 JSON과 수집 실행 식별자는 내보내지 않는다. 이는 Simulation 규칙의 입력 근거로 읽을 수 있는 관측 자료이지, 운영 재고나 주문 완료 사실이 아니다.
 
 Preview의 예상값은 카드용 Interpretation이며 원장을 변경하지 않는다. 일반 Decision Confirm은 `Confirmed Decision`, `Scheduled Task`, `Pending Effect`를 분리해 기록한다. 수확 판로 Confirm은 여기에 `HarvestLotAllocation=Reserved`를 더하고 labor·treasury와 비축 선택의 storage capacity를 예약한다. 실제 Tick에서 Task·Effect와 allocation을 완료하면서 비용과 Simulation 수입, 시장 공급 또는 비축 Stock Lot을 한 aggregate lock 안에서 적용하고 예약을 해제한다.
 

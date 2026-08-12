@@ -1,73 +1,25 @@
+using Ssalddel.WorkflowRules;
+using Ssalddel.WorkflowRules.Contracts;
+
 namespace 살뜰.Services.Dispatch.Recommendation
 {
     public sealed partial class 배차추천평가Service
     {
         private static decimal ScoreRecommendation(운송삽입평가결과? scheduleEvaluation, decimal? estimatedExtraProfit, decimal? additionalDelayMinutes, decimal? routeAnchorDistanceKm, string recommendationType, bool cargoSensitive, decimal? returnDetourDistanceKm, bool returnBasisUsed)
         {
-            var score = 0m;
-
-            if (scheduleEvaluation is not null)
+            return 화물배차추천점수Policy.판정(new 화물배차추천점수요청
             {
-                if (!scheduleEvaluation.전체완수가능여부)
-                {
-                    score -= 50m;
-                }
-                else if (scheduleEvaluation.삽입가능여부)
-                {
-                    score += 10m;
-                }
-
-                if (scheduleEvaluation.경로변경이점여부)
-                {
-                    score += 15m;
-                }
-            }
-
-            if (estimatedExtraProfit.HasValue)
-            {
-                score += Math.Clamp(estimatedExtraProfit.Value / 1000m, -20m, 40m);
-            }
-
-            if (additionalDelayMinutes.HasValue)
-            {
-                score += additionalDelayMinutes.Value <= 5m ? 18m
-                    : additionalDelayMinutes.Value <= 10m ? 10m
-                    : additionalDelayMinutes.Value <= 20m ? 2m
-                    : -10m;
-            }
-
-            if (routeAnchorDistanceKm.HasValue)
-            {
-                score += routeAnchorDistanceKm.Value <= 2m ? 15m
-                    : routeAnchorDistanceKm.Value <= 5m ? 8m
-                    : routeAnchorDistanceKm.Value <= 8m ? 2m
-                    : -8m;
-            }
-
-            if (string.Equals(recommendationType, "bundle_insert", StringComparison.OrdinalIgnoreCase))
-            {
-                score += 12m;
-            }
-            else if (string.Equals(recommendationType, "next_after_dropoff", StringComparison.OrdinalIgnoreCase))
-            {
-                score += 8m;
-            }
-
-            if (cargoSensitive)
-            {
-                score -= 6m;
-            }
-
-            if (returnBasisUsed && returnDetourDistanceKm.HasValue)
-            {
-                score += returnDetourDistanceKm.Value <= 0m ? 20m
-                    : returnDetourDistanceKm.Value <= 5m ? 10m
-                    : returnDetourDistanceKm.Value <= 15m ? 0m
-                    : returnDetourDistanceKm.Value <= 30m ? -10m
-                    : -25m;
-            }
-
-            return score;
+                전체일정완수가능여부 = scheduleEvaluation?.전체완수가능여부,
+                일정삽입가능여부 = scheduleEvaluation?.삽입가능여부,
+                경로변경이점여부 = scheduleEvaluation?.경로변경이점여부 ?? false,
+                예상추가순이익 = estimatedExtraProfit,
+                추가지연분 = additionalDelayMinutes,
+                경로기준거리Km = routeAnchorDistanceKm,
+                추천유형 = recommendationType,
+                화물민감여부 = cargoSensitive,
+                복귀우회증가거리Km = returnDetourDistanceKm,
+                복귀지기준사용여부 = returnBasisUsed,
+            }).총점;
         }
     }
 }

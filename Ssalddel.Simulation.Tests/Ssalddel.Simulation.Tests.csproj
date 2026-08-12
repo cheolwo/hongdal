@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
@@ -16,10 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Domain\Ssalddel.Domain.csproj" />
+    <ProjectReference Include="..\Ssalddel.Infrastructure\Ssalddel.Infrastructure.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Application\Ssalddel.Simulation.Application.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Contracts\Ssalddel.Simulation.Contracts.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Domain\Ssalddel.Simulation.Domain.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Infrastructure\Ssalddel.Simulation.Infrastructure.csproj" />
+    <ProjectReference Include="..\Ssalddel.Simulation.Persistence\Ssalddel.Simulation.Persistence.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Server\Ssalddel.Simulation.Server.csproj" />
   </ItemGroup>
 

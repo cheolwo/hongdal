@@ -1,25 +1,17 @@
-using Ssalddel.Simulation.Application;
-using Ssalddel.Simulation.Domain;
-using Ssalddel.Simulation.Infrastructure;
+using Microsoft.Extensions.Options;
 using Ssalddel.Simulation.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
-builder.Services.Configure<SimulationServerOptions>(
-    builder.Configuration.GetSection(SimulationServerOptions.SectionName));
-builder.Services.AddSingleton<I경영SimulationSessionStore, InMemory경영SimulationSessionStore>();
-builder.Services.AddSingleton<ISimulationSessionSaveStore, InMemorySimulationSessionSaveStore>();
-builder.Services.AddSingleton<경영SimulationSessionService>();
-
-var executionMode = builder.Configuration["SsalddelExecution:Mode"];
-if (!string.Equals(executionMode, "Simulation", StringComparison.Ordinal))
-    throw new InvalidOperationException("Ssalddel.Simulation.Server requires SsalddelExecution:Mode=Simulation.");
+builder.Services.AddSimulationServerServices(builder.Configuration);
+SimulationServerServiceCollectionExtensions.RequireSimulationExecutionMode(
+    builder.Configuration);
 
 var app = builder.Build();
-var simulationOptions = app.Configuration
-    .GetSection(SimulationServerOptions.SectionName)
-    .Get<SimulationServerOptions>() ?? new SimulationServerOptions();
+var simulationOptions = app.Services
+    .GetRequiredService<IOptions<SimulationServerOptions>>()
+    .Value;
 
 app.MapHealthChecks("/health");
 if (simulationOptions.Enabled)

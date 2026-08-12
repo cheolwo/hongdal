@@ -243,7 +243,7 @@ public sealed class 경영SimulationSessionTests
     }
 
     [Fact]
-    public void SimulationServer는_운영서버와UnityAssembly를참조하지않는다()
+    public void SimulationServer는_공공데이터Persistence경계만참조하고_운영Host와Unity는_참조하지않는다()
     {
         var references = typeof(경영SimulationSessionsController).Assembly
             .GetReferencedAssemblies()
@@ -255,6 +255,7 @@ public sealed class 경영SimulationSessionTests
         Assert.DoesNotContain("Ssalddel.Domain", references);
         Assert.DoesNotContain("Ssalddel.Infrastructure", references);
         Assert.DoesNotContain("Ssalddel.Unity", references);
+        Assert.Contains("Ssalddel.Simulation.Persistence", references);
     }
 
     private static 경영SimulationSessionService Service()

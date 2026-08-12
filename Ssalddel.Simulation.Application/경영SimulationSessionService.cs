@@ -122,6 +122,20 @@ namespace Ssalddel.Simulation.Application
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
                 .ConfirmLogisticsMovement(request);
 
+        public SimulationFreightDispatchPreviewSnapshot PreviewFreightDispatch(
+            string sessionStableId,
+            SimulationFreightDispatchPreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .PreviewFreightDispatch(request);
+
+        public 경영SimulationSessionSnapshot ConfirmFreightDispatch(
+            string sessionStableId,
+            SimulationFreightDispatchConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .ConfirmFreightDispatch(request);
+
         public SimulationFreightTransportPreviewSnapshot PreviewFreightTransport(
             string sessionStableId,
             SimulationFreightTransportPreviewRequest request)

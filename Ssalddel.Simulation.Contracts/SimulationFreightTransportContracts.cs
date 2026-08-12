@@ -15,6 +15,7 @@ namespace Ssalddel.Simulation.Contracts
         public string VehicleStableId { get; set; } = string.Empty;
         public decimal VehicleCapacity { get; set; }
         public string VehicleCapacityUnitCode { get; set; } = string.Empty;
+        public SimulationFreightDispatchDecisionSnapshot? DispatchDecision { get; set; }
     }
 
     public sealed class SimulationFreightTransportPreviewRequest
@@ -97,6 +98,7 @@ namespace Ssalddel.Simulation.Contracts
         public int? ArrivedAtDropoffTick { get; set; }
         public int? ReceivedTick { get; set; }
         public string RuleRevision { get; set; } = string.Empty;
+        public SimulationFreightDispatchDecisionSnapshot? DispatchDecision { get; set; }
         public string[] ExcludedOperationalEffectCodes { get; set; } = Array.Empty<string>();
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
         public SimulationFreightTransportTransitionSnapshot[] StateHistory { get; set; }

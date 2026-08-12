@@ -9,6 +9,7 @@ namespace Ssalddel.Simulation.Domain
     {
         private const string FoolCardStableId = "learning:hongik.fool.beginner-mind";
         private const string ChariotCardStableId = "learning:hongik.chariot.integrated-progress";
+        internal const string TarotChariotCardStableId = "tarot:major.chariot";
         internal const string SeoulLivingCultureCardStableId =
             "culture:kr-seoul.living-culture-question.2026";
         private readonly List<SimulationTurnClosingSnapshot> turnClosings =
@@ -34,6 +35,7 @@ namespace Ssalddel.Simulation.Domain
                         ? Array.Empty<string>()
                         : new[] { "SimulationDurationCompleted" },
                     AvailableCards = CreateAvailableTurnCards(),
+                    TarotDraw = CreateTarotDraw(),
                 };
             }
         }
@@ -96,6 +98,9 @@ namespace Ssalddel.Simulation.Domain
                         CardStableId = card.CardStableId,
                         CardRevision = card.CardRevision,
                         CardKindCode = card.CardKindCode,
+                        CardCopyStableId = card.CardCopyStableId,
+                        OfferStableId = card.OfferStableId,
+                        OrientationCode = card.OrientationCode,
                         EffectCode = card.EffectCode,
                         TargetStatCode = card.TargetStatCode,
                         StatDelta = card.StatDelta,
@@ -128,12 +133,32 @@ namespace Ssalddel.Simulation.Domain
                 throw new SimulationContractException("SimulationTurnCardSelectionInvalid");
             if (request.SelectedCardStableIds.Length > 1)
                 throw new SimulationContractException("SimulationTurnCardSelectionLimitExceeded");
+            if (request.SelectedCardStableIds.Length > 0
+                && request.SelectedTarotCard != null)
+            {
+                throw new SimulationContractException("SimulationTurnCardSelectionLimitExceeded");
+            }
             foreach (var cardStableId in request.SelectedCardStableIds)
                 RequireStableId(cardStableId, "SimulationTurnCardStableIdInvalid");
             if (request.SelectedCardStableIds.Distinct(StringComparer.Ordinal).Count()
                 != request.SelectedCardStableIds.Length)
             {
                 throw new SimulationContractException("SimulationTurnCardSelectionDuplicate");
+            }
+            if (request.SelectedTarotCard != null)
+            {
+                RequireStableId(request.SelectedTarotCard.OfferStableId,
+                    "SimulationTarotOfferStableIdInvalid");
+                RequireStableId(request.SelectedTarotCard.CardStableId,
+                    "SimulationTurnCardStableIdInvalid");
+                if (request.SelectedTarotCard.OrientationCode
+                        != Simulation타로카드방향Codes.Upright
+                    && request.SelectedTarotCard.OrientationCode
+                        != Simulation타로카드방향Codes.Reversed)
+                {
+                    throw new SimulationContractException(
+                        "SimulationTarotOrientationInvalid");
+                }
             }
         }
 
@@ -151,8 +176,12 @@ namespace Ssalddel.Simulation.Domain
             SimulationTurnClosingPreviewRequest request)
         {
             ValidateTurnClosingPreviewRequest(request);
+            var tarot = request.SelectedTarotCard;
             return request.ExpectedRevision + "|"
-                + string.Join(",", request.SelectedCardStableIds.Select(value => value.Trim()));
+                + string.Join(",", request.SelectedCardStableIds.Select(value => value.Trim()))
+                + "|" + (tarot?.OfferStableId.Trim() ?? string.Empty)
+                + "|" + (tarot?.CardStableId.Trim() ?? string.Empty)
+                + "|" + (tarot?.OrientationCode ?? string.Empty);
         }
 
         private SimulationTurnClosingPreviewSnapshot CreateTurnClosingPreview(
@@ -166,6 +195,24 @@ namespace Ssalddel.Simulation.Domain
                 if (!available.TryGetValue(stableId.Trim(), out var card))
                     throw new SimulationConflictException("SimulationTurnCardUnavailable");
                 selected.Add(CloneTurnCard(card));
+            }
+            if (request.SelectedTarotCard != null)
+            {
+                var selection = request.SelectedTarotCard;
+                var offer = CreateTarotDraw().Offers.SingleOrDefault(value =>
+                    value.OfferStableId == selection.OfferStableId.Trim());
+                if (offer == null)
+                    throw new SimulationConflictException("SimulationTarotOfferUnavailable");
+                if (offer.Card.CardStableId != selection.CardStableId.Trim()
+                    || offer.OrientationCode != selection.OrientationCode)
+                {
+                    throw new SimulationConflictException("SimulationTarotOfferMismatch");
+                }
+                var card = CloneTurnCard(offer.Card);
+                card.CardCopyStableId = offer.CardCopyStableId;
+                card.OfferStableId = offer.OfferStableId;
+                card.OrientationCode = offer.OrientationCode;
+                selected.Add(card);
             }
 
             var closingTurnNumber = CurrentTick + 1;
@@ -254,6 +301,14 @@ namespace Ssalddel.Simulation.Domain
                 .ToArray();
         }
 
+        private Simulation타로DrawSnapshot CreateTarotDraw()
+            => new Simulation타로카드뽑기().Draw(
+                ScenarioSeed,
+                CurrentTick + 1,
+                turnClosings.SelectMany(value => value.SelectedCards)
+                    .Where(value => value.CardKindCode == SimulationTurnCardKindCodes.Tarot)
+                    .Select(value => value.OfferStableId));
+
         public static void ValidateCultureCard(SimulationTurnCardSnapshot card)
         {
             if (card == null
@@ -288,6 +343,9 @@ namespace Ssalddel.Simulation.Domain
                 CardStableId = source.CardStableId,
                 CardRevision = source.CardRevision,
                 CardKindCode = source.CardKindCode,
+                CardCopyStableId = source.CardCopyStableId,
+                OfferStableId = source.OfferStableId,
+                OrientationCode = source.OrientationCode,
                 Title = source.Title,
                 Summary = source.Summary,
                 EffectTimingCode = source.EffectTimingCode,
@@ -323,6 +381,9 @@ namespace Ssalddel.Simulation.Domain
                 CardStableId = source.CardStableId,
                 CardRevision = source.CardRevision,
                 CardKindCode = source.CardKindCode,
+                CardCopyStableId = source.CardCopyStableId,
+                OfferStableId = source.OfferStableId,
+                OrientationCode = source.OrientationCode,
                 EffectCode = source.EffectCode,
                 TargetStatCode = source.TargetStatCode,
                 StatDelta = source.StatDelta,

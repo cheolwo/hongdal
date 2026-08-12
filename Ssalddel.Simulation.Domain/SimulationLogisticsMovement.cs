@@ -484,6 +484,7 @@ namespace Ssalddel.Simulation.Domain
                 request.VehicleStableId.Trim(),
                 request.VehicleCapacity.ToString(CultureInfo.InvariantCulture),
                 request.VehicleCapacityUnitCode.Trim(),
+                BuildFreightDispatchDecisionPayloadKey(request.DispatchDecision),
             });
 
         private static string DestinationCandidateId(string cargoStableId)

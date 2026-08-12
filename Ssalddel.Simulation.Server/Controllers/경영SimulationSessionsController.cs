@@ -244,6 +244,23 @@ public sealed class 경영SimulationSessionsController(
         [FromBody] SimulationLogisticsMovementConfirmRequest request)
         => Execute(() => Ok(service.ConfirmLogisticsMovement(sessionStableId, request)));
 
+    [HttpPost("{sessionStableId}/freight-dispatch-previews")]
+    [ProducesResponseType(
+        typeof(SimulationFreightDispatchPreviewSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationFreightDispatchPreviewSnapshot> PreviewFreightDispatch(
+        string sessionStableId,
+        [FromBody] SimulationFreightDispatchPreviewRequest request)
+        => ExecuteFreightDispatch(() => Ok(
+            service.PreviewFreightDispatch(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/freight-dispatches/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmFreightDispatch(
+        string sessionStableId,
+        [FromBody] SimulationFreightDispatchConfirmRequest request)
+        => Execute(() => Ok(service.ConfirmFreightDispatch(sessionStableId, request)));
+
     [HttpPost("{sessionStableId}/freight-transport-previews")]
     [ProducesResponseType(
         typeof(SimulationFreightTransportPreviewSnapshot),
@@ -766,6 +783,27 @@ public sealed class 경영SimulationSessionsController(
 
     private ActionResult<SimulationFreightTransportPreviewSnapshot> ExecuteFreightTransport(
         Func<ActionResult<SimulationFreightTransportPreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<SimulationFreightDispatchPreviewSnapshot> ExecuteFreightDispatch(
+        Func<ActionResult<SimulationFreightDispatchPreviewSnapshot>> action)
     {
         try
         {

@@ -23,6 +23,7 @@ public sealed class SimulationTurnClosingTests
         Assert.Equal(new DateTimeOffset(2026, 4, 1, 0, 0, 0, TimeSpan.Zero), context.GameDate);
         Assert.True(context.CanCloseTurn);
         Assert.Equal(3, context.AvailableCards.Length);
+        Assert.Equal(3, context.TarotDraw.Offers.Length);
         Assert.All(context.AvailableCards.Where(card =>
             card.CardKindCode == SimulationTurnCardKindCodes.Philosophy), card =>
         {

@@ -521,6 +521,9 @@ namespace Ssalddel.Simulation.Domain
                     Add(target, effect.CardStableId);
                     Add(target, effect.CardRevision);
                     Add(target, effect.CardKindCode);
+                    Add(target, effect.CardCopyStableId);
+                    Add(target, effect.OfferStableId);
+                    Add(target, effect.OrientationCode);
                     Add(target, effect.EffectCode);
                     Add(target, effect.TargetStatCode);
                     Add(target, effect.StatDelta);
@@ -542,6 +545,9 @@ namespace Ssalddel.Simulation.Domain
             Add(target, card.CardStableId);
             Add(target, card.CardRevision);
             Add(target, card.CardKindCode);
+            Add(target, card.CardCopyStableId);
+            Add(target, card.OfferStableId);
+            Add(target, card.OrientationCode);
             Add(target, card.Title);
             Add(target, card.Summary);
             Add(target, card.EffectTimingCode);
@@ -907,6 +913,7 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.ArrivedAtDropoffTick ?? -1);
             Add(target, value.ReceivedTick ?? -1);
             Add(target, value.RuleRevision);
+            AddFreightDispatchDecision(target, value.DispatchDecision);
             AddStrings(target, value.ExcludedOperationalEffectCodes);
             AddStrings(target, value.SourceStableIds);
             Add(target, value.StateHistory.Length);
@@ -917,6 +924,46 @@ namespace Ssalddel.Simulation.Domain
                 Add(target, transition.WorldTick);
                 Add(target, transition.CauseStableId);
                 Add(target, transition.RuleRevision);
+            }
+        }
+
+        private static void AddFreightDispatchDecision(
+            StringBuilder target,
+            SimulationFreightDispatchDecisionSnapshot? value)
+        {
+            Add(target, value == null ? 0 : 1);
+            if (value == null) return;
+            Add(target, value.DispatchOfferStableId);
+            Add(target, value.TransportRequestStableId);
+            Add(target, value.RecommendedCarrierCandidateStableId ?? string.Empty);
+            Add(target, value.SelectedCarrierCandidateStableId ?? string.Empty);
+            Add(target, value.SelectedVehicleStableId ?? string.Empty);
+            Add(target, value.RuleRevision);
+            AddStrings(target, value.SourceStableIds);
+            Add(target, value.CandidateEvaluations.Length);
+            foreach (var candidate in value.CandidateEvaluations)
+            {
+                Add(target, candidate.CarrierCandidateStableId);
+                Add(target, candidate.VehicleStableId);
+                Add(target, candidate.IsEligible ? 1 : 0);
+                Add(target, candidate.IsRecommended ? 1 : 0);
+                Add(target, candidate.IsSelected ? 1 : 0);
+                Add(target, candidate.Rank);
+                Add(target, candidate.PickupDistanceKm ?? decimal.MinValue);
+                Add(target, candidate.VehicleCapacity);
+                Add(target, candidate.VehicleCapacityUnitCode);
+                Add(target, candidate.Reason);
+                AddStrings(target, candidate.BlockReasonCodes);
+                Add(target, candidate.Score.ScheduleScore);
+                Add(target, candidate.Score.ProfitScore);
+                Add(target, candidate.Score.DelayScore);
+                Add(target, candidate.Score.DistanceScore);
+                Add(target, candidate.Score.RecommendationTypeScore);
+                Add(target, candidate.Score.CargoSensitivityScore);
+                Add(target, candidate.Score.ReturnBurdenScore);
+                Add(target, candidate.Score.BaseScore);
+                Add(target, candidate.Score.DriverWaitingScore);
+                Add(target, candidate.Score.TotalScore);
             }
         }
 
@@ -1292,6 +1339,14 @@ namespace Ssalddel.Simulation.Domain
                 {
                     ExpectedRevision = source.Preview.ExpectedRevision,
                     SelectedCardStableIds = source.Preview.SelectedCardStableIds.ToArray(),
+                    SelectedTarotCard = source.Preview.SelectedTarotCard == null
+                        ? null
+                        : new Simulation타로CardSelectionRequest
+                        {
+                            OfferStableId = source.Preview.SelectedTarotCard.OfferStableId,
+                            CardStableId = source.Preview.SelectedTarotCard.CardStableId,
+                            OrientationCode = source.Preview.SelectedTarotCard.OrientationCode,
+                        },
                 },
             };
 

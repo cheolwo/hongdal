@@ -128,6 +128,7 @@ public sealed class SimulationServerHttpBoundaryTests
                         {
                             ["SsalddelExecution:Mode"] = "Simulation",
                             ["SimulationServer:Enabled"] = enabled.ToString(),
+                            ["SimulationSharedPublicData:Enabled"] = "false",
                         });
                 });
             });

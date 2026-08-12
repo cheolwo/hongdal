@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4c99c95e-78d5-44f3-9c91-04d8dc8576c9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +12,7 @@
     <ProjectReference Include="..\Ssalddel.Simulation.Contracts\Ssalddel.Simulation.Contracts.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Domain\Ssalddel.Simulation.Domain.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Infrastructure\Ssalddel.Simulation.Infrastructure.csproj" />
+    <ProjectReference Include="..\Ssalddel.Simulation.Persistence\Ssalddel.Simulation.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

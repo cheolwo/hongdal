@@ -4,6 +4,7 @@ namespace Ssalddel.Simulation.Contracts
 {
     public static class SimulationTurnCardKindCodes
     {
+        public const string Tarot = "Tarot";
         public const string Philosophy = "Philosophy";
         public const string Culture = "Culture";
     }
@@ -15,6 +16,10 @@ namespace Ssalddel.Simulation.Contracts
 
     public static class SimulationTurnCardEffectCodes
     {
+        public const string EmpressProductionGrowth = "EmpressProductionGrowth";
+        public const string ChariotFastTransport = "ChariotFastTransport";
+        public const string JusticeTradeBalance = "JusticeTradeBalance";
+        public const string TemperanceFlowBalance = "TemperanceFlowBalance";
         public const string BeginnerMind = "BeginnerMind";
         public const string IntegratedProgress = "IntegratedProgress";
         public const string LocalContextAwareness = "LocalContextAwareness";
@@ -25,6 +30,9 @@ namespace Ssalddel.Simulation.Contracts
         public string CardStableId { get; set; } = string.Empty;
         public string CardRevision { get; set; } = string.Empty;
         public string CardKindCode { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
+        public string OfferStableId { get; set; } = string.Empty;
+        public string OrientationCode { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
         public string EffectTimingCode { get; set; } = SimulationTurnCardEffectTimingCodes.NextTurn;
@@ -52,12 +60,16 @@ namespace Ssalddel.Simulation.Contracts
         public string[] BlockReasonCodes { get; set; } = Array.Empty<string>();
         public SimulationTurnCardSnapshot[] AvailableCards { get; set; }
             = Array.Empty<SimulationTurnCardSnapshot>();
+        public Simulation타로DrawSnapshot TarotDraw { get; set; }
+            = new Simulation타로DrawSnapshot();
     }
 
     public sealed class SimulationTurnClosingPreviewRequest
     {
         public long ExpectedRevision { get; set; }
         public string[] SelectedCardStableIds { get; set; } = Array.Empty<string>();
+        public Simulation타로CardSelectionRequest? SelectedTarotCard { get; set; }
+            = null;
     }
 
     public sealed class SimulationTurnClosingPreviewSnapshot
@@ -98,6 +110,9 @@ namespace Ssalddel.Simulation.Contracts
         public string CardStableId { get; set; } = string.Empty;
         public string CardRevision { get; set; } = string.Empty;
         public string CardKindCode { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
+        public string OfferStableId { get; set; } = string.Empty;
+        public string OrientationCode { get; set; } = string.Empty;
         public string EffectCode { get; set; } = string.Empty;
         public string TargetStatCode { get; set; } = string.Empty;
         public int StatDelta { get; set; }
