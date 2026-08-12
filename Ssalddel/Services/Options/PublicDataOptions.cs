@@ -60,6 +60,8 @@ public sealed class PublicDataOptions
 
     public NongsaroOpenApiOptions Nongsaro { get; set; } = new();
 
+    public KmaAsosOptions KmaAsos { get; set; } = new();
+
     public MaffRegionalCuisineOptions MaffRegionalCuisine { get; set; } = new();
 
     public JapanRegionalDataOptions Japan { get; set; } = new();
@@ -341,6 +343,14 @@ public sealed class NongsaroOpenApiOptions
     public string ApiKey { get; set; } = string.Empty;
 
     public string BaseUrl { get; set; } = "https://api.nongsaro.go.kr";
+}
+
+public sealed class KmaAsosOptions
+{
+    public string BaseUrl { get; set; } = "https://apis.data.go.kr";
+
+    public string DailyPath { get; set; }
+        = "/1360000/AsosDalyInfoService/getWthrDataList";
 }
 
 public sealed class MaffRegionalCuisineOptions

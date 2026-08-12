@@ -69,6 +69,22 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I공통식품품목기존Data대조UseCase,
             공통식품품목기존Data대조UseCase>();
         services.AddTransient<I농사로농작업일정Module, 농사로농작업일정Module>();
+        services.AddScoped<I농사로감자생육요구Profile조회UseCase,
+            농사로감자생육요구Profile조회UseCase>();
+        services
+            .AddHttpClient<I기상청Asos일관측Client, 기상청Asos일관측Client>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider
+                        .GetRequiredService<IOptions<PublicDataOptions>>()
+                        .Value;
+                    client.BaseAddress = new Uri(options.KmaAsos.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                        "Ssalddel-KMA-ASOS-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(
+                        Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
         services.AddTransient<I농사로농작물재해예방Module,
             농사로농작물재해예방Module>();
         services.AddTransient<I농사로품종정보Module, 농사로품종정보Module>();
