@@ -121,6 +121,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I마트주문요청조회UseCase, 마트주문요청조회UseCase>();
         services.AddScoped<I마트주문요청작성UseCase, 마트주문요청작성UseCase>();
         services.AddScoped<I마트피킹조회UseCase, 마트피킹조회UseCase>();
+        services.AddSingleton<마트피킹포장WorldProjector>();
+        services.AddScoped<I마트피킹포장World조회UseCase, 마트피킹포장World조회UseCase>();
         services.AddScoped<I공공데이터조회UseCase, 공공데이터조회UseCase>();
         services.AddSingleton<I공동구매상품CatalogUseCase, 공동구매상품CatalogUseCase>();
         services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();

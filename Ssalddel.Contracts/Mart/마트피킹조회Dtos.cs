@@ -109,6 +109,12 @@ public sealed class 마트피킹작업응답
 
     public string 작업자표시명 { get; set; } = string.Empty;
 
+    public long? 입고상품Id { get; set; }
+
+    public string? 이전작업Key { get; set; }
+
+    public string? 다음작업Key { get; set; }
+
     public string 라인Key { get; set; } = string.Empty;
 
     public string 상품명 { get; set; } = string.Empty;
@@ -120,6 +126,8 @@ public sealed class 마트피킹작업응답
     public string? 적재대코드 { get; set; }
 
     public string? 보관위치코드 { get; set; }
+
+    public string? 묶음바코드 { get; set; }
 
     public DateTime? 시작일시Utc { get; set; }
 

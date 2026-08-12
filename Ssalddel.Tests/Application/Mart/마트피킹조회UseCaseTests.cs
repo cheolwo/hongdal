@@ -55,6 +55,12 @@ public sealed class 마트피킹조회UseCaseTests
         Assert.Equal("MART-A", found.Value.주문참조번호);
         Assert.Equal(2, found.Value.작업목록.Count);
         Assert.All(found.Value.작업목록, task => Assert.Equal(seeded.OwnWarehouseId, task.창고Id));
+        var picking = found.Value.작업목록.Single(task => task.작업Key == "PICK-A");
+        Assert.Equal(71, picking.입고상품Id);
+        Assert.Equal("PACK-A", picking.다음작업Key);
+        Assert.Equal("TOTE-A", picking.묶음바코드);
+        var packing = found.Value.작업목록.Single(task => task.작업Key == "PACK-A");
+        Assert.Equal("PICK-A", packing.이전작업Key);
         Assert.True(hidden.IsFailed);
         Assert.Equal(404, hidden.Errors.Single().Metadata["StatusCode"]);
     }
@@ -170,11 +176,15 @@ public sealed class 마트피킹조회UseCaseTests
                 창고명 = ownWarehouse.창고명,
                 작업자UserId = "worker-a",
                 작업자표시명 = "작업자 A",
+                입고상품Id = 71,
+                다음작업Key = "PACK-A",
                 주문참조번호 = ownOrder.주문참조번호,
                 라인Key = "LINE-A",
                 상품명 = "생수 6입",
                 SKU = "WATER-6",
                 수량 = 3,
+                적재대코드 = "A-03-02",
+                묶음바코드 = "TOTE-A",
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -189,11 +199,13 @@ public sealed class 마트피킹조회UseCaseTests
                 작업자UserId = "packer-a",
                 작업자표시명 = "포장 A",
                 상대작업자UserId = "worker-a",
+                이전작업Key = "PICK-A",
                 주문참조번호 = ownOrder.주문참조번호,
                 라인Key = "LINE-A",
                 상품명 = "생수 6입",
                 SKU = "WATER-6",
                 수량 = 2,
+                묶음바코드 = "TOTE-A",
                 CreatedAt = now,
                 UpdatedAt = now.AddMinutes(10)
             },
