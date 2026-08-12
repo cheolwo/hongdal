@@ -54,6 +54,14 @@ SimulationWorldShell의 Farm·Logistics·Market·Town 구역에 배치
 | Scene 배치 검증 | Scene·구역·배치 규격 개정 번호·배치 기준점·데이터 연결 검증 | 7개 배치 |
 | 검증기와 테스트 | 중복 식별자, 누락 연결 지점, 외곽 범위, 잘못된 데이터 연결, 권한 누출 차단 | 서버·Unity 변환기·EditMode 적용 |
 
+### Unity 클라이언트 책임 분리 현황
+
+2026-08-12의 `UNITY-CLIENT-REFACTOR-1`에서는 통합 전시관 Presenter가 예행 연습용 상태까지 직접 만들던 책임을 분리했다. 예행 연습 상태 생성은 Runtime의 `통합전시관FixtureApiModelFactory`가 담당하고, Presenter는 전달받은 `통합전시관Snapshot`을 선택·표시하는 역할만 맡는다. 따라서 현재 화면은 기존 예행 연습 상태로 그대로 실행하면서도, 다음 단계에서 시뮬레이션 서버의 관점별 조회 결과를 Unity용 변환기로 바꿔 같은 Presenter에 주입할 수 있다.
+
+운영 서버와 게임 세계·예행 연습 서버의 UnityWebRequest API Client도 각각 자신이 사용하는 서버 주소만 검증하도록 분리했다. 한 서버의 주소가 잘못됐다는 이유로 다른 서버용 Client 생성까지 실패하지 않는다. 전체 실행 설정을 구성할 때는 기존 `UnityClientRuntimeOptions.Validate()`가 두 주소, 상세 페이지 주소, 실행 모드와 예행 연습 데이터 허용 정책을 함께 검증하므로 전체 구성 안전성은 유지된다.
+
+아직 구현하지 않은 부분은 시뮬레이션 서버에서 통합 전시관 상태 사본을 실제 HTTP로 조회하는 저장소, 로딩·재시도·취소 처리, 서버 개정 번호가 뒤바뀌었을 때 기존 화면을 보존하는 처리다. 이번 리팩토링은 이를 연결할 주입 경계까지만 준비했으며 실운영 API 호출이나 업무 확정 기능은 추가하지 않았다.
+
 ## 5. O6 실제 World 배치 검증 완료 모듈 7개
 
 이 표의 배치 객체는 모판 미리보기와 별도로 `SimulationWorldShell` 배치까지 검증됐다.
@@ -146,6 +154,10 @@ EXH-5 업무 흐름과 음식배달 상태 계보는 구현되어 있지만, 다
 - Unity 배치 객체 모판: 프로젝트용 Prefab 15개와 2열 선택 UI, EditMode 5/5, Game View 확인
 - Unity Scene 배치 검증: 7/7
 - 기존 `SimulationWorldShell` 회귀: 10/10
+- `UNITY-CLIENT-REFACTOR-1` 집중 검증: 통합 전시관 책임 분리 7/7, 두 서버 Client 독립 설정과 World 초기화 7/7
+- Unity 전체 EditMode 회귀: 264개 중 263개 통과. 실패 1개는 연구 Scene 파일 수를 27개로 고정한 기존 테스트와 실제 29개 Scene의 불일치이며, 이번 Client 리팩토링 경로의 실패는 아니다
 - 서버 조회 결과 생성기 집중 테스트: 24/24
 - Unity용 변환기 집중 테스트: 25/25
-- 운영 API·provider 호출·배포·commit·push: 수행하지 않음
+- Unity 스크립트 재컴파일: 오류 0건
+- Scene·Prefab·카메라·UI 변경과 Game View 변화: 없음
+- 운영 API·시뮬레이션 API·외부 provider 호출과 배포: 수행하지 않음
