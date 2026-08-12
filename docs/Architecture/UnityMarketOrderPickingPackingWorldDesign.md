@@ -105,7 +105,7 @@ AND 피킹 작업 생성
 
 이 흐름은 완성 Scene 하나가 아니라 다음 배치 객체의 조합으로 만든다.
 
-1. 운영자 전용 재고 Shelf: 재고 항목과 적재 위치를 표현하고 `InventoryAccess`, `PickPoint` 연결 지점을 가진다.
+1. 운영자 전용 재고 Shelf: 주소 지정 가능한 적재·피킹 위치 한 곳을 나타낸다. 기존 Prefab의 `Inventory`, `ShelfTask`, `Operator` 연결 지점을 사용하고, NPC 이동은 공간 대장의 Rack 접근점과 상품 피킹점을 사용한다. 세부 판정은 [운영자 전용 재고 Shelf 심층 연구](UnityOperatorInventoryShelfDeepStudy.md)를 따른다.
 2. 마트 Picker NPC: 서버 작업을 표현하지만 완료를 소유하지 않으며 `Carry`, `LookTarget`, `Home` 연결 지점을 가진다.
 3. 피킹 Tote 또는 Cart: 여러 주문 라인의 피킹 결과를 포장 묶음 단위로 모은다.
 4. 포장 작업대: `PackingInput`, `PackageOutput`, `OperatorStand` 연결 지점을 가진다.
@@ -164,6 +164,52 @@ PickingReady → PickingInProgress → Picked → PackingReady
 ```
 
 첫 단계에서는 포장 완료·기사 배차·실운영 재고 변경까지 연결하지 않는다. 서버 상태 사본을 읽어 NPC가 Rack과 포장대로 이동하는 표현, 개정 번호 보존, 취소와 위치 누락 처리까지 검증한다.
+
+### 11.1 서버 상태 사본 구현 상태
+
+`MARKET-PICK-PACK-SERVER-1`에서 다음 읽기 전용 API를 추가했다.
+
+```text
+GET api/v1/warehouse-operations/mart/world/picking-packing?warehouseId={창고 ID}
+```
+
+이 경로는 현재 `Ssalddel` 운영 서버의 권한 제한 관점별 조회 결과다. Simulation 세션의 가상 주문·가상 재고를 같은 계약으로 공급하는 adapter는 아직 구현하지 않았으며, Unity는 두 서버의 결과를 혼합하지 않아야 한다.
+
+현재 구현된 범위는 다음과 같다.
+
+- 마트 주문과 피킹·포장 작업의 선후 관계를 하나의 업무 흐름으로 연결
+- 주문 품목, 재고 항목, Rack 위치, Tote 묶음과 포장대 입력 배치 기준점을 상태 사본에 포함
+- 원문 주문 참조번호 대신 해시 기반 업무 흐름·주문 라인·작업 고유 식별자 제공
+- 요청한 창고의 작업만 포함하며 다른 창고 작업은 제외
+- Rack 위치 누락 시 `LocationUnmapped`로 표시하고 NPC 이동을 만들지 않음
+- 피킹 완료 뒤 후속 포장 작업이 있으면 `market.rack:{위치}:pick → market.packing:station-01:input` 이동으로 해석
+- 포장 작업은 이전 피킹 완료 여부에 따라 `AwaitingPicking`과 `PackingReady`를 구분
+- 최대 50개 주문을 반환하며 초과 여부를 `IsTruncated`로 명시
+- SHA-256 내용 개정 문자열과 수정 시각 기반 비교용 개정 번호를 함께 제공하여 Unity가 이전 상태 사본을 거부할 수 있게 함
+
+이 API는 서버 상태를 변경하지 않는다. Unity에서 NPC가 목적지에 도착하더라도 피킹이나 포장을 완료시키지 않으며, 완료는 기존 서버 작업 API와 기준 원장 재조회로만 확인한다.
+
+### 11.2 Unity 운영 서버 읽기 구현 상태
+
+`UNITY-MARKET-PICK-PACK-CLIENT-1`에서 다음 경계를 추가했다.
+
+```text
+운영 서버 API Client
+    ↓ 인증된 마트 피킹·포장 상태 사본 조회
+Unity용 데이터 변환
+    ↓ 서버 DTO와 분리된 상태 모델
+관계·공개 범위 검증
+    ↓
+개정 번호 보호 상태 저장소
+    ↓
+후속 모판 Presenter 입력
+```
+
+- 낮은 개정 번호는 `MarketPickingPackingWorldRevisionRegressed`로 거부
+- 같은 개정 번호의 서로 다른 내용은 `MarketPickingPackingWorldRevisionConflict`로 거부
+- 위치 미연결 작업이 표현 준비 상태로 들어오면 거부
+- 조회 실패나 취소가 이미 수락한 마지막 성공 상태 사본을 덮어쓰지 않음
+- 실제 Scene, NPC, NavMesh와 배치 기준점 대장 연결은 다음 단계로 남김
 
 ## 12. 완료 조건
 

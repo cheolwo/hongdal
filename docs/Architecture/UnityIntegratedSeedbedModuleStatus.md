@@ -96,10 +96,12 @@ SimulationWorldShell의 Farm·Logistics·Market·Town 구역에 배치
 | 감자 재배체 | `seedbed-object:farm.potato-plant-visual.a` | CanonicalProductCultivation·FarmEnvironmentalGrowthTurn | 생육 Visual variant 배치 |
 | 밭 관수 스프링클러 | `seedbed-object:farm.irrigation-sprinkler.a` | FarmEnvironmentalGrowthTurn·AgriculturalWeatherObservation | 관측과 시뮬레이션 혼합 방지 배치 |
 | 주민 관점 Visual | `seedbed-object:town.resident-visual.a` | IndividualIntent·OwnerAuthorizedPerspective | 실제 사람 식별 정보·개인 의향 비소유 상태로 Town 배치 |
-| 운영자 전용 재고 Shelf | `seedbed-object:city.operator-inventory-shelf.a` | MarketInventory·ShelfTask | 운영자 권한 전용 구역 배치 |
+| 운영자 전용 재고 Shelf | `seedbed-object:city.operator-inventory-shelf.a` | MarketInventory·ShelfTask | 위치별 실제 재고·피킹 작업 연결 완료, 운영자 권한 전용 구역 배치 |
 | 마트 운영자 Visual | `seedbed-object:city.market-operator-visual.a` | MarketInventory·ShelfTask·MarketOperatorPerspective | 시각 표현과 권한 소유 분리 배치 |
 
 운영자 전용 재고 Shelf와 마트 운영자 Visual을 주문 상품의 실제 적재 위치, 피킹 Tote와 포장 작업대로 연결하는 다음 설계는 [마트 주문 피킹·포장 World 설계](UnityMarketOrderPickingPackingWorldDesign.md)를 따른다.
+
+운영자 전용 재고 Shelf는 [심층 연구](UnityOperatorInventoryShelfDeepStudy.md)에 따라 창고 전체나 단일 상품이 아니라 주소 지정 가능한 적재·피킹 위치 한 곳으로 정의했다. 서버의 실제 가용·예약 재고와 연결 피킹 작업을 Unity 읽기 모델까지 연결했지만 특정 Scene 배치와 Game View는 아직 검증하지 않았으므로 O5 모판 실행 검증 완료 상태를 유지한다.
 
 다음 우선순위는 배치 수를 늘리는 작업이 아니라 [15개 배치 객체 심층 연구](UnitySeedbedObjectDeepStudyPriority.md)다. 첫 대상인 감자 재배체는 [재배 규모·생산 능력·품목 속성](UnityPotatoPlantScaleYieldProductAttributeStudy.md)의 세 갈래로 나누고, 대표 단위부터 순서대로 판정한다. 감자 이후 객체의 같은 질문 비교는 [배치 객체 수평 연구 대장](UnitySeedbedObjectHorizontalStudyMatrix.md)을 사용한다. 기존 `OBJ-7D 주민 관점 Visual` 배치는 연구 결과가 쌓일 때까지 보류한다.
 
