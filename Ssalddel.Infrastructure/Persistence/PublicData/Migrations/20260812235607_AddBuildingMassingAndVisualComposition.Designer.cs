@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ssalddel.Infrastructure.Persistence.PublicData;
 
@@ -11,9 +12,11 @@ using Ssalddel.Infrastructure.Persistence.PublicData;
 namespace Ssalddel.Infrastructure.Persistence.PublicData.Migrations
 {
     [DbContext(typeof(PublicDataIngestionDbContext))]
-    partial class PublicDataIngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260812235607_AddBuildingMassingAndVisualComposition")]
+    partial class AddBuildingMassingAndVisualComposition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,61 +24,6 @@ namespace Ssalddel.Infrastructure.Persistence.PublicData.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.건축물공개사업장Aggregate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("AggregateHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.Property<Guid>("BuildingRecordId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("ClosedBusinessCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EvidenceKindCode")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<DateTimeOffset>("GeneratedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("OpenBusinessCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RuleRevision")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("SourceRevision")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<int>("SuspendedBusinessCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalBusinessCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnresolvedStatusCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildingRecordId", "SourceRevision", "RuleRevision")
-                        .IsUnique();
-
-                    b.ToTable("public_building_business_aggregates", (string)null);
-                });
 
             modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.건축물대장표제부Record", b =>
                 {
@@ -124,10 +72,6 @@ namespace Ssalddel.Infrastructure.Persistence.PublicData.Migrations
                     b.Property<string>("MainPurposeName")
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
-
-                    b.Property<string>("NormalizedRoadAddressKey")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
 
                     b.Property<DateTimeOffset>("ObservedAtUtc")
                         .HasColumnType("datetime(6)");
@@ -660,173 +604,6 @@ namespace Ssalddel.Infrastructure.Persistence.PublicData.Migrations
                     b.ToTable("public_building_massing_profiles", (string)null);
                 });
 
-            modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.공개사업장건축물Assignment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("AssignmentMethodCode")
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
-
-                    b.Property<string>("AssignmentStatusCode")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<Guid?>("BuildingRecordId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("BusinessRecordId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("CandidateBuildingCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConfidenceCode")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<DateTimeOffset>("EvaluatedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("RuleRevision")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildingRecordId", "AssignmentStatusCode");
-
-                    b.HasIndex("BusinessRecordId", "RuleRevision")
-                        .IsUnique();
-
-                    b.ToTable("public_business_building_assignments", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.공개인허가사업장Record", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("BusinessName")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
-
-                    b.Property<string>("BusinessStatusCode")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<string>("BusinessStatusName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("BusinessTypeName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<DateOnly?>("ClosureDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("DetailedStatusCode")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<string>("DetailedStatusName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<long?>("EvidenceSnapshotId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("LicenseCategoryName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<DateOnly?>("LicenseDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("LotAddress")
-                        .HasMaxLength(600)
-                        .HasColumnType("varchar(600)");
-
-                    b.Property<string>("ManagementNumber")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("varchar(160)");
-
-                    b.Property<string>("NormalizedRoadAddressKey")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<DateTimeOffset>("ObservedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("OpenServiceId")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
-
-                    b.Property<string>("OpenServiceName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("RoadAddress")
-                        .HasMaxLength(600)
-                        .HasColumnType("varchar(600)");
-
-                    b.Property<string>("SourceCoordinateReferenceSystem")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<decimal?>("SourceCoordinateX")
-                        .HasPrecision(20, 8)
-                        .HasColumnType("decimal(20,8)");
-
-                    b.Property<decimal?>("SourceCoordinateY")
-                        .HasPrecision(20, 8)
-                        .HasColumnType("decimal(20,8)");
-
-                    b.Property<string>("SourceDatasetId")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("varchar(160)");
-
-                    b.Property<string>("SourceHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.Property<string>("SourceId")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("varchar(160)");
-
-                    b.Property<DateTimeOffset?>("SourceLastModifiedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("SourceRevision")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusinessStatusCode", "SourceRevision");
-
-                    b.HasIndex("NormalizedRoadAddressKey", "SourceRevision");
-
-                    b.HasIndex("SourceId", "OpenServiceId", "ManagementNumber", "SourceRevision")
-                        .IsUnique();
-
-                    b.ToTable("public_licensed_business_records", (string)null);
-                });
-
             modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.행정동건축물CategoryAggregate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1252,17 +1029,6 @@ namespace Ssalddel.Infrastructure.Persistence.PublicData.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.건축물공개사업장Aggregate", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.PublicData.Korea.건축물대장표제부Record", "BuildingRecord")
-                        .WithMany()
-                        .HasForeignKey("BuildingRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BuildingRecord");
-                });
-
             modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.건축물시각구성계획", b =>
                 {
                     b.HasOne("Ssalddel.Domain.PublicData.Korea.건축물형태Profile", "건축물형태Profile")
@@ -1313,24 +1079,6 @@ namespace Ssalddel.Infrastructure.Persistence.PublicData.Migrations
                         .IsRequired();
 
                     b.Navigation("건축물Record");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.공개사업장건축물Assignment", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.PublicData.Korea.건축물대장표제부Record", "BuildingRecord")
-                        .WithMany()
-                        .HasForeignKey("BuildingRecordId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Ssalddel.Domain.PublicData.Korea.공개인허가사업장Record", "BusinessRecord")
-                        .WithMany()
-                        .HasForeignKey("BusinessRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BuildingRecord");
-
-                    b.Navigation("BusinessRecord");
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.PublicData.Korea.행정동건축물CategoryAggregate", b =>
