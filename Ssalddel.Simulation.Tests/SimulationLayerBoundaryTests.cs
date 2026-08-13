@@ -49,6 +49,18 @@ public sealed class SimulationLayerBoundaryTests
             .IsAssignableFrom(typeof(Simulation공유공공데이터Reader)));
     }
 
+    [Fact]
+    public void Persistence는_파생원장Store를_구현하고_Server를_참조하지_않는다()
+    {
+        var references = ReferenceNames(typeof(SimulationWorld파생원장Store).Assembly);
+
+        Assert.Contains("Ssalddel.Simulation.Application", references);
+        Assert.Contains("Ssalddel.Simulation.Domain", references);
+        Assert.DoesNotContain("Ssalddel.Simulation.Server", references);
+        Assert.True(typeof(ISimulationWorld파생원장Store)
+            .IsAssignableFrom(typeof(SimulationWorld파생원장Store)));
+    }
+
     private static IReadOnlySet<string> ReferenceNames(Assembly assembly)
         => assembly.GetReferencedAssemblies()
             .Select(reference => reference.Name ?? string.Empty)

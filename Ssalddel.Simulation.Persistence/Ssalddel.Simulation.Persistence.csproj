@@ -11,9 +11,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Ssalddel.Infrastructure\Ssalddel.Infrastructure.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Application\Ssalddel.Simulation.Application.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Contracts\Ssalddel.Simulation.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.Simulation.Domain\Ssalddel.Simulation.Domain.csproj" />
   </ItemGroup>
 
 </Project>

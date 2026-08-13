@@ -20,6 +20,19 @@ public sealed class SimulationServerHttpBoundaryTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("/health/live")]
+    [InlineData("/health/ready")]
+    public async Task 운영서버와_같은_상태확인_경로를_제공한다(string path)
+    {
+        using var factory = CreateFactory(enabled: false);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(path);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
     [Fact]
     public async Task API가_비활성화되면_Simulation경로를_공개하지_않는다()
     {

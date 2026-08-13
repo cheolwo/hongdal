@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
+using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 
@@ -15,12 +17,47 @@ public static class SimulationSharedPublicDataPersistence
         int maxItems)
     {
         services.AddAgriculturalFisheriesReadOnlyPersistence(connectionString);
+        services.AddSingleton<SimulationSharedPublicDataReadOnlySaveChangesInterceptor>();
+        services.AddDbContext<PublicDataIngestionDbContext>((serviceProvider, options) =>
+            options
+                .UseMySql(
+                    connectionString,
+                    new MySqlServerVersion(new Version(8, 4, 0)),
+                    mysql =>
+                    {
+                        mysql.MigrationsAssembly("Ssalddel.Infrastructure");
+                        mysql.MigrationsHistoryTable(
+                            "__EFMigrationsHistory_PublicDataIngestion");
+                        mysql.EnableRetryOnFailure();
+                    })
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .AddInterceptors(serviceProvider.GetRequiredService<
+                    SimulationSharedPublicDataReadOnlySaveChangesInterceptor>()));
         services.AddSingleton(Options.Create(
             new SimulationSharedPublicDataQueryOptions { MaxItems = maxItems }));
         services.AddScoped<ISimulation공유공공데이터조회Port,
             Simulation공유공공데이터Reader>();
+        services.AddScoped<ISimulationDatabaseReadinessProbe,
+            SimulationSharedPublicDataReadinessProbe>();
         return services;
     }
+}
+
+public sealed class SimulationSharedPublicDataReadOnlySaveChangesInterceptor
+    : SaveChangesInterceptor
+{
+    public const string ErrorCode = "SimulationSharedPublicDataWriteForbidden";
+
+    public override InterceptionResult<int> SavingChanges(
+        DbContextEventData eventData,
+        InterceptionResult<int> result) =>
+        throw new InvalidOperationException(ErrorCode);
+
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default) =>
+        throw new InvalidOperationException(ErrorCode);
 }
 
 public sealed class SimulationSharedPublicDataQueryOptions

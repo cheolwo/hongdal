@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Domain;
 using Ssalddel.Simulation.Infrastructure;
@@ -10,6 +11,8 @@ public static class SimulationServerServiceCollectionExtensions
 {
     public const string ConnectionStringMissingErrorCode =
         "SimulationSharedPublicDataConnectionStringMissing";
+    public const string WorldDerivationConnectionStringMissingErrorCode =
+        "SimulationWorldDerivationConnectionStringMissing";
 
     public static IServiceCollection AddSimulationServerServices(
         this IServiceCollection services,
@@ -25,6 +28,12 @@ public static class SimulationServerServiceCollectionExtensions
                 "공유 공공데이터 연결 문자열 이름이 필요합니다.")
             .Validate(options => options.MaxItems is >= 1 and <= 200,
                 "공유 공공데이터 최대 조회 건수는 1~200이어야 합니다.")
+            .ValidateOnStart();
+        services.AddOptions<SimulationWorldDerivationDatabaseOptions>()
+            .Bind(configuration.GetSection(SimulationWorldDerivationDatabaseOptions.SectionName))
+            .Validate(options => !options.Enabled
+                || !string.IsNullOrWhiteSpace(options.ConnectionStringName),
+                "Simulation World 파생 DB 연결 문자열 이름이 필요합니다.")
             .ValidateOnStart();
 
         var sharedOptions = configuration
@@ -44,11 +53,41 @@ public static class SimulationServerServiceCollectionExtensions
                 DisabledSimulation공유공공데이터Reader>();
         }
 
+        var derivationOptions = configuration
+            .GetSection(SimulationWorldDerivationDatabaseOptions.SectionName)
+            .Get<SimulationWorldDerivationDatabaseOptions>()
+            ?? new SimulationWorldDerivationDatabaseOptions();
+        if (derivationOptions.Enabled)
+        {
+            var connectionString = configuration.GetConnectionString(
+                derivationOptions.ConnectionStringName);
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException(
+                    WorldDerivationConnectionStringMissingErrorCode);
+            services.AddSimulationWorldDerivationPersistence(connectionString);
+            if (sharedOptions.Enabled)
+                services.Add평창군공간파생Pipeline();
+        }
+
         services.AddSingleton<I경영SimulationSessionStore, InMemory경영SimulationSessionStore>();
         services.AddSingleton<ISimulationSessionSaveStore, InMemorySimulationSessionSaveStore>();
         services.AddSingleton<경영SimulationSessionService>();
         services.AddSingleton<Simulation타로화물운송PreviewService>();
         services.AddSingleton<Simulation타로객체반응PreviewService>();
+        services.AddSingleton<SimulationFreight렌더링의도Projector>();
+        services.AddSingleton<Simulation렌더링의도합성Policy>();
+        services.AddSingleton<Simulation기본Urp표현Catalog>();
+        services.AddSingleton<SimulationRuntimeWorldPresentationService>();
+        services.AddHealthChecks()
+            .AddCheck(
+                "self",
+                () => HealthCheckResult.Healthy(),
+                tags: ["live"])
+            .AddCheck<SimulationServerReadinessHealthCheck>(
+                "simulation-persistence",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: ["ready"],
+                timeout: TimeSpan.FromSeconds(15));
         return services;
     }
 

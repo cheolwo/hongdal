@@ -2,6 +2,7 @@
 **/.agents
 **/.artifacts
 **/.codex*
+**/.codex-build/**
 **/.dockerignore
 **/.env
 **/appsettings.Local.json
@@ -12,6 +13,7 @@
 **/.settings
 **/.toolstarget
 **/.tmp
+**/.local-private-storage/**
 **/.vs
 **/.vscode
 **/*.*proj.user
@@ -28,6 +30,8 @@
 **/logs
 **/App_Data
 **/artifacts
+**/artifacts/**
+**/.artifacts/**
 **/*.pfx
 **/*.p12
 **/*.pem

@@ -9,7 +9,7 @@ Unity 경영 Simulation의 session, scenario clock와 deterministic command 권�
 - `Ssalddel.Simulation.Domain`: Aggregate, 순수 규칙, 상태 전이와 저장 자료 재현
 - `Ssalddel.Simulation.Application`: 세션 조회와 미리보기·확정·저장·복원 업무 조율, 저장소 계약
 - `Ssalddel.Simulation.Infrastructure`: 메모리 저장소와 이후 영속 저장소 구현
-- `Ssalddel.Simulation.Persistence`: 운영 DB의 공공데이터를 읽는 전용 EF 연결 구현
+- `Ssalddel.Simulation.Persistence`: 공유 공공데이터 DB의 읽기 전용 EF 연결과 별도 Simulation World 파생 관계 DB 저장 구현
 - `Ssalddel.Simulation.Server`: HTTP, 실행 설정과 의존성 조립
 
 Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않는다. Application은 저장 구현이나 EF를 직접 생성하지 않고 저장소 계약과 공공데이터 조회 포트만 정의한다. Server는 운영 `Ssalddel.Infrastructure`를 직접 참조하지 않고 Persistence 연결 모듈만 조립한다.
@@ -44,7 +44,13 @@ Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않�
 - 수령준비 전 주문 취소의 원래 Task/Effect 취소와 재고·노동 예약 반환
 - 최대 duration을 넘는 Tick 차단
 
-이 서버는 운영 업무용 `SsalddelContext`를 등록하지 않으며 실제 계약·발주·결제·입고·재고를 만들지 않는다. 다만 운영 서버가 외부에서 수집해 둔 공공데이터는 같은 MySQL DB의 `AgriculturalFisheriesDbContext`를 읽기 전용으로 등록해 함께 사용한다. 공공데이터 조회에는 `AsNoTracking`을 적용하고 `SaveChanges`를 차단한다. 수집기, migration, 초기화 작업과 운영 업무 원장은 등록하지 않는다. Simulation session·가상 재고·save는 이 공공데이터 DB에 저장하지 않는다.
+이 서버는 운영 업무용 `SsalddelContext`를 등록하지 않으며 실제 계약·발주·결제·입고·재고를 만들지 않는다. 다만 운영 서버가 외부에서 수집해 둔 공공데이터는 같은 MySQL DB의 `AgriculturalFisheriesDbContext`와 `PublicDataIngestionDbContext`를 읽기 전용으로 등록해 함께 사용한다. 공공데이터 조회에는 `AsNoTracking`을 적용하고 `SaveChanges`를 차단한다. 수집기, migration, 초기화 작업과 운영 업무 원장은 등록하지 않는다. Simulation session·가상 재고·save는 이 공공데이터 DB에 저장하지 않는다.
+
+공공데이터·공간 규칙·시나리오 역할의 결과는 별도 `SimulationWorldDerived` DB의 `SchemaVersion 2` 공간 실행에 저장한다. Synty·URP 대장과 그래픽·VisualKey 계획은 이 공간 실행의 ID와 출력 SHA-256을 입력으로 받는 별도 Synty 경관 실행에 저장한다. Synty 대장이나 URP 프로필만 바뀌면 공간 실행을 다시 만들지 않는다. 건물과 공개 인허가 사업장 node는 공유 공공데이터의 원본 레코드를 참조하고, 사업장–건물 연결을 실제 입주·소유 사실로 확정하지 않는다. 그래픽 계획은 실제 파일 경로 대신 질감·재질·색조·배경·조명·시간대 키와 그림자·LOD·품질 정책을 보존한다. `SimulationWorldDerivationDatabase:Enabled=true`와 별도 연결 문자열이 있을 때만 저장소가 등록되고 기본 설정에서는 비활성이다. migration은 host 시작 시 자동 적용하지 않는다.
+
+평창군 공간 Pipeline `v5`는 공유 공공데이터 DB의 전체 건축물 원장을 유지하면서 Unity 공간 실행에는 건물 용도 Category별 대표 건물을 하나씩만 저장한다. 대표 node에는 대표군·대표하는 원본 건수·대표 순위 1을 기록하며, 공개 사업장도 선택된 대표 건물과 연결된 항목만 표현 후보가 된다. 이 제한은 원본 삭제나 실제 건물 수 축소가 아니라 Unity 표현 Projection이다.
+
+`--interpret-pyeongchang-building-type-demo --spatial-build=<공간실행>`은 종류별 대표에 고정 seed 시험 상태를 배정하고 공간 규칙·Simulation 규칙·결합 규칙·해석 결과를 저장한다. 시험 상태는 실제 회사 영업이나 작업 관측이 아니며 `ScenarioFixtureBuildingActivity`로 명시된다. 출력의 기본 구성 키와 동적 의도 묶음 키는 후속 Synty·URP Adapter 입력이다.
 
 API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationServer:Enabled=true`로 켜며 `SsalddelExecution:Mode=Simulation`이 아니면 host 시작을 거부한다. 현재 session store와 save store는 모두 프로세스 수명에 한정된 in-memory 구현이다. restore port는 구현됐지만 외부 durable adapter를 연결하지 않은 현재 host는 실제 프로세스 재시작 뒤 save를 읽을 수 없다.
 
@@ -55,6 +61,76 @@ API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationS
 ```powershell
 dotnet user-secrets set "ConnectionStrings:SharedPublicData" "<같은 DB의 읽기 전용 연결 문자열>" --project Ssalddel.Simulation.Server
 ```
+
+## Docker Compose 실행 구성
+
+운영 `Ssalddel` 서버와 같은 .NET 10 다단계 이미지, 비루트 사용자, 환경 변수의 `Section__Key` 주입과 `live`/`ready` 상태 확인 관례를 사용한다. 다만 운영 업무 DB 연결을 Simulation 컨테이너에 전달하지 않는다. `docker-compose.simulation.yml`은 다음 두 권한을 분리한다.
+
+- `ssalddel_simulation_reader`: 기존 `ssalddel_dev` 공유 공공데이터 DB의 `SELECT`만 허용
+- `ssalddel_simulation_world`: 별도 `ssalddel_simulation_world` DB의 공간 파생·규칙·표현 해석 원장만 읽고 씀
+
+`eng/docker/simulation.env.example`의 항목을 저장소 루트의 추적되지 않는 `.env`에 옮기고 비밀번호를 교체한다. 로컬 예시 기본 비밀번호를 실제 공유 환경이나 운영 환경에 사용하지 않는다. 계정 이름과 비밀번호는 초기화 Script의 SQL 안전 검사를 위해 영문자·숫자와 `_ . @ % -`만 사용한다.
+
+기존 개발 볼륨처럼 실제 공공데이터 DB 이름이 `ssalddel_dev`와 다르면 `SSALDDEL_SIMULATION_PUBLIC_DATA_DATABASE`에 그 이름을 지정한다. 초기화 Script는 지정된 기존 DB를 새로 만들거나 migration하지 않고 읽기 전용 계정에 `SELECT` 권한만 부여한다.
+
+```powershell
+docker compose `
+  -f docker-compose.yml `
+  -f docker-compose.simulation.yml `
+  --profile simulation `
+  up -d --build mysql simulation-db-init simulation
+```
+
+첫 실행 또는 파생 DB migration이 추가된 뒤에는 일반 API host 시작과 분리된 명시적 명령으로 migration을 적용한다. host 시작 자체는 migration을 자동 적용하지 않는다.
+
+```powershell
+docker compose `
+  -f docker-compose.yml `
+  -f docker-compose.simulation.yml `
+  --profile simulation `
+  run --rm simulation --migrate-simulation-world-database
+```
+
+상태 확인은 기존 호환 경로 `/health`와 함께 운영 서버와 동일한 의미를 갖는 두 경로를 제공한다.
+
+- `/health/live`: Simulation 프로세스가 응답하는지 확인
+- `/health/ready`: 활성화된 공유 공공데이터 DB와 Simulation World 파생 DB에 연결 가능한지 확인
+
+컨테이너 기본 노출은 `127.0.0.1:5204`이고, 외부 공개·TLS·인증·방화벽 구성은 이 로컬 Compose 범위에 포함하지 않는다. `Container` 환경 설정은 두 DB 연결을 활성화하지만 실제 연결 문자열은 Compose 환경 변수로만 공급한다.
+
+공유 공공데이터에서 평창군 Area·건물·공개 사업장 관계를 공간 실행으로 파생하려면 두 DB 연결을 활성화한 승인된 Simulation 환경에서 다음 명령을 실행한다.
+
+```powershell
+dotnet run --project Ssalddel.Simulation.Server -- `
+  --build-pyeongchang-world-derived `
+  --tile-manifest=<private-pyeongchang-tile-manifest-json-path>
+```
+
+이 명령은 공유 DB에 쓰지 않는다. 원본 정렬·입력 SHA-256, 공간 관계 생성, 원장 검증·출력 hash와 멱등 저장을 수행한다. 건물도형·좌표가 없으면 임의 위치를 생성하지 않고 미배치로 보고하며, 원본이 0건이면 `InsufficientSourceData`와 자료부족 node를 공간 DB에 남긴다.
+
+공간 실행과 독립된 Synty 경관 계획은 다음 명령으로 Job Shell에 제출한다.
+
+```powershell
+dotnet run --project Ssalddel.Simulation.Server -- `
+  --build-pyeongchang-synty-landscape `
+  --spatial-build=<공간 실행 고유 식별자>
+```
+
+Job Shell은 공간 출력 SHA-256, AreaSet, Synty·URP 대장, 경관 규칙, seed와 품질 단계를 별도 fingerprint로 만든다. 현재 공간 산출물에 배치 기준점이 없으면 임의 `VisualKey` 위치를 만들지 않고 `Partial`과 배치 거부 사유를 저장한다. 실제 Prefab·Material·HLOD 결합은 후속 Unity BatchMode 작업자의 책임이다.
+
+현재 Simulation 상태의 동적 표현은 정적 Synty 경관 실행과 다시 분리한다. `SimulationRuntimeWorldPresentationService`는 화물운송과 물류 이동 상태 사본을 의미 기반 렌더링 의도로 투영하고, Channel 충돌·수명·공간 Route 표면·PC/Mobile Capability를 합성해 URP·Particle·Animation Profile 키와 결정적 표현 hash를 만든다. 이 계산은 Session·WorldTick을 변경하지 않으며 아직 HTTP route나 Unity URP Adapter로 노출하지 않는다. 세부 구조는 [Simulation 규칙 기반 Runtime 렌더링 의도 Pipeline](../docs/Architecture/SimulationRuntimeRenderingIntentPipeline.md)을 따른다.
+
+공간 node와 Simulation 규칙이 객체 표현으로 만나는 단계는 `SimulationWorld객체표현해석JobShell`이 담당한다. 공간·Simulation 규칙 Metadata와 결합 규칙은 초안·활성·폐기 상태로 개정 관리하고, 실제 적용 결과는 공간 출력 hash와 선택적 Session 개정·WorldTick을 봉인한 불변 해석 실행본으로 저장한다. 규칙이 미정이면 활성 공간 규칙의 기본 구성만 사용한다. 세부 구조는 [공간·Simulation 규칙 객체 표현 결합 원장](../docs/Architecture/SimulationWorldObjectRepresentationRuleLedger.md)을 따른다.
+
+시설 의미·시설 기능·업무 Simulation 규칙·객체 연결·Scenario 규칙 묶음은 다음 명령으로 별도 불변 대장에 집결한다. 규칙 실행 코드는 서버에, 현재 상태는 Session 원장에 유지하며 파생 DB는 개정과 관계 계보만 저장한다. 세부 구조는 [Simulation World 업무 규칙 집결 트리](../docs/Architecture/SimulationWorldBusinessRuleTree.md)를 따른다.
+
+```powershell
+dotnet run --project Ssalddel.Simulation.Server -- `
+  --assemble-pyeongchang-world-business-rules `
+  --spatial-build=<공간 실행 고유 식별자>
+```
+
+공간 DB는 추가로 `Unity공간변환Profile → Unity타일Manifest → Unity산출물`을 축적한다. `--tile-manifest`를 생략하면 Unity 원점이나 기준 표고를 추측하지 않고 `WaitingForTileManifest` Profile만 저장한다. Manifest가 있으면 L0~L2 타일 경계·Halo·fingerprint와 원본 계보를 저장한다. 다만 Manifest에 DEM 기준 표고가 없으면 Profile은 `InsufficientSourceData`이며 Terrain·Mask·HLOD 산출 완료로 간주하지 않는다.
 
 ```text
 POST /api/simulation/v1/sessions
@@ -80,6 +156,8 @@ POST /api/simulation/v1/sessions/{sessionStableId}/individual-order-cancellation
 POST /api/simulation/v1/sessions/{sessionStableId}/saves
 POST /api/simulation/v1/sessions/restores
 GET  /health
+GET  /health/live
+GET  /health/ready
 ```
 
 첫 공공데이터 관점별 조회 결과는 KAMIS 가격 관측이다. 품목, 조사일, 규격 단위, 원화 가격, 결측 여부, 출처와 마지막 확인 시각을 반환하며 원문 JSON과 수집 실행 식별자는 내보내지 않는다. 이는 Simulation 규칙의 입력 근거로 읽을 수 있는 관측 자료이지, 운영 재고나 주문 완료 사실이 아니다.
@@ -98,4 +176,4 @@ save package는 session 생성 요청, 저장 시점 snapshot과 Confirm/Tick Co
 
 같이주문 Preview는 각 참여자의 명시적 동의와 의향 수량을 보존하고 목표 충족 여부를 계산하지만 상태를 바꾸지 않는다. 모집 결과 Confirm은 공통 Task를 만들고, 완료 WorldTick에서만 목표 충족 모집을 `확정`, 미달 모집을 `모집종료목표미달`로 전이한다. 같은 참여자의 중복 의향은 차단하고 실제 주문·결제·자동 동의는 수행하지 않는다.
 
-다음 구조 우선순위는 비동기·취소·기대 개정 번호를 보존하는 영속 저장 계약과 외부 저장 구현이다. 인증된 세션 범위, 시나리오 묶음 검증기와 migration은 별도 후속 통과 조건이다.
+다음 공간 구조 우선순위는 평창군 건물 SHP geometry와 DEM 기준 표고·표본을 처리해 현재 미배치 건물과 타일 Manifest를 실제 Terrain·Mask·HLOD 산출물로 연결하는 것이다. 세션·save의 durable 저장소, 인증된 세션 범위와 시나리오 묶음 검증기는 별도 후속 통과 조건이다.
