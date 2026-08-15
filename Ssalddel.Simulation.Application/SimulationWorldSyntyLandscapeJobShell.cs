@@ -219,15 +219,15 @@ public sealed class SimulationWorld기본Synty경관Planner : ISimulationWorldSy
         var profile = ResolveProfile(area.RegionCode);
         return new SimulationWorld그래픽표현계획
         {
-            StableId = "synty-graphics:" + profile.Role + ":" + StableSuffix(area.StableId) + ":v1",
+            StableId = "synty-graphics:" + profile.Role + ":" + StableSuffix(area.StableId) + ":v2",
             TargetNodeStableId = area.StableId,
             PresentationScopeCode = "AreaEnvironment",
-            TextureSetKey = "texture." + profile.Role + ".ground.v1",
-            MaterialVariantKey = "material." + profile.Role + ".regional.v1",
+            TextureSetKey = "texture." + profile.Role + ".ground.v2",
+            MaterialVariantKey = "material." + profile.Role + ".regional.v2",
             ColorPaletteKey = profile.Palette,
             BackgroundProfileKey = profile.Background,
-            LightingProfileKey = "lighting.pyeongchang.shared-day.v1",
-            TimeOfDayProfileKey = "timeofday.shared-day.v1",
+            LightingProfileKey = "lighting.pyeongchang.shared-day.v2",
+            TimeOfDayProfileKey = "timeofday.shared-day.v2",
             ShadowPolicyCode = SimulationWorld그림자정책Codes.혼합,
             CastShadows = true,
             ReceiveShadows = true,
@@ -248,19 +248,19 @@ public sealed class SimulationWorld기본Synty경관Planner : ISimulationWorldSy
     {
         if (regionCode == "5176038000")
             return new SyntyAreaProfile(
-                "farm", "palette.farm.warm-earth-green.v1",
-                "background.daegwallyeong.forest-ridge.v1", 0.45m, 0.25m);
+                "farm", "palette.farm.nature-warm-earth-green.v2",
+                "background.daegwallyeong.nature-forest-ridge.v2", 0.45m, 0.25m);
         if (regionCode == "5176036000")
             return new SyntyAreaProfile(
-                "hub", "palette.hub.concrete-orange.v1",
-                "background.jinbu.forest-buffer.v1", 0.6m, 0.4m);
+                "hub", "palette.hub.nature-concrete-orange.v2",
+                "background.jinbu.nature-forest-buffer.v2", 0.6m, 0.4m);
         if (regionCode == "5176025000")
             return new SyntyAreaProfile(
-                "town", "palette.town.cream-brick.v1",
-                "background.pyeongchang.low-town.v1", 0.55m, 0.35m);
+                "town", "palette.town.nature-cream-brick.v2",
+                "background.pyeongchang.nature-low-town.v2", 0.55m, 0.35m);
         return new SyntyAreaProfile(
-            "generic", "palette.rural.neutral.v1",
-            "background.rural.generic.v1", 0.5m, 0.3m);
+            "generic", "palette.rural.nature-neutral.v2",
+            "background.rural.nature-generic.v2", 0.5m, 0.3m);
     }
 
     private static string StableSuffix(string stableId) =>
