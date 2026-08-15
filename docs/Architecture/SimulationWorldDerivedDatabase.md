@@ -27,6 +27,31 @@
 
 공유 공공데이터 DB는 공식 자료와 정규화 결과의 권위다. 파생 관계 DB는 동일 원본·규칙·seed에서 다시 만들 수 있는 Simulation 해석 원장이며 운영 계약·주문·재고·배차의 권위가 아니다.
 
+## 행정동·법정동 우선 가공
+
+월드 API는 공공데이터 원문을 요청마다 직접 결합하지 않는다. 공간 파생 실행이 먼저 건축물–법정동 Assignment, 법정동–행정동 관할 관계와 행정동별 건물 분류 집계를 읽어 다음 지역 Projection을 만든다.
+
+```text
+공유 공공데이터 DB
+├─ 건축물–법정동·행정동 Assignment
+├─ 법정동–행정동 기준시점 관계
+└─ 행정동별 건물 Category 집계
+   ↓ 공간 파생 실행
+Simulation World 파생 관계 DB
+├─ LegalRegion / AdministrativeRegion node
+├─ LegalAdministrativeRegionCrosswalk
+├─ LocatedInLegalRegion / AggregatedInAdministrativeRegion
+└─ HasBuildingCategoryAggregate
+   ↓ 읽기 전용 지역 Projection
+GET /api/simulation/v1/world-stream/regions/{regionStableId}
+   ↓ 후속 타일 조립기
+Tile·Area의 건물 표현 후보와 VisualKey 입력
+```
+
+법정동과 행정동은 별도 고유 식별자로 유지한다. 파생 실행의 입력 fingerprint와 출력 hash가 같으면 같은 지역 Projection을 재사용한다. 현재 뼈대는 기존 `SchemaVersion 2` 실행·node·relation 표를 재사용하므로 별도 DB migration이 필요하지 않다.
+
+행정구역 경계 geometry가 파생 실행에 연결되기 전에는 지역을 임의 타일에 배정하지 않는다. 이 경우 API는 건물 분류 집계와 교차 관계는 반환하되 `WaitingForRegionGeometry`와 빈 `TileKeys`를 반환한다. 지역 Projection은 Unity 표현용 읽기 결과이며 운영 시설 상태나 실제 업무 완료를 뜻하지 않는다.
+
 ## DB 책임
 
 | DB | 쓰기 책임 | 읽기 책임 | 포함하지 않는 것 |
@@ -34,8 +59,11 @@
 | 운영 업무 DB | 운영 서버 Command·UseCase | 권한 있는 운영 API | Simulation 결과의 자동 승격 |
 | 공유 공공데이터 DB | 운영 공공데이터 수집기와 migration | 운영 서버, SELECT 전용 Simulation 연결 | 가상 재고·시나리오 결과·Prefab 경로 |
 | Simulation World 파생 관계 DB | Simulation 파생 생성기 | Simulation Runtime, 검증·관리 관점별 조회 결과 | 운영 업무 확정, 개인 연락처, Synty 원본 자산 |
+| Simulation Session DB | Simulation 저장 자료 adapter | 저장 식별자 기반 복원과 검증 | 공공데이터 원본, 공간 파생 사실, 운영 업무 상태 |
 
 Simulation 서버의 공유 공공데이터 연결은 `AgriculturalFisheriesDbContext`와 `PublicDataIngestionDbContext`를 모두 읽기 전용으로 등록한다. `SaveChanges`는 차단하며 수집기·migration·초기화 작업은 Simulation host에서 실행하지 않는다.
+
+Simulation Session DB에는 현재 실행 중 aggregate를 매 Command마다 투영하지 않는다. 사용자가 명시적으로 만든 `simulation-save.v1` 저장 자료와 재생 hash를 보존하고, 재시작 뒤 Command를 재생해 활성 Session을 복원한다. 역할 카드 장착·활동처럼 Session에 속한 가변 상태도 이 저장 자료에 포함되지만 World 파생 관계 DB에는 복제하지 않는다.
 
 ## 파생 실행본
 
@@ -61,6 +89,8 @@ OutputHashSha256
 - `Relations`: 포함·인접·접근·연결·시나리오 역할과 `Observed / Derived / StatisticallyAllocated / Scenario / Decorative` 근거
 - `BuildingPlacements`: 영역에서 표현할 건물, 관측 도형·관측 대표점·영역 구성·시나리오 배치 근거, 건물 분류·표현 층수·시각 Family와 위치
 - 공간 실행의 fingerprint에는 Synty 구성 대장, URP 표현 대장, 그래픽 계획과 `VisualKey`가 포함되지 않는다.
+
+첫 수직 구현에서는 `completion-area:sim:pyeongchang:daegwallyeong-farm.v1`을 `LandscapeCompletionArea` node로 저장한다. 이 node는 대관령 Farm Area에 포함되고, 1km×1km 범위를 이루는 L2 500m 타일 네 개를 `ContainsSpatialTile` 관계로 참조한다. 전체 평창군 Manifest에 대상 네 타일이 있으면 공간 실행은 이 네 타일과 필요한 L1·L0 상위 타일만 선택한다. 이는 DB schema를 늘리는 기능이 아니라 기존 SchemaVersion 2의 node·relation·Unity 타일 Manifest를 좁은 완결 범위로 사용하는 규칙 개정이다.
 
 별도 `SimulationWorldSynty경관실행원장`은 다음 값을 가진다.
 
@@ -107,6 +137,13 @@ Synty·URP 구성 대장이나 경관 규칙만 바뀌면 공간 실행을 재�
 - `시뮬레이션월드_건물배치계획`
 - `시뮬레이션월드_그래픽표현계획`
 - `시뮬레이션월드_시각배치계획`
+- `시뮬레이션월드_UI기획대장`
+- `시뮬레이션월드_UI설계근거`
+- `시뮬레이션월드_UI화면영역기획`
+- `시뮬레이션월드_UI정보항목기획`
+- `시뮬레이션월드_UI상태표현기획`
+- `시뮬레이션월드_UI행동후보기획`
+- `시뮬레이션월드_UI업무규칙연결`
 
 위 그래픽·시각 배치 표는 `SchemaVersion 1` 호환을 위해 보존한다. 증분 migration `Synty경관JobShell분리`는 공간 실행의 `시각자산대장개정번호`를 선택 사항으로 바꾸고 다음 독립 표를 추가한다.
 

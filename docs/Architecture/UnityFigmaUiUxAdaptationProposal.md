@@ -166,6 +166,13 @@ Farm 감자/수확물 선택
 
 `FUX0`에서 전용 Figma page를 먼저 새로 만드는 것은 피한다. 기존 node와 보존 PNG를 다시 확인하고 실제 Unity 화면에 필요한 component inventory를 확정한 뒤 `FUX1~FUX5`의 구현 결과를 `FUX6`에서 Figma 기준으로 정리하는 순서가 낭비가 적다.
 
+### 2026-08-14 첫 적용 상태
+
+- `FUX0`: Figma `05P1 Warehouse`의 역할 띠, 상태 배지, 요약·근거·다음 단계, 보조·주요 행동 문법을 재확인했다.
+- `FUX1`: `figma-maui-warehouse.v1` 의미 프로필과 Unity Theme Catalog를 추가했다. 역할 색과 상태 색은 별도 축이다.
+- `FUX3`: 진부면 물류 거점의 검수→적재 정보판을 `SimulationWorldShell`에 배치하고 Preview·Confirm·WorldTick·재조회 버튼을 실제 기능에 연결했다.
+- 저장 Scene은 서버 기준이며 fixture는 EditMode·PlayMode와 Game View 증거 생성에서만 사용한다. stale·blocked의 자동화 검증과 Figma 역동기화는 후속 범위다.
+
 ## 8. 디자인 토큰 제안
 
 역할 색과 상태 색은 다른 축으로 유지한다.

@@ -38,6 +38,24 @@
 
 > 현재 Unity 화면은 개발용 Simulation입니다. 실제 판매·결제·배차·수출·정산을 실행하지 않으며, 운영 상태의 최종 권위는 서버에 있습니다.
 
+현재 공공데이터 기반 농장 생존 방향은 다음 트리로 정리되어 있습니다.
+
+```text
+공공데이터 지형·법정동·건물
+└─ Simulation Session
+   ├─ 플레이어 직접 노동
+   ├─ NPC 위임 노동
+   ├─ 농장 방어
+   ├─ 좀비·가상 약탈자 사건
+   ├─ 회복 가능한 피해
+   └─ Save / Replay
+      └─ Unity PresentationKey / VisualKey
+         ├─ 현재 보유 Synty fallback
+         └─ 향후 Apocalypse·Alpine 연결
+```
+
+설계·구현 경계와 첫 7일 수직 단위는 [공공데이터 기반 Synty 농장 생존 Simulation 기획과 구현 기준](docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md)을 따릅니다.
+
 <p align="center">
   <a href="docs/ProjectOverview/page-docs/">
     <img src="docs/assets/changes/2026-07-20-community-forum-restoration/community-board-desktop.png" alt="살뜰 커뮤니티 게시판 글 목록" width="900">
