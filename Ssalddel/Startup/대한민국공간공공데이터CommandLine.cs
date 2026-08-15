@@ -245,7 +245,12 @@ internal static class 대한민국공간공공데이터CommandLine
             Path.GetFullPath(filePath),
             sourceRevision,
             GetOption(arguments, "--encoding=") ?? "utf-8",
-            GetOption(arguments, "--building-source-revision="));
+            GetOption(arguments, "--building-source-revision="),
+            GetOption(arguments, "--source-id=") ?? 지방행정인허가사업장ImportService.SourceId,
+            GetOption(arguments, "--dataset-id=") ?? 지방행정인허가사업장ImportService.DatasetId,
+            GetOption(arguments, "--default-open-service-id="),
+            GetOption(arguments, "--default-open-service-name="),
+            ParseDateTimeOffsetOption(arguments, "--observed-at="));
     }
 
     private static async Task CollectLegalDongAsync(
@@ -350,8 +355,13 @@ internal static class 대한민국공간공공데이터CommandLine
                 new 지방행정인허가사업장ImportRequest(
                     parsedArguments.SourceRevision,
                     sourceHash,
-                    File.GetLastWriteTimeUtc(parsedArguments.FilePath),
-                    EncodingName: parsedArguments.EncodingName),
+                    parsedArguments.ObservedAtUtc
+                    ?? File.GetLastWriteTimeUtc(parsedArguments.FilePath),
+                    EncodingName: parsedArguments.EncodingName,
+                    SourceId: parsedArguments.SourceId,
+                    DatasetId: parsedArguments.DatasetId,
+                    DefaultOpenServiceId: parsedArguments.DefaultOpenServiceId,
+                    DefaultOpenServiceName: parsedArguments.DefaultOpenServiceName),
                 cancellationToken);
         logger.LogInformation(
             "지방행정인허가 사업장 적재 완료. Parsed={Parsed}, Inserted={Inserted}, Existing={Existing}, Rejected={Rejected}, Revision={Revision}, Hash={Hash}",
@@ -407,13 +417,36 @@ internal static class 대한민국공간공공데이터CommandLine
         arguments.FirstOrDefault(argument => argument.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             ?[prefix.Length..]
             .Trim();
+
+    private static DateTimeOffset? ParseDateTimeOffsetOption(
+        IEnumerable<string> arguments,
+        string prefix)
+    {
+        var value = GetOption(arguments, prefix);
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        if (DateTimeOffset.TryParse(
+                value,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal,
+                out var parsed))
+            return parsed;
+
+        throw new ArgumentException($"{prefix.TrimEnd('=')}는 올바른 날짜·시각이어야 합니다.");
+    }
 }
 
 internal sealed record 공개사업장가져오기Arguments(
     string FilePath,
     string SourceRevision,
     string EncodingName,
-    string? BuildingSourceRevision);
+    string? BuildingSourceRevision,
+    string SourceId,
+    string DatasetId,
+    string? DefaultOpenServiceId,
+    string? DefaultOpenServiceName,
+    DateTimeOffset? ObservedAtUtc);
 
 internal sealed record 공간원본Argument(
     string FilePath,

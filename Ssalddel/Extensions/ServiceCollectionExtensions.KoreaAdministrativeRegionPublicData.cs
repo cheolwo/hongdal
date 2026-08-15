@@ -77,6 +77,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<VWorld건물통합정보ImportService>();
         services.AddScoped<평창군공공공간원본등록Service>();
         services.AddSingleton<IExternalDataSourceRegistration, 지방행정인허가사업장SourceRegistration>();
+        services.AddSingleton<IExternalDataSourceRegistration, 중랑구음식점현황SourceRegistration>();
         services.AddScoped<지방행정인허가사업장ImportService>();
         services.AddScoped<공개사업장건축물연결Service>();
     }

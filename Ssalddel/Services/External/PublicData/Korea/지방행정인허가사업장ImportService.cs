@@ -11,7 +11,11 @@ public sealed record 지방행정인허가사업장ImportRequest(
     string SourceHashSha256,
     DateTimeOffset ObservedAtUtc,
     long? EvidenceSnapshotId = null,
-    string EncodingName = "utf-8");
+    string EncodingName = "utf-8",
+    string SourceId = 지방행정인허가사업장ImportService.SourceId,
+    string DatasetId = 지방행정인허가사업장ImportService.DatasetId,
+    string? DefaultOpenServiceId = null,
+    string? DefaultOpenServiceName = null);
 
 public sealed record 지방행정인허가사업장ImportResult(
     int ParsedCount,
@@ -39,6 +43,8 @@ public sealed class 지방행정인허가사업장ImportService
     {
         ArgumentNullException.ThrowIfNull(csv);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceRevision);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.DatasetId);
         if (request.SourceHashSha256.Length != 64)
             throw new ArgumentException("원본 SHA-256은 64자리여야 합니다.", nameof(request));
 
@@ -64,8 +70,10 @@ public sealed class 지방행정인허가사업장ImportService
             cancellationToken.ThrowIfCancellationRequested();
             parsed++;
             var values = rows.Current;
-            var serviceId = Get(values, header, "개방서비스아이디", "개방서비스ID", "OPNSFTEAMCODE");
-            var managementNumber = Get(values, header, "관리번호", "MGTNO");
+            var serviceId = FirstNotEmpty(
+                Get(values, header, "개방서비스아이디", "개방서비스ID", "OPNSFTEAMCODE"),
+                request.DefaultOpenServiceId);
+            var managementNumber = Get(values, header, "관리번호", "인허가번호", "MGTNO");
             var businessName = Get(values, header, "사업장명", "업소명", "BPLCNM");
             if (string.IsNullOrWhiteSpace(serviceId)
                 || string.IsNullOrWhiteSpace(managementNumber)
@@ -75,18 +83,26 @@ public sealed class 지방행정인허가사업장ImportService
                 continue;
             }
 
-            var roadAddress = NullIfEmpty(Get(values, header, "도로명전체주소", "도로명주소", "RDNWHLADDR"));
+            var roadAddress = NullIfEmpty(Get(
+                values,
+                header,
+                "도로명전체주소",
+                "도로명주소",
+                "소재지(도로명)",
+                "RDNWHLADDR"));
             batch.Add(new 공개인허가사업장Record
             {
                 Id = 공공데이터원장식별자.결정적Guid(
-                    $"{SourceId}|{serviceId}|{managementNumber}|{request.SourceRevision}"),
-                SourceId = SourceId,
-                SourceDatasetId = DatasetId,
+                    $"{request.SourceId}|{serviceId}|{managementNumber}|{request.SourceRevision}"),
+                SourceId = request.SourceId,
+                SourceDatasetId = request.DatasetId,
                 OpenServiceId = serviceId,
-                OpenServiceName = NullIfEmpty(Get(values, header, "개방서비스명", "OPNSVCNM")),
+                OpenServiceName = FirstNotEmpty(
+                    NullIfEmpty(Get(values, header, "개방서비스명", "OPNSVCNM")),
+                    request.DefaultOpenServiceName),
                 ManagementNumber = managementNumber,
                 BusinessName = businessName.Trim(),
-                BusinessTypeName = NullIfEmpty(Get(values, header, "업태구분명", "UPTAENM")),
+                BusinessTypeName = NullIfEmpty(Get(values, header, "업태구분명", "업태명", "UPTAENM")),
                 LicenseCategoryName = NullIfEmpty(Get(values, header, "업종명", "위생업종명", "SNTUPTAENM")),
                 BusinessStatusCode = NullIfEmpty(Get(values, header, "영업상태구분코드", "TRDSTATEGBN")),
                 BusinessStatusName = NullIfEmpty(Get(values, header, "영업상태명", "TRDSTATENM")),
@@ -216,6 +232,9 @@ public sealed class 지방행정인허가사업장ImportService
     }
 
     private static string? NullIfEmpty(string value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static string? FirstNotEmpty(params string?[] values) =>
+        values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim();
 
     private static decimal? Decimal(string value) =>
         decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? result : null;

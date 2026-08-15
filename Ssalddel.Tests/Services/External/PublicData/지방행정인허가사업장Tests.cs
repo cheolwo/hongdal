@@ -24,6 +24,18 @@ public sealed class 지방행정인허가사업장Tests
     }
 
     [Fact]
+    public void 중랑구음식점Source는_로그인없는공식파일과공간한계를명시한다()
+    {
+        var source = Assert.Single(new 중랑구음식점현황SourceRegistration().GetDefinitions());
+
+        Assert.Equal("seoul-jungnang-open-data", source.SourceId);
+        Assert.Equal("jungnang-restaurant-status", source.DatasetId);
+        Assert.False(source.RequiresCredential);
+        Assert.Contains("면목동", source.UsageLimitations, StringComparison.Ordinal);
+        Assert.Contains("건물 입주", source.UsageLimitations, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task CsvImport는_상호업종상태주소를저장하고_대표자와전화번호를투영하지않는다()
     {
         await using var db = CreateDb();
@@ -66,6 +78,37 @@ public sealed class 지방행정인허가사업장Tests
         Assert.Equal(0, second.InsertedCount);
         Assert.Equal(1, second.ExistingCount);
         Assert.Equal(1, await db.공개인허가사업장Records.CountAsync());
+    }
+
+    [Fact]
+    public async Task 지역공개파일은_공급처기본값과인허가번호주소별칭으로_같은원장에적재한다()
+    {
+        await using var db = CreateDb();
+        await db.Database.EnsureCreatedAsync();
+        var service = new 지방행정인허가사업장ImportService(db);
+        await using var csv = Csv(
+            "업종명,인허가번호,업소명,소재지(도로명),건물내부면적,업태명\n" +
+            "일반음식점,202600001,면목식당,서울특별시 중랑구 면목로 10 (면목동),42.5,한식\n");
+
+        var result = await service.ImportCsvAsync(
+            csv,
+            new 지방행정인허가사업장ImportRequest(
+                "jungnang-restaurants-20260224",
+                SourceHash,
+                DateTimeOffset.Parse("2026-02-24T00:00:00+09:00"),
+                SourceId: "seoul-jungnang-open-data",
+                DatasetId: "jungnang-restaurant-status",
+                DefaultOpenServiceId: "jungnang-restaurants",
+                DefaultOpenServiceName: "중랑구 음식점 현황"));
+
+        var record = await db.공개인허가사업장Records.SingleAsync();
+        Assert.Equal(new 지방행정인허가사업장ImportResult(1, 1, 0, 0), result);
+        Assert.Equal("seoul-jungnang-open-data", record.SourceId);
+        Assert.Equal("jungnang-restaurant-status", record.SourceDatasetId);
+        Assert.Equal("202600001", record.ManagementNumber);
+        Assert.Equal("한식", record.BusinessTypeName);
+        Assert.Equal("일반음식점", record.LicenseCategoryName);
+        Assert.Equal("서울특별시 중랑구 면목로 10", record.NormalizedRoadAddressKey);
     }
 
     [Fact]
@@ -147,6 +190,39 @@ public sealed class 지방행정인허가사업장Tests
             Assert.Equal("localdata-20260813", parsed.SourceRevision);
             Assert.Equal("utf-8", parsed.EncodingName);
             Assert.Equal("building-202608", parsed.BuildingSourceRevision);
+            Assert.Equal(지방행정인허가사업장ImportService.SourceId, parsed.SourceId);
+            Assert.Equal(지방행정인허가사업장ImportService.DatasetId, parsed.DatasetId);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
+    public void 지역공개파일가져오기인자는_공급처와기준일을보존한다()
+    {
+        var filePath = Path.GetTempFileName();
+        try
+        {
+            var parsed = 대한민국공간공공데이터CommandLine.ParseImportArguments([
+                대한민국공간공공데이터CommandLine.공개사업장가져오기Command,
+                $"--file={filePath}",
+                "--source-revision=jungnang-restaurants-20260224",
+                "--source-id=seoul-jungnang-open-data",
+                "--dataset-id=jungnang-restaurant-status",
+                "--default-open-service-id=jungnang-restaurants",
+                "--default-open-service-name=중랑구 음식점 현황",
+                "--observed-at=2026-02-24T00:00:00+09:00",
+            ]);
+
+            Assert.Equal("seoul-jungnang-open-data", parsed.SourceId);
+            Assert.Equal("jungnang-restaurant-status", parsed.DatasetId);
+            Assert.Equal("jungnang-restaurants", parsed.DefaultOpenServiceId);
+            Assert.Equal("중랑구 음식점 현황", parsed.DefaultOpenServiceName);
+            Assert.Equal(
+                DateTimeOffset.Parse("2026-02-24T00:00:00+09:00"),
+                parsed.ObservedAtUtc);
         }
         finally
         {

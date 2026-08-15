@@ -33,3 +33,34 @@ public sealed class 지방행정인허가사업장SourceRegistration : IExternal
 
     public IReadOnlyCollection<ExternalDataSourceDefinition> GetDefinitions() => [Definition];
 }
+
+public sealed class 중랑구음식점현황SourceRegistration : IExternalDataSourceRegistration
+{
+    private static readonly ExternalDataSourceDefinition Definition = new()
+    {
+        SourceId = "seoul-jungnang-open-data",
+        DatasetId = "jungnang-restaurant-status",
+        Name = "서울특별시 중랑구 음식점 현황",
+        Provider = "서울특별시 중랑구",
+        CountryCode = "KOR",
+        DataDomain = "LicensedBusiness",
+        OfficialSourceUrl = "https://www.data.go.kr/data/15035759/fileData.do",
+        DocumentationUrl = "https://www.data.go.kr/data/15035759/fileData.do",
+        AccessMethod = ExternalDataAccessMethod.DownloadFile,
+        CredentialType = ExternalDataCredentialType.None,
+        RequiresCredential = false,
+        DefaultCollectionEnabled = false,
+        ApiAvailable = false,
+        DataFormat = "UTF-8 CSV: 업종명·인허가번호·업소명·도로명주소·건물내부면적·업태명",
+        SpatialResolution = "공개 음식점 도로명주소",
+        TemporalResolution = "공급처 파일 기준일",
+        RefreshCadence = "연간",
+        License = "이용허락범위 제한 없음",
+        RedistributionAllowed = true,
+        AttributionRequirement = "서울특별시 중랑구, 파일 기준일과 원본 해시 표시",
+        UsageLimitations = "음식점 인허가 공개 현황이며 모든 사업체나 건물의 전수명부가 아닙니다. 도로명주소의 괄호 안 법정동 표기로 면목동을 분류하며, 행정동 소속과 건물 입주는 별도 공간자료로 검증해야 합니다.",
+        LastVerifiedDate = new DateOnly(2026, 8, 14),
+    };
+
+    public IReadOnlyCollection<ExternalDataSourceDefinition> GetDefinitions() => [Definition];
+}
