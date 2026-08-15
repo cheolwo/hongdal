@@ -225,6 +225,8 @@ namespace Ssalddel.Simulation.Domain
         {
             if (farmSurvivalCreationState == null) return;
 
+            AdvanceFarmTacticalCombat(currentTick);
+
             foreach (var workOrder in farmWorkOrders.Where(value =>
                 value.StatusCode == SimulationFarmSurvivalCodes.InProgress
                 && value.CompletesWorldTick <= currentTick)
@@ -238,10 +240,18 @@ namespace Ssalddel.Simulation.Domain
                 CreateZombieWarning();
             if (previousTick < 5 && currentTick >= 5)
             {
-                ResolveZombieEncounter();
+                if (UsesInteractiveCombatRule()) PrepareZombieCombat();
+                else ResolveZombieEncounter();
                 CreateRaiderApproach();
             }
             if (previousTick < 6 && currentTick >= 6)
+            {
+                if (UsesInteractiveCombatRule()) ExpireActiveFarmCombat();
+            }
+            if (currentTick >= 6 && !HasOpenTacticalOrderWindow()
+                && threatEncounters.Any(value => value.ThreatTypeCode ==
+                    SimulationFarmSurvivalCodes.ZombiePressure
+                    && value.StateCode == SimulationFarmSurvivalCodes.Resolved))
                 CreateDamageAssessmentReport();
         }
 
@@ -581,6 +591,7 @@ namespace Ssalddel.Simulation.Domain
                     }).ToArray(),
                 Encounters = threatEncounters.Select(CloneThreatEncounter).ToArray(),
                 DayReports = survivalDayReports.Select(CloneDayReport).ToArray(),
+                Combat = CreateFarmCombatStateSnapshot(),
                 SimulationOnly = true,
                 IsOperationalState = false,
             };
@@ -608,6 +619,7 @@ namespace Ssalddel.Simulation.Domain
                 SupplyUnits = source.SupplyUnits,
                 RepairMaterialUnits = source.RepairMaterialUnits,
                 RecoverableDamageUnits = source.RecoverableDamageUnits,
+                Combat = CloneFarmCombatState(source.Combat),
                 Actors = source.Actors.Select(value => new SimulationFarmActorSnapshot
                 {
                     ActorStableId = value.ActorStableId,
@@ -816,6 +828,47 @@ namespace Ssalddel.Simulation.Domain
                 foreach (var id in report.SourceStableIds)
                     AddFarmKey(key, id);
             }
+            AddFarmKey(key, value.Combat.RuleRevision);
+            foreach (var perspective in value.Combat.Perspectives)
+            {
+                AddFarmKey(key, perspective.ActorStableId);
+                AddFarmKey(key, perspective.PerspectiveCode);
+                AddFarmKey(key, perspective.PresentationKey);
+            }
+            foreach (var beat in value.Combat.Beats)
+            {
+                AddFarmKey(key, beat.BeatStableId);
+                AddFarmKey(key, beat.EncounterStableId);
+                AddFarmKey(key, beat.ActorStableId);
+                AddFarmKey(key, beat.AppliedPerspectiveCode);
+                AddFarmKey(key, beat.AttackPatternCode);
+                AddFarmKey(key, beat.Sequence);
+                AddFarmKey(key, beat.StartedWorldTick);
+                AddFarmKey(key, beat.ImpactOffsetMs);
+                AddFarmKey(key, beat.GuardWindowMs);
+                AddFarmKey(key, beat.CounterWindowMs);
+                AddFarmKey(key, beat.PerfectGuardWindowMs);
+                AddFarmKey(key, beat.PerfectCounterWindowMs);
+                AddFarmKey(key, beat.StateCode);
+                AddFarmKey(key, beat.ReactionStableId);
+                AddFarmKey(key, beat.PresentationKey);
+            }
+            foreach (var reaction in value.Combat.Reactions)
+            {
+                AddFarmKey(key, reaction.ReactionStableId);
+                AddFarmKey(key, reaction.CommandId);
+                AddFarmKey(key, reaction.BeatStableId);
+                AddFarmKey(key, reaction.ActorStableId);
+                AddFarmKey(key, reaction.ReactionActionCode);
+                AddFarmKey(key, reaction.ReactionOffsetMs);
+                AddFarmKey(key, reaction.TimingDeltaMs);
+                AddFarmKey(key, reaction.GradeCode);
+                AddFarmKey(key, reaction.ActorDamageUnits);
+                AddFarmKey(key, reaction.DefenseResponseScore);
+                AddFarmKey(key, reaction.ThreatStaggered);
+                AddFarmKey(key, reaction.PresentationKey);
+            }
+            AddFarmTacticalCombatKey(key, value.Combat.Tactical);
             return key.ToString();
         }
 
@@ -823,7 +876,11 @@ namespace Ssalddel.Simulation.Domain
             SimulationFarmSurvivalInitialStateRequest? request)
         {
             if (request == null) return;
-            if (request.RuleRevision != SimulationFarmSurvivalCodes.RuleRevision)
+            if (request.RuleRevision != SimulationFarmSurvivalCodes.RuleRevision
+                && request.RuleRevision !=
+                    SimulationFarmSurvivalCodes.InteractiveCombatRuleRevision
+                && request.RuleRevision !=
+                    SimulationFarmSurvivalCodes.HeroTacticalCombatRuleRevision)
                 throw new SimulationContractException(
                     "SimulationFarmSurvivalRuleUnsupported");
             RequireStableId(request.RegionStableId, "SimulationFarmRegionInvalid");
@@ -857,6 +914,12 @@ namespace Ssalddel.Simulation.Domain
                 value.ActorKindCode == SimulationFarmSurvivalCodes.Player))
                 throw new SimulationContractException(
                     "SimulationFarmPlayerMissing");
+            if (request.RuleRevision ==
+                    SimulationFarmSurvivalCodes.HeroTacticalCombatRuleRevision
+                && !request.Actors.Any(value => value.ActorKindCode ==
+                    SimulationFarmSurvivalCodes.Npc))
+                throw new SimulationContractException(
+                    "SimulationFarmTacticalNpcMissing");
             foreach (var soil in request.SoilTiles)
             {
                 if (soil.StateCode != SimulationFarmSurvivalCodes.Untilled
@@ -943,7 +1006,8 @@ namespace Ssalddel.Simulation.Domain
 
         private bool HasAppliedFarmSurvivalCommand(string commandId)
             => appliedFarmWorkCommands.ContainsKey(commandId)
-                || appliedThreatResponseCommands.ContainsKey(commandId);
+                || appliedThreatResponseCommands.ContainsKey(commandId)
+                || HasAppliedFarmCombatCommand(commandId);
 
         private static void EnsureUniqueFarmIds(
             IEnumerable<string> values,

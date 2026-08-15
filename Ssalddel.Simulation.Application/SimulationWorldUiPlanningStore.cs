@@ -81,16 +81,20 @@ public static class PyeongchangSimulationWorldUI기획Factory
             Evidence(commonHomeEvidence, "2177:64", "살뜰 공통 홈", "DiscoveryParticipationBoundaryRoleSelection"),
         };
         var farm = Surface("farm-work", PyeongchangSimulationWorldStableIds.대관령Farm시설, "농장 출하 준비", "FarmWorkyard", 10, SimulationWorldUI역할Codes.화주, "Request", commonHomeEvidence);
+        var farmDefense = Surface("farm-defense", PyeongchangSimulationWorldStableIds.대관령Farm시설, "농장 전투 방어", "FarmDefense", 15, SimulationWorldUI역할Codes.화주, "PerspectiveTelegraphReact", commonHomeEvidence, SimulationWorldUI화면종류Codes.WorldHud);
+        var farmTactical = Surface("farm-tactical-order", PyeongchangSimulationWorldStableIds.대관령Farm시설, "농장 영웅 전술 명령", "FarmTacticalOrder", 16, SimulationWorldUI역할Codes.화주, "OpportunityPreviewConfirmResolve", commonHomeEvidence, SimulationWorldUI화면종류Codes.WorldHud);
         var hub = Surface("hub-operations", PyeongchangSimulationWorldStableIds.진부Hub시설, "진부면 물류 거점 입출고", "LogisticsOperations", 20, SimulationWorldUI역할Codes.창고관리자, "ReceiveInspectStore", roleMapEvidence);
         var freightRequest = Surface("freight-request", PyeongchangSimulationWorldStableIds.진부Hub시설, "화물 의뢰·배차", "FreightDesk", 30, SimulationWorldUI역할Codes.화주, "RequestQuoteDispatch", roleMapEvidence);
         var freightExecution = Surface("freight-execution", PyeongchangSimulationWorldStableIds.진부Hub시설, "상차·운송·하차", "FreightRoute", 40, SimulationWorldUI역할Codes.기사, "AcceptLoadTransportUnload", roleMapEvidence, SimulationWorldUI화면종류Codes.WorldHud);
         var mart = Surface("mart-order", PyeongchangSimulationWorldStableIds.평창읍Mart시설, "마트 상품 발견·비교·주문", "MartOrderDesk", 50, SimulationWorldUI역할Codes.주문자, "DiscoverCompareParticipate", ordererFlowEvidence);
         var restaurant = Surface("restaurant-supply", PyeongchangSimulationWorldStableIds.평창읍음식점시설, "음식점 주문 수신·준비", "RestaurantReceiving", 60, SimulationWorldUI역할Codes.음식점, "ReceivePreparePickup", roleMapEvidence);
-        var surfaces = new[] { farm, hub, freightRequest, freightExecution, mart, restaurant };
+        var surfaces = new[] { farm, farmDefense, farmTactical, hub, freightRequest, freightExecution, mart, restaurant };
         var information = surfaces.SelectMany(Information).ToArray();
         var states = surfaces.SelectMany(States).ToArray();
         var actions = new List<SimulationWorldUI행동후보기획>();
         AddActions(actions, farm, "HarvestDispositionImpact", "HarvestDispositionImpact.Confirm", "수확 판로");
+        AddActions(actions, farmDefense, "FarmCombatBeat", nameof(SimulationCombatReactionConfirmRequest), "전투 박자 대응");
+        AddActions(actions, farmTactical, "FarmTacticalOrder", nameof(SimulationTacticalOrderConfirmRequest), "영웅 전술 명령");
         AddActions(actions, hub, "FreightReceipt", "FreightReceipt.Confirm", "입고 검수");
         AddActions(actions, freightRequest, "FreightDispatch", "FreightDispatch.Confirm", "화물 배차");
         AddActions(actions, freightExecution, "FreightTransport", "FreightTransport.Confirm", "운송 단계");
@@ -110,6 +114,11 @@ public static class PyeongchangSimulationWorldUI기획Factory
             [PyeongchangSimulationWorldStableIds.개별주문규칙] = mart,
             [PyeongchangSimulationWorldStableIds.Mart재고진열규칙] = mart,
             [PyeongchangSimulationWorldStableIds.음식점식자재주문규칙] = restaurant,
+            [PyeongchangSimulationWorldStableIds.전투시점확정규칙] = farmDefense,
+            [PyeongchangSimulationWorldStableIds.전투박자시작규칙] = farmDefense,
+            [PyeongchangSimulationWorldStableIds.전투반응판정규칙] = farmDefense,
+            [PyeongchangSimulationWorldStableIds.전술기회생성규칙] = farmTactical,
+            [PyeongchangSimulationWorldStableIds.전술명령확정규칙] = farmTactical,
         };
         var ruleByKey = rules.Rules.ToDictionary(x => x.StableId + "@" + x.Revision, StringComparer.Ordinal);
         var bindings = rules.Bindings.Where(x => x.Active).Select(sourceBinding =>
@@ -133,7 +142,7 @@ public static class PyeongchangSimulationWorldUI기획Factory
         var plan = new SimulationWorldUI기획원장
         {
             SchemaVersion = SimulationWorldUI기획Validator.CurrentSchemaVersion,
-            CatalogRevision = "pyeongchang-farm-hub-town-ui-plan.v3",
+            CatalogRevision = "pyeongchang-farm-hub-town-ui-plan.v5",
             BusinessRuleCatalogRevision = rules.CatalogRevision,
             BusinessRuleCatalogHashSha256 = SimulationWorld업무규칙집결Validator.ComputeHash(rules),
             CreatedAtUtc = DateTimeOffset.Parse("2026-08-13T00:00:00Z"),
@@ -220,11 +229,11 @@ public static class PyeongchangSimulationWorldUI기획Factory
         });
     }
 
-    private static void AddActions(List<SimulationWorldUI행동후보기획> target, SimulationWorldUI화면영역기획 surface, string capability, string command, string subject)
+    private static void AddActions(List<SimulationWorldUI행동후보기획> target, SimulationWorldUI화면영역기획 surface, string capability, string command, string subject, string stableIdPrefix = "")
     {
-        target.Add(Action(surface, "inspect", SimulationWorldUI행동종류Codes.조회, subject + " 상세 보기", capability + ".Inspect", null, 10));
-        target.Add(Action(surface, "preview", SimulationWorldUI행동종류Codes.미리보기, subject + " 미리보기", capability + ".Preview", null, 20));
-        target.Add(Action(surface, "confirm", SimulationWorldUI행동종류Codes.확정, subject + " 확정", capability + ".Confirm", command, 30));
+        target.Add(Action(surface, stableIdPrefix + "inspect", SimulationWorldUI행동종류Codes.조회, subject + " 상세 보기", capability + ".Inspect", null, 10));
+        target.Add(Action(surface, stableIdPrefix + "preview", SimulationWorldUI행동종류Codes.미리보기, subject + " 미리보기", capability + ".Preview", null, 20));
+        target.Add(Action(surface, stableIdPrefix + "confirm", SimulationWorldUI행동종류Codes.확정, subject + " 확정", capability + ".Confirm", command, 30));
     }
 
     private static SimulationWorldUI행동후보기획 Action(SimulationWorldUI화면영역기획 surface, string suffix, string kind, string label, string capability, string? command, int order) => new SimulationWorldUI행동후보기획

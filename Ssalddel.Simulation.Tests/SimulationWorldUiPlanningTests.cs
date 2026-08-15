@@ -20,16 +20,19 @@ public sealed class SimulationWorldUiPlanningTests
         var second = SimulationWorldUI기획Validator.ComputeHash(plan, Rules);
 
         Assert.Equal(3, plan.DesignEvidence.Count);
-        Assert.Equal(6, plan.Surfaces.Count);
-        Assert.Equal(36, plan.InformationItems.Count);
-        Assert.Equal(48, plan.StatePresentations.Count);
-        Assert.Equal(18, plan.ActionCandidates.Count);
-        Assert.Equal(11, plan.RuleBindings.Count);
+        Assert.Equal(8, plan.Surfaces.Count);
+        Assert.Equal(48, plan.InformationItems.Count);
+        Assert.Equal(64, plan.StatePresentations.Count);
+        Assert.Equal(24, plan.ActionCandidates.Count);
+        Assert.Equal(16, plan.RuleBindings.Count);
         Assert.Equal(SimulationWorldUI기획Validator.CurrentSchemaVersion, plan.SchemaVersion);
         Assert.Equal(first, second);
         Assert.All(plan.InformationItems, x => Assert.Equal(nameof(SimulationWorldUIProjectionItem), x.SourceContractKey));
         Assert.Contains(plan.Surfaces, x => x.RoleCode == SimulationWorldUI역할Codes.주문자 && x.WorkflowStageCode == "DiscoverCompareParticipate");
         Assert.Contains(plan.Surfaces, x => x.RoleCode == SimulationWorldUI역할Codes.기사 && x.WorkflowStageCode == "AcceptLoadTransportUnload");
+        Assert.Contains(plan.ActionCandidates, x => x.ServerCommandKey ==
+            nameof(SimulationTacticalOrderConfirmRequest)
+            && x.KoreanLabel == "영웅 전술 명령 확정");
         Assert.All(plan.RuleBindings, uiBinding =>
         {
             var source = Assert.Single(Rules.Bindings, x => x.StableId == uiBinding.BusinessRuleBindingStableId);
@@ -94,7 +97,7 @@ public sealed class SimulationWorldUiPlanningTests
         var result = await shell.실행Async(Rules.CatalogRevision, CancellationToken.None);
 
         Assert.True(result.Inserted);
-        Assert.Equal(6, result.SurfaceCount);
+        Assert.Equal(8, result.SurfaceCount);
         Assert.NotNull(store.Plan);
     }
 

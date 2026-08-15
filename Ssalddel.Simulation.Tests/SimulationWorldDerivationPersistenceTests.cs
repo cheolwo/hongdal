@@ -16,7 +16,7 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationWorldDerivationPersistenceTests
 {
     [Fact]
-    public async Task 팀역할과수집보상규칙정의는_파생Db업무규칙대장에저장한다()
+    public async Task 팀역할과수집보상과전투규칙정의는_파생Db업무규칙대장에저장한다()
     {
         await using var db = CreateDb();
         await db.Database.EnsureCreatedAsync();
@@ -29,7 +29,7 @@ public sealed class SimulationWorldDerivationPersistenceTests
         var result = await store.저장Async(catalog, CancellationToken.None);
 
         Assert.True(result.Inserted);
-        Assert.Equal(18, result.RuleCount);
+        Assert.Equal(23, result.RuleCount);
         Assert.Equal(3, await db.BusinessSimulationRules.CountAsync(value =>
             value.DomainCode == SimulationWorld업무규칙영역Codes.팀역할));
         Assert.Contains(await db.BusinessSimulationRules.ToListAsync(), value =>
@@ -40,6 +40,14 @@ public sealed class SimulationWorldDerivationPersistenceTests
         Assert.Contains(await db.BusinessSimulationRules.ToListAsync(), value =>
             value.StableId == PyeongchangSimulationWorldStableIds.수집Card양도규칙
             && value.InputContractKey == nameof(SimulationCollectibleCardTransferRequest));
+        Assert.Equal(5, await db.BusinessSimulationRules.CountAsync(value =>
+            value.DomainCode == SimulationWorld업무규칙영역Codes.전투));
+        Assert.Contains(await db.BusinessSimulationRules.ToListAsync(), value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.전투반응판정규칙
+            && value.InputContractKey == nameof(SimulationCombatReactionConfirmRequest));
+        Assert.Contains(await db.BusinessSimulationRules.ToListAsync(), value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.전술명령확정규칙
+            && value.InputContractKey == nameof(SimulationTacticalOrderConfirmRequest));
     }
 
     [Fact]

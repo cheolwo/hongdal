@@ -35,6 +35,31 @@ namespace Ssalddel.Simulation.Application
             SimulationThreatResponseConfirmRequest request)
             => Find(sessionStableId).ConfirmThreatResponse(request);
 
+        public SimulationFarmSurvivalStateSnapshot ConfirmCombatPerspective(
+            string sessionStableId,
+            SimulationCombatPerspectiveConfirmRequest request)
+            => Find(sessionStableId).ConfirmCombatPerspective(request);
+
+        public SimulationFarmSurvivalStateSnapshot StartCombatBeat(
+            string sessionStableId,
+            SimulationCombatBeatStartRequest request)
+            => Find(sessionStableId).StartCombatBeat(request);
+
+        public SimulationFarmSurvivalStateSnapshot ConfirmCombatReaction(
+            string sessionStableId,
+            SimulationCombatReactionConfirmRequest request)
+            => Find(sessionStableId).ConfirmCombatReaction(request);
+
+        public SimulationTacticalOrderPreviewSnapshot PreviewTacticalOrder(
+            string sessionStableId,
+            SimulationTacticalOrderPreviewRequest request)
+            => Find(sessionStableId).PreviewTacticalOrder(request);
+
+        public SimulationFarmSurvivalStateSnapshot ConfirmTacticalOrder(
+            string sessionStableId,
+            SimulationTacticalOrderConfirmRequest request)
+            => Find(sessionStableId).ConfirmTacticalOrder(request);
+
         private 경영SimulationSessionAggregate Find(string sessionStableId)
         {
             if (string.IsNullOrWhiteSpace(sessionStableId))

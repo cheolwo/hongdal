@@ -347,6 +347,34 @@ namespace Ssalddel.Simulation.Domain
                             entry.ThreatResponseConfirmRequest!));
                 }
                 else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatPerspectiveConfirm)
+                {
+                    aggregate.ConfirmCombatPerspective(
+                        SimulationSaveReplayCloner.CloneCombatPerspectiveConfirmRequest(
+                            entry.CombatPerspectiveConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatBeatStart)
+                {
+                    aggregate.StartCombatBeat(
+                        SimulationSaveReplayCloner.CloneCombatBeatStartRequest(
+                            entry.CombatBeatStartRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatReactionConfirm)
+                {
+                    aggregate.ConfirmCombatReaction(
+                        SimulationSaveReplayCloner.CloneCombatReactionConfirmRequest(
+                            entry.CombatReactionConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TacticalOrderConfirm)
+                {
+                    aggregate.ConfirmTacticalOrder(
+                        SimulationSaveReplayCloner.CloneTacticalOrderConfirmRequest(
+                            entry.TacticalOrderConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
                     == SimulationCommandTypeCodes.TeamRoleCardEquip)
                 {
                     aggregate.EquipTeamRoleCard(
@@ -496,7 +524,18 @@ namespace Ssalddel.Simulation.Domain
                     || package.Snapshot.FarmSurvival.Defenses == null
                     || package.Snapshot.FarmSurvival.WorkOrders == null
                     || package.Snapshot.FarmSurvival.Encounters == null
-                    || package.Snapshot.FarmSurvival.DayReports == null))
+                    || package.Snapshot.FarmSurvival.DayReports == null
+                    || package.Snapshot.FarmSurvival.Combat == null
+                    || package.Snapshot.FarmSurvival.Combat.Perspectives == null
+                    || package.Snapshot.FarmSurvival.Combat.Beats == null
+                    || package.Snapshot.FarmSurvival.Combat.Reactions == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical.Fronts == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical.Squads == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical.Opportunities == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical.OrderWindows == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical.Orders == null
+                    || package.Snapshot.FarmSurvival.Combat.Tactical.Resolutions == null))
             {
                 throw new SimulationContractException("SimulationSavePackageInvalid");
             }
@@ -616,6 +655,30 @@ namespace Ssalddel.Simulation.Domain
                         entry.ThreatResponseConfirmRequest!);
                 }
                 else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatPerspectiveConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateCombatPerspectiveRequest(
+                        entry.CombatPerspectiveConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatBeatStart)
+                {
+                    경영SimulationSessionAggregate.ValidateCombatBeatStartRequest(
+                        entry.CombatBeatStartRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatReactionConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateCombatReactionRequest(
+                        entry.CombatReactionConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TacticalOrderConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateTacticalOrderConfirmRequest(
+                        entry.TacticalOrderConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
                     == SimulationCommandTypeCodes.TeamRoleCardEquip)
                 {
                     SimulationTeamRoleCardState.ValidateEquip(
@@ -698,6 +761,10 @@ namespace Ssalddel.Simulation.Domain
             if (entry.SurvivalTarotResolutionConfirmRequest != null) payloadCount++;
             if (entry.FarmWorkConfirmRequest != null) payloadCount++;
             if (entry.ThreatResponseConfirmRequest != null) payloadCount++;
+            if (entry.CombatPerspectiveConfirmRequest != null) payloadCount++;
+            if (entry.CombatBeatStartRequest != null) payloadCount++;
+            if (entry.CombatReactionConfirmRequest != null) payloadCount++;
+            if (entry.TacticalOrderConfirmRequest != null) payloadCount++;
             if (entry.TeamRoleCardEquipRequest != null) payloadCount++;
             if (entry.TeamActivityStartRequest != null) payloadCount++;
             if (entry.TeamActivityEndRequest != null) payloadCount++;
@@ -811,6 +878,38 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, request.ExpectedRevision);
                     Add(canonical, 경영SimulationSessionAggregate
                         .BuildThreatResponsePayloadKey(request));
+                }
+                if (entry.CombatPerspectiveConfirmRequest != null)
+                {
+                    var request = entry.CombatPerspectiveConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildCombatPerspectivePayloadKey(request));
+                }
+                if (entry.CombatBeatStartRequest != null)
+                {
+                    var request = entry.CombatBeatStartRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildCombatBeatPayloadKey(request));
+                }
+                if (entry.CombatReactionConfirmRequest != null)
+                {
+                    var request = entry.CombatReactionConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildCombatReactionPayloadKey(request));
+                }
+                if (entry.TacticalOrderConfirmRequest != null)
+                {
+                    var request = entry.TacticalOrderConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildTacticalOrderPayloadKey(request));
                 }
                 if (entry.TeamRoleCardEquipRequest != null)
                 {
@@ -2199,6 +2298,20 @@ namespace Ssalddel.Simulation.Domain
                     ? null
                     : CloneThreatResponseConfirmRequest(
                         source.ThreatResponseConfirmRequest),
+                CombatPerspectiveConfirmRequest =
+                    source.CombatPerspectiveConfirmRequest == null ? null
+                        : CloneCombatPerspectiveConfirmRequest(
+                            source.CombatPerspectiveConfirmRequest),
+                CombatBeatStartRequest = source.CombatBeatStartRequest == null ? null
+                    : CloneCombatBeatStartRequest(source.CombatBeatStartRequest),
+                CombatReactionConfirmRequest =
+                    source.CombatReactionConfirmRequest == null ? null
+                        : CloneCombatReactionConfirmRequest(
+                            source.CombatReactionConfirmRequest),
+                TacticalOrderConfirmRequest =
+                    source.TacticalOrderConfirmRequest == null ? null
+                        : CloneTacticalOrderConfirmRequest(
+                            source.TacticalOrderConfirmRequest),
                 TeamRoleCardEquipRequest = source.TeamRoleCardEquipRequest == null
                     ? null : CloneTeamRoleCardEquipRequest(
                         source.TeamRoleCardEquipRequest),
@@ -2241,6 +2354,54 @@ namespace Ssalddel.Simulation.Domain
                 EncounterStableId = source.EncounterStableId,
                 ActorStableId = source.ActorStableId,
                 ChoiceStableId = source.ChoiceStableId,
+            };
+
+        public static SimulationCombatPerspectiveConfirmRequest
+            CloneCombatPerspectiveConfirmRequest(
+                SimulationCombatPerspectiveConfirmRequest source)
+            => new SimulationCombatPerspectiveConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                ActorStableId = source.ActorStableId,
+                PerspectiveCode = source.PerspectiveCode,
+            };
+
+        public static SimulationCombatBeatStartRequest CloneCombatBeatStartRequest(
+            SimulationCombatBeatStartRequest source)
+            => new SimulationCombatBeatStartRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                EncounterStableId = source.EncounterStableId,
+                ActorStableId = source.ActorStableId,
+            };
+
+        public static SimulationCombatReactionConfirmRequest
+            CloneCombatReactionConfirmRequest(
+                SimulationCombatReactionConfirmRequest source)
+            => new SimulationCombatReactionConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                BeatStableId = source.BeatStableId,
+                ActorStableId = source.ActorStableId,
+                ReactionActionCode = source.ReactionActionCode,
+                ReactionOffsetMs = source.ReactionOffsetMs,
+            };
+
+        public static SimulationTacticalOrderConfirmRequest
+            CloneTacticalOrderConfirmRequest(
+                SimulationTacticalOrderConfirmRequest source)
+            => new SimulationTacticalOrderConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                OrderWindowStableId = source.OrderWindowStableId,
+                FrontStableId = source.FrontStableId,
+                ActorStableId = source.ActorStableId,
+                OrderCode = source.OrderCode,
+                OpportunityStableId = source.OpportunityStableId,
             };
 
         public static SimulationTeamRoleCardEquipRequest

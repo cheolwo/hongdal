@@ -20,9 +20,9 @@ public sealed class SimulationWorldBusinessRuleCatalogTests
         var secondHash = SimulationWorld업무규칙집결Validator.ComputeHash(catalog);
 
         Assert.Equal(4, catalog.Facilities.Count);
-        Assert.Equal(18, catalog.Capabilities.Count);
-        Assert.Equal(18, catalog.Rules.Count);
-        Assert.Equal(11, catalog.Bindings.Count);
+        Assert.Equal(19, catalog.Capabilities.Count);
+        Assert.Equal(23, catalog.Rules.Count);
+        Assert.Equal(16, catalog.Bindings.Count);
         Assert.Contains(catalog.Rules, value =>
             value.StableId == PyeongchangSimulationWorldStableIds.창고적재규칙
             && value.InputContractKey == nameof(SimulationWarehousePutAwayPreviewRequest));
@@ -40,8 +40,17 @@ public sealed class SimulationWorldBusinessRuleCatalogTests
         Assert.Contains(catalog.Rules, value =>
             value.StableId == PyeongchangSimulationWorldStableIds.수집Card뽑기규칙
             && value.OutputContractKey == nameof(SimulationCollectibleCardDrawResponse));
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.전투반응판정규칙
+            && value.InputContractKey == nameof(SimulationCombatReactionConfirmRequest)
+            && value.OutputContractKey == nameof(SimulationCombatReactionSnapshot));
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.전술명령확정규칙
+            && value.InputContractKey == nameof(SimulationTacticalOrderConfirmRequest)
+            && value.OutputContractKey ==
+                nameof(SimulationFarmTacticalCombatStateSnapshot));
         Assert.Single(catalog.ScenarioRuleSets);
-        Assert.Equal(18, catalog.ScenarioRuleSets[0].Items.Count);
+        Assert.Equal(23, catalog.ScenarioRuleSets[0].Items.Count);
         Assert.Equal(firstHash, secondHash);
         Assert.All(catalog.Rules, rule => Assert.True(rule.SimulationOnly));
     }

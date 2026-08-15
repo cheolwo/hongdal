@@ -30,6 +30,7 @@ public static class SimulationWorld시설기능Codes
     public const string 진열 = "Display";
     public const string 판매 = "Sell";
     public const string 소비 = "Consume";
+    public const string 방어 = "Defense";
 }
 
 public static class SimulationWorld업무규칙영역Codes
@@ -43,6 +44,7 @@ public static class SimulationWorld업무규칙영역Codes
     public const string 음식점 = "Restaurant";
     public const string 팀역할 = "TeamRole";
     public const string 수집보상 = "CollectibleReward";
+    public const string 전투 = "Combat";
 }
 
 public sealed class SimulationWorld시설의미

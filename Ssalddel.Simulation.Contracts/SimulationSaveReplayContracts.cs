@@ -24,6 +24,10 @@ namespace Ssalddel.Simulation.Contracts
         public const string SurvivalTarotResolutionConfirm = "SurvivalTarotResolutionConfirm";
         public const string FarmWorkConfirm = "FarmWorkConfirm";
         public const string ThreatResponseConfirm = "ThreatResponseConfirm";
+        public const string CombatPerspectiveConfirm = "CombatPerspectiveConfirm";
+        public const string CombatBeatStart = "CombatBeatStart";
+        public const string CombatReactionConfirm = "CombatReactionConfirm";
+        public const string TacticalOrderConfirm = "TacticalOrderConfirm";
         public const string TeamRoleCardEquip = "TeamRoleCardEquip";
         public const string TeamActivityStart = "TeamActivityStart";
         public const string TeamActivityEnd = "TeamActivityEnd";
@@ -64,6 +68,13 @@ namespace Ssalddel.Simulation.Contracts
             { get; set; }
         public SimulationFarmWorkConfirmRequest? FarmWorkConfirmRequest { get; set; }
         public SimulationThreatResponseConfirmRequest? ThreatResponseConfirmRequest { get; set; }
+        public SimulationCombatPerspectiveConfirmRequest? CombatPerspectiveConfirmRequest
+            { get; set; }
+        public SimulationCombatBeatStartRequest? CombatBeatStartRequest { get; set; }
+        public SimulationCombatReactionConfirmRequest? CombatReactionConfirmRequest
+            { get; set; }
+        public SimulationTacticalOrderConfirmRequest? TacticalOrderConfirmRequest
+            { get; set; }
         public SimulationTeamRoleCardEquipRequest? TeamRoleCardEquipRequest { get; set; }
         public SimulationTeamActivityStartRequest? TeamActivityStartRequest { get; set; }
         public SimulationTeamActivityEndRequest? TeamActivityEndRequest { get; set; }

@@ -79,7 +79,7 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
         var restaurant = Facility(PyeongchangSimulationWorldStableIds.평창읍음식점시설, PyeongchangSimulationWorldStableIds.평창읍Town영역, SimulationWorld시설종류Codes.음식점);
         var facilities = new[] { farm, hub, mart, restaurant };
         var capabilities = new List<SimulationWorld시설기능>();
-        AddCapabilities(capabilities, farm, SimulationWorld시설기능Codes.생산, SimulationWorld시설기능Codes.수확, SimulationWorld시설기능Codes.포장, SimulationWorld시설기능Codes.출하);
+        AddCapabilities(capabilities, farm, SimulationWorld시설기능Codes.생산, SimulationWorld시설기능Codes.수확, SimulationWorld시설기능Codes.포장, SimulationWorld시설기능Codes.출하, SimulationWorld시설기능Codes.방어);
         AddCapabilities(capabilities, hub, SimulationWorld시설기능Codes.입고, SimulationWorld시설기능Codes.검수, SimulationWorld시설기능Codes.보관, SimulationWorld시설기능Codes.상차, SimulationWorld시설기능Codes.하차);
         AddCapabilities(capabilities, mart, SimulationWorld시설기능Codes.주문, SimulationWorld시설기능Codes.입고, SimulationWorld시설기능Codes.보관, SimulationWorld시설기능Codes.진열, SimulationWorld시설기능Codes.판매);
         AddCapabilities(capabilities, restaurant, SimulationWorld시설기능Codes.주문, SimulationWorld시설기능Codes.입고, SimulationWorld시설기능Codes.보관, SimulationWorld시설기능Codes.소비);
@@ -104,6 +104,11 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
             Rule(PyeongchangSimulationWorldStableIds.농사완료보상규칙, SimulationWorld업무규칙영역Codes.수집보상, "FarmCompletionReward", "경영SimulationSessionAggregate", nameof(SimulationFarmWorkConfirmRequest), nameof(SimulationCollectibleCardRewardStateSnapshot), "플레이어 직접 밭갈기가 WorldTick에서 실제 완료될 때만 결정적 수집 카드 기회를 판정한다."),
             Rule(PyeongchangSimulationWorldStableIds.수집Card뽑기규칙, SimulationWorld업무규칙영역Codes.수집보상, "CollectibleCardDraw", "경영SimulationSessionAggregate", nameof(SimulationCollectibleCardDrawRequest), nameof(SimulationCollectibleCardDrawResponse), "개인 미개봉 기회의 소유자를 확인하고 팀이 아직 보유하지 않은 정의 중 하나를 서버가 결정한다."),
             Rule(PyeongchangSimulationWorldStableIds.수집Card양도규칙, SimulationWorld업무규칙영역Codes.수집보상, "CollectibleCardTransfer", "경영SimulationSessionAggregate", nameof(SimulationCollectibleCardTransferRequest), nameof(SimulationCollectibleCardTransferResponse), "같은 팀 구성원 사이에서 카드 사본의 소유권만 원격으로 변경한다."),
+            Rule(PyeongchangSimulationWorldStableIds.전투시점확정규칙, SimulationWorld업무규칙영역Codes.전투, "CombatPerspectiveConfirm", "경영SimulationSessionAggregate", nameof(SimulationCombatPerspectiveConfirmRequest), nameof(SimulationFarmCombatStateSnapshot), "플레이어가 선택한 전투 시점을 고정하되, 활성 전투 박자 중에는 변경하지 못하게 한다."),
+            Rule(PyeongchangSimulationWorldStableIds.전투박자시작규칙, SimulationWorld업무규칙영역Codes.전투, "CombatBeatStart", "경영SimulationSessionAggregate", nameof(SimulationCombatBeatStartRequest), nameof(SimulationCombatBeatSnapshot), "서버가 공격 유형과 충돌 시각, 시점별 방어·카운터 허용 구간을 결정한다."),
+            Rule(PyeongchangSimulationWorldStableIds.전투반응판정규칙, SimulationWorld업무규칙영역Codes.전투, "CombatReactionConfirm", "경영SimulationSessionAggregate", nameof(SimulationCombatReactionConfirmRequest), nameof(SimulationCombatReactionSnapshot), "Unity가 제출한 행동과 반응 시각을 서버가 판정해 피해·방어 점수·위협 경직을 확정한다."),
+            Rule(PyeongchangSimulationWorldStableIds.전술기회생성규칙, SimulationWorld업무규칙영역Codes.전투, "TacticalOpportunityDerivation", "경영SimulationSessionAggregate", nameof(SimulationCombatReactionSnapshot), nameof(SimulationTacticalOpportunitySnapshot), "성공한 영웅의 방어·카운터 판정에서 해당 전선과 다음 명령창에만 유효한 전술 기회를 결정적으로 생성한다."),
+            Rule(PyeongchangSimulationWorldStableIds.전술명령확정규칙, SimulationWorld업무규칙영역Codes.전투, "TacticalOrderConfirm", "경영SimulationSessionAggregate", nameof(SimulationTacticalOrderConfirmRequest), nameof(SimulationFarmTacticalCombatStateSnapshot), "기회를 만든 영웅의 전진 공격·대형 사수·전술 후퇴 명령을 확정하고 다음 WorldTick에서 분대·전선·시설 결과를 판정한다."),
         };
         var bindings = new[]
         {
@@ -113,10 +118,15 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
             Bind(hub, SimulationWorld시설기능Codes.상차, rules[6], 80), Bind(hub, SimulationWorld시설기능Codes.하차, rules[7], 80),
             Bind(mart, SimulationWorld시설기능Codes.주문, rules[8], 100), Bind(mart, SimulationWorld시설기능Codes.진열, rules[9], 90),
             Bind(restaurant, SimulationWorld시설기능Codes.주문, rules[10], 100),
+            Bind(farm, SimulationWorld시설기능Codes.방어, rules[18], 100),
+            Bind(farm, SimulationWorld시설기능Codes.방어, rules[19], 95),
+            Bind(farm, SimulationWorld시설기능Codes.방어, rules[20], 90),
+            Bind(farm, SimulationWorld시설기능Codes.방어, rules[21], 85),
+            Bind(farm, SimulationWorld시설기능Codes.방어, rules[22], 80),
         };
         return new SimulationWorld업무규칙집결원장
         {
-            CatalogRevision = "pyeongchang-farm-hub-town-business-rules.v4",
+            CatalogRevision = "pyeongchang-farm-hub-town-business-rules.v6",
             SpatialBuildStableId = spatialBuildStableId,
             SpatialOutputHashSha256 = spatialOutputHashSha256,
             CreatedAtUtc = DateTimeOffset.Parse("2026-08-13T00:00:00Z"),
@@ -130,7 +140,7 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
                 new SimulationWorldScenario규칙묶음
                 {
                     StableId = "scenario-rule-set:pyeongchang-farm-hub-town",
-                    Revision = "r4",
+                    Revision = "r6",
                     AreaSetStableId = areaSetStableId,
                     Items = rules.Select((rule, index) => new SimulationWorldScenario규칙항목
                     {

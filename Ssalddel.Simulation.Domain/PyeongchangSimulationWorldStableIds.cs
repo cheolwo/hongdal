@@ -51,5 +51,15 @@ public static class PyeongchangSimulationWorldStableIds
         "rule:simulation:collectible-card:draw";
     public const string 수집Card양도규칙 =
         "rule:simulation:collectible-card:transfer";
+    public const string 전투시점확정규칙 =
+        "rule:simulation:farm-combat:perspective-confirm";
+    public const string 전투박자시작규칙 =
+        "rule:simulation:farm-combat:beat-start";
+    public const string 전투반응판정규칙 =
+        "rule:simulation:farm-combat:reaction-confirm";
+    public const string 전술기회생성규칙 =
+        "rule:simulation:farm-combat:tactical-opportunity";
+    public const string 전술명령확정규칙 =
+        "rule:simulation:farm-combat:tactical-order-confirm";
 }
 }

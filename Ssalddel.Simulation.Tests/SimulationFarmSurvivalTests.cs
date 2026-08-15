@@ -264,6 +264,665 @@ public sealed class SimulationFarmSurvivalTests
             Assert.Single(confirmed!.WorkOrders).StatusCode);
     }
 
+    [Fact]
+    public void 일인칭은_삼인칭보다넓은일반방어창을가지지만_완벽방어창은같다()
+    {
+        var firstPerson = ResolveGuardAt(
+            SimulationFarmCombatCodes.FirstPersonPrecision, 750);
+        var thirdPerson = ResolveGuardAt(
+            SimulationFarmCombatCodes.ThirdPersonAwareness, 750);
+        var firstPerfect = ResolveGuardAt(
+            SimulationFarmCombatCodes.FirstPersonPrecision, 950);
+        var thirdPerfect = ResolveGuardAt(
+            SimulationFarmCombatCodes.ThirdPersonAwareness, 950);
+
+        Assert.Equal(SimulationFarmCombatCodes.OnTime,
+            Assert.Single(firstPerson.Combat.Reactions).GradeCode);
+        Assert.Equal(SimulationFarmCombatCodes.Early,
+            Assert.Single(thirdPerson.Combat.Reactions).GradeCode);
+        Assert.Equal(SimulationFarmCombatCodes.Perfect,
+            Assert.Single(firstPerfect.Combat.Reactions).GradeCode);
+        Assert.Equal(SimulationFarmCombatCodes.Perfect,
+            Assert.Single(thirdPerfect.Combat.Reactions).GradeCode);
+    }
+
+    [Fact]
+    public void 완벽카운터는_서버가피해와점수와경직을결정하고_좀비전을끝낸다()
+    {
+        var session = CreateInteractiveCombatSession();
+        var ready = AdvanceToInteractiveCombat(session);
+        var perspective = session.ConfirmCombatPerspective(
+            CombatPerspective(ready.WorldRevision,
+                SimulationFarmCombatCodes.FirstPersonPrecision));
+        var encounter = perspective.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:beat:start",
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+        var beat = Assert.Single(started.Combat.Beats);
+
+        var resolved = session.ConfirmCombatReaction(
+            new SimulationCombatReactionConfirmRequest
+            {
+                CommandId = "command:combat:reaction:counter",
+                ExpectedRevision = started.WorldRevision,
+                BeatStableId = beat.BeatStableId,
+                ActorStableId = Player,
+                ReactionActionCode = SimulationFarmCombatCodes.Counter,
+                ReactionOffsetMs = SimulationFarmCombatCodes.ImpactOffsetMs,
+            });
+
+        var reaction = Assert.Single(resolved.Combat.Reactions);
+        Assert.Equal(SimulationFarmCombatCodes.Perfect, reaction.GradeCode);
+        Assert.Equal(0m, reaction.ActorDamageUnits);
+        Assert.Equal(2, reaction.DefenseResponseScore);
+        Assert.True(reaction.ThreatStaggered);
+        Assert.Equal(SimulationFarmSurvivalCodes.DefenseSucceeded,
+            resolved.Encounters.Single(value => value.EncounterStableId ==
+                encounter.EncounterStableId).OutcomeCode);
+    }
+
+    [Fact]
+    public void 활성전투박자는_시점변경과두번째반응을거부하고_명령재시도는멱등하다()
+    {
+        var session = CreateInteractiveCombatSession();
+        var ready = AdvanceToInteractiveCombat(session);
+        var perspectiveRequest = CombatPerspective(ready.WorldRevision,
+            SimulationFarmCombatCodes.FirstPersonPrecision);
+        var perspective = session.ConfirmCombatPerspective(perspectiveRequest);
+        var retriedPerspective = session.ConfirmCombatPerspective(perspectiveRequest);
+        Assert.Equal(perspective.WorldRevision, retriedPerspective.WorldRevision);
+
+        var encounter = perspective.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:beat:lock-test",
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+        var locked = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmCombatPerspective(CombatPerspective(started.WorldRevision,
+                SimulationFarmCombatCodes.ThirdPersonAwareness)));
+        Assert.Equal("SimulationCombatPerspectiveLocked", locked.ErrorCode);
+
+        var beat = Assert.Single(started.Combat.Beats);
+        var reactionRequest = new SimulationCombatReactionConfirmRequest
+        {
+            CommandId = "command:combat:reaction:idempotent",
+            ExpectedRevision = started.WorldRevision,
+            BeatStableId = beat.BeatStableId,
+            ActorStableId = Player,
+            ReactionActionCode = SimulationFarmCombatCodes.Guard,
+            ReactionOffsetMs = 1000,
+        };
+        var resolved = session.ConfirmCombatReaction(reactionRequest);
+        var retried = session.ConfirmCombatReaction(reactionRequest);
+        Assert.Equal(resolved.WorldRevision, retried.WorldRevision);
+
+        var second = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmCombatReaction(new SimulationCombatReactionConfirmRequest
+            {
+                CommandId = "command:combat:reaction:second",
+                ExpectedRevision = resolved.WorldRevision,
+                BeatStableId = beat.BeatStableId,
+                ActorStableId = Player,
+                ReactionActionCode = SimulationFarmCombatCodes.Counter,
+                ReactionOffsetMs = 1000,
+            }));
+        Assert.Equal("SimulationCombatBeatAlreadyResolved", second.ErrorCode);
+    }
+
+    [Fact]
+    public void 반응하지않은전투박자는_다음WorldTick에서결정적으로만료된다()
+    {
+        var session = CreateInteractiveCombatSession();
+        var ready = AdvanceToInteractiveCombat(session);
+        var perspective = session.ConfirmCombatPerspective(
+            CombatPerspective(ready.WorldRevision,
+                SimulationFarmCombatCodes.FirstPersonPrecision));
+        var encounter = perspective.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:beat:expire",
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+
+        var advanced = session.Advance(Tick("command:tick:combat-expire",
+            started.WorldRevision));
+        var reaction = Assert.Single(advanced.FarmSurvival!.Combat.Reactions);
+        Assert.Equal(SimulationFarmCombatCodes.Expired, reaction.GradeCode);
+        Assert.Equal(10m, reaction.ActorDamageUnits);
+        Assert.Equal(SimulationFarmCombatCodes.Resolved,
+            Assert.Single(advanced.FarmSurvival.Combat.Beats).StateCode);
+    }
+
+    [Fact]
+    public void 전투명령세개는_저장재생후동일한상태와hash를만든다()
+    {
+        var session = CreateInteractiveCombatSession();
+        var ready = AdvanceToInteractiveCombat(session);
+        var perspective = session.ConfirmCombatPerspective(
+            CombatPerspective(ready.WorldRevision,
+                SimulationFarmCombatCodes.FirstPersonPrecision));
+        var encounter = perspective.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:beat:save",
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+        var beat = Assert.Single(started.Combat.Beats);
+        session.ConfirmCombatReaction(new SimulationCombatReactionConfirmRequest
+        {
+            CommandId = "command:combat:reaction:save",
+            ExpectedRevision = started.WorldRevision,
+            BeatStableId = beat.BeatStableId,
+            ActorStableId = Player,
+            ReactionActionCode = SimulationFarmCombatCodes.Counter,
+            ReactionOffsetMs = 1000,
+        });
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:farm-combat:one-beat",
+            ExpectedRevision = session.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = package.SaveStableId,
+                ExpectedRevision = restored.Revision,
+            });
+
+        Assert.Contains(package.CommandLog, value => value.CommandTypeCode ==
+            SimulationCommandTypeCodes.CombatPerspectiveConfirm);
+        Assert.Contains(package.CommandLog, value => value.CommandTypeCode ==
+            SimulationCommandTypeCodes.CombatBeatStart);
+        Assert.Contains(package.CommandLog, value => value.CommandTypeCode ==
+            SimulationCommandTypeCodes.CombatReactionConfirm);
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+        Assert.Equal(Assert.Single(session.GetFarmSurvivalState().Combat.Reactions).GradeCode,
+            Assert.Single(restored.GetFarmSurvivalState().Combat.Reactions).GradeCode);
+    }
+
+    [Fact]
+    public void 완벽카운터는_r3에서돌파기회를열고_전진공격은다음Tick에전선을전진시킨다()
+    {
+        var session = CreateHeroTacticalCombatSession();
+        var reacted = ReactHeroTacticalCombat(session,
+            SimulationFarmCombatCodes.Counter,
+            SimulationFarmCombatCodes.ImpactOffsetMs);
+
+        var encounter = reacted.Encounters.Single(value => value.ThreatTypeCode ==
+            SimulationFarmSurvivalCodes.ZombiePressure);
+        Assert.Equal(string.Empty, encounter.OutcomeCode);
+        var opportunity = Assert.Single(reacted.Combat.Tactical.Opportunities);
+        Assert.Equal(SimulationFarmTacticalCombatCodes.Breakthrough,
+            opportunity.OpportunityKindCode);
+        Assert.Equal(2, opportunity.Quality);
+        var window = Assert.Single(reacted.Combat.Tactical.OrderWindows);
+        var front = Assert.Single(reacted.Combat.Tactical.Fronts);
+
+        var preview = session.PreviewTacticalOrder(new SimulationTacticalOrderPreviewRequest
+        {
+            ExpectedRevision = reacted.WorldRevision,
+            OrderWindowStableId = window.OrderWindowStableId,
+            FrontStableId = front.FrontStableId,
+            ActorStableId = Player,
+            OrderCode = SimulationFarmTacticalCombatCodes.AdvanceAndAttack,
+            OpportunityStableId = opportunity.OpportunityStableId,
+        });
+        Assert.True(preview.CanConfirm);
+        Assert.Equal(2, preview.OpportunityBonusScore);
+        Assert.True(preview.ProjectedDefenseSucceeded);
+
+        var confirmed = session.ConfirmTacticalOrder(
+            new SimulationTacticalOrderConfirmRequest
+            {
+                CommandId = "command:tactical:advance",
+                ExpectedRevision = reacted.WorldRevision,
+                OrderWindowStableId = window.OrderWindowStableId,
+                FrontStableId = front.FrontStableId,
+                ActorStableId = Player,
+                OrderCode = SimulationFarmTacticalCombatCodes.AdvanceAndAttack,
+                OpportunityStableId = opportunity.OpportunityStableId,
+            });
+        Assert.Equal(SimulationFarmTacticalCombatCodes.Reserved,
+            Assert.Single(confirmed.Combat.Tactical.Opportunities).StateCode);
+
+        var advanced = session.Advance(Tick("command:tick:tactical-advance",
+            confirmed.WorldRevision)).FarmSurvival!;
+        var resolution = Assert.Single(advanced.Combat.Tactical.Resolutions);
+        Assert.True(resolution.DefenseSucceeded);
+        Assert.Equal(SimulationFarmTacticalCombatCodes.Forward,
+            resolution.FrontPositionCode);
+        Assert.Equal(SimulationFarmTacticalCombatCodes.Consumed,
+            Assert.Single(advanced.Combat.Tactical.Opportunities).StateCode);
+        Assert.Equal(SimulationFarmSurvivalCodes.DefenseSucceeded,
+            advanced.Encounters.Single(value => value.EncounterStableId ==
+                encounter.EncounterStableId).OutcomeCode);
+    }
+
+    [Fact]
+    public void 전술기회는행동과영웅이맞아야하며_확정명령은멱등하다()
+    {
+        var request = CreateRequest();
+        request.FarmSurvival!.RuleRevision =
+            SimulationFarmSurvivalCodes.HeroTacticalCombatRuleRevision;
+        request.FarmSurvival.Actors = request.FarmSurvival.Actors.Concat(
+        [
+            new SimulationFarmActorInitialStateRequest
+            {
+                ActorStableId = "actor:sim:teammate",
+                ActorKindCode = SimulationFarmSurvivalCodes.Player,
+                KoreanName = "팀원 영웅",
+            },
+        ]).ToArray();
+        var session = new 경영SimulationSessionAggregate(request);
+        var reacted = ReactHeroTacticalCombat(session,
+            SimulationFarmCombatCodes.Guard,
+            SimulationFarmCombatCodes.ImpactOffsetMs);
+        var opportunity = Assert.Single(reacted.Combat.Tactical.Opportunities);
+        var window = Assert.Single(reacted.Combat.Tactical.OrderWindows);
+        var front = Assert.Single(reacted.Combat.Tactical.Fronts);
+
+        var wrongOrder = session.PreviewTacticalOrder(
+            new SimulationTacticalOrderPreviewRequest
+            {
+                ExpectedRevision = reacted.WorldRevision,
+                OrderWindowStableId = window.OrderWindowStableId,
+                FrontStableId = front.FrontStableId,
+                ActorStableId = Player,
+                OrderCode = SimulationFarmTacticalCombatCodes.AdvanceAndAttack,
+                OpportunityStableId = opportunity.OpportunityStableId,
+            });
+        Assert.False(wrongOrder.CanConfirm);
+        Assert.Contains("SimulationTacticalOpportunityOrderMismatch",
+            wrongOrder.BlockingReasonCodes);
+
+        var otherHero = session.PreviewTacticalOrder(
+            new SimulationTacticalOrderPreviewRequest
+            {
+                ExpectedRevision = reacted.WorldRevision,
+                OrderWindowStableId = window.OrderWindowStableId,
+                FrontStableId = front.FrontStableId,
+                ActorStableId = "actor:sim:teammate",
+                OrderCode = SimulationFarmTacticalCombatCodes.HoldFormation,
+                OpportunityStableId = opportunity.OpportunityStableId,
+            });
+        Assert.False(otherHero.CanConfirm);
+        Assert.Contains("SimulationTacticalOrderActorMismatch",
+            otherHero.BlockingReasonCodes);
+
+        var command = new SimulationTacticalOrderConfirmRequest
+        {
+            CommandId = "command:tactical:hold:idempotent",
+            ExpectedRevision = reacted.WorldRevision,
+            OrderWindowStableId = window.OrderWindowStableId,
+            FrontStableId = front.FrontStableId,
+            ActorStableId = Player,
+            OrderCode = SimulationFarmTacticalCombatCodes.HoldFormation,
+            OpportunityStableId = opportunity.OpportunityStableId,
+        };
+        var confirmed = session.ConfirmTacticalOrder(command);
+        var retried = session.ConfirmTacticalOrder(command);
+        Assert.Equal(confirmed.WorldRevision, retried.WorldRevision);
+    }
+
+    [Fact]
+    public void 명령하지않으면_다음Tick에기회가만료되고_보너스없는대형사수가적용된다()
+    {
+        var session = CreateHeroTacticalCombatSession();
+        var reacted = ReactHeroTacticalCombat(session,
+            SimulationFarmCombatCodes.Counter,
+            SimulationFarmCombatCodes.ImpactOffsetMs);
+
+        var advanced = session.Advance(Tick("command:tick:tactical-timeout",
+            reacted.WorldRevision)).FarmSurvival!;
+        var order = Assert.Single(advanced.Combat.Tactical.Orders);
+        Assert.True(order.AutomaticallySelected);
+        Assert.Equal(SimulationFarmTacticalCombatCodes.HoldFormation,
+            order.OrderCode);
+        Assert.Equal(SimulationFarmTacticalCombatCodes.Expired,
+            Assert.Single(advanced.Combat.Tactical.Opportunities).StateCode);
+        var allied = advanced.Combat.Tactical.Squads.Single(value =>
+            value.SideCode == SimulationFarmTacticalCombatCodes.Allied);
+        Assert.Equal(0, allied.CombatStrength);
+        Assert.Equal(1, allied.RecoverableInjuryCount);
+        Assert.True(advanced.Actors.Single(value => value.ActorStableId == Npc).Injured);
+        Assert.Equal(20m, advanced.RecoverableDamageUnits);
+    }
+
+    [Fact]
+    public void 전술명령과Tick판정은_저장재생후동일한hash를만든다()
+    {
+        var session = CreateHeroTacticalCombatSession();
+        var reacted = ReactHeroTacticalCombat(session,
+            SimulationFarmCombatCodes.Counter,
+            SimulationFarmCombatCodes.ImpactOffsetMs);
+        var opportunity = Assert.Single(reacted.Combat.Tactical.Opportunities);
+        var window = Assert.Single(reacted.Combat.Tactical.OrderWindows);
+        var front = Assert.Single(reacted.Combat.Tactical.Fronts);
+        var confirmed = session.ConfirmTacticalOrder(
+            new SimulationTacticalOrderConfirmRequest
+            {
+                CommandId = "command:tactical:save",
+                ExpectedRevision = reacted.WorldRevision,
+                OrderWindowStableId = window.OrderWindowStableId,
+                FrontStableId = front.FrontStableId,
+                ActorStableId = Player,
+                OrderCode = SimulationFarmTacticalCombatCodes.AdvanceAndAttack,
+                OpportunityStableId = opportunity.OpportunityStableId,
+            });
+        session.Advance(Tick("command:tick:tactical-save",
+            confirmed.WorldRevision));
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:farm-tactical:one-order",
+            ExpectedRevision = session.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = package.SaveStableId,
+                ExpectedRevision = restored.Revision,
+            });
+
+        Assert.Contains(package.CommandLog, value => value.CommandTypeCode ==
+            SimulationCommandTypeCodes.TacticalOrderConfirm);
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+        Assert.Equal(Assert.Single(session.GetFarmSurvivalState().Combat.Tactical
+                .Resolutions).OutcomeCode,
+            Assert.Single(restored.GetFarmSurvivalState().Combat.Tactical
+                .Resolutions).OutcomeCode);
+    }
+
+    [Fact]
+    public async Task HTTP전투경계는_경로의박자Id와본문Id를일치시키고_서버결과를반환한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var request = CreateRequest();
+        request.ClientRequestId = Guid.Parse("5ff6319f-babd-43a4-a595-25cb891b0951");
+        request.FarmSurvival!.RuleRevision =
+            SimulationFarmSurvivalCodes.InteractiveCombatRuleRevision;
+        var createResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", request);
+        var session = await createResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var sessionRoute = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(session!.SessionStableId);
+        var tickResponse = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:combat:to-day-6",
+                ExpectedRevision = 0,
+                TickCount = 5,
+            });
+        var ready = await tickResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var farmRoute = sessionRoute + "/farm-survival";
+        var perspectiveResponse = await client.PostAsJsonAsync(
+            farmRoute + "/combat/perspective/confirm",
+            new SimulationCombatPerspectiveConfirmRequest
+            {
+                CommandId = "command:http:combat:perspective",
+                ExpectedRevision = ready!.Revision,
+                ActorStableId = Player,
+                PerspectiveCode = SimulationFarmCombatCodes.FirstPersonPrecision,
+            });
+        var perspective = await perspectiveResponse.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+        var encounter = perspective!.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var beatResponse = await client.PostAsJsonAsync(
+            farmRoute + "/combat/beats/start",
+            new SimulationCombatBeatStartRequest
+            {
+                CommandId = "command:http:combat:beat",
+                ExpectedRevision = perspective.WorldRevision,
+                EncounterStableId = encounter.EncounterStableId,
+                ActorStableId = Player,
+            });
+        var started = await beatResponse.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+        var beat = Assert.Single(started!.Combat.Beats);
+        var reaction = new SimulationCombatReactionConfirmRequest
+        {
+            CommandId = "command:http:combat:reaction",
+            ExpectedRevision = started.WorldRevision,
+            BeatStableId = beat.BeatStableId,
+            ActorStableId = Player,
+            ReactionActionCode = SimulationFarmCombatCodes.Counter,
+            ReactionOffsetMs = 1000,
+        };
+
+        var mismatch = await client.PostAsJsonAsync(
+            farmRoute + "/combat/beats/another-beat/react", reaction);
+        var resolved = await client.PostAsJsonAsync(farmRoute + "/combat/beats/"
+            + Uri.EscapeDataString(beat.BeatStableId) + "/react", reaction);
+        var state = await resolved.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+
+        Assert.Equal(HttpStatusCode.BadRequest, mismatch.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, resolved.StatusCode);
+        Assert.Equal(SimulationFarmCombatCodes.Perfect,
+            Assert.Single(state!.Combat.Reactions).GradeCode);
+    }
+
+    [Fact]
+    public async Task HTTP전술경계는_Preview와명령창Id확인을거쳐Confirm한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var request = CreateRequest();
+        request.ClientRequestId = Guid.Parse("60d40d0b-7cf6-45e8-a9b7-6fe390c50326");
+        request.FarmSurvival!.RuleRevision =
+            SimulationFarmSurvivalCodes.HeroTacticalCombatRuleRevision;
+        var created = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", request);
+        var session = await created.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var sessionRoute = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(session!.SessionStableId);
+        var tick = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:tactical:to-combat",
+                ExpectedRevision = 0,
+                TickCount = 5,
+            });
+        var ready = await tick.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var farmRoute = sessionRoute + "/farm-survival";
+        var perspectiveResponse = await client.PostAsJsonAsync(
+            farmRoute + "/combat/perspective/confirm",
+            new SimulationCombatPerspectiveConfirmRequest
+            {
+                CommandId = "command:http:tactical:perspective",
+                ExpectedRevision = ready!.Revision,
+                ActorStableId = Player,
+                PerspectiveCode = SimulationFarmCombatCodes.FirstPersonPrecision,
+            });
+        var perspective = await perspectiveResponse.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+        var encounter = perspective!.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var beatResponse = await client.PostAsJsonAsync(
+            farmRoute + "/combat/beats/start",
+            new SimulationCombatBeatStartRequest
+            {
+                CommandId = "command:http:tactical:beat",
+                ExpectedRevision = perspective.WorldRevision,
+                EncounterStableId = encounter.EncounterStableId,
+                ActorStableId = Player,
+            });
+        var started = await beatResponse.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+        var beat = Assert.Single(started!.Combat.Beats);
+        var reactionResponse = await client.PostAsJsonAsync(
+            farmRoute + "/combat/beats/"
+                + Uri.EscapeDataString(beat.BeatStableId) + "/react",
+            new SimulationCombatReactionConfirmRequest
+            {
+                CommandId = "command:http:tactical:reaction",
+                ExpectedRevision = started.WorldRevision,
+                BeatStableId = beat.BeatStableId,
+                ActorStableId = Player,
+                ReactionActionCode = SimulationFarmCombatCodes.Counter,
+                ReactionOffsetMs = SimulationFarmCombatCodes.ImpactOffsetMs,
+            });
+        var reacted = await reactionResponse.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+        var window = Assert.Single(reacted!.Combat.Tactical.OrderWindows);
+        var front = Assert.Single(reacted.Combat.Tactical.Fronts);
+        var opportunity = Assert.Single(reacted.Combat.Tactical.Opportunities);
+        var previewRequest = new SimulationTacticalOrderPreviewRequest
+        {
+            ExpectedRevision = reacted.WorldRevision,
+            OrderWindowStableId = window.OrderWindowStableId,
+            FrontStableId = front.FrontStableId,
+            ActorStableId = Player,
+            OrderCode = SimulationFarmTacticalCombatCodes.AdvanceAndAttack,
+            OpportunityStableId = opportunity.OpportunityStableId,
+        };
+        var previewResponse = await client.PostAsJsonAsync(
+            farmRoute + "/combat/tactical-orders/preview", previewRequest);
+        var preview = await previewResponse.Content
+            .ReadFromJsonAsync<SimulationTacticalOrderPreviewSnapshot>();
+        Assert.True(preview!.CanConfirm);
+
+        var confirm = new SimulationTacticalOrderConfirmRequest
+        {
+            CommandId = "command:http:tactical:confirm",
+            ExpectedRevision = reacted.WorldRevision,
+            OrderWindowStableId = window.OrderWindowStableId,
+            FrontStableId = front.FrontStableId,
+            ActorStableId = Player,
+            OrderCode = SimulationFarmTacticalCombatCodes.AdvanceAndAttack,
+            OpportunityStableId = opportunity.OpportunityStableId,
+        };
+        var mismatch = await client.PostAsJsonAsync(
+            farmRoute + "/combat/tactical-orders/another-window/confirm", confirm);
+        var confirmed = await client.PostAsJsonAsync(
+            farmRoute + "/combat/tactical-orders/"
+                + Uri.EscapeDataString(window.OrderWindowStableId) + "/confirm",
+            confirm);
+
+        Assert.Equal(HttpStatusCode.BadRequest, mismatch.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, confirmed.StatusCode);
+    }
+
+    private static SimulationFarmSurvivalStateSnapshot ResolveGuardAt(
+        string perspectiveCode,
+        int reactionOffsetMs)
+    {
+        var session = CreateInteractiveCombatSession();
+        var ready = AdvanceToInteractiveCombat(session);
+        var perspective = session.ConfirmCombatPerspective(
+            CombatPerspective(ready.WorldRevision, perspectiveCode));
+        var encounter = perspective.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:beat:" + perspectiveCode,
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+        var beat = Assert.Single(started.Combat.Beats);
+        return session.ConfirmCombatReaction(new SimulationCombatReactionConfirmRequest
+        {
+            CommandId = "command:combat:reaction:" + perspectiveCode,
+            ExpectedRevision = started.WorldRevision,
+            BeatStableId = beat.BeatStableId,
+            ActorStableId = Player,
+            ReactionActionCode = SimulationFarmCombatCodes.Guard,
+            ReactionOffsetMs = reactionOffsetMs,
+        });
+    }
+
+    private static 경영SimulationSessionAggregate CreateInteractiveCombatSession()
+    {
+        var request = CreateRequest();
+        request.FarmSurvival!.RuleRevision =
+            SimulationFarmSurvivalCodes.InteractiveCombatRuleRevision;
+        return new 경영SimulationSessionAggregate(request);
+    }
+
+    private static 경영SimulationSessionAggregate CreateHeroTacticalCombatSession()
+    {
+        var request = CreateRequest();
+        request.FarmSurvival!.RuleRevision =
+            SimulationFarmSurvivalCodes.HeroTacticalCombatRuleRevision;
+        return new 경영SimulationSessionAggregate(request);
+    }
+
+    private static SimulationFarmSurvivalStateSnapshot ReactHeroTacticalCombat(
+        경영SimulationSessionAggregate session,
+        string actionCode,
+        int reactionOffsetMs)
+    {
+        var ready = AdvanceToInteractiveCombat(session);
+        var perspective = session.ConfirmCombatPerspective(
+            CombatPerspective(ready.WorldRevision,
+                SimulationFarmCombatCodes.FirstPersonPrecision));
+        var encounter = perspective.Encounters.Single(value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:beat:tactical",
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+        var beat = Assert.Single(started.Combat.Beats);
+        return session.ConfirmCombatReaction(
+            new SimulationCombatReactionConfirmRequest
+            {
+                CommandId = "command:combat:reaction:tactical",
+                ExpectedRevision = started.WorldRevision,
+                BeatStableId = beat.BeatStableId,
+                ActorStableId = Player,
+                ReactionActionCode = actionCode,
+                ReactionOffsetMs = reactionOffsetMs,
+            });
+    }
+
+    private static SimulationFarmSurvivalStateSnapshot AdvanceToInteractiveCombat(
+        경영SimulationSessionAggregate session)
+        => session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:to-interactive-combat",
+            ExpectedRevision = 0,
+            TickCount = 5,
+        }).FarmSurvival!;
+
+    private static SimulationCombatPerspectiveConfirmRequest CombatPerspective(
+        long revision,
+        string perspectiveCode)
+        => new()
+        {
+            CommandId = "command:combat:perspective:" + perspectiveCode,
+            ExpectedRevision = revision,
+            ActorStableId = Player,
+            PerspectiveCode = perspectiveCode,
+        };
+
     private static (경영SimulationSessionAggregate Session, long Revision)
         AdvanceToRaider(경영SimulationSessionAggregate session)
     {

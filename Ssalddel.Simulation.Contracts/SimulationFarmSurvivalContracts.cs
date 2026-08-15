@@ -5,6 +5,10 @@ namespace Ssalddel.Simulation.Contracts
     public static class SimulationFarmSurvivalCodes
     {
         public const string RuleRevision = "farm-survival.spring-preparation.r1";
+        public const string InteractiveCombatRuleRevision =
+            "farm-survival.spring-preparation.r2";
+        public const string HeroTacticalCombatRuleRevision =
+            "farm-survival.spring-preparation.r3";
 
         public const string Player = "Player";
         public const string Npc = "Npc";
@@ -32,6 +36,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string ZombiePressure = "ZombiePressure";
         public const string RaiderFaction = "RaiderFaction";
         public const string Warning = "Warning";
+        public const string AwaitingCombat = "AwaitingCombat";
         public const string AwaitingResponse = "AwaitingResponse";
         public const string Resolved = "Resolved";
 
@@ -43,6 +48,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string InventoryTaken = "InventoryTaken";
         public const string FacilityDamaged = "FacilityDamaged";
         public const string ActorInjured = "ActorInjured";
+        public const string TacticalWithdrawal = "TacticalWithdrawal";
         public const string TradeCompleted = "TradeCompleted";
         public const string ThreatRepelled = "ThreatRepelled";
 
@@ -170,6 +176,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationThreatEncounterSnapshot>();
         public SimulationSurvivalDayReportSnapshot[] DayReports { get; set; }
             = Array.Empty<SimulationSurvivalDayReportSnapshot>();
+        public SimulationFarmCombatStateSnapshot Combat { get; set; }
+            = new SimulationFarmCombatStateSnapshot();
         public bool SimulationOnly { get; set; } = true;
         public bool IsOperationalState { get; set; }
     }
