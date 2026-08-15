@@ -39,7 +39,7 @@
                 </MudGrid>
 
                 <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
-                    현재 상태는 <strong>@selected.상태</strong>입니다. 이 페이지에서는 재고 생성, 검수 완료, 적재 위치 확정, 계약 연결이나 정산을 수행하지 않습니다.
+                    현재 상태는 <strong>@selected.상태</strong>입니다. 예정 상태라면 아래에서 도착·수령을 명시적으로 기록할 수 있으며, 검수와 최종 적재는 별도 단계입니다.
                 </MudAlert>
 
                 @if (!string.IsNullOrWhiteSpace(WorkBoardHref))

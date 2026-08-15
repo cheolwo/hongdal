@@ -18,6 +18,9 @@ public partial class SsalddelInboundReceivingWorkspace
     public string? WorkBoardPath { get; set; }
 
     [Parameter]
+    public string? InspectionPath { get; set; }
+
+    [Parameter]
     public EventCallback<long?> OnInboundSelected { get; set; }
 
     private bool _initialized;
@@ -33,6 +36,12 @@ public partial class SsalddelInboundReceivingWorkspace
         => InboundReceivingPresentation.WorkBoardHref(
             WorkBoardPath,
             ViewModel.상세.항목?.Id);
+
+    private string? InspectionHref
+        => !string.IsNullOrWhiteSpace(InspectionPath)
+           && ViewModel.수령.완료된입고상품Id is > 0
+            ? $"{InspectionPath.TrimEnd('/')}?inboundItemId={ViewModel.수령.완료된입고상품Id.Value}"
+            : null;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -118,6 +127,9 @@ public partial class SsalddelInboundReceivingWorkspace
         _loadedInboundId = inboundId;
         await OnInboundSelected.InvokeAsync(inboundId);
     }
+
+    private Task RecordReceiptAsync()
+        => ViewModel.수령기록후재조회Async();
 
     private async Task ClearSelectedInboundAsync()
     {

@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.WorkflowRules.Contracts\Ssalddel.WorkflowRules.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.WorkflowRules\Ssalddel.WorkflowRules.csproj" />
   </ItemGroup>
 
 </Project>

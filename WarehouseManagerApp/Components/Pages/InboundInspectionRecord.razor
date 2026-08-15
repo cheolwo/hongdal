@@ -8,7 +8,8 @@
                               Description="실제 수량과 현장 확인을 검토하고 한 입고상품의 검수 결과를 명시적으로 저장합니다.">
     <InboundInspectionRecordScreen InboundItemId="@InboundItemId"
                                    Context="@Context"
-                                   HomeHref="@WarehouseManagerRoutes.WorkBoard" />
+                                   HomeHref="@WarehouseManagerRoutes.WorkBoard"
+                                   PutAwayHref="@PutAwayHref" />
 </InboundInspectionAccessFrame>
 
 @code {
@@ -16,4 +17,7 @@
 
     private InboundInspectionNavigationContext Context
         => InboundInspectionNavigationContext.Parse(Navigation.Uri);
+
+    private string PutAwayHref
+        => $"{WarehouseManagerRoutes.PutAwayTask}?inboundItemId={InboundItemId}";
 }

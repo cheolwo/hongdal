@@ -465,6 +465,10 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(입고상품수령상세ViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고수령완료ViewModel)
+            && x.ImplementationType == typeof(입고수령완료ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(입고상품수령PageViewModel)
             && x.ImplementationType == typeof(입고상품수령PageViewModel)
             && x.Lifetime == ServiceLifetime.Transient);

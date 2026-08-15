@@ -1,0 +1,86 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@using Ssalddel.WorkflowRules.Contracts
+
+@if (Receiver.대상 is { } inbound)
+{
+    <MudPaper Class="pa-4" Elevation="0" Outlined="true" aria-label="도착·수령 기록">
+        <MudStack Spacing="3">
+            <div>
+                <MudText Typo="Typo.h6">3. 도착·수령 기록</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    입고 요청 #@(inbound.Id)의 실제 도착 수량을 확인한 뒤 서버 원장에 명시적으로 기록합니다.
+                </MudText>
+            </div>
+
+            @if (Receiver.완료된입고상품Id is > 0 and var inboundItemId)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt">
+                    같은 입고 요청을 다시 조회해 검수 대기 상태를 확인했습니다. 입고상품 ID는 <strong>@inboundItemId</strong>입니다.
+                </MudAlert>
+                @if (!string.IsNullOrWhiteSpace(InspectionHref))
+                {
+                    <MudButton Href="@InspectionHref"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               EndIcon="@Icons.Material.Filled.ChevronRight">
+                        이 입고상품 검수로 이동
+                    </MudButton>
+                }
+            }
+            else if (Receiver.공통상태코드 == 창고입고상태코드.입고예정)
+            {
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string" Label="상품명" Value="@Receiver.상품명" ValueChanged="SetProductName" Variant="Variant.Outlined" Disabled="@IsBusy" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string" Label="상품 SKU·바코드" Value="@Receiver.상품Sku" ValueChanged="SetSku" Variant="Variant.Outlined" Disabled="@IsBusy" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="int" Label="실제 입고 수량" Value="@Receiver.실제입고수량" ValueChanged="SetQuantity" Min="1" Max="100000" Variant="Variant.Outlined" Disabled="@IsBusy" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="int" Label="도착 시 확인한 불량 수량" Value="@Receiver.불량수량" ValueChanged="SetDefectiveQuantity" Min="0" Max="@Math.Max(0, Receiver.실제입고수량)" Variant="Variant.Outlined" Disabled="@IsBusy" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField T="string" Label="검수 대기 위치" HelperText="최종 보관 위치는 검수 뒤 적재 작업에서 별도로 확정합니다." Value="@Receiver.검수대기위치" ValueChanged="SetWaitingLocation" MaxLength="100" Variant="Variant.Outlined" Disabled="@IsBusy" />
+                    </MudItem>
+                </MudGrid>
+                <MudCheckBox T="bool" Value="@Receiver.도착상품수량확인" ValueChanged="SetArrivalConfirmed" Label="도착한 상품과 실제 수량을 확인했습니다." Disabled="@IsBusy" />
+                @if (Receiver.오류발생)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Receiver.오류메시지</MudAlert>
+                }
+                <MudButton FullWidth="true"
+                           Size="Size.Large"
+                           Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Inventory"
+                           Disabled="@(!Receiver.완료가능 || IsBusy)"
+                           OnClick="SubmitRequested">
+                    도착·수령 기록 저장
+                </MudButton>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    이 입고 요청은 이미 수령 기록을 마쳤습니다. 검수·적재는 생성된 입고상품 ID를 기준으로 별도 실행합니다.
+                </MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    [Parameter, EditorRequired] public 입고수령완료ViewModel Receiver { get; set; } = default!;
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public string? InspectionHref { get; set; }
+    [Parameter] public EventCallback SubmitRequested { get; set; }
+
+    private void SetProductName(string value) => Receiver.상품명 = value ?? string.Empty;
+    private void SetSku(string value) => Receiver.상품Sku = value ?? string.Empty;
+    private void SetQuantity(int value) => Receiver.실제입고수량 = value;
+    private void SetDefectiveQuantity(int value) => Receiver.불량수량 = value;
+    private void SetWaitingLocation(string value) => Receiver.검수대기위치 = value ?? string.Empty;
+    private void SetArrivalConfirmed(bool value) => Receiver.도착상품수량확인 = value;
+}

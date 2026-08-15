@@ -115,6 +115,15 @@
                             <MudText Typo="Typo.caption">현재 상태에서는 검수 Command를 다시 실행할 수 없습니다.</MudText>
                         </MudStack>
                     </MudAlert>
+                    @if (!string.IsNullOrWhiteSpace(PutAwayHref))
+                    {
+                        <MudButton Href="@PutAwayHref"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   EndIcon="@Icons.Material.Filled.ChevronRight">
+                            이 입고상품 적재로 이동
+                        </MudButton>
+                    }
                 }
 
                 <MudButton Href="@Context.PathFor(InboundInspectionScreenKind.Detail, selected.InboundItemId)"
@@ -142,6 +151,7 @@
     [Parameter, EditorRequired] public long InboundItemId { get; set; }
     [Parameter, EditorRequired] public InboundInspectionNavigationContext Context { get; set; } = new();
     [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter] public string? PutAwayHref { get; set; }
 
     private long _loadedInboundItemId;
 

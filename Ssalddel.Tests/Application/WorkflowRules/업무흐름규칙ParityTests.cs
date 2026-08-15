@@ -10,21 +10,53 @@ namespace Ssalddel.Tests.Application.WorkflowRules;
 public sealed class 업무흐름규칙ParityTests
 {
     [Fact]
-    public void Catalog는_네_업무와_운영효과_제외경계를_보존한다()
+    public void Catalog는_다섯_업무와_규칙별개정_운영효과제외경계를_보존한다()
     {
         var rules = 업무흐름규칙Catalog.전체조회();
 
         Assert.Equal(
-            [업무흐름코드.음식배달, 업무흐름코드.화물운송, 업무흐름코드.같이주문, 업무흐름코드.개별주문],
+            [업무흐름코드.음식배달, 업무흐름코드.화물운송, 업무흐름코드.같이주문, 업무흐름코드.개별주문, 업무흐름코드.창고입고],
             rules.Select(x => x.업무흐름코드).OrderBy(x => x, StringComparer.Ordinal));
         Assert.All(rules, rule =>
         {
             Assert.NotEmpty(rule.SourceCapabilityKey);
             Assert.NotEmpty(rule.SourceContractRevision);
-            Assert.Equal("workflow-rules.v1", rule.RuleRevision);
+            Assert.False(string.IsNullOrWhiteSpace(rule.RuleRevision));
             Assert.NotEmpty(rule.SourceStableIds);
             Assert.NotEmpty(rule.Simulation제외운영효과코드목록);
         });
+        Assert.All(
+            rules.Where(rule => rule.업무흐름코드 != 업무흐름코드.창고입고),
+            rule => Assert.Equal("workflow-rules.v1", rule.RuleRevision));
+        Assert.Equal(
+            "warehouse-inbound.v1",
+            rules.Single(rule => rule.업무흐름코드 == 업무흐름코드.창고입고).RuleRevision);
+    }
+
+    [Fact]
+    public void 창고입고는_수령_검수_적재를_분리하고_운영상태를_정규화한다()
+    {
+        var rule = 업무흐름규칙Catalog.조회(업무흐름코드.창고입고);
+
+        Assert.Equal(
+            [
+                창고입고상태코드.입고예정,
+                창고입고상태코드.검수대기,
+                창고입고상태코드.적재대기,
+                창고입고상태코드.적재완료,
+            ],
+            rule.상태코드목록);
+        Assert.True(업무상태전이Policy.판정(
+            업무흐름코드.창고입고,
+            창고입고상태코드.입고예정,
+            창고입고상태코드.검수대기).허용여부);
+        Assert.False(업무상태전이Policy.판정(
+            업무흐름코드.창고입고,
+            창고입고상태코드.검수대기,
+            창고입고상태코드.적재완료).허용여부);
+        Assert.Equal(창고입고상태코드.검수대기, 창고입고업무상태Adapter.정규화("보관중"));
+        Assert.Equal(창고입고상태코드.적재대기, 창고입고업무상태Adapter.정규화("검수완료-불량포함"));
+        Assert.Equal(창고입고상태코드.적재완료, 창고입고업무상태Adapter.정규화("적재완료"));
     }
 
     [Fact]

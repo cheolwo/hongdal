@@ -24,6 +24,7 @@ public static class SsalddelCodeFeatureKeys
     public const string CommonFoodProductIdentity = "common-food-product-identity";
     public const string HongikAcademyContentMap = "hongik-academy-content-map";
     public const string TransportExecutionProfile = "transport-execution-profile";
+    public const string WarehouseInboundVertical = "warehouse-inbound-vertical";
     public const string WorldRolePerspective = "world-role-perspective";
     public const string TradeLedgerExtensions = "trade-ledger-extensions";
 }

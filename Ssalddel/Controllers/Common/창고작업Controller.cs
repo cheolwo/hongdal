@@ -2,6 +2,7 @@ using Ssalddel.Application.Warehouse;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Inventory;
 using Ssalddel.Contracts.Common.Hr;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Shipper.Request;
 using Ssalddel.Contracts.Common.Warehouse;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +33,14 @@ namespace Ssalddel.Controllers.Common;
 [Authorize(Policy = "운영사용자전용")]
 [Route("api/v1/warehouse-operations")]
 [SsalddelApiContractName("WarehouseOperationsController")]
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.WarehouseInboundVertical,
+    SsalddelCodeLayer.Api,
+    "인증된 창고 작업자의 입고 수령·검수·적재 요청을 기존 운영 UseCase로 전달한다.",
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ContractType = typeof(입고완료요청),
+    FlowOrder = 40,
+    Boundary = "운영 인증과 창고 접근 범위를 검사하며 Simulation NPC 권한을 대신하지 않는다.")]
 public sealed class 창고작업Controller : ControllerBase
 {
     private readonly I창고작업UseCase _useCase;

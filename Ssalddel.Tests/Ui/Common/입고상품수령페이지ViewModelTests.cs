@@ -261,6 +261,109 @@ public sealed class 입고상품수령페이지ViewModelTests
         Assert.Null(page.상세.입고요청Id);
     }
 
+    [Fact]
+    public async Task 예정한건은_명시적수령뒤_같은입고Id를재조회하고_입고상품Id를인계한다()
+    {
+        var receiptSaved = false;
+        var client = new ScenarioJsonApiClient
+        {
+            Responder = (method, path, responseType, request) =>
+            {
+                if (responseType == typeof(창고목록응답))
+                    return new 창고목록응답
+                    {
+                        Items = [new 창고요약응답 { Id = 17, 창고명 = "공동 창고", IsActive = true }],
+                    };
+                if (method == HttpMethod.Get && path == "api/v1/warehouse-operations/inbounds/91")
+                    return new 입고요청항목응답
+                    {
+                        Id = 91,
+                        창고Id = 17,
+                        예정상품명 = "평창 감자",
+                        예정SKU = "SKU:POTATO-001",
+                        예정수량 = 12,
+                        상태 = receiptSaved ? 입고상태코드.완료 : 입고상태코드.예정,
+                    };
+                if (method == HttpMethod.Post
+                    && path == "api/v1/warehouse-operations/inbounds/91/complete"
+                    && request is 입고완료요청)
+                {
+                    receiptSaved = true;
+                    return new 입고상품목록응답
+                    {
+                        Items =
+                        [
+                            new 입고상품항목응답
+                            {
+                                Id = 901,
+                                입고요청Id = 91,
+                                SKU = "SKU:POTATO-001",
+                                상태 = "보관중",
+                            },
+                        ],
+                    };
+                }
+                throw new InvalidOperationException($"예상하지 않은 요청: {method} {path} ({responseType.Name})");
+            },
+        };
+        var service = new 입출고작업Service(client);
+        using var page = new 입고상품수령PageViewModel(
+            new 입고상품수령창고ViewModel(service),
+            new 입고예정상품검색ViewModel(service),
+            new 현장입고요청작성ViewModel(service),
+            new 입고상품수령상세ViewModel(service),
+            new 입고수령완료ViewModel(service));
+        Assert.True(await page.초기화Async(17, 91));
+        page.수령.검수대기위치 = "INBOUND-QA-01";
+        page.수령.도착상품수량확인 = true;
+
+        var succeeded = await page.수령기록후재조회Async();
+
+        Assert.True(succeeded);
+        Assert.Equal(901, page.수령.완료된입고상품Id);
+        Assert.Equal(입고상태코드.완료, page.상세.항목?.상태);
+        var command = Assert.IsType<입고완료요청>(client.Requests.Single(item =>
+            item.Path.EndsWith("/complete", StringComparison.Ordinal)).Request);
+        var item = Assert.Single(command.Items);
+        Assert.Equal("평창 감자", item.상품명);
+        Assert.Equal(12, item.입고수량);
+        Assert.Equal("INBOUND-QA-01", item.보관위치);
+        Assert.Equal(2, client.Requests.Count(item =>
+            item.Path == "api/v1/warehouse-operations/inbounds/91"));
+    }
+
+    [Fact]
+    public async Task 수령응답이_선택한한상품과다르면_다음단계로인계하지않는다()
+    {
+        var client = new ScenarioJsonApiClient
+        {
+            Responder = (_, _, responseType, _) => responseType == typeof(입고상품목록응답)
+                ? new 입고상품목록응답
+                {
+                    Items =
+                    [
+                        new 입고상품항목응답 { Id = 901, 입고요청Id = 77, SKU = "OTHER" },
+                    ],
+                }
+                : null,
+        };
+        var viewModel = new 입고수령완료ViewModel(new 입출고작업Service(client));
+        viewModel.대상준비(new 입고요청항목응답
+        {
+            Id = 91,
+            예정상품명 = "평창 감자",
+            예정SKU = "SKU:POTATO-001",
+            예정수량 = 12,
+            상태 = 입고상태코드.예정,
+        });
+        viewModel.검수대기위치 = "INBOUND-QA-01";
+        viewModel.도착상품수량확인 = true;
+
+        Assert.False(await viewModel.수령기록Async());
+        Assert.Null(viewModel.완료된입고상품Id);
+        Assert.Contains("정확히 일치하지 않습니다", viewModel.오류메시지);
+    }
+
     private sealed record RecordedRequest(HttpMethod Method, string Path, object? Request);
 
     private sealed class ScenarioJsonApiClient : ISsalddelJsonApiClient

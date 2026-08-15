@@ -38,6 +38,11 @@
 
             <InboundReceivingPersistedResult Detail="@ViewModel.상세"
                                               WorkBoardHref="@WorkBoardHref" />
+
+            <InboundReceivingReceiptForm Receiver="@ViewModel.수령"
+                                          IsBusy="@ViewModel.처리중"
+                                          InspectionHref="@InspectionHref"
+                                          SubmitRequested="RecordReceiptAsync" />
         }
     </MudStack>
 </section>

@@ -8,6 +8,7 @@ namespace Ssalddel.WorkflowRules.Contracts
         public const string 같이주문 = "GroupOrder";
         public const string 음식배달 = "FoodDelivery";
         public const string 화물운송 = "FreightTransport";
+        public const string 창고입고 = "WarehouseInbound";
     }
 
     public static class 개별주문상태코드
@@ -50,6 +51,21 @@ namespace Ssalddel.WorkflowRules.Contracts
         public const string 상차완료 = "상차완료";
         public const string 하차지도착 = "하차지도착";
         public const string 인수완료 = "인수완료";
+    }
+
+    public static class 창고입고상태코드
+    {
+        public const string 입고예정 = "Expected";
+        public const string 검수대기 = "PendingInspection";
+        public const string 적재대기 = "PutAwayPending";
+        public const string 적재완료 = "PutAwayCompleted";
+    }
+
+    public static class 창고입고행동코드
+    {
+        public const string 수령기록 = "RecordReceipt";
+        public const string 검수완료 = "CompleteInspection";
+        public const string 적재완료 = "CompletePutAway";
     }
 
     public static class 업무규칙차단사유코드

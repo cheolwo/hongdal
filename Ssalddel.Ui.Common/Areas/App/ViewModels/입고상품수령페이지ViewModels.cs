@@ -1,7 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ssalddel.Contracts.Common.Inbound;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Warehouse;
 using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.WorkflowRules;
+using Ssalddel.WorkflowRules.Contracts;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -282,6 +285,8 @@ public sealed partial class 현장입고요청작성ViewModel(
 public sealed partial class 입고상품수령상세ViewModel(
     I입출고작업Service service) : 업무작업ViewModelBase
 {
+    internal I입출고작업Service Service => service;
+
     [ObservableProperty]
     public partial long? 입고요청Id { get; private set; }
 
@@ -326,7 +331,154 @@ public sealed partial class 입고상품수령상세ViewModel(
     }
 }
 
+/// <summary>선택한 입고 예정 한 건의 도착·수령 기록과 정확한 입고상품 ID 확인을 관리합니다.</summary>
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.WarehouseInboundVertical,
+    SsalddelCodeLayer.ViewModel,
+    "입고 예정 한 건의 실제 수량과 검수 대기 위치를 확인하고 운영 입고 완료 Command를 요청한다.",
+    Effects = SsalddelCodeEffect.UiStateMutation,
+    ContractType = typeof(입고완료요청),
+    FlowOrder = 20,
+    Boundary = "운영 MAUI 조작 상태이며 서버 응답 전에는 수령 완료를 확정하지 않는다.")]
+public sealed partial class 입고수령완료ViewModel(
+    I입출고작업Service service) : 업무작업ViewModelBase
+{
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    [NotifyPropertyChangedFor(nameof(공통상태코드))]
+    public partial 입고요청항목응답? 대상 { get; private set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    public partial string 상품명 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    public partial string 상품Sku { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 옵션명 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    public partial int 실제입고수량 { get; set; } = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    public partial int 불량수량 { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    public partial string 검수대기위치 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(완료가능))]
+    public partial bool 도착상품수량확인 { get; set; }
+
+    [ObservableProperty]
+    public partial IReadOnlyList<입고상품항목응답> 결과목록 { get; private set; } = [];
+
+    [ObservableProperty]
+    public partial long? 완료된입고상품Id { get; private set; }
+
+    public string 공통상태코드 => 창고입고업무상태Adapter.정규화(대상?.상태 ?? string.Empty);
+
+    public bool 완료가능
+        => !처리중
+           && 대상 is { Id: > 0 }
+           && string.Equals(공통상태코드, 창고입고상태코드.입고예정, StringComparison.Ordinal)
+           && !string.IsNullOrWhiteSpace(상품명)
+           && !string.IsNullOrWhiteSpace(상품Sku)
+           && 실제입고수량 is >= 1 and <= 100_000
+           && 불량수량 >= 0
+           && 불량수량 <= 실제입고수량
+           && 검수대기위치.Trim().Length is > 0 and <= 100
+           && 도착상품수량확인;
+
+    public void 대상준비(입고요청항목응답? item)
+    {
+        대상 = item;
+        상품명 = item?.예정상품명?.Trim() ?? string.Empty;
+        상품Sku = item?.예정SKU?.Trim() ?? string.Empty;
+        옵션명 = string.Empty;
+        실제입고수량 = Math.Max(1, item?.예정수량 ?? 1);
+        불량수량 = 0;
+        검수대기위치 = string.Empty;
+        도착상품수량확인 = false;
+        결과목록 = [];
+        완료된입고상품Id = null;
+        작업상태초기화();
+        OnPropertyChanged(nameof(공통상태코드));
+        OnPropertyChanged(nameof(완료가능));
+    }
+
+    public Task<bool> 수령기록Async(CancellationToken cancellationToken = default)
+    {
+        if (!완료가능 || 대상 is not { Id: > 0 } inbound)
+            return Task.FromResult(유효성실패("실제 입고 수량, 불량 수량, 검수 대기 위치와 도착 확인을 완료해 주세요."));
+
+        var expectedSku = NormalizeSku(상품Sku);
+        return 작업실행Async(
+            async token =>
+            {
+                var items = await service.입고완료Async(inbound.Id, new 입고완료요청
+                {
+                    Items =
+                    [
+                        new 입고상품저장요청
+                        {
+                            상품명 = 상품명.Trim(),
+                            SKU = 상품Sku.Trim(),
+                            옵션명 = 옵션명.Trim(),
+                            입고수량 = 실제입고수량,
+                            불량수량 = 불량수량,
+                            보관위치 = 검수대기위치.Trim(),
+                        },
+                    ],
+                }, token);
+                var matched = items.Where(item =>
+                        item.입고요청Id == inbound.Id
+                        && string.Equals(NormalizeSku(item.SKU), expectedSku, StringComparison.Ordinal))
+                    .ToArray();
+                if (items.Count != 1 || matched.Length != 1)
+                    throw new InvalidOperationException("입고 완료 응답이 선택한 한 상품과 정확히 일치하지 않습니다.");
+                결과목록 = items;
+                완료된입고상품Id = matched[0].Id;
+            },
+            "도착·수령 기록을 저장하고 입고상품 ID를 확인했습니다.",
+            cancellationToken,
+            ex => $"도착·수령 기록을 저장하지 못했습니다. {ex.Message}");
+    }
+
+    public bool 재조회결과확인(입고요청항목응답? reloaded)
+    {
+        if (대상 is not { } original
+            || reloaded?.Id != original.Id
+            || !string.Equals(
+                창고입고업무상태Adapter.정규화(reloaded.상태),
+                창고입고상태코드.검수대기,
+                StringComparison.Ordinal))
+            return 유효성실패("수령 기록 뒤 같은 입고 요청이 검수 대기 상태인지 확인하지 못했습니다.");
+
+        대상 = reloaded;
+        OnPropertyChanged(nameof(공통상태코드));
+        OnPropertyChanged(nameof(완료가능));
+        return 완료된입고상품Id is > 0;
+    }
+
+    private static string NormalizeSku(string? value)
+        => (value ?? string.Empty).Trim().ToUpperInvariant();
+}
+
 /// <summary>창고 선택, 바코드 검색, 현장 요청 작성과 저장 후 같은 ID 재조회만 조립합니다.</summary>
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.WarehouseInboundVertical,
+    SsalddelCodeLayer.ViewModel,
+    "창고 선택부터 수령 기록, 같은 입고 요청 재조회와 검수 인계까지 한 건의 MAUI 흐름을 조립한다.",
+    Effects = SsalddelCodeEffect.UiStateMutation,
+    ContractType = typeof(입고완료요청),
+    FlowOrder = 10,
+    Boundary = "운영 Command 성공과 같은 ID 재조회가 모두 확인되어야 다음 검수 단계로 인계한다.")]
 public sealed class 입고상품수령PageViewModel : PageViewModelBase
 {
     private long? _초기창고Id;
@@ -336,21 +488,24 @@ public sealed class 입고상품수령PageViewModel : PageViewModelBase
         입고상품수령창고ViewModel warehouses,
         입고예정상품검색ViewModel search,
         현장입고요청작성ViewModel writer,
-        입고상품수령상세ViewModel detail)
+        입고상품수령상세ViewModel detail,
+        입고수령완료ViewModel? receiver = null)
     {
         창고 = 하위ViewModel등록(warehouses);
         검색 = 하위ViewModel등록(search);
         작성 = 하위ViewModel등록(writer);
         상세 = 하위ViewModel등록(detail);
+        수령 = 하위ViewModel등록(receiver ?? new 입고수령완료ViewModel(detail.Service));
     }
 
     public 입고상품수령창고ViewModel 창고 { get; }
     public 입고예정상품검색ViewModel 검색 { get; }
     public 현장입고요청작성ViewModel 작성 { get; }
     public 입고상품수령상세ViewModel 상세 { get; }
+    public 입고수령완료ViewModel 수령 { get; }
 
     protected override bool 하위ViewModel처리중
-        => 창고.처리중 || 검색.처리중 || 작성.처리중 || 상세.처리중;
+        => 창고.처리중 || 검색.처리중 || 작성.처리중 || 상세.처리중 || 수령.처리중;
 
     public Task<bool> 초기화Async(
         long? initialWarehouseId,
@@ -407,6 +562,7 @@ public sealed class 입고상품수령PageViewModel : PageViewModelBase
         }
 
         상세.조회대상설정(null);
+        수령.대상준비(null);
     }
 
     public bool 창고선택(long? warehouseId)
@@ -419,6 +575,7 @@ public sealed class 입고상품수령PageViewModel : PageViewModelBase
         검색.초기화();
         작성.닫기();
         상세.조회대상설정(null);
+        수령.대상준비(null);
         return true;
     }
 
@@ -430,6 +587,7 @@ public sealed class 입고상품수령PageViewModel : PageViewModelBase
         검색.검색어설정(productBarcode);
         작성.닫기();
         상세.조회대상설정(null);
+        수령.대상준비(null);
     }
 
     public void 현장입고작성시작()
@@ -457,13 +615,30 @@ public sealed class 입고상품수령PageViewModel : PageViewModelBase
     {
         상세.조회대상설정(inboundId);
         var queried = await 상세.조회Async(cancellationToken);
-        return queried
+        var selected = queried
                && !상세.대상없음
                && 상세.항목?.Id == inboundId;
+        수령.대상준비(selected ? 상세.항목 : null);
+        return selected;
+    }
+
+    public async Task<bool> 수령기록후재조회Async(CancellationToken cancellationToken = default)
+    {
+        if (!await 수령.수령기록Async(cancellationToken)
+            || 상세.입고요청Id is not { } inboundId
+            || 수령.완료된입고상품Id is not > 0)
+            return false;
+
+        상세.조회대상설정(inboundId);
+        return await 상세.조회Async(cancellationToken)
+               && 수령.재조회결과확인(상세.항목);
     }
 
     public void 입고선택해제()
-        => 상세.조회대상설정(null);
+    {
+        상세.조회대상설정(null);
+        수령.대상준비(null);
+    }
 
     private void 초기경로설정(long? initialWarehouseId, long? inboundId)
     {
@@ -479,6 +654,7 @@ public sealed class 입고상품수령PageViewModel : PageViewModelBase
             검색.작업취소();
             작성.작업취소();
             상세.작업취소();
+            수령.작업취소();
         }
 
         base.Dispose(disposing);

@@ -2,6 +2,7 @@ using FluentResults;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Inventory;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Warehouse;
 using Ssalddel.Contracts.Shipper.Request;
 using Ssalddel.Application.Warehouse.Events;
@@ -51,6 +52,14 @@ public interface I창고작업UseCase
 [SsalddelUseCaseActor(SsalddelActor.WarehouseManager)]
 [SsalddelUseCaseActor(SsalddelActor.ShipperOrSeller, SsalddelUseCaseActorRole.Supporting)]
 [SsalddelUseCaseActor(SsalddelActor.Shipper, SsalddelUseCaseActorRole.Supporting)]
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.WarehouseInboundVertical,
+    SsalddelCodeLayer.Application,
+    "접근 가능한 입고 예정 한 건의 수령을 멱등 처리하고 감사와 완료 Event를 발행한다.",
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ContractType = typeof(입고완료요청),
+    FlowOrder = 50,
+    Boundary = "운영 창고 원장의 상태 변경 권위이며 Unity와 Simulation 상태를 직접 변경하지 않는다.")]
 [SsalddelUseCaseRelation(
     SsalddelUseCaseRelationKind.Extend,
     "화주운송의뢰UseCase",

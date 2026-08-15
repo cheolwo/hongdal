@@ -209,7 +209,7 @@ public sealed class PageCapabilityCatalogTests
     [InlineData("WarehouseManagerApp", "/work/inbound/products?inboundId=88", "warehouse-app-inbound-products")]
     [InlineData("Ssalddel.WebApp", "/warehouse/work/inbound/products?inboundId=88", "web-warehouse-inbound-products")]
     [InlineData("Ssalddel.WebApp", "/work/inbound/products?inboundId=88", "web-warehouse-inbound-products-alias")]
-    public void 입고상품수령페이지는_요청만영속하고외부효과가없는Beta로분류한다(
+    public void 입고상품수령페이지는_명시적수령을영속하고외부효과가없는Beta로분류한다(
         string appCode,
         string route,
         string pageKey)
@@ -224,7 +224,8 @@ public sealed class PageCapabilityCatalogTests
         Assert.False(capability.HasExternalEffects);
         Assert.Contains("WarehouseFulfillmentWorkflow", capability.FeatureKeys);
         Assert.Contains("WarehouseFulfillment", capability.WorkflowCodes);
-        Assert.Contains("재고 생성은 실행하지 않습니다", capability.Notice);
+        Assert.Contains("도착·수령", capability.Notice);
+        Assert.Contains("자동 실행하지 않습니다", capability.Notice);
     }
 
     [Theory]
@@ -235,7 +236,7 @@ public sealed class PageCapabilityCatalogTests
     [InlineData("WarehouseManagerApp", "/work/inbound/inspection/88/record", "warehouse-app-inbound-inspection-routes")]
     [InlineData("Ssalddel.WebApp", "/warehouse/work/inbound/inspection/88", "web-warehouse-inbound-inspection-routes")]
     [InlineData("Ssalddel.WebApp", "/work/inbound/inspection/88/record", "web-warehouse-inbound-inspection-alias-routes")]
-    public void 입고검수페이지는_서버Simulation상태만변경하는Beta로분류한다(
+    public void 입고검수페이지는_운영창고원장을변경하는Beta로분류한다(
         string appCode,
         string route,
         string pageKey)
@@ -245,7 +246,7 @@ public sealed class PageCapabilityCatalogTests
         Assert.True(found);
         Assert.Equal(pageKey, capability.PageKey);
         Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
-        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.Equal(PageInteractionBoundary.PlatformPersistence, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects);
         Assert.Contains("WarehouseFulfillmentWorkflow", capability.FeatureKeys);
@@ -303,20 +304,20 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Theory]
-    [InlineData("WarehouseManagerApp", "/work/inbound/put-away?inboundItemId=8", "warehouse-app-put-away-task")]
-    [InlineData("Ssalddel.WebApp", "/warehouse/work/inbound/put-away?inboundItemId=8", "web-warehouse-put-away-task")]
-    [InlineData("Ssalddel.WebApp", "/work/inbound/put-away?inboundItemId=8", "web-warehouse-put-away-task-alias")]
-    [InlineData("WarehouseManagerApp", "/work/outbound/packing?inboundItemId=8", "warehouse-app-packing-task")]
-    [InlineData("Ssalddel.WebApp", "/warehouse/work/outbound/packing?inboundItemId=8", "web-warehouse-packing-task")]
-    [InlineData("Ssalddel.WebApp", "/work/outbound/packing?inboundItemId=8", "web-warehouse-packing-task-alias")]
-    [InlineData("WarehouseManagerApp", "/warehouse/general/transport-handoff?inboundItemId=8", "warehouse-app-outbound-handoff")]
-    [InlineData("Ssalddel.WebApp", "/warehouse/general/transport-handoff?inboundItemId=8", "web-warehouse-outbound-handoff")]
-    [InlineData("Ssalddel.WebApp", "/work/outbound/handoff?inboundItemId=8", "web-warehouse-outbound-handoff-alias")]
-    public void 적재작업페이지는_위치확정만하는BetaSimulation으로분류한다(string appCode,string route,string pageKey)
+    [InlineData("WarehouseManagerApp", "/work/inbound/put-away?inboundItemId=8", "warehouse-app-put-away-task", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("Ssalddel.WebApp", "/warehouse/work/inbound/put-away?inboundItemId=8", "web-warehouse-put-away-task", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("Ssalddel.WebApp", "/work/inbound/put-away?inboundItemId=8", "web-warehouse-put-away-task-alias", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("WarehouseManagerApp", "/work/outbound/packing?inboundItemId=8", "warehouse-app-packing-task", PageInteractionBoundary.Simulation)]
+    [InlineData("Ssalddel.WebApp", "/warehouse/work/outbound/packing?inboundItemId=8", "web-warehouse-packing-task", PageInteractionBoundary.Simulation)]
+    [InlineData("Ssalddel.WebApp", "/work/outbound/packing?inboundItemId=8", "web-warehouse-packing-task-alias", PageInteractionBoundary.Simulation)]
+    [InlineData("WarehouseManagerApp", "/warehouse/general/transport-handoff?inboundItemId=8", "warehouse-app-outbound-handoff", PageInteractionBoundary.Simulation)]
+    [InlineData("Ssalddel.WebApp", "/warehouse/general/transport-handoff?inboundItemId=8", "web-warehouse-outbound-handoff", PageInteractionBoundary.Simulation)]
+    [InlineData("Ssalddel.WebApp", "/work/outbound/handoff?inboundItemId=8", "web-warehouse-outbound-handoff-alias", PageInteractionBoundary.Simulation)]
+    public void 적재와후속작업은_실제저장경계대로분류한다(string appCode,string route,string pageKey,PageInteractionBoundary expectedBoundary)
     {
         Assert.True(SsalddelPageCapabilityCatalog.TryResolve(appCode,route,out var capability));
         Assert.Equal(pageKey,capability.PageKey); Assert.Equal(PageCapabilityStage.Beta,capability.Stage);
-        Assert.Equal(PageInteractionBoundary.Simulation,capability.Boundary); Assert.True(capability.RequiresAuthentication);
+        Assert.Equal(expectedBoundary,capability.Boundary); Assert.True(capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects); Assert.Contains("WarehouseFulfillmentWorkflow",capability.FeatureKeys);
     }
 

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Inventory;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Warehouse;
 using Ssalddel.Contracts.Shipper.Request;
 
@@ -120,6 +121,14 @@ public interface I공동구매창고Service : I입출고작업Service
 {
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.WarehouseInboundVertical,
+    SsalddelCodeLayer.ClientAdapter,
+    "MAUI 입고 수령 요청을 기존 창고 운영 API 계약으로 전송하고 응답을 반환한다.",
+    Effects = SsalddelCodeEffect.NetworkCall,
+    ContractType = typeof(입고완료요청),
+    FlowOrder = 30,
+    Boundary = "운영 API 호출 경계이며 sample fallback으로 성공을 만들지 않는다.")]
 public class 입출고작업Service(ISsalddelJsonApiClient client) : I입출고작업Service
 {
     private const string BasePath = "api/v1/warehouse-operations";

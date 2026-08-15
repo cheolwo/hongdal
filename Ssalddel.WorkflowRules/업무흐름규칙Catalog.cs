@@ -7,7 +7,8 @@ namespace Ssalddel.WorkflowRules
 {
     public static class 업무흐름규칙Catalog
     {
-        private const string 현재RuleRevision = "workflow-rules.v1";
+        private const string 기존RuleRevision = "workflow-rules.v1";
+        private const string 창고입고RuleRevision = "warehouse-inbound.v1";
 
         private static readonly IReadOnlyDictionary<string, 업무흐름규칙Snapshot> 규칙목록 =
             new Dictionary<string, 업무흐름규칙Snapshot>(StringComparer.Ordinal)
@@ -105,6 +106,25 @@ namespace Ssalddel.WorkflowRules
                         Transition(화물운송상태코드.하차지도착, 화물운송상태코드.인수완료),
                     },
                     "RealDriverAssignment", "GpsLocationWrite", "OperationalFreightSettlement", "CarrierNotification"),
+                [업무흐름코드.창고입고] = CreateWithRevision(
+                    업무흐름코드.창고입고,
+                    "warehouse.inbound-receive-inspect-put-away",
+                    "warehouse-inbound.v1",
+                    new[]
+                    {
+                        창고입고상태코드.입고예정,
+                        창고입고상태코드.검수대기,
+                        창고입고상태코드.적재대기,
+                        창고입고상태코드.적재완료,
+                    },
+                    new[]
+                    {
+                        Transition(창고입고상태코드.입고예정, 창고입고상태코드.검수대기),
+                        Transition(창고입고상태코드.검수대기, 창고입고상태코드.적재대기),
+                        Transition(창고입고상태코드.적재대기, 창고입고상태코드.적재완료),
+                    },
+                    창고입고RuleRevision,
+                    "OperationalInventoryWrite", "OperationalAuditLog", "OperationalWarehouseEvent", "OperationalEmployeeAuthorization"),
             };
 
         public static 업무흐름규칙Snapshot[] 전체조회()
@@ -133,13 +153,30 @@ namespace Ssalddel.WorkflowRules
             string[] states,
             업무상태전이[] transitions,
             params string[] excludedOperationalEffects)
+            => CreateWithRevision(
+                workflowCode,
+                sourceCapabilityKey,
+                sourceContractRevision,
+                states,
+                transitions,
+                기존RuleRevision,
+                excludedOperationalEffects);
+
+        private static 업무흐름규칙Snapshot CreateWithRevision(
+            string workflowCode,
+            string sourceCapabilityKey,
+            string sourceContractRevision,
+            string[] states,
+            업무상태전이[] transitions,
+            string ruleRevision,
+            params string[] excludedOperationalEffects)
         {
             return new 업무흐름규칙Snapshot
             {
                 업무흐름코드 = workflowCode,
                 SourceCapabilityKey = sourceCapabilityKey,
                 SourceContractRevision = sourceContractRevision,
-                RuleRevision = 현재RuleRevision,
+                RuleRevision = ruleRevision,
                 상태코드목록 = states,
                 허용전이목록 = transitions,
                 Simulation제외운영효과코드목록 = excludedOperationalEffects,
@@ -147,7 +184,7 @@ namespace Ssalddel.WorkflowRules
                 {
                     "capability:" + sourceCapabilityKey,
                     "contract-revision:" + sourceContractRevision,
-                    "rule-revision:" + 현재RuleRevision,
+                    "rule-revision:" + ruleRevision,
                 },
             };
         }
