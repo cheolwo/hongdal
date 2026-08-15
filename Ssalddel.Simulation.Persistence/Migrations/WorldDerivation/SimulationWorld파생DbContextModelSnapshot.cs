@@ -536,6 +536,490 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                     b.ToTable("시뮬레이션월드_Synty시각배치계획", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BusinessRuleCatalogHashSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("업무규칙대장SHA256");
+
+                    b.Property<string>("BusinessRuleCatalogRevision")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("업무규칙대장개정번호");
+
+                    b.Property<string>("CatalogHashSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("UI기획SHA256");
+
+                    b.Property<string>("CatalogRevision")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("UI기획개정번호");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("생성시각UTC");
+
+                    b.Property<int>("SchemaVersion")
+                        .HasColumnType("int")
+                        .HasColumnName("스키마버전");
+
+                    b.Property<DateTimeOffset>("StoredAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("저장시각UTC");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogRevision")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI기획대장", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI상태표현Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("BlocksMutationActions")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("변경행동차단여부");
+
+                    b.Property<long>("CatalogId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UI기획대장식별번호");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("표시순서");
+
+                    b.Property<string>("KoreanLabel")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("한글표시명");
+
+                    b.Property<string>("PresentationIntentCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("표현의도코드");
+
+                    b.Property<string>("SeverityCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("심각도코드");
+
+                    b.Property<string>("StableId")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("상태표현고유식별자");
+
+                    b.Property<string>("StateCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("상태코드");
+
+                    b.Property<string>("SurfaceStableId")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("화면영역고유식별자");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogId", "StableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI상태표현기획", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI설계근거Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CatalogId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UI기획대장식별번호");
+
+                    b.Property<string>("FileKey")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("Figma파일키");
+
+                    b.Property<string>("KoreanTitle")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("한글제목");
+
+                    b.Property<string>("NodeId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("FigmaNode식별자");
+
+                    b.Property<DateTimeOffset>("ObservedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("확인시각UTC");
+
+                    b.Property<string>("ObservedStructureCode")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("관측구조코드");
+
+                    b.Property<string>("ProviderCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("제공자코드");
+
+                    b.Property<string>("StableId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("설계근거고유식별자");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogId", "StableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI설계근거", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI업무규칙연결Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BusinessRuleBindingStableId")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("원본객체업무규칙연결고유식별자");
+
+                    b.Property<long>("CatalogId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UI기획대장식별번호");
+
+                    b.Property<string>("FacilityCapabilityCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("시설기능코드");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int")
+                        .HasColumnName("우선순위");
+
+                    b.Property<string>("PurposeCode")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("연결목적코드");
+
+                    b.Property<string>("RuleRevision")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("업무규칙개정번호");
+
+                    b.Property<string>("RuleStableId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("업무규칙고유식별자");
+
+                    b.Property<string>("StableId")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("연결고유식별자");
+
+                    b.Property<string>("SurfaceStableId")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("화면영역고유식별자");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogId", "BusinessRuleBindingStableId")
+                        .IsUnique();
+
+                    b.HasIndex("CatalogId", "StableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI업무규칙연결", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI정보항목Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CatalogId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UI기획대장식별번호");
+
+                    b.Property<string>("FormatCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("표시형식코드");
+
+                    b.Property<string>("InformationKindCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("정보종류코드");
+
+                    b.Property<string>("KoreanLabel")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("한글표시명");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int")
+                        .HasColumnName("우선순위");
+
+                    b.Property<bool>("ProvenanceRequired")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("계보표시필수여부");
+
+                    b.Property<string>("SourceContractKey")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("원본계약키");
+
+                    b.Property<string>("StableId")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("정보항목고유식별자");
+
+                    b.Property<string>("SurfaceStableId")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("화면영역고유식별자");
+
+                    b.Property<string>("UnitCode")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("단위코드");
+
+                    b.Property<string>("ValueSemanticCode")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("값의미코드");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogId", "StableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI정보항목기획", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI행동후보Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ActionKindCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("행동종류코드");
+
+                    b.Property<string>("CapabilityKey")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("기능키");
+
+                    b.Property<long>("CatalogId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UI기획대장식별번호");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("표시순서");
+
+                    b.Property<string>("KoreanLabel")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("한글표시명");
+
+                    b.Property<bool>("RequiresExpectedRevision")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("기대개정번호필수여부");
+
+                    b.Property<bool>("RequiresExplicitConfirmation")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("명시적확인필수여부");
+
+                    b.Property<bool>("RequiresPreview")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("Preview필수여부");
+
+                    b.Property<string>("ServerCommandKey")
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("서버Command키");
+
+                    b.Property<bool>("SimulationOnly")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("Simulation전용여부");
+
+                    b.Property<string>("StableId")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("행동후보고유식별자");
+
+                    b.Property<string>("SurfaceStableId")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("화면영역고유식별자");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogId", "StableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI행동후보기획", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI화면영역Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AnchorSemanticCode")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("공간Anchor의미코드");
+
+                    b.Property<long>("CatalogId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("UI기획대장식별번호");
+
+                    b.Property<bool>("DefaultVisible")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("기본표시여부");
+
+                    b.Property<string>("DesignEvidenceStableId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("설계근거고유식별자");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("표시순서");
+
+                    b.Property<string>("FacilityStableId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("시설고유식별자");
+
+                    b.Property<string>("KoreanTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("한글제목");
+
+                    b.Property<string>("PerspectiveCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("관점코드");
+
+                    b.Property<string>("RoleCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("역할코드");
+
+                    b.Property<string>("StableId")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)")
+                        .HasColumnName("화면영역고유식별자");
+
+                    b.Property<string>("SurfaceKindCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("화면종류코드");
+
+                    b.Property<string>("WorkflowStageCode")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("업무단계코드");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogId", "StableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_UI화면영역기획", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUnity공간변환Entity", b =>
                 {
                     b.Property<long>("Id")
@@ -2201,6 +2685,60 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                         .IsRequired();
 
                     b.Navigation("VisualRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI상태표현Entity", b =>
+                {
+                    b.HasOne("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI설계근거Entity", b =>
+                {
+                    b.HasOne("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI업무규칙연결Entity", b =>
+                {
+                    b.HasOne("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI정보항목Entity", b =>
+                {
+                    b.HasOne("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI행동후보Entity", b =>
+                {
+                    b.HasOne("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUI화면영역Entity", b =>
+                {
+                    b.HasOne("Ssalddel.Simulation.Persistence.SimulationWorldUI기획CatalogEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldUnity공간변환Entity", b =>

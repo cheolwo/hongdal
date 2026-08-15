@@ -80,6 +80,13 @@ namespace Ssalddel.Simulation.Application
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
                 .ConfirmDecision(request);
 
+        public 경영SimulationSessionSnapshot UpdateNpcPolicy(
+            string sessionStableId,
+            SimulationNpcPolicyChangeRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .UpdateNpcPolicy(request);
+
         public SimulationIndividualOrderPreviewSnapshot PreviewIndividualOrder(
             string sessionStableId,
             SimulationIndividualOrderPreviewRequest request)
@@ -163,6 +170,20 @@ namespace Ssalddel.Simulation.Application
             => (store.Find(sessionStableId)
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
                 .ConfirmFreightReceipt(request);
+
+        public SimulationDecisionPreviewSnapshot PreviewWarehousePutAway(
+            string sessionStableId,
+            SimulationWarehousePutAwayPreviewRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .PreviewWarehousePutAway(request);
+
+        public 경영SimulationSessionSnapshot ConfirmWarehousePutAway(
+            string sessionStableId,
+            SimulationWarehousePutAwayConfirmRequest request)
+            => (store.Find(sessionStableId)
+                ?? throw new SimulationNotFoundException("SimulationSessionNotFound"))
+                .ConfirmWarehousePutAway(request);
 
         public Simulation같이주문PreviewSnapshot PreviewGroupOrder(
             string sessionStableId,

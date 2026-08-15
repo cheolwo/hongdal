@@ -18,6 +18,18 @@ namespace Ssalddel.Simulation.Contracts
         public const string HarvestDispositionImpactConfirm = "HarvestDispositionImpactConfirm";
         public const string LogisticsMovementConfirm = "LogisticsMovementConfirm";
         public const string TurnClosingConfirm = "TurnClosingConfirm";
+        public const string NpcPolicyChange = "NpcPolicyChange";
+        public const string WorldItemAcquisitionConfirm = "WorldItemAcquisitionConfirm";
+        public const string SurvivalTarotResponseConfirm = "SurvivalTarotResponseConfirm";
+        public const string SurvivalTarotResolutionConfirm = "SurvivalTarotResolutionConfirm";
+        public const string FarmWorkConfirm = "FarmWorkConfirm";
+        public const string ThreatResponseConfirm = "ThreatResponseConfirm";
+        public const string TeamRoleCardEquip = "TeamRoleCardEquip";
+        public const string TeamActivityStart = "TeamActivityStart";
+        public const string TeamActivityEnd = "TeamActivityEnd";
+        public const string TileTraversalConfirm = "TileTraversalConfirm";
+        public const string CollectibleCardDraw = "CollectibleCardDraw";
+        public const string CollectibleCardTransfer = "CollectibleCardTransfer";
         public const string TickAdvance = "TickAdvance";
     }
 
@@ -43,6 +55,21 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationHarvestDispositionImpactConfirmRequest? HarvestDispositionImpactConfirmRequest { get; set; }
         public SimulationLogisticsMovementConfirmRequest? LogisticsMovementConfirmRequest { get; set; }
         public SimulationTurnClosingConfirmRequest? TurnClosingConfirmRequest { get; set; }
+        public SimulationNpcPolicyChangeRequest? NpcPolicyChangeRequest { get; set; }
+        public SimulationWorldItemAcquisitionConfirmRequest? WorldItemAcquisitionConfirmRequest
+            { get; set; }
+        public SimulationSurvivalTarotResponseConfirmRequest? SurvivalTarotResponseConfirmRequest
+            { get; set; }
+        public SimulationSurvivalTarotResolutionConfirmRequest? SurvivalTarotResolutionConfirmRequest
+            { get; set; }
+        public SimulationFarmWorkConfirmRequest? FarmWorkConfirmRequest { get; set; }
+        public SimulationThreatResponseConfirmRequest? ThreatResponseConfirmRequest { get; set; }
+        public SimulationTeamRoleCardEquipRequest? TeamRoleCardEquipRequest { get; set; }
+        public SimulationTeamActivityStartRequest? TeamActivityStartRequest { get; set; }
+        public SimulationTeamActivityEndRequest? TeamActivityEndRequest { get; set; }
+        public SimulationTileTraversalConfirmRequest? TileTraversalConfirmRequest { get; set; }
+        public SimulationCollectibleCardDrawRequest? CollectibleCardDrawRequest { get; set; }
+        public SimulationCollectibleCardTransferRequest? CollectibleCardTransferRequest { get; set; }
     }
 
     public sealed class SimulationSessionSavePackage
@@ -59,6 +86,10 @@ namespace Ssalddel.Simulation.Contracts
             = new 경영SimulationSession생성Request();
         public 경영SimulationSessionSnapshot Snapshot { get; set; }
             = new 경영SimulationSessionSnapshot();
+        public SimulationWorldInventorySnapshot WorldInventory { get; set; }
+            = new SimulationWorldInventorySnapshot();
+        public SimulationSurvivalTarotStateSnapshot SurvivalTarot { get; set; }
+            = new SimulationSurvivalTarotStateSnapshot();
         public SimulationCommandLogEntrySnapshot[] CommandLog { get; set; }
             = Array.Empty<SimulationCommandLogEntrySnapshot>();
     }

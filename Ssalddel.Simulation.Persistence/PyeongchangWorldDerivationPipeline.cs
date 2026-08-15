@@ -3,8 +3,10 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Domain.PublicData.Korea;
 using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Persistence;
@@ -40,8 +42,8 @@ public sealed class 평창군공간파생Pipeline(
     public const string 자료부족 = "InsufficientSourceData";
     private const string 평창군Code = "51760";
     private const string SourceStableId = "source:shared-public-data:pyeongchang-building-business";
-    private const string 공간RecipeRevision = "pyeongchang-public-spatial-pipeline.v5";
-    private const string 공간RuleRevision = "one-representative-per-building-category.v5";
+    private const string 공간RecipeRevision = "pyeongchang-completion-area-pipeline.v7";
+    private const string 공간RuleRevision = "region-first-world-projection.v7";
 
     public Task<평창군공간파생PipelineResult> 실행Async(CancellationToken cancellationToken)
         => 실행Async(null, cancellationToken);
@@ -55,6 +57,22 @@ public sealed class 평창군공간파생Pipeline(
             .OrderBy(item => item.Id)
             .ToListAsync(cancellationToken);
         var buildingIds = buildings.Select(item => item.Id).ToList();
+        var regionAssignments = await publicDataDb.BuildingRegionAssignments.AsNoTracking()
+            .Where(item => buildingIds.Contains(item.BuildingRecordId) && item.ValidToUtc == null)
+            .OrderBy(item => item.Id)
+            .ToListAsync(cancellationToken);
+        var administrativeRegionIds = regionAssignments
+            .Select(item => item.AdministrativeRegionStableId)
+            .Where(item => !string.IsNullOrWhiteSpace(item))
+            .Cast<string>()
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        var administrativeAggregates = await publicDataDb.AdministrativeBuildingCategoryAggregates
+            .AsNoTracking()
+            .Where(item => administrativeRegionIds.Contains(item.AdministrativeRegionStableId))
+            .OrderBy(item => item.AdministrativeRegionStableId)
+            .ThenBy(item => item.CategoryCode)
+            .ToListAsync(cancellationToken);
         var categories = await publicDataDb.BuildingCategoryAssignments.AsNoTracking()
             .Where(item => buildingIds.Contains(item.BuildingRecordId) && item.IsPrimary)
             .ToDictionaryAsync(item => item.BuildingRecordId, item => item.CategoryCode, cancellationToken);
@@ -81,7 +99,14 @@ public sealed class 평창군공간파생Pipeline(
         var tileManifest = string.IsNullOrWhiteSpace(tileManifestPath)
             ? null
             : await ReadTileManifestAsync(tileManifestPath, cancellationToken);
-        var publicDataSourceHash = SourceHash(buildings, categories, profiles, compositions, assignments);
+        var publicDataSourceHash = SourceHash(
+            buildings,
+            categories,
+            profiles,
+            compositions,
+            assignments,
+            regionAssignments,
+            administrativeAggregates);
         var sourceHash = tileManifest == null
             ? publicDataSourceHash
             : Sha256(publicDataSourceHash + "|tile-manifest:" + tileManifest.ManifestFileHashSha256);
@@ -89,12 +114,15 @@ public sealed class 평창군공간파생Pipeline(
             sourceHash + "|schema:2|recipe:" + 공간RecipeRevision + "|rule:" + 공간RuleRevision);
         var generatedAt = buildings.Select(item => item.ObservedAtUtc)
             .Concat(assignments.Select(item => item.BusinessRecord.ObservedAtUtc))
+            .Concat(administrativeAggregates.Select(item => item.GeneratedAtUtc))
             .DefaultIfEmpty(DateTimeOffset.UnixEpoch)
             .Max();
         var status = buildings.Count == 0 ? 자료부족 : 완료;
         var ledger = BuildLedger(
             representativeBuildings,
             representativeAssignments,
+            regionAssignments,
+            administrativeAggregates,
             tileManifest,
             publicDataSourceHash,
             spatialInputFingerprint,
@@ -123,6 +151,8 @@ public sealed class 평창군공간파생Pipeline(
     private static SimulationWorld파생원장 BuildLedger(
         IReadOnlyList<대표건축물선정항목> representativeBuildings,
         IReadOnlyList<Ssalddel.Domain.PublicData.Korea.공개사업장건축물Assignment> assignments,
+        IReadOnlyList<건축물행정구역Assignment> regionAssignments,
+        IReadOnlyList<행정동건축물CategoryAggregate> administrativeAggregates,
         PyeongchangTileManifest? tileManifest,
         string publicDataSourceHash,
         string sourceHash,
@@ -131,6 +161,16 @@ public sealed class 평창군공간파생Pipeline(
     {
         var nodes = AreaNodes().ToList();
         var relations = new List<SimulationWorld파생Relation>();
+        Add경관완결영역(nodes, relations, tileManifest);
+        Add지역Projection(
+            nodes,
+            relations,
+            representativeBuildings,
+            regionAssignments,
+            administrativeAggregates);
+        var regionAssignmentByBuilding = regionAssignments
+            .GroupBy(item => item.BuildingRecordId)
+            .ToDictionary(group => group.Key, group => group.First());
         foreach (var representative in representativeBuildings)
         {
             var building = representative.Building;
@@ -165,6 +205,8 @@ public sealed class 평창군공간파생Pipeline(
                     Confidence = 1m,
                 });
             }
+            if (regionAssignmentByBuilding.TryGetValue(building.Id, out var regionAssignment))
+                Add건물지역관계(relations, buildingNode, regionAssignment);
         }
 
         foreach (var assignment in assignments)
@@ -235,6 +277,152 @@ public sealed class 평창군공간파생Pipeline(
         };
     }
 
+    private static void Add지역Projection(
+        ICollection<SimulationWorld파생Node> nodes,
+        ICollection<SimulationWorld파생Relation> relations,
+        IReadOnlyList<대표건축물선정항목> representativeBuildings,
+        IReadOnlyList<건축물행정구역Assignment> assignments,
+        IReadOnlyList<행정동건축물CategoryAggregate> aggregates)
+    {
+        var representativeByBuilding = representativeBuildings
+            .ToDictionary(item => item.Building.Id, item => item.Building);
+        foreach (var group in assignments
+                     .GroupBy(item => item.LegalRegionStableId, StringComparer.Ordinal)
+                     .OrderBy(item => item.Key, StringComparer.Ordinal))
+        {
+            var relatedArea = group
+                .Where(item => representativeByBuilding.ContainsKey(item.BuildingRecordId))
+                .Select(item => AreaNodeFor(representativeByBuilding[item.BuildingRecordId].LegalDongCode))
+                .FirstOrDefault(item => item != null);
+            nodes.Add(new SimulationWorld파생Node
+            {
+                StableId = RegionNodeStableId("legal", group.Key),
+                NodeKindCode = SimulationWorldRegionProjectionCodes.LegalRegion,
+                SourceStableId = SourceStableId,
+                SourceRecordStableId = group.Key,
+                EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+                AreaStableId = relatedArea,
+                DisplayName = group.Key,
+            });
+        }
+
+        foreach (var regionStableId in assignments
+                     .Select(item => item.AdministrativeRegionStableId)
+                     .Where(item => !string.IsNullOrWhiteSpace(item))
+                     .Cast<string>()
+                     .Distinct(StringComparer.Ordinal)
+                     .OrderBy(item => item, StringComparer.Ordinal))
+        {
+            nodes.Add(new SimulationWorld파생Node
+            {
+                StableId = RegionNodeStableId("administrative", regionStableId),
+                NodeKindCode = SimulationWorldRegionProjectionCodes.AdministrativeRegion,
+                SourceStableId = SourceStableId,
+                SourceRecordStableId = regionStableId,
+                EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+                DisplayName = regionStableId,
+            });
+        }
+
+        foreach (var pair in assignments
+                     .Where(item => !string.IsNullOrWhiteSpace(item.AdministrativeRegionStableId))
+                     .Select(item => new
+                     {
+                         item.LegalRegionStableId,
+                         AdministrativeRegionStableId = item.AdministrativeRegionStableId!,
+                     })
+                     .Distinct()
+                     .OrderBy(item => item.LegalRegionStableId, StringComparer.Ordinal)
+                     .ThenBy(item => item.AdministrativeRegionStableId, StringComparer.Ordinal))
+        {
+            var legalNode = RegionNodeStableId("legal", pair.LegalRegionStableId);
+            var administrativeNode = RegionNodeStableId(
+                "administrative", pair.AdministrativeRegionStableId);
+            relations.Add(new SimulationWorld파생Relation
+            {
+                StableId = RelationStableId(
+                    "region-crosswalk", legalNode, administrativeNode),
+                FromNodeStableId = legalNode,
+                RelationCode = "LegalAdministrativeRegionCrosswalk",
+                ToNodeStableId = administrativeNode,
+                EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+                SourceStableId = SourceStableId,
+                Confidence = 1m,
+            });
+        }
+
+        foreach (var aggregate in aggregates.Where(item => item.BuildingCount > 0))
+        {
+            var administrativeNode = RegionNodeStableId(
+                "administrative", aggregate.AdministrativeRegionStableId);
+            var aggregateNode = "region-aggregate:building-category:"
+                                + aggregate.Id.ToString("N");
+            nodes.Add(new SimulationWorld파생Node
+            {
+                StableId = aggregateNode,
+                NodeKindCode = "AdministrativeRegionBuildingCategoryAggregate",
+                SourceStableId = SourceStableId,
+                SourceRecordStableId = aggregate.Id.ToString("N"),
+                EvidenceKindCode = aggregate.EvidenceKindCode,
+                DisplayName = aggregate.CategoryCode + " 건축물 집계",
+                RepresentativeGroupCode = aggregate.CategoryCode,
+                RepresentedRecordCount = aggregate.BuildingCount > int.MaxValue
+                    ? int.MaxValue
+                    : (int)aggregate.BuildingCount,
+                RepresentativeRank = 1,
+            });
+            relations.Add(new SimulationWorld파생Relation
+            {
+                StableId = RelationStableId(
+                    "region-building-category", administrativeNode, aggregateNode),
+                FromNodeStableId = administrativeNode,
+                RelationCode = "HasBuildingCategoryAggregate",
+                ToNodeStableId = aggregateNode,
+                EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+                SourceStableId = SourceStableId,
+                Confidence = 1m,
+            });
+        }
+    }
+
+    private static void Add건물지역관계(
+        ICollection<SimulationWorld파생Relation> relations,
+        string buildingNode,
+        건축물행정구역Assignment assignment)
+    {
+        var legalNode = RegionNodeStableId("legal", assignment.LegalRegionStableId);
+        relations.Add(new SimulationWorld파생Relation
+        {
+            StableId = RelationStableId("building-legal-region", buildingNode, legalNode),
+            FromNodeStableId = buildingNode,
+            RelationCode = "LocatedInLegalRegion",
+            ToNodeStableId = legalNode,
+            EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+            SourceStableId = SourceStableId,
+            Confidence = Confidence(assignment.ConfidenceCode),
+        });
+        if (string.IsNullOrWhiteSpace(assignment.AdministrativeRegionStableId)) return;
+        var administrativeNode = RegionNodeStableId(
+            "administrative", assignment.AdministrativeRegionStableId);
+        relations.Add(new SimulationWorld파생Relation
+        {
+            StableId = RelationStableId(
+                "building-administrative-region", buildingNode, administrativeNode),
+            FromNodeStableId = buildingNode,
+            RelationCode = "AggregatedInAdministrativeRegion",
+            ToNodeStableId = administrativeNode,
+            EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+            SourceStableId = SourceStableId,
+            Confidence = Confidence(assignment.ConfidenceCode),
+        });
+    }
+
+    private static string RegionNodeStableId(string regionKind, string regionStableId)
+        => "region-projection:" + regionKind + ':' + Sha256(regionStableId)[..20];
+
+    private static string RelationStableId(string kind, string from, string to)
+        => "relation:" + kind + ':' + Sha256(from + '|' + to)[..24];
+
     private static IEnumerable<SimulationWorld파생Node> AreaNodes() =>
     [
         Area("area:sim:pyeongchang:daegwallyeong-farm", "5176038000", "대관령면 Farm"),
@@ -251,6 +439,65 @@ public sealed class 평창군공간파생Pipeline(
         AreaStableId = id,
         DisplayName = name,
     };
+
+    private static void Add경관완결영역(
+        ICollection<SimulationWorld파생Node> nodes,
+        ICollection<SimulationWorld파생Relation> relations,
+        PyeongchangTileManifest? tileManifest)
+    {
+        var completionAreaId = PyeongchangSimulationWorldStableIds.대관령Farm경관완결영역;
+        var farmAreaId = PyeongchangSimulationWorldStableIds.대관령Farm영역;
+        nodes.Add(new SimulationWorld파생Node
+        {
+            StableId = completionAreaId,
+            NodeKindCode = "LandscapeCompletionArea",
+            EvidenceKindCode = SimulationWorld근거종류Codes.시나리오,
+            RegionCode = "5176038000",
+            TileKey = PyeongchangSimulationWorldStableIds.대관령Farm경관완결L2타일키[0],
+            AreaStableId = farmAreaId,
+            DisplayName = "대관령면 Farm 경관 완결 영역 v1",
+        });
+        relations.Add(new SimulationWorld파생Relation
+        {
+            StableId = $"relation:{farmAreaId}:contains:{completionAreaId}",
+            FromNodeStableId = farmAreaId,
+            RelationCode = "ContainsLandscapeCompletionArea",
+            ToNodeStableId = completionAreaId,
+            EvidenceKindCode = SimulationWorld근거종류Codes.시나리오,
+            SourceStableId = SourceStableId,
+            Confidence = 1m,
+        });
+
+        if (tileManifest == null)
+            return;
+
+        var taskTileKeys = PyeongchangSimulationWorldStableIds.대관령Farm경관완결L2타일키
+            .ToHashSet(StringComparer.Ordinal);
+        foreach (var tile in tileManifest.Tiles.Where(item => taskTileKeys.Contains(item.TileKey)))
+        {
+            var tileNodeId = "spatial-tile:" + tile.TileKey;
+            nodes.Add(new SimulationWorld파생Node
+            {
+                StableId = tileNodeId,
+                NodeKindCode = "SpatialTile",
+                EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+                RegionCode = "5176038000",
+                TileKey = tile.TileKey,
+                AreaStableId = completionAreaId,
+                DisplayName = tile.TileKey,
+            });
+            relations.Add(new SimulationWorld파생Relation
+            {
+                StableId = $"relation:{completionAreaId}:contains:{tileNodeId}",
+                FromNodeStableId = completionAreaId,
+                RelationCode = "ContainsSpatialTile",
+                ToNodeStableId = tileNodeId,
+                EvidenceKindCode = SimulationWorld근거종류Codes.파생,
+                SourceStableId = "source:shared-public-data:pyeongchang-spatial-tile-manifest",
+                Confidence = 1m,
+            });
+        }
+    }
 
     private static SimulationWorld원본계보[] SourceLineage(
         string publicDataSourceHash,
@@ -412,7 +659,26 @@ public sealed class 평창군공간파생Pipeline(
             generatedAt,
             fileHash,
             rasterHash,
-            tiles.ToArray());
+            Select경관완결영역Tiles(tiles));
+    }
+
+    public static SimulationWorldUnity타일Manifest[] Select경관완결영역Tiles(
+        IEnumerable<SimulationWorldUnity타일Manifest> tiles)
+    {
+        var source = tiles.ToArray();
+        var taskTileKeys = PyeongchangSimulationWorldStableIds.대관령Farm경관완결L2타일키
+            .ToHashSet(StringComparer.Ordinal);
+        var selectedTileKeys = taskTileKeys
+            .Concat(PyeongchangSimulationWorldStableIds.대관령Farm경관완결상위타일키)
+            .ToHashSet(StringComparer.Ordinal);
+        if (!selectedTileKeys.All(key => source.Any(item => item.TileKey == key)))
+            return source;
+
+        return source
+            .Where(item => selectedTileKeys.Contains(item.TileKey))
+            .OrderBy(item => item.Level)
+            .ThenBy(item => item.TileKey, StringComparer.Ordinal)
+            .ToArray();
     }
 
     private static decimal Confidence(string code) => code switch
@@ -459,9 +725,12 @@ public sealed class 평창군공간파생Pipeline(
         IReadOnlyDictionary<Guid, string> categories,
         IReadOnlyDictionary<Guid, Ssalddel.Domain.PublicData.Korea.건축물형태Profile> profiles,
         IReadOnlyDictionary<Guid, Ssalddel.Domain.PublicData.Korea.건축물시각구성계획> compositions,
-        IEnumerable<Ssalddel.Domain.PublicData.Korea.공개사업장건축물Assignment> assignments)
+        IEnumerable<Ssalddel.Domain.PublicData.Korea.공개사업장건축물Assignment> assignments,
+        IEnumerable<건축물행정구역Assignment> regionAssignments,
+        IEnumerable<행정동건축물CategoryAggregate> administrativeAggregates)
     {
-        var canonical = new StringBuilder("pyeongchang-public-spatial-pipeline.v5|one-representative-per-building-category|unity-transform:pending");
+        var canonical = new StringBuilder(
+            "pyeongchang-completion-area-pipeline.v7|region-first-world-projection|unity-transform:pending");
         foreach (var item in buildings)
             canonical.Append("|B:").Append(item.Id).Append(':').Append(item.SourceRevision)
                 .Append(':').Append(item.ObservedAtUtc.ToUniversalTime().ToString("O"));
@@ -474,6 +743,17 @@ public sealed class 평창군공간파생Pipeline(
         foreach (var item in assignments)
             canonical.Append("|A:").Append(item.Id).Append(':').Append(item.BusinessRecord.SourceHashSha256)
                 .Append(':').Append(item.RuleRevision);
+        foreach (var item in regionAssignments.OrderBy(item => item.Id))
+            canonical.Append("|RA:").Append(item.Id).Append(':').Append(item.LegalRegionStableId)
+                .Append(':').Append(item.AdministrativeRegionStableId).Append(':')
+                .Append(item.SourceVintage).Append(':').Append(item.RuleRevision);
+        foreach (var item in administrativeAggregates
+                     .OrderBy(item => item.AdministrativeRegionStableId, StringComparer.Ordinal)
+                     .ThenBy(item => item.CategoryCode, StringComparer.Ordinal))
+            canonical.Append("|AG:").Append(item.Id).Append(':')
+                .Append(item.AdministrativeRegionStableId).Append(':').Append(item.CategoryCode)
+                .Append(':').Append(item.BuildingCount).Append(':')
+                .Append(item.AggregateHashSha256).Append(':').Append(item.RuleRevision);
         return Sha256(canonical.ToString());
     }
 

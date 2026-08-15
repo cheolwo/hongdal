@@ -1,4 +1,5 @@
 using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Tests;
@@ -20,9 +21,27 @@ public sealed class SimulationWorldBusinessRuleCatalogTests
 
         Assert.Equal(4, catalog.Facilities.Count);
         Assert.Equal(18, catalog.Capabilities.Count);
-        Assert.Equal(10, catalog.Rules.Count);
-        Assert.Equal(10, catalog.Bindings.Count);
+        Assert.Equal(18, catalog.Rules.Count);
+        Assert.Equal(11, catalog.Bindings.Count);
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.창고적재규칙
+            && value.InputContractKey == nameof(SimulationWarehousePutAwayPreviewRequest));
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.팀역할Card장착규칙
+            && value.InputContractKey == nameof(SimulationTeamRoleCardEquipRequest));
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.팀활동시작규칙
+            && value.OutputContractKey == nameof(SimulationTeamRoleCardStateSnapshot));
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.팀활동종료규칙);
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.L2타일발견보상규칙
+            && value.InputContractKey == nameof(SimulationTileTraversalConfirmRequest));
+        Assert.Contains(catalog.Rules, value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.수집Card뽑기규칙
+            && value.OutputContractKey == nameof(SimulationCollectibleCardDrawResponse));
         Assert.Single(catalog.ScenarioRuleSets);
+        Assert.Equal(18, catalog.ScenarioRuleSets[0].Items.Count);
         Assert.Equal(firstHash, secondHash);
         Assert.All(catalog.Rules, rule => Assert.True(rule.SimulationOnly));
     }

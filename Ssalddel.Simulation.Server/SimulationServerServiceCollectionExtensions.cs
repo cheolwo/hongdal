@@ -13,6 +13,8 @@ public static class SimulationServerServiceCollectionExtensions
         "SimulationSharedPublicDataConnectionStringMissing";
     public const string WorldDerivationConnectionStringMissingErrorCode =
         "SimulationWorldDerivationConnectionStringMissing";
+    public const string SessionConnectionStringMissingErrorCode =
+        "SimulationSessionConnectionStringMissing";
 
     public static IServiceCollection AddSimulationServerServices(
         this IServiceCollection services,
@@ -34,6 +36,13 @@ public static class SimulationServerServiceCollectionExtensions
             .Validate(options => !options.Enabled
                 || !string.IsNullOrWhiteSpace(options.ConnectionStringName),
                 "Simulation World 파생 DB 연결 문자열 이름이 필요합니다.")
+            .ValidateOnStart();
+        services.AddOptions<SimulationSessionDatabaseOptions>()
+            .Bind(configuration.GetSection(
+                SimulationSessionDatabaseOptions.SectionName))
+            .Validate(options => !options.Enabled
+                || !string.IsNullOrWhiteSpace(options.ConnectionStringName),
+                "Simulation Session DB 연결 문자열 이름이 필요합니다.")
             .ValidateOnStart();
 
         var sharedOptions = configuration
@@ -57,6 +66,8 @@ public static class SimulationServerServiceCollectionExtensions
             .GetSection(SimulationWorldDerivationDatabaseOptions.SectionName)
             .Get<SimulationWorldDerivationDatabaseOptions>()
             ?? new SimulationWorldDerivationDatabaseOptions();
+        services.AddSingleton<ISimulationWorld지역ProjectionReader,
+            DisabledSimulationWorld지역ProjectionReader>();
         if (derivationOptions.Enabled)
         {
             var connectionString = configuration.GetConnectionString(
@@ -70,14 +81,50 @@ public static class SimulationServerServiceCollectionExtensions
         }
 
         services.AddSingleton<I경영SimulationSessionStore, InMemory경영SimulationSessionStore>();
-        services.AddSingleton<ISimulationSessionSaveStore, InMemorySimulationSessionSaveStore>();
+        var sessionDatabaseOptions = configuration
+            .GetSection(SimulationSessionDatabaseOptions.SectionName)
+            .Get<SimulationSessionDatabaseOptions>()
+            ?? new SimulationSessionDatabaseOptions();
+        if (sessionDatabaseOptions.Enabled)
+        {
+            var connectionString = configuration.GetConnectionString(
+                sessionDatabaseOptions.ConnectionStringName);
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException(
+                    SessionConnectionStringMissingErrorCode);
+            services.AddSimulationSessionPersistence(connectionString);
+        }
+        else
+        {
+            services.AddSingleton<ISimulationSessionSaveStore,
+                InMemorySimulationSessionSaveStore>();
+        }
         services.AddSingleton<경영SimulationSessionService>();
+        services.AddSingleton<SimulationWorldUIProjectionService>();
         services.AddSingleton<Simulation타로화물운송PreviewService>();
         services.AddSingleton<Simulation타로객체반응PreviewService>();
         services.AddSingleton<SimulationFreight렌더링의도Projector>();
         services.AddSingleton<Simulation렌더링의도합성Policy>();
         services.AddSingleton<Simulation기본Urp표현Catalog>();
         services.AddSingleton<SimulationRuntimeWorldPresentationService>();
+        services.AddSingleton<SimulationWorldStreamingService>();
+        services.AddSingleton<SimulationWorldExplorationService>();
+        services.AddSingleton<SimulationWorldSurvivalInventoryService>();
+        services.AddSingleton<SimulationSurvivalTarotService>();
+        services.AddSingleton<SimulationWorldEventProjectionService>();
+        services.AddSingleton<SimulationFarmSurvivalService>();
+        services.AddSingleton<InMemorySimulationTeamObservationPolicyStore>();
+        services.AddSingleton<ISimulationTeamObservationPolicyStore>(provider =>
+            provider.GetRequiredService<InMemorySimulationTeamObservationPolicyStore>());
+        services.AddSingleton<InMemorySimulationTeamMemberPoseStore>();
+        services.AddSingleton<ISimulationTeamMemberPoseStore>(provider =>
+            provider.GetRequiredService<InMemorySimulationTeamMemberPoseStore>());
+        services.AddSingleton<InMemorySimulationTeamObservationSessionStore>();
+        services.AddSingleton<ISimulationTeamObservationSessionStore>(provider =>
+            provider.GetRequiredService<InMemorySimulationTeamObservationSessionStore>());
+        services.AddSingleton<SimulationTeamObservationService>();
+        services.AddSingleton<SimulationTeamRoleCardService>();
+        services.AddSingleton<SimulationCollectibleCardRewardService>();
         services.AddHealthChecks()
             .AddCheck(
                 "self",

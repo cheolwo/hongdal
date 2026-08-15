@@ -3,11 +3,34 @@ using Ssalddel.Domain.PublicData.Korea;
 using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Simulation.Persistence;
 using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Tests;
 
 public sealed class PyeongchangRepresentativeSelectionTests
 {
+    [Fact]
+    public void 경관완결영역은_2곱하기2_L2타일과필요한상위타일만선택한다()
+    {
+        var tiles = PyeongchangSimulationWorldStableIds.대관령Farm경관완결L2타일키
+            .Concat(PyeongchangSimulationWorldStableIds.대관령Farm경관완결상위타일키)
+            .Append("kr5186:l2:702:1144")
+            .Select(Tile)
+            .ToArray();
+
+        var selected = 평창군공간파생Pipeline.Select경관완결영역Tiles(tiles);
+
+        Assert.Equal(6, selected.Length);
+        Assert.DoesNotContain(selected, item => item.TileKey == "kr5186:l2:702:1144");
+        Assert.Equal(
+            PyeongchangSimulationWorldStableIds.대관령Farm경관완결L2타일키
+                .OrderBy(item => item, StringComparer.Ordinal),
+            selected.Where(item => item.Level == 2)
+                .Select(item => item.TileKey)
+                .OrderBy(item => item, StringComparer.Ordinal));
+        Assert.Equal(new[] { 0, 1, 2, 2, 2, 2 }, selected.Select(item => item.Level));
+    }
+
     [Fact]
     public void 대표선정은_건물종류마다정확히하나만선택한다()
     {
@@ -154,6 +177,19 @@ public sealed class PyeongchangRepresentativeSelectionTests
     private static int Index(Guid id) => BitConverter.ToInt32(id.ToByteArray(), 0) - 1;
     private static string Value(대표건축물선정항목 item) =>
         $"{item.Building.Id:N}|{item.GroupCode}|{item.RepresentedRecordCount}|{item.Rank}";
+
+    private static SimulationWorldUnity타일Manifest Tile(string tileKey)
+    {
+        var segments = tileKey.Split(':');
+        var level = int.Parse(segments[1][1..], System.Globalization.CultureInfo.InvariantCulture);
+        return new SimulationWorldUnity타일Manifest
+        {
+            StableId = "unity-tile:" + tileKey,
+            TileKey = tileKey,
+            Level = level,
+            SizeMeters = level switch { 0 => 8000m, 1 => 2000m, _ => 500m },
+        };
+    }
 
     private static PublicDataIngestionDbContext CreatePublicDataDb() => new(
         new DbContextOptionsBuilder<PublicDataIngestionDbContext>()

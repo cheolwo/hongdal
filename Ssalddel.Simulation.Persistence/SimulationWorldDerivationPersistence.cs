@@ -32,6 +32,13 @@ public sealed class SimulationWorld파생DbContext(
     public DbSet<SimulationWorld객체업무규칙연결Entity> ObjectBusinessRuleBindings => Set<SimulationWorld객체업무규칙연결Entity>();
     public DbSet<SimulationWorldScenario규칙묶음Entity> ScenarioRuleSets => Set<SimulationWorldScenario규칙묶음Entity>();
     public DbSet<SimulationWorldScenario규칙항목Entity> ScenarioRuleItems => Set<SimulationWorldScenario규칙항목Entity>();
+    public DbSet<SimulationWorldUI기획CatalogEntity> UiPlanningCatalogs => Set<SimulationWorldUI기획CatalogEntity>();
+    public DbSet<SimulationWorldUI설계근거Entity> UiDesignEvidence => Set<SimulationWorldUI설계근거Entity>();
+    public DbSet<SimulationWorldUI화면영역Entity> UiSurfaces => Set<SimulationWorldUI화면영역Entity>();
+    public DbSet<SimulationWorldUI정보항목Entity> UiInformationItems => Set<SimulationWorldUI정보항목Entity>();
+    public DbSet<SimulationWorldUI상태표현Entity> UiStatePresentations => Set<SimulationWorldUI상태표현Entity>();
+    public DbSet<SimulationWorldUI행동후보Entity> UiActionCandidates => Set<SimulationWorldUI행동후보Entity>();
+    public DbSet<SimulationWorldUI업무규칙연결Entity> UiBusinessRuleBindings => Set<SimulationWorldUI업무규칙연결Entity>();
     public DbSet<SimulationWorld공간규칙MetadataEntity> SpatialRuleMetadata => Set<SimulationWorld공간규칙MetadataEntity>();
     public DbSet<SimulationWorldSimulation규칙MetadataEntity> SimulationRuleMetadata => Set<SimulationWorldSimulation규칙MetadataEntity>();
     public DbSet<SimulationWorld객체표현결합규칙Entity> ObjectRepresentationBindingRules => Set<SimulationWorld객체표현결합규칙Entity>();
@@ -63,6 +70,13 @@ public sealed class SimulationWorld파생DbContext(
         modelBuilder.ApplyConfiguration(new SimulationWorld객체업무규칙연결Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorldScenario규칙묶음Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorldScenario규칙항목Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI기획CatalogConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI설계근거Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI화면영역Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI정보항목Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI상태표현Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI행동후보Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldUI업무규칙연결Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorld공간규칙MetadataConfiguration());
         modelBuilder.ApplyConfiguration(new SimulationWorldSimulation규칙MetadataConfiguration());
         modelBuilder.ApplyConfiguration(new SimulationWorld객체표현결합규칙Configuration());
@@ -479,6 +493,7 @@ public static class SimulationWorldDerivationPersistenceRegistration
                 mysql.MigrationsHistoryTable("__EF마이그레이션이력_시뮬레이션월드파생");
             }));
         services.AddScoped<ISimulationWorld파생원장Store, SimulationWorld파생원장Store>();
+        services.AddScoped<ISimulationWorld지역ProjectionReader, SimulationWorld지역ProjectionReader>();
         services.AddScoped<ISimulationWorld객체표현규칙Store, SimulationWorld객체표현규칙Store>();
         services.AddScoped<SimulationWorld객체표현해석JobShell>();
         services.AddScoped<SimulationWorld건물종류DemoPipeline>();
@@ -488,6 +503,10 @@ public static class SimulationWorldDerivationPersistenceRegistration
         services.AddScoped<SimulationWorldSynty경관JobShell>();
         services.AddScoped<ISimulationWorld업무규칙집결Store, SimulationWorld업무규칙집결Store>();
         services.AddScoped<SimulationWorld업무규칙집결JobShell>();
+        services.AddScoped<ISimulationWorld업무규칙집결Reader, SimulationWorld업무규칙집결Reader>();
+        services.AddSingleton<ISimulationWorldUI기획Assembler, PyeongchangSimulationWorldUI기획Assembler>();
+        services.AddScoped<ISimulationWorldUI기획Store, SimulationWorldUI기획Store>();
+        services.AddScoped<SimulationWorldUI기획JobShell>();
         services.AddScoped<ISimulationDatabaseReadinessProbe,
             SimulationWorldDerivedReadinessProbe>();
         return services;

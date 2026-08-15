@@ -8,8 +8,8 @@ Unity 경영 Simulation의 session, scenario clock와 deterministic command 권�
 
 - `Ssalddel.Simulation.Domain`: Aggregate, 순수 규칙, 상태 전이와 저장 자료 재현
 - `Ssalddel.Simulation.Application`: 세션 조회와 미리보기·확정·저장·복원 업무 조율, 저장소 계약
-- `Ssalddel.Simulation.Infrastructure`: 메모리 저장소와 이후 영속 저장소 구현
-- `Ssalddel.Simulation.Persistence`: 공유 공공데이터 DB의 읽기 전용 EF 연결과 별도 Simulation World 파생 관계 DB 저장 구현
+- `Ssalddel.Simulation.Infrastructure`: DB가 비활성일 때 사용하는 메모리 저장소
+- `Ssalddel.Simulation.Persistence`: 공유 공공데이터 DB의 읽기 전용 EF 연결, Simulation World 파생 관계 DB와 Simulation Session 저장 자료 DB 구현
 - `Ssalddel.Simulation.Server`: HTTP, 실행 설정과 의존성 조립
 
 Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않는다. Application은 저장 구현이나 EF를 직접 생성하지 않고 저장소 계약과 공공데이터 조회 포트만 정의한다. Server는 운영 `Ssalddel.Infrastructure`를 직접 참조하지 않고 Persistence 연결 모듈만 조립한다.
@@ -38,6 +38,7 @@ Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않�
 - 도착 뒤 Hub 검수 전 `DestinationStockCandidate` 경계와 물류 Command save/replay
 - 같은 Cargo에 결합된 화물운송 의뢰·배차 후보·가상 차량 용량과 상차·운송·하차 상태 이력
 - 목적지 도착 뒤 별도 Preview·Confirm·WorldTick을 요구하는 화물 인수 완료
+- 검수 완료 재고를 적재 대기로 보존하고 별도 Preview·Confirm·NPC WorldTick으로 완료하는 창고 적재
 - 참여자별 명시적 의향·수량·동의를 보존하는 같이주문 모집 결과 Preview와 Confirm
 - 목표 충족의 `확정`, 목표 미달의 `모집종료목표미달` WorldTick 전이
 - 감자 시장재고 300kg을 기준으로 한 개별주문 20kg Preview·재고/노동 예약·포장 Task·수령준비
@@ -52,7 +53,9 @@ Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않�
 
 `--interpret-pyeongchang-building-type-demo --spatial-build=<공간실행>`은 종류별 대표에 고정 seed 시험 상태를 배정하고 공간 규칙·Simulation 규칙·결합 규칙·해석 결과를 저장한다. 시험 상태는 실제 회사 영업이나 작업 관측이 아니며 `ScenarioFixtureBuildingActivity`로 명시된다. 출력의 기본 구성 키와 동적 의도 묶음 키는 후속 Synty·URP Adapter 입력이다.
 
-API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationServer:Enabled=true`로 켜며 `SsalddelExecution:Mode=Simulation`이 아니면 host 시작을 거부한다. 현재 session store와 save store는 모두 프로세스 수명에 한정된 in-memory 구현이다. restore port는 구현됐지만 외부 durable adapter를 연결하지 않은 현재 host는 실제 프로세스 재시작 뒤 save를 읽을 수 없다.
+API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationServer:Enabled=true`로 켜며 `SsalddelExecution:Mode=Simulation`이 아니면 host 시작을 거부한다. 실행 중 aggregate를 가진 session store는 계속 프로세스 수명에 한정된다. 저장 자료는 `SimulationSessionDatabase:Enabled=true`일 때 별도 `SimulationSession` MySQL DB에 보관하며, 꺼져 있으면 기존 in-memory 저장소를 사용한다. 프로세스 재시작 뒤에는 저장 식별자로 DB 자료를 읽고 Command를 재생해 새 활성 Session을 복원한다. 현재 활성 Session 자체를 매 Command마다 DB snapshot으로 덮어쓰지는 않는다.
+
+Session 저장 표는 저장 식별자·Session 식별자·schema·WorldTick·개정·Command 수·재생 SHA-256과 전체 `simulation-save.v1` JSON을 함께 보존한다. 조회 시 열 Metadata와 JSON을 대조하고 기존 Save/Replay 검증을 다시 통과하지 못하면 손상 자료로 거부한다. 같은 저장 식별자와 같은 재생 hash는 멱등 재사용하고 다른 hash는 충돌로 거부한다. migration은 host 시작 시 자동 적용하지 않는다.
 
 공공데이터 공유 조회도 기본 비활성이다. 개발 설정에서는 `SimulationSharedPublicData:Enabled=true`이며 `ConnectionStrings:SharedPublicData`를 먼저 사용하고, 개발 설정에 명시된 `FallbackConnectionStringName=DefaultConnection`이 있을 때만 대체 연결 문자열을 사용한다. 배포 기본 설정에는 대체 이름이 없으므로 `SharedPublicData`가 반드시 필요하다. 배포 환경에서는 같은 DB와 스키마를 가리키되 `SELECT`만 허용한 별도 DB 계정을 사용한다. 연결 문자열은 환경 변수나 서버 측 secret 저장소에서 제공하며 source에 기록하지 않는다. 설정을 켰는데 허용된 연결 문자열이 없으면 host 시작을 거부한다.
 
@@ -60,14 +63,16 @@ API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationS
 
 ```powershell
 dotnet user-secrets set "ConnectionStrings:SharedPublicData" "<같은 DB의 읽기 전용 연결 문자열>" --project Ssalddel.Simulation.Server
+dotnet user-secrets set "ConnectionStrings:SimulationSession" "<별도 Simulation Session DB 연결 문자열>" --project Ssalddel.Simulation.Server
 ```
 
 ## Docker Compose 실행 구성
 
-운영 `Ssalddel` 서버와 같은 .NET 10 다단계 이미지, 비루트 사용자, 환경 변수의 `Section__Key` 주입과 `live`/`ready` 상태 확인 관례를 사용한다. 다만 운영 업무 DB 연결을 Simulation 컨테이너에 전달하지 않는다. `docker-compose.simulation.yml`은 다음 두 권한을 분리한다.
+운영 `Ssalddel` 서버와 같은 .NET 10 다단계 이미지, 비루트 사용자, 환경 변수의 `Section__Key` 주입과 `live`/`ready` 상태 확인 관례를 사용한다. 다만 운영 업무 DB 연결을 Simulation 컨테이너에 전달하지 않는다. `docker-compose.simulation.yml`은 다음 세 권한을 분리한다.
 
 - `ssalddel_simulation_reader`: 기존 `ssalddel_dev` 공유 공공데이터 DB의 `SELECT`만 허용
 - `ssalddel_simulation_world`: 별도 `ssalddel_simulation_world` DB의 공간 파생·규칙·표현 해석 원장만 읽고 씀
+- `ssalddel_simulation_session`: 별도 `ssalddel_simulation_session` DB의 Session 저장 자료만 읽고 씀
 
 `eng/docker/simulation.env.example`의 항목을 저장소 루트의 추적되지 않는 `.env`에 옮기고 비밀번호를 교체한다. 로컬 예시 기본 비밀번호를 실제 공유 환경이나 운영 환경에 사용하지 않는다. 계정 이름과 비밀번호는 초기화 Script의 SQL 안전 검사를 위해 영문자·숫자와 `_ . @ % -`만 사용한다.
 
@@ -81,7 +86,7 @@ docker compose `
   up -d --build mysql simulation-db-init simulation
 ```
 
-첫 실행 또는 파생 DB migration이 추가된 뒤에는 일반 API host 시작과 분리된 명시적 명령으로 migration을 적용한다. host 시작 자체는 migration을 자동 적용하지 않는다.
+첫 실행 또는 DB migration이 추가된 뒤에는 일반 API host 시작과 분리된 명시적 명령으로 각 migration을 적용한다. host 시작 자체는 migration을 자동 적용하지 않는다.
 
 ```powershell
 docker compose `
@@ -89,14 +94,20 @@ docker compose `
   -f docker-compose.simulation.yml `
   --profile simulation `
   run --rm simulation --migrate-simulation-world-database
+
+docker compose `
+  -f docker-compose.yml `
+  -f docker-compose.simulation.yml `
+  --profile simulation `
+  run --rm simulation --migrate-simulation-session-database
 ```
 
 상태 확인은 기존 호환 경로 `/health`와 함께 운영 서버와 동일한 의미를 갖는 두 경로를 제공한다.
 
 - `/health/live`: Simulation 프로세스가 응답하는지 확인
-- `/health/ready`: 활성화된 공유 공공데이터 DB와 Simulation World 파생 DB에 연결 가능한지 확인
+- `/health/ready`: 활성화된 공유 공공데이터 DB, Simulation World 파생 DB와 Simulation Session DB에 연결 가능한지 확인
 
-컨테이너 기본 노출은 `127.0.0.1:5204`이고, 외부 공개·TLS·인증·방화벽 구성은 이 로컬 Compose 범위에 포함하지 않는다. `Container` 환경 설정은 두 DB 연결을 활성화하지만 실제 연결 문자열은 Compose 환경 변수로만 공급한다.
+컨테이너 기본 노출은 `127.0.0.1:5204`이고, 외부 공개·TLS·인증·방화벽 구성은 이 로컬 Compose 범위에 포함하지 않는다. `Container` 환경 설정은 세 DB 연결을 활성화하지만 실제 연결 문자열은 Compose 환경 변수로만 공급한다.
 
 공유 공공데이터에서 평창군 Area·건물·공개 사업장 관계를 공간 실행으로 파생하려면 두 DB 연결을 활성화한 승인된 Simulation 환경에서 다음 명령을 실행한다.
 
@@ -107,6 +118,8 @@ dotnet run --project Ssalddel.Simulation.Server -- `
 ```
 
 이 명령은 공유 DB에 쓰지 않는다. 원본 정렬·입력 SHA-256, 공간 관계 생성, 원장 검증·출력 hash와 멱등 저장을 수행한다. 건물도형·좌표가 없으면 임의 위치를 생성하지 않고 미배치로 보고하며, 원본이 0건이면 `InsufficientSourceData`와 자료부족 node를 공간 DB에 남긴다.
+
+같은 실행은 건축물–법정동·행정동 Assignment와 행정동별 건물 Category 집계를 먼저 지역 Projection으로 가공한다. `GET /api/simulation/v1/world-stream/regions/{regionStableId}`는 최신 파생 실행의 법정동·행정동 관계와 건물 분류 집계를 반환한다. 경계 geometry가 아직 없으면 `WaitingForRegionGeometry`와 빈 타일 목록을 반환하며 임의의 지역–타일 관계를 생성하지 않는다.
 
 공간 실행과 독립된 Synty 경관 계획은 다음 명령으로 Job Shell에 제출한다.
 
@@ -130,12 +143,28 @@ dotnet run --project Ssalddel.Simulation.Server -- `
   --spatial-build=<공간 실행 고유 식별자>
 ```
 
+업무 규칙 대장을 바탕으로 Unity 구현 전 UI 정보 구조를 만들려면 다음 명령을 사용한다. Figma 역할 지도·주문자 흐름·공통 홈 node를 설계 근거로 보존하지만 실제 Canvas 좌표나 Prefab 경로는 저장하지 않는다.
+
+```powershell
+dotnet run --project Ssalddel.Simulation.Server -- `
+  --plan-pyeongchang-world-ui `
+  --business-rule-catalog=pyeongchang-farm-hub-town-business-rules.v3
+```
+
+UI 기획 `v3`는 활성 객체–업무 규칙 연결을 기준으로 조립하며 진부 Hub 적재 규칙까지 포함한다. 화면 시설·시설 기능·규칙 개정이 원본 연결과 모두 일치해야 하며, 활성 연결이 UI에서 빠지거나 중복되면 저장하지 않는다. 지역별 UI 조립기는 Job Shell과 분리되어 있으므로 다른 AreaSet은 같은 저장·검증 Pipeline을 재사용하고 별도 조립기만 제공한다.
+
+세부 구조는 [Figma 근거 Simulation World UI 기획 원장](../docs/Architecture/SimulationWorldUiPlanningLedger.md)을 따른다.
+
 공간 DB는 추가로 `Unity공간변환Profile → Unity타일Manifest → Unity산출물`을 축적한다. `--tile-manifest`를 생략하면 Unity 원점이나 기준 표고를 추측하지 않고 `WaitingForTileManifest` Profile만 저장한다. Manifest가 있으면 L0~L2 타일 경계·Halo·fingerprint와 원본 계보를 저장한다. 다만 Manifest에 DEM 기준 표고가 없으면 Profile은 `InsufficientSourceData`이며 Terrain·Mask·HLOD 산출 완료로 간주하지 않는다.
+
+L2 500m Runtime Recipe `r2`의 PC 초기 예산은 `3×3 상세 / 5×5 활성 / 9×9 준비`, 동시 Manifest 로드 4개다. 플레이어가 경계 125m 안에서 해당 방향으로 이동하면 Unity가 준비 중심을 한 타일 앞당긴다. 서버 Fixture의 11×11 `CoverageTileKeys`는 이 이동을 검증할 수 있는 제공 범위이지 한 번에 다운로드하거나 활성화하는 범위가 아니다.
 
 ```text
 POST /api/simulation/v1/sessions
 GET  /api/simulation/v1/sessions/{sessionStableId}
+GET  /api/simulation/v1/sessions/{sessionStableId}/world-events?afterWorldRevision={revision}
 GET  /api/simulation/v1/public-data/kamis-price-observations?itemName=감자&limit=20
+GET  /api/simulation/v1/world-stream/regions/{regionStableId}
 POST /api/simulation/v1/sessions/{sessionStableId}/ticks
 POST /api/simulation/v1/sessions/{sessionStableId}/decision-previews
 POST /api/simulation/v1/sessions/{sessionStableId}/decisions/confirm
@@ -147,6 +176,8 @@ POST /api/simulation/v1/sessions/{sessionStableId}/freight-transport-previews
 POST /api/simulation/v1/sessions/{sessionStableId}/freight-transports/confirm
 POST /api/simulation/v1/sessions/{sessionStableId}/freight-receipt-previews
 POST /api/simulation/v1/sessions/{sessionStableId}/freight-receipts/confirm
+POST /api/simulation/v1/sessions/{sessionStableId}/warehouse-put-away-previews
+POST /api/simulation/v1/sessions/{sessionStableId}/warehouse-put-aways/confirm
 POST /api/simulation/v1/sessions/{sessionStableId}/group-order-previews
 POST /api/simulation/v1/sessions/{sessionStableId}/group-orders/confirm
 POST /api/simulation/v1/sessions/{sessionStableId}/individual-order-previews
@@ -159,6 +190,8 @@ GET  /health
 GET  /health/live
 GET  /health/ready
 ```
+
+세계 사건 조회는 Simulation Session이 먼저 확정한 사건을 개정 단위로 내려준다. 처음 조회는 `afterWorldRevision=-1`을 사용하고, 이후에는 응답의 `NextAfterWorldRevision`을 다음 요청에 사용한다. `PresentationKey`는 Unity 구성 대장의 의미 키이며 Prefab·Material 경로나 시뮬레이션 업무 확정 권위가 아니다. 현재 첫 adapter는 생존 타로 기회로, 응답·합의는 기존 `/survival-tarot` Confirm 경로를 사용하고 확정 후 사건 변경을 다시 조회한다.
 
 첫 공공데이터 관점별 조회 결과는 KAMIS 가격 관측이다. 품목, 조사일, 규격 단위, 원화 가격, 결측 여부, 출처와 마지막 확인 시각을 반환하며 원문 JSON과 수집 실행 식별자는 내보내지 않는다. 이는 Simulation 규칙의 입력 근거로 읽을 수 있는 관측 자료이지, 운영 재고나 주문 완료 사실이 아니다.
 

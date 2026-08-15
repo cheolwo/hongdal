@@ -12,6 +12,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string Scheduled = "Scheduled";
         public const string InProgress = "InProgress";
+        public const string Blocked = "Blocked";
         public const string Completed = "Completed";
         public const string Cancelled = "Cancelled";
     }
@@ -44,6 +45,8 @@ namespace Ssalddel.Simulation.Contracts
         public string TaskStableId { get; set; } = string.Empty;
         public string TaskTypeCode { get; set; } = string.Empty;
         public string FacilityStableId { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string AssignedActorStableId { get; set; } = string.Empty;
         public decimal AssignedCapacity { get; set; }
         public string AssignedCapacityUnitCode { get; set; } = string.Empty;
         public int DurationTicks { get; set; } = 1;
@@ -105,6 +108,8 @@ namespace Ssalddel.Simulation.Contracts
         public string TaskStableId { get; set; } = string.Empty;
         public string TaskTypeCode { get; set; } = string.Empty;
         public string FacilityStableId { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string AssignedActorStableId { get; set; } = string.Empty;
         public decimal AssignedCapacity { get; set; }
         public string AssignedCapacityUnitCode { get; set; } = string.Empty;
         public int DurationTicks { get; set; }
@@ -121,6 +126,8 @@ namespace Ssalddel.Simulation.Contracts
         public long Revision { get; set; }
         public string CausedByDecisionStableId { get; set; } = string.Empty;
         public string FacilityStableId { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string AssignedActorStableId { get; set; } = string.Empty;
         public decimal AssignedCapacity { get; set; }
         public string AssignedCapacityUnitCode { get; set; } = string.Empty;
         public int ScheduledStartTick { get; set; }

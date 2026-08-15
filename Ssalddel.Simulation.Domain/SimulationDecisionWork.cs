@@ -45,7 +45,8 @@ namespace Ssalddel.Simulation.Domain
             Action<SimulationDecisionConfirmRequest> appendCommand)
         {
                 if (appliedCommands.ContainsKey(request.CommandId)
-                    || appliedTurnClosingCommands.ContainsKey(request.CommandId))
+                    || appliedTurnClosingCommands.ContainsKey(request.CommandId)
+                    || HasAppliedNpcPolicyCommand(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 var payloadKey = BuildDecisionPayloadKey(request.Preview);
                 if (appliedDecisionCommands.TryGetValue(request.CommandId, out var applied))
@@ -81,6 +82,8 @@ namespace Ssalddel.Simulation.Domain
                     Revision = 1,
                     CausedByDecisionStableId = decision.DecisionStableId,
                     FacilityStableId = preview.TaskPlan.FacilityStableId,
+                    ActionCode = preview.TaskPlan.ActionCode,
+                    AssignedActorStableId = preview.TaskPlan.AssignedActorStableId,
                     AssignedCapacity = preview.TaskPlan.AssignedCapacity,
                     AssignedCapacityUnitCode = preview.TaskPlan.AssignedCapacityUnitCode,
                     ScheduledStartTick = CurrentTick + 1,
@@ -130,6 +133,7 @@ namespace Ssalddel.Simulation.Domain
                 if (pendingEffects.Any(value => effects.ContainsKey(value.EffectStableId)))
                     throw new SimulationConflictException("SimulationEffectStableIdConflict");
 
+                RegisterNpcTaskAssignment(task);
                 decisions.Add(decision.DecisionStableId, decision);
                 tasks.Add(task.TaskStableId, task);
                 foreach (var effect in pendingEffects)
@@ -167,6 +171,8 @@ namespace Ssalddel.Simulation.Domain
                 if (task.StateCode == SimulationTaskStateCodes.Completed
                     || task.StateCode == SimulationTaskStateCodes.Cancelled)
                     continue;
+                if (!CanAdvanceNpcTask(task, currentTick))
+                    continue;
 
                 if (currentTick >= task.ExpectedEndTick)
                 {
@@ -185,6 +191,7 @@ namespace Ssalddel.Simulation.Domain
                     Advance수출준비성검토ForTask(task, task.ExpectedEndTick);
                     Advance수출선적계획ForTask(task, task.ExpectedEndTick);
                     Advance수출선적실행ForTask(task, task.ExpectedEndTick);
+                    CompleteNpcTaskAssignment(task, task.ExpectedEndTick);
                     task.StateCode = SimulationTaskStateCodes.Completed;
                     task.Revision++;
                     task.ActualEndTick = task.ExpectedEndTick;
@@ -221,11 +228,16 @@ namespace Ssalddel.Simulation.Domain
             => appliedDecisionCommands.ContainsKey(commandId)
                 || HasAppliedHarvestDispositionImpactCommand(commandId)
                 || appliedLogisticsMovementCommands.ContainsKey(commandId)
-                || appliedTurnClosingCommands.ContainsKey(commandId);
+                || appliedTurnClosingCommands.ContainsKey(commandId)
+                || HasAppliedNpcPolicyCommand(commandId)
+                || appliedWorldItemAcquisitionCommands.ContainsKey(commandId)
+                || HasAppliedSurvivalTarotCommand(commandId)
+                || HasAppliedCollectibleCardCommand(commandId);
 
         private SimulationDecisionPreviewSnapshot CreateDecisionPreview(
             SimulationDecisionPreviewRequest request)
-            => new SimulationDecisionPreviewSnapshot
+        {
+            var result = new SimulationDecisionPreviewSnapshot
             {
                 Decision = new SimulationDecisionSnapshot
                 {
@@ -251,6 +263,8 @@ namespace Ssalddel.Simulation.Domain
                     TaskStableId = request.Task.TaskStableId.Trim(),
                     TaskTypeCode = request.Task.TaskTypeCode.Trim(),
                     FacilityStableId = request.Task.FacilityStableId.Trim(),
+                    ActionCode = request.Task.ActionCode.Trim(),
+                    AssignedActorStableId = request.Task.AssignedActorStableId.Trim(),
                     AssignedCapacity = request.Task.AssignedCapacity,
                     AssignedCapacityUnitCode = request.Task.AssignedCapacityUnitCode.Trim(),
                     DurationTicks = request.Task.DurationTicks,
@@ -259,6 +273,9 @@ namespace Ssalddel.Simulation.Domain
                     SourceStableIds = NormalizeIds(request.Task.SourceStableIds),
                 },
             };
+            ResolveNpcPreviewAssignment(result.TaskPlan);
+            return result;
+        }
 
         private SimulationDecisionSnapshot[] CreateDecisionSnapshots()
             => decisions.Values
@@ -315,6 +332,12 @@ namespace Ssalddel.Simulation.Domain
                 "SimulationTaskAssignedCapacityUnitCodeInvalid");
             if (request.Task.DurationTicks <= 0 || request.Task.DurationTicks > 28)
                 throw new SimulationContractException("SimulationTaskDurationTicksInvalid");
+            if (!string.IsNullOrWhiteSpace(request.Task.ActionCode))
+                RequireStableId(request.Task.ActionCode, "SimulationTaskActionCodeInvalid");
+            if (!string.IsNullOrWhiteSpace(request.Task.AssignedActorStableId))
+                RequireStableId(
+                    request.Task.AssignedActorStableId,
+                    "SimulationTaskAssignedActorStableIdInvalid");
             ValidateIds(request.Task.InputLotStableIds, true, "SimulationTaskInputLotStableIdsInvalid");
             ValidateIds(request.Task.OutputCandidateCodes, false, "SimulationTaskOutputCandidateCodesInvalid");
             ValidateIds(request.Task.SourceStableIds, true, "SimulationTaskSourceStableIdsInvalid");
@@ -373,7 +396,7 @@ namespace Ssalddel.Simulation.Domain
         internal static string BuildDecisionPayloadKey(SimulationDecisionPreviewRequest request)
         {
             var preview = NormalizePreviewForPayload(request);
-            return string.Join("\u001e", new[]
+            var parts = new List<string>
             {
                 preview.DecisionStableId,
                 preview.DecisionTypeCode,
@@ -393,7 +416,15 @@ namespace Ssalddel.Simulation.Domain
                 string.Join("\u001f", preview.Task.InputLotStableIds),
                 string.Join("\u001f", preview.Task.OutputCandidateCodes),
                 string.Join("\u001f", preview.Task.SourceStableIds),
-            });
+            };
+            if (preview.Task.ActionCode.Length > 0
+                || preview.Task.AssignedActorStableId.Length > 0)
+            {
+                parts.Add("NpcTaskBindingV1");
+                parts.Add(preview.Task.ActionCode);
+                parts.Add(preview.Task.AssignedActorStableId);
+            }
+            return string.Join("\u001e", parts);
         }
 
         private static SimulationDecisionPreviewRequest NormalizePreviewForPayload(
@@ -414,6 +445,8 @@ namespace Ssalddel.Simulation.Domain
                     TaskStableId = request.Task.TaskStableId.Trim(),
                     TaskTypeCode = request.Task.TaskTypeCode.Trim(),
                     FacilityStableId = request.Task.FacilityStableId.Trim(),
+                    ActionCode = request.Task.ActionCode.Trim(),
+                    AssignedActorStableId = request.Task.AssignedActorStableId.Trim(),
                     AssignedCapacity = request.Task.AssignedCapacity,
                     AssignedCapacityUnitCode = request.Task.AssignedCapacityUnitCode.Trim(),
                     DurationTicks = request.Task.DurationTicks,
@@ -496,6 +529,8 @@ namespace Ssalddel.Simulation.Domain
                 Revision = source.Revision,
                 CausedByDecisionStableId = source.CausedByDecisionStableId,
                 FacilityStableId = source.FacilityStableId,
+                ActionCode = source.ActionCode,
+                AssignedActorStableId = source.AssignedActorStableId,
                 AssignedCapacity = source.AssignedCapacity,
                 AssignedCapacityUnitCode = source.AssignedCapacityUnitCode,
                 ScheduledStartTick = source.ScheduledStartTick,

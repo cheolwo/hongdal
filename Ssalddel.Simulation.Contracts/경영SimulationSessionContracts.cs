@@ -18,6 +18,11 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationWorldContext생성Request WorldContext { get; set; }
             = new SimulationWorldContext생성Request();
         public SimulationSettlementInitialStateRequest? Settlement { get; set; }
+        public SimulationNpcWorkforceInitialStateRequest? NpcWorkforce { get; set; }
+        public SimulationWorldInventoryInitialStateRequest? WorldInventory { get; set; }
+        public SimulationSurvivalTarotInitialStateRequest? SurvivalTarot { get; set; }
+        public SimulationFarmSurvivalInitialStateRequest? FarmSurvival { get; set; }
+        public SimulationTeamRoleCardInitialState? TeamRoleCards { get; set; }
     }
 
     public sealed class SimulationWorldContext생성Request
@@ -89,7 +94,27 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationTurnClosingSnapshot>();
         public SimulationActiveTurnCardEffectSnapshot[] ActiveTurnCardEffects { get; set; }
             = Array.Empty<SimulationActiveTurnCardEffectSnapshot>();
+        public SimulationNpcOrganizationSnapshot[] NpcOrganizations { get; set; }
+            = Array.Empty<SimulationNpcOrganizationSnapshot>();
+        public SimulationNpcActorSnapshot[] NpcActors { get; set; }
+            = Array.Empty<SimulationNpcActorSnapshot>();
+        public SimulationNpcCapabilityGrantSnapshot[] NpcCapabilityGrants { get; set; }
+            = Array.Empty<SimulationNpcCapabilityGrantSnapshot>();
+        public SimulationNpcWorkPolicySnapshot[] NpcWorkPolicies { get; set; }
+            = Array.Empty<SimulationNpcWorkPolicySnapshot>();
+        public SimulationNpcTaskAssignmentSnapshot[] NpcTaskAssignments { get; set; }
+            = Array.Empty<SimulationNpcTaskAssignmentSnapshot>();
+        public SimulationNpcWorkRecordSnapshot[] NpcWorkRecords { get; set; }
+            = Array.Empty<SimulationNpcWorkRecordSnapshot>();
+        public SimulationNpcActionProjection[] NpcActionProjections { get; set; }
+            = Array.Empty<SimulationNpcActionProjection>();
+        public SimulationNpcFacilityInventorySnapshot[] NpcFacilityInventories { get; set; }
+            = Array.Empty<SimulationNpcFacilityInventorySnapshot>();
         public SimulationSettlementEconomySnapshot? Settlement { get; set; }
+        public SimulationFarmSurvivalStateSnapshot? FarmSurvival { get; set; }
+        public SimulationTeamRoleCardStateSnapshot? TeamRoleCards { get; set; }
+        public SimulationWorldExplorationStateSnapshot? Exploration { get; set; }
+        public SimulationCollectibleCardRewardStateSnapshot? CollectibleCardRewards { get; set; }
     }
 
     public sealed class SimulationWorldContextSnapshot

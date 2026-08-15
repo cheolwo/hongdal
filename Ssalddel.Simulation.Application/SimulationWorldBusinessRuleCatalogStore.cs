@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Application
@@ -23,6 +24,13 @@ public interface ISimulationWorld업무규칙집결Store
 {
     Task<SimulationWorld업무규칙집결저장결과> 저장Async(
         SimulationWorld업무규칙집결원장 catalog,
+        CancellationToken cancellationToken);
+}
+
+public interface ISimulationWorld업무규칙집결Reader
+{
+    Task<SimulationWorld업무규칙집결원장?> 조회Async(
+        string catalogRevision,
         CancellationToken cancellationToken);
 }
 
@@ -65,10 +73,10 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
         string spatialOutputHashSha256,
         string areaSetStableId)
     {
-        var farm = Facility("facility:sim:pyeongchang:daegwallyeong-farm", "area:sim:pyeongchang:daegwallyeong-farm", SimulationWorld시설종류Codes.농장);
-        var hub = Facility("facility:sim:pyeongchang:jinbu-hub", "area:sim:pyeongchang:jinbu-hub", SimulationWorld시설종류Codes.물류Hub);
-        var mart = Facility("facility:sim:pyeongchang:pyeongchang-town-mart", "area:sim:pyeongchang:pyeongchang-town", SimulationWorld시설종류Codes.마트);
-        var restaurant = Facility("facility:sim:pyeongchang:pyeongchang-town-restaurant", "area:sim:pyeongchang:pyeongchang-town", SimulationWorld시설종류Codes.음식점);
+        var farm = Facility(PyeongchangSimulationWorldStableIds.대관령Farm시설, PyeongchangSimulationWorldStableIds.대관령Farm영역, SimulationWorld시설종류Codes.농장);
+        var hub = Facility(PyeongchangSimulationWorldStableIds.진부Hub시설, PyeongchangSimulationWorldStableIds.진부Hub영역, SimulationWorld시설종류Codes.물류Hub);
+        var mart = Facility(PyeongchangSimulationWorldStableIds.평창읍Mart시설, PyeongchangSimulationWorldStableIds.평창읍Town영역, SimulationWorld시설종류Codes.마트);
+        var restaurant = Facility(PyeongchangSimulationWorldStableIds.평창읍음식점시설, PyeongchangSimulationWorldStableIds.평창읍Town영역, SimulationWorld시설종류Codes.음식점);
         var facilities = new[] { farm, hub, mart, restaurant };
         var capabilities = new List<SimulationWorld시설기능>();
         AddCapabilities(capabilities, farm, SimulationWorld시설기능Codes.생산, SimulationWorld시설기능Codes.수확, SimulationWorld시설기능Codes.포장, SimulationWorld시설기능Codes.출하);
@@ -78,28 +86,37 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
 
         var rules = new[]
         {
-            Rule("rule:simulation:farm:harvest-allocation", SimulationWorld업무규칙영역Codes.생산, "HarvestAllocation", "SimulationHarvestDispositionImpactEngine", "HarvestDispositionImpactPreviewRequest", "HarvestDispositionImpactPreview", "수확 Lot의 판로와 자원 예약 후보를 계산한다."),
-            Rule("rule:simulation:farm:outbound-cargo", SimulationWorld업무규칙영역Codes.생산, "OutboundCargo", "SimulationLogisticsMovementEngine", "LogisticsMovementPreviewRequest", "LogisticsMovementPreview", "출하 가능한 원천 allocation에서 Simulation 화물을 구성한다."),
-            Rule("rule:simulation:warehouse:capacity-reservation", SimulationWorld업무규칙영역Codes.창고, "CapacityReservation", "Simulation창고자원효과계산기", "WarehouseResourceEffectRequest", "WarehouseResourceEffectResult", "입고 전 창고 보관 용량을 예약한다."),
-            Rule("rule:simulation:warehouse:inbound-inspection", SimulationWorld업무규칙영역Codes.창고, "InboundInspection", "SimulationFreightReceiptEngine", "FreightReceiptPreviewRequest", "FreightReceiptPreview", "Hub 도착 화물을 검수 전 재고 후보로 유지한다."),
-            Rule("rule:simulation:logistics:movement", SimulationWorld업무규칙영역Codes.물류, "Movement", "SimulationLogisticsMovementEngine", "LogisticsMovementPreviewRequest", "LogisticsMovementSnapshot", "공통 WorldTick으로 출발·이동·도착 상태를 전이한다."),
-            Rule("rule:simulation:freight:dispatch", SimulationWorld업무규칙영역Codes.화물, "Dispatch", "SimulationFreightDispatchEngine", "FreightDispatchPreviewRequest", "FreightDispatchPreview", "차량 용량과 후보 상태로 가상 배차 후보를 계산한다."),
-            Rule("rule:simulation:freight:transport", SimulationWorld업무규칙영역Codes.화물, "Transport", "SimulationFreightTransportEngine", "FreightTransportPreviewRequest", "FreightTransportSnapshot", "상차·운송·하차와 별도 인수완료 상태를 관리한다."),
-            Rule("rule:simulation:order:individual", SimulationWorld업무규칙영역Codes.주문, "IndividualOrder", "SimulationIndividualOrderEngine", "IndividualOrderPreviewRequest", "IndividualOrderPreview", "마트 재고에 대한 개별 주문 후보와 예약을 계산한다."),
-            Rule("rule:simulation:mart:stock-display", SimulationWorld업무규칙영역Codes.마트, "StockDisplay", "도심마트공급경영SimulationEngine", "MartSupplySimulationRequest", "MartSupplySimulationSnapshot", "마트 입고 재고와 진열·판매 가능 상태를 투영한다."),
-            Rule("rule:simulation:restaurant:ingredient-order", SimulationWorld업무규칙영역Codes.음식점, "IngredientOrder", "Simulation음식배달Engine", "FoodDeliveryPreviewRequest", "FoodDeliveryPreview", "음식점 식자재 주문·입고 후보를 Simulation으로 계산한다."),
+            Rule(PyeongchangSimulationWorldStableIds.수확판로배분규칙, SimulationWorld업무규칙영역Codes.생산, "HarvestAllocation", "SimulationHarvestDispositionImpactEngine", "HarvestDispositionImpactPreviewRequest", "HarvestDispositionImpactPreview", "수확 Lot의 판로와 자원 예약 후보를 계산한다."),
+            Rule(PyeongchangSimulationWorldStableIds.Farm출하화물규칙, SimulationWorld업무규칙영역Codes.생산, "OutboundCargo", "SimulationLogisticsMovementEngine", "LogisticsMovementPreviewRequest", "LogisticsMovementPreview", "출하 가능한 원천 allocation에서 Simulation 화물을 구성한다."),
+            Rule(PyeongchangSimulationWorldStableIds.창고용량예약규칙, SimulationWorld업무규칙영역Codes.창고, "CapacityReservation", "Simulation창고자원효과계산기", "WarehouseResourceEffectRequest", "WarehouseResourceEffectResult", "입고 전 창고 보관 용량을 예약한다."),
+            Rule(PyeongchangSimulationWorldStableIds.창고입고검수규칙, SimulationWorld업무규칙영역Codes.창고, "InboundInspection", "SimulationFreightReceiptEngine", "FreightReceiptPreviewRequest", "FreightReceiptPreview", "물류 거점 도착 화물을 검수 전 재고 후보로 유지한다."),
+            Rule(PyeongchangSimulationWorldStableIds.창고적재규칙, SimulationWorld업무규칙영역Codes.창고, "PutAway", "SimulationWarehousePutAwayEngine", nameof(SimulationWarehousePutAwayPreviewRequest), nameof(SimulationDecisionPreviewSnapshot), "검수를 통과한 같은 입고 재고를 적재 담당 NPC의 작업으로 보관 위치에 적재한다."),
+            Rule(PyeongchangSimulationWorldStableIds.물류이동규칙, SimulationWorld업무규칙영역Codes.물류, "Movement", "SimulationLogisticsMovementEngine", "LogisticsMovementPreviewRequest", "LogisticsMovementSnapshot", "공통 WorldTick으로 출발·이동·도착 상태를 전이한다."),
+            Rule(PyeongchangSimulationWorldStableIds.화물배차규칙, SimulationWorld업무규칙영역Codes.화물, "Dispatch", "SimulationFreightDispatchEngine", "FreightDispatchPreviewRequest", "FreightDispatchPreview", "차량 용량과 후보 상태로 가상 배차 후보를 계산한다."),
+            Rule(PyeongchangSimulationWorldStableIds.화물운송규칙, SimulationWorld업무규칙영역Codes.화물, "Transport", "SimulationFreightTransportEngine", "FreightTransportPreviewRequest", "FreightTransportSnapshot", "상차·운송·하차와 별도 인수완료 상태를 관리한다."),
+            Rule(PyeongchangSimulationWorldStableIds.개별주문규칙, SimulationWorld업무규칙영역Codes.주문, "IndividualOrder", "SimulationIndividualOrderEngine", "IndividualOrderPreviewRequest", "IndividualOrderPreview", "마트 재고에 대한 개별 주문 후보와 예약을 계산한다."),
+            Rule(PyeongchangSimulationWorldStableIds.Mart재고진열규칙, SimulationWorld업무규칙영역Codes.마트, "StockDisplay", "도심마트공급경영SimulationEngine", "MartSupplySimulationRequest", "MartSupplySimulationSnapshot", "마트 입고 재고와 진열·판매 가능 상태를 투영한다."),
+            Rule(PyeongchangSimulationWorldStableIds.음식점식자재주문규칙, SimulationWorld업무규칙영역Codes.음식점, "IngredientOrder", "Simulation음식배달Engine", "FoodDeliveryPreviewRequest", "FoodDeliveryPreview", "음식점 식자재 주문·입고 후보를 Simulation으로 계산한다."),
+            Rule(PyeongchangSimulationWorldStableIds.팀역할Card장착규칙, SimulationWorld업무규칙영역Codes.팀역할, "RoleCardEquip", "SimulationTeamRoleCardState", nameof(SimulationTeamRoleCardEquipRequest), nameof(SimulationTeamRoleCardStateSnapshot), "팀 공동 카드 사본을 구성원의 장착 칸으로 옮기고 현재 역할 투영을 갱신한다."),
+            Rule(PyeongchangSimulationWorldStableIds.팀활동시작규칙, SimulationWorld업무규칙영역Codes.팀역할, "TeamActivityStart", "SimulationTeamRoleCardState", nameof(SimulationTeamActivityStartRequest), nameof(SimulationTeamRoleCardStateSnapshot), "장착 카드의 역할과 일치하는 팀 활동을 시작하고 카드와 행위자를 잠근다."),
+            Rule(PyeongchangSimulationWorldStableIds.팀활동종료규칙, SimulationWorld업무규칙영역Codes.팀역할, "TeamActivityEnd", "SimulationTeamRoleCardState", nameof(SimulationTeamActivityEndRequest), nameof(SimulationTeamRoleCardStateSnapshot), "팀 활동을 종료하고 카드와 행위자의 잠금을 해제한다."),
+            Rule(PyeongchangSimulationWorldStableIds.L2타일발견보상규칙, SimulationWorld업무규칙영역Codes.수집보상, "TileDiscoveryReward", "경영SimulationSessionAggregate", nameof(SimulationTileTraversalConfirmRequest), nameof(SimulationTileTraversalConfirmResponse), "서버가 현재 L2와 인접 이동을 확인한 뒤 팀 최초 발견과 결정적 수집 카드 기회를 판정한다."),
+            Rule(PyeongchangSimulationWorldStableIds.농사완료보상규칙, SimulationWorld업무규칙영역Codes.수집보상, "FarmCompletionReward", "경영SimulationSessionAggregate", nameof(SimulationFarmWorkConfirmRequest), nameof(SimulationCollectibleCardRewardStateSnapshot), "플레이어 직접 밭갈기가 WorldTick에서 실제 완료될 때만 결정적 수집 카드 기회를 판정한다."),
+            Rule(PyeongchangSimulationWorldStableIds.수집Card뽑기규칙, SimulationWorld업무규칙영역Codes.수집보상, "CollectibleCardDraw", "경영SimulationSessionAggregate", nameof(SimulationCollectibleCardDrawRequest), nameof(SimulationCollectibleCardDrawResponse), "개인 미개봉 기회의 소유자를 확인하고 팀이 아직 보유하지 않은 정의 중 하나를 서버가 결정한다."),
+            Rule(PyeongchangSimulationWorldStableIds.수집Card양도규칙, SimulationWorld업무규칙영역Codes.수집보상, "CollectibleCardTransfer", "경영SimulationSessionAggregate", nameof(SimulationCollectibleCardTransferRequest), nameof(SimulationCollectibleCardTransferResponse), "같은 팀 구성원 사이에서 카드 사본의 소유권만 원격으로 변경한다."),
         };
         var bindings = new[]
         {
             Bind(farm, SimulationWorld시설기능Codes.수확, rules[0], 100), Bind(farm, SimulationWorld시설기능Codes.출하, rules[1], 90),
             Bind(hub, SimulationWorld시설기능Codes.보관, rules[2], 100), Bind(hub, SimulationWorld시설기능Codes.검수, rules[3], 100),
-            Bind(hub, SimulationWorld시설기능Codes.입고, rules[4], 90), Bind(hub, SimulationWorld시설기능Codes.상차, rules[5], 80),
-            Bind(hub, SimulationWorld시설기능Codes.하차, rules[6], 80), Bind(mart, SimulationWorld시설기능Codes.주문, rules[7], 100),
-            Bind(mart, SimulationWorld시설기능Codes.진열, rules[8], 90), Bind(restaurant, SimulationWorld시설기능Codes.주문, rules[9], 100),
+            Bind(hub, SimulationWorld시설기능Codes.보관, rules[4], 95), Bind(hub, SimulationWorld시설기능Codes.입고, rules[5], 90),
+            Bind(hub, SimulationWorld시설기능Codes.상차, rules[6], 80), Bind(hub, SimulationWorld시설기능Codes.하차, rules[7], 80),
+            Bind(mart, SimulationWorld시설기능Codes.주문, rules[8], 100), Bind(mart, SimulationWorld시설기능Codes.진열, rules[9], 90),
+            Bind(restaurant, SimulationWorld시설기능Codes.주문, rules[10], 100),
         };
         return new SimulationWorld업무규칙집결원장
         {
-            CatalogRevision = "pyeongchang-farm-hub-town-business-rules.v1",
+            CatalogRevision = "pyeongchang-farm-hub-town-business-rules.v4",
             SpatialBuildStableId = spatialBuildStableId,
             SpatialOutputHashSha256 = spatialOutputHashSha256,
             CreatedAtUtc = DateTimeOffset.Parse("2026-08-13T00:00:00Z"),
@@ -113,7 +130,7 @@ public static class PyeongchangSimulationWorld업무규칙CatalogFactory
                 new SimulationWorldScenario규칙묶음
                 {
                     StableId = "scenario-rule-set:pyeongchang-farm-hub-town",
-                    Revision = "r1",
+                    Revision = "r4",
                     AreaSetStableId = areaSetStableId,
                     Items = rules.Select((rule, index) => new SimulationWorldScenario규칙항목
                     {

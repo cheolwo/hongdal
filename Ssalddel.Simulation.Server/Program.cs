@@ -12,8 +12,16 @@ var requiresWorldDerivationDatabase = args.Any(argument =>
     || string.Equals(argument, "--build-pyeongchang-world-derived", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--build-pyeongchang-synty-landscape", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--assemble-pyeongchang-world-business-rules", StringComparison.OrdinalIgnoreCase));
+requiresWorldDerivationDatabase = requiresWorldDerivationDatabase || args.Any(argument =>
+    string.Equals(argument, "--plan-pyeongchang-world-ui", StringComparison.OrdinalIgnoreCase));
 if (requiresWorldDerivationDatabase)
     builder.Configuration["SimulationWorldDerivationDatabase:Enabled"] = "true";
+
+if (args.Contains("--migrate-simulation-session-database",
+        StringComparer.OrdinalIgnoreCase))
+{
+    builder.Configuration["SimulationSessionDatabase:Enabled"] = "true";
+}
 
 if (args.Contains("--build-pyeongchang-world-derived", StringComparer.OrdinalIgnoreCase))
     builder.Configuration["SimulationSharedPublicData:Enabled"] = "true";
@@ -27,6 +35,17 @@ var app = builder.Build();
 var simulationOptions = app.Services
     .GetRequiredService<IOptions<SimulationServerOptions>>()
     .Value;
+
+if (args.Contains("--migrate-simulation-session-database",
+        StringComparer.OrdinalIgnoreCase))
+{
+    var factory = app.Services.GetRequiredService<IDbContextFactory<
+        Ssalddel.Simulation.Persistence.SimulationSessionDbContext>>();
+    await using var sessionDb = await factory.CreateDbContextAsync();
+    await sessionDb.Database.MigrateAsync(CancellationToken.None);
+    Console.WriteLine("SimulationSessionDBMigration완료");
+    return;
+}
 
 if (args.Contains("--migrate-simulation-world-database", StringComparer.OrdinalIgnoreCase))
 {
@@ -134,6 +153,24 @@ if (args.Contains("--assemble-pyeongchang-world-business-rules", StringComparer.
         $"기능={result.CapabilityCount};규칙={result.RuleCount};연결={result.BindingCount};" +
         $"Scenario규칙묶음={result.ScenarioRuleSetCount};대장={result.CatalogRevision};" +
         $"SHA256={result.CatalogHashSha256}");
+    return;
+}
+
+if (args.Contains("--plan-pyeongchang-world-ui", StringComparer.OrdinalIgnoreCase))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var ruleCatalogArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--business-rule-catalog=", StringComparison.OrdinalIgnoreCase));
+    if (ruleCatalogArgument == null)
+        throw new InvalidOperationException("--business-rule-catalog is required.");
+    var shell = scope.ServiceProvider.GetRequiredService<SimulationWorldUI기획JobShell>();
+    var result = await shell.실행Async(
+        ruleCatalogArgument["--business-rule-catalog=".Length..], CancellationToken.None);
+    Console.WriteLine(
+        $"평창군SimulationWorldUI기획완료:신규={result.Inserted};화면영역={result.SurfaceCount};" +
+        $"정보항목={result.InformationItemCount};상태표현={result.StatePresentationCount};" +
+        $"행동후보={result.ActionCandidateCount};규칙연결={result.RuleBindingCount};" +
+        $"대장={result.CatalogRevision};SHA256={result.CatalogHashSha256}");
     return;
 }
 

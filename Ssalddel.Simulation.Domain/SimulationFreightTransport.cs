@@ -244,6 +244,7 @@ namespace Ssalddel.Simulation.Domain
                     TaskStableId = "task:freight-receipt:" + freight.TransportRequestStableId,
                     TaskTypeCode = "FreightReceiptConfirmation",
                     FacilityStableId = movement.DestinationFacilityStableId,
+                    ActionCode = SimulationNpcActionCodes.WarehouseInboundInspection,
                     AssignedCapacity = freight.Quantity,
                     AssignedCapacityUnitCode = freight.UnitCode,
                     DurationTicks = request.ReceiptDurationTicks,

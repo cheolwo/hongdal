@@ -1,0 +1,235 @@
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.Contracts;
+using Ssalddel.Simulation.Domain;
+
+namespace Ssalddel.Simulation.Persistence;
+
+public sealed class SimulationSession저장자료Entity
+{
+    public long Id { get; set; }
+    public string SaveStableId { get; set; } = string.Empty;
+    public string SessionStableId { get; set; } = string.Empty;
+    public string SchemaVersion { get; set; } = string.Empty;
+    public int SavedWorldTick { get; set; }
+    public long SavedWorldRevision { get; set; }
+    public string ReplayHashAlgorithmCode { get; set; } = string.Empty;
+    public string ReplayHash { get; set; } = string.Empty;
+    public int CommandCount { get; set; }
+    public string PackageJson { get; set; } = string.Empty;
+    public DateTimeOffset StoredAtUtc { get; set; }
+}
+
+public sealed class SimulationSessionDbContext(
+    DbContextOptions<SimulationSessionDbContext> options) : DbContext(options)
+{
+    public DbSet<SimulationSession저장자료Entity> SessionSaves =>
+        Set<SimulationSession저장자료Entity>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new SimulationSession저장자료Configuration());
+    }
+}
+
+internal sealed class SimulationSession저장자료Configuration
+    : IEntityTypeConfiguration<SimulationSession저장자료Entity>
+{
+    public void Configure(EntityTypeBuilder<SimulationSession저장자료Entity> builder)
+    {
+        builder.ToTable("시뮬레이션세션_저장자료");
+        builder.HasKey(value => value.Id);
+        builder.HasIndex(value => value.SaveStableId).IsUnique();
+        builder.HasIndex(value => new
+        {
+            value.SessionStableId,
+            value.SavedWorldRevision,
+        });
+        builder.Property(value => value.Id).HasColumnName("식별번호");
+        builder.Property(value => value.SaveStableId)
+            .HasColumnName("저장자료고유식별자").HasMaxLength(200).IsRequired();
+        builder.Property(value => value.SessionStableId)
+            .HasColumnName("세션고유식별자").HasMaxLength(200).IsRequired();
+        builder.Property(value => value.SchemaVersion)
+            .HasColumnName("스키마버전").HasMaxLength(60).IsRequired();
+        builder.Property(value => value.SavedWorldTick)
+            .HasColumnName("저장WorldTick");
+        builder.Property(value => value.SavedWorldRevision)
+            .HasColumnName("저장World개정번호");
+        builder.Property(value => value.ReplayHashAlgorithmCode)
+            .HasColumnName("재생Hash알고리즘코드").HasMaxLength(40).IsRequired();
+        builder.Property(value => value.ReplayHash)
+            .HasColumnName("재생SHA256").HasMaxLength(64).IsRequired();
+        builder.Property(value => value.CommandCount)
+            .HasColumnName("명령기록수");
+        builder.Property(value => value.PackageJson)
+            .HasColumnName("저장자료JSON").HasColumnType("longtext").IsRequired();
+        builder.Property(value => value.StoredAtUtc)
+            .HasColumnName("저장시각UTC").IsRequired();
+    }
+}
+
+public sealed class SimulationSessionSaveStore(
+    IDbContextFactory<SimulationSessionDbContext> dbContextFactory)
+    : ISimulationSessionSaveStore
+{
+    public const string CorruptedCode = "SimulationSessionSavePersistenceCorrupted";
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
+    public SimulationSessionSavePackage SaveOrGet(
+        SimulationSessionSavePackage package)
+    {
+        if (package == null) throw new ArgumentNullException(nameof(package));
+        var candidate = SimulationSaveReplayCloner.ClonePackage(package);
+        SimulationSessionReplay.Restore(candidate);
+
+        using var db = dbContextFactory.CreateDbContext();
+        var existing = db.SessionSaves.AsNoTracking().SingleOrDefault(value =>
+            value.SaveStableId == candidate.SaveStableId);
+        if (existing != null)
+            return ExistingOrConflict(existing, candidate);
+
+        db.SessionSaves.Add(new SimulationSession저장자료Entity
+        {
+            SaveStableId = candidate.SaveStableId,
+            SessionStableId = candidate.SessionStableId,
+            SchemaVersion = candidate.SchemaVersion,
+            SavedWorldTick = candidate.SavedWorldTick,
+            SavedWorldRevision = candidate.SavedWorldRevision,
+            ReplayHashAlgorithmCode = candidate.ReplayHashAlgorithmCode,
+            ReplayHash = candidate.ReplayHash,
+            CommandCount = candidate.CommandLog.Length,
+            PackageJson = JsonSerializer.Serialize(candidate, JsonOptions),
+            StoredAtUtc = DateTimeOffset.UtcNow,
+        });
+        try
+        {
+            db.SaveChanges();
+        }
+        catch (DbUpdateException)
+        {
+            db.ChangeTracker.Clear();
+            existing = db.SessionSaves.AsNoTracking().SingleOrDefault(value =>
+                value.SaveStableId == candidate.SaveStableId);
+            if (existing == null) throw;
+            return ExistingOrConflict(existing, candidate);
+        }
+
+        return SimulationSaveReplayCloner.ClonePackage(candidate);
+    }
+
+    public SimulationSessionSavePackage? Find(string saveStableId)
+    {
+        if (string.IsNullOrWhiteSpace(saveStableId)) return null;
+        using var db = dbContextFactory.CreateDbContext();
+        var entity = db.SessionSaves.AsNoTracking().SingleOrDefault(value =>
+            value.SaveStableId == saveStableId.Trim());
+        return entity == null ? null : DeserializeAndValidate(entity);
+    }
+
+    private static SimulationSessionSavePackage ExistingOrConflict(
+        SimulationSession저장자료Entity existing,
+        SimulationSessionSavePackage candidate)
+    {
+        if (!string.Equals(existing.SessionStableId, candidate.SessionStableId,
+                StringComparison.Ordinal)
+            || !string.Equals(existing.ReplayHash, candidate.ReplayHash,
+                StringComparison.Ordinal))
+        {
+            throw new SimulationConflictException(
+                "SimulationSaveStableIdConflict");
+        }
+
+        return DeserializeAndValidate(existing);
+    }
+
+    private static SimulationSessionSavePackage DeserializeAndValidate(
+        SimulationSession저장자료Entity entity)
+    {
+        SimulationSessionSavePackage package;
+        try
+        {
+            package = JsonSerializer.Deserialize<SimulationSessionSavePackage>(
+                entity.PackageJson, JsonOptions)
+                ?? throw new InvalidOperationException(CorruptedCode);
+        }
+        catch (JsonException error)
+        {
+            throw new InvalidOperationException(CorruptedCode, error);
+        }
+
+        if (!string.Equals(entity.SaveStableId, package.SaveStableId,
+                StringComparison.Ordinal)
+            || !string.Equals(entity.SessionStableId, package.SessionStableId,
+                StringComparison.Ordinal)
+            || !string.Equals(entity.SchemaVersion, package.SchemaVersion,
+                StringComparison.Ordinal)
+            || entity.SavedWorldTick != package.SavedWorldTick
+            || entity.SavedWorldRevision != package.SavedWorldRevision
+            || !string.Equals(entity.ReplayHashAlgorithmCode,
+                package.ReplayHashAlgorithmCode, StringComparison.Ordinal)
+            || !string.Equals(entity.ReplayHash, package.ReplayHash,
+                StringComparison.Ordinal)
+            || entity.CommandCount != package.CommandLog.Length)
+        {
+            throw new InvalidOperationException(CorruptedCode);
+        }
+
+        try
+        {
+            SimulationSessionReplay.Restore(package);
+        }
+        catch (Exception error) when (error is SimulationContractException
+            || error is SimulationConflictException
+            || error is ArgumentException
+            || error is InvalidOperationException)
+        {
+            throw new InvalidOperationException(CorruptedCode, error);
+        }
+        return SimulationSaveReplayCloner.ClonePackage(package);
+    }
+}
+
+internal sealed class SimulationSessionDatabaseReadinessProbe(
+    IDbContextFactory<SimulationSessionDbContext> dbContextFactory)
+    : ISimulationDatabaseReadinessProbe
+{
+    public string 데이터베이스이름 => "Simulation Session DB";
+
+    public async Task<bool> 연결가능Async(CancellationToken cancellationToken)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync(
+            cancellationToken);
+        return await db.Database.CanConnectAsync(cancellationToken);
+    }
+}
+
+public static class SimulationSessionPersistenceRegistration
+{
+    public static IServiceCollection AddSimulationSessionPersistence(
+        this IServiceCollection services,
+        string connectionString)
+    {
+        services.AddPooledDbContextFactory<SimulationSessionDbContext>(options =>
+            options.UseMySql(
+                connectionString,
+                new MySqlServerVersion(new Version(8, 4, 0)),
+                mysql =>
+                {
+                    mysql.MigrationsAssembly("Ssalddel.Simulation.Persistence");
+                    mysql.MigrationsHistoryTable(
+                        "__EF마이그레이션이력_시뮬레이션세션");
+                }));
+        services.AddSingleton<ISimulationSessionSaveStore,
+            SimulationSessionSaveStore>();
+        services.AddSingleton<ISimulationDatabaseReadinessProbe,
+            SimulationSessionDatabaseReadinessProbe>();
+        return services;
+    }
+}

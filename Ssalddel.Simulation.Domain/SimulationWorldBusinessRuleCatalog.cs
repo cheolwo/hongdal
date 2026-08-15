@@ -41,6 +41,8 @@ public static class SimulationWorld업무규칙영역Codes
     public const string 물류 = "Logistics";
     public const string 화물 = "Freight";
     public const string 음식점 = "Restaurant";
+    public const string 팀역할 = "TeamRole";
+    public const string 수집보상 = "CollectibleReward";
 }
 
 public sealed class SimulationWorld시설의미
@@ -189,6 +191,7 @@ public static class SimulationWorld업무규칙집결Validator
         }
         foreach (var binding in catalog.Bindings)
         {
+            Text(binding.StableId, "객체 규칙 연결 식별자");
             Require(facilities.Contains(binding.FacilityStableId), "연결이 존재하지 않는 시설을 참조합니다.");
             Require(capabilities.Contains(binding.FacilityStableId + ":" + binding.CapabilityCode), "연결이 시설에 없는 기능을 참조합니다.");
             Require(rules.Contains(RuleKey(binding.RuleStableId, binding.RuleRevision)), "연결이 존재하지 않는 규칙을 참조합니다.");

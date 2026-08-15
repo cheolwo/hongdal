@@ -8,8 +8,12 @@ namespace Ssalddel.Simulation.Server.Controllers;
 [ApiController]
 [Route("api/simulation/v1/sessions")]
 public sealed class 경영SimulationSessionsController(
-    경영SimulationSessionService service) : ControllerBase
+    경영SimulationSessionService service,
+    SimulationWorldUIProjectionService? projectionService = null) : ControllerBase
 {
+    private readonly SimulationWorldUIProjectionService worldUiProjectionService =
+        projectionService ?? new SimulationWorldUIProjectionService(service);
+
     [HttpPost]
     [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status201Created)]
     public ActionResult<경영SimulationSessionSnapshot> Create(
@@ -24,6 +28,14 @@ public sealed class 경영SimulationSessionsController(
     [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
     public ActionResult<경영SimulationSessionSnapshot> Get(string sessionStableId)
         => Execute(() => Ok(service.Get(sessionStableId)));
+
+    [HttpGet("{sessionStableId}/world-ui/surfaces/{surfaceStableId}")]
+    [ProducesResponseType(typeof(SimulationWorldUIProjection), StatusCodes.Status200OK)]
+    public ActionResult<SimulationWorldUIProjection> GetWorldUiSurface(
+        string sessionStableId,
+        string surfaceStableId)
+        => ExecuteWorldUiProjection(() => Ok(
+            worldUiProjectionService.Get(sessionStableId, surfaceStableId)));
 
     [HttpPost("{sessionStableId}/ticks")]
     [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
@@ -67,6 +79,13 @@ public sealed class 경영SimulationSessionsController(
         string sessionStableId,
         [FromBody] SimulationDecisionConfirmRequest request)
         => Execute(() => Ok(service.ConfirmDecision(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/npc-policies")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> UpdateNpcPolicy(
+        string sessionStableId,
+        [FromBody] SimulationNpcPolicyChangeRequest request)
+        => Execute(() => Ok(service.UpdateNpcPolicy(sessionStableId, request)));
 
     [HttpPost("{sessionStableId}/saves")]
     [ProducesResponseType(typeof(SimulationSessionSavePackage), StatusCodes.Status200OK)]
@@ -291,6 +310,20 @@ public sealed class 경영SimulationSessionsController(
         string sessionStableId,
         [FromBody] SimulationFreightReceiptConfirmRequest request)
         => Execute(() => Ok(service.ConfirmFreightReceipt(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/warehouse-put-away-previews")]
+    [ProducesResponseType(typeof(SimulationDecisionPreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<SimulationDecisionPreviewSnapshot> PreviewWarehousePutAway(
+        string sessionStableId,
+        [FromBody] SimulationWarehousePutAwayPreviewRequest request)
+        => ExecutePreview(() => Ok(service.PreviewWarehousePutAway(sessionStableId, request)));
+
+    [HttpPost("{sessionStableId}/warehouse-put-aways/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmWarehousePutAway(
+        string sessionStableId,
+        [FromBody] SimulationWarehousePutAwayConfirmRequest request)
+        => Execute(() => Ok(service.ConfirmWarehousePutAway(sessionStableId, request)));
 
     [HttpPost("{sessionStableId}/group-order-previews")]
     [ProducesResponseType(typeof(Simulation같이주문PreviewSnapshot), StatusCodes.Status200OK)]
@@ -783,6 +816,27 @@ public sealed class 경영SimulationSessionsController(
 
     private ActionResult<SimulationFreightTransportPreviewSnapshot> ExecuteFreightTransport(
         Func<ActionResult<SimulationFreightTransportPreviewSnapshot>> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    private ActionResult<SimulationWorldUIProjection> ExecuteWorldUiProjection(
+        Func<ActionResult<SimulationWorldUIProjection>> action)
     {
         try
         {

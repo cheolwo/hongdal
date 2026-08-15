@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Domain.PublicData.Korea;
+using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 using Ssalddel.Simulation.Persistence;
 using Ssalddel.Simulation.Server;
@@ -12,6 +15,33 @@ namespace Ssalddel.Simulation.Tests;
 
 public sealed class SimulationWorldDerivationPersistenceTests
 {
+    [Fact]
+    public async Task 팀역할과수집보상규칙정의는_파생Db업무규칙대장에저장한다()
+    {
+        await using var db = CreateDb();
+        await db.Database.EnsureCreatedAsync();
+        var catalog = PyeongchangSimulationWorld업무규칙CatalogFactory.Create(
+            "world-build:test:team-role-card",
+            new string('a', 64),
+            "area-set:sim:pyeongchang:farm-hub-town.v1");
+        var store = new SimulationWorld업무규칙집결Store(db);
+
+        var result = await store.저장Async(catalog, CancellationToken.None);
+
+        Assert.True(result.Inserted);
+        Assert.Equal(18, result.RuleCount);
+        Assert.Equal(3, await db.BusinessSimulationRules.CountAsync(value =>
+            value.DomainCode == SimulationWorld업무규칙영역Codes.팀역할));
+        Assert.Contains(await db.BusinessSimulationRules.ToListAsync(), value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.팀역할Card장착규칙
+            && value.InputContractKey == nameof(SimulationTeamRoleCardEquipRequest));
+        Assert.Equal(4, await db.BusinessSimulationRules.CountAsync(value =>
+            value.DomainCode == SimulationWorld업무규칙영역Codes.수집보상));
+        Assert.Contains(await db.BusinessSimulationRules.ToListAsync(), value =>
+            value.StableId == PyeongchangSimulationWorldStableIds.수집Card양도규칙
+            && value.InputContractKey == nameof(SimulationCollectibleCardTransferRequest));
+    }
+
     [Fact]
     public void 파생Db의_물리테이블과열이름은_한국어로정의한다()
     {
@@ -346,6 +376,9 @@ public sealed class SimulationWorldDerivationPersistenceTests
             descriptor.ServiceType == typeof(ISimulationWorld파생원장Store)
             && descriptor.ImplementationType == typeof(SimulationWorld파생원장Store));
         Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ISimulationWorld지역ProjectionReader)
+            && descriptor.ImplementationType == typeof(SimulationWorld지역ProjectionReader));
+        Assert.Contains(services, descriptor =>
             descriptor.ServiceType == typeof(ISimulationWorld공간실행Reader)
             && descriptor.ImplementationType == typeof(SimulationWorld공간실행Reader));
         Assert.Contains(services, descriptor =>
@@ -376,6 +409,12 @@ public sealed class SimulationWorldDerivationPersistenceTests
         Assert.Equal(평창군공간파생Pipeline.자료부족, result.상태코드);
         Assert.Equal(0, result.건축물수);
         Assert.Equal(1, await derivedDb.Nodes.CountAsync(item => item.NodeKindCode == "DataGap"));
+        Assert.Equal(1, await derivedDb.Nodes.CountAsync(item =>
+            item.NodeKindCode == "LandscapeCompletionArea"
+            && item.StableId == PyeongchangSimulationWorldStableIds.대관령Farm경관완결영역));
+        Assert.Equal(1, await derivedDb.Relations.CountAsync(item =>
+            item.RelationCode == "ContainsLandscapeCompletionArea"
+            && item.ToNodeStableId == PyeongchangSimulationWorldStableIds.대관령Farm경관완결영역));
         Assert.Equal(0, await derivedDb.GraphicsPlans.CountAsync());
         Assert.Null((await derivedDb.Runs.SingleAsync()).VisualCatalogRevision);
         Assert.Equal(1, result.Unity공간변환Profile수);
@@ -607,6 +646,8 @@ public sealed class SimulationWorldDerivationPersistenceTests
     private static SimulationWorld파생DbContext CreateDb() => new(
         new DbContextOptionsBuilder<SimulationWorld파생DbContext>()
             .UseInMemoryDatabase("simulation-world-derivation-" + Guid.NewGuid().ToString("N"))
+            .ConfigureWarnings(warnings => warnings.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning))
             .Options);
 
     private static PublicDataIngestionDbContext CreatePublicDataDb() => new(

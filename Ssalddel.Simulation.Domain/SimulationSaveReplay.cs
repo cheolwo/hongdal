@@ -31,6 +31,8 @@ namespace Ssalddel.Simulation.Domain
                     ReplayHashAlgorithmCode = SimulationReplayHashAlgorithmCodes.Sha256,
                     SessionCreateRequest = CreateSessionRequest(),
                     Snapshot = CreateSnapshot(),
+                    WorldInventory = CreateWorldInventorySnapshot(),
+                    SurvivalTarot = CreateSurvivalTarotStateSnapshot(),
                     CommandLog = commandLog.Select(SimulationSaveReplayCloner.CloneCommand).ToArray(),
                 };
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
@@ -93,6 +95,112 @@ namespace Ssalddel.Simulation.Domain
                     SimulationSaveReplayCloner.CloneTurnClosingConfirmRequest(request),
             });
 
+        private void AppendNpcPolicyCommand(SimulationNpcPolicyChangeRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.NpcPolicyChange,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                NpcPolicyChangeRequest = SimulationSaveReplayCloner.CloneNpcPolicyChangeRequest(request),
+            });
+
+        private void AppendWorldItemAcquisitionCommand(
+            SimulationWorldItemAcquisitionConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.WorldItemAcquisitionConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                WorldItemAcquisitionConfirmRequest =
+                    SimulationSaveReplayCloner.CloneWorldItemAcquisitionConfirmRequest(request),
+            });
+
+        private void AppendSurvivalTarotResponseCommand(
+            SimulationSurvivalTarotResponseConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.SurvivalTarotResponseConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                SurvivalTarotResponseConfirmRequest =
+                    SimulationSaveReplayCloner.CloneSurvivalTarotResponseConfirmRequest(request),
+            });
+
+        private void AppendSurvivalTarotResolutionCommand(
+            SimulationSurvivalTarotResolutionConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.SurvivalTarotResolutionConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                SurvivalTarotResolutionConfirmRequest =
+                    SimulationSaveReplayCloner.CloneSurvivalTarotResolutionConfirmRequest(request),
+            });
+
+        private void AppendFarmWorkConfirmCommand(
+            SimulationFarmWorkConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.FarmWorkConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                FarmWorkConfirmRequest =
+                    SimulationSaveReplayCloner.CloneFarmWorkConfirmRequest(request),
+            });
+
+        private void AppendThreatResponseConfirmCommand(
+            SimulationThreatResponseConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.ThreatResponseConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                ThreatResponseConfirmRequest =
+                    SimulationSaveReplayCloner.CloneThreatResponseConfirmRequest(request),
+            });
+
+        private void AppendTeamRoleCardEquipCommand(
+            SimulationTeamRoleCardEquipRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.TeamRoleCardEquip,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                TeamRoleCardEquipRequest =
+                    SimulationSaveReplayCloner.CloneTeamRoleCardEquipRequest(request),
+            });
+
+        private void AppendTeamActivityStartCommand(
+            SimulationTeamActivityStartRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.TeamActivityStart,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                TeamActivityStartRequest =
+                    SimulationSaveReplayCloner.CloneTeamActivityStartRequest(request),
+            });
+
+        private void AppendTeamActivityEndCommand(
+            SimulationTeamActivityEndRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.TeamActivityEnd,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                TeamActivityEndRequest =
+                    SimulationSaveReplayCloner.CloneTeamActivityEndRequest(request),
+            });
+
         private 경영SimulationSession생성Request CreateSessionRequest()
             => new 경영SimulationSession생성Request
             {
@@ -110,6 +218,12 @@ namespace Ssalddel.Simulation.Domain
                     GameDateStartsOn = GameDateStartsOn,
                 },
                 Settlement = CloneSettlementRequest(settlementCreationState),
+                NpcWorkforce = CloneNpcWorkforceInitialState(npcWorkforceCreationState),
+                WorldInventory = CloneWorldInventoryInitialState(worldInventoryCreationState),
+                SurvivalTarot = CloneSurvivalTarotInitialState(survivalTarotCreationState),
+                FarmSurvival = CloneFarmSurvivalInitialState(farmSurvivalCreationState),
+                TeamRoleCards = CloneTeamRoleCardInitialStateOrNull(
+                    teamRoleCardCreationState),
             };
 
         private static void ValidateSaveRequest(SimulationSessionSaveRequest request)
@@ -136,13 +250,15 @@ namespace Ssalddel.Simulation.Domain
                 var entry = package.CommandLog[index];
                 if (entry.Sequence != index + 1L)
                     throw new SimulationConflictException("SimulationCommandLogSequenceInvalid");
+                EnsureSingleCommandPayload(entry);
 
                 if (entry.CommandTypeCode == SimulationCommandTypeCodes.DecisionConfirm)
                 {
                     if (entry.DecisionConfirmRequest == null || entry.TickRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
                         || entry.LogisticsMovementConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmDecision(
                         SimulationSaveReplayCloner.CloneConfirmRequest(entry.DecisionConfirmRequest));
@@ -152,7 +268,8 @@ namespace Ssalddel.Simulation.Domain
                     if (entry.HarvestDispositionImpactConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
                         || entry.LogisticsMovementConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmHarvestDispositionImpact(
                         SimulationSaveReplayCloner.CloneHarvestDispositionImpactConfirmRequest(
@@ -163,7 +280,8 @@ namespace Ssalddel.Simulation.Domain
                     if (entry.LogisticsMovementConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmLogisticsMovement(
                         SimulationSaveReplayCloner.CloneLogisticsMovementConfirmRequest(
@@ -174,18 +292,109 @@ namespace Ssalddel.Simulation.Domain
                     if (entry.TurnClosingConfirmRequest == null || entry.TickRequest != null
                         || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.ConfirmTurnClosing(
                         SimulationSaveReplayCloner.CloneTurnClosingConfirmRequest(
                             entry.TurnClosingConfirmRequest));
+                }
+                else if (entry.CommandTypeCode == SimulationCommandTypeCodes.NpcPolicyChange)
+                {
+                    if (entry.NpcPolicyChangeRequest == null || entry.TickRequest != null
+                        || entry.DecisionConfirmRequest != null
+                        || entry.HarvestDispositionImpactConfirmRequest != null
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                    aggregate.UpdateNpcPolicy(
+                        SimulationSaveReplayCloner.CloneNpcPolicyChangeRequest(
+                            entry.NpcPolicyChangeRequest));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.WorldItemAcquisitionConfirm)
+                {
+                    aggregate.ConfirmWorldItemAcquisition(
+                        SimulationSaveReplayCloner.CloneWorldItemAcquisitionConfirmRequest(
+                            entry.WorldItemAcquisitionConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.SurvivalTarotResponseConfirm)
+                {
+                    aggregate.ConfirmSurvivalTarotResponse(
+                        SimulationSaveReplayCloner.CloneSurvivalTarotResponseConfirmRequest(
+                            entry.SurvivalTarotResponseConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.SurvivalTarotResolutionConfirm)
+                {
+                    aggregate.ConfirmSurvivalTarotResolution(
+                        SimulationSaveReplayCloner.CloneSurvivalTarotResolutionConfirmRequest(
+                            entry.SurvivalTarotResolutionConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.FarmWorkConfirm)
+                {
+                    aggregate.ConfirmFarmWork(
+                        SimulationSaveReplayCloner.CloneFarmWorkConfirmRequest(
+                            entry.FarmWorkConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.ThreatResponseConfirm)
+                {
+                    aggregate.ConfirmThreatResponse(
+                        SimulationSaveReplayCloner.CloneThreatResponseConfirmRequest(
+                            entry.ThreatResponseConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TeamRoleCardEquip)
+                {
+                    aggregate.EquipTeamRoleCard(
+                        SimulationSaveReplayCloner.CloneTeamRoleCardEquipRequest(
+                            entry.TeamRoleCardEquipRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TeamActivityStart)
+                {
+                    aggregate.StartTeamActivity(
+                        SimulationSaveReplayCloner.CloneTeamActivityStartRequest(
+                            entry.TeamActivityStartRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TeamActivityEnd)
+                {
+                    aggregate.EndTeamActivity(
+                        SimulationSaveReplayCloner.CloneTeamActivityEndRequest(
+                            entry.TeamActivityEndRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TileTraversalConfirm)
+                {
+                    aggregate.ConfirmTileTraversal(
+                        경영SimulationSessionAggregate.CloneTileTraversalRequest(
+                            entry.TileTraversalConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CollectibleCardDraw)
+                {
+                    aggregate.DrawCollectibleCard(
+                        경영SimulationSessionAggregate.CloneCollectibleCardDrawRequest(
+                            entry.CollectibleCardDrawRequest!));
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CollectibleCardTransfer)
+                {
+                    aggregate.TransferCollectibleCard(
+                        경영SimulationSessionAggregate.CloneCollectibleCardTransferRequest(
+                            entry.CollectibleCardTransferRequest!));
                 }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
                         || entry.LogisticsMovementConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     aggregate.Advance(
                         SimulationSaveReplayCloner.CloneTickRequest(entry.TickRequest));
@@ -237,6 +446,8 @@ namespace Ssalddel.Simulation.Domain
                 || package.SessionCreateRequest == null
                 || package.SessionCreateRequest.WorldContext == null
                 || package.Snapshot == null
+                || package.WorldInventory == null
+                || package.SurvivalTarot == null
                 || package.Snapshot.WorldContext == null
                 || package.Snapshot.Decisions == null
                 || package.Snapshot.Tasks == null
@@ -255,6 +466,14 @@ namespace Ssalddel.Simulation.Domain
                 || package.Snapshot.ExportReadinessReviews == null
                 || package.Snapshot.ExportShipmentPlans == null
                 || package.Snapshot.ExportShipmentExecutions == null
+                || package.Snapshot.NpcOrganizations == null
+                || package.Snapshot.NpcActors == null
+                || package.Snapshot.NpcCapabilityGrants == null
+                || package.Snapshot.NpcWorkPolicies == null
+                || package.Snapshot.NpcTaskAssignments == null
+                || package.Snapshot.NpcWorkRecords == null
+                || package.Snapshot.NpcActionProjections == null
+                || package.Snapshot.NpcFacilityInventories == null
                 || package.CommandLog == null)
             {
                 throw new SimulationContractException("SimulationSavePackageInvalid");
@@ -271,18 +490,53 @@ namespace Ssalddel.Simulation.Domain
             {
                 throw new SimulationContractException("SimulationSavePackageInvalid");
             }
+            if (package.Snapshot.FarmSurvival != null
+                && (package.Snapshot.FarmSurvival.Actors == null
+                    || package.Snapshot.FarmSurvival.SoilTiles == null
+                    || package.Snapshot.FarmSurvival.Defenses == null
+                    || package.Snapshot.FarmSurvival.WorkOrders == null
+                    || package.Snapshot.FarmSurvival.Encounters == null
+                    || package.Snapshot.FarmSurvival.DayReports == null))
+            {
+                throw new SimulationContractException("SimulationSavePackageInvalid");
+            }
+            if (package.Snapshot.TeamRoleCards != null
+                && (package.Snapshot.TeamRoleCards.MemberActorStableIds == null
+                    || package.Snapshot.TeamRoleCards.Cards == null
+                    || package.Snapshot.TeamRoleCards.ActiveActivities == null
+                    || package.Snapshot.TeamRoleCards.MemberRoles == null))
+            {
+                throw new SimulationContractException("SimulationSavePackageInvalid");
+            }
+            if (package.Snapshot.Exploration != null
+                && (package.Snapshot.Exploration.ActorTilePositions == null
+                    || package.Snapshot.Exploration.RevealedL2TileKeys == null
+                    || package.Snapshot.Exploration.RevealedL1AreaKeys == null
+                    || package.Snapshot.Exploration.DiscoveryEvents == null))
+                throw new SimulationContractException("SimulationSavePackageInvalid");
+            if (package.Snapshot.CollectibleCardRewards != null
+                && (package.Snapshot.CollectibleCardRewards.ProbabilityProfile == null
+                    || package.Snapshot.CollectibleCardRewards.Definitions == null
+                    || package.Snapshot.CollectibleCardRewards.DrawOpportunities == null
+                    || package.Snapshot.CollectibleCardRewards.Cards == null
+                    || package.Snapshot.CollectibleCardRewards.PityStates == null
+                    || package.Snapshot.CollectibleCardRewards.Evaluations == null
+                    || package.Snapshot.CollectibleCardRewards.Transfers == null))
+                throw new SimulationContractException("SimulationSavePackageInvalid");
 
             for (var index = 0; index < package.CommandLog.Length; index++)
             {
                 var entry = package.CommandLog[index];
                 if (entry == null || entry.Sequence != index + 1L)
                     throw new SimulationConflictException("SimulationCommandLogSequenceInvalid");
+                EnsureSingleCommandPayload(entry);
                 if (entry.CommandTypeCode == SimulationCommandTypeCodes.DecisionConfirm)
                 {
                     if (entry.DecisionConfirmRequest == null || entry.TickRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
                         || entry.LogisticsMovementConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateDecisionConfirm(
                         entry.DecisionConfirmRequest);
@@ -292,7 +546,8 @@ namespace Ssalddel.Simulation.Domain
                     if (entry.HarvestDispositionImpactConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
                         || entry.LogisticsMovementConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateHarvestDispositionImpactConfirmRequestForReplay(
                         entry.HarvestDispositionImpactConfirmRequest);
@@ -302,7 +557,8 @@ namespace Ssalddel.Simulation.Domain
                     if (entry.LogisticsMovementConfirmRequest == null
                         || entry.TickRequest != null || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateLogisticsMovementConfirmRequestForReplay(
                         entry.LogisticsMovementConfirmRequest);
@@ -312,17 +568,96 @@ namespace Ssalddel.Simulation.Domain
                     if (entry.TurnClosingConfirmRequest == null || entry.TickRequest != null
                         || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
-                        || entry.LogisticsMovementConfirmRequest != null)
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateTurnClosingConfirmRequest(
                         entry.TurnClosingConfirmRequest);
+                }
+                else if (entry.CommandTypeCode == SimulationCommandTypeCodes.NpcPolicyChange)
+                {
+                    if (entry.NpcPolicyChangeRequest == null || entry.TickRequest != null
+                        || entry.DecisionConfirmRequest != null
+                        || entry.HarvestDispositionImpactConfirmRequest != null
+                        || entry.LogisticsMovementConfirmRequest != null
+                        || entry.TurnClosingConfirmRequest != null)
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                    경영SimulationSessionAggregate.ValidateNpcPolicyChangeRequest(
+                        entry.NpcPolicyChangeRequest);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.WorldItemAcquisitionConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateWorldItemAcquisitionConfirmRequest(
+                        entry.WorldItemAcquisitionConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.SurvivalTarotResponseConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateSurvivalTarotResponseRequest(
+                        entry.SurvivalTarotResponseConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.SurvivalTarotResolutionConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateSurvivalTarotResolutionRequest(
+                        entry.SurvivalTarotResolutionConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.FarmWorkConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateFarmWorkConfirmRequest(
+                        entry.FarmWorkConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.ThreatResponseConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateThreatResponseRequest(
+                        entry.ThreatResponseConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TeamRoleCardEquip)
+                {
+                    SimulationTeamRoleCardState.ValidateEquip(
+                        entry.TeamRoleCardEquipRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TeamActivityStart)
+                {
+                    SimulationTeamRoleCardState.ValidateStart(
+                        entry.TeamActivityStartRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TeamActivityEnd)
+                {
+                    SimulationTeamRoleCardState.ValidateEnd(
+                        entry.TeamActivityEndRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.TileTraversalConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateTileTraversalRequest(
+                        entry.TileTraversalConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CollectibleCardDraw)
+                {
+                    경영SimulationSessionAggregate.ValidateCollectibleCardDrawRequest(
+                        entry.CollectibleCardDrawRequest!);
+                }
+                else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CollectibleCardTransfer)
+                {
+                    경영SimulationSessionAggregate.ValidateCollectibleCardTransferRequest(
+                        entry.CollectibleCardTransferRequest!);
                 }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
                         || entry.HarvestDispositionImpactConfirmRequest != null
                         || entry.LogisticsMovementConfirmRequest != null
-                        || entry.TurnClosingConfirmRequest != null)
+                        || entry.TurnClosingConfirmRequest != null
+                        || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                     경영SimulationSessionAggregate.ValidateAdvance(entry.TickRequest);
                 }
@@ -348,6 +683,30 @@ namespace Ssalddel.Simulation.Domain
             if (!string.Equals(packageHash, package.ReplayHash, StringComparison.Ordinal))
                 throw new SimulationConflictException("SimulationReplayHashMismatch");
         }
+
+        private static void EnsureSingleCommandPayload(SimulationCommandLogEntrySnapshot entry)
+        {
+            var payloadCount = 0;
+            if (entry.TickRequest != null) payloadCount++;
+            if (entry.DecisionConfirmRequest != null) payloadCount++;
+            if (entry.HarvestDispositionImpactConfirmRequest != null) payloadCount++;
+            if (entry.LogisticsMovementConfirmRequest != null) payloadCount++;
+            if (entry.TurnClosingConfirmRequest != null) payloadCount++;
+            if (entry.NpcPolicyChangeRequest != null) payloadCount++;
+            if (entry.WorldItemAcquisitionConfirmRequest != null) payloadCount++;
+            if (entry.SurvivalTarotResponseConfirmRequest != null) payloadCount++;
+            if (entry.SurvivalTarotResolutionConfirmRequest != null) payloadCount++;
+            if (entry.FarmWorkConfirmRequest != null) payloadCount++;
+            if (entry.ThreatResponseConfirmRequest != null) payloadCount++;
+            if (entry.TeamRoleCardEquipRequest != null) payloadCount++;
+            if (entry.TeamActivityStartRequest != null) payloadCount++;
+            if (entry.TeamActivityEndRequest != null) payloadCount++;
+            if (entry.TileTraversalConfirmRequest != null) payloadCount++;
+            if (entry.CollectibleCardDrawRequest != null) payloadCount++;
+            if (entry.CollectibleCardTransferRequest != null) payloadCount++;
+            if (payloadCount != 1)
+                throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+        }
     }
 
     internal static class SimulationReplayHasher
@@ -358,6 +717,10 @@ namespace Ssalddel.Simulation.Domain
             Add(canonical, package.SchemaVersion);
             AddCreateRequest(canonical, package.SessionCreateRequest);
             AddSnapshot(canonical, package.Snapshot);
+            if (package.SessionCreateRequest.WorldInventory != null)
+                AddWorldInventory(canonical, package.WorldInventory);
+            if (package.SessionCreateRequest.SurvivalTarot != null)
+                AddSurvivalTarot(canonical, package.SurvivalTarot);
             Add(canonical, package.CommandLog.Length);
             foreach (var entry in package.CommandLog.OrderBy(value => value.Sequence))
             {
@@ -399,6 +762,108 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, 경영SimulationSessionAggregate.BuildTurnClosingPayloadKey(
                         entry.TurnClosingConfirmRequest.Preview));
                 }
+                if (entry.NpcPolicyChangeRequest != null)
+                {
+                    Add(canonical, entry.NpcPolicyChangeRequest.CommandId);
+                    Add(canonical, entry.NpcPolicyChangeRequest.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate.BuildNpcPolicyPayloadKey(
+                        entry.NpcPolicyChangeRequest));
+                }
+                if (entry.WorldItemAcquisitionConfirmRequest != null)
+                {
+                    var request = entry.WorldItemAcquisitionConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, request.PlayerStableId);
+                    Add(canonical, request.BuildingStableId);
+                    Add(canonical, request.ContainerStableId);
+                    Add(canonical, request.ItemStackStableId);
+                    Add(canonical, request.Quantity);
+                }
+                if (entry.SurvivalTarotResponseConfirmRequest != null)
+                {
+                    var request = entry.SurvivalTarotResponseConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildSurvivalTarotResponsePayloadKey(request));
+                }
+                if (entry.SurvivalTarotResolutionConfirmRequest != null)
+                {
+                    var request = entry.SurvivalTarotResolutionConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildSurvivalTarotResolutionPayloadKey(request));
+                }
+                if (entry.FarmWorkConfirmRequest != null)
+                {
+                    var request = entry.FarmWorkConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildFarmWorkPayloadKey(request));
+                }
+                if (entry.ThreatResponseConfirmRequest != null)
+                {
+                    var request = entry.ThreatResponseConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildThreatResponsePayloadKey(request));
+                }
+                if (entry.TeamRoleCardEquipRequest != null)
+                {
+                    var request = entry.TeamRoleCardEquipRequest;
+                    Add(canonical, request.ClientRequestId.ToString("N"));
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, request.ExpectedTeamPolicyRevision);
+                    Add(canonical, request.RequestingActorStableId);
+                    Add(canonical, request.TargetActorStableId);
+                    Add(canonical, request.CardCopyStableId);
+                    Add(canonical, request.SlotCode);
+                }
+                if (entry.TeamActivityStartRequest != null)
+                {
+                    var request = entry.TeamActivityStartRequest;
+                    Add(canonical, request.ClientRequestId.ToString("N"));
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, request.ExpectedTeamPolicyRevision);
+                    Add(canonical, request.ActorStableId);
+                    Add(canonical, request.CardCopyStableId);
+                    Add(canonical, request.ActivityRoleCode);
+                    Add(canonical, request.ActivityStableId);
+                    Add(canonical, request.LocationStableId);
+                }
+                if (entry.TeamActivityEndRequest != null)
+                {
+                    var request = entry.TeamActivityEndRequest;
+                    Add(canonical, request.ClientRequestId.ToString("N"));
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, request.ActorStableId);
+                    Add(canonical, request.ActivityStableId);
+                }
+                if (entry.TileTraversalConfirmRequest != null)
+                {
+                    var request = entry.TileTraversalConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildTileTraversalPayloadKey(request));
+                }
+                if (entry.CollectibleCardDrawRequest != null)
+                {
+                    var request = entry.CollectibleCardDrawRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildCollectibleCardDrawPayloadKey(request));
+                }
+                if (entry.CollectibleCardTransferRequest != null)
+                {
+                    var request = entry.CollectibleCardTransferRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildCollectibleCardTransferPayloadKey(request));
+                }
             }
 
             using (var sha = SHA256.Create())
@@ -425,6 +890,210 @@ namespace Ssalddel.Simulation.Domain
             Add(target, request.WorldContext.SettlementStableId);
             Add(target, request.WorldContext.GameDateStartsOn.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture));
             Add(target, 경영SimulationSessionAggregate.BuildSettlementPayloadKey(request.Settlement));
+            if (request.NpcWorkforce != null)
+                Add(target, 경영SimulationSessionAggregate.BuildNpcWorkforcePayloadKey(request.NpcWorkforce));
+            if (request.WorldInventory != null)
+                Add(target, 경영SimulationSessionAggregate.BuildWorldInventoryPayloadKey(
+                    request.WorldInventory));
+            if (request.SurvivalTarot != null)
+                Add(target, 경영SimulationSessionAggregate.BuildSurvivalTarotPayloadKey(
+                    request.SurvivalTarot));
+            if (request.FarmSurvival != null)
+                Add(target, 경영SimulationSessionAggregate.BuildFarmSurvivalPayloadKey(
+                    request.FarmSurvival));
+            if (request.TeamRoleCards != null)
+                Add(target, 경영SimulationSessionAggregate.BuildTeamRoleCardPayloadKey(
+                    request.TeamRoleCards));
+        }
+
+        private static void AddWorldInventory(
+            StringBuilder target,
+            SimulationWorldInventorySnapshot value)
+        {
+            Add(target, "WorldInventoryExtensionV1");
+            Add(target, value.SessionStableId);
+            Add(target, value.WorldRevision);
+            Add(target, value.WorldTick);
+            Add(target, value.RuleRevision);
+            Add(target, value.Buildings.Length);
+            foreach (var item in value.Buildings)
+            {
+                Add(target, item.BuildingStableId);
+                Add(target, item.TileKey);
+                Add(target, item.RegionStableId);
+                Add(target, item.BuildingEvidenceKindCode);
+                Add(target, item.SourceRecordStableId);
+                Add(target, item.InteriorSpaceStableId);
+                Add(target, item.InteriorEvidenceKindCode);
+            }
+            Add(target, value.Containers.Length);
+            foreach (var item in value.Containers)
+            {
+                Add(target, item.ContainerStableId);
+                Add(target, item.BuildingStableId);
+                Add(target, item.InteriorSpaceStableId);
+                Add(target, item.AccessPolicyCode);
+                Add(target, item.CapacityUnits);
+                AddStrings(target, item.ManagerPlayerStableIds);
+                Add(target, item.EvidenceKindCode);
+            }
+            Add(target, value.ContainerItemStacks.Length);
+            foreach (var item in value.ContainerItemStacks)
+            {
+                Add(target, item.ItemStackStableId);
+                Add(target, item.ContainerStableId);
+                Add(target, item.ItemCode);
+                Add(target, item.KoreanName);
+                Add(target, item.Quantity);
+                Add(target, item.UnitCode);
+                Add(target, item.BuildingItemRelationStableId);
+                Add(target, item.EvidenceKindCode);
+            }
+            Add(target, value.Players.Length);
+            foreach (var player in value.Players)
+            {
+                Add(target, player.PlayerStableId);
+                Add(target, player.CurrentBuildingStableId);
+                Add(target, player.InventoryCapacityUnits);
+                AddStrings(target, player.ManagedContainerStableIds);
+                Add(target, player.Items.Length);
+                foreach (var item in player.Items)
+                {
+                    Add(target, item.ItemCode);
+                    Add(target, item.KoreanName);
+                    Add(target, item.Quantity);
+                    Add(target, item.UnitCode);
+                }
+            }
+            Add(target, value.Transfers.Length);
+            foreach (var item in value.Transfers)
+            {
+                Add(target, item.TransferStableId);
+                Add(target, item.CommandId);
+                Add(target, item.PlayerStableId);
+                Add(target, item.BuildingStableId);
+                Add(target, item.SourceContainerStableId);
+                Add(target, item.SourceItemStackStableId);
+                Add(target, item.ItemCode);
+                Add(target, item.Quantity);
+                Add(target, item.UnitCode);
+                Add(target, item.AppliedWorldTick);
+                Add(target, item.AppliedWorldRevision);
+                Add(target, item.EvidenceKindCode);
+                Add(target, item.SimulationOnly);
+            }
+            Add(target, value.SimulationOnly);
+            Add(target, value.IsOperationalState);
+        }
+
+        private static void AddSurvivalTarot(
+            StringBuilder target,
+            SimulationSurvivalTarotStateSnapshot value)
+        {
+            Add(target, "SurvivalTarotExtensionV1");
+            Add(target, value.SessionStableId);
+            Add(target, value.RuleRevision);
+            Add(target, value.WorldTick);
+            Add(target, value.WorldRevision);
+            Add(target, value.PeriodicIntervalTicks);
+            Add(target, value.FoodCrisisThresholdPersonDays);
+            Add(target, value.CurrentFoodReservePersonDays);
+            if (value.FarmScopeConfigured)
+            {
+                Add(target, "FarmExitExtensionV1");
+                Add(target, value.FarmExitThresholdPersonDays);
+                Add(target, value.CurrentFarmFoodReservePersonDays);
+                Add(target, value.RequiresExternalExpedition);
+            }
+            Add(target, value.CalendarRuleCode);
+            Add(target, value.PendingOpportunity == null);
+            if (value.PendingOpportunity != null)
+                AddSurvivalTarotOpportunity(target, value.PendingOpportunity,
+                    value.FarmScopeConfigured);
+            Add(target, value.OpportunityHistory.Length);
+            foreach (var opportunity in value.OpportunityHistory)
+                AddSurvivalTarotOpportunity(target, opportunity,
+                    value.FarmScopeConfigured);
+            Add(target, value.ActiveModifierLines.Length);
+            foreach (var line in value.ActiveModifierLines)
+                AddTarotModifierLine(target, line);
+            Add(target, value.SimulationOnly);
+            Add(target, value.IsOperationalState);
+        }
+
+        private static void AddSurvivalTarotOpportunity(
+            StringBuilder target,
+            SimulationSurvivalTarotOpportunitySnapshot value,
+            bool farmScopeConfigured)
+        {
+            Add(target, value.OpportunityStableId);
+            Add(target, value.TriggerCode);
+            Add(target, value.StatusCode);
+            Add(target, value.TriggeredWorldTick);
+            Add(target, value.FoodReservePersonDays);
+            if (farmScopeConfigured)
+            {
+                Add(target, value.FarmFoodReservePersonDays);
+                Add(target, value.RequiresExternalExpedition);
+            }
+            Add(target, value.SafeBuildingStableId);
+            AddStrings(target, value.ParticipantPlayerStableIds);
+            Add(target, value.Draw.DrawStableId);
+            Add(target, value.Draw.DeckStableId);
+            Add(target, value.Draw.DeckRevision);
+            Add(target, value.Draw.DrawRuleRevision);
+            Add(target, value.Draw.TurnNumber);
+            Add(target, value.Draw.TurnHistoryHash);
+            Add(target, value.Draw.Offers.Length);
+            foreach (var offer in value.Draw.Offers)
+            {
+                Add(target, offer.OfferStableId);
+                Add(target, offer.OfferSlotNumber);
+                Add(target, offer.CardCopyStableId);
+                Add(target, offer.OrientationCode);
+                AddTurnCard(target, offer.Card);
+            }
+            Add(target, value.Responses.Length);
+            foreach (var response in value.Responses)
+            {
+                Add(target, response.PlayerStableId);
+                Add(target, response.OfferStableId);
+                Add(target, response.RespondedWorldTick);
+                Add(target, response.RespondedWorldRevision);
+            }
+            Add(target, value.SelectedOfferStableId);
+            Add(target, value.ResolvedWorldTick?.ToString(CultureInfo.InvariantCulture)
+                ?? string.Empty);
+            Add(target, value.ResolvedWorldRevision?.ToString(CultureInfo.InvariantCulture)
+                ?? string.Empty);
+            Add(target, value.ModifierLines.Length);
+            foreach (var line in value.ModifierLines)
+                AddTarotModifierLine(target, line);
+        }
+
+        private static void AddTarotModifierLine(
+            StringBuilder target,
+            Simulation타로규칙보정선Snapshot value)
+        {
+            Add(target, value.ModifierLineStableId);
+            Add(target, value.UpperRuleStableId);
+            Add(target, value.UpperRuleRevision);
+            Add(target, value.SourceCardStableId);
+            Add(target, value.SourceCardRevision);
+            Add(target, value.CardOrientationCode);
+            Add(target, value.ResponseStableId);
+            Add(target, value.TargetConnectionPointStableId);
+            Add(target, value.TargetRuleDomainCode);
+            Add(target, value.CompatibleLowerRuleStableId);
+            Add(target, value.CompatibleLowerRuleRevision);
+            Add(target, value.CalculationKindCode);
+            Add(target, value.ModifierValue);
+            Add(target, value.ModifierUnitCode);
+            Add(target, value.MeaningCode);
+            Add(target, value.ActiveFromTurnNumber);
+            Add(target, value.ActiveThroughTurnNumber);
+            Add(target, value.SourceTurnClosingStableId);
+            AddStrings(target, value.SourceStableIds);
         }
 
         private static void AddSnapshot(StringBuilder target, 경영SimulationSessionSnapshot value)
@@ -537,7 +1206,164 @@ namespace Ssalddel.Simulation.Domain
                     Add(target, effect.EvidenceCheckedAtUtc?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty);
                 }
             }
+            AddNpcWorkforceSnapshot(target, value);
             AddSettlement(target, value.Settlement);
+            if (value.FarmSurvival != null)
+                Add(target, 경영SimulationSessionAggregate
+                    .BuildFarmSurvivalStatePayloadKey(value.FarmSurvival));
+            if (value.TeamRoleCards != null)
+                Add(target, 경영SimulationSessionAggregate
+                    .BuildTeamRoleCardStatePayloadKey(value.TeamRoleCards));
+            if (value.Exploration != null)
+                Add(target, 경영SimulationSessionAggregate
+                    .BuildWorldExplorationStatePayloadKey(value.Exploration));
+            if (value.CollectibleCardRewards != null)
+                Add(target, 경영SimulationSessionAggregate
+                    .BuildCollectibleCardRewardStatePayloadKey(
+                        value.CollectibleCardRewards));
+        }
+
+        private static void AddNpcWorkforceSnapshot(
+            StringBuilder target,
+            경영SimulationSessionSnapshot value)
+        {
+            if (value.NpcOrganizations.Length == 0
+                && value.NpcActors.Length == 0
+                && value.NpcCapabilityGrants.Length == 0
+                && value.NpcWorkPolicies.Length == 0
+                && value.NpcTaskAssignments.Length == 0
+                && value.NpcWorkRecords.Length == 0
+                && value.NpcActionProjections.Length == 0
+                && value.NpcFacilityInventories.Length == 0)
+                return;
+            Add(target, "NpcWorkforceExtensionV1");
+            Add(target, value.NpcOrganizations.Length);
+            foreach (var organization in value.NpcOrganizations)
+            {
+                Add(target, organization.OrganizationStableId);
+                Add(target, organization.DisplayName);
+                AddStrings(target, organization.FacilityStableIds);
+                AddStrings(target, organization.AllowedCapabilityCodes);
+                AddStrings(target, organization.SourceStableIds);
+            }
+            Add(target, value.NpcActors.Length);
+            foreach (var actor in value.NpcActors)
+            {
+                Add(target, actor.ActorStableId);
+                Add(target, actor.OrganizationStableId);
+                Add(target, actor.DisplayName);
+                Add(target, actor.HomeFacilityStableId);
+                Add(target, actor.ReferenceRoleCode);
+                Add(target, actor.MaximumConcurrentTasks);
+                AddStrings(target, actor.AssignableCapabilityCodes);
+                Add(target, actor.Skills.Length);
+                foreach (var skill in actor.Skills)
+                {
+                    Add(target, skill.CapabilityCode);
+                    Add(target, skill.Score);
+                }
+                AddStrings(target, actor.SourceStableIds);
+            }
+            Add(target, value.NpcCapabilityGrants.Length);
+            foreach (var grant in value.NpcCapabilityGrants)
+            {
+                Add(target, grant.GrantStableId);
+                Add(target, grant.OrganizationStableId);
+                Add(target, grant.ActorStableId);
+                Add(target, grant.FacilityStableId);
+                Add(target, grant.CapabilityCode);
+                Add(target, grant.GrantedByActorStableId);
+                Add(target, grant.GrantKindCode);
+                Add(target, grant.CanDelegate);
+                Add(target, grant.Active);
+                Add(target, grant.GrantedTick);
+                Add(target, grant.Revision);
+                AddStrings(target, grant.SourceStableIds);
+            }
+            Add(target, value.NpcWorkPolicies.Length);
+            foreach (var policy in value.NpcWorkPolicies)
+            {
+                Add(target, policy.PolicyStableId);
+                Add(target, policy.OrganizationStableId);
+                Add(target, policy.FacilityStableId);
+                Add(target, policy.ActionCode);
+                Add(target, policy.RequiredCapabilityCode);
+                Add(target, policy.AutomationEnabled);
+                Add(target, policy.Priority);
+                Add(target, policy.PreferredActorStableId);
+                Add(target, policy.AutoDelegationEnabled);
+                Add(target, policy.AutoDelegationBacklogThreshold);
+                Add(target, policy.TravelDurationTicks);
+                Add(target, policy.WorkDurationTicks);
+                Add(target, policy.InteractionPointKey);
+                Add(target, policy.ActionVisualKey);
+                Add(target, policy.Revision);
+                AddStrings(target, policy.SourceStableIds);
+            }
+            Add(target, value.NpcTaskAssignments.Length);
+            foreach (var assignment in value.NpcTaskAssignments)
+            {
+                Add(target, assignment.AssignmentStableId);
+                Add(target, assignment.TaskStableId);
+                Add(target, assignment.PolicyStableId);
+                Add(target, assignment.OrganizationStableId);
+                Add(target, assignment.FacilityStableId);
+                Add(target, assignment.ActorStableId);
+                Add(target, assignment.ActionCode);
+                Add(target, assignment.RequiredCapabilityCode);
+                Add(target, assignment.PhaseCode);
+                Add(target, assignment.AssignedTick);
+                Add(target, assignment.PhaseStartedTick);
+                Add(target, assignment.TravelDurationTicks);
+                Add(target, assignment.WorkDurationTicks);
+                Add(target, assignment.CompletedTick?.ToString(CultureInfo.InvariantCulture) ?? string.Empty);
+                AddStrings(target, assignment.BlockReasonCodes);
+                Add(target, assignment.Revision);
+            }
+            Add(target, value.NpcWorkRecords.Length);
+            foreach (var record in value.NpcWorkRecords)
+            {
+                Add(target, record.WorkRecordStableId);
+                Add(target, record.AssignmentStableId);
+                Add(target, record.TaskStableId);
+                Add(target, record.ActorStableId);
+                Add(target, record.ActionCode);
+                Add(target, record.FacilityStableId);
+                Add(target, record.StartedTick);
+                Add(target, record.CompletedTick);
+                AddStrings(target, record.ResultCodes);
+                AddStrings(target, record.SourceStableIds);
+            }
+            Add(target, value.NpcActionProjections.Length);
+            foreach (var projection in value.NpcActionProjections)
+            {
+                Add(target, projection.ProjectionStableId);
+                Add(target, projection.ActorStableId);
+                Add(target, projection.TaskStableId);
+                Add(target, projection.FacilityStableId);
+                Add(target, projection.InteractionPointKey);
+                Add(target, projection.ActionVisualKey);
+                Add(target, projection.PhaseCode);
+                Add(target, projection.ProgressRate);
+                AddStrings(target, projection.BlockReasonCodes);
+                Add(target, projection.Revision);
+                Add(target, projection.WorldTick);
+                Add(target, projection.PresentationOnly);
+            }
+            Add(target, value.NpcFacilityInventories.Length);
+            foreach (var inventory in value.NpcFacilityInventories)
+            {
+                Add(target, inventory.InventoryStableId);
+                Add(target, inventory.LotStableId);
+                Add(target, inventory.FacilityStableId);
+                Add(target, inventory.StateCode);
+                Add(target, inventory.Quantity);
+                Add(target, inventory.UnitCode);
+                Add(target, inventory.SourceTaskStableId);
+                Add(target, inventory.UpdatedTick);
+                Add(target, inventory.Revision);
+                AddStrings(target, inventory.SourceStableIds);
+            }
         }
 
         private static void AddTurnCard(StringBuilder target, SimulationTurnCardSnapshot card)
@@ -1096,6 +1922,13 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.Revision);
             Add(target, value.CausedByDecisionStableId);
             Add(target, value.FacilityStableId);
+            if (!string.IsNullOrWhiteSpace(value.ActionCode)
+                || !string.IsNullOrWhiteSpace(value.AssignedActorStableId))
+            {
+                Add(target, "NpcTaskBindingV1");
+                Add(target, value.ActionCode);
+                Add(target, value.AssignedActorStableId);
+            }
             Add(target, value.AssignedCapacity);
             Add(target, value.AssignedCapacityUnitCode);
             Add(target, value.ScheduledStartTick);
@@ -1282,6 +2115,10 @@ namespace Ssalddel.Simulation.Domain
                 ReplayHash = source.ReplayHash,
                 SessionCreateRequest = CloneCreateRequest(source.SessionCreateRequest),
                 Snapshot = 경영SimulationSessionAggregate.Clone(source.Snapshot),
+                WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventory(
+                    source.WorldInventory),
+                SurvivalTarot = 경영SimulationSessionAggregate.CloneSurvivalTarotState(
+                    source.SurvivalTarot),
                 CommandLog = source.CommandLog.Select(CloneCommand).ToArray(),
             };
 
@@ -1303,6 +2140,16 @@ namespace Ssalddel.Simulation.Domain
                     GameDateStartsOn = source.WorldContext.GameDateStartsOn,
                 },
                 Settlement = 경영SimulationSessionAggregate.CloneSettlementRequest(source.Settlement),
+                NpcWorkforce = 경영SimulationSessionAggregate.CloneNpcWorkforceInitialState(
+                    source.NpcWorkforce),
+                WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventoryInitialState(
+                    source.WorldInventory),
+                SurvivalTarot = 경영SimulationSessionAggregate.CloneSurvivalTarotInitialState(
+                    source.SurvivalTarot),
+                FarmSurvival = 경영SimulationSessionAggregate.CloneFarmSurvivalInitialState(
+                    source.FarmSurvival),
+                TeamRoleCards = 경영SimulationSessionAggregate
+                    .CloneTeamRoleCardInitialStateOrNull(source.TeamRoleCards),
             };
 
         public static SimulationCommandLogEntrySnapshot CloneCommand(
@@ -1327,6 +2174,161 @@ namespace Ssalddel.Simulation.Domain
                 TurnClosingConfirmRequest = source.TurnClosingConfirmRequest == null
                     ? null
                     : CloneTurnClosingConfirmRequest(source.TurnClosingConfirmRequest),
+                NpcPolicyChangeRequest = source.NpcPolicyChangeRequest == null
+                    ? null
+                    : CloneNpcPolicyChangeRequest(source.NpcPolicyChangeRequest),
+                WorldItemAcquisitionConfirmRequest =
+                    source.WorldItemAcquisitionConfirmRequest == null
+                        ? null
+                        : CloneWorldItemAcquisitionConfirmRequest(
+                            source.WorldItemAcquisitionConfirmRequest),
+                SurvivalTarotResponseConfirmRequest =
+                    source.SurvivalTarotResponseConfirmRequest == null
+                        ? null
+                        : CloneSurvivalTarotResponseConfirmRequest(
+                            source.SurvivalTarotResponseConfirmRequest),
+                SurvivalTarotResolutionConfirmRequest =
+                    source.SurvivalTarotResolutionConfirmRequest == null
+                        ? null
+                        : CloneSurvivalTarotResolutionConfirmRequest(
+                            source.SurvivalTarotResolutionConfirmRequest),
+                FarmWorkConfirmRequest = source.FarmWorkConfirmRequest == null
+                    ? null
+                    : CloneFarmWorkConfirmRequest(source.FarmWorkConfirmRequest),
+                ThreatResponseConfirmRequest = source.ThreatResponseConfirmRequest == null
+                    ? null
+                    : CloneThreatResponseConfirmRequest(
+                        source.ThreatResponseConfirmRequest),
+                TeamRoleCardEquipRequest = source.TeamRoleCardEquipRequest == null
+                    ? null : CloneTeamRoleCardEquipRequest(
+                        source.TeamRoleCardEquipRequest),
+                TeamActivityStartRequest = source.TeamActivityStartRequest == null
+                    ? null : CloneTeamActivityStartRequest(
+                        source.TeamActivityStartRequest),
+                TeamActivityEndRequest = source.TeamActivityEndRequest == null
+                    ? null : CloneTeamActivityEndRequest(
+                        source.TeamActivityEndRequest),
+                TileTraversalConfirmRequest = source.TileTraversalConfirmRequest == null
+                    ? null : 경영SimulationSessionAggregate.CloneTileTraversalRequest(
+                        source.TileTraversalConfirmRequest),
+                CollectibleCardDrawRequest = source.CollectibleCardDrawRequest == null
+                    ? null : 경영SimulationSessionAggregate.CloneCollectibleCardDrawRequest(
+                        source.CollectibleCardDrawRequest),
+                CollectibleCardTransferRequest = source.CollectibleCardTransferRequest == null
+                    ? null : 경영SimulationSessionAggregate.CloneCollectibleCardTransferRequest(
+                        source.CollectibleCardTransferRequest),
+            };
+
+        public static SimulationFarmWorkConfirmRequest CloneFarmWorkConfirmRequest(
+            SimulationFarmWorkConfirmRequest source)
+            => new SimulationFarmWorkConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                ActorStableId = source.ActorStableId,
+                TargetStableId = source.TargetStableId,
+                ActionCode = source.ActionCode,
+                AssignmentKindCode = source.AssignmentKindCode,
+            };
+
+        public static SimulationThreatResponseConfirmRequest
+            CloneThreatResponseConfirmRequest(
+                SimulationThreatResponseConfirmRequest source)
+            => new SimulationThreatResponseConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                EncounterStableId = source.EncounterStableId,
+                ActorStableId = source.ActorStableId,
+                ChoiceStableId = source.ChoiceStableId,
+            };
+
+        public static SimulationTeamRoleCardEquipRequest
+            CloneTeamRoleCardEquipRequest(SimulationTeamRoleCardEquipRequest source)
+            => new SimulationTeamRoleCardEquipRequest
+            {
+                ClientRequestId = source.ClientRequestId,
+                ExpectedRevision = source.ExpectedRevision,
+                ExpectedTeamPolicyRevision = source.ExpectedTeamPolicyRevision,
+                RequestingActorStableId = source.RequestingActorStableId,
+                TargetActorStableId = source.TargetActorStableId,
+                CardCopyStableId = source.CardCopyStableId,
+                SlotCode = source.SlotCode,
+            };
+
+        public static SimulationTeamActivityStartRequest
+            CloneTeamActivityStartRequest(SimulationTeamActivityStartRequest source)
+            => new SimulationTeamActivityStartRequest
+            {
+                ClientRequestId = source.ClientRequestId,
+                ExpectedRevision = source.ExpectedRevision,
+                ExpectedTeamPolicyRevision = source.ExpectedTeamPolicyRevision,
+                ActorStableId = source.ActorStableId,
+                CardCopyStableId = source.CardCopyStableId,
+                ActivityRoleCode = source.ActivityRoleCode,
+                ActivityStableId = source.ActivityStableId,
+                LocationStableId = source.LocationStableId,
+            };
+
+        public static SimulationTeamActivityEndRequest
+            CloneTeamActivityEndRequest(SimulationTeamActivityEndRequest source)
+            => new SimulationTeamActivityEndRequest
+            {
+                ClientRequestId = source.ClientRequestId,
+                ExpectedRevision = source.ExpectedRevision,
+                ActorStableId = source.ActorStableId,
+                ActivityStableId = source.ActivityStableId,
+            };
+
+        public static SimulationWorldItemAcquisitionConfirmRequest
+            CloneWorldItemAcquisitionConfirmRequest(
+                SimulationWorldItemAcquisitionConfirmRequest source)
+            => new SimulationWorldItemAcquisitionConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                PlayerStableId = source.PlayerStableId,
+                BuildingStableId = source.BuildingStableId,
+                ContainerStableId = source.ContainerStableId,
+                ItemStackStableId = source.ItemStackStableId,
+                Quantity = source.Quantity,
+            };
+
+        public static SimulationSurvivalTarotResponseConfirmRequest
+            CloneSurvivalTarotResponseConfirmRequest(
+                SimulationSurvivalTarotResponseConfirmRequest source)
+            => new SimulationSurvivalTarotResponseConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                OpportunityStableId = source.OpportunityStableId,
+                PlayerStableId = source.PlayerStableId,
+                OfferStableId = source.OfferStableId,
+            };
+
+        public static SimulationSurvivalTarotResolutionConfirmRequest
+            CloneSurvivalTarotResolutionConfirmRequest(
+                SimulationSurvivalTarotResolutionConfirmRequest source)
+            => new SimulationSurvivalTarotResolutionConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                OpportunityStableId = source.OpportunityStableId,
+                PlayerStableId = source.PlayerStableId,
+                OfferStableId = source.OfferStableId,
+            };
+
+        public static SimulationNpcPolicyChangeRequest CloneNpcPolicyChangeRequest(
+            SimulationNpcPolicyChangeRequest source)
+            => new SimulationNpcPolicyChangeRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                PolicyStableId = source.PolicyStableId,
+                AutomationEnabled = source.AutomationEnabled,
+                Priority = source.Priority,
+                PreferredActorStableId = source.PreferredActorStableId,
+                AutoDelegationEnabled = source.AutoDelegationEnabled,
             };
 
         public static SimulationTurnClosingConfirmRequest CloneTurnClosingConfirmRequest(
@@ -1439,6 +2441,8 @@ namespace Ssalddel.Simulation.Domain
                     TaskStableId = source.Task.TaskStableId,
                     TaskTypeCode = source.Task.TaskTypeCode,
                     FacilityStableId = source.Task.FacilityStableId,
+                    ActionCode = source.Task.ActionCode,
+                    AssignedActorStableId = source.Task.AssignedActorStableId,
                     AssignedCapacity = source.Task.AssignedCapacity,
                     AssignedCapacityUnitCode = source.Task.AssignedCapacityUnitCode,
                     DurationTicks = source.Task.DurationTicks,

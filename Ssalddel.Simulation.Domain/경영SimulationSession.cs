@@ -60,6 +60,12 @@ namespace Ssalddel.Simulation.Domain
             SettlementStableId = request.WorldContext.SettlementStableId.Trim();
             GameDateStartsOn = request.WorldContext.GameDateStartsOn;
             InitializeSettlement(request.Settlement);
+            InitializeNpcWorkforce(request.NpcWorkforce);
+            InitializeWorldInventory(request.WorldInventory);
+            InitializeSurvivalTarot(request.SurvivalTarot);
+            InitializeFarmSurvival(request.FarmSurvival);
+            InitializeTeamRoleCards(request.TeamRoleCards);
+            InitializeCollectibleCardRewards();
         }
 
         public string SessionStableId { get; }
@@ -89,7 +95,10 @@ namespace Ssalddel.Simulation.Domain
             ValidateAdvance(request);
             lock (gate)
             {
-                if (HasAppliedDecisionCommand(request.CommandId))
+                if (HasAppliedDecisionCommand(request.CommandId)
+                    || HasAppliedNpcPolicyCommand(request.CommandId)
+                    || HasAppliedFarmSurvivalCommand(request.CommandId)
+                    || HasAppliedCollectibleCardCommand(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 if (appliedCommands.TryGetValue(request.CommandId, out var applied))
                 {
@@ -103,10 +112,14 @@ namespace Ssalddel.Simulation.Domain
                 if (CurrentTick + request.TickCount > DurationTicks)
                     throw new SimulationConflictException("SimulationDurationExceeded");
 
+                var previousTick = CurrentTick;
                 CurrentTick += request.TickCount;
+                AdvanceNpcWorkforce(CurrentTick);
                 AdvanceDecisionWork(CurrentTick);
                 ExpireActiveTurnCardEffects();
                 Revision++;
+                AdvanceFarmSurvival(previousTick, CurrentTick);
+                EvaluateSurvivalTarotOpportunity();
                 AppendTickCommand(request);
                 var snapshot = CreateSnapshot();
                 appliedCommands.Add(
@@ -132,6 +145,26 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(
                     SettlementPayloadKey,
                     BuildSettlementPayloadKey(request.Settlement),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    BuildNpcWorkforcePayloadKey(npcWorkforceCreationState),
+                    BuildNpcWorkforcePayloadKey(request.NpcWorkforce),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    worldInventoryInitialPayloadKey,
+                    BuildWorldInventoryPayloadKey(request.WorldInventory),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    survivalTarotInitialPayloadKey,
+                    BuildSurvivalTarotPayloadKey(request.SurvivalTarot),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    farmSurvivalInitialPayloadKey,
+                    BuildFarmSurvivalPayloadKey(request.FarmSurvival),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    teamRoleCardInitialPayloadKey,
+                    BuildTeamRoleCardPayloadKey(request.TeamRoleCards),
                     StringComparison.Ordinal))
             {
                 throw new SimulationConflictException("SimulationCreateRequestPayloadConflict");
@@ -183,7 +216,20 @@ namespace Ssalddel.Simulation.Domain
                 ExportShipmentExecutions = Create수출선적실행Snapshots(),
                 TurnClosings = CreateTurnClosingSnapshots(),
                 ActiveTurnCardEffects = CreateActiveTurnCardEffectSnapshots(),
+                NpcOrganizations = CreateNpcOrganizationSnapshots(),
+                NpcActors = CreateNpcActorSnapshots(),
+                NpcCapabilityGrants = CreateNpcCapabilityGrantSnapshots(),
+                NpcWorkPolicies = CreateNpcWorkPolicySnapshots(),
+                NpcTaskAssignments = CreateNpcTaskAssignmentSnapshots(),
+                NpcWorkRecords = CreateNpcWorkRecordSnapshots(),
+                NpcActionProjections = CreateNpcActionProjections(),
+                NpcFacilityInventories = CreateNpcFacilityInventorySnapshots(),
                 Settlement = CreateSettlementSnapshot(),
+                FarmSurvival = farmSurvivalCreationState == null
+                    ? null : CreateFarmSurvivalStateSnapshot(),
+                TeamRoleCards = CreateTeamRoleCardStateSnapshotOrNull(),
+                Exploration = CreateWorldExplorationStateSnapshotOrNull(),
+                CollectibleCardRewards = CreateCollectibleCardRewardStateSnapshotOrNull(),
             };
 
         internal static 경영SimulationSessionSnapshot Clone(경영SimulationSessionSnapshot source)
@@ -238,7 +284,20 @@ namespace Ssalddel.Simulation.Domain
                 TurnClosings = source.TurnClosings.Select(CloneTurnClosing).ToArray(),
                 ActiveTurnCardEffects = source.ActiveTurnCardEffects
                     .Select(CloneActiveTurnCardEffect).ToArray(),
+                NpcOrganizations = source.NpcOrganizations.Select(CloneNpcOrganization).ToArray(),
+                NpcActors = source.NpcActors.Select(CloneNpcActor).ToArray(),
+                NpcCapabilityGrants = source.NpcCapabilityGrants.Select(CloneNpcCapabilityGrant).ToArray(),
+                NpcWorkPolicies = source.NpcWorkPolicies.Select(CloneNpcWorkPolicy).ToArray(),
+                NpcTaskAssignments = source.NpcTaskAssignments.Select(CloneNpcTaskAssignment).ToArray(),
+                NpcWorkRecords = source.NpcWorkRecords.Select(CloneNpcWorkRecord).ToArray(),
+                NpcActionProjections = source.NpcActionProjections.Select(CloneNpcActionProjection).ToArray(),
+                NpcFacilityInventories = source.NpcFacilityInventories.Select(CloneNpcFacilityInventory).ToArray(),
                 Settlement = CloneSettlementSnapshot(source.Settlement),
+                FarmSurvival = CloneFarmSurvivalStateOrNull(source.FarmSurvival),
+                TeamRoleCards = CloneTeamRoleCardStateOrNull(source.TeamRoleCards),
+                Exploration = CloneWorldExplorationStateOrNull(source.Exploration),
+                CollectibleCardRewards = CloneCollectibleCardRewardStateOrNull(
+                    source.CollectibleCardRewards),
             };
 
         internal static void ValidateCreate(경영SimulationSession생성Request request)
@@ -261,6 +320,11 @@ namespace Ssalddel.Simulation.Domain
                 || request.WorldContext.GameDateStartsOn.TimeOfDay != TimeSpan.Zero)
                 throw new SimulationContractException("SimulationGameDateStartsOnInvalid");
             ValidateSettlementInitialState(request.Settlement, request.WorldContext.SettlementStableId);
+            ValidateNpcWorkforceInitialState(request.NpcWorkforce);
+            ValidateWorldInventoryInitialState(request.WorldInventory);
+            ValidateSurvivalTarotInitialState(request.SurvivalTarot);
+            ValidateFarmSurvivalInitialState(request.FarmSurvival);
+            ValidateTeamRoleCardInitialState(request.TeamRoleCards);
         }
 
         internal static void ValidateAdvance(경영SimulationTick진행Request request)

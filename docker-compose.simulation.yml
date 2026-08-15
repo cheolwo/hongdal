@@ -10,6 +10,8 @@ services:
       SSALDDEL_SIMULATION_PUBLIC_DATA_PASSWORD: "${SSALDDEL_SIMULATION_PUBLIC_DATA_PASSWORD:-YOUR_LOCAL_SIMULATION_READER_PASSWORD}"
       SSALDDEL_SIMULATION_WORLD_USER: "${SSALDDEL_SIMULATION_WORLD_USER:-ssalddel_simulation_world}"
       SSALDDEL_SIMULATION_WORLD_PASSWORD: "${SSALDDEL_SIMULATION_WORLD_PASSWORD:-YOUR_LOCAL_SIMULATION_WORLD_PASSWORD}"
+      SSALDDEL_SIMULATION_SESSION_USER: "${SSALDDEL_SIMULATION_SESSION_USER:-ssalddel_simulation_session}"
+      SSALDDEL_SIMULATION_SESSION_PASSWORD: "${SSALDDEL_SIMULATION_SESSION_PASSWORD:-YOUR_LOCAL_SIMULATION_SESSION_PASSWORD}"
     volumes:
       - ./eng/docker/init-simulation-databases.sh:/opt/ssalddel/init-simulation-databases.sh:ro
     entrypoint: ["sh", "/opt/ssalddel/init-simulation-databases.sh"]
@@ -37,8 +39,11 @@ services:
       SimulationSharedPublicData__MaxItems: "${SSALDDEL_SIMULATION_PUBLIC_DATA_MAX_ITEMS:-50}"
       SimulationWorldDerivationDatabase__Enabled: "${SSALDDEL_SIMULATION_WORLD_DATABASE_ENABLED:-true}"
       SimulationWorldDerivationDatabase__ConnectionStringName: SimulationWorldDerived
+      SimulationSessionDatabase__Enabled: "${SSALDDEL_SIMULATION_SESSION_DATABASE_ENABLED:-true}"
+      SimulationSessionDatabase__ConnectionStringName: SimulationSession
       ConnectionStrings__SharedPublicData: "server=mysql;port=3306;database=${SSALDDEL_SIMULATION_PUBLIC_DATA_DATABASE:-ssalddel_dev};user=${SSALDDEL_SIMULATION_PUBLIC_DATA_USER:-ssalddel_simulation_reader};password=${SSALDDEL_SIMULATION_PUBLIC_DATA_PASSWORD:-YOUR_LOCAL_SIMULATION_READER_PASSWORD};"
       ConnectionStrings__SimulationWorldDerived: "server=mysql;port=3306;database=ssalddel_simulation_world;user=${SSALDDEL_SIMULATION_WORLD_USER:-ssalddel_simulation_world};password=${SSALDDEL_SIMULATION_WORLD_PASSWORD:-YOUR_LOCAL_SIMULATION_WORLD_PASSWORD};"
+      ConnectionStrings__SimulationSession: "server=mysql;port=3306;database=ssalddel_simulation_session;user=${SSALDDEL_SIMULATION_SESSION_USER:-ssalddel_simulation_session};password=${SSALDDEL_SIMULATION_SESSION_PASSWORD:-YOUR_LOCAL_SIMULATION_SESSION_PASSWORD};"
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/health/ready"]
       interval: 30s
