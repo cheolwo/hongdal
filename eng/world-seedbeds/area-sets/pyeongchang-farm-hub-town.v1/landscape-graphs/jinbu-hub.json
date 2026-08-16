@@ -1,0 +1,9 @@
+{
+  "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
+  "graphRoleCode": "HubCore",
+  "graphRevision": 1,
+  "areaRefs": ["area:sim:pyeongchang:jinbu-hub"],
+  "tileRefs": [],
+  "scenarioRouteRefs": [],
+  "presentationOnly": true
+}

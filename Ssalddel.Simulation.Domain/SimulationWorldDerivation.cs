@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Simulation.Domain
 {
@@ -50,6 +51,14 @@ public static class SimulationWorldUnity산출물상태Codes
     public const string 성능예산초과 = "PerformanceBudgetExceeded";
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+    SsalddelCodeLayer.Domain,
+    "공간 원본 계보·파생 node·관계·배치 계획을 불변 실행 단위로 정의한다.",
+    StepKey = "domain.derived-world-ledger",
+    ExecutionStage = SsalddelCodeExecutionStage.Definition,
+    FlowOrder = 10,
+    Boundary = "관측·파생·통계배분·시나리오·장식 근거를 분리하며 추정 위치를 실제 사실로 승격하지 않는다.")]
 public sealed class SimulationWorld파생원장
 {
     public int SchemaVersion { get; set; } = 2;
@@ -190,6 +199,17 @@ public sealed class SimulationWorldUnity산출물
     public string LodCode { get; set; } = string.Empty;
     public string? StorageObjectKey { get; set; }
     public string? ArtifactHashSha256 { get; set; }
+    public string? SourceRevision { get; set; }
+    public string? SourceHashSha256 { get; set; }
+    public string? SourceReferenceDate { get; set; }
+    public string? HorizontalCrsCode { get; set; }
+    public string? VerticalDatumCode { get; set; }
+    public decimal? ResolutionMeters { get; set; }
+    public string? NoDataValue { get; set; }
+    public string? ArtifactFormatCode { get; set; }
+    public long? ArtifactByteLength { get; set; }
+    public int? SampleWidth { get; set; }
+    public int? SampleHeight { get; set; }
     public long? VertexCount { get; set; }
     public long? TriangleCount { get; set; }
     public int? MaterialSlotCount { get; set; }
@@ -405,10 +425,26 @@ public static class SimulationWorld파생원장Validator
                 "정점 수는 음수일 수 없습니다.");
             Require(artifact.TriangleCount == null || artifact.TriangleCount >= 0,
                 "삼각형 수는 음수일 수 없습니다.");
+            Require(artifact.ResolutionMeters == null || artifact.ResolutionMeters > 0m,
+                "Unity 산출물 원본 해상도는 0보다 커야 합니다.");
+            Require(artifact.ArtifactByteLength == null || artifact.ArtifactByteLength >= 0,
+                "Unity 산출물 바이트 길이는 음수일 수 없습니다.");
+            Require(artifact.SampleWidth == null || artifact.SampleWidth > 0,
+                "Unity 산출물 표본 너비는 0보다 커야 합니다.");
+            Require(artifact.SampleHeight == null || artifact.SampleHeight > 0,
+                "Unity 산출물 표본 높이는 0보다 커야 합니다.");
             if (artifact.StatusCode == SimulationWorldUnity산출물상태Codes.완료)
             {
                 RequireText(artifact.StorageObjectKey, "완료 Unity 산출물 저장 객체 키");
                 Require(artifact.ArtifactHashSha256 != null, "완료 Unity 산출물 SHA-256이 필요합니다.");
+                RequireSha256(artifact.SourceHashSha256!, "완료 Unity 산출물 원본 SHA-256");
+                RequireText(artifact.SourceRevision, "완료 Unity 산출물 원본 개정 번호");
+                RequireText(artifact.HorizontalCrsCode, "완료 Unity 산출물 수평 좌표계");
+                RequireText(artifact.ArtifactFormatCode, "완료 Unity 산출물 형식 코드");
+                Require(artifact.ArtifactByteLength != null,
+                    "완료 Unity 산출물 바이트 길이가 필요합니다.");
+                Require(artifact.SampleWidth != null && artifact.SampleHeight != null,
+                    "완료 Unity 산출물 표본 크기가 필요합니다.");
             }
         }
 
@@ -582,6 +618,12 @@ public static class SimulationWorld파생원장Hash
             canonical.Append("|UA:").Append(artifact.StableId).Append(':').Append(artifact.TileManifestStableId)
                 .Append(':').Append(artifact.ArtifactKindCode).Append(':').Append(artifact.LodCode)
                 .Append(':').Append(artifact.StorageObjectKey).Append(':').Append(artifact.ArtifactHashSha256)
+                .Append(':').Append(artifact.SourceRevision).Append(':').Append(artifact.SourceHashSha256)
+                .Append(':').Append(artifact.SourceReferenceDate)
+                .Append(':').Append(artifact.HorizontalCrsCode).Append(':').Append(artifact.VerticalDatumCode)
+                .Append(':').Append(artifact.ResolutionMeters).Append(':').Append(artifact.NoDataValue)
+                .Append(':').Append(artifact.ArtifactFormatCode).Append(':').Append(artifact.ArtifactByteLength)
+                .Append(':').Append(artifact.SampleWidth).Append(':').Append(artifact.SampleHeight)
                 .Append(':').Append(artifact.VertexCount).Append(':').Append(artifact.TriangleCount)
                 .Append(':').Append(artifact.MaterialSlotCount).Append(':').Append(artifact.EstimatedDrawCallCount)
                 .Append(':').Append(artifact.BoundaryVertexHashSha256).Append(':').Append(artifact.StatusCode);

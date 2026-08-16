@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Domain.PublicData.Korea;
 using Ssalddel.Infrastructure.Persistence.PublicData;
 using Ssalddel.Simulation.Application;
@@ -34,6 +35,18 @@ public sealed record 대표건축물선정항목(
     int RepresentedRecordCount,
     int Rank);
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+    SsalddelCodeLayer.Application,
+    "평창군 공공데이터를 읽어 대표 건물·공간 관계·Unity 타일 계획을 결정적으로 조립한다.",
+    StepKey = "application.pyeongchang-derivation",
+    DependsOnStepKeys = new string[] { "domain.derived-world-ledger" },
+    ExecutionStage = SsalddelCodeExecutionStage.Projection,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ReadsFrom = SsalddelCodeDataScope.SharedPublicData,
+    WritesTo = SsalddelCodeDataScope.DerivedWorld,
+    FlowOrder = 20,
+    Boundary = "공유 공공데이터는 읽기 전용이며 건물 도형이나 DEM이 없으면 임의 좌표를 생성하지 않는다.")]
 public sealed class 평창군공간파생Pipeline(
     PublicDataIngestionDbContext publicDataDb,
     ISimulationWorld파생원장Store derivedStore)
@@ -46,10 +59,16 @@ public sealed class 평창군공간파생Pipeline(
     private const string 공간RuleRevision = "region-first-world-projection.v7";
 
     public Task<평창군공간파생PipelineResult> 실행Async(CancellationToken cancellationToken)
-        => 실행Async(null, cancellationToken);
+        => 실행Async(null, null, cancellationToken);
 
     public async Task<평창군공간파생PipelineResult> 실행Async(
         string? tileManifestPath,
+        CancellationToken cancellationToken)
+        => await 실행Async(tileManifestPath, null, cancellationToken);
+
+    public async Task<평창군공간파생PipelineResult> 실행Async(
+        string? tileManifestPath,
+        string? spatialArtifactManifestPath,
         CancellationToken cancellationToken)
     {
         var buildings = await publicDataDb.BuildingRegisterTitles.AsNoTracking()
@@ -99,6 +118,13 @@ public sealed class 평창군공간파생Pipeline(
         var tileManifest = string.IsNullOrWhiteSpace(tileManifestPath)
             ? null
             : await ReadTileManifestAsync(tileManifestPath, cancellationToken);
+        var spatialArtifacts = string.IsNullOrWhiteSpace(spatialArtifactManifestPath)
+            ? null
+            : await ReadSpatialArtifactManifestAsync(spatialArtifactManifestPath, cancellationToken);
+        if (spatialArtifacts != null
+            && (tileManifest == null
+                || !tileManifest.Tiles.Any(item => item.TileKey == spatialArtifacts.TileKey)))
+            throw new InvalidDataException("PyeongchangSpatialArtifactTileManifestMissing");
         var publicDataSourceHash = SourceHash(
             buildings,
             categories,
@@ -110,6 +136,8 @@ public sealed class 평창군공간파생Pipeline(
         var sourceHash = tileManifest == null
             ? publicDataSourceHash
             : Sha256(publicDataSourceHash + "|tile-manifest:" + tileManifest.ManifestFileHashSha256);
+        if (spatialArtifacts != null)
+            sourceHash = Sha256(sourceHash + "|spatial-artifacts:" + spatialArtifacts.ManifestFileHashSha256);
         var spatialInputFingerprint = Sha256(
             sourceHash + "|schema:2|recipe:" + 공간RecipeRevision + "|rule:" + 공간RuleRevision);
         var generatedAt = buildings.Select(item => item.ObservedAtUtc)
@@ -124,6 +152,7 @@ public sealed class 평창군공간파생Pipeline(
             regionAssignments,
             administrativeAggregates,
             tileManifest,
+            spatialArtifacts,
             publicDataSourceHash,
             spatialInputFingerprint,
             generatedAt,
@@ -154,6 +183,7 @@ public sealed class 평창군공간파생Pipeline(
         IReadOnlyList<건축물행정구역Assignment> regionAssignments,
         IReadOnlyList<행정동건축물CategoryAggregate> administrativeAggregates,
         PyeongchangTileManifest? tileManifest,
+        PyeongchangSpatialArtifactManifest? spatialArtifacts,
         string publicDataSourceHash,
         string sourceHash,
         DateTimeOffset generatedAt,
@@ -260,7 +290,7 @@ public sealed class 평창군공간파생Pipeline(
             GeneratedAtUtc = generatedAt == DateTimeOffset.UnixEpoch
                 ? DateTimeOffset.Parse("2026-08-13T00:00:00Z")
                 : generatedAt,
-            Sources = SourceLineage(publicDataSourceHash, generatedAt, tileManifest),
+            Sources = SourceLineage(publicDataSourceHash, generatedAt, tileManifest, spatialArtifacts),
             Nodes = nodes,
             Relations = relations,
             BuildingPlacements = Array.Empty<SimulationWorld건물배치계획>(),
@@ -269,10 +299,11 @@ public sealed class 평창군공간파생Pipeline(
             {
                 tileManifest == null
                     ? PendingUnityTransformProfile()
-                    : TileManifestTransformProfile(tileManifest),
+                    : TileManifestTransformProfile(tileManifest, spatialArtifacts),
             },
             UnityTileManifests = tileManifest?.Tiles ?? Array.Empty<SimulationWorldUnity타일Manifest>(),
-            UnityArtifacts = Array.Empty<SimulationWorldUnity산출물>(),
+            UnityArtifacts = spatialArtifacts?.ToDomainArtifacts()
+                ?? Array.Empty<SimulationWorldUnity산출물>(),
             VisualPlacements = Array.Empty<SimulationWorld시각배치계획>(),
         };
     }
@@ -502,7 +533,8 @@ public sealed class 평창군공간파생Pipeline(
     private static SimulationWorld원본계보[] SourceLineage(
         string publicDataSourceHash,
         DateTimeOffset generatedAt,
-        PyeongchangTileManifest? tileManifest)
+        PyeongchangTileManifest? tileManifest,
+        PyeongchangSpatialArtifactManifest? spatialArtifacts)
     {
         var sources = new List<SimulationWorld원본계보>
         {
@@ -535,6 +567,25 @@ public sealed class 평창군공간파생Pipeline(
                 SourceRevision = "2021-v200",
                 SourceHashSha256 = tileManifest.RasterSourceHashSha256,
                 ReferenceTimeUtc = DateTimeOffset.Parse("2021-12-31T00:00:00Z"),
+            });
+        }
+        if (spatialArtifacts != null)
+        {
+            sources.Add(new SimulationWorld원본계보
+            {
+                SourceStableId = "source:public-spatial:pyeongchang-copernicus-dem",
+                SourceDatabaseCode = "PrivateObjectStorage",
+                DatasetCode = "copernicus-dem-glo30-epsg5186",
+                SourceRevision = spatialArtifacts.ElevationSource.SourceRevision,
+                SourceHashSha256 = spatialArtifacts.ElevationSource.SourceHashSha256,
+            });
+            sources.Add(new SimulationWorld원본계보
+            {
+                SourceStableId = "source:public-spatial:pyeongchang-l2-artifact-manifest",
+                SourceDatabaseCode = "DerivedWorldArtifactStorage",
+                DatasetCode = spatialArtifacts.SchemaVersion,
+                SourceRevision = spatialArtifacts.RuleRevision,
+                SourceHashSha256 = spatialArtifacts.ManifestFileHashSha256,
             });
         }
         return sources.ToArray();
@@ -574,13 +625,19 @@ public sealed class 평창군공간파생Pipeline(
     }
 
     private static SimulationWorldUnity공간변환Profile TileManifestTransformProfile(
-        PyeongchangTileManifest manifest)
+        PyeongchangTileManifest manifest,
+        PyeongchangSpatialArtifactManifest? spatialArtifacts)
     {
         const string stableId = "unity-transform:area-set:pyeongchang:farm-hub-town.v1";
         const string ruleRevision = "unity-space-transform.epsg5186.v1";
-        var originEasting = manifest.Tiles.Min(item => item.MinEastingMeters);
-        var originNorthing = manifest.Tiles.Min(item => item.MinNorthingMeters);
-        var status = SimulationWorldUnity변환상태Codes.자료부족;
+        var originEasting = spatialArtifacts?.MinEastingMeters
+            ?? manifest.Tiles.Min(item => item.MinEastingMeters);
+        var originNorthing = spatialArtifacts?.MinNorthingMeters
+            ?? manifest.Tiles.Min(item => item.MinNorthingMeters);
+        var referenceElevation = spatialArtifacts?.MinimumPhysicalElevationMeters;
+        var status = referenceElevation == null
+            ? SimulationWorldUnity변환상태Codes.자료부족
+            : SimulationWorldUnity변환상태Codes.변환가능;
         return new SimulationWorldUnity공간변환Profile
         {
             StableId = stableId,
@@ -589,17 +646,78 @@ public sealed class 평창군공간파생Pipeline(
             AxisMappingCode = "EastingToX-NorthingToZ-ElevationToY",
             OriginEastingMeters = originEasting,
             OriginNorthingMeters = originNorthing,
-            ReferenceElevationMeters = null,
+            ReferenceElevationMeters = referenceElevation,
             HorizontalScale = 1m,
             VerticalExaggeration = 1m,
             MetersPerUnityUnit = 1m,
             RuleRevision = ruleRevision,
             StatusCode = status,
             ProfileHashSha256 = Sha256(
-                $"{stableId}|EPSG:5186|{originEasting}|{originNorthing}|reference-elevation:pending|" +
-                $"horizontal:1|vertical:1|meters-per-unit:1|{ruleRevision}|{status}|{manifest.ManifestFileHashSha256}"),
+                $"{stableId}|EPSG:5186|{originEasting}|{originNorthing}|reference-elevation:{referenceElevation}|" +
+                $"horizontal:1|vertical:1|meters-per-unit:1|{ruleRevision}|{status}|{manifest.ManifestFileHashSha256}|" +
+                $"{spatialArtifacts?.ManifestFileHashSha256}"),
         };
     }
+
+    private static async Task<PyeongchangSpatialArtifactManifest> ReadSpatialArtifactManifestAsync(
+        string path,
+        CancellationToken cancellationToken)
+    {
+        var fullPath = Path.GetFullPath(path);
+        if (!File.Exists(fullPath))
+            throw new FileNotFoundException("PyeongchangSpatialArtifactManifestMissing", fullPath);
+        await using var stream = File.OpenRead(fullPath);
+        var fileHash = Convert.ToHexString(await SHA256.HashDataAsync(stream, cancellationToken));
+        stream.Position = 0;
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+        var root = document.RootElement;
+        var tileKey = RequiredString(root, "tileKey");
+        var crs = RequiredString(root, "coordinateReferenceSystem");
+        if (crs != "EPSG:5186")
+            throw new InvalidDataException("PyeongchangSpatialArtifactCrsUnsupported");
+        var core = root.GetProperty("coreBounds");
+        var sources = root.GetProperty("sources");
+        var artifacts = root.GetProperty("artifacts");
+        var statistics = root.GetProperty("statistics");
+        return new PyeongchangSpatialArtifactManifest(
+            RequiredString(root, "schemaVersion"),
+            RequiredString(root, "ruleRevision"),
+            fileHash,
+            tileKey,
+            crs,
+            core.GetProperty("minEasting").GetDecimal(),
+            core.GetProperty("minNorthing").GetDecimal(),
+            statistics.GetProperty("minimumPhysicalElevationMeters").GetDecimal(),
+            root.GetProperty("sampleSpacingMeters").GetDecimal(),
+            ReadSpatialSource(sources.GetProperty("elevation")),
+            ReadSpatialSource(sources.GetProperty("landCover")),
+            ReadSpatialArtifact(artifacts.GetProperty("elevation")),
+            ReadSpatialArtifact(artifacts.GetProperty("landCover")),
+            ReadSpatialArtifact(artifacts.GetProperty("placementMask")));
+    }
+
+    private static PyeongchangSpatialSource ReadSpatialSource(JsonElement source) => new(
+        RequiredString(source, "sourceRevision"),
+        RequiredString(source, "sha256"),
+        RequiredString(source, "horizontalCrs"),
+        source.TryGetProperty("verticalDatum", out var datum) ? datum.GetString() : null,
+        source.GetProperty("resolutionMeters").GetDecimal(),
+        source.GetProperty("noDataValue").GetRawText(),
+        source.TryGetProperty("sourceReferenceDate", out var date) && date.ValueKind != JsonValueKind.Null
+            ? date.GetString()
+            : null);
+
+    private static PyeongchangSpatialArtifact ReadSpatialArtifact(JsonElement artifact) => new(
+        RequiredString(artifact, "relativePath"),
+        RequiredString(artifact, "sha256"),
+        RequiredString(artifact, "formatCode"),
+        artifact.GetProperty("byteLength").GetInt64(),
+        artifact.GetProperty("width").GetInt32(),
+        artifact.GetProperty("height").GetInt32());
+
+    private static string RequiredString(JsonElement element, string propertyName) =>
+        element.GetProperty(propertyName).GetString()
+        ?? throw new InvalidDataException("PyeongchangSpatialArtifactPropertyMissing:" + propertyName);
 
     private static async Task<PyeongchangTileManifest> ReadTileManifestAsync(
         string path,
@@ -690,35 +808,11 @@ public sealed class 평창군공간파생Pipeline(
 
     public static IReadOnlyList<대표건축물선정항목> SelectOneRepresentativePerBuildingCategory(
         IReadOnlyList<Ssalddel.Domain.PublicData.Korea.건축물대장표제부Record> buildings,
-        IReadOnlyDictionary<Guid, string> categories)
-    {
-        if (buildings.Count == 0) return Array.Empty<대표건축물선정항목>();
-        return buildings
-            .GroupBy(building => categories.TryGetValue(building.Id, out var category)
-                ? category
-                : "unresolved", StringComparer.Ordinal)
-            .OrderBy(group => group.Key, StringComparer.Ordinal)
-            .Select(group =>
-            {
-                var representative = group.OrderByDescending(QualityScore)
-                    .ThenBy(building => Sha256("representative:51760:" + building.Id.ToString("N")), StringComparer.Ordinal)
-                    .First();
-                return new 대표건축물선정항목(
-                    representative, "building-category:" + group.Key, group.Count(), 1);
-            })
-            .ToArray();
-    }
-
-    private static int QualityScore(Ssalddel.Domain.PublicData.Korea.건축물대장표제부Record building)
-    {
-        var score = !string.IsNullOrWhiteSpace(building.BuildingName) ? 100 : 0;
-        if (building.BuildingAreaSquareMeters.HasValue) score += 10;
-        if (building.TotalFloorAreaSquareMeters.HasValue) score += 8;
-        if (building.AboveGroundFloorCount.HasValue) score += 6;
-        if (building.HeightMeters.HasValue) score += 4;
-        if (!string.IsNullOrWhiteSpace(building.RoadAddress)) score += 2;
-        return score;
-    }
+        IReadOnlyDictionary<Guid, string> categories) =>
+        지역대표건축물Selector.SelectOnePerCategory(
+            "region:kr:sigungu:" + 평창군Code,
+            buildings,
+            categories);
 
     private static string SourceHash(
         IEnumerable<Ssalddel.Domain.PublicData.Korea.건축물대장표제부Record> buildings,
@@ -768,6 +862,82 @@ internal sealed record PyeongchangTileManifest(
     string ManifestFileHashSha256,
     string RasterSourceHashSha256,
     SimulationWorldUnity타일Manifest[] Tiles);
+
+internal sealed record PyeongchangSpatialSource(
+    string SourceRevision,
+    string SourceHashSha256,
+    string HorizontalCrsCode,
+    string? VerticalDatumCode,
+    decimal ResolutionMeters,
+    string NoDataValue,
+    string? SourceReferenceDate);
+
+internal sealed record PyeongchangSpatialArtifact(
+    string RelativePath,
+    string ArtifactHashSha256,
+    string FormatCode,
+    long ByteLength,
+    int Width,
+    int Height);
+
+internal sealed record PyeongchangSpatialArtifactManifest(
+    string SchemaVersion,
+    string RuleRevision,
+    string ManifestFileHashSha256,
+    string TileKey,
+    string HorizontalCrsCode,
+    decimal MinEastingMeters,
+    decimal MinNorthingMeters,
+    decimal MinimumPhysicalElevationMeters,
+    decimal SampleSpacingMeters,
+    PyeongchangSpatialSource ElevationSource,
+    PyeongchangSpatialSource LandCoverSource,
+    PyeongchangSpatialArtifact Elevation,
+    PyeongchangSpatialArtifact LandCover,
+    PyeongchangSpatialArtifact PlacementMask)
+{
+    public SimulationWorldUnity산출물[] ToDomainArtifacts() => new[]
+    {
+        Create("elevation", Elevation, ElevationSource),
+        Create("land-cover", LandCover, LandCoverSource),
+        Create("placement-mask", PlacementMask, new PyeongchangSpatialSource(
+            RuleRevision,
+            Hash(ElevationSource.SourceHashSha256 + "|" + LandCoverSource.SourceHashSha256 + "|" + RuleRevision),
+            HorizontalCrsCode,
+            ElevationSource.VerticalDatumCode,
+            SampleSpacingMeters,
+            "0",
+            null)),
+    };
+
+    private SimulationWorldUnity산출물 Create(
+        string layerCode,
+        PyeongchangSpatialArtifact artifact,
+        PyeongchangSpatialSource source) => new()
+        {
+            StableId = $"unity-artifact:{TileKey}:{layerCode}",
+            TileManifestStableId = "unity-tile:" + TileKey,
+            ArtifactKindCode = layerCode,
+            LodCode = "L2",
+            StorageObjectKey = artifact.RelativePath,
+            ArtifactHashSha256 = artifact.ArtifactHashSha256,
+            SourceRevision = source.SourceRevision,
+            SourceHashSha256 = source.SourceHashSha256,
+            SourceReferenceDate = source.SourceReferenceDate,
+            HorizontalCrsCode = source.HorizontalCrsCode,
+            VerticalDatumCode = source.VerticalDatumCode,
+            ResolutionMeters = source.ResolutionMeters,
+            NoDataValue = source.NoDataValue,
+            ArtifactFormatCode = artifact.FormatCode,
+            ArtifactByteLength = artifact.ByteLength,
+            SampleWidth = artifact.Width,
+            SampleHeight = artifact.Height,
+            StatusCode = SimulationWorldUnity산출물상태Codes.완료,
+        };
+
+    private static string Hash(string value) =>
+        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
+}
 
 public static class 평창군공간파생PipelineRegistration
 {

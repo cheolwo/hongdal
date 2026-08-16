@@ -59,6 +59,7 @@
 	<PackageVersion Include="StackExchange.Redis" Version="3.0.0" />
 	<PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
 	<PackageVersion Include="System.Windows.Extensions" Version="10.0.0" />
+	<PackageVersion Include="System.Text.Json" Version="10.0.0" />
 	<PackageVersion Include="Syncfusion.Maui.Toolkit" Version="1.0.8" />
 	<PackageVersion Include="Tmds.DBus.Protocol" Version="0.21.3" />
 	<PackageVersion Include="Xamarin.Firebase.Messaging" Version="125.1.0" />

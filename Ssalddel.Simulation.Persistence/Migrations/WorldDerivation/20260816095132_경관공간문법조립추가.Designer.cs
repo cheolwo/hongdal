@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ssalddel.Simulation.Persistence;
 
@@ -11,9 +12,11 @@ using Ssalddel.Simulation.Persistence;
 namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
 {
     [DbContext(typeof(SimulationWorld파생DbContext))]
-    partial class SimulationWorld파생DbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816095132_경관공간문법조립추가")]
+    partial class 경관공간문법조립추가
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,151 +24,6 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldAreaSetGraph참조Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("AreaSetRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("AreaSet개정번호");
-
-                    b.Property<string>("AreaSetStableId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("AreaSet고유식별자");
-
-                    b.Property<string>("LandscapeGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("경관Graph고유식별자");
-
-                    b.Property<int>("ReferenceOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("참조순서");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaSetStableId", "AreaSetRevision", "LandscapeGraphStableId")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_AreaSetGraph참조", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldAreaSet공간참조Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("AreaSetRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("AreaSet개정번호");
-
-                    b.Property<string>("AreaSetStableId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("AreaSet고유식별자");
-
-                    b.Property<string>("ReferenceKindCode")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("참조종류코드");
-
-                    b.Property<int>("ReferenceOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("참조순서");
-
-                    b.Property<string>("ReferenceStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("공간참조고유식별자");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaSetStableId", "AreaSetRevision", "ReferenceKindCode", "ReferenceStableId")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_AreaSet공간참조", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldAreaSet정의Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AreaSetStableId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("AreaSet고유식별자");
-
-                    b.Property<string>("DefinitionHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("실행정의SHA256");
-
-                    b.Property<string>("DefinitionStatusCode")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("정의상태코드");
-
-                    b.Property<string>("DocumentHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("작성문서SHA256");
-
-                    b.Property<bool>("PresentationOnly")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("표현전용여부");
-
-                    b.Property<int>("Revision")
-                        .HasColumnType("int")
-                        .HasColumnName("AreaSet개정번호");
-
-                    b.Property<DateTimeOffset>("StoredAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("저장시각UTC");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("요약");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("제목");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaSetStableId", "Revision")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_AreaSet정의", (string)null);
-                });
 
             modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldScenario규칙묶음Entity", b =>
                 {
@@ -1983,244 +1841,6 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                     b.ToTable("시뮬레이션월드_건물배치계획", (string)null);
                 });
 
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld경관GraphTile참조Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("GraphRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("경관Graph개정번호");
-
-                    b.Property<string>("LandscapeGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("경관Graph고유식별자");
-
-                    b.Property<int>("ReferenceOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("참조순서");
-
-                    b.Property<string>("TileKey")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("타일키");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TileKey");
-
-                    b.HasIndex("LandscapeGraphStableId", "GraphRevision", "TileKey")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_경관GraphTile참조", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld경관Graph공간참조Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("GraphRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("경관Graph개정번호");
-
-                    b.Property<string>("LandscapeGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("경관Graph고유식별자");
-
-                    b.Property<string>("ReferenceKindCode")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("참조종류코드");
-
-                    b.Property<int>("ReferenceOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("참조순서");
-
-                    b.Property<string>("ReferenceStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("공간참조고유식별자");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LandscapeGraphStableId", "GraphRevision", "ReferenceKindCode", "ReferenceStableId")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_경관Graph공간참조", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld경관Graph관계Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("AreaSetRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("AreaSet개정번호");
-
-                    b.Property<string>("AreaSetStableId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("AreaSet고유식별자");
-
-                    b.Property<string>("ConnectorTypeCode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("연결지점종류코드");
-
-                    b.Property<string>("FromConnectorStableId")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("출발연결지점고유식별자");
-
-                    b.Property<string>("FromGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("출발경관Graph고유식별자");
-
-                    b.Property<string>("RelationCode")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("관계코드");
-
-                    b.Property<string>("RelationStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("Graph관계고유식별자");
-
-                    b.Property<string>("RouteSignature")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("varchar(160)")
-                        .HasColumnName("경로서명");
-
-                    b.Property<string>("ToConnectorStableId")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("도착연결지점고유식별자");
-
-                    b.Property<string>("ToGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("도착경관Graph고유식별자");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaSetStableId", "AreaSetRevision", "RelationStableId")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_경관Graph관계", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld경관Graph정의Entity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("식별번호");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AreaSetStableId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("AreaSet고유식별자");
-
-                    b.Property<string>("BuildStatusCode")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("생성상태코드");
-
-                    b.Property<string>("DefinitionHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("경관Graph정의SHA256");
-
-                    b.Property<string>("GraphHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("경관GraphSHA256");
-
-                    b.Property<int>("GraphRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("경관Graph개정번호");
-
-                    b.Property<string>("GraphRoleCode")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("경관Graph역할코드");
-
-                    b.Property<bool>("HasBounds")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("경계범위보유여부");
-
-                    b.Property<string>("LandscapeGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("경관Graph고유식별자");
-
-                    b.Property<double>("MaxEastingMeters")
-                        .HasColumnType("double")
-                        .HasColumnName("최대동쪽좌표미터");
-
-                    b.Property<double>("MaxNorthingMeters")
-                        .HasColumnType("double")
-                        .HasColumnName("최대북쪽좌표미터");
-
-                    b.Property<double>("MinEastingMeters")
-                        .HasColumnType("double")
-                        .HasColumnName("최소동쪽좌표미터");
-
-                    b.Property<double>("MinNorthingMeters")
-                        .HasColumnType("double")
-                        .HasColumnName("최소북쪽좌표미터");
-
-                    b.Property<DateTimeOffset>("StoredAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("저장시각UTC");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LandscapeGraphStableId", "GraphRevision")
-                        .IsUnique();
-
-                    b.ToTable("시뮬레이션월드_경관Graph정의", (string)null);
-                });
-
             modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld경관공간EdgeEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -2550,18 +2170,6 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                         .HasColumnType("varchar(200)")
                         .HasColumnName("영역묶음고유식별자");
 
-                    b.Property<string>("BuildScopeCode")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar(32)")
-                        .HasColumnName("생성범위코드");
-
-                    b.Property<string>("DefinitionHashSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("경관Graph정의SHA256");
-
                     b.Property<string>("GrammarHashSha256")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -2585,22 +2193,6 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)")
                         .HasColumnName("경관GraphSHA256");
-
-                    b.Property<int>("GraphRevision")
-                        .HasColumnType("int")
-                        .HasColumnName("경관Graph개정번호");
-
-                    b.Property<string>("GraphRoleCode")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("경관Graph역할코드");
-
-                    b.Property<string>("LandscapeGraphStableId")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("경관Graph고유식별자");
 
                     b.Property<bool>("PresentationOnly")
                         .HasColumnType("tinyint(1)")

@@ -10,4 +10,8 @@
     <Folder Include="Benefits\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.CodeMetadata\Ssalddel.CodeMetadata.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Domain;
 
@@ -44,6 +45,22 @@ public sealed class SimulationWorld파생DbContext(
     public DbSet<SimulationWorld객체표현결합규칙Entity> ObjectRepresentationBindingRules => Set<SimulationWorld객체표현결합규칙Entity>();
     public DbSet<SimulationWorld객체표현해석RunEntity> ObjectRepresentationInterpretationRuns => Set<SimulationWorld객체표현해석RunEntity>();
     public DbSet<SimulationWorld객체표현해석ResultEntity> ObjectRepresentationInterpretationResults => Set<SimulationWorld객체표현해석ResultEntity>();
+    public DbSet<SimulationWorld지역표현요약ProfileEntity> RegionSummaryProfiles => Set<SimulationWorld지역표현요약ProfileEntity>();
+    public DbSet<SimulationWorld지역표현요약RunEntity> RegionSummaryRuns => Set<SimulationWorld지역표현요약RunEntity>();
+    public DbSet<SimulationWorld지역표현요약ItemEntity> RegionSummaryItems => Set<SimulationWorld지역표현요약ItemEntity>();
+    public DbSet<SimulationWorld지역표현요약CategoryReportEntity> RegionSummaryCategoryReports => Set<SimulationWorld지역표현요약CategoryReportEntity>();
+    public DbSet<SimulationWorld경관조립실행Entity> LandscapeAssemblyRuns => Set<SimulationWorld경관조립실행Entity>();
+    public DbSet<SimulationWorld경관공간NodeEntity> LandscapeNodes => Set<SimulationWorld경관공간NodeEntity>();
+    public DbSet<SimulationWorld경관공간EdgeEntity> LandscapeEdges => Set<SimulationWorld경관공간EdgeEntity>();
+    public DbSet<SimulationWorld경관모판배치Entity> LandscapePlacements => Set<SimulationWorld경관모판배치Entity>();
+    public DbSet<SimulationWorld경관조립미해결Entity> LandscapeUnresolved => Set<SimulationWorld경관조립미해결Entity>();
+    public DbSet<SimulationWorldAreaSet정의Entity> AreaSetDefinitions => Set<SimulationWorldAreaSet정의Entity>();
+    public DbSet<SimulationWorldAreaSet공간참조Entity> AreaSetSpatialRefs => Set<SimulationWorldAreaSet공간참조Entity>();
+    public DbSet<SimulationWorldAreaSetGraph참조Entity> AreaSetGraphRefs => Set<SimulationWorldAreaSetGraph참조Entity>();
+    public DbSet<SimulationWorld경관Graph정의Entity> LandscapeGraphDefinitions => Set<SimulationWorld경관Graph정의Entity>();
+    public DbSet<SimulationWorld경관Graph공간참조Entity> LandscapeGraphSpatialRefs => Set<SimulationWorld경관Graph공간참조Entity>();
+    public DbSet<SimulationWorld경관GraphTile참조Entity> LandscapeGraphTileRefs => Set<SimulationWorld경관GraphTile참조Entity>();
+    public DbSet<SimulationWorld경관Graph관계Entity> LandscapeGraphRelations => Set<SimulationWorld경관Graph관계Entity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -82,6 +99,22 @@ public sealed class SimulationWorld파생DbContext(
         modelBuilder.ApplyConfiguration(new SimulationWorld객체표현결합규칙Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorld객체표현해석RunConfiguration());
         modelBuilder.ApplyConfiguration(new SimulationWorld객체표현해석ResultConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld지역표현요약ProfileConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld지역표현요약RunConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld지역표현요약ItemConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld지역표현요약CategoryReportConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관조립실행Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관공간NodeConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관공간EdgeConfiguration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관모판배치Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관조립미해결Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldAreaSet정의Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldAreaSet공간참조Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorldAreaSetGraph참조Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관Graph정의Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관Graph공간참조Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관GraphTile참조Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld경관Graph관계Configuration());
     }
 }
 
@@ -261,6 +294,17 @@ public sealed class SimulationWorldUnity산출물Entity
     public string LodCode { get; set; } = string.Empty;
     public string? StorageObjectKey { get; set; }
     public string? ArtifactHashSha256 { get; set; }
+    public string? SourceRevision { get; set; }
+    public string? SourceHashSha256 { get; set; }
+    public string? SourceReferenceDate { get; set; }
+    public string? HorizontalCrsCode { get; set; }
+    public string? VerticalDatumCode { get; set; }
+    public decimal? ResolutionMeters { get; set; }
+    public string? NoDataValue { get; set; }
+    public string? ArtifactFormatCode { get; set; }
+    public long? ArtifactByteLength { get; set; }
+    public int? SampleWidth { get; set; }
+    public int? SampleHeight { get; set; }
     public long? VertexCount { get; set; }
     public long? TriangleCount { get; set; }
     public int? MaterialSlotCount { get; set; }
@@ -270,6 +314,18 @@ public sealed class SimulationWorldUnity산출물Entity
     public SimulationWorld파생RunEntity Run { get; set; } = null!;
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+    SsalddelCodeLayer.Infrastructure,
+    "파생 World 원장과 입력·출력 hash를 별도 DB에 멱등 저장한다.",
+    StepKey = "infrastructure.derived-world-store",
+    DependsOnStepKeys = new string[] { "application.pyeongchang-derivation" },
+    ExecutionStage = SsalddelCodeExecutionStage.Persistence,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ReadsFrom = SsalddelCodeDataScope.DerivedWorld,
+    WritesTo = SsalddelCodeDataScope.DerivedWorld,
+    FlowOrder = 30,
+    Boundary = "SimulationWorldDerived DB만 변경하며 입력 fingerprint가 다른 같은 식별자는 충돌로 거부한다.")]
 public sealed class SimulationWorld파생원장Store(
     SimulationWorld파생DbContext dbContext) : ISimulationWorld파생원장Store
 {
@@ -433,6 +489,17 @@ public sealed class SimulationWorld파생원장Store(
             LodCode = item.LodCode,
             StorageObjectKey = item.StorageObjectKey,
             ArtifactHashSha256 = item.ArtifactHashSha256,
+            SourceRevision = item.SourceRevision,
+            SourceHashSha256 = item.SourceHashSha256,
+            SourceReferenceDate = item.SourceReferenceDate,
+            HorizontalCrsCode = item.HorizontalCrsCode,
+            VerticalDatumCode = item.VerticalDatumCode,
+            ResolutionMeters = item.ResolutionMeters,
+            NoDataValue = item.NoDataValue,
+            ArtifactFormatCode = item.ArtifactFormatCode,
+            ArtifactByteLength = item.ArtifactByteLength,
+            SampleWidth = item.SampleWidth,
+            SampleHeight = item.SampleHeight,
             VertexCount = item.VertexCount,
             TriangleCount = item.TriangleCount,
             MaterialSlotCount = item.MaterialSlotCount,
@@ -454,6 +521,7 @@ public sealed class SimulationWorld파생원장Store(
             UniformScale = item.UniformScale,
             PresentationOnly = item.PresentationOnly,
         }));
+        dbContext.Add지역표현요약(run, ledger);
         await dbContext.SaveChangesAsync(cancellationToken);
         return Result(true, ledger, outputHash);
     }
@@ -482,7 +550,9 @@ public static class SimulationWorldDerivationPersistenceRegistration
 {
     public static IServiceCollection AddSimulationWorldDerivationPersistence(
         this IServiceCollection services,
-        string connectionString)
+        string connectionString,
+        string? landscapeGrammarManifestPath = null,
+        string? areaSetDefinitionPath = null)
     {
         services.AddDbContext<SimulationWorld파생DbContext>(options => options.UseMySql(
             connectionString,
@@ -494,6 +564,8 @@ public static class SimulationWorldDerivationPersistenceRegistration
             }));
         services.AddScoped<ISimulationWorld파생원장Store, SimulationWorld파생원장Store>();
         services.AddScoped<ISimulationWorld지역ProjectionReader, SimulationWorld지역ProjectionReader>();
+        services.AddScoped<ISimulationWorld지역표현요약Reader, SimulationWorld지역표현요약Reader>();
+        services.AddScoped<ISimulationWorldTileArtifactReader, SimulationWorldTileArtifactReader>();
         services.AddScoped<ISimulationWorld객체표현규칙Store, SimulationWorld객체표현규칙Store>();
         services.AddScoped<SimulationWorld객체표현해석JobShell>();
         services.AddScoped<SimulationWorld건물종류DemoPipeline>();
@@ -507,6 +579,18 @@ public static class SimulationWorldDerivationPersistenceRegistration
         services.AddSingleton<ISimulationWorldUI기획Assembler, PyeongchangSimulationWorldUI기획Assembler>();
         services.AddScoped<ISimulationWorldUI기획Store, SimulationWorldUI기획Store>();
         services.AddScoped<SimulationWorldUI기획JobShell>();
+        services.AddScoped<ISimulationWorldLandscapeCompositionStore,
+            SimulationWorldLandscapeCompositionStore>();
+        services.AddScoped<ISimulationWorldLandscapeCompositionReader,
+            SimulationWorldLandscapeCompositionStore>();
+        services.AddScoped<ISimulationWorldAreaSetGraphStore,
+            SimulationWorldAreaSetGraphStore>();
+        services.AddSingleton<ISimulationWorldLandscapeGrammarCatalogReader>(
+            new SimulationWorldLandscapeGrammarManifestReader(
+                landscapeGrammarManifestPath ?? string.Empty));
+        services.AddSingleton<ISimulationWorldAreaSetDefinitionReader>(
+            new FileSimulationWorldAreaSetDefinitionReader(
+                areaSetDefinitionPath ?? string.Empty));
         services.AddScoped<ISimulationDatabaseReadinessProbe,
             SimulationWorldDerivedReadinessProbe>();
         return services;
@@ -779,6 +863,17 @@ internal sealed class SimulationWorldUnity산출물Configuration
         SimulationWorld파생RunConfiguration.Text(builder.Property(item => item.LodCode), "세부표현단계코드", 40);
         builder.Property(item => item.StorageObjectKey).HasColumnName("산출물보관객체키").HasMaxLength(500);
         builder.Property(item => item.ArtifactHashSha256).HasColumnName("산출물SHA256").HasMaxLength(64);
+        builder.Property(item => item.SourceRevision).HasColumnName("원본개정번호").HasMaxLength(160);
+        builder.Property(item => item.SourceHashSha256).HasColumnName("원본SHA256").HasMaxLength(64);
+        builder.Property(item => item.SourceReferenceDate).HasColumnName("원본기준일").HasMaxLength(40);
+        builder.Property(item => item.HorizontalCrsCode).HasColumnName("수평좌표계코드").HasMaxLength(40);
+        builder.Property(item => item.VerticalDatumCode).HasColumnName("높이기준코드").HasMaxLength(80);
+        builder.Property(item => item.ResolutionMeters).HasColumnName("원본해상도미터").HasPrecision(12, 4);
+        builder.Property(item => item.NoDataValue).HasColumnName("NoData값").HasMaxLength(80);
+        builder.Property(item => item.ArtifactFormatCode).HasColumnName("산출물형식코드").HasMaxLength(80);
+        SimulationWorld파생RunConfiguration.Column(builder.Property(item => item.ArtifactByteLength), "산출물바이트길이");
+        SimulationWorld파생RunConfiguration.Column(builder.Property(item => item.SampleWidth), "표본너비");
+        SimulationWorld파생RunConfiguration.Column(builder.Property(item => item.SampleHeight), "표본높이");
         SimulationWorld파생RunConfiguration.Column(builder.Property(item => item.VertexCount), "정점수");
         SimulationWorld파생RunConfiguration.Column(builder.Property(item => item.TriangleCount), "삼각형수");
         SimulationWorld파생RunConfiguration.Column(builder.Property(item => item.MaterialSlotCount), "재질슬롯수");

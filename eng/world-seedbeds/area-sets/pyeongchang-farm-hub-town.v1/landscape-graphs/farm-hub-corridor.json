@@ -1,0 +1,9 @@
+{
+  "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-corridor.v1",
+  "graphRoleCode": "FarmHubCorridor",
+  "graphRevision": 1,
+  "areaRefs": ["area:sim:pyeongchang:daegwallyeong-farm", "area:sim:pyeongchang:jinbu-hub"],
+  "tileRefs": [],
+  "scenarioRouteRefs": ["scenario-route:sim:pyeongchang:farm-hub.v1"],
+  "presentationOnly": true
+}

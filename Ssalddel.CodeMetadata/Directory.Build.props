@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Keep local .NET build products completely outside the local UPM package import graph. -->
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\artifacts\local\dotnet\Ssalddel.CodeMetadata\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\artifacts\local\dotnet\Ssalddel.CodeMetadata\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

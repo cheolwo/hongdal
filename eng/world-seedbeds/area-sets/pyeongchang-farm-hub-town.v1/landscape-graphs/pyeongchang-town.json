@@ -1,0 +1,9 @@
+{
+  "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:pyeongchang-town.v1",
+  "graphRoleCode": "TownCore",
+  "graphRevision": 1,
+  "areaRefs": ["area:sim:pyeongchang:pyeongchang-town"],
+  "tileRefs": [],
+  "scenarioRouteRefs": [],
+  "presentationOnly": true
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ssalddel.Simulation.Persistence;
 
@@ -11,9 +12,11 @@ using Ssalddel.Simulation.Persistence;
 namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
 {
     [DbContext(typeof(SimulationWorld파생DbContext))]
-    partial class SimulationWorld파생DbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816110138_AreaSet문서Graph계층추가")]
+    partial class AreaSet문서Graph계층추가
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

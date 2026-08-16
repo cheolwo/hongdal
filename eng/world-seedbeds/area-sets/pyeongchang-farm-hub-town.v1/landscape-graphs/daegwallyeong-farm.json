@@ -1,0 +1,10 @@
+{
+  "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+  "graphRoleCode": "FarmCore",
+  "graphRevision": 1,
+  "bounds": { "minEastingMeters": 350000, "minNorthingMeters": 572000, "maxEastingMeters": 351000, "maxNorthingMeters": 573000 },
+  "areaRefs": ["area:sim:pyeongchang:daegwallyeong-farm"],
+  "tileRefs": ["kr5186:l2:700:1145", "kr5186:l2:701:1145", "kr5186:l2:700:1144", "kr5186:l2:701:1144"],
+  "scenarioRouteRefs": [],
+  "presentationOnly": true
+}

@@ -1,0 +1,8 @@
+{
+  "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+  "title": "대관령면 Farm",
+  "regionCode": "5176038000",
+  "roleCode": "Farm",
+  "evidenceKindCode": "Scenario",
+  "authoredDocument": "../authored/areas/daegwallyeong-farm.md"
+}

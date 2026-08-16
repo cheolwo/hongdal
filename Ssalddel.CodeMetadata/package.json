@@ -1,0 +1,14 @@
+{
+  "name": "com.ssalddel.code-metadata",
+  "version": "0.1.0",
+  "displayName": "Ssalddel Code Metadata",
+  "description": "Engine-independent code navigation metadata shared by the Ssalddel server, simulation, and Unity packages.",
+  "keywords": [
+    "ssalddel",
+    "metadata",
+    "code-map"
+  ],
+  "author": {
+    "name": "Ssalddel"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "artifacts": {
+    "elevation": {
+      "byteLength": 15876,
+      "formatCode": "height-f32-v1",
+      "height": 63,
+      "relativePath": "generated/tiles/kr5186_l2_700_1145/elevation.height-f32-v1.bin",
+      "sha256": "B1A2FACB6D7E0E77493F8D2F23FBC452BDCBDDB907B0CCFAD5798EDAE263AC64",
+      "width": 63
+    },
+    "landCover": {
+      "byteLength": 3844,
+      "formatCode": "landcover-u8-v1",
+      "height": 62,
+      "relativePath": "generated/tiles/kr5186_l2_700_1145/land-cover.landcover-u8-v1.bin",
+      "sha256": "188B07D27FD9FE56583F55485C09D4C4D60374310F48818174B4970A6FE3D77B",
+      "width": 62
+    },
+    "placementMask": {
+      "byteLength": 3844,
+      "formatCode": "placement-mask-u8-v1",
+      "height": 62,
+      "relativePath": "generated/tiles/kr5186_l2_700_1145/placement.placement-mask-u8-v1.bin",
+      "sha256": "99FA5D0EC9C59AA386F178834CB72A04D0D865CBD91F4FBF383B4875578DE5C8",
+      "width": 62
+    }
+  },
+  "coordinateReferenceSystem": "EPSG:5186",
+  "coreBounds": {
+    "maxEasting": 350500,
+    "maxNorthing": 573000,
+    "minEasting": 350000,
+    "minNorthing": 572500
+  },
+  "fingerprintSha256": "508AF1DB4C7D5F6A70D3098B32A9400ECE22FC42DBD5E128B80CCA6FBB3E1F60",
+  "generationBounds": {
+    "maxEasting": 350560,
+    "maxNorthing": 573060,
+    "minEasting": 349940,
+    "minNorthing": 572440
+  },
+  "haloMeters": 60,
+  "isOperationalState": false,
+  "physicalElevationIsAuthoritativeForPlacement": true,
+  "placementMaskBits": {
+    "0": "ValidTerrain",
+    "1": "Water",
+    "2": "SlopeAbove12Degrees",
+    "3": "SlopeAbove20Degrees",
+    "4": "BuiltArea",
+    "5": "AgricultureCandidate",
+    "6": "ForestCandidate",
+    "7": "NoData"
+  },
+  "ruleRevision": "daegwallyeong-l2-physical-spatial.r1",
+  "sampleSpacingMeters": 10,
+  "schemaVersion": "ssalddel-spatial-layer-artifacts.v1",
+  "sources": {
+    "elevation": {
+      "horizontalCrs": "EPSG:5186",
+      "noDataValue": -32767,
+      "physicalElevationUnit": "meter",
+      "providerCode": "CopernicusDEM",
+      "resolutionMeters": 30,
+      "sha256": "D173A82973EBB3292F6E1DA45C250F8A68C131E8039AC93E0C1181CF303FADE8",
+      "sourceReferenceDate": null,
+      "sourceRevision": "Copernicus-DEM-GLO30-N37E128",
+      "verticalDatum": "Unverified"
+    },
+    "landCover": {
+      "horizontalCrs": "EPSG:5186",
+      "noDataValue": 0,
+      "providerCode": "ESAWorldCover",
+      "resolutionMeters": 10,
+      "sha256": "2769C2087D97C5DB121D0DA76C1BEB966B9A96002C757A470294FF12559417A5",
+      "sourceReferenceDate": "2021",
+      "sourceRevision": "ESA-WorldCover-2021-v200-N36E126"
+    }
+  },
+  "statistics": {
+    "agricultureCandidateCellCount": 73,
+    "forestCandidateCellCount": 3652,
+    "maximumPhysicalElevationMeters": 1057.0731,
+    "maximumSlopeDegrees": 38.25,
+    "minimumPhysicalElevationMeters": 905.4617,
+    "noDataCellCount": 0,
+    "validElevationSampleCount": 3969,
+    "waterCellCount": 0
+  },
+  "tileKey": "kr5186:l2:700:1145",
+  "tileSizeMeters": 500,
+  "visualHeightExaggerationStoredSeparately": true
+}

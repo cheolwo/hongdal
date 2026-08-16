@@ -1,0 +1,9 @@
+{
+  "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-corridor.v1",
+  "graphRoleCode": "HubTownCorridor",
+  "graphRevision": 1,
+  "areaRefs": ["area:sim:pyeongchang:jinbu-hub", "area:sim:pyeongchang:pyeongchang-town"],
+  "tileRefs": [],
+  "scenarioRouteRefs": ["scenario-route:sim:pyeongchang:hub-town.v1"],
+  "presentationOnly": true
+}

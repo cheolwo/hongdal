@@ -1,0 +1,8 @@
+{
+  "areaStableId": "area:sim:pyeongchang:pyeongchang-town",
+  "title": "평창읍 Town",
+  "regionCode": "5176025000",
+  "roleCode": "Town",
+  "evidenceKindCode": "Scenario",
+  "authoredDocument": "../authored/areas/pyeongchang-town.md"
+}

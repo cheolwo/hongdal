@@ -1,0 +1,8 @@
+{
+  "areaStableId": "area:sim:pyeongchang:jinbu-hub",
+  "title": "진부면 Hub",
+  "regionCode": "5176036000",
+  "roleCode": "Hub",
+  "evidenceKindCode": "Scenario",
+  "authoredDocument": "../authored/areas/jinbu-hub.md"
+}

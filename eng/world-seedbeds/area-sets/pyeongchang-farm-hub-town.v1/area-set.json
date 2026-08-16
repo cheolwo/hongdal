@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "simulation-world-area-set.v1",
+  "areaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
+  "revision": 1,
+  "title": "평창 Farm–Hub–Town 지역 세계",
+  "summary": "대관령 생산지에서 진부 물류 거점을 거쳐 평창읍 생활권으로 이어지는 첫 지역 유통 Simulation 공간이다.",
+  "authoredDocument": "authored/area-set.md",
+  "areaRefs": [
+    "area:sim:pyeongchang:daegwallyeong-farm",
+    "area:sim:pyeongchang:jinbu-hub",
+    "area:sim:pyeongchang:pyeongchang-town"
+  ],
+  "scenarioRouteRefs": [
+    "scenario-route:sim:pyeongchang:farm-hub.v1",
+    "scenario-route:sim:pyeongchang:hub-town.v1"
+  ],
+  "completionAreaRefs": [
+    "completion-area:sim:pyeongchang:daegwallyeong-farm.v1"
+  ],
+  "landscapeGraphRefs": [
+    "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+    "landscape-graph:sim:pyeongchang:farm-hub-corridor.v1",
+    "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
+    "landscape-graph:sim:pyeongchang:hub-town-corridor.v1",
+    "landscape-graph:sim:pyeongchang:pyeongchang-town.v1"
+  ],
+  "graphRelations": [
+    {
+      "relationStableId": "graph-relation:pyeongchang:farm-to-farm-hub",
+      "fromGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "toGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-corridor.v1",
+      "relationCode": "Connected",
+      "fromConnectorStableId": "stub:external-road-east:701-1145",
+      "toConnectorStableId": "stub:farm-hub:west",
+      "connectorTypeCode": "farm-road",
+      "routeSignature": "scenario.route.farm-hub"
+    },
+    {
+      "relationStableId": "graph-relation:pyeongchang:farm-hub-to-hub",
+      "fromGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-corridor.v1",
+      "toGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
+      "relationCode": "Transition",
+      "fromConnectorStableId": "stub:farm-hub:east",
+      "toConnectorStableId": "stub:jinbu-hub:west",
+      "connectorTypeCode": "vehicle",
+      "routeSignature": "scenario.route.farm-hub"
+    },
+    {
+      "relationStableId": "graph-relation:pyeongchang:hub-to-hub-town",
+      "fromGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
+      "toGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-corridor.v1",
+      "relationCode": "Connected",
+      "fromConnectorStableId": "stub:jinbu-hub:south",
+      "toConnectorStableId": "stub:hub-town:north",
+      "connectorTypeCode": "vehicle",
+      "routeSignature": "scenario.route.hub-town"
+    },
+    {
+      "relationStableId": "graph-relation:pyeongchang:hub-town-to-town",
+      "fromGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-corridor.v1",
+      "toGraphStableId": "landscape-graph:sim:pyeongchang:pyeongchang-town.v1",
+      "relationCode": "Transition",
+      "fromConnectorStableId": "stub:hub-town:south",
+      "toConnectorStableId": "stub:pyeongchang-town:north",
+      "connectorTypeCode": "vehicle",
+      "routeSignature": "scenario.route.hub-town"
+    }
+  ],
+  "presentationOnly": true
+}
