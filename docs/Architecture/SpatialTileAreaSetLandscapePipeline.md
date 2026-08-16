@@ -53,6 +53,43 @@
 
 시각 자산 대장은 허용 토지피복·역할·경사, footprint·여백, collision 정책, LOD, 군집·회전 가능 여부와 예상 렌더링 비용을 가진다. Overview와 Region 단계는 Cluster/HLOD 대상이다.
 
+### JSON 경관 배치 계획과 Scene 적용 관문
+
+정적 경관은 생성기가 Scene에 즉시 쓰지 않고, 사람이 읽는 Markdown 기획서와 기계가 검증하는 JSON 계획을 중간 산출물로 거친다. 첫 평창 계획은 현재 Fixture에서 생성하지만 이후 서버도 같은 JSON schema를 내려줄 수 있다. 계약에는 `VisualKey`·`CompositionKey`, 세계 좌표, 회전·크기, 토지피복·영역 역할·경사·수계·계절·분위기 조건, 표현 전용 근거, 성능 예산과 대상 컨테이너만 저장한다. Synty Prefab 경로·GUID와 원본 이름은 저장하지 않는다.
+
+```text
+사람이 읽는 경관 배치 기획서.md
+├─ 영역별 주역·필수·금지 요소와 자료 한계
+└─ 기획서 고유 식별자·개정·내용 hash
+
+기본 배치 계획 JSON
+├─ 서버·Fixture가 결정한 137개 의미 배치
+└─ 계획 hash와 항목별 hash
+
+사람 보정 JSON
+├─ Add / Modify / Disable
+└─ 예상 기본 계획 hash + 예상 항목 hash
+
+병합·검증
+├─ 대장 revision·의미 key·토지피복·역할·경사·수계 조건
+├─ 컨테이너 범위·겹침·LOD별 렌더링 예산
+└─ 오류·경고·hash가 담긴 배치 검증 기록
+
+Unity 준비 산출물
+├─ 8개 말단 배치 대상별 Staging Prefab
+└─ 배치 영수증 + VisualRoot/Composition 해석 결과
+
+사람 검토 승인 기록
+└─ 기획서·기본·보정·병합 계획 hash 봉인
+
+명시적 Scene 적용
+└─ 승인 hash와 Anchor를 다시 확인한 뒤 StaticSceneryGeneratedRoot만 교체
+```
+
+현재 8개 말단 배치 대상은 대관령 Farm 4개 L2 타일, Farm–Hub 회랑, 진부 Hub, Hub–Town 회랑, 평창 Town이다. 상위 `L4_L7_Synty경관_PresentationOnly`은 이들을 묶는 Scene 계층 부모이며 자체 배치·Staging을 갖지 않는다. 전용 Unity 검토창은 기본 계획을 읽기 전용으로 표시하고 이동·회전·크기·의미 키 변경을 보정 JSON의 `Add/Modify/Disable`로만 저장한다. 2D 배치도와 대상 목록, 배치 속성, 검증 문제와 성능 예산을 함께 보여주며 활성 Scene을 수정하지 않는다.
+
+`WORLD-PLAN-2`는 검토 승인 전에도 Staging을 허용한다. 검토 완료 또는 Scene 적용 승인은 기획서·기본 계획·보정 계획·병합 계획의 SHA-256을 별도 승인 기록에 봉인한다. 이후 어느 입력이라도 바뀌면 상태를 `Stale`로 계산하고 `WORLD-PLAN-3`을 차단한다. Scene 적용은 오류 0건, `ApprovedForSceneApply`, 네 hash 일치를 모두 만족할 때만 수행하며 저장 실패 시 기존 정적 경관 Root를 보존한다. 계절 사건 Overlay, 플레이어·NPC·차량, 카메라와 UI는 정적 계획에서 제외하고 각자의 Simulation 상태 사본과 런타임 표현 Pipeline을 유지한다.
+
 ## 첫 세로 단위
 
 `area-set:sim:pyeongchang:farm-hub-town.v1`은 대관령면 Farm, 진부면 Hub, 평창읍 Town과 두 `ScenarioRoute`를 참조한다. 공식 도로 공간자료가 연결되기 전까지 회랑을 실제 도로로 주장하지 않는다. Unity는 `SimulationWorldShell` 한 Scene에서 카메라 거리에 따라 L0/L1/L2 표현만 전환하며 서버나 Simulation 상태를 변경하지 않는다.

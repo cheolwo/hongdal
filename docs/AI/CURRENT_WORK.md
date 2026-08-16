@@ -26,6 +26,7 @@
 - 새 기본 규칙 `farm-survival.scenic-season.r1`은 1~23일에 위협을 만들지 않고 24일 예고, 27일 자동 방어·직접 전투 선택, 28일 자동 판정과 계절 보고를 기록한다. 기존 `spring-preparation.r1~r3`은 명시적 호환 규칙으로 유지한다.
 - 계절 방어 선택은 기존 위협 응답 API를 재사용한다. 선택 가능 ID와 마감 Tick을 상태 사본·세계 사건·Save/Replay 해시에 보존하며, Unity 표현 의도는 직접 전투를 선택해 `AwaitingCombat`이 되기 전까지 적 개체와 전투 HUD를 숨긴다.
 - 평창 경관 후단은 `Nature + Farm + Town + City` 네 팩 Profile로 개정했다. 서버 Job은 `legal-dong-scenic-catalog.v2`와 경로가 아닌 Nature 의미 키를 저장하고, Unity는 5개 영역 비중과 Nature 8개 경관 세트 × A/B/C 총 24개 wrapper Prefab을 독립 생성한다. `SimulationWorldShell`의 대관령 L2 산림 전이 구획에는 활엽·침엽·혼효·산 능선·숲 가장자리를 배치하고 물 마스크가 없는 개울 회랑은 제외했다. 사계절 색조·FX는 원본 Material을 변경하지 않으며 늪·무덤·폐허 등은 평상시 숨긴 서버 사건 키 전용 Overlay 5종으로 분리했다.
+- 평창 정적 경관은 Scene 직접 배치 전에 사람이 읽는 Markdown 기획서, 기본 JSON과 사람 보정 JSON을 거친다. Farm·Town·City 보유 Prefab 1,535건은 기술 대장으로 전수 등록하되 배치 승격과 분리하고, Nature·Farm·Town·City 팩별 기준 문서와 개별·묶음 SHA-256을 기획서 승인 입력으로 봉인한다. 의미 구성 대장은 Farm 24개·Town 18개·City 18개의 60개 세트와 Nature 24개를 `CompositionKey`로 해석한다. 현재 기본 계획은 8개 말단 배치 대상의 137개 정적 경관, 8개 구획별 로컬 저작 좌표–세계 Anchor 변환과 15개 의미 구성 배치를 선언한다. 대관령 Farm 대표 구획 3개, 진부 Hub 3개, 평창 Town 4개는 각 팩의 큰 덩어리를 먼저 잡고 기존 나머지 타일·두 회랑은 유지한다. 전용 Unity 검토창은 네 팩 기준 메뉴, 2D 배치도·대상·속성·검증·성능 예산을 보여주며 보정 JSON만 갱신한다. 검증을 통과한 결과는 8개 Staging Prefab과 배치 영수증으로 만들며, 실제 Scene 교체는 기획서 bundle·기본·보정·병합 계획 hash가 `ApprovedForSceneApply` 승인 기록과 일치하는 별도 `WORLD-PLAN-3` 명령으로 분리했다.
 
 ## 검증 상태
 
@@ -43,6 +44,7 @@
 - 코드 지도 생성 원본에는 이번 작업 이전부터 변경이 남아 있고 `docs/AI/generated`와 일치하지 않는다. 이번 범위 지정 Task 검증은 코드 지도 검사에서 중단됐으며 다른 작업의 생성 결과를 섞지 않기 위해 `--write`를 실행하지 않았다.
 - 이번 기능 검증 산출물은 `artifacts/local/validation/20260815-210838/`에 있다. Simulation·Unity solution은 경고·오류 0으로 빌드됐고 관련 전체 시험은 통과했다. `Ssalddel.v0.0.slnx` 직접 빌드는 184초 제한에서 완료 여부를 확인하지 못했다.
 - 평창 4팩 경관의 기존 검증은 Simulation 전체 568/568, 새 집중 범위 1/1, Unity EditMode 5/5가 통과했다. 이번 Nature 세분화 뒤 Unity 6000.5.6f1 스크립트 재컴파일 오류 0건, 생성기 오류 0건, Nature 집중 EditMode 7/7과 기존 4팩 Profile 3/3이 통과했다. 24개 기본 조합 Prefab·5개 사건 Overlay·사계절 제어기·저장 Scene 배선을 구조적으로 확인했다. 같은 생성기를 연속 실행했을 때 29개 Prefab과 2개 구성 대장의 SHA-256은 모두 같았고 저장 Scene은 의미 배선 시험은 같지만 Unity 이진 직렬화 해시는 달랐다. 전체 EditMode 일괄 실행은 Pipeline 연결의 30초 제한과 연결 재설정으로 결과를 수신하지 못했다.
+- 네 팩 정적 경관 계획·검토 Pipeline은 Unity 6000.5.6f1에서 자산 대장 1,535건과 Farm·Town·City 의미 구성 60건을 생성했다. 집중 EditMode는 계획·검토 12/12, 자산 대장 2/2, 팩 구성 대장 2/2, 기존 Nature 회귀 7/7로 합계 23/23이 통과했다. v3 기본 계획은 137개 배치·8개 구획 변환·15개 의미 구성 참조를 포함하고 8개 Staging Prefab을 생성했다. 검증 기록은 오류 0건·경고 12건이며 경고는 겹침 후보 5건, 성능 예산 접근 6건, ScenarioPreview 높이 근거 1건이다. 현재 검토 상태는 이전 승인 기록과 기획서·계획 hash가 달라 `Draft`, `CanStage=true`, `CanApply=false`이고 Scene은 수정하지 않았다.
 
 ## 남은 문제
 
@@ -54,3 +56,4 @@
 - 전투 입력을 위한 `SimulationWorldShell` 저장 배선은 완료했지만 경관 산책·계절 방어 Game View 수동 조작, 실행 중인 서버와의 실제 HTTP 왕복, 운영 DB migration, commit, push와 배포는 수행하지 않았다. Synty 원본 Prefab과 `.meta` GUID는 변경하지 않았다.
 - 지역 표현 요약의 EF 모델·적재·조회 코드는 추가했지만 실제 MySQL migration 생성·적용과 기존 평창 원본을 사용한 재파생 실행은 이번 작업에서 수행하지 않았다. 좌표가 없는 건물은 타일 요약으로 승격하지 않으며 실제 Unity Game View 표현도 후속 검증 범위다.
 - 평창 4팩 경관은 현재 ScenarioTerrainPreview 위의 표현 완결 단계다. 실제 DEM mesh·세분류 토지피복 위치 대체, 실제 수계 마스크가 있는 개울 회랑 배치, HLOD bake와 Draw Call·Shadow Caster 실측, Play Mode·Game View 시각 검증은 수행하지 않았다.
+- 정적 경관 계획의 `WORLD-PLAN-3` Scene 적용은 아직 실행하지 않았다. 평창 기획서·네 팩 공통 기준·1,535건 기술 대장·60개 팩 구성 세트·8개 Staging Prefab 검증까지는 완료됐지만 현재 승인 기록이 `Draft`라 적용 관문이 의도적으로 차단되어 있다. 사람이 경고 12건과 네 기준 문서·대표 Farm/Hub/Town Staging을 검토해 `ApprovedForSceneApply`로 승인한 뒤에만 저장 Scene을 교체할 수 있다. 실제 DEM·토지피복·수계 연결, 저장 Scene의 새 구획 Anchor 배선과 Play Mode·Game View 시각 확인도 그 이후 범위다.
