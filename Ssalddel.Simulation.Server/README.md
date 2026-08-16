@@ -114,10 +114,17 @@ docker compose `
 ```powershell
 dotnet run --project Ssalddel.Simulation.Server -- `
   --build-pyeongchang-world-derived `
-  --tile-manifest=<private-pyeongchang-tile-manifest-json-path>
+  --tile-manifest=<private-pyeongchang-tile-manifest-json-path> `
+  --spatial-artifact-manifest=<tracked-center-l2-artifact-manifest-json-path>
 ```
 
-이 명령은 공유 DB에 쓰지 않는다. 원본 정렬·입력 SHA-256, 공간 관계 생성, 원장 검증·출력 hash와 멱등 저장을 수행한다. 건물도형·좌표가 없으면 임의 위치를 생성하지 않고 미배치로 보고하며, 원본이 0건이면 `InsufficientSourceData`와 자료부족 node를 공간 DB에 남긴다.
+이 명령은 공유 DB에 쓰지 않는다. 원본 정렬·입력 SHA-256, 공간 관계 생성, 원장 검증·출력 hash와 멱등 저장을 수행한다. 선택적 공간 산출물 manifest가 있으면 DEM·토지피복·배치 마스크의 원본 계보, 형식, 표본 크기와 객체 키를 파생 DB에 함께 저장한다. 건물도형·좌표가 없으면 임의 위치를 생성하지 않고 미배치로 보고하며, 원본이 0건이면 `InsufficientSourceData`와 자료부족 node를 공간 DB에 남긴다.
+
+완료 산출물은 기존 Manifest·Artifact route를 유지하면서 다음 본문 route로 읽는다. 로컬 개발에서는 `SimulationWorldDerivationDatabase:ArtifactRootPath` 아래의 상대 객체 키만 허용하며 파일 길이와 SHA-256 불일치는 `409`로 거부한다.
+
+```text
+GET /api/simulation/v1/world-stream/tiles/{tileKey}/artifacts/{layerCode}/content
+```
 
 같은 실행은 건축물–법정동·행정동 Assignment와 행정동별 건물 Category 집계를 먼저 지역 Projection으로 가공한다. `GET /api/simulation/v1/world-stream/regions/{regionStableId}`는 최신 파생 실행의 법정동·행정동 관계와 건물 분류 집계를 반환한다. 경계 geometry가 아직 없으면 `WaitingForRegionGeometry`와 빈 타일 목록을 반환하며 임의의 지역–타일 관계를 생성하지 않는다.
 

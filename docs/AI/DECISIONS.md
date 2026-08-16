@@ -1608,3 +1608,23 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 적용 관문: 기본 JSON과 사람 보정 JSON을 병합해 검증한 뒤 구획별 Staging Prefab만 생성한다. 저장 Scene 적용은 별도 승인 기록이 기획서 bundle·기본·보정·병합 hash와 모두 일치할 때만 허용한다. 기술 대장 등록, Staging 생성, Scene 적용과 Game View 검증은 서로 다른 증거 단계다.
 - 권위와 호환: Synty 원본 Prefab과 Material, `.meta` GUID는 수정하지 않는다. 유료 원본 파일명·경로·GUID는 공개 문서나 업무·공간 계약에 저장하지 않고, 팩 교체가 공공 공간자료·Simulation 상태·업무 완료를 변경하지 않게 한다.
 - 관계: D-116의 공공데이터 경관, D-118의 Synty 역할 표현, D-122~D-125의 타일 스트리밍, D-143의 지역 요약을 문서 우선 배치 검토 절차로 연결함
+
+## D-145 미완료 작업은 증거 단계 원장으로 관리하고 중앙 L2 실자료부터 종단 완결한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-16
+- 결정: 계획, 코드, 자동 시험, 로컬 DB·자료 적용, Runtime 확인과 원자료부터 Unity까지의 종단 확인을 E0~E6으로 분리한다. `eng/execution-ledgers/simulation-unity.json`을 원본으로 삼고 한국어 실행 트리는 결정적으로 생성한다. 첫 종단 완결 대상은 대관령 중앙 L2 `kr5186:l2:700:1145`이며 전국 확장은 이 타일의 원자료·파생 DB·HTTP·Unity 검증 뒤 진행한다.
+- 공간 산출물: Copernicus DEM과 ESA WorldCover 원본은 private storage에 두고 Git에는 원본 hash·CRS·해상도·NoData·수직 기준·산출물 hash·형식·표본 크기를 가진 manifest만 둔다. `PhysicalElevation`은 배치 판정 근거이고 Unity 높이 과장은 표현 전용이다. 확인되지 않은 수직 기준이나 세분류 위치는 꾸며내지 않는다.
+- 전달 경계: 파생 DB는 산출물 계보와 객체 키를 저장하고 서버는 루트 경로 이탈, 바이트 길이와 SHA-256을 검증해 본문을 제공한다. Unity는 다시 hash를 확인하고 상세 범위에서만 Mesh를 만든다. 이 표현 Mesh는 Collider나 Simulation 권위를 갖지 않는다.
+- 완료 판정: 코드나 Fixture 시험만으로 E6 또는 완료로 올리지 않는다. 실제 저장 Scene의 서버 연결·Play Mode·Game View, mask 기반 Synty 배치와 경계 연속성이 남아 있는 동안 관련 항목은 진행 중으로 유지한다.
+- 관계: D-122~D-125의 L2 스트리밍, D-139의 구조 검증, D-140의 생성 코드 지도와 D-143~D-144의 지역 요약·Synty 적용 관문을 실자료 실행 순서로 묶음
+
+## D-146 AreaSet은 문서 중심 상위 컨테이너이고 LandscapeGraph는 독립 조립·스트리밍 단위다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-16
+- 결정: `AreaSet`은 Area·ScenarioRoute·여러 `LandscapeGraph`와 Graph 관계를 묶는 지역 세계 정의서다. `LandscapeGraph`는 하나 이상의 Area·Tile을 참조하는 독립 공간 조립·검증·부분 재생성·스트리밍 단위이고, `Tile`은 공간 Layer 산출물과 캐시 단위다. Area와 Graph를 1:1로 고정하지 않는다.
+- 문서 권위: 사람이 작성한 Markdown은 의미·근거·미해결을 설명하고 JSON만 실행 권위를 가진다. compiler는 Markdown 참조와 JSON 참조가 정확히 같은지 검증하고 두 SHA-256을 분리한다. DB 실행 상태 문서는 결정적으로 생성하며 직접 수정하지 않는다.
+- 연결 경계: Graph 내부 Node는 다른 Graph의 Node를 직접 참조하지 않는다. Graph 간 연결은 AreaSet의 `GraphRelation`과 양쪽 `ExternalConnectorStub` 쌍으로만 검증한다. 연결 불일치는 꾸며내지 않고 `GraphConnectorUnresolved`로 기록한다.
+- Runtime 경계: 서버의 Graph 빌드 상태와 Unity의 플레이어별 `Prepared / Active / Cached` 상태를 분리한다. 기존 Tile API는 한 Recipe 개정 동안 Graph 결과를 Tile별로 투영하는 호환 조회이며 새 공간 권위를 갖지 않는다. 업무·공간 계약에는 Synty Prefab 경로와 `.meta` GUID를 넣지 않는다.
+- 관계: D-116의 공공데이터 경관, D-122~D-125의 Tile 스트리밍, D-144의 문서 우선 Synty 적용과 D-145의 증거 단계 원장을 AreaSet 상위 구조로 연결함

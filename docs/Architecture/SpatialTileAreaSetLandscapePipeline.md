@@ -26,7 +26,9 @@
 
 현재 기본 표고는 Copernicus GLO-30 30m이고 VWorld·국토지리정보원 90m DEM은 국내 공식 비교 자료다. 토지피복 위치는 ESA WorldCover 2021 10m를 사용한다.
 
-현재 오프라인 실행기가 실제로 절단·집계하는 공간 원본은 WorldCover다. DEM의 출처·CRS·NoData·높이 metadata와 계약은 연결했지만, Unity 연속 Mesh는 아직 기존 `ScenarioTerrainPreview`이다. DEM 표본·경사·수계·공유 경계 정점을 산출하는 단계가 연결되기 전에는 Scene Mesh를 `PhysicalElevation` 결과로 보고하지 않는다.
+현재 오프라인 실행기는 대관령 중앙 L2 `kr5186:l2:700:1145`와 Halo 60m에 대해 Copernicus DEM과 WorldCover를 함께 절단한다. `height-f32-v1`은 63×63 물리 표고, `landcover-u8-v1`과 `placement-mask-u8-v1`은 각각 62×62 의미·배치 bit 표본이며 manifest에 원본·산출물 SHA-256, CRS, 해상도, NoData와 아직 확인되지 않은 DEM 수직 기준 `Unverified`를 기록한다. Unity는 Halo를 제외한 중앙 500m의 51×51 표본만 표현용 Mesh로 만들고, 높이 과장은 Renderer에만 적용한다. 이 Mesh는 현재 Collider나 배치 판정 권위를 갖지 않는다.
+
+세 산출물은 로컬 `SimulationWorldDerived` DB의 한국어 열에 계보·형식·표본 크기와 함께 저장되고 `world-stream` Manifest에서 `Available`로 투영된다. 바이너리 본문 API는 객체 키가 설정한 산출물 루트를 벗어나지 않는지 확인하고 DB의 길이·SHA-256과 일치할 때만 응답한다. 자료가 없는 이웃 타일은 계속 `WaitingForSpatialArtifact`다.
 
 2026-08-13에는 VWorld 90m DEM ZIP, VWorld 법정동 경계 ZIP, ESA WorldCover 평창군 TIFF, Copernicus DEM 평창군 TIFF, 환경부 토지피복 통계 CSV, 평창군 타일 Manifest JSON의 원본 6종을 공유 공공데이터 DB의 raw snapshot으로 등록했다. 환경부 CSV에서 평창군 7개 연도·294개 면적 값을 `km2`, 기준연도, 지역 고유 식별자와 `AreaStatisticWithoutGeometry` 제한으로 정규화했다. 같은 파일을 다시 등록했을 때 새 snapshot과 수치 행을 만들지 않는 멱등성도 확인했다. 원본 파일은 `artifacts/local/public-spatial/`의 비공개·Git 제외 경로에 유지한다.
 
@@ -90,6 +92,98 @@ Unity 준비 산출물
 
 `WORLD-PLAN-2`는 검토 승인 전에도 Staging을 허용한다. 검토 완료 또는 Scene 적용 승인은 기획서·기본 계획·보정 계획·병합 계획의 SHA-256을 별도 승인 기록에 봉인한다. 이후 어느 입력이라도 바뀌면 상태를 `Stale`로 계산하고 `WORLD-PLAN-3`을 차단한다. Scene 적용은 오류 0건, `ApprovedForSceneApply`, 네 hash 일치를 모두 만족할 때만 수행하며 저장 실패 시 기존 정적 경관 Root를 보존한다. 계절 사건 Overlay, 플레이어·NPC·차량, 카메라와 UI는 정적 계획에서 제외하고 각자의 Simulation 상태 사본과 런타임 표현 Pipeline을 유지한다.
 
+## 문서 중심 AreaSet과 여러 LandscapeGraph
+
+`AreaSet`은 하나의 거대한 경관 Graph가 아니라 지역 세계의 의미와 시나리오 범위를 설명하고 여러 독립 Graph를 묶는 상위 컨테이너다. `LandscapeGraph`는 실제 공간 조립·검증·부분 재생성·의미 기반 스트리밍 단위이고, `Tile`은 공간 Layer 산출물과 캐시 단위다. `Area`는 법정동 또는 Farm·Hub·Town 같은 의미 범위이므로 `Area = LandscapeGraph`를 1:1로 고정하지 않는다. 한 Graph는 여러 Area·Tile을 참조할 수 있고, 큰 Area도 여러 Graph로 나눌 수 있다.
+
+```text
+World
+└─ AreaSet : 지역 세계 정의서
+   ├─ authored/area-set.md       사람의 의도·근거·미해결 설명
+   ├─ area-set.json              실행 권위·고유 식별자·참조·관계
+   ├─ generated/status.md        DB 실행 상태의 자동 산출물
+   │
+   ├─ LandscapeGraph : 대관령 Farm
+   │  └─ AreaRefs[] + TileRefs[] + Node/Edge/Placement
+   ├─ LandscapeGraph : Farm–Hub 회랑
+   ├─ LandscapeGraph : 진부 Hub
+   ├─ LandscapeGraph : Hub–Town 회랑
+   └─ LandscapeGraph : 평창 Town
+
+      GraphRelations[]
+      └─ ExternalConnectorStub ↔ ConnectorPair ↔ ExternalConnectorStub
+```
+
+JSON만 실행 권위를 가진다. Markdown의 `@areaset`, `@area`, `@landscape-graph` 참조는 compiler가 JSON과 정확히 일치하는지 검증하고, 사람이 작성한 문서 SHA-256과 실행 정의 SHA-256을 따로 기록한다. `generated/area-set-status.md`는 파생 DB의 최신 실행 상태로 다시 만들며 사람이 직접 수정하지 않는다. Unity나 Simulation이 Markdown을 제각각 해석하지 않고 compiler가 만든 단일 `AreaSetDefinition`만 소비한다.
+
+Graph 내부 Node는 다른 Graph의 Node를 직접 참조하지 않는다. Graph 사이 연결은 AreaSet의 `GraphRelation`과 양쪽 `ExternalConnectorStub`의 식별자·종류·방향·폭·좌표·Route 서명을 비교해 검증한다. 양쪽 Graph가 조립 가능한 상태인데 연결이 맞지 않으면 임의 연결을 만들지 않고 두 Graph를 `PartialUnresolved`로 남긴다. 한 Graph를 다시 만들 때 이웃 Graph 전체를 무효화하지 않는 것이 이 경계의 목적이다.
+
+서버의 `Declared / Available / PartialUnresolved`는 공간자료와 조립 결과의 상태다. Unity의 플레이어별 `Unloaded / Declared / Prepared / Active / Cached`는 같은 Graph를 언제 메모리에 보관하고 표시할지 나타내는 로컬 스트리밍 상태이며 서버 상태를 변경하지 않는다. Unity는 Graph 하나의 모든 타일 조각을 비활성 staging root에 조립·검증한 후 Graph root 단위로 교체한다.
+
+```text
+GET /api/simulation/v1/world-stream/area-sets/{areaSetStableId}
+GET /api/simulation/v1/world-stream/area-sets/{areaSetStableId}/landscape-graphs
+GET /api/simulation/v1/world-stream/landscape-graphs/{landscapeGraphStableId}
+GET /api/simulation/v1/world-stream/tiles/{tileKey}/landscape-composition
+```
+
+마지막 Tile API는 기존 Unity 소비자를 위한 호환 조회다. 한 Recipe 개정 동안 Graph에서 해당 Tile 소유 Node·Edge·Placement만 투영하며, 새 Graph 계약을 다시 Tile 권위로 축소하지 않는다.
+
+## 모판을 연속 공간으로 만드는 공간 문법
+
+`CompositionKey`는 완성 Scene이 아니라 경관을 만드는 어휘다. 서버는 Prefab 좌표를 무작정 나열하지 않고 `공간 골격 → 영역 채우기 → 연결망 생성 → 경계 봉합 → 반복 변형`을 거쳐 Macro·Meso `LandscapeGraph`를 만든다. Unity wrapper는 이 Graph와 세계 좌표 기반 seed를 받아 Micro 장식, LOD·HLOD와 Renderer 세부 구성을 맡는다.
+
+```text
+공간 원본·Area·ScenarioRoute
+└─ LandscapeSkeleton
+   ├─ 면형 영역: 숲·밭·초지·주택지
+   ├─ 선형 연결망: 농로·타운도로·도시도로
+   └─ 의미 경계: Nature–Farm·Farm–Town·Farm–Hub 등
+      ↓
+   LandscapeGraph
+   ├─ Node: Macro·Meso 공간 의미와 근거 수준
+   ├─ Edge: 포함·인접·연결·전환 관계
+   ├─ Placement: CompositionKey·세계 좌표·회전·seed
+   ├─ ExternalConnectorStub: 인접 타일 인계
+   └─ Unresolved: 자료·연결·호환 부족
+      ↓
+   Unity LandscapeCompositionRoot
+   ├─ 면형모판
+   ├─ 선형모판
+   ├─ 결절모판
+   ├─ 경계봉합모판
+   ├─ 거점모판
+   └─ 세부모판
+```
+
+경관 문법의 공개 대장은 아래 52개 의미 모판군 × A/B/C 세 변형, 정확히 156개다. 원본 팩별 기술 대장과 기존 도로·Gate 대장은 제작 근거로 더 많은 항목을 가질 수 있지만 서버와 런타임이 소비하는 canonical 대장은 이 156개뿐이다.
+
+| 계열 | 의미 모판군 | A/B/C 포함 항목 수 |
+| --- | ---: | ---: |
+| Nature | 12 | 36 |
+| Farm | 8 | 24 |
+| Town | 6 | 18 |
+| City·Hub | 6 | 18 |
+| Network | 농촌·타운·도시의 직선·곡선·T·십자 12 | 36 |
+| Transition | Nature–Farm, Farm–Town, Town–City, Farm–Hub, Town–Hub, Hub–City, Water–Land, Road–BuildingFront 8 | 24 |
+| 합계 | 52 | 156 |
+
+각 항목은 `Area / Linear / Junction / Transition / Landmark / Detail` 위상, 사방 `EdgeProfile`, 위치·방향·폭을 가진 `Connector`, 연속 반복 상한과 최근 변형 감점, 허용·선호·금지 이웃, 타일·연쇄·종료 가능 여부, 내부 detail 생성기 개정과 세계 좌표 seed 규약을 가진다. `EdgeProfile`은 맞닿는 면의 성격이고 `Connector`는 길·수로·보행처럼 실제로 이어지는 지점이므로 합치지 않는다.
+
+Unity는 의미 대장에서 유료 Prefab을 해석하지만 서버로 내보내는 안전 Manifest에는 Prefab 경로·원본 이름·GUID를 넣지 않는다. `CatalogRevision`과 안전 필드 SHA-256이 서버 응답과 로컬 대장에서 모두 일치해야 조립한다. 새 경관은 비활성 staging root에서 전부 검증한 후 `LandscapeCompositionRoot`와 원자적으로 교체한다. hash나 Node·Edge·Placement 참조가 틀리면 기존 root를 유지한다.
+
+파생 DB는 공간 원본과 Synty 해석 영수증 사이에 다음 중립 테이블을 둔다.
+
+```text
+시뮬레이션월드_경관조립실행
+├─ 시뮬레이션월드_경관공간Node
+├─ 시뮬레이션월드_경관공간Edge
+├─ 시뮬레이션월드_경관모판배치
+└─ 시뮬레이션월드_경관조립미해결
+```
+
+이 테이블은 `CompositionKey`까지만 저장하고 Synty 상품 정보는 저장하지 않는다. 실제 도로 자료가 없는 첫 농로 연결은 `Scenario` 근거와 외부 연결 Stub으로 남기며 관측 도로로 승격하지 않는다.
+
 ## 첫 세로 단위
 
 `area-set:sim:pyeongchang:farm-hub-town.v1`은 대관령면 Farm, 진부면 Hub, 평창읍 Town과 두 `ScenarioRoute`를 참조한다. 공식 도로 공간자료가 연결되기 전까지 회랑을 실제 도로로 주장하지 않는다. Unity는 `SimulationWorldShell` 한 Scene에서 카메라 거리에 따라 L0/L1/L2 표현만 전환하며 서버나 Simulation 상태를 변경하지 않는다.
@@ -101,9 +195,9 @@ kr5186:l2:700:1145 | kr5186:l2:701:1145
 kr5186:l2:700:1144 | kr5186:l2:701:1144
 ```
 
-서버 파생 Pipeline은 전체 Manifest에 네 타일이 모두 있으면 이 네 L2 타일과 상위 `kr5186:l1:175:286`, `kr5186:l0:43:71`만 선택한다. 파생 DB에는 `LandscapeCompletionArea` node, Farm 포함 관계, 네 `SpatialTile` node와 포함 관계를 SchemaVersion 2의 기존 node·relation 구조로 저장하므로 새 물리 표는 필요하지 않다. Unity `WorldBuildManifest`는 같은 네 타일에 대해 `elevation`, `land-cover`, `placement-mask` 계약 12개와 결정적 완결 영역 hash를 만든다.
+서버 파생 Pipeline은 전체 Manifest에 네 타일이 모두 있으면 이 네 L2 타일과 상위 `kr5186:l1:175:286`, `kr5186:l0:43:71`만 선택한다. `LandscapeCompletionArea`, Farm과 네 `SpatialTile`의 원본 공간 관계는 SchemaVersion 2의 기존 node·relation 구조에 유지한다. 그 위에서 반복 생성·외부 연결·부분 미해결을 조회하기 위한 경관 Graph만 위의 다섯 중립 테이블에 별도 저장한다. Unity `WorldBuildManifest`는 같은 네 타일에 대해 `elevation`, `land-cover`, `placement-mask` 계약 12개와 결정적 완결 영역 hash를 만든다.
 
-완결 여부는 `원자료 → 물리 공간 → 공간 의미 → Scenario 규칙 → 경관 계획 → UI 계획 → Unity Runtime → 최종 검증` 여덟 수직 관문으로 기록한다. 현재 원자료·Scenario·경관 계획 계약은 준비됐지만 실제 DEM 지형·배치 마스크는 `WaitingForSpatialArtifact`, UI·Unity Runtime·최종 화면 검증은 `RequiresEditorEvidence`다. 따라서 계약·정적 컴파일 통과를 완성된 Game View로 표현하지 않는다.
+완결 여부는 `원자료 → 물리 공간 → 공간 의미 → Scenario 규칙 → 경관 계획 → UI 계획 → Unity Runtime → 최종 검증` 여덟 수직 관문으로 기록한다. 중앙 타일 `kr5186:l2:700:1145`은 DEM·WorldCover·배치 마스크가 준비됐고 나머지 세 타일은 아직 `WaitingForSpatialArtifact`다. 경관 문법 계약·DB·API·Unity 원자적 조립 코드는 준비됐지만 네 타일 실제 조립과 최종 Game View는 아직 완료 증거가 아니다.
 
 각 Area는 타일 레이어 결과뿐 아니라 공유 공공데이터 DB의 건축물대장·GIS 건물도형과 공개 지방행정 인허가 사업장 관점별 조회 결과를 읽는다. 관측 건물은 도형 또는 대표점에 배치하고, 도형이 없는 건물은 임의 좌표에 놓지 않는다. 자료 부족을 보완하는 대표 건물은 `AreaComposition`, Farm·Hub·Town 역할 건물은 `Scenario` 근거로 분리한다. 공개 사업장명과 업종은 간판·상점 계열 시각 후보의 근거가 될 수 있지만 실제 입주 확정이나 운영 업무 완료를 뜻하지 않는다.
 
@@ -152,13 +246,14 @@ GET /api/simulation/v1/world-stream/tiles/{tileKey}/manifest
 GET /api/simulation/v1/world-stream/tiles/{tileKey}/artifacts/{layerCode}
 GET /api/simulation/v1/world-stream/tiles/{tileKey}/activities
 GET /api/simulation/v1/world-stream/tiles/{tileKey}/objects
+GET /api/simulation/v1/world-stream/tiles/{tileKey}/landscape-compositions
 ```
 
 Recipe와 Manifest는 좌표계, 타일 크기, 활성·준비 반경, Halo, Layer 상태와 결정적 SHA-256을 제공한다. 활동 관점별 조회 결과는 표현용 읽기 사본이며 Unity 이동으로 `WorldTick`이나 Session 개정을 진행하지 않는다.
 
 지역 조회는 타일 요청보다 앞에서 공유 공공데이터 DB의 법정동·행정동 Assignment, 관할 교차 관계와 행정동별 건물 Category 집계를 파생 DB에 고정한 결과를 읽는다. 경계 geometry가 없으면 `WaitingForRegionGeometry`로 남기며, 지역을 임의 타일이나 Farm·Hub·Town 역할에 끼워 맞추지 않는다. 후속 타일 조립기는 `IntersectsSpatialTile` 관계가 검증된 뒤에만 이 지역 Projection을 타일별 건물 표현 후보와 결합한다.
 
-현재 첫 수직 단위는 타일 생명주기와 서버 계약까지 구현됐다. 실제 DEM·토지피복·배치 마스크 런타임 산출물은 아직 없으므로 세 Layer 모두 `WaitingForSpatialArtifact`다. Unity Fixture는 한 시점의 81개 준비 타일 경계와 상태판만 만들고 Terrain Mesh·Collider·가짜 높이를 만들지 않는다. 따라서 기존 `ScenarioTerrainPreview` 위에서 동적 경계를 확인할 수 있지만 이를 실제 DEM 기반 지형의 완료 증거로 사용하지 않는다.
+현재 첫 수직 단위는 타일 생명주기, 중앙 타일의 실제 DEM·토지피복·배치 마스크 산출물, 경관 Graph 계약·저장·조회와 Unity 조립 경계까지 구현됐다. 로컬 MySQL Job에서 중앙 타일은 Node 5·Edge 3·Composition 배치 5·인접 타일 연결 Stub 1개로 저장됐고 같은 입력 재실행의 Graph SHA-256이 일치했다. 나머지 세 L2 타일은 필수 Layer가 없어 `WaitingForSpatialArtifact`로 저장하며 가짜 경관을 만들지 않는다. Unity Fixture도 자료 대기 응답만 제공한다. 따라서 중앙 타일 산출물과 코드·시험 검증을 네 타일 실제 경관 또는 Game View 완료 증거로 사용하지 않는다.
 
 ### 이동하면서 새 공간을 마주하는 런타임 구조
 
