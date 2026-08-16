@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 using Ssalddel.Simulation.Server;
 
@@ -11,11 +12,18 @@ var requiresWorldDerivationDatabase = args.Any(argument =>
     string.Equals(argument, "--migrate-simulation-world-database", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--build-pyeongchang-world-derived", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--build-pyeongchang-synty-landscape", StringComparison.OrdinalIgnoreCase)
+    || string.Equals(argument, "--assemble-pyeongchang-landscape-graph", StringComparison.OrdinalIgnoreCase)
+    || string.Equals(argument, "--render-pyeongchang-area-set-status", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--assemble-pyeongchang-world-business-rules", StringComparison.OrdinalIgnoreCase));
 requiresWorldDerivationDatabase = requiresWorldDerivationDatabase || args.Any(argument =>
     string.Equals(argument, "--plan-pyeongchang-world-ui", StringComparison.OrdinalIgnoreCase));
 if (requiresWorldDerivationDatabase)
     builder.Configuration["SimulationWorldDerivationDatabase:Enabled"] = "true";
+var landscapeGrammarArgument = args.FirstOrDefault(argument =>
+    argument.StartsWith("--landscape-grammar=", StringComparison.OrdinalIgnoreCase));
+if (landscapeGrammarArgument != null)
+    builder.Configuration["SimulationWorldDerivationDatabase:LandscapeGrammarManifestPath"] =
+        landscapeGrammarArgument["--landscape-grammar=".Length..];
 
 if (args.Contains("--migrate-simulation-session-database",
         StringComparer.OrdinalIgnoreCase))
@@ -26,7 +34,8 @@ if (args.Contains("--migrate-simulation-session-database",
 if (args.Contains("--build-pyeongchang-world-derived", StringComparer.OrdinalIgnoreCase))
     builder.Configuration["SimulationSharedPublicData:Enabled"] = "true";
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    options.Filters.Add<SimulationApiExceptionFilter>());
 builder.Services.AddSimulationServerServices(builder.Configuration);
 SimulationServerServiceCollectionExtensions.RequireSimulationExecutionMode(
     builder.Configuration);
@@ -64,8 +73,11 @@ if (args.Contains("--build-pyeongchang-world-derived", StringComparer.OrdinalIgn
         Ssalddel.Simulation.Persistence.평창군공간파생Pipeline>();
     var tileManifestArgument = args.FirstOrDefault(argument =>
         argument.StartsWith("--tile-manifest=", StringComparison.OrdinalIgnoreCase));
+    var spatialArtifactManifestArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--spatial-artifact-manifest=", StringComparison.OrdinalIgnoreCase));
     var result = await pipeline.실행Async(
         tileManifestArgument?["--tile-manifest=".Length..],
+        spatialArtifactManifestArgument?["--spatial-artifact-manifest=".Length..],
         CancellationToken.None);
     Console.WriteLine(
         $"평창군공간파생완료:상태={result.상태코드};새실행본={result.새실행본저장여부};" +
@@ -94,15 +106,15 @@ if (args.Contains("--build-pyeongchang-synty-landscape", StringComparer.OrdinalI
     var shell = scope.ServiceProvider.GetRequiredService<SimulationWorldSynty경관JobShell>();
     var request = new SimulationWorldSynty경관Job요청
     {
-        JobStableId = "synty-job:pyeongchang:" + spatialBuild.OutputHashSha256[..16] + ":pc-high:v1",
+        JobStableId = "synty-job:pyeongchang:" + spatialBuild.OutputHashSha256[..16] + ":pc-high:v2",
         SpatialBuildStableId = spatialBuild.BuildStableId,
         SpatialOutputHashSha256 = spatialBuild.OutputHashSha256,
         AreaSetStableId = spatialBuild.AreaSetStableId,
         ScopeKindCode = SimulationWorldSynty범위Codes.영역묶음,
         ScopeStableId = spatialBuild.AreaSetStableId,
-        LandscapeRuleRevision = "pyeongchang-synty-landscape.v1",
-        VisualCatalogRevision = "synty-world-catalog.v1",
-        UrpProfileCatalogRevision = "urp-world-profile.v1",
+        LandscapeRuleRevision = "pyeongchang-synty-landscape.v2",
+        VisualCatalogRevision = "legal-dong-scenic-catalog.v2",
+        UrpProfileCatalogRevision = "urp-pyeongchang-four-pack.v2",
         Seed = 51760,
         TargetPlatformCode = SimulationWorldSynty대상플랫폼Codes.PC,
         QualityTierCode = "PC-High",
@@ -113,6 +125,62 @@ if (args.Contains("--build-pyeongchang-synty-landscape", StringComparer.OrdinalI
         $"그래픽계획={result.GraphicsPlanCount};시각배치={result.VisualPlacementCount};" +
         $"배치거부={result.RejectionCount};시각실행={result.VisualBuildStableId};" +
         $"출력SHA256={result.OutputHashSha256}");
+    return;
+}
+
+if (args.Contains("--assemble-pyeongchang-landscape-graph", StringComparer.OrdinalIgnoreCase))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var shell = scope.ServiceProvider.GetRequiredService<
+        SimulationWorldAreaSetLandscapeGraphJobShell>();
+    var results = await shell.BuildAsync(CancellationToken.None);
+    Console.WriteLine(
+        $"평창군경관Graph조립완료:Graph={results.Count};" +
+        $"준비={results.Count(item => item.StatusCode == SimulationWorldLandscapeCompositionCodes.Available)};" +
+        $"대기={results.Count(item => item.StatusCode == SimulationWorldLandscapeCompositionCodes.WaitingForSpatialArtifact)};" +
+        $"미해결={results.Sum(item => item.Unresolved.Length)}");
+    foreach (var result in results)
+        Console.WriteLine(
+            $"경관Graph:{result.LandscapeGraphStableId};상태={result.StatusCode};" +
+            $"타일={result.TileRefs.Length};" +
+            $"Node={result.Nodes.Length};Edge={result.Edges.Length};" +
+            $"배치={result.Placements.Length};외부연결={result.ExternalConnectorStubs.Length};" +
+            $"SHA256={result.GraphHashSha256}");
+    return;
+}
+
+if (args.Contains("--render-pyeongchang-area-set-status", StringComparer.OrdinalIgnoreCase))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var service = scope.ServiceProvider.GetRequiredService<
+        SimulationWorldAreaSetLandscapeGraphService>();
+    var areaSet = await service.ReadAreaSetAsync(
+        PyeongchangAreaSetStableIds.AreaSet, CancellationToken.None)
+        ?? throw new InvalidOperationException("PyeongchangAreaSetNotFound");
+    var graphs = new List<SimulationWorldLandscapeGraphResponse>();
+    foreach (var descriptor in areaSet.LandscapeGraphs)
+        graphs.Add(await service.ReadGraphAsync(
+            descriptor.LandscapeGraphStableId, CancellationToken.None)
+            ?? throw new InvalidOperationException(
+                "PyeongchangLandscapeGraphNotFound:" + descriptor.LandscapeGraphStableId));
+    var outputArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--area-set-status-output=", StringComparison.OrdinalIgnoreCase));
+    var outputPath = outputArgument?["--area-set-status-output=".Length..]
+                     ?? "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/generated/area-set-status.md";
+    // dotnet run은 프로세스 작업 경로와 ContentRootPath를 Server 폴더로 맞춘다.
+    // 기본 상대 경로는 한 단계 위 저장소 루트를 기준으로 해석한다.
+    var repositoryRoot = Directory.GetParent(builder.Environment.ContentRootPath)?.FullName
+                         ?? builder.Environment.ContentRootPath;
+    var fullOutputPath = Path.IsPathRooted(outputPath)
+        ? Path.GetFullPath(outputPath)
+        : Path.GetFullPath(outputPath, repositoryRoot);
+    Directory.CreateDirectory(Path.GetDirectoryName(fullOutputPath)!);
+    await File.WriteAllTextAsync(
+        fullOutputPath,
+        SimulationWorldAreaSetStatusMarkdownRenderer.Render(areaSet, graphs),
+        new System.Text.UTF8Encoding(false),
+        CancellationToken.None);
+    Console.WriteLine("평창AreaSet상태문서생성완료:" + fullOutputPath);
     return;
 }
 

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
@@ -7,9 +8,22 @@ namespace Ssalddel.Simulation.Server.Controllers;
 
 [ApiController]
 [Route("api/simulation/v1/world-stream")]
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationWorldStreaming,
+    SsalddelCodeLayer.Api,
+    "타일 Recipe·Manifest·Layer·객체 Projection 조회 경계를 제공한다.",
+    StepKey = "api.world-stream",
+    DependsOnStepKeys = new string[] { "contract.stream-recipe" },
+    ExecutionStage = SsalddelCodeExecutionStage.Query,
+    ReadsFrom = SsalddelCodeDataScope.DerivedWorld | SsalddelCodeDataScope.SimulationState,
+    FlowOrder = 20,
+    Boundary = "조회와 eligibility Preview는 타일이나 업무 상태를 생성·확정하지 않는다.")]
 public sealed class SimulationWorldStreamingController(
     SimulationWorldStreamingService service,
-    SimulationWorldExplorationService exploration) : ControllerBase
+    SimulationWorldExplorationService exploration,
+    SimulationWorldTileArtifactContentService artifactContent,
+    SimulationWorldLandscapeCompositionService landscapeComposition,
+    SimulationWorldAreaSetLandscapeGraphService areaSetGraphs) : ControllerBase
 {
     [HttpGet("recipes/{recipeId}")]
     [ProducesResponseType(typeof(SimulationWorldStreamRecipeResponse), StatusCodes.Status200OK)]
@@ -27,6 +41,60 @@ public sealed class SimulationWorldStreamingController(
             ? Ok(value)
             : NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldStreamTileNotFound" });
 
+    [HttpGet("tiles/{tileKey}/landscape-compositions")]
+    [ProducesResponseType(typeof(SimulationWorldLandscapeCompositionTileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldLandscapeCompositionTileResponse>>
+        LandscapeCompositions(string tileKey, CancellationToken cancellationToken)
+    {
+        var value = await areaSetGraphs.ReadTileFacadeAsync(tileKey, cancellationToken)
+                    ?? await landscapeComposition.ReadLatestAsync(tileKey, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse
+                { ErrorCode = "SimulationWorldLandscapeCompositionNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("area-sets/{areaSetStableId}")]
+    [ProducesResponseType(typeof(SimulationWorldAreaSetDefinitionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldAreaSetDefinitionResponse>> AreaSet(
+        string areaSetStableId, CancellationToken cancellationToken)
+    {
+        var value = await areaSetGraphs.ReadAreaSetAsync(areaSetStableId, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldAreaSetNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("area-sets/{areaSetStableId}/landscape-graphs")]
+    [ProducesResponseType(typeof(SimulationWorldLandscapeGraphIndexResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldLandscapeGraphIndexResponse>> LandscapeGraphIndex(
+        string areaSetStableId,
+        [FromQuery] string tileKey,
+        [FromQuery] int radiusTiles = 4,
+        CancellationToken cancellationToken = default)
+    {
+        var value = await areaSetGraphs.ReadGraphIndexAsync(
+            areaSetStableId, tileKey, radiusTiles, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldLandscapeGraphIndexNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("landscape-graphs/{landscapeGraphStableId}")]
+    [ProducesResponseType(typeof(SimulationWorldLandscapeGraphResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldLandscapeGraphResponse>> LandscapeGraph(
+        string landscapeGraphStableId, CancellationToken cancellationToken)
+    {
+        var value = await areaSetGraphs.ReadGraphAsync(landscapeGraphStableId, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldLandscapeGraphNotFound" })
+            : Ok(value);
+    }
+
     [HttpGet("tiles/{tileKey}/artifacts/{layerCode}")]
     [ProducesResponseType(typeof(SimulationWorldTileArtifactDescriptorResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
@@ -35,6 +103,28 @@ public sealed class SimulationWorldStreamingController(
         => service.TryGetArtifact(tileKey, layerCode, out var value)
             ? Ok(value)
             : NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldStreamArtifactNotFound" });
+
+    [HttpGet("tiles/{tileKey}/artifacts/{layerCode}/content")]
+    [Produces("application/octet-stream")]
+    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status409Conflict)]
+    public IActionResult ArtifactContent(string tileKey, string layerCode)
+    {
+        if (!service.TryGetArtifact(tileKey, layerCode, out var descriptor)
+            || descriptor.StatusCode != SimulationWorldStreamCodes.Available)
+            return NotFound(new SimulationErrorResponse
+                { ErrorCode = "SimulationWorldStreamArtifactNotFound" });
+        if (!artifactContent.TryResolve(descriptor, out var file, out var errorCode))
+        {
+            var error = new SimulationErrorResponse { ErrorCode = errorCode };
+            return errorCode == SimulationWorldTileArtifactContentService.IntegrityMismatch
+                ? Conflict(error)
+                : NotFound(error);
+        }
+
+        return PhysicalFile(file.FullPath, file.ContentType, enableRangeProcessing: true);
+    }
 
     [HttpGet("tiles/{tileKey}/activities")]
     [ProducesResponseType(typeof(SimulationWorldTileActivityProjectionResponse), StatusCodes.Status200OK)]

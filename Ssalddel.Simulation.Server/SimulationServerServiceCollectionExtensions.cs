@@ -68,6 +68,21 @@ public static class SimulationServerServiceCollectionExtensions
             ?? new SimulationWorldDerivationDatabaseOptions();
         services.AddSingleton<ISimulationWorld지역ProjectionReader,
             DisabledSimulationWorld지역ProjectionReader>();
+        services.AddSingleton<ISimulationWorld지역표현요약Reader,
+            DisabledSimulationWorld지역표현요약Reader>();
+        services.AddSingleton<ISimulationWorldTileArtifactReader,
+            DisabledSimulationWorldTileArtifactReader>();
+        services.AddSingleton<ISimulationWorldLandscapeGrammarCatalogReader,
+            DisabledSimulationWorldLandscapeGrammarCatalogReader>();
+        services.AddSingleton<DisabledSimulationWorldLandscapeCompositionStore>();
+        services.AddSingleton<ISimulationWorldLandscapeCompositionStore>(provider =>
+            provider.GetRequiredService<DisabledSimulationWorldLandscapeCompositionStore>());
+        services.AddSingleton<ISimulationWorldLandscapeCompositionReader>(provider =>
+            provider.GetRequiredService<DisabledSimulationWorldLandscapeCompositionStore>());
+        services.AddSingleton<ISimulationWorldAreaSetDefinitionReader,
+            DisabledSimulationWorldAreaSetDefinitionReader>();
+        services.AddSingleton<ISimulationWorldAreaSetGraphStore,
+            DisabledSimulationWorldAreaSetGraphStore>();
         if (derivationOptions.Enabled)
         {
             var connectionString = configuration.GetConnectionString(
@@ -75,7 +90,10 @@ public static class SimulationServerServiceCollectionExtensions
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new InvalidOperationException(
                     WorldDerivationConnectionStringMissingErrorCode);
-            services.AddSimulationWorldDerivationPersistence(connectionString);
+            services.AddSimulationWorldDerivationPersistence(
+                connectionString,
+                derivationOptions.LandscapeGrammarManifestPath,
+                derivationOptions.AreaSetDefinitionPath);
             if (sharedOptions.Enabled)
                 services.Add평창군공간파생Pipeline();
         }
@@ -107,8 +125,17 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<Simulation렌더링의도합성Policy>();
         services.AddSingleton<Simulation기본Urp표현Catalog>();
         services.AddSingleton<SimulationRuntimeWorldPresentationService>();
-        services.AddSingleton<SimulationWorldStreamingService>();
-        services.AddSingleton<SimulationWorldExplorationService>();
+        services.AddScoped<SimulationWorldStreamingService>();
+        services.AddScoped<SimulationWorldLandscapeCompositionService>();
+        services.AddScoped<SimulationWorldLandscapeCompositionJobShell>();
+        services.AddScoped<SimulationWorldAreaSetLandscapeGraphJobShell>();
+        services.AddScoped<SimulationWorldAreaSetLandscapeGraphService>();
+        services.AddScoped<ISimulationWorldLandscapeSkeletonSource,
+            PyeongchangFirstLandscapeSkeletonSource>();
+        services.AddSingleton<SimulationWorldLandscapeGraphAssembler>();
+        services.AddScoped<SimulationWorldTileArtifactContentService>();
+        services.AddScoped<SimulationWorld지역표현요약Service>();
+        services.AddScoped<SimulationWorldExplorationService>();
         services.AddSingleton<SimulationWorldSurvivalInventoryService>();
         services.AddSingleton<SimulationSurvivalTarotService>();
         services.AddSingleton<SimulationWorldEventProjectionService>();
