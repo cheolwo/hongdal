@@ -1,0 +1,385 @@
+{
+  "ledgerKey": "simulation-unity-incomplete-execution",
+  "schemaVersion": "2",
+  "revision": "simulation-unity-incomplete-execution.r3",
+  "lastVerifiedDate": "2026-08-17",
+  "firstExecutionTrackId": "TRACK-DAEGWALLYEONG-L2-REAL-DATA",
+  "firstExecutionTileKey": "kr5186:l2:700:1145",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "items": [
+    {
+      "id": "GEO-LEGAL-01",
+      "category": "공간 원자료",
+      "title": "실제 법정동 경계와 건물 geometry 연결",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": [],
+      "sourceReferences": [
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md",
+        "docs/Architecture/KoreaAdministrativeBuildingDataLedger.md"
+      ],
+      "evidence": [
+        "2026-07-01 법정동 EMD SHP 로컬 원본과 SHA-256 확인",
+        "평창군 법정동 8개 경계를 사용한 래스터 절단 실행"
+      ],
+      "blockers": [
+        "건물 footprint geometry와 파생 World node의 실제 좌표 연결이 끝나지 않음"
+      ],
+      "nextAction": "중심 L2 타일과 교차하는 법정동 경계 및 좌표가 확인된 건물 footprint를 EPSG:5186로 절단한다.",
+      "doneWhen": "중심 L2 타일의 경계·건물 관계가 출처 hash와 함께 파생 DB, Streaming 응답, Unity 배치에 동일한 고유 식별자로 나타난다."
+    },
+    {
+      "id": "GEO-DEM-01",
+      "category": "공간 원자료",
+      "title": "DEM PhysicalElevation과 수직 기준 연결",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": ["GEO-LEGAL-01"],
+      "sourceReferences": [
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md"
+      ],
+      "evidence": [
+        "Copernicus DEM GLO-30 평창 EPSG:5186 절단본 SHA-256 D173A82973EBB3292F6E1DA45C250F8A68C131E8039AC93E0C1181CF303FADE8",
+        "VWorld 국토지리정보원 90m DEM 비교본 SHA-256 2D8139587033C1AD4341C914D8FD249104E89C7EEFDB031A1EC8F7D327C1B52B",
+        "중심 L2와 Halo 60m를 63x63 float32로 생성하고 물리 표고 905.4617~1057.0731m를 기록",
+        "Unity 표현 Mesh는 Halo를 제외한 51x51 표본만 사용하고 높이 과장을 Renderer에만 적용하는 EditMode 시험 통과"
+      ],
+      "blockers": [
+        "Copernicus 원본의 수직 기준은 Unverified로 남아 있음",
+        "실제 서버 산출물을 Unity 저장 Scene에서 로드한 Play Mode·Game View 증거는 아직 없음"
+      ],
+      "nextAction": "수직 기준 공식 근거를 보완하고 실제 서버 산출물을 Unity 저장 Scene에서 로드해 지형 연속성과 시점 이동을 확인한다.",
+      "doneWhen": "경사·배치 판정은 PhysicalElevation을 사용하고 Unity 높이 과장은 별도 표현 Profile만 사용하며 공유 경계 표본이 일치한다."
+    },
+    {
+      "id": "GEO-LANDCOVER-01",
+      "category": "공간 원자료",
+      "title": "토지피복·수계·배치 마스크 연결",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": ["GEO-LEGAL-01", "GEO-DEM-01"],
+      "sourceReferences": [
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md",
+        "docs/Architecture/SimulationWorldDerivedDatabase.md"
+      ],
+      "evidence": [
+        "ESA WorldCover 2021 v200 평창 EPSG:5186 절단본 SHA-256 2769C2087D97C5DB121D0DA76C1BEB966B9A96002C757A470294FF12559417A5",
+        "평창 L0 42건·L1 437건·L2 6150건 타일 Manifest 생성",
+        "중심 L2 landcover-u8-v1과 placement-mask-u8-v1 생성 및 SHA-256 재현성 시험 통과",
+        "중심 L2 통계: 농업 후보 73셀, 산림 후보 3652셀, 수계 0셀, NoData 0셀"
+      ],
+      "blockers": [
+        "환경부 세분류 공간 SHP가 없어 논·밭·수종 위치는 StatisticallyAllocated 수준",
+        "Unity가 토지피복·배치 마스크를 Synty 경관 배치 제한에 실제 적용하는 단계는 미완료"
+      ],
+      "nextAction": "검증된 mask bit를 Synty 경관 계획기의 허용 토지피복·경사·수계 판정 입력으로 연결한다.",
+      "doneWhen": "수계와 과경사 영역이 배치 불가로 표시되고 통계 배분 유형이 실제 관측 위치처럼 노출되지 않는다."
+    },
+    {
+      "id": "DATA-BUILDING-01",
+      "category": "공공데이터 파생",
+      "title": "행정동·법정동 건물과 공개 사업장 관계",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 2,
+      "dependsOn": ["GEO-LEGAL-01"],
+      "sourceReferences": [
+        "docs/Architecture/KoreaAdministrativeBuildingDataLedger.md",
+        "docs/Architecture/SimulationWorldDerivedDatabase.md"
+      ],
+      "evidence": [
+        "평창군 건축물 37383건을 보존하는 대표군 투영 규칙과 집중 시험 존재",
+        "실제 평창 재파생에서 건축물 37383건을 15개 대표군으로 축약하고 37368건 생략을 명시적으로 기록"
+      ],
+      "blockers": [
+        "좌표 없는 건물은 타일로 승격할 수 없음",
+        "전국 행정동·건물·사업장 전수 적재 실행 증거가 없음"
+      ],
+      "nextAction": "중심 L2 타일의 좌표가 확인된 건물만 법정동·행정동 관계와 함께 지역 표현 요약 입력으로 승격한다.",
+      "doneWhen": "공개 상호명은 검증된 건물 관계의 상세 조회에서만 나오고 대표자·연락처·사업자등록번호는 계약에 포함되지 않는다."
+    },
+    {
+      "id": "DB-REGION-SUMMARY-01",
+      "category": "파생 DB",
+      "title": "지역 표현 요약 migration과 평창 재파생",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": ["GEO-LEGAL-01", "GEO-LANDCOVER-01", "DATA-BUILDING-01"],
+      "sourceReferences": [
+        "docs/Architecture/SimulationWorldDerivedDatabase.md"
+      ],
+      "evidence": [
+        "지역 표현 요약 EF 모델·저장·조회 코드와 집중 시험 존재",
+        "20260816080216 증분 migration을 로컬 SimulationWorldDerived DB에 적용",
+        "실제 평창 입력과 공간 산출물로 재파생 후 동일 fingerprint 재실행에서 새실행본=False 확인"
+      ],
+      "blockers": [
+        "중심 타일 지역 표현 요약을 Unity에서 실제 조회·표현한 증거는 아직 없음"
+      ],
+      "nextAction": "중심 타일 지역 표현 요약 응답을 Unity 정보판과 Synty 배치 예산에 연결한다.",
+      "doneWhen": "같은 입력 fingerprint 재실행이 새 행을 만들지 않고 중심 타일 요약과 원본 생략 보고서를 반환한다."
+    },
+    {
+      "id": "ART-TILE-01",
+      "category": "Unity 공간 산출물",
+      "title": "중심 L2 Terrain·Mask 산출물 생성",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": ["GEO-DEM-01", "GEO-LANDCOVER-01", "DB-REGION-SUMMARY-01"],
+      "sourceReferences": [
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md"
+      ],
+      "evidence": [
+        "WorldCover 기반 전체 타일 Manifest와 결정적 fingerprint 존재",
+        "height-f32-v1·landcover-u8-v1·placement-mask-u8-v1 생성 및 두 차례 동일 SHA-256 확인",
+        "파생 DB에 Unity 산출물 3건을 저장하고 실제 HTTP에서 세 Layer Available 확인"
+      ],
+      "blockers": [
+        "실제 Unity 저장 Scene의 Preview root 교체와 Game View 확인은 아직 없음"
+      ],
+      "nextAction": "SimulationWorldShell의 실제 서버 모드에서 중심 DEM Mesh를 로드하고 기존 Preview와 시각적으로 비교한다.",
+      "doneWhen": "산출물 세 개가 파생 DB와 Streaming API에서 Available로 조회되고 같은 입력 재생성 hash가 같다."
+    },
+    {
+      "id": "API-STREAM-01",
+      "category": "Simulation 서버",
+      "title": "파생 DB 기반 실제 타일 Streaming",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": ["ART-TILE-01"],
+      "sourceReferences": [
+        "Ssalddel.Simulation.Server/README.md",
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md"
+      ],
+      "evidence": [
+        "Recipe·Manifest·Artifact·Object 기존 API와 단위 시험 존재",
+        "3x3 상세·5x5 활성·9x9 준비 Recipe r3 구현",
+        "실행 중인 로컬 서버에서 세 Layer Available과 elevation 본문 SHA-256 B1A2FACB6D7E0E77493F8D2F23FBC452BDCBDDB907B0CCFAD5798EDAE263AC 일치 확인"
+      ],
+      "blockers": [
+        "실제 HTTP 왕복을 Unity Play Mode에서 수행한 증거는 아직 없음"
+      ],
+      "nextAction": "Unity 저장 Scene을 서버 기준 모드로 전환해 실제 Manifest·본문을 한 차례 종단 로드한다.",
+      "doneWhen": "중심 타일 세 Layer는 Available과 실제 hash·상대 경로를, 자료 없는 이웃은 WaitingForSpatialArtifact를 반환한다."
+    },
+    {
+      "id": "UNITY-REAL-TILE-01",
+      "category": "Unity Runtime",
+      "title": "SimulationWorldShell 실제 중심 타일 로딩",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 1,
+      "dependsOn": ["API-STREAM-01"],
+      "sourceReferences": [
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md",
+        "docs/AI/CURRENT_WORK.md"
+      ],
+      "evidence": [
+        "Fixture 기반 Streaming Controller·PlayMode 시험 존재",
+        "SimulationWorldShell ScenarioTerrainPreview와 127개 정적 경관 배치 확인",
+        "Unity 서버 repository의 바이너리 SHA 검증·Halo 절단·표현용 Mesh 생성 코드와 EditMode 10건 통과",
+        "상세 범위의 검증된 DEM만 Mesh로 만들고 Collider를 생성하지 않는 Controller 시험 통과"
+      ],
+      "blockers": [
+        "실제 서버 산출물을 Unity 저장 Scene에서 로드한 Play Mode·Game View 증거가 없음",
+        "land-cover와 placement-mask는 내려받기 계약만 있고 Synty 배치 제한 적용은 미완료"
+      ],
+      "nextAction": "SimulationWorldShell을 서버 기준 모드로 실행해 실제 DEM Mesh를 배치하고 mask를 Synty 배치 제한에 연결한다.",
+      "doneWhen": "실제 타일 위에서 1인칭·전술 시점·창고 상호작용이 유지되고 실패 시 마지막 성공 상태를 보존한다."
+    },
+    {
+      "id": "RENDER-URP-01",
+      "category": "렌더링",
+      "title": "Simulation Runtime 렌더링 의도 HTTP·URP Adapter",
+      "status": "InProgress",
+      "currentEvidenceStage": "E2",
+      "targetEvidenceStage": "E7",
+      "priority": 3,
+      "dependsOn": ["UNITY-REAL-TILE-01"],
+      "sourceReferences": [
+        "docs/Architecture/SimulationRuntimeRenderingIntentPipeline.md"
+      ],
+      "evidence": [
+        "Runtime 렌더링 의도 Service와 결정적 표현 hash 코드 존재"
+      ],
+      "blockers": [
+        "HTTP route와 Unity URP Adapter 미노출"
+      ],
+      "nextAction": "서버가 결정한 표현 Profile key를 조회하는 API와 Unity MaterialPropertyBlock·FX Adapter를 연결한다.",
+      "doneWhen": "Unity가 WorldTick을 변경하지 않고 서버 표현 의도를 URP Profile로만 해석한다."
+    },
+    {
+      "id": "PERF-HLOD-01",
+      "category": "렌더링",
+      "title": "HLOD bake와 실제 렌더링 비용 측정",
+      "status": "NotStarted",
+      "currentEvidenceStage": "E1",
+      "targetEvidenceStage": "E7",
+      "priority": 4,
+      "dependsOn": ["UNITY-REAL-TILE-01"],
+      "sourceReferences": [
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md"
+      ],
+      "evidence": [
+        "계획 단계 Triangle·Material Slot·Draw Call·Shadow Caster 예산 존재"
+      ],
+      "blockers": [
+        "실제 Terrain과 대표 Renderer 기준 HLOD bake 미실행"
+      ],
+      "nextAction": "실제 중심 타일을 기준으로 HLOD 대표 Renderer를 bake하고 Profiler 비용을 기록한다.",
+      "doneWhen": "계획 추정치가 아니라 실제 Draw Call·Shadow Caster·메모리·프레임 시간 증거가 남는다."
+    },
+    {
+      "id": "SIM-LIVE-HTTP-01",
+      "category": "Simulation 실행",
+      "title": "턴·전투·창고 live HTTP와 서버 상태 재조회",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 2,
+      "dependsOn": ["API-STREAM-01"],
+      "sourceReferences": [
+        "docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md"
+      ],
+      "evidence": [
+        "Fixture·HTTP 계약 시험과 저장 Scene 입력 배선 존재"
+      ],
+      "blockers": [
+        "실행 중인 서버가 없어 Game View에서 연결 오류 3건 관찰"
+      ],
+      "nextAction": "로컬 Simulation 서버를 실행해 Preview·Confirm·재조회 왕복을 Unity 저장 Scene에서 검증한다.",
+      "doneWhen": "Unity가 결과를 계산하지 않고 서버 개정과 확정 상태를 재조회해 UI·World 표현을 갱신한다."
+    },
+    {
+      "id": "PERSIST-SIM-01",
+      "category": "Simulation 실행",
+      "title": "Session·전투·관전 영속 저장과 재시작 복원",
+      "status": "InProgress",
+      "currentEvidenceStage": "E2",
+      "targetEvidenceStage": "E7",
+      "priority": 4,
+      "dependsOn": ["SIM-LIVE-HTTP-01"],
+      "sourceReferences": [
+        "docs/Architecture/SimulationParallelManagementBattleInstances.md"
+      ],
+      "evidence": [
+        "Save·Replay 계약과 process-local InMemory Store 코드 존재"
+      ],
+      "blockers": [
+        "자동 저장·자동 재시작 복원·다중 인스턴스 잠금 미지원"
+      ],
+      "nextAction": "기존 Save JSON 호환을 유지하는 durable Store를 연결하고 재시작 복원 시험을 추가한다.",
+      "doneWhen": "세션 재시작 뒤 전투·예약·관전 상태와 멱등 명령 결과가 동일 hash로 복원된다."
+    },
+    {
+      "id": "UI-FIGMA-01",
+      "category": "Unity UI",
+      "title": "Figma·MAUI 근거 Unity 역할 UI 확장",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 5,
+      "dependsOn": ["SIM-LIVE-HTTP-01"],
+      "sourceReferences": [
+        "docs/Architecture/SimulationWorldUiPlanningLedger.md",
+        "docs/Architecture/UnityFigmaUiUxAdaptationProposal.md"
+      ],
+      "evidence": [
+        "창고 오른쪽 정보판 수직 Slice와 UI Projection 계약 존재"
+      ],
+      "blockers": [
+        "현재 Figma 전체 node 재검증과 01~09 역할 UI의 Unity 연결 미완료"
+      ],
+      "nextAction": "현재 Figma node와 MAUI route를 다시 확인하고 다음 역할 화면 하나를 Preview·Confirm·서버 재조회까지 완결한다.",
+      "doneWhen": "선택한 역할 화면이 현재 Figma 근거, 서버 계약, Unity Scene, PlayMode 증거를 함께 가진다."
+    },
+    {
+      "id": "WI-001",
+      "category": "세계 상호작용",
+      "title": "진부 Hub 입고 검수 공간–Simulation 종단 연결",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 2,
+      "dependsOn": [],
+      "sourceReferences": [
+        "docs/Architecture/세계상호작용단위중심공간Simulation통합.md",
+        "docs/Architecture/SimulationNpcWorkforceAndActionRules.md"
+      ],
+      "evidence": [
+        "Scenario 근거의 검수 공간 능력과 WorkArea 1자리 계약 구현",
+        "미리보기 무상태·확정 예약·완료 해제·취소 계보·저장 재생 자동 시험 통과",
+        "시험 HTTP 호스트에서 입고 검수 Preview·Confirm·Cancel·상태 재조회 통과",
+        "Unity 입고 정보판이 선택 공간·Scenario 근거·공간 차단 사유를 한국어로 표시"
+      ],
+      "blockers": [
+        "실제 진부 Hub LandscapeGraph 업무 공간 Node와 승인된 공간 능력 연결이 없음",
+        "실행 중인 실제 서버와 Unity Play Mode·Game View 종단 검증을 수행하지 않음"
+      ],
+      "nextAction": "진부 Hub 경관 그래프에 검수 공간 Node를 조립하고 승인된 공간 능력 연결로 Scenario 공간 공급자를 승격한다.",
+      "doneWhen": "실제 경관 그래프 근거의 검수 공간에서 Preview·Confirm·작업·효과·저장 재생·HTTP·Unity 표현이 같은 고유 식별자와 개정으로 확인된다."
+    },
+    {
+      "id": "WI-002",
+      "category": "세계 상호작용",
+      "title": "진부 Hub 창고 적재 공간–Simulation 종단 연결",
+      "status": "InProgress",
+      "currentEvidenceStage": "E3",
+      "targetEvidenceStage": "E7",
+      "priority": 2,
+      "dependsOn": ["WI-001"],
+      "sourceReferences": [
+        "docs/Architecture/세계상호작용단위중심공간Simulation통합.md",
+        "docs/ProjectOverview/SimulationRulesHandbook.ko.md"
+      ],
+      "evidence": [
+        "Scenario 근거의 창고 Storage 10000kg와 LoadingWorkArea 1자리 계약 구현",
+        "보관 용량·작업 영역 동시 예약, 중복 사용 차단, 완료 시 사용 중 용량 전환 자동 시험 통과",
+        "입고 검수 완료 뒤 적재 Preview·Confirm·Tick·상태 재조회 HTTP 시험 통과",
+        "공간 상태·예약·취소 명령을 포함하는 simulation-save.v2와 v1 호환 재생 구현"
+      ],
+      "blockers": [
+        "실제 진부 Hub 창고 Node의 물리 용량과 접근성 근거가 승인되지 않음",
+        "실행 중인 실제 서버·DB와 Unity Play Mode·Game View 종단 검증을 수행하지 않음"
+      ],
+      "nextAction": "실제 진부 Hub 창고 Node와 검토된 보관 용량을 연결한 뒤 동일 WI를 재생하고 Unity 정보판의 경관 그래프 근거 표시를 확인한다.",
+      "doneWhen": "실제 경관 그래프 창고에서 재고 수량만큼 예약·점유가 일관되게 전이되고 Save·Replay·HTTP·Unity가 같은 상태를 표시한다."
+    },
+    {
+      "id": "EXPAND-NATIONWIDE-01",
+      "category": "전국 확장",
+      "title": "전국 행정동·법정동·건물·사업장 확장",
+      "status": "NotStarted",
+      "currentEvidenceStage": "E1",
+      "targetEvidenceStage": "E7",
+      "priority": 6,
+      "dependsOn": ["GEO-LEGAL-01", "DATA-BUILDING-01", "UNITY-REAL-TILE-01"],
+      "sourceReferences": [
+        "docs/Architecture/KoreaAdministrativeBuildingDataLedger.md",
+        "docs/Architecture/SimulationWorldDerivedDatabase.md"
+      ],
+      "evidence": [
+        "전국 확장 가능한 고유 식별자·파생 원장·타일 구조 설계 존재"
+      ],
+      "blockers": [
+        "평창 중심 L2 실자료 기준작이 E7에 도달하지 않음"
+      ],
+      "nextAction": "대관령 중심 L2가 E7에 도달한 뒤 두 번째 시군구를 같은 Recipe로 재현한다.",
+      "doneWhen": "시군구가 달라도 같은 source manifest·파생·Streaming·Unity 검증 절차를 반복할 수 있다."
+    }
+  ]
+}

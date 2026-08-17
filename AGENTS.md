@@ -33,7 +33,8 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 | `Ssalddel.Ui.Common/` 공통 UI | `Ssalddel.Ui.Common/AGENTS.md` | 3단계 navigation, MVVM, render 검증 |
 | `Ssalddel.Tests/` test | `Ssalddel.Tests/AGENTS.md` | filter 우선, 영향 project build |
 | `docs/` 문서·변경 기록 | `docs/AGENTS.md` | 기준 문서 단일화, link·diff 검증 |
-| 여러 project를 통과하는 기능 | `SsalddelCodeMetadataAttribute`, `SsalddelCodeFeatureKeys` 검색 | `FlowOrder`, `Layer`, `Effects`, `Boundary`, `ContractType` |
+| 여러 project를 통과하는 기능 | `SsalddelCodeMetadataAttribute`, `SsalddelCodeFeatureKeys` 검색 | `StepKey`, `FlowOrder`, `Layer`, `ExecutionStage`, `ReadsFrom/WritesTo`, `Effects`, `Boundary` |
+| Simulation·Unity 탐색 | `eng/work-areas/simulation-unity.json`, `docs/AI/generated/simulation-unity-code-map.md` | 생성 트리에서 기능 키와 핵심 단계를 고른 뒤 소스로 이동하고, 생성 문서를 직접 수정하지 않음 |
 | 커뮤니티 0.0 | `[SsalddelCommunityV0Module]` 검색 | module catalog와 `0.0-A~E` |
 | 기능 slice 작업 | `docs/Architecture/FunctionalWorkAreaPartitioning.md`, `eng/work-areas/<slice>.json` | manifest의 `readFirst`, `sourceRoots`, `excludedRoots`만 먼저 읽고 범위를 넓힐 때 이유를 남김 |
 | 지역문화·공공데이터 | `eng/work-areas/regional-culture-public-data.json` | 문화 이미지·지역 key·공식 근거·가격 관측 |
@@ -125,6 +126,8 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 - shared contract나 shared UI 변경은 소비 client 검증 없이 server build만으로 끝내지 않는다.
 - 상태 전이·동기화는 원장 저장, RDB 투영, Event 재처리, 권한, 다른 client 재조회를 확인한다.
 - UI는 가능한 경우 local server와 browser로 핵심 경로를 확인한다. 불가능하면 제한과 대체 검증을 적는다.
+- 현재 Unity 개발 단계의 기본 완료 기준은 소스 정적 검사, 컴파일, 관련 EditMode·단위 시험과 필요한 경우 저장 Scene·조립 코드의 구조 검증이다. 사용자가 실행 화면이나 시각 마감을 명시적으로 요청하지 않은 작업에서는 Play Mode 수동 조작, Game View 확인과 PNG 캡처를 필수로 요구하지 않는다.
+- Game View를 생략했을 때는 `코드·시험 검증 완료 / Play Mode·Game View 미검증`처럼 증거 수준을 분리해 보고한다. 화면에서만 판별할 수 있는 입력·카메라·배치 문제, 릴리스 검증, 또는 사용자가 실제 화면 확인을 요청한 경우에는 Play Mode와 Game View 검증을 다시 수행한다.
 - test나 build를 실행하지 못하면 이유와 미검증 범위를 보고한다.
 
 ## Git과 산출물
@@ -132,7 +135,7 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 - commit과 push는 사용자가 명시적으로 요청한 경우에만 수행한다.
 - commit은 feature, refactor, fix, test, docs처럼 되돌릴 수 있는 맥락으로 나누고 다른 스레드 변경을 섞지 않는다.
 - stage 전 이번 작업의 `git diff`와 `git status`를 다시 확인한다.
-- 화면 변경은 [커밋별 시각 변경 기록](docs/Changes/README.md)에 실제 PNG와 함께 기록한다. Unity Scene·prefab·material·camera·UI처럼 Game View 결과가 달라지는 변경은 최종 상태를 Editor/Pipeline에서 다시 캡처하고, 대표 Game View PNG와 변경 기록을 해당 코드·Scene과 같은 맥락의 커밋에 포함한다. Scene View는 보조 증거일 뿐 Game View를 대신하지 않는다. 화면이 없으면 `화면 없음` 또는 `간접 확인`으로 남긴다.
+- 화면 변경은 [커밋별 시각 변경 기록](docs/Changes/README.md)에 검증 수준을 기록한다. 현재 단계에서는 코드·시험 검증이 기본이며, 사용자가 실제 화면 확인·시각 마감·릴리스 증거를 요청한 경우에만 Editor/Pipeline에서 최종 Game View를 다시 캡처하고 대표 PNG를 관련 코드·Scene과 같은 맥락의 커밋에 포함한다. 캡처를 생략한 변경은 `화면 미검증` 또는 `간접 확인`으로 명시하며 코드 검증을 실제 화면 검증으로 표현하지 않는다. Scene View는 배선 설명을 위한 보조 증거일 뿐 Game View를 대신하지 않는다.
 - 임시 log, browser profile, raw capture, test result는 `artifacts/local/`에 두고 commit하지 않는다.
 - 새 worktree는 가능하면 저장소 바깥의 sibling 경로에 만든다. `artifacts/worktrees/`는 탐색·검증 대상에서 제외한다.
 - 장기 보존할 대표 화면만 `docs/assets/changes/`로 옮긴다.

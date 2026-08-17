@@ -1,0 +1,359 @@
+{
+  "catalogKey": "simulation-world-interactions",
+  "schemaVersion": "2",
+  "revision": "simulation-world-interactions.r2",
+  "lastVerifiedDate": "2026-08-17",
+  "defaultImplementationTargetStage": "E3",
+  "defaultIntegrationTargetStage": "E7",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "interactionKinds": ["Command", "AutomaticTransition", "SharedPolicy"],
+  "items": [
+    {
+      "id": "WI-FARM-01", "groupCode": "FARM", "sequence": 1, "title": "밭갈기", "kind": "Command",
+      "worldAction": "행위자가 농지 작업 구획을 경작 가능한 상태로 만든다.",
+      "startStateCodes": ["Untilled"], "completionStateCodes": ["Tilled"],
+      "actorRequirements": ["Player 또는 농장 작업 NPC"], "spatialRequirements": ["WorkerAccessible", "TillingWorkArea"], "resourceRequirements": ["노동 또는 체력"], "reservationKinds": ["WorkArea", "Actor"],
+      "previewRule": "행위자·대상 토양·공간·노동을 검사하고 상태를 바꾸지 않는다.", "confirmRule": "결정·작업·행위자와 작업 영역 예약을 원자적으로 만든다.", "taskRule": "확정 뒤 Tick에 따라 밭갈기 작업을 진행한다.", "effectCodes": ["SoilTilled"],
+      "cancellationPolicy": "완료 전 예약만 계보에 따라 반환한다.", "blockReasonCodes": ["SimulationFarmSoilTileNotFound", "SimulationFarmActorBusy"],
+      "predecessorWiIds": [], "successorWiIds": ["WI-FARM-02"], "actionCode": "Tilling", "ruleRevision": "farm-survival.scenic-season.r1",
+      "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/confirm"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFarmSurvival.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 밭갈이 자동 시험 통과."] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["대관령 Farm Graph의 agriculture-region Node와 ReviewedDesign 1 slot을 사용해 Preview·Confirm·예약·Task·Effect·Save/Replay 자동 시험 및 로컬 파생 DB 저장을 통과했다. 저장 Scene 적용은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
+    },
+    {
+      "id": "WI-FARM-02", "groupCode": "FARM", "sequence": 2, "title": "파종", "kind": "Command",
+      "worldAction": "경작된 농지에 작물 재배 단위를 시작한다.", "startStateCodes": ["Tilled"], "completionStateCodes": ["Growing"],
+      "actorRequirements": ["파종 가능 행위자"], "spatialRequirements": ["CropProduction", "WorkerAccessible"], "resourceRequirements": ["종자", "노동"], "reservationKinds": ["Parcel", "WorkArea", "Actor"],
+      "previewRule": "경작 상태·종자·행위자·농지 수용 가능성을 검사한다.", "confirmRule": "대상 농지와 종자를 예약하고 파종 작업을 만든다.", "taskRule": "완료 Tick에 재배 단위를 Growing으로 만든다.", "effectCodes": ["CultivationStarted"],
+      "cancellationPolicy": "작업 전 예약을 반환하며 이미 소비된 종자는 별도 규칙을 따른다.", "blockReasonCodes": ["CultivationParcelUnavailable", "SeedInsufficient"],
+      "predecessorWiIds": ["WI-FARM-01"], "successorWiIds": ["WI-FARM-03"], "actionCode": "Sowing", "ruleRevision": "world-interaction.farm.r1",
+      "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 파종·종자 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["대관령 Farm Graph 생산구획에서 선행 밭갈이와 후속 재배 관리까지 공간 폐루프를 확인하고 Graph 근거 작업을 완료했다. 저장 Scene 적용은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
+    },
+    {
+      "id": "WI-FARM-03", "groupCode": "FARM", "sequence": 3, "title": "관수·재배 관리", "kind": "Command",
+      "worldAction": "Growing 재배 단위의 생육 조건을 관리한다.", "startStateCodes": ["Growing"], "completionStateCodes": ["Growing", "HarvestReady"],
+      "actorRequirements": ["재배 관리 가능 행위자"], "spatialRequirements": ["CropProduction", "WaterAccessible", "WorkerAccessible"], "resourceRequirements": ["물", "노동"], "reservationKinds": ["WorkArea", "Actor"],
+      "previewRule": "생육 상태와 물·노동·공간 접근을 검사한다.", "confirmRule": "재배 관리 작업과 필요한 자원을 예약한다.", "taskRule": "완료 효과가 생육 진행도를 반영한다.", "effectCodes": ["CropCareApplied"],
+      "cancellationPolicy": "미사용 예약만 반환한다.", "blockReasonCodes": ["CropStateInvalid", "WaterUnavailable"],
+      "predecessorWiIds": ["WI-FARM-02"], "successorWiIds": ["WI-FARM-04"], "actionCode": "CropCare", "ruleRevision": "world-interaction.farm.r1",
+      "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 재배 관리·물 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["대관령 Farm Graph 생산구획에서 수확 직전까지 공간 폐루프를 확인하고 Graph 근거 작업을 완료했다. 저장 Scene 적용은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
+    },
+    {
+      "id": "WI-FARM-04", "groupCode": "FARM", "sequence": 4, "title": "수확", "kind": "Command",
+      "worldAction": "수확 가능한 감자 재배 단위를 수확 Lot으로 전환한다.", "startStateCodes": ["HarvestReady"], "completionStateCodes": ["Harvested", "HarvestedAtField"],
+      "actorRequirements": ["FarmHarvest"], "spatialRequirements": ["CropProduction", "WorkerAccessible", "CargoAccessible", "HarvestWorkArea"], "resourceRequirements": ["노동 또는 체력", "수확 대상 재배 단위"], "reservationKinds": ["CultivationUnit", "WorkArea", "Actor"],
+      "previewRule": "100㎡·3kg/㎡와 승인된 계수를 적용해 300kg 후보를 계산하고 상태는 바꾸지 않는다.", "confirmRule": "재배 단위·행위자·수확 작업 영역을 예약한다.", "taskRule": "Player 1 Tick, NPC 2 Tick 뒤 수확 Lot을 만든다.", "effectCodes": ["HarvestLotCreated", "CultivationHarvested"],
+      "cancellationPolicy": "완료 전 재배 단위와 작업 영역 예약을 반환한다.", "blockReasonCodes": ["CultivationUnitNotHarvestReady", "SimulationSpatialCapabilityMissing", "SimulationSpatialReservationConflict"],
+      "predecessorWiIds": ["WI-FARM-03"], "successorWiIds": ["WI-FARM-05"], "actionCode": "Harvesting", "ruleRevision": "world-interaction.farm-supply.r1",
+      "saveReplayPayloadCodes": ["FarmWorkConfirm", "CultivationUnits", "HarvestLots"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/confirm"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Domain/Simulation감자생산규칙.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg 결정적 수확·공간 예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 농장 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Contracts/Simulation감자생산Contracts.cs"], "notes": ["Scenario 공간은 실제 공공 공간자료 증거가 아니다."]
+    },
+    {
+      "id": "WI-FARM-05", "groupCode": "FARM", "sequence": 5, "title": "수확물 집하", "kind": "Command",
+      "worldAction": "밭의 수확 Lot을 농장 집하장으로 옮긴다.", "startStateCodes": ["HarvestedAtField"], "completionStateCodes": ["CollectedAtYard"],
+      "actorRequirements": ["FarmCollection"], "spatialRequirements": ["CollectionWorkArea", "WorkerAccessible", "CargoAccessible"], "resourceRequirements": ["수확 Lot", "노동"], "reservationKinds": ["HarvestLot", "WorkArea", "Actor"],
+      "previewRule": "Lot 상태·행위자·집하 공간을 검사한다.", "confirmRule": "Lot과 집하 작업 영역을 예약한다.", "taskRule": "완료 Tick에 Lot 위치 상태를 CollectedAtYard로 바꾼다.", "effectCodes": ["HarvestLotCollected"],
+      "cancellationPolicy": "완료 전 Lot·작업 영역 예약을 반환한다.", "blockReasonCodes": ["HarvestLotStateInvalid", "SimulationSpatialReservationConflict"],
+      "predecessorWiIds": ["WI-FARM-04"], "successorWiIds": ["WI-FARM-06"], "actionCode": "HarvestCollection", "ruleRevision": "world-interaction.farm-supply.r1",
+      "saveReplayPayloadCodes": ["FarmWorkConfirm", "HarvestLots"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["수확 Lot 집하 상태 전이·공간 예약·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 집하 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-FARM-06", "groupCode": "FARM", "sequence": 6, "title": "출하 준비·포장", "kind": "Command",
+      "worldAction": "집하된 수확 Lot을 포장 Lot과 운송 Cargo로 만든다.", "startStateCodes": ["CollectedAtYard"], "completionStateCodes": ["PackedForShipment", "PreparedForShipment"],
+      "actorRequirements": ["FarmPacking"], "spatialRequirements": ["PackingWorkArea", "WorkerAccessible", "CargoAccessible"], "resourceRequirements": ["수확 Lot", "포장 노동"], "reservationKinds": ["HarvestLot", "WorkArea", "Actor"],
+      "previewRule": "Lot 상태·수량·포장 공간을 검사하고 Cargo 계보 후보를 제시한다.", "confirmRule": "Lot과 포장 작업 영역을 예약한다.", "taskRule": "완료 Tick에 PackageLot과 Cargo를 동일 수량으로 만든다.", "effectCodes": ["PackageLotCreated", "CargoPrepared"],
+      "cancellationPolicy": "완료 전 Lot·작업 영역 예약을 반환한다.", "blockReasonCodes": ["HarvestLotStateInvalid", "PackingWorkAreaUnavailable"],
+      "predecessorWiIds": ["WI-FARM-05"], "successorWiIds": ["WI-LOG-01"], "actionCode": "OutboundPacking", "ruleRevision": "world-interaction.farm-supply.r1",
+      "saveReplayPayloadCodes": ["FarmWorkConfirm", "HarvestLots", "PackageLots"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/SimulationLogisticsMovementContracts.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg PackageLot·Cargo·출하 배분 계보와 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 포장 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["기존 물류 요청의 HarvestLotStableId·PackageLotStableId·CargoStableId를 이어 쓴다."]
+    },
+    {
+      "id": "WI-LOG-01", "groupCode": "LOG", "sequence": 1, "title": "차량 상차 확정", "kind": "Command",
+      "worldAction": "Farm 출하 Cargo를 차량과 Farm 상차 공간에 예약한다.", "startStateCodes": ["PreparedForShipment"], "completionStateCodes": ["Reserved"],
+      "actorRequirements": ["운송 담당 행위자"], "spatialRequirements": ["VehicleAccessible", "CargoAccessible", "LoadingWorkArea"], "resourceRequirements": ["Cargo", "차량 용량"], "reservationKinds": ["Cargo", "Vehicle", "WorkArea"],
+      "previewRule": "Cargo·차량 용량·원점 상차 공간·경로·도착 하차 공간을 함께 검사한다.", "confirmRule": "하나의 물류 결정으로 Cargo·차량·공간을 예약한다.", "taskRule": "확정된 운송 작업이 후속 자동 전이를 소유한다.", "effectCodes": ["CargoTransportReserved"],
+      "cancellationPolicy": "출발 전 모든 예약을 계보로 반환한다.", "blockReasonCodes": ["FreightVehicleCapacityExceeded", "SimulationSpatialReservationConflict"],
+      "predecessorWiIds": ["WI-FARM-06"], "successorWiIds": ["WI-LOG-02"], "actionCode": "CargoRouteMovement", "ruleRevision": "world-interaction.logistics.r1",
+      "saveReplayPayloadCodes": ["LogisticsMovementConfirm", "SpatialReservations"], "httpContracts": ["기존 logistics-movements 또는 freight-transports Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs", "Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["상차 공간·차량 용량·원본 배분 예약과 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 상차 공간만 사용하며 실제 차량·LandscapeGraph·Unity 검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["하나의 명령이 출발·이동·도착 자동 전이의 원인이다."]
+    },
+    {
+      "id": "WI-LOG-02", "groupCode": "LOG", "sequence": 2, "title": "Farm 출발", "kind": "AutomaticTransition",
+      "worldAction": "상차 예약된 Cargo가 운송 시작 Tick에 Farm을 출발한다.", "startStateCodes": ["Reserved"], "completionStateCodes": ["InTransit"],
+      "actorRequirements": [], "spatialRequirements": ["OriginLoading"], "resourceRequirements": [], "reservationKinds": ["OriginWorkAreaRelease"],
+      "previewRule": "독립 Preview가 없고 WI-LOG-01 Preview 결과를 사용한다.", "confirmRule": "독립 Confirm이 없고 WI-LOG-01 Command 계보를 사용한다.", "taskRule": "ScheduledStartTick 도달 시 결정적으로 전이한다.", "effectCodes": ["CargoDeparted"],
+      "cancellationPolicy": "출발 이후 취소 규칙은 부모 운송 작업이 소유한다.", "blockReasonCodes": [], "predecessorWiIds": ["WI-LOG-01"], "successorWiIds": ["WI-LOG-03"],
+      "actionCode": "CargoDepartureTransition", "ruleRevision": "world-interaction.logistics.r1", "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs"],
+      "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "Reserved", "targetState": "InTransit", "causeLineage": "부모 물류 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["운송 첫 Tick에서 상차 공간 예약 해제와 운송중 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 공간·논리 이동만 검증했으며 실제 차량 표현은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-LOG-03", "groupCode": "LOG", "sequence": 3, "title": "Farm→Hub 화물 이동", "kind": "AutomaticTransition",
+      "worldAction": "Cargo가 승인된 Farm–Hub 경로를 따라 이동 진행도를 갱신한다.", "startStateCodes": ["InTransit"], "completionStateCodes": ["InTransit", "ArrivedAtDestination"],
+      "actorRequirements": [], "spatialRequirements": ["CargoRoute"], "resourceRequirements": [], "reservationKinds": ["RouteAccess"],
+      "previewRule": "독립 Preview 없이 부모 명령에서 경로 접근을 검사한다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "WorldTick에 따라 CompletedRouteTicks를 결정적으로 갱신한다.", "effectCodes": ["CargoRouteProgressed"], "cancellationPolicy": "부모 운송 작업 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-LOG-02"], "successorWiIds": ["WI-LOG-04"], "actionCode": "CargoRouteProgressTransition", "ruleRevision": "world-interaction.logistics.r1",
+      "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs"],
+      "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "InTransit", "targetState": "ArrivedAtDestination", "causeLineage": "부모 물류 TaskStableId와 WorldTick" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["3 Tick Farm→Hub 회랑 진행과 Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 회랑만 사용하며 실제 경로·Unity 이동 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-LOG-04", "groupCode": "LOG", "sequence": 4, "title": "Hub 하차", "kind": "AutomaticTransition",
+      "worldAction": "도착 Cargo가 Hub 하차 작업 영역을 사용하고 도착 후보가 된다.", "startStateCodes": ["InTransit"], "completionStateCodes": ["ArrivedAtDestination"],
+      "actorRequirements": [], "spatialRequirements": ["UnloadingWorkArea", "CargoAccessible"], "resourceRequirements": [], "reservationKinds": ["DestinationWorkAreaRelease"],
+      "previewRule": "부모 Preview가 도착 공간을 선검사한다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "ExpectedEndTick에 도착·하차 상태로 전이한다.", "effectCodes": ["CargoUnloaded"], "cancellationPolicy": "부모 운송 작업 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-LOG-03"], "successorWiIds": ["WI-LOG-05"], "actionCode": "CargoUnloadTransition", "ruleRevision": "world-interaction.logistics.r1",
+      "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
+      "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "InTransit", "targetState": "ArrivedAtDestination", "causeLineage": "부모 물류 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["도착 Tick에서 하차 공간 예약 해제와 하차지도착 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 하차 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-LOG-05", "groupCode": "LOG", "sequence": 5, "title": "Hub 인수", "kind": "AutomaticTransition",
+      "worldAction": "Hub 입고검수 완료가 운송 Cargo의 인수 완료를 함께 확정한다.", "startStateCodes": ["ArrivedAtDestination", "PendingInspection"], "completionStateCodes": ["Received", "StorageEligible"],
+      "actorRequirements": [], "spatialRequirements": ["InspectionWorkArea"], "resourceRequirements": ["도착 Cargo"], "reservationKinds": [],
+      "previewRule": "독립 Preview가 없고 WI-001 입고검수 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없고 WI-001 Command에 포함된다.", "taskRule": "WI-001 Task 완료 시 같은 계보로 전이한다.", "effectCodes": ["FreightReceived", "StorageEligible"], "cancellationPolicy": "WI-001 취소 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-LOG-04"], "successorWiIds": ["WI-001"], "actionCode": "FreightReceiptTransition", "ruleRevision": "world-interaction.hub.r1",
+      "saveReplayPayloadCodes": ["FreightReceipt", "NpcFacilityInventory"], "httpContracts": ["독립 경로 없음; freight-receipts Preview/Confirm은 WI-001이 소유"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
+      "automaticTransition": { "triggerWiId": "WI-001", "triggerState": "PendingInspection", "targetState": "StorageEligible", "causeLineage": "WI-001 입고검수 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["기존 입고검수 Confirm 안의 인수 계보와 PendingInspection 생성을 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario Hub 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["별도 인수 Confirm API를 만들지 않는다."]
+    },
+    {
+      "id": "WI-001", "groupCode": "HUB", "sequence": 1, "title": "진부 Hub 입고검수", "kind": "Command",
+      "worldAction": "도착 Cargo를 적격 NPC와 검수 공간에서 검수한다.", "startStateCodes": ["ArrivedAtDestination", "PendingInspection"], "completionStateCodes": ["StorageEligible", "Received"],
+      "actorRequirements": ["WarehouseInspection"], "spatialRequirements": ["CargoAccessible", "WorkerAccessible", "InspectionWorkArea"], "resourceRequirements": ["도착 Cargo", "NPC 노동"], "reservationKinds": ["WorkArea", "Actor"],
+      "previewRule": "Cargo·NPC·검수 공간·개정·예약 충돌을 검사하며 상태는 바꾸지 않는다.", "confirmRule": "Decision·Task·NPC 배정·작업 영역 예약을 원자적으로 만든다.", "taskRule": "배정→이동→작업→완료 상태를 서버 Tick이 확정한다.", "effectCodes": ["InspectionWorkAreaReleased", "StorageEligible", "FreightReceived"],
+      "cancellationPolicy": "이 Task가 만든 공간·NPC·임시 재고만 계보로 반환한다.", "blockReasonCodes": ["SimulationSpatialCapabilityMissing", "SimulationSpatialReservationConflict"],
+      "predecessorWiIds": ["WI-LOG-05"], "successorWiIds": ["WI-002"], "actionCode": "WarehouseInboundInspection", "ruleRevision": "world-interaction.hub.r1",
+      "saveReplayPayloadCodes": ["DecisionConfirm", "SpatialReservations", "TaskCancel"], "httpContracts": ["기존 freight-receipts Preview/Confirm 경로", "POST /api/simulation/v1/sessions/{sessionStableId}/tasks/{taskStableId}/cancel"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs", "Ssalddel.Simulation.Domain/Simulation공간상호작용.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["공간 능력·예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 공간 근거만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Tests/Simulation공간상호작용Tests.cs"], "notes": ["구현 완료 E3와 실제 공간·Unity 통합 완료를 분리한다."]
+    },
+    {
+      "id": "WI-002", "groupCode": "HUB", "sequence": 2, "title": "진부 Hub 창고 적재", "kind": "Command",
+      "worldAction": "검수 완료 재고를 창고 용량과 적재 작업 영역을 사용해 적재한다.", "startStateCodes": ["StorageEligible"], "completionStateCodes": ["PutAwayCompleted"],
+      "actorRequirements": ["WarehousePutAway"], "spatialRequirements": ["Storage", "CargoAccessible", "WorkerAccessible", "LoadingWorkArea"], "resourceRequirements": ["StorageEligible 재고", "NPC 노동"], "reservationKinds": ["StorageCapacity", "WorkArea", "Actor"],
+      "previewRule": "남은 보관 용량과 작업 영역·행위자·개정을 검사한다.", "confirmRule": "재고 수량만큼 보관 용량과 작업 영역을 원자적으로 예약한다.", "taskRule": "완료 Tick에 예약 용량을 실제 점유량으로 전환한다.", "effectCodes": ["SpatialStorageCapacityConsumed", "SpatialWorkAreaReleased", "PutAwayCompleted"],
+      "cancellationPolicy": "완료 전 보관 용량·작업 영역·NPC 예약을 반환한다.", "blockReasonCodes": ["SimulationSpatialCapacityInsufficient", "SimulationSpatialReservationConflict"],
+      "predecessorWiIds": ["WI-001"], "successorWiIds": ["WI-HUB-03"], "actionCode": "WarehouseStorageMove", "ruleRevision": "world-interaction.hub.r1",
+      "saveReplayPayloadCodes": ["DecisionConfirm", "SpatialReservations", "TaskCancel"], "httpContracts": ["기존 warehouse-putaway Preview/Confirm 경로", "POST /api/simulation/v1/sessions/{sessionStableId}/tasks/{taskStableId}/cancel"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationWarehousePutAway.cs", "Ssalddel.Simulation.Domain/Simulation공간상호작용.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["용량·작업영역 예약·완료·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 창고 근거만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Tests/Simulation공간상호작용Tests.cs"], "notes": ["AvailableCapacity는 저장하지 않고 계산한다."]
+    },
+    {
+      "id": "WI-HUB-03", "groupCode": "HUB", "sequence": 3, "title": "출고 요청", "kind": "Command",
+      "worldAction": "창고 재고에 대해 목적지 출고를 요청한다.", "startStateCodes": ["PutAwayCompleted"], "completionStateCodes": ["OutboundRequested"],
+      "actorRequirements": ["출고 권한 행위자"], "spatialRequirements": ["Storage", "WorkerAccessible"], "resourceRequirements": ["창고 재고"], "reservationKinds": ["Stock"],
+      "previewRule": "재고·목적지·권한을 검사한다.", "confirmRule": "출고 결정과 대상 재고 예약을 만든다.", "taskRule": "후속 피킹 자동 전이의 부모 작업이다.", "effectCodes": ["OutboundRequested"], "cancellationPolicy": "피킹 전 재고 예약을 반환한다.", "blockReasonCodes": ["WarehouseStockInsufficient"],
+      "predecessorWiIds": ["WI-002"], "successorWiIds": ["WI-HUB-04"], "actionCode": "WarehouseOutboundRequest", "ruleRevision": "world-interaction.hub.r1",
+      "saveReplayPayloadCodes": ["DecisionConfirm"], "httpContracts": ["기존 창고 출고 계약 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 요청 자동 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 요청 자동 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-HUB-04", "groupCode": "HUB", "sequence": 4, "title": "피킹", "kind": "AutomaticTransition",
+      "worldAction": "출고 요청 재고를 창고에서 피킹한다.", "startStateCodes": ["OutboundRequested"], "completionStateCodes": ["Picked"],
+      "actorRequirements": [], "spatialRequirements": ["Storage", "WorkerAccessible", "PickingWorkArea"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
+      "previewRule": "부모 출고 요청이 피킹 가능성을 검사한다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "부모 Task 진행 중 자동 상태로 기록한다.", "effectCodes": ["StockPicked"], "cancellationPolicy": "부모 작업 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-HUB-03"], "successorWiIds": ["WI-HUB-05"], "actionCode": "WarehousePickingTransition", "ruleRevision": "world-interaction.hub.r1", "saveReplayPayloadCodes": ["WarehouseOutboundState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": [],
+      "automaticTransition": { "triggerWiId": "WI-HUB-03", "triggerState": "OutboundRequested", "targetState": "Picked", "causeLineage": "출고 요청 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 피킹 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 피킹 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-HUB-05", "groupCode": "HUB", "sequence": 5, "title": "출고 준비", "kind": "AutomaticTransition",
+      "worldAction": "피킹 재고를 출고 가능한 Cargo 후보로 만든다.", "startStateCodes": ["Picked"], "completionStateCodes": ["OutboundReady"],
+      "actorRequirements": [], "spatialRequirements": ["PackingWorkArea", "CargoAccessible"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
+      "previewRule": "부모 출고 요청 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "피킹 뒤 결정적으로 출고 준비 상태가 된다.", "effectCodes": ["OutboundCargoPrepared"], "cancellationPolicy": "부모 작업 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-HUB-04"], "successorWiIds": ["WI-HUB-06"], "actionCode": "WarehouseOutboundPreparationTransition", "ruleRevision": "world-interaction.hub.r1", "saveReplayPayloadCodes": ["WarehouseOutboundState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": [],
+      "automaticTransition": { "triggerWiId": "WI-HUB-03", "triggerState": "Picked", "targetState": "OutboundReady", "causeLineage": "출고 요청 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 준비 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 준비 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-HUB-06", "groupCode": "HUB", "sequence": 6, "title": "Hub 차량 상차", "kind": "Command",
+      "worldAction": "출고 준비 Cargo를 Town행 차량에 상차한다.", "startStateCodes": ["OutboundReady"], "completionStateCodes": ["Reserved"],
+      "actorRequirements": ["운송 담당 행위자"], "spatialRequirements": ["LoadingWorkArea", "VehicleAccessible", "CargoAccessible"], "resourceRequirements": ["Cargo", "차량"], "reservationKinds": ["Cargo", "Vehicle", "WorkArea"],
+      "previewRule": "Cargo·차량·Hub 상차 공간을 검사한다.", "confirmRule": "운송 예약을 원자적으로 만든다.", "taskRule": "Hub→Town 운송의 선행 작업이다.", "effectCodes": ["HubCargoLoaded"], "cancellationPolicy": "출발 전 예약을 반환한다.", "blockReasonCodes": ["FreightVehicleCapacityExceeded"],
+      "predecessorWiIds": ["WI-HUB-05"], "successorWiIds": ["WI-MARKET-01"], "actionCode": "HubVehicleLoading", "ruleRevision": "world-interaction.market-supply.r1", "saveReplayPayloadCodes": ["FreightTransportConfirm"], "httpContracts": ["기존 freight-transports Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 상차·배분 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 상차·배분 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-MARKET-01", "groupCode": "MARKET", "sequence": 1, "title": "Hub→마트 운송", "kind": "Command",
+      "worldAction": "Hub 출고 Cargo를 Town 마트로 운송한다.", "startStateCodes": ["Reserved"], "completionStateCodes": ["ArrivedAtDestination"],
+      "actorRequirements": ["운송 담당 행위자"], "spatialRequirements": ["CargoRoute", "VehicleAccessible"], "resourceRequirements": ["Cargo", "차량"], "reservationKinds": ["Cargo", "Vehicle"],
+      "previewRule": "경로·차량·목적지 접근을 검사한다.", "confirmRule": "운송 작업을 확정한다.", "taskRule": "Tick 기반 운송 하위 상태를 진행한다.", "effectCodes": ["MarketCargoArrived"], "cancellationPolicy": "운송 상태에 따른 부모 취소 규칙을 사용한다.", "blockReasonCodes": ["CargoRouteUnavailable"],
+      "predecessorWiIds": ["WI-HUB-06"], "successorWiIds": ["WI-MARKET-02"], "actionCode": "HubToMarketTransport", "ruleRevision": "world-interaction.market-supply.r1", "saveReplayPayloadCodes": ["FreightTransportConfirm"], "httpContracts": ["기존 freight-transports Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub→마트 운송 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub→마트 운송 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-MARKET-02", "groupCode": "MARKET", "sequence": 2, "title": "마트 하차·인수", "kind": "Command",
+      "worldAction": "도착 Cargo를 마트 하차 공간에서 인수한다.", "startStateCodes": ["ArrivedAtDestination"], "completionStateCodes": ["MarketReceived"],
+      "actorRequirements": ["마트 입고 담당"], "spatialRequirements": ["UnloadingWorkArea", "CargoAccessible", "WorkerAccessible"], "resourceRequirements": ["도착 Cargo"], "reservationKinds": ["WorkArea", "Actor"],
+      "previewRule": "도착 상태·담당자·하차 공간을 검사한다.", "confirmRule": "인수 작업과 공간을 예약한다.", "taskRule": "완료 Tick에 마트 인수 상태가 된다.", "effectCodes": ["MarketFreightReceived"], "cancellationPolicy": "완료 전 예약을 반환한다.", "blockReasonCodes": ["MarketReceivingUnavailable"],
+      "predecessorWiIds": ["WI-MARKET-01"], "successorWiIds": ["WI-MARKET-03"], "actionCode": "MarketFreightReceipt", "ruleRevision": "world-interaction.market-supply.r1", "saveReplayPayloadCodes": ["DecisionConfirm"], "httpContracts": ["기존 일반 Decision Preview/Confirm 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 하차·인수 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 하차·인수 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-MARKET-03", "groupCode": "MARKET", "sequence": 3, "title": "마트 입고검수", "kind": "Command",
+      "worldAction": "마트 인수 재고의 품질과 수량을 검수한다.", "startStateCodes": ["MarketReceived"], "completionStateCodes": ["MarketStorageEligible"],
+      "actorRequirements": ["마트 검수 담당"], "spatialRequirements": ["InspectionWorkArea", "WorkerAccessible"], "resourceRequirements": ["마트 인수 재고"], "reservationKinds": ["WorkArea", "Actor"],
+      "previewRule": "재고·담당자·검수 공간을 검사한다.", "confirmRule": "검수 작업을 확정한다.", "taskRule": "완료 시 후방 적재 가능 상태가 된다.", "effectCodes": ["MarketStorageEligible"], "cancellationPolicy": "완료 전 예약을 반환한다.", "blockReasonCodes": ["MarketInventoryStateInvalid"],
+      "predecessorWiIds": ["WI-MARKET-02"], "successorWiIds": ["WI-MARKET-04"], "actionCode": "MarketInboundInspection", "ruleRevision": "world-interaction.market-supply.r1", "saveReplayPayloadCodes": ["DecisionConfirm"], "httpContracts": ["기존 일반 Decision Preview/Confirm 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 입고 검수 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 입고 검수 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-MARKET-04", "groupCode": "MARKET", "sequence": 4, "title": "마트 후방 적재", "kind": "Command",
+      "worldAction": "검수 완료 마트 재고를 후방 창고에 적재한다.", "startStateCodes": ["MarketStorageEligible"], "completionStateCodes": ["MarketBackroomStored"],
+      "actorRequirements": ["마트 적재 담당"], "spatialRequirements": ["Storage", "LoadingWorkArea", "WorkerAccessible"], "resourceRequirements": ["마트 적재 가능 재고"], "reservationKinds": ["StorageCapacity", "WorkArea", "Actor"],
+      "previewRule": "후방 용량과 작업 영역을 검사한다.", "confirmRule": "용량·작업 영역·행위자를 예약한다.", "taskRule": "완료 시 후방 점유량이 증가한다.", "effectCodes": ["MarketBackroomStored"], "cancellationPolicy": "완료 전 용량 예약을 반환한다.", "blockReasonCodes": ["SimulationSpatialCapacityInsufficient"],
+      "predecessorWiIds": ["WI-MARKET-03"], "successorWiIds": ["WI-MARKET-05"], "actionCode": "MarketBackroomPutAway", "ruleRevision": "world-interaction.market-supply.r1", "saveReplayPayloadCodes": ["DecisionConfirm", "SpatialReservations"], "httpContracts": ["기존 일반 Decision Preview/Confirm 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 후방 적재 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 후방 적재 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-MARKET-05", "groupCode": "MARKET", "sequence": 5, "title": "진열 보충", "kind": "Command",
+      "worldAction": "후방 재고를 고객 진열 공간으로 옮긴다.", "startStateCodes": ["MarketBackroomStored"], "completionStateCodes": ["Displayed"],
+      "actorRequirements": ["진열 담당"], "spatialRequirements": ["DisplayArea", "CustomerAccessible", "WorkerAccessible"], "resourceRequirements": ["후방 재고"], "reservationKinds": ["DisplayCapacity", "WorkArea", "Actor"],
+      "previewRule": "후방 재고와 진열 용량을 검사한다.", "confirmRule": "진열 공간과 재고를 예약한다.", "taskRule": "완료 시 판매 가능한 진열 재고가 된다.", "effectCodes": ["DisplayStockReplenished"], "cancellationPolicy": "완료 전 예약을 반환한다.", "blockReasonCodes": ["DisplayCapacityInsufficient"],
+      "predecessorWiIds": ["WI-MARKET-04"], "successorWiIds": ["WI-ORDER-01"], "actionCode": "MarketDisplayReplenishment", "ruleRevision": "world-interaction.market-supply.r1", "saveReplayPayloadCodes": ["DecisionConfirm"], "httpContracts": ["기존 일반 Decision Preview/Confirm 재사용 예정"], "existingImplementationReferences": [],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 진열 보충 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 진열 보충 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-ORDER-01", "groupCode": "ORDER", "sequence": 1, "title": "주문 확정", "kind": "Command",
+      "worldAction": "주민의 수요 후보를 명시적 주문으로 확정한다.", "startStateCodes": ["DemandCandidate"], "completionStateCodes": ["OrderConfirmed"],
+      "actorRequirements": ["주문자"], "spatialRequirements": [], "resourceRequirements": ["상품·수량·가격 후보"], "reservationKinds": [],
+      "previewRule": "수요와 주문을 구분하고 주문 조건을 검사한다.", "confirmRule": "명시적 주문만 생성한다.", "taskRule": "주문 예약 자동 전이의 부모 원인이다.", "effectCodes": ["OrderConfirmed"], "cancellationPolicy": "예약·이행 단계에 따라 주문 취소 규칙을 적용한다.", "blockReasonCodes": ["OrderTermsInvalid"],
+      "predecessorWiIds": ["WI-MARKET-05"], "successorWiIds": ["WI-ORDER-02"], "actionCode": "IndividualOrderConfirm", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["DecisionConfirm", "IndividualOrders"], "httpContracts": ["기존 individual-order Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationIndividualOrder.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 확정 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 확정 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-ORDER-02", "groupCode": "ORDER", "sequence": 2, "title": "주문 재고 예약", "kind": "AutomaticTransition",
+      "worldAction": "확정 주문 수량을 시장 재고에서 예약한다.", "startStateCodes": ["OrderConfirmed"], "completionStateCodes": ["StockReserved"],
+      "actorRequirements": [], "spatialRequirements": [], "resourceRequirements": ["판매 재고"], "reservationKinds": ["Stock"],
+      "previewRule": "주문 Preview에서 재고 가능성을 계산한다.", "confirmRule": "주문 Confirm과 같은 원자적 변경으로 예약한다.", "taskRule": "독립 Task가 아니다.", "effectCodes": ["OrderStockReserved"], "cancellationPolicy": "주문 취소 시 미이행 예약을 반환한다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-ORDER-01"], "successorWiIds": ["WI-ORDER-03"], "actionCode": "OrderStockReservationTransition", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["StockReservations"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationIndividualOrder.cs"],
+      "automaticTransition": { "triggerWiId": "WI-ORDER-01", "triggerState": "OrderConfirmed", "targetState": "StockReserved", "causeLineage": "주문 DecisionStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 재고 예약 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 재고 예약 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-ORDER-03", "groupCode": "ORDER", "sequence": 3, "title": "주문 피킹", "kind": "AutomaticTransition",
+      "worldAction": "예약 재고를 주문별로 피킹한다.", "startStateCodes": ["StockReserved"], "completionStateCodes": ["Picked"],
+      "actorRequirements": [], "spatialRequirements": ["PickingWorkArea"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
+      "previewRule": "부모 주문 이행 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "주문 이행 Task의 하위 상태다.", "effectCodes": ["OrderStockPicked"], "cancellationPolicy": "부모 주문 이행 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-ORDER-02"], "successorWiIds": ["WI-ORDER-04"], "actionCode": "OrderPickingTransition", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["IndividualOrderState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": [],
+      "automaticTransition": { "triggerWiId": "WI-ORDER-01", "triggerState": "StockReserved", "targetState": "Picked", "causeLineage": "주문 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 피킹 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 피킹 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-ORDER-04", "groupCode": "ORDER", "sequence": 4, "title": "주문 포장", "kind": "AutomaticTransition",
+      "worldAction": "피킹된 주문 재고를 수령 단위로 포장한다.", "startStateCodes": ["Picked"], "completionStateCodes": ["Packed"],
+      "actorRequirements": [], "spatialRequirements": ["PackingWorkArea"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
+      "previewRule": "부모 주문 이행 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "주문 이행 Task의 하위 상태다.", "effectCodes": ["OrderPacked"], "cancellationPolicy": "부모 주문 이행 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-ORDER-03"], "successorWiIds": ["WI-ORDER-05"], "actionCode": "OrderPackingTransition", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["IndividualOrderState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": [],
+      "automaticTransition": { "triggerWiId": "WI-ORDER-01", "triggerState": "Picked", "targetState": "Packed", "causeLineage": "주문 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 포장 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 포장 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-ORDER-05", "groupCode": "ORDER", "sequence": 5, "title": "수령 준비", "kind": "AutomaticTransition",
+      "worldAction": "포장 주문을 주민 수령 가능 상태로 만든다.", "startStateCodes": ["Packed"], "completionStateCodes": ["ReadyForPickup"],
+      "actorRequirements": [], "spatialRequirements": ["CustomerAccessible"], "resourceRequirements": [], "reservationKinds": [],
+      "previewRule": "부모 주문 이행 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "포장 완료 뒤 자동 전이한다.", "effectCodes": ["OrderReadyForPickup"], "cancellationPolicy": "부모 주문 상태 규칙을 따른다.", "blockReasonCodes": [],
+      "predecessorWiIds": ["WI-ORDER-04"], "successorWiIds": ["WI-ORDER-06"], "actionCode": "OrderPickupReadyTransition", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["IndividualOrderState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationIndividualOrder.cs"],
+      "automaticTransition": { "triggerWiId": "WI-ORDER-01", "triggerState": "Packed", "targetState": "ReadyForPickup", "causeLineage": "주문 TaskStableId" },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 수령 준비 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 수령 준비 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-ORDER-06", "groupCode": "ORDER", "sequence": 6, "title": "주민 수령", "kind": "Command",
+      "worldAction": "주민이 준비된 주문을 수령한다.", "startStateCodes": ["ReadyForPickup"], "completionStateCodes": ["Fulfilled"],
+      "actorRequirements": ["주문자 또는 승인된 수령자"], "spatialRequirements": ["CustomerAccessible", "PickupArea"], "resourceRequirements": ["수령 준비 주문"], "reservationKinds": ["PickupArea"],
+      "previewRule": "수령자·주문·수령 공간을 검사한다.", "confirmRule": "수령 행위를 명시적으로 확정한다.", "taskRule": "완료 시 주문 이행 상태가 된다.", "effectCodes": ["OrderFulfilled"], "cancellationPolicy": "수령 확정 전 예약을 반환한다.", "blockReasonCodes": ["OrderNotReadyForPickup"],
+      "predecessorWiIds": ["WI-ORDER-05"], "successorWiIds": ["WI-ORDER-07"], "actionCode": "ResidentOrderPickup", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["DecisionConfirm", "IndividualOrderState"], "httpContracts": ["기존 주문 수령 Preview/Confirm 재사용 예정"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationIndividualOrder.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주민 수령 공간 예약 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주민 수령 공간 예약 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["수령 시 시장 재고를 한 번만 차감한다."]
+    },
+    {
+      "id": "WI-ORDER-07", "groupCode": "ORDER", "sequence": 7, "title": "주민 소비", "kind": "Command",
+      "worldAction": "주민이 이미 이행된 주문 상품을 소비 상태로 전환한다.", "startStateCodes": ["Fulfilled"], "completionStateCodes": ["Consumed"],
+      "actorRequirements": ["주문 수령 주민"], "spatialRequirements": [], "resourceRequirements": ["주민 보유 상품"], "reservationKinds": [],
+      "previewRule": "이행 계보와 중복 소비 여부를 검사한다.", "confirmRule": "소비 행위를 확정한다.", "taskRule": "완료 효과는 주민 상태만 바꾸고 시장 재고를 재차감하지 않는다.", "effectCodes": ["ResidentConsumed"], "cancellationPolicy": "소비 완료 뒤 취소하지 않는다.", "blockReasonCodes": ["OrderNotFulfilled", "ConsumptionAlreadyApplied"],
+      "predecessorWiIds": ["WI-ORDER-06"], "successorWiIds": [], "actionCode": "ResidentConsumption", "ruleRevision": "world-interaction.order.r1", "saveReplayPayloadCodes": ["DecisionConfirm", "MarketConsumptions"], "httpContracts": ["기존 market-consumption Preview/Confirm 재사용 예정"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationMarketConsumption.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 소비·시장 재고 단일 차감 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 소비·시장 재고 단일 차감 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["소비에서 시장 재고를 다시 차감하지 않는다."]
+    },
+    {
+      "id": "WI-WORLD-01", "groupCode": "WORLD", "sequence": 1, "title": "NPC 작업 배정", "kind": "SharedPolicy",
+      "worldAction": "여러 WI가 적격 NPC를 결정적으로 선택하고 배정한다.", "startStateCodes": ["Available"], "completionStateCodes": ["Assigned"],
+      "actorRequirements": ["ActionCode별 NPC capability"], "spatialRequirements": [], "resourceRequirements": ["노동 용량"], "reservationKinds": ["Actor", "Labor"],
+      "previewRule": "요구 역량·정책·현재 배정을 검사한다.", "confirmRule": "소비 WI의 Confirm 안에서 원자적으로 배정한다.", "taskRule": "독립 업무 Task를 만들지 않는다.", "effectCodes": ["NpcAssigned"], "cancellationPolicy": "소비 Task 취소 계보로 배정을 반환한다.", "blockReasonCodes": ["SimulationNpcCapabilityMissing", "SimulationNpcUnavailable"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "NpcAssignmentPolicy", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["NpcTaskAssignments"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationNpcWorkforce.cs"],
+      "sharedPolicy": { "consumers": ["WI-001", "WI-002", "WI-FARM-04", "WI-FARM-05", "WI-FARM-06"], "resultCodes": ["Assigned", "MissingCapability", "Unavailable"] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 결정적 배정 정책 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 결정적 배정 정책 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-02", "groupCode": "WORLD", "sequence": 2, "title": "NPC 역량 위임", "kind": "Command",
+      "worldAction": "승인된 주체가 NPC에 특정 업무 역량을 위임한다.", "startStateCodes": ["NotGranted"], "completionStateCodes": ["Granted"],
+      "actorRequirements": ["위임 권한 주체"], "spatialRequirements": [], "resourceRequirements": [], "reservationKinds": [],
+      "previewRule": "권한·대상·중복 위임을 검사한다.", "confirmRule": "역량 부여 원장을 갱신한다.", "taskRule": "즉시 상태 전이 또는 정책 Task를 따른다.", "effectCodes": ["NpcCapabilityGranted"], "cancellationPolicy": "철회는 별도 명령과 개정 검사를 사용한다.", "blockReasonCodes": ["NpcCapabilityGrantUnauthorized"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "NpcCapabilityGrant", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["NpcPolicyChange"], "httpContracts": ["기존 NPC policy 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationNpcWorkforce.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 역량 위임·저장재생 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 역량 위임·저장재생 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-03", "groupCode": "WORLD", "sequence": 3, "title": "작업 취소", "kind": "Command",
+      "worldAction": "진행 전 작업의 계보 소유 예약과 임시 상태를 취소한다.", "startStateCodes": ["Scheduled", "Blocked"], "completionStateCodes": ["Cancelled"],
+      "actorRequirements": ["취소 권한 주체"], "spatialRequirements": [], "resourceRequirements": [], "reservationKinds": ["LineageOwnedReservations"],
+      "previewRule": "현재 Task lifecycle과 취소 가능성을 검사한다.", "confirmRule": "CommandId·ExpectedRevision으로 취소를 확정한다.", "taskRule": "새 업무 Task를 만들지 않고 대상 Task를 취소한다.", "effectCodes": ["TaskCancelled", "ReservationsReleased"], "cancellationPolicy": "취소 명령 자체는 멱등 처리한다.", "blockReasonCodes": ["SimulationTaskCancellationNotAllowed"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "TaskCancel", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["TaskCancel"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/tasks/{taskStableId}/cancel"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/Simulation작업취소.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInboundInspectionUiVerticalSliceTests.cs의 작업 취소·예약 반환 HTTP 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInboundInspectionUiVerticalSliceTests.cs의 작업 취소·예약 반환 HTTP 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-04", "groupCode": "WORLD", "sequence": 4, "title": "시설 수리", "kind": "Command",
+      "worldAction": "손상된 시설의 회복 가능한 내구도를 수리한다.", "startStateCodes": ["Damaged"], "completionStateCodes": ["Repaired"],
+      "actorRequirements": ["수리 가능 행위자"], "spatialRequirements": ["WorkerAccessible", "RepairWorkArea"], "resourceRequirements": ["수리 자재", "노동"], "reservationKinds": ["WorkArea", "Actor", "Material"],
+      "previewRule": "손상·자재·행위자·공간을 검사한다.", "confirmRule": "수리 작업과 자재를 예약한다.", "taskRule": "완료 시 내구도와 회복 가능 손상을 갱신한다.", "effectCodes": ["FacilityRepaired"], "cancellationPolicy": "미사용 자재와 공간을 반환한다.", "blockReasonCodes": ["RepairMaterialInsufficient"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "FacilityRepair", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 경로 일부 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFarmSurvival.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 시설 수리 공간·자재 예약 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 시설 수리 공간·자재 예약 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-05", "groupCode": "WORLD", "sequence": 5, "title": "지역 발견", "kind": "Command",
+      "worldAction": "행위자가 아직 발견되지 않은 지역을 탐사한다.", "startStateCodes": ["Undiscovered"], "completionStateCodes": ["Discovered"],
+      "actorRequirements": ["탐사 가능 행위자"], "spatialRequirements": ["Traversable"], "resourceRequirements": ["탐사 시간"], "reservationKinds": ["Actor"],
+      "previewRule": "접근·발견 상태·행위자를 검사한다.", "confirmRule": "탐사 활동을 확정한다.", "taskRule": "완료 효과가 지역 발견 상태를 남긴다.", "effectCodes": ["RegionDiscovered"], "cancellationPolicy": "완료 전 행위자 예약을 반환한다.", "blockReasonCodes": ["RegionNotTraversable"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "RegionDiscovery", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["WorldItemAcquisitionConfirm", "Exploration"], "httpContracts": ["기존 탐사 경로 재사용 예정"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationWorldExploration.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationCollectibleCardRewardTests.cs의 지역 발견·저장재생·HTTP 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationCollectibleCardRewardTests.cs의 지역 발견·저장재생·HTTP 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-06", "groupCode": "WORLD", "sequence": 6, "title": "역할 카드 장착", "kind": "Command",
+      "worldAction": "팀 역할 카드를 명시적으로 장착한다.", "startStateCodes": ["Unequipped"], "completionStateCodes": ["Equipped"],
+      "actorRequirements": ["팀 역할 관리 권한"], "spatialRequirements": [], "resourceRequirements": ["보유 카드"], "reservationKinds": [],
+      "previewRule": "소유·슬롯·중복 상태를 검사한다.", "confirmRule": "ExpectedRevision으로 장착 상태를 확정한다.", "taskRule": "즉시 상태 전이한다.", "effectCodes": ["TeamRoleCardEquipped"], "cancellationPolicy": "해제는 별도 명령으로 처리한다.", "blockReasonCodes": ["TeamRoleCardUnavailable"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "TeamRoleCardEquip", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["TeamRoleCardEquip"], "httpContracts": ["기존 team-role-card 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationTeamRoleCards.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 역할 카드 장착·멱등성·HTTP 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 역할 카드 장착·멱등성·HTTP 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-07", "groupCode": "WORLD", "sequence": 7, "title": "활동 시작·종료", "kind": "Command",
+      "worldAction": "팀 활동을 시작하거나 종료한다.", "startStateCodes": ["Available", "Active"], "completionStateCodes": ["Active", "Completed"],
+      "actorRequirements": ["활동 관리 권한"], "spatialRequirements": [], "resourceRequirements": ["활동 조건"], "reservationKinds": ["ActivitySlot"],
+      "previewRule": "활동 상태·조건·중복을 검사한다.", "confirmRule": "시작 또는 종료 명령을 확정한다.", "taskRule": "활동 상태를 서버가 소유한다.", "effectCodes": ["TeamActivityStarted", "TeamActivityEnded"], "cancellationPolicy": "활동 규칙에 따른 종료 명령을 사용한다.", "blockReasonCodes": ["TeamActivityStateInvalid"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "TeamActivityLifecycle", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["TeamActivityStart", "TeamActivityEnd"], "httpContracts": ["기존 team-activity 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationTeamRoleCards.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 활동 시작·종료·저장재생 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 활동 시작·종료·저장재생 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-08", "groupCode": "WORLD", "sequence": 8, "title": "턴 마감", "kind": "Command",
+      "worldAction": "현재 턴의 결정·효과를 마감하고 다음 세계 상태를 연다.", "startStateCodes": ["TurnOpen"], "completionStateCodes": ["TurnClosed"],
+      "actorRequirements": ["턴 마감 권한"], "spatialRequirements": [], "resourceRequirements": [], "reservationKinds": [],
+      "previewRule": "미해결 필수 작업과 마감 조건을 검사한다.", "confirmRule": "ExpectedRevision으로 턴 마감을 확정한다.", "taskRule": "턴 효과와 후속 상태를 결정적으로 계산한다.", "effectCodes": ["TurnClosed"], "cancellationPolicy": "확정된 턴 마감은 취소하지 않고 후속 보정 명령을 사용한다.", "blockReasonCodes": ["TurnClosingBlocked"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "TurnClosing", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["TurnClosingConfirm"], "httpContracts": ["기존 turn-closing Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationTurnClosing.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationTurnClosingTests.cs의 Preview·Confirm·개정·저장재생·Controller 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationTurnClosingTests.cs의 Preview·Confirm·개정·저장재생·Controller 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    }
+  ]
+}

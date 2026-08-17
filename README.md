@@ -43,18 +43,20 @@
 ```text
 공공데이터 지형·법정동·건물
 └─ Simulation Session
-   ├─ 플레이어 직접 노동
-   ├─ NPC 위임 노동
-   ├─ 농장 방어
-   ├─ 좀비·가상 약탈자 사건
-   ├─ 회복 가능한 피해
+   ├─ 1~23일 경관 산책·지역 발견·선택 농사
+   ├─ 24~26일 계절 방어 예고·준비
+   ├─ 27일 자동 방어·직접 전투 선택
+   ├─ 28일 회복 가능한 결과와 계절 보고
+   ├─ 기존 전투 시나리오 호환
    └─ Save / Replay
       └─ Unity PresentationKey / VisualKey
          ├─ 현재 보유 Synty fallback
          └─ 향후 Apocalypse·Alpine 연결
 ```
 
-설계·구현 경계와 첫 7일 수직 단위는 [공공데이터 기반 Synty 농장 생존 Simulation 기획과 구현 기준](docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md)을 따릅니다.
+기본 경관 장, 계절 방어와 기존 전투 규칙의 호환 경계는 [공공데이터 기반 Synty 경관 생활·농장 생존 Simulation 기획과 구현 기준](docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md)을 따릅니다.
+
+계획·코드·DB·Runtime·Game View를 같은 완료로 섞지 않기 위해, 현재 남은 작업과 증거 단계는 [Simulation·Unity 미완료 실행 트리](docs/AI/generated/simulation-unity-execution-tree.md)에서 한눈에 확인합니다. 이 트리는 `eng/execution-ledgers/simulation-unity.json`에서 자동 생성되며 첫 종단 완결 대상은 대관령 중앙 L2 `kr5186:l2:700:1145`입니다.
 
 <p align="center">
   <a href="docs/ProjectOverview/page-docs/">
