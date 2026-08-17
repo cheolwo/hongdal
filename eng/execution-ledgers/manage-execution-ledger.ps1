@@ -50,7 +50,7 @@ $evidenceStages = @($stageCatalog.stages)
 Require (-not [string]::IsNullOrWhiteSpace($ledger.ledgerKey)) "LedgerKeyMissing"
 Require (-not [string]::IsNullOrWhiteSpace($ledger.revision)) "RevisionMissing"
 Require (-not [string]::IsNullOrWhiteSpace($ledger.evidenceStageCatalogPath)) "EvidenceStageCatalogPathMissing"
-Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v2") "EvidenceStageCatalogSchemaInvalid"
+Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v3") "EvidenceStageCatalogSchemaInvalid"
 Require ($evidenceStages.Count -eq 8) "EvidenceStagesMustHaveEightEntries"
 Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7") "EvidenceStageOrderInvalid"
 Require (@($ledger.items).Count -gt 0) "ItemsMissing"
@@ -163,7 +163,7 @@ foreach ($category in @($ledger.items | Sort-Object priority, id | Group-Object 
 [void] $builder.AppendLine("## 승격 규칙")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- 계획 문구나 코드 존재만으로 완료 처리하지 않는다.")
-[void] $builder.AppendLine("- E4는 의미 공간, E5는 이동 가능한 경관, E6는 WI 필수 공공데이터 연결, E7은 실제 플레이 폐루프다.")
+[void] $builder.AppendLine("- E4는 WI 공간 모판, E5는 실제 지역 경관, E6는 WI 필수 공공데이터 연결, E7은 실제 플레이 폐루프다.")
 [void] $builder.AppendLine("- 실제 DB 적용, HTTP 왕복, Play Mode, Game View, commit과 push는 서로 다른 증거다.")
 [void] $builder.AppendLine("- ``Done``은 목표 증거 단계와 검증 자료가 모두 있을 때만 허용한다.")
 [void] $builder.AppendLine("- 원자료가 부족하면 Fixture로 숨기지 않고 ``Blocked`` 또는 ``InProgress``와 차단 사유를 유지한다.")

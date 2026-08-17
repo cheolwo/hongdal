@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "simulation-evidence-stages.v2",
-  "revision": "simulation-evidence-stages.r2",
+  "schemaVersion": "simulation-evidence-stages.v3",
+  "revision": "simulation-evidence-stages.r3",
   "stages": [
     {
       "code": "E0",
@@ -24,13 +24,13 @@
     },
     {
       "code": "E4",
-      "label": "실제 의미 공간 귀속",
-      "completionGate": "세계 상호작용이 실제 LandscapeGraph Node의 역할·능력·용량과 닫힌 공간 전이에 연결되었다."
+      "label": "WI 공간 모판 완료",
+      "completionGate": "하나 이상의 E3 세계 상호작용이 위치 독립 공간 역할·능력·용량·내부 관계·외부 연결구를 가진 승인된 재사용 공간 모판에서 다시 실행되었다."
     },
     {
       "code": "E5",
-      "label": "이동 가능한 경관 조직",
-      "completionGate": "도로·교차로·Gate가 Block을 만들고 공간 역할·LandscapePattern과 경로가 결정적으로 연결되었다."
+      "label": "실제 지역 경관 조립",
+      "completionGate": "실제 AreaSet·LandscapeGraph의 도로·교차로·Gate가 Block을 만들고 승인된 E4 공간 모판 인스턴스와 실제 이동 경로가 결정적으로 연결되었다."
     },
     {
       "code": "E6",

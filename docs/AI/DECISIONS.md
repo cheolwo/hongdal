@@ -1676,3 +1676,14 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - E6: 선정 WI의 공간 판정에 필요한 최소 공공데이터만 E5 경관에 연결한다. 출처·기준일·좌표계·원본과 파생 hash·근거 수준·한계를 보존하며, 관계없는 자료의 부재는 승격을 막지 않는다. `Scenario`, `ReviewedDesign`, 통계 배분과 관측 위치를 서로 바꾸어 표현하지 않는다.
 - E7: 사람이 실제 Simulation 서버와 저장된 `SimulationWorldShell`에서 이동·선택·Preview·Confirm·Tick·재조회를 수행하고 Game View와 Console로 확인해야 한다. 자동 WI는 부모 명령 뒤의 자동 전이를 관찰한다. Unity는 입력과 표현만 담당하며 서버가 성공·효과·개정을 확정한다. 패키징 빌드·배포·운영 공개는 E7의 기본 완료 조건이 아니다.
 - 이관: E0~E3 증거는 유지한다. 이전 정의의 E4·E5 값은 새 의미로 자동 승계하지 않고 최대 E3으로 보수적으로 재분류한 뒤 새 관문 증거로 다시 승격한다. D-145의 E0~E6 종단선, D-148의 E4~E6 통합선과 D-150의 저장 Scene 중심 E4 완료 판정은 이 결정으로 구체화·대체한다.
+
+## D-152 E4는 WI 공간 모판이고 E5는 실제 지역 경관 조립이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-17
+- 결정: `E4`는 하나 이상의 E3 WI를 공간 역할·능력·업무 용량·내부 관계·외부 연결구와 결합한 위치 독립적이고 재사용 가능한 `WI 공간 모판` 완료선이다. E4는 E3를 대체하지 않고 포함하며, 모판 정의로 만든 `Scenario` 공간에서 동일한 Preview·Confirm·Task·Tick·Effect·Save/Replay를 다시 통과해야 한다.
+- E4 경계: E4 실행 권위는 버전 관리 JSON이고 사람이 읽는 Markdown은 의미·근거·한계를 설명한다. 모판은 허용된 경관 문법 `compositionKey` 후보와 회전·크기 제약을 가질 수 있지만 `AreaSet`, `LandscapeGraph`, Tile, 절대좌표, 실제 도로, Prefab·GUID·Material·Scene 경로를 가질 수 없다. `1 slot`은 물리 면적이 아니라 해당 작업을 동시에 한 건 예약할 수 있다는 Simulation 업무 용량이다.
+- E5 경계: `E5`는 실제 AreaSet·LandscapeGraph에서 도로 Network와 Junction이 만든 Block에 승인된 E4 모판 인스턴스를 배치하고, 추상 연결구를 실제 Node·Edge·GraphRelation에 결속하여 이동 가능한 지역 경관을 닫는 단계다. 기존 대관령 Farm의 공간 능력 연결과 Graph 폐루프 판정은 폐기하지 않고 E5 배치 후보 증거로 이관한다. 실제 Graph 모드에서 미해결 공간을 Scenario로 자동 대체하지 않는다.
+- 계약과 책임: WI 공간 모판은 새 운영 Domain 엔티티나 공개 API·저장 원장이 아니다. 기존 Unity 배치 객체 모판과 위치 독립성·결정적 해시·검토 승인 원칙은 공유하지만, WI 공간 모판 계약과 Unity 표현 모판 계약은 서로 분리한다. 새로운 `LandscapePattern` 계약을 만들지 않고 기존 156개 기준 경관 문법을 허용 후보로 재사용한다.
+- 후속 단계: E6는 E5 경관에 필요한 공공데이터 원본·파생·출처·해시 계보를 연결하고, E7은 실제 서버와 저장된 `SimulationWorldShell`에서 플레이어가 이동·선택·Preview·Confirm·Tick·재조회를 수행해 서버 상태와 Game View를 함께 확인한다.
+- 호환과 이관: 37개 WI의 E3 구현 증거, ActionCode, API, 상태 코드, Save/Replay 형식과 기존 Fixture 해시는 유지한다. D-151의 E6·E7 정의는 유지하고 E4·E5 정의만 이 결정으로 대체한다. D-150의 Graph 공간 폐루프는 E4 완료 조건이 아니라 E5 후보 검사로 재분류한다.
