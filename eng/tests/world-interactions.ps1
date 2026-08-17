@@ -24,6 +24,17 @@ if ((@($stages.stages.code) -join ",") -ne "E0,E1,E2,E3,E4,E5,E6,E7") {
 if (@($catalog.items | Where-Object { $_.integration.targetStage -ne "E7" }).Count -ne 0) {
     throw "WorldInteractionIntegrationTargetMustBeE7"
 }
+if ([string] $catalog.schemaVersion -ne "3" -or [string] $catalog.revision -ne "simulation-world-interactions.r3") {
+    throw "WorldInteractionCatalogRevisionMustBeR3"
+}
+$e4Items = @($catalog.items | Where-Object { $_.integration.currentStage -eq "E4" })
+if ($e4Items.Count -ne 13) { throw "WorldInteractionE4SeedbedItemCountMustBe13" }
+if (@($e4Items | Where-Object { @($_.integration.e4SeedbedRefs).Count -eq 0 }).Count -ne 0) {
+    throw "WorldInteractionE4SeedbedRefMissing"
+}
+if (@($e4Items.integration.e4SeedbedRefs | Select-Object -Unique).Count -ne 5) {
+    throw "WorldInteractionE4SeedbedCountMustBe5"
+}
 if ($check -notmatch "WorldInteractionCatalogValid:37") {
     throw "WorldInteractionCatalogValidationDidNotComplete"
 }

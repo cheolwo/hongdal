@@ -2,8 +2,8 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 개정: `simulation-world-interactions.r2`
-- 증거 단계 개정: `simulation-evidence-stages.r2`
+- 대장 개정: `simulation-world-interactions.r3`
+- 증거 단계 개정: `simulation-evidence-stages.r3`
 - 마지막 확인일: `2026-08-17`
 - 기본 구현 완료선: `E3 자동 시험 통과`
 - 실제 공간·공공데이터·Unity 통합 목표선: `E7 실제 플레이 폐루프`
@@ -25,19 +25,19 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 
 | WI | 종류 | 시작 → 완료 | 구현 | 통합 |
 | --- | --- | --- | --- | --- |
-| `WI-FARM-01` 밭갈기 | 명시적 명령 | Untilled → Tilled | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-FARM-02` 파종 | 명시적 명령 | Tilled → Growing | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-FARM-03` 관수·재배 관리 | 명시적 명령 | Growing → Growing, HarvestReady | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-FARM-04` 수확 | 명시적 명령 | HarvestReady → Harvested, HarvestedAtField | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-FARM-05` 수확물 집하 | 명시적 명령 | HarvestedAtField → CollectedAtYard | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-FARM-06` 출하 준비·포장 | 명시적 명령 | CollectedAtYard → PackedForShipment, PreparedForShipment | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
+| `WI-FARM-01` 밭갈기 | 명시적 명령 | Untilled → Tilled | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-FARM-02` 파종 | 명시적 명령 | Tilled → Growing | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-FARM-03` 관수·재배 관리 | 명시적 명령 | Growing → Growing, HarvestReady | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-FARM-04` 수확 | 명시적 명령 | HarvestReady → Harvested, HarvestedAtField | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-FARM-05` 수확물 집하 | 명시적 명령 | HarvestedAtField → CollectedAtYard | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-FARM-06` 출하 준비·포장 | 명시적 명령 | CollectedAtYard → PackedForShipment, PreparedForShipment | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 
 ## HUB 작업군
 
 | WI | 종류 | 시작 → 완료 | 구현 | 통합 |
 | --- | --- | --- | --- | --- |
-| `WI-001` 진부 Hub 입고검수 | 명시적 명령 | ArrivedAtDestination, PendingInspection → StorageEligible, Received | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-002` 진부 Hub 창고 적재 | 명시적 명령 | StorageEligible → PutAwayCompleted | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
+| `WI-001` 진부 Hub 입고검수 | 명시적 명령 | ArrivedAtDestination, PendingInspection → StorageEligible, Received | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-002` 진부 Hub 창고 적재 | 명시적 명령 | StorageEligible → PutAwayCompleted | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | `WI-HUB-03` 출고 요청 | 명시적 명령 | PutAwayCompleted → OutboundRequested | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | `WI-HUB-04` 피킹 | 자동 상태 전이 | OutboundRequested → Picked | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | `WI-HUB-05` 출고 준비 | 자동 상태 전이 | Picked → OutboundReady | 완료 · `E3→E3` | 미선정 · `E1→E7` |
@@ -47,11 +47,11 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 
 | WI | 종류 | 시작 → 완료 | 구현 | 통합 |
 | --- | --- | --- | --- | --- |
-| `WI-LOG-01` 차량 상차 확정 | 명시적 명령 | PreparedForShipment → Reserved | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-LOG-02` Farm 출발 | 자동 상태 전이 | Reserved → InTransit | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-LOG-03` Farm→Hub 화물 이동 | 자동 상태 전이 | InTransit → InTransit, ArrivedAtDestination | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-LOG-04` Hub 하차 | 자동 상태 전이 | InTransit → ArrivedAtDestination | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
-| `WI-LOG-05` Hub 인수 | 자동 상태 전이 | ArrivedAtDestination, PendingInspection → Received, StorageEligible | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
+| `WI-LOG-01` 차량 상차 확정 | 명시적 명령 | PreparedForShipment → Reserved | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-LOG-02` Farm 출발 | 자동 상태 전이 | Reserved → InTransit | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-LOG-03` Farm→Hub 화물 이동 | 자동 상태 전이 | InTransit → InTransit, ArrivedAtDestination | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-LOG-04` Hub 하차 | 자동 상태 전이 | InTransit → ArrivedAtDestination | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-LOG-05` Hub 인수 | 자동 상태 전이 | ArrivedAtDestination, PendingInspection → Received, StorageEligible | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 
 ## MARKET 작업군
 
@@ -88,7 +88,7 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 | `WI-WORLD-07` 활동 시작·종료 | 명시적 명령 | Available, Active → Active, Completed | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | `WI-WORLD-08` 턴 마감 | 명시적 명령 | TurnOpen → TurnClosed | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 
-## 첫 E3 인과선
+## 첫 E4 공간 모판 공급선
 
 ```text
 WI-FARM-04 수확 (100㎡ × 3kg/㎡ = 300kg)
@@ -107,6 +107,7 @@ WI-FARM-04 수확 (100㎡ × 3kg/㎡ = 300kg)
 
 - E3는 계약·코드·자동 시험의 구현 완료선이다.
 - Scenario 공간으로 통과한 E3는 실제 LandscapeGraph 또는 공공 공간자료 증거가 아니다.
-- E4는 실제 의미 공간 귀속, E5는 이동 가능한 경관 조직, E6는 WI 필수 공공데이터 연결이다.
+- E4는 하나 이상의 E3 WI를 품는 위치 독립 공간 모판 완료선이다. 실제 AreaSet·Graph·좌표를 요구하지 않는다.
+- E5는 승인된 E4 모판을 실제 AreaSet·도로·Block·LandscapeGraph에 배치해 이동 경로를 닫는 단계다.
 - 실제 서버와 저장 Scene에서 사람이 조작한 Play Mode·Game View·Console 증거가 있어야 E7이다.
 - Unity 애니메이션이나 GameObject 상태가 Task 완료를 확정하지 않는다.

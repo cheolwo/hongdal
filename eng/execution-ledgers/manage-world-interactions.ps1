@@ -41,10 +41,22 @@ Require-Text $catalog.revision "RevisionMissing"
 Require-Text $catalog.evidenceStageCatalogPath "EvidenceStageCatalogPathMissing"
 Require ([string] $catalog.defaultImplementationTargetStage -eq "E3") "DefaultImplementationTargetMustBeE3"
 Require ([string] $catalog.defaultIntegrationTargetStage -eq "E7") "DefaultIntegrationTargetMustBeE7"
-Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v2") "EvidenceStageCatalogSchemaInvalid"
+Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v3") "EvidenceStageCatalogSchemaInvalid"
 Require ($evidenceStages.Count -eq 8) "EvidenceStagesMustHaveEightEntries"
 Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7") "EvidenceStageOrderInvalid"
 Require (@($catalog.items).Count -eq 37) "WorldInteractionCountMustBe37"
+Require ([string] $catalog.schemaVersion -eq "3") "WorldInteractionCatalogSchemaMustBe3"
+
+$seedbedRoot = Join-Path $repositoryRoot "eng/world-seedbeds/wi-spatial-seedbeds"
+$seedbedCatalog = Get-Content -LiteralPath (Join-Path $seedbedRoot "catalog.json") -Raw -Encoding UTF8 |
+    ConvertFrom-Json
+$approvedSeedbedIds = @{}
+foreach ($definitionRef in @($seedbedCatalog.definitionRefs)) {
+    $definition = Get-Content -LiteralPath (Join-Path $seedbedRoot ([string] $definitionRef)) -Raw -Encoding UTF8 |
+        ConvertFrom-Json
+    Require ([string] $definition.reviewStatusCode -eq "ApprovedForSimulation") "SeedbedNotApproved:$($definition.stableId)"
+    $approvedSeedbedIds[[string] $definition.stableId] = $true
+}
 
 $allowedKinds = @("Command", "AutomaticTransition", "SharedPolicy")
 $allowedImplementationStatuses = @("NotStarted", "InProgress", "Blocked", "Done")
@@ -90,6 +102,13 @@ foreach ($item in @($catalog.items)) {
     if ([string] $implementation.status -eq "Done") {
         Require ([string] $implementation.currentStage -eq "E3") "ImplementationDoneWithoutE3:$id"
         Require (@($implementation.evidence).Count -gt 0) "ImplementationEvidenceMissing:$id"
+    }
+    if ($integrationCurrent -ge (Get-StageIndex $evidenceStages "E4")) {
+        Require ($integration.PSObject.Properties.Name -contains "e4SeedbedRefs") "E4SeedbedRefsMissing:$id"
+        Require (@($integration.e4SeedbedRefs).Count -gt 0) "E4SeedbedRefsEmpty:$id"
+        foreach ($seedbedRef in @($integration.e4SeedbedRefs)) {
+            Require ($approvedSeedbedIds.ContainsKey([string] $seedbedRef)) "E4SeedbedRefUnknown:${id}:$seedbedRef"
+        }
     }
     if ([string] $item.kind -eq "AutomaticTransition") {
         Require ($null -ne $item.automaticTransition) "AutomaticTransitionContractMissing:$id"
@@ -171,7 +190,7 @@ foreach ($group in @($catalog.items | Sort-Object groupCode, sequence | Group-Ob
 }
 
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("## 첫 E3 인과선")
+[void] $builder.AppendLine("## 첫 E4 공간 모판 공급선")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine('```text')
 [void] $builder.AppendLine("WI-FARM-04 수확 (100㎡ × 3kg/㎡ = 300kg)")
@@ -190,7 +209,8 @@ foreach ($group in @($catalog.items | Sort-Object groupCode, sequence | Group-Ob
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- E3는 계약·코드·자동 시험의 구현 완료선이다.")
 [void] $builder.AppendLine("- Scenario 공간으로 통과한 E3는 실제 LandscapeGraph 또는 공공 공간자료 증거가 아니다.")
-[void] $builder.AppendLine("- E4는 실제 의미 공간 귀속, E5는 이동 가능한 경관 조직, E6는 WI 필수 공공데이터 연결이다.")
+[void] $builder.AppendLine("- E4는 하나 이상의 E3 WI를 품는 위치 독립 공간 모판 완료선이다. 실제 AreaSet·Graph·좌표를 요구하지 않는다.")
+[void] $builder.AppendLine("- E5는 승인된 E4 모판을 실제 AreaSet·도로·Block·LandscapeGraph에 배치해 이동 경로를 닫는 단계다.")
 [void] $builder.AppendLine("- 실제 서버와 저장 Scene에서 사람이 조작한 Play Mode·Game View·Console 증거가 있어야 E7이다.")
 [void] $builder.AppendLine("- Unity 애니메이션이나 GameObject 상태가 Task 완료를 확정하지 않는다.")
 

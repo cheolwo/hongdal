@@ -1,7 +1,7 @@
 {
   "catalogKey": "simulation-world-interactions",
-  "schemaVersion": "2",
-  "revision": "simulation-world-interactions.r2",
+  "schemaVersion": "3",
+  "revision": "simulation-world-interactions.r3",
   "lastVerifiedDate": "2026-08-17",
   "defaultImplementationTargetStage": "E3",
   "defaultIntegrationTargetStage": "E7",
@@ -19,7 +19,7 @@
       "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/confirm"],
       "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFarmSurvival.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 밭갈이 자동 시험 통과."] },
-      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["대관령 Farm Graph의 agriculture-region Node와 ReviewedDesign 1 slot을 사용해 Preview·Confirm·예약·Task·Effect·Save/Replay 자동 시험 및 로컬 파생 DB 저장을 통과했다. 저장 Scene 적용은 남아 있다."] },
+      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:wi-farm-01:production-plot"], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판에서 Preview·Confirm·예약·Task·Effect·Save/Replay를 다시 통과했다. 기존 Graph·DB 증거는 E5 배치 후보로 보존한다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
@@ -30,7 +30,7 @@
       "cancellationPolicy": "작업 전 예약을 반환하며 이미 소비된 종자는 별도 규칙을 따른다.", "blockReasonCodes": ["CultivationParcelUnavailable", "SeedInsufficient"],
       "predecessorWiIds": ["WI-FARM-01"], "successorWiIds": ["WI-FARM-03"], "actionCode": "Sowing", "ruleRevision": "world-interaction.farm.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 파종·종자 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["대관령 Farm Graph 생산구획에서 선행 밭갈이와 후속 재배 관리까지 공간 폐루프를 확인하고 Graph 근거 작업을 완료했다. 저장 Scene 적용은 남아 있다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 파종·종자 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:wi-farm-02:production-plot"], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판에서 파종 공간 요구와 공급선 재실행을 통과했다. 기존 Graph·DB 증거는 E5 배치 후보로 보존한다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
@@ -41,7 +41,7 @@
       "cancellationPolicy": "미사용 예약만 반환한다.", "blockReasonCodes": ["CropStateInvalid", "WaterUnavailable"],
       "predecessorWiIds": ["WI-FARM-02"], "successorWiIds": ["WI-FARM-04"], "actionCode": "CropCare", "ruleRevision": "world-interaction.farm.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 재배 관리·물 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["대관령 Farm Graph 생산구획에서 수확 직전까지 공간 폐루프를 확인하고 Graph 근거 작업을 완료했다. 저장 Scene 적용은 남아 있다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 재배 관리·물 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:wi-farm-03:production-plot"], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판에서 재배 관리 공간 요구와 공급선 재실행을 통과했다. 기존 Graph·DB 증거는 E5 배치 후보로 보존한다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
@@ -53,7 +53,7 @@
       "predecessorWiIds": ["WI-FARM-03"], "successorWiIds": ["WI-FARM-05"], "actionCode": "Harvesting", "ruleRevision": "world-interaction.farm-supply.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm", "CultivationUnits", "HarvestLots"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/confirm"],
       "existingImplementationReferences": ["Ssalddel.Simulation.Domain/Simulation감자생산규칙.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg 결정적 수확·공간 예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 농장 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg 결정적 수확·공간 예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판의 수확 작업과 작업마당 출력 연결구를 사용해 300kg 공급선 재실행을 통과했다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Contracts/Simulation감자생산Contracts.cs"], "notes": ["Scenario 공간은 실제 공공 공간자료 증거가 아니다."]
     },
     {
@@ -64,7 +64,7 @@
       "cancellationPolicy": "완료 전 Lot·작업 영역 예약을 반환한다.", "blockReasonCodes": ["HarvestLotStateInvalid", "SimulationSpatialReservationConflict"],
       "predecessorWiIds": ["WI-FARM-04"], "successorWiIds": ["WI-FARM-06"], "actionCode": "HarvestCollection", "ruleRevision": "world-interaction.farm-supply.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm", "HarvestLots"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["수확 Lot 집하 상태 전이·공간 예약·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 집하 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["수확 Lot 집하 상태 전이·공간 예약·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-work-yard.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 작업마당 공간 모판의 집하영역에서 공간 예약과 공급선 재실행을 통과했다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
@@ -75,7 +75,7 @@
       "cancellationPolicy": "완료 전 Lot·작업 영역 예약을 반환한다.", "blockReasonCodes": ["HarvestLotStateInvalid", "PackingWorkAreaUnavailable"],
       "predecessorWiIds": ["WI-FARM-05"], "successorWiIds": ["WI-LOG-01"], "actionCode": "OutboundPacking", "ruleRevision": "world-interaction.farm-supply.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm", "HarvestLots", "PackageLots"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/SimulationLogisticsMovementContracts.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg PackageLot·Cargo·출하 배분 계보와 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 포장 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg PackageLot·Cargo·출하 배분 계보와 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-work-yard.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 작업마당 공간 모판의 포장영역과 상차 출력 연결구에서 300kg Cargo 계보를 재검증했다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["기존 물류 요청의 HarvestLotStableId·PackageLotStableId·CargoStableId를 이어 쓴다."]
     },
     {
@@ -86,7 +86,7 @@
       "cancellationPolicy": "출발 전 모든 예약을 계보로 반환한다.", "blockReasonCodes": ["FreightVehicleCapacityExceeded", "SimulationSpatialReservationConflict"],
       "predecessorWiIds": ["WI-FARM-06"], "successorWiIds": ["WI-LOG-02"], "actionCode": "CargoRouteMovement", "ruleRevision": "world-interaction.logistics.r1",
       "saveReplayPayloadCodes": ["LogisticsMovementConfirm", "SpatialReservations"], "httpContracts": ["기존 logistics-movements 또는 freight-transports Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs", "Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["상차 공간·차량 용량·원본 배분 예약과 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 상차 공간만 사용하며 실제 차량·LandscapeGraph·Unity 검증은 남아 있다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["상차 공간·차량 용량·원본 배분 예약과 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 상차·Gate 공간 모판의 상차영역에서 차량·화물·작업영역 요구를 재검증했다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["하나의 명령이 출발·이동·도착 자동 전이의 원인이다."]
     },
     {
@@ -97,7 +97,7 @@
       "cancellationPolicy": "출발 이후 취소 규칙은 부모 운송 작업이 소유한다.", "blockReasonCodes": [], "predecessorWiIds": ["WI-LOG-01"], "successorWiIds": ["WI-LOG-03"],
       "actionCode": "CargoDepartureTransition", "ruleRevision": "world-interaction.logistics.r1", "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs"],
       "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "Reserved", "targetState": "InTransit", "causeLineage": "부모 물류 TaskStableId" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["운송 첫 Tick에서 상차 공간 예약 해제와 운송중 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 공간·논리 이동만 검증했으며 실제 차량 표현은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["운송 첫 Tick에서 상차 공간 예약 해제와 운송중 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 상차·Gate 공간 모판에서 상차영역과 Farm Gate의 내부 전이 및 회랑 출력 연결구를 검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
       "id": "WI-LOG-03", "groupCode": "LOG", "sequence": 3, "title": "Farm→Hub 화물 이동", "kind": "AutomaticTransition",
@@ -107,7 +107,7 @@
       "predecessorWiIds": ["WI-LOG-02"], "successorWiIds": ["WI-LOG-04"], "actionCode": "CargoRouteProgressTransition", "ruleRevision": "world-interaction.logistics.r1",
       "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs"],
       "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "InTransit", "targetState": "ArrivedAtDestination", "causeLineage": "부모 물류 TaskStableId와 WorldTick" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["3 Tick Farm→Hub 회랑 진행과 Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 회랑만 사용하며 실제 경로·Unity 이동 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["3 Tick Farm→Hub 회랑 진행과 Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-hub-corridor.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Farm–Hub 화물회랑 공간 모판에서 3 Tick 이동과 양쪽 외부 연결구 요구를 재검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
       "id": "WI-LOG-04", "groupCode": "LOG", "sequence": 4, "title": "Hub 하차", "kind": "AutomaticTransition",
@@ -117,7 +117,7 @@
       "predecessorWiIds": ["WI-LOG-03"], "successorWiIds": ["WI-LOG-05"], "actionCode": "CargoUnloadTransition", "ruleRevision": "world-interaction.logistics.r1",
       "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
       "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "InTransit", "targetState": "ArrivedAtDestination", "causeLineage": "부모 물류 TaskStableId" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["도착 Tick에서 하차 공간 예약 해제와 하차지도착 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 하차 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["도착 Tick에서 하차 공간 예약 해제와 하차지도착 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:hub-receiving-storage.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Hub 입고·보관 공간 모판의 하차영역과 검수 인계 관계에서 도착 전이를 재검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
       "id": "WI-LOG-05", "groupCode": "LOG", "sequence": 5, "title": "Hub 인수", "kind": "AutomaticTransition",
@@ -127,7 +127,7 @@
       "predecessorWiIds": ["WI-LOG-04"], "successorWiIds": ["WI-001"], "actionCode": "FreightReceiptTransition", "ruleRevision": "world-interaction.hub.r1",
       "saveReplayPayloadCodes": ["FreightReceipt", "NpcFacilityInventory"], "httpContracts": ["독립 경로 없음; freight-receipts Preview/Confirm은 WI-001이 소유"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
       "automaticTransition": { "triggerWiId": "WI-001", "triggerState": "PendingInspection", "targetState": "StorageEligible", "causeLineage": "WI-001 입고검수 TaskStableId" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["기존 입고검수 Confirm 안의 인수 계보와 PendingInspection 생성을 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario Hub 공간만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["별도 인수 Confirm API를 만들지 않는다."]
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["기존 입고검수 Confirm 안의 인수 계보와 PendingInspection 생성을 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:hub-receiving-storage.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Hub 입고·보관 공간 모판의 검수영역에서 기존 입고검수 부모 명령 안의 자동 인수 계보를 재검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["별도 인수 Confirm API를 만들지 않는다."]
     },
     {
       "id": "WI-001", "groupCode": "HUB", "sequence": 1, "title": "진부 Hub 입고검수", "kind": "Command",
@@ -139,7 +139,7 @@
       "saveReplayPayloadCodes": ["DecisionConfirm", "SpatialReservations", "TaskCancel"], "httpContracts": ["기존 freight-receipts Preview/Confirm 경로", "POST /api/simulation/v1/sessions/{sessionStableId}/tasks/{taskStableId}/cancel"],
       "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFreightTransport.cs", "Ssalddel.Simulation.Domain/Simulation공간상호작용.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["공간 능력·예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] },
-      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 공간 근거만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:hub-receiving-storage.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Hub 입고·보관 공간 모판의 검수영역에서 Preview·Confirm·인수 자동 전이·Save/Replay를 재검증했다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Tests/Simulation공간상호작용Tests.cs"], "notes": ["구현 완료 E3와 실제 공간·Unity 통합 완료를 분리한다."]
     },
     {
@@ -152,7 +152,7 @@
       "saveReplayPayloadCodes": ["DecisionConfirm", "SpatialReservations", "TaskCancel"], "httpContracts": ["기존 warehouse-putaway Preview/Confirm 경로", "POST /api/simulation/v1/sessions/{sessionStableId}/tasks/{taskStableId}/cancel"],
       "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationWarehousePutAway.cs", "Ssalddel.Simulation.Domain/Simulation공간상호작용.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["용량·작업영역 예약·완료·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] },
-      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Scenario 창고 근거만 사용하며 실제 LandscapeGraph·Unity 검증은 남아 있다."] },
+      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:hub-receiving-storage.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Hub 입고·보관 공간 모판의 보관영역에서 300kg 적재·용량 전환·Save/Replay를 재검증했다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Tests/Simulation공간상호작용Tests.cs"], "notes": ["AvailableCapacity는 저장하지 않고 계산한다."]
     },
     {
