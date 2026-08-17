@@ -61,6 +61,8 @@ public sealed class SimulationWorld파생DbContext(
     public DbSet<SimulationWorld경관Graph공간참조Entity> LandscapeGraphSpatialRefs => Set<SimulationWorld경관Graph공간참조Entity>();
     public DbSet<SimulationWorld경관GraphTile참조Entity> LandscapeGraphTileRefs => Set<SimulationWorld경관GraphTile참조Entity>();
     public DbSet<SimulationWorld경관Graph관계Entity> LandscapeGraphRelations => Set<SimulationWorld경관Graph관계Entity>();
+    public DbSet<SimulationWorld상호작용Graph준비도Entity> WorldInteractionGraphReadiness =>
+        Set<SimulationWorld상호작용Graph준비도Entity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -115,6 +117,7 @@ public sealed class SimulationWorld파생DbContext(
         modelBuilder.ApplyConfiguration(new SimulationWorld경관Graph공간참조Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorld경관GraphTile참조Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorld경관Graph관계Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationWorld상호작용Graph준비도Configuration());
     }
 }
 
@@ -585,6 +588,8 @@ public static class SimulationWorldDerivationPersistenceRegistration
             SimulationWorldLandscapeCompositionStore>();
         services.AddScoped<ISimulationWorldAreaSetGraphStore,
             SimulationWorldAreaSetGraphStore>();
+        services.AddScoped<ISimulationWorld상호작용GraphReadinessStore,
+            SimulationWorld상호작용GraphReadinessStore>();
         services.AddSingleton<ISimulationWorldLandscapeGrammarCatalogReader>(
             new SimulationWorldLandscapeGrammarManifestReader(
                 landscapeGrammarManifestPath ?? string.Empty));

@@ -129,6 +129,12 @@ public sealed class SimulationWorldUIProjectionService
                 : !inspectorAvailable
                     ? InboundInspectorNotAvailableCode
                     : null;
+        actionBlockReason ??= ResolveSpatialActionBlock(
+            session,
+            surface.FacilityStableId,
+            putAwayFlow,
+            putAwayCandidate?.Quantity ?? 0m,
+            putAwayCandidate?.UnitCode ?? "KGM");
 
         return new SimulationWorldUIProjection
         {
@@ -217,10 +223,16 @@ public sealed class SimulationWorldUIProjectionService
                     : putAwayCompleted > 0
                         ? "적재 완료된 재고를 확인"
                         : "도착 화물 대기";
+        var spatialStatus = ResolveSpatialKoreanStatus(
+            session,
+            surface.FacilityStableId,
+            putAwayCandidate != null || activePutAway,
+            putAwayCandidate?.Quantity ?? 0m,
+            putAwayCandidate?.UnitCode ?? "KGM");
         var values = new Dictionary<string, (string Value, string Status, string? Source, string? Limitation)>(StringComparer.Ordinal)
         {
             ["Summary"] = ($"도착 화물 {freightAtFacility.Count}건 · 검수 대기 {pendingInspection}건 · 적재 대기 {putAwayPending}건 · 적재 완료 {putAwayCompleted}건", "Derived", surface.FacilityStableId, null),
-            ["Status"] = (active == null ? stateKoreanLabel : stateKoreanLabel + " · " + PhaseKorean(active.ActionCode, active.PhaseCode), "Derived", active?.AssignmentStableId ?? surface.FacilityStableId, null),
+            ["Status"] = ((active == null ? stateKoreanLabel : stateKoreanLabel + " · " + PhaseKorean(active.ActionCode, active.PhaseCode)) + " · " + spatialStatus, "Derived", active?.AssignmentStableId ?? surface.FacilityStableId, null),
             ["NextStep"] = (nextStep, "Derived", putAwayCandidate?.InventoryStableId ?? receivableFreight?.TransportRequestStableId, null),
             ["Evidence"] = ($"{evidenceRule} · {_businessRules.CatalogRevision}", "Derived", evidenceRule, null),
             ["Limitation"] = ("Simulation 상태 표현이며 실제 입고·검수·재고 업무를 변경하지 않음", "Scenario", session.ScenarioStableId, "SimulationOnly"),
@@ -247,6 +259,76 @@ public sealed class SimulationWorldUIProjectionService
                 };
             })
             .ToArray();
+    }
+
+    private static string? ResolveSpatialActionBlock(
+        경영SimulationSessionSnapshot session,
+        string facilityStableId,
+        bool putAway,
+        decimal quantity,
+        string unitCode)
+    {
+        var requiredCapability = putAway
+            ? Simulation공간능력Codes.LoadingWorkArea
+            : Simulation공간능력Codes.InspectionWorkArea;
+        var definitions = session.SpatialDefinitions.Where(value =>
+                value.FacilityStableId == facilityStableId
+                && value.CapabilityCodes.Contains(requiredCapability, StringComparer.Ordinal))
+            .OrderBy(value => value.SpatialStableId, StringComparer.Ordinal).ToArray();
+        if (definitions.Length == 0) return Simulation공간차단Codes.DefinitionUnavailable;
+        foreach (var definition in definitions)
+        {
+            var runtime = session.SpatialRuntimeStates.Single(value =>
+                value.SpatialStableId == definition.SpatialStableId);
+            if (runtime.AccessStateCode != Simulation공간접근상태Codes.Available) continue;
+            if (AvailableCapacity(definition, runtime, Simulation공간용량Codes.WorkArea, "slot") < 1m)
+                continue;
+            if (!putAway || AvailableCapacity(definition, runtime,
+                    Simulation공간용량Codes.StorageCapacity, unitCode) >= quantity)
+                return null;
+        }
+        if (definitions.All(value => session.SpatialRuntimeStates.Single(runtime =>
+                runtime.SpatialStableId == value.SpatialStableId).AccessStateCode
+                != Simulation공간접근상태Codes.Available))
+            return Simulation공간차단Codes.AccessUnavailable;
+        return putAway
+            ? Simulation공간차단Codes.CapacityInsufficient
+            : Simulation공간차단Codes.ReservationConflict;
+    }
+
+    private static string ResolveSpatialKoreanStatus(
+        경영SimulationSessionSnapshot session,
+        string facilityStableId,
+        bool putAway,
+        decimal quantity,
+        string unitCode)
+    {
+        var block = ResolveSpatialActionBlock(
+            session, facilityStableId, putAway, quantity, unitCode);
+        if (block == null) return putAway ? "적재 공간 사용 가능" : "검수 공간 사용 가능";
+        return block switch
+        {
+            Simulation공간차단Codes.DefinitionUnavailable => "공간 정의 없음",
+            Simulation공간차단Codes.AccessUnavailable => "공간 접근 차단",
+            Simulation공간차단Codes.CapacityInsufficient => "공간 용량 부족",
+            Simulation공간차단Codes.ReservationConflict => "작업 공간 예약 중",
+            _ => "공간 조건 미충족",
+        };
+    }
+
+    private static decimal AvailableCapacity(
+        Simulation공간정의Snapshot definition,
+        Simulation공간실행상태Snapshot runtime,
+        string capacityCode,
+        string unitCode)
+    {
+        var baseValue = definition.BaseCapacities.FirstOrDefault(value =>
+            value.CapacityCode == capacityCode && value.UnitCode == unitCode)?.Quantity ?? 0m;
+        var occupied = runtime.OccupiedCapacities.FirstOrDefault(value =>
+            value.CapacityCode == capacityCode && value.UnitCode == unitCode)?.Quantity ?? 0m;
+        var reserved = runtime.ReservedCapacities.FirstOrDefault(value =>
+            value.CapacityCode == capacityCode && value.UnitCode == unitCode)?.Quantity ?? 0m;
+        return baseValue - occupied - reserved;
     }
 
     private IReadOnlyList<SimulationWorldUIProjectionAction> ProjectActions(

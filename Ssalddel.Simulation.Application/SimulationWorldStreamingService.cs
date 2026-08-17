@@ -3,14 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Contracts;
+using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Application
 {
     /// <summary>
     /// 대관령 Farm L2 공간의 자료 조사 기반 다단계 스트림 계약을 제공한다.
-    /// 현재 물리 DEM 산출물은 등록되지 않았으므로 URL이나 높이를 꾸며내지 않는다.
+    /// 파생 DB에 완료 산출물이 있으면 출처와 형식을 함께 투영하고, 없으면 자료 대기로 남긴다.
     /// </summary>
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldStreaming,
+        SsalddelCodeLayer.Application,
+        "카메라·플레이어 경계 접근에 필요한 타일 Recipe와 Manifest Projection을 제공한다.",
+        StepKey = "application.world-stream",
+        DependsOnStepKeys = new string[] { "api.world-stream" },
+        ExecutionStage = SsalddelCodeExecutionStage.Projection,
+        ReadsFrom = SsalddelCodeDataScope.DerivedWorld,
+        FlowOrder = 30,
+        Boundary = "자료가 없는 DEM·배치 좌표·URL을 꾸며내지 않고 명시된 제공 범위만 투영한다.")]
     public sealed class SimulationWorldStreamingService
     {
         public const int CenterX = 700;
@@ -22,8 +34,8 @@ namespace Ssalddel.Simulation.Application
         public const int MaxConcurrentTileLoads = 4;
         public const double BoundaryPrefetchFraction = 0.25d;
         public const int L2HaloMeters = 60;
-        public const string RecipeRevision = "world-stream.pyeongchang-farm.r2";
-        public const string ManifestRevision = "world-stream.tile-manifest.r1";
+        public const string RecipeRevision = "world-stream.pyeongchang-farm.r3";
+        public const string ManifestRevision = "world-stream.tile-manifest.r2";
         public const string ObjectPlacementRevision = "world-stream.object-placement.r1";
 
         private static readonly string[] LayerCodes =
@@ -35,9 +47,18 @@ namespace Ssalddel.Simulation.Application
 
         private readonly SimulationWorldStreamRecipeResponse recipe;
         private readonly HashSet<string> coverage;
+        private readonly ISimulationWorldTileArtifactReader artifactReader;
 
         public SimulationWorldStreamingService()
+            : this(new DisabledSimulationWorldTileArtifactReader())
         {
+        }
+
+        public SimulationWorldStreamingService(ISimulationWorldTileArtifactReader artifactReader)
+        {
+            this.artifactReader = artifactReader
+                ?? throw new ArgumentNullException(nameof(artifactReader));
+            var summaryProfile = SimulationWorld지역표현요약Profile.CreateDefault();
             var tileKeys = CreateCoverageTileKeys();
             coverage = new HashSet<string>(tileKeys, StringComparer.Ordinal);
             recipe = new SimulationWorldStreamRecipeResponse
@@ -56,6 +77,10 @@ namespace Ssalddel.Simulation.Application
                 CenterTileY = CenterY,
                 CoverageTileKeys = tileKeys,
                 LayerCodes = LayerCodes.ToArray(),
+                RegionSummaryProfileRevision = summaryProfile.ProfileRevision,
+                RegionSummaryProfileHashSha256 = summaryProfile.ComputeHash(),
+                SupportedSummaryLodCodes = summaryProfile.Budgets
+                    .Select(item => item.LodCode).ToArray(),
                 IsOperationalState = false,
                 EvidenceKindCode = SimulationWorldStreamCodes.Derived,
             };
@@ -81,7 +106,7 @@ namespace Ssalddel.Simulation.Application
             if (!coverage.Contains(tileKey) || !TryParseTileKey(tileKey, out var x, out var y))
                 return false;
 
-            var layers = LayerCodes.Select(code => CreateLayer(code)).ToArray();
+            var layers = LayerCodes.Select(code => CreateLayer(tileKey, code)).ToArray();
             value = new SimulationWorldTileStreamManifestResponse
             {
                 RecipeStableId = recipe.RecipeStableId,
@@ -91,6 +116,9 @@ namespace Ssalddel.Simulation.Application
                 TileY = y,
                 HaloMeters = L2HaloMeters,
                 ManifestRevision = ManifestRevision,
+                RegionSummaryProfileRevision = recipe.RegionSummaryProfileRevision,
+                RegionSummaryStatusCode = SimulationWorldStreamCodes.RegionSummaryWaitingForDerivedData,
+                RegionSummaryHashSha256 = null,
                 Layers = layers,
                 IsOperationalState = false,
             };
@@ -107,7 +135,7 @@ namespace Ssalddel.Simulation.Application
             if (!coverage.Contains(tileKey) || !LayerCodes.Contains(layerCode, StringComparer.Ordinal))
                 return false;
 
-            var layer = CreateLayer(layerCode);
+            var layer = CreateLayer(tileKey, layerCode);
             value = new SimulationWorldTileArtifactDescriptorResponse
             {
                 TileKey = tileKey,
@@ -117,8 +145,21 @@ namespace Ssalddel.Simulation.Application
                 SourceRevision = layer.SourceRevision,
                 ArtifactHashSha256 = layer.ArtifactHashSha256,
                 ArtifactRelativePath = layer.ArtifactRelativePath,
+                ArtifactContentPath = layer.ArtifactContentPath,
+                SourceHashSha256 = layer.SourceHashSha256,
+                SourceReferenceDate = layer.SourceReferenceDate,
+                HorizontalCrsCode = layer.HorizontalCrsCode,
+                VerticalDatumCode = layer.VerticalDatumCode,
+                ResolutionMeters = layer.ResolutionMeters,
+                NoDataValue = layer.NoDataValue,
+                ArtifactFormatCode = layer.ArtifactFormatCode,
+                ArtifactByteLength = layer.ArtifactByteLength,
+                SampleWidth = layer.SampleWidth,
+                SampleHeight = layer.SampleHeight,
                 PresentationOnly = layer.PresentationOnly,
-                KoreanStatusLabel = "공간 산출물 자료 대기",
+                KoreanStatusLabel = layer.StatusCode == SimulationWorldStreamCodes.Available
+                    ? "검증된 공간 산출물 사용 가능"
+                    : "공간 산출물 자료 대기",
             };
             return true;
         }
@@ -187,14 +228,41 @@ namespace Ssalddel.Simulation.Application
                 && int.TryParse(parts[3], out y);
         }
 
-        private static SimulationWorldTileLayerDescriptorResponse CreateLayer(string code)
-            => new SimulationWorldTileLayerDescriptorResponse
+        private SimulationWorldTileLayerDescriptorResponse CreateLayer(string tileKey, string code)
+        {
+            if (!string.IsNullOrWhiteSpace(tileKey)
+                && artifactReader.TryRead(tileKey, code, out var artifact))
+                return new SimulationWorldTileLayerDescriptorResponse
+                {
+                    LayerCode = code,
+                    StatusCode = SimulationWorldStreamCodes.Available,
+                    EvidenceKindCode = code == SimulationWorldStreamCodes.PlacementMaskLayer
+                        ? SimulationWorldStreamCodes.Derived
+                        : SimulationWorldStreamCodes.Observed,
+                    SourceRevision = artifact.SourceRevision,
+                    ArtifactHashSha256 = artifact.ArtifactHashSha256,
+                    ArtifactRelativePath = artifact.ArtifactRelativePath,
+                    ArtifactContentPath = ArtifactContentPath(tileKey, code),
+                    SourceHashSha256 = artifact.SourceHashSha256,
+                    SourceReferenceDate = artifact.SourceReferenceDate,
+                    HorizontalCrsCode = artifact.HorizontalCrsCode,
+                    VerticalDatumCode = artifact.VerticalDatumCode,
+                    ResolutionMeters = artifact.ResolutionMeters,
+                    NoDataValue = artifact.NoDataValue,
+                    ArtifactFormatCode = artifact.ArtifactFormatCode,
+                    ArtifactByteLength = artifact.ArtifactByteLength,
+                    SampleWidth = artifact.SampleWidth,
+                    SampleHeight = artifact.SampleHeight,
+                    PresentationOnly = false,
+                };
+
+            return new SimulationWorldTileLayerDescriptorResponse
             {
                 LayerCode = code,
                 StatusCode = SimulationWorldStreamCodes.WaitingForSpatialArtifact,
-                EvidenceKindCode = code == SimulationWorldStreamCodes.ElevationLayer
-                    ? SimulationWorldStreamCodes.Observed
-                    : SimulationWorldStreamCodes.Derived,
+                EvidenceKindCode = code == SimulationWorldStreamCodes.PlacementMaskLayer
+                    ? SimulationWorldStreamCodes.Derived
+                    : SimulationWorldStreamCodes.Observed,
                 SourceRevision = code == SimulationWorldStreamCodes.ElevationLayer
                     ? "dem-source-registered.runtime-artifact-missing"
                     : "spatial-derived-artifact-missing",
@@ -202,6 +270,11 @@ namespace Ssalddel.Simulation.Application
                 ArtifactRelativePath = null,
                 PresentationOnly = false,
             };
+        }
+
+        private static string ArtifactContentPath(string tileKey, string layerCode) =>
+            "/api/simulation/v1/world-stream/tiles/" + tileKey
+            + "/artifacts/" + layerCode + "/content";
 
         private static SimulationWorldTileObjectPlacementResponse[] CreateScenarioObjects(
             string tileKey)
@@ -273,6 +346,8 @@ namespace Ssalddel.Simulation.Application
                     "R", System.Globalization.CultureInfo.InvariantCulture),
                 value.CenterTileX.ToString(), value.CenterTileY.ToString(),
                 string.Join(",", value.CoverageTileKeys), string.Join(",", value.LayerCodes),
+                value.RegionSummaryProfileRevision, value.RegionSummaryProfileHashSha256,
+                string.Join(",", value.SupportedSummaryLodCodes),
                 value.EvidenceKindCode,
             });
 
@@ -282,8 +357,12 @@ namespace Ssalddel.Simulation.Application
                 value.RecipeStableId, value.TileKey, value.TileLevel.ToString(),
                 value.TileX.ToString(), value.TileY.ToString(), value.HaloMeters.ToString(),
                 value.ManifestRevision,
+                value.RegionSummaryProfileRevision, value.RegionSummaryStatusCode,
+                value.RegionSummaryHashSha256 ?? string.Empty,
                 string.Join(",", value.Layers.Select(layer =>
-                    layer.LayerCode + ":" + layer.StatusCode + ":" + layer.SourceRevision)),
+                    layer.LayerCode + ":" + layer.StatusCode + ":" + layer.SourceRevision
+                    + ":" + layer.ArtifactHashSha256 + ":" + layer.SourceHashSha256
+                    + ":" + layer.ArtifactFormatCode + ":" + layer.SampleWidth + "x" + layer.SampleHeight)),
             });
 
         private static string ObjectCanonical(SimulationWorldTileObjectProjectionResponse value)

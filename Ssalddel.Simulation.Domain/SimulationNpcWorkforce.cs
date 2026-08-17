@@ -276,8 +276,13 @@ namespace Ssalddel.Simulation.Domain
         private void CompleteNpcTaskAssignment(SimulationTaskSnapshot task, int completedTick)
         {
             var assignment = FindNpcAssignment(task.TaskStableId);
-            if (assignment == null || assignment.PhaseCode == SimulationNpcActionPhaseCodes.Completed)
+            if (assignment == null)
+            {
+                CompleteInspectionInventory(task, completedTick);
+                CompletePutAwayInventory(task, completedTick);
                 return;
+            }
+            if (assignment.PhaseCode == SimulationNpcActionPhaseCodes.Completed) return;
 
             assignment.PhaseCode = SimulationNpcActionPhaseCodes.Completed;
             assignment.PhaseStartedTick = completedTick;
@@ -289,7 +294,12 @@ namespace Ssalddel.Simulation.Domain
                     assignment.ActionCode,
                     SimulationNpcActionCodes.WarehouseInboundInspection,
                     StringComparison.Ordinal)
-                ? new[] { SimulationNpcInventoryStateCodes.StorageEligible }
+                ? new[]
+                {
+                    IsMarketFacility(task.FacilityStableId)
+                        ? SimulationNpcInventoryStateCodes.MarketReceived
+                        : SimulationNpcInventoryStateCodes.StorageEligible,
+                }
                 : string.Equals(
                     assignment.ActionCode,
                     SimulationNpcActionCodes.WarehouseStorageMove,
@@ -485,6 +495,8 @@ namespace Ssalddel.Simulation.Domain
                     InventoryStableId = inventoryStableId,
                     LotStableId = lotStableId,
                     FacilityStableId = task.FacilityStableId,
+                    ProductStableId = logisticsMovements.TryGetValue(lotStableId,
+                        out var movement) ? movement.ProductStableId : string.Empty,
                     StateCode = SimulationNpcInventoryStateCodes.PendingInspection,
                     Quantity = task.AssignedCapacity,
                     UnitCode = task.AssignedCapacityUnitCode,
@@ -503,7 +515,9 @@ namespace Ssalddel.Simulation.Domain
             foreach (var inventory in npcFacilityInventories.Values.Where(value =>
                 string.Equals(value.SourceTaskStableId, task.TaskStableId, StringComparison.Ordinal)))
             {
-                inventory.StateCode = SimulationNpcInventoryStateCodes.StorageEligible;
+                inventory.StateCode = IsMarketFacility(task.FacilityStableId)
+                    ? SimulationNpcInventoryStateCodes.MarketReceived
+                    : SimulationNpcInventoryStateCodes.StorageEligible;
                 inventory.UpdatedTick = completedTick;
                 inventory.Revision++;
             }
@@ -716,6 +730,7 @@ namespace Ssalddel.Simulation.Domain
                 InventoryStableId = source.InventoryStableId,
                 LotStableId = source.LotStableId,
                 FacilityStableId = source.FacilityStableId,
+                ProductStableId = source.ProductStableId,
                 StateCode = source.StateCode,
                 Quantity = source.Quantity,
                 UnitCode = source.UnitCode,

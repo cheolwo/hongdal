@@ -9,7 +9,12 @@ namespace Ssalddel.Simulation.Contracts
 
     public static class SimulationIndividualOrderStateCodes
     {
+        public const string OrderConfirmed = "OrderConfirmed";
         public const string StockReserved = "StockReserved";
+        public const string Picking = "Picking";
+        public const string Packed = "Packed";
+        public const string PickupScheduled = "PickupScheduled";
+        public const string Fulfilled = "Fulfilled";
         public const string CancellationScheduled = "CancellationScheduled";
         public const string ReadyForPickup = "ReadyForPickup";
         public const string ConsumptionScheduled = "ConsumptionScheduled";
@@ -96,12 +101,37 @@ namespace Ssalddel.Simulation.Contracts
         public string TaskStableId { get; set; } = string.Empty;
         public string? CancellationTaskStableId { get; set; }
         public int ReservedTick { get; set; }
+        public int ConfirmedTick { get; set; }
+        public int StockReservedTick { get; set; }
+        public int? PickedTick { get; set; }
+        public int? PackedTick { get; set; }
         public int? ReadyForPickupTick { get; set; }
+        public string? PickupDecisionStableId { get; set; }
+        public string? PickupTaskStableId { get; set; }
+        public int? FulfilledTick { get; set; }
         public string? ConsumptionDecisionStableId { get; set; }
         public string? ConsumptionTaskStableId { get; set; }
         public int? ConsumedTick { get; set; }
         public int? CancelledTick { get; set; }
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
+    }
+
+    public sealed class SimulationIndividualOrderPickupPreviewRequest
+    {
+        public string OrderStableId { get; set; } = string.Empty;
+        public long OrderRevision { get; set; }
+        public string ActorStableId { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
+        public int PickupDurationTicks { get; set; } = 1;
+        public string[] SourceStableIds { get; set; } = Array.Empty<string>();
+    }
+
+    public sealed class SimulationIndividualOrderPickupConfirmRequest
+    {
+        public string CommandId { get; set; } = string.Empty;
+        public long ExpectedRevision { get; set; }
+        public SimulationIndividualOrderPickupPreviewRequest Pickup { get; set; }
+            = new SimulationIndividualOrderPickupPreviewRequest();
     }
 
     public sealed class SimulationStockReservationSnapshot

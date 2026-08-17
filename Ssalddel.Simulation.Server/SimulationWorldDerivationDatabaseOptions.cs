@@ -26,4 +26,10 @@ public sealed class SimulationWorldDerivationDatabaseOptions
     /// </summary>
     public string AreaSetDefinitionPath { get; set; } =
         "../eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/area-set.json";
+
+    /// <summary>
+    /// WI와 경관 Graph 공간 역할·능력·용량을 연결하는 승인 대장이다.
+    /// </summary>
+    public string InteractionGraphBindingCatalogPath { get; set; } =
+        "../eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json";
 }

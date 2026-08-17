@@ -253,6 +253,10 @@ namespace Ssalddel.Simulation.Domain
                 ? allocation?.AvailableQuantity ?? 0m
                 : allocation?.OutboundReservedQuantity ?? 0m;
             var reservationDelta = exportHandoff == null ? -request.Quantity : 0m;
+            var usesSpatialRoles = !string.IsNullOrWhiteSpace(
+                    request.PreferredOriginSpatialStableId)
+                || !string.IsNullOrWhiteSpace(request.PreferredRouteSpatialStableId)
+                || !string.IsNullOrWhiteSpace(request.PreferredDestinationSpatialStableId);
             return new SimulationDecisionPreviewRequest
             {
                 DecisionStableId = "decision:logistics:" + request.CargoStableId.Trim(),
@@ -298,6 +302,12 @@ namespace Ssalddel.Simulation.Domain
                     TaskStableId = "task:logistics:" + request.CargoStableId.Trim(),
                     TaskTypeCode = "CargoRouteMovement",
                     FacilityStableId = request.OriginFacilityStableId.Trim(),
+                    ActionCode = usesSpatialRoles ? "CargoRouteMovement" : string.Empty,
+                    PreferredOriginSpatialStableId = request.PreferredOriginSpatialStableId.Trim(),
+                    PreferredRouteSpatialStableId = request.PreferredRouteSpatialStableId.Trim(),
+                    PreferredDestinationSpatialStableId = request.PreferredDestinationSpatialStableId.Trim(),
+                    RouteStableId = request.RouteStableId.Trim(),
+                    DestinationFacilityStableId = request.DestinationFacilityStableId.Trim(),
                     AssignedCapacity = request.Quantity,
                     AssignedCapacityUnitCode = request.UnitCode.Trim(),
                     DurationTicks = request.RequiredRouteTicks,
@@ -356,6 +366,8 @@ namespace Ssalddel.Simulation.Domain
                 movement.StateCode = SimulationLogisticsMovementStateCodes.InTransit;
                 movement.DepartedTick = task.ScheduledStartTick;
                 movement.Revision++;
+                ReleaseSimulationSpatialReservationsForTaskRole(task,
+                    Simulation공간역할Codes.OriginLoading, task.ScheduledStartTick);
             }
             if (completed != movement.CompletedRouteTicks)
             {
@@ -409,7 +421,8 @@ namespace Ssalddel.Simulation.Domain
 
         internal static string BuildLogisticsMovementPayloadKey(
             SimulationLogisticsMovementPreviewRequest request)
-            => string.Join("\u001e", new[]
+        {
+            var parts = new List<string>(new[]
             {
                 request.CargoStableId.Trim(),
                 request.CargoRevision.ToString(CultureInfo.InvariantCulture),
@@ -429,6 +442,17 @@ namespace Ssalddel.Simulation.Domain
                 string.Join("\u001f", request.SourceStableIds.Select(value => value.Trim())
                     .OrderBy(value => value, StringComparer.Ordinal)),
             });
+            if (!string.IsNullOrWhiteSpace(request.PreferredOriginSpatialStableId)
+                || !string.IsNullOrWhiteSpace(request.PreferredRouteSpatialStableId)
+                || !string.IsNullOrWhiteSpace(request.PreferredDestinationSpatialStableId))
+            {
+                parts.Add("SimulationLogisticsSpatialRolesV1");
+                parts.Add(request.PreferredOriginSpatialStableId.Trim());
+                parts.Add(request.PreferredRouteSpatialStableId.Trim());
+                parts.Add(request.PreferredDestinationSpatialStableId.Trim());
+            }
+            return string.Join("\u001e", parts);
+        }
 
         internal static void ValidateLogisticsMovementConfirmRequestForReplay(
             SimulationLogisticsMovementConfirmRequest request)
@@ -467,6 +491,16 @@ namespace Ssalddel.Simulation.Domain
             if (request.OriginFacilityStableId.Trim() == request.DestinationFacilityStableId.Trim())
                 throw new SimulationContractException("SimulationLogisticsRouteEndpointsEqual");
             RequireStableId(request.ActorStableId, "SimulationActorStableIdInvalid");
+            foreach (var preferred in new[]
+            {
+                request.PreferredOriginSpatialStableId,
+                request.PreferredRouteSpatialStableId,
+                request.PreferredDestinationSpatialStableId,
+            })
+            {
+                if (!string.IsNullOrWhiteSpace(preferred))
+                    RequireStableId(preferred, "SimulationPreferredSpatialStableIdInvalid");
+            }
             if (request.RequiredRouteTicks <= 0 || request.RequiredRouteTicks > 30)
                 throw new SimulationContractException("SimulationRouteTicksInvalid");
             if (request.FreightTransport != null)

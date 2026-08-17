@@ -68,7 +68,8 @@ namespace Ssalddel.Simulation.Domain
                 blocks.Add("SimulationIndividualOrderRevisionMismatch");
             if (!string.Equals(order.ActorStableId, request.ActorStableId.Trim(), StringComparison.Ordinal))
                 blocks.Add("SimulationIndividualOrderActorMismatch");
-            if (order.StateCode != SimulationIndividualOrderStateCodes.ReadyForPickup)
+            if (order.StateCode != SimulationIndividualOrderStateCodes.ReadyForPickup
+                && order.StateCode != SimulationIndividualOrderStateCodes.Fulfilled)
                 blocks.Add("SimulationIndividualOrderNotReadyForConsumption");
             if (reservation == null
                 || reservation.StateCode != SimulationStockReservationStateCodes.Consumed)
@@ -174,7 +175,8 @@ namespace Ssalddel.Simulation.Domain
                 ?? throw new SimulationContractException("SimulationIndividualOrderStableIdInvalid");
             if (!individualOrders.TryGetValue(orderId, out var order))
                 throw new SimulationNotFoundException("SimulationIndividualOrderNotFound");
-            if (order.StateCode != SimulationIndividualOrderStateCodes.ReadyForPickup)
+            if (order.StateCode != SimulationIndividualOrderStateCodes.ReadyForPickup
+                && order.StateCode != SimulationIndividualOrderStateCodes.Fulfilled)
                 throw new SimulationConflictException("SimulationIndividualOrderNotReadyForConsumption");
             if (!string.Equals(order.ActorStableId, request.ActorStableId, StringComparison.Ordinal))
                 throw new SimulationConflictException("SimulationIndividualOrderActorMismatch");

@@ -24,7 +24,8 @@ Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않�
 - `1 Tick = 1 Game Day` 규칙의 `WorldTick`, `WorldRevision`, `GameDate`
 - 상태를 바꾸지 않는 Decision Preview와 명시적 Confirm
 - `Decision → Task → Effect` 인과 원장과 Tick 기반 작업 완료
-- `simulation-save.v1` snapshot·append-only Command log·SHA-256 replay hash
+- 기존 공간 비사용 Session의 `simulation-save.v1` 호환과 공간 상태·예약·취소 계보를 포함하는 `simulation-save.v2`
+- snapshot·append-only Command log·SHA-256 replay hash
 - snapshot 직접 주입 없이 Command를 재실행하는 restore port
 - scenario가 명시한 정착지 District·Facility graph와 재정·노동·창고·시장·비축 snapshot
 - outbound 예약 식량을 제외한 Fixture `FoodSecurityDays` 계산
@@ -39,6 +40,7 @@ Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않�
 - 같은 Cargo에 결합된 화물운송 의뢰·배차 후보·가상 차량 용량과 상차·운송·하차 상태 이력
 - 목적지 도착 뒤 별도 Preview·Confirm·WorldTick을 요구하는 화물 인수 완료
 - 검수 완료 재고를 적재 대기로 보존하고 별도 Preview·Confirm·NPC WorldTick으로 완료하는 창고 적재
+- 진부 Hub 입고검수·창고 적재의 공간 능력·용량 검사, Session 공간 예약과 작업 취소
 - 참여자별 명시적 의향·수량·동의를 보존하는 같이주문 모집 결과 Preview와 Confirm
 - 목표 충족의 `확정`, 목표 미달의 `모집종료목표미달` WorldTick 전이
 - 감자 시장재고 300kg을 기준으로 한 개별주문 20kg Preview·재고/노동 예약·포장 Task·수령준비
@@ -55,7 +57,7 @@ Domain은 Application·Infrastructure·Persistence·Server를 참조하지 않�
 
 API는 기본 비활성이다. 승인된 Simulation 환경에서만 `SimulationServer:Enabled=true`로 켜며 `SsalddelExecution:Mode=Simulation`이 아니면 host 시작을 거부한다. 실행 중 aggregate를 가진 session store는 계속 프로세스 수명에 한정된다. 저장 자료는 `SimulationSessionDatabase:Enabled=true`일 때 별도 `SimulationSession` MySQL DB에 보관하며, 꺼져 있으면 기존 in-memory 저장소를 사용한다. 프로세스 재시작 뒤에는 저장 식별자로 DB 자료를 읽고 Command를 재생해 새 활성 Session을 복원한다. 현재 활성 Session 자체를 매 Command마다 DB snapshot으로 덮어쓰지는 않는다.
 
-Session 저장 표는 저장 식별자·Session 식별자·schema·WorldTick·개정·Command 수·재생 SHA-256과 전체 `simulation-save.v1` JSON을 함께 보존한다. 조회 시 열 Metadata와 JSON을 대조하고 기존 Save/Replay 검증을 다시 통과하지 못하면 손상 자료로 거부한다. 같은 저장 식별자와 같은 재생 hash는 멱등 재사용하고 다른 hash는 충돌로 거부한다. migration은 host 시작 시 자동 적용하지 않는다.
+Session 저장 표는 저장 식별자·Session 식별자·schema·WorldTick·개정·Command 수·재생 SHA-256과 전체 `simulation-save.v1` 또는 `simulation-save.v2` JSON을 함께 보존한다. 공간 정의가 없는 기존 Session은 v1과 기존 재생 hash를 유지하고 공간 상태·예약·취소 계보가 필요한 Session은 v2를 사용한다. 조회 시 열 Metadata와 JSON을 대조하고 Save/Replay 검증을 다시 통과하지 못하면 손상 자료로 거부한다. 같은 저장 식별자와 같은 재생 hash는 멱등 재사용하고 다른 hash는 충돌로 거부한다. migration은 host 시작 시 자동 적용하지 않는다.
 
 공공데이터 공유 조회도 기본 비활성이다. 개발 설정에서는 `SimulationSharedPublicData:Enabled=true`이며 `ConnectionStrings:SharedPublicData`를 먼저 사용하고, 개발 설정에 명시된 `FallbackConnectionStringName=DefaultConnection`이 있을 때만 대체 연결 문자열을 사용한다. 배포 기본 설정에는 대체 이름이 없으므로 `SharedPublicData`가 반드시 필요하다. 배포 환경에서는 같은 DB와 스키마를 가리키되 `SELECT`만 허용한 별도 DB 계정을 사용한다. 연결 문자열은 환경 변수나 서버 측 secret 저장소에서 제공하며 source에 기록하지 않는다. 설정을 켰는데 허용된 연결 문자열이 없으면 host 시작을 거부한다.
 
@@ -138,6 +140,16 @@ dotnet run --project Ssalddel.Simulation.Server -- `
 
 Job Shell은 공간 출력 SHA-256, AreaSet, Synty·URP 대장, 경관 규칙, seed와 품질 단계를 별도 fingerprint로 만든다. 현재 공간 산출물에 배치 기준점이 없으면 임의 `VisualKey` 위치를 만들지 않고 `Partial`과 배치 거부 사유를 저장한다. 실제 Prefab·Material·HLOD 결합은 후속 Unity BatchMode 작업자의 책임이다.
 
+WI의 실제 경관 공간 승격은 승인 대장과 공간 폐루프를 검사한 뒤 파생 DB에 저장한다. Graph 개정·해시·Node·후속 경로가 맞지 않으면 Scenario 공간으로 자동 대체하지 않는다.
+
+```powershell
+dotnet run --project Ssalddel.Simulation.Server -- --build-pyeongchang-wi-spatial-bindings
+```
+
+```text
+GET /api/simulation/v1/world-stream/area-sets/{areaSetStableId}/interaction-graph-readiness
+```
+
 현재 Simulation 상태의 동적 표현은 정적 Synty 경관 실행과 다시 분리한다. `SimulationRuntimeWorldPresentationService`는 화물운송과 물류 이동 상태 사본을 의미 기반 렌더링 의도로 투영하고, Channel 충돌·수명·공간 Route 표면·PC/Mobile Capability를 합성해 URP·Particle·Animation Profile 키와 결정적 표현 hash를 만든다. 이 계산은 Session·WorldTick을 변경하지 않으며 아직 HTTP route나 Unity URP Adapter로 노출하지 않는다. 세부 구조는 [Simulation 규칙 기반 Runtime 렌더링 의도 Pipeline](../docs/Architecture/SimulationRuntimeRenderingIntentPipeline.md)을 따른다.
 
 공간 node와 Simulation 규칙이 객체 표현으로 만나는 단계는 `SimulationWorld객체표현해석JobShell`이 담당한다. 공간·Simulation 규칙 Metadata와 결합 규칙은 초안·활성·폐기 상태로 개정 관리하고, 실제 적용 결과는 공간 출력 hash와 선택적 Session 개정·WorldTick을 봉인한 불변 해석 실행본으로 저장한다. 규칙이 미정이면 활성 공간 규칙의 기본 구성만 사용한다. 세부 구조는 [공간·Simulation 규칙 객체 표현 결합 원장](../docs/Architecture/SimulationWorldObjectRepresentationRuleLedger.md)을 따른다.
@@ -172,6 +184,16 @@ GET  /api/simulation/v1/sessions/{sessionStableId}
 GET  /api/simulation/v1/sessions/{sessionStableId}/world-events?afterWorldRevision={revision}
 GET  /api/simulation/v1/public-data/kamis-price-observations?itemName=감자&limit=20
 GET  /api/simulation/v1/world-stream/regions/{regionStableId}
+GET  /api/simulation/v1/sessions/{sessionStableId}/battles
+GET  /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/previews
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/confirm
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}/participants/confirm
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}/deployments/preview
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}/deployments/confirm
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}/support-previews
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}/supports/confirm
+POST /api/simulation/v1/sessions/{sessionStableId}/battles/{battleStableId}/ticks
 POST /api/simulation/v1/sessions/{sessionStableId}/ticks
 POST /api/simulation/v1/sessions/{sessionStableId}/decision-previews
 POST /api/simulation/v1/sessions/{sessionStableId}/decisions/confirm
@@ -197,6 +219,8 @@ GET  /health
 GET  /health/live
 GET  /health/ready
 ```
+
+병렬 전투는 기존 FarmSurvival 위협 사건에서 Preview/Confirm으로 생성한다. 경영 세계의 `WorldTick`과 전투의 `BattleTick`은 독립적으로 진행하고, 완료 결과는 다음 안전한 `WorldTick`에 합류한다. 경영 팀원은 보급 상자나 증원 분대를 지원할 수 있지만 예약 자원을 세계 재고 획득이나 농장 노동에 동시에 사용할 수 없다. 명시적 Session Save는 진행 중 전투·예약·멱등 명령 결과와 전투별 무결성 hash를 기존 저장 JSON에 포함하고, Restore에서 활성 전투를 다시 만든다. 활성 저장소는 여전히 프로세스 내부 메모리이므로 자동 저장·자동 시작 복원·다중 인스턴스 분산 잠금은 아직 지원하지 않는다. 계약·자원 잠금·Unity 표현 경계는 [병렬 경영–전투 인스턴스 구조](../docs/Architecture/SimulationParallelManagementBattleInstances.md)를 따른다.
 
 세계 사건 조회는 Simulation Session이 먼저 확정한 사건을 개정 단위로 내려준다. 처음 조회는 `afterWorldRevision=-1`을 사용하고, 이후에는 응답의 `NextAfterWorldRevision`을 다음 요청에 사용한다. `PresentationKey`는 Unity 구성 대장의 의미 키이며 Prefab·Material 경로나 시뮬레이션 업무 확정 권위가 아니다. 현재 첫 adapter는 생존 타로 기회로, 응답·합의는 기존 `/survival-tarot` Confirm 경로를 사용하고 확정 후 사건 변경을 다시 조회한다.
 

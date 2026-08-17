@@ -1,10 +1,12 @@
 using System;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Simulation.Contracts
 {
     public static class SimulationSaveSchemaVersions
     {
         public const string V1 = "simulation-save.v1";
+        public const string V2 = "simulation-save.v2";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -35,8 +37,17 @@ namespace Ssalddel.Simulation.Contracts
         public const string CollectibleCardDraw = "CollectibleCardDraw";
         public const string CollectibleCardTransfer = "CollectibleCardTransfer";
         public const string TickAdvance = "TickAdvance";
+        public const string TaskCancel = "TaskCancel";
     }
 
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationSaveReplay,
+        SsalddelCodeLayer.Contract,
+        "세션 저장 식별자와 기대 개정을 정의한다.",
+        StepKey = "contract.save-request",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        FlowOrder = 10,
+        Boundary = "저장 자료는 Simulation 상태만 포함하며 운영 원장과 공공데이터 원본을 복제하지 않는다.")]
     public sealed class SimulationSessionSaveRequest
     {
         public string SaveStableId { get; set; } = string.Empty;
@@ -81,11 +92,13 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationTileTraversalConfirmRequest? TileTraversalConfirmRequest { get; set; }
         public SimulationCollectibleCardDrawRequest? CollectibleCardDrawRequest { get; set; }
         public SimulationCollectibleCardTransferRequest? CollectibleCardTransferRequest { get; set; }
+        public SimulationTaskCancelRequest? TaskCancelRequest { get; set; }
+        public string? TaskStableId { get; set; }
     }
 
     public sealed class SimulationSessionSavePackage
     {
-        public string SchemaVersion { get; set; } = SimulationSaveSchemaVersions.V1;
+        public string SchemaVersion { get; set; } = SimulationSaveSchemaVersions.V2;
         public string SaveStableId { get; set; } = string.Empty;
         public string SessionStableId { get; set; } = string.Empty;
         public int SavedWorldTick { get; set; }
@@ -103,6 +116,8 @@ namespace Ssalddel.Simulation.Contracts
             = new SimulationSurvivalTarotStateSnapshot();
         public SimulationCommandLogEntrySnapshot[] CommandLog { get; set; }
             = Array.Empty<SimulationCommandLogEntrySnapshot>();
+        public SimulationBattleSaveRecordSnapshot[] Battles { get; set; }
+            = Array.Empty<SimulationBattleSaveRecordSnapshot>();
     }
 
     public sealed class SimulationSessionRestoreResult
@@ -111,6 +126,7 @@ namespace Ssalddel.Simulation.Contracts
         public string SchemaVersion { get; set; } = string.Empty;
         public string ReplayHash { get; set; } = string.Empty;
         public int ReplayedCommandCount { get; set; }
+        public int RestoredBattleCount { get; set; }
         public 경영SimulationSessionSnapshot Session { get; set; }
             = new 경영SimulationSessionSnapshot();
     }

@@ -35,6 +35,8 @@ namespace Ssalddel.Simulation.Domain
             {
                 if (HasAppliedHarvestDispositionImpactCommand(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
+                if (HasAppliedTaskCancelCommand(request.CommandId))
+                    throw new SimulationConflictException("SimulationCommandKindConflict");
                 return ConfirmDecisionCore(request, false, AppendDecisionConfirmCommand);
             }
         }
@@ -84,6 +86,11 @@ namespace Ssalddel.Simulation.Domain
                     FacilityStableId = preview.TaskPlan.FacilityStableId,
                     ActionCode = preview.TaskPlan.ActionCode,
                     AssignedActorStableId = preview.TaskPlan.AssignedActorStableId,
+                    SelectedSpatialStableId = preview.TaskPlan.SelectedSpatialStableId,
+                    SpatialDefinitionRevision = preview.TaskPlan.SpatialDefinitionRevision,
+                    SpatialDefinitionHashSha256 = preview.TaskPlan.SpatialDefinitionHashSha256,
+                    SpatialRoleBindings = preview.TaskPlan.SpatialRoleBindings
+                        .Select(CloneSpatialRoleBinding).ToArray(),
                     AssignedCapacity = preview.TaskPlan.AssignedCapacity,
                     AssignedCapacityUnitCode = preview.TaskPlan.AssignedCapacityUnitCode,
                     ScheduledStartTick = CurrentTick + 1,
@@ -96,11 +103,13 @@ namespace Ssalddel.Simulation.Domain
                 };
                 var individualOrder = PrepareIndividualOrderReservation(request.Preview, preview);
                 var cancelledIndividualOrder = PrepareIndividualOrderCancellation(request.Preview);
+                var individualOrderPickup = PrepareIndividualOrderPickup(request.Preview);
                 var freightReceipt = PrepareFreightReceipt(request.Preview);
                 var groupOrder = PrepareGroupOrder(request.Preview);
                 var foodDelivery = PrepareFoodDelivery(request.Preview);
                 var foodDeliveryReceipt = PrepareFoodDeliveryReceipt(request.Preview);
                 var marketConsumption = PrepareMarketConsumption(request.Preview);
+                var supplyChainInventory = PrepareSupplyChainWork(request.Preview);
                 var exportPreparation = Prepare수출준비(request.Preview, preview);
                 var exportCargoPreparation = Prepare수출Cargo준비(request.Preview, preview);
                 var exportCargoHandoff = Prepare수출Cargo인계(request.Preview, preview);
@@ -108,6 +117,7 @@ namespace Ssalddel.Simulation.Domain
                 var exportReadinessReview = Prepare수출준비성검토(request.Preview, preview);
                 var exportShipmentPlan = Prepare수출선적계획(request.Preview, preview);
                 var exportShipmentExecution = Prepare수출선적실행(request.Preview, preview);
+                var spatialReservationsToRegister = PrepareSimulationSpatialReservations(task);
 
                 var effectValues = includeExpectedCostsAsEffects
                     ? decision.ExpectedCosts.Concat(decision.ExpectedEffects)
@@ -134,17 +144,24 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException("SimulationEffectStableIdConflict");
 
                 RegisterNpcTaskAssignment(task);
+                // NPC 정책이 없는 시나리오 시설은 서버 Task로 직접 진행한다.
+                // 다만 정책이 차단한 Task는 배정 기록이 있으므로 임시 재고를 만들지 않는다.
+                if (FindNpcAssignment(task.TaskStableId) == null)
+                    RegisterPendingInspectionInventory(task);
+                RegisterSimulationSpatialReservations(task, spatialReservationsToRegister);
                 decisions.Add(decision.DecisionStableId, decision);
                 tasks.Add(task.TaskStableId, task);
                 foreach (var effect in pendingEffects)
                     effects.Add(effect.EffectStableId, effect);
                 ReserveIndividualOrder(individualOrder);
                 ScheduleIndividualOrderCancellation(cancelledIndividualOrder, task);
+                ScheduleIndividualOrderPickup(individualOrderPickup, decision, task);
                 ScheduleFreightReceipt(freightReceipt, decision, task);
                 ScheduleGroupOrder(groupOrder, decision, task);
                 ScheduleFoodDelivery(foodDelivery, decision, task);
                 ScheduleFoodDeliveryReceipt(foodDeliveryReceipt, decision, task);
                 ScheduleMarketConsumption(marketConsumption, decision, task);
+                ScheduleSupplyChainWork(supplyChainInventory, task);
                 Schedule수출준비(exportPreparation);
                 Schedule수출Cargo준비(exportCargoPreparation);
                 Schedule수출Cargo인계(exportCargoHandoff);
@@ -176,14 +193,18 @@ namespace Ssalddel.Simulation.Domain
 
                 if (currentTick >= task.ExpectedEndTick)
                 {
+                    AdvanceSupplyChainWorkForTask(task, currentTick);
+                    AdvanceIndividualOrderFulfillmentForTask(task, currentTick);
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     ApplySettlementEconomyForTask(task, task.ExpectedEndTick);
                     ApplyIndividualOrderCancellationForTask(task, task.ExpectedEndTick);
                     ApplyIndividualOrderForTask(task, task.ExpectedEndTick);
+                    ApplyIndividualOrderPickupForTask(task, task.ExpectedEndTick);
                     ApplyFreightReceiptForTask(task, task.ExpectedEndTick);
                     ApplyGroupOrderForTask(task, task.ExpectedEndTick);
                     AdvanceFoodDeliveryForTask(task, task.ExpectedEndTick);
                     ApplyMarketConsumptionForTask(task, task.ExpectedEndTick);
+                    CompleteSimulationSpatialReservationsForTask(task, task.ExpectedEndTick);
                     Advance수출준비ForTask(task, task.ExpectedEndTick);
                     Advance수출Cargo준비ForTask(task, task.ExpectedEndTick);
                     Advance수출Cargo인계ForTask(task, task.ExpectedEndTick);
@@ -207,6 +228,8 @@ namespace Ssalddel.Simulation.Domain
                 else if (currentTick >= task.ScheduledStartTick
                     && task.StateCode == SimulationTaskStateCodes.Scheduled)
                 {
+                    AdvanceSupplyChainWorkForTask(task, currentTick);
+                    AdvanceIndividualOrderFulfillmentForTask(task, currentTick);
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     AdvanceFoodDeliveryForTask(task, currentTick);
                     Advance수출준비ForTask(task, currentTick);
@@ -216,6 +239,8 @@ namespace Ssalddel.Simulation.Domain
                 }
                 else if (currentTick >= task.ScheduledStartTick)
                 {
+                    AdvanceSupplyChainWorkForTask(task, currentTick);
+                    AdvanceIndividualOrderFulfillmentForTask(task, currentTick);
                     AdvanceLogisticsMovementForTask(task, currentTick);
                     AdvanceFoodDeliveryForTask(task, currentTick);
                     Advance수출준비ForTask(task, currentTick);
@@ -232,7 +257,8 @@ namespace Ssalddel.Simulation.Domain
                 || HasAppliedNpcPolicyCommand(commandId)
                 || appliedWorldItemAcquisitionCommands.ContainsKey(commandId)
                 || HasAppliedSurvivalTarotCommand(commandId)
-                || HasAppliedCollectibleCardCommand(commandId);
+                || HasAppliedCollectibleCardCommand(commandId)
+                || HasAppliedTaskCancelCommand(commandId);
 
         private SimulationDecisionPreviewSnapshot CreateDecisionPreview(
             SimulationDecisionPreviewRequest request)
@@ -265,6 +291,12 @@ namespace Ssalddel.Simulation.Domain
                     FacilityStableId = request.Task.FacilityStableId.Trim(),
                     ActionCode = request.Task.ActionCode.Trim(),
                     AssignedActorStableId = request.Task.AssignedActorStableId.Trim(),
+                    PreferredSpatialStableId = request.Task.PreferredSpatialStableId.Trim(),
+                    PreferredOriginSpatialStableId = request.Task.PreferredOriginSpatialStableId.Trim(),
+                    PreferredRouteSpatialStableId = request.Task.PreferredRouteSpatialStableId.Trim(),
+                    PreferredDestinationSpatialStableId = request.Task.PreferredDestinationSpatialStableId.Trim(),
+                    RouteStableId = request.Task.RouteStableId.Trim(),
+                    DestinationFacilityStableId = request.Task.DestinationFacilityStableId.Trim(),
                     AssignedCapacity = request.Task.AssignedCapacity,
                     AssignedCapacityUnitCode = request.Task.AssignedCapacityUnitCode.Trim(),
                     DurationTicks = request.Task.DurationTicks,
@@ -274,6 +306,7 @@ namespace Ssalddel.Simulation.Domain
                 },
             };
             ResolveNpcPreviewAssignment(result.TaskPlan);
+            ResolveSimulationSpatialPreview(result);
             return result;
         }
 
@@ -338,6 +371,25 @@ namespace Ssalddel.Simulation.Domain
                 RequireStableId(
                     request.Task.AssignedActorStableId,
                     "SimulationTaskAssignedActorStableIdInvalid");
+            if (!string.IsNullOrWhiteSpace(request.Task.PreferredSpatialStableId))
+                RequireStableId(
+                    request.Task.PreferredSpatialStableId,
+                    "SimulationPreferredSpatialStableIdInvalid");
+            foreach (var preferred in new[]
+            {
+                request.Task.PreferredOriginSpatialStableId,
+                request.Task.PreferredRouteSpatialStableId,
+                request.Task.PreferredDestinationSpatialStableId,
+            })
+            {
+                if (!string.IsNullOrWhiteSpace(preferred))
+                    RequireStableId(preferred, "SimulationPreferredSpatialStableIdInvalid");
+            }
+            if (!string.IsNullOrWhiteSpace(request.Task.RouteStableId))
+                RequireStableId(request.Task.RouteStableId, "SimulationRouteStableIdInvalid");
+            if (!string.IsNullOrWhiteSpace(request.Task.DestinationFacilityStableId))
+                RequireStableId(request.Task.DestinationFacilityStableId,
+                    "SimulationDestinationFacilityStableIdInvalid");
             ValidateIds(request.Task.InputLotStableIds, true, "SimulationTaskInputLotStableIdsInvalid");
             ValidateIds(request.Task.OutputCandidateCodes, false, "SimulationTaskOutputCandidateCodesInvalid");
             ValidateIds(request.Task.SourceStableIds, true, "SimulationTaskSourceStableIdsInvalid");
@@ -410,6 +462,7 @@ namespace Ssalddel.Simulation.Domain
                 preview.Task.TaskStableId,
                 preview.Task.TaskTypeCode,
                 preview.Task.FacilityStableId,
+                preview.Task.PreferredSpatialStableId,
                 preview.Task.AssignedCapacity.ToString(CultureInfo.InvariantCulture),
                 preview.Task.AssignedCapacityUnitCode,
                 preview.Task.DurationTicks.ToString(CultureInfo.InvariantCulture),
@@ -423,6 +476,17 @@ namespace Ssalddel.Simulation.Domain
                 parts.Add("NpcTaskBindingV1");
                 parts.Add(preview.Task.ActionCode);
                 parts.Add(preview.Task.AssignedActorStableId);
+            }
+            if (preview.Task.PreferredOriginSpatialStableId.Length > 0
+                || preview.Task.PreferredRouteSpatialStableId.Length > 0
+                || preview.Task.PreferredDestinationSpatialStableId.Length > 0)
+            {
+                parts.Add("SimulationSpatialRolePreferencesV1");
+                parts.Add(preview.Task.PreferredOriginSpatialStableId);
+                parts.Add(preview.Task.PreferredRouteSpatialStableId);
+                parts.Add(preview.Task.PreferredDestinationSpatialStableId);
+                parts.Add(preview.Task.RouteStableId);
+                parts.Add(preview.Task.DestinationFacilityStableId);
             }
             return string.Join("\u001e", parts);
         }
@@ -447,6 +511,12 @@ namespace Ssalddel.Simulation.Domain
                     FacilityStableId = request.Task.FacilityStableId.Trim(),
                     ActionCode = request.Task.ActionCode.Trim(),
                     AssignedActorStableId = request.Task.AssignedActorStableId.Trim(),
+                    PreferredSpatialStableId = request.Task.PreferredSpatialStableId.Trim(),
+                    PreferredOriginSpatialStableId = request.Task.PreferredOriginSpatialStableId.Trim(),
+                    PreferredRouteSpatialStableId = request.Task.PreferredRouteSpatialStableId.Trim(),
+                    PreferredDestinationSpatialStableId = request.Task.PreferredDestinationSpatialStableId.Trim(),
+                    RouteStableId = request.Task.RouteStableId.Trim(),
+                    DestinationFacilityStableId = request.Task.DestinationFacilityStableId.Trim(),
                     AssignedCapacity = request.Task.AssignedCapacity,
                     AssignedCapacityUnitCode = request.Task.AssignedCapacityUnitCode.Trim(),
                     DurationTicks = request.Task.DurationTicks,
@@ -531,6 +601,11 @@ namespace Ssalddel.Simulation.Domain
                 FacilityStableId = source.FacilityStableId,
                 ActionCode = source.ActionCode,
                 AssignedActorStableId = source.AssignedActorStableId,
+                SelectedSpatialStableId = source.SelectedSpatialStableId,
+                SpatialDefinitionRevision = source.SpatialDefinitionRevision,
+                SpatialDefinitionHashSha256 = source.SpatialDefinitionHashSha256,
+                SpatialRoleBindings = source.SpatialRoleBindings
+                    .Select(CloneSpatialRoleBinding).ToArray(),
                 AssignedCapacity = source.AssignedCapacity,
                 AssignedCapacityUnitCode = source.AssignedCapacityUnitCode,
                 ScheduledStartTick = source.ScheduledStartTick,

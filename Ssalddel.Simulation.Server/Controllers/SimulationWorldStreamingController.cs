@@ -23,7 +23,8 @@ public sealed class SimulationWorldStreamingController(
     SimulationWorldExplorationService exploration,
     SimulationWorldTileArtifactContentService artifactContent,
     SimulationWorldLandscapeCompositionService landscapeComposition,
-    SimulationWorldAreaSetLandscapeGraphService areaSetGraphs) : ControllerBase
+    SimulationWorldAreaSetLandscapeGraphService areaSetGraphs,
+    SimulationWorld상호작용GraphService interactionGraphs) : ControllerBase
 {
     [HttpGet("recipes/{recipeId}")]
     [ProducesResponseType(typeof(SimulationWorldStreamRecipeResponse), StatusCodes.Status200OK)]
@@ -93,6 +94,28 @@ public sealed class SimulationWorldStreamingController(
         return value == null
             ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldLandscapeGraphNotFound" })
             : Ok(value);
+    }
+
+    [HttpGet("area-sets/{areaSetStableId}/interaction-graph-readiness")]
+    [ProducesResponseType(typeof(SimulationWorld상호작용Graph준비도Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<SimulationWorld상호작용Graph준비도Response>>
+        InteractionGraphReadiness(
+            string areaSetStableId,
+            CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await interactionGraphs.EvaluateAsync(areaSetStableId, cancellationToken));
+        }
+        catch (InvalidOperationException error)
+        {
+            var response = new SimulationErrorResponse { ErrorCode = error.Message };
+            return error.Message == "SimulationWorldAreaSetNotFound"
+                ? NotFound(response)
+                : Conflict(response);
+        }
     }
 
     [HttpGet("tiles/{tileKey}/artifacts/{layerCode}")]

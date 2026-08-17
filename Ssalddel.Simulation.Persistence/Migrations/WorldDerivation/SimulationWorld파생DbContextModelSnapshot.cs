@@ -2821,6 +2821,66 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
                     b.ToTable("시뮬레이션월드_그래픽표현계획", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld상호작용Graph준비도Entity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("식별번호");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AreaSetDefinitionHashSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("AreaSet정의SHA256");
+
+                    b.Property<int>("AreaSetRevision")
+                        .HasColumnType("int")
+                        .HasColumnName("AreaSet개정");
+
+                    b.Property<string>("AreaSetStableId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("AreaSet고유식별자");
+
+                    b.Property<string>("BindingCatalogHashSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("공간연결대장SHA256");
+
+                    b.Property<string>("BindingCatalogRevision")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("공간연결대장개정");
+
+                    b.Property<string>("OverallStatusCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("종합상태코드");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("준비도JSON");
+
+                    b.Property<DateTimeOffset>("StoredAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("저장시각UTC");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AreaSetStableId")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_WI공간Graph준비도", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorld시각배치Entity", b =>
                 {
                     b.Property<long>("Id")

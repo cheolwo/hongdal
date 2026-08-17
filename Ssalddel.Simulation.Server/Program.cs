@@ -13,6 +13,7 @@ var requiresWorldDerivationDatabase = args.Any(argument =>
     || string.Equals(argument, "--build-pyeongchang-world-derived", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--build-pyeongchang-synty-landscape", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--assemble-pyeongchang-landscape-graph", StringComparison.OrdinalIgnoreCase)
+    || string.Equals(argument, "--build-pyeongchang-wi-spatial-bindings", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--render-pyeongchang-area-set-status", StringComparison.OrdinalIgnoreCase)
     || string.Equals(argument, "--assemble-pyeongchang-world-business-rules", StringComparison.OrdinalIgnoreCase));
 requiresWorldDerivationDatabase = requiresWorldDerivationDatabase || args.Any(argument =>
@@ -181,6 +182,29 @@ if (args.Contains("--render-pyeongchang-area-set-status", StringComparer.Ordinal
         new System.Text.UTF8Encoding(false),
         CancellationToken.None);
     Console.WriteLine("평창AreaSet상태문서생성완료:" + fullOutputPath);
+    return;
+}
+
+if (args.Contains("--build-pyeongchang-wi-spatial-bindings", StringComparer.OrdinalIgnoreCase))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var shell = scope.ServiceProvider.GetRequiredService<SimulationWorld상호작용GraphJobShell>();
+    var result = await shell.BuildAsync(PyeongchangAreaSetStableIds.AreaSet, CancellationToken.None);
+    var readinessStore = scope.ServiceProvider.GetRequiredService<
+        ISimulationWorld상호작용GraphReadinessStore>();
+    var stored = await readinessStore.ReadLatestAsync(
+        PyeongchangAreaSetStableIds.AreaSet, CancellationToken.None)
+        ?? throw new InvalidOperationException("PyeongchangWiSpatialReadbackMissing");
+    if (!string.Equals(result.BindingCatalogHashSha256,
+            stored.BindingCatalogHashSha256, StringComparison.Ordinal)
+        || !string.Equals(result.AreaSetDefinitionHashSha256,
+            stored.AreaSetDefinitionHashSha256, StringComparison.Ordinal))
+        throw new InvalidOperationException("PyeongchangWiSpatialReadbackMismatch");
+    Console.WriteLine(
+        $"평창WI공간Graph연결완료:상태={result.OverallStatusCode};" +
+        $"폐루프={result.Bindings.Count(item => item.SpatialClosedLoop)};" +
+        $"전체WI={result.Bindings.Length};DB재조회=일치;" +
+        $"대장SHA256={result.BindingCatalogHashSha256}");
     return;
 }
 

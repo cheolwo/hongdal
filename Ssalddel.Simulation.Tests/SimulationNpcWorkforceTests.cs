@@ -133,7 +133,7 @@ public sealed class SimulationNpcWorkforceTests
     public void 두번째검수작업은_관리자초기권한으로_보조Npc에게동적위임된다()
     {
         var context = CreateContext();
-        var current = context.Service.Create(CreateSessionRequest());
+        var current = context.Service.Create(CreateSessionRequest(inspectionSlots: 2m));
         current = Confirm(context, current, InboundInspection("1"), "command:npc-backlog:1");
         current = Confirm(context, current, InboundInspection("2"), "command:npc-backlog:2");
 
@@ -294,7 +294,7 @@ public sealed class SimulationNpcWorkforceTests
     private static 경영SimulationSessionSnapshot RunDeterministicFixture()
     {
         var context = CreateContext();
-        var current = context.Service.Create(CreateSessionRequest());
+        var current = context.Service.Create(CreateSessionRequest(inspectionSlots: 2m));
         current = Confirm(context, current, InboundInspection("1"), "command:npc-deterministic:1");
         return Confirm(context, current, InboundInspection("2"), "command:npc-deterministic:2");
     }
@@ -359,8 +359,13 @@ public sealed class SimulationNpcWorkforceTests
             },
         };
 
-    private static 경영SimulationSession생성Request CreateSessionRequest()
-        => new 경영SimulationSession생성Request
+    private static 경영SimulationSession생성Request CreateSessionRequest(decimal inspectionSlots = 1m)
+    {
+        var spatialWorld = PyeongchangSimulation공간상호작용Fixture.Create();
+        spatialWorld.Definitions.Single(value => value.CapabilityCodes.Contains(
+            Simulation공간능력Codes.InspectionWorkArea)).BaseCapacities.Single().Quantity
+            = inspectionSlots;
+        return new 경영SimulationSession생성Request
         {
             ClientRequestId = Guid.Parse("2731b15d-1d1f-4f4f-88d4-89ae8013790a"),
             ScenarioStableId = "scenario:pyeongchang-farm-hub-town:npc-workforce",
@@ -376,7 +381,9 @@ public sealed class SimulationNpcWorkforceTests
                 GameDateStartsOn = new DateTimeOffset(2026, 8, 13, 0, 0, 0, TimeSpan.Zero),
             },
             NpcWorkforce = PyeongchangSimulationNpcWorkforceFixture.Create(),
+            SpatialWorld = spatialWorld,
         };
+    }
 
     private static TestContext CreateContext()
         => new(new 경영SimulationSessionService(

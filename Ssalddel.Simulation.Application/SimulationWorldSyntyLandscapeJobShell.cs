@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Application
@@ -62,6 +63,18 @@ public interface ISimulationWorldSynty경관Planner
         IReadOnlyList<SimulationWorld파생Node> targetNodes);
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationSyntyLandscape,
+    SsalddelCodeLayer.Application,
+    "공간 실행을 읽어 Synty·URP 경관 계획을 만들고 별도 실행 원장으로 저장한다.",
+    StepKey = "application.synty-job",
+    DependsOnStepKeys = new string[] { "domain.synty-ledger" },
+    ExecutionStage = SsalddelCodeExecutionStage.Projection,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ReadsFrom = SsalddelCodeDataScope.DerivedWorld,
+    WritesTo = SsalddelCodeDataScope.DerivedWorld,
+    FlowOrder = 30,
+    Boundary = "Synty 원본 경로나 Prefab 이름을 업무 권위로 사용하지 않고 공간 출력 hash를 입력으로 삼는다.")]
 public sealed class SimulationWorldSynty경관JobShell
 {
     public const string SpatialBuildNotFoundCode = "SimulationWorldSpatialBuildNotFound";

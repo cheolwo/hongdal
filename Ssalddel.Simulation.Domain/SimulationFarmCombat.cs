@@ -2,10 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Domain
 {
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationFarmCombatInput,
+        SsalddelCodeLayer.Domain,
+        "전투 박자·타이밍 등급·피해·전술 기회를 결정적으로 판정한다.",
+        StepKey = "domain.farm-combat",
+        DependsOnStepKeys = new[] { "application.farm-combat" },
+        FlowOrder = 40,
+        ExecutionStage = SsalddelCodeExecutionStage.Tick,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        WritesTo = SsalddelCodeDataScope.SimulationState,
+        Effects = SsalddelCodeEffect.StateMutation,
+        Boundary = "Unity가 제출한 판정 결과를 신뢰하지 않고 Session aggregate가 최종 결과를 확정한다.")]
     public sealed partial class 경영SimulationSessionAggregate
     {
         private readonly Dictionary<string, string> combatPerspectives =
@@ -287,6 +300,14 @@ namespace Ssalddel.Simulation.Domain
                 value.ThreatTypeCode == SimulationFarmSurvivalCodes.ZombiePressure);
             if (encounter == null || encounter.StateCode == SimulationFarmSurvivalCodes.Resolved)
                 return;
+            PrepareZombieCombat(encounter);
+        }
+
+        private void PrepareZombieCombat(
+            SimulationThreatEncounterSnapshot encounter)
+        {
+            if (encounter.StateCode == SimulationFarmSurvivalCodes.Resolved)
+                return;
             encounter.StateCode = SimulationFarmSurvivalCodes.AwaitingCombat;
             encounter.PresentationKey = "survival.combat.ready";
             if (UsesHeroTacticalCombatRule()) PrepareTacticalFront(encounter);
@@ -430,7 +451,12 @@ namespace Ssalddel.Simulation.Domain
         private bool UsesInteractiveCombatRule()
             => farmSurvivalCreationState?.RuleRevision ==
                 SimulationFarmSurvivalCodes.InteractiveCombatRuleRevision
-                || UsesHeroTacticalCombatRule();
+                || UsesHeroTacticalCombatRule()
+                || UsesScenicSeasonRule();
+
+        private bool UsesScenicSeasonRule()
+            => farmSurvivalCreationState?.RuleRevision ==
+                SimulationFarmSurvivalCodes.ScenicSeasonRuleRevision;
 
         private bool UsesHeroTacticalCombatRule()
             => farmSurvivalCreationState?.RuleRevision ==

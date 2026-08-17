@@ -93,6 +93,8 @@ public sealed class SimulationWorldDerivationPersistenceTests
         AssertColumns<SimulationWorldUnity산출물Entity>(db, "시뮬레이션월드_Unity산출물",
             "식별번호", "파생실행식별번호", "산출물고유식별자", "타일Manifest고유식별자",
             "산출물종류코드", "세부표현단계코드", "산출물보관객체키", "산출물SHA256",
+            "원본개정번호", "원본SHA256", "원본기준일", "수평좌표계코드", "높이기준코드",
+            "원본해상도미터", "NoData값", "산출물형식코드", "산출물바이트길이", "표본너비", "표본높이",
             "정점수", "삼각형수", "재질슬롯수", "예상DrawCall수", "경계정점SHA256", "생성상태코드");
         AssertColumns<SimulationWorld시각배치Entity>(db, "시뮬레이션월드_시각배치계획",
             "식별번호", "파생실행식별번호", "시각배치고유식별자", "대상노드고유식별자",
@@ -489,6 +491,89 @@ public sealed class SimulationWorldDerivationPersistenceTests
         finally
         {
             File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task 평창군Pipeline은_중앙L2공간산출물과_물리표고기준을_파생Db에저장한다()
+    {
+        await using var publicDb = CreatePublicDataDb();
+        await using var derivedDb = CreateDb();
+        await publicDb.Database.EnsureCreatedAsync();
+        await derivedDb.Database.EnsureCreatedAsync();
+        var pipeline = new 평창군공간파생Pipeline(
+            publicDb,
+            new SimulationWorld파생원장Store(derivedDb));
+        var suffix = Guid.NewGuid().ToString("N");
+        var tilePath = Path.Combine(Path.GetTempPath(), $"pyeongchang-tile-{suffix}.json");
+        var artifactPath = Path.Combine(Path.GetTempPath(), $"pyeongchang-artifact-{suffix}.json");
+        await File.WriteAllTextAsync(tilePath, $$"""
+            {
+              "schemaVersion": "pyeongchang-spatial-tile-manifest.v1",
+              "generatedAt": "2026-08-13T00:00:00+00:00",
+              "source": { "sha256": "{{new string('b', 64)}}" },
+              "tiles": [{
+                "tileKey": "kr5186:l2:700:1145", "level": 2,
+                "sizeMeters": 500, "haloMeters": 60,
+                "coreBounds": { "minEasting": 350000, "minNorthing": 572500,
+                  "maxEasting": 350500, "maxNorthing": 573000 },
+                "fingerprint": "{{new string('a', 64)}}"
+              }]
+            }
+            """);
+        await File.WriteAllTextAsync(artifactPath, $$"""
+            {
+              "schemaVersion": "ssalddel-spatial-layer-artifacts.v1",
+              "ruleRevision": "daegwallyeong-l2-physical-spatial.r1",
+              "tileKey": "kr5186:l2:700:1145",
+              "coordinateReferenceSystem": "EPSG:5186",
+              "sampleSpacingMeters": 10,
+              "coreBounds": { "minEasting": 350000, "minNorthing": 572500 },
+              "statistics": { "minimumPhysicalElevationMeters": 905.4617 },
+              "sources": {
+                "elevation": { "sourceRevision": "Copernicus-DEM-GLO30-N37E128",
+                  "sha256": "{{new string('c', 64)}}", "horizontalCrs": "EPSG:5186",
+                  "verticalDatum": "Unverified", "resolutionMeters": 30,
+                  "noDataValue": -32767, "sourceReferenceDate": null },
+                "landCover": { "sourceRevision": "ESA-WorldCover-2021-v200-N36E126",
+                  "sha256": "{{new string('d', 64)}}", "horizontalCrs": "EPSG:5186",
+                  "resolutionMeters": 10, "noDataValue": 0, "sourceReferenceDate": "2021" }
+              },
+              "artifacts": {
+                "elevation": { "relativePath": "generated/elevation.bin", "sha256": "{{new string('e', 64)}}",
+                  "formatCode": "height-f32-v1", "byteLength": 15876, "width": 63, "height": 63 },
+                "landCover": { "relativePath": "generated/land-cover.bin", "sha256": "{{new string('f', 64)}}",
+                  "formatCode": "landcover-u8-v1", "byteLength": 3844, "width": 62, "height": 62 },
+                "placementMask": { "relativePath": "generated/placement-mask.bin", "sha256": "{{new string('1', 64)}}",
+                  "formatCode": "placement-mask-u8-v1", "byteLength": 3844, "width": 62, "height": 62 }
+              }
+            }
+            """);
+
+        try
+        {
+            var result = await pipeline.실행Async(tilePath, artifactPath, CancellationToken.None);
+
+            Assert.Equal(3, result.Unity산출물수);
+            Assert.Equal(3, await derivedDb.UnityArtifacts.CountAsync());
+            var elevation = await derivedDb.UnityArtifacts.SingleAsync(
+                item => item.ArtifactKindCode == "elevation");
+            Assert.Equal("height-f32-v1", elevation.ArtifactFormatCode);
+            Assert.Equal("Unverified", elevation.VerticalDatumCode);
+            Assert.Equal(63, elevation.SampleWidth);
+            var reader = new SimulationWorldTileArtifactReader(derivedDb);
+            Assert.True(reader.TryRead("kr5186:l2:700:1145", "elevation", out var snapshot));
+            Assert.Equal(elevation.ArtifactHashSha256, snapshot.ArtifactHashSha256);
+            Assert.Equal("EPSG:5186", snapshot.HorizontalCrsCode);
+            var transform = await derivedDb.UnityTransformProfiles.SingleAsync();
+            Assert.Equal(SimulationWorldUnity변환상태Codes.변환가능, transform.StatusCode);
+            Assert.Equal(905.4617m, transform.ReferenceElevationMeters);
+            Assert.Equal(350000m, transform.OriginEastingMeters);
+        }
+        finally
+        {
+            File.Delete(tilePath);
+            File.Delete(artifactPath);
         }
     }
 

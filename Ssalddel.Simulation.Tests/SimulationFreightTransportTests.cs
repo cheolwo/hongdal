@@ -532,6 +532,9 @@ public sealed class SimulationFreightTransportTests
                 },
                 SourceStableIds = new[] { "source:fixture.settlement-1" },
             },
+            SpatialWorld = PyeongchangSimulation공간상호작용Fixture.Create(
+                "facility:sim.regional-hub-1",
+                "source:fixture.spatial-world-1"),
         };
 
     private static SimulationSettlementDistrictRequest District(string id, string type)

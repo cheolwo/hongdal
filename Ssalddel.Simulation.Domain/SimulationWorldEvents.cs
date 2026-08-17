@@ -144,6 +144,7 @@ namespace Ssalddel.Simulation.Domain
                 StateCode = encounter.StateCode,
                 OccurredWorldTick = encounter.OccurredWorldTick,
                 VisibleFromWorldTick = encounter.OccurredWorldTick,
+                ExpiresAfterWorldTick = encounter.DecisionDeadlineWorldTick,
                 AudienceScopeCode = SimulationWorldEventCodes.SessionParticipants,
                 PresentationKey = encounter.PresentationKey,
                 ResponseKindCode = choices.Length > 0
@@ -184,7 +185,8 @@ namespace Ssalddel.Simulation.Domain
         }
 
         private void UpdateFarmThreatWorldEvent(
-            SimulationThreatEncounterSnapshot encounter)
+            SimulationThreatEncounterSnapshot encounter,
+            SimulationWorldEventChoiceSnapshot[]? choices = null)
         {
             var worldEvent = worldEvents.Single(value => string.Equals(
                 value.SourceOpportunityStableId,
@@ -194,11 +196,31 @@ namespace Ssalddel.Simulation.Domain
             worldEvent.LastChangedWorldRevision = Revision;
             worldEvent.StateCode = encounter.StateCode;
             worldEvent.PresentationKey = encounter.PresentationKey;
+            worldEvent.ExpiresAfterWorldTick = encounter.DecisionDeadlineWorldTick;
             worldEvent.SelectedChoiceStableId = encounter.SelectedChoiceStableId;
+            if (choices != null)
+            {
+                worldEvent.ResponseKindCode =
+                    SimulationWorldEventCodes.FarmThreatChoice;
+                worldEvent.ChoiceSetStableId =
+                    "choice-set:" + encounter.EncounterStableId;
+                worldEvent.Choices = choices.Select(value =>
+                    new SimulationWorldEventChoiceSnapshot
+                    {
+                        ChoiceStableId = value.ChoiceStableId,
+                        DisplayOrder = value.DisplayOrder,
+                        KoreanTitle = value.KoreanTitle,
+                        KoreanSummary = value.KoreanSummary,
+                    }).ToArray();
+                worldEvent.RequiredParticipantCount = 1;
+                worldEvent.RequiresExpectedRevision = true;
+            }
             worldEvent.RespondedParticipantCount =
                 string.IsNullOrWhiteSpace(encounter.SelectedChoiceStableId) ? 0 : 1;
             worldEvent.CanRespond =
-                encounter.StateCode == SimulationFarmSurvivalCodes.AwaitingResponse;
+                encounter.StateCode == SimulationFarmSurvivalCodes.AwaitingResponse
+                || encounter.StateCode ==
+                    SimulationFarmSurvivalCodes.AwaitingDefenseChoice;
         }
 
         private string FindCommonSafeBuildingStableId()

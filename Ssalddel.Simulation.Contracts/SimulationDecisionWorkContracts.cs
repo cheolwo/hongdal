@@ -6,6 +6,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string Previewed = "Previewed";
         public const string Confirmed = "Confirmed";
+        public const string Cancelled = "Cancelled";
     }
 
     public static class SimulationTaskStateCodes
@@ -47,6 +48,12 @@ namespace Ssalddel.Simulation.Contracts
         public string FacilityStableId { get; set; } = string.Empty;
         public string ActionCode { get; set; } = string.Empty;
         public string AssignedActorStableId { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
+        public string PreferredOriginSpatialStableId { get; set; } = string.Empty;
+        public string PreferredRouteSpatialStableId { get; set; } = string.Empty;
+        public string PreferredDestinationSpatialStableId { get; set; } = string.Empty;
+        public string RouteStableId { get; set; } = string.Empty;
+        public string DestinationFacilityStableId { get; set; } = string.Empty;
         public decimal AssignedCapacity { get; set; }
         public string AssignedCapacityUnitCode { get; set; } = string.Empty;
         public int DurationTicks { get; set; } = 1;
@@ -70,6 +77,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public SimulationDecisionSnapshot Decision { get; set; } = new SimulationDecisionSnapshot();
         public SimulationTaskPlanSnapshot TaskPlan { get; set; } = new SimulationTaskPlanSnapshot();
+        public Simulation공간상호작용PreviewSnapshot? SpatialInteraction { get; set; }
     }
 
     public sealed class SimulationDecisionConfirmRequest
@@ -110,6 +118,17 @@ namespace Ssalddel.Simulation.Contracts
         public string FacilityStableId { get; set; } = string.Empty;
         public string ActionCode { get; set; } = string.Empty;
         public string AssignedActorStableId { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
+        public string PreferredOriginSpatialStableId { get; set; } = string.Empty;
+        public string PreferredRouteSpatialStableId { get; set; } = string.Empty;
+        public string PreferredDestinationSpatialStableId { get; set; } = string.Empty;
+        public string RouteStableId { get; set; } = string.Empty;
+        public string DestinationFacilityStableId { get; set; } = string.Empty;
+        public string SelectedSpatialStableId { get; set; } = string.Empty;
+        public string SpatialDefinitionRevision { get; set; } = string.Empty;
+        public string SpatialDefinitionHashSha256 { get; set; } = string.Empty;
+        public Simulation공간역할BindingSnapshot[] SpatialRoleBindings { get; set; }
+            = Array.Empty<Simulation공간역할BindingSnapshot>();
         public decimal AssignedCapacity { get; set; }
         public string AssignedCapacityUnitCode { get; set; } = string.Empty;
         public int DurationTicks { get; set; }
@@ -128,6 +147,11 @@ namespace Ssalddel.Simulation.Contracts
         public string FacilityStableId { get; set; } = string.Empty;
         public string ActionCode { get; set; } = string.Empty;
         public string AssignedActorStableId { get; set; } = string.Empty;
+        public string SelectedSpatialStableId { get; set; } = string.Empty;
+        public string SpatialDefinitionRevision { get; set; } = string.Empty;
+        public string SpatialDefinitionHashSha256 { get; set; } = string.Empty;
+        public Simulation공간역할BindingSnapshot[] SpatialRoleBindings { get; set; }
+            = Array.Empty<Simulation공간역할BindingSnapshot>();
         public decimal AssignedCapacity { get; set; }
         public string AssignedCapacityUnitCode { get; set; } = string.Empty;
         public int ScheduledStartTick { get; set; }

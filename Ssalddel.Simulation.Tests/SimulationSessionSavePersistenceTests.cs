@@ -142,6 +142,59 @@ public sealed class SimulationSessionSavePersistenceTests
     }
 
     [Fact]
+    public void 전투저장기록은_JSON저장소를거쳐도상태와무결성Hash를보존한다()
+    {
+        var factory = CreateFactory();
+        EnsureCreated(factory);
+        var store = new SimulationSessionSaveStore(factory);
+        var sessions = new InMemory경영SimulationSessionStore();
+        var service = new 경영SimulationSessionService(sessions, store);
+        service.Create(CreateRequest());
+        var aggregate = Assert.IsType<경영SimulationSessionAggregate>(
+            sessions.Find(Session));
+        var package = aggregate.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:session-persistence:battle",
+            ExpectedRevision = 0,
+        });
+        var battle = new SimulationBattleInstanceState(new SimulationBattleCreationContext
+        {
+            BattleStableId = "battle:persistence:one",
+            SessionStableId = Session,
+            EncounterStableId = "encounter:persistence:one",
+            AreaStableId = "area:persistence:farm",
+            CommanderActorStableId = "actor:farmer",
+            StartedWorldTick = 0,
+            StartedWorldRevision = 0,
+            ScenarioSeed = 20260815,
+            AlliedStrength = 12,
+            HostileStrength = 9,
+            InitialResourceStableIds = ["building:persistence:farm"],
+            ReinforcementCandidateStableIds = ["npc:persistence:reserve"],
+            CreateCommandId = "command:battle:persistence:create",
+        });
+        battle.ConfirmDeployment(new SimulationBattleDeploymentConfirmRequest
+        {
+            CommandId = "command:battle:persistence:deploy",
+            ExpectedBattleRevision = 0,
+            ActorStableId = "actor:farmer",
+            DeploymentCode = SimulationBattleInstanceCodes.Defensive,
+        });
+        package = SimulationSaveReplayCloner.WithBattles(package,
+            [battle.CreateSaveRecord()]);
+        var saved = store.SaveOrGet(package);
+        var loaded = new SimulationSessionSaveStore(factory).Find(saved.SaveStableId)!;
+        var restoredBattle = SimulationBattleInstanceState.Restore(
+            Assert.Single(loaded.Battles));
+
+        Assert.Equal(saved.ReplayHash, loaded.ReplayHash);
+        Assert.Equal(battle.Snapshot().ReplayHashSha256,
+            restoredBattle.Snapshot().ReplayHashSha256);
+        Assert.Equal(SimulationBattleInstanceCodes.Active,
+            restoredBattle.Snapshot().PhaseCode);
+    }
+
+    [Fact]
     public void 저장자료물리표와열은_한국어로정의한다()
     {
         var factory = CreateFactory();

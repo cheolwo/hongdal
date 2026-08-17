@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
@@ -7,6 +8,18 @@ namespace Ssalddel.Simulation.Server.Controllers;
 
 [ApiController]
 [Route("api/simulation/v1/sessions/{sessionStableId}/farm-survival")]
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationFarmCombatInput,
+    SsalddelCodeLayer.Api,
+    "전투 시점·박자 시작·반응 확정 HTTP 경계를 제공한다.",
+    StepKey = "api.farm-combat",
+    DependsOnStepKeys = new[] { "contract.farm-combat" },
+    FlowOrder = 20,
+    ExecutionStage = SsalddelCodeExecutionStage.Confirm,
+    ReadsFrom = SsalddelCodeDataScope.SimulationState,
+    WritesTo = SsalddelCodeDataScope.SimulationState,
+    Effects = SsalddelCodeEffect.StateMutation,
+    Boundary = "Simulation 전용 경로이며 운영 서버 권한·원장을 변경하지 않는다.")]
 public sealed class SimulationFarmSurvivalController(
     SimulationFarmSurvivalService service) : ControllerBase
 {

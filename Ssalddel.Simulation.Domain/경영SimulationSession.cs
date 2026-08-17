@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Domain
@@ -39,6 +40,18 @@ namespace Ssalddel.Simulation.Domain
         public string ErrorCode { get; }
     }
 
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationSessionLifecycle,
+        SsalddelCodeLayer.Domain,
+        "결정적 세션 상태와 개정·Tick 상태 전이를 소유한다.",
+        StepKey = "domain.session-aggregate",
+        DependsOnStepKeys = new string[] { "application.session-lifecycle" },
+        ExecutionStage = SsalddelCodeExecutionStage.Tick,
+        Effects = SsalddelCodeEffect.StateMutation,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        WritesTo = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 40,
+        Boundary = "Aggregate 상태 전이는 Simulation 전용이며 운영 계약·재고·결제를 변경하지 않는다.")]
     public sealed partial class 경영SimulationSessionAggregate
     {
         private readonly object gate = new object();
@@ -61,6 +74,7 @@ namespace Ssalddel.Simulation.Domain
             GameDateStartsOn = request.WorldContext.GameDateStartsOn;
             InitializeSettlement(request.Settlement);
             InitializeNpcWorkforce(request.NpcWorkforce);
+            InitializeSimulationSpatialWorld(request.SpatialWorld);
             InitializeWorldInventory(request.WorldInventory);
             InitializeSurvivalTarot(request.SurvivalTarot);
             InitializeFarmSurvival(request.FarmSurvival);
@@ -151,6 +165,10 @@ namespace Ssalddel.Simulation.Domain
                     BuildNpcWorkforcePayloadKey(request.NpcWorkforce),
                     StringComparison.Ordinal)
                 || !string.Equals(
+                    BuildSimulationSpatialPayloadKey(spatialWorldCreationState),
+                    BuildSimulationSpatialPayloadKey(request.SpatialWorld),
+                    StringComparison.Ordinal)
+                || !string.Equals(
                     worldInventoryInitialPayloadKey,
                     BuildWorldInventoryPayloadKey(request.WorldInventory),
                     StringComparison.Ordinal)
@@ -224,6 +242,9 @@ namespace Ssalddel.Simulation.Domain
                 NpcWorkRecords = CreateNpcWorkRecordSnapshots(),
                 NpcActionProjections = CreateNpcActionProjections(),
                 NpcFacilityInventories = CreateNpcFacilityInventorySnapshots(),
+                SpatialDefinitions = CreateSimulationSpatialDefinitionSnapshots(),
+                SpatialRuntimeStates = CreateSimulationSpatialRuntimeSnapshots(),
+                SpatialReservations = CreateSimulationSpatialReservationSnapshots(),
                 Settlement = CreateSettlementSnapshot(),
                 FarmSurvival = farmSurvivalCreationState == null
                     ? null : CreateFarmSurvivalStateSnapshot(),
@@ -292,6 +313,9 @@ namespace Ssalddel.Simulation.Domain
                 NpcWorkRecords = source.NpcWorkRecords.Select(CloneNpcWorkRecord).ToArray(),
                 NpcActionProjections = source.NpcActionProjections.Select(CloneNpcActionProjection).ToArray(),
                 NpcFacilityInventories = source.NpcFacilityInventories.Select(CloneNpcFacilityInventory).ToArray(),
+                SpatialDefinitions = source.SpatialDefinitions.Select(CloneSpatialDefinition).ToArray(),
+                SpatialRuntimeStates = source.SpatialRuntimeStates.Select(CloneSpatialRuntime).ToArray(),
+                SpatialReservations = source.SpatialReservations.Select(CloneSpatialReservation).ToArray(),
                 Settlement = CloneSettlementSnapshot(source.Settlement),
                 FarmSurvival = CloneFarmSurvivalStateOrNull(source.FarmSurvival),
                 TeamRoleCards = CloneTeamRoleCardStateOrNull(source.TeamRoleCards),
@@ -321,6 +345,7 @@ namespace Ssalddel.Simulation.Domain
                 throw new SimulationContractException("SimulationGameDateStartsOnInvalid");
             ValidateSettlementInitialState(request.Settlement, request.WorldContext.SettlementStableId);
             ValidateNpcWorkforceInitialState(request.NpcWorkforce);
+            ValidateSimulationSpatialInitialState(request.SpatialWorld);
             ValidateWorldInventoryInitialState(request.WorldInventory);
             ValidateSurvivalTarotInitialState(request.SurvivalTarot);
             ValidateFarmSurvivalInitialState(request.FarmSurvival);

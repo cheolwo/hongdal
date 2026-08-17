@@ -53,6 +53,7 @@ namespace Ssalddel.Simulation.Contracts
         public string TransportRequestStableId { get; set; } = string.Empty;
         public long TransportRevision { get; set; }
         public string ActorStableId { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
         public int ReceiptDurationTicks { get; set; } = 1;
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
     }

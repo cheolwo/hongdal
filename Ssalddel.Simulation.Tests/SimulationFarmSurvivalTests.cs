@@ -63,6 +63,198 @@ public sealed class SimulationFarmSurvivalTests
     }
 
     [Fact]
+    public void 경관중심규칙은_이십삼일까지평온하고_이십사일에계절방어를예고한다()
+    {
+        Assert.Equal(SimulationFarmSurvivalCodes.ScenicSeasonRuleRevision,
+            new SimulationFarmSurvivalInitialStateRequest().RuleRevision);
+        var session = new 경영SimulationSessionAggregate(CreateScenicRequest());
+
+        var dayTwentyThree = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:scenic:day-23",
+            ExpectedRevision = 0,
+            TickCount = 22,
+        });
+        Assert.Empty(dayTwentyThree.FarmSurvival!.Encounters);
+        Assert.Equal("ScenicExploration",
+            dayTwentyThree.FarmSurvival.DayGoalCode);
+
+        var dayTwentyFour = session.Advance(Tick(
+            "command:tick:scenic:day-24", dayTwentyThree.Revision));
+        var warning = Assert.Single(dayTwentyFour.FarmSurvival!.Encounters);
+        Assert.Equal(SimulationFarmSurvivalCodes.Warning, warning.StateCode);
+        Assert.Equal(27, warning.DecisionDeadlineWorldTick);
+        Assert.Empty(warning.AvailableChoiceStableIds);
+        Assert.Equal(
+            SimulationFarmSurvivalCodes.SeasonalDefenseWarningPresentation,
+            warning.PresentationKey);
+        var worldEvent = Assert.Single(session.GetWorldEvents(0).Events);
+        Assert.False(worldEvent.CanRespond);
+        Assert.Empty(worldEvent.Choices);
+    }
+
+    [Fact]
+    public void 계절방어는_이십칠일에선택을열고_미선택이면이십팔일자동판정한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateScenicRequest());
+        var dayTwentySeven = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:scenic:day-27",
+            ExpectedRevision = 0,
+            TickCount = 26,
+        });
+
+        var choice = Assert.Single(dayTwentySeven.FarmSurvival!.Encounters);
+        Assert.Equal(SimulationFarmSurvivalCodes.AwaitingDefenseChoice,
+            choice.StateCode);
+        Assert.Equal(new[]
+        {
+            SimulationFarmSurvivalCodes.AutomaticDefense,
+            SimulationFarmSurvivalCodes.DirectCombat,
+        }, choice.AvailableChoiceStableIds);
+        Assert.DoesNotContain(dayTwentySeven.FarmSurvival.Encounters, value =>
+            value.ThreatTypeCode == SimulationFarmSurvivalCodes.RaiderFaction);
+        var choiceEvent = Assert.Single(session.GetWorldEvents(0).Events);
+        Assert.True(choiceEvent.CanRespond);
+        Assert.Equal(2, choiceEvent.Choices.Length);
+
+        var dayTwentyEight = session.Advance(Tick(
+            "command:tick:scenic:day-28", dayTwentySeven.Revision));
+        var resolved = Assert.Single(dayTwentyEight.FarmSurvival!.Encounters);
+        Assert.Equal(SimulationFarmSurvivalCodes.Resolved, resolved.StateCode);
+        Assert.Equal(SimulationFarmSurvivalCodes.AutomaticDefense,
+            resolved.SelectedChoiceStableId);
+        Assert.Equal(28, Assert.Single(dayTwentyEight.FarmSurvival.DayReports).DayNumber);
+    }
+
+    [Fact]
+    public void 직접전투를선택해야만_경관중심규칙에서교전대기상태가열린다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateScenicRequest());
+        var dayTwentySeven = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:scenic:direct:day-27",
+            ExpectedRevision = 0,
+            TickCount = 26,
+        }).FarmSurvival!;
+        var encounter = Assert.Single(dayTwentySeven.Encounters);
+
+        var selected = session.ConfirmThreatResponse(
+            new SimulationThreatResponseConfirmRequest
+            {
+                CommandId = "command:threat:scenic:direct",
+                ExpectedRevision = dayTwentySeven.WorldRevision,
+                EncounterStableId = encounter.EncounterStableId,
+                ActorStableId = Player,
+                ChoiceStableId = SimulationFarmSurvivalCodes.DirectCombat,
+            });
+
+        Assert.Equal(SimulationFarmSurvivalCodes.AwaitingCombat,
+            Assert.Single(selected.Encounters).StateCode);
+        Assert.Equal(SimulationFarmSurvivalCodes.DirectCombat,
+            Assert.Single(selected.Encounters).SelectedChoiceStableId);
+
+        var perspective = session.ConfirmCombatPerspective(
+            CombatPerspective(selected.WorldRevision,
+                SimulationFarmCombatCodes.FirstPersonPrecision));
+        var started = session.StartCombatBeat(new SimulationCombatBeatStartRequest
+        {
+            CommandId = "command:combat:scenic:beat",
+            ExpectedRevision = perspective.WorldRevision,
+            EncounterStableId = encounter.EncounterStableId,
+            ActorStableId = Player,
+        });
+        var beat = Assert.Single(started.Combat.Beats);
+        var resolved = session.ConfirmCombatReaction(
+            new SimulationCombatReactionConfirmRequest
+            {
+                CommandId = "command:combat:scenic:counter",
+                ExpectedRevision = started.WorldRevision,
+                BeatStableId = beat.BeatStableId,
+                ActorStableId = Player,
+                ReactionActionCode = SimulationFarmCombatCodes.Counter,
+                ReactionOffsetMs = SimulationFarmCombatCodes.ImpactOffsetMs,
+            });
+        Assert.Equal(SimulationFarmSurvivalCodes.Resolved,
+            Assert.Single(resolved.Encounters).StateCode);
+        Assert.Equal(SimulationFarmSurvivalCodes.DefenseSucceeded,
+            Assert.Single(resolved.Encounters).OutcomeCode);
+    }
+
+    [Fact]
+    public void 자동방어선택과계절결과는_SaveReplay후에도같은Hash를만든다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateScenicRequest());
+        var dayTwentySeven = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:scenic:save:day-27",
+            ExpectedRevision = 0,
+            TickCount = 26,
+        }).FarmSurvival!;
+        var encounter = Assert.Single(dayTwentySeven.Encounters);
+        var selected = session.ConfirmThreatResponse(
+            new SimulationThreatResponseConfirmRequest
+            {
+                CommandId = "command:threat:scenic:auto",
+                ExpectedRevision = dayTwentySeven.WorldRevision,
+                EncounterStableId = encounter.EncounterStableId,
+                ActorStableId = Player,
+                ChoiceStableId = SimulationFarmSurvivalCodes.AutomaticDefense,
+            });
+        Assert.Equal(SimulationFarmSurvivalCodes.AwaitingAutoResolution,
+            Assert.Single(selected.Encounters).StateCode);
+        session.Advance(Tick("command:tick:scenic:save:day-28",
+            selected.WorldRevision));
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:farm-survival:scenic-season",
+            ExpectedRevision = session.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = package.SaveStableId,
+                ExpectedRevision = restored.Revision,
+            });
+
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+        Assert.Equal(SimulationFarmSurvivalCodes.AutomaticDefense,
+            Assert.Single(restored.GetFarmSurvivalState().Encounters)
+                .SelectedChoiceStableId);
+    }
+
+    [Fact]
+    public void 긴Session도_각이십팔일장마다계절방어를하나씩만기록한다()
+    {
+        var request = CreateScenicRequest();
+        request.DurationTicks = 56;
+        var session = new 경영SimulationSessionAggregate(request);
+
+        var secondSeasonStart = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:scenic:first-season",
+            ExpectedRevision = 0,
+            TickCount = 28,
+        });
+        var dayFiftySix = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:tick:scenic:second-season",
+            ExpectedRevision = secondSeasonStart.Revision,
+            TickCount = 27,
+        }).FarmSurvival!;
+
+        Assert.Equal(2, dayFiftySix.Encounters.Length);
+        Assert.Equal(2, dayFiftySix.Encounters.Select(value =>
+            value.EncounterStableId).Distinct(StringComparer.Ordinal).Count());
+        Assert.All(dayFiftySix.Encounters, value =>
+            Assert.Equal(SimulationFarmSurvivalCodes.Resolved, value.StateCode));
+        Assert.Equal(new[] { 28, 56 }, dayFiftySix.DayReports.Select(value =>
+            value.DayNumber).ToArray());
+    }
+
+    [Fact]
     public void 다섯째날위협은경고로먼저보이고_방어부족결과는복구가능하게남는다()
     {
         var session = new 경영SimulationSessionAggregate(CreateRequest());
@@ -1037,6 +1229,7 @@ public sealed class SimulationFarmSurvivalTests
             },
             FarmSurvival = new SimulationFarmSurvivalInitialStateRequest
             {
+                RuleRevision = SimulationFarmSurvivalCodes.RuleRevision,
                 RegionStableId = "region:legal-dong:5176031000",
                 AreaStableId = "area:sim.daegwallyeong-farm",
                 TileKey = "kr5186:l2:438:419",
@@ -1102,6 +1295,14 @@ public sealed class SimulationFarmSurvivalTests
                 ],
             },
         };
+
+    private static 경영SimulationSession생성Request CreateScenicRequest()
+    {
+        var request = CreateRequest();
+        request.FarmSurvival!.RuleRevision =
+            SimulationFarmSurvivalCodes.ScenicSeasonRuleRevision;
+        return request;
+    }
 
     private static WebApplicationFactory<Program> CreateFactory()
         => new WebApplicationFactory<Program>()

@@ -7,6 +7,7 @@ namespace Ssalddel.Simulation.Contracts
         public string InventoryStableId { get; set; } = string.Empty;
         public long InventoryRevision { get; set; }
         public string ActorStableId { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
         public int PutAwayDurationTicks { get; set; } = 2;
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
     }

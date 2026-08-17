@@ -24,6 +24,9 @@ public sealed class SimulationWorldStreamingTests
         Assert.Equal(4, a.PrefetchRadius);
         Assert.Equal(4, a.MaxConcurrentTileLoads);
         Assert.Equal(0.25d, a.BoundaryPrefetchFraction);
+        Assert.Equal("region-presentation-summary.v1", a.RegionSummaryProfileRevision);
+        Assert.Equal(64, a.RegionSummaryProfileHashSha256.Length);
+        Assert.Equal(new[] { "L0", "L1", "L2" }, a.SupportedSummaryLodCodes);
         Assert.Equal(64, a.RecipeHashSha256.Length);
         Assert.Equal(a.RecipeHashSha256, b.RecipeHashSha256);
         Assert.False(a.IsOperationalState);
@@ -45,6 +48,33 @@ public sealed class SimulationWorldStreamingTests
             Assert.Null(layer.ArtifactHashSha256);
         });
         Assert.Equal(60, manifest.HaloMeters);
+        Assert.Equal(SimulationWorldStreamCodes.RegionSummaryWaitingForDerivedData,
+            manifest.RegionSummaryStatusCode);
+        Assert.Null(manifest.RegionSummaryHashSha256);
+    }
+
+    [Fact]
+    public void 파생Db산출물이있으면_원본계보와본문경로를_Manifest에투영한다()
+    {
+        var service = new SimulationWorldStreamingService(new FixtureArtifactReader());
+        var key = SimulationWorldStreamingService.TileKey(700, 1145);
+
+        Assert.True(service.TryGetManifest(key, out var manifest));
+        var elevation = Assert.Single(manifest.Layers,
+            item => item.LayerCode == SimulationWorldStreamCodes.ElevationLayer);
+        Assert.Equal(SimulationWorldStreamCodes.Available, elevation.StatusCode);
+        Assert.Equal("Copernicus-DEM-GLO30-N37E128", elevation.SourceRevision);
+        Assert.Equal("EPSG:5186", elevation.HorizontalCrsCode);
+        Assert.Equal("Unverified", elevation.VerticalDatumCode);
+        Assert.Equal("height-f32-v1", elevation.ArtifactFormatCode);
+        Assert.Equal(63, elevation.SampleWidth);
+        Assert.Equal(63, elevation.SampleHeight);
+        Assert.EndsWith("/artifacts/elevation/content", elevation.ArtifactContentPath);
+        Assert.False(elevation.PresentationOnly);
+
+        Assert.True(service.TryGetArtifact(key, "elevation", out var descriptor));
+        Assert.Equal(elevation.ArtifactHashSha256, descriptor.ArtifactHashSha256);
+        Assert.Equal("검증된 공간 산출물 사용 가능", descriptor.KoreanStatusLabel);
     }
 
     [Fact]
@@ -117,6 +147,16 @@ public sealed class SimulationWorldStreamingTests
             "/api/simulation/v1/world-stream/regions/"
             + Uri.EscapeDataString("region:kr:administrative:5176038000"));
         Assert.Equal(HttpStatusCode.ServiceUnavailable, regionWhileDatabaseDisabled.StatusCode);
+
+        using var summaryWhileDatabaseDisabled = await client.GetAsync(
+            "/api/simulation/v1/world-stream/regions/"
+            + Uri.EscapeDataString("region:kr:bjd:5176038000") + "/summary?lod=L1");
+        Assert.Equal(HttpStatusCode.NotFound, summaryWhileDatabaseDisabled.StatusCode);
+
+        using var detailWhileDatabaseDisabled = await client.GetAsync(
+            "/api/simulation/v1/world-stream/objects/"
+            + Uri.EscapeDataString("business:public-license:test") + "/public-detail");
+        Assert.Equal(HttpStatusCode.NotFound, detailWhileDatabaseDisabled.StatusCode);
     }
 
     private static WebApplicationFactory<Program> CreateFactory()
@@ -134,4 +174,36 @@ public sealed class SimulationWorldStreamingTests
                     });
                 });
             });
+
+    private sealed class FixtureArtifactReader : ISimulationWorldTileArtifactReader
+    {
+        public bool TryRead(
+            string tileKey,
+            string layerCode,
+            out SimulationWorldTileArtifactSnapshot value)
+        {
+            value = new SimulationWorldTileArtifactSnapshot();
+            if (tileKey != SimulationWorldStreamingService.TileKey(700, 1145)
+                || layerCode != SimulationWorldStreamCodes.ElevationLayer)
+                return false;
+            value = new SimulationWorldTileArtifactSnapshot
+            {
+                TileKey = tileKey,
+                LayerCode = layerCode,
+                SourceRevision = "Copernicus-DEM-GLO30-N37E128",
+                ArtifactHashSha256 = new string('a', 64),
+                SourceHashSha256 = new string('b', 64),
+                HorizontalCrsCode = "EPSG:5186",
+                VerticalDatumCode = "Unverified",
+                ResolutionMeters = 30m,
+                NoDataValue = "-32767",
+                ArtifactFormatCode = "height-f32-v1",
+                ArtifactRelativePath = "generated/tiles/kr5186_l2_700_1145/elevation.bin",
+                ArtifactByteLength = 15876,
+                SampleWidth = 63,
+                SampleHeight = 63,
+            };
+            return true;
+        }
+    }
 }

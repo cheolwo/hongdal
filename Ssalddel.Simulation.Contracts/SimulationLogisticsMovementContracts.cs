@@ -24,6 +24,9 @@ namespace Ssalddel.Simulation.Contracts
         public string OriginFacilityStableId { get; set; } = string.Empty;
         public string DestinationFacilityStableId { get; set; } = string.Empty;
         public string ActorStableId { get; set; } = string.Empty;
+        public string PreferredOriginSpatialStableId { get; set; } = string.Empty;
+        public string PreferredRouteSpatialStableId { get; set; } = string.Empty;
+        public string PreferredDestinationSpatialStableId { get; set; } = string.Empty;
         public int RequiredRouteTicks { get; set; }
         public SimulationFreightTransportBindingRequest? FreightTransport { get; set; }
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();

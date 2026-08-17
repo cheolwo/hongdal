@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Domain;
 
@@ -127,6 +128,18 @@ public sealed class SimulationWorld공간실행Reader(
     }
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationSyntyLandscape,
+    SsalddelCodeLayer.Infrastructure,
+    "Synty 경관 실행과 그래픽·배치·거부 결과를 별도 파생 DB에 저장한다.",
+    StepKey = "infrastructure.synty-store",
+    DependsOnStepKeys = new string[] { "application.synty-job" },
+    ExecutionStage = SsalddelCodeExecutionStage.Persistence,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ReadsFrom = SsalddelCodeDataScope.DerivedWorld,
+    WritesTo = SsalddelCodeDataScope.DerivedWorld,
+    FlowOrder = 40,
+    Boundary = "공간 실행과 별도 fingerprint를 사용하며 Synty 대장 변경이 공간 원장을 다시 쓰게 하지 않는다.")]
 public sealed class SimulationWorldSynty경관Store(
     SimulationWorld파생DbContext dbContext) : ISimulationWorldSynty경관Store
 {

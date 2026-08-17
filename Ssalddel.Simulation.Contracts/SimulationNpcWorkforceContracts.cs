@@ -28,6 +28,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string Working = "Working";
         public const string Completed = "Completed";
         public const string Blocked = "Blocked";
+        public const string Cancelled = "Cancelled";
     }
 
     public static class SimulationNpcGrantKindCodes
@@ -41,6 +42,13 @@ namespace Ssalddel.Simulation.Contracts
         public const string PendingInspection = "PendingInspection";
         public const string StorageEligible = "StorageEligible";
         public const string PutAwayCompleted = "PutAwayCompleted";
+        public const string OutboundRequested = "OutboundRequested";
+        public const string Picked = "Picked";
+        public const string OutboundReady = "OutboundReady";
+        public const string MarketReceived = "MarketReceived";
+        public const string MarketStorageEligible = "MarketStorageEligible";
+        public const string MarketBackroomStored = "MarketBackroomStored";
+        public const string Displayed = "Displayed";
     }
 
     public sealed class SimulationNpcWorkforceInitialStateRequest
@@ -246,6 +254,7 @@ namespace Ssalddel.Simulation.Contracts
         public string InventoryStableId { get; set; } = string.Empty;
         public string LotStableId { get; set; } = string.Empty;
         public string FacilityStableId { get; set; } = string.Empty;
+        public string ProductStableId { get; set; } = string.Empty;
         public string StateCode { get; set; } = string.Empty;
         public decimal Quantity { get; set; }
         public string UnitCode { get; set; } = string.Empty;

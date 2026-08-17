@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Simulation.Domain
 {
@@ -45,6 +46,14 @@ public sealed class SimulationWorldSynty경관Job요청
     public string QualityTierCode { get; set; } = string.Empty;
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationSyntyLandscape,
+    SsalddelCodeLayer.Domain,
+    "공간 출력과 Synty·URP 대장 개정을 결합한 경관 실행 결과를 정의한다.",
+    StepKey = "domain.synty-ledger",
+    ExecutionStage = SsalddelCodeExecutionStage.Definition,
+    FlowOrder = 10,
+    Boundary = "경관 실행은 표현 계획이며 공간 원본·법정동·Simulation 상태를 변경하지 않는다.")]
 public sealed class SimulationWorldSynty경관실행원장
 {
     public int SchemaVersion { get; set; } = 1;

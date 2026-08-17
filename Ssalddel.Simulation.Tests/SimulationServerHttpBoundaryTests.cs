@@ -1,14 +1,48 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Tests;
 
 public sealed class SimulationServerHttpBoundaryTests
 {
+    [Fact]
+    public async Task 세션_API_경로와_HTTP방식은_호환기준을_유지한다()
+    {
+        using var factory = CreateFactory(enabled: true);
+        using var client = factory.CreateClient();
+        using var health = await client.GetAsync("/health");
+        health.EnsureSuccessStatusCode();
+
+        var endpoints = factory.Services.GetRequiredService<EndpointDataSource>();
+        var manifest = endpoints.Endpoints
+            .OfType<RouteEndpoint>()
+            .Where(endpoint => endpoint.RoutePattern.RawText?.StartsWith(
+                "api/simulation/v1/sessions",
+                StringComparison.Ordinal) == true)
+            .SelectMany(endpoint => endpoint.Metadata
+                .GetMetadata<IHttpMethodMetadata>()?
+                .HttpMethods
+                .Select(method => $"{method} {endpoint.RoutePattern.RawText}")
+                ?? Array.Empty<string>())
+            .OrderBy(value => value, StringComparer.Ordinal)
+            .ToArray();
+        var hash = Convert.ToHexString(SHA256.HashData(
+                Encoding.UTF8.GetBytes(string.Join("\n", manifest))))
+            .ToLowerInvariant();
+        Assert.Equal(101, manifest.Length);
+        Assert.Equal(
+            "286f9b2bc55f001cdff6143081872d3ca6c38b2a34b49e4e0ed172cf80591aa5",
+            hash);
+    }
+
     [Fact]
     public async Task API가_비활성화되어도_상태확인은_가능하다()
     {
@@ -53,6 +87,21 @@ public sealed class SimulationServerHttpBoundaryTests
 
         using var response = await client.GetAsync(
             "/api/simulation/v1/sessions/simulation-session:missing");
+        var error = await response.Content.ReadFromJsonAsync<SimulationErrorResponse>();
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.NotNull(error);
+        Assert.Equal("SimulationSessionNotFound", error.ErrorCode);
+    }
+
+    [Fact]
+    public async Task 분리된_턴Controller도_공통예외Filter로_404를_반환한다()
+    {
+        using var factory = CreateFactory(enabled: true);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(
+            "/api/simulation/v1/sessions/simulation-session:missing/turn-closing-context");
         var error = await response.Content.ReadFromJsonAsync<SimulationErrorResponse>();
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

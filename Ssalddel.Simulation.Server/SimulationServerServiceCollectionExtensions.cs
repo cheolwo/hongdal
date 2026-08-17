@@ -83,6 +83,8 @@ public static class SimulationServerServiceCollectionExtensions
             DisabledSimulationWorldAreaSetDefinitionReader>();
         services.AddSingleton<ISimulationWorldAreaSetGraphStore,
             DisabledSimulationWorldAreaSetGraphStore>();
+        services.AddSingleton<ISimulationWorld상호작용GraphReadinessStore,
+            DisabledSimulationWorld상호작용GraphReadinessStore>();
         if (derivationOptions.Enabled)
         {
             var connectionString = configuration.GetConnectionString(
@@ -118,6 +120,12 @@ public static class SimulationServerServiceCollectionExtensions
                 InMemorySimulationSessionSaveStore>();
         }
         services.AddSingleton<경영SimulationSessionService>();
+        services.AddSingleton<경영SimulationSessionAccessor>();
+        services.AddSingleton<경영SimulationSession생명주기Service>();
+        services.AddSingleton<경영Simulation턴결정Service>();
+        services.AddSingleton<경영Simulation수확수출Service>();
+        services.AddSingleton<경영Simulation물류창고Service>();
+        services.AddSingleton<경영Simulation주문소비Service>();
         services.AddSingleton<SimulationWorldUIProjectionService>();
         services.AddSingleton<Simulation타로화물운송PreviewService>();
         services.AddSingleton<Simulation타로객체반응PreviewService>();
@@ -130,6 +138,11 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddScoped<SimulationWorldLandscapeCompositionJobShell>();
         services.AddScoped<SimulationWorldAreaSetLandscapeGraphJobShell>();
         services.AddScoped<SimulationWorldAreaSetLandscapeGraphService>();
+        services.AddSingleton<ISimulationWorld상호작용GraphCatalogReader>(
+            new FileSimulationWorld상호작용GraphCatalogReader(
+                derivationOptions.InteractionGraphBindingCatalogPath));
+        services.AddScoped<SimulationWorld상호작용GraphService>();
+        services.AddScoped<SimulationWorld상호작용GraphJobShell>();
         services.AddScoped<ISimulationWorldLandscapeSkeletonSource,
             PyeongchangFirstLandscapeSkeletonSource>();
         services.AddSingleton<SimulationWorldLandscapeGraphAssembler>();
@@ -151,6 +164,14 @@ public static class SimulationServerServiceCollectionExtensions
             provider.GetRequiredService<InMemorySimulationTeamObservationSessionStore>());
         services.AddSingleton<SimulationTeamObservationService>();
         services.AddSingleton<SimulationTeamRoleCardService>();
+        services.AddSingleton<InMemorySimulationBattleInstanceStore>();
+        services.AddSingleton<ISimulationBattleInstanceStore>(provider =>
+            provider.GetRequiredService<InMemorySimulationBattleInstanceStore>());
+        services.AddSingleton<ISimulationBattleResourceLockReader>(provider =>
+            provider.GetRequiredService<InMemorySimulationBattleInstanceStore>());
+        services.AddSingleton<SimulationBattleInstanceService>();
+        services.AddSingleton<ISimulationBattleWorldReconciler>(provider =>
+            provider.GetRequiredService<SimulationBattleInstanceService>());
         services.AddSingleton<SimulationCollectibleCardRewardService>();
         services.AddHealthChecks()
             .AddCheck(

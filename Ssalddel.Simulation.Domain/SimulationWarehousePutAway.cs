@@ -110,6 +110,7 @@ namespace Ssalddel.Simulation.Domain
                     FacilityStableId = inventory.FacilityStableId,
                     ActionCode = SimulationNpcActionCodes.WarehouseStorageMove,
                     AssignedActorStableId = request.ActorStableId.Trim(),
+                    PreferredSpatialStableId = request.PreferredSpatialStableId.Trim(),
                     AssignedCapacity = inventory.Quantity,
                     AssignedCapacityUnitCode = inventory.UnitCode,
                     DurationTicks = request.PutAwayDurationTicks,
@@ -136,6 +137,9 @@ namespace Ssalddel.Simulation.Domain
             if (request.InventoryRevision <= 0)
                 throw new SimulationContractException("SimulationWarehouseInventoryRevisionInvalid");
             RequireStableId(request.ActorStableId, "SimulationActorStableIdInvalid");
+            if (!string.IsNullOrWhiteSpace(request.PreferredSpatialStableId))
+                RequireStableId(request.PreferredSpatialStableId,
+                    "SimulationPreferredSpatialStableIdInvalid");
             if (request.PutAwayDurationTicks <= 0 || request.PutAwayDurationTicks > 7)
                 throw new SimulationContractException("SimulationWarehousePutAwayDurationInvalid");
             ValidateIds(request.SourceStableIds, true, "SimulationWarehousePutAwaySourceStableIdsInvalid");

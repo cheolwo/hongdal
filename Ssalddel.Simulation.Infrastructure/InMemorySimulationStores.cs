@@ -1,11 +1,24 @@
 using System;
 using System.Collections.Concurrent;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Infrastructure
 {
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationSessionLifecycle,
+        SsalddelCodeLayer.Infrastructure,
+        "활성 Simulation 세션을 프로세스 수명 동안 보관한다.",
+        StepKey = "infrastructure.session-store",
+        DependsOnStepKeys = new string[] { "domain.session-aggregate" },
+        ExecutionStage = SsalddelCodeExecutionStage.Persistence,
+        Effects = SsalddelCodeEffect.StateMutation,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        WritesTo = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 50,
+        Boundary = "프로세스 내부 저장소이며 durable 저장이나 다중 인스턴스 동기화를 보장하지 않는다.")]
     public sealed class InMemory경영SimulationSessionStore : I경영SimulationSessionStore
     {
         private readonly ConcurrentDictionary<string, 경영SimulationSessionAggregate> sessions =

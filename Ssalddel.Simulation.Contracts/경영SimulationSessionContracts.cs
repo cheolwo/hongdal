@@ -1,4 +1,5 @@
 using System;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Simulation.Contracts
 {
@@ -7,6 +8,14 @@ namespace Ssalddel.Simulation.Contracts
         public const string Simulation = "Simulation";
     }
 
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationSessionLifecycle,
+        SsalddelCodeLayer.Contract,
+        "Simulation 세션 생성 입력과 초기 World 문맥을 정의한다.",
+        StepKey = "contract.session-create",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        FlowOrder = 10,
+        Boundary = "운영 업무 생성 계약이 아니라 결정적 Simulation 세션 입력 계약이다.")]
     public sealed class 경영SimulationSession생성Request
     {
         public Guid ClientRequestId { get; set; }
@@ -19,6 +28,7 @@ namespace Ssalddel.Simulation.Contracts
             = new SimulationWorldContext생성Request();
         public SimulationSettlementInitialStateRequest? Settlement { get; set; }
         public SimulationNpcWorkforceInitialStateRequest? NpcWorkforce { get; set; }
+        public Simulation공간세계InitialStateRequest? SpatialWorld { get; set; }
         public SimulationWorldInventoryInitialStateRequest? WorldInventory { get; set; }
         public SimulationSurvivalTarotInitialStateRequest? SurvivalTarot { get; set; }
         public SimulationFarmSurvivalInitialStateRequest? FarmSurvival { get; set; }
@@ -110,6 +120,12 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationNpcActionProjection>();
         public SimulationNpcFacilityInventorySnapshot[] NpcFacilityInventories { get; set; }
             = Array.Empty<SimulationNpcFacilityInventorySnapshot>();
+        public Simulation공간정의Snapshot[] SpatialDefinitions { get; set; }
+            = Array.Empty<Simulation공간정의Snapshot>();
+        public Simulation공간실행상태Snapshot[] SpatialRuntimeStates { get; set; }
+            = Array.Empty<Simulation공간실행상태Snapshot>();
+        public Simulation공간예약Snapshot[] SpatialReservations { get; set; }
+            = Array.Empty<Simulation공간예약Snapshot>();
         public SimulationSettlementEconomySnapshot? Settlement { get; set; }
         public SimulationFarmSurvivalStateSnapshot? FarmSurvival { get; set; }
         public SimulationTeamRoleCardStateSnapshot? TeamRoleCards { get; set; }

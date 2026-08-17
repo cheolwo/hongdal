@@ -6,6 +6,105 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationIndividualOrderTests
 {
     [Fact]
+    public void WI_ORDER_01부터_07까지_확정_예약_피킹_포장_수령_소비를분리한다()
+    {
+        var saveStore = new InMemorySimulationSessionSaveStore();
+        var service = new 경영SimulationSessionService(
+            new InMemory경영SimulationSessionStore(), saveStore);
+        var session = CreateSession(service);
+        var orderRequest = OrderRequest();
+        orderRequest.FulfillmentDurationTicks = 3;
+        var confirmed = service.ConfirmIndividualOrder(session.SessionStableId,
+            ConfirmRequest(session.Revision, orderRequest,
+                "command:wi-order:confirm"));
+        var order = Assert.Single(confirmed.IndividualOrders);
+        Assert.Equal(SimulationIndividualOrderStateCodes.StockReserved, order.StateCode);
+        Assert.Equal(order.ConfirmedTick, order.StockReservedTick);
+        Assert.Equal(SimulationStockReservationStateCodes.Reserved,
+            Assert.Single(confirmed.StockReservations).StateCode);
+
+        var picked = service.Advance(session.SessionStableId, Tick(
+            "command:wi-order:picking", confirmed.Revision));
+        order = Assert.Single(picked.IndividualOrders);
+        Assert.Equal(SimulationIndividualOrderStateCodes.Picking, order.StateCode);
+        Assert.NotNull(order.PickedTick);
+        var packed = service.Advance(session.SessionStableId, Tick(
+            "command:wi-order:packing", picked.Revision));
+        order = Assert.Single(packed.IndividualOrders);
+        Assert.Equal(SimulationIndividualOrderStateCodes.Packed, order.StateCode);
+        Assert.NotNull(order.PackedTick);
+        var ready = service.Advance(session.SessionStableId, Tick(
+            "command:wi-order:ready", packed.Revision));
+        order = Assert.Single(ready.IndividualOrders);
+        Assert.Equal(SimulationIndividualOrderStateCodes.ReadyForPickup, order.StateCode);
+
+        var pickup = new SimulationIndividualOrderPickupPreviewRequest
+        {
+            OrderStableId = order.OrderStableId,
+            OrderRevision = order.Revision,
+            ActorStableId = order.ActorStableId,
+            PreferredSpatialStableId = "spatial:sim:market-pickup",
+            PickupDurationTicks = 1,
+            SourceStableIds = [order.OrderStableId],
+        };
+        Assert.Empty(service.PreviewIndividualOrderPickup(
+            session.SessionStableId, pickup).Decision.BlockReasonCodes);
+        Assert.Equal(ready.Revision, service.Get(session.SessionStableId).Revision);
+        var pickupScheduled = service.ConfirmIndividualOrderPickup(
+            session.SessionStableId, new SimulationIndividualOrderPickupConfirmRequest
+            {
+                CommandId = "command:wi-order:pickup",
+                ExpectedRevision = ready.Revision,
+                Pickup = pickup,
+            });
+        var fulfilled = service.Advance(session.SessionStableId, Tick(
+            "command:wi-order:pickup-tick", pickupScheduled.Revision));
+        order = Assert.Single(fulfilled.IndividualOrders);
+        Assert.Equal(SimulationIndividualOrderStateCodes.Fulfilled, order.StateCode);
+
+        var consumption = new Simulation시장소비PreviewRequest
+        {
+            ConsumptionStableId = "market-consumption:wi-order:potato-20kg",
+            OrderStableId = order.OrderStableId,
+            OrderRevision = order.Revision,
+            ActorStableId = order.ActorStableId,
+            ConsumptionDurationTicks = 1,
+            SourceStableIds = [order.OrderStableId],
+        };
+        Assert.Empty(service.PreviewMarketConsumption(session.SessionStableId,
+            consumption).BlockReasonCodes);
+        var consumptionScheduled = service.ConfirmMarketConsumption(
+            session.SessionStableId, new Simulation시장소비ConfirmRequest
+            {
+                CommandId = "command:wi-order:consume",
+                ExpectedRevision = fulfilled.Revision,
+                Consumption = consumption,
+            });
+        var consumed = service.Advance(session.SessionStableId, Tick(
+            "command:wi-order:consume-tick", consumptionScheduled.Revision));
+        Assert.Equal(SimulationIndividualOrderStateCodes.Consumed,
+            Assert.Single(consumed.IndividualOrders).StateCode);
+        Assert.Equal(Simulation시장소비StateCodes.Consumed,
+            Assert.Single(consumed.MarketConsumptions).StateCode);
+        Assert.Equal(280m,
+            Assert.Single(consumed.Settlement!.MarketSupplyByProduct).Quantity);
+        var saved = service.Save(session.SessionStableId,
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = "save:wi-order:full-lifecycle",
+                ExpectedRevision = consumed.Revision,
+            });
+        var restored = new 경영SimulationSessionService(
+            new InMemory경영SimulationSessionStore(), saveStore).Restore(
+                new SimulationSessionRestoreRequest
+                {
+                    SaveStableId = saved.SaveStableId,
+                });
+        Assert.Equal(saved.ReplayHash, restored.ReplayHash);
+        Assert.Equal(SimulationIndividualOrderStateCodes.Consumed,
+            Assert.Single(restored.Session.IndividualOrders).StateCode);
+    }
+    [Fact]
     public void Preview는_감자재고와노동후보를계산하지만_session을변경하지않는다()
     {
         var service = Service();
@@ -308,7 +407,49 @@ public sealed class SimulationIndividualOrderTests
                 ],
                 SourceStableIds = ["scenario:sim.order-core-1"],
             },
+            SpatialWorld = new Simulation공간세계InitialStateRequest
+            {
+                Definitions =
+                [
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = "spatial:sim:market-pickup",
+                        FacilityStableId = "facility:sim.market-1",
+                        AreaStableId = "area:sim:market-1",
+                        AreaSetStableId = "area-set:sim:order-core",
+                        EvidenceKindCode = Simulation공간근거종류Codes.Scenario,
+                        AccessStateCode = Simulation공간접근상태Codes.Available,
+                        CapabilityCodes =
+                        [
+                            Simulation공간능력Codes.CustomerAccessible,
+                            Simulation공간능력Codes.PickupArea,
+                        ],
+                        BaseCapacities =
+                        [
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.WorkArea,
+                                Quantity = 1m,
+                                UnitCode = "slot",
+                            },
+                        ],
+                        DefinitionRevision = "scenario-order-pickup.v1",
+                        DefinitionHashSha256 = new string('e', 64),
+                        SourceStableIds = ["scenario:sim.order-core-1"],
+                    },
+                ],
+            },
         });
+
+    private static 경영SimulationTick진행Request Tick(
+        string commandId,
+        long expectedRevision)
+        => new()
+        {
+            CommandId = commandId,
+            ExpectedRevision = expectedRevision,
+            TickCount = 1,
+        };
 
     private static SimulationIndividualOrderPreviewRequest OrderRequest(
         decimal quantity = 20m,

@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Shared/">
+    <Project Path="Ssalddel.CodeMetadata/Ssalddel.CodeMetadata.csproj" />
+  </Folder>
   <Folder Name="/Simulation/">
     <Project Path="Ssalddel.Simulation.Application/Ssalddel.Simulation.Application.csproj" />
     <Project Path="Ssalddel.Simulation.Contracts/Ssalddel.Simulation.Contracts.csproj" />

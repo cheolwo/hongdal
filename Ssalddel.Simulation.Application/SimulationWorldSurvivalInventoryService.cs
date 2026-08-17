@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
@@ -11,10 +12,13 @@ namespace Ssalddel.Simulation.Application
     public sealed class SimulationWorldSurvivalInventoryService
     {
         private readonly I경영SimulationSessionStore store;
+        private readonly ISimulationBattleResourceLockReader? battleLocks;
 
-        public SimulationWorldSurvivalInventoryService(I경영SimulationSessionStore store)
+        public SimulationWorldSurvivalInventoryService(I경영SimulationSessionStore store,
+            ISimulationBattleResourceLockReader? battleResourceLocks = null)
         {
             this.store = store ?? throw new ArgumentNullException(nameof(store));
+            battleLocks = battleResourceLocks;
         }
 
         public SimulationWorldInventorySnapshot Get(string sessionStableId)
@@ -23,12 +27,26 @@ namespace Ssalddel.Simulation.Application
         public SimulationWorldItemAcquisitionPreviewSnapshot PreviewAcquisition(
             string sessionStableId,
             SimulationWorldItemAcquisitionPreviewRequest request)
-            => Find(sessionStableId).PreviewWorldItemAcquisition(request);
+        {
+            var preview = Find(sessionStableId).PreviewWorldItemAcquisition(request);
+            if (battleLocks?.IsLocked(sessionStableId, request.ItemStackStableId) == true)
+            {
+                preview.CanConfirm = false;
+                preview.EligibilityStateCode = SimulationWorldSurvivalInventoryCodes.Blocked;
+                preview.BlockReasonCodes = preview.BlockReasonCodes
+                    .Concat(new[] { "BattleResourceLocked" }).Distinct().ToArray();
+            }
+            return preview;
+        }
 
         public SimulationWorldItemAcquisitionResultSnapshot ConfirmAcquisition(
             string sessionStableId,
             SimulationWorldItemAcquisitionConfirmRequest request)
-            => Find(sessionStableId).ConfirmWorldItemAcquisition(request);
+        {
+            if (battleLocks?.IsLocked(sessionStableId, request.ItemStackStableId) == true)
+                throw new SimulationConflictException("BattleResourceLocked");
+            return Find(sessionStableId).ConfirmWorldItemAcquisition(request);
+        }
 
         private 경영SimulationSessionAggregate Find(string sessionStableId)
         {

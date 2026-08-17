@@ -17,6 +17,50 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationWorldInboundInspectionUiVerticalSliceTests
 {
     [Fact]
+    public async System.Threading.Tasks.Task 공간예약된검수작업은_HTTP취소뒤예약과임시재고가반환된다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var session = await Post<경영SimulationSessionSnapshot>(
+            client,
+            "/api/simulation/v1/sessions",
+            CreateSessionRequest(),
+            HttpStatusCode.Created);
+        var request = CancellationInspection();
+        var preview = await Post<SimulationDecisionPreviewSnapshot>(
+            client,
+            $"/api/simulation/v1/sessions/{session.SessionStableId}/decision-previews",
+            request);
+        Assert.Equal(PyeongchangSimulation공간StableIds.진부Hub검수공간,
+            preview.TaskPlan.SelectedSpatialStableId);
+
+        session = await Post<경영SimulationSessionSnapshot>(
+            client,
+            $"/api/simulation/v1/sessions/{session.SessionStableId}/decisions/confirm",
+            new SimulationDecisionConfirmRequest
+            {
+                CommandId = "command:http:spatial-cancel:confirm",
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        var task = Assert.Single(session.Tasks);
+        session = await Post<경영SimulationSessionSnapshot>(
+            client,
+            $"/api/simulation/v1/sessions/{session.SessionStableId}/tasks/{task.TaskStableId}/cancel",
+            new SimulationTaskCancelRequest
+            {
+                CommandId = "command:http:spatial-cancel",
+                ExpectedRevision = session.Revision,
+                ReasonCode = "UserCancelled",
+            });
+
+        Assert.Equal(SimulationTaskStateCodes.Cancelled, Assert.Single(session.Tasks).StateCode);
+        Assert.Empty(session.NpcFacilityInventories);
+        Assert.All(session.SpatialReservations, value =>
+            Assert.Equal(Simulation공간예약상태Codes.Cancelled, value.StatusCode));
+    }
+
+    [Fact]
     public async System.Threading.Tasks.Task 진부면물류거점정보판은_미리보기_확정_Npc검수_완료재조회를끝까지잇는다()
     {
         using var factory = CreateFactory();
@@ -181,6 +225,42 @@ public sealed class SimulationWorldInboundInspectionUiVerticalSliceTests
             SourceStableIds = invocation.SourceStableIds.ToArray(),
         };
 
+    private static SimulationDecisionPreviewRequest CancellationInspection()
+        => new()
+        {
+            DecisionStableId = "decision:http:spatial-cancel",
+            DecisionTypeCode = SimulationNpcActionCodes.WarehouseInboundInspection,
+            ActorStableId = PyeongchangSimulationNpcStableIds.진부입고검수담당,
+            TargetStableIds = new[] { "cargo:http:spatial-cancel" },
+            ExpectedEffects = new[]
+            {
+                new SimulationValueProjection
+                {
+                    ValueTypeCode = "FreightReceiptQuantity",
+                    TargetLedgerStableId = "cargo:http:spatial-cancel",
+                    BeforeValue = 0m,
+                    Delta = 100m,
+                    AfterValue = 100m,
+                    UnitCode = "KGM",
+                    SourceStableIds = new[] { "source:fixture:http-spatial-cancel" },
+                },
+            },
+            SourceStableIds = new[] { "source:fixture:http-spatial-cancel" },
+            Task = new SimulationTaskPlanRequest
+            {
+                TaskStableId = "task:http:spatial-cancel",
+                TaskTypeCode = "FreightReceiptConfirmation",
+                FacilityStableId = PyeongchangSimulationWorldStableIds.진부Hub시설,
+                ActionCode = SimulationNpcActionCodes.WarehouseInboundInspection,
+                AssignedCapacity = 100m,
+                AssignedCapacityUnitCode = "KGM",
+                DurationTicks = 1,
+                InputLotStableIds = new[] { "cargo:http:spatial-cancel" },
+                OutputCandidateCodes = new[] { SimulationNpcInventoryStateCodes.StorageEligible },
+                SourceStableIds = new[] { "source:fixture:http-spatial-cancel" },
+            },
+        };
+
     private static SimulationWarehousePutAwayPreviewRequest PutAway(
         SimulationWorldUIActionInvocation invocation)
         => new()
@@ -328,6 +408,7 @@ public sealed class SimulationWorldInboundInspectionUiVerticalSliceTests
                 SourceStableIds = new[] { "source:fixture:ui-vertical-settlement-1" },
             },
             NpcWorkforce = PyeongchangSimulationNpcWorkforceFixture.Create(),
+            SpatialWorld = PyeongchangSimulation공간상호작용Fixture.Create(),
         };
 
     private static SimulationSettlementDistrictRequest District(string stableId, string typeCode)

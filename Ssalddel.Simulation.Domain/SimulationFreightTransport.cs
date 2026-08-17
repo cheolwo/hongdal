@@ -124,6 +124,9 @@ namespace Ssalddel.Simulation.Domain
                 OriginFacilityStableId = source.OriginFacilityStableId,
                 DestinationFacilityStableId = source.DestinationFacilityStableId,
                 ActorStableId = source.ActorStableId,
+                PreferredOriginSpatialStableId = source.PreferredOriginSpatialStableId,
+                PreferredRouteSpatialStableId = source.PreferredRouteSpatialStableId,
+                PreferredDestinationSpatialStableId = source.PreferredDestinationSpatialStableId,
                 RequiredRouteTicks = source.RequiredRouteTicks,
                 FreightTransport = CloneFreightTransportBinding(request.Transport),
                 SourceStableIds = source.SourceStableIds.ToArray(),
@@ -245,6 +248,7 @@ namespace Ssalddel.Simulation.Domain
                     TaskTypeCode = "FreightReceiptConfirmation",
                     FacilityStableId = movement.DestinationFacilityStableId,
                     ActionCode = SimulationNpcActionCodes.WarehouseInboundInspection,
+                    PreferredSpatialStableId = request.PreferredSpatialStableId.Trim(),
                     AssignedCapacity = freight.Quantity,
                     AssignedCapacityUnitCode = freight.UnitCode,
                     DurationTicks = request.ReceiptDurationTicks,
@@ -482,6 +486,9 @@ namespace Ssalddel.Simulation.Domain
             if (request.TransportRevision <= 0)
                 throw new SimulationContractException("SimulationFreightTransportRevisionInvalid");
             RequireStableId(request.ActorStableId, "SimulationActorStableIdInvalid");
+            if (!string.IsNullOrWhiteSpace(request.PreferredSpatialStableId))
+                RequireStableId(request.PreferredSpatialStableId,
+                    "SimulationPreferredSpatialStableIdInvalid");
             if (request.ReceiptDurationTicks <= 0 || request.ReceiptDurationTicks > 7)
                 throw new SimulationContractException("SimulationFreightReceiptDurationInvalid");
             ValidateIds(request.SourceStableIds, true, "SimulationFreightReceiptSourceStableIdsInvalid");
@@ -493,6 +500,7 @@ namespace Ssalddel.Simulation.Domain
                 request.TransportRequestStableId.Trim(),
                 request.TransportRevision.ToString(CultureInfo.InvariantCulture),
                 request.ActorStableId.Trim(),
+                request.PreferredSpatialStableId.Trim(),
                 request.ReceiptDurationTicks.ToString(CultureInfo.InvariantCulture),
                 string.Join("\u001f", request.SourceStableIds.Select(value => value.Trim())
                     .OrderBy(value => value, StringComparer.Ordinal)),

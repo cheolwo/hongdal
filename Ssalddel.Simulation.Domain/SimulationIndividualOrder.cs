@@ -288,6 +288,8 @@ namespace Ssalddel.Simulation.Domain
                 DecisionStableId = preview.Decision.DecisionStableId,
                 TaskStableId = preview.TaskPlan.TaskStableId,
                 ReservedTick = CurrentTick,
+                ConfirmedTick = CurrentTick,
+                StockReservedTick = CurrentTick,
                 SourceStableIds = MergeSources(request.SourceStableIds, stockEffect.SourceStableIds),
             };
         }
@@ -304,7 +306,9 @@ namespace Ssalddel.Simulation.Domain
                 throw new SimulationConflictException("SimulationIndividualOrderNotFound");
             if (!string.Equals(order.ActorStableId, request.ActorStableId, StringComparison.Ordinal))
                 throw new SimulationConflictException("SimulationIndividualOrderActorMismatch");
-            if (order.StateCode != SimulationIndividualOrderStateCodes.StockReserved)
+            if (order.StateCode != SimulationIndividualOrderStateCodes.StockReserved
+                && order.StateCode != SimulationIndividualOrderStateCodes.Picking
+                && order.StateCode != SimulationIndividualOrderStateCodes.Packed)
                 throw new SimulationConflictException("SimulationIndividualOrderCancellationNotAllowed");
             return order;
         }
@@ -377,8 +381,12 @@ namespace Ssalddel.Simulation.Domain
         {
             var order = individualOrders.Values.FirstOrDefault(value =>
                 value.TaskStableId == task.TaskStableId
-                && value.StateCode == SimulationIndividualOrderStateCodes.StockReserved);
+                && (value.StateCode == SimulationIndividualOrderStateCodes.StockReserved
+                    || value.StateCode == SimulationIndividualOrderStateCodes.Picking
+                    || value.StateCode == SimulationIndividualOrderStateCodes.Packed));
             if (order == null) return;
+            if (order.PickedTick == null) order.PickedTick = appliedTick;
+            if (order.PackedTick == null) order.PackedTick = appliedTick;
             var reservation = stockReservations.Values.Single(value =>
                 value.OrderStableId == order.OrderStableId
                 && value.StateCode == SimulationStockReservationStateCodes.Reserved);
@@ -396,6 +404,31 @@ namespace Ssalddel.Simulation.Domain
             order.Revision++;
             reservation.StateCode = SimulationStockReservationStateCodes.Consumed;
             reservation.ConsumedTick = appliedTick;
+        }
+
+        private void AdvanceIndividualOrderFulfillmentForTask(
+            SimulationTaskSnapshot task,
+            int currentTick)
+        {
+            var order = individualOrders.Values.FirstOrDefault(value =>
+                value.TaskStableId == task.TaskStableId
+                && (value.StateCode == SimulationIndividualOrderStateCodes.StockReserved
+                    || value.StateCode == SimulationIndividualOrderStateCodes.Picking
+                    || value.StateCode == SimulationIndividualOrderStateCodes.Packed));
+            if (order == null || currentTick < task.ScheduledStartTick) return;
+            if (order.PickedTick == null)
+            {
+                order.StateCode = SimulationIndividualOrderStateCodes.Picking;
+                order.PickedTick = currentTick;
+                order.Revision++;
+            }
+            if (currentTick >= Math.Max(task.ScheduledStartTick, task.ExpectedEndTick - 1)
+                && order.PackedTick == null)
+            {
+                order.StateCode = SimulationIndividualOrderStateCodes.Packed;
+                order.PackedTick = currentTick;
+                order.Revision++;
+            }
         }
 
         private SimulationIndividualOrderSnapshot[] CreateIndividualOrderSnapshots()
@@ -430,7 +463,14 @@ namespace Ssalddel.Simulation.Domain
                 TaskStableId = source.TaskStableId,
                 CancellationTaskStableId = source.CancellationTaskStableId,
                 ReservedTick = source.ReservedTick,
+                ConfirmedTick = source.ConfirmedTick,
+                StockReservedTick = source.StockReservedTick,
+                PickedTick = source.PickedTick,
+                PackedTick = source.PackedTick,
                 ReadyForPickupTick = source.ReadyForPickupTick,
+                PickupDecisionStableId = source.PickupDecisionStableId,
+                PickupTaskStableId = source.PickupTaskStableId,
+                FulfilledTick = source.FulfilledTick,
                 ConsumptionDecisionStableId = source.ConsumptionDecisionStableId,
                 ConsumptionTaskStableId = source.ConsumptionTaskStableId,
                 ConsumedTick = source.ConsumedTick,

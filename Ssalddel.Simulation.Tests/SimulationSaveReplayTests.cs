@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
@@ -5,6 +7,29 @@ namespace Ssalddel.Simulation.Tests;
 
 public sealed class SimulationSaveReplayTests
 {
+    [Fact]
+    public void 기존_v1_JSON에_Battles가_없어도_빈목록과_기존hash로복원한다()
+    {
+        var service = Service(
+            new InMemory경영SimulationSessionStore(),
+            new InMemorySimulationSessionSaveStore());
+        var session = CreateSession(service);
+        var saved = service.Save(
+            session.SessionStableId,
+            SaveRequest("save:sim.legacy-without-battles", 0));
+        var json = JsonNode.Parse(JsonSerializer.Serialize(saved))!.AsObject();
+
+        Assert.True(json.Remove(nameof(SimulationSessionSavePackage.Battles)));
+        var legacy = JsonSerializer.Deserialize<SimulationSessionSavePackage>(
+            json.ToJsonString());
+        var restored = SimulationSessionReplay.Restore(Assert.IsType<
+            SimulationSessionSavePackage>(legacy));
+
+        Assert.Empty(legacy.Battles);
+        Assert.Equal(saved.ReplayHash, legacy.ReplayHash);
+        Assert.Equal(saved.SessionStableId, restored.Snapshot().SessionStableId);
+    }
+
     [Fact]
     public void Save는_version과hash를기록하지만_session을변경하지않는다()
     {

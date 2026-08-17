@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "simulation-world-interaction-graph-binding.v1",
+  "areaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
+  "catalogRevision": "pyeongchang-farm-wi-spatial.r1",
+  "bindings": [
+    {
+      "bindingStableId": "binding:wi-farm-01:production-plot",
+      "worldInteractionId": "WI-FARM-01",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "agriculture-region",
+      "spatialRoleCode": "FarmProductionPlot",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:production-plot",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.TillingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 생산구획 동시 작업 한 건", "capacityRuleRevision": "farm-work-area-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-FARM-01"]
+    },
+    {
+      "bindingStableId": "binding:wi-farm-02:production-plot",
+      "worldInteractionId": "WI-FARM-02",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "agriculture-region",
+      "spatialRoleCode": "FarmProductionPlot",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:production-plot",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.CropProduction", "Spatial.WorkerAccessible", "Spatial.SowingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 생산구획 동시 작업 한 건", "capacityRuleRevision": "farm-work-area-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-FARM-02"]
+    },
+    {
+      "bindingStableId": "binding:wi-farm-03:production-plot",
+      "worldInteractionId": "WI-FARM-03",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "agriculture-region",
+      "spatialRoleCode": "FarmProductionPlot",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:production-plot",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.CropProduction", "Spatial.WorkerAccessible", "Spatial.WaterAccessible", "Spatial.CropCareWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 생산구획 동시 작업 한 건", "capacityRuleRevision": "farm-work-area-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-FARM-03"]
+    },
+    {
+      "bindingStableId": "binding:wi-farm-04:production-plot",
+      "worldInteractionId": "WI-FARM-04",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "agriculture-region",
+      "spatialRoleCode": "FarmProductionPlot",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:production-plot",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.CropProduction", "Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.HarvestWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 생산구획 동시 작업 한 건", "capacityRuleRevision": "farm-work-area-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-FARM-04"]
+    },
+    {
+      "bindingStableId": "binding:wi-farm-05:work-yard",
+      "worldInteractionId": "WI-FARM-05",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "farm-work-yard",
+      "spatialRoleCode": "FarmWorkYard",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:work-yard",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.CollectionWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 작업마당 동시 작업 한 건", "capacityRuleRevision": "farm-work-yard-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-FARM-05"]
+    },
+    {
+      "bindingStableId": "binding:wi-farm-06:work-yard",
+      "worldInteractionId": "WI-FARM-06",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "farm-work-yard",
+      "spatialRoleCode": "FarmWorkYard",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:work-yard",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.PackingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 작업마당 동시 작업 한 건", "capacityRuleRevision": "farm-work-yard-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-FARM-06"]
+    },
+    {
+      "bindingStableId": "binding:wi-log-01:loading-bay",
+      "worldInteractionId": "WI-LOG-01",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "farm-loading-bay",
+      "spatialRoleCode": "FarmLoadingBay",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:loading-bay",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.VehicleAccessible", "Spatial.LoadingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 상차 동시 작업 한 건", "capacityRuleRevision": "farm-loading-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-LOG-01"]
+    },
+    {
+      "bindingStableId": "binding:wi-log-02:farm-gate",
+      "worldInteractionId": "WI-LOG-02",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "farm-gate",
+      "spatialRoleCode": "FarmGate",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:gate",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.CargoAccessible", "Spatial.VehicleAccessible"],
+      "baseCapacities": [],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-LOG-02"]
+    },
+    {
+      "bindingStableId": "binding:wi-world-04:work-yard",
+      "worldInteractionId": "WI-WORLD-04",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+      "requiredGraphRevision": 1,
+      "requiredGraphHashSha256": "9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84",
+      "requiredNodeSemanticCode": "farm-work-yard",
+      "spatialRoleCode": "FarmWorkYard",
+      "spatialStableId": "spatial:graph:pyeongchang:daegwallyeong-farm:work-yard",
+      "facilityStableId": "facility:sim:pyeongchang:daegwallyeong-farm",
+      "areaStableId": "area:sim:pyeongchang:daegwallyeong-farm",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.RepairWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot", "evidenceKindCode": "ReviewedDesign", "evidenceReference": "P1 작업마당 정비 작업 한 건", "capacityRuleRevision": "farm-work-yard-capacity.r1" }
+      ],
+      "reviewStatusCode": "ApprovedForSimulation",
+      "sourceStableIds": ["source:reviewed-design:pyeongchang-farm-p1", "wi:WI-WORLD-04"]
+    }
+  ],
+  "transitions": [
+    { "transitionStableId": "transition:wi-farm-01:wi-farm-02", "fromWorldInteractionId": "WI-FARM-01", "toWorldInteractionId": "WI-FARM-02", "externalConnectorRequired": false },
+    { "transitionStableId": "transition:wi-farm-02:wi-farm-03", "fromWorldInteractionId": "WI-FARM-02", "toWorldInteractionId": "WI-FARM-03", "externalConnectorRequired": false },
+    { "transitionStableId": "transition:wi-farm-03:wi-farm-04", "fromWorldInteractionId": "WI-FARM-03", "toWorldInteractionId": "WI-FARM-04", "externalConnectorRequired": false },
+    { "transitionStableId": "transition:wi-farm-04:wi-farm-05", "fromWorldInteractionId": "WI-FARM-04", "toWorldInteractionId": "WI-FARM-05", "externalConnectorRequired": false },
+    { "transitionStableId": "transition:wi-farm-05:wi-farm-06", "fromWorldInteractionId": "WI-FARM-05", "toWorldInteractionId": "WI-FARM-06", "externalConnectorRequired": false },
+    { "transitionStableId": "transition:wi-farm-06:wi-log-01", "fromWorldInteractionId": "WI-FARM-06", "toWorldInteractionId": "WI-LOG-01", "externalConnectorRequired": false },
+    { "transitionStableId": "transition:wi-log-01:wi-log-02", "fromWorldInteractionId": "WI-LOG-01", "toWorldInteractionId": "WI-LOG-02", "externalConnectorRequired": true, "requiredConnectorTypeCode": "farm-road" }
+  ]
+}

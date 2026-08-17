@@ -1,4 +1,5 @@
 using System;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Simulation.Contracts
 {
@@ -39,6 +40,14 @@ namespace Ssalddel.Simulation.Contracts
         public const int PerfectCounterWindowMs = 45;
     }
 
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationFarmCombatInput,
+        SsalddelCodeLayer.Contract,
+        "전투 시점·박자·반응 입력의 서버 계약을 정의한다.",
+        StepKey = "contract.farm-combat",
+        FlowOrder = 10,
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        Boundary = "Unity는 안정 식별자·예상 개정·행동·반응 경과 시간만 제출한다.")]
     public sealed class SimulationCombatPerspectiveConfirmRequest
     {
         public string CommandId { get; set; } = string.Empty;

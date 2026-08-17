@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
@@ -72,6 +73,18 @@ internal sealed class SimulationSession저장자료Configuration
     }
 }
 
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.SimulationSaveReplay,
+    SsalddelCodeLayer.Infrastructure,
+    "검증된 세션 저장 자료 JSON과 재생 hash를 Simulation 전용 DB에 보관한다.",
+    StepKey = "infrastructure.save-store",
+    DependsOnStepKeys = new string[] { "domain.save-package" },
+    ExecutionStage = SsalddelCodeExecutionStage.Persistence,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    ReadsFrom = SsalddelCodeDataScope.SimulationState,
+    WritesTo = SsalddelCodeDataScope.SimulationState,
+    FlowOrder = 50,
+    Boundary = "공유 공공데이터 DB가 아니라 별도 SimulationSession DB만 읽고 쓴다.")]
 public sealed class SimulationSessionSaveStore(
     IDbContextFactory<SimulationSessionDbContext> dbContextFactory)
     : ISimulationSessionSaveStore

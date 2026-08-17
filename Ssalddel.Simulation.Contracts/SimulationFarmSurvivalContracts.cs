@@ -9,6 +9,9 @@ namespace Ssalddel.Simulation.Contracts
             "farm-survival.spring-preparation.r2";
         public const string HeroTacticalCombatRuleRevision =
             "farm-survival.spring-preparation.r3";
+        public const string ScenicSeasonRuleRevision =
+            "farm-survival.scenic-season.r1";
+        public const string DefaultRuleRevision = ScenicSeasonRuleRevision;
 
         public const string Player = "Player";
         public const string Npc = "Npc";
@@ -22,6 +25,11 @@ namespace Ssalddel.Simulation.Contracts
         public const string Completed = "Completed";
 
         public const string Tilling = "Tilling";
+        public const string Sowing = "Sowing";
+        public const string CropCare = "CropCare";
+        public const string Harvesting = "Harvesting";
+        public const string HarvestCollection = "HarvestCollection";
+        public const string OutboundPacking = "OutboundPacking";
         public const string FenceRepair = "FenceRepair";
         public const string StorageSecuring = "StorageSecuring";
         public const string LightingPreparation = "LightingPreparation";
@@ -38,11 +46,15 @@ namespace Ssalddel.Simulation.Contracts
         public const string Warning = "Warning";
         public const string AwaitingCombat = "AwaitingCombat";
         public const string AwaitingResponse = "AwaitingResponse";
+        public const string AwaitingDefenseChoice = "AwaitingDefenseChoice";
+        public const string AwaitingAutoResolution = "AwaitingAutoResolution";
         public const string Resolved = "Resolved";
 
         public const string Trade = "choice:raider:trade";
         public const string Refuse = "choice:raider:refuse";
         public const string Deception = "choice:raider:deception";
+        public const string AutomaticDefense = "choice:defense:auto";
+        public const string DirectCombat = "choice:defense:direct";
 
         public const string DefenseSucceeded = "DefenseSucceeded";
         public const string InventoryTaken = "InventoryTaken";
@@ -58,23 +70,64 @@ namespace Ssalddel.Simulation.Contracts
         public const string ZombieWarningPresentation = "survival.zombie-warning";
         public const string RaiderApproachPresentation = "survival.raider-approach";
         public const string DamageAssessmentPresentation = "survival.damage-assessment";
+        public const string ScenicExplorationPresentation =
+            "survival.scenic-exploration";
+        public const string SeasonalDefenseWarningPresentation =
+            "survival.seasonal-defense.warning";
+        public const string SeasonalDefenseChoicePresentation =
+            "survival.seasonal-defense.choice";
+        public const string SeasonalDefenseAutomaticPresentation =
+            "survival.seasonal-defense.automatic";
+        public const string FarmHarvestPresentation = "farm.harvest";
+        public const string FarmSowingPresentation = "farm.sowing";
+        public const string FarmCropCarePresentation = "farm.crop-care";
+        public const string FarmCollectionPresentation = "farm.harvest-collection";
+        public const string FarmPackingPresentation = "farm.outbound-packing";
+    }
+
+    public static class SimulationFarmActorCapabilityCodes
+    {
+        public const string FarmTilling = "FarmTilling";
+        public const string FarmSowing = "FarmSowing";
+        public const string FarmCropCare = "FarmCropCare";
+        public const string FarmHarvest = "FarmHarvest";
+        public const string FarmCollection = "FarmCollection";
+        public const string FarmPacking = "FarmPacking";
+    }
+
+    public static class Simulation수확Lot상태Codes
+    {
+        public const string HarvestedAtField = "HarvestedAtField";
+        public const string CollectedAtYard = "CollectedAtYard";
+        public const string PackedForShipment = "PackedForShipment";
+    }
+
+    public static class Simulation포장Lot상태Codes
+    {
+        public const string PreparedForShipment = "PreparedForShipment";
     }
 
     public sealed class SimulationFarmSurvivalInitialStateRequest
     {
-        public string RuleRevision { get; set; } = SimulationFarmSurvivalCodes.RuleRevision;
+        public string RuleRevision { get; set; }
+            = SimulationFarmSurvivalCodes.DefaultRuleRevision;
         public string RegionStableId { get; set; } = string.Empty;
         public string AreaStableId { get; set; } = string.Empty;
         public string TileKey { get; set; } = string.Empty;
         public string FarmBuildingStableId { get; set; } = string.Empty;
         public decimal SupplyUnits { get; set; }
         public decimal RepairMaterialUnits { get; set; }
+        public decimal SeedUnits { get; set; }
+        public decimal WaterUnits { get; set; }
         public SimulationFarmActorInitialStateRequest[] Actors { get; set; }
             = Array.Empty<SimulationFarmActorInitialStateRequest>();
         public SimulationFarmSoilTileInitialStateRequest[] SoilTiles { get; set; }
             = Array.Empty<SimulationFarmSoilTileInitialStateRequest>();
         public SimulationFarmDefenseInitialStateRequest[] Defenses { get; set; }
             = Array.Empty<SimulationFarmDefenseInitialStateRequest>();
+        public Simulation재배단위Snapshot[] CultivationUnits { get; set; }
+            = Array.Empty<Simulation재배단위Snapshot>();
+        public Simulation감자생산RuleSnapshot? PotatoProductionRule { get; set; }
     }
 
     public sealed class SimulationFarmActorInitialStateRequest
@@ -84,6 +137,7 @@ namespace Ssalddel.Simulation.Contracts
         public string KoreanName { get; set; } = string.Empty;
         public decimal Health { get; set; } = 100m;
         public decimal Stamina { get; set; } = 100m;
+        public string[] CapabilityCodes { get; set; } = Array.Empty<string>();
     }
 
     public sealed class SimulationFarmSoilTileInitialStateRequest
@@ -92,6 +146,7 @@ namespace Ssalddel.Simulation.Contracts
         public int GridX { get; set; }
         public int GridY { get; set; }
         public string StateCode { get; set; } = SimulationFarmSurvivalCodes.Untilled;
+        public decimal PhysicalAreaSquareMeters { get; set; } = 100m;
     }
 
     public sealed class SimulationFarmDefenseInitialStateRequest
@@ -109,6 +164,7 @@ namespace Ssalddel.Simulation.Contracts
         public string TargetStableId { get; set; } = string.Empty;
         public string ActionCode { get; set; } = string.Empty;
         public string AssignmentKindCode { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
     }
 
     public sealed class SimulationFarmWorkConfirmRequest
@@ -119,6 +175,7 @@ namespace Ssalddel.Simulation.Contracts
         public string TargetStableId { get; set; } = string.Empty;
         public string ActionCode { get; set; } = string.Empty;
         public string AssignmentKindCode { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
     }
 
     public sealed class SimulationFarmWorkPreviewSnapshot
@@ -130,9 +187,15 @@ namespace Ssalddel.Simulation.Contracts
         public decimal RequiredLabor { get; set; }
         public decimal StaminaCost { get; set; }
         public decimal MaterialCost { get; set; }
+        public decimal SeedCost { get; set; }
+        public decimal WaterCost { get; set; }
         public int DurationTicks { get; set; }
         public int EstimatedCompletionWorldTick { get; set; }
         public string PresentationKey { get; set; } = string.Empty;
+        public decimal ProjectedQuantity { get; set; }
+        public string ProjectedQuantityUnitCode { get; set; } = string.Empty;
+        public string ProjectedLotStableId { get; set; } = string.Empty;
+        public Simulation공간상호작용PreviewSnapshot? SpatialInteraction { get; set; }
         public bool CanConfirm { get; set; }
         public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
         public bool SimulationOnly { get; set; } = true;
@@ -163,6 +226,10 @@ namespace Ssalddel.Simulation.Contracts
         public string DayGoalCode { get; set; } = string.Empty;
         public decimal SupplyUnits { get; set; }
         public decimal RepairMaterialUnits { get; set; }
+        public decimal SeedUnits { get; set; }
+        public decimal WaterUnits { get; set; }
+        public decimal ReservedSeedUnits { get; set; }
+        public decimal ReservedWaterUnits { get; set; }
         public decimal RecoverableDamageUnits { get; set; }
         public SimulationFarmActorSnapshot[] Actors { get; set; }
             = Array.Empty<SimulationFarmActorSnapshot>();
@@ -170,6 +237,12 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationFarmSoilTileSnapshot>();
         public SimulationFarmDefenseSnapshot[] Defenses { get; set; }
             = Array.Empty<SimulationFarmDefenseSnapshot>();
+        public Simulation재배단위Snapshot[] CultivationUnits { get; set; }
+            = Array.Empty<Simulation재배단위Snapshot>();
+        public Simulation수확LotSnapshot[] HarvestLots { get; set; }
+            = Array.Empty<Simulation수확LotSnapshot>();
+        public Simulation포장LotSnapshot[] PackageLots { get; set; }
+            = Array.Empty<Simulation포장LotSnapshot>();
         public SimulationFarmWorkOrderSnapshot[] WorkOrders { get; set; }
             = Array.Empty<SimulationFarmWorkOrderSnapshot>();
         public SimulationThreatEncounterSnapshot[] Encounters { get; set; }
@@ -191,6 +264,7 @@ namespace Ssalddel.Simulation.Contracts
         public decimal Stamina { get; set; }
         public bool Injured { get; set; }
         public string ActiveWorkOrderStableId { get; set; } = string.Empty;
+        public string[] CapabilityCodes { get; set; } = Array.Empty<string>();
     }
 
     public sealed class SimulationFarmSoilTileSnapshot
@@ -199,6 +273,7 @@ namespace Ssalddel.Simulation.Contracts
         public int GridX { get; set; }
         public int GridY { get; set; }
         public string StateCode { get; set; } = string.Empty;
+        public decimal PhysicalAreaSquareMeters { get; set; }
     }
 
     public sealed class SimulationFarmDefenseSnapshot
@@ -224,7 +299,42 @@ namespace Ssalddel.Simulation.Contracts
         public decimal ReservedLabor { get; set; }
         public decimal StaminaCost { get; set; }
         public decimal MaterialCost { get; set; }
+        public decimal SeedCost { get; set; }
+        public decimal WaterCost { get; set; }
         public string PresentationKey { get; set; } = string.Empty;
+        public string SelectedSpatialStableId { get; set; } = string.Empty;
+        public string SpatialDefinitionRevision { get; set; } = string.Empty;
+        public string SpatialDefinitionHashSha256 { get; set; } = string.Empty;
+    }
+
+    public sealed class Simulation수확LotSnapshot
+    {
+        public string HarvestLotStableId { get; set; } = string.Empty;
+        public long Revision { get; set; }
+        public string CultivationUnitStableId { get; set; } = string.Empty;
+        public string ProductStableId { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitCode { get; set; } = string.Empty;
+        public string StateCode { get; set; } = string.Empty;
+        public string CausedByTaskStableId { get; set; } = string.Empty;
+        public int CreatedWorldTick { get; set; }
+        public string[] SourceStableIds { get; set; } = Array.Empty<string>();
+    }
+
+    public sealed class Simulation포장LotSnapshot
+    {
+        public string PackageLotStableId { get; set; } = string.Empty;
+        public long Revision { get; set; }
+        public string HarvestLotStableId { get; set; } = string.Empty;
+        public string CargoStableId { get; set; } = string.Empty;
+        public string SourceAllocationStableId { get; set; } = string.Empty;
+        public string ProductStableId { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitCode { get; set; } = string.Empty;
+        public string StateCode { get; set; } = string.Empty;
+        public string CausedByTaskStableId { get; set; } = string.Empty;
+        public int CreatedWorldTick { get; set; }
+        public string[] SourceStableIds { get; set; } = Array.Empty<string>();
     }
 
     public sealed class SimulationThreatEncounterSnapshot
@@ -235,6 +345,9 @@ namespace Ssalddel.Simulation.Contracts
         public string StateCode { get; set; } = string.Empty;
         public int OccurredWorldTick { get; set; }
         public string PresentationKey { get; set; } = string.Empty;
+        public string[] AvailableChoiceStableIds { get; set; }
+            = Array.Empty<string>();
+        public int? DecisionDeadlineWorldTick { get; set; }
         public string SelectedChoiceStableId { get; set; } = string.Empty;
         public string OutcomeCode { get; set; } = string.Empty;
         public decimal SupplyLossUnits { get; set; }
