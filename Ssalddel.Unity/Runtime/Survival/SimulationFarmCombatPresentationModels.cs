@@ -1,5 +1,8 @@
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Unity.Survival
 {
@@ -7,6 +10,7 @@ namespace Ssalddel.Unity.Survival
     {
         public const string FirstPersonPrecision = "FirstPersonPrecision";
         public const string ThirdPersonAwareness = "ThirdPersonAwareness";
+        public const string AwaitingCombat = "AwaitingCombat";
         public const string Active = "Active";
         public const string Guard = "Guard";
         public const string Counter = "Counter";
@@ -29,6 +33,12 @@ namespace Ssalddel.Unity.Survival
         public const string RunMovement = "Run";
         public const string GuardMovement = "Guard";
         public const string StaggerMovement = "Stagger";
+
+        public const string Ready = "Ready";
+        public const string Entering = "Entering";
+        public const string Telegraph = "Telegraph";
+        public const string Submitting = "Submitting";
+        public const string Failed = "Failed";
     }
 
     public sealed class FarmCombatPerspectiveApiModel
@@ -57,14 +67,40 @@ namespace Ssalddel.Unity.Survival
     public sealed class FarmCombatStateApiModel
     {
         public long WorldRevision { get; set; }
+        public FarmCombatEngagementApiModel[] Engagements { get; set; }
+            = Array.Empty<FarmCombatEngagementApiModel>();
         public FarmCombatPerspectiveApiModel[] Perspectives { get; set; }
             = Array.Empty<FarmCombatPerspectiveApiModel>();
         public FarmCombatBeatApiModel[] Beats { get; set; }
             = Array.Empty<FarmCombatBeatApiModel>();
+        public FarmCombatReactionApiModel[] Reactions { get; set; }
+            = Array.Empty<FarmCombatReactionApiModel>();
         public FarmTacticalCombatStateApiModel Tactical { get; set; }
             = new FarmTacticalCombatStateApiModel();
         public bool SimulationOnly { get; set; } = true;
         public bool IsOperationalState { get; set; }
+    }
+
+    public sealed class FarmCombatEngagementApiModel
+    {
+        public string EncounterStableId { get; set; } = string.Empty;
+        public string StateCode { get; set; } = string.Empty;
+        public string PresentationKey { get; set; } = string.Empty;
+    }
+
+    public sealed class FarmCombatReactionApiModel
+    {
+        public string ReactionStableId { get; set; } = string.Empty;
+        public string BeatStableId { get; set; } = string.Empty;
+        public string ActorStableId { get; set; } = string.Empty;
+        public string ReactionActionCode { get; set; } = string.Empty;
+        public int ReactionOffsetMs { get; set; }
+        public int TimingDeltaMs { get; set; }
+        public string GradeCode { get; set; } = string.Empty;
+        public decimal ActorDamageUnits { get; set; }
+        public int DefenseResponseScore { get; set; }
+        public bool ThreatStaggered { get; set; }
+        public string PresentationKey { get; set; } = string.Empty;
     }
 
     public sealed class FarmTacticalCombatStateApiModel
@@ -246,6 +282,189 @@ namespace Ssalddel.Unity.Survival
         public string ActorStableId { get; set; } = string.Empty;
         public string ReactionActionCode { get; set; } = string.Empty;
         public int ReactionOffsetMs { get; set; }
+    }
+
+    public sealed class FarmCombatPerspectiveCommandDraft
+    {
+        public string CommandId { get; set; } = string.Empty;
+        public long ExpectedRevision { get; set; }
+        public string ActorStableId { get; set; } = string.Empty;
+        public string PerspectiveCode { get; set; } = string.Empty;
+    }
+
+    public sealed class FarmCombatBeatStartCommandDraft
+    {
+        public string CommandId { get; set; } = string.Empty;
+        public long ExpectedRevision { get; set; }
+        public string EncounterStableId { get; set; } = string.Empty;
+        public string ActorStableId { get; set; } = string.Empty;
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationFarmCombatInput,
+        SsalddelCodeLayer.ClientAdapter,
+        "서버 전투 상태를 공격 진입·방어·반격 명령 초안으로 변환한다.",
+        StepKey = "unity.farm-combat-input",
+        DependsOnStepKeys = new[] { "domain.farm-combat" },
+        FlowOrder = 50,
+        ExecutionStage = SsalddelCodeExecutionStage.Presentation,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        WritesTo = SsalddelCodeDataScope.ClientPresentation,
+        Effects = SsalddelCodeEffect.UiStateMutation,
+        Boundary = "피해·판정 등급·전술 효과를 계산하지 않고 안정 식별자와 입력 시각만 전달한다.")]
+    public static class FarmCombatInputCommandFactory
+    {
+        public static FarmCombatPerspectiveCommandDraft CreatePerspective(
+            FarmCombatStateApiModel state,
+            string actorStableId,
+            string perspectiveCode,
+            string commandId)
+        {
+            ValidateStateAndIdentity(state, actorStableId, commandId);
+            if (perspectiveCode != FarmCombatPresentationCodes.FirstPersonPrecision
+                && perspectiveCode != FarmCombatPresentationCodes.ThirdPersonAwareness)
+                throw new ArgumentException("FarmCombatPerspectiveInvalid",
+                    nameof(perspectiveCode));
+            if ((state.Beats ?? Array.Empty<FarmCombatBeatApiModel>())
+                .Any(value => value.StateCode == FarmCombatPresentationCodes.Active))
+                throw new InvalidOperationException("FarmCombatPerspectiveLocked");
+            return new FarmCombatPerspectiveCommandDraft
+            {
+                CommandId = commandId.Trim(),
+                ExpectedRevision = state.WorldRevision,
+                ActorStableId = actorStableId.Trim(),
+                PerspectiveCode = perspectiveCode,
+            };
+        }
+
+        public static FarmCombatBeatStartCommandDraft CreateBeatStart(
+            FarmCombatStateApiModel state,
+            string actorStableId,
+            string encounterStableId,
+            string commandId)
+        {
+            ValidateStateAndIdentity(state, actorStableId, commandId);
+            if (string.IsNullOrWhiteSpace(encounterStableId))
+                throw new ArgumentException("FarmCombatEncounterRequired",
+                    nameof(encounterStableId));
+            if (!(state.Perspectives ?? Array.Empty<FarmCombatPerspectiveApiModel>())
+                .Any(value => value.ActorStableId == actorStableId))
+                throw new InvalidOperationException("FarmCombatPerspectiveRequired");
+            if ((state.Beats ?? Array.Empty<FarmCombatBeatApiModel>())
+                .Any(value => value.StateCode == FarmCombatPresentationCodes.Active))
+                throw new InvalidOperationException("FarmCombatBeatAlreadyActive");
+            if (!(state.Engagements ?? Array.Empty<FarmCombatEngagementApiModel>())
+                .Any(value => value.EncounterStableId == encounterStableId
+                    && value.StateCode == FarmCombatPresentationCodes.AwaitingCombat))
+                throw new InvalidOperationException("FarmCombatEncounterNotReady");
+            return new FarmCombatBeatStartCommandDraft
+            {
+                CommandId = commandId.Trim(),
+                ExpectedRevision = state.WorldRevision,
+                EncounterStableId = encounterStableId.Trim(),
+                ActorStableId = actorStableId.Trim(),
+            };
+        }
+
+        private static void ValidateStateAndIdentity(
+            FarmCombatStateApiModel state,
+            string actorStableId,
+            string commandId)
+        {
+            if (state == null || !state.SimulationOnly || state.IsOperationalState
+                || state.WorldRevision < 0)
+                throw new InvalidOperationException("FarmCombatStateInvalid");
+            if (string.IsNullOrWhiteSpace(actorStableId))
+                throw new ArgumentException("FarmCombatActorRequired",
+                    nameof(actorStableId));
+            if (string.IsNullOrWhiteSpace(commandId))
+                throw new ArgumentException("FarmCombatCommandIdRequired",
+                    nameof(commandId));
+        }
+    }
+
+    public sealed class FarmCombatBeatClock
+    {
+        private string _beatStableId = string.Empty;
+        private double _observedAtMilliseconds;
+
+        public string BeatStableId => _beatStableId;
+
+        public bool Observe(string beatStableId, double nowMilliseconds)
+        {
+            if (string.IsNullOrWhiteSpace(beatStableId)
+                || nowMilliseconds < 0d)
+                throw new ArgumentException("FarmCombatBeatClockInputInvalid");
+            if (string.Equals(_beatStableId, beatStableId,
+                StringComparison.Ordinal)) return false;
+            _beatStableId = beatStableId.Trim();
+            _observedAtMilliseconds = nowMilliseconds;
+            return true;
+        }
+
+        public int ElapsedMilliseconds(double nowMilliseconds, int maximum)
+        {
+            if (string.IsNullOrWhiteSpace(_beatStableId)
+                || nowMilliseconds < _observedAtMilliseconds || maximum < 0)
+                throw new InvalidOperationException("FarmCombatBeatClockUnavailable");
+            return Math.Min(maximum,
+                Math.Max(0, (int)Math.Round(nowMilliseconds
+                    - _observedAtMilliseconds, MidpointRounding.AwayFromZero)));
+        }
+
+        public void Clear()
+        {
+            _beatStableId = string.Empty;
+            _observedAtMilliseconds = 0d;
+        }
+    }
+
+    public interface ISimulationFarmCombatAuthorityClient
+    {
+        Task<FarmCombatStateApiModel> LoadAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken);
+
+        Task<FarmCombatStateApiModel> ConfirmPerspectiveAsync(
+            string sessionStableId,
+            FarmCombatPerspectiveCommandDraft request,
+            CancellationToken cancellationToken);
+
+        Task<FarmCombatStateApiModel> StartBeatAsync(
+            string sessionStableId,
+            FarmCombatBeatStartCommandDraft request,
+            CancellationToken cancellationToken);
+
+        Task<FarmCombatStateApiModel> ConfirmReactionAsync(
+            string sessionStableId,
+            FarmCombatReactionCommandDraft request,
+            CancellationToken cancellationToken);
+    }
+
+    public static class SimulationFarmCombatApiRoutes
+    {
+        public static string State(string sessionStableId)
+            => Base(sessionStableId);
+
+        public static string Perspective(string sessionStableId)
+            => Base(sessionStableId) + "/combat/perspective/confirm";
+
+        public static string StartBeat(string sessionStableId)
+            => Base(sessionStableId) + "/combat/beats/start";
+
+        public static string Reaction(string sessionStableId, string beatStableId)
+            => Base(sessionStableId) + "/combat/beats/"
+                + Required(beatStableId, nameof(beatStableId)) + "/react";
+
+        private static string Base(string sessionStableId)
+            => "api/simulation/v1/sessions/"
+                + Required(sessionStableId, nameof(sessionStableId))
+                + "/farm-survival";
+
+        private static string Required(string value, string name)
+            => !string.IsNullOrWhiteSpace(value)
+                ? Uri.EscapeDataString(value.Trim())
+                : throw new ArgumentException("FarmCombatRouteValueRequired", name);
     }
 
     public static class FarmCombatReactionCommandFactory

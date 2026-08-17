@@ -12,6 +12,9 @@
   "author": {
     "name": "Ssalddel"
   },
+  "dependencies": {
+    "com.ssalddel.code-metadata": "0.1.0"
+  },
   "samples": [
     {
       "displayName": "Urban Market Primitive Vertical Slice",

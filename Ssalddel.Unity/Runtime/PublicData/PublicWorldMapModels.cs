@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Unity.Data;
+using Ssalddel.Unity.Application;
 using Ssalddel.Unity.PresentationContracts.Reconciliation;
 
 namespace Ssalddel.Unity.PublicData
@@ -262,11 +264,24 @@ namespace Ssalddel.Unity.PublicData
         public Exception? Error { get; set; }
     }
 
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.UnityResilientWorldLoad,
+        SsalddelCodeLayer.ClientAdapter,
+        "공공데이터 World Map Snapshot 조회와 마지막 성공 상태 조정을 연결한다.",
+        StepKey = "client.public-data-load",
+        DependsOnStepKeys = new string[] { "client.last-successful-runtime" },
+        ExecutionStage = SsalddelCodeExecutionStage.Query,
+        Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.UiStateMutation,
+        ReadsFrom = SsalddelCodeDataScope.SharedPublicData,
+        WritesTo = SsalddelCodeDataScope.ClientPresentation,
+        FlowOrder = 20,
+        Boundary = "출처와 자료 상태가 있는 조회 결과만 표현하며 공공데이터 원본을 수정하지 않는다.")]
     public sealed class PublicDataHallLoadCoordinator
     {
         private readonly PublicWorldMapQueryUseCase query;
         private readonly PublicWorldMapReconciler reconciler;
-        private PublicWorldMapSnapshot? lastSuccessful;
+        private readonly LastSuccessfulLoadRuntime<PublicWorldMapSnapshot,
+            PublicWorldMapChangeSet> runtime = new();
 
         public PublicDataHallLoadCoordinator(
             PublicWorldMapQueryUseCase query,
@@ -282,41 +297,30 @@ namespace Ssalddel.Unity.PublicData
             PublicWorldMapQuery request,
             CancellationToken cancellationToken = default)
         {
-            var refreshing = lastSuccessful != null;
-            StateCode = refreshing
-                ? PublicDataHallLoadStateCodes.Refreshing
-                : PublicDataHallLoadStateCodes.Loading;
-            try
+            var result = await runtime.LoadAsync(
+                token => query.실행Async(request, token),
+                (previous, snapshot) => reconciler.Reconcile(
+                    previous?.Observations ?? Array.Empty<PublicWorldMapObservation>(),
+                    snapshot.Observations),
+                cancellationToken).ConfigureAwait(false);
+            StateCode = MapState(result.StateCode);
+            return new PublicDataHallLoadResult
             {
-                var snapshot = await query.실행Async(request, cancellationToken).ConfigureAwait(false);
-                var changes = reconciler.Reconcile(
-                    lastSuccessful?.Observations ?? Array.Empty<PublicWorldMapObservation>(),
-                    snapshot.Observations);
-                lastSuccessful = snapshot;
-                StateCode = PublicDataHallLoadStateCodes.Success;
-                return new PublicDataHallLoadResult
-                {
-                    StateCode = StateCode,
-                    Snapshot = snapshot,
-                    Changes = changes,
-                };
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                StateCode = refreshing
-                    ? PublicDataHallLoadStateCodes.RefreshError
-                    : PublicDataHallLoadStateCodes.InitialLoadError;
-                return new PublicDataHallLoadResult
-                {
-                    StateCode = StateCode,
-                    Snapshot = lastSuccessful,
-                    Error = exception,
-                };
-            }
+                StateCode = StateCode,
+                Snapshot = result.Snapshot,
+                Changes = result.Changes,
+                Error = result.Error,
+            };
         }
+
+        private static string MapState(ZoneRuntimeStateCode stateCode)
+            => stateCode switch
+            {
+                ZoneRuntimeStateCode.Ready => PublicDataHallLoadStateCodes.Success,
+                ZoneRuntimeStateCode.Refreshing => PublicDataHallLoadStateCodes.Refreshing,
+                ZoneRuntimeStateCode.RefreshError => PublicDataHallLoadStateCodes.RefreshError,
+                ZoneRuntimeStateCode.InitialError => PublicDataHallLoadStateCodes.InitialLoadError,
+                _ => PublicDataHallLoadStateCodes.Loading,
+            };
     }
 }

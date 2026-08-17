@@ -20,6 +20,17 @@ namespace Ssalddel.Unity.Survival
         public const string FarmPropFallback = "prop.farm.generic";
     }
 
+    public static class FarmSurvivalExperienceCodes
+    {
+        public const string ScenicSeasonRuleRevision =
+            "farm-survival.scenic-season.r1";
+        public const string AwaitingCombat = "AwaitingCombat";
+        public const string Peaceful = "Peaceful";
+        public const string SeasonalPreparation = "SeasonalPreparation";
+        public const string Combat = "Combat";
+        public const string ScenicPresentation = "survival.scenic-exploration";
+    }
+
     public sealed class FarmSurvivalVisualCatalogEntry
     {
         public string VisualKey { get; set; } = string.Empty;
@@ -138,6 +149,9 @@ namespace Ssalddel.Unity.Survival
         public int ThreatUnitCount { get; set; }
         public string StateCode { get; set; } = string.Empty;
         public string PresentationKey { get; set; } = string.Empty;
+        public string[] AvailableChoiceStableIds { get; set; }
+            = Array.Empty<string>();
+        public int? DecisionDeadlineWorldTick { get; set; }
         public decimal DamageUnits { get; set; }
     }
 
@@ -146,6 +160,8 @@ namespace Ssalddel.Unity.Survival
         public string SessionStableId { get; set; } = string.Empty;
         public long WorldRevision { get; set; }
         public int WorldTick { get; set; }
+        public int ChapterDayNumber { get; set; } = 1;
+        public string RuleRevision { get; set; } = string.Empty;
         public string TileKey { get; set; } = string.Empty;
         public string FarmBuildingStableId { get; set; } = string.Empty;
         public FarmSurvivalActorApiModel[] Actors { get; set; }
@@ -158,6 +174,62 @@ namespace Ssalddel.Unity.Survival
             = Array.Empty<FarmSurvivalEncounterApiModel>();
         public bool SimulationOnly { get; set; } = true;
         public bool IsOperationalState { get; set; }
+    }
+
+    public sealed class FarmSurvivalExperienceIntent
+    {
+        public string MoodCode { get; set; } = string.Empty;
+        public string PrimaryPresentationKey { get; set; } = string.Empty;
+        public bool ShowScenicHud { get; set; }
+        public bool ShowCombatHud { get; set; }
+        public bool ShowThreatVisuals { get; set; }
+        public bool DirectCombatOptional { get; set; }
+        public bool PresentationOnly { get; set; } = true;
+    }
+
+    /// <summary>
+    /// 경관 중심 규칙에서는 직접 전투를 선택하기 전까지 평온한 HUD와 경관을 유지한다.
+    /// 서버 상태를 숨기지 않으며 화면 노출 우선순위만 결정한다.
+    /// </summary>
+    public static class FarmSurvivalExperienceIntentMapper
+    {
+        public static FarmSurvivalExperienceIntent Map(
+            FarmSurvivalStateApiModel source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (!source.SimulationOnly || source.IsOperationalState)
+                throw new InvalidOperationException("FarmSurvivalBoundaryInvalid");
+            var encounters = source.Encounters
+                ?? Array.Empty<FarmSurvivalEncounterApiModel>();
+            var combat = encounters.FirstOrDefault(value => value.StateCode ==
+                FarmSurvivalExperienceCodes.AwaitingCombat);
+            if (combat != null)
+                return new FarmSurvivalExperienceIntent
+                {
+                    MoodCode = FarmSurvivalExperienceCodes.Combat,
+                    PrimaryPresentationKey = combat.PresentationKey,
+                    ShowCombatHud = true,
+                    ShowThreatVisuals = true,
+                    DirectCombatOptional = source.RuleRevision ==
+                        FarmSurvivalExperienceCodes.ScenicSeasonRuleRevision,
+                };
+
+            var seasonal = encounters.LastOrDefault(value =>
+                value.StateCode != "Resolved");
+            return new FarmSurvivalExperienceIntent
+            {
+                MoodCode = seasonal == null
+                    ? FarmSurvivalExperienceCodes.Peaceful
+                    : FarmSurvivalExperienceCodes.SeasonalPreparation,
+                PrimaryPresentationKey = seasonal?.PresentationKey
+                    ?? FarmSurvivalExperienceCodes.ScenicPresentation,
+                ShowScenicHud = true,
+                ShowCombatHud = false,
+                ShowThreatVisuals = false,
+                DirectCombatOptional = source.RuleRevision ==
+                    FarmSurvivalExperienceCodes.ScenicSeasonRuleRevision,
+            };
+        }
     }
 
     public sealed class FarmSurvivalVisualIntent
@@ -225,7 +297,11 @@ namespace Ssalddel.Unity.Survival
                 ?? Array.Empty<FarmSurvivalEncounterApiModel>())
             {
                 Require(encounter.EncounterStableId, "FarmSurvivalEncounterMissing");
-                if (encounter.StateCode != "Resolved")
+                var showThreatVisual = source.RuleRevision !=
+                        FarmSurvivalExperienceCodes.ScenicSeasonRuleRevision
+                    || encounter.StateCode ==
+                        FarmSurvivalExperienceCodes.AwaitingCombat;
+                if (encounter.StateCode != "Resolved" && showThreatVisual)
                 {
                     if (encounter.ThreatUnitCount <= 0 || encounter.ThreatUnitCount > 12)
                         throw new InvalidOperationException("FarmSurvivalThreatCountInvalid");

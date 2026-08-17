@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Unity.Application;
 using Ssalddel.Unity.Data;
 using Ssalddel.Unity.PresentationContracts.Reconciliation;
 
@@ -202,11 +204,24 @@ namespace Ssalddel.Unity.Community
         public Exception? Error { get; set; }
     }
 
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.UnityResilientWorldLoad,
+        SsalddelCodeLayer.ClientAdapter,
+        "커뮤니티 광장 Snapshot 조회와 마지막 성공 상태 조정을 연결한다.",
+        StepKey = "client.community-load",
+        DependsOnStepKeys = new string[] { "client.last-successful-runtime" },
+        ExecutionStage = SsalddelCodeExecutionStage.Query,
+        Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.UiStateMutation,
+        ReadsFrom = SsalddelCodeDataScope.OperationalState,
+        WritesTo = SsalddelCodeDataScope.ClientPresentation,
+        FlowOrder = 20,
+        Boundary = "공개 Projection만 읽고 커뮤니티 원장이나 서버 개정을 변경하지 않는다.")]
     public sealed class CommunityMarketSquareLoadCoordinator
     {
         private readonly CommunityMarketSquareQueryUseCase query;
         private readonly CommunityMarketSquareReconciler reconciler;
-        private CommunityMarketSquareSnapshot? lastSuccessful;
+        private readonly LastSuccessfulLoadRuntime<CommunityMarketSquareSnapshot,
+            CommunityMarketSquareChangeSet> runtime = new();
 
         public CommunityMarketSquareLoadCoordinator(CommunityMarketSquareQueryUseCase query, CommunityMarketSquareReconciler reconciler)
         {
@@ -216,23 +231,25 @@ namespace Ssalddel.Unity.Community
 
         public async Task<CommunityMarketSquareLoadResult> LoadAsync(CancellationToken cancellationToken = default)
         {
-            var refreshing = lastSuccessful != null;
-            try
+            var result = await runtime.LoadAsync(
+                token => query.실행Async(token),
+                (previous, snapshot) => reconciler.Reconcile(
+                    previous?.Items ?? Array.Empty<CommunitySquareWorldItem>(),
+                    snapshot.Items),
+                cancellationToken).ConfigureAwait(false);
+            return new CommunityMarketSquareLoadResult
             {
-                var snapshot = await query.실행Async(cancellationToken).ConfigureAwait(false);
-                var changes = reconciler.Reconcile(lastSuccessful?.Items ?? Array.Empty<CommunitySquareWorldItem>(), snapshot.Items);
-                lastSuccessful = snapshot;
-                return new CommunityMarketSquareLoadResult { StateCode = CommunityMarketSquareLoadStateCodes.Success, Snapshot = snapshot, Changes = changes };
-            }
-            catch (OperationCanceledException) { throw; }
-            catch (Exception exception)
-            {
-                return new CommunityMarketSquareLoadResult
+                StateCode = result.StateCode switch
                 {
-                    StateCode = refreshing ? CommunityMarketSquareLoadStateCodes.RefreshError : CommunityMarketSquareLoadStateCodes.InitialLoadError,
-                    Snapshot = lastSuccessful, Error = exception,
-                };
-            }
+                    ZoneRuntimeStateCode.Ready => CommunityMarketSquareLoadStateCodes.Success,
+                    ZoneRuntimeStateCode.RefreshError => CommunityMarketSquareLoadStateCodes.RefreshError,
+                    ZoneRuntimeStateCode.InitialError => CommunityMarketSquareLoadStateCodes.InitialLoadError,
+                    _ => CommunityMarketSquareLoadStateCodes.Loading,
+                },
+                Snapshot = result.Snapshot,
+                Changes = result.Changes,
+                Error = result.Error,
+            };
         }
     }
 }

@@ -12,4 +12,8 @@
     <Compile Remove="Samples~\**\*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.CodeMetadata\Ssalddel.CodeMetadata.csproj" />
+  </ItemGroup>
+
 </Project>

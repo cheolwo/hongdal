@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Unity.Application;
 using Ssalddel.Unity.Data;
 using Ssalddel.Unity.Npcs;
 using Ssalddel.Unity.PresentationContracts.Reconciliation;
@@ -235,21 +237,46 @@ namespace Ssalddel.Unity.Warehouse
         public WarehouseWorldChangeSet? Changes { get; set; }
         public Exception? Error { get; set; }
     }
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.UnityResilientWorldLoad,
+        SsalddelCodeLayer.ClientAdapter,
+        "창고 World Snapshot 조회와 마지막 성공 상태 조정을 연결한다.",
+        StepKey = "client.warehouse-load",
+        DependsOnStepKeys = new string[] { "client.last-successful-runtime" },
+        ExecutionStage = SsalddelCodeExecutionStage.Query,
+        Effects = SsalddelCodeEffect.NetworkCall | SsalddelCodeEffect.UiStateMutation,
+        ReadsFrom = SsalddelCodeDataScope.OperationalState,
+        WritesTo = SsalddelCodeDataScope.ClientPresentation,
+        FlowOrder = 20,
+        Boundary = "권한 적용된 창고 Projection만 표현하며 Unity가 입출고 완료를 확정하지 않는다.")]
     public sealed class WarehouseWorldLoadCoordinator
     {
-        private readonly WarehouseWorldQueryUseCase query; private readonly WarehouseWorldReconciler reconciler; private WarehouseWorldSnapshot? lastSuccessful;
+        private readonly WarehouseWorldQueryUseCase query;
+        private readonly WarehouseWorldReconciler reconciler;
+        private readonly LastSuccessfulLoadRuntime<WarehouseWorldSnapshot,
+            WarehouseWorldChangeSet> runtime = new();
         public WarehouseWorldLoadCoordinator(WarehouseWorldQueryUseCase query, WarehouseWorldReconciler reconciler) { this.query = query; this.reconciler = reconciler; }
         public async Task<WarehouseWorldLoadResult> LoadAsync(long warehouseId, CancellationToken cancellationToken = default)
         {
-            var refreshing = lastSuccessful != null;
-            try
+            var result = await runtime.LoadAsync(
+                token => query.실행Async(warehouseId, token),
+                (previous, snapshot) => reconciler.Reconcile(
+                    previous?.Objects ?? Array.Empty<WarehouseWorldObject>(),
+                    snapshot.Objects),
+                cancellationToken).ConfigureAwait(false);
+            return new WarehouseWorldLoadResult
             {
-                var snapshot = await query.실행Async(warehouseId, cancellationToken).ConfigureAwait(false);
-                var changes = reconciler.Reconcile(lastSuccessful?.Objects ?? Array.Empty<WarehouseWorldObject>(), snapshot.Objects); lastSuccessful = snapshot;
-                return new WarehouseWorldLoadResult { StateCode = WarehouseWorldLoadStateCodes.Success, Snapshot = snapshot, Changes = changes };
-            }
-            catch (OperationCanceledException) { throw; }
-            catch (Exception error) { return new WarehouseWorldLoadResult { StateCode = refreshing ? WarehouseWorldLoadStateCodes.RefreshError : WarehouseWorldLoadStateCodes.InitialLoadError, Snapshot = lastSuccessful, Error = error }; }
+                StateCode = result.StateCode switch
+                {
+                    ZoneRuntimeStateCode.Ready => WarehouseWorldLoadStateCodes.Success,
+                    ZoneRuntimeStateCode.RefreshError => WarehouseWorldLoadStateCodes.RefreshError,
+                    ZoneRuntimeStateCode.InitialError => WarehouseWorldLoadStateCodes.InitialLoadError,
+                    _ => WarehouseWorldLoadStateCodes.Loading,
+                },
+                Snapshot = result.Snapshot,
+                Changes = result.Changes,
+                Error = result.Error,
+            };
         }
     }
 }

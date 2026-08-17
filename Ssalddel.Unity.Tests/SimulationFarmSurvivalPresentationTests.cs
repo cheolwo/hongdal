@@ -37,6 +37,52 @@ public sealed class SimulationFarmSurvivalPresentationTests
         Assert.Equal("FarmSurvivalBoundaryInvalid", error.Message);
     }
 
+    [Fact]
+    public void 경관중심규칙은_방어예고동안적개체와전투Hud를숨긴다()
+    {
+        var state = State();
+        state.RuleRevision =
+            FarmSurvivalExperienceCodes.ScenicSeasonRuleRevision;
+        state.Encounters[0].PresentationKey =
+            "survival.seasonal-defense.warning";
+
+        var visuals = new FarmSurvivalVisualIntentMapper(
+            FarmSurvivalVisualCatalog.CreateDefault()).Map(state);
+        var experience = FarmSurvivalExperienceIntentMapper.Map(state);
+
+        Assert.DoesNotContain(visuals, value =>
+            value.VisualKey == FarmSurvivalVisualKeys.StylizedZombie);
+        Assert.Equal(FarmSurvivalExperienceCodes.SeasonalPreparation,
+            experience.MoodCode);
+        Assert.True(experience.ShowScenicHud);
+        Assert.False(experience.ShowCombatHud);
+        Assert.False(experience.ShowThreatVisuals);
+        Assert.True(experience.DirectCombatOptional);
+    }
+
+    [Fact]
+    public void 경관중심규칙도_직접전투선택뒤에는전투표현을연다()
+    {
+        var state = State();
+        state.RuleRevision =
+            FarmSurvivalExperienceCodes.ScenicSeasonRuleRevision;
+        state.Encounters[0].StateCode =
+            FarmSurvivalExperienceCodes.AwaitingCombat;
+        state.Encounters[0].PresentationKey = "survival.combat.ready";
+
+        var visuals = new FarmSurvivalVisualIntentMapper(
+            FarmSurvivalVisualCatalog.CreateDefault()).Map(state);
+        var experience = FarmSurvivalExperienceIntentMapper.Map(state);
+
+        Assert.Equal(3, visuals.Count(value =>
+            value.VisualKey == FarmSurvivalVisualKeys.StylizedZombie));
+        Assert.Equal(FarmSurvivalExperienceCodes.Combat,
+            experience.MoodCode);
+        Assert.False(experience.ShowScenicHud);
+        Assert.True(experience.ShowCombatHud);
+        Assert.True(experience.ShowThreatVisuals);
+    }
+
     private static FarmSurvivalStateApiModel State()
         => new()
         {

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Shared/">
+    <Project Path="Ssalddel.CodeMetadata/Ssalddel.CodeMetadata.csproj" />
+  </Folder>
+  <Folder Name="/Simulation Contracts/">
+    <Project Path="Ssalddel.Simulation.Contracts/Ssalddel.Simulation.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/Unity Data Core/">
+    <Project Path="Ssalddel.Unity/Ssalddel.Unity.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Ssalddel.Unity.Tests/Ssalddel.Unity.Tests.csproj" />
+  </Folder>
+</Solution>

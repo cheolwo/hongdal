@@ -43,6 +43,61 @@ public sealed class SimulationFarmCombatPresentationTests
     }
 
     [Fact]
+    public void 평상시좌클릭은_피해가아닌전투박자시작초안을만든다()
+    {
+        var state = ReadyState();
+        var perspective = FarmCombatInputCommandFactory.CreatePerspective(
+            state, "actor:sim:player",
+            FarmCombatPresentationCodes.FirstPersonPrecision,
+            "command:unity:perspective:1");
+        state.Perspectives =
+        [
+            new FarmCombatPerspectiveApiModel
+            {
+                ActorStableId = perspective.ActorStableId,
+                PerspectiveCode = perspective.PerspectiveCode,
+            },
+        ];
+
+        var start = FarmCombatInputCommandFactory.CreateBeatStart(
+            state, "actor:sim:player", "encounter:zombie:1",
+            "command:unity:beat:1");
+
+        Assert.Equal("encounter:zombie:1", start.EncounterStableId);
+        Assert.Equal(3, start.ExpectedRevision);
+        Assert.Null(typeof(FarmCombatBeatStartCommandDraft)
+            .GetProperty("DamageUnits"));
+        Assert.Null(typeof(FarmCombatBeatStartCommandDraft)
+            .GetProperty("GradeCode"));
+    }
+
+    [Fact]
+    public void 같은전투박자상태를반복관측해도_반응시계는초기화되지않는다()
+    {
+        var clock = new FarmCombatBeatClock();
+
+        Assert.True(clock.Observe("combat-beat:1", 1000d));
+        Assert.False(clock.Observe("combat-beat:1", 1300d));
+        Assert.Equal(500, clock.ElapsedMilliseconds(1500d, 1600));
+        Assert.True(clock.Observe("combat-beat:2", 1600d));
+        Assert.Equal(100, clock.ElapsedMilliseconds(1700d, 1600));
+    }
+
+    [Fact]
+    public void 전투Api경로는_기존FarmSurvival계약을그대로사용한다()
+    {
+        const string session = "session:one";
+        Assert.Equal("api/simulation/v1/sessions/session%3Aone/farm-survival",
+            SimulationFarmCombatApiRoutes.State(session));
+        Assert.EndsWith("/combat/perspective/confirm",
+            SimulationFarmCombatApiRoutes.Perspective(session));
+        Assert.EndsWith("/combat/beats/start",
+            SimulationFarmCombatApiRoutes.StartBeat(session));
+        Assert.EndsWith("/combat/beats/beat%3Aone/react",
+            SimulationFarmCombatApiRoutes.Reaction(session, "beat:one"));
+    }
+
+    [Fact]
     public void 전술명령창은_강제전환없이_주변전선과삼인칭전환만제안한다()
     {
         var source = State(FarmCombatPresentationCodes.FirstPersonPrecision);
@@ -206,6 +261,22 @@ public sealed class SimulationFarmCombatPresentationTests
                     PerfectGuardWindowMs = 70,
                     PerfectCounterWindowMs = 45,
                     StateCode = FarmCombatPresentationCodes.Active,
+                },
+            ],
+            SimulationOnly = true,
+            IsOperationalState = false,
+        };
+
+    private static FarmCombatStateApiModel ReadyState()
+        => new()
+        {
+            WorldRevision = 3,
+            Engagements =
+            [
+                new FarmCombatEngagementApiModel
+                {
+                    EncounterStableId = "encounter:zombie:1",
+                    StateCode = FarmCombatPresentationCodes.AwaitingCombat,
                 },
             ],
             SimulationOnly = true,
