@@ -4,7 +4,7 @@
 
 ## 현재 목표
 
-- 공간과 Simulation을 `WI` 세계 상호작용 단위로 종단 연결한다. 기본 구현 완료는 E3이며, E4 위치 독립적 WI 공간 모판 → E5 실제 도로·Block·경관 그래프 배치 → E6 WI 필수 공공데이터 계보 → E7 실제 플레이 폐루프로 승격한다. 개발 순서는 `P0 핵심 인과선 → P1 세계 공통 규칙 → P2 원장·문서 → P3 전체 회귀`로 나눈다.
+- 공간과 Simulation을 `WI` 세계 상호작용 단위로 종단 연결한다. `E`는 증거 깊이, `H1 WI 공간 모판 → H2 LandscapeBlock → H3 LandscapeGraph → H4 AreaSet`은 공간 포함 깊이로 분리한다. 기본 구현 완료는 E3이며, E4 H1 모판 실행 검증 → E5 H1~H4 실제 이동 경관 폐루프 → E6 WI 필수 공공데이터 계보 → E7 실제 플레이 폐루프로 승격한다. 개발 순서는 `P0 핵심 인과선 → P1 세계 공통 규칙 → P2 원장·문서 → P3 전체 회귀`로 나눈다.
 - Simulation·Unity의 외부 계약을 보존하는 구조 리팩토링 위에서, 경관 산책 중심의 28일 농장 생활과 선택 가능한 계절 방어 수직 단위를 완성한다.
 - 순서는 `검증 라우팅 → 서버 책임 경계 → Save/Replay → Unity 읽기 런타임 → 문서`다.
 - 운영 서버 권위, Simulation 상태와 Unity 표현의 분리, `SimulationWorldShell` 단일 실행 Scene 원칙을 유지한다.
@@ -12,10 +12,11 @@
 ## 현재 구현 상태
 
 - 기계 원본 `eng/execution-ledgers/world-interactions.json`에 농장·물류·Hub·마트·주문·세계 공통 37개 행위를 등록하고 한국어 [세계 상호작용 단위 대장](generated/world-interaction-catalog.md)을 결정적으로 생성한다. 26개 명령, 10개 부모 작업 자동 전이, 1개 공유 판정 정책을 구분한다.
-- 37개 항목의 기본 구현 상태는 계속 E3다. P0 집중 시험 22건과 P1 세계 공통 집중 시험 57건을 유지하며, E4 모판 시험 6건을 더한 Simulation 전체 회귀 611건이 통과했다.
-- 첫 13개 WI를 농장 생산, 농장 작업마당, 농장 상차·Gate, Farm–Hub 화물회랑, Hub 입고·보관의 다섯 E4 공간 모판으로 묶었다. 실행 권위 JSON과 사람이 읽는 Markdown을 분리하고 Compiler가 WI E3 상태·능력 충족·내부 관계·연결구 쌍·기준 경관 문법 후보·금지 위치/Unity 자산 필드와 정의·문서·대장 SHA-256을 검증한다.
-- E4 모판은 AreaSet·경관 그래프·Tile·절대좌표·실제 도로·Prefab·GUID·Material·Scene 경로를 갖지 않는다. 별도 `LandscapePattern` 계약을 만들지 않고 기존 156개 기준 경관 문법의 `compositionKey`를 허용 후보로 재사용한다.
-- 다섯 E4 모판에서 기존 Simulation 공간 Provider가 소비하는 9개 `Scenario` 공간 정의를 결정적으로 만들고, 13개 WI의 Preview·Confirm·Task·Tick·Effect와 300kg 공급선 Save/Replay를 다시 통과했다. 이 시험은 E4가 E3를 품는다는 증거이며 실제 평창 공간이나 공공데이터 근거가 아니다.
+- 공간 포함 계층은 별도 기계 대장 `simulation-world-spatial-hierarchy.r1`로 관리한다. 현재 정의는 H1 WI 공간 모판 5개, H2 LandscapeBlock 0개, H3 LandscapeGraph 5개, H4 AreaSet 1개이며 H3·H4의 존재를 E5 완료로 오판하지 않도록 검증한다. 기준 경관 문법 156개와 Tile·Area·경관 완결 영역·ScenarioRoute는 H 계층 밖의 어휘·참조 축이다.
+- 37개 항목의 기본 구현 상태는 계속 E3다. P0 집중 시험 22건과 P1 세계 공통 집중 시험 57건을 유지하며, H1 모판 E4 시험 6건을 더한 Simulation 전체 회귀 611건이 통과했다.
+- 첫 13개 WI를 농장 생산, 농장 작업마당, 농장 상차·Gate, Farm–Hub 화물회랑, Hub 입고·보관의 다섯 H1 WI 공간 모판으로 묶었다. 실행 권위 JSON과 사람이 읽는 Markdown을 분리하고 Compiler가 WI E3 상태·능력 충족·내부 관계·연결구 쌍·기준 경관 문법 후보·금지 위치/Unity 자산 필드와 정의·문서·대장 SHA-256을 검증한다.
+- H1 WI 공간 모판은 AreaSet·경관 그래프·Tile·절대좌표·실제 도로·Prefab·GUID·Material·Scene 경로를 갖지 않는다. 별도 `LandscapePattern` 계약을 만들지 않고 기존 156개 기준 경관 문법의 `compositionKey`를 허용 후보로 재사용한다.
+- 다섯 H1 모판에서 기존 Simulation 공간 Provider가 소비하는 9개 `Scenario` 공간 정의를 결정적으로 만들고, 13개 WI의 Preview·Confirm·Task·Tick·Effect와 300kg 공급선 Save/Replay를 다시 통과했다. 이 시험 통과가 E4 증거이며 실제 평창 공간이나 공공데이터 근거가 아니다.
 - 대관령 Farm의 기존 Graph Node 5·Edge 3·외부 연결점 0·미해결 3과 `spatial-capabilities.v1.json` 폐루프 3/9는 E4 완료 증거가 아니라 E5 배치 후보 근거로 재분류했다. Graph 해시 불일치 또는 미해결 공간을 Scenario로 자동 대체하지 않는 경계는 유지한다.
 - `WI-FARM-01~06`, `WI-LOG-01~05`, `WI-001~002` 공급선은 재배 면적 100m²와 Fixture 생산 규칙에서 300kg 수확 Lot·포장 Lot·Cargo·출하 배분을 만들고, 상차 공간·Farm–Hub 회랑·하차 공간을 역할별로 판정해 진부 Hub 검수와 창고 사용 중 용량 300kg까지 같은 계보로 연결한다.
 - 화물 이동은 출발지 상차·운송 회랑·목적지 하차의 세 공간 역할을 가진다. 출발 Tick에 상차 작업 영역 예약을 반환하고 도착 Tick에 하차 작업 영역 예약을 반환한다. 클라이언트는 역할별 선택적 선호 공간만 제출하며, 능력·용량·기간은 서버 규칙이 정하고 부적합한 선호 공간을 자동 대체하지 않는다.
@@ -23,7 +24,9 @@
 - Session 상태 사본은 공간 정의·현재 점유·예약을 포함한다. 미리보기는 상태를 바꾸지 않고 확정은 기존 자원과 공간을 함께 예약하며, 완료 시 작업 영역을 해제하고 보관 예약을 실제 사용 중 용량으로 전환한다. 예정·차단 작업 취소는 같은 작업 계보의 공간 예약·NPC 배정·임시 검수 재고만 되돌린다.
 - 13개 첫 공급선 WI의 통합 증거는 E4이며, E5 실제 배치 전 시험 인스턴스의 근거 종류는 계속 `Scenario`다. 공간 상태·역할별 예약·취소 명령이 있는 Session은 `simulation-save.v2`로 저장하고 역할 공간이 없는 기존 요청과 v1 재생 해시는 유지한다.
 - 작업 취소 HTTP 경로와 Unity 입고 정보판 연결을 추가했다. Unity는 미리보기에서 선택된 공간과 “시나리오 공간 근거”를 표시하고 공간 정의·능력·용량·접근·예약 충돌을 한국어로 보여주지만 완료를 확정하지 않는다.
-- 2026-08-17 E4 집중 시험 16건, Simulation 전체 시험 611건과 `Ssalddel.Simulation.slnx` 빌드가 경고·오류 없이 통과했다. 세계 상호작용·실행 원장 검증과 결정적 문서 재생성도 통과했다. 이번 E4 범위에서는 파생 DB migration, 실제 Graph 조립, Unity Editor·Play Mode·Game View를 실행하지 않았다.
+- 2026-08-17 E4 집중 시험 16건, Simulation 전체 시험 611건과 `Ssalddel.Simulation.slnx` 빌드가 경고·오류 없이 통과했다. 세계 상호작용·실행 원장 검증과 결정적 문서 재생성도 통과했다. 이어 Unity에는 원본 E4 JSON을 SHA-256 영수증과 함께 읽는 `WI공간모판VisualCatalog`와 전용 `WI공간모판검토실` Scene을 추가했다. 5개 H1 모판·9개 내부 공간의 전체 흐름, 모판별 대표 상세와 27개 고유 경관 후보 비교를 제공하며 H2~H4 실제 공간 조립이나 E5 증거·운영 상태는 만들지 않는다. 파생 DB migration과 실제 Graph 조립은 여전히 수행하지 않았다.
+- WI 공간 작업의 반복 속도를 위해 세 생성기는 동일 내용이면 출력 파일을 다시 쓰지 않는 공통 원자적 writer를 사용한다. 세계 상호작용·H 공간 계층·Simulation–Unity 실행 대장 시험은 `eng/tests/wi-spatial-validation.ps1` 한 진입점에서 같은 PowerShell process로 실행하며, 해당 범위만 읽는 `eng/work-areas/wi-spatial-evidence.json`을 추가했다.
+- Unity H1 검토실 생성기는 원본 경로·해시, JSON mirror 동기화, Visual Catalog 조립, UI 조립 책임을 별도 파일로 분리했다. 중심 `WI공간모판검토실Builder.cs`는 911줄에서 387줄로 줄었고, `빠른 원본·Catalog 새로고침`은 입력이 같을 때 JSON·Catalog·Scene 수정 시각을 바꾸지 않는다. 저장 Scene 전체 생성 메뉴와 고유 식별자·해시·화면 계약은 유지한다.
 - `eng/validate-changes.ps1`는 제품·Simulation·Unity 변경을 서로 다른 작업 단위로 판정하며 혼합 변경에서는 필요한 solution과 test project를 모두 선택한다. `-PlanOnly`는 선택 결과를 JSON으로 반환하고 별도 routing 검증 스크립트가 네 가지 경로 조합을 확인한다.
 - 기존 54개 endpoint가 집중됐던 `경영SimulationSessionsController`는 생명주기, World UI, 턴 결정, 수확·수출, 물류·창고, 주문·소비 Controller로 분리했다. 전체 세션 계열 96개 endpoint의 경로·HTTP 방식은 SHA-256 호환 시험으로 고정했다.
 - Application은 공통 `경영SimulationSessionAccessor` 위에 생명주기·턴 결정·수확수출·물류창고·주문소비 Service를 두고, 기존 `경영SimulationSessionService`는 공개 호출 호환 Facade로 유지한다.
@@ -51,6 +54,8 @@
 
 ## 검증 상태
 
+- E4 WI 공간 모판 Unity 검토실은 Unity 6000.5.6f1에서 생성·저장 Scene 재개방 검증을 통과했고 집중 EditMode 5/5가 통과했다. 실제 Play Mode에서 전체 개요 1장, 모판별 대표 5장, 후보 비교 5장 등 Game View 11장을 1600×900으로 확인했다. E/H 분리 뒤에는 전체 개요를 다시 캡처해 `증거 E4 · 공간 계층 H1`과 `실제 H2 Block이 아님` 경계를 확인했다. Console 오류는 0건이며 기존 nullable·폐기 예정 API 경고는 남아 있다. `SimulationWorldShell`, 기존 통합 모판 Scene, 서버 API·Domain 계약은 수정하지 않았다.
+- 반복 작업 리팩터링 뒤 WI 공간 통합 PowerShell 검증 3/3은 내부 실행 약 0.95초에 통과했고 연속 생성에서 hash와 파일 수정 시각이 모두 유지됐다. Unity 재컴파일은 오류 없이 완료됐고 H1 검토실 EditMode는 빠른 no-op 새로고침 시험을 포함해 6/6 통과했다. 리팩터링 후 저장 Scene을 전체 재생성·재개방했으며 Play Mode·Game View는 화면 변경 작업이 아니므로 다시 실행하지 않았다.
 - 공통 E0~E7 대장과 두 실행 원장의 E7 목표선 검증을 추가했다. 세계 상호작용 대장 37개와 Simulation–Unity 실행 대장 16개는 각각 두 번 생성해 동일 hash를 확인했고 최신 생성 문서 검사도 통과했다.
 - 중앙 L2 산출물 생성 결정성 시험, 실행 대장 생성·검증 시험과 Simulation 공간 집중 시험 28/28이 통과했다. Simulation Server 빌드는 경고·오류 0이며 로컬 MySQL 증분 migration과 실제 평창 재파생·멱등 재실행을 확인했다.
 - 실행 중인 로컬 `world-stream`에서 elevation·land-cover·placement-mask가 모두 `Available`이고 elevation 바이너리 SHA-256이 `B1A2FACB6D7E0E77493F8D2F23FBC452BDCBDDB907B0CCFAD5798EDAE263AC64`로 일치했다.
@@ -71,6 +76,7 @@
 - 평창 4팩 경관의 기존 검증은 Simulation 전체 568/568, 새 집중 범위 1/1, Unity EditMode 5/5가 통과했다. 이번 Nature 세분화 뒤 Unity 6000.5.6f1 스크립트 재컴파일 오류 0건, 생성기 오류 0건, Nature 집중 EditMode 7/7과 기존 4팩 Profile 3/3이 통과했다. 24개 기본 조합 Prefab·5개 사건 Overlay·사계절 제어기·저장 Scene 배선을 구조적으로 확인했다. 같은 생성기를 연속 실행했을 때 29개 Prefab과 2개 구성 대장의 SHA-256은 모두 같았고 저장 Scene은 의미 배선 시험은 같지만 Unity 이진 직렬화 해시는 달랐다. 전체 EditMode 일괄 실행은 Pipeline 연결의 30초 제한과 연결 재설정으로 결과를 수신하지 못했다.
 - 네 팩 정적 경관 계획·검토 Pipeline은 Unity 6000.5.6f1에서 승인 입력 일치를 확인하고 `WORLD-PLAN-3`까지 실행했다. 현재 검토 상태는 `ApprovedForSceneApply`, `CanStage=true`, `CanApply=true`다. 보정 뒤 활성 배치 127건·Anchor 8/8·생성 Root 8/8·유효 배치 View 127/127을 저장 Scene에서 확인했고, 이전 정적 경관 중복 164개는 제거했으며 관측 창고 Fixture 하나는 보존했다. 감자 작물 24개는 개별 밭고랑 Renderer 안에 모두 포함되고 회전은 밭고랑과 같은 8도로 정렬됐다. 최종 성능 합계는 삼각형 212,151/222,412, Material Slot·Draw Call 378/408, Shadow Caster 238/260, Collider 194/213, Animator 5/7이다. 경고 6건은 성능 예산 80% 접근 5건과 `ScenarioPreview` 높이 근거 1건이다. 정적 경관 Pipeline 15/15와 창고 아이템 5/5가 통과했다.
 - 저장된 `SimulationWorldShell`의 플레이어·카메라와 창고 Target·Controller 배선을 복구했다. Unity 6000.5.6f1 DX12 실제 Play Mode에서 1인칭과 전술 3인칭 버튼 전환, 농가·풍차·농지 경관, 감자 상자 Pallet 시선 감지를 확인했다. 통합 월드 3/3, 전투 입력 3/3, 턴 마감 5/5, 농장 경영 시점 3/3과 PlayMode `F2 → W 유지 → F3` 2/2가 통과했다. `UnifiedWorldModeWiringMissing`, 전투 실패 처리 `NullReferenceException`, 창고 `Scene 배선 오류`는 재발하지 않았다. 실행 중인 서버가 없어 턴 마감·입고 UI·농장 전투 세션 오류 3건은 남고, 로컬 오디오 출력 장치의 FMOD 전환 오류 1건을 별도로 관찰했다.
+- `SimulationWorldShell`의 1인칭 WASD와 3인칭 전술 이동 범위를 대관령 Farm 전용 `X 10.5~31.5 / Z 2.5~22`에서 평창 통합 지도 `X -30.5~30.5 / Z -22.5~22.5`로 넓혔다. 연속 지형 Collider와 공간 Streaming 안전 Gate는 유지하며 8개 법정동 경계가 새 범위 안에 있음을 저장 Scene에서 검증했다. Unity 재컴파일 오류 0, Profile 1/1·통합 Scene 3/3·실제 키보드 `W` PlayMode 1/1이 통과했고, 별도 실제 Play Mode에서 `W` 2초 입력으로 `(15.400, 1.742, 10.250) → (15.400, 1.720, 12.105)` 이동과 `MovementBlockedByStreaming=false`를 확인했다. Game View 증거는 Unity 저장소의 `artifacts/local/validation/world-traversal-1/after-wasd.png`에 보존했다.
 - 경관 공간 문법 집중 검증은 Simulation 계약·결정성·반복 상한·자료 대기·파생 DB 재조회·Manifest 변조 차단과 기존 world-stream 경계를 합쳐 22/22 통과했다. `Ssalddel.Simulation.slnx` 빌드는 경고·오류 0이다. Unity 6000.5.6f1 재컴파일 오류 0, 안전 Manifest hash 일치·staging 원자 교체·hash 불일치 차단·서버 조회 경로 EditMode 4/4와 기존 공간 Streaming 10/10이 통과했고 저장 Scene의 `공간TileStreamingController.landscapeCompositionCatalog` 배선을 Editor에서 확인했다. 이번 변경의 Play Mode·Game View는 실행하지 않았다.
 - 경관 문법 마이그레이션을 로컬 `ssalddel_simulation_world`에 적용했다. 최신 AreaSet Graph 조립 기준 중앙 `kr5186:l2:700:1145`은 Node 5·Edge 3·배치 5이고 Graph 전체의 외부 연결점은 0, Graph SHA-256은 `9c3b09c7fc59bd98a4a0102f6e08a1538e050aa2fbc3d2d0fc0becdb459ecc84`다. 동쪽 연결점은 자료가 없는 `701:1145`에 속해 생성되지 않았으며 문서 값으로 꾸며내지 않는다.
 - `area-set:sim:pyeongchang:farm-hub-town.v1`을 JSON 실행 정의와 사람이 작성한 Markdown으로 분리하고 compiler가 참조·schema·금지된 Prefab/GUID 경로와 두 SHA-256을 검증하도록 했다. AreaSet은 대관령 Farm·두 회랑·진부 Hub·평창 Town의 다섯 `LandscapeGraph`와 네 Connector 관계를 묶으며, Graph는 Area·Tile을 N:N으로 참조한다.
@@ -79,8 +85,8 @@
 
 ## 남은 문제
 
-- 대관령 Farm 2×2의 나머지 세 L2 공간 산출물과 작업마당·상차영역·Farm Gate, Farm–Hub·진부 Hub Graph가 없다. E5는 실제 도로 Network·Junction·Block을 만든 뒤 승인된 E4 모판 인스턴스를 배치하고 양쪽 연결구를 Node·Edge·GraphRelation에 결속해야 한다.
-- `SimulationWorldShell.unity`는 이번 E4 작업에서 수정하지 않았다. 저장 Scene 배선과 사람 조작은 E4 조건이 아니라 E7 실제 플레이 폐루프 조건이며, WI-FARM-01~03의 기존 Graph 근거는 E5 배치 후보로만 유지한다.
+- 대관령 Farm 2×2의 나머지 세 L2 공간 산출물과 작업마당·상차영역·Farm Gate, Farm–Hub·진부 Hub Graph가 없다. E5는 실제 도로 Network·Junction으로 H2 Block을 만든 뒤 승인된 H1 모판 인스턴스를 배치하고 양쪽 연결구를 H3 Node·Edge와 H4 GraphRelation에 결속해야 한다.
+- `SimulationWorldShell.unity`의 표현 전용 플레이어 이동 범위는 평창 통합 지도 전체로 넓혔지만 이것은 E4 모판 승인이나 E5 실제 Graph 배치 증거를 승격하지 않는다. WI-FARM-01~03의 기존 Graph 근거는 계속 E5 배치 후보이며, 실제 지형 산출물이 없는 타일을 자료 완료로 간주하지 않는다.
 - E5 경관에 WI별 필수 공공데이터 원본·파생·출처·해시 계보를 연결하는 E6과 실제 서버·Session DB·저장 Scene에서 사람이 조작하는 E7도 남아 있다.
 - 실행 중인 실제 Simulation 서버·Session DB와 Unity 저장 Scene을 사용한 감자 생산→Hub 보관 HTTP·Play Mode·Game View 종단 검증은 남아 있다. 현재 첫 공급선의 완료 증거는 다섯 공간 모판에서 13개 E3 행위와 Save/Replay를 다시 통과한 E4까지다.
 - 팀 관전의 기존 process-local `InMemory...Store` 공개 타입은 호환 표면으로 남아 있다. 실제 원장 연결이나 다음 호환 개정에서 Infrastructure 이전 여부를 결정해야 한다.
