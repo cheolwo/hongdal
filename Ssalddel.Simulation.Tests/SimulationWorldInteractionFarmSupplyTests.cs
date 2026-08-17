@@ -135,6 +135,142 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
     }
 
     [Fact]
+    public void 다섯_E4공간모판은_13개_WI_300kg공급선을_SaveReplay까지다시실행한다()
+    {
+        var spatialWorld = SimulationWorldInteractionSpatialSeedbedTestFixture
+            .CreateSpatialWorld();
+        var session = new 경영SimulationSessionAggregate(CreateRequest(spatialWorld));
+
+        var tilled = RunWork(session, "seedbed-till", PreparationSoil,
+            SimulationFarmSurvivalCodes.Tilling,
+            SimulationWorldInteractionSpatialSeedbedTestFixture.ProductionPlot);
+        var sown = RunWork(session, "seedbed-sow", PreparationSoil,
+            SimulationFarmSurvivalCodes.Sowing,
+            SimulationWorldInteractionSpatialSeedbedTestFixture.ProductionPlot);
+        var growing = sown.FarmSurvival!.CultivationUnits.Single(value =>
+            value.TileStableId == PreparationSoil);
+        var cared = RunWork(session, "seedbed-care", growing.CultivationUnitStableId,
+            SimulationFarmSurvivalCodes.CropCare,
+            SimulationWorldInteractionSpatialSeedbedTestFixture.ProductionPlot);
+        Assert.Equal(Simulation재배단위상태Codes.HarvestReady,
+            cared.FarmSurvival!.CultivationUnits.Single(value =>
+                value.CultivationUnitStableId == growing.CultivationUnitStableId).StateCode);
+
+        var harvested = RunWork(session, "seedbed-harvest", CultivationUnit,
+            SimulationFarmSurvivalCodes.Harvesting,
+            SimulationWorldInteractionSpatialSeedbedTestFixture.ProductionPlot);
+        var harvestLot = Assert.Single(harvested.FarmSurvival!.HarvestLots);
+        RunWork(session, "seedbed-collect", harvestLot.HarvestLotStableId,
+            SimulationFarmSurvivalCodes.HarvestCollection,
+            SimulationWorldInteractionSpatialSeedbedTestFixture.CollectionArea);
+        var packed = RunWork(session, "seedbed-pack", harvestLot.HarvestLotStableId,
+            SimulationFarmSurvivalCodes.OutboundPacking,
+            SimulationWorldInteractionSpatialSeedbedTestFixture.PackingArea);
+        var packageLot = Assert.Single(packed.FarmSurvival!.PackageLots);
+
+        var freightRequest = Freight(packageLot);
+        freightRequest.Movement.PreferredOriginSpatialStableId =
+            SimulationWorldInteractionSpatialSeedbedTestFixture.LoadingArea;
+        freightRequest.Movement.PreferredRouteSpatialStableId =
+            SimulationWorldInteractionSpatialSeedbedTestFixture.FarmHubCorridor;
+        freightRequest.Movement.PreferredDestinationSpatialStableId =
+            SimulationWorldInteractionSpatialSeedbedTestFixture.HubUnloading;
+        var freightPreview = session.PreviewFreightTransport(freightRequest);
+        Assert.Empty(freightPreview.BlockReasonCodes);
+        Assert.Equal(packed.Revision, session.Snapshot().Revision);
+        var dispatched = session.ConfirmFreightTransport(
+            new SimulationFreightTransportConfirmRequest
+            {
+                CommandId = "command:wi-seedbed:farm-hub",
+                ExpectedRevision = packed.Revision,
+                Freight = freightRequest,
+            });
+        var departed = session.Advance(Tick("command:wi-seedbed:depart",
+            dispatched.Revision));
+        var inTransit = session.Advance(Tick("command:wi-seedbed:route",
+            departed.Revision));
+        var arrived = session.Advance(Tick("command:wi-seedbed:arrive",
+            inTransit.Revision));
+        var freight = Assert.Single(arrived.FreightTransports);
+        Assert.Equal(화물운송상태코드.하차지도착, freight.StateCode);
+
+        var receipt = new SimulationFreightReceiptPreviewRequest
+        {
+            TransportRequestStableId = freight.TransportRequestStableId,
+            TransportRevision = freight.Revision,
+            ActorStableId = PyeongchangSimulationNpcStableIds.진부입고검수담당,
+            PreferredSpatialStableId =
+                SimulationWorldInteractionSpatialSeedbedTestFixture.HubInspection,
+            ReceiptDurationTicks = 1,
+            SourceStableIds = new[] { packageLot.CargoStableId },
+        };
+        Assert.Empty(session.PreviewFreightReceipt(receipt).Decision.BlockReasonCodes);
+        var receiptScheduled = session.ConfirmFreightReceipt(
+            new SimulationFreightReceiptConfirmRequest
+            {
+                CommandId = "command:wi-seedbed:receipt",
+                ExpectedRevision = arrived.Revision,
+                Receipt = receipt,
+            });
+        var receiptCompleted = AdvanceTicks(session, receiptScheduled, 3,
+            "command:wi-seedbed:receipt-tick");
+        var inventory = Assert.Single(receiptCompleted.NpcFacilityInventories);
+        Assert.Equal(SimulationNpcInventoryStateCodes.StorageEligible, inventory.StateCode);
+
+        var putAway = new SimulationWarehousePutAwayPreviewRequest
+        {
+            InventoryStableId = inventory.InventoryStableId,
+            InventoryRevision = inventory.Revision,
+            ActorStableId = PyeongchangSimulationNpcStableIds.진부적재담당,
+            PreferredSpatialStableId =
+                SimulationWorldInteractionSpatialSeedbedTestFixture.HubStorage,
+            PutAwayDurationTicks = 2,
+            SourceStableIds = new[] { inventory.InventoryStableId },
+        };
+        Assert.Empty(session.PreviewWarehousePutAway(putAway).Decision.BlockReasonCodes);
+        var putAwayScheduled = session.ConfirmWarehousePutAway(
+            new SimulationWarehousePutAwayConfirmRequest
+            {
+                CommandId = "command:wi-seedbed:put-away",
+                ExpectedRevision = receiptCompleted.Revision,
+                PutAway = putAway,
+            });
+        var completed = AdvanceTicks(session, putAwayScheduled, 3,
+            "command:wi-seedbed:put-away-tick");
+
+        Assert.Equal(300m, completed.SpatialRuntimeStates.Single(value =>
+                value.SpatialStableId ==
+                    SimulationWorldInteractionSpatialSeedbedTestFixture.HubStorage)
+            .OccupiedCapacities.Single(value =>
+                value.CapacityCode == Simulation공간용량Codes.StorageCapacity).Quantity);
+        Assert.All(completed.SpatialDefinitions, definition =>
+        {
+            Assert.Equal(Simulation공간근거종류Codes.Scenario,
+                definition.EvidenceKindCode);
+            Assert.Contains(definition.SourceStableIds, value =>
+                value.StartsWith("wi-spatial-seedbed:", StringComparison.Ordinal));
+        });
+
+        var saved = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:wi-seedbed:farm-hub",
+            ExpectedRevision = completed.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(saved);
+        var restoredSave = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = saved.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(saved.ReplayHash, restoredSave.ReplayHash);
+        Assert.Equal(300m, restored.Snapshot().SpatialRuntimeStates.Single(value =>
+                value.SpatialStableId ==
+                    SimulationWorldInteractionSpatialSeedbedTestFixture.HubStorage)
+            .OccupiedCapacities.Single(value =>
+                value.CapacityCode == Simulation공간용량Codes.StorageCapacity).Quantity);
+    }
+
+    [Fact]
     public void WI_WORLD_04_시설수리는_수리공간과자재를예약하고_완료후내구도를갱신한다()
     {
         var session = new 경영SimulationSessionAggregate(CreateRequest());
