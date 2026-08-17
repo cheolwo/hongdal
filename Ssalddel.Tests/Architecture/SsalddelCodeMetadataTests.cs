@@ -15,6 +15,17 @@ namespace Ssalddel.Tests.Architecture;
 public sealed class SsalddelCodeMetadataTests
 {
     [Fact]
+    public void 기존ContractsAssembly는_CodeMetadataType을_전달한다()
+    {
+        var forwarded = Type.GetType(
+            "Ssalddel.Contracts.Common.Metadata.SsalddelCodeMetadataAttribute, Ssalddel.Contracts",
+            throwOnError: true);
+
+        Assert.Equal(typeof(SsalddelCodeMetadataAttribute), forwarded);
+        Assert.Equal("Ssalddel.CodeMetadata", forwarded!.Assembly.GetName().Name);
+    }
+
+    [Fact]
     public void CommunityAuthoringImage_MetadataBuildsSearchableVerticalSlice()
     {
         var metadata = ReadFeatureMetadata();

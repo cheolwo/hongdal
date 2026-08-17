@@ -2,7 +2,7 @@
 
 ## 목적
 
-프로젝트 수와 기능이 늘어도 개발자와 Codex가 매 작업마다 전체 저장소를 읽지 않도록 제품 흐름을 다섯 작업영역으로 나눈다. 이 분할은 먼저 **읽기·검색·검증·커밋 경계**로 적용하고, 프로젝트 간 의존성이 안정된 뒤에만 물리 assembly 또는 별도 repository 분리를 검토한다.
+프로젝트 수와 기능이 늘어도 개발자와 Codex가 매 작업마다 전체 저장소를 읽지 않도록 제품 흐름 다섯 영역과 Simulation·Unity 공통 영역으로 나눈다. 이 분할은 먼저 **읽기·검색·검증·커밋 경계**로 적용하고, 프로젝트 간 의존성이 안정된 뒤에만 물리 assembly 또는 별도 repository 분리를 검토한다.
 
 ## 작업영역
 
@@ -13,6 +13,7 @@
 | `individual-intent` | 0.5 | 비용 미리보기·수정/철회 가능한 개인 의향 | `Ssalddel.v0.5.slnx` |
 | `group-purchase` | 1.0 | 별도 참여 동의·집계·공동구매 원장 | `Ssalddel.v1.0.slnx` |
 | `trade-readiness` | 1.5 | 공급자·HS/HTS·검역·표시·포워더 인계 전 준비 | `Ssalddel.v1.5.slnx` |
+| `simulation-unity` | 공통 | Simulation 세션·파생 World·Streaming과 Unity 데이터 코어 | `Ssalddel.Simulation.slnx`, `Ssalddel.Unity.slnx` |
 
 각 작업영역의 기계 판독 범위는 `eng/work-areas/*.json`을 단일 기준으로 사용한다.
 
@@ -24,6 +25,7 @@
 4. 다른 작업영역 contract가 필요한 경우 공개 route·DTO·metadata부터 읽고 내부 구현 전체로 바로 확장하지 않는다.
 5. 둘 이상의 작업영역을 변경하면 커밋을 영역별로 나누고, 공유 contract 변경은 소비 영역 test를 별도로 실행한다.
 6. 전체 repository 검색은 이름 충돌, DI 조립, migration snapshot, 공개 route 호환처럼 전역 확인이 필요한 경우에만 수행한다.
+7. `simulation-unity`에서는 생성 코드 지도의 기능 트리를 먼저 읽고, `StepKey` 순서로 핵심 타입만 연 뒤 세부 구현으로 확장한다.
 
 ## 물리 분리 판단
 

@@ -57,6 +57,7 @@
     <Project Path="Ssalddel.WorkflowRules/Ssalddel.WorkflowRules.csproj" />
   </Folder>
   <Folder Name="/Shared/">
+    <Project Path="Ssalddel.CodeMetadata/Ssalddel.CodeMetadata.csproj" />
     <Project Path="Ssalddel.BackOffice.Client/Ssalddel.BackOffice.Client.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>

@@ -1,0 +1,921 @@
+{
+  "schemaVersion": "ssalddel-code-map.v1",
+  "workAreaKey": "simulation-unity",
+  "workAreaVersion": "1",
+  "features": [
+    {
+      "key": "simulation-session-lifecycle",
+      "label": "Simulation \uC138\uC158 \uC0DD\uBA85\uC8FC\uAE30",
+      "dependsOnFeatures": [],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "contract.session-create",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.\uACBD\uC601SimulationSession\uC0DD\uC131Request",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/\uACBD\uC601SimulationSessionContracts.cs",
+          "responsibility": "Simulation \uC138\uC158 \uC0DD\uC131 \uC785\uB825\uACFC \uCD08\uAE30 World \uBB38\uB9E5\uC744 \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uC6B4\uC601 \uC5C5\uBB34 \uC0DD\uC131 \uACC4\uC57D\uC774 \uC544\uB2C8\uB77C \uACB0\uC815\uC801 Simulation \uC138\uC158 \uC785\uB825 \uACC4\uC57D\uC774\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "api.session-lifecycle",
+          "dependsOnStepKeys": [
+            "contract.session-create"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.\uACBD\uC601SimulationSessionsController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/\uACBD\uC601SimulationSessionsController.cs",
+          "responsibility": "\uC138\uC158 \uC0DD\uC131\u00B7\uC870\uD68C\u00B7Tick HTTP \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "Simulation \uC2E4\uD589 \uBAA8\uB4DC\uC5D0\uC11C\uB9CC \uC870\uB9BD\uB418\uBA70 \uC624\uB958 \uACC4\uC57D\uACFC \uAE30\uC874 route\uB97C \uBCF4\uC874\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.session-lifecycle",
+          "dependsOnStepKeys": [
+            "api.session-lifecycle"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service.cs",
+          "responsibility": "\uC138\uC158 \uC0DD\uC131\u00B7\uC870\uD68C\u00B7Tick\u00B7\uC800\uC7A5\u00B7\uBCF5\uC6D0\uC744 \uC870\uC728\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC2E4\uC81C \uC5C5\uBB34 \uC0C1\uD0DC\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uC73C\uBA70 \uAE30\uB300 \uAC1C\uC815\uACFC \uC800\uC7A5 \uC790\uB8CC \uBB34\uACB0\uC131\uC744 \uD1B5\uACFC\uD55C Simulation \uC0C1\uD0DC\uB9CC \uBCC0\uACBD\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 40,
+          "stepKey": "domain.session-aggregate",
+          "dependsOnStepKeys": [
+            "application.session-lifecycle"
+          ],
+          "executionStage": "Tick",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/\uACBD\uC601SimulationSession.cs",
+          "responsibility": "\uACB0\uC815\uC801 \uC138\uC158 \uC0C1\uD0DC\uC640 \uAC1C\uC815\u00B7Tick \uC0C1\uD0DC \uC804\uC774\uB97C \uC18C\uC720\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "Aggregate \uC0C1\uD0DC \uC804\uC774\uB294 Simulation \uC804\uC6A9\uC774\uBA70 \uC6B4\uC601 \uACC4\uC57D\u00B7\uC7AC\uACE0\u00B7\uACB0\uC81C\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 50,
+          "stepKey": "infrastructure.session-store",
+          "dependsOnStepKeys": [
+            "domain.session-aggregate"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Infrastructure",
+          "componentType": "Ssalddel.Simulation.Infrastructure.InMemory\uACBD\uC601SimulationSessionStore",
+          "assembly": "Ssalddel.Simulation.Infrastructure",
+          "sourcePath": "Ssalddel.Simulation.Infrastructure/InMemorySimulationStores.cs",
+          "responsibility": "\uD65C\uC131 Simulation \uC138\uC158\uC744 \uD504\uB85C\uC138\uC2A4 \uC218\uBA85 \uB3D9\uC548 \uBCF4\uAD00\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uD504\uB85C\uC138\uC2A4 \uB0B4\uBD80 \uC800\uC7A5\uC18C\uC774\uBA70 durable \uC800\uC7A5\uC774\uB098 \uB2E4\uC911 \uC778\uC2A4\uD134\uC2A4 \uB3D9\uAE30\uD654\uB97C \uBCF4\uC7A5\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "simulation-parallel-battle",
+      "label": "\uBCD1\uB82C \uACBD\uC601-\uC804\uD22C",
+      "dependsOnFeatures": [
+        "simulation-session-lifecycle"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "contract.battle-preview",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationBattleCreatePreviewRequest",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationBattleInstanceContracts.cs",
+          "responsibility": "\uBCD1\uB82C \uC804\uD22C \uC0DD\uC131 \uBBF8\uB9AC\uBCF4\uAE30\uC758 \uC11C\uBC84 \uC785\uB825\uC744 \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uD074\uB77C\uC774\uC5B8\uD2B8\uB294 \uC804\uD22C \uACB0\uACFC\uB098 \uC218\uCE58 \uBCF4\uC815\uC744 \uD655\uC815\uD558\uC9C0 \uC54A\uACE0 \uC608\uC0C1 World \uAC1C\uC815\uACFC \uC548\uC815 ID\uB9CC \uBCF4\uB0B8\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "api.battle",
+          "dependsOnStepKeys": [
+            "contract.battle-preview"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.SimulationBattlesController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationBattlesController.cs",
+          "responsibility": "\uBCD1\uB82C \uC804\uD22C \uC870\uD68C\u00B7Preview\u00B7Confirm\u00B7\uC9C4\uD589 HTTP \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uD074\uB77C\uC774\uC5B8\uD2B8\uAC00 \uBCF4\uB0B8 \uC548\uC815 ID\uC640 \uC608\uC0C1 \uAC1C\uC815\uB9CC \uBC1B\uC544 \uC11C\uBC84 \uADDC\uCE59\uC73C\uB85C \uC804\uD22C \uC0C1\uD0DC\uB97C \uD655\uC815\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.battle",
+          "dependsOnStepKeys": [
+            "api.battle"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationBattleInstanceService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationBattleInstanceService.cs",
+          "responsibility": "\uC804\uD22C Preview\u00B7Confirm\u00B7\uC9C4\uD589\uACFC \uACBD\uC601 World \uD569\uB958\uB97C \uC870\uC728\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC804\uD22C Tick\uACFC \uACBD\uC601 WorldTick\uC744 \uBD84\uB9AC\uD558\uACE0 \uC644\uB8CC \uACB0\uACFC\uB9CC \uC548\uC804\uD55C WorldTick\uC5D0 \uD569\uB958\uC2DC\uD0A8\uB2E4."
+        },
+        {
+          "flowOrder": 40,
+          "stepKey": "domain.battle-state",
+          "dependsOnStepKeys": [
+            "application.battle"
+          ],
+          "executionStage": "Tick",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.SimulationBattleInstanceState",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/SimulationBattleInstances.cs",
+          "responsibility": "\uB3C5\uB9BD BattleTick\u00B7\uCC38\uAC00\u00B7\uBC30\uCE58\u00B7\uC9C0\uC6D0\u00B7\uACB0\uACFC \uC0C1\uD0DC \uC804\uC774\uB97C \uC18C\uC720\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC804\uD22C \uC0C1\uD0DC\uB294 SimulationOnly\uC774\uBA70 \uC6B4\uC601 \uC790\uC6D0\uC774\uB098 \uC2E4\uC81C \uC778\uB825\uC744 \uC7A0\uADF8\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 50,
+          "stepKey": "infrastructure.battle-store",
+          "dependsOnStepKeys": [
+            "domain.battle-state"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Infrastructure",
+          "componentType": "Ssalddel.Simulation.Infrastructure.InMemorySimulationBattleInstanceStore",
+          "assembly": "Ssalddel.Simulation.Infrastructure",
+          "sourcePath": "Ssalddel.Simulation.Infrastructure/InMemorySimulationBattleInstanceStore.cs",
+          "responsibility": "\uD65C\uC131 \uC804\uD22C\uC640 Simulation \uC790\uC6D0 \uC608\uC57D\uC744 \uD504\uB85C\uC138\uC2A4 \uC218\uBA85 \uB3D9\uC548 \uBCF4\uAD00\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC2E4\uC81C \uCC3D\uACE0 \uC7AC\uACE0\uB098 \uC778\uB825\uC744 \uC7A0\uADF8\uC9C0 \uC54A\uB294 process-local Simulation \uC800\uC7A5\uC18C\uB2E4."
+        },
+        {
+          "flowOrder": 60,
+          "stepKey": "unity.battle-presentation",
+          "dependsOnStepKeys": [
+            "infrastructure.battle-store"
+          ],
+          "executionStage": "Presentation",
+          "layer": "ViewModel",
+          "componentType": "Ssalddel.Unity.Battles.BattlePresentationMapper",
+          "assembly": "Ssalddel.Unity",
+          "sourcePath": "Ssalddel.Unity/Runtime/Battles/SimulationBattleInstancePresentationModels.cs",
+          "responsibility": "\uC11C\uBC84 \uC804\uD22C Snapshot\uC744 \uACBD\uC601\u00B7\uC804\uD22C \uCE74\uBA54\uB77C\uC640 \uC815\uBCF4\uD310 \uD45C\uD604 \uC0C1\uD0DC\uB85C \uD22C\uC601\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [],
+          "boundary": "\uC804\uD22C \uACB0\uACFC\u00B7World \uC0C1\uD0DC\uB97C \uACC4\uC0B0\uD558\uAC70\uB098 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294 \uC21C\uC218 Unity \uD45C\uD604 \uBCC0\uD658\uC774\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "simulation-farm-combat-input",
+      "label": "1\uC778\uCE6D \uB18D\uC7A5 \uD0C0\uC774\uBC0D \uC804\uD22C",
+      "dependsOnFeatures": [
+        "simulation-session-lifecycle"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "contract.farm-combat",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationCombatPerspectiveConfirmRequest",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationFarmCombatContracts.cs",
+          "responsibility": "\uC804\uD22C \uC2DC\uC810\u00B7\uBC15\uC790\u00B7\uBC18\uC751 \uC785\uB825\uC758 \uC11C\uBC84 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "Unity\uB294 \uC548\uC815 \uC2DD\uBCC4\uC790\u00B7\uC608\uC0C1 \uAC1C\uC815\u00B7\uD589\uB3D9\u00B7\uBC18\uC751 \uACBD\uACFC \uC2DC\uAC04\uB9CC \uC81C\uCD9C\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "api.farm-combat",
+          "dependsOnStepKeys": [
+            "contract.farm-combat"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.SimulationFarmSurvivalController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationFarmSurvivalController.cs",
+          "responsibility": "\uC804\uD22C \uC2DC\uC810\u00B7\uBC15\uC790 \uC2DC\uC791\u00B7\uBC18\uC751 \uD655\uC815 HTTP \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "Simulation \uC804\uC6A9 \uACBD\uB85C\uC774\uBA70 \uC6B4\uC601 \uC11C\uBC84 \uAD8C\uD55C\u00B7\uC6D0\uC7A5\uC744 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.farm-combat",
+          "dependsOnStepKeys": [
+            "api.farm-combat"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationFarmSurvivalService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationFarmSurvivalService.cs",
+          "responsibility": "\uC804\uD22C \uC785\uB825\uC744 \uD604\uC7AC Simulation Session aggregate\uC5D0 \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC6B4\uC601 \uC5C5\uBB34 \uC0C1\uD0DC\uAC00 \uC544\uB2C8\uB77C Simulation Session \uC0C1\uD0DC\uB9CC \uBCC0\uACBD\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 40,
+          "stepKey": "domain.farm-combat",
+          "dependsOnStepKeys": [
+            "application.farm-combat"
+          ],
+          "executionStage": "Tick",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/SimulationFarmCombat.cs",
+          "responsibility": "\uC804\uD22C \uBC15\uC790\u00B7\uD0C0\uC774\uBC0D \uB4F1\uAE09\u00B7\uD53C\uD574\u00B7\uC804\uC220 \uAE30\uD68C\uB97C \uACB0\uC815\uC801\uC73C\uB85C \uD310\uC815\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "Unity\uAC00 \uC81C\uCD9C\uD55C \uD310\uC815 \uACB0\uACFC\uB97C \uC2E0\uB8B0\uD558\uC9C0 \uC54A\uACE0 Session aggregate\uAC00 \uCD5C\uC885 \uACB0\uACFC\uB97C \uD655\uC815\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 50,
+          "stepKey": "unity.farm-combat-input",
+          "dependsOnStepKeys": [
+            "domain.farm-combat"
+          ],
+          "executionStage": "Presentation",
+          "layer": "ClientAdapter",
+          "componentType": "Ssalddel.Unity.Survival.FarmCombatInputCommandFactory",
+          "assembly": "Ssalddel.Unity",
+          "sourcePath": "Ssalddel.Unity/Runtime/Survival/SimulationFarmCombatPresentationModels.cs",
+          "responsibility": "\uC11C\uBC84 \uC804\uD22C \uC0C1\uD0DC\uB97C \uACF5\uACA9 \uC9C4\uC785\u00B7\uBC29\uC5B4\u00B7\uBC18\uACA9 \uBA85\uB839 \uCD08\uC548\uC73C\uB85C \uBCC0\uD658\uD55C\uB2E4.",
+          "effects": [
+            "UiStateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "ClientPresentation"
+          ],
+          "boundary": "\uD53C\uD574\u00B7\uD310\uC815 \uB4F1\uAE09\u00B7\uC804\uC220 \uD6A8\uACFC\uB97C \uACC4\uC0B0\uD558\uC9C0 \uC54A\uACE0 \uC548\uC815 \uC2DD\uBCC4\uC790\uC640 \uC785\uB825 \uC2DC\uAC01\uB9CC \uC804\uB2EC\uD55C\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "simulation-save-replay",
+      "label": "Simulation \uC800\uC7A5-\uC7AC\uC0DD",
+      "dependsOnFeatures": [
+        "simulation-session-lifecycle",
+        "simulation-parallel-battle"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "contract.save-request",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationSessionSaveRequest",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationSaveReplayContracts.cs",
+          "responsibility": "\uC138\uC158 \uC800\uC7A5 \uC2DD\uBCC4\uC790\uC640 \uAE30\uB300 \uAC1C\uC815\uC744 \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uC800\uC7A5 \uC790\uB8CC\uB294 Simulation \uC0C1\uD0DC\uB9CC \uD3EC\uD568\uD558\uBA70 \uC6B4\uC601 \uC6D0\uC7A5\uACFC \uACF5\uACF5\uB370\uC774\uD130 \uC6D0\uBCF8\uC744 \uBCF5\uC81C\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "api.save-replay",
+          "dependsOnStepKeys": [
+            "contract.save-request"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.\uACBD\uC601SimulationSessionsController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/\uACBD\uC601SimulationSessionsController.cs",
+          "responsibility": "\uC138\uC158 \uC800\uC7A5\u00B7\uBCF5\uC6D0 HTTP \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC800\uC7A5 \uC2DD\uBCC4\uC790\uC640 \uAE30\uB300 \uAC1C\uC815\uC744 \uC11C\uBC84\uAC00 \uAC80\uC99D\uD558\uBA70 \uC6B4\uC601 \uC11C\uBC84 \uC800\uC7A5 API\uB85C \uC804\uB2EC\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.save-replay",
+          "dependsOnStepKeys": [
+            "api.save-replay"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service.cs",
+          "responsibility": "\uC138\uC158 \uC800\uC7A5\u00B7\uBCF5\uC6D0\uACFC \uC804\uD22C \uC800\uC7A5 \uC790\uB8CC \uACB0\uD569\uC744 \uC870\uC728\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uAC80\uC99D\uB41C simulation-save.v1\u00B7v2 \uC790\uB8CC\uB9CC \uC800\uC7A5\u00B7\uBCF5\uC6D0\uD558\uBA70 \uD65C\uC131 \uC138\uC158\uC744 \uC784\uC758\uB85C \uB36E\uC5B4\uC4F0\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 40,
+          "stepKey": "domain.save-package",
+          "dependsOnStepKeys": [
+            "application.save-replay"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/SimulationSaveReplay.cs",
+          "responsibility": "\uC138\uC158 Snapshot\uACFC Command log\uB97C \uBD09\uC778\uD55C \uC800\uC7A5 \uC790\uB8CC\uB85C \uB9CC\uB4E0\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [],
+          "boundary": "\uC7AC\uC0DD hash\uC640 schema\uAC00 \uC77C\uCE58\uD558\uB294 Simulation \uC790\uB8CC\uB9CC \uB9CC\uB4E4\uBA70 \uC6B4\uC601 \uC6D0\uC7A5\uC744 \uC9C1\uB82C\uD654\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 50,
+          "stepKey": "infrastructure.save-store",
+          "dependsOnStepKeys": [
+            "domain.save-package"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Infrastructure",
+          "componentType": "Ssalddel.Simulation.Persistence.SimulationSessionSaveStore",
+          "assembly": "Ssalddel.Simulation.Persistence",
+          "sourcePath": "Ssalddel.Simulation.Persistence/SimulationSessionSavePersistence.cs",
+          "responsibility": "\uAC80\uC99D\uB41C \uC138\uC158 \uC800\uC7A5 \uC790\uB8CC JSON\uACFC \uC7AC\uC0DD hash\uB97C Simulation \uC804\uC6A9 DB\uC5D0 \uBCF4\uAD00\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uACF5\uC720 \uACF5\uACF5\uB370\uC774\uD130 DB\uAC00 \uC544\uB2C8\uB77C \uBCC4\uB3C4 SimulationSession DB\uB9CC \uC77D\uACE0 \uC4F4\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "simulation-world-derivation",
+      "label": "\uACF5\uACF5\uB370\uC774\uD130-\uD30C\uC0DD World",
+      "dependsOnFeatures": [],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "domain.derived-world-ledger",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.SimulationWorld\uD30C\uC0DD\uC6D0\uC7A5",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/SimulationWorldDerivation.cs",
+          "responsibility": "\uACF5\uAC04 \uC6D0\uBCF8 \uACC4\uBCF4\u00B7\uD30C\uC0DD node\u00B7\uAD00\uACC4\u00B7\uBC30\uCE58 \uACC4\uD68D\uC744 \uBD88\uBCC0 \uC2E4\uD589 \uB2E8\uC704\uB85C \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uAD00\uCE21\u00B7\uD30C\uC0DD\u00B7\uD1B5\uACC4\uBC30\uBD84\u00B7\uC2DC\uB098\uB9AC\uC624\u00B7\uC7A5\uC2DD \uADFC\uAC70\uB97C \uBD84\uB9AC\uD558\uBA70 \uCD94\uC815 \uC704\uCE58\uB97C \uC2E4\uC81C \uC0AC\uC2E4\uB85C \uC2B9\uACA9\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 16,
+          "stepKey": "contract.landscape-composition-tile",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldLandscapeCompositionTileResponse",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldLandscapeCompositionContracts.cs",
+          "responsibility": "\uACF5\uAC04 \uADFC\uAC70\uB85C \uC870\uB9BD\uB41C \uACBD\uAD00 Graph\uC640 \uC758\uBBF8 \uAE30\uBC18 Composition \uBC30\uCE58\uB97C Unity\uC5D0 \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "Prefab \uACBD\uB85C\u00B7GUID\u00B7\uC0C1\uD488\uBA85\uC740 \uB178\uCD9C\uD558\uC9C0 \uC54A\uC73C\uBA70, \uC751\uB2F5\uC740 \uD45C\uD604 \uACC4\uD68D\uC774\uC9C0 \uC6B4\uC601 \uC0AC\uC2E4\uC774\uB098 \uC2E4\uC81C \uC2DC\uC124 \uC874\uC7AC\uC758 \uD655\uC815\uC774 \uC544\uB2C8\uB2E4."
+        },
+        {
+          "flowOrder": 17,
+          "stepKey": "contract.landscape-graph",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldLandscapeGraphResponse",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldLandscapeCompositionContracts.cs",
+          "responsibility": "\uC5EC\uB7EC \uD0C0\uC77C\uACFC Area\uB97C \uCC38\uC870\uD558\uB294 \uD558\uB098\uC758 \uACBD\uAD00 Graph\uB97C Unity\uC5D0 \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "Graph\uB294 \uD45C\uD604\uC6A9 \uACF5\uAC04 \uAD6C\uC870\uC774\uBA70 Unity\uC758 \uB85C\uB4DC \uC0C1\uD0DC\uB098 \uC6B4\uC601 \uC5C5\uBB34 \uC0C1\uD0DC\uB97C \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "application.pyeongchang-derivation",
+          "dependsOnStepKeys": [
+            "domain.derived-world-ledger"
+          ],
+          "executionStage": "Projection",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Persistence.\uD3C9\uCC3D\uAD70\uACF5\uAC04\uD30C\uC0DDPipeline",
+          "assembly": "Ssalddel.Simulation.Persistence",
+          "sourcePath": "Ssalddel.Simulation.Persistence/PyeongchangWorldDerivationPipeline.cs",
+          "responsibility": "\uD3C9\uCC3D\uAD70 \uACF5\uACF5\uB370\uC774\uD130\uB97C \uC77D\uC5B4 \uB300\uD45C \uAC74\uBB3C\u00B7\uACF5\uAC04 \uAD00\uACC4\u00B7Unity \uD0C0\uC77C \uACC4\uD68D\uC744 \uACB0\uC815\uC801\uC73C\uB85C \uC870\uB9BD\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SharedPublicData"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "\uACF5\uC720 \uACF5\uACF5\uB370\uC774\uD130\uB294 \uC77D\uAE30 \uC804\uC6A9\uC774\uBA70 \uAC74\uBB3C \uB3C4\uD615\uC774\uB098 DEM\uC774 \uC5C6\uC73C\uBA74 \uC784\uC758 \uC88C\uD45C\uB97C \uC0DD\uC131\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "infrastructure.derived-world-store",
+          "dependsOnStepKeys": [
+            "application.pyeongchang-derivation"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Infrastructure",
+          "componentType": "Ssalddel.Simulation.Persistence.SimulationWorld\uD30C\uC0DD\uC6D0\uC7A5Store",
+          "assembly": "Ssalddel.Simulation.Persistence",
+          "sourcePath": "Ssalddel.Simulation.Persistence/SimulationWorldDerivationPersistence.cs",
+          "responsibility": "\uD30C\uC0DD World \uC6D0\uC7A5\uACFC \uC785\uB825\u00B7\uCD9C\uB825 hash\uB97C \uBCC4\uB3C4 DB\uC5D0 \uBA71\uB4F1 \uC800\uC7A5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "SimulationWorldDerived DB\uB9CC \uBCC0\uACBD\uD558\uBA70 \uC785\uB825 fingerprint\uAC00 \uB2E4\uB978 \uAC19\uC740 \uC2DD\uBCC4\uC790\uB294 \uCDA9\uB3CC\uB85C \uAC70\uBD80\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 42,
+          "stepKey": "domain.landscape-graph-assembler",
+          "dependsOnStepKeys": [
+            "contract.landscape-composition-tile"
+          ],
+          "executionStage": "Projection",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.SimulationWorldLandscapeGraphAssembler",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/SimulationWorldLandscapeAssembly.cs",
+          "responsibility": "Macro\u00B7Meso \uACF5\uAC04 \uACE8\uACA9\uC744 156\uAC1C \uC758\uBBF8 \uBAA8\uD310\uC758 \uC5F0\uACB0\u00B7\uBC18\uBCF5 \uBB38\uBC95\uC73C\uB85C \uACB0\uC815\uC801\uC73C\uB85C \uC870\uB9BD\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uC2E4\uC81C \uB3C4\uB85C\uAC00 \uC5C6\uB294 \uC5F0\uACB0\uC740 Scenario \uADFC\uAC70\uB97C \uC720\uC9C0\uD558\uBA70, Micro \uC7A5\uC2DD \uC88C\uD45C\uC640 Prefab\uC740 Unity wrapper\uAC00 \uACB0\uC815\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 44,
+          "stepKey": "application.landscape-graph-job",
+          "dependsOnStepKeys": [
+            "domain.landscape-graph-assembler"
+          ],
+          "executionStage": "Projection",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationWorldLandscapeCompositionJobShell",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldLandscapeCompositionService.cs",
+          "responsibility": "\uACF5\uAC04 Layer \uC900\uBE44 \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uACE0 \uB124 L2 \uD0C0\uC77C\uC758 \uACBD\uAD00 Graph\uB97C \uC870\uB9BD\u00B7\uC800\uC7A5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "\uC790\uB8CC\uAC00 \uC5C6\uB294 \uD0C0\uC77C\uC740 \uAFB8\uBA70\uB0B4\uC9C0 \uC54A\uACE0 \uB300\uAE30 \uC0C1\uD0DC\uB85C \uC800\uC7A5\uD558\uBA70 Unity Prefab\uC744 \uD574\uC11D\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "simulation-synty-landscape",
+      "label": "\uB3C5\uB9BD Synty \uACBD\uAD00 \uCC98\uB9AC",
+      "dependsOnFeatures": [
+        "simulation-world-derivation"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "domain.synty-ledger",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Domain",
+          "componentType": "Ssalddel.Simulation.Domain.SimulationWorldSynty\uACBD\uAD00\uC2E4\uD589\uC6D0\uC7A5",
+          "assembly": "Ssalddel.Simulation.Domain",
+          "sourcePath": "Ssalddel.Simulation.Domain/SimulationWorldSyntyLandscape.cs",
+          "responsibility": "\uACF5\uAC04 \uCD9C\uB825\uACFC Synty\u00B7URP \uB300\uC7A5 \uAC1C\uC815\uC744 \uACB0\uD569\uD55C \uACBD\uAD00 \uC2E4\uD589 \uACB0\uACFC\uB97C \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uACBD\uAD00 \uC2E4\uD589\uC740 \uD45C\uD604 \uACC4\uD68D\uC774\uBA70 \uACF5\uAC04 \uC6D0\uBCF8\u00B7\uBC95\uC815\uB3D9\u00B7Simulation \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.synty-job",
+          "dependsOnStepKeys": [
+            "domain.synty-ledger"
+          ],
+          "executionStage": "Projection",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationWorldSynty\uACBD\uAD00JobShell",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldSyntyLandscapeJobShell.cs",
+          "responsibility": "\uACF5\uAC04 \uC2E4\uD589\uC744 \uC77D\uC5B4 Synty\u00B7URP \uACBD\uAD00 \uACC4\uD68D\uC744 \uB9CC\uB4E4\uACE0 \uBCC4\uB3C4 \uC2E4\uD589 \uC6D0\uC7A5\uC73C\uB85C \uC800\uC7A5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "Synty \uC6D0\uBCF8 \uACBD\uB85C\uB098 Prefab \uC774\uB984\uC744 \uC5C5\uBB34 \uAD8C\uC704\uB85C \uC0AC\uC6A9\uD558\uC9C0 \uC54A\uACE0 \uACF5\uAC04 \uCD9C\uB825 hash\uB97C \uC785\uB825\uC73C\uB85C \uC0BC\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 40,
+          "stepKey": "infrastructure.synty-store",
+          "dependsOnStepKeys": [
+            "application.synty-job"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Infrastructure",
+          "componentType": "Ssalddel.Simulation.Persistence.SimulationWorldSynty\uACBD\uAD00Store",
+          "assembly": "Ssalddel.Simulation.Persistence",
+          "sourcePath": "Ssalddel.Simulation.Persistence/SimulationWorldSyntyLandscapePersistence.cs",
+          "responsibility": "Synty \uACBD\uAD00 \uC2E4\uD589\uACFC \uADF8\uB798\uD53D\u00B7\uBC30\uCE58\u00B7\uAC70\uBD80 \uACB0\uACFC\uB97C \uBCC4\uB3C4 \uD30C\uC0DD DB\uC5D0 \uC800\uC7A5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "\uACF5\uAC04 \uC2E4\uD589\uACFC \uBCC4\uB3C4 fingerprint\uB97C \uC0AC\uC6A9\uD558\uBA70 Synty \uB300\uC7A5 \uBCC0\uACBD\uC774 \uACF5\uAC04 \uC6D0\uC7A5\uC744 \uB2E4\uC2DC \uC4F0\uAC8C \uD558\uC9C0 \uC54A\uB294\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "simulation-world-streaming",
+      "label": "L2 \uD0C0\uC77C Streaming",
+      "dependsOnFeatures": [
+        "simulation-world-derivation"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "contract.stream-recipe",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldStreamRecipeResponse",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldStreamingContracts.cs",
+          "responsibility": "L2 \uD0C0\uC77C \uD65C\uC131\u00B7\uC900\uBE44 \uBC94\uC704\uC640 \uC0AC\uC804 \uC801\uC7AC \uADDC\uCE59\uC744 \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "Recipe\uB294 \uC81C\uACF5 \uBC94\uC704\uC640 \uB85C\uB4DC \uC815\uCC45\uC774\uBA70 Unity\uAC00 \uC804\uCCB4 \uD0C0\uC77C\uC744 \uB3D9\uC2DC\uC5D0 \uC0DD\uC131\uD558\uB77C\uB294 \uBA85\uB839\uC774 \uC544\uB2C8\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "api.world-stream",
+          "dependsOnStepKeys": [
+            "contract.stream-recipe"
+          ],
+          "executionStage": "Query",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.SimulationWorldStreamingController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationWorldStreamingController.cs",
+          "responsibility": "\uD0C0\uC77C Recipe\u00B7Manifest\u00B7Layer\u00B7\uAC1D\uCCB4 Projection \uC870\uD68C \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState",
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "\uC870\uD68C\uC640 eligibility Preview\uB294 \uD0C0\uC77C\uC774\uB098 \uC5C5\uBB34 \uC0C1\uD0DC\uB97C \uC0DD\uC131\u00B7\uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 25,
+          "stepKey": "api.world-region-summary",
+          "dependsOnStepKeys": [
+            "api.world-stream"
+          ],
+          "executionStage": "Query",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.SimulationWorldRegionSummaryController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationWorldRegionSummaryController.cs",
+          "responsibility": "\uC9C0\uC5ED\u00B7\uD0C0\uC77C\uBCC4 \uB300\uD45C \uC815\uBCF4\uC640 \uAC00\uAE4C\uC6B4 \uACF5\uAC1C \uAC1D\uCCB4\uC758 \uC81C\uD55C\uB41C \uC0C1\uC138\uC815\uBCF4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "\uC694\uC57D \uC751\uB2F5\uC5D0\uB294 \uC0C1\uD638\uBA85\uC744 \uB123\uC9C0 \uC54A\uACE0 \uBA85\uC2DC\uC801\uC778 \uACF5\uAC1C \uC0C1\uC138 \uC870\uD68C\uC5D0\uC11C\uB9CC \uACF5\uAC1C \uACF5\uACF5\uB370\uC774\uD130 \uC0C1\uD638\uBA85\uC744 \uBC18\uD658\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.world-stream",
+          "dependsOnStepKeys": [
+            "api.world-stream"
+          ],
+          "executionStage": "Projection",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationWorldStreamingService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldStreamingService.cs",
+          "responsibility": "\uCE74\uBA54\uB77C\u00B7\uD50C\uB808\uC774\uC5B4 \uACBD\uACC4 \uC811\uADFC\uC5D0 \uD544\uC694\uD55C \uD0C0\uC77C Recipe\uC640 Manifest Projection\uC744 \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "\uC790\uB8CC\uAC00 \uC5C6\uB294 DEM\u00B7\uBC30\uCE58 \uC88C\uD45C\u00B7URL\uC744 \uAFB8\uBA70\uB0B4\uC9C0 \uC54A\uACE0 \uBA85\uC2DC\uB41C \uC81C\uACF5 \uBC94\uC704\uB9CC \uD22C\uC601\uD55C\uB2E4."
+        }
+      ]
+    },
+    {
+      "key": "unity-resilient-world-load",
+      "label": "Unity \uB9C8\uC9C0\uB9C9 \uC131\uACF5 \uC0C1\uD0DC \uB85C\uB529",
+      "dependsOnFeatures": [
+        "simulation-world-streaming"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "client.last-successful-runtime",
+          "dependsOnStepKeys": [],
+          "executionStage": "Presentation",
+          "layer": "ClientAdapter",
+          "componentType": "Ssalddel.Unity.Application.LastSuccessfulLoadRuntime\u00602",
+          "assembly": "Ssalddel.Unity",
+          "sourcePath": "Ssalddel.Unity/Runtime/Application/LastSuccessfulLoadRuntime.cs",
+          "responsibility": "\uCD5C\uCD08 \uC870\uD68C\uC640 \uC0C8\uB85C\uACE0\uCE68\uC744 \uAD6C\uBD84\uD558\uACE0 \uB9C8\uC9C0\uB9C9 \uC131\uACF5 Snapshot\uC744 \uC720\uC9C0\uD55C\uB2E4.",
+          "effects": [
+            "UiStateMutation"
+          ],
+          "readsFrom": [],
+          "writesTo": [
+            "ClientPresentation"
+          ],
+          "boundary": "\uC11C\uBC84 \uC0C1\uD0DC\uB97C \uB9CC\uB4E4\uAC70\uB098 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uACE0 \uC2E4\uD328 \uC2DC \uB9C8\uC9C0\uB9C9 \uC131\uACF5 \uD45C\uD604\uB9CC \uBCF4\uC874\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "client.community-load",
+          "dependsOnStepKeys": [
+            "client.last-successful-runtime"
+          ],
+          "executionStage": "Query",
+          "layer": "ClientAdapter",
+          "componentType": "Ssalddel.Unity.Community.CommunityMarketSquareLoadCoordinator",
+          "assembly": "Ssalddel.Unity",
+          "sourcePath": "Ssalddel.Unity/Runtime/Community/CommunityMarketSquareModels.cs",
+          "responsibility": "\uCEE4\uBBA4\uB2C8\uD2F0 \uAD11\uC7A5 Snapshot \uC870\uD68C\uC640 \uB9C8\uC9C0\uB9C9 \uC131\uACF5 \uC0C1\uD0DC \uC870\uC815\uC744 \uC5F0\uACB0\uD55C\uB2E4.",
+          "effects": [
+            "NetworkCall",
+            "UiStateMutation"
+          ],
+          "readsFrom": [
+            "OperationalState"
+          ],
+          "writesTo": [
+            "ClientPresentation"
+          ],
+          "boundary": "\uACF5\uAC1C Projection\uB9CC \uC77D\uACE0 \uCEE4\uBBA4\uB2C8\uD2F0 \uC6D0\uC7A5\uC774\uB098 \uC11C\uBC84 \uAC1C\uC815\uC744 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "client.public-data-load",
+          "dependsOnStepKeys": [
+            "client.last-successful-runtime"
+          ],
+          "executionStage": "Query",
+          "layer": "ClientAdapter",
+          "componentType": "Ssalddel.Unity.PublicData.PublicDataHallLoadCoordinator",
+          "assembly": "Ssalddel.Unity",
+          "sourcePath": "Ssalddel.Unity/Runtime/PublicData/PublicWorldMapModels.cs",
+          "responsibility": "\uACF5\uACF5\uB370\uC774\uD130 World Map Snapshot \uC870\uD68C\uC640 \uB9C8\uC9C0\uB9C9 \uC131\uACF5 \uC0C1\uD0DC \uC870\uC815\uC744 \uC5F0\uACB0\uD55C\uB2E4.",
+          "effects": [
+            "NetworkCall",
+            "UiStateMutation"
+          ],
+          "readsFrom": [
+            "SharedPublicData"
+          ],
+          "writesTo": [
+            "ClientPresentation"
+          ],
+          "boundary": "\uCD9C\uCC98\uC640 \uC790\uB8CC \uC0C1\uD0DC\uAC00 \uC788\uB294 \uC870\uD68C \uACB0\uACFC\uB9CC \uD45C\uD604\uD558\uBA70 \uACF5\uACF5\uB370\uC774\uD130 \uC6D0\uBCF8\uC744 \uC218\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "client.warehouse-load",
+          "dependsOnStepKeys": [
+            "client.last-successful-runtime"
+          ],
+          "executionStage": "Query",
+          "layer": "ClientAdapter",
+          "componentType": "Ssalddel.Unity.Warehouse.WarehouseWorldLoadCoordinator",
+          "assembly": "Ssalddel.Unity",
+          "sourcePath": "Ssalddel.Unity/Runtime/Warehouse/WarehouseWorldModels.cs",
+          "responsibility": "\uCC3D\uACE0 World Snapshot \uC870\uD68C\uC640 \uB9C8\uC9C0\uB9C9 \uC131\uACF5 \uC0C1\uD0DC \uC870\uC815\uC744 \uC5F0\uACB0\uD55C\uB2E4.",
+          "effects": [
+            "NetworkCall",
+            "UiStateMutation"
+          ],
+          "readsFrom": [
+            "OperationalState"
+          ],
+          "writesTo": [
+            "ClientPresentation"
+          ],
+          "boundary": "\uAD8C\uD55C \uC801\uC6A9\uB41C \uCC3D\uACE0 Projection\uB9CC \uD45C\uD604\uD558\uBA70 Unity\uAC00 \uC785\uCD9C\uACE0 \uC644\uB8CC\uB97C \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        }
+      ]
+    }
+  ],
+  "diagnostics": [
+    {
+      "severity": "Warning",
+      "code": "CODEMAP100",
+      "featureKey": "simulation-unity",
+      "stepKey": "Ssalddel.Simulation.Application",
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 45\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ISimulationTeamObservationSessionStore, ..."
+    },
+    {
+      "severity": "Warning",
+      "code": "CODEMAP100",
+      "featureKey": "simulation-unity",
+      "stepKey": "Ssalddel.Simulation.Infrastructure",
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 1\uAC1C: InMemorySimulationSessionSaveStore"
+    },
+    {
+      "severity": "Warning",
+      "code": "CODEMAP100",
+      "featureKey": "simulation-unity",
+      "stepKey": "Ssalddel.Simulation.Persistence",
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 6\uAC1C: SimulationWorldAreaSetGraphStore, SimulationWorldLandscapeCompositionStore, SimulationWorldUI\uAE30\uD68DStore, SimulationWorld\uAC1D\uCCB4\uD45C\uD604\uADDC\uCE59Store, SimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, SimulationWorld\uC5C5\uBB34\uADDC\uCE59\uC9D1\uACB0Store"
+    },
+    {
+      "severity": "Warning",
+      "code": "CODEMAP100",
+      "featureKey": "simulation-unity",
+      "stepKey": "Ssalddel.Simulation.Server",
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 16\uAC1C: SimulationCollectibleCardRewardsController, SimulationSurvivalTarotController, SimulationTeamObservationController, SimulationTeamRoleCardsController, SimulationWorldEventsController, SimulationWorldRegionProjectionController, SimulationWorldSurvivalInventoryController, SimulationWorldTileArtifactContentService, ..."
+    },
+    {
+      "severity": "Warning",
+      "code": "CODEMAP100",
+      "featureKey": "simulation-unity",
+      "stepKey": "Ssalddel.Unity",
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 45\uAC1C: CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, FarmSurvivalExperienceIntentMapper, ..."
+    }
+  ]
+}

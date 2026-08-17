@@ -12,8 +12,12 @@
 | `Layer` | `Contract`, `Api`, `Application`, `Domain`, adapter, `ViewModel`, `View` 중 실제 책임 계층 |
 | `Responsibility` | 해당 타입이 맡는 한 가지 주 책임 |
 | `ContractType` | 구현이 따르는 주 interface 또는 ViewModel 타입 |
+| `StepKey` | 기능 안에서 한 단계를 가리키는 안정적인 식별자 |
+| `DependsOnStepKeys` | 코드 지도를 따라갈 때 바로 앞에서 읽을 단계 식별자 |
 | `FlowOrder` | 사용자의 입력에서 외부 경계까지 탐색할 때의 대략적인 순서 |
-| `Effects` | 네트워크, 외부 API, 영속화, object storage, UI 상태 변경, 비용 발생 가능성 |
+| `ExecutionStage` | 정의, 조회, 미리보기, 확인, Tick, 투영, 저장, 표현 중 현재 단계 |
+| `ReadsFrom`, `WritesTo` | 운영 상태, 공유 공공데이터, Simulation 상태, 파생 World, 클라이언트 표현 중 데이터 권위 경계 |
+| `Effects` | 네트워크, 외부 API, 영속화, object storage, 일반·UI 상태 변경, 비용 발생 가능성 |
 | `Boundary` | 호출 전에 알아야 할 권한·비용·개인정보·증빙·상태 변경 경계 |
 
 `Effects`는 직접 작성한 코드 한 줄만이 아니라 그 타입의 공개 동작이 하위 서비스에 위임해 발생시키는 효과까지 표시한다. 예를 들어 API Controller가 Application service에 생성을 위임하더라도 외부 비용 가능성을 숨기지 않는다.
@@ -25,6 +29,8 @@
 - `Responsibility`에는 구현 방법을 나열하지 말고 타입이 소유한 결과를 한 문장으로 적는다.
 - 외부 호출, 영속 상태 변경, 비용, 개인정보 전송, 법적 증빙 오인 가능성은 `Effects`와 `Boundary`에 명시한다.
 - 순수 계산기는 `Effects = None`으로 두고 순수성 경계를 적는다.
+- `ReadsFrom/WritesTo`는 데이터 권위를 나타낸다. Simulation·Unity는 `OperationalState`를 쓰지 않고, 공유 공공데이터는 읽기 전용이며, Unity의 쓰기는 `ClientPresentation`으로 제한한다.
+- `StepKey`는 같은 기능 안에서 중복하지 않고 의존 단계보다 큰 `FlowOrder`를 사용한다. 여러 병렬 단계는 같은 `FlowOrder`를 사용할 수 있다.
 - 기능을 분리하거나 이름을 바꾸면 특성, reader 검증 테스트와 관련 아키텍처 문서를 함께 갱신한다.
 
 ## 코드 명명 언어
@@ -98,9 +104,20 @@ rg -n "SsalddelCodeMetadata\(" -g "*.cs" -g "*.razor"
 
 런타임 또는 테스트에서는 `SsalddelCodeMetadataReader.ReadFeature`에 관련 assembly를 전달하면 `FlowOrder` 순서의 descriptor를 얻는다. 현재 기준 구현인 `community-authoring-image`는 `View -> ViewModel -> client port -> 관리자 HTTP adapter -> API -> 문맥 planner -> 생성 orchestration -> Gemini Nano Banana adapter`로 이어진다.
 
+Simulation·Unity는 다음 명령으로 생성된 한국어 트리와 JSON을 함께 사용한다.
+
+```powershell
+dotnet run --project eng/Ssalddel.CodeMap -- --feature simulation-parallel-battle
+dotnet run --project eng/Ssalddel.CodeMap -- --check
+```
+
+- `eng/work-areas/simulation-unity.json`은 읽을 문서·소스 범위·기능 관계·필수 단계를 정의한다.
+- `docs/AI/generated/simulation-unity-code-map.md`는 사람이 읽는 트리, 같은 이름의 JSON은 기계 판독 자료다.
+- 소스 특성과 manifest가 원본이며 생성 파일은 직접 수정하지 않는다. 필수 단계·권위 위반·오래된 생성 파일은 검증을 실패시키고, 아직 표기하지 않은 일반 공개 타입은 프로젝트별 경고 요약으로 남긴다.
+
 ## 경계
 
-이 특성은 권한 검사, 트랜잭션, validation 또는 보안 통제를 대신하지 않는다. 코드가 실제로 수행하는 효과와 특성이 다르면 코드를 기준으로 즉시 특성을 고치고 테스트로 차이를 드러낸다. secret이나 실제 개인정보는 메타데이터 문자열에 기록하지 않는다.
+이 특성은 권한 검사, 트랜잭션, validation 또는 보안 통제를 대신하지 않는다. 코드가 실제로 수행하는 효과와 특성이 다르면 코드를 기준으로 즉시 특성을 고치고 테스트로 차이를 드러낸다. secret, 실제 개인정보, Prefab·Material의 원본 경로는 메타데이터 문자열에 기록하지 않는다.
 
 ## 제품 모듈 특성
 

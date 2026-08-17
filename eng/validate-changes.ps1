@@ -167,13 +167,61 @@ function Get-DirectBuildTargets {
 
         if ($file -match "^(Directory\.(Build|Packages)\.(props|targets)|global\.json)$") {
             [void] $targets.Add("Ssalddel.v3.5.slnx")
+            [void] $targets.Add("Ssalddel.Simulation.slnx")
+            [void] $targets.Add("Ssalddel.Unity.slnx")
         }
     }
 
     return @($targets | Sort-Object)
 }
 
-function Get-TaskSlice {
+function Test-IsSimulationPath {
+    param([string] $File)
+
+    return $File -match "^(Ssalddel\.Simulation\.|Ssalddel\.WorkflowRules(?:\.|/))"
+}
+
+function Test-IsUnityPath {
+    param([string] $File)
+
+    return $File -match "^Ssalddel\.Unity(?:\.|/)"
+}
+
+function Test-IsCodeMetadataSharedPath {
+    param([string] $File)
+
+    return $File -match "^Ssalddel\.CodeMetadata/" -or
+        $File -eq "Ssalddel.Contracts/Common/Metadata/SsalddelCodeMetadataAttribute.cs"
+}
+
+function Test-RequiresCodeMapCheck {
+    param([string[]] $Files)
+
+    return @(
+        $Files | Where-Object {
+            (Test-IsCodeMetadataSharedPath -File $_) -or
+            (Test-IsSimulationPath -File $_) -or
+            (Test-IsUnityPath -File $_) -or
+            $_ -match "^eng/Ssalddel\.CodeMap/" -or
+            $_ -eq "eng/work-areas/simulation-unity.json" -or
+            $_ -match "^docs/AI/generated/simulation-unity-code-map\.(json|md)$"
+        }
+    ).Count -gt 0
+}
+
+function Test-IsProductPath {
+    param([string] $File)
+
+    if (Test-IsSimulationPath -File $File) { return $false }
+    if (Test-IsUnityPath -File $File) { return $false }
+    if ($File -match "^(docs/|eng/|\.codex/)" -or $File -match "(^|/)AGENTS\.md$") {
+        return $false
+    }
+
+    return $true
+}
+
+function Get-ProductTaskSlice {
     param([string[]] $Files)
 
     $requiresFullProductSlice = @(
@@ -207,8 +255,44 @@ function Get-TaskSlice {
     return "Ssalddel.v0.0.slnx"
 }
 
-function Get-RelatedTestFilter {
+function Get-TaskSlices {
     param([string[]] $Files)
+
+    $targets = New-Object "System.Collections.Generic.HashSet[string]" (
+        [System.StringComparer]::OrdinalIgnoreCase
+    )
+
+    $globalChange = @(
+        $Files | Where-Object {
+            $_ -match "^(Directory\.(Build|Packages)\.(props|targets)|global\.json)$" -or
+            (Test-IsCodeMetadataSharedPath -File $_)
+        }
+    ).Count -gt 0
+
+    if ($globalChange -or @($Files | Where-Object { Test-IsSimulationPath -File $_ }).Count -gt 0) {
+        [void] $targets.Add("Ssalddel.Simulation.slnx")
+    }
+
+    if ($globalChange -or @($Files | Where-Object { Test-IsUnityPath -File $_ }).Count -gt 0) {
+        [void] $targets.Add("Ssalddel.Unity.slnx")
+    }
+
+    $productFiles = @($Files | Where-Object { Test-IsProductPath -File $_ })
+    if ($globalChange) {
+        [void] $targets.Add("Ssalddel.v3.5.slnx")
+    }
+    elseif ($productFiles.Count -gt 0) {
+        [void] $targets.Add((Get-ProductTaskSlice -Files $productFiles))
+    }
+
+    return @($targets | Sort-Object)
+}
+
+function Get-RelatedTestFilter {
+    param(
+        [string[]] $Files,
+        [string] $TestRoot
+    )
 
     if (-not [string]::IsNullOrWhiteSpace($TestFilter)) {
         return $TestFilter
@@ -219,7 +303,7 @@ function Get-RelatedTestFilter {
     )
 
     foreach ($file in $Files) {
-        if ($file -match "^Ssalddel\.Tests/.+Tests\.cs$") {
+        if ($file -match "^$([regex]::Escape($TestRoot))/.+Tests\.cs$") {
             [void] $testClasses.Add([System.IO.Path]::GetFileNameWithoutExtension($file))
         }
     }
@@ -230,7 +314,7 @@ function Get-RelatedTestFilter {
             $Files |
                 Where-Object {
                     $_ -match "\.(cs|razor)$" -and
-                    $_ -notmatch "^Ssalddel\.Tests/"
+                    $_ -notmatch "^$([regex]::Escape($TestRoot))/"
                 } |
                 ForEach-Object {
                     [System.IO.Path]::GetFileNameWithoutExtension($_)
@@ -244,7 +328,7 @@ function Get-RelatedTestFilter {
 
         foreach ($term in $terms) {
             $matches = @(
-                & rg -l --fixed-strings --glob "*Tests.cs" --glob "!bin/**" --glob "!obj/**" -- $term "Ssalddel.Tests" 2>$null
+                & rg -l --fixed-strings --glob "*Tests.cs" --glob "!bin/**" --glob "!obj/**" -- $term $TestRoot 2>$null
             )
             foreach ($match in $matches) {
                 [void] $testClasses.Add([System.IO.Path]::GetFileNameWithoutExtension($match))
@@ -258,6 +342,52 @@ function Get-RelatedTestFilter {
     }
 
     return (($selected | ForEach-Object { "FullyQualifiedName~$_" }) -join "|")
+}
+
+function Get-TestProjectDefinitions {
+    param([string[]] $Files)
+
+    $definitions = New-Object "System.Collections.Generic.List[object]"
+    $globalChange = @(
+        $Files | Where-Object {
+            $_ -match "^(Directory\.(Build|Packages)\.(props|targets)|global\.json)$" -or
+            (Test-IsCodeMetadataSharedPath -File $_)
+        }
+    ).Count -gt 0
+
+    if ($globalChange -or @($Files | Where-Object { Test-IsSimulationPath -File $_ }).Count -gt 0) {
+        $definitions.Add([pscustomobject]@{
+            Project = "Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj"
+            TestRoot = "Ssalddel.Simulation.Tests"
+            Solution = "Ssalddel.Simulation.slnx"
+        })
+    }
+
+    if ($globalChange -or @($Files | Where-Object { Test-IsUnityPath -File $_ }).Count -gt 0) {
+        $definitions.Add([pscustomobject]@{
+            Project = "Ssalddel.Unity.Tests/Ssalddel.Unity.Tests.csproj"
+            TestRoot = "Ssalddel.Unity.Tests"
+            Solution = "Ssalddel.Unity.slnx"
+        })
+    }
+
+    if ($globalChange -or @($Files | Where-Object { Test-IsProductPath -File $_ }).Count -gt 0) {
+        $productSolution = if ($globalChange) {
+            "Ssalddel.v3.5.slnx"
+        }
+        else {
+            Get-ProductTaskSlice -Files @(
+                $Files | Where-Object { Test-IsProductPath -File $_ }
+            )
+        }
+        $definitions.Add([pscustomobject]@{
+            Project = "Ssalddel.Tests/Ssalddel.Tests.csproj"
+            TestRoot = "Ssalddel.Tests"
+            Solution = $productSolution
+        })
+    }
+
+    return $definitions.ToArray()
 }
 
 function Show-FailureSummary {
@@ -321,24 +451,46 @@ try {
 
     $changedFiles = @(Get-ChangedFiles)
     $guidanceOnly = Test-IsGuidanceOnly -Files $changedFiles
-    $effectiveTestFilter = Get-RelatedTestFilter -Files $changedFiles
+    $codeMapCheck = Test-RequiresCodeMapCheck -Files $changedFiles
     $buildTargets = @()
-    $runTests = $false
-    $runFullTests = $false
+    $testPlans = @()
 
     if (-not $guidanceOnly) {
+        $testDefinitions = @(Get-TestProjectDefinitions -Files $changedFiles)
         switch ($Level) {
             "Fast" {
                 $buildTargets = @(Get-DirectBuildTargets -Files $changedFiles)
                 if ($buildTargets.Count -gt 3) {
-                    $buildTargets = @(Get-TaskSlice -Files $changedFiles)
+                    $buildTargets = @(Get-TaskSlices -Files $changedFiles)
                 }
-                $runTests = -not [string]::IsNullOrWhiteSpace($effectiveTestFilter)
+                $testPlans = @(
+                    foreach ($definition in $testDefinitions) {
+                        $filter = Get-RelatedTestFilter `
+                            -Files $changedFiles `
+                            -TestRoot $definition.TestRoot
+                        if (-not [string]::IsNullOrWhiteSpace($filter)) {
+                            [pscustomobject]@{
+                                Project = $definition.Project
+                                Solution = $definition.Solution
+                                Mode = "Targeted"
+                                Filter = $filter
+                            }
+                        }
+                    }
+                )
             }
             "Task" {
-                $buildTargets = @(Get-TaskSlice -Files $changedFiles)
-                $runTests = $true
-                $runFullTests = [string]::IsNullOrWhiteSpace($effectiveTestFilter)
+                $buildTargets = @(Get-TaskSlices -Files $changedFiles)
+                $testPlans = @(
+                    foreach ($definition in $testDefinitions) {
+                        [pscustomobject]@{
+                            Project = $definition.Project
+                            Solution = $definition.Solution
+                            Mode = "Full"
+                            Filter = $null
+                        }
+                    }
+                )
             }
             "Release" {
                 $buildTargets = @(
@@ -346,12 +498,53 @@ try {
                     "Ssalddel.v0.5.slnx",
                     "Ssalddel.v1.0.slnx",
                     "Ssalddel.v1.5.slnx",
-                    "Ssalddel.v3.5.slnx"
+                    "Ssalddel.v3.5.slnx",
+                    "Ssalddel.Simulation.slnx",
+                    "Ssalddel.Unity.slnx"
                 )
-                $runTests = $true
-                $runFullTests = $true
+                $testPlans = @(
+                    [pscustomobject]@{
+                        Project = "Ssalddel.Tests/Ssalddel.Tests.csproj"
+                        Solution = "Ssalddel.v3.5.slnx"
+                        Mode = "Full"
+                        Filter = $null
+                    },
+                    [pscustomobject]@{
+                        Project = "Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj"
+                        Solution = "Ssalddel.Simulation.slnx"
+                        Mode = "Full"
+                        Filter = $null
+                    },
+                    [pscustomobject]@{
+                        Project = "Ssalddel.Unity.Tests/Ssalddel.Unity.Tests.csproj"
+                        Solution = "Ssalddel.Unity.slnx"
+                        Mode = "Full"
+                        Filter = $null
+                    }
+                )
             }
         }
+    }
+
+    $validationPlan = [pscustomobject]@{
+        Level = $Level
+        Configuration = $Configuration
+        ChangedPaths = @($changedFiles)
+        GuidanceOnly = $guidanceOnly
+        CodeMapCheck = $codeMapCheck
+        BuildTargets = @($buildTargets)
+        TestPlans = @($testPlans | ForEach-Object {
+            [pscustomobject]@{
+                Project = $_.Project
+                Mode = $_.Mode
+                Filter = $_.Filter
+            }
+        })
+    }
+
+    if ($PlanOnly) {
+        $validationPlan | ConvertTo-Json -Depth 6
+        exit 0
     }
 
     Write-Host "Validation plan"
@@ -359,25 +552,26 @@ try {
     Write-Host "  Configuration: $Configuration"
     Write-Host "  Changed paths: $($changedFiles.Count)"
     Write-Host "  Guidance/docs only: $guidanceOnly"
+    Write-Host "  Code map check: $codeMapCheck"
     if ($buildTargets.Count -eq 0) {
         Write-Host "  Build: skipped"
     }
     else {
         Write-Host "  Build: $($buildTargets -join ', ')"
     }
-    if (-not $runTests) {
+    if ($testPlans.Count -eq 0) {
         Write-Host "  Tests: skipped"
     }
-    elseif ($runFullTests) {
-        Write-Host "  Tests: full suite"
-    }
     else {
-        $filterCount = @($effectiveTestFilter -split "\|").Count
-        Write-Host "  Tests: targeted ($filterCount filters)"
-    }
-
-    if ($PlanOnly) {
-        exit 0
+        foreach ($testPlan in $testPlans) {
+            if ($testPlan.Mode -eq "Full") {
+                Write-Host "  Tests: $($testPlan.Project) (full)"
+            }
+            else {
+                $filterCount = @($testPlan.Filter -split "\|").Count
+                Write-Host "  Tests: $($testPlan.Project) (targeted, $filterCount filters)"
+            }
+        }
     }
 
     $runId = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -389,6 +583,27 @@ try {
         -Executable "git" `
         -Arguments @("diff", "--check") `
         -LogPath (Join-Path $runDirectory "diff-check.log")
+
+    if ($codeMapCheck) {
+        $codeMapArguments = @(
+            "run",
+            "--project",
+            "eng/Ssalddel.CodeMap/Ssalddel.CodeMap.csproj",
+            "--configuration",
+            $Configuration,
+            "--no-launch-profile"
+        )
+        if ($NoRestore) {
+            $codeMapArguments += "--no-restore"
+        }
+        $codeMapArguments += @("--", "--check")
+
+        Invoke-LoggedCommand `
+            -Name "Simulation Unity code map check" `
+            -Executable "dotnet" `
+            -Arguments $codeMapArguments `
+            -LogPath (Join-Path $runDirectory "code-map-check.log")
+    }
 
     $buildIndex = 0
     foreach ($target in $buildTargets) {
@@ -413,15 +628,18 @@ try {
             -LogPath (Join-Path $runDirectory ("build-{0:D2}.log" -f $buildIndex))
     }
 
-    if ($runTests) {
+    $testIndex = 0
+    foreach ($testPlan in $testPlans) {
+        $testIndex++
+        $testName = [System.IO.Path]::GetFileNameWithoutExtension($testPlan.Project)
         $testArguments = @(
             "test",
-            "Ssalddel.Tests/Ssalddel.Tests.csproj",
+            $testPlan.Project,
             "--configuration",
             $Configuration,
             "--nologo",
             "--logger",
-            "trx;LogFileName=ssalddel-tests.trx",
+            "trx;LogFileName=$testName.trx",
             "--results-directory",
             $runDirectory
         )
@@ -430,22 +648,22 @@ try {
         }
         $testsAlreadyBuilt = @(
             $buildTargets | Where-Object {
-                $_ -match "\.slnx?$" -or
-                $_ -eq "Ssalddel.Tests/Ssalddel.Tests.csproj"
+                $_ -eq $testPlan.Solution -or
+                $_ -eq $testPlan.Project
             }
         ).Count -gt 0
         if ($Level -ne "Fast" -or $testsAlreadyBuilt) {
             $testArguments += "--no-build"
         }
-        if (-not $runFullTests) {
-            $testArguments += @("--filter", $effectiveTestFilter)
+        if ($testPlan.Mode -eq "Targeted") {
+            $testArguments += @("--filter", $testPlan.Filter)
         }
 
         Invoke-LoggedCommand `
-            -Name $(if ($runFullTests) { "full tests" } else { "targeted tests" }) `
+            -Name "$($testPlan.Mode.ToLowerInvariant()) tests $($testPlan.Project)" `
             -Executable "dotnet" `
             -Arguments $testArguments `
-            -LogPath (Join-Path $runDirectory "tests.log")
+            -LogPath (Join-Path $runDirectory ("tests-{0:D2}.log" -f $testIndex))
     }
 
     Write-Host "Validation complete"

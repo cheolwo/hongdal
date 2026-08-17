@@ -1,0 +1,127 @@
+{
+  "key": "simulation-unity",
+  "version": "1",
+  "solutions": [
+    "Ssalddel.Simulation.slnx",
+    "Ssalddel.Unity.slnx"
+  ],
+  "readFirst": [
+    "AGENTS.md",
+    "docs/ProjectOverview/GptProjectContext.md",
+    "docs/AI/DECISIONS.md",
+    "docs/AI/CURRENT_WORK.md",
+    "Ssalddel.Simulation.Server/README.md",
+    "docs/Architecture/SsalddelCodeMetadata.md"
+  ],
+  "sourceRoots": [
+    "Ssalddel.Simulation.Contracts",
+    "Ssalddel.Simulation.Domain",
+    "Ssalddel.Simulation.Application",
+    "Ssalddel.Simulation.Infrastructure",
+    "Ssalddel.Simulation.Persistence",
+    "Ssalddel.Simulation.Server",
+    "Ssalddel.Unity"
+  ],
+  "excludedRoots": [
+    "bin",
+    "obj",
+    ".vs",
+    "artifacts",
+    "Samples~"
+  ],
+  "features": [
+    {
+      "key": "simulation-session-lifecycle",
+      "label": "Simulation 세션 생명주기",
+      "dependsOnFeatures": [],
+      "requiredStepKeys": [
+        "contract.session-create",
+        "api.session-lifecycle",
+        "application.session-lifecycle",
+        "domain.session-aggregate",
+        "infrastructure.session-store"
+      ]
+    },
+    {
+      "key": "simulation-parallel-battle",
+      "label": "병렬 경영-전투",
+      "dependsOnFeatures": ["simulation-session-lifecycle"],
+      "requiredStepKeys": [
+        "contract.battle-preview",
+        "api.battle",
+        "application.battle",
+        "domain.battle-state",
+        "infrastructure.battle-store",
+        "unity.battle-presentation"
+      ]
+    },
+    {
+      "key": "simulation-farm-combat-input",
+      "label": "1인칭 농장 타이밍 전투",
+      "dependsOnFeatures": ["simulation-session-lifecycle"],
+      "requiredStepKeys": [
+        "contract.farm-combat",
+        "api.farm-combat",
+        "application.farm-combat",
+        "domain.farm-combat",
+        "unity.farm-combat-input"
+      ]
+    },
+    {
+      "key": "simulation-save-replay",
+      "label": "Simulation 저장-재생",
+      "dependsOnFeatures": [
+        "simulation-session-lifecycle",
+        "simulation-parallel-battle"
+      ],
+      "requiredStepKeys": [
+        "contract.save-request",
+        "api.save-replay",
+        "application.save-replay",
+        "domain.save-package",
+        "infrastructure.save-store"
+      ]
+    },
+    {
+      "key": "simulation-world-derivation",
+      "label": "공공데이터-파생 World",
+      "dependsOnFeatures": [],
+      "requiredStepKeys": [
+        "domain.derived-world-ledger",
+        "application.pyeongchang-derivation",
+        "infrastructure.derived-world-store"
+      ]
+    },
+    {
+      "key": "simulation-synty-landscape",
+      "label": "독립 Synty 경관 처리",
+      "dependsOnFeatures": ["simulation-world-derivation"],
+      "requiredStepKeys": [
+        "domain.synty-ledger",
+        "application.synty-job",
+        "infrastructure.synty-store"
+      ]
+    },
+    {
+      "key": "simulation-world-streaming",
+      "label": "L2 타일 Streaming",
+      "dependsOnFeatures": ["simulation-world-derivation"],
+      "requiredStepKeys": [
+        "contract.stream-recipe",
+        "api.world-stream",
+        "application.world-stream"
+      ]
+    },
+    {
+      "key": "unity-resilient-world-load",
+      "label": "Unity 마지막 성공 상태 로딩",
+      "dependsOnFeatures": ["simulation-world-streaming"],
+      "requiredStepKeys": [
+        "client.last-successful-runtime",
+        "client.community-load",
+        "client.public-data-load",
+        "client.warehouse-load"
+      ]
+    }
+  ]
+}
