@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-evidence-stages.v3",
-  "revision": "simulation-evidence-stages.r3",
+  "revision": "simulation-evidence-stages.r4",
   "stages": [
     {
       "code": "E0",
@@ -25,12 +25,12 @@
     {
       "code": "E4",
       "label": "WI 공간 모판 완료",
-      "completionGate": "하나 이상의 E3 세계 상호작용이 위치 독립 공간 역할·능력·용량·내부 관계·외부 연결구를 가진 승인된 재사용 공간 모판에서 다시 실행되었다."
+      "completionGate": "하나 이상의 E3 세계 상호작용이 위치 독립 공간 역할·능력·용량·내부 관계·외부 연결구를 가진 승인된 H1 WI 공간 모판에서 다시 실행되었다."
     },
     {
       "code": "E5",
       "label": "실제 지역 경관 조립",
-      "completionGate": "실제 AreaSet·LandscapeGraph의 도로·교차로·Gate가 Block을 만들고 승인된 E4 공간 모판 인스턴스와 실제 이동 경로가 결정적으로 연결되었다."
+      "completionGate": "승인된 H1 WI 공간 모판 인스턴스가 실제 H2 LandscapeBlock에 배치되고 H2→H3 LandscapeGraph→H4 AreaSet의 도로·교차로·Gate·GraphRelation과 실제 이동 경로가 결정적으로 연결되었다."
     },
     {
       "code": "E6",

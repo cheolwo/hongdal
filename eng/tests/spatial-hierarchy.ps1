@@ -1,0 +1,36 @@
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+$repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
+$script = Join-Path $repositoryRoot "eng/world-seedbeds/manage-spatial-hierarchy.ps1"
+$output = Join-Path $repositoryRoot "docs/AI/generated/simulation-world-spatial-hierarchy.md"
+
+$first = & $script -Mode Write
+$firstHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $output).Hash
+$firstWriteTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
+$second = & $script -Mode Write
+$secondHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $output).Hash
+$secondWriteTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
+$check = & $script -Mode Check
+
+if ($firstHash -ne $secondHash) { throw "SpatialHierarchyGenerationIsNotDeterministic" }
+if ($firstWriteTicks -ne $secondWriteTicks) { throw "SpatialHierarchyUnchangedOutputWasRewritten" }
+if ($check -notmatch "SpatialHierarchyValid:H1=5;H2=0;H3=5;H4=1") {
+    throw "SpatialHierarchyValidationDidNotComplete"
+}
+
+$document = Get-Content -LiteralPath $output -Raw -Encoding UTF8
+if ($document -notmatch "E.*증거 깊이.*H.*공간 포함 깊이") {
+    throw "SpatialHierarchyAxisDistinctionMissing"
+}
+if ($document -notmatch "H4 AreaSet[\s\S]*H3 LandscapeGraph[\s\S]*H2 LandscapeBlock[\s\S]*H1 WI 공간 모판") {
+    throw "SpatialHierarchyContainmentDiagramMissing"
+}
+if ($document -notmatch "H4 AreaSet과 H3 Graph가 존재해도[\s\S]*E5가 아니다") {
+    throw "SpatialHierarchyDoesNotPreventFalseE5Promotion"
+}
+
+Write-Output "SpatialHierarchyTestsPassed"
+Write-Output $first
+Write-Output $second
+Write-Output $check

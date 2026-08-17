@@ -116,6 +116,23 @@ World
 
 JSON만 실행 권위를 가진다. Markdown의 `@areaset`, `@area`, `@landscape-graph` 참조는 compiler가 JSON과 정확히 일치하는지 검증하고, 사람이 작성한 문서 SHA-256과 실행 정의 SHA-256을 따로 기록한다. `generated/area-set-status.md`는 파생 DB의 최신 실행 상태로 다시 만들며 사람이 직접 수정하지 않는다. Unity나 Simulation이 Markdown을 제각각 해석하지 않고 compiler가 만든 단일 `AreaSetDefinition`만 소비한다.
 
+### E 증거 단계와 H 공간 포함 계층
+
+`E`는 검증 깊이이고 `H`는 공간 구조의 포함 깊이다. 두 축을 같은 단계 번호처럼 사용하지 않는다.
+
+```text
+H4 AreaSet
+└─ H3 LandscapeGraph
+   └─ H2 LandscapeBlock
+      └─ H1 WI 공간 모판 인스턴스
+```
+
+- `E4`는 H1 모판에서 포함된 E3 WI를 다시 실행한 증거다.
+- `E5`는 H1을 실제 H2에 배치하고 H2→H3→H4 이동 경로를 닫은 증거다.
+- `E6`는 E5 경관에 공공데이터 계보를 연결하고 `E7`은 플레이어 이용 폐루프를 검증한다.
+
+H 코드는 리소스 종류를 분류할 뿐 완료 상태를 올리지 않는다. 현재 H3·H4 정의가 존재해도 실제 H2 Block과 연결 폐루프가 없으면 E5가 아니다. 기존 156개 기준 경관 문법 모판은 H 계층이 아니라 H1의 허용 후보와 H2·H3 조립에 쓰는 공간 문법 어휘다. Tile L0~L2, Area, 경관 완결 영역, ScenarioRoute도 각각 기술 해상도·의미 범위·검토 범위·이동 의미 참조이므로 H 계층에 넣지 않는다.
+
 Graph 내부 Node는 다른 Graph의 Node를 직접 참조하지 않는다. Graph 사이 연결은 AreaSet의 `GraphRelation`과 양쪽 `ExternalConnectorStub`의 식별자·종류·방향·폭·좌표·Route 서명을 비교해 검증한다. 양쪽 Graph가 조립 가능한 상태인데 연결이 맞지 않으면 임의 연결을 만들지 않고 두 Graph를 `PartialUnresolved`로 남긴다. 한 Graph를 다시 만들 때 이웃 Graph 전체를 무효화하지 않는 것이 이 경계의 목적이다.
 
 서버의 `Declared / Available / PartialUnresolved`는 공간자료와 조립 결과의 상태다. Unity의 플레이어별 `Unloaded / Declared / Prepared / Active / Cached`는 같은 Graph를 언제 메모리에 보관하고 표시할지 나타내는 로컬 스트리밍 상태이며 서버 상태를 변경하지 않는다. Unity는 Graph 하나의 모든 타일 조각을 비활성 staging root에 조립·검증한 후 Graph root 단위로 교체한다.

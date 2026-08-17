@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "simulation-world-spatial-hierarchy.v1",
+  "revision": "simulation-world-spatial-hierarchy.r1",
+  "axisCode": "H",
+  "title": "Simulation World 공간 포함 계층",
+  "summary": "E 증거 단계와 분리하여 WI 공간 모판부터 AreaSet까지의 포함 깊이만 분류한다.",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "levels": [
+    {
+      "code": "H1",
+      "label": "WI 공간 모판",
+      "resourceKindCode": "WiSpatialSeedbed",
+      "containsLevelCodes": [],
+      "definitionSourceTypeCode": "SeedbedCatalog",
+      "definitionSourcePath": "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json",
+      "expectedCurrentDefinitionCount": 5,
+      "currentInstancePolicyCode": "Defined",
+      "boundary": "위치 독립적인 WI 공간 역할·능력·업무 용량·내부 관계·외부 연결구를 정의하며 실제 좌표·도로·Block·Graph를 소유하지 않는다."
+    },
+    {
+      "code": "H2",
+      "label": "LandscapeBlock",
+      "resourceKindCode": "LandscapeBlock",
+      "containsLevelCodes": ["H1"],
+      "definitionSourceTypeCode": "ReservedDefinitionRoot",
+      "definitionSourcePath": "eng/world-seedbeds/landscape-blocks",
+      "expectedCurrentDefinitionCount": 0,
+      "currentInstancePolicyCode": "ReservedForE5",
+      "boundary": "실제 도로·경계가 만든 면에 승인된 H1 모판 인스턴스를 배치하는 E5 공간 파생 단위다. 현재 실제 정의를 꾸며내지 않는다."
+    },
+    {
+      "code": "H3",
+      "label": "LandscapeGraph",
+      "resourceKindCode": "LandscapeGraph",
+      "containsLevelCodes": ["H2"],
+      "definitionSourceTypeCode": "AreaSetLandscapeGraphDirectory",
+      "definitionSourcePath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/landscape-graphs",
+      "ownerDefinitionPath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/area-set.json",
+      "expectedCurrentDefinitionCount": 5,
+      "currentInstancePolicyCode": "DefinedPartialAssemblyAllowed",
+      "boundary": "여러 Block과 Network·Node·Edge·외부 연결 지점을 묶는 독립 조립·부분 재생성·스트리밍 단위다. H3 분류 자체는 E5 완료를 뜻하지 않는다."
+    },
+    {
+      "code": "H4",
+      "label": "AreaSet",
+      "resourceKindCode": "AreaSet",
+      "containsLevelCodes": ["H3"],
+      "definitionSourceTypeCode": "AreaSetDefinition",
+      "definitionSourcePath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/area-set.json",
+      "expectedCurrentDefinitionCount": 1,
+      "currentInstancePolicyCode": "DefinedPartialAssemblyAllowed",
+      "boundary": "여러 독립 LandscapeGraph와 GraphRelation을 묶는 지역 세계·시나리오 범위다. H4 분류 자체는 E5·E6·E7 완료를 뜻하지 않는다."
+    }
+  ],
+  "referenceAxes": [
+    {
+      "code": "TileL0L2",
+      "label": "Tile L0~L2",
+      "reason": "원자료 절단·캐시·부분 재생성 해상도이며 공간 포함 계층이 아니다."
+    },
+    {
+      "code": "Area",
+      "label": "Area",
+      "reason": "법정동·Farm·Hub·Town 의미 범위이며 LandscapeGraph와 N:N으로 참조된다."
+    },
+    {
+      "code": "LandscapeCompletionArea",
+      "label": "경관 완결 영역",
+      "reason": "사람의 검토·완결 범위이며 구조적 부모 단위가 아니다."
+    },
+    {
+      "code": "ScenarioRoute",
+      "label": "ScenarioRoute",
+      "reason": "Graph와 AreaSet이 참조하는 이동 의미이며 포함 계층이 아니다."
+    }
+  ],
+  "grammarVocabulary": {
+    "label": "기준 경관 문법 모판",
+    "catalogRevision": "pyeongchang-landscape-grammar.v1",
+    "canonicalItemCount": 156,
+    "boundary": "H 계층이 아니라 H1의 허용 후보와 H2·H3 조립에서 사용하는 공간 문법 어휘다."
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

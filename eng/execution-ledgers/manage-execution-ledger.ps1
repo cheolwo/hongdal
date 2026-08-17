@@ -8,6 +8,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "../common/deterministic-text-output.ps1")
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "ExecutionLedgerInvalid:$Code" }
@@ -168,16 +169,15 @@ foreach ($category in @($ledger.items | Sort-Object priority, id | Group-Object 
 [void] $builder.AppendLine("- ``Done``은 목표 증거 단계와 검증 자료가 모두 있을 때만 허용한다.")
 [void] $builder.AppendLine("- 원자료가 부족하면 Fixture로 숨기지 않고 ``Blocked`` 또는 ``InProgress``와 차단 사유를 유지한다.")
 
-$expected = $builder.ToString().Replace("`r`n", "`n")
+$expected = ConvertTo-DeterministicText $builder.ToString()
 $resolvedOutput = Join-Path $repositoryRoot $OutputPath
 if ($Mode -eq "Write") {
-    [IO.Directory]::CreateDirectory((Split-Path -Parent $resolvedOutput)) | Out-Null
-    [IO.File]::WriteAllText($resolvedOutput, $expected, [Text.UTF8Encoding]::new($false))
+    Write-DeterministicTextIfChanged $resolvedOutput $expected | Out-Null
     Write-Output "ExecutionLedgerGenerated:$OutputPath"
 }
 else {
     Require (Test-Path -LiteralPath $resolvedOutput) "GeneratedDocumentMissing:$OutputPath"
-    $actual = [IO.File]::ReadAllText($resolvedOutput).Replace("`r`n", "`n")
+    $actual = ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedOutput))
     Require ($actual -eq $expected) "GeneratedDocumentOutOfDate:$OutputPath"
     Write-Output "ExecutionLedgerValid:$($ledger.items.Count)"
 }

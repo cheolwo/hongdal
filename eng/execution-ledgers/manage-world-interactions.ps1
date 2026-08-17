@@ -8,6 +8,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "../common/deterministic-text-output.ps1")
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "WorldInteractionCatalogInvalid:$Code" }
@@ -190,7 +191,7 @@ foreach ($group in @($catalog.items | Sort-Object groupCode, sequence | Group-Ob
 }
 
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("## 첫 E4 공간 모판 공급선")
+[void] $builder.AppendLine("## 첫 E4 · H1 WI 공간 모판 공급선")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine('```text')
 [void] $builder.AppendLine("WI-FARM-04 수확 (100㎡ × 3kg/㎡ = 300kg)")
@@ -209,21 +210,21 @@ foreach ($group in @($catalog.items | Sort-Object groupCode, sequence | Group-Ob
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- E3는 계약·코드·자동 시험의 구현 완료선이다.")
 [void] $builder.AppendLine("- Scenario 공간으로 통과한 E3는 실제 LandscapeGraph 또는 공공 공간자료 증거가 아니다.")
-[void] $builder.AppendLine("- E4는 하나 이상의 E3 WI를 품는 위치 독립 공간 모판 완료선이다. 실제 AreaSet·Graph·좌표를 요구하지 않는다.")
-[void] $builder.AppendLine("- E5는 승인된 E4 모판을 실제 AreaSet·도로·Block·LandscapeGraph에 배치해 이동 경로를 닫는 단계다.")
+[void] $builder.AppendLine("- E4는 하나 이상의 E3 WI를 품는 H1 위치 독립 공간 모판 완료선이다. 실제 AreaSet·Graph·좌표를 요구하지 않는다.")
+[void] $builder.AppendLine("- E5는 승인된 H1 모판을 H2 LandscapeBlock에 배치하고 H3 LandscapeGraph와 H4 AreaSet까지 이동 경로를 닫는 단계다.")
+[void] $builder.AppendLine("- H는 공간 포함 계층이며 증거 단계가 아니다. H4 AreaSet이 존재해도 H2 실제 Block 폐루프가 없으면 E5가 아니다.")
 [void] $builder.AppendLine("- 실제 서버와 저장 Scene에서 사람이 조작한 Play Mode·Game View·Console 증거가 있어야 E7이다.")
 [void] $builder.AppendLine("- Unity 애니메이션이나 GameObject 상태가 Task 완료를 확정하지 않는다.")
 
-$expected = $builder.ToString().Replace("`r`n", "`n")
+$expected = ConvertTo-DeterministicText $builder.ToString()
 $resolvedOutput = Join-Path $repositoryRoot $OutputPath
 if ($Mode -eq "Write") {
-    [IO.Directory]::CreateDirectory((Split-Path -Parent $resolvedOutput)) | Out-Null
-    [IO.File]::WriteAllText($resolvedOutput, $expected, [Text.UTF8Encoding]::new($false))
+    Write-DeterministicTextIfChanged $resolvedOutput $expected | Out-Null
     Write-Output "WorldInteractionCatalogGenerated:$OutputPath"
 }
 else {
     Require (Test-Path -LiteralPath $resolvedOutput) "GeneratedDocumentMissing:$OutputPath"
-    $actual = [IO.File]::ReadAllText($resolvedOutput).Replace("`r`n", "`n")
+    $actual = ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedOutput))
     Require ($actual -eq $expected) "GeneratedDocumentOutOfDate:$OutputPath"
     Write-Output "WorldInteractionCatalogValid:$($catalog.items.Count)"
 }

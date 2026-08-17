@@ -1,0 +1,43 @@
+{
+  "key": "wi-spatial-evidence",
+  "version": "1",
+  "solutions": [
+    "Ssalddel.Simulation.slnx",
+    "Ssalddel.Unity.slnx"
+  ],
+  "readFirst": [
+    "AGENTS.md",
+    "docs/AI/CURRENT_WORK.md",
+    "docs/AI/DECISIONS.md",
+    "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md",
+    "docs/AI/generated/simulation-world-spatial-hierarchy.md"
+  ],
+  "sourceRoots": [
+    "eng/execution-ledgers",
+    "eng/world-seedbeds",
+    "Ssalddel.Simulation.Application/SimulationWorld상호작용공간모판Service.cs",
+    "Ssalddel.Simulation.Domain/Simulation공간상호작용.cs",
+    "Ssalddel.Simulation.Tests/SimulationWorldInteractionSpatialSeedbedTests.cs",
+    "Ssalddel.Simulation.Tests/SimulationWorldAreaSetLandscapeGraphTests.cs"
+  ],
+  "unitySourceRoots": [
+    "Assets/Ssalddel/Editor/WI공간모판검토실Builder.cs",
+    "Assets/Ssalddel/Editor/WI공간모판AuthoringSource.cs",
+    "Assets/Ssalddel/Editor/WI공간모판SourceModels.cs",
+    "Assets/Ssalddel/Editor/WI공간모판SourceSynchronizer.cs",
+    "Assets/Ssalddel/Editor/WI공간모판CatalogBuilder.cs",
+    "Assets/Ssalddel/Editor/WI공간모판UiFactory.cs",
+    "Assets/Ssalddel/Presentation/World/WI공간모판VisualCatalog.cs",
+    "Assets/Ssalddel/Presentation/World/WI공간모판검토Presenter.cs",
+    "Assets/Ssalddel/Tests/EditMode/WI공간모판검토실Tests.cs",
+    "Assets/Ssalddel/Scenes/WI공간모판검토실.unity"
+  ],
+  "excludedRoots": [
+    "bin",
+    "obj",
+    ".vs",
+    "artifacts",
+    "docs/AI/generated/simulation-unity-code-map.json",
+    "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json"
+  ]
+}
