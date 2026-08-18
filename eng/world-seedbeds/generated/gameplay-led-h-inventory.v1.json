@@ -1,8 +1,8 @@
 {
   "schemaVersion": "simulation-world-gameplay-led-h-inventory-report.v1",
-  "policyRevision": "simulation-world-gameplay-led-h-policy.r1",
+  "policyRevision": "simulation-world-gameplay-led-h-policy.r2",
   "catalogRevision": "simulation-world-spatial-design-knowledge.r3",
-  "areaSetPriorityRevision": "simulation-world-area-set-composition-priorities.r4",
+  "areaSetPriorityRevision": "simulation-world-area-set-composition-priorities.r5",
   "counts": {
     "primaryGamePlans": 4,
     "crossWorldPlans": 1,
@@ -29,7 +29,11 @@
       ],
       "coreWiIds": [
         "WI-WORLD-05",
-        "WI-WORLD-07"
+        "WI-WORLD-07",
+        "WI-NATURE-01",
+        "WI-NATURE-02",
+        "WI-NATURE-03",
+        "WI-NATURE-04"
       ],
       "coverage": {
         "h1InteractionRefs": [
@@ -483,12 +487,13 @@
       "priorityCode": "E-P4",
       "title": "Nature 사건 행위 계약 보완",
       "targetStageCode": "E1",
-      "anticipatedGameplayCodes": [
-        "RegionalThreatObservation",
-        "EmergencyRetreat",
-        "NatureRestoration",
-        "PartyRecovery"
-      ]
+      "wiIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-02",
+        "WI-NATURE-03",
+        "WI-NATURE-04"
+      ],
+      "completionStateCode": "ContractEstablished"
     },
     {
       "priorityCode": "E-P5",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-h2-composition-plans.v1",
-  "revision": "simulation-world-h2-composition-plans.r2",
-  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r3",
+  "revision": "simulation-world-h2-composition-plans.r3",
+  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r4",
   "generatedPlanCount": 6,
   "plans": [
     {
@@ -85,7 +85,7 @@
       ],
       "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "1fca55cb958d80cf4e8391c84b6bfbbf24cdb77fdf93133b90eb04fcb7341a0c"
+      "derivationInputHashSha256": "4067104bff49809269bc2ce2e4084cd2d5d4103c398c071b5931909f364c8c89"
     },
     {
       "planId": "h2-plan:farm-loss-restoration-handoff",
@@ -168,7 +168,7 @@
       ],
       "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "72c1578b25a5bf2d40d654903cfd9e1e124dfdf0c5e70a19cb0a89952f2369c1"
+      "derivationInputHashSha256": "0fc8074628c52ab264afbd2dd4a9bc093a6ade689d397175d068b9dbd0832255"
     },
     {
       "planId": "h2-plan:nature-restoration-recovery",
@@ -188,7 +188,23 @@
           "localX": -28,
           "localZ": 30,
           "rotationDegrees": 10,
-          "required": true
+          "required": true,
+          "playRoleCode": "Restore",
+          "wiIds": [
+            "WI-NATURE-03"
+          ],
+          "planningCapacities": [
+            {
+              "capacityCode": "RestorationWorkArea",
+              "quantity": 1,
+              "unitCode": "slot"
+            },
+            {
+              "capacityCode": "RestorationMaterialStaging",
+              "quantity": 1,
+              "unitCode": "cargo-lot"
+            }
+          ]
         },
         {
           "localNodeId": "safe-recovery-camp",
@@ -196,7 +212,23 @@
           "localX": 64,
           "localZ": -34,
           "rotationDegrees": 190,
-          "required": true
+          "required": true,
+          "playRoleCode": "Recover",
+          "wiIds": [
+            "WI-NATURE-04"
+          ],
+          "planningCapacities": [
+            {
+              "capacityCode": "RestAreaParty",
+              "quantity": 1,
+              "unitCode": "party"
+            },
+            {
+              "capacityCode": "RecoverySupportWorkArea",
+              "quantity": 1,
+              "unitCode": "slot"
+            }
+          ]
         }
       ],
       "edges": [
@@ -218,6 +250,14 @@
           "facingDegrees": 170
         },
         {
+          "connectorId": "retreat-recovery-input",
+          "roleCode": "RetreatRecoveryInput",
+          "attachedNodeId": "safe-recovery-camp",
+          "localX": 26,
+          "localZ": -78,
+          "facingDegrees": 210
+        },
+        {
           "connectorId": "safe-core-output",
           "roleCode": "SafeCoreOutput",
           "attachedNodeId": "safe-recovery-camp",
@@ -236,7 +276,7 @@
       ],
       "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "0db71eac78b91066e9f7532684a973be8f453322f245e37a19824970c627dd08"
+      "derivationInputHashSha256": "d1063908b20890bc664f462002c014cc31db94df0de032952b57aa6f31adcb7d"
     },
     {
       "planId": "h2-plan:nature-threat-response",
@@ -256,7 +296,23 @@
           "localX": 0,
           "localZ": 0,
           "rotationDegrees": 20,
-          "required": true
+          "required": true,
+          "playRoleCode": "ObserveThreat",
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "planningCapacities": [
+            {
+              "capacityCode": "ObservationWorkArea",
+              "quantity": 1,
+              "unitCode": "slot"
+            },
+            {
+              "capacityCode": "MonitoredThreatRoute",
+              "quantity": 1,
+              "unitCode": "route"
+            }
+          ]
         },
         {
           "localNodeId": "incident-trace",
@@ -264,7 +320,23 @@
           "localX": 62,
           "localZ": 48,
           "rotationDegrees": 35,
-          "required": true
+          "required": true,
+          "playRoleCode": "InvestigateTrace",
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "planningCapacities": [
+            {
+              "capacityCode": "InvestigationWorkArea",
+              "quantity": 1,
+              "unitCode": "slot"
+            },
+            {
+              "capacityCode": "IncidentTraceTarget",
+              "quantity": 1,
+              "unitCode": "trace"
+            }
+          ]
         },
         {
           "localNodeId": "emergency-retreat",
@@ -272,7 +344,23 @@
           "localX": -72,
           "localZ": -58,
           "rotationDegrees": 215,
-          "required": true
+          "required": true,
+          "playRoleCode": "Retreat",
+          "wiIds": [
+            "WI-NATURE-02"
+          ],
+          "planningCapacities": [
+            {
+              "capacityCode": "EscapeRouteParty",
+              "quantity": 1,
+              "unitCode": "party"
+            },
+            {
+              "capacityCode": "EmergencyPassage",
+              "quantity": 1,
+              "unitCode": "route"
+            }
+          ]
         }
       ],
       "edges": [
@@ -315,11 +403,19 @@
           "localX": -116,
           "localZ": -92,
           "facingDegrees": 225
+        },
+        {
+          "connectorId": "recovery-handoff",
+          "roleCode": "RecoveryHandoff",
+          "attachedNodeId": "emergency-retreat",
+          "localX": -86,
+          "localZ": -28,
+          "facingDegrees": 45
         }
       ],
       "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "1fdb87b5f1fad13447b1fc6d859612da5a64ab1fc17852c9824d4ee2a4fde6fe"
+      "derivationInputHashSha256": "22c63e65d86610d339021028c2638d321da4e0b16afb7d630c985ac538456493"
     },
     {
       "planId": "h2-plan:town-contamination-control",
@@ -402,7 +498,7 @@
       ],
       "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "6ac225e75af4de0bf596ea552e104d55d325ada45807815be48de73816320c09"
+      "derivationInputHashSha256": "4ce90a5907880c97cbba42eb5e53d026d3a7c393cdcd36543e2e67baa6614d22"
     },
     {
       "planId": "h2-plan:town-recall-relief",
@@ -485,7 +581,81 @@
       ],
       "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "558a40fa61f00923cd0102fd7fe8456a0621dc81894e59334ca2541317dabea5"
+      "derivationInputHashSha256": "b08194d6b8a5a1b10cee543045ffac40ba1cb4a01778da3164c366a8ad66e8d7"
+    }
+  ],
+  "referencePlayLoops": [
+    {
+      "playLoopId": "reference-play:nature-threat-recovery.v1",
+      "title": "Nature 위협 관찰·후퇴·복원·회복 기준 플레이",
+      "h3Ref": "h3-candidate:nature-threat-recovery",
+      "entryContext": {
+        "wiId": "WI-WORLD-05",
+        "h1Refs": [
+          "h1-stock:nature-trailhead",
+          "h1-stock:nature-exploration-buffer"
+        ]
+      },
+      "branches": [
+        {
+          "branchCode": "RetreatAndRecover",
+          "wiSequence": [
+            "WI-NATURE-01",
+            "WI-NATURE-02",
+            "WI-NATURE-04"
+          ],
+          "h1Sequence": [
+            "h1-stock:nature-threat-watch",
+            "h1-stock:nature-incident-trace",
+            "h1-stock:nature-emergency-retreat",
+            "h1-stock:nature-safe-recovery-camp"
+          ]
+        },
+        {
+          "branchCode": "RestoreAndRecover",
+          "wiSequence": [
+            "WI-NATURE-01",
+            "WI-NATURE-03",
+            "WI-NATURE-04"
+          ],
+          "h1Sequence": [
+            "h1-stock:nature-threat-watch",
+            "h1-stock:nature-incident-trace",
+            "h1-stock:nature-restoration-site",
+            "h1-stock:nature-safe-recovery-camp"
+          ]
+        }
+      ],
+      "h2Handoffs": [
+        {
+          "relationCode": "RetreatRecoveryHandoff",
+          "fromH2Ref": "h2-candidate:nature-threat-response",
+          "fromConnectorRoleCode": "RecoveryHandoff",
+          "toH2Ref": "h2-candidate:nature-restoration-recovery",
+          "toConnectorRoleCode": "RetreatRecoveryInput"
+        },
+        {
+          "relationCode": "IncidentRestorationHandoff",
+          "fromH2Ref": "h2-candidate:nature-threat-response",
+          "fromConnectorRoleCode": "ThreatBandContinuation",
+          "toH2Ref": "h2-candidate:nature-restoration-recovery",
+          "toConnectorRoleCode": "IncidentRouteInput"
+        },
+        {
+          "relationCode": "SafeCoreReentry",
+          "fromH2Ref": "h2-candidate:nature-restoration-recovery",
+          "fromConnectorRoleCode": "SafeCoreOutput",
+          "toH2Ref": "h2-candidate:nature-threat-response",
+          "toConnectorRoleCode": "SafeCoreInput"
+        }
+      ],
+      "completionContext": {
+        "stateCode": "PartyRecovered",
+        "nextPlayerVerbCode": "Explore",
+        "exitConnectorRoleCode": "RestoredRouteOutput"
+      },
+      "authorityStateCode": "DesignCandidateOnly",
+      "evidenceStageCode": "E1"
     }
   ],
   "authorityBoundary": "위치 독립 H2 설계 조립안이며 실제 도로·경계·AreaSet·LandscapeGraph 권위를 갖지 않는다.",

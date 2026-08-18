@@ -5,10 +5,12 @@
   "hierarchyLevelCode": "H1",
   "title": "자연권 안전 회복 야영지",
   "summary": "위협 관찰·후퇴·복구 뒤 플레이어와 동료가 다음 행동을 준비하는 안전 생활핵의 회복 공간이다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "knowledgeStateCode": "CandidateForReview",
   "originModeCode": "Mixed",
   "approvedDefinitionStableId": null,
-  "wiIds": [],
+  "wiIds": [
+    "WI-NATURE-04"
+  ],
   "anticipatedGameplayCodes": [
     "PartyRecovery",
     "ThreatDebrief",
@@ -23,7 +25,10 @@
     "Spatial.SafeCore",
     "Spatial.NpcWorkArea"
   ],
-  "capacityConceptCodes": [],
+  "capacityConceptCodes": [
+    "RestAreaParty",
+    "RecoverySupportWorkArea"
+  ],
   "predecessorH1Refs": [
     "h1-stock:nature-emergency-retreat",
     "h1-stock:nature-restoration-site"
@@ -45,7 +50,7 @@
     "nature:초지·야생화"
   ],
   "qualificationSignals": {
-    "requiredByExistingWi": false,
+    "requiredByExistingWi": true,
     "likelyFutureGameplay": true,
     "reusableAcrossWorlds": true,
     "representableByOwnedSynty": true
@@ -55,7 +60,7 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-safe-recovery-camp"
   ],
   "unresolvedItems": [
-    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+    "E2에서 파티 회복 시간·보급과 동시 회복 단위를 확정한다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

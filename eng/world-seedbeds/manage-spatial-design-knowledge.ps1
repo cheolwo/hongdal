@@ -107,7 +107,7 @@ function New-H1FromLegacy([object] $Item, [hashtable] $ApprovedDefinitions) {
         anticipatedGameplayCodes = @()
         spatialRoleCodes = @($Item.spatialRoleCodes)
         capabilityCodes = $capabilities
-        capacityConceptCodes = @()
+        capacityConceptCodes = if ($Item.PSObject.Properties.Name -contains "capacityConceptCodes") { @($Item.capacityConceptCodes) } else { @() }
         predecessorH1Refs = @()
         successorH1Refs = @()
         connectorRoleCodes = $connectors
@@ -138,7 +138,7 @@ function New-H1FromExpansion([object] $Item) {
         anticipatedGameplayCodes = @($Item.anticipatedGameplayCodes)
         spatialRoleCodes = @($Item.spatialRoleCodes)
         capabilityCodes = @($Item.capabilityCodes)
-        capacityConceptCodes = @()
+        capacityConceptCodes = if ($Item.PSObject.Properties.Name -contains "capacityConceptCodes") { @($Item.capacityConceptCodes) } else { @() }
         predecessorH1Refs = @($Item.predecessorH1Refs)
         successorH1Refs = @($Item.successorH1Refs)
         connectorRoleCodes = @($Item.connectorRoleCodes)
@@ -261,6 +261,7 @@ function New-KnowledgeMarkdown([object] $Definition) {
         Add-DirectiveLines $builder "gameplay" @($Definition.anticipatedGameplayCodes)
         Add-DirectiveLines $builder "role" @($Definition.spatialRoleCodes)
         Add-DirectiveLines $builder "capability" @($Definition.capabilityCodes)
+        Add-DirectiveLines $builder "capacity" @($Definition.capacityConceptCodes)
         Add-DirectiveLines $builder "predecessor" @($Definition.predecessorH1Refs)
         Add-DirectiveLines $builder "successor" @($Definition.successorH1Refs)
         Add-DirectiveLines $builder "connector" @($Definition.connectorRoleCodes)
@@ -381,6 +382,7 @@ foreach ($level in @("h1", "h2", "h3")) {
                 @{ Name = "gameplay"; Values = @($definition.anticipatedGameplayCodes) },
                 @{ Name = "role"; Values = @($definition.spatialRoleCodes) },
                 @{ Name = "capability"; Values = @($definition.capabilityCodes) },
+                @{ Name = "capacity"; Values = @($definition.capacityConceptCodes) },
                 @{ Name = "predecessor"; Values = @($definition.predecessorH1Refs) },
                 @{ Name = "successor"; Values = @($definition.successorH1Refs) },
                 @{ Name = "connector"; Values = @($definition.connectorRoleCodes) },

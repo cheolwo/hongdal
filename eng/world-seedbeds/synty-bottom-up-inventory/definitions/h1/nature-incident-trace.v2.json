@@ -5,10 +5,12 @@
   "hierarchyLevelCode": "H1",
   "title": "자연권 사건 흔적 조사 구역",
   "summary": "Farm·Town·City/Hub 사건이 자연권에 남긴 오염·파손·이동 흔적을 조사하는 위치 독립 공간 후보다.",
-  "knowledgeStateCode": "IdeaInventory",
+  "knowledgeStateCode": "CandidateForReview",
   "originModeCode": "WorldIntent",
   "approvedDefinitionStableId": null,
-  "wiIds": [],
+  "wiIds": [
+    "WI-NATURE-01"
+  ],
   "anticipatedGameplayCodes": [
     "IncidentTraceInvestigation",
     "CauseIdentification",
@@ -22,7 +24,10 @@
     "Spatial.InvestigationArea",
     "Spatial.ThreatMonitoringArea"
   ],
-  "capacityConceptCodes": [],
+  "capacityConceptCodes": [
+    "InvestigationWorkArea",
+    "IncidentTraceTarget"
+  ],
   "predecessorH1Refs": [
     "h1-stock:nature-threat-watch"
   ],
@@ -43,7 +48,7 @@
     "nature:산길·바위 길목"
   ],
   "qualificationSignals": {
-    "requiredByExistingWi": false,
+    "requiredByExistingWi": true,
     "likelyFutureGameplay": true,
     "reusableAcrossWorlds": true,
     "representableByOwnedSynty": true
@@ -53,7 +58,7 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-incident-trace"
   ],
   "unresolvedItems": [
-    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+    "E2에서 관찰 WI 안의 조사 단계와 원인 계보 판정 단위를 확정한다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

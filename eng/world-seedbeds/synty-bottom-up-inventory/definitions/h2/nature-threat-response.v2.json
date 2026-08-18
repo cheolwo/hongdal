@@ -5,7 +5,7 @@
   "hierarchyLevelCode": "H2",
   "title": "자연 위협 추적·대피 블록",
   "summary": "위협 감시에서 사건 흔적 추적과 긴급 후퇴까지 이어지는 자연권 최우선 대응 레시피다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "knowledgeStateCode": "CandidateForReview",
   "topologyCode": "ContourAdaptive",
   "requiredH1Refs": [
     "h1-stock:nature-threat-watch",
@@ -19,7 +19,8 @@
   "connectorRoleCodes": [
     "SafeCoreInput",
     "ThreatBandContinuation",
-    "EmergencyExit"
+    "EmergencyExit",
+    "RecoveryHandoff"
   ],
   "sizeVariantCodes": [
     "Compact",
@@ -31,7 +32,7 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:nature-threat-response"
   ],
   "unresolvedItems": [
-    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+    "E2에서 위협 관찰 결과가 후퇴·복원 분기로 전달되는 상태 계약을 확정한다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

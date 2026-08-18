@@ -5,7 +5,7 @@
   "hierarchyLevelCode": "H3",
   "title": "자연 생활·위협·회복 경관",
   "summary": "안전 생활권에서 위협을 감시·추적하고 긴급 후퇴와 복원을 거쳐 다시 탐색 가능한 상태로 돌아오는 자연권 핵심 경관이다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "knowledgeStateCode": "CandidateForReview",
   "topologyCode": "Organic",
   "requiredH2Refs": [
     "h2-candidate:nature-threat-response",
@@ -28,7 +28,7 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:nature-threat-recovery"
   ],
   "unresolvedItems": [
-    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+    "E5에서 승인된 H 설계를 실제 AreaSet 인스턴스에 배치하고 이동 경로를 검증한다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

@@ -4,7 +4,7 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "7dbc8cd455a1be95a9633379f57c394d2d04df3f13e2843ab93663e329bcd89f",
+  "previousCatalogSha256": "41918d94124f691619d3a5b7743e37f68aed0b5a440fe96d89692fb1be10aa4d",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
@@ -259,9 +259,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
-      "definitionSha256": "6461848d2740f7417ccfe4d8347192a1d7272c57289e0dbaf661b5c3b0d610a3",
+      "definitionSha256": "92b0f06134723288ed05e0ea9cd73eb85d4cea22db12dc579a0536950c0ed88c",
       "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
-      "documentSha256": "ed172bb2e27152e8b3840bcdf20f1f111a8edf8d430007f775a1ade2643ca218"
+      "documentSha256": "b85c34ef5a0b62450dbe3472703b490e361246f342357bed027823471ebb70c7"
     },
     {
       "stableId": "h1-stock:nature-exploration-buffer",
@@ -286,9 +286,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-incident-trace.v2.json",
-      "definitionSha256": "6abf8316bbd16c83b482b359ec10986791f86998dcb9fd780ea247ae52dd7039",
+      "definitionSha256": "dc5d678ec5c5b58a430d1f01d51e4c2753f43e57896a8749ba198fc09fb09e04",
       "documentPath": "authored/h1/nature-incident-trace.v2.md",
-      "documentSha256": "ec8ed54ed534807f58eb060cd4c24db00333d6b03f3bbe821dad10ccd239fd42"
+      "documentSha256": "112bbe8f98023927d5c806c1f14342b41e02c53011378462bea7d1f0108d24de"
     },
     {
       "stableId": "h1-stock:nature-lookout",
@@ -304,18 +304,18 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-restoration-site.v2.json",
-      "definitionSha256": "6f0f7e6a081b52656f5f011f34b5d0d68e8d64d080ebb695508ecc5d55fb8205",
+      "definitionSha256": "18dfd75c515eef94d1145e665f37aa4fe566715d102e54f332202c9d09251d35",
       "documentPath": "authored/h1/nature-restoration-site.v2.md",
-      "documentSha256": "e83126c05bac007dfc76b49b2c21b1d7a6639615eea1986edd2b113083c6ffb6"
+      "documentSha256": "090ae992b6447e9125bfec96008af9cf76611066cb6cbc46017dacf3e14e08c6"
     },
     {
       "stableId": "h1-stock:nature-safe-recovery-camp",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-safe-recovery-camp.v2.json",
-      "definitionSha256": "624897126701d981ce8fc14220ad2aea573826e20eed44cc4f555d5e186a25da",
+      "definitionSha256": "cf519feff8e5cd3d89d6b8bfec30454910a0029d37e5498ad0303a576848f8a0",
       "documentPath": "authored/h1/nature-safe-recovery-camp.v2.md",
-      "documentSha256": "7d520a02f2544f69aae939b0644f8ee2516bab2c2c974dd9c7fef8b8f56791ae"
+      "documentSha256": "915b6b39541f11d939c0810b6ba34c841c09579af42dd328f76bc344f8b42e19"
     },
     {
       "stableId": "h1-stock:nature-shelter",
@@ -331,9 +331,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-threat-watch.v2.json",
-      "definitionSha256": "0597ebcf348eea39b858efcb38097ca15001fc309834c536b9a67416d50242d6",
+      "definitionSha256": "6caef27f0679b020ab785106e633ea9c40bdf32b0f86c50e11f150f48e61e2c7",
       "documentPath": "authored/h1/nature-threat-watch.v2.md",
-      "documentSha256": "ed77b7333797dfba8377dda6a841de8b91bbcac80723d930768118dc0116dbae"
+      "documentSha256": "bca4206f5f400dadb144a1f8b2e96c92e073ed92f11155410c5aa76444786bdd"
     },
     {
       "stableId": "h1-stock:nature-trailhead",
@@ -1307,9 +1307,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
-      "definitionSha256": "6461848d2740f7417ccfe4d8347192a1d7272c57289e0dbaf661b5c3b0d610a3",
+      "definitionSha256": "92b0f06134723288ed05e0ea9cd73eb85d4cea22db12dc579a0536950c0ed88c",
       "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
-      "documentSha256": "ed172bb2e27152e8b3840bcdf20f1f111a8edf8d430007f775a1ade2643ca218"
+      "documentSha256": "b85c34ef5a0b62450dbe3472703b490e361246f342357bed027823471ebb70c7"
     },
     {
       "stableId": "h1-stock:nature-exploration-buffer",
@@ -1334,9 +1334,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-incident-trace.v2.json",
-      "definitionSha256": "6abf8316bbd16c83b482b359ec10986791f86998dcb9fd780ea247ae52dd7039",
+      "definitionSha256": "dc5d678ec5c5b58a430d1f01d51e4c2753f43e57896a8749ba198fc09fb09e04",
       "documentPath": "authored/h1/nature-incident-trace.v2.md",
-      "documentSha256": "ec8ed54ed534807f58eb060cd4c24db00333d6b03f3bbe821dad10ccd239fd42"
+      "documentSha256": "112bbe8f98023927d5c806c1f14342b41e02c53011378462bea7d1f0108d24de"
     },
     {
       "stableId": "h1-stock:nature-lookout",
@@ -1352,18 +1352,18 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-restoration-site.v2.json",
-      "definitionSha256": "6f0f7e6a081b52656f5f011f34b5d0d68e8d64d080ebb695508ecc5d55fb8205",
+      "definitionSha256": "18dfd75c515eef94d1145e665f37aa4fe566715d102e54f332202c9d09251d35",
       "documentPath": "authored/h1/nature-restoration-site.v2.md",
-      "documentSha256": "e83126c05bac007dfc76b49b2c21b1d7a6639615eea1986edd2b113083c6ffb6"
+      "documentSha256": "090ae992b6447e9125bfec96008af9cf76611066cb6cbc46017dacf3e14e08c6"
     },
     {
       "stableId": "h1-stock:nature-safe-recovery-camp",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-safe-recovery-camp.v2.json",
-      "definitionSha256": "624897126701d981ce8fc14220ad2aea573826e20eed44cc4f555d5e186a25da",
+      "definitionSha256": "cf519feff8e5cd3d89d6b8bfec30454910a0029d37e5498ad0303a576848f8a0",
       "documentPath": "authored/h1/nature-safe-recovery-camp.v2.md",
-      "documentSha256": "7d520a02f2544f69aae939b0644f8ee2516bab2c2c974dd9c7fef8b8f56791ae"
+      "documentSha256": "915b6b39541f11d939c0810b6ba34c841c09579af42dd328f76bc344f8b42e19"
     },
     {
       "stableId": "h1-stock:nature-shelter",
@@ -1379,9 +1379,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-threat-watch.v2.json",
-      "definitionSha256": "0597ebcf348eea39b858efcb38097ca15001fc309834c536b9a67416d50242d6",
+      "definitionSha256": "6caef27f0679b020ab785106e633ea9c40bdf32b0f86c50e11f150f48e61e2c7",
       "documentPath": "authored/h1/nature-threat-watch.v2.md",
-      "documentSha256": "ed77b7333797dfba8377dda6a841de8b91bbcac80723d930768118dc0116dbae"
+      "documentSha256": "bca4206f5f400dadb144a1f8b2e96c92e073ed92f11155410c5aa76444786bdd"
     },
     {
       "stableId": "h1-stock:nature-trailhead",
@@ -1669,17 +1669,17 @@
       "stableId": "h2-candidate:nature-restoration-recovery",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-restoration-recovery.v2.json",
-      "definitionSha256": "22020dfa06d97aeed47c3094d66127f0bfea756183764a8aef533605f8232e55",
+      "definitionSha256": "7f987a44100bfbdd2396b8388fd8337a0ce337c01e536eba12f18e2f6e61fca3",
       "documentPath": "authored/h2/nature-restoration-recovery.v2.md",
-      "documentSha256": "334935cb78044f3b8730c321e833a95e818974f835f5ad3f52fb2d0cabcf5614"
+      "documentSha256": "6b3275a59c6c54f120deb5310fd015305de2b6dd620f565d048a65e526bac772"
     },
     {
       "stableId": "h2-candidate:nature-threat-response",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-threat-response.v2.json",
-      "definitionSha256": "12dd09f4a863980ed1199ce027e41697cd33b870d1f862d27a15ab921939ef21",
+      "definitionSha256": "29100533e23f3e37070806a4b2c5bb0ad8d2bdac6601a12d3c0e6c9f5af5c8bf",
       "documentPath": "authored/h2/nature-threat-response.v2.md",
-      "documentSha256": "06fa8bb8b8dfc17b54b4a7ec036009915037b8159dc511bf894993cb45a2ad56"
+      "documentSha256": "5959dc531720b3ed79f27df1a5bb11dfdbc2501f027dc6828cde4f76aeb96a37"
     },
     {
       "stableId": "h2-candidate:nature-trail-shelter",
@@ -1799,9 +1799,9 @@
       "stableId": "h3-candidate:nature-threat-recovery",
       "revision": 1,
       "definitionPath": "definitions/h3/nature-threat-recovery.v2.json",
-      "definitionSha256": "c6a18a7f41542a9df5ee07987f8862a77e677f46df19d7841982cf733e5b1850",
+      "definitionSha256": "12b71b6b4d52d11ad4dad82b93b063753b0752d0a76b33b1e078b594c854e56a",
       "documentPath": "authored/h3/nature-threat-recovery.v2.md",
-      "documentSha256": "a5cc1641da3f0b3ac5523f370168d58279b401c3da9200005e5586a16a94377d"
+      "documentSha256": "dd1091ca756c8b3020742dd71c5be21f1468455d8836db39ec26facafcff1a7d"
     },
     {
       "stableId": "h3-candidate:nature-trail-network",
@@ -1870,7 +1870,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/nature-home-exploration-region.v3.json",
-      "definitionSha256": "9f531477f86e557db62a68ba10406e7c2008ea001cf30074fa89fbb796a7ff36",
+      "definitionSha256": "04f008d9a21cd763d2c3728d9d629cf96f3140ee639d0bc8b5900c7c0cbe6834",
       "documentPath": "authored/h4/nature-home-exploration-region.v3.md",
       "documentSha256": "aeae602d4298ac6e6b980a4890e8c8c5dea7acc014ea5cc6dbda492c3e25d13f"
     },
@@ -2235,7 +2235,7 @@
         "nature:초지·야생화",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "0bc7f7d3080d9e2dd2d6bf9458adc4d9cb13ebe319ef204c07558cb92af1b366",
+      "derivationInputHashSha256": "822fe0b02adf4d0c4c1e9c17c85f61dda459e48c5449982ecbe9a9215f9a83fd",
       "presentationOnly": true
     },
     {
@@ -2257,7 +2257,7 @@
         "nature:숲 빈터·고사목",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "5af4d4ae4d02b122894398d74da540ec2afcd102b19371382b0e1063df9ef196",
+      "derivationInputHashSha256": "54736c06c0821e4cc6c75423fd5e6a086891aa21a65c27427466f759cc7b775e",
       "presentationOnly": true
     },
     {
@@ -2605,7 +2605,7 @@
         "transition:Nature–Farm 전환",
         "transition:Water–Land 전환"
       ],
-      "derivationInputHashSha256": "db06943c4bee85d1e062eaff3a6bb4dcb678b481b4c9dd1d1d416ef8c0ea09bc",
+      "derivationInputHashSha256": "6781c05d0adda18c9d1c709c91f7d9307cb105448daf0f5f8f95de7f3f2df987",
       "presentationOnly": true
     },
     {
@@ -2703,5 +2703,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "3ce2e56009c4ae33122f00b52a8023824ad6afbf0fc70ee9424b1e7698a65d7a"
+  "contentHashSha256": "eb42b74af470d368c1cbe533ad8f6cf79ee9edaef414a0b3f1d389a2db353c7f"
 }

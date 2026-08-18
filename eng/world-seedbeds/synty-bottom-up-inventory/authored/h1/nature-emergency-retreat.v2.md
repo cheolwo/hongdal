@@ -1,8 +1,9 @@
 # 자연권 긴급 후퇴 길목
 
 @spatial-knowledge h1-stock:nature-emergency-retreat
+@wi WI-NATURE-02
 @hierarchy H1
-@state ExploratoryInventory
+@state CandidateForReview
 @gameplay EmergencyRetreat
 @gameplay ThreatEvacuation
 @gameplay SafeCoreReturn
@@ -10,6 +11,8 @@
 @capability Spatial.Traversable
 @capability Spatial.EmergencyAccess
 @capability Spatial.PlayerEscapeRoute
+@capacity EscapeRouteParty
+@capacity EmergencyPassage
 @predecessor h1-stock:nature-incident-trace
 @predecessor h1-stock:nature-threat-watch
 @successor h1-stock:nature-shelter
@@ -26,12 +29,12 @@
 
 ## 설계 상태
 
-- 재고 상태: `ExploratoryInventory`
+- 재고 상태: `CandidateForReview`
 - 공간 계층: `H1`
 - 실제 지역 권위: 없음
 
 ## 미해결
 
-- 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다.
+- E2에서 파티 단위 경로 예약과 후퇴 중단 규칙을 확정한다.
 
 이 문서는 상향식 공간 설계 지식이며 실제 좌표·AreaSet·LandscapeGraph·Unity 자산 권위를 만들지 않는다.

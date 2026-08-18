@@ -21,6 +21,15 @@ if ([int] $report.counts.quarantinedExpressionH1 -ne 9) { throw "GameplayLedHInv
 if ((@($report.planCoverage.gamePlanCode) -join ",") -ne "NatureHomeThreatRecovery,FarmProductionSurvival,TownLivingMarketSafety,CityHubLogisticsResilience") { throw "GameplayLedHInventoryPlanOrderInvalid" }
 $town = @($report.planCoverage | Where-Object gamePlanCode -eq "TownLivingMarketSafety")
 if (@($town.coverage.h1InteractionRefs) -notcontains "h1-stock:town-order-packing") { throw "GameplayLedHInventoryOrderPackingMissing" }
+$nature = @($report.planCoverage | Where-Object gamePlanCode -eq "NatureHomeThreatRecovery")
+$natureWiIds = @("WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04")
+foreach ($wiId in $natureWiIds) {
+    if (@($nature.coreWiIds) -notcontains $wiId) { throw "GameplayLedHInventoryNatureWiMissing:$wiId" }
+}
+$natureEvidence = @($report.wiEvidenceQueue | Where-Object priorityCode -eq "E-P4")
+if ($natureEvidence.Count -ne 1 -or (@($natureEvidence.wiIds) -join ",") -ne ($natureWiIds -join ",")) {
+    throw "GameplayLedHInventoryNatureEvidenceQueueInvalid"
+}
 if ((@($report.hExpansionQueue.priorityCode) -join ",") -ne "H-P0,H-P1,H-P2,H-P3,H-P4") { throw "GameplayLedHInventoryHPriorityInvalid" }
 if ((@($report.wiEvidenceQueue.priorityCode) -join ",") -ne "E-P1,E-P2,E-P3,E-P4,E-P5") { throw "GameplayLedHInventoryEPriorityInvalid" }
 if ([string] $report.wiEvidenceQueue[-1].targetStageCode -ne "E6") { throw "GameplayLedHInventoryE6BoundaryInvalid" }

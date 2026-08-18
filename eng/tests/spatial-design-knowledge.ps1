@@ -60,6 +60,34 @@ if ([string] $grammarQuery.h1ExpressionRecommendations[0].stableId -ne "h1-expre
 
 $catalogV3 = Get-Content -LiteralPath $catalogV3Path -Raw -Encoding UTF8 | ConvertFrom-Json
 $knowledgeRoot = Join-Path $repositoryRoot "eng/world-seedbeds/synty-bottom-up-inventory"
+$natureH1Refs = @(
+    "h1-stock:nature-threat-watch",
+    "h1-stock:nature-incident-trace",
+    "h1-stock:nature-emergency-retreat",
+    "h1-stock:nature-restoration-site",
+    "h1-stock:nature-safe-recovery-camp"
+)
+foreach ($stableId in $natureH1Refs) {
+    $reference = @($catalogV3.h1InteractionDefinitionRefs | Where-Object stableId -eq $stableId)
+    if ($reference.Count -ne 1) { throw "SpatialDesignKnowledgeNatureH1Missing:$stableId" }
+    $definition = Get-Content -LiteralPath (Join-Path $knowledgeRoot ([string] $reference[0].definitionPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ([string] $definition.knowledgeStateCode -ne "CandidateForReview" -or
+        @($definition.wiIds).Count -eq 0 -or
+        @($definition.capacityConceptCodes).Count -lt 2) {
+        throw "SpatialDesignKnowledgeNatureH1NotReviewReady:$stableId"
+    }
+}
+$natureH2H3Refs = @(
+    "h2-candidate:nature-threat-response",
+    "h2-candidate:nature-restoration-recovery",
+    "h3-candidate:nature-threat-recovery"
+)
+foreach ($stableId in $natureH2H3Refs) {
+    $reference = @($catalogV3.h2DefinitionRefs + $catalogV3.h3DefinitionRefs | Where-Object stableId -eq $stableId)
+    if ($reference.Count -ne 1) { throw "SpatialDesignKnowledgeNatureHigherHMissing:$stableId" }
+    $definition = Get-Content -LiteralPath (Join-Path $knowledgeRoot ([string] $reference[0].definitionPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ([string] $definition.knowledgeStateCode -ne "CandidateForReview") { throw "SpatialDesignKnowledgeNatureHigherHNotReviewReady:$stableId" }
+}
 foreach ($reference in @($catalogV3.h2DefinitionRefs + $catalogV3.h4DefinitionRefs)) {
     $definitionRaw = Get-Content -LiteralPath (Join-Path $knowledgeRoot ([string] $reference.definitionPath)) -Raw -Encoding UTF8
     if ($definitionRaw -match 'requiredEvidencePurposeCodes|evidence-purpose|dataRequirement') { throw "SpatialDesignKnowledgePublicDataCouplingForbidden:$($reference.stableId)" }

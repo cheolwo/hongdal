@@ -1,8 +1,9 @@
 # 자연권 위협 관찰 초소
 
 @spatial-knowledge h1-stock:nature-threat-watch
+@wi WI-NATURE-01
 @hierarchy H1
-@state ExploratoryInventory
+@state CandidateForReview
 @gameplay RegionalThreatObservation
 @gameplay NatureRouteWarning
 @gameplay EncounterForecast
@@ -10,6 +11,8 @@
 @capability Spatial.Traversable
 @capability Spatial.ObservationArea
 @capability Spatial.ThreatMonitoringArea
+@capacity ObservationWorkArea
+@capacity MonitoredThreatRoute
 @predecessor h1-stock:nature-trailhead
 @predecessor h1-stock:nature-lookout
 @successor h1-stock:nature-emergency-retreat
@@ -26,12 +29,12 @@
 
 ## 설계 상태
 
-- 재고 상태: `ExploratoryInventory`
+- 재고 상태: `CandidateForReview`
 - 공간 계층: `H1`
 - 실제 지역 권위: 없음
 
 ## 미해결
 
-- 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다.
+- E2에서 관찰 대상 경로 선택과 예약 단위를 확정한다.
 
 이 문서는 상향식 공간 설계 지식이며 실제 좌표·AreaSet·LandscapeGraph·Unity 자산 권위를 만들지 않는다.

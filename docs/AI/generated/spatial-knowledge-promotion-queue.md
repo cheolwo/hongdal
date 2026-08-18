@@ -10,28 +10,28 @@
 | 4 | `H1` | `h1-stock:farm-worker-waiting` 농장 작업자 대기 공간 | 사람 검토 우선 후보 |
 | 5 | `H1` | `h1-stock:hub-long-term-storage` Hub 장기 보관 공간 | 사람 검토 우선 후보 |
 | 6 | `H1` | `h1-stock:hub-temporary-staging` Hub 임시 적치 공간 | 사람 검토 우선 후보 |
-| 7 | `H1` | `h1-stock:nature-lookout` 자연 전망·관찰 공간 | 사람 검토 우선 후보 |
-| 8 | `H1` | `h1-stock:nature-shelter` 자연 임시 대피 공간 | 사람 검토 우선 후보 |
-| 9 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | 사람 검토 우선 후보 |
-| 10 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | 사람 검토 우선 후보 |
-| 11 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | 사람 검토 우선 후보 |
-| 12 | `H2` | `h2-candidate:farm-hub-corridor` Farm–Hub 회랑 블록 | 2/2 필수 H1 승인 참조 |
-| 13 | `H2` | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | 2/3 필수 H1 승인 참조 |
-| 14 | `H1` | `h1-stock:farm-exposure-inspection` 농장 수확물 노출 점검 공간 | 설계 보완 필요 |
-| 15 | `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | 설계 보완 필요 |
-| 16 | `H1` | `h1-stock:farm-loss-recovery` 농장 손실 복구·재작업 공간 | 설계 보완 필요 |
-| 17 | `H1` | `h1-stock:farm-restoration-supply` 농장 자연권 복구 자재 인계 공간 | 설계 보완 필요 |
-| 18 | `H1` | `h1-stock:farm-sorting` 농산물 선별 공간 | 설계 보완 필요 |
-| 19 | `H1` | `h1-stock:farm-washing` 농산물 세척 공간 | 설계 보완 필요 |
-| 20 | `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | 설계 보완 필요 |
-| 21 | `H1` | `h1-stock:hub-cold-storage` Hub 저온 보관 공간 | 설계 보완 필요 |
-| 22 | `H1` | `h1-stock:hub-quarantine` Hub 검역·격리 공간 | 설계 보완 필요 |
-| 23 | `H1` | `h1-stock:hub-returns` Hub 반품 처리 공간 | 설계 보완 필요 |
-| 24 | `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | 설계 보완 필요 |
-| 25 | `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | 설계 보완 필요 |
-| 26 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | 설계 보완 필요 |
-| 27 | `H1` | `h1-stock:nature-safe-recovery-camp` 자연권 안전 회복 야영지 | 설계 보완 필요 |
-| 28 | `H1` | `h1-stock:nature-threat-watch` 자연권 위협 관찰 초소 | 설계 보완 필요 |
+| 7 | `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | 사람 검토 우선 후보 |
+| 8 | `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | 사람 검토 우선 후보 |
+| 9 | `H1` | `h1-stock:nature-lookout` 자연 전망·관찰 공간 | 사람 검토 우선 후보 |
+| 10 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | 사람 검토 우선 후보 |
+| 11 | `H1` | `h1-stock:nature-safe-recovery-camp` 자연권 안전 회복 야영지 | 사람 검토 우선 후보 |
+| 12 | `H1` | `h1-stock:nature-shelter` 자연 임시 대피 공간 | 사람 검토 우선 후보 |
+| 13 | `H1` | `h1-stock:nature-threat-watch` 자연권 위협 관찰 초소 | 사람 검토 우선 후보 |
+| 14 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | 사람 검토 우선 후보 |
+| 15 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | 사람 검토 우선 후보 |
+| 16 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | 사람 검토 우선 후보 |
+| 17 | `H2` | `h2-candidate:farm-hub-corridor` Farm–Hub 회랑 블록 | 2/2 필수 H1 승인 참조 |
+| 18 | `H2` | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | 2/3 필수 H1 승인 참조 |
+| 19 | `H1` | `h1-stock:farm-exposure-inspection` 농장 수확물 노출 점검 공간 | 설계 보완 필요 |
+| 20 | `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | 설계 보완 필요 |
+| 21 | `H1` | `h1-stock:farm-loss-recovery` 농장 손실 복구·재작업 공간 | 설계 보완 필요 |
+| 22 | `H1` | `h1-stock:farm-restoration-supply` 농장 자연권 복구 자재 인계 공간 | 설계 보완 필요 |
+| 23 | `H1` | `h1-stock:farm-sorting` 농산물 선별 공간 | 설계 보완 필요 |
+| 24 | `H1` | `h1-stock:farm-washing` 농산물 세척 공간 | 설계 보완 필요 |
+| 25 | `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | 설계 보완 필요 |
+| 26 | `H1` | `h1-stock:hub-cold-storage` Hub 저온 보관 공간 | 설계 보완 필요 |
+| 27 | `H1` | `h1-stock:hub-quarantine` Hub 검역·격리 공간 | 설계 보완 필요 |
+| 28 | `H1` | `h1-stock:hub-returns` Hub 반품 처리 공간 | 설계 보완 필요 |
 | 29 | `H1` | `h1-stock:town-cleanup-transfer` 생활권 정화·폐기 인계 공간 | 설계 보완 필요 |
 | 30 | `H1` | `h1-stock:town-contamination-inspection` 생활권 재고 오염 점검 공간 | 설계 보완 필요 |
 | 31 | `H1` | `h1-stock:town-contamination-quarantine` 생활권 오염 재고 격리 공간 | 설계 보완 필요 |
