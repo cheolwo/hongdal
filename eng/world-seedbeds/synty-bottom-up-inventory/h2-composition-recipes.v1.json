@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "simulation-world-h2-composition-recipes.v1",
+  "revision": "simulation-world-h2-composition-recipes.r1",
+  "coordinateSpaceCode": "LocalMeters",
+  "authorityBoundary": "위치 독립 H2 설계 조립안이며 실제 도로·경계·AreaSet·LandscapeGraph 권위를 갖지 않는다.",
+  "recipes": [
+    {
+      "recipeId": "h2-composition:nature-threat-response.r1",
+      "targetKnowledgeRef": "h2-candidate:nature-threat-response",
+      "priorityCode": "P1",
+      "referenceSizeMeters": { "width": 240, "depth": 200 },
+      "nodes": [
+        { "localNodeId": "threat-watch", "h1Ref": "h1-stock:nature-threat-watch", "localX": 0, "localZ": 0, "rotationDegrees": 20, "required": true },
+        { "localNodeId": "incident-trace", "h1Ref": "h1-stock:nature-incident-trace", "localX": 62, "localZ": 48, "rotationDegrees": 35, "required": true },
+        { "localNodeId": "emergency-retreat", "h1Ref": "h1-stock:nature-emergency-retreat", "localX": -72, "localZ": -58, "rotationDegrees": 215, "required": true }
+      ],
+      "edges": [
+        { "localEdgeId": "watch-to-trace", "fromNodeId": "threat-watch", "toNodeId": "incident-trace", "relationCode": "ThreatInvestigationRoute", "bidirectional": true },
+        { "localEdgeId": "trace-to-retreat", "fromNodeId": "incident-trace", "toNodeId": "emergency-retreat", "relationCode": "EmergencyRetreatRoute", "bidirectional": true }
+      ],
+      "externalConnectors": [
+        { "connectorId": "safe-core-input", "roleCode": "SafeCoreInput", "attachedNodeId": "threat-watch", "localX": -102, "localZ": -78, "facingDegrees": 225 },
+        { "connectorId": "threat-band-continuation", "roleCode": "ThreatBandContinuation", "attachedNodeId": "incident-trace", "localX": 108, "localZ": 82, "facingDegrees": 35 },
+        { "connectorId": "emergency-exit", "roleCode": "EmergencyExit", "attachedNodeId": "emergency-retreat", "localX": -116, "localZ": -92, "facingDegrees": 225 }
+      ]
+    },
+    {
+      "recipeId": "h2-composition:nature-restoration-recovery.r1",
+      "targetKnowledgeRef": "h2-candidate:nature-restoration-recovery",
+      "priorityCode": "P1",
+      "referenceSizeMeters": { "width": 220, "depth": 180 },
+      "nodes": [
+        { "localNodeId": "restoration-site", "h1Ref": "h1-stock:nature-restoration-site", "localX": -28, "localZ": 30, "rotationDegrees": 10, "required": true },
+        { "localNodeId": "safe-recovery-camp", "h1Ref": "h1-stock:nature-safe-recovery-camp", "localX": 64, "localZ": -34, "rotationDegrees": 190, "required": true }
+      ],
+      "edges": [
+        { "localEdgeId": "restoration-to-recovery", "fromNodeId": "restoration-site", "toNodeId": "safe-recovery-camp", "relationCode": "RestorationRecoveryRoute", "bidirectional": true }
+      ],
+      "externalConnectors": [
+        { "connectorId": "incident-route-input", "roleCode": "IncidentRouteInput", "attachedNodeId": "restoration-site", "localX": -104, "localZ": 46, "facingDegrees": 170 },
+        { "connectorId": "safe-core-output", "roleCode": "SafeCoreOutput", "attachedNodeId": "safe-recovery-camp", "localX": 104, "localZ": -62, "facingDegrees": 325 },
+        { "connectorId": "restored-route-output", "roleCode": "RestoredRouteOutput", "attachedNodeId": "restoration-site", "localX": 8, "localZ": 86, "facingDegrees": 20 }
+      ]
+    }
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

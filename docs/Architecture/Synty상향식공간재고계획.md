@@ -75,6 +75,8 @@ pwsh -NoProfile -File eng/world-seedbeds/query-spatial-design-knowledge.ps1 `
 
 P1은 플레이어가 상시 머무는 Nature의 위협·대피·회복 폐루프를 먼저 닫는다. P2와 P3는 Farm·Town 전문 경관에서 생긴 사건 결과를 P1의 자연권 회복 공간으로 인계한다. 이 순서는 설계 재고 제작 순서이며, 실제 도로·경계·승인 H1 배치와 Graph 근거가 없는 후보를 공식 H2로 승격하는 권한은 아니다.
 
+P1 두 후보는 [`h2-composition-recipes.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-recipes.v1.json)의 로컬 H1 배치·내부 관계·외부 연결구로 구현한다. 결정적 생성 결과는 [P1 H2 조립안](../AI/generated/h2-composition-plans.md)에서 확인한다. 좌표계 `LocalMeters`는 재사용 조립안 내부의 상대 위치일 뿐 실제 지역 좌표가 아니며, 결과 상태 `DesignCandidateOnly / WaitingForRoadBoundaryEvidence`는 공식 H2와 E5 승격을 명시적으로 차단한다.
+
 ## 팩의 기본 역할
 
 - Nature: 지형 골격, 숲 경계, 수변, 완충, 탐색 배경
