@@ -721,6 +721,23 @@
           "boundary": "Recipe\uB294 \uC81C\uACF5 \uBC94\uC704\uC640 \uB85C\uB4DC \uC815\uCC45\uC774\uBA70 Unity\uAC00 \uC804\uCCB4 \uD0C0\uC77C\uC744 \uB3D9\uC2DC\uC5D0 \uC0DD\uC131\uD558\uB77C\uB294 \uBA85\uB839\uC774 \uC544\uB2C8\uB2E4."
         },
         {
+          "flowOrder": 11,
+          "stepKey": "contract.lh-world-profile",
+          "dependsOnStepKeys": [
+            "contract.stream-recipe"
+          ],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationLhWorldProfileResponse",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationLhWorldContracts.cs",
+          "responsibility": "L \uD574\uC0C1\uB3C4\uC640 H \uACF5\uAC04 \uACC4\uBCF4\uB97C \uACB0\uD569\uD558\uB294 LH World \uC0DD\uC131\u00B7\uC2A4\uD2B8\uB9AC\uBC0D Profile\uC744 \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "Profile\uACFC Cell Preview\uB294 Simulation \uACF5\uAC04 \uD6C4\uBCF4\uC774\uBA70 H \uAD8C\uC704\uB098 \uC6B4\uC601 \uC0C1\uD0DC\uB97C \uC0C8\uB85C \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
           "flowOrder": 20,
           "stepKey": "api.world-stream",
           "dependsOnStepKeys": [
@@ -777,6 +794,46 @@
           ],
           "writesTo": [],
           "boundary": "\uC790\uB8CC\uAC00 \uC5C6\uB294 DEM\u00B7\uBC30\uCE58 \uC88C\uD45C\u00B7URL\uC744 \uAFB8\uBA70\uB0B4\uC9C0 \uC54A\uACE0 \uBA85\uC2DC\uB41C \uC81C\uACF5 \uBC94\uC704\uB9CC \uD22C\uC601\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 31,
+          "stepKey": "application.lh-world-preview",
+          "dependsOnStepKeys": [
+            "contract.lh-world-profile"
+          ],
+          "executionStage": "Preview",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationLhWorldService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationLhWorldService.cs",
+          "responsibility": "\uD50C\uB808\uC774\uC5B4 L3 \uC704\uCE58\uB97C \uAE30\uC900\uC73C\uB85C H \uACC4\uBCF4\uC640 \uACB0\uC815\uB860\uC801 \uC8FC\uBCC0 \uACF5\uAC04 \uD6C4\uBCF4\uB97C \uBBF8\uB9AC \uACC4\uC0B0\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState",
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "Preview\uB294 H \uAD8C\uC704\u00B7\uC6B4\uC601 \uC6D0\uC7A5\u00B7\uC790\uC6D0 \uC6D0\uC7A5\uC744 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uACE0 ScenarioProcedural \uBC30\uCE58 \uD6C4\uBCF4\uB9CC \uBC18\uD658\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 32,
+          "stepKey": "api.lh-world-preview",
+          "dependsOnStepKeys": [
+            "application.lh-world-preview"
+          ],
+          "executionStage": "Preview",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.SimulationLhWorldController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationLhWorldController.cs",
+          "responsibility": "\uD50C\uB808\uC774\uC5B4 L3 \uC704\uCE58\uC5D0 \uD544\uC694\uD55C LH Cell \uD6C4\uBCF4\uB97C \uC11C\uBC84 Simulation \uC2DC\uAC01\uC73C\uB85C Preview\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState",
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "\uC815\uD655\uD55C Transform\uC744 \uBC1B\uC9C0 \uC54A\uACE0 \uC591\uC790\uD654\uD55C L3 Cell\uB9CC \uC0AC\uC6A9\uD558\uBA70 Preview\uB294 \uC5B4\uB5A4 \uC6D0\uC7A5\uB3C4 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
         }
       ]
     },
@@ -887,7 +944,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Application",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 45\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ISimulationTeamObservationSessionStore, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 46\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ISimulationTeamObservationSessionStore, ..."
     },
     {
       "severity": "Warning",
@@ -915,7 +972,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Unity",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 45\uAC1C: CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, FarmSurvivalExperienceIntentMapper, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 46\uAC1C: CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, FarmSurvivalExperienceIntentMapper, ..."
     }
   ]
 }

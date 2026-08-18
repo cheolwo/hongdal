@@ -43,9 +43,12 @@ Simulation·Unity
 │  └─ 040 infrastructure.synty-store · Infrastructure · Persistence
 ├─ L2 타일 Streaming [simulation-world-streaming]
 │  ├─ 010 contract.stream-recipe · Contract · Definition
+│  ├─ 011 contract.lh-world-profile · Contract · Definition
 │  ├─ 020 api.world-stream · Api · Query
 │  ├─ 025 api.world-region-summary · Api · Query
-│  └─ 030 application.world-stream · Application · Projection
+│  ├─ 030 application.world-stream · Application · Projection
+│  ├─ 031 application.lh-world-preview · Application · Preview
+│  └─ 032 api.lh-world-preview · Api · Preview
 └─ Unity 마지막 성공 상태 로딩 [unity-resilient-world-load]
    ├─ 010 client.last-successful-runtime · ClientAdapter · Presentation
    ├─ 020 client.community-load · ClientAdapter · Query
@@ -245,6 +248,11 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Recipe는 제공 범위와 로드 정책이며 Unity가 전체 타일을 동시에 생성하라는 명령이 아니다.
+- **011 contract.lh-world-profile** — [SimulationLhWorldProfileResponse](../../../Ssalddel.Simulation.Contracts/SimulationLhWorldContracts.cs) · L 해상도와 H 공간 계보를 결합하는 LH World 생성·스트리밍 Profile을 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: Profile과 Cell Preview는 Simulation 공간 후보이며 H 권위나 운영 상태를 새로 확정하지 않는다.
 - **020 api.world-stream** — [SimulationWorldStreamingController](../../../Ssalddel.Simulation.Server/Controllers/SimulationWorldStreamingController.cs) · 타일 Recipe·Manifest·Layer·객체 Projection 조회 경계를 제공한다.
   - 계층/단계: `Api / Query`
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
@@ -260,6 +268,16 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 자료가 없는 DEM·배치 좌표·URL을 꾸며내지 않고 명시된 제공 범위만 투영한다.
+- **031 application.lh-world-preview** — [SimulationLhWorldService](../../../Ssalddel.Simulation.Application/SimulationLhWorldService.cs) · 플레이어 L3 위치를 기준으로 H 계보와 결정론적 주변 공간 후보를 미리 계산한다.
+  - 계층/단계: `Application / Preview`
+  - 읽기/쓰기: `SimulationState | DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: Preview는 H 권위·운영 원장·자원 원장을 변경하지 않고 ScenarioProcedural 배치 후보만 반환한다.
+- **032 api.lh-world-preview** — [SimulationLhWorldController](../../../Ssalddel.Simulation.Server/Controllers/SimulationLhWorldController.cs) · 플레이어 L3 위치에 필요한 LH Cell 후보를 서버 Simulation 시각으로 Preview한다.
+  - 계층/단계: `Api / Preview`
+  - 읽기/쓰기: `SimulationState | DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 정확한 Transform을 받지 않고 양자화한 L3 Cell만 사용하며 Preview는 어떤 원장도 변경하지 않는다.
 
 ## Unity 마지막 성공 상태 로딩 (`unity-resilient-world-load`)
 
