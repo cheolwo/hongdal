@@ -49,6 +49,8 @@
 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-waste` 생활권 폐기물 처리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H2` | `h2-candidate:farm-hub-corridor` Farm–Hub 회랑 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
+| `H2` | `h2-candidate:farm-incident-containment` 농장 사건 점검·격리 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
+| `H2` | `h2-candidate:farm-loss-restoration-handoff` 농장 손실 회복·복원 인계 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
@@ -58,8 +60,12 @@
 | `H2` | `h2-candidate:hub-town-corridor` Hub–Town 회랑 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:lowrise-residential` 저층 주거 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:market-life-commerce` 마트·생활상권 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
+| `H2` | `h2-candidate:nature-restoration-recovery` 자연 복원·안전 회복 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
+| `H2` | `h2-candidate:nature-threat-response` 자연 위협 추적·대피 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:nature-trail-shelter` 자연 탐색·대피 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:nature-water-buffer` 산림·수변 완충 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
+| `H2` | `h2-candidate:town-contamination-control` 생활권 오염 점검·정화 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
+| `H2` | `h2-candidate:town-recall-relief` 생활권 회수 안내·자연권 구호 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:farm-wash-sort-pack` 세척·선별·포장 블록 | `IdeaInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:farm-worker-support` 농장 작업 지원 블록 | `IdeaInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | `IdeaInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |

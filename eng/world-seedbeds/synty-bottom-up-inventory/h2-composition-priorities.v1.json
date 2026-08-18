@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "simulation-world-h2-composition-priorities.v1",
+  "revision": "simulation-world-h2-composition-priorities.r1",
+  "sourceCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+  "purpose": "아직 H2에서 사용하지 않는 사건 대응 H1을 공간 흐름으로 묶고, 상향식 경관 재고 확장 순서를 고정한다.",
+  "selectionPolicy": {
+    "requiredSignals": [
+      "필수 H1 사이에 선행·후속 관계가 있다.",
+      "두 개 이상의 H1을 공유 위상과 연결구로 묶을 수 있다.",
+      "Nature·Farm·Town 사이의 사건 인과 또는 회복 인계를 강화한다."
+    ],
+    "exclusionRules": [
+      "기존 H2가 같은 필수 H1 조합을 이미 수용하면 새 후보를 만들지 않는다.",
+      "실제 도로·경계·배치 근거 없이 공식 H2 정의로 승격하지 않는다.",
+      "후보가 부족한 현실 근거를 Scenario로 묵시적 대체하지 않는다."
+    ]
+  },
+  "priorityGroups": [
+    {
+      "priorityCode": "P1",
+      "title": "자연권 위협 대응과 회복",
+      "reason": "플레이어가 주로 머무는 Nature 중심 장면의 위협·대피·회복 흐름을 먼저 닫고, Farm·Town 사건 결과가 도착할 공간 골격을 만든다.",
+      "candidateRefs": [
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-restoration-recovery"
+      ]
+    },
+    {
+      "priorityCode": "P2",
+      "title": "농장 사건 격리와 복원 인계",
+      "reason": "Farm 사건의 실패 결과를 생산 흐름에서 분리하고 자연권 회복으로 전달하는 중간 공간을 만든다.",
+      "candidateRefs": [
+        "h2-candidate:farm-incident-containment",
+        "h2-candidate:farm-loss-restoration-handoff"
+      ]
+    },
+    {
+      "priorityCode": "P3",
+      "title": "생활권 오염 통제와 구호",
+      "reason": "Town 시장·주민 사건의 오염 통제와 회수·구호 흐름을 닫아 자연권 위협 완화와 복원으로 연결한다.",
+      "candidateRefs": [
+        "h2-candidate:town-contamination-control",
+        "h2-candidate:town-recall-relief"
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "candidateRef": "h2-candidate:nature-threat-response",
+      "priorityCode": "P1",
+      "requiredH1Refs": ["h1-stock:nature-threat-watch", "h1-stock:nature-incident-trace", "h1-stock:nature-emergency-retreat"],
+      "flow": "위협 감시 → 사건 흔적 추적 → 긴급 후퇴",
+      "closedLoopExit": "EmergencyExit",
+      "nextCandidateRefs": ["h2-candidate:nature-restoration-recovery"]
+    },
+    {
+      "candidateRef": "h2-candidate:nature-restoration-recovery",
+      "priorityCode": "P1",
+      "requiredH1Refs": ["h1-stock:nature-restoration-site", "h1-stock:nature-safe-recovery-camp"],
+      "flow": "복원 작업 → 안전 회복 → 탐색 재개",
+      "closedLoopExit": "RestoredRouteOutput",
+      "nextCandidateRefs": ["h2-candidate:nature-threat-response"]
+    },
+    {
+      "candidateRef": "h2-candidate:farm-incident-containment",
+      "priorityCode": "P2",
+      "requiredH1Refs": ["h1-stock:farm-exposure-inspection", "h1-stock:farm-incident-quarantine", "h1-stock:farm-weather-protection"],
+      "flow": "노출 점검 → 사건 격리 → 기상 보호",
+      "closedLoopExit": "RecoveryOutput",
+      "nextCandidateRefs": ["h2-candidate:farm-loss-restoration-handoff"]
+    },
+    {
+      "candidateRef": "h2-candidate:farm-loss-restoration-handoff",
+      "priorityCode": "P2",
+      "requiredH1Refs": ["h1-stock:farm-incident-quarantine", "h1-stock:farm-loss-recovery", "h1-stock:farm-restoration-supply"],
+      "flow": "격리 인계 → 손실 회복 → 자연권 복원 물자 인계",
+      "closedLoopExit": "NatureRestorationOutput",
+      "nextCandidateRefs": ["h2-candidate:nature-restoration-recovery"]
+    },
+    {
+      "candidateRef": "h2-candidate:town-contamination-control",
+      "priorityCode": "P3",
+      "requiredH1Refs": ["h1-stock:town-contamination-inspection", "h1-stock:town-contamination-quarantine", "h1-stock:town-cleanup-transfer"],
+      "flow": "오염 점검 → 격리 → 정화 폐기 인계",
+      "closedLoopExit": "ServiceVehicleOutput",
+      "nextCandidateRefs": ["h2-candidate:town-recall-relief"]
+    },
+    {
+      "candidateRef": "h2-candidate:town-recall-relief",
+      "priorityCode": "P3",
+      "requiredH1Refs": ["h1-stock:town-recall-service", "h1-stock:town-nature-relief", "h1-stock:town-neighborhood-service"],
+      "flow": "주민 회수 안내 → 생활 서비스 → 자연권 구호 인계",
+      "closedLoopExit": "NatureReliefOutput",
+      "nextCandidateRefs": ["h2-candidate:nature-restoration-recovery"]
+    }
+  ],
+  "promotionGate": {
+    "candidateStage": "설계 재고",
+    "officialH2Requires": [
+      "실제 도로·경계로 결정된 Block 면",
+      "승인된 H1 인스턴스 배치",
+      "연결구와 다음 공간 경로의 폐루프",
+      "Graph revision·hash와 공간 근거 검토"
+    ],
+    "automaticPromotionForbidden": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

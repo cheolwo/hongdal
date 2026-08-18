@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:nature-threat-response",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "자연 위협 추적·대피 블록",
+  "summary": "위협 감시에서 사건 흔적 추적과 긴급 후퇴까지 이어지는 자연권 최우선 대응 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ContourAdaptive",
+  "requiredH1Refs": [
+    "h1-stock:nature-threat-watch",
+    "h1-stock:nature-incident-trace",
+    "h1-stock:nature-emergency-retreat"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:nature-lookout",
+    "h1-stock:nature-shelter"
+  ],
+  "connectorRoleCodes": [
+    "SafeCoreInput",
+    "ThreatBandContinuation",
+    "EmergencyExit"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "TerrainSlope",
+    "LandCover",
+    "TrailNetwork",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/nature-threat-response.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:nature-threat-response"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

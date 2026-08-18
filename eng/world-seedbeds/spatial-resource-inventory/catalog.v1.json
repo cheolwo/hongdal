@@ -34,7 +34,7 @@
           "sourceTypeCode": "JsonArrayProperty",
           "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
           "collectionProperty": "h2DefinitionRefs",
-          "expectedCount": 18
+          "expectedCount": 24
         },
         {
           "sourceTypeCode": "JsonDirectory",

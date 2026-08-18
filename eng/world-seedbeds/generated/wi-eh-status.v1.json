@@ -211,6 +211,7 @@
         "h1-expression:farm:혼합-작물밭"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-incident-containment",
         "h2-candidate:farm-wash-sort-pack",
         "h2-candidate:forest-edge-farm",
         "h2-candidate:highland-production"
@@ -263,6 +264,8 @@
         "h1-expression:farm:헛간-작업마당"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-incident-containment",
+        "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:farm-processing-shipping",
         "h2-candidate:farm-wash-sort-pack"
       ],
@@ -309,6 +312,7 @@
         "h1-expression:farm:헛간-작업마당"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:farm-processing-shipping",
         "h2-candidate:farm-wash-sort-pack"
       ],
@@ -880,7 +884,8 @@
       "h2CandidateRefs": [
         "h2-candidate:hub-outbound-vehicle",
         "h2-candidate:hub-town-corridor",
-        "h2-candidate:market-life-commerce"
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-contamination-control"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -924,7 +929,8 @@
         "h1-expression:city:도심-마트-앞마당"
       ],
       "h2CandidateRefs": [
-        "h2-candidate:market-life-commerce"
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-contamination-control"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -963,7 +969,8 @@
         "h1-expression:city:도심-마트-앞마당"
       ],
       "h2CandidateRefs": [
-        "h2-candidate:market-life-commerce"
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-contamination-control"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -1161,7 +1168,8 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:lowrise-residential",
-        "h2-candidate:market-life-commerce"
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-recall-relief"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -1201,7 +1209,8 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:lowrise-residential",
-        "h2-candidate:market-life-commerce"
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-recall-relief"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -1242,7 +1251,8 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:lowrise-residential",
-        "h2-candidate:market-life-commerce"
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-recall-relief"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -1370,6 +1380,7 @@
         "h1-expression:farm:헛간-작업마당"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:farm-processing-shipping",
         "h2-candidate:farm-seed-and-tools",
         "h2-candidate:farm-wash-sort-pack",
@@ -1437,12 +1448,16 @@
         "h1-expression:town:읍내-상점-전면"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:forest-edge-farm",
         "h2-candidate:highland-production",
         "h2-candidate:lowrise-residential",
         "h2-candidate:market-life-commerce",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
         "h2-candidate:nature-trail-shelter",
-        "h2-candidate:nature-water-buffer"
+        "h2-candidate:nature-water-buffer",
+        "h2-candidate:town-recall-relief"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -1518,6 +1533,8 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:forest-edge-farm",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
         "h2-candidate:nature-trail-shelter",
         "h2-candidate:nature-water-buffer",
         "h2-candidate:town-returns-waste"
@@ -1575,5 +1592,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "e66256e959f0bdda75ce8f45d6e5514cff3866a441869275a583d4581e75bec0"
+  "contentHashSha256": "65bc1f9a56c3422ac41808c1ff13a8b417e644aac3f7a8c5db6b33e2cdf610b4"
 }

@@ -3,7 +3,7 @@
 > 항목별 JSON·Markdown에서 결정적으로 생성된다. 직접 수정하지 않는다.
 
 - H1 작업공간 지식: `51개`
-- H2 블록 조립법: `18개`
+- H2 블록 조립법: `24개`
 - H3 지역 유형 청사진: `10개`
 
 ## H1
@@ -67,6 +67,8 @@
 | 상태 | 고유 식별자 | 이름 | 검색 단서 |
 | --- | --- | --- | --- |
 | `ExploratoryInventory` | `h2-candidate:farm-hub-corridor` | Farm–Hub 회랑 블록 | h1-stock:farm-loading-gate, h1-stock:farm-hub-corridor, RoadNetwork, BlockBoundary |
+| `ExploratoryInventory` | `h2-candidate:farm-incident-containment` | 농장 사건 점검·격리 블록 | h1-stock:farm-exposure-inspection, h1-stock:farm-incident-quarantine, h1-stock:farm-weather-protection, RoadNetwork, BuildingFootprint, BlockBoundary, WeatherContext |
+| `ExploratoryInventory` | `h2-candidate:farm-loss-restoration-handoff` | 농장 손실 회복·복원 인계 블록 | h1-stock:farm-incident-quarantine, h1-stock:farm-loss-recovery, h1-stock:farm-restoration-supply, RoadNetwork, BlockBoundary, NatureTransition |
 | `ExploratoryInventory` | `h2-candidate:farm-processing-shipping` | 농장 작업·출하 블록 | h1-stock:farm-work-yard, h1-stock:farm-maintenance-yard, h1-stock:farm-loading-gate, RoadNetwork, BlockBoundary |
 | `ExploratoryInventory` | `h2-candidate:farm-seed-and-tools` | 종자·농기구 준비 블록 | h1-stock:farm-tool-storage, h1-stock:farm-seed-preparation, RoadNetwork, BlockBoundary |
 | `ExploratoryInventory` | `h2-candidate:forest-edge-farm` | 숲 경계 농장 블록 | h1-stock:nature-farm-edge, h1-stock:nature-exploration-buffer, h1-stock:farm-production, TerrainSlope, LandCover, BlockBoundary |
@@ -76,8 +78,12 @@
 | `ExploratoryInventory` | `h2-candidate:hub-town-corridor` | Hub–Town 회랑 블록 | h1-stock:hub-market-transfer, h1-stock:hub-town-corridor, h1-stock:road-facility-access, RoadNetwork, BlockBoundary |
 | `ExploratoryInventory` | `h2-candidate:lowrise-residential` | 저층 주거 블록 | h1-stock:town-living-square, h1-stock:town-resident-pickup, RoadNetwork, BuildingFootprint, BlockBoundary |
 | `ExploratoryInventory` | `h2-candidate:market-life-commerce` | 마트·생활상권 블록 | h1-stock:town-market-receiving, h1-stock:town-market-display, h1-stock:town-resident-pickup, h1-stock:town-living-square, RoadNetwork, BuildingFootprint, BlockBoundary |
+| `ExploratoryInventory` | `h2-candidate:nature-restoration-recovery` | 자연 복원·안전 회복 블록 | h1-stock:nature-restoration-site, h1-stock:nature-safe-recovery-camp, TerrainSlope, LandCover, WaterPresence, BlockBoundary |
+| `ExploratoryInventory` | `h2-candidate:nature-threat-response` | 자연 위협 추적·대피 블록 | h1-stock:nature-threat-watch, h1-stock:nature-incident-trace, h1-stock:nature-emergency-retreat, TerrainSlope, LandCover, TrailNetwork, BlockBoundary |
 | `ExploratoryInventory` | `h2-candidate:nature-trail-shelter` | 자연 탐색·대피 블록 | h1-stock:nature-trailhead, h1-stock:nature-lookout, h1-stock:nature-shelter, TerrainSlope, LandCover, TrailNetwork, BlockBoundary |
 | `ExploratoryInventory` | `h2-candidate:nature-water-buffer` | 산림·수변 완충 블록 | h1-stock:nature-exploration-buffer, h1-stock:nature-farm-edge, TerrainSlope, LandCover, Hydrography, BlockBoundary |
+| `ExploratoryInventory` | `h2-candidate:town-contamination-control` | 생활권 오염 점검·정화 블록 | h1-stock:town-contamination-inspection, h1-stock:town-contamination-quarantine, h1-stock:town-cleanup-transfer, RoadNetwork, BuildingFootprint, BlockBoundary, MarketContext |
+| `ExploratoryInventory` | `h2-candidate:town-recall-relief` | 생활권 회수 안내·자연권 구호 블록 | h1-stock:town-recall-service, h1-stock:town-nature-relief, h1-stock:town-neighborhood-service, RoadNetwork, BuildingFootprint, BlockBoundary, MarketContext |
 | `IdeaInventory` | `h2-candidate:farm-wash-sort-pack` | 세척·선별·포장 블록 | h1-stock:farm-harvest-staging, h1-stock:farm-washing, h1-stock:farm-sorting, h1-stock:farm-work-yard, RoadNetwork, WaterPresence, BlockBoundary |
 | `IdeaInventory` | `h2-candidate:farm-worker-support` | 농장 작업 지원 블록 | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard, RoadNetwork, BuildingFootprint, BlockBoundary |
 | `IdeaInventory` | `h2-candidate:hub-longterm-cold-storage` | Hub 장기·저온 보관 블록 | h1-stock:hub-long-term-storage, h1-stock:hub-cold-storage, RoadNetwork, BuildingFootprint, BlockBoundary |

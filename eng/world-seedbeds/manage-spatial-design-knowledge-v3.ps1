@@ -194,7 +194,7 @@ foreach ($level in @("H1", "H2", "H3")) {
     }
 }
 Require (@($definitionRefsByLevel.H1).Count -eq 51) "InteractionH1CountMustBe51"
-Require (@($definitionRefsByLevel.H2).Count -eq 18) "H2CountMustBe18"
+Require (@($definitionRefsByLevel.H2).Count -eq 24) "H2CountMustBe24"
 Require (@($definitionRefsByLevel.H3).Count -eq 10) "H3CountMustBe10"
 
 $packPolicy = $recipes.h1ExpressionPolicy
@@ -226,7 +226,7 @@ foreach ($group in $expressionGroups) {
     $definitionPath = "definitions/h1-expression/$family/$slug.v3.json"
     $documentPath = "authored/h1-expression/$family/$slug.v3.md"
     $input = [pscustomobject][ordered]@{
-        recipeRevision = [string] $recipes.revision
+        recipeRevision = if ($packPolicy.PSObject.Properties.Name -contains "revision") { [string] $packPolicy.revision } else { [string] $recipes.revision }
         grammarCatalogHashSha256 = [string] $grammar.catalogHashSha256
         grammarEntries = $entries
     }
@@ -306,8 +306,8 @@ function Require-GrammarSetRefs([object[]] $References, [string] $Owner) {
 $h2Bindings = @()
 $h2BindingById = @{}
 $h2Recipes = @($recipes.h2Derivations)
-Require ($h2Recipes.Count -eq 18) "H2RecipeCountMustBe18"
-Require (@($h2Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 18) "H2RecipeTargetDuplicate"
+Require ($h2Recipes.Count -eq 24) "H2RecipeCountMustBe24"
+Require (@($h2Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 24) "H2RecipeTargetDuplicate"
 foreach ($recipe in $h2Recipes | Sort-Object targetKnowledgeRef) {
     $targetId = [string] $recipe.targetKnowledgeRef
     Require ($definitionsById.ContainsKey($targetId)) "H2RecipeTargetUnknown:$targetId"
@@ -620,8 +620,8 @@ Require ($expressionFileCount -eq 32) "ExpressionDefinitionFileCount:$expression
 Require ($h4FileCount -eq 5) "H4DefinitionFileCount:$h4FileCount"
 
 if ($Mode -eq "Check") {
-    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=18;H3=10;H4=5"
+    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=24;H3=10;H4=5"
 }
 else {
-    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=18;H3=10;H4=5"
+    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=24;H3=10;H4=5"
 }

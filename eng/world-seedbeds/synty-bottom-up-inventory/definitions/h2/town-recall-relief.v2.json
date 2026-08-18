@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:town-recall-relief",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "생활권 회수 안내·자연권 구호 블록",
+  "summary": "주민 회수 안내와 생활 서비스, 자연권 구호 물자 인계를 하나의 지역 대응 거점으로 묶는 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Cluster",
+  "requiredH1Refs": [
+    "h1-stock:town-recall-service",
+    "h1-stock:town-nature-relief",
+    "h1-stock:town-neighborhood-service"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:town-resident-pickup",
+    "h1-stock:town-living-square"
+  ],
+  "connectorRoleCodes": [
+    "ResidentInput",
+    "ReturnOutput",
+    "NatureReliefOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BuildingFootprint",
+    "BlockBoundary",
+    "MarketContext"
+  ],
+  "authoredDocument": "authored/h2/town-recall-relief.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:town-recall-relief"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

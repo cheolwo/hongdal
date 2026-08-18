@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:farm-loss-restoration-handoff",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "농장 손실 회복·복원 인계 블록",
+  "summary": "격리된 손실을 회복 처리하고 자연권 복원 물자를 인계하는 농장과 자연권 사이의 회복 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Linear",
+  "requiredH1Refs": [
+    "h1-stock:farm-incident-quarantine",
+    "h1-stock:farm-loss-recovery",
+    "h1-stock:farm-restoration-supply"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:farm-work-yard",
+    "h1-stock:nature-farm-edge"
+  ],
+  "connectorRoleCodes": [
+    "IncidentInput",
+    "RecoveredCargoOutput",
+    "NatureRestorationOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BlockBoundary",
+    "NatureTransition"
+  ],
+  "authoredDocument": "authored/h2/farm-loss-restoration-handoff.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-loss-restoration-handoff"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}
