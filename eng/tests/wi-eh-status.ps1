@@ -30,8 +30,8 @@ if ([string] $status.schemaVersion -ne "simulation-world-interaction-eh-status.v
 $summaryInvalid = $status.summary.totalWorldInteractions -ne 37 -or
     $status.summary.implementationE3Count -ne 37 -or
     $status.summary.establishedH1Count -ne 13 -or
-    $status.summary.candidateLineageCount -ne 17 -or
-    $status.summary.missingRequiredCount -ne 1 -or
+    $status.summary.candidateLineageCount -ne 18 -or
+    $status.summary.missingRequiredCount -ne 0 -or
     $status.summary.notApplicableCount -ne 6
 if ($summaryInvalid) {
     throw "WorldInteractionEhStatusSummaryInvalid"
@@ -45,10 +45,11 @@ if ($hierarchyCountsInvalid) {
 }
 $orderPacking = @($status.items | Where-Object worldInteractionId -eq "WI-ORDER-04")
 $orderPackingInvalid = $orderPacking.Count -ne 1 -or
-    $orderPacking[0].spatialDesignStateCode -ne "MissingRequired" -or
-    @($orderPacking[0].warningCodes) -notcontains "RequiredSpatialDesignMissing"
+    $orderPacking[0].spatialDesignStateCode -ne "CandidateLineage" -or
+    @($orderPacking[0].interactionH1CandidateRefs) -notcontains "h1-stock:town-order-packing" -or
+    @($orderPacking[0].warningCodes) -contains "RequiredSpatialDesignMissing"
 if ($orderPackingInvalid) {
-    throw "WorldInteractionOrderPackingGapMissing"
+    throw "WorldInteractionOrderPackingDesignNotConnected"
 }
 $repair = @($status.items | Where-Object worldInteractionId -eq "WI-WORLD-04")
 $repairInvalid = $repair.Count -ne 1 -or

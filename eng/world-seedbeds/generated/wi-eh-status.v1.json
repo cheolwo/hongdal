@@ -15,8 +15,8 @@
     "totalWorldInteractions": 37,
     "implementationE3Count": 37,
     "establishedH1Count": 13,
-    "candidateLineageCount": 17,
-    "missingRequiredCount": 1,
+    "candidateLineageCount": 18,
+    "missingRequiredCount": 0,
     "notApplicableCount": 6,
     "officialH1DefinitionCount": 5,
     "officialH2DefinitionCount": 0,
@@ -904,7 +904,8 @@
         "h3-candidate:hub-town-logistics",
         "h3-candidate:jinbu-hub",
         "h3-candidate:lowrise-market-town",
-        "h3-candidate:resilient-logistics-hub"
+        "h3-candidate:resilient-logistics-hub",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -946,7 +947,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -986,7 +988,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1027,7 +1030,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1116,7 +1120,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1140,23 +1145,35 @@
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
       "priorityCode": "P4",
-      "spatialDesignStateCode": "MissingRequired",
+      "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
-      "interactionH1CandidateRefs": [],
-      "expressionH1CandidateRefs": [],
-      "h2CandidateRefs": [],
-      "h3CandidateRefs": [],
-      "h4CandidateRefs": [],
+      "interactionH1CandidateRefs": [
+        "h1-stock:town-order-packing"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:city:먹거리-상점-골목",
+        "h1-expression:town:읍내-상점-전면"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:market-life-commerce"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:circular-market-town",
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:farm-hub-town-region",
+        "h4-blueprint:lowrise-market-region"
+      ],
       "graphBindingRefs": [],
       "e5PlacementCandidateRefs": [],
       "requiredSpatialCapabilityCodes": [
         "PackingWorkArea"
       ],
-      "lhEngineHandoffStateCode": "BlockedMissingDesign",
-      "warningCodes": [
-        "RequiredSpatialDesignMissing"
-      ]
+      "lhEngineHandoffStateCode": "DesignCandidateOnly",
+      "warningCodes": []
     },
     {
       "worldInteractionId": "WI-ORDER-05",
@@ -1185,7 +1202,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1226,7 +1244,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1268,7 +1287,8 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
-        "h3-candidate:lowrise-market-town"
+        "h3-candidate:lowrise-market-town",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1408,7 +1428,8 @@
         "h3-candidate:highland-farm",
         "h3-candidate:hub-town-logistics",
         "h3-candidate:jinbu-hub",
-        "h3-candidate:resilient-logistics-hub"
+        "h3-candidate:resilient-logistics-hub",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1480,7 +1501,8 @@
         "h3-candidate:lowrise-market-town",
         "h3-candidate:nature-exploration-buffer",
         "h3-candidate:nature-threat-recovery",
-        "h3-candidate:nature-trail-network"
+        "h3-candidate:nature-trail-network",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1562,7 +1584,8 @@
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
         "h3-candidate:nature-threat-recovery",
-        "h3-candidate:nature-trail-network"
+        "h3-candidate:nature-trail-network",
+        "h3-candidate:town-contamination-relief"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1611,5 +1634,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "718e0ef072d14232c174eeb810711ce93427f4db3d20841484af74779f09a4dd"
+  "contentHashSha256": "c2c448d8159bf387cd59f685189a3284a692f6f1be74dd4cfba52362be0bb544"
 }

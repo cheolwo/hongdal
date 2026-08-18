@@ -1,0 +1,501 @@
+{
+  "schemaVersion": "simulation-world-gameplay-led-h-inventory-report.v1",
+  "policyRevision": "simulation-world-gameplay-led-h-policy.r1",
+  "catalogRevision": "simulation-world-spatial-design-knowledge.r3",
+  "areaSetPriorityRevision": "simulation-world-area-set-composition-priorities.r4",
+  "counts": {
+    "primaryGamePlans": 4,
+    "crossWorldPlans": 1,
+    "h1Interaction": 52,
+    "h1Expression": 32,
+    "h2": 24,
+    "h3": 13,
+    "h4": 6,
+    "violations": 0,
+    "quarantinedExpressionH1": 9
+  },
+  "planCoverage": [
+    {
+      "priorityCode": "P1",
+      "gamePlanCode": "NatureHomeThreatRecovery",
+      "title": "Nature 생활·탐험 AreaSet",
+      "playerWorldRoleCode": "PersistentHomeWorld",
+      "corePlayerVerbCodes": [
+        "Explore",
+        "ObserveThreat",
+        "Retreat",
+        "Restore",
+        "Recover"
+      ],
+      "coreWiIds": [
+        "WI-WORLD-05",
+        "WI-WORLD-07"
+      ],
+      "coverage": {
+        "h1InteractionRefs": [
+          "h1-stock:farm-production",
+          "h1-stock:nature-emergency-retreat",
+          "h1-stock:nature-exploration-buffer",
+          "h1-stock:nature-farm-edge",
+          "h1-stock:nature-incident-trace",
+          "h1-stock:nature-lookout",
+          "h1-stock:nature-restoration-site",
+          "h1-stock:nature-safe-recovery-camp",
+          "h1-stock:nature-shelter",
+          "h1-stock:nature-threat-watch",
+          "h1-stock:nature-trailhead"
+        ],
+        "h1ExpressionRefs": [
+          "h1-expression:farm:감자밭-두렁",
+          "h1-expression:farm:혼합-작물밭",
+          "h1-expression:nature:고지대-노출지",
+          "h1-expression:nature:산-능선",
+          "h1-expression:nature:산길-바위-길목",
+          "h1-expression:nature:수변-완충지",
+          "h1-expression:nature:숲-가장자리",
+          "h1-expression:nature:숲-빈터-고사목",
+          "h1-expression:nature:초지-야생화"
+        ],
+        "h2Refs": [
+          "h2-candidate:forest-edge-farm",
+          "h2-candidate:nature-restoration-recovery",
+          "h2-candidate:nature-threat-response",
+          "h2-candidate:nature-trail-shelter",
+          "h2-candidate:nature-water-buffer"
+        ],
+        "h3Refs": [
+          "h3-candidate:nature-exploration-buffer",
+          "h3-candidate:nature-threat-recovery",
+          "h3-candidate:nature-trail-network"
+        ],
+        "h4Refs": [
+          "h4-blueprint:nature-home-exploration-region",
+          "h4-blueprint:nature-water-region"
+        ]
+      }
+    },
+    {
+      "priorityCode": "P2",
+      "gamePlanCode": "FarmProductionSurvival",
+      "title": "Farm 생산·생존 AreaSet",
+      "playerWorldRoleCode": "ProfessionalWorld",
+      "corePlayerVerbCodes": [
+        "Cultivate",
+        "Harvest",
+        "ContainIncident",
+        "RecoverLoss",
+        "Ship"
+      ],
+      "coreWiIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-LOG-01",
+        "WI-LOG-02"
+      ],
+      "coverage": {
+        "h1InteractionRefs": [
+          "h1-stock:farm-exposure-inspection",
+          "h1-stock:farm-harvest-staging",
+          "h1-stock:farm-incident-quarantine",
+          "h1-stock:farm-loading-gate",
+          "h1-stock:farm-loss-recovery",
+          "h1-stock:farm-maintenance-yard",
+          "h1-stock:farm-production",
+          "h1-stock:farm-restoration-supply",
+          "h1-stock:farm-seed-preparation",
+          "h1-stock:farm-sorting",
+          "h1-stock:farm-tool-storage",
+          "h1-stock:farm-washing",
+          "h1-stock:farm-weather-protection",
+          "h1-stock:farm-work-yard",
+          "h1-stock:farm-worker-waiting",
+          "h1-stock:nature-exploration-buffer",
+          "h1-stock:nature-farm-edge"
+        ],
+        "h1ExpressionRefs": [
+          "h1-expression:farm:감자밭-두렁",
+          "h1-expression:farm:농산물-집하-직판장",
+          "h1-expression:farm:시설하우스-단동",
+          "h1-expression:farm:헛간-작업마당",
+          "h1-expression:farm:혼합-작물밭",
+          "h1-expression:nature:산길-바위-길목",
+          "h1-expression:nature:수변-완충지",
+          "h1-expression:nature:숲-가장자리",
+          "h1-expression:nature:숲-빈터-고사목",
+          "h1-expression:town:버스-정류장-보행-쉼터"
+        ],
+        "h2Refs": [
+          "h2-candidate:farm-incident-containment",
+          "h2-candidate:farm-loss-restoration-handoff",
+          "h2-candidate:farm-processing-shipping",
+          "h2-candidate:farm-seed-and-tools",
+          "h2-candidate:farm-wash-sort-pack",
+          "h2-candidate:farm-worker-support",
+          "h2-candidate:forest-edge-farm",
+          "h2-candidate:highland-production"
+        ],
+        "h3Refs": [
+          "h3-candidate:farm-incident-recovery",
+          "h3-candidate:farm-processing-campus",
+          "h3-candidate:highland-farm"
+        ],
+        "h4Refs": [
+          "h4-blueprint:farm-production-processing-region"
+        ]
+      }
+    },
+    {
+      "priorityCode": "P3",
+      "gamePlanCode": "TownLivingMarketSafety",
+      "title": "Town 생활·시장 AreaSet",
+      "playerWorldRoleCode": "ProfessionalWorld",
+      "corePlayerVerbCodes": [
+        "ReceiveGoods",
+        "Display",
+        "Order",
+        "Pack",
+        "Pickup",
+        "RelieveResidents"
+      ],
+      "coreWiIds": [
+        "WI-MARKET-02",
+        "WI-MARKET-03",
+        "WI-MARKET-04",
+        "WI-MARKET-05",
+        "WI-ORDER-03",
+        "WI-ORDER-04",
+        "WI-ORDER-05",
+        "WI-ORDER-06"
+      ],
+      "coverage": {
+        "h1InteractionRefs": [
+          "h1-stock:road-facility-access",
+          "h1-stock:town-cleanup-transfer",
+          "h1-stock:town-contamination-inspection",
+          "h1-stock:town-contamination-quarantine",
+          "h1-stock:town-living-square",
+          "h1-stock:town-market-display",
+          "h1-stock:town-market-receiving",
+          "h1-stock:town-nature-relief",
+          "h1-stock:town-neighborhood-service",
+          "h1-stock:town-order-packing",
+          "h1-stock:town-recall-service",
+          "h1-stock:town-resident-pickup",
+          "h1-stock:town-returns",
+          "h1-stock:town-staff-rest",
+          "h1-stock:town-waste"
+        ],
+        "h1ExpressionRefs": [
+          "h1-expression:city:공동주택-생활마당",
+          "h1-expression:city:도심-마트-앞마당",
+          "h1-expression:city:먹거리-상점-골목",
+          "h1-expression:city:상하차-dock",
+          "h1-expression:city:화물-대기-야드",
+          "h1-expression:town:근린-놀이터",
+          "h1-expression:town:버스-정류장-보행-쉼터",
+          "h1-expression:town:생활-공공광장",
+          "h1-expression:town:읍내-상점-전면",
+          "h1-expression:town:정원-담장-경계"
+        ],
+        "h2Refs": [
+          "h2-candidate:lowrise-residential",
+          "h2-candidate:market-life-commerce",
+          "h2-candidate:town-contamination-control",
+          "h2-candidate:town-recall-relief",
+          "h2-candidate:town-returns-waste"
+        ],
+        "h3Refs": [
+          "h3-candidate:circular-market-town",
+          "h3-candidate:lowrise-market-town",
+          "h3-candidate:town-contamination-relief"
+        ],
+        "h4Refs": [
+          "h4-blueprint:lowrise-market-region"
+        ]
+      }
+    },
+    {
+      "priorityCode": "P4",
+      "gamePlanCode": "CityHubLogisticsResilience",
+      "title": "City/Hub 물류 AreaSet",
+      "playerWorldRoleCode": "ProfessionalWorld",
+      "corePlayerVerbCodes": [
+        "Unload",
+        "Inspect",
+        "Store",
+        "Pick",
+        "Stage",
+        "Load"
+      ],
+      "coreWiIds": [
+        "WI-LOG-04",
+        "WI-LOG-05",
+        "WI-001",
+        "WI-002",
+        "WI-HUB-03",
+        "WI-HUB-04",
+        "WI-HUB-05",
+        "WI-HUB-06"
+      ],
+      "coverage": {
+        "h1InteractionRefs": [
+          "h1-stock:hub-cold-storage",
+          "h1-stock:hub-long-term-storage",
+          "h1-stock:hub-market-transfer",
+          "h1-stock:hub-outbound-staging",
+          "h1-stock:hub-quarantine",
+          "h1-stock:hub-receiving-storage",
+          "h1-stock:hub-returns",
+          "h1-stock:hub-service-maintenance",
+          "h1-stock:hub-temporary-staging",
+          "h1-stock:hub-vehicle-yard"
+        ],
+        "h1ExpressionRefs": [
+          "h1-expression:city:물류-station-진입부",
+          "h1-expression:city:상하차-dock",
+          "h1-expression:city:화물-대기-야드"
+        ],
+        "h2Refs": [
+          "h2-candidate:hub-inbound-storage",
+          "h2-candidate:hub-longterm-cold-storage",
+          "h2-candidate:hub-outbound-vehicle",
+          "h2-candidate:hub-quarantine-staging",
+          "h2-candidate:hub-returns-processing"
+        ],
+        "h3Refs": [
+          "h3-candidate:jinbu-hub",
+          "h3-candidate:resilient-logistics-hub"
+        ],
+        "h4Refs": [
+          "h4-blueprint:logistics-hub-region"
+        ]
+      }
+    }
+  ],
+  "crossWorldCoverage": [
+    {
+      "gamePlanCode": "RegionalSupplyChainOrchestration",
+      "roleCode": "CrossWorldOrchestration",
+      "participatingGamePlanCodes": [
+        "FarmProductionSurvival",
+        "CityHubLogisticsResilience",
+        "TownLivingMarketSafety"
+      ],
+      "coverage": {
+        "h1InteractionRefs": [
+          "h1-stock:farm-harvest-staging",
+          "h1-stock:farm-hub-corridor",
+          "h1-stock:farm-loading-gate",
+          "h1-stock:farm-maintenance-yard",
+          "h1-stock:farm-production",
+          "h1-stock:farm-seed-preparation",
+          "h1-stock:farm-sorting",
+          "h1-stock:farm-tool-storage",
+          "h1-stock:farm-washing",
+          "h1-stock:farm-work-yard",
+          "h1-stock:farm-worker-waiting",
+          "h1-stock:hub-cold-storage",
+          "h1-stock:hub-long-term-storage",
+          "h1-stock:hub-market-transfer",
+          "h1-stock:hub-outbound-staging",
+          "h1-stock:hub-quarantine",
+          "h1-stock:hub-receiving-storage",
+          "h1-stock:hub-returns",
+          "h1-stock:hub-service-maintenance",
+          "h1-stock:hub-temporary-staging",
+          "h1-stock:hub-town-corridor",
+          "h1-stock:hub-vehicle-yard",
+          "h1-stock:nature-exploration-buffer",
+          "h1-stock:nature-farm-edge",
+          "h1-stock:road-facility-access",
+          "h1-stock:town-living-square",
+          "h1-stock:town-market-display",
+          "h1-stock:town-market-receiving",
+          "h1-stock:town-order-packing",
+          "h1-stock:town-resident-pickup",
+          "h1-stock:town-returns",
+          "h1-stock:town-staff-rest",
+          "h1-stock:town-waste"
+        ],
+        "h1ExpressionRefs": [
+          "h1-expression:city:공동주택-생활마당",
+          "h1-expression:city:도심-마트-앞마당",
+          "h1-expression:city:먹거리-상점-골목",
+          "h1-expression:city:물류-station-진입부",
+          "h1-expression:city:상하차-dock",
+          "h1-expression:city:화물-대기-야드",
+          "h1-expression:farm:감자밭-두렁",
+          "h1-expression:farm:농산물-집하-직판장",
+          "h1-expression:farm:시설하우스-단동",
+          "h1-expression:farm:헛간-작업마당",
+          "h1-expression:farm:혼합-작물밭",
+          "h1-expression:nature:산길-바위-길목",
+          "h1-expression:nature:수변-완충지",
+          "h1-expression:nature:숲-가장자리",
+          "h1-expression:nature:숲-빈터-고사목",
+          "h1-expression:town:근린-놀이터",
+          "h1-expression:town:버스-정류장-보행-쉼터",
+          "h1-expression:town:생활-공공광장",
+          "h1-expression:town:읍내-상점-전면",
+          "h1-expression:town:정원-담장-경계"
+        ],
+        "h2Refs": [
+          "h2-candidate:farm-hub-corridor",
+          "h2-candidate:farm-processing-shipping",
+          "h2-candidate:farm-seed-and-tools",
+          "h2-candidate:farm-wash-sort-pack",
+          "h2-candidate:farm-worker-support",
+          "h2-candidate:forest-edge-farm",
+          "h2-candidate:highland-production",
+          "h2-candidate:hub-inbound-storage",
+          "h2-candidate:hub-longterm-cold-storage",
+          "h2-candidate:hub-outbound-vehicle",
+          "h2-candidate:hub-quarantine-staging",
+          "h2-candidate:hub-returns-processing",
+          "h2-candidate:hub-town-corridor",
+          "h2-candidate:lowrise-residential",
+          "h2-candidate:market-life-commerce",
+          "h2-candidate:town-returns-waste"
+        ],
+        "h3Refs": [
+          "h3-candidate:circular-market-town",
+          "h3-candidate:farm-hub-logistics",
+          "h3-candidate:farm-processing-campus",
+          "h3-candidate:highland-farm",
+          "h3-candidate:hub-town-logistics",
+          "h3-candidate:jinbu-hub",
+          "h3-candidate:lowrise-market-town",
+          "h3-candidate:resilient-logistics-hub"
+        ],
+        "h4Refs": [
+          "h4-blueprint:farm-hub-town-region"
+        ]
+      }
+    }
+  ],
+  "violations": {
+    "contextlessInteractionH1Refs": [],
+    "unlinkedExpressionH1Refs": [],
+    "quarantinedExpressionH1Refs": [
+      "h1-expression:farm:과수원-블록",
+      "h1-expression:farm:논-필지-농수로-표현",
+      "h1-expression:farm:시설하우스-병렬단지",
+      "h1-expression:nature:개울-회랑",
+      "h1-expression:nature:바위-절개지",
+      "h1-expression:nature:침엽수림-군집",
+      "h1-expression:nature:혼효림-군집",
+      "h1-expression:nature:활엽수림-군집",
+      "h1-expression:town:저층-주택-블록"
+    ],
+    "orphanH1Refs": [],
+    "orphanH2Refs": [],
+    "orphanH3Refs": []
+  },
+  "hExpansionQueue": [
+    {
+      "priorityCode": "H-P0",
+      "title": "맥락 누락과 필수 공간 누락 제거",
+      "goal": "고아 H를 격리하고 공간 필수 WI에 빠진 H1을 먼저 보완한다.",
+      "targetGamePlanCodes": [
+        "TownLivingMarketSafety"
+      ],
+      "targetWiIds": [
+        "WI-ORDER-04"
+      ]
+    },
+    {
+      "priorityCode": "H-P1",
+      "title": "Nature 상시 생활·위협·회복 폐루프",
+      "goal": "플레이어가 가장 오래 머무는 자연권의 탐색·위협·후퇴·복원 공간을 우선 완결한다.",
+      "targetGamePlanCodes": [
+        "NatureHomeThreatRecovery"
+      ]
+    },
+    {
+      "priorityCode": "H-P2",
+      "title": "Farm 생산·사건 대응·출하",
+      "goal": "재배에서 사건 격리와 출하까지 이어지는 생산 공간을 완결한다.",
+      "targetGamePlanCodes": [
+        "FarmProductionSurvival"
+      ]
+    },
+    {
+      "priorityCode": "H-P3",
+      "title": "Town 생활·시장 안전",
+      "goal": "입고·진열·주문·포장·수령과 오염 대응 공간을 완결한다.",
+      "targetGamePlanCodes": [
+        "TownLivingMarketSafety"
+      ]
+    },
+    {
+      "priorityCode": "H-P4",
+      "title": "City/Hub 물류 회복력",
+      "goal": "입고·검수·보관·피킹·출고와 품질 대응 공간을 완결한다.",
+      "targetGamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ]
+    }
+  ],
+  "wiEvidenceQueue": [
+    {
+      "priorityCode": "E-P1",
+      "title": "Farm 수확·출하 공간 실행",
+      "targetStageCode": "E5",
+      "wiIds": [
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-LOG-01",
+        "WI-LOG-02"
+      ]
+    },
+    {
+      "priorityCode": "E-P2",
+      "title": "Hub 입고·검수·보관 공간 실행",
+      "targetStageCode": "E5",
+      "wiIds": [
+        "WI-LOG-04",
+        "WI-LOG-05",
+        "WI-001",
+        "WI-002"
+      ]
+    },
+    {
+      "priorityCode": "E-P3",
+      "title": "Town 입고·주문·수령 공간 실행",
+      "targetStageCode": "E4",
+      "wiIds": [
+        "WI-MARKET-02",
+        "WI-MARKET-03",
+        "WI-MARKET-04",
+        "WI-MARKET-05",
+        "WI-ORDER-03",
+        "WI-ORDER-04",
+        "WI-ORDER-05",
+        "WI-ORDER-06"
+      ]
+    },
+    {
+      "priorityCode": "E-P4",
+      "title": "Nature 사건 행위 계약 보완",
+      "targetStageCode": "E1",
+      "anticipatedGameplayCodes": [
+        "RegionalThreatObservation",
+        "EmergencyRetreat",
+        "NatureRestoration",
+        "PartyRecovery"
+      ]
+    },
+    {
+      "priorityCode": "E-P5",
+      "title": "선정 WI 공공데이터 계보",
+      "targetStageCode": "E6",
+      "selectionPolicyCode": "OnlyAfterE5InstanceAndExplicitRequirement"
+    }
+  ],
+  "authorityBoundary": "H는 게임 기획에 속한 위치 독립 설계다. E5가 실제 배치, E6가 선정 WI의 공공데이터 계보다."
+}

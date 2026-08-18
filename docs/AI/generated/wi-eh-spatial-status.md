@@ -4,8 +4,8 @@
 
 - WI: `37개` · E3: `37개`
 - E4/H1 실행 성립: `13개`
-- H1~H4 설계 후보 계보만 존재: `17개`
-- 필수 공간 설계 누락: `1개`
+- H1~H4 설계 후보 계보만 존재: `18개`
+- 필수 공간 설계 누락: `0개`
 - 공간 비적용: `6개`
 - 공식 H 정의: `H1 5 / H2 0 / H3 5 / H4 1`
 
@@ -60,7 +60,7 @@
 | `WI-ORDER-01` 주문 확정 | `E3/E1` | `NotRequired` | `-` | `NotApplicable` | `P4` | `NotApplicable` |  |
 | `WI-ORDER-02` 주문 재고 예약 | `E3/E1` | `NotRequired` | `-` | `NotApplicable` | `P4` | `NotApplicable` |  |
 | `WI-ORDER-03` 주문 피킹 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
-| `WI-ORDER-04` 주문 포장 | `E3/E1` | `Required` | `-` | `MissingRequired` | `P4` | `BlockedMissingDesign` | RequiredSpatialDesignMissing |
+| `WI-ORDER-04` 주문 포장 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | `WI-ORDER-05` 수령 준비 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | `WI-ORDER-06` 주민 수령 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | `WI-ORDER-07` 주민 소비 | `E3/E1` | `Contextual` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
@@ -81,17 +81,16 @@
 ## P1 기준 플레이 공간 구성
 
 `WI-FARM-04 → WI-FARM-05 → WI-FARM-06 → WI-LOG-01`을 생산구획 → 집하 → 포장 → 상차 공간으로 연결한다.
-실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json`에 있으며 실제 도로·Block 경계가 없으므로 H2·E5로 승격하지 않는다.
+실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json`에 있다. H 설계 승인은 공공데이터와 독립이며, 실제 AreaSet의 작성 도로·Block 경계와 이동 폐루프가 아직 없어 E5로 승격하지 않는다. 필요한 공공데이터 목적은 E6 계획으로만 기록한다.
 
 ## P2 진부 Hub 입고·보관 공간 구성
 
 `WI-LOG-04 → WI-LOG-05 → WI-001 → WI-002`를 하차 공간 → 인수·검수 공간 → 창고 적재 공간으로 연결한다.
-실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json`에 있으며 진부 Hub의 실제 업무 Node와 H2 Block이 없으므로 후보 설계로 유지한다.
+실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json`에 있다. 진부 Hub의 실제 업무 Node와 E5 배치 Block이 없어 지역 인스턴스 후보로 유지하며, 필요한 공공데이터 목적은 E6 계획으로만 기록한다.
 
 ## 확인이 필요한 공백
 
 - `WI-FARM-01` 밭갈기: `E5PlacementReferenceWithoutH2Definition`
 - `WI-FARM-02` 파종: `E5PlacementReferenceWithoutH2Definition`
 - `WI-FARM-03` 관수·재배 관리: `E5PlacementReferenceWithoutH2Definition`
-- `WI-ORDER-04` 주문 포장: `RequiredSpatialDesignMissing`
 - `WI-WORLD-04` 시설 수리: `GraphBindingWithoutApprovedH1`

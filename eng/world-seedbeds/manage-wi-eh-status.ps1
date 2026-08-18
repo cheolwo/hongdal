@@ -261,11 +261,11 @@ $summary = [ordered]@{
 }
 Require ($summary.implementationE3Count -eq 37) "AllWorldInteractionsMustBeE3"
 Require ($summary.establishedH1Count -eq 13) "EstablishedH1CountMustBe13"
-Require ($summary.candidateLineageCount -eq 17) "CandidateLineageCountMustBe17"
-Require ($summary.missingRequiredCount -eq 1) "MissingRequiredCountMustBe1"
+Require ($summary.candidateLineageCount -eq 18) "CandidateLineageCountMustBe18"
+Require ($summary.missingRequiredCount -eq 0) "MissingRequiredCountMustBe0"
 Require ($summary.notApplicableCount -eq 6) "NotApplicableCountMustBe6"
 Require ($summary.officialH2DefinitionCount -eq 0) "OfficialH2MustRemainZero"
-Require (@($rows | Where-Object { $_.warningCodes -contains "RequiredSpatialDesignMissing" }).worldInteractionId -contains "WI-ORDER-04") "OrderPackingGapMustBeVisible"
+Require (@($rows | Where-Object { $_.warningCodes -contains "RequiredSpatialDesignMissing" }).Count -eq 0) "RequiredSpatialDesignGapMustBeClosed"
 Require (@($rows | Where-Object { $_.warningCodes -contains "GraphBindingWithoutApprovedH1" }).worldInteractionId -contains "WI-WORLD-04") "FacilityRepairBindingGapMustBeVisible"
 
 $payload = [ordered]@{
@@ -329,12 +329,12 @@ foreach ($group in @($rows | Group-Object groupCode)) {
 [void] $builder.AppendLine("## P1 기준 플레이 공간 구성")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("``WI-FARM-04 → WI-FARM-05 → WI-FARM-06 → WI-LOG-01``을 생산구획 → 집하 → 포장 → 상차 공간으로 연결한다.")
-[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json``에 있으며 실제 도로·Block 경계가 없으므로 H2·E5로 승격하지 않는다.")
+[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json``에 있다. H 설계 승인은 공공데이터와 독립이며, 실제 AreaSet의 작성 도로·Block 경계와 이동 폐루프가 아직 없어 E5로 승격하지 않는다. 필요한 공공데이터 목적은 E6 계획으로만 기록한다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## P2 진부 Hub 입고·보관 공간 구성")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("``WI-LOG-04 → WI-LOG-05 → WI-001 → WI-002``를 하차 공간 → 인수·검수 공간 → 창고 적재 공간으로 연결한다.")
-[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json``에 있으며 진부 Hub의 실제 업무 Node와 H2 Block이 없으므로 후보 설계로 유지한다.")
+[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json``에 있다. 진부 Hub의 실제 업무 Node와 E5 배치 Block이 없어 지역 인스턴스 후보로 유지하며, 필요한 공공데이터 목적은 E6 계획으로만 기록한다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 확인이 필요한 공백")
 [void] $builder.AppendLine()
