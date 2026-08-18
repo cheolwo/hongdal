@@ -627,6 +627,14 @@
       "documentSha256": "d4a7a2fa3c9cac093795eb29902bb58d81c6db52fdc7f30ec5a3ee5190694336"
     },
     {
+      "stableId": "h3-candidate:farm-incident-recovery",
+      "revision": 1,
+      "definitionPath": "definitions/h3/farm-incident-recovery.v2.json",
+      "definitionSha256": "c87119d2805bf0fea5cb843c04639b47887d731906f8206afe39fc4cabb6adca",
+      "documentPath": "authored/h3/farm-incident-recovery.v2.md",
+      "documentSha256": "a2824587603eaea7e6fa451508d092a7dd5e3124d7bc26321a67e7c9d1262416"
+    },
+    {
       "stableId": "h3-candidate:farm-processing-campus",
       "revision": 1,
       "definitionPath": "definitions/h3/farm-processing-campus.v2.json",

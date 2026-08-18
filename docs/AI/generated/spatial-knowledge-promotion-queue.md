@@ -76,12 +76,13 @@
 | 70 | `H2` | `h2-candidate:town-returns-waste` 생활권 반품·폐기물 블록 | 0/3 필수 H1 승인 참조 |
 | 71 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
 | 72 | `H3` | `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 73 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 74 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 75 | `H3` | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 76 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 77 | `H3` | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 78 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 79 | `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 80 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 81 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 73 | `H3` | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 74 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 75 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 76 | `H3` | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 77 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 78 | `H3` | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 79 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 80 | `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 81 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 82 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-area-set-composition-priorities.v1",
-  "revision": "simulation-world-area-set-composition-priorities.r1",
+  "revision": "simulation-world-area-set-composition-priorities.r2",
   "purpose": "Nature·Farm·Town·City/Hub를 하나의 AreaSet에 합치지 않고 각각 H1→H2→H3→AreaSet으로 상향 조립하는 순서를 관리한다.",
   "areaSetCandidates": [
     {
@@ -18,8 +18,8 @@
       "areaSetCandidateRef": "h4-blueprint:farm-production-processing-region",
       "title": "Farm 생산·생존 AreaSet",
       "primaryExpressionPackCode": "Farm",
-      "stateCode": "QueuedAfterNature",
-      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus"],
+      "stateCode": "ReadyForDesignComposition",
+      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus", "h3-candidate:farm-incident-recovery"],
       "optionalH3Refs": ["h3-candidate:farm-hub-logistics"],
       "playerWorldRoleCode": "ProfessionalWorld"
     },

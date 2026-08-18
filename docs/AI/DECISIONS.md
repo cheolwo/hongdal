@@ -1827,3 +1827,12 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 관계 분리: Nature↔Farm·Town·City/Hub는 플레이어 이동 관계다. Farm→City/Hub→Town은 Nature 생활권을 지름길로 쓰지 않는 별도 화물 관계다. 후보 연결은 실제 GraphRelation이 아니며 양쪽 AreaSet의 승인 Connector가 준비되기 전에는 이동 폐루프나 E5 증거로 승격하지 않는다.
 - 권위 경계: H4 후보는 실제 AreaSet이 아니다. 실제 지역 세계가 되려면 사람의 세계 의도, 지역 범위, DataRequirement, H3 LandscapeGraph와 GraphRelation 승인이 필요하며 누락 근거를 Scenario로 대체하지 않는다.
 - 관계: D-147의 AreaSet-first 공간 권위, D-155~D-156의 H1~H4 상향식 재고, D-162의 Nature 상시 생활권과 전문 경관 구조, D-165의 H2 조립 우선순위를 다중 AreaSet 구성으로 구체화함
+
+## D-167 Farm AreaSet 후보는 생산 흐름과 사건 격리·회복 흐름을 함께 포함한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-18
+- 결정: P2 Farm은 생산·후처리 경관만 가진 AreaSet 후보로 끝내지 않는다. 노출 점검·사건 격리·기상 보호를 묶은 H2와 손실 회복·자연권 복원 물자 인계를 묶은 H2를 Farm 사건 격리·회복 H3로 조립하고, 고지대 생산 H3·생산 후처리 H3와 함께 Farm 생산·생존 H4 후보의 필수 경관으로 둔다.
+- 인계: Farm의 `NatureRestorationOutput`은 Nature 복원·안전 회복 H2의 사건 입력 후보와 의미상 대응한다. 그러나 양쪽 실제 AreaSet의 승인된 외부 연결점과 GraphRelation이 없으면 자동 연결하거나 E5 이동 폐루프로 간주하지 않는다.
+- 공간 경계: H2 조립 좌표는 `LocalMeters` 상대 설계값이다. 실제 도로·Block 경계·AreaSet 범위·공공데이터 근거가 없으므로 공식 H2나 실제 Farm AreaSet으로 승격하지 않는다.
+- 관계: D-163의 Farm 사건→Nature 위협 인과, D-165의 P2 H2 우선순위, D-166의 팩별 독립 AreaSet 조립 원칙을 Farm 생산·생존 경관으로 구체화함

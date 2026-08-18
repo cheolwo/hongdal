@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-expansion.v2",
-  "revision": "simulation-world-spatial-design-knowledge-expansion.r6",
-  "summary": "기존 v1 재고에 추가할 예상 게임 플레이와 Nature 위협·회복, Farm·Town 사건 대응 기반 H1·H2·H3 상향식 설계 지식이며, 사건 대응 H1을 우선순위별 H2 연속 공간 블록과 Nature H3 경관으로 묶는다.",
+  "revision": "simulation-world-spatial-design-knowledge-expansion.r7",
+  "summary": "기존 v1 재고에 추가할 예상 게임 플레이와 Nature 위협·회복, Farm·Town 사건 대응 기반 H1·H2·H3 상향식 설계 지식이며, 사건 대응 H1을 우선순위별 H2 연속 공간 블록과 Nature·Farm H3 경관으로 묶는다.",
   "h1Additions": [
     {
       "inventoryId": "h1-stock:farm-seed-preparation",
@@ -586,6 +586,7 @@
     { "candidateId": "h3-candidate:resilient-logistics-hub", "title": "품질·보관 대응형 물류 Hub 경관", "summary": "입출고 외에 격리·장기·저온·반품 흐름을 독립적으로 운영할 수 있는 Hub 청사진이다.", "stateCode": "IdeaInventory", "topologyCode": "ModifiedGrid", "requiredH2Refs": ["h2-candidate:hub-inbound-storage", "h2-candidate:hub-quarantine-staging", "h2-candidate:hub-longterm-cold-storage", "h2-candidate:hub-outbound-vehicle"], "optionalH2Refs": ["h2-candidate:hub-returns-processing"], "connectorRoleCodes": ["HubInboundGate", "HubOutboundGate", "ReturnGate"] },
     { "candidateId": "h3-candidate:circular-market-town", "title": "반품·회수 순환형 시장 마을 경관", "summary": "판매·수령 이후 반품과 폐기물 회수까지 생활권 후방 동선에 포함하는 청사진이다.", "stateCode": "IdeaInventory", "topologyCode": "ModifiedGrid", "requiredH2Refs": ["h2-candidate:market-life-commerce", "h2-candidate:town-returns-waste"], "optionalH2Refs": ["h2-candidate:lowrise-residential"], "connectorRoleCodes": ["TownReceivingGate", "ReturnOutput", "TownLocalRoad"] },
     { "candidateId": "h3-candidate:nature-trail-network", "title": "자연 탐색길·대피망 경관", "summary": "생활권 또는 농장 가장자리에서 탐색 출발·전망·대피를 순환 경로로 조직하는 청사진이다.", "stateCode": "ExploratoryInventory", "topologyCode": "Organic", "requiredH2Refs": ["h2-candidate:nature-trail-shelter", "h2-candidate:nature-water-buffer"], "optionalH2Refs": ["h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["TownOrFarmAccess", "TrailLoop", "EmergencyExit"] },
-    { "candidateId": "h3-candidate:nature-threat-recovery", "title": "자연 생활·위협·회복 경관", "summary": "안전 생활권에서 위협을 감시·추적하고 긴급 후퇴와 복원을 거쳐 다시 탐색 가능한 상태로 돌아오는 자연권 핵심 경관이다.", "stateCode": "ExploratoryInventory", "topologyCode": "Organic", "requiredH2Refs": ["h2-candidate:nature-threat-response", "h2-candidate:nature-restoration-recovery"], "optionalH2Refs": ["h2-candidate:nature-trail-shelter", "h2-candidate:nature-water-buffer"], "connectorRoleCodes": ["SafeCoreAccess", "FarmIncidentInput", "TownReliefInput", "CityHubReturn", "RestoredTrailOutput"] }
+    { "candidateId": "h3-candidate:nature-threat-recovery", "title": "자연 생활·위협·회복 경관", "summary": "안전 생활권에서 위협을 감시·추적하고 긴급 후퇴와 복원을 거쳐 다시 탐색 가능한 상태로 돌아오는 자연권 핵심 경관이다.", "stateCode": "ExploratoryInventory", "topologyCode": "Organic", "requiredH2Refs": ["h2-candidate:nature-threat-response", "h2-candidate:nature-restoration-recovery"], "optionalH2Refs": ["h2-candidate:nature-trail-shelter", "h2-candidate:nature-water-buffer"], "connectorRoleCodes": ["SafeCoreAccess", "FarmIncidentInput", "TownReliefInput", "CityHubReturn", "RestoredTrailOutput"] },
+    { "candidateId": "h3-candidate:farm-incident-recovery", "title": "농장 사건 격리·회복 경관", "summary": "생산·수확 흐름에서 사건을 점검·격리하고 손실 회복과 자연권 복원 물자 인계까지 이어지는 Farm 생존 경관이다.", "stateCode": "ExploratoryInventory", "topologyCode": "ModifiedGrid", "requiredH2Refs": ["h2-candidate:farm-incident-containment", "h2-candidate:farm-loss-restoration-handoff"], "optionalH2Refs": ["h2-candidate:farm-processing-shipping", "h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["ProductionIncidentInput", "RecoveredProductionOutput", "NatureRestorationHandoff", "FarmExternalGate"] }
   ]
 }

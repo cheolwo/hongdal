@@ -23,7 +23,7 @@ H4 AreaSet 후보
 | 순서 | AreaSet 후보 | 주축 표현 | 현재 상태 |
 | --- | --- | --- | --- |
 | P1 | Nature 생활·탐험권 | Nature | H2→H3→H4 설계 계보 준비 |
-| P2 | Farm 생산·생존권 | Farm | Nature 이후 조립 대기 |
+| P2 | Farm 생산·생존권 | Farm | H2→H3→H4 설계 계보 준비 |
 | P3 | Town 생활·시장권 | Town | Farm 이후 조립 대기 |
 | P4 | City/Hub 물류권 | City | Town 이후 조립 대기 |
 
@@ -50,6 +50,28 @@ Nature 생활·탐험 H4 AreaSet 후보
 ```
 
 현재 결과는 위치 독립 설계 후보다. 실제 지역 좌표·공공데이터·LandscapeGraph·GraphRelation·Unity Scene을 갖지 않는다.
+
+## P2 Farm 상향 계보
+
+```text
+노출 점검·사건 격리·기상 보호 H1
+  ↓
+농장 사건 점검·격리 H2
+
+사건 격리·손실 회복·복원 물자 H1
+  ↓
+농장 손실 회복·복원 인계 H2
+
+두 H2
+  ↓
+농장 사건 격리·회복 H3
+
+H3 + 고지대 생산 H3 + 생산·후처리 H3
+  ↓
+Farm 생산·생존 H4 AreaSet 후보
+```
+
+복원 물자 출력은 Nature AreaSet의 복원 입력 후보와 의미상 대응하지만, 양쪽 실제 연결점이 승인되기 전에는 GraphRelation이 아니다.
 
 ## AreaSet 사이 관계
 

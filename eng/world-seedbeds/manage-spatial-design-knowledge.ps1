@@ -414,7 +414,7 @@ foreach ($level in @("h1", "h2", "h3")) {
 
 Require (@($definitionsByLevel.H1).Count -eq 51) "H1CountMustBe51"
 Require (@($definitionsByLevel.H2).Count -eq 24) "H2CountMustBe24"
-Require (@($definitionsByLevel.H3).Count -eq 11) "H3CountMustBe11"
+Require (@($definitionsByLevel.H3).Count -eq 12) "H3CountMustBe12"
 foreach ($h1 in @($definitionsByLevel.H1)) {
     foreach ($reference in @($h1.predecessorH1Refs + $h1.successorH1Refs)) { Require ($definitionsById.ContainsKey([string] $reference)) "H1RelationUnknown:$($h1.stableId):$reference" }
 }
@@ -474,7 +474,7 @@ function New-IndexDocument([hashtable] $ByLevel) {
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("- H1 작업공간 지식: ``51개``")
     [void] $builder.AppendLine("- H2 블록 조립법: ``24개``")
-    [void] $builder.AppendLine("- H3 지역 유형 청사진: ``11개``")
+    [void] $builder.AppendLine("- H3 지역 유형 청사진: ``12개``")
     foreach ($level in @("H1", "H2", "H3")) {
         [void] $builder.AppendLine()
         [void] $builder.AppendLine("## $level")
@@ -570,10 +570,10 @@ if ($Mode -eq "Check") {
         Require (Test-Path -LiteralPath $path) "GeneratedDocumentMissing:$($pair.Key)"
         Require ((ConvertTo-StableText ([IO.File]::ReadAllText($path))) -ceq $pair.Value) "GeneratedDocumentOutOfDate:$($pair.Key)"
     }
-    Write-Output "SpatialDesignKnowledgeValid:H1=51;H2=24;H3=11"
+    Write-Output "SpatialDesignKnowledgeValid:H1=51;H2=24;H3=12"
 }
 else {
     [void] (Write-TextIfChanged $catalogPath (ConvertTo-StableJson $catalog))
     foreach ($pair in $generated.GetEnumerator()) { [void] (Write-TextIfChanged (Resolve-RepositoryPath $repositoryRoot $pair.Key) $pair.Value) }
-    Write-Output "SpatialDesignKnowledgeGenerated:H1=51;H2=24;H3=11"
+    Write-Output "SpatialDesignKnowledgeGenerated:H1=51;H2=24;H3=12"
 }

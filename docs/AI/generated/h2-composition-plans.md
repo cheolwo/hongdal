@@ -1,6 +1,36 @@
-# P1 H2 조립안
+# P1~P2 H2 조립안
 
 이 문서는 H1을 상대 위치·관계·연결구로 조립한 위치 독립 H2 설계안이다. 실제 도로·경계·AreaSet·경관 그래프 권위가 아니다.
+
+## 농장 사건 점검·격리 블록
+
+- 후보: `h2-candidate:farm-incident-containment`
+- 위상: `ModifiedGrid`
+- 기준 크기: `240m × 180m`
+- 근거 상태: `WaitingForRoadBoundaryEvidence`
+
+| H1 노드 | 로컬 X/Z | 회전 |
+| --- | ---: | ---: |
+| `h1-stock:farm-exposure-inspection` | -66 / 8 | 0° |
+| `h1-stock:farm-incident-quarantine` | 12 / 34 | 20° |
+| `h1-stock:farm-weather-protection` | 48 / -46 | 180° |
+
+연결구: `HarvestInput`, `SafeCargoOutput`, `RecoveryOutput`
+
+## 농장 손실 회복·복원 인계 블록
+
+- 후보: `h2-candidate:farm-loss-restoration-handoff`
+- 위상: `Linear`
+- 기준 크기: `260m × 180m`
+- 근거 상태: `WaitingForRoadBoundaryEvidence`
+
+| H1 노드 | 로컬 X/Z | 회전 |
+| --- | ---: | ---: |
+| `h1-stock:farm-incident-quarantine` | -78 / 24 | 10° |
+| `h1-stock:farm-loss-recovery` | -4 / 0 | 0° |
+| `h1-stock:farm-restoration-supply` | 82 / -24 | 345° |
+
+연결구: `IncidentInput`, `RecoveredCargoOutput`, `NatureRestorationOutput`
 
 ## 자연 복원·안전 회복 블록
 

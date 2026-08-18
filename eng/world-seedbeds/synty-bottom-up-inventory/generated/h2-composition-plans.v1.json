@@ -1,9 +1,186 @@
 {
   "schemaVersion": "simulation-world-h2-composition-plans.v1",
   "revision": "simulation-world-h2-composition-plans.r1",
-  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r1",
-  "generatedPlanCount": 2,
+  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r2",
+  "generatedPlanCount": 4,
   "plans": [
+    {
+      "planId": "h2-plan:farm-incident-containment",
+      "targetKnowledgeRef": "h2-candidate:farm-incident-containment",
+      "title": "농장 사건 점검·격리 블록",
+      "priorityCode": "P2",
+      "topologyCode": "ModifiedGrid",
+      "coordinateSpaceCode": "LocalMeters",
+      "referenceSizeMeters": {
+        "width": 240,
+        "depth": 180
+      },
+      "nodes": [
+        {
+          "localNodeId": "exposure-inspection",
+          "h1Ref": "h1-stock:farm-exposure-inspection",
+          "localX": -66,
+          "localZ": 8,
+          "rotationDegrees": 0,
+          "required": true
+        },
+        {
+          "localNodeId": "incident-quarantine",
+          "h1Ref": "h1-stock:farm-incident-quarantine",
+          "localX": 12,
+          "localZ": 34,
+          "rotationDegrees": 20,
+          "required": true
+        },
+        {
+          "localNodeId": "weather-protection",
+          "h1Ref": "h1-stock:farm-weather-protection",
+          "localX": 48,
+          "localZ": -46,
+          "rotationDegrees": 180,
+          "required": true
+        }
+      ],
+      "edges": [
+        {
+          "localEdgeId": "inspection-to-quarantine",
+          "fromNodeId": "exposure-inspection",
+          "toNodeId": "incident-quarantine",
+          "relationCode": "IncidentIsolationRoute",
+          "bidirectional": true
+        },
+        {
+          "localEdgeId": "quarantine-to-weather-protection",
+          "fromNodeId": "incident-quarantine",
+          "toNodeId": "weather-protection",
+          "relationCode": "ProtectedRecoveryRoute",
+          "bidirectional": true
+        }
+      ],
+      "externalConnectors": [
+        {
+          "connectorId": "harvest-input",
+          "roleCode": "HarvestInput",
+          "attachedNodeId": "exposure-inspection",
+          "localX": -112,
+          "localZ": 4,
+          "facingDegrees": 180
+        },
+        {
+          "connectorId": "safe-cargo-output",
+          "roleCode": "SafeCargoOutput",
+          "attachedNodeId": "incident-quarantine",
+          "localX": 82,
+          "localZ": 68,
+          "facingDegrees": 25
+        },
+        {
+          "connectorId": "recovery-output",
+          "roleCode": "RecoveryOutput",
+          "attachedNodeId": "weather-protection",
+          "localX": 104,
+          "localZ": -72,
+          "facingDegrees": 330
+        }
+      ],
+      "requiredEvidencePurposeCodes": [
+        "RoadNetwork",
+        "BuildingFootprint",
+        "BlockBoundary",
+        "WeatherContext"
+      ],
+      "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
+      "authorityStateCode": "DesignCandidateOnly",
+      "derivationInputHashSha256": "6bb4298f7da70b61a8f584912375de9fd0e97a17e4ef4146441e7eeac7ca3492"
+    },
+    {
+      "planId": "h2-plan:farm-loss-restoration-handoff",
+      "targetKnowledgeRef": "h2-candidate:farm-loss-restoration-handoff",
+      "title": "농장 손실 회복·복원 인계 블록",
+      "priorityCode": "P2",
+      "topologyCode": "Linear",
+      "coordinateSpaceCode": "LocalMeters",
+      "referenceSizeMeters": {
+        "width": 260,
+        "depth": 180
+      },
+      "nodes": [
+        {
+          "localNodeId": "incident-quarantine",
+          "h1Ref": "h1-stock:farm-incident-quarantine",
+          "localX": -78,
+          "localZ": 24,
+          "rotationDegrees": 10,
+          "required": true
+        },
+        {
+          "localNodeId": "loss-recovery",
+          "h1Ref": "h1-stock:farm-loss-recovery",
+          "localX": -4,
+          "localZ": 0,
+          "rotationDegrees": 0,
+          "required": true
+        },
+        {
+          "localNodeId": "restoration-supply",
+          "h1Ref": "h1-stock:farm-restoration-supply",
+          "localX": 82,
+          "localZ": -24,
+          "rotationDegrees": 345,
+          "required": true
+        }
+      ],
+      "edges": [
+        {
+          "localEdgeId": "quarantine-to-loss-recovery",
+          "fromNodeId": "incident-quarantine",
+          "toNodeId": "loss-recovery",
+          "relationCode": "LossRecoveryRoute",
+          "bidirectional": true
+        },
+        {
+          "localEdgeId": "loss-recovery-to-restoration-supply",
+          "fromNodeId": "loss-recovery",
+          "toNodeId": "restoration-supply",
+          "relationCode": "NatureRestorationHandoffRoute",
+          "bidirectional": true
+        }
+      ],
+      "externalConnectors": [
+        {
+          "connectorId": "incident-input",
+          "roleCode": "IncidentInput",
+          "attachedNodeId": "incident-quarantine",
+          "localX": -122,
+          "localZ": 38,
+          "facingDegrees": 170
+        },
+        {
+          "connectorId": "recovered-cargo-output",
+          "roleCode": "RecoveredCargoOutput",
+          "attachedNodeId": "loss-recovery",
+          "localX": 8,
+          "localZ": 78,
+          "facingDegrees": 70
+        },
+        {
+          "connectorId": "nature-restoration-output",
+          "roleCode": "NatureRestorationOutput",
+          "attachedNodeId": "restoration-supply",
+          "localX": 124,
+          "localZ": -38,
+          "facingDegrees": 350
+        }
+      ],
+      "requiredEvidencePurposeCodes": [
+        "RoadNetwork",
+        "BlockBoundary",
+        "NatureTransition"
+      ],
+      "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
+      "authorityStateCode": "DesignCandidateOnly",
+      "derivationInputHashSha256": "9a0cae32b9acb991f8e7e5cd68cff9e7277468145187b55d993bc056389d1014"
+    },
     {
       "planId": "h2-plan:nature-restoration-recovery",
       "targetKnowledgeRef": "h2-candidate:nature-restoration-recovery",
@@ -76,7 +253,7 @@
       ],
       "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "2a395e6ab3a0b8e02239145676fd72d31b366b8c3711acf95172b2ec2f1ccb1e"
+      "derivationInputHashSha256": "43ee6c583fde318f6511ef5ed24b240a712e35b9af55f26cde3eb8326f12d6d3"
     },
     {
       "planId": "h2-plan:nature-threat-response",
@@ -165,7 +342,7 @@
       ],
       "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "a632d71e5ee3b7a9eda4b022dfd665abe8438d77c16f880c44d28107a7871ae0"
+      "derivationInputHashSha256": "94f30d786cc5c7bfa38c6678c705439428872311cd2a6567754568884ea4b268"
     }
   ],
   "authorityBoundary": "위치 독립 H2 설계 조립안이며 실제 도로·경계·AreaSet·LandscapeGraph 권위를 갖지 않는다.",

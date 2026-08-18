@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-h2-composition-recipes.v1",
-  "revision": "simulation-world-h2-composition-recipes.r1",
+  "revision": "simulation-world-h2-composition-recipes.r2",
   "coordinateSpaceCode": "LocalMeters",
   "authorityBoundary": "위치 독립 H2 설계 조립안이며 실제 도로·경계·AreaSet·LandscapeGraph 권위를 갖지 않는다.",
   "recipes": [
@@ -40,6 +40,46 @@
         { "connectorId": "incident-route-input", "roleCode": "IncidentRouteInput", "attachedNodeId": "restoration-site", "localX": -104, "localZ": 46, "facingDegrees": 170 },
         { "connectorId": "safe-core-output", "roleCode": "SafeCoreOutput", "attachedNodeId": "safe-recovery-camp", "localX": 104, "localZ": -62, "facingDegrees": 325 },
         { "connectorId": "restored-route-output", "roleCode": "RestoredRouteOutput", "attachedNodeId": "restoration-site", "localX": 8, "localZ": 86, "facingDegrees": 20 }
+      ]
+    },
+    {
+      "recipeId": "h2-composition:farm-incident-containment.r1",
+      "targetKnowledgeRef": "h2-candidate:farm-incident-containment",
+      "priorityCode": "P2",
+      "referenceSizeMeters": { "width": 240, "depth": 180 },
+      "nodes": [
+        { "localNodeId": "exposure-inspection", "h1Ref": "h1-stock:farm-exposure-inspection", "localX": -66, "localZ": 8, "rotationDegrees": 0, "required": true },
+        { "localNodeId": "incident-quarantine", "h1Ref": "h1-stock:farm-incident-quarantine", "localX": 12, "localZ": 34, "rotationDegrees": 20, "required": true },
+        { "localNodeId": "weather-protection", "h1Ref": "h1-stock:farm-weather-protection", "localX": 48, "localZ": -46, "rotationDegrees": 180, "required": true }
+      ],
+      "edges": [
+        { "localEdgeId": "inspection-to-quarantine", "fromNodeId": "exposure-inspection", "toNodeId": "incident-quarantine", "relationCode": "IncidentIsolationRoute", "bidirectional": true },
+        { "localEdgeId": "quarantine-to-weather-protection", "fromNodeId": "incident-quarantine", "toNodeId": "weather-protection", "relationCode": "ProtectedRecoveryRoute", "bidirectional": true }
+      ],
+      "externalConnectors": [
+        { "connectorId": "harvest-input", "roleCode": "HarvestInput", "attachedNodeId": "exposure-inspection", "localX": -112, "localZ": 4, "facingDegrees": 180 },
+        { "connectorId": "safe-cargo-output", "roleCode": "SafeCargoOutput", "attachedNodeId": "incident-quarantine", "localX": 82, "localZ": 68, "facingDegrees": 25 },
+        { "connectorId": "recovery-output", "roleCode": "RecoveryOutput", "attachedNodeId": "weather-protection", "localX": 104, "localZ": -72, "facingDegrees": 330 }
+      ]
+    },
+    {
+      "recipeId": "h2-composition:farm-loss-restoration-handoff.r1",
+      "targetKnowledgeRef": "h2-candidate:farm-loss-restoration-handoff",
+      "priorityCode": "P2",
+      "referenceSizeMeters": { "width": 260, "depth": 180 },
+      "nodes": [
+        { "localNodeId": "incident-quarantine", "h1Ref": "h1-stock:farm-incident-quarantine", "localX": -78, "localZ": 24, "rotationDegrees": 10, "required": true },
+        { "localNodeId": "loss-recovery", "h1Ref": "h1-stock:farm-loss-recovery", "localX": -4, "localZ": 0, "rotationDegrees": 0, "required": true },
+        { "localNodeId": "restoration-supply", "h1Ref": "h1-stock:farm-restoration-supply", "localX": 82, "localZ": -24, "rotationDegrees": 345, "required": true }
+      ],
+      "edges": [
+        { "localEdgeId": "quarantine-to-loss-recovery", "fromNodeId": "incident-quarantine", "toNodeId": "loss-recovery", "relationCode": "LossRecoveryRoute", "bidirectional": true },
+        { "localEdgeId": "loss-recovery-to-restoration-supply", "fromNodeId": "loss-recovery", "toNodeId": "restoration-supply", "relationCode": "NatureRestorationHandoffRoute", "bidirectional": true }
+      ],
+      "externalConnectors": [
+        { "connectorId": "incident-input", "roleCode": "IncidentInput", "attachedNodeId": "incident-quarantine", "localX": -122, "localZ": 38, "facingDegrees": 170 },
+        { "connectorId": "recovered-cargo-output", "roleCode": "RecoveredCargoOutput", "attachedNodeId": "loss-recovery", "localX": 8, "localZ": 78, "facingDegrees": 70 },
+        { "connectorId": "nature-restoration-output", "roleCode": "NatureRestorationOutput", "attachedNodeId": "restoration-supply", "localX": 124, "localZ": -38, "facingDegrees": 350 }
       ]
     }
   ],

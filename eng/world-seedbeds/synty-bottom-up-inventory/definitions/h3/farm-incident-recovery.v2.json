@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:farm-incident-recovery",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "농장 사건 격리·회복 경관",
+  "summary": "생산·수확 흐름에서 사건을 점검·격리하고 손실 회복과 자연권 복원 물자 인계까지 이어지는 Farm 생존 경관이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:farm-incident-containment",
+    "h2-candidate:farm-loss-restoration-handoff"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:farm-processing-shipping",
+    "h2-candidate:forest-edge-farm"
+  ],
+  "connectorRoleCodes": [
+    "ProductionIncidentInput",
+    "RecoveredProductionOutput",
+    "NatureRestorationHandoff",
+    "FarmExternalGate"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/farm-incident-recovery.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:farm-incident-recovery"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

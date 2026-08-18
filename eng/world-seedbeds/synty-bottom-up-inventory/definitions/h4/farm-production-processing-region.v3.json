@@ -5,24 +5,29 @@
   "hierarchyLevelCode": "H4",
   "cardKindCode": "RegionalBlueprint",
   "title": "농업 생산·후처리권",
-  "summary": "고지대 생산과 농산물 후처리를 결합하는 위치 독립 지역 청사진이다.",
+  "summary": "고지대 생산과 농산물 후처리, 사건 격리·회복을 결합하는 위치 독립 Farm AreaSet 청사진이다.",
   "knowledgeStateCode": "ExploratoryInventory",
   "originModeCode": "ExpressionExploration",
   "requiredH3Refs": [
     "h3-candidate:highland-farm",
-    "h3-candidate:farm-processing-campus"
+    "h3-candidate:farm-processing-campus",
+    "h3-candidate:farm-incident-recovery"
   ],
   "optionalH3Refs": [],
   "childKnowledgeRefs": [
+    "h3-candidate:farm-incident-recovery",
     "h3-candidate:farm-processing-campus",
     "h3-candidate:highland-farm"
   ],
   "worldThemeCodes": [
     "FarmProduction",
-    "FarmProcessing"
+    "FarmProcessing",
+    "FarmSurvival"
   ],
   "graphRelationRoleCodes": [
-    "ProductionToProcessing"
+    "ProductionToProcessing",
+    "IncidentToRecovery",
+    "RecoveryToNature"
   ],
   "requiredEvidencePurposeCodes": [
     "TerrainElevation",
@@ -50,7 +55,7 @@
     "transition:Nature–Farm 전환"
   ],
   "derivationRecipeCode": "h4.farm-production-processing-region.r1",
-  "derivationInputHashSha256": "68213144e097a013e4ec5cb2afd57a13adf6fd94cb2b7bed69efc60e24a06a5a",
+  "derivationInputHashSha256": "2f0a42ce78ca49bf459436904c94d361f51ecd987b11a48d94dc68cf12b7e9ab",
   "authoredDocument": "authored/h4/farm-production-processing-region.v3.md",
   "unresolvedItems": [
     "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."

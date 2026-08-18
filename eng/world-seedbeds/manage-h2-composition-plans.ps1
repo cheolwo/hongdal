@@ -46,7 +46,7 @@ $recipes = Read-Json $recipePath
 
 Require ([string] $recipes.coordinateSpaceCode -eq "LocalMeters") "H2CompositionCoordinateSpaceMustBeLocalMeters"
 Require (-not ([string] $recipes.authorityBoundary -match "실제.*권위.*갖는다")) "H2CompositionAuthorityBoundaryInvalid"
-Require (@($recipes.recipes).Count -eq 2) "H2CompositionP1RecipeCountMustBe2"
+Require (@($recipes.recipes).Count -eq 4) "H2CompositionP1P2RecipeCountMustBe4"
 
 $h1ById = @{}
 foreach ($reference in @($catalog.h1DefinitionRefs)) { $h1ById[[string] $reference.stableId] = $reference }
@@ -63,8 +63,8 @@ foreach ($recipe in @($recipes.recipes | Sort-Object targetKnowledgeRef)) {
     $targetId = [string] $recipe.targetKnowledgeRef
     Require ($h2ById.ContainsKey($targetId)) "H2CompositionTargetUnknown:$targetId"
     Require ($priorityByCandidate.ContainsKey($targetId)) "H2CompositionPriorityUnknown:$targetId"
-    Require ([string] $recipe.priorityCode -eq "P1") "H2CompositionOnlyP1MayBeBuilt:$targetId"
-    Require ([string] $priorityByCandidate[$targetId].priorityCode -eq "P1") "H2CompositionPriorityMismatch:$targetId"
+    Require (@("P1", "P2") -contains [string] $recipe.priorityCode) "H2CompositionPriorityNotEnabled:$targetId"
+    Require ([string] $priorityByCandidate[$targetId].priorityCode -eq [string] $recipe.priorityCode) "H2CompositionPriorityMismatch:$targetId"
 
     $target = $h2ById[$targetId]
     $requiredH1 = @($target.requiredH1Refs | Sort-Object -Unique)
@@ -128,7 +128,7 @@ $output = [pscustomobject][ordered]@{
 $outputJson = ConvertTo-StableJson $output
 
 $builder = [Text.StringBuilder]::new()
-[void] $builder.AppendLine("# P1 H2 조립안")
+[void] $builder.AppendLine("# P1~P2 H2 조립안")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("이 문서는 H1을 상대 위치·관계·연결구로 조립한 위치 독립 H2 설계안이다. 실제 도로·경계·AreaSet·경관 그래프 권위가 아니다.")
 foreach ($plan in $plans) {
@@ -151,12 +151,12 @@ $document = $builder.ToString().TrimEnd() + "`n"
 if ($Mode -eq "Write") {
     Write-TextIfChanged $outputPath $outputJson
     Write-TextIfChanged $documentPath $document
-    Write-Output "H2CompositionPlansGenerated:P1=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
+    Write-Output "H2CompositionPlansGenerated:P1=2;P2=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
 }
 else {
     Require (Test-Path -LiteralPath $outputPath) "H2CompositionOutputMissing"
     Require (Test-Path -LiteralPath $documentPath) "H2CompositionDocumentMissing"
     Require ((Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8) -ceq ($outputJson.TrimEnd() + "`n")) "H2CompositionOutputOutOfDate"
     Require ((Get-Content -LiteralPath $documentPath -Raw -Encoding UTF8) -ceq $document) "H2CompositionDocumentOutOfDate"
-    Write-Output "H2CompositionPlansValid:P1=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
+    Write-Output "H2CompositionPlansValid:P1=2;P2=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
 }

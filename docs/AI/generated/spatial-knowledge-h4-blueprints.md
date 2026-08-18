@@ -12,7 +12,7 @@
 ## 농업 생산·후처리권
 
 - 후보: `h4-blueprint:farm-production-processing-region`
-- 필수 H3: h3-candidate:highland-farm, h3-candidate:farm-processing-campus
+- 필수 H3: h3-candidate:highland-farm, h3-candidate:farm-processing-campus, h3-candidate:farm-incident-recovery
 - 선택 H3: 없음
 - 현실 자료 목적: TerrainElevation, LandCoverClassification, AgriculturalComposition, RoadNetwork
 

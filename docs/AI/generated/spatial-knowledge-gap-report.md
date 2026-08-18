@@ -73,6 +73,7 @@
 | `H2` | `h2-candidate:hub-returns-processing` Hub 반품 처리 블록 | `IdeaInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:town-returns-waste` 생활권 반품·폐기물 블록 | `IdeaInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H3` | `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
+| `H3` | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
 | `H3` | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |

@@ -195,7 +195,7 @@ foreach ($level in @("H1", "H2", "H3")) {
 }
 Require (@($definitionRefsByLevel.H1).Count -eq 51) "InteractionH1CountMustBe51"
 Require (@($definitionRefsByLevel.H2).Count -eq 24) "H2CountMustBe24"
-Require (@($definitionRefsByLevel.H3).Count -eq 11) "H3CountMustBe11"
+Require (@($definitionRefsByLevel.H3).Count -eq 12) "H3CountMustBe12"
 
 $packPolicy = $recipes.h1ExpressionPolicy
 $packFamilies = @($packPolicy.sourceFamilyCodes)
@@ -342,8 +342,8 @@ foreach ($recipe in $h2Recipes | Sort-Object targetKnowledgeRef) {
 $h3Bindings = @()
 $h3BindingById = @{}
 $h3Recipes = @($recipes.h3Derivations)
-Require ($h3Recipes.Count -eq 11) "H3RecipeCountMustBe11"
-Require (@($h3Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 11) "H3RecipeTargetDuplicate"
+Require ($h3Recipes.Count -eq 12) "H3RecipeCountMustBe12"
+Require (@($h3Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 12) "H3RecipeTargetDuplicate"
 foreach ($recipe in $h3Recipes | Sort-Object targetKnowledgeRef) {
     $targetId = [string] $recipe.targetKnowledgeRef
     Require ($definitionsById.ContainsKey($targetId)) "H3RecipeTargetUnknown:$targetId"
@@ -620,8 +620,8 @@ Require ($expressionFileCount -eq 32) "ExpressionDefinitionFileCount:$expression
 Require ($h4FileCount -eq 6) "H4DefinitionFileCount:$h4FileCount"
 
 if ($Mode -eq "Check") {
-    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=24;H3=11;H4=6"
+    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=24;H3=12;H4=6"
 }
 else {
-    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=24;H3=11;H4=6"
+    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=24;H3=12;H4=6"
 }

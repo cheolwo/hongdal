@@ -4,7 +4,7 @@
 
 - H1 작업공간 지식: `51개`
 - H2 블록 조립법: `24개`
-- H3 지역 유형 청사진: `11개`
+- H3 지역 유형 청사진: `12개`
 
 ## H1
 
@@ -96,6 +96,7 @@
 | 상태 | 고유 식별자 | 이름 | 검색 단서 |
 | --- | --- | --- | --- |
 | `ExploratoryInventory` | `h3-candidate:farm-hub-logistics` | 농장–물류 거점 연결 경관 | h2-candidate:farm-hub-corridor, FarmGate, HubInboundGate |
+| `ExploratoryInventory` | `h3-candidate:farm-incident-recovery` | 농장 사건 격리·회복 경관 | h2-candidate:farm-incident-containment, h2-candidate:farm-loss-restoration-handoff, ProductionIncidentInput, RecoveredProductionOutput, NatureRestorationHandoff, FarmExternalGate |
 | `ExploratoryInventory` | `h3-candidate:highland-farm` | 고지대 농장 경관 | h2-candidate:highland-production, h2-candidate:farm-processing-shipping, h2-candidate:forest-edge-farm, FarmExternalGate |
 | `ExploratoryInventory` | `h3-candidate:hub-town-logistics` | Hub–Town 연결 경관 | h2-candidate:hub-town-corridor, HubOutboundGate, TownReceivingGate |
 | `ExploratoryInventory` | `h3-candidate:jinbu-hub` | 진부형 물류 Hub 경관 | h2-candidate:hub-inbound-storage, h2-candidate:hub-outbound-vehicle, HubInboundGate, HubOutboundGate |

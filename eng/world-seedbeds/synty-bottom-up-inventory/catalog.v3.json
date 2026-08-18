@@ -4,12 +4,12 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "b41aa25b4fcc923036f95917aa1876032848cb8e274e8af719936c19d0c64171",
+  "previousCatalogSha256": "774bf11fad3393a31ce29ce6227131380d8933f446b2eee3b33c2d85fe5cefc2",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
-  "derivationRecipeSha256": "4dd3414448f63938228a3933a0b0d1605c99e24c49c35486f0f77f1c3b8bf20b",
+  "derivationRecipeSha256": "03cddeb1895a846dcbafefc067a97e75962f7e194d1de180f9c27f9e99d129cb",
   "h1InteractionDefinitionRefs": [
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -1722,6 +1722,14 @@
       "documentSha256": "d4a7a2fa3c9cac093795eb29902bb58d81c6db52fdc7f30ec5a3ee5190694336"
     },
     {
+      "stableId": "h3-candidate:farm-incident-recovery",
+      "revision": 1,
+      "definitionPath": "definitions/h3/farm-incident-recovery.v2.json",
+      "definitionSha256": "c87119d2805bf0fea5cb843c04639b47887d731906f8206afe39fc4cabb6adca",
+      "documentPath": "authored/h3/farm-incident-recovery.v2.md",
+      "documentSha256": "a2824587603eaea7e6fa451508d092a7dd5e3124d7bc26321a67e7c9d1262416"
+    },
+    {
       "stableId": "h3-candidate:farm-processing-campus",
       "revision": 1,
       "definitionPath": "definitions/h3/farm-processing-campus.v2.json",
@@ -1809,9 +1817,9 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-production-processing-region.v3.json",
-      "definitionSha256": "067dc9e0b0575ac8e020e1a434bb558196bdebd8d57fdde55be1d0e66c80d6ba",
+      "definitionSha256": "a5a67f958ccdbb2d3f413df76ea8e2fb5947aad523a9327b7d5503a5b1a1f635",
       "documentPath": "authored/h4/farm-production-processing-region.v3.md",
-      "documentSha256": "62008fcd51e408c225ebfa2c79a5db317b8cf1fecd6ad2ae0c3ab17b5600f49e"
+      "documentSha256": "25620b6aa01f913654f6a047bb21550fe3e9aaf8cbc32e8deebf9da76587527c"
     },
     {
       "stableId": "h4-blueprint:logistics-hub-region",
@@ -2376,6 +2384,33 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h3-candidate:farm-incident-recovery",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.farm-incident-recovery.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:farm-incident-containment",
+        "h2-candidate:farm-loss-restoration-handoff",
+        "h2-candidate:farm-processing-shipping",
+        "h2-candidate:forest-edge-farm"
+      ],
+      "sourceGrammarRefs": [
+        "farm:감자밭 두렁",
+        "farm:농산물 집하·직판장",
+        "farm:시설하우스 단동",
+        "farm:헛간 작업마당",
+        "farm:혼합 작물밭",
+        "nature:산길·바위 길목",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "network:농촌도로 곡선",
+        "network:농촌도로 직선",
+        "transition:Farm–Hub 전환",
+        "transition:Nature–Farm 전환"
+      ],
+      "derivationInputHashSha256": "182ababb811c871c89845b07e4dc2a11b51ef6dd75553676650e523ce1cfc477",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h3-candidate:farm-processing-campus",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.farm-processing-campus.r1",
@@ -2610,5 +2645,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "b9ae5c1cd6887eb5c97db7a1b0f723ce94859f0acd59e0eca4632e75694577b6"
+  "contentHashSha256": "14de46eb8d7ff6111415dd30ba0abd0d1302cf1ebc9d99fc8a28cbb28e178181"
 }

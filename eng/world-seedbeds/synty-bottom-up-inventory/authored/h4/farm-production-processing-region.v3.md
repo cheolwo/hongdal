@@ -7,17 +7,19 @@
 @derivation-recipe h4.farm-production-processing-region.r1
 @required-h3 h3-candidate:highland-farm
 @required-h3 h3-candidate:farm-processing-campus
+@required-h3 h3-candidate:farm-incident-recovery
 @evidence-purpose TerrainElevation
 @evidence-purpose LandCoverClassification
 @evidence-purpose AgriculturalComposition
 @evidence-purpose RoadNetwork
 
-고지대 생산과 농산물 후처리를 결합하는 위치 독립 지역 청사진이다.
+고지대 생산과 농산물 후처리, 사건 격리·회복을 결합하는 위치 독립 Farm AreaSet 청사진이다.
 
 ## 세계 주제
 
 - `FarmProduction`
 - `FarmProcessing`
+- `FarmSurvival`
 
 ## 권위 경계
 

@@ -5,7 +5,7 @@
     "worldInteractionCatalogRevision": "simulation-world-interactions.r3",
     "spatialPriorityRevision": "simulation-world-interaction-spatial-priorities.r1",
     "designKnowledgeRevision": "simulation-world-spatial-design-knowledge.r3",
-    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r4",
+    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r5",
     "compositionPlanStableId": "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
     "compositionPlanRevision": 1,
     "p2CompositionPlanStableId": "wi-spatial-composition-plan:p2-hub-inbound-storage.v1",
@@ -51,6 +51,7 @@
         "h2-candidate:highland-production"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
@@ -108,6 +109,7 @@
         "h2-candidate:highland-production"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
@@ -161,6 +163,7 @@
         "h2-candidate:highland-production"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
@@ -220,6 +223,7 @@
         "h2-candidate:highland-production"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
@@ -274,6 +278,7 @@
         "h2-candidate:farm-wash-sort-pack"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm"
       ],
@@ -321,6 +326,7 @@
         "h2-candidate:farm-wash-sort-pack"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm"
       ],
@@ -633,6 +639,7 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:farm-hub-logistics",
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm"
       ],
@@ -679,6 +686,7 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:farm-hub-logistics",
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm"
       ],
@@ -1395,6 +1403,7 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:hub-town-logistics",
@@ -1465,6 +1474,7 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:lowrise-market-town",
@@ -1547,6 +1557,7 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
+        "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
@@ -1600,5 +1611,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "df1cfe52b21598c907635cce182f5ca9cc6e67d926673048211b3077ffc165f7"
+  "contentHashSha256": "718e0ef072d14232c174eeb810711ce93427f4db3d20841484af74779f09a4dd"
 }
