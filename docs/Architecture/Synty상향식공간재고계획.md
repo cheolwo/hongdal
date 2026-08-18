@@ -6,19 +6,33 @@
 
 상향식 재고는 `내가 가진 표현 재료로 어떤 공간 가능성을 만들 수 있는가`를 탐색한다. 실제 지역 세계의 권위는 계속 AreaSet·LandscapeGraph·공공데이터 근거에 있다.
 
+## 게임 기획이 재고 범위를 통제한다
+
+H를 먼저 축적하되 Synty 자산이나 보기 좋은 공간 조합만으로 카드를 늘리지 않는다. 모든 상호작용 H1은 기존 WI 또는 명시된 예상 플레이에 연결되고, H2~H4는 `Nature 생활·위협·회복`, `Farm 생산·생존`, `Town 생활·시장 안전`, `City/Hub 물류 회복력` 가운데 하나의 게임 기획 묶음에 속해야 한다. 여러 세계를 잇는 Farm–Hub–Town 청사진은 독립 재고 확장축이 아니라 네 묶음을 연결하는 교차 세계 조정안으로만 사용한다.
+
+입고 조건은 다음과 같다.
+
+1. H1은 플레이어가 수행하거나 관찰할 행위, 공간 역할과 앞뒤 연결을 설명한다.
+2. 팩 표현 H1은 연결 가능한 상호작용 H1이 있어야 탐색 재고가 된다. 연결이 없으면 `IdeaInventory`로 격리한다.
+3. H2는 여러 H1이 만드는 반복 가능한 플레이 흐름, H3는 여러 H2가 만드는 사건·이동 경관, H4는 그 경험을 묶는 지역 세계 의도를 가져야 한다.
+4. 게임 기획이나 WI 계보가 끊긴 카드는 자동 삭제하지 않고 아이디어 재고로 강등한다. 공식 H 승격과 E 단계 입력에는 사용하지 않는다.
+5. H가 공간을 제안한 뒤 WI별 E 부족분을 계산한다. H 정의 안에 E6 공공데이터를 넣지 않는다.
+
+기계 기준과 최신 감사·우선순위는 [`gameplay-led-h-policy.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/gameplay-led-h-policy.v1.json)과 [게임 기획 주도 H 공간 재고](../AI/generated/gameplay-led-h-inventory.md)를 따른다.
+
 ## 두 종류의 재고
 
 - **승인 재고**: E3 세계 상호작용을 품고 시험 공간에서 다시 검증된 공식 H1 WI 공간 모판이다.
-- **탐색 재고**: Synty 조합에서 발견한 H1 검토 후보, H2 블록 후보, H3 조립 후보다. 검토와 현실 근거 없이 공식 공간으로 자동 승격하지 않는다.
+- **탐색 재고**: Synty 조합에서 발견한 H1 검토 후보, H2 블록 후보, H3 조립 후보다. 공간 역할·관계·연결구 설계 검토 없이 공식 H 정의로 자동 승격하지 않는다.
 
 현재 설계 지식 재고는 다음과 같다.
 
 | 분류 | 수량 | 의미 |
 | --- | ---: | --- |
-| H1 행동 공간 카드 | 51 | 승인 참조 5개와 Nature 위협·회복 5개, Farm 사건 대응 5개, Town 사건 대응 5개를 포함한 WI·능력 중심 장소 지식 |
+| H1 행동 공간 카드 | 52 | 승인 참조 5개와 Nature 위협·회복 5개, Farm 사건 대응 5개, Town 사건 대응 및 주문 포장 공간을 포함한 WI·능력 중심 장소 지식 |
 | H1 팩 단독 표현 카드 | 32 | Nature 12·Farm 8·Town 6·City 6 의미군과 A/B/C 변형 |
 | H2 블록 조립법 | 24 | H1을 위상과 연결구로 묶는 재사용 레시피. 이 가운데 사건 대응 H1에서 유도한 Nature 2·Farm 2·Town 2개를 P1~P3 우선순위로 관리한다. |
-| H3 경관 청사진 | 12 | Farm·Hub·Town·회랑·Nature 경관 유형. Nature 생활·위협·회복과 Farm 사건 격리·회복 경관을 포함한다. |
+| H3 경관 청사진 | 13 | Farm·Hub·Town·회랑·Nature 경관 유형. Nature 생활·위협·회복, Farm 사건 격리·회복, Town 오염 통제·구호 경관을 포함한다. |
 | H4 지역 청사진 후보 | 6 | 실제 AreaSet이 아닌 위치 독립 세계 구성 후보. Nature 생활·탐험권을 포함한다. |
 
 초기 `catalog.v1.json`과 항목별 `catalog.v2.json`은 호환 입력으로 보존한다. 현재 `catalog.v3.json`은 기존 StableId를 유지하면서 행동 공간 H1과 팩 단독 표현 H1을 구분하고, 검토된 조립법의 문법→H1→H2→H3→H4 계보와 파일 SHA-256을 봉인한다. 팩 단독 H1과 H4 후보는 각각 `definitions/h1-expression/`, `definitions/h4/`와 대응 Markdown으로 결정적으로 생성한다.
@@ -42,6 +56,9 @@ pwsh -NoProfile -File eng/world-seedbeds/manage-spatial-design-knowledge.ps1 -Mo
 pwsh -NoProfile -File eng/world-seedbeds/manage-spatial-design-knowledge-v3.ps1 -Mode Check
 pwsh -NoProfile -File eng/world-seedbeds/manage-spatial-design-knowledge-v3.ps1 -Mode Write
 
+# 게임 기획 소속·고아 재고·H/E 우선순위 검증
+pwsh -NoProfile -File eng/world-seedbeds/manage-gameplay-led-h-inventory.ps1 -Mode Check
+
 # 수확·집하·포장 WI에 맞는 Farm/Nature 조합 후보 조회
 pwsh -NoProfile -File eng/world-seedbeds/query-spatial-design-knowledge.ps1 `
   -WiIds WI-FARM-04,WI-FARM-05,WI-FARM-06 `
@@ -58,7 +75,7 @@ pwsh -NoProfile -File eng/world-seedbeds/query-spatial-design-knowledge.ps1 `
 4. 여러 H1을 `Grid`, `ModifiedGrid`, `Linear`, `ContourAdaptive`, `Organic` 위상으로 묶어 H2 후보를 만든다.
 5. 여러 H2 후보와 외부 연결 역할을 조합해 H3 청사진을 만든다.
 6. 여러 H3와 세계 주제를 묶어 실제 지역 권위가 없는 H4 청사진 후보를 만든다.
-7. 실제 AreaSet에 적용할 때만 도로·경계·지형·수계 근거로 H2 경계를 파생하고 H3 Node·Edge·Connector와 H4 GraphRelation을 조립한다.
+7. 승인 H 설계를 실제 AreaSet에 적용하는 E5에서 지역 인스턴스의 도로·경계와 H3 Node·Edge·Connector, H4 GraphRelation을 조립한다. 공공데이터 계보는 E6에서만 결속한다.
 
 ## H1에서 H2로 올리는 현재 우선순위
 
@@ -73,9 +90,9 @@ pwsh -NoProfile -File eng/world-seedbeds/query-spatial-design-knowledge.ps1 `
 | P3 | 생활권 오염 점검·정화 블록 | 오염 점검 → 격리 → 정화 폐기 인계 |
 | P3 | 생활권 회수 안내·자연권 구호 블록 | 주민 회수 안내 → 생활 서비스 → 자연권 구호 인계 |
 
-P1은 플레이어가 상시 머무는 Nature의 위협·대피·회복 폐루프를 먼저 닫는다. P2와 P3는 Farm·Town 전문 경관에서 생긴 사건 결과를 P1의 자연권 회복 공간으로 인계한다. 이 순서는 설계 재고 제작 순서이며, 실제 도로·경계·승인 H1 배치와 Graph 근거가 없는 후보를 공식 H2로 승격하는 권한은 아니다.
+P1은 플레이어가 상시 머무는 Nature의 위협·대피·회복 폐루프를 먼저 닫는다. P2와 P3는 Farm·Town 전문 경관에서 생긴 사건 결과를 P1의 자연권 회복 공간으로 인계한다. 이 순서는 위치 독립 설계 재고 제작 순서다. 공식 H2 승격은 필수 H1, 내부 관계, 연결구, 위상과 크기 범위의 설계 검토로 판단하고 실제 지역 배치는 E5에서 별도로 판단한다.
 
-P1 두 후보는 [`h2-composition-recipes.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-recipes.v1.json)의 로컬 H1 배치·내부 관계·외부 연결구로 구현한다. 결정적 생성 결과는 [P1 H2 조립안](../AI/generated/h2-composition-plans.md)에서 확인한다. 좌표계 `LocalMeters`는 재사용 조립안 내부의 상대 위치일 뿐 실제 지역 좌표가 아니며, 결과 상태 `DesignCandidateOnly / WaitingForRoadBoundaryEvidence`는 공식 H2와 E5 승격을 명시적으로 차단한다.
+P1~P3 여섯 후보는 [`h2-composition-recipes.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-recipes.v1.json)의 로컬 H1 배치·내부 관계·외부 연결구로 구현한다. 결정적 생성 결과는 [P1~P3 H2 조립안](../AI/generated/h2-composition-plans.md)에서 확인한다. 좌표계 `LocalMeters`는 재사용 조립안 내부의 상대 위치일 뿐 실제 지역 좌표가 아니며, 결과 상태 `DesignCandidateOnly / ReadyForPlanningReview`는 H2 설계 검토 대기 상태다. 실제 AreaSet 배치와 E5 증거를 뜻하지 않는다.
 
 ## 팩의 기본 역할
 
@@ -87,12 +104,16 @@ P1 두 후보는 [`h2-composition-recipes.v1.json`](../../eng/world-seedbeds/syn
 
 ## 승격 관문
 
-H1 검토 후보는 공간 역할·능력·업무 용량·내부 관계·외부 연결구와 E3 WI 재실행 증거가 있어야 공식 H1이 된다.
+H 계층은 위치 독립 공간 설계의 조립 깊이만 나타낸다. 공공데이터 목적·출처·좌표계·원본·파생 hash는 H1~H4 정의에 넣지 않고 E6에서 선택한 WI와 E5 경관 인스턴스에만 연결한다.
 
-H2 후보는 실제 도로와 경계가 만든 결정적 면, 필요한 공공데이터 목적, 승인된 H1 인스턴스 배치가 있어야 공식 H2가 된다.
+H1 검토 후보는 공간 역할·능력·업무 용량·내부 관계·외부 연결구와 E3 WI 재실행 증거로 설계 승인한다.
 
-H3 후보는 공식 AreaSet이 소유하는 실제 H2·Network·Node·Edge·Connector와 GraphRelation이 닫혀야 공식 LandscapeGraph로 승격할 수 있다.
+H2 후보는 필수 H1, 상대 위치, 위상, 내부 관계, 크기 변형과 외부 연결구가 결정적으로 닫히면 설계 승인한다.
 
-H4 후보는 사람의 AreaSet 세계 의도, 실제 지역 범위, DataRequirement와 GraphRelation 승인을 거쳐야 공식 AreaSet으로 승격할 수 있다. H4 후보를 실제 AreaSet으로 자동 대체하거나 Scenario로 묵시적 대체하지 않는다.
+H3 후보는 필수 H2, Node·Edge·Connector 역할과 경관 내부 흐름이 닫히면 설계 승인한다.
+
+H4 후보는 사람의 세계 의도, 필수 H3, 지역 내부 관계와 외부 연결 역할이 닫히면 설계 승인한다.
+
+승인 H 설계를 특정 AreaSet에 배치하고 이동 경로를 닫는 작업은 E5다. 그 인스턴스에 필요한 공공데이터를 선별해 계보를 연결하는 작업은 E6다. H4 설계 후보를 실제 AreaSet이나 E6 완료 상태로 자동 대체하지 않는다.
 
 Prefab 이름, GUID, Material, Scene 경로, GameObject 이름은 어느 승격 관문에서도 공간 StableId나 Simulation 권위가 될 수 없다.
