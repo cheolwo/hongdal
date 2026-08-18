@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-restoration-supply",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농장 자연권 복구 자재 인계 공간",
+  "summary": "Farm 사건을 해결한 뒤 자연권 정화·복구에 필요한 자재와 회수물을 Nature 경계로 인계하는 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "RestorationSupplyHandoff",
+    "RecoveredMaterialTransfer",
+    "NatureRouteSupport"
+  ],
+  "spatialRoleCodes": [
+    "FarmRestorationSupplyHandoffArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.LoadingWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-incident-quarantine",
+    "h1-stock:farm-loss-recovery"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-restoration-site",
+    "h1-stock:nature-farm-edge"
+  ],
+  "connectorRoleCodes": [
+    "FarmRecoveryInput",
+    "NatureRestorationOutput",
+    "ReturnMaterialInput"
+  ],
+  "sourcePackCodes": [
+    "Farm",
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "farm:농산물 집하·직판장",
+    "nature:숲 가장자리"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-restoration-supply.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-restoration-supply"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

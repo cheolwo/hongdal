@@ -56,7 +56,11 @@
     "maximumColliderCount": 5
   },
   "supportsInteractionH1Refs": [
+    "h1-stock:farm-exposure-inspection",
     "h1-stock:farm-harvest-staging",
+    "h1-stock:farm-incident-quarantine",
+    "h1-stock:farm-loss-recovery",
+    "h1-stock:farm-restoration-supply",
     "h1-stock:farm-sorting",
     "h1-stock:farm-work-yard"
   ],

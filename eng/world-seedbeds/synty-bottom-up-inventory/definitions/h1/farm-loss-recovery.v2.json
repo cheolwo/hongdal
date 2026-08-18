@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-loss-recovery",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농장 손실 복구·재작업 공간",
+  "summary": "사건 처리 뒤 회수 가능한 수확물을 재선별·재포장하고 손실량을 분리하는 복구 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "CropLossAssessment",
+    "ProduceRework",
+    "RecoveryPacking"
+  ],
+  "spatialRoleCodes": [
+    "FarmLossRecoveryWorkArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.SortingWorkArea",
+    "Spatial.PackingWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-incident-quarantine"
+  ],
+  "successorH1Refs": [
+    "h1-stock:farm-work-yard",
+    "h1-stock:farm-restoration-supply"
+  ],
+  "connectorRoleCodes": [
+    "QuarantineInput",
+    "RecoveredCargoOutput",
+    "LossOutput"
+  ],
+  "sourcePackCodes": [
+    "Farm"
+  ],
+  "grammarSetRefs": [
+    "farm:농산물 집하·직판장",
+    "farm:헛간 작업마당"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-loss-recovery.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-loss-recovery"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

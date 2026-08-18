@@ -4,13 +4,22 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "86955fd8ee34e1231968bc077a21d2c97b133773384681cc6aa3d84009c985c8",
+  "previousCatalogSha256": "7bcd1b9832f27ee198b10d695117a9f7fa26f9941ed4d1764a4107f755f218c2",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
   "derivationRecipeSha256": "574e3aca44e7b603374f4466caf0df3e9317737d6ccd65fa6b58643e87f17b7b",
   "h1InteractionDefinitionRefs": [
+    {
+      "stableId": "h1-stock:farm-exposure-inspection",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-exposure-inspection.v2.json",
+      "definitionSha256": "2cf0b0218d620cff85b26210978e908d45fbd0e125fd3b92c260518773bf1030",
+      "documentPath": "authored/h1/farm-exposure-inspection.v2.md",
+      "documentSha256": "f7a3933609007633e9028c105b92e9a6e0008774969810cae8f8b7393024bc3a"
+    },
     {
       "stableId": "h1-stock:farm-harvest-staging",
       "revision": 1,
@@ -30,6 +39,15 @@
       "documentSha256": "84e7721bd6ed6d1984942af97e4e87f8dbfac33a9dd12654b6a2993bbe30b2ca"
     },
     {
+      "stableId": "h1-stock:farm-incident-quarantine",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-incident-quarantine.v2.json",
+      "definitionSha256": "a9bfd52f8e2be6f86669eb9d6d459d141fb69760af110afa18404bbdf5537cc9",
+      "documentPath": "authored/h1/farm-incident-quarantine.v2.md",
+      "documentSha256": "bf45984be2a6e0e135eb2a3d7fa9f8cd0e7a49ea97d8e149e42b1f45695de2f0"
+    },
+    {
       "stableId": "h1-stock:farm-loading-gate",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
@@ -37,6 +55,15 @@
       "definitionSha256": "ae8261c84c6b3250c3bcc625ca6a05b5321667ddeb321eae0a150cbb07ed93e6",
       "documentPath": "authored/h1/farm-loading-gate.v2.md",
       "documentSha256": "dee81b8e110a2820b580e304538a358ea0d5868bab2a3cdd1381da6d72f39a0f"
+    },
+    {
+      "stableId": "h1-stock:farm-loss-recovery",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-loss-recovery.v2.json",
+      "definitionSha256": "f31de8bf3b97f39cf03d9572486788f72a2319853393d7b6aa4bcce87c00c8b5",
+      "documentPath": "authored/h1/farm-loss-recovery.v2.md",
+      "documentSha256": "60f01d001f1d6b609297bf1cfded9c66dadc7415bd4c0eaf1f69ec7e8f1f7391"
     },
     {
       "stableId": "h1-stock:farm-maintenance-yard",
@@ -55,6 +82,15 @@
       "definitionSha256": "e02d835f921f717ab72fdaac5f5a67c83cceeffdf3df555f25d6db0a150b84d5",
       "documentPath": "authored/h1/farm-production.v2.md",
       "documentSha256": "9091acdffbf875cca841a5c557f1351d726a738e46ea31aa4705ca634ff9ef8a"
+    },
+    {
+      "stableId": "h1-stock:farm-restoration-supply",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-restoration-supply.v2.json",
+      "definitionSha256": "10802fd5b582def7e11b36a401b532eb2850329585a3d0a54734c12590973c1e",
+      "documentPath": "authored/h1/farm-restoration-supply.v2.md",
+      "documentSha256": "2ad956237c1b18e072d268c459bf6b8702ae2b6af45e0a1aeb4db9bf5a67a350"
     },
     {
       "stableId": "h1-stock:farm-seed-preparation",
@@ -91,6 +127,15 @@
       "definitionSha256": "379d94985339cdb98427bf6bd32f5144dfba6069283794c84fc3303c4a230486",
       "documentPath": "authored/h1/farm-washing.v2.md",
       "documentSha256": "2240e6dcf4d6b724d0e629041947b2c8dbe9eaa79977807235704b0d4bd47028"
+    },
+    {
+      "stableId": "h1-stock:farm-weather-protection",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-weather-protection.v2.json",
+      "definitionSha256": "041184a5e6ab24608bd1a703437a3f84774c9ff35b9dedaf9f29bfe47dfe47be",
+      "documentPath": "authored/h1/farm-weather-protection.v2.md",
+      "documentSha256": "77e4dd54a507d024f45680779abcc8ba5a7607c61bd402c43bb9cd7874e4541a"
     },
     {
       "stableId": "h1-stock:farm-work-yard",
@@ -468,18 +513,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/농산물-집하-직판장.v3.json",
-      "definitionSha256": "f48f00ff7723b97c95de795918ae8142645200b48d632f2c460b3ba14d20ac22",
+      "definitionSha256": "b1afb1f8a2f387c0aebe69b5b40eef6f51c081b8a9ad087a2bd3ada5a1072868",
       "documentPath": "authored/h1-expression/farm/농산물-집하-직판장.v3.md",
-      "documentSha256": "89fc19f72a41d46b237a4016904d5d549abb7b014ff821d746d9348797036f7b"
+      "documentSha256": "c72ac7ee3f05c5f158bad828bf9948ec5002682759f0b8572258f2337c9eda2a"
     },
     {
       "stableId": "h1-expression:farm:시설하우스-단동",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/시설하우스-단동.v3.json",
-      "definitionSha256": "2f920370be88ba14f338b33fe8b8d077e0b0484c6756d3b069efc7a687fda2c1",
+      "definitionSha256": "7bf3646f876ceeada53c28c7c96408b6c0d7974625bfa7ad74329ba723164431",
       "documentPath": "authored/h1-expression/farm/시설하우스-단동.v3.md",
-      "documentSha256": "3299f02c33c67ba496db4b492b848025dc2e3c80330530dd4b40791d0478e019"
+      "documentSha256": "a7f740dd5f545b50d80b5df42075e843571214a42b7d1ebb3be0529fe5d03f4b"
     },
     {
       "stableId": "h1-expression:farm:시설하우스-병렬단지",
@@ -495,9 +540,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/헛간-작업마당.v3.json",
-      "definitionSha256": "7fcb6cdc3d87a563ffd1583103846c1e093e2d140351a5dd163f6d5fd930996a",
+      "definitionSha256": "d5b5f50a9dbd2267ec868ebe463c3b0aa1e302fd8091be7df169d3f45efa7311",
       "documentPath": "authored/h1-expression/farm/헛간-작업마당.v3.md",
-      "documentSha256": "ef241ea43734b9bca3c8ba84d420837236d8729093a814a7b8a504df70602fc8"
+      "documentSha256": "d959536178e93b281175ce25ca1ab73620b9716e949f062d39b71c70a9c229ed"
     },
     {
       "stableId": "h1-expression:farm:혼합-작물밭",
@@ -567,9 +612,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/숲-가장자리.v3.json",
-      "definitionSha256": "a06453332c0deee42f8b95a92274519383187eda489e480283a381ce41e5b8ba",
+      "definitionSha256": "08d43b1c88f99b36940e3d3f7cdcbf894d6247ffa47f6b669dae15ad45ec4cf3",
       "documentPath": "authored/h1-expression/nature/숲-가장자리.v3.md",
-      "documentSha256": "fca0862cca670152bec49ddba0f7ecfe43c041a3bf72e539aab16f0015b57dff"
+      "documentSha256": "ab67b7dfeee2acc4dc0b07e486e6e478206653af7bb5af4f6d5cecbf2efeed05"
     },
     {
       "stableId": "h1-expression:nature:숲-빈터-고사목",
@@ -758,18 +803,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/농산물-집하-직판장.v3.json",
-      "definitionSha256": "f48f00ff7723b97c95de795918ae8142645200b48d632f2c460b3ba14d20ac22",
+      "definitionSha256": "b1afb1f8a2f387c0aebe69b5b40eef6f51c081b8a9ad087a2bd3ada5a1072868",
       "documentPath": "authored/h1-expression/farm/농산물-집하-직판장.v3.md",
-      "documentSha256": "89fc19f72a41d46b237a4016904d5d549abb7b014ff821d746d9348797036f7b"
+      "documentSha256": "c72ac7ee3f05c5f158bad828bf9948ec5002682759f0b8572258f2337c9eda2a"
     },
     {
       "stableId": "h1-expression:farm:시설하우스-단동",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/시설하우스-단동.v3.json",
-      "definitionSha256": "2f920370be88ba14f338b33fe8b8d077e0b0484c6756d3b069efc7a687fda2c1",
+      "definitionSha256": "7bf3646f876ceeada53c28c7c96408b6c0d7974625bfa7ad74329ba723164431",
       "documentPath": "authored/h1-expression/farm/시설하우스-단동.v3.md",
-      "documentSha256": "3299f02c33c67ba496db4b492b848025dc2e3c80330530dd4b40791d0478e019"
+      "documentSha256": "a7f740dd5f545b50d80b5df42075e843571214a42b7d1ebb3be0529fe5d03f4b"
     },
     {
       "stableId": "h1-expression:farm:시설하우스-병렬단지",
@@ -785,9 +830,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/헛간-작업마당.v3.json",
-      "definitionSha256": "7fcb6cdc3d87a563ffd1583103846c1e093e2d140351a5dd163f6d5fd930996a",
+      "definitionSha256": "d5b5f50a9dbd2267ec868ebe463c3b0aa1e302fd8091be7df169d3f45efa7311",
       "documentPath": "authored/h1-expression/farm/헛간-작업마당.v3.md",
-      "documentSha256": "ef241ea43734b9bca3c8ba84d420837236d8729093a814a7b8a504df70602fc8"
+      "documentSha256": "d959536178e93b281175ce25ca1ab73620b9716e949f062d39b71c70a9c229ed"
     },
     {
       "stableId": "h1-expression:farm:혼합-작물밭",
@@ -857,9 +902,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/숲-가장자리.v3.json",
-      "definitionSha256": "a06453332c0deee42f8b95a92274519383187eda489e480283a381ce41e5b8ba",
+      "definitionSha256": "08d43b1c88f99b36940e3d3f7cdcbf894d6247ffa47f6b669dae15ad45ec4cf3",
       "documentPath": "authored/h1-expression/nature/숲-가장자리.v3.md",
-      "documentSha256": "fca0862cca670152bec49ddba0f7ecfe43c041a3bf72e539aab16f0015b57dff"
+      "documentSha256": "ab67b7dfeee2acc4dc0b07e486e6e478206653af7bb5af4f6d5cecbf2efeed05"
     },
     {
       "stableId": "h1-expression:nature:숲-빈터-고사목",
@@ -961,6 +1006,15 @@
       "documentSha256": "8fff1e2a216f2e189f9db67ac0e7813198c6ebdb98d8a442e86bbf8f0dab655e"
     },
     {
+      "stableId": "h1-stock:farm-exposure-inspection",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-exposure-inspection.v2.json",
+      "definitionSha256": "2cf0b0218d620cff85b26210978e908d45fbd0e125fd3b92c260518773bf1030",
+      "documentPath": "authored/h1/farm-exposure-inspection.v2.md",
+      "documentSha256": "f7a3933609007633e9028c105b92e9a6e0008774969810cae8f8b7393024bc3a"
+    },
+    {
       "stableId": "h1-stock:farm-harvest-staging",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -979,6 +1033,15 @@
       "documentSha256": "84e7721bd6ed6d1984942af97e4e87f8dbfac33a9dd12654b6a2993bbe30b2ca"
     },
     {
+      "stableId": "h1-stock:farm-incident-quarantine",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-incident-quarantine.v2.json",
+      "definitionSha256": "a9bfd52f8e2be6f86669eb9d6d459d141fb69760af110afa18404bbdf5537cc9",
+      "documentPath": "authored/h1/farm-incident-quarantine.v2.md",
+      "documentSha256": "bf45984be2a6e0e135eb2a3d7fa9f8cd0e7a49ea97d8e149e42b1f45695de2f0"
+    },
+    {
       "stableId": "h1-stock:farm-loading-gate",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
@@ -986,6 +1049,15 @@
       "definitionSha256": "ae8261c84c6b3250c3bcc625ca6a05b5321667ddeb321eae0a150cbb07ed93e6",
       "documentPath": "authored/h1/farm-loading-gate.v2.md",
       "documentSha256": "dee81b8e110a2820b580e304538a358ea0d5868bab2a3cdd1381da6d72f39a0f"
+    },
+    {
+      "stableId": "h1-stock:farm-loss-recovery",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-loss-recovery.v2.json",
+      "definitionSha256": "f31de8bf3b97f39cf03d9572486788f72a2319853393d7b6aa4bcce87c00c8b5",
+      "documentPath": "authored/h1/farm-loss-recovery.v2.md",
+      "documentSha256": "60f01d001f1d6b609297bf1cfded9c66dadc7415bd4c0eaf1f69ec7e8f1f7391"
     },
     {
       "stableId": "h1-stock:farm-maintenance-yard",
@@ -1004,6 +1076,15 @@
       "definitionSha256": "e02d835f921f717ab72fdaac5f5a67c83cceeffdf3df555f25d6db0a150b84d5",
       "documentPath": "authored/h1/farm-production.v2.md",
       "documentSha256": "9091acdffbf875cca841a5c557f1351d726a738e46ea31aa4705ca634ff9ef8a"
+    },
+    {
+      "stableId": "h1-stock:farm-restoration-supply",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-restoration-supply.v2.json",
+      "definitionSha256": "10802fd5b582def7e11b36a401b532eb2850329585a3d0a54734c12590973c1e",
+      "documentPath": "authored/h1/farm-restoration-supply.v2.md",
+      "documentSha256": "2ad956237c1b18e072d268c459bf6b8702ae2b6af45e0a1aeb4db9bf5a67a350"
     },
     {
       "stableId": "h1-stock:farm-seed-preparation",
@@ -1040,6 +1121,15 @@
       "definitionSha256": "379d94985339cdb98427bf6bd32f5144dfba6069283794c84fc3303c4a230486",
       "documentPath": "authored/h1/farm-washing.v2.md",
       "documentSha256": "2240e6dcf4d6b724d0e629041947b2c8dbe9eaa79977807235704b0d4bd47028"
+    },
+    {
+      "stableId": "h1-stock:farm-weather-protection",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/farm-weather-protection.v2.json",
+      "definitionSha256": "041184a5e6ab24608bd1a703437a3f84774c9ff35b9dedaf9f29bfe47dfe47be",
+      "documentPath": "authored/h1/farm-weather-protection.v2.md",
+      "documentSha256": "77e4dd54a507d024f45680779abcc8ba5a7607c61bd402c43bb9cd7874e4541a"
     },
     {
       "stableId": "h1-stock:farm-work-yard",
@@ -2203,9 +2293,9 @@
   "counts": {
     "grammarMeaningGroups": 52,
     "grammarVariants": 156,
-    "h1Interaction": 41,
+    "h1Interaction": 46,
     "h1Expression": 32,
-    "h1Total": 73,
+    "h1Total": 78,
     "h2": 18,
     "h3": 10,
     "h4Blueprint": 5
@@ -2213,5 +2303,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "fca028923030b548a2b8bc8117b808f7e5e5de8dfd92463cbfc85a505828a95b"
+  "contentHashSha256": "434102ff3fc6ee6e990ee74e229f638ca4c98521ba216fbc1dbda121cc559b6c"
 }

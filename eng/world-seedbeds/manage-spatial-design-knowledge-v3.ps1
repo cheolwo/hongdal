@@ -193,7 +193,7 @@ foreach ($level in @("H1", "H2", "H3")) {
         $definitionRefsByLevel[$level] += $reference
     }
 }
-Require (@($definitionRefsByLevel.H1).Count -eq 41) "InteractionH1CountMustBe41"
+Require (@($definitionRefsByLevel.H1).Count -eq 46) "InteractionH1CountMustBe46"
 Require (@($definitionRefsByLevel.H2).Count -eq 18) "H2CountMustBe18"
 Require (@($definitionRefsByLevel.H3).Count -eq 10) "H3CountMustBe10"
 
@@ -487,9 +487,9 @@ $catalogPayload = [pscustomobject][ordered]@{
     counts = [pscustomobject][ordered]@{
         grammarMeaningGroups = 52
         grammarVariants = 156
-        h1Interaction = 41
+        h1Interaction = 46
         h1Expression = 32
-        h1Total = 73
+        h1Total = 78
         h2 = 18
         h3 = 10
         h4Blueprint = 5
@@ -620,8 +620,8 @@ Require ($expressionFileCount -eq 32) "ExpressionDefinitionFileCount:$expression
 Require ($h4FileCount -eq 5) "H4DefinitionFileCount:$h4FileCount"
 
 if ($Mode -eq "Check") {
-    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=73(41+32);H2=18;H3=10;H4=5"
+    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=78(46+32);H2=18;H3=10;H4=5"
 }
 else {
-    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=73(41+32);H2=18;H3=10;H4=5"
+    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=78(46+32);H2=18;H3=10;H4=5"
 }

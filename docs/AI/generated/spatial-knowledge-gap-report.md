@@ -2,10 +2,13 @@
 
 | 계층 | 지식 | 현재 상태 | 다음 보완 |
 | --- | --- | --- | --- |
+| `H1` | `h1-stock:farm-exposure-inspection` 농장 수확물 노출 점검 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-harvest-staging` 수확물 임시 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-maintenance-yard` 농장 시설 정비 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:farm-restoration-supply` 농장 자연권 복구 자재 인계 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-seed-preparation` 종자 준비 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-tool-storage` 농기구 보관 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-long-term-storage` Hub 장기 보관 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-market-transfer` Hub–시장 화물 인계 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:hub-outbound-staging` Hub 피킹·출고 준비 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
@@ -25,6 +28,8 @@
 | `H1` | `h1-stock:town-market-receiving` 마트 후방 입고 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-resident-pickup` 주민 수령 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:farm-loss-recovery` 농장 손실 복구·재작업 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-sorting` 농산물 선별 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-washing` 농산물 세척 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-worker-waiting` 농장 작업자 대기 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |

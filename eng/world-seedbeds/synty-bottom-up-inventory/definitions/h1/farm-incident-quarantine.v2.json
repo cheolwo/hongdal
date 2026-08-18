@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-incident-quarantine",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농장 사고 수확물 격리 공간",
+  "summary": "노출·오염이 의심되는 수확물을 정상 집하·포장 화물과 분리해 해결 선택을 기다리는 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "FarmCargoQuarantine",
+    "IncidentHold",
+    "ReleaseOrDiscard"
+  ],
+  "spatialRoleCodes": [
+    "FarmIncidentQuarantineArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.ExclusiveOccupancy",
+    "Spatial.TemporaryStorage"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-exposure-inspection"
+  ],
+  "successorH1Refs": [
+    "h1-stock:farm-loss-recovery",
+    "h1-stock:farm-restoration-supply"
+  ],
+  "connectorRoleCodes": [
+    "InspectionHoldInput",
+    "RecoveryOutput",
+    "DisposalOutput"
+  ],
+  "sourcePackCodes": [
+    "Farm"
+  ],
+  "grammarSetRefs": [
+    "farm:헛간 작업마당",
+    "farm:농산물 집하·직판장"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-incident-quarantine.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-incident-quarantine"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

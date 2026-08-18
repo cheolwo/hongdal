@@ -7,6 +7,14 @@
   "expansionSourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json",
   "h1DefinitionRefs": [
     {
+      "stableId": "h1-stock:farm-exposure-inspection",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-exposure-inspection.v2.json",
+      "definitionSha256": "2cf0b0218d620cff85b26210978e908d45fbd0e125fd3b92c260518773bf1030",
+      "documentPath": "authored/h1/farm-exposure-inspection.v2.md",
+      "documentSha256": "f7a3933609007633e9028c105b92e9a6e0008774969810cae8f8b7393024bc3a"
+    },
+    {
       "stableId": "h1-stock:farm-harvest-staging",
       "revision": 1,
       "definitionPath": "definitions/h1/farm-harvest-staging.v2.json",
@@ -23,12 +31,28 @@
       "documentSha256": "84e7721bd6ed6d1984942af97e4e87f8dbfac33a9dd12654b6a2993bbe30b2ca"
     },
     {
+      "stableId": "h1-stock:farm-incident-quarantine",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-incident-quarantine.v2.json",
+      "definitionSha256": "a9bfd52f8e2be6f86669eb9d6d459d141fb69760af110afa18404bbdf5537cc9",
+      "documentPath": "authored/h1/farm-incident-quarantine.v2.md",
+      "documentSha256": "bf45984be2a6e0e135eb2a3d7fa9f8cd0e7a49ea97d8e149e42b1f45695de2f0"
+    },
+    {
       "stableId": "h1-stock:farm-loading-gate",
       "revision": 2,
       "definitionPath": "definitions/h1/farm-loading-gate.v2.json",
       "definitionSha256": "ae8261c84c6b3250c3bcc625ca6a05b5321667ddeb321eae0a150cbb07ed93e6",
       "documentPath": "authored/h1/farm-loading-gate.v2.md",
       "documentSha256": "dee81b8e110a2820b580e304538a358ea0d5868bab2a3cdd1381da6d72f39a0f"
+    },
+    {
+      "stableId": "h1-stock:farm-loss-recovery",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-loss-recovery.v2.json",
+      "definitionSha256": "f31de8bf3b97f39cf03d9572486788f72a2319853393d7b6aa4bcce87c00c8b5",
+      "documentPath": "authored/h1/farm-loss-recovery.v2.md",
+      "documentSha256": "60f01d001f1d6b609297bf1cfded9c66dadc7415bd4c0eaf1f69ec7e8f1f7391"
     },
     {
       "stableId": "h1-stock:farm-maintenance-yard",
@@ -45,6 +69,14 @@
       "definitionSha256": "e02d835f921f717ab72fdaac5f5a67c83cceeffdf3df555f25d6db0a150b84d5",
       "documentPath": "authored/h1/farm-production.v2.md",
       "documentSha256": "9091acdffbf875cca841a5c557f1351d726a738e46ea31aa4705ca634ff9ef8a"
+    },
+    {
+      "stableId": "h1-stock:farm-restoration-supply",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-restoration-supply.v2.json",
+      "definitionSha256": "10802fd5b582def7e11b36a401b532eb2850329585a3d0a54734c12590973c1e",
+      "documentPath": "authored/h1/farm-restoration-supply.v2.md",
+      "documentSha256": "2ad956237c1b18e072d268c459bf6b8702ae2b6af45e0a1aeb4db9bf5a67a350"
     },
     {
       "stableId": "h1-stock:farm-seed-preparation",
@@ -77,6 +109,14 @@
       "definitionSha256": "379d94985339cdb98427bf6bd32f5144dfba6069283794c84fc3303c4a230486",
       "documentPath": "authored/h1/farm-washing.v2.md",
       "documentSha256": "2240e6dcf4d6b724d0e629041947b2c8dbe9eaa79977807235704b0d4bd47028"
+    },
+    {
+      "stableId": "h1-stock:farm-weather-protection",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-weather-protection.v2.json",
+      "definitionSha256": "041184a5e6ab24608bd1a703437a3f84774c9ff35b9dedaf9f29bfe47dfe47be",
+      "documentPath": "authored/h1/farm-weather-protection.v2.md",
+      "documentSha256": "77e4dd54a507d024f45680779abcc8ba5a7607c61bd402c43bb9cd7874e4541a"
     },
     {
       "stableId": "h1-stock:farm-work-yard",

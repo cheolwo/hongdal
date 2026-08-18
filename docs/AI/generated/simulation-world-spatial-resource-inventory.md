@@ -10,7 +10,7 @@
 
 | 계층 | 사람 중심 명칭 | 기술 자원 | 설계 재고 | 현재 정의 |
 | --- | --- | --- | ---: | ---: |
-| `H1` | 작업공간 모판 | `WiSpatialSeedbed` | 73 | 5 |
+| `H1` | 작업공간 모판 | `WiSpatialSeedbed` | 78 | 5 |
 | `H2` | 블록 모판 | `LandscapeBlock` | 19 | 0 |
 | `H3` | 경관 모판 | `LandscapeGraph` | 10 | 5 |
 | `H4` | 지역 모판 | `AreaSet` | 5 | 1 |

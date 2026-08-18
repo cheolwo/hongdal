@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-exposure-inspection",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농장 수확물 노출 점검 공간",
+  "summary": "수확 직후 비·야생동물·오염에 노출된 수확물을 정상 집하 흐름에 넣기 전에 확인하는 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "HarvestExposureInspection",
+    "ContaminationAssessment",
+    "SafeHandoffDecision"
+  ],
+  "spatialRoleCodes": [
+    "FarmExposureInspectionArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.InspectionWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-production",
+    "h1-stock:farm-harvest-staging"
+  ],
+  "successorH1Refs": [
+    "h1-stock:farm-incident-quarantine",
+    "h1-stock:farm-work-yard"
+  ],
+  "connectorRoleCodes": [
+    "HarvestInput",
+    "SafeCargoOutput",
+    "QuarantineOutput"
+  ],
+  "sourcePackCodes": [
+    "Farm"
+  ],
+  "grammarSetRefs": [
+    "farm:농산물 집하·직판장",
+    "farm:헛간 작업마당"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-exposure-inspection.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-exposure-inspection"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

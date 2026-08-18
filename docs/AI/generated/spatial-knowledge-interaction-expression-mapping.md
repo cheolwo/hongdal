@@ -2,15 +2,20 @@
 
 | 행동 공간 H1 | 표현 H1 후보 |
 | --- | --- |
+| `h1-stock:farm-exposure-inspection` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-harvest-staging` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-hub-corridor` |  |
+| `h1-stock:farm-incident-quarantine` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-loading-gate` | h1-expression:farm:헛간-작업마당 |
+| `h1-stock:farm-loss-recovery` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-maintenance-yard` | h1-expression:farm:시설하우스-단동, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-production` | h1-expression:farm:감자밭-두렁, h1-expression:farm:혼합-작물밭 |
+| `h1-stock:farm-restoration-supply` | h1-expression:farm:농산물-집하-직판장, h1-expression:nature:숲-가장자리 |
 | `h1-stock:farm-seed-preparation` | h1-expression:farm:시설하우스-단동, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-sorting` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-tool-storage` | h1-expression:farm:시설하우스-단동, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-washing` | h1-expression:farm:헛간-작업마당, h1-expression:nature:수변-완충지 |
+| `h1-stock:farm-weather-protection` | h1-expression:farm:시설하우스-단동, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-work-yard` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-worker-waiting` | h1-expression:farm:헛간-작업마당, h1-expression:town:버스-정류장-보행-쉼터 |
 | `h1-stock:hub-cold-storage` | h1-expression:city:물류-station-진입부, h1-expression:city:화물-대기-야드 |

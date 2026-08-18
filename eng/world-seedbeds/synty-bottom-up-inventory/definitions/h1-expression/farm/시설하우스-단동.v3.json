@@ -58,7 +58,8 @@
   "supportsInteractionH1Refs": [
     "h1-stock:farm-maintenance-yard",
     "h1-stock:farm-seed-preparation",
-    "h1-stock:farm-tool-storage"
+    "h1-stock:farm-tool-storage",
+    "h1-stock:farm-weather-protection"
   ],
   "derivationRecipeCode": "h1.pack-expression.farm.r1",
   "derivationInputHashSha256": "c1836f93e4f173566f24a21c06527b9710ec03f56423bab2de3131cf99fa6c70",

@@ -60,6 +60,7 @@
     "maximumColliderCount": 0
   },
   "supportsInteractionH1Refs": [
+    "h1-stock:farm-restoration-supply",
     "h1-stock:nature-emergency-retreat",
     "h1-stock:nature-farm-edge",
     "h1-stock:nature-restoration-site",

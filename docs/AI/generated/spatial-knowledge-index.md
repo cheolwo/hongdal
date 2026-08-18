@@ -2,7 +2,7 @@
 
 > 항목별 JSON·Markdown에서 결정적으로 생성된다. 직접 수정하지 않는다.
 
-- H1 작업공간 지식: `41개`
+- H1 작업공간 지식: `46개`
 - H2 블록 조립법: `18개`
 - H3 지역 유형 청사진: `10개`
 
@@ -15,10 +15,13 @@
 | `ApprovedReference` | `h1-stock:farm-production` | 농업 생산구획 | WI-FARM-01, WI-FARM-02, WI-FARM-03, WI-FARM-04, Spatial.CargoAccessible, Spatial.CropCareWorkArea, Spatial.CropProduction, Spatial.HarvestWorkArea, Spatial.SowingWorkArea, Spatial.TillingWorkArea, Spatial.WaterAccessible, Spatial.WorkerAccessible, Farm |
 | `ApprovedReference` | `h1-stock:farm-work-yard` | 수확·집하 작업마당 | WI-FARM-05, WI-FARM-06, WI-WORLD-04, Spatial.CargoAccessible, Spatial.CollectionWorkArea, Spatial.PackingWorkArea, Spatial.WorkerAccessible, Farm |
 | `ApprovedReference` | `h1-stock:hub-receiving-storage` | Hub 입고·검수·보관 공간 | WI-LOG-04, WI-LOG-05, WI-001, WI-002, Spatial.CargoAccessible, Spatial.InspectionWorkArea, Spatial.LoadingWorkArea, Spatial.Storage, Spatial.UnloadingWorkArea, Spatial.WorkerAccessible, City |
+| `ExploratoryInventory` | `h1-stock:farm-exposure-inspection` | 농장 수확물 노출 점검 공간 | HarvestExposureInspection, ContaminationAssessment, SafeHandoffDecision, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.InspectionWorkArea, Farm |
 | `ExploratoryInventory` | `h1-stock:farm-harvest-staging` | 수확물 임시 적치 공간 | WI-FARM-04, WI-FARM-05, TemporaryCropStorage, WaitForPacking, WaitForVehicle, Spatial.CargoAccessible, Spatial.WorkerAccessible, Spatial.TemporaryStorage, Farm |
 | `ExploratoryInventory` | `h1-stock:farm-maintenance-yard` | 농장 시설 정비 공간 | WI-WORLD-04, Farm |
+| `ExploratoryInventory` | `h1-stock:farm-restoration-supply` | 농장 자연권 복구 자재 인계 공간 | RestorationSupplyHandoff, RecoveredMaterialTransfer, NatureRouteSupport, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.LoadingWorkArea, Farm, Nature |
 | `ExploratoryInventory` | `h1-stock:farm-seed-preparation` | 종자 준비 공간 | WI-FARM-02, SeedInspection, SeedBatchPreparation, Spatial.WorkerAccessible, Spatial.MaterialPreparationArea, Farm |
 | `ExploratoryInventory` | `h1-stock:farm-tool-storage` | 농기구 보관 공간 | WI-WORLD-04, ToolCheckout, ToolReturn, Spatial.Storage, Spatial.WorkerAccessible, Farm |
+| `ExploratoryInventory` | `h1-stock:farm-weather-protection` | 농장 기상 보호 적치 공간 | WeatherProtectedStaging, HarvestDelay, MaterialShelter, Spatial.CargoAccessible, Spatial.TemporaryStorage, Spatial.WeatherShelter, Farm |
 | `ExploratoryInventory` | `h1-stock:hub-long-term-storage` | Hub 장기 보관 공간 | WI-002, LongTermStorage, StorageAging, CapacityPlanning, Spatial.Storage, Spatial.CargoAccessible, Spatial.WorkerAccessible, City |
 | `ExploratoryInventory` | `h1-stock:hub-market-transfer` | Hub–시장 화물 인계 공간 | WI-MARKET-01, WI-MARKET-02, City, Transition |
 | `ExploratoryInventory` | `h1-stock:hub-outbound-staging` | Hub 피킹·출고 준비 공간 | WI-HUB-03, WI-HUB-04, WI-HUB-05, City |
@@ -38,6 +41,8 @@
 | `ExploratoryInventory` | `h1-stock:town-market-receiving` | 마트 후방 입고 공간 | WI-MARKET-02, WI-MARKET-03, WI-MARKET-04, City, Transition |
 | `ExploratoryInventory` | `h1-stock:town-neighborhood-service` | 근린 서비스 거점 | WI-WORLD-05, LocalInformation, NeighborhoodTaskStart, Spatial.CustomerAccessible, Spatial.WorkerAccessible, Spatial.InformationArea, Town |
 | `ExploratoryInventory` | `h1-stock:town-resident-pickup` | 주민 수령 공간 | WI-ORDER-05, WI-ORDER-06, Town |
+| `IdeaInventory` | `h1-stock:farm-incident-quarantine` | 농장 사고 수확물 격리 공간 | FarmCargoQuarantine, IncidentHold, ReleaseOrDiscard, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.ExclusiveOccupancy, Spatial.TemporaryStorage, Farm |
+| `IdeaInventory` | `h1-stock:farm-loss-recovery` | 농장 손실 복구·재작업 공간 | CropLossAssessment, ProduceRework, RecoveryPacking, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.SortingWorkArea, Spatial.PackingWorkArea, Farm |
 | `IdeaInventory` | `h1-stock:farm-sorting` | 농산물 선별 공간 | ProduceSorting, QualityGrading, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.SortingWorkArea, Farm |
 | `IdeaInventory` | `h1-stock:farm-washing` | 농산물 세척 공간 | ProduceWashing, WaterUse, WasteWaterHandling, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.WaterAccessible, Spatial.WashingWorkArea, Farm, Nature |
 | `IdeaInventory` | `h1-stock:farm-worker-waiting` | 농장 작업자 대기 공간 | WI-WORLD-01, WorkerBriefing, ShiftHandoff, Spatial.WorkerAccessible, Spatial.NpcWorkArea, Farm, Town |

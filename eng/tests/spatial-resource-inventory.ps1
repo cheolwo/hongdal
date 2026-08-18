@@ -15,7 +15,7 @@ $check = & $script -Mode Check
 
 if ($firstHash -ne $secondHash) { throw "SpatialResourceInventoryGenerationIsNotDeterministic" }
 if ($firstWriteTicks -ne $secondWriteTicks) { throw "SpatialResourceInventoryUnchangedOutputWasRewritten" }
-if ($check -notmatch "SpatialResourceInventoryValid:H1=73/5;H2=19/0;H3=10/5;H4=5/1") {
+if ($check -notmatch "SpatialResourceInventoryValid:H1=78/5;H2=19/0;H3=10/5;H4=5/1") {
     throw "SpatialResourceInventoryValidationDidNotComplete"
 }
 
