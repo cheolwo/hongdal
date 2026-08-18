@@ -78,6 +78,7 @@
 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
 | `H3` | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
+| `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |

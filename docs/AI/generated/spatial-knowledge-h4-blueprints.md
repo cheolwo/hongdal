@@ -30,6 +30,13 @@
 - 선택 H3: 없음
 - 현실 자료 목적: BuildingPlacement, RoadNetwork, MarketContext
 
+## Nature 생활·탐험권
+
+- 후보: `h4-blueprint:nature-home-exploration-region`
+- 필수 H3: h3-candidate:nature-threat-recovery, h3-candidate:nature-trail-network
+- 선택 H3: h3-candidate:nature-exploration-buffer
+- 현실 자료 목적: TerrainElevation, LandCoverClassification, Hydrography, RoadNetwork
+
 ## 산림·수계 자연권
 
 - 후보: `h4-blueprint:nature-water-region`

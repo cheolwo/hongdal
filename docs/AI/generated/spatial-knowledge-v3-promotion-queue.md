@@ -40,4 +40,5 @@
 | 34 | `H4` | `h4-blueprint:farm-production-processing-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
 | 35 | `H4` | `h4-blueprint:logistics-hub-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
 | 36 | `H4` | `h4-blueprint:lowrise-market-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
-| 37 | `H4` | `h4-blueprint:nature-water-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
+| 37 | `H4` | `h4-blueprint:nature-home-exploration-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
+| 38 | `H4` | `h4-blueprint:nature-water-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |

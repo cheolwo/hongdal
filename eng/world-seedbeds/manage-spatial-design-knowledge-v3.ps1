@@ -195,7 +195,7 @@ foreach ($level in @("H1", "H2", "H3")) {
 }
 Require (@($definitionRefsByLevel.H1).Count -eq 51) "InteractionH1CountMustBe51"
 Require (@($definitionRefsByLevel.H2).Count -eq 24) "H2CountMustBe24"
-Require (@($definitionRefsByLevel.H3).Count -eq 10) "H3CountMustBe10"
+Require (@($definitionRefsByLevel.H3).Count -eq 11) "H3CountMustBe11"
 
 $packPolicy = $recipes.h1ExpressionPolicy
 $packFamilies = @($packPolicy.sourceFamilyCodes)
@@ -342,8 +342,8 @@ foreach ($recipe in $h2Recipes | Sort-Object targetKnowledgeRef) {
 $h3Bindings = @()
 $h3BindingById = @{}
 $h3Recipes = @($recipes.h3Derivations)
-Require ($h3Recipes.Count -eq 10) "H3RecipeCountMustBe10"
-Require (@($h3Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 10) "H3RecipeTargetDuplicate"
+Require ($h3Recipes.Count -eq 11) "H3RecipeCountMustBe11"
+Require (@($h3Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 11) "H3RecipeTargetDuplicate"
 foreach ($recipe in $h3Recipes | Sort-Object targetKnowledgeRef) {
     $targetId = [string] $recipe.targetKnowledgeRef
     Require ($definitionsById.ContainsKey($targetId)) "H3RecipeTargetUnknown:$targetId"
@@ -376,7 +376,7 @@ foreach ($recipe in $h3Recipes | Sort-Object targetKnowledgeRef) {
 
 $h4Definitions = @()
 $h4ReferenceRows = @()
-Require (@($recipes.h4Blueprints).Count -eq 5) "H4BlueprintCountMustBe5"
+Require (@($recipes.h4Blueprints).Count -eq 6) "H4BlueprintCountMustBe6"
 foreach ($blueprint in @($recipes.h4Blueprints | Sort-Object stableId)) {
     $stableId = [string] $blueprint.stableId
     $children = Get-UniqueStrings @($blueprint.requiredH3Refs + $blueprint.optionalH3Refs)
@@ -617,11 +617,11 @@ foreach ($entry in $generated.GetEnumerator()) {
 $expressionFileCount = @(Get-ChildItem -LiteralPath (Join-Path $knowledgeRoot "definitions/h1-expression") -Filter "*.json" -File -Recurse).Count
 $h4FileCount = @(Get-ChildItem -LiteralPath (Join-Path $knowledgeRoot "definitions/h4") -Filter "*.json" -File -Recurse).Count
 Require ($expressionFileCount -eq 32) "ExpressionDefinitionFileCount:$expressionFileCount"
-Require ($h4FileCount -eq 5) "H4DefinitionFileCount:$h4FileCount"
+Require ($h4FileCount -eq 6) "H4DefinitionFileCount:$h4FileCount"
 
 if ($Mode -eq "Check") {
-    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=24;H3=10;H4=5"
+    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=24;H3=11;H4=6"
 }
 else {
-    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=24;H3=10;H4=5"
+    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=24;H3=11;H4=6"
 }

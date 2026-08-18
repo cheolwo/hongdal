@@ -5,7 +5,7 @@
     "worldInteractionCatalogRevision": "simulation-world-interactions.r3",
     "spatialPriorityRevision": "simulation-world-interaction-spatial-priorities.r1",
     "designKnowledgeRevision": "simulation-world-spatial-design-knowledge.r3",
-    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r3",
+    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r4",
     "compositionPlanStableId": "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
     "compositionPlanRevision": 1,
     "p2CompositionPlanStableId": "wi-spatial-composition-plan:p2-hub-inbound-storage.v1",
@@ -59,6 +59,7 @@
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
         "h4-blueprint:farm-production-processing-region",
+        "h4-blueprint:nature-home-exploration-region",
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [
@@ -115,6 +116,7 @@
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
         "h4-blueprint:farm-production-processing-region",
+        "h4-blueprint:nature-home-exploration-region",
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [
@@ -167,6 +169,7 @@
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
         "h4-blueprint:farm-production-processing-region",
+        "h4-blueprint:nature-home-exploration-region",
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [
@@ -225,6 +228,7 @@
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
         "h4-blueprint:farm-production-processing-region",
+        "h4-blueprint:nature-home-exploration-region",
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [
@@ -1465,12 +1469,14 @@
         "h3-candidate:highland-farm",
         "h3-candidate:lowrise-market-town",
         "h3-candidate:nature-exploration-buffer",
+        "h3-candidate:nature-threat-recovery",
         "h3-candidate:nature-trail-network"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
         "h4-blueprint:farm-production-processing-region",
         "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [],
@@ -1544,12 +1550,14 @@
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
+        "h3-candidate:nature-threat-recovery",
         "h3-candidate:nature-trail-network"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
         "h4-blueprint:farm-production-processing-region",
         "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [],
@@ -1592,5 +1600,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "65bc1f9a56c3422ac41808c1ff13a8b417e644aac3f7a8c5db6b33e2cdf610b4"
+  "contentHashSha256": "df1cfe52b21598c907635cce182f5ca9cc6e67d926673048211b3077ffc165f7"
 }

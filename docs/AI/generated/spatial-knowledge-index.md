@@ -4,7 +4,7 @@
 
 - H1 작업공간 지식: `51개`
 - H2 블록 조립법: `24개`
-- H3 지역 유형 청사진: `10개`
+- H3 지역 유형 청사진: `11개`
 
 ## H1
 
@@ -101,6 +101,7 @@
 | `ExploratoryInventory` | `h3-candidate:jinbu-hub` | 진부형 물류 Hub 경관 | h2-candidate:hub-inbound-storage, h2-candidate:hub-outbound-vehicle, HubInboundGate, HubOutboundGate |
 | `ExploratoryInventory` | `h3-candidate:lowrise-market-town` | 저층 생활·시장 경관 | h2-candidate:lowrise-residential, h2-candidate:market-life-commerce, TownReceivingGate, TownLocalRoad |
 | `ExploratoryInventory` | `h3-candidate:nature-exploration-buffer` | Nature 탐색·완충 경관 | h2-candidate:nature-water-buffer, h2-candidate:forest-edge-farm, NatureTrail, FarmEdge |
+| `ExploratoryInventory` | `h3-candidate:nature-threat-recovery` | 자연 생활·위협·회복 경관 | h2-candidate:nature-threat-response, h2-candidate:nature-restoration-recovery, SafeCoreAccess, FarmIncidentInput, TownReliefInput, CityHubReturn, RestoredTrailOutput |
 | `ExploratoryInventory` | `h3-candidate:nature-trail-network` | 자연 탐색길·대피망 경관 | h2-candidate:nature-trail-shelter, h2-candidate:nature-water-buffer, TownOrFarmAccess, TrailLoop, EmergencyExit |
 | `IdeaInventory` | `h3-candidate:circular-market-town` | 반품·회수 순환형 시장 마을 경관 | h2-candidate:market-life-commerce, h2-candidate:town-returns-waste, TownReceivingGate, ReturnOutput, TownLocalRoad |
 | `IdeaInventory` | `h3-candidate:farm-processing-campus` | 농장 생산·후처리 복합 경관 | h2-candidate:highland-production, h2-candidate:farm-seed-and-tools, h2-candidate:farm-wash-sort-pack, h2-candidate:farm-processing-shipping, FarmExternalGate, NatureEdge |

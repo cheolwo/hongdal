@@ -4,12 +4,12 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "8aab921ec7d5c3642b6313e1ed4df4aba28fe44fadc1efeab91d0ca0a3768588",
+  "previousCatalogSha256": "b41aa25b4fcc923036f95917aa1876032848cb8e274e8af719936c19d0c64171",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
-  "derivationRecipeSha256": "f46f1403e0f33b80427d280e280f7edd885b0628d2384982838e2cebdc7a04ba",
+  "derivationRecipeSha256": "4dd3414448f63938228a3933a0b0d1605c99e24c49c35486f0f77f1c3b8bf20b",
   "h1InteractionDefinitionRefs": [
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -1770,6 +1770,14 @@
       "documentSha256": "d545a1d4e52f7e92ff5f37bc66b49be3c55caf1bf190bab78bb95a8977e5d1c7"
     },
     {
+      "stableId": "h3-candidate:nature-threat-recovery",
+      "revision": 1,
+      "definitionPath": "definitions/h3/nature-threat-recovery.v2.json",
+      "definitionSha256": "c6a18a7f41542a9df5ee07987f8862a77e677f46df19d7841982cf733e5b1850",
+      "documentPath": "authored/h3/nature-threat-recovery.v2.md",
+      "documentSha256": "a5cc1641da3f0b3ac5523f370168d58279b401c3da9200005e5586a16a94377d"
+    },
+    {
       "stableId": "h3-candidate:nature-trail-network",
       "revision": 1,
       "definitionPath": "definitions/h3/nature-trail-network.v2.json",
@@ -1822,6 +1830,15 @@
       "definitionSha256": "9936a47a54353bef1098398df9e5acea09cc2cc0a7568f6e4ef4ac419549cdaf",
       "documentPath": "authored/h4/lowrise-market-region.v3.md",
       "documentSha256": "8bad9a4d18f8feaa724bd7d42fa78a94585901e961649ed0536cbed43965ce6a"
+    },
+    {
+      "stableId": "h4-blueprint:nature-home-exploration-region",
+      "revision": 1,
+      "cardKindCode": "RegionalBlueprint",
+      "definitionPath": "definitions/h4/nature-home-exploration-region.v3.json",
+      "definitionSha256": "c094c6e4c99f69d85b942f3ae88b71ced37fb166b3ade9cb5a3e8e5be83134af",
+      "documentPath": "authored/h4/nature-home-exploration-region.v3.md",
+      "documentSha256": "a3ca35cfd2dcf841303126778b776c1d027162b7ef1459c1ba34e5e0c62c4f9d"
     },
     {
       "stableId": "h4-blueprint:nature-water-region",
@@ -2505,6 +2522,31 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h3-candidate:nature-threat-recovery",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.nature-threat-recovery.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-trail-shelter",
+        "h2-candidate:nature-water-buffer"
+      ],
+      "sourceGrammarRefs": [
+        "nature:고지대 노출지",
+        "nature:산 능선",
+        "nature:산길·바위 길목",
+        "nature:수변 완충지",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "nature:초지·야생화",
+        "network:농촌도로 곡선",
+        "transition:Nature–Farm 전환",
+        "transition:Water–Land 전환"
+      ],
+      "derivationInputHashSha256": "db06943c4bee85d1e062eaff3a6bb4dcb678b481b4c9dd1d1d416ef8c0ea09bc",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h3-candidate:nature-trail-network",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.nature-trail-network.r1",
@@ -2568,5 +2610,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "656c554f0e751f8e4c3a49d450b2f5e5435644f9dfce28afa38986d61e3939d5"
+  "contentHashSha256": "b9ae5c1cd6887eb5c97db7a1b0f723ce94859f0acd59e0eca4632e75694577b6"
 }

@@ -1817,3 +1817,13 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 조립 기준: H2 후보는 필수 H1 사이의 선행·후속 관계, 공유 위상, 입출력 연결구와 다음 H2로 이어지는 폐루프 출구를 가져야 한다. 같은 필수 H1 조합을 기존 H2가 이미 수용하면 중복 후보를 만들지 않는다. Network 기준 경관 문법은 조립 입력으로 연결하지만 H1의 WI·능력·용량을 자동 추론하지 않는다.
 - 승격 경계: 여섯 항목은 위치 독립 설계 재고이며 공식 H2 정의가 아니다. 실제 도로·경계로 결정된 Block 면, 승인 H1 배치, 연결구 폐루프, Graph revision·hash와 공간 근거 검토가 없으면 자동 승격하거나 Scenario로 대체하지 않는다.
 - 관계: D-155~D-156의 문법 유도와 H 계층, D-162~D-164의 Nature 중심 세계·사건 인과·재고 확장 순서를 H2 조립 실행 순서로 구체화함
+
+## D-166 Nature·Farm·Town·City/Hub는 각각 독립 AreaSet 후보로 상향 조립한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-18
+- 결정: 네 팩 중심 경관을 하나의 AreaSet에 평면적으로 넣지 않는다. Nature 생활·탐험, Farm 생산·생존, Town 생활·시장, City/Hub 물류를 각각 `H1 → H2 → H3 → H4 AreaSet 후보`로 독립 성장시키고, 상위 구성 대장은 후보 사이의 이동·물류 관계만 관리한다. 팩은 주축 표현 정보이며 AreaSet의 공간 권위가 아니다.
+- 우선순위: P1 Nature는 상시 생활 세계이므로 위협 추적·대피 H2와 복원·안전 회복 H2를 자연 생활·위협·회복 H3로 묶고 Nature 생활·탐험 H4 후보에 연결한다. 이후 P2 Farm, P3 Town, P4 City/Hub 순서로 같은 상향 조립을 반복한다.
+- 관계 분리: Nature↔Farm·Town·City/Hub는 플레이어 이동 관계다. Farm→City/Hub→Town은 Nature 생활권을 지름길로 쓰지 않는 별도 화물 관계다. 후보 연결은 실제 GraphRelation이 아니며 양쪽 AreaSet의 승인 Connector가 준비되기 전에는 이동 폐루프나 E5 증거로 승격하지 않는다.
+- 권위 경계: H4 후보는 실제 AreaSet이 아니다. 실제 지역 세계가 되려면 사람의 세계 의도, 지역 범위, DataRequirement, H3 LandscapeGraph와 GraphRelation 승인이 필요하며 누락 근거를 Scenario로 대체하지 않는다.
+- 관계: D-147의 AreaSet-first 공간 권위, D-155~D-156의 H1~H4 상향식 재고, D-162의 Nature 상시 생활권과 전문 경관 구조, D-165의 H2 조립 우선순위를 다중 AreaSet 구성으로 구체화함

@@ -82,5 +82,6 @@
 | 76 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
 | 77 | `H3` | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
 | 78 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 79 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
-| 80 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 79 | `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 80 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | H2 승인·실제 지역 근거 전 조립 후보 |
+| 81 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | H2 승인·실제 지역 근거 전 조립 후보 |

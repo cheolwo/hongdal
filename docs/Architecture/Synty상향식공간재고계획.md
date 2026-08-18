@@ -18,8 +18,8 @@
 | H1 행동 공간 카드 | 51 | 승인 참조 5개와 Nature 위협·회복 5개, Farm 사건 대응 5개, Town 사건 대응 5개를 포함한 WI·능력 중심 장소 지식 |
 | H1 팩 단독 표현 카드 | 32 | Nature 12·Farm 8·Town 6·City 6 의미군과 A/B/C 변형 |
 | H2 블록 조립법 | 24 | H1을 위상과 연결구로 묶는 재사용 레시피. 이 가운데 사건 대응 H1에서 유도한 Nature 2·Farm 2·Town 2개를 P1~P3 우선순위로 관리한다. |
-| H3 경관 청사진 | 10 | Farm·Hub·Town·회랑·Nature 경관 유형 |
-| H4 지역 청사진 후보 | 5 | 실제 AreaSet이 아닌 위치 독립 세계 구성 후보 |
+| H3 경관 청사진 | 11 | Farm·Hub·Town·회랑·Nature 경관 유형. Nature 생활·위협·회복 경관을 포함한다. |
+| H4 지역 청사진 후보 | 6 | 실제 AreaSet이 아닌 위치 독립 세계 구성 후보. Nature 생활·탐험권을 포함한다. |
 
 초기 `catalog.v1.json`과 항목별 `catalog.v2.json`은 호환 입력으로 보존한다. 현재 `catalog.v3.json`은 기존 StableId를 유지하면서 행동 공간 H1과 팩 단독 표현 H1을 구분하고, 검토된 조립법의 문법→H1→H2→H3→H4 계보와 파일 SHA-256을 봉인한다. 팩 단독 H1과 H4 후보는 각각 `definitions/h1-expression/`, `definitions/h4/`와 대응 Markdown으로 결정적으로 생성한다.
 

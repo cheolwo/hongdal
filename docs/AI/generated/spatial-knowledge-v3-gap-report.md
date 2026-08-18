@@ -15,4 +15,5 @@
 | `H4` | `h4-blueprint:farm-production-processing-region` 농업 생산·후처리권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |
 | `H4` | `h4-blueprint:logistics-hub-region` 물류 Hub권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |
 | `H4` | `h4-blueprint:lowrise-market-region` 저층 생활·시장권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |
+| `H4` | `h4-blueprint:nature-home-exploration-region` Nature 생활·탐험권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |
 | `H4` | `h4-blueprint:nature-water-region` 산림·수계 자연권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |

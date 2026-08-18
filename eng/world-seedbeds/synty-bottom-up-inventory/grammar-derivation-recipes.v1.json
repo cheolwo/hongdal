@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-spatial-grammar-derivation-recipes.v1",
-  "revision": "simulation-world-spatial-grammar-derivation-recipes.r2",
+  "revision": "simulation-world-spatial-grammar-derivation-recipes.r3",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "h1ExpressionPolicy": {
     "revision": "simulation-world-spatial-grammar-derivation-recipes.r1",
@@ -51,6 +51,7 @@
     { "targetKnowledgeRef": "h3-candidate:lowrise-market-town", "recipeCode": "h3.lowrise-market-town.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환"] },
     { "targetKnowledgeRef": "h3-candidate:nature-exploration-buffer", "recipeCode": "h3.nature-exploration-buffer.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환", "transition:Water–Land 전환"] },
     { "targetKnowledgeRef": "h3-candidate:nature-trail-network", "recipeCode": "h3.nature-trail-network.r1", "supplementalGrammarSetRefs": ["transition:Water–Land 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:nature-threat-recovery", "recipeCode": "h3.nature-threat-recovery.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환", "transition:Water–Land 전환"] },
     { "targetKnowledgeRef": "h3-candidate:resilient-logistics-hub", "recipeCode": "h3.resilient-logistics-hub.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환"] }
   ],
   "h4Blueprints": [
@@ -64,6 +65,17 @@
       "worldThemeCodes": ["NatureExploration", "WaterBuffer"],
       "graphRelationRoleCodes": ["NatureContinuity", "WaterLandTransition"],
       "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "Hydrography"]
+    },
+    {
+      "stableId": "h4-blueprint:nature-home-exploration-region",
+      "title": "Nature 생활·탐험권",
+      "summary": "플레이어의 안전 생활핵, 위협 대응·회복 경관과 탐색길을 결합하고 Farm·Town·City/Hub AreaSet으로 연결하는 위치 독립 Nature AreaSet 청사진이다.",
+      "recipeCode": "h4.nature-home-exploration-region.r1",
+      "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network"],
+      "optionalH3Refs": ["h3-candidate:nature-exploration-buffer"],
+      "worldThemeCodes": ["NatureHome", "NatureExploration", "ThreatRecovery"],
+      "graphRelationRoleCodes": ["SafeCoreToThreatBand", "ThreatBandToRecovery", "NatureToFarm", "NatureToTown", "NatureToCityHub"],
+      "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "Hydrography", "RoadNetwork"]
     },
     {
       "stableId": "h4-blueprint:farm-production-processing-region",

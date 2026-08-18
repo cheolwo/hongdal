@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-area-set-composition-priorities.v1",
+  "revision": "simulation-world-area-set-composition-priorities.r1",
+  "purpose": "Nature·Farm·Town·City/Hub를 하나의 AreaSet에 합치지 않고 각각 H1→H2→H3→AreaSet으로 상향 조립하는 순서를 관리한다.",
+  "areaSetCandidates": [
+    {
+      "priorityCode": "P1",
+      "areaSetCandidateRef": "h4-blueprint:nature-home-exploration-region",
+      "title": "Nature 생활·탐험 AreaSet",
+      "primaryExpressionPackCode": "Nature",
+      "stateCode": "ReadyForDesignComposition",
+      "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network"],
+      "optionalH3Refs": ["h3-candidate:nature-exploration-buffer"],
+      "playerWorldRoleCode": "PersistentHomeWorld"
+    },
+    {
+      "priorityCode": "P2",
+      "areaSetCandidateRef": "h4-blueprint:farm-production-processing-region",
+      "title": "Farm 생산·생존 AreaSet",
+      "primaryExpressionPackCode": "Farm",
+      "stateCode": "QueuedAfterNature",
+      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus"],
+      "optionalH3Refs": ["h3-candidate:farm-hub-logistics"],
+      "playerWorldRoleCode": "ProfessionalWorld"
+    },
+    {
+      "priorityCode": "P3",
+      "areaSetCandidateRef": "h4-blueprint:lowrise-market-region",
+      "title": "Town 생활·시장 AreaSet",
+      "primaryExpressionPackCode": "Town",
+      "stateCode": "QueuedAfterFarm",
+      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town"],
+      "optionalH3Refs": [],
+      "playerWorldRoleCode": "ProfessionalWorld"
+    },
+    {
+      "priorityCode": "P4",
+      "areaSetCandidateRef": "h4-blueprint:logistics-hub-region",
+      "title": "City/Hub 물류 AreaSet",
+      "primaryExpressionPackCode": "City",
+      "stateCode": "QueuedAfterTown",
+      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub"],
+      "optionalH3Refs": [],
+      "playerWorldRoleCode": "ProfessionalWorld"
+    }
+  ],
+  "interAreaSetRelations": [
+    { "relationCode": "NatureToFarm", "fromAreaSetCandidateRef": "h4-blueprint:nature-home-exploration-region", "toAreaSetCandidateRef": "h4-blueprint:farm-production-processing-region", "relationKindCode": "PlayerTraversal" },
+    { "relationCode": "NatureToTown", "fromAreaSetCandidateRef": "h4-blueprint:nature-home-exploration-region", "toAreaSetCandidateRef": "h4-blueprint:lowrise-market-region", "relationKindCode": "PlayerTraversal" },
+    { "relationCode": "NatureToCityHub", "fromAreaSetCandidateRef": "h4-blueprint:nature-home-exploration-region", "toAreaSetCandidateRef": "h4-blueprint:logistics-hub-region", "relationKindCode": "PlayerTraversal" },
+    { "relationCode": "FarmToCityHub", "fromAreaSetCandidateRef": "h4-blueprint:farm-production-processing-region", "toAreaSetCandidateRef": "h4-blueprint:logistics-hub-region", "relationKindCode": "CargoLogistics" },
+    { "relationCode": "CityHubToTown", "fromAreaSetCandidateRef": "h4-blueprint:logistics-hub-region", "toAreaSetCandidateRef": "h4-blueprint:lowrise-market-region", "relationKindCode": "CargoLogistics" }
+  ],
+  "authorityBoundary": {
+    "h4CandidateIsNotActualAreaSet": true,
+    "primaryPackDoesNotDefineSpatialAuthority": true,
+    "actualAreaSetRequiresWorldIntentAndEvidence": true,
+    "scenarioFallbackForbidden": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

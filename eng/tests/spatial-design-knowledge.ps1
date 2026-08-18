@@ -8,6 +8,7 @@ $query = Join-Path $repositoryRoot "eng/world-seedbeds/query-spatial-design-know
 $catalogPath = Join-Path $repositoryRoot "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json"
 $catalogV3Path = Join-Path $repositoryRoot "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
 $h2PriorityPath = Join-Path $repositoryRoot "eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-priorities.v1.json"
+$areaSetPriorityPath = Join-Path $repositoryRoot "eng/world-seedbeds/synty-bottom-up-inventory/area-set-composition-priorities.v1.json"
 
 $beforeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash
 $beforeTicks = (Get-Item -LiteralPath $catalogPath).LastWriteTimeUtc.Ticks
@@ -16,8 +17,8 @@ $write = & pwsh -NoProfile -File $manager -Mode Write
 $afterHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash
 $afterTicks = (Get-Item -LiteralPath $catalogPath).LastWriteTimeUtc.Ticks
 
-if ($check -notmatch "SpatialDesignKnowledgeValid:H1=51;H2=24;H3=10") { throw "SpatialDesignKnowledgeCheckFailed" }
-if ($write -notmatch "SpatialDesignKnowledgeGenerated:H1=51;H2=24;H3=10") { throw "SpatialDesignKnowledgeWriteFailed" }
+if ($check -notmatch "SpatialDesignKnowledgeValid:H1=51;H2=24;H3=11") { throw "SpatialDesignKnowledgeCheckFailed" }
+if ($write -notmatch "SpatialDesignKnowledgeGenerated:H1=51;H2=24;H3=11") { throw "SpatialDesignKnowledgeWriteFailed" }
 if ($beforeHash -ne $afterHash) { throw "SpatialDesignKnowledgeCatalogHashChangedWithoutInputChange" }
 if ($beforeTicks -ne $afterTicks) { throw "SpatialDesignKnowledgeCatalogWasRewrittenWithoutInputChange" }
 
@@ -27,8 +28,8 @@ $checkV3 = & pwsh -NoProfile -File $managerV3 -Mode Check
 $writeV3 = & pwsh -NoProfile -File $managerV3 -Mode Write
 $afterV3Hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogV3Path).Hash
 $afterV3Ticks = (Get-Item -LiteralPath $catalogV3Path).LastWriteTimeUtc.Ticks
-if ($checkV3 -notmatch "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83\(51\+32\);H2=24;H3=10;H4=5") { throw "SpatialDesignKnowledgeV3CheckFailed" }
-if ($writeV3 -notmatch "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83\(51\+32\);H2=24;H3=10;H4=5") { throw "SpatialDesignKnowledgeV3WriteFailed" }
+if ($checkV3 -notmatch "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83\(51\+32\);H2=24;H3=11;H4=6") { throw "SpatialDesignKnowledgeV3CheckFailed" }
+if ($writeV3 -notmatch "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83\(51\+32\);H2=24;H3=11;H4=6") { throw "SpatialDesignKnowledgeV3WriteFailed" }
 if ($beforeV3Hash -ne $afterV3Hash) { throw "SpatialDesignKnowledgeV3CatalogHashChangedWithoutInputChange" }
 if ($beforeV3Ticks -ne $afterV3Ticks) { throw "SpatialDesignKnowledgeV3CatalogWasRewrittenWithoutInputChange" }
 
@@ -78,4 +79,23 @@ foreach ($group in @($h2Priority.priorityGroups)) {
 }
 if (-not [bool] $h2Priority.promotionGate.automaticPromotionForbidden) { throw "SpatialDesignKnowledgeH2AutomaticPromotionMustBeForbidden" }
 
-Write-Output "SpatialDesignKnowledgeTestsPassed:Grammar=52/156;H1=83(51+32);H2=24;H3=10;H4=5;PriorityH2=6"
+$areaSetPriority = Get-Content -LiteralPath $areaSetPriorityPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$knownH3 = @($catalogV3.h3DefinitionRefs.stableId)
+$knownH4 = @($catalogV3.h4DefinitionRefs.stableId)
+$areaSetRefs = @($areaSetPriority.areaSetCandidates.areaSetCandidateRef)
+if (@($areaSetPriority.areaSetCandidates).Count -ne 4) { throw "SpatialDesignKnowledgeAreaSetPriorityCountInvalid" }
+if (($areaSetPriority.areaSetCandidates.priorityCode -join ",") -ne "P1,P2,P3,P4") { throw "SpatialDesignKnowledgeAreaSetPriorityOrderInvalid" }
+if (@($areaSetRefs | Sort-Object -Unique).Count -ne 4) { throw "SpatialDesignKnowledgeAreaSetPriorityDuplicate" }
+foreach ($candidate in @($areaSetPriority.areaSetCandidates)) {
+    if ($knownH4 -notcontains [string] $candidate.areaSetCandidateRef) { throw "SpatialDesignKnowledgeAreaSetUnknown:$($candidate.areaSetCandidateRef)" }
+    foreach ($h3Ref in @($candidate.requiredH3Refs + $candidate.optionalH3Refs)) {
+        if ($knownH3 -notcontains [string] $h3Ref) { throw "SpatialDesignKnowledgeAreaSetH3Unknown:$($candidate.areaSetCandidateRef):$h3Ref" }
+    }
+}
+foreach ($relation in @($areaSetPriority.interAreaSetRelations)) {
+    if ($areaSetRefs -notcontains [string] $relation.fromAreaSetCandidateRef) { throw "SpatialDesignKnowledgeAreaSetRelationFromUnknown:$($relation.relationCode)" }
+    if ($areaSetRefs -notcontains [string] $relation.toAreaSetCandidateRef) { throw "SpatialDesignKnowledgeAreaSetRelationToUnknown:$($relation.relationCode)" }
+}
+if (-not [bool] $areaSetPriority.authorityBoundary.h4CandidateIsNotActualAreaSet) { throw "SpatialDesignKnowledgeAreaSetAuthorityBoundaryMissing" }
+
+Write-Output "SpatialDesignKnowledgeTestsPassed:Grammar=52/156;H1=83(51+32);H2=24;H3=11;H4=6;PriorityH2=6;AreaSets=4"

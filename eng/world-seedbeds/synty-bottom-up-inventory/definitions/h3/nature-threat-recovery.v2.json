@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:nature-threat-recovery",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "자연 생활·위협·회복 경관",
+  "summary": "안전 생활권에서 위협을 감시·추적하고 긴급 후퇴와 복원을 거쳐 다시 탐색 가능한 상태로 돌아오는 자연권 핵심 경관이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Organic",
+  "requiredH2Refs": [
+    "h2-candidate:nature-threat-response",
+    "h2-candidate:nature-restoration-recovery"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:nature-trail-shelter",
+    "h2-candidate:nature-water-buffer"
+  ],
+  "connectorRoleCodes": [
+    "SafeCoreAccess",
+    "FarmIncidentInput",
+    "TownReliefInput",
+    "CityHubReturn",
+    "RestoredTrailOutput"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/nature-threat-recovery.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:nature-threat-recovery"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

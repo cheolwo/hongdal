@@ -2,7 +2,7 @@
 
 > 이 문서는 `eng/world-seedbeds/spatial-resource-inventory/catalog.v1.json`에서 결정적으로 생성된다. 직접 수정하지 않는다.
 
-- 재고 개정: `simulation-world-spatial-resource-inventory.r3`
+- 재고 개정: `simulation-world-spatial-resource-inventory.r4`
 - 계열 의미: 모판은 H1 하나의 이름이 아니라 H1~H4를 상향 조립하는 공간 구성 자원 계열이다.
 - 축 구분: H는 공간 자원 종류, 재고 상태는 후보·승인·배정·배치, E는 구현·통합 증거 깊이다.
 
@@ -12,8 +12,8 @@
 | --- | --- | --- | ---: | ---: |
 | `H1` | 작업공간 모판 | `WiSpatialSeedbed` | 83 | 5 |
 | `H2` | 블록 모판 | `LandscapeBlock` | 25 | 0 |
-| `H3` | 경관 모판 | `LandscapeGraph` | 10 | 5 |
-| `H4` | 지역 모판 | `AreaSet` | 5 | 1 |
+| `H3` | 경관 모판 | `LandscapeGraph` | 11 | 5 |
+| `H4` | 지역 모판 | `AreaSet` | 6 | 1 |
 
 ```text
 H1 작업공간 모판 재고

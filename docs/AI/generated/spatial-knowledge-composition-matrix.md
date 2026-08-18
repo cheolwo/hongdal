@@ -41,5 +41,6 @@
 | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | `ModifiedGrid` | h2-candidate:hub-inbound-storage, h2-candidate:hub-outbound-vehicle |  | HubInboundGate, HubOutboundGate |
 | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | `ModifiedGrid` | h2-candidate:lowrise-residential, h2-candidate:market-life-commerce |  | TownReceivingGate, TownLocalRoad |
 | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | `Organic` | h2-candidate:nature-water-buffer, h2-candidate:forest-edge-farm |  | NatureTrail, FarmEdge |
+| `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | `Organic` | h2-candidate:nature-threat-response, h2-candidate:nature-restoration-recovery | h2-candidate:nature-trail-shelter, h2-candidate:nature-water-buffer | SafeCoreAccess, FarmIncidentInput, TownReliefInput, CityHubReturn, RestoredTrailOutput |
 | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | `Organic` | h2-candidate:nature-trail-shelter, h2-candidate:nature-water-buffer | h2-candidate:forest-edge-farm | TownOrFarmAccess, TrailLoop, EmergencyExit |
 | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | `ModifiedGrid` | h2-candidate:hub-inbound-storage, h2-candidate:hub-quarantine-staging, h2-candidate:hub-longterm-cold-storage, h2-candidate:hub-outbound-vehicle | h2-candidate:hub-returns-processing | HubInboundGate, HubOutboundGate, ReturnGate |
