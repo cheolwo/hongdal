@@ -16,4 +16,11 @@
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\eng\world-seedbeds\generated\wi-eh-status.v1.json"
+                      LogicalName="Ssalddel.Simulation.SpatialKnowledge.wi-eh-status.v1.json" />
+    <EmbeddedResource Include="..\eng\world-seedbeds\wi-spatial-composition-plans\reference-play-01-harvest-shipping.v1.json"
+                      LogicalName="Ssalddel.Simulation.SpatialKnowledge.reference-play-01-harvest-shipping.v1.json" />
+  </ItemGroup>
+
 </Project>

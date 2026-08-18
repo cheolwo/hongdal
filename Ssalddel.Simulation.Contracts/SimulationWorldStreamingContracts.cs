@@ -48,6 +48,7 @@ namespace Ssalddel.Simulation.Contracts
         public string RegionSummaryProfileRevision { get; set; } = string.Empty;
         public string RegionSummaryProfileHashSha256 { get; set; } = string.Empty;
         public string[] SupportedSummaryLodCodes { get; set; } = Array.Empty<string>();
+        public SimulationLhWorldProfileResponse? LhProfile { get; set; }
         public bool IsOperationalState { get; set; }
         public string EvidenceKindCode { get; set; } = string.Empty;
     }

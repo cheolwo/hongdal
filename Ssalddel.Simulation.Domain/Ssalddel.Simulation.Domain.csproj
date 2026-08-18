@@ -13,4 +13,10 @@
     <ProjectReference Include="..\Ssalddel.WorkflowRules\Ssalddel.WorkflowRules.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Ssalddel.Simulation.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

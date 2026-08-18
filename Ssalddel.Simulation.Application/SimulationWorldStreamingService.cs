@@ -34,7 +34,7 @@ namespace Ssalddel.Simulation.Application
         public const int MaxConcurrentTileLoads = 4;
         public const double BoundaryPrefetchFraction = 0.25d;
         public const int L2HaloMeters = 60;
-        public const string RecipeRevision = "world-stream.pyeongchang-farm.r3";
+        public const string RecipeRevision = "world-stream.pyeongchang-farm.r4";
         public const string ManifestRevision = "world-stream.tile-manifest.r2";
         public const string ObjectPlacementRevision = "world-stream.object-placement.r1";
 
@@ -81,6 +81,7 @@ namespace Ssalddel.Simulation.Application
                 RegionSummaryProfileHashSha256 = summaryProfile.ComputeHash(),
                 SupportedSummaryLodCodes = summaryProfile.Budgets
                     .Select(item => item.LodCode).ToArray(),
+                LhProfile = SimulationLhWorldService.CreateDefaultProfile(),
                 IsOperationalState = false,
                 EvidenceKindCode = SimulationWorldStreamCodes.Derived,
             };
@@ -348,6 +349,7 @@ namespace Ssalddel.Simulation.Application
                 string.Join(",", value.CoverageTileKeys), string.Join(",", value.LayerCodes),
                 value.RegionSummaryProfileRevision, value.RegionSummaryProfileHashSha256,
                 string.Join(",", value.SupportedSummaryLodCodes),
+                value.LhProfile?.ProfileHashSha256 ?? string.Empty,
                 value.EvidenceKindCode,
             });
 

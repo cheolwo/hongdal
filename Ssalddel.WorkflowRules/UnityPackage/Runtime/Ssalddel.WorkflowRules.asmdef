@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.WorkflowRules",
+  "rootNamespace": "Ssalddel.WorkflowRules",
+  "references": ["Ssalddel.WorkflowRules.Contracts"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

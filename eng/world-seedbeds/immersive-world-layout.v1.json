@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "simulation-world-immersive-layout.v1",
+  "revision": "simulation-world-immersive-layout.r1",
+  "worldStableId": "immersive-world:nature-led-farm-town-city.v1",
+  "entrySceneCode": "SimulationWorldShell",
+  "defaultInstanceStableId": "immersive-instance:nature-home",
+  "defaultViewModeCode": "TacticalThirdPerson",
+  "backgroundSimulationContinues": true,
+  "remoteFieldConfirmAllowed": false,
+  "instances": [
+    {
+      "stableId": "immersive-instance:nature-home",
+      "instanceKindCode": "NatureHome",
+      "title": "Nature 생활·탐색 세계",
+      "primaryPackCode": "Nature",
+      "h3CandidateRefs": [
+        "h3-candidate:nature-exploration-buffer",
+        "h3-candidate:nature-trail-network"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-water-buffer",
+        "h2-candidate:nature-trail-shelter"
+      ],
+      "worldInteractionIds": ["WI-WORLD-05", "WI-WORLD-07"],
+      "compositionWeights": {
+        "Nature": 90,
+        "NetworkTransition": 10
+      },
+      "persistent": true,
+      "fieldVisitRequired": false
+    },
+    {
+      "stableId": "immersive-instance:farm",
+      "instanceKindCode": "Farm",
+      "title": "Farm 생산·출하 경관",
+      "primaryPackCode": "Farm",
+      "h3CandidateRefs": ["h3-candidate:highland-farm"],
+      "h2CandidateRefs": [
+        "h2-candidate:highland-production",
+        "h2-candidate:farm-processing-shipping",
+        "h2-candidate:forest-edge-farm"
+      ],
+      "worldInteractionIds": ["WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-LOG-01"],
+      "compositionWeights": {
+        "Farm": 70,
+        "Nature": 20,
+        "NetworkTransition": 10
+      },
+      "persistent": false,
+      "fieldVisitRequired": true
+    },
+    {
+      "stableId": "immersive-instance:town",
+      "instanceKindCode": "Town",
+      "title": "Town 생활·시장 경관",
+      "primaryPackCode": "Town",
+      "h3CandidateRefs": ["h3-candidate:lowrise-market-town"],
+      "h2CandidateRefs": [
+        "h2-candidate:lowrise-residential",
+        "h2-candidate:market-life-commerce"
+      ],
+      "worldInteractionIds": ["WI-MARKET-02", "WI-MARKET-03", "WI-MARKET-04", "WI-MARKET-05", "WI-ORDER-05", "WI-ORDER-06"],
+      "compositionWeights": {
+        "Town": 70,
+        "Nature": 20,
+        "NetworkTransition": 10
+      },
+      "persistent": false,
+      "fieldVisitRequired": true
+    },
+    {
+      "stableId": "immersive-instance:city-hub",
+      "instanceKindCode": "CityHub",
+      "title": "City 물류 Hub 경관",
+      "primaryPackCode": "City",
+      "h3CandidateRefs": ["h3-candidate:jinbu-hub"],
+      "h2CandidateRefs": [
+        "h2-candidate:hub-inbound-storage",
+        "h2-candidate:hub-outbound-vehicle"
+      ],
+      "worldInteractionIds": ["WI-LOG-04", "WI-LOG-05", "WI-001", "WI-002"],
+      "compositionWeights": {
+        "City": 70,
+        "Nature": 20,
+        "NetworkTransition": 10
+      },
+      "persistent": false,
+      "fieldVisitRequired": true
+    }
+  ],
+  "natureRiskBands": [
+    {
+      "riskBandCode": "SafeCore",
+      "order": 0,
+      "title": "안전 생활 중심부",
+      "h1CandidateRefs": ["h1-stock:nature-trailhead", "h1-stock:nature-shelter"],
+      "encounterSocketRoleCodes": [],
+      "allowedPresentationKeys": [],
+      "monsterPresentationAllowed": false
+    },
+    {
+      "riskBandCode": "WarningBand",
+      "order": 1,
+      "title": "위협 징후 외곽",
+      "h1CandidateRefs": ["h1-stock:nature-exploration-buffer", "h1-stock:nature-lookout"],
+      "encounterSocketRoleCodes": ["WarningSignal", "RetreatRoute"],
+      "allowedPresentationKeys": ["survival.seasonal-defense.warning", "survival.zombie-warning"],
+      "monsterPresentationAllowed": false
+    },
+    {
+      "riskBandCode": "EncounterBand",
+      "order": 2,
+      "title": "조우 위험 외곽",
+      "h1CandidateRefs": ["h1-stock:nature-exploration-buffer", "h1-stock:nature-shelter"],
+      "encounterSocketRoleCodes": ["ThreatSpawn", "CombatClearing", "RetreatRoute"],
+      "allowedPresentationKeys": ["survival.zombie-warning", "survival.tactical.squad.zombie-pressure"],
+      "monsterPresentationAllowed": true,
+      "requiredAssetGateCode": "PolygonApocalypse"
+    }
+  ],
+  "connectors": [
+    {
+      "connectorCode": "NatureToFarm",
+      "fromInstanceStableId": "immersive-instance:nature-home",
+      "toInstanceStableId": "immersive-instance:farm",
+      "entryRoleCode": "FarmTrailhead",
+      "returnRoleCode": "NatureFarmReturn"
+    },
+    {
+      "connectorCode": "NatureToTown",
+      "fromInstanceStableId": "immersive-instance:nature-home",
+      "toInstanceStableId": "immersive-instance:town",
+      "entryRoleCode": "TownBusStop",
+      "returnRoleCode": "NatureTownReturn"
+    },
+    {
+      "connectorCode": "NatureToCityHub",
+      "fromInstanceStableId": "immersive-instance:nature-home",
+      "toInstanceStableId": "immersive-instance:city-hub",
+      "entryRoleCode": "HubTransportPoint",
+      "returnRoleCode": "NatureHubReturn"
+    }
+  ],
+  "assetGates": [
+    {
+      "assetGateCode": "PolygonApocalypse",
+      "packCode": "POLYGON Apocalypse",
+      "stateCode": "WaitingForApocalypseAssetPack",
+      "fallbackPolicyCode": "Forbidden",
+      "requiredForCapabilityCodes": ["EncounterBandMonsterPresentation"]
+    }
+  ],
+  "authorityBoundary": {
+    "candidateLayoutDoesNotRaiseEvidence": true,
+    "playerMovementDoesNotChangeWorldState": true,
+    "unityCollisionDoesNotResolveCombat": true,
+    "publicDataCannotIdentifyThreatTargets": true,
+    "operationalModeThreatsForbidden": true,
+    "scenarioFallbackForbiddenForGraphRequest": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}
