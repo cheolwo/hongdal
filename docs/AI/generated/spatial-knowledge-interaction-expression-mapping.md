@@ -24,10 +24,15 @@
 | `h1-stock:hub-temporary-staging` | h1-expression:city:상하차-dock, h1-expression:city:화물-대기-야드 |
 | `h1-stock:hub-town-corridor` |  |
 | `h1-stock:hub-vehicle-yard` | h1-expression:city:상하차-dock, h1-expression:city:화물-대기-야드 |
+| `h1-stock:nature-emergency-retreat` | h1-expression:nature:산길-바위-길목, h1-expression:nature:숲-가장자리 |
 | `h1-stock:nature-exploration-buffer` | h1-expression:nature:산길-바위-길목, h1-expression:nature:숲-빈터-고사목 |
 | `h1-stock:nature-farm-edge` | h1-expression:nature:숲-가장자리 |
+| `h1-stock:nature-incident-trace` | h1-expression:nature:산길-바위-길목, h1-expression:nature:숲-빈터-고사목 |
 | `h1-stock:nature-lookout` | h1-expression:nature:고지대-노출지, h1-expression:nature:산-능선 |
+| `h1-stock:nature-restoration-site` | h1-expression:nature:수변-완충지, h1-expression:nature:숲-가장자리 |
+| `h1-stock:nature-safe-recovery-camp` | h1-expression:nature:숲-빈터-고사목, h1-expression:nature:초지-야생화 |
 | `h1-stock:nature-shelter` | h1-expression:nature:산길-바위-길목, h1-expression:nature:숲-빈터-고사목 |
+| `h1-stock:nature-threat-watch` | h1-expression:nature:고지대-노출지, h1-expression:nature:산-능선 |
 | `h1-stock:nature-trailhead` | h1-expression:nature:산길-바위-길목, h1-expression:nature:숲-가장자리 |
 | `h1-stock:road-facility-access` |  |
 | `h1-stock:town-living-square` | h1-expression:town:근린-놀이터, h1-expression:town:생활-공공광장 |

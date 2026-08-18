@@ -58,6 +58,8 @@
   },
   "supportsInteractionH1Refs": [
     "h1-stock:nature-exploration-buffer",
+    "h1-stock:nature-incident-trace",
+    "h1-stock:nature-safe-recovery-camp",
     "h1-stock:nature-shelter"
   ],
   "derivationRecipeCode": "h1.pack-expression.nature.r1",

@@ -7,7 +7,6 @@
 | `H1` | `h1-expression:farm:시설하우스-병렬단지` 시설하우스 병렬단지 — Farm 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:개울-회랑` 개울 회랑 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:바위-절개지` 바위 절개지 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
-| `H1` | `h1-expression:nature:초지-야생화` 초지·야생화 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:침엽수림-군집` 침엽수림 군집 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:혼효림-군집` 혼효림 군집 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:활엽수림-군집` 활엽수림 군집 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |

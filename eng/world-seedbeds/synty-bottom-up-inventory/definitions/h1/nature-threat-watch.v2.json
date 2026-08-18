@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-threat-watch",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연권 위협 관찰 초소",
+  "summary": "전문 경관에서 번진 위험의 방향과 강도를 관찰하고 안전 생활핵에 경고를 전달하는 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "RegionalThreatObservation",
+    "NatureRouteWarning",
+    "EncounterForecast"
+  ],
+  "spatialRoleCodes": [
+    "NatureThreatWatchArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.ObservationArea",
+    "Spatial.ThreatMonitoringArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:nature-trailhead",
+    "h1-stock:nature-lookout"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-emergency-retreat",
+    "h1-stock:nature-safe-recovery-camp"
+  ],
+  "connectorRoleCodes": [
+    "SafeCoreInput",
+    "ThreatBandOutput",
+    "WarningRelay"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:산 능선",
+    "nature:고지대 노출지"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-threat-watch.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-threat-watch"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -57,7 +57,8 @@
     "maximumColliderCount": 2
   },
   "supportsInteractionH1Refs": [
-    "h1-stock:farm-washing"
+    "h1-stock:farm-washing",
+    "h1-stock:nature-restoration-site"
   ],
   "derivationRecipeCode": "h1.pack-expression.nature.r1",
   "derivationInputHashSha256": "26a7a249cb8a07466186a0ef184e6511d87696f6a5da42233219f7c28474f338",

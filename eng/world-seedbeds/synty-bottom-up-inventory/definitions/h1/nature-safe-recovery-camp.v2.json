@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-safe-recovery-camp",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연권 안전 회복 야영지",
+  "summary": "위협 관찰·후퇴·복구 뒤 플레이어와 동료가 다음 행동을 준비하는 안전 생활핵의 회복 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "PartyRecovery",
+    "ThreatDebrief",
+    "NextActionPreparation"
+  ],
+  "spatialRoleCodes": [
+    "NatureSafeRecoveryCampArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.RestArea",
+    "Spatial.SafeCore",
+    "Spatial.NpcWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:nature-emergency-retreat",
+    "h1-stock:nature-restoration-site"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-trailhead",
+    "h1-stock:nature-threat-watch"
+  ],
+  "connectorRoleCodes": [
+    "RetreatInput",
+    "RecoveryInput",
+    "SafeCoreOutput"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:숲 빈터·고사목",
+    "nature:초지·야생화"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-safe-recovery-camp.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-safe-recovery-camp"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

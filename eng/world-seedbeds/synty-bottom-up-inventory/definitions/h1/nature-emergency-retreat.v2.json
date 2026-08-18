@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-emergency-retreat",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연권 긴급 후퇴 길목",
+  "summary": "조우 위험대에서 경계 완충대와 안전 생활핵으로 돌아가는 단방향 우선 후퇴 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "EmergencyRetreat",
+    "ThreatEvacuation",
+    "SafeCoreReturn"
+  ],
+  "spatialRoleCodes": [
+    "NatureEmergencyRetreatArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.EmergencyAccess",
+    "Spatial.PlayerEscapeRoute"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:nature-incident-trace",
+    "h1-stock:nature-threat-watch"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-shelter",
+    "h1-stock:nature-safe-recovery-camp"
+  ],
+  "connectorRoleCodes": [
+    "ThreatBandInput",
+    "BufferOutput",
+    "SafeCoreOutput"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:산길·바위 길목",
+    "nature:숲 가장자리"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-emergency-retreat.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-emergency-retreat"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

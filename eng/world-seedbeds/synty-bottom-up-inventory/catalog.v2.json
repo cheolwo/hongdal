@@ -183,6 +183,14 @@
       "documentSha256": "b650712e08b8c12305edb51cfb599406a867ed7222debbb0bb043afb541d7ed8"
     },
     {
+      "stableId": "h1-stock:nature-emergency-retreat",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
+      "definitionSha256": "6461848d2740f7417ccfe4d8347192a1d7272c57289e0dbaf661b5c3b0d610a3",
+      "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
+      "documentSha256": "ed172bb2e27152e8b3840bcdf20f1f111a8edf8d430007f775a1ade2643ca218"
+    },
+    {
       "stableId": "h1-stock:nature-exploration-buffer",
       "revision": 2,
       "definitionPath": "definitions/h1/nature-exploration-buffer.v2.json",
@@ -199,6 +207,14 @@
       "documentSha256": "cec5a53c3e833b805fb4abd3ba263270123bbc5c07ab1cb17f5edb97d57d3df8"
     },
     {
+      "stableId": "h1-stock:nature-incident-trace",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-incident-trace.v2.json",
+      "definitionSha256": "6abf8316bbd16c83b482b359ec10986791f86998dcb9fd780ea247ae52dd7039",
+      "documentPath": "authored/h1/nature-incident-trace.v2.md",
+      "documentSha256": "ec8ed54ed534807f58eb060cd4c24db00333d6b03f3bbe821dad10ccd239fd42"
+    },
+    {
       "stableId": "h1-stock:nature-lookout",
       "revision": 1,
       "definitionPath": "definitions/h1/nature-lookout.v2.json",
@@ -207,12 +223,36 @@
       "documentSha256": "20ad3a63a62527ab1eab0508ef102fe6a46c7754be5bbcb87df53129b42ebb62"
     },
     {
+      "stableId": "h1-stock:nature-restoration-site",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-restoration-site.v2.json",
+      "definitionSha256": "6f0f7e6a081b52656f5f011f34b5d0d68e8d64d080ebb695508ecc5d55fb8205",
+      "documentPath": "authored/h1/nature-restoration-site.v2.md",
+      "documentSha256": "e83126c05bac007dfc76b49b2c21b1d7a6639615eea1986edd2b113083c6ffb6"
+    },
+    {
+      "stableId": "h1-stock:nature-safe-recovery-camp",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-safe-recovery-camp.v2.json",
+      "definitionSha256": "624897126701d981ce8fc14220ad2aea573826e20eed44cc4f555d5e186a25da",
+      "documentPath": "authored/h1/nature-safe-recovery-camp.v2.md",
+      "documentSha256": "7d520a02f2544f69aae939b0644f8ee2516bab2c2c974dd9c7fef8b8f56791ae"
+    },
+    {
       "stableId": "h1-stock:nature-shelter",
       "revision": 1,
       "definitionPath": "definitions/h1/nature-shelter.v2.json",
       "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
       "documentPath": "authored/h1/nature-shelter.v2.md",
       "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+    },
+    {
+      "stableId": "h1-stock:nature-threat-watch",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-threat-watch.v2.json",
+      "definitionSha256": "0597ebcf348eea39b858efcb38097ca15001fc309834c536b9a67416d50242d6",
+      "documentPath": "authored/h1/nature-threat-watch.v2.md",
+      "documentSha256": "ed77b7333797dfba8377dda6a841de8b91bbcac80723d930768118dc0116dbae"
     },
     {
       "stableId": "h1-stock:nature-trailhead",

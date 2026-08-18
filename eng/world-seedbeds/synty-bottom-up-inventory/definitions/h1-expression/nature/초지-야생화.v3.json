@@ -59,11 +59,13 @@
     "maximumRendererCount": 4,
     "maximumColliderCount": 2
   },
-  "supportsInteractionH1Refs": [],
+  "supportsInteractionH1Refs": [
+    "h1-stock:nature-safe-recovery-camp"
+  ],
   "derivationRecipeCode": "h1.pack-expression.nature.r1",
   "derivationInputHashSha256": "de66872bd7d4db731faa41926d4aa9fc28e5e4de42633125102a8f456cd7b354",
   "authoredDocument": "authored/h1-expression/nature/초지-야생화.v3.md",
-  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
   "presentationOnly": true,
   "isOperationalState": false
 }

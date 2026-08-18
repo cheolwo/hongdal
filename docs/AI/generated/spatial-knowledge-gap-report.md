@@ -13,8 +13,11 @@
 | `H1` | `h1-stock:hub-temporary-staging` Hub 임시 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-town-corridor` Hub–Town 물류 회랑 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:hub-vehicle-yard` Hub 차량 상차·대기 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-exploration-buffer` 자연 탐색·완충 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:nature-farm-edge` 숲 경계형 농장 전환 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:nature-safe-recovery-camp` 자연권 안전 회복 야영지 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:nature-threat-watch` 자연권 위협 관찰 초소 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:road-facility-access` 도로–시설 진입 전환 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:town-living-square` 생활권 작은 광장 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
@@ -28,7 +31,9 @@
 | `H1` | `h1-stock:hub-cold-storage` Hub 저온 보관 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-quarantine` Hub 검역·격리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-returns` Hub 반품 처리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-lookout` 자연 전망·관찰 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-shelter` 자연 임시 대피 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-returns` 마트 반품 접수 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |

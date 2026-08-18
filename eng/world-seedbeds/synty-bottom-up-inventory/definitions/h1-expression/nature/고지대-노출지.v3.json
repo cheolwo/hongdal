@@ -60,7 +60,8 @@
     "maximumColliderCount": 4
   },
   "supportsInteractionH1Refs": [
-    "h1-stock:nature-lookout"
+    "h1-stock:nature-lookout",
+    "h1-stock:nature-threat-watch"
   ],
   "derivationRecipeCode": "h1.pack-expression.nature.r1",
   "derivationInputHashSha256": "6731f8212ddedfff4a75d63f90c564c31fca643b367fe15afc05690def8a3e7d",

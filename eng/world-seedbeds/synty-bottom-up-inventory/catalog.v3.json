@@ -4,7 +4,7 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "c0659670eb13aaefe711ebcab2892913e0486f69baf2a31f6ff5618427555d93",
+  "previousCatalogSha256": "86955fd8ee34e1231968bc077a21d2c97b133773384681cc6aa3d84009c985c8",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
@@ -210,6 +210,15 @@
       "documentSha256": "b650712e08b8c12305edb51cfb599406a867ed7222debbb0bb043afb541d7ed8"
     },
     {
+      "stableId": "h1-stock:nature-emergency-retreat",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
+      "definitionSha256": "6461848d2740f7417ccfe4d8347192a1d7272c57289e0dbaf661b5c3b0d610a3",
+      "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
+      "documentSha256": "ed172bb2e27152e8b3840bcdf20f1f111a8edf8d430007f775a1ade2643ca218"
+    },
+    {
       "stableId": "h1-stock:nature-exploration-buffer",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
@@ -228,6 +237,15 @@
       "documentSha256": "cec5a53c3e833b805fb4abd3ba263270123bbc5c07ab1cb17f5edb97d57d3df8"
     },
     {
+      "stableId": "h1-stock:nature-incident-trace",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-incident-trace.v2.json",
+      "definitionSha256": "6abf8316bbd16c83b482b359ec10986791f86998dcb9fd780ea247ae52dd7039",
+      "documentPath": "authored/h1/nature-incident-trace.v2.md",
+      "documentSha256": "ec8ed54ed534807f58eb060cd4c24db00333d6b03f3bbe821dad10ccd239fd42"
+    },
+    {
       "stableId": "h1-stock:nature-lookout",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -237,6 +255,24 @@
       "documentSha256": "20ad3a63a62527ab1eab0508ef102fe6a46c7754be5bbcb87df53129b42ebb62"
     },
     {
+      "stableId": "h1-stock:nature-restoration-site",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-restoration-site.v2.json",
+      "definitionSha256": "6f0f7e6a081b52656f5f011f34b5d0d68e8d64d080ebb695508ecc5d55fb8205",
+      "documentPath": "authored/h1/nature-restoration-site.v2.md",
+      "documentSha256": "e83126c05bac007dfc76b49b2c21b1d7a6639615eea1986edd2b113083c6ffb6"
+    },
+    {
+      "stableId": "h1-stock:nature-safe-recovery-camp",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-safe-recovery-camp.v2.json",
+      "definitionSha256": "624897126701d981ce8fc14220ad2aea573826e20eed44cc4f555d5e186a25da",
+      "documentPath": "authored/h1/nature-safe-recovery-camp.v2.md",
+      "documentSha256": "7d520a02f2544f69aae939b0644f8ee2516bab2c2c974dd9c7fef8b8f56791ae"
+    },
+    {
       "stableId": "h1-stock:nature-shelter",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -244,6 +280,15 @@
       "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
       "documentPath": "authored/h1/nature-shelter.v2.md",
       "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+    },
+    {
+      "stableId": "h1-stock:nature-threat-watch",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-threat-watch.v2.json",
+      "definitionSha256": "0597ebcf348eea39b858efcb38097ca15001fc309834c536b9a67416d50242d6",
+      "documentPath": "authored/h1/nature-threat-watch.v2.md",
+      "documentSha256": "ed77b7333797dfba8377dda6a841de8b91bbcac80723d930768118dc0116dbae"
     },
     {
       "stableId": "h1-stock:nature-trailhead",
@@ -477,9 +522,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/고지대-노출지.v3.json",
-      "definitionSha256": "ae292b2f6432ae302033fe08c120181c48394fcaa8906708bcfa155b65836016",
+      "definitionSha256": "8c529c64eba30128462d47067ad586ded2a8441d18f4b28d9ca8ed006378aa1f",
       "documentPath": "authored/h1-expression/nature/고지대-노출지.v3.md",
-      "documentSha256": "8f92c821af678edc388dabc429762ae427359bfd4dba4f1e58ecc2d4333ebc0d"
+      "documentSha256": "86dfe15031b193013b49aab7eb2e50d46a2dd0e3095a8222abb04a4f75f45d3d"
     },
     {
       "stableId": "h1-expression:nature:바위-절개지",
@@ -495,54 +540,54 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/산-능선.v3.json",
-      "definitionSha256": "f0c665658fd2aab2c05094aab1f326ce8389e6ace271caa054bbaa45b5bafbbf",
+      "definitionSha256": "41f00d1af4e365015f96a8b5b94711296b5e104c613491fd857bbbec461a6e66",
       "documentPath": "authored/h1-expression/nature/산-능선.v3.md",
-      "documentSha256": "3873439eee07189a4de34ec351cefd274a8b5ec2e84a7f0e6b1a4a2e93d32fd9"
+      "documentSha256": "b85ecdf8ac550239b0985d88248ad511740af9d000612627e1084c2629fc1878"
     },
     {
       "stableId": "h1-expression:nature:산길-바위-길목",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/산길-바위-길목.v3.json",
-      "definitionSha256": "7f80cd61ffbed8b08ec4f6094d3c2119b7c6a3a864015f2196dd64ca55357b4b",
+      "definitionSha256": "91803843f6febba496436d91bfb359af162385702a5965456e57e488c1fff781",
       "documentPath": "authored/h1-expression/nature/산길-바위-길목.v3.md",
-      "documentSha256": "f3220c0c09221cc1f6ef52dcb87189639ee6b7c17e4f154af82660e3789e8b84"
+      "documentSha256": "4ca171ca6aa8142587be2ae600e61f2920408f65be6b83e403ab6fd52c1124ef"
     },
     {
       "stableId": "h1-expression:nature:수변-완충지",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/수변-완충지.v3.json",
-      "definitionSha256": "fbb1a4f46ff5c7f319adfca5a903448d1cded505524cc09783bc4ec89de0c9f9",
+      "definitionSha256": "139a56e65c84ef347a3b7248d18bb95e0b0009cf68d88d29a0b5b46ea3eebf5c",
       "documentPath": "authored/h1-expression/nature/수변-완충지.v3.md",
-      "documentSha256": "a12fddc43c7d86f69d2900d0ed1f80aacd61f73c621acea47233c2d51a66eaab"
+      "documentSha256": "7ec5a8f82c51bca23d9e76355f1e8a4a214dea7de1ebd08852d0d85522ce2b13"
     },
     {
       "stableId": "h1-expression:nature:숲-가장자리",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/숲-가장자리.v3.json",
-      "definitionSha256": "91ba01b59990b72b50079de3bd7ad68714d8bebbc6ffa5bd65004f437ca531b6",
+      "definitionSha256": "a06453332c0deee42f8b95a92274519383187eda489e480283a381ce41e5b8ba",
       "documentPath": "authored/h1-expression/nature/숲-가장자리.v3.md",
-      "documentSha256": "8b5a6a7ca07564ff2b1481793321fdf23c81b8002fb63d6fc646232678c35581"
+      "documentSha256": "fca0862cca670152bec49ddba0f7ecfe43c041a3bf72e539aab16f0015b57dff"
     },
     {
       "stableId": "h1-expression:nature:숲-빈터-고사목",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/숲-빈터-고사목.v3.json",
-      "definitionSha256": "8e9898e7539a9bfbca12a1443d7a987f35de4d580441f68edfbf30339acfdb88",
+      "definitionSha256": "bde1f989976c571c312aa338489769ae4abfb3b011f9d446fbaf16506eaf7ee6",
       "documentPath": "authored/h1-expression/nature/숲-빈터-고사목.v3.md",
-      "documentSha256": "4ba25be9d6d583703c6a04675afe35c2c536db24f8819d3dc2ad564dd4982f6b"
+      "documentSha256": "33d05e46cd5bedf55ded654ce38338c9298dac91526f8c3a672b76d4f99c61fc"
     },
     {
       "stableId": "h1-expression:nature:초지-야생화",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/초지-야생화.v3.json",
-      "definitionSha256": "ce7c08a346b64b7323b519b0e2036ff4508a62aa954c6c25b951b653296ca4ac",
+      "definitionSha256": "899e83359a0938b26e4ab9b1c4822916fb41829f6e1c4ea2cfed543414068f53",
       "documentPath": "authored/h1-expression/nature/초지-야생화.v3.md",
-      "documentSha256": "3eb0097431daaf108febf8161e0b84d704be42955f4b28f4f29b7b8bddc6c8dc"
+      "documentSha256": "912587bd5f9a0d9d2398cbf8b03373a8d5713194824e5fe438aeba8a2193201a"
     },
     {
       "stableId": "h1-expression:nature:침엽수림-군집",
@@ -767,9 +812,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/고지대-노출지.v3.json",
-      "definitionSha256": "ae292b2f6432ae302033fe08c120181c48394fcaa8906708bcfa155b65836016",
+      "definitionSha256": "8c529c64eba30128462d47067ad586ded2a8441d18f4b28d9ca8ed006378aa1f",
       "documentPath": "authored/h1-expression/nature/고지대-노출지.v3.md",
-      "documentSha256": "8f92c821af678edc388dabc429762ae427359bfd4dba4f1e58ecc2d4333ebc0d"
+      "documentSha256": "86dfe15031b193013b49aab7eb2e50d46a2dd0e3095a8222abb04a4f75f45d3d"
     },
     {
       "stableId": "h1-expression:nature:바위-절개지",
@@ -785,54 +830,54 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/산-능선.v3.json",
-      "definitionSha256": "f0c665658fd2aab2c05094aab1f326ce8389e6ace271caa054bbaa45b5bafbbf",
+      "definitionSha256": "41f00d1af4e365015f96a8b5b94711296b5e104c613491fd857bbbec461a6e66",
       "documentPath": "authored/h1-expression/nature/산-능선.v3.md",
-      "documentSha256": "3873439eee07189a4de34ec351cefd274a8b5ec2e84a7f0e6b1a4a2e93d32fd9"
+      "documentSha256": "b85ecdf8ac550239b0985d88248ad511740af9d000612627e1084c2629fc1878"
     },
     {
       "stableId": "h1-expression:nature:산길-바위-길목",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/산길-바위-길목.v3.json",
-      "definitionSha256": "7f80cd61ffbed8b08ec4f6094d3c2119b7c6a3a864015f2196dd64ca55357b4b",
+      "definitionSha256": "91803843f6febba496436d91bfb359af162385702a5965456e57e488c1fff781",
       "documentPath": "authored/h1-expression/nature/산길-바위-길목.v3.md",
-      "documentSha256": "f3220c0c09221cc1f6ef52dcb87189639ee6b7c17e4f154af82660e3789e8b84"
+      "documentSha256": "4ca171ca6aa8142587be2ae600e61f2920408f65be6b83e403ab6fd52c1124ef"
     },
     {
       "stableId": "h1-expression:nature:수변-완충지",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/수변-완충지.v3.json",
-      "definitionSha256": "fbb1a4f46ff5c7f319adfca5a903448d1cded505524cc09783bc4ec89de0c9f9",
+      "definitionSha256": "139a56e65c84ef347a3b7248d18bb95e0b0009cf68d88d29a0b5b46ea3eebf5c",
       "documentPath": "authored/h1-expression/nature/수변-완충지.v3.md",
-      "documentSha256": "a12fddc43c7d86f69d2900d0ed1f80aacd61f73c621acea47233c2d51a66eaab"
+      "documentSha256": "7ec5a8f82c51bca23d9e76355f1e8a4a214dea7de1ebd08852d0d85522ce2b13"
     },
     {
       "stableId": "h1-expression:nature:숲-가장자리",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/숲-가장자리.v3.json",
-      "definitionSha256": "91ba01b59990b72b50079de3bd7ad68714d8bebbc6ffa5bd65004f437ca531b6",
+      "definitionSha256": "a06453332c0deee42f8b95a92274519383187eda489e480283a381ce41e5b8ba",
       "documentPath": "authored/h1-expression/nature/숲-가장자리.v3.md",
-      "documentSha256": "8b5a6a7ca07564ff2b1481793321fdf23c81b8002fb63d6fc646232678c35581"
+      "documentSha256": "fca0862cca670152bec49ddba0f7ecfe43c041a3bf72e539aab16f0015b57dff"
     },
     {
       "stableId": "h1-expression:nature:숲-빈터-고사목",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/숲-빈터-고사목.v3.json",
-      "definitionSha256": "8e9898e7539a9bfbca12a1443d7a987f35de4d580441f68edfbf30339acfdb88",
+      "definitionSha256": "bde1f989976c571c312aa338489769ae4abfb3b011f9d446fbaf16506eaf7ee6",
       "documentPath": "authored/h1-expression/nature/숲-빈터-고사목.v3.md",
-      "documentSha256": "4ba25be9d6d583703c6a04675afe35c2c536db24f8819d3dc2ad564dd4982f6b"
+      "documentSha256": "33d05e46cd5bedf55ded654ce38338c9298dac91526f8c3a672b76d4f99c61fc"
     },
     {
       "stableId": "h1-expression:nature:초지-야생화",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/초지-야생화.v3.json",
-      "definitionSha256": "ce7c08a346b64b7323b519b0e2036ff4508a62aa954c6c25b951b653296ca4ac",
+      "definitionSha256": "899e83359a0938b26e4ab9b1c4822916fb41829f6e1c4ea2cfed543414068f53",
       "documentPath": "authored/h1-expression/nature/초지-야생화.v3.md",
-      "documentSha256": "3eb0097431daaf108febf8161e0b84d704be42955f4b28f4f29b7b8bddc6c8dc"
+      "documentSha256": "912587bd5f9a0d9d2398cbf8b03373a8d5713194824e5fe438aeba8a2193201a"
     },
     {
       "stableId": "h1-expression:nature:침엽수림-군집",
@@ -1114,6 +1159,15 @@
       "documentSha256": "b650712e08b8c12305edb51cfb599406a867ed7222debbb0bb043afb541d7ed8"
     },
     {
+      "stableId": "h1-stock:nature-emergency-retreat",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
+      "definitionSha256": "6461848d2740f7417ccfe4d8347192a1d7272c57289e0dbaf661b5c3b0d610a3",
+      "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
+      "documentSha256": "ed172bb2e27152e8b3840bcdf20f1f111a8edf8d430007f775a1ade2643ca218"
+    },
+    {
       "stableId": "h1-stock:nature-exploration-buffer",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
@@ -1132,6 +1186,15 @@
       "documentSha256": "cec5a53c3e833b805fb4abd3ba263270123bbc5c07ab1cb17f5edb97d57d3df8"
     },
     {
+      "stableId": "h1-stock:nature-incident-trace",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-incident-trace.v2.json",
+      "definitionSha256": "6abf8316bbd16c83b482b359ec10986791f86998dcb9fd780ea247ae52dd7039",
+      "documentPath": "authored/h1/nature-incident-trace.v2.md",
+      "documentSha256": "ec8ed54ed534807f58eb060cd4c24db00333d6b03f3bbe821dad10ccd239fd42"
+    },
+    {
       "stableId": "h1-stock:nature-lookout",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -1141,6 +1204,24 @@
       "documentSha256": "20ad3a63a62527ab1eab0508ef102fe6a46c7754be5bbcb87df53129b42ebb62"
     },
     {
+      "stableId": "h1-stock:nature-restoration-site",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-restoration-site.v2.json",
+      "definitionSha256": "6f0f7e6a081b52656f5f011f34b5d0d68e8d64d080ebb695508ecc5d55fb8205",
+      "documentPath": "authored/h1/nature-restoration-site.v2.md",
+      "documentSha256": "e83126c05bac007dfc76b49b2c21b1d7a6639615eea1986edd2b113083c6ffb6"
+    },
+    {
+      "stableId": "h1-stock:nature-safe-recovery-camp",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-safe-recovery-camp.v2.json",
+      "definitionSha256": "624897126701d981ce8fc14220ad2aea573826e20eed44cc4f555d5e186a25da",
+      "documentPath": "authored/h1/nature-safe-recovery-camp.v2.md",
+      "documentSha256": "7d520a02f2544f69aae939b0644f8ee2516bab2c2c974dd9c7fef8b8f56791ae"
+    },
+    {
       "stableId": "h1-stock:nature-shelter",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -1148,6 +1229,15 @@
       "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
       "documentPath": "authored/h1/nature-shelter.v2.md",
       "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+    },
+    {
+      "stableId": "h1-stock:nature-threat-watch",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/nature-threat-watch.v2.json",
+      "definitionSha256": "0597ebcf348eea39b858efcb38097ca15001fc309834c536b9a67416d50242d6",
+      "documentPath": "authored/h1/nature-threat-watch.v2.md",
+      "documentSha256": "ed77b7333797dfba8377dda6a841de8b91bbcac80723d930768118dc0116dbae"
     },
     {
       "stableId": "h1-stock:nature-trailhead",
@@ -2113,9 +2203,9 @@
   "counts": {
     "grammarMeaningGroups": 52,
     "grammarVariants": 156,
-    "h1Interaction": 36,
+    "h1Interaction": 41,
     "h1Expression": 32,
-    "h1Total": 68,
+    "h1Total": 73,
     "h2": 18,
     "h3": 10,
     "h4Blueprint": 5
@@ -2123,5 +2213,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "e3bd3c197c6f9c1c6f7067dbeef1d12e1c71e7fb4da681174be63cda7bd03cfb"
+  "contentHashSha256": "fca028923030b548a2b8bc8117b808f7e5e5de8dfd92463cbfc85a505828a95b"
 }

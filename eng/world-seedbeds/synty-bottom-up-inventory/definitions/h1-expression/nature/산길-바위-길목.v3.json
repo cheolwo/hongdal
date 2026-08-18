@@ -61,7 +61,9 @@
     "maximumColliderCount": 4
   },
   "supportsInteractionH1Refs": [
+    "h1-stock:nature-emergency-retreat",
     "h1-stock:nature-exploration-buffer",
+    "h1-stock:nature-incident-trace",
     "h1-stock:nature-shelter",
     "h1-stock:nature-trailhead"
   ],

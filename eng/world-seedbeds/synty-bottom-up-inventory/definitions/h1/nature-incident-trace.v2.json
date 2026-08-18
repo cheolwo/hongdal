@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-incident-trace",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연권 사건 흔적 조사 구역",
+  "summary": "Farm·Town·City/Hub 사건이 자연권에 남긴 오염·파손·이동 흔적을 조사하는 위치 독립 공간 후보다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "IncidentTraceInvestigation",
+    "CauseIdentification",
+    "ThreatTracking"
+  ],
+  "spatialRoleCodes": [
+    "NatureIncidentTraceArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.InvestigationArea",
+    "Spatial.ThreatMonitoringArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:nature-threat-watch"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-restoration-site",
+    "h1-stock:nature-emergency-retreat"
+  ],
+  "connectorRoleCodes": [
+    "ObservationInput",
+    "CauseRouteOutput",
+    "RetreatOutput"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:숲 빈터·고사목",
+    "nature:산길·바위 길목"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-incident-trace.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-incident-trace"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

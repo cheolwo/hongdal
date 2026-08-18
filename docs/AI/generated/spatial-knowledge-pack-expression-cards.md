@@ -17,14 +17,14 @@
 | `Farm` | `h1-expression:farm:헛간-작업마당` 헛간 작업마당 — Farm 단독 표현 | farm:헛간 작업마당:A, farm:헛간 작업마당:B, farm:헛간 작업마당:C | h1-stock:farm-harvest-staging, h1-stock:farm-loading-gate, h1-stock:farm-maintenance-yard, h1-stock:farm-seed-preparation, h1-stock:farm-sorting, h1-stock:farm-tool-storage, h1-stock:farm-washing, h1-stock:farm-work-yard, h1-stock:farm-worker-waiting |
 | `Farm` | `h1-expression:farm:혼합-작물밭` 혼합 작물밭 — Farm 단독 표현 | farm:혼합 작물밭:A, farm:혼합 작물밭:B, farm:혼합 작물밭:C | h1-stock:farm-production |
 | `Nature` | `h1-expression:nature:개울-회랑` 개울 회랑 — Nature 단독 표현 | nature:개울 회랑:A, nature:개울 회랑:B, nature:개울 회랑:C |  |
-| `Nature` | `h1-expression:nature:고지대-노출지` 고지대 노출지 — Nature 단독 표현 | nature:고지대 노출지:A, nature:고지대 노출지:B, nature:고지대 노출지:C | h1-stock:nature-lookout |
+| `Nature` | `h1-expression:nature:고지대-노출지` 고지대 노출지 — Nature 단독 표현 | nature:고지대 노출지:A, nature:고지대 노출지:B, nature:고지대 노출지:C | h1-stock:nature-lookout, h1-stock:nature-threat-watch |
 | `Nature` | `h1-expression:nature:바위-절개지` 바위 절개지 — Nature 단독 표현 | nature:바위 절개지:A, nature:바위 절개지:B, nature:바위 절개지:C |  |
-| `Nature` | `h1-expression:nature:산-능선` 산 능선 — Nature 단독 표현 | nature:산 능선:A, nature:산 능선:B, nature:산 능선:C | h1-stock:nature-lookout |
-| `Nature` | `h1-expression:nature:산길-바위-길목` 산길·바위 길목 — Nature 단독 표현 | nature:산길·바위 길목:A, nature:산길·바위 길목:B, nature:산길·바위 길목:C | h1-stock:nature-exploration-buffer, h1-stock:nature-shelter, h1-stock:nature-trailhead |
-| `Nature` | `h1-expression:nature:수변-완충지` 수변 완충지 — Nature 단독 표현 | nature:수변 완충지:A, nature:수변 완충지:B, nature:수변 완충지:C | h1-stock:farm-washing |
-| `Nature` | `h1-expression:nature:숲-가장자리` 숲 가장자리 — Nature 단독 표현 | nature:숲 가장자리:A, nature:숲 가장자리:B, nature:숲 가장자리:C | h1-stock:nature-farm-edge, h1-stock:nature-trailhead |
-| `Nature` | `h1-expression:nature:숲-빈터-고사목` 숲 빈터·고사목 — Nature 단독 표현 | nature:숲 빈터·고사목:A, nature:숲 빈터·고사목:B, nature:숲 빈터·고사목:C | h1-stock:nature-exploration-buffer, h1-stock:nature-shelter |
-| `Nature` | `h1-expression:nature:초지-야생화` 초지·야생화 — Nature 단독 표현 | nature:초지·야생화:A, nature:초지·야생화:B, nature:초지·야생화:C |  |
+| `Nature` | `h1-expression:nature:산-능선` 산 능선 — Nature 단독 표현 | nature:산 능선:A, nature:산 능선:B, nature:산 능선:C | h1-stock:nature-lookout, h1-stock:nature-threat-watch |
+| `Nature` | `h1-expression:nature:산길-바위-길목` 산길·바위 길목 — Nature 단독 표현 | nature:산길·바위 길목:A, nature:산길·바위 길목:B, nature:산길·바위 길목:C | h1-stock:nature-emergency-retreat, h1-stock:nature-exploration-buffer, h1-stock:nature-incident-trace, h1-stock:nature-shelter, h1-stock:nature-trailhead |
+| `Nature` | `h1-expression:nature:수변-완충지` 수변 완충지 — Nature 단독 표현 | nature:수변 완충지:A, nature:수변 완충지:B, nature:수변 완충지:C | h1-stock:farm-washing, h1-stock:nature-restoration-site |
+| `Nature` | `h1-expression:nature:숲-가장자리` 숲 가장자리 — Nature 단독 표현 | nature:숲 가장자리:A, nature:숲 가장자리:B, nature:숲 가장자리:C | h1-stock:nature-emergency-retreat, h1-stock:nature-farm-edge, h1-stock:nature-restoration-site, h1-stock:nature-trailhead |
+| `Nature` | `h1-expression:nature:숲-빈터-고사목` 숲 빈터·고사목 — Nature 단독 표현 | nature:숲 빈터·고사목:A, nature:숲 빈터·고사목:B, nature:숲 빈터·고사목:C | h1-stock:nature-exploration-buffer, h1-stock:nature-incident-trace, h1-stock:nature-safe-recovery-camp, h1-stock:nature-shelter |
+| `Nature` | `h1-expression:nature:초지-야생화` 초지·야생화 — Nature 단독 표현 | nature:초지·야생화:A, nature:초지·야생화:B, nature:초지·야생화:C | h1-stock:nature-safe-recovery-camp |
 | `Nature` | `h1-expression:nature:침엽수림-군집` 침엽수림 군집 — Nature 단독 표현 | nature:침엽수림 군집:A, nature:침엽수림 군집:B, nature:침엽수림 군집:C |  |
 | `Nature` | `h1-expression:nature:혼효림-군집` 혼효림 군집 — Nature 단독 표현 | nature:혼효림 군집:A, nature:혼효림 군집:B, nature:혼효림 군집:C |  |
 | `Nature` | `h1-expression:nature:활엽수림-군집` 활엽수림 군집 — Nature 단독 표현 | nature:활엽수림 군집:A, nature:활엽수림 군집:B, nature:활엽수림 군집:C |  |
