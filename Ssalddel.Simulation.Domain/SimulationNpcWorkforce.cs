@@ -520,6 +520,11 @@ namespace Ssalddel.Simulation.Domain
                     : SimulationNpcInventoryStateCodes.StorageEligible;
                 inventory.UpdatedTick = completedTick;
                 inventory.Revision++;
+                if (IsMarketFacility(task.FacilityStableId))
+                    RegisterTownMarketContaminationIncident(
+                        inventory.InventoryStableId,
+                        task.FacilityStableId,
+                        completedTick);
             }
         }
 

@@ -67,47 +67,57 @@ namespace Ssalddel.Simulation.Application
             var world = session.Snapshot();
             var policy = FindPolicy(sessionStableId, request.RequestingActorStableId);
             var farm = world.FarmSurvival;
+            var natureEncounter = world.NatureThreat.Encounters.FirstOrDefault(value =>
+                value.EncounterStableId == request.EncounterStableId.Trim());
             var blocks = new List<string>();
             if (request.ExpectedWorldRevision != world.Revision)
                 blocks.Add("SimulationExpectedRevisionMismatch");
-            if (farm == null || farm.IsOperationalState || !farm.SimulationOnly)
+            if ((farm == null || farm.IsOperationalState || !farm.SimulationOnly)
+                && natureEncounter == null)
                 blocks.Add("SimulationBattleFarmStateUnavailable");
             var encounter = farm?.Encounters.FirstOrDefault(value =>
                 value.EncounterStableId == request.EncounterStableId.Trim());
-            if (encounter == null)
+            if (encounter == null && natureEncounter == null)
                 blocks.Add("SimulationBattleEncounterNotFound");
-            else if (encounter.StateCode == SimulationFarmSurvivalCodes.Resolved)
+            else if (encounter?.StateCode == SimulationFarmSurvivalCodes.Resolved
+                || natureEncounter?.StateCode == SimulationRegionalIncidentCodes.Resolved)
                 blocks.Add("SimulationBattleEncounterAlreadyResolved");
 
-            var actors = farm?.Actors.Where(value =>
+            var actorIds = farm?.Actors.Where(value =>
                     value.ActorKindCode == SimulationFarmSurvivalCodes.Npc)
-                .OrderBy(value => value.ActorStableId, StringComparer.Ordinal).ToArray()
-                ?? Array.Empty<SimulationFarmActorSnapshot>();
-            var initialActorCount = actors.Length == 0 ? 0 : Math.Max(1, actors.Length / 2);
-            var initialActors = actors.Take(initialActorCount).Select(value => value.ActorStableId).ToArray();
-            var reinforcementActors = actors.Skip(initialActorCount).Select(value => value.ActorStableId).ToArray();
-            var initialResources = farm == null ? Array.Empty<string>() : initialActors
-                .Concat(new[]
+                .Select(value => value.ActorStableId)
+                .OrderBy(value => value, StringComparer.Ordinal).ToArray()
+                ?? world.NpcActors.Select(value => value.ActorStableId)
+                    .OrderBy(value => value, StringComparer.Ordinal).ToArray();
+            var initialActorCount = actorIds.Length == 0 ? 0 : Math.Max(1, actorIds.Length / 2);
+            var initialActors = actorIds.Take(initialActorCount).ToArray();
+            var reinforcementActors = actorIds.Skip(initialActorCount).ToArray();
+            var initialResources = initialActors.Concat(new[]
                 {
-                    farm.FarmBuildingStableId,
+                    farm?.FarmBuildingStableId ?? string.Empty,
                     "battle-squad:initial:" + request.EncounterStableId.Trim(),
                 }).Where(value => !string.IsNullOrWhiteSpace(value)).ToArray();
-            if (actors.Length == 0) blocks.Add("SimulationBattleAlliedForceUnavailable");
-            if (encounter != null && encounter.ThreatUnitCount <= 0)
+            if (actorIds.Length == 0) blocks.Add("SimulationBattleAlliedForceUnavailable");
+            var hostileStrength = encounter?.ThreatUnitCount
+                ?? natureEncounter?.ThreatUnitCount ?? 0;
+            if (hostileStrength <= 0)
                 blocks.Add("SimulationBattleHostileForceUnavailable");
-            if (farm != null && !battleStore.CanReserve(sessionStableId.Trim(), farm.AreaStableId,
+            var areaStableId = encounter != null ? farm?.AreaStableId ?? string.Empty
+                : natureEncounter == null ? string.Empty
+                    : "nature-route:" + natureEncounter.NatureRouteCode;
+            if (!battleStore.CanReserve(sessionStableId.Trim(), areaStableId,
                 initialResources)) blocks.Add("BattleResourceLocked");
 
             return new SimulationBattleCreatePreviewSnapshot
             {
                 SessionStableId = world.SessionStableId,
                 EncounterStableId = request.EncounterStableId.Trim(),
-                AreaStableId = farm?.AreaStableId ?? string.Empty,
+                AreaStableId = areaStableId,
                 WorldRevision = world.Revision,
                 WorldTick = world.CurrentTick,
                 AlliedStrength = 1 + initialActors.Length
                     + (farm?.Defenses.Count(value => value.Prepared) ?? 0) * 2,
-                HostileStrength = encounter?.ThreatUnitCount ?? 0,
+                HostileStrength = hostileStrength,
                 InitialResourceStableIds = initialResources,
                 ReinforcementCandidateStableIds = reinforcementActors,
                 CanConfirm = blocks.Count == 0,
@@ -237,8 +247,18 @@ namespace Ssalddel.Simulation.Application
 
         public void Reconcile(string sessionStableId, 경영SimulationSessionSnapshot world)
         {
+            var session = FindSession(sessionStableId);
             foreach (var battle in battleStore.FindBySession(sessionStableId.Trim()))
-                battle.Reconcile(world.CurrentTick, world.Revision);
+            {
+                var snapshot = battle.Reconcile(world.CurrentTick, world.Revision);
+                if (snapshot.Outcome?.ResultCode == SimulationBattleInstanceCodes.Victory
+                    && snapshot.Outcome.ReconciliationStateCode ==
+                        SimulationBattleInstanceCodes.Applied
+                    && world.NatureThreat.Encounters.Any(value =>
+                        value.EncounterStableId == snapshot.EncounterStableId))
+                    session.ApplyNatureEncounterVictory(snapshot.BattleStableId,
+                        snapshot.EncounterStableId);
+            }
         }
 
         public SimulationBattleSaveRecordSnapshot[] Capture(string sessionStableId)

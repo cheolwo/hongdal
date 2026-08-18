@@ -113,6 +113,13 @@ namespace Ssalddel.Simulation.Domain
                             entry.FarmWorkConfirmRequest!));
                 }
                 else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.FarmWorkPlanConfirm)
+                {
+                    aggregate.ConfirmFarmWorkPlan(
+                        SimulationSaveReplayCloner.CloneFarmWorkPlanConfirmRequest(
+                            entry.FarmWorkPlanConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode
                     == SimulationCommandTypeCodes.ThreatResponseConfirm)
                 {
                     aggregate.ConfirmThreatResponse(
@@ -196,6 +203,21 @@ namespace Ssalddel.Simulation.Domain
                         SimulationSaveReplayCloner.CloneTaskCancelRequest(
                             entry.TaskCancelRequest!));
                 }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.RegionalIncidentResponseConfirm)
+                {
+                    aggregate.ConfirmRegionalIncidentResponse(
+                        entry.WorldEventStableId!,
+                        SimulationSaveReplayCloner.CloneRegionalIncidentResponseConfirmRequest(
+                            entry.RegionalIncidentResponseConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.NatureEncounterVictory)
+                {
+                    aggregate.ApplyNatureEncounterVictory(
+                        entry.NatureEncounterVictoryRequest!.BattleStableId,
+                        entry.NatureEncounterVictoryRequest.EncounterStableId);
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
@@ -220,6 +242,7 @@ namespace Ssalddel.Simulation.Domain
                 }
             }
 
+            aggregate.RestoreLhWorldState(package.LhWorld);
             var replayed = aggregate.CreateSavePackage(new SimulationSessionSaveRequest
             {
                 SaveStableId = package.SaveStableId,
@@ -244,8 +267,15 @@ namespace Ssalddel.Simulation.Domain
             if (package == null) throw new ArgumentNullException(nameof(package));
             if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V1, StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V2,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V4,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationSaveSchemaUnsupported");
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
+                    StringComparison.Ordinal) && package.LhWorld == null)
+                throw new SimulationContractException("SimulationLhWorldStateMissing");
             if (!string.Equals(
                 package.ReplayHashAlgorithmCode,
                 SimulationReplayHashAlgorithmCodes.Sha256,
@@ -435,6 +465,12 @@ namespace Ssalddel.Simulation.Domain
                         entry.FarmWorkConfirmRequest!);
                 }
                 else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.FarmWorkPlanConfirm)
+                {
+                    경영SimulationSessionAggregate.ValidateFarmWorkPlanConfirmRequest(
+                        entry.FarmWorkPlanConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode
                     == SimulationCommandTypeCodes.ThreatResponseConfirm)
                 {
                     경영SimulationSessionAggregate.ValidateThreatResponseRequest(
@@ -508,6 +544,25 @@ namespace Ssalddel.Simulation.Domain
                         entry.TaskStableId,
                         entry.TaskCancelRequest!);
                 }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.RegionalIncidentResponseConfirm)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.WorldEventStableId))
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                    경영SimulationSessionAggregate.ValidateRegionalIncidentConfirmRequest(
+                        entry.WorldEventStableId!,
+                        entry.RegionalIncidentResponseConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.NatureEncounterVictory)
+                {
+                    if (entry.NatureEncounterVictoryRequest == null
+                        || string.IsNullOrWhiteSpace(
+                            entry.NatureEncounterVictoryRequest.BattleStableId)
+                        || string.IsNullOrWhiteSpace(
+                            entry.NatureEncounterVictoryRequest.EncounterStableId))
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
@@ -556,6 +611,7 @@ namespace Ssalddel.Simulation.Domain
             if (entry.SurvivalTarotResponseConfirmRequest != null) payloadCount++;
             if (entry.SurvivalTarotResolutionConfirmRequest != null) payloadCount++;
             if (entry.FarmWorkConfirmRequest != null) payloadCount++;
+            if (entry.FarmWorkPlanConfirmRequest != null) payloadCount++;
             if (entry.ThreatResponseConfirmRequest != null) payloadCount++;
             if (entry.CombatPerspectiveConfirmRequest != null) payloadCount++;
             if (entry.CombatBeatStartRequest != null) payloadCount++;
@@ -568,6 +624,8 @@ namespace Ssalddel.Simulation.Domain
             if (entry.CollectibleCardDrawRequest != null) payloadCount++;
             if (entry.CollectibleCardTransferRequest != null) payloadCount++;
             if (entry.TaskCancelRequest != null) payloadCount++;
+            if (entry.RegionalIncidentResponseConfirmRequest != null) payloadCount++;
+            if (entry.NatureEncounterVictoryRequest != null) payloadCount++;
             if (payloadCount != 1)
                 throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
         }

@@ -7,6 +7,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string V1 = "simulation-save.v1";
         public const string V2 = "simulation-save.v2";
+        public const string V3 = "simulation-save.v3";
+        public const string V4 = "simulation-save.v4";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -25,6 +27,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string SurvivalTarotResponseConfirm = "SurvivalTarotResponseConfirm";
         public const string SurvivalTarotResolutionConfirm = "SurvivalTarotResolutionConfirm";
         public const string FarmWorkConfirm = "FarmWorkConfirm";
+        public const string FarmWorkPlanConfirm = "FarmWorkPlanConfirm";
         public const string ThreatResponseConfirm = "ThreatResponseConfirm";
         public const string CombatPerspectiveConfirm = "CombatPerspectiveConfirm";
         public const string CombatBeatStart = "CombatBeatStart";
@@ -38,6 +41,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string CollectibleCardTransfer = "CollectibleCardTransfer";
         public const string TickAdvance = "TickAdvance";
         public const string TaskCancel = "TaskCancel";
+        public const string RegionalIncidentResponseConfirm = "RegionalIncidentResponseConfirm";
+        public const string NatureEncounterVictory = "NatureEncounterVictory";
     }
 
     [SsalddelCodeMetadata(
@@ -52,6 +57,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string SaveStableId { get; set; } = string.Empty;
         public long ExpectedRevision { get; set; }
+        public SimulationLhWorldStateSnapshot? LhWorldState { get; set; }
     }
 
     public sealed class SimulationSessionRestoreRequest
@@ -78,6 +84,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationSurvivalTarotResolutionConfirmRequest? SurvivalTarotResolutionConfirmRequest
             { get; set; }
         public SimulationFarmWorkConfirmRequest? FarmWorkConfirmRequest { get; set; }
+        public SimulationFarmWorkPlanConfirmRequest? FarmWorkPlanConfirmRequest { get; set; }
         public SimulationThreatResponseConfirmRequest? ThreatResponseConfirmRequest { get; set; }
         public SimulationCombatPerspectiveConfirmRequest? CombatPerspectiveConfirmRequest
             { get; set; }
@@ -94,6 +101,11 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationCollectibleCardTransferRequest? CollectibleCardTransferRequest { get; set; }
         public SimulationTaskCancelRequest? TaskCancelRequest { get; set; }
         public string? TaskStableId { get; set; }
+        public SimulationRegionalIncidentResponseConfirmRequest?
+            RegionalIncidentResponseConfirmRequest { get; set; }
+        public string? WorldEventStableId { get; set; }
+        public SimulationNatureEncounterVictoryRequest? NatureEncounterVictoryRequest
+            { get; set; }
     }
 
     public sealed class SimulationSessionSavePackage
@@ -118,6 +130,7 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationCommandLogEntrySnapshot>();
         public SimulationBattleSaveRecordSnapshot[] Battles { get; set; }
             = Array.Empty<SimulationBattleSaveRecordSnapshot>();
+        public SimulationLhWorldStateSnapshot? LhWorld { get; set; }
     }
 
     public sealed class SimulationSessionRestoreResult

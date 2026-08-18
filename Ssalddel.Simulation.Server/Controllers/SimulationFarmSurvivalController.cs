@@ -46,6 +46,22 @@ public sealed class SimulationFarmSurvivalController(
         [FromBody] SimulationFarmWorkConfirmRequest request)
         => Execute(() => service.ConfirmWork(sessionStableId, request));
 
+    [HttpPost("work-plans/preview")]
+    [ProducesResponseType(typeof(SimulationFarmWorkPlanPreviewSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationFarmWorkPlanPreviewSnapshot> PreviewWorkPlan(
+        string sessionStableId,
+        [FromBody] SimulationFarmWorkPlanPreviewRequest request)
+        => Execute(() => service.PreviewWorkPlan(sessionStableId, request));
+
+    [HttpPost("work-plans/confirm")]
+    [ProducesResponseType(typeof(SimulationFarmSurvivalStateSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationFarmSurvivalStateSnapshot> ConfirmWorkPlan(
+        string sessionStableId,
+        [FromBody] SimulationFarmWorkPlanConfirmRequest request)
+        => Execute(() => service.ConfirmWorkPlan(sessionStableId, request));
+
     [HttpPost("threat-responses/confirm")]
     [ProducesResponseType(typeof(SimulationFarmSurvivalStateSnapshot),
         StatusCodes.Status200OK)]

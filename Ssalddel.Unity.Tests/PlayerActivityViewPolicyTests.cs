@@ -30,12 +30,12 @@ public sealed class PlayerActivityViewPolicyTests
     }
 
     [Fact]
-    public void 탐험은_1인칭을기본으로하고_시야기반로딩능력을표시한다()
+    public void 탐험은_전술3인칭을기본으로하고_시야기반로딩능력을표시한다()
     {
         var decision = PlayerActivityViewPolicyCatalog.CreateDefault()
             .Resolve(PlayerActivityCodes.Exploration);
 
-        Assert.Equal(PlayerActivityViewModeCodes.FirstPerson,
+        Assert.Equal(PlayerActivityViewModeCodes.TacticalThirdPerson,
             decision.ViewModeCode);
         Assert.Contains(PlayerActivityViewCapabilityCodes.DirectMovement,
             decision.AdvantageCapabilityCodes);
@@ -58,22 +58,22 @@ public sealed class PlayerActivityViewPolicyTests
     }
 
     [Fact]
-    public void 전투는_일인칭을권장하지만_전술삼인칭수동전환도허용한다()
+    public void 전투는_전술3인칭을기본으로하고_일인칭수동전환도허용한다()
     {
         var catalog = PlayerActivityViewPolicyCatalog.CreateDefault();
 
         var defaults = catalog.Resolve(PlayerActivityCodes.Combat);
-        var awareness = catalog.Resolve(PlayerActivityCodes.Combat,
-            PlayerActivityViewModeCodes.TacticalThirdPerson);
+        var firstPerson = catalog.Resolve(PlayerActivityCodes.Combat,
+            PlayerActivityViewModeCodes.FirstPerson);
 
-        Assert.Equal(PlayerActivityViewModeCodes.FirstPerson,
+        Assert.Equal(PlayerActivityViewModeCodes.TacticalThirdPerson,
             defaults.ViewModeCode);
         Assert.Contains(PlayerActivityViewCapabilityCodes.WiderReactionWindow,
             defaults.AdvantageCapabilityCodes);
-        Assert.Equal(PlayerActivityViewModeCodes.TacticalThirdPerson,
-            awareness.ViewModeCode);
-        Assert.True(awareness.ManualOverrideApplied);
-        Assert.True(awareness.PresentationOnly);
-        Assert.False(awareness.ChangesWorldState);
+        Assert.Equal(PlayerActivityViewModeCodes.FirstPerson,
+            firstPerson.ViewModeCode);
+        Assert.True(firstPerson.ManualOverrideApplied);
+        Assert.True(firstPerson.PresentationOnly);
+        Assert.False(firstPerson.ChangesWorldState);
     }
 }

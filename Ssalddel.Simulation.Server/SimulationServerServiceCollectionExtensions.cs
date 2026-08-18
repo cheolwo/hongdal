@@ -134,6 +134,7 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<Simulation기본Urp표현Catalog>();
         services.AddSingleton<SimulationRuntimeWorldPresentationService>();
         services.AddScoped<SimulationWorldStreamingService>();
+        services.AddScoped<SimulationLhWorldService>();
         services.AddScoped<SimulationWorldLandscapeCompositionService>();
         services.AddScoped<SimulationWorldLandscapeCompositionJobShell>();
         services.AddScoped<SimulationWorldAreaSetLandscapeGraphJobShell>();
@@ -152,6 +153,7 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<SimulationWorldSurvivalInventoryService>();
         services.AddSingleton<SimulationSurvivalTarotService>();
         services.AddSingleton<SimulationWorldEventProjectionService>();
+        services.AddSingleton<SimulationRegionalIncidentService>();
         services.AddSingleton<SimulationFarmSurvivalService>();
         services.AddSingleton<InMemorySimulationTeamObservationPolicyStore>();
         services.AddSingleton<ISimulationTeamObservationPolicyStore>(provider =>

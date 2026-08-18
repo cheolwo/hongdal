@@ -136,11 +136,11 @@ namespace Ssalddel.Unity.PlayerActivities
                         PlayerActivityViewCapabilityCodes.BatchWorkPlanning,
                     }, true),
                 Policy(PlayerActivityCodes.Exploration,
-                    PlayerActivityViewModeCodes.FirstPerson,
+                    PlayerActivityViewModeCodes.TacticalThirdPerson,
                     new[]
                     {
-                        PlayerActivityViewModeCodes.FirstPerson,
                         PlayerActivityViewModeCodes.TacticalThirdPerson,
+                        PlayerActivityViewModeCodes.FirstPerson,
                     },
                     new[]
                     {
@@ -161,11 +161,11 @@ namespace Ssalddel.Unity.PlayerActivities
                         PlayerActivityViewCapabilityCodes.WorkDraftPreview,
                     }, true),
                 Policy(PlayerActivityCodes.Combat,
-                    PlayerActivityViewModeCodes.FirstPerson,
+                    PlayerActivityViewModeCodes.TacticalThirdPerson,
                     new[]
                     {
-                        PlayerActivityViewModeCodes.FirstPerson,
                         PlayerActivityViewModeCodes.TacticalThirdPerson,
+                        PlayerActivityViewModeCodes.FirstPerson,
                     },
                     new[]
                     {

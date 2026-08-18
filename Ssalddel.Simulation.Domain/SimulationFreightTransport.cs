@@ -201,6 +201,8 @@ namespace Ssalddel.Simulation.Domain
             {
                 ApplyWorkflowTransition(freight, 화물운송상태코드.하차지도착, currentTick, movement.TaskStableId);
                 freight.ArrivedAtDropoffTick = currentTick;
+                RegisterHubCargoBacklogIncident(freight.CargoStableId,
+                    movement.DestinationFacilityStableId, currentTick);
             }
         }
 

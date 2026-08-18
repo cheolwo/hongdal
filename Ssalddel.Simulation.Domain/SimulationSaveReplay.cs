@@ -32,11 +32,17 @@ namespace Ssalddel.Simulation.Domain
                 if (request.ExpectedRevision != Revision)
                     throw new SimulationConflictException("SimulationExpectedRevisionMismatch");
 
+                var lhWorld = request.LhWorldState ?? lhWorldState;
                 var package = new SimulationSessionSavePackage
                 {
-                    SchemaVersion = spatialWorldCreationState == null
-                        ? SimulationSaveSchemaVersions.V1
-                        : SimulationSaveSchemaVersions.V2,
+                    SchemaVersion = regionalIncidents.Count > 0
+                        || appliedRegionalIncidentResponseCommands.Count > 0
+                        ? SimulationSaveSchemaVersions.V4
+                        : lhWorld != null
+                        ? SimulationSaveSchemaVersions.V3
+                        : spatialWorldCreationState == null
+                            ? SimulationSaveSchemaVersions.V1
+                            : SimulationSaveSchemaVersions.V2,
                     SaveStableId = request.SaveStableId.Trim(),
                     SessionStableId = SessionStableId,
                     SavedWorldTick = CurrentTick,
@@ -47,6 +53,7 @@ namespace Ssalddel.Simulation.Domain
                     WorldInventory = CreateWorldInventorySnapshot(),
                     SurvivalTarot = CreateSurvivalTarotStateSnapshot(),
                     CommandLog = commandLog.Select(SimulationSaveReplayCloner.CloneCommand).ToArray(),
+                    LhWorld = SimulationSaveReplayCloner.CloneLhWorld(lhWorld),
                 };
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
                 return SimulationSaveReplayCloner.ClonePackage(package);
@@ -84,6 +91,35 @@ namespace Ssalddel.Simulation.Domain
                 ResultingWorldRevision = Revision,
                 TaskCancelRequest = SimulationSaveReplayCloner.CloneTaskCancelRequest(request),
                 TaskStableId = taskStableId.Trim(),
+            });
+
+        private void AppendRegionalIncidentResponseConfirmCommand(
+            string eventStableId,
+            SimulationRegionalIncidentResponseConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.RegionalIncidentResponseConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                WorldEventStableId = eventStableId.Trim(),
+                RegionalIncidentResponseConfirmRequest =
+                    SimulationSaveReplayCloner.CloneRegionalIncidentResponseConfirmRequest(request),
+            });
+
+        private void AppendNatureEncounterVictoryCommand(string battleStableId,
+            string encounterStableId)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.NatureEncounterVictory,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                NatureEncounterVictoryRequest = new SimulationNatureEncounterVictoryRequest
+                {
+                    BattleStableId = battleStableId.Trim(),
+                    EncounterStableId = encounterStableId.Trim(),
+                },
             });
 
         private void AppendHarvestDispositionImpactConfirmCommand(
@@ -179,6 +215,18 @@ namespace Ssalddel.Simulation.Domain
                     SimulationSaveReplayCloner.CloneFarmWorkConfirmRequest(request),
             });
 
+        private void AppendFarmWorkPlanConfirmCommand(
+            SimulationFarmWorkPlanConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.FarmWorkPlanConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                FarmWorkPlanConfirmRequest =
+                    SimulationSaveReplayCloner.CloneFarmWorkPlanConfirmRequest(request),
+            });
+
         private void AppendThreatResponseConfirmCommand(
             SimulationThreatResponseConfirmRequest request)
             => commandLog.Add(new SimulationCommandLogEntrySnapshot
@@ -259,6 +307,7 @@ namespace Ssalddel.Simulation.Domain
             RequireStableId(request.SaveStableId, "SimulationSaveStableIdInvalid");
             if (request.ExpectedRevision < 0)
                 throw new SimulationContractException("SimulationExpectedRevisionInvalid");
+            ValidateLhWorldState(request.LhWorldState, request.ExpectedRevision);
         }
     }
 }

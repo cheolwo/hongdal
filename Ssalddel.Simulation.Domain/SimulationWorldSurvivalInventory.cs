@@ -555,7 +555,8 @@ namespace Ssalddel.Simulation.Domain
                 || appliedFoodDeliveryCommands.ContainsKey(commandId)
                 || appliedFoodReceiptCommands.ContainsKey(commandId)
                 || HasAppliedFarmSurvivalCommand(commandId)
-                || HasAppliedCollectibleCardCommand(commandId);
+                || HasAppliedCollectibleCardCommand(commandId)
+                || appliedRegionalIncidentResponseCommands.ContainsKey(commandId);
 
         private static bool CanAcquire(
             SimulationWorldContainerSnapshot container,

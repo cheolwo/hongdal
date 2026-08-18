@@ -63,6 +63,115 @@ public sealed class SimulationFarmSurvivalTests
     }
 
     [Fact]
+    public void 오늘작업계획은_여러작업을한개개정으로원자확정하고_SaveReplay한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var items = new[]
+        {
+            PlanItem("plan-item:today:player", 10, Player, SoilA,
+                SimulationFarmSurvivalCodes.PlayerDirect),
+            PlanItem("plan-item:today:npc", 20, Npc, SoilB,
+                SimulationFarmSurvivalCodes.NpcDelegated),
+        };
+
+        var preview = session.PreviewFarmWorkPlan(new SimulationFarmWorkPlanPreviewRequest
+        {
+            ExpectedRevision = 0,
+            Items = items,
+        });
+
+        Assert.True(preview.CanConfirm);
+        Assert.Equal(3m, preview.TotalRequiredLabor);
+        Assert.Equal(2, preview.EstimatedCompletionWorldTick);
+        Assert.Equal(0, session.Revision);
+
+        var request = new SimulationFarmWorkPlanConfirmRequest
+        {
+            CommandId = "command:farm-work-plan:today",
+            ExpectedRevision = 0,
+            Items = items,
+        };
+        var confirmed = session.ConfirmFarmWorkPlan(request);
+        Assert.Equal(1, confirmed.WorldRevision);
+        Assert.Equal(2, confirmed.WorkOrders.Length);
+        var confirmedSession = session.Snapshot();
+        Assert.Equal(3m, confirmedSession.Settlement!.LaborReserved);
+
+        var retried = session.ConfirmFarmWorkPlan(request);
+        Assert.Equal(confirmed.WorldRevision, retried.WorldRevision);
+        Assert.Equal(2, retried.WorkOrders.Length);
+
+        var saved = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:farm-work-plan:today",
+            ExpectedRevision = confirmed.WorldRevision,
+        });
+        var restored = SimulationSessionReplay.Restore(saved);
+        var replayed = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = saved.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(saved.ReplayHash, replayed.ReplayHash);
+        Assert.Equal(2, restored.GetFarmSurvivalState().WorkOrders.Length);
+    }
+
+    [Fact]
+    public void 오늘작업계획은_한항목이라도막히면_예약과개정을전혀변경하지않는다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var items = new[]
+        {
+            PlanItem("plan-item:today:valid", 10, Player, SoilA,
+                SimulationFarmSurvivalCodes.PlayerDirect),
+            PlanItem("plan-item:today:missing", 20, Npc,
+                "soil-tile:sim:missing", SimulationFarmSurvivalCodes.NpcDelegated),
+        };
+        var preview = session.PreviewFarmWorkPlan(new SimulationFarmWorkPlanPreviewRequest
+        {
+            ExpectedRevision = 0,
+            Items = items,
+        });
+        Assert.False(preview.CanConfirm);
+        Assert.Contains("SimulationFarmSoilTileNotFound", preview.BlockingReasonCodes);
+
+        var error = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmFarmWorkPlan(new SimulationFarmWorkPlanConfirmRequest
+            {
+                CommandId = "command:farm-work-plan:blocked",
+                ExpectedRevision = 0,
+                Items = items,
+            }));
+        Assert.Equal("SimulationFarmSoilTileNotFound", error.Message);
+        var state = session.Snapshot();
+        Assert.Equal(0, state.Revision);
+        Assert.Empty(state.FarmSurvival!.WorkOrders);
+        Assert.Equal(0m, state.Settlement!.LaborReserved);
+    }
+
+    [Fact]
+    public void 오늘작업계획은_같은행위자의중복배정을확정전에차단한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var preview = session.PreviewFarmWorkPlan(new SimulationFarmWorkPlanPreviewRequest
+        {
+            ExpectedRevision = 0,
+            Items =
+            [
+                PlanItem("plan-item:today:first", 10, Player, SoilA,
+                    SimulationFarmSurvivalCodes.PlayerDirect),
+                PlanItem("plan-item:today:second", 20, Player, SoilB,
+                    SimulationFarmSurvivalCodes.PlayerDirect),
+            ],
+        });
+
+        Assert.False(preview.CanConfirm);
+        Assert.Contains("SimulationFarmWorkPlanActorConflict",
+            preview.BlockingReasonCodes);
+        Assert.Empty(session.GetFarmSurvivalState().WorkOrders);
+    }
+
+    [Fact]
     public void 경관중심규칙은_이십삼일까지평온하고_이십사일에계절방어를예고한다()
     {
         Assert.Equal(SimulationFarmSurvivalCodes.ScenicSeasonRuleRevision,
@@ -454,6 +563,53 @@ public sealed class SimulationFarmSurvivalTests
             .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
         Assert.Equal(SimulationFarmSurvivalCodes.InProgress,
             Assert.Single(confirmed!.WorkOrders).StatusCode);
+    }
+
+    [Fact]
+    public async Task HTTP에서도_오늘작업계획을한번에Preview하고원자확정한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var createResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", CreateRequest());
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var session = await createResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var route = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(session!.SessionStableId)
+            + "/farm-survival/work-plans";
+        var items = new[]
+        {
+            PlanItem("plan-item:http:player", 10, Player, SoilA,
+                SimulationFarmSurvivalCodes.PlayerDirect),
+            PlanItem("plan-item:http:npc", 20, Npc, SoilB,
+                SimulationFarmSurvivalCodes.NpcDelegated),
+        };
+
+        var previewResponse = await client.PostAsJsonAsync(route + "/preview",
+            new SimulationFarmWorkPlanPreviewRequest
+            {
+                ExpectedRevision = session.Revision,
+                Items = items,
+            });
+        Assert.Equal(HttpStatusCode.OK, previewResponse.StatusCode);
+        var preview = await previewResponse.Content
+            .ReadFromJsonAsync<SimulationFarmWorkPlanPreviewSnapshot>();
+        Assert.True(preview!.CanConfirm);
+        Assert.Equal(2, preview.Items.Length);
+
+        var confirmResponse = await client.PostAsJsonAsync(route + "/confirm",
+            new SimulationFarmWorkPlanConfirmRequest
+            {
+                CommandId = "command:farm-work-plan:http",
+                ExpectedRevision = session.Revision,
+                Items = items,
+            });
+        Assert.Equal(HttpStatusCode.OK, confirmResponse.StatusCode);
+        var confirmed = await confirmResponse.Content
+            .ReadFromJsonAsync<SimulationFarmSurvivalStateSnapshot>();
+        Assert.Equal(session.Revision + 1, confirmed!.WorldRevision);
+        Assert.Equal(2, confirmed.WorkOrders.Length);
     }
 
     [Fact]
@@ -1151,6 +1307,22 @@ public sealed class SimulationFarmSurvivalTests
         {
             CommandId = commandId,
             ExpectedRevision = revision,
+            ActorStableId = actor,
+            TargetStableId = target,
+            ActionCode = SimulationFarmSurvivalCodes.Tilling,
+            AssignmentKindCode = assignment,
+        };
+
+    private static SimulationFarmWorkPlanItemRequest PlanItem(
+        string planItemStableId,
+        int priority,
+        string actor,
+        string target,
+        string assignment)
+        => new()
+        {
+            PlanItemStableId = planItemStableId,
+            Priority = priority,
             ActorStableId = actor,
             TargetStableId = target,
             ActionCode = SimulationFarmSurvivalCodes.Tilling,

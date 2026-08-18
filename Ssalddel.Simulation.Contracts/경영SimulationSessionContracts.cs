@@ -131,6 +131,10 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationTeamRoleCardStateSnapshot? TeamRoleCards { get; set; }
         public SimulationWorldExplorationStateSnapshot? Exploration { get; set; }
         public SimulationCollectibleCardRewardStateSnapshot? CollectibleCardRewards { get; set; }
+        public SimulationRegionalIncidentSnapshot[] RegionalIncidents { get; set; }
+            = Array.Empty<SimulationRegionalIncidentSnapshot>();
+        public SimulationNatureThreatStateSnapshot NatureThreat { get; set; }
+            = new SimulationNatureThreatStateSnapshot();
     }
 
     public sealed class SimulationWorldContextSnapshot

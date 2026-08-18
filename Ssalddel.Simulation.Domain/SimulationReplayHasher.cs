@@ -20,6 +20,25 @@ namespace Ssalddel.Simulation.Domain
                 AddWorldInventory(canonical, package.WorldInventory);
             if (package.SessionCreateRequest.SurvivalTarot != null)
                 AddSurvivalTarot(canonical, package.SurvivalTarot);
+            if (package.LhWorld != null)
+            {
+                Add(canonical, package.LhWorld.WorldSeed);
+                Add(canonical, package.LhWorld.GeneratorVersion);
+                Add(canonical, package.LhWorld.AreaSetStableId);
+                Add(canonical, package.LhWorld.AreaSetRevision);
+                Add(canonical, package.LhWorld.AreaSetBoundaryHashSha256);
+                Add(canonical, package.LhWorld.LastL3CellKey);
+                Add(canonical, package.LhWorld.Deltas.Length);
+                foreach (var delta in package.LhWorld.Deltas.OrderBy(
+                             value => value.GeneratedStableId, StringComparer.Ordinal))
+                {
+                    Add(canonical, delta.GeneratedStableId);
+                    Add(canonical, delta.DeltaKindCode);
+                    Add(canonical, delta.StateCode);
+                    Add(canonical, delta.AppliedWorldRevision);
+                    Add(canonical, delta.Tombstone);
+                }
+            }
             if (package.Battles.Length > 0)
             {
                 Add(canonical, package.Battles.Length);
@@ -49,6 +68,20 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, entry.DecisionConfirmRequest.ExpectedRevision);
                     Add(canonical, 경영SimulationSessionAggregate.BuildDecisionPayloadKey(
                         entry.DecisionConfirmRequest.Preview));
+                }
+                if (entry.RegionalIncidentResponseConfirmRequest != null)
+                {
+                    var request = entry.RegionalIncidentResponseConfirmRequest;
+                    Add(canonical, entry.WorldEventStableId ?? string.Empty);
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, request.ActorStableId);
+                    Add(canonical, request.ChoiceStableId);
+                }
+                if (entry.NatureEncounterVictoryRequest != null)
+                {
+                    Add(canonical, entry.NatureEncounterVictoryRequest.BattleStableId);
+                    Add(canonical, entry.NatureEncounterVictoryRequest.EncounterStableId);
                 }
                 if (entry.HarvestDispositionImpactConfirmRequest != null)
                 {
@@ -112,6 +145,14 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, request.ExpectedRevision);
                     Add(canonical, 경영SimulationSessionAggregate
                         .BuildFarmWorkPayloadKey(request));
+                }
+                if (entry.FarmWorkPlanConfirmRequest != null)
+                {
+                    var request = entry.FarmWorkPlanConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, 경영SimulationSessionAggregate
+                        .BuildFarmWorkPlanPayloadKey(request));
                 }
                 if (entry.ThreatResponseConfirmRequest != null)
                 {
@@ -573,6 +614,61 @@ namespace Ssalddel.Simulation.Domain
                 Add(target, 경영SimulationSessionAggregate
                     .BuildCollectibleCardRewardStatePayloadKey(
                         value.CollectibleCardRewards));
+            if (value.RegionalIncidents.Length > 0
+                || value.NatureThreat.Encounters.Length > 0)
+            {
+                Add(target, "RegionalIncidentExtensionV1");
+                Add(target, value.RegionalIncidents.Length);
+                foreach (var incident in value.RegionalIncidents.OrderBy(
+                    item => item.IncidentStableId, StringComparer.Ordinal))
+                {
+                    Add(target, incident.IncidentStableId);
+                    Add(target, incident.EventStableId);
+                    Add(target, incident.IncidentRevision);
+                    Add(target, incident.SourceInstanceStableId);
+                    Add(target, incident.NatureRouteCode);
+                    Add(target, incident.IncidentTypeCode);
+                    Add(target, incident.StateCode);
+                    Add(target, incident.OutcomeCode);
+                    Add(target, incident.Severity);
+                    Add(target, incident.RemainingSeverity);
+                    Add(target, incident.OccurredWorldTick);
+                    Add(target, incident.DeadlineWorldTick);
+                    Add(target, incident.SourceTargetStableId);
+                    Add(target, incident.FacilityStableId);
+                    Add(target, incident.SelectedChoiceStableId);
+                    AddStrings(target, incident.RequiredWorldInteractionIds);
+                    AddStrings(target, incident.RequiredActionCodes);
+                    AddStrings(target, incident.CompletedActionCodes);
+                    AddStrings(target, incident.SourceStableIds);
+                }
+                Add(target, value.NatureThreat.Routes.Length);
+                foreach (var route in value.NatureThreat.Routes.OrderBy(
+                    item => item.NatureRouteCode, StringComparer.Ordinal))
+                {
+                    Add(target, route.NatureRouteCode);
+                    Add(target, route.RootRemainingSeverity);
+                    Add(target, route.GlobalSpilloverPressure);
+                    Add(target, route.EffectivePressure);
+                    Add(target, route.PressureLevelCode);
+                    AddStrings(target, route.SourceIncidentStableIds);
+                }
+                Add(target, value.NatureThreat.Encounters.Length);
+                foreach (var encounter in value.NatureThreat.Encounters.OrderBy(
+                    item => item.EncounterStableId, StringComparer.Ordinal))
+                {
+                    Add(target, encounter.EncounterStableId);
+                    Add(target, encounter.EncounterRevision);
+                    Add(target, encounter.NatureRouteCode);
+                    Add(target, encounter.StateCode);
+                    Add(target, encounter.RiskBandCode);
+                    Add(target, encounter.ThreatUnitCount);
+                    Add(target, encounter.OccurredWorldTick);
+                    Add(target, encounter.ResolvedWorldTick ?? -1);
+                    AddStrings(target, encounter.SourceIncidentStableIds);
+                    Add(target, encounter.PresentationKey);
+                }
+            }
         }
 
         private static void AddNpcWorkforceSnapshot(

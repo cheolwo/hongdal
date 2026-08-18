@@ -216,6 +216,7 @@ namespace Ssalddel.Simulation.Domain
                     task.StateCode = SimulationTaskStateCodes.Completed;
                     task.Revision++;
                     task.ActualEndTick = task.ExpectedEndTick;
+                    ObserveRegionalIncidentTaskCompletion(task, task.ExpectedEndTick);
                     foreach (var effect in effects.Values.Where(
                         value => value.CausedByTaskStableId == task.TaskStableId
                             && value.StateCode == SimulationEffectStateCodes.Pending))
@@ -258,6 +259,7 @@ namespace Ssalddel.Simulation.Domain
                 || appliedWorldItemAcquisitionCommands.ContainsKey(commandId)
                 || HasAppliedSurvivalTarotCommand(commandId)
                 || HasAppliedCollectibleCardCommand(commandId)
+                || appliedRegionalIncidentResponseCommands.ContainsKey(commandId)
                 || HasAppliedTaskCancelCommand(commandId);
 
         private SimulationDecisionPreviewSnapshot CreateDecisionPreview(

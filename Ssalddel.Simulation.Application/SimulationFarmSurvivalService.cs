@@ -62,6 +62,33 @@ namespace Ssalddel.Simulation.Application
             return Find(sessionStableId).ConfirmFarmWork(request);
         }
 
+        public SimulationFarmWorkPlanPreviewSnapshot PreviewWorkPlan(
+            string sessionStableId,
+            SimulationFarmWorkPlanPreviewRequest request)
+        {
+            var preview = Find(sessionStableId).PreviewFarmWorkPlan(request);
+            if (request.Items.Any(value => IsLocked(sessionStableId,
+                    value.ActorStableId) || IsLocked(sessionStableId,
+                    value.TargetStableId)))
+            {
+                preview.CanConfirm = false;
+                preview.BlockingReasonCodes = preview.BlockingReasonCodes
+                    .Concat(new[] { "BattleResourceLocked" }).Distinct().ToArray();
+            }
+            return preview;
+        }
+
+        public SimulationFarmSurvivalStateSnapshot ConfirmWorkPlan(
+            string sessionStableId,
+            SimulationFarmWorkPlanConfirmRequest request)
+        {
+            if (request.Items.Any(value => IsLocked(sessionStableId,
+                    value.ActorStableId) || IsLocked(sessionStableId,
+                    value.TargetStableId)))
+                throw new SimulationConflictException("BattleResourceLocked");
+            return Find(sessionStableId).ConfirmFarmWorkPlan(request);
+        }
+
         public SimulationFarmSurvivalStateSnapshot ConfirmThreatResponse(
             string sessionStableId,
             SimulationThreatResponseConfirmRequest request)

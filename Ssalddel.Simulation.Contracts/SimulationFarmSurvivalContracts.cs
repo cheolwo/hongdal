@@ -178,6 +178,55 @@ namespace Ssalddel.Simulation.Contracts
         public string PreferredSpatialStableId { get; set; } = string.Empty;
     }
 
+    public sealed class SimulationFarmWorkPlanItemRequest
+    {
+        public string PlanItemStableId { get; set; } = string.Empty;
+        public int Priority { get; set; }
+        public string ActorStableId { get; set; } = string.Empty;
+        public string TargetStableId { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string AssignmentKindCode { get; set; } = string.Empty;
+        public string PreferredSpatialStableId { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationFarmWorkPlanPreviewRequest
+    {
+        public long ExpectedRevision { get; set; }
+        public SimulationFarmWorkPlanItemRequest[] Items { get; set; }
+            = Array.Empty<SimulationFarmWorkPlanItemRequest>();
+    }
+
+    public sealed class SimulationFarmWorkPlanConfirmRequest
+    {
+        public string CommandId { get; set; } = string.Empty;
+        public long ExpectedRevision { get; set; }
+        public SimulationFarmWorkPlanItemRequest[] Items { get; set; }
+            = Array.Empty<SimulationFarmWorkPlanItemRequest>();
+    }
+
+    public sealed class SimulationFarmWorkPlanItemPreviewSnapshot
+    {
+        public string PlanItemStableId { get; set; } = string.Empty;
+        public int Priority { get; set; }
+        public SimulationFarmWorkPreviewSnapshot Work { get; set; }
+            = new SimulationFarmWorkPreviewSnapshot();
+        public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
+    }
+
+    public sealed class SimulationFarmWorkPlanPreviewSnapshot
+    {
+        public long ExpectedRevision { get; set; }
+        public SimulationFarmWorkPlanItemPreviewSnapshot[] Items { get; set; }
+            = Array.Empty<SimulationFarmWorkPlanItemPreviewSnapshot>();
+        public decimal TotalRequiredLabor { get; set; }
+        public decimal TotalStaminaCost { get; set; }
+        public int EstimatedCompletionWorldTick { get; set; }
+        public bool CanConfirm { get; set; }
+        public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
+        public bool SimulationOnly { get; set; } = true;
+        public bool IsOperationalState { get; set; }
+    }
+
     public sealed class SimulationFarmWorkPreviewSnapshot
     {
         public string ActorStableId { get; set; } = string.Empty;

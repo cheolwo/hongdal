@@ -29,6 +29,8 @@ namespace Ssalddel.Simulation.Domain
             new List<SimulationSurvivalDayReportSnapshot>();
         private readonly Dictionary<string, AppliedFarmCommand> appliedFarmWorkCommands =
             new Dictionary<string, AppliedFarmCommand>(StringComparer.Ordinal);
+        private readonly Dictionary<string, AppliedFarmCommand> appliedFarmWorkPlanCommands =
+            new Dictionary<string, AppliedFarmCommand>(StringComparer.Ordinal);
         private readonly Dictionary<string, AppliedFarmCommand> appliedThreatResponseCommands =
             new Dictionary<string, AppliedFarmCommand>(StringComparer.Ordinal);
 
@@ -89,6 +91,7 @@ namespace Ssalddel.Simulation.Domain
                 }
 
                 if (HasDifferentKindCommand(commandId)
+                    || appliedFarmWorkPlanCommands.ContainsKey(commandId)
                     || appliedThreatResponseCommands.ContainsKey(commandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 if (request.ExpectedRevision != Revision)
@@ -106,51 +109,71 @@ namespace Ssalddel.Simulation.Domain
                         preview.BlockingReasonCodes.FirstOrDefault()
                         ?? "SimulationFarmWorkBlocked");
 
-                if (preview.AssignmentKindCode == SimulationFarmSurvivalCodes.NpcDelegated)
-                    settlementInitialState!.LaborReserved += preview.RequiredLabor;
-                farmRepairMaterialUnits -= preview.MaterialCost;
-                farmSeedUnits -= preview.SeedCost;
-                farmWaterUnits -= preview.WaterCost;
-                farmReservedSeedUnits += preview.SeedCost;
-                farmReservedWaterUnits += preview.WaterCost;
-
-                var isSupplyWork = IsFarmWorldInteractionAction(preview.ActionCode)
-                    && preview.SpatialInteraction != null;
-                var workOrder = new FarmWorkOrderState
-                {
-                    WorkOrderStableId = isSupplyWork
-                        ? "task:farm-supply:" + commandId
-                        : "farm-work:" + commandId,
-                    CommandId = commandId,
-                    ActorStableId = preview.ActorStableId,
-                    TargetStableId = preview.TargetStableId,
-                    ActionCode = preview.ActionCode,
-                    AssignmentKindCode = preview.AssignmentKindCode,
-                    StatusCode = SimulationFarmSurvivalCodes.InProgress,
-                    StartedWorldTick = CurrentTick,
-                    CompletesWorldTick = preview.EstimatedCompletionWorldTick,
-                    ReservedLabor = preview.RequiredLabor,
-                    StaminaCost = preview.StaminaCost,
-                    MaterialCost = preview.MaterialCost,
-                    SeedCost = preview.SeedCost,
-                    WaterCost = preview.WaterCost,
-                    PresentationKey = preview.PresentationKey,
-                    SelectedSpatialStableId = preview.SpatialInteraction?.SelectedSpatialStableId
-                        ?? string.Empty,
-                    SpatialDefinitionRevision = preview.SpatialInteraction?.DefinitionRevision
-                        ?? string.Empty,
-                    SpatialDefinitionHashSha256 = preview.SpatialInteraction?.DefinitionHashSha256
-                        ?? string.Empty,
-                };
-                if (isSupplyWork)
-                    RegisterFarmSupplyDecisionAndTask(workOrder, preview);
-                farmActors[preview.ActorStableId].ActiveWorkOrderStableId =
-                    workOrder.WorkOrderStableId;
-                farmWorkOrders.Add(workOrder);
+                ApplyFarmWorkPreview(commandId, preview);
                 Revision++;
                 AppendFarmWorkConfirmCommand(request);
                 var state = CreateFarmSurvivalStateSnapshot();
                 appliedFarmWorkCommands.Add(commandId,
+                    new AppliedFarmCommand(payloadKey, CloneFarmSurvivalState(state)));
+                return state;
+            }
+        }
+
+        public SimulationFarmWorkPlanPreviewSnapshot PreviewFarmWorkPlan(
+            SimulationFarmWorkPlanPreviewRequest request)
+        {
+            ValidateFarmWorkPlanPreviewRequest(request);
+            lock (gate)
+            {
+                EnsureFarmSurvivalConfigured();
+                if (request.ExpectedRevision != Revision)
+                    throw new SimulationConflictException(
+                        "SimulationExpectedRevisionMismatch");
+                return CreateFarmWorkPlanPreview(request.ExpectedRevision, request.Items);
+            }
+        }
+
+        public SimulationFarmSurvivalStateSnapshot ConfirmFarmWorkPlan(
+            SimulationFarmWorkPlanConfirmRequest request)
+        {
+            ValidateFarmWorkPlanConfirmRequest(request);
+            lock (gate)
+            {
+                EnsureFarmSurvivalConfigured();
+                var commandId = request.CommandId.Trim();
+                var payloadKey = BuildFarmWorkPlanPayloadKey(request);
+                if (appliedFarmWorkPlanCommands.TryGetValue(commandId, out var applied))
+                {
+                    if (!string.Equals(applied.PayloadKey, payloadKey,
+                        StringComparison.Ordinal))
+                        throw new SimulationConflictException(
+                            "SimulationCommandPayloadConflict");
+                    return CloneFarmSurvivalState(applied.State);
+                }
+
+                if (HasDifferentKindCommand(commandId)
+                    || appliedFarmWorkCommands.ContainsKey(commandId)
+                    || appliedThreatResponseCommands.ContainsKey(commandId))
+                    throw new SimulationConflictException("SimulationCommandKindConflict");
+                if (request.ExpectedRevision != Revision)
+                    throw new SimulationConflictException(
+                        "SimulationExpectedRevisionMismatch");
+
+                var preview = CreateFarmWorkPlanPreview(
+                    request.ExpectedRevision, request.Items);
+                if (!preview.CanConfirm)
+                    throw new SimulationConflictException(
+                        preview.BlockingReasonCodes.FirstOrDefault()
+                        ?? "SimulationFarmWorkPlanBlocked");
+
+                foreach (var item in preview.Items.OrderBy(value => value.Priority)
+                    .ThenBy(value => value.PlanItemStableId, StringComparer.Ordinal))
+                    ApplyFarmWorkPreview(commandId + ":" + item.PlanItemStableId, item.Work);
+
+                Revision++;
+                AppendFarmWorkPlanConfirmCommand(request);
+                var state = CreateFarmSurvivalStateSnapshot();
+                appliedFarmWorkPlanCommands.Add(commandId,
                     new AppliedFarmCommand(payloadKey, CloneFarmSurvivalState(state)));
                 return state;
             }
@@ -559,6 +582,145 @@ namespace Ssalddel.Simulation.Domain
             };
         }
 
+        private SimulationFarmWorkPlanPreviewSnapshot CreateFarmWorkPlanPreview(
+            long expectedRevision,
+            SimulationFarmWorkPlanItemRequest[] items)
+        {
+            var ordered = items.OrderBy(value => value.Priority)
+                .ThenBy(value => value.PlanItemStableId, StringComparer.Ordinal).ToArray();
+            var itemPreviews = ordered.Select(value =>
+            {
+                var work = CreateFarmWorkPreview(
+                    value.ActorStableId.Trim(), value.TargetStableId.Trim(),
+                    value.ActionCode.Trim(), value.AssignmentKindCode.Trim(),
+                    value.PreferredSpatialStableId.Trim());
+                return new SimulationFarmWorkPlanItemPreviewSnapshot
+                {
+                    PlanItemStableId = value.PlanItemStableId.Trim(),
+                    Priority = value.Priority,
+                    Work = work,
+                    BlockingReasonCodes = work.BlockingReasonCodes.ToArray(),
+                };
+            }).ToArray();
+            var blocks = itemPreviews.SelectMany(value => value.BlockingReasonCodes)
+                .ToList();
+
+            if (itemPreviews.GroupBy(value => value.Work.ActorStableId,
+                    StringComparer.Ordinal).Any(group => group.Count() > 1))
+                blocks.Add("SimulationFarmWorkPlanActorConflict");
+            if (itemPreviews.GroupBy(value => string.Join("|",
+                    value.Work.ActionCode, value.Work.TargetStableId),
+                    StringComparer.Ordinal).Any(group => group.Count() > 1))
+                blocks.Add("SimulationFarmWorkPlanTargetConflict");
+
+            var totalLabor = itemPreviews.Sum(value => value.Work.RequiredLabor);
+            var totalMaterial = itemPreviews.Sum(value => value.Work.MaterialCost);
+            var totalSeed = itemPreviews.Sum(value => value.Work.SeedCost);
+            var totalWater = itemPreviews.Sum(value => value.Work.WaterCost);
+            if (settlementInitialState != null
+                && totalLabor > settlementInitialState.LaborCapacityTotal
+                    - settlementInitialState.LaborReserved)
+                blocks.Add("SimulationSettlementLaborInsufficient");
+            if (totalMaterial > farmRepairMaterialUnits)
+                blocks.Add("SimulationFarmRepairMaterialInsufficient");
+            if (totalSeed > farmSeedUnits)
+                blocks.Add("SimulationFarmSeedInsufficient");
+            if (totalWater > farmWaterUnits)
+                blocks.Add("SimulationFarmWaterInsufficient");
+
+            foreach (var capacityGroup in itemPreviews
+                .Where(value => value.Work.SpatialInteraction != null)
+                .SelectMany(value => value.Work.SpatialInteraction!.RequiredCapacities
+                    .Select(capacity => new
+                    {
+                        SpatialStableId = value.Work.SpatialInteraction!.SelectedSpatialStableId,
+                        Capacity = capacity,
+                    }))
+                .GroupBy(value => string.Join("|", value.SpatialStableId,
+                    value.Capacity.CapacityCode, value.Capacity.UnitCode),
+                    StringComparer.Ordinal))
+            {
+                var first = capacityGroup.First();
+                if (!spatialDefinitions.TryGetValue(first.SpatialStableId, out var definition)
+                    || !spatialRuntimeStates.TryGetValue(first.SpatialStableId, out var runtime))
+                {
+                    blocks.Add(Simulation공간차단Codes.DefinitionUnavailable);
+                    continue;
+                }
+                var baseCapacity = FindCapacity(definition.BaseCapacities, first.Capacity);
+                var available = (baseCapacity?.Quantity ?? 0m)
+                    - CapacityQuantity(runtime.OccupiedCapacities, first.Capacity)
+                    - CapacityQuantity(runtime.ReservedCapacities, first.Capacity);
+                if (capacityGroup.Sum(value => value.Capacity.Quantity) > available)
+                    blocks.Add(first.Capacity.CapacityCode == Simulation공간용량Codes.WorkArea
+                        ? Simulation공간차단Codes.ReservationConflict
+                        : Simulation공간차단Codes.CapacityInsufficient);
+            }
+
+            var distinctBlocks = blocks.Distinct(StringComparer.Ordinal).ToArray();
+            return new SimulationFarmWorkPlanPreviewSnapshot
+            {
+                ExpectedRevision = expectedRevision,
+                Items = itemPreviews,
+                TotalRequiredLabor = totalLabor,
+                TotalStaminaCost = itemPreviews.Sum(value => value.Work.StaminaCost),
+                EstimatedCompletionWorldTick = itemPreviews.Length == 0
+                    ? CurrentTick
+                    : itemPreviews.Max(value => value.Work.EstimatedCompletionWorldTick),
+                CanConfirm = distinctBlocks.Length == 0,
+                BlockingReasonCodes = distinctBlocks,
+                SimulationOnly = true,
+                IsOperationalState = false,
+            };
+        }
+
+        private void ApplyFarmWorkPreview(
+            string commandId,
+            SimulationFarmWorkPreviewSnapshot preview)
+        {
+            if (preview.AssignmentKindCode == SimulationFarmSurvivalCodes.NpcDelegated)
+                settlementInitialState!.LaborReserved += preview.RequiredLabor;
+            farmRepairMaterialUnits -= preview.MaterialCost;
+            farmSeedUnits -= preview.SeedCost;
+            farmWaterUnits -= preview.WaterCost;
+            farmReservedSeedUnits += preview.SeedCost;
+            farmReservedWaterUnits += preview.WaterCost;
+
+            var isSupplyWork = IsFarmWorldInteractionAction(preview.ActionCode)
+                && preview.SpatialInteraction != null;
+            var workOrder = new FarmWorkOrderState
+            {
+                WorkOrderStableId = isSupplyWork
+                    ? "task:farm-supply:" + commandId
+                    : "farm-work:" + commandId,
+                CommandId = commandId,
+                ActorStableId = preview.ActorStableId,
+                TargetStableId = preview.TargetStableId,
+                ActionCode = preview.ActionCode,
+                AssignmentKindCode = preview.AssignmentKindCode,
+                StatusCode = SimulationFarmSurvivalCodes.InProgress,
+                StartedWorldTick = CurrentTick,
+                CompletesWorldTick = preview.EstimatedCompletionWorldTick,
+                ReservedLabor = preview.RequiredLabor,
+                StaminaCost = preview.StaminaCost,
+                MaterialCost = preview.MaterialCost,
+                SeedCost = preview.SeedCost,
+                WaterCost = preview.WaterCost,
+                PresentationKey = preview.PresentationKey,
+                SelectedSpatialStableId = preview.SpatialInteraction?.SelectedSpatialStableId
+                    ?? string.Empty,
+                SpatialDefinitionRevision = preview.SpatialInteraction?.DefinitionRevision
+                    ?? string.Empty,
+                SpatialDefinitionHashSha256 = preview.SpatialInteraction?.DefinitionHashSha256
+                    ?? string.Empty,
+            };
+            if (isSupplyWork)
+                RegisterFarmSupplyDecisionAndTask(workOrder, preview);
+            farmActors[preview.ActorStableId].ActiveWorkOrderStableId =
+                workOrder.WorkOrderStableId;
+            farmWorkOrders.Add(workOrder);
+        }
+
         private void CompleteFarmWork(FarmWorkOrderState workOrder)
         {
             workOrder.StatusCode = SimulationFarmSurvivalCodes.Completed;
@@ -632,6 +794,10 @@ namespace Ssalddel.Simulation.Domain
                     CreatedWorldTick = workOrder.CompletesWorldTick,
                     SourceStableIds = production.PendingEffectBundle.SourceStableIds.ToArray(),
                 });
+                RegisterFarmHarvestExposureIncident(
+                    production.HarvestLotStableId,
+                    farmSurvivalCreationState!.FarmBuildingStableId,
+                    workOrder.CompletesWorldTick);
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.HarvestCollection)
@@ -639,6 +805,8 @@ namespace Ssalddel.Simulation.Domain
                 var harvestLot = harvestLots[workOrder.TargetStableId];
                 harvestLot.StateCode = Simulation수확Lot상태Codes.CollectedAtYard;
                 harvestLot.Revision++;
+                ObserveRegionalIncidentAction(workOrder.ActionCode,
+                    harvestLot.HarvestLotStableId, workOrder.CompletesWorldTick);
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.OutboundPacking)
@@ -688,6 +856,8 @@ namespace Ssalddel.Simulation.Domain
                     SourceStableIds = packageLots[packageLotId].SourceStableIds.ToArray(),
                 });
                 harvestLotAllocationIds.Add(harvestLot.HarvestLotStableId, allocationId);
+                ObserveRegionalIncidentAction(workOrder.ActionCode,
+                    harvestLot.HarvestLotStableId, workOrder.CompletesWorldTick);
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.MedicalRest)
@@ -1702,6 +1872,14 @@ namespace Ssalddel.Simulation.Domain
                     "SimulationSpatialStableIdInvalid");
         }
 
+        internal static void ValidateFarmWorkPlanConfirmRequest(
+            SimulationFarmWorkPlanConfirmRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            RequireStableId(request.CommandId, "SimulationCommandIdInvalid");
+            ValidateFarmWorkPlanItems(request.ExpectedRevision, request.Items);
+        }
+
         internal static void ValidateThreatResponseRequest(
             SimulationThreatResponseConfirmRequest request)
         {
@@ -1729,6 +1907,16 @@ namespace Ssalddel.Simulation.Domain
                 : legacy + "|" + request.PreferredSpatialStableId.Trim();
         }
 
+        internal static string BuildFarmWorkPlanPayloadKey(
+            SimulationFarmWorkPlanConfirmRequest request)
+            => string.Join(";", request.Items.OrderBy(value => value.Priority)
+                .ThenBy(value => value.PlanItemStableId, StringComparer.Ordinal)
+                .Select(value => string.Join("|", value.PlanItemStableId.Trim(),
+                    value.Priority.ToString(CultureInfo.InvariantCulture),
+                    value.ActorStableId.Trim(), value.TargetStableId.Trim(),
+                    value.ActionCode.Trim(), value.AssignmentKindCode.Trim(),
+                    value.PreferredSpatialStableId.Trim())));
+
         internal static string BuildThreatResponsePayloadKey(
             SimulationThreatResponseConfirmRequest request)
             => string.Join("|", request.EncounterStableId.Trim(),
@@ -1743,6 +1931,44 @@ namespace Ssalddel.Simulation.Domain
             if (!string.IsNullOrWhiteSpace(request.PreferredSpatialStableId))
                 RequireStableId(request.PreferredSpatialStableId,
                     "SimulationSpatialStableIdInvalid");
+        }
+
+        private static void ValidateFarmWorkPlanPreviewRequest(
+            SimulationFarmWorkPlanPreviewRequest request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            ValidateFarmWorkPlanItems(request.ExpectedRevision, request.Items);
+        }
+
+        private static void ValidateFarmWorkPlanItems(
+            long expectedRevision,
+            SimulationFarmWorkPlanItemRequest[] items)
+        {
+            if (expectedRevision < 0)
+                throw new SimulationContractException(
+                    "SimulationExpectedRevisionInvalid");
+            if (items == null || items.Length == 0 || items.Length > 32)
+                throw new SimulationContractException("SimulationFarmWorkPlanItemsInvalid");
+            var itemIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var item in items)
+            {
+                if (item == null)
+                    throw new SimulationContractException(
+                        "SimulationFarmWorkPlanItemInvalid");
+                RequireStableId(item.PlanItemStableId,
+                    "SimulationFarmWorkPlanItemInvalid");
+                if (!itemIds.Add(item.PlanItemStableId.Trim()))
+                    throw new SimulationContractException(
+                        "SimulationFarmWorkPlanItemDuplicate");
+                if (item.Priority < 0)
+                    throw new SimulationContractException(
+                        "SimulationFarmWorkPlanPriorityInvalid");
+                ValidateFarmWorkFields(expectedRevision, item.ActorStableId,
+                    item.TargetStableId, item.ActionCode, item.AssignmentKindCode);
+                if (!string.IsNullOrWhiteSpace(item.PreferredSpatialStableId))
+                    RequireStableId(item.PreferredSpatialStableId,
+                        "SimulationSpatialStableIdInvalid");
+            }
         }
 
         private static void ValidateFarmWorkFields(
@@ -1771,6 +1997,7 @@ namespace Ssalddel.Simulation.Domain
 
         private bool HasAppliedFarmSurvivalCommand(string commandId)
             => appliedFarmWorkCommands.ContainsKey(commandId)
+                || appliedFarmWorkPlanCommands.ContainsKey(commandId)
                 || appliedThreatResponseCommands.ContainsKey(commandId)
                 || HasAppliedFarmCombatCommand(commandId);
 

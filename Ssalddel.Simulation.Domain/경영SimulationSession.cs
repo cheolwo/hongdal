@@ -133,6 +133,7 @@ namespace Ssalddel.Simulation.Domain
                 ExpireActiveTurnCardEffects();
                 Revision++;
                 AdvanceFarmSurvival(previousTick, CurrentTick);
+                AdvanceRegionalIncidents(CurrentTick);
                 EvaluateSurvivalTarotOpportunity();
                 AppendTickCommand(request);
                 var snapshot = CreateSnapshot();
@@ -251,6 +252,8 @@ namespace Ssalddel.Simulation.Domain
                 TeamRoleCards = CreateTeamRoleCardStateSnapshotOrNull(),
                 Exploration = CreateWorldExplorationStateSnapshotOrNull(),
                 CollectibleCardRewards = CreateCollectibleCardRewardStateSnapshotOrNull(),
+                RegionalIncidents = CreateRegionalIncidentSnapshots(),
+                NatureThreat = CreateNatureThreatStateSnapshot(),
             };
 
         internal static 경영SimulationSessionSnapshot Clone(경영SimulationSessionSnapshot source)
@@ -322,6 +325,25 @@ namespace Ssalddel.Simulation.Domain
                 Exploration = CloneWorldExplorationStateOrNull(source.Exploration),
                 CollectibleCardRewards = CloneCollectibleCardRewardStateOrNull(
                     source.CollectibleCardRewards),
+                RegionalIncidents = source.RegionalIncidents
+                    .Select(CloneRegionalIncident).ToArray(),
+                NatureThreat = new SimulationNatureThreatStateSnapshot
+                {
+                    Routes = source.NatureThreat.Routes.Select(value =>
+                        new SimulationNatureThreatRouteSnapshot
+                        {
+                            NatureRouteCode = value.NatureRouteCode,
+                            RootRemainingSeverity = value.RootRemainingSeverity,
+                            GlobalSpilloverPressure = value.GlobalSpilloverPressure,
+                            EffectivePressure = value.EffectivePressure,
+                            PressureLevelCode = value.PressureLevelCode,
+                            SourceIncidentStableIds = value.SourceIncidentStableIds.ToArray(),
+                        }).ToArray(),
+                    Encounters = source.NatureThreat.Encounters
+                        .Select(CloneNatureEncounter).ToArray(),
+                    SimulationOnly = source.NatureThreat.SimulationOnly,
+                    IsOperationalState = source.NatureThreat.IsOperationalState,
+                },
             };
 
         internal static void ValidateCreate(경영SimulationSession생성Request request)

@@ -12,6 +12,9 @@ namespace Ssalddel.Simulation.Contracts
         public const string SurvivalTarotOpportunity = "SurvivalTarotOpportunity";
         public const string FarmThreatChoice = "FarmThreatChoice";
         public const string FarmThreatEncounter = "FarmThreatEncounter";
+        public const string RegionalIncident = "RegionalIncident";
+        public const string NatureThreatWarning = "NatureThreatWarning";
+        public const string NatureThreatEncounter = "NatureThreatEncounter";
 
         public const string ExternalExpeditionPresentation =
             "survival.external-expedition";
@@ -67,6 +70,9 @@ namespace Ssalddel.Simulation.Contracts
         public bool RequiresExpectedRevision { get; set; }
         public string RuleRevision { get; set; } = string.Empty;
         public string[] SourceStableIds { get; set; } = Array.Empty<string>();
+        public string SourceInstanceStableId { get; set; } = string.Empty;
+        public string NatureRouteCode { get; set; } = string.Empty;
+        public int ProjectedThreatPressureDelta { get; set; }
         public bool SimulationOnly { get; set; } = true;
         public bool IsOperationalState { get; set; }
         public bool PresentationOnly { get; set; } = true;

@@ -29,7 +29,31 @@ namespace Ssalddel.Simulation.Domain
                 CommandLog = source.CommandLog.Select(CloneCommand).ToArray(),
                 Battles = source.Battles.Select(
                     SimulationBattleInstanceState.CloneSaveRecord).ToArray(),
+                LhWorld = CloneLhWorld(source.LhWorld),
             };
+
+        public static SimulationLhWorldStateSnapshot? CloneLhWorld(
+            SimulationLhWorldStateSnapshot? source)
+            => source == null
+                ? null
+                : new SimulationLhWorldStateSnapshot
+                {
+                    WorldSeed = source.WorldSeed,
+                    GeneratorVersion = source.GeneratorVersion,
+                    AreaSetStableId = source.AreaSetStableId,
+                    AreaSetRevision = source.AreaSetRevision,
+                    AreaSetBoundaryHashSha256 = source.AreaSetBoundaryHashSha256,
+                    LastL3CellKey = source.LastL3CellKey,
+                    Deltas = source.Deltas.Select(value =>
+                        new SimulationLhWorldDeltaSnapshot
+                        {
+                            GeneratedStableId = value.GeneratedStableId,
+                            DeltaKindCode = value.DeltaKindCode,
+                            StateCode = value.StateCode,
+                            AppliedWorldRevision = value.AppliedWorldRevision,
+                            Tombstone = value.Tombstone,
+                        }).ToArray(),
+                };
 
         public static 경영SimulationSession생성Request CloneCreateRequest(
             경영SimulationSession생성Request source)
@@ -106,6 +130,9 @@ namespace Ssalddel.Simulation.Domain
                 FarmWorkConfirmRequest = source.FarmWorkConfirmRequest == null
                     ? null
                     : CloneFarmWorkConfirmRequest(source.FarmWorkConfirmRequest),
+                FarmWorkPlanConfirmRequest = source.FarmWorkPlanConfirmRequest == null
+                    ? null
+                    : CloneFarmWorkPlanConfirmRequest(source.FarmWorkPlanConfirmRequest),
                 ThreatResponseConfirmRequest = source.ThreatResponseConfirmRequest == null
                     ? null
                     : CloneThreatResponseConfirmRequest(
@@ -145,6 +172,28 @@ namespace Ssalddel.Simulation.Domain
                 TaskCancelRequest = source.TaskCancelRequest == null
                     ? null : CloneTaskCancelRequest(source.TaskCancelRequest),
                 TaskStableId = source.TaskStableId,
+                WorldEventStableId = source.WorldEventStableId,
+                RegionalIncidentResponseConfirmRequest =
+                    source.RegionalIncidentResponseConfirmRequest == null ? null
+                        : CloneRegionalIncidentResponseConfirmRequest(
+                            source.RegionalIncidentResponseConfirmRequest),
+                NatureEncounterVictoryRequest = source.NatureEncounterVictoryRequest == null
+                    ? null : new SimulationNatureEncounterVictoryRequest
+                    {
+                        BattleStableId = source.NatureEncounterVictoryRequest.BattleStableId,
+                        EncounterStableId = source.NatureEncounterVictoryRequest.EncounterStableId,
+                    },
+            };
+
+        public static SimulationRegionalIncidentResponseConfirmRequest
+            CloneRegionalIncidentResponseConfirmRequest(
+                SimulationRegionalIncidentResponseConfirmRequest source)
+            => new SimulationRegionalIncidentResponseConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                ActorStableId = source.ActorStableId,
+                ChoiceStableId = source.ChoiceStableId,
             };
 
         public static SimulationTaskCancelRequest CloneTaskCancelRequest(
@@ -162,6 +211,28 @@ namespace Ssalddel.Simulation.Domain
             {
                 CommandId = source.CommandId,
                 ExpectedRevision = source.ExpectedRevision,
+                ActorStableId = source.ActorStableId,
+                TargetStableId = source.TargetStableId,
+                ActionCode = source.ActionCode,
+                AssignmentKindCode = source.AssignmentKindCode,
+                PreferredSpatialStableId = source.PreferredSpatialStableId,
+            };
+
+        public static SimulationFarmWorkPlanConfirmRequest CloneFarmWorkPlanConfirmRequest(
+            SimulationFarmWorkPlanConfirmRequest source)
+            => new SimulationFarmWorkPlanConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedRevision = source.ExpectedRevision,
+                Items = source.Items.Select(CloneFarmWorkPlanItemRequest).ToArray(),
+            };
+
+        private static SimulationFarmWorkPlanItemRequest CloneFarmWorkPlanItemRequest(
+            SimulationFarmWorkPlanItemRequest source)
+            => new SimulationFarmWorkPlanItemRequest
+            {
+                PlanItemStableId = source.PlanItemStableId,
+                Priority = source.Priority,
                 ActorStableId = source.ActorStableId,
                 TargetStableId = source.TargetStableId,
                 ActionCode = source.ActionCode,
