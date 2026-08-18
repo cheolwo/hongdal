@@ -2,7 +2,7 @@
   "schemaVersion": "simulation-world-interaction-eh-status.v1",
   "revision": "simulation-world-interaction-eh-status.r1",
   "generatedFrom": {
-    "worldInteractionCatalogRevision": "simulation-world-interactions.r3",
+    "worldInteractionCatalogRevision": "simulation-world-interactions.r4",
     "spatialPriorityRevision": "simulation-world-interaction-spatial-priorities.r1",
     "designKnowledgeRevision": "simulation-world-spatial-design-knowledge.r3",
     "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r5",
@@ -12,10 +12,10 @@
     "p2CompositionPlanRevision": 1
   },
   "summary": {
-    "totalWorldInteractions": 37,
-    "implementationE3Count": 37,
+    "totalWorldInteractions": 41,
+    "implementationE3Count": 41,
     "establishedH1Count": 13,
-    "candidateLineageCount": 18,
+    "candidateLineageCount": 22,
     "missingRequiredCount": 0,
     "notApplicableCount": 6,
     "officialH1DefinitionCount": 5,
@@ -33,7 +33,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -87,7 +87,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -145,7 +145,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -200,7 +200,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P1",
+      "priorityCode": "P2",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -257,7 +257,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P1",
+      "priorityCode": "P2",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -307,7 +307,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P1",
+      "priorityCode": "P2",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -355,7 +355,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P2",
+      "priorityCode": "P3",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -403,7 +403,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P2",
+      "priorityCode": "P3",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -451,7 +451,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Contextual",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -491,7 +491,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -536,7 +536,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -580,7 +580,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -621,7 +621,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P1",
+      "priorityCode": "P2",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -668,7 +668,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -713,7 +713,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -749,7 +749,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P2",
+      "priorityCode": "P3",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -793,7 +793,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P2",
+      "priorityCode": "P3",
       "spatialDesignStateCode": "EstablishedH1",
       "highestEstablishedHLevelCode": "H1",
       "approvedH1DefinitionRefs": [
@@ -836,7 +836,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -881,7 +881,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -931,7 +931,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -972,7 +972,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1014,7 +1014,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P3",
+      "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1048,6 +1048,165 @@
       "warningCodes": []
     },
     {
+      "worldInteractionId": "WI-NATURE-01",
+      "groupCode": "NATURE",
+      "sequence": 1,
+      "title": "자연권 위협 관찰",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "CandidateLineage",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-threat-watch"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:고지대-노출지",
+        "h1-expression:nature:산-능선",
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-빈터-고사목"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-threat-response"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-threat-recovery"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:nature-home-exploration-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "ObservationArea",
+        "ThreatMonitoringArea",
+        "Traversable"
+      ],
+      "lhEngineHandoffStateCode": "DesignCandidateOnly",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-02",
+      "groupCode": "NATURE",
+      "sequence": 2,
+      "title": "자연권 긴급 후퇴",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "CandidateLineage",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-emergency-retreat"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-가장자리"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-threat-response"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-threat-recovery"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:nature-home-exploration-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "EmergencyAccess",
+        "PlayerEscapeRoute",
+        "Traversable"
+      ],
+      "lhEngineHandoffStateCode": "DesignCandidateOnly",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-03",
+      "groupCode": "NATURE",
+      "sequence": 3,
+      "title": "자연권 복원",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "CandidateLineage",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-restoration-site"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:수변-완충지",
+        "h1-expression:nature:숲-가장자리"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-restoration-recovery"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-threat-recovery"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:nature-home-exploration-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "CargoAccessible",
+        "RestorationWorkArea",
+        "WorkerAccessible"
+      ],
+      "lhEngineHandoffStateCode": "DesignCandidateOnly",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-04",
+      "groupCode": "NATURE",
+      "sequence": 4,
+      "title": "파티 회복",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "CandidateLineage",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:숲-빈터-고사목",
+        "h1-expression:nature:초지-야생화"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-restoration-recovery"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-threat-recovery"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:nature-home-exploration-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "RestArea",
+        "SafeCore",
+        "Traversable"
+      ],
+      "lhEngineHandoffStateCode": "DesignCandidateOnly",
+      "warningCodes": []
+    },
+    {
       "worldInteractionId": "WI-ORDER-01",
       "groupCode": "ORDER",
       "sequence": 1,
@@ -1056,7 +1215,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "NotRequired",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "NotApplicable",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1080,7 +1239,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "NotRequired",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "NotApplicable",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1104,7 +1263,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1144,7 +1303,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1184,7 +1343,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1226,7 +1385,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1269,7 +1428,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Contextual",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1309,7 +1468,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Contextual",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1346,7 +1505,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "NotRequired",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "NotApplicable",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1370,7 +1529,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "NotRequired",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "NotApplicable",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1394,7 +1553,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Required",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1459,7 +1618,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Contextual",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1528,7 +1687,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "NotRequired",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "NotApplicable",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1552,7 +1711,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "Contextual",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1609,7 +1768,7 @@
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
       "spatialParticipationCode": "NotRequired",
-      "priorityCode": "P4",
+      "priorityCode": "P5",
       "spatialDesignStateCode": "NotApplicable",
       "highestEstablishedHLevelCode": "",
       "approvedH1DefinitionRefs": [],
@@ -1634,5 +1793,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "c2c448d8159bf387cd59f685189a3284a692f6f1be74dd4cfba52362be0bb544"
+  "contentHashSha256": "4b629c4c874e9cf1c5e3e34967b2fab1bd8a950a675438dea417b997428b5e4d"
 }

@@ -86,4 +86,204 @@ public sealed class SimulationWorldEventsController(
             return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
         }
     }
+
+    [HttpPost("nature-threat/observation-previews")]
+    [ProducesResponseType(typeof(SimulationNatureThreatObservationPreviewSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationNatureThreatObservationPreviewSnapshot>
+        PreviewNatureThreatObservation(
+            string sessionStableId,
+            [FromBody] SimulationNatureThreatObservationPreviewRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.PreviewThreatObservation(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/observations/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmNatureThreatObservation(
+        string sessionStableId,
+        [FromBody] SimulationNatureThreatObservationConfirmRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.ConfirmThreatObservation(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/retreat-previews")]
+    [ProducesResponseType(typeof(SimulationNatureEmergencyRetreatPreviewSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationNatureEmergencyRetreatPreviewSnapshot>
+        PreviewNatureEmergencyRetreat(
+            string sessionStableId,
+            [FromBody] SimulationNatureEmergencyRetreatPreviewRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.PreviewEmergencyRetreat(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/retreats/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmNatureEmergencyRetreat(
+        string sessionStableId,
+        [FromBody] SimulationNatureEmergencyRetreatConfirmRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.ConfirmEmergencyRetreat(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/restoration-previews")]
+    [ProducesResponseType(typeof(SimulationNatureRestorationPreviewSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationNatureRestorationPreviewSnapshot>
+        PreviewNatureRestoration(
+            string sessionStableId,
+            [FromBody] SimulationNatureRestorationPreviewRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.PreviewRestoration(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/restorations/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmNatureRestoration(
+        string sessionStableId,
+        [FromBody] SimulationNatureRestorationConfirmRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.ConfirmRestoration(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/party-recovery-previews")]
+    [ProducesResponseType(typeof(SimulationNaturePartyRecoveryPreviewSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationNaturePartyRecoveryPreviewSnapshot>
+        PreviewNaturePartyRecovery(
+            string sessionStableId,
+            [FromBody] SimulationNaturePartyRecoveryPreviewRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.PreviewPartyRecovery(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
+
+    [HttpPost("nature-threat/party-recoveries/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> ConfirmNaturePartyRecovery(
+        string sessionStableId,
+        [FromBody] SimulationNaturePartyRecoveryConfirmRequest request)
+    {
+        try
+        {
+            return Ok(incidentService.ConfirmPartyRecovery(sessionStableId, request));
+        }
+        catch (SimulationContractException error)
+        {
+            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationNotFoundException error)
+        {
+            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+        catch (SimulationConflictException error)
+        {
+            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
+        }
+    }
 }

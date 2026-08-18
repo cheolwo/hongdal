@@ -27,8 +27,21 @@ if ((@($stages.stages.code) -join ",") -ne "E0,E1,E2,E3,E4,E5,E6,E7") {
 if (@($catalog.items | Where-Object { $_.integration.targetStage -ne "E7" }).Count -ne 0) {
     throw "WorldInteractionIntegrationTargetMustBeE7"
 }
-if ([string] $catalog.schemaVersion -ne "3" -or [string] $catalog.revision -ne "simulation-world-interactions.r3") {
-    throw "WorldInteractionCatalogRevisionMustBeR3"
+if ([string] $catalog.schemaVersion -ne "3" -or [string] $catalog.revision -ne "simulation-world-interactions.r4") {
+    throw "WorldInteractionCatalogRevisionMustBeR4"
+}
+$natureIds = @("WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04")
+$natureItems = @($catalog.items | Where-Object id -in $natureIds | Sort-Object sequence)
+if ($natureItems.Count -ne 4 -or (@($natureItems.id) -join ",") -ne ($natureIds -join ",")) {
+    throw "WorldInteractionNatureContractsMissing"
+}
+if (@($natureItems | Where-Object {
+        $_.implementation.currentStage -ne "E3" -or $_.implementation.status -ne "Done"
+    }).Count -ne 0) {
+    throw "WorldInteractionNatureEvidenceStagesInvalid"
+}
+if ((@($natureItems.actionCode) -join ",") -ne "RegionalThreatObservation,EmergencyRetreat,NatureRestoration,PartyRecovery") {
+    throw "WorldInteractionNatureActionCodesInvalid"
 }
 $e4Items = @($catalog.items | Where-Object { $_.integration.currentStage -eq "E4" })
 if ($e4Items.Count -ne 13) { throw "WorldInteractionE4SeedbedItemCountMustBe13" }
@@ -38,7 +51,7 @@ if (@($e4Items | Where-Object { @($_.integration.e4SeedbedRefs).Count -eq 0 }).C
 if (@($e4Items.integration.e4SeedbedRefs | Select-Object -Unique).Count -ne 5) {
     throw "WorldInteractionE4SeedbedCountMustBe5"
 }
-if ($check -notmatch "WorldInteractionCatalogValid:37") {
+if ($check -notmatch "WorldInteractionCatalogValid:41") {
     throw "WorldInteractionCatalogValidationDidNotComplete"
 }
 

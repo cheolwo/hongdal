@@ -27,10 +27,10 @@ $status = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-J
 if ([string] $status.schemaVersion -ne "simulation-world-interaction-eh-status.v1") {
     throw "WorldInteractionEhStatusSchemaInvalid"
 }
-$summaryInvalid = $status.summary.totalWorldInteractions -ne 37 -or
-    $status.summary.implementationE3Count -ne 37 -or
+$summaryInvalid = $status.summary.totalWorldInteractions -ne 41 -or
+    $status.summary.implementationE3Count -ne 41 -or
     $status.summary.establishedH1Count -ne 13 -or
-    $status.summary.candidateLineageCount -ne 18 -or
+    $status.summary.candidateLineageCount -ne 22 -or
     $status.summary.missingRequiredCount -ne 0 -or
     $status.summary.notApplicableCount -ne 6
 if ($summaryInvalid) {
@@ -51,6 +51,18 @@ $orderPackingInvalid = $orderPacking.Count -ne 1 -or
 if ($orderPackingInvalid) {
     throw "WorldInteractionOrderPackingDesignNotConnected"
 }
+$natureIds = @("WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04")
+$nature = @($status.items | Where-Object worldInteractionId -in $natureIds | Sort-Object sequence)
+if ($nature.Count -ne 4 -or
+    @($nature | Where-Object {
+    $_.implementationEvidenceStage -ne "E3" -or
+    $_.spatialDesignStateCode -ne "CandidateLineage" -or
+    @($_.interactionH1CandidateRefs).Count -eq 0 -or
+    @($_.h2CandidateRefs).Count -eq 0 -or
+    @($_.h3CandidateRefs).Count -eq 0
+}).Count -ne 0) {
+    throw "WorldInteractionNatureEvidenceAndHLineageInvalid"
+}
 $repair = @($status.items | Where-Object worldInteractionId -eq "WI-WORLD-04")
 $repairInvalid = $repair.Count -ne 1 -or
     @($repair[0].warningCodes) -notcontains "GraphBindingWithoutApprovedH1"
@@ -63,7 +75,7 @@ if (@($status.items | Where-Object {
 }).Count -ne 0) {
     throw "WorldInteractionE5CandidateBoundaryMissing"
 }
-if ($check -notmatch "WorldInteractionEhStatusValid:Items=37") {
+if ($check -notmatch "WorldInteractionEhStatusValid:Items=41") {
     throw "WorldInteractionEhStatusCheckDidNotComplete"
 }
 

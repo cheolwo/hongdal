@@ -3,6 +3,8 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 
@@ -245,6 +247,822 @@ public sealed class SimulationRegionalIncidentTests
             .EffectivePressure);
     }
 
+    [Fact]
+    public void 자연권위협관찰은_공간을예약하고_압력을바꾸지않으며_저장재생된다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var incidentState = HarvestAndCreateIncident(session);
+        var incident = Assert.Single(incidentState.RegionalIncidents);
+        var adverse = session.ConfirmRegionalIncidentResponse(incident.EventStableId,
+            new SimulationRegionalIncidentResponseConfirmRequest
+            {
+                CommandId = "command:test:nature-observation-source",
+                ExpectedRevision = incidentState.Revision,
+                ActorStableId = "actor:test:manager",
+                ChoiceStableId = SimulationRegionalIncidentCodes.FarmLeaveExposed,
+            });
+        var pressureBefore = adverse.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
+            .EffectivePressure;
+        var previewRequest = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = adverse.Revision,
+            DecisionStableId = "decision:test:nature-observation",
+            TaskStableId = "task:test:nature-observation",
+            ActorStableId = "actor:test:scout",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+        };
+
+        var preview = session.PreviewNatureThreatObservation(previewRequest);
+
+        Assert.True(preview.CanConfirm);
+        Assert.Equal(pressureBefore, preview.EffectivePressure);
+        Assert.Equal(adverse.Revision, session.Revision);
+        Assert.Equal(PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+            preview.DecisionPreview.SpatialInteraction!.SelectedSpatialStableId);
+        Assert.Equal(new[] { "WI-NATURE-02", "WI-NATURE-03" },
+            preview.NextWorldInteractionIds);
+
+        var confirmRequest = new SimulationNatureThreatObservationConfirmRequest
+        {
+            CommandId = "command:test:nature-observation",
+            ExpectedRevision = adverse.Revision,
+            Preview = previewRequest,
+        };
+        var confirmed = session.ConfirmNatureThreatObservation(confirmRequest);
+        var retried = session.ConfirmNatureThreatObservation(confirmRequest);
+
+        Assert.Equal(confirmed.Revision, retried.Revision);
+        var conflictingPreview = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = confirmRequest.ExpectedRevision,
+            DecisionStableId = previewRequest.DecisionStableId,
+            TaskStableId = previewRequest.TaskStableId,
+            ActorStableId = previewRequest.ActorStableId,
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToTown,
+            PreferredSpatialStableId = previewRequest.PreferredSpatialStableId,
+        };
+        var payloadConflict = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmNatureThreatObservation(
+                new SimulationNatureThreatObservationConfirmRequest
+                {
+                    CommandId = confirmRequest.CommandId,
+                    ExpectedRevision = confirmRequest.ExpectedRevision,
+                    Preview = conflictingPreview,
+                }));
+        Assert.Equal("SimulationCommandPayloadConflict", payloadConflict.ErrorCode);
+        Assert.Equal(SimulationTaskStateCodes.Scheduled,
+            confirmed.Tasks.Single(value => value.TaskStableId ==
+                previewRequest.TaskStableId).StateCode);
+        Assert.Contains(confirmed.SpatialReservations, value =>
+            value.TaskStableId == previewRequest.TaskStableId
+            && value.StatusCode == Simulation공간예약상태Codes.Reserved);
+        Assert.Equal(pressureBefore, confirmed.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
+            .EffectivePressure);
+
+        var completed = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-observation-tick",
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+        Assert.Equal(SimulationTaskStateCodes.Completed,
+            completed.Tasks.Single(value => value.TaskStableId ==
+                previewRequest.TaskStableId).StateCode);
+        Assert.Equal(SimulationEffectStateCodes.Applied,
+            completed.Effects.Single(value => value.EffectTypeCode ==
+                SimulationNatureInteractionCodes.NatureThreatObserved).StateCode);
+        Assert.Contains(completed.SpatialReservations, value =>
+            value.TaskStableId == previewRequest.TaskStableId
+            && value.StatusCode == Simulation공간예약상태Codes.Released);
+        Assert.Equal(pressureBefore, completed.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
+            .EffectivePressure);
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:test:nature-observation",
+            ExpectedRevision = completed.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = package.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+        Assert.Contains(restored.Snapshot().Effects, value =>
+            value.EffectTypeCode == SimulationNatureInteractionCodes.NatureThreatObserved
+            && value.StateCode == SimulationEffectStateCodes.Applied);
+    }
+
+    [Fact]
+    public async Task 자연권위협관찰Api는_미리보기_확정_완료를왕복한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var createResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", CreateRequest());
+        var created = await createResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var sessionRoute = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(created!.SessionStableId);
+        var request = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = created.Revision,
+            DecisionStableId = "decision:http:nature-observation",
+            TaskStableId = "task:http:nature-observation",
+            ActorStableId = "actor:http:scout",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+        };
+
+        var previewResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/observation-previews", request);
+        var preview = await previewResponse.Content
+            .ReadFromJsonAsync<SimulationNatureThreatObservationPreviewSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, previewResponse.StatusCode);
+        Assert.True(preview!.CanConfirm);
+
+        var confirmResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/observations/confirm",
+            new SimulationNatureThreatObservationConfirmRequest
+            {
+                CommandId = "command:http:nature-observation",
+                ExpectedRevision = created.Revision,
+                Preview = request,
+            });
+        var confirmed = await confirmResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, confirmResponse.StatusCode);
+        Assert.Contains(confirmed!.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.StatusCode == Simulation공간예약상태Codes.Reserved);
+
+        var tickResponse = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:nature-observation-tick",
+                ExpectedRevision = confirmed.Revision,
+                TickCount = 1,
+            });
+        var completed = await tickResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, tickResponse.StatusCode);
+        Assert.Contains(completed!.Effects, value =>
+            value.EffectTypeCode == SimulationNatureInteractionCodes.NatureThreatObserved
+            && value.StateCode == SimulationEffectStateCodes.Applied);
+    }
+
+    [Fact]
+    public void 자연권긴급후퇴는_관찰후_공간을예약하고_파티를안전핵으로인계한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        ObserveThreat(session, SimulationRegionalIncidentCodes.NatureToFarm,
+            "retreat-prerequisite");
+        var pressureBefore = session.Snapshot().NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
+            .EffectivePressure;
+        var request = new SimulationNatureEmergencyRetreatPreviewRequest
+        {
+            ExpectedRevision = session.Revision,
+            DecisionStableId = "decision:test:nature-retreat",
+            TaskStableId = "task:test:nature-retreat",
+            ActorStableId = "actor:test:player-party",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature긴급후퇴경로,
+        };
+
+        var preview = session.PreviewNatureEmergencyRetreat(request);
+
+        Assert.True(preview.CanConfirm);
+        Assert.True(preview.HasObservedThreat);
+        Assert.False(preview.HasActiveEncounter);
+        Assert.Equal(new[] { "WI-NATURE-04" }, preview.NextWorldInteractionIds);
+        Assert.Equal(PyeongchangSimulation공간StableIds.Nature긴급후퇴경로,
+            preview.DecisionPreview.SpatialInteraction!.SelectedSpatialStableId);
+        var confirm = new SimulationNatureEmergencyRetreatConfirmRequest
+        {
+            CommandId = "command:test:nature-retreat",
+            ExpectedRevision = session.Revision,
+            Preview = request,
+        };
+        var confirmed = session.ConfirmNatureEmergencyRetreat(confirm);
+        var retried = session.ConfirmNatureEmergencyRetreat(confirm);
+        Assert.Equal(confirmed.Revision, retried.Revision);
+        Assert.Contains(confirmed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.EscapeRouteCapacity
+            && value.StatusCode == Simulation공간예약상태Codes.Reserved);
+
+        var completed = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-retreat-tick",
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+        Assert.Equal(SimulationEffectStateCodes.Applied,
+            completed.Effects.Single(value => value.EffectTypeCode ==
+                SimulationNatureInteractionCodes.PartyRetreatedToSafeCore).StateCode);
+        Assert.Contains(completed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.StatusCode == Simulation공간예약상태Codes.Released);
+        Assert.Equal(pressureBefore, completed.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
+            .EffectivePressure);
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:test:nature-retreat",
+            ExpectedRevision = completed.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = package.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+
+        var conflictRequest = new SimulationNatureEmergencyRetreatPreviewRequest
+        {
+            ExpectedRevision = confirm.ExpectedRevision,
+            DecisionStableId = request.DecisionStableId,
+            TaskStableId = request.TaskStableId,
+            ActorStableId = request.ActorStableId,
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToTown,
+            PreferredSpatialStableId = request.PreferredSpatialStableId,
+        };
+        var conflict = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmNatureEmergencyRetreat(
+                new SimulationNatureEmergencyRetreatConfirmRequest
+                {
+                    CommandId = confirm.CommandId,
+                    ExpectedRevision = confirm.ExpectedRevision,
+                    Preview = conflictRequest,
+                }));
+        Assert.Equal("SimulationCommandPayloadConflict", conflict.ErrorCode);
+    }
+
+    [Fact]
+    public void 자연권긴급후퇴는_선행관찰_공간_개정을검사하고_취소시예약을반환한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var request = new SimulationNatureEmergencyRetreatPreviewRequest
+        {
+            ExpectedRevision = session.Revision,
+            DecisionStableId = "decision:test:nature-retreat-blocked",
+            TaskStableId = "task:test:nature-retreat-blocked",
+            ActorStableId = "actor:test:player-party",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+        };
+        var withoutObservation = session.PreviewNatureEmergencyRetreat(request);
+        Assert.False(withoutObservation.CanConfirm);
+        Assert.Contains("NatureThreatObservationRequired",
+            withoutObservation.BlockingReasonCodes);
+
+        var encounterSession = new 경영SimulationSessionAggregate(CreateRequest());
+        var incidentSnapshot = HarvestAndCreateIncident(encounterSession);
+        var incident = Assert.Single(incidentSnapshot.RegionalIncidents);
+        encounterSession.ConfirmRegionalIncidentResponse(incident.EventStableId,
+            new SimulationRegionalIncidentResponseConfirmRequest
+            {
+                CommandId = "command:test:retreat-active-encounter",
+                ExpectedRevision = incidentSnapshot.Revision,
+                ActorStableId = "actor:test:manager",
+                ChoiceStableId = SimulationRegionalIncidentCodes.FarmLeaveExposed,
+            });
+        request.ExpectedRevision = encounterSession.Revision;
+        request.PreferredSpatialStableId =
+            PyeongchangSimulation공간StableIds.Nature긴급후퇴경로;
+        var activeEncounter = encounterSession.PreviewNatureEmergencyRetreat(request);
+        Assert.True(activeEncounter.CanConfirm);
+        Assert.False(activeEncounter.HasObservedThreat);
+        Assert.True(activeEncounter.HasActiveEncounter);
+
+        ObserveThreat(session, request.NatureRouteCode, "retreat-cancel");
+        request.ExpectedRevision = session.Revision;
+        request.PreferredSpatialStableId =
+            PyeongchangSimulation공간StableIds.Nature긴급후퇴경로;
+        var scheduled = session.ConfirmNatureEmergencyRetreat(
+            new SimulationNatureEmergencyRetreatConfirmRequest
+            {
+                CommandId = "command:test:nature-retreat-cancel",
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        var cancelled = session.CancelTask(request.TaskStableId,
+            new SimulationTaskCancelRequest
+            {
+                CommandId = "command:test:nature-retreat-task-cancel",
+                ExpectedRevision = scheduled.Revision,
+                ReasonCode = "PlayerCancelled",
+            });
+        Assert.All(cancelled.SpatialReservations.Where(value =>
+            value.TaskStableId == request.TaskStableId), value =>
+                Assert.Equal(Simulation공간예약상태Codes.Cancelled, value.StatusCode));
+
+        var noSpaceRequest = CreateRequest();
+        noSpaceRequest.SpatialWorld!.Definitions = noSpaceRequest.SpatialWorld.Definitions
+            .Where(value => value.SpatialStableId !=
+                PyeongchangSimulation공간StableIds.Nature긴급후퇴경로).ToArray();
+        var noSpace = new 경영SimulationSessionAggregate(noSpaceRequest);
+        ObserveThreat(noSpace, SimulationRegionalIncidentCodes.NatureToFarm,
+            "retreat-no-space");
+        request.ExpectedRevision = noSpace.Revision;
+        var missingSpace = noSpace.PreviewNatureEmergencyRetreat(request);
+        Assert.False(missingSpace.CanConfirm);
+        Assert.Contains(Simulation공간차단Codes.DefinitionUnavailable,
+            missingSpace.BlockingReasonCodes);
+
+        request.PreferredSpatialStableId = string.Empty;
+        request.ExpectedRevision = noSpace.Revision + 1;
+        var stale = noSpace.PreviewNatureEmergencyRetreat(request);
+        Assert.Contains("SimulationExpectedRevisionMismatch", stale.BlockingReasonCodes);
+    }
+
+    [Fact]
+    public async Task 자연권긴급후퇴Api는_관찰후_미리보기_확정_완료를왕복한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var createResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", CreateRequest());
+        var created = await createResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var sessionRoute = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(created!.SessionStableId);
+        var observation = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = created.Revision,
+            DecisionStableId = "decision:http:retreat-observation",
+            TaskStableId = "task:http:retreat-observation",
+            ActorStableId = "actor:http:scout",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId = PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+        };
+        var observedResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/observations/confirm",
+            new SimulationNatureThreatObservationConfirmRequest
+            {
+                CommandId = "command:http:retreat-observation",
+                ExpectedRevision = created.Revision,
+                Preview = observation,
+            });
+        var observed = await observedResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var observationTick = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:retreat-observation-tick",
+                ExpectedRevision = observed!.Revision,
+                TickCount = 1,
+            });
+        var ready = await observationTick.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var retreat = new SimulationNatureEmergencyRetreatPreviewRequest
+        {
+            ExpectedRevision = ready!.Revision,
+            DecisionStableId = "decision:http:nature-retreat",
+            TaskStableId = "task:http:nature-retreat",
+            ActorStableId = "actor:http:player-party",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId = PyeongchangSimulation공간StableIds.Nature긴급후퇴경로,
+        };
+        var previewResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/retreat-previews", retreat);
+        var preview = await previewResponse.Content
+            .ReadFromJsonAsync<SimulationNatureEmergencyRetreatPreviewSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, previewResponse.StatusCode);
+        Assert.True(preview!.CanConfirm);
+        var confirmResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/retreats/confirm",
+            new SimulationNatureEmergencyRetreatConfirmRequest
+            {
+                CommandId = "command:http:nature-retreat",
+                ExpectedRevision = ready.Revision,
+                Preview = retreat,
+            });
+        var confirmed = await confirmResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var tickResponse = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:nature-retreat-tick",
+                ExpectedRevision = confirmed!.Revision,
+                TickCount = 1,
+            });
+        var completed = await tickResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, tickResponse.StatusCode);
+        Assert.Contains(completed!.Effects, value => value.EffectTypeCode ==
+            SimulationNatureInteractionCodes.PartyRetreatedToSafeCore
+            && value.StateCode == SimulationEffectStateCodes.Applied);
+    }
+
+    [Fact]
+    public void 자연권복원은_관찰한원인이해결된경로의_공간과자재를사용한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var resolved = PrepareResolvedObservedNatureRoute(session, "restoration");
+        var request = RestorationRequest(session.Revision, "restoration");
+        var pressureBefore = resolved.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == request.NatureRouteCode).EffectivePressure;
+
+        var preview = session.PreviewNatureRestoration(request);
+
+        Assert.True(preview.CanConfirm);
+        Assert.Single(preview.ResolvedCauseIncidentStableIds);
+        Assert.Equal(new[] { "WI-NATURE-04" }, preview.NextWorldInteractionIds);
+        Assert.Equal(PyeongchangSimulation공간StableIds.Nature복원작업공간,
+            preview.DecisionPreview.SpatialInteraction!.SelectedSpatialStableId);
+        var confirm = new SimulationNatureRestorationConfirmRequest
+        {
+            CommandId = "command:test:nature-restoration",
+            ExpectedRevision = session.Revision,
+            Preview = request,
+        };
+        var confirmed = session.ConfirmNatureRestoration(confirm);
+        var retried = session.ConfirmNatureRestoration(confirm);
+        Assert.Equal(confirmed.Revision, retried.Revision);
+        Assert.Contains(confirmed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.RestorationMaterial
+            && value.StatusCode == Simulation공간예약상태Codes.Reserved);
+
+        var completed = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-restoration-tick",
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+        Assert.Equal(SimulationEffectStateCodes.Applied,
+            completed.Effects.Single(value => value.EffectTypeCode ==
+                SimulationNatureInteractionCodes.NatureRouteRestored).StateCode);
+        Assert.Contains(completed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.RestorationMaterial
+            && value.StatusCode == Simulation공간예약상태Codes.Consumed);
+        Assert.Contains(completed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.WorkArea
+            && value.StatusCode == Simulation공간예약상태Codes.Released);
+        Assert.Equal(pressureBefore, completed.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == request.NatureRouteCode).EffectivePressure);
+        request.ExpectedRevision = completed.Revision;
+        Assert.Contains("NatureRouteAlreadyRestored",
+            session.PreviewNatureRestoration(request).BlockingReasonCodes);
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:test:nature-restoration",
+            ExpectedRevision = completed.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = package.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+    }
+
+    [Fact]
+    public void 자연권복원은_미해결원인_공간부재_낮은개정을차단하고_취소예약을반환한다()
+    {
+        var unresolved = new 경영SimulationSessionAggregate(CreateRequest());
+        var adverse = CreateAdverseObservedNatureRoute(unresolved, "unresolved");
+        var request = RestorationRequest(unresolved.Revision, "unresolved");
+        var unresolvedPreview = unresolved.PreviewNatureRestoration(request);
+        Assert.False(unresolvedPreview.CanConfirm);
+        Assert.Contains("NatureIncidentCauseUnresolved",
+            unresolvedPreview.BlockingReasonCodes);
+        Assert.True(adverse.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == request.NatureRouteCode).EffectivePressure > 0);
+
+        var cancellable = new 경영SimulationSessionAggregate(CreateRequest());
+        PrepareResolvedObservedNatureRoute(cancellable, "restoration-cancel");
+        request = RestorationRequest(cancellable.Revision, "restoration-cancel");
+        var scheduled = cancellable.ConfirmNatureRestoration(
+            new SimulationNatureRestorationConfirmRequest
+            {
+                CommandId = "command:test:nature-restoration-cancel",
+                ExpectedRevision = cancellable.Revision,
+                Preview = request,
+            });
+        var cancelled = cancellable.CancelTask(request.TaskStableId,
+            new SimulationTaskCancelRequest
+            {
+                CommandId = "command:test:nature-restoration-task-cancel",
+                ExpectedRevision = scheduled.Revision,
+                ReasonCode = "PlayerCancelled",
+            });
+        Assert.All(cancelled.SpatialReservations.Where(value =>
+            value.TaskStableId == request.TaskStableId), value =>
+                Assert.Equal(Simulation공간예약상태Codes.Cancelled, value.StatusCode));
+
+        var missingRequest = CreateRequest();
+        missingRequest.SpatialWorld!.Definitions = missingRequest.SpatialWorld.Definitions
+            .Where(value => value.SpatialStableId !=
+                PyeongchangSimulation공간StableIds.Nature복원작업공간).ToArray();
+        var missing = new 경영SimulationSessionAggregate(missingRequest);
+        PrepareResolvedObservedNatureRoute(missing, "restoration-missing");
+        request = RestorationRequest(missing.Revision, "restoration-missing");
+        var missingPreview = missing.PreviewNatureRestoration(request);
+        Assert.Contains(Simulation공간차단Codes.DefinitionUnavailable,
+            missingPreview.BlockingReasonCodes);
+        request.ExpectedRevision = missing.Revision + 1;
+        Assert.Contains("SimulationExpectedRevisionMismatch",
+            missing.PreviewNatureRestoration(request).BlockingReasonCodes);
+    }
+
+    [Fact]
+    public async Task 자연권복원Api는_해결된원인에서_미리보기_확정_완료를왕복한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var createResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", CreateRequest());
+        var created = await createResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var accessor = factory.Services.GetRequiredService<경영SimulationSessionAccessor>();
+        var session = accessor.Require(created!.SessionStableId);
+        PrepareResolvedObservedNatureRoute(session, "restoration-http");
+        var request = RestorationRequest(session.Revision, "restoration-http");
+        var sessionRoute = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(created.SessionStableId);
+
+        var previewResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/restoration-previews", request);
+        var preview = await previewResponse.Content
+            .ReadFromJsonAsync<SimulationNatureRestorationPreviewSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, previewResponse.StatusCode);
+        Assert.True(preview!.CanConfirm);
+        var confirmResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/restorations/confirm",
+            new SimulationNatureRestorationConfirmRequest
+            {
+                CommandId = "command:http:nature-restoration",
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        var confirmed = await confirmResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var tickResponse = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:nature-restoration-tick",
+                ExpectedRevision = confirmed!.Revision,
+                TickCount = 1,
+            });
+        var completed = await tickResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, tickResponse.StatusCode);
+        Assert.Contains(completed!.Effects, value => value.EffectTypeCode ==
+            SimulationNatureInteractionCodes.NatureRouteRestored
+            && value.StateCode == SimulationEffectStateCodes.Applied);
+    }
+
+    [Fact]
+    public void 파티회복은_후퇴후_안전생활핵공간과보급을사용하고_탐색을다시연다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        PrepareRetreatedParty(session, "party-recovery");
+        var request = PartyRecoveryRequest(session.Revision, "party-recovery");
+        var pressureBefore = session.Snapshot().NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == request.NatureRouteCode).EffectivePressure;
+
+        var preview = session.PreviewNaturePartyRecovery(request);
+
+        Assert.True(preview.CanConfirm);
+        Assert.True(preview.HasRetreatPredecessor);
+        Assert.False(preview.HasRestorationPredecessor);
+        Assert.Equal("Explore", preview.NextPlayerActionCode);
+        Assert.Equal(PyeongchangSimulation공간StableIds.Nature안전회복야영지,
+            preview.DecisionPreview.SpatialInteraction!.SelectedSpatialStableId);
+        var confirm = new SimulationNaturePartyRecoveryConfirmRequest
+        {
+            CommandId = "command:test:nature-party-recovery",
+            ExpectedRevision = session.Revision,
+            Preview = request,
+        };
+        var confirmed = session.ConfirmNaturePartyRecovery(confirm);
+        var retried = session.ConfirmNaturePartyRecovery(confirm);
+        Assert.Equal(confirmed.Revision, retried.Revision);
+        Assert.Contains(confirmed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.RecoverySupply
+            && value.StatusCode == Simulation공간예약상태Codes.Reserved);
+
+        var completed = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-party-recovery-tick",
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+        Assert.Equal(SimulationEffectStateCodes.Applied,
+            completed.Effects.Single(value => value.EffectTypeCode ==
+                SimulationNatureInteractionCodes.PartyRecovered).StateCode);
+        Assert.Contains(completed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.RecoverySupply
+            && value.StatusCode == Simulation공간예약상태Codes.Consumed);
+        Assert.Contains(completed.SpatialReservations, value =>
+            value.TaskStableId == request.TaskStableId
+            && value.ReservationKindCode == Simulation공간용량Codes.RestAreaParty
+            && value.StatusCode == Simulation공간예약상태Codes.Released);
+        Assert.Equal(pressureBefore, completed.NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == request.NatureRouteCode).EffectivePressure);
+        request.ExpectedRevision = completed.Revision;
+        Assert.Contains("PartyAlreadyRecovered",
+            session.PreviewNaturePartyRecovery(request).BlockingReasonCodes);
+
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:test:nature-party-recovery",
+            ExpectedRevision = completed.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = package.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+    }
+
+    [Fact]
+    public void 파티회복은_복원효과도선행으로받고_미완료_공간부재_취소를검사한다()
+    {
+        var missingPredecessor = new 경영SimulationSessionAggregate(CreateRequest());
+        var request = PartyRecoveryRequest(missingPredecessor.Revision, "no-predecessor");
+        Assert.Contains("NatureRecoveryPrerequisiteMissing",
+            missingPredecessor.PreviewNaturePartyRecovery(request).BlockingReasonCodes);
+
+        var restoredRoute = new 경영SimulationSessionAggregate(CreateRequest());
+        PrepareRestoredRoute(restoredRoute, "recovery-restored-route");
+        request = PartyRecoveryRequest(restoredRoute.Revision, "restored-route");
+        var restorationPreview = restoredRoute.PreviewNaturePartyRecovery(request);
+        Assert.True(restorationPreview.CanConfirm);
+        Assert.False(restorationPreview.HasRetreatPredecessor);
+        Assert.True(restorationPreview.HasRestorationPredecessor);
+
+        var cancellable = new 경영SimulationSessionAggregate(CreateRequest());
+        PrepareRetreatedParty(cancellable, "recovery-cancel");
+        request = PartyRecoveryRequest(cancellable.Revision, "recovery-cancel");
+        var scheduled = cancellable.ConfirmNaturePartyRecovery(
+            new SimulationNaturePartyRecoveryConfirmRequest
+            {
+                CommandId = "command:test:nature-recovery-cancel",
+                ExpectedRevision = cancellable.Revision,
+                Preview = request,
+            });
+        var cancelled = cancellable.CancelTask(request.TaskStableId,
+            new SimulationTaskCancelRequest
+            {
+                CommandId = "command:test:nature-recovery-task-cancel",
+                ExpectedRevision = scheduled.Revision,
+                ReasonCode = "PlayerCancelled",
+            });
+        Assert.All(cancelled.SpatialReservations.Where(value =>
+            value.TaskStableId == request.TaskStableId), value =>
+                Assert.Equal(Simulation공간예약상태Codes.Cancelled, value.StatusCode));
+
+        var missingSpaceRequest = CreateRequest();
+        missingSpaceRequest.SpatialWorld!.Definitions = missingSpaceRequest.SpatialWorld.Definitions
+            .Where(value => value.SpatialStableId !=
+                PyeongchangSimulation공간StableIds.Nature안전회복야영지).ToArray();
+        var missingSpace = new 경영SimulationSessionAggregate(missingSpaceRequest);
+        PrepareRetreatedParty(missingSpace, "recovery-missing-space");
+        request = PartyRecoveryRequest(missingSpace.Revision, "recovery-missing-space");
+        Assert.Contains(Simulation공간차단Codes.DefinitionUnavailable,
+            missingSpace.PreviewNaturePartyRecovery(request).BlockingReasonCodes);
+        request.ExpectedRevision = missingSpace.Revision + 1;
+        Assert.Contains("SimulationExpectedRevisionMismatch",
+            missingSpace.PreviewNaturePartyRecovery(request).BlockingReasonCodes);
+    }
+
+    [Fact]
+    public async Task 파티회복Api는_후퇴후_미리보기_확정_완료를왕복한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var createResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", CreateRequest());
+        var created = await createResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var session = factory.Services.GetRequiredService<경영SimulationSessionAccessor>()
+            .Require(created!.SessionStableId);
+        PrepareRetreatedParty(session, "recovery-http");
+        var request = PartyRecoveryRequest(session.Revision, "recovery-http");
+        var sessionRoute = "/api/simulation/v1/sessions/"
+            + Uri.EscapeDataString(created.SessionStableId);
+        var previewResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/party-recovery-previews", request);
+        var preview = await previewResponse.Content
+            .ReadFromJsonAsync<SimulationNaturePartyRecoveryPreviewSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, previewResponse.StatusCode);
+        Assert.True(preview!.CanConfirm);
+        var confirmResponse = await client.PostAsJsonAsync(
+            sessionRoute + "/world-events/nature-threat/party-recoveries/confirm",
+            new SimulationNaturePartyRecoveryConfirmRequest
+            {
+                CommandId = "command:http:nature-party-recovery",
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        var confirmed = await confirmResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        var tickResponse = await client.PostAsJsonAsync(sessionRoute + "/ticks",
+            new 경영SimulationTick진행Request
+            {
+                CommandId = "command:http:nature-party-recovery-tick",
+                ExpectedRevision = confirmed!.Revision,
+                TickCount = 1,
+            });
+        var completed = await tickResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.Equal(HttpStatusCode.OK, tickResponse.StatusCode);
+        Assert.Contains(completed!.Effects, value => value.EffectTypeCode ==
+            SimulationNatureInteractionCodes.PartyRecovered
+            && value.StateCode == SimulationEffectStateCodes.Applied);
+    }
+
+    [Fact]
+    public void 자연권위협관찰은_낮은개정_잘못된경로_공간부족을차단한다()
+    {
+        var request = CreateRequest();
+        request.SpatialWorld!.Definitions = request.SpatialWorld.Definitions.Where(value =>
+            value.SpatialStableId != PyeongchangSimulation공간StableIds.Nature위협관찰공간)
+            .ToArray();
+        var session = new 경영SimulationSessionAggregate(request);
+        var baseRequest = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = session.Revision,
+            DecisionStableId = "decision:test:nature-observation-blocked",
+            TaskStableId = "task:test:nature-observation-blocked",
+            ActorStableId = "actor:test:scout",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+        };
+
+        var missingSpace = session.PreviewNatureThreatObservation(baseRequest);
+        Assert.False(missingSpace.CanConfirm);
+        Assert.Contains(Simulation공간차단Codes.DefinitionUnavailable,
+            missingSpace.BlockingReasonCodes);
+
+        baseRequest.NatureRouteCode = "UnknownNatureRoute";
+        var missingRoute = session.PreviewNatureThreatObservation(baseRequest);
+        Assert.False(missingRoute.CanConfirm);
+        Assert.Contains("NatureThreatRouteUnavailable", missingRoute.BlockingReasonCodes);
+
+        baseRequest.NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm;
+        baseRequest.ExpectedRevision = session.Revision + 1;
+        var stale = session.PreviewNatureThreatObservation(baseRequest);
+        Assert.False(stale.CanConfirm);
+        Assert.Contains("SimulationExpectedRevisionMismatch", stale.BlockingReasonCodes);
+        Assert.Equal(0, session.Revision);
+
+        var cancellable = new 경영SimulationSessionAggregate(CreateRequest());
+        var cancellablePreview = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = cancellable.Revision,
+            DecisionStableId = "decision:test:nature-observation-cancel",
+            TaskStableId = "task:test:nature-observation-cancel",
+            ActorStableId = "actor:test:scout",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+        };
+        var scheduled = cancellable.ConfirmNatureThreatObservation(
+            new SimulationNatureThreatObservationConfirmRequest
+            {
+                CommandId = "command:test:nature-observation-cancel",
+                ExpectedRevision = cancellable.Revision,
+                Preview = cancellablePreview,
+            });
+        var cancelled = cancellable.CancelTask(cancellablePreview.TaskStableId,
+            new SimulationTaskCancelRequest
+            {
+                CommandId = "command:test:nature-observation-task-cancel",
+                ExpectedRevision = scheduled.Revision,
+                ReasonCode = "PlayerCancelled",
+            });
+        Assert.Equal(SimulationTaskStateCodes.Cancelled,
+            cancelled.Tasks.Single(value => value.TaskStableId ==
+                cancellablePreview.TaskStableId).StateCode);
+        Assert.All(cancelled.SpatialReservations.Where(value =>
+            value.TaskStableId == cancellablePreview.TaskStableId), value =>
+                Assert.Equal(Simulation공간예약상태Codes.Cancelled, value.StatusCode));
+    }
+
     private static SimulationRegionalIncidentSnapshot Incident(
         string id, string route, int remaining)
         => new()
@@ -292,8 +1110,60 @@ public sealed class SimulationRegionalIncidentTests
                 GameDateStartsOn = new DateTimeOffset(
                     2026, 8, 18, 0, 0, 0, TimeSpan.Zero),
             },
-            SpatialWorld = PyeongchangSimulation공간상호작용Fixture.CreateFarmHubSupply(
-                "facility:test:farm", "facility:test:market"),
+            Settlement = new SimulationSettlementInitialStateRequest
+            {
+                TreasuryBalance = 1_000_000m,
+                CurrencyCode = "KRW",
+                LaborCapacityTotal = 100m,
+                StorageCapacity = 20_000m,
+                StorageUnitCode = "KGM",
+                PopulationCount = 100,
+                PopulationFoodDemandPerTick = 100m,
+                FoodEquivalentUnitCode = "KGM",
+                FoodEquivalentRuleRevision = "food-equivalent:regional-incident.r1",
+                Districts = new[]
+                {
+                    new SimulationSettlementDistrictRequest
+                    {
+                        DistrictStableId = "district:test:farm",
+                        DistrictTypeCode = "Farm",
+                        SourceStableIds = new[] { "source:test:regional-incident" },
+                    },
+                },
+                Facilities = new[]
+                {
+                    new SimulationSettlementFacilityRequest
+                    {
+                        FacilityStableId = "facility:test:farm",
+                        FacilityTypeCode = "FarmPacking",
+                        DistrictStableId = "district:test:farm",
+                        SourceStableIds = new[] { "source:test:regional-incident" },
+                    },
+                    new SimulationSettlementFacilityRequest
+                    {
+                        FacilityStableId = "facility:test:storage",
+                        FacilityTypeCode = SimulationSettlementFacilityTypeCodes.Storage,
+                        DistrictStableId = "district:test:farm",
+                        SourceStableIds = new[] { "source:test:regional-incident" },
+                    },
+                    new SimulationSettlementFacilityRequest
+                    {
+                        FacilityStableId = "facility:test:market",
+                        FacilityTypeCode = SimulationSettlementFacilityTypeCodes.Market,
+                        DistrictStableId = "district:test:farm",
+                        SourceStableIds = new[] { "source:test:regional-incident" },
+                    },
+                },
+                MarketSupplyByProduct = Array.Empty<SimulationMarketSupplyRequest>(),
+                SourceStableIds = new[] { "source:test:regional-incident" },
+            },
+            SpatialWorld = new Simulation공간세계InitialStateRequest
+            {
+                Definitions = PyeongchangSimulation공간상호작용Fixture.CreateFarmHubSupply(
+                        "facility:test:farm", "facility:test:market").Definitions
+                    .Concat(PyeongchangSimulation공간상호작용Fixture
+                        .CreateNatureThreatResponse().Definitions).ToArray(),
+            },
             FarmSurvival = new SimulationFarmSurvivalInitialStateRequest
             {
                 RuleRevision = SimulationFarmSurvivalCodes.RuleRevision,
@@ -370,4 +1240,164 @@ public sealed class SimulationRegionalIncidentTests
                         });
                 });
             });
+
+    private static void ObserveThreat(경영SimulationSessionAggregate session,
+        string routeCode, string suffix)
+    {
+        var request = new SimulationNatureThreatObservationPreviewRequest
+        {
+            ExpectedRevision = session.Revision,
+            DecisionStableId = "decision:test:nature-observation:" + suffix,
+            TaskStableId = "task:test:nature-observation:" + suffix,
+            ActorStableId = "actor:test:scout",
+            NatureRouteCode = routeCode,
+            PreferredSpatialStableId = PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+        };
+        var confirmed = session.ConfirmNatureThreatObservation(
+            new SimulationNatureThreatObservationConfirmRequest
+            {
+                CommandId = "command:test:nature-observation:" + suffix,
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-observation-tick:" + suffix,
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+    }
+
+    private static 경영SimulationSessionSnapshot CreateAdverseObservedNatureRoute(
+        경영SimulationSessionAggregate session, string suffix)
+    {
+        var harvested = HarvestAndCreateIncident(session);
+        var incident = Assert.Single(harvested.RegionalIncidents);
+        var adverse = session.ConfirmRegionalIncidentResponse(incident.EventStableId,
+            new SimulationRegionalIncidentResponseConfirmRequest
+            {
+                CommandId = "command:test:nature-adverse:" + suffix,
+                ExpectedRevision = harvested.Revision,
+                ActorStableId = "actor:test:manager",
+                ChoiceStableId = SimulationRegionalIncidentCodes.FarmLeaveExposed,
+            });
+        ObserveThreat(session, SimulationRegionalIncidentCodes.NatureToFarm,
+            "cause:" + suffix);
+        return adverse;
+    }
+
+    private static 경영SimulationSessionSnapshot PrepareResolvedObservedNatureRoute(
+        경영SimulationSessionAggregate session, string suffix)
+    {
+        CreateAdverseObservedNatureRoute(session, suffix);
+        var harvestLotId = Assert.Single(session.Snapshot().FarmSurvival!.HarvestLots)
+            .HarvestLotStableId;
+        var collected = RunFarmCauseWork(session, suffix + ":collect", harvestLotId,
+            SimulationFarmSurvivalCodes.HarvestCollection,
+            PyeongchangSimulation공간StableIds.대관령Farm집하공간);
+        var packed = RunFarmCauseWork(session, suffix + ":pack", harvestLotId,
+            SimulationFarmSurvivalCodes.OutboundPacking,
+            PyeongchangSimulation공간StableIds.대관령Farm포장공간);
+        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
+            Assert.Single(packed.RegionalIncidents).StateCode);
+        return packed;
+    }
+
+    private static 경영SimulationSessionSnapshot RunFarmCauseWork(
+        경영SimulationSessionAggregate session, string suffix, string targetStableId,
+        string actionCode, string spatialStableId)
+    {
+        var confirmed = session.ConfirmFarmWork(new SimulationFarmWorkConfirmRequest
+        {
+            CommandId = "command:test:nature-cause-work:" + suffix,
+            ExpectedRevision = session.Revision,
+            ActorStableId = "actor:test:farmer",
+            TargetStableId = targetStableId,
+            ActionCode = actionCode,
+            AssignmentKindCode = SimulationFarmSurvivalCodes.PlayerDirect,
+            PreferredSpatialStableId = spatialStableId,
+        });
+        return session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-cause-work-tick:" + suffix,
+            ExpectedRevision = confirmed.WorldRevision,
+            TickCount = 1,
+        });
+    }
+
+    private static SimulationNatureRestorationPreviewRequest RestorationRequest(
+        long revision, string suffix)
+        => new()
+        {
+            ExpectedRevision = revision,
+            DecisionStableId = "decision:test:nature-restoration:" + suffix,
+            TaskStableId = "task:test:nature-restoration:" + suffix,
+            ActorStableId = "actor:test:restorer",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature복원작업공간,
+        };
+
+    private static void PrepareRetreatedParty(경영SimulationSessionAggregate session,
+        string suffix)
+    {
+        ObserveThreat(session, SimulationRegionalIncidentCodes.NatureToFarm,
+            "retreat-prerequisite:" + suffix);
+        var request = new SimulationNatureEmergencyRetreatPreviewRequest
+        {
+            ExpectedRevision = session.Revision,
+            DecisionStableId = "decision:test:nature-retreat:" + suffix,
+            TaskStableId = "task:test:nature-retreat:" + suffix,
+            ActorStableId = "actor:test:player-party",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature긴급후퇴경로,
+        };
+        var confirmed = session.ConfirmNatureEmergencyRetreat(
+            new SimulationNatureEmergencyRetreatConfirmRequest
+            {
+                CommandId = "command:test:nature-retreat:" + suffix,
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-retreat-tick:" + suffix,
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+    }
+
+    private static void PrepareRestoredRoute(경영SimulationSessionAggregate session,
+        string suffix)
+    {
+        PrepareResolvedObservedNatureRoute(session, suffix);
+        var request = RestorationRequest(session.Revision, suffix);
+        var confirmed = session.ConfirmNatureRestoration(
+            new SimulationNatureRestorationConfirmRequest
+            {
+                CommandId = "command:test:nature-restoration:" + suffix,
+                ExpectedRevision = session.Revision,
+                Preview = request,
+            });
+        session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-restoration-tick:" + suffix,
+            ExpectedRevision = confirmed.Revision,
+            TickCount = 1,
+        });
+    }
+
+    private static SimulationNaturePartyRecoveryPreviewRequest PartyRecoveryRequest(
+        long revision, string suffix)
+        => new()
+        {
+            ExpectedRevision = revision,
+            DecisionStableId = "decision:test:nature-party-recovery:" + suffix,
+            TaskStableId = "task:test:nature-party-recovery:" + suffix,
+            ActorStableId = "actor:test:player-party",
+            NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
+            PreferredSpatialStableId =
+                PyeongchangSimulation공간StableIds.Nature안전회복야영지,
+        };
 }

@@ -25,6 +25,14 @@ namespace Ssalddel.Simulation.Contracts
         public const string CustomerAccessible = "Spatial.CustomerAccessible";
         public const string PickupArea = "Spatial.PickupArea";
         public const string RepairWorkArea = "Spatial.RepairWorkArea";
+        public const string Traversable = "Spatial.Traversable";
+        public const string ObservationArea = "Spatial.ObservationArea";
+        public const string ThreatMonitoringArea = "Spatial.ThreatMonitoringArea";
+        public const string EmergencyAccess = "Spatial.EmergencyAccess";
+        public const string PlayerEscapeRoute = "Spatial.PlayerEscapeRoute";
+        public const string SafeCore = "Spatial.SafeCore";
+        public const string RestorationWorkArea = "Spatial.RestorationWorkArea";
+        public const string RestArea = "Spatial.RestArea";
     }
 
     public static class Simulation공간근거종류Codes
@@ -43,6 +51,10 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string StorageCapacity = "StorageCapacity";
         public const string WorkArea = "WorkArea";
+        public const string EscapeRouteCapacity = "EscapeRouteCapacity";
+        public const string RestorationMaterial = "RestorationMaterial";
+        public const string RestAreaParty = "RestAreaParty";
+        public const string RecoverySupply = "RecoverySupply";
     }
 
     public static class Simulation공간예약상태Codes

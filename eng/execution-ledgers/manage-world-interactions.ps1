@@ -45,7 +45,7 @@ Require ([string] $catalog.defaultIntegrationTargetStage -eq "E7") "DefaultInteg
 Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v3") "EvidenceStageCatalogSchemaInvalid"
 Require ($evidenceStages.Count -eq 8) "EvidenceStagesMustHaveEightEntries"
 Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7") "EvidenceStageOrderInvalid"
-Require (@($catalog.items).Count -eq 37) "WorldInteractionCountMustBe37"
+Require (@($catalog.items).Count -eq 41) "WorldInteractionCountMustBe41"
 Require ([string] $catalog.schemaVersion -eq "3") "WorldInteractionCatalogSchemaMustBe3"
 
 $seedbedRoot = Join-Path $repositoryRoot "eng/world-seedbeds/wi-spatial-seedbeds"
@@ -129,7 +129,7 @@ foreach ($item in @($catalog.items)) {
     $itemsById[$id] = $item
 }
 
-Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 26) "CommandCountMustBe26"
+Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 30) "CommandCountMustBe30"
 Require (@($catalog.items | Where-Object kind -eq "AutomaticTransition").Count -eq 10) "AutomaticTransitionCountMustBe10"
 Require (@($catalog.items | Where-Object kind -eq "SharedPolicy").Count -eq 1) "SharedPolicyCountMustBe1"
 

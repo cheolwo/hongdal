@@ -10,6 +10,8 @@ namespace Ssalddel.Simulation.Domain
     {
         private const string 공간작업영역해제EffectCode = "SpatialWorkAreaReleased";
         private const string 공간보관용량사용EffectCode = "SpatialStorageCapacityConsumed";
+        private const string 공간복원자재사용EffectCode = "SpatialRestorationMaterialConsumed";
+        private const string 공간회복보급사용EffectCode = "SpatialRecoverySupplyConsumed";
 
         private readonly Dictionary<string, Simulation공간정의Snapshot> spatialDefinitions =
             new Dictionary<string, Simulation공간정의Snapshot>(StringComparer.Ordinal);
@@ -416,7 +418,7 @@ namespace Ssalddel.Simulation.Domain
                 {
                     AddCapacity(runtime.ReservedCapacities, reservation.ReservationKindCode,
                         -reservation.Quantity, reservation.UnitCode);
-                    if (reservation.ReservationKindCode == Simulation공간용량Codes.StorageCapacity)
+                    if (IsConsumableCapacity(reservation.ReservationKindCode))
                     {
                         AddCapacity(runtime.OccupiedCapacities, reservation.ReservationKindCode,
                             reservation.Quantity, reservation.UnitCode);
@@ -649,11 +651,22 @@ namespace Ssalddel.Simulation.Domain
             return rule.Capacities.Select(required =>
             {
                 var isStorage = required.CapacityCode == Simulation공간용량Codes.StorageCapacity;
-                var before = isStorage ? CapacityQuantity(runtime.OccupiedCapacities, required) : 1m;
-                var delta = isStorage ? required.Quantity : -1m;
+                var isRestorationMaterial = required.CapacityCode ==
+                    Simulation공간용량Codes.RestorationMaterial;
+                var isRecoverySupply = required.CapacityCode ==
+                    Simulation공간용량Codes.RecoverySupply;
+                var isConsumable = isStorage || isRestorationMaterial || isRecoverySupply;
+                var before = isConsumable ? CapacityQuantity(runtime.OccupiedCapacities, required) : 1m;
+                var delta = isConsumable ? required.Quantity : -1m;
                 return new SimulationValueProjection
                 {
-                    ValueTypeCode = isStorage ? 공간보관용량사용EffectCode : 공간작업영역해제EffectCode,
+                    ValueTypeCode = isStorage
+                        ? 공간보관용량사용EffectCode
+                        : isRestorationMaterial
+                            ? 공간복원자재사용EffectCode
+                            : isRecoverySupply
+                                ? 공간회복보급사용EffectCode
+                            : 공간작업영역해제EffectCode,
                     TargetLedgerStableId = definition.SpatialStableId,
                     BeforeValue = before,
                     Delta = delta,
@@ -833,8 +846,66 @@ namespace Ssalddel.Simulation.Domain
                     },
                     new[] { Capacity(Simulation공간용량Codes.WorkArea, 1m, "slot") });
             }
+            if (actionCode == SimulationNatureInteractionCodes.RegionalThreatObservation)
+            {
+                return new Simulation공간Rule(
+                    new[]
+                    {
+                        Simulation공간능력Codes.Traversable,
+                        Simulation공간능력Codes.ObservationArea,
+                        Simulation공간능력Codes.ThreatMonitoringArea,
+                    },
+                    new[] { Capacity(Simulation공간용량Codes.WorkArea, 1m, "slot") });
+            }
+            if (actionCode == SimulationNatureInteractionCodes.EmergencyRetreat)
+            {
+                return new Simulation공간Rule(
+                    new[]
+                    {
+                        Simulation공간능력Codes.Traversable,
+                        Simulation공간능력Codes.EmergencyAccess,
+                        Simulation공간능력Codes.PlayerEscapeRoute,
+                        Simulation공간능력Codes.SafeCore,
+                    },
+                    new[] { Capacity(Simulation공간용량Codes.EscapeRouteCapacity, 1m, "party") });
+            }
+            if (actionCode == SimulationNatureInteractionCodes.NatureRestoration)
+            {
+                return new Simulation공간Rule(
+                    new[]
+                    {
+                        Simulation공간능력Codes.WorkerAccessible,
+                        Simulation공간능력Codes.CargoAccessible,
+                        Simulation공간능력Codes.RestorationWorkArea,
+                    },
+                    new[]
+                    {
+                        Capacity(Simulation공간용량Codes.WorkArea, 1m, "slot"),
+                        Capacity(Simulation공간용량Codes.RestorationMaterial, 1m, "material-lot"),
+                    });
+            }
+            if (actionCode == SimulationNatureInteractionCodes.PartyRecovery)
+            {
+                return new Simulation공간Rule(
+                    new[]
+                    {
+                        Simulation공간능력Codes.Traversable,
+                        Simulation공간능력Codes.RestArea,
+                        Simulation공간능력Codes.SafeCore,
+                    },
+                    new[]
+                    {
+                        Capacity(Simulation공간용량Codes.RestAreaParty, 1m, "party"),
+                        Capacity(Simulation공간용량Codes.RecoverySupply, 1m, "supply-lot"),
+                    });
+            }
             return null;
         }
+
+        private static bool IsConsumableCapacity(string capacityCode)
+            => capacityCode == Simulation공간용량Codes.StorageCapacity
+                || capacityCode == Simulation공간용량Codes.RestorationMaterial
+                || capacityCode == Simulation공간용량Codes.RecoverySupply;
 
         private sealed class Simulation공간Rule
         {

@@ -25,10 +25,156 @@ namespace Ssalddel.Simulation.Domain
         public const string 평창Town마트진열공간 = "spatial:scenario:pyeongchang:town-market:display";
         public const string 평창Town마트수령공간 = "spatial:scenario:pyeongchang:town-market:pickup";
         public const string 대관령Farm수리공간 = "spatial:scenario:pyeongchang:daegwallyeong-farm:repair";
+        public const string Nature위협관찰공간 = "spatial:scenario:pyeongchang:nature-home:threat-observation";
+        public const string Nature긴급후퇴경로 = "spatial:scenario:pyeongchang:nature-home:emergency-retreat";
+        public const string Nature복원작업공간 = "spatial:scenario:pyeongchang:nature-home:restoration";
+        public const string Nature안전회복야영지 = "spatial:scenario:pyeongchang:nature-home:safe-recovery";
     }
 
     public static class PyeongchangSimulation공간상호작용Fixture
     {
+        public static Simulation공간세계InitialStateRequest CreateNatureThreatObservation(
+            string sourceStableId = "scenario:pyeongchang-nature-threat-observation.v1")
+            => new Simulation공간세계InitialStateRequest
+            {
+                Definitions = new[]
+                {
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = PyeongchangSimulation공간StableIds.Nature위협관찰공간,
+                        FacilityStableId = SimulationNatureInteractionCodes.NatureHomeFacility,
+                        AreaStableId = "area:pyeongchang:nature-home",
+                        AreaSetStableId = "area-set:candidate:nature-home-exploration",
+                        EvidenceKindCode = Simulation공간근거종류Codes.Scenario,
+                        AccessStateCode = Simulation공간접근상태Codes.Available,
+                        CapabilityCodes = new[]
+                        {
+                            Simulation공간능력Codes.Traversable,
+                            Simulation공간능력Codes.ObservationArea,
+                            Simulation공간능력Codes.ThreatMonitoringArea,
+                        },
+                        BaseCapacities = new[]
+                        {
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.WorkArea,
+                                Quantity = 1m,
+                                UnitCode = "slot",
+                            },
+                        },
+                        DefinitionRevision = "scenario-nature-observation.v1",
+                        DefinitionHashSha256 = new string('f', 64),
+                        SourceStableIds = new[] { sourceStableId },
+                    },
+                },
+            };
+
+        public static Simulation공간세계InitialStateRequest CreateNatureThreatResponse(
+            string sourceStableId = "scenario:pyeongchang-nature-threat-response.v1")
+        {
+            var observation = CreateNatureThreatObservation(sourceStableId);
+            return new Simulation공간세계InitialStateRequest
+            {
+                Definitions = observation.Definitions.Concat(new[]
+                {
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = PyeongchangSimulation공간StableIds.Nature긴급후퇴경로,
+                        FacilityStableId = SimulationNatureInteractionCodes.NatureHomeFacility,
+                        AreaStableId = "area:pyeongchang:nature-home",
+                        AreaSetStableId = "area-set:candidate:nature-home-exploration",
+                        EvidenceKindCode = Simulation공간근거종류Codes.Scenario,
+                        AccessStateCode = Simulation공간접근상태Codes.Available,
+                        CapabilityCodes = new[]
+                        {
+                            Simulation공간능력Codes.Traversable,
+                            Simulation공간능력Codes.EmergencyAccess,
+                            Simulation공간능력Codes.PlayerEscapeRoute,
+                            Simulation공간능력Codes.SafeCore,
+                        },
+                        BaseCapacities = new[]
+                        {
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.EscapeRouteCapacity,
+                                Quantity = 1m,
+                                UnitCode = "party",
+                            },
+                        },
+                        DefinitionRevision = "scenario-nature-retreat.v1",
+                        DefinitionHashSha256 = new string('e', 64),
+                        SourceStableIds = new[] { sourceStableId },
+                    },
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = PyeongchangSimulation공간StableIds.Nature복원작업공간,
+                        FacilityStableId = SimulationNatureInteractionCodes.NatureHomeFacility,
+                        AreaStableId = "area:pyeongchang:nature-home",
+                        AreaSetStableId = "area-set:candidate:nature-home-exploration",
+                        EvidenceKindCode = Simulation공간근거종류Codes.Scenario,
+                        AccessStateCode = Simulation공간접근상태Codes.Available,
+                        CapabilityCodes = new[]
+                        {
+                            Simulation공간능력Codes.WorkerAccessible,
+                            Simulation공간능력Codes.CargoAccessible,
+                            Simulation공간능력Codes.RestorationWorkArea,
+                        },
+                        BaseCapacities = new[]
+                        {
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.WorkArea,
+                                Quantity = 1m,
+                                UnitCode = "slot",
+                            },
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.RestorationMaterial,
+                                Quantity = 1m,
+                                UnitCode = "material-lot",
+                            },
+                        },
+                        DefinitionRevision = "scenario-nature-restoration.v1",
+                        DefinitionHashSha256 = new string('d', 64),
+                        SourceStableIds = new[] { sourceStableId },
+                    },
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = PyeongchangSimulation공간StableIds.Nature안전회복야영지,
+                        FacilityStableId = SimulationNatureInteractionCodes.NatureHomeFacility,
+                        AreaStableId = "area:pyeongchang:nature-home",
+                        AreaSetStableId = "area-set:candidate:nature-home-exploration",
+                        EvidenceKindCode = Simulation공간근거종류Codes.Scenario,
+                        AccessStateCode = Simulation공간접근상태Codes.Available,
+                        CapabilityCodes = new[]
+                        {
+                            Simulation공간능력Codes.Traversable,
+                            Simulation공간능력Codes.RestArea,
+                            Simulation공간능력Codes.SafeCore,
+                        },
+                        BaseCapacities = new[]
+                        {
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.RestAreaParty,
+                                Quantity = 1m,
+                                UnitCode = "party",
+                            },
+                            new Simulation공간용량Snapshot
+                            {
+                                CapacityCode = Simulation공간용량Codes.RecoverySupply,
+                                Quantity = 1m,
+                                UnitCode = "supply-lot",
+                            },
+                        },
+                        DefinitionRevision = "scenario-nature-recovery.v1",
+                        DefinitionHashSha256 = new string('c', 64),
+                        SourceStableIds = new[] { sourceStableId },
+                    },
+                }).ToArray(),
+            };
+        }
+
         public static Simulation공간세계InitialStateRequest CreateFarmHubSupply(
             string farmFacilityStableId,
             string marketFacilityStableId = "facility:scenario:pyeongchang:town-market",

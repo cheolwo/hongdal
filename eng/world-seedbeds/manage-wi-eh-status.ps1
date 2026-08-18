@@ -65,7 +65,7 @@ $compositionPlan = Read-Json $compositionPlanPath
 $p2CompositionPlan = Read-Json $p2CompositionPlanPath
 
 Require ([string] $worldCatalog.revision -eq [string] $priority.worldInteractionCatalogRevision) "PriorityWorldCatalogRevisionMismatch"
-Require (@($worldCatalog.items).Count -eq 37) "WorldInteractionCountMustBe37"
+Require (@($worldCatalog.items).Count -eq 41) "WorldInteractionCountMustBe41"
 Require ([string] $priority.schemaVersion -eq "simulation-world-interaction-spatial-priorities.v1") "PrioritySchemaInvalid"
 Require ([string] $compositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "CompositionPlanSchemaInvalid"
 Require ([string] $p2CompositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "P2CompositionPlanSchemaInvalid"
@@ -259,9 +259,9 @@ $summary = [ordered]@{
     definedH3Count = 5
     definedH4Count = 1
 }
-Require ($summary.implementationE3Count -eq 37) "AllWorldInteractionsMustBeE3"
+Require ($summary.implementationE3Count -eq 41) "AllWorldInteractionsMustBeE3"
 Require ($summary.establishedH1Count -eq 13) "EstablishedH1CountMustBe13"
-Require ($summary.candidateLineageCount -eq 18) "CandidateLineageCountMustBe18"
+Require ($summary.candidateLineageCount -eq 22) "CandidateLineageCountMustBe22"
 Require ($summary.missingRequiredCount -eq 0) "MissingRequiredCountMustBe0"
 Require ($summary.notApplicableCount -eq 6) "NotApplicableCountMustBe6"
 Require ($summary.officialH2DefinitionCount -eq 0) "OfficialH2MustRemainZero"

@@ -2,12 +2,12 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 개정: `simulation-world-interactions.r3`
+- 대장 개정: `simulation-world-interactions.r4`
 - 증거 단계 개정: `simulation-evidence-stages.r5`
-- 마지막 확인일: `2026-08-17`
+- 마지막 확인일: `2026-08-18`
 - 기본 구현 완료선: `E3 자동 시험 통과`
 - 실제 공간·공공데이터·Unity 통합 목표선: `E7 실제 플레이 폐루프`
-- 전체 항목: `37`
+- 전체 항목: `41`
 
 ## 읽는 법
 
@@ -17,7 +17,7 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 
 | 분류 | 수 |
 | --- | ---: |
-| 명시적 명령 | 26 |
+| 명시적 명령 | 30 |
 | 자동 상태 전이 | 10 |
 | 공유 정책 | 1 |
 
@@ -62,6 +62,15 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 | `WI-MARKET-03` 마트 입고검수 | 명시적 명령 | MarketReceived → MarketStorageEligible | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | `WI-MARKET-04` 마트 후방 적재 | 명시적 명령 | MarketStorageEligible → MarketBackroomStored | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | `WI-MARKET-05` 진열 보충 | 명시적 명령 | MarketBackroomStored → Displayed | 완료 · `E3→E3` | 미선정 · `E1→E7` |
+
+## NATURE 작업군
+
+| WI | 종류 | 시작 → 완료 | 구현 | 통합 |
+| --- | --- | --- | --- | --- |
+| `WI-NATURE-01` 자연권 위협 관찰 | 명시적 명령 | Stable, Warning, Threatened, Infested → ThreatObserved | 완료 · `E3→E3` | 미선정 · `E1→E7` |
+| `WI-NATURE-02` 자연권 긴급 후퇴 | 명시적 명령 | ThreatObserved, EncounterActive → RetreatedToSafeCore | 완료 · `E3→E3` | 미선정 · `E1→E7` |
+| `WI-NATURE-03` 자연권 복원 | 명시적 명령 | ThreatObserved, CauseResolved → NatureRouteRestored | 완료 · `E3→E3` | 미선정 · `E1→E7` |
+| `WI-NATURE-04` 파티 회복 | 명시적 명령 | RetreatedToSafeCore, NatureRouteRestored → PartyRecovered | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 
 ## ORDER 작업군
 
