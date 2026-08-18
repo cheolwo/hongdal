@@ -23,10 +23,13 @@
 | `H1` | `h1-stock:nature-threat-watch` 자연권 위협 관찰 초소 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:road-facility-access` 도로–시설 진입 전환 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:town-contamination-inspection` 생활권 재고 오염 점검 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-living-square` 생활권 작은 광장 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:town-market-display` 마트 진열·판매 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:town-market-receiving` 마트 후방 입고 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:town-nature-relief` 생활권 자연권 지원 인계점 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:town-recall-service` 생활권 회수·안내 창구 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-resident-pickup` 주민 수령 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-loss-recovery` 농장 손실 복구·재작업 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
@@ -40,6 +43,8 @@
 | `H1` | `h1-stock:nature-lookout` 자연 전망·관찰 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:nature-shelter` 자연 임시 대피 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:town-cleanup-transfer` 생활권 정화·폐기 인계 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:town-contamination-quarantine` 생활권 오염 재고 격리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-returns` 마트 반품 접수 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-waste` 생활권 폐기물 처리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |

@@ -311,6 +311,30 @@
       "documentSha256": "4b00ddf4decc2bc36337373acf7575a48e4d32fdcad9860acbced234296c35cf"
     },
     {
+      "stableId": "h1-stock:town-cleanup-transfer",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-cleanup-transfer.v2.json",
+      "definitionSha256": "71fe043bea4d4c5fcd478f604394381cebab1cdaff12c3867eed4cae07bfc12f",
+      "documentPath": "authored/h1/town-cleanup-transfer.v2.md",
+      "documentSha256": "c2a2782134a206e4d8d61b0efa2d13569a22da2702779250fa48fec69848db0b"
+    },
+    {
+      "stableId": "h1-stock:town-contamination-inspection",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-contamination-inspection.v2.json",
+      "definitionSha256": "e17aebd2ca3c95269dd5d925510dba134623738b9c1b0c7061297645575bb1e7",
+      "documentPath": "authored/h1/town-contamination-inspection.v2.md",
+      "documentSha256": "3138dfd128777f73d87dec81b1f1f2bc91825e8bacc4bcfcd185f8d37c6c12d4"
+    },
+    {
+      "stableId": "h1-stock:town-contamination-quarantine",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-contamination-quarantine.v2.json",
+      "definitionSha256": "62aa5f067250501a932286fcd98638933416340c2cfcb6fbc227a1a71fec2959",
+      "documentPath": "authored/h1/town-contamination-quarantine.v2.md",
+      "documentSha256": "e4507166083c62fc83c20af6fa473099313ee5d6a9c98874643d39bca59267d4"
+    },
+    {
       "stableId": "h1-stock:town-living-square",
       "revision": 2,
       "definitionPath": "definitions/h1/town-living-square.v2.json",
@@ -335,12 +359,28 @@
       "documentSha256": "e66039d139b2f1d5310274b321d18ec4a044f399952ba6cdb6e9a912b89e12f7"
     },
     {
+      "stableId": "h1-stock:town-nature-relief",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-nature-relief.v2.json",
+      "definitionSha256": "c0614a74ecb4c83bdfc4fa24ac4c7e603789ebad6908084442bafdd2412898ef",
+      "documentPath": "authored/h1/town-nature-relief.v2.md",
+      "documentSha256": "5474bbe47cd264e226b013bc1341dd8559fdfff4202b3d256b9a7ecbe7c88830"
+    },
+    {
       "stableId": "h1-stock:town-neighborhood-service",
       "revision": 1,
       "definitionPath": "definitions/h1/town-neighborhood-service.v2.json",
       "definitionSha256": "49709361c8db8d5ac9daea1326eeb907a94c350fedc2a4cdda7e95a59c9b48d3",
       "documentPath": "authored/h1/town-neighborhood-service.v2.md",
       "documentSha256": "c4403f8964cf3e28124ef6aacce099fca21dd3deb44550b7b144655a3b8d352c"
+    },
+    {
+      "stableId": "h1-stock:town-recall-service",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-recall-service.v2.json",
+      "definitionSha256": "aaffa9a5107afc26a3238ee551f12a3b513ab7bc13187259369bcdb2e738941f",
+      "documentPath": "authored/h1/town-recall-service.v2.md",
+      "documentSha256": "f82db8f538198c5802a6a9feb4f48904e0610dc5f99dacb807b6ce72b43bf58e"
     },
     {
       "stableId": "h1-stock:town-resident-pickup",

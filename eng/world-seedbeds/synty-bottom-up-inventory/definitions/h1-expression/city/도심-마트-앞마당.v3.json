@@ -62,6 +62,7 @@
     "maximumColliderCount": 4
   },
   "supportsInteractionH1Refs": [
+    "h1-stock:town-contamination-inspection",
     "h1-stock:town-market-receiving",
     "h1-stock:town-returns"
   ],

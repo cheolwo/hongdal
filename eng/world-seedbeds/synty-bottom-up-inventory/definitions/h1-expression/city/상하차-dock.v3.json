@@ -61,7 +61,8 @@
     "h1-stock:hub-receiving-storage",
     "h1-stock:hub-returns",
     "h1-stock:hub-temporary-staging",
-    "h1-stock:hub-vehicle-yard"
+    "h1-stock:hub-vehicle-yard",
+    "h1-stock:town-contamination-quarantine"
   ],
   "derivationRecipeCode": "h1.pack-expression.city.r1",
   "derivationInputHashSha256": "ff9620d7f9f487e0cda825aeee7980d8ce207d40769e0d98b9c5ccbd231a60f3",

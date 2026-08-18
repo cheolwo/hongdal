@@ -53,6 +53,7 @@
     "maximumColliderCount": 3
   },
   "supportsInteractionH1Refs": [
+    "h1-stock:town-cleanup-transfer",
     "h1-stock:town-waste"
   ],
   "derivationRecipeCode": "h1.pack-expression.town.r1",

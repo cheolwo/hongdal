@@ -2,7 +2,7 @@
 
 > 항목별 JSON·Markdown에서 결정적으로 생성된다. 직접 수정하지 않는다.
 
-- H1 작업공간 지식: `46개`
+- H1 작업공간 지식: `51개`
 - H2 블록 조립법: `18개`
 - H3 지역 유형 청사진: `10개`
 
@@ -36,10 +36,13 @@
 | `ExploratoryInventory` | `h1-stock:nature-threat-watch` | 자연권 위협 관찰 초소 | RegionalThreatObservation, NatureRouteWarning, EncounterForecast, Spatial.Traversable, Spatial.ObservationArea, Spatial.ThreatMonitoringArea, Nature |
 | `ExploratoryInventory` | `h1-stock:nature-trailhead` | 자연 탐색 출발지 | WI-WORLD-05, WI-WORLD-07, TrailStart, RouteCheck, ExplorationBriefing, Spatial.Traversable, Spatial.WorkerAccessible, Spatial.InformationArea, Nature |
 | `ExploratoryInventory` | `h1-stock:road-facility-access` | 도로–시설 진입 전환 공간 | WI-WORLD-04, Network, Transition |
+| `ExploratoryInventory` | `h1-stock:town-contamination-inspection` | 생활권 재고 오염 점검 공간 | MarketContaminationInspection, StockSafetyAssessment, SaleHoldDecision, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.InspectionWorkArea, City, Town |
 | `ExploratoryInventory` | `h1-stock:town-living-square` | 생활권 작은 광장 | WI-WORLD-05, WI-ORDER-07, Town |
 | `ExploratoryInventory` | `h1-stock:town-market-display` | 마트 진열·판매 공간 | WI-MARKET-05, WI-ORDER-03, City, Town |
 | `ExploratoryInventory` | `h1-stock:town-market-receiving` | 마트 후방 입고 공간 | WI-MARKET-02, WI-MARKET-03, WI-MARKET-04, City, Transition |
+| `ExploratoryInventory` | `h1-stock:town-nature-relief` | 생활권 자연권 지원 인계점 | NatureReliefCollection, RestorationSupplyHandoff, CommunitySupport, Spatial.CustomerAccessible, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.CollectionWorkArea, Town |
 | `ExploratoryInventory` | `h1-stock:town-neighborhood-service` | 근린 서비스 거점 | WI-WORLD-05, LocalInformation, NeighborhoodTaskStart, Spatial.CustomerAccessible, Spatial.WorkerAccessible, Spatial.InformationArea, Town |
+| `ExploratoryInventory` | `h1-stock:town-recall-service` | 생활권 회수·안내 창구 | ResidentRecallNotice, ContaminatedReturn, ReplacementPickup, Spatial.CustomerAccessible, Spatial.WorkerAccessible, Spatial.ReturnsWorkArea, Spatial.InformationArea, Town |
 | `ExploratoryInventory` | `h1-stock:town-resident-pickup` | 주민 수령 공간 | WI-ORDER-05, WI-ORDER-06, Town |
 | `IdeaInventory` | `h1-stock:farm-incident-quarantine` | 농장 사고 수확물 격리 공간 | FarmCargoQuarantine, IncidentHold, ReleaseOrDiscard, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.ExclusiveOccupancy, Spatial.TemporaryStorage, Farm |
 | `IdeaInventory` | `h1-stock:farm-loss-recovery` | 농장 손실 복구·재작업 공간 | CropLossAssessment, ProduceRework, RecoveryPacking, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.SortingWorkArea, Spatial.PackingWorkArea, Farm |
@@ -53,6 +56,8 @@
 | `IdeaInventory` | `h1-stock:nature-lookout` | 자연 전망·관찰 공간 | WI-WORLD-05, LandscapeObservation, ThreatObservation, Spatial.Traversable, Spatial.ObservationArea, Nature |
 | `IdeaInventory` | `h1-stock:nature-restoration-site` | 자연권 정화·복구 작업 공간 | NatureRestoration, ContaminationCleanup, RouteRecovery, Spatial.WorkerAccessible, Spatial.RestorationWorkArea, Spatial.CargoAccessible, Nature |
 | `IdeaInventory` | `h1-stock:nature-shelter` | 자연 임시 대피 공간 | WI-WORLD-07, TemporaryShelter, WeatherWait, Recovery, Spatial.Traversable, Spatial.RestArea, Spatial.WeatherShelter, Nature |
+| `IdeaInventory` | `h1-stock:town-cleanup-transfer` | 생활권 정화·폐기 인계 공간 | ContaminatedWasteTransfer, MarketCleanup, ServiceVehicleHandoff, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.VehicleAccessible, Spatial.WasteHandlingArea, City, Town |
+| `IdeaInventory` | `h1-stock:town-contamination-quarantine` | 생활권 오염 재고 격리 공간 | MarketStockQuarantine, RecallHold, ReleaseOrDispose, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.ExclusiveOccupancy, Spatial.TemporaryStorage, City, Town |
 | `IdeaInventory` | `h1-stock:town-returns` | 마트 반품 접수 공간 | CustomerReturn, ReturnTriage, ReturnHandoff, Spatial.CustomerAccessible, Spatial.WorkerAccessible, Spatial.InspectionWorkArea, City, Town |
 | `IdeaInventory` | `h1-stock:town-staff-rest` | 생활권 직원 휴게 공간 | WI-WORLD-07, WorkerRest, ShiftChange, Spatial.WorkerAccessible, Spatial.RestArea, City, Town |
 | `IdeaInventory` | `h1-stock:town-waste` | 생활권 폐기물 처리 공간 | WasteSorting, WasteStorage, WasteCollection, Spatial.WorkerAccessible, Spatial.TemporaryStorage, Spatial.ServiceVehicleAccessible, Town, Transition |

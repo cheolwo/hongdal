@@ -54,7 +54,9 @@
   },
   "supportsInteractionH1Refs": [
     "h1-stock:town-living-square",
+    "h1-stock:town-nature-relief",
     "h1-stock:town-neighborhood-service",
+    "h1-stock:town-recall-service",
     "h1-stock:town-staff-rest"
   ],
   "derivationRecipeCode": "h1.pack-expression.town.r1",

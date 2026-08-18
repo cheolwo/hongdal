@@ -40,10 +40,15 @@
 | `h1-stock:nature-threat-watch` | h1-expression:nature:고지대-노출지, h1-expression:nature:산-능선 |
 | `h1-stock:nature-trailhead` | h1-expression:nature:산길-바위-길목, h1-expression:nature:숲-가장자리 |
 | `h1-stock:road-facility-access` |  |
+| `h1-stock:town-cleanup-transfer` | h1-expression:city:화물-대기-야드, h1-expression:town:정원-담장-경계 |
+| `h1-stock:town-contamination-inspection` | h1-expression:city:도심-마트-앞마당, h1-expression:town:읍내-상점-전면 |
+| `h1-stock:town-contamination-quarantine` | h1-expression:city:상하차-dock, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-living-square` | h1-expression:town:근린-놀이터, h1-expression:town:생활-공공광장 |
 | `h1-stock:town-market-display` | h1-expression:city:먹거리-상점-골목, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-market-receiving` | h1-expression:city:도심-마트-앞마당 |
+| `h1-stock:town-nature-relief` | h1-expression:town:버스-정류장-보행-쉼터, h1-expression:town:생활-공공광장 |
 | `h1-stock:town-neighborhood-service` | h1-expression:town:생활-공공광장, h1-expression:town:읍내-상점-전면 |
+| `h1-stock:town-recall-service` | h1-expression:town:생활-공공광장, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-resident-pickup` | h1-expression:town:버스-정류장-보행-쉼터, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-returns` | h1-expression:city:도심-마트-앞마당, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-staff-rest` | h1-expression:city:공동주택-생활마당, h1-expression:town:생활-공공광장 |

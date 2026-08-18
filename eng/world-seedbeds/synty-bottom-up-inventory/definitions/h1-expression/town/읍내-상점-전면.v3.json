@@ -53,8 +53,11 @@
     "maximumColliderCount": 7
   },
   "supportsInteractionH1Refs": [
+    "h1-stock:town-contamination-inspection",
+    "h1-stock:town-contamination-quarantine",
     "h1-stock:town-market-display",
     "h1-stock:town-neighborhood-service",
+    "h1-stock:town-recall-service",
     "h1-stock:town-resident-pickup",
     "h1-stock:town-returns"
   ],

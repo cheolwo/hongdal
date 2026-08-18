@@ -412,7 +412,7 @@ foreach ($level in @("h1", "h2", "h3")) {
     }
 }
 
-Require (@($definitionsByLevel.H1).Count -eq 46) "H1CountMustBe46"
+Require (@($definitionsByLevel.H1).Count -eq 51) "H1CountMustBe51"
 Require (@($definitionsByLevel.H2).Count -eq 18) "H2CountMustBe18"
 Require (@($definitionsByLevel.H3).Count -eq 10) "H3CountMustBe10"
 foreach ($h1 in @($definitionsByLevel.H1)) {
@@ -472,7 +472,7 @@ function New-IndexDocument([hashtable] $ByLevel) {
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("> 항목별 JSON·Markdown에서 결정적으로 생성된다. 직접 수정하지 않는다.")
     [void] $builder.AppendLine()
-    [void] $builder.AppendLine("- H1 작업공간 지식: ``46개``")
+    [void] $builder.AppendLine("- H1 작업공간 지식: ``51개``")
     [void] $builder.AppendLine("- H2 블록 조립법: ``18개``")
     [void] $builder.AppendLine("- H3 지역 유형 청사진: ``10개``")
     foreach ($level in @("H1", "H2", "H3")) {
@@ -570,10 +570,10 @@ if ($Mode -eq "Check") {
         Require (Test-Path -LiteralPath $path) "GeneratedDocumentMissing:$($pair.Key)"
         Require ((ConvertTo-StableText ([IO.File]::ReadAllText($path))) -ceq $pair.Value) "GeneratedDocumentOutOfDate:$($pair.Key)"
     }
-    Write-Output "SpatialDesignKnowledgeValid:H1=46;H2=18;H3=10"
+    Write-Output "SpatialDesignKnowledgeValid:H1=51;H2=18;H3=10"
 }
 else {
     [void] (Write-TextIfChanged $catalogPath (ConvertTo-StableJson $catalog))
     foreach ($pair in $generated.GetEnumerator()) { [void] (Write-TextIfChanged (Resolve-RepositoryPath $repositoryRoot $pair.Key) $pair.Value) }
-    Write-Output "SpatialDesignKnowledgeGenerated:H1=46;H2=18;H3=10"
+    Write-Output "SpatialDesignKnowledgeGenerated:H1=51;H2=18;H3=10"
 }

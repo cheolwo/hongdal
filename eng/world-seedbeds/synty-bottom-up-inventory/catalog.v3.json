@@ -4,7 +4,7 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "7bcd1b9832f27ee198b10d695117a9f7fa26f9941ed4d1764a4107f755f218c2",
+  "previousCatalogSha256": "6f313b4d9e85050662c68d15df457579c0ed56d894cb7b46f1cbcd0305814d3f",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
@@ -354,6 +354,33 @@
       "documentSha256": "4b00ddf4decc2bc36337373acf7575a48e4d32fdcad9860acbced234296c35cf"
     },
     {
+      "stableId": "h1-stock:town-cleanup-transfer",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-cleanup-transfer.v2.json",
+      "definitionSha256": "71fe043bea4d4c5fcd478f604394381cebab1cdaff12c3867eed4cae07bfc12f",
+      "documentPath": "authored/h1/town-cleanup-transfer.v2.md",
+      "documentSha256": "c2a2782134a206e4d8d61b0efa2d13569a22da2702779250fa48fec69848db0b"
+    },
+    {
+      "stableId": "h1-stock:town-contamination-inspection",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-contamination-inspection.v2.json",
+      "definitionSha256": "e17aebd2ca3c95269dd5d925510dba134623738b9c1b0c7061297645575bb1e7",
+      "documentPath": "authored/h1/town-contamination-inspection.v2.md",
+      "documentSha256": "3138dfd128777f73d87dec81b1f1f2bc91825e8bacc4bcfcd185f8d37c6c12d4"
+    },
+    {
+      "stableId": "h1-stock:town-contamination-quarantine",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-contamination-quarantine.v2.json",
+      "definitionSha256": "62aa5f067250501a932286fcd98638933416340c2cfcb6fbc227a1a71fec2959",
+      "documentPath": "authored/h1/town-contamination-quarantine.v2.md",
+      "documentSha256": "e4507166083c62fc83c20af6fa473099313ee5d6a9c98874643d39bca59267d4"
+    },
+    {
       "stableId": "h1-stock:town-living-square",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
@@ -381,6 +408,15 @@
       "documentSha256": "e66039d139b2f1d5310274b321d18ec4a044f399952ba6cdb6e9a912b89e12f7"
     },
     {
+      "stableId": "h1-stock:town-nature-relief",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-nature-relief.v2.json",
+      "definitionSha256": "c0614a74ecb4c83bdfc4fa24ac4c7e603789ebad6908084442bafdd2412898ef",
+      "documentPath": "authored/h1/town-nature-relief.v2.md",
+      "documentSha256": "5474bbe47cd264e226b013bc1341dd8559fdfff4202b3d256b9a7ecbe7c88830"
+    },
+    {
       "stableId": "h1-stock:town-neighborhood-service",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -388,6 +424,15 @@
       "definitionSha256": "49709361c8db8d5ac9daea1326eeb907a94c350fedc2a4cdda7e95a59c9b48d3",
       "documentPath": "authored/h1/town-neighborhood-service.v2.md",
       "documentSha256": "c4403f8964cf3e28124ef6aacce099fca21dd3deb44550b7b144655a3b8d352c"
+    },
+    {
+      "stableId": "h1-stock:town-recall-service",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-recall-service.v2.json",
+      "definitionSha256": "aaffa9a5107afc26a3238ee551f12a3b513ab7bc13187259369bcdb2e738941f",
+      "documentPath": "authored/h1/town-recall-service.v2.md",
+      "documentSha256": "f82db8f538198c5802a6a9feb4f48904e0610dc5f99dacb807b6ce72b43bf58e"
     },
     {
       "stableId": "h1-stock:town-resident-pickup",
@@ -441,9 +486,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/도심-마트-앞마당.v3.json",
-      "definitionSha256": "8048f5207bcc7de861d14b83b091f1704aab9fde15a7c7a6cf8c4a134799875b",
+      "definitionSha256": "638f4c74651a5286a91049f64f1ab19ee526f104aa6cc1fcb5cc767441331b76",
       "documentPath": "authored/h1-expression/city/도심-마트-앞마당.v3.md",
-      "documentSha256": "e07db134b69a692674a19dfce5a34a88a60e96e0a7853e15c03031aa8866a8c3"
+      "documentSha256": "bc83695cd85e2269839befe87fac07fac6fd985e933636fcc8f19037943018bc"
     },
     {
       "stableId": "h1-expression:city:먹거리-상점-골목",
@@ -468,18 +513,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/상하차-dock.v3.json",
-      "definitionSha256": "e9a001bddc1adf9878c20ec0c66276e651e877367437775e66a6e9d122f36735",
+      "definitionSha256": "2af6f218a748c97950783bcf46e127e3d35eff5bb440ef132ce6feb29c0ff422",
       "documentPath": "authored/h1-expression/city/상하차-dock.v3.md",
-      "documentSha256": "a4a0d0412361a776bcf2aa0ad7c1c61dd795fe39908083f5b33f4b41d98336a9"
+      "documentSha256": "ea8341c52b8729e30c3ea8eb7c392fe1d669bea37759a99e08f788a63616896c"
     },
     {
       "stableId": "h1-expression:city:화물-대기-야드",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/화물-대기-야드.v3.json",
-      "definitionSha256": "8a7e2584bc412833e60913aa58df7b775335c16258ad6ab0ffa90375de99ae25",
+      "definitionSha256": "1570216e5499fe41d659d21269a757794160da62e6ab582185e64b392fea2621",
       "documentPath": "authored/h1-expression/city/화물-대기-야드.v3.md",
-      "documentSha256": "94eeb64f9314d069c41945bd3454afff42cc4d62d69837b6d9e3a0d9925d3f84"
+      "documentSha256": "7951284ac587d7b03f7345c2dc1afa41929584ea9f47c89848d113e60138a3bd"
     },
     {
       "stableId": "h1-expression:farm:감자밭-두렁",
@@ -675,27 +720,27 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/버스-정류장-보행-쉼터.v3.json",
-      "definitionSha256": "c96be192cc25e6dab3c4a5922c9f1fc54fe1cdb27e46910db99227f0a47bc4d8",
+      "definitionSha256": "0a45013dc8ea1bc9d8cc40618e6f4820c522e3098461ebe1e02d857aac235e6f",
       "documentPath": "authored/h1-expression/town/버스-정류장-보행-쉼터.v3.md",
-      "documentSha256": "c44ef3d632414c8456cfb806fa0d4af714af7ec54aa810c8cd42c46c97b8301b"
+      "documentSha256": "5717a7a359603fd9f7f36b764d01ad8832223e9f3b1aa85a91dba014f50e3463"
     },
     {
       "stableId": "h1-expression:town:생활-공공광장",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/생활-공공광장.v3.json",
-      "definitionSha256": "92b691b07dfef0e6b0548e399891a15950f528142aa742e5b9d38a88b1bfed6a",
+      "definitionSha256": "9ea51fee705e6e54a8018813323aa5c6010264ea851a5d70b6751a86c0713bd0",
       "documentPath": "authored/h1-expression/town/생활-공공광장.v3.md",
-      "documentSha256": "f56a6f3fa6b3e18c8cfecdf7ab24a2193a45d4eb16243bcb0cc6a8208edc286e"
+      "documentSha256": "0e5aa202b1b6c1cf0f66237e9927f5bdc5550893d6ae3c87c99e23fb3120cfc3"
     },
     {
       "stableId": "h1-expression:town:읍내-상점-전면",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/읍내-상점-전면.v3.json",
-      "definitionSha256": "ffddf28dcae4c3a1ee758ec8623e17b3c9fce45e12d1055cfba812441bdeb43f",
+      "definitionSha256": "03a5c6003c736a2bfad4b61a082b0fbe0d9657cdce2a78b4be1d190fe8f01bc4",
       "documentPath": "authored/h1-expression/town/읍내-상점-전면.v3.md",
-      "documentSha256": "1ed785d836083b87af56b756fdf99aec94b2f420e50efe41e06807420b35f18b"
+      "documentSha256": "b0a9c0906e2e73811db9280b07877b328dfce90b0d0a04c049f6436489f6322d"
     },
     {
       "stableId": "h1-expression:town:저층-주택-블록",
@@ -711,9 +756,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/정원-담장-경계.v3.json",
-      "definitionSha256": "cc8f96f6c8954268ea1f918ab3aa949acefe01652125c4c631c98003a78f3b23",
+      "definitionSha256": "d3c5ca44b9d1a5e4e6c9627723e3c77cce723fad4e5451c13bf4b4c03333ccd4",
       "documentPath": "authored/h1-expression/town/정원-담장-경계.v3.md",
-      "documentSha256": "8fff1e2a216f2e189f9db67ac0e7813198c6ebdb98d8a442e86bbf8f0dab655e"
+      "documentSha256": "0c690f257730fa6bc8778609f0e5b4e2325afcc535c9410673c6ab27332238b0"
     }
   ],
   "h1DefinitionRefs": [
@@ -731,9 +776,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/도심-마트-앞마당.v3.json",
-      "definitionSha256": "8048f5207bcc7de861d14b83b091f1704aab9fde15a7c7a6cf8c4a134799875b",
+      "definitionSha256": "638f4c74651a5286a91049f64f1ab19ee526f104aa6cc1fcb5cc767441331b76",
       "documentPath": "authored/h1-expression/city/도심-마트-앞마당.v3.md",
-      "documentSha256": "e07db134b69a692674a19dfce5a34a88a60e96e0a7853e15c03031aa8866a8c3"
+      "documentSha256": "bc83695cd85e2269839befe87fac07fac6fd985e933636fcc8f19037943018bc"
     },
     {
       "stableId": "h1-expression:city:먹거리-상점-골목",
@@ -758,18 +803,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/상하차-dock.v3.json",
-      "definitionSha256": "e9a001bddc1adf9878c20ec0c66276e651e877367437775e66a6e9d122f36735",
+      "definitionSha256": "2af6f218a748c97950783bcf46e127e3d35eff5bb440ef132ce6feb29c0ff422",
       "documentPath": "authored/h1-expression/city/상하차-dock.v3.md",
-      "documentSha256": "a4a0d0412361a776bcf2aa0ad7c1c61dd795fe39908083f5b33f4b41d98336a9"
+      "documentSha256": "ea8341c52b8729e30c3ea8eb7c392fe1d669bea37759a99e08f788a63616896c"
     },
     {
       "stableId": "h1-expression:city:화물-대기-야드",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/화물-대기-야드.v3.json",
-      "definitionSha256": "8a7e2584bc412833e60913aa58df7b775335c16258ad6ab0ffa90375de99ae25",
+      "definitionSha256": "1570216e5499fe41d659d21269a757794160da62e6ab582185e64b392fea2621",
       "documentPath": "authored/h1-expression/city/화물-대기-야드.v3.md",
-      "documentSha256": "94eeb64f9314d069c41945bd3454afff42cc4d62d69837b6d9e3a0d9925d3f84"
+      "documentSha256": "7951284ac587d7b03f7345c2dc1afa41929584ea9f47c89848d113e60138a3bd"
     },
     {
       "stableId": "h1-expression:farm:감자밭-두렁",
@@ -965,27 +1010,27 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/버스-정류장-보행-쉼터.v3.json",
-      "definitionSha256": "c96be192cc25e6dab3c4a5922c9f1fc54fe1cdb27e46910db99227f0a47bc4d8",
+      "definitionSha256": "0a45013dc8ea1bc9d8cc40618e6f4820c522e3098461ebe1e02d857aac235e6f",
       "documentPath": "authored/h1-expression/town/버스-정류장-보행-쉼터.v3.md",
-      "documentSha256": "c44ef3d632414c8456cfb806fa0d4af714af7ec54aa810c8cd42c46c97b8301b"
+      "documentSha256": "5717a7a359603fd9f7f36b764d01ad8832223e9f3b1aa85a91dba014f50e3463"
     },
     {
       "stableId": "h1-expression:town:생활-공공광장",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/생활-공공광장.v3.json",
-      "definitionSha256": "92b691b07dfef0e6b0548e399891a15950f528142aa742e5b9d38a88b1bfed6a",
+      "definitionSha256": "9ea51fee705e6e54a8018813323aa5c6010264ea851a5d70b6751a86c0713bd0",
       "documentPath": "authored/h1-expression/town/생활-공공광장.v3.md",
-      "documentSha256": "f56a6f3fa6b3e18c8cfecdf7ab24a2193a45d4eb16243bcb0cc6a8208edc286e"
+      "documentSha256": "0e5aa202b1b6c1cf0f66237e9927f5bdc5550893d6ae3c87c99e23fb3120cfc3"
     },
     {
       "stableId": "h1-expression:town:읍내-상점-전면",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/읍내-상점-전면.v3.json",
-      "definitionSha256": "ffddf28dcae4c3a1ee758ec8623e17b3c9fce45e12d1055cfba812441bdeb43f",
+      "definitionSha256": "03a5c6003c736a2bfad4b61a082b0fbe0d9657cdce2a78b4be1d190fe8f01bc4",
       "documentPath": "authored/h1-expression/town/읍내-상점-전면.v3.md",
-      "documentSha256": "1ed785d836083b87af56b756fdf99aec94b2f420e50efe41e06807420b35f18b"
+      "documentSha256": "b0a9c0906e2e73811db9280b07877b328dfce90b0d0a04c049f6436489f6322d"
     },
     {
       "stableId": "h1-expression:town:저층-주택-블록",
@@ -1001,9 +1046,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/정원-담장-경계.v3.json",
-      "definitionSha256": "cc8f96f6c8954268ea1f918ab3aa949acefe01652125c4c631c98003a78f3b23",
+      "definitionSha256": "d3c5ca44b9d1a5e4e6c9627723e3c77cce723fad4e5451c13bf4b4c03333ccd4",
       "documentPath": "authored/h1-expression/town/정원-담장-경계.v3.md",
-      "documentSha256": "8fff1e2a216f2e189f9db67ac0e7813198c6ebdb98d8a442e86bbf8f0dab655e"
+      "documentSha256": "0c690f257730fa6bc8778609f0e5b4e2325afcc535c9410673c6ab27332238b0"
     },
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -1348,6 +1393,33 @@
       "documentSha256": "4b00ddf4decc2bc36337373acf7575a48e4d32fdcad9860acbced234296c35cf"
     },
     {
+      "stableId": "h1-stock:town-cleanup-transfer",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-cleanup-transfer.v2.json",
+      "definitionSha256": "71fe043bea4d4c5fcd478f604394381cebab1cdaff12c3867eed4cae07bfc12f",
+      "documentPath": "authored/h1/town-cleanup-transfer.v2.md",
+      "documentSha256": "c2a2782134a206e4d8d61b0efa2d13569a22da2702779250fa48fec69848db0b"
+    },
+    {
+      "stableId": "h1-stock:town-contamination-inspection",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-contamination-inspection.v2.json",
+      "definitionSha256": "e17aebd2ca3c95269dd5d925510dba134623738b9c1b0c7061297645575bb1e7",
+      "documentPath": "authored/h1/town-contamination-inspection.v2.md",
+      "documentSha256": "3138dfd128777f73d87dec81b1f1f2bc91825e8bacc4bcfcd185f8d37c6c12d4"
+    },
+    {
+      "stableId": "h1-stock:town-contamination-quarantine",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-contamination-quarantine.v2.json",
+      "definitionSha256": "62aa5f067250501a932286fcd98638933416340c2cfcb6fbc227a1a71fec2959",
+      "documentPath": "authored/h1/town-contamination-quarantine.v2.md",
+      "documentSha256": "e4507166083c62fc83c20af6fa473099313ee5d6a9c98874643d39bca59267d4"
+    },
+    {
       "stableId": "h1-stock:town-living-square",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
@@ -1375,6 +1447,15 @@
       "documentSha256": "e66039d139b2f1d5310274b321d18ec4a044f399952ba6cdb6e9a912b89e12f7"
     },
     {
+      "stableId": "h1-stock:town-nature-relief",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-nature-relief.v2.json",
+      "definitionSha256": "c0614a74ecb4c83bdfc4fa24ac4c7e603789ebad6908084442bafdd2412898ef",
+      "documentPath": "authored/h1/town-nature-relief.v2.md",
+      "documentSha256": "5474bbe47cd264e226b013bc1341dd8559fdfff4202b3d256b9a7ecbe7c88830"
+    },
+    {
       "stableId": "h1-stock:town-neighborhood-service",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -1382,6 +1463,15 @@
       "definitionSha256": "49709361c8db8d5ac9daea1326eeb907a94c350fedc2a4cdda7e95a59c9b48d3",
       "documentPath": "authored/h1/town-neighborhood-service.v2.md",
       "documentSha256": "c4403f8964cf3e28124ef6aacce099fca21dd3deb44550b7b144655a3b8d352c"
+    },
+    {
+      "stableId": "h1-stock:town-recall-service",
+      "revision": 1,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-recall-service.v2.json",
+      "definitionSha256": "aaffa9a5107afc26a3238ee551f12a3b513ab7bc13187259369bcdb2e738941f",
+      "documentPath": "authored/h1/town-recall-service.v2.md",
+      "documentSha256": "f82db8f538198c5802a6a9feb4f48904e0610dc5f99dacb807b6ce72b43bf58e"
     },
     {
       "stableId": "h1-stock:town-resident-pickup",
@@ -2293,9 +2383,9 @@
   "counts": {
     "grammarMeaningGroups": 52,
     "grammarVariants": 156,
-    "h1Interaction": 46,
+    "h1Interaction": 51,
     "h1Expression": 32,
-    "h1Total": 78,
+    "h1Total": 83,
     "h2": 18,
     "h3": 10,
     "h4Blueprint": 5
@@ -2303,5 +2393,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "434102ff3fc6ee6e990ee74e229f638ca4c98521ba216fbc1dbda121cc559b6c"
+  "contentHashSha256": "80c8fbd9b6c458c1a60cfcdfd4198477e959de41cac188c74007571302e70a87"
 }

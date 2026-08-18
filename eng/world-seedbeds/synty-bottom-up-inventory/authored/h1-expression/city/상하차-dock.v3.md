@@ -15,6 +15,7 @@
 @supports-interaction-h1 h1-stock:hub-returns
 @supports-interaction-h1 h1-stock:hub-temporary-staging
 @supports-interaction-h1 h1-stock:hub-vehicle-yard
+@supports-interaction-h1 h1-stock:town-contamination-quarantine
 
 상하차 Dock 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.
 

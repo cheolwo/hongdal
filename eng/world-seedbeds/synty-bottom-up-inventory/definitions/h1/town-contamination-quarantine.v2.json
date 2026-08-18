@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:town-contamination-quarantine",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "생활권 오염 재고 격리 공간",
+  "summary": "오염이 의심되는 재고를 후방 정상 재고와 분리해 회수·폐기·재검사 결정을 기다리는 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "MarketStockQuarantine",
+    "RecallHold",
+    "ReleaseOrDispose"
+  ],
+  "spatialRoleCodes": [
+    "TownContaminationQuarantineArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.ExclusiveOccupancy",
+    "Spatial.TemporaryStorage"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:town-contamination-inspection"
+  ],
+  "successorH1Refs": [
+    "h1-stock:town-recall-service",
+    "h1-stock:town-cleanup-transfer"
+  ],
+  "connectorRoleCodes": [
+    "InspectionHoldInput",
+    "RecallOutput",
+    "DisposalOutput"
+  ],
+  "sourcePackCodes": [
+    "City",
+    "Town"
+  ],
+  "grammarSetRefs": [
+    "town:읍내 상점 전면",
+    "city:상하차 Dock"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/town-contamination-quarantine.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:town-contamination-quarantine"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

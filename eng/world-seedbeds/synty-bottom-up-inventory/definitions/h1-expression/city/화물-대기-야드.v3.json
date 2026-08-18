@@ -64,7 +64,8 @@
     "h1-stock:hub-returns",
     "h1-stock:hub-service-maintenance",
     "h1-stock:hub-temporary-staging",
-    "h1-stock:hub-vehicle-yard"
+    "h1-stock:hub-vehicle-yard",
+    "h1-stock:town-cleanup-transfer"
   ],
   "derivationRecipeCode": "h1.pack-expression.city.r1",
   "derivationInputHashSha256": "6d8f3c9b2197716148a9695ffbc7519879551c13c3b1d747d69ae18570e02323",

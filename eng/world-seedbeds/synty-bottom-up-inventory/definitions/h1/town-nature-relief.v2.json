@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:town-nature-relief",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "생활권 자연권 지원 인계점",
+  "summary": "시장 사건을 해결한 뒤 Nature 생활권 복구에 필요한 식량·약품·정화 자재를 주민과 작업자가 모아 넘기는 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "NatureReliefCollection",
+    "RestorationSupplyHandoff",
+    "CommunitySupport"
+  ],
+  "spatialRoleCodes": [
+    "TownNatureReliefHandoffArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.CustomerAccessible",
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.CollectionWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:town-recall-service",
+    "h1-stock:town-neighborhood-service"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-safe-recovery-camp",
+    "h1-stock:nature-restoration-site"
+  ],
+  "connectorRoleCodes": [
+    "CommunityInput",
+    "NatureReliefOutput",
+    "ReturnReportInput"
+  ],
+  "sourcePackCodes": [
+    "Town"
+  ],
+  "grammarSetRefs": [
+    "town:생활 공공광장",
+    "town:버스 정류장·보행 쉼터"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/town-nature-relief.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:town-nature-relief"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}
