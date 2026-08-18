@@ -77,7 +77,7 @@ Require (@($seedbedIds | Select-Object -Unique).Count -eq $seedbedIds.Count) "H1
 $counts.H1 = $seedbedIds.Count
 
 $h2 = $levels[1]
-Require ([string] $h2.currentInstancePolicyCode -eq "ReservedForE5") "H2PolicyInvalid"
+Require ([string] $h2.currentInstancePolicyCode -eq "DesignInventorySeparatedFromE5Instances") "H2PolicyInvalid"
 $blockRoot = Resolve-RepositoryPath $repositoryRoot ([string] $h2.definitionSourcePath)
 $blockDefinitions = @(
     if (Test-Path -LiteralPath $blockRoot) {

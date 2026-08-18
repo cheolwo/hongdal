@@ -25,10 +25,6 @@
     "InboundToStorage",
     "StorageToOutbound"
   ],
-  "requiredEvidencePurposeCodes": [
-    "BuildingPlacement",
-    "RoadNetwork"
-  ],
   "sourceGrammarRefs": [
     "city:물류 Station 진입부",
     "city:상하차 Dock",
@@ -42,10 +38,10 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.logistics-hub-region.r1",
-  "derivationInputHashSha256": "cb5eaafbcdcefb0cc872d7403d8840f2d161d55972cf0e9dab54b1425939aa21",
+  "derivationInputHashSha256": "a13f90d15ae94248ad8224405fbe92281a2b8657d64d4eb79edf691d96ad5323",
   "authoredDocument": "authored/h4/logistics-hub-region.v3.md",
   "unresolvedItems": [
-    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+    "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

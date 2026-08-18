@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-spatial-grammar-derivation-recipes.v1",
-  "revision": "simulation-world-spatial-grammar-derivation-recipes.r4",
+  "revision": "simulation-world-spatial-grammar-derivation-recipes.r7",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "h1ExpressionPolicy": {
     "revision": "simulation-world-spatial-grammar-derivation-recipes.r1",
@@ -13,6 +13,7 @@
     },
     "cardKindCode": "PackExpression",
     "knowledgeStateCode": "ExploratoryInventory",
+    "unlinkedKnowledgeStateCode": "IdeaInventory",
     "originModeCode": "ExpressionExploration"
   },
   "h2Derivations": [
@@ -53,7 +54,8 @@
     { "targetKnowledgeRef": "h3-candidate:nature-exploration-buffer", "recipeCode": "h3.nature-exploration-buffer.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환", "transition:Water–Land 전환"] },
     { "targetKnowledgeRef": "h3-candidate:nature-trail-network", "recipeCode": "h3.nature-trail-network.r1", "supplementalGrammarSetRefs": ["transition:Water–Land 전환"] },
     { "targetKnowledgeRef": "h3-candidate:nature-threat-recovery", "recipeCode": "h3.nature-threat-recovery.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환", "transition:Water–Land 전환"] },
-    { "targetKnowledgeRef": "h3-candidate:resilient-logistics-hub", "recipeCode": "h3.resilient-logistics-hub.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환"] }
+    { "targetKnowledgeRef": "h3-candidate:resilient-logistics-hub", "recipeCode": "h3.resilient-logistics-hub.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:town-contamination-relief", "recipeCode": "h3.town-contamination-relief.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Town–City 전환", "transition:Town–Hub 전환"] }
   ],
   "h4Blueprints": [
     {
@@ -64,8 +66,7 @@
       "requiredH3Refs": ["h3-candidate:nature-exploration-buffer", "h3-candidate:nature-trail-network"],
       "optionalH3Refs": [],
       "worldThemeCodes": ["NatureExploration", "WaterBuffer"],
-      "graphRelationRoleCodes": ["NatureContinuity", "WaterLandTransition"],
-      "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "Hydrography"]
+      "graphRelationRoleCodes": ["NatureContinuity", "WaterLandTransition"]
     },
     {
       "stableId": "h4-blueprint:nature-home-exploration-region",
@@ -75,8 +76,7 @@
       "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network"],
       "optionalH3Refs": ["h3-candidate:nature-exploration-buffer"],
       "worldThemeCodes": ["NatureHome", "NatureExploration", "ThreatRecovery"],
-      "graphRelationRoleCodes": ["SafeCoreToThreatBand", "ThreatBandToRecovery", "NatureToFarm", "NatureToTown", "NatureToCityHub"],
-      "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "Hydrography", "RoadNetwork"]
+      "graphRelationRoleCodes": ["SafeCoreToThreatBand", "ThreatBandToRecovery", "NatureToFarm", "NatureToTown", "NatureToCityHub"]
     },
     {
       "stableId": "h4-blueprint:farm-production-processing-region",
@@ -86,8 +86,7 @@
       "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus", "h3-candidate:farm-incident-recovery"],
       "optionalH3Refs": [],
       "worldThemeCodes": ["FarmProduction", "FarmProcessing", "FarmSurvival"],
-      "graphRelationRoleCodes": ["ProductionToProcessing", "IncidentToRecovery", "RecoveryToNature"],
-      "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "AgriculturalComposition", "RoadNetwork"]
+      "graphRelationRoleCodes": ["ProductionToProcessing", "IncidentToRecovery", "RecoveryToNature"]
     },
     {
       "stableId": "h4-blueprint:logistics-hub-region",
@@ -97,19 +96,17 @@
       "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub"],
       "optionalH3Refs": [],
       "worldThemeCodes": ["LogisticsHub", "StorageResilience"],
-      "graphRelationRoleCodes": ["InboundToStorage", "StorageToOutbound"],
-      "requiredEvidencePurposeCodes": ["BuildingPlacement", "RoadNetwork"]
+      "graphRelationRoleCodes": ["InboundToStorage", "StorageToOutbound"]
     },
     {
       "stableId": "h4-blueprint:lowrise-market-region",
       "title": "저층 생활·시장권",
-      "summary": "저층 생활권과 반품·회수 순환형 시장을 결합하는 위치 독립 지역 청사진이다.",
+      "summary": "저층 생활권과 순환형 시장, 오염 통제·주민 구호를 결합하는 위치 독립 Town AreaSet 청사진이다.",
       "recipeCode": "h4.lowrise-market-region.r1",
-      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town"],
+      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief"],
       "optionalH3Refs": [],
-      "worldThemeCodes": ["LowriseLiving", "CircularMarket"],
-      "graphRelationRoleCodes": ["LivingToMarket", "MarketReturnLoop"],
-      "requiredEvidencePurposeCodes": ["BuildingPlacement", "RoadNetwork", "MarketContext"]
+      "worldThemeCodes": ["LowriseLiving", "CircularMarket", "TownSafety"],
+      "graphRelationRoleCodes": ["LivingToMarket", "MarketReturnLoop", "IncidentToRelief", "ReliefToNature"]
     },
     {
       "stableId": "h4-blueprint:farm-hub-town-region",
@@ -119,8 +116,7 @@
       "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-hub-logistics", "h3-candidate:jinbu-hub", "h3-candidate:hub-town-logistics", "h3-candidate:lowrise-market-town"],
       "optionalH3Refs": ["h3-candidate:farm-processing-campus", "h3-candidate:resilient-logistics-hub", "h3-candidate:circular-market-town"],
       "worldThemeCodes": ["FarmHubTown", "RegionalSupplyChain"],
-      "graphRelationRoleCodes": ["FarmToHub", "HubToTown"],
-      "requiredEvidencePurposeCodes": ["AdministrativeBoundary", "TerrainElevation", "LandCoverClassification", "RoadNetwork"]
+      "graphRelationRoleCodes": ["FarmToHub", "HubToTown"]
     }
   ],
   "promotionPolicy": {

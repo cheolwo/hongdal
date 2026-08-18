@@ -11,9 +11,6 @@
 @connector IncidentInput
 @connector RecoveredCargoOutput
 @connector NatureRestorationOutput
-@evidence RoadNetwork
-@evidence BlockBoundary
-@evidence NatureTransition
 
 ## 존재 이유
 

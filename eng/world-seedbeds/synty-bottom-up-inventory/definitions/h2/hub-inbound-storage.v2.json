@@ -18,11 +18,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BuildingFootprint",
-    "BlockBoundary"
-  ],
   "authoredDocument": "authored/h2/hub-inbound-storage.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:hub-inbound-storage"

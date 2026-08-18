@@ -11,10 +11,6 @@
 @connector SafeCoreInput
 @connector ThreatBandContinuation
 @connector EmergencyExit
-@evidence TerrainSlope
-@evidence LandCover
-@evidence TrailNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

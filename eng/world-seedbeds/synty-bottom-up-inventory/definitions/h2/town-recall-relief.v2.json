@@ -26,12 +26,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BuildingFootprint",
-    "BlockBoundary",
-    "MarketContext"
-  ],
   "authoredDocument": "authored/h2/town-recall-relief.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:town-recall-relief"

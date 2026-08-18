@@ -10,10 +10,6 @@
 @connector HarvestInput
 @connector SafeCargoOutput
 @connector RecoveryOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
-@evidence WeatherContext
 
 ## 존재 이유
 

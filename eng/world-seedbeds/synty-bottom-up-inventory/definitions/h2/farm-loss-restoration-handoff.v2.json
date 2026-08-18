@@ -26,11 +26,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BlockBoundary",
-    "NatureTransition"
-  ],
   "authoredDocument": "authored/h2/farm-loss-restoration-handoff.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-loss-restoration-handoff"

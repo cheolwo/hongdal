@@ -6,9 +6,6 @@
 @required-h1 h1-stock:hub-outbound-staging
 @required-h1 h1-stock:hub-vehicle-yard
 @required-h1 h1-stock:hub-market-transfer
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

@@ -4,12 +4,12 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "774bf11fad3393a31ce29ce6227131380d8933f446b2eee3b33c2d85fe5cefc2",
+  "previousCatalogSha256": "7dbc8cd455a1be95a9633379f57c394d2d04df3f13e2843ab93663e329bcd89f",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
-  "derivationRecipeSha256": "03cddeb1895a846dcbafefc067a97e75962f7e194d1de180f9c27f9e99d129cb",
+  "derivationRecipeSha256": "f766b8baf43c6413049809b7c182c00fc4174c27ab76a45a3e6d8c9a522da3a3",
   "h1InteractionDefinitionRefs": [
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -426,6 +426,15 @@
       "documentSha256": "c4403f8964cf3e28124ef6aacce099fca21dd3deb44550b7b144655a3b8d352c"
     },
     {
+      "stableId": "h1-stock:town-order-packing",
+      "revision": 2,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-order-packing.v2.json",
+      "definitionSha256": "48e94684749889c78e0788a4055d6eef55846d8aef899624ff58d41add40bab7",
+      "documentPath": "authored/h1/town-order-packing.v2.md",
+      "documentSha256": "7b5980038641ac95bdabf8c4ef4f76beb5e93988a5ccc4dfb93dd4235059b327"
+    },
+    {
       "stableId": "h1-stock:town-recall-service",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -495,9 +504,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/먹거리-상점-골목.v3.json",
-      "definitionSha256": "00fb53b774626fbec89f0b2a85530873df6b0dfaf81efdf6179826712b51a046",
+      "definitionSha256": "a8396a2694f1e754f761faf97e6ae4da67bc358211256caeb95eb4a737f91bfa",
       "documentPath": "authored/h1-expression/city/먹거리-상점-골목.v3.md",
-      "documentSha256": "b3a2c7bfd874ccf917ab6faa70bfa35b57caeafeaf81bc158e88fd4f0b89e3f1"
+      "documentSha256": "1284fbce28a2db9fa13d6b3254b34366cd18d5a3c0980c286e33a9efab31a884"
     },
     {
       "stableId": "h1-expression:city:물류-station-진입부",
@@ -540,18 +549,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/과수원-블록.v3.json",
-      "definitionSha256": "73337907ccb019f18e3dc125f43fc349db83147b87c6592ded5d98f4c6220c55",
+      "definitionSha256": "06adc036807aefd5220a662a325331c4b1ef2c7c836ff1c1d7a94bf4d0f8376d",
       "documentPath": "authored/h1-expression/farm/과수원-블록.v3.md",
-      "documentSha256": "0e1e682a65931a28334ca4cf2814921812755f7cf117fc91c87f856a1ad0d215"
+      "documentSha256": "bb6cb0cd07e1a7bdd9e325403240651688a405a5a44d060a59de21cfc8291021"
     },
     {
       "stableId": "h1-expression:farm:논-필지-농수로-표현",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/논-필지-농수로-표현.v3.json",
-      "definitionSha256": "4a4d7dca2be459e39d459282684aede67ec2bd847d9afbdbd56fdb184956ce4d",
+      "definitionSha256": "bf9d3efe8ec2b0c9467ccbfebb932087da2e547ca5542b3aaa9706411322951e",
       "documentPath": "authored/h1-expression/farm/논-필지-농수로-표현.v3.md",
-      "documentSha256": "c4c3bc555d2084d6faf041f406fafc640c6b2cc80c8de4975d691430e8fd65e5"
+      "documentSha256": "881d07fa6bff1c6d0566cf6926b789e4f0eb8234c9e7bb38aedff08d09aa8f55"
     },
     {
       "stableId": "h1-expression:farm:농산물-집하-직판장",
@@ -576,9 +585,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/시설하우스-병렬단지.v3.json",
-      "definitionSha256": "24758ded90675877cb9f1e8c8ce1dd2fb85da9b99ac96171c50a85135a37a413",
+      "definitionSha256": "f0abe72765bce008c1f8129932be91df6ae4fbd2e96a597a00571e8d8d059ec1",
       "documentPath": "authored/h1-expression/farm/시설하우스-병렬단지.v3.md",
-      "documentSha256": "79c02c58385f7eedf0c90322ade09ca596b31e88dd84ad73a5cd4b78b4d40e17"
+      "documentSha256": "f98d71652c4b8b9124e563068acc75c47c46075e5b435a3330577057b9a1e534"
     },
     {
       "stableId": "h1-expression:farm:헛간-작업마당",
@@ -603,9 +612,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/개울-회랑.v3.json",
-      "definitionSha256": "46f46e850c406b4d4527910ded3c285657d5c5b99c271d648e03735e07f518ef",
+      "definitionSha256": "ce651084f9b19fc40a656b2c34f81c4d989659e5e4d26bef117f02c211b75aaf",
       "documentPath": "authored/h1-expression/nature/개울-회랑.v3.md",
-      "documentSha256": "576a72a489ebde48d2ceaba672fbd9c0d8201905a918a32a523dc4ac01b19c8a"
+      "documentSha256": "22815a29457cca9a9bb1f961f3fab9aeea73b36d864a84ee6683512788d71746"
     },
     {
       "stableId": "h1-expression:nature:고지대-노출지",
@@ -621,9 +630,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/바위-절개지.v3.json",
-      "definitionSha256": "4d877a97287fcbf1f07c87d6b020024e55104b6f5a4e15048f4fd7f1d3b7963e",
+      "definitionSha256": "d78ba64c38657d7fe59d338840026bf202be87f921bc7f3291a7cbf6910a3ff6",
       "documentPath": "authored/h1-expression/nature/바위-절개지.v3.md",
-      "documentSha256": "cb337ba8feeb529c59a8293eef71eab00a347d3e979b2d521d24ce60c2b0040e"
+      "documentSha256": "ed423d0f0be30035c94d8d0c2fa3e4fe7db00dc516bd17bd21947f88ba8da7b9"
     },
     {
       "stableId": "h1-expression:nature:산-능선",
@@ -684,27 +693,27 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/침엽수림-군집.v3.json",
-      "definitionSha256": "4f73b489076becf714bc05e4e21d1ac7f44b00cdba56e480206968229d334978",
+      "definitionSha256": "4b421b5d146ad53fb98232b7488e387fa6209d82b018d65b63ffac491666a6fa",
       "documentPath": "authored/h1-expression/nature/침엽수림-군집.v3.md",
-      "documentSha256": "46fd5a6fba7d36d3891ecbdbc47654cc15dcb3042d796d5938dde60db4139052"
+      "documentSha256": "18357c264f6767ccbd1743ebce3b835871c5d44d4b320f4f4f3fb0cae1ff760c"
     },
     {
       "stableId": "h1-expression:nature:혼효림-군집",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/혼효림-군집.v3.json",
-      "definitionSha256": "5ec7b9226253b995df97016908b5cb3ff8276f9e858fd0dbe740398950fdc498",
+      "definitionSha256": "63ae5e9f7a877d077a3ffed103159a4a6bc592f1bc3409e51d6de32d6a5b913c",
       "documentPath": "authored/h1-expression/nature/혼효림-군집.v3.md",
-      "documentSha256": "bd6879da5cd290fcba134d433b0fc6d0786481aead58707053b97abd22bf63c1"
+      "documentSha256": "b51b7e280a9ecf769167f8207100ae1deeeaf6a0843ebea9cfd5d8c91b13f3bf"
     },
     {
       "stableId": "h1-expression:nature:활엽수림-군집",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/활엽수림-군집.v3.json",
-      "definitionSha256": "ae8a3ae49d43f70befd931a2478ed764abe50c7d8f542a11c35a0933557987aa",
+      "definitionSha256": "99463d319efaabe63b6cab110cd3151d0b7f6e1dd36889a661fcd61554bdaa1f",
       "documentPath": "authored/h1-expression/nature/활엽수림-군집.v3.md",
-      "documentSha256": "5123181f425d6f7cd4bd92f368933dba5404b0d5b43a15b12ab825b5a5d53e78"
+      "documentSha256": "e2ffc006418143ee2e01f9981b795fb50b997de040909fc71a1921e78c5c5680"
     },
     {
       "stableId": "h1-expression:town:근린-놀이터",
@@ -738,18 +747,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/읍내-상점-전면.v3.json",
-      "definitionSha256": "03a5c6003c736a2bfad4b61a082b0fbe0d9657cdce2a78b4be1d190fe8f01bc4",
+      "definitionSha256": "03170669ba17ac6ae24009f874cf134c1d8dc8118956e0ad6d4ab9640500198a",
       "documentPath": "authored/h1-expression/town/읍내-상점-전면.v3.md",
-      "documentSha256": "b0a9c0906e2e73811db9280b07877b328dfce90b0d0a04c049f6436489f6322d"
+      "documentSha256": "ecceefd6f7998c210078e9859588820d2ea42d0b8e15b191badbb10c1b1fe03c"
     },
     {
       "stableId": "h1-expression:town:저층-주택-블록",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/저층-주택-블록.v3.json",
-      "definitionSha256": "d7ea4ba41b3b1db6d7f695fb94640ae6227fa1512c4676f0ce249de4e736acfb",
+      "definitionSha256": "f52369d158c74852ef01c6d5f8603c2a31a5556f48c3c077f13afe47092f94a6",
       "documentPath": "authored/h1-expression/town/저층-주택-블록.v3.md",
-      "documentSha256": "774fcdd346466c22826bfb54775c7e6503760cbd6925c5aa35f5967191835963"
+      "documentSha256": "25ba877b570f04afe909d5bcb42de9f169413827c4b3d45dd9e9f1c03dd9f81d"
     },
     {
       "stableId": "h1-expression:town:정원-담장-경계",
@@ -785,9 +794,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/city/먹거리-상점-골목.v3.json",
-      "definitionSha256": "00fb53b774626fbec89f0b2a85530873df6b0dfaf81efdf6179826712b51a046",
+      "definitionSha256": "a8396a2694f1e754f761faf97e6ae4da67bc358211256caeb95eb4a737f91bfa",
       "documentPath": "authored/h1-expression/city/먹거리-상점-골목.v3.md",
-      "documentSha256": "b3a2c7bfd874ccf917ab6faa70bfa35b57caeafeaf81bc158e88fd4f0b89e3f1"
+      "documentSha256": "1284fbce28a2db9fa13d6b3254b34366cd18d5a3c0980c286e33a9efab31a884"
     },
     {
       "stableId": "h1-expression:city:물류-station-진입부",
@@ -830,18 +839,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/과수원-블록.v3.json",
-      "definitionSha256": "73337907ccb019f18e3dc125f43fc349db83147b87c6592ded5d98f4c6220c55",
+      "definitionSha256": "06adc036807aefd5220a662a325331c4b1ef2c7c836ff1c1d7a94bf4d0f8376d",
       "documentPath": "authored/h1-expression/farm/과수원-블록.v3.md",
-      "documentSha256": "0e1e682a65931a28334ca4cf2814921812755f7cf117fc91c87f856a1ad0d215"
+      "documentSha256": "bb6cb0cd07e1a7bdd9e325403240651688a405a5a44d060a59de21cfc8291021"
     },
     {
       "stableId": "h1-expression:farm:논-필지-농수로-표현",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/논-필지-농수로-표현.v3.json",
-      "definitionSha256": "4a4d7dca2be459e39d459282684aede67ec2bd847d9afbdbd56fdb184956ce4d",
+      "definitionSha256": "bf9d3efe8ec2b0c9467ccbfebb932087da2e547ca5542b3aaa9706411322951e",
       "documentPath": "authored/h1-expression/farm/논-필지-농수로-표현.v3.md",
-      "documentSha256": "c4c3bc555d2084d6faf041f406fafc640c6b2cc80c8de4975d691430e8fd65e5"
+      "documentSha256": "881d07fa6bff1c6d0566cf6926b789e4f0eb8234c9e7bb38aedff08d09aa8f55"
     },
     {
       "stableId": "h1-expression:farm:농산물-집하-직판장",
@@ -866,9 +875,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/farm/시설하우스-병렬단지.v3.json",
-      "definitionSha256": "24758ded90675877cb9f1e8c8ce1dd2fb85da9b99ac96171c50a85135a37a413",
+      "definitionSha256": "f0abe72765bce008c1f8129932be91df6ae4fbd2e96a597a00571e8d8d059ec1",
       "documentPath": "authored/h1-expression/farm/시설하우스-병렬단지.v3.md",
-      "documentSha256": "79c02c58385f7eedf0c90322ade09ca596b31e88dd84ad73a5cd4b78b4d40e17"
+      "documentSha256": "f98d71652c4b8b9124e563068acc75c47c46075e5b435a3330577057b9a1e534"
     },
     {
       "stableId": "h1-expression:farm:헛간-작업마당",
@@ -893,9 +902,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/개울-회랑.v3.json",
-      "definitionSha256": "46f46e850c406b4d4527910ded3c285657d5c5b99c271d648e03735e07f518ef",
+      "definitionSha256": "ce651084f9b19fc40a656b2c34f81c4d989659e5e4d26bef117f02c211b75aaf",
       "documentPath": "authored/h1-expression/nature/개울-회랑.v3.md",
-      "documentSha256": "576a72a489ebde48d2ceaba672fbd9c0d8201905a918a32a523dc4ac01b19c8a"
+      "documentSha256": "22815a29457cca9a9bb1f961f3fab9aeea73b36d864a84ee6683512788d71746"
     },
     {
       "stableId": "h1-expression:nature:고지대-노출지",
@@ -911,9 +920,9 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/바위-절개지.v3.json",
-      "definitionSha256": "4d877a97287fcbf1f07c87d6b020024e55104b6f5a4e15048f4fd7f1d3b7963e",
+      "definitionSha256": "d78ba64c38657d7fe59d338840026bf202be87f921bc7f3291a7cbf6910a3ff6",
       "documentPath": "authored/h1-expression/nature/바위-절개지.v3.md",
-      "documentSha256": "cb337ba8feeb529c59a8293eef71eab00a347d3e979b2d521d24ce60c2b0040e"
+      "documentSha256": "ed423d0f0be30035c94d8d0c2fa3e4fe7db00dc516bd17bd21947f88ba8da7b9"
     },
     {
       "stableId": "h1-expression:nature:산-능선",
@@ -974,27 +983,27 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/침엽수림-군집.v3.json",
-      "definitionSha256": "4f73b489076becf714bc05e4e21d1ac7f44b00cdba56e480206968229d334978",
+      "definitionSha256": "4b421b5d146ad53fb98232b7488e387fa6209d82b018d65b63ffac491666a6fa",
       "documentPath": "authored/h1-expression/nature/침엽수림-군집.v3.md",
-      "documentSha256": "46fd5a6fba7d36d3891ecbdbc47654cc15dcb3042d796d5938dde60db4139052"
+      "documentSha256": "18357c264f6767ccbd1743ebce3b835871c5d44d4b320f4f4f3fb0cae1ff760c"
     },
     {
       "stableId": "h1-expression:nature:혼효림-군집",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/혼효림-군집.v3.json",
-      "definitionSha256": "5ec7b9226253b995df97016908b5cb3ff8276f9e858fd0dbe740398950fdc498",
+      "definitionSha256": "63ae5e9f7a877d077a3ffed103159a4a6bc592f1bc3409e51d6de32d6a5b913c",
       "documentPath": "authored/h1-expression/nature/혼효림-군집.v3.md",
-      "documentSha256": "bd6879da5cd290fcba134d433b0fc6d0786481aead58707053b97abd22bf63c1"
+      "documentSha256": "b51b7e280a9ecf769167f8207100ae1deeeaf6a0843ebea9cfd5d8c91b13f3bf"
     },
     {
       "stableId": "h1-expression:nature:활엽수림-군집",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/nature/활엽수림-군집.v3.json",
-      "definitionSha256": "ae8a3ae49d43f70befd931a2478ed764abe50c7d8f542a11c35a0933557987aa",
+      "definitionSha256": "99463d319efaabe63b6cab110cd3151d0b7f6e1dd36889a661fcd61554bdaa1f",
       "documentPath": "authored/h1-expression/nature/활엽수림-군집.v3.md",
-      "documentSha256": "5123181f425d6f7cd4bd92f368933dba5404b0d5b43a15b12ab825b5a5d53e78"
+      "documentSha256": "e2ffc006418143ee2e01f9981b795fb50b997de040909fc71a1921e78c5c5680"
     },
     {
       "stableId": "h1-expression:town:근린-놀이터",
@@ -1028,18 +1037,18 @@
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/읍내-상점-전면.v3.json",
-      "definitionSha256": "03a5c6003c736a2bfad4b61a082b0fbe0d9657cdce2a78b4be1d190fe8f01bc4",
+      "definitionSha256": "03170669ba17ac6ae24009f874cf134c1d8dc8118956e0ad6d4ab9640500198a",
       "documentPath": "authored/h1-expression/town/읍내-상점-전면.v3.md",
-      "documentSha256": "b0a9c0906e2e73811db9280b07877b328dfce90b0d0a04c049f6436489f6322d"
+      "documentSha256": "ecceefd6f7998c210078e9859588820d2ea42d0b8e15b191badbb10c1b1fe03c"
     },
     {
       "stableId": "h1-expression:town:저층-주택-블록",
       "revision": 1,
       "cardKindCode": "PackExpression",
       "definitionPath": "definitions/h1-expression/town/저층-주택-블록.v3.json",
-      "definitionSha256": "d7ea4ba41b3b1db6d7f695fb94640ae6227fa1512c4676f0ce249de4e736acfb",
+      "definitionSha256": "f52369d158c74852ef01c6d5f8603c2a31a5556f48c3c077f13afe47092f94a6",
       "documentPath": "authored/h1-expression/town/저층-주택-블록.v3.md",
-      "documentSha256": "774fcdd346466c22826bfb54775c7e6503760cbd6925c5aa35f5967191835963"
+      "documentSha256": "25ba877b570f04afe909d5bcb42de9f169413827c4b3d45dd9e9f1c03dd9f81d"
     },
     {
       "stableId": "h1-expression:town:정원-담장-경계",
@@ -1465,6 +1474,15 @@
       "documentSha256": "c4403f8964cf3e28124ef6aacce099fca21dd3deb44550b7b144655a3b8d352c"
     },
     {
+      "stableId": "h1-stock:town-order-packing",
+      "revision": 2,
+      "cardKindCode": "InteractionSpace",
+      "definitionPath": "definitions/h1/town-order-packing.v2.json",
+      "definitionSha256": "48e94684749889c78e0788a4055d6eef55846d8aef899624ff58d41add40bab7",
+      "documentPath": "authored/h1/town-order-packing.v2.md",
+      "documentSha256": "7b5980038641ac95bdabf8c4ef4f76beb5e93988a5ccc4dfb93dd4235059b327"
+    },
+    {
       "stableId": "h1-stock:town-recall-service",
       "revision": 1,
       "cardKindCode": "InteractionSpace",
@@ -1515,193 +1533,193 @@
       "stableId": "h2-candidate:farm-hub-corridor",
       "revision": 2,
       "definitionPath": "definitions/h2/farm-hub-corridor.v2.json",
-      "definitionSha256": "034bfe1b6ecb8d3445d02d185e5371c92232c263849e9cc4bb36ab5909c06256",
+      "definitionSha256": "a869a37b7219e1c47cd72e4176629f96b273e04110095f915f371421a7d5727b",
       "documentPath": "authored/h2/farm-hub-corridor.v2.md",
-      "documentSha256": "4ee8d887b26852c13308f620da270f54c3ff3d2b9364e037deae3d560c366694"
+      "documentSha256": "7583b3abd3b6f81a4929003773b360735dfb8fadef15a61db5e8f2130706bc4e"
     },
     {
       "stableId": "h2-candidate:farm-incident-containment",
       "revision": 1,
       "definitionPath": "definitions/h2/farm-incident-containment.v2.json",
-      "definitionSha256": "08a65661a39ef60325306ee9602d5ff47f9e0a835d3ad092da6e88aa78358041",
+      "definitionSha256": "738fecb4c5ee023b84bb605c64edf5d94e1a4400a549b0340b02caffe8c47031",
       "documentPath": "authored/h2/farm-incident-containment.v2.md",
-      "documentSha256": "41b41363a5c93fe3f56d63e9a811f27a1136d03f1034720876ba97f47bbf30b2"
+      "documentSha256": "81ca2de3e11d696584aea3886fd88bc4d7a464936a67b727d3da67473e215417"
     },
     {
       "stableId": "h2-candidate:farm-loss-restoration-handoff",
       "revision": 1,
       "definitionPath": "definitions/h2/farm-loss-restoration-handoff.v2.json",
-      "definitionSha256": "ca2635654f1094881a09f0c543c5d8d8388eea1c6a456b5b0a52730f6da2efbd",
+      "definitionSha256": "99e31029628bbc5159b6603243cbe625ea2f0de08b2e02cf74f68e6c085e89e7",
       "documentPath": "authored/h2/farm-loss-restoration-handoff.v2.md",
-      "documentSha256": "01e48d3ff7fe3a1d3f18b002c620f6051e4683a4ed489b6a868960f69a7c07ea"
+      "documentSha256": "9dd3122deaec4685c68c7bb426cc1c8c036d78c460482d0724db3b9ff66b4a6d"
     },
     {
       "stableId": "h2-candidate:farm-processing-shipping",
       "revision": 2,
       "definitionPath": "definitions/h2/farm-processing-shipping.v2.json",
-      "definitionSha256": "bbfa34ebffad33e58d944afc1a4db0e7bc539db152709d9e95a5d9ac6263a487",
+      "definitionSha256": "0b9d2c03bf57e2534a2e7aa2a40092c39ceef6481fb62e71c9725ee14abe5eb1",
       "documentPath": "authored/h2/farm-processing-shipping.v2.md",
-      "documentSha256": "0d86c1026520c971c729a0957bb1adab500cd763733d55beff78161147b9aec7"
+      "documentSha256": "bbaf2fdfae8dd49500cefcbf607873f717a9addbf7a9ab0fa413c079c539c2f0"
     },
     {
       "stableId": "h2-candidate:farm-seed-and-tools",
       "revision": 1,
       "definitionPath": "definitions/h2/farm-seed-and-tools.v2.json",
-      "definitionSha256": "daba8d008423a21c1f61885e7935d5c671fadb24a4c616ca6d245e7c5e160016",
+      "definitionSha256": "d21e2e9c25119b91e9ea927bebb9e09c0106890598991f143ec2bf170f26c49d",
       "documentPath": "authored/h2/farm-seed-and-tools.v2.md",
-      "documentSha256": "9ed4688d37cce691c4d250c1e6e31085dc13a68972de2deb96c1f4da92c03d43"
+      "documentSha256": "50e3fd23d6c8a1ba6e78872076b7b23c0a34a5c9cea0ddc8e64c6368f877a7a1"
     },
     {
       "stableId": "h2-candidate:farm-wash-sort-pack",
       "revision": 1,
       "definitionPath": "definitions/h2/farm-wash-sort-pack.v2.json",
-      "definitionSha256": "18a262050b233e737c6319c56c8eb63a0dc9cf086f4a21c68272f0fa8d82450e",
+      "definitionSha256": "f0e36f1dd4ca7078180e1a81b01baf4098f9332222b3ef1357e07c25a960a89e",
       "documentPath": "authored/h2/farm-wash-sort-pack.v2.md",
-      "documentSha256": "860efe307de6670e2d8e1955e054272f1185dfbae3b8a2c0f1af169c506256a3"
+      "documentSha256": "948ca7208e030795c0c1800a900a747b9938f3de6cb2ffd13d1c7203b8ae1fcd"
     },
     {
       "stableId": "h2-candidate:farm-worker-support",
       "revision": 1,
       "definitionPath": "definitions/h2/farm-worker-support.v2.json",
-      "definitionSha256": "d33021e3f05098d9004c98c4c8fe52f9424e4953821d578afba169082ad6eb0d",
+      "definitionSha256": "1ed13a196931e9cc2c28d5764e9bafcd3aec9bfa1bfe3d35976121df73795768",
       "documentPath": "authored/h2/farm-worker-support.v2.md",
-      "documentSha256": "a5333e8cbab0a338a37f473c525e5ddaeafaee17a9f16ebb1567722be633e4c6"
+      "documentSha256": "53a42c7eed89af1d60c20a6416fc0dd40572a11a5662fd06ee789de98a7ad0b7"
     },
     {
       "stableId": "h2-candidate:forest-edge-farm",
       "revision": 2,
       "definitionPath": "definitions/h2/forest-edge-farm.v2.json",
-      "definitionSha256": "5e53e95e3703c3a4c0aa356b7a70511f804d66e5cc3964ccdd787173e6036b4f",
+      "definitionSha256": "f164c5096fa8a33fe4c951c3914681ba27704006a48e19511dfbb14afc3923e4",
       "documentPath": "authored/h2/forest-edge-farm.v2.md",
-      "documentSha256": "e5afd1979befaee2ec8f1968ac68570d8ce37283f9ffa7785a900f059479b5bb"
+      "documentSha256": "7877dfe92bf005da4f83e5ad21b980674dc769fea062de699845617638ac0015"
     },
     {
       "stableId": "h2-candidate:highland-production",
       "revision": 2,
       "definitionPath": "definitions/h2/highland-production.v2.json",
-      "definitionSha256": "36555eab01d1c35cce65f83d4329d9a9db137eaf6803ce43c5eb7869188a49ef",
+      "definitionSha256": "4a1be889ed70a5b680844a498c8ce07d11c4f938c10aee7953dca4f60de6820c",
       "documentPath": "authored/h2/highland-production.v2.md",
-      "documentSha256": "331c14466a178694ee9229c75e013cd6eb879d3d40a0dc853472f1d34b35b68a"
+      "documentSha256": "355b3b30fed758dde2dcbd2a50b13d75a4993a6f0917f5fb0050ff341d6c34aa"
     },
     {
       "stableId": "h2-candidate:hub-inbound-storage",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-inbound-storage.v2.json",
-      "definitionSha256": "3ca2848b729859f64ba5a02d8dc3c0967752dbc126d2f83983c4c75515806a04",
+      "definitionSha256": "b2bbeb6511452b9b881439f68f32c417252238acfa2d5ce8177d1c3515c145a0",
       "documentPath": "authored/h2/hub-inbound-storage.v2.md",
-      "documentSha256": "f0346bf6171496089db6e1995c49eb562274b53b15cc7bb799fea8ffcd28ad8e"
+      "documentSha256": "fed6725b72053230cc23991609223ebdf3e88c6aa03db9bc9ab50fb163baedcd"
     },
     {
       "stableId": "h2-candidate:hub-longterm-cold-storage",
       "revision": 1,
       "definitionPath": "definitions/h2/hub-longterm-cold-storage.v2.json",
-      "definitionSha256": "340383169fd64ca951d47294f1d9a3b2114c4957dd25964a848a738f3edd958f",
+      "definitionSha256": "1149e7fa8dd2d6ef889af153d3a58b05922a275e778ade80169b89beed869e28",
       "documentPath": "authored/h2/hub-longterm-cold-storage.v2.md",
-      "documentSha256": "3ac0e4bf7e1a84706f452713ca121afa1022eb018d1eaba41791788e3ddd070f"
+      "documentSha256": "35f7d768fc90b793ba48cd32ebfd3db991f6b5872a1df03a6b67483559d8a249"
     },
     {
       "stableId": "h2-candidate:hub-outbound-vehicle",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-outbound-vehicle.v2.json",
-      "definitionSha256": "d445dc48e6161aaa239972a763f823e1fa7ddd93f5412ea2c2285b48a234b68d",
+      "definitionSha256": "dd43ebb3b73b7491ef87f16a9be76bb999ca4a571a455b6ad23374920634e96d",
       "documentPath": "authored/h2/hub-outbound-vehicle.v2.md",
-      "documentSha256": "3b0839599f0d9c85728e71098fd062c76499bedd2e12a5032f5c9ab3202374d3"
+      "documentSha256": "cc5b2ff8b9307b32474887e10f86c86955d5ba3a818721cacb304f08a58a8b9c"
     },
     {
       "stableId": "h2-candidate:hub-quarantine-staging",
       "revision": 1,
       "definitionPath": "definitions/h2/hub-quarantine-staging.v2.json",
-      "definitionSha256": "70a47e3f7cdcaacf698a1f726adf33301308c73034111947f371fc7ccda58e55",
+      "definitionSha256": "955f58d6276621d85e3bd84843a52c9aa78b766e0b6827182f3d2b53000e4708",
       "documentPath": "authored/h2/hub-quarantine-staging.v2.md",
-      "documentSha256": "c772436a3c96bdf8a50fbb34183f1a01a55da5fd9347b9d6672c82317db42039"
+      "documentSha256": "4cd7277f24c27d8636ef4f68623571481e5dc3ff906c11607a4ad438cffbb82e"
     },
     {
       "stableId": "h2-candidate:hub-returns-processing",
       "revision": 1,
       "definitionPath": "definitions/h2/hub-returns-processing.v2.json",
-      "definitionSha256": "c0ff62145d0af82a6b8a0db47af3f4f6cb60c24f3d7783f936669942174322d2",
+      "definitionSha256": "b3d9ab94ceff7cfe2e6e989e36fbdbe0e02eb30c097f51840295192e09a802bf",
       "documentPath": "authored/h2/hub-returns-processing.v2.md",
-      "documentSha256": "d950518f320f661dec501d6e9effa7237c24b927c973ceff63afa2a2c80ce236"
+      "documentSha256": "eb17d9750f0aac310025239ded94d36dc1debe7e9269540dd835b9a2c6162197"
     },
     {
       "stableId": "h2-candidate:hub-town-corridor",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-town-corridor.v2.json",
-      "definitionSha256": "ae8182dc7999c5533dbd2289c178ed63c9be78514b4dde879a06e11f5f0e4147",
+      "definitionSha256": "950c4357c1a0deb7e7cd011073491bff09f523aebc6b3b34451a98efd0a77730",
       "documentPath": "authored/h2/hub-town-corridor.v2.md",
-      "documentSha256": "89f7a1979d65597916c45e3b0a5c76bc5e810f9ba738d31f9b058f5c079c8f64"
+      "documentSha256": "845160a6b8d324b08a034c057a2af3f155ece6ec3dd3b8c3c0e443715900255a"
     },
     {
       "stableId": "h2-candidate:lowrise-residential",
       "revision": 2,
       "definitionPath": "definitions/h2/lowrise-residential.v2.json",
-      "definitionSha256": "a00c37e9068f69f49c0dfe08d4f4203a1859931d7a09b702a344a180d354dfe8",
+      "definitionSha256": "665dbc1324cff1ae39bd89d48fb9fc0ca41da50589534414a531833089aaa980",
       "documentPath": "authored/h2/lowrise-residential.v2.md",
-      "documentSha256": "d966c598bc3e859e853a0c2826aea710d838b9427d65e8746dd20f2c1318a1fa"
+      "documentSha256": "26bc182048e656c877207d7d4b2e957a342f706ec4c44c4bcd7751f146a475b7"
     },
     {
       "stableId": "h2-candidate:market-life-commerce",
       "revision": 2,
       "definitionPath": "definitions/h2/market-life-commerce.v2.json",
-      "definitionSha256": "9101bf689e83271501a07758bea230aca987d1fdabda6d07077b0f323d50f5d3",
+      "definitionSha256": "937dbcb1e1032b8abe1d79a708e33ace41591fcf8a8f386ce9b49b104ebc7648",
       "documentPath": "authored/h2/market-life-commerce.v2.md",
-      "documentSha256": "29586e0817982c0744f39b87f0f3680792f804010f5e7dc9c844d262b8f7533f"
+      "documentSha256": "930da4e6a706e453fc7a0e122a14de11fe1e08b2f3c5bad564867f8bd9ddb5f6"
     },
     {
       "stableId": "h2-candidate:nature-restoration-recovery",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-restoration-recovery.v2.json",
-      "definitionSha256": "263678c8f9053d0a8794ee808a59332039c9503a447c33e123c93c5dfa1a412f",
+      "definitionSha256": "22020dfa06d97aeed47c3094d66127f0bfea756183764a8aef533605f8232e55",
       "documentPath": "authored/h2/nature-restoration-recovery.v2.md",
-      "documentSha256": "db931159c3be5e0099c1f37ac8cf44e0ec24bf2925c7ac9526cfd5c7c3df5c57"
+      "documentSha256": "334935cb78044f3b8730c321e833a95e818974f835f5ad3f52fb2d0cabcf5614"
     },
     {
       "stableId": "h2-candidate:nature-threat-response",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-threat-response.v2.json",
-      "definitionSha256": "44bbb7faf59bf0e72e2c69328b67e95e659327d8c5201aa3607fab0a34d1a2ec",
+      "definitionSha256": "12dd09f4a863980ed1199ce027e41697cd33b870d1f862d27a15ab921939ef21",
       "documentPath": "authored/h2/nature-threat-response.v2.md",
-      "documentSha256": "5445bf3476db036b5c04d2f757501be18404e42f1b243d5c3b62372bdde0918b"
+      "documentSha256": "06fa8bb8b8dfc17b54b4a7ec036009915037b8159dc511bf894993cb45a2ad56"
     },
     {
       "stableId": "h2-candidate:nature-trail-shelter",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-trail-shelter.v2.json",
-      "definitionSha256": "25884136170ed9a37bffefaf336d7a80d9059954c1bbceb90c25cb2117e26ba0",
+      "definitionSha256": "40cfff56bbc219e115125e47c9a699e153fde1dfa8cca56c6c80a1842f858f3b",
       "documentPath": "authored/h2/nature-trail-shelter.v2.md",
-      "documentSha256": "a171f0a05aabc0c322187bdedb2e8ad2fafd0a73d1856ab7ff7a57a8ef9ac4a0"
+      "documentSha256": "2568fe1f6b4ad6b5079f7938c0fc79fb202436590ab5ca1fd4f18dff17f75b4f"
     },
     {
       "stableId": "h2-candidate:nature-water-buffer",
       "revision": 2,
       "definitionPath": "definitions/h2/nature-water-buffer.v2.json",
-      "definitionSha256": "7be3781399c5d6c64d01142535713ff9517568f6b1d9990d720a6e01701af57d",
+      "definitionSha256": "3c332819913f3c0e1f7130bd2fdc609d525f1a948de2bee5e62aa56ce0a33674",
       "documentPath": "authored/h2/nature-water-buffer.v2.md",
-      "documentSha256": "49a616b46698cb567908e13ed76f9483d51d2b0edc500c3943b818aadea6f9a8"
+      "documentSha256": "38cb6c48899f6568a537b7630125c46fa1e92ccab0ea08e5bf922c5e317f5182"
     },
     {
       "stableId": "h2-candidate:town-contamination-control",
       "revision": 1,
       "definitionPath": "definitions/h2/town-contamination-control.v2.json",
-      "definitionSha256": "0a99ac62533de0467987e0b1769903df71f882c69a85e3c368a09df7b8bee11c",
+      "definitionSha256": "401ab5f996c35e5ec8748c343580c15c8a79d29749392234657646f2088b140b",
       "documentPath": "authored/h2/town-contamination-control.v2.md",
-      "documentSha256": "b839b7cc8500ce34258de4973aec4aa2272d202d920b514a84ba434a7159c474"
+      "documentSha256": "214f74bc22e05c8784b5a35dffd58cae1859a5a7fe3a3dc50e93f201abb588f8"
     },
     {
       "stableId": "h2-candidate:town-recall-relief",
       "revision": 1,
       "definitionPath": "definitions/h2/town-recall-relief.v2.json",
-      "definitionSha256": "020e861d9beb0723372b560199320224f0ff2beb3bf8590d8a0b848336de6084",
+      "definitionSha256": "d1edb7c63c64009e4e466ee4e54c78ef19a66e5fa8121eeb7e8ca2e01a4a45f7",
       "documentPath": "authored/h2/town-recall-relief.v2.md",
-      "documentSha256": "2a140497f0f6cd5e467adf782fec5ead14e765a68b0c985f511a49da2a641644"
+      "documentSha256": "5ec2df519bb53433942458741a4feb3952b2a2f1bc7411bd5aba1f8009455071"
     },
     {
       "stableId": "h2-candidate:town-returns-waste",
       "revision": 1,
       "definitionPath": "definitions/h2/town-returns-waste.v2.json",
-      "definitionSha256": "11f95dc056c95bf32f8168c97593d6fe6e5b4f54831469f8521c423d794aea48",
+      "definitionSha256": "47ce8474dff132ffb21d65367d2e87e55c9bcc9c7b28e88852edcc3c4e8e7c5e",
       "documentPath": "authored/h2/town-returns-waste.v2.md",
-      "documentSha256": "5f02a7cbccdd75110e6fb15a3a17b1d43a17449937290785869690ca41ea26ef"
+      "documentSha256": "3ae946b108a34baf27f9226a970c3f4f22db219ca89303e37947ed969f4ca0cc"
     }
   ],
   "h3DefinitionRefs": [
@@ -1800,6 +1818,14 @@
       "definitionSha256": "67d47cd867e795ba4c7b05368a8225222ef190a9b24362fcef32add028903f58",
       "documentPath": "authored/h3/resilient-logistics-hub.v2.md",
       "documentSha256": "a1fda9308df181215b943d8f1d0580ee2b405b93e51cd1ca89227e26a19dca85"
+    },
+    {
+      "stableId": "h3-candidate:town-contamination-relief",
+      "revision": 1,
+      "definitionPath": "definitions/h3/town-contamination-relief.v2.json",
+      "definitionSha256": "3f0c7531f929f8f2ba08ffe3b7b262596cdc3c8c0b24fcc74745ace57fb8c6c4",
+      "documentPath": "authored/h3/town-contamination-relief.v2.md",
+      "documentSha256": "48d87f135542d72e559d6a4750798195ee167efaae4adffeb0484127de17bc45"
     }
   ],
   "h4DefinitionRefs": [
@@ -1808,54 +1834,54 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-hub-town-region.v3.json",
-      "definitionSha256": "7dd548ca47fff6489d433d176c66f60c7b52aa8bd34651f7abca47e09df964ac",
+      "definitionSha256": "d232acb74a6f66d57251f2f4829f2eb84d2180c960a42205fff0155874e9b61e",
       "documentPath": "authored/h4/farm-hub-town-region.v3.md",
-      "documentSha256": "0996fee07689b0fdb1899d9a98083630a23161ac8dd53f6e4cdb9e6b287b95e6"
+      "documentSha256": "ffeca14c788987771653157549450e4332139d919730bbffc9e2b51b48cf45cf"
     },
     {
       "stableId": "h4-blueprint:farm-production-processing-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-production-processing-region.v3.json",
-      "definitionSha256": "a5a67f958ccdbb2d3f413df76ea8e2fb5947aad523a9327b7d5503a5b1a1f635",
+      "definitionSha256": "3b35c141c6b4390878a660075e53f12bd3951f4359c3acaa1680a5aba9053fd3",
       "documentPath": "authored/h4/farm-production-processing-region.v3.md",
-      "documentSha256": "25620b6aa01f913654f6a047bb21550fe3e9aaf8cbc32e8deebf9da76587527c"
+      "documentSha256": "d87f132d072c468a9302a985d39a80b2b131f9e8fd6d53134595f43dcb3169a4"
     },
     {
       "stableId": "h4-blueprint:logistics-hub-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/logistics-hub-region.v3.json",
-      "definitionSha256": "62ac5cddceb2e86ffa29450bfb2fd68c5a97a4fe03d03c886ef182896c0b115f",
+      "definitionSha256": "25d4b3180d6a42b5e7a0aa2e81f202b5d9a9493a44a6c627a540698981f70b21",
       "documentPath": "authored/h4/logistics-hub-region.v3.md",
-      "documentSha256": "a0307df8cec2af54891e93e243a61bb23de600a084a5ba2ce8a1948746ff8bba"
+      "documentSha256": "a37a60d3205d1e5792f92b729d2ed11fc6d7972dcc3ceac9a02200ff89448df5"
     },
     {
       "stableId": "h4-blueprint:lowrise-market-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/lowrise-market-region.v3.json",
-      "definitionSha256": "9936a47a54353bef1098398df9e5acea09cc2cc0a7568f6e4ef4ac419549cdaf",
+      "definitionSha256": "7278773e5305a3be403c63afc589bcb1468bacde738a6ab0e89977912238d460",
       "documentPath": "authored/h4/lowrise-market-region.v3.md",
-      "documentSha256": "8bad9a4d18f8feaa724bd7d42fa78a94585901e961649ed0536cbed43965ce6a"
+      "documentSha256": "b9ce55f391048a2724362407e28fcdc10247b1006e33f315325b567dd1d09b2e"
     },
     {
       "stableId": "h4-blueprint:nature-home-exploration-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/nature-home-exploration-region.v3.json",
-      "definitionSha256": "c094c6e4c99f69d85b942f3ae88b71ced37fb166b3ade9cb5a3e8e5be83134af",
+      "definitionSha256": "9f531477f86e557db62a68ba10406e7c2008ea001cf30074fa89fbb796a7ff36",
       "documentPath": "authored/h4/nature-home-exploration-region.v3.md",
-      "documentSha256": "a3ca35cfd2dcf841303126778b776c1d027162b7ef1459c1ba34e5e0c62c4f9d"
+      "documentSha256": "aeae602d4298ac6e6b980a4890e8c8c5dea7acc014ea5cc6dbda492c3e25d13f"
     },
     {
       "stableId": "h4-blueprint:nature-water-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/nature-water-region.v3.json",
-      "definitionSha256": "59b19cc25978a409bf129e8df79ff7d0f298f793bd58a108ea8a903c31010e89",
+      "definitionSha256": "f34f7b073e9e794f2ead2ff7c4da6cf9d78b1830e88f9d2b3c5f910b0a8a037a",
       "documentPath": "authored/h4/nature-water-region.v3.md",
-      "documentSha256": "992a8d47097cddbc419b431980b39614d85e41f68bd5c7ce62dca6961c5666fa"
+      "documentSha256": "129d5e323d409c7eb88c12e42525e7b1a3d26cf7915ffdbe57e815c6aa40f80a"
     }
   ],
   "h2DerivationBindings": [
@@ -2173,6 +2199,7 @@
         "h1-stock:town-living-square",
         "h1-stock:town-market-display",
         "h1-stock:town-market-receiving",
+        "h1-stock:town-order-packing",
         "h1-stock:town-resident-pickup"
       ],
       "sourceGrammarRefs": [
@@ -2187,7 +2214,7 @@
         "town:읍내 상점 전면",
         "transition:Road–BuildingFront 전환"
       ],
-      "derivationInputHashSha256": "ba38225df16fa905f8406b1ca99ae516c377a29312874f8236e8ef855b0a0b21",
+      "derivationInputHashSha256": "37336d7262d117765aee88570b246cb4471e5be3256d5c8850c357e90562ca61",
       "presentationOnly": true
     },
     {
@@ -2366,7 +2393,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Town–City 전환"
       ],
-      "derivationInputHashSha256": "41e3cd1cafc90d96b47964cbd4f12bb364f2aa54c28f04efb727416162cd7c2e",
+      "derivationInputHashSha256": "e9197a5546887d2a2ee2f1c9c100e06c8c79f83abe2f0924da4033127a1f6b8c",
       "presentationOnly": true
     },
     {
@@ -2532,7 +2559,7 @@
         "town:읍내 상점 전면",
         "transition:Road–BuildingFront 전환"
       ],
-      "derivationInputHashSha256": "4ed77d719c23c433b65c089173cddbe4e91a49c34958bb56526d72e1faa4c44b",
+      "derivationInputHashSha256": "4b0dae2e38f9b84c28f0023993842a85b344f19de7661477b41d870c6b0dcf2e",
       "presentationOnly": true
     },
     {
@@ -2630,14 +2657,45 @@
       ],
       "derivationInputHashSha256": "a810d31504c2cf287e4e4b2affa69e24f21395816f60911d750c38d3c0a81960",
       "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h3-candidate:town-contamination-relief",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.town-contamination-relief.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-contamination-control",
+        "h2-candidate:town-recall-relief",
+        "h2-candidate:town-returns-waste"
+      ],
+      "sourceGrammarRefs": [
+        "city:공동주택 생활마당",
+        "city:도심 마트 앞마당",
+        "city:먹거리 상점 골목",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:타운도로 십자",
+        "network:타운도로 직선",
+        "network:타운도로 T자",
+        "town:근린 놀이터",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면",
+        "town:정원·담장 경계",
+        "transition:Road–BuildingFront 전환",
+        "transition:Town–City 전환",
+        "transition:Town–Hub 전환"
+      ],
+      "derivationInputHashSha256": "5d9ce40a05cfbd77fb7be9059aa54d50fea08cd94eba4dd498b85e9e654967bc",
+      "presentationOnly": true
     }
   ],
   "counts": {
     "grammarMeaningGroups": 52,
     "grammarVariants": 156,
-    "h1Interaction": 51,
+    "h1Interaction": 52,
     "h1Expression": 32,
-    "h1Total": 83,
+    "h1Total": 84,
     "h2": 18,
     "h3": 10,
     "h4Blueprint": 5
@@ -2645,5 +2703,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "14de46eb8d7ff6111415dd30ba0abd0d1302cf1ebc9d99fc8a28cbb28e178181"
+  "contentHashSha256": "3ce2e56009c4ae33122f00b52a8023824ad6afbf0fc70ee9424b1e7698a65d7a"
 }

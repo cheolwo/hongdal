@@ -190,7 +190,6 @@ foreach ($item in @($byLevel.H4)) {
         matchedRequiredH3Refs = $requiredMatches
         missingRequiredH3Refs = @($item.requiredH3Refs | Where-Object { $selectedH3Ids -notcontains [string] $_ })
         matchedOptionalH3Refs = $optionalMatches
-        requiredEvidencePurposeCodes = @($item.requiredEvidencePurposeCodes)
     }
 }
 $h4Rows = @($h4Rows | Sort-Object @{ Expression = "score"; Descending = $true }, stableId | Select-Object -First $Limit)

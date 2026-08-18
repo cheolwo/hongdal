@@ -9,9 +9,6 @@
 @connector ReturnInput
 @connector RestockOutput
 @connector DisposalOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

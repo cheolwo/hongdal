@@ -5,9 +5,6 @@
 @state ExploratoryInventory
 @required-h1 h1-stock:hub-receiving-storage
 @required-h1 h1-stock:hub-service-maintenance
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

@@ -38,12 +38,6 @@
     "FarmToHub",
     "HubToTown"
   ],
-  "requiredEvidencePurposeCodes": [
-    "AdministrativeBoundary",
-    "TerrainElevation",
-    "LandCoverClassification",
-    "RoadNetwork"
-  ],
   "sourceGrammarRefs": [
     "city:공동주택 생활마당",
     "city:도심 마트 앞마당",
@@ -86,10 +80,10 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.farm-hub-town-region.r1",
-  "derivationInputHashSha256": "50c2fe66eeff1a49d619d0513e56c22f54f69e76cd3e2bcad2fde06a78e7b765",
+  "derivationInputHashSha256": "f45992ce74f4952ccdd76e98dedf903c890c54fc279ab1ec9bc862c3ee3ec8a8",
   "authoredDocument": "authored/h4/farm-hub-town-region.v3.md",
   "unresolvedItems": [
-    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+    "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

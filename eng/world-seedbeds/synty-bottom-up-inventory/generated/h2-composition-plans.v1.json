@@ -1,8 +1,8 @@
 {
   "schemaVersion": "simulation-world-h2-composition-plans.v1",
-  "revision": "simulation-world-h2-composition-plans.r1",
-  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r2",
-  "generatedPlanCount": 4,
+  "revision": "simulation-world-h2-composition-plans.r2",
+  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r3",
+  "generatedPlanCount": 6,
   "plans": [
     {
       "planId": "h2-plan:farm-incident-containment",
@@ -83,15 +83,9 @@
           "facingDegrees": 330
         }
       ],
-      "requiredEvidencePurposeCodes": [
-        "RoadNetwork",
-        "BuildingFootprint",
-        "BlockBoundary",
-        "WeatherContext"
-      ],
-      "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
+      "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "6bb4298f7da70b61a8f584912375de9fd0e97a17e4ef4146441e7eeac7ca3492"
+      "derivationInputHashSha256": "1fca55cb958d80cf4e8391c84b6bfbbf24cdb77fdf93133b90eb04fcb7341a0c"
     },
     {
       "planId": "h2-plan:farm-loss-restoration-handoff",
@@ -172,14 +166,9 @@
           "facingDegrees": 350
         }
       ],
-      "requiredEvidencePurposeCodes": [
-        "RoadNetwork",
-        "BlockBoundary",
-        "NatureTransition"
-      ],
-      "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
+      "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "9a0cae32b9acb991f8e7e5cd68cff9e7277468145187b55d993bc056389d1014"
+      "derivationInputHashSha256": "72c1578b25a5bf2d40d654903cfd9e1e124dfdf0c5e70a19cb0a89952f2369c1"
     },
     {
       "planId": "h2-plan:nature-restoration-recovery",
@@ -245,15 +234,9 @@
           "facingDegrees": 20
         }
       ],
-      "requiredEvidencePurposeCodes": [
-        "TerrainSlope",
-        "LandCover",
-        "WaterPresence",
-        "BlockBoundary"
-      ],
-      "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
+      "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "43ee6c583fde318f6511ef5ed24b240a712e35b9af55f26cde3eb8326f12d6d3"
+      "derivationInputHashSha256": "0db71eac78b91066e9f7532684a973be8f453322f245e37a19824970c627dd08"
     },
     {
       "planId": "h2-plan:nature-threat-response",
@@ -334,15 +317,175 @@
           "facingDegrees": 225
         }
       ],
-      "requiredEvidencePurposeCodes": [
-        "TerrainSlope",
-        "LandCover",
-        "TrailNetwork",
-        "BlockBoundary"
-      ],
-      "evidenceStateCode": "WaitingForRoadBoundaryEvidence",
+      "designStateCode": "ReadyForPlanningReview",
       "authorityStateCode": "DesignCandidateOnly",
-      "derivationInputHashSha256": "94f30d786cc5c7bfa38c6678c705439428872311cd2a6567754568884ea4b268"
+      "derivationInputHashSha256": "1fdb87b5f1fad13447b1fc6d859612da5a64ab1fc17852c9824d4ee2a4fde6fe"
+    },
+    {
+      "planId": "h2-plan:town-contamination-control",
+      "targetKnowledgeRef": "h2-candidate:town-contamination-control",
+      "title": "생활권 오염 점검·정화 블록",
+      "priorityCode": "P3",
+      "topologyCode": "ModifiedGrid",
+      "coordinateSpaceCode": "LocalMeters",
+      "referenceSizeMeters": {
+        "width": 240,
+        "depth": 180
+      },
+      "nodes": [
+        {
+          "localNodeId": "contamination-inspection",
+          "h1Ref": "h1-stock:town-contamination-inspection",
+          "localX": -68,
+          "localZ": 26,
+          "rotationDegrees": 0,
+          "required": true
+        },
+        {
+          "localNodeId": "contamination-quarantine",
+          "h1Ref": "h1-stock:town-contamination-quarantine",
+          "localX": 4,
+          "localZ": 36,
+          "rotationDegrees": 10,
+          "required": true
+        },
+        {
+          "localNodeId": "cleanup-transfer",
+          "h1Ref": "h1-stock:town-cleanup-transfer",
+          "localX": 70,
+          "localZ": -38,
+          "rotationDegrees": 315,
+          "required": true
+        }
+      ],
+      "edges": [
+        {
+          "localEdgeId": "inspection-to-quarantine",
+          "fromNodeId": "contamination-inspection",
+          "toNodeId": "contamination-quarantine",
+          "relationCode": "ContaminationIsolationRoute",
+          "bidirectional": true
+        },
+        {
+          "localEdgeId": "quarantine-to-cleanup-transfer",
+          "fromNodeId": "contamination-quarantine",
+          "toNodeId": "cleanup-transfer",
+          "relationCode": "CleanupServiceRoute",
+          "bidirectional": true
+        }
+      ],
+      "externalConnectors": [
+        {
+          "connectorId": "market-stock-input",
+          "roleCode": "MarketStockInput",
+          "attachedNodeId": "contamination-inspection",
+          "localX": -112,
+          "localZ": 32,
+          "facingDegrees": 180
+        },
+        {
+          "connectorId": "safe-display-output",
+          "roleCode": "SafeDisplayOutput",
+          "attachedNodeId": "contamination-inspection",
+          "localX": -52,
+          "localZ": 82,
+          "facingDegrees": 70
+        },
+        {
+          "connectorId": "service-vehicle-output",
+          "roleCode": "ServiceVehicleOutput",
+          "attachedNodeId": "cleanup-transfer",
+          "localX": 116,
+          "localZ": -68,
+          "facingDegrees": 330
+        }
+      ],
+      "designStateCode": "ReadyForPlanningReview",
+      "authorityStateCode": "DesignCandidateOnly",
+      "derivationInputHashSha256": "6ac225e75af4de0bf596ea552e104d55d325ada45807815be48de73816320c09"
+    },
+    {
+      "planId": "h2-plan:town-recall-relief",
+      "targetKnowledgeRef": "h2-candidate:town-recall-relief",
+      "title": "생활권 회수 안내·자연권 구호 블록",
+      "priorityCode": "P3",
+      "topologyCode": "Cluster",
+      "coordinateSpaceCode": "LocalMeters",
+      "referenceSizeMeters": {
+        "width": 240,
+        "depth": 190
+      },
+      "nodes": [
+        {
+          "localNodeId": "recall-service",
+          "h1Ref": "h1-stock:town-recall-service",
+          "localX": -66,
+          "localZ": 8,
+          "rotationDegrees": 0,
+          "required": true
+        },
+        {
+          "localNodeId": "neighborhood-service",
+          "h1Ref": "h1-stock:town-neighborhood-service",
+          "localX": 0,
+          "localZ": 36,
+          "rotationDegrees": 15,
+          "required": true
+        },
+        {
+          "localNodeId": "nature-relief",
+          "h1Ref": "h1-stock:town-nature-relief",
+          "localX": 72,
+          "localZ": -32,
+          "rotationDegrees": 330,
+          "required": true
+        }
+      ],
+      "edges": [
+        {
+          "localEdgeId": "recall-to-neighborhood-service",
+          "fromNodeId": "recall-service",
+          "toNodeId": "neighborhood-service",
+          "relationCode": "ResidentServiceRoute",
+          "bidirectional": true
+        },
+        {
+          "localEdgeId": "neighborhood-service-to-nature-relief",
+          "fromNodeId": "neighborhood-service",
+          "toNodeId": "nature-relief",
+          "relationCode": "NatureReliefHandoffRoute",
+          "bidirectional": true
+        }
+      ],
+      "externalConnectors": [
+        {
+          "connectorId": "resident-input",
+          "roleCode": "ResidentInput",
+          "attachedNodeId": "recall-service",
+          "localX": -114,
+          "localZ": 10,
+          "facingDegrees": 180
+        },
+        {
+          "connectorId": "return-output",
+          "roleCode": "ReturnOutput",
+          "attachedNodeId": "recall-service",
+          "localX": -78,
+          "localZ": -82,
+          "facingDegrees": 235
+        },
+        {
+          "connectorId": "nature-relief-output",
+          "roleCode": "NatureReliefOutput",
+          "attachedNodeId": "nature-relief",
+          "localX": 116,
+          "localZ": -54,
+          "facingDegrees": 340
+        }
+      ],
+      "designStateCode": "ReadyForPlanningReview",
+      "authorityStateCode": "DesignCandidateOnly",
+      "derivationInputHashSha256": "558a40fa61f00923cd0102fd7fe8456a0621dc81894e59334ca2541317dabea5"
     }
   ],
   "authorityBoundary": "위치 독립 H2 설계 조립안이며 실제 도로·경계·AreaSet·LandscapeGraph 권위를 갖지 않는다.",

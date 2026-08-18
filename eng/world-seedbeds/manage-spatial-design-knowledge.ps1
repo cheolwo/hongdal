@@ -168,7 +168,6 @@ function New-H2FromLegacy([object] $Item) {
         optionalH1Refs = @()
         connectorRoleCodes = @()
         sizeVariantCodes = @($Item.sizeVariantCodes)
-        requiredEvidencePurposeCodes = @($Item.requiredEvidencePurposeCodes)
         authoredDocument = "authored/h2/$slug.v2.md"
         sourceReferences = @("$LegacyCatalogPath#$($Item.candidateId)")
         unresolvedItems = @("필수 H1 사이 연결구와 내부 도달 가능성을 검토한다.")
@@ -192,10 +191,9 @@ function New-H2FromExpansion([object] $Item) {
         optionalH1Refs = @($Item.optionalH1Refs)
         connectorRoleCodes = @($Item.connectorRoleCodes)
         sizeVariantCodes = @($Item.sizeVariantCodes)
-        requiredEvidencePurposeCodes = @($Item.requiredEvidencePurposeCodes)
         authoredDocument = "authored/h2/$slug.v2.md"
         sourceReferences = @("$ExpansionPath#$($Item.candidateId)")
-        unresolvedItems = @("실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다.")
+        unresolvedItems = @("기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다.")
         presentationOnly = $true
         isOperationalState = $false
     }
@@ -272,7 +270,6 @@ function New-KnowledgeMarkdown([object] $Definition) {
         Add-DirectiveLines $builder "required-h1" @($Definition.requiredH1Refs)
         Add-DirectiveLines $builder "optional-h1" @($Definition.optionalH1Refs)
         Add-DirectiveLines $builder "connector" @($Definition.connectorRoleCodes)
-        Add-DirectiveLines $builder "evidence" @($Definition.requiredEvidencePurposeCodes)
     }
     else {
         Add-DirectiveLines $builder "required-h2" @($Definition.requiredH2Refs)
@@ -354,7 +351,7 @@ foreach ($level in @("h1", "h2", "h3")) {
         Require ($stateCodes -contains [string] $definition.knowledgeStateCode) "KnowledgeStateInvalid:$id"
         Require ([bool] $definition.presentationOnly -and -not [bool] $definition.isOperationalState) "AuthorityBoundaryInvalid:$id"
         $raw = [IO.File]::ReadAllText($file.FullName)
-        Require (-not ($raw -match '"(absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath|landscapeGraphStableId|areaSetStableId)"')) "AuthorityFieldForbidden:$id"
+        Require (-not ($raw -match '"(absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath|landscapeGraphStableId|areaSetStableId|requiredEvidencePurposeCodes)"')) "AuthorityFieldForbidden:$id"
         $documentPath = Join-Path $knowledgeRoot ([string] $definition.authoredDocument)
         Require (Test-Path -LiteralPath $documentPath) "MarkdownMissing:$id"
         $markdown = [IO.File]::ReadAllText($documentPath)
@@ -394,11 +391,9 @@ foreach ($level in @("h1", "h2", "h3")) {
         elseif ($level -eq "h2") {
             Require (@($definition.requiredH1Refs).Count -gt 0) "H2RequiredH1Missing:$id"
             Require ((@($definition.sizeVariantCodes) -join ",") -eq "Compact,Standard,Expanded") "H2SizeVariantsInvalid:$id"
-            Require (@($definition.requiredEvidencePurposeCodes).Count -gt 0) "H2EvidenceMissing:$id"
             Test-DirectiveSet $markdown "required-h1" @($definition.requiredH1Refs) $id
             Test-DirectiveSet $markdown "optional-h1" @($definition.optionalH1Refs) $id
             Test-DirectiveSet $markdown "connector" @($definition.connectorRoleCodes) $id
-            Test-DirectiveSet $markdown "evidence" @($definition.requiredEvidencePurposeCodes) $id
         }
         else {
             Require (@($definition.requiredH2Refs).Count -gt 0) "H3RequiredH2Missing:$id"
@@ -412,9 +407,9 @@ foreach ($level in @("h1", "h2", "h3")) {
     }
 }
 
-Require (@($definitionsByLevel.H1).Count -eq 51) "H1CountMustBe51"
+Require (@($definitionsByLevel.H1).Count -eq 52) "H1CountMustBe52"
 Require (@($definitionsByLevel.H2).Count -eq 24) "H2CountMustBe24"
-Require (@($definitionsByLevel.H3).Count -eq 12) "H3CountMustBe12"
+Require (@($definitionsByLevel.H3).Count -eq 13) "H3CountMustBe13"
 foreach ($h1 in @($definitionsByLevel.H1)) {
     foreach ($reference in @($h1.predecessorH1Refs + $h1.successorH1Refs)) { Require ($definitionsById.ContainsKey([string] $reference)) "H1RelationUnknown:$($h1.stableId):$reference" }
 }
@@ -472,9 +467,9 @@ function New-IndexDocument([hashtable] $ByLevel) {
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("> 항목별 JSON·Markdown에서 결정적으로 생성된다. 직접 수정하지 않는다.")
     [void] $builder.AppendLine()
-    [void] $builder.AppendLine("- H1 작업공간 지식: ``51개``")
+    [void] $builder.AppendLine("- H1 작업공간 지식: ``52개``")
     [void] $builder.AppendLine("- H2 블록 조립법: ``24개``")
-    [void] $builder.AppendLine("- H3 지역 유형 청사진: ``12개``")
+    [void] $builder.AppendLine("- H3 지역 유형 청사진: ``13개``")
     foreach ($level in @("H1", "H2", "H3")) {
         [void] $builder.AppendLine()
         [void] $builder.AppendLine("## $level")
@@ -482,7 +477,7 @@ function New-IndexDocument([hashtable] $ByLevel) {
         [void] $builder.AppendLine("| 상태 | 고유 식별자 | 이름 | 검색 단서 |")
         [void] $builder.AppendLine("| --- | --- | --- | --- |")
         foreach ($item in @($ByLevel[$level] | Sort-Object knowledgeStateCode, stableId)) {
-            $clues = if ($level -eq "H1") { @($item.wiIds + $item.anticipatedGameplayCodes + $item.capabilityCodes + $item.sourcePackCodes) -join ", " } elseif ($level -eq "H2") { @($item.requiredH1Refs + $item.requiredEvidencePurposeCodes) -join ", " } else { @($item.requiredH2Refs + $item.connectorRoleCodes) -join ", " }
+            $clues = if ($level -eq "H1") { @($item.wiIds + $item.anticipatedGameplayCodes + $item.capabilityCodes + $item.sourcePackCodes) -join ", " } elseif ($level -eq "H2") { @($item.requiredH1Refs + $item.connectorRoleCodes) -join ", " } else { @($item.requiredH2Refs + $item.connectorRoleCodes) -join ", " }
             [void] $builder.AppendLine("| ``$($item.knowledgeStateCode)`` | ``$($item.stableId)`` | $($item.title) | $($clues.Replace('|','\|')) |")
         }
     }
@@ -544,7 +539,7 @@ function New-PromotionDocument([hashtable] $ByLevel, [hashtable] $ById) {
         $rows += [pscustomobject]@{ Score = $score; Level = "H2"; Id = $item.stableId; Title = $item.title; Result = "$approvedChildren/$(@($item.requiredH1Refs).Count) 필수 H1 승인 참조" }
     }
     foreach ($item in @($ByLevel.H3)) {
-        $rows += [pscustomobject]@{ Score = 0; Level = "H3"; Id = $item.stableId; Title = $item.title; Result = "H2 승인·실제 지역 근거 전 조립 후보" }
+        $rows += [pscustomobject]@{ Score = 0; Level = "H3"; Id = $item.stableId; Title = $item.title; Result = "H2 설계 승인 전 조립 후보" }
     }
     $rank = 1
     foreach ($row in @($rows | Sort-Object @{ Expression = "Score"; Descending = $true }, Level, Id)) {
@@ -570,10 +565,10 @@ if ($Mode -eq "Check") {
         Require (Test-Path -LiteralPath $path) "GeneratedDocumentMissing:$($pair.Key)"
         Require ((ConvertTo-StableText ([IO.File]::ReadAllText($path))) -ceq $pair.Value) "GeneratedDocumentOutOfDate:$($pair.Key)"
     }
-    Write-Output "SpatialDesignKnowledgeValid:H1=51;H2=24;H3=12"
+    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=24;H3=13"
 }
 else {
     [void] (Write-TextIfChanged $catalogPath (ConvertTo-StableJson $catalog))
     foreach ($pair in $generated.GetEnumerator()) { [void] (Write-TextIfChanged (Resolve-RepositoryPath $repositoryRoot $pair.Key) $pair.Value) }
-    Write-Output "SpatialDesignKnowledgeGenerated:H1=51;H2=24;H3=12"
+    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=24;H3=13"
 }

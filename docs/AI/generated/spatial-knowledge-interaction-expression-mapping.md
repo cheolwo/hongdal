@@ -48,6 +48,7 @@
 | `h1-stock:town-market-receiving` | h1-expression:city:도심-마트-앞마당 |
 | `h1-stock:town-nature-relief` | h1-expression:town:버스-정류장-보행-쉼터, h1-expression:town:생활-공공광장 |
 | `h1-stock:town-neighborhood-service` | h1-expression:town:생활-공공광장, h1-expression:town:읍내-상점-전면 |
+| `h1-stock:town-order-packing` | h1-expression:city:먹거리-상점-골목, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-recall-service` | h1-expression:town:생활-공공광장, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-resident-pickup` | h1-expression:town:버스-정류장-보행-쉼터, h1-expression:town:읍내-상점-전면 |
 | `h1-stock:town-returns` | h1-expression:city:도심-마트-앞마당, h1-expression:town:읍내-상점-전면 |

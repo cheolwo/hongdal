@@ -10,10 +10,6 @@
 @connector IncidentRouteInput
 @connector SafeCoreOutput
 @connector RestoredRouteOutput
-@evidence TerrainSlope
-@evidence LandCover
-@evidence WaterPresence
-@evidence BlockBoundary
 
 ## 존재 이유
 

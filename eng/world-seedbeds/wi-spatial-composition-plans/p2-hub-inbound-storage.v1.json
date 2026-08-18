@@ -103,9 +103,10 @@
     "candidateH2GrantsTraversalAuthority": false,
     "requiresContinuousPlayerPath": true,
     "requiresDeterministicRelationOrder": true,
-    "forbidsAbsoluteCoordinatesBeforeH2Approval": true,
+    "forbidsAbsoluteCoordinatesBeforeE5PlacementApproval": true,
     "forbidsScenarioFallbackForGraphRequest": true
   },
+  "publicDataLinkageStageCode": "E6",
   "requiredEvidencePurposeCodes": [
     "RoadNetwork",
     "BuildingFootprint",

@@ -6,8 +6,6 @@
 @required-h1 h1-stock:farm-work-yard
 @required-h1 h1-stock:farm-maintenance-yard
 @required-h1 h1-stock:farm-loading-gate
-@evidence RoadNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

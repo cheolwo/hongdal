@@ -9,9 +9,6 @@
 @required-h1 h1-stock:farm-work-yard
 @connector HarvestInput
 @connector ShippingOutput
-@evidence RoadNetwork
-@evidence WaterPresence
-@evidence BlockBoundary
 
 ## 존재 이유
 

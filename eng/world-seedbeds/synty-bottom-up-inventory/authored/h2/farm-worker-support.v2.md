@@ -8,9 +8,6 @@
 @required-h1 h1-stock:farm-maintenance-yard
 @connector FarmRoadAccess
 @connector ProductionAccess
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

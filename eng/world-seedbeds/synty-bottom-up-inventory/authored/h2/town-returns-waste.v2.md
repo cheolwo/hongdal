@@ -9,9 +9,6 @@
 @optional-h1 h1-stock:town-staff-rest
 @connector CustomerReturnInput
 @connector ServiceVehicleOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

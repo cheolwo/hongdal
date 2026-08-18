@@ -56,7 +56,8 @@
     "maximumColliderCount": 8
   },
   "supportsInteractionH1Refs": [
-    "h1-stock:town-market-display"
+    "h1-stock:town-market-display",
+    "h1-stock:town-order-packing"
   ],
   "derivationRecipeCode": "h1.pack-expression.city.r1",
   "derivationInputHashSha256": "9f5b3bf0ae5cb4542418a03602a4e903e5f27e27f8c4761a3927cbeef13e051e",

@@ -19,10 +19,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BlockBoundary"
-  ],
   "authoredDocument": "authored/h2/farm-processing-shipping.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:farm-processing-shipping"

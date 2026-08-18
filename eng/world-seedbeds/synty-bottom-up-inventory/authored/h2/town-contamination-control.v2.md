@@ -10,10 +10,6 @@
 @connector MarketStockInput
 @connector SafeDisplayOutput
 @connector ServiceVehicleOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
-@evidence MarketContext
 
 ## 존재 이유
 

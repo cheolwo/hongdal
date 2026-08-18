@@ -105,9 +105,9 @@ foreach ($item in @($catalog.h1Inventory)) {
     }
     $h1Ids[$id] = $true
 }
-Require (@($catalog.h1Inventory).Count -eq 18) "H1InventoryCountMustBe18"
+Require (@($catalog.h1Inventory).Count -eq 19) "H1InventoryCountMustBe19"
 Require (@($catalog.h1Inventory | Where-Object stateCode -eq "ApprovedReference").Count -eq 5) "H1ApprovedReferenceCountMustBe5"
-Require (@($catalog.h1Inventory | Where-Object stateCode -eq "CandidateForReview").Count -eq 13) "H1CandidateCountMustBe13"
+Require (@($catalog.h1Inventory | Where-Object stateCode -eq "CandidateForReview").Count -eq 14) "H1CandidateCountMustBe14"
 
 $h2Ids = @{}
 foreach ($item in @($catalog.h2Candidates)) {
@@ -116,7 +116,6 @@ foreach ($item in @($catalog.h2Candidates)) {
     Require (-not $h2Ids.ContainsKey($id)) "H2IdDuplicate:$id"
     Require (@($item.h1InventoryRefs).Count -gt 0) "H2H1RefMissing:$id"
     Require ((@($item.sizeVariantCodes) -join ",") -eq "Compact,Standard,Expanded") "H2SizeVariantsInvalid:$id"
-    Require (@($item.requiredEvidencePurposeCodes).Count -gt 0) "H2EvidenceGateMissing:$id"
     foreach ($h1Ref in @($item.h1InventoryRefs)) {
         Require ($h1Ids.ContainsKey([string] $h1Ref)) "H2H1RefUnknown:${id}:$h1Ref"
     }
@@ -152,7 +151,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- 재고 개정: ``$($catalog.revision)``")
 [void] $builder.AppendLine("- 원본 Prefab: ``1,762개``")
-[void] $builder.AppendLine("- H1 의미 재고: ``18개`` — 승인 참조 5개, 검토 후보 13개")
+[void] $builder.AppendLine("- H1 의미 재고: ``19개`` — 승인 참조 5개, 검토 후보 14개")
 [void] $builder.AppendLine("- H1 최소 A/B/C 표현 슬롯: ``54개``")
 [void] $builder.AppendLine("- 기준 경관 문법 후보 연결: ``${grammarCandidateLinks}개``")
 [void] $builder.AppendLine("- H2 블록 후보: ``10개 × 3 크기 = 30개 배치안``")
@@ -179,10 +178,10 @@ foreach ($item in @($catalog.h1Inventory)) {
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## H2 블록 후보")
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("| 후보 | 위상 | 포함 H1 | 승격에 필요한 현실 근거 |")
+[void] $builder.AppendLine("| 후보 | 위상 | 포함 H1 | 설계 상태 |")
 [void] $builder.AppendLine("| --- | --- | --- | --- |")
 foreach ($item in @($catalog.h2Candidates)) {
-    [void] $builder.AppendLine("| ``$($item.candidateId)`` $($item.title) | ``$($item.topologyCode)`` | $(Escape-Markdown (@($item.h1InventoryRefs) -join ', ')) | $(Escape-Markdown (@($item.requiredEvidencePurposeCodes) -join ', ')) |")
+    [void] $builder.AppendLine("| ``$($item.candidateId)`` $($item.title) | ``$($item.topologyCode)`` | $(Escape-Markdown (@($item.h1InventoryRefs) -join ', ')) | 위치 독립 설계 |")
 }
 
 [void] $builder.AppendLine()
@@ -206,11 +205,11 @@ $expected = ConvertTo-DeterministicText $builder.ToString()
 $resolvedOutput = Join-Path $repositoryRoot $OutputPath
 if ($Mode -eq "Write") {
     Write-DeterministicTextIfChanged $resolvedOutput $expected | Out-Null
-    Write-Output "SyntyBottomUpInventoryGenerated:H1=18;H2Candidates=10;H3Candidates=6;GrammarLinks=$grammarCandidateLinks"
+    Write-Output "SyntyBottomUpInventoryGenerated:H1=19;H2Candidates=10;H3Candidates=6;GrammarLinks=$grammarCandidateLinks"
 }
 else {
     Require (Test-Path -LiteralPath $resolvedOutput) "GeneratedDocumentMissing:$OutputPath"
     $actual = ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedOutput))
     Require ($actual -eq $expected) "GeneratedDocumentOutOfDate:$OutputPath"
-    Write-Output "SyntyBottomUpInventoryValid:H1=18;H2Candidates=10;H3Candidates=6;GrammarLinks=$grammarCandidateLinks"
+    Write-Output "SyntyBottomUpInventoryValid:H1=19;H2Candidates=10;H3Candidates=6;GrammarLinks=$grammarCandidateLinks"
 }

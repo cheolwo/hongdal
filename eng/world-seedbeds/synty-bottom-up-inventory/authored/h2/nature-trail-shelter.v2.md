@@ -9,10 +9,6 @@
 @optional-h1 h1-stock:nature-exploration-buffer
 @connector RoadAccess
 @connector TrailContinuation
-@evidence TerrainSlope
-@evidence LandCover
-@evidence TrailNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

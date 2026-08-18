@@ -9,9 +9,6 @@
 @connector HubInboundGate
 @connector StorageOutput
 @connector RejectOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

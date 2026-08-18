@@ -5,35 +5,37 @@
   "hierarchyLevelCode": "H4",
   "cardKindCode": "RegionalBlueprint",
   "title": "저층 생활·시장권",
-  "summary": "저층 생활권과 반품·회수 순환형 시장을 결합하는 위치 독립 지역 청사진이다.",
+  "summary": "저층 생활권과 순환형 시장, 오염 통제·주민 구호를 결합하는 위치 독립 Town AreaSet 청사진이다.",
   "knowledgeStateCode": "ExploratoryInventory",
   "originModeCode": "ExpressionExploration",
   "requiredH3Refs": [
     "h3-candidate:lowrise-market-town",
-    "h3-candidate:circular-market-town"
+    "h3-candidate:circular-market-town",
+    "h3-candidate:town-contamination-relief"
   ],
   "optionalH3Refs": [],
   "childKnowledgeRefs": [
     "h3-candidate:circular-market-town",
-    "h3-candidate:lowrise-market-town"
+    "h3-candidate:lowrise-market-town",
+    "h3-candidate:town-contamination-relief"
   ],
   "worldThemeCodes": [
     "LowriseLiving",
-    "CircularMarket"
+    "CircularMarket",
+    "TownSafety"
   ],
   "graphRelationRoleCodes": [
     "LivingToMarket",
-    "MarketReturnLoop"
-  ],
-  "requiredEvidencePurposeCodes": [
-    "BuildingPlacement",
-    "RoadNetwork",
-    "MarketContext"
+    "MarketReturnLoop",
+    "IncidentToRelief",
+    "ReliefToNature"
   ],
   "sourceGrammarRefs": [
     "city:공동주택 생활마당",
     "city:도심 마트 앞마당",
     "city:먹거리 상점 골목",
+    "city:상하차 Dock",
+    "city:화물 대기 야드",
     "network:타운도로 곡선",
     "network:타운도로 십자",
     "network:타운도로 직선",
@@ -44,13 +46,14 @@
     "town:읍내 상점 전면",
     "town:정원·담장 경계",
     "transition:Road–BuildingFront 전환",
-    "transition:Town–City 전환"
+    "transition:Town–City 전환",
+    "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.lowrise-market-region.r1",
-  "derivationInputHashSha256": "0efb22b7137f3c4205efff0e2b30ccdf5f386d3c346a4bbf0e59e52e5e79fab7",
+  "derivationInputHashSha256": "38f2545814c7c760a467118e617f653febfc131c0ce82acae44bcb66f168d8e8",
   "authoredDocument": "authored/h4/lowrise-market-region.v3.md",
   "unresolvedItems": [
-    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+    "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

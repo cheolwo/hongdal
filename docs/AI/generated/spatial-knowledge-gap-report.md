@@ -29,6 +29,7 @@
 | `H1` | `h1-stock:town-market-receiving` 마트 후방 입고 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:town-nature-relief` 생활권 자연권 지원 인계점 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
+| `H1` | `h1-stock:town-order-packing` 주문 포장 작업공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:town-recall-service` 생활권 회수·안내 창구 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:town-resident-pickup` 주민 수령 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | `IdeaInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
@@ -81,6 +82,7 @@
 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
 | `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
+| `H3` | `h3-candidate:town-contamination-relief` 생활권 오염 통제·구호 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |

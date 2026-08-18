@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:town-contamination-relief",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "생활권 오염 통제·구호 경관",
+  "summary": "시장 재고 오염을 점검·격리·정화하고 주민 회수 안내와 자연권 구호 물자 인계까지 이어지는 Town 생활 안전 경관이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:town-contamination-control",
+    "h2-candidate:town-recall-relief"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:market-life-commerce",
+    "h2-candidate:town-returns-waste"
+  ],
+  "connectorRoleCodes": [
+    "MarketIncidentInput",
+    "SafeMarketOutput",
+    "ResidentReturnLoop",
+    "NatureReliefHandoff",
+    "TownExternalGate"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/town-contamination-relief.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:town-contamination-relief"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

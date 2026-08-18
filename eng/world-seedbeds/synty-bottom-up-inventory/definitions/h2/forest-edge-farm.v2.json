@@ -19,11 +19,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "TerrainSlope",
-    "LandCover",
-    "BlockBoundary"
-  ],
   "authoredDocument": "authored/h2/forest-edge-farm.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:forest-edge-farm"

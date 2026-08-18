@@ -25,12 +25,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BuildingFootprint",
-    "BlockBoundary",
-    "WeatherContext"
-  ],
   "authoredDocument": "authored/h2/farm-incident-containment.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-incident-containment"

@@ -6,9 +6,9 @@
 | ---: | --- | --- | --- |
 | 1 | `H1` | `h1-expression:farm:헛간-작업마당` | 행동 H1과 능력·용량·연결구 검토 |
 | 2 | `H1` | `h1-expression:city:화물-대기-야드` | 행동 H1과 능력·용량·연결구 검토 |
-| 3 | `H1` | `h1-expression:city:상하차-dock` | 행동 H1과 능력·용량·연결구 검토 |
-| 4 | `H1` | `h1-expression:farm:농산물-집하-직판장` | 행동 H1과 능력·용량·연결구 검토 |
-| 5 | `H1` | `h1-expression:town:읍내-상점-전면` | 행동 H1과 능력·용량·연결구 검토 |
+| 3 | `H1` | `h1-expression:town:읍내-상점-전면` | 행동 H1과 능력·용량·연결구 검토 |
+| 4 | `H1` | `h1-expression:city:상하차-dock` | 행동 H1과 능력·용량·연결구 검토 |
+| 5 | `H1` | `h1-expression:farm:농산물-집하-직판장` | 행동 H1과 능력·용량·연결구 검토 |
 | 6 | `H1` | `h1-expression:nature:산길-바위-길목` | 행동 H1과 능력·용량·연결구 검토 |
 | 7 | `H1` | `h1-expression:nature:숲-가장자리` | 행동 H1과 능력·용량·연결구 검토 |
 | 8 | `H1` | `h1-expression:town:생활-공공광장` | 행동 H1과 능력·용량·연결구 검토 |
@@ -17,12 +17,12 @@
 | 11 | `H1` | `h1-expression:nature:숲-빈터-고사목` | 행동 H1과 능력·용량·연결구 검토 |
 | 12 | `H1` | `h1-expression:city:도심-마트-앞마당` | 행동 H1과 능력·용량·연결구 검토 |
 | 13 | `H1` | `h1-expression:town:버스-정류장-보행-쉼터` | 행동 H1과 능력·용량·연결구 검토 |
-| 14 | `H1` | `h1-expression:nature:고지대-노출지` | 행동 H1과 능력·용량·연결구 검토 |
-| 15 | `H1` | `h1-expression:nature:산-능선` | 행동 H1과 능력·용량·연결구 검토 |
-| 16 | `H1` | `h1-expression:nature:수변-완충지` | 행동 H1과 능력·용량·연결구 검토 |
-| 17 | `H1` | `h1-expression:town:정원-담장-경계` | 행동 H1과 능력·용량·연결구 검토 |
-| 18 | `H1` | `h1-expression:city:공동주택-생활마당` | 행동 H1과 능력·용량·연결구 검토 |
-| 19 | `H1` | `h1-expression:city:먹거리-상점-골목` | 행동 H1과 능력·용량·연결구 검토 |
+| 14 | `H1` | `h1-expression:city:먹거리-상점-골목` | 행동 H1과 능력·용량·연결구 검토 |
+| 15 | `H1` | `h1-expression:nature:고지대-노출지` | 행동 H1과 능력·용량·연결구 검토 |
+| 16 | `H1` | `h1-expression:nature:산-능선` | 행동 H1과 능력·용량·연결구 검토 |
+| 17 | `H1` | `h1-expression:nature:수변-완충지` | 행동 H1과 능력·용량·연결구 검토 |
+| 18 | `H1` | `h1-expression:town:정원-담장-경계` | 행동 H1과 능력·용량·연결구 검토 |
+| 19 | `H1` | `h1-expression:city:공동주택-생활마당` | 행동 H1과 능력·용량·연결구 검토 |
 | 20 | `H1` | `h1-expression:farm:감자밭-두렁` | 행동 H1과 능력·용량·연결구 검토 |
 | 21 | `H1` | `h1-expression:farm:혼합-작물밭` | 행동 H1과 능력·용량·연결구 검토 |
 | 22 | `H1` | `h1-expression:nature:초지-야생화` | 행동 H1과 능력·용량·연결구 검토 |
@@ -36,9 +36,9 @@
 | 30 | `H1` | `h1-expression:nature:혼효림-군집` | 행동 공간 H1 연결 |
 | 31 | `H1` | `h1-expression:nature:활엽수림-군집` | 행동 공간 H1 연결 |
 | 32 | `H1` | `h1-expression:town:저층-주택-블록` | 행동 공간 H1 연결 |
-| 33 | `H4` | `h4-blueprint:farm-hub-town-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
-| 34 | `H4` | `h4-blueprint:farm-production-processing-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
-| 35 | `H4` | `h4-blueprint:logistics-hub-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
-| 36 | `H4` | `h4-blueprint:lowrise-market-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
-| 37 | `H4` | `h4-blueprint:nature-home-exploration-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
-| 38 | `H4` | `h4-blueprint:nature-water-region` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |
+| 33 | `H4` | `h4-blueprint:farm-hub-town-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
+| 34 | `H4` | `h4-blueprint:farm-production-processing-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
+| 35 | `H4` | `h4-blueprint:logistics-hub-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
+| 36 | `H4` | `h4-blueprint:lowrise-market-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
+| 37 | `H4` | `h4-blueprint:nature-home-exploration-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
+| 38 | `H4` | `h4-blueprint:nature-water-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |

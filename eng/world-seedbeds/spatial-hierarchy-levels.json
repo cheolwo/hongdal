@@ -26,8 +26,8 @@
       "definitionSourceTypeCode": "ReservedDefinitionRoot",
       "definitionSourcePath": "eng/world-seedbeds/landscape-blocks",
       "expectedCurrentDefinitionCount": 0,
-      "currentInstancePolicyCode": "ReservedForE5",
-      "boundary": "실제 도로·경계가 만든 면에 승인된 H1 모판 인스턴스를 배치하는 E5 공간 파생 단위다. 현재 실제 정의를 꾸며내지 않는다."
+      "currentInstancePolicyCode": "DesignInventorySeparatedFromE5Instances",
+      "boundary": "여러 H1을 상대 위치·위상·내부 관계·외부 연결구로 묶는 위치 독립 블록 설계다. E5에서 특정 AreaSet에 배치할 수 있지만 공공데이터 결속은 E6 전까지 요구하지 않는다."
     },
     {
       "code": "H3",
@@ -39,7 +39,7 @@
       "ownerDefinitionPath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/area-set.json",
       "expectedCurrentDefinitionCount": 5,
       "currentInstancePolicyCode": "DefinedPartialAssemblyAllowed",
-      "boundary": "여러 Block과 Network·Node·Edge·외부 연결 지점을 묶는 독립 조립·부분 재생성·스트리밍 단위다. H3 분류 자체는 E5 완료를 뜻하지 않는다."
+      "boundary": "여러 H2와 Network·Node·Edge·외부 연결 지점을 묶는 위치 독립 경관 설계다. E5에서 실제 LandscapeGraph 인스턴스로 배치할 수 있으며 H3 분류 자체는 E5·E6 완료를 뜻하지 않는다."
     },
     {
       "code": "H4",
@@ -50,7 +50,7 @@
       "definitionSourcePath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/area-set.json",
       "expectedCurrentDefinitionCount": 1,
       "currentInstancePolicyCode": "DefinedPartialAssemblyAllowed",
-      "boundary": "여러 독립 LandscapeGraph와 GraphRelation을 묶는 지역 세계·시나리오 범위다. H4 분류 자체는 E5·E6·E7 완료를 뜻하지 않는다."
+      "boundary": "여러 H3와 관계를 묶는 위치 독립 지역 세계 청사진이다. 실제 AreaSet 인스턴스와 공공데이터 계보는 각각 E5·E6에서 별도로 결속하며 H4 분류 자체는 어느 E 단계 완료도 뜻하지 않는다."
     }
   ],
   "referenceAxes": [
@@ -78,7 +78,7 @@
       "code": "SyntyBottomUpInventory",
       "label": "Synty 상향식 공간 설계 재고",
       "catalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json",
-      "reason": "팩에서 출발해 축적한 H1 검토 후보·H2 블록 후보·H3 조립 후보이며, 사람 승인과 실제 공간 근거 전에는 공식 H 정의 수나 E 증거를 올리지 않는다."
+      "reason": "팩에서 출발해 축적한 H1~H4 위치 독립 설계 재고다. 사람의 설계 검토로 승인할 수 있지만 실제 AreaSet 배치와 공공데이터 계보는 각각 E5·E6에서 별도로 검증한다."
     }
   ],
   "grammarVocabulary": {

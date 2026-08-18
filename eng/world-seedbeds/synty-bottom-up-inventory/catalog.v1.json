@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-synty-bottom-up-inventory.v1",
-  "revision": "simulation-world-synty-bottom-up-inventory.r1",
+  "revision": "simulation-world-synty-bottom-up-inventory.r2",
   "title": "Synty 상향식 공간 설계 재고",
   "summary": "Nature·Farm·Town·City 팩에서 출발해 H1 실행 모판과 검토 후보, H2 블록 후보, H3 조립 후보를 미리 축적하되 실제 지역 공간 권위를 부여하지 않는 설계 재고다.",
   "landscapeGrammarManifestPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
@@ -144,6 +144,16 @@
       "grammarSetRefs": ["town:읍내 상점 전면", "city:먹거리 상점 골목"]
     },
     {
+      "inventoryId": "h1-stock:town-order-packing",
+      "title": "주문 포장 작업공간",
+      "groupCode": "TownMarket",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-ORDER-04"],
+      "spatialRoleCodes": ["OrderPackingArea"],
+      "grammarSetRefs": ["town:읍내 상점 전면", "city:먹거리 상점 골목"]
+    },
+    {
       "inventoryId": "h1-stock:town-resident-pickup",
       "title": "주민 수령 공간",
       "groupCode": "TownMarket",
@@ -195,16 +205,16 @@
     }
   ],
   "h2Candidates": [
-    { "candidateId": "h2-candidate:highland-production", "title": "고지대 생산 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:farm-production", "h1-stock:nature-farm-edge"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["TerrainSlope", "LandCover", "RoadNetwork", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:farm-processing-shipping", "title": "농장 작업·출하 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:farm-work-yard", "h1-stock:farm-maintenance-yard", "h1-stock:farm-loading-gate"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:forest-edge-farm", "title": "숲 경계 농장 블록", "topologyCode": "ContourAdaptive", "h1InventoryRefs": ["h1-stock:nature-farm-edge", "h1-stock:nature-exploration-buffer", "h1-stock:farm-production"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["TerrainSlope", "LandCover", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:hub-inbound-storage", "title": "Hub 입고·창고 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:hub-receiving-storage", "h1-stock:hub-service-maintenance"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:hub-outbound-vehicle", "title": "Hub 출고·차량 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:hub-outbound-staging", "h1-stock:hub-vehicle-yard", "h1-stock:hub-market-transfer"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:lowrise-residential", "title": "저층 주거 블록", "topologyCode": "Grid", "h1InventoryRefs": ["h1-stock:town-living-square", "h1-stock:town-resident-pickup"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:market-life-commerce", "title": "마트·생활상권 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:town-market-receiving", "h1-stock:town-market-display", "h1-stock:town-resident-pickup", "h1-stock:town-living-square"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:farm-hub-corridor", "title": "Farm–Hub 회랑 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:farm-loading-gate", "h1-stock:farm-hub-corridor"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:hub-town-corridor", "title": "Hub–Town 회랑 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:hub-market-transfer", "h1-stock:hub-town-corridor", "h1-stock:road-facility-access"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BlockBoundary"] },
-    { "candidateId": "h2-candidate:nature-water-buffer", "title": "산림·수변 완충 블록", "topologyCode": "Organic", "h1InventoryRefs": ["h1-stock:nature-exploration-buffer", "h1-stock:nature-farm-edge"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["TerrainSlope", "LandCover", "Hydrography", "BlockBoundary"] }
+    { "candidateId": "h2-candidate:highland-production", "title": "고지대 생산 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:farm-production", "h1-stock:nature-farm-edge"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:farm-processing-shipping", "title": "농장 작업·출하 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:farm-work-yard", "h1-stock:farm-maintenance-yard", "h1-stock:farm-loading-gate"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:forest-edge-farm", "title": "숲 경계 농장 블록", "topologyCode": "ContourAdaptive", "h1InventoryRefs": ["h1-stock:nature-farm-edge", "h1-stock:nature-exploration-buffer", "h1-stock:farm-production"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:hub-inbound-storage", "title": "Hub 입고·창고 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:hub-receiving-storage", "h1-stock:hub-service-maintenance"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:hub-outbound-vehicle", "title": "Hub 출고·차량 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:hub-outbound-staging", "h1-stock:hub-vehicle-yard", "h1-stock:hub-market-transfer"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:lowrise-residential", "title": "저층 주거 블록", "topologyCode": "Grid", "h1InventoryRefs": ["h1-stock:town-living-square", "h1-stock:town-resident-pickup"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:market-life-commerce", "title": "마트·생활상권 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:town-market-receiving", "h1-stock:town-market-display", "h1-stock:town-order-packing", "h1-stock:town-resident-pickup", "h1-stock:town-living-square"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:farm-hub-corridor", "title": "Farm–Hub 회랑 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:farm-loading-gate", "h1-stock:farm-hub-corridor"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:hub-town-corridor", "title": "Hub–Town 회랑 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:hub-market-transfer", "h1-stock:hub-town-corridor", "h1-stock:road-facility-access"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] },
+    { "candidateId": "h2-candidate:nature-water-buffer", "title": "산림·수변 완충 블록", "topologyCode": "Organic", "h1InventoryRefs": ["h1-stock:nature-exploration-buffer", "h1-stock:nature-farm-edge"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"] }
   ],
   "h3AssemblyCandidates": [
     { "candidateId": "h3-candidate:highland-farm", "title": "고지대 농장 경관", "topologyCode": "ContourAdaptive", "h2CandidateRefs": ["h2-candidate:highland-production", "h2-candidate:farm-processing-shipping", "h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["FarmExternalGate"] },

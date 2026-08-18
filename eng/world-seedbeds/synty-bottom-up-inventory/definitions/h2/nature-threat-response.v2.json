@@ -26,12 +26,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "TerrainSlope",
-    "LandCover",
-    "TrailNetwork",
-    "BlockBoundary"
-  ],
   "authoredDocument": "authored/h2/nature-threat-response.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:nature-threat-response"

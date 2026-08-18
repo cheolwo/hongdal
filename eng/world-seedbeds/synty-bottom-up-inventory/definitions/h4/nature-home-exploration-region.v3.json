@@ -32,12 +32,6 @@
     "NatureToTown",
     "NatureToCityHub"
   ],
-  "requiredEvidencePurposeCodes": [
-    "TerrainElevation",
-    "LandCoverClassification",
-    "Hydrography",
-    "RoadNetwork"
-  ],
   "sourceGrammarRefs": [
     "farm:감자밭 두렁",
     "farm:혼합 작물밭",
@@ -53,10 +47,10 @@
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.nature-home-exploration-region.r1",
-  "derivationInputHashSha256": "c066afb4a6b6c44233ea4b7507b82701337ebe77dfaa7ca50836316b322bd538",
+  "derivationInputHashSha256": "3d3adfe0b65e141d4cdb56a6140b75270917d257fd63e9958909fe3c660d8eb1",
   "authoredDocument": "authored/h4/nature-home-exploration-region.v3.md",
   "unresolvedItems": [
-    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+    "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

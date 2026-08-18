@@ -5,10 +5,6 @@
 @state ExploratoryInventory
 @required-h1 h1-stock:farm-production
 @required-h1 h1-stock:nature-farm-edge
-@evidence TerrainSlope
-@evidence LandCover
-@evidence RoadNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

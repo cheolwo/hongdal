@@ -11,10 +11,6 @@
 @connector ResidentInput
 @connector ReturnOutput
 @connector NatureReliefOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
-@evidence MarketContext
 
 ## 존재 이유
 

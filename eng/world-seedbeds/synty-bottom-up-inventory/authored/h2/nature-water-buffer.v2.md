@@ -5,10 +5,6 @@
 @state ExploratoryInventory
 @required-h1 h1-stock:nature-exploration-buffer
 @required-h1 h1-stock:nature-farm-edge
-@evidence TerrainSlope
-@evidence LandCover
-@evidence Hydrography
-@evidence BlockBoundary
 
 ## 존재 이유
 

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "simulation-world-landscape-block-candidate.v1",
   "candidateStableId": "landscape-block-candidate:sim:pyeongchang:daegwallyeong-harvest-day.v1",
-  "revision": 1,
+  "revision": 2,
   "title": "Farmhouse에서 감자밭과 작업마당을 거쳐 Farm Gate까지 걷는 하루",
-  "stateCode": "WaitingForRoadBoundaryEvidence",
+  "stateCode": "ReadyForAuthoredPlacementReview",
   "targetWalkDurationSeconds": 90,
   "tileRefs": [
     "kr5186:l2:700:1145"
@@ -38,36 +38,16 @@
       "worldInteractionIds": ["WI-LOG-01"]
     }
   ],
-  "evidenceInputs": [
-    {
-      "evidenceCode": "TerrainElevation",
-      "stateCode": "Available",
-      "manifestPath": "eng/public-spatial/manifests/kr5186-l2-700-1145.json"
-    },
-    {
-      "evidenceCode": "LandCoverAndPlacementMask",
-      "stateCode": "Available",
-      "manifestPath": "eng/public-spatial/manifests/kr5186-l2-700-1145.json"
-    },
-    {
-      "evidenceCode": "RoadNetworkAndJunction",
-      "stateCode": "WaitingForSource",
-      "manifestPath": ""
-    },
-    {
-      "evidenceCode": "BlockBoundary",
-      "stateCode": "WaitingForDerivation",
-      "manifestPath": ""
-    }
-  ],
   "promotionGate": {
     "targetResourceKindCode": "LandscapeBlock",
     "targetHierarchyLevelCode": "H2",
+    "targetEvidenceStageCode": "E5",
     "requiredStateCode": "ApprovedForE5",
-    "requiresDeterministicBoundaryHash": true,
+    "requiresDeterministicAuthoredBoundaryHash": true,
     "requiresConnectedWalkPath": true,
     "requiresSceneApplyApproval": true
   },
+  "publicDataLinkageStageCode": "E6",
   "presentationOnly": true,
   "isOperationalState": false
 }

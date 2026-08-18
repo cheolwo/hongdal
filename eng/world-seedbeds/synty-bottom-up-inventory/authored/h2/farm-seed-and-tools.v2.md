@@ -8,8 +8,6 @@
 @optional-h1 h1-stock:farm-worker-waiting
 @connector ProductionOutput
 @connector WorkerAccess
-@evidence RoadNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

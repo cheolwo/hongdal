@@ -10,6 +10,7 @@
   "requiredH1Refs": [
     "h1-stock:town-market-receiving",
     "h1-stock:town-market-display",
+    "h1-stock:town-order-packing",
     "h1-stock:town-resident-pickup",
     "h1-stock:town-living-square"
   ],
@@ -19,11 +20,6 @@
     "Compact",
     "Standard",
     "Expanded"
-  ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BuildingFootprint",
-    "BlockBoundary"
   ],
   "authoredDocument": "authored/h2/market-life-commerce.v2.md",
   "sourceReferences": [

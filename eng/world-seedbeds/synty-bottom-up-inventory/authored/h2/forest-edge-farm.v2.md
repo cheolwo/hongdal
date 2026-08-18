@@ -6,9 +6,6 @@
 @required-h1 h1-stock:nature-farm-edge
 @required-h1 h1-stock:nature-exploration-buffer
 @required-h1 h1-stock:farm-production
-@evidence TerrainSlope
-@evidence LandCover
-@evidence BlockBoundary
 
 ## 존재 이유
 

@@ -6,8 +6,6 @@
 @required-h1 h1-stock:hub-market-transfer
 @required-h1 h1-stock:hub-town-corridor
 @required-h1 h1-stock:road-facility-access
-@evidence RoadNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

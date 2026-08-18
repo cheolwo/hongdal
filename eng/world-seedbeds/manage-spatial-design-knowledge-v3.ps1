@@ -133,7 +133,6 @@ function New-H4Markdown([object] $Definition) {
     [void] $builder.AppendLine("@derivation-recipe $($Definition.derivationRecipeCode)")
     foreach ($reference in @($Definition.requiredH3Refs)) { [void] $builder.AppendLine("@required-h3 $reference") }
     foreach ($reference in @($Definition.optionalH3Refs)) { [void] $builder.AppendLine("@optional-h3 $reference") }
-    foreach ($purpose in @($Definition.requiredEvidencePurposeCodes)) { [void] $builder.AppendLine("@evidence-purpose $purpose") }
     [void] $builder.AppendLine()
     [void] $builder.AppendLine($Definition.summary)
     [void] $builder.AppendLine()
@@ -143,7 +142,7 @@ function New-H4Markdown([object] $Definition) {
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("## 권위 경계")
     [void] $builder.AppendLine()
-    [void] $builder.AppendLine("이 후보는 실제 AreaSet이 아니다. 지역 코드·좌표·DataRequirement·실제 LandscapeGraph StableId를 갖지 않으며 사람의 세계 의도와 현실 근거 승인 후에만 공식 H4 정의로 승격할 수 있다.")
+    [void] $builder.AppendLine("이 후보는 위치 독립 지역 세계 설계다. 지역 코드·좌표·공공데이터 요구·실제 LandscapeGraph StableId를 갖지 않으며, 하위 H3 구성과 관계를 사람이 검토한 뒤 설계 재고로 승인한다. 실제 AreaSet 배치와 공공데이터 연결은 각각 E5·E6에서 별도로 수행한다.")
     return ConvertTo-DeterministicText $builder.ToString()
 }
 
@@ -193,9 +192,9 @@ foreach ($level in @("H1", "H2", "H3")) {
         $definitionRefsByLevel[$level] += $reference
     }
 }
-Require (@($definitionRefsByLevel.H1).Count -eq 51) "InteractionH1CountMustBe51"
+Require (@($definitionRefsByLevel.H1).Count -eq 52) "InteractionH1CountMustBe52"
 Require (@($definitionRefsByLevel.H2).Count -eq 24) "H2CountMustBe24"
-Require (@($definitionRefsByLevel.H3).Count -eq 12) "H3CountMustBe12"
+Require (@($definitionRefsByLevel.H3).Count -eq 13) "H3CountMustBe13"
 
 $packPolicy = $recipes.h1ExpressionPolicy
 $packFamilies = @($packPolicy.sourceFamilyCodes)
@@ -238,7 +237,7 @@ foreach ($group in $expressionGroups) {
         cardKindCode = "PackExpression"
         title = "$setName — $(Get-PackLabel $family) 단독 표현"
         summary = "$setName 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다."
-        knowledgeStateCode = [string] $packPolicy.knowledgeStateCode
+        knowledgeStateCode = if ($supports.Count -eq 0) { [string] $packPolicy.unlinkedKnowledgeStateCode } else { [string] $packPolicy.knowledgeStateCode }
         originModeCode = [string] $packPolicy.originModeCode
         sourcePackCode = Get-PackLabel $family
         sourceGrammarSetRef = $sourceGrammarSetRef
@@ -275,7 +274,7 @@ foreach ($group in $expressionGroups) {
         derivationRecipeCode = "h1.pack-expression.$family.r1"
         derivationInputHashSha256 = Get-TextSha256 (ConvertTo-StableJson $input)
         authoredDocument = $documentPath
-        unresolvedItems = if ($supports.Count -eq 0) { @("연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.") } else { @("행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.") }
+        unresolvedItems = if ($supports.Count -eq 0) { @("연결된 행동 공간 H1과 게임 기획 묶음이 없어 IdeaInventory로 격리한다.") } else { @("행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.") }
         presentationOnly = $true
         isOperationalState = $false
     }
@@ -342,8 +341,8 @@ foreach ($recipe in $h2Recipes | Sort-Object targetKnowledgeRef) {
 $h3Bindings = @()
 $h3BindingById = @{}
 $h3Recipes = @($recipes.h3Derivations)
-Require ($h3Recipes.Count -eq 12) "H3RecipeCountMustBe12"
-Require (@($h3Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 12) "H3RecipeTargetDuplicate"
+Require ($h3Recipes.Count -eq 13) "H3RecipeCountMustBe13"
+Require (@($h3Recipes.targetKnowledgeRef | Sort-Object -Unique).Count -eq 13) "H3RecipeTargetDuplicate"
 foreach ($recipe in $h3Recipes | Sort-Object targetKnowledgeRef) {
     $targetId = [string] $recipe.targetKnowledgeRef
     Require ($definitionsById.ContainsKey($targetId)) "H3RecipeTargetUnknown:$targetId"
@@ -407,17 +406,16 @@ foreach ($blueprint in @($recipes.h4Blueprints | Sort-Object stableId)) {
         childKnowledgeRefs = $children
         worldThemeCodes = @($blueprint.worldThemeCodes)
         graphRelationRoleCodes = @($blueprint.graphRelationRoleCodes)
-        requiredEvidencePurposeCodes = @($blueprint.requiredEvidencePurposeCodes)
         sourceGrammarRefs = $sourceGrammar
         derivationRecipeCode = [string] $blueprint.recipeCode
         derivationInputHashSha256 = Get-TextSha256 (ConvertTo-StableJson $input)
         authoredDocument = $documentPath
-        unresolvedItems = @("사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다.")
+        unresolvedItems = @("하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다.")
         presentationOnly = $true
         isOperationalState = $false
     }
     $definitionJson = ConvertTo-StableJson $definition
-    Require (-not ($definitionJson -match '"(areaSetStableId|landscapeGraphStableId|dataRequirement|absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath)"')) "H4AuthorityFieldForbidden:$stableId"
+    Require (-not ($definitionJson -match '"(areaSetStableId|landscapeGraphStableId|dataRequirement|requiredEvidencePurposeCodes|absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath)"')) "H4AuthorityFieldForbidden:$stableId"
     $markdown = New-H4Markdown $definition
     Write-Or-Check (Join-Path $knowledgeRoot $definitionPath) $definitionJson "H4Definition"
     Write-Or-Check (Join-Path $knowledgeRoot $documentPath) $markdown "H4Document"
@@ -487,9 +485,9 @@ $catalogPayload = [pscustomobject][ordered]@{
     counts = [pscustomobject][ordered]@{
         grammarMeaningGroups = 52
         grammarVariants = 156
-        h1Interaction = 51
+        h1Interaction = 52
         h1Expression = 32
-        h1Total = 83
+        h1Total = 84
         h2 = 18
         h3 = 10
         h4Blueprint = 5
@@ -557,7 +555,7 @@ foreach ($item in $h4Definitions) {
 $h4Document = [Text.StringBuilder]::new()
 [void] $h4Document.AppendLine("# H4 지역 청사진 후보집")
 [void] $h4Document.AppendLine()
-[void] $h4Document.AppendLine("> 이 후보들은 실제 AreaSet이 아니며 실제 지역 코드·좌표·DataRequirement·LandscapeGraph StableId를 갖지 않는다.")
+[void] $h4Document.AppendLine("> 이 후보들은 위치 독립 설계 재고이며 실제 지역 코드·좌표·공공데이터 요구·LandscapeGraph StableId를 갖지 않는다. 실제 배치와 공공데이터 연결은 E5·E6에서 분리한다.")
 [void] $h4Document.AppendLine()
 foreach ($item in $h4Definitions | Sort-Object stableId) {
     [void] $h4Document.AppendLine("## $($item.title)")
@@ -567,7 +565,7 @@ foreach ($item in $h4Definitions | Sort-Object stableId) {
     $optionalH3 = @($item.optionalH3Refs) -join ', '
     if ([string]::IsNullOrWhiteSpace($optionalH3)) { $optionalH3 = "없음" }
     [void] $h4Document.AppendLine("- 선택 H3: $optionalH3")
-    [void] $h4Document.AppendLine("- 현실 자료 목적: $(@($item.requiredEvidencePurposeCodes) -join ', ')")
+    [void] $h4Document.AppendLine("- 설계 관계: $(@($item.graphRelationRoleCodes) -join ', ')")
     [void] $h4Document.AppendLine()
 }
 
@@ -597,7 +595,7 @@ foreach ($item in $expressionDefinitions | Sort-Object @{ Expression = { @($_.su
     $priority++
 }
 foreach ($item in $h4Definitions | Sort-Object stableId) {
-    [void] $promotion.AppendLine("| $priority | ``H4`` | ``$($item.stableId)`` | AreaSet 의도·지역 범위·DataRequirement·GraphRelation 승인 |")
+    [void] $promotion.AppendLine("| $priority | ``H4`` | ``$($item.stableId)`` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |")
     $priority++
 }
 
@@ -620,8 +618,8 @@ Require ($expressionFileCount -eq 32) "ExpressionDefinitionFileCount:$expression
 Require ($h4FileCount -eq 6) "H4DefinitionFileCount:$h4FileCount"
 
 if ($Mode -eq "Check") {
-    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=83(51+32);H2=24;H3=12;H4=6"
+    Write-Output "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=84(52+32);H2=24;H3=13;H4=6"
 }
 else {
-    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=83(51+32);H2=24;H3=12;H4=6"
+    Write-Output "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=84(52+32);H2=24;H3=13;H4=6"
 }

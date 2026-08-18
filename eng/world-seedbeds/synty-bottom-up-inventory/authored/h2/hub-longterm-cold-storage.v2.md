@@ -8,9 +8,6 @@
 @optional-h1 h1-stock:hub-temporary-staging
 @connector InboundStorage
 @connector PickingOutput
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

@@ -8,8 +8,8 @@ $candidate = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Js
 if ([string] $candidate.schemaVersion -ne "simulation-world-landscape-block-candidate.v1") {
     throw "LandscapeBlockCandidateSchemaInvalid"
 }
-if ([string] $candidate.stateCode -ne "WaitingForRoadBoundaryEvidence") {
-    throw "LandscapeBlockCandidateMustWaitForRoadBoundaryEvidence"
+if ([string] $candidate.stateCode -ne "ReadyForAuthoredPlacementReview") {
+    throw "LandscapeBlockCandidateMustBeReadyForAuthoredPlacementReview"
 }
 if ([int] $candidate.targetWalkDurationSeconds -ne 90) {
     throw "LandscapeBlockCandidateWalkDurationInvalid"
@@ -27,15 +27,12 @@ foreach ($required in @(
         throw "LandscapeBlockCandidateSeedbedMissing:$required"
     }
 }
-$road = @($candidate.evidenceInputs | Where-Object evidenceCode -eq "RoadNetworkAndJunction")
-$boundary = @($candidate.evidenceInputs | Where-Object evidenceCode -eq "BlockBoundary")
-if ($road.Count -ne 1 -or [string] $road[0].stateCode -ne "WaitingForSource") {
-    throw "LandscapeBlockCandidateRoadGateInvalid"
-}
-if ($boundary.Count -ne 1 -or [string] $boundary[0].stateCode -ne "WaitingForDerivation") {
-    throw "LandscapeBlockCandidateBoundaryGateInvalid"
+if (@($candidate.PSObject.Properties.Name) -contains "evidenceInputs") {
+    throw "LandscapeBlockCandidatePublicDataCouplingForbidden"
 }
 if (([string] $candidate.promotionGate.targetHierarchyLevelCode -ne "H2") -or
+    ([string] $candidate.promotionGate.targetEvidenceStageCode -ne "E5") -or
+    ([string] $candidate.publicDataLinkageStageCode -ne "E6") -or
     (-not [bool] $candidate.promotionGate.requiresSceneApplyApproval)) {
     throw "LandscapeBlockCandidatePromotionGateInvalid"
 }
@@ -43,4 +40,4 @@ if (-not [bool] $candidate.presentationOnly -or [bool] $candidate.isOperationalS
     throw "LandscapeBlockCandidateAuthorityBoundaryInvalid"
 }
 
-Write-Output "LandscapeBlockCandidateTestsPassed:WaitingForRoadBoundaryEvidence"
+Write-Output "LandscapeBlockCandidateTestsPassed:ReadyForAuthoredPlacementReview"

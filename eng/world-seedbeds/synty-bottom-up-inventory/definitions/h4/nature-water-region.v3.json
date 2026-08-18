@@ -25,11 +25,6 @@
     "NatureContinuity",
     "WaterLandTransition"
   ],
-  "requiredEvidencePurposeCodes": [
-    "TerrainElevation",
-    "LandCoverClassification",
-    "Hydrography"
-  ],
   "sourceGrammarRefs": [
     "farm:감자밭 두렁",
     "farm:혼합 작물밭",
@@ -43,10 +38,10 @@
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.nature-water-region.r1",
-  "derivationInputHashSha256": "0d92d347fe7655eec35d940a8d55f477547a219d289ec0413735a1a2da3a2c88",
+  "derivationInputHashSha256": "a47eac38b42b9f28681eae9b26ba98ce2ecf3249b97712ad690237db93147cde",
   "authoredDocument": "authored/h4/nature-water-region.v3.md",
   "unresolvedItems": [
-    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+    "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

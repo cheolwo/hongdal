@@ -3,7 +3,7 @@
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - 대장 개정: `simulation-world-interactions.r3`
-- 증거 단계 개정: `simulation-evidence-stages.r4`
+- 증거 단계 개정: `simulation-evidence-stages.r5`
 - 마지막 확인일: `2026-08-17`
 - 기본 구현 완료선: `E3 자동 시험 통과`
 - 실제 공간·공공데이터·Unity 통합 목표선: `E7 실제 플레이 폐루프`

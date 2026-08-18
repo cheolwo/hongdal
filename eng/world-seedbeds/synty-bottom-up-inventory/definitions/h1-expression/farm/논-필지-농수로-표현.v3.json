@@ -6,7 +6,7 @@
   "cardKindCode": "PackExpression",
   "title": "논 필지·농수로 표현 — Farm 단독 표현",
   "summary": "논 필지·농수로 표현 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "knowledgeStateCode": "IdeaInventory",
   "originModeCode": "ExpressionExploration",
   "sourcePackCode": "Farm",
   "sourceGrammarSetRef": "farm:논 필지·농수로 표현",
@@ -56,7 +56,7 @@
   "derivationRecipeCode": "h1.pack-expression.farm.r1",
   "derivationInputHashSha256": "5ad7e2de987612e7aee2553ff8b681a26dea80d5601e361332f8bb0a76715c81",
   "authoredDocument": "authored/h1-expression/farm/논-필지-농수로-표현.v3.md",
-  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "unresolvedItems": "연결된 행동 공간 H1과 게임 기획 묶음이 없어 IdeaInventory로 격리한다.",
   "presentationOnly": true,
   "isOperationalState": false
 }

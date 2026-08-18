@@ -24,11 +24,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BuildingFootprint",
-    "BlockBoundary"
-  ],
   "authoredDocument": "authored/h2/hub-returns-processing.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:hub-returns-processing"

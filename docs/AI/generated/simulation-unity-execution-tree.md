@@ -3,7 +3,7 @@
 > 이 문서는 `eng/execution-ledgers/simulation-unity.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - 원장 개정: `simulation-unity-incomplete-execution.r3`
-- 증거 단계 개정: `simulation-evidence-stages.r4`
+- 증거 단계 개정: `simulation-evidence-stages.r5`
 - 마지막 확인일: `2026-08-17`
 - 첫 실행축: `TRACK-DAEGWALLYEONG-L2-REAL-DATA`
 - 중심 타일: `kr5186:l2:700:1145`

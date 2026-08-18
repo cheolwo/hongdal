@@ -23,10 +23,6 @@
     "Standard",
     "Expanded"
   ],
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BlockBoundary"
-  ],
   "authoredDocument": "authored/h2/farm-seed-and-tools.v2.md",
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-seed-and-tools"

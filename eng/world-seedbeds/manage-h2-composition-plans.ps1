@@ -46,7 +46,7 @@ $recipes = Read-Json $recipePath
 
 Require ([string] $recipes.coordinateSpaceCode -eq "LocalMeters") "H2CompositionCoordinateSpaceMustBeLocalMeters"
 Require (-not ([string] $recipes.authorityBoundary -match "실제.*권위.*갖는다")) "H2CompositionAuthorityBoundaryInvalid"
-Require (@($recipes.recipes).Count -eq 4) "H2CompositionP1P2RecipeCountMustBe4"
+Require (@($recipes.recipes).Count -eq 6) "H2CompositionP1P2P3RecipeCountMustBe6"
 
 $h1ById = @{}
 foreach ($reference in @($catalog.h1DefinitionRefs)) { $h1ById[[string] $reference.stableId] = $reference }
@@ -63,7 +63,7 @@ foreach ($recipe in @($recipes.recipes | Sort-Object targetKnowledgeRef)) {
     $targetId = [string] $recipe.targetKnowledgeRef
     Require ($h2ById.ContainsKey($targetId)) "H2CompositionTargetUnknown:$targetId"
     Require ($priorityByCandidate.ContainsKey($targetId)) "H2CompositionPriorityUnknown:$targetId"
-    Require (@("P1", "P2") -contains [string] $recipe.priorityCode) "H2CompositionPriorityNotEnabled:$targetId"
+    Require (@("P1", "P2", "P3") -contains [string] $recipe.priorityCode) "H2CompositionPriorityNotEnabled:$targetId"
     Require ([string] $priorityByCandidate[$targetId].priorityCode -eq [string] $recipe.priorityCode) "H2CompositionPriorityMismatch:$targetId"
 
     $target = $h2ById[$targetId]
@@ -108,8 +108,7 @@ foreach ($recipe in @($recipes.recipes | Sort-Object targetKnowledgeRef)) {
         nodes = @($recipe.nodes)
         edges = @($recipe.edges)
         externalConnectors = @($recipe.externalConnectors)
-        requiredEvidencePurposeCodes = @($target.requiredEvidencePurposeCodes)
-        evidenceStateCode = "WaitingForRoadBoundaryEvidence"
+        designStateCode = "ReadyForPlanningReview"
         authorityStateCode = "DesignCandidateOnly"
         derivationInputHashSha256 = Get-TextSha256 (ConvertTo-StableJson $input)
     }
@@ -117,7 +116,7 @@ foreach ($recipe in @($recipes.recipes | Sort-Object targetKnowledgeRef)) {
 
 $output = [pscustomobject][ordered]@{
     schemaVersion = "simulation-world-h2-composition-plans.v1"
-    revision = "simulation-world-h2-composition-plans.r1"
+    revision = "simulation-world-h2-composition-plans.r2"
     sourceRecipeRevision = [string] $recipes.revision
     generatedPlanCount = $plans.Count
     plans = $plans
@@ -128,7 +127,7 @@ $output = [pscustomobject][ordered]@{
 $outputJson = ConvertTo-StableJson $output
 
 $builder = [Text.StringBuilder]::new()
-[void] $builder.AppendLine("# P1~P2 H2 조립안")
+[void] $builder.AppendLine("# P1~P3 H2 조립안")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("이 문서는 H1을 상대 위치·관계·연결구로 조립한 위치 독립 H2 설계안이다. 실제 도로·경계·AreaSet·경관 그래프 권위가 아니다.")
 foreach ($plan in $plans) {
@@ -138,7 +137,7 @@ foreach ($plan in $plans) {
     [void] $builder.AppendLine("- 후보: ``$($plan.targetKnowledgeRef)``")
     [void] $builder.AppendLine("- 위상: ``$($plan.topologyCode)``")
     [void] $builder.AppendLine("- 기준 크기: ``$($plan.referenceSizeMeters.width)m × $($plan.referenceSizeMeters.depth)m``")
-    [void] $builder.AppendLine("- 근거 상태: ``$($plan.evidenceStateCode)``")
+    [void] $builder.AppendLine("- 설계 상태: ``$($plan.designStateCode)``")
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("| H1 노드 | 로컬 X/Z | 회전 |")
     [void] $builder.AppendLine("| --- | ---: | ---: |")
@@ -151,12 +150,12 @@ $document = $builder.ToString().TrimEnd() + "`n"
 if ($Mode -eq "Write") {
     Write-TextIfChanged $outputPath $outputJson
     Write-TextIfChanged $documentPath $document
-    Write-Output "H2CompositionPlansGenerated:P1=2;P2=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
+    Write-Output "H2CompositionPlansGenerated:P1=2;P2=2;P3=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
 }
 else {
     Require (Test-Path -LiteralPath $outputPath) "H2CompositionOutputMissing"
     Require (Test-Path -LiteralPath $documentPath) "H2CompositionDocumentMissing"
     Require ((Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8) -ceq ($outputJson.TrimEnd() + "`n")) "H2CompositionOutputOutOfDate"
     Require ((Get-Content -LiteralPath $documentPath -Raw -Encoding UTF8) -ceq $document) "H2CompositionDocumentOutOfDate"
-    Write-Output "H2CompositionPlansValid:P1=2;P2=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
+    Write-Output "H2CompositionPlansValid:P1=2;P2=2;P3=2;Nodes=$(@($plans.nodes).Count);Edges=$(@($plans.edges).Count);Connectors=$(@($plans.externalConnectors).Count)"
 }

@@ -5,11 +5,9 @@
 @state ExploratoryInventory
 @required-h1 h1-stock:town-market-receiving
 @required-h1 h1-stock:town-market-display
+@required-h1 h1-stock:town-order-packing
 @required-h1 h1-stock:town-resident-pickup
 @required-h1 h1-stock:town-living-square
-@evidence RoadNetwork
-@evidence BuildingFootprint
-@evidence BlockBoundary
 
 ## 존재 이유
 

@@ -5,8 +5,6 @@
 @state ExploratoryInventory
 @required-h1 h1-stock:farm-loading-gate
 @required-h1 h1-stock:farm-hub-corridor
-@evidence RoadNetwork
-@evidence BlockBoundary
 
 ## 존재 이유
 

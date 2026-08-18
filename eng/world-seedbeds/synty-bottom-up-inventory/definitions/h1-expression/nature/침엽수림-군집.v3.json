@@ -6,7 +6,7 @@
   "cardKindCode": "PackExpression",
   "title": "침엽수림 군집 — Nature 단독 표현",
   "summary": "침엽수림 군집 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "knowledgeStateCode": "IdeaInventory",
   "originModeCode": "ExpressionExploration",
   "sourcePackCode": "Nature",
   "sourceGrammarSetRef": "nature:침엽수림 군집",
@@ -60,7 +60,7 @@
   "derivationRecipeCode": "h1.pack-expression.nature.r1",
   "derivationInputHashSha256": "6c46c589690a05d8cef4fa7b81286a8b0ba92ea4b8c1d70e5439f2987e6e0b15",
   "authoredDocument": "authored/h1-expression/nature/침엽수림-군집.v3.md",
-  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "unresolvedItems": "연결된 행동 공간 H1과 게임 기획 묶음이 없어 IdeaInventory로 격리한다.",
   "presentationOnly": true,
   "isOperationalState": false
 }

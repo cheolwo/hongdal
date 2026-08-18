@@ -20,7 +20,7 @@
 | `h2-candidate:hub-returns-processing` Hub 반품 처리 블록 | `ModifiedGrid` | h1-stock:hub-returns, h1-stock:hub-quarantine | h1-stock:hub-temporary-staging |
 | `h2-candidate:hub-town-corridor` Hub–Town 회랑 블록 | `Linear` | h1-stock:hub-market-transfer, h1-stock:hub-town-corridor, h1-stock:road-facility-access |  |
 | `h2-candidate:lowrise-residential` 저층 주거 블록 | `Grid` | h1-stock:town-living-square, h1-stock:town-resident-pickup |  |
-| `h2-candidate:market-life-commerce` 마트·생활상권 블록 | `ModifiedGrid` | h1-stock:town-market-receiving, h1-stock:town-market-display, h1-stock:town-resident-pickup, h1-stock:town-living-square |  |
+| `h2-candidate:market-life-commerce` 마트·생활상권 블록 | `ModifiedGrid` | h1-stock:town-market-receiving, h1-stock:town-market-display, h1-stock:town-order-packing, h1-stock:town-resident-pickup, h1-stock:town-living-square |  |
 | `h2-candidate:nature-restoration-recovery` 자연 복원·안전 회복 블록 | `Organic` | h1-stock:nature-restoration-site, h1-stock:nature-safe-recovery-camp | h1-stock:nature-exploration-buffer, h1-stock:nature-shelter |
 | `h2-candidate:nature-threat-response` 자연 위협 추적·대피 블록 | `ContourAdaptive` | h1-stock:nature-threat-watch, h1-stock:nature-incident-trace, h1-stock:nature-emergency-retreat | h1-stock:nature-lookout, h1-stock:nature-shelter |
 | `h2-candidate:nature-trail-shelter` 자연 탐색·대피 블록 | `ContourAdaptive` | h1-stock:nature-trailhead, h1-stock:nature-lookout, h1-stock:nature-shelter | h1-stock:nature-exploration-buffer |
@@ -45,3 +45,4 @@
 | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | `Organic` | h2-candidate:nature-threat-response, h2-candidate:nature-restoration-recovery | h2-candidate:nature-trail-shelter, h2-candidate:nature-water-buffer | SafeCoreAccess, FarmIncidentInput, TownReliefInput, CityHubReturn, RestoredTrailOutput |
 | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | `Organic` | h2-candidate:nature-trail-shelter, h2-candidate:nature-water-buffer | h2-candidate:forest-edge-farm | TownOrFarmAccess, TrailLoop, EmergencyExit |
 | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | `ModifiedGrid` | h2-candidate:hub-inbound-storage, h2-candidate:hub-quarantine-staging, h2-candidate:hub-longterm-cold-storage, h2-candidate:hub-outbound-vehicle | h2-candidate:hub-returns-processing | HubInboundGate, HubOutboundGate, ReturnGate |
+| `h3-candidate:town-contamination-relief` 생활권 오염 통제·구호 경관 | `ModifiedGrid` | h2-candidate:town-contamination-control, h2-candidate:town-recall-relief | h2-candidate:market-life-commerce, h2-candidate:town-returns-waste | MarketIncidentInput, SafeMarketOutput, ResidentReturnLoop, NatureReliefHandoff, TownExternalGate |

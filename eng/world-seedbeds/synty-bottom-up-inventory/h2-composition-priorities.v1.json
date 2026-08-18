@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-h2-composition-priorities.v1",
-  "revision": "simulation-world-h2-composition-priorities.r1",
+  "revision": "simulation-world-h2-composition-priorities.r2",
   "sourceCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
   "purpose": "아직 H2에서 사용하지 않는 사건 대응 H1을 공간 흐름으로 묶고, 상향식 경관 재고 확장 순서를 고정한다.",
   "selectionPolicy": {
@@ -11,8 +11,8 @@
     ],
     "exclusionRules": [
       "기존 H2가 같은 필수 H1 조합을 이미 수용하면 새 후보를 만들지 않는다.",
-      "실제 도로·경계·배치 근거 없이 공식 H2 정의로 승격하지 않는다.",
-      "후보가 부족한 현실 근거를 Scenario로 묵시적 대체하지 않는다."
+      "필수 H1·내부 관계·연결구·위상·크기 범위의 설계 검토 없이 공식 H2 정의로 승격하지 않는다.",
+      "위치 독립 H2 정의에 실제 지역 좌표나 공공데이터 요구·출처·계보를 넣지 않는다."
     ]
   },
   "priorityGroups": [
@@ -97,10 +97,10 @@
   "promotionGate": {
     "candidateStage": "설계 재고",
     "officialH2Requires": [
-      "실제 도로·경계로 결정된 Block 면",
-      "승인된 H1 인스턴스 배치",
-      "연결구와 다음 공간 경로의 폐루프",
-      "Graph revision·hash와 공간 근거 검토"
+      "승인된 H1 설계 참조",
+      "결정적인 상대 배치와 내부 관계",
+      "외부 연결구와 다음 H 설계로 이어지는 역할 폐루프",
+      "위상·크기 범위·금지 조합의 사람 검토"
     ],
     "automaticPromotionForbidden": true
   },
