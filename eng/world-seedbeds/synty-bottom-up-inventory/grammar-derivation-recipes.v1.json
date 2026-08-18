@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "simulation-world-spatial-grammar-derivation-recipes.v1",
+  "revision": "simulation-world-spatial-grammar-derivation-recipes.r1",
+  "grammarRevision": "pyeongchang-landscape-grammar.v1",
+  "h1ExpressionPolicy": {
+    "sourceFamilyCodes": ["nature", "farm", "town", "city"],
+    "expectedMeaningGroupCounts": {
+      "nature": 12,
+      "farm": 8,
+      "town": 6,
+      "city": 6
+    },
+    "cardKindCode": "PackExpression",
+    "knowledgeStateCode": "ExploratoryInventory",
+    "originModeCode": "ExpressionExploration"
+  },
+  "h2Derivations": [
+    { "targetKnowledgeRef": "h2-candidate:farm-hub-corridor", "recipeCode": "h2.farm-hub-corridor.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선", "network:농촌도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:farm-processing-shipping", "recipeCode": "h2.farm-processing-shipping.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:farm-seed-and-tools", "recipeCode": "h2.farm-seed-and-tools.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:farm-wash-sort-pack", "recipeCode": "h2.farm-wash-sort-pack.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:farm-worker-support", "recipeCode": "h2.farm-worker-support.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:forest-edge-farm", "recipeCode": "h2.forest-edge-farm.r1", "supplementalGrammarSetRefs": ["network:농촌도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:highland-production", "recipeCode": "h2.highland-production.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선", "network:농촌도로 T자", "network:농촌도로 십자"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-inbound-storage", "recipeCode": "h2.hub-inbound-storage.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선", "network:도시도로 T자", "network:도시도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-longterm-cold-storage", "recipeCode": "h2.hub-longterm-cold-storage.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-outbound-vehicle", "recipeCode": "h2.hub-outbound-vehicle.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선", "network:도시도로 T자", "network:도시도로 십자"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-quarantine-staging", "recipeCode": "h2.hub-quarantine-staging.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-returns-processing", "recipeCode": "h2.hub-returns-processing.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-town-corridor", "recipeCode": "h2.hub-town-corridor.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선", "network:타운도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:lowrise-residential", "recipeCode": "h2.lowrise-residential.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선", "network:타운도로 T자", "network:타운도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:market-life-commerce", "recipeCode": "h2.market-life-commerce.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선", "network:타운도로 T자", "network:타운도로 십자"] },
+    { "targetKnowledgeRef": "h2-candidate:nature-trail-shelter", "recipeCode": "h2.nature-trail-shelter.r1", "supplementalGrammarSetRefs": ["network:농촌도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:nature-water-buffer", "recipeCode": "h2.nature-water-buffer.r1", "supplementalGrammarSetRefs": ["network:농촌도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:town-returns-waste", "recipeCode": "h2.town-returns-waste.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] }
+  ],
+  "h3Derivations": [
+    { "targetKnowledgeRef": "h3-candidate:circular-market-town", "recipeCode": "h3.circular-market-town.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Town–City 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:farm-hub-logistics", "recipeCode": "h3.farm-hub-logistics.r1", "supplementalGrammarSetRefs": ["transition:Farm–Hub 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:farm-processing-campus", "recipeCode": "h3.farm-processing-campus.r1", "supplementalGrammarSetRefs": ["transition:Farm–Town 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:highland-farm", "recipeCode": "h3.highland-farm.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:hub-town-logistics", "recipeCode": "h3.hub-town-logistics.r1", "supplementalGrammarSetRefs": ["transition:Town–Hub 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:jinbu-hub", "recipeCode": "h3.jinbu-hub.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환", "transition:Road–BuildingFront 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:lowrise-market-town", "recipeCode": "h3.lowrise-market-town.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:nature-exploration-buffer", "recipeCode": "h3.nature-exploration-buffer.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환", "transition:Water–Land 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:nature-trail-network", "recipeCode": "h3.nature-trail-network.r1", "supplementalGrammarSetRefs": ["transition:Water–Land 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:resilient-logistics-hub", "recipeCode": "h3.resilient-logistics-hub.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환"] }
+  ],
+  "h4Blueprints": [
+    {
+      "stableId": "h4-blueprint:nature-water-region",
+      "title": "산림·수계 자연권",
+      "summary": "자연 탐색·완충과 탐색길·대피망을 결합하는 위치 독립 지역 청사진이다.",
+      "recipeCode": "h4.nature-water-region.r1",
+      "requiredH3Refs": ["h3-candidate:nature-exploration-buffer", "h3-candidate:nature-trail-network"],
+      "optionalH3Refs": [],
+      "worldThemeCodes": ["NatureExploration", "WaterBuffer"],
+      "graphRelationRoleCodes": ["NatureContinuity", "WaterLandTransition"],
+      "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "Hydrography"]
+    },
+    {
+      "stableId": "h4-blueprint:farm-production-processing-region",
+      "title": "농업 생산·후처리권",
+      "summary": "고지대 생산과 농산물 후처리를 결합하는 위치 독립 지역 청사진이다.",
+      "recipeCode": "h4.farm-production-processing-region.r1",
+      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus"],
+      "optionalH3Refs": [],
+      "worldThemeCodes": ["FarmProduction", "FarmProcessing"],
+      "graphRelationRoleCodes": ["ProductionToProcessing"],
+      "requiredEvidencePurposeCodes": ["TerrainElevation", "LandCoverClassification", "AgriculturalComposition", "RoadNetwork"]
+    },
+    {
+      "stableId": "h4-blueprint:logistics-hub-region",
+      "title": "물류 Hub권",
+      "summary": "입고·보관·출고와 품질 대응 물류 공간을 결합하는 위치 독립 지역 청사진이다.",
+      "recipeCode": "h4.logistics-hub-region.r1",
+      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub"],
+      "optionalH3Refs": [],
+      "worldThemeCodes": ["LogisticsHub", "StorageResilience"],
+      "graphRelationRoleCodes": ["InboundToStorage", "StorageToOutbound"],
+      "requiredEvidencePurposeCodes": ["BuildingPlacement", "RoadNetwork"]
+    },
+    {
+      "stableId": "h4-blueprint:lowrise-market-region",
+      "title": "저층 생활·시장권",
+      "summary": "저층 생활권과 반품·회수 순환형 시장을 결합하는 위치 독립 지역 청사진이다.",
+      "recipeCode": "h4.lowrise-market-region.r1",
+      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town"],
+      "optionalH3Refs": [],
+      "worldThemeCodes": ["LowriseLiving", "CircularMarket"],
+      "graphRelationRoleCodes": ["LivingToMarket", "MarketReturnLoop"],
+      "requiredEvidencePurposeCodes": ["BuildingPlacement", "RoadNetwork", "MarketContext"]
+    },
+    {
+      "stableId": "h4-blueprint:farm-hub-town-region",
+      "title": "Farm–Hub–Town 연결권",
+      "summary": "생산·물류·생활권을 두 회랑으로 잇는 위치 독립 지역 청사진이다.",
+      "recipeCode": "h4.farm-hub-town-region.r1",
+      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-hub-logistics", "h3-candidate:jinbu-hub", "h3-candidate:hub-town-logistics", "h3-candidate:lowrise-market-town"],
+      "optionalH3Refs": ["h3-candidate:farm-processing-campus", "h3-candidate:resilient-logistics-hub", "h3-candidate:circular-market-town"],
+      "worldThemeCodes": ["FarmHubTown", "RegionalSupplyChain"],
+      "graphRelationRoleCodes": ["FarmToHub", "HubToTown"],
+      "requiredEvidencePurposeCodes": ["AdministrativeBoundary", "TerrainElevation", "LandCoverClassification", "RoadNetwork"]
+    }
+  ],
+  "promotionPolicy": {
+    "requiresHumanReview": true,
+    "forbidsAutomaticAuthorityPromotion": true,
+    "forbidsScenarioFallback": true,
+    "h4BlueprintIsNotAreaSet": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

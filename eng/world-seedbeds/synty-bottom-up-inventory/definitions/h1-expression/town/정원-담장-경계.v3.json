@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:town:정원-담장-경계",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "정원·담장 경계 — Town 단독 표현",
+  "summary": "정원·담장 경계 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Town",
+  "sourceGrammarSetRef": "town:정원·담장 경계",
+  "sourceGrammarRefs": [
+    "town:정원·담장 경계:A",
+    "town:정원·담장 경계:B",
+    "town:정원·담장 경계:C"
+  ],
+  "grammarVariantRefs": [
+    "town:정원·담장 경계:A",
+    "town:정원·담장 경계:B",
+    "town:정원·담장 경계:C"
+  ],
+  "topologyCodes": "landmark",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 18.0,
+    "maximumWidthMeters": 18.0,
+    "minimumDepthMeters": 8.0,
+    "maximumDepthMeters": 8.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 15.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Residential",
+  "allowedRegionRoleCodes": "Town",
+  "edgeProfileCodes": "residential",
+  "connectorTypeCodes": "pedestrian",
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": false,
+  "repeatAllowed": false,
+  "renderCost": {
+    "minimumTriangleCount": 2257,
+    "maximumTriangleCount": 2624,
+    "maximumMaterialSlotCount": 4,
+    "maximumRendererCount": 4,
+    "maximumColliderCount": 3
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:town-waste"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.town.r1",
+  "derivationInputHashSha256": "fb95a8edeb05f1d531101e53d0601f59899cd9c7cb9150058001b0d9907a4bc8",
+  "authoredDocument": "authored/h1-expression/town/정원-담장-경계.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:hub-market-transfer",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "Hub–시장 화물 인계 공간",
+  "summary": "기존 상향식 재고 v1에서 이관한 Hub–시장 화물 인계 공간 설계 지식이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-MARKET-01",
+    "WI-MARKET-02"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "HubMarketTransferArea"
+  ],
+  "capabilityCodes": [],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [],
+  "sourcePackCodes": [
+    "City",
+    "Transition"
+  ],
+  "grammarSetRefs": [
+    "transition:Town–Hub 전환",
+    "city:물류 Station 진입부"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/hub-market-transfer.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:hub-market-transfer"
+  ],
+  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

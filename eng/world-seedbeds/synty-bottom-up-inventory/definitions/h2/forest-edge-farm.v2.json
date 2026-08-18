@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:forest-edge-farm",
+  "revision": 2,
+  "hierarchyLevelCode": "H2",
+  "title": "숲 경계 농장 블록",
+  "summary": "기존 상향식 재고 v1에서 이관한 숲 경계 농장 블록 조립 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ContourAdaptive",
+  "requiredH1Refs": [
+    "h1-stock:nature-farm-edge",
+    "h1-stock:nature-exploration-buffer",
+    "h1-stock:farm-production"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "TerrainSlope",
+    "LandCover",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/forest-edge-farm.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:forest-edge-farm"
+  ],
+  "unresolvedItems": [
+    "필수 H1 사이 연결구와 내부 도달 가능성을 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

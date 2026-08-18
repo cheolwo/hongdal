@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:hub-receiving-storage",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "Hub 입고·검수·보관 공간",
+  "summary": "기존 상향식 재고 v1에서 이관한 Hub 입고·검수·보관 공간 설계 지식이다.",
+  "knowledgeStateCode": "ApprovedReference",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": "wi-spatial-seedbed:hub-receiving-storage.v1",
+  "wiIds": [
+    "WI-LOG-04",
+    "WI-LOG-05",
+    "WI-001",
+    "WI-002"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "HubUnloadingArea",
+    "HubInspectionArea",
+    "HubStorageArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.CargoAccessible",
+    "Spatial.InspectionWorkArea",
+    "Spatial.LoadingWorkArea",
+    "Spatial.Storage",
+    "Spatial.UnloadingWorkArea",
+    "Spatial.WorkerAccessible"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [
+    "vehicle"
+  ],
+  "sourcePackCodes": [
+    "City"
+  ],
+  "grammarSetRefs": [
+    "city:물류 Station 진입부",
+    "city:상하차 Dock",
+    "city:화물 대기 야드"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/hub-receiving-storage.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:hub-receiving-storage"
+  ],
+  "unresolvedItems": null,
+  "presentationOnly": true,
+  "isOperationalState": false
+}

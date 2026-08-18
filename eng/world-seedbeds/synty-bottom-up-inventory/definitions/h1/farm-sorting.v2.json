@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-sorting",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농산물 선별 공간",
+  "summary": "세척 또는 집하된 농산물을 등급·상태별로 분류해 포장으로 넘기는 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "ProduceSorting",
+    "QualityGrading"
+  ],
+  "spatialRoleCodes": [
+    "FarmProduceSortingArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.SortingWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-washing",
+    "h1-stock:farm-harvest-staging"
+  ],
+  "successorH1Refs": [
+    "h1-stock:farm-work-yard"
+  ],
+  "connectorRoleCodes": [
+    "CargoInput",
+    "PackingHandoff"
+  ],
+  "sourcePackCodes": [
+    "Farm"
+  ],
+  "grammarSetRefs": [
+    "farm:농산물 집하·직판장",
+    "farm:헛간 작업마당"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-sorting.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-sorting"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

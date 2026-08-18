@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:nature:고지대-노출지",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "고지대 노출지 — Nature 단독 표현",
+  "summary": "고지대 노출지 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Nature",
+  "sourceGrammarSetRef": "nature:고지대 노출지",
+  "sourceGrammarRefs": [
+    "nature:고지대 노출지:A",
+    "nature:고지대 노출지:B",
+    "nature:고지대 노출지:C"
+  ],
+  "grammarVariantRefs": [
+    "nature:고지대 노출지:A",
+    "nature:고지대 노출지:B",
+    "nature:고지대 노출지:C"
+  ],
+  "topologyCodes": "landmark",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 24.0,
+    "maximumWidthMeters": 24.0,
+    "minimumDepthMeters": 16.0,
+    "maximumDepthMeters": 16.0
+  },
+  "slope": {
+    "minimumDegrees": 20.0,
+    "maximumDegrees": 90.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": [
+    "BareGround",
+    "Forest"
+  ],
+  "allowedRegionRoleCodes": [
+    "Farm",
+    "Region",
+    "Town"
+  ],
+  "edgeProfileCodes": "forest",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": false,
+  "repeatAllowed": false,
+  "renderCost": {
+    "minimumTriangleCount": 2129,
+    "maximumTriangleCount": 3103,
+    "maximumMaterialSlotCount": 7,
+    "maximumRendererCount": 5,
+    "maximumColliderCount": 4
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:nature-lookout"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.nature.r1",
+  "derivationInputHashSha256": "6731f8212ddedfff4a75d63f90c564c31fca643b367fe15afc05690def8a3e7d",
+  "authoredDocument": "authored/h1-expression/nature/고지대-노출지.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

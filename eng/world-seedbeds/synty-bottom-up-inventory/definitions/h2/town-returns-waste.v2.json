@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:town-returns-waste",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "생활권 반품·폐기물 블록",
+  "summary": "마트 반품과 폐기물 분류·차량 인계를 후방 서비스 동선으로 묶는 레시피다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "topologyCode": "Linear",
+  "requiredH1Refs": [
+    "h1-stock:town-returns",
+    "h1-stock:town-waste",
+    "h1-stock:road-facility-access"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:town-staff-rest"
+  ],
+  "connectorRoleCodes": [
+    "CustomerReturnInput",
+    "ServiceVehicleOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BuildingFootprint",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/town-returns-waste.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:town-returns-waste"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

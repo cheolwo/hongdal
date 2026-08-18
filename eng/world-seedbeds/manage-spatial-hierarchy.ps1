@@ -44,6 +44,12 @@ Require ([string] $catalog.axisCode -eq "H") "AxisCodeMustBeH"
 Require (($levels.code -join ",") -eq "H1,H2,H3,H4") "LevelOrderInvalid"
 Require ($levels.Count -eq 4) "LevelCountMustBeFour"
 Require (@($levels.code | Select-Object -Unique).Count -eq 4) "LevelCodeDuplicate"
+Require (($levels.label -join ",") -eq "작업공간 모판,블록 모판,경관 모판,지역 모판") "FamilyLabelOrderInvalid"
+
+$resourceInventoryPath = Resolve-RepositoryPath $repositoryRoot ([string] $catalog.resourceInventoryCatalogPath)
+$resourceInventory = Read-Json $resourceInventoryPath
+Require ([string] $resourceInventory.schemaVersion -eq "simulation-world-spatial-resource-inventory.v1") "ResourceInventorySchemaInvalid"
+Require (($resourceInventory.levels.levelCode -join ",") -eq "H1,H2,H3,H4") "ResourceInventoryLevelOrderInvalid"
 
 $expectedKinds = @("WiSpatialSeedbed", "LandscapeBlock", "LandscapeGraph", "AreaSet")
 Require (($levels.resourceKindCode -join ",") -eq ($expectedKinds -join ",")) "ResourceKindOrderInvalid"
@@ -128,7 +134,13 @@ foreach ($code in @("H1", "H2", "H3", "H4")) {
 Require ([string] $evidenceByCode.E6.completionGate -notmatch "H[1-4]") "E6MustNotBeHierarchyLevel"
 Require ([string] $evidenceByCode.E7.completionGate -notmatch "H[1-4]") "E7MustNotBeHierarchyLevel"
 
-Require (@($catalog.referenceAxes).Count -eq 4) "ReferenceAxisCountMustBeFour"
+Require (@($catalog.referenceAxes).Count -eq 5) "ReferenceAxisCountMustBeFive"
+$referenceAxisCodes = @($catalog.referenceAxes | ForEach-Object { [string] $_.code })
+Require-SameSet @("TileL0L2", "Area", "LandscapeCompletionArea", "ScenarioRoute", "SyntyBottomUpInventory") $referenceAxisCodes "ReferenceAxisCodesInvalid"
+$bottomUpInventoryAxis = @($catalog.referenceAxes | Where-Object code -eq "SyntyBottomUpInventory")
+Require ($bottomUpInventoryAxis.Count -eq 1) "SyntyBottomUpInventoryAxisMissing"
+$bottomUpInventoryCatalogPath = Resolve-RepositoryPath $repositoryRoot ([string] $bottomUpInventoryAxis[0].catalogPath)
+Require (Test-Path -LiteralPath $bottomUpInventoryCatalogPath) "SyntyBottomUpInventoryCatalogMissing"
 Require ([int] $catalog.grammarVocabulary.canonicalItemCount -eq 156) "GrammarVocabularyCountMustBe156"
 Require ([bool] $catalog.presentationOnly) "PresentationOnlyMustBeTrue"
 Require (-not [bool] $catalog.isOperationalState) "OperationalStateMustBeFalse"
@@ -141,6 +153,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- 계층 대장 개정: ``$($catalog.revision)``")
 [void] $builder.AppendLine("- 증거 단계 개정: ``$($evidence.revision)``")
 [void] $builder.AppendLine("- 축 구분: ``E``는 증거 깊이, ``H``는 공간 포함 깊이다.")
+[void] $builder.AppendLine("- 모판 계열: ``H1 작업공간 → H2 블록 → H3 경관 → H4 지역``으로 상향 조립하며 재고 상태는 별도 대장에서 관리한다.")
 [void] $builder.AppendLine("- 현재 정의 수: ``H1 $($counts.H1) / H2 $($counts.H2) / H3 $($counts.H3) / H4 $($counts.H4)``")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 포함 계층")
@@ -153,10 +166,10 @@ foreach ($level in $levels) {
 }
 [void] $builder.AppendLine()
 [void] $builder.AppendLine('```text')
-[void] $builder.AppendLine("H4 AreaSet")
-[void] $builder.AppendLine("└─ H3 LandscapeGraph")
-[void] $builder.AppendLine("   └─ H2 LandscapeBlock")
-[void] $builder.AppendLine("      └─ H1 WI 공간 모판 인스턴스")
+[void] $builder.AppendLine("H4 지역 모판 (AreaSet)")
+[void] $builder.AppendLine("└─ H3 경관 모판 (LandscapeGraph)")
+[void] $builder.AppendLine("   └─ H2 블록 모판 (LandscapeBlock)")
+[void] $builder.AppendLine("      └─ H1 작업공간 모판 (WI 공간 모판) 인스턴스")
 [void] $builder.AppendLine('```')
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("H 코드는 리소스 종류를 분류할 뿐 완료 상태를 올리지 않는다. 현재 H4 AreaSet과 H3 Graph가 존재해도 실제 H2 Block과 연결 폐루프가 없으므로 E5가 아니다.")

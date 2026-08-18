@@ -1,0 +1,542 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-catalog.v2",
+  "revision": "simulation-world-spatial-design-knowledge.r2",
+  "title": "Codex 공간 설계 지식 저장소",
+  "summary": "게임 플레이와 Synty 표현 가능성에서 출발한 H1·H2·H3 항목별 Markdown+JSON 공간 설계 지식이다.",
+  "legacyCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json",
+  "expansionSourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json",
+  "h1DefinitionRefs": [
+    {
+      "stableId": "h1-stock:farm-harvest-staging",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-harvest-staging.v2.json",
+      "definitionSha256": "991cb6275aecb37eb8a23626e6892766f2627b44496e1bc6f23472937887fc87",
+      "documentPath": "authored/h1/farm-harvest-staging.v2.md",
+      "documentSha256": "0a74fa76180888e0c34926936ddda427a74c60c3ee68843f3bcd1f96303dd041"
+    },
+    {
+      "stableId": "h1-stock:farm-hub-corridor",
+      "revision": 2,
+      "definitionPath": "definitions/h1/farm-hub-corridor.v2.json",
+      "definitionSha256": "8d7e1d04c5281fded4b40e365e7b231786f38949fe6d1ad19cdeffbf6a051880",
+      "documentPath": "authored/h1/farm-hub-corridor.v2.md",
+      "documentSha256": "84e7721bd6ed6d1984942af97e4e87f8dbfac33a9dd12654b6a2993bbe30b2ca"
+    },
+    {
+      "stableId": "h1-stock:farm-loading-gate",
+      "revision": 2,
+      "definitionPath": "definitions/h1/farm-loading-gate.v2.json",
+      "definitionSha256": "ae8261c84c6b3250c3bcc625ca6a05b5321667ddeb321eae0a150cbb07ed93e6",
+      "documentPath": "authored/h1/farm-loading-gate.v2.md",
+      "documentSha256": "dee81b8e110a2820b580e304538a358ea0d5868bab2a3cdd1381da6d72f39a0f"
+    },
+    {
+      "stableId": "h1-stock:farm-maintenance-yard",
+      "revision": 2,
+      "definitionPath": "definitions/h1/farm-maintenance-yard.v2.json",
+      "definitionSha256": "68a2193fc2b7141961bcdfaf2f21fcde529755aeff265fad61b2465035e5094b",
+      "documentPath": "authored/h1/farm-maintenance-yard.v2.md",
+      "documentSha256": "e147df835020959f7d31995c71c936766f98c8ec9b3bd5f15a50629b5b21f654"
+    },
+    {
+      "stableId": "h1-stock:farm-production",
+      "revision": 2,
+      "definitionPath": "definitions/h1/farm-production.v2.json",
+      "definitionSha256": "e02d835f921f717ab72fdaac5f5a67c83cceeffdf3df555f25d6db0a150b84d5",
+      "documentPath": "authored/h1/farm-production.v2.md",
+      "documentSha256": "9091acdffbf875cca841a5c557f1351d726a738e46ea31aa4705ca634ff9ef8a"
+    },
+    {
+      "stableId": "h1-stock:farm-seed-preparation",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-seed-preparation.v2.json",
+      "definitionSha256": "8b9d1a731f8cc243b56bbb1d9c81c37e8f1359427003dd8110c5ff004166fc2d",
+      "documentPath": "authored/h1/farm-seed-preparation.v2.md",
+      "documentSha256": "a9f67a208b90f4705fd695cf231d03faa2ab75ffc66d4a5d7297cdb75a13dc70"
+    },
+    {
+      "stableId": "h1-stock:farm-sorting",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-sorting.v2.json",
+      "definitionSha256": "4651bce2cd0aefb965a510578e2ed663657bcaff9b73616e084b8f78e8313dbc",
+      "documentPath": "authored/h1/farm-sorting.v2.md",
+      "documentSha256": "87fb79ed2c9dc03ce106a4e9397f0126e5007eb93f5f28025de4274ab74b36e3"
+    },
+    {
+      "stableId": "h1-stock:farm-tool-storage",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-tool-storage.v2.json",
+      "definitionSha256": "d1461678235a5ede8066a233b839534d4e1b41de6906e4881050572c3eb6d6de",
+      "documentPath": "authored/h1/farm-tool-storage.v2.md",
+      "documentSha256": "9d1a1a588bdbb082ecf6f03da3365fc7d5868603cdac78c184a6bfbae7771eac"
+    },
+    {
+      "stableId": "h1-stock:farm-washing",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-washing.v2.json",
+      "definitionSha256": "379d94985339cdb98427bf6bd32f5144dfba6069283794c84fc3303c4a230486",
+      "documentPath": "authored/h1/farm-washing.v2.md",
+      "documentSha256": "2240e6dcf4d6b724d0e629041947b2c8dbe9eaa79977807235704b0d4bd47028"
+    },
+    {
+      "stableId": "h1-stock:farm-work-yard",
+      "revision": 2,
+      "definitionPath": "definitions/h1/farm-work-yard.v2.json",
+      "definitionSha256": "b2cec2b010ed52221e95dccab2957ce051edc72dd6ab3c895b49f6791750022e",
+      "documentPath": "authored/h1/farm-work-yard.v2.md",
+      "documentSha256": "141d18bc2019a6280a58262128392ef4dd11abd63d48bbd0165b12400310eab9"
+    },
+    {
+      "stableId": "h1-stock:farm-worker-waiting",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
+      "definitionSha256": "726b76a248946581eb9ebeef143fc85a99c3bdf0f217d2f0aeea747c4d842345",
+      "documentPath": "authored/h1/farm-worker-waiting.v2.md",
+      "documentSha256": "67fb63f6950ceb648e34abc42469a3d31e679869f21b7b379eda495cd781f2f0"
+    },
+    {
+      "stableId": "h1-stock:hub-cold-storage",
+      "revision": 1,
+      "definitionPath": "definitions/h1/hub-cold-storage.v2.json",
+      "definitionSha256": "e2c3c3ae90a3459fc998adc0e44cfc6297d9ea0d2f2f145f52511c2132536fb6",
+      "documentPath": "authored/h1/hub-cold-storage.v2.md",
+      "documentSha256": "a9c21b376cc50d35a353596bc8f9cfc25fa25264963fbbdfca8ab6ca03ae1c28"
+    },
+    {
+      "stableId": "h1-stock:hub-long-term-storage",
+      "revision": 1,
+      "definitionPath": "definitions/h1/hub-long-term-storage.v2.json",
+      "definitionSha256": "54e669b45dc563ea9d4171b78d92d707b114db12a7f974e27ed1085093e6465b",
+      "documentPath": "authored/h1/hub-long-term-storage.v2.md",
+      "documentSha256": "84676d450a37717da419763ab2eaa938a48828695d023dbf3e16203020082f05"
+    },
+    {
+      "stableId": "h1-stock:hub-market-transfer",
+      "revision": 2,
+      "definitionPath": "definitions/h1/hub-market-transfer.v2.json",
+      "definitionSha256": "05b3d3a890eb01bda53e737d361708fd1aafa90c3b7ac13823c3247060d0d7db",
+      "documentPath": "authored/h1/hub-market-transfer.v2.md",
+      "documentSha256": "f4a2243749a3118baf15eb176876e84ae1d14b3cccf11a215c42aeb4e657d932"
+    },
+    {
+      "stableId": "h1-stock:hub-outbound-staging",
+      "revision": 2,
+      "definitionPath": "definitions/h1/hub-outbound-staging.v2.json",
+      "definitionSha256": "1f55a9f9e25f9023da72c24b39ee73417c624c7d306daee9080a6e460b492855",
+      "documentPath": "authored/h1/hub-outbound-staging.v2.md",
+      "documentSha256": "3d1b4b951a1aa2477c9a8cd4940230054779859ac49847d5fd086a589ee63752"
+    },
+    {
+      "stableId": "h1-stock:hub-quarantine",
+      "revision": 1,
+      "definitionPath": "definitions/h1/hub-quarantine.v2.json",
+      "definitionSha256": "a2a3ae2744e4de419f4417f14449a7bfab426333930c19cef04a5b665cb7e3be",
+      "documentPath": "authored/h1/hub-quarantine.v2.md",
+      "documentSha256": "215b20e8d3c74431ce27d4f07f2d95d414ce229932624974df291cf45b0676d0"
+    },
+    {
+      "stableId": "h1-stock:hub-receiving-storage",
+      "revision": 2,
+      "definitionPath": "definitions/h1/hub-receiving-storage.v2.json",
+      "definitionSha256": "9489147ecba91eea7bd76670edf198cc6f919833626439f13c8f32584243ace7",
+      "documentPath": "authored/h1/hub-receiving-storage.v2.md",
+      "documentSha256": "2300af448e1dc401a00e56c706b7af48f4cadd6316d20c9e83b22d4dd123b325"
+    },
+    {
+      "stableId": "h1-stock:hub-returns",
+      "revision": 1,
+      "definitionPath": "definitions/h1/hub-returns.v2.json",
+      "definitionSha256": "82d7f6ec831f842b2ec9f848b88f07cee02f31f25ed62faad59d11d60a99d16b",
+      "documentPath": "authored/h1/hub-returns.v2.md",
+      "documentSha256": "26dfac6018ecb2729f9667011e356b667cf6291f05e47662447da96affe4d506"
+    },
+    {
+      "stableId": "h1-stock:hub-service-maintenance",
+      "revision": 2,
+      "definitionPath": "definitions/h1/hub-service-maintenance.v2.json",
+      "definitionSha256": "96707d57b5e64e905b02b003f526a544a71fe4eb6df5edbe030e042d4a93d5e0",
+      "documentPath": "authored/h1/hub-service-maintenance.v2.md",
+      "documentSha256": "8ac1e532b076be648e6f414efc18d41c7ddd05751184602edc30ea83bfa07c43"
+    },
+    {
+      "stableId": "h1-stock:hub-temporary-staging",
+      "revision": 1,
+      "definitionPath": "definitions/h1/hub-temporary-staging.v2.json",
+      "definitionSha256": "9695688015ae7f8dd91257ad40698515c46a769ee1c6be6b1609a1ba17ba7ef5",
+      "documentPath": "authored/h1/hub-temporary-staging.v2.md",
+      "documentSha256": "888965c6a172dfba8aa4a0eb8c16b381fd028c80e63d1541cb7711d962a25316"
+    },
+    {
+      "stableId": "h1-stock:hub-town-corridor",
+      "revision": 2,
+      "definitionPath": "definitions/h1/hub-town-corridor.v2.json",
+      "definitionSha256": "09f5e45c66e3210c80e6ecff60ed546d61490c09db0b2a6110bee0de7614ac10",
+      "documentPath": "authored/h1/hub-town-corridor.v2.md",
+      "documentSha256": "e070f89c43ee9093f466c8e1c7224bf24ca61f42d66fa2882fa6b0b493fd7d70"
+    },
+    {
+      "stableId": "h1-stock:hub-vehicle-yard",
+      "revision": 2,
+      "definitionPath": "definitions/h1/hub-vehicle-yard.v2.json",
+      "definitionSha256": "42ad638b61b8761601bd163728adc3aa877943f4a5c7f3d826959c3b79f3b0fc",
+      "documentPath": "authored/h1/hub-vehicle-yard.v2.md",
+      "documentSha256": "b650712e08b8c12305edb51cfb599406a867ed7222debbb0bb043afb541d7ed8"
+    },
+    {
+      "stableId": "h1-stock:nature-exploration-buffer",
+      "revision": 2,
+      "definitionPath": "definitions/h1/nature-exploration-buffer.v2.json",
+      "definitionSha256": "4b71cb2fb01baab9dfe7b91ceeee84a1c93812301e8c6767592279f93dbe8a42",
+      "documentPath": "authored/h1/nature-exploration-buffer.v2.md",
+      "documentSha256": "ecbe9bd84b3cd88c34cb8f11fceb2d970ee1ad3c14429134ee5ff60c57ffddd5"
+    },
+    {
+      "stableId": "h1-stock:nature-farm-edge",
+      "revision": 2,
+      "definitionPath": "definitions/h1/nature-farm-edge.v2.json",
+      "definitionSha256": "7cd7796e6272fe9539a1f3593dedecefd19a48474dec415c4a475bd5a26463a4",
+      "documentPath": "authored/h1/nature-farm-edge.v2.md",
+      "documentSha256": "cec5a53c3e833b805fb4abd3ba263270123bbc5c07ab1cb17f5edb97d57d3df8"
+    },
+    {
+      "stableId": "h1-stock:nature-lookout",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-lookout.v2.json",
+      "definitionSha256": "7f3aa2306b91ee13f6f4832a789a1304ab7afc059cf25b2f2bafe329ddf4e6f9",
+      "documentPath": "authored/h1/nature-lookout.v2.md",
+      "documentSha256": "20ad3a63a62527ab1eab0508ef102fe6a46c7754be5bbcb87df53129b42ebb62"
+    },
+    {
+      "stableId": "h1-stock:nature-shelter",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-shelter.v2.json",
+      "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
+      "documentPath": "authored/h1/nature-shelter.v2.md",
+      "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+    },
+    {
+      "stableId": "h1-stock:nature-trailhead",
+      "revision": 1,
+      "definitionPath": "definitions/h1/nature-trailhead.v2.json",
+      "definitionSha256": "92fa147d40e5bec5cec7bee4dad77e70dd9d495c078290a425e17b3f74856729",
+      "documentPath": "authored/h1/nature-trailhead.v2.md",
+      "documentSha256": "211445bb8085c28aab2e6107f0f10f3d0494b8ff1b4c2c50721d68e330625f04"
+    },
+    {
+      "stableId": "h1-stock:road-facility-access",
+      "revision": 2,
+      "definitionPath": "definitions/h1/road-facility-access.v2.json",
+      "definitionSha256": "287148fdf76f4ca7aa9a6055b4eebf195f01b3243e9052fbdbd5d12937bed360",
+      "documentPath": "authored/h1/road-facility-access.v2.md",
+      "documentSha256": "4b00ddf4decc2bc36337373acf7575a48e4d32fdcad9860acbced234296c35cf"
+    },
+    {
+      "stableId": "h1-stock:town-living-square",
+      "revision": 2,
+      "definitionPath": "definitions/h1/town-living-square.v2.json",
+      "definitionSha256": "2a0a23b2897e23aa9fcc44aa34aff5b09678ed628ff452bf2c18111f1a1d35aa",
+      "documentPath": "authored/h1/town-living-square.v2.md",
+      "documentSha256": "21560e38e9b95d7a6b44fee3ed6d40193c05fe2a8e380d22f8c90dc12aa4ac60"
+    },
+    {
+      "stableId": "h1-stock:town-market-display",
+      "revision": 2,
+      "definitionPath": "definitions/h1/town-market-display.v2.json",
+      "definitionSha256": "546b2b335ac0f1e5336d4a939c803e74bab9c5eee55b99e45f313f9a7a04d056",
+      "documentPath": "authored/h1/town-market-display.v2.md",
+      "documentSha256": "dabf0c66f6dad9f47a89c7a41aa0ef580076dceb69493b7ecad6f7b56cc8d599"
+    },
+    {
+      "stableId": "h1-stock:town-market-receiving",
+      "revision": 2,
+      "definitionPath": "definitions/h1/town-market-receiving.v2.json",
+      "definitionSha256": "6cc81b71903c40e9b53c78573e68ecdbb4f5ab921aa07a503afa86d327bd4827",
+      "documentPath": "authored/h1/town-market-receiving.v2.md",
+      "documentSha256": "e66039d139b2f1d5310274b321d18ec4a044f399952ba6cdb6e9a912b89e12f7"
+    },
+    {
+      "stableId": "h1-stock:town-neighborhood-service",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-neighborhood-service.v2.json",
+      "definitionSha256": "49709361c8db8d5ac9daea1326eeb907a94c350fedc2a4cdda7e95a59c9b48d3",
+      "documentPath": "authored/h1/town-neighborhood-service.v2.md",
+      "documentSha256": "c4403f8964cf3e28124ef6aacce099fca21dd3deb44550b7b144655a3b8d352c"
+    },
+    {
+      "stableId": "h1-stock:town-resident-pickup",
+      "revision": 2,
+      "definitionPath": "definitions/h1/town-resident-pickup.v2.json",
+      "definitionSha256": "1ef4b3baf3e0b382ecde5559c27b4270ba8876c97549478522721ce74f13325d",
+      "documentPath": "authored/h1/town-resident-pickup.v2.md",
+      "documentSha256": "30682a6a3b15461d349cc735dc227056c83f1fe02b746836d1e26f5c5474246f"
+    },
+    {
+      "stableId": "h1-stock:town-returns",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-returns.v2.json",
+      "definitionSha256": "722b95e14b821fbd9ab074345cd5948fabf687253bbbf0335a367f8747e0a2f3",
+      "documentPath": "authored/h1/town-returns.v2.md",
+      "documentSha256": "4530ec9d7800cded54e3af77bc59148f43f3fea68413e6c18a5ba049fcc167bc"
+    },
+    {
+      "stableId": "h1-stock:town-staff-rest",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-staff-rest.v2.json",
+      "definitionSha256": "09ff52c162b147a91f5ad5a504457b032d997d7219315fa960e819f57c3f5cb5",
+      "documentPath": "authored/h1/town-staff-rest.v2.md",
+      "documentSha256": "fbc8016e5ff996b33a5a44b6afb813a339b1e22adae749a34bfc83874a8710a4"
+    },
+    {
+      "stableId": "h1-stock:town-waste",
+      "revision": 1,
+      "definitionPath": "definitions/h1/town-waste.v2.json",
+      "definitionSha256": "7d4c9d28e92a2c407392deff5376cebd574727e322d050eefc6c8e6c26ac718d",
+      "documentPath": "authored/h1/town-waste.v2.md",
+      "documentSha256": "2dd2523255caf91f9fd2ea84858957ffbb9413dbeb8a5c3eef7a50d17435a583"
+    }
+  ],
+  "h2DefinitionRefs": [
+    {
+      "stableId": "h2-candidate:farm-hub-corridor",
+      "revision": 2,
+      "definitionPath": "definitions/h2/farm-hub-corridor.v2.json",
+      "definitionSha256": "034bfe1b6ecb8d3445d02d185e5371c92232c263849e9cc4bb36ab5909c06256",
+      "documentPath": "authored/h2/farm-hub-corridor.v2.md",
+      "documentSha256": "4ee8d887b26852c13308f620da270f54c3ff3d2b9364e037deae3d560c366694"
+    },
+    {
+      "stableId": "h2-candidate:farm-processing-shipping",
+      "revision": 2,
+      "definitionPath": "definitions/h2/farm-processing-shipping.v2.json",
+      "definitionSha256": "bbfa34ebffad33e58d944afc1a4db0e7bc539db152709d9e95a5d9ac6263a487",
+      "documentPath": "authored/h2/farm-processing-shipping.v2.md",
+      "documentSha256": "0d86c1026520c971c729a0957bb1adab500cd763733d55beff78161147b9aec7"
+    },
+    {
+      "stableId": "h2-candidate:farm-seed-and-tools",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-seed-and-tools.v2.json",
+      "definitionSha256": "daba8d008423a21c1f61885e7935d5c671fadb24a4c616ca6d245e7c5e160016",
+      "documentPath": "authored/h2/farm-seed-and-tools.v2.md",
+      "documentSha256": "9ed4688d37cce691c4d250c1e6e31085dc13a68972de2deb96c1f4da92c03d43"
+    },
+    {
+      "stableId": "h2-candidate:farm-wash-sort-pack",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-wash-sort-pack.v2.json",
+      "definitionSha256": "18a262050b233e737c6319c56c8eb63a0dc9cf086f4a21c68272f0fa8d82450e",
+      "documentPath": "authored/h2/farm-wash-sort-pack.v2.md",
+      "documentSha256": "860efe307de6670e2d8e1955e054272f1185dfbae3b8a2c0f1af169c506256a3"
+    },
+    {
+      "stableId": "h2-candidate:farm-worker-support",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-worker-support.v2.json",
+      "definitionSha256": "d33021e3f05098d9004c98c4c8fe52f9424e4953821d578afba169082ad6eb0d",
+      "documentPath": "authored/h2/farm-worker-support.v2.md",
+      "documentSha256": "a5333e8cbab0a338a37f473c525e5ddaeafaee17a9f16ebb1567722be633e4c6"
+    },
+    {
+      "stableId": "h2-candidate:forest-edge-farm",
+      "revision": 2,
+      "definitionPath": "definitions/h2/forest-edge-farm.v2.json",
+      "definitionSha256": "5e53e95e3703c3a4c0aa356b7a70511f804d66e5cc3964ccdd787173e6036b4f",
+      "documentPath": "authored/h2/forest-edge-farm.v2.md",
+      "documentSha256": "e5afd1979befaee2ec8f1968ac68570d8ce37283f9ffa7785a900f059479b5bb"
+    },
+    {
+      "stableId": "h2-candidate:highland-production",
+      "revision": 2,
+      "definitionPath": "definitions/h2/highland-production.v2.json",
+      "definitionSha256": "36555eab01d1c35cce65f83d4329d9a9db137eaf6803ce43c5eb7869188a49ef",
+      "documentPath": "authored/h2/highland-production.v2.md",
+      "documentSha256": "331c14466a178694ee9229c75e013cd6eb879d3d40a0dc853472f1d34b35b68a"
+    },
+    {
+      "stableId": "h2-candidate:hub-inbound-storage",
+      "revision": 2,
+      "definitionPath": "definitions/h2/hub-inbound-storage.v2.json",
+      "definitionSha256": "3ca2848b729859f64ba5a02d8dc3c0967752dbc126d2f83983c4c75515806a04",
+      "documentPath": "authored/h2/hub-inbound-storage.v2.md",
+      "documentSha256": "f0346bf6171496089db6e1995c49eb562274b53b15cc7bb799fea8ffcd28ad8e"
+    },
+    {
+      "stableId": "h2-candidate:hub-longterm-cold-storage",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-longterm-cold-storage.v2.json",
+      "definitionSha256": "340383169fd64ca951d47294f1d9a3b2114c4957dd25964a848a738f3edd958f",
+      "documentPath": "authored/h2/hub-longterm-cold-storage.v2.md",
+      "documentSha256": "3ac0e4bf7e1a84706f452713ca121afa1022eb018d1eaba41791788e3ddd070f"
+    },
+    {
+      "stableId": "h2-candidate:hub-outbound-vehicle",
+      "revision": 2,
+      "definitionPath": "definitions/h2/hub-outbound-vehicle.v2.json",
+      "definitionSha256": "d445dc48e6161aaa239972a763f823e1fa7ddd93f5412ea2c2285b48a234b68d",
+      "documentPath": "authored/h2/hub-outbound-vehicle.v2.md",
+      "documentSha256": "3b0839599f0d9c85728e71098fd062c76499bedd2e12a5032f5c9ab3202374d3"
+    },
+    {
+      "stableId": "h2-candidate:hub-quarantine-staging",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-quarantine-staging.v2.json",
+      "definitionSha256": "70a47e3f7cdcaacf698a1f726adf33301308c73034111947f371fc7ccda58e55",
+      "documentPath": "authored/h2/hub-quarantine-staging.v2.md",
+      "documentSha256": "c772436a3c96bdf8a50fbb34183f1a01a55da5fd9347b9d6672c82317db42039"
+    },
+    {
+      "stableId": "h2-candidate:hub-returns-processing",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-returns-processing.v2.json",
+      "definitionSha256": "c0ff62145d0af82a6b8a0db47af3f4f6cb60c24f3d7783f936669942174322d2",
+      "documentPath": "authored/h2/hub-returns-processing.v2.md",
+      "documentSha256": "d950518f320f661dec501d6e9effa7237c24b927c973ceff63afa2a2c80ce236"
+    },
+    {
+      "stableId": "h2-candidate:hub-town-corridor",
+      "revision": 2,
+      "definitionPath": "definitions/h2/hub-town-corridor.v2.json",
+      "definitionSha256": "ae8182dc7999c5533dbd2289c178ed63c9be78514b4dde879a06e11f5f0e4147",
+      "documentPath": "authored/h2/hub-town-corridor.v2.md",
+      "documentSha256": "89f7a1979d65597916c45e3b0a5c76bc5e810f9ba738d31f9b058f5c079c8f64"
+    },
+    {
+      "stableId": "h2-candidate:lowrise-residential",
+      "revision": 2,
+      "definitionPath": "definitions/h2/lowrise-residential.v2.json",
+      "definitionSha256": "a00c37e9068f69f49c0dfe08d4f4203a1859931d7a09b702a344a180d354dfe8",
+      "documentPath": "authored/h2/lowrise-residential.v2.md",
+      "documentSha256": "d966c598bc3e859e853a0c2826aea710d838b9427d65e8746dd20f2c1318a1fa"
+    },
+    {
+      "stableId": "h2-candidate:market-life-commerce",
+      "revision": 2,
+      "definitionPath": "definitions/h2/market-life-commerce.v2.json",
+      "definitionSha256": "9101bf689e83271501a07758bea230aca987d1fdabda6d07077b0f323d50f5d3",
+      "documentPath": "authored/h2/market-life-commerce.v2.md",
+      "documentSha256": "29586e0817982c0744f39b87f0f3680792f804010f5e7dc9c844d262b8f7533f"
+    },
+    {
+      "stableId": "h2-candidate:nature-trail-shelter",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-trail-shelter.v2.json",
+      "definitionSha256": "25884136170ed9a37bffefaf336d7a80d9059954c1bbceb90c25cb2117e26ba0",
+      "documentPath": "authored/h2/nature-trail-shelter.v2.md",
+      "documentSha256": "a171f0a05aabc0c322187bdedb2e8ad2fafd0a73d1856ab7ff7a57a8ef9ac4a0"
+    },
+    {
+      "stableId": "h2-candidate:nature-water-buffer",
+      "revision": 2,
+      "definitionPath": "definitions/h2/nature-water-buffer.v2.json",
+      "definitionSha256": "7be3781399c5d6c64d01142535713ff9517568f6b1d9990d720a6e01701af57d",
+      "documentPath": "authored/h2/nature-water-buffer.v2.md",
+      "documentSha256": "49a616b46698cb567908e13ed76f9483d51d2b0edc500c3943b818aadea6f9a8"
+    },
+    {
+      "stableId": "h2-candidate:town-returns-waste",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-returns-waste.v2.json",
+      "definitionSha256": "11f95dc056c95bf32f8168c97593d6fe6e5b4f54831469f8521c423d794aea48",
+      "documentPath": "authored/h2/town-returns-waste.v2.md",
+      "documentSha256": "5f02a7cbccdd75110e6fb15a3a17b1d43a17449937290785869690ca41ea26ef"
+    }
+  ],
+  "h3DefinitionRefs": [
+    {
+      "stableId": "h3-candidate:circular-market-town",
+      "revision": 1,
+      "definitionPath": "definitions/h3/circular-market-town.v2.json",
+      "definitionSha256": "ccf3b3f3ab8575a469ed9ce603a688e392ef27a275091e5f029371da754eb9da",
+      "documentPath": "authored/h3/circular-market-town.v2.md",
+      "documentSha256": "d174d1b4ecb9f31ce96e77bf8735f62581b6e95160b6441860aca439e9699547"
+    },
+    {
+      "stableId": "h3-candidate:farm-hub-logistics",
+      "revision": 2,
+      "definitionPath": "definitions/h3/farm-hub-logistics.v2.json",
+      "definitionSha256": "3cfe0a551639b7a7d512e0bf2db9107aa7baebf5c7e76f75586fd167edfc8db3",
+      "documentPath": "authored/h3/farm-hub-logistics.v2.md",
+      "documentSha256": "d4a7a2fa3c9cac093795eb29902bb58d81c6db52fdc7f30ec5a3ee5190694336"
+    },
+    {
+      "stableId": "h3-candidate:farm-processing-campus",
+      "revision": 1,
+      "definitionPath": "definitions/h3/farm-processing-campus.v2.json",
+      "definitionSha256": "35760a6fdf106d7c084df32c3f23a084b00c23299f01538cf9a8bacc51637cc2",
+      "documentPath": "authored/h3/farm-processing-campus.v2.md",
+      "documentSha256": "22b5f000efbf232c97ef733f4644c5747adfef1df7b3974a8e0837b1d5d56f51"
+    },
+    {
+      "stableId": "h3-candidate:highland-farm",
+      "revision": 2,
+      "definitionPath": "definitions/h3/highland-farm.v2.json",
+      "definitionSha256": "94273055b82d53e5fcf77517cf87e1e300b2c30c32cb085a8a0065fcf98e1d38",
+      "documentPath": "authored/h3/highland-farm.v2.md",
+      "documentSha256": "8aac687bb2f92e91fb0238c2d218c5fe85b627b2fce606510b17e5a5a10b3f52"
+    },
+    {
+      "stableId": "h3-candidate:hub-town-logistics",
+      "revision": 2,
+      "definitionPath": "definitions/h3/hub-town-logistics.v2.json",
+      "definitionSha256": "acf2229d6a1b2173fbd72bcf430295f06b08970eef2af5446f7ec0db19f1c9c5",
+      "documentPath": "authored/h3/hub-town-logistics.v2.md",
+      "documentSha256": "310b1083150d99921a6e0d6bb98d69b4a79461a5599f4a2b32797e4bffc4f8df"
+    },
+    {
+      "stableId": "h3-candidate:jinbu-hub",
+      "revision": 2,
+      "definitionPath": "definitions/h3/jinbu-hub.v2.json",
+      "definitionSha256": "1288ac5dfec004b4a588a4c3548f8cf82fb8d473a45063d557ddfc4914af743c",
+      "documentPath": "authored/h3/jinbu-hub.v2.md",
+      "documentSha256": "ebcb852417fabc47223abb2a6271bf55f11f69e8963d54ebcc2c47133bc948d0"
+    },
+    {
+      "stableId": "h3-candidate:lowrise-market-town",
+      "revision": 2,
+      "definitionPath": "definitions/h3/lowrise-market-town.v2.json",
+      "definitionSha256": "31350f15d07e3b12df361e6256830893c39303b5f31f8293d158eb4a663b507b",
+      "documentPath": "authored/h3/lowrise-market-town.v2.md",
+      "documentSha256": "5b15eac2a0c8e6f430e257fbf1c87efd94ec9d622dee16688d90d2c13455e549"
+    },
+    {
+      "stableId": "h3-candidate:nature-exploration-buffer",
+      "revision": 2,
+      "definitionPath": "definitions/h3/nature-exploration-buffer.v2.json",
+      "definitionSha256": "523a71b49bba21f414c8a7a95b7521e55dbed09d3eb2e6e3366ca262e61d82ac",
+      "documentPath": "authored/h3/nature-exploration-buffer.v2.md",
+      "documentSha256": "d545a1d4e52f7e92ff5f37bc66b49be3c55caf1bf190bab78bb95a8977e5d1c7"
+    },
+    {
+      "stableId": "h3-candidate:nature-trail-network",
+      "revision": 1,
+      "definitionPath": "definitions/h3/nature-trail-network.v2.json",
+      "definitionSha256": "91bc4f181d7738adf46588fcd38140ea61b2daf196538b302adab85a1db4db9d",
+      "documentPath": "authored/h3/nature-trail-network.v2.md",
+      "documentSha256": "d8e2c061fd36e0ae74fa7f2784fd8186c8304e8f74e467a623afa702b832aac0"
+    },
+    {
+      "stableId": "h3-candidate:resilient-logistics-hub",
+      "revision": 1,
+      "definitionPath": "definitions/h3/resilient-logistics-hub.v2.json",
+      "definitionSha256": "67d47cd867e795ba4c7b05368a8225222ef190a9b24362fcef32add028903f58",
+      "documentPath": "authored/h3/resilient-logistics-hub.v2.md",
+      "documentSha256": "a1fda9308df181215b943d8f1d0580ee2b405b93e51cd1ca89227e26a19dca85"
+    }
+  ],
+  "stateCodes": [
+    "IdeaInventory",
+    "ExploratoryInventory",
+    "CandidateForReview",
+    "ApprovedReference"
+  ],
+  "promotionPolicy": {
+    "requiresHumanReview": true,
+    "requiresExactChildRevision": true,
+    "requiresDeterministicHash": true,
+    "forbidsAutomaticAuthorityPromotion": true,
+    "forbidsAbsoluteCoordinates": true,
+    "forbidsUnityAssetAuthority": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

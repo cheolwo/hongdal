@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:town-waste",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "생활권 폐기물 처리 공간",
+  "summary": "판매·반품·생활 활동에서 발생한 폐기물을 임시 집하하고 외부 처리로 인계하는 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "WasteSorting",
+    "WasteStorage",
+    "WasteCollection"
+  ],
+  "spatialRoleCodes": [
+    "TownWasteHandlingArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.TemporaryStorage",
+    "Spatial.ServiceVehicleAccessible"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:town-market-display",
+    "h1-stock:town-returns"
+  ],
+  "successorH1Refs": [
+    "h1-stock:road-facility-access"
+  ],
+  "connectorRoleCodes": [
+    "WasteInput",
+    "ServiceVehicleOutput"
+  ],
+  "sourcePackCodes": [
+    "Town",
+    "Transition"
+  ],
+  "grammarSetRefs": [
+    "transition:Road–BuildingFront 전환",
+    "town:정원·담장 경계"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/town-waste.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:town-waste"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

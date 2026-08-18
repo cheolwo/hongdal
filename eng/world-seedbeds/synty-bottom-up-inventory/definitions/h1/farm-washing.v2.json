@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-washing",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농산물 세척 공간",
+  "summary": "수확물의 흙과 이물질을 제거해 선별·포장으로 넘기는 습식 작업 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "ProduceWashing",
+    "WaterUse",
+    "WasteWaterHandling"
+  ],
+  "spatialRoleCodes": [
+    "FarmProduceWashingArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.CargoAccessible",
+    "Spatial.WaterAccessible",
+    "Spatial.WashingWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-harvest-staging"
+  ],
+  "successorH1Refs": [
+    "h1-stock:farm-sorting"
+  ],
+  "connectorRoleCodes": [
+    "CargoInput",
+    "WetProcessOutput"
+  ],
+  "sourcePackCodes": [
+    "Farm",
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "farm:헛간 작업마당",
+    "nature:수변 완충지"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-washing.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-washing"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

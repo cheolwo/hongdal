@@ -3,12 +3,13 @@
   "revision": "simulation-world-spatial-hierarchy.r1",
   "axisCode": "H",
   "title": "Simulation World 공간 포함 계층",
-  "summary": "E 증거 단계와 분리하여 WI 공간 모판부터 AreaSet까지의 포함 깊이만 분류한다.",
+  "summary": "E 증거 단계와 분리하여 H1 작업공간 모판부터 H4 지역 모판까지 상향 조립되는 공간 자원 종류와 포함 깊이를 분류한다.",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "resourceInventoryCatalogPath": "eng/world-seedbeds/spatial-resource-inventory/catalog.v1.json",
   "levels": [
     {
       "code": "H1",
-      "label": "WI 공간 모판",
+      "label": "작업공간 모판",
       "resourceKindCode": "WiSpatialSeedbed",
       "containsLevelCodes": [],
       "definitionSourceTypeCode": "SeedbedCatalog",
@@ -19,7 +20,7 @@
     },
     {
       "code": "H2",
-      "label": "LandscapeBlock",
+      "label": "블록 모판",
       "resourceKindCode": "LandscapeBlock",
       "containsLevelCodes": ["H1"],
       "definitionSourceTypeCode": "ReservedDefinitionRoot",
@@ -30,7 +31,7 @@
     },
     {
       "code": "H3",
-      "label": "LandscapeGraph",
+      "label": "경관 모판",
       "resourceKindCode": "LandscapeGraph",
       "containsLevelCodes": ["H2"],
       "definitionSourceTypeCode": "AreaSetLandscapeGraphDirectory",
@@ -42,7 +43,7 @@
     },
     {
       "code": "H4",
-      "label": "AreaSet",
+      "label": "지역 모판",
       "resourceKindCode": "AreaSet",
       "containsLevelCodes": ["H3"],
       "definitionSourceTypeCode": "AreaSetDefinition",
@@ -72,6 +73,12 @@
       "code": "ScenarioRoute",
       "label": "ScenarioRoute",
       "reason": "Graph와 AreaSet이 참조하는 이동 의미이며 포함 계층이 아니다."
+    },
+    {
+      "code": "SyntyBottomUpInventory",
+      "label": "Synty 상향식 공간 설계 재고",
+      "catalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json",
+      "reason": "팩에서 출발해 축적한 H1 검토 후보·H2 블록 후보·H3 조립 후보이며, 사람 승인과 실제 공간 근거 전에는 공식 H 정의 수나 E 증거를 올리지 않는다."
     }
   ],
   "grammarVocabulary": {

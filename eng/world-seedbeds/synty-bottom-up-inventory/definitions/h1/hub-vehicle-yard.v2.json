@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:hub-vehicle-yard",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "Hub 차량 상차·대기 공간",
+  "summary": "기존 상향식 재고 v1에서 이관한 Hub 차량 상차·대기 공간 설계 지식이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-HUB-06",
+    "WI-MARKET-01"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "HubVehicleLoadingArea",
+    "HubVehicleWaitingArea"
+  ],
+  "capabilityCodes": [],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [],
+  "sourcePackCodes": [
+    "City"
+  ],
+  "grammarSetRefs": [
+    "city:상하차 Dock",
+    "city:화물 대기 야드"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/hub-vehicle-yard.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:hub-vehicle-yard"
+  ],
+  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

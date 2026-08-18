@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:hub-quarantine-staging",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "Hub 검역·격리 블록",
+  "summary": "입고 검수와 격리, 임시 적치를 일반 보관 흐름과 분리하는 품질 관리 레시피다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:hub-receiving-storage",
+    "h1-stock:hub-quarantine",
+    "h1-stock:hub-temporary-staging"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [
+    "HubInboundGate",
+    "StorageOutput",
+    "RejectOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BuildingFootprint",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/hub-quarantine-staging.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:hub-quarantine-staging"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

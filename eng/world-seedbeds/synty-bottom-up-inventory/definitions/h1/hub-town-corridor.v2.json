@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:hub-town-corridor",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "Hub–Town 물류 회랑",
+  "summary": "기존 상향식 재고 v1에서 이관한 Hub–Town 물류 회랑 설계 지식이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-MARKET-01"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "HubTownCargoCorridor"
+  ],
+  "capabilityCodes": [],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [],
+  "sourcePackCodes": [
+    "Network",
+    "Transition"
+  ],
+  "grammarSetRefs": [
+    "network:타운도로 직선",
+    "transition:Town–Hub 전환"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/hub-town-corridor.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:hub-town-corridor"
+  ],
+  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

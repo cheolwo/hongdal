@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-priorities.v1",
+  "revision": "simulation-world-interaction-spatial-priorities.r1",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r3",
+  "spatialParticipationCodes": [
+    "Required",
+    "Contextual",
+    "NotRequired"
+  ],
+  "notRequiredWiIds": [
+    "WI-ORDER-01",
+    "WI-ORDER-02",
+    "WI-WORLD-02",
+    "WI-WORLD-03",
+    "WI-WORLD-06",
+    "WI-WORLD-08"
+  ],
+  "contextualWiIds": [
+    "WI-HUB-03",
+    "WI-ORDER-07",
+    "WI-WORLD-01",
+    "WI-WORLD-05",
+    "WI-WORLD-07"
+  ],
+  "priorityGroups": [
+    {
+      "priorityCode": "P1",
+      "title": "기준 플레이 수확·출하 공간",
+      "wiIds": [
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-LOG-01"
+      ]
+    },
+    {
+      "priorityCode": "P2",
+      "title": "Hub 입고·검수·보관 공간",
+      "wiIds": [
+        "WI-LOG-04",
+        "WI-LOG-05",
+        "WI-001",
+        "WI-002"
+      ]
+    },
+    {
+      "priorityCode": "P3",
+      "title": "Hub 출고·마트 공간",
+      "wiIds": [
+        "WI-HUB-03",
+        "WI-HUB-04",
+        "WI-HUB-05",
+        "WI-HUB-06",
+        "WI-MARKET-01",
+        "WI-MARKET-02",
+        "WI-MARKET-03",
+        "WI-MARKET-04",
+        "WI-MARKET-05"
+      ]
+    }
+  ],
+  "defaultPriorityCode": "P4",
+  "policy": {
+    "requiredWithoutH1DesignIsBlocked": true,
+    "contextualWithoutH1DesignNeedsReview": true,
+    "notRequiredDoesNotReceiveSyntheticH": true,
+    "candidateLineageDoesNotRaiseEvidenceStage": true,
+    "graphBindingDoesNotReplaceApprovedH1": true,
+    "e5RequiresActualH2Definition": true,
+    "forbidsScenarioFallbackForGraphRequest": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

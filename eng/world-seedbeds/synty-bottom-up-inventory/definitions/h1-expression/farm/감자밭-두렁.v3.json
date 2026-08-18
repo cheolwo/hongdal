@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:farm:감자밭-두렁",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "감자밭 두렁 — Farm 단독 표현",
+  "summary": "감자밭 두렁 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Farm",
+  "sourceGrammarSetRef": "farm:감자밭 두렁",
+  "sourceGrammarRefs": [
+    "farm:감자밭 두렁:A",
+    "farm:감자밭 두렁:B",
+    "farm:감자밭 두렁:C"
+  ],
+  "grammarVariantRefs": [
+    "farm:감자밭 두렁:A",
+    "farm:감자밭 두렁:B",
+    "farm:감자밭 두렁:C"
+  ],
+  "topologyCodes": "area",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 14.0,
+    "maximumWidthMeters": 14.0,
+    "minimumDepthMeters": 12.0,
+    "maximumDepthMeters": 12.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 18.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Cropland",
+  "allowedRegionRoleCodes": "Farm",
+  "edgeProfileCodes": "field",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 752,
+    "maximumTriangleCount": 1834,
+    "maximumMaterialSlotCount": 5,
+    "maximumRendererCount": 5,
+    "maximumColliderCount": 6
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:farm-production"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.farm.r1",
+  "derivationInputHashSha256": "613d369dbf490c06df99edf8eb550c09597df4c73fbd40a2e7bb705e28aafaef",
+  "authoredDocument": "authored/h1-expression/farm/감자밭-두렁.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:nature:바위-절개지",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "바위 절개지 — Nature 단독 표현",
+  "summary": "바위 절개지 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Nature",
+  "sourceGrammarSetRef": "nature:바위 절개지",
+  "sourceGrammarRefs": [
+    "nature:바위 절개지:A",
+    "nature:바위 절개지:B",
+    "nature:바위 절개지:C"
+  ],
+  "grammarVariantRefs": [
+    "nature:바위 절개지:A",
+    "nature:바위 절개지:B",
+    "nature:바위 절개지:C"
+  ],
+  "topologyCodes": "detail",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 10.0,
+    "maximumWidthMeters": 10.0,
+    "minimumDepthMeters": 5.0,
+    "maximumDepthMeters": 5.0
+  },
+  "slope": {
+    "minimumDegrees": 15.0,
+    "maximumDegrees": 70.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "BareGround",
+  "allowedRegionRoleCodes": [
+    "Farm",
+    "Region",
+    "Town"
+  ],
+  "edgeProfileCodes": "forest",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 2978,
+    "maximumTriangleCount": 3634,
+    "maximumMaterialSlotCount": 7,
+    "maximumRendererCount": 5,
+    "maximumColliderCount": 4
+  },
+  "supportsInteractionH1Refs": [],
+  "derivationRecipeCode": "h1.pack-expression.nature.r1",
+  "derivationInputHashSha256": "32cc95050b8267e48ad5ba637082df51c681d9b0596ba3ad2ada54bfea3cdb90",
+  "authoredDocument": "authored/h1-expression/nature/바위-절개지.v3.md",
+  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

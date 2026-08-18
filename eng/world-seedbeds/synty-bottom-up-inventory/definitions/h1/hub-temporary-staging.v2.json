@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:hub-temporary-staging",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "Hub 임시 적치 공간",
+  "summary": "입고·피킹·출고 사이에서 화물을 짧게 대기시키는 공유 적치 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-001",
+    "WI-HUB-04",
+    "WI-HUB-05"
+  ],
+  "anticipatedGameplayCodes": [
+    "InboundStaging",
+    "OutboundStaging"
+  ],
+  "spatialRoleCodes": [
+    "HubTemporaryStagingArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.CargoAccessible",
+    "Spatial.WorkerAccessible",
+    "Spatial.TemporaryStorage"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:hub-receiving-storage"
+  ],
+  "successorH1Refs": [
+    "h1-stock:hub-outbound-staging",
+    "h1-stock:hub-long-term-storage"
+  ],
+  "connectorRoleCodes": [
+    "InboundHandoff",
+    "StorageHandoff",
+    "OutboundHandoff"
+  ],
+  "sourcePackCodes": [
+    "City"
+  ],
+  "grammarSetRefs": [
+    "city:화물 대기 야드",
+    "city:상하차 Dock"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/hub-temporary-staging.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:hub-temporary-staging"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

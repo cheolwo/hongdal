@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:town-staff-rest",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "생활권 직원 휴게 공간",
+  "summary": "마트·생활시설 작업자의 교대와 회복을 수용하는 작은 비업무 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "ExpressionExploration",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-WORLD-07"
+  ],
+  "anticipatedGameplayCodes": [
+    "WorkerRest",
+    "ShiftChange"
+  ],
+  "spatialRoleCodes": [
+    "TownStaffRestArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.RestArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:town-market-receiving"
+  ],
+  "successorH1Refs": [
+    "h1-stock:town-market-display"
+  ],
+  "connectorRoleCodes": [
+    "WorkerAccess"
+  ],
+  "sourcePackCodes": [
+    "City",
+    "Town"
+  ],
+  "grammarSetRefs": [
+    "town:생활 공공광장",
+    "city:공동주택 생활마당"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/town-staff-rest.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:town-staff-rest"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

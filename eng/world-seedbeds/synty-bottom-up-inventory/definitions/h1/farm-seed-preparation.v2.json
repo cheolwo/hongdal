@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-seed-preparation",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "종자 준비 공간",
+  "summary": "파종 전에 종자와 소모품을 확인하고 작업 단위로 준비하는 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-FARM-02"
+  ],
+  "anticipatedGameplayCodes": [
+    "SeedInspection",
+    "SeedBatchPreparation"
+  ],
+  "spatialRoleCodes": [
+    "FarmSeedPreparationArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.MaterialPreparationArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:farm-tool-storage"
+  ],
+  "successorH1Refs": [
+    "h1-stock:farm-production"
+  ],
+  "connectorRoleCodes": [
+    "MaterialHandoff",
+    "WorkerAccess"
+  ],
+  "sourcePackCodes": [
+    "Farm"
+  ],
+  "grammarSetRefs": [
+    "farm:헛간 작업마당",
+    "farm:시설하우스 단동"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-seed-preparation.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-seed-preparation"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-trailhead",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연 탐색 출발지",
+  "summary": "산길·숲 탐색을 시작하고 안전 상태와 경로를 확인하는 진입 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-WORLD-05",
+    "WI-WORLD-07"
+  ],
+  "anticipatedGameplayCodes": [
+    "TrailStart",
+    "RouteCheck",
+    "ExplorationBriefing"
+  ],
+  "spatialRoleCodes": [
+    "NatureTrailheadArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.WorkerAccessible",
+    "Spatial.InformationArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:road-facility-access"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-lookout",
+    "h1-stock:nature-shelter"
+  ],
+  "connectorRoleCodes": [
+    "RoadAccess",
+    "TrailOutput"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:산길·바위 길목",
+    "nature:숲 가장자리"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-trailhead.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-trailhead"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

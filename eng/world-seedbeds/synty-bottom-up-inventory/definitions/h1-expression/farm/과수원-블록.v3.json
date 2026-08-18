@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:farm:과수원-블록",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "과수원 블록 — Farm 단독 표현",
+  "summary": "과수원 블록 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Farm",
+  "sourceGrammarSetRef": "farm:과수원 블록",
+  "sourceGrammarRefs": [
+    "farm:과수원 블록:A",
+    "farm:과수원 블록:B",
+    "farm:과수원 블록:C"
+  ],
+  "grammarVariantRefs": [
+    "farm:과수원 블록:A",
+    "farm:과수원 블록:B",
+    "farm:과수원 블록:C"
+  ],
+  "topologyCodes": "area",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 24.0,
+    "maximumWidthMeters": 24.0,
+    "minimumDepthMeters": 20.0,
+    "maximumDepthMeters": 20.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 18.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Cropland",
+  "allowedRegionRoleCodes": "Farm",
+  "edgeProfileCodes": "field",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 1430,
+    "maximumTriangleCount": 9748,
+    "maximumMaterialSlotCount": 7,
+    "maximumRendererCount": 7,
+    "maximumColliderCount": 23
+  },
+  "supportsInteractionH1Refs": [],
+  "derivationRecipeCode": "h1.pack-expression.farm.r1",
+  "derivationInputHashSha256": "f5020d656f3b785fbfec9bab69858dce075c1ed626c46acc79a69f1ce0facc3f",
+  "authoredDocument": "authored/h1-expression/farm/과수원-블록.v3.md",
+  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

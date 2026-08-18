@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-worker-waiting",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농장 작업자 대기 공간",
+  "summary": "배정 전후의 작업자가 모이고 다음 작업 구역으로 이동하는 작은 대기 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-WORLD-01"
+  ],
+  "anticipatedGameplayCodes": [
+    "WorkerBriefing",
+    "ShiftHandoff"
+  ],
+  "spatialRoleCodes": [
+    "FarmWorkerWaitingArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.WorkerAccessible",
+    "Spatial.NpcWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [
+    "h1-stock:farm-production",
+    "h1-stock:farm-work-yard"
+  ],
+  "connectorRoleCodes": [
+    "WorkerAccess"
+  ],
+  "sourcePackCodes": [
+    "Farm",
+    "Town"
+  ],
+  "grammarSetRefs": [
+    "farm:헛간 작업마당",
+    "town:버스 정류장·보행 쉼터"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-worker-waiting.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-worker-waiting"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-lookout",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연 전망·관찰 공간",
+  "summary": "경관과 위험·길목을 관찰하고 지역 발견을 확정하기 전 정보를 제공하는 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "ExpressionExploration",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-WORLD-05"
+  ],
+  "anticipatedGameplayCodes": [
+    "LandscapeObservation",
+    "ThreatObservation"
+  ],
+  "spatialRoleCodes": [
+    "NatureLookoutArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.ObservationArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:nature-trailhead"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-exploration-buffer"
+  ],
+  "connectorRoleCodes": [
+    "TrailInput",
+    "TrailOutput"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:산 능선",
+    "nature:고지대 노출지"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-lookout.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-lookout"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h4-blueprint.v3",
+  "stableId": "h4-blueprint:logistics-hub-region",
+  "revision": 1,
+  "hierarchyLevelCode": "H4",
+  "cardKindCode": "RegionalBlueprint",
+  "title": "물류 Hub권",
+  "summary": "입고·보관·출고와 품질 대응 물류 공간을 결합하는 위치 독립 지역 청사진이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "requiredH3Refs": [
+    "h3-candidate:jinbu-hub",
+    "h3-candidate:resilient-logistics-hub"
+  ],
+  "optionalH3Refs": [],
+  "childKnowledgeRefs": [
+    "h3-candidate:jinbu-hub",
+    "h3-candidate:resilient-logistics-hub"
+  ],
+  "worldThemeCodes": [
+    "LogisticsHub",
+    "StorageResilience"
+  ],
+  "graphRelationRoleCodes": [
+    "InboundToStorage",
+    "StorageToOutbound"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "BuildingPlacement",
+    "RoadNetwork"
+  ],
+  "sourceGrammarRefs": [
+    "city:물류 Station 진입부",
+    "city:상하차 Dock",
+    "city:화물 대기 야드",
+    "network:도시도로 곡선",
+    "network:도시도로 십자",
+    "network:도시도로 직선",
+    "network:도시도로 T자",
+    "transition:Hub–City 전환",
+    "transition:Road–BuildingFront 전환",
+    "transition:Town–Hub 전환"
+  ],
+  "derivationRecipeCode": "h4.logistics-hub-region.r1",
+  "derivationInputHashSha256": "cb5eaafbcdcefb0cc872d7403d8840f2d161d55972cf0e9dab54b1425939aa21",
+  "authoredDocument": "authored/h4/logistics-hub-region.v3.md",
+  "unresolvedItems": [
+    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:lowrise-market-town",
+  "revision": 2,
+  "hierarchyLevelCode": "H3",
+  "title": "저층 생활·시장 경관",
+  "summary": "기존 상향식 재고 v1에서 이관한 저층 생활·시장 경관 지역 유형 청사진이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:lowrise-residential",
+    "h2-candidate:market-life-commerce"
+  ],
+  "optionalH2Refs": [],
+  "connectorRoleCodes": [
+    "TownReceivingGate",
+    "TownLocalRoad"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/lowrise-market-town.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h3-candidate:lowrise-market-town"
+  ],
+  "unresolvedItems": [
+    "AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

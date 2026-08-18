@@ -1,0 +1,229 @@
+{
+  "schemaVersion": "simulation-world-synty-bottom-up-inventory.v1",
+  "revision": "simulation-world-synty-bottom-up-inventory.r1",
+  "title": "Synty 상향식 공간 설계 재고",
+  "summary": "Nature·Farm·Town·City 팩에서 출발해 H1 실행 모판과 검토 후보, H2 블록 후보, H3 조립 후보를 미리 축적하되 실제 지역 공간 권위를 부여하지 않는 설계 재고다.",
+  "landscapeGrammarManifestPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
+  "approvedH1CatalogPath": "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "packInventory": [
+    { "packCode": "Nature", "unityAssetRelativeRoot": "Assets/Synty/PolygonNature", "prefabCount": 227 },
+    { "packCode": "Farm", "unityAssetRelativeRoot": "Assets/Synty/PolygonFarm", "prefabCount": 498 },
+    { "packCode": "Town", "unityAssetRelativeRoot": "Assets/Synty/PolygonTown", "prefabCount": 702 },
+    { "packCode": "City", "unityAssetRelativeRoot": "Assets/Synty/PolygonCity", "prefabCount": 335 }
+  ],
+  "h1Inventory": [
+    {
+      "inventoryId": "h1-stock:farm-production",
+      "title": "농업 생산구획",
+      "groupCode": "FarmNature",
+      "stateCode": "ApprovedReference",
+      "approvedSeedbedStableId": "wi-spatial-seedbed:farm-production.v1",
+      "wiIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04"],
+      "spatialRoleCodes": ["FarmProductionPlot"],
+      "grammarSetRefs": ["farm:감자밭 두렁", "farm:혼합 작물밭"]
+    },
+    {
+      "inventoryId": "h1-stock:farm-work-yard",
+      "title": "수확·집하 작업마당",
+      "groupCode": "FarmNature",
+      "stateCode": "ApprovedReference",
+      "approvedSeedbedStableId": "wi-spatial-seedbed:farm-work-yard.v1",
+      "wiIds": ["WI-FARM-05", "WI-FARM-06", "WI-WORLD-04"],
+      "spatialRoleCodes": ["FarmCollectionArea", "FarmPackingArea"],
+      "grammarSetRefs": ["farm:농산물 집하·직판장", "farm:헛간 작업마당"]
+    },
+    {
+      "inventoryId": "h1-stock:farm-loading-gate",
+      "title": "농장 상차·출입 공간",
+      "groupCode": "FarmNature",
+      "stateCode": "ApprovedReference",
+      "approvedSeedbedStableId": "wi-spatial-seedbed:farm-loading-gate.v1",
+      "wiIds": ["WI-LOG-01", "WI-LOG-02"],
+      "spatialRoleCodes": ["FarmLoadingArea", "FarmGate"],
+      "grammarSetRefs": ["farm:헛간 작업마당", "transition:Farm–Hub 전환"]
+    },
+    {
+      "inventoryId": "h1-stock:farm-maintenance-yard",
+      "title": "농장 시설 정비 공간",
+      "groupCode": "FarmNature",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-WORLD-04"],
+      "spatialRoleCodes": ["FarmMaintenanceYard"],
+      "grammarSetRefs": ["farm:헛간 작업마당", "farm:시설하우스 단동"]
+    },
+    {
+      "inventoryId": "h1-stock:nature-farm-edge",
+      "title": "숲 경계형 농장 전환 공간",
+      "groupCode": "FarmNature",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-WORLD-05"],
+      "spatialRoleCodes": ["NatureFarmEdge"],
+      "grammarSetRefs": ["nature:숲 가장자리", "transition:Nature–Farm 전환"]
+    },
+    {
+      "inventoryId": "h1-stock:nature-exploration-buffer",
+      "title": "자연 탐색·완충 공간",
+      "groupCode": "FarmNature",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-WORLD-05", "WI-WORLD-07"],
+      "spatialRoleCodes": ["NatureExplorationBuffer"],
+      "grammarSetRefs": ["nature:숲 빈터·고사목", "nature:산길·바위 길목"]
+    },
+    {
+      "inventoryId": "h1-stock:hub-receiving-storage",
+      "title": "Hub 입고·검수·보관 공간",
+      "groupCode": "HubCity",
+      "stateCode": "ApprovedReference",
+      "approvedSeedbedStableId": "wi-spatial-seedbed:hub-receiving-storage.v1",
+      "wiIds": ["WI-LOG-04", "WI-LOG-05", "WI-001", "WI-002"],
+      "spatialRoleCodes": ["HubUnloadingArea", "HubInspectionArea", "HubStorageArea"],
+      "grammarSetRefs": ["city:물류 Station 진입부", "city:상하차 Dock", "city:화물 대기 야드"]
+    },
+    {
+      "inventoryId": "h1-stock:hub-outbound-staging",
+      "title": "Hub 피킹·출고 준비 공간",
+      "groupCode": "HubCity",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-HUB-03", "WI-HUB-04", "WI-HUB-05"],
+      "spatialRoleCodes": ["HubPickingArea", "HubOutboundStagingArea"],
+      "grammarSetRefs": ["city:화물 대기 야드", "city:상하차 Dock"]
+    },
+    {
+      "inventoryId": "h1-stock:hub-vehicle-yard",
+      "title": "Hub 차량 상차·대기 공간",
+      "groupCode": "HubCity",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-HUB-06", "WI-MARKET-01"],
+      "spatialRoleCodes": ["HubVehicleLoadingArea", "HubVehicleWaitingArea"],
+      "grammarSetRefs": ["city:상하차 Dock", "city:화물 대기 야드"]
+    },
+    {
+      "inventoryId": "h1-stock:hub-market-transfer",
+      "title": "Hub–시장 화물 인계 공간",
+      "groupCode": "HubCity",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-MARKET-01", "WI-MARKET-02"],
+      "spatialRoleCodes": ["HubMarketTransferArea"],
+      "grammarSetRefs": ["transition:Town–Hub 전환", "city:물류 Station 진입부"]
+    },
+    {
+      "inventoryId": "h1-stock:hub-service-maintenance",
+      "title": "Hub 시설 정비 공간",
+      "groupCode": "HubCity",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-WORLD-04"],
+      "spatialRoleCodes": ["HubMaintenanceArea"],
+      "grammarSetRefs": ["city:화물 대기 야드", "transition:Road–BuildingFront 전환"]
+    },
+    {
+      "inventoryId": "h1-stock:town-market-receiving",
+      "title": "마트 후방 입고 공간",
+      "groupCode": "TownMarket",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-MARKET-02", "WI-MARKET-03", "WI-MARKET-04"],
+      "spatialRoleCodes": ["MarketReceivingArea", "MarketBackroomArea"],
+      "grammarSetRefs": ["city:도심 마트 앞마당", "transition:Road–BuildingFront 전환"]
+    },
+    {
+      "inventoryId": "h1-stock:town-market-display",
+      "title": "마트 진열·판매 공간",
+      "groupCode": "TownMarket",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-MARKET-05", "WI-ORDER-03"],
+      "spatialRoleCodes": ["MarketDisplayArea", "MarketPickingArea"],
+      "grammarSetRefs": ["town:읍내 상점 전면", "city:먹거리 상점 골목"]
+    },
+    {
+      "inventoryId": "h1-stock:town-resident-pickup",
+      "title": "주민 수령 공간",
+      "groupCode": "TownMarket",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-ORDER-05", "WI-ORDER-06"],
+      "spatialRoleCodes": ["ResidentPickupArea"],
+      "grammarSetRefs": ["town:버스 정류장·보행 쉼터", "town:읍내 상점 전면"]
+    },
+    {
+      "inventoryId": "h1-stock:town-living-square",
+      "title": "생활권 작은 광장",
+      "groupCode": "TownMarket",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-WORLD-05", "WI-ORDER-07"],
+      "spatialRoleCodes": ["TownLivingSquare"],
+      "grammarSetRefs": ["town:생활 공공광장", "town:근린 놀이터"]
+    },
+    {
+      "inventoryId": "h1-stock:farm-hub-corridor",
+      "title": "Farm–Hub 화물 회랑",
+      "groupCode": "CorridorTransition",
+      "stateCode": "ApprovedReference",
+      "approvedSeedbedStableId": "wi-spatial-seedbed:farm-hub-corridor.v1",
+      "wiIds": ["WI-LOG-03"],
+      "spatialRoleCodes": ["FarmHubCargoCorridor"],
+      "grammarSetRefs": ["network:농촌도로 직선", "transition:Farm–Hub 전환"]
+    },
+    {
+      "inventoryId": "h1-stock:hub-town-corridor",
+      "title": "Hub–Town 물류 회랑",
+      "groupCode": "CorridorTransition",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-MARKET-01"],
+      "spatialRoleCodes": ["HubTownCargoCorridor"],
+      "grammarSetRefs": ["network:타운도로 직선", "transition:Town–Hub 전환"]
+    },
+    {
+      "inventoryId": "h1-stock:road-facility-access",
+      "title": "도로–시설 진입 전환 공간",
+      "groupCode": "CorridorTransition",
+      "stateCode": "CandidateForReview",
+      "approvedSeedbedStableId": null,
+      "wiIds": ["WI-WORLD-04"],
+      "spatialRoleCodes": ["RoadFacilityAccess"],
+      "grammarSetRefs": ["transition:Road–BuildingFront 전환", "network:타운도로 T자"]
+    }
+  ],
+  "h2Candidates": [
+    { "candidateId": "h2-candidate:highland-production", "title": "고지대 생산 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:farm-production", "h1-stock:nature-farm-edge"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["TerrainSlope", "LandCover", "RoadNetwork", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:farm-processing-shipping", "title": "농장 작업·출하 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:farm-work-yard", "h1-stock:farm-maintenance-yard", "h1-stock:farm-loading-gate"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:forest-edge-farm", "title": "숲 경계 농장 블록", "topologyCode": "ContourAdaptive", "h1InventoryRefs": ["h1-stock:nature-farm-edge", "h1-stock:nature-exploration-buffer", "h1-stock:farm-production"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["TerrainSlope", "LandCover", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:hub-inbound-storage", "title": "Hub 입고·창고 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:hub-receiving-storage", "h1-stock:hub-service-maintenance"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:hub-outbound-vehicle", "title": "Hub 출고·차량 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:hub-outbound-staging", "h1-stock:hub-vehicle-yard", "h1-stock:hub-market-transfer"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:lowrise-residential", "title": "저층 주거 블록", "topologyCode": "Grid", "h1InventoryRefs": ["h1-stock:town-living-square", "h1-stock:town-resident-pickup"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:market-life-commerce", "title": "마트·생활상권 블록", "topologyCode": "ModifiedGrid", "h1InventoryRefs": ["h1-stock:town-market-receiving", "h1-stock:town-market-display", "h1-stock:town-resident-pickup", "h1-stock:town-living-square"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BuildingFootprint", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:farm-hub-corridor", "title": "Farm–Hub 회랑 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:farm-loading-gate", "h1-stock:farm-hub-corridor"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:hub-town-corridor", "title": "Hub–Town 회랑 블록", "topologyCode": "Linear", "h1InventoryRefs": ["h1-stock:hub-market-transfer", "h1-stock:hub-town-corridor", "h1-stock:road-facility-access"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["RoadNetwork", "BlockBoundary"] },
+    { "candidateId": "h2-candidate:nature-water-buffer", "title": "산림·수변 완충 블록", "topologyCode": "Organic", "h1InventoryRefs": ["h1-stock:nature-exploration-buffer", "h1-stock:nature-farm-edge"], "sizeVariantCodes": ["Compact", "Standard", "Expanded"], "requiredEvidencePurposeCodes": ["TerrainSlope", "LandCover", "Hydrography", "BlockBoundary"] }
+  ],
+  "h3AssemblyCandidates": [
+    { "candidateId": "h3-candidate:highland-farm", "title": "고지대 농장 경관", "topologyCode": "ContourAdaptive", "h2CandidateRefs": ["h2-candidate:highland-production", "h2-candidate:farm-processing-shipping", "h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["FarmExternalGate"] },
+    { "candidateId": "h3-candidate:farm-hub-logistics", "title": "농장–물류 거점 연결 경관", "topologyCode": "Linear", "h2CandidateRefs": ["h2-candidate:farm-hub-corridor"], "connectorRoleCodes": ["FarmGate", "HubInboundGate"] },
+    { "candidateId": "h3-candidate:jinbu-hub", "title": "진부형 물류 Hub 경관", "topologyCode": "ModifiedGrid", "h2CandidateRefs": ["h2-candidate:hub-inbound-storage", "h2-candidate:hub-outbound-vehicle"], "connectorRoleCodes": ["HubInboundGate", "HubOutboundGate"] },
+    { "candidateId": "h3-candidate:hub-town-logistics", "title": "Hub–Town 연결 경관", "topologyCode": "Linear", "h2CandidateRefs": ["h2-candidate:hub-town-corridor"], "connectorRoleCodes": ["HubOutboundGate", "TownReceivingGate"] },
+    { "candidateId": "h3-candidate:lowrise-market-town", "title": "저층 생활·시장 경관", "topologyCode": "ModifiedGrid", "h2CandidateRefs": ["h2-candidate:lowrise-residential", "h2-candidate:market-life-commerce"], "connectorRoleCodes": ["TownReceivingGate", "TownLocalRoad"] },
+    { "candidateId": "h3-candidate:nature-exploration-buffer", "title": "Nature 탐색·완충 경관", "topologyCode": "Organic", "h2CandidateRefs": ["h2-candidate:nature-water-buffer", "h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["NatureTrail", "FarmEdge"] }
+  ],
+  "promotionPolicy": {
+    "h1CandidateTargetStateCode": "ApprovedForSimulation",
+    "h2CandidateTargetResourceKindCode": "LandscapeBlock",
+    "h3CandidateTargetResourceKindCode": "LandscapeGraph",
+    "requiresHumanReview": true,
+    "requiresDeterministicHash": true,
+    "forbidsAutomaticAuthorityPromotion": true,
+    "forbidsAbsoluteCoordinates": true,
+    "forbidsUnityAssetAuthority": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

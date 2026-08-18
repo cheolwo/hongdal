@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:farm:시설하우스-단동",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "시설하우스 단동 — Farm 단독 표현",
+  "summary": "시설하우스 단동 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Farm",
+  "sourceGrammarSetRef": "farm:시설하우스 단동",
+  "sourceGrammarRefs": [
+    "farm:시설하우스 단동:A",
+    "farm:시설하우스 단동:B",
+    "farm:시설하우스 단동:C"
+  ],
+  "grammarVariantRefs": [
+    "farm:시설하우스 단동:A",
+    "farm:시설하우스 단동:B",
+    "farm:시설하우스 단동:C"
+  ],
+  "topologyCodes": "area",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 18.0,
+    "maximumWidthMeters": 18.0,
+    "minimumDepthMeters": 24.0,
+    "maximumDepthMeters": 24.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 12.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": [
+    "Cropland",
+    "Residential"
+  ],
+  "allowedRegionRoleCodes": "Farm",
+  "edgeProfileCodes": "field",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 1632,
+    "maximumTriangleCount": 3306,
+    "maximumMaterialSlotCount": 16,
+    "maximumRendererCount": 16,
+    "maximumColliderCount": 7
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:farm-maintenance-yard",
+    "h1-stock:farm-seed-preparation",
+    "h1-stock:farm-tool-storage"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.farm.r1",
+  "derivationInputHashSha256": "c1836f93e4f173566f24a21c06527b9710ec03f56423bab2de3131cf99fa6c70",
+  "authoredDocument": "authored/h1-expression/farm/시설하우스-단동.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

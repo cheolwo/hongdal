@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:city:공동주택-생활마당",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "공동주택 생활마당 — City 단독 표현",
+  "summary": "공동주택 생활마당 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "City",
+  "sourceGrammarSetRef": "city:공동주택 생활마당",
+  "sourceGrammarRefs": [
+    "city:공동주택 생활마당:A",
+    "city:공동주택 생활마당:B",
+    "city:공동주택 생활마당:C"
+  ],
+  "grammarVariantRefs": [
+    "city:공동주택 생활마당:A",
+    "city:공동주택 생활마당:B",
+    "city:공동주택 생활마당:C"
+  ],
+  "topologyCodes": "area",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 30.0,
+    "maximumWidthMeters": 30.0,
+    "minimumDepthMeters": 24.0,
+    "maximumDepthMeters": 24.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 10.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Residential",
+  "allowedRegionRoleCodes": "Town",
+  "edgeProfileCodes": "residential",
+  "connectorTypeCodes": [
+    "pedestrian",
+    "vehicle"
+  ],
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 1330,
+    "maximumTriangleCount": 1906,
+    "maximumMaterialSlotCount": 3,
+    "maximumRendererCount": 3,
+    "maximumColliderCount": 9
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:town-staff-rest"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.city.r1",
+  "derivationInputHashSha256": "1944907c6b5290f79e16765b349f852ea2d03c96e48340d073f48bd12ba59030",
+  "authoredDocument": "authored/h1-expression/city/공동주택-생활마당.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

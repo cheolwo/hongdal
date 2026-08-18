@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:town-returns",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "마트 반품 접수 공간",
+  "summary": "주민 반품을 접수해 재진열·Hub 반송·폐기로 분기하는 생활권 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "CustomerReturn",
+    "ReturnTriage",
+    "ReturnHandoff"
+  ],
+  "spatialRoleCodes": [
+    "MarketReturnsArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.CustomerAccessible",
+    "Spatial.WorkerAccessible",
+    "Spatial.InspectionWorkArea"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:town-resident-pickup"
+  ],
+  "successorH1Refs": [
+    "h1-stock:hub-returns",
+    "h1-stock:town-waste"
+  ],
+  "connectorRoleCodes": [
+    "CustomerReturnInput",
+    "HubReturnOutput",
+    "WasteOutput"
+  ],
+  "sourcePackCodes": [
+    "City",
+    "Town"
+  ],
+  "grammarSetRefs": [
+    "city:도심 마트 앞마당",
+    "town:읍내 상점 전면"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/town-returns.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:town-returns"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

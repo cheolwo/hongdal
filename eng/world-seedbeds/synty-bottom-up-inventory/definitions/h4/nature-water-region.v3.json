@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h4-blueprint.v3",
+  "stableId": "h4-blueprint:nature-water-region",
+  "revision": 1,
+  "hierarchyLevelCode": "H4",
+  "cardKindCode": "RegionalBlueprint",
+  "title": "산림·수계 자연권",
+  "summary": "자연 탐색·완충과 탐색길·대피망을 결합하는 위치 독립 지역 청사진이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "requiredH3Refs": [
+    "h3-candidate:nature-exploration-buffer",
+    "h3-candidate:nature-trail-network"
+  ],
+  "optionalH3Refs": [],
+  "childKnowledgeRefs": [
+    "h3-candidate:nature-exploration-buffer",
+    "h3-candidate:nature-trail-network"
+  ],
+  "worldThemeCodes": [
+    "NatureExploration",
+    "WaterBuffer"
+  ],
+  "graphRelationRoleCodes": [
+    "NatureContinuity",
+    "WaterLandTransition"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "TerrainElevation",
+    "LandCoverClassification",
+    "Hydrography"
+  ],
+  "sourceGrammarRefs": [
+    "farm:감자밭 두렁",
+    "farm:혼합 작물밭",
+    "nature:고지대 노출지",
+    "nature:산 능선",
+    "nature:산길·바위 길목",
+    "nature:숲 가장자리",
+    "nature:숲 빈터·고사목",
+    "network:농촌도로 곡선",
+    "transition:Nature–Farm 전환",
+    "transition:Water–Land 전환"
+  ],
+  "derivationRecipeCode": "h4.nature-water-region.r1",
+  "derivationInputHashSha256": "0d92d347fe7655eec35d940a8d55f477547a219d289ec0413735a1a2da3a2c88",
+  "authoredDocument": "authored/h4/nature-water-region.v3.md",
+  "unresolvedItems": [
+    "사람의 AreaSet 세계 의도와 실제 지역 범위·DataRequirement·GraphRelation 승인이 필요하다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

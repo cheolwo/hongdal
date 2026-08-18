@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:nature:혼효림-군집",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "혼효림 군집 — Nature 단독 표현",
+  "summary": "혼효림 군집 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Nature",
+  "sourceGrammarSetRef": "nature:혼효림 군집",
+  "sourceGrammarRefs": [
+    "nature:혼효림 군집:A",
+    "nature:혼효림 군집:B",
+    "nature:혼효림 군집:C"
+  ],
+  "grammarVariantRefs": [
+    "nature:혼효림 군집:A",
+    "nature:혼효림 군집:B",
+    "nature:혼효림 군집:C"
+  ],
+  "topologyCodes": "area",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 12.0,
+    "maximumWidthMeters": 12.0,
+    "minimumDepthMeters": 12.0,
+    "maximumDepthMeters": 12.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 40.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Forest",
+  "allowedRegionRoleCodes": [
+    "Farm",
+    "Region",
+    "Town"
+  ],
+  "edgeProfileCodes": "forest",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 1824,
+    "maximumTriangleCount": 14428,
+    "maximumMaterialSlotCount": 9,
+    "maximumRendererCount": 6,
+    "maximumColliderCount": 4
+  },
+  "supportsInteractionH1Refs": [],
+  "derivationRecipeCode": "h1.pack-expression.nature.r1",
+  "derivationInputHashSha256": "6af54b2de67cd05e6018e9b4a2664949ec638b350a51abe6b1bdb23d08de09cc",
+  "authoredDocument": "authored/h1-expression/nature/혼효림-군집.v3.md",
+  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

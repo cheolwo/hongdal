@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:nature-trail-network",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "자연 탐색길·대피망 경관",
+  "summary": "생활권 또는 농장 가장자리에서 탐색 출발·전망·대피를 순환 경로로 조직하는 청사진이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Organic",
+  "requiredH2Refs": [
+    "h2-candidate:nature-trail-shelter",
+    "h2-candidate:nature-water-buffer"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:forest-edge-farm"
+  ],
+  "connectorRoleCodes": [
+    "TownOrFarmAccess",
+    "TrailLoop",
+    "EmergencyExit"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/nature-trail-network.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:nature-trail-network"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

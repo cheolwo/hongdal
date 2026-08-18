@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:farm-wash-sort-pack",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "세척·선별·포장 블록",
+  "summary": "수확물 적치에서 세척·선별·포장까지 이어지는 후처리 레시피다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "topologyCode": "Linear",
+  "requiredH1Refs": [
+    "h1-stock:farm-harvest-staging",
+    "h1-stock:farm-washing",
+    "h1-stock:farm-sorting",
+    "h1-stock:farm-work-yard"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [
+    "HarvestInput",
+    "ShippingOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "WaterPresence",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/farm-wash-sort-pack.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-wash-sort-pack"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

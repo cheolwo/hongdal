@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-composition-plan.v1",
+  "planStableId": "wi-spatial-composition-plan:p2-hub-inbound-storage.v1",
+  "revision": 1,
+  "title": "진부 Hub 하차·인수·검수·적재 공간 구성",
+  "priorityCode": "P2",
+  "knowledgeStateCode": "CandidateForReview",
+  "targetLandscapeBlockCandidateRef": "h2-candidate:hub:inbound-storage",
+  "worldInteractionSequence": [
+    "WI-LOG-04",
+    "WI-LOG-05",
+    "WI-001",
+    "WI-002"
+  ],
+  "spaces": [
+    {
+      "spaceCode": "unloading-area",
+      "title": "Hub 하차 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:hub-receiving-storage.v1",
+      "interactionH1Ref": "h1-stock:hub-receiving-storage",
+      "worldInteractionIds": ["WI-LOG-04"],
+      "requiredCapabilityCodes": [
+        "Spatial.UnloadingWorkArea",
+        "Spatial.CargoAccessible",
+        "Spatial.WorkerAccessible"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock"
+      ],
+      "preferredCompositionKey": "city:물류 Station 진입부:A"
+    },
+    {
+      "spaceCode": "inspection-area",
+      "title": "Hub 인수·입고검수 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:hub-receiving-storage.v1",
+      "interactionH1Ref": "h1-stock:hub-receiving-storage",
+      "worldInteractionIds": ["WI-LOG-05", "WI-001"],
+      "requiredCapabilityCodes": [
+        "Spatial.InspectionWorkArea",
+        "Spatial.CargoAccessible",
+        "Spatial.WorkerAccessible"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "city:상하차 Dock"
+      ],
+      "preferredCompositionKey": "city:상하차 Dock:A"
+    },
+    {
+      "spaceCode": "storage-area",
+      "title": "Hub 창고 적재 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:hub-receiving-storage.v1",
+      "interactionH1Ref": "h1-stock:hub-receiving-storage",
+      "worldInteractionIds": ["WI-002"],
+      "requiredCapabilityCodes": [
+        "Spatial.Storage",
+        "Spatial.CargoAccessible",
+        "Spatial.WorkerAccessible",
+        "Spatial.LoadingWorkArea"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "StorageCapacity", "minimumQuantity": 10000, "unitCode": "KGM" },
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "city:화물 대기 야드"
+      ],
+      "preferredCompositionKey": "city:화물 대기 야드:A"
+    }
+  ],
+  "relations": [
+    {
+      "fromSpaceCode": "unloading-area",
+      "toSpaceCode": "inspection-area",
+      "relationCode": "CargoHandoff",
+      "connectorTypeCode": "cargo-handoff",
+      "playerTraversalRequired": true
+    },
+    {
+      "fromSpaceCode": "inspection-area",
+      "toSpaceCode": "storage-area",
+      "relationCode": "WarehouseHandoff",
+      "connectorTypeCode": "cargo-handoff",
+      "playerTraversalRequired": true
+    }
+  ],
+  "externalConnector": {
+    "fromSpaceCode": "unloading-area",
+    "connectorRoleCode": "HubInboundGate",
+    "connectorTypeCode": "vehicle",
+    "targetH1Ref": "h1-stock:farm-hub-corridor",
+    "targetWorldInteractionId": "WI-LOG-03"
+  },
+  "lhEngineHandoff": {
+    "selectionPolicyCode": "ApprovedH1Only",
+    "candidateH2MayGuidePreview": true,
+    "candidateH2GrantsTraversalAuthority": false,
+    "requiresContinuousPlayerPath": true,
+    "requiresDeterministicRelationOrder": true,
+    "forbidsAbsoluteCoordinatesBeforeH2Approval": true,
+    "forbidsScenarioFallbackForGraphRequest": true
+  },
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BuildingFootprint",
+    "BlockBoundary"
+  ],
+  "unresolvedItems": [
+    "진부 Hub 경관 그래프에 승인된 업무 공간 Node가 아직 없다.",
+    "Hub 진입 도로와 상하차 동선의 실제 연결 근거가 없다.",
+    "결정적 H2 Block 경계와 내부 보행·화물 이동 경로가 없다.",
+    "창고 10000 KGM과 작업영역 1 slot은 Scenario 근거이며 실측 용량이 아니다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:nature:초지-야생화",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "초지·야생화 — Nature 단독 표현",
+  "summary": "초지·야생화 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Nature",
+  "sourceGrammarSetRef": "nature:초지·야생화",
+  "sourceGrammarRefs": [
+    "nature:초지·야생화:A",
+    "nature:초지·야생화:B",
+    "nature:초지·야생화:C"
+  ],
+  "grammarVariantRefs": [
+    "nature:초지·야생화:A",
+    "nature:초지·야생화:B",
+    "nature:초지·야생화:C"
+  ],
+  "topologyCodes": "area",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 12.0,
+    "maximumWidthMeters": 12.0,
+    "minimumDepthMeters": 12.0,
+    "maximumDepthMeters": 12.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 25.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": [
+    "BareGround",
+    "Cropland"
+  ],
+  "allowedRegionRoleCodes": [
+    "Farm",
+    "Region",
+    "Town"
+  ],
+  "edgeProfileCodes": "forest",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 981,
+    "maximumTriangleCount": 1073,
+    "maximumMaterialSlotCount": 4,
+    "maximumRendererCount": 4,
+    "maximumColliderCount": 2
+  },
+  "supportsInteractionH1Refs": [],
+  "derivationRecipeCode": "h1.pack-expression.nature.r1",
+  "derivationInputHashSha256": "de66872bd7d4db731faa41926d4aa9fc28e5e4de42633125102a8f456cd7b354",
+  "authoredDocument": "authored/h1-expression/nature/초지-야생화.v3.md",
+  "unresolvedItems": "연결된 행동 공간 H1이 없어 표현 탐색 재고로 유지한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -5,22 +5,23 @@
 - 계층 대장 개정: `simulation-world-spatial-hierarchy.r1`
 - 증거 단계 개정: `simulation-evidence-stages.r4`
 - 축 구분: `E`는 증거 깊이, `H`는 공간 포함 깊이다.
+- 모판 계열: `H1 작업공간 → H2 블록 → H3 경관 → H4 지역`으로 상향 조립하며 재고 상태는 별도 대장에서 관리한다.
 - 현재 정의 수: `H1 5 / H2 0 / H3 5 / H4 1`
 
 ## 포함 계층
 
 | 계층 | 의미 | 포함 | 현재 정의 | 현재 정책 |
 | --- | --- | --- | ---: | --- |
-| `H1` | WI 공간 모판 | - | 5 | `Defined` |
-| `H2` | LandscapeBlock | H1 | 0 | `ReservedForE5` |
-| `H3` | LandscapeGraph | H2 | 5 | `DefinedPartialAssemblyAllowed` |
-| `H4` | AreaSet | H3 | 1 | `DefinedPartialAssemblyAllowed` |
+| `H1` | 작업공간 모판 | - | 5 | `Defined` |
+| `H2` | 블록 모판 | H1 | 0 | `ReservedForE5` |
+| `H3` | 경관 모판 | H2 | 5 | `DefinedPartialAssemblyAllowed` |
+| `H4` | 지역 모판 | H3 | 1 | `DefinedPartialAssemblyAllowed` |
 
 ```text
-H4 AreaSet
-└─ H3 LandscapeGraph
-   └─ H2 LandscapeBlock
-      └─ H1 WI 공간 모판 인스턴스
+H4 지역 모판 (AreaSet)
+└─ H3 경관 모판 (LandscapeGraph)
+   └─ H2 블록 모판 (LandscapeBlock)
+      └─ H1 작업공간 모판 (WI 공간 모판) 인스턴스
 ```
 
 H 코드는 리소스 종류를 분류할 뿐 완료 상태를 올리지 않는다. 현재 H4 AreaSet과 H3 Graph가 존재해도 실제 H2 Block과 연결 폐루프가 없으므로 E5가 아니다.
@@ -41,5 +42,6 @@ H 코드는 리소스 종류를 분류할 뿐 완료 상태를 올리지 않는�
 - **Area**: 법정동·Farm·Hub·Town 의미 범위이며 LandscapeGraph와 N:N으로 참조된다.
 - **경관 완결 영역**: 사람의 검토·완결 범위이며 구조적 부모 단위가 아니다.
 - **ScenarioRoute**: Graph와 AreaSet이 참조하는 이동 의미이며 포함 계층이 아니다.
+- **Synty 상향식 공간 설계 재고**: 팩에서 출발해 축적한 H1 검토 후보·H2 블록 후보·H3 조립 후보이며, 사람 승인과 실제 공간 근거 전에는 공식 H 정의 수나 E 증거를 올리지 않는다.
 
 기존 156개 기준 경관 문법 모판은 H 계층이 아니다. H1의 허용 후보와 H2·H3 조립에서 사용하는 공간 문법 어휘다.

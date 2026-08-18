@@ -10,6 +10,11 @@ if ($PSVersionTable.PSEdition -ne "Core") {
 $tests = @(
     "world-interactions.ps1",
     "spatial-hierarchy.ps1",
+    "synty-bottom-up-inventory.ps1",
+    "spatial-resource-inventory.ps1",
+    "spatial-design-knowledge.ps1",
+    "wi-eh-status.ps1",
+    "immersive-world-layout.ps1",
     "execution-ledger.ps1"
 )
 $started = [Diagnostics.Stopwatch]::StartNew()

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:road-facility-access",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "도로–시설 진입 전환 공간",
+  "summary": "기존 상향식 재고 v1에서 이관한 도로–시설 진입 전환 공간 설계 지식이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-WORLD-04"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "RoadFacilityAccess"
+  ],
+  "capabilityCodes": [],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [],
+  "sourcePackCodes": [
+    "Network",
+    "Transition"
+  ],
+  "grammarSetRefs": [
+    "transition:Road–BuildingFront 전환",
+    "network:타운도로 T자"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/road-facility-access.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:road-facility-access"
+  ],
+  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

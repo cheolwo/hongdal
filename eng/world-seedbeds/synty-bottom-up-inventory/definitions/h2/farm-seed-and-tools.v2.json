@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:farm-seed-and-tools",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "종자·농기구 준비 블록",
+  "summary": "농기구 보관과 종자 준비, 작업자 대기를 생산구획 앞에서 묶는 작업 시작 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Cluster",
+  "requiredH1Refs": [
+    "h1-stock:farm-tool-storage",
+    "h1-stock:farm-seed-preparation"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:farm-worker-waiting"
+  ],
+  "connectorRoleCodes": [
+    "ProductionOutput",
+    "WorkerAccess"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/farm-seed-and-tools.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-seed-and-tools"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

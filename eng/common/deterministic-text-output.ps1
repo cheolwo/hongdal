@@ -16,13 +16,18 @@ function Write-DeterministicTextIfChanged(
     [IO.Directory]::CreateDirectory($directory) | Out-Null
     $temporaryPath = Join-Path $directory (".{0}.{1}.tmp" -f
         [IO.Path]::GetFileName($Path), [Guid]::NewGuid().ToString("N"))
+    $backupPath = Join-Path $directory (".{0}.{1}.bak" -f
+        [IO.Path]::GetFileName($Path), [Guid]::NewGuid().ToString("N"))
     try {
         [IO.File]::WriteAllText($temporaryPath, $normalized, [Text.UTF8Encoding]::new($false))
         $lastError = $null
         for ($attempt = 0; $attempt -lt 5; $attempt++) {
             try {
                 if (Test-Path -LiteralPath $Path) {
-                    [IO.File]::Replace($temporaryPath, $Path, $null, $true)
+                    [IO.File]::Replace($temporaryPath, $Path, $backupPath, $true)
+                    if (Test-Path -LiteralPath $backupPath) {
+                        Remove-Item -LiteralPath $backupPath -Force
+                    }
                 }
                 else {
                     [IO.File]::Move($temporaryPath, $Path)
@@ -39,6 +44,9 @@ function Write-DeterministicTextIfChanged(
     finally {
         if (Test-Path -LiteralPath $temporaryPath) {
             Remove-Item -LiteralPath $temporaryPath -Force
+        }
+        if (Test-Path -LiteralPath $backupPath) {
+            Remove-Item -LiteralPath $backupPath -Force
         }
     }
 }

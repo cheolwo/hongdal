@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:nature-shelter",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "자연 임시 대피 공간",
+  "summary": "기상·위험·피로로 탐색을 계속하기 어려울 때 잠시 머무는 회복 공간이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-WORLD-07"
+  ],
+  "anticipatedGameplayCodes": [
+    "TemporaryShelter",
+    "WeatherWait",
+    "Recovery"
+  ],
+  "spatialRoleCodes": [
+    "NatureTemporaryShelterArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.RestArea",
+    "Spatial.WeatherShelter"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:nature-trailhead"
+  ],
+  "successorH1Refs": [
+    "h1-stock:nature-exploration-buffer"
+  ],
+  "connectorRoleCodes": [
+    "TrailInput",
+    "TrailOutput"
+  ],
+  "sourcePackCodes": [
+    "Nature"
+  ],
+  "grammarSetRefs": [
+    "nature:숲 빈터·고사목",
+    "nature:산길·바위 길목"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/nature-shelter.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:nature-shelter"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

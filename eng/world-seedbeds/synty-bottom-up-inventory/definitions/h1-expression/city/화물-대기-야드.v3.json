@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:city:화물-대기-야드",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "화물 대기 야드 — City 단독 표현",
+  "summary": "화물 대기 야드 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "City",
+  "sourceGrammarSetRef": "city:화물 대기 야드",
+  "sourceGrammarRefs": [
+    "city:화물 대기 야드:A",
+    "city:화물 대기 야드:B",
+    "city:화물 대기 야드:C"
+  ],
+  "grammarVariantRefs": [
+    "city:화물 대기 야드:A",
+    "city:화물 대기 야드:B",
+    "city:화물 대기 야드:C"
+  ],
+  "topologyCodes": "landmark",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 24.0,
+    "maximumWidthMeters": 24.0,
+    "minimumDepthMeters": 18.0,
+    "maximumDepthMeters": 18.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 10.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Logistics",
+  "allowedRegionRoleCodes": "Hub",
+  "edgeProfileCodes": "logistics",
+  "connectorTypeCodes": [
+    "pedestrian",
+    "vehicle"
+  ],
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": false,
+  "repeatAllowed": false,
+  "renderCost": {
+    "minimumTriangleCount": 600,
+    "maximumTriangleCount": 600,
+    "maximumMaterialSlotCount": 4,
+    "maximumRendererCount": 4,
+    "maximumColliderCount": 7
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:hub-cold-storage",
+    "h1-stock:hub-long-term-storage",
+    "h1-stock:hub-outbound-staging",
+    "h1-stock:hub-quarantine",
+    "h1-stock:hub-receiving-storage",
+    "h1-stock:hub-returns",
+    "h1-stock:hub-service-maintenance",
+    "h1-stock:hub-temporary-staging",
+    "h1-stock:hub-vehicle-yard"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.city.r1",
+  "derivationInputHashSha256": "6d8f3c9b2197716148a9695ffbc7519879551c13c3b1d747d69ae18570e02323",
+  "authoredDocument": "authored/h1-expression/city/화물-대기-야드.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

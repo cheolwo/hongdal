@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:nature:수변-완충지",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "수변 완충지 — Nature 단독 표현",
+  "summary": "수변 완충지 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Nature",
+  "sourceGrammarSetRef": "nature:수변 완충지",
+  "sourceGrammarRefs": [
+    "nature:수변 완충지:A",
+    "nature:수변 완충지:B",
+    "nature:수변 완충지:C"
+  ],
+  "grammarVariantRefs": [
+    "nature:수변 완충지:A",
+    "nature:수변 완충지:B",
+    "nature:수변 완충지:C"
+  ],
+  "topologyCodes": "detail",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 10.0,
+    "maximumWidthMeters": 10.0,
+    "minimumDepthMeters": 6.0,
+    "maximumDepthMeters": 6.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 12.0
+  },
+  "requiresWaterMask": true,
+  "allowedLandCoverCodes": "Water",
+  "allowedRegionRoleCodes": [
+    "Farm",
+    "Region",
+    "Town"
+  ],
+  "edgeProfileCodes": "water",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 426,
+    "maximumTriangleCount": 782,
+    "maximumMaterialSlotCount": 4,
+    "maximumRendererCount": 4,
+    "maximumColliderCount": 2
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:farm-washing"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.nature.r1",
+  "derivationInputHashSha256": "26a7a249cb8a07466186a0ef184e6511d87696f6a5da42233219f7c28474f338",
+  "authoredDocument": "authored/h1-expression/nature/수변-완충지.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

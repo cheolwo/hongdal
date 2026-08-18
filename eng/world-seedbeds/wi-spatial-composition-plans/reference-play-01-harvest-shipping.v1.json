@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-composition-plan.v1",
+  "planStableId": "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
+  "revision": 1,
+  "title": "기준 플레이 01 수확·집하·포장·상차 공간 구성",
+  "priorityCode": "P1",
+  "knowledgeStateCode": "CandidateForReview",
+  "targetLandscapeBlockCandidateRef": "landscape-block-candidate:sim:pyeongchang:daegwallyeong-harvest-day.v1",
+  "worldInteractionSequence": [
+    "WI-FARM-04",
+    "WI-FARM-05",
+    "WI-FARM-06",
+    "WI-LOG-01"
+  ],
+  "spaces": [
+    {
+      "spaceCode": "production-plot",
+      "title": "감자 생산구획",
+      "h1DefinitionRef": "wi-spatial-seedbed:farm-production.v1",
+      "interactionH1Ref": "h1-stock:farm-production",
+      "worldInteractionIds": ["WI-FARM-04"],
+      "requiredCapabilityCodes": [
+        "Spatial.CropProduction",
+        "Spatial.WorkerAccessible",
+        "Spatial.CargoAccessible",
+        "Spatial.HarvestWorkArea"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "farm:감자밭 두렁",
+        "farm:혼합 작물밭"
+      ],
+      "preferredCompositionKey": "farm:감자밭 두렁:A"
+    },
+    {
+      "spaceCode": "collection-area",
+      "title": "수확물 집하 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:farm-work-yard.v1",
+      "interactionH1Ref": "h1-stock:farm-work-yard",
+      "worldInteractionIds": ["WI-FARM-05"],
+      "requiredCapabilityCodes": [
+        "Spatial.WorkerAccessible",
+        "Spatial.CargoAccessible",
+        "Spatial.CollectionWorkArea"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "farm:헛간 작업마당",
+        "farm:농산물 집하·직판장"
+      ],
+      "preferredCompositionKey": "farm:농산물 집하·직판장:A"
+    },
+    {
+      "spaceCode": "packing-area",
+      "title": "출하 포장 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:farm-work-yard.v1",
+      "interactionH1Ref": "h1-stock:farm-work-yard",
+      "worldInteractionIds": ["WI-FARM-06"],
+      "requiredCapabilityCodes": [
+        "Spatial.WorkerAccessible",
+        "Spatial.CargoAccessible",
+        "Spatial.PackingWorkArea"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "farm:헛간 작업마당",
+        "farm:농산물 집하·직판장"
+      ],
+      "preferredCompositionKey": "farm:헛간 작업마당:A"
+    },
+    {
+      "spaceCode": "loading-area",
+      "title": "차량 상차 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:farm-loading-gate.v1",
+      "interactionH1Ref": "h1-stock:farm-loading-gate",
+      "worldInteractionIds": ["WI-LOG-01"],
+      "requiredCapabilityCodes": [
+        "Spatial.WorkerAccessible",
+        "Spatial.CargoAccessible",
+        "Spatial.VehicleAccessible",
+        "Spatial.LoadingWorkArea"
+      ],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": [
+        "farm:농산물 집하·직판장",
+        "network:농촌도로 T자"
+      ],
+      "preferredCompositionKey": "network:농촌도로 T자:A"
+    }
+  ],
+  "relations": [
+    {
+      "fromSpaceCode": "production-plot",
+      "toSpaceCode": "collection-area",
+      "relationCode": "HarvestHandoff",
+      "connectorTypeCode": "cargo-handoff",
+      "playerTraversalRequired": true
+    },
+    {
+      "fromSpaceCode": "collection-area",
+      "toSpaceCode": "packing-area",
+      "relationCode": "ProcessingFlow",
+      "connectorTypeCode": "cargo-handoff",
+      "playerTraversalRequired": true
+    },
+    {
+      "fromSpaceCode": "packing-area",
+      "toSpaceCode": "loading-area",
+      "relationCode": "LoadingHandoff",
+      "connectorTypeCode": "cargo-handoff",
+      "playerTraversalRequired": true
+    }
+  ],
+  "externalConnector": {
+    "fromSpaceCode": "loading-area",
+    "connectorRoleCode": "FarmGate",
+    "connectorTypeCode": "farm-road",
+    "targetH1Ref": "h1-stock:farm-hub-corridor",
+    "targetWorldInteractionId": "WI-LOG-02"
+  },
+  "lhEngineHandoff": {
+    "selectionPolicyCode": "ApprovedH1Only",
+    "candidateH2MayGuidePreview": true,
+    "candidateH2GrantsTraversalAuthority": false,
+    "requiresContinuousPlayerPath": true,
+    "requiresDeterministicRelationOrder": true,
+    "forbidsAbsoluteCoordinatesBeforeH2Approval": true,
+    "forbidsScenarioFallbackForGraphRequest": true
+  },
+  "requiredEvidencePurposeCodes": [
+    "TerrainElevation",
+    "LandCoverClassification",
+    "RoadNetwork",
+    "BlockBoundary"
+  ],
+  "unresolvedItems": [
+    "실제 도로 Network와 교차로 근거가 없다.",
+    "결정적 H2 Block 경계와 내부 보행 경로가 없다.",
+    "Farm Gate와 Farm–Hub 경관의 양쪽 연결구가 실제 배치되지 않았다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:farm-processing-campus",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "농장 생산·후처리 복합 경관",
+  "summary": "생산부터 세척·선별·포장·출하까지 한 농장 권역에 조직하는 청사진이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:highland-production",
+    "h2-candidate:farm-seed-and-tools",
+    "h2-candidate:farm-wash-sort-pack",
+    "h2-candidate:farm-processing-shipping"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:farm-worker-support",
+    "h2-candidate:forest-edge-farm"
+  ],
+  "connectorRoleCodes": [
+    "FarmExternalGate",
+    "NatureEdge"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/farm-processing-campus.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:farm-processing-campus"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

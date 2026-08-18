@@ -23,7 +23,7 @@ $document = Get-Content -LiteralPath $output -Raw -Encoding UTF8
 if ($document -notmatch "E.*증거 깊이.*H.*공간 포함 깊이") {
     throw "SpatialHierarchyAxisDistinctionMissing"
 }
-if ($document -notmatch "H4 AreaSet[\s\S]*H3 LandscapeGraph[\s\S]*H2 LandscapeBlock[\s\S]*H1 WI 공간 모판") {
+if ($document -notmatch "H4 지역 모판 \(AreaSet\)[\s\S]*H3 경관 모판 \(LandscapeGraph\)[\s\S]*H2 블록 모판 \(LandscapeBlock\)[\s\S]*H1 작업공간 모판 \(WI 공간 모판\)") {
     throw "SpatialHierarchyContainmentDiagramMissing"
 }
 if ($document -notmatch "H4 AreaSet과 H3 Graph가 존재해도[\s\S]*E5가 아니다") {

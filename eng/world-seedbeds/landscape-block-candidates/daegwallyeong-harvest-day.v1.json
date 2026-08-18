@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "simulation-world-landscape-block-candidate.v1",
+  "candidateStableId": "landscape-block-candidate:sim:pyeongchang:daegwallyeong-harvest-day.v1",
+  "revision": 1,
+  "title": "Farmhouse에서 감자밭과 작업마당을 거쳐 Farm Gate까지 걷는 하루",
+  "stateCode": "WaitingForRoadBoundaryEvidence",
+  "targetWalkDurationSeconds": 90,
+  "tileRefs": [
+    "kr5186:l2:700:1145"
+  ],
+  "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+  "areaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
+  "exitGraphRelationStableId": "graph-relation:pyeongchang:farm-to-farm-hub",
+  "exitConnectorStableId": "stub:external-road-east:701-1145",
+  "pathRoleSequence": [
+    "farmhouse-start",
+    "potato-production-plot",
+    "collection-packing-yard",
+    "farm-loading-gate"
+  ],
+  "seedbedBindings": [
+    {
+      "bindingStableId": "binding-candidate:harvest-day:farm-production",
+      "seedbedStableId": "wi-spatial-seedbed:farm-production.v1",
+      "roleCode": "potato-production-plot",
+      "worldInteractionIds": ["WI-FARM-04"]
+    },
+    {
+      "bindingStableId": "binding-candidate:harvest-day:farm-work-yard",
+      "seedbedStableId": "wi-spatial-seedbed:farm-work-yard.v1",
+      "roleCode": "collection-packing-yard",
+      "worldInteractionIds": ["WI-FARM-05", "WI-FARM-06"]
+    },
+    {
+      "bindingStableId": "binding-candidate:harvest-day:farm-loading-gate",
+      "seedbedStableId": "wi-spatial-seedbed:farm-loading-gate.v1",
+      "roleCode": "farm-loading-gate",
+      "worldInteractionIds": ["WI-LOG-01"]
+    }
+  ],
+  "evidenceInputs": [
+    {
+      "evidenceCode": "TerrainElevation",
+      "stateCode": "Available",
+      "manifestPath": "eng/public-spatial/manifests/kr5186-l2-700-1145.json"
+    },
+    {
+      "evidenceCode": "LandCoverAndPlacementMask",
+      "stateCode": "Available",
+      "manifestPath": "eng/public-spatial/manifests/kr5186-l2-700-1145.json"
+    },
+    {
+      "evidenceCode": "RoadNetworkAndJunction",
+      "stateCode": "WaitingForSource",
+      "manifestPath": ""
+    },
+    {
+      "evidenceCode": "BlockBoundary",
+      "stateCode": "WaitingForDerivation",
+      "manifestPath": ""
+    }
+  ],
+  "promotionGate": {
+    "targetResourceKindCode": "LandscapeBlock",
+    "targetHierarchyLevelCode": "H2",
+    "requiredStateCode": "ApprovedForE5",
+    "requiresDeterministicBoundaryHash": true,
+    "requiresConnectedWalkPath": true,
+    "requiresSceneApplyApproval": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

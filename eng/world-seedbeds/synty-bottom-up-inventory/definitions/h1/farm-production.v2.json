@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-production",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "농업 생산구획",
+  "summary": "기존 상향식 재고 v1에서 이관한 농업 생산구획 설계 지식이다.",
+  "knowledgeStateCode": "ApprovedReference",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": "wi-spatial-seedbed:farm-production.v1",
+  "wiIds": [
+    "WI-FARM-01",
+    "WI-FARM-02",
+    "WI-FARM-03",
+    "WI-FARM-04"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "FarmProductionPlot"
+  ],
+  "capabilityCodes": [
+    "Spatial.CargoAccessible",
+    "Spatial.CropCareWorkArea",
+    "Spatial.CropProduction",
+    "Spatial.HarvestWorkArea",
+    "Spatial.SowingWorkArea",
+    "Spatial.TillingWorkArea",
+    "Spatial.WaterAccessible",
+    "Spatial.WorkerAccessible"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [
+    "cargo-handoff"
+  ],
+  "sourcePackCodes": [
+    "Farm"
+  ],
+  "grammarSetRefs": [
+    "farm:감자밭 두렁",
+    "farm:혼합 작물밭"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/farm-production.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:farm-production"
+  ],
+  "unresolvedItems": null,
+  "presentationOnly": true,
+  "isOperationalState": false
+}

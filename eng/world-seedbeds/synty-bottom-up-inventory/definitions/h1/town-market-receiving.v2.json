@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:town-market-receiving",
+  "revision": 2,
+  "hierarchyLevelCode": "H1",
+  "title": "마트 후방 입고 공간",
+  "summary": "기존 상향식 재고 v1에서 이관한 마트 후방 입고 공간 설계 지식이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "Mixed",
+  "approvedDefinitionStableId": null,
+  "wiIds": [
+    "WI-MARKET-02",
+    "WI-MARKET-03",
+    "WI-MARKET-04"
+  ],
+  "anticipatedGameplayCodes": [],
+  "spatialRoleCodes": [
+    "MarketReceivingArea",
+    "MarketBackroomArea"
+  ],
+  "capabilityCodes": [],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [],
+  "sourcePackCodes": [
+    "City",
+    "Transition"
+  ],
+  "grammarSetRefs": [
+    "city:도심 마트 앞마당",
+    "transition:Road–BuildingFront 전환"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": true,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/town-market-receiving.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:town-market-receiving"
+  ],
+  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:city:도심-마트-앞마당",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "도심 마트 앞마당 — City 단독 표현",
+  "summary": "도심 마트 앞마당 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "City",
+  "sourceGrammarSetRef": "city:도심 마트 앞마당",
+  "sourceGrammarRefs": [
+    "city:도심 마트 앞마당:A",
+    "city:도심 마트 앞마당:B",
+    "city:도심 마트 앞마당:C"
+  ],
+  "grammarVariantRefs": [
+    "city:도심 마트 앞마당:A",
+    "city:도심 마트 앞마당:B",
+    "city:도심 마트 앞마당:C"
+  ],
+  "topologyCodes": "landmark",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 28.0,
+    "maximumWidthMeters": 28.0,
+    "minimumDepthMeters": 22.0,
+    "maximumDepthMeters": 22.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 10.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": [
+    "Logistics",
+    "Residential"
+  ],
+  "allowedRegionRoleCodes": [
+    "Hub",
+    "Town"
+  ],
+  "edgeProfileCodes": "logistics",
+  "connectorTypeCodes": [
+    "pedestrian",
+    "vehicle"
+  ],
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": false,
+  "repeatAllowed": false,
+  "renderCost": {
+    "minimumTriangleCount": 241,
+    "maximumTriangleCount": 756,
+    "maximumMaterialSlotCount": 4,
+    "maximumRendererCount": 4,
+    "maximumColliderCount": 4
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:town-market-receiving",
+    "h1-stock:town-returns"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.city.r1",
+  "derivationInputHashSha256": "e65352d9326c5acb0a4d75b1255c26bbc24a70b7faf1619a2b912aa00fd308cf",
+  "authoredDocument": "authored/h1-expression/city/도심-마트-앞마당.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

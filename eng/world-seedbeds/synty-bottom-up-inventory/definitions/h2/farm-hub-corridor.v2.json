@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:farm-hub-corridor",
+  "revision": 2,
+  "hierarchyLevelCode": "H2",
+  "title": "Farm–Hub 회랑 블록",
+  "summary": "기존 상향식 재고 v1에서 이관한 Farm–Hub 회랑 블록 조립 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Linear",
+  "requiredH1Refs": [
+    "h1-stock:farm-loading-gate",
+    "h1-stock:farm-hub-corridor"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/farm-hub-corridor.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:farm-hub-corridor"
+  ],
+  "unresolvedItems": [
+    "필수 H1 사이 연결구와 내부 도달 가능성을 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

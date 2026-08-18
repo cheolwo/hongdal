@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:town:생활-공공광장",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "생활 공공광장 — Town 단독 표현",
+  "summary": "생활 공공광장 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Town",
+  "sourceGrammarSetRef": "town:생활 공공광장",
+  "sourceGrammarRefs": [
+    "town:생활 공공광장:A",
+    "town:생활 공공광장:B",
+    "town:생활 공공광장:C"
+  ],
+  "grammarVariantRefs": [
+    "town:생활 공공광장:A",
+    "town:생활 공공광장:B",
+    "town:생활 공공광장:C"
+  ],
+  "topologyCodes": "landmark",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 24.0,
+    "maximumWidthMeters": 24.0,
+    "minimumDepthMeters": 20.0,
+    "maximumDepthMeters": 20.0
+  },
+  "slope": {
+    "minimumDegrees": 0.0,
+    "maximumDegrees": 15.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": "Residential",
+  "allowedRegionRoleCodes": "Town",
+  "edgeProfileCodes": "residential",
+  "connectorTypeCodes": "pedestrian",
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": false,
+  "repeatAllowed": false,
+  "renderCost": {
+    "minimumTriangleCount": 2743,
+    "maximumTriangleCount": 2933,
+    "maximumMaterialSlotCount": 10,
+    "maximumRendererCount": 7,
+    "maximumColliderCount": 7
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:town-living-square",
+    "h1-stock:town-neighborhood-service",
+    "h1-stock:town-staff-rest"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.town.r1",
+  "derivationInputHashSha256": "ace9ef85d58334e273d2ab73383af3111a6f9c566baa3602b50f650e1ceab4c9",
+  "authoredDocument": "authored/h1-expression/town/생활-공공광장.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

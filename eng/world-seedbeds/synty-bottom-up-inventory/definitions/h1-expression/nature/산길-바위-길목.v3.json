@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1-expression.v3",
+  "stableId": "h1-expression:nature:산길-바위-길목",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "cardKindCode": "PackExpression",
+  "title": "산길·바위 길목 — Nature 단독 표현",
+  "summary": "산길·바위 길목 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "ExpressionExploration",
+  "sourcePackCode": "Nature",
+  "sourceGrammarSetRef": "nature:산길·바위 길목",
+  "sourceGrammarRefs": [
+    "nature:산길·바위 길목:A",
+    "nature:산길·바위 길목:B",
+    "nature:산길·바위 길목:C"
+  ],
+  "grammarVariantRefs": [
+    "nature:산길·바위 길목:A",
+    "nature:산길·바위 길목:B",
+    "nature:산길·바위 길목:C"
+  ],
+  "topologyCodes": "detail",
+  "assemblyScaleCodes": "meso",
+  "footprint": {
+    "minimumWidthMeters": 14.0,
+    "maximumWidthMeters": 14.0,
+    "minimumDepthMeters": 8.0,
+    "maximumDepthMeters": 8.0
+  },
+  "slope": {
+    "minimumDegrees": 5.0,
+    "maximumDegrees": 55.0
+  },
+  "requiresWaterMask": false,
+  "allowedLandCoverCodes": [
+    "BareGround",
+    "Corridor",
+    "Forest"
+  ],
+  "allowedRegionRoleCodes": [
+    "Farm",
+    "Region",
+    "Town"
+  ],
+  "edgeProfileCodes": "forest",
+  "connectorTypeCodes": null,
+  "rotationCodes": [
+    "0",
+    "180",
+    "270",
+    "90"
+  ],
+  "mirrorAllowed": true,
+  "repeatAllowed": true,
+  "renderCost": {
+    "minimumTriangleCount": 1438,
+    "maximumTriangleCount": 2782,
+    "maximumMaterialSlotCount": 7,
+    "maximumRendererCount": 5,
+    "maximumColliderCount": 4
+  },
+  "supportsInteractionH1Refs": [
+    "h1-stock:nature-exploration-buffer",
+    "h1-stock:nature-shelter",
+    "h1-stock:nature-trailhead"
+  ],
+  "derivationRecipeCode": "h1.pack-expression.nature.r1",
+  "derivationInputHashSha256": "41b58c6c392ba8a5a0b126402bf991ace2dcaf7431ea30e90a04bc0160f1d92a",
+  "authoredDocument": "authored/h1-expression/nature/산길-바위-길목.v3.md",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

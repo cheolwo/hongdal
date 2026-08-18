@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "simulation-world-spatial-resource-inventory.v1",
+  "revision": "simulation-world-spatial-resource-inventory.r3",
+  "title": "H 공간 구성 재고",
+  "summary": "모판을 H1 단일 명칭이 아니라 H1~H4 상향 조립 공간 자원 계열로 다루며, 재사용 설계 재고와 실제 공간 정의를 분리한다.",
+  "hierarchyCatalogPath": "eng/world-seedbeds/spatial-hierarchy-levels.json",
+  "levels": [
+    {
+      "levelCode": "H1",
+      "familyLabel": "작업공간 모판",
+      "resourceKindCode": "WiSpatialSeedbed",
+      "designInventorySources": [
+        {
+          "sourceTypeCode": "JsonArrayProperty",
+          "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+          "collectionProperty": "h1DefinitionRefs",
+          "expectedCount": 68
+        }
+      ],
+      "definitionSources": [
+        {
+          "sourceTypeCode": "DefinitionCatalogRefs",
+          "sourcePath": "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json",
+          "expectedCount": 5
+        }
+      ]
+    },
+    {
+      "levelCode": "H2",
+      "familyLabel": "블록 모판",
+      "resourceKindCode": "LandscapeBlock",
+      "designInventorySources": [
+        {
+          "sourceTypeCode": "JsonArrayProperty",
+          "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+          "collectionProperty": "h2DefinitionRefs",
+          "expectedCount": 18
+        },
+        {
+          "sourceTypeCode": "JsonDirectory",
+          "sourcePath": "eng/world-seedbeds/landscape-block-candidates",
+          "expectedCount": 1
+        }
+      ],
+      "definitionSources": [
+        {
+          "sourceTypeCode": "JsonDirectory",
+          "sourcePath": "eng/world-seedbeds/landscape-blocks",
+          "expectedCount": 0
+        }
+      ]
+    },
+    {
+      "levelCode": "H3",
+      "familyLabel": "경관 모판",
+      "resourceKindCode": "LandscapeGraph",
+      "designInventorySources": [
+        {
+          "sourceTypeCode": "JsonArrayProperty",
+          "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+          "collectionProperty": "h3DefinitionRefs",
+          "expectedCount": 10
+        }
+      ],
+      "definitionSources": [
+        {
+          "sourceTypeCode": "JsonDirectory",
+          "sourcePath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/landscape-graphs",
+          "expectedCount": 5
+        }
+      ]
+    },
+    {
+      "levelCode": "H4",
+      "familyLabel": "지역 모판",
+      "resourceKindCode": "AreaSet",
+      "designInventorySources": [
+        {
+          "sourceTypeCode": "JsonArrayProperty",
+          "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+          "collectionProperty": "h4DefinitionRefs",
+          "expectedCount": 5
+        }
+      ],
+      "definitionSources": [
+        {
+          "sourceTypeCode": "SingleJson",
+          "sourcePath": "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/area-set.json",
+          "expectedCount": 1
+        }
+      ]
+    }
+  ],
+  "h4Inventory": [
+    {
+      "inventoryId": "h4-stock:pyeongchang-farm-hub-town",
+      "title": "평창 Farm–Hub–Town 지역 모판",
+      "stateCode": "DefinedPartialAssemblyReference",
+      "definitionStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
+      "h3DefinitionRefs": [
+        "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+        "landscape-graph:sim:pyeongchang:farm-hub-corridor.v1",
+        "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
+        "landscape-graph:sim:pyeongchang:hub-town-corridor.v1",
+        "landscape-graph:sim:pyeongchang:pyeongchang-town.v1"
+      ]
+    }
+  ],
+  "stateModel": {
+    "designStateCodes": [
+      "IdeaInventory",
+      "ExploratoryInventory",
+      "CandidateForReview",
+      "ApprovedReference",
+      "DefinedPartialAssemblyReference"
+    ],
+    "placementStateCodes": [
+      "Unallocated",
+      "Allocated",
+      "Placed"
+    ],
+    "boundary": "H 코드는 공간 자원 종류이고 상태가 아니다. 설계 후보·승인 참조와 실제 배정·배치 상태를 H 계층 및 E 증거 단계와 분리한다."
+  },
+  "compositionPolicy": {
+    "directionCode": "BottomUp",
+    "requiresExactChildRevision": true,
+    "requiresDeterministicHash": true,
+    "requiresHumanReviewForPromotion": true,
+    "forbidsAutomaticAuthorityPromotion": true,
+    "forbidsHierarchyCycles": true,
+    "definitionInventorySeparatedFromPlacementInventory": true
+  },
+  "compatibilityPolicy": {
+    "preserveExistingStableIds": true,
+    "preserveExistingSchemaVersions": true,
+    "storeHierarchyCodeOnlyInInventoryLedger": true,
+    "legacySeedbedTermsRemainAdapters": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

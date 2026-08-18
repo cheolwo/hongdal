@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:hub-cold-storage",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "Hub 저온 보관 공간",
+  "summary": "온도 조건이 필요한 화물을 일반 보관과 분리해 관리하는 공간 가능성이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "ColdStorage",
+    "TemperatureExcursion",
+    "ColdChainRelease"
+  ],
+  "spatialRoleCodes": [
+    "HubColdStorageArea"
+  ],
+  "capabilityCodes": [
+    "Spatial.Storage",
+    "Spatial.CargoAccessible",
+    "Spatial.TemperatureControlled"
+  ],
+  "capacityConceptCodes": [],
+  "predecessorH1Refs": [
+    "h1-stock:hub-receiving-storage"
+  ],
+  "successorH1Refs": [
+    "h1-stock:hub-outbound-staging"
+  ],
+  "connectorRoleCodes": [
+    "ColdChainInput",
+    "ColdChainOutput"
+  ],
+  "sourcePackCodes": [
+    "City"
+  ],
+  "grammarSetRefs": [
+    "city:화물 대기 야드",
+    "city:물류 Station 진입부"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": true
+  },
+  "authoredDocument": "authored/h1/hub-cold-storage.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:hub-cold-storage"
+  ],
+  "unresolvedItems": [
+    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

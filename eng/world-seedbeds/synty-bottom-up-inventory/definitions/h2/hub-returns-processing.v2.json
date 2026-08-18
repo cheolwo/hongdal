@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:hub-returns-processing",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "Hub 반품 처리 블록",
+  "summary": "반품 접수에서 격리·재입고·폐기 인계까지 분기하는 회수 물류 레시피다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:hub-returns",
+    "h1-stock:hub-quarantine"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:hub-temporary-staging"
+  ],
+  "connectorRoleCodes": [
+    "ReturnInput",
+    "RestockOutput",
+    "DisposalOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BuildingFootprint",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/hub-returns-processing.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:hub-returns-processing"
+  ],
+  "unresolvedItems": [
+    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:circular-market-town",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "반품·회수 순환형 시장 마을 경관",
+  "summary": "판매·수령 이후 반품과 폐기물 회수까지 생활권 후방 동선에 포함하는 청사진이다.",
+  "knowledgeStateCode": "IdeaInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:market-life-commerce",
+    "h2-candidate:town-returns-waste"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:lowrise-residential"
+  ],
+  "connectorRoleCodes": [
+    "TownReceivingGate",
+    "ReturnOutput",
+    "TownLocalRoad"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/circular-market-town.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:circular-market-town"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:market-life-commerce",
+  "revision": 2,
+  "hierarchyLevelCode": "H2",
+  "title": "마트·생활상권 블록",
+  "summary": "기존 상향식 재고 v1에서 이관한 마트·생활상권 블록 조립 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:town-market-receiving",
+    "h1-stock:town-market-display",
+    "h1-stock:town-resident-pickup",
+    "h1-stock:town-living-square"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "RoadNetwork",
+    "BuildingFootprint",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/market-life-commerce.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:market-life-commerce"
+  ],
+  "unresolvedItems": [
+    "필수 H1 사이 연결구와 내부 도달 가능성을 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

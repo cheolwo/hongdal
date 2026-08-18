@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:highland-farm",
+  "revision": 2,
+  "hierarchyLevelCode": "H3",
+  "title": "고지대 농장 경관",
+  "summary": "기존 상향식 재고 v1에서 이관한 고지대 농장 경관 지역 유형 청사진이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ContourAdaptive",
+  "requiredH2Refs": [
+    "h2-candidate:highland-production",
+    "h2-candidate:farm-processing-shipping",
+    "h2-candidate:forest-edge-farm"
+  ],
+  "optionalH2Refs": [],
+  "connectorRoleCodes": [
+    "FarmExternalGate"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/highland-farm.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h3-candidate:highland-farm"
+  ],
+  "unresolvedItems": [
+    "AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

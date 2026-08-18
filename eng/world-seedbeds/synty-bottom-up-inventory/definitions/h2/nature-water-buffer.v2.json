@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:nature-water-buffer",
+  "revision": 2,
+  "hierarchyLevelCode": "H2",
+  "title": "산림·수변 완충 블록",
+  "summary": "기존 상향식 재고 v1에서 이관한 산림·수변 완충 블록 조립 레시피다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Organic",
+  "requiredH1Refs": [
+    "h1-stock:nature-exploration-buffer",
+    "h1-stock:nature-farm-edge"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "requiredEvidencePurposeCodes": [
+    "TerrainSlope",
+    "LandCover",
+    "Hydrography",
+    "BlockBoundary"
+  ],
+  "authoredDocument": "authored/h2/nature-water-buffer.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h2-candidate:nature-water-buffer"
+  ],
+  "unresolvedItems": [
+    "필수 H1 사이 연결구와 내부 도달 가능성을 검토한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}
