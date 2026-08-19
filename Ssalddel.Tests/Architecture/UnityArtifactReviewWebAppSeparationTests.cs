@@ -42,6 +42,7 @@ public sealed class UnityArtifactReviewWebAppSeparationTests
         var compose = Read("deploy/azure-unity-review-vm/compose.yaml");
         var localOverride = Read("deploy/azure-unity-review-vm/compose.local.override.yaml");
         var caddy = Read("deploy/azure-unity-review-vm/Caddyfile");
+        var packageScript = Read("deploy/azure-unity-review-vm/package.ps1");
 
         Assert.Contains("mysql:", compose);
         Assert.DoesNotContain("mongo:", compose);
@@ -51,6 +52,8 @@ public sealed class UnityArtifactReviewWebAppSeparationTests
         Assert.Contains("review_images:/review-content", compose);
         Assert.Contains("package-work/bundle/api:/app:ro", localOverride);
         Assert.Contains("package-work/bundle/web:/srv:ro", localOverride);
+        Assert.Contains("Ssalddel.Contracts/Common/WorldProjection", packageScript);
+        Assert.Contains("Ssalddel/Services/WorldProjection", packageScript);
         Assert.Contains("/local-storage/*", caddy);
         Assert.DoesNotContain("roles/01", caddy);
     }

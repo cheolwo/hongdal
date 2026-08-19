@@ -61,9 +61,8 @@ $relevantStatus = @(& git -C $repositoryRoot status --short -- `
     Ssalddel.UnityReview.Core `
     Ssalddel.Web.UnityReviewApp `
     Ssalddel.UnityReview.slnx `
-    Ssalddel.Contracts/Common/WorldProjection/Synty공간조립모바일검토Dtos.cs `
-    Ssalddel/Services/WorldProjection/Synty공간조립모바일검토Service.cs `
-    Ssalddel/Services/WorldProjection/Synty공간조립검토촬영업로드Service.cs `
+    Ssalddel.Contracts/Common/WorldProjection `
+    Ssalddel/Services/WorldProjection `
     deploy/azure-unity-review-vm `
     Directory.Packages.props)
 $commitLabel = if ($relevantStatus.Count -gt 0) { "$commit-working-tree" } else { $commit }
