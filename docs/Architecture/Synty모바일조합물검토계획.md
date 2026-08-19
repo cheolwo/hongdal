@@ -224,6 +224,18 @@ Unity 촬영 산출물은 커뮤니티·주문·운송 등 일반 업무 화면�
 
 전용 앱은 `Ssalddel.Contracts`와 공통 인증 토큰 구조만 참조하고 `Ssalddel.WebApp` 프로젝트·페이지·레이아웃·서비스를 참조하지 않는다. 인증 localStorage와 검토 오프라인 대기열도 `ssalddel.unity-review.*` 키를 사용해 일반 WebApp 브라우저 상태와 분리한다. 검토 API 요청에는 전용 앱이 복구한 Bearer token을 명시적으로 붙이며, 로그인 성공 뒤에도 `서버관리자` 역할이 없으면 토큰을 즉시 지운다.
 
+전용 앱 내부도 다음 책임으로 나눈다.
+
+| 구성 | 책임 | 금지 경계 |
+| --- | --- | --- |
+| `Synty공간조립Web검토Page.razor` | 모바일 표시와 사용자 입력 binding | API 호출·localStorage 직접 접근·상태 전이 계산 |
+| page code-behind | 로그인 복구·로그아웃·초기화 생명주기 | 검토 목록·판단 대기열 소유 |
+| `Synty공간조립검토Workspace` | 카드 선택·4시점 전환·판단·재전송 화면 상태 | HTTP 구현·브라우저 저장 API 직접 접근 |
+| `ISynty공간조립모바일검토Client` 구현 | Bearer API 조회·판단 전송 | 오프라인 데이터 영속 |
+| `Synty공간조립오프라인검토Store` | 전용 localStorage 대기열 조회·추가·삭제 | 서버 성공 상태의 권위 판단 |
+
+서버는 검토·촬영 UseCase와 Mongo·메모리 `Stores`를 분리하고, Unity는 공개 `Synty공간조립Web검토CapturePipeline` 진입점을 유지한 채 orchestration, Capture Stage·카메라, API client, 전송 model을 파일로 나눈다. 이 분리는 코드 책임을 줄이기 위한 것이며 API route, JSON field, Stable ID, Blob·Mongo 권위와 `Good ≠ 승인` 의미를 바꾸지 않는다.
+
 전용 개발 솔루션은 `Ssalddel.UnityReview.slnx`다. 일반 제품 배포 대상인 `Ssalddel.v3.5.slnx`와 역할별 `Ssalddel.RoleWebApps.slnx`에는 자동 포함하지 않는다. 로컬 기본 주소는 `https://localhost:7286`, 서버 API 기본 주소는 `https://localhost:7117`이며 다음처럼 실행한다.
 
 ```powershell

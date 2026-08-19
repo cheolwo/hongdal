@@ -1992,3 +1992,13 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 배포: 전용 앱은 `Ssalddel.UnityReview.slnx`로 독립 빌드한다. 일반 제품 릴리스와 역할 WebApp에 자동 포함하지 않으며, 배포·hostname·공개 Blob 정책·민감 화면 검증을 별도 게이트로 관리한다.
 - 공유 경계: 서버 API·`Ssalddel.Contracts`·공통 인증 토큰 구조만 재사용한다. 일반 WebApp 프로젝트·레이아웃·서비스에 대한 참조는 금지한다.
 - 관계: D-181의 공개 이미지·관리자 검토 경계를 배포 가능한 클라이언트 경계로 구체화하며 `Good ≠ 승인`, 서버 원장 권위와 Unity 표현 전용 원칙은 유지한다.
+
+## D-183 Synty 검토 폐루프는 저장·화면 상태·전송·촬영 조립 책임을 분리한다
+
+- 상태: Accepted
+- 결정일: 2026-08-19
+- 서버: 검토·촬영 UseCase는 상태 전이와 PNG 검증을 소유하고 Mongo·메모리 원장 구현, 영수증 record와 저장 구현은 별도 `Stores` 파일이 소유한다. Blob 위치와 Mongo 영수증의 권위, 기존 API route·JSON 계약·Stable ID는 바꾸지 않는다.
+- 전용 WebApp: Razor page는 표시만, code-behind는 인증 생명주기만, `Workspace`는 화면 상태와 판단 전이만 맡는다. HTTP Client는 Bearer API 통신만 맡고 브라우저 `localStorage` 대기열은 전용 오프라인 Store가 맡는다. 일반 `Ssalddel.WebApp`으로 책임을 되돌리지 않는다.
+- Unity: 공개 메뉴와 `Synty공간조립Web검토CapturePipeline` 진입점은 유지하고 orchestration, 전용 Capture Stage·카메라, 서버 API client, 전송 model을 파일 단위로 나눈다. 원본 Synty Prefab·저장 Scene·촬영 Stable ID와 v2 계약은 유지한다.
+- 검증 경계: 구조 분리는 서버·Web 집중 시험, Unity Editor 어셈블리 빌드와 그래픽 장치를 유지한 EditMode 촬영 시험으로 확인한다. 이는 Azure·Mongo·관리자 HTTP·휴대폰 실기기 왕복 증거를 대신하지 않는다.
+- 관계: D-181의 서버 권위·촬영 계보와 D-182의 물리 Web 프로젝트 분리를 내부 책임 경계까지 구체화한다.
