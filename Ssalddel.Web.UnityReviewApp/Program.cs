@@ -22,6 +22,8 @@ if (!Uri.TryCreate(configuredBaseAddress, UriKind.Absolute, out var apiBaseAddre
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = apiBaseAddress });
 builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
 builder.Services.AddScoped<UnityReviewAuthSessionService>();
-builder.Services.AddScoped<Synty공간조립모바일검토Client>();
+builder.Services.AddScoped<Synty공간조립오프라인검토Store>();
+builder.Services.AddScoped<ISynty공간조립모바일검토Client, Synty공간조립모바일검토Client>();
+builder.Services.AddScoped<Synty공간조립검토Workspace>();
 
 await builder.Build().RunAsync();

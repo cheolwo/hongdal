@@ -2,9 +2,9 @@
 @page "/reviews/compositions"
 @page "/world/review/compositions"
 @using Ssalddel.Contracts.Common.WorldProjection
-@inject Synty공간조립모바일검토Client ReviewClient
+@inject Synty공간조립검토Workspace Workspace
 @inject UnityReviewAuthSessionService AuthSession
-@implements IDisposable
+
 
 <PageTitle>Synty 공간 조립 Web 검토 · 살뜰</PageTitle>
 
@@ -40,14 +40,14 @@ else if (!IsServerAdministrator)
 else
 {
     <main class="composition-review-shell">
-        <section class="safety-lock @(ParkingConfirmed ? "confirmed" : string.Empty)">
+        <section class="safety-lock @(Workspace.ParkingConfirmed ? "confirmed" : string.Empty)">
             <div>
                 <strong>신호 대기 중에는 사용하지 마세요</strong>
                 <p>차량을 합법적인 장소에 완전히 주차하고 운전을 종료한 뒤에만 검토해 주세요.</p>
             </div>
-            @if (!ParkingConfirmed)
+            @if (!Workspace.ParkingConfirmed)
             {
-                <button type="button" class="parking-confirm" @onclick="ConfirmParking">
+                <button type="button" class="parking-confirm" @onclick="Workspace.ConfirmParking">
                     안전하게 주차했습니다
                 </button>
             }
@@ -64,35 +64,35 @@ else
 
         <section class="review-toolbar" aria-label="검토함 상태">
             <div>
-                <span>전체 <strong>@(_inbox?.TotalCount ?? 0)</strong></span>
-                <span>검토 대기 <strong>@(_inbox?.ReadyCount ?? 0)</strong></span>
-                <span>판단 완료 <strong>@(_inbox?.ReviewedCount ?? 0)</strong></span>
+                <span>전체 <strong>@(Workspace.Inbox?.TotalCount ?? 0)</strong></span>
+                <span>검토 대기 <strong>@(Workspace.Inbox?.ReadyCount ?? 0)</strong></span>
+                <span>판단 완료 <strong>@(Workspace.Inbox?.ReviewedCount ?? 0)</strong></span>
             </div>
             <div class="toolbar-actions">
-                @if (_offlinePendingCount > 0)
+                @if (Workspace.OfflinePendingCount > 0)
                 {
-                    <button type="button" class="sync-button" disabled="@_busy" @onclick="SynchronizeOfflineAsync">
-                        오프라인 @_offlinePendingCount 건 동기화
+                    <button type="button" class="sync-button" disabled="@Workspace.Busy" @onclick="Workspace.SynchronizeOfflineAsync">
+                        오프라인 @Workspace.OfflinePendingCount 건 동기화
                     </button>
                 }
-                <button type="button" class="refresh-button" disabled="@_busy" @onclick="LoadInboxAsync">
+                <button type="button" class="refresh-button" disabled="@Workspace.Busy" @onclick="Workspace.LoadInboxAsync">
                     새로고침
                 </button>
             </div>
         </section>
 
-        @if (!string.IsNullOrWhiteSpace(_message))
+        @if (!string.IsNullOrWhiteSpace(Workspace.Message))
         {
-            <div class="review-message @(_messageIsError ? "error" : "success")" role="status">
-                @_message
+            <div class="review-message @(Workspace.MessageIsError ? "error" : "success")" role="status">
+                @Workspace.Message
             </div>
         }
 
-        @if (_loading)
+        @if (Workspace.Loading)
         {
             <section class="review-empty">검토 조합물을 불러오고 있습니다.</section>
         }
-        else if (CurrentItem is null)
+        else if (Workspace.CurrentItem is null)
         {
             <section class="review-empty">
                 <h2>아직 등록된 촬영 조합물이 없습니다</h2>
@@ -101,18 +101,18 @@ else
         }
         else
         {
-            var item = CurrentItem;
+            var item = Workspace.CurrentItem;
             var composition = item.Composition;
-            var capture = CurrentCapture;
+            var capture = Workspace.CurrentCapture;
 
             <article class="review-card" aria-labelledby="composition-review-title">
                 <header class="card-heading">
                     <div>
-                        <span class="card-progress">@(_currentIndex + 1) / @(_inbox?.Items.Count ?? 0)</span>
+                        <span class="card-progress">@(Workspace.CurrentIndex + 1) / @(Workspace.Inbox?.Items.Count ?? 0)</span>
                         <h2 id="composition-review-title">@composition.DisplayName</h2>
                         <p>@item.BatchTitle · @composition.VariantCode · @composition.StateProfileCode</p>
                     </div>
-                    <span class="state-badge @StateCss(item.ReviewStateCode)">@StateLabel(item.ReviewStateCode)</span>
+                    <span class="state-badge @Synty공간조립검토Presentation.StateCss(item.ReviewStateCode)">@Synty공간조립검토Presentation.StateLabel(item.ReviewStateCode)</span>
                 </header>
 
                 <section class="capture-stage">
@@ -125,22 +125,22 @@ else
                     }
                     else
                     {
-                        @if (_imageLoadFailed)
+                        @if (Workspace.ImageLoadFailed)
                         {
                             <div class="capture-placeholder image-error">
                                 <strong>이미지를 불러오지 못했습니다</strong>
                                 <span>Blob 공개 읽기 설정과 저장 경로를 확인한 뒤 다시 시도해 주세요.</span>
-                                <button type="button" @onclick="RetryImage">이미지 다시 시도</button>
+                                <button type="button" @onclick="Workspace.RetryImage">이미지 다시 시도</button>
                             </div>
                         }
                         else
                         {
-                            <button type="button" class="capture-image-button" @onclick="OpenImage" aria-label="이미지 전체 화면으로 보기">
-                                <img @key="ImageRenderKey"
+                            <button type="button" class="capture-image-button" @onclick="Workspace.OpenImage" aria-label="이미지 전체 화면으로 보기">
+                                <img @key="Workspace.ImageRenderKey"
                                      src="@capture.ImageUrl"
                                      alt="@($"{composition.DisplayName} · {capture.DisplayName}")"
                                      loading="eager"
-                                     @onerror="HandleImageLoadError" />
+                                     @onerror="Workspace.HandleImageLoadError" />
                             </button>
                         }
                         <span class="capture-label">@capture.DisplayName · @capture.Width×@capture.Height</span>
@@ -162,9 +162,9 @@ else
                         {
                             var index = captureIndex;
                             <button type="button"
-                                    class="@(index == _captureIndex ? "active" : string.Empty)"
+                                    class="@(index == Workspace.CaptureIndex ? "active" : string.Empty)"
                                     aria-label="@(composition.Captures[index].DisplayName)"
-                                    @onclick="() => SelectCapture(index)">
+                                    @onclick="() => Workspace.SelectCapture(index)">
                                 @(index + 1)
                             </button>
                         }
@@ -191,14 +191,14 @@ else
                 <section class="issue-section">
                     <h3>눈에 띈 문제</h3>
                     <div class="issue-chips">
-                        @foreach (var issue in IssueChoices)
+                        @foreach (var issue in Synty공간조립검토Presentation.IssueChoices)
                         {
-                            var selected = _selectedIssues.Contains(issue.Code);
+                            var selected = Workspace.SelectedIssues.Contains(issue.Code);
                             <button type="button"
                                     class="@(selected ? "selected" : string.Empty)"
                                     aria-pressed="@selected"
-                                    disabled="@(!ParkingConfirmed || _busy)"
-                                    @onclick="() => ToggleIssue(issue.Code)">
+                                    disabled="@(!Workspace.ParkingConfirmed || Workspace.Busy)"
+                                    @onclick="() => Workspace.ToggleIssue(issue.Code)">
                                 @issue.Label
                             </button>
                         }
@@ -207,9 +207,9 @@ else
                     <textarea id="composition-review-note"
                               maxlength="500"
                               rows="2"
-                              disabled="@(!ParkingConfirmed || _busy)"
+                              disabled="@(!Workspace.ParkingConfirmed || Workspace.Busy)"
                               placeholder="필요할 때만 입력하세요."
-                              @bind="_note"></textarea>
+                              @bind="Workspace.Note"></textarea>
                 </section>
 
                 @if (item.History.Count > 0)
@@ -219,7 +219,7 @@ else
                         @foreach (var history in item.History.OrderByDescending(value => value.Revision).Take(3))
                         {
                             <div>
-                                <strong>@HistoryLabel(history)</strong>
+                                <strong>@Synty공간조립검토Presentation.HistoryLabel(history)</strong>
                                 <span>@history.ReviewerDisplayName · @history.DecidedAtUtc.ToLocalTime().ToString("MM-dd HH:mm")</span>
                                 @if (!string.IsNullOrWhiteSpace(history.Note))
                                 {
@@ -231,386 +231,35 @@ else
                 }
 
                 <section class="decision-grid" aria-label="빠른 검토 판단">
-                    <button type="button" class="good" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.Good)">
+                    <button type="button" class="good" disabled="@Workspace.DecisionDisabled" @onclick="() => Workspace.SubmitDecisionAsync(Synty공간조립검토결정Codes.Good)">
                         <strong>좋음</strong><span>검토 후보로 남김</span>
                     </button>
-                    <button type="button" class="revise" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.NeedsRevision)">
+                    <button type="button" class="revise" disabled="@Workspace.DecisionDisabled" @onclick="() => Workspace.SubmitDecisionAsync(Synty공간조립검토결정Codes.NeedsRevision)">
                         <strong>수정 필요</strong><span>문제와 함께 재조립</span>
                     </button>
-                    <button type="button" class="hold" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.OnHold)">
+                    <button type="button" class="hold" disabled="@Workspace.DecisionDisabled" @onclick="() => Workspace.SubmitDecisionAsync(Synty공간조립검토결정Codes.OnHold)">
                         <strong>보류</strong><span>나중에 다시 판단</span>
                     </button>
-                    <button type="button" class="compare" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.CompareCandidate)">
+                    <button type="button" class="compare" disabled="@Workspace.DecisionDisabled" @onclick="() => Workspace.SubmitDecisionAsync(Synty공간조립검토결정Codes.CompareCandidate)">
                         <strong>비교 후보</strong><span>A/B/C와 나란히 보기</span>
                     </button>
                 </section>
 
                 <footer class="card-footer">
-                    <button type="button" disabled="@(_currentIndex <= 0 || _busy)" @onclick="PreviousItem">이전</button>
+                    <button type="button" disabled="@(Workspace.CurrentIndex <= 0 || Workspace.Busy)" @onclick="Workspace.PreviousItem">이전</button>
                     <span>휴대폰 판단은 최종 Scene 승인이 아닙니다.</span>
-                    <button type="button" disabled="@(!CanMoveNext || _busy)" @onclick="NextItem">다음</button>
+                    <button type="button" disabled="@(!Workspace.CanMoveNext || Workspace.Busy)" @onclick="Workspace.NextItem">다음</button>
                 </footer>
             </article>
 
-            @if (_imageExpanded && capture is not null)
+            @if (Workspace.ImageExpanded && capture is not null)
             {
-                <div class="image-lightbox" role="dialog" aria-modal="true" aria-label="조합물 촬영 이미지 확대" @onclick="CloseImage">
-                    <button type="button" class="lightbox-close" @onclick="CloseImage">닫기</button>
+                <div class="image-lightbox" role="dialog" aria-modal="true" aria-label="조합물 촬영 이미지 확대" @onclick="Workspace.CloseImage">
+                    <button type="button" class="lightbox-close" @onclick="Workspace.CloseImage">닫기</button>
                     <img src="@capture.ImageUrl" alt="@($"{composition.DisplayName} · {capture.DisplayName} 확대")" />
                     <span>@capture.DisplayName · 손가락으로 확대해 세부를 확인하세요.</span>
                 </div>
             }
         }
     </main>
-}
-
-@code {
-    private static readonly (string Code, string Label)[] IssueChoices =
-    [
-        (Synty공간조립검토문제Codes.RouteUnclear, "동선 불명확"),
-        (Synty공간조립검토문제Codes.TooDense, "너무 복잡함"),
-        (Synty공간조립검토문제Codes.PackBlendAwkward, "팩 혼합 어색"),
-        (Synty공간조립검토문제Codes.PsychologicalReadabilityWeak, "회복·위협감 부족"),
-        (Synty공간조립검토문제Codes.PerformanceConcern, "성능 우려"),
-        (Synty공간조립검토문제Codes.EntranceExitUnclear, "출입구 불명확")
-    ];
-
-    private Synty공간조립검토함Response? _inbox;
-    private readonly HashSet<string> _selectedIssues = new(StringComparer.Ordinal);
-    private readonly HashSet<string> _offlineQueuedItems = new(StringComparer.Ordinal);
-    private int _currentIndex;
-    private int _captureIndex;
-    private int _offlinePendingCount;
-    private string _note = string.Empty;
-    private string? _message;
-    private bool _messageIsError;
-    private bool _loading;
-    private bool _busy;
-    private bool _loaded;
-    private bool _imageExpanded;
-    private bool _imageLoadFailed;
-    private int _imageRetryRevision;
-
-    private bool ParkingConfirmed { get; set; }
-
-    private bool IsServerAdministrator
-        => AuthSession.Roles.Any(role =>
-            string.Equals(role, "서버관리자", StringComparison.OrdinalIgnoreCase));
-
-    private Synty공간조립검토항목Dto? CurrentItem
-        => _inbox?.Items.Count > _currentIndex && _currentIndex >= 0
-            ? _inbox.Items[_currentIndex]
-            : null;
-
-    private Synty공간조립검토촬영Dto? CurrentCapture
-        => CurrentItem?.Composition.Captures.Count > _captureIndex && _captureIndex >= 0
-            ? CurrentItem.Composition.Captures[_captureIndex]
-            : null;
-
-    private bool DecisionDisabled
-        => !ParkingConfirmed
-           || _busy
-           || CurrentItem is null
-           || CurrentItem.Composition.Captures.Count == 0
-           || _offlineQueuedItems.Contains(CurrentItem.ReviewItemStableId);
-
-    private bool CanMoveNext => _inbox is not null && _currentIndex < _inbox.Items.Count - 1;
-
-    private string ImageRenderKey
-        => $"{CurrentCapture?.CaptureUploadId}:{CurrentCapture?.ImageSha256}:{_imageRetryRevision}";
-
-    protected override void OnInitialized()
-    {
-        AuthSession.Changed += HandleAuthChanged;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        await AuthSession.EnsureRestoredAsync();
-        _offlinePendingCount = await ReviewClient.오프라인대기수조회Async();
-        if (AuthSession.IsLoggedIn && IsServerAdministrator)
-        {
-            await LoadInboxAsync();
-        }
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private void ConfirmParking()
-    {
-        ParkingConfirmed = true;
-        _message = "주차 검토 모드를 열었습니다. 출발 전에는 화면을 닫아 주세요.";
-        _messageIsError = false;
-    }
-
-    private async Task LoadInboxAsync()
-    {
-        if (_busy || !AuthSession.IsLoggedIn || !IsServerAdministrator)
-        {
-            return;
-        }
-        _loading = true;
-        _busy = true;
-        _message = null;
-        try
-        {
-            _inbox = await ReviewClient.검토함조회Async(take: 100);
-            _currentIndex = FindFirstReviewIndex(_inbox.Items);
-            _captureIndex = 0;
-            ResetDraft();
-            _loaded = true;
-        }
-        catch (Exception exception)
-        {
-            _message = $"검토함을 불러오지 못했습니다. {exception.Message}";
-            _messageIsError = true;
-        }
-        finally
-        {
-            _loading = false;
-            _busy = false;
-        }
-    }
-
-    private async Task SubmitDecisionAsync(string decisionCode)
-    {
-        var item = CurrentItem;
-        if (DecisionDisabled || item is null)
-        {
-            return;
-        }
-        if (decisionCode == Synty공간조립검토결정Codes.NeedsRevision
-            && _selectedIssues.Count == 0
-            && string.IsNullOrWhiteSpace(_note))
-        {
-            _message = "수정 필요를 선택하려면 문제 꼬리표나 짧은 메모를 하나 남겨 주세요.";
-            _messageIsError = true;
-            return;
-        }
-
-        _busy = true;
-        _message = null;
-        try
-        {
-            var request = new Synty공간조립검토결정Request
-            {
-                ExpectedRevision = item.Revision,
-                IdempotencyKey = $"mobile:{item.ReviewItemStableId}:{item.Revision}:{Guid.NewGuid():N}",
-                DecisionCode = decisionCode,
-                IssueCodes = _selectedIssues.OrderBy(code => code, StringComparer.Ordinal).ToList(),
-                Note = _note.Trim()
-            };
-            var result = await ReviewClient.결정전송Async(
-                item.ReviewItemStableId,
-                request);
-            if (result.Item is not null && _inbox is not null)
-            {
-                _inbox.Items[_currentIndex] = result.Item;
-                _inbox.ReadyCount = Math.Max(0, _inbox.ReadyCount - 1);
-                _inbox.ReviewedCount++;
-            }
-            if (result.QueuedOffline)
-            {
-                _offlineQueuedItems.Add(item.ReviewItemStableId);
-                _offlinePendingCount = await ReviewClient.오프라인대기수조회Async();
-            }
-            _message = result.Message;
-            _messageIsError = false;
-            MoveNextAfterDecision();
-        }
-        catch (Synty공간조립검토HttpException exception)
-        {
-            _message = exception.StatusCode == System.Net.HttpStatusCode.Conflict
-                ? "다른 검토 또는 새 촬영 묶음이 먼저 저장되었습니다. 새로고침 후 다시 확인해 주세요."
-                : $"검토 결과를 저장하지 못했습니다. {exception.Message}";
-            _messageIsError = true;
-        }
-        catch (Exception exception)
-        {
-            _message = $"검토 결과를 저장하지 못했습니다. {exception.Message}";
-            _messageIsError = true;
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
-
-    private async Task SynchronizeOfflineAsync()
-    {
-        if (_busy)
-        {
-            return;
-        }
-        _busy = true;
-        try
-        {
-            var result = await ReviewClient.오프라인대기열동기화Async();
-            _offlinePendingCount = result.PendingCount;
-            _message = result.ErrorMessage
-                       ?? $"오프라인 검토 {result.SynchronizedCount}건을 서버에 동기화했습니다.";
-            _messageIsError = result.ErrorMessage is not null;
-            if (result.SynchronizedCount > 0)
-            {
-                _offlineQueuedItems.Clear();
-                _busy = false;
-                await LoadInboxAsync();
-                return;
-            }
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
-
-    private void SelectCapture(int index)
-    {
-        if (CurrentItem is not null && index >= 0 && index < CurrentItem.Composition.Captures.Count)
-        {
-            _captureIndex = index;
-            ResetImageState();
-        }
-    }
-
-    private void OpenImage() => _imageExpanded = CurrentCapture is not null && !_imageLoadFailed;
-
-    private void CloseImage() => _imageExpanded = false;
-
-    private void HandleImageLoadError()
-    {
-        _imageLoadFailed = true;
-        _imageExpanded = false;
-    }
-
-    private void RetryImage()
-    {
-        _imageLoadFailed = false;
-        _imageRetryRevision++;
-    }
-
-    private void ToggleIssue(string issueCode)
-    {
-        if (!_selectedIssues.Add(issueCode))
-        {
-            _selectedIssues.Remove(issueCode);
-        }
-    }
-
-    private void PreviousItem()
-    {
-        if (_currentIndex <= 0)
-        {
-            return;
-        }
-        _currentIndex--;
-        _captureIndex = 0;
-        ResetImageState();
-        ResetDraft();
-    }
-
-    private void NextItem()
-    {
-        if (!CanMoveNext)
-        {
-            return;
-        }
-        _currentIndex++;
-        _captureIndex = 0;
-        ResetImageState();
-        ResetDraft();
-    }
-
-    private void MoveNextAfterDecision()
-    {
-        if (CanMoveNext)
-        {
-            _currentIndex++;
-            _captureIndex = 0;
-        }
-        ResetImageState();
-        ResetDraft();
-    }
-
-    private void ResetImageState()
-    {
-        _imageExpanded = false;
-        _imageLoadFailed = false;
-    }
-
-    private void ResetDraft()
-    {
-        _selectedIssues.Clear();
-        _note = string.Empty;
-    }
-
-    private void HandleAuthChanged()
-        => _ = InvokeAsync(async () =>
-        {
-            if (AuthSession.IsLoggedIn && IsServerAdministrator && !_loaded)
-            {
-                await LoadInboxAsync();
-            }
-            StateHasChanged();
-        });
-
-    private static int FindFirstReviewIndex(IReadOnlyList<Synty공간조립검토항목Dto> items)
-    {
-        for (var index = 0; index < items.Count; index++)
-        {
-            if (items[index].ReviewStateCode is Synty공간조립검토상태Codes.ReadyForReview
-                or Synty공간조립검토상태Codes.Stale)
-            {
-                return index;
-            }
-        }
-        return 0;
-    }
-
-    private static string StateLabel(string stateCode)
-        => stateCode switch
-        {
-            Synty공간조립검토상태Codes.WaitingForCapture => "촬영 대기",
-            Synty공간조립검토상태Codes.ReadyForReview => "검토 대기",
-            Synty공간조립검토상태Codes.ReviewedCandidate => "좋음 후보",
-            Synty공간조립검토상태Codes.NeedsRevision => "Unity 재촬영 대기",
-            Synty공간조립검토상태Codes.OnHold => "보류",
-            Synty공간조립검토상태Codes.CompareCandidate => "비교 후보",
-            Synty공간조립검토상태Codes.Stale => "입력 변경 · 재검토",
-            _ => stateCode
-        };
-
-    private static string HistoryLabel(Synty공간조립검토결정이력Dto history)
-        => history.EventCode switch
-        {
-            Synty공간조립검토EventCodes.RecaptureSubmitted => "새 재촬영 등록",
-            Synty공간조립검토EventCodes.SourceUpdated => "조립 입력 변경",
-            _ => history.DecisionCode switch
-            {
-                Synty공간조립검토결정Codes.Good => "좋음 후보",
-                Synty공간조립검토결정Codes.NeedsRevision => "수정 필요",
-                Synty공간조립검토결정Codes.OnHold => "보류",
-                Synty공간조립검토결정Codes.CompareCandidate => "비교 후보",
-                _ => history.EventCode
-            }
-        };
-
-    private static string StateCss(string stateCode)
-        => stateCode switch
-        {
-            Synty공간조립검토상태Codes.ReadyForReview => "ready",
-            Synty공간조립검토상태Codes.Stale => "stale",
-            Synty공간조립검토상태Codes.ReviewedCandidate => "reviewed",
-            Synty공간조립검토상태Codes.NeedsRevision => "revision",
-            _ => "neutral"
-        };
-
-    public void Dispose()
-    {
-        AuthSession.Changed -= HandleAuthChanged;
-    }
 }

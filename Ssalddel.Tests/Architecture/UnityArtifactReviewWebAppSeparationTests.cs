@@ -38,12 +38,38 @@ public sealed class UnityArtifactReviewWebAppSeparationTests
             "Ssalddel.Web.UnityReviewApp/Services/UnityReviewAuthSessionService.cs");
         var client = Read(
             "Ssalddel.Web.UnityReviewApp/Services/Synty공간조립모바일검토Client.cs");
+        var offlineStore = Read(
+            "Ssalddel.Web.UnityReviewApp/Services/Synty공간조립오프라인검토Store.cs");
 
         Assert.Contains("서버관리자", page);
         Assert.Contains("공개 읽기 방식", page);
         Assert.Contains("ssalddel.unity-review.auth.v1", auth);
-        Assert.Contains("ssalddel.unity-review.composition-review.offline.v1", client);
+        Assert.Contains("ssalddel.unity-review.composition-review.offline.v1", offlineStore);
+        Assert.DoesNotContain("localStorage", client);
         Assert.Contains("AuthenticationHeaderValue", client);
+    }
+
+    [Fact]
+    public void 전용WebApp은_화면상태와_전송과_브라우저저장을_분리한다()
+    {
+        var page = Read(
+            "Ssalddel.Web.UnityReviewApp/Pages/Synty공간조립Web검토Page.razor");
+        var pageCodeBehind = Read(
+            "Ssalddel.Web.UnityReviewApp/Pages/Synty공간조립Web검토Page.razor.cs");
+        var workspace = Read(
+            "Ssalddel.Web.UnityReviewApp/Services/Synty공간조립검토Workspace.cs");
+        var client = Read(
+            "Ssalddel.Web.UnityReviewApp/Services/Synty공간조립모바일검토Client.cs");
+        var offlineStore = Read(
+            "Ssalddel.Web.UnityReviewApp/Services/Synty공간조립오프라인검토Store.cs");
+
+        Assert.DoesNotContain("@code", page);
+        Assert.Contains("Workspace.", page);
+        Assert.Contains("AuthSession.Changed", pageCodeBehind);
+        Assert.Contains("ISynty공간조립모바일검토Client", workspace);
+        Assert.Contains("HttpClient", client);
+        Assert.DoesNotContain("IJSRuntime", client);
+        Assert.Contains("IJSRuntime", offlineStore);
     }
 
     private static string Read(string relativePath)
