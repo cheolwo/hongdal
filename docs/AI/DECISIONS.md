@@ -2012,3 +2012,14 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 서버와 데이터: 검토 API가 바뀐 경우 서버 이미지는 별도로 갱신하되 기존 MySQL·MongoDB·Data Protection·업로드 볼륨과 VM 비밀값을 보존한다. 촬영 이미지는 기존 Azure Blob 공개 container의 불변 `world-composition-reviews/` prefix를 사용하고 Mongo 영수증 권위를 유지한다.
 - 운영 경계: 화면은 H1·H2·H3 고유 식별자와 촬영 묶음을 보여 주지만 `Good`은 후보 판단일 뿐 H 승인·Scene 적용·E5·Simulation 완료가 아니다. Azure VM의 현재 비용 통제 운영창은 한국 시간 19:00~23:00이며 시간 밖 수동 기동은 별도 명시 승인을 요구한다.
 - 관계: D-182의 물리 WebApp 분리를 저비용 Azure 미리보기의 실제 경로와 원격 교체 단위까지 구체화한다.
+
+## D-186 Unity 산출물 검토는 역할별 VM과 분리한 무료 대상 VM의 최소 Docker 스택으로 운영한다
+
+- 상태: Accepted
+- 결정일: 2026-08-19
+- 대체 관계: D-184의 기존 Azure VM `/unity-review/` 공동 운영 결정을 대체한다. 기존 배포 묶음은 비상용 자료로만 남기며 새 검토 앱은 역할별 WebApp VM의 기동 시간·Caddy·MySQL·MongoDB·비밀값을 공유하지 않는다.
+- 실행 경계: 별도 `Standard_B2ats_v2` 또는 같은 무료 대상 SKU에 Caddy, `Ssalddel.UnityReview.Api`, MySQL 8.4만 Docker Compose로 실행한다. MongoDB와 통합 `Ssalddel` 서버는 넣지 않으며 Compose 메모리 상한 64MB·320MB·384MB와 host 2GB swap을 적용한다.
+- 코드 경계: `Ssalddel.UnityReview.Core`가 검토 상태 전이와 PNG 검증 소스만 재사용하고 전용 API는 통합 서버 프로젝트를 참조하지 않는다. 전용 solution·hostname·관리자 JWT·MySQL 원장·이미지 volume·배포 archive와 SSH key를 역할별 WebApp에서 분리한다.
+- 저장 경계: 미리보기 이미지는 hash 기반 불변 Docker volume, 촬영 영수증과 검토 snapshot은 MySQL에 저장한다. 공개 URL은 Caddy 투영값일 뿐 권위가 아니고 `ContainerName + ObjectName + StoredImageSha256`이 위치·무결성 기준이다. 단일 VM volume은 운영 백업이나 H·E 승인 증거가 아니다.
+- 비용 경계: 무료 대상 VM 혜택의 기간·월별 시간과 디스크·공인 IP·전송 부대 비용은 별도로 확인한다. 구독이 쓰기 가능한 상태가 아니면 provisioning을 중단하며 무료 크레딧 반복 생성을 전제로 하지 않는다.
+- 관계: D-180의 주차 후 후보 선별, D-181의 불변 영수증·부모 bundle, D-182의 물리 WebApp 분리와 D-185의 H1~H4 촬영 Profile을 유지한다.

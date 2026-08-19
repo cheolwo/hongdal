@@ -234,13 +234,28 @@ Unity 촬영 산출물은 커뮤니티·주문·운송 등 일반 업무 화면�
 | `ISynty공간조립모바일검토Client` 구현 | Bearer API 조회·판단 전송 | 오프라인 데이터 영속 |
 | `Synty공간조립오프라인검토Store` | 전용 localStorage 대기열 조회·추가·삭제 | 서버 성공 상태의 권위 판단 |
 
-서버는 검토·촬영 UseCase와 Mongo·메모리 `Stores`를 분리하고, Unity는 공개 `Synty공간조립Web검토CapturePipeline` 진입점을 유지한 채 orchestration, Capture Stage·카메라, API client, 전송 model을 파일로 나눈다. 이 분리는 코드 책임을 줄이기 위한 것이며 API route, JSON field, Stable ID, Blob·Mongo 권위와 `Good ≠ 승인` 의미를 바꾸지 않는다.
+통합 서버는 검토·촬영 UseCase와 Mongo·메모리 `Stores`를 분리한다. 무료 VM 미리보기는 같은 상태 전이·PNG 검증 소스를 `Ssalddel.UnityReview.Core`로 재사용하되 별도 `Ssalddel.UnityReview.Api`와 MySQL 원장 adapter를 사용한다. Unity는 공개 `Synty공간조립Web검토CapturePipeline` 진입점을 유지한 채 orchestration, Capture Stage·카메라, API client, 전송 model을 파일로 나눈다. 배포 adapter가 달라도 API route, JSON field, Stable ID, 불변 업로드 영수증과 `Good ≠ 승인` 의미는 바꾸지 않는다.
 
 전용 개발 솔루션은 `Ssalddel.UnityReview.slnx`다. 일반 제품 배포 대상인 `Ssalddel.v3.5.slnx`와 역할별 `Ssalddel.RoleWebApps.slnx`에는 자동 포함하지 않는다. 로컬 기본 주소는 `https://localhost:7286`, 서버 API 기본 주소는 `https://localhost:7117`이며 다음처럼 실행한다.
 
 ```powershell
 dotnet run --project Ssalddel.Web.UnityReviewApp/Ssalddel.Web.UnityReviewApp.csproj
 ```
+
+### 무료 VM 독립 배포
+
+Unity 검토 앱은 기존 역할별 WebApp VM의 `/unity-review/` 하위 경로를 사용하지 않고 별도 무료 대상 VM과 hostname으로 이동한다. `deploy/azure-unity-review-vm/`이 다음 최소 Docker 스택을 소유한다.
+
+| 컨테이너·볼륨 | 책임 | 무료 VM 제한 |
+| --- | --- | --- |
+| Caddy | 전용 WebAssembly 정적 파일, HTTPS, API 역방향 전달, 공개 이미지 읽기 | 64MB 상한 |
+| `Ssalddel.UnityReview.Api` | 전용 관리자 로그인, PNG 검증·재인코딩, 검토 상태 전이 | 320MB 상한 |
+| MySQL 8.4 | 촬영 영수증·검토 snapshot·개정 번호 | 384MB 상한 |
+| `review_images` | hash 기반 불변 PNG | API 쓰기·Caddy 읽기 전용 |
+
+MongoDB와 역할별 업무 API·DB는 이 VM에 넣지 않는다. 관리자는 전용 PBKDF2 비밀번호와 JWT를 사용하며 비밀번호 원문은 API 프로젝트의 .NET User Secrets에만 둔다. 서버 `.env`에는 PBKDF2 결과, JWT signing key와 MySQL 비밀값만 두고 Git에 포함하지 않는다. VM은 2GB swap을 준비하지만 Compose 메모리 상한을 먼저 적용한다.
+
+미리보기 adapter는 `ContainerName + ObjectName + StoredImageSha256`을 MySQL에 저장하고 Caddy가 `/local-storage/`를 공개 읽기로 투영한다. URL은 권위값이 아니며 향후 Azure Blob·Mongo adapter로 돌아가도 Stable ID와 영수증 계약은 유지한다. 로컬 volume은 단일 VM 장애에 대한 내구 저장소가 아니므로 운영 승인 증거나 유일한 백업으로 사용하지 않는다.
 
 화면은 한 카드에서 네 시점을 전환하고 원본 크기 lightbox로 확대한다. 최신 판단 이력, 원장 revision, 팩 활용 비율, 조립·Rendering hash를 함께 표시한다.
 
@@ -293,7 +308,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File eng/world-seedbeds/synty-mob
 
 실제 확대 순서는 다음과 같다.
 
-1. 회복 A Normal 1카드의 Azure Blob·Mongo·Web·재촬영 실HTTP 폐루프를 통과한다.
+1. 회복 A Normal 1카드의 전용 VM 이미지 volume·MySQL·Web·재촬영 실HTTP 폐루프를 통과한다.
 2. 회복 A의 상태 표현을 Normal/Intensified로 분리한다.
 3. 회복 B/C로 공간 불변 조건을 검증한다.
 4. 위협 A를 같은 계약으로 연결한다.
@@ -308,8 +323,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File eng/world-seedbeds/synty-mob
 | Web 프로젝트 분리·컴파일 | 전용 앱만 검토 화면·Client를 소유하고 일반 WebApp에는 관련 route·DI가 없으며 두 프로젝트가 각각 컴파일 |
 | Unity 코드 컴파일 | 전용 Stage, 실제 다섯 팩 경로, 업로드 client, 재촬영 조회가 오류 없이 import |
 | Unity 로컬 촬영 | 네 개 1600×900 PNG, 서로 다른 hash, 원래 Scene 복귀, 민감 UI 없음 |
-| 실서버 왕복 | PNG 업로드 → Blob → Mongo receipt → batch → Web 조회 |
+| 실서버 왕복 | PNG 업로드 → 불변 저장 위치 → MySQL receipt → batch → Web 조회 |
 | 재촬영 왕복 | Web `NeedsRevision` → Unity queue → 새 bundle → `ReadyForReview` |
 | 실제 휴대폰 | 로그인, 주차 잠금, 세로 가독성, 터치, 이미지 확대, 오프라인·재연결 |
 
-현재 완료 증거는 코드·서버 집중 시험·전용 WebApp과 일반 WebApp의 독립 빌드·Unity Editor 컴파일과 로컬 Capture Camera PNG다. 실제 Azure provider 호출, Mongo 영속, 관리자 로그인 HTTP, 휴대폰 브라우저, Play Mode·일반 Game View와 Scene 적용은 수행한 것으로 표시하지 않는다.
+현재 전용 Docker 스택은 로컬에서 MySQL schema, 전용 관리자 로그인, 무인증 401, PNG 4개 불변 업로드, 12개 batch, `ReadyForReview → ReviewedCandidate`, API 재시작 뒤 원장 복원과 이미지 hash를 통과했다. 이 로컬 시험은 임시 Unity Game View 한 장을 네 영수증에 재사용한 전송 기준작이므로 실제 H 조합물 4시점 증거가 아니다. Azure 구독은 `Warned / FreeTrial / spendingLimit On`으로 쓰기가 차단되어 별도 VM·공개 HTTPS·휴대폰 브라우저는 아직 미검증이다.
