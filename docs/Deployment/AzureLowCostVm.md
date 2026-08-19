@@ -99,6 +99,15 @@ Blob 이미지 object는 현재 공개 읽기이므로 URL 보유자는 로그�
 현재 비용 통제 운영창은 매일 한국 시간 19:00~23:00이다. 이 시간 밖에서 VM을
 수동 기동하거나 운영창을 바꾸는 것은 별도 명시 승인을 받은 뒤 수행한다.
 
+배포 전에는 CLI의 로컬 account 표시만 보지 말고 ARM subscription 상태와 실제 VM
+쓰기 가능 여부를 확인한다. Free Trial 크레딧 만료나 spending limit 도달 뒤
+subscription이 `Warned` 또는 `ReadOnlyDisabledSubscription`이면 VM 시작·Blob 쓰기와
+배포가 차단된다. 이 경우 종량제 전환이나 spending limit 제거를 자동 수행하지 않는다.
+유효한 결제 수단과 향후 사용량 청구에 대한 별도 명시 승인을 받은 뒤 Azure Portal에서
+구독을 다시 활성화해야 한다. 기준은 Microsoft의
+[Azure spending limit](https://learn.microsoft.com/azure/cost-management-billing/manage/spending-limit)과
+[무료 계정 비용 방지](https://learn.microsoft.com/azure/cost-management-billing/manage/avoid-charges-free-account)를 따른다.
+
 ### 주문자 1.0 미리보기
 
 비구속 공동구매 수요와 주문자 집단화까지만 확인할 때는
