@@ -16,6 +16,7 @@
 		redir /roles/03 /roles/03/ 308
 		redir /roles/04 /roles/04/ 308
 		redir /roles/05 /roles/05/ 308
+		redir /unity-review /unity-review/ 308
 
 		handle_path /roles/01/* {
 			root * /srv/roles/01
@@ -43,6 +44,12 @@
 
 		handle_path /roles/05/* {
 			root * /srv/roles/05
+			try_files {path} /index.html
+			file_server
+		}
+
+		handle_path /unity-review/* {
+			root * /srv/unity-review
 			try_files {path} /index.html
 			file_server
 		}

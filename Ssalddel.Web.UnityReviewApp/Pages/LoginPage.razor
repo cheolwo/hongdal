@@ -110,6 +110,10 @@
             target = "/";
         }
 
-        Navigation.NavigateTo(target);
+        var applicationRelativeTarget = target == "/"
+            ? string.Empty
+            : target[1..];
+        var destination = new Uri(new Uri(Navigation.BaseUri), applicationRelativeTarget);
+        Navigation.NavigateTo(destination.AbsoluteUri);
     }
 }

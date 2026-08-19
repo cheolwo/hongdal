@@ -11,12 +11,18 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 const string apiBaseAddressKey = "SsalddelApiBaseAddress";
 var configuredBaseAddress = builder.Configuration[apiBaseAddressKey]
                             ?? "https://localhost:7117/";
-if (!Uri.TryCreate(configuredBaseAddress, UriKind.Absolute, out var apiBaseAddress)
-    || !(string.Equals(apiBaseAddress.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
-         || string.Equals(apiBaseAddress.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)))
+Uri apiBaseAddress;
+if (string.Equals(configuredBaseAddress, "same-origin", StringComparison.OrdinalIgnoreCase))
+{
+    var applicationBaseAddress = new Uri(builder.HostEnvironment.BaseAddress, UriKind.Absolute);
+    apiBaseAddress = new Uri(applicationBaseAddress.GetLeftPart(UriPartial.Authority) + "/");
+}
+else if (!Uri.TryCreate(configuredBaseAddress, UriKind.Absolute, out apiBaseAddress!)
+         || !(string.Equals(apiBaseAddress.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
+              || string.Equals(apiBaseAddress.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)))
 {
     throw new InvalidOperationException(
-        $"{apiBaseAddressKey}는 절대 HTTP(S) 주소여야 합니다.");
+        $"{apiBaseAddressKey}는 'same-origin' 또는 절대 HTTP(S) 주소여야 합니다.");
 }
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = apiBaseAddress });

@@ -2002,3 +2002,13 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - Unity: 공개 메뉴와 `Synty공간조립Web검토CapturePipeline` 진입점은 유지하고 orchestration, 전용 Capture Stage·카메라, 서버 API client, 전송 model을 파일 단위로 나눈다. 원본 Synty Prefab·저장 Scene·촬영 Stable ID와 v2 계약은 유지한다.
 - 검증 경계: 구조 분리는 서버·Web 집중 시험, Unity Editor 어셈블리 빌드와 그래픽 장치를 유지한 EditMode 촬영 시험으로 확인한다. 이는 Azure·Mongo·관리자 HTTP·휴대폰 실기기 왕복 증거를 대신하지 않는다.
 - 관계: D-181의 서버 권위·촬영 계보와 D-182의 물리 Web 프로젝트 분리를 내부 책임 경계까지 구체화한다.
+
+## D-184 Unity 산출물 검토 앱은 기존 Azure VM에서 별도 경로·배포 묶음으로 운영한다
+
+- 상태: Accepted
+- 결정일: 2026-08-19
+- 배포 단위: `Ssalddel.Web.UnityReviewApp`은 일반 01~05 WebApp 게시 묶음과 분리한 `unity-review.tar.gz`로 게시하고 `/opt/ssalddel/web/unity-review`만 원자 교체한다. 일반 역할 앱 파일을 Unity 검토 배포에 다시 게시하거나 함께 교체하지 않는다.
+- 공개 경로와 API: 추가 유료 host를 만들지 않고 기존 Azure 미리보기 VM의 `/unity-review/`를 사용한다. Production 앱은 같은 host 루트의 관리자 API를 호출하며 Caddy는 `/unity-review/*`만 전용 정적 루트로 보낸다. 물리 프로젝트·인증 저장 키·배포 묶음의 분리는 유지한다.
+- 서버와 데이터: 검토 API가 바뀐 경우 서버 이미지는 별도로 갱신하되 기존 MySQL·MongoDB·Data Protection·업로드 볼륨과 VM 비밀값을 보존한다. 촬영 이미지는 기존 Azure Blob 공개 container의 불변 `world-composition-reviews/` prefix를 사용하고 Mongo 영수증 권위를 유지한다.
+- 운영 경계: 화면은 H1·H2·H3 고유 식별자와 촬영 묶음을 보여 주지만 `Good`은 후보 판단일 뿐 H 승인·Scene 적용·E5·Simulation 완료가 아니다. Azure VM의 현재 비용 통제 운영창은 한국 시간 19:00~23:00이며 시간 밖 수동 기동은 별도 명시 승인을 요구한다.
+- 관계: D-182의 물리 WebApp 분리를 저비용 Azure 미리보기의 실제 경로와 원격 교체 단위까지 구체화한다.

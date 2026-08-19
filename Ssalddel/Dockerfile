@@ -22,6 +22,10 @@ COPY ["Ssalddel.Community/Ssalddel.Community.csproj", "Ssalddel.Community/"]
 COPY ["Ssalddel.Contracts/Ssalddel.Contracts.csproj", "Ssalddel.Contracts/"]
 COPY ["Ssalddel.Domain/Ssalddel.Domain.csproj", "Ssalddel.Domain/"]
 COPY ["Ssalddel.Infrastructure/Ssalddel.Infrastructure.csproj", "Ssalddel.Infrastructure/"]
+COPY ["Ssalddel.WorkflowRules.Contracts/Ssalddel.WorkflowRules.Contracts.csproj", "Ssalddel.WorkflowRules.Contracts/"]
+COPY ["Ssalddel.WorkflowRules/Ssalddel.WorkflowRules.csproj", "Ssalddel.WorkflowRules/"]
+COPY ["Ssalddel.CodeMetadata/Ssalddel.CodeMetadata.csproj", "Ssalddel.CodeMetadata/"]
+COPY ["Ssalddel.CodeMetadata/Directory.Build.props", "Ssalddel.CodeMetadata/"]
 RUN dotnet restore "./Ssalddel/Ssalddel.csproj"
 COPY . .
 WORKDIR "/src/Ssalddel"

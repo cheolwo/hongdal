@@ -5,7 +5,7 @@
 
 <div class="unity-review-app">
     <header class="app-bar">
-        <a class="brand" href="/">
+        <a class="brand" href="./">
             <span class="brand-mark">U</span>
             <span>
                 <strong>Unity 산출물 검토실</strong>
@@ -20,7 +20,7 @@
             }
             else if (AuthSession.IsInitialized)
             {
-                <a href="/login">관리자 로그인</a>
+                <a href="login">관리자 로그인</a>
             }
         </div>
     </header>
@@ -53,7 +53,7 @@
     private async Task LogoutAsync()
     {
         await AuthSession.ClearAsync();
-        Navigation.NavigateTo("/login");
+        Navigation.NavigateTo("login");
     }
 
     private void HandleSessionChanged() => _ = InvokeAsync(StateHasChanged);

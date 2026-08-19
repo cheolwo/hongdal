@@ -61,6 +61,44 @@ sudo bash deploy-web-preview.sh \
 역할 분리 구조와 route 경계는
 [01~05 역할 분리 WebApp](../Architecture/RoleSeparatedWebApps.md)을 따른다.
 
+### Unity 산출물 검토 WebApp 별도 갱신
+
+Unity 촬영 산출물의 H1·H2·H3 후보 검토 화면은 일반 01~05 WebApp 묶음에
+포함하지 않는다. `Ssalddel.Web.UnityReviewApp`만 게시하는 전용 명령을 사용한다.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File deploy/azure-vm/package-unity-review-preview.ps1
+```
+
+산출물은 `artifacts/local/azure-unity-review-preview/` 아래의
+`unity-review.tar.gz`, SHA-256 파일과 `unity-review/preview-build.json`이다.
+manifest는 `/unity-review/` base path, H1·H2·H3 검토 범위와
+`ServerAdministratorCandidateReview` 권한 경계를 기록한다. 운영 설정의 API 주소는
+`same-origin`이며 브라우저의 현재 host 루트에 있는 기존 관리자 API를 사용한다.
+
+기존 VM을 재사용해 비용을 억제하되 원격 교체 단위는 분리한다. 다음 스크립트는
+`/opt/ssalddel/web/unity-review`만 타임스탬프 백업 후 교체하고 Caddy 설정을 검증한다.
+일반 `/roles/01/`~`/roles/05/` 파일과 API·MySQL·MongoDB 볼륨은 바꾸지 않는다.
+
+```bash
+sudo bash deploy-unity-review-preview.sh \
+  unity-review.tar.gz \
+  <sha256> \
+  /opt/ssalddel \
+  Caddyfile
+```
+
+검토 API나 Mongo·Blob 저장 코드가 함께 바뀐 배포는 정적 WebApp 교체 전에 새
+`ssalddel-server:azure-preview` 이미지를 적재하고 app health를 확인해야 한다.
+정적 배포 스크립트가 서버 이미지를 암묵적으로 바꾸지는 않는다. 공개 주소는
+`https://<SSALDDEL_SITE_HOST>/unity-review/`이며 화면은 서버관리자 로그인을 요구한다.
+Blob 이미지 object는 현재 공개 읽기이므로 URL 보유자는 로그인 없이 이미지를 열 수
+있고, 촬영 PNG에는 개인정보·주문·인증·Console 정보를 넣지 않는다.
+
+현재 비용 통제 운영창은 매일 한국 시간 19:00~23:00이다. 이 시간 밖에서 VM을
+수동 기동하거나 운영창을 바꾸는 것은 별도 명시 승인을 받은 뒤 수행한다.
+
 ### 주문자 1.0 미리보기
 
 비구속 공동구매 수요와 주문자 집단화까지만 확인할 때는
