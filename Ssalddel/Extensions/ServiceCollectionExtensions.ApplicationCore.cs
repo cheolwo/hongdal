@@ -33,6 +33,7 @@ using Ssalddel.Services.Community;
 using Ssalddel.Services.Privacy;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Services.Content;
+using Ssalddel.Services.WorldProjection;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
 using 살뜰.Infrastructure;
 using 살뜰.Services.Audit;
@@ -189,6 +190,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<ICommunityVoteStore, MongoCommunityVoteStore>();
         services.AddSingleton<I공식뉴스검토원장Store, Mongo공식뉴스검토원장Store>();
         services.AddScoped<I공식뉴스검토원장Service, 공식뉴스검토원장Service>();
+        services.AddSingleton<ISynty공간조립검토원장Store, MongoSynty공간조립검토원장Store>();
+        services.AddScoped<ISynty공간조립모바일검토Service, Synty공간조립모바일검토Service>();
         services.AddSingleton<I신청개인정보동의증적Store, Mongo신청개인정보동의증적Store>();
         services.AddScoped<I신청개인정보동의증적Service, 신청개인정보동의증적Service>();
         services.AddSingleton<I공동구매원장캠페인Store, CommunityVote공동구매원장캠페인Store>();
