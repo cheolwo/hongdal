@@ -14,7 +14,8 @@ namespace Ssalddel.Controllers.Platform;
 [Authorize(Policy = "서버관리자전용")]
 [Route(Synty공간조립모바일검토Routes.Base)]
 public sealed class Synty공간조립모바일검토Controller(
-    ISynty공간조립모바일검토Service service) : ControllerBase
+    ISynty공간조립모바일검토Service service,
+    ISynty공간조립검토촬영업로드Service captureUploadService) : ControllerBase
 {
     [HttpGet]
     [SsalddelApiContractName("GetSyntyCompositionMobileReviewInbox")]
@@ -30,6 +31,38 @@ public sealed class Synty공간조립모바일검토Controller(
                 batchStableId,
                 reviewStateCode,
                 take,
+                cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateProblem(400, exception.Message));
+        }
+    }
+
+    [HttpPost("capture-uploads")]
+    [RequestSizeLimit(Synty공간조립검토촬영업로드Service.MaximumPngBytes + 256_000)]
+    [SsalddelApiContractName("UploadSyntyCompositionReviewCapture")]
+    public async Task<ActionResult<Synty공간조립검토촬영업로드Response>> 촬영업로드(
+        [FromForm] Synty공간조립검토촬영업로드Request request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await captureUploadService.업로드Async(
+                new Synty공간조립검토촬영업로드Command(
+                    request?.File,
+                    request?.BatchStableId,
+                    request?.ReviewItemStableId,
+                    request?.CaptureStableId,
+                    request?.ViewCode,
+                    request?.CaptureBundleHash,
+                    request?.ParentCaptureBundleHash,
+                    request?.SourceCompositionHash,
+                    request?.ExpectedReviewItemRevision ?? -1,
+                    request?.RenderingProfileHash,
+                    request?.ImageSha256,
+                    request?.Width ?? 0,
+                    request?.Height ?? 0),
                 cancellationToken));
         }
         catch (ArgumentException exception)
@@ -116,4 +149,21 @@ public sealed class Synty공간조립모바일검토Controller(
             },
             Detail = detail
         };
+}
+
+public sealed class Synty공간조립검토촬영업로드Request
+{
+    public IFormFile? File { get; set; }
+    public string BatchStableId { get; set; } = string.Empty;
+    public string ReviewItemStableId { get; set; } = string.Empty;
+    public string CaptureStableId { get; set; } = string.Empty;
+    public string ViewCode { get; set; } = string.Empty;
+    public string CaptureBundleHash { get; set; } = string.Empty;
+    public string ParentCaptureBundleHash { get; set; } = string.Empty;
+    public string SourceCompositionHash { get; set; } = string.Empty;
+    public long ExpectedReviewItemRevision { get; set; }
+    public string RenderingProfileHash { get; set; } = string.Empty;
+    public string ImageSha256 { get; set; } = string.Empty;
+    public int Width { get; set; }
+    public int Height { get; set; }
 }

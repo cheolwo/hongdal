@@ -1,3 +1,4 @@
+using Azure;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -43,7 +44,7 @@ public sealed class AzureBlobStorageService : IObjectStorageService
             .GetBlobContainerClient(containerName)
             .GetBlobClient(objectName);
 
-        await blob.UploadAsync(
+        var response = await blob.UploadAsync(
             stream,
             new BlobUploadOptions
             {
@@ -59,7 +60,62 @@ public sealed class AzureBlobStorageService : IObjectStorageService
         return new ObjectStorageUploadResult(
             containerName,
             objectName,
-            blob.Uri.AbsoluteUri);
+            blob.Uri.AbsoluteUri,
+            response.Value.ETag.ToString());
+    }
+
+    public async Task<ObjectStorageUploadResult> UploadImmutableAsync(
+        Stream stream,
+        string objectName,
+        string? contentType,
+        ObjectStorageAccess access,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (stream is null || !stream.CanRead)
+        {
+            throw new ArgumentException("Readable stream is required.", nameof(stream));
+        }
+
+        EnsureConfigured(access);
+        var containerName = ResolveContainerName(access);
+        var normalizedObjectName = ObjectStorageObjectName.NormalizeProvided(objectName);
+        var blob = _client.Value
+            .GetBlobContainerClient(containerName)
+            .GetBlobClient(normalizedObjectName);
+        try
+        {
+            var response = await blob.UploadAsync(
+                stream,
+                new BlobUploadOptions
+                {
+                    HttpHeaders = new BlobHttpHeaders
+                    {
+                        ContentType = string.IsNullOrWhiteSpace(contentType)
+                            ? "application/octet-stream"
+                            : contentType
+                    },
+                    Metadata = metadata is null
+                        ? null
+                        : new Dictionary<string, string>(metadata, StringComparer.Ordinal),
+                    Conditions = new BlobRequestConditions { IfNoneMatch = ETag.All }
+                },
+                cancellationToken);
+            return new ObjectStorageUploadResult(
+                containerName,
+                normalizedObjectName,
+                blob.Uri.AbsoluteUri,
+                response.Value.ETag.ToString());
+        }
+        catch (RequestFailedException exception) when (exception.Status is 409 or 412)
+        {
+            var properties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+            return new ObjectStorageUploadResult(
+                containerName,
+                normalizedObjectName,
+                blob.Uri.AbsoluteUri,
+                properties.Value.ETag.ToString());
+        }
     }
 
     public async Task<byte[]> DownloadAsync(

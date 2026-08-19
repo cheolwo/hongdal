@@ -1,5 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
+using System.Net;
 using Microsoft.Extensions.Options;
 using Ssalddel.Services.Storage;
 
@@ -45,7 +46,7 @@ namespace 살뜰.Services.External.Google
                 ? "application/octet-stream"
                 : contentType;
 
-            await _storageClient.Value.UploadObjectAsync(
+            var uploaded = await _storageClient.Value.UploadObjectAsync(
                 bucket: bucketName,
                 objectName: objectName,
                 contentType: resolvedContentType,
@@ -53,7 +54,63 @@ namespace 살뜰.Services.External.Google
                 cancellationToken: cancellationToken);
 
             var url = $"{_options.PublicBaseUrl.TrimEnd('/')}/{bucketName}/{objectName}";
-            return new ObjectStorageUploadResult(bucketName, objectName, url);
+            return new ObjectStorageUploadResult(bucketName, objectName, url, uploaded.ETag ?? string.Empty);
+        }
+
+        public async Task<ObjectStorageUploadResult> UploadImmutableAsync(
+            Stream stream,
+            string objectName,
+            string? contentType,
+            ObjectStorageAccess access,
+            IReadOnlyDictionary<string, string>? metadata = null,
+            CancellationToken cancellationToken = default)
+        {
+            var bucketName = ResolveBucketName(access);
+            if (string.IsNullOrWhiteSpace(bucketName))
+            {
+                throw new InvalidOperationException($"Google Cloud Storage bucket configuration is required for {access} objects.");
+            }
+            if (stream is null || !stream.CanRead)
+            {
+                throw new ArgumentException("Readable stream is required.", nameof(stream));
+            }
+
+            var normalizedObjectName = ObjectStorageObjectName.NormalizeProvided(objectName);
+            var destination = new global::Google.Apis.Storage.v1.Data.Object
+            {
+                Bucket = bucketName,
+                Name = normalizedObjectName,
+                ContentType = string.IsNullOrWhiteSpace(contentType)
+                    ? "application/octet-stream"
+                    : contentType,
+                Metadata = metadata is null
+                    ? null
+                    : new Dictionary<string, string>(metadata, StringComparer.Ordinal)
+            };
+            global::Google.Apis.Storage.v1.Data.Object immutableObject;
+            try
+            {
+                immutableObject = await _storageClient.Value.UploadObjectAsync(
+                    destination,
+                    stream,
+                    new UploadObjectOptions { IfGenerationMatch = 0 },
+                    cancellationToken);
+            }
+            catch (global::Google.GoogleApiException exception) when (
+                exception.HttpStatusCode is HttpStatusCode.Conflict or HttpStatusCode.PreconditionFailed)
+            {
+                immutableObject = await _storageClient.Value.GetObjectAsync(
+                    bucketName,
+                    normalizedObjectName,
+                    cancellationToken: cancellationToken);
+            }
+
+            var url = $"{_options.PublicBaseUrl.TrimEnd('/')}/{bucketName}/{normalizedObjectName}";
+            return new ObjectStorageUploadResult(
+                bucketName,
+                normalizedObjectName,
+                url,
+                immutableObject.ETag ?? string.Empty);
         }
 
         public async Task<byte[]> DownloadAsync(

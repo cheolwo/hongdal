@@ -191,6 +191,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공식뉴스검토원장Store, Mongo공식뉴스검토원장Store>();
         services.AddScoped<I공식뉴스검토원장Service, 공식뉴스검토원장Service>();
         services.AddSingleton<ISynty공간조립검토원장Store, MongoSynty공간조립검토원장Store>();
+        services.AddSingleton<ISynty공간조립검토촬영업로드Store, MongoSynty공간조립검토촬영업로드Store>();
+        services.AddScoped<ISynty공간조립검토촬영업로드Service, Synty공간조립검토촬영업로드Service>();
         services.AddScoped<ISynty공간조립모바일검토Service, Synty공간조립모바일검토Service>();
         services.AddSingleton<I신청개인정보동의증적Store, Mongo신청개인정보동의증적Store>();
         services.AddScoped<I신청개인정보동의증적Service, 신청개인정보동의증적Service>();

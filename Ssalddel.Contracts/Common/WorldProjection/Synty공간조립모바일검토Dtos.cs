@@ -4,12 +4,14 @@ public static class Synty공간조립모바일검토Routes
 {
     public const string Base = "api/v1/platform/world-composition-reviews";
     public const string Batches = Base + "/batches";
+    public const string CaptureUploads = Base + "/capture-uploads";
     public const string Decisions = Base + "/items/{reviewItemStableId}/decisions";
 }
 
 public static class Synty공간조립검토SchemaVersions
 {
     public const string BatchV1 = "synty-composition-review-batch.v1";
+    public const string BatchV2 = "synty-composition-review-batch.v2";
 }
 
 public static class Synty공간조립검토상태Codes
@@ -70,6 +72,13 @@ public static class Synty공간조립검토문제Codes
     };
 }
 
+public static class Synty공간조립검토EventCodes
+{
+    public const string MobileDecision = "MobileDecision";
+    public const string SourceUpdated = "SourceUpdated";
+    public const string RecaptureSubmitted = "RecaptureSubmitted";
+}
+
 public sealed class Synty공간조립검토Batch등록Request
 {
     public string SchemaVersion { get; set; } = Synty공간조립검토SchemaVersions.BatchV1;
@@ -82,6 +91,7 @@ public sealed class Synty공간조립검토Batch등록Request
 
 public sealed class Synty공간조립검토항목등록Request
 {
+    public long ExpectedRevision { get; set; }
     public string ReviewItemStableId { get; set; } = string.Empty;
     public string CompositionStableId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
@@ -95,6 +105,7 @@ public sealed class Synty공간조립검토항목등록Request
     public string RenderingProfileId { get; set; } = string.Empty;
     public string RenderingProfileRevision { get; set; } = string.Empty;
     public string RenderingProfileHash { get; set; } = string.Empty;
+    public string ParentCaptureBundleHash { get; set; } = string.Empty;
     public string CaptureBundleHash { get; set; } = string.Empty;
     public List<Synty공간조립팩활용Dto> PackUsages { get; set; } = [];
     public List<Synty공간조립검토촬영Dto> Captures { get; set; } = [];
@@ -112,10 +123,43 @@ public sealed class Synty공간조립검토촬영Dto
     public string CaptureStableId { get; set; } = string.Empty;
     public string ViewCode { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
+    public string CaptureUploadId { get; set; } = string.Empty;
+    public string StorageProviderCode { get; set; } = string.Empty;
+    public string ContainerName { get; set; } = string.Empty;
+    public string ObjectName { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public string ImageSha256 { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public long ContentLength { get; set; }
+    public string ETag { get; set; } = string.Empty;
     public int Width { get; set; }
     public int Height { get; set; }
+}
+
+public sealed class Synty공간조립검토촬영업로드Response
+{
+    public string CaptureUploadId { get; set; } = string.Empty;
+    public string BatchStableId { get; set; } = string.Empty;
+    public string ReviewItemStableId { get; set; } = string.Empty;
+    public string CaptureStableId { get; set; } = string.Empty;
+    public string ViewCode { get; set; } = string.Empty;
+    public string CaptureBundleHash { get; set; } = string.Empty;
+    public string ParentCaptureBundleHash { get; set; } = string.Empty;
+    public string SourceCompositionHash { get; set; } = string.Empty;
+    public long ExpectedReviewItemRevision { get; set; }
+    public string RenderingProfileHash { get; set; } = string.Empty;
+    public string StorageProviderCode { get; set; } = string.Empty;
+    public string ContainerName { get; set; } = string.Empty;
+    public string ObjectName { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
+    public string UploadedSourceSha256 { get; set; } = string.Empty;
+    public string StoredImageSha256 { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public long ContentLength { get; set; }
+    public string ETag { get; set; } = string.Empty;
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public DateTime UploadedAtUtc { get; set; }
 }
 
 public sealed class Synty공간조립검토결정Request

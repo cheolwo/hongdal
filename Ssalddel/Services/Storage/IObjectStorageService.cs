@@ -18,6 +18,15 @@ public interface IObjectStorageService
         ObjectStorageAccess access,
         CancellationToken cancellationToken = default);
 
+    Task<ObjectStorageUploadResult> UploadImmutableAsync(
+        Stream stream,
+        string objectName,
+        string? contentType,
+        ObjectStorageAccess access,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("This object storage adapter does not support immutable named uploads.");
+
     Task<byte[]> DownloadAsync(
         string containerName,
         string objectName,
@@ -27,7 +36,8 @@ public interface IObjectStorageService
 public sealed record ObjectStorageUploadResult(
     string ContainerName,
     string ObjectName,
-    string Url);
+    string Url,
+    string ETag = "");
 
 internal static class ObjectStorageObjectName
 {
@@ -40,6 +50,23 @@ internal static class ObjectStorageObjectName
         return string.IsNullOrWhiteSpace(normalizedFolder)
             ? generatedFileName
             : $"{normalizedFolder}/{generatedFileName}";
+    }
+
+    public static string NormalizeProvided(string objectName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(objectName);
+        var segments = objectName
+            .Replace('\\', '/')
+            .Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(Path.GetFileName)
+            .Where(segment => !string.IsNullOrWhiteSpace(segment) && segment is not "." and not "..")
+            .ToArray();
+        var normalized = string.Join('/', segments);
+        if (normalized.Length == 0 || normalized.Length > 1024)
+        {
+            throw new ArgumentException("Object storage object name is invalid.", nameof(objectName));
+        }
+        return normalized;
     }
 
     private static string NormalizeFolder(string? folder)

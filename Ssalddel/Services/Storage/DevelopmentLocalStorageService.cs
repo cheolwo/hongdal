@@ -63,6 +63,43 @@ public sealed class DevelopmentLocalStorageService : IObjectStorageService
         return new ObjectStorageUploadResult(containerName, objectName, url);
     }
 
+    public async Task<ObjectStorageUploadResult> UploadImmutableAsync(
+        Stream stream,
+        string objectName,
+        string? contentType,
+        ObjectStorageAccess access,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (stream is null || !stream.CanRead)
+        {
+            throw new ArgumentException("Readable stream is required.", nameof(stream));
+        }
+        var containerName = ResolveContainerName(access);
+        var normalizedObjectName = ObjectStorageObjectName.NormalizeProvided(objectName);
+        var filePath = ResolveStoragePath(containerName, normalizedObjectName);
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+        try
+        {
+            await using var output = new FileStream(
+                filePath,
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.None,
+                bufferSize: 81920,
+                useAsync: true);
+            await stream.CopyToAsync(output, cancellationToken);
+        }
+        catch (IOException) when (File.Exists(filePath))
+        {
+            // 같은 불변 object 재시도는 기존 파일을 유지한다.
+        }
+        var url = access == ObjectStorageAccess.Public
+            ? BuildPublicUrl(normalizedObjectName)
+            : BuildPrivateLocation(containerName, normalizedObjectName);
+        return new ObjectStorageUploadResult(containerName, normalizedObjectName, url);
+    }
+
     public Task<byte[]> DownloadAsync(
         string containerName,
         string objectName,

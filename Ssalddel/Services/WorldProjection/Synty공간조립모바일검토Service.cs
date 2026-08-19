@@ -53,7 +53,8 @@ public interface ISynty공간조립모바일검토Service
 
 public sealed class Synty공간조립모바일검토Service(
     ISynty공간조립검토원장Store store,
-    TimeProvider timeProvider) : ISynty공간조립모바일검토Service
+    TimeProvider timeProvider,
+    ISynty공간조립검토촬영업로드Store? captureUploadStore = null) : ISynty공간조립모바일검토Service
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -62,10 +63,9 @@ public sealed class Synty공간조립모바일검토Service(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (!string.Equals(
-                request.SchemaVersion,
-                Synty공간조립검토SchemaVersions.BatchV1,
-                StringComparison.Ordinal))
+        var schemaVersion = Require(request.SchemaVersion, nameof(request.SchemaVersion), 80);
+        if (!string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV1, StringComparison.Ordinal)
+            && !string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal))
         {
             throw new ArgumentException(
                 $"지원하지 않는 검토 batch schema입니다. SchemaVersion={request.SchemaVersion}");
@@ -83,9 +83,17 @@ public sealed class Synty공간조립모바일검토Service(
             throw new ArgumentException("한 검토 batch에는 1개 이상 100개 이하 조합물이 필요합니다.");
         }
 
-        var normalizedItems = request.Items.Select(NormalizeItem).ToArray();
+        var normalizedItems = new List<Synty공간조립검토항목등록Request>(request.Items.Count);
+        foreach (var sourceItem in request.Items)
+        {
+            normalizedItems.Add(await NormalizeItemAsync(
+                sourceItem,
+                schemaVersion,
+                batchStableId,
+                cancellationToken));
+        }
         if (normalizedItems.Select(item => item.ReviewItemStableId)
-            .Distinct(StringComparer.Ordinal).Count() != normalizedItems.Length)
+            .Distinct(StringComparer.Ordinal).Count() != normalizedItems.Count)
         {
             throw new ArgumentException("한 검토 batch 안에 중복된 ReviewItemStableId가 있습니다.");
         }
@@ -95,7 +103,7 @@ public sealed class Synty공간조립모바일검토Service(
         var updatedCount = 0;
         var unchangedCount = 0;
         var staleCount = 0;
-        var results = new List<Synty공간조립검토항목Dto>(normalizedItems.Length);
+        var results = new List<Synty공간조립검토항목Dto>(normalizedItems.Count);
 
         foreach (var item in normalizedItems)
         {
@@ -104,6 +112,11 @@ public sealed class Synty공간조립모바일검토Service(
             var existing = await store.조회Async(item.ReviewItemStableId, cancellationToken);
             if (existing is null)
             {
+                if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+                    && (item.ExpectedRevision != 0 || item.ParentCaptureBundleHash.Length != 0))
+                {
+                    throw new Synty공간조립검토ConcurrencyException(item.ReviewItemStableId, 0);
+                }
                 var created = new Synty공간조립검토원장Record
                 {
                     ReviewItemStableId = item.ReviewItemStableId,
@@ -139,13 +152,45 @@ public sealed class Synty공간조립모바일검토Service(
             }
 
             var expectedRevision = existing.Revision;
+            if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+                && item.ExpectedRevision != expectedRevision)
+            {
+                throw new Synty공간조립검토ConcurrencyException(item.ReviewItemStableId, expectedRevision);
+            }
             var hadReviewDecision = existing.History.Any(history =>
                 string.Equals(history.EventCode, Synty공간조립검토EventCodes.MobileDecision, StringComparison.Ordinal));
+            var previousItem = JsonSerializer.Deserialize<Synty공간조립검토항목등록Request>(
+                                   existing.SnapshotJson,
+                                   JsonOptions)
+                               ?? throw new InvalidDataException("Synty 공간 조립 검토 snapshot이 손상되었습니다.");
+            if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+                && !string.Equals(
+                    item.ParentCaptureBundleHash,
+                    previousItem.CaptureBundleHash,
+                    StringComparison.Ordinal))
+            {
+                throw new Synty공간조립검토ConcurrencyException(item.ReviewItemStableId, expectedRevision);
+            }
+            var isRequestedRecapture = string.Equals(
+                                           existing.ReviewStateCode,
+                                           Synty공간조립검토상태Codes.NeedsRevision,
+                                           StringComparison.Ordinal)
+                                       && item.Captures.Count > 0
+                                       && !string.Equals(
+                                           previousItem.CaptureBundleHash,
+                                           item.CaptureBundleHash,
+                                           StringComparison.Ordinal)
+                                       && string.Equals(
+                                           CompositionBasisHash(previousItem),
+                                           CompositionBasisHash(item),
+                                           StringComparison.Ordinal);
             existing.BatchStableId = batchStableId;
             existing.BatchRevision = batchRevision;
             existing.BatchTitle = batchTitle;
             existing.Revision++;
-            existing.ReviewStateCode = hadReviewDecision
+            existing.ReviewStateCode = isRequestedRecapture
+                ? Synty공간조립검토상태Codes.ReadyForReview
+                : hadReviewDecision
                 ? Synty공간조립검토상태Codes.Stale
                 : item.Captures.Count == 0
                     ? Synty공간조립검토상태Codes.WaitingForCapture
@@ -156,10 +201,16 @@ public sealed class Synty공간조립모바일검토Service(
             existing.UpdatedAtUtc = now;
             existing.History.Add(new Synty공간조립검토결정이력Record
             {
-                IdempotencyKey = $"source:{snapshotHash}",
-                EventCode = Synty공간조립검토EventCodes.SourceUpdated,
+                IdempotencyKey = isRequestedRecapture
+                    ? $"recapture:{item.CaptureBundleHash}"
+                    : $"source:{snapshotHash}",
+                EventCode = isRequestedRecapture
+                    ? Synty공간조립검토EventCodes.RecaptureSubmitted
+                    : Synty공간조립검토EventCodes.SourceUpdated,
                 DecisionCode = string.Empty,
-                Note = "Unity 촬영 입력 또는 표현 계획이 변경되었습니다.",
+                Note = isRequestedRecapture
+                    ? "수정 필요 판단에 대한 새 Unity 촬영 묶음이 등록되었습니다."
+                    : "Unity 촬영 입력 또는 표현 계획이 변경되었습니다.",
                 ReviewerId = "system",
                 ReviewerDisplayName = "Unity 촬영 인계",
                 DecidedAtUtc = now,
@@ -174,7 +225,7 @@ public sealed class Synty공간조립모바일검토Service(
             }
 
             updatedCount++;
-            if (hadReviewDecision)
+            if (hadReviewDecision && !isRequestedRecapture)
             {
                 staleCount++;
             }
@@ -326,10 +377,14 @@ public sealed class Synty공간조립모바일검토Service(
         return ToDto(existing);
     }
 
-    private static Synty공간조립검토항목등록Request NormalizeItem(
-        Synty공간조립검토항목등록Request source)
+    private async Task<Synty공간조립검토항목등록Request> NormalizeItemAsync(
+        Synty공간조립검토항목등록Request source,
+        string schemaVersion,
+        string batchStableId,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(source);
+        var reviewItemStableId = Require(source.ReviewItemStableId, nameof(source.ReviewItemStableId), 160);
         var variantCode = Require(source.VariantCode, nameof(source.VariantCode), 8).ToUpperInvariant();
         if (variantCode is not ("A" or "B" or "C"))
         {
@@ -357,19 +412,87 @@ public sealed class Synty공간조립모바일검토Service(
             throw new ArgumentException("PackUsages는 다섯 주력 팩 중 중복 없이 구성하고 UsagePercent 합계를 100으로 맞춰야 합니다.");
         }
 
-        var captures = (source.Captures ?? [])
-            .Select(capture => new Synty공간조립검토촬영Dto
+        var renderingProfileHash = RequireSha256(
+            source.RenderingProfileHash,
+            nameof(source.RenderingProfileHash));
+        var sourceCompositionHash = RequireSha256(
+            source.CompositionInputHash,
+            nameof(source.CompositionInputHash));
+        if (source.ExpectedRevision < 0)
+        {
+            throw new ArgumentException("ExpectedRevision은 0 이상이어야 합니다.");
+        }
+        var parentCaptureBundleHash = string.IsNullOrWhiteSpace(source.ParentCaptureBundleHash)
+            ? string.Empty
+            : RequireSha256(source.ParentCaptureBundleHash, nameof(source.ParentCaptureBundleHash));
+        var sourceCaptures = source.Captures ?? [];
+        var captureBundleHash = sourceCaptures.Count == 0
+            ? Optional(source.CaptureBundleHash, 64) ?? string.Empty
+            : RequireSha256(source.CaptureBundleHash, nameof(source.CaptureBundleHash));
+        var captures = new List<Synty공간조립검토촬영Dto>(sourceCaptures.Count);
+        foreach (var capture in sourceCaptures)
+        {
+            var captureStableId = Require(capture.CaptureStableId, nameof(capture.CaptureStableId), 180);
+            var viewCode = Require(capture.ViewCode, nameof(capture.ViewCode), 80);
+            var displayName = Require(capture.DisplayName, nameof(capture.DisplayName), 100);
+            if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal))
             {
-                CaptureStableId = Require(capture.CaptureStableId, nameof(capture.CaptureStableId), 180),
-                ViewCode = Require(capture.ViewCode, nameof(capture.ViewCode), 80),
-                DisplayName = Require(capture.DisplayName, nameof(capture.DisplayName), 100),
+                if (captureUploadStore is null)
+                {
+                    throw new InvalidOperationException("v2 촬영 batch를 확인할 업로드 원장이 구성되지 않았습니다.");
+                }
+                var captureUploadId = Require(
+                    capture.CaptureUploadId,
+                    nameof(capture.CaptureUploadId),
+                    160);
+                var uploaded = await captureUploadStore.조회Async(captureUploadId, cancellationToken)
+                               ?? throw new ArgumentException(
+                                   $"등록된 촬영 업로드 영수증을 찾을 수 없습니다. CaptureUploadId={captureUploadId}");
+                if (!string.Equals(uploaded.BatchStableId, batchStableId, StringComparison.Ordinal)
+                    || !string.Equals(uploaded.ReviewItemStableId, reviewItemStableId, StringComparison.Ordinal)
+                    || !string.Equals(uploaded.CaptureStableId, captureStableId, StringComparison.Ordinal)
+                    || !string.Equals(uploaded.ViewCode, viewCode, StringComparison.Ordinal)
+                    || !string.Equals(uploaded.CaptureBundleHash, captureBundleHash, StringComparison.Ordinal)
+                    || !string.Equals(uploaded.ParentCaptureBundleHash, parentCaptureBundleHash, StringComparison.Ordinal)
+                    || !string.Equals(uploaded.SourceCompositionHash, sourceCompositionHash, StringComparison.Ordinal)
+                    || uploaded.ExpectedReviewItemRevision != source.ExpectedRevision
+                    || !string.Equals(uploaded.RenderingProfileHash, renderingProfileHash, StringComparison.Ordinal))
+                {
+                    throw new ArgumentException(
+                        $"촬영 업로드 영수증과 batch 촬영 정보가 일치하지 않습니다. CaptureUploadId={captureUploadId}");
+                }
+                captures.Add(new Synty공간조립검토촬영Dto
+                {
+                    CaptureStableId = captureStableId,
+                    ViewCode = viewCode,
+                    DisplayName = displayName,
+                    CaptureUploadId = captureUploadId,
+                    StorageProviderCode = uploaded.StorageProviderCode,
+                    ContainerName = uploaded.ContainerName,
+                    ObjectName = uploaded.ObjectName,
+                    ImageUrl = NormalizeImageUrl(uploaded.ImageUrl),
+                    ImageSha256 = uploaded.StoredImageSha256,
+                    ContentType = uploaded.ContentType,
+                    ContentLength = uploaded.ContentLength,
+                    ETag = uploaded.ETag,
+                    Width = uploaded.Width,
+                    Height = uploaded.Height
+                });
+                continue;
+            }
+
+            captures.Add(new Synty공간조립검토촬영Dto
+            {
+                CaptureStableId = captureStableId,
+                ViewCode = viewCode,
+                DisplayName = displayName,
                 ImageUrl = NormalizeImageUrl(capture.ImageUrl),
                 ImageSha256 = RequireSha256(capture.ImageSha256, nameof(capture.ImageSha256)),
                 Width = capture.Width,
                 Height = capture.Height
-            })
-            .OrderBy(capture => capture.ViewCode, StringComparer.Ordinal)
-            .ToList();
+            });
+        }
+        captures = captures.OrderBy(capture => capture.ViewCode, StringComparer.Ordinal).ToList();
         if (captures.Count > 8
             || captures.Any(capture => capture.Width <= 0 || capture.Height <= 0)
             || captures.Select(capture => capture.CaptureStableId).Distinct(StringComparer.Ordinal).Count() != captures.Count
@@ -380,7 +503,8 @@ public sealed class Synty공간조립모바일검토Service(
 
         return new Synty공간조립검토항목등록Request
         {
-            ReviewItemStableId = Require(source.ReviewItemStableId, nameof(source.ReviewItemStableId), 160),
+            ExpectedRevision = source.ExpectedRevision,
+            ReviewItemStableId = reviewItemStableId,
             CompositionStableId = Require(source.CompositionStableId, nameof(source.CompositionStableId), 160),
             DisplayName = Require(source.DisplayName, nameof(source.DisplayName), 160),
             H1StableId = Require(source.H1StableId, nameof(source.H1StableId), 180),
@@ -388,14 +512,13 @@ public sealed class Synty공간조립모바일검토Service(
             H3StableId = Require(source.H3StableId, nameof(source.H3StableId), 180),
             VariantCode = variantCode,
             StateProfileCode = Require(source.StateProfileCode, nameof(source.StateProfileCode), 100),
-            CompositionInputHash = RequireSha256(source.CompositionInputHash, nameof(source.CompositionInputHash)),
+            CompositionInputHash = sourceCompositionHash,
             PlanHash = RequireSha256(source.PlanHash, nameof(source.PlanHash)),
             RenderingProfileId = Require(source.RenderingProfileId, nameof(source.RenderingProfileId), 160),
             RenderingProfileRevision = Require(source.RenderingProfileRevision, nameof(source.RenderingProfileRevision), 120),
-            RenderingProfileHash = RequireSha256(source.RenderingProfileHash, nameof(source.RenderingProfileHash)),
-            CaptureBundleHash = captures.Count == 0
-                ? Optional(source.CaptureBundleHash, 64) ?? string.Empty
-                : RequireSha256(source.CaptureBundleHash, nameof(source.CaptureBundleHash)),
+            RenderingProfileHash = renderingProfileHash,
+            ParentCaptureBundleHash = parentCaptureBundleHash,
+            CaptureBundleHash = captureBundleHash,
             PackUsages = packUsages,
             Captures = captures
         };
@@ -454,6 +577,27 @@ public sealed class Synty공간조립모바일검토Service(
     private static string Sha256(string value)
         => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
 
+    private static string CompositionBasisHash(Synty공간조립검토항목등록Request item)
+        => Sha256(JsonSerializer.Serialize(new
+        {
+            item.ReviewItemStableId,
+            item.CompositionStableId,
+            item.DisplayName,
+            item.H1StableId,
+            item.H2StableId,
+            item.H3StableId,
+            item.VariantCode,
+            item.StateProfileCode,
+            item.CompositionInputHash,
+            item.PlanHash,
+            item.RenderingProfileId,
+            item.RenderingProfileRevision,
+            item.RenderingProfileHash,
+            PackUsages = item.PackUsages
+                .OrderBy(pack => pack.PackCode, StringComparer.Ordinal)
+                .Select(pack => new { pack.PackCode, pack.UsagePercent, pack.RoleCode })
+        }, JsonOptions));
+
     private static string DecisionState(string decisionCode)
         => decisionCode switch
         {
@@ -501,12 +645,6 @@ public sealed class Synty공간조립모바일검토Service(
                 Revision = history.Revision
             }).ToList()
         };
-}
-
-public static class Synty공간조립검토EventCodes
-{
-    public const string MobileDecision = "MobileDecision";
-    public const string SourceUpdated = "SourceUpdated";
 }
 
 public sealed class Synty공간조립검토ConcurrencyException(
