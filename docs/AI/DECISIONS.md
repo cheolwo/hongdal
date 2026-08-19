@@ -1938,3 +1938,25 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 호환과 이행: `NatureHome`, `ProfessionalWorld`, Nature·Farm·Town·City/Hub 팩 코드, AreaSet·WI·API·저장 식별자는 바꾸지 않는다. D-162의 공간·시점·자산 관문은 유지하면서 사람이 읽는 세계 의미를 이 결정으로 구체화한다. D-163의 경로별 위협 계보는 유지하되 자연권 전투가 업무 사건 심각도를 직접 줄이는 현재 동작은 심리 완충과 업무 원인 해결을 분리하는 후속 구현에서 대체한다.
 - 증거: 이번 결정은 용어와 인과 기획만 확정한다. 회복 발전소 상태, 두 발전소의 동시 변화, 업무 영역 되먹임, 저장 계약과 Unity 배치는 아직 구현·시험하지 않았다.
 - 기준 문서: [업무 사건과 심리 영역 발전소 영향 규칙](../Architecture/지역사건-자연권위협-규칙.md)
+
+## D-178 Construction 팩은 공통 조립층이며 두 발전소는 기존 Nature H2·H3를 확장한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-18
+- 팩 역할: POLYGON Construction은 독립 AreaSet이나 다섯 번째 업무 영역이 아니다. Nature·Farm·Town·City/Hub의 구조물·공사·복구·격리·전환 상태를 만드는 공통 조립 재료층이다. 한 H1은 주도 팩 하나, Construction 기능층과 보조 팩 1~2개를 기본으로 하며 모든 공간에 다섯 팩을 같은 비율로 넣지 않는다.
+- 발전소 H: `회복 발전 동력핵`과 `위협 발전 집속핵`을 예상 플레이가 있는 H1 문서 후보로 둔다. 회복 발전소는 기존 `nature-restoration-recovery`, 위협 발전소는 기존 `nature-threat-response` H2를 확장하고 둘은 기존 `nature-threat-recovery` H3 안에서 완충 지형과 복귀 동선으로 연결한다. 기존 `NatureHome`, H2·H3 Stable ID, AreaSet·WI·API·저장 식별자는 바꾸지 않는다.
+- 변형과 권위: A/B/C는 같은 면적·연결구·핵심 소켓을 유지하는 공간 배치 변형이며 발전소의 시간·강도 상태가 아니다. Prefab 이름·경로는 교체 가능한 표현 참조이고 서버가 확정하는 업무 결과·발전소 상태나 Simulation 권위를 만들지 않는다.
+- 증거: 이번 범위는 다섯 팩 2,346개와 Construction 584개 Prefab 설치 여부를 확인한 `DesignPlanOnly` 문서다. 새 H1의 기계 대장 등록, Unity 조립 Prefab·Scene, Play Mode·Game View와 Simulation 수치·저장 계약은 구현하지 않았다.
+- 기준 문서: [심리·업무 영역 Synty 5팩 공간 조립 계획](../Architecture/심리업무영역Synty공간조립계획.md)
+- 관계: D-155~D-156의 Synty 상향식 재고와 H 계층, D-165의 H2 조립 우선순위, D-170의 게임 기획 관문, D-177의 심리 영역·두 발전소 인과를 보유 자산 조립 규칙으로 구체화한다.
+
+## D-179 다섯 Synty 팩은 H 승격 전에 전수 기술 대장과 의미 자산군으로 관리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 전수 범위: Nature 227·Farm 498·Town 702·City 335·Construction 584개, 합계 2,346개 Prefab을 기술 대장에 등록한다. Character·Vehicle·Item·Tool·FX도 누락하지 않되 정적 경관 자동 배치 대상과는 분리한다.
+- 호환과 분류: 기존 Farm·Town·City 1,535개 `inventoryId` 산식은 유지한다. 팩마다 다른 원본 `Environment(s)` 경로는 새 정규화 분류로 흡수하고, 각 항목에 의미 자산군, 주 활용 트랙, 검토 상태와 계획 적용 영역을 둔다. Construction은 네 영역의 공통 상태층 후보이며 독립 H1로 자동 승격하지 않는다.
+- 승격 경계: 전수 등록과 자동 분류는 보유 표현 재료를 찾은 증거다. 사람 검토 대기 항목과 대표 조립물은 별도로 검증하며 기술 대장만으로 H 승인, E4~E7, AreaSet 배치나 Simulation 상태가 성립하지 않는다.
+- 구현 증거: `synty-pack-inventory.v2` 대장에 2,346개·1,499개 의미 자산군을 생성했고 Vehicle 51개를 포함한 자동 분류 2,345개와 Nature `Misc` 사람 검토 대기 1개를 분리했다. Editor·EditMode 시험 어셈블리는 오류 0개로 컴파일했고 집중 Unity EditMode 시험 4/4가 통과했다. 조립 Prefab·Scene, Play Mode·Game View는 완료 증거에 포함하지 않는다.
+- 기준 문서: [심리·업무 영역 Synty 5팩 공간 조립 계획](../Architecture/심리업무영역Synty공간조립계획.md), [Synty 상향식 공간 재고 계획](../Architecture/Synty상향식공간재고계획.md)
+- 관계: D-178의 Construction 공통 조립층과 발전소 설계를 바꾸지 않고, 그 설계 전에 수행할 표현 재료 전수 관리 규칙을 구현 수준으로 고정한다.
