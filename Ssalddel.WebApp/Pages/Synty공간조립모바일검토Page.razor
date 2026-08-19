@@ -1,0 +1,502 @@
+@page "/world/review/compositions"
+@using Ssalddel.Contracts.Common.WorldProjection
+@inject Synty공간조립모바일검토Client ReviewClient
+@inject WebAuthSessionService AuthSession
+@implements IDisposable
+
+<PageTitle>Synty 공간 조립 모바일 검토 · 살뜰</PageTitle>
+
+<WebPageHeader Eyebrow="World Projection"
+               Title="Synty 공간 조립 모바일 검토"
+               Description="Unity가 촬영한 조합물을 주차 후 짧게 검토하고, 서버 원장에 후보 판단만 기록합니다."
+               Badge="관리자 · 후보 검토" />
+
+@if (!AuthSession.IsLoggedIn)
+{
+    <section class="review-gate">
+        <h2>로그인이 필요합니다</h2>
+        <p>촬영 조합물과 검토 이력은 서버관리자에게만 공개됩니다.</p>
+        <a class="primary-link" href="/login">로그인</a>
+    </section>
+}
+else if (!IsServerAdministrator)
+{
+    <section class="review-gate">
+        <h2>서버관리자 전용 검토함입니다</h2>
+        <p>현재 계정으로는 촬영 묶음과 검토 원장을 조회할 수 없습니다.</p>
+    </section>
+}
+else
+{
+    <main class="composition-review-shell">
+        <section class="safety-lock @(ParkingConfirmed ? "confirmed" : string.Empty)">
+            <div>
+                <strong>신호 대기 중에는 사용하지 마세요</strong>
+                <p>차량을 합법적인 장소에 완전히 주차하고 운전을 종료한 뒤에만 검토해 주세요.</p>
+            </div>
+            @if (!ParkingConfirmed)
+            {
+                <button type="button" class="parking-confirm" @onclick="ConfirmParking">
+                    안전하게 주차했습니다
+                </button>
+            }
+            else
+            {
+                <span class="parking-state">주차 검토 모드</span>
+            }
+        </section>
+
+        <section class="review-toolbar" aria-label="검토함 상태">
+            <div>
+                <span>전체 <strong>@(_inbox?.TotalCount ?? 0)</strong></span>
+                <span>검토 대기 <strong>@(_inbox?.ReadyCount ?? 0)</strong></span>
+                <span>판단 완료 <strong>@(_inbox?.ReviewedCount ?? 0)</strong></span>
+            </div>
+            <div class="toolbar-actions">
+                @if (_offlinePendingCount > 0)
+                {
+                    <button type="button" class="sync-button" disabled="@_busy" @onclick="SynchronizeOfflineAsync">
+                        오프라인 @_offlinePendingCount 건 동기화
+                    </button>
+                }
+                <button type="button" class="refresh-button" disabled="@_busy" @onclick="LoadInboxAsync">
+                    새로고침
+                </button>
+            </div>
+        </section>
+
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <div class="review-message @(_messageIsError ? "error" : "success")" role="status">
+                @_message
+            </div>
+        }
+
+        @if (_loading)
+        {
+            <section class="review-empty">검토 조합물을 불러오고 있습니다.</section>
+        }
+        else if (CurrentItem is null)
+        {
+            <section class="review-empty">
+                <h2>아직 등록된 촬영 조합물이 없습니다</h2>
+                <p>Unity 촬영 묶음을 관리자 API에 등록하면 이 화면에 카드가 나타납니다.</p>
+            </section>
+        }
+        else
+        {
+            var item = CurrentItem;
+            var composition = item.Composition;
+            var capture = CurrentCapture;
+
+            <article class="review-card" aria-labelledby="composition-review-title">
+                <header class="card-heading">
+                    <div>
+                        <span class="card-progress">@(_currentIndex + 1) / @(_inbox?.Items.Count ?? 0)</span>
+                        <h2 id="composition-review-title">@composition.DisplayName</h2>
+                        <p>@item.BatchTitle · @composition.VariantCode · @composition.StateProfileCode</p>
+                    </div>
+                    <span class="state-badge @StateCss(item.ReviewStateCode)">@StateLabel(item.ReviewStateCode)</span>
+                </header>
+
+                <section class="capture-stage">
+                    @if (capture is null)
+                    {
+                        <div class="capture-placeholder">
+                            <strong>촬영 대기</strong>
+                            <span>이미지가 등록되어야 휴대폰 검토를 시작할 수 있습니다.</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="@capture.ImageUrl"
+                             alt="@($"{composition.DisplayName} · {capture.DisplayName}")"
+                             loading="eager" />
+                        <span class="capture-label">@capture.DisplayName · @capture.Width×@capture.Height</span>
+                    }
+                </section>
+
+                @if (composition.Captures.Count > 1)
+                {
+                    <nav class="capture-nav" aria-label="촬영 시점 선택">
+                        @for (var captureIndex = 0; captureIndex < composition.Captures.Count; captureIndex++)
+                        {
+                            var index = captureIndex;
+                            <button type="button"
+                                    class="@(index == _captureIndex ? "active" : string.Empty)"
+                                    aria-label="@(composition.Captures[index].DisplayName)"
+                                    @onclick="() => SelectCapture(index)">
+                                @(index + 1)
+                            </button>
+                        }
+                    </nav>
+                }
+
+                <section class="composition-facts">
+                    <div><span>H1</span><code>@composition.H1StableId</code></div>
+                    <div><span>H2</span><code>@composition.H2StableId</code></div>
+                    <div><span>H3</span><code>@composition.H3StableId</code></div>
+                </section>
+
+                <section class="pack-usage" aria-label="팩 활용 비율">
+                    @foreach (var pack in composition.PackUsages.OrderByDescending(pack => pack.UsagePercent))
+                    {
+                        <div class="pack-row">
+                            <div><strong>@pack.PackCode</strong><span>@pack.RoleCode</span></div>
+                            <div class="pack-meter"><span style="width: @(pack.UsagePercent)%"></span></div>
+                            <b>@pack.UsagePercent%</b>
+                        </div>
+                    }
+                </section>
+
+                <section class="issue-section">
+                    <h3>눈에 띈 문제</h3>
+                    <div class="issue-chips">
+                        @foreach (var issue in IssueChoices)
+                        {
+                            var selected = _selectedIssues.Contains(issue.Code);
+                            <button type="button"
+                                    class="@(selected ? "selected" : string.Empty)"
+                                    aria-pressed="@selected"
+                                    disabled="@(!ParkingConfirmed || _busy)"
+                                    @onclick="() => ToggleIssue(issue.Code)">
+                                @issue.Label
+                            </button>
+                        }
+                    </div>
+                    <label for="composition-review-note">짧은 메모</label>
+                    <textarea id="composition-review-note"
+                              maxlength="500"
+                              rows="2"
+                              disabled="@(!ParkingConfirmed || _busy)"
+                              placeholder="필요할 때만 입력하세요."
+                              @bind="_note"></textarea>
+                </section>
+
+                <section class="decision-grid" aria-label="빠른 검토 판단">
+                    <button type="button" class="good" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.Good)">
+                        <strong>좋음</strong><span>검토 후보로 남김</span>
+                    </button>
+                    <button type="button" class="revise" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.NeedsRevision)">
+                        <strong>수정 필요</strong><span>문제와 함께 재조립</span>
+                    </button>
+                    <button type="button" class="hold" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.OnHold)">
+                        <strong>보류</strong><span>나중에 다시 판단</span>
+                    </button>
+                    <button type="button" class="compare" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.CompareCandidate)">
+                        <strong>비교 후보</strong><span>A/B/C와 나란히 보기</span>
+                    </button>
+                </section>
+
+                <footer class="card-footer">
+                    <button type="button" disabled="@(_currentIndex <= 0 || _busy)" @onclick="PreviousItem">이전</button>
+                    <span>휴대폰 판단은 최종 Scene 승인이 아닙니다.</span>
+                    <button type="button" disabled="@(!CanMoveNext || _busy)" @onclick="NextItem">다음</button>
+                </footer>
+            </article>
+        }
+    </main>
+}
+
+@code {
+    private static readonly (string Code, string Label)[] IssueChoices =
+    [
+        (Synty공간조립검토문제Codes.RouteUnclear, "동선 불명확"),
+        (Synty공간조립검토문제Codes.TooDense, "너무 복잡함"),
+        (Synty공간조립검토문제Codes.PackBlendAwkward, "팩 혼합 어색"),
+        (Synty공간조립검토문제Codes.PsychologicalReadabilityWeak, "회복·위협감 부족"),
+        (Synty공간조립검토문제Codes.PerformanceConcern, "성능 우려"),
+        (Synty공간조립검토문제Codes.EntranceExitUnclear, "출입구 불명확")
+    ];
+
+    private Synty공간조립검토함Response? _inbox;
+    private readonly HashSet<string> _selectedIssues = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _offlineQueuedItems = new(StringComparer.Ordinal);
+    private int _currentIndex;
+    private int _captureIndex;
+    private int _offlinePendingCount;
+    private string _note = string.Empty;
+    private string? _message;
+    private bool _messageIsError;
+    private bool _loading;
+    private bool _busy;
+    private bool _loaded;
+
+    private bool ParkingConfirmed { get; set; }
+
+    private bool IsServerAdministrator
+        => AuthSession.Roles.Any(role =>
+            string.Equals(role, "서버관리자", StringComparison.OrdinalIgnoreCase));
+
+    private Synty공간조립검토항목Dto? CurrentItem
+        => _inbox?.Items.Count > _currentIndex && _currentIndex >= 0
+            ? _inbox.Items[_currentIndex]
+            : null;
+
+    private Synty공간조립검토촬영Dto? CurrentCapture
+        => CurrentItem?.Composition.Captures.Count > _captureIndex && _captureIndex >= 0
+            ? CurrentItem.Composition.Captures[_captureIndex]
+            : null;
+
+    private bool DecisionDisabled
+        => !ParkingConfirmed
+           || _busy
+           || CurrentItem is null
+           || CurrentItem.Composition.Captures.Count == 0
+           || _offlineQueuedItems.Contains(CurrentItem.ReviewItemStableId);
+
+    private bool CanMoveNext => _inbox is not null && _currentIndex < _inbox.Items.Count - 1;
+
+    protected override void OnInitialized()
+    {
+        AuthSession.Changed += HandleAuthChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _offlinePendingCount = await ReviewClient.오프라인대기수조회Async();
+        if (AuthSession.IsLoggedIn && IsServerAdministrator)
+        {
+            await LoadInboxAsync();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ConfirmParking()
+    {
+        ParkingConfirmed = true;
+        _message = "주차 검토 모드를 열었습니다. 출발 전에는 화면을 닫아 주세요.";
+        _messageIsError = false;
+    }
+
+    private async Task LoadInboxAsync()
+    {
+        if (_busy || !AuthSession.IsLoggedIn || !IsServerAdministrator)
+        {
+            return;
+        }
+        _loading = true;
+        _busy = true;
+        _message = null;
+        try
+        {
+            _inbox = await ReviewClient.검토함조회Async(take: 100);
+            _currentIndex = FindFirstReviewIndex(_inbox.Items);
+            _captureIndex = 0;
+            ResetDraft();
+            _loaded = true;
+        }
+        catch (Exception exception)
+        {
+            _message = $"검토함을 불러오지 못했습니다. {exception.Message}";
+            _messageIsError = true;
+        }
+        finally
+        {
+            _loading = false;
+            _busy = false;
+        }
+    }
+
+    private async Task SubmitDecisionAsync(string decisionCode)
+    {
+        var item = CurrentItem;
+        if (DecisionDisabled || item is null)
+        {
+            return;
+        }
+        if (decisionCode == Synty공간조립검토결정Codes.NeedsRevision
+            && _selectedIssues.Count == 0
+            && string.IsNullOrWhiteSpace(_note))
+        {
+            _message = "수정 필요를 선택하려면 문제 꼬리표나 짧은 메모를 하나 남겨 주세요.";
+            _messageIsError = true;
+            return;
+        }
+
+        _busy = true;
+        _message = null;
+        try
+        {
+            var request = new Synty공간조립검토결정Request
+            {
+                ExpectedRevision = item.Revision,
+                IdempotencyKey = $"mobile:{item.ReviewItemStableId}:{item.Revision}:{Guid.NewGuid():N}",
+                DecisionCode = decisionCode,
+                IssueCodes = _selectedIssues.OrderBy(code => code, StringComparer.Ordinal).ToList(),
+                Note = _note.Trim()
+            };
+            var result = await ReviewClient.결정전송Async(
+                item.ReviewItemStableId,
+                request);
+            if (result.Item is not null && _inbox is not null)
+            {
+                _inbox.Items[_currentIndex] = result.Item;
+                _inbox.ReadyCount = Math.Max(0, _inbox.ReadyCount - 1);
+                _inbox.ReviewedCount++;
+            }
+            if (result.QueuedOffline)
+            {
+                _offlineQueuedItems.Add(item.ReviewItemStableId);
+                _offlinePendingCount = await ReviewClient.오프라인대기수조회Async();
+            }
+            _message = result.Message;
+            _messageIsError = false;
+            MoveNextAfterDecision();
+        }
+        catch (Synty공간조립검토HttpException exception)
+        {
+            _message = exception.StatusCode == System.Net.HttpStatusCode.Conflict
+                ? "다른 검토 또는 새 촬영 묶음이 먼저 저장되었습니다. 새로고침 후 다시 확인해 주세요."
+                : $"검토 결과를 저장하지 못했습니다. {exception.Message}";
+            _messageIsError = true;
+        }
+        catch (Exception exception)
+        {
+            _message = $"검토 결과를 저장하지 못했습니다. {exception.Message}";
+            _messageIsError = true;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task SynchronizeOfflineAsync()
+    {
+        if (_busy)
+        {
+            return;
+        }
+        _busy = true;
+        try
+        {
+            var result = await ReviewClient.오프라인대기열동기화Async();
+            _offlinePendingCount = result.PendingCount;
+            _message = result.ErrorMessage
+                       ?? $"오프라인 검토 {result.SynchronizedCount}건을 서버에 동기화했습니다.";
+            _messageIsError = result.ErrorMessage is not null;
+            if (result.SynchronizedCount > 0)
+            {
+                _offlineQueuedItems.Clear();
+                _busy = false;
+                await LoadInboxAsync();
+                return;
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void SelectCapture(int index)
+    {
+        if (CurrentItem is not null && index >= 0 && index < CurrentItem.Composition.Captures.Count)
+        {
+            _captureIndex = index;
+        }
+    }
+
+    private void ToggleIssue(string issueCode)
+    {
+        if (!_selectedIssues.Add(issueCode))
+        {
+            _selectedIssues.Remove(issueCode);
+        }
+    }
+
+    private void PreviousItem()
+    {
+        if (_currentIndex <= 0)
+        {
+            return;
+        }
+        _currentIndex--;
+        _captureIndex = 0;
+        ResetDraft();
+    }
+
+    private void NextItem()
+    {
+        if (!CanMoveNext)
+        {
+            return;
+        }
+        _currentIndex++;
+        _captureIndex = 0;
+        ResetDraft();
+    }
+
+    private void MoveNextAfterDecision()
+    {
+        if (CanMoveNext)
+        {
+            _currentIndex++;
+            _captureIndex = 0;
+        }
+        ResetDraft();
+    }
+
+    private void ResetDraft()
+    {
+        _selectedIssues.Clear();
+        _note = string.Empty;
+    }
+
+    private void HandleAuthChanged()
+        => _ = InvokeAsync(async () =>
+        {
+            if (AuthSession.IsLoggedIn && IsServerAdministrator && !_loaded)
+            {
+                await LoadInboxAsync();
+            }
+            StateHasChanged();
+        });
+
+    private static int FindFirstReviewIndex(IReadOnlyList<Synty공간조립검토항목Dto> items)
+    {
+        for (var index = 0; index < items.Count; index++)
+        {
+            if (items[index].ReviewStateCode is Synty공간조립검토상태Codes.ReadyForReview
+                or Synty공간조립검토상태Codes.Stale)
+            {
+                return index;
+            }
+        }
+        return 0;
+    }
+
+    private static string StateLabel(string stateCode)
+        => stateCode switch
+        {
+            Synty공간조립검토상태Codes.WaitingForCapture => "촬영 대기",
+            Synty공간조립검토상태Codes.ReadyForReview => "검토 대기",
+            Synty공간조립검토상태Codes.ReviewedCandidate => "좋음 후보",
+            Synty공간조립검토상태Codes.NeedsRevision => "수정 필요",
+            Synty공간조립검토상태Codes.OnHold => "보류",
+            Synty공간조립검토상태Codes.CompareCandidate => "비교 후보",
+            Synty공간조립검토상태Codes.Stale => "입력 변경 · 재검토",
+            _ => stateCode
+        };
+
+    private static string StateCss(string stateCode)
+        => stateCode switch
+        {
+            Synty공간조립검토상태Codes.ReadyForReview => "ready",
+            Synty공간조립검토상태Codes.Stale => "stale",
+            Synty공간조립검토상태Codes.ReviewedCandidate => "reviewed",
+            Synty공간조립검토상태Codes.NeedsRevision => "revision",
+            _ => "neutral"
+        };
+
+    public void Dispose()
+    {
+        AuthSession.Changed -= HandleAuthChanged;
+    }
+}
