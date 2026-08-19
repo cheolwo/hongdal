@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Ssalddel.UnityReview.Core</RootNamespace>
+    <AssemblyName>Ssalddel.UnityReview.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="SkiaSharp" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Ssalddel\Services\WorldProjection\Synty공간조립모바일검토Service.cs"
+             Link="WorldProjection\Synty공간조립모바일검토Service.cs" />
+    <Compile Include="..\Ssalddel\Services\WorldProjection\Synty공간조립검토촬영업로드Service.cs"
+             Link="WorldProjection\Synty공간조립검토촬영업로드Service.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9cbf44fe-a86a-47dc-b59d-f6adf99ffac0</UserSecretsId>
+    <RootNamespace>Ssalddel.UnityReview.Api</RootNamespace>
+    <AssemblyName>Ssalddel.UnityReview.Api</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="MySqlConnector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.UnityReview.Core\Ssalddel.UnityReview.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/Unity Review/">
+    <Project Path="Ssalddel.UnityReview.Api/Ssalddel.UnityReview.Api.csproj" />
+    <Project Path="Ssalddel.UnityReview.Core/Ssalddel.UnityReview.Core.csproj" />
     <Project Path="Ssalddel.Web.UnityReviewApp/Ssalddel.Web.UnityReviewApp.csproj" />
   </Folder>
   <Folder Name="/Shared/">
