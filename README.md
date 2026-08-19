@@ -38,23 +38,41 @@
 
 > 현재 Unity 화면은 개발용 Simulation입니다. 실제 판매·결제·배차·수출·정산을 실행하지 않으며, 운영 상태의 최종 권위는 서버에 있습니다.
 
-현재 공공데이터 기반 농장 생존 방향은 다음 트리로 정리되어 있습니다.
+현재 세계 구축은 공공데이터에서 출발하지 않습니다. 게임 플레이와 세계 의도에서 필요한 WI와 H 공간을 상향식으로 조립하고, AreaSet이 요구한 현실 근거만 E6에서 연결합니다.
 
 ```text
-공공데이터 지형·법정동·건물
-└─ Simulation Session
-   ├─ 1~23일 경관 산책·지역 발견·선택 농사
-   ├─ 24~26일 계절 방어 예고·준비
-   ├─ 27일 자동 방어·직접 전투 선택
-   ├─ 28일 회복 가능한 결과와 계절 보고
-   ├─ 기존 전투 시나리오 호환
-   └─ Save / Replay
-      └─ Unity PresentationKey / VisualKey
-         ├─ 현재 보유 Synty fallback
-         └─ 향후 Apocalypse·Alpine 연결
+게임 기획과 세계 의도
+├─ 플레이어 경험
+│  ├─ Nature 체류·탐험·위협·회복
+│  ├─ Farm 생산·수확·출하
+│  ├─ City/Hub 물류·검수·보관
+│  └─ Town 시장·생활·소비
+├─ WI 세계 상호작용 단위
+│  └─ 행위자·시작 조건·공간 요구·예약·Task·Effect
+└─ 상향식 H 공간 설계 재고
+   ├─ 기준 경관 문법 52개 의미군 × A/B/C = 156개 표현 변형
+   ├─ H1 작업공간 모판
+   ├─ H2 블록 모판
+   ├─ H3 경관 모판
+   └─ H4 지역 모판
+      ↓
+이론 공간 생산 공장
+├─ H2 TheoryQualified 24개
+├─ H3 TheoryQualified 13개
+└─ E5TheoryQualified AreaSet 4개
+   ↓
+AreaSet 세계 설계
+└─ LandscapeGraph 공간 조립
+   ├─ Node·Edge·외부 Connector
+   ├─ 공간 역할·공간 능력·업무 용량
+   ├─ E6 DataRequirement·EvidenceBinding·DerivedArtifact
+   └─ Simulation 서버
+      └─ Preview → Confirm → WorldTick → 최신 상태 재조회
+         └─ Unity SimulationWorldShell 표현
+            └─ E7 실제 플레이·Save / Replay 검증
 ```
 
-기본 경관 장, 계절 방어와 기존 전투 규칙의 호환 경계는 [공공데이터 기반 Synty 경관 생활·농장 생존 Simulation 기획과 구현 기준](docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md)을 따릅니다.
+`E5TheoryQualified`는 사람 검토 없이 이론상 공간 구조와 연결이 닫힌 상태이며 실제 지역·공공데이터·Unity Runtime 증거는 아닙니다. 공공데이터 기반 경관과 계절 방어의 상세 기준은 [공공데이터 기반 Synty 경관 생활·농장 생존 Simulation 기획과 구현 기준](docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md)을 따르고, Unity의 상세 구조는 [Ssalddel Unity README](https://github.com/cheolwo/unity#한눈에-보는-상향식-세계-구축-구조)에서 확인합니다.
 
 계획·코드·DB·Runtime·Game View를 같은 완료로 섞지 않기 위해, 현재 남은 작업과 증거 단계는 [Simulation·Unity 미완료 실행 트리](docs/AI/generated/simulation-unity-execution-tree.md)에서 한눈에 확인합니다. 이 트리는 `eng/execution-ledgers/simulation-unity.json`에서 자동 생성되며 첫 종단 완결 대상은 대관령 중앙 L2 `kr5186:l2:700:1145`입니다.
 
