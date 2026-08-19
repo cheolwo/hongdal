@@ -1960,3 +1960,35 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 구현 증거: `synty-pack-inventory.v2` 대장에 2,346개·1,499개 의미 자산군을 생성했고 Vehicle 51개를 포함한 자동 분류 2,345개와 Nature `Misc` 사람 검토 대기 1개를 분리했다. Editor·EditMode 시험 어셈블리는 오류 0개로 컴파일했고 집중 Unity EditMode 시험 4/4가 통과했다. 조립 Prefab·Scene, Play Mode·Game View는 완료 증거에 포함하지 않는다.
 - 기준 문서: [심리·업무 영역 Synty 5팩 공간 조립 계획](../Architecture/심리업무영역Synty공간조립계획.md), [Synty 상향식 공간 재고 계획](../Architecture/Synty상향식공간재고계획.md)
 - 관계: D-178의 Construction 공통 조립층과 발전소 설계를 바꾸지 않고, 그 설계 전에 수행할 표현 재료 전수 관리 규칙을 구현 수준으로 고정한다.
+
+## D-180 휴대폰 공간 조립 검토는 주차 후 후보 선별이며 최종 Scene 승인이 아니다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 안전 경계: 모바일 검토는 합법적인 장소에 완전히 주차하고 운전을 종료한 뒤에만 사용한다. 신호 대기·정체 중 사용하지 않으며 화면은 `안전하게 주차했습니다` 확인 전 판단 입력을 잠근다.
+- 권위와 상태: Unity 촬영 batch는 조합·계획·Rendering Profile·이미지 hash를 서버 검토 원장에 등록한다. 휴대폰은 Stable ID, 예상 개정, 멱등 키, 판단 코드와 선택적 문제·메모만 보내며 `Good`은 `ReviewedCandidate`다. 어떤 모바일 판단도 `ApprovedForSceneApply`, Simulation 상태나 운영 업무 결과를 만들지 않는다.
+- 변경과 오프라인: 같은 조합물의 입력 또는 촬영 snapshot이 바뀌면 기존 판단을 `Stale`로 만들어 재검토한다. 통신 실패 요청은 휴대폰에 임시 보관하지만 `409` 개정 충돌을 자동 덮어쓰지 않는다.
+- 첫 범위: 회복·위협 발전소 × A/B/C × 기본·강화 상태의 12개 카드를 첫 batch로 사용한다. 서버 Mongo 원장·관리자 API·모바일 Web 화면·오프라인 요청 대기열과 촬영 전 batch 생성기를 구현하며, Unity 실제 촬영·업로드와 PC 최종 승인은 후속 검증으로 남긴다.
+- 기준 문서: [Synty 모바일 조합물 검토 계획](../Architecture/Synty모바일조합물검토계획.md)
+- 관계: D-178~D-179의 다섯 팩 조립·전수 기술 대장을 사람이 짧게 비교 검토하는 인계 절차로 확장하며 기존 정적 경관 배치 승인 영수증의 hash 권위를 유지한다.
+
+## D-181 Synty Web 검토 v2는 불변 촬영 영수증과 부모 bundle 계보로 재촬영을 닫는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 계약과 경합: 새 Unity 촬영은 `synty-composition-review-batch.v2`를 사용하고 `ExpectedRevision`, `CompositionInputHash`, `RenderingProfileHash`, `ParentCaptureBundleHash`, `CaptureBundleHash`를 함께 보낸다. `NeedsRevision` 재촬영은 현재 원장의 부모 bundle·조립 입력·예상 개정이 모두 맞을 때만 `ReadyForReview`로 돌아가며, 원본 변경은 `Stale`, 늦은 재촬영은 `409`로 처리한다. URL 기반 v1은 읽기 호환으로 유지한다.
+- 이미지 권위: Unity는 Blob URL을 결정하지 않고 PNG를 서버에 보낸다. 서버는 signature·크기·원본 hash를 검증하고 PNG를 재인코딩한 뒤 `UploadedSourceSha256`과 `StoredImageSha256`을 분리한다. `CaptureUploadId` 영수증이 `StorageProviderCode + ContainerName + ObjectName + hash`를 보존하며 Review Batch v2는 이 영수증만 참조한다.
+- 저장 실패: Blob은 불변 object의 `create-if-absent`, Mongo는 촬영 영수증 원장으로 나눈다. Blob 성공 뒤 Mongo 실패는 orphan을 허용하고 같은 영수증 재시도로 원장 저장을 회복한다. 기존 object를 덮어쓰거나 실패 시 URL을 권위값으로 대체하지 않는다.
+- 공개와 개인정보: 현재 검토 이미지는 공개 읽기 object다. URL 비밀성은 접근 제어가 아니므로 Capture Camera는 전용 layer만 렌더링하고 사용자·주소·주문·서버·인증·Console·token·로컬 경로를 PNG에 넣지 않는다. Web은 관리자 화면과 공개 이미지 접근 경계가 다름을 명시한다.
+- 이행 순서: 12카드·48이미지를 먼저 만들지 않고 회복 발전소 A Normal 1카드에서 Capture Stage → 업로드 영수증 → Web 판단 → `NeedsRevision` 재촬영 폐루프를 먼저 닫는다. 현재 코드와 로컬 네 시점 PNG까지 구현했으며 Azure Blob·Mongo·관리자 HTTP·실제 휴대폰 왕복은 별도 운영 검증이다.
+- 기준 문서: [Synty Web 조합물 검토 폐루프 계획](../Architecture/Synty모바일조합물검토계획.md)
+- 관계: D-180의 주차 후 후보 선별과 `Good ≠ 승인`을 유지하면서 촬영 저장·재촬영 경합·공개 이미지 개인정보 경계를 구현 계약으로 구체화한다.
+
+## D-182 Unity 산출물 검토 WebApp은 일반 업무 WebApp과 물리 프로젝트를 분리한다
+
+- 상태: Accepted
+- 결정: Unity 촬영 이미지·검토 이력·후보 판단은 `Ssalddel.Web.UnityReviewApp`이 소유한다. 일반 `Ssalddel.WebApp`과 01~05 역할별 WebApp은 Unity 검토 route, page, Client와 오프라인 대기열을 포함하지 않는다.
+- 인증: 전용 앱은 기존 서버 로그인 API와 계약을 사용하되 별도 `ssalddel.unity-review.auth.v1` 저장 키를 쓴다. 검토 API에는 Bearer token을 명시적으로 전송하고 `서버관리자` 역할이 아니면 전용 앱 토큰을 보존하지 않는다.
+- 배포: 전용 앱은 `Ssalddel.UnityReview.slnx`로 독립 빌드한다. 일반 제품 릴리스와 역할 WebApp에 자동 포함하지 않으며, 배포·hostname·공개 Blob 정책·민감 화면 검증을 별도 게이트로 관리한다.
+- 공유 경계: 서버 API·`Ssalddel.Contracts`·공통 인증 토큰 구조만 재사용한다. 일반 WebApp 프로젝트·레이아웃·서비스에 대한 참조는 금지한다.
+- 관계: D-181의 공개 이미지·관리자 검토 경계를 배포 가능한 클라이언트 경계로 구체화하며 `Good ≠ 승인`, 서버 원장 권위와 Unity 표현 전용 원칙은 유지한다.
