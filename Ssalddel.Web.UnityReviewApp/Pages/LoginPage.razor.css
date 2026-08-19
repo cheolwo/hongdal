@@ -1,0 +1,93 @@
+.login-shell {
+    display: grid;
+    min-height: calc(100vh - 190px);
+    padding: 2rem 1rem;
+    place-items: center;
+}
+
+.login-card {
+    width: min(100%, 480px);
+    padding: clamp(1.4rem, 5vw, 2.3rem);
+    border: 1px solid #d5dfd8;
+    border-radius: 1.4rem;
+    background: white;
+    box-shadow: 0 20px 55px rgba(31, 63, 45, .09);
+}
+
+.eyebrow {
+    color: #26704b;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+}
+
+h1 {
+    margin: .45rem 0 .55rem;
+}
+
+p {
+    margin: 0 0 1.4rem;
+    color: #66736b;
+    line-height: 1.6;
+}
+
+form,
+label {
+    display: grid;
+    gap: .45rem;
+}
+
+form {
+    gap: 1rem;
+}
+
+label {
+    color: #3f4e45;
+    font-size: .85rem;
+    font-weight: 800;
+}
+
+input {
+    min-height: 48px;
+    padding: 0 .85rem;
+    border: 1px solid #bccbc1;
+    border-radius: .75rem;
+    font: inherit;
+}
+
+button {
+    min-height: 50px;
+    border: 0;
+    border-radius: .8rem;
+    background: #1e6842;
+    color: white;
+    font: inherit;
+    font-weight: 900;
+}
+
+button:disabled {
+    opacity: .55;
+}
+
+.login-message,
+aside {
+    margin: 0 0 1rem;
+    padding: .8rem .9rem;
+    border-radius: .75rem;
+    background: #eef7f1;
+    color: #295d40;
+    font-size: .82rem;
+}
+
+.login-message.error {
+    background: #fff0ec;
+    color: #963d24;
+}
+
+aside {
+    display: grid;
+    gap: .2rem;
+    margin: 1.1rem 0 0;
+    background: #f4f6f4;
+    color: #5c6961;
+}

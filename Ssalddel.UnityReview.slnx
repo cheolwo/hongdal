@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Unity Review/">
+    <Project Path="Ssalddel.Web.UnityReviewApp/Ssalddel.Web.UnityReviewApp.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="Ssalddel.Client.Infrastructure/Ssalddel.Client.Infrastructure.csproj" />
+    <Project Path="Ssalddel.Contracts/Ssalddel.Contracts.csproj" />
+  </Folder>
+</Solution>

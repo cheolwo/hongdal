@@ -1,16 +1,18 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.JSInterop;
 using Ssalddel.Contracts.Common.WorldProjection;
 
-namespace Ssalddel.WebApp.Services;
+namespace Ssalddel.Web.UnityReviewApp.Services;
 
 public sealed class Synty공간조립모바일검토Client(
     HttpClient httpClient,
-    IJSRuntime jsRuntime)
+    IJSRuntime jsRuntime,
+    UnityReviewAuthSessionService authSession)
 {
-    private const string OfflineQueueStorageKey = "ssalddel.synty-composition-review.offline.v1";
+    private const string OfflineQueueStorageKey = "ssalddel.unity-review.composition-review.offline.v1";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     public async Task<Synty공간조립검토함Response> 검토함조회Async(
@@ -24,7 +26,8 @@ public sealed class Synty공간조립모바일검토Client(
             url += $"&reviewStateCode={Uri.EscapeDataString(reviewStateCode.Trim())}";
         }
 
-        using var response = await httpClient.GetAsync(url, cancellationToken);
+        using var request = CreateAuthorizedRequest(HttpMethod.Get, url);
+        using var response = await httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "공간 조립 검토함을 불러오지 못했습니다.", cancellationToken);
         return await response.Content.ReadFromJsonAsync<Synty공간조립검토함Response>(cancellationToken)
                ?? throw new InvalidOperationException("공간 조립 검토함 응답이 비어 있습니다.");
@@ -96,7 +99,9 @@ public sealed class Synty공간조립모바일검토Client(
     {
         var url = $"{Synty공간조립모바일검토Routes.Base}/items/" +
                   $"{Uri.EscapeDataString(reviewItemStableId)}/decisions";
-        using var response = await httpClient.PostAsJsonAsync(url, request, cancellationToken);
+        using var httpRequest = CreateAuthorizedRequest(HttpMethod.Post, url);
+        httpRequest.Content = JsonContent.Create(request);
+        using var response = await httpClient.SendAsync(httpRequest, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             var message = await ReadFailureAsync(response, cancellationToken);
@@ -187,6 +192,18 @@ public sealed class Synty공간조립모바일검토Client(
         throw new Synty공간조립검토HttpException(
             response.StatusCode,
             await ReadFailureAsync(response, cancellationToken, fallback));
+    }
+
+    private HttpRequestMessage CreateAuthorizedRequest(HttpMethod method, string url)
+    {
+        if (!authSession.IsLoggedIn || string.IsNullOrWhiteSpace(authSession.AccessToken))
+        {
+            throw new InvalidOperationException("Unity 산출물 검토 앱에 서버관리자로 로그인해 주세요.");
+        }
+
+        var request = new HttpRequestMessage(method, url);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authSession.AccessToken);
+        return request;
     }
 
     private static async Task<string> ReadFailureAsync(

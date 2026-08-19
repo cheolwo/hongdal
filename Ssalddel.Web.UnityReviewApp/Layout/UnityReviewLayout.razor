@@ -1,0 +1,65 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject UnityReviewAuthSessionService AuthSession
+@inject NavigationManager Navigation
+
+<div class="unity-review-app">
+    <header class="app-bar">
+        <a class="brand" href="/">
+            <span class="brand-mark">U</span>
+            <span>
+                <strong>Unity 산출물 검토실</strong>
+                <small>일반 살뜰 WebApp과 분리된 관리자 도구</small>
+            </span>
+        </a>
+        <div class="session-area">
+            @if (AuthSession.IsLoggedIn)
+            {
+                <span>@(AuthSession.UserName ?? AuthSession.UserId)</span>
+                <button type="button" @onclick="LogoutAsync">로그아웃</button>
+            }
+            else if (AuthSession.IsInitialized)
+            {
+                <a href="/login">관리자 로그인</a>
+            }
+        </div>
+    </header>
+
+    <main class="app-content">
+        @Body
+    </main>
+
+    <footer>
+        <strong>운영 경계</strong>
+        <span>이 앱은 Unity 촬영 산출물의 후보 검토만 담당하며 업무 WebApp, Scene 적용 승인, Simulation 결과를 대신하지 않습니다.</span>
+    </footer>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthSession.Changed += HandleSessionChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await AuthSession.EnsureRestoredAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthSession.ClearAsync();
+        Navigation.NavigateTo("/login");
+    }
+
+    private void HandleSessionChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        AuthSession.Changed -= HandleSessionChanged;
+    }
+}

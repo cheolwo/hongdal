@@ -1,0 +1,67 @@
+:root {
+    font-family: Pretendard, "Noto Sans KR", "Segoe UI", sans-serif;
+    color: #18231d;
+    background: #f3f6f4;
+    font-synthesis: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    background: #f3f6f4;
+}
+
+button,
+a,
+input,
+textarea {
+    touch-action: manipulation;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.boot-loading {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    color: #3c6d51;
+    font-weight: 800;
+}
+
+#blazor-error-ui {
+    position: fixed;
+    z-index: 1000;
+    right: 1rem;
+    bottom: 1rem;
+    display: none;
+    padding: .8rem 1rem;
+    border-radius: .7rem;
+    background: #8d351f;
+    color: white;
+}
+
+#blazor-error-ui a {
+    margin-left: .5rem;
+    color: white;
+}
+
+.not-found {
+    max-width: 680px;
+    margin: 3rem auto;
+    padding: 2rem;
+    border: 1px solid #d6e0d9;
+    border-radius: 1rem;
+    background: white;
+    text-align: center;
+}

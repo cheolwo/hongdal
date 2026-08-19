@@ -31,6 +31,9 @@
     <Project Path="Ssalddel.Web.DriverApp/Ssalddel.Web.DriverApp.csproj" />
     <Project Path="Ssalddel.Web.WarehouseApp/Ssalddel.Web.WarehouseApp.csproj" />
   </Folder>
+  <Folder Name="/Unity Tooling/">
+    <Project Path="Ssalddel.Web.UnityReviewApp/Ssalddel.Web.UnityReviewApp.csproj" />
+  </Folder>
   <Folder Name="/Server Modules/">
     <Project Path="Ssalddel.Community/Ssalddel.Community.csproj" />
   </Folder>

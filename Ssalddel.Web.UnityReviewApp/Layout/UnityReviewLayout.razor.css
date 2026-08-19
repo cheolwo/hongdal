@@ -1,0 +1,95 @@
+.unity-review-app {
+    min-height: 100vh;
+    background: #f3f6f4;
+}
+
+.app-bar {
+    position: sticky;
+    z-index: 20;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 68px;
+    padding: .65rem clamp(1rem, 4vw, 2.5rem);
+    border-bottom: 1px solid #ccd8d0;
+    background: rgba(250, 252, 250, .96);
+    backdrop-filter: blur(12px);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .7rem;
+    color: #17241d;
+    text-decoration: none;
+}
+
+.brand-mark {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 12px;
+    background: #1d6842;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.brand strong,
+.brand small {
+    display: block;
+}
+
+.brand small {
+    margin-top: .1rem;
+    color: #68756d;
+    font-size: .72rem;
+}
+
+.session-area {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    color: #58665e;
+    font-size: .82rem;
+}
+
+.session-area a,
+.session-area button {
+    min-height: 42px;
+    padding: 0 .9rem;
+    border: 1px solid #b9c9bf;
+    border-radius: 999px;
+    background: white;
+    color: #235d3e;
+    font: inherit;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.app-content {
+    padding: .5rem clamp(.8rem, 3vw, 2rem) 2rem;
+}
+
+footer {
+    display: grid;
+    gap: .25rem;
+    padding: 1.2rem clamp(1rem, 4vw, 2.5rem) 2rem;
+    border-top: 1px solid #d8e0db;
+    color: #66736b;
+    font-size: .78rem;
+}
+
+@media (max-width: 640px) {
+    .brand small,
+    .session-area > span {
+        display: none;
+    }
+
+    .app-bar {
+        min-height: 60px;
+    }
+}

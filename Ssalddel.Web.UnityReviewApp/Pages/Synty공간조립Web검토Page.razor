@@ -1,17 +1,28 @@
+@page "/"
+@page "/reviews/compositions"
 @page "/world/review/compositions"
 @using Ssalddel.Contracts.Common.WorldProjection
 @inject Synty공간조립모바일검토Client ReviewClient
-@inject WebAuthSessionService AuthSession
+@inject UnityReviewAuthSessionService AuthSession
 @implements IDisposable
 
-<PageTitle>Synty 공간 조립 모바일 검토 · 살뜰</PageTitle>
+<PageTitle>Synty 공간 조립 Web 검토 · 살뜰</PageTitle>
 
-<WebPageHeader Eyebrow="World Projection"
-               Title="Synty 공간 조립 모바일 검토"
-               Description="Unity가 촬영한 조합물을 주차 후 짧게 검토하고, 서버 원장에 후보 판단만 기록합니다."
-               Badge="관리자 · 후보 검토" />
+<header class="review-page-header">
+    <span>UNITY ARTIFACT REVIEW</span>
+    <h1>Synty 공간 조립 Web 검토</h1>
+    <p>Unity가 촬영한 조합물을 휴대폰 Web에서 확인하고, 서버 원장에 후보 판단만 기록합니다.</p>
+    <strong>관리자 · 후보 검토</strong>
+</header>
 
-@if (!AuthSession.IsLoggedIn)
+@if (!AuthSession.IsInitialized)
+{
+    <section class="review-gate">
+        <h2>검토 세션을 확인하고 있습니다</h2>
+        <p>전용 Unity 산출물 검토 앱의 로그인 상태를 불러오는 중입니다.</p>
+    </section>
+}
+else if (!AuthSession.IsLoggedIn)
 {
     <section class="review-gate">
         <h2>로그인이 필요합니다</h2>
@@ -44,6 +55,11 @@ else
             {
                 <span class="parking-state">주차 검토 모드</span>
             }
+        </section>
+
+        <section class="public-image-notice" aria-label="검토 이미지 공개 범위">
+            <strong>이미지 공개 범위</strong>
+            <span>검토 화면은 관리자 전용이지만 검토 이미지 객체는 공개 읽기 방식입니다. 이미지 URL을 가진 사람은 로그인 없이 열 수 있습니다.</span>
         </section>
 
         <section class="review-toolbar" aria-label="검토함 상태">
@@ -109,12 +125,35 @@ else
                     }
                     else
                     {
-                        <img src="@capture.ImageUrl"
-                             alt="@($"{composition.DisplayName} · {capture.DisplayName}")"
-                             loading="eager" />
+                        @if (_imageLoadFailed)
+                        {
+                            <div class="capture-placeholder image-error">
+                                <strong>이미지를 불러오지 못했습니다</strong>
+                                <span>Blob 공개 읽기 설정과 저장 경로를 확인한 뒤 다시 시도해 주세요.</span>
+                                <button type="button" @onclick="RetryImage">이미지 다시 시도</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <button type="button" class="capture-image-button" @onclick="OpenImage" aria-label="이미지 전체 화면으로 보기">
+                                <img @key="ImageRenderKey"
+                                     src="@capture.ImageUrl"
+                                     alt="@($"{composition.DisplayName} · {capture.DisplayName}")"
+                                     loading="eager"
+                                     @onerror="HandleImageLoadError" />
+                            </button>
+                        }
                         <span class="capture-label">@capture.DisplayName · @capture.Width×@capture.Height</span>
                     }
                 </section>
+
+                @if (item.ReviewStateCode == Synty공간조립검토상태Codes.NeedsRevision)
+                {
+                    <section class="recapture-waiting">
+                        <strong>Unity 재촬영 대기</strong>
+                        <span>현재 촬영 묶음과 원장 개정을 부모로 참조하는 새 촬영이 등록되어야 다시 검토할 수 있습니다.</span>
+                    </section>
+                }
 
                 @if (composition.Captures.Count > 1)
                 {
@@ -173,6 +212,24 @@ else
                               @bind="_note"></textarea>
                 </section>
 
+                @if (item.History.Count > 0)
+                {
+                    <section class="review-history" aria-label="최근 검토 이력">
+                        <h3>최근 검토 이력</h3>
+                        @foreach (var history in item.History.OrderByDescending(value => value.Revision).Take(3))
+                        {
+                            <div>
+                                <strong>@HistoryLabel(history)</strong>
+                                <span>@history.ReviewerDisplayName · @history.DecidedAtUtc.ToLocalTime().ToString("MM-dd HH:mm")</span>
+                                @if (!string.IsNullOrWhiteSpace(history.Note))
+                                {
+                                    <p>@history.Note</p>
+                                }
+                            </div>
+                        }
+                    </section>
+                }
+
                 <section class="decision-grid" aria-label="빠른 검토 판단">
                     <button type="button" class="good" disabled="@DecisionDisabled" @onclick="() => SubmitDecisionAsync(Synty공간조립검토결정Codes.Good)">
                         <strong>좋음</strong><span>검토 후보로 남김</span>
@@ -194,6 +251,15 @@ else
                     <button type="button" disabled="@(!CanMoveNext || _busy)" @onclick="NextItem">다음</button>
                 </footer>
             </article>
+
+            @if (_imageExpanded && capture is not null)
+            {
+                <div class="image-lightbox" role="dialog" aria-modal="true" aria-label="조합물 촬영 이미지 확대" @onclick="CloseImage">
+                    <button type="button" class="lightbox-close" @onclick="CloseImage">닫기</button>
+                    <img src="@capture.ImageUrl" alt="@($"{composition.DisplayName} · {capture.DisplayName} 확대")" />
+                    <span>@capture.DisplayName · 손가락으로 확대해 세부를 확인하세요.</span>
+                </div>
+            }
         }
     </main>
 }
@@ -221,6 +287,9 @@ else
     private bool _loading;
     private bool _busy;
     private bool _loaded;
+    private bool _imageExpanded;
+    private bool _imageLoadFailed;
+    private int _imageRetryRevision;
 
     private bool ParkingConfirmed { get; set; }
 
@@ -247,6 +316,9 @@ else
 
     private bool CanMoveNext => _inbox is not null && _currentIndex < _inbox.Items.Count - 1;
 
+    private string ImageRenderKey
+        => $"{CurrentCapture?.CaptureUploadId}:{CurrentCapture?.ImageSha256}:{_imageRetryRevision}";
+
     protected override void OnInitialized()
     {
         AuthSession.Changed += HandleAuthChanged;
@@ -259,6 +331,7 @@ else
             return;
         }
 
+        await AuthSession.EnsureRestoredAsync();
         _offlinePendingCount = await ReviewClient.오프라인대기수조회Async();
         if (AuthSession.IsLoggedIn && IsServerAdministrator)
         {
@@ -400,7 +473,24 @@ else
         if (CurrentItem is not null && index >= 0 && index < CurrentItem.Composition.Captures.Count)
         {
             _captureIndex = index;
+            ResetImageState();
         }
+    }
+
+    private void OpenImage() => _imageExpanded = CurrentCapture is not null && !_imageLoadFailed;
+
+    private void CloseImage() => _imageExpanded = false;
+
+    private void HandleImageLoadError()
+    {
+        _imageLoadFailed = true;
+        _imageExpanded = false;
+    }
+
+    private void RetryImage()
+    {
+        _imageLoadFailed = false;
+        _imageRetryRevision++;
     }
 
     private void ToggleIssue(string issueCode)
@@ -419,6 +509,7 @@ else
         }
         _currentIndex--;
         _captureIndex = 0;
+        ResetImageState();
         ResetDraft();
     }
 
@@ -430,6 +521,7 @@ else
         }
         _currentIndex++;
         _captureIndex = 0;
+        ResetImageState();
         ResetDraft();
     }
 
@@ -440,7 +532,14 @@ else
             _currentIndex++;
             _captureIndex = 0;
         }
+        ResetImageState();
         ResetDraft();
+    }
+
+    private void ResetImageState()
+    {
+        _imageExpanded = false;
+        _imageLoadFailed = false;
     }
 
     private void ResetDraft()
@@ -478,11 +577,26 @@ else
             Synty공간조립검토상태Codes.WaitingForCapture => "촬영 대기",
             Synty공간조립검토상태Codes.ReadyForReview => "검토 대기",
             Synty공간조립검토상태Codes.ReviewedCandidate => "좋음 후보",
-            Synty공간조립검토상태Codes.NeedsRevision => "수정 필요",
+            Synty공간조립검토상태Codes.NeedsRevision => "Unity 재촬영 대기",
             Synty공간조립검토상태Codes.OnHold => "보류",
             Synty공간조립검토상태Codes.CompareCandidate => "비교 후보",
             Synty공간조립검토상태Codes.Stale => "입력 변경 · 재검토",
             _ => stateCode
+        };
+
+    private static string HistoryLabel(Synty공간조립검토결정이력Dto history)
+        => history.EventCode switch
+        {
+            Synty공간조립검토EventCodes.RecaptureSubmitted => "새 재촬영 등록",
+            Synty공간조립검토EventCodes.SourceUpdated => "조립 입력 변경",
+            _ => history.DecisionCode switch
+            {
+                Synty공간조립검토결정Codes.Good => "좋음 후보",
+                Synty공간조립검토결정Codes.NeedsRevision => "수정 필요",
+                Synty공간조립검토결정Codes.OnHold => "보류",
+                Synty공간조립검토결정Codes.CompareCandidate => "비교 후보",
+                _ => history.EventCode
+            }
         };
 
     private static string StateCss(string stateCode)

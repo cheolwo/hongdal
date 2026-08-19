@@ -1,0 +1,115 @@
+@page "/login"
+@inject UnityReviewAuthSessionService AuthSession
+@inject NavigationManager Navigation
+
+<PageTitle>관리자 로그인 · Unity 산출물 검토실</PageTitle>
+
+<main class="login-shell">
+    <section class="login-card">
+        <span class="eyebrow">UNITY ARTIFACT REVIEW</span>
+        <h1>서버관리자 로그인</h1>
+        <p>Unity 촬영 이미지와 검토 이력은 일반 WebApp 계정 화면과 분리해 이 전용 앱에서만 다룹니다.</p>
+
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <div class="login-message @(_messageIsError ? "error" : "success")" role="status">@_message</div>
+        }
+
+        <form @onsubmit="LoginAsync" @onsubmit:preventDefault>
+            <label>
+                아이디 또는 이메일
+                <input autocomplete="username" @bind="_userNameOrEmail" disabled="@_busy" />
+            </label>
+            <label>
+                비밀번호
+                <input type="password" autocomplete="current-password" @bind="_password" disabled="@_busy" />
+            </label>
+            <button type="submit" disabled="@_busy">
+                @(_busy ? "로그인 확인 중" : "검토실 로그인")
+            </button>
+        </form>
+
+        <aside>
+            <strong>권한 경계</strong>
+            <span>로그인 성공 뒤에도 `서버관리자` 역할이 없으면 검토실 토큰을 저장하지 않습니다.</span>
+        </aside>
+    </section>
+</main>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    private string _userNameOrEmail = string.Empty;
+    private string _password = string.Empty;
+    private string? _message;
+    private bool _messageIsError;
+    private bool _busy;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await AuthSession.EnsureRestoredAsync();
+        if (AuthSession.IsLoggedIn && AuthSession.IsServerAdministrator)
+        {
+            NavigateAfterLogin();
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        _message = null;
+        try
+        {
+            await AuthSession.LoginAsync(_userNameOrEmail, _password);
+            _password = string.Empty;
+            if (!AuthSession.IsServerAdministrator)
+            {
+                await AuthSession.ClearAsync();
+                _message = "이 계정에는 서버관리자 역할이 없어 Unity 산출물 검토실을 열 수 없습니다.";
+                _messageIsError = true;
+                return;
+            }
+
+            _message = "서버관리자 권한을 확인했습니다.";
+            _messageIsError = false;
+            NavigateAfterLogin();
+        }
+        catch (Exception exception)
+        {
+            _message = exception.Message;
+            _messageIsError = true;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void NavigateAfterLogin()
+    {
+        var target = ReturnUrl?.Trim();
+        if (string.IsNullOrWhiteSpace(target)
+            || !target.StartsWith("/", StringComparison.Ordinal)
+            || target.StartsWith("//", StringComparison.Ordinal)
+            || target.Contains('\\')
+            || target.Contains('\r')
+            || target.Contains('\n'))
+        {
+            target = "/";
+        }
+
+        Navigation.NavigateTo(target);
+    }
+}

@@ -34,7 +34,6 @@ builder.Services.AddScoped<CommunityPersonalPreferenceService>();
 builder.Services.AddScoped<커뮤니티세계지도Client>();
 builder.Services.AddScoped<지역문화이미지Client>();
 builder.Services.AddScoped<GoogleMapsBrowserRuntimeClient>();
-builder.Services.AddScoped<Synty공간조립모바일검토Client>();
 builder.Services.AddScoped<OrdererBetaReadinessService>();
 builder.Services.AddScoped<PreviewBuildManifestService>();
 builder.Services.AddTransient<CommunityPersonalPageViewModel>();
