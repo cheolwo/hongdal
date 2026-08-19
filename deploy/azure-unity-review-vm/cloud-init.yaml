@@ -1,0 +1,17 @@
+#cloud-config
+package_update: true
+packages:
+  - ca-certificates
+  - curl
+  - docker.io
+  - docker-compose-v2
+  - jq
+
+runcmd:
+  - [bash, -lc, "systemctl enable --now docker"]
+  - [bash, -lc, "usermod -aG docker __ADMIN_USERNAME__"]
+  - [bash, -lc, "install -d -m 0750 -o __ADMIN_USERNAME__ -g __ADMIN_USERNAME__ /opt/ssalddel-unity-review/releases"]
+  - [bash, -lc, "if ! swapon --show=NAME --noheadings | grep -qx /swapfile; then test -f /swapfile || fallocate -l 2G /swapfile; chmod 600 /swapfile; file /swapfile | grep -q 'swap file' || mkswap /swapfile; swapon /swapfile; grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab; fi"]
+  - [bash, -lc, "sysctl vm.swappiness=20"]
+
+final_message: "Ssalddel Unity Review free-tier VM Docker host bootstrap completed."

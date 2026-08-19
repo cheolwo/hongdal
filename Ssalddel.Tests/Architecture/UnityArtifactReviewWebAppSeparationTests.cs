@@ -18,6 +18,44 @@ public sealed class UnityArtifactReviewWebAppSeparationTests
     }
 
     [Fact]
+    public void Unity검토Api는_역할별서버와_별도실행프로젝트다()
+    {
+        var apiProject = Read("Ssalddel.UnityReview.Api/Ssalddel.UnityReview.Api.csproj");
+        var dedicatedSolution = Read("Ssalddel.UnityReview.slnx");
+        var roleSolution = Read("Ssalddel.RoleWebApps.slnx");
+        var productSolution = Read("Ssalddel.v3.5.slnx");
+
+        Assert.Contains("Ssalddel.UnityReview.Api", apiProject);
+        Assert.Contains("Ssalddel.UnityReview.Core.csproj", apiProject);
+        Assert.DoesNotContain("..\\Ssalddel\\Ssalddel.csproj", apiProject);
+        Assert.Contains("Ssalddel.UnityReview.Api.csproj", dedicatedSolution);
+        Assert.DoesNotContain("Ssalddel.UnityReview.Api.csproj", roleSolution);
+        Assert.DoesNotContain("Ssalddel.UnityReview.Api.csproj", productSolution);
+        Assert.Contains(
+            "controllers.PartManager.ApplicationParts.Clear()",
+            Read("Ssalddel.UnityReview.Api/Program.cs"));
+    }
+
+    [Fact]
+    public void 무료Vm스택은_MySql하나와_전용Api만실행한다()
+    {
+        var compose = Read("deploy/azure-unity-review-vm/compose.yaml");
+        var localOverride = Read("deploy/azure-unity-review-vm/compose.local.override.yaml");
+        var caddy = Read("deploy/azure-unity-review-vm/Caddyfile");
+
+        Assert.Contains("mysql:", compose);
+        Assert.DoesNotContain("mongo:", compose);
+        Assert.Contains("Ssalddel.UnityReview.Api.dll", compose);
+        Assert.Contains("mem_limit: 384m", compose);
+        Assert.Contains("mem_limit: 320m", compose);
+        Assert.Contains("review_images:/review-content", compose);
+        Assert.Contains("package-work/bundle/api:/app:ro", localOverride);
+        Assert.Contains("package-work/bundle/web:/srv:ro", localOverride);
+        Assert.Contains("/local-storage/*", caddy);
+        Assert.DoesNotContain("roles/01", caddy);
+    }
+
+    [Fact]
     public void 일반WebApp은_Unity산출물검토화면과Client를_포함하지않는다()
     {
         Assert.False(File.Exists(PathAt(

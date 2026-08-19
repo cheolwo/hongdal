@@ -1,0 +1,21 @@
+services:
+  mysql:
+    ports:
+      - "127.0.0.1:3307:3306"
+
+  api:
+    volumes: !override
+      - ../../artifacts/local/azure-unity-review-vm/package-work/bundle/api:/app:ro
+      - review_images:/review-content
+
+  caddy:
+    environment:
+      UNITY_REVIEW_SITE_HOST: http://localhost:8088
+    ports: !override
+      - "8088:8088"
+    volumes: !override
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../../artifacts/local/azure-unity-review-vm/package-work/bundle/web:/srv:ro
+      - review_images:/review-content:ro
+      - caddy_data:/data
+      - caddy_config:/config
