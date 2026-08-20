@@ -68,6 +68,8 @@ namespace Ssalddel.Simulation.Contracts
         public int HostileStrength { get; set; }
         public string[] InitialResourceStableIds { get; set; } = Array.Empty<string>();
         public string[] ReinforcementCandidateStableIds { get; set; } = Array.Empty<string>();
+        public SimulationCombatScaleDecisionSnapshot ScaleDecision { get; set; } = new();
+        public SimulationLocalCombatWorldContextSnapshot LocalWorldContext { get; set; } = new();
         public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
         public SimulationBattleUnitRosterSnapshot UnitRoster { get; set; } = new();
         public bool CanConfirm { get; set; }
@@ -160,6 +162,10 @@ namespace Ssalddel.Simulation.Contracts
         public string EncounterStableId { get; set; } = string.Empty;
         public string AreaStableId { get; set; } = string.Empty;
         public string RuleRevision { get; set; } = SimulationBattleInstanceCodes.RuleRevision;
+        public string CombatSpaceCode { get; set; } = SimulationLocalCombatCodes.DerivedBattlefield;
+        public string EncounterScaleCode { get; set; } = SimulationLocalCombatCodes.Battlefield;
+        public string ScalePolicyRevision { get; set; } = SimulationLocalCombatCodes.ScalePolicyRevision;
+        public string[] ScaleReasonCodes { get; set; } = Array.Empty<string>();
         public string PhaseCode { get; set; } = string.Empty;
         public long BattleRevision { get; set; }
         public int CombatTick { get; set; }
@@ -177,6 +183,7 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationBattleSupportSnapshot>();
         public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
         public SimulationBattleUnitRosterSnapshot UnitRoster { get; set; } = new();
+        public SimulationLocalCombatStateSnapshot LocalCombat { get; set; } = new();
         public SimulationBattleParticipationReservationSnapshot[] ParticipationReservations
             { get; set; } = Array.Empty<SimulationBattleParticipationReservationSnapshot>();
         public SimulationBattleWorldTargetReservationSnapshot[] WorldTargetReservations
@@ -249,6 +256,11 @@ namespace Ssalddel.Simulation.Contracts
         public int ScenarioSeed { get; set; }
         public int AlliedStrength { get; set; }
         public int HostileStrength { get; set; }
+        public string CombatSpaceCode { get; set; } = SimulationLocalCombatCodes.DerivedBattlefield;
+        public string EncounterScaleCode { get; set; } = SimulationLocalCombatCodes.Battlefield;
+        public string ScalePolicyRevision { get; set; } = SimulationLocalCombatCodes.ScalePolicyRevision;
+        public string[] ScaleReasonCodes { get; set; } = Array.Empty<string>();
+        public SimulationLocalCombatWorldContextSnapshot LocalWorldContext { get; set; } = new();
         public string[] InitialResourceStableIds { get; set; } = Array.Empty<string>();
         public string[] ReinforcementCandidateStableIds { get; set; } = Array.Empty<string>();
         public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();

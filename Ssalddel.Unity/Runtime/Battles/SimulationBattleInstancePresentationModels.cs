@@ -19,6 +19,8 @@ namespace Ssalddel.Unity.Battles
         public const string TacticalThirdPerson = "TacticalThirdPerson";
         public const string FirstPerson = "FirstPerson";
         public const string Follow = "Follow";
+        public const string WorldLocal = "WorldLocal";
+        public const string DerivedBattlefield = "DerivedBattlefield";
     }
 
     public sealed class BattleInstanceApiModel
@@ -27,6 +29,9 @@ namespace Ssalddel.Unity.Battles
         public string SessionStableId { get; set; } = string.Empty;
         public string EncounterStableId { get; set; } = string.Empty;
         public string AreaStableId { get; set; } = string.Empty;
+        public string CombatSpaceCode { get; set; } = BattlePresentationCodes.DerivedBattlefield;
+        public string EncounterScaleCode { get; set; } = string.Empty;
+        public string[] ScaleReasonCodes { get; set; } = Array.Empty<string>();
         public string PhaseCode { get; set; } = string.Empty;
         public long BattleRevision { get; set; }
         public int CombatTick { get; set; }
@@ -36,6 +41,7 @@ namespace Ssalddel.Unity.Battles
             = Array.Empty<BattleSupportApiModel>();
         public BattlefieldDerivationApiModel BattlefieldDerivation { get; set; } = new();
         public BattleUnitRosterApiModel UnitRoster { get; set; } = new();
+        public LocalCombatStateApiModel LocalCombat { get; set; } = new();
         public BattleOutcomeApiModel? Outcome { get; set; }
         public string ReplayHashSha256 { get; set; } = string.Empty;
         public bool SimulationOnly { get; set; }
@@ -88,6 +94,11 @@ namespace Ssalddel.Unity.Battles
         public BattleOutcomePresentationState? Outcome { get; set; }
         public bool ChangesWorldState { get; set; }
         public bool PresentationOnly { get; set; } = true;
+        public bool KeepsCurrentWorldVisible { get; set; }
+        public bool PinsLhDetailWindow { get; set; }
+        public bool PinsLhActiveWindow { get; set; }
+        public bool FreezesWorldTick { get; set; }
+        public string FocusedTargetStableId { get; set; } = string.Empty;
     }
 
     public sealed class BattleOutcomePresentationState
@@ -118,6 +129,10 @@ namespace Ssalddel.Unity.Battles
     {
         public BattlePresentationState Map(BattleInstanceApiModel source,
             string localActorStableId)
+            => Map(source, localActorStableId, BattlePresentationCodes.FirstPerson);
+
+        public BattlePresentationState Map(BattleInstanceApiModel source,
+            string localActorStableId, string requestedPerspectiveCode)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrWhiteSpace(localActorStableId)
@@ -141,7 +156,9 @@ namespace Ssalddel.Unity.Battles
             var mode = controlsBattle ? BattlePresentationCodes.BattleControl
                 : observes ? BattlePresentationCodes.BattleObservation
                 : BattlePresentationCodes.Management;
-            var view = mode == BattlePresentationCodes.BattleControl
+            var localCombat = source.CombatSpaceCode == BattlePresentationCodes.WorldLocal;
+            var view = localCombat ? requestedPerspectiveCode
+                : mode == BattlePresentationCodes.BattleControl
                 ? source.PhaseCode == BattlePresentationCodes.Deploying
                     ? BattlePresentationCodes.TacticalThirdPerson
                     : BattlePresentationCodes.FirstPerson
@@ -155,8 +172,8 @@ namespace Ssalddel.Unity.Battles
                 PhaseCode = source.PhaseCode,
                 LocalModeCode = mode,
                 DefaultViewModeCode = view,
-                ShowBattleRoot = controlsBattle || observes,
-                ShowManagementRoot = !controlsBattle && !observes,
+                ShowBattleRoot = !localCombat && (controlsBattle || observes),
+                ShowManagementRoot = localCombat || (!controlsBattle && !observes),
                 CanControlBattle = controlsBattle,
                 CanSendManagementSupport = mode == BattlePresentationCodes.Management
                     && !resolved,
@@ -173,6 +190,14 @@ namespace Ssalddel.Unity.Battles
                 },
                 ChangesWorldState = false,
                 PresentationOnly = true,
+                KeepsCurrentWorldVisible = localCombat,
+                PinsLhDetailWindow = localCombat
+                    && source.LocalCombat.WorldContext.PinsDetailWindow,
+                PinsLhActiveWindow = localCombat
+                    && source.LocalCombat.WorldContext.PinsActiveWindow,
+                FreezesWorldTick = localCombat && !resolved,
+                FocusedTargetStableId = localCombat
+                    ? source.LocalCombat.FocusedTargetStableId : string.Empty,
             };
         }
     }

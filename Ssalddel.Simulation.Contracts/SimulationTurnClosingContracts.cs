@@ -62,6 +62,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationTurnCardSnapshot>();
         public Simulation타로DrawSnapshot TarotDraw { get; set; }
             = new Simulation타로DrawSnapshot();
+        public SimulationTarotContextStateSnapshot TarotContext { get; set; }
+            = new SimulationTarotContextStateSnapshot();
     }
 
     public sealed class SimulationTurnClosingPreviewRequest

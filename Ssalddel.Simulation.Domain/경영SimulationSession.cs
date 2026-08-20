@@ -80,6 +80,7 @@ namespace Ssalddel.Simulation.Domain
             InitializeFarmSurvival(request.FarmSurvival);
             InitializeTeamRoleCards(request.TeamRoleCards);
             InitializeCollectibleCardRewards();
+            InitializeIntegratedWorld(request.IntegratedWorld);
         }
 
         public string SessionStableId { get; }
@@ -131,9 +132,11 @@ namespace Ssalddel.Simulation.Domain
                 AdvanceNpcWorkforce(CurrentTick);
                 AdvanceDecisionWork(CurrentTick);
                 ExpireActiveTurnCardEffects();
+                ExpireTarotContext();
                 Revision++;
                 AdvanceFarmSurvival(previousTick, CurrentTick);
                 AdvanceRegionalIncidents(CurrentTick);
+                AdvanceIntegratedWorld(CurrentTick);
                 EvaluateSurvivalTarotOpportunity();
                 AppendTickCommand(request);
                 var snapshot = CreateSnapshot();
@@ -184,6 +187,10 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(
                     teamRoleCardInitialPayloadKey,
                     BuildTeamRoleCardPayloadKey(request.TeamRoleCards),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    BuildIntegratedWorldInitialFingerprint(integratedWorldCreationState),
+                    BuildIntegratedWorldInitialFingerprint(request.IntegratedWorld),
                     StringComparison.Ordinal))
             {
                 throw new SimulationConflictException("SimulationCreateRequestPayloadConflict");
@@ -235,6 +242,7 @@ namespace Ssalddel.Simulation.Domain
                 ExportShipmentExecutions = Create수출선적실행Snapshots(),
                 TurnClosings = CreateTurnClosingSnapshots(),
                 ActiveTurnCardEffects = CreateActiveTurnCardEffectSnapshots(),
+                TarotContext = CreateTarotContextSnapshot(),
                 NpcOrganizations = CreateNpcOrganizationSnapshots(),
                 NpcActors = CreateNpcActorSnapshots(),
                 NpcCapabilityGrants = CreateNpcCapabilityGrantSnapshots(),
@@ -255,6 +263,7 @@ namespace Ssalddel.Simulation.Domain
                 RegionalIncidents = CreateRegionalIncidentSnapshots(),
                 NatureThreat = CreateNatureThreatStateSnapshot(),
                 RegionalCausality = CreateRegionalCausalitySnapshot(),
+                IntegratedWorld = CreateIntegratedWorldSnapshot(),
             };
 
         internal static 경영SimulationSessionSnapshot Clone(경영SimulationSessionSnapshot source)
@@ -309,6 +318,7 @@ namespace Ssalddel.Simulation.Domain
                 TurnClosings = source.TurnClosings.Select(CloneTurnClosing).ToArray(),
                 ActiveTurnCardEffects = source.ActiveTurnCardEffects
                     .Select(CloneActiveTurnCardEffect).ToArray(),
+                TarotContext = CloneTarotContext(source.TarotContext),
                 NpcOrganizations = source.NpcOrganizations.Select(CloneNpcOrganization).ToArray(),
                 NpcActors = source.NpcActors.Select(CloneNpcActor).ToArray(),
                 NpcCapabilityGrants = source.NpcCapabilityGrants.Select(CloneNpcCapabilityGrant).ToArray(),
@@ -350,6 +360,7 @@ namespace Ssalddel.Simulation.Domain
                 },
                 RegionalCausality = CloneRegionalCausalityState(
                     source.RegionalCausality),
+                IntegratedWorld = CloneIntegratedWorldSnapshot(source.IntegratedWorld),
             };
 
         internal static void ValidateCreate(경영SimulationSession생성Request request)

@@ -45,4 +45,11 @@ public sealed class SimulationWorldDerivationDatabaseOptions
     /// </summary>
     public string WorldLayoutCatalogPath { get; set; } =
         "../eng/world-seedbeds/generated/h5-world-layout.v1.json";
+
+    /// <summary>
+    /// AreaSet별 E6 정밀 몰입 질문·근거·교차 H3 폐루프 판정 결과다.
+    /// 선택형 GIS 결속 상태와 분리되며 Simulation 규칙을 자동 변경하지 않는다.
+    /// </summary>
+    public string AreaSetImmersionReadinessCatalogPath { get; set; } =
+        "../eng/world-seedbeds/generated/area-set-immersion-readiness.v1.json";
 }

@@ -35,7 +35,9 @@ namespace Ssalddel.Simulation.Domain
                 var lhWorld = request.LhWorldState ?? lhWorldState;
                 var package = new SimulationSessionSavePackage
                 {
-                    SchemaVersion = regionalCausalitySchemaEnabled
+                    SchemaVersion = integratedWorldCreationState != null
+                        ? SimulationSaveSchemaVersions.V6
+                        : regionalCausalitySchemaEnabled
                                     && (regionalIncidents.Count > 0
                                         || appliedRegionalIncidentResponseCommands.Count > 0
                                         || regionalCausalityRevision > 0)
@@ -73,6 +75,32 @@ namespace Ssalddel.Simulation.Domain
                 AppliedWorldTick = CurrentTick,
                 ResultingWorldRevision = Revision,
                 TickRequest = SimulationSaveReplayCloner.CloneTickRequest(request),
+            });
+
+        private void AppendIntegratedWorldCommand(SimulationIntegratedWorldCommandRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.IntegratedWorldConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                IntegratedWorldConfirmRequest = CloneIntegratedWorldCommand(request),
+            });
+
+        private void AppendIntegratedWorldEffectEnqueued(string battleStableId,
+            string facilityStableId, string severityCode)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.IntegratedWorldEffectEnqueued,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                FacilityDamageQueueRequest = new SimulationFacilityDamageQueueRequest
+                {
+                    BattleStableId = battleStableId,
+                    FacilityStableId = facilityStableId,
+                    SeverityCode = severityCode,
+                },
             });
 
         private void AppendDecisionConfirmCommand(SimulationDecisionConfirmRequest request)
@@ -256,6 +284,18 @@ namespace Ssalddel.Simulation.Domain
                     SimulationSaveReplayCloner.CloneTeamRoleCardEquipRequest(request),
             });
 
+        private void AppendCombatCardLoadoutSetCommand(
+            SimulationCombatCardLoadoutSetRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.CombatCardLoadoutSet,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                CombatCardLoadoutSetRequest =
+                    SimulationSaveReplayCloner.CloneCombatCardLoadoutSetRequest(request),
+            });
+
         private void AppendTeamActivityStartCommand(
             SimulationTeamActivityStartRequest request)
             => commandLog.Add(new SimulationCommandLogEntrySnapshot
@@ -304,6 +344,8 @@ namespace Ssalddel.Simulation.Domain
                 FarmSurvival = CloneFarmSurvivalInitialState(farmSurvivalCreationState),
                 TeamRoleCards = CloneTeamRoleCardInitialStateOrNull(
                     teamRoleCardCreationState),
+                IntegratedWorld = CloneIntegratedWorldInitialState(
+                    integratedWorldCreationState),
             };
 
         private static void ValidateSaveRequest(SimulationSessionSaveRequest request)

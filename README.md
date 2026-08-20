@@ -65,7 +65,8 @@ AreaSet 세계 설계
 └─ LandscapeGraph 공간 조립
    ├─ Node·Edge·외부 Connector
    ├─ 공간 역할·공간 능력·업무 용량
-   ├─ E6 DataRequirement·EvidenceBinding·DerivedArtifact
+   ├─ 선택형 E6 현실 결속
+   │  └─ 선택한 프로필의 DataRequirement·EvidenceBinding·DerivedArtifact
    └─ Simulation 서버
       └─ Preview → Confirm → WorldTick → 최신 상태 재조회
          └─ Unity SimulationWorldShell 표현

@@ -16,6 +16,8 @@ namespace Ssalddel.Simulation.Domain
         private readonly Dictionary<string, CardState> cards;
         private readonly Dictionary<string, ActivityState> activities =
             new(StringComparer.Ordinal);
+        private readonly Dictionary<string, CombatLoadoutState> combatLoadouts =
+            new(StringComparer.Ordinal);
         private readonly Dictionary<Guid, AppliedCommand> applied = new();
 
         public SimulationTeamRoleCardState(
@@ -25,12 +27,13 @@ namespace Ssalddel.Simulation.Domain
             SessionStableId = initial.SessionStableId.Trim();
             TeamStableId = initial.TeamStableId.Trim();
             TeamPolicyRevision = initial.TeamPolicyRevision;
-            RuleRevision = initial.RuleRevision.Trim();
+            RuleRevision = SimulationTeamRoleCardCodes.RuleRevision;
             members = new HashSet<string>(initial.MemberActorStableIds
                 .Select(value => value.Trim()), StringComparer.Ordinal);
             cards = initial.Cards.ToDictionary(value => value.CardCopyStableId.Trim(),
                 value => new CardState(value), StringComparer.Ordinal);
             ValidateSlots();
+            InitializeCombatLoadouts(initial.CombatLoadouts);
         }
 
         public string SessionStableId { get; }
@@ -151,6 +154,40 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        public SimulationTeamRoleCardStateSnapshot SetCombatLoadout(
+            SimulationCombatCardLoadoutSetRequest request)
+        {
+            ValidateCombatLoadout(request);
+            lock (gate)
+            {
+                var key = CombatLoadoutKey(request);
+                if (TryReplay(request.ClientRequestId, key, out var replay))
+                    return replay;
+                EnsureRevision(request.ExpectedRevision);
+                EnsurePolicyRevision(request.ExpectedTeamPolicyRevision);
+                EnsureMember(request.RequestingActorStableId);
+                EnsureMember(request.TargetActorStableId);
+                var actor = request.TargetActorStableId.Trim();
+                var slots = request.Slots.Select(value =>
+                {
+                    var card = FindCard(value.CardCopyStableId);
+                    if (card.IsLocked)
+                        throw new SimulationConflictException(
+                            "SimulationCombatCardLoadoutActiveLock");
+                    return new SimulationCombatCardLoadoutSlotSnapshot
+                    {
+                        SlotCode = value.SlotCode.Trim(),
+                        CardCopyStableId = card.CardCopyStableId,
+                    };
+                }).ToArray();
+                combatLoadouts[LoadoutKey(actor, request.CombatControlModeCode)] =
+                    new CombatLoadoutState(actor,
+                        request.CombatControlModeCode.Trim(), slots);
+                Revision++;
+                return Remember(request.ClientRequestId, key);
+            }
+        }
+
         private SimulationTeamRoleCardStateSnapshot CreateSnapshot()
         {
             var cardSnapshots = cards.Values
@@ -173,6 +210,11 @@ namespace Ssalddel.Simulation.Domain
                 MemberRoles = members.OrderBy(value => value, StringComparer.Ordinal)
                     .Select(actor => CreateRole(actor, cardSnapshots,
                         activitySnapshots)).ToArray(),
+                CombatLoadouts = combatLoadouts.Values
+                    .OrderBy(value => value.ActorStableId, StringComparer.Ordinal)
+                    .ThenBy(value => value.CombatControlModeCode,
+                        StringComparer.Ordinal)
+                    .Select(value => value.Snapshot()).ToArray(),
                 SupportsRemoteEquip = true,
                 SimulationOnly = true,
                 IsOperationalState = false,
@@ -260,12 +302,54 @@ namespace Ssalddel.Simulation.Domain
                     "SimulationTeamRoleCardSlotDuplicated");
         }
 
+        private void InitializeCombatLoadouts(
+            SimulationCombatCardLoadoutInitialState[]? initial)
+        {
+            var values = initial ?? Array.Empty<SimulationCombatCardLoadoutInitialState>();
+            if (values.Length > 0)
+            {
+                foreach (var value in values)
+                {
+                    var slots = value.Slots ?? Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>();
+                    combatLoadouts.Add(LoadoutKey(value.ActorStableId,
+                        value.CombatControlModeCode), new CombatLoadoutState(
+                        value.ActorStableId.Trim(), value.CombatControlModeCode.Trim(),
+                        slots.Select(CloneSlot).ToArray()));
+                }
+                return;
+            }
+
+            // r1 저장자료에는 전투 편성이 없었다. 기존 업무 장착을 두 대체
+            // 조작 방식의 초기 편성으로 한 번 승격해 기존 전투 효과를 보존한다.
+            foreach (var actor in members.OrderBy(value => value, StringComparer.Ordinal))
+            {
+                var slots = cards.Values
+                    .Where(value => value.EquippedActorStableId == actor
+                        && ValidSlot(value.SlotCode))
+                    .OrderBy(value => value.SlotCode, StringComparer.Ordinal)
+                    .Select(value => new SimulationCombatCardLoadoutSlotSnapshot
+                    {
+                        SlotCode = value.SlotCode,
+                        CardCopyStableId = value.CardCopyStableId,
+                    }).ToArray();
+                foreach (var mode in new[]
+                         {
+                             SimulationTeamRoleCardCodes.DirectAction,
+                             SimulationTeamRoleCardCodes.TacticalCommand,
+                         })
+                    combatLoadouts.Add(LoadoutKey(actor, mode),
+                        new CombatLoadoutState(actor, mode,
+                            slots.Select(CloneSlot).ToArray()));
+            }
+        }
+
         public static void ValidateInitial(SimulationTeamRoleCardInitialState initial)
         {
             if (initial == null || string.IsNullOrWhiteSpace(initial.SessionStableId)
                 || string.IsNullOrWhiteSpace(initial.TeamStableId)
                 || initial.TeamPolicyRevision < 0
-                || initial.RuleRevision != SimulationTeamRoleCardCodes.RuleRevision
+                || (initial.RuleRevision != SimulationTeamRoleCardCodes.RuleRevision
+                    && initial.RuleRevision != "team-role-card-loadout.r1")
                 || initial.MemberActorStableIds == null
                 || initial.Cards == null || initial.MemberActorStableIds.Length == 0
                 || initial.MemberActorStableIds.Any(string.IsNullOrWhiteSpace)
@@ -287,6 +371,7 @@ namespace Ssalddel.Simulation.Domain
                     .Distinct(StringComparer.Ordinal).Count() != initial.Cards.Length)
                 throw new SimulationContractException(
                     "SimulationTeamRoleCardInitialStateInvalid");
+            ValidateInitialCombatLoadouts(initial);
         }
 
         public static void ValidateEquip(SimulationTeamRoleCardEquipRequest request)
@@ -326,9 +411,59 @@ namespace Ssalddel.Simulation.Domain
                     "SimulationTeamActivityEndRequestInvalid");
         }
 
+        public static void ValidateCombatLoadout(
+            SimulationCombatCardLoadoutSetRequest request)
+        {
+            if (request == null || request.ClientRequestId == Guid.Empty
+                || request.ExpectedRevision < 0
+                || request.ExpectedTeamPolicyRevision < 0
+                || string.IsNullOrWhiteSpace(request.RequestingActorStableId)
+                || string.IsNullOrWhiteSpace(request.TargetActorStableId)
+                || !ValidControlMode(request.CombatControlModeCode)
+                || request.Slots == null || request.Slots.Length > 2
+                || request.Slots.Any(value => value == null
+                    || !ValidSlot(value.SlotCode)
+                    || string.IsNullOrWhiteSpace(value.CardCopyStableId))
+                || request.Slots.Select(value => value.SlotCode)
+                    .Distinct(StringComparer.Ordinal).Count() != request.Slots.Length
+                || request.Slots.Select(value => value.CardCopyStableId)
+                    .Distinct(StringComparer.Ordinal).Count() != request.Slots.Length)
+                throw new SimulationContractException(
+                    "SimulationCombatCardLoadoutRequestInvalid");
+        }
+
         private static bool ValidSlot(string slot)
             => slot == SimulationTeamRoleCardCodes.Primary
                || slot == SimulationTeamRoleCardCodes.Support;
+
+        private static bool ValidControlMode(string mode)
+            => mode == SimulationTeamRoleCardCodes.DirectAction
+               || mode == SimulationTeamRoleCardCodes.TacticalCommand;
+
+        private static void ValidateInitialCombatLoadouts(
+            SimulationTeamRoleCardInitialState initial)
+        {
+            var values = initial.CombatLoadouts
+                ?? Array.Empty<SimulationCombatCardLoadoutInitialState>();
+            if (values.Any(value => value == null
+                    || !initial.MemberActorStableIds.Contains(value.ActorStableId,
+                        StringComparer.Ordinal)
+                    || !ValidControlMode(value.CombatControlModeCode)
+                    || value.Slots == null || value.Slots.Length > 2
+                    || value.Slots.Any(slot => slot == null
+                        || !ValidSlot(slot.SlotCode)
+                        || !initial.Cards.Any(card => card.CardCopyStableId ==
+                            slot.CardCopyStableId))
+                    || value.Slots.Select(slot => slot.SlotCode)
+                        .Distinct(StringComparer.Ordinal).Count() != value.Slots.Length
+                    || value.Slots.Select(slot => slot.CardCopyStableId)
+                        .Distinct(StringComparer.Ordinal).Count() != value.Slots.Length)
+                || values.GroupBy(value => LoadoutKey(value.ActorStableId,
+                        value.CombatControlModeCode), StringComparer.Ordinal)
+                    .Any(group => group.Count() > 1))
+                throw new SimulationContractException(
+                    "SimulationCombatCardLoadoutInitialStateInvalid");
+        }
 
         private static string EquipKey(SimulationTeamRoleCardEquipRequest value)
             => string.Join("|", value.ExpectedRevision,
@@ -345,6 +480,28 @@ namespace Ssalddel.Simulation.Domain
         private static string EndKey(SimulationTeamActivityEndRequest value)
             => string.Join("|", value.ExpectedRevision, value.ActorStableId.Trim(),
                 value.ActivityStableId.Trim());
+
+        private static string CombatLoadoutKey(
+            SimulationCombatCardLoadoutSetRequest value)
+            => string.Join("|", value.ExpectedRevision,
+                value.ExpectedTeamPolicyRevision,
+                value.RequestingActorStableId.Trim(),
+                value.TargetActorStableId.Trim(),
+                value.CombatControlModeCode.Trim(),
+                string.Join(";", value.Slots
+                    .OrderBy(slot => slot.SlotCode, StringComparer.Ordinal)
+                    .Select(slot => slot.SlotCode.Trim() + ":"
+                        + slot.CardCopyStableId.Trim())));
+
+        private static string LoadoutKey(string actor, string mode)
+            => actor.Trim() + "|" + mode.Trim();
+
+        private static SimulationCombatCardLoadoutSlotSnapshot CloneSlot(
+            SimulationCombatCardLoadoutSlotSnapshot value) => new()
+            {
+                SlotCode = value.SlotCode,
+                CardCopyStableId = value.CardCopyStableId,
+            };
 
         private static SimulationTeamRoleCardStateSnapshot Clone(
             SimulationTeamRoleCardStateSnapshot source)
@@ -388,6 +545,13 @@ namespace Ssalddel.Simulation.Domain
                         EquippedCardCopyStableIds =
                             value.EquippedCardCopyStableIds.ToArray(),
                         IsPermanentProfession = false,
+                    }).ToArray(),
+                CombatLoadouts = source.CombatLoadouts.Select(value =>
+                    new SimulationCombatCardLoadoutSnapshot
+                    {
+                        ActorStableId = value.ActorStableId,
+                        CombatControlModeCode = value.CombatControlModeCode,
+                        Slots = value.Slots.Select(CloneSlot).ToArray(),
                     }).ToArray(),
                 SupportsRemoteEquip = true,
                 SimulationOnly = true,
@@ -448,6 +612,29 @@ namespace Ssalddel.Simulation.Domain
                 ActivityRoleCode = ActivityRoleCode,
                 LocationStableId = LocationStableId,
                 StateCode = SimulationTeamRoleCardCodes.Active,
+            };
+        }
+
+        private sealed class CombatLoadoutState
+        {
+            public CombatLoadoutState(string actorStableId,
+                string combatControlModeCode,
+                SimulationCombatCardLoadoutSlotSnapshot[] slots)
+            {
+                ActorStableId = actorStableId;
+                CombatControlModeCode = combatControlModeCode;
+                Slots = slots;
+            }
+
+            public string ActorStableId { get; }
+            public string CombatControlModeCode { get; }
+            public SimulationCombatCardLoadoutSlotSnapshot[] Slots { get; }
+
+            public SimulationCombatCardLoadoutSnapshot Snapshot() => new()
+            {
+                ActorStableId = ActorStableId,
+                CombatControlModeCode = CombatControlModeCode,
+                Slots = Slots.Select(CloneSlot).ToArray(),
             };
         }
 
@@ -527,6 +714,23 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        public SimulationTeamRoleCardStateSnapshot SetTeamCombatCardLoadout(
+            SimulationCombatCardLoadoutSetRequest request)
+        {
+            lock (gate)
+            {
+                var state = RequireTeamRoleCardState();
+                var before = state.Revision;
+                var result = state.SetCombatLoadout(request);
+                if (result.Revision > before)
+                {
+                    Revision++;
+                    AppendCombatCardLoadoutSetCommand(request);
+                }
+                return result;
+            }
+        }
+
         private void InitializeTeamRoleCards(
             SimulationTeamRoleCardInitialState? initial)
         {
@@ -581,6 +785,20 @@ namespace Ssalddel.Simulation.Domain
                         EquippedActorStableId = value.EquippedActorStableId,
                         SlotCode = value.SlotCode,
                     }).ToArray(),
+                CombatLoadouts = (source.CombatLoadouts
+                        ?? Array.Empty<SimulationCombatCardLoadoutInitialState>())
+                    .Select(value => new SimulationCombatCardLoadoutInitialState
+                    {
+                        ActorStableId = value.ActorStableId,
+                        CombatControlModeCode = value.CombatControlModeCode,
+                        Slots = (value.Slots
+                                ?? Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>())
+                            .Select(slot => new SimulationCombatCardLoadoutSlotSnapshot
+                            {
+                                SlotCode = slot.SlotCode,
+                                CardCopyStableId = slot.CardCopyStableId,
+                            }).ToArray(),
+                    }).ToArray(),
             };
 
         internal static SimulationTeamRoleCardStateSnapshot?
@@ -631,6 +849,20 @@ namespace Ssalddel.Simulation.Domain
                             value.EquippedCardCopyStableIds.ToArray(),
                         IsPermanentProfession = value.IsPermanentProfession,
                     }).ToArray(),
+                CombatLoadouts = (source.CombatLoadouts
+                        ?? Array.Empty<SimulationCombatCardLoadoutSnapshot>())
+                    .Select(value => new SimulationCombatCardLoadoutSnapshot
+                    {
+                        ActorStableId = value.ActorStableId,
+                        CombatControlModeCode = value.CombatControlModeCode,
+                        Slots = (value.Slots
+                                ?? Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>())
+                            .Select(slot => new SimulationCombatCardLoadoutSlotSnapshot
+                            {
+                                SlotCode = slot.SlotCode,
+                                CardCopyStableId = slot.CardCopyStableId,
+                            }).ToArray(),
+                    }).ToArray(),
                 SupportsRemoteEquip = source.SupportsRemoteEquip,
                 SimulationOnly = source.SimulationOnly,
                 IsOperationalState = source.IsOperationalState,
@@ -650,7 +882,19 @@ namespace Ssalddel.Simulation.Domain
                         value.CardDefinitionStableId, value.Title,
                         string.Join(",", value.ActivityRoleCodes
                             .OrderBy(role => role, StringComparer.Ordinal)),
-                        value.EquippedActorStableId, value.SlotCode))));
+                        value.EquippedActorStableId, value.SlotCode))),
+                string.Join(";", (initial.CombatLoadouts
+                        ?? Array.Empty<SimulationCombatCardLoadoutInitialState>())
+                    .OrderBy(value => value.ActorStableId, StringComparer.Ordinal)
+                    .ThenBy(value => value.CombatControlModeCode,
+                        StringComparer.Ordinal)
+                    .Select(value => string.Join("|", value.ActorStableId,
+                        value.CombatControlModeCode,
+                        string.Join(",", (value.Slots
+                                ?? Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>())
+                            .OrderBy(slot => slot.SlotCode, StringComparer.Ordinal)
+                            .Select(slot => slot.SlotCode + ":"
+                                + slot.CardCopyStableId))))));
         }
 
         internal static string BuildTeamRoleCardStatePayloadKey(
@@ -675,6 +919,19 @@ namespace Ssalddel.Simulation.Domain
                         value.ActorStableId, value.CardCopyStableId,
                         value.ActivityRoleCode, value.LocationStableId,
                         value.StateCode))), state.SupportsRemoteEquip,
-                state.SimulationOnly, state.IsOperationalState);
+                string.Join(";", (state.CombatLoadouts
+                        ?? Array.Empty<SimulationCombatCardLoadoutSnapshot>())
+                    .OrderBy(value => value.ActorStableId, StringComparer.Ordinal)
+                    .ThenBy(value => value.CombatControlModeCode,
+                        StringComparer.Ordinal)
+                    .Select(value => string.Join("|", value.ActorStableId,
+                        value.CombatControlModeCode,
+                        string.Join(",", (value.Slots
+                                ?? Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>())
+                            .OrderBy(slot => slot.SlotCode, StringComparer.Ordinal)
+                            .Select(slot => slot.SlotCode + ":"
+                                + slot.CardCopyStableId))))),
+                state.SupportsRemoteEquip, state.SimulationOnly,
+                state.IsOperationalState);
     }
 }

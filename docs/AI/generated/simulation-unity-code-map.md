@@ -12,6 +12,8 @@ Simulation·Unity
 │  └─ 050 infrastructure.session-store · Infrastructure · Persistence
 ├─ 병렬 경영-전투 [simulation-parallel-battle]
 │  ├─ 010 contract.battle-preview · Contract · Definition
+│  ├─ 010 contract.local-combat-control-mode · Contract · Definition
+│  ├─ 011 contract.local-combat-action · Contract · Definition
 │  ├─ 020 api.battle · Api · Confirm
 │  ├─ 030 application.battle · Application · Confirm
 │  ├─ 040 domain.battle-state · Domain · Tick
@@ -96,6 +98,16 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 클라이언트는 전투 결과나 수치 보정을 확정하지 않고 예상 World 개정과 안정 ID만 보낸다.
+- **010 contract.local-combat-control-mode** — [SimulationLocalCombatControlModeConfirmRequest](../../../Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs) · 현장 전투의 1인칭 직접 행동과 3인칭 전술 지휘 중 하나를 서버에 확정한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: 카메라 자체가 아니라 서버가 확정한 전투 조작 방식만 행동 허용 범위를 바꾼다.
+- **011 contract.local-combat-action** — [SimulationLocalCombatActionConfirmRequest](../../../Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs) · 현재 H5/LH 공간에서 수행하는 전투 행동의 서버 입력을 정의한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: 클라이언트는 피해·명중·미터 좌표를 제출하지 않고 대상과 행동 의도만 보낸다.
 - **020 api.battle** — [SimulationBattlesController](../../../Ssalddel.Simulation.Server/Controllers/SimulationBattlesController.cs) · 병렬 전투 조회·Preview·Confirm·진행 HTTP 경계를 제공한다.
   - 계층/단계: `Api / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`

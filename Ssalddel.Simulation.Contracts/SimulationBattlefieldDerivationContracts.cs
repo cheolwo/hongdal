@@ -4,7 +4,9 @@ namespace Ssalddel.Simulation.Contracts
 {
     public static class SimulationBattlefieldDerivationCodes
     {
-        public const string ContextSchemaVersion = "simulation-battle-world-context.v1";
+        public const string LegacyContextSchemaVersion = "simulation-battle-world-context.v1";
+        public const string ContextSchemaVersion = "simulation-battle-world-context.v2";
+        public const string ContextDerivationRuleVersion = "battle-context.static-runtime-projection.r2";
         public const string PlanSchemaVersion = "simulation-battlefield-plan.v1";
         public const string GeneratorRevision = "battlefield-generator.constraint-pcg32.r1";
         public const string AnchorPolicyRevision = "battlefield-anchor-policy.nature-farm.r1";
@@ -160,6 +162,16 @@ namespace Ssalddel.Simulation.Contracts
         public string SchemaVersion { get; set; } = SimulationBattlefieldDerivationCodes.ContextSchemaVersion;
         public string ContextStableId { get; set; } = string.Empty;
         public int ContextRevision { get; set; } = 1;
+        public long SourceWorldRevision { get; set; }
+        public string ContextDerivationRuleVersion { get; set; }
+            = SimulationBattlefieldDerivationCodes.ContextDerivationRuleVersion;
+        public string StaticSpatialContextHashSha256 { get; set; } = string.Empty;
+        public string EncounterScopeHashSha256 { get; set; } = string.Empty;
+        public string AttackerContextHashSha256 { get; set; } = string.Empty;
+        public string DefenderContextHashSha256 { get; set; } = string.Empty;
+        public string BattleRelevantOverlayHashSha256 { get; set; } = string.Empty;
+        public SimulationBattleRelevantRuntimeProjectionSnapshot BattleRelevantRuntime { get; set; }
+            = new SimulationBattleRelevantRuntimeProjectionSnapshot();
         public double CenterXMeters { get; set; }
         public double CenterZMeters { get; set; }
         public double ContextWidthMeters { get; set; } = 1000d;
@@ -250,6 +262,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string CardCopyStableId { get; set; } = string.Empty;
         public string CardDefinitionStableId { get; set; } = string.Empty;
+        public long SourceCardRevision { get; set; }
+        public string ApplicableControlModeCode { get; set; } = string.Empty;
         public string ActorStableId { get; set; } = string.Empty;
         public string ModifierCode { get; set; } = string.Empty;
         public int BasisPoints { get; set; }

@@ -8,7 +8,7 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Domain
 {
-    internal static class SimulationReplayHasher
+    internal static partial class SimulationReplayHasher
     {
         public static string Calculate(SimulationSessionSavePackage package)
         {
@@ -17,8 +17,17 @@ namespace Ssalddel.Simulation.Domain
             AddCreateRequest(canonical, package.SessionCreateRequest);
             AddSnapshot(canonical, package.Snapshot);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
                     StringComparison.Ordinal))
                 AddRegionalCausality(canonical, package.Snapshot.RegionalCausality);
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
+                    StringComparison.Ordinal))
+            {
+                AddIntegratedWorldInitialState(canonical,
+                    package.SessionCreateRequest.IntegratedWorld!);
+                AddIntegratedWorldSnapshot(canonical, package.Snapshot.IntegratedWorld);
+            }
             if (package.SessionCreateRequest.WorldInventory != null)
                 AddWorldInventory(canonical, package.WorldInventory);
             if (package.SessionCreateRequest.SurvivalTarot != null)
@@ -73,6 +82,15 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, entry.TickRequest.CommandId);
                     Add(canonical, entry.TickRequest.ExpectedRevision);
                     Add(canonical, entry.TickRequest.TickCount);
+                }
+                if (entry.IntegratedWorldConfirmRequest != null)
+                    AddIntegratedWorldCommand(canonical,
+                        entry.IntegratedWorldConfirmRequest);
+                if (entry.FacilityDamageQueueRequest != null)
+                {
+                    Add(canonical, entry.FacilityDamageQueueRequest.BattleStableId);
+                    Add(canonical, entry.FacilityDamageQueueRequest.FacilityStableId);
+                    Add(canonical, entry.FacilityDamageQueueRequest.SeverityCode);
                 }
                 if (entry.DecisionConfirmRequest != null)
                 {
@@ -216,6 +234,22 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, request.TargetActorStableId);
                     Add(canonical, request.CardCopyStableId);
                     Add(canonical, request.SlotCode);
+                }
+                if (entry.CombatCardLoadoutSetRequest != null)
+                {
+                    var request = entry.CombatCardLoadoutSetRequest;
+                    Add(canonical, request.ClientRequestId.ToString("N"));
+                    Add(canonical, request.ExpectedRevision);
+                    Add(canonical, request.ExpectedTeamPolicyRevision);
+                    Add(canonical, request.RequestingActorStableId);
+                    Add(canonical, request.TargetActorStableId);
+                    Add(canonical, request.CombatControlModeCode);
+                    foreach (var slot in request.Slots.OrderBy(value =>
+                                 value.SlotCode, StringComparer.Ordinal))
+                    {
+                        Add(canonical, slot.SlotCode);
+                        Add(canonical, slot.CardCopyStableId);
+                    }
                 }
                 if (entry.TeamActivityStartRequest != null)
                 {
@@ -609,6 +643,16 @@ namespace Ssalddel.Simulation.Domain
                     Add(target, effect.SourceUrl);
                     Add(target, effect.EvidenceCheckedAtUtc?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty);
                 }
+            }
+            if (value.TarotContext != null
+                && (value.TarotContext.FrameSet.ActiveFrames.Length > 0
+                    || value.TarotContext.Proposals.Length > 0
+                    || value.TarotContext.IncidentEvaluations.Length > 0))
+            {
+                Add(target, "TarotContextExtensionV1");
+                Add(target, 경영SimulationSessionAggregate
+                    .BuildTarotContextStatePayloadKey(value.TarotContext));
+                Add(target, value.TarotContext.ContextStateHashSha256);
             }
             AddNpcWorkforceSnapshot(target, value);
             AddSimulationSpatialSnapshot(target, value);

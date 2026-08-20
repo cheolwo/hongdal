@@ -55,6 +55,7 @@ namespace Ssalddel.Simulation.Application
             string sessionStableId,
             경영SimulationTick진행Request request)
         {
+            battleReconciler?.EnsureWorldTickCanAdvance(sessionStableId);
             var snapshot = sessions.Require(sessionStableId).Advance(request);
             battleReconciler?.Reconcile(sessionStableId, snapshot);
             return snapshot;

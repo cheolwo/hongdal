@@ -21,6 +21,11 @@ namespace Ssalddel.Simulation.Domain
         public int ScenarioSeed { get; set; }
         public int AlliedStrength { get; set; }
         public int HostileStrength { get; set; }
+        public string CombatSpaceCode { get; set; } = SimulationLocalCombatCodes.DerivedBattlefield;
+        public string EncounterScaleCode { get; set; } = SimulationLocalCombatCodes.Battlefield;
+        public string ScalePolicyRevision { get; set; } = SimulationLocalCombatCodes.ScalePolicyRevision;
+        public string[] ScaleReasonCodes { get; set; } = Array.Empty<string>();
+        public SimulationLocalCombatWorldContextSnapshot LocalWorldContext { get; set; } = new();
         public string[] InitialResourceStableIds { get; set; } = Array.Empty<string>();
         public string[] ReinforcementCandidateStableIds { get; set; } = Array.Empty<string>();
         public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
@@ -40,7 +45,7 @@ namespace Ssalddel.Simulation.Domain
         WritesTo = SsalddelCodeDataScope.SimulationState,
         FlowOrder = 40,
         Boundary = "전투 상태는 SimulationOnly이며 운영 자원이나 실제 인력을 잠그지 않는다.")]
-    public sealed class SimulationBattleInstanceState
+    public sealed partial class SimulationBattleInstanceState
     {
         private readonly object gate = new object();
         private readonly SimulationBattleCreationContext context;
@@ -122,6 +127,7 @@ namespace Ssalddel.Simulation.Domain
                         },
                     });
             }
+            InitializeLocalCombat();
             replayEvents.Add("create~" + Payload(creation));
         }
 
@@ -190,6 +196,7 @@ namespace Ssalddel.Simulation.Domain
                 restored.deploymentCode = record.State.DeploymentCode;
                 restored.revision = record.State.BattleRevision;
                 restored.combatTick = record.State.CombatTick;
+                restored.RestoreLocalCombat(record.State.LocalCombat);
                 restored.replayEvents.Clear();
                 restored.replayEvents.AddRange(record.ReplayEvents);
                 restored.commands.Clear();
@@ -444,6 +451,8 @@ namespace Ssalddel.Simulation.Domain
             ValidateAdvance(request);
             lock (gate)
             {
+                if (context.CombatSpaceCode == SimulationLocalCombatCodes.WorldLocal)
+                    return AdvanceLocalCombat(request, currentWorldTick);
                 return Apply(request.CommandId, request.ExpectedBattleRevision,
                     request.CombatTickCount.ToString(CultureInfo.InvariantCulture),
                     () =>
@@ -600,6 +609,10 @@ namespace Ssalddel.Simulation.Domain
                 SessionStableId = context.SessionStableId,
                 EncounterStableId = context.EncounterStableId,
                 AreaStableId = context.AreaStableId,
+                CombatSpaceCode = context.CombatSpaceCode,
+                EncounterScaleCode = context.EncounterScaleCode,
+                ScalePolicyRevision = context.ScalePolicyRevision,
+                ScaleReasonCodes = context.ScaleReasonCodes.ToArray(),
                 PhaseCode = phaseCode,
                 BattleRevision = revision,
                 CombatTick = combatTick,
@@ -615,6 +628,7 @@ namespace Ssalddel.Simulation.Domain
                 BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
                     context.BattlefieldDerivation),
                 UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(context.UnitRoster),
+                LocalCombat = CreateLocalCombatSnapshot(),
                 ParticipationReservations = participationReservations.Select(
                     SimulationBattlefieldSnapshotCloner.Participation).ToArray(),
                 WorldTargetReservations = worldTargetReservations.Select(
@@ -633,6 +647,10 @@ namespace Ssalddel.Simulation.Domain
                 BattleStableId = source.BattleStableId, SessionStableId = source.SessionStableId,
                 EncounterStableId = source.EncounterStableId, AreaStableId = source.AreaStableId,
                 RuleRevision = source.RuleRevision, PhaseCode = source.PhaseCode,
+                CombatSpaceCode = source.CombatSpaceCode,
+                EncounterScaleCode = source.EncounterScaleCode,
+                ScalePolicyRevision = source.ScalePolicyRevision,
+                ScaleReasonCodes = source.ScaleReasonCodes.ToArray(),
                 BattleRevision = source.BattleRevision, CombatTick = source.CombatTick,
                 StartedWorldTick = source.StartedWorldTick,
                 StartedWorldRevision = source.StartedWorldRevision,
@@ -644,6 +662,7 @@ namespace Ssalddel.Simulation.Domain
                 BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
                     source.BattlefieldDerivation),
                 UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(source.UnitRoster),
+                LocalCombat = CloneLocalCombat(source.LocalCombat),
                 ParticipationReservations = source.ParticipationReservations.Select(
                     SimulationBattlefieldSnapshotCloner.Participation).ToArray(),
                 WorldTargetReservations = source.WorldTargetReservations.Select(
@@ -791,8 +810,12 @@ namespace Ssalddel.Simulation.Domain
             if (value.AlliedStrength <= 0 || value.HostileStrength <= 0
                 || value.InitialResourceStableIds == null
                 || value.ReinforcementCandidateStableIds == null
+                || value.ScaleReasonCodes == null || value.LocalWorldContext == null
                 || value.BattlefieldDerivation == null || value.UnitRoster == null)
                 throw new SimulationContractException("SimulationBattleCreationContextInvalid");
+            if (!SimulationCombatScalePolicy.IsKnownSpace(value.CombatSpaceCode)
+                || !SimulationCombatScalePolicy.IsKnownScale(value.EncounterScaleCode))
+                throw new SimulationContractException("SimulationBattleCombatScaleInvalid");
             var spatial = !string.IsNullOrWhiteSpace(value.BattlefieldDerivation
                 .BattlefieldDerivationInputHashSha256);
             if (spatial && (!value.BattlefieldDerivation.CanConfirm
@@ -884,6 +907,9 @@ namespace Ssalddel.Simulation.Domain
             value.StartedWorldRevision, value.ScenarioSeed, value.AlliedStrength, value.HostileStrength,
             string.Join(",", value.InitialResourceStableIds.OrderBy(x => x, StringComparer.Ordinal)),
             string.Join(",", value.ReinforcementCandidateStableIds.OrderBy(x => x, StringComparer.Ordinal)),
+            value.CombatSpaceCode, value.EncounterScaleCode, value.ScalePolicyRevision,
+            string.Join(",", value.ScaleReasonCodes.OrderBy(x => x, StringComparer.Ordinal)),
+            value.LocalWorldContext.ContextHashSha256,
             value.BattlefieldDerivation.BattlefieldDerivationInputHashSha256,
             value.BattlefieldDerivation.BattlefieldPlan.BattlefieldPlanHashSha256,
             value.UnitRoster.BattleUnitRosterHashSha256,
@@ -896,6 +922,11 @@ namespace Ssalddel.Simulation.Domain
             CommanderActorStableId = value.CommanderActorStableId.Trim(), StartedWorldTick = value.StartedWorldTick,
             StartedWorldRevision = value.StartedWorldRevision, ScenarioSeed = value.ScenarioSeed,
             AlliedStrength = value.AlliedStrength, HostileStrength = value.HostileStrength,
+            CombatSpaceCode = value.CombatSpaceCode,
+            EncounterScaleCode = value.EncounterScaleCode,
+            ScalePolicyRevision = value.ScalePolicyRevision,
+            ScaleReasonCodes = value.ScaleReasonCodes.Select(x => x.Trim()).ToArray(),
+            LocalWorldContext = CloneLocalWorldContext(value.LocalWorldContext),
             InitialResourceStableIds = value.InitialResourceStableIds.Select(x => x.Trim()).ToArray(),
             ReinforcementCandidateStableIds = value.ReinforcementCandidateStableIds.Select(x => x.Trim()).ToArray(),
             BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
@@ -941,6 +972,12 @@ namespace Ssalddel.Simulation.Domain
                     ScenarioSeed = source.Creation.ScenarioSeed,
                     AlliedStrength = source.Creation.AlliedStrength,
                     HostileStrength = source.Creation.HostileStrength,
+                    CombatSpaceCode = source.Creation.CombatSpaceCode,
+                    EncounterScaleCode = source.Creation.EncounterScaleCode,
+                    ScalePolicyRevision = source.Creation.ScalePolicyRevision,
+                    ScaleReasonCodes = source.Creation.ScaleReasonCodes.ToArray(),
+                    LocalWorldContext = CloneLocalWorldContext(
+                        source.Creation.LocalWorldContext),
                     InitialResourceStableIds = source.Creation.InitialResourceStableIds.ToArray(),
                     ReinforcementCandidateStableIds = source.Creation
                         .ReinforcementCandidateStableIds.ToArray(),
@@ -975,6 +1012,11 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioSeed = value.ScenarioSeed,
                 AlliedStrength = value.AlliedStrength,
                 HostileStrength = value.HostileStrength,
+                CombatSpaceCode = value.CombatSpaceCode,
+                EncounterScaleCode = value.EncounterScaleCode,
+                ScalePolicyRevision = value.ScalePolicyRevision,
+                ScaleReasonCodes = value.ScaleReasonCodes.ToArray(),
+                LocalWorldContext = CloneLocalWorldContext(value.LocalWorldContext),
                 InitialResourceStableIds = value.InitialResourceStableIds.ToArray(),
                 ReinforcementCandidateStableIds = value.ReinforcementCandidateStableIds.ToArray(),
                 BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
@@ -1002,6 +1044,11 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioSeed = value.ScenarioSeed,
                 AlliedStrength = value.AlliedStrength,
                 HostileStrength = value.HostileStrength,
+                CombatSpaceCode = value.CombatSpaceCode,
+                EncounterScaleCode = value.EncounterScaleCode,
+                ScalePolicyRevision = value.ScalePolicyRevision,
+                ScaleReasonCodes = value.ScaleReasonCodes.ToArray(),
+                LocalWorldContext = CloneLocalWorldContext(value.LocalWorldContext),
                 InitialResourceStableIds = value.InitialResourceStableIds.ToArray(),
                 ReinforcementCandidateStableIds = value.ReinforcementCandidateStableIds.ToArray(),
                 BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
@@ -1047,6 +1094,15 @@ namespace Ssalddel.Simulation.Domain
             AddCanonical(target, value.ScenarioSeed);
             AddCanonical(target, value.AlliedStrength);
             AddCanonical(target, value.HostileStrength);
+            if (value.CombatSpaceCode == SimulationLocalCombatCodes.WorldLocal)
+            {
+                AddCanonical(target, value.CombatSpaceCode);
+                AddCanonical(target, value.EncounterScaleCode);
+                AddCanonical(target, value.ScalePolicyRevision);
+                foreach (var reason in value.ScaleReasonCodes.OrderBy(item => item,
+                             StringComparer.Ordinal)) AddCanonical(target, reason);
+                AddLocalWorldContextCanonical(target, value.LocalWorldContext);
+            }
             AddCanonical(target, value.InitialResourceStableIds.Length);
             foreach (var id in value.InitialResourceStableIds) AddCanonical(target, id);
             AddCanonical(target, value.ReinforcementCandidateStableIds.Length);
@@ -1072,6 +1128,15 @@ namespace Ssalddel.Simulation.Domain
             AddCanonical(target, value.EncounterStableId);
             AddCanonical(target, value.AreaStableId);
             AddCanonical(target, value.RuleRevision);
+            if (value.CombatSpaceCode == SimulationLocalCombatCodes.WorldLocal)
+            {
+                AddCanonical(target, value.CombatSpaceCode);
+                AddCanonical(target, value.EncounterScaleCode);
+                AddCanonical(target, value.ScalePolicyRevision);
+                foreach (var reason in value.ScaleReasonCodes.OrderBy(item => item,
+                             StringComparer.Ordinal)) AddCanonical(target, reason);
+                AddLocalCombatCanonical(target, value.LocalCombat);
+            }
             AddCanonical(target, value.PhaseCode);
             AddCanonical(target, value.BattleRevision);
             AddCanonical(target, value.CombatTick);

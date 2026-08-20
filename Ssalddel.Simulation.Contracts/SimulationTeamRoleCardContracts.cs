@@ -4,7 +4,7 @@ namespace Ssalddel.Simulation.Contracts
 {
     public static class SimulationTeamRoleCardCodes
     {
-        public const string RuleRevision = "team-role-card-loadout.r1";
+        public const string RuleRevision = "team-role-card-loadout.r2";
         public const string FarmWork = "FarmWork";
         public const string Exploration = "Exploration";
         public const string Logistics = "Logistics";
@@ -12,6 +12,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string Support = "Support";
         public const string Idle = "Idle";
         public const string Active = "Active";
+        public const string DirectAction = "DirectAction";
+        public const string TacticalCommand = "TacticalCommand";
     }
 
     public sealed class SimulationTeamRoleCardInitialState
@@ -23,6 +25,8 @@ namespace Ssalddel.Simulation.Contracts
         public string[] MemberActorStableIds { get; set; } = Array.Empty<string>();
         public SimulationTeamRoleCardInitialCard[] Cards { get; set; }
             = Array.Empty<SimulationTeamRoleCardInitialCard>();
+        public SimulationCombatCardLoadoutInitialState[] CombatLoadouts { get; set; }
+            = Array.Empty<SimulationCombatCardLoadoutInitialState>();
     }
 
     public sealed class SimulationTeamRoleCardInitialCard
@@ -44,6 +48,40 @@ namespace Ssalddel.Simulation.Contracts
         public string TargetActorStableId { get; set; } = string.Empty;
         public string CardCopyStableId { get; set; } = string.Empty;
         public string SlotCode { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationCombatCardLoadoutInitialState
+    {
+        public string ActorStableId { get; set; } = string.Empty;
+        public string CombatControlModeCode { get; set; } = string.Empty;
+        public SimulationCombatCardLoadoutSlotSnapshot[] Slots { get; set; }
+            = Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>();
+    }
+
+    public sealed class SimulationCombatCardLoadoutSetRequest
+    {
+        public Guid ClientRequestId { get; set; }
+        public long ExpectedRevision { get; set; }
+        public long ExpectedTeamPolicyRevision { get; set; }
+        public string RequestingActorStableId { get; set; } = string.Empty;
+        public string TargetActorStableId { get; set; } = string.Empty;
+        public string CombatControlModeCode { get; set; } = string.Empty;
+        public SimulationCombatCardLoadoutSlotSnapshot[] Slots { get; set; }
+            = Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>();
+    }
+
+    public sealed class SimulationCombatCardLoadoutSlotSnapshot
+    {
+        public string SlotCode { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationCombatCardLoadoutSnapshot
+    {
+        public string ActorStableId { get; set; } = string.Empty;
+        public string CombatControlModeCode { get; set; } = string.Empty;
+        public SimulationCombatCardLoadoutSlotSnapshot[] Slots { get; set; }
+            = Array.Empty<SimulationCombatCardLoadoutSlotSnapshot>();
     }
 
     public sealed class SimulationTeamActivityStartRequest
@@ -113,6 +151,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationTeamActivityAssignmentSnapshot>();
         public SimulationTeamMemberRoleProjection[] MemberRoles { get; set; }
             = Array.Empty<SimulationTeamMemberRoleProjection>();
+        public SimulationCombatCardLoadoutSnapshot[] CombatLoadouts { get; set; }
+            = Array.Empty<SimulationCombatCardLoadoutSnapshot>();
         public bool SupportsRemoteEquip { get; set; }
         public bool SimulationOnly { get; set; }
         public bool IsOperationalState { get; set; }

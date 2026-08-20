@@ -10,6 +10,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string V3 = "simulation-save.v3";
         public const string V4 = "simulation-save.v4";
         public const string V5 = "simulation-save.v5";
+        public const string V6 = "simulation-save.v6";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -35,6 +36,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string CombatReactionConfirm = "CombatReactionConfirm";
         public const string TacticalOrderConfirm = "TacticalOrderConfirm";
         public const string TeamRoleCardEquip = "TeamRoleCardEquip";
+        public const string CombatCardLoadoutSet = "CombatCardLoadoutSet";
         public const string TeamActivityStart = "TeamActivityStart";
         public const string TeamActivityEnd = "TeamActivityEnd";
         public const string TileTraversalConfirm = "TileTraversalConfirm";
@@ -44,6 +46,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string TaskCancel = "TaskCancel";
         public const string RegionalIncidentResponseConfirm = "RegionalIncidentResponseConfirm";
         public const string NatureEncounterVictory = "NatureEncounterVictory";
+        public const string IntegratedWorldConfirm = "IntegratedWorldConfirm";
+        public const string IntegratedWorldEffectEnqueued = "IntegratedWorldEffectEnqueued";
     }
 
     [SsalddelCodeMetadata(
@@ -95,6 +99,8 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationTacticalOrderConfirmRequest? TacticalOrderConfirmRequest
             { get; set; }
         public SimulationTeamRoleCardEquipRequest? TeamRoleCardEquipRequest { get; set; }
+        public SimulationCombatCardLoadoutSetRequest? CombatCardLoadoutSetRequest
+            { get; set; }
         public SimulationTeamActivityStartRequest? TeamActivityStartRequest { get; set; }
         public SimulationTeamActivityEndRequest? TeamActivityEndRequest { get; set; }
         public SimulationTileTraversalConfirmRequest? TileTraversalConfirmRequest { get; set; }
@@ -107,6 +113,16 @@ namespace Ssalddel.Simulation.Contracts
         public string? WorldEventStableId { get; set; }
         public SimulationNatureEncounterVictoryRequest? NatureEncounterVictoryRequest
             { get; set; }
+        public SimulationIntegratedWorldCommandRequest? IntegratedWorldConfirmRequest
+            { get; set; }
+        public SimulationFacilityDamageQueueRequest? FacilityDamageQueueRequest { get; set; }
+    }
+
+    public sealed class SimulationFacilityDamageQueueRequest
+    {
+        public string BattleStableId { get; set; } = string.Empty;
+        public string FacilityStableId { get; set; } = string.Empty;
+        public string SeverityCode { get; set; } = string.Empty;
     }
 
     public sealed class SimulationSessionSavePackage

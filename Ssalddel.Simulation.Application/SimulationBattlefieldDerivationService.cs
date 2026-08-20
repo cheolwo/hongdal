@@ -32,13 +32,16 @@ namespace Ssalddel.Simulation.Application
         private const double BattlefieldHalf = BattlefieldSizeMeters / 2d;
         private readonly ISimulationWorldLayoutCatalogReader layoutReader;
         private readonly ISimulationWorldActualE5SpatialCatalogReader spatialReader;
+        private readonly ISimulationBattleRuntimeProjectionProvider? runtimeProjectionProvider;
 
         public SimulationBattlefieldDerivationService(
             ISimulationWorldLayoutCatalogReader worldLayoutReader,
-            ISimulationWorldActualE5SpatialCatalogReader actualE5SpatialReader)
+            ISimulationWorldActualE5SpatialCatalogReader actualE5SpatialReader,
+            ISimulationBattleRuntimeProjectionProvider? battleRuntimeProjectionProvider = null)
         {
             layoutReader = worldLayoutReader ?? throw new ArgumentNullException(nameof(worldLayoutReader));
             spatialReader = actualE5SpatialReader ?? throw new ArgumentNullException(nameof(actualE5SpatialReader));
+            runtimeProjectionProvider = battleRuntimeProjectionProvider;
         }
 
         public SimulationBattlefieldDerivationSnapshot Derive(
@@ -120,8 +123,16 @@ namespace Ssalddel.Simulation.Application
                 CanonicalPose(origin.EncounterPose) + CanonicalPose(origin.AttackerPose)
                 + CanonicalPose(origin.DefenderPose) + approach.ConnectorStableId);
 
+            var runtimeProjection = runtimeProjectionProvider?.Create(sessionStableId.Trim(),
+                encounterStableId.Trim(), roleCode)
+                ?? new SimulationBattleRelevantRuntimeProjectionSnapshot
+                {
+                    EncounterScopeStableId = encounterStableId.Trim(),
+                    BattleRelevantOverlayHashSha256 = Hash("empty-runtime-overlay"),
+                };
             var context = BuildContext(sessionStableId.Trim(), encounterStableId.Trim(),
-                origin, area, definition, spatialCatalog);
+                origin, area, definition, spatialCatalog, capturedWorldRevision,
+                runtimeProjection);
             var profile = natureEncounter
                 ? SimulationBattlefieldDerivationCodes.NatureField500
                 : SimulationBattlefieldDerivationCodes.FarmPerimeter500;
@@ -160,7 +171,9 @@ namespace Ssalddel.Simulation.Application
             SimulationBattleSpatialOriginSnapshot origin,
             SimulationWorldAreaSetInstanceResponse encounterArea,
             SimulationWorldLayoutDefinitionResponse definition,
-            SimulationWorldActualE5SpatialCatalog spatialCatalog)
+            SimulationWorldActualE5SpatialCatalog spatialCatalog,
+            long capturedWorldRevision,
+            SimulationBattleRelevantRuntimeProjectionSnapshot runtimeProjection)
         {
             var items = new List<SimulationBattleWorldContextItemSnapshot>();
             var edgeRelations = new List<(string EdgeId, string From, string To,
@@ -316,8 +329,26 @@ namespace Ssalddel.Simulation.Application
                 RouteConstraints = routes.OrderBy(value => value.RouteConstraintStableId,
                     StringComparer.Ordinal).ToArray(),
                 RelationConstraints = relations,
+                SourceWorldRevision = capturedWorldRevision,
+                BattleRelevantRuntime = runtimeProjection,
+                BattleRelevantOverlayHashSha256 = runtimeProjection
+                    .BattleRelevantOverlayHashSha256,
             };
-            context.ContextHashSha256 = Hash(CanonicalContext(context));
+            context.StaticSpatialContextHashSha256 = Hash(CanonicalContext(context));
+            context.EncounterScopeHashSha256 = Hash(string.Join("|", encounterStableId,
+                CanonicalPose(origin.EncounterPose), origin.ApproachConnectorStableId));
+            context.AttackerContextHashSha256 = Hash(CanonicalPose(origin.AttackerPose));
+            context.DefenderContextHashSha256 = Hash(string.Join("|",
+                CanonicalPose(origin.DefenderPose), string.Join(",", runtimeProjection.Formations
+                    .OrderBy(value => value.FormationStableId, StringComparer.Ordinal)
+                    .Select(value => value.FormationStableId + ":" + value.StateCode))));
+            context.ContextHashSha256 = Hash(string.Join("|", context.SchemaVersion,
+                context.ContextDerivationRuleVersion,
+                context.StaticSpatialContextHashSha256,
+                context.EncounterScopeHashSha256,
+                context.AttackerContextHashSha256,
+                context.DefenderContextHashSha256,
+                context.BattleRelevantOverlayHashSha256));
             context.AnchorSetHashSha256 = Hash(CanonicalAnchors(context));
             return context;
         }
@@ -847,6 +878,7 @@ namespace Ssalddel.Simulation.Application
         {
             var text = new StringBuilder();
             Add(text, value.SchemaVersion); Add(text, value.ContextRevision);
+            Add(text, value.ContextDerivationRuleVersion);
             Add(text, value.CenterXMeters); Add(text, value.CenterZMeters);
             foreach (var item in value.Items.OrderBy(item => item.SourceStableId,
                          StringComparer.Ordinal))

@@ -110,6 +110,51 @@ namespace Ssalddel.Simulation.Application
             });
         }
 
+        /// <summary>
+        /// 실제 E5 대장에서 공간 폐루프가 닫힌 WI만 세션 초기 공간으로 해석한다.
+        /// 해석 실패를 Scenario 공간으로 대체하지 않는다.
+        /// </summary>
+        public async Task<Simulation공간세계InitialStateRequest> ResolveSpatialWorldAsync(
+            string networkStableId,
+            string areaSetStableId,
+            IEnumerable<string> worldInteractionIds,
+            CancellationToken cancellationToken = default)
+        {
+            if (worldInteractionIds == null)
+                throw new ArgumentNullException(nameof(worldInteractionIds));
+            var requested = worldInteractionIds
+                .Where(item => !string.IsNullOrWhiteSpace(item))
+                .Select(item => item.Trim())
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(item => item, StringComparer.Ordinal)
+                .ToArray();
+            if (requested.Length == 0)
+                throw new InvalidOperationException("SimulationActualE5WorldInteractionRequired");
+
+            var readiness = await EvaluateAsync(networkStableId, cancellationToken)
+                .ConfigureAwait(false);
+            var definitions = new List<Simulation공간정의InitialRequest>();
+            foreach (var wiId in requested)
+            {
+                var binding = readiness.DirectBindings.SingleOrDefault(item =>
+                    string.Equals(item.WorldInteractionId, wiId, StringComparison.Ordinal)
+                    && string.Equals(item.AreaSetStableId, areaSetStableId,
+                        StringComparison.Ordinal));
+                if (binding == null || !binding.SpatialClosedLoop
+                    || binding.SpatialDefinition == null)
+                    throw new InvalidOperationException(
+                        "SimulationActualE5SpatialClosedLoopUnavailable:" + wiId);
+                definitions.Add(binding.SpatialDefinition);
+            }
+
+            return new Simulation공간세계InitialStateRequest
+            {
+                Definitions = definitions
+                    .OrderBy(item => item.SpatialStableId, StringComparer.Ordinal)
+                    .ToArray(),
+            };
+        }
+
         private static void ValidateCatalog(
             SimulationWorld상호작용NetworkBindingCatalog catalog,
             SimulationWorldActualE5SpatialCatalog spatial)

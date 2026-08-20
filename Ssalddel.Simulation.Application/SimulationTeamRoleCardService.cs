@@ -59,6 +59,15 @@ namespace Ssalddel.Simulation.Application
                 .EndTeamActivity(request);
         }
 
+        public SimulationTeamRoleCardStateSnapshot SetCombatLoadout(
+            string sessionStableId,
+            SimulationCombatCardLoadoutSetRequest request)
+        {
+            SimulationTeamRoleCardState.ValidateCombatLoadout(request);
+            return FindCurrent(sessionStableId, request.RequestingActorStableId)
+                .SetTeamCombatCardLoadout(request);
+        }
+
         private 경영SimulationSessionAggregate FindCurrent(
             string sessionStableId,
             string actorStableId)

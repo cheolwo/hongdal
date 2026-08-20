@@ -21,6 +21,8 @@ namespace Ssalddel.Unity.TeamRoles
             => Base(sessionStableId) + "/activities/start";
         public static string EndActivity(string sessionStableId)
             => Base(sessionStableId) + "/activities/end";
+        public static string SetCombatLoadout(string sessionStableId)
+            => Base(sessionStableId) + "/combat-loadouts/set";
     }
 
     public sealed class TeamRoleCardEquipApiRequest
@@ -52,6 +54,32 @@ namespace Ssalddel.Unity.TeamRoles
         public long ExpectedRevision { get; set; }
         public string ActorStableId { get; set; } = string.Empty;
         public string ActivityStableId { get; set; } = string.Empty;
+    }
+
+    public sealed class TeamCombatCardLoadoutSetApiRequest
+    {
+        public Guid ClientRequestId { get; set; }
+        public long ExpectedRevision { get; set; }
+        public long ExpectedTeamPolicyRevision { get; set; }
+        public string RequestingActorStableId { get; set; } = string.Empty;
+        public string TargetActorStableId { get; set; } = string.Empty;
+        public string CombatControlModeCode { get; set; } = string.Empty;
+        public TeamCombatCardLoadoutSlotApiModel[] Slots { get; set; }
+            = Array.Empty<TeamCombatCardLoadoutSlotApiModel>();
+    }
+
+    public sealed class TeamCombatCardLoadoutSlotApiModel
+    {
+        public string SlotCode { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
+    }
+
+    public sealed class TeamCombatCardLoadoutApiModel
+    {
+        public string ActorStableId { get; set; } = string.Empty;
+        public string CombatControlModeCode { get; set; } = string.Empty;
+        public TeamCombatCardLoadoutSlotApiModel[] Slots { get; set; }
+            = Array.Empty<TeamCombatCardLoadoutSlotApiModel>();
     }
 
     public sealed class TeamRoleCardApiModel
@@ -102,6 +130,8 @@ namespace Ssalddel.Unity.TeamRoles
             = Array.Empty<TeamActivityAssignmentApiModel>();
         public TeamMemberRoleApiModel[] MemberRoles { get; set; }
             = Array.Empty<TeamMemberRoleApiModel>();
+        public TeamCombatCardLoadoutApiModel[] CombatLoadouts { get; set; }
+            = Array.Empty<TeamCombatCardLoadoutApiModel>();
         public bool SupportsRemoteEquip { get; set; }
         public bool SimulationOnly { get; set; }
         public bool IsOperationalState { get; set; }
@@ -119,6 +149,8 @@ namespace Ssalddel.Unity.TeamRoles
             = Array.Empty<TeamActivityAssignmentApiModel>();
         public TeamMemberRoleApiModel[] MemberRoles { get; set; }
             = Array.Empty<TeamMemberRoleApiModel>();
+        public TeamCombatCardLoadoutApiModel[] CombatLoadouts { get; set; }
+            = Array.Empty<TeamCombatCardLoadoutApiModel>();
         public bool CanRequestRemoteEquip { get; set; }
         public bool CalculatesRoleLocally { get; set; }
         public bool PresentationOnly { get; set; }
@@ -133,6 +165,7 @@ namespace Ssalddel.Unity.TeamRoles
                 || source.Revision < 0 || source.TeamPolicyRevision < 0
                 || source.MemberActorStableIds == null || source.Cards == null
                 || source.ActiveActivities == null || source.MemberRoles == null
+                || source.CombatLoadouts == null
                 || !source.SupportsRemoteEquip || !source.SimulationOnly
                 || source.IsOperationalState
                 || source.Cards.Any(value => value == null
@@ -143,7 +176,16 @@ namespace Ssalddel.Unity.TeamRoles
                 || source.MemberRoles.Any(value => value == null
                     || value.IsPermanentProfession
                     || !source.MemberActorStableIds.Contains(
-                        value.ActorStableId, StringComparer.Ordinal)))
+                        value.ActorStableId, StringComparer.Ordinal))
+                || source.CombatLoadouts.Any(value => value == null
+                    || value.Slots == null
+                    || !source.MemberActorStableIds.Contains(
+                        value.ActorStableId, StringComparer.Ordinal)
+                    || (value.CombatControlModeCode != "DirectAction"
+                        && value.CombatControlModeCode != "TacticalCommand")
+                    || value.Slots.Any(slot => slot == null
+                        || (slot.SlotCode != "Primary"
+                            && slot.SlotCode != "Support"))))
                 throw new InvalidOperationException(
                     "TeamRoleCardPresentationBoundaryInvalid");
 
@@ -156,6 +198,7 @@ namespace Ssalddel.Unity.TeamRoles
                 Cards = source.Cards.ToArray(),
                 ActiveActivities = source.ActiveActivities.ToArray(),
                 MemberRoles = source.MemberRoles.ToArray(),
+                CombatLoadouts = source.CombatLoadouts.ToArray(),
                 CanRequestRemoteEquip = true,
                 CalculatesRoleLocally = false,
                 PresentationOnly = true,
@@ -173,6 +216,9 @@ namespace Ssalddel.Unity.TeamRoles
             TeamActivityStartApiRequest request, CancellationToken cancellationToken);
         Task<TeamRoleCardStateApiModel> EndActivityAsync(string sessionStableId,
             TeamActivityEndApiRequest request, CancellationToken cancellationToken);
+        Task<TeamRoleCardStateApiModel> SetCombatLoadoutAsync(
+            string sessionStableId, TeamCombatCardLoadoutSetApiRequest request,
+            CancellationToken cancellationToken);
     }
 
     public sealed class TeamRoleCardClientCoordinator
@@ -213,6 +259,12 @@ namespace Ssalddel.Unity.TeamRoles
             CancellationToken cancellationToken = default)
             => Accept(await authority.EndActivityAsync(sessionStableId, request,
                 cancellationToken));
+
+        public async Task<TeamRoleCardPresentationState> SetCombatLoadoutAsync(
+            string sessionStableId, TeamCombatCardLoadoutSetApiRequest request,
+            CancellationToken cancellationToken = default)
+            => Accept(await authority.SetCombatLoadoutAsync(sessionStableId,
+                request, cancellationToken));
 
         private TeamRoleCardPresentationState Accept(
             TeamRoleCardStateApiModel response)

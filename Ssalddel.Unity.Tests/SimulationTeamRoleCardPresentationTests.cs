@@ -119,5 +119,10 @@ public sealed class SimulationTeamRoleCardPresentationTests
             string sessionStableId, TeamActivityEndApiRequest request,
             CancellationToken cancellationToken)
             => Task.FromResult(State);
+
+        public Task<TeamRoleCardStateApiModel> SetCombatLoadoutAsync(
+            string sessionStableId, TeamCombatCardLoadoutSetApiRequest request,
+            CancellationToken cancellationToken)
+            => Task.FromResult(State);
     }
 }

@@ -113,29 +113,56 @@ namespace Ssalddel.Simulation.Application
         private static SimulationBattleCardModifierSnapshot[] BuildModifiers(
             SimulationTeamRoleCardStateSnapshot? state)
         {
-            if (state?.Cards == null) return Array.Empty<SimulationBattleCardModifierSnapshot>();
+            if (state?.Cards == null || state.CombatLoadouts == null)
+                return Array.Empty<SimulationBattleCardModifierSnapshot>();
             var values = new List<SimulationBattleCardModifierSnapshot>();
-            foreach (var card in state.Cards.Where(value =>
-                         !string.IsNullOrWhiteSpace(value.EquippedActorStableId))
-                         .OrderBy(value => value.CardCopyStableId, StringComparer.Ordinal))
+            foreach (var loadout in state.CombatLoadouts
+                         .OrderBy(value => value.ActorStableId, StringComparer.Ordinal)
+                         .ThenBy(value => value.CombatControlModeCode,
+                             StringComparer.Ordinal))
             {
-                foreach (var role in card.ActivityRoleCodes.OrderBy(value => value,
+                foreach (var slot in loadout.Slots.OrderBy(value => value.SlotCode,
                              StringComparer.Ordinal))
                 {
-                    if (role == SimulationTeamRoleCardCodes.Exploration)
+                    var card = state.Cards.Single(value => value.CardCopyStableId ==
+                        slot.CardCopyStableId);
+                    foreach (var role in card.ActivityRoleCodes.OrderBy(value => value,
+                                 StringComparer.Ordinal))
                     {
-                        Add(values, card, "ReconnaissanceRadius", 1000);
-                        Add(values, card, "FormationCohesion", -500);
-                    }
-                    else if (role == SimulationTeamRoleCardCodes.FarmWork)
-                    {
-                        Add(values, card, "FarmDefensiveReadiness", 1000);
-                        Add(values, card, "PursuitSpeed", -500);
-                    }
-                    else if (role == SimulationTeamRoleCardCodes.Logistics)
-                    {
-                        Add(values, card, "SupplyEfficiency", 1000);
-                        Add(values, card, "DeploymentSpeed", -500);
+                        if (loadout.CombatControlModeCode ==
+                            SimulationTeamRoleCardCodes.DirectAction)
+                        {
+                            if (role == SimulationTeamRoleCardCodes.Exploration)
+                                Add(values, state, card, loadout,
+                                    "DirectSkillPower", 1000);
+                            else if (role == SimulationTeamRoleCardCodes.FarmWork)
+                                Add(values, state, card, loadout,
+                                    "DirectGuardEfficiency", 1000);
+                            else if (role == SimulationTeamRoleCardCodes.Logistics)
+                                Add(values, state, card, loadout,
+                                    "DirectSkillPower", 500);
+                        }
+                        else if (role == SimulationTeamRoleCardCodes.Exploration)
+                        {
+                            Add(values, state, card, loadout,
+                                "ReconnaissanceRadius", 1000);
+                            Add(values, state, card, loadout,
+                                "FormationCohesion", -500);
+                        }
+                        else if (role == SimulationTeamRoleCardCodes.FarmWork)
+                        {
+                            Add(values, state, card, loadout,
+                                "FarmDefensiveReadiness", 1000);
+                            Add(values, state, card, loadout,
+                                "PursuitSpeed", -500);
+                        }
+                        else if (role == SimulationTeamRoleCardCodes.Logistics)
+                        {
+                            Add(values, state, card, loadout,
+                                "SupplyEfficiency", 1000);
+                            Add(values, state, card, loadout,
+                                "DeploymentSpeed", -500);
+                        }
                     }
                 }
             }
@@ -144,15 +171,20 @@ namespace Ssalddel.Simulation.Application
         }
 
         private static void Add(ICollection<SimulationBattleCardModifierSnapshot> target,
-            SimulationTeamRoleCardSnapshot card, string code, int basisPoints)
+            SimulationTeamRoleCardStateSnapshot state,
+            SimulationTeamRoleCardSnapshot card,
+            SimulationCombatCardLoadoutSnapshot loadout,
+            string code, int basisPoints)
             => target.Add(new SimulationBattleCardModifierSnapshot
             {
                 CardCopyStableId = card.CardCopyStableId,
                 CardDefinitionStableId = card.CardDefinitionStableId,
-                ActorStableId = card.EquippedActorStableId,
+                SourceCardRevision = state.Revision,
+                ApplicableControlModeCode = loadout.CombatControlModeCode,
+                ActorStableId = loadout.ActorStableId,
                 ModifierCode = code,
                 BasisPoints = basisPoints,
-                RuleRevision = "battle-card-modifier.role-card.r1",
+                RuleRevision = "battle-card-modifier.role-card.r2",
             });
 
         private static string Role(SimulationTeamRoleCardStateSnapshot? cards, string actorId)
@@ -207,6 +239,8 @@ namespace Ssalddel.Simulation.Application
                          StringComparer.Ordinal))
             {
                 Add(text, value.CardCopyStableId); Add(text, value.CardDefinitionStableId);
+                Add(text, value.SourceCardRevision);
+                Add(text, value.ApplicableControlModeCode);
                 Add(text, value.ActorStableId); Add(text, value.ModifierCode);
                 Add(text, value.BasisPoints); Add(text, value.RuleRevision);
             }

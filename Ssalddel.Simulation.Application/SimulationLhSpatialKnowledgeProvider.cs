@@ -60,8 +60,10 @@ namespace Ssalddel.Simulation.Application
             var summary = status.GetProperty("summary");
             Require(summary.GetProperty("totalWorldInteractions").GetInt32() == 41,
                 "StatusInteractionCountInvalid");
-            Require(summary.GetProperty("establishedH1Count").GetInt32() == 13,
+            Require(summary.GetProperty("establishedH1Count").GetInt32() == 5,
                 "StatusEstablishedH1CountInvalid");
+            Require(summary.GetProperty("establishedH3Count").GetInt32() == 8,
+                "StatusEstablishedH3CountInvalid");
             Require(summary.GetProperty("officialH2DefinitionCount").GetInt32() == 0,
                 "StatusMustNotClaimH2");
 
@@ -93,8 +95,9 @@ namespace Ssalddel.Simulation.Application
                 {
                     Require(statusByWi.TryGetValue(wiId, out var wiStatus),
                         "StatusWiMissing:" + wiId);
-                    Require(String(wiStatus, "lhEngineHandoffStateCode") ==
-                            "ReadyForApprovedH1Input",
+                    var handoffState = String(wiStatus, "lhEngineHandoffStateCode");
+                    Require(handoffState == "ReadyForApprovedH1Input"
+                            || handoffState == "ReadyForActualE5Input",
                         "StatusWiNotApprovedForHandoff:" + wiId);
                     Require(Strings(wiStatus.GetProperty("approvedH1DefinitionRefs"))
                             .Contains(h1DefinitionRef, StringComparer.Ordinal),

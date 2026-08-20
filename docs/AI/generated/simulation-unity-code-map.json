@@ -141,6 +141,36 @@
           "boundary": "\uD074\uB77C\uC774\uC5B8\uD2B8\uB294 \uC804\uD22C \uACB0\uACFC\uB098 \uC218\uCE58 \uBCF4\uC815\uC744 \uD655\uC815\uD558\uC9C0 \uC54A\uACE0 \uC608\uC0C1 World \uAC1C\uC815\uACFC \uC548\uC815 ID\uB9CC \uBCF4\uB0B8\uB2E4."
         },
         {
+          "flowOrder": 10,
+          "stepKey": "contract.local-combat-control-mode",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationLocalCombatControlModeConfirmRequest",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs",
+          "responsibility": "\uD604\uC7A5 \uC804\uD22C\uC758 1\uC778\uCE6D \uC9C1\uC811 \uD589\uB3D9\uACFC 3\uC778\uCE6D \uC804\uC220 \uC9C0\uD718 \uC911 \uD558\uB098\uB97C \uC11C\uBC84\uC5D0 \uD655\uC815\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uCE74\uBA54\uB77C \uC790\uCCB4\uAC00 \uC544\uB2C8\uB77C \uC11C\uBC84\uAC00 \uD655\uC815\uD55C \uC804\uD22C \uC870\uC791 \uBC29\uC2DD\uB9CC \uD589\uB3D9 \uD5C8\uC6A9 \uBC94\uC704\uB97C \uBC14\uAFBC\uB2E4."
+        },
+        {
+          "flowOrder": 11,
+          "stepKey": "contract.local-combat-action",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationLocalCombatActionConfirmRequest",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs",
+          "responsibility": "\uD604\uC7AC H5/LH \uACF5\uAC04\uC5D0\uC11C \uC218\uD589\uD558\uB294 \uC804\uD22C \uD589\uB3D9\uC758 \uC11C\uBC84 \uC785\uB825\uC744 \uC815\uC758\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uD074\uB77C\uC774\uC5B8\uD2B8\uB294 \uD53C\uD574\u00B7\uBA85\uC911\u00B7\uBBF8\uD130 \uC88C\uD45C\uB97C \uC81C\uCD9C\uD558\uC9C0 \uC54A\uACE0 \uB300\uC0C1\uACFC \uD589\uB3D9 \uC758\uB3C4\uB9CC \uBCF4\uB0B8\uB2E4."
+        },
+        {
           "flowOrder": 20,
           "stepKey": "api.battle",
           "dependsOnStepKeys": [
@@ -959,7 +989,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Application",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 51\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 54\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ..."
     },
     {
       "severity": "Warning",
@@ -980,14 +1010,14 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Server",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 16\uAC1C: SimulationCollectibleCardRewardsController, SimulationSurvivalTarotController, SimulationTeamObservationController, SimulationTeamRoleCardsController, SimulationWorldEventsController, SimulationWorldRegionProjectionController, SimulationWorldSurvivalInventoryController, SimulationWorldTileArtifactContentService, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 19\uAC1C: SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationIntegratedWorldController, SimulationSurvivalTarotController, SimulationTeamObservationController, SimulationTeamRoleCardsController, SimulationWorldEventsController, ..."
     },
     {
       "severity": "Warning",
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Unity",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 46\uAC1C: CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, FarmSurvivalExperienceIntentMapper, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 47\uAC1C: CardWorkspaceCoordinator, CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, ..."
     }
   ]
 }

@@ -101,6 +101,34 @@ public sealed class SimulationTeamRoleCardTests
     }
 
     [Fact]
+    public void 직접전투와전술지휘편성은_서버에서독립적으로저장된다()
+    {
+        var context = CreateContext();
+        var initial = context.Service.Get(Session, Farmer);
+        Assert.Equal(4, initial.CombatLoadouts.Length);
+
+        var direct = context.Service.SetCombatLoadout(Session,
+            Loadout(initial.Revision, Farmer,
+                SimulationTeamRoleCardCodes.DirectAction,
+                (SimulationTeamRoleCardCodes.Primary, ExploreCard)));
+        var tactical = context.Service.SetCombatLoadout(Session,
+            Loadout(direct.Revision, Farmer,
+                SimulationTeamRoleCardCodes.TacticalCommand,
+                (SimulationTeamRoleCardCodes.Primary, FarmCard)));
+
+        Assert.Equal(ExploreCard, Assert.Single(tactical.CombatLoadouts,
+            value => value.ActorStableId == Farmer
+                && value.CombatControlModeCode ==
+                SimulationTeamRoleCardCodes.DirectAction).Slots.Single()
+            .CardCopyStableId);
+        Assert.Equal(FarmCard, Assert.Single(tactical.CombatLoadouts,
+            value => value.ActorStableId == Farmer
+                && value.CombatControlModeCode ==
+                SimulationTeamRoleCardCodes.TacticalCommand).Slots.Single()
+            .CardCopyStableId);
+    }
+
+    [Fact]
     public async Task Api는_공동카드조회_원격장착_활동시작종료를제공한다()
     {
         using var factory = CreateFactory();
@@ -138,6 +166,10 @@ public sealed class SimulationTeamRoleCardTests
                 ActorStableId = Explorer,
                 ActivityStableId = "activity:explore:http",
             });
+        using var loadoutResponse = await client.PostAsJsonAsync(
+            path + "/combat-loadouts/set",
+            Loadout(3, Farmer, SimulationTeamRoleCardCodes.DirectAction,
+                (SimulationTeamRoleCardCodes.Primary, FarmCard)));
 
         Assert.NotNull(initial);
         Assert.Equal(HttpStatusCode.OK, equipResponse.StatusCode);
@@ -148,6 +180,7 @@ public sealed class SimulationTeamRoleCardTests
         Assert.Single(active.ActiveActivities);
         Assert.Equal(HttpStatusCode.Conflict, lockedResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, endResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, loadoutResponse.StatusCode);
     }
 
     [Fact]
@@ -160,6 +193,9 @@ public sealed class SimulationTeamRoleCardTests
             Start(1, Explorer, ExploreCard,
                 SimulationTeamRoleCardCodes.Exploration,
                 "activity:explore:save"));
+        context.Service.SetCombatLoadout(Session,
+            Loadout(2, Farmer, SimulationTeamRoleCardCodes.TacticalCommand,
+                (SimulationTeamRoleCardCodes.Primary, FarmCard)));
         var aggregate = Assert.IsType<경영SimulationSessionAggregate>(
             context.Sessions.Find(Session));
 
@@ -167,13 +203,13 @@ public sealed class SimulationTeamRoleCardTests
             new SimulationSessionSaveRequest
             {
                 SaveStableId = "simulation-save:team-role-card-1",
-                ExpectedRevision = 2,
+                ExpectedRevision = 3,
             });
         var restored = SimulationSessionReplay.Restore(package);
         var state = restored.GetTeamRoleCards();
 
-        Assert.Equal(2, restored.Revision);
-        Assert.Equal(2, state.Revision);
+        Assert.Equal(3, restored.Revision);
+        Assert.Equal(3, state.Revision);
         Assert.True(Assert.Single(state.Cards,
             value => value.CardCopyStableId == ExploreCard).IsLocked);
         Assert.Equal(SimulationTeamRoleCardCodes.Exploration,
@@ -183,6 +219,13 @@ public sealed class SimulationTeamRoleCardTests
             value.CommandTypeCode == SimulationCommandTypeCodes.TeamRoleCardEquip);
         Assert.Contains(package.CommandLog, value =>
             value.CommandTypeCode == SimulationCommandTypeCodes.TeamActivityStart);
+        Assert.Contains(package.CommandLog, value =>
+            value.CommandTypeCode == SimulationCommandTypeCodes.CombatCardLoadoutSet);
+        Assert.Equal(FarmCard, Assert.Single(state.CombatLoadouts,
+            value => value.ActorStableId == Farmer
+                && value.CombatControlModeCode ==
+                SimulationTeamRoleCardCodes.TacticalCommand).Slots.Single()
+            .CardCopyStableId);
     }
 
     private static TestContext CreateContext()
@@ -289,6 +332,23 @@ public sealed class SimulationTeamRoleCardTests
         ActivityStableId = activity,
         LocationStableId = role == SimulationTeamRoleCardCodes.Exploration
             ? "region:jinbu-myeon" : "region:daegwallyeong-myeon",
+    };
+
+    private static SimulationCombatCardLoadoutSetRequest Loadout(
+        long revision, string actor, string mode,
+        params (string Slot, string Card)[] slots) => new()
+    {
+        ClientRequestId = Guid.NewGuid(),
+        ExpectedRevision = revision,
+        ExpectedTeamPolicyRevision = 7,
+        RequestingActorStableId = actor,
+        TargetActorStableId = actor,
+        CombatControlModeCode = mode,
+        Slots = slots.Select(value => new SimulationCombatCardLoadoutSlotSnapshot
+        {
+            SlotCode = value.Slot,
+            CardCopyStableId = value.Card,
+        }).ToArray(),
     };
 
     private static WebApplicationFactory<Program> CreateFactory()

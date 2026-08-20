@@ -33,6 +33,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationSurvivalTarotInitialStateRequest? SurvivalTarot { get; set; }
         public SimulationFarmSurvivalInitialStateRequest? FarmSurvival { get; set; }
         public SimulationTeamRoleCardInitialState? TeamRoleCards { get; set; }
+        public SimulationIntegratedWorldInitialStateRequest? IntegratedWorld { get; set; }
     }
 
     public sealed class SimulationWorldContext생성Request
@@ -137,6 +138,10 @@ namespace Ssalddel.Simulation.Contracts
             = new SimulationNatureThreatStateSnapshot();
         public SimulationRegionalCausalityStateSnapshot RegionalCausality { get; set; }
             = new SimulationRegionalCausalityStateSnapshot();
+        public SimulationTarotContextStateSnapshot TarotContext { get; set; }
+            = new SimulationTarotContextStateSnapshot();
+        public SimulationIntegratedWorldSnapshot IntegratedWorld { get; set; }
+            = new SimulationIntegratedWorldSnapshot();
     }
 
     public sealed class SimulationWorldContextSnapshot

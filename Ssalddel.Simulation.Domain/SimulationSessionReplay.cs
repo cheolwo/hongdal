@@ -16,6 +16,8 @@ namespace Ssalddel.Simulation.Domain
             var aggregate = new 경영SimulationSessionAggregate(
                 SimulationSaveReplayCloner.CloneCreateRequest(package.SessionCreateRequest));
             if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
                     StringComparison.Ordinal))
                 aggregate.UseLegacyRegionalCausalityRules();
             if (!string.Equals(aggregate.SessionStableId, package.SessionStableId, StringComparison.Ordinal))
@@ -172,6 +174,13 @@ namespace Ssalddel.Simulation.Domain
                             entry.TeamActivityStartRequest!));
                 }
                 else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatCardLoadoutSet)
+                {
+                    aggregate.SetTeamCombatCardLoadout(
+                        SimulationSaveReplayCloner.CloneCombatCardLoadoutSetRequest(
+                            entry.CombatCardLoadoutSetRequest!));
+                }
+                else if (entry.CommandTypeCode
                     == SimulationCommandTypeCodes.TeamActivityEnd)
                 {
                     aggregate.EndTeamActivity(
@@ -220,6 +229,21 @@ namespace Ssalddel.Simulation.Domain
                     aggregate.ApplyNatureEncounterVictory(
                         entry.NatureEncounterVictoryRequest!.BattleStableId,
                         entry.NatureEncounterVictoryRequest.EncounterStableId);
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.IntegratedWorldConfirm)
+                {
+                    aggregate.ConfirmIntegratedWorldCommand(
+                        경영SimulationSessionAggregate.CloneIntegratedWorldCommand(
+                            entry.IntegratedWorldConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.IntegratedWorldEffectEnqueued)
+                {
+                    aggregate.QueueFacilityBattleDamage(
+                        entry.FacilityDamageQueueRequest!.BattleStableId,
+                        entry.FacilityDamageQueueRequest.FacilityStableId,
+                        entry.FacilityDamageQueueRequest.SeverityCode);
                 }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
@@ -276,6 +300,8 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V4,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationSaveSchemaUnsupported");
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
@@ -322,9 +348,15 @@ namespace Ssalddel.Simulation.Domain
                 || package.Snapshot.NpcWorkRecords == null
                 || package.Snapshot.NpcActionProjections == null
                 || package.Snapshot.NpcFacilityInventories == null
-                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                || ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
                         StringComparison.Ordinal)
-                    && package.Snapshot.RegionalCausality == null)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
+                        StringComparison.Ordinal)
+                    ) && package.Snapshot.RegionalCausality == null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
+                        StringComparison.Ordinal)
+                    && (package.SessionCreateRequest.IntegratedWorld == null
+                        || package.Snapshot.IntegratedWorld == null))
                 || package.CommandLog == null
                 || package.Battles == null)
             {
@@ -521,6 +553,12 @@ namespace Ssalddel.Simulation.Domain
                         entry.TeamActivityStartRequest!);
                 }
                 else if (entry.CommandTypeCode
+                    == SimulationCommandTypeCodes.CombatCardLoadoutSet)
+                {
+                    SimulationTeamRoleCardState.ValidateCombatLoadout(
+                        entry.CombatCardLoadoutSetRequest!);
+                }
+                else if (entry.CommandTypeCode
                     == SimulationCommandTypeCodes.TeamActivityEnd)
                 {
                     SimulationTeamRoleCardState.ValidateEnd(
@@ -569,6 +607,18 @@ namespace Ssalddel.Simulation.Domain
                             entry.NatureEncounterVictoryRequest.BattleStableId)
                         || string.IsNullOrWhiteSpace(
                             entry.NatureEncounterVictoryRequest.EncounterStableId))
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.IntegratedWorldConfirm)
+                {
+                    if (entry.IntegratedWorldConfirmRequest == null)
+                        throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.IntegratedWorldEffectEnqueued)
+                {
+                    if (entry.FacilityDamageQueueRequest == null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
                 }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
@@ -626,6 +676,7 @@ namespace Ssalddel.Simulation.Domain
             if (entry.CombatReactionConfirmRequest != null) payloadCount++;
             if (entry.TacticalOrderConfirmRequest != null) payloadCount++;
             if (entry.TeamRoleCardEquipRequest != null) payloadCount++;
+            if (entry.CombatCardLoadoutSetRequest != null) payloadCount++;
             if (entry.TeamActivityStartRequest != null) payloadCount++;
             if (entry.TeamActivityEndRequest != null) payloadCount++;
             if (entry.TileTraversalConfirmRequest != null) payloadCount++;
@@ -634,6 +685,8 @@ namespace Ssalddel.Simulation.Domain
             if (entry.TaskCancelRequest != null) payloadCount++;
             if (entry.RegionalIncidentResponseConfirmRequest != null) payloadCount++;
             if (entry.NatureEncounterVictoryRequest != null) payloadCount++;
+            if (entry.IntegratedWorldConfirmRequest != null) payloadCount++;
+            if (entry.FacilityDamageQueueRequest != null) payloadCount++;
             if (payloadCount != 1)
                 throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
         }

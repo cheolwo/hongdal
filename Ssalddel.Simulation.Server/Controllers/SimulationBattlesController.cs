@@ -87,6 +87,41 @@ public sealed class SimulationBattlesController(SimulationBattleInstanceService 
         => Execute(() => service.ConfirmTacticalCommand(sessionStableId,
             battleStableId, request));
 
+    [HttpPost("{battleStableId}/local-focus/confirm")]
+    public ActionResult<SimulationBattleInstanceSnapshot> ConfirmLocalFocus(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationLocalCombatFocusConfirmRequest request)
+        => Execute(() => service.ConfirmLocalFocus(sessionStableId,
+            battleStableId, request));
+
+    [HttpPost("{battleStableId}/local-actions/confirm")]
+    public ActionResult<SimulationBattleInstanceSnapshot> ConfirmLocalAction(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationLocalCombatActionConfirmRequest request)
+        => Execute(() => service.ConfirmLocalAction(sessionStableId,
+            battleStableId, request));
+
+    [HttpPost("{battleStableId}/local-control-mode/confirm")]
+    public ActionResult<SimulationBattleInstanceSnapshot> ConfirmLocalControlMode(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationLocalCombatControlModeConfirmRequest request)
+        => Execute(() => service.ConfirmLocalControlMode(sessionStableId,
+            battleStableId, request));
+
+    [HttpPost("{battleStableId}/escalations/preview")]
+    public ActionResult<SimulationBattleEscalationPreviewSnapshot> PreviewEscalation(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationBattleEscalationPreviewRequest request)
+        => Execute(() => service.PreviewEscalation(sessionStableId,
+            battleStableId, request));
+
+    [HttpPost("{battleStableId}/escalations/confirm")]
+    public ActionResult<SimulationBattleInstanceSnapshot> ConfirmEscalation(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationBattleEscalationConfirmRequest request)
+        => Execute(() => service.ConfirmEscalation(sessionStableId,
+            battleStableId, request));
+
     private ActionResult<T> Execute<T>(Func<T> action)
     {
         try { return Ok(action()); }

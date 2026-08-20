@@ -122,6 +122,9 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<경영SimulationSessionService>();
         services.AddSingleton<경영SimulationSessionAccessor>();
         services.AddSingleton<경영SimulationSession생명주기Service>();
+        services.AddSingleton<경영Simulation통합생활세계Service>();
+        services.AddSingleton<ISimulationBattleRuntimeProjectionProvider,
+            SimulationBattleRuntimeProjectionProvider>();
         services.AddSingleton<경영Simulation턴결정Service>();
         services.AddSingleton<경영Simulation수확수출Service>();
         services.AddSingleton<경영Simulation물류창고Service>();
@@ -148,9 +151,14 @@ public static class SimulationServerServiceCollectionExtensions
             new FileSimulationWorldLayoutCatalogReader(
                 derivationOptions.WorldLayoutCatalogPath));
         services.AddScoped<SimulationWorldLayoutService>();
+        services.AddSingleton<ISimulationAreaSetImmersionCatalogReader>(
+            new FileSimulationAreaSetImmersionCatalogReader(
+                derivationOptions.AreaSetImmersionReadinessCatalogPath));
+        services.AddScoped<SimulationAreaSetImmersionService>();
         services.AddScoped<ISimulationLhCellContentSource,
             H5AuthoritativeSimulationLhCellContentSource>();
         services.AddScoped<SimulationWorld상호작용NetworkService>();
+        services.AddScoped<SimulationActualE5SessionCreationService>();
         services.AddSingleton<ISimulationWorld상호작용GraphCatalogReader>(
             new FileSimulationWorld상호작용GraphCatalogReader(
                 derivationOptions.InteractionGraphBindingCatalogPath));

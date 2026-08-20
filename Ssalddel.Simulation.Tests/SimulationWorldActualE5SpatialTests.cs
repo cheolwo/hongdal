@@ -85,6 +85,29 @@ public sealed class SimulationWorldActualE5SpatialTests
     }
 
     [Fact]
+    public async Task Farm몰입WI는_실제E5_H3공간정의로세션에공급된다()
+    {
+        var service = new SimulationWorld상호작용NetworkService(Reader());
+
+        var world = await service.ResolveSpatialWorldAsync(
+            PyeongchangAreaSetStableIds.ActualNetwork,
+            PyeongchangAreaSetStableIds.FarmAreaSet,
+            new[] { "WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-LOG-01", "WI-LOG-02" });
+
+        Assert.Equal(5, world.Definitions.Length);
+        Assert.All(world.Definitions, definition =>
+        {
+            Assert.Equal(PyeongchangAreaSetStableIds.FarmAreaSet,
+                definition.AreaSetStableId);
+            Assert.Equal(Simulation공간근거종류Codes.LandscapeGraph,
+                definition.EvidenceKindCode);
+            Assert.StartsWith("landscape-graph:sim:pyeongchang:",
+                definition.LandscapeGraphStableId);
+            Assert.Contains("binding-sha256:", string.Join("|", definition.SourceStableIds));
+        });
+    }
+
+    [Fact]
     public async Task WorldStream_API에서_Network와마흔한개WI준비도를조회한다()
     {
         using var factory = new WebApplicationFactory<Program>();
@@ -109,6 +132,202 @@ public sealed class SimulationWorldActualE5SpatialTests
             readiness.OverallStatusCode);
     }
 
+    [Fact]
+    public async Task 실제E5세션_API는_FarmH5배치와공간폐루프를고정하고_E6를요구하지않는다()
+    {
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        const string layoutId = "world-layout:sim:pyeongchang:nature-farm-hub-town.v1";
+        var layout = await client.GetFromJsonAsync<SimulationWorldLayoutDefinitionResponse>(
+            "/api/simulation/v1/world-stream/world-layouts/" + Uri.EscapeDataString(layoutId));
+        Assert.NotNull(layout);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions/actual-e5",
+            new SimulationActualE5SessionCreateRequest
+            {
+                AreaSetNetworkStableId = PyeongchangAreaSetStableIds.ActualNetwork,
+                AreaSetStableId = PyeongchangAreaSetStableIds.FarmAreaSet,
+                WorldLayoutStableId = layoutId,
+                ExpectedWorldLayoutRevision = layout!.WorldLayoutRevision,
+                ExpectedWorldLayoutHashSha256 = layout.WorldLayoutHashSha256,
+                WorldInteractionIds = new[]
+                {
+                    "WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-LOG-01", "WI-LOG-02",
+                },
+                Session = CreateSessionRequest(),
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var result = await response.Content
+            .ReadFromJsonAsync<SimulationActualE5SessionCreateResponse>();
+        Assert.NotNull(result);
+        Assert.Equal("E5", result!.EvidenceStageCode);
+        Assert.Equal(SimulationWorldLayoutCodes.ScenarioRelative,
+            result.PlacementAuthorityCode);
+        Assert.Equal(SimulationWorldLayoutCodes.NotApplied,
+            result.WorldGroundingStateCode);
+        Assert.Equal(5, result.Session.SpatialDefinitions.Length);
+        Assert.All(result.Session.SpatialDefinitions, item => Assert.Equal(
+            Simulation공간근거종류Codes.LandscapeGraph, item.EvidenceKindCode));
+    }
+
+    [Fact]
+    public async Task 실제E5세션_API는_낡은H5해시와_클라이언트공간주입을거부한다()
+    {
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        const string layoutId = "world-layout:sim:pyeongchang:nature-farm-hub-town.v1";
+        var request = new SimulationActualE5SessionCreateRequest
+        {
+            AreaSetNetworkStableId = PyeongchangAreaSetStableIds.ActualNetwork,
+            AreaSetStableId = PyeongchangAreaSetStableIds.FarmAreaSet,
+            WorldLayoutStableId = layoutId,
+            ExpectedWorldLayoutRevision = 2,
+            ExpectedWorldLayoutHashSha256 = new string('0', 64),
+            WorldInteractionIds = new[] { "WI-FARM-04" },
+            Session = CreateSessionRequest(),
+        };
+
+        var stale = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions/actual-e5", request);
+        Assert.Equal(HttpStatusCode.BadRequest, stale.StatusCode);
+        Assert.Equal("SimulationWorldLayoutRevisionMismatch",
+            (await stale.Content.ReadFromJsonAsync<SimulationErrorResponse>())!.ErrorCode);
+
+        var layout = await client.GetFromJsonAsync<SimulationWorldLayoutDefinitionResponse>(
+            "/api/simulation/v1/world-stream/world-layouts/" + Uri.EscapeDataString(layoutId));
+        request.ExpectedWorldLayoutRevision = layout!.WorldLayoutRevision;
+        request.ExpectedWorldLayoutHashSha256 = layout.WorldLayoutHashSha256;
+        request.Session.SpatialWorld = new Simulation공간세계InitialStateRequest();
+        var injected = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions/actual-e5", request);
+        Assert.Equal(HttpStatusCode.BadRequest, injected.StatusCode);
+        Assert.Equal("SimulationActualE5ClientSpatialWorldForbidden",
+            (await injected.Content.ReadFromJsonAsync<SimulationErrorResponse>())!.ErrorCode);
+    }
+
+    [Fact]
+    public async Task Farm_E6는_E5와GIS축을보존하고_네H3와교차폐루프를승격한다()
+    {
+        var service = new SimulationAreaSetImmersionService(
+            new FileSimulationAreaSetImmersionCatalogReader(ImmersionCatalogPath()));
+
+        var result = await service.ReadAsync(PyeongchangAreaSetStableIds.FarmAreaSet);
+
+        Assert.NotNull(result);
+        Assert.Equal(SimulationAreaSetImmersionCodes.SpatialE5Qualified,
+            result!.SpatialMaturityCode);
+        Assert.Equal(SimulationAreaSetImmersionCodes.ImmersionQualified,
+            result.ImmersionMaturityCode);
+        Assert.Equal(SimulationAreaSetImmersionCodes.Current,
+            result.FreshnessStateCode);
+        Assert.Equal(SimulationAreaSetImmersionCodes.NotApplied,
+            result.GroundingStatusCode);
+        Assert.Equal(SimulationAreaSetImmersionCodes.Open,
+            result.E7GateStateCode);
+        Assert.Equal(4, result.H3Audits.Length);
+        Assert.All(result.H3Audits, audit =>
+        {
+            Assert.Equal(SimulationAreaSetImmersionCodes.ImmersionQualified,
+                audit.ImmersionMaturityCode);
+            Assert.Equal(SimulationAreaSetImmersionCodes.Current,
+                audit.FreshnessStateCode);
+            Assert.NotEmpty(audit.H2StableIds);
+            Assert.NotEmpty(audit.H1StableIds);
+            Assert.All(audit.Questions, question =>
+                Assert.Equal("Pass", question.QualificationResultCode));
+        });
+        Assert.Equal(3, result.CrossH3Closures.Length);
+        Assert.All(result.CrossH3Closures, closure =>
+            Assert.Equal("Pass", closure.QualificationResultCode));
+        Assert.False(result.PublicDataChangesSimulationRules);
+        Assert.False(result.PublicDataMovesSpatialDefinitions);
+        Assert.False(result.RuntimeValidated);
+    }
+
+    [Fact]
+    public async Task Farm_E7시작_API는_Current_E6관문을요구하지만_E7완료를주장하지않는다()
+    {
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        const string layoutId = "world-layout:sim:pyeongchang:nature-farm-hub-town.v1";
+        var layout = await client.GetFromJsonAsync<SimulationWorldLayoutDefinitionResponse>(
+            "/api/simulation/v1/world-stream/world-layouts/" + Uri.EscapeDataString(layoutId));
+        Assert.NotNull(layout);
+
+        var readiness = await client.GetFromJsonAsync<SimulationAreaSetImmersionReadinessResponse>(
+            "/api/simulation/v1/world-stream/area-sets/"
+            + Uri.EscapeDataString(PyeongchangAreaSetStableIds.FarmAreaSet)
+            + "/immersion-readiness");
+        Assert.NotNull(readiness);
+        Assert.Equal(SimulationAreaSetImmersionCodes.Open, readiness!.E7GateStateCode);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions/actual-e5/e7",
+            new SimulationActualE5SessionCreateRequest
+            {
+                AreaSetNetworkStableId = PyeongchangAreaSetStableIds.ActualNetwork,
+                AreaSetStableId = PyeongchangAreaSetStableIds.FarmAreaSet,
+                WorldLayoutStableId = layoutId,
+                ExpectedWorldLayoutRevision = layout!.WorldLayoutRevision,
+                ExpectedWorldLayoutHashSha256 = layout.WorldLayoutHashSha256,
+                WorldInteractionIds = new[]
+                {
+                    "WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-LOG-01", "WI-LOG-02",
+                },
+                Session = CreateSessionRequest(),
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var result = await response.Content.ReadFromJsonAsync<SimulationE7LaunchResponse>();
+        Assert.NotNull(result);
+        Assert.Equal("E7", result!.TargetEvidenceStageCode);
+        Assert.False(result.RuntimeValidationCompleted);
+        Assert.Equal(SimulationAreaSetImmersionCodes.ImmersionQualified,
+            result.ImmersionReadiness.ImmersionMaturityCode);
+        Assert.Equal("E5", result.SessionCreation.EvidenceStageCode);
+    }
+
+    [Fact]
+    public async Task E7관문은_과거합격이더라도_Stale이면닫힌다()
+    {
+        var stale = new SimulationAreaSetImmersionReadinessResponse
+        {
+            AreaSetStableId = PyeongchangAreaSetStableIds.FarmAreaSet,
+            SpatialMaturityCode = SimulationAreaSetImmersionCodes.SpatialE5Qualified,
+            ImmersionMaturityCode = SimulationAreaSetImmersionCodes.ImmersionQualified,
+            FreshnessStateCode = SimulationAreaSetImmersionCodes.Stale,
+            E7GateStateCode = SimulationAreaSetImmersionCodes.Closed,
+        };
+        var service = new SimulationAreaSetImmersionService(
+            new FixedImmersionReader(stale));
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.RequireE7GateAsync(PyeongchangAreaSetStableIds.FarmAreaSet));
+
+        Assert.Equal("AreaSetImmersionStale", error.Message);
+        Assert.Equal(SimulationAreaSetImmersionCodes.ImmersionQualified,
+            stale.ImmersionMaturityCode);
+    }
+
+    private static 경영SimulationSession생성Request CreateSessionRequest() => new()
+    {
+        ClientRequestId = Guid.NewGuid(),
+        ScenarioStableId = "scenario:sim.farm-immersive-e5-1",
+        ScenarioDataRevision = "scenario-data:r1",
+        ScenarioSeed = 20260820,
+        RuleRevision = "rule:farm-immersive.r1",
+        DurationTicks = 28,
+        WorldContext = new SimulationWorldContext생성Request
+        {
+            FactionStableId = "faction:sim.farmers-1",
+            TerritoryStableId = "territory:sim.farm-production-1",
+            SettlementStableId = "settlement:sim.farm-home-1",
+            GameDateStartsOn = new DateTimeOffset(2026, 4, 1, 0, 0, 0, TimeSpan.Zero),
+        },
+    };
+
     private static FileSimulationWorldActualE5SpatialCatalogReader Reader() =>
         new(CatalogPath());
 
@@ -123,5 +342,31 @@ public sealed class SimulationWorldActualE5SpatialTests
             current = current.Parent;
         }
         throw new FileNotFoundException("actual-e5-spatial.v1.json");
+    }
+
+    private static string ImmersionCatalogPath()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+        while (current != null)
+        {
+            var candidate = Path.Combine(current.FullName, "eng", "world-seedbeds",
+                "generated", "area-set-immersion-readiness.v1.json");
+            if (File.Exists(candidate)) return candidate;
+            current = current.Parent;
+        }
+        throw new FileNotFoundException("area-set-immersion-readiness.v1.json");
+    }
+
+    private sealed class FixedImmersionReader(
+        SimulationAreaSetImmersionReadinessResponse readiness) :
+        ISimulationAreaSetImmersionCatalogReader
+    {
+        public bool TryRead(out SimulationAreaSetImmersionReadinessResponse value,
+            out string errorCode)
+        {
+            value = readiness;
+            errorCode = string.Empty;
+            return true;
+        }
     }
 }

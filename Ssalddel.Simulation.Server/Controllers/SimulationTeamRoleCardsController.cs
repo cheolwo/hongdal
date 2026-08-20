@@ -43,6 +43,14 @@ public sealed class SimulationTeamRoleCardsController(
         [FromBody] SimulationTeamActivityEndRequest request)
         => Execute(() => service.EndActivity(sessionStableId, request));
 
+    [HttpPost("combat-loadouts/set")]
+    [ProducesResponseType(typeof(SimulationTeamRoleCardStateSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationTeamRoleCardStateSnapshot> SetCombatLoadout(
+        string sessionStableId,
+        [FromBody] SimulationCombatCardLoadoutSetRequest request)
+        => Execute(() => service.SetCombatLoadout(sessionStableId, request));
+
     private ActionResult<SimulationTeamRoleCardStateSnapshot> Execute(
         Func<SimulationTeamRoleCardStateSnapshot> action)
     {

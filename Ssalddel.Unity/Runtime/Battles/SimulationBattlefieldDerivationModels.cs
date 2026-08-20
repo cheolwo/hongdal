@@ -118,9 +118,13 @@ namespace Ssalddel.Unity.Battles
     public sealed class BattleCardModifierApiModel
     {
         public string CardCopyStableId { get; set; } = string.Empty;
+        public string CardDefinitionStableId { get; set; } = string.Empty;
+        public long SourceCardRevision { get; set; }
+        public string ApplicableControlModeCode { get; set; } = string.Empty;
         public string ActorStableId { get; set; } = string.Empty;
         public string ModifierCode { get; set; } = string.Empty;
         public int BasisPoints { get; set; }
+        public string RuleRevision { get; set; } = string.Empty;
     }
 
     public sealed class BattleUnitRosterApiModel
@@ -136,12 +140,18 @@ namespace Ssalddel.Unity.Battles
 
     public sealed class BattleCreatePreviewApiModel
     {
+        public string SessionStableId { get; set; } = string.Empty;
         public long WorldRevision { get; set; }
         public string EncounterStableId { get; set; } = string.Empty;
+        public string AreaStableId { get; set; } = string.Empty;
+        public CombatScaleDecisionApiModel ScaleDecision { get; set; } = new();
+        public LocalCombatWorldContextApiModel LocalWorldContext { get; set; } = new();
         public BattlefieldDerivationApiModel BattlefieldDerivation { get; set; } = new();
         public BattleUnitRosterApiModel UnitRoster { get; set; } = new();
         public bool CanConfirm { get; set; }
         public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
+        public bool SimulationOnly { get; set; }
+        public bool IsOperationalState { get; set; }
     }
 
     public sealed class BattleCreateConfirmDraft

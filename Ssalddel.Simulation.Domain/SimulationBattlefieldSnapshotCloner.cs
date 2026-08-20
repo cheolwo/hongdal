@@ -104,6 +104,51 @@ namespace Ssalddel.Simulation.Domain
             SchemaVersion = value.SchemaVersion,
             ContextStableId = value.ContextStableId,
             ContextRevision = value.ContextRevision,
+            SourceWorldRevision = value.SourceWorldRevision,
+            ContextDerivationRuleVersion = value.ContextDerivationRuleVersion,
+            StaticSpatialContextHashSha256 = value.StaticSpatialContextHashSha256,
+            EncounterScopeHashSha256 = value.EncounterScopeHashSha256,
+            AttackerContextHashSha256 = value.AttackerContextHashSha256,
+            DefenderContextHashSha256 = value.DefenderContextHashSha256,
+            BattleRelevantOverlayHashSha256 = value.BattleRelevantOverlayHashSha256,
+            BattleRelevantRuntime = new SimulationBattleRelevantRuntimeProjectionSnapshot
+            {
+                EncounterScopeStableId = value.BattleRelevantRuntime.EncounterScopeStableId,
+                Facilities = value.BattleRelevantRuntime.Facilities.Select(facility =>
+                    new SimulationRuntimeFacilitySnapshot
+                    {
+                        FacilityStableId = facility.FacilityStableId,
+                        FacilityDefinitionStableId = facility.FacilityDefinitionStableId,
+                        FacilityDefinitionRevision = facility.FacilityDefinitionRevision,
+                        FacilityDefinitionHashSha256 = facility.FacilityDefinitionHashSha256,
+                        PlacementH1StableId = facility.PlacementH1StableId,
+                        AccessConnectorStableIds = facility.AccessConnectorStableIds.ToArray(),
+                        LifecycleCode = facility.LifecycleCode,
+                        IntegrityCode = facility.IntegrityCode,
+                        MaintenanceCode = facility.MaintenanceCode,
+                        DefinedCapabilityCodes = facility.DefinedCapabilityCodes.ToArray(),
+                        EffectiveCapabilities = facility.EffectiveCapabilities.Select(capability =>
+                            new SimulationEffectiveFacilityCapabilitySnapshot
+                            {
+                                CapabilityCode = capability.CapabilityCode,
+                                StateCode = capability.StateCode,
+                                SourceRestrictionStableIds = capability.SourceRestrictionStableIds.ToArray(),
+                            }).ToArray(),
+                    }).ToArray(),
+                Formations = value.BattleRelevantRuntime.Formations.Select(formation =>
+                    new SimulationFormationSnapshot
+                    {
+                        FormationStableId = formation.FormationStableId,
+                        StateCode = formation.StateCode,
+                        MemberActorStableIds = formation.MemberActorStableIds.ToArray(),
+                        GarrisonFacilityStableId = formation.GarrisonFacilityStableId,
+                        StateCompletesAtTick = formation.StateCompletesAtTick,
+                    }).ToArray(),
+                BattleAvailableActorStableIds = value.BattleRelevantRuntime
+                    .BattleAvailableActorStableIds.ToArray(),
+                BattleRelevantOverlayHashSha256 = value.BattleRelevantRuntime
+                    .BattleRelevantOverlayHashSha256,
+            },
             CenterXMeters = value.CenterXMeters,
             CenterZMeters = value.CenterZMeters,
             ContextWidthMeters = value.ContextWidthMeters,
@@ -278,6 +323,8 @@ namespace Ssalddel.Simulation.Domain
         {
             CardCopyStableId = value.CardCopyStableId,
             CardDefinitionStableId = value.CardDefinitionStableId,
+            SourceCardRevision = value.SourceCardRevision,
+            ApplicableControlModeCode = value.ApplicableControlModeCode,
             ActorStableId = value.ActorStableId,
             ModifierCode = value.ModifierCode,
             BasisPoints = value.BasisPoints,

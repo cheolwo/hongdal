@@ -91,6 +91,8 @@ namespace Ssalddel.Simulation.Domain
                     source.FarmSurvival),
                 TeamRoleCards = 경영SimulationSessionAggregate
                     .CloneTeamRoleCardInitialStateOrNull(source.TeamRoleCards),
+                IntegratedWorld = 경영SimulationSessionAggregate
+                    .CloneIntegratedWorldInitialState(source.IntegratedWorld),
             };
 
         public static SimulationCommandLogEntrySnapshot CloneCommand(
@@ -160,6 +162,9 @@ namespace Ssalddel.Simulation.Domain
                 TeamRoleCardEquipRequest = source.TeamRoleCardEquipRequest == null
                     ? null : CloneTeamRoleCardEquipRequest(
                         source.TeamRoleCardEquipRequest),
+                CombatCardLoadoutSetRequest = source.CombatCardLoadoutSetRequest == null
+                    ? null : CloneCombatCardLoadoutSetRequest(
+                        source.CombatCardLoadoutSetRequest),
                 TeamActivityStartRequest = source.TeamActivityStartRequest == null
                     ? null : CloneTeamActivityStartRequest(
                         source.TeamActivityStartRequest),
@@ -188,6 +193,16 @@ namespace Ssalddel.Simulation.Domain
                     {
                         BattleStableId = source.NatureEncounterVictoryRequest.BattleStableId,
                         EncounterStableId = source.NatureEncounterVictoryRequest.EncounterStableId,
+                    },
+                IntegratedWorldConfirmRequest = source.IntegratedWorldConfirmRequest == null
+                    ? null : 경영SimulationSessionAggregate.CloneIntegratedWorldCommand(
+                        source.IntegratedWorldConfirmRequest),
+                FacilityDamageQueueRequest = source.FacilityDamageQueueRequest == null ? null
+                    : new SimulationFacilityDamageQueueRequest
+                    {
+                        BattleStableId = source.FacilityDamageQueueRequest.BattleStableId,
+                        FacilityStableId = source.FacilityDamageQueueRequest.FacilityStableId,
+                        SeverityCode = source.FacilityDamageQueueRequest.SeverityCode,
                     },
             };
 
@@ -317,6 +332,25 @@ namespace Ssalddel.Simulation.Domain
                 TargetActorStableId = source.TargetActorStableId,
                 CardCopyStableId = source.CardCopyStableId,
                 SlotCode = source.SlotCode,
+            };
+
+        public static SimulationCombatCardLoadoutSetRequest
+            CloneCombatCardLoadoutSetRequest(
+                SimulationCombatCardLoadoutSetRequest source)
+            => new SimulationCombatCardLoadoutSetRequest
+            {
+                ClientRequestId = source.ClientRequestId,
+                ExpectedRevision = source.ExpectedRevision,
+                ExpectedTeamPolicyRevision = source.ExpectedTeamPolicyRevision,
+                RequestingActorStableId = source.RequestingActorStableId,
+                TargetActorStableId = source.TargetActorStableId,
+                CombatControlModeCode = source.CombatControlModeCode,
+                Slots = source.Slots.Select(value =>
+                    new SimulationCombatCardLoadoutSlotSnapshot
+                    {
+                        SlotCode = value.SlotCode,
+                        CardCopyStableId = value.CardCopyStableId,
+                    }).ToArray(),
             };
 
         public static SimulationTeamActivityStartRequest

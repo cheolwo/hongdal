@@ -36,6 +36,7 @@ namespace Ssalddel.Simulation.Domain
                         : new[] { "SimulationDurationCompleted" },
                     AvailableCards = CreateAvailableTurnCards(),
                     TarotDraw = CreateTarotDraw(),
+                    TarotContext = CreateTarotContextSnapshot(),
                 };
             }
         }
@@ -113,6 +114,7 @@ namespace Ssalddel.Simulation.Domain
                         SourceUrl = card.SourceUrl,
                         EvidenceCheckedAtUtc = card.EvidenceCheckedAtUtc,
                     }).ToArray();
+                ApplyTarotContext(closing);
                 ObserveRegionalCausalityTurnCards(closing);
                 RebuildNatureThreat(CurrentTick);
 

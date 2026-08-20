@@ -196,6 +196,43 @@ public sealed class SimulationTurnClosingTests
     }
 
     [Fact]
+    public void TURN0_타로는_Frame과Proposal을만들지만_Incident와Effect를자동생성하지않는다()
+    {
+        var service = Service();
+        var session = service.Create(CreateRequest());
+        var offer = service.GetTurnClosingContext(session.SessionStableId)
+            .TarotDraw.Offers.First(value => value.OrientationCode ==
+                Simulation타로카드방향Codes.Upright);
+        var preview = new SimulationTurnClosingPreviewRequest
+        {
+            ExpectedRevision = 0,
+            SelectedTarotCard = new Simulation타로CardSelectionRequest
+            {
+                OfferStableId = offer.OfferStableId,
+                CardStableId = offer.Card.CardStableId,
+                OrientationCode = offer.OrientationCode,
+            },
+        };
+
+        var next = service.ConfirmTurnClosing(session.SessionStableId,
+            ConfirmRequest("command:turn.tarot-context", 0, preview));
+        var frame = Assert.Single(next.TarotContext.FrameSet.ActiveFrames);
+        var proposal = Assert.Single(next.TarotContext.Proposals);
+        var evaluation = Assert.Single(next.TarotContext.IncidentEvaluations);
+
+        Assert.Equal(SimulationTarotFrameScopeCodes.Turn, frame.FrameScopeCode);
+        Assert.Equal(frame.FrameStableId, proposal.SourceFrameStableId);
+        Assert.Equal(SimulationTarotIncidentEvaluationResultCodes.NoIncident,
+            evaluation.EvaluationResultCode);
+        Assert.Empty(evaluation.IncidentStableId);
+        Assert.Empty(evaluation.EffectStableIds);
+        Assert.All(next.TarotContext.Relations,
+            relation => Assert.False(relation.ChangesAvailability));
+        Assert.NotEmpty(next.TarotContext.FrameSet.FrameSetHashSha256);
+        Assert.NotEmpty(next.TarotContext.ContextStateHashSha256);
+    }
+
+    [Fact]
     public void TURN0_같은Command는멱등하고다른카드payload와staleRevision은거부한다()
     {
         var service = Service();
