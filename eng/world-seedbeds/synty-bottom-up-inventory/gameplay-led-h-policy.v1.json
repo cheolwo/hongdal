@@ -1,20 +1,56 @@
 {
   "schemaVersion": "simulation-world-gameplay-led-h-policy.v1",
-  "revision": "simulation-world-gameplay-led-h-policy.r2",
+  "revision": "simulation-world-gameplay-led-h-policy.r7",
   "title": "게임 기획 주도 H 공간 재고 정책",
   "principle": "게임 기획이 H 재고의 범위를 통제하고, H가 WI가 일어날 공간을 제공하며, E가 그 결합의 검증 깊이를 기록한다.",
   "areaSetPriorityPath": "eng/world-seedbeds/synty-bottom-up-inventory/area-set-composition-priorities.v1.json",
   "catalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+  "gameplaySpatialCompletionPath": "eng/world-seedbeds/gameplay-spatial-completion.v1.json",
+  "theoryFactoryPolicyPath": "eng/world-seedbeds/theory-spatial-factory-policy.v1.json",
   "admissionRules": {
     "interactionH1RequiresExistingWiOrAnticipatedGameplay": true,
     "packExpressionH1RequiresCompatibleInteractionH1": true,
     "h2RequiresChildH1AndGamePlan": true,
+    "h1RecognitionIsSufficientForH2Composition": true,
+    "h1OfficialSimulationApprovalIsNotRequiredForH2Composition": true,
+    "h2IsFirstSpatialCompositionJudgmentSurface": true,
+    "h2RequiresDeterministicRelativeLayoutForReview": true,
+    "h2RequiresUnityRootAndFiveViewCaptureForVisualReview": false,
+    "h2TheoryQualificationDoesNotRequireHumanReview": true,
+    "h3TheoryQualificationDoesNotRequireHumanReview": true,
+    "e5TheoryQualificationDoesNotRequireHumanReview": true,
     "h3RequiresChildH2AndGamePlan": true,
+    "packNativeH2MayStageBeforeH3": true,
     "h4RequiresGamePlanRole": true,
     "publicDataFieldsForbiddenInHDefinitions": true,
     "orphanDispositionCode": "QuarantineAsIdeaInventory",
     "automaticDeletionForbidden": true,
     "automaticPromotionForbidden": true
+  },
+  "compositionMaturityModel": {
+    "h1RecognizedPart": "H1은 공간 부품의 의미·표현 후보·게임 맥락이 식별된 상태다. H2 조합 입력이 되기 위해 별도 Simulation 승인을 요구하지 않는다.",
+    "h2Composable": "필수 H1 두 개 이상이 모두 존재하고 게임 기획 묶음 안에서 조합 목적을 설명할 수 있는 상태다.",
+    "h2ReviewReady": "결정적인 상대 배치·위상·내부 관계·외부 연결구·크기 제약과 Unity 조합 Root·표준 5시점 촬영이 준비된 상태다.",
+    "h2Approved": "사람이 H2 조합물 자체를 검토해 승인한 위치 독립 블록 정의다. 실제 AreaSet 배치나 WI E단계는 별도다.",
+    "h2TheoryQualified": "게임 맥락·위상·상대 배치·충돌·연결·입출구·결정성 관문을 통과한 자동 생산 블록이다. 사람 검토 없이 H3 입력으로 사용할 수 있다.",
+    "h3TheoryQualified": "필수 H2의 이론 적격 상태와 블록 이동 폐루프를 통과한 자동 생산 경관이다.",
+    "e5TheoryQualified": "명시적 H4 세계 의도에서 특정 Theory AreaSet·Graph 인스턴스와 관계를 결정적으로 만든 상태다. E6 공공데이터와 E7 실제 플레이는 주장하지 않는다."
+  },
+  "humanReviewPolicy": {
+    "blocking": false,
+    "modeCode": "DeferredBatchReview",
+    "automaticHumanApprovalClaimForbidden": true,
+    "theoryFactoryMayContinueThroughH3AndE5": true
+  },
+  "gameplayTracePolicy": {
+    "independentFromHCompositionState": true,
+    "independentFromEvidenceStage": true,
+    "supportingLandscapeAllowed": true,
+    "strictGamePlanCodes": ["NatureHomeThreatRecovery", "FarmProductionSurvival"],
+    "warningOnlyGamePlanCodes": ["TownLivingMarketSafety", "CityHubLogisticsResilience"],
+    "strictH2GameplayReviewRequiresTrace": true,
+    "unlinkedHExcludedFromGameplayPriority": true,
+    "playableSliceCompletionDoesNotFollowFromHOrEAlone": true
   },
   "supportBlueprintBindings": [
     {
@@ -68,31 +104,36 @@
     {
       "priorityCode": "E-P1",
       "title": "Farm 수확·출하 공간 실행",
+      "evidenceTrackCode": "Integration",
       "targetStageCode": "E5",
       "wiIds": ["WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-LOG-01", "WI-LOG-02"]
     },
     {
       "priorityCode": "E-P2",
       "title": "Hub 입고·검수·보관 공간 실행",
+      "evidenceTrackCode": "Integration",
       "targetStageCode": "E5",
       "wiIds": ["WI-LOG-04", "WI-LOG-05", "WI-001", "WI-002"]
     },
     {
       "priorityCode": "E-P3",
       "title": "Town 입고·주문·수령 공간 실행",
+      "evidenceTrackCode": "Integration",
       "targetStageCode": "E4",
       "wiIds": ["WI-MARKET-02", "WI-MARKET-03", "WI-MARKET-04", "WI-MARKET-05", "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-05", "WI-ORDER-06"]
     },
     {
       "priorityCode": "E-P4",
-      "title": "Nature 사건 행위 계약 보완",
-      "targetStageCode": "E1",
+      "title": "Nature 사건 공간 모판 재검증",
+      "evidenceTrackCode": "Integration",
+      "targetStageCode": "E4",
       "wiIds": ["WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04"],
-      "completionStateCode": "ContractEstablished"
+      "completionStateCode": "SeedbedValidated"
     },
     {
       "priorityCode": "E-P5",
       "title": "선정 WI 공공데이터 계보",
+      "evidenceTrackCode": "Integration",
       "targetStageCode": "E6",
       "selectionPolicyCode": "OnlyAfterE5InstanceAndExplicitRequirement"
     }

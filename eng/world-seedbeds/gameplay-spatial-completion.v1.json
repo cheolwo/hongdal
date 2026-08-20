@@ -1,0 +1,630 @@
+{
+  "schemaVersion": "simulation-world-gameplay-spatial-completion.v1",
+  "revision": "simulation-world-gameplay-spatial-completion.r4",
+  "title": "게임플레이·H 공간·E 증거·완성 단위 결합 대장",
+  "principle": "H는 이론 공간 조립 깊이, GameplayTraceState는 공간의 플레이 기여, E는 실제 증거 깊이, PlayableSliceState는 사람이 완주할 수 있는 마감 상태를 각각 독립적으로 기록한다.",
+  "sourceCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+  "areaSetPriorityPath": "eng/world-seedbeds/synty-bottom-up-inventory/area-set-composition-priorities.v1.json",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "theorySpatialFactoryOutputPath": "eng/world-seedbeds/generated/theory-spatial-factory.v1.json",
+  "actualE5SpatialOutputPath": "eng/world-seedbeds/generated/actual-e5-spatial.v1.json",
+  "traceStateOrder": [
+    "Unlinked",
+    "Supporting",
+    "DirectAction",
+    "SequenceMapped",
+    "LoopMapped",
+    "RegionalCausalityMapped"
+  ],
+  "supportingContributionCodes": [
+    "TraversalGuidance",
+    "SightlineAndLandmark",
+    "ThreatReadability",
+    "BufferAndSafety",
+    "AtmosphereAndIdentity",
+    "StatePresentation",
+    "TransitionHandoff"
+  ],
+  "gatePolicy": {
+    "strictGamePlanCodes": [
+      "NatureHomeThreatRecovery",
+      "FarmProductionSurvival"
+    ],
+    "warningOnlyGamePlanCodes": [
+      "TownLivingMarketSafety",
+      "CityHubLogisticsResilience"
+    ],
+    "unlinkedHExcludedFromGameplayPriority": true,
+    "supportingHAllowed": true,
+    "automaticHPromotionForbidden": true,
+    "scenarioFallbackForMissingE5Forbidden": true,
+    "spatialApprovalAndGameplayReadinessAreIndependent": true,
+    "theorySpatialProductionIndependentFromGameplayTrace": true,
+    "actualE5RequiredForPlayableCompletion": true
+  },
+  "playableSlices": [
+    {
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "revision": 1,
+      "title": "Nature↔Farm 수확과 회복의 하루",
+      "playerPromise": "Nature 안전 생활핵에서 하루를 시작해 Farm의 감자 300kg를 직접 또는 NPC에게 맡겨 수확·집하·포장하고, 사건 결과에 대응한 뒤 귀환하여 다음 날을 연다.",
+      "targetDurationMinutes": {
+        "minimum": 20,
+        "maximum": 40
+      },
+      "playModeCode": "SinglePlayerWithNpcDelegation",
+      "targetPlatformCode": "WindowsPcKeyboardMouse",
+      "canonicalScenePath": "Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "FarmProductionSurvival"
+      ],
+      "targetPlayableSliceStateCode": "PlayableSliceComplete",
+      "declaredPlayableSliceStateCode": "SpatiallyComposed",
+      "theorySpatialBindingStateCode": "E5TheoryQualified",
+      "actualSpatialBindingStateCode": "ActualE5Bound",
+      "entryContext": {
+        "stateCode": "NatureSafeCoreReady",
+        "h1Refs": [
+          "h1-stock:nature-safe-recovery-camp",
+          "h1-stock:nature-trailhead"
+        ],
+        "h2Refs": [
+          "h2-candidate:nature-restoration-recovery",
+          "h2-candidate:nature-trail-shelter"
+        ],
+        "h3Ref": "h3-candidate:nature-threat-recovery",
+        "h4Ref": "h4-blueprint:nature-home-exploration-region"
+      },
+      "steps": [
+        {
+          "stepId": "day-start",
+          "title": "안전 생활핵에서 오늘 목표 확인",
+          "verbCode": "ReviewDayGoal",
+          "wiIds": [],
+          "directH1Refs": [],
+          "supportingH1Refs": [
+            "h1-stock:nature-safe-recovery-camp",
+            "h1-stock:nature-trailhead"
+          ],
+          "supportingContributionCodes": [
+            "SightlineAndLandmark",
+            "TraversalGuidance"
+          ],
+          "h2Refs": [
+            "h2-candidate:nature-restoration-recovery",
+            "h2-candidate:nature-trail-shelter"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-threat-recovery",
+            "h3-candidate:nature-trail-network",
+            "h3-candidate:nature-home-encounter-defense"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region"
+          ],
+          "visibleConsequenceCodes": [
+            "DayGoalVisible",
+            "FarmRouteVisible"
+          ]
+        },
+        {
+          "stepId": "travel-to-farm",
+          "title": "Nature에서 Farm으로 이동",
+          "verbCode": "TravelToFarm",
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "directH1Refs": [],
+          "supportingH1Refs": [
+            "h1-stock:nature-trailhead",
+            "h1-stock:nature-exploration-buffer",
+            "h1-stock:nature-farm-edge"
+          ],
+          "supportingContributionCodes": [
+            "TraversalGuidance",
+            "TransitionHandoff",
+            "AtmosphereAndIdentity"
+          ],
+          "h2Refs": [
+            "h2-candidate:nature-trail-shelter",
+            "h2-candidate:nature-water-buffer",
+            "h2-candidate:forest-edge-farm"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-trail-network",
+            "h3-candidate:nature-exploration-buffer",
+            "h3-candidate:highland-farm"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region",
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "requiredRelationCodes": [
+            "NatureToFarm"
+          ],
+          "visibleConsequenceCodes": [
+            "FarmBoundaryRecognizable"
+          ]
+        },
+        {
+          "stepId": "plan-harvest",
+          "title": "수확 밭과 직접 작업·NPC 위임 선택",
+          "verbCode": "PlanHarvest",
+          "wiIds": [
+            "WI-FARM-04"
+          ],
+          "directH1Refs": [
+            "h1-stock:farm-production"
+          ],
+          "supportingH1Refs": [
+            "h1-stock:farm-work-yard",
+            "h1-stock:farm-tool-storage",
+            "h1-stock:farm-worker-waiting"
+          ],
+          "supportingContributionCodes": [
+            "SightlineAndLandmark",
+            "StatePresentation"
+          ],
+          "h2Refs": [
+            "h2-candidate:highland-production",
+            "h2-candidate:farm-seed-and-tools",
+            "h2-candidate:farm-worker-support",
+            "h2-candidate:farm-processing-shipping"
+          ],
+          "h3Refs": [
+            "h3-candidate:highland-farm",
+            "h3-candidate:farm-processing-campus",
+            "h3-candidate:farm-seasonal-production-loop"
+          ],
+          "h4Refs": [
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "visibleConsequenceCodes": [
+            "SelectedParcelVisible",
+            "DelegationModeVisible",
+            "PreviewCostsVisible"
+          ]
+        },
+        {
+          "stepId": "harvest",
+          "title": "감자 300kg 수확",
+          "verbCode": "Harvest",
+          "wiIds": [
+            "WI-FARM-04"
+          ],
+          "directH1Refs": [
+            "h1-stock:farm-production",
+            "h1-stock:farm-harvest-staging"
+          ],
+          "supportingH1Refs": [
+            "h1-stock:nature-farm-edge"
+          ],
+          "supportingContributionCodes": [
+            "StatePresentation"
+          ],
+          "h2Refs": [
+            "h2-candidate:highland-production",
+            "h2-candidate:farm-wash-sort-pack"
+          ],
+          "h3Refs": [
+            "h3-candidate:highland-farm",
+            "h3-candidate:farm-processing-campus"
+          ],
+          "h4Refs": [
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "visibleConsequenceCodes": [
+            "HarvestedParcelVisible",
+            "HarvestLot300KgmVisible"
+          ]
+        },
+        {
+          "stepId": "collect",
+          "title": "수확물 집하",
+          "verbCode": "CollectHarvest",
+          "wiIds": [
+            "WI-FARM-05"
+          ],
+          "directH1Refs": [
+            "h1-stock:farm-harvest-staging",
+            "h1-stock:farm-work-yard"
+          ],
+          "supportingH1Refs": [],
+          "supportingContributionCodes": [],
+          "h2Refs": [
+            "h2-candidate:farm-wash-sort-pack",
+            "h2-candidate:farm-processing-shipping"
+          ],
+          "h3Refs": [
+            "h3-candidate:farm-processing-campus"
+          ],
+          "h4Refs": [
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "visibleConsequenceCodes": [
+            "HarvestLotMovedToYard"
+          ]
+        },
+        {
+          "stepId": "pack",
+          "title": "출하 준비·포장",
+          "verbCode": "PackForShipment",
+          "wiIds": [
+            "WI-FARM-06"
+          ],
+          "directH1Refs": [
+            "h1-stock:farm-work-yard"
+          ],
+          "supportingH1Refs": [
+            "h1-stock:farm-harvest-staging"
+          ],
+          "supportingContributionCodes": [
+            "StatePresentation"
+          ],
+          "h2Refs": [
+            "h2-candidate:farm-wash-sort-pack",
+            "h2-candidate:farm-processing-shipping"
+          ],
+          "h3Refs": [
+            "h3-candidate:farm-processing-campus"
+          ],
+          "h4Refs": [
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "visibleConsequenceCodes": [
+            "PackageLotPrepared",
+            "CargoPreparedForShipment"
+          ]
+        },
+        {
+          "stepId": "farm-incident-decision",
+          "title": "수확물 노출 사건의 안전 처리 또는 방치",
+          "verbCode": "RespondToFarmIncident",
+          "wiIds": [],
+          "directH1Refs": [
+            "h1-stock:farm-exposure-inspection",
+            "h1-stock:farm-incident-quarantine"
+          ],
+          "supportingH1Refs": [
+            "h1-stock:farm-loss-recovery",
+            "h1-stock:farm-restoration-supply"
+          ],
+          "supportingContributionCodes": [
+            "ThreatReadability",
+            "StatePresentation",
+            "TransitionHandoff"
+          ],
+          "h2Refs": [
+            "h2-candidate:farm-incident-containment",
+            "h2-candidate:farm-loss-restoration-handoff"
+          ],
+          "h3Refs": [
+            "h3-candidate:farm-incident-recovery"
+          ],
+          "h4Refs": [
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "visibleConsequenceCodes": [
+            "ExposureRiskVisible",
+            "SafeHandoffVisible",
+            "DeadlineVisible"
+          ]
+        },
+        {
+          "stepId": "observe-threat",
+          "title": "NatureToFarm 위협 관찰·흔적 조사",
+          "verbCode": "ObserveThreat",
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "directH1Refs": [
+            "h1-stock:nature-threat-watch",
+            "h1-stock:nature-incident-trace"
+          ],
+          "supportingH1Refs": [],
+          "supportingContributionCodes": [],
+          "h2Refs": [
+            "h2-candidate:nature-threat-response"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-threat-recovery"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region"
+          ],
+          "visibleConsequenceCodes": [
+            "NatureToFarmPressureVisible",
+            "IncidentLineageVisible"
+          ]
+        },
+        {
+          "stepId": "retreat",
+          "title": "긴급 후퇴",
+          "verbCode": "Retreat",
+          "wiIds": [
+            "WI-NATURE-02"
+          ],
+          "directH1Refs": [
+            "h1-stock:nature-emergency-retreat"
+          ],
+          "supportingH1Refs": [
+            "h1-stock:nature-safe-recovery-camp"
+          ],
+          "supportingContributionCodes": [
+            "BufferAndSafety",
+            "TraversalGuidance"
+          ],
+          "h2Refs": [
+            "h2-candidate:nature-threat-response",
+            "h2-candidate:nature-restoration-recovery"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-threat-recovery"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region"
+          ],
+          "visibleConsequenceCodes": [
+            "EmergencyExitVisible",
+            "SafeCoreVisible"
+          ]
+        },
+        {
+          "stepId": "restore-route",
+          "title": "Farm 원인 해결 뒤 Nature 경로 복원",
+          "verbCode": "Restore",
+          "wiIds": [
+            "WI-NATURE-03"
+          ],
+          "directH1Refs": [
+            "h1-stock:nature-restoration-site"
+          ],
+          "supportingH1Refs": [
+            "h1-stock:farm-restoration-supply"
+          ],
+          "supportingContributionCodes": [
+            "TransitionHandoff",
+            "StatePresentation"
+          ],
+          "h2Refs": [
+            "h2-candidate:nature-restoration-recovery",
+            "h2-candidate:farm-loss-restoration-handoff"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-threat-recovery",
+            "h3-candidate:farm-incident-recovery"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region",
+            "h4-blueprint:farm-production-processing-region"
+          ],
+          "requiredRelationCodes": [
+            "NatureToFarm"
+          ],
+          "visibleConsequenceCodes": [
+            "RestorationMaterialVisible",
+            "RouteRestoredVisible"
+          ]
+        },
+        {
+          "stepId": "recover-party",
+          "title": "안전 생활핵에서 파티 회복",
+          "verbCode": "Recover",
+          "wiIds": [
+            "WI-NATURE-04"
+          ],
+          "directH1Refs": [
+            "h1-stock:nature-safe-recovery-camp"
+          ],
+          "supportingH1Refs": [],
+          "supportingContributionCodes": [],
+          "h2Refs": [
+            "h2-candidate:nature-restoration-recovery"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-threat-recovery"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region"
+          ],
+          "visibleConsequenceCodes": [
+            "PartyRecoveredVisible",
+            "NextActionAvailable"
+          ]
+        },
+        {
+          "stepId": "close-day",
+          "title": "턴 결과와 다음 날 조건 확인",
+          "verbCode": "CloseDay",
+          "wiIds": [],
+          "directH1Refs": [],
+          "supportingH1Refs": [
+            "h1-stock:nature-safe-recovery-camp"
+          ],
+          "supportingContributionCodes": [
+            "StatePresentation"
+          ],
+          "h2Refs": [
+            "h2-candidate:nature-restoration-recovery"
+          ],
+          "h3Refs": [
+            "h3-candidate:nature-threat-recovery"
+          ],
+          "h4Refs": [
+            "h4-blueprint:nature-home-exploration-region"
+          ],
+          "visibleConsequenceCodes": [
+            "DayResultVisible",
+            "NextDayConditionPreviewVisible"
+          ]
+        }
+      ],
+      "branches": [
+        {
+          "branchCode": "SafeHarvestReturn",
+          "title": "수확물을 기한 내 집하·포장하고 귀환",
+          "stepIds": [
+            "day-start",
+            "travel-to-farm",
+            "plan-harvest",
+            "harvest",
+            "collect",
+            "pack",
+            "farm-incident-decision",
+            "recover-party",
+            "close-day"
+          ],
+          "completionStateCode": "NextDayReady"
+        },
+        {
+          "branchCode": "RetreatAndRecover",
+          "title": "노출 사건 방치 뒤 위협 관찰·후퇴·회복",
+          "stepIds": [
+            "day-start",
+            "travel-to-farm",
+            "plan-harvest",
+            "harvest",
+            "farm-incident-decision",
+            "observe-threat",
+            "retreat",
+            "recover-party",
+            "close-day"
+          ],
+          "completionStateCode": "NextDayReadyWithUnresolvedFarmCause"
+        },
+        {
+          "branchCode": "ResolveRestoreAndRecover",
+          "title": "Farm 원인을 해결하고 Nature 경로를 복원·회복",
+          "stepIds": [
+            "day-start",
+            "travel-to-farm",
+            "plan-harvest",
+            "harvest",
+            "farm-incident-decision",
+            "collect",
+            "pack",
+            "observe-threat",
+            "restore-route",
+            "recover-party",
+            "close-day"
+          ],
+          "completionStateCode": "NextDayReadyAfterRestoration"
+        }
+      ],
+      "regionalHandoffs": [
+        {
+          "handoffCode": "NatureToFarmTraversal",
+          "fromH4Ref": "h4-blueprint:nature-home-exploration-region",
+          "toH4Ref": "h4-blueprint:farm-production-processing-region",
+          "relationCode": "NatureToFarm",
+          "theoryBindingStateCode": "E5TheoryQualified",
+          "actualBindingStateCode": "ActualE5Bound"
+        },
+        {
+          "handoffCode": "FarmIncidentToNatureThreat",
+          "fromH4Ref": "h4-blueprint:farm-production-processing-region",
+          "toH4Ref": "h4-blueprint:nature-home-exploration-region",
+          "relationCode": "IncidentToNatureThreat",
+          "theoryBindingStateCode": "DesignLineageOnly",
+          "actualBindingStateCode": "DesignLineageOnly"
+        },
+        {
+          "handoffCode": "FarmRestorationSupplyToNature",
+          "fromH4Ref": "h4-blueprint:farm-production-processing-region",
+          "toH4Ref": "h4-blueprint:nature-home-exploration-region",
+          "relationCode": "RecoveryToNature",
+          "theoryBindingStateCode": "DesignLineageOnly",
+          "actualBindingStateCode": "DesignLineageOnly"
+        }
+      ],
+      "conditionSlots": [
+        {
+          "conditionSlotCode": "NextDayManagementCondition",
+          "allowedStateCodes": [
+            "Normal",
+            "Opportunity",
+            "Threat",
+            "Recovery"
+          ],
+          "affectedStepIds": [
+            "plan-harvest",
+            "travel-to-farm",
+            "farm-incident-decision",
+            "close-day"
+          ],
+          "spatialExpressionH1Refs": [
+            "h1-stock:farm-production",
+            "h1-stock:farm-work-yard",
+            "h1-stock:nature-threat-watch",
+            "h1-stock:nature-safe-recovery-camp"
+          ],
+          "authorityBoundary": "구체 카드·수치·보정선은 서버 턴 규칙이 확정하며 이 대장은 공간 표현 연결점만 가진다."
+        }
+      ],
+      "completionGates": {
+        "planned": {
+          "required": true,
+          "evidenceRefs": [
+            "docs/Content/기준플레이01-수확과출하의날.md",
+            "docs/Architecture/지역사건-자연권위협-규칙.md"
+          ]
+        },
+        "theorySpatiallyComposed": {
+          "required": true,
+          "evidenceRefs": [
+            "eng/world-seedbeds/generated/theory-spatial-factory.v1.json"
+          ],
+          "blockReasonCodes": []
+        },
+        "spatiallyComposed": {
+          "required": true,
+          "evidenceRefs": [
+            "eng/world-seedbeds/generated/actual-e5-spatial.v1.json"
+          ],
+          "blockReasonCodes": []
+        },
+        "functionallyClosed": {
+          "required": true,
+          "evidenceRefs": [],
+          "blockReasonCodes": [
+            "FullNormalAndRecoveryRuntimeEvidenceMissing"
+          ]
+        },
+        "experienceValidated": {
+          "required": true,
+          "evidenceRefs": [],
+          "blockReasonCodes": [
+            "FirstTimePlayerEvidenceMissing"
+          ]
+        },
+        "playableSliceComplete": {
+          "required": true,
+          "evidenceRefs": [],
+          "blockReasonCodes": [
+            "VisualAudioPerformancePolishEvidenceMissing",
+            "SavedScenePlayModeGameViewEvidenceMissing"
+          ]
+        }
+      }
+    }
+  ],
+  "nextPlayableSliceQueue": [
+    {
+      "priority": 1,
+      "playableSliceId": "reference-play:farm-hub-supply-line.v1",
+      "title": "Farm→Hub 공급선",
+      "blockedByPlayableSliceId": "reference-play:nature-farm-day.v1"
+    },
+    {
+      "priority": 2,
+      "playableSliceId": "reference-play:hub-town-market-day.v1",
+      "title": "Hub→Town 시장·수령의 하루",
+      "blockedByPlayableSliceId": "reference-play:farm-hub-supply-line.v1"
+    }
+  ],
+  "authorityBoundary": "이 대장은 이론 공간 조립·게임플레이 추적과 완성 차단 사유를 기록한다. E5TheoryQualified는 실제 지역 LandscapeGraph·AreaSet, 공공데이터 E6, Runtime E7, 서버 상태 또는 Unity 실행 결과가 아니다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

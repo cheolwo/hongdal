@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-area-set-composition-priorities.v1",
-  "revision": "simulation-world-area-set-composition-priorities.r5",
+  "revision": "simulation-world-area-set-composition-priorities.r9",
   "purpose": "게임 기획 묶음이 H 재고 범위를 통제하도록 Nature·Farm·Town·City/Hub의 핵심 경험과 H1→H2→H3→H4 상향 조립 순서를 관리한다.",
   "areaSetCandidates": [
     {
@@ -10,8 +10,8 @@
       "title": "Nature 생활·탐험 AreaSet",
       "primaryExpressionPackCode": "Nature",
       "stateCode": "ReadyForDesignComposition",
-      "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network"],
-      "optionalH3Refs": ["h3-candidate:nature-exploration-buffer"],
+      "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network", "h3-candidate:nature-home-encounter-defense"],
+      "optionalH3Refs": ["h3-candidate:nature-exploration-buffer", "h3-candidate:nature-town-relief-loop"],
       "playerWorldRoleCode": "PersistentHomeWorld"
       ,"corePlayerVerbCodes": ["Explore", "ObserveThreat", "Retreat", "Restore", "Recover"]
       ,"coreWiIds": ["WI-WORLD-05", "WI-WORLD-07", "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04"]
@@ -23,7 +23,7 @@
       "title": "Farm 생산·생존 AreaSet",
       "primaryExpressionPackCode": "Farm",
       "stateCode": "ReadyForDesignComposition",
-      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus", "h3-candidate:farm-incident-recovery"],
+      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus", "h3-candidate:farm-incident-recovery", "h3-candidate:farm-seasonal-production-loop"],
       "optionalH3Refs": ["h3-candidate:farm-hub-logistics"],
       "playerWorldRoleCode": "ProfessionalWorld"
       ,"corePlayerVerbCodes": ["Cultivate", "Harvest", "ContainIncident", "RecoverLoss", "Ship"]
@@ -36,8 +36,8 @@
       "title": "Town 생활·시장 AreaSet",
       "primaryExpressionPackCode": "Town",
       "stateCode": "ReadyForDesignComposition",
-      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief"],
-      "optionalH3Refs": [],
+      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief", "h3-candidate:town-resident-service-loop"],
+      "optionalH3Refs": ["h3-candidate:nature-town-relief-loop"],
       "playerWorldRoleCode": "ProfessionalWorld"
       ,"corePlayerVerbCodes": ["ReceiveGoods", "Display", "Order", "Pack", "Pickup", "RelieveResidents"]
       ,"coreWiIds": ["WI-MARKET-02", "WI-MARKET-03", "WI-MARKET-04", "WI-MARKET-05", "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-05", "WI-ORDER-06"]
@@ -49,7 +49,7 @@
       "title": "City/Hub 물류 AreaSet",
       "primaryExpressionPackCode": "City",
       "stateCode": "QueuedAfterTown",
-      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub"],
+      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub", "h3-candidate:hub-maintenance-emergency-loop"],
       "optionalH3Refs": [],
       "playerWorldRoleCode": "ProfessionalWorld"
       ,"corePlayerVerbCodes": ["Unload", "Inspect", "Store", "Pick", "Stage", "Load"]
@@ -66,7 +66,10 @@
   "authorityBoundary": {
     "h4CandidateIsNotActualAreaSet": true,
     "primaryPackDoesNotDefineSpatialAuthority": true,
-    "e5AreaSetInstanceRequiresWorldIntentAndAuthoredPlacement": true,
+    "e5AreaSetInstanceRequiresWorldIntentAndAuthoredPlacement": false,
+    "e5AreaSetInstanceRequiresWorldIntentAndDeterministicPlacement": true,
+    "humanReviewRequiredForE5TheoryQualification": false,
+    "theoryGeneratedAreaSetMustUseDistinctStableId": true,
     "publicDataLineageBelongsOnlyToE6": true,
     "scenarioFallbackForbidden": true
   },

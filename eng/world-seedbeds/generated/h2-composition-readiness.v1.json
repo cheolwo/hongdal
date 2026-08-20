@@ -1,0 +1,1583 @@
+{
+  "schemaVersion": "simulation-world-h2-composition-readiness.v1",
+  "revision": "simulation-world-h2-composition-readiness.r3",
+  "catalogRevision": "simulation-world-spatial-design-knowledge.r3",
+  "catalogSha256": "4e08c7d9243d504c9aaa1520e4f9af505e3ca4793ba473db02a9e5494dad5c37",
+  "priorityRevision": "simulation-world-h2-composition-priorities.r3",
+  "prioritySha256": "5bed216f1f27e8b90d073c0f520d1e285ae020f781dfd1b852da2b9d208150a8",
+  "recipeRevision": "simulation-world-h2-composition-recipes.r4",
+  "recipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+  "unityEvidenceRevision": "simulation-world-h2-unity-review-evidence.r1",
+  "unityEvidenceSha256": "f0e7cfd4901f513c66f54560d57f8aaabf0da2d27c4e448078dad2e6cfa70b73",
+  "gameplayCompletionRevision": "simulation-world-gameplay-spatial-completion.r4",
+  "gameplayCompletionSha256": "8eaf4e65763546343a658f5437246a6d36b1d3aff35cf9e35e0aa76ad23d4f08",
+  "theoryFactoryRevision": "simulation-world-theory-spatial-factory-output.r2",
+  "theoryFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r3",
+  "theoryFactorySha256": "20967a8269abd1bcb80f5418a28ada686b75cf8c8fab044e6db97b0c9b4807ad",
+  "recognitionRule": "H1 정의가 존재하고 WI 또는 예상 게임 플레이, 공간 역할, Synty 팩 또는 기준 문법 표현 근거가 각각 하나 이상이면 인지 부품이다. 공식 Simulation 승인 상태는 H2 조합 조건이 아니다.",
+  "theoryProductionRule": "H2는 인지된 필수 H1, 게임 맥락, 연결된 결정적 상대 배치와 출입 연결구를 갖추면 TheoryQualified가 된다. 사람 검토와 게임플레이 추적은 이론 생산을 막지 않는다.",
+  "reviewRule": "TheoryQualified H2에 Unity H2 Root와 표준 5시점 촬영 근거가 등록되면 사람 검토 준비가 된다. 검토 부재는 별도 상태로 보이되 이론 생산을 되돌리지 않는다.",
+  "gameplayRule": "Nature·Farm의 엄격 추적은 게임플레이 우선순위만 막는다. Town·Hub 추적 누락은 경고이며, 어느 추적 상태도 H2 이론 생산의 자격 조건이 아니다.",
+  "counts": {
+    "h1RecognizedPartCount": 52,
+    "h1UsedByH2Count": 51,
+    "h2CandidateCount": 34,
+    "h2ComposableCount": 34,
+    "h2TheoryQualifiedCount": 34,
+    "h2AuthoredTheoryRecipeCount": 6,
+    "h2DerivedTheoryRecipeCount": 28,
+    "h2DetailedRecipeReadyCount": 6,
+    "h2UnityReviewEvidenceCount": 6,
+    "h2ReviewReadyCount": 6,
+    "h2TheoryProductionBlockedByHumanReviewCount": 0,
+    "h2GameplayTraceCount": 12,
+    "h2StrictGameplayGateCount": 20,
+    "h2StrictGameplayTraceMissingCount": 8,
+    "h2WarningOnlyGameplayTraceMissingCount": 12,
+    "h2GameplayTheoryPriorityReadyCount": 24,
+    "h2GameplayReviewPriorityReadyCount": 5,
+    "h2GameplayPriorityReadyCount": 24
+  },
+  "items": [
+    {
+      "h2StableId": "h2-candidate:farm-harvest-throughput",
+      "title": "농장 집중 수확·집하 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-production",
+        "h1-stock:farm-harvest-staging",
+        "h1-stock:farm-work-yard"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-production",
+        "h1-stock:farm-harvest-staging",
+        "h1-stock:farm-work-yard"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "44e3a692490174ecf0a62c9a743d0df2be545f1146d91ed786bc8d4d34c92eab",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-hub-corridor",
+      "title": "Farm–Hub 회랑 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-loading-gate",
+        "h1-stock:farm-hub-corridor"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-loading-gate",
+        "h1-stock:farm-hub-corridor"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "f030017b98bf70bccb5f9948d380e54126d34be73d099a014d77c15d017e35dd",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [],
+      "gameplayGateModeCode": "NotSelected",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-incident-containment",
+      "title": "농장 사건 점검·격리 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "ReviewReady",
+      "requiredH1Refs": [
+        "h1-stock:farm-exposure-inspection",
+        "h1-stock:farm-incident-quarantine",
+        "h1-stock:farm-weather-protection"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-exposure-inspection",
+        "h1-stock:farm-incident-quarantine",
+        "h1-stock:farm-weather-protection"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": "h2-composition:farm-incident-containment.r1",
+      "theoryRecipeSourceCode": "AuthoredRecipe",
+      "theoryHashSha256": "337aa0d2254c91727b2bd5ffdb851e99b00dc4afc1835f69aadaeec3a84cc614",
+      "unityReviewEvidenceRef": "h2-unity-review-evidence:farm-incident-containment.r1",
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": true,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": "farm-incident-decision",
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": true,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-irrigation-service",
+      "title": "농장 관수·급수 관리 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-production",
+        "h1-stock:farm-maintenance-yard",
+        "h1-stock:farm-weather-protection"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-production",
+        "h1-stock:farm-maintenance-yard",
+        "h1-stock:farm-weather-protection"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "46a16b3b8ebd0c851dea1b5ba686f96419d9ca2e318853758a8c7261c91d1511",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-loss-restoration-handoff",
+      "title": "농장 손실 회복·복원 인계 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "ReviewReady",
+      "requiredH1Refs": [
+        "h1-stock:farm-incident-quarantine",
+        "h1-stock:farm-loss-recovery",
+        "h1-stock:farm-restoration-supply"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-incident-quarantine",
+        "h1-stock:farm-loss-recovery",
+        "h1-stock:farm-restoration-supply"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": "h2-composition:farm-loss-restoration-handoff.r1",
+      "theoryRecipeSourceCode": "AuthoredRecipe",
+      "theoryHashSha256": "2fcad303201511473b2354a161dfdd39b550e54564c09efa692bdd952a0208c2",
+      "unityReviewEvidenceRef": "h2-unity-review-evidence:farm-loss-restoration-handoff.r1",
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": true,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "farm-incident-decision",
+        "restore-route"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": true,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-processing-shipping",
+      "title": "농장 작업·출하 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-work-yard",
+        "h1-stock:farm-maintenance-yard",
+        "h1-stock:farm-loading-gate"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-work-yard",
+        "h1-stock:farm-maintenance-yard",
+        "h1-stock:farm-loading-gate"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "e6848b470fb4b1f81bfd24c1fbc8af1a4cbfa409aaef715f2cadc74968bc0a20",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "collect",
+        "pack",
+        "plan-harvest"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-seed-and-tools",
+      "title": "종자·농기구 준비 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-tool-storage",
+        "h1-stock:farm-seed-preparation"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-tool-storage",
+        "h1-stock:farm-seed-preparation"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "eef071a4f1763438fa05ab47b932c81a9a01b81c39a20366de3e15146a4dca55",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": "plan-harvest",
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-wash-sort-pack",
+      "title": "세척·선별·포장 블록",
+      "inventoryStateCode": "IdeaInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-harvest-staging",
+        "h1-stock:farm-washing",
+        "h1-stock:farm-sorting",
+        "h1-stock:farm-work-yard"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-harvest-staging",
+        "h1-stock:farm-washing",
+        "h1-stock:farm-sorting",
+        "h1-stock:farm-work-yard"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "279345a33ebb1b84ae61a7e1065b6d3dd87227b73bf04d9493e80649ecb7e4eb",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "collect",
+        "harvest",
+        "pack"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:farm-worker-support",
+      "title": "농장 작업 지원 블록",
+      "inventoryStateCode": "IdeaInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-worker-waiting",
+        "h1-stock:farm-tool-storage",
+        "h1-stock:farm-maintenance-yard"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-worker-waiting",
+        "h1-stock:farm-tool-storage",
+        "h1-stock:farm-maintenance-yard"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "57c5e8056eefac0788ec47ee412a9a74a65a836550882c036a4e7e86020b95f3",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": "plan-harvest",
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:forest-edge-farm",
+      "title": "숲 경계 농장 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:nature-farm-edge",
+        "h1-stock:nature-exploration-buffer",
+        "h1-stock:farm-production"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-farm-edge",
+        "h1-stock:nature-exploration-buffer",
+        "h1-stock:farm-production"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "1deb9fddedd25e3d61118a73fb392fc0acef9d4dee9ecf25d8dfaa67062ecffc",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival",
+        "NatureHomeThreatRecovery"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": "travel-to-farm",
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:highland-production",
+      "title": "고지대 생산 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:farm-production",
+        "h1-stock:nature-farm-edge"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:farm-production",
+        "h1-stock:nature-farm-edge"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "25eaaaed36c6eb99c30ec001773b2d5200ffd28595520af41086c7ee55b45fad",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "FarmProductionSurvival"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "harvest",
+        "plan-harvest"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:hub-emergency-power",
+      "title": "Hub 비상 전력·보관 유지 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-cold-storage",
+        "h1-stock:hub-long-term-storage",
+        "h1-stock:hub-service-maintenance"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-cold-storage",
+        "h1-stock:hub-long-term-storage",
+        "h1-stock:hub-service-maintenance"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "ebd14a52c82a64719d121045525523de0b7d95f31d15d2444e3d7d4442bf94a3",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-inbound-storage",
+      "title": "Hub 입고·창고 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-receiving-storage",
+        "h1-stock:hub-service-maintenance"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-receiving-storage",
+        "h1-stock:hub-service-maintenance"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "f628c5d4123675733d0cdcec6287e64142d5402820e101ce7fc596d13cab8155",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-longterm-cold-storage",
+      "title": "Hub 장기·저온 보관 블록",
+      "inventoryStateCode": "IdeaInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-long-term-storage",
+        "h1-stock:hub-cold-storage"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-long-term-storage",
+        "h1-stock:hub-cold-storage"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "33d99186b036a37ed6876599de7fe2d8775ceb25fa30afd6748be7736280da29",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-maintenance-yard",
+      "title": "Hub 차량·시설 정비 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-vehicle-yard",
+        "h1-stock:hub-service-maintenance"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-vehicle-yard",
+        "h1-stock:hub-service-maintenance"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "04d78c007765519dfcbde02a64f4123aac23b3c5e8e389d98f7f5569caa69f03",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-outbound-vehicle",
+      "title": "Hub 출고·차량 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-outbound-staging",
+        "h1-stock:hub-vehicle-yard",
+        "h1-stock:hub-market-transfer"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-outbound-staging",
+        "h1-stock:hub-vehicle-yard",
+        "h1-stock:hub-market-transfer"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "4f6884984e458c671743299f445e6ccff13d6acb9e379e4d0d12fe782da70a75",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-quarantine-staging",
+      "title": "Hub 검역·격리 블록",
+      "inventoryStateCode": "IdeaInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-receiving-storage",
+        "h1-stock:hub-quarantine",
+        "h1-stock:hub-temporary-staging"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-receiving-storage",
+        "h1-stock:hub-quarantine",
+        "h1-stock:hub-temporary-staging"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "7b82c57cea229e6e50d4385f7c31ca345aa9509f59fde2f3b0746cb3ab164548",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-returns-processing",
+      "title": "Hub 반품 처리 블록",
+      "inventoryStateCode": "IdeaInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-returns",
+        "h1-stock:hub-quarantine"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-returns",
+        "h1-stock:hub-quarantine"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "6b4ecb72e3e8a578309118590154cbebb58347b33caed0bbb254fe639f9caa27",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "CityHubLogisticsResilience"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:hub-town-corridor",
+      "title": "Hub–Town 회랑 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:hub-market-transfer",
+        "h1-stock:hub-town-corridor",
+        "h1-stock:road-facility-access"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:hub-market-transfer",
+        "h1-stock:hub-town-corridor",
+        "h1-stock:road-facility-access"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "f0537f2df3fce83ff45f6149a56c075e257ce971622e193b53b66b6437d6da19",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [],
+      "gameplayGateModeCode": "NotSelected",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:lowrise-residential",
+      "title": "저층 주거 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:town-living-square",
+        "h1-stock:town-resident-pickup"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-living-square",
+        "h1-stock:town-resident-pickup"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "892a17cff28be73126b51b588a1784e033da6fe040afd5c42c5c78c262f977c3",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:market-life-commerce",
+      "title": "마트·생활상권 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:town-market-receiving",
+        "h1-stock:town-market-display",
+        "h1-stock:town-order-packing",
+        "h1-stock:town-resident-pickup",
+        "h1-stock:town-living-square"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-market-receiving",
+        "h1-stock:town-market-display",
+        "h1-stock:town-order-packing",
+        "h1-stock:town-resident-pickup",
+        "h1-stock:town-living-square"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "ea27bea8bddfe33394caf9b5f14ca69cee9fe2d07d88a23c67ba462414e14e88",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:nature-defense-ring",
+      "title": "자연 야간 방어 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-shelter",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-shelter",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "63187a78855d44a279bcd57a51dcd2cb7f18c1c59f7b4be81feee7cd7816c950",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-encounter-route",
+      "title": "자연 몬스터 조우·이탈 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-emergency-retreat"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-emergency-retreat"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "136d655d9ee09e884eb10630f13c2cddbca1c6f6caae9e04a66e1408d5ded73a",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-home-core",
+      "title": "자연 안전 생활핵 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:nature-safe-recovery-camp",
+        "h1-stock:nature-shelter",
+        "h1-stock:nature-trailhead"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-safe-recovery-camp",
+        "h1-stock:nature-shelter",
+        "h1-stock:nature-trailhead"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "338569ad415d83908a7523d4619ee2946f16fea1c3e4b1fb1de19abe5d70d37b",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-restoration-recovery",
+      "title": "자연 복원·안전 회복 블록",
+      "inventoryStateCode": "CandidateForReview",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "ReviewReady",
+      "requiredH1Refs": [
+        "h1-stock:nature-restoration-site",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-restoration-site",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": "h2-composition:nature-restoration-recovery.r1",
+      "theoryRecipeSourceCode": "AuthoredRecipe",
+      "theoryHashSha256": "01e0817bd1bbc019e4156fc85ec302f77ed09a71397345fb2555539004d89b88",
+      "unityReviewEvidenceRef": "h2-unity-review-evidence:nature-restoration-recovery.r1",
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": true,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "close-day",
+        "day-start",
+        "recover-party",
+        "restore-route",
+        "retreat"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": true,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-threat-response",
+      "title": "자연 위협 추적·대피 블록",
+      "inventoryStateCode": "CandidateForReview",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "ReviewReady",
+      "requiredH1Refs": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-emergency-retreat"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-emergency-retreat"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": "h2-composition:nature-threat-response.r1",
+      "theoryRecipeSourceCode": "AuthoredRecipe",
+      "theoryHashSha256": "5225081c4fae142c3fea0d17a8fa83d04628a41d4fbf4b57c198971e06983d3b",
+      "unityReviewEvidenceRef": "h2-unity-review-evidence:nature-threat-response.r1",
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": true,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "observe-threat",
+        "retreat"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": true,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-town-relief-transition",
+      "title": "Nature–Town 대피·구호 전환 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:town-nature-relief",
+        "h1-stock:nature-restoration-site",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-nature-relief",
+        "h1-stock:nature-restoration-site",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "7a0e43fc42791cde25f8a2abc81d380599c54731e6d23da8dea716ffe7e4d516",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-trail-shelter",
+      "title": "자연 탐색·대피 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:nature-trailhead",
+        "h1-stock:nature-lookout",
+        "h1-stock:nature-shelter"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-trailhead",
+        "h1-stock:nature-lookout",
+        "h1-stock:nature-shelter"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "ae5d94835081bee3dee8c02d90cae151b5ae93bd8c8e1112e64d0bda0d2c81e0",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": [
+        "day-start",
+        "travel-to-farm"
+      ],
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:nature-water-buffer",
+      "title": "산림·수변 완충 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:nature-exploration-buffer",
+        "h1-stock:nature-farm-edge"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:nature-exploration-buffer",
+        "h1-stock:nature-farm-edge"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "04fd5f365c27dfb83bfd5fca51501a8c39ba3527044756c719150fb0b0a74552",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "gameplayTraceSliceIds": "reference-play:nature-farm-day.v1",
+      "gameplayTraceStepIds": "travel-to-farm",
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:town-contamination-control",
+      "title": "생활권 오염 점검·정화 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "ReviewReady",
+      "requiredH1Refs": [
+        "h1-stock:town-contamination-inspection",
+        "h1-stock:town-contamination-quarantine",
+        "h1-stock:town-cleanup-transfer"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-contamination-inspection",
+        "h1-stock:town-contamination-quarantine",
+        "h1-stock:town-cleanup-transfer"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": "h2-composition:town-contamination-control.r1",
+      "theoryRecipeSourceCode": "AuthoredRecipe",
+      "theoryHashSha256": "9f084a7dc428bb3fe93eb715945285059054bf592de061397e089ad1910e2666",
+      "unityReviewEvidenceRef": "h2-unity-review-evidence:town-contamination-control.r1",
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": true,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [],
+      "blockers": [],
+      "gamePlanCodes": [
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": true,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:town-recall-relief",
+      "title": "생활권 회수 안내·자연권 구호 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "ReviewReady",
+      "requiredH1Refs": [
+        "h1-stock:town-recall-service",
+        "h1-stock:town-nature-relief",
+        "h1-stock:town-neighborhood-service"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-recall-service",
+        "h1-stock:town-nature-relief",
+        "h1-stock:town-neighborhood-service"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": "h2-composition:town-recall-relief.r1",
+      "theoryRecipeSourceCode": "AuthoredRecipe",
+      "theoryHashSha256": "0faba48141f65bf2dc38a738b38f9b0630eeddc8bfa1f120d9d057d2e6686306",
+      "unityReviewEvidenceRef": "h2-unity-review-evidence:town-recall-relief.r1",
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": true,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:town-resident-service",
+      "title": "생활권 주민지원·공동수령 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:town-neighborhood-service",
+        "h1-stock:town-resident-pickup",
+        "h1-stock:town-recall-service"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-neighborhood-service",
+        "h1-stock:town-resident-pickup",
+        "h1-stock:town-recall-service"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "3957d680e9296be9eb0d5c34acae808f3bc19f7a6ff85756848ebe4252ff5ab8",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "Strict",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": false,
+      "gameplayTheoryPriorityReady": false,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": false,
+      "gameplayBlockers": [
+        "StrictGameplayTraceMissing"
+      ],
+      "gameplayWarnings": []
+    },
+    {
+      "h2StableId": "h2-candidate:town-residential-alley",
+      "title": "생활권 주거 골목 블록",
+      "inventoryStateCode": "ExploratoryInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:town-living-square",
+        "h1-stock:town-neighborhood-service"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-living-square",
+        "h1-stock:town-neighborhood-service"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "2f15c628992b5f8d9bb1fda9cfc8ffcc53bb7ad43977ddfb3bda218fea95e81e",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    },
+    {
+      "h2StableId": "h2-candidate:town-returns-waste",
+      "title": "생활권 반품·폐기물 블록",
+      "inventoryStateCode": "IdeaInventory",
+      "compositionStageCode": "TheoryQualified",
+      "reviewStateCode": "AwaitingUnityReviewEvidence",
+      "requiredH1Refs": [
+        "h1-stock:town-returns",
+        "h1-stock:town-waste",
+        "h1-stock:road-facility-access"
+      ],
+      "recognizedH1Refs": [
+        "h1-stock:town-returns",
+        "h1-stock:town-waste",
+        "h1-stock:road-facility-access"
+      ],
+      "unrecognizedH1Refs": [],
+      "deterministicRecipeId": null,
+      "theoryRecipeSourceCode": "DerivedTheoryRecipe",
+      "theoryHashSha256": "a32ba082332d8c2e6e02f3d27c1e117fab70da6830cb26d31775cb8e32ea2f8f",
+      "unityReviewEvidenceRef": null,
+      "composable": true,
+      "theoryQualified": true,
+      "reviewReady": false,
+      "theoryProductionBlockedByHumanReview": false,
+      "theoryBlockers": [],
+      "reviewBlockers": [
+        "UnityH2RootAndFiveViewCaptureMissing"
+      ],
+      "blockers": [],
+      "gamePlanCodes": [
+        "TownLivingMarketSafety"
+      ],
+      "gameplayGateModeCode": "WarningOnly",
+      "gameplayTraceStateCode": "Unlinked",
+      "gameplayTraceSliceIds": null,
+      "gameplayTraceStepIds": null,
+      "gameplayGateSatisfied": true,
+      "gameplayTheoryPriorityReady": true,
+      "gameplayReviewPriorityReady": false,
+      "gameplayPriorityReady": true,
+      "gameplayBlockers": [],
+      "gameplayWarnings": [
+        "WarningOnlyGameplayTraceMissing"
+      ]
+    }
+  ],
+  "compatibilityNote": "gameplayPriorityReady는 gameplayTheoryPriorityReady의 호환 별칭이다. 사람 검토 우선순위는 gameplayReviewPriorityReady를 사용한다.",
+  "authorityBoundary": "이 결과의 TheoryQualified는 위치 독립 이론 공간 생산 상태다. 사람의 공식 H2 승인, 실제 지역 E5 배치, E6 공공데이터, E7 Runtime 또는 Play Mode 증거가 아니다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

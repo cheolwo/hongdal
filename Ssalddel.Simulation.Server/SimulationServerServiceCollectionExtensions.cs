@@ -139,6 +139,11 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddScoped<SimulationWorldLandscapeCompositionJobShell>();
         services.AddScoped<SimulationWorldAreaSetLandscapeGraphJobShell>();
         services.AddScoped<SimulationWorldAreaSetLandscapeGraphService>();
+        services.AddSingleton<ISimulationWorldActualE5SpatialCatalogReader>(
+            new FileSimulationWorldActualE5SpatialCatalogReader(
+                derivationOptions.ActualE5SpatialCatalogPath));
+        services.AddScoped<SimulationWorldActualE5SpatialService>();
+        services.AddScoped<SimulationWorld상호작용NetworkService>();
         services.AddSingleton<ISimulationWorld상호작용GraphCatalogReader>(
             new FileSimulationWorld상호작용GraphCatalogReader(
                 derivationOptions.InteractionGraphBindingCatalogPath));

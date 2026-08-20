@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:hub-maintenance-emergency-loop",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "City/Hub 정비·비상운영 회복 경관",
+  "summary": "차량·시설 정비와 비상 전력·보관 유지, 정상 출고 복귀를 하나의 City/Hub 단독 운영 경관으로 묶는다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:hub-maintenance-yard",
+    "h2-candidate:hub-emergency-power",
+    "h2-candidate:hub-outbound-vehicle"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:hub-longterm-cold-storage"
+  ],
+  "connectorRoleCodes": [
+    "IncidentInput",
+    "EmergencyOperationsLoop",
+    "HubOperationsReturn"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/hub-maintenance-emergency-loop.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:hub-maintenance-emergency-loop"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

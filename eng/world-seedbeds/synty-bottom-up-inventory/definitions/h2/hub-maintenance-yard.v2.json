@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:hub-maintenance-yard",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "Hub 차량·시설 정비 블록",
+  "summary": "차량 상차·대기 공간과 시설 정비 공간을 연결해 물류 중단 뒤 복구 작업을 수용하는 City 단독 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:hub-vehicle-yard",
+    "h1-stock:hub-service-maintenance"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:hub-temporary-staging"
+  ],
+  "connectorRoleCodes": [
+    "VehicleInput",
+    "MaintenanceLoop",
+    "OperationsReturn"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/hub-maintenance-yard.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:hub-maintenance-yard"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

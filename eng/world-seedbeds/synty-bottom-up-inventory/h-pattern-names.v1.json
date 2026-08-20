@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "simulation-world-h-pattern-naming.v1",
+  "revision": "simulation-world-h-pattern-naming.r6",
+  "title": "H2·H3 팩 주도 공간 패턴 이름 대장",
+  "principle": "기존 H StableId는 보존하고 H 정의의 물리 공간 이름을 주 이름으로, 기존 행위 중심 이름을 게임플레이 활용 유형으로 분리한다.",
+  "displayPolicy": {
+    "primarySpatialNameSourceCode": "PatternSpatialDisplayName",
+    "legacyDisplayNameRoleCode": "GameplayProfileName",
+    "h2PrimaryMeaningCode": "PlaceableBlock",
+    "h3PrimaryMeaningCode": "PlaceableDistrictAssembly",
+    "spatialNameMustBeShownBeforeGameplayProfile": true
+  },
+  "namingRules": {
+    "patternCodeFormat": "{LEAD_PACK}-H{LEVEL}-{FAMILY}-{SEQUENCE:00}",
+    "stableIdRenameForbidden": true,
+    "visualVariantMustRemainSeparate": true,
+    "singlePackMustHaveNoSupportPacks": true,
+    "crossPackMustUseMixedLeadPack": true,
+    "allowedLeadPackCodes": ["Nature", "Farm", "City", "Town", "Mixed"],
+    "allowedCompositionModeCodes": ["SinglePack", "LeadPackWithSupport", "CrossPackTransition"],
+    "h2ResourceKindCode": "BlockPattern",
+    "h3ResourceKindCode": "LandscapeAssemblyPattern"
+  },
+  "productionPhases": [
+    { "phaseCode": "P1", "title": "팩 단독 H2 블록 패턴", "hierarchyLevelCode": "H2", "allowedCompositionModeCodes": ["SinglePack"], "principle": "Nature·Farm·City·Town 각 팩만으로 반복 조립 가능한 블록 패턴 재고를 먼저 확보한다." },
+    { "phaseCode": "P2", "title": "팩 내부 H3 경관 조립", "hierarchyLevelCode": "H3", "allowedCompositionModeCodes": ["SinglePack"], "principle": "같은 주도 팩의 H2 블록을 이동·사건 폐루프로 묶는다." },
+    { "phaseCode": "P3", "title": "주도 팩과 보조 팩 조합", "hierarchyLevelCode": "H2/H3", "allowedCompositionModeCodes": ["LeadPackWithSupport"], "principle": "팩 단독 재고로 부족한 기능층만 Nature·Construction 등 보조 팩으로 보완한다." },
+    { "phaseCode": "P4", "title": "팩 간 혼합 H2 전환 블록", "hierarchyLevelCode": "H2", "allowedCompositionModeCodes": ["CrossPackTransition"], "principle": "두 업무 영역의 Gate와 경계를 잇는 혼합 블록을 만든다." },
+    { "phaseCode": "P5", "title": "팩 간 혼합 H3 연결 경관", "hierarchyLevelCode": "H3", "allowedCompositionModeCodes": ["CrossPackTransition"], "principle": "혼합 H2를 AreaSet 간 이동·물류·대피 인과로 조립한다." }
+  ],
+  "inventoryTargets": [
+    { "leadPackCode": "Nature", "currentH2": 7, "firstTargetH2": 8, "currentH3": 4, "firstTargetH3": 5 },
+    { "leadPackCode": "Farm", "currentH2": 9, "firstTargetH2": 10, "currentH3": 4, "firstTargetH3": 5 },
+    { "leadPackCode": "City", "currentH2": 7, "firstTargetH2": 8, "currentH3": 3, "firstTargetH3": 4 },
+    { "leadPackCode": "Town", "currentH2": 7, "firstTargetH2": 8, "currentH3": 4, "firstTargetH3": 5 },
+    { "leadPackCode": "Mixed", "currentH2": 4, "firstTargetH2": 5, "currentH3": 3, "firstTargetH3": 4 }
+  ],
+  "priorityExpansionQueue": [],
+  "h2Patterns": [
+    { "stableId": "h2-candidate:nature-trail-shelter", "patternCode": "NATURE-H2-TRAIL-01", "spatialDisplayNameKo": "탐색로·대피 쉼터 블록", "displayNameKo": "네이처 탐색 패턴 01 — 탐색·대피형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Trail", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-threat-response", "patternCode": "NATURE-H2-THREAT-01", "spatialDisplayNameKo": "위험 흔적길·긴급 대피로 블록", "displayNameKo": "네이처 위협 패턴 01 — 추적·긴급후퇴형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Threat", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-restoration-recovery", "patternCode": "NATURE-H2-RECOVERY-01", "spatialDisplayNameKo": "복원 작업지·회복 쉼터 블록", "displayNameKo": "네이처 회복 패턴 01 — 경로복원·안전회복형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Recovery", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-water-buffer", "patternCode": "NATURE-H2-BUFFER-01", "spatialDisplayNameKo": "산림·수변 완충지 블록", "displayNameKo": "네이처 완충 패턴 01 — 산림·수변형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Buffer", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-home-core", "patternCode": "NATURE-H2-HOME-01", "spatialDisplayNameKo": "안전 생활핵·보급 거점 블록", "displayNameKo": "네이처 생활 패턴 01 — 안전 생활핵형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Home", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-encounter-route", "patternCode": "NATURE-H2-ENCOUNTER-01", "spatialDisplayNameKo": "조우로·이탈로 블록", "displayNameKo": "네이처 조우 패턴 01 — 몬스터 접근·이탈형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Encounter", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-defense-ring", "patternCode": "NATURE-H2-DEFENSE-01", "spatialDisplayNameKo": "방어환·야영지 블록", "displayNameKo": "네이처 방어 패턴 01 — 야간 방어형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Defense", "patternSequence": 1 },
+
+    { "stableId": "h2-candidate:highland-production", "patternCode": "FARM-H2-PRODUCTION-01", "spatialDisplayNameKo": "고지대 경작지 블록", "displayNameKo": "팜 생산 패턴 01 — 고지대 경작형", "leadPackCode": "Farm", "supportPackCodes": ["Nature"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Production", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-seed-and-tools", "patternCode": "FARM-H2-PREP-01", "spatialDisplayNameKo": "종자창고·농기구고 블록", "displayNameKo": "팜 준비 패턴 01 — 종자·농기구형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Preparation", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-worker-support", "patternCode": "FARM-H2-SUPPORT-01", "spatialDisplayNameKo": "작업자 대기소·정비고 블록", "displayNameKo": "팜 작업지원 패턴 01 — 대기·정비형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Support", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-wash-sort-pack", "patternCode": "FARM-H2-PROCESSING-01", "spatialDisplayNameKo": "세척장·선별장·포장장 블록", "displayNameKo": "팜 후처리 패턴 01 — 세척·선별·포장형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Processing", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-processing-shipping", "patternCode": "FARM-H2-SHIPPING-01", "spatialDisplayNameKo": "작업마당·출하장 블록", "displayNameKo": "팜 출하 패턴 01 — 작업마당·상차형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Shipping", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-incident-containment", "patternCode": "FARM-H2-INCIDENT-01", "spatialDisplayNameKo": "점검마당·격리구획 블록", "displayNameKo": "팜 사건대응 패턴 01 — 점검·격리형", "leadPackCode": "Farm", "supportPackCodes": ["Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Incident", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-loss-restoration-handoff", "patternCode": "FARM-H2-RECOVERY-01", "spatialDisplayNameKo": "복구 작업장·복원 인계장 블록", "displayNameKo": "팜 손실회복 패턴 01 — 복원 인계형", "leadPackCode": "Farm", "supportPackCodes": ["Nature", "Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Recovery", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-irrigation-service", "patternCode": "FARM-H2-IRRIGATION-01", "spatialDisplayNameKo": "농수로·급수시설 블록", "displayNameKo": "팜 관수 패턴 01 — 농수로·급수형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Irrigation", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-harvest-throughput", "patternCode": "FARM-H2-HARVEST-01", "spatialDisplayNameKo": "생산구획·집하마당 블록", "displayNameKo": "팜 수확 패턴 01 — 집중 집하형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Harvest", "patternSequence": 1 },
+
+    { "stableId": "h2-candidate:hub-inbound-storage", "patternCode": "CITY-H2-INBOUND-01", "spatialDisplayNameKo": "Hub 입고장·창고 전면 블록", "displayNameKo": "시티 허브 입고 패턴 01 — 검수·창고형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Inbound", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-quarantine-staging", "patternCode": "CITY-H2-QUARANTINE-01", "spatialDisplayNameKo": "Hub 검역장·격리창고 블록", "displayNameKo": "시티 허브 격리 패턴 01 — 검역·임시적치형", "leadPackCode": "City", "supportPackCodes": ["Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Quarantine", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-longterm-cold-storage", "patternCode": "CITY-H2-STORAGE-01", "spatialDisplayNameKo": "Hub 장기·저온 창고 블록", "displayNameKo": "시티 허브 보관 패턴 01 — 장기·저온형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Storage", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-outbound-vehicle", "patternCode": "CITY-H2-OUTBOUND-01", "spatialDisplayNameKo": "Hub 출고장·차량 대기 블록", "displayNameKo": "시티 허브 출고 패턴 01 — 피킹·차량형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Outbound", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-returns-processing", "patternCode": "CITY-H2-RETURN-01", "spatialDisplayNameKo": "Hub 반품장·격리 적치 블록", "displayNameKo": "시티 허브 반품 패턴 01 — 회수·격리형", "leadPackCode": "City", "supportPackCodes": ["Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Return", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-maintenance-yard", "patternCode": "CITY-H2-MAINTENANCE-01", "spatialDisplayNameKo": "Hub 정비고·차량 마당 블록", "displayNameKo": "시티 허브 정비 패턴 01 — 차량·시설 복구형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Maintenance", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-emergency-power", "patternCode": "CITY-H2-POWER-01", "spatialDisplayNameKo": "Hub 비상전력실·보관동 블록", "displayNameKo": "시티 허브 비상 패턴 01 — 전력·보관 유지형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Power", "patternSequence": 1 },
+
+    { "stableId": "h2-candidate:lowrise-residential", "patternCode": "TOWN-H2-VILLAGE-01", "spatialDisplayNameKo": "저층 주거·생활광장 블록", "displayNameKo": "타운 빌리지 패턴 01 — 저층 생활광장형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Village", "patternSequence": 1 },
+    { "stableId": "h2-candidate:market-life-commerce", "patternCode": "TOWN-H2-VILLAGE-02", "spatialDisplayNameKo": "마트·생활상가 블록", "displayNameKo": "타운 빌리지 패턴 02 — 생활상권형", "leadPackCode": "Town", "supportPackCodes": ["City"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Village", "patternSequence": 2 },
+    { "stableId": "h2-candidate:town-contamination-control", "patternCode": "TOWN-H2-SAFETY-01", "spatialDisplayNameKo": "오염 점검장·격리구획 블록", "displayNameKo": "타운 안전 패턴 01 — 오염점검·격리형", "leadPackCode": "Town", "supportPackCodes": ["Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Safety", "patternSequence": 1 },
+    { "stableId": "h2-candidate:town-recall-relief", "patternCode": "TOWN-H2-RELIEF-01", "spatialDisplayNameKo": "주민 안내소·구호 물자 인계장 블록", "displayNameKo": "타운 구호 패턴 01 — 회수안내·주민지원형", "leadPackCode": "Town", "supportPackCodes": ["Nature"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Relief", "patternSequence": 1 },
+    { "stableId": "h2-candidate:town-returns-waste", "patternCode": "TOWN-H2-CIRCULAR-01", "spatialDisplayNameKo": "반품 집하장·폐기물 처리장 블록", "displayNameKo": "타운 순환 패턴 01 — 반품·폐기물형", "leadPackCode": "Town", "supportPackCodes": ["Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Circular", "patternSequence": 1 },
+    { "stableId": "h2-candidate:town-residential-alley", "patternCode": "TOWN-H2-VILLAGE-03", "spatialDisplayNameKo": "저층 주거 골목 블록", "displayNameKo": "타운 빌리지 패턴 03 — 주거골목형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Village", "patternSequence": 3 },
+    { "stableId": "h2-candidate:town-resident-service", "patternCode": "TOWN-H2-SERVICE-01", "spatialDisplayNameKo": "주민지원소·공동수령장 블록", "displayNameKo": "타운 서비스 패턴 01 — 주민지원·공동수령형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Service", "patternSequence": 1 },
+
+    { "stableId": "h2-candidate:forest-edge-farm", "patternCode": "MIX-H2-NATURE-FARM-01", "spatialDisplayNameKo": "숲 가장자리 경작지 블록", "displayNameKo": "네이처–팜 전환 패턴 01 — 숲 경계 생산형", "leadPackCode": "Mixed", "supportPackCodes": ["Nature", "Farm"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "NatureFarm", "patternSequence": 1 },
+    { "stableId": "h2-candidate:farm-hub-corridor", "patternCode": "MIX-H2-FARM-HUB-01", "spatialDisplayNameKo": "농장 출구–Hub 진입 회랑 블록", "displayNameKo": "팜–허브 회랑 패턴 01 — 농산물 운송형", "leadPackCode": "Mixed", "supportPackCodes": ["Farm", "City"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "FarmHub", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-town-corridor", "patternCode": "MIX-H2-HUB-TOWN-01", "spatialDisplayNameKo": "Hub 출구–Town 입고 회랑 블록", "displayNameKo": "허브–타운 회랑 패턴 01 — 시장 배송형", "leadPackCode": "Mixed", "supportPackCodes": ["City", "Town"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "HubTown", "patternSequence": 1 },
+    { "stableId": "h2-candidate:nature-town-relief-transition", "patternCode": "MIX-H2-NATURE-TOWN-01", "spatialDisplayNameKo": "자연권 출구–생활권 구호 인계 블록", "displayNameKo": "네이처–타운 전환 패턴 01 — 생활권 대피·구호형", "leadPackCode": "Mixed", "supportPackCodes": ["Nature", "Town"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "NatureTown", "patternSequence": 1 }
+  ],
+  "h3Patterns": [
+    { "stableId": "h3-candidate:nature-exploration-buffer", "patternCode": "NATURE-H3-REGION-01", "spatialDisplayNameKo": "탐색로·산림완충지 구역", "displayNameKo": "네이처 경관 01 — 탐색·완충형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 1 },
+    { "stableId": "h3-candidate:nature-threat-recovery", "patternCode": "NATURE-H3-REGION-02", "spatialDisplayNameKo": "생활핵·대피로·복원쉼터 구역", "displayNameKo": "네이처 경관 02 — 위협·회복형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 2 },
+    { "stableId": "h3-candidate:nature-trail-network", "patternCode": "NATURE-H3-REGION-03", "spatialDisplayNameKo": "탐색로·대피망 구역", "displayNameKo": "네이처 경관 03 — 탐색길·대피망형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 3 },
+    { "stableId": "h3-candidate:nature-home-encounter-defense", "patternCode": "NATURE-H3-REGION-04", "spatialDisplayNameKo": "생활핵·조우로·방어환 구역", "displayNameKo": "네이처 경관 04 — 생활핵·조우·방어 폐루프형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 4 },
+
+    { "stableId": "h3-candidate:highland-farm", "patternCode": "FARM-H3-REGION-01", "spatialDisplayNameKo": "고지대 경작지·숲경계 구역", "displayNameKo": "팜 경관 01 — 고지대 농장형", "leadPackCode": "Farm", "supportPackCodes": ["Nature"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Region", "patternSequence": 1 },
+    { "stableId": "h3-candidate:farm-processing-campus", "patternCode": "FARM-H3-REGION-02", "spatialDisplayNameKo": "생산구획·후처리장 구역", "displayNameKo": "팜 경관 02 — 생산·후처리 캠퍼스형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 2 },
+    { "stableId": "h3-candidate:farm-incident-recovery", "patternCode": "FARM-H3-REGION-03", "spatialDisplayNameKo": "격리구획·복구 작업장 구역", "displayNameKo": "팜 경관 03 — 사건격리·손실회복형", "leadPackCode": "Farm", "supportPackCodes": ["Nature", "Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Region", "patternSequence": 3 },
+    { "stableId": "h3-candidate:farm-seasonal-production-loop", "patternCode": "FARM-H3-REGION-04", "spatialDisplayNameKo": "관수 경작지·출하장 구역", "displayNameKo": "팜 경관 04 — 계절 생산·출하 순환형", "leadPackCode": "Farm", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 4 },
+
+    { "stableId": "h3-candidate:jinbu-hub", "patternCode": "CITY-H3-HUB-01", "spatialDisplayNameKo": "Hub 입고장·창고·출고장 구역", "displayNameKo": "시티 허브 경관 01 — 입고·보관·출고형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Hub", "patternSequence": 1 },
+    { "stableId": "h3-candidate:resilient-logistics-hub", "patternCode": "CITY-H3-HUB-02", "spatialDisplayNameKo": "Hub 검역장·저온창고 구역", "displayNameKo": "시티 허브 경관 02 — 품질·격리·저온대응형", "leadPackCode": "City", "supportPackCodes": ["Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Hub", "patternSequence": 2 },
+    { "stableId": "h3-candidate:hub-maintenance-emergency-loop", "patternCode": "CITY-H3-HUB-03", "spatialDisplayNameKo": "Hub 정비고·비상전력 구역", "displayNameKo": "시티 허브 경관 03 — 정비·비상운영 회복형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Hub", "patternSequence": 3 },
+
+    { "stableId": "h3-candidate:lowrise-market-town", "patternCode": "TOWN-H3-VILLAGE-01", "spatialDisplayNameKo": "저층 주거·마트 구역", "displayNameKo": "타운 빌리지 경관 01 — 저층 생활·시장형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Village", "patternSequence": 1 },
+    { "stableId": "h3-candidate:circular-market-town", "patternCode": "TOWN-H3-VILLAGE-02", "spatialDisplayNameKo": "시장·반품집하 구역", "displayNameKo": "타운 빌리지 경관 02 — 반품·회수 순환시장형", "leadPackCode": "Town", "supportPackCodes": ["City", "Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Village", "patternSequence": 2 },
+    { "stableId": "h3-candidate:town-contamination-relief", "patternCode": "TOWN-H3-VILLAGE-03", "spatialDisplayNameKo": "오염격리·주민구호 구역", "displayNameKo": "타운 빌리지 경관 03 — 오염통제·주민구호형", "leadPackCode": "Town", "supportPackCodes": ["Nature", "Construction"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Village", "patternSequence": 3 },
+    { "stableId": "h3-candidate:town-resident-service-loop", "patternCode": "TOWN-H3-VILLAGE-04", "spatialDisplayNameKo": "주거골목·주민지원 구역", "displayNameKo": "타운 빌리지 경관 04 — 주민서비스·공동수령형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Village", "patternSequence": 4 },
+
+    { "stableId": "h3-candidate:farm-hub-logistics", "patternCode": "MIX-H3-FARM-HUB-01", "spatialDisplayNameKo": "농장 출하문–Hub 입고문 회랑", "displayNameKo": "팜–허브 연결 경관 01 — 생산물류형", "leadPackCode": "Mixed", "supportPackCodes": ["Farm", "City"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "FarmHub", "patternSequence": 1 },
+    { "stableId": "h3-candidate:hub-town-logistics", "patternCode": "MIX-H3-HUB-TOWN-01", "spatialDisplayNameKo": "Hub 출고문–Town 입고문 회랑", "displayNameKo": "허브–타운 연결 경관 01 — 시장배송형", "leadPackCode": "Mixed", "supportPackCodes": ["City", "Town"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "HubTown", "patternSequence": 1 },
+    { "stableId": "h3-candidate:nature-town-relief-loop", "patternCode": "MIX-H3-NATURE-TOWN-01", "spatialDisplayNameKo": "Nature 대피문–Town 구호문 회랑", "displayNameKo": "네이처–타운 연결 경관 01 — 대피·구호 인계형", "leadPackCode": "Mixed", "supportPackCodes": ["Nature", "Town"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "NatureTown", "patternSequence": 1 }
+  ]
+}

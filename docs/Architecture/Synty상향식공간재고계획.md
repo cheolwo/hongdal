@@ -14,7 +14,7 @@ H를 먼저 축적하되 Synty 자산이나 보기 좋은 공간 조합만으로
 
 1. H1은 플레이어가 수행하거나 관찰할 행위, 공간 역할과 앞뒤 연결을 설명한다.
 2. 팩 표현 H1은 연결 가능한 상호작용 H1이 있어야 탐색 재고가 된다. 연결이 없으면 `IdeaInventory`로 격리한다.
-3. H2는 여러 H1이 만드는 반복 가능한 플레이 흐름, H3는 여러 H2가 만드는 사건·이동 경관, H4는 그 경험을 묶는 지역 세계 의도를 가져야 한다.
+3. H2는 여러 H1을 실제 계획기에서 한 단위로 놓을 수 있는 물리 블록이고, H3는 여러 H2를 도로·경계·연결구로 묶어 한 단위로 놓을 수 있는 구역 조립안이다. 반복 플레이와 사건 흐름은 이 공간 재고의 주 이름이 아니라 활용 유형과 검증 계보다.
 4. 게임 기획이나 WI 계보가 끊긴 카드는 자동 삭제하지 않고 아이디어 재고로 강등한다. 공식 H 승격과 E 단계 입력에는 사용하지 않는다.
 5. H가 공간을 제안한 뒤 WI별 E 부족분을 계산한다. H 정의 안에 E6 공공데이터를 넣지 않는다.
 
@@ -31,8 +31,8 @@ H를 먼저 축적하되 Synty 자산이나 보기 좋은 공간 조합만으로
 | --- | ---: | --- |
 | H1 행동 공간 카드 | 52 | 승인 참조 5개와 Nature 위협·회복 5개, Farm 사건 대응 5개, Town 사건 대응 및 주문 포장 공간을 포함한 WI·능력 중심 장소 지식 |
 | H1 팩 단독 표현 카드 | 32 | Nature 12·Farm 8·Town 6·City 6 의미군과 A/B/C 변형 |
-| H2 블록 조립법 | 24 | H1을 위상과 연결구로 묶는 재사용 레시피. 이 가운데 사건 대응 H1에서 유도한 Nature 2·Farm 2·Town 2개를 P1~P3 우선순위로 관리한다. |
-| H3 경관 청사진 | 13 | Farm·Hub·Town·회랑·Nature 경관 유형. Nature 생활·위협·회복, Farm 사건 격리·회복, Town 오염 통제·구호 경관을 포함한다. |
+| H2 블록 조립법 | 34 | 기존 33개에 Nature 복원 공간과 Town 구호 인계점을 잇는 혼합 대피·구호 전환 블록을 추가했다. |
+| H3 경관 청사진 | 18 | 기존 17개에 Town 회수·구호에서 Nature 복원·안전 귀환까지 잇는 혼합 인계 경관을 추가했다. |
 | H4 지역 청사진 후보 | 6 | 실제 AreaSet이 아닌 위치 독립 세계 구성 후보. Nature 생활·탐험권을 포함한다. |
 
 초기 `catalog.v1.json`과 항목별 `catalog.v2.json`은 호환 입력으로 보존한다. 현재 `catalog.v3.json`은 기존 StableId를 유지하면서 행동 공간 H1과 팩 단독 표현 H1을 구분하고, 검토된 조립법의 문법→H1→H2→H3→H4 계보와 파일 SHA-256을 봉인한다. 팩 단독 H1과 H4 후보는 각각 `definitions/h1-expression/`, `definitions/h4/`와 대응 Markdown으로 결정적으로 생성한다.
@@ -75,7 +75,7 @@ pwsh -NoProfile -File eng/world-seedbeds/query-spatial-design-knowledge.ps1 `
 4. 여러 H1을 `Grid`, `ModifiedGrid`, `Linear`, `ContourAdaptive`, `Organic` 위상으로 묶어 H2 후보를 만든다.
 5. 여러 H2 후보와 외부 연결 역할을 조합해 H3 청사진을 만든다.
 6. 여러 H3와 세계 주제를 묶어 실제 지역 권위가 없는 H4 청사진 후보를 만든다.
-7. 승인 H 설계를 실제 AreaSet에 적용하는 E5에서 지역 인스턴스의 도로·경계와 H3 Node·Edge·Connector, H4 GraphRelation을 조립한다. 공공데이터 계보는 E6에서만 결속한다.
+7. 이론 적격 H 설계를 명시적 H4 세계 의도에 적용해 전용 `area-set:theory:*`와 H3 Node·Edge·Connector, H4 GraphRelation을 결정적으로 조립한다. 이는 이론 E5이며 실제 지역·공공데이터·Runtime 권위가 아니다. 공공데이터 계보는 E6에서만 결속한다.
 
 ## H1에서 H2로 올리는 현재 우선순위
 
@@ -90,7 +90,7 @@ pwsh -NoProfile -File eng/world-seedbeds/query-spatial-design-knowledge.ps1 `
 | P3 | 생활권 오염 점검·정화 블록 | 오염 점검 → 격리 → 정화 폐기 인계 |
 | P3 | 생활권 회수 안내·자연권 구호 블록 | 주민 회수 안내 → 생활 서비스 → 자연권 구호 인계 |
 
-P1은 플레이어가 상시 머무는 Nature의 위협·대피·회복 폐루프를 먼저 닫는다. P2와 P3는 Farm·Town 전문 경관에서 생긴 사건 결과를 P1의 자연권 회복 공간으로 인계한다. 이 순서는 위치 독립 설계 재고 제작 순서다. 공식 H2 승격은 필수 H1, 내부 관계, 연결구, 위상과 크기 범위의 설계 검토로 판단하고 실제 지역 배치는 E5에서 별도로 판단한다.
+P1은 플레이어가 상시 머무는 Nature의 위협·대피·회복 폐루프를 먼저 닫는다. P2와 P3는 Farm·Town 전문 경관에서 생긴 사건 결과를 P1의 자연권 회복 공간으로 인계한다. 이 순서는 위치 독립 설계 재고 제작 순서다. H2 이론 적격은 필수 H1, 내부 관계, 연결구, 위상, 크기 범위와 결정성의 자동 검사로 판단한다. 사람 검토는 후속 일괄 품질 검토이며 생산을 차단하지 않는다.
 
 P1~P3 여섯 후보는 [`h2-composition-recipes.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-recipes.v1.json)의 로컬 H1 배치·내부 관계·외부 연결구로 구현한다. 결정적 생성 결과는 [P1~P3 H2 조립안](../AI/generated/h2-composition-plans.md)에서 확인한다. 좌표계 `LocalMeters`는 재사용 조립안 내부의 상대 위치일 뿐 실제 지역 좌표가 아니며, 결과 상태 `DesignCandidateOnly / ReadyForPlanningReview`는 H2 설계 검토 대기 상태다. 실제 AreaSet 배치와 E5 증거를 뜻하지 않는다.
 
@@ -113,14 +113,53 @@ Construction을 포함한 다섯 팩의 조립 규칙과 심리 영역의 두 �
 
 H 계층은 위치 독립 공간 설계의 조립 깊이만 나타낸다. 공공데이터 목적·출처·좌표계·원본·파생 hash는 H1~H4 정의에 넣지 않고 E6에서 선택한 WI와 E5 경관 인스턴스에만 연결한다.
 
-H1 검토 후보는 공간 역할·능력·업무 용량·내부 관계·외부 연결구와 E3 WI 재실행 증거로 설계 승인한다.
+H1 후보는 공간 역할·능력·업무 용량·내부 관계·외부 연결구와 E3 WI 재실행 증거로 이론 적격을 판정한다.
 
-H2 후보는 필수 H1, 상대 위치, 위상, 내부 관계, 크기 변형과 외부 연결구가 결정적으로 닫히면 설계 승인한다.
+H2 후보는 필수 H1, 상대 위치, 위상, 내부 관계, 크기 변형과 외부 연결구가 결정적으로 닫히면 `TheoryQualified`로 자동 승격한다.
 
-H3 후보는 필수 H2, Node·Edge·Connector 역할과 경관 내부 흐름이 닫히면 설계 승인한다.
+H3 후보는 필수 이론 적격 H2, Node·Edge·Connector 역할과 경관 내부 흐름이 닫히면 `TheoryQualified`로 자동 승격한다.
 
-H4 후보는 사람의 세계 의도, 필수 H3, 지역 내부 관계와 외부 연결 역할이 닫히면 설계 승인한다.
+H4 후보는 작성된 세계 의도, 필수 H3, 지역 내부 관계와 외부 연결 역할이 닫히면 이론 E5 입력으로 사용할 수 있다.
 
-승인 H 설계를 특정 AreaSet에 배치하고 이동 경로를 닫는 작업은 E5다. 그 인스턴스에 필요한 공공데이터를 선별해 계보를 연결하는 작업은 E6다. H4 설계 후보를 실제 AreaSet이나 E6 완료 상태로 자동 대체하지 않는다.
+이론 적격 H 설계를 전용 `area-set:theory:*`에 배치하고 이동 경로를 닫는 작업은 `E5TheoryQualified`다. 그 인스턴스에 필요한 공공데이터를 선별해 계보를 연결하는 작업은 E6이며 실제 서버·Unity Runtime 검증은 E7이다. 이론 E5를 사람 승인, 실제 지역 AreaSet, E6 또는 E7 완료 상태로 자동 대체하지 않는다.
+
+자동 공장은 H2 34개, H3 18개와 Nature·Farm·City/Hub·Town 이론 E5 인스턴스를 반복 생성한다. 팩 내부 H3가 준비되면 AreaSet 후보가 H2를 임시로 직접 소유하지 않고 해당 H3를 통해 하위 블록을 추적한다. Nature–Town 혼합 H3는 두 청사진의 선택 가능한 교차 경관 계보이며 실제 Graph나 지역 E5 인스턴스로 자동 복제하지 않는다. 사람 검토 결과는 별도의 `DeferredBatchReview`로 기록하며 생성 중단 조건이나 자동 승인 근거로 사용하지 않는다.
 
 Prefab 이름, GUID, Material, Scene 경로, GameObject 이름은 어느 승격 관문에서도 공간 StableId나 Simulation 권위가 될 수 없다.
+
+## H2·H3 팩 주도 패턴 이름
+
+H2·H3의 저장·계보 참조는 기존 `h2-candidate:*`, `h3-candidate:*` StableId를 유지한다. AreaSet 구성·Unity 검토·사람 문서에서 구분하는 이름은 [`h-pattern-names.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/h-pattern-names.v1.json)의 별도 패턴 코드를 사용한다.
+
+```text
+{NATURE|FARM|CITY|TOWN|MIX}-H{2|3}-{FAMILY}-{SEQUENCE:00}
+```
+
+예를 들어 `TOWN-H2-VILLAGE-01`의 주 이름은 이름 대장의 물리 공간 이름인 `저층 주거·생활광장 블록`이고, `타운 빌리지 패턴 01 — 저층 생활광장형`은 보조 게임플레이 활용 유형이다. `TOWN-H3-VILLAGE-01`도 `저층 주거·마트 구역`을 먼저 보여 주고 `타운 빌리지 경관 01 — 저층 생활·시장형`을 보조 정보로 표시한다. 패턴 번호는 서로 다른 공간 조립을 구분하며 기준 경관 문법 A/B/C 표현 변형과 혼합하지 않는다.
+
+단일 팩만 사용하는 `SinglePack`, 주도 팩과 보조 팩을 함께 쓰는 `LeadPackWithSupport`, 팩 경계를 잇는 `CrossPackTransition`을 분리한다. 혼합 회랑은 `MIX`로 이름 붙이고 Construction은 지원 기능층으로만 기록한다. 패턴 이름은 H 승인·E5·Prefab·Simulation 권위를 만들지 않는다.
+
+### 공간 계획기용 배치 계약
+
+H2와 H3의 주 용도는 행동 목록을 분류하는 것이 아니라 공간 계획기에 놓고 이어 붙이는 것이다. 이론 공간 공장은 이름 대장 r6부터 다음 계약을 함께 생성한다.
+
+- H2 `BlockPattern`: 로컬 미터 좌표계의 H1 배치, 내부 이동 관계, 기준 경계, 90도 회전 단위, 크기 변형과 외부 연결 역할을 가진다.
+- H3 `LandscapeAssemblyPattern`: H2 배치, 블록 사이 이동 관계, 기준 경계, 구역 형태와 외부 연결 역할을 가진다.
+- `spatialDisplayNameKo`: 이름 대장이 선언한 물리 공간 이름이며 목록·계획기에서 먼저 표시한다.
+- `gameplayProfileNameKo`: 기존 행동 중심 이름이며 해당 공간에서 어떤 플레이를 수용하는지 설명하는 보조 분류다.
+- `spatialFormCode`: `StreetBlock`, `LinearBlock`, `CompoundBlock`, `DistrictAssembly`, `CorridorAssembly`처럼 배치 형식을 나타낸다.
+- `referenceBoundsMeters`: 결정적 상대 배치에서 계산한 이론상 기준 경계다. 실제 지역 면적·건물 경계·공공데이터 근거가 아니다.
+
+기존 H2·H3 StableId와 팩·계열 패턴 코드는 유지한다. 따라서 저장·계보 참조를 깨지 않고 공간 계획 화면은 `물리 공간 이름 → 형태·크기·연결구 → 게임플레이 활용 유형` 순으로 재고를 제시할 수 있다.
+
+### 팩별 패턴 생산 순서
+
+H2는 여러 H1을 상대 배치와 내부 동선으로 묶고 입구·출구를 가진 `BlockPattern`이다. H3는 여러 H2와 외부 연결 역할을 묶은 `LandscapeAssemblyPattern`이다. 따라서 새로운 공간 재고는 다음 순서로 늘린다.
+
+1. `PackNativeH2`: Nature·Farm·City·Town 각 팩만으로 구성 가능한 H2 블록 패턴을 먼저 확보한다.
+2. `PackNativeH3`: 같은 팩의 H2 블록을 조합하여 팩 내부 H3 경관 패턴을 만든다.
+3. `LeadPackWithSupport`: 주도 팩의 의미를 유지하면서 Construction이나 다른 팩을 기능·전환 보조층으로 사용한다.
+4. `CrossPackH2`: 두 팩의 경계를 한 블록 안에서 직접 다루는 혼합 H2를 만든다.
+5. `CrossPackH3`: 여러 팩의 H2·H3 인계가 닫힌 뒤 혼합 H3 경관으로 확장한다.
+
+기존 혼합 패턴은 호환성과 이미 만든 게임 플레이 계보를 위해 보존한다. 다만 새 재고를 추가할 때는 팩 단독 H2와 팩 내부 H3의 부족분을 먼저 채운다. 이 순서는 표현 자산 생산 순서이며 특정 AreaSet 배치, 실제 Scene, WI E5, 공공데이터 E6 또는 실제 플레이 E7을 자동으로 증명하지 않는다.

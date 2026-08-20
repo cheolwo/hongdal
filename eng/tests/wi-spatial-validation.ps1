@@ -13,8 +13,11 @@ $tests = @(
     "synty-bottom-up-inventory.ps1",
     "spatial-resource-inventory.ps1",
     "spatial-design-knowledge.ps1",
+    "theory-spatial-factory.ps1",
+    "gameplay-spatial-completion.ps1",
     "gameplay-led-h-inventory.ps1",
     "h2-composition-plans.ps1",
+    "h2-composition-readiness.ps1",
     "wi-eh-status.ps1",
     "immersive-world-layout.ps1",
     "execution-ledger.ps1"

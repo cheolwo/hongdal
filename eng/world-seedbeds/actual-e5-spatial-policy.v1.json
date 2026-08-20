@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "simulation-world-actual-e5-spatial-policy.v1",
+  "revision": "simulation-world-actual-e5-spatial-policy.r1",
+  "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
+  "legacyFacadeAreaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
+  "coordinateSpaceCode": "ScenarioLocalMeters",
+  "approvalSourceStableId": "source:user-approved-plan:actual-e5-regional-gameplay-skeleton.r1",
+  "areaSets": [
+    {
+      "theoryAreaSetStableId": "area-set:theory:nature-home-exploration-region",
+      "actualAreaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+      "areaRoleCode": "NatureHome",
+      "loadPolicyCode": "Persistent"
+    },
+    {
+      "theoryAreaSetStableId": "area-set:theory:farm-production-processing-region",
+      "actualAreaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "areaRoleCode": "Farm",
+      "loadPolicyCode": "OnDemand"
+    },
+    {
+      "theoryAreaSetStableId": "area-set:theory:logistics-hub-region",
+      "actualAreaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "areaRoleCode": "CityHub",
+      "loadPolicyCode": "OnDemand"
+    },
+    {
+      "theoryAreaSetStableId": "area-set:theory:lowrise-market-region",
+      "actualAreaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+      "areaRoleCode": "Town",
+      "loadPolicyCode": "OnDemand"
+    }
+  ],
+  "networkRouteH3Refs": [
+    "h3-candidate:nature-exploration-buffer",
+    "h3-candidate:farm-hub-logistics",
+    "h3-candidate:hub-town-logistics"
+  ],
+  "deferredTheoryH3Refs": [
+    "h3-candidate:nature-town-relief-loop"
+  ],
+  "networkRelations": [
+    {
+      "relationCode": "NatureToFarm",
+      "fromH3Ref": "h3-candidate:nature-trail-network",
+      "toH3Ref": "h3-candidate:highland-farm",
+      "relationKindCode": "PlayerTraversal",
+      "routeH3Ref": "h3-candidate:nature-exploration-buffer"
+    },
+    {
+      "relationCode": "FarmToNature",
+      "fromH3Ref": "h3-candidate:highland-farm",
+      "toH3Ref": "h3-candidate:nature-trail-network",
+      "relationKindCode": "PlayerTraversal",
+      "routeH3Ref": "h3-candidate:nature-exploration-buffer"
+    },
+    {
+      "relationCode": "NatureToCityHub",
+      "fromH3Ref": "h3-candidate:nature-trail-network",
+      "toH3Ref": "h3-candidate:jinbu-hub",
+      "relationKindCode": "PlayerTraversal",
+      "routeH3Ref": ""
+    },
+    {
+      "relationCode": "CityHubToNature",
+      "fromH3Ref": "h3-candidate:jinbu-hub",
+      "toH3Ref": "h3-candidate:nature-trail-network",
+      "relationKindCode": "PlayerTraversal",
+      "routeH3Ref": ""
+    },
+    {
+      "relationCode": "NatureToTown",
+      "fromH3Ref": "h3-candidate:nature-trail-network",
+      "toH3Ref": "h3-candidate:lowrise-market-town",
+      "relationKindCode": "PlayerTraversal",
+      "routeH3Ref": ""
+    },
+    {
+      "relationCode": "TownToNature",
+      "fromH3Ref": "h3-candidate:lowrise-market-town",
+      "toH3Ref": "h3-candidate:nature-trail-network",
+      "relationKindCode": "PlayerTraversal",
+      "routeH3Ref": ""
+    },
+    {
+      "relationCode": "FarmToCityHub",
+      "fromH3Ref": "h3-candidate:farm-processing-campus",
+      "toH3Ref": "h3-candidate:jinbu-hub",
+      "relationKindCode": "CargoLogistics",
+      "routeH3Ref": "h3-candidate:farm-hub-logistics"
+    },
+    {
+      "relationCode": "CityHubToTown",
+      "fromH3Ref": "h3-candidate:jinbu-hub",
+      "toH3Ref": "h3-candidate:lowrise-market-town",
+      "relationKindCode": "CargoLogistics",
+      "routeH3Ref": "h3-candidate:hub-town-logistics"
+    }
+  ],
+  "wiBindingPreferences": {
+    "WI-FARM-01": "h3-candidate:highland-farm",
+    "WI-FARM-02": "h3-candidate:highland-farm",
+    "WI-FARM-03": "h3-candidate:highland-farm",
+    "WI-FARM-04": "h3-candidate:highland-farm",
+    "WI-FARM-05": "h3-candidate:farm-processing-campus",
+    "WI-FARM-06": "h3-candidate:farm-processing-campus",
+    "WI-LOG-01": "h3-candidate:farm-processing-campus",
+    "WI-LOG-02": "h3-candidate:farm-processing-campus",
+    "WI-LOG-03": "h3-candidate:farm-hub-logistics",
+    "WI-LOG-04": "h3-candidate:jinbu-hub",
+    "WI-LOG-05": "h3-candidate:jinbu-hub",
+    "WI-001": "h3-candidate:jinbu-hub",
+    "WI-002": "h3-candidate:jinbu-hub",
+    "WI-HUB-04": "h3-candidate:jinbu-hub",
+    "WI-HUB-05": "h3-candidate:jinbu-hub",
+    "WI-HUB-06": "h3-candidate:jinbu-hub",
+    "WI-MARKET-01": "h3-candidate:hub-town-logistics",
+    "WI-MARKET-02": "h3-candidate:lowrise-market-town",
+    "WI-MARKET-03": "h3-candidate:lowrise-market-town",
+    "WI-MARKET-04": "h3-candidate:lowrise-market-town",
+    "WI-MARKET-05": "h3-candidate:lowrise-market-town",
+    "WI-ORDER-03": "h3-candidate:lowrise-market-town",
+    "WI-ORDER-04": "h3-candidate:lowrise-market-town",
+    "WI-ORDER-05": "h3-candidate:lowrise-market-town",
+    "WI-ORDER-06": "h3-candidate:lowrise-market-town",
+    "WI-NATURE-01": "h3-candidate:nature-threat-recovery",
+    "WI-NATURE-02": "h3-candidate:nature-threat-recovery",
+    "WI-NATURE-03": "h3-candidate:nature-threat-recovery",
+    "WI-NATURE-04": "h3-candidate:nature-threat-recovery",
+    "WI-WORLD-04": "h3-candidate:farm-processing-campus"
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

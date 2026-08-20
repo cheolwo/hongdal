@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "simulation-world-h2-human-review-queue.v1",
+  "revision": "simulation-world-h2-human-review-queue.r1",
+  "sourcePriorityPath": "eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-priorities.v1.json",
+  "sourceEvidencePath": "eng/world-seedbeds/synty-bottom-up-inventory/h2-unity-review-evidence.v1.json",
+  "sourceGameplayPath": "eng/world-seedbeds/gameplay-spatial-completion.v1.json",
+  "purpose": "H1 부품이 아니라 실제 H2 조합을 사람의 첫 공간 판단 단위로 검토하되, 현재 기준 플레이에 직접 필요한 Nature와 Farm을 먼저 본다.",
+  "reviewPolicy": {
+    "oneH2PerDecision": true,
+    "requiredViewCount": 5,
+    "requiredJudgmentCodes": [
+      "EntranceReadable",
+      "GoalReadable",
+      "RiskReadable",
+      "ExitReadable",
+      "GameplayFlowCoherent"
+    ],
+    "allowedDecisionCodes": ["ApproveCandidate", "NeedsRevision", "Hold"],
+    "automaticApprovalForbidden": true,
+    "approvalDoesNotAdvanceEvidenceStage": true,
+    "approvalDoesNotCreateAreaSetAuthority": true
+  },
+  "items": [
+    {
+      "priority": 1,
+      "h2Ref": "h2-candidate:nature-threat-response",
+      "evidenceRef": "h2-unity-review-evidence:nature-threat-response.r1",
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "gameplayMomentCode": "ObserveThreatAndRetreat",
+      "reviewQuestion": "위협 관찰 지점에서 흔적을 읽고 비상 출구로 후퇴하는 흐름이 한눈에 구분되는가?",
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "priority": 2,
+      "h2Ref": "h2-candidate:nature-restoration-recovery",
+      "evidenceRef": "h2-unity-review-evidence:nature-restoration-recovery.r1",
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "gameplayMomentCode": "RestoreAndRecover",
+      "reviewQuestion": "복원 작업 지점과 안전 회복 생활핵, 다음 탐색 출구가 자연스럽게 이어지는가?",
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "priority": 3,
+      "h2Ref": "h2-candidate:farm-incident-containment",
+      "evidenceRef": "h2-unity-review-evidence:farm-incident-containment.r1",
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "gameplayMomentCode": "InspectAndContainFarmIncident",
+      "reviewQuestion": "노출 점검, 사건 격리, 기상 보호의 순서와 안전 경계가 읽히는가?",
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "priority": 4,
+      "h2Ref": "h2-candidate:farm-loss-restoration-handoff",
+      "evidenceRef": "h2-unity-review-evidence:farm-loss-restoration-handoff.r1",
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "gameplayMomentCode": "RecoverLossAndHandoffRestorationSupply",
+      "reviewQuestion": "격리 결과가 손실 회복과 Nature 복원 물자 인계로 이어지는 출구를 가지는가?",
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "priority": 5,
+      "h2Ref": "h2-candidate:town-contamination-control",
+      "evidenceRef": "h2-unity-review-evidence:town-contamination-control.r1",
+      "playableSliceId": "reference-play:hub-town-market-day.v1",
+      "gameplayMomentCode": "InspectAndControlTownContamination",
+      "reviewQuestion": "생활 동선과 오염 점검·격리·정화 인계 동선이 충돌하지 않는가?",
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "priority": 6,
+      "h2Ref": "h2-candidate:town-recall-relief",
+      "evidenceRef": "h2-unity-review-evidence:town-recall-relief.r1",
+      "playableSliceId": "reference-play:hub-town-market-day.v1",
+      "gameplayMomentCode": "RecallServiceAndNatureRelief",
+      "reviewQuestion": "주민 회수 안내와 생활 서비스, Nature 구호 인계가 하나의 생활권 흐름으로 읽히는가?",
+      "reviewStateCode": "AwaitingHumanReview"
+    }
+  ],
+  "authorityBoundary": "사람이 H2 조합 후보를 판단할 순서다. 승인 판단 전에는 공식 H2가 아니며 판단 뒤에도 AreaSet·WI E단계·공공데이터·Runtime 권위를 만들지 않는다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

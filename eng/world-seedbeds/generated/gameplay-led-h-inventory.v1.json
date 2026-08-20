@@ -1,16 +1,18 @@
 {
   "schemaVersion": "simulation-world-gameplay-led-h-inventory-report.v1",
-  "policyRevision": "simulation-world-gameplay-led-h-policy.r2",
+  "policyRevision": "simulation-world-gameplay-led-h-policy.r7",
   "catalogRevision": "simulation-world-spatial-design-knowledge.r3",
-  "areaSetPriorityRevision": "simulation-world-area-set-composition-priorities.r5",
+  "areaSetPriorityRevision": "simulation-world-area-set-composition-priorities.r9",
   "counts": {
     "primaryGamePlans": 4,
     "crossWorldPlans": 1,
     "h1Interaction": 52,
     "h1Expression": 32,
-    "h2": 24,
-    "h3": 13,
+    "h2": 34,
+    "h3": 18,
     "h4": 6,
+    "playableSlices": 1,
+    "warningOnlyGamePlansWithoutPlayableSlice": 2,
     "violations": 0,
     "quarantinedExpressionH1": 9
   },
@@ -35,6 +37,7 @@
         "WI-NATURE-03",
         "WI-NATURE-04"
       ],
+      "stagedPackNativeH2Refs": null,
       "coverage": {
         "h1InteractionRefs": [
           "h1-stock:farm-production",
@@ -47,7 +50,12 @@
           "h1-stock:nature-safe-recovery-camp",
           "h1-stock:nature-shelter",
           "h1-stock:nature-threat-watch",
-          "h1-stock:nature-trailhead"
+          "h1-stock:nature-trailhead",
+          "h1-stock:town-living-square",
+          "h1-stock:town-nature-relief",
+          "h1-stock:town-neighborhood-service",
+          "h1-stock:town-recall-service",
+          "h1-stock:town-resident-pickup"
         ],
         "h1ExpressionRefs": [
           "h1-expression:farm:감자밭-두렁",
@@ -58,18 +66,30 @@
           "h1-expression:nature:수변-완충지",
           "h1-expression:nature:숲-가장자리",
           "h1-expression:nature:숲-빈터-고사목",
-          "h1-expression:nature:초지-야생화"
+          "h1-expression:nature:초지-야생화",
+          "h1-expression:town:근린-놀이터",
+          "h1-expression:town:버스-정류장-보행-쉼터",
+          "h1-expression:town:생활-공공광장",
+          "h1-expression:town:읍내-상점-전면"
         ],
         "h2Refs": [
           "h2-candidate:forest-edge-farm",
+          "h2-candidate:nature-defense-ring",
+          "h2-candidate:nature-encounter-route",
+          "h2-candidate:nature-home-core",
           "h2-candidate:nature-restoration-recovery",
           "h2-candidate:nature-threat-response",
+          "h2-candidate:nature-town-relief-transition",
           "h2-candidate:nature-trail-shelter",
-          "h2-candidate:nature-water-buffer"
+          "h2-candidate:nature-water-buffer",
+          "h2-candidate:town-recall-relief",
+          "h2-candidate:town-resident-service"
         ],
         "h3Refs": [
           "h3-candidate:nature-exploration-buffer",
+          "h3-candidate:nature-home-encounter-defense",
           "h3-candidate:nature-threat-recovery",
+          "h3-candidate:nature-town-relief-loop",
           "h3-candidate:nature-trail-network"
         ],
         "h4Refs": [
@@ -100,6 +120,7 @@
         "WI-LOG-01",
         "WI-LOG-02"
       ],
+      "stagedPackNativeH2Refs": null,
       "coverage": {
         "h1InteractionRefs": [
           "h1-stock:farm-exposure-inspection",
@@ -133,7 +154,9 @@
           "h1-expression:town:버스-정류장-보행-쉼터"
         ],
         "h2Refs": [
+          "h2-candidate:farm-harvest-throughput",
           "h2-candidate:farm-incident-containment",
+          "h2-candidate:farm-irrigation-service",
           "h2-candidate:farm-loss-restoration-handoff",
           "h2-candidate:farm-processing-shipping",
           "h2-candidate:farm-seed-and-tools",
@@ -145,6 +168,7 @@
         "h3Refs": [
           "h3-candidate:farm-incident-recovery",
           "h3-candidate:farm-processing-campus",
+          "h3-candidate:farm-seasonal-production-loop",
           "h3-candidate:highland-farm"
         ],
         "h4Refs": [
@@ -175,8 +199,16 @@
         "WI-ORDER-05",
         "WI-ORDER-06"
       ],
+      "stagedPackNativeH2Refs": null,
       "coverage": {
         "h1InteractionRefs": [
+          "h1-stock:nature-emergency-retreat",
+          "h1-stock:nature-exploration-buffer",
+          "h1-stock:nature-lookout",
+          "h1-stock:nature-restoration-site",
+          "h1-stock:nature-safe-recovery-camp",
+          "h1-stock:nature-shelter",
+          "h1-stock:nature-trailhead",
           "h1-stock:road-facility-access",
           "h1-stock:town-cleanup-transfer",
           "h1-stock:town-contamination-inspection",
@@ -199,6 +231,13 @@
           "h1-expression:city:먹거리-상점-골목",
           "h1-expression:city:상하차-dock",
           "h1-expression:city:화물-대기-야드",
+          "h1-expression:nature:고지대-노출지",
+          "h1-expression:nature:산-능선",
+          "h1-expression:nature:산길-바위-길목",
+          "h1-expression:nature:수변-완충지",
+          "h1-expression:nature:숲-가장자리",
+          "h1-expression:nature:숲-빈터-고사목",
+          "h1-expression:nature:초지-야생화",
           "h1-expression:town:근린-놀이터",
           "h1-expression:town:버스-정류장-보행-쉼터",
           "h1-expression:town:생활-공공광장",
@@ -208,14 +247,21 @@
         "h2Refs": [
           "h2-candidate:lowrise-residential",
           "h2-candidate:market-life-commerce",
+          "h2-candidate:nature-home-core",
+          "h2-candidate:nature-restoration-recovery",
+          "h2-candidate:nature-town-relief-transition",
           "h2-candidate:town-contamination-control",
           "h2-candidate:town-recall-relief",
+          "h2-candidate:town-resident-service",
+          "h2-candidate:town-residential-alley",
           "h2-candidate:town-returns-waste"
         ],
         "h3Refs": [
           "h3-candidate:circular-market-town",
           "h3-candidate:lowrise-market-town",
-          "h3-candidate:town-contamination-relief"
+          "h3-candidate:nature-town-relief-loop",
+          "h3-candidate:town-contamination-relief",
+          "h3-candidate:town-resident-service-loop"
         ],
         "h4Refs": [
           "h4-blueprint:lowrise-market-region"
@@ -245,6 +291,7 @@
         "WI-HUB-05",
         "WI-HUB-06"
       ],
+      "stagedPackNativeH2Refs": null,
       "coverage": {
         "h1InteractionRefs": [
           "h1-stock:hub-cold-storage",
@@ -264,13 +311,16 @@
           "h1-expression:city:화물-대기-야드"
         ],
         "h2Refs": [
+          "h2-candidate:hub-emergency-power",
           "h2-candidate:hub-inbound-storage",
           "h2-candidate:hub-longterm-cold-storage",
+          "h2-candidate:hub-maintenance-yard",
           "h2-candidate:hub-outbound-vehicle",
           "h2-candidate:hub-quarantine-staging",
           "h2-candidate:hub-returns-processing"
         ],
         "h3Refs": [
+          "h3-candidate:hub-maintenance-emergency-loop",
           "h3-candidate:jinbu-hub",
           "h3-candidate:resilient-logistics-hub"
         ],
@@ -381,6 +431,24 @@
       }
     }
   ],
+  "playableSliceSummary": [
+    {
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "title": "Nature↔Farm 수확과 회복의 하루",
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "FarmProductionSurvival"
+      ],
+      "declaredPlayableSliceStateCode": "SpatiallyComposed",
+      "targetPlayableSliceStateCode": "PlayableSliceComplete",
+      "theorySpatialBindingStateCode": "E5TheoryQualified",
+      "actualSpatialBindingStateCode": "ActualE5Bound"
+    }
+  ],
+  "warningOnlyGamePlanCodesMissingPlayableSlice": [
+    "CityHubLogisticsResilience",
+    "TownLivingMarketSafety"
+  ],
   "violations": {
     "contextlessInteractionH1Refs": [],
     "unlinkedExpressionH1Refs": [],
@@ -448,6 +516,10 @@
     {
       "priorityCode": "E-P1",
       "title": "Farm 수확·출하 공간 실행",
+      "evidenceTrackCode": "Integration",
+      "currentStageCodes": [
+        "E4"
+      ],
       "targetStageCode": "E5",
       "wiIds": [
         "WI-FARM-04",
@@ -455,22 +527,34 @@
         "WI-FARM-06",
         "WI-LOG-01",
         "WI-LOG-02"
-      ]
+      ],
+      "completionStateCode": "",
+      "selectionPolicyCode": ""
     },
     {
       "priorityCode": "E-P2",
       "title": "Hub 입고·검수·보관 공간 실행",
+      "evidenceTrackCode": "Integration",
+      "currentStageCodes": [
+        "E4"
+      ],
       "targetStageCode": "E5",
       "wiIds": [
         "WI-LOG-04",
         "WI-LOG-05",
         "WI-001",
         "WI-002"
-      ]
+      ],
+      "completionStateCode": "",
+      "selectionPolicyCode": ""
     },
     {
       "priorityCode": "E-P3",
       "title": "Town 입고·주문·수령 공간 실행",
+      "evidenceTrackCode": "Integration",
+      "currentStageCodes": [
+        "E1"
+      ],
       "targetStageCode": "E4",
       "wiIds": [
         "WI-MARKET-02",
@@ -481,24 +565,35 @@
         "WI-ORDER-04",
         "WI-ORDER-05",
         "WI-ORDER-06"
-      ]
+      ],
+      "completionStateCode": "",
+      "selectionPolicyCode": ""
     },
     {
       "priorityCode": "E-P4",
-      "title": "Nature 사건 행위 계약 보완",
-      "targetStageCode": "E1",
+      "title": "Nature 사건 공간 모판 재검증",
+      "evidenceTrackCode": "Integration",
+      "currentStageCodes": [
+        "E1"
+      ],
+      "targetStageCode": "E4",
       "wiIds": [
         "WI-NATURE-01",
         "WI-NATURE-02",
         "WI-NATURE-03",
         "WI-NATURE-04"
       ],
-      "completionStateCode": "ContractEstablished"
+      "completionStateCode": "SeedbedValidated",
+      "selectionPolicyCode": ""
     },
     {
       "priorityCode": "E-P5",
       "title": "선정 WI 공공데이터 계보",
+      "evidenceTrackCode": "Integration",
+      "currentStageCodes": [],
       "targetStageCode": "E6",
+      "wiIds": null,
+      "completionStateCode": "",
       "selectionPolicyCode": "OnlyAfterE5InstanceAndExplicitRequirement"
     }
   ],

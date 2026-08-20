@@ -16,7 +16,8 @@
       "definitionSourcePath": "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json",
       "expectedCurrentDefinitionCount": 5,
       "currentInstancePolicyCode": "Defined",
-      "boundary": "위치 독립적인 WI 공간 역할·능력·업무 용량·내부 관계·외부 연결구를 정의하며 실제 좌표·도로·Block·Graph를 소유하지 않는다."
+      "judgmentSurfaceCode": "RecognizedSpatialPart",
+      "boundary": "위치 독립적인 공간 부품의 의미·표현 후보·게임 맥락을 식별한다. H2 조합 입력에는 이 인지 수준이면 충분하며, 공식 WI 공간 능력·업무 용량 승인은 필요한 H1에만 별도로 적용한다. 실제 좌표·도로·Block·Graph를 소유하지 않는다."
     },
     {
       "code": "H2",
@@ -27,7 +28,8 @@
       "definitionSourcePath": "eng/world-seedbeds/landscape-blocks",
       "expectedCurrentDefinitionCount": 0,
       "currentInstancePolicyCode": "DesignInventorySeparatedFromE5Instances",
-      "boundary": "여러 H1을 상대 위치·위상·내부 관계·외부 연결구로 묶는 위치 독립 블록 설계다. E5에서 특정 AreaSet에 배치할 수 있지만 공공데이터 결속은 E6 전까지 요구하지 않는다."
+      "judgmentSurfaceCode": "FirstSpatialCompositionReview",
+      "boundary": "여러 H1 인지 부품을 상대 위치·위상·내부 관계·외부 연결구로 묶는 첫 공간 판단 단위다. H1의 공식 Simulation 승인을 선행 조건으로 요구하지 않으며 H2 자체의 Unity Root와 5시점 촬영을 검토한다. E5에서 특정 AreaSet에 배치할 수 있지만 공공데이터 결속은 E6 전까지 요구하지 않는다."
     },
     {
       "code": "H3",

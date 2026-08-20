@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:nature-town-relief-loop",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "Nature–Town 대피·구호 인계 경관",
+  "summary": "Town의 회수·구호 대응에서 Nature 복원 작업과 안전 생활핵 귀환까지 이어지는 양방향 대피·구호 인과를 묶은 혼합 경관이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Linear",
+  "requiredH2Refs": [
+    "h2-candidate:town-recall-relief",
+    "h2-candidate:nature-town-relief-transition",
+    "h2-candidate:nature-restoration-recovery"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:town-resident-service",
+    "h2-candidate:nature-home-core"
+  ],
+  "connectorRoleCodes": [
+    "TownReliefGate",
+    "NatureRestorationGate",
+    "SafeCoreReturnLoop"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/nature-town-relief-loop.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:nature-town-relief-loop"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

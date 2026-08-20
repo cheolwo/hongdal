@@ -69,7 +69,7 @@ Require (@($worldCatalog.items).Count -eq 41) "WorldInteractionCountMustBe41"
 Require ([string] $priority.schemaVersion -eq "simulation-world-interaction-spatial-priorities.v1") "PrioritySchemaInvalid"
 Require ([string] $compositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "CompositionPlanSchemaInvalid"
 Require ([string] $p2CompositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "P2CompositionPlanSchemaInvalid"
-Require ([string] $resourceInventory.revision -eq "simulation-world-spatial-resource-inventory.r5") "ResourceInventoryRevisionInvalid"
+Require ([string] $resourceInventory.revision -eq "simulation-world-spatial-resource-inventory.r8") "ResourceInventoryRevisionInvalid"
 
 $itemsById = @{}
 foreach ($item in @($worldCatalog.items)) { $itemsById[[string] $item.id] = $item }

@@ -14,6 +14,12 @@ public static class PyeongchangAreaSetStableIds
 {
     public const string AreaSet = "area-set:sim:pyeongchang:farm-hub-town.v1";
     public const string LegacyAreaSetAlias = "pyeongchang-farm-hub-town-v1";
+    public const string ActualNetwork =
+        "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1";
+    public const string NatureAreaSet = "area-set:sim:pyeongchang:nature-home.v1";
+    public const string FarmAreaSet = "area-set:sim:pyeongchang:farm-production.v1";
+    public const string HubAreaSet = "area-set:sim:pyeongchang:logistics-hub.v1";
+    public const string TownAreaSet = "area-set:sim:pyeongchang:town-market.v1";
     public const string FarmGraph = "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1";
     public const string FarmHubCorridorGraph = "landscape-graph:sim:pyeongchang:farm-hub-corridor.v1";
     public const string HubGraph = "landscape-graph:sim:pyeongchang:jinbu-hub.v1";

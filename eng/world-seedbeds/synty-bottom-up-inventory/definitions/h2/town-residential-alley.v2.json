@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:town-residential-alley",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "생활권 주거 골목 블록",
+  "summary": "작은 광장과 근린 서비스 거점을 보행 골목으로 연결해 주민 이동과 일상 체류를 수용하는 Town 단독 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:town-living-square",
+    "h1-stock:town-neighborhood-service"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:town-staff-rest"
+  ],
+  "connectorRoleCodes": [
+    "NeighborhoodInput",
+    "PedestrianLoop",
+    "LocalRoadOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/town-residential-alley.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:town-residential-alley"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -4,12 +4,12 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "41918d94124f691619d3a5b7743e37f68aed0b5a440fe96d89692fb1be10aa4d",
+  "previousCatalogSha256": "e52b3593850c4e263b6303f9c889d4eeed84560261853ba2cc54cd6c5fc512ea",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
-  "derivationRecipeSha256": "f766b8baf43c6413049809b7c182c00fc4174c27ab76a45a3e6d8c9a522da3a3",
+  "derivationRecipeSha256": "73b8983f988edb9f5adcd71407e485750b9067c49e496b78ec837049cee6c4a2",
   "h1InteractionDefinitionRefs": [
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -1530,6 +1530,14 @@
   ],
   "h2DefinitionRefs": [
     {
+      "stableId": "h2-candidate:farm-harvest-throughput",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-harvest-throughput.v2.json",
+      "definitionSha256": "9d8854da2d6580704654f495a6681a050a8b2e8df15fd3b6879e116dc5ed39ba",
+      "documentPath": "authored/h2/farm-harvest-throughput.v2.md",
+      "documentSha256": "eed92803234469fae1e6fa4ebd60ade0b5ab3f957792a2fe5027506fa81eb7fe"
+    },
+    {
       "stableId": "h2-candidate:farm-hub-corridor",
       "revision": 2,
       "definitionPath": "definitions/h2/farm-hub-corridor.v2.json",
@@ -1544,6 +1552,14 @@
       "definitionSha256": "738fecb4c5ee023b84bb605c64edf5d94e1a4400a549b0340b02caffe8c47031",
       "documentPath": "authored/h2/farm-incident-containment.v2.md",
       "documentSha256": "81ca2de3e11d696584aea3886fd88bc4d7a464936a67b727d3da67473e215417"
+    },
+    {
+      "stableId": "h2-candidate:farm-irrigation-service",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-irrigation-service.v2.json",
+      "definitionSha256": "ee14536ea25fc6db82356721a3233b7480917813bff8122ed7374b0b99328184",
+      "documentPath": "authored/h2/farm-irrigation-service.v2.md",
+      "documentSha256": "08f7a3a419a3fe110eee6f6773b824a1064139f0b4b58ad3866393b68af29091"
     },
     {
       "stableId": "h2-candidate:farm-loss-restoration-handoff",
@@ -1602,6 +1618,14 @@
       "documentSha256": "355b3b30fed758dde2dcbd2a50b13d75a4993a6f0917f5fb0050ff341d6c34aa"
     },
     {
+      "stableId": "h2-candidate:hub-emergency-power",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-emergency-power.v2.json",
+      "definitionSha256": "b844d4651513a7145371f22a4e45a15a0471fdfb7f2e2f19e91f72d6b0c276c8",
+      "documentPath": "authored/h2/hub-emergency-power.v2.md",
+      "documentSha256": "56d70f88bc8c4ae1400aae25dc16a92b67c59e705cce8d5ad1c4e1922f324984"
+    },
+    {
       "stableId": "h2-candidate:hub-inbound-storage",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-inbound-storage.v2.json",
@@ -1616,6 +1640,14 @@
       "definitionSha256": "1149e7fa8dd2d6ef889af153d3a58b05922a275e778ade80169b89beed869e28",
       "documentPath": "authored/h2/hub-longterm-cold-storage.v2.md",
       "documentSha256": "35f7d768fc90b793ba48cd32ebfd3db991f6b5872a1df03a6b67483559d8a249"
+    },
+    {
+      "stableId": "h2-candidate:hub-maintenance-yard",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-maintenance-yard.v2.json",
+      "definitionSha256": "8e0e0a38090588972a83829cb800fe90f3f3447b70392758e982529f07e5a2e7",
+      "documentPath": "authored/h2/hub-maintenance-yard.v2.md",
+      "documentSha256": "1852e0fe6572b505e1216827753d3da8c51c30428385aea36adbd0a37b1937e6"
     },
     {
       "stableId": "h2-candidate:hub-outbound-vehicle",
@@ -1666,6 +1698,30 @@
       "documentSha256": "930da4e6a706e453fc7a0e122a14de11fe1e08b2f3c5bad564867f8bd9ddb5f6"
     },
     {
+      "stableId": "h2-candidate:nature-defense-ring",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-defense-ring.v2.json",
+      "definitionSha256": "20536a490f223282b69a567bc1baa36d327c10de663dc763e2e8bea5bfcbc9eb",
+      "documentPath": "authored/h2/nature-defense-ring.v2.md",
+      "documentSha256": "35ca42c50d7a82faf0efce6d39bbd4e98f3d53b1604a121bef3b3117a12c7e73"
+    },
+    {
+      "stableId": "h2-candidate:nature-encounter-route",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-encounter-route.v2.json",
+      "definitionSha256": "ef1223cbafafd731144abe31991722c500883c081d0363045bb4b101e7e87083",
+      "documentPath": "authored/h2/nature-encounter-route.v2.md",
+      "documentSha256": "486b8db7a9e068b8de946db5ffde8c26f525a7b31642fd7d57eaeda27855d502"
+    },
+    {
+      "stableId": "h2-candidate:nature-home-core",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-home-core.v2.json",
+      "definitionSha256": "aed122746f23331b1cb0c63d19f649d653eafdafc8d4e3e306329378b92a3015",
+      "documentPath": "authored/h2/nature-home-core.v2.md",
+      "documentSha256": "532625299088f8b5cc096bfe83ca36bba3007c611f24688fd30ca3346b5a47be"
+    },
+    {
       "stableId": "h2-candidate:nature-restoration-recovery",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-restoration-recovery.v2.json",
@@ -1680,6 +1736,14 @@
       "definitionSha256": "29100533e23f3e37070806a4b2c5bb0ad8d2bdac6601a12d3c0e6c9f5af5c8bf",
       "documentPath": "authored/h2/nature-threat-response.v2.md",
       "documentSha256": "5959dc531720b3ed79f27df1a5bb11dfdbc2501f027dc6828cde4f76aeb96a37"
+    },
+    {
+      "stableId": "h2-candidate:nature-town-relief-transition",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-town-relief-transition.v2.json",
+      "definitionSha256": "3c5991f1a2bfbd9883be857d7de0cc8db7bf31f32ca4ae583fa926eddd63f2c5",
+      "documentPath": "authored/h2/nature-town-relief-transition.v2.md",
+      "documentSha256": "ca40f54b98687def8fc12702c61df71806ae83baa2835f66b0b379589f581bc9"
     },
     {
       "stableId": "h2-candidate:nature-trail-shelter",
@@ -1712,6 +1776,22 @@
       "definitionSha256": "d1edb7c63c64009e4e466ee4e54c78ef19a66e5fa8121eeb7e8ca2e01a4a45f7",
       "documentPath": "authored/h2/town-recall-relief.v2.md",
       "documentSha256": "5ec2df519bb53433942458741a4feb3952b2a2f1bc7411bd5aba1f8009455071"
+    },
+    {
+      "stableId": "h2-candidate:town-resident-service",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-resident-service.v2.json",
+      "definitionSha256": "a9114f4e23705e62d84a6f5d07bfce4980ac335f2f5aeb09bfa57163384aa6ba",
+      "documentPath": "authored/h2/town-resident-service.v2.md",
+      "documentSha256": "b4aab8fab707694d3b5e9ddbef1869b97cf0e4b25b78289a09f2a60d8c872818"
+    },
+    {
+      "stableId": "h2-candidate:town-residential-alley",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-residential-alley.v2.json",
+      "definitionSha256": "b874688232b03e195594cc92d3c60814ab83cdc1128721f7ad739755d572f487",
+      "documentPath": "authored/h2/town-residential-alley.v2.md",
+      "documentSha256": "c4d52257525a69bd551393ba6d20d2174a72376c05351122ed4b826500323239"
     },
     {
       "stableId": "h2-candidate:town-returns-waste",
@@ -1756,12 +1836,28 @@
       "documentSha256": "22b5f000efbf232c97ef733f4644c5747adfef1df7b3974a8e0837b1d5d56f51"
     },
     {
+      "stableId": "h3-candidate:farm-seasonal-production-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/farm-seasonal-production-loop.v2.json",
+      "definitionSha256": "c1f7c9c845a23add069b5e622702c29e3dd17bd8646d60277a59a36884d9cf1f",
+      "documentPath": "authored/h3/farm-seasonal-production-loop.v2.md",
+      "documentSha256": "c8146df024d1a1d48f1666f6d3397a11ac64a28335e2c1dd3ce3677124d8cac3"
+    },
+    {
       "stableId": "h3-candidate:highland-farm",
       "revision": 2,
       "definitionPath": "definitions/h3/highland-farm.v2.json",
       "definitionSha256": "94273055b82d53e5fcf77517cf87e1e300b2c30c32cb085a8a0065fcf98e1d38",
       "documentPath": "authored/h3/highland-farm.v2.md",
       "documentSha256": "8aac687bb2f92e91fb0238c2d218c5fe85b627b2fce606510b17e5a5a10b3f52"
+    },
+    {
+      "stableId": "h3-candidate:hub-maintenance-emergency-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/hub-maintenance-emergency-loop.v2.json",
+      "definitionSha256": "83c72ff3883509b0e2861153e3dc33eadb40c883e73d9df795afdad44402370f",
+      "documentPath": "authored/h3/hub-maintenance-emergency-loop.v2.md",
+      "documentSha256": "e85f4caf56abef9e227f3bc24c26a558cf69cba7a4ce6f27920eef41359ebf90"
     },
     {
       "stableId": "h3-candidate:hub-town-logistics",
@@ -1796,12 +1892,28 @@
       "documentSha256": "d545a1d4e52f7e92ff5f37bc66b49be3c55caf1bf190bab78bb95a8977e5d1c7"
     },
     {
+      "stableId": "h3-candidate:nature-home-encounter-defense",
+      "revision": 1,
+      "definitionPath": "definitions/h3/nature-home-encounter-defense.v2.json",
+      "definitionSha256": "35d4129d86783537de4b72314dda1f999135708705523c59b8ad401a7ee142c8",
+      "documentPath": "authored/h3/nature-home-encounter-defense.v2.md",
+      "documentSha256": "f6f2ad3c033840bf6d85110298243e1112e9350fc2c87d521ad731dc2abdbeae"
+    },
+    {
       "stableId": "h3-candidate:nature-threat-recovery",
       "revision": 1,
       "definitionPath": "definitions/h3/nature-threat-recovery.v2.json",
       "definitionSha256": "12b71b6b4d52d11ad4dad82b93b063753b0752d0a76b33b1e078b594c854e56a",
       "documentPath": "authored/h3/nature-threat-recovery.v2.md",
       "documentSha256": "dd1091ca756c8b3020742dd71c5be21f1468455d8836db39ec26facafcff1a7d"
+    },
+    {
+      "stableId": "h3-candidate:nature-town-relief-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/nature-town-relief-loop.v2.json",
+      "definitionSha256": "cb5534a7b6b755433c8400e96d5621c150ef2c0b4f088cde6635939a7bac9903",
+      "documentPath": "authored/h3/nature-town-relief-loop.v2.md",
+      "documentSha256": "855af38bcd021bf6bac76675589a2e1419c4d2a47f3f75ec1757a81692054e95"
     },
     {
       "stableId": "h3-candidate:nature-trail-network",
@@ -1826,6 +1938,14 @@
       "definitionSha256": "3f0c7531f929f8f2ba08ffe3b7b262596cdc3c8c0b24fcc74745ace57fb8c6c4",
       "documentPath": "authored/h3/town-contamination-relief.v2.md",
       "documentSha256": "48d87f135542d72e559d6a4750798195ee167efaae4adffeb0484127de17bc45"
+    },
+    {
+      "stableId": "h3-candidate:town-resident-service-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/town-resident-service-loop.v2.json",
+      "definitionSha256": "a3faa4ec7822d48ba0966356d9d0e4ecb8bbbd8834f2ca1f38c09605b37845c7",
+      "documentPath": "authored/h3/town-resident-service-loop.v2.md",
+      "documentSha256": "4193c0f05669e1a450598d32578dcad0a3864ac4885f6ae405a634936d3d0d71"
     }
   ],
   "h4DefinitionRefs": [
@@ -1843,36 +1963,36 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-production-processing-region.v3.json",
-      "definitionSha256": "3b35c141c6b4390878a660075e53f12bd3951f4359c3acaa1680a5aba9053fd3",
+      "definitionSha256": "0a44601bbca9e063d1846666600042114c90ae90d775587b4c34406289619bf7",
       "documentPath": "authored/h4/farm-production-processing-region.v3.md",
-      "documentSha256": "d87f132d072c468a9302a985d39a80b2b131f9e8fd6d53134595f43dcb3169a4"
+      "documentSha256": "23fadf8553ba8b147e666a0d525cfff6aee0b1f78d772a69f51a909a82a54a6d"
     },
     {
       "stableId": "h4-blueprint:logistics-hub-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/logistics-hub-region.v3.json",
-      "definitionSha256": "25d4b3180d6a42b5e7a0aa2e81f202b5d9a9493a44a6c627a540698981f70b21",
+      "definitionSha256": "5345a10427dae7fabc59b8b0d8352a247a1620204777f8ddc8bf6c0317ebdee1",
       "documentPath": "authored/h4/logistics-hub-region.v3.md",
-      "documentSha256": "a37a60d3205d1e5792f92b729d2ed11fc6d7972dcc3ceac9a02200ff89448df5"
+      "documentSha256": "3d9bece4eaa9ff9df503a4340743b93fa4273bc58ba9618ae7f3f8ca21996ec3"
     },
     {
       "stableId": "h4-blueprint:lowrise-market-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/lowrise-market-region.v3.json",
-      "definitionSha256": "7278773e5305a3be403c63afc589bcb1468bacde738a6ab0e89977912238d460",
+      "definitionSha256": "e6d073fbcf03d3e6fc5483ed6ec816a58e51a69e1dfaa0c6a81b5a2d8c0c0666",
       "documentPath": "authored/h4/lowrise-market-region.v3.md",
-      "documentSha256": "b9ce55f391048a2724362407e28fcdc10247b1006e33f315325b567dd1d09b2e"
+      "documentSha256": "11e222c0c34563366e4aea83402cc35d8431806cb3e4dde387afd71ce30e0511"
     },
     {
       "stableId": "h4-blueprint:nature-home-exploration-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/nature-home-exploration-region.v3.json",
-      "definitionSha256": "04f008d9a21cd763d2c3728d9d629cf96f3140ee639d0bc8b5900c7c0cbe6834",
+      "definitionSha256": "db9959b37dfada55a6f8d4f1ce1ff8884f8c8aff8728b01e81d1e610b166d575",
       "documentPath": "authored/h4/nature-home-exploration-region.v3.md",
-      "documentSha256": "aeae602d4298ac6e6b980a4890e8c8c5dea7acc014ea5cc6dbda492c3e25d13f"
+      "documentSha256": "094abd28a0f9f7d316d98bf2faa2862f5de1690667be58a30b73121e5134071a"
     },
     {
       "stableId": "h4-blueprint:nature-water-region",
@@ -1885,6 +2005,28 @@
     }
   ],
   "h2DerivationBindings": [
+    {
+      "targetKnowledgeRef": "h2-candidate:farm-harvest-throughput",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.farm-harvest-throughput.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:farm-harvest-staging",
+        "h1-stock:farm-production",
+        "h1-stock:farm-work-yard",
+        "h1-stock:farm-worker-waiting"
+      ],
+      "sourceGrammarRefs": [
+        "farm:감자밭 두렁",
+        "farm:농산물 집하·직판장",
+        "farm:헛간 작업마당",
+        "farm:혼합 작물밭",
+        "network:농촌도로 직선",
+        "network:농촌도로 T자",
+        "town:버스 정류장·보행 쉼터"
+      ],
+      "derivationInputHashSha256": "5a5dcefac857e70057c5d26736c6e1632b94b39edf21c0d64e8ad7aca1b79bde",
+      "presentationOnly": true
+    },
     {
       "targetKnowledgeRef": "h2-candidate:farm-hub-corridor",
       "targetHierarchyLevelCode": "H2",
@@ -1919,6 +2061,26 @@
         "network:농촌도로 직선"
       ],
       "derivationInputHashSha256": "2e067d141ad80b4aa23f5a618872108be621f2e1def81cc8464b88a95452044e",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:farm-irrigation-service",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.farm-irrigation-service.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:farm-maintenance-yard",
+        "h1-stock:farm-production",
+        "h1-stock:farm-tool-storage",
+        "h1-stock:farm-weather-protection"
+      ],
+      "sourceGrammarRefs": [
+        "farm:감자밭 두렁",
+        "farm:시설하우스 단동",
+        "farm:헛간 작업마당",
+        "farm:혼합 작물밭",
+        "network:농촌도로 직선"
+      ],
+      "derivationInputHashSha256": "312a48431ccb484728ecdc8eef091ad4e7ee0d76e6d86059bd647cafcc3d58ec",
       "presentationOnly": true
     },
     {
@@ -2058,6 +2220,26 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h2-candidate:hub-emergency-power",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.hub-emergency-power.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:hub-cold-storage",
+        "h1-stock:hub-long-term-storage",
+        "h1-stock:hub-service-maintenance",
+        "h1-stock:hub-temporary-staging"
+      ],
+      "sourceGrammarRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 직선",
+        "transition:Road–BuildingFront 전환"
+      ],
+      "derivationInputHashSha256": "92dbc7fa0656a3182df7f044a9b4ab91158a4e5483f4b6b35afcf30dc219c0f5",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h2-candidate:hub-inbound-storage",
       "targetHierarchyLevelCode": "H2",
       "derivationRecipeCode": "h2.hub-inbound-storage.r1",
@@ -2093,6 +2275,25 @@
         "network:도시도로 직선"
       ],
       "derivationInputHashSha256": "f02746da9017f02b082ecced39b00c5c9b8555887decaa48c3bccdf62f1c609d",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:hub-maintenance-yard",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.hub-maintenance-yard.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:hub-service-maintenance",
+        "h1-stock:hub-temporary-staging",
+        "h1-stock:hub-vehicle-yard"
+      ],
+      "sourceGrammarRefs": [
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 직선",
+        "network:도시도로 T자",
+        "transition:Road–BuildingFront 전환"
+      ],
+      "derivationInputHashSha256": "b141a179a1fd3d00537d34c78f0b217de66e2729ded8ceb553e9332a91a408ff",
       "presentationOnly": true
     },
     {
@@ -2218,6 +2419,71 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h2-candidate:nature-defense-ring",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.nature-defense-ring.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-safe-recovery-camp",
+        "h1-stock:nature-shelter",
+        "h1-stock:nature-threat-watch"
+      ],
+      "sourceGrammarRefs": [
+        "nature:고지대 노출지",
+        "nature:산 능선",
+        "nature:산길·바위 길목",
+        "nature:숲 빈터·고사목",
+        "nature:초지·야생화",
+        "network:농촌도로 곡선",
+        "network:농촌도로 T자"
+      ],
+      "derivationInputHashSha256": "0c697c344d658b255c5f72f59f4150cfded1ac0ecbde65308613964b59e92150",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:nature-encounter-route",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.nature-encounter-route.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:nature-emergency-retreat",
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-lookout",
+        "h1-stock:nature-threat-watch"
+      ],
+      "sourceGrammarRefs": [
+        "nature:고지대 노출지",
+        "nature:산 능선",
+        "nature:산길·바위 길목",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "network:농촌도로 곡선"
+      ],
+      "derivationInputHashSha256": "ebd6fbcab53875b01a46de4092a33218fc3bbefbb94ef7612432f70b6099117d",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:nature-home-core",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.nature-home-core.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:nature-lookout",
+        "h1-stock:nature-safe-recovery-camp",
+        "h1-stock:nature-shelter",
+        "h1-stock:nature-trailhead"
+      ],
+      "sourceGrammarRefs": [
+        "nature:고지대 노출지",
+        "nature:산 능선",
+        "nature:산길·바위 길목",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "nature:초지·야생화",
+        "network:농촌도로 곡선"
+      ],
+      "derivationInputHashSha256": "6ecacc4b6b405c208df17acb6aaf088c8e869fd5b5b1660c1a71e3a8d2ed7abc",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h2-candidate:nature-restoration-recovery",
       "targetHierarchyLevelCode": "H2",
       "derivationRecipeCode": "h2.nature-restoration-recovery.r1",
@@ -2258,6 +2524,32 @@
         "network:농촌도로 곡선"
       ],
       "derivationInputHashSha256": "54736c06c0821e4cc6c75423fd5e6a086891aa21a65c27427466f759cc7b775e",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:nature-town-relief-transition",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.nature-town-relief-transition.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:nature-emergency-retreat",
+        "h1-stock:nature-restoration-site",
+        "h1-stock:nature-safe-recovery-camp",
+        "h1-stock:town-nature-relief",
+        "h1-stock:town-recall-service"
+      ],
+      "sourceGrammarRefs": [
+        "nature:산길·바위 길목",
+        "nature:수변 완충지",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "nature:초지·야생화",
+        "network:농촌도로 곡선",
+        "network:타운도로 곡선",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면"
+      ],
+      "derivationInputHashSha256": "52b290af010bfd3ec2e729351ba8fdcdf9ed25e2fdc18d76b539cfe4e57c16e7",
       "presentationOnly": true
     },
     {
@@ -2341,6 +2633,46 @@
         "town:읍내 상점 전면"
       ],
       "derivationInputHashSha256": "1a5cdefe9f5a5b84b14b359b60123d076c1e15f2029d37622ac63cdda2949ca0",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:town-resident-service",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.town-resident-service.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:town-living-square",
+        "h1-stock:town-neighborhood-service",
+        "h1-stock:town-recall-service",
+        "h1-stock:town-resident-pickup"
+      ],
+      "sourceGrammarRefs": [
+        "network:타운도로 직선",
+        "town:근린 놀이터",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면"
+      ],
+      "derivationInputHashSha256": "55cd9a285e783124a0eb5552e8cc912bfed2b043b661b678a9ad92af326a7afc",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:town-residential-alley",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.town-residential-alley.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:town-living-square",
+        "h1-stock:town-neighborhood-service",
+        "h1-stock:town-staff-rest"
+      ],
+      "sourceGrammarRefs": [
+        "city:공동주택 생활마당",
+        "network:타운도로 직선",
+        "network:타운도로 T자",
+        "town:근린 놀이터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면"
+      ],
+      "derivationInputHashSha256": "36cc11c7a123a879c906bac7576598594de273e6f9c136209a200882f1dc942a",
       "presentationOnly": true
     },
     {
@@ -2472,6 +2804,31 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h3-candidate:farm-seasonal-production-loop",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.farm-seasonal-production-loop.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:farm-harvest-throughput",
+        "h2-candidate:farm-irrigation-service",
+        "h2-candidate:farm-processing-shipping",
+        "h2-candidate:farm-worker-support"
+      ],
+      "sourceGrammarRefs": [
+        "farm:감자밭 두렁",
+        "farm:농산물 집하·직판장",
+        "farm:시설하우스 단동",
+        "farm:헛간 작업마당",
+        "farm:혼합 작물밭",
+        "network:농촌도로 직선",
+        "network:농촌도로 T자",
+        "town:버스 정류장·보행 쉼터",
+        "transition:Farm–Hub 전환",
+        "transition:Farm–Town 전환"
+      ],
+      "derivationInputHashSha256": "e3d56e325b10af861f928fd276bebb4216755d61d0a8c1db8af0e00d3e2e191d",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h3-candidate:highland-farm",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.highland-farm.r1",
@@ -2497,6 +2854,30 @@
         "transition:Nature–Farm 전환"
       ],
       "derivationInputHashSha256": "b55b1ee77b51d4158f018a1aef1d7857bac33bd22e2ecf552e3b8f5233b37846",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h3-candidate:hub-maintenance-emergency-loop",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.hub-maintenance-emergency-loop.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:hub-emergency-power",
+        "h2-candidate:hub-longterm-cold-storage",
+        "h2-candidate:hub-maintenance-yard",
+        "h2-candidate:hub-outbound-vehicle"
+      ],
+      "sourceGrammarRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 십자",
+        "network:도시도로 직선",
+        "network:도시도로 T자",
+        "transition:Hub–City 전환",
+        "transition:Road–BuildingFront 전환",
+        "transition:Town–Hub 전환"
+      ],
+      "derivationInputHashSha256": "a0a97697b313c89fa20cb2433417bb86a5306ca6f9bb1fab3b466db386ed24cc",
       "presentationOnly": true
     },
     {
@@ -2584,6 +2965,31 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h3-candidate:nature-home-encounter-defense",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.nature-home-encounter-defense.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-encounter-route",
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery"
+      ],
+      "sourceGrammarRefs": [
+        "nature:고지대 노출지",
+        "nature:산 능선",
+        "nature:산길·바위 길목",
+        "nature:수변 완충지",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "nature:초지·야생화",
+        "network:농촌도로 곡선",
+        "network:농촌도로 T자",
+        "transition:Water–Land 전환"
+      ],
+      "derivationInputHashSha256": "acab3e5ddeb20d0c38131b2ed4696e51e0b1d6f618f7ba6b75bc4710b20e324e",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h3-candidate:nature-threat-recovery",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.nature-threat-recovery.r1",
@@ -2606,6 +3012,39 @@
         "transition:Water–Land 전환"
       ],
       "derivationInputHashSha256": "6781c05d0adda18c9d1c709c91f7d9307cb105448daf0f5f8f95de7f3f2df987",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h3-candidate:nature-town-relief-loop",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.nature-town-relief-loop.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-town-relief-transition",
+        "h2-candidate:town-recall-relief",
+        "h2-candidate:town-resident-service"
+      ],
+      "sourceGrammarRefs": [
+        "nature:고지대 노출지",
+        "nature:산 능선",
+        "nature:산길·바위 길목",
+        "nature:수변 완충지",
+        "nature:숲 가장자리",
+        "nature:숲 빈터·고사목",
+        "nature:초지·야생화",
+        "network:농촌도로 곡선",
+        "network:타운도로 곡선",
+        "network:타운도로 직선",
+        "network:타운도로 T자",
+        "town:근린 놀이터",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면",
+        "transition:Road–BuildingFront 전환",
+        "transition:Water–Land 전환"
+      ],
+      "derivationInputHashSha256": "3eabfc753f5e69f7d27fc0442fad1b81339341200057d304fadc9a8c7a4abc5d",
       "presentationOnly": true
     },
     {
@@ -2688,6 +3127,29 @@
       ],
       "derivationInputHashSha256": "5d9ce40a05cfbd77fb7be9059aa54d50fea08cd94eba4dd498b85e9e654967bc",
       "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h3-candidate:town-resident-service-loop",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.town-resident-service-loop.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:lowrise-residential",
+        "h2-candidate:town-resident-service",
+        "h2-candidate:town-residential-alley"
+      ],
+      "sourceGrammarRefs": [
+        "city:공동주택 생활마당",
+        "network:타운도로 곡선",
+        "network:타운도로 직선",
+        "network:타운도로 T자",
+        "town:근린 놀이터",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면",
+        "transition:Road–BuildingFront 전환"
+      ],
+      "derivationInputHashSha256": "dd95d9871953e38a7255fe02692feb03c66a7b4baae07d0ad3b9c90d5da323d9",
+      "presentationOnly": true
     }
   ],
   "counts": {
@@ -2703,5 +3165,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "eb42b74af470d368c1cbe533ad8f6cf79ee9edaef414a0b3f1d389a2db353c7f"
+  "contentHashSha256": "9d6476536240032aad7d998f6422220d320427560acfe6708dc5c798e88c97ab"
 }

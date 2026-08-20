@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:nature-home-core",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "자연 안전 생활핵 블록",
+  "summary": "회복 야영지와 임시 대피 공간, 탐색 출발지를 묶어 Nature 상시 체류와 탐험 복귀를 지원하는 단독 팩 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Cluster",
+  "requiredH1Refs": [
+    "h1-stock:nature-safe-recovery-camp",
+    "h1-stock:nature-shelter",
+    "h1-stock:nature-trailhead"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:nature-lookout"
+  ],
+  "connectorRoleCodes": [
+    "TrailInput",
+    "SafeCoreOutput",
+    "EmergencyReturn"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/nature-home-core.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:nature-home-core"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

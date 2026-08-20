@@ -410,8 +410,8 @@ foreach ($level in @("h1", "h2", "h3")) {
 }
 
 Require (@($definitionsByLevel.H1).Count -eq 52) "H1CountMustBe52"
-Require (@($definitionsByLevel.H2).Count -eq 24) "H2CountMustBe24"
-Require (@($definitionsByLevel.H3).Count -eq 13) "H3CountMustBe13"
+Require (@($definitionsByLevel.H2).Count -eq 34) "H2CountMustBe34"
+Require (@($definitionsByLevel.H3).Count -eq 18) "H3CountMustBe18"
 foreach ($h1 in @($definitionsByLevel.H1)) {
     foreach ($reference in @($h1.predecessorH1Refs + $h1.successorH1Refs)) { Require ($definitionsById.ContainsKey([string] $reference)) "H1RelationUnknown:$($h1.stableId):$reference" }
 }
@@ -567,10 +567,10 @@ if ($Mode -eq "Check") {
         Require (Test-Path -LiteralPath $path) "GeneratedDocumentMissing:$($pair.Key)"
         Require ((ConvertTo-StableText ([IO.File]::ReadAllText($path))) -ceq $pair.Value) "GeneratedDocumentOutOfDate:$($pair.Key)"
     }
-    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=24;H3=13"
+    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=34;H3=18"
 }
 else {
     [void] (Write-TextIfChanged $catalogPath (ConvertTo-StableJson $catalog))
     foreach ($pair in $generated.GetEnumerator()) { [void] (Write-TextIfChanged (Resolve-RepositoryPath $repositoryRoot $pair.Key) $pair.Value) }
-    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=24;H3=13"
+    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=34;H3=18"
 }

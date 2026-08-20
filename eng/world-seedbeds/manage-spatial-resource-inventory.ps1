@@ -78,7 +78,7 @@ $raw = [IO.File]::ReadAllText($resolvedInput, [Text.Encoding]::UTF8)
 $inventory = $raw | ConvertFrom-Json
 
 Require ([string] $inventory.schemaVersion -eq "simulation-world-spatial-resource-inventory.v1") "SchemaVersionInvalid"
-Require ([string] $inventory.revision -eq "simulation-world-spatial-resource-inventory.r5") "RevisionInvalid"
+Require ([string] $inventory.revision -eq "simulation-world-spatial-resource-inventory.r8") "RevisionInvalid"
 Require ([bool] $inventory.presentationOnly) "PresentationOnlyMustBeTrue"
 Require (-not [bool] $inventory.isOperationalState) "OperationalStateMustBeFalse"
 Require (-not ($raw -match '"(absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath)"')) "AuthorityFieldForbidden"
@@ -156,7 +156,7 @@ Require-SameSet $graphIds @($h4Stock[0].h3DefinitionRefs) "H4ChildDefinitionsMis
 Require-SameSet @("IdeaInventory", "ExploratoryInventory", "CandidateForReview", "ApprovedReference", "DefinedPartialAssemblyReference") @($inventory.stateModel.designStateCodes) "DesignStateModelInvalid"
 Require-SameSet @("Unallocated", "Allocated", "Placed") @($inventory.stateModel.placementStateCodes) "PlacementStateModelInvalid"
 Require ([string] $inventory.compositionPolicy.directionCode -eq "BottomUp") "CompositionDirectionInvalid"
-foreach ($required in @("requiresExactChildRevision", "requiresDeterministicHash", "requiresHumanReviewForPromotion", "forbidsAutomaticAuthorityPromotion", "forbidsHierarchyCycles", "definitionInventorySeparatedFromPlacementInventory")) {
+foreach ($required in @("requiresExactChildRevision", "requiresDeterministicHash", "requiresHumanReviewForPromotion", "h1RecognitionIsSufficientForH2Composition", "h2IsFirstSpatialCompositionJudgmentSurface", "h2VisualReviewRequiresUnityRoot", "forbidsAutomaticAuthorityPromotion", "forbidsHierarchyCycles", "definitionInventorySeparatedFromPlacementInventory")) {
     Require ([bool] $inventory.compositionPolicy.$required) "CompositionPolicyRequired:$required"
 }
 foreach ($required in @("preserveExistingStableIds", "preserveExistingSchemaVersions", "storeHierarchyCodeOnlyInInventoryLedger", "legacySeedbedTermsRemainAdapters")) {

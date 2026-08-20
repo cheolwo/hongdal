@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:town-resident-service",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "생활권 주민지원·공동수령 블록",
+  "summary": "근린 서비스 거점과 주민 수령 공간, 회수 안내 창구를 묶어 공동수령과 주민 지원을 수용하는 Town 단독 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Cluster",
+  "requiredH1Refs": [
+    "h1-stock:town-neighborhood-service",
+    "h1-stock:town-resident-pickup",
+    "h1-stock:town-recall-service"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:town-living-square"
+  ],
+  "connectorRoleCodes": [
+    "ResidentInput",
+    "ServiceLoop",
+    "PickupOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/town-resident-service.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:town-resident-service"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:nature-town-relief-transition",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "Nature–Town 대피·구호 전환 블록",
+  "summary": "Town의 주민 구호 물자 인계점과 Nature의 복원 작업·안전 회복 공간을 연결해 대피와 구호가 양방향으로 이어지는 혼합 전환 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Linear",
+  "requiredH1Refs": [
+    "h1-stock:town-nature-relief",
+    "h1-stock:nature-restoration-site",
+    "h1-stock:nature-safe-recovery-camp"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:town-recall-service",
+    "h1-stock:nature-emergency-retreat"
+  ],
+  "connectorRoleCodes": [
+    "TownReliefInput",
+    "NatureRestorationHandoff",
+    "SafeCoreReturn"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/nature-town-relief-transition.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:nature-town-relief-transition"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

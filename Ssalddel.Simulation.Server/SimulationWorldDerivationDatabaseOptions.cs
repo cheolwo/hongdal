@@ -32,4 +32,11 @@ public sealed class SimulationWorldDerivationDatabaseOptions
     /// </summary>
     public string InteractionGraphBindingCatalogPath { get; set; } =
         "../eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json";
+
+    /// <summary>
+    /// H1~H3 이론 생산물을 4개 실제 AreaSet과 하나의 AreaSet Network로 결속한
+    /// E5 시나리오 공간 대장이다. 공공데이터 E6 또는 운영 상태를 대신하지 않는다.
+    /// </summary>
+    public string ActualE5SpatialCatalogPath { get; set; } =
+        "../eng/world-seedbeds/generated/actual-e5-spatial.v1.json";
 }

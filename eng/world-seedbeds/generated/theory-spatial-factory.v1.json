@@ -1,0 +1,6250 @@
+{
+  "schemaVersion": "simulation-world-theory-spatial-factory-output.v1",
+  "revision": "simulation-world-theory-spatial-factory-output.r2",
+  "policyRevision": "simulation-world-theory-spatial-factory-policy.r3",
+  "patternNamingRevision": "simulation-world-h-pattern-naming.r6",
+  "generatedAtRuleCode": "DeterministicNoWallClock",
+  "counts": {
+    "h1Inputs": 52,
+    "h2TheoryQualified": 34,
+    "h3TheoryQualified": 18,
+    "e5TheoryQualifiedAreaSets": 4,
+    "authoredH2RecipesReused": 6,
+    "derivedH2Recipes": 28,
+    "reservedExpansionPatterns": 0
+  },
+  "h2Plans": [
+    {
+      "h2StableId": "h2-candidate:farm-harvest-throughput",
+      "patternCode": "FARM-H2-HARVEST-01",
+      "displayNameKo": "생산구획·집하마당 블록",
+      "spatialDisplayNameKo": "생산구획·집하마당 블록",
+      "gameplayProfileNameKo": "팜 수확 패턴 01 — 집중 집하형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Harvest",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "농장 집중 수확·집하 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 80.0,
+          "width": 160.0,
+          "depth": 160.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "ProductionInput",
+          "HarvestFlow",
+          "ProcessingOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-production",
+          "h1Ref": "h1-stock:farm-production",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-FARM-01",
+            "WI-FARM-02",
+            "WI-FARM-03",
+            "WI-FARM-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmProductionPlot"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-harvest-staging",
+          "h1Ref": "h1-stock:farm-harvest-staging",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-FARM-04",
+            "WI-FARM-05"
+          ],
+          "spatialRoleCodes": [
+            "FarmHarvestStagingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-work-yard",
+          "h1Ref": "h1-stock:farm-work-yard",
+          "x": -40.0,
+          "z": 40.0,
+          "wiIds": [
+            "WI-FARM-05",
+            "WI-FARM-06",
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmCollectionArea",
+            "FarmPackingArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-production",
+          "toNodeId": "h1-farm-harvest-staging",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-farm-harvest-staging",
+          "toNodeId": "h1-farm-work-yard",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "ProductionInput",
+          "attachedNodeId": "h1-farm-production"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "HarvestFlow",
+          "attachedNodeId": "h1-farm-production"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "ProcessingOutput",
+          "attachedNodeId": "h1-farm-work-yard"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "TemporaryCropStorage",
+        "WaitForPacking",
+        "WaitForVehicle"
+      ],
+      "theoryHashSha256": "44e3a692490174ecf0a62c9a743d0df2be545f1146d91ed786bc8d4d34c92eab"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-hub-corridor",
+      "patternCode": "MIX-H2-FARM-HUB-01",
+      "displayNameKo": "농장 출구–Hub 진입 회랑 블록",
+      "spatialDisplayNameKo": "농장 출구–Hub 진입 회랑 블록",
+      "gameplayProfileNameKo": "팜–허브 회랑 패턴 01 — 농산물 운송형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "Farm",
+        "City"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "FarmHub",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Farm–Hub 회랑 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -40.0,
+          "maximumX": 80.0,
+          "maximumZ": 40.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-loading-gate",
+          "h1Ref": "h1-stock:farm-loading-gate",
+          "x": -40.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-LOG-01",
+            "WI-LOG-02"
+          ],
+          "spatialRoleCodes": [
+            "FarmLoadingArea",
+            "FarmGate"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-hub-corridor",
+          "h1Ref": "h1-stock:farm-hub-corridor",
+          "x": 40.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-LOG-03"
+          ],
+          "spatialRoleCodes": [
+            "FarmHubCargoCorridor"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-loading-gate",
+          "toNodeId": "h1-farm-hub-corridor",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-farm-loading-gate"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-farm-hub-corridor"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-LOG-01",
+        "WI-LOG-02",
+        "WI-LOG-03"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "f030017b98bf70bccb5f9948d380e54126d34be73d099a014d77c15d017e35dd"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-incident-containment",
+      "patternCode": "FARM-H2-INCIDENT-01",
+      "displayNameKo": "점검마당·격리구획 블록",
+      "spatialDisplayNameKo": "점검마당·격리구획 블록",
+      "gameplayProfileNameKo": "팜 사건대응 패턴 01 — 점검·격리형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Incident",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "농장 사건 점검·격리 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "AuthoredRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -106.0,
+          "minimumZ": -86.0,
+          "maximumX": 88.0,
+          "maximumZ": 74.0,
+          "width": 194.0,
+          "depth": 160.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "HarvestInput",
+          "SafeCargoOutput",
+          "RecoveryOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "exposure-inspection",
+          "h1Ref": "h1-stock:farm-exposure-inspection",
+          "x": -66.0,
+          "z": 8.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmExposureInspectionArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "incident-quarantine",
+          "h1Ref": "h1-stock:farm-incident-quarantine",
+          "x": 12.0,
+          "z": 34.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmIncidentQuarantineArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "weather-protection",
+          "h1Ref": "h1-stock:farm-weather-protection",
+          "x": 48.0,
+          "z": -46.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmWeatherProtectedStagingArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "inspection-to-quarantine",
+          "fromNodeId": "exposure-inspection",
+          "toNodeId": "incident-quarantine",
+          "relationCode": "IncidentIsolationRoute"
+        },
+        {
+          "edgeId": "quarantine-to-weather-protection",
+          "fromNodeId": "incident-quarantine",
+          "toNodeId": "weather-protection",
+          "relationCode": "ProtectedRecoveryRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "harvest-input",
+          "roleCode": "HarvestInput",
+          "attachedNodeId": "exposure-inspection"
+        },
+        {
+          "connectorId": "safe-cargo-output",
+          "roleCode": "SafeCargoOutput",
+          "attachedNodeId": "incident-quarantine"
+        },
+        {
+          "connectorId": "recovery-output",
+          "roleCode": "RecoveryOutput",
+          "attachedNodeId": "weather-protection"
+        }
+      ],
+      "gameplayWiIds": [],
+      "anticipatedGameplayCodes": [
+        "ContaminationAssessment",
+        "FarmCargoQuarantine",
+        "HarvestDelay",
+        "HarvestExposureInspection",
+        "IncidentHold",
+        "MaterialShelter",
+        "ReleaseOrDiscard",
+        "SafeHandoffDecision",
+        "WeatherProtectedStaging"
+      ],
+      "theoryHashSha256": "337aa0d2254c91727b2bd5ffdb851e99b00dc4afc1835f69aadaeec3a84cc614"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-irrigation-service",
+      "patternCode": "FARM-H2-IRRIGATION-01",
+      "displayNameKo": "농수로·급수시설 블록",
+      "spatialDisplayNameKo": "농수로·급수시설 블록",
+      "gameplayProfileNameKo": "팜 관수 패턴 01 — 농수로·급수형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Irrigation",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "농장 관수·급수 관리 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "FieldInput",
+          "WaterServiceRoute",
+          "CropCareOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-production",
+          "h1Ref": "h1-stock:farm-production",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-FARM-01",
+            "WI-FARM-02",
+            "WI-FARM-03",
+            "WI-FARM-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmProductionPlot"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-maintenance-yard",
+          "h1Ref": "h1-stock:farm-maintenance-yard",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmMaintenanceYard"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-weather-protection",
+          "h1Ref": "h1-stock:farm-weather-protection",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmWeatherProtectedStagingArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-production",
+          "toNodeId": "h1-farm-maintenance-yard",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-farm-maintenance-yard",
+          "toNodeId": "h1-farm-weather-protection",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "FieldInput",
+          "attachedNodeId": "h1-farm-production"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "WaterServiceRoute",
+          "attachedNodeId": "h1-farm-production"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "CropCareOutput",
+          "attachedNodeId": "h1-farm-weather-protection"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "HarvestDelay",
+        "MaterialShelter",
+        "WeatherProtectedStaging"
+      ],
+      "theoryHashSha256": "46a16b3b8ebd0c851dea1b5ba686f96419d9ca2e318853758a8c7261c91d1511"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-loss-restoration-handoff",
+      "patternCode": "FARM-H2-RECOVERY-01",
+      "displayNameKo": "복구 작업장·복원 인계장 블록",
+      "spatialDisplayNameKo": "복구 작업장·복원 인계장 블록",
+      "gameplayProfileNameKo": "팜 손실회복 패턴 01 — 복원 인계형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Nature",
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Recovery",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "농장 손실 회복·복원 인계 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "AuthoredRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -118.0,
+          "minimumZ": -64.0,
+          "maximumX": 122.0,
+          "maximumZ": 64.0,
+          "width": 240.0,
+          "depth": 128.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "IncidentInput",
+          "RecoveredCargoOutput",
+          "NatureRestorationOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "incident-quarantine",
+          "h1Ref": "h1-stock:farm-incident-quarantine",
+          "x": -78.0,
+          "z": 24.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmIncidentQuarantineArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "loss-recovery",
+          "h1Ref": "h1-stock:farm-loss-recovery",
+          "x": -4.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmLossRecoveryWorkArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "restoration-supply",
+          "h1Ref": "h1-stock:farm-restoration-supply",
+          "x": 82.0,
+          "z": -24.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmRestorationSupplyHandoffArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "quarantine-to-loss-recovery",
+          "fromNodeId": "incident-quarantine",
+          "toNodeId": "loss-recovery",
+          "relationCode": "LossRecoveryRoute"
+        },
+        {
+          "edgeId": "loss-recovery-to-restoration-supply",
+          "fromNodeId": "loss-recovery",
+          "toNodeId": "restoration-supply",
+          "relationCode": "NatureRestorationHandoffRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "incident-input",
+          "roleCode": "IncidentInput",
+          "attachedNodeId": "incident-quarantine"
+        },
+        {
+          "connectorId": "recovered-cargo-output",
+          "roleCode": "RecoveredCargoOutput",
+          "attachedNodeId": "loss-recovery"
+        },
+        {
+          "connectorId": "nature-restoration-output",
+          "roleCode": "NatureRestorationOutput",
+          "attachedNodeId": "restoration-supply"
+        }
+      ],
+      "gameplayWiIds": [],
+      "anticipatedGameplayCodes": [
+        "CropLossAssessment",
+        "FarmCargoQuarantine",
+        "IncidentHold",
+        "NatureRouteSupport",
+        "ProduceRework",
+        "RecoveredMaterialTransfer",
+        "RecoveryPacking",
+        "ReleaseOrDiscard",
+        "RestorationSupplyHandoff"
+      ],
+      "theoryHashSha256": "2fcad303201511473b2354a161dfdd39b550e54564c09efa692bdd952a0208c2"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-processing-shipping",
+      "patternCode": "FARM-H2-SHIPPING-01",
+      "displayNameKo": "작업마당·출하장 블록",
+      "spatialDisplayNameKo": "작업마당·출하장 블록",
+      "gameplayProfileNameKo": "팜 출하 패턴 01 — 작업마당·상차형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Shipping",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "농장 작업·출하 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-work-yard",
+          "h1Ref": "h1-stock:farm-work-yard",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-FARM-05",
+            "WI-FARM-06",
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmCollectionArea",
+            "FarmPackingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-maintenance-yard",
+          "h1Ref": "h1-stock:farm-maintenance-yard",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmMaintenanceYard"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-loading-gate",
+          "h1Ref": "h1-stock:farm-loading-gate",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-LOG-01",
+            "WI-LOG-02"
+          ],
+          "spatialRoleCodes": [
+            "FarmLoadingArea",
+            "FarmGate"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-work-yard",
+          "toNodeId": "h1-farm-maintenance-yard",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-farm-maintenance-yard",
+          "toNodeId": "h1-farm-loading-gate",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-farm-work-yard"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-farm-loading-gate"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-LOG-01",
+        "WI-LOG-02",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "e6848b470fb4b1f81bfd24c1fbc8af1a4cbfa409aaef715f2cadc74968bc0a20"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-seed-and-tools",
+      "patternCode": "FARM-H2-PREP-01",
+      "displayNameKo": "종자창고·농기구고 블록",
+      "spatialDisplayNameKo": "종자창고·농기구고 블록",
+      "gameplayProfileNameKo": "팜 준비 패턴 01 — 종자·농기구형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Preparation",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "종자·농기구 준비 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Cluster",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CompoundBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "ProductionOutput",
+          "WorkerAccess"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-tool-storage",
+          "h1Ref": "h1-stock:farm-tool-storage",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmToolStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-seed-preparation",
+          "h1Ref": "h1-stock:farm-seed-preparation",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-FARM-02"
+          ],
+          "spatialRoleCodes": [
+            "FarmSeedPreparationArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-tool-storage",
+          "toNodeId": "h1-farm-seed-preparation",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "ProductionOutput",
+          "attachedNodeId": "h1-farm-tool-storage"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "WorkerAccess",
+          "attachedNodeId": "h1-farm-seed-preparation"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-02",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "SeedBatchPreparation",
+        "SeedInspection",
+        "ToolCheckout",
+        "ToolReturn"
+      ],
+      "theoryHashSha256": "eef071a4f1763438fa05ab47b932c81a9a01b81c39a20366de3e15146a4dca55"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-wash-sort-pack",
+      "patternCode": "FARM-H2-PROCESSING-01",
+      "displayNameKo": "세척장·선별장·포장장 블록",
+      "spatialDisplayNameKo": "세척장·선별장·포장장 블록",
+      "gameplayProfileNameKo": "팜 후처리 패턴 01 — 세척·선별·포장형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Processing",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "세척·선별·포장 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -160.0,
+          "minimumZ": -40.0,
+          "maximumX": 160.0,
+          "maximumZ": 40.0,
+          "width": 320.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "HarvestInput",
+          "ShippingOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-harvest-staging",
+          "h1Ref": "h1-stock:farm-harvest-staging",
+          "x": -120.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-FARM-04",
+            "WI-FARM-05"
+          ],
+          "spatialRoleCodes": [
+            "FarmHarvestStagingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-washing",
+          "h1Ref": "h1-stock:farm-washing",
+          "x": -40.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmProduceWashingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-sorting",
+          "h1Ref": "h1-stock:farm-sorting",
+          "x": 40.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "FarmProduceSortingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-work-yard",
+          "h1Ref": "h1-stock:farm-work-yard",
+          "x": 120.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-FARM-05",
+            "WI-FARM-06",
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmCollectionArea",
+            "FarmPackingArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-harvest-staging",
+          "toNodeId": "h1-farm-washing",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-farm-washing",
+          "toNodeId": "h1-farm-sorting",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-3",
+          "fromNodeId": "h1-farm-sorting",
+          "toNodeId": "h1-farm-work-yard",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "HarvestInput",
+          "attachedNodeId": "h1-farm-harvest-staging"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "ShippingOutput",
+          "attachedNodeId": "h1-farm-work-yard"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "ProduceSorting",
+        "ProduceWashing",
+        "QualityGrading",
+        "TemporaryCropStorage",
+        "WaitForPacking",
+        "WaitForVehicle",
+        "WasteWaterHandling",
+        "WaterUse"
+      ],
+      "theoryHashSha256": "279345a33ebb1b84ae61a7e1065b6d3dd87227b73bf04d9493e80649ecb7e4eb"
+    },
+    {
+      "h2StableId": "h2-candidate:farm-worker-support",
+      "patternCode": "FARM-H2-SUPPORT-01",
+      "displayNameKo": "작업자 대기소·정비고 블록",
+      "spatialDisplayNameKo": "작업자 대기소·정비고 블록",
+      "gameplayProfileNameKo": "팜 작업지원 패턴 01 — 대기·정비형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Support",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "농장 작업 지원 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Cluster",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CompoundBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -109.28,
+          "maximumX": 120.0,
+          "maximumZ": 109.28,
+          "width": 200.0,
+          "depth": 218.56
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "FarmRoadAccess",
+          "ProductionAccess"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-worker-waiting",
+          "h1Ref": "h1-stock:farm-worker-waiting",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-01"
+          ],
+          "spatialRoleCodes": [
+            "FarmWorkerWaitingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-tool-storage",
+          "h1Ref": "h1-stock:farm-tool-storage",
+          "x": -40.0,
+          "z": 69.28,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmToolStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-maintenance-yard",
+          "h1Ref": "h1-stock:farm-maintenance-yard",
+          "x": -40.0,
+          "z": -69.28,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmMaintenanceYard"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-worker-waiting",
+          "toNodeId": "h1-farm-tool-storage",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-farm-tool-storage",
+          "toNodeId": "h1-farm-maintenance-yard",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "FarmRoadAccess",
+          "attachedNodeId": "h1-farm-worker-waiting"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "ProductionAccess",
+          "attachedNodeId": "h1-farm-maintenance-yard"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-WORLD-01",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "ShiftHandoff",
+        "ToolCheckout",
+        "ToolReturn",
+        "WorkerBriefing"
+      ],
+      "theoryHashSha256": "57c5e8056eefac0788ec47ee412a9a74a65a836550882c036a4e7e86020b95f3"
+    },
+    {
+      "h2StableId": "h2-candidate:forest-edge-farm",
+      "patternCode": "MIX-H2-NATURE-FARM-01",
+      "displayNameKo": "숲 가장자리 경작지 블록",
+      "spatialDisplayNameKo": "숲 가장자리 경작지 블록",
+      "gameplayProfileNameKo": "네이처–팜 전환 패턴 01 — 숲 경계 생산형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "Nature",
+        "Farm"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "NatureFarm",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "숲 경계 농장 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ContourAdaptive",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "TerrainAdaptiveBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -68.0,
+          "maximumX": 120.0,
+          "maximumZ": 68.0,
+          "width": 240.0,
+          "depth": 136.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-nature-farm-edge",
+          "h1Ref": "h1-stock:nature-farm-edge",
+          "x": -80.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "spatialRoleCodes": [
+            "NatureFarmEdge"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-exploration-buffer",
+          "h1Ref": "h1-stock:nature-exploration-buffer",
+          "x": 0.0,
+          "z": 28.0,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureExplorationBuffer"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-farm-production",
+          "h1Ref": "h1-stock:farm-production",
+          "x": 80.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-FARM-01",
+            "WI-FARM-02",
+            "WI-FARM-03",
+            "WI-FARM-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmProductionPlot"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-nature-farm-edge",
+          "toNodeId": "h1-nature-exploration-buffer",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-nature-exploration-buffer",
+          "toNodeId": "h1-farm-production",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-nature-farm-edge"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-farm-production"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-WORLD-05",
+        "WI-WORLD-07"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "1deb9fddedd25e3d61118a73fb392fc0acef9d4dee9ecf25d8dfaa67062ecffc"
+    },
+    {
+      "h2StableId": "h2-candidate:highland-production",
+      "patternCode": "FARM-H2-PRODUCTION-01",
+      "displayNameKo": "고지대 경작지 블록",
+      "spatialDisplayNameKo": "고지대 경작지 블록",
+      "gameplayProfileNameKo": "팜 생산 패턴 01 — 고지대 경작형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Nature"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Production",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "고지대 생산 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-farm-production",
+          "h1Ref": "h1-stock:farm-production",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-FARM-01",
+            "WI-FARM-02",
+            "WI-FARM-03",
+            "WI-FARM-04"
+          ],
+          "spatialRoleCodes": [
+            "FarmProductionPlot"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-farm-edge",
+          "h1Ref": "h1-stock:nature-farm-edge",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "spatialRoleCodes": [
+            "NatureFarmEdge"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-farm-production",
+          "toNodeId": "h1-nature-farm-edge",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-farm-production"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-nature-farm-edge"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-WORLD-05"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "25eaaaed36c6eb99c30ec001773b2d5200ffd28595520af41086c7ee55b45fad"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-emergency-power",
+      "patternCode": "CITY-H2-POWER-01",
+      "displayNameKo": "Hub 비상전력실·보관동 블록",
+      "spatialDisplayNameKo": "Hub 비상전력실·보관동 블록",
+      "gameplayProfileNameKo": "시티 허브 비상 패턴 01 — 전력·보관 유지형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Power",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 비상 전력·보관 유지 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Cluster",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CompoundBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -109.28,
+          "maximumX": 120.0,
+          "maximumZ": 109.28,
+          "width": 200.0,
+          "depth": 218.56
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "StorageInput",
+          "EmergencyService",
+          "SafeReleaseOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-cold-storage",
+          "h1Ref": "h1-stock:hub-cold-storage",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "HubColdStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-long-term-storage",
+          "h1Ref": "h1-stock:hub-long-term-storage",
+          "x": -40.0,
+          "z": 69.28,
+          "wiIds": [
+            "WI-002"
+          ],
+          "spatialRoleCodes": [
+            "HubLongTermStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-service-maintenance",
+          "h1Ref": "h1-stock:hub-service-maintenance",
+          "x": -40.0,
+          "z": -69.28,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "HubMaintenanceArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-cold-storage",
+          "toNodeId": "h1-hub-long-term-storage",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-hub-long-term-storage",
+          "toNodeId": "h1-hub-service-maintenance",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "StorageInput",
+          "attachedNodeId": "h1-hub-cold-storage"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "EmergencyService",
+          "attachedNodeId": "h1-hub-cold-storage"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "SafeReleaseOutput",
+          "attachedNodeId": "h1-hub-service-maintenance"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-002",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "CapacityPlanning",
+        "ColdChainRelease",
+        "ColdStorage",
+        "LongTermStorage",
+        "StorageAging",
+        "TemperatureExcursion"
+      ],
+      "theoryHashSha256": "ebd14a52c82a64719d121045525523de0b7d95f31d15d2444e3d7d4442bf94a3"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-inbound-storage",
+      "patternCode": "CITY-H2-INBOUND-01",
+      "displayNameKo": "Hub 입고장·창고 전면 블록",
+      "spatialDisplayNameKo": "Hub 입고장·창고 전면 블록",
+      "gameplayProfileNameKo": "시티 허브 입고 패턴 01 — 검수·창고형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Inbound",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 입고·창고 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-receiving-storage",
+          "h1Ref": "h1-stock:hub-receiving-storage",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-LOG-04",
+            "WI-LOG-05",
+            "WI-001",
+            "WI-002"
+          ],
+          "spatialRoleCodes": [
+            "HubUnloadingArea",
+            "HubInspectionArea",
+            "HubStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-service-maintenance",
+          "h1Ref": "h1-stock:hub-service-maintenance",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "HubMaintenanceArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-receiving-storage",
+          "toNodeId": "h1-hub-service-maintenance",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-hub-receiving-storage"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-hub-service-maintenance"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-001",
+        "WI-002",
+        "WI-LOG-04",
+        "WI-LOG-05",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "f628c5d4123675733d0cdcec6287e64142d5402820e101ce7fc596d13cab8155"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-longterm-cold-storage",
+      "patternCode": "CITY-H2-STORAGE-01",
+      "displayNameKo": "Hub 장기·저온 창고 블록",
+      "spatialDisplayNameKo": "Hub 장기·저온 창고 블록",
+      "gameplayProfileNameKo": "시티 허브 보관 패턴 01 — 장기·저온형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Storage",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 장기·저온 보관 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Grid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "InboundStorage",
+          "PickingOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-long-term-storage",
+          "h1Ref": "h1-stock:hub-long-term-storage",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-002"
+          ],
+          "spatialRoleCodes": [
+            "HubLongTermStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-cold-storage",
+          "h1Ref": "h1-stock:hub-cold-storage",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "HubColdStorageArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-long-term-storage",
+          "toNodeId": "h1-hub-cold-storage",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "InboundStorage",
+          "attachedNodeId": "h1-hub-long-term-storage"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "PickingOutput",
+          "attachedNodeId": "h1-hub-cold-storage"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-002"
+      ],
+      "anticipatedGameplayCodes": [
+        "CapacityPlanning",
+        "ColdChainRelease",
+        "ColdStorage",
+        "LongTermStorage",
+        "StorageAging",
+        "TemperatureExcursion"
+      ],
+      "theoryHashSha256": "33d99186b036a37ed6876599de7fe2d8775ceb25fa30afd6748be7736280da29"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-maintenance-yard",
+      "patternCode": "CITY-H2-MAINTENANCE-01",
+      "displayNameKo": "Hub 정비고·차량 마당 블록",
+      "spatialDisplayNameKo": "Hub 정비고·차량 마당 블록",
+      "gameplayProfileNameKo": "시티 허브 정비 패턴 01 — 차량·시설 복구형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Maintenance",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 차량·시설 정비 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "VehicleInput",
+          "MaintenanceLoop",
+          "OperationsReturn"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-vehicle-yard",
+          "h1Ref": "h1-stock:hub-vehicle-yard",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-HUB-06",
+            "WI-MARKET-01"
+          ],
+          "spatialRoleCodes": [
+            "HubVehicleLoadingArea",
+            "HubVehicleWaitingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-service-maintenance",
+          "h1Ref": "h1-stock:hub-service-maintenance",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "HubMaintenanceArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-vehicle-yard",
+          "toNodeId": "h1-hub-service-maintenance",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "VehicleInput",
+          "attachedNodeId": "h1-hub-vehicle-yard"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "MaintenanceLoop",
+          "attachedNodeId": "h1-hub-vehicle-yard"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "OperationsReturn",
+          "attachedNodeId": "h1-hub-service-maintenance"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-HUB-06",
+        "WI-MARKET-01",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "04d78c007765519dfcbde02a64f4123aac23b3c5e8e389d98f7f5569caa69f03"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-outbound-vehicle",
+      "patternCode": "CITY-H2-OUTBOUND-01",
+      "displayNameKo": "Hub 출고장·차량 대기 블록",
+      "spatialDisplayNameKo": "Hub 출고장·차량 대기 블록",
+      "gameplayProfileNameKo": "시티 허브 출고 패턴 01 — 피킹·차량형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Outbound",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 출고·차량 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-outbound-staging",
+          "h1Ref": "h1-stock:hub-outbound-staging",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-HUB-03",
+            "WI-HUB-04",
+            "WI-HUB-05"
+          ],
+          "spatialRoleCodes": [
+            "HubPickingArea",
+            "HubOutboundStagingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-vehicle-yard",
+          "h1Ref": "h1-stock:hub-vehicle-yard",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-HUB-06",
+            "WI-MARKET-01"
+          ],
+          "spatialRoleCodes": [
+            "HubVehicleLoadingArea",
+            "HubVehicleWaitingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-market-transfer",
+          "h1Ref": "h1-stock:hub-market-transfer",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-MARKET-01",
+            "WI-MARKET-02"
+          ],
+          "spatialRoleCodes": [
+            "HubMarketTransferArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-outbound-staging",
+          "toNodeId": "h1-hub-vehicle-yard",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-hub-vehicle-yard",
+          "toNodeId": "h1-hub-market-transfer",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-hub-outbound-staging"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-hub-market-transfer"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-HUB-03",
+        "WI-HUB-04",
+        "WI-HUB-05",
+        "WI-HUB-06",
+        "WI-MARKET-01",
+        "WI-MARKET-02"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "4f6884984e458c671743299f445e6ccff13d6acb9e379e4d0d12fe782da70a75"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-quarantine-staging",
+      "patternCode": "CITY-H2-QUARANTINE-01",
+      "displayNameKo": "Hub 검역장·격리창고 블록",
+      "spatialDisplayNameKo": "Hub 검역장·격리창고 블록",
+      "gameplayProfileNameKo": "시티 허브 격리 패턴 01 — 검역·임시적치형",
+      "leadPackCode": "City",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Quarantine",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 검역·격리 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 80.0,
+          "width": 160.0,
+          "depth": 160.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "HubInboundGate",
+          "StorageOutput",
+          "RejectOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-receiving-storage",
+          "h1Ref": "h1-stock:hub-receiving-storage",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-LOG-04",
+            "WI-LOG-05",
+            "WI-001",
+            "WI-002"
+          ],
+          "spatialRoleCodes": [
+            "HubUnloadingArea",
+            "HubInspectionArea",
+            "HubStorageArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-quarantine",
+          "h1Ref": "h1-stock:hub-quarantine",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "HubQuarantineArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-temporary-staging",
+          "h1Ref": "h1-stock:hub-temporary-staging",
+          "x": -40.0,
+          "z": 40.0,
+          "wiIds": [
+            "WI-001",
+            "WI-HUB-04",
+            "WI-HUB-05"
+          ],
+          "spatialRoleCodes": [
+            "HubTemporaryStagingArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-receiving-storage",
+          "toNodeId": "h1-hub-quarantine",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-hub-quarantine",
+          "toNodeId": "h1-hub-temporary-staging",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "HubInboundGate",
+          "attachedNodeId": "h1-hub-receiving-storage"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "StorageOutput",
+          "attachedNodeId": "h1-hub-receiving-storage"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "RejectOutput",
+          "attachedNodeId": "h1-hub-temporary-staging"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-001",
+        "WI-002",
+        "WI-HUB-04",
+        "WI-HUB-05",
+        "WI-LOG-04",
+        "WI-LOG-05"
+      ],
+      "anticipatedGameplayCodes": [
+        "CargoQuarantine",
+        "InboundStaging",
+        "OutboundStaging",
+        "QualityHold",
+        "ReleaseOrReject"
+      ],
+      "theoryHashSha256": "7b82c57cea229e6e50d4385f7c31ca345aa9509f59fde2f3b0746cb3ab164548"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-returns-processing",
+      "patternCode": "CITY-H2-RETURN-01",
+      "displayNameKo": "Hub 반품장·격리 적치 블록",
+      "spatialDisplayNameKo": "Hub 반품장·격리 적치 블록",
+      "gameplayProfileNameKo": "시티 허브 반품 패턴 01 — 회수·격리형",
+      "leadPackCode": "City",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Return",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 반품 처리 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "ReturnInput",
+          "RestockOutput",
+          "DisposalOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-returns",
+          "h1Ref": "h1-stock:hub-returns",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "HubReturnsProcessingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-quarantine",
+          "h1Ref": "h1-stock:hub-quarantine",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "HubQuarantineArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-returns",
+          "toNodeId": "h1-hub-quarantine",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "ReturnInput",
+          "attachedNodeId": "h1-hub-returns"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "RestockOutput",
+          "attachedNodeId": "h1-hub-returns"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "DisposalOutput",
+          "attachedNodeId": "h1-hub-quarantine"
+        }
+      ],
+      "gameplayWiIds": [],
+      "anticipatedGameplayCodes": [
+        "CargoQuarantine",
+        "QualityHold",
+        "ReleaseOrReject",
+        "RestockOrDispose",
+        "ReturnInspection",
+        "ReturnReceiving"
+      ],
+      "theoryHashSha256": "6b4ecb72e3e8a578309118590154cbebb58347b33caed0bbb254fe639f9caa27"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-town-corridor",
+      "patternCode": "MIX-H2-HUB-TOWN-01",
+      "displayNameKo": "Hub 출구–Town 입고 회랑 블록",
+      "spatialDisplayNameKo": "Hub 출구–Town 입고 회랑 블록",
+      "gameplayProfileNameKo": "허브–타운 회랑 패턴 01 — 시장 배송형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "City",
+        "Town"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "HubTown",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub–Town 회랑 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-market-transfer",
+          "h1Ref": "h1-stock:hub-market-transfer",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-MARKET-01",
+            "WI-MARKET-02"
+          ],
+          "spatialRoleCodes": [
+            "HubMarketTransferArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-hub-town-corridor",
+          "h1Ref": "h1-stock:hub-town-corridor",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-MARKET-01"
+          ],
+          "spatialRoleCodes": [
+            "HubTownCargoCorridor"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-road-facility-access",
+          "h1Ref": "h1-stock:road-facility-access",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "RoadFacilityAccess"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-hub-market-transfer",
+          "toNodeId": "h1-hub-town-corridor",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-hub-town-corridor",
+          "toNodeId": "h1-road-facility-access",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-hub-market-transfer"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-road-facility-access"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-MARKET-01",
+        "WI-MARKET-02",
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "f0537f2df3fce83ff45f6149a56c075e257ce971622e193b53b66b6437d6da19"
+    },
+    {
+      "h2StableId": "h2-candidate:lowrise-residential",
+      "patternCode": "TOWN-H2-VILLAGE-01",
+      "displayNameKo": "저층 주거·생활광장 블록",
+      "spatialDisplayNameKo": "저층 주거·생활광장 블록",
+      "gameplayProfileNameKo": "타운 빌리지 패턴 01 — 저층 생활광장형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Village",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "저층 주거 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Grid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-town-living-square",
+          "h1Ref": "h1-stock:town-living-square",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-ORDER-07"
+          ],
+          "spatialRoleCodes": [
+            "TownLivingSquare"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-resident-pickup",
+          "h1Ref": "h1-stock:town-resident-pickup",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-ORDER-05",
+            "WI-ORDER-06"
+          ],
+          "spatialRoleCodes": [
+            "ResidentPickupArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-town-living-square",
+          "toNodeId": "h1-town-resident-pickup",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-town-living-square"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-town-resident-pickup"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-ORDER-05",
+        "WI-ORDER-06",
+        "WI-ORDER-07",
+        "WI-WORLD-05"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "892a17cff28be73126b51b588a1784e033da6fe040afd5c42c5c78c262f977c3"
+    },
+    {
+      "h2StableId": "h2-candidate:market-life-commerce",
+      "patternCode": "TOWN-H2-VILLAGE-02",
+      "displayNameKo": "마트·생활상가 블록",
+      "spatialDisplayNameKo": "마트·생활상가 블록",
+      "gameplayProfileNameKo": "타운 빌리지 패턴 02 — 생활상권형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "City"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Village",
+      "patternSequence": 2,
+      "resourceKindCode": "BlockPattern",
+      "title": "마트·생활상권 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -80.0,
+          "maximumX": 120.0,
+          "maximumZ": 80.0,
+          "width": 240.0,
+          "depth": 160.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-town-market-receiving",
+          "h1Ref": "h1-stock:town-market-receiving",
+          "x": -80.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-MARKET-02",
+            "WI-MARKET-03",
+            "WI-MARKET-04"
+          ],
+          "spatialRoleCodes": [
+            "MarketReceivingArea",
+            "MarketBackroomArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-market-display",
+          "h1Ref": "h1-stock:town-market-display",
+          "x": 0.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-MARKET-05",
+            "WI-ORDER-03"
+          ],
+          "spatialRoleCodes": [
+            "MarketDisplayArea",
+            "MarketPickingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-order-packing",
+          "h1Ref": "h1-stock:town-order-packing",
+          "x": 80.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-ORDER-04"
+          ],
+          "spatialRoleCodes": [
+            "OrderPackingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-resident-pickup",
+          "h1Ref": "h1-stock:town-resident-pickup",
+          "x": -80.0,
+          "z": 40.0,
+          "wiIds": [
+            "WI-ORDER-05",
+            "WI-ORDER-06"
+          ],
+          "spatialRoleCodes": [
+            "ResidentPickupArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-living-square",
+          "h1Ref": "h1-stock:town-living-square",
+          "x": 0.0,
+          "z": 40.0,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-ORDER-07"
+          ],
+          "spatialRoleCodes": [
+            "TownLivingSquare"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-town-market-receiving",
+          "toNodeId": "h1-town-market-display",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-town-market-display",
+          "toNodeId": "h1-town-order-packing",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-3",
+          "fromNodeId": "h1-town-order-packing",
+          "toNodeId": "h1-town-resident-pickup",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-4",
+          "fromNodeId": "h1-town-resident-pickup",
+          "toNodeId": "h1-town-living-square",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-town-market-receiving"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-town-living-square"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-MARKET-02",
+        "WI-MARKET-03",
+        "WI-MARKET-04",
+        "WI-MARKET-05",
+        "WI-ORDER-03",
+        "WI-ORDER-04",
+        "WI-ORDER-05",
+        "WI-ORDER-06",
+        "WI-ORDER-07",
+        "WI-WORLD-05"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "ea27bea8bddfe33394caf9b5f14ca69cee9fe2d07d88a23c67ba462414e14e88"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-defense-ring",
+      "patternCode": "NATURE-H2-DEFENSE-01",
+      "displayNameKo": "방어환·야영지 블록",
+      "spatialDisplayNameKo": "방어환·야영지 블록",
+      "gameplayProfileNameKo": "네이처 방어 패턴 01 — 야간 방어형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Defense",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "자연 야간 방어 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Radial",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "RingBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -109.28,
+          "maximumX": 120.0,
+          "maximumZ": 109.28,
+          "width": 200.0,
+          "depth": 218.56
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "ThreatInput",
+          "DefenseLoop",
+          "RecoveryOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-nature-threat-watch",
+          "h1Ref": "h1-stock:nature-threat-watch",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "spatialRoleCodes": [
+            "NatureThreatWatchArea"
+          ],
+          "capacityConceptCodes": [
+            "ObservationWorkArea",
+            "MonitoredThreatRoute"
+          ]
+        },
+        {
+          "nodeId": "h1-nature-shelter",
+          "h1Ref": "h1-stock:nature-shelter",
+          "x": -40.0,
+          "z": 69.28,
+          "wiIds": [
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureTemporaryShelterArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-safe-recovery-camp",
+          "h1Ref": "h1-stock:nature-safe-recovery-camp",
+          "x": -40.0,
+          "z": -69.28,
+          "wiIds": [
+            "WI-NATURE-04"
+          ],
+          "spatialRoleCodes": [
+            "NatureSafeRecoveryCampArea"
+          ],
+          "capacityConceptCodes": [
+            "RestAreaParty",
+            "RecoverySupportWorkArea"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-nature-threat-watch",
+          "toNodeId": "h1-nature-shelter",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-nature-shelter",
+          "toNodeId": "h1-nature-safe-recovery-camp",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "ThreatInput",
+          "attachedNodeId": "h1-nature-threat-watch"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "DefenseLoop",
+          "attachedNodeId": "h1-nature-threat-watch"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "RecoveryOutput",
+          "attachedNodeId": "h1-nature-safe-recovery-camp"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-04",
+        "WI-WORLD-07"
+      ],
+      "anticipatedGameplayCodes": [
+        "EncounterForecast",
+        "NatureRouteWarning",
+        "NextActionPreparation",
+        "PartyRecovery",
+        "Recovery",
+        "RegionalThreatObservation",
+        "TemporaryShelter",
+        "ThreatDebrief",
+        "WeatherWait"
+      ],
+      "theoryHashSha256": "63187a78855d44a279bcd57a51dcd2cb7f18c1c59f7b4be81feee7cd7816c950"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-encounter-route",
+      "patternCode": "NATURE-H2-ENCOUNTER-01",
+      "displayNameKo": "조우로·이탈로 블록",
+      "spatialDisplayNameKo": "조우로·이탈로 블록",
+      "gameplayProfileNameKo": "네이처 조우 패턴 01 — 몬스터 접근·이탈형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Encounter",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "자연 몬스터 조우·이탈 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ContourAdaptive",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "TerrainAdaptiveBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -68.0,
+          "maximumX": 120.0,
+          "maximumZ": 68.0,
+          "width": 240.0,
+          "depth": 136.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "EncounterInput",
+          "ThreatContinuation",
+          "RetreatOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-nature-threat-watch",
+          "h1Ref": "h1-stock:nature-threat-watch",
+          "x": -80.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "spatialRoleCodes": [
+            "NatureThreatWatchArea"
+          ],
+          "capacityConceptCodes": [
+            "ObservationWorkArea",
+            "MonitoredThreatRoute"
+          ]
+        },
+        {
+          "nodeId": "h1-nature-incident-trace",
+          "h1Ref": "h1-stock:nature-incident-trace",
+          "x": 0.0,
+          "z": 28.0,
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "spatialRoleCodes": [
+            "NatureIncidentTraceArea"
+          ],
+          "capacityConceptCodes": [
+            "InvestigationWorkArea",
+            "IncidentTraceTarget"
+          ]
+        },
+        {
+          "nodeId": "h1-nature-emergency-retreat",
+          "h1Ref": "h1-stock:nature-emergency-retreat",
+          "x": 80.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-NATURE-02"
+          ],
+          "spatialRoleCodes": [
+            "NatureEmergencyRetreatArea"
+          ],
+          "capacityConceptCodes": [
+            "EscapeRouteParty",
+            "EmergencyPassage"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-nature-threat-watch",
+          "toNodeId": "h1-nature-incident-trace",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-nature-incident-trace",
+          "toNodeId": "h1-nature-emergency-retreat",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "EncounterInput",
+          "attachedNodeId": "h1-nature-threat-watch"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "ThreatContinuation",
+          "attachedNodeId": "h1-nature-threat-watch"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "RetreatOutput",
+          "attachedNodeId": "h1-nature-emergency-retreat"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-02"
+      ],
+      "anticipatedGameplayCodes": [
+        "CauseIdentification",
+        "EmergencyRetreat",
+        "EncounterForecast",
+        "IncidentTraceInvestigation",
+        "NatureRouteWarning",
+        "RegionalThreatObservation",
+        "SafeCoreReturn",
+        "ThreatEvacuation",
+        "ThreatTracking"
+      ],
+      "theoryHashSha256": "136d655d9ee09e884eb10630f13c2cddbca1c6f6caae9e04a66e1408d5ded73a"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-home-core",
+      "patternCode": "NATURE-H2-HOME-01",
+      "displayNameKo": "안전 생활핵·보급 거점 블록",
+      "spatialDisplayNameKo": "안전 생활핵·보급 거점 블록",
+      "gameplayProfileNameKo": "네이처 생활 패턴 01 — 안전 생활핵형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Home",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "자연 안전 생활핵 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Cluster",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CompoundBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -109.28,
+          "maximumX": 120.0,
+          "maximumZ": 109.28,
+          "width": 200.0,
+          "depth": 218.56
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TrailInput",
+          "SafeCoreOutput",
+          "EmergencyReturn"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-nature-safe-recovery-camp",
+          "h1Ref": "h1-stock:nature-safe-recovery-camp",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-NATURE-04"
+          ],
+          "spatialRoleCodes": [
+            "NatureSafeRecoveryCampArea"
+          ],
+          "capacityConceptCodes": [
+            "RestAreaParty",
+            "RecoverySupportWorkArea"
+          ]
+        },
+        {
+          "nodeId": "h1-nature-shelter",
+          "h1Ref": "h1-stock:nature-shelter",
+          "x": -40.0,
+          "z": 69.28,
+          "wiIds": [
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureTemporaryShelterArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-trailhead",
+          "h1Ref": "h1-stock:nature-trailhead",
+          "x": -40.0,
+          "z": -69.28,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureTrailheadArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-nature-safe-recovery-camp",
+          "toNodeId": "h1-nature-shelter",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-nature-shelter",
+          "toNodeId": "h1-nature-trailhead",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TrailInput",
+          "attachedNodeId": "h1-nature-safe-recovery-camp"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "SafeCoreOutput",
+          "attachedNodeId": "h1-nature-safe-recovery-camp"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "EmergencyReturn",
+          "attachedNodeId": "h1-nature-trailhead"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-NATURE-04",
+        "WI-WORLD-05",
+        "WI-WORLD-07"
+      ],
+      "anticipatedGameplayCodes": [
+        "ExplorationBriefing",
+        "NextActionPreparation",
+        "PartyRecovery",
+        "Recovery",
+        "RouteCheck",
+        "TemporaryShelter",
+        "ThreatDebrief",
+        "TrailStart",
+        "WeatherWait"
+      ],
+      "theoryHashSha256": "338569ad415d83908a7523d4619ee2946f16fea1c3e4b1fb1de19abe5d70d37b"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-restoration-recovery",
+      "patternCode": "NATURE-H2-RECOVERY-01",
+      "displayNameKo": "복원 작업지·회복 쉼터 블록",
+      "spatialDisplayNameKo": "복원 작업지·회복 쉼터 블록",
+      "gameplayProfileNameKo": "네이처 회복 패턴 01 — 경로복원·안전회복형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Recovery",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "자연 복원·안전 회복 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Organic",
+      "recipeSourceCode": "AuthoredRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "TerrainAdaptiveBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -68.0,
+          "minimumZ": -74.0,
+          "maximumX": 104.0,
+          "maximumZ": 70.0,
+          "width": 172.0,
+          "depth": 144.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "IncidentRouteInput",
+          "RetreatRecoveryInput",
+          "SafeCoreOutput",
+          "RestoredRouteOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "restoration-site",
+          "h1Ref": "h1-stock:nature-restoration-site",
+          "x": -28.0,
+          "z": 30.0,
+          "wiIds": [
+            "WI-NATURE-03"
+          ],
+          "spatialRoleCodes": [
+            "NatureRestorationWorkArea"
+          ],
+          "capacityConceptCodes": [
+            "RestorationWorkArea",
+            "RestorationMaterialStaging"
+          ]
+        },
+        {
+          "nodeId": "safe-recovery-camp",
+          "h1Ref": "h1-stock:nature-safe-recovery-camp",
+          "x": 64.0,
+          "z": -34.0,
+          "wiIds": [
+            "WI-NATURE-04"
+          ],
+          "spatialRoleCodes": [
+            "NatureSafeRecoveryCampArea"
+          ],
+          "capacityConceptCodes": [
+            "RestAreaParty",
+            "RecoverySupportWorkArea"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "restoration-to-recovery",
+          "fromNodeId": "restoration-site",
+          "toNodeId": "safe-recovery-camp",
+          "relationCode": "RestorationRecoveryRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "incident-route-input",
+          "roleCode": "IncidentRouteInput",
+          "attachedNodeId": "restoration-site"
+        },
+        {
+          "connectorId": "retreat-recovery-input",
+          "roleCode": "RetreatRecoveryInput",
+          "attachedNodeId": "safe-recovery-camp"
+        },
+        {
+          "connectorId": "safe-core-output",
+          "roleCode": "SafeCoreOutput",
+          "attachedNodeId": "safe-recovery-camp"
+        },
+        {
+          "connectorId": "restored-route-output",
+          "roleCode": "RestoredRouteOutput",
+          "attachedNodeId": "restoration-site"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-NATURE-03",
+        "WI-NATURE-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "ContaminationCleanup",
+        "NatureRestoration",
+        "NextActionPreparation",
+        "PartyRecovery",
+        "RouteRecovery",
+        "ThreatDebrief"
+      ],
+      "theoryHashSha256": "01e0817bd1bbc019e4156fc85ec302f77ed09a71397345fb2555539004d89b88"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-threat-response",
+      "patternCode": "NATURE-H2-THREAT-01",
+      "displayNameKo": "위험 흔적길·긴급 대피로 블록",
+      "spatialDisplayNameKo": "위험 흔적길·긴급 대피로 블록",
+      "gameplayProfileNameKo": "네이처 위협 패턴 01 — 추적·긴급후퇴형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Threat",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "자연 위협 추적·대피 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ContourAdaptive",
+      "recipeSourceCode": "AuthoredRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "TerrainAdaptiveBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -112.0,
+          "minimumZ": -98.0,
+          "maximumX": 102.0,
+          "maximumZ": 88.0,
+          "width": 214.0,
+          "depth": 186.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "SafeCoreInput",
+          "ThreatBandContinuation",
+          "EmergencyExit",
+          "RecoveryHandoff"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "threat-watch",
+          "h1Ref": "h1-stock:nature-threat-watch",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "spatialRoleCodes": [
+            "NatureThreatWatchArea"
+          ],
+          "capacityConceptCodes": [
+            "ObservationWorkArea",
+            "MonitoredThreatRoute"
+          ]
+        },
+        {
+          "nodeId": "incident-trace",
+          "h1Ref": "h1-stock:nature-incident-trace",
+          "x": 62.0,
+          "z": 48.0,
+          "wiIds": [
+            "WI-NATURE-01"
+          ],
+          "spatialRoleCodes": [
+            "NatureIncidentTraceArea"
+          ],
+          "capacityConceptCodes": [
+            "InvestigationWorkArea",
+            "IncidentTraceTarget"
+          ]
+        },
+        {
+          "nodeId": "emergency-retreat",
+          "h1Ref": "h1-stock:nature-emergency-retreat",
+          "x": -72.0,
+          "z": -58.0,
+          "wiIds": [
+            "WI-NATURE-02"
+          ],
+          "spatialRoleCodes": [
+            "NatureEmergencyRetreatArea"
+          ],
+          "capacityConceptCodes": [
+            "EscapeRouteParty",
+            "EmergencyPassage"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "watch-to-trace",
+          "fromNodeId": "threat-watch",
+          "toNodeId": "incident-trace",
+          "relationCode": "ThreatInvestigationRoute"
+        },
+        {
+          "edgeId": "trace-to-retreat",
+          "fromNodeId": "incident-trace",
+          "toNodeId": "emergency-retreat",
+          "relationCode": "EmergencyRetreatRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "safe-core-input",
+          "roleCode": "SafeCoreInput",
+          "attachedNodeId": "threat-watch"
+        },
+        {
+          "connectorId": "threat-band-continuation",
+          "roleCode": "ThreatBandContinuation",
+          "attachedNodeId": "incident-trace"
+        },
+        {
+          "connectorId": "emergency-exit",
+          "roleCode": "EmergencyExit",
+          "attachedNodeId": "emergency-retreat"
+        },
+        {
+          "connectorId": "recovery-handoff",
+          "roleCode": "RecoveryHandoff",
+          "attachedNodeId": "emergency-retreat"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-02"
+      ],
+      "anticipatedGameplayCodes": [
+        "CauseIdentification",
+        "EmergencyRetreat",
+        "EncounterForecast",
+        "IncidentTraceInvestigation",
+        "NatureRouteWarning",
+        "RegionalThreatObservation",
+        "SafeCoreReturn",
+        "ThreatEvacuation",
+        "ThreatTracking"
+      ],
+      "theoryHashSha256": "5225081c4fae142c3fea0d17a8fa83d04628a41d4fbf4b57c198971e06983d3b"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-town-relief-transition",
+      "patternCode": "MIX-H2-NATURE-TOWN-01",
+      "displayNameKo": "자연권 출구–생활권 구호 인계 블록",
+      "spatialDisplayNameKo": "자연권 출구–생활권 구호 인계 블록",
+      "gameplayProfileNameKo": "네이처–타운 전환 패턴 01 — 생활권 대피·구호형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "Nature",
+        "Town"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "NatureTown",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Nature–Town 대피·구호 전환 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TownReliefInput",
+          "NatureRestorationHandoff",
+          "SafeCoreReturn"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-town-nature-relief",
+          "h1Ref": "h1-stock:town-nature-relief",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownNatureReliefHandoffArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-restoration-site",
+          "h1Ref": "h1-stock:nature-restoration-site",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-NATURE-03"
+          ],
+          "spatialRoleCodes": [
+            "NatureRestorationWorkArea"
+          ],
+          "capacityConceptCodes": [
+            "RestorationWorkArea",
+            "RestorationMaterialStaging"
+          ]
+        },
+        {
+          "nodeId": "h1-nature-safe-recovery-camp",
+          "h1Ref": "h1-stock:nature-safe-recovery-camp",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-NATURE-04"
+          ],
+          "spatialRoleCodes": [
+            "NatureSafeRecoveryCampArea"
+          ],
+          "capacityConceptCodes": [
+            "RestAreaParty",
+            "RecoverySupportWorkArea"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-town-nature-relief",
+          "toNodeId": "h1-nature-restoration-site",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-nature-restoration-site",
+          "toNodeId": "h1-nature-safe-recovery-camp",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TownReliefInput",
+          "attachedNodeId": "h1-town-nature-relief"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "NatureRestorationHandoff",
+          "attachedNodeId": "h1-town-nature-relief"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "SafeCoreReturn",
+          "attachedNodeId": "h1-nature-safe-recovery-camp"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-NATURE-03",
+        "WI-NATURE-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "CommunitySupport",
+        "ContaminationCleanup",
+        "NatureReliefCollection",
+        "NatureRestoration",
+        "NextActionPreparation",
+        "PartyRecovery",
+        "RestorationSupplyHandoff",
+        "RouteRecovery",
+        "ThreatDebrief"
+      ],
+      "theoryHashSha256": "7a0e43fc42791cde25f8a2abc81d380599c54731e6d23da8dea716ffe7e4d516"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-trail-shelter",
+      "patternCode": "NATURE-H2-TRAIL-01",
+      "displayNameKo": "탐색로·대피 쉼터 블록",
+      "spatialDisplayNameKo": "탐색로·대피 쉼터 블록",
+      "gameplayProfileNameKo": "네이처 탐색 패턴 01 — 탐색·대피형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Trail",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "자연 탐색·대피 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ContourAdaptive",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "TerrainAdaptiveBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -68.0,
+          "maximumX": 120.0,
+          "maximumZ": 68.0,
+          "width": 240.0,
+          "depth": 136.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "RoadAccess",
+          "TrailContinuation"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-nature-trailhead",
+          "h1Ref": "h1-stock:nature-trailhead",
+          "x": -80.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureTrailheadArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-lookout",
+          "h1Ref": "h1-stock:nature-lookout",
+          "x": 0.0,
+          "z": 28.0,
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "spatialRoleCodes": [
+            "NatureLookoutArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-shelter",
+          "h1Ref": "h1-stock:nature-shelter",
+          "x": 80.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureTemporaryShelterArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-nature-trailhead",
+          "toNodeId": "h1-nature-lookout",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-nature-lookout",
+          "toNodeId": "h1-nature-shelter",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "RoadAccess",
+          "attachedNodeId": "h1-nature-trailhead"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TrailContinuation",
+          "attachedNodeId": "h1-nature-shelter"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-WORLD-05",
+        "WI-WORLD-07"
+      ],
+      "anticipatedGameplayCodes": [
+        "ExplorationBriefing",
+        "LandscapeObservation",
+        "Recovery",
+        "RouteCheck",
+        "TemporaryShelter",
+        "ThreatObservation",
+        "TrailStart",
+        "WeatherWait"
+      ],
+      "theoryHashSha256": "ae5d94835081bee3dee8c02d90cae151b5ae93bd8c8e1112e64d0bda0d2c81e0"
+    },
+    {
+      "h2StableId": "h2-candidate:nature-water-buffer",
+      "patternCode": "NATURE-H2-BUFFER-01",
+      "displayNameKo": "산림·수변 완충지 블록",
+      "spatialDisplayNameKo": "산림·수변 완충지 블록",
+      "gameplayProfileNameKo": "네이처 완충 패턴 01 — 산림·수변형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Buffer",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "산림·수변 완충 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Organic",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "TerrainAdaptiveBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -68.0,
+          "maximumX": 80.0,
+          "maximumZ": 68.0,
+          "width": 160.0,
+          "depth": 136.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "TheoryIngress",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-nature-exploration-buffer",
+          "h1Ref": "h1-stock:nature-exploration-buffer",
+          "x": -40.0,
+          "z": -28.0,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-WORLD-07"
+          ],
+          "spatialRoleCodes": [
+            "NatureExplorationBuffer"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-nature-farm-edge",
+          "h1Ref": "h1-stock:nature-farm-edge",
+          "x": 40.0,
+          "z": 28.0,
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "spatialRoleCodes": [
+            "NatureFarmEdge"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-nature-exploration-buffer",
+          "toNodeId": "h1-nature-farm-edge",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "TheoryIngress",
+          "attachedNodeId": "h1-nature-exploration-buffer"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h1-nature-farm-edge"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-WORLD-05",
+        "WI-WORLD-07"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "04fd5f365c27dfb83bfd5fca51501a8c39ba3527044756c719150fb0b0a74552"
+    },
+    {
+      "h2StableId": "h2-candidate:town-contamination-control",
+      "patternCode": "TOWN-H2-SAFETY-01",
+      "displayNameKo": "오염 점검장·격리구획 블록",
+      "spatialDisplayNameKo": "오염 점검장·격리구획 블록",
+      "gameplayProfileNameKo": "타운 안전 패턴 01 — 오염점검·격리형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Safety",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "생활권 오염 점검·정화 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "AuthoredRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -108.0,
+          "minimumZ": -78.0,
+          "maximumX": 110.0,
+          "maximumZ": 76.0,
+          "width": 218.0,
+          "depth": 154.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "MarketStockInput",
+          "SafeDisplayOutput",
+          "ServiceVehicleOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "contamination-inspection",
+          "h1Ref": "h1-stock:town-contamination-inspection",
+          "x": -68.0,
+          "z": 26.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownContaminationInspectionArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "contamination-quarantine",
+          "h1Ref": "h1-stock:town-contamination-quarantine",
+          "x": 4.0,
+          "z": 36.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownContaminationQuarantineArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "cleanup-transfer",
+          "h1Ref": "h1-stock:town-cleanup-transfer",
+          "x": 70.0,
+          "z": -38.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownCleanupTransferArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "inspection-to-quarantine",
+          "fromNodeId": "contamination-inspection",
+          "toNodeId": "contamination-quarantine",
+          "relationCode": "ContaminationIsolationRoute"
+        },
+        {
+          "edgeId": "quarantine-to-cleanup-transfer",
+          "fromNodeId": "contamination-quarantine",
+          "toNodeId": "cleanup-transfer",
+          "relationCode": "CleanupServiceRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "market-stock-input",
+          "roleCode": "MarketStockInput",
+          "attachedNodeId": "contamination-inspection"
+        },
+        {
+          "connectorId": "safe-display-output",
+          "roleCode": "SafeDisplayOutput",
+          "attachedNodeId": "contamination-inspection"
+        },
+        {
+          "connectorId": "service-vehicle-output",
+          "roleCode": "ServiceVehicleOutput",
+          "attachedNodeId": "cleanup-transfer"
+        }
+      ],
+      "gameplayWiIds": [],
+      "anticipatedGameplayCodes": [
+        "ContaminatedWasteTransfer",
+        "MarketCleanup",
+        "MarketContaminationInspection",
+        "MarketStockQuarantine",
+        "RecallHold",
+        "ReleaseOrDispose",
+        "SaleHoldDecision",
+        "ServiceVehicleHandoff",
+        "StockSafetyAssessment"
+      ],
+      "theoryHashSha256": "9f084a7dc428bb3fe93eb715945285059054bf592de061397e089ad1910e2666"
+    },
+    {
+      "h2StableId": "h2-candidate:town-recall-relief",
+      "patternCode": "TOWN-H2-RELIEF-01",
+      "displayNameKo": "주민 안내소·구호 물자 인계장 블록",
+      "spatialDisplayNameKo": "주민 안내소·구호 물자 인계장 블록",
+      "gameplayProfileNameKo": "타운 구호 패턴 01 — 회수안내·주민지원형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "Nature"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Relief",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "생활권 회수 안내·자연권 구호 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Cluster",
+      "recipeSourceCode": "AuthoredRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CompoundBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -106.0,
+          "minimumZ": -72.0,
+          "maximumX": 112.0,
+          "maximumZ": 76.0,
+          "width": 218.0,
+          "depth": 148.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "ResidentInput",
+          "ReturnOutput",
+          "NatureReliefOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "recall-service",
+          "h1Ref": "h1-stock:town-recall-service",
+          "x": -66.0,
+          "z": 8.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownRecallServiceArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "neighborhood-service",
+          "h1Ref": "h1-stock:town-neighborhood-service",
+          "x": 0.0,
+          "z": 36.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownNeighborhoodServiceArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "nature-relief",
+          "h1Ref": "h1-stock:town-nature-relief",
+          "x": 72.0,
+          "z": -32.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownNatureReliefHandoffArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "recall-to-neighborhood-service",
+          "fromNodeId": "recall-service",
+          "toNodeId": "neighborhood-service",
+          "relationCode": "ResidentServiceRoute"
+        },
+        {
+          "edgeId": "neighborhood-service-to-nature-relief",
+          "fromNodeId": "neighborhood-service",
+          "toNodeId": "nature-relief",
+          "relationCode": "NatureReliefHandoffRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "resident-input",
+          "roleCode": "ResidentInput",
+          "attachedNodeId": "recall-service"
+        },
+        {
+          "connectorId": "return-output",
+          "roleCode": "ReturnOutput",
+          "attachedNodeId": "recall-service"
+        },
+        {
+          "connectorId": "nature-relief-output",
+          "roleCode": "NatureReliefOutput",
+          "attachedNodeId": "nature-relief"
+        }
+      ],
+      "gameplayWiIds": [],
+      "anticipatedGameplayCodes": [
+        "CommunitySupport",
+        "ContaminatedReturn",
+        "LocalInformation",
+        "NatureReliefCollection",
+        "NeighborhoodTaskStart",
+        "ReplacementPickup",
+        "ResidentRecallNotice",
+        "RestorationSupplyHandoff"
+      ],
+      "theoryHashSha256": "0faba48141f65bf2dc38a738b38f9b0630eeddc8bfa1f120d9d057d2e6686306"
+    },
+    {
+      "h2StableId": "h2-candidate:town-resident-service",
+      "patternCode": "TOWN-H2-SERVICE-01",
+      "displayNameKo": "주민지원소·공동수령장 블록",
+      "spatialDisplayNameKo": "주민지원소·공동수령장 블록",
+      "gameplayProfileNameKo": "타운 서비스 패턴 01 — 주민지원·공동수령형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Service",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "생활권 주민지원·공동수령 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Cluster",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CompoundBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -109.28,
+          "maximumX": 120.0,
+          "maximumZ": 109.28,
+          "width": 200.0,
+          "depth": 218.56
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "ResidentInput",
+          "ServiceLoop",
+          "PickupOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-town-neighborhood-service",
+          "h1Ref": "h1-stock:town-neighborhood-service",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "spatialRoleCodes": [
+            "TownNeighborhoodServiceArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-resident-pickup",
+          "h1Ref": "h1-stock:town-resident-pickup",
+          "x": -40.0,
+          "z": 69.28,
+          "wiIds": [
+            "WI-ORDER-05",
+            "WI-ORDER-06"
+          ],
+          "spatialRoleCodes": [
+            "ResidentPickupArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-recall-service",
+          "h1Ref": "h1-stock:town-recall-service",
+          "x": -40.0,
+          "z": -69.28,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownRecallServiceArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-town-neighborhood-service",
+          "toNodeId": "h1-town-resident-pickup",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-town-resident-pickup",
+          "toNodeId": "h1-town-recall-service",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "ResidentInput",
+          "attachedNodeId": "h1-town-neighborhood-service"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "ServiceLoop",
+          "attachedNodeId": "h1-town-neighborhood-service"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "PickupOutput",
+          "attachedNodeId": "h1-town-recall-service"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-ORDER-05",
+        "WI-ORDER-06",
+        "WI-WORLD-05"
+      ],
+      "anticipatedGameplayCodes": [
+        "ContaminatedReturn",
+        "LocalInformation",
+        "NeighborhoodTaskStart",
+        "ReplacementPickup",
+        "ResidentRecallNotice"
+      ],
+      "theoryHashSha256": "3957d680e9296be9eb0d5c34acae808f3bc19f7a6ff85756848ebe4252ff5ab8"
+    },
+    {
+      "h2StableId": "h2-candidate:town-residential-alley",
+      "patternCode": "TOWN-H2-VILLAGE-03",
+      "displayNameKo": "저층 주거 골목 블록",
+      "spatialDisplayNameKo": "저층 주거 골목 블록",
+      "gameplayProfileNameKo": "타운 빌리지 패턴 03 — 주거골목형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Village",
+      "patternSequence": 3,
+      "resourceKindCode": "BlockPattern",
+      "title": "생활권 주거 골목 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "NeighborhoodInput",
+          "PedestrianLoop",
+          "LocalRoadOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-town-living-square",
+          "h1Ref": "h1-stock:town-living-square",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-WORLD-05",
+            "WI-ORDER-07"
+          ],
+          "spatialRoleCodes": [
+            "TownLivingSquare"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-neighborhood-service",
+          "h1Ref": "h1-stock:town-neighborhood-service",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-WORLD-05"
+          ],
+          "spatialRoleCodes": [
+            "TownNeighborhoodServiceArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-town-living-square",
+          "toNodeId": "h1-town-neighborhood-service",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "NeighborhoodInput",
+          "attachedNodeId": "h1-town-living-square"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "PedestrianLoop",
+          "attachedNodeId": "h1-town-living-square"
+        },
+        {
+          "connectorId": "connector-2",
+          "roleCode": "LocalRoadOutput",
+          "attachedNodeId": "h1-town-neighborhood-service"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-ORDER-07",
+        "WI-WORLD-05"
+      ],
+      "anticipatedGameplayCodes": [
+        "LocalInformation",
+        "NeighborhoodTaskStart"
+      ],
+      "theoryHashSha256": "2f15c628992b5f8d9bb1fda9cfc8ffcc53bb7ad43977ddfb3bda218fea95e81e"
+    },
+    {
+      "h2StableId": "h2-candidate:town-returns-waste",
+      "patternCode": "TOWN-H2-CIRCULAR-01",
+      "displayNameKo": "반품 집하장·폐기물 처리장 블록",
+      "spatialDisplayNameKo": "반품 집하장·폐기물 처리장 블록",
+      "gameplayProfileNameKo": "타운 순환 패턴 01 — 반품·폐기물형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Circular",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "생활권 반품·폐기물 블록",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LinearBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -120.0,
+          "minimumZ": -40.0,
+          "maximumX": 120.0,
+          "maximumZ": 40.0,
+          "width": 240.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "CustomerReturnInput",
+          "ServiceVehicleOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-town-returns",
+          "h1Ref": "h1-stock:town-returns",
+          "x": -80.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "MarketReturnsArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-town-waste",
+          "h1Ref": "h1-stock:town-waste",
+          "x": 0.0,
+          "z": 0.0,
+          "wiIds": [],
+          "spatialRoleCodes": [
+            "TownWasteHandlingArea"
+          ],
+          "capacityConceptCodes": []
+        },
+        {
+          "nodeId": "h1-road-facility-access",
+          "h1Ref": "h1-stock:road-facility-access",
+          "x": 80.0,
+          "z": 0.0,
+          "wiIds": [
+            "WI-WORLD-04"
+          ],
+          "spatialRoleCodes": [
+            "RoadFacilityAccess"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-1",
+          "fromNodeId": "h1-town-returns",
+          "toNodeId": "h1-town-waste",
+          "relationCode": "TheoryInternalRoute"
+        },
+        {
+          "edgeId": "edge-2",
+          "fromNodeId": "h1-town-waste",
+          "toNodeId": "h1-road-facility-access",
+          "relationCode": "TheoryInternalRoute"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector-0",
+          "roleCode": "CustomerReturnInput",
+          "attachedNodeId": "h1-town-returns"
+        },
+        {
+          "connectorId": "connector-1",
+          "roleCode": "ServiceVehicleOutput",
+          "attachedNodeId": "h1-road-facility-access"
+        }
+      ],
+      "gameplayWiIds": [
+        "WI-WORLD-04"
+      ],
+      "anticipatedGameplayCodes": [
+        "CustomerReturn",
+        "ReturnHandoff",
+        "ReturnTriage",
+        "WasteCollection",
+        "WasteSorting",
+        "WasteStorage"
+      ],
+      "theoryHashSha256": "a32ba082332d8c2e6e02f3d27c1e117fab70da6830cb26d31775cb8e32ea2f8f"
+    }
+  ],
+  "h3Plans": [
+    {
+      "h3StableId": "h3-candidate:circular-market-town",
+      "patternCode": "TOWN-H3-VILLAGE-02",
+      "displayNameKo": "시장·반품집하 구역",
+      "spatialDisplayNameKo": "시장·반품집하 구역",
+      "gameplayProfileNameKo": "타운 빌리지 경관 02 — 반품·회수 순환시장형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "City",
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Village",
+      "patternSequence": 2,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "반품·회수 순환형 시장 마을 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 0.0,
+          "width": 840.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "TownReceivingGate",
+          "ReturnOutput",
+          "TownLocalRoad"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-market-life-commerce",
+          "h2Ref": "h2-candidate:market-life-commerce",
+          "h2PatternCode": "TOWN-H2-VILLAGE-02",
+          "h2DisplayNameKo": "마트·생활상가 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "ea27bea8bddfe33394caf9b5f14ca69cee9fe2d07d88a23c67ba462414e14e88"
+        },
+        {
+          "nodeId": "h2-town-returns-waste",
+          "h2Ref": "h2-candidate:town-returns-waste",
+          "h2PatternCode": "TOWN-H2-CIRCULAR-01",
+          "h2DisplayNameKo": "반품 집하장·폐기물 처리장 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "a32ba082332d8c2e6e02f3d27c1e117fab70da6830cb26d31775cb8e32ea2f8f"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-market-life-commerce",
+          "toNodeId": "h2-town-returns-waste",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "TownReceivingGate",
+          "attachedNodeId": "h2-market-life-commerce"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "ReturnOutput",
+          "attachedNodeId": "h2-market-life-commerce"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "TownLocalRoad",
+          "attachedNodeId": "h2-town-returns-waste"
+        }
+      ],
+      "theoryHashSha256": "4a349ecddaceb57cc4080e19df7fb82d49558ec4e76d5aa1dcc920526f94c73f"
+    },
+    {
+      "h3StableId": "h3-candidate:farm-hub-logistics",
+      "patternCode": "MIX-H3-FARM-HUB-01",
+      "displayNameKo": "농장 출하문–Hub 입고문 회랑",
+      "spatialDisplayNameKo": "농장 출하문–Hub 입고문 회랑",
+      "gameplayProfileNameKo": "팜–허브 연결 경관 01 — 생산물류형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "Farm",
+        "City"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "FarmHub",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "농장–물류 거점 연결 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CorridorAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -210.0,
+          "minimumZ": -210.0,
+          "maximumX": 210.0,
+          "maximumZ": 210.0,
+          "width": 420.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "FarmGate",
+          "HubInboundGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-farm-hub-corridor",
+          "h2Ref": "h2-candidate:farm-hub-corridor",
+          "h2PatternCode": "MIX-H2-FARM-HUB-01",
+          "h2DisplayNameKo": "농장 출구–Hub 진입 회랑 블록",
+          "x": 0.0,
+          "z": 0.0,
+          "h2TheoryHashSha256": "f030017b98bf70bccb5f9948d380e54126d34be73d099a014d77c15d017e35dd"
+        }
+      ],
+      "edges": [],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "FarmGate",
+          "attachedNodeId": "h2-farm-hub-corridor"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "HubInboundGate",
+          "attachedNodeId": "h2-farm-hub-corridor"
+        }
+      ],
+      "theoryHashSha256": "179d8a138b96823f083b9e6432512248b36dde31ad34f835676eafa2415d7f34"
+    },
+    {
+      "h3StableId": "h3-candidate:farm-incident-recovery",
+      "patternCode": "FARM-H3-REGION-03",
+      "displayNameKo": "격리구획·복구 작업장 구역",
+      "spatialDisplayNameKo": "격리구획·복구 작업장 구역",
+      "gameplayProfileNameKo": "팜 경관 03 — 사건격리·손실회복형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Nature",
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Region",
+      "patternSequence": 3,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "농장 사건 격리·회복 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 0.0,
+          "width": 840.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "ProductionIncidentInput",
+          "RecoveredProductionOutput",
+          "NatureRestorationHandoff",
+          "FarmExternalGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-farm-incident-containment",
+          "h2Ref": "h2-candidate:farm-incident-containment",
+          "h2PatternCode": "FARM-H2-INCIDENT-01",
+          "h2DisplayNameKo": "점검마당·격리구획 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "337aa0d2254c91727b2bd5ffdb851e99b00dc4afc1835f69aadaeec3a84cc614"
+        },
+        {
+          "nodeId": "h2-farm-loss-restoration-handoff",
+          "h2Ref": "h2-candidate:farm-loss-restoration-handoff",
+          "h2PatternCode": "FARM-H2-RECOVERY-01",
+          "h2DisplayNameKo": "복구 작업장·복원 인계장 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "2fcad303201511473b2354a161dfdd39b550e54564c09efa692bdd952a0208c2"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-farm-incident-containment",
+          "toNodeId": "h2-farm-loss-restoration-handoff",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "ProductionIncidentInput",
+          "attachedNodeId": "h2-farm-incident-containment"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "RecoveredProductionOutput",
+          "attachedNodeId": "h2-farm-incident-containment"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "NatureRestorationHandoff",
+          "attachedNodeId": "h2-farm-loss-restoration-handoff"
+        },
+        {
+          "connectorId": "h3-connector-3",
+          "roleCode": "FarmExternalGate",
+          "attachedNodeId": "h2-farm-loss-restoration-handoff"
+        }
+      ],
+      "theoryHashSha256": "9808d7fb6606da5f201cd6f6cf5b56349a94991a0ae7dc343da871f91ef072cc"
+    },
+    {
+      "h3StableId": "h3-candidate:farm-processing-campus",
+      "patternCode": "FARM-H3-REGION-02",
+      "displayNameKo": "생산구획·후처리장 구역",
+      "spatialDisplayNameKo": "생산구획·후처리장 구역",
+      "gameplayProfileNameKo": "팜 경관 02 — 생산·후처리 캠퍼스형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Region",
+      "patternSequence": 2,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "농장 생산·후처리 복합 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 420.0,
+          "width": 840.0,
+          "depth": 840.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "FarmExternalGate",
+          "NatureEdge"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-highland-production",
+          "h2Ref": "h2-candidate:highland-production",
+          "h2PatternCode": "FARM-H2-PRODUCTION-01",
+          "h2DisplayNameKo": "고지대 경작지 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "25eaaaed36c6eb99c30ec001773b2d5200ffd28595520af41086c7ee55b45fad"
+        },
+        {
+          "nodeId": "h2-farm-seed-and-tools",
+          "h2Ref": "h2-candidate:farm-seed-and-tools",
+          "h2PatternCode": "FARM-H2-PREP-01",
+          "h2DisplayNameKo": "종자창고·농기구고 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "eef071a4f1763438fa05ab47b932c81a9a01b81c39a20366de3e15146a4dca55"
+        },
+        {
+          "nodeId": "h2-farm-wash-sort-pack",
+          "h2Ref": "h2-candidate:farm-wash-sort-pack",
+          "h2PatternCode": "FARM-H2-PROCESSING-01",
+          "h2DisplayNameKo": "세척장·선별장·포장장 블록",
+          "x": -210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "279345a33ebb1b84ae61a7e1065b6d3dd87227b73bf04d9493e80649ecb7e4eb"
+        },
+        {
+          "nodeId": "h2-farm-processing-shipping",
+          "h2Ref": "h2-candidate:farm-processing-shipping",
+          "h2PatternCode": "FARM-H2-SHIPPING-01",
+          "h2DisplayNameKo": "작업마당·출하장 블록",
+          "x": 210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "e6848b470fb4b1f81bfd24c1fbc8af1a4cbfa409aaef715f2cadc74968bc0a20"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-highland-production",
+          "toNodeId": "h2-farm-seed-and-tools",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-farm-seed-and-tools",
+          "toNodeId": "h2-farm-wash-sort-pack",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-3",
+          "fromNodeId": "h2-farm-wash-sort-pack",
+          "toNodeId": "h2-farm-processing-shipping",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "FarmExternalGate",
+          "attachedNodeId": "h2-highland-production"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "NatureEdge",
+          "attachedNodeId": "h2-farm-processing-shipping"
+        }
+      ],
+      "theoryHashSha256": "24ae0d70697d67f6b5328e04ef0ac29bb403c60f45fa5ac68f6b597aa8ffddcc"
+    },
+    {
+      "h3StableId": "h3-candidate:farm-seasonal-production-loop",
+      "patternCode": "FARM-H3-REGION-04",
+      "displayNameKo": "관수 경작지·출하장 구역",
+      "spatialDisplayNameKo": "관수 경작지·출하장 구역",
+      "gameplayProfileNameKo": "팜 경관 04 — 계절 생산·출하 순환형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Region",
+      "patternSequence": 4,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "Farm 계절 생산·출하 순환 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 420.0,
+          "width": 840.0,
+          "depth": 840.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "SeasonInput",
+          "ProductionLoop",
+          "FarmShippingGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-farm-irrigation-service",
+          "h2Ref": "h2-candidate:farm-irrigation-service",
+          "h2PatternCode": "FARM-H2-IRRIGATION-01",
+          "h2DisplayNameKo": "농수로·급수시설 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "46a16b3b8ebd0c851dea1b5ba686f96419d9ca2e318853758a8c7261c91d1511"
+        },
+        {
+          "nodeId": "h2-farm-harvest-throughput",
+          "h2Ref": "h2-candidate:farm-harvest-throughput",
+          "h2PatternCode": "FARM-H2-HARVEST-01",
+          "h2DisplayNameKo": "생산구획·집하마당 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "44e3a692490174ecf0a62c9a743d0df2be545f1146d91ed786bc8d4d34c92eab"
+        },
+        {
+          "nodeId": "h2-farm-processing-shipping",
+          "h2Ref": "h2-candidate:farm-processing-shipping",
+          "h2PatternCode": "FARM-H2-SHIPPING-01",
+          "h2DisplayNameKo": "작업마당·출하장 블록",
+          "x": -210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "e6848b470fb4b1f81bfd24c1fbc8af1a4cbfa409aaef715f2cadc74968bc0a20"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-farm-irrigation-service",
+          "toNodeId": "h2-farm-harvest-throughput",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-farm-harvest-throughput",
+          "toNodeId": "h2-farm-processing-shipping",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "SeasonInput",
+          "attachedNodeId": "h2-farm-irrigation-service"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "ProductionLoop",
+          "attachedNodeId": "h2-farm-irrigation-service"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "FarmShippingGate",
+          "attachedNodeId": "h2-farm-processing-shipping"
+        }
+      ],
+      "theoryHashSha256": "7f21ca73d72f3d0a979803658ae64b7ed04c7c0e89f5878e93018ebfd1167dfe"
+    },
+    {
+      "h3StableId": "h3-candidate:highland-farm",
+      "patternCode": "FARM-H3-REGION-01",
+      "displayNameKo": "고지대 경작지·숲경계 구역",
+      "spatialDisplayNameKo": "고지대 경작지·숲경계 구역",
+      "gameplayProfileNameKo": "팜 경관 01 — 고지대 농장형",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Nature"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Region",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "고지대 농장 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ContourAdaptive",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LandscapeDistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -630.0,
+          "minimumZ": -357.0,
+          "maximumX": 630.0,
+          "maximumZ": 357.0,
+          "width": 1260.0,
+          "depth": 714.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "FarmExternalGate",
+          "TheoryEgress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-highland-production",
+          "h2Ref": "h2-candidate:highland-production",
+          "h2PatternCode": "FARM-H2-PRODUCTION-01",
+          "h2DisplayNameKo": "고지대 경작지 블록",
+          "x": -420.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "25eaaaed36c6eb99c30ec001773b2d5200ffd28595520af41086c7ee55b45fad"
+        },
+        {
+          "nodeId": "h2-farm-processing-shipping",
+          "h2Ref": "h2-candidate:farm-processing-shipping",
+          "h2PatternCode": "FARM-H2-SHIPPING-01",
+          "h2DisplayNameKo": "작업마당·출하장 블록",
+          "x": 0.0,
+          "z": 147.0,
+          "h2TheoryHashSha256": "e6848b470fb4b1f81bfd24c1fbc8af1a4cbfa409aaef715f2cadc74968bc0a20"
+        },
+        {
+          "nodeId": "h2-forest-edge-farm",
+          "h2Ref": "h2-candidate:forest-edge-farm",
+          "h2PatternCode": "MIX-H2-NATURE-FARM-01",
+          "h2DisplayNameKo": "숲 가장자리 경작지 블록",
+          "x": 420.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "1deb9fddedd25e3d61118a73fb392fc0acef9d4dee9ecf25d8dfaa67062ecffc"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-highland-production",
+          "toNodeId": "h2-farm-processing-shipping",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-farm-processing-shipping",
+          "toNodeId": "h2-forest-edge-farm",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "FarmExternalGate",
+          "attachedNodeId": "h2-highland-production"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "TheoryEgress",
+          "attachedNodeId": "h2-forest-edge-farm"
+        }
+      ],
+      "theoryHashSha256": "fb5e70518a2b9480ccd993f8d57d9a9c53173b28af7ddf9f77201d6a8522d628"
+    },
+    {
+      "h3StableId": "h3-candidate:hub-maintenance-emergency-loop",
+      "patternCode": "CITY-H3-HUB-03",
+      "displayNameKo": "Hub 정비고·비상전력 구역",
+      "spatialDisplayNameKo": "Hub 정비고·비상전력 구역",
+      "gameplayProfileNameKo": "시티 허브 경관 03 — 정비·비상운영 회복형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Hub",
+      "patternSequence": 3,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "City/Hub 정비·비상운영 회복 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 420.0,
+          "width": 840.0,
+          "depth": 840.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "IncidentInput",
+          "EmergencyOperationsLoop",
+          "HubOperationsReturn"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-hub-maintenance-yard",
+          "h2Ref": "h2-candidate:hub-maintenance-yard",
+          "h2PatternCode": "CITY-H2-MAINTENANCE-01",
+          "h2DisplayNameKo": "Hub 정비고·차량 마당 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "04d78c007765519dfcbde02a64f4123aac23b3c5e8e389d98f7f5569caa69f03"
+        },
+        {
+          "nodeId": "h2-hub-emergency-power",
+          "h2Ref": "h2-candidate:hub-emergency-power",
+          "h2PatternCode": "CITY-H2-POWER-01",
+          "h2DisplayNameKo": "Hub 비상전력실·보관동 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "ebd14a52c82a64719d121045525523de0b7d95f31d15d2444e3d7d4442bf94a3"
+        },
+        {
+          "nodeId": "h2-hub-outbound-vehicle",
+          "h2Ref": "h2-candidate:hub-outbound-vehicle",
+          "h2PatternCode": "CITY-H2-OUTBOUND-01",
+          "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
+          "x": -210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "4f6884984e458c671743299f445e6ccff13d6acb9e379e4d0d12fe782da70a75"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-hub-maintenance-yard",
+          "toNodeId": "h2-hub-emergency-power",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-hub-emergency-power",
+          "toNodeId": "h2-hub-outbound-vehicle",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "IncidentInput",
+          "attachedNodeId": "h2-hub-maintenance-yard"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "EmergencyOperationsLoop",
+          "attachedNodeId": "h2-hub-maintenance-yard"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "HubOperationsReturn",
+          "attachedNodeId": "h2-hub-outbound-vehicle"
+        }
+      ],
+      "theoryHashSha256": "8fec8d8d7376364eb0ba00907b6cf7ee59691c9a876775cceca997ea63bb78f8"
+    },
+    {
+      "h3StableId": "h3-candidate:hub-town-logistics",
+      "patternCode": "MIX-H3-HUB-TOWN-01",
+      "displayNameKo": "Hub 출고문–Town 입고문 회랑",
+      "spatialDisplayNameKo": "Hub 출고문–Town 입고문 회랑",
+      "gameplayProfileNameKo": "허브–타운 연결 경관 01 — 시장배송형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "City",
+        "Town"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "HubTown",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "Hub–Town 연결 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CorridorAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -210.0,
+          "minimumZ": -210.0,
+          "maximumX": 210.0,
+          "maximumZ": 210.0,
+          "width": 420.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "HubOutboundGate",
+          "TownReceivingGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-hub-town-corridor",
+          "h2Ref": "h2-candidate:hub-town-corridor",
+          "h2PatternCode": "MIX-H2-HUB-TOWN-01",
+          "h2DisplayNameKo": "Hub 출구–Town 입고 회랑 블록",
+          "x": 0.0,
+          "z": 0.0,
+          "h2TheoryHashSha256": "f0537f2df3fce83ff45f6149a56c075e257ce971622e193b53b66b6437d6da19"
+        }
+      ],
+      "edges": [],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "HubOutboundGate",
+          "attachedNodeId": "h2-hub-town-corridor"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "TownReceivingGate",
+          "attachedNodeId": "h2-hub-town-corridor"
+        }
+      ],
+      "theoryHashSha256": "1d4f148fab6fa181b65482433eb7bf18c1fb0587a2cd1fecf79f4573598fb5b6"
+    },
+    {
+      "h3StableId": "h3-candidate:jinbu-hub",
+      "patternCode": "CITY-H3-HUB-01",
+      "displayNameKo": "Hub 입고장·창고·출고장 구역",
+      "spatialDisplayNameKo": "Hub 입고장·창고·출고장 구역",
+      "gameplayProfileNameKo": "시티 허브 경관 01 — 입고·보관·출고형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Hub",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "진부형 물류 Hub 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 0.0,
+          "width": 840.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "HubInboundGate",
+          "HubOutboundGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-hub-inbound-storage",
+          "h2Ref": "h2-candidate:hub-inbound-storage",
+          "h2PatternCode": "CITY-H2-INBOUND-01",
+          "h2DisplayNameKo": "Hub 입고장·창고 전면 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "f628c5d4123675733d0cdcec6287e64142d5402820e101ce7fc596d13cab8155"
+        },
+        {
+          "nodeId": "h2-hub-outbound-vehicle",
+          "h2Ref": "h2-candidate:hub-outbound-vehicle",
+          "h2PatternCode": "CITY-H2-OUTBOUND-01",
+          "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "4f6884984e458c671743299f445e6ccff13d6acb9e379e4d0d12fe782da70a75"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-hub-inbound-storage",
+          "toNodeId": "h2-hub-outbound-vehicle",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "HubInboundGate",
+          "attachedNodeId": "h2-hub-inbound-storage"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "HubOutboundGate",
+          "attachedNodeId": "h2-hub-outbound-vehicle"
+        }
+      ],
+      "theoryHashSha256": "4a7bdd98865ca6f8fa1619d6ab7e5f11f124d9e105c25ce9697a987c54f93e96"
+    },
+    {
+      "h3StableId": "h3-candidate:lowrise-market-town",
+      "patternCode": "TOWN-H3-VILLAGE-01",
+      "displayNameKo": "저층 주거·마트 구역",
+      "spatialDisplayNameKo": "저층 주거·마트 구역",
+      "gameplayProfileNameKo": "타운 빌리지 경관 01 — 저층 생활·시장형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Village",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "저층 생활·시장 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 0.0,
+          "width": 840.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "TownReceivingGate",
+          "TownLocalRoad"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-lowrise-residential",
+          "h2Ref": "h2-candidate:lowrise-residential",
+          "h2PatternCode": "TOWN-H2-VILLAGE-01",
+          "h2DisplayNameKo": "저층 주거·생활광장 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "892a17cff28be73126b51b588a1784e033da6fe040afd5c42c5c78c262f977c3"
+        },
+        {
+          "nodeId": "h2-market-life-commerce",
+          "h2Ref": "h2-candidate:market-life-commerce",
+          "h2PatternCode": "TOWN-H2-VILLAGE-02",
+          "h2DisplayNameKo": "마트·생활상가 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "ea27bea8bddfe33394caf9b5f14ca69cee9fe2d07d88a23c67ba462414e14e88"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-lowrise-residential",
+          "toNodeId": "h2-market-life-commerce",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "TownReceivingGate",
+          "attachedNodeId": "h2-lowrise-residential"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "TownLocalRoad",
+          "attachedNodeId": "h2-market-life-commerce"
+        }
+      ],
+      "theoryHashSha256": "26cae50710a930936a51643acd0e939a063724095e9491dbb7fc83e657d8b098"
+    },
+    {
+      "h3StableId": "h3-candidate:nature-exploration-buffer",
+      "patternCode": "NATURE-H3-REGION-01",
+      "displayNameKo": "탐색로·산림완충지 구역",
+      "spatialDisplayNameKo": "탐색로·산림완충지 구역",
+      "gameplayProfileNameKo": "네이처 경관 01 — 탐색·완충형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Region",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "Nature 탐색·완충 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Organic",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LandscapeDistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -357.0,
+          "maximumX": 420.0,
+          "maximumZ": 357.0,
+          "width": 840.0,
+          "depth": 714.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "NatureTrail",
+          "FarmEdge"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-nature-water-buffer",
+          "h2Ref": "h2-candidate:nature-water-buffer",
+          "h2PatternCode": "NATURE-H2-BUFFER-01",
+          "h2DisplayNameKo": "산림·수변 완충지 블록",
+          "x": -210.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "04fd5f365c27dfb83bfd5fca51501a8c39ba3527044756c719150fb0b0a74552"
+        },
+        {
+          "nodeId": "h2-forest-edge-farm",
+          "h2Ref": "h2-candidate:forest-edge-farm",
+          "h2PatternCode": "MIX-H2-NATURE-FARM-01",
+          "h2DisplayNameKo": "숲 가장자리 경작지 블록",
+          "x": 210.0,
+          "z": 147.0,
+          "h2TheoryHashSha256": "1deb9fddedd25e3d61118a73fb392fc0acef9d4dee9ecf25d8dfaa67062ecffc"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-nature-water-buffer",
+          "toNodeId": "h2-forest-edge-farm",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "NatureTrail",
+          "attachedNodeId": "h2-nature-water-buffer"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "FarmEdge",
+          "attachedNodeId": "h2-forest-edge-farm"
+        }
+      ],
+      "theoryHashSha256": "2ed64898b626ab54d263927a7ee165819b954d812da86f2d488d15d61cba7659"
+    },
+    {
+      "h3StableId": "h3-candidate:nature-home-encounter-defense",
+      "patternCode": "NATURE-H3-REGION-04",
+      "displayNameKo": "생활핵·조우로·방어환 구역",
+      "spatialDisplayNameKo": "생활핵·조우로·방어환 구역",
+      "gameplayProfileNameKo": "네이처 경관 04 — 생활핵·조우·방어 폐루프형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Region",
+      "patternSequence": 4,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "Nature 생활핵·조우·방어 폐루프 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Organic",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LandscapeDistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -630.0,
+          "minimumZ": -357.0,
+          "maximumX": 630.0,
+          "maximumZ": 357.0,
+          "width": 1260.0,
+          "depth": 714.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "SafeCoreGate",
+          "ExplorationOutput",
+          "ThreatInput",
+          "RecoveryReturn"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-nature-home-core",
+          "h2Ref": "h2-candidate:nature-home-core",
+          "h2PatternCode": "NATURE-H2-HOME-01",
+          "h2DisplayNameKo": "안전 생활핵·보급 거점 블록",
+          "x": -420.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "338569ad415d83908a7523d4619ee2946f16fea1c3e4b1fb1de19abe5d70d37b"
+        },
+        {
+          "nodeId": "h2-nature-encounter-route",
+          "h2Ref": "h2-candidate:nature-encounter-route",
+          "h2PatternCode": "NATURE-H2-ENCOUNTER-01",
+          "h2DisplayNameKo": "조우로·이탈로 블록",
+          "x": 0.0,
+          "z": 147.0,
+          "h2TheoryHashSha256": "136d655d9ee09e884eb10630f13c2cddbca1c6f6caae9e04a66e1408d5ded73a"
+        },
+        {
+          "nodeId": "h2-nature-defense-ring",
+          "h2Ref": "h2-candidate:nature-defense-ring",
+          "h2PatternCode": "NATURE-H2-DEFENSE-01",
+          "h2DisplayNameKo": "방어환·야영지 블록",
+          "x": 420.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "63187a78855d44a279bcd57a51dcd2cb7f18c1c59f7b4be81feee7cd7816c950"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-nature-home-core",
+          "toNodeId": "h2-nature-encounter-route",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-nature-encounter-route",
+          "toNodeId": "h2-nature-defense-ring",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "SafeCoreGate",
+          "attachedNodeId": "h2-nature-home-core"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "ExplorationOutput",
+          "attachedNodeId": "h2-nature-home-core"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "ThreatInput",
+          "attachedNodeId": "h2-nature-defense-ring"
+        },
+        {
+          "connectorId": "h3-connector-3",
+          "roleCode": "RecoveryReturn",
+          "attachedNodeId": "h2-nature-defense-ring"
+        }
+      ],
+      "theoryHashSha256": "1d0c7057e5661cc2d3c9550e0961dc4d82027f7495fa1eee998ceb6d1ec694a8"
+    },
+    {
+      "h3StableId": "h3-candidate:nature-threat-recovery",
+      "patternCode": "NATURE-H3-REGION-02",
+      "displayNameKo": "생활핵·대피로·복원쉼터 구역",
+      "spatialDisplayNameKo": "생활핵·대피로·복원쉼터 구역",
+      "gameplayProfileNameKo": "네이처 경관 02 — 위협·회복형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Region",
+      "patternSequence": 2,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "자연 생활·위협·회복 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Organic",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LandscapeDistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -357.0,
+          "maximumX": 420.0,
+          "maximumZ": 357.0,
+          "width": 840.0,
+          "depth": 714.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "SafeCoreAccess",
+          "FarmIncidentInput",
+          "TownReliefInput",
+          "CityHubReturn",
+          "RestoredTrailOutput"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-nature-threat-response",
+          "h2Ref": "h2-candidate:nature-threat-response",
+          "h2PatternCode": "NATURE-H2-THREAT-01",
+          "h2DisplayNameKo": "위험 흔적길·긴급 대피로 블록",
+          "x": -210.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "5225081c4fae142c3fea0d17a8fa83d04628a41d4fbf4b57c198971e06983d3b"
+        },
+        {
+          "nodeId": "h2-nature-restoration-recovery",
+          "h2Ref": "h2-candidate:nature-restoration-recovery",
+          "h2PatternCode": "NATURE-H2-RECOVERY-01",
+          "h2DisplayNameKo": "복원 작업지·회복 쉼터 블록",
+          "x": 210.0,
+          "z": 147.0,
+          "h2TheoryHashSha256": "01e0817bd1bbc019e4156fc85ec302f77ed09a71397345fb2555539004d89b88"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-nature-threat-response",
+          "toNodeId": "h2-nature-restoration-recovery",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "SafeCoreAccess",
+          "attachedNodeId": "h2-nature-threat-response"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "FarmIncidentInput",
+          "attachedNodeId": "h2-nature-threat-response"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "TownReliefInput",
+          "attachedNodeId": "h2-nature-threat-response"
+        },
+        {
+          "connectorId": "h3-connector-3",
+          "roleCode": "CityHubReturn",
+          "attachedNodeId": "h2-nature-restoration-recovery"
+        },
+        {
+          "connectorId": "h3-connector-4",
+          "roleCode": "RestoredTrailOutput",
+          "attachedNodeId": "h2-nature-restoration-recovery"
+        }
+      ],
+      "theoryHashSha256": "d58fc3b1679069660a9857c566385bd3f12441b65929624059f09e7d73540874"
+    },
+    {
+      "h3StableId": "h3-candidate:nature-town-relief-loop",
+      "patternCode": "MIX-H3-NATURE-TOWN-01",
+      "displayNameKo": "Nature 대피문–Town 구호문 회랑",
+      "spatialDisplayNameKo": "Nature 대피문–Town 구호문 회랑",
+      "gameplayProfileNameKo": "네이처–타운 연결 경관 01 — 대피·구호 인계형",
+      "leadPackCode": "Mixed",
+      "supportPackCodes": [
+        "Nature",
+        "Town"
+      ],
+      "compositionModeCode": "CrossPackTransition",
+      "patternFamilyCode": "NatureTown",
+      "patternSequence": 1,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "Nature–Town 대피·구호 인계 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Linear",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "CorridorAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -630.0,
+          "minimumZ": -210.0,
+          "maximumX": 630.0,
+          "maximumZ": 210.0,
+          "width": 1260.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "TownReliefGate",
+          "NatureRestorationGate",
+          "SafeCoreReturnLoop"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-town-recall-relief",
+          "h2Ref": "h2-candidate:town-recall-relief",
+          "h2PatternCode": "TOWN-H2-RELIEF-01",
+          "h2DisplayNameKo": "주민 안내소·구호 물자 인계장 블록",
+          "x": -420.0,
+          "z": 0.0,
+          "h2TheoryHashSha256": "0faba48141f65bf2dc38a738b38f9b0630eeddc8bfa1f120d9d057d2e6686306"
+        },
+        {
+          "nodeId": "h2-nature-town-relief-transition",
+          "h2Ref": "h2-candidate:nature-town-relief-transition",
+          "h2PatternCode": "MIX-H2-NATURE-TOWN-01",
+          "h2DisplayNameKo": "자연권 출구–생활권 구호 인계 블록",
+          "x": 0.0,
+          "z": 0.0,
+          "h2TheoryHashSha256": "7a0e43fc42791cde25f8a2abc81d380599c54731e6d23da8dea716ffe7e4d516"
+        },
+        {
+          "nodeId": "h2-nature-restoration-recovery",
+          "h2Ref": "h2-candidate:nature-restoration-recovery",
+          "h2PatternCode": "NATURE-H2-RECOVERY-01",
+          "h2DisplayNameKo": "복원 작업지·회복 쉼터 블록",
+          "x": 420.0,
+          "z": 0.0,
+          "h2TheoryHashSha256": "01e0817bd1bbc019e4156fc85ec302f77ed09a71397345fb2555539004d89b88"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-town-recall-relief",
+          "toNodeId": "h2-nature-town-relief-transition",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-nature-town-relief-transition",
+          "toNodeId": "h2-nature-restoration-recovery",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "TownReliefGate",
+          "attachedNodeId": "h2-town-recall-relief"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "NatureRestorationGate",
+          "attachedNodeId": "h2-town-recall-relief"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "SafeCoreReturnLoop",
+          "attachedNodeId": "h2-nature-restoration-recovery"
+        }
+      ],
+      "theoryHashSha256": "cb4619b16a2a3c46b493794b27ad515f98a0aa26a82cb3633f7714601c31051a"
+    },
+    {
+      "h3StableId": "h3-candidate:nature-trail-network",
+      "patternCode": "NATURE-H3-REGION-03",
+      "displayNameKo": "탐색로·대피망 구역",
+      "spatialDisplayNameKo": "탐색로·대피망 구역",
+      "gameplayProfileNameKo": "네이처 경관 03 — 탐색길·대피망형",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Region",
+      "patternSequence": 3,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "자연 탐색길·대피망 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "Organic",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "LandscapeDistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -357.0,
+          "maximumX": 420.0,
+          "maximumZ": 357.0,
+          "width": 840.0,
+          "depth": 714.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "TownOrFarmAccess",
+          "TrailLoop",
+          "EmergencyExit"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-nature-trail-shelter",
+          "h2Ref": "h2-candidate:nature-trail-shelter",
+          "h2PatternCode": "NATURE-H2-TRAIL-01",
+          "h2DisplayNameKo": "탐색로·대피 쉼터 블록",
+          "x": -210.0,
+          "z": -147.0,
+          "h2TheoryHashSha256": "ae5d94835081bee3dee8c02d90cae151b5ae93bd8c8e1112e64d0bda0d2c81e0"
+        },
+        {
+          "nodeId": "h2-nature-water-buffer",
+          "h2Ref": "h2-candidate:nature-water-buffer",
+          "h2PatternCode": "NATURE-H2-BUFFER-01",
+          "h2DisplayNameKo": "산림·수변 완충지 블록",
+          "x": 210.0,
+          "z": 147.0,
+          "h2TheoryHashSha256": "04fd5f365c27dfb83bfd5fca51501a8c39ba3527044756c719150fb0b0a74552"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-nature-trail-shelter",
+          "toNodeId": "h2-nature-water-buffer",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "TownOrFarmAccess",
+          "attachedNodeId": "h2-nature-trail-shelter"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "TrailLoop",
+          "attachedNodeId": "h2-nature-trail-shelter"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "EmergencyExit",
+          "attachedNodeId": "h2-nature-water-buffer"
+        }
+      ],
+      "theoryHashSha256": "d400b44e672b819deb68665df8e8b9d381e7d5a3b85eed2a8d9b0457576a832f"
+    },
+    {
+      "h3StableId": "h3-candidate:resilient-logistics-hub",
+      "patternCode": "CITY-H3-HUB-02",
+      "displayNameKo": "Hub 검역장·저온창고 구역",
+      "spatialDisplayNameKo": "Hub 검역장·저온창고 구역",
+      "gameplayProfileNameKo": "시티 허브 경관 02 — 품질·격리·저온대응형",
+      "leadPackCode": "City",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Hub",
+      "patternSequence": 2,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "품질·보관 대응형 물류 Hub 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 420.0,
+          "width": 840.0,
+          "depth": 840.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "HubInboundGate",
+          "HubOutboundGate",
+          "ReturnGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-hub-inbound-storage",
+          "h2Ref": "h2-candidate:hub-inbound-storage",
+          "h2PatternCode": "CITY-H2-INBOUND-01",
+          "h2DisplayNameKo": "Hub 입고장·창고 전면 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "f628c5d4123675733d0cdcec6287e64142d5402820e101ce7fc596d13cab8155"
+        },
+        {
+          "nodeId": "h2-hub-quarantine-staging",
+          "h2Ref": "h2-candidate:hub-quarantine-staging",
+          "h2PatternCode": "CITY-H2-QUARANTINE-01",
+          "h2DisplayNameKo": "Hub 검역장·격리창고 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "7b82c57cea229e6e50d4385f7c31ca345aa9509f59fde2f3b0746cb3ab164548"
+        },
+        {
+          "nodeId": "h2-hub-longterm-cold-storage",
+          "h2Ref": "h2-candidate:hub-longterm-cold-storage",
+          "h2PatternCode": "CITY-H2-STORAGE-01",
+          "h2DisplayNameKo": "Hub 장기·저온 창고 블록",
+          "x": -210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "33d99186b036a37ed6876599de7fe2d8775ceb25fa30afd6748be7736280da29"
+        },
+        {
+          "nodeId": "h2-hub-outbound-vehicle",
+          "h2Ref": "h2-candidate:hub-outbound-vehicle",
+          "h2PatternCode": "CITY-H2-OUTBOUND-01",
+          "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
+          "x": 210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "4f6884984e458c671743299f445e6ccff13d6acb9e379e4d0d12fe782da70a75"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-hub-inbound-storage",
+          "toNodeId": "h2-hub-quarantine-staging",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-hub-quarantine-staging",
+          "toNodeId": "h2-hub-longterm-cold-storage",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-3",
+          "fromNodeId": "h2-hub-longterm-cold-storage",
+          "toNodeId": "h2-hub-outbound-vehicle",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "HubInboundGate",
+          "attachedNodeId": "h2-hub-inbound-storage"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "HubOutboundGate",
+          "attachedNodeId": "h2-hub-inbound-storage"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "ReturnGate",
+          "attachedNodeId": "h2-hub-outbound-vehicle"
+        }
+      ],
+      "theoryHashSha256": "05ac0d975b1e78f2a3c046e09680806677e8eb462a1e8dea819def9d60947a93"
+    },
+    {
+      "h3StableId": "h3-candidate:town-contamination-relief",
+      "patternCode": "TOWN-H3-VILLAGE-03",
+      "displayNameKo": "오염격리·주민구호 구역",
+      "spatialDisplayNameKo": "오염격리·주민구호 구역",
+      "gameplayProfileNameKo": "타운 빌리지 경관 03 — 오염통제·주민구호형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "Nature",
+        "Construction"
+      ],
+      "compositionModeCode": "LeadPackWithSupport",
+      "patternFamilyCode": "Village",
+      "patternSequence": 3,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "생활권 오염 통제·구호 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 0.0,
+          "width": 840.0,
+          "depth": 420.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "MarketIncidentInput",
+          "SafeMarketOutput",
+          "ResidentReturnLoop",
+          "NatureReliefHandoff",
+          "TownExternalGate"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-town-contamination-control",
+          "h2Ref": "h2-candidate:town-contamination-control",
+          "h2PatternCode": "TOWN-H2-SAFETY-01",
+          "h2DisplayNameKo": "오염 점검장·격리구획 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "9f084a7dc428bb3fe93eb715945285059054bf592de061397e089ad1910e2666"
+        },
+        {
+          "nodeId": "h2-town-recall-relief",
+          "h2Ref": "h2-candidate:town-recall-relief",
+          "h2PatternCode": "TOWN-H2-RELIEF-01",
+          "h2DisplayNameKo": "주민 안내소·구호 물자 인계장 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "0faba48141f65bf2dc38a738b38f9b0630eeddc8bfa1f120d9d057d2e6686306"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-town-contamination-control",
+          "toNodeId": "h2-town-recall-relief",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "MarketIncidentInput",
+          "attachedNodeId": "h2-town-contamination-control"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "SafeMarketOutput",
+          "attachedNodeId": "h2-town-contamination-control"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "ResidentReturnLoop",
+          "attachedNodeId": "h2-town-contamination-control"
+        },
+        {
+          "connectorId": "h3-connector-3",
+          "roleCode": "NatureReliefHandoff",
+          "attachedNodeId": "h2-town-recall-relief"
+        },
+        {
+          "connectorId": "h3-connector-4",
+          "roleCode": "TownExternalGate",
+          "attachedNodeId": "h2-town-recall-relief"
+        }
+      ],
+      "theoryHashSha256": "1558d6c6615280a74cc73e8d065bc3fbc15d4eb1560316238b915df31fa69bb7"
+    },
+    {
+      "h3StableId": "h3-candidate:town-resident-service-loop",
+      "patternCode": "TOWN-H3-VILLAGE-04",
+      "displayNameKo": "주거골목·주민지원 구역",
+      "spatialDisplayNameKo": "주거골목·주민지원 구역",
+      "gameplayProfileNameKo": "타운 빌리지 경관 04 — 주민서비스·공동수령형",
+      "leadPackCode": "Town",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Village",
+      "patternSequence": 4,
+      "resourceKindCode": "LandscapeAssemblyPattern",
+      "title": "Town 주민서비스·공동수령 경관",
+      "theoryStateCode": "TheoryQualified",
+      "topologyCode": "ModifiedGrid",
+      "placementContract": {
+        "resourceKindCode": "LandscapeAssemblyPattern",
+        "placementUnitCode": "H3District",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "DistrictAssembly",
+        "referenceBoundsMeters": {
+          "minimumX": -420.0,
+          "minimumZ": -420.0,
+          "maximumX": 420.0,
+          "maximumZ": 420.0,
+          "width": 840.0,
+          "depth": 840.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Reference"
+        ],
+        "connectionRoleCodes": [
+          "NeighborhoodGate",
+          "ResidentServiceLoop",
+          "TownLocalRoad"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h2-town-residential-alley",
+          "h2Ref": "h2-candidate:town-residential-alley",
+          "h2PatternCode": "TOWN-H2-VILLAGE-03",
+          "h2DisplayNameKo": "저층 주거 골목 블록",
+          "x": -210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "2f15c628992b5f8d9bb1fda9cfc8ffcc53bb7ad43977ddfb3bda218fea95e81e"
+        },
+        {
+          "nodeId": "h2-town-resident-service",
+          "h2Ref": "h2-candidate:town-resident-service",
+          "h2PatternCode": "TOWN-H2-SERVICE-01",
+          "h2DisplayNameKo": "주민지원소·공동수령장 블록",
+          "x": 210.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "3957d680e9296be9eb0d5c34acae808f3bc19f7a6ff85756848ebe4252ff5ab8"
+        },
+        {
+          "nodeId": "h2-lowrise-residential",
+          "h2Ref": "h2-candidate:lowrise-residential",
+          "h2PatternCode": "TOWN-H2-VILLAGE-01",
+          "h2DisplayNameKo": "저층 주거·생활광장 블록",
+          "x": -210.0,
+          "z": 210.0,
+          "h2TheoryHashSha256": "892a17cff28be73126b51b588a1784e033da6fe040afd5c42c5c78c262f977c3"
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "h3-edge-1",
+          "fromNodeId": "h2-town-residential-alley",
+          "toNodeId": "h2-town-resident-service",
+          "relationCode": "TheoryBlockTraversal"
+        },
+        {
+          "edgeId": "h3-edge-2",
+          "fromNodeId": "h2-town-resident-service",
+          "toNodeId": "h2-lowrise-residential",
+          "relationCode": "TheoryBlockTraversal"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "h3-connector-0",
+          "roleCode": "NeighborhoodGate",
+          "attachedNodeId": "h2-town-residential-alley"
+        },
+        {
+          "connectorId": "h3-connector-1",
+          "roleCode": "ResidentServiceLoop",
+          "attachedNodeId": "h2-town-residential-alley"
+        },
+        {
+          "connectorId": "h3-connector-2",
+          "roleCode": "TownLocalRoad",
+          "attachedNodeId": "h2-lowrise-residential"
+        }
+      ],
+      "theoryHashSha256": "e3806b50fbed12e3302c31b11472f0fd91e5f536c0e354850dfe5739e16ccd8b"
+    }
+  ],
+  "e5AreaSetInstances": [
+    {
+      "areaSetStableId": "area-set:theory:nature-home-exploration-region",
+      "title": "Nature 생활·탐험 AreaSet",
+      "worldIntentRef": "h4-blueprint:nature-home-exploration-region",
+      "gamePlanCode": "NatureHomeThreatRecovery",
+      "evidenceStageCode": "E5",
+      "e5QualificationCode": "E5TheoryQualified",
+      "evidenceKindCode": "TheoryGenerated",
+      "humanReviewed": false,
+      "publicDataBound": false,
+      "runtimeValidated": false,
+      "graphInstances": [
+        {
+          "graphInstanceStableId": "graph:theory:nature-threat-recovery",
+          "h3Ref": "h3-candidate:nature-threat-recovery",
+          "h3PatternCode": "NATURE-H3-REGION-02",
+          "h3DisplayNameKo": "생활핵·대피로·복원쉼터 구역",
+          "x": -480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "d58fc3b1679069660a9857c566385bd3f12441b65929624059f09e7d73540874"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:nature-trail-network",
+          "h3Ref": "h3-candidate:nature-trail-network",
+          "h3PatternCode": "NATURE-H3-REGION-03",
+          "h3DisplayNameKo": "탐색로·대피망 구역",
+          "x": 480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "d400b44e672b819deb68665df8e8b9d381e7d5a3b85eed2a8d9b0457576a832f"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:nature-home-encounter-defense",
+          "h3Ref": "h3-candidate:nature-home-encounter-defense",
+          "h3PatternCode": "NATURE-H3-REGION-04",
+          "h3DisplayNameKo": "생활핵·조우로·방어환 구역",
+          "x": -480.0,
+          "z": 480.0,
+          "h3TheoryHashSha256": "1d0c7057e5661cc2d3c9550e0961dc4d82027f7495fa1eee998ceb6d1ec694a8"
+        }
+      ],
+      "graphRelations": [
+        {
+          "relationStableId": "graph-relation:theory:1:nature-home-exploration-region",
+          "fromGraphInstanceStableId": "graph:theory:nature-threat-recovery",
+          "toGraphInstanceStableId": "graph:theory:nature-trail-network",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        },
+        {
+          "relationStableId": "graph-relation:theory:2:nature-home-exploration-region",
+          "fromGraphInstanceStableId": "graph:theory:nature-trail-network",
+          "toGraphInstanceStableId": "graph:theory:nature-home-encounter-defense",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        }
+      ],
+      "theoryHashSha256": "4aa093d54f845b52ffa4880bb4845810c5a70542082ca5fea19bd88d1eb14c1a"
+    },
+    {
+      "areaSetStableId": "area-set:theory:farm-production-processing-region",
+      "title": "Farm 생산·생존 AreaSet",
+      "worldIntentRef": "h4-blueprint:farm-production-processing-region",
+      "gamePlanCode": "FarmProductionSurvival",
+      "evidenceStageCode": "E5",
+      "e5QualificationCode": "E5TheoryQualified",
+      "evidenceKindCode": "TheoryGenerated",
+      "humanReviewed": false,
+      "publicDataBound": false,
+      "runtimeValidated": false,
+      "graphInstances": [
+        {
+          "graphInstanceStableId": "graph:theory:highland-farm",
+          "h3Ref": "h3-candidate:highland-farm",
+          "h3PatternCode": "FARM-H3-REGION-01",
+          "h3DisplayNameKo": "고지대 경작지·숲경계 구역",
+          "x": -480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "fb5e70518a2b9480ccd993f8d57d9a9c53173b28af7ddf9f77201d6a8522d628"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:farm-processing-campus",
+          "h3Ref": "h3-candidate:farm-processing-campus",
+          "h3PatternCode": "FARM-H3-REGION-02",
+          "h3DisplayNameKo": "생산구획·후처리장 구역",
+          "x": 480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "24ae0d70697d67f6b5328e04ef0ac29bb403c60f45fa5ac68f6b597aa8ffddcc"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:farm-incident-recovery",
+          "h3Ref": "h3-candidate:farm-incident-recovery",
+          "h3PatternCode": "FARM-H3-REGION-03",
+          "h3DisplayNameKo": "격리구획·복구 작업장 구역",
+          "x": -480.0,
+          "z": 480.0,
+          "h3TheoryHashSha256": "9808d7fb6606da5f201cd6f6cf5b56349a94991a0ae7dc343da871f91ef072cc"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:farm-seasonal-production-loop",
+          "h3Ref": "h3-candidate:farm-seasonal-production-loop",
+          "h3PatternCode": "FARM-H3-REGION-04",
+          "h3DisplayNameKo": "관수 경작지·출하장 구역",
+          "x": 480.0,
+          "z": 480.0,
+          "h3TheoryHashSha256": "7f21ca73d72f3d0a979803658ae64b7ed04c7c0e89f5878e93018ebfd1167dfe"
+        }
+      ],
+      "graphRelations": [
+        {
+          "relationStableId": "graph-relation:theory:1:farm-production-processing-region",
+          "fromGraphInstanceStableId": "graph:theory:highland-farm",
+          "toGraphInstanceStableId": "graph:theory:farm-processing-campus",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        },
+        {
+          "relationStableId": "graph-relation:theory:2:farm-production-processing-region",
+          "fromGraphInstanceStableId": "graph:theory:farm-processing-campus",
+          "toGraphInstanceStableId": "graph:theory:farm-incident-recovery",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        },
+        {
+          "relationStableId": "graph-relation:theory:3:farm-production-processing-region",
+          "fromGraphInstanceStableId": "graph:theory:farm-incident-recovery",
+          "toGraphInstanceStableId": "graph:theory:farm-seasonal-production-loop",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        }
+      ],
+      "theoryHashSha256": "6260a9d49cfe1d84cd46a118b04d4391e548286f01fbb8eb37c77a4093e1dec3"
+    },
+    {
+      "areaSetStableId": "area-set:theory:logistics-hub-region",
+      "title": "City/Hub 물류 AreaSet",
+      "worldIntentRef": "h4-blueprint:logistics-hub-region",
+      "gamePlanCode": "CityHubLogisticsResilience",
+      "evidenceStageCode": "E5",
+      "e5QualificationCode": "E5TheoryQualified",
+      "evidenceKindCode": "TheoryGenerated",
+      "humanReviewed": false,
+      "publicDataBound": false,
+      "runtimeValidated": false,
+      "graphInstances": [
+        {
+          "graphInstanceStableId": "graph:theory:jinbu-hub",
+          "h3Ref": "h3-candidate:jinbu-hub",
+          "h3PatternCode": "CITY-H3-HUB-01",
+          "h3DisplayNameKo": "Hub 입고장·창고·출고장 구역",
+          "x": -480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "4a7bdd98865ca6f8fa1619d6ab7e5f11f124d9e105c25ce9697a987c54f93e96"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:resilient-logistics-hub",
+          "h3Ref": "h3-candidate:resilient-logistics-hub",
+          "h3PatternCode": "CITY-H3-HUB-02",
+          "h3DisplayNameKo": "Hub 검역장·저온창고 구역",
+          "x": 480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "05ac0d975b1e78f2a3c046e09680806677e8eb462a1e8dea819def9d60947a93"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:hub-maintenance-emergency-loop",
+          "h3Ref": "h3-candidate:hub-maintenance-emergency-loop",
+          "h3PatternCode": "CITY-H3-HUB-03",
+          "h3DisplayNameKo": "Hub 정비고·비상전력 구역",
+          "x": -480.0,
+          "z": 480.0,
+          "h3TheoryHashSha256": "8fec8d8d7376364eb0ba00907b6cf7ee59691c9a876775cceca997ea63bb78f8"
+        }
+      ],
+      "graphRelations": [
+        {
+          "relationStableId": "graph-relation:theory:1:logistics-hub-region",
+          "fromGraphInstanceStableId": "graph:theory:jinbu-hub",
+          "toGraphInstanceStableId": "graph:theory:resilient-logistics-hub",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        },
+        {
+          "relationStableId": "graph-relation:theory:2:logistics-hub-region",
+          "fromGraphInstanceStableId": "graph:theory:resilient-logistics-hub",
+          "toGraphInstanceStableId": "graph:theory:hub-maintenance-emergency-loop",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        }
+      ],
+      "theoryHashSha256": "6926f62e177b60187a51613f14363c80499e42a36e23518dda943fd4bc37ee88"
+    },
+    {
+      "areaSetStableId": "area-set:theory:lowrise-market-region",
+      "title": "Town 생활·시장 AreaSet",
+      "worldIntentRef": "h4-blueprint:lowrise-market-region",
+      "gamePlanCode": "TownLivingMarketSafety",
+      "evidenceStageCode": "E5",
+      "e5QualificationCode": "E5TheoryQualified",
+      "evidenceKindCode": "TheoryGenerated",
+      "humanReviewed": false,
+      "publicDataBound": false,
+      "runtimeValidated": false,
+      "graphInstances": [
+        {
+          "graphInstanceStableId": "graph:theory:lowrise-market-town",
+          "h3Ref": "h3-candidate:lowrise-market-town",
+          "h3PatternCode": "TOWN-H3-VILLAGE-01",
+          "h3DisplayNameKo": "저층 주거·마트 구역",
+          "x": -480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "26cae50710a930936a51643acd0e939a063724095e9491dbb7fc83e657d8b098"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:circular-market-town",
+          "h3Ref": "h3-candidate:circular-market-town",
+          "h3PatternCode": "TOWN-H3-VILLAGE-02",
+          "h3DisplayNameKo": "시장·반품집하 구역",
+          "x": 480.0,
+          "z": -480.0,
+          "h3TheoryHashSha256": "4a349ecddaceb57cc4080e19df7fb82d49558ec4e76d5aa1dcc920526f94c73f"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:town-contamination-relief",
+          "h3Ref": "h3-candidate:town-contamination-relief",
+          "h3PatternCode": "TOWN-H3-VILLAGE-03",
+          "h3DisplayNameKo": "오염격리·주민구호 구역",
+          "x": -480.0,
+          "z": 480.0,
+          "h3TheoryHashSha256": "1558d6c6615280a74cc73e8d065bc3fbc15d4eb1560316238b915df31fa69bb7"
+        },
+        {
+          "graphInstanceStableId": "graph:theory:town-resident-service-loop",
+          "h3Ref": "h3-candidate:town-resident-service-loop",
+          "h3PatternCode": "TOWN-H3-VILLAGE-04",
+          "h3DisplayNameKo": "주거골목·주민지원 구역",
+          "x": 480.0,
+          "z": 480.0,
+          "h3TheoryHashSha256": "e3806b50fbed12e3302c31b11472f0fd91e5f536c0e354850dfe5739e16ccd8b"
+        }
+      ],
+      "graphRelations": [
+        {
+          "relationStableId": "graph-relation:theory:1:lowrise-market-region",
+          "fromGraphInstanceStableId": "graph:theory:lowrise-market-town",
+          "toGraphInstanceStableId": "graph:theory:circular-market-town",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        },
+        {
+          "relationStableId": "graph-relation:theory:2:lowrise-market-region",
+          "fromGraphInstanceStableId": "graph:theory:circular-market-town",
+          "toGraphInstanceStableId": "graph:theory:town-contamination-relief",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        },
+        {
+          "relationStableId": "graph-relation:theory:3:lowrise-market-region",
+          "fromGraphInstanceStableId": "graph:theory:town-contamination-relief",
+          "toGraphInstanceStableId": "graph:theory:town-resident-service-loop",
+          "relationKindCode": "PlayerAndWorkTraversal"
+        }
+      ],
+      "theoryHashSha256": "2ff04b5cef18dcad403b4c9b1af139a813c9a6def0847a29a996f827b7f5d602"
+    }
+  ],
+  "interAreaSetRelations": [
+    {
+      "relationCode": "NatureToFarm",
+      "fromAreaSetCandidateRef": "h4-blueprint:nature-home-exploration-region",
+      "toAreaSetCandidateRef": "h4-blueprint:farm-production-processing-region",
+      "relationKindCode": "PlayerTraversal"
+    },
+    {
+      "relationCode": "NatureToTown",
+      "fromAreaSetCandidateRef": "h4-blueprint:nature-home-exploration-region",
+      "toAreaSetCandidateRef": "h4-blueprint:lowrise-market-region",
+      "relationKindCode": "PlayerTraversal"
+    },
+    {
+      "relationCode": "NatureToCityHub",
+      "fromAreaSetCandidateRef": "h4-blueprint:nature-home-exploration-region",
+      "toAreaSetCandidateRef": "h4-blueprint:logistics-hub-region",
+      "relationKindCode": "PlayerTraversal"
+    },
+    {
+      "relationCode": "FarmToCityHub",
+      "fromAreaSetCandidateRef": "h4-blueprint:farm-production-processing-region",
+      "toAreaSetCandidateRef": "h4-blueprint:logistics-hub-region",
+      "relationKindCode": "CargoLogistics"
+    },
+    {
+      "relationCode": "CityHubToTown",
+      "fromAreaSetCandidateRef": "h4-blueprint:logistics-hub-region",
+      "toAreaSetCandidateRef": "h4-blueprint:lowrise-market-region",
+      "relationKindCode": "CargoLogistics"
+    }
+  ],
+  "inventoryTargets": [
+    {
+      "leadPackCode": "Nature",
+      "currentH2": 7,
+      "firstTargetH2": 8,
+      "currentH3": 4,
+      "firstTargetH3": 5
+    },
+    {
+      "leadPackCode": "Farm",
+      "currentH2": 9,
+      "firstTargetH2": 10,
+      "currentH3": 4,
+      "firstTargetH3": 5
+    },
+    {
+      "leadPackCode": "City",
+      "currentH2": 7,
+      "firstTargetH2": 8,
+      "currentH3": 3,
+      "firstTargetH3": 4
+    },
+    {
+      "leadPackCode": "Town",
+      "currentH2": 7,
+      "firstTargetH2": 8,
+      "currentH3": 4,
+      "firstTargetH3": 5
+    },
+    {
+      "leadPackCode": "Mixed",
+      "currentH2": 4,
+      "firstTargetH2": 5,
+      "currentH3": 3,
+      "firstTargetH3": 4
+    }
+  ],
+  "productionPhases": [
+    {
+      "phaseCode": "P1",
+      "title": "팩 단독 H2 블록 패턴",
+      "hierarchyLevelCode": "H2",
+      "allowedCompositionModeCodes": [
+        "SinglePack"
+      ],
+      "principle": "Nature·Farm·City·Town 각 팩만으로 반복 조립 가능한 블록 패턴 재고를 먼저 확보한다."
+    },
+    {
+      "phaseCode": "P2",
+      "title": "팩 내부 H3 경관 조립",
+      "hierarchyLevelCode": "H3",
+      "allowedCompositionModeCodes": [
+        "SinglePack"
+      ],
+      "principle": "같은 주도 팩의 H2 블록을 이동·사건 폐루프로 묶는다."
+    },
+    {
+      "phaseCode": "P3",
+      "title": "주도 팩과 보조 팩 조합",
+      "hierarchyLevelCode": "H2/H3",
+      "allowedCompositionModeCodes": [
+        "LeadPackWithSupport"
+      ],
+      "principle": "팩 단독 재고로 부족한 기능층만 Nature·Construction 등 보조 팩으로 보완한다."
+    },
+    {
+      "phaseCode": "P4",
+      "title": "팩 간 혼합 H2 전환 블록",
+      "hierarchyLevelCode": "H2",
+      "allowedCompositionModeCodes": [
+        "CrossPackTransition"
+      ],
+      "principle": "두 업무 영역의 Gate와 경계를 잇는 혼합 블록을 만든다."
+    },
+    {
+      "phaseCode": "P5",
+      "title": "팩 간 혼합 H3 연결 경관",
+      "hierarchyLevelCode": "H3",
+      "allowedCompositionModeCodes": [
+        "CrossPackTransition"
+      ],
+      "principle": "혼합 H2를 AreaSet 간 이동·물류·대피 인과로 조립한다."
+    }
+  ],
+  "priorityExpansionQueue": [],
+  "humanReviewModeCode": "DeferredBatchReview",
+  "authorityBoundary": {
+    "humanApprovalNotClaimed": true,
+    "publicDataNotBound": true,
+    "runtimeNotValidated": true,
+    "e6AndE7RemainSeparate": true
+  }
+}

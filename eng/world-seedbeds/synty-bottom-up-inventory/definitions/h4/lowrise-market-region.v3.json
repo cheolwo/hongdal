@@ -11,13 +11,18 @@
   "requiredH3Refs": [
     "h3-candidate:lowrise-market-town",
     "h3-candidate:circular-market-town",
-    "h3-candidate:town-contamination-relief"
+    "h3-candidate:town-contamination-relief",
+    "h3-candidate:town-resident-service-loop"
   ],
-  "optionalH3Refs": [],
+  "optionalH3Refs": [
+    "h3-candidate:nature-town-relief-loop"
+  ],
   "childKnowledgeRefs": [
     "h3-candidate:circular-market-town",
     "h3-candidate:lowrise-market-town",
-    "h3-candidate:town-contamination-relief"
+    "h3-candidate:nature-town-relief-loop",
+    "h3-candidate:town-contamination-relief",
+    "h3-candidate:town-resident-service-loop"
   ],
   "worldThemeCodes": [
     "LowriseLiving",
@@ -36,6 +41,14 @@
     "city:먹거리 상점 골목",
     "city:상하차 Dock",
     "city:화물 대기 야드",
+    "nature:고지대 노출지",
+    "nature:산 능선",
+    "nature:산길·바위 길목",
+    "nature:수변 완충지",
+    "nature:숲 가장자리",
+    "nature:숲 빈터·고사목",
+    "nature:초지·야생화",
+    "network:농촌도로 곡선",
     "network:타운도로 곡선",
     "network:타운도로 십자",
     "network:타운도로 직선",
@@ -47,10 +60,11 @@
     "town:정원·담장 경계",
     "transition:Road–BuildingFront 전환",
     "transition:Town–City 전환",
-    "transition:Town–Hub 전환"
+    "transition:Town–Hub 전환",
+    "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.lowrise-market-region.r1",
-  "derivationInputHashSha256": "38f2545814c7c760a467118e617f653febfc131c0ce82acae44bcb66f168d8e8",
+  "derivationInputHashSha256": "07682f25ba019f9e827205af13fc9ce0f974f8279877342f79ec847fd292b6ec",
   "authoredDocument": "authored/h4/lowrise-market-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

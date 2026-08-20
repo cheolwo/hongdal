@@ -5,14 +5,16 @@ $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $manager = Join-Path $repositoryRoot "eng/world-seedbeds/manage-gameplay-led-h-inventory.ps1"
 $output = Join-Path $repositoryRoot "eng/world-seedbeds/generated/gameplay-led-h-inventory.v1.json"
 
+$firstWrite = & pwsh -NoProfile -File $manager -Mode Write
 $beforeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $output).Hash
 $beforeTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
 $check = & pwsh -NoProfile -File $manager -Mode Check
-$write = & pwsh -NoProfile -File $manager -Mode Write
+$secondWrite = & pwsh -NoProfile -File $manager -Mode Write
 $afterHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $output).Hash
 $afterTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
-if ($check -notmatch "GameplayLedHInventoryValid:Plans=4;H1=52\+32;H2=24;H3=13;H4=6;Violations=0") { throw "GameplayLedHInventoryCheckFailed" }
-if ($write -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=24;H3=13;H4=6;Violations=0") { throw "GameplayLedHInventoryWriteFailed" }
+if ($firstWrite -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=34;H3=18;H4=6;Violations=0") { throw "GameplayLedHInventoryFirstWriteFailed" }
+if ($check -notmatch "GameplayLedHInventoryValid:Plans=4;H1=52\+32;H2=34;H3=18;H4=6;Violations=0") { throw "GameplayLedHInventoryCheckFailed" }
+if ($secondWrite -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=34;H3=18;H4=6;Violations=0") { throw "GameplayLedHInventorySecondWriteFailed" }
 if ($beforeHash -ne $afterHash -or $beforeTicks -ne $afterTicks) { throw "GameplayLedHInventoryNonDeterministic" }
 
 $report = Get-Content -LiteralPath $output -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -30,8 +32,19 @@ $natureEvidence = @($report.wiEvidenceQueue | Where-Object priorityCode -eq "E-P
 if ($natureEvidence.Count -ne 1 -or (@($natureEvidence.wiIds) -join ",") -ne ($natureWiIds -join ",")) {
     throw "GameplayLedHInventoryNatureEvidenceQueueInvalid"
 }
+if ([string] $natureEvidence.evidenceTrackCode -ne "Integration") { throw "GameplayLedHInventoryNatureEvidenceTrackInvalid" }
+if ((@($natureEvidence.currentStageCodes) -join ",") -ne "E1") { throw "GameplayLedHInventoryNatureCurrentStageInvalid" }
+if ([string] $natureEvidence.targetStageCode -ne "E4") { throw "GameplayLedHInventoryNatureTargetStageInvalid" }
 if ((@($report.hExpansionQueue.priorityCode) -join ",") -ne "H-P0,H-P1,H-P2,H-P3,H-P4") { throw "GameplayLedHInventoryHPriorityInvalid" }
 if ((@($report.wiEvidenceQueue.priorityCode) -join ",") -ne "E-P1,E-P2,E-P3,E-P4,E-P5") { throw "GameplayLedHInventoryEPriorityInvalid" }
 if ([string] $report.wiEvidenceQueue[-1].targetStageCode -ne "E6") { throw "GameplayLedHInventoryE6BoundaryInvalid" }
+if ([string] $report.policyRevision -ne "simulation-world-gameplay-led-h-policy.r7") { throw "GameplayLedHInventoryPolicyRevisionInvalid" }
+if (@($report.planCoverage.stagedPackNativeH2Refs | Sort-Object -Unique).Count -ne 0) { throw "GameplayLedHInventoryStagedPackNativeH2MustBeEmptyAfterH3Promotion" }
+$playableSlice = @($report.playableSliceSummary | Where-Object playableSliceId -eq "reference-play:nature-farm-day.v1")
+if ($playableSlice.Count -ne 1) { throw "GameplayLedHInventoryPlayableSliceMissing" }
+if ([string] $playableSlice[0].declaredPlayableSliceStateCode -ne "SpatiallyComposed") { throw "GameplayLedHInventoryPlayableSliceStateInvalid" }
+if ([string] $playableSlice[0].theorySpatialBindingStateCode -ne "E5TheoryQualified") { throw "GameplayLedHInventoryPlayableSliceTheorySpatialBoundaryInvalid" }
+if ([string] $playableSlice[0].actualSpatialBindingStateCode -ne "ActualE5Bound") { throw "GameplayLedHInventoryPlayableSliceActualSpatialBoundaryInvalid" }
+if ((@($report.warningOnlyGamePlanCodesMissingPlayableSlice) -join ",") -ne "CityHubLogisticsResilience,TownLivingMarketSafety") { throw "GameplayLedHInventoryWarningOnlyPlansInvalid" }
 
 Write-Output "GameplayLedHInventoryTestsPassed:Plans=4;Violations=0;OrderPacking=Covered"

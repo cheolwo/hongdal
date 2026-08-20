@@ -1,0 +1,1157 @@
+{
+  "schemaVersion": "simulation-world-gameplay-spatial-completion-report.v1",
+  "revision": "simulation-world-gameplay-spatial-completion-report.r3",
+  "sourceRevision": "simulation-world-gameplay-spatial-completion.r4",
+  "hCatalogRevision": "simulation-world-spatial-design-knowledge.r3",
+  "worldInteractionRevision": "simulation-world-interactions.r4",
+  "evidenceStageRevision": "simulation-evidence-stages.r5",
+  "theorySpatialFactoryRevision": "simulation-world-theory-spatial-factory-output.r2",
+  "theorySpatialFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r3",
+  "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r1",
+  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r1",
+  "axisDefinitions": {
+    "h": "공간 자원의 종류와 H1→H4 조립 깊이",
+    "gameplayTrace": "공간이 기준 플레이를 직접 또는 간접 지원하는 정도",
+    "evidence": "E0→E7 구현·통합 증거 깊이",
+    "playableSlice": "사람이 시작부터 다음 날까지 완주하는 마감 상태"
+  },
+  "gatePolicy": {
+    "strictGamePlanCodes": [
+      "NatureHomeThreatRecovery",
+      "FarmProductionSurvival"
+    ],
+    "warningOnlyGamePlanCodes": [
+      "TownLivingMarketSafety",
+      "CityHubLogisticsResilience"
+    ],
+    "unlinkedHExcludedFromGameplayPriority": true,
+    "supportingHAllowed": true,
+    "automaticHPromotionForbidden": true,
+    "scenarioFallbackForMissingE5Forbidden": true,
+    "spatialApprovalAndGameplayReadinessAreIndependent": true,
+    "theorySpatialProductionIndependentFromGameplayTrace": true,
+    "actualE5RequiredForPlayableCompletion": true
+  },
+  "counts": {
+    "playableSlices": 1,
+    "coveredGamePlans": 2,
+    "strictGamePlans": 2,
+    "warningOnlyGamePlans": 2,
+    "warningOnlyMissingGamePlans": 2,
+    "h1Traces": 17,
+    "h2Traces": 12,
+    "h3Traces": 8,
+    "h4Traces": 2,
+    "completionBlockers": 4
+  },
+  "coveredGamePlanCodes": [
+    "FarmProductionSurvival",
+    "NatureHomeThreatRecovery"
+  ],
+  "warningOnlyMissingGamePlanCodes": [
+    "CityHubLogisticsResilience",
+    "TownLivingMarketSafety"
+  ],
+  "hTrace": [
+    {
+      "knowledgeRef": "h1-stock:farm-exposure-inspection",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "farm-incident-decision"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-harvest-staging",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "collect",
+        "harvest",
+        "pack"
+      ],
+      "contributionCodes": [
+        "StatePresentation"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-incident-quarantine",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "farm-incident-decision"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-loss-recovery",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "farm-incident-decision"
+      ],
+      "contributionCodes": [
+        "StatePresentation",
+        "ThreatReadability",
+        "TransitionHandoff"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-production",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "harvest",
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-restoration-supply",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "farm-incident-decision",
+        "restore-route"
+      ],
+      "contributionCodes": [
+        "StatePresentation",
+        "ThreatReadability",
+        "TransitionHandoff"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-tool-storage",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "plan-harvest"
+      ],
+      "contributionCodes": [
+        "SightlineAndLandmark",
+        "StatePresentation"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-work-yard",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "collect",
+        "pack",
+        "plan-harvest"
+      ],
+      "contributionCodes": [
+        "SightlineAndLandmark",
+        "StatePresentation"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:farm-worker-waiting",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "plan-harvest"
+      ],
+      "contributionCodes": [
+        "SightlineAndLandmark",
+        "StatePresentation"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-emergency-retreat",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "retreat"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-exploration-buffer",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "travel-to-farm"
+      ],
+      "contributionCodes": [
+        "AtmosphereAndIdentity",
+        "TransitionHandoff",
+        "TraversalGuidance"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-farm-edge",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "harvest",
+        "travel-to-farm"
+      ],
+      "contributionCodes": [
+        "AtmosphereAndIdentity",
+        "StatePresentation",
+        "TransitionHandoff",
+        "TraversalGuidance"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-incident-trace",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "observe-threat"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-restoration-site",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "restore-route"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-safe-recovery-camp",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "close-day",
+        "day-start",
+        "recover-party",
+        "retreat"
+      ],
+      "contributionCodes": [
+        "BufferAndSafety",
+        "SightlineAndLandmark",
+        "StatePresentation",
+        "TraversalGuidance"
+      ]
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-threat-watch",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "DirectAction",
+      "stepIds": [
+        "observe-threat"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h1-stock:nature-trailhead",
+      "hierarchyLevelCode": "H1",
+      "gameplayTraceStateCode": "Supporting",
+      "stepIds": [
+        "day-start",
+        "travel-to-farm"
+      ],
+      "contributionCodes": [
+        "AtmosphereAndIdentity",
+        "SightlineAndLandmark",
+        "TransitionHandoff",
+        "TraversalGuidance"
+      ]
+    },
+    {
+      "knowledgeRef": "h2-candidate:farm-incident-containment",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "farm-incident-decision"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:farm-loss-restoration-handoff",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "farm-incident-decision",
+        "restore-route"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:farm-processing-shipping",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "collect",
+        "pack",
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:farm-seed-and-tools",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:farm-wash-sort-pack",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "collect",
+        "harvest",
+        "pack"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:farm-worker-support",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:forest-edge-farm",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:highland-production",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "harvest",
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:nature-restoration-recovery",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "close-day",
+        "day-start",
+        "recover-party",
+        "restore-route",
+        "retreat"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:nature-threat-response",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "observe-threat",
+        "retreat"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:nature-trail-shelter",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "day-start",
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h2-candidate:nature-water-buffer",
+      "hierarchyLevelCode": "H2",
+      "gameplayTraceStateCode": "SequenceMapped",
+      "stepIds": [
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:farm-incident-recovery",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "farm-incident-decision",
+        "restore-route"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:farm-processing-campus",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "collect",
+        "harvest",
+        "pack",
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:farm-seasonal-production-loop",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "plan-harvest"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:highland-farm",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "harvest",
+        "plan-harvest",
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:nature-exploration-buffer",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:nature-home-encounter-defense",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "day-start"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:nature-threat-recovery",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "close-day",
+        "day-start",
+        "observe-threat",
+        "recover-party",
+        "restore-route",
+        "retreat"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h3-candidate:nature-trail-network",
+      "hierarchyLevelCode": "H3",
+      "gameplayTraceStateCode": "LoopMapped",
+      "stepIds": [
+        "day-start",
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h4-blueprint:farm-production-processing-region",
+      "hierarchyLevelCode": "H4",
+      "gameplayTraceStateCode": "RegionalCausalityMapped",
+      "stepIds": [
+        "collect",
+        "farm-incident-decision",
+        "harvest",
+        "pack",
+        "plan-harvest",
+        "restore-route",
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    },
+    {
+      "knowledgeRef": "h4-blueprint:nature-home-exploration-region",
+      "hierarchyLevelCode": "H4",
+      "gameplayTraceStateCode": "RegionalCausalityMapped",
+      "stepIds": [
+        "close-day",
+        "day-start",
+        "observe-threat",
+        "recover-party",
+        "restore-route",
+        "retreat",
+        "travel-to-farm"
+      ],
+      "contributionCodes": []
+    }
+  ],
+  "playableSlices": [
+    {
+      "playableSliceId": "reference-play:nature-farm-day.v1",
+      "title": "Nature↔Farm 수확과 회복의 하루",
+      "playerPromise": "Nature 안전 생활핵에서 하루를 시작해 Farm의 감자 300kg를 직접 또는 NPC에게 맡겨 수확·집하·포장하고, 사건 결과에 대응한 뒤 귀환하여 다음 날을 연다.",
+      "targetDurationMinutes": {
+        "minimum": 20,
+        "maximum": 40
+      },
+      "playModeCode": "SinglePlayerWithNpcDelegation",
+      "targetPlatformCode": "WindowsPcKeyboardMouse",
+      "canonicalScenePath": "Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+      "gamePlanCodes": [
+        "NatureHomeThreatRecovery",
+        "FarmProductionSurvival"
+      ],
+      "currentPlayableSliceStateCode": "SpatiallyComposed",
+      "targetPlayableSliceStateCode": "PlayableSliceComplete",
+      "theorySpatialBindingStateCode": "E5TheoryQualified",
+      "theoryAreaSetStableIds": [
+        "area-set:theory:farm-production-processing-region",
+        "area-set:theory:nature-home-exploration-region"
+      ],
+      "actualSpatialBindingStateCode": "ActualE5Bound",
+      "actualAreaSetStableIds": [
+        "area-set:sim:pyeongchang:farm-production.v1",
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
+      "actualNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
+      "stepCount": 12,
+      "branchCount": 3,
+      "completionBlockReasonCodes": [
+        "FirstTimePlayerEvidenceMissing",
+        "FullNormalAndRecoveryRuntimeEvidenceMissing",
+        "SavedScenePlayModeGameViewEvidenceMissing",
+        "VisualAudioPerformancePolishEvidenceMissing"
+      ],
+      "hTrace": [
+        {
+          "knowledgeRef": "h1-stock:farm-exposure-inspection",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "farm-incident-decision"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-harvest-staging",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "collect",
+            "harvest",
+            "pack"
+          ],
+          "contributionCodes": [
+            "StatePresentation"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-incident-quarantine",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "farm-incident-decision"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-loss-recovery",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "farm-incident-decision"
+          ],
+          "contributionCodes": [
+            "StatePresentation",
+            "ThreatReadability",
+            "TransitionHandoff"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-production",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "harvest",
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-restoration-supply",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "farm-incident-decision",
+            "restore-route"
+          ],
+          "contributionCodes": [
+            "StatePresentation",
+            "ThreatReadability",
+            "TransitionHandoff"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-tool-storage",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "plan-harvest"
+          ],
+          "contributionCodes": [
+            "SightlineAndLandmark",
+            "StatePresentation"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-work-yard",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "collect",
+            "pack",
+            "plan-harvest"
+          ],
+          "contributionCodes": [
+            "SightlineAndLandmark",
+            "StatePresentation"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:farm-worker-waiting",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "plan-harvest"
+          ],
+          "contributionCodes": [
+            "SightlineAndLandmark",
+            "StatePresentation"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-emergency-retreat",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "retreat"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-exploration-buffer",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "travel-to-farm"
+          ],
+          "contributionCodes": [
+            "AtmosphereAndIdentity",
+            "TransitionHandoff",
+            "TraversalGuidance"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-farm-edge",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "harvest",
+            "travel-to-farm"
+          ],
+          "contributionCodes": [
+            "AtmosphereAndIdentity",
+            "StatePresentation",
+            "TransitionHandoff",
+            "TraversalGuidance"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-incident-trace",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "observe-threat"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-restoration-site",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "restore-route"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-safe-recovery-camp",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "close-day",
+            "day-start",
+            "recover-party",
+            "retreat"
+          ],
+          "contributionCodes": [
+            "BufferAndSafety",
+            "SightlineAndLandmark",
+            "StatePresentation",
+            "TraversalGuidance"
+          ]
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-threat-watch",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "DirectAction",
+          "stepIds": [
+            "observe-threat"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h1-stock:nature-trailhead",
+          "hierarchyLevelCode": "H1",
+          "gameplayTraceStateCode": "Supporting",
+          "stepIds": [
+            "day-start",
+            "travel-to-farm"
+          ],
+          "contributionCodes": [
+            "AtmosphereAndIdentity",
+            "SightlineAndLandmark",
+            "TransitionHandoff",
+            "TraversalGuidance"
+          ]
+        },
+        {
+          "knowledgeRef": "h2-candidate:farm-incident-containment",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "farm-incident-decision"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:farm-loss-restoration-handoff",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "farm-incident-decision",
+            "restore-route"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:farm-processing-shipping",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "collect",
+            "pack",
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:farm-seed-and-tools",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:farm-wash-sort-pack",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "collect",
+            "harvest",
+            "pack"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:farm-worker-support",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:forest-edge-farm",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:highland-production",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "harvest",
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:nature-restoration-recovery",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "close-day",
+            "day-start",
+            "recover-party",
+            "restore-route",
+            "retreat"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:nature-threat-response",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "observe-threat",
+            "retreat"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:nature-trail-shelter",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "day-start",
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h2-candidate:nature-water-buffer",
+          "hierarchyLevelCode": "H2",
+          "gameplayTraceStateCode": "SequenceMapped",
+          "stepIds": [
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:farm-incident-recovery",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "farm-incident-decision",
+            "restore-route"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:farm-processing-campus",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "collect",
+            "harvest",
+            "pack",
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:farm-seasonal-production-loop",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "plan-harvest"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:highland-farm",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "harvest",
+            "plan-harvest",
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:nature-exploration-buffer",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:nature-home-encounter-defense",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "day-start"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:nature-threat-recovery",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "close-day",
+            "day-start",
+            "observe-threat",
+            "recover-party",
+            "restore-route",
+            "retreat"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h3-candidate:nature-trail-network",
+          "hierarchyLevelCode": "H3",
+          "gameplayTraceStateCode": "LoopMapped",
+          "stepIds": [
+            "day-start",
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h4-blueprint:farm-production-processing-region",
+          "hierarchyLevelCode": "H4",
+          "gameplayTraceStateCode": "RegionalCausalityMapped",
+          "stepIds": [
+            "collect",
+            "farm-incident-decision",
+            "harvest",
+            "pack",
+            "plan-harvest",
+            "restore-route",
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        },
+        {
+          "knowledgeRef": "h4-blueprint:nature-home-exploration-region",
+          "hierarchyLevelCode": "H4",
+          "gameplayTraceStateCode": "RegionalCausalityMapped",
+          "stepIds": [
+            "close-day",
+            "day-start",
+            "observe-threat",
+            "recover-party",
+            "restore-route",
+            "retreat",
+            "travel-to-farm"
+          ],
+          "contributionCodes": []
+        }
+      ],
+      "wiEvidence": [
+        {
+          "wiId": "WI-FARM-04",
+          "title": "수확",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E4",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [
+            "wi-spatial-seedbed:farm-production.v1"
+          ],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-farm-04"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-FARM-05",
+          "title": "수확물 집하",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E4",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [
+            "wi-spatial-seedbed:farm-work-yard.v1"
+          ],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-farm-05"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-FARM-06",
+          "title": "출하 준비·포장",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E4",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [
+            "wi-spatial-seedbed:farm-work-yard.v1"
+          ],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-farm-06"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-NATURE-01",
+          "title": "자연권 위협 관찰",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E1",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-nature-01"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-NATURE-02",
+          "title": "자연권 긴급 후퇴",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E1",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-nature-02"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-NATURE-03",
+          "title": "자연권 복원",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E1",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-nature-03"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-NATURE-04",
+          "title": "파티 회복",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E1",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [],
+          "e5PlacementRefs": [
+            "spatial:actual-e5:wi-nature-04"
+          ],
+          "e5ContextRefs": [],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        },
+        {
+          "wiId": "WI-WORLD-05",
+          "title": "지역 발견",
+          "implementationStageCode": "E3",
+          "catalogIntegrationStageCode": "E1",
+          "integrationStageCode": "E5",
+          "e4SeedbedRefs": [],
+          "e5PlacementRefs": [],
+          "e5ContextRefs": [
+            "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1"
+          ],
+          "e6EvidenceRefs": [],
+          "e7EvidenceRefs": []
+        }
+      ],
+      "regionalHandoffs": [
+        {
+          "handoffCode": "NatureToFarmTraversal",
+          "fromH4Ref": "h4-blueprint:nature-home-exploration-region",
+          "toH4Ref": "h4-blueprint:farm-production-processing-region",
+          "relationCode": "NatureToFarm",
+          "theoryBindingStateCode": "E5TheoryQualified",
+          "actualBindingStateCode": "ActualE5Bound"
+        },
+        {
+          "handoffCode": "FarmIncidentToNatureThreat",
+          "fromH4Ref": "h4-blueprint:farm-production-processing-region",
+          "toH4Ref": "h4-blueprint:nature-home-exploration-region",
+          "relationCode": "IncidentToNatureThreat",
+          "theoryBindingStateCode": "DesignLineageOnly",
+          "actualBindingStateCode": "DesignLineageOnly"
+        },
+        {
+          "handoffCode": "FarmRestorationSupplyToNature",
+          "fromH4Ref": "h4-blueprint:farm-production-processing-region",
+          "toH4Ref": "h4-blueprint:nature-home-exploration-region",
+          "relationCode": "RecoveryToNature",
+          "theoryBindingStateCode": "DesignLineageOnly",
+          "actualBindingStateCode": "DesignLineageOnly"
+        }
+      ],
+      "conditionSlots": [
+        {
+          "conditionSlotCode": "NextDayManagementCondition",
+          "allowedStateCodes": [
+            "Normal",
+            "Opportunity",
+            "Threat",
+            "Recovery"
+          ],
+          "affectedStepIds": [
+            "plan-harvest",
+            "travel-to-farm",
+            "farm-incident-decision",
+            "close-day"
+          ],
+          "spatialExpressionH1Refs": [
+            "h1-stock:farm-production",
+            "h1-stock:farm-work-yard",
+            "h1-stock:nature-threat-watch",
+            "h1-stock:nature-safe-recovery-camp"
+          ],
+          "authorityBoundary": "구체 카드·수치·보정선은 서버 턴 규칙이 확정하며 이 대장은 공간 표현 연결점만 가진다."
+        }
+      ]
+    }
+  ],
+  "nextPlayableSliceQueue": [
+    {
+      "priority": 1,
+      "playableSliceId": "reference-play:farm-hub-supply-line.v1",
+      "title": "Farm→Hub 공급선",
+      "blockedByPlayableSliceId": "reference-play:nature-farm-day.v1"
+    },
+    {
+      "priority": 2,
+      "playableSliceId": "reference-play:hub-town-market-day.v1",
+      "title": "Hub→Town 시장·수령의 하루",
+      "blockedByPlayableSliceId": "reference-play:farm-hub-supply-line.v1"
+    }
+  ],
+  "authorityBoundary": "이 대장은 이론 공간 조립·게임플레이 추적과 완성 차단 사유를 기록한다. E5TheoryQualified는 실제 지역 LandscapeGraph·AreaSet, 공공데이터 E6, Runtime E7, 서버 상태 또는 Unity 실행 결과가 아니다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "simulation-world-h2-unity-review-evidence.v1",
+  "revision": "simulation-world-h2-unity-review-evidence.r1",
+  "sourceUnityProjectCode": "ssalddel",
+  "captureProfileCode": "H2BlockFiveViews",
+  "capturedAtUtc": "2026-08-19T08:49:47.613Z",
+  "sourceRecipeRevision": "simulation-world-h2-composition-recipes.r4",
+  "sourceRecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+  "captureInventoryRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/h2-local-capture-inventory.json",
+  "items": [
+    {
+      "targetKnowledgeRef": "h2-candidate:farm-incident-containment",
+      "evidenceRef": "h2-unity-review-evidence:farm-incident-containment.r1",
+      "prefabAssetPath": "Assets/Ssalddel/Generated/H2CompositionReview/farm-incident-containment.prefab",
+      "prefabAssetSha256": "bab380e838038c79245808c1d5b146400d4a044c6545bb448a4453de15eeb7e9",
+      "captureFolderRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/farm-incident-containment",
+      "sourceCompositionSha256": "66627fdf243cb69e152aada848dd748a6fb1e3bc1aa436207e93521ad8e08b37",
+      "captureBundleSha256": "5802e57e54c43a1c2d6033d54d7bab7ff24a1f39214c9f03dff3d17a23f3d36e",
+      "captureCount": 5,
+      "childH1StableIds": [
+        "h1-stock:farm-exposure-inspection",
+        "h1-stock:farm-incident-quarantine",
+        "h1-stock:farm-weather-protection"
+      ],
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:farm-loss-restoration-handoff",
+      "evidenceRef": "h2-unity-review-evidence:farm-loss-restoration-handoff.r1",
+      "prefabAssetPath": "Assets/Ssalddel/Generated/H2CompositionReview/farm-loss-restoration-handoff.prefab",
+      "prefabAssetSha256": "fd09e305006475a21157fa803c38e1b8c207f68f344b015b56eb1c3db5647f8c",
+      "captureFolderRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/farm-loss-restoration-handoff",
+      "sourceCompositionSha256": "7044a37480383856f9ccf2805ae7ea7ce911654c506e62b40f781826d007cb43",
+      "captureBundleSha256": "a66e4a272f2d75162eef96568e70042e403b65f5beb547a5db7b49a4689079be",
+      "captureCount": 5,
+      "childH1StableIds": [
+        "h1-stock:farm-incident-quarantine",
+        "h1-stock:farm-loss-recovery",
+        "h1-stock:farm-restoration-supply"
+      ],
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:nature-restoration-recovery",
+      "evidenceRef": "h2-unity-review-evidence:nature-restoration-recovery.r1",
+      "prefabAssetPath": "Assets/Ssalddel/Generated/H2CompositionReview/nature-restoration-recovery.prefab",
+      "prefabAssetSha256": "7c1cfdf58ea3c888483b08d965f66325a0f8e7672cc1a233bef5d7d7eb6f20d6",
+      "captureFolderRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/nature-restoration-recovery",
+      "sourceCompositionSha256": "aeb64dbd2d4c4d01e5f24f0e7533853a1e13c861aa8219cb07998bfb363e128e",
+      "captureBundleSha256": "1804b54f167a28408a7205dd929f1fa521603f93dc6793817b2826107c5262bc",
+      "captureCount": 5,
+      "childH1StableIds": [
+        "h1-stock:nature-restoration-site",
+        "h1-stock:nature-safe-recovery-camp"
+      ],
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:nature-threat-response",
+      "evidenceRef": "h2-unity-review-evidence:nature-threat-response.r1",
+      "prefabAssetPath": "Assets/Ssalddel/Generated/H2CompositionReview/nature-threat-response.prefab",
+      "prefabAssetSha256": "2454ae0f96770d1b26815b440eb98b26e295c085bb2a18d93b0e520dc2641877",
+      "captureFolderRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/nature-threat-response",
+      "sourceCompositionSha256": "e8760bdcb7a3c85dd85a26f50e0c3fd3d8049741f841c7c2adc66677fab82172",
+      "captureBundleSha256": "2f30bec98f612e7eae7162abf56542f9b75482f47b5b1bd44af3ffbfc6478d08",
+      "captureCount": 5,
+      "childH1StableIds": [
+        "h1-stock:nature-threat-watch",
+        "h1-stock:nature-incident-trace",
+        "h1-stock:nature-emergency-retreat"
+      ],
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:town-contamination-control",
+      "evidenceRef": "h2-unity-review-evidence:town-contamination-control.r1",
+      "prefabAssetPath": "Assets/Ssalddel/Generated/H2CompositionReview/town-contamination-control.prefab",
+      "prefabAssetSha256": "5547889e8942594b1c73312319930036959e7c2dfaa535525c00b3745dd8d60c",
+      "captureFolderRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/town-contamination-control",
+      "sourceCompositionSha256": "ccb770854721fab94a52792425c4e0d73861441f3eefa41c7e50eb46b74a193f",
+      "captureBundleSha256": "b24d86b7304bab6d0442d4c02c65ba5e2cb009d556246cd745cff0ae438bed04",
+      "captureCount": 5,
+      "childH1StableIds": [
+        "h1-stock:town-contamination-inspection",
+        "h1-stock:town-contamination-quarantine",
+        "h1-stock:town-cleanup-transfer"
+      ],
+      "reviewStateCode": "AwaitingHumanReview"
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:town-recall-relief",
+      "evidenceRef": "h2-unity-review-evidence:town-recall-relief.r1",
+      "prefabAssetPath": "Assets/Ssalddel/Generated/H2CompositionReview/town-recall-relief.prefab",
+      "prefabAssetSha256": "5aba23f47e4019c4b281288369015b7e0f4a870434baffeae3690adb8be99108",
+      "captureFolderRelativePath": "artifacts/local/synty-web-review/h2-composition-inventory/20260819T084947613Z/town-recall-relief",
+      "sourceCompositionSha256": "4d361880e7f483a57765bda990d5f7e8f74ce3037bc904e0047178940fa0bf7b",
+      "captureBundleSha256": "802277c45a7808dfd2b3df947d6375eaa72d83998ee6d069d63edcf11b440d42",
+      "captureCount": 5,
+      "childH1StableIds": [
+        "h1-stock:town-recall-service",
+        "h1-stock:town-neighborhood-service",
+        "h1-stock:town-nature-relief"
+      ],
+      "reviewStateCode": "AwaitingHumanReview"
+    }
+  ],
+  "authorityBoundary": "로컬 Unity Root와 5시점 촬영 영수증이다. 사람의 H2 판단, 공식 H2 승인, AreaSet·WI E단계·공공데이터·Runtime 증거가 아니다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

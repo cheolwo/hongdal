@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:farm-harvest-throughput",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "농장 집중 수확·집하 블록",
+  "summary": "생산구획에서 수확물 임시 적치와 집하 작업마당으로 이어지는 집중 수확 흐름을 수용하는 Farm 단독 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:farm-production",
+    "h1-stock:farm-harvest-staging",
+    "h1-stock:farm-work-yard"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:farm-worker-waiting"
+  ],
+  "connectorRoleCodes": [
+    "ProductionInput",
+    "HarvestFlow",
+    "ProcessingOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/farm-harvest-throughput.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-harvest-throughput"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

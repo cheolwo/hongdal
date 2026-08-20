@@ -5,7 +5,7 @@
     "worldInteractionCatalogRevision": "simulation-world-interactions.r4",
     "spatialPriorityRevision": "simulation-world-interaction-spatial-priorities.r1",
     "designKnowledgeRevision": "simulation-world-spatial-design-knowledge.r3",
-    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r5",
+    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r8",
     "compositionPlanStableId": "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
     "compositionPlanRevision": 1,
     "p2CompositionPlanStableId": "wi-spatial-composition-plan:p2-hub-inbound-storage.v1",
@@ -47,12 +47,15 @@
         "h1-expression:farm:혼합-작물밭"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
+        "h2-candidate:farm-irrigation-service",
         "h2-candidate:forest-edge-farm",
         "h2-candidate:highland-production"
       ],
       "h3CandidateRefs": [
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
         "h3-candidate:nature-trail-network"
@@ -104,6 +107,8 @@
         "h1-expression:farm:혼합-작물밭"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
+        "h2-candidate:farm-irrigation-service",
         "h2-candidate:farm-seed-and-tools",
         "h2-candidate:forest-edge-farm",
         "h2-candidate:highland-production"
@@ -111,6 +116,7 @@
       "h3CandidateRefs": [
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
         "h3-candidate:nature-trail-network"
@@ -159,12 +165,15 @@
         "h1-expression:farm:혼합-작물밭"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
+        "h2-candidate:farm-irrigation-service",
         "h2-candidate:forest-edge-farm",
         "h2-candidate:highland-production"
       ],
       "h3CandidateRefs": [
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
         "h3-candidate:nature-trail-network"
@@ -217,7 +226,9 @@
         "h1-expression:farm:혼합-작물밭"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
         "h2-candidate:farm-incident-containment",
+        "h2-candidate:farm-irrigation-service",
         "h2-candidate:farm-wash-sort-pack",
         "h2-candidate:forest-edge-farm",
         "h2-candidate:highland-production"
@@ -225,6 +236,7 @@
       "h3CandidateRefs": [
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
         "h3-candidate:nature-trail-network"
@@ -272,6 +284,7 @@
         "h1-expression:farm:헛간-작업마당"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
         "h2-candidate:farm-incident-containment",
         "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:farm-processing-shipping",
@@ -280,6 +293,7 @@
       "h3CandidateRefs": [
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm"
       ],
       "h4CandidateRefs": [
@@ -321,6 +335,7 @@
         "h1-expression:farm:헛간-작업마당"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
         "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:farm-processing-shipping",
         "h2-candidate:farm-wash-sort-pack"
@@ -328,6 +343,7 @@
       "h3CandidateRefs": [
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm"
       ],
       "h4CandidateRefs": [
@@ -371,12 +387,15 @@
         "h1-expression:city:화물-대기-야드"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-inbound-storage",
         "h2-candidate:hub-longterm-cold-storage",
+        "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-quarantine-staging",
         "h2-candidate:hub-returns-processing"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -419,11 +438,13 @@
         "h1-expression:city:화물-대기-야드"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-inbound-storage",
         "h2-candidate:hub-longterm-cold-storage",
         "h2-candidate:hub-quarantine-staging"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -466,6 +487,7 @@
         "h2-candidate:hub-outbound-vehicle"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -504,12 +526,15 @@
         "h1-expression:city:화물-대기-야드"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-longterm-cold-storage",
+        "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle",
         "h2-candidate:hub-quarantine-staging",
         "h2-candidate:hub-returns-processing"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -549,12 +574,15 @@
         "h1-expression:city:화물-대기-야드"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-longterm-cold-storage",
+        "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle",
         "h2-candidate:hub-quarantine-staging",
         "h2-candidate:hub-returns-processing"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -592,9 +620,11 @@
         "h1-expression:city:화물-대기-야드"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -641,6 +671,7 @@
         "h3-candidate:farm-hub-logistics",
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm"
       ],
       "h4CandidateRefs": [
@@ -688,6 +719,7 @@
         "h3-candidate:farm-hub-logistics",
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm"
       ],
       "h4CandidateRefs": [
@@ -851,10 +883,12 @@
         "h1-expression:city:화물-대기-야드"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle",
         "h2-candidate:hub-town-corridor"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:hub-town-logistics",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
@@ -901,6 +935,7 @@
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:hub-town-logistics",
         "h3-candidate:jinbu-hub",
         "h3-candidate:lowrise-market-town",
@@ -1071,9 +1106,12 @@
         "h1-expression:nature:숲-빈터-고사목"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-encounter-route",
         "h2-candidate:nature-threat-response"
       ],
       "h3CandidateRefs": [
+        "h3-candidate:nature-home-encounter-defense",
         "h3-candidate:nature-threat-recovery"
       ],
       "h4CandidateRefs": [
@@ -1110,12 +1148,17 @@
         "h1-expression:nature:숲-가장자리"
       ],
       "h2CandidateRefs": [
-        "h2-candidate:nature-threat-response"
+        "h2-candidate:nature-encounter-route",
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-town-relief-transition"
       ],
       "h3CandidateRefs": [
-        "h3-candidate:nature-threat-recovery"
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop"
       ],
       "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
         "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
@@ -1149,12 +1192,16 @@
         "h1-expression:nature:숲-가장자리"
       ],
       "h2CandidateRefs": [
-        "h2-candidate:nature-restoration-recovery"
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-town-relief-transition"
       ],
       "h3CandidateRefs": [
-        "h3-candidate:nature-threat-recovery"
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop"
       ],
       "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
         "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
@@ -1188,12 +1235,18 @@
         "h1-expression:nature:초지-야생화"
       ],
       "h2CandidateRefs": [
-        "h2-candidate:nature-restoration-recovery"
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-town-relief-transition"
       ],
       "h3CandidateRefs": [
-        "h3-candidate:nature-threat-recovery"
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop"
       ],
       "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
         "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
@@ -1357,16 +1410,20 @@
       "h2CandidateRefs": [
         "h2-candidate:lowrise-residential",
         "h2-candidate:market-life-commerce",
-        "h2-candidate:town-recall-relief"
+        "h2-candidate:town-recall-relief",
+        "h2-candidate:town-resident-service"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
         "h3-candidate:lowrise-market-town",
-        "h3-candidate:town-contamination-relief"
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:town-contamination-relief",
+        "h3-candidate:town-resident-service-loop"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
-        "h4-blueprint:lowrise-market-region"
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
       "e5PlacementCandidateRefs": [],
@@ -1399,16 +1456,20 @@
       "h2CandidateRefs": [
         "h2-candidate:lowrise-residential",
         "h2-candidate:market-life-commerce",
-        "h2-candidate:town-recall-relief"
+        "h2-candidate:town-recall-relief",
+        "h2-candidate:town-resident-service"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
         "h3-candidate:lowrise-market-town",
-        "h3-candidate:town-contamination-relief"
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:town-contamination-relief",
+        "h3-candidate:town-resident-service-loop"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
-        "h4-blueprint:lowrise-market-region"
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
       "e5PlacementCandidateRefs": [],
@@ -1442,16 +1503,21 @@
       "h2CandidateRefs": [
         "h2-candidate:lowrise-residential",
         "h2-candidate:market-life-commerce",
-        "h2-candidate:town-recall-relief"
+        "h2-candidate:town-recall-relief",
+        "h2-candidate:town-resident-service",
+        "h2-candidate:town-residential-alley"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
         "h3-candidate:lowrise-market-town",
-        "h3-candidate:town-contamination-relief"
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:town-contamination-relief",
+        "h3-candidate:town-resident-service-loop"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
-        "h4-blueprint:lowrise-market-region"
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
       "e5PlacementCandidateRefs": [],
@@ -1480,11 +1546,13 @@
         "h1-expression:town:버스-정류장-보행-쉼터"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
         "h2-candidate:farm-seed-and-tools",
         "h2-candidate:farm-worker-support"
       ],
       "h3CandidateRefs": [
-        "h3-candidate:farm-processing-campus"
+        "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1571,12 +1639,16 @@
         "h1-expression:farm:헛간-작업마당"
       ],
       "h2CandidateRefs": [
+        "h2-candidate:farm-harvest-throughput",
+        "h2-candidate:farm-irrigation-service",
         "h2-candidate:farm-loss-restoration-handoff",
         "h2-candidate:farm-processing-shipping",
         "h2-candidate:farm-seed-and-tools",
         "h2-candidate:farm-wash-sort-pack",
         "h2-candidate:farm-worker-support",
+        "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-inbound-storage",
+        "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-town-corridor",
         "h2-candidate:town-returns-waste"
       ],
@@ -1584,7 +1656,9 @@
         "h3-candidate:circular-market-town",
         "h3-candidate:farm-incident-recovery",
         "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
         "h3-candidate:highland-farm",
+        "h3-candidate:hub-maintenance-emergency-loop",
         "h3-candidate:hub-town-logistics",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub",
@@ -1646,11 +1720,15 @@
         "h2-candidate:highland-production",
         "h2-candidate:lowrise-residential",
         "h2-candidate:market-life-commerce",
+        "h2-candidate:nature-encounter-route",
+        "h2-candidate:nature-home-core",
         "h2-candidate:nature-restoration-recovery",
         "h2-candidate:nature-threat-response",
         "h2-candidate:nature-trail-shelter",
         "h2-candidate:nature-water-buffer",
-        "h2-candidate:town-recall-relief"
+        "h2-candidate:town-recall-relief",
+        "h2-candidate:town-resident-service",
+        "h2-candidate:town-residential-alley"
       ],
       "h3CandidateRefs": [
         "h3-candidate:circular-market-town",
@@ -1659,9 +1737,12 @@
         "h3-candidate:highland-farm",
         "h3-candidate:lowrise-market-town",
         "h3-candidate:nature-exploration-buffer",
+        "h3-candidate:nature-home-encounter-defense",
         "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
         "h3-candidate:nature-trail-network",
-        "h3-candidate:town-contamination-relief"
+        "h3-candidate:town-contamination-relief",
+        "h3-candidate:town-resident-service-loop"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1730,10 +1811,13 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:forest-edge-farm",
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-home-core",
         "h2-candidate:nature-restoration-recovery",
         "h2-candidate:nature-threat-response",
         "h2-candidate:nature-trail-shelter",
         "h2-candidate:nature-water-buffer",
+        "h2-candidate:town-residential-alley",
         "h2-candidate:town-returns-waste"
       ],
       "h3CandidateRefs": [
@@ -1742,9 +1826,12 @@
         "h3-candidate:farm-processing-campus",
         "h3-candidate:highland-farm",
         "h3-candidate:nature-exploration-buffer",
+        "h3-candidate:nature-home-encounter-defense",
         "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
         "h3-candidate:nature-trail-network",
-        "h3-candidate:town-contamination-relief"
+        "h3-candidate:town-contamination-relief",
+        "h3-candidate:town-resident-service-loop"
       ],
       "h4CandidateRefs": [
         "h4-blueprint:farm-hub-town-region",
@@ -1793,5 +1880,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "4b629c4c874e9cf1c5e3e34967b2fab1bd8a950a675438dea417b997428b5e4d"
+  "contentHashSha256": "2ee416ba01b1643f66a692ca2f780ab7312d2fd5fd535e25f2123ed8b2237f9c"
 }

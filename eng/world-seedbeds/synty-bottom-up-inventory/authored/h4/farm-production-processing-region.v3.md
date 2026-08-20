@@ -8,6 +8,7 @@
 @required-h3 h3-candidate:highland-farm
 @required-h3 h3-candidate:farm-processing-campus
 @required-h3 h3-candidate:farm-incident-recovery
+@required-h3 h3-candidate:farm-seasonal-production-loop
 
 고지대 생산과 농산물 후처리, 사건 격리·회복을 결합하는 위치 독립 Farm AreaSet 청사진이다.
 

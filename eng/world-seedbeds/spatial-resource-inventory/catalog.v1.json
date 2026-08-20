@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-spatial-resource-inventory.v1",
-  "revision": "simulation-world-spatial-resource-inventory.r5",
+  "revision": "simulation-world-spatial-resource-inventory.r8",
   "title": "H 공간 구성 재고",
   "summary": "모판을 H1 단일 명칭이 아니라 H1~H4 상향 조립 공간 자원 계열로 다루며, 재사용 설계 재고와 실제 공간 정의를 분리한다.",
   "hierarchyCatalogPath": "eng/world-seedbeds/spatial-hierarchy-levels.json",
@@ -34,7 +34,7 @@
           "sourceTypeCode": "JsonArrayProperty",
           "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
           "collectionProperty": "h2DefinitionRefs",
-          "expectedCount": 24
+          "expectedCount": 34
         },
         {
           "sourceTypeCode": "JsonDirectory",
@@ -59,7 +59,7 @@
           "sourceTypeCode": "JsonArrayProperty",
           "sourcePath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
           "collectionProperty": "h3DefinitionRefs",
-          "expectedCount": 13
+          "expectedCount": 18
         }
       ],
       "definitionSources": [
@@ -126,6 +126,9 @@
     "requiresExactChildRevision": true,
     "requiresDeterministicHash": true,
     "requiresHumanReviewForPromotion": true,
+    "h1RecognitionIsSufficientForH2Composition": true,
+    "h2IsFirstSpatialCompositionJudgmentSurface": true,
+    "h2VisualReviewRequiresUnityRoot": true,
     "forbidsAutomaticAuthorityPromotion": true,
     "forbidsHierarchyCycles": true,
     "definitionInventorySeparatedFromPlacementInventory": true

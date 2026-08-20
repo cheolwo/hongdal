@@ -17,6 +17,11 @@ namespace Ssalddel.Simulation.Contracts
         public const string Declared = "Declared";
         public const string GraphConnectorUnresolved = "GraphConnectorUnresolved";
 
+        public const string ScenarioLocalMeters = "ScenarioLocalMeters";
+        public const string LegacyUnspecifiedCoordinates = "LegacyUnspecified";
+        public const string AreaSetOwner = "AreaSet";
+        public const string AreaSetNetworkOwner = "AreaSetNetwork";
+
         public const string GraphDeliveryMode = "GraphV2";
         public const string LegacyTileDeliveryMode = "TileFacadeV1";
         public const string GraphBuildScope = "Graph";
@@ -49,6 +54,8 @@ namespace Ssalddel.Simulation.Contracts
         public string Summary { get; set; } = string.Empty;
         public string DefinitionHashSha256 { get; set; } = string.Empty;
         public string DocumentHashSha256 { get; set; } = string.Empty;
+        public string CanonicalNetworkStableId { get; set; } = string.Empty;
+        public string CoordinateSpaceCode { get; set; } = string.Empty;
         public string[] AreaRefs { get; set; } = Array.Empty<string>();
         public string[] ScenarioRouteRefs { get; set; } = Array.Empty<string>();
         public string[] CompletionAreaRefs { get; set; } = Array.Empty<string>();
@@ -82,6 +89,9 @@ namespace Ssalddel.Simulation.Contracts
         public string DefinitionHashSha256 { get; set; } = string.Empty;
         public string BuildStatusCode { get; set; } = string.Empty;
         public string GraphHashSha256 { get; set; } = string.Empty;
+        public string SpatialOwnerKindCode { get; set; } = string.Empty;
+        public string SpatialOwnerStableId { get; set; } = string.Empty;
+        public string CoordinateSpaceCode { get; set; } = string.Empty;
         public SimulationWorldLandscapeBoundsResponse Bounds { get; set; } = new();
         public string[] AreaRefs { get; set; } = Array.Empty<string>();
         public string[] TileRefs { get; set; } = Array.Empty<string>();
@@ -132,6 +142,9 @@ namespace Ssalddel.Simulation.Contracts
         public int GraphRevision { get; set; }
         public string DefinitionHashSha256 { get; set; } = string.Empty;
         public string GraphHashSha256 { get; set; } = string.Empty;
+        public string SpatialOwnerKindCode { get; set; } = string.Empty;
+        public string SpatialOwnerStableId { get; set; } = string.Empty;
+        public string CoordinateSpaceCode { get; set; } = string.Empty;
         public string GrammarRevision { get; set; } = string.Empty;
         public string GrammarHashSha256 { get; set; } = string.Empty;
         public string StatusCode { get; set; } = string.Empty;

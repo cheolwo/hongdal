@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:town-resident-service-loop",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "Town 주민서비스·공동수령 경관",
+  "summary": "주거 골목과 주민지원·공동수령 블록, 저층 생활광장을 연결해 일상 이동과 주민 서비스를 반복하는 Town 단독 경관이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ModifiedGrid",
+  "requiredH2Refs": [
+    "h2-candidate:town-residential-alley",
+    "h2-candidate:town-resident-service",
+    "h2-candidate:lowrise-residential"
+  ],
+  "optionalH2Refs": [],
+  "connectorRoleCodes": [
+    "NeighborhoodGate",
+    "ResidentServiceLoop",
+    "TownLocalRoad"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/town-resident-service-loop.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:town-resident-service-loop"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

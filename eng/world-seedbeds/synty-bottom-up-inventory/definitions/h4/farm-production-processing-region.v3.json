@@ -11,12 +11,14 @@
   "requiredH3Refs": [
     "h3-candidate:highland-farm",
     "h3-candidate:farm-processing-campus",
-    "h3-candidate:farm-incident-recovery"
+    "h3-candidate:farm-incident-recovery",
+    "h3-candidate:farm-seasonal-production-loop"
   ],
   "optionalH3Refs": [],
   "childKnowledgeRefs": [
     "h3-candidate:farm-incident-recovery",
     "h3-candidate:farm-processing-campus",
+    "h3-candidate:farm-seasonal-production-loop",
     "h3-candidate:highland-farm"
   ],
   "worldThemeCodes": [
@@ -49,7 +51,7 @@
     "transition:Nature–Farm 전환"
   ],
   "derivationRecipeCode": "h4.farm-production-processing-region.r1",
-  "derivationInputHashSha256": "5359f6f91abef5a3d2aa1509907d3eb59bedfcdd5500f3b63e8881d9850dc113",
+  "derivationInputHashSha256": "8a805da3682e6d623340dd7678c6c5bb68b3244c9375bed2d0e626bb44864eaa",
   "authoredDocument": "authored/h4/farm-production-processing-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

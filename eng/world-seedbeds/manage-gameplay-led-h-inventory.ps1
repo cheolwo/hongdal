@@ -1,4 +1,4 @@
-param(
+﻿param(
     [ValidateSet("Write", "Check")]
     [string] $Mode = "Check",
     [string] $OutputJsonPath = "eng/world-seedbeds/generated/gameplay-led-h-inventory.v1.json",
@@ -92,9 +92,23 @@ $policy = Read-Json $policyPath
 $priority = Read-Json $priorityPath
 $catalog = Read-Json $catalogPath
 $worldInteractions = Read-Json $worldInteractionPath
+$gameplaySpatialCompletionPath = Join-Path $repositoryRoot ([string] $policy.gameplaySpatialCompletionPath -replace "/", [IO.Path]::DirectorySeparatorChar)
+$gameplaySpatialCompletion = Read-Json $gameplaySpatialCompletionPath
+$theoryFactoryPolicyPath = Join-Path $repositoryRoot ([string] $policy.theoryFactoryPolicyPath -replace "/", [IO.Path]::DirectorySeparatorChar)
+$theoryFactoryPolicy = Read-Json $theoryFactoryPolicyPath
 Require ([string] $policy.schemaVersion -eq "simulation-world-gameplay-led-h-policy.v1") "PolicySchema"
 Require ([bool] $policy.admissionRules.publicDataFieldsForbiddenInHDefinitions) "PublicDataBoundary"
 Require ([string] $policy.admissionRules.orphanDispositionCode -eq "QuarantineAsIdeaInventory") "OrphanDisposition"
+Require ([string] $gameplaySpatialCompletion.schemaVersion -eq "simulation-world-gameplay-spatial-completion.v1") "GameplaySpatialCompletionSchema"
+Require ([string] $theoryFactoryPolicy.schemaVersion -eq "simulation-world-theory-spatial-factory-policy.v1") "TheoryFactoryPolicySchema"
+Require (-not [bool] $theoryFactoryPolicy.humanReviewPolicy.blocking) "TheoryFactoryHumanReviewMustNotBlock"
+Require ([bool] $policy.admissionRules.h2TheoryQualificationDoesNotRequireHumanReview) "H2TheoryQualificationMustNotRequireReview"
+Require ([bool] $policy.admissionRules.h3TheoryQualificationDoesNotRequireHumanReview) "H3TheoryQualificationMustNotRequireReview"
+Require ([bool] $policy.admissionRules.e5TheoryQualificationDoesNotRequireHumanReview) "E5TheoryQualificationMustNotRequireReview"
+Require ([bool] $policy.gameplayTracePolicy.independentFromHCompositionState) "GameplayTraceMustRemainIndependentFromH"
+Require ([bool] $policy.gameplayTracePolicy.independentFromEvidenceStage) "GameplayTraceMustRemainIndependentFromE"
+Require ([bool] $policy.gameplayTracePolicy.supportingLandscapeAllowed) "SupportingLandscapeMustBeAllowed"
+Require ([bool] $gameplaySpatialCompletion.gatePolicy.theorySpatialProductionIndependentFromGameplayTrace) "TheoryProductionMustRemainIndependentFromGameplayTrace"
 Require (@($priority.areaSetCandidates).Count -eq 4) "PrimaryGamePlanCount"
 
 $interactionH1 = Load-Definitions $knowledgeRoot @($catalog.h1InteractionDefinitionRefs)
@@ -125,7 +139,13 @@ foreach ($definition in $expressionH1) {
 }
 
 $usedH3 = @($h4 | ForEach-Object { @($_.requiredH3Refs + $_.optionalH3Refs) } | Sort-Object -Unique)
-$usedH2 = @($h3 | ForEach-Object { @($_.requiredH2Refs + $_.optionalH2Refs) } | Sort-Object -Unique)
+$stagedH2Refs = @($priority.areaSetCandidates | ForEach-Object {
+    $property = $_.PSObject.Properties["stagedPackNativeH2Refs"]
+    if ($null -ne $property) { @($property.Value) }
+} | Sort-Object -Unique)
+foreach ($stagedH2Ref in $stagedH2Refs) { Require ($h2Map.ContainsKey([string] $stagedH2Ref)) "StagedH2Unknown:$stagedH2Ref" }
+$h3UsedH2Refs = @($h3 | ForEach-Object { @($_.requiredH2Refs + $_.optionalH2Refs) } | Sort-Object -Unique)
+$usedH2 = @(($h3UsedH2Refs + $stagedH2Refs) | Sort-Object -Unique)
 $usedH1 = @($h2 | ForEach-Object { @($_.requiredH1Refs + $_.optionalH1Refs) } | Sort-Object -Unique)
 $orphanH1 = @($interactionH1.stableId | Where-Object { $_ -notin $usedH1 } | Sort-Object)
 $orphanH2 = @($h2.stableId | Where-Object { $_ -notin $usedH2 } | Sort-Object)
@@ -146,6 +166,8 @@ foreach ($candidate in @($priority.areaSetCandidates)) {
     $rootRefs = @([string] $candidate.areaSetCandidateRef)
     if ($supportByPlan.ContainsKey($planCode)) { $rootRefs += @($supportByPlan[$planCode]) }
     $coverage = Expand-H4Coverage $rootRefs $h4Map $h3Map $h2Map $expressionH1
+    $stagedProperty = $candidate.PSObject.Properties["stagedPackNativeH2Refs"]
+    $stagedForPlan = if ($null -eq $stagedProperty) { @() } else { @($stagedProperty.Value | Sort-Object -Unique) }
     $planCoverage += [ordered]@{
         priorityCode = [string] $candidate.priorityCode
         gamePlanCode = $planCode
@@ -153,6 +175,7 @@ foreach ($candidate in @($priority.areaSetCandidates)) {
         playerWorldRoleCode = [string] $candidate.playerWorldRoleCode
         corePlayerVerbCodes = @($candidate.corePlayerVerbCodes)
         coreWiIds = @($candidate.coreWiIds)
+        stagedPackNativeH2Refs = $stagedForPlan
         coverage = $coverage
     }
 }
@@ -167,6 +190,55 @@ foreach ($binding in @($policy.crossWorldBlueprintBindings)) {
         coverage = $coverage
     }
 }
+
+$playableSliceGamePlanCodes = @($gameplaySpatialCompletion.playableSlices.gamePlanCodes | Sort-Object -Unique)
+$strictGamePlanCodes = @($policy.gameplayTracePolicy.strictGamePlanCodes)
+$warningOnlyGamePlanCodes = @($policy.gameplayTracePolicy.warningOnlyGamePlanCodes)
+Require ((@($gameplaySpatialCompletion.gatePolicy.strictGamePlanCodes) -join "|") -eq ($strictGamePlanCodes -join "|")) "StrictGamePlanPolicyMismatch"
+Require ((@($gameplaySpatialCompletion.gatePolicy.warningOnlyGamePlanCodes) -join "|") -eq ($warningOnlyGamePlanCodes -join "|")) "WarningGamePlanPolicyMismatch"
+$strictGamePlanCodesMissingPlayableSlice = @($strictGamePlanCodes | Where-Object { $_ -notin $playableSliceGamePlanCodes } | Sort-Object)
+Require ($strictGamePlanCodesMissingPlayableSlice.Count -eq 0) "StrictGamePlanPlayableSliceMissing:$($strictGamePlanCodesMissingPlayableSlice -join ',')"
+$warningOnlyGamePlanCodesMissingPlayableSlice = @($warningOnlyGamePlanCodes | Where-Object { $_ -notin $playableSliceGamePlanCodes } | Sort-Object)
+$playableSliceSummary = @($gameplaySpatialCompletion.playableSlices | ForEach-Object {
+    [ordered]@{
+        playableSliceId = [string] $_.playableSliceId
+        title = [string] $_.title
+        gamePlanCodes = @($_.gamePlanCodes)
+        declaredPlayableSliceStateCode = [string] $_.declaredPlayableSliceStateCode
+        targetPlayableSliceStateCode = [string] $_.targetPlayableSliceStateCode
+        theorySpatialBindingStateCode = [string] $_.theorySpatialBindingStateCode
+        actualSpatialBindingStateCode = [string] $_.actualSpatialBindingStateCode
+    }
+})
+
+$worldInteractionMap = @{}
+foreach ($wi in @($worldInteractions.items)) { $worldInteractionMap[[string] $wi.id] = $wi }
+$wiEvidenceQueueSummary = @($policy.wiEvidenceQueue | ForEach-Object {
+    $queueItem = $_
+    $trackCode = [string] $queueItem.evidenceTrackCode
+    Require ($trackCode -in @("Implementation", "Integration")) "WiEvidenceTrackInvalid:$($queueItem.priorityCode)"
+    Require ([string] $queueItem.targetStageCode -match '^E[0-7]$') "WiEvidenceTargetStageInvalid:$($queueItem.priorityCode)"
+    $currentStageCodes = @()
+    $queueWiIds = if ($null -ne $queueItem.PSObject.Properties["wiIds"]) { @($queueItem.wiIds) } else { @() }
+    foreach ($wiId in $queueWiIds) {
+        Require ($worldInteractionMap.ContainsKey([string] $wiId)) "WiEvidenceQueueUnknownWi:$wiId"
+        $wi = $worldInteractionMap[[string] $wiId]
+        $currentStageCode = if ($trackCode -eq "Implementation") { [string] $wi.implementation.currentStage } else { [string] $wi.integration.currentStage }
+        Require ($currentStageCode -match '^E[0-7]$') "WiEvidenceCurrentStageInvalid:$wiId"
+        Require ([int] $currentStageCode.Substring(1) -le [int] ([string] $queueItem.targetStageCode).Substring(1)) "WiEvidenceTargetBehindCurrent:$wiId"
+        $currentStageCodes += $currentStageCode
+    }
+    [ordered]@{
+        priorityCode = [string] $queueItem.priorityCode
+        title = [string] $queueItem.title
+        evidenceTrackCode = $trackCode
+        currentStageCodes = @($currentStageCodes | Sort-Object -Unique)
+        targetStageCode = [string] $queueItem.targetStageCode
+        wiIds = $queueWiIds
+        completionStateCode = if ($null -ne $queueItem.PSObject.Properties["completionStateCode"]) { [string] $queueItem.completionStateCode } else { "" }
+        selectionPolicyCode = if ($null -ne $queueItem.PSObject.Properties["selectionPolicyCode"]) { [string] $queueItem.selectionPolicyCode } else { "" }
+    }
+})
 
 $violations = [ordered]@{
     contextlessInteractionH1Refs = $contextlessInteractionH1
@@ -189,14 +261,18 @@ $result = [ordered]@{
         h2 = @($h2).Count
         h3 = @($h3).Count
         h4 = @($h4).Count
+        playableSlices = @($playableSliceSummary).Count
+        warningOnlyGamePlansWithoutPlayableSlice = $warningOnlyGamePlanCodesMissingPlayableSlice.Count
         violations = @($contextlessInteractionH1 + $unlinkedExpressionH1 + $orphanH1 + $orphanH2 + $orphanH3).Count
         quarantinedExpressionH1 = @($quarantinedExpressionH1).Count
     }
     planCoverage = $planCoverage
     crossWorldCoverage = $crossWorldCoverage
+    playableSliceSummary = $playableSliceSummary
+    warningOnlyGamePlanCodesMissingPlayableSlice = $warningOnlyGamePlanCodesMissingPlayableSlice
     violations = $violations
     hExpansionQueue = @($policy.hExpansionQueue)
-    wiEvidenceQueue = @($policy.wiEvidenceQueue)
+    wiEvidenceQueue = $wiEvidenceQueueSummary
     authorityBoundary = "H는 게임 기획에 속한 위치 독립 설계다. E5가 실제 배치, E6가 선정 WI의 공공데이터 계보다."
 }
 
@@ -226,9 +302,26 @@ foreach ($plan in $planCoverage) {
 [void] $builder.AppendLine()
 foreach ($item in @($policy.hExpansionQueue)) { [void] $builder.AppendLine("1. **$($item.priorityCode) $($item.title)** — $($item.goal)") }
 [void] $builder.AppendLine()
+[void] $builder.AppendLine("## 플레이 가능한 완성 단위")
+[void] $builder.AppendLine()
+[void] $builder.AppendLine("H 조립 상태, 게임플레이 추적, E 증거와 사람이 완주하는 완성 상태는 서로 독립이다.")
+[void] $builder.AppendLine()
+[void] $builder.AppendLine("| 기준 플레이 | 게임 기획 | 현재 | 목표 | 이론 공간 | 실제 공간 |")
+[void] $builder.AppendLine("| --- | --- | --- | --- | --- | --- |")
+foreach ($slice in $playableSliceSummary) {
+    [void] $builder.AppendLine("| $($slice.title) (``$($slice.playableSliceId)``) | $(@($slice.gamePlanCodes) -join ', ') | ``$($slice.declaredPlayableSliceStateCode)`` | ``$($slice.targetPlayableSliceStateCode)`` | ``$($slice.theorySpatialBindingStateCode)`` | ``$($slice.actualSpatialBindingStateCode)`` |")
+}
+[void] $builder.AppendLine()
+if ($warningOnlyGamePlanCodesMissingPlayableSlice.Count -gt 0) {
+    [void] $builder.AppendLine("- 아직 기준 플레이가 없는 경고 전용 기획: $($warningOnlyGamePlanCodesMissingPlayableSlice -join ', ')")
+    [void] $builder.AppendLine()
+}
 [void] $builder.AppendLine("## WI의 E 채움 순서")
 [void] $builder.AppendLine()
-foreach ($item in @($policy.wiEvidenceQueue)) { [void] $builder.AppendLine("1. **$($item.priorityCode) $($item.title)** — 목표 $($item.targetStageCode)") }
+foreach ($item in $wiEvidenceQueueSummary) {
+    $current = if (@($item.currentStageCodes).Count -gt 0) { @($item.currentStageCodes) -join ", " } else { "선정 뒤 판정" }
+    [void] $builder.AppendLine("1. **$($item.priorityCode) $($item.title)** — ``$($item.evidenceTrackCode)`` 현재 $current → 목표 $($item.targetStageCode)")
+}
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 경계")
 [void] $builder.AppendLine()

@@ -96,7 +96,10 @@ foreach ($recipe in @($recipes.recipes | Sort-Object targetKnowledgeRef)) {
             Require (@($node.wiIds).Count -gt 0) "H2CompositionWiMissing:${targetId}:$($node.localNodeId)"
             Require (@($node.planningCapacities).Count -gt 0) "H2CompositionCapacityMissing:${targetId}:$($node.localNodeId)"
             $h1 = $h1ById[[string] $node.h1Ref]
-            Require ([string] $h1.knowledgeStateCode -eq "CandidateForReview") "H2CompositionH1NotReviewReady:${targetId}:$($node.h1Ref)"
+            $h1HasGameContext = @($h1.wiIds).Count -gt 0 -or @($h1.anticipatedGameplayCodes).Count -gt 0
+            $h1HasSpatialMeaning = @($h1.spatialRoleCodes).Count -gt 0
+            $h1HasExpressionSource = @($h1.sourcePackCodes).Count -gt 0 -or @($h1.grammarSetRefs).Count -gt 0
+            Require ($h1HasGameContext -and $h1HasSpatialMeaning -and $h1HasExpressionSource) "H2CompositionH1NotRecognized:${targetId}:$($node.h1Ref)"
             foreach ($wiId in @($node.wiIds)) {
                 Require ($wiById.ContainsKey([string] $wiId)) "H2CompositionWiUnknown:${targetId}:$wiId"
                 Require (@($h1.wiIds) -contains [string] $wiId) "H2CompositionH1WiMismatch:${targetId}:$($node.h1Ref):$wiId"

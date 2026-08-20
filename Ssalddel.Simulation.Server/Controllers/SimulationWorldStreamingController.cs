@@ -24,7 +24,9 @@ public sealed class SimulationWorldStreamingController(
     SimulationWorldTileArtifactContentService artifactContent,
     SimulationWorldLandscapeCompositionService landscapeComposition,
     SimulationWorldAreaSetLandscapeGraphService areaSetGraphs,
-    SimulationWorld상호작용GraphService interactionGraphs) : ControllerBase
+    SimulationWorldActualE5SpatialService actualE5Spatial,
+    SimulationWorld상호작용GraphService interactionGraphs,
+    SimulationWorld상호작용NetworkService interactionNetwork) : ControllerBase
 {
     [HttpGet("recipes/{recipeId}")]
     [ProducesResponseType(typeof(SimulationWorldStreamRecipeResponse), StatusCodes.Status200OK)]
@@ -62,7 +64,8 @@ public sealed class SimulationWorldStreamingController(
     public async Task<ActionResult<SimulationWorldAreaSetDefinitionResponse>> AreaSet(
         string areaSetStableId, CancellationToken cancellationToken)
     {
-        var value = await areaSetGraphs.ReadAreaSetAsync(areaSetStableId, cancellationToken);
+        var value = await actualE5Spatial.ReadAreaSetAsync(areaSetStableId, cancellationToken)
+                    ?? await areaSetGraphs.ReadAreaSetAsync(areaSetStableId, cancellationToken);
         return value == null
             ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldAreaSetNotFound" })
             : Ok(value);
@@ -73,12 +76,16 @@ public sealed class SimulationWorldStreamingController(
     [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<SimulationWorldLandscapeGraphIndexResponse>> LandscapeGraphIndex(
         string areaSetStableId,
-        [FromQuery] string tileKey,
+        [FromQuery] string? tileKey = null,
         [FromQuery] int radiusTiles = 4,
         CancellationToken cancellationToken = default)
     {
-        var value = await areaSetGraphs.ReadGraphIndexAsync(
-            areaSetStableId, tileKey, radiusTiles, cancellationToken);
+        var value = await actualE5Spatial.ReadGraphIndexAsync(
+                        areaSetStableId, tileKey, radiusTiles, cancellationToken)
+                    ?? (tileKey == null
+                        ? null
+                        : await areaSetGraphs.ReadGraphIndexAsync(
+                            areaSetStableId, tileKey, radiusTiles, cancellationToken));
         return value == null
             ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldLandscapeGraphIndexNotFound" })
             : Ok(value);
@@ -90,10 +97,51 @@ public sealed class SimulationWorldStreamingController(
     public async Task<ActionResult<SimulationWorldLandscapeGraphResponse>> LandscapeGraph(
         string landscapeGraphStableId, CancellationToken cancellationToken)
     {
-        var value = await areaSetGraphs.ReadGraphAsync(landscapeGraphStableId, cancellationToken);
+        var value = await actualE5Spatial.ReadGraphAsync(
+                        landscapeGraphStableId, cancellationToken)
+                    ?? await areaSetGraphs.ReadGraphAsync(
+                        landscapeGraphStableId, cancellationToken);
         return value == null
             ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldLandscapeGraphNotFound" })
             : Ok(value);
+    }
+
+    [HttpGet("area-set-networks/{networkStableId}")]
+    [ProducesResponseType(typeof(SimulationWorldAreaSetNetworkResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldAreaSetNetworkResponse>> AreaSetNetwork(
+        string networkStableId,
+        CancellationToken cancellationToken)
+    {
+        var value = await actualE5Spatial.ReadNetworkAsync(networkStableId, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse
+                { ErrorCode = "SimulationWorldAreaSetNetworkNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("area-set-networks/{networkStableId}/interaction-readiness")]
+    [ProducesResponseType(typeof(SimulationWorld상호작용Network준비도Response),
+        StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<SimulationWorld상호작용Network준비도Response>>
+        AreaSetNetworkInteractionReadiness(
+            string networkStableId,
+            CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await interactionNetwork.EvaluateAsync(
+                networkStableId, cancellationToken));
+        }
+        catch (InvalidOperationException error)
+        {
+            var response = new SimulationErrorResponse { ErrorCode = error.Message };
+            return error.Message == "SimulationWorldAreaSetNetworkNotFound"
+                ? NotFound(response)
+                : Conflict(response);
+        }
     }
 
     [HttpGet("area-sets/{areaSetStableId}/interaction-graph-readiness")]

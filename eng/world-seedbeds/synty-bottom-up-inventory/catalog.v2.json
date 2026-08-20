@@ -425,6 +425,14 @@
   ],
   "h2DefinitionRefs": [
     {
+      "stableId": "h2-candidate:farm-harvest-throughput",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-harvest-throughput.v2.json",
+      "definitionSha256": "9d8854da2d6580704654f495a6681a050a8b2e8df15fd3b6879e116dc5ed39ba",
+      "documentPath": "authored/h2/farm-harvest-throughput.v2.md",
+      "documentSha256": "eed92803234469fae1e6fa4ebd60ade0b5ab3f957792a2fe5027506fa81eb7fe"
+    },
+    {
       "stableId": "h2-candidate:farm-hub-corridor",
       "revision": 2,
       "definitionPath": "definitions/h2/farm-hub-corridor.v2.json",
@@ -439,6 +447,14 @@
       "definitionSha256": "738fecb4c5ee023b84bb605c64edf5d94e1a4400a549b0340b02caffe8c47031",
       "documentPath": "authored/h2/farm-incident-containment.v2.md",
       "documentSha256": "81ca2de3e11d696584aea3886fd88bc4d7a464936a67b727d3da67473e215417"
+    },
+    {
+      "stableId": "h2-candidate:farm-irrigation-service",
+      "revision": 1,
+      "definitionPath": "definitions/h2/farm-irrigation-service.v2.json",
+      "definitionSha256": "ee14536ea25fc6db82356721a3233b7480917813bff8122ed7374b0b99328184",
+      "documentPath": "authored/h2/farm-irrigation-service.v2.md",
+      "documentSha256": "08f7a3a419a3fe110eee6f6773b824a1064139f0b4b58ad3866393b68af29091"
     },
     {
       "stableId": "h2-candidate:farm-loss-restoration-handoff",
@@ -497,6 +513,14 @@
       "documentSha256": "355b3b30fed758dde2dcbd2a50b13d75a4993a6f0917f5fb0050ff341d6c34aa"
     },
     {
+      "stableId": "h2-candidate:hub-emergency-power",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-emergency-power.v2.json",
+      "definitionSha256": "b844d4651513a7145371f22a4e45a15a0471fdfb7f2e2f19e91f72d6b0c276c8",
+      "documentPath": "authored/h2/hub-emergency-power.v2.md",
+      "documentSha256": "56d70f88bc8c4ae1400aae25dc16a92b67c59e705cce8d5ad1c4e1922f324984"
+    },
+    {
       "stableId": "h2-candidate:hub-inbound-storage",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-inbound-storage.v2.json",
@@ -511,6 +535,14 @@
       "definitionSha256": "1149e7fa8dd2d6ef889af153d3a58b05922a275e778ade80169b89beed869e28",
       "documentPath": "authored/h2/hub-longterm-cold-storage.v2.md",
       "documentSha256": "35f7d768fc90b793ba48cd32ebfd3db991f6b5872a1df03a6b67483559d8a249"
+    },
+    {
+      "stableId": "h2-candidate:hub-maintenance-yard",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-maintenance-yard.v2.json",
+      "definitionSha256": "8e0e0a38090588972a83829cb800fe90f3f3447b70392758e982529f07e5a2e7",
+      "documentPath": "authored/h2/hub-maintenance-yard.v2.md",
+      "documentSha256": "1852e0fe6572b505e1216827753d3da8c51c30428385aea36adbd0a37b1937e6"
     },
     {
       "stableId": "h2-candidate:hub-outbound-vehicle",
@@ -561,6 +593,30 @@
       "documentSha256": "930da4e6a706e453fc7a0e122a14de11fe1e08b2f3c5bad564867f8bd9ddb5f6"
     },
     {
+      "stableId": "h2-candidate:nature-defense-ring",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-defense-ring.v2.json",
+      "definitionSha256": "20536a490f223282b69a567bc1baa36d327c10de663dc763e2e8bea5bfcbc9eb",
+      "documentPath": "authored/h2/nature-defense-ring.v2.md",
+      "documentSha256": "35ca42c50d7a82faf0efce6d39bbd4e98f3d53b1604a121bef3b3117a12c7e73"
+    },
+    {
+      "stableId": "h2-candidate:nature-encounter-route",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-encounter-route.v2.json",
+      "definitionSha256": "ef1223cbafafd731144abe31991722c500883c081d0363045bb4b101e7e87083",
+      "documentPath": "authored/h2/nature-encounter-route.v2.md",
+      "documentSha256": "486b8db7a9e068b8de946db5ffde8c26f525a7b31642fd7d57eaeda27855d502"
+    },
+    {
+      "stableId": "h2-candidate:nature-home-core",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-home-core.v2.json",
+      "definitionSha256": "aed122746f23331b1cb0c63d19f649d653eafdafc8d4e3e306329378b92a3015",
+      "documentPath": "authored/h2/nature-home-core.v2.md",
+      "documentSha256": "532625299088f8b5cc096bfe83ca36bba3007c611f24688fd30ca3346b5a47be"
+    },
+    {
       "stableId": "h2-candidate:nature-restoration-recovery",
       "revision": 1,
       "definitionPath": "definitions/h2/nature-restoration-recovery.v2.json",
@@ -575,6 +631,14 @@
       "definitionSha256": "29100533e23f3e37070806a4b2c5bb0ad8d2bdac6601a12d3c0e6c9f5af5c8bf",
       "documentPath": "authored/h2/nature-threat-response.v2.md",
       "documentSha256": "5959dc531720b3ed79f27df1a5bb11dfdbc2501f027dc6828cde4f76aeb96a37"
+    },
+    {
+      "stableId": "h2-candidate:nature-town-relief-transition",
+      "revision": 1,
+      "definitionPath": "definitions/h2/nature-town-relief-transition.v2.json",
+      "definitionSha256": "3c5991f1a2bfbd9883be857d7de0cc8db7bf31f32ca4ae583fa926eddd63f2c5",
+      "documentPath": "authored/h2/nature-town-relief-transition.v2.md",
+      "documentSha256": "ca40f54b98687def8fc12702c61df71806ae83baa2835f66b0b379589f581bc9"
     },
     {
       "stableId": "h2-candidate:nature-trail-shelter",
@@ -607,6 +671,22 @@
       "definitionSha256": "d1edb7c63c64009e4e466ee4e54c78ef19a66e5fa8121eeb7e8ca2e01a4a45f7",
       "documentPath": "authored/h2/town-recall-relief.v2.md",
       "documentSha256": "5ec2df519bb53433942458741a4feb3952b2a2f1bc7411bd5aba1f8009455071"
+    },
+    {
+      "stableId": "h2-candidate:town-resident-service",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-resident-service.v2.json",
+      "definitionSha256": "a9114f4e23705e62d84a6f5d07bfce4980ac335f2f5aeb09bfa57163384aa6ba",
+      "documentPath": "authored/h2/town-resident-service.v2.md",
+      "documentSha256": "b4aab8fab707694d3b5e9ddbef1869b97cf0e4b25b78289a09f2a60d8c872818"
+    },
+    {
+      "stableId": "h2-candidate:town-residential-alley",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-residential-alley.v2.json",
+      "definitionSha256": "b874688232b03e195594cc92d3c60814ab83cdc1128721f7ad739755d572f487",
+      "documentPath": "authored/h2/town-residential-alley.v2.md",
+      "documentSha256": "c4d52257525a69bd551393ba6d20d2174a72376c05351122ed4b826500323239"
     },
     {
       "stableId": "h2-candidate:town-returns-waste",
@@ -651,12 +731,28 @@
       "documentSha256": "22b5f000efbf232c97ef733f4644c5747adfef1df7b3974a8e0837b1d5d56f51"
     },
     {
+      "stableId": "h3-candidate:farm-seasonal-production-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/farm-seasonal-production-loop.v2.json",
+      "definitionSha256": "c1f7c9c845a23add069b5e622702c29e3dd17bd8646d60277a59a36884d9cf1f",
+      "documentPath": "authored/h3/farm-seasonal-production-loop.v2.md",
+      "documentSha256": "c8146df024d1a1d48f1666f6d3397a11ac64a28335e2c1dd3ce3677124d8cac3"
+    },
+    {
       "stableId": "h3-candidate:highland-farm",
       "revision": 2,
       "definitionPath": "definitions/h3/highland-farm.v2.json",
       "definitionSha256": "94273055b82d53e5fcf77517cf87e1e300b2c30c32cb085a8a0065fcf98e1d38",
       "documentPath": "authored/h3/highland-farm.v2.md",
       "documentSha256": "8aac687bb2f92e91fb0238c2d218c5fe85b627b2fce606510b17e5a5a10b3f52"
+    },
+    {
+      "stableId": "h3-candidate:hub-maintenance-emergency-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/hub-maintenance-emergency-loop.v2.json",
+      "definitionSha256": "83c72ff3883509b0e2861153e3dc33eadb40c883e73d9df795afdad44402370f",
+      "documentPath": "authored/h3/hub-maintenance-emergency-loop.v2.md",
+      "documentSha256": "e85f4caf56abef9e227f3bc24c26a558cf69cba7a4ce6f27920eef41359ebf90"
     },
     {
       "stableId": "h3-candidate:hub-town-logistics",
@@ -691,12 +787,28 @@
       "documentSha256": "d545a1d4e52f7e92ff5f37bc66b49be3c55caf1bf190bab78bb95a8977e5d1c7"
     },
     {
+      "stableId": "h3-candidate:nature-home-encounter-defense",
+      "revision": 1,
+      "definitionPath": "definitions/h3/nature-home-encounter-defense.v2.json",
+      "definitionSha256": "35d4129d86783537de4b72314dda1f999135708705523c59b8ad401a7ee142c8",
+      "documentPath": "authored/h3/nature-home-encounter-defense.v2.md",
+      "documentSha256": "f6f2ad3c033840bf6d85110298243e1112e9350fc2c87d521ad731dc2abdbeae"
+    },
+    {
       "stableId": "h3-candidate:nature-threat-recovery",
       "revision": 1,
       "definitionPath": "definitions/h3/nature-threat-recovery.v2.json",
       "definitionSha256": "12b71b6b4d52d11ad4dad82b93b063753b0752d0a76b33b1e078b594c854e56a",
       "documentPath": "authored/h3/nature-threat-recovery.v2.md",
       "documentSha256": "dd1091ca756c8b3020742dd71c5be21f1468455d8836db39ec26facafcff1a7d"
+    },
+    {
+      "stableId": "h3-candidate:nature-town-relief-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/nature-town-relief-loop.v2.json",
+      "definitionSha256": "cb5534a7b6b755433c8400e96d5621c150ef2c0b4f088cde6635939a7bac9903",
+      "documentPath": "authored/h3/nature-town-relief-loop.v2.md",
+      "documentSha256": "855af38bcd021bf6bac76675589a2e1419c4d2a47f3f75ec1757a81692054e95"
     },
     {
       "stableId": "h3-candidate:nature-trail-network",
@@ -721,6 +833,14 @@
       "definitionSha256": "3f0c7531f929f8f2ba08ffe3b7b262596cdc3c8c0b24fcc74745ace57fb8c6c4",
       "documentPath": "authored/h3/town-contamination-relief.v2.md",
       "documentSha256": "48d87f135542d72e559d6a4750798195ee167efaae4adffeb0484127de17bc45"
+    },
+    {
+      "stableId": "h3-candidate:town-resident-service-loop",
+      "revision": 1,
+      "definitionPath": "definitions/h3/town-resident-service-loop.v2.json",
+      "definitionSha256": "a3faa4ec7822d48ba0966356d9d0e4ecb8bbbd8834f2ca1f38c09605b37845c7",
+      "documentPath": "authored/h3/town-resident-service-loop.v2.md",
+      "documentSha256": "4193c0f05669e1a450598d32578dcad0a3864ac4885f6ae405a634936d3d0d71"
     }
   ],
   "stateCodes": [

@@ -10,14 +10,18 @@
   "originModeCode": "ExpressionExploration",
   "requiredH3Refs": [
     "h3-candidate:nature-threat-recovery",
-    "h3-candidate:nature-trail-network"
+    "h3-candidate:nature-trail-network",
+    "h3-candidate:nature-home-encounter-defense"
   ],
   "optionalH3Refs": [
-    "h3-candidate:nature-exploration-buffer"
+    "h3-candidate:nature-exploration-buffer",
+    "h3-candidate:nature-town-relief-loop"
   ],
   "childKnowledgeRefs": [
     "h3-candidate:nature-exploration-buffer",
+    "h3-candidate:nature-home-encounter-defense",
     "h3-candidate:nature-threat-recovery",
+    "h3-candidate:nature-town-relief-loop",
     "h3-candidate:nature-trail-network"
   ],
   "worldThemeCodes": [
@@ -43,11 +47,20 @@
     "nature:숲 빈터·고사목",
     "nature:초지·야생화",
     "network:농촌도로 곡선",
+    "network:농촌도로 T자",
+    "network:타운도로 곡선",
+    "network:타운도로 직선",
+    "network:타운도로 T자",
+    "town:근린 놀이터",
+    "town:버스 정류장·보행 쉼터",
+    "town:생활 공공광장",
+    "town:읍내 상점 전면",
     "transition:Nature–Farm 전환",
+    "transition:Road–BuildingFront 전환",
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.nature-home-exploration-region.r1",
-  "derivationInputHashSha256": "a7fe0955f8201a33c5a6beef2d6cf45faf418843e34e40b887e33f840a2a83b3",
+  "derivationInputHashSha256": "b236fa0627718da1b443db33fb0b7503f206a4e843f7443558fb046508878f8e",
   "authoredDocument": "authored/h4/nature-home-exploration-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

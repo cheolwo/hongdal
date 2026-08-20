@@ -62,6 +62,7 @@ $counts = @{}
 
 $h1 = $levels[0]
 Require ([string] $h1.definitionSourceTypeCode -eq "SeedbedCatalog") "H1SourceTypeInvalid"
+Require ([string] $h1.judgmentSurfaceCode -eq "RecognizedSpatialPart") "H1JudgmentSurfaceInvalid"
 $seedbedCatalogPath = Resolve-RepositoryPath $repositoryRoot ([string] $h1.definitionSourcePath)
 $seedbedCatalog = Read-Json $seedbedCatalogPath
 $seedbedRoot = Split-Path -Parent $seedbedCatalogPath
@@ -78,6 +79,7 @@ $counts.H1 = $seedbedIds.Count
 
 $h2 = $levels[1]
 Require ([string] $h2.currentInstancePolicyCode -eq "DesignInventorySeparatedFromE5Instances") "H2PolicyInvalid"
+Require ([string] $h2.judgmentSurfaceCode -eq "FirstSpatialCompositionReview") "H2JudgmentSurfaceInvalid"
 $blockRoot = Resolve-RepositoryPath $repositoryRoot ([string] $h2.definitionSourcePath)
 $blockDefinitions = @(
     if (Test-Path -LiteralPath $blockRoot) {

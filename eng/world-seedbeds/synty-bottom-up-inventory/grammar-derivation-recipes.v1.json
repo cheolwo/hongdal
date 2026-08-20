@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-spatial-grammar-derivation-recipes.v1",
-  "revision": "simulation-world-spatial-grammar-derivation-recipes.r7",
+  "revision": "simulation-world-spatial-grammar-derivation-recipes.r10",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "h1ExpressionPolicy": {
     "revision": "simulation-world-spatial-grammar-derivation-recipes.r1",
@@ -40,7 +40,17 @@
     { "targetKnowledgeRef": "h2-candidate:farm-loss-restoration-handoff", "recipeCode": "h2.farm-loss-restoration-handoff.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선"] },
     { "targetKnowledgeRef": "h2-candidate:town-contamination-control", "recipeCode": "h2.town-contamination-control.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] },
     { "targetKnowledgeRef": "h2-candidate:town-recall-relief", "recipeCode": "h2.town-recall-relief.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선", "network:타운도로 T자"] },
-    { "targetKnowledgeRef": "h2-candidate:town-returns-waste", "recipeCode": "h2.town-returns-waste.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] }
+    { "targetKnowledgeRef": "h2-candidate:town-returns-waste", "recipeCode": "h2.town-returns-waste.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:nature-home-core", "recipeCode": "h2.nature-home-core.r1", "supplementalGrammarSetRefs": ["network:농촌도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:nature-encounter-route", "recipeCode": "h2.nature-encounter-route.r1", "supplementalGrammarSetRefs": ["network:농촌도로 곡선"] },
+    { "targetKnowledgeRef": "h2-candidate:nature-defense-ring", "recipeCode": "h2.nature-defense-ring.r1", "supplementalGrammarSetRefs": ["network:농촌도로 곡선", "network:농촌도로 T자"] },
+    { "targetKnowledgeRef": "h2-candidate:farm-irrigation-service", "recipeCode": "h2.farm-irrigation-service.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:farm-harvest-throughput", "recipeCode": "h2.farm-harvest-throughput.r1", "supplementalGrammarSetRefs": ["network:농촌도로 직선", "network:농촌도로 T자"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-maintenance-yard", "recipeCode": "h2.hub-maintenance-yard.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선", "network:도시도로 T자"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-emergency-power", "recipeCode": "h2.hub-emergency-power.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:town-residential-alley", "recipeCode": "h2.town-residential-alley.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선", "network:타운도로 T자"] },
+    { "targetKnowledgeRef": "h2-candidate:town-resident-service", "recipeCode": "h2.town-resident-service.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:nature-town-relief-transition", "recipeCode": "h2.nature-town-relief-transition.r1", "supplementalGrammarSetRefs": ["network:타운도로 곡선", "network:농촌도로 곡선"] }
   ],
   "h3Derivations": [
     { "targetKnowledgeRef": "h3-candidate:circular-market-town", "recipeCode": "h3.circular-market-town.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Town–City 전환"] },
@@ -55,7 +65,12 @@
     { "targetKnowledgeRef": "h3-candidate:nature-trail-network", "recipeCode": "h3.nature-trail-network.r1", "supplementalGrammarSetRefs": ["transition:Water–Land 전환"] },
     { "targetKnowledgeRef": "h3-candidate:nature-threat-recovery", "recipeCode": "h3.nature-threat-recovery.r1", "supplementalGrammarSetRefs": ["transition:Nature–Farm 전환", "transition:Water–Land 전환"] },
     { "targetKnowledgeRef": "h3-candidate:resilient-logistics-hub", "recipeCode": "h3.resilient-logistics-hub.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환"] },
-    { "targetKnowledgeRef": "h3-candidate:town-contamination-relief", "recipeCode": "h3.town-contamination-relief.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Town–City 전환", "transition:Town–Hub 전환"] }
+    { "targetKnowledgeRef": "h3-candidate:town-contamination-relief", "recipeCode": "h3.town-contamination-relief.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Town–City 전환", "transition:Town–Hub 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:nature-home-encounter-defense", "recipeCode": "h3.nature-home-encounter-defense.r1", "supplementalGrammarSetRefs": ["transition:Water–Land 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:farm-seasonal-production-loop", "recipeCode": "h3.farm-seasonal-production-loop.r1", "supplementalGrammarSetRefs": ["transition:Farm–Town 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:hub-maintenance-emergency-loop", "recipeCode": "h3.hub-maintenance-emergency-loop.r1", "supplementalGrammarSetRefs": ["transition:Hub–City 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:town-resident-service-loop", "recipeCode": "h3.town-resident-service-loop.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환"] },
+    { "targetKnowledgeRef": "h3-candidate:nature-town-relief-loop", "recipeCode": "h3.nature-town-relief-loop.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Water–Land 전환"] }
   ],
   "h4Blueprints": [
     {
@@ -73,8 +88,8 @@
       "title": "Nature 생활·탐험권",
       "summary": "플레이어의 안전 생활핵, 위협 대응·회복 경관과 탐색길을 결합하고 Farm·Town·City/Hub AreaSet으로 연결하는 위치 독립 Nature AreaSet 청사진이다.",
       "recipeCode": "h4.nature-home-exploration-region.r1",
-      "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network"],
-      "optionalH3Refs": ["h3-candidate:nature-exploration-buffer"],
+      "requiredH3Refs": ["h3-candidate:nature-threat-recovery", "h3-candidate:nature-trail-network", "h3-candidate:nature-home-encounter-defense"],
+      "optionalH3Refs": ["h3-candidate:nature-exploration-buffer", "h3-candidate:nature-town-relief-loop"],
       "worldThemeCodes": ["NatureHome", "NatureExploration", "ThreatRecovery"],
       "graphRelationRoleCodes": ["SafeCoreToThreatBand", "ThreatBandToRecovery", "NatureToFarm", "NatureToTown", "NatureToCityHub"]
     },
@@ -83,7 +98,7 @@
       "title": "농업 생산·후처리권",
       "summary": "고지대 생산과 농산물 후처리, 사건 격리·회복을 결합하는 위치 독립 Farm AreaSet 청사진이다.",
       "recipeCode": "h4.farm-production-processing-region.r1",
-      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus", "h3-candidate:farm-incident-recovery"],
+      "requiredH3Refs": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus", "h3-candidate:farm-incident-recovery", "h3-candidate:farm-seasonal-production-loop"],
       "optionalH3Refs": [],
       "worldThemeCodes": ["FarmProduction", "FarmProcessing", "FarmSurvival"],
       "graphRelationRoleCodes": ["ProductionToProcessing", "IncidentToRecovery", "RecoveryToNature"]
@@ -93,7 +108,7 @@
       "title": "물류 Hub권",
       "summary": "입고·보관·출고와 품질 대응 물류 공간을 결합하는 위치 독립 지역 청사진이다.",
       "recipeCode": "h4.logistics-hub-region.r1",
-      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub"],
+      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub", "h3-candidate:hub-maintenance-emergency-loop"],
       "optionalH3Refs": [],
       "worldThemeCodes": ["LogisticsHub", "StorageResilience"],
       "graphRelationRoleCodes": ["InboundToStorage", "StorageToOutbound"]
@@ -103,8 +118,8 @@
       "title": "저층 생활·시장권",
       "summary": "저층 생활권과 순환형 시장, 오염 통제·주민 구호를 결합하는 위치 독립 Town AreaSet 청사진이다.",
       "recipeCode": "h4.lowrise-market-region.r1",
-      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief"],
-      "optionalH3Refs": [],
+      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief", "h3-candidate:town-resident-service-loop"],
+      "optionalH3Refs": ["h3-candidate:nature-town-relief-loop"],
       "worldThemeCodes": ["LowriseLiving", "CircularMarket", "TownSafety"],
       "graphRelationRoleCodes": ["LivingToMarket", "MarketReturnLoop", "IncidentToRelief", "ReliefToNature"]
     },

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:nature-encounter-route",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "자연 몬스터 조우·이탈 블록",
+  "summary": "위협 관찰과 사건 흔적 조사, 긴급 후퇴를 하나의 접근·이탈 경로로 묶는 Nature 단독 조우 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "ContourAdaptive",
+  "requiredH1Refs": [
+    "h1-stock:nature-threat-watch",
+    "h1-stock:nature-incident-trace",
+    "h1-stock:nature-emergency-retreat"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:nature-lookout"
+  ],
+  "connectorRoleCodes": [
+    "EncounterInput",
+    "ThreatContinuation",
+    "RetreatOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/nature-encounter-route.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:nature-encounter-route"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

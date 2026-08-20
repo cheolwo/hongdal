@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
+  "stableId": "h3-candidate:nature-home-encounter-defense",
+  "revision": 1,
+  "hierarchyLevelCode": "H3",
+  "title": "Nature 생활핵·조우·방어 폐루프 경관",
+  "summary": "안전 생활핵에서 탐색을 시작해 몬스터 조우와 야간 방어를 거친 뒤 회복 공간으로 돌아오는 Nature 단독 경관이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Organic",
+  "requiredH2Refs": [
+    "h2-candidate:nature-home-core",
+    "h2-candidate:nature-encounter-route",
+    "h2-candidate:nature-defense-ring"
+  ],
+  "optionalH2Refs": [
+    "h2-candidate:nature-restoration-recovery"
+  ],
+  "connectorRoleCodes": [
+    "SafeCoreGate",
+    "ExplorationOutput",
+    "ThreatInput",
+    "RecoveryReturn"
+  ],
+  "targetAreaRoleCodes": [],
+  "authoredDocument": "authored/h3/nature-home-encounter-defense.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:nature-home-encounter-defense"
+  ],
+  "unresolvedItems": [
+    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

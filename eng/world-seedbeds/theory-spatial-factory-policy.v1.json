@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "simulation-world-theory-spatial-factory-policy.v1",
+  "revision": "simulation-world-theory-spatial-factory-policy.r3",
+  "title": "게임 플레이 주도 H2·H3·이론 E5 반복 생산 정책",
+  "principle": "사람 검토를 생산 관문으로 사용하지 않고 게임 플레이 의미·위상·연결·결정성 규칙을 통과한 위치 독립 H2, H3와 특정 Theory AreaSet E5 인스턴스를 반복 생성한다.",
+  "sourceCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
+  "sourceAuthoredRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/h2-composition-recipes.v1.json",
+  "sourceAreaSetPriorityPath": "eng/world-seedbeds/synty-bottom-up-inventory/area-set-composition-priorities.v1.json",
+  "sourceWorldInteractionPath": "eng/execution-ledgers/world-interactions.json",
+  "sourcePatternNamingPath": "eng/world-seedbeds/synty-bottom-up-inventory/h-pattern-names.v1.json",
+  "productionModeCode": "ContinuousTheoryProduction",
+  "humanReviewPolicy": {
+    "blocking": false,
+    "modeCode": "DeferredBatchReview",
+    "reviewCanImproveLaterRevision": true,
+    "absenceOfReviewMustRemainVisible": true
+  },
+  "qualityGates": {
+    "h2": [
+      "RequiredH1Recognized",
+      "GameplayContextPresent",
+      "DeterministicRelativeLayout",
+      "NoNodeOverlap",
+      "ConnectedInternalGraph",
+      "IngressAndEgressAvailable",
+      "PublicDataForbidden"
+    ],
+    "h3": [
+      "RequiredH2TheoryQualified",
+      "ConnectedBlockGraph",
+      "ConnectorClosure",
+      "DeterministicLayout",
+      "PublicDataForbidden"
+    ],
+    "e5": [
+      "WorldIntentBound",
+      "RequiredH3TheoryQualified",
+      "SpecificAreaSetStableId",
+      "GraphRelationClosure",
+      "DeterministicLayout",
+      "ScenarioFallbackForbidden",
+      "PublicDataDeferredToE6"
+    ]
+  },
+  "layoutRules": {
+    "nodeSpacingMeters": 80,
+    "h2SpacingMeters": 420,
+    "h3SpacingMeters": 960,
+    "minimumNodeSeparationMeters": 40,
+    "generatedConnectorPolicyCode": "SynthesizeIngressEgressWhenDefinitionHasNone"
+  },
+  "productionPriority": [
+    "NatureHomeThreatRecovery",
+    "FarmProductionSurvival",
+    "CityHubLogisticsResilience",
+    "TownLivingMarketSafety"
+  ],
+  "patternProductionOrderCodes": [
+    "PackNativeH2",
+    "PackNativeH3",
+    "LeadPackWithSupport",
+    "CrossPackH2",
+    "CrossPackH3"
+  ],
+  "outputStateCodes": {
+    "h2": "TheoryQualified",
+    "h3": "TheoryQualified",
+    "e5": "E5TheoryQualified"
+  },
+  "authorityBoundary": {
+    "humanApprovalNotClaimed": true,
+    "publicDataNotBound": true,
+    "runtimeNotValidated": true,
+    "e6AndE7RemainSeparate": true,
+    "unityDoesNotCreateSimulationAuthority": true
+  }
+}
