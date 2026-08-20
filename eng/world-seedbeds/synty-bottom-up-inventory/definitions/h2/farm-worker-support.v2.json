@@ -1,11 +1,11 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
   "stableId": "h2-candidate:farm-worker-support",
-  "revision": 1,
+  "revision": 2,
   "hierarchyLevelCode": "H2",
-  "title": "농장 작업 지원 블록",
-  "summary": "작업자 대기·농기구 보관·시설 정비를 공유 마당에 묶는 지원 레시피다.",
-  "knowledgeStateCode": "IdeaInventory",
+  "title": "농가·작업지원 생활 블록",
+  "summary": "귀환·휴식·작업자 대기·농기구 보관·시설 정비를 공유 마당에 묶고 생산구획으로 이어 주는 Farm 생활 거점 레시피다.",
+  "knowledgeStateCode": "ApprovedReference",
   "topologyCode": "Cluster",
   "requiredH1Refs": [
     "h1-stock:farm-worker-waiting",
@@ -14,6 +14,7 @@
   ],
   "optionalH1Refs": [],
   "connectorRoleCodes": [
+    "FarmHomeIngress",
     "FarmRoadAccess",
     "ProductionAccess"
   ],
@@ -26,9 +27,7 @@
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:farm-worker-support"
   ],
-  "unresolvedItems": [
-    "실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다."
-  ],
+  "unresolvedItems": [],
   "presentationOnly": true,
   "isOperationalState": false
 }

@@ -1344,6 +1344,7 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [
+        "NextTaskPreparation",
         "SeedBatchPreparation",
         "SeedInspection",
         "ToolCheckout",
@@ -1588,16 +1589,16 @@
     {
       "h2StableId": "h2-candidate:farm-worker-support",
       "patternCode": "FARM-H2-SUPPORT-01",
-      "displayNameKo": "작업자 대기소·정비고 블록",
-      "spatialDisplayNameKo": "작업자 대기소·정비고 블록",
-      "gameplayProfileNameKo": "팜 작업지원 패턴 01 — 대기·정비형",
+      "displayNameKo": "농가·작업지원 생활 블록",
+      "spatialDisplayNameKo": "농가·작업지원 생활 블록",
+      "gameplayProfileNameKo": "팜 생활거점 패턴 01 — 귀환·대기·정비형",
       "leadPackCode": "Farm",
       "supportPackCodes": [],
       "compositionModeCode": "SinglePack",
       "patternFamilyCode": "Support",
       "patternSequence": 1,
       "resourceKindCode": "BlockPattern",
-      "title": "농장 작업 지원 블록",
+      "title": "농가·작업지원 생활 블록",
       "theoryStateCode": "TheoryQualified",
       "structureQualificationCode": "StructureQualified",
       "closureStateCode": "Closed",
@@ -1664,6 +1665,8 @@
             "WI-WORLD-01"
           ],
           "spatialRoleCodes": [
+            "FarmRestArea",
+            "FarmReturnPoint",
             "FarmWorkerWaitingArea"
           ],
           "capacityConceptCodes": []
@@ -1775,12 +1778,16 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [
+        "FarmRest",
+        "FarmReturn",
+        "NextTaskPreparation",
+        "NextTaskSelection",
         "ShiftHandoff",
         "ToolCheckout",
         "ToolReturn",
         "WorkerBriefing"
       ],
-      "theoryHashSha256": "7ecb9274c64b2b201c00b3adcc3a798301b5d08c860ff80c97cff0ae7fbb4fcf"
+      "theoryHashSha256": "e6314beaebbf4397b04bd4a26f2ca5d4d13f794c102f8fdc5df8a87ecc1bb73e"
     },
     {
       "h2StableId": "h2-candidate:forest-edge-farm",
@@ -7905,16 +7912,16 @@
     {
       "h3StableId": "h3-candidate:farm-processing-campus",
       "patternCode": "FARM-H3-REGION-02",
-      "displayNameKo": "생산구획·후처리장 구역",
-      "spatialDisplayNameKo": "생산구획·후처리장 구역",
-      "gameplayProfileNameKo": "팜 경관 02 — 생산·후처리 캠퍼스형",
+      "displayNameKo": "농가·생산·후처리 생활 구역",
+      "spatialDisplayNameKo": "농가·생산·후처리 생활 구역",
+      "gameplayProfileNameKo": "팜 경관 02 — 귀환·생산·후처리 생활형",
       "leadPackCode": "Farm",
       "supportPackCodes": [],
       "compositionModeCode": "SinglePack",
       "patternFamilyCode": "Region",
       "patternSequence": 2,
       "resourceKindCode": "LandscapeAssemblyPattern",
-      "title": "농장 생산·후처리 복합 경관",
+      "title": "농가·생산·후처리 생활 경관",
       "theoryStateCode": "TheoryQualified",
       "structureQualificationCode": "StructureQualified",
       "closureStateCode": "Closed",
@@ -7926,11 +7933,11 @@
         "localCoordinateSystemCode": "LocalMeters",
         "spatialFormCode": "DistrictAssembly",
         "referenceBoundsMeters": {
-          "minimumX": -420.0,
+          "minimumX": -630.0,
           "minimumZ": -420.0,
-          "maximumX": 420.0,
+          "maximumX": 630.0,
           "maximumZ": 420.0,
-          "width": 840.0,
+          "width": 1260.0,
           "depth": 840.0
         },
         "allowedRotationStepDegrees": 90,
@@ -7940,6 +7947,7 @@
         "connectionRoleCodes": [
           "Egress",
           "FarmExternalGate",
+          "FarmHomeIngress",
           "Ingress",
           "NatureEdge"
         ]
@@ -7950,7 +7958,7 @@
           "h2Ref": "h2-candidate:farm-processing-shipping",
           "h2PatternCode": "FARM-H2-SHIPPING-01",
           "h2DisplayNameKo": "작업마당·출하장 블록",
-          "x": 210.0,
+          "x": 0.0,
           "z": 210.0,
           "h2TheoryHashSha256": "75471816f35e0dc9003a0462bbecee1baa8da1e8b8f6ab1174a458d21f71e72e"
         },
@@ -7959,7 +7967,7 @@
           "h2Ref": "h2-candidate:farm-seed-and-tools",
           "h2PatternCode": "FARM-H2-PREP-01",
           "h2DisplayNameKo": "종자창고·농기구고 블록",
-          "x": 210.0,
+          "x": 420.0,
           "z": -210.0,
           "h2TheoryHashSha256": "2d34f9846cc8c94f0e6a4694036d1042a976be79e7ed3a87088fa4f22a565360"
         },
@@ -7968,16 +7976,25 @@
           "h2Ref": "h2-candidate:farm-wash-sort-pack",
           "h2PatternCode": "FARM-H2-PROCESSING-01",
           "h2DisplayNameKo": "세척장·선별장·포장장 블록",
-          "x": -210.0,
+          "x": -420.0,
           "z": 210.0,
           "h2TheoryHashSha256": "5746f9789c0e52b3817a871d5dbfd98308cc77c9b9ff28101bca6efe0da0e9c2"
+        },
+        {
+          "nodeId": "h2-farm-worker-support",
+          "h2Ref": "h2-candidate:farm-worker-support",
+          "h2PatternCode": "FARM-H2-SUPPORT-01",
+          "h2DisplayNameKo": "농가·작업지원 생활 블록",
+          "x": -420.0,
+          "z": -210.0,
+          "h2TheoryHashSha256": "e6314beaebbf4397b04bd4a26f2ca5d4d13f794c102f8fdc5df8a87ecc1bb73e"
         },
         {
           "nodeId": "h2-highland-production",
           "h2Ref": "h2-candidate:highland-production",
           "h2PatternCode": "FARM-H2-PRODUCTION-01",
           "h2DisplayNameKo": "고지대 경작지 블록",
-          "x": -210.0,
+          "x": 0.0,
           "z": -210.0,
           "h2TheoryHashSha256": "7e8921a886f9c288fa73c0f95f296bfcfe6b5573ab9395e02ce96310e6802934"
         }
@@ -7994,6 +8011,13 @@
           "edgeId": "relation:h3-farm-processing-campus:88de107c27151a26",
           "fromNodeId": "h2-farm-seed-and-tools",
           "toNodeId": "h2-farm-wash-sort-pack",
+          "relationCode": "CargoLogistics",
+          "relationDirectionCode": "Directed"
+        },
+        {
+          "edgeId": "relation:h3-farm-processing-campus:96a3695b615604b9",
+          "fromNodeId": "h2-farm-worker-support",
+          "toNodeId": "h2-highland-production",
           "relationCode": "CargoLogistics",
           "relationDirectionCode": "Directed"
         },
@@ -8020,7 +8044,18 @@
         {
           "connectorId": "connector:h3:farm-processing-campus:farmexternalgate",
           "roleCode": "FarmExternalGate",
-          "attachedNodeId": "h2-highland-production",
+          "attachedNodeId": "h2-farm-worker-support",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "CargoLogistics",
+            "PlayerTraversal",
+            "WorkTraversal"
+          ]
+        },
+        {
+          "connectorId": "connector:h3:farm-processing-campus:farmhomeingress",
+          "roleCode": "FarmHomeIngress",
+          "attachedNodeId": "h2-farm-worker-support",
           "directionCode": "Input",
           "movementKindCodes": [
             "CargoLogistics",
@@ -8031,7 +8066,7 @@
         {
           "connectorId": "connector:h3:farm-processing-campus:ingress",
           "roleCode": "Ingress",
-          "attachedNodeId": "h2-highland-production",
+          "attachedNodeId": "h2-farm-worker-support",
           "directionCode": "Input",
           "movementKindCodes": [
             "CargoLogistics",
@@ -8054,7 +8089,7 @@
       "semanticRelations": [
         {
           "relationStableId": "relation:h3-farm-processing-campus:81b9aec3da54d87a",
-          "relationCode": "h2-flow-1",
+          "relationCode": "h2-flow-2",
           "fromRef": "h2-candidate:highland-production",
           "fromConnectorRoleCode": "Egress",
           "toRef": "h2-candidate:farm-seed-and-tools",
@@ -8065,7 +8100,7 @@
         },
         {
           "relationStableId": "relation:h3-farm-processing-campus:88de107c27151a26",
-          "relationCode": "h2-flow-2",
+          "relationCode": "h2-flow-3",
           "fromRef": "h2-candidate:farm-seed-and-tools",
           "fromConnectorRoleCode": "Egress",
           "toRef": "h2-candidate:farm-wash-sort-pack",
@@ -8075,8 +8110,19 @@
           "compatibilityRuleCode": "OutputToInputSameFlow"
         },
         {
+          "relationStableId": "relation:h3-farm-processing-campus:96a3695b615604b9",
+          "relationCode": "h2-flow-1",
+          "fromRef": "h2-candidate:farm-worker-support",
+          "fromConnectorRoleCode": "Egress",
+          "toRef": "h2-candidate:highland-production",
+          "toConnectorRoleCode": "Ingress",
+          "relationKindCode": "CargoLogistics",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
           "relationStableId": "relation:h3-farm-processing-campus:b0f29e3dc1ce1a27",
-          "relationCode": "h2-flow-3",
+          "relationCode": "h2-flow-4",
           "fromRef": "h2-candidate:farm-wash-sort-pack",
           "fromConnectorRoleCode": "Egress",
           "toRef": "h2-candidate:farm-processing-shipping",
@@ -8109,9 +8155,22 @@
             "PlayerTraversal",
             "WorkTraversal"
           ],
-          "sourceChildRef": "h2-candidate:highland-production",
+          "sourceChildRef": "h2-candidate:farm-worker-support",
           "sourceChildConnectorRoleCode": "Ingress",
-          "sourceChildConnectorStableId": "connector:h2:highland-production:ingress"
+          "sourceChildConnectorStableId": "connector:h2:farm-worker-support:ingress"
+        },
+        {
+          "connectorStableId": "connector:h3:farm-processing-campus:farmhomeingress",
+          "roleCode": "FarmHomeIngress",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "CargoLogistics",
+            "PlayerTraversal",
+            "WorkTraversal"
+          ],
+          "sourceChildRef": "h2-candidate:farm-worker-support",
+          "sourceChildConnectorRoleCode": "Ingress",
+          "sourceChildConnectorStableId": "connector:h2:farm-worker-support:ingress"
         },
         {
           "connectorStableId": "connector:h3:farm-processing-campus:ingress",
@@ -8122,9 +8181,9 @@
             "PlayerTraversal",
             "WorkTraversal"
           ],
-          "sourceChildRef": "h2-candidate:highland-production",
+          "sourceChildRef": "h2-candidate:farm-worker-support",
           "sourceChildConnectorRoleCode": "Ingress",
-          "sourceChildConnectorStableId": "connector:h2:highland-production:ingress"
+          "sourceChildConnectorStableId": "connector:h2:farm-worker-support:ingress"
         },
         {
           "connectorStableId": "connector:h3:farm-processing-campus:natureedge",
@@ -8149,7 +8208,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "a32a14f2efa53437fb0b398065c04db2e8ec6173cd501a438fa335ed9c8a6ed5"
+      "theoryHashSha256": "2288f710cbd2511a7a1269b3e51de8188de14f3011d8006d02a6d8c9863778f9"
     },
     {
       "h3StableId": "h3-candidate:farm-seasonal-production-loop",
@@ -12089,10 +12148,10 @@
           "graphInstanceStableId": "graph:theory:farm-processing-campus",
           "h3Ref": "h3-candidate:farm-processing-campus",
           "h3PatternCode": "FARM-H3-REGION-02",
-          "h3DisplayNameKo": "생산구획·후처리장 구역",
+          "h3DisplayNameKo": "농가·생산·후처리 생활 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "a32a14f2efa53437fb0b398065c04db2e8ec6173cd501a438fa335ed9c8a6ed5"
+          "h3TheoryHashSha256": "2288f710cbd2511a7a1269b3e51de8188de14f3011d8006d02a6d8c9863778f9"
         },
         {
           "graphInstanceStableId": "graph:theory:farm-seasonal-production-loop",
@@ -12193,7 +12252,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "739c220a95bccbd44e30430f340df2f26aeec2ba8152520315c13f42d4a3a826"
+      "theoryHashSha256": "83ecf49c098f65ff00ca748412fd21b29b666d1fac81d95fd66ffa70459d980f"
     },
     {
       "areaSetStableId": "area-set:theory:logistics-hub-region",

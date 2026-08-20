@@ -1,12 +1,12 @@
 {
   "schemaVersion": "simulation-world-h5-spatial-output.v1",
-  "revision": "simulation-world-h5-spatial-output.r1",
-  "policyRevision": "simulation-world-h5-layout-policy.r1",
+  "revision": "simulation-world-h5-spatial-output.r2",
+  "policyRevision": "simulation-world-h5-layout-policy.r3",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "worldLayoutDefinition": {
     "schemaVersion": "simulation-world-layout-definition.v1",
     "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
-    "worldLayoutRevision": 1,
+    "worldLayoutRevision": 2,
     "worldIntentStableId": "theory-world:nature-farm-city-town",
     "areaSetNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
     "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -86,33 +86,33 @@
               {
                 "connectorStableId": "stub:actual-e5:farm-processing-campus:ingress",
                 "coordinateSpaceCode": "ParentLocalMeters",
-                "localXMeters": 290.0,
+                "localXMeters": 80.0,
                 "localZMeters": 210.0,
-                "rotationDegrees": 53.426969,
+                "rotationDegrees": 22.232972,
                 "widthMeters": 6.0,
                 "directionCode": "Ingress",
                 "travelTypeCodes": [
                   "PlayerTraversal"
                 ],
-                "connectorPoseHashSha256": "d2a4188599c1adc38c07fa53b608414f0c3065cb8671b54397f31a3bbb1e60d3"
+                "connectorPoseHashSha256": "59363d8ed11a72cba16c89272d121cd234ee2c1ef19a7940bbc4a398b7334304"
               },
               {
                 "connectorStableId": "stub:actual-e5:farm-processing-campus:egress",
                 "coordinateSpaceCode": "ParentLocalMeters",
-                "localXMeters": -170.0,
+                "localXMeters": 40.0,
                 "localZMeters": -250.0,
-                "rotationDegrees": 213.111342,
+                "rotationDegrees": 164.431989,
                 "widthMeters": 6.0,
                 "directionCode": "Egress",
                 "travelTypeCodes": [
                   "CargoLogistics"
                 ],
-                "connectorPoseHashSha256": "95868c20ce78f42204b3647b9fee52c84d9a8a92a929ee683833a18d4bc0dfd7"
+                "connectorPoseHashSha256": "ef8b035e0256a44d21b6e878f24fce825b2dd7a2b5ec4820982e2cd9cc885dcf"
               }
             ],
-            "sourcePatternHashSha256": "a32a14f2efa53437fb0b398065c04db2e8ec6173cd501a438fa335ed9c8a6ed5",
+            "sourcePatternHashSha256": "2288f710cbd2511a7a1269b3e51de8188de14f3011d8006d02a6d8c9863778f9",
             "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
-            "instanceHashSha256": "f2587c243811d20ff697b3f1f585fd28bd0edfabce47631e2014cecabbb1fad1"
+            "instanceHashSha256": "dde178a15f66cf032be19db8716cf28d94e54089ab911b09a7e2c71c24e4e4d7"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:farm-production-v1:farm-seasonal-production-loop",
@@ -233,28 +233,28 @@
           {
             "connectorStableId": "stub:actual-e5:farm-processing-campus:ingress",
             "coordinateSpaceCode": "ParentLocalMeters",
-            "localXMeters": 770.0,
+            "localXMeters": 560.0,
             "localZMeters": -270.0,
-            "rotationDegrees": 53.426969,
+            "rotationDegrees": 22.232972,
             "widthMeters": 6.0,
             "directionCode": "Ingress",
             "travelTypeCodes": [
               "PlayerTraversal"
             ],
-            "connectorPoseHashSha256": "5d85501a7684df45fd904767afeff32df49c8df91953da18b0c1e598fd61d246"
+            "connectorPoseHashSha256": "24ddb51cb42f4954a1686a5ab4859046f6722ac78335c7ba8c4a677465182a9a"
           },
           {
             "connectorStableId": "stub:actual-e5:farm-processing-campus:egress",
             "coordinateSpaceCode": "ParentLocalMeters",
-            "localXMeters": 310.0,
+            "localXMeters": 520.0,
             "localZMeters": -730.0,
-            "rotationDegrees": 213.111342,
+            "rotationDegrees": 164.431989,
             "widthMeters": 6.0,
             "directionCode": "Egress",
             "travelTypeCodes": [
               "PlayerTraversal"
             ],
-            "connectorPoseHashSha256": "b7fcb1f5578e867b37f66e9178b6b3785ede804851d912fb481e3201872bdaf4"
+            "connectorPoseHashSha256": "bd0e865930d43fd295f48bd76ed1f97493fc45ab70061fc8cbe0b867846861cb"
           },
           {
             "connectorStableId": "stub:actual-e5:farm-seasonal-production-loop:ingress",
@@ -310,7 +310,7 @@
           }
         ],
         "placementHashSha256": "842a13c979a106c6b596b8dc63d7182529c42a7c509e0b72d9a2377e8069f804",
-        "instanceHashSha256": "61daf6ebe03dd8bff1a952aee1fe616573b2a0c77eec0c835e40cd1ae92f2aad"
+        "instanceHashSha256": "2519bbeb93b83d1a9eca44acc7f7fcf46aadfa61275cb59cb69c88f9612daea7"
       },
       {
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
@@ -319,9 +319,9 @@
         "loadPolicyCode": "OnDemand",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
-          "localXMeters": -396.226868,
-          "localZMeters": -99.661864,
-          "rotationDegrees": 177.182472,
+          "localXMeters": 395.256719,
+          "localZMeters": -564.642079,
+          "rotationDegrees": 128.503119,
           "sizeVariantCode": "Reference",
           "mirrorCode": "None"
         },
@@ -539,8 +539,8 @@
             "connectorPoseHashSha256": "9ae67f67ea97f8b0804bab95f4f70f440819478d6da108722fa34ee32e167b0e"
           }
         ],
-        "placementHashSha256": "75f7b58f9447507f4dc3f60f644d0d3f3f86a97cb600bddb0f3873c20a6c76f3",
-        "instanceHashSha256": "fcbeba205809f5541c072b590b2d4338bd3128b9d2ac6411d629a687a1758719"
+        "placementHashSha256": "141f7da93fc520e2e9fbc38b7fd0016dcd9f55860461abb16d78a86d1f5801a3",
+        "instanceHashSha256": "84f58055387692c43a55ffe2592a8292c385eb733d27100e0a308d475536b8fc"
       },
       {
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
@@ -779,9 +779,9 @@
         "loadPolicyCode": "OnDemand",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
-          "localXMeters": -1936.628882,
-          "localZMeters": -415.234212,
-          "rotationDegrees": 172.890598,
+          "localXMeters": -384.825022,
+          "localZMeters": -1929.888118,
+          "rotationDegrees": 124.211245,
           "sizeVariantCode": "Reference",
           "mirrorCode": "None"
         },
@@ -1069,8 +1069,8 @@
             "connectorPoseHashSha256": "905861362d79dce271c4983b3a5e7fd473205e1087ca2660e8b650ad6d550622"
           }
         ],
-        "placementHashSha256": "ccc9088b91e8bef5a2d568eabe99e79653824562400360d62d5ab5123d8ea480",
-        "instanceHashSha256": "0a7dbe584bad4f7bf3d4736beefb91697111a9591e9752871cd84f9ad0c477ca"
+        "placementHashSha256": "316f550af37ddc055ccc7f5f65ce30e8cced2b786b14003fe776ce1c08c76da6",
+        "instanceHashSha256": "e2e34f4f7b4b1c5d0ab9dbc4a0b62bb6e21eb296104282fc20f4de90cff52ec4"
       }
     ],
     "corridorInstances": [
@@ -1126,9 +1126,9 @@
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-logistics.v1",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
-          "localXMeters": 757.338587,
-          "localZMeters": 701.326427,
-          "rotationDegrees": 170.560133,
+          "localXMeters": 555.36086,
+          "localZMeters": 830.586277,
+          "rotationDegrees": 121.88078,
           "sizeVariantCode": "Reference",
           "mirrorCode": "None"
         },
@@ -1165,17 +1165,17 @@
             "connectorPoseHashSha256": "efed6830f590a17461f4dd7fcae7ab63b901aaf15b320e20438bbc89ad5ed9ed"
           }
         ],
-        "placementHashSha256": "1d79ef3ca77eab2b9a774fb36f532af2d53942143442fd510c40b1cfba4ed580",
-        "instanceHashSha256": "fc1d638cedf4aaa3c4b5fc1c280599d30d4f0d7b886dbf5c109ad8154b48336f"
+        "placementHashSha256": "9fc7e49b39f291c246a74d25d116a0f9ef60895f0d16dd017daefe665f2ca43a",
+        "instanceHashSha256": "1ec1b16fe70df407fd28ceb7eb9bf22600786753367621bb8c6061dc7736ae0d"
       },
       {
         "corridorInstanceStableId": "corridor-instance:h5:cityhubtotown",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-logistics.v1",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
-          "localXMeters": -496.443957,
-          "localZMeters": 550.605183,
-          "rotationDegrees": 171.173466,
+          "localXMeters": -159.281475,
+          "localZMeters": -210.554392,
+          "rotationDegrees": 122.494113,
           "sizeVariantCode": "Reference",
           "mirrorCode": "None"
         },
@@ -1212,8 +1212,8 @@
             "connectorPoseHashSha256": "3c234bef61ec2aaffffe34c64eae236c6fdc9408197b2aed3f2786966fb85656"
           }
         ],
-        "placementHashSha256": "34ea868236e769b33996c86f91b1f8dbd3b2d9cceb4641f21804a42315c72fcc",
-        "instanceHashSha256": "cffc603e7e51a3522f6376feaec8b383f1f7cc8429719f596a076741c5720536"
+        "placementHashSha256": "416c26f2b241a91d10b77349e444e45c78751d9259168ba6d8168a29c36a4267",
+        "instanceHashSha256": "4ae2d4b64fabc0e06f41e28008d22da51df69be71da80f9afb43d52707ec3e5f"
       }
     ],
     "relations": [
@@ -1320,22 +1320,22 @@
         "corridorInstanceStableId": ""
       }
     ],
-    "worldLayoutHashSha256": "7917c3484eb86e44de157d5be07bdb46af6f8aa3d164c35a40ff971aa0b51039",
+    "worldLayoutHashSha256": "5a60deb9205ec983a2dc11dd417eb23a24488c78ef28ff185953f4674060c603",
     "presentationOnly": true,
     "isOperationalState": false
   },
   "worldGroundingBinding": {
     "schemaVersion": "simulation-world-grounding-binding.v1",
     "groundingBindingStableId": "grounding-binding:sim:pyeongchang:nature-farm-hub-town.v1",
-    "groundingBindingRevision": 1,
+    "groundingBindingRevision": 2,
     "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
-    "worldLayoutRevision": 1,
-    "worldLayoutHashSha256": "7917c3484eb86e44de157d5be07bdb46af6f8aa3d164c35a40ff971aa0b51039",
+    "worldLayoutRevision": 2,
+    "worldLayoutHashSha256": "5a60deb9205ec983a2dc11dd417eb23a24488c78ef28ff185953f4674060c603",
     "placementAuthorityCode": "ScenarioRelative",
     "worldGroundingStateCode": "NotApplied",
     "e6AnchorStableId": "",
     "groundingEvidenceHashSha256": "",
-    "bindingHashSha256": "e885e171d4844ba3feb25e8c4b7bff322e0200283d93c0178367dd8d058d4dd9",
+    "bindingHashSha256": "55bdbabd139945fa8eb4d7b9bbb160d78c93a8bf001b38d7827ed8498dd69847",
     "presentationOnly": true,
     "isOperationalState": false
   },

@@ -4,6 +4,8 @@
 
 공간 원본은 배치 가능 위치를, 환경부 면적 통계는 행정구역 전체의 경관 구성 목표를, Simulation은 Farm·Town·Hub 역할과 구체 작물을 결정한다. Synty Prefab과 높이 과장은 `PresentationOnly`이며 법정동·공간 관측·업무 완료를 변경하지 않는다.
 
+이 문서는 DEM·토지피복을 선택한 현실 정합 프로필의 파생 절차를 설명한다. 이 프로필의 Layer는 프로필 내부에서는 필수일 수 있지만 H1~H5, WI Simulation, Scenario 상대 공간과 E7의 공통 필수 조건은 아니다. DEM·도로를 사용하지 않는 세계는 `NotRequired` 또는 `Optional / NotApplied`로 유효하게 유지한다.
+
 ```text
 원본 snapshot → EPSG:5186 고정 Tile → 공간 Layer
 → LandAllocationResult → LandscapeCompositionPlan

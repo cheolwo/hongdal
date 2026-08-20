@@ -7,7 +7,7 @@
 | 1 | `H1` | `h1-stock:farm-harvest-staging` 수확물 임시 적치 공간 | 사람 검토 우선 후보 |
 | 2 | `H1` | `h1-stock:farm-seed-preparation` 종자 준비 공간 | 사람 검토 우선 후보 |
 | 3 | `H1` | `h1-stock:farm-tool-storage` 농기구 보관 공간 | 사람 검토 우선 후보 |
-| 4 | `H1` | `h1-stock:farm-worker-waiting` 농장 작업자 대기 공간 | 사람 검토 우선 후보 |
+| 4 | `H1` | `h1-stock:farm-worker-waiting` 농가 귀환·작업자 대기 공간 | 사람 검토 우선 후보 |
 | 5 | `H1` | `h1-stock:hub-long-term-storage` Hub 장기 보관 공간 | 사람 검토 우선 후보 |
 | 6 | `H1` | `h1-stock:hub-temporary-staging` Hub 임시 적치 공간 | 사람 검토 우선 후보 |
 | 7 | `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | 사람 검토 우선 후보 |
@@ -63,7 +63,7 @@
 | 57 | `H2` | `h2-candidate:farm-incident-containment` 농장 사건 점검·격리 블록 | 0/3 필수 H1 승인 참조 |
 | 58 | `H2` | `h2-candidate:farm-loss-restoration-handoff` 농장 손실 회복·복원 인계 블록 | 0/3 필수 H1 승인 참조 |
 | 59 | `H2` | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | 0/2 필수 H1 승인 참조 |
-| 60 | `H2` | `h2-candidate:farm-worker-support` 농장 작업 지원 블록 | 0/3 필수 H1 승인 참조 |
+| 60 | `H2` | `h2-candidate:farm-worker-support` 농가·작업지원 생활 블록 | 0/3 필수 H1 승인 참조 |
 | 61 | `H2` | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | 0/3 필수 H1 승인 참조 |
 | 62 | `H2` | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | 0/2 필수 H1 승인 참조 |
 | 63 | `H2` | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | 0/2 필수 H1 승인 참조 |
@@ -91,7 +91,7 @@
 | 85 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | H2 설계 승인 전 조립 후보 |
 | 86 | `H3` | `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | H2 설계 승인 전 조립 후보 |
 | 87 | `H3` | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | H2 설계 승인 전 조립 후보 |
-| 88 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | H2 설계 승인 전 조립 후보 |
+| 88 | `H3` | `h3-candidate:farm-processing-campus` 농가·생산·후처리 생활 경관 | H2 설계 승인 전 조립 후보 |
 | 89 | `H3` | `h3-candidate:farm-seasonal-production-loop` Farm 계절 생산·출하 순환 경관 | H2 설계 승인 전 조립 후보 |
 | 90 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | H2 설계 승인 전 조립 후보 |
 | 91 | `H3` | `h3-candidate:hub-fulfillment-operations` City/Hub 보관·피킹·상차 운영 경관 | H2 설계 승인 전 조립 후보 |

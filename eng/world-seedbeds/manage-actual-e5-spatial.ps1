@@ -76,6 +76,7 @@ $worldInteractions = Read-Json "eng/execution-ledgers/world-interactions.json"
 $spatialPriorities = Read-Json "eng/world-seedbeds/wi-spatial-priorities.v1.json"
 $designCatalog = Read-Json "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
 $h1Definitions = Load-H1Definitions $designCatalog
+$outputRevision = if ($policy.PSObject.Properties.Name -contains "outputRevision") { [int] $policy.outputRevision } else { 1 }
 
 Require ([string] $policy.schemaVersion -eq "simulation-world-actual-e5-spatial-policy.v1") "PolicySchema"
 Require ([string] $theory.schemaVersion -eq "simulation-world-theory-spatial-factory-output.v1") "TheorySchema"
@@ -299,7 +300,7 @@ foreach ($h3 in @($theory.h3Plans | Where-Object {
         landscapeGraphStableId = $graphId
         graphBuildStableId = "graph-build:actual-e5:${graphSlug}:" + $graphHash.Substring(0, 12)
         graphRoleCode = if ($networkOwned) { "NetworkRoute" } else { [string] $areaPolicy.areaRoleCode }
-        graphRevision = 1
+        graphRevision = $outputRevision
         definitionHashSha256 = [string] $h3.theoryHashSha256
         graphHashSha256 = $graphHash
         spatialOwnerKindCode = $ownerKind
@@ -387,7 +388,7 @@ foreach ($areaPolicy in @($policy.areaSets)) {
     $definition = [ordered]@{
         schemaVersion = "simulation-world-area-set.v1"
         areaSetStableId = [string] $areaPolicy.actualAreaSetStableId
-        revision = 1
+        revision = $outputRevision
         title = [string] $theoryArea.title
         summary = "승인된 H1~H4를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다."
         definitionHashSha256 = $areaHash
@@ -403,11 +404,17 @@ foreach ($areaPolicy in @($policy.areaSets)) {
         presentationOnly = $true
         isOperationalState = $false
     }
+    $defaultEntryH3Ref = if ($areaPolicy.PSObject.Properties.Name -contains "defaultEntryH3Ref" -and
+        -not [string]::IsNullOrWhiteSpace([string] $areaPolicy.defaultEntryH3Ref)) {
+        [string] $areaPolicy.defaultEntryH3Ref
+    }
+    else { [string] $promotedInstances[0].h3Ref }
+    Require (@($promotedInstances.h3Ref) -contains $defaultEntryH3Ref) "DefaultEntryH3NotPromoted:$($areaPolicy.actualAreaSetStableId)"
     $areaSets += [ordered]@{
         theoryAreaSetStableId = [string] $areaPolicy.theoryAreaSetStableId
         areaRoleCode = [string] $areaPolicy.areaRoleCode
         loadPolicyCode = [string] $areaPolicy.loadPolicyCode
-        defaultEntryConnectorStableId = Stub-Id ([string] $promotedInstances[0].h3Ref) "ingress"
+        defaultEntryConnectorStableId = Stub-Id $defaultEntryH3Ref "ingress"
         definition = $definition
         graphs = $areaGraphs
     }
@@ -461,7 +468,7 @@ $networkHash = Text-Hash (Stable-Json $networkCore)
 $network = [ordered]@{
     schemaVersion = "simulation-world-area-set-network.v1"
     networkStableId = [string] $policy.networkStableId
-    revision = 1
+    revision = $outputRevision
     title = "평창 Nature–Farm–Hub–Town 게임 플레이 Network"
     summary = "Nature 생활 거점과 Farm·City/Hub·Town 업무 영역을 플레이어 이동과 화물 물류로 연결한 실제 E5 Network다."
     coordinateSpaceCode = [string] $policy.coordinateSpaceCode
@@ -503,7 +510,7 @@ foreach ($preference in @($policy.wiBindingPreferences.PSObject.Properties | Sor
             quantity = 1
             unitCode = "slot"
             evidenceKindCode = "Scenario"
-            evidenceReference = "actual-e5-spatial-policy.r2"
+            evidenceReference = [string] $policy.revision
             capacityRuleRevision = "actual-e5-work-area-capacity.r1"
         })
     }
@@ -582,7 +589,7 @@ $interactionSpatialCatalog.catalogHashSha256 = Text-Hash (Stable-Json $interacti
 
 $result = [ordered]@{
     schemaVersion = "simulation-world-actual-e5-spatial-output.v1"
-    revision = "simulation-world-actual-e5-spatial-output.r1"
+    revision = "simulation-world-actual-e5-spatial-output.r$outputRevision"
     policyRevision = [string] $policy.revision
     generatedAtRuleCode = "DeterministicNoWallClock"
     counts = [ordered]@{

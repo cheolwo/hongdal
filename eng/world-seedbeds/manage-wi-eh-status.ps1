@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet("Write", "Check")]
     [string] $Mode = "Check",
@@ -30,6 +30,21 @@ function Add-MapValue([hashtable] $Map, [string] $Key, [object] $Value) {
     $Map[$Key].Add($Value)
 }
 
+function Assert-RealityGroundingBoundary([object] $Plan, [string] $Raw, [string] $CodePrefix) {
+    Require (-not ($Raw -match '"requiredEvidencePurposeCodes"')) "$($CodePrefix)LegacyRequiredEvidenceForbidden"
+    Require ($Plan.PSObject.Properties.Name -contains "realityGrounding") "$($CodePrefix)RealityGroundingMissing"
+    $grounding = $Plan.realityGrounding
+    Require ([string] $grounding.stageCode -eq "E6") "$($CodePrefix)RealityGroundingStageInvalid"
+    Require (@("NotRequired", "Optional", "Required") -contains [string] $grounding.policyCode) "$($CodePrefix)RealityGroundingPolicyInvalid"
+    Require (@("NotApplied", "Applied", "Stale") -contains [string] $grounding.applicationStateCode) "$($CodePrefix)RealityGroundingStateInvalid"
+    Require (-not [bool] $grounding.blocksScenarioExecution) "$($CodePrefix)RealityGroundingMustNotBlockScenario"
+    if ([string] $grounding.policyCode -eq "Optional") {
+        Require (-not [bool] $grounding.requiredForTargetCompletion) "$($CodePrefix)OptionalGroundingMustNotBlockTarget"
+    }
+    $purposeCodes = @(Get-Values $grounding "candidateEvidencePurposeCodes")
+    Require ($purposeCodes.Count -eq @($purposeCodes | Sort-Object -Unique).Count) "$($CodePrefix)RealityGroundingPurposeDuplicate"
+}
+
 function Get-Hash([string] $Content) {
     $sha = [Security.Cryptography.SHA256]::Create()
     try {
@@ -54,6 +69,7 @@ $bindingPath = Join-Path $repositoryRoot "eng/world-seedbeds/area-sets/pyeongcha
 $resourceInventoryPath = Join-Path $repositoryRoot "eng/world-seedbeds/spatial-resource-inventory/catalog.v1.json"
 $compositionPlanPath = Join-Path $repositoryRoot "eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json"
 $p2CompositionPlanPath = Join-Path $repositoryRoot "eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json"
+$actualE5Path = Join-Path $repositoryRoot "eng/world-seedbeds/generated/actual-e5-spatial.v1.json"
 
 $worldCatalog = Read-Json $worldCatalogPath
 $priority = Read-Json $priorityPath
@@ -63,6 +79,11 @@ $bindings = Read-Json $bindingPath
 $resourceInventory = Read-Json $resourceInventoryPath
 $compositionPlan = Read-Json $compositionPlanPath
 $p2CompositionPlan = Read-Json $p2CompositionPlanPath
+$actualE5 = Read-Json $actualE5Path
+$actualE5BindingsById = @{}
+foreach ($binding in @($actualE5.interactionSpatialCatalog.bindings)) {
+    $actualE5BindingsById[[string] $binding.bindingStableId] = $binding
+}
 
 Require ([string] $worldCatalog.revision -eq [string] $priority.worldInteractionCatalogRevision) "PriorityWorldCatalogRevisionMismatch"
 Require (@($worldCatalog.items).Count -eq 41) "WorldInteractionCountMustBe41"
@@ -154,6 +175,7 @@ foreach ($relation in @($compositionPlan.relations)) {
 }
 $compositionPlanRaw = Get-Content -LiteralPath $compositionPlanPath -Raw -Encoding UTF8
 Require (-not ($compositionPlanRaw -match '"(absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath)"')) "CompositionPlanAuthorityFieldForbidden"
+Assert-RealityGroundingBoundary $compositionPlan $compositionPlanRaw "CompositionPlan"
 
 $p2PlanWiIds = @($p2CompositionPlan.worldInteractionSequence)
 Require (($p2PlanWiIds -join ",") -eq "WI-LOG-04,WI-LOG-05,WI-001,WI-002") "P2CompositionPlanSequenceInvalid"
@@ -171,6 +193,7 @@ foreach ($relation in @($p2CompositionPlan.relations)) {
 }
 $p2CompositionPlanRaw = Get-Content -LiteralPath $p2CompositionPlanPath -Raw -Encoding UTF8
 Require (-not ($p2CompositionPlanRaw -match '"(absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath)"')) "P2CompositionPlanAuthorityFieldForbidden"
+Assert-RealityGroundingBoundary $p2CompositionPlan $p2CompositionPlanRaw "P2CompositionPlan"
 
 $rows = @()
 foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) {
@@ -206,15 +229,18 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
     $warnings = [Collections.Generic.List[string]]::new()
     if ($participation -eq "Required" -and $interaction.Count -eq 0) { $warnings.Add("RequiredSpatialDesignMissing") }
     if ($graphBindings.Count -gt 0 -and $official.Count -eq 0) { $warnings.Add("GraphBindingWithoutApprovedH1") }
-    if ($e5Refs.Count -gt 0 -and $officialH2Count -eq 0) { $warnings.Add("E5PlacementReferenceWithoutH2Definition") }
+    $resolvedE5Bindings = @($e5Refs | Where-Object { $actualE5BindingsById.ContainsKey([string] $_) })
+    if ($e5Refs.Count -gt 0 -and $resolvedE5Bindings.Count -ne $e5Refs.Count) { $warnings.Add("E5PlacementReferenceMissing") }
     if ([string] $item.integration.currentStage -eq "E4" -and $official.Count -eq 0) { $warnings.Add("E4WithoutApprovedH1") }
 
     $designState = if ($participation -eq "NotRequired") { "NotApplicable" }
+        elseif ([string] $item.integration.currentStage -in @("E5", "E6", "E7") -and $e5Refs.Count -gt 0 -and $resolvedE5Bindings.Count -eq $e5Refs.Count) { "EstablishedH3" }
         elseif ($official.Count -gt 0 -and [string] $item.integration.currentStage -eq "E4") { "EstablishedH1" }
         elseif ($interaction.Count -gt 0) { "CandidateLineage" }
         elseif ($participation -eq "Required") { "MissingRequired" }
         else { "NeedsDecision" }
     $engineState = switch ($designState) {
+        "EstablishedH3" { "ReadyForActualE5Input" }
         "EstablishedH1" { "ReadyForApprovedH1Input" }
         "CandidateLineage" { "DesignCandidateOnly" }
         "NotApplicable" { "NotApplicable" }
@@ -232,7 +258,7 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
         spatialParticipationCode = $participation
         priorityCode = $priorityCode
         spatialDesignStateCode = $designState
-        highestEstablishedHLevelCode = if ($designState -eq "EstablishedH1") { "H1" } else { "" }
+        highestEstablishedHLevelCode = if ($designState -eq "EstablishedH3") { "H3" } elseif ($designState -eq "EstablishedH1") { "H1" } else { "" }
         approvedH1DefinitionRefs = @($official | ForEach-Object stableId | Sort-Object -Unique)
         interactionH1CandidateRefs = $interactionIds
         expressionH1CandidateRefs = @($expression | ForEach-Object stableId | Sort-Object -Unique)
@@ -251,6 +277,7 @@ $summary = [ordered]@{
     totalWorldInteractions = $rows.Count
     implementationE3Count = @($rows | Where-Object implementationEvidenceStage -eq "E3").Count
     establishedH1Count = @($rows | Where-Object spatialDesignStateCode -eq "EstablishedH1").Count
+    establishedH3Count = @($rows | Where-Object spatialDesignStateCode -eq "EstablishedH3").Count
     candidateLineageCount = @($rows | Where-Object spatialDesignStateCode -eq "CandidateLineage").Count
     missingRequiredCount = @($rows | Where-Object spatialDesignStateCode -eq "MissingRequired").Count
     notApplicableCount = @($rows | Where-Object spatialDesignStateCode -eq "NotApplicable").Count
@@ -260,7 +287,8 @@ $summary = [ordered]@{
     definedH4Count = 1
 }
 Require ($summary.implementationE3Count -eq 41) "AllWorldInteractionsMustBeE3"
-Require ($summary.establishedH1Count -eq 13) "EstablishedH1CountMustBe13"
+Require ($summary.establishedH1Count -eq 5) "EstablishedH1CountMustBe5"
+Require ($summary.establishedH3Count -eq 8) "EstablishedH3CountMustBe8"
 Require ($summary.candidateLineageCount -eq 22) "CandidateLineageCountMustBe22"
 Require ($summary.missingRequiredCount -eq 0) "MissingRequiredCountMustBe0"
 Require ($summary.notApplicableCount -eq 6) "NotApplicableCountMustBe6"
@@ -285,10 +313,12 @@ $payload = [ordered]@{
     items = $rows
     authorityBoundary = [ordered]@{
         candidateLineageDoesNotRaiseEvidence = $true
-        graphBindingDoesNotProveE5 = $true
-        actualH2RequiredForE5 = $true
+        authoredGraphBindingAloneDoesNotProveE5 = $true
+        actualE5BindingWithRevisionAndHashProvesH3Placement = $true
         scenarioFallbackForbiddenForGraphRequest = $true
         lhEngineConsumesApprovedH1Only = $true
+        optionalRealityGroundingDoesNotBlockScenarioExecution = $true
+        demAndRoadAreNotGlobalRequirements = $true
     }
     presentationOnly = $true
     isOperationalState = $false
@@ -306,6 +336,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- WI: ``$($summary.totalWorldInteractions)개`` · E3: ``$($summary.implementationE3Count)개``")
 [void] $builder.AppendLine("- E4/H1 실행 성립: ``$($summary.establishedH1Count)개``")
+[void] $builder.AppendLine("- E5/H3 실제 공간 결속: ``$($summary.establishedH3Count)개``")
 [void] $builder.AppendLine("- H1~H4 설계 후보 계보만 존재: ``$($summary.candidateLineageCount)개``")
 [void] $builder.AppendLine("- 필수 공간 설계 누락: ``$($summary.missingRequiredCount)개``")
 [void] $builder.AppendLine("- 공간 비적용: ``$($summary.notApplicableCount)개``")
@@ -329,12 +360,12 @@ foreach ($group in @($rows | Group-Object groupCode)) {
 [void] $builder.AppendLine("## P1 기준 플레이 공간 구성")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("``WI-FARM-04 → WI-FARM-05 → WI-FARM-06 → WI-LOG-01``을 생산구획 → 집하 → 포장 → 상차 공간으로 연결한다.")
-[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json``에 있다. H 설계 승인은 공공데이터와 독립이며, 실제 AreaSet의 작성 도로·Block 경계와 이동 폐루프가 아직 없어 E5로 승격하지 않는다. 필요한 공공데이터 목적은 E6 계획으로만 기록한다.")
+[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json``에 있다. H 설계와 Scenario 실행은 공공데이터와 독립이다. DEM·토지피복·도로·Block 경계는 현실 정합을 선택할 때 사용하는 E6 후보 목적이며, 미적용 상태는 H 공간이나 Scenario E7을 차단하지 않는다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## P2 진부 Hub 입고·보관 공간 구성")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("``WI-LOG-04 → WI-LOG-05 → WI-001 → WI-002``를 하차 공간 → 인수·검수 공간 → 창고 적재 공간으로 연결한다.")
-[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json``에 있다. 진부 Hub의 실제 업무 Node와 E5 배치 Block이 없어 지역 인스턴스 후보로 유지하며, 필요한 공공데이터 목적은 E6 계획으로만 기록한다.")
+[void] $builder.AppendLine("실행 입력은 ``eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json``에 있다. 진부 Hub의 권위 업무 Node와 E5 배치 Block이 없어 지역 인스턴스 후보로 유지한다. 도로·건물·Block 경계는 현실 정합을 선택할 때만 E6 후보 목적이 되며 Scenario 공간 실행을 막지 않는다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 확인이 필요한 공백")
 [void] $builder.AppendLine()
@@ -348,12 +379,12 @@ $resolvedMarkdownOutput = Join-Path $repositoryRoot $OutputMarkdownPath
 if ($Mode -eq "Write") {
     Write-DeterministicTextIfChanged $resolvedJsonOutput $expectedJson | Out-Null
     Write-DeterministicTextIfChanged $resolvedMarkdownOutput $expectedMarkdown | Out-Null
-    Write-Output "WorldInteractionEhStatusGenerated:Items=$($rows.Count);EstablishedH1=$($summary.establishedH1Count);Candidate=$($summary.candidateLineageCount);Missing=$($summary.missingRequiredCount)"
+    Write-Output "WorldInteractionEhStatusGenerated:Items=$($rows.Count);EstablishedH1=$($summary.establishedH1Count);EstablishedH3=$($summary.establishedH3Count);Candidate=$($summary.candidateLineageCount);Missing=$($summary.missingRequiredCount)"
 }
 else {
     Require (Test-Path -LiteralPath $resolvedJsonOutput) "GeneratedJsonMissing"
     Require (Test-Path -LiteralPath $resolvedMarkdownOutput) "GeneratedMarkdownMissing"
     Require ((ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedJsonOutput))) -ceq $expectedJson) "GeneratedJsonOutOfDate"
     Require ((ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedMarkdownOutput))) -ceq $expectedMarkdown) "GeneratedMarkdownOutOfDate"
-    Write-Output "WorldInteractionEhStatusValid:Items=$($rows.Count);EstablishedH1=$($summary.establishedH1Count);Candidate=$($summary.candidateLineageCount);Missing=$($summary.missingRequiredCount)"
+    Write-Output "WorldInteractionEhStatusValid:Items=$($rows.Count);EstablishedH1=$($summary.establishedH1Count);EstablishedH3=$($summary.establishedH3Count);Candidate=$($summary.candidateLineageCount);Missing=$($summary.missingRequiredCount)"
 }

@@ -1,8 +1,8 @@
 {
   "catalogKey": "simulation-world-interactions",
   "schemaVersion": "3",
-  "revision": "simulation-world-interactions.r4",
-  "lastVerifiedDate": "2026-08-18",
+  "revision": "simulation-world-interactions.r5",
+  "lastVerifiedDate": "2026-08-20",
   "defaultImplementationTargetStage": "E3",
   "defaultIntegrationTargetStage": "E7",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -19,7 +19,7 @@
       "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/confirm"],
       "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationFarmSurvival.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 밭갈이 자동 시험 통과."] },
-      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:wi-farm-01:production-plot"], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판에서 Preview·Confirm·예약·Task·Effect·Save/Replay를 다시 통과했다. 기존 Graph·DB 증거는 E5 배치 후보로 보존한다."] },
+      "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-farm-01"], "e6EvidenceRefs": ["question:highland-farm:cultivation-flow.r1", "question:highland-farm:crop-context.r1"], "e7EvidenceRefs": [], "evidence": ["Farm E5 고지대 농장 Graph 결속을 유지한 채 E6 질문 행렬과 농사로 설명 근거를 통과했다. GIS는 NotApplied이며 E7 실제 플레이 증거는 아직 없다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
@@ -30,7 +30,7 @@
       "cancellationPolicy": "작업 전 예약을 반환하며 이미 소비된 종자는 별도 규칙을 따른다.", "blockReasonCodes": ["CultivationParcelUnavailable", "SeedInsufficient"],
       "predecessorWiIds": ["WI-FARM-01"], "successorWiIds": ["WI-FARM-03"], "actionCode": "Sowing", "ruleRevision": "world-interaction.farm.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 파종·종자 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:wi-farm-02:production-plot"], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판에서 파종 공간 요구와 공급선 재실행을 통과했다. 기존 Graph·DB 증거는 E5 배치 후보로 보존한다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 파종·종자 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-farm-02"], "e6EvidenceRefs": ["question:highland-farm:cultivation-flow.r1", "question:farm-seasonal:calendar-context.r1"], "e7EvidenceRefs": [], "evidence": ["고지대 농장과 계절 생산 H3의 E6 질문·작물 문맥을 통과했다. GIS는 NotApplied이며 E7 실제 플레이 증거는 아직 없다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
@@ -41,7 +41,7 @@
       "cancellationPolicy": "미사용 예약만 반환한다.", "blockReasonCodes": ["CropStateInvalid", "WaterUnavailable"],
       "predecessorWiIds": ["WI-FARM-02"], "successorWiIds": ["WI-FARM-04"], "actionCode": "CropCare", "ruleRevision": "world-interaction.farm.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용 예정"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 재배 관리·물 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:wi-farm-03:production-plot"], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판에서 재배 관리 공간 요구와 공급선 재실행을 통과했다. 기존 Graph·DB 증거는 E5 배치 후보로 보존한다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 재배 관리·물 예약 자동 시험 통과."] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-farm-03"], "e6EvidenceRefs": ["question:highland-farm:crop-context.r1", "question:farm-seasonal:repeat-loop.r1"], "e7EvidenceRefs": [], "evidence": ["고지대 재배 공간과 계절 반복 흐름의 E6 질문을 통과했다. GIS는 NotApplied이며 E7 실제 플레이 증거는 아직 없다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
@@ -53,7 +53,7 @@
       "predecessorWiIds": ["WI-FARM-03"], "successorWiIds": ["WI-FARM-05"], "actionCode": "Harvesting", "ruleRevision": "world-interaction.farm-supply.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm", "CultivationUnits", "HarvestLots"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/farm-survival/work/confirm"],
       "existingImplementationReferences": ["Ssalddel.Simulation.Domain/Simulation감자생산규칙.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg 결정적 수확·공간 예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 생산 공간 모판의 수확 작업과 작업마당 출력 연결구를 사용해 300kg 공급선 재실행을 통과했다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg 결정적 수확·공간 예약·취소·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-production.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-farm-04"], "e6EvidenceRefs": ["question:highland-farm:cultivation-flow.r1", "closure:farm:harvest-to-processing.r1"], "e7EvidenceRefs": [], "evidence": ["수확 장소·상태 변화와 후처리 H3 인계 폐루프가 E6에서 통과했다. E7 실제 조작은 아직 없다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Contracts/Simulation감자생산Contracts.cs"], "notes": ["Scenario 공간은 실제 공공 공간자료 증거가 아니다."]
     },
     {
@@ -64,7 +64,7 @@
       "cancellationPolicy": "완료 전 Lot·작업 영역 예약을 반환한다.", "blockReasonCodes": ["HarvestLotStateInvalid", "SimulationSpatialReservationConflict"],
       "predecessorWiIds": ["WI-FARM-04"], "successorWiIds": ["WI-FARM-06"], "actionCode": "HarvestCollection", "ruleRevision": "world-interaction.farm-supply.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm", "HarvestLots"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["수확 Lot 집하 상태 전이·공간 예약·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-work-yard.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 작업마당 공간 모판의 집하영역에서 공간 예약과 공급선 재실행을 통과했다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["수확 Lot 집하 상태 전이·공간 예약·Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-work-yard.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-farm-05"], "e6EvidenceRefs": ["question:farm-processing:place-flow.r1", "closure:farm:harvest-to-processing.r1"], "e7EvidenceRefs": [], "evidence": ["수확 Lot의 집하 장소와 수확 H3 인계 폐루프가 E6에서 통과했다. E7 실제 조작은 아직 없다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
@@ -75,7 +75,7 @@
       "cancellationPolicy": "완료 전 Lot·작업 영역 예약을 반환한다.", "blockReasonCodes": ["HarvestLotStateInvalid", "PackingWorkAreaUnavailable"],
       "predecessorWiIds": ["WI-FARM-05"], "successorWiIds": ["WI-LOG-01"], "actionCode": "OutboundPacking", "ruleRevision": "world-interaction.farm-supply.r1",
       "saveReplayPayloadCodes": ["FarmWorkConfirm", "HarvestLots", "PackageLots"], "httpContracts": ["기존 농장 작업 Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/SimulationLogisticsMovementContracts.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg PackageLot·Cargo·출하 배분 계보와 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-work-yard.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 작업마당 공간 모판의 포장영역과 상차 출력 연결구에서 300kg Cargo 계보를 재검증했다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["300kg PackageLot·Cargo·출하 배분 계보와 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-work-yard.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-farm-06"], "e6EvidenceRefs": ["question:farm-processing:potato-context.r1", "closure:farm:processing-to-shipping.r1"], "e7EvidenceRefs": [], "evidence": ["감자 후처리·포장 문맥과 출하 H3 인계 폐루프가 E6에서 통과했다. E7 실제 조작은 아직 없다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["기존 물류 요청의 HarvestLotStableId·PackageLotStableId·CargoStableId를 이어 쓴다."]
     },
     {
@@ -86,7 +86,7 @@
       "cancellationPolicy": "출발 전 모든 예약을 계보로 반환한다.", "blockReasonCodes": ["FreightVehicleCapacityExceeded", "SimulationSpatialReservationConflict"],
       "predecessorWiIds": ["WI-FARM-06"], "successorWiIds": ["WI-LOG-02"], "actionCode": "CargoRouteMovement", "ruleRevision": "world-interaction.logistics.r1",
       "saveReplayPayloadCodes": ["LogisticsMovementConfirm", "SpatialReservations"], "httpContracts": ["기존 logistics-movements 또는 freight-transports Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs", "Ssalddel.Simulation.Domain/SimulationFreightTransport.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["상차 공간·차량 용량·원본 배분 예약과 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 상차·Gate 공간 모판의 상차영역에서 차량·화물·작업영역 요구를 재검증했다."] },
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["상차 공간·차량 용량·원본 배분 예약과 시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-log-01"], "e6EvidenceRefs": ["question:farm-seasonal:repeat-loop.r1", "closure:farm:processing-to-shipping.r1"], "e7EvidenceRefs": [], "evidence": ["상차 공간·출하 상태와 포장 출력 인계가 E6에서 통과했다. E7에서는 Farm Gate 출하 준비까지만 검증한다."] },
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["하나의 명령이 출발·이동·도착 자동 전이의 원인이다."]
     },
     {
@@ -97,7 +97,7 @@
       "cancellationPolicy": "출발 이후 취소 규칙은 부모 운송 작업이 소유한다.", "blockReasonCodes": [], "predecessorWiIds": ["WI-LOG-01"], "successorWiIds": ["WI-LOG-03"],
       "actionCode": "CargoDepartureTransition", "ruleRevision": "world-interaction.logistics.r1", "saveReplayPayloadCodes": ["LogisticsMovementState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationLogisticsMovement.cs"],
       "automaticTransition": { "triggerWiId": "WI-LOG-01", "triggerState": "Reserved", "targetState": "InTransit", "causeLineage": "부모 물류 TaskStableId" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["운송 첫 Tick에서 상차 공간 예약 해제와 운송중 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["농장 상차·Gate 공간 모판에서 상차영역과 Farm Gate의 내부 전이 및 회랑 출력 연결구를 검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["운송 첫 Tick에서 상차 공간 예약 해제와 운송중 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-log-02"], "e6EvidenceRefs": ["question:farm-seasonal:repeat-loop.r1", "closure:farm:processing-to-shipping.r1"], "e7EvidenceRefs": [], "evidence": ["Farm Gate 출발과 계절 출하 폐루프가 E6에서 통과했다. 첫 Farm E7에서는 실제 출발 조작을 별도로 검증한다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
       "id": "WI-LOG-03", "groupCode": "LOG", "sequence": 3, "title": "Farm→Hub 화물 이동", "kind": "AutomaticTransition",

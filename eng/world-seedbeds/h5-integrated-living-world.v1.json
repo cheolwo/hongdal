@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "h5-integrated-living-world.v1",
+  "contractStableId": "contract:h5:integrated-living-world:v1",
+  "displayNameKo": "H5 통합 생활세계 기준 구현 계약",
+  "authority": {
+    "staticSpatialAuthority": "H5WorldLayout",
+    "runtimeStateAuthority": "SimulationSession",
+    "presentationAuthority": "None",
+    "publicDataRequired": false,
+    "unityRuntimeValidated": false
+  },
+  "gameplayLoop": [
+    "HubManufacturing",
+    "FarmCargoDelivery",
+    "FarmBarracksConstruction",
+    "PotatoPackaging",
+    "MilitiaFormation",
+    "FarmGateBattle",
+    "FacilityDamage",
+    "FacilityRepair",
+    "FarmShippingRestored"
+  ],
+  "spatialBindings": [
+    {
+      "h1StableId": "h1:hub:manufacturing-workshop",
+      "spatialRoleCode": "ManufacturingWorkshop",
+      "capabilityCodes": ["Manufacturing", "WorkerAccessible", "CargoAccessible"],
+      "wiActionCodes": ["WI-MFG-01"]
+    },
+    {
+      "h1StableId": "h1:farm:military-build-site",
+      "spatialRoleCode": "MilitaryFacilityBuildSite",
+      "capabilityCodes": ["ConstructionSite", "WorkerAccessible", "CargoAccessible"],
+      "wiActionCodes": ["WI-CON-01"]
+    },
+    {
+      "h1StableId": "h1:farm:training-yard",
+      "spatialRoleCode": "OutdoorTrainingArea",
+      "capabilityCodes": ["TrainingWorkArea", "WorkerAccessible"],
+      "wiActionCodes": ["WI-MIL-02", "WI-MIL-03"]
+    },
+    {
+      "h1StableId": "h1:farm:warehouse-site",
+      "spatialRoleCode": "FarmWarehouseSite",
+      "capabilityCodes": ["Storage", "LoadingWorkArea", "RepairWorkArea", "CargoAccessible"],
+      "wiActionCodes": ["WI-FARM-06", "WI-WORLD-04"]
+    },
+    {
+      "h1StableId": "h1:farm:gate",
+      "spatialRoleCode": "FarmGateEncounterArea",
+      "capabilityCodes": ["Garrison", "BattleContextSource", "CargoAccessible"],
+      "wiActionCodes": ["WI-LOG-03", "WI-MIL-03"]
+    }
+  ],
+  "runtimeFacilitySeeds": [
+    "facility:farm:warehouse:existing",
+    "facility:hub:workshop:existing",
+    "facility:town:market:existing"
+  ],
+  "playerBuiltFacilityDefinitions": [
+    "facility-definition:barracks:v1"
+  ],
+  "invariants": [
+    "H1IsSpaceAndFacilityIsSessionRuntimeState",
+    "TransportBoxIsPackagingInputNotUniversalCargoRequirement",
+    "EffectsAreImmutableAndPendingAndAppliedReceiptsAreSeparate",
+    "BattleContextHashExcludesSourceWorldRevision",
+    "RepairResolvesOnlyRestrictionsFrozenAtConfirm",
+    "PublicDataE6IsOptionalAndSeparate",
+    "UnityDoesNotConfirmSimulationCompletion"
+  ],
+  "evidence": {
+    "implementationTarget": "E3",
+    "spatialInventoryLevel": "H5ScenarioRelative",
+    "actualE5Bound": false,
+    "e6RealityGrounded": false,
+    "e7RuntimeValidated": false
+  }
+}

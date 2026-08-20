@@ -1,10 +1,11 @@
 {
   "schemaVersion": "simulation-world-actual-e5-spatial-policy.v1",
-  "revision": "simulation-world-actual-e5-spatial-policy.r2",
+  "revision": "simulation-world-actual-e5-spatial-policy.r3",
+  "outputRevision": 2,
   "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
   "legacyFacadeAreaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
   "coordinateSpaceCode": "ScenarioLocalMeters",
-  "approvalSourceStableId": "source:user-approved-plan:actual-e5-regional-gameplay-skeleton.r1",
+  "approvalSourceStableId": "source:user-approved-plan:farm-immersive-living-region.r2",
   "areaSets": [
     {
       "theoryAreaSetStableId": "area-set:theory:nature-home-exploration-region",
@@ -16,7 +17,8 @@
       "theoryAreaSetStableId": "area-set:theory:farm-production-processing-region",
       "actualAreaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
       "areaRoleCode": "Farm",
-      "loadPolicyCode": "OnDemand"
+      "loadPolicyCode": "OnDemand",
+      "defaultEntryH3Ref": "h3-candidate:farm-processing-campus"
     },
     {
       "theoryAreaSetStableId": "area-set:theory:logistics-hub-region",

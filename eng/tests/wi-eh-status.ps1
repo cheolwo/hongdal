@@ -29,7 +29,8 @@ if ([string] $status.schemaVersion -ne "simulation-world-interaction-eh-status.v
 }
 $summaryInvalid = $status.summary.totalWorldInteractions -ne 41 -or
     $status.summary.implementationE3Count -ne 41 -or
-    $status.summary.establishedH1Count -ne 13 -or
+    $status.summary.establishedH1Count -ne 5 -or
+    $status.summary.establishedH3Count -ne 8 -or
     $status.summary.candidateLineageCount -ne 22 -or
     $status.summary.missingRequiredCount -ne 0 -or
     $status.summary.notApplicableCount -ne 6
@@ -42,6 +43,10 @@ $hierarchyCountsInvalid = $status.summary.officialH1DefinitionCount -ne 5 -or
     $status.summary.definedH4Count -ne 1
 if ($hierarchyCountsInvalid) {
     throw "WorldInteractionEhStatusHierarchyCountsInvalid"
+}
+if (-not [bool] $status.authorityBoundary.optionalRealityGroundingDoesNotBlockScenarioExecution -or
+    -not [bool] $status.authorityBoundary.demAndRoadAreNotGlobalRequirements) {
+    throw "WorldInteractionOptionalRealityGroundingBoundaryInvalid"
 }
 $orderPacking = @($status.items | Where-Object worldInteractionId -eq "WI-ORDER-04")
 $orderPackingInvalid = $orderPacking.Count -ne 1 -or
@@ -70,10 +75,10 @@ if ($repairInvalid) {
     throw "WorldInteractionFacilityRepairGapMissing"
 }
 if (@($status.items | Where-Object {
-    (@($_.e5PlacementCandidateRefs).Count -gt 0) -and
-    (@($_.warningCodes) -notcontains "E5PlacementReferenceWithoutH2Definition")
+    $_.integrationEvidenceStage -eq "E5" -and
+    ($_.spatialDesignStateCode -ne "EstablishedH3" -or $_.highestEstablishedHLevelCode -ne "H3" -or @($_.warningCodes).Count -gt 0)
 }).Count -ne 0) {
-    throw "WorldInteractionE5CandidateBoundaryMissing"
+    throw "WorldInteractionActualE5BoundaryInvalid"
 }
 if ($check -notmatch "WorldInteractionEhStatusValid:Items=41") {
     throw "WorldInteractionEhStatusCheckDidNotComplete"

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-composition-plan.v1",
   "planStableId": "wi-spatial-composition-plan:p2-hub-inbound-storage.v1",
-  "revision": 1,
+  "revision": 2,
   "title": "진부 Hub 하차·인수·검수·적재 공간 구성",
   "priorityCode": "P2",
   "knowledgeStateCode": "CandidateForReview",
@@ -106,17 +106,27 @@
     "forbidsAbsoluteCoordinatesBeforeE5PlacementApproval": true,
     "forbidsScenarioFallbackForGraphRequest": true
   },
-  "publicDataLinkageStageCode": "E6",
-  "requiredEvidencePurposeCodes": [
-    "RoadNetwork",
-    "BuildingFootprint",
-    "BlockBoundary"
-  ],
+  "realityGrounding": {
+    "stageCode": "E6",
+    "policyCode": "Optional",
+    "applicationStateCode": "NotApplied",
+    "requiredForTargetCompletion": false,
+    "blocksScenarioExecution": false,
+    "candidateEvidencePurposeCodes": [
+      "RoadNetwork",
+      "BuildingFootprint",
+      "BlockBoundary"
+    ],
+    "groundingGapItems": [
+      "실제 도로·건물·블록 경계에 정합시키는 프로필을 선택할 경우 해당 근거가 아직 연결되지 않았다."
+    ],
+    "limitations": [
+      "창고 10000 KGM과 작업영역 1 slot은 Scenario 설계 용량이며 실측 용량이 아니다."
+    ]
+  },
   "unresolvedItems": [
     "진부 Hub 경관 그래프에 승인된 업무 공간 Node가 아직 없다.",
-    "Hub 진입 도로와 상하차 동선의 실제 연결 근거가 없다.",
-    "결정적 H2 Block 경계와 내부 보행·화물 이동 경로가 없다.",
-    "창고 10000 KGM과 작업영역 1 slot은 Scenario 근거이며 실측 용량이 아니다."
+    "결정적 H2 Block 경계와 내부 보행·화물 이동 경로가 없다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

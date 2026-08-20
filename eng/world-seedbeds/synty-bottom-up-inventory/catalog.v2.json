@@ -96,11 +96,11 @@
     },
     {
       "stableId": "h1-stock:farm-tool-storage",
-      "revision": 1,
+      "revision": 2,
       "definitionPath": "definitions/h1/farm-tool-storage.v2.json",
-      "definitionSha256": "d1461678235a5ede8066a233b839534d4e1b41de6906e4881050572c3eb6d6de",
+      "definitionSha256": "d89ece784f4bbe8dde4e54d3fa5299c76c80ebd04d9a6626f90bca1feeede096",
       "documentPath": "authored/h1/farm-tool-storage.v2.md",
-      "documentSha256": "9d1a1a588bdbb082ecf6f03da3365fc7d5868603cdac78c184a6bfbae7771eac"
+      "documentSha256": "c894fe116d5327bb87f1ad24984a859106bfe634548f44272f266f3c3abefbc4"
     },
     {
       "stableId": "h1-stock:farm-washing",
@@ -128,11 +128,11 @@
     },
     {
       "stableId": "h1-stock:farm-worker-waiting",
-      "revision": 1,
+      "revision": 2,
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "726b76a248946581eb9ebeef143fc85a99c3bdf0f217d2f0aeea747c4d842345",
+      "definitionSha256": "1643289d8cf85b448d01c3425a93474dca336dc40c26e984b459df6441736e4b",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "67fb63f6950ceb648e34abc42469a3d31e679869f21b7b379eda495cd781f2f0"
+      "documentSha256": "c0bce67dcc86f09d8690569d183e8f051f74926c0f85c9ec228eaa25e253f1c7"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -490,11 +490,11 @@
     },
     {
       "stableId": "h2-candidate:farm-worker-support",
-      "revision": 1,
+      "revision": 2,
       "definitionPath": "definitions/h2/farm-worker-support.v2.json",
-      "definitionSha256": "1ed13a196931e9cc2c28d5764e9bafcd3aec9bfa1bfe3d35976121df73795768",
+      "definitionSha256": "f716186b2907d80bb62a1323443cf05c97eb8e4d0e6f0e5ff17a58ed2800a2fb",
       "documentPath": "authored/h2/farm-worker-support.v2.md",
-      "documentSha256": "53a42c7eed89af1d60c20a6416fc0dd40572a11a5662fd06ee789de98a7ad0b7"
+      "documentSha256": "217f0a06301b479cf839d4141882079097b911ef6c96a10db18882681f7bc2d9"
     },
     {
       "stableId": "h2-candidate:forest-edge-farm",
@@ -748,11 +748,11 @@
     },
     {
       "stableId": "h3-candidate:farm-processing-campus",
-      "revision": 1,
+      "revision": 2,
       "definitionPath": "definitions/h3/farm-processing-campus.v2.json",
-      "definitionSha256": "35760a6fdf106d7c084df32c3f23a084b00c23299f01538cf9a8bacc51637cc2",
+      "definitionSha256": "f8f06098e61132efb93d6107798ce79acb9bcb6b1aa1513108281f7772b558c0",
       "documentPath": "authored/h3/farm-processing-campus.v2.md",
-      "documentSha256": "22b5f000efbf232c97ef733f4644c5747adfef1df7b3974a8e0837b1d5d56f51"
+      "documentSha256": "c0433c68a9647d8efe470c8eebf3095d1528ce81cb6c66c32ff8b28f9dc7d219"
     },
     {
       "stableId": "h3-candidate:farm-seasonal-production-loop",

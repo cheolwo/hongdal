@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-composition-plan.v1",
   "planStableId": "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
-  "revision": 1,
+  "revision": 2,
   "title": "기준 플레이 01 수확·집하·포장·상차 공간 구성",
   "priorityCode": "P1",
   "knowledgeStateCode": "CandidateForReview",
@@ -135,15 +135,23 @@
     "forbidsAbsoluteCoordinatesBeforeE5PlacementApproval": true,
     "forbidsScenarioFallbackForGraphRequest": true
   },
-  "publicDataLinkageStageCode": "E6",
-  "requiredEvidencePurposeCodes": [
-    "TerrainElevation",
-    "LandCoverClassification",
-    "RoadNetwork",
-    "BlockBoundary"
-  ],
+  "realityGrounding": {
+    "stageCode": "E6",
+    "policyCode": "Optional",
+    "applicationStateCode": "NotApplied",
+    "requiredForTargetCompletion": false,
+    "blocksScenarioExecution": false,
+    "candidateEvidencePurposeCodes": [
+      "TerrainElevation",
+      "LandCoverClassification",
+      "RoadNetwork",
+      "BlockBoundary"
+    ],
+    "groundingGapItems": [
+      "실제 지형·토지피복·도로·블록 경계에 정합시키는 프로필을 선택할 경우 해당 근거가 아직 연결되지 않았다."
+    ]
+  },
   "unresolvedItems": [
-    "실제 도로 Network와 교차로 근거가 없다.",
     "결정적 H2 Block 경계와 내부 보행 경로가 없다.",
     "Farm Gate와 Farm–Hub 경관의 양쪽 연결구가 실제 배치되지 않았다."
   ],

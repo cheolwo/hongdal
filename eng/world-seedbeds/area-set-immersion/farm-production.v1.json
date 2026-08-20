@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "simulation-area-set-immersion-profile.v1",
+  "profileRevision": "farm-area-set-immersion.r1",
+  "questionMatrixRevision": "farm-immersion-questions.r1",
+  "immersionPolicyRevision": "area-set-immersion-policy.r1",
+  "generatorVersion": "manage-area-set-immersion.ps1.r1",
+  "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+  "spatialMaturityCode": "E5Qualified",
+  "e7GatePolicyCode": "RequiredBeforeE7",
+  "evidenceSnapshots": [
+    {
+      "evidenceSnapshotStableId": "evidence-snapshot:farm:nongsaro-potato-profile-contract.r1",
+      "evidenceKindCode": "NongsaroReference",
+      "sourceStableId": "crop-requirement-profile:nongsaro.potato.1",
+      "sourceRevision": "1",
+      "sourceReferencePath": "Ssalddel/Services/AgriculturalFisheries/Information/농사로감자생육요구ProfileQuery.cs",
+      "linkStatusCode": "ContractReference",
+      "limitationCodes": [
+        "DescriptiveContextOnly",
+        "PendingHumanReview",
+        "ProductRelationUnlinked",
+        "NotSimulationThreshold"
+      ]
+    },
+    {
+      "evidenceSnapshotStableId": "evidence-snapshot:farm:kamis-market-context-contract.r1",
+      "evidenceKindCode": "KamisMarketContext",
+      "sourceStableId": "public-data:kamis-price-observations",
+      "sourceRevision": "simulation-shared-public-data.v1",
+      "sourceReferencePath": "Ssalddel.Simulation.Contracts/SimulationSharedPublicDataContracts.cs",
+      "linkStatusCode": "ContractReference",
+      "limitationCodes": [
+        "MarketContextOnly",
+        "SourceUnitAndMarketStageRequired",
+        "NotProductionOrProfitRule",
+        "NoLiveProviderCallInQualification"
+      ]
+    },
+    {
+      "evidenceSnapshotStableId": "evidence-snapshot:farm:nongsaro-disaster-module-contract.r1",
+      "evidenceKindCode": "NongsaroReference",
+      "sourceStableId": "public-data:nongsaro-disaster-prevention-module",
+      "sourceRevision": "repository-contract.r1",
+      "sourceReferencePath": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro공공데이터Module.cs",
+      "linkStatusCode": "ContractReference",
+      "limitationCodes": [
+        "DescriptiveContextOnly",
+        "NoLiveProviderCallInQualification",
+        "NotAutomaticIncidentRule"
+      ]
+    },
+    {
+      "evidenceSnapshotStableId": "evidence-snapshot:farm:usda-ams-optional-contract.r1",
+      "evidenceKindCode": "UsdaAmsMarketContext",
+      "sourceStableId": "public-data:usda-ams-market-news",
+      "sourceRevision": "repository-contract.r1",
+      "sourceReferencePath": "Ssalddel/Services/AgriculturalFisheries/Information/UsdaAmsMarketNewsClient.cs",
+      "linkStatusCode": "OptionalContractReference",
+      "limitationCodes": [
+        "OptionalEvidence",
+        "DifferentCurrencyUnitAndMarketStage",
+        "NoDirectRankingWithoutAlignment",
+        "NoLiveProviderCallInQualification"
+      ]
+    }
+  ],
+  "h3Audits": [
+    {
+      "priority": 1,
+      "h3StableId": "h3-candidate:farm-processing-campus",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
+      "worldInteractionIds": ["WI-FARM-05", "WI-FARM-06", "WI-LOG-01"],
+      "questions": [
+        {
+          "questionStableId": "question:farm-processing:place-flow.r1",
+          "questionTypeCode": "SpatialFlow",
+          "questionText": "작업자 귀환·집하·선별·포장·상차가 같은 생활 구역 안에서 끊기지 않는가?",
+          "requiredForQualification": true,
+          "answerSummary": "작업지원 블록에서 생산·세척선별포장·출하 블록으로 이어지는 H2 관계와 WI-FARM-05~LOG-01 계보를 함께 사용한다.",
+          "evidenceSnapshotIds": []
+        },
+        {
+          "questionStableId": "question:farm-processing:potato-context.r1",
+          "questionTypeCode": "RealityContext",
+          "questionText": "감자 수확 뒤 후처리와 포장을 설명할 작물 문맥이 존재하는가?",
+          "requiredForQualification": true,
+          "answerSummary": "농사로 감자 Profile 계약을 설명 근거로 연결하되 포장 규칙과 생산량을 자동 생성하지 않는다.",
+          "evidenceSnapshotIds": ["evidence-snapshot:farm:nongsaro-potato-profile-contract.r1"]
+        },
+        {
+          "questionStableId": "question:farm-processing:market-context.r1",
+          "questionTypeCode": "RealityContext",
+          "questionText": "출하 선택을 설명할 국내 시장 관측 문맥이 출처·단위 경계와 함께 존재하는가?",
+          "requiredForQualification": true,
+          "answerSummary": "KAMIS 관측 계약을 시장 문맥으로만 연결하며 수익성 또는 출하 결정을 자동 확정하지 않는다.",
+          "evidenceSnapshotIds": ["evidence-snapshot:farm:kamis-market-context-contract.r1"]
+        }
+      ]
+    },
+    {
+      "priority": 2,
+      "h3StableId": "h3-candidate:highland-farm",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
+      "worldInteractionIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04"],
+      "questions": [
+        {
+          "questionStableId": "question:highland-farm:cultivation-flow.r1",
+          "questionTypeCode": "SpatialFlow",
+          "questionText": "농지 준비부터 수확까지 작업 공간과 이동 관계가 닫혀 있는가?",
+          "requiredForQualification": true,
+          "answerSummary": "고지대 생산 H2와 Farm 작업·출하 H2가 WI-FARM-01~04를 수용하며 Graph 연결점을 가진다.",
+          "evidenceSnapshotIds": []
+        },
+        {
+          "questionStableId": "question:highland-farm:crop-context.r1",
+          "questionTypeCode": "RealityContext",
+          "questionText": "감자의 생육 단계·작업 시기·재배 주의점을 설명할 근거가 있는가?",
+          "requiredForQualification": true,
+          "answerSummary": "농사로 감자 Profile의 생육 주제를 설명 근거로 사용하되 실제 Farm 상태나 성장 임계값으로 간주하지 않는다.",
+          "evidenceSnapshotIds": ["evidence-snapshot:farm:nongsaro-potato-profile-contract.r1"]
+        },
+        {
+          "questionStableId": "question:highland-farm:gis-option.r1",
+          "questionTypeCode": "GroundingOption",
+          "questionText": "표고·도로 자료 없이도 H5 상대 공간과 Simulation이 유효한가?",
+          "requiredForQualification": true,
+          "answerSummary": "유효하다. GIS는 선택형 Grounding 축이며 적용 시에도 H5 상대 배치와 WI 규칙을 묵시적으로 변경하지 않는다.",
+          "evidenceSnapshotIds": []
+        }
+      ]
+    },
+    {
+      "priority": 3,
+      "h3StableId": "h3-candidate:farm-seasonal-production-loop",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-seasonal-production-loop.v1",
+      "worldInteractionIds": ["WI-FARM-02", "WI-FARM-03", "WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-LOG-01", "WI-LOG-02"],
+      "questions": [
+        {
+          "questionStableId": "question:farm-seasonal:repeat-loop.r1",
+          "questionTypeCode": "StateTransition",
+          "questionText": "파종·관리·수확·집하·포장·출하 뒤 다음 생산 선택으로 돌아갈 수 있는가?",
+          "requiredForQualification": true,
+          "answerSummary": "계절 생산 H3가 Farm WI의 선후행 계보와 출하 연결점을 함께 보유해 반복 생활 흐름을 설명한다.",
+          "evidenceSnapshotIds": []
+        },
+        {
+          "questionStableId": "question:farm-seasonal:calendar-context.r1",
+          "questionTypeCode": "RealityContext",
+          "questionText": "감자 작업 시기와 시장 관측을 서로 다른 근거로 설명할 수 있는가?",
+          "requiredForQualification": true,
+          "answerSummary": "농사로는 작물 작업 문맥, KAMIS는 국내 시장 문맥을 담당하며 두 근거를 동일 단위나 자동 규칙으로 합치지 않는다.",
+          "evidenceSnapshotIds": [
+            "evidence-snapshot:farm:nongsaro-potato-profile-contract.r1",
+            "evidence-snapshot:farm:kamis-market-context-contract.r1"
+          ]
+        },
+        {
+          "questionStableId": "question:farm-seasonal:ams-option.r1",
+          "questionTypeCode": "OptionalEvidence",
+          "questionText": "USDA AMS는 국내 출하 판정이 아니라 비교 문맥으로만 남는가?",
+          "requiredForQualification": true,
+          "answerSummary": "AMS 계약은 선택 근거이며 통화·단위·시장 단계 정렬 없이는 KAMIS와 직접 순위를 만들지 않는다.",
+          "evidenceSnapshotIds": ["evidence-snapshot:farm:usda-ams-optional-contract.r1"]
+        }
+      ]
+    },
+    {
+      "priority": 4,
+      "h3StableId": "h3-candidate:farm-incident-recovery",
+      "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-incident-recovery.v1",
+      "worldInteractionIds": ["WI-WORLD-03", "WI-WORLD-04"],
+      "questions": [
+        {
+          "questionStableId": "question:farm-recovery:incident-loop.r1",
+          "questionTypeCode": "StateTransition",
+          "questionText": "사고 발생·격리·수리·능력 복구 뒤 원래 생산 흐름으로 돌아갈 수 있는가?",
+          "requiredForQualification": true,
+          "answerSummary": "격리·정비 공간과 WI-WORLD-04 복구 계보를 통해 제한 상태를 해제하고 생산 H3로 복귀한다.",
+          "evidenceSnapshotIds": []
+        },
+        {
+          "questionStableId": "question:farm-recovery:safety-context.r1",
+          "questionTypeCode": "RealityContext",
+          "questionText": "농업 재해 예방 자료를 사건 설명 근거로 연결하되 자동 사건 규칙으로 오해하지 않는가?",
+          "requiredForQualification": true,
+          "answerSummary": "농사로 재해예방 Module 계약은 설명 문맥만 제공하며 사건 발생률·피해량을 자동 결정하지 않는다.",
+          "evidenceSnapshotIds": ["evidence-snapshot:farm:nongsaro-disaster-module-contract.r1"]
+        },
+        {
+          "questionStableId": "question:farm-recovery:shared-identity.r1",
+          "questionTypeCode": "Lineage",
+          "questionText": "복구 대상 시설·Actor·Lot을 새 가짜 객체로 재생성하지 않고 같은 StableId 계보로 추적하는가?",
+          "requiredForQualification": true,
+          "answerSummary": "Cross-H3 폐루프는 동일 대상 StableId와 Effect 계보를 요구하며 H3 경계에서 객체를 복제하지 않는다.",
+          "evidenceSnapshotIds": []
+        }
+      ]
+    }
+  ],
+  "crossH3Closures": [
+    {
+      "closureStableId": "closure:farm:harvest-to-processing.r1",
+      "fromH3StableId": "h3-candidate:highland-farm",
+      "toH3StableId": "h3-candidate:farm-processing-campus",
+      "worldInteractionIds": ["WI-FARM-04", "WI-FARM-05"],
+      "inputSemanticCode": "HarvestReadyCropUnit",
+      "outputSemanticCode": "HarvestLot"
+    },
+    {
+      "closureStableId": "closure:farm:processing-to-shipping.r1",
+      "fromH3StableId": "h3-candidate:farm-processing-campus",
+      "toH3StableId": "h3-candidate:farm-seasonal-production-loop",
+      "worldInteractionIds": ["WI-FARM-06", "WI-LOG-01", "WI-LOG-02"],
+      "inputSemanticCode": "HarvestLot",
+      "outputSemanticCode": "CargoDeparted"
+    },
+    {
+      "closureStableId": "closure:farm:incident-to-production-recovery.r1",
+      "fromH3StableId": "h3-candidate:farm-incident-recovery",
+      "toH3StableId": "h3-candidate:highland-farm",
+      "worldInteractionIds": ["WI-WORLD-04", "WI-FARM-01"],
+      "inputSemanticCode": "FacilityRestricted",
+      "outputSemanticCode": "ProductionCapabilityRestored"
+    }
+  ],
+  "authorityBoundary": {
+    "publicDataChangesSimulationRules": false,
+    "publicDataMovesSpatialDefinitions": false,
+    "publicDataCalculatesProductionOrProfit": false,
+    "liveProviderCallRequired": false,
+    "runtimeValidated": false
+  }
+}

@@ -2,9 +2,9 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 개정: `simulation-world-interactions.r4`
-- 증거 단계 개정: `simulation-evidence-stages.r5`
-- 마지막 확인일: `2026-08-18`
+- 대장 개정: `simulation-world-interactions.r5`
+- 증거 단계 개정: `simulation-evidence-stages.r7`
+- 마지막 확인일: `2026-08-20`
 - 기본 구현 완료선: `E3 자동 시험 통과`
 - 실제 공간·공공데이터·Unity 통합 목표선: `E7 실제 플레이 폐루프`
 - 전체 항목: `41`
@@ -25,12 +25,12 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 
 | WI | 종류 | 시작 → 완료 | 구현 | 통합 |
 | --- | --- | --- | --- | --- |
-| `WI-FARM-01` 밭갈기 | 명시적 명령 | Untilled → Tilled | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
-| `WI-FARM-02` 파종 | 명시적 명령 | Tilled → Growing | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
-| `WI-FARM-03` 관수·재배 관리 | 명시적 명령 | Growing → Growing, HarvestReady | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
-| `WI-FARM-04` 수확 | 명시적 명령 | HarvestReady → Harvested, HarvestedAtField | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
-| `WI-FARM-05` 수확물 집하 | 명시적 명령 | HarvestedAtField → CollectedAtYard | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
-| `WI-FARM-06` 출하 준비·포장 | 명시적 명령 | CollectedAtYard → PackedForShipment, PreparedForShipment | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-FARM-01` 밭갈기 | 명시적 명령 | Untilled → Tilled | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| `WI-FARM-02` 파종 | 명시적 명령 | Tilled → Growing | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| `WI-FARM-03` 관수·재배 관리 | 명시적 명령 | Growing → Growing, HarvestReady | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| `WI-FARM-04` 수확 | 명시적 명령 | HarvestReady → Harvested, HarvestedAtField | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| `WI-FARM-05` 수확물 집하 | 명시적 명령 | HarvestedAtField → CollectedAtYard | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| `WI-FARM-06` 출하 준비·포장 | 명시적 명령 | CollectedAtYard → PackedForShipment, PreparedForShipment | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
 
 ## HUB 작업군
 
@@ -47,8 +47,8 @@ WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기�
 
 | WI | 종류 | 시작 → 완료 | 구현 | 통합 |
 | --- | --- | --- | --- | --- |
-| `WI-LOG-01` 차량 상차 확정 | 명시적 명령 | PreparedForShipment → Reserved | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
-| `WI-LOG-02` Farm 출발 | 자동 상태 전이 | Reserved → InTransit | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
+| `WI-LOG-01` 차량 상차 확정 | 명시적 명령 | PreparedForShipment → Reserved | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| `WI-LOG-02` Farm 출발 | 자동 상태 전이 | Reserved → InTransit | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
 | `WI-LOG-03` Farm→Hub 화물 이동 | 자동 상태 전이 | InTransit → InTransit, ArrivedAtDestination | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | `WI-LOG-04` Hub 하차 | 자동 상태 전이 | InTransit → ArrivedAtDestination | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | `WI-LOG-05` Hub 인수 | 자동 상태 전이 | ArrivedAtDestination, PendingInspection → Received, StorageEligible | 완료 · `E3→E3` | 진행 중 · `E4→E7` |

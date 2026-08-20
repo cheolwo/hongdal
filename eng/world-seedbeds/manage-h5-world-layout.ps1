@@ -110,9 +110,14 @@ function Opposed-Rotation-Difference([object] $a, [object] $b) {
 $policy = Read-Json $PolicyPath
 $theory = Read-Json $TheoryPath
 $actual = Read-Json $ActualE5Path
+$outputRevision = if ($policy.PSObject.Properties.Name -contains "outputRevision") { [int] $policy.outputRevision } else { 1 }
 Require ([string] $policy.schemaVersion -eq "simulation-world-h5-layout-policy.v1") "PolicySchema"
 Require ([string] $actual.schemaVersion -eq "simulation-world-actual-e5-spatial-output.v1") "ActualE5Schema"
 Require ([string] $policy.coordinateSpaceCode -eq "ScenarioLocalMeters") "RootCoordinateSpace"
+Require (@("NotRequired", "Optional", "Required") -contains [string] $policy.worldGroundingPolicyCode) "WorldGroundingPolicy"
+Require ([string] $policy.realityGroundingDefaults.applicationStateCode -eq "NotApplied") "WorldGroundingDefaultState"
+Require (-not [bool] $policy.realityGroundingDefaults.requiredForScenarioExecution) "WorldGroundingMustNotBlockScenario"
+Require (@($policy.realityGroundingDefaults.globalRequiredEvidencePurposeCodes).Count -eq 0) "WorldGroundingGlobalRequirementsForbidden"
 Require (@($policy.physicalCorridors).Count -eq 3) "PhysicalCorridorCount"
 Require ([bool] $policy.presentationOnly -and -not [bool] $policy.isOperationalState) "AuthorityBoundary"
 
@@ -282,7 +287,7 @@ for ($i = 0; $i -lt $areaIds.Count; $i++) {
 $definition = [ordered]@{
     schemaVersion = "simulation-world-layout-definition.v1"
     worldLayoutStableId = [string] $policy.worldLayoutStableId
-    worldLayoutRevision = 1
+    worldLayoutRevision = $outputRevision
     worldIntentStableId = [string] $policy.worldIntentStableId
     areaSetNetworkStableId = [string] $policy.areaSetNetworkStableId
     coordinateSpaceCode = "ScenarioLocalMeters"
@@ -300,7 +305,7 @@ $definition.worldLayoutHashSha256 = Text-Hash (Stable-Json $definition)
 $binding = [ordered]@{
     schemaVersion = "simulation-world-grounding-binding.v1"
     groundingBindingStableId = "grounding-binding:sim:pyeongchang:nature-farm-hub-town.v1"
-    groundingBindingRevision = 1
+    groundingBindingRevision = $outputRevision
     worldLayoutStableId = [string] $definition.worldLayoutStableId
     worldLayoutRevision = [int] $definition.worldLayoutRevision
     worldLayoutHashSha256 = [string] $definition.worldLayoutHashSha256
@@ -330,7 +335,7 @@ $readiness.readinessHashSha256 = Text-Hash (Stable-Json $readiness)
 
 $result = [ordered]@{
     schemaVersion = "simulation-world-h5-spatial-output.v1"
-    revision = "simulation-world-h5-spatial-output.r1"
+    revision = "simulation-world-h5-spatial-output.r$outputRevision"
     policyRevision = [string] $policy.revision
     generatedAtRuleCode = "DeterministicNoWallClock"
     worldLayoutDefinition = $definition
@@ -358,6 +363,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- 현실 결속: ``$($definition.worldGroundingPolicyCode) / $($binding.worldGroundingStateCode)``")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("E6가 없어도 이 H5는 ScenarioRelative 권위 세계다. E6는 H5 이하 상대 X/Z 배치를 바꾸지 않는다.")
+[void] $builder.AppendLine("DEM·도로는 전역 필수 자료가 아니며 선택한 현실 결속 프로필의 준비도에만 참여한다.")
 $markdown = Normalize $builder.ToString()
 
 $jsonPath = Resolve-RepoPath $OutputPath

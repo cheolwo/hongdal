@@ -3,6 +3,15 @@ Set-StrictMode -Version Latest
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $manager = Join-Path $repositoryRoot "eng/world-seedbeds/manage-h5-world-layout.ps1"
 $output = Join-Path $repositoryRoot "eng/world-seedbeds/generated/h5-world-layout.v1.json"
+$policyPath = Join-Path $repositoryRoot "eng/world-seedbeds/h5-world-layout-policy.v1.json"
+
+$policy = Get-Content -LiteralPath $policyPath -Raw -Encoding UTF8 | ConvertFrom-Json
+if ($policy.worldGroundingPolicyCode -ne "Optional" -or
+    $policy.realityGroundingDefaults.applicationStateCode -ne "NotApplied" -or
+    [bool] $policy.realityGroundingDefaults.requiredForScenarioExecution -or
+    @($policy.realityGroundingDefaults.globalRequiredEvidencePurposeCodes).Count -ne 0) {
+    throw "H5OptionalRealityGroundingDefaultsInvalid"
+}
 
 $write = & pwsh -NoProfile -File $manager -Mode Write
 if ($write -notmatch "H5WorldLayoutGenerated:AreaSets=4;Corridors=3;Grounding=Optional/NotApplied") { throw "H5WorldLayoutWriteFailed" }

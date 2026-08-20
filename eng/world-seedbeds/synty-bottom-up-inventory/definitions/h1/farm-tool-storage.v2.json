@@ -1,11 +1,11 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
   "stableId": "h1-stock:farm-tool-storage",
-  "revision": 1,
+  "revision": 2,
   "hierarchyLevelCode": "H1",
   "title": "농기구 보관 공간",
-  "summary": "농장 작업 전후에 도구와 소형 장비를 보관·반환하는 공간이다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "summary": "농장 작업 전후에 도구와 소형 장비를 보관·반환하고 다음 작업을 준비하는 생활 거점 공간이다.",
+  "knowledgeStateCode": "CandidateForReview",
   "originModeCode": "ExpressionExploration",
   "approvedDefinitionStableId": null,
   "wiIds": [
@@ -13,7 +13,8 @@
   ],
   "anticipatedGameplayCodes": [
     "ToolCheckout",
-    "ToolReturn"
+    "ToolReturn",
+    "NextTaskPreparation"
   ],
   "spatialRoleCodes": [
     "FarmToolStorageArea"
@@ -50,7 +51,7 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-tool-storage"
   ],
   "unresolvedItems": [
-    "실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다."
+    "도구별 재고 원장은 후속 Simulation 계약이며 현재는 공간 수용 능력만 승인한다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

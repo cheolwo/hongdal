@@ -4,7 +4,7 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "ddd89ae50065c1991beec0176efd8f0c3e6cdb78a2131acd0809eb64cfebc114",
+  "previousCatalogSha256": "c3c81e76f131e3f2ae25ccb57cc0e0e622892553669903cc2ea8f8635518237b",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
@@ -112,12 +112,12 @@
     },
     {
       "stableId": "h1-stock:farm-tool-storage",
-      "revision": 1,
+      "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-tool-storage.v2.json",
-      "definitionSha256": "d1461678235a5ede8066a233b839534d4e1b41de6906e4881050572c3eb6d6de",
+      "definitionSha256": "d89ece784f4bbe8dde4e54d3fa5299c76c80ebd04d9a6626f90bca1feeede096",
       "documentPath": "authored/h1/farm-tool-storage.v2.md",
-      "documentSha256": "9d1a1a588bdbb082ecf6f03da3365fc7d5868603cdac78c184a6bfbae7771eac"
+      "documentSha256": "c894fe116d5327bb87f1ad24984a859106bfe634548f44272f266f3c3abefbc4"
     },
     {
       "stableId": "h1-stock:farm-washing",
@@ -148,12 +148,12 @@
     },
     {
       "stableId": "h1-stock:farm-worker-waiting",
-      "revision": 1,
+      "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "726b76a248946581eb9ebeef143fc85a99c3bdf0f217d2f0aeea747c4d842345",
+      "definitionSha256": "1643289d8cf85b448d01c3425a93474dca336dc40c26e984b459df6441736e4b",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "67fb63f6950ceb648e34abc42469a3d31e679869f21b7b379eda495cd781f2f0"
+      "documentSha256": "c0bce67dcc86f09d8690569d183e8f051f74926c0f85c9ec228eaa25e253f1c7"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -1160,12 +1160,12 @@
     },
     {
       "stableId": "h1-stock:farm-tool-storage",
-      "revision": 1,
+      "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-tool-storage.v2.json",
-      "definitionSha256": "d1461678235a5ede8066a233b839534d4e1b41de6906e4881050572c3eb6d6de",
+      "definitionSha256": "d89ece784f4bbe8dde4e54d3fa5299c76c80ebd04d9a6626f90bca1feeede096",
       "documentPath": "authored/h1/farm-tool-storage.v2.md",
-      "documentSha256": "9d1a1a588bdbb082ecf6f03da3365fc7d5868603cdac78c184a6bfbae7771eac"
+      "documentSha256": "c894fe116d5327bb87f1ad24984a859106bfe634548f44272f266f3c3abefbc4"
     },
     {
       "stableId": "h1-stock:farm-washing",
@@ -1196,12 +1196,12 @@
     },
     {
       "stableId": "h1-stock:farm-worker-waiting",
-      "revision": 1,
+      "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "726b76a248946581eb9ebeef143fc85a99c3bdf0f217d2f0aeea747c4d842345",
+      "definitionSha256": "1643289d8cf85b448d01c3425a93474dca336dc40c26e984b459df6441736e4b",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "67fb63f6950ceb648e34abc42469a3d31e679869f21b7b379eda495cd781f2f0"
+      "documentSha256": "c0bce67dcc86f09d8690569d183e8f051f74926c0f85c9ec228eaa25e253f1c7"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -1595,11 +1595,11 @@
     },
     {
       "stableId": "h2-candidate:farm-worker-support",
-      "revision": 1,
+      "revision": 2,
       "definitionPath": "definitions/h2/farm-worker-support.v2.json",
-      "definitionSha256": "1ed13a196931e9cc2c28d5764e9bafcd3aec9bfa1bfe3d35976121df73795768",
+      "definitionSha256": "f716186b2907d80bb62a1323443cf05c97eb8e4d0e6f0e5ff17a58ed2800a2fb",
       "documentPath": "authored/h2/farm-worker-support.v2.md",
-      "documentSha256": "53a42c7eed89af1d60c20a6416fc0dd40572a11a5662fd06ee789de98a7ad0b7"
+      "documentSha256": "217f0a06301b479cf839d4141882079097b911ef6c96a10db18882681f7bc2d9"
     },
     {
       "stableId": "h2-candidate:forest-edge-farm",
@@ -1853,11 +1853,11 @@
     },
     {
       "stableId": "h3-candidate:farm-processing-campus",
-      "revision": 1,
+      "revision": 2,
       "definitionPath": "definitions/h3/farm-processing-campus.v2.json",
-      "definitionSha256": "35760a6fdf106d7c084df32c3f23a084b00c23299f01538cf9a8bacc51637cc2",
+      "definitionSha256": "f8f06098e61132efb93d6107798ce79acb9bcb6b1aa1513108281f7772b558c0",
       "documentPath": "authored/h3/farm-processing-campus.v2.md",
-      "documentSha256": "22b5f000efbf232c97ef733f4644c5747adfef1df7b3974a8e0837b1d5d56f51"
+      "documentSha256": "c0433c68a9647d8efe470c8eebf3095d1528ce81cb6c66c32ff8b28f9dc7d219"
     },
     {
       "stableId": "h3-candidate:farm-seasonal-production-loop",
@@ -1994,7 +1994,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-hub-town-region.v3.json",
-      "definitionSha256": "ed886e645fd1205e297df19e85f858086f21e92b1c54a88c02321e4503d90e4f",
+      "definitionSha256": "3e18b8fe3718564f135c9cae91a6e399b334430757360e3d0f43af764faf8754",
       "documentPath": "authored/h4/farm-hub-town-region.v3.md",
       "documentSha256": "73526189ac42cd3b98c6a0e6bd6fee44870bb29b1e48de0523a38c042760a7a4"
     },
@@ -2003,7 +2003,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-production-processing-region.v3.json",
-      "definitionSha256": "0a44601bbca9e063d1846666600042114c90ae90d775587b4c34406289619bf7",
+      "definitionSha256": "6a3307b299929915d6d8d76c877a7916875ac02665f671365e5755edf3631ac5",
       "documentPath": "authored/h4/farm-production-processing-region.v3.md",
       "documentSha256": "23fadf8553ba8b147e666a0d525cfff6aee0b1f78d772a69f51a909a82a54a6d"
     },
@@ -2064,7 +2064,7 @@
         "network:농촌도로 T자",
         "town:버스 정류장·보행 쉼터"
       ],
-      "derivationInputHashSha256": "5a5dcefac857e70057c5d26736c6e1632b94b39edf21c0d64e8ad7aca1b79bde",
+      "derivationInputHashSha256": "1dccf9c7cc9082ad8645b4da4048f94e1d68a632866494e7657e3031f21d4fd2",
       "presentationOnly": true
     },
     {
@@ -2120,7 +2120,7 @@
         "farm:혼합 작물밭",
         "network:농촌도로 직선"
       ],
-      "derivationInputHashSha256": "312a48431ccb484728ecdc8eef091ad4e7ee0d76e6d86059bd647cafcc3d58ec",
+      "derivationInputHashSha256": "e3992373ec85535719dc8e383797fb7da66794596d8d3731b12f42160ae8bdee",
       "presentationOnly": true
     },
     {
@@ -2178,7 +2178,7 @@
         "network:농촌도로 직선",
         "town:버스 정류장·보행 쉼터"
       ],
-      "derivationInputHashSha256": "1002fc477c970585ebc499767f3e0c8c620d7c4efc0ea883cbfc7d3ba643bf4c",
+      "derivationInputHashSha256": "4a7d2fbd1d17461b2b55aa73512b52d541855ae3280894fc34d6e383e49bd9d9",
       "presentationOnly": true
     },
     {
@@ -2215,7 +2215,7 @@
         "network:농촌도로 직선",
         "town:버스 정류장·보행 쉼터"
       ],
-      "derivationInputHashSha256": "2b983d829663dbfc429799da3fad594757b8124479f4a0ea2f6bf1af28f002d6",
+      "derivationInputHashSha256": "c7a1a18c8f14d996224ca06373b7a8a04f0be909727738f7e8d96ed0b52edf39",
       "presentationOnly": true
     },
     {
@@ -2916,7 +2916,7 @@
         "transition:Farm–Town 전환",
         "transition:Nature–Farm 전환"
       ],
-      "derivationInputHashSha256": "6b31d79b96f993549ef5812c81687fc21f8016d51519c8f9553ec61dbee2e785",
+      "derivationInputHashSha256": "4f95b9c594b2cd018c1385be74ef1276d29fc3810611505eb1576b024a810354",
       "presentationOnly": true
     },
     {
@@ -2941,7 +2941,7 @@
         "transition:Farm–Hub 전환",
         "transition:Farm–Town 전환"
       ],
-      "derivationInputHashSha256": "e3d56e325b10af861f928fd276bebb4216755d61d0a8c1db8af0e00d3e2e191d",
+      "derivationInputHashSha256": "3724d0837e9fafed43c9b1e367668814697a06b2c573784fc586be5f743786a7",
       "presentationOnly": true
     },
     {
@@ -3347,5 +3347,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "71c97de6c42d7632bc8b5f4468387d37729c7aeda4cdf3002921576f161f10d7"
+  "contentHashSha256": "e46a06a6d05e544bdbfb51be6d67984945e0ea24d72d33f1ba750a230cacb9a6"
 }

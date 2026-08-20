@@ -1,11 +1,17 @@
 {
   "schemaVersion": "simulation-world-h5-layout-policy.v1",
-  "revision": "simulation-world-h5-layout-policy.r1",
+  "revision": "simulation-world-h5-layout-policy.r3",
+  "outputRevision": 2,
   "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
   "worldIntentStableId": "theory-world:nature-farm-city-town",
   "areaSetNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
   "coordinateSpaceCode": "ScenarioLocalMeters",
   "worldGroundingPolicyCode": "Optional",
+  "realityGroundingDefaults": {
+    "applicationStateCode": "NotApplied",
+    "requiredForScenarioExecution": false,
+    "globalRequiredEvidencePurposeCodes": []
+  },
   "rootAreaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
   "physicalCorridors": [
     {

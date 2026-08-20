@@ -12,7 +12,7 @@
 | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | `Linear` | h1-stock:farm-work-yard, h1-stock:farm-maintenance-yard, h1-stock:farm-loading-gate |  |
 | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | `Cluster` | h1-stock:farm-tool-storage, h1-stock:farm-seed-preparation | h1-stock:farm-worker-waiting |
 | `h2-candidate:farm-wash-sort-pack` 세척·선별·포장 블록 | `Linear` | h1-stock:farm-harvest-staging, h1-stock:farm-washing, h1-stock:farm-sorting, h1-stock:farm-work-yard |  |
-| `h2-candidate:farm-worker-support` 농장 작업 지원 블록 | `Cluster` | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard |  |
+| `h2-candidate:farm-worker-support` 농가·작업지원 생활 블록 | `Cluster` | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard |  |
 | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ContourAdaptive` | h1-stock:nature-farm-edge, h1-stock:nature-exploration-buffer, h1-stock:farm-production |  |
 | `h2-candidate:highland-production` 고지대 생산 블록 | `ModifiedGrid` | h1-stock:farm-production, h1-stock:nature-farm-edge |  |
 | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | `Cluster` | h1-stock:hub-cold-storage, h1-stock:hub-long-term-storage, h1-stock:hub-service-maintenance | h1-stock:hub-temporary-staging |
@@ -49,7 +49,7 @@
 | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | `ModifiedGrid` | h2-candidate:market-life-commerce, h2-candidate:town-returns-waste | h2-candidate:lowrise-residential | TownReceivingGate, ReturnOutput, TownLocalRoad |
 | `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | `Linear` | h2-candidate:farm-processing-shipping, h2-candidate:farm-hub-corridor, h2-candidate:hub-inbound-storage |  | FarmGate, HubInboundGate |
 | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | `ModifiedGrid` | h2-candidate:farm-incident-containment, h2-candidate:farm-loss-restoration-handoff | h2-candidate:farm-processing-shipping, h2-candidate:forest-edge-farm | ProductionIncidentInput, RecoveredProductionOutput, NatureRestorationHandoff, FarmExternalGate |
-| `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | `ModifiedGrid` | h2-candidate:highland-production, h2-candidate:farm-seed-and-tools, h2-candidate:farm-wash-sort-pack, h2-candidate:farm-processing-shipping | h2-candidate:farm-worker-support, h2-candidate:forest-edge-farm | FarmExternalGate, NatureEdge |
+| `h3-candidate:farm-processing-campus` 농가·생산·후처리 생활 경관 | `ModifiedGrid` | h2-candidate:farm-worker-support, h2-candidate:highland-production, h2-candidate:farm-seed-and-tools, h2-candidate:farm-wash-sort-pack, h2-candidate:farm-processing-shipping | h2-candidate:forest-edge-farm | FarmHomeIngress, FarmExternalGate, NatureEdge |
 | `h3-candidate:farm-seasonal-production-loop` Farm 계절 생산·출하 순환 경관 | `ModifiedGrid` | h2-candidate:farm-irrigation-service, h2-candidate:farm-harvest-throughput, h2-candidate:farm-processing-shipping | h2-candidate:farm-worker-support | SeasonInput, ProductionLoop, FarmShippingGate |
 | `h3-candidate:highland-farm` 고지대 농장 경관 | `ContourAdaptive` | h2-candidate:highland-production, h2-candidate:farm-processing-shipping, h2-candidate:forest-edge-farm |  | FarmExternalGate |
 | `h3-candidate:hub-fulfillment-operations` City/Hub 보관·피킹·상차 운영 경관 | `ModifiedGrid` | h2-candidate:hub-longterm-cold-storage, h2-candidate:hub-fulfillment, h2-candidate:hub-outbound-vehicle | h2-candidate:hub-maintenance-yard | StorageCargoInput, FulfillmentLoop, HubLoadingOutput |

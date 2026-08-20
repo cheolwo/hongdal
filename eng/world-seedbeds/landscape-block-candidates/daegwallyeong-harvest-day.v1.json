@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-landscape-block-candidate.v1",
   "candidateStableId": "landscape-block-candidate:sim:pyeongchang:daegwallyeong-harvest-day.v1",
-  "revision": 2,
+  "revision": 3,
   "title": "Farmhouse에서 감자밭과 작업마당을 거쳐 Farm Gate까지 걷는 하루",
   "stateCode": "ReadyForAuthoredPlacementReview",
   "targetWalkDurationSeconds": 90,
@@ -47,7 +47,13 @@
     "requiresConnectedWalkPath": true,
     "requiresSceneApplyApproval": true
   },
-  "publicDataLinkageStageCode": "E6",
+  "realityGrounding": {
+    "stageCode": "E6",
+    "policyCode": "Optional",
+    "applicationStateCode": "NotApplied",
+    "requiredForTargetCompletion": false,
+    "blocksScenarioExecution": false
+  },
   "presentationOnly": true,
   "isOperationalState": false
 }

@@ -3,7 +3,8 @@
 > 이 문서는 E/H 원장·공간 재고·공식 H 정의를 대조해 자동 생성한다. 직접 수정하지 않는다.
 
 - WI: `41개` · E3: `41개`
-- E4/H1 실행 성립: `13개`
+- E4/H1 실행 성립: `5개`
+- E5/H3 실제 공간 결속: `8개`
 - H1~H4 설계 후보 계보만 존재: `22개`
 - 필수 공간 설계 누락: `0개`
 - 공간 비적용: `6개`
@@ -15,12 +16,12 @@
 
 | WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `WI-FARM-01` 밭갈기 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P5` | `ReadyForApprovedH1Input` | E5PlacementReferenceWithoutH2Definition |
-| `WI-FARM-02` 파종 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P5` | `ReadyForApprovedH1Input` | E5PlacementReferenceWithoutH2Definition |
-| `WI-FARM-03` 관수·재배 관리 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P5` | `ReadyForApprovedH1Input` | E5PlacementReferenceWithoutH2Definition |
-| `WI-FARM-04` 수확 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P2` | `ReadyForApprovedH1Input` |  |
-| `WI-FARM-05` 수확물 집하 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P2` | `ReadyForApprovedH1Input` |  |
-| `WI-FARM-06` 출하 준비·포장 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P2` | `ReadyForApprovedH1Input` |  |
+| `WI-FARM-01` 밭갈기 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P5` | `ReadyForActualE5Input` |  |
+| `WI-FARM-02` 파종 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P5` | `ReadyForActualE5Input` |  |
+| `WI-FARM-03` 관수·재배 관리 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P5` | `ReadyForActualE5Input` |  |
+| `WI-FARM-04` 수확 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
+| `WI-FARM-05` 수확물 집하 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
+| `WI-FARM-06` 출하 준비·포장 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
 
 ## HUB
 
@@ -37,8 +38,8 @@
 
 | WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `WI-LOG-01` 차량 상차 확정 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P2` | `ReadyForApprovedH1Input` |  |
-| `WI-LOG-02` Farm 출발 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P5` | `ReadyForApprovedH1Input` |  |
+| `WI-LOG-01` 차량 상차 확정 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
+| `WI-LOG-02` Farm 출발 | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P5` | `ReadyForActualE5Input` |  |
 | `WI-LOG-03` Farm→Hub 화물 이동 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P5` | `ReadyForApprovedH1Input` |  |
 | `WI-LOG-04` Hub 하차 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P3` | `ReadyForApprovedH1Input` |  |
 | `WI-LOG-05` Hub 인수 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P3` | `ReadyForApprovedH1Input` |  |
@@ -90,16 +91,13 @@
 ## P1 기준 플레이 공간 구성
 
 `WI-FARM-04 → WI-FARM-05 → WI-FARM-06 → WI-LOG-01`을 생산구획 → 집하 → 포장 → 상차 공간으로 연결한다.
-실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json`에 있다. H 설계 승인은 공공데이터와 독립이며, 실제 AreaSet의 작성 도로·Block 경계와 이동 폐루프가 아직 없어 E5로 승격하지 않는다. 필요한 공공데이터 목적은 E6 계획으로만 기록한다.
+실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/reference-play-01-harvest-shipping.v1.json`에 있다. H 설계와 Scenario 실행은 공공데이터와 독립이다. DEM·토지피복·도로·Block 경계는 현실 정합을 선택할 때 사용하는 E6 후보 목적이며, 미적용 상태는 H 공간이나 Scenario E7을 차단하지 않는다.
 
 ## P2 진부 Hub 입고·보관 공간 구성
 
 `WI-LOG-04 → WI-LOG-05 → WI-001 → WI-002`를 하차 공간 → 인수·검수 공간 → 창고 적재 공간으로 연결한다.
-실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json`에 있다. 진부 Hub의 실제 업무 Node와 E5 배치 Block이 없어 지역 인스턴스 후보로 유지하며, 필요한 공공데이터 목적은 E6 계획으로만 기록한다.
+실행 입력은 `eng/world-seedbeds/wi-spatial-composition-plans/p2-hub-inbound-storage.v1.json`에 있다. 진부 Hub의 권위 업무 Node와 E5 배치 Block이 없어 지역 인스턴스 후보로 유지한다. 도로·건물·Block 경계는 현실 정합을 선택할 때만 E6 후보 목적이 되며 Scenario 공간 실행을 막지 않는다.
 
 ## 확인이 필요한 공백
 
-- `WI-FARM-01` 밭갈기: `E5PlacementReferenceWithoutH2Definition`
-- `WI-FARM-02` 파종: `E5PlacementReferenceWithoutH2Definition`
-- `WI-FARM-03` 관수·재배 관리: `E5PlacementReferenceWithoutH2Definition`
 - `WI-WORLD-04` 시설 수리: `GraphBindingWithoutApprovedH1`

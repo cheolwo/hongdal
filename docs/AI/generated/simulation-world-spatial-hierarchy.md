@@ -3,7 +3,7 @@
 > 이 문서는 `eng/world-seedbeds/spatial-hierarchy-levels.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - 계층 대장 개정: `simulation-world-spatial-hierarchy.r1`
-- 증거 단계 개정: `simulation-evidence-stages.r5`
+- 증거 단계 개정: `simulation-evidence-stages.r6`
 - 축 구분: `E`는 증거 깊이, `H`는 공간 포함 깊이다.
 - 모판 계열: `H1 작업공간 → H2 블록 → H3 경관 → H4 지역`으로 상향 조립하며 재고 상태는 별도 대장에서 관리한다.
 - 현재 정의 수: `H1 5 / H2 0 / H3 5 / H4 1`

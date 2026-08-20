@@ -32,9 +32,15 @@ if (@($candidate.PSObject.Properties.Name) -contains "evidenceInputs") {
 }
 if (([string] $candidate.promotionGate.targetHierarchyLevelCode -ne "H2") -or
     ([string] $candidate.promotionGate.targetEvidenceStageCode -ne "E5") -or
-    ([string] $candidate.publicDataLinkageStageCode -ne "E6") -or
     (-not [bool] $candidate.promotionGate.requiresSceneApplyApproval)) {
     throw "LandscapeBlockCandidatePromotionGateInvalid"
+}
+if (([string] $candidate.realityGrounding.stageCode -ne "E6") -or
+    ([string] $candidate.realityGrounding.policyCode -ne "Optional") -or
+    ([string] $candidate.realityGrounding.applicationStateCode -ne "NotApplied") -or
+    [bool] $candidate.realityGrounding.requiredForTargetCompletion -or
+    [bool] $candidate.realityGrounding.blocksScenarioExecution) {
+    throw "LandscapeBlockCandidateRealityGroundingBoundaryInvalid"
 }
 if (-not [bool] $candidate.presentationOnly -or [bool] $candidate.isOperationalState) {
     throw "LandscapeBlockCandidateAuthorityBoundaryInvalid"

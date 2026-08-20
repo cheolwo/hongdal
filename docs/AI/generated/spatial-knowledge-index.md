@@ -15,6 +15,8 @@
 | `ApprovedReference` | `h1-stock:farm-production` | 농업 생산구획 | WI-FARM-01, WI-FARM-02, WI-FARM-03, WI-FARM-04, Spatial.CargoAccessible, Spatial.CropCareWorkArea, Spatial.CropProduction, Spatial.HarvestWorkArea, Spatial.SowingWorkArea, Spatial.TillingWorkArea, Spatial.WaterAccessible, Spatial.WorkerAccessible, Farm |
 | `ApprovedReference` | `h1-stock:farm-work-yard` | 수확·집하 작업마당 | WI-FARM-05, WI-FARM-06, WI-WORLD-04, Spatial.CargoAccessible, Spatial.CollectionWorkArea, Spatial.PackingWorkArea, Spatial.WorkerAccessible, Farm |
 | `ApprovedReference` | `h1-stock:hub-receiving-storage` | Hub 입고·검수·보관 공간 | WI-LOG-04, WI-LOG-05, WI-001, WI-002, Spatial.CargoAccessible, Spatial.InspectionWorkArea, Spatial.LoadingWorkArea, Spatial.Storage, Spatial.UnloadingWorkArea, Spatial.WorkerAccessible, City |
+| `CandidateForReview` | `h1-stock:farm-tool-storage` | 농기구 보관 공간 | WI-WORLD-04, ToolCheckout, ToolReturn, NextTaskPreparation, Spatial.Storage, Spatial.WorkerAccessible, Farm |
+| `CandidateForReview` | `h1-stock:farm-worker-waiting` | 농가 귀환·작업자 대기 공간 | WI-WORLD-01, WorkerBriefing, ShiftHandoff, FarmReturn, FarmRest, NextTaskSelection, Spatial.WorkerAccessible, Spatial.NpcWorkArea, Spatial.RestArea, Farm, Town |
 | `CandidateForReview` | `h1-stock:nature-emergency-retreat` | 자연권 긴급 후퇴 길목 | WI-NATURE-02, EmergencyRetreat, ThreatEvacuation, SafeCoreReturn, Spatial.Traversable, Spatial.EmergencyAccess, Spatial.PlayerEscapeRoute, Nature |
 | `CandidateForReview` | `h1-stock:nature-incident-trace` | 자연권 사건 흔적 조사 구역 | WI-NATURE-01, IncidentTraceInvestigation, CauseIdentification, ThreatTracking, Spatial.Traversable, Spatial.InvestigationArea, Spatial.ThreatMonitoringArea, Nature |
 | `CandidateForReview` | `h1-stock:nature-restoration-site` | 자연권 정화·복구 작업 공간 | WI-NATURE-03, NatureRestoration, ContaminationCleanup, RouteRecovery, Spatial.WorkerAccessible, Spatial.RestorationWorkArea, Spatial.CargoAccessible, Nature |
@@ -25,7 +27,6 @@
 | `ExploratoryInventory` | `h1-stock:farm-maintenance-yard` | 농장 시설 정비 공간 | WI-WORLD-04, Farm |
 | `ExploratoryInventory` | `h1-stock:farm-restoration-supply` | 농장 자연권 복구 자재 인계 공간 | RestorationSupplyHandoff, RecoveredMaterialTransfer, NatureRouteSupport, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.LoadingWorkArea, Farm, Nature |
 | `ExploratoryInventory` | `h1-stock:farm-seed-preparation` | 종자 준비 공간 | WI-FARM-02, SeedInspection, SeedBatchPreparation, Spatial.WorkerAccessible, Spatial.MaterialPreparationArea, Farm |
-| `ExploratoryInventory` | `h1-stock:farm-tool-storage` | 농기구 보관 공간 | WI-WORLD-04, ToolCheckout, ToolReturn, Spatial.Storage, Spatial.WorkerAccessible, Farm |
 | `ExploratoryInventory` | `h1-stock:farm-weather-protection` | 농장 기상 보호 적치 공간 | WeatherProtectedStaging, HarvestDelay, MaterialShelter, Spatial.CargoAccessible, Spatial.TemporaryStorage, Spatial.WeatherShelter, Farm |
 | `ExploratoryInventory` | `h1-stock:hub-long-term-storage` | Hub 장기 보관 공간 | WI-002, LongTermStorage, StorageAging, CapacityPlanning, Spatial.Storage, Spatial.CargoAccessible, Spatial.WorkerAccessible, City |
 | `ExploratoryInventory` | `h1-stock:hub-market-transfer` | Hub–시장 화물 인계 공간 | WI-MARKET-01, WI-MARKET-02, City, Transition |
@@ -51,7 +52,6 @@
 | `IdeaInventory` | `h1-stock:farm-loss-recovery` | 농장 손실 복구·재작업 공간 | CropLossAssessment, ProduceRework, RecoveryPacking, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.SortingWorkArea, Spatial.PackingWorkArea, Farm |
 | `IdeaInventory` | `h1-stock:farm-sorting` | 농산물 선별 공간 | ProduceSorting, QualityGrading, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.SortingWorkArea, Farm |
 | `IdeaInventory` | `h1-stock:farm-washing` | 농산물 세척 공간 | ProduceWashing, WaterUse, WasteWaterHandling, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.WaterAccessible, Spatial.WashingWorkArea, Farm, Nature |
-| `IdeaInventory` | `h1-stock:farm-worker-waiting` | 농장 작업자 대기 공간 | WI-WORLD-01, WorkerBriefing, ShiftHandoff, Spatial.WorkerAccessible, Spatial.NpcWorkArea, Farm, Town |
 | `IdeaInventory` | `h1-stock:hub-cold-storage` | Hub 저온 보관 공간 | ColdStorage, TemperatureExcursion, ColdChainRelease, Spatial.Storage, Spatial.CargoAccessible, Spatial.TemperatureControlled, City |
 | `IdeaInventory` | `h1-stock:hub-quarantine` | Hub 검역·격리 공간 | CargoQuarantine, QualityHold, ReleaseOrReject, Spatial.CargoAccessible, Spatial.WorkerAccessible, Spatial.ExclusiveOccupancy, City |
 | `IdeaInventory` | `h1-stock:hub-returns` | Hub 반품 처리 공간 | ReturnReceiving, ReturnInspection, RestockOrDispose, Spatial.CargoAccessible, Spatial.WorkerAccessible, Spatial.InspectionWorkArea, City |
@@ -67,6 +67,7 @@
 
 | 상태 | 고유 식별자 | 이름 | 검색 단서 |
 | --- | --- | --- | --- |
+| `ApprovedReference` | `h2-candidate:farm-worker-support` | 농가·작업지원 생활 블록 | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard, FarmHomeIngress, FarmRoadAccess, ProductionAccess |
 | `CandidateForReview` | `h2-candidate:nature-restoration-recovery` | 자연 복원·안전 회복 블록 | h1-stock:nature-restoration-site, h1-stock:nature-safe-recovery-camp, IncidentRouteInput, RetreatRecoveryInput, SafeCoreOutput, RestoredRouteOutput |
 | `CandidateForReview` | `h2-candidate:nature-threat-response` | 자연 위협 추적·대피 블록 | h1-stock:nature-threat-watch, h1-stock:nature-incident-trace, h1-stock:nature-emergency-retreat, SafeCoreInput, ThreatBandContinuation, EmergencyExit, RecoveryHandoff |
 | `ExploratoryInventory` | `h2-candidate:farm-harvest-throughput` | 농장 집중 수확·집하 블록 | h1-stock:farm-production, h1-stock:farm-harvest-staging, h1-stock:farm-work-yard, ProductionInput, HarvestFlow, ProcessingOutput |
@@ -99,7 +100,6 @@
 | `ExploratoryInventory` | `h2-candidate:town-resident-service` | 생활권 주민지원·공동수령 블록 | h1-stock:town-neighborhood-service, h1-stock:town-resident-pickup, h1-stock:town-recall-service, ResidentInput, ServiceLoop, PickupOutput |
 | `ExploratoryInventory` | `h2-candidate:town-residential-alley` | 생활권 주거 골목 블록 | h1-stock:town-living-square, h1-stock:town-neighborhood-service, NeighborhoodInput, PedestrianLoop, LocalRoadOutput |
 | `IdeaInventory` | `h2-candidate:farm-wash-sort-pack` | 세척·선별·포장 블록 | h1-stock:farm-harvest-staging, h1-stock:farm-washing, h1-stock:farm-sorting, h1-stock:farm-work-yard, HarvestInput, ShippingOutput |
-| `IdeaInventory` | `h2-candidate:farm-worker-support` | 농장 작업 지원 블록 | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard, FarmRoadAccess, ProductionAccess |
 | `IdeaInventory` | `h2-candidate:hub-longterm-cold-storage` | Hub 장기·저온 보관 블록 | h1-stock:hub-long-term-storage, h1-stock:hub-cold-storage, InboundStorage, PickingOutput |
 | `IdeaInventory` | `h2-candidate:hub-quarantine-staging` | Hub 검역·격리 블록 | h1-stock:hub-receiving-storage, h1-stock:hub-quarantine, h1-stock:hub-temporary-staging, HubInboundGate, StorageOutput, RejectOutput |
 | `IdeaInventory` | `h2-candidate:hub-returns-processing` | Hub 반품 처리 블록 | h1-stock:hub-returns, h1-stock:hub-quarantine, ReturnInput, RestockOutput, DisposalOutput |
@@ -109,6 +109,7 @@
 
 | 상태 | 고유 식별자 | 이름 | 검색 단서 |
 | --- | --- | --- | --- |
+| `ApprovedReference` | `h3-candidate:farm-processing-campus` | 농가·생산·후처리 생활 경관 | h2-candidate:farm-worker-support, h2-candidate:highland-production, h2-candidate:farm-seed-and-tools, h2-candidate:farm-wash-sort-pack, h2-candidate:farm-processing-shipping, FarmHomeIngress, FarmExternalGate, NatureEdge |
 | `CandidateForReview` | `h3-candidate:nature-threat-recovery` | 자연 생활·위협·회복 경관 | h2-candidate:nature-threat-response, h2-candidate:nature-restoration-recovery, SafeCoreAccess, FarmIncidentInput, TownReliefInput, CityHubReturn, RestoredTrailOutput |
 | `ExploratoryInventory` | `h3-candidate:farm-hub-logistics` | 농장–물류 거점 연결 경관 | h2-candidate:farm-processing-shipping, h2-candidate:farm-hub-corridor, h2-candidate:hub-inbound-storage, FarmGate, HubInboundGate |
 | `ExploratoryInventory` | `h3-candidate:farm-incident-recovery` | 농장 사건 격리·회복 경관 | h2-candidate:farm-incident-containment, h2-candidate:farm-loss-restoration-handoff, ProductionIncidentInput, RecoveredProductionOutput, NatureRestorationHandoff, FarmExternalGate |
@@ -127,5 +128,4 @@
 | `ExploratoryInventory` | `h3-candidate:town-market-fulfillment` | Town 마트 입고·주문이행 경관 | h2-candidate:town-market-receiving, h2-candidate:market-life-commerce, h2-candidate:town-order-fulfillment, TownDeliveryInput, MarketFulfillmentLoop, ResidentPickupOutput |
 | `ExploratoryInventory` | `h3-candidate:town-resident-service-loop` | Town 주민서비스·공동수령 경관 | h2-candidate:town-residential-alley, h2-candidate:town-resident-service, h2-candidate:lowrise-residential, NeighborhoodGate, ResidentServiceLoop, TownLocalRoad |
 | `IdeaInventory` | `h3-candidate:circular-market-town` | 반품·회수 순환형 시장 마을 경관 | h2-candidate:market-life-commerce, h2-candidate:town-returns-waste, TownReceivingGate, ReturnOutput, TownLocalRoad |
-| `IdeaInventory` | `h3-candidate:farm-processing-campus` | 농장 생산·후처리 복합 경관 | h2-candidate:highland-production, h2-candidate:farm-seed-and-tools, h2-candidate:farm-wash-sort-pack, h2-candidate:farm-processing-shipping, FarmExternalGate, NatureEdge |
 | `IdeaInventory` | `h3-candidate:resilient-logistics-hub` | 품질·보관 대응형 물류 Hub 경관 | h2-candidate:hub-inbound-storage, h2-candidate:hub-quarantine-staging, h2-candidate:hub-longterm-cold-storage, h2-candidate:hub-outbound-vehicle, HubInboundGate, HubOutboundGate, ReturnGate |

@@ -8,3 +8,4 @@ H4 AreaSet과 H3 회랑을 H5의 `ScenarioLocalMeters`에 배치한 실제 E5 �
 - 현실 결속: `Optional / NotApplied`
 
 E6가 없어도 이 H5는 ScenarioRelative 권위 세계다. E6는 H5 이하 상대 X/Z 배치를 바꾸지 않는다.
+DEM·도로는 전역 필수 자료가 아니며 선택한 현실 결속 프로필의 준비도에만 참여한다.

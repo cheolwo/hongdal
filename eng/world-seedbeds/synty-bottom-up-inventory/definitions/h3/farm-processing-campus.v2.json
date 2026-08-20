@@ -1,23 +1,24 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
   "stableId": "h3-candidate:farm-processing-campus",
-  "revision": 1,
+  "revision": 2,
   "hierarchyLevelCode": "H3",
-  "title": "농장 생산·후처리 복합 경관",
-  "summary": "생산부터 세척·선별·포장·출하까지 한 농장 권역에 조직하는 청사진이다.",
-  "knowledgeStateCode": "IdeaInventory",
+  "title": "농가·생산·후처리 생활 경관",
+  "summary": "농가 귀환과 작업 준비에서 생산·세척·선별·포장·출하까지 플레이어가 반복해서 걷고 일하는 Farm 생활 권역 청사진이다.",
+  "knowledgeStateCode": "ApprovedReference",
   "topologyCode": "ModifiedGrid",
   "requiredH2Refs": [
+    "h2-candidate:farm-worker-support",
     "h2-candidate:highland-production",
     "h2-candidate:farm-seed-and-tools",
     "h2-candidate:farm-wash-sort-pack",
     "h2-candidate:farm-processing-shipping"
   ],
   "optionalH2Refs": [
-    "h2-candidate:farm-worker-support",
     "h2-candidate:forest-edge-farm"
   ],
   "connectorRoleCodes": [
+    "FarmHomeIngress",
     "FarmExternalGate",
     "NatureEdge"
   ],
@@ -26,9 +27,7 @@
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h3-candidate:farm-processing-campus"
   ],
-  "unresolvedItems": [
-    "실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다."
-  ],
+  "unresolvedItems": [],
   "presentationOnly": true,
   "isOperationalState": false
 }

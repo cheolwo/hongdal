@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-priorities.v1",
   "revision": "simulation-world-interaction-spatial-priorities.r1",
-  "worldInteractionCatalogRevision": "simulation-world-interactions.r4",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r5",
   "spatialParticipationCodes": [
     "Required",
     "Contextual",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-evidence-stages.v3",
-  "revision": "simulation-evidence-stages.r5",
+  "revision": "simulation-evidence-stages.r7",
   "stages": [
     {
       "code": "E0",
@@ -34,13 +34,13 @@
     },
     {
       "code": "E6",
-      "label": "필수 공공데이터 경관 연결",
-      "completionGate": "선정 WI에 필요한 공공데이터만 E5 경관 인스턴스에 출처·기준일·좌표계·원본 및 파생 hash·한계와 함께 연결되었다. 위치 독립 공간 설계 정의에는 공공데이터 요구나 근거를 저장하지 않는다."
+      "label": "AreaSet 정밀 몰입·현실 근거 결속",
+      "completionGate": "E5로 성립한 AreaSet의 모든 H3·H2·H1·WI·상태 변화와 H3 사이 인과 폐루프를 질문 행렬로 정밀 조사하고, 필요한 현실 문맥 근거의 출처·판본·hash·한계를 연결해 그 장소를 설명할 수 있다. GIS 결속은 독립 선택 축이며 DEM·도로를 공통 필수 자료로 간주하지 않는다."
     },
     {
       "code": "E7",
       "label": "실제 플레이 폐루프",
-      "completionGate": "사람이 실제 서버와 저장 Scene에서 이동·선택·Preview·Confirm·Tick·재조회를 수행하고 Game View와 Console로 확인했다."
+      "completionGate": "사람이 실제 서버와 저장 Scene에서 이동·선택·Preview·Confirm·Tick·재조회를 수행하고 Game View와 Console로 확인했다. AreaSet이 RequiredBeforeE7을 선언하면 Current 상태의 E6 정밀 몰입 합격을 선행하며, GIS NotApplied 자체는 E7을 차단하지 않는다."
     }
   ]
 }

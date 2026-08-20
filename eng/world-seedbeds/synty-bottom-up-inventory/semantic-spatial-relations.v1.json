@@ -5310,6 +5310,7 @@
     {
       "targetRef": "h3-candidate:farm-processing-campus",
       "requiredChildRefs": [
+        "h2-candidate:farm-worker-support",
         "h2-candidate:highland-production",
         "h2-candidate:farm-seed-and-tools",
         "h2-candidate:farm-wash-sort-pack",
@@ -5318,6 +5319,16 @@
       "relations": [
         {
           "relationCode": "h2-flow-1",
+          "fromRef": "h2-candidate:farm-worker-support",
+          "fromConnectorRoleCode": "Egress",
+          "toRef": "h2-candidate:highland-production",
+          "toConnectorRoleCode": "Ingress",
+          "relationKindCode": "CargoLogistics",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "relationCode": "h2-flow-2",
           "fromRef": "h2-candidate:highland-production",
           "fromConnectorRoleCode": "Egress",
           "toRef": "h2-candidate:farm-seed-and-tools",
@@ -5327,7 +5338,7 @@
           "compatibilityRuleCode": "OutputToInputSameFlow"
         },
         {
-          "relationCode": "h2-flow-2",
+          "relationCode": "h2-flow-3",
           "fromRef": "h2-candidate:farm-seed-and-tools",
           "fromConnectorRoleCode": "Egress",
           "toRef": "h2-candidate:farm-wash-sort-pack",
@@ -5337,7 +5348,7 @@
           "compatibilityRuleCode": "OutputToInputSameFlow"
         },
         {
-          "relationCode": "h2-flow-3",
+          "relationCode": "h2-flow-4",
           "fromRef": "h2-candidate:farm-wash-sort-pack",
           "fromConnectorRoleCode": "Egress",
           "toRef": "h2-candidate:farm-processing-shipping",
@@ -5357,7 +5368,7 @@
             "WorkTraversal",
             "CargoLogistics"
           ],
-          "sourceChildRef": "h2-candidate:highland-production",
+          "sourceChildRef": "h2-candidate:farm-worker-support",
           "sourceChildConnectorRoleCode": "Ingress"
         },
         {
@@ -5373,6 +5384,18 @@
           "sourceChildConnectorRoleCode": "Egress"
         },
         {
+          "connectorStableId": "connector:h3:farm-processing-campus:farmhomeingress",
+          "roleCode": "FarmHomeIngress",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "PlayerTraversal",
+            "WorkTraversal",
+            "CargoLogistics"
+          ],
+          "sourceChildRef": "h2-candidate:farm-worker-support",
+          "sourceChildConnectorRoleCode": "Ingress"
+        },
+        {
           "connectorStableId": "connector:h3:farm-processing-campus:farmexternalgate",
           "roleCode": "FarmExternalGate",
           "directionCode": "Input",
@@ -5381,7 +5404,7 @@
             "WorkTraversal",
             "CargoLogistics"
           ],
-          "sourceChildRef": "h2-candidate:highland-production",
+          "sourceChildRef": "h2-candidate:farm-worker-support",
           "sourceChildConnectorRoleCode": "Ingress"
         },
         {
