@@ -2013,6 +2013,16 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 운영 경계: 화면은 H1·H2·H3 고유 식별자와 촬영 묶음을 보여 주지만 `Good`은 후보 판단일 뿐 H 승인·Scene 적용·E5·Simulation 완료가 아니다. Azure VM의 현재 비용 통제 운영창은 한국 시간 19:00~23:00이며 시간 밖 수동 기동은 별도 명시 승인을 요구한다.
 - 관계: D-182의 물리 WebApp 분리를 저비용 Azure 미리보기의 실제 경로와 원격 교체 단위까지 구체화한다.
 
+## D-185 H1~H4 Unity 조합물은 선택 Root 촬영 영수증으로 모바일 검토하되 공간 권위를 만들지 않는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 결정: Unity 편집기에서 H1~H4 조합물의 최상위 Root와 H 계보를 명시하고, 저장 장면을 변경하지 않는 임시 장면에서 단계별 표준 시점 PNG를 만든 뒤 서버 업로드 영수증과 `synty-composition-review-batch.v3` 검토 묶음을 등록한다. 사용자는 전용 Web 검토함을 휴대폰으로 열어 후보 판단을 남긴다.
+- 촬영 Profile: H1 장소는 4시점, H2 블록은 5시점, H3 경관은 6시점, H4 지역 청사진은 4시점이다. 서버는 주 검토 대상과 H 계보, Profile, 시점 수, 조립 입력·Rendering Profile·부모 묶음·예상 개정 및 개별 업로드 영수증을 함께 검증한다.
+- 권위 경계: 촬영 이미지, 자동 계산한 팩 사용 비율과 모바일 `Good`은 표현 검토 증거와 `ReviewedCandidate`만 만든다. 공식 H 승인, WI의 E단계, AreaSet·경관 그래프·공공데이터 근거, Scene 적용이나 Simulation 상태를 만들지 않는다.
+- 보안 경계: Unity는 관리자 토큰을 파일·manifest·로그에 저장하지 않고 환경 변수에서 읽는다. 서버가 PNG를 검증·재인코딩하고 불변 저장 위치 영수증을 발급하며 Unity는 Blob 위치를 결정하지 않는다.
+- 관계: D-180의 주차 후 모바일 후보 선별, D-181의 불변 업로드·재촬영 계보, D-183의 촬영·전송 책임 분리를 H1~H4 일반 조합물로 확장함
+
 ## D-186 Unity 산출물 검토는 역할별 VM과 분리한 무료 대상 VM의 최소 Docker 스택으로 운영한다
 
 - 상태: Accepted
@@ -2023,3 +2033,116 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 저장 경계: 미리보기 이미지는 hash 기반 불변 Docker volume, 촬영 영수증과 검토 snapshot은 MySQL에 저장한다. 공개 URL은 Caddy 투영값일 뿐 권위가 아니고 `ContainerName + ObjectName + StoredImageSha256`이 위치·무결성 기준이다. 단일 VM volume은 운영 백업이나 H·E 승인 증거가 아니다.
 - 비용 경계: 무료 대상 VM 혜택의 기간·월별 시간과 디스크·공인 IP·전송 부대 비용은 별도로 확인한다. 구독이 쓰기 가능한 상태가 아니면 provisioning을 중단하며 무료 크레딧 반복 생성을 전제로 하지 않는다.
 - 관계: D-180의 주차 후 후보 선별, D-181의 불변 영수증·부모 bundle, D-182의 물리 WebApp 분리와 D-185의 H1~H4 촬영 Profile을 유지한다.
+
+## D-187 H1은 인지 부품이고 H2는 첫 공간 조합 판단 단위다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- H1 역할: H1 설계 재고는 재사용 가능한 공간 부품이 존재하고 그 의미·표현 후보·게임 기획 맥락을 식별하는 단계다. H2 조합 입력이 되기 위해 모든 H1이 먼저 공식 Simulation 공간 능력·업무 용량 승인을 받을 필요는 없다. WI가 실제로 사용하는 H1의 강한 계약은 해당 WI의 E단계에서 별도로 검증한다.
+- H2 역할: 사용자가 공간 구성을 처음 판단하는 기본 단위는 H2 블록 모판이다. 필수 H1 두 개 이상, 정확한 하위 revision·hash, 결정적인 상대 배치, 위상, 내부 도달 관계, 외부 연결구, 크기·금지 조합, 촬영 가능한 Unity Root와 표준 5시점 촬영 기록을 갖춘 뒤 H2 조합물 자체를 사람이 검토한다.
+- 상태 분리: `H1 인지 부품 → H2 조합 가능 → H2 검토 가능 → H2 승인`을 구분한다. H2 조합 가능은 공식 승인이나 자동 승격이 아니며 Unity 촬영과 모바일 `Good`도 `ReviewedCandidate`만 만든다. 실제 AreaSet 배치·경관 이동 폐루프는 E5, 공공데이터 계보는 E6에서 별도로 검증한다.
+- 재고 운영: H1의 `knowledgeStateCode` 자체를 H2 조합 차단기로 사용하지 않는다. 정의가 존재하고 WI 또는 예상 게임 플레이, 공간 역할, Synty 팩 또는 기준 문법 표현 근거가 각각 하나 이상 식별되면 `IdeaInventory`도 인지 부품으로 사용할 수 있다. 이 맥락 신호가 없는 고아 아이디어만 계속 격리한다. H2 후보 24개는 이 인지 조건을 기준으로 조합 가능성을 먼저 감사하고, 세부 조립법과 Unity Root가 준비된 항목부터 우선 촬영한다.
+- 관계: D-170의 게임 기획 주도 H 재고, D-172의 계획 용량, D-180의 모바일 후보 선별과 D-185의 H1~H4 촬영 Profile을 유지하면서 H1 과승인 병목을 제거하고 H2를 실제 공간 판단 표면으로 재정의한다.
+
+## D-188 H 조립·게임플레이 추적·E 증거·완주 상태는 독립 축으로 관리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 네 축: H1 인지 부품·H2 블록·H3 `LandscapeGraph`급 경관·H4 `AreaSet`급 지역 설계는 공간 조립 깊이다. `GameplayTraceState`는 `Unlinked`, 지원 경관, 직접 행위, H2 순서, H3 폐루프, H4 지역 인과를 별도로 기록한다. E0~E7은 증거 깊이이고 `PlayableSliceState`는 사람이 실제로 완주할 수 있는 마감 상태다. 어느 한 축도 다른 축을 자동 승격하지 않는다.
+- 첫 엄격 관문: `NatureHomeThreatRecovery`와 `FarmProductionSurvival`은 `reference-play:nature-farm-day.v1`에서 H 추적 누락을 차단한다. Town 생활·시장 안전과 City/Hub 물류 회복력의 기준 플레이 누락은 경고만 남기며 기존 H 후보·사람 검토를 폐기하거나 막지 않는다.
+- 카드 경계: 첫 기준 플레이에는 `Normal / Opportunity / Threat / Recovery` 조건 슬롯과 영향을 받는 단계·H1 표현 연결점만 둔다. 구체 카드 ID·수치·비용·확률·플러스·마이너스 효과는 서버 턴 규칙이 확정하며 H 대장과 Unity가 계산하지 않는다.
+- 완성 판정: Nature↔Farm 기준 플레이는 설계·H 추적이 있어도 실제 E5 `LandscapeGraph`·`AreaSet` 결속, 정상·실패·회복 Runtime 완주, 처음 접한 플레이어의 20~40분 관찰, canonical `SimulationWorldShell` 저장 배선·Play Mode·Game View와 시각·음향·성능 마감 증거가 모두 있기 전에는 `Planned`를 유지한다. H 승인, 촬영 `Good`, 개별 E3·E4 성공만으로 `PlayableSliceComplete`를 선언하지 않는다.
+- 관계: D-170의 게임 기획 주도 H 범위, D-172의 Nature 반복 폐루프, D-187의 H1/H2 공간 판단 분리를 보존하면서 실제 게임 완성을 반복해서 판정할 수 있는 별도 관문을 추가한다.
+
+## D-189 H2·H3와 이론 E5 공간 생산은 사람 검토를 차단 관문으로 사용하지 않는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 결정: 게임 플레이 맥락, 필수 하위 H 인지, 결정적 상대 배치, 최소 간격, 연결 그래프, 입구·출구, 세계 의도와 GraphRelation 폐루프를 자동 검사해 `TheoryQualified` H2·H3와 `E5TheoryQualified` Theory AreaSet 인스턴스를 반복 생산한다. 사람의 이미지 검토는 `DeferredBatchReview`로 남기며 생산을 멈추지 않는다.
+- E5 경계: 이론 공장은 H4 후보를 그대로 AreaSet으로 가장하지 않고 별도 `area-set:theory:*` 고유 식별자, H3 Graph 인스턴스, 관계와 결정성 hash를 만든다. 이 산출물은 E5 공간 조립 계보를 가지지만 `EvidenceKind=TheoryGenerated`, `humanReviewed=false`, `publicDataBound=false`, `runtimeValidated=false`를 반드시 함께 기록한다.
+- 사람 검토: 촬영·휴대폰 판단은 나중 개정의 미감·가독성 개선 입력이다. 검토가 없다는 사실을 숨기거나 자동 사람 승인으로 기록하지 않는다. D-180·D-185의 모바일 검토 경로는 선택적 품질 개선 수단으로 유지한다.
+- 후속 관문: H2·H3·이론 E5 생산은 E6 공공데이터 계보와 E7 실제 서버·저장 Scene 플레이를 완료했다고 주장하지 않는다. 실제 지역 근거가 필요한 WI만 E6에서 연결하고 실제 플레이 완주는 E7에서 별도로 검증한다.
+- 관계: D-187의 “H2가 첫 사람 판단 단위” 가운데 사람 판단의 생산 차단 역할을 대체한다. H1 인지 부품, H/E 독립 축과 자동 사람 승인 금지는 유지한다.
+
+## D-190 이론 공간 공급과 실제 플레이 공간 완성 사이에 독립 완료 상태를 둔다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 상태 사슬: `PlayableSliceState`는 `Planned → TheorySpatiallyComposed → SpatiallyComposed → FunctionallyClosed → ExperienceValidated → PlayableSliceComplete` 순서를 사용한다. `TheorySpatiallyComposed`는 추적된 H2·H3와 H4 세계 의도가 결정적인 전용 `area-set:theory:*`에 결속되어 다음 실제 배치 작업의 입력이 준비됐음을 뜻한다.
+- 이론 관문: 이 상태에는 `TheoryQualified` H2·H3, `E5TheoryQualified`, 별도 고유 식별자와 결정성 hash가 필요하다. 사람 검토, 게임플레이 추적, 공공데이터와 Runtime은 이론 공간 생산을 차단하지 않는다. 엄격 게임플레이 추적은 Nature·Farm 우선 작업 선정을 막을 수 있지만 이미 적격인 이론 H를 폐기하거나 강등하지 않는다.
+- 실제 관문: `SpatiallyComposed`는 승인된 H가 실제 지역 근거의 `LandscapeGraph`·`AreaSet`과 양쪽 연결구에 결속된 실제 E5 이동 폐루프가 있을 때만 부여한다. 이론 E5는 실제 E5, E6 공공데이터, E7 서버·저장 Scene Runtime, Play Mode·Game View를 대신하지 않는다.
+- 현재 판정: `reference-play:nature-farm-day.v1`은 Nature·Farm 이론 AreaSet 두 개까지 닫혀 `TheorySpatiallyComposed`다. `ActualE5BindingMissing`, Runtime 분기 완주, 처음 접한 플레이어 관찰, canonical Scene 실행 증거, 시각·음향·성능 마감이 남으므로 실제 게임 완성은 아니다.
+- 관계: D-188의 네 독립 축과 최종 완료 기준을 유지하되, 이론 공간 공장을 도입한 D-189에 맞춰 D-188의 `Planned` 고정 판정을 이 중간 상태 모델로 대체한다.
+
+## D-191 H2·H3는 StableId를 보존하고 팩 주도 패턴 이름을 별도로 가진다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 이름 계약: 기존 `h2-candidate:*`, `h3-candidate:*` StableId는 저장·계보·생성기 참조용으로 보존한다. 사람이 AreaSet 재고를 구분하는 이름은 `{주도 팩}-H{단계}-{패턴 계열}-{일련번호}` 형식의 별도 `patternCode`와 한국어 `displayNameKo`로 관리한다.
+- 팩 경계: 단일 팩 `SinglePack`, 주도 팩과 보조 팩의 `LeadPackWithSupport`, 팩 사이 전환인 `CrossPackTransition`을 구분한다. 혼합 회랑은 어느 한 팩의 단독 자원으로 가장하지 않고 `MIX` 계열을 사용하며 Construction은 독립 AreaSet이 아닌 지원 기능층으로만 기록한다.
+- 변형 경계: 패턴 일련번호는 서로 다른 H2·H3 공간 조립을 구분한다. 기준 경관 문법의 A/B/C 표현 변형과 같은 값이 아니며 패턴 코드가 Prefab·GUID·Scene·Simulation 권위를 만들지 않는다.
+- 생산 연결: 이론 공간 공장은 패턴 이름 대장 전체를 검증하고 H3 Node에 하위 H2 패턴, 이론 AreaSet Graph 인스턴스에 H3 패턴을 투영한다. 대장 누락·중복·형식 오류·StableId 불일치가 있으면 생산을 중단한다.
+- 자원 종류: H2는 여러 H1의 상대 배치·내부 동선·입구·출구를 봉인한 `BlockPattern`이고, H3는 여러 H2와 외부 연결 역할을 묶은 `LandscapeAssemblyPattern`이다. H2·H3를 단순 번호 목록이 아니라 팩·계열·공간 역할이 드러나는 패턴 재고로 관리한다.
+- 확장 순서: 첫째 Nature·Farm·City·Town 각 팩만으로 구성 가능한 `SinglePack` H2 블록을 고르게 확보한다. 둘째 같은 팩의 H2를 그 팩 내부 H3로 묶는다. 셋째 주도 팩에 Construction이나 다른 팩을 보조층으로 붙이는 `LeadPackWithSupport`를 확장한다. 넷째 팩 경계를 직접 조립하는 혼합 H2와 혼합 H3를 차례로 만든다. 기존 혼합 패턴은 보존하지만 새 단독 팩 재고보다 먼저 증식시키지 않는다. 예약 이름은 실제 H 정의나 E5 증거가 아니다.
+- 관계: D-170의 게임 기획 주도 H 재고, D-189의 비차단 이론 생산과 D-190의 이론 공간 완료 상태를 유지하면서 AreaSet에 채울 H2·H3 재고의 식별성과 확장 순서를 고정한다.
+
+## D-192 팩 단독 H2는 팩 내부 H3보다 먼저 게임 기획 AreaSet에 대기 결속한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 결정: 팩 단독 H2는 H3가 아직 정의되지 않았다는 이유로 고아 재고로 격리하지 않는다. Nature·Farm·City/Hub·Town 게임 기획 AreaSet 후보가 `stagedPackNativeH2Refs`로 직접 소유하고, 다음 팩 내부 H3 생산의 입력으로 사용한다.
+- 현재 재고: Nature 생활핵·조우·방어 3개, Farm 관수·집중수확 2개, City/Hub 정비·비상전력 2개, Town 주거골목·주민서비스 2개를 추가해 H2를 24개에서 33개로 확장했다. 아홉 블록은 모두 단일 주도 팩 `SinglePack`, 위치 독립 상대 조립, 최소 두 H1, Network 문법, 입구·출구를 가지며 `TheoryQualified`다.
+- E 경계: H2 생성과 이론 적격은 WI 플레이 순서 추적을 기다리지 않는다. Nature·Farm의 엄격 추적 누락과 City·Town의 경고형 추적 누락은 후속 E 보완 대상으로 표시하며 H3·AreaSet·실제 플레이 완성을 자동 주장하지 않는다.
+- 관계: D-189의 사람 검토 비차단 이론 생산, D-191의 팩 주도 패턴 이름과 생산 순서를 첫 팩 단독 H2 묶음으로 실행한다.
+
+## D-193 팩 내부 H3가 준비되면 AreaSet의 임시 H2 직접 참조를 H3 계보로 대체한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 결정: 같은 팩의 H2를 조합한 H3가 `TheoryQualified`가 되면 게임 기획 AreaSet 후보의 `stagedPackNativeH2Refs`를 제거하고 해당 H3를 `requiredH3Refs`에 결속한다. H2는 H3 정의의 하위 계보로 계속 추적되며 고유 식별자와 해시는 유지한다.
+- 현재 재고: Nature 생활핵·조우·방어 폐루프, Farm 계절 생산 폐루프, City/Hub 정비·비상 대응 폐루프, Town 주민 서비스 폐루프를 추가해 H3를 13개에서 17개로 확장했다. 팩 주도 H2·H3 패턴은 50개이며 다음 생산 대기열은 Nature–Town 혼합 H2·H3 두 개다.
+- 게임플레이 추적: 엄격 기준 플레이가 사용하는 새 Nature·Farm H3는 플레이 단계에서 명시적으로 추적한다. AreaSet이 H3를 요구한다는 사실만으로 플레이 계보를 자동 보완하거나 E단계를 승격하지 않는다.
+- E 경계: 새 H3와 이론 AreaSet 재조립은 위치 독립 `TheoryQualified`·`E5TheoryQualified` 증거다. 실제 지역 Graph 결속, 공공데이터, Unity Scene·Runtime 또는 사람 검토 완료를 뜻하지 않는다.
+- 관계: D-192의 H2 대기 결속을 완료된 팩 내부 H3에 한해 종료하고, D-188~D-191의 H·게임플레이·E 독립 축과 StableId 보존 원칙을 유지한다.
+
+## D-194 Nature–Town 혼합 경관은 선택 계보로 만들고 실제 E5 배치를 자동 생성하지 않는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 공간 구성: `MIX-H2-NATURE-TOWN-01`은 Town 구호 물자 인계점과 Nature 복원 작업·안전 회복 공간을 연결한다. `MIX-H3-NATURE-TOWN-01`은 Town 회수·구호 블록, 이 전환 블록, Nature 복원·회복 블록을 `Town 구호 → Nature 복원 → 안전 생활핵 귀환` 흐름으로 묶는다.
+- 문법 경계: 기준 156 문법에 존재하지 않는 Nature–Town 전환어를 새로 꾸미지 않는다. H2는 타운·농촌 곡선 도로, H3는 건물 전면·수변 전환 문법을 조합하고 혼합 의미는 H 계보와 연결구가 담당한다.
+- AreaSet 경계: 혼합 H3는 Nature와 Town H4 청사진 양쪽의 선택 가능한 교차 경관 계보다. 같은 Graph를 두 이론 AreaSet에 자동 복제하지 않으며 실제 소유 Graph, 양쪽 연결점과 GraphRelation은 후속 E5에서 결정한다.
+- E 경계: H2 34개·H3 18개의 `TheoryQualified`와 패턴 대기열 0개는 위치 독립 설계 재고 완성을 뜻한다. 새 경관의 WI 추적·실제 지역 E5·공공데이터 E6·Unity Runtime을 완료했다고 주장하지 않는다.
+- 관계: D-191의 P4·P5 혼합 생산 순서를 실행하고 D-188~D-190의 H·게임플레이·E 독립 관문을 유지한다.
+
+## D-195 H2는 배치 가능한 물리 블록이고 H3는 배치 가능한 구역 조립안이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 주 이름: H2·H3 목록과 공간 계획기에서는 이름 대장의 `spatialDisplayNameKo` 물리 공간 이름을 먼저 표시한다. 기존 `탐색·대피형`, `집중 집하형`, `순환시장형` 같은 행동 중심 이름은 삭제하지 않고 `gameplayProfileNameKo` 보조 활용 유형으로 내린다. StableId와 팩·계열 `patternCode`는 바꾸지 않는다.
+- H2 계약: `BlockPattern`은 여러 H1의 로컬 상대 배치, 내부 이동 관계, 기준 경계, 허용 회전, 크기 변형과 외부 연결 역할을 봉인해 도시·농장·자연권 계획기에 한 단위로 놓을 수 있어야 한다.
+- H3 계약: `LandscapeAssemblyPattern`은 여러 H2의 상대 배치, 블록 사이 이동 관계, 기준 경계, 구역 형태와 외부 연결 역할을 봉인해 지구·캠퍼스·회랑 단위로 놓을 수 있어야 한다.
+- 게임플레이 경계: WI와 사건 흐름은 H2·H3의 존재 이유와 검증 계보지만 공간 자원 자체의 주 이름이나 자원 종류를 대신하지 않는다. 같은 물리 블록은 능력·용량 관문을 만족하는 여러 WI가 재사용할 수 있다.
+- 근거 경계: `LocalMeters` 기준 경계와 `spatialFormCode`는 위치 독립 이론 배치 계약이다. 실제 지역 좌표·도로·건물·공공데이터 E6, Unity Scene·Runtime E7 또는 사람 승인을 증명하지 않는다.
+- 관계: D-187의 H2 첫 공간 판단 단위와 D-191의 팩 주도 식별자를 유지하면서, 행동 중심 표시 때문에 H2가 블록처럼 읽히지 않던 문제를 공간 계획기용 자원 계약으로 보완한다.
+
+## D-196 실제 E5는 네 전용 AreaSet과 하나의 Network로 결속하고 모든 이론 H3의 처리를 명시한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 공간 소유권: Nature·Farm·City/Hub·Town은 각각 독립 `area-set:sim:*`을 소유하고, AreaSet 내부 H3는 내부 `LandscapeGraph`, 영역 사이 H3는 `AreaSetNetwork` 소유 경로 Graph로 둔다. 기존 `area-set:sim:pyeongchang:farm-hub-town.v1`은 공개 계약 호환 facade로 보존하며 새 실제 공간의 소유권으로 재사용하지 않는다.
+- 현재 결속: 내부 Graph 14개와 Network 경로 Graph 3개를 AreaSet 4개·Network 1개·방향 관계 8개로 결속한다. 현재 이론 H3 18개 가운데 17개는 실제 E5 소유자를 갖고 `h3-candidate:nature-town-relief-loop` 1개는 정책에 명시적으로 보류한다. 이후 이론 H3도 승격 또는 보류 중 하나로 분류되지 않으면 생성을 실패시킨다.
+- WI 결속: 전체 WI 41개를 직접 공간 결속 30개, AreaSet 문맥 결속 5개, 비공간 6개로 상호 배타적으로 분류한다. 기준 플레이의 Nature·Farm WI는 이 실제 대장을 근거로 유효 통합 단계를 E5로 계산하고 `reference-play:nature-farm-day.v1`을 `SpatiallyComposed`로 올린다.
+- 좌표·증거 경계: 이번 실제 E5는 사람이 승인한 게임 기획을 `ScenarioLocalMeters`에 결정적으로 작성한 공간 결속이다. 공공데이터·실제 도로·DEM 계보 E6, 실행 중 서버·Session DB·사람 조작 E7, 운영 상태나 사람 시각 승인을 뜻하지 않는다.
+- Unity 적재: canonical `SimulationWorldShell` 하나에서 Nature는 상시 유지하고 Farm·City/Hub·Town은 선택된 업무 영역만 적재한다. Network 경로 Graph는 전환에 필요한 경로만 준비·캐시하며 별도 공식 Scene을 만들지 않는다.
+- 관계: D-190의 `ActualE5BindingMissing` 현재 판정을 대체해 `SpatiallyComposed`로 올리되, `FunctionallyClosed` 이후 관문은 그대로 유지한다. D-194의 Nature–Town 혼합 H3 보류와 D-188의 H·게임플레이·E·완주 독립 축을 유지한다.
+
+## D-197 지역 위협·회복과 카드 효과는 서버 권위 v5 인과 원장으로 계산한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-19
+- 인과 원장: Simulation Session은 원인 경로별 `Threat`와 `Recovery`를 함께 보존한다. 확정된 안전 업무 결과와 Nature 복원·파티 회복은 회복을 높이고 위협을 낮추며, 불안전 선택과 기한 초과는 반대로 적용한다. 미리보기 차단과 일반 취소는 인과 입력이 아니다.
+- 카드 경계: 정방향의 유리한 카드는 회복 쪽, 역방향의 불리한 카드는 위협 쪽 변화로 확정한다. 다음 날 `Normal / Opportunity / Threat / Recovery`, 사건 심각도와 경로 영향은 서버가 계산하며 Unity는 결과 코드와 원장을 표시할 뿐 수치나 플러스·마이너스를 다시 계산하지 않는다.
+- 저장 호환: `simulation-save.v5`는 인과 상태와 변화 계보를 저장·재생한다. v1~v4 저장·재생은 당시 의미를 보존하기 위해 새 인과 규칙을 적용하지 않으며 기존 결과 hash 호환을 유지한다.
+- 표현 경계: Unity HUD는 서버 상태 사본을 읽어 위협·회복과 다음 날 결과를 보여 준다. 저장 Scene 배선과 EditMode 시험은 E7 사람 조작, Play Mode·Game View 또는 업무 완료의 증거가 아니다.
+- 관계: D-177의 심리 영역·업무 영역 되먹임을 실행 규칙으로 구체화하고, D-196의 실제 E5 공간 소유권과 독립적으로 서버 상태 권위를 유지한다.

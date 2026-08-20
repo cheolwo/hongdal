@@ -61,7 +61,8 @@ public sealed class Synty공간조립모바일검토Service(
         ArgumentNullException.ThrowIfNull(request);
         var schemaVersion = Require(request.SchemaVersion, nameof(request.SchemaVersion), 80);
         if (!string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV1, StringComparison.Ordinal)
-            && !string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal))
+            && !string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+            && !string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV3, StringComparison.Ordinal))
         {
             throw new ArgumentException(
                 $"지원하지 않는 검토 batch schema입니다. SchemaVersion={request.SchemaVersion}");
@@ -108,7 +109,7 @@ public sealed class Synty공간조립모바일검토Service(
             var existing = await store.조회Async(item.ReviewItemStableId, cancellationToken);
             if (existing is null)
             {
-                if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+                if (UsesUploadReceipts(schemaVersion)
                     && (item.ExpectedRevision != 0 || item.ParentCaptureBundleHash.Length != 0))
                 {
                     throw new Synty공간조립검토ConcurrencyException(item.ReviewItemStableId, 0);
@@ -148,7 +149,7 @@ public sealed class Synty공간조립모바일검토Service(
             }
 
             var expectedRevision = existing.Revision;
-            if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+            if (UsesUploadReceipts(schemaVersion)
                 && item.ExpectedRevision != expectedRevision)
             {
                 throw new Synty공간조립검토ConcurrencyException(item.ReviewItemStableId, expectedRevision);
@@ -159,7 +160,7 @@ public sealed class Synty공간조립모바일검토Service(
                                    existing.SnapshotJson,
                                    JsonOptions)
                                ?? throw new InvalidDataException("Synty 공간 조립 검토 snapshot이 손상되었습니다.");
-            if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+            if (UsesUploadReceipts(schemaVersion)
                 && !string.Equals(
                     item.ParentCaptureBundleHash,
                     previousItem.CaptureBundleHash,
@@ -387,6 +388,77 @@ public sealed class Synty공간조립모바일검토Service(
             throw new ArgumentException($"공간 변형은 A, B, C 중 하나여야 합니다. VariantCode={variantCode}");
         }
 
+        var isV3 = string.Equals(
+            schemaVersion,
+            Synty공간조립검토SchemaVersions.BatchV3,
+            StringComparison.Ordinal);
+        var h1StableId = Optional(source.H1StableId, 180) ?? string.Empty;
+        var h2StableId = Optional(source.H2StableId, 180) ?? string.Empty;
+        var h3StableId = Optional(source.H3StableId, 180) ?? string.Empty;
+        var h4StableId = Optional(source.H4StableId, 180) ?? string.Empty;
+        var reviewTargetLevelCode = isV3
+            ? Require(source.ReviewTargetLevelCode, nameof(source.ReviewTargetLevelCode), 8).ToUpperInvariant()
+            : string.Empty;
+        var reviewTargetStableId = isV3
+            ? Require(source.ReviewTargetStableId, nameof(source.ReviewTargetStableId), 180)
+            : string.Empty;
+        var captureProfileCode = isV3
+            ? Require(source.CaptureProfileCode, nameof(source.CaptureProfileCode), 80)
+            : string.Empty;
+        if (isV3)
+        {
+            if (!Synty공간조립검토계층Codes.All.Contains(reviewTargetLevelCode))
+            {
+                throw new ArgumentException(
+                    $"검토 대상 계층은 H1~H4 중 하나여야 합니다. ReviewTargetLevelCode={reviewTargetLevelCode}");
+            }
+            if (!Synty공간조립촬영ProfileCodes.All.Contains(captureProfileCode))
+            {
+                throw new ArgumentException(
+                    $"알 수 없는 H 촬영 profile입니다. CaptureProfileCode={captureProfileCode}");
+            }
+            if (!string.Equals(
+                    captureProfileCode,
+                    ExpectedCaptureProfile(reviewTargetLevelCode),
+                    StringComparison.Ordinal))
+            {
+                throw new ArgumentException(
+                    $"검토 대상 계층과 촬영 profile이 일치하지 않습니다. ReviewTargetLevelCode={reviewTargetLevelCode}, CaptureProfileCode={captureProfileCode}");
+            }
+
+            var requiredLineage = reviewTargetLevelCode switch
+            {
+                Synty공간조립검토계층Codes.H1 => new[] { h1StableId },
+                Synty공간조립검토계층Codes.H2 => new[] { h1StableId, h2StableId },
+                Synty공간조립검토계층Codes.H3 => new[] { h1StableId, h2StableId, h3StableId },
+                Synty공간조립검토계층Codes.H4 => new[] { h1StableId, h2StableId, h3StableId, h4StableId },
+                _ => []
+            };
+            if (requiredLineage.Any(string.IsNullOrEmpty))
+            {
+                throw new ArgumentException(
+                    $"{reviewTargetLevelCode} 검토에는 해당 단계까지의 H 계보가 필요합니다.");
+            }
+            var expectedTargetStableId = reviewTargetLevelCode switch
+            {
+                Synty공간조립검토계층Codes.H1 => h1StableId,
+                Synty공간조립검토계층Codes.H2 => h2StableId,
+                Synty공간조립검토계층Codes.H3 => h3StableId,
+                Synty공간조립검토계층Codes.H4 => h4StableId,
+                _ => string.Empty
+            };
+            if (!string.Equals(reviewTargetStableId, expectedTargetStableId, StringComparison.Ordinal))
+            {
+                throw new ArgumentException("ReviewTargetStableId가 선택한 H 계보 항목과 일치하지 않습니다.");
+            }
+        }
+        else
+        {
+            h1StableId = Require(source.H1StableId, nameof(source.H1StableId), 180);
+            h2StableId = Require(source.H2StableId, nameof(source.H2StableId), 180);
+            h3StableId = Require(source.H3StableId, nameof(source.H3StableId), 180);
+        }
+
         var packUsages = (source.PackUsages ?? [])
             .Select(pack => new Synty공간조립팩활용Dto
             {
@@ -431,7 +503,7 @@ public sealed class Synty공간조립모바일검토Service(
             var captureStableId = Require(capture.CaptureStableId, nameof(capture.CaptureStableId), 180);
             var viewCode = Require(capture.ViewCode, nameof(capture.ViewCode), 80);
             var displayName = Require(capture.DisplayName, nameof(capture.DisplayName), 100);
-            if (string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal))
+            if (UsesUploadReceipts(schemaVersion))
             {
                 if (captureUploadStore is null)
                 {
@@ -496,6 +568,11 @@ public sealed class Synty공간조립모바일검토Service(
         {
             throw new ArgumentException("촬영 이미지는 최대 8개이며 고유한 CaptureStableId·ViewCode와 양수 크기가 필요합니다.");
         }
+        if (isV3 && captures.Count > 0 && captures.Count != ExpectedCaptureCount(captureProfileCode))
+        {
+            throw new ArgumentException(
+                $"{captureProfileCode}은(는) {ExpectedCaptureCount(captureProfileCode)}개 촬영 영수증이 필요합니다.");
+        }
 
         return new Synty공간조립검토항목등록Request
         {
@@ -503,9 +580,13 @@ public sealed class Synty공간조립모바일검토Service(
             ReviewItemStableId = reviewItemStableId,
             CompositionStableId = Require(source.CompositionStableId, nameof(source.CompositionStableId), 160),
             DisplayName = Require(source.DisplayName, nameof(source.DisplayName), 160),
-            H1StableId = Require(source.H1StableId, nameof(source.H1StableId), 180),
-            H2StableId = Require(source.H2StableId, nameof(source.H2StableId), 180),
-            H3StableId = Require(source.H3StableId, nameof(source.H3StableId), 180),
+            H1StableId = h1StableId,
+            H2StableId = h2StableId,
+            H3StableId = h3StableId,
+            H4StableId = h4StableId,
+            ReviewTargetLevelCode = reviewTargetLevelCode,
+            ReviewTargetStableId = reviewTargetStableId,
+            CaptureProfileCode = captureProfileCode,
             VariantCode = variantCode,
             StateProfileCode = Require(source.StateProfileCode, nameof(source.StateProfileCode), 100),
             CompositionInputHash = sourceCompositionHash,
@@ -519,6 +600,30 @@ public sealed class Synty공간조립모바일검토Service(
             Captures = captures
         };
     }
+
+    private static bool UsesUploadReceipts(string schemaVersion)
+        => string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV2, StringComparison.Ordinal)
+           || string.Equals(schemaVersion, Synty공간조립검토SchemaVersions.BatchV3, StringComparison.Ordinal);
+
+    private static int ExpectedCaptureCount(string captureProfileCode)
+        => captureProfileCode switch
+        {
+            Synty공간조립촬영ProfileCodes.H1PlaceFourViews => 4,
+            Synty공간조립촬영ProfileCodes.H2BlockFiveViews => 5,
+            Synty공간조립촬영ProfileCodes.H3LandscapeSixViews => 6,
+            Synty공간조립촬영ProfileCodes.H4WorldFourViews => 4,
+            _ => throw new ArgumentException($"알 수 없는 H 촬영 profile입니다. CaptureProfileCode={captureProfileCode}")
+        };
+
+    private static string ExpectedCaptureProfile(string reviewTargetLevelCode)
+        => reviewTargetLevelCode switch
+        {
+            Synty공간조립검토계층Codes.H1 => Synty공간조립촬영ProfileCodes.H1PlaceFourViews,
+            Synty공간조립검토계층Codes.H2 => Synty공간조립촬영ProfileCodes.H2BlockFiveViews,
+            Synty공간조립검토계층Codes.H3 => Synty공간조립촬영ProfileCodes.H3LandscapeSixViews,
+            Synty공간조립검토계층Codes.H4 => Synty공간조립촬영ProfileCodes.H4WorldFourViews,
+            _ => throw new ArgumentException($"검토 대상 계층은 H1~H4 중 하나여야 합니다. ReviewTargetLevelCode={reviewTargetLevelCode}")
+        };
 
     private static string NormalizeImageUrl(string? value)
     {
@@ -582,6 +687,10 @@ public sealed class Synty공간조립모바일검토Service(
             item.H1StableId,
             item.H2StableId,
             item.H3StableId,
+            item.H4StableId,
+            item.ReviewTargetLevelCode,
+            item.ReviewTargetStableId,
+            item.CaptureProfileCode,
             item.VariantCode,
             item.StateProfileCode,
             item.CompositionInputHash,

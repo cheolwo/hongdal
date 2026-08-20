@@ -12,6 +12,36 @@ public static class Synty공간조립검토SchemaVersions
 {
     public const string BatchV1 = "synty-composition-review-batch.v1";
     public const string BatchV2 = "synty-composition-review-batch.v2";
+    public const string BatchV3 = "synty-composition-review-batch.v3";
+}
+
+public static class Synty공간조립검토계층Codes
+{
+    public const string H1 = "H1";
+    public const string H2 = "H2";
+    public const string H3 = "H3";
+    public const string H4 = "H4";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.Ordinal)
+    {
+        H1, H2, H3, H4
+    };
+}
+
+public static class Synty공간조립촬영ProfileCodes
+{
+    public const string H1PlaceFourViews = "H1PlaceFourViews";
+    public const string H2BlockFiveViews = "H2BlockFiveViews";
+    public const string H3LandscapeSixViews = "H3LandscapeSixViews";
+    public const string H4WorldFourViews = "H4WorldFourViews";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.Ordinal)
+    {
+        H1PlaceFourViews,
+        H2BlockFiveViews,
+        H3LandscapeSixViews,
+        H4WorldFourViews
+    };
 }
 
 public static class Synty공간조립검토상태Codes
@@ -98,6 +128,10 @@ public sealed class Synty공간조립검토항목등록Request
     public string H1StableId { get; set; } = string.Empty;
     public string H2StableId { get; set; } = string.Empty;
     public string H3StableId { get; set; } = string.Empty;
+    public string H4StableId { get; set; } = string.Empty;
+    public string ReviewTargetLevelCode { get; set; } = string.Empty;
+    public string ReviewTargetStableId { get; set; } = string.Empty;
+    public string CaptureProfileCode { get; set; } = string.Empty;
     public string VariantCode { get; set; } = string.Empty;
     public string StateProfileCode { get; set; } = string.Empty;
     public string CompositionInputHash { get; set; } = string.Empty;

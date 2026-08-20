@@ -259,6 +259,64 @@ public sealed class Synty공간조립모바일검토ServiceTests
         Assert.Equal(hold.Revision, exception.CurrentRevision);
     }
 
+    [Fact]
+    public async Task v3_H3촬영초안은_주검토계층과_촬영Profile을_원장에봉인한다()
+    {
+        var batch = CreateBatch();
+        batch.SchemaVersion = Synty공간조립검토SchemaVersions.BatchV3;
+        batch.BatchRevision = "design-h3-r1";
+        var item = batch.Items[0];
+        item.Captures = [];
+        item.CaptureBundleHash = string.Empty;
+        item.ReviewTargetLevelCode = Synty공간조립검토계층Codes.H3;
+        item.ReviewTargetStableId = item.H3StableId;
+        item.CaptureProfileCode = Synty공간조립촬영ProfileCodes.H3LandscapeSixViews;
+
+        var registered = await CreateService().Batch등록Async(batch);
+
+        var composition = Assert.Single(registered.Items).Composition;
+        Assert.Equal(Synty공간조립검토상태Codes.WaitingForCapture, registered.Items[0].ReviewStateCode);
+        Assert.Equal(Synty공간조립검토계층Codes.H3, composition.ReviewTargetLevelCode);
+        Assert.Equal(composition.H3StableId, composition.ReviewTargetStableId);
+        Assert.Equal(Synty공간조립촬영ProfileCodes.H3LandscapeSixViews, composition.CaptureProfileCode);
+    }
+
+    [Fact]
+    public async Task v3_주검토대상이_선택한H계보와다르면_등록을거부한다()
+    {
+        var batch = CreateBatch();
+        batch.SchemaVersion = Synty공간조립검토SchemaVersions.BatchV3;
+        var item = batch.Items[0];
+        item.Captures = [];
+        item.CaptureBundleHash = string.Empty;
+        item.ReviewTargetLevelCode = Synty공간조립검토계층Codes.H2;
+        item.ReviewTargetStableId = item.H1StableId;
+        item.CaptureProfileCode = Synty공간조립촬영ProfileCodes.H2BlockFiveViews;
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+            CreateService().Batch등록Async(batch));
+
+        Assert.Contains("ReviewTargetStableId", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task v3_주검토계층과_촬영Profile이다르면_등록을거부한다()
+    {
+        var batch = CreateBatch();
+        batch.SchemaVersion = Synty공간조립검토SchemaVersions.BatchV3;
+        var item = batch.Items[0];
+        item.Captures = [];
+        item.CaptureBundleHash = string.Empty;
+        item.ReviewTargetLevelCode = Synty공간조립검토계층Codes.H2;
+        item.ReviewTargetStableId = item.H2StableId;
+        item.CaptureProfileCode = Synty공간조립촬영ProfileCodes.H3LandscapeSixViews;
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+            CreateService().Batch등록Async(batch));
+
+        Assert.Contains("촬영 profile", exception.Message, StringComparison.Ordinal);
+    }
+
     private static Synty공간조립모바일검토Service CreateService()
         => new(new InMemorySynty공간조립검토원장Store(), TimeProvider.System);
 

@@ -26,6 +26,40 @@ Unity에서 만든 Synty 공간 조합물을 네 시점 PNG로 고정하고, 서
 | P5 발전소 확대 | 후속 | 회복·위협 × A/B/C의 실제 조립 6개와 Normal·Intensified 표현 결합 |
 | P6 모바일 운영 검증 | 후속 | 12카드·48이미지 Blob/Mongo 등록과 실제 휴대폰 검토 |
 
+### H1~H4 선택 Root 촬영·전송 파이프라인
+
+단일 기준작에 한정됐던 촬영기를 `synty-composition-review-batch.v3`로 확장했다. Unity Hierarchy에서 H 조합물의 최상위 Root를 선택하고 `Ssalddel/Synty Web 검토/H1-H4 조합물 촬영·전송` 창을 열면 다음 한 흐름을 실행한다.
+
+```text
+선택한 H 조합물 Root
+        ↓ 저장 장면을 수정하지 않는 임시 Additive Scene 복제
+H 단계별 표준 시점 PNG + 조합 입력 SHA-256
+        ↓ 각 PNG 개별 업로드
+서버 PNG 검증·재인코딩 + 불변 업로드 영수증
+        ↓ 모든 영수증이 맞을 때만
+검토 묶음 v3 등록
+        ↓
+휴대폰 전용 Web 검토함
+```
+
+| 주 검토 대상 | 표준 촬영 | 필요한 계보 |
+| --- | ---: | --- |
+| H1 장소 | 4시점 | H1 |
+| H2 블록 | 5시점 | H1→H2 |
+| H3 경관 | 6시점 | H1→H2→H3 |
+| H4 지역 청사진 | 4시점 | H1→H2→H3→H4 |
+
+v3는 `ReviewTargetLevelCode`, `ReviewTargetStableId`, `CaptureProfileCode`와 H1~H4 계보를 봉인한다. 주 검토 대상 ID가 선택 단계의 계보와 다르거나, 단계까지 필요한 하위 계보가 빠지거나, 표준 시점 수가 맞지 않으면 서버가 등록을 거부한다. 선택 Root의 장면 절대 위치·회전·축척은 조합 입력 지문에서 제외하고 자식의 Prefab 원본 GUID·상대 변환·활성 상태는 포함한다. 따라서 같은 조합을 다른 검토 장면 위치에서 찍어도 같은 입력으로 읽고, 내부 배치가 바뀌면 새 입력으로 읽는다.
+
+`검토용 ID와 계획 해시 채우기`는 검토 계보 식별자만 결정적으로 만든다. 공식 H 승인, E단계 승격, AreaSet·경관 그래프 권위는 만들지 않는다. 팩 사용 비율도 Renderer가 참조한 Synty Prefab을 세어 표현 출처로 기록할 뿐 공간 능력이나 업무 규칙을 추론하지 않는다.
+
+### H1과 H2의 검토 책임
+
+- H1은 공간 부품의 존재·의미·표현 후보·게임 기획 맥락을 인지하는 재고다. 모든 H1을 단품 이미지로 최종 판단하거나 공식 Simulation 승인한 뒤에만 H2에 넣지 않는다.
+- H2는 필수 H1 두 개 이상을 상대 위치·위상·내부 관계·외부 연결구로 조합한 첫 공간 판단 단위다. 사람이 실제 공간 구성 가능성을 판단하는 기본 촬영 대상은 H2다.
+- `H2 조합 가능`은 하위 H1이 모두 인지 재고에 있고 조합 목적이 설명되는 상태다. `H2 검토 가능`은 결정적인 조립법과 Unity Root, 표준 5시점 촬영까지 준비된 상태다.
+- H2 촬영과 모바일 판단은 위치 독립 표현 검토다. 실제 AreaSet 배치·WI E단계·공공데이터 근거를 자동으로 만들지 않는다.
+
 현재 검토 화면은 별도 `Ssalddel.Web.UnityReviewApp`의 `/`, `/reviews/compositions`, 호환 주소 `/world/review/compositions`에서 열며 서버관리자 로그인이 필요하다. 일반 `Ssalddel.WebApp`과 역할별 WebApp에는 이 화면과 검토 Client를 포함하지 않는다. Unity 로컬 촬영은 실제 PNG를 생성했지만 Azure Blob·MongoDB·Web까지의 실HTTP 왕복과 실제 휴대폰 렌더는 아직 실행 증거가 아니다.
 
 ## 전체 흐름
@@ -60,9 +94,11 @@ Web 사람 검토
 
 Unity는 Blob URL을 결정하지 않는다. PNG와 고유 식별자·hash만 서버에 보내고, 서버가 `CaptureUploadId`와 저장 위치 영수증을 발급한다. Review Batch v2는 임의 외부 URL이 아니라 이 영수증을 참조한다.
 
-## v1과 v2 계약
+## v1, v2와 v3 계약
 
-`synty-composition-review-batch.v1`은 기존 URL 기반 batch를 읽기 위한 호환 계약으로 유지한다. 새 Unity 촬영은 `synty-composition-review-batch.v2`만 쓴다.
+`synty-composition-review-batch.v1`은 기존 URL 기반 batch를 읽기 위한 호환 계약으로 유지한다. 회복 발전소 단일 기준작은 v2, H1~H4 일반 선택 Root 촬영은 v3를 쓴다.
+
+기존 회복 발전소 단일 기준작과 재촬영은 v2를 유지한다. Hierarchy에서 임의의 H1~H4 조합물을 선택해 촬영하는 새 편집기 흐름은 v3를 사용한다. v3도 v2와 같은 불변 업로드 영수증·부모 촬영 묶음·예상 개정 검사를 재사용하며 H 계보와 단계별 촬영 Profile 검증만 추가한다.
 
 v2 한 검토 항목의 핵심 값은 다음과 같다.
 
@@ -94,7 +130,7 @@ v2 한 검토 항목의 핵심 값은 다음과 같다.
 | --- | --- | --- |
 | 검토함 조회 | `GET` | `/api/v1/platform/world-composition-reviews` |
 | PNG 업로드·영수증 발급 | `POST multipart/form-data` | `/api/v1/platform/world-composition-reviews/capture-uploads` |
-| v1/v2 batch 등록 | `POST` | `/api/v1/platform/world-composition-reviews/batches` |
+| v1/v2/v3 batch 등록 | `POST` | `/api/v1/platform/world-composition-reviews/batches` |
 | Web 판단 기록 | `POST` | `/api/v1/platform/world-composition-reviews/items/{reviewItemStableId}/decisions` |
 
 모든 경로는 `서버관리자전용` 정책을 요구한다.
@@ -198,6 +234,7 @@ Blob과 MongoDB는 하나의 트랜잭션이 아니다. 첫 버전은 다음 순
 | `Ssalddel/Synty Web 검토/01 ... 4시점 로컬 촬영` | 로컬 PNG와 manifest 생성, 단축키 `F10` |
 | `.../02 ... 최초 업로드 및 등록` | 네 PNG 업로드 영수증을 받은 뒤 v2 batch 최초 등록 |
 | `.../03 NeedsRevision ... 재촬영 및 등록` | 현재 부모 bundle·revision·조립 hash를 조회한 뒤 재촬영 |
+| `.../H1-H4 조합물 촬영·전송` | 선택한 Root의 H 계보를 입력하고 로컬 촬영 또는 촬영·업로드·v3 등록을 한 번에 실행 |
 
 로컬 결과는 Unity 프로젝트의 `artifacts/local/synty-web-review/<UTC>/`에 둔다. `capture-manifest.json`은 로컬 검증 자료이며 공개 Blob에 올리지 않는다.
 
