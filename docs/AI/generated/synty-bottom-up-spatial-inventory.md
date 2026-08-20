@@ -63,9 +63,9 @@
 | 후보 | 위상 | H2 후보 | 외부 연결 역할 |
 | --- | --- | --- | --- |
 | `h3-candidate:highland-farm` 고지대 농장 경관 | `ContourAdaptive` | h2-candidate:highland-production, h2-candidate:farm-processing-shipping, h2-candidate:forest-edge-farm | FarmExternalGate |
-| `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | `Linear` | h2-candidate:farm-hub-corridor | FarmGate, HubInboundGate |
+| `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | `Linear` | h2-candidate:farm-processing-shipping, h2-candidate:farm-hub-corridor, h2-candidate:hub-inbound-storage | FarmGate, HubInboundGate |
 | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | `ModifiedGrid` | h2-candidate:hub-inbound-storage, h2-candidate:hub-outbound-vehicle | HubInboundGate, HubOutboundGate |
-| `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | `Linear` | h2-candidate:hub-town-corridor | HubOutboundGate, TownReceivingGate |
+| `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | `Linear` | h2-candidate:hub-outbound-vehicle, h2-candidate:hub-town-corridor, h2-candidate:market-life-commerce | HubOutboundGate, TownReceivingGate |
 | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | `ModifiedGrid` | h2-candidate:lowrise-residential, h2-candidate:market-life-commerce | TownReceivingGate, TownLocalRoad |
 | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | `Organic` | h2-candidate:nature-water-buffer, h2-candidate:forest-edge-farm | NatureTrail, FarmEdge |
 

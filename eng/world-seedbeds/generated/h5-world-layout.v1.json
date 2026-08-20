@@ -1,0 +1,1367 @@
+{
+  "schemaVersion": "simulation-world-h5-spatial-output.v1",
+  "revision": "simulation-world-h5-spatial-output.r1",
+  "policyRevision": "simulation-world-h5-layout-policy.r1",
+  "generatedAtRuleCode": "DeterministicNoWallClock",
+  "worldLayoutDefinition": {
+    "schemaVersion": "simulation-world-layout-definition.v1",
+    "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
+    "worldLayoutRevision": 1,
+    "worldIntentStableId": "theory-world:nature-farm-city-town",
+    "areaSetNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
+    "coordinateSpaceCode": "ScenarioLocalMeters",
+    "worldGroundingPolicyCode": "Optional",
+    "areaSetInstances": [
+      {
+        "areaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "blueprintStableId": "h4-blueprint:farm-production-processing-region",
+        "areaRoleCode": "Farm",
+        "loadPolicyCode": "OnDemand",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 634.910789,
+          "localZMeters": -93.977416,
+          "rotationDegrees": 209.013842,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "graphInstances": [
+          {
+            "graphInstanceStableId": "graph-instance:h4:farm-production-v1:farm-incident-recovery",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-incident-recovery.v1",
+            "h3Ref": "h3-candidate:farm-incident-recovery",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -480.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:farm-incident-recovery:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -276.0,
+                "localZMeters": -202.0,
+                "rotationDegrees": 272.822155,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "4f295106204416fc348b654bf08b06e5c8d2a5c024d2871ea9150f76cdc2bb8f"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:farm-incident-recovery:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 292.0,
+                "localZMeters": -234.0,
+                "rotationDegrees": 93.626572,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "25ba70fa5177c4ba0c8e52bbb076dcb1427d1cf0863e5111e21c27fa68625bab"
+              }
+            ],
+            "sourcePatternHashSha256": "342a8a93fe39c6b74fc70b0b7fcb13d1636dc0fb4cd84591ae840de083f5e25e",
+            "placementHashSha256": "be21bf036db56ed71d6626e90183659c4165b287d53c68207afbe5049051054c",
+            "instanceHashSha256": "dace52238320a15f1f5478c720354966ba40126401d8c986133f74d44e701099"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:farm-production-v1:farm-processing-campus",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
+            "h3Ref": "h3-candidate:farm-processing-campus",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 480.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:farm-processing-campus:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 290.0,
+                "localZMeters": 210.0,
+                "rotationDegrees": 53.426969,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "d2a4188599c1adc38c07fa53b608414f0c3065cb8671b54397f31a3bbb1e60d3"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:farm-processing-campus:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -170.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 213.111342,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "CargoLogistics"
+                ],
+                "connectorPoseHashSha256": "95868c20ce78f42204b3647b9fee52c84d9a8a92a929ee683833a18d4bc0dfd7"
+              }
+            ],
+            "sourcePatternHashSha256": "a32a14f2efa53437fb0b398065c04db2e8ec6173cd501a438fa335ed9c8a6ed5",
+            "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
+            "instanceHashSha256": "f2587c243811d20ff697b3f1f585fd28bd0edfabce47631e2014cecabbb1fad1"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:farm-production-v1:farm-seasonal-production-loop",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-seasonal-production-loop.v1",
+            "h3Ref": "h3-candidate:farm-seasonal-production-loop",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 480.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:farm-seasonal-production-loop:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 250.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 130.426079,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "4f865a72de9d4f01b4479fdfbc92ad7ffd927b7cbc072f0c99ba2b51cdc61a55"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:farm-seasonal-production-loop:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -290.0,
+                "localZMeters": 210.0,
+                "rotationDegrees": 310.426079,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "dd09e546d08ebe95e63b422e3b4420a08fd41b37531d599dba8be0c0b01346a2"
+              }
+            ],
+            "sourcePatternHashSha256": "eba7a6a29d3dc5133b95a631b36fcaf1c006d3dc3c4400b3ea06dcc8bebaf63a",
+            "placementHashSha256": "d9b259ef3466538caf340d5247073d5dd39d920e6d5b9e9eeb892e5e15fb7848",
+            "instanceHashSha256": "91a490d8986227f499e36847bc52893a7a291a45ead94dd339ad49aee29f50ef"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:farm-production-v1:highland-farm",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
+            "h3Ref": "h3-candidate:highland-farm",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -480.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:highland-farm:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 80.0,
+                "localZMeters": 147.0,
+                "rotationDegrees": 19.762421,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "786fea7f78cb856a4882ae08aa814ed8c6f0fa5a980cd40636f0e81256b58daf"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:highland-farm:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -380.0,
+                "localZMeters": -187.0,
+                "rotationDegrees": 247.339464,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "b9114eefac24c7944f5f7f3734b00343193240e99f79dff6368245434dfcd464"
+              }
+            ],
+            "sourcePatternHashSha256": "e89da2a9956b37c65dd5b52ec8bb39b4e7640e095dce128471e35d67c597b35a",
+            "placementHashSha256": "d5e27d7893e7c507ada34017843f894eaa89ef4c85f820ba6b2ae76f6e38a344",
+            "instanceHashSha256": "e6e54899e1b7c90798e5b7ef428c47e63645054622151549030157c595ce4957"
+          }
+        ],
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:farm-incident-recovery:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -756.0,
+            "localZMeters": 278.0,
+            "rotationDegrees": 272.822155,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "a423aa86082e61d523ef7a5d4ec5f03b92b19222fc41dc6698dbf5ed19f348ef"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:farm-incident-recovery:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -188.0,
+            "localZMeters": 246.0,
+            "rotationDegrees": 93.626572,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "40cffbcd467a976c3d99cf875f0cac2254bd925b75b960d4b866c300d6ccaf84"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:farm-processing-campus:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 770.0,
+            "localZMeters": -270.0,
+            "rotationDegrees": 53.426969,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "5d85501a7684df45fd904767afeff32df49c8df91953da18b0c1e598fd61d246"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:farm-processing-campus:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 310.0,
+            "localZMeters": -730.0,
+            "rotationDegrees": 213.111342,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "b7fcb1f5578e867b37f66e9178b6b3785ede804851d912fb481e3201872bdaf4"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:farm-seasonal-production-loop:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 730.0,
+            "localZMeters": 230.0,
+            "rotationDegrees": 130.426079,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "7c5b6ba0003c5bdc24bd58b88093adacf18b74a1b2432c2cd9f5a0e5606b7dee"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:farm-seasonal-production-loop:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 190.0,
+            "localZMeters": 690.0,
+            "rotationDegrees": 310.426079,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "e874542513b707d05c2fb85fda312eee37c2eabb07a19098c2f808c589d78b6f"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:highland-farm:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -400.0,
+            "localZMeters": -333.0,
+            "rotationDegrees": 19.762421,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "272ca1bae28a6e7c1906eb7c9af271cd951a9815e02ac7b93dd415272e24f8c7"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:highland-farm:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -860.0,
+            "localZMeters": -667.0,
+            "rotationDegrees": 247.339464,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "35903fdee8f187c272622c9ae7581172545b1ff8386b65e93e81e764ccb995ba"
+          }
+        ],
+        "placementHashSha256": "842a13c979a106c6b596b8dc63d7182529c42a7c509e0b72d9a2377e8069f804",
+        "instanceHashSha256": "61daf6ebe03dd8bff1a952aee1fe616573b2a0c77eec0c835e40cd1ae92f2aad"
+      },
+      {
+        "areaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "blueprintStableId": "h4-blueprint:logistics-hub-region",
+        "areaRoleCode": "CityHub",
+        "loadPolicyCode": "OnDemand",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": -396.226868,
+          "localZMeters": -99.661864,
+          "rotationDegrees": 177.182472,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "graphInstances": [
+          {
+            "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:hub-maintenance-emergency-loop",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-maintenance-emergency-loop.v1",
+            "h3Ref": "h3-candidate:hub-maintenance-emergency-loop",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -480.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:hub-maintenance-emergency-loop:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 290.0,
+                "localZMeters": -210.0,
+                "rotationDegrees": 121.160919,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "a27b4005729d6378f4f18f101c23e5da2fd02e4006367e9de22c4c74791a6176"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:hub-maintenance-emergency-loop:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -210.0,
+                "localZMeters": 210.0,
+                "rotationDegrees": 319.35707,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "9d7f309692700c55804e289622853b722a96fb070a4811130d7e4668ca39f3c8"
+              }
+            ],
+            "sourcePatternHashSha256": "76a4832692979661e79a71f9bb12fe7281915ea55e2c8b90f91a5916fe7f85d6",
+            "placementHashSha256": "be21bf036db56ed71d6626e90183659c4165b287d53c68207afbe5049051054c",
+            "instanceHashSha256": "9bb614493be050879c813a557befc16ba95997cb0f7d3d61518de0a51e1bc502"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:jinbu-hub",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
+            "h3Ref": "h3-candidate:jinbu-hub",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -480.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:jinbu-hub:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -250.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 265.763605,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "CargoLogistics"
+                ],
+                "connectorPoseHashSha256": "675464b1ed26ac3e89342c8256220bb6cb45dc5855bb23d1c6402b6da175572c"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:jinbu-hub:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 210.0,
+                "localZMeters": -210.0,
+                "rotationDegrees": 83.990994,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "CargoLogistics"
+                ],
+                "connectorPoseHashSha256": "4afd9aa160919b2c1bf18d22bf1e0418d8c1c5ee6ebb807a350060dfa23e53a2"
+              }
+            ],
+            "sourcePatternHashSha256": "1685288c2b4a43505fc73a8a2576502a574c6c6a090e04d15b806f86702f7b15",
+            "placementHashSha256": "d5e27d7893e7c507ada34017843f894eaa89ef4c85f820ba6b2ae76f6e38a344",
+            "instanceHashSha256": "976ffae710b4605cdd1cb2535396fcdf124c7e4156c56546085707a658db16d1"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:resilient-logistics-hub",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:resilient-logistics-hub.v1",
+            "h3Ref": "h3-candidate:resilient-logistics-hub",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 480.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:resilient-logistics-hub:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -250.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 229.573921,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "22cea0b560ff23b2f58a949e31a6d6d125aa8b24b83a9268c599ff73f664948e"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:resilient-logistics-hub:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 170.0,
+                "localZMeters": -170.0,
+                "rotationDegrees": 135.0,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "5dc3c354fc49d3e6f2f86514ef422decb3c12e18ffe6d86bac97e58604adc3c4"
+              }
+            ],
+            "sourcePatternHashSha256": "f0b6de17878bf46891c5b92ee9c7cb8f916c9318379389bc2bc7757d834886f9",
+            "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
+            "instanceHashSha256": "d72a2c480f7a66ab9354ff027204dbd5a4679e09117e16846057b2b476914af3"
+          }
+        ],
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:hub-maintenance-emergency-loop:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -190.0,
+            "localZMeters": 270.0,
+            "rotationDegrees": 121.160919,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "bcac162971eef6b130dc2d27dbcf6840c3bcf2b7df75c436d05adefef33db0f4"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:hub-maintenance-emergency-loop:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -690.0,
+            "localZMeters": 690.0,
+            "rotationDegrees": 319.35707,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "6a65ce3203e9687c6692b130740e8343caa3b316dcf0358296d3576bb27e41a3"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:jinbu-hub:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -730.0,
+            "localZMeters": -730.0,
+            "rotationDegrees": 265.763605,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "b0a27c3c55f95b1079a3f15c542db3a38c2745fa6d23c28abcba7c4e3cf8beec"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:jinbu-hub:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -270.0,
+            "localZMeters": -690.0,
+            "rotationDegrees": 83.990994,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "dc50d837ca2d55b0a632b836996b50b094f0a76dd5d468cbea80ef42b4dee583"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:resilient-logistics-hub:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 230.0,
+            "localZMeters": -730.0,
+            "rotationDegrees": 229.573921,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "21969a8341ee0503362fd54253132e99726bab862c131eaef2c8fc28ff72a0d7"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:resilient-logistics-hub:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 650.0,
+            "localZMeters": -650.0,
+            "rotationDegrees": 135.0,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "9ae67f67ea97f8b0804bab95f4f70f440819478d6da108722fa34ee32e167b0e"
+          }
+        ],
+        "placementHashSha256": "75f7b58f9447507f4dc3f60f644d0d3f3f86a97cb600bddb0f3873c20a6c76f3",
+        "instanceHashSha256": "fcbeba205809f5541c072b590b2d4338bd3128b9d2ac6411d629a687a1758719"
+      },
+      {
+        "areaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "blueprintStableId": "h4-blueprint:nature-home-exploration-region",
+        "areaRoleCode": "NatureHome",
+        "loadPolicyCode": "Persistent",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 0.0,
+          "localZMeters": 0.0,
+          "rotationDegrees": 0.0,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "graphInstances": [
+          {
+            "graphInstanceStableId": "graph-instance:h4:nature-home-v1:nature-home-encounter-defense",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
+            "h3Ref": "h3-candidate:nature-home-encounter-defense",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -480.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:nature-home-encounter-defense:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 380.0,
+                "localZMeters": -216.28,
+                "rotationDegrees": 118.521623,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "4792d8d3c007fdf853f72123f5bcaffe68ee17af11139fe2392319f8f2e6e4c5"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:nature-home-encounter-defense:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -460.0,
+                "localZMeters": -216.28,
+                "rotationDegrees": 247.82501,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "e3f63b109233d65ea6fbfe3e318d7b0febb1e8f2840cdfb910365ef4ab305532"
+              }
+            ],
+            "sourcePatternHashSha256": "6f58e862fadfa7fdff4010295301f78a2d7d55af98fef7291b517b8ccfdead8b",
+            "placementHashSha256": "be21bf036db56ed71d6626e90183659c4165b287d53c68207afbe5049051054c",
+            "instanceHashSha256": "434920f277c6155001fd5090389bb9010cd441b19c07cce946de72602599b951"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:nature-home-v1:nature-threat-recovery",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
+            "h3Ref": "h3-candidate:nature-threat-recovery",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -480.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:nature-threat-recovery:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 182.0,
+                "localZMeters": 177.0,
+                "rotationDegrees": 44.240154,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "4472c7341fd47630bb2e95579efa656f9c7ec8e3bc79f7c39ba540a83c957cd4"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:nature-threat-recovery:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -210.0,
+                "localZMeters": -147.0,
+                "rotationDegrees": 237.152457,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "5697a34f622f9275e5952cbc50f8fbf6efe068e1b12a63d2432bad87a44d4733"
+              }
+            ],
+            "sourcePatternHashSha256": "b9be1b6e1d1a91542037925edc0f03795804124d7c62aecd6070bc2be79e287a",
+            "placementHashSha256": "d5e27d7893e7c507ada34017843f894eaa89ef4c85f820ba6b2ae76f6e38a344",
+            "instanceHashSha256": "2e07c53b941dfe5d91136fd52e81d140386d9a7672745ab62c6e8164a4092f8f"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:nature-home-v1:nature-trail-network",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-trail-network.v1",
+            "h3Ref": "h3-candidate:nature-trail-network",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 480.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:nature-trail-network:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -210.0,
+                "localZMeters": -119.0,
+                "rotationDegrees": 237.940436,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "2113dd482a506cf92cd877b8663e98a8aa8427d8dfa5c3b458b575621a90c297"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:nature-trail-network:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 250.0,
+                "localZMeters": 175.0,
+                "rotationDegrees": 57.050785,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "0709ef9478137e4dc04a3731863cfd46a552d62d1cad889944f777c7b28ab815"
+              }
+            ],
+            "sourcePatternHashSha256": "810d1d6a2ed08c79ff777d791d68b7b90e6436739873d0b229bceb02a3c33932",
+            "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
+            "instanceHashSha256": "78f85bb2564a202ae19014be456be433e8517af205de419e76b72964ef54cac9"
+          }
+        ],
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:nature-home-encounter-defense:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -100.0,
+            "localZMeters": 263.72,
+            "rotationDegrees": 118.521623,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "1b27a54a551b05dabbd2813cda7b133288cf6efb3254e5e394321f81002da19b"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:nature-home-encounter-defense:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -940.0,
+            "localZMeters": 263.72,
+            "rotationDegrees": 247.82501,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "f1687c3d0b0f093825dea250c9d20a8a2b4555b179d468d25c31fea58dad1368"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:nature-threat-recovery:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -298.0,
+            "localZMeters": -303.0,
+            "rotationDegrees": 44.240154,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "ffdc947fcc730ca3b32c0f9310ac59bcbd0e298c276d68aebc7a692b1262aa13"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:nature-threat-recovery:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -690.0,
+            "localZMeters": -627.0,
+            "rotationDegrees": 237.152457,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "1990aa075643419b14c8cf88c2266379a142f12be4237e476658c31556eb0cb8"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:nature-trail-network:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 270.0,
+            "localZMeters": -599.0,
+            "rotationDegrees": 237.940436,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "1d20de630316faef3074bbb7632aa7cd072a54e96046b473dfa4e100374abc40"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:nature-trail-network:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 730.0,
+            "localZMeters": -305.0,
+            "rotationDegrees": 57.050785,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "2714be6caece22f7c1f05afa78ad2e68913ccd4fef4758ebb5ef5443c8d59c62"
+          }
+        ],
+        "placementHashSha256": "245dd30cdbac334e50a5519aca4ef3fe000e6de798c1ef6403f38deaf0fa9f9d",
+        "instanceHashSha256": "439266c8b96dbe22abd300be12752a47fe822db0135afbdcb3b36229df542640"
+      },
+      {
+        "areaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "blueprintStableId": "h4-blueprint:lowrise-market-region",
+        "areaRoleCode": "Town",
+        "loadPolicyCode": "OnDemand",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": -1936.628882,
+          "localZMeters": -415.234212,
+          "rotationDegrees": 172.890598,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "graphInstances": [
+          {
+            "graphInstanceStableId": "graph-instance:h4:town-market-v1:circular-market-town",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:circular-market-town.v1",
+            "h3Ref": "h3-candidate:circular-market-town",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 0.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:circular-market-town:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -210.0,
+                "localZMeters": -170.0,
+                "rotationDegrees": 280.784298,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "d5fc796d5bbc6ed7a0d308a047afdefa55751ff6394b080e8bc9ba57b88a4719"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:circular-market-town:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 210.0,
+                "localZMeters": -210.0,
+                "rotationDegrees": 90.0,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "80e1768b4601de9baf5455ba9d5828d40756d824e8bf41116d7c7815a483ea5b"
+              }
+            ],
+            "sourcePatternHashSha256": "820b32798f844bd3182efc90f1de5536707380ae75087c36050394c56d351db1",
+            "placementHashSha256": "ca41a8858aba396ced05483464a13f59c60775ad28178053cc1d6eeb0480b73b",
+            "instanceHashSha256": "2157d6b23298fa70878e4816315fd0bba20210ca176905c7ef11430ffb92054c"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:town-market-v1:lowrise-market-town",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
+            "h3Ref": "h3-candidate:lowrise-market-town",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -960.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:lowrise-market-town:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -250.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 261.573031,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "CargoLogistics"
+                ],
+                "connectorPoseHashSha256": "8330349ac2a2fa8ee2fe02886c27ed104da02016bb0638611568f0daf492db91"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:lowrise-market-town:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 130.0,
+                "localZMeters": -170.0,
+                "rotationDegrees": 70.016893,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "365a57f170459d3372d6b2736d297e20ae0393d4709f384799ab6333e87c0e29"
+              }
+            ],
+            "sourcePatternHashSha256": "b2c398dae4b8f0dd4ae8f7df7da9f73dfbefed5a2ee5148e53b633de6ac2207b",
+            "placementHashSha256": "724ebfa46ab73f4348b2eacb0e27ad4c5c7c12390b694d520a3dc483ffbe27c6",
+            "instanceHashSha256": "68055a10bece10c17819272f879841cd371fb51362529ba9c12cd81a8213e439"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:town-market-v1:town-contamination-relief",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-contamination-relief.v1",
+            "h3Ref": "h3-candidate:town-contamination-relief",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 960.0,
+              "localZMeters": -480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:town-contamination-relief:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -140.0,
+                "localZMeters": -248.0,
+                "rotationDegrees": 255.395553,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "a2cf0f2f2715dc088fd79f20bab20398e9a15881c8db206ee0a556bc4d6495f4"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:town-contamination-relief:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 144.0,
+                "localZMeters": -202.0,
+                "rotationDegrees": 86.373428,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "7834f260d1168a3f3dcdb61b6b243f85560d221758e55bbe5a27583f47e45f53"
+              }
+            ],
+            "sourcePatternHashSha256": "c601db9e87d9e192d5de366d22c09bbf46755379ea644a021651b43353da6056",
+            "placementHashSha256": "375b872a0e3c699fb7f62dc42d5ea4d5e037c4cb933f6dd4d709caefc53f3ba4",
+            "instanceHashSha256": "47fadc62720dab2d22900ef8818313a6a29918725e60cba1717bc79ec93c9551"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:town-market-v1:town-resident-service-loop",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-resident-service-loop.v1",
+            "h3Ref": "h3-candidate:town-resident-service-loop",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": -960.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:town-resident-service-loop:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -250.0,
+                "localZMeters": 170.0,
+                "rotationDegrees": 307.159432,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "1c337fef47bb0db28a68eef5aeb8038935c94cb7d0faa33a49ab2ef924a911f6"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:town-resident-service-loop:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -170.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 221.420146,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "30810d8a8c90bbc572b5bb6bd10b613981ff09fb39a43e164152d1d951f0a1cf"
+              }
+            ],
+            "sourcePatternHashSha256": "db5757498b465de603b4b5adbb3b6bdbd8efc82983f06700cefbad6f00468bed",
+            "placementHashSha256": "b09a2ab28dd2788a6f2a0e32d26cffa2ad4b36089bd57c916c53926a18999017",
+            "instanceHashSha256": "fa50fd08ac455e00bd396c296d96bfb3695c589347f7573da04a9896bdc13ab9"
+          }
+        ],
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:circular-market-town:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -210.0,
+            "localZMeters": -650.0,
+            "rotationDegrees": 280.784298,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "0e60d5c8e51546d49edcf019dcf3703a8a2447f984f9ee6a48c00bcfab7be8ac"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:circular-market-town:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 210.0,
+            "localZMeters": -690.0,
+            "rotationDegrees": 90.0,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "b1ae123a6d5ead20dad122918700ceecab00506cd79e7b9897c5c81d1a253a2b"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:lowrise-market-town:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -1210.0,
+            "localZMeters": -730.0,
+            "rotationDegrees": 261.573031,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "8ecae1f920756d22afe654491c7492912895a1ed2c63cf923a18172bbf4b6fc8"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:lowrise-market-town:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -830.0,
+            "localZMeters": -650.0,
+            "rotationDegrees": 70.016893,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "75e703cbc253700631c156715a025014e71c0f6ebe163b0c8cae90e8662cafd9"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:town-contamination-relief:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 820.0,
+            "localZMeters": -728.0,
+            "rotationDegrees": 255.395553,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "2fd7fc41b2cb0bba1bd2a9af8d1a05c18e19cf71496abb2ecd1d42ca9f84d560"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:town-contamination-relief:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 1104.0,
+            "localZMeters": -682.0,
+            "rotationDegrees": 86.373428,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "0e630727d595f73a8749457cd87c804239cd2c56eb50cb696407109901dc21ab"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:town-resident-service-loop:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -1210.0,
+            "localZMeters": 650.0,
+            "rotationDegrees": 307.159432,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "fb516de6336bfbe5c2b5ab83edf5b4a10ff072075e23dbf1ab5f2a7603361154"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:town-resident-service-loop:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -1130.0,
+            "localZMeters": 230.0,
+            "rotationDegrees": 221.420146,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "905861362d79dce271c4983b3a5e7fd473205e1087ca2660e8b650ad6d550622"
+          }
+        ],
+        "placementHashSha256": "ccc9088b91e8bef5a2d568eabe99e79653824562400360d62d5ab5123d8ea480",
+        "instanceHashSha256": "0a7dbe584bad4f7bf3d4736beefb91697111a9591e9752871cd84f9ad0c477ca"
+      }
+    ],
+    "corridorInstances": [
+      {
+        "corridorInstanceStableId": "corridor-instance:h5:naturetofarm",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-exploration-buffer.v1",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 997.346049,
+          "localZMeters": -141.332379,
+          "rotationDegrees": 170.835827,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "fromConnectorStableId": "stub:actual-e5:nature-trail-network:egress",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "toConnectorStableId": "stub:actual-e5:highland-farm:ingress",
+        "relationStableId": "area-set-relation:actual-e5:naturetofarm",
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:nature-exploration-buffer:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 290.0,
+            "localZMeters": 119.0,
+            "rotationDegrees": 66.214958,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "485bf4e20318de423e12400af193dda35360ad76c40454a2d8c56ddc1ce80e8e"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:nature-exploration-buffer:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -170.0,
+            "localZMeters": -119.0,
+            "rotationDegrees": 237.940436,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "8f587cde171d52740d38aa9fcb03353583289e2fcf5873e41c28eb398dd8a62e"
+          }
+        ],
+        "placementHashSha256": "ac7271c3612a64634d6d5c773fbb132ed538d104fed3ef3ebf097a23ba2331b5",
+        "instanceHashSha256": "b8420e092ce7e0d072ae5944e5643883fbdbb57f53f50ede2cd50b751b70cb56"
+      },
+      {
+        "corridorInstanceStableId": "corridor-instance:h5:farmtocityhub",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-logistics.v1",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 757.338587,
+          "localZMeters": 701.326427,
+          "rotationDegrees": 170.560133,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "fromConnectorStableId": "stub:actual-e5:farm-processing-campus:egress",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "toConnectorStableId": "stub:actual-e5:jinbu-hub:ingress",
+        "relationStableId": "area-set-relation:actual-e5:farmtocityhub",
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:farm-hub-logistics:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 40.0,
+            "localZMeters": 0.0,
+            "rotationDegrees": 71.565051,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "CargoLogistics"
+            ],
+            "connectorPoseHashSha256": "d38a3efadac045d0931f262488797cd8b848c0368c5b74fcb5ef73ad3a07d1c1"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:farm-hub-logistics:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 460.0,
+            "localZMeters": -40.0,
+            "rotationDegrees": 92.385944,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "CargoLogistics"
+            ],
+            "connectorPoseHashSha256": "efed6830f590a17461f4dd7fcae7ab63b901aaf15b320e20438bbc89ad5ed9ed"
+          }
+        ],
+        "placementHashSha256": "1d79ef3ca77eab2b9a774fb36f532af2d53942143442fd510c40b1cfba4ed580",
+        "instanceHashSha256": "fc1d638cedf4aaa3c4b5fc1c280599d30d4f0d7b886dbf5c109ad8154b48336f"
+      },
+      {
+        "corridorInstanceStableId": "corridor-instance:h5:cityhubtotown",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-logistics.v1",
+        "placementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": -496.443957,
+          "localZMeters": 550.605183,
+          "rotationDegrees": 171.173466,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "fromConnectorStableId": "stub:actual-e5:jinbu-hub:egress",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "toConnectorStableId": "stub:actual-e5:lowrise-market-town:ingress",
+        "relationStableId": "area-set-relation:actual-e5:cityhubtotown",
+        "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:hub-town-logistics:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -340.0,
+            "localZMeters": 0.0,
+            "rotationDegrees": 270.0,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "CargoLogistics"
+            ],
+            "connectorPoseHashSha256": "20b42880a60c3c67dc910373ba6f6b595aae9e2af72606cbf3fe660a2dbd8961"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:hub-town-logistics:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 340.0,
+            "localZMeters": 40.0,
+            "rotationDegrees": 83.290163,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "CargoLogistics"
+            ],
+            "connectorPoseHashSha256": "3c234bef61ec2aaffffe34c64eae236c6fdc9408197b2aed3f2786966fb85656"
+          }
+        ],
+        "placementHashSha256": "34ea868236e769b33996c86f91b1f8dbd3b2d9cceb4641f21804a42315c72fcc",
+        "instanceHashSha256": "cffc603e7e51a3522f6376feaec8b383f1f7cc8429719f596a076741c5720536"
+      }
+    ],
+    "relations": [
+      {
+        "relationStableId": "area-set-relation:actual-e5:cityhubtonature",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "AbstractTravel",
+        "corridorInstanceStableId": ""
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:cityhubtotown",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "relationKindCode": "CargoLogistics",
+        "spatialRealizationCode": "PhysicalCorridor",
+        "corridorInstanceStableId": "corridor-instance:h5:cityhubtotown"
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:farmtocityhub",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "relationKindCode": "CargoLogistics",
+        "spatialRealizationCode": "PhysicalCorridor",
+        "corridorInstanceStableId": "corridor-instance:h5:farmtocityhub"
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:farmtonature",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "AbstractTravel",
+        "corridorInstanceStableId": ""
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:naturetocityhub",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "AbstractTravel",
+        "corridorInstanceStableId": ""
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:naturetofarm",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "PhysicalCorridor",
+        "corridorInstanceStableId": "corridor-instance:h5:naturetofarm"
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:naturetotown",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "AbstractTravel",
+        "corridorInstanceStableId": ""
+      },
+      {
+        "relationStableId": "area-set-relation:actual-e5:towntonature",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "AbstractTravel",
+        "corridorInstanceStableId": ""
+      }
+    ],
+    "overlapRules": [
+      {
+        "fromInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "toInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "overlapPolicyCode": "TransitionOverlap",
+        "corridorInstanceStableId": "corridor-instance:h5:farmtocityhub"
+      },
+      {
+        "fromInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "toInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "overlapPolicyCode": "TransitionOverlap",
+        "corridorInstanceStableId": "corridor-instance:h5:naturetofarm"
+      },
+      {
+        "fromInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "toInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "overlapPolicyCode": "Disallow",
+        "corridorInstanceStableId": ""
+      },
+      {
+        "fromInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "toInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "overlapPolicyCode": "Disallow",
+        "corridorInstanceStableId": ""
+      },
+      {
+        "fromInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "toInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "overlapPolicyCode": "TransitionOverlap",
+        "corridorInstanceStableId": "corridor-instance:h5:cityhubtotown"
+      },
+      {
+        "fromInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "toInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "overlapPolicyCode": "Disallow",
+        "corridorInstanceStableId": ""
+      }
+    ],
+    "worldLayoutHashSha256": "7917c3484eb86e44de157d5be07bdb46af6f8aa3d164c35a40ff971aa0b51039",
+    "presentationOnly": true,
+    "isOperationalState": false
+  },
+  "worldGroundingBinding": {
+    "schemaVersion": "simulation-world-grounding-binding.v1",
+    "groundingBindingStableId": "grounding-binding:sim:pyeongchang:nature-farm-hub-town.v1",
+    "groundingBindingRevision": 1,
+    "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
+    "worldLayoutRevision": 1,
+    "worldLayoutHashSha256": "7917c3484eb86e44de157d5be07bdb46af6f8aa3d164c35a40ff971aa0b51039",
+    "placementAuthorityCode": "ScenarioRelative",
+    "worldGroundingStateCode": "NotApplied",
+    "e6AnchorStableId": "",
+    "groundingEvidenceHashSha256": "",
+    "bindingHashSha256": "e885e171d4844ba3feb25e8c4b7bff322e0200283d93c0178367dd8d058d4dd9",
+    "presentationOnly": true,
+    "isOperationalState": false
+  },
+  "groundingReadiness": {
+    "schemaVersion": "simulation-world-grounding-readiness.v1",
+    "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
+    "groundingReadinessStateCode": "Partial",
+    "availableEvidenceKindCodes": [],
+    "missingEvidenceKindCodes": [
+      "WorldAnchor",
+      "DEM",
+      "Landcover",
+      "Road"
+    ],
+    "blockReasonCodes": [],
+    "readinessHashSha256": "a5fd8d1287ed1e927388c68cdeb4ae7466c93f7b5a856c94308bdbab944fae2d",
+    "appliesAuthority": false,
+    "presentationOnly": true,
+    "isOperationalState": false
+  },
+  "authorityBoundary": {
+    "scenarioRelativeIsAuthoritative": true,
+    "e6IsOptional": true,
+    "e6CannotRewriteLayout": true,
+    "floatingOriginExcludedFromAuthority": true,
+    "presentationOnly": true,
+    "operationalState": false
+  }
+}

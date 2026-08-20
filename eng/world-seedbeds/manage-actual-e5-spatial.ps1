@@ -87,10 +87,12 @@ Require (@($policy.networkRelations).Count -eq 8) "NetworkRelationCount"
 $h2ById = @{}; foreach ($h2 in @($theory.h2Plans)) { $h2ById[[string] $h2.h2StableId] = $h2 }
 $h3ById = @{}; foreach ($h3 in @($theory.h3Plans)) { $h3ById[[string] $h3.h3StableId] = $h3 }
 $areaPolicyByTheory = @{}; foreach ($area in @($policy.areaSets)) { $areaPolicyByTheory[[string] $area.theoryAreaSetStableId] = $area }
+$deferredH3Refs = @($policy.deferredTheoryH3Refs | Sort-Object -Unique)
 $areaByH3 = @{}
 foreach ($instance in @($theory.e5AreaSetInstances)) {
     Require ($areaPolicyByTheory.ContainsKey([string] $instance.areaSetStableId)) "AreaPolicyMissing:$($instance.areaSetStableId)"
     foreach ($graph in @($instance.graphInstances)) {
+        if ($deferredH3Refs -contains [string] $graph.h3Ref) { continue }
         $areaByH3[[string] $graph.h3Ref] = $areaPolicyByTheory[[string] $instance.areaSetStableId]
     }
 }
@@ -104,7 +106,6 @@ foreach ($routeH3Ref in @($policy.networkRouteH3Refs)) {
     Require (-not $promotedH3Refs.ContainsKey([string] $routeH3Ref)) "PromotedH3Duplicate:$routeH3Ref"
     $promotedH3Refs[[string] $routeH3Ref] = $true
 }
-$deferredH3Refs = @($policy.deferredTheoryH3Refs | Sort-Object -Unique)
 foreach ($deferredH3Ref in $deferredH3Refs) {
     Require ($h3ById.ContainsKey([string] $deferredH3Ref)) "DeferredH3Unknown:$deferredH3Ref"
     Require (-not $promotedH3Refs.ContainsKey([string] $deferredH3Ref)) "DeferredH3Promoted:$deferredH3Ref"
@@ -355,11 +356,12 @@ $areaSets = @()
 foreach ($areaPolicy in @($policy.areaSets)) {
     $theoryArea = @($theory.e5AreaSetInstances | Where-Object areaSetStableId -eq ([string] $areaPolicy.theoryAreaSetStableId))[0]
     Require ($null -ne $theoryArea) "TheoryAreaMissing:$($areaPolicy.theoryAreaSetStableId)"
-    $areaGraphs = @($theoryArea.graphInstances | ForEach-Object { $graphMetadata[[string] $_.h3Ref].Graph })
+    $promotedInstances = @($theoryArea.graphInstances | Where-Object { $deferredH3Refs -notcontains [string] $_.h3Ref })
+    $areaGraphs = @($promotedInstances | ForEach-Object { $graphMetadata[[string] $_.h3Ref].Graph })
     $relations = @()
     for ($index = 1; $index -lt $areaGraphs.Count; $index++) {
-        $fromH3 = [string] $theoryArea.graphInstances[$index - 1].h3Ref
-        $toH3 = [string] $theoryArea.graphInstances[$index].h3Ref
+        $fromH3 = [string] $promotedInstances[$index - 1].h3Ref
+        $toH3 = [string] $promotedInstances[$index].h3Ref
         $relations += [ordered]@{
             relationStableId = "graph-relation:actual-e5:" + ([string] $areaPolicy.areaRoleCode).ToLowerInvariant() + ":$index"
             fromGraphStableId = Graph-Id $fromH3
@@ -405,7 +407,7 @@ foreach ($areaPolicy in @($policy.areaSets)) {
         theoryAreaSetStableId = [string] $areaPolicy.theoryAreaSetStableId
         areaRoleCode = [string] $areaPolicy.areaRoleCode
         loadPolicyCode = [string] $areaPolicy.loadPolicyCode
-        defaultEntryConnectorStableId = Stub-Id ([string] $theoryArea.graphInstances[0].h3Ref) "ingress"
+        defaultEntryConnectorStableId = Stub-Id ([string] $promotedInstances[0].h3Ref) "ingress"
         definition = $definition
         graphs = $areaGraphs
     }
@@ -413,7 +415,7 @@ foreach ($areaPolicy in @($policy.areaSets)) {
 
 $areaByGraphRef = @{}
 foreach ($area in $areaSets) {
-    foreach ($instance in @($theory.e5AreaSetInstances | Where-Object areaSetStableId -eq $area.theoryAreaSetStableId).graphInstances) {
+    foreach ($instance in @($theory.e5AreaSetInstances | Where-Object areaSetStableId -eq $area.theoryAreaSetStableId).graphInstances | Where-Object { $deferredH3Refs -notcontains [string] $_.h3Ref }) {
         $areaByGraphRef[[string] $instance.h3Ref] = $area
     }
 }
@@ -501,7 +503,7 @@ foreach ($preference in @($policy.wiBindingPreferences.PSObject.Properties | Sor
             quantity = 1
             unitCode = "slot"
             evidenceKindCode = "Scenario"
-            evidenceReference = "actual-e5-spatial-policy.r1"
+            evidenceReference = "actual-e5-spatial-policy.r2"
             capacityRuleRevision = "actual-e5-work-area-capacity.r1"
         })
     }

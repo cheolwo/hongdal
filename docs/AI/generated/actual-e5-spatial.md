@@ -5,7 +5,7 @@
 - AreaSet: `4`
 - 내부 Graph: `14` · Network 경로 Graph: `3`
 - Network 관계: `8`
-- 이론 보류 Graph: `1` (정책 승격 전 실제 E5에서 제외)
+- 이론 보류 Graph: `3` (정책 승격 전 실제 E5에서 제외)
 - WI: 직접 `30` · 문맥 `5` · 비공간 `6`
 
 | 영역 | 실제 AreaSet | Graph | 적재 정책 |

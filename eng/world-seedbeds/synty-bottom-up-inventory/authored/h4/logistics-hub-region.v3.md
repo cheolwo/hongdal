@@ -8,6 +8,7 @@
 @required-h3 h3-candidate:jinbu-hub
 @required-h3 h3-candidate:resilient-logistics-hub
 @required-h3 h3-candidate:hub-maintenance-emergency-loop
+@required-h3 h3-candidate:hub-fulfillment-operations
 
 입고·보관·출고와 품질 대응 물류 공간을 결합하는 위치 독립 지역 청사진이다.
 

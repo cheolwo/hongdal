@@ -43,6 +43,12 @@ namespace Ssalddel.Simulation.Domain
                     AreaSetStableId = source.AreaSetStableId,
                     AreaSetRevision = source.AreaSetRevision,
                     AreaSetBoundaryHashSha256 = source.AreaSetBoundaryHashSha256,
+                    WorldLayoutStableId = source.WorldLayoutStableId,
+                    WorldLayoutRevision = source.WorldLayoutRevision,
+                    WorldLayoutHashSha256 = source.WorldLayoutHashSha256,
+                    PlacementAuthorityCode = source.PlacementAuthorityCode,
+                    WorldGroundingStateCode = source.WorldGroundingStateCode,
+                    GroundingEvidenceHashSha256 = source.GroundingEvidenceHashSha256,
                     LastL3CellKey = source.LastL3CellKey,
                     Deltas = source.Deltas.Select(value =>
                         new SimulationLhWorldDeltaSnapshot

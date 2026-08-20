@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-actual-e5-spatial-policy.v1",
-  "revision": "simulation-world-actual-e5-spatial-policy.r1",
+  "revision": "simulation-world-actual-e5-spatial-policy.r2",
   "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
   "legacyFacadeAreaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
   "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -37,7 +37,9 @@
     "h3-candidate:hub-town-logistics"
   ],
   "deferredTheoryH3Refs": [
-    "h3-candidate:nature-town-relief-loop"
+    "h3-candidate:nature-town-relief-loop",
+    "h3-candidate:hub-fulfillment-operations",
+    "h3-candidate:town-market-fulfillment"
   ],
   "networkRelations": [
     {

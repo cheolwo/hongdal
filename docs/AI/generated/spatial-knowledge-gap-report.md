@@ -61,6 +61,7 @@
 | `H2` | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:highland-production` 고지대 생산 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
+| `H2` | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
 | `H2` | `h2-candidate:hub-inbound-storage` Hub 입고·창고 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:hub-maintenance-yard` Hub 차량·시설 정비 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
 | `H2` | `h2-candidate:hub-outbound-vehicle` Hub 출고·차량 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
@@ -74,6 +75,8 @@
 | `H2` | `h2-candidate:nature-trail-shelter` 자연 탐색·대피 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:nature-water-buffer` 산림·수변 완충 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:town-contamination-control` 생활권 오염 점검·정화 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
+| `H2` | `h2-candidate:town-market-receiving` 마트 후방 입고·검수 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
+| `H2` | `h2-candidate:town-order-fulfillment` 주문 피킹·포장·수령 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
 | `H2` | `h2-candidate:town-recall-relief` 생활권 회수 안내·자연권 구호 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:town-resident-service` 생활권 주민지원·공동수령 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
 | `H2` | `h2-candidate:town-residential-alley` 생활권 주거 골목 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
@@ -88,6 +91,7 @@
 | `H3` | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:farm-seasonal-production-loop` Farm 계절 생산·출하 순환 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
+| `H3` | `h3-candidate:hub-fulfillment-operations` City/Hub 보관·피킹·상차 운영 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:hub-maintenance-emergency-loop` City/Hub 정비·비상운영 회복 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | `ExploratoryInventory` | AreaSet 적용 전에는 실제 Graph Node·Edge·좌표를 부여하지 않는다. |
@@ -97,6 +101,7 @@
 | `H3` | `h3-candidate:nature-town-relief-loop` Nature–Town 대피·구호 인계 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:town-contamination-relief` 생활권 오염 통제·구호 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
+| `H3` | `h3-candidate:town-market-fulfillment` Town 마트 입고·주문이행 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:town-resident-service-loop` Town 주민서비스·공동수령 경관 | `ExploratoryInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |
 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | `IdeaInventory` | 실제 AreaSet과 공공데이터 근거를 적용하기 전까지 조립 후보로 유지한다. |

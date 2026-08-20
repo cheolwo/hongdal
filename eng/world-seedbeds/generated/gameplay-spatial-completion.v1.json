@@ -5,10 +5,10 @@
   "hCatalogRevision": "simulation-world-spatial-design-knowledge.r3",
   "worldInteractionRevision": "simulation-world-interactions.r4",
   "evidenceStageRevision": "simulation-evidence-stages.r5",
-  "theorySpatialFactoryRevision": "simulation-world-theory-spatial-factory-output.r2",
-  "theorySpatialFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r3",
+  "theorySpatialFactoryRevision": "simulation-world-theory-spatial-factory-output.r3",
+  "theorySpatialFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r4",
   "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r1",
-  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r1",
+  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r2",
   "axisDefinitions": {
     "h": "공간 자원의 종류와 H1→H4 조립 깊이",
     "gameplayTrace": "공간이 기준 플레이를 직접 또는 간접 지원하는 정도",

@@ -18,17 +18,21 @@
   "optionalH3Refs": [
     "h3-candidate:farm-processing-campus",
     "h3-candidate:resilient-logistics-hub",
-    "h3-candidate:circular-market-town"
+    "h3-candidate:circular-market-town",
+    "h3-candidate:hub-fulfillment-operations",
+    "h3-candidate:town-market-fulfillment"
   ],
   "childKnowledgeRefs": [
     "h3-candidate:circular-market-town",
     "h3-candidate:farm-hub-logistics",
     "h3-candidate:farm-processing-campus",
     "h3-candidate:highland-farm",
+    "h3-candidate:hub-fulfillment-operations",
     "h3-candidate:hub-town-logistics",
     "h3-candidate:jinbu-hub",
     "h3-candidate:lowrise-market-town",
-    "h3-candidate:resilient-logistics-hub"
+    "h3-candidate:resilient-logistics-hub",
+    "h3-candidate:town-market-fulfillment"
   ],
   "worldThemeCodes": [
     "FarmHubTown",
@@ -80,7 +84,7 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.farm-hub-town-region.r1",
-  "derivationInputHashSha256": "f45992ce74f4952ccdd76e98dedf903c890c54fc279ab1ec9bc862c3ee3ec8a8",
+  "derivationInputHashSha256": "42489e340630d00a815d17e7684a8a8957ea4fababb82e947aba31b138eb4c22",
   "authoredDocument": "authored/h4/farm-hub-town-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

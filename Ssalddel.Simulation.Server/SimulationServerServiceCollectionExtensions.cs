@@ -134,6 +134,7 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<Simulation기본Urp표현Catalog>();
         services.AddSingleton<SimulationRuntimeWorldPresentationService>();
         services.AddScoped<SimulationWorldStreamingService>();
+        services.AddScoped<ISimulationLhWindowPlanner, SimulationLhWindowPlanner>();
         services.AddScoped<SimulationLhWorldService>();
         services.AddScoped<SimulationWorldLandscapeCompositionService>();
         services.AddScoped<SimulationWorldLandscapeCompositionJobShell>();
@@ -143,6 +144,12 @@ public static class SimulationServerServiceCollectionExtensions
             new FileSimulationWorldActualE5SpatialCatalogReader(
                 derivationOptions.ActualE5SpatialCatalogPath));
         services.AddScoped<SimulationWorldActualE5SpatialService>();
+        services.AddSingleton<ISimulationWorldLayoutCatalogReader>(
+            new FileSimulationWorldLayoutCatalogReader(
+                derivationOptions.WorldLayoutCatalogPath));
+        services.AddScoped<SimulationWorldLayoutService>();
+        services.AddScoped<ISimulationLhCellContentSource,
+            H5AuthoritativeSimulationLhCellContentSource>();
         services.AddScoped<SimulationWorld상호작용NetworkService>();
         services.AddSingleton<ISimulationWorld상호작용GraphCatalogReader>(
             new FileSimulationWorld상호작용GraphCatalogReader(

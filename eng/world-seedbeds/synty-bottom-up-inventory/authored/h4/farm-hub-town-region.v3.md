@@ -13,6 +13,8 @@
 @optional-h3 h3-candidate:farm-processing-campus
 @optional-h3 h3-candidate:resilient-logistics-hub
 @optional-h3 h3-candidate:circular-market-town
+@optional-h3 h3-candidate:hub-fulfillment-operations
+@optional-h3 h3-candidate:town-market-fulfillment
 
 생산·물류·생활권을 두 회랑으로 잇는 위치 독립 지역 청사진이다.
 

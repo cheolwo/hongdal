@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "simulation-world-h5-layout-policy.v1",
+  "revision": "simulation-world-h5-layout-policy.r1",
+  "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
+  "worldIntentStableId": "theory-world:nature-farm-city-town",
+  "areaSetNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
+  "coordinateSpaceCode": "ScenarioLocalMeters",
+  "worldGroundingPolicyCode": "Optional",
+  "rootAreaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+  "physicalCorridors": [
+    {
+      "relationCode": "NatureToFarm",
+      "fromAreaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+      "fromH3Ref": "h3-candidate:nature-trail-network",
+      "toAreaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "toH3Ref": "h3-candidate:highland-farm",
+      "routeH3Ref": "h3-candidate:nature-exploration-buffer"
+    },
+    {
+      "relationCode": "FarmToCityHub",
+      "fromAreaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "fromH3Ref": "h3-candidate:farm-processing-campus",
+      "toAreaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "toH3Ref": "h3-candidate:jinbu-hub",
+      "routeH3Ref": "h3-candidate:farm-hub-logistics"
+    },
+    {
+      "relationCode": "CityHubToTown",
+      "fromAreaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "fromH3Ref": "h3-candidate:jinbu-hub",
+      "toAreaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+      "toH3Ref": "h3-candidate:lowrise-market-town",
+      "routeH3Ref": "h3-candidate:hub-town-logistics"
+    }
+  ],
+  "abstractTravelRelationCodes": [
+    "FarmToNature",
+    "NatureToCityHub",
+    "CityHubToNature",
+    "NatureToTown",
+    "TownToNature"
+  ],
+  "connectorPositionToleranceMeters": 0.1,
+  "connectorRotationToleranceDegrees": 1.0,
+  "presentationOnly": true,
+  "isOperationalState": false
+}

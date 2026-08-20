@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "simulation-world-gameplay-h-inventory-demands.v1",
+  "revision": "simulation-world-gameplay-h-inventory-demands.r1",
+  "principle": "H 재고 수량이 아니라 게임플레이 인과선에서 실제로 분리되어야 하는 장소와 이동 흐름을 기준으로 H2·H3를 생산한다.",
+  "targetInventoryAfterWave": {
+    "h2": 37,
+    "h3": 20
+  },
+  "demandItems": [
+    {
+      "demandStableId": "h-demand:city-hub-outbound-fulfillment",
+      "priorityCode": "P1",
+      "title": "City/Hub 피킹·출고준비 공간 분리",
+      "gamePlanCode": "CityHubLogisticsResilience",
+      "requiredWiRefs": ["WI-HUB-04", "WI-HUB-05", "WI-HUB-06"],
+      "demandKindCode": "SpatialInventoryGap",
+      "reuseH2Refs": ["h2-candidate:hub-longterm-cold-storage", "h2-candidate:hub-outbound-vehicle"],
+      "newH2Refs": ["h2-candidate:hub-fulfillment"],
+      "newH3Refs": ["h3-candidate:hub-fulfillment-operations"],
+      "requiredFlowCodes": ["StorageToPicking", "PickingToOutboundStaging", "StagingToLoading"],
+      "stateCode": "SatisfiedByTheoryInventory"
+    },
+    {
+      "demandStableId": "h-demand:town-market-receiving",
+      "priorityCode": "P2",
+      "title": "Town 마트 후방 입고·검수 공간 분리",
+      "gamePlanCode": "TownLivingMarketSafety",
+      "requiredWiRefs": ["WI-MARKET-02", "WI-MARKET-03", "WI-MARKET-04"],
+      "demandKindCode": "SpatialInventoryGap",
+      "reuseH2Refs": ["h2-candidate:market-life-commerce"],
+      "newH2Refs": ["h2-candidate:town-market-receiving"],
+      "newH3Refs": ["h3-candidate:town-market-fulfillment"],
+      "requiredFlowCodes": ["DeliveryToReceiving", "ReceivingToBackroom"],
+      "stateCode": "SatisfiedByTheoryInventory"
+    },
+    {
+      "demandStableId": "h-demand:town-order-fulfillment",
+      "priorityCode": "P3",
+      "title": "Town 주문 피킹·포장·수령 공간 분리",
+      "gamePlanCode": "TownLivingMarketSafety",
+      "requiredWiRefs": ["WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-05", "WI-ORDER-06"],
+      "demandKindCode": "SpatialInventoryGap",
+      "reuseH2Refs": ["h2-candidate:market-life-commerce", "h2-candidate:town-resident-service"],
+      "newH2Refs": ["h2-candidate:town-order-fulfillment"],
+      "newH3Refs": ["h3-candidate:town-market-fulfillment"],
+      "requiredFlowCodes": ["DisplayToPicking", "PickingToPacking", "PackingToResidentPickup"],
+      "stateCode": "SatisfiedByTheoryInventory"
+    },
+    {
+      "demandStableId": "h-demand:farm-hub-town-causal-flow",
+      "priorityCode": "P4",
+      "title": "Farm–Hub–Town 화물 인과선 의미 폐쇄",
+      "gamePlanCode": "RegionalSupplyChainOrchestration",
+      "requiredWiRefs": ["WI-LOG-03", "WI-LOG-04", "WI-LOG-05", "WI-HUB-04", "WI-HUB-05", "WI-HUB-06", "WI-MARKET-01", "WI-MARKET-02", "WI-MARKET-03", "WI-MARKET-04", "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-05", "WI-ORDER-06"],
+      "demandKindCode": "Reuse",
+      "reuseH2Refs": ["h2-candidate:farm-hub-corridor", "h2-candidate:hub-fulfillment", "h2-candidate:hub-town-corridor", "h2-candidate:town-market-receiving", "h2-candidate:town-order-fulfillment"],
+      "newH2Refs": [],
+      "newH3Refs": ["h3-candidate:hub-fulfillment-operations", "h3-candidate:town-market-fulfillment"],
+      "requiredFlowCodes": ["FarmCargoToCityHub", "CityHubCargoToTown", "TownReceivingToResidentPickup"],
+      "stateCode": "SatisfiedByTheoryInventory"
+    },
+    {
+      "demandStableId": "h-demand:nature-threat-recovery-revision",
+      "priorityCode": "P5",
+      "title": "Nature 위협·후퇴·회복 의미 개정",
+      "gamePlanCode": "NatureHomeThreatRecovery",
+      "requiredWiRefs": ["WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04"],
+      "demandKindCode": "RevisionExpansion",
+      "reuseH2Refs": ["h2-candidate:nature-threat-response", "h2-candidate:nature-restoration-recovery"],
+      "newH2Refs": [],
+      "newH3Refs": ["h3-candidate:nature-threat-recovery"],
+      "requiredFlowCodes": ["ThreatToRetreat", "RetreatToRestoration", "RestorationToSafeCore"],
+      "stateCode": "Queued"
+    }
+  ],
+  "authorityBoundary": {
+    "positionIndependent": true,
+    "publicDataForbidden": true,
+    "unityAssetReferencesForbidden": true,
+    "actualE5PromotionForbidden": true,
+    "evidenceStageMutationForbidden": true
+  }
+}

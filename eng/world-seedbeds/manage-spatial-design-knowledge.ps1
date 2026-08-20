@@ -201,13 +201,21 @@ function New-H2FromExpansion([object] $Item) {
 
 function New-H3FromLegacy([object] $Item) {
     $slug = Get-Slug ([string] $Item.candidateId)
+    $isSemanticCorridorRevision = [string] $Item.candidateId -in @("h3-candidate:farm-hub-logistics", "h3-candidate:hub-town-logistics")
+    $summary = if ([string] $Item.candidateId -eq "h3-candidate:farm-hub-logistics") {
+        "농장 출하 블록, Farm–Hub 회랑 블록, Hub 입고 블록을 연결점 의미와 방향에 맞춰 잇는 경계 통과 경관 청사진이다."
+    }
+    elseif ([string] $Item.candidateId -eq "h3-candidate:hub-town-logistics") {
+        "Hub 출고 블록, Hub–Town 회랑 블록, Town 입고·시장 블록을 연결점 의미와 방향에 맞춰 잇는 경계 통과 경관 청사진이다."
+    }
+    else { "기존 상향식 재고 v1에서 이관한 $($Item.title) 지역 유형 청사진이다." }
     return [pscustomobject][ordered]@{
         schemaVersion = "simulation-world-spatial-design-knowledge-h3.v2"
         stableId = [string] $Item.candidateId
-        revision = 2
+        revision = if ($isSemanticCorridorRevision) { 3 } else { 2 }
         hierarchyLevelCode = "H3"
         title = [string] $Item.title
-        summary = "기존 상향식 재고 v1에서 이관한 $($Item.title) 지역 유형 청사진이다."
+        summary = $summary
         knowledgeStateCode = "ExploratoryInventory"
         topologyCode = [string] $Item.topologyCode
         requiredH2Refs = @($Item.h2CandidateRefs)
@@ -410,8 +418,8 @@ foreach ($level in @("h1", "h2", "h3")) {
 }
 
 Require (@($definitionsByLevel.H1).Count -eq 52) "H1CountMustBe52"
-Require (@($definitionsByLevel.H2).Count -eq 34) "H2CountMustBe34"
-Require (@($definitionsByLevel.H3).Count -eq 18) "H3CountMustBe18"
+Require (@($definitionsByLevel.H2).Count -eq 37) "H2CountMustBe37"
+Require (@($definitionsByLevel.H3).Count -eq 20) "H3CountMustBe20"
 foreach ($h1 in @($definitionsByLevel.H1)) {
     foreach ($reference in @($h1.predecessorH1Refs + $h1.successorH1Refs)) { Require ($definitionsById.ContainsKey([string] $reference)) "H1RelationUnknown:$($h1.stableId):$reference" }
 }
@@ -567,10 +575,10 @@ if ($Mode -eq "Check") {
         Require (Test-Path -LiteralPath $path) "GeneratedDocumentMissing:$($pair.Key)"
         Require ((ConvertTo-StableText ([IO.File]::ReadAllText($path))) -ceq $pair.Value) "GeneratedDocumentOutOfDate:$($pair.Key)"
     }
-    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=34;H3=18"
+    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=37;H3=20"
 }
 else {
     [void] (Write-TextIfChanged $catalogPath (ConvertTo-StableJson $catalog))
     foreach ($pair in $generated.GetEnumerator()) { [void] (Write-TextIfChanged (Resolve-RepositoryPath $repositoryRoot $pair.Key) $pair.Value) }
-    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=34;H3=18"
+    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=37;H3=20"
 }

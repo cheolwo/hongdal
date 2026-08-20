@@ -3,13 +3,15 @@
 @spatial-knowledge h3-candidate:farm-hub-logistics
 @hierarchy H3
 @state ExploratoryInventory
+@required-h2 h2-candidate:farm-processing-shipping
 @required-h2 h2-candidate:farm-hub-corridor
+@required-h2 h2-candidate:hub-inbound-storage
 @connector FarmGate
 @connector HubInboundGate
 
 ## 존재 이유
 
-기존 상향식 재고 v1에서 이관한 농장–물류 거점 연결 경관 지역 유형 청사진이다.
+농장 출하 블록, Farm–Hub 회랑 블록, Hub 입고 블록을 연결점 의미와 방향에 맞춰 잇는 경계 통과 경관 청사진이다.
 
 ## 설계 상태
 

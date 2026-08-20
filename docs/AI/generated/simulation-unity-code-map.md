@@ -46,6 +46,7 @@ Simulation·Unity
 │  ├─ 011 contract.lh-world-profile · Contract · Definition
 │  ├─ 020 api.world-stream · Api · Query
 │  ├─ 025 api.world-region-summary · Api · Query
+│  ├─ 028 contract.world-layout-definition · Contract · Definition
 │  ├─ 030 application.world-stream · Application · Projection
 │  ├─ 031 application.lh-world-preview · Application · Preview
 │  └─ 032 api.lh-world-preview · Api · Preview
@@ -263,16 +264,21 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 요약 응답에는 상호명을 넣지 않고 명시적인 공개 상세 조회에서만 공개 공공데이터 상호명을 반환한다.
+- **028 contract.world-layout-definition** — [SimulationWorldLayoutDefinitionResponse](../../../Ssalddel.Simulation.Contracts/SimulationWorldLayoutContracts.cs) · H4 AreaSet과 H3 회랑의 H5 상대 공간 배치를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: ScenarioRelative H5는 E6 없이도 권위 세계이며 AreaSetNetwork나 Simulation 상태를 변경하지 않는다.
 - **030 application.world-stream** — [SimulationWorldStreamingService](../../../Ssalddel.Simulation.Application/SimulationWorldStreamingService.cs) · 카메라·플레이어 경계 접근에 필요한 타일 Recipe와 Manifest Projection을 제공한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 자료가 없는 DEM·배치 좌표·URL을 꾸며내지 않고 명시된 제공 범위만 투영한다.
-- **031 application.lh-world-preview** — [SimulationLhWorldService](../../../Ssalddel.Simulation.Application/SimulationLhWorldService.cs) · 플레이어 L3 위치를 기준으로 H 계보와 결정론적 주변 공간 후보를 미리 계산한다.
+- **031 application.lh-world-preview** — [SimulationLhWorldService](../../../Ssalddel.Simulation.Application/SimulationLhWorldService.cs) · 플레이어 L3 위치를 기준으로 스트리밍 범위와 셀 내용을 분리해 주변 공간 후보를 계산한다.
   - 계층/단계: `Application / Preview`
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
   - 부수효과: `None`
-  - 경계: Preview는 H 권위·운영 원장·자원 원장을 변경하지 않고 ScenarioProcedural 배치 후보만 반환한다.
+  - 경계: Preview는 공간 권위·운영 원장·자원 원장을 변경하지 않는다. 시나리오 셀 내용 공급자는 실제 E5·E6 근거로 자동 승격되지 않는다.
 - **032 api.lh-world-preview** — [SimulationLhWorldController](../../../Ssalddel.Simulation.Server/Controllers/SimulationLhWorldController.cs) · 플레이어 L3 위치에 필요한 LH Cell 후보를 서버 Simulation 시각으로 Preview한다.
   - 계층/단계: `Api / Preview`
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`

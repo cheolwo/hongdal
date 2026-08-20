@@ -12,9 +12,9 @@ $check = & pwsh -NoProfile -File $manager -Mode Check
 $secondWrite = & pwsh -NoProfile -File $manager -Mode Write
 $afterHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $output).Hash
 $afterTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
-if ($firstWrite -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=34;H3=18;H4=6;Violations=0") { throw "GameplayLedHInventoryFirstWriteFailed" }
-if ($check -notmatch "GameplayLedHInventoryValid:Plans=4;H1=52\+32;H2=34;H3=18;H4=6;Violations=0") { throw "GameplayLedHInventoryCheckFailed" }
-if ($secondWrite -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=34;H3=18;H4=6;Violations=0") { throw "GameplayLedHInventorySecondWriteFailed" }
+if ($firstWrite -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=37;H3=20;H4=6;Violations=0") { throw "GameplayLedHInventoryFirstWriteFailed" }
+if ($check -notmatch "GameplayLedHInventoryValid:Plans=4;H1=52\+32;H2=37;H3=20;H4=6;Violations=0") { throw "GameplayLedHInventoryCheckFailed" }
+if ($secondWrite -notmatch "GameplayLedHInventoryGenerated:Plans=4;H1=52\+32;H2=37;H3=20;H4=6;Violations=0") { throw "GameplayLedHInventorySecondWriteFailed" }
 if ($beforeHash -ne $afterHash -or $beforeTicks -ne $afterTicks) { throw "GameplayLedHInventoryNonDeterministic" }
 
 $report = Get-Content -LiteralPath $output -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -46,5 +46,9 @@ if ([string] $playableSlice[0].declaredPlayableSliceStateCode -ne "SpatiallyComp
 if ([string] $playableSlice[0].theorySpatialBindingStateCode -ne "E5TheoryQualified") { throw "GameplayLedHInventoryPlayableSliceTheorySpatialBoundaryInvalid" }
 if ([string] $playableSlice[0].actualSpatialBindingStateCode -ne "ActualE5Bound") { throw "GameplayLedHInventoryPlayableSliceActualSpatialBoundaryInvalid" }
 if ((@($report.warningOnlyGamePlanCodesMissingPlayableSlice) -join ",") -ne "CityHubLogisticsResilience,TownLivingMarketSafety") { throw "GameplayLedHInventoryWarningOnlyPlansInvalid" }
+if ([string] $report.demandRevision -ne "simulation-world-gameplay-h-inventory-demands.r1") { throw "GameplayLedHInventoryDemandRevisionInvalid" }
+if ([int] $report.counts.inventoryDemands -ne 5 -or [int] $report.counts.satisfiedInventoryDemands -ne 4) { throw "GameplayLedHInventoryDemandCountInvalid" }
+if ((@($report.inventoryDemandSummary.newH2Refs | Sort-Object -Unique) -join ",") -ne "h2-candidate:hub-fulfillment,h2-candidate:town-market-receiving,h2-candidate:town-order-fulfillment") { throw "GameplayLedHInventoryNewH2DemandInvalid" }
+if ((@($report.inventoryDemandSummary.newH3Refs | Sort-Object -Unique) -join ",") -ne "h3-candidate:hub-fulfillment-operations,h3-candidate:nature-threat-recovery,h3-candidate:town-market-fulfillment") { throw "GameplayLedHInventoryNewH3DemandInvalid" }
 
-Write-Output "GameplayLedHInventoryTestsPassed:Plans=4;Violations=0;OrderPacking=Covered"
+Write-Output "GameplayLedHInventoryTestsPassed:Plans=4;H2=37;H3=20;Demands=5;Violations=0;OrderPacking=Covered"

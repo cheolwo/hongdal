@@ -65,41 +65,46 @@
 | 59 | `H2` | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | 0/2 필수 H1 승인 참조 |
 | 60 | `H2` | `h2-candidate:farm-worker-support` 농장 작업 지원 블록 | 0/3 필수 H1 승인 참조 |
 | 61 | `H2` | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | 0/3 필수 H1 승인 참조 |
-| 62 | `H2` | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | 0/2 필수 H1 승인 참조 |
-| 63 | `H2` | `h2-candidate:hub-maintenance-yard` Hub 차량·시설 정비 블록 | 0/2 필수 H1 승인 참조 |
-| 64 | `H2` | `h2-candidate:hub-outbound-vehicle` Hub 출고·차량 블록 | 0/3 필수 H1 승인 참조 |
-| 65 | `H2` | `h2-candidate:hub-returns-processing` Hub 반품 처리 블록 | 0/2 필수 H1 승인 참조 |
-| 66 | `H2` | `h2-candidate:hub-town-corridor` Hub–Town 회랑 블록 | 0/3 필수 H1 승인 참조 |
-| 67 | `H2` | `h2-candidate:lowrise-residential` 저층 주거 블록 | 0/2 필수 H1 승인 참조 |
-| 68 | `H2` | `h2-candidate:market-life-commerce` 마트·생활상권 블록 | 0/5 필수 H1 승인 참조 |
-| 69 | `H2` | `h2-candidate:nature-defense-ring` 자연 야간 방어 블록 | 0/3 필수 H1 승인 참조 |
-| 70 | `H2` | `h2-candidate:nature-encounter-route` 자연 몬스터 조우·이탈 블록 | 0/3 필수 H1 승인 참조 |
-| 71 | `H2` | `h2-candidate:nature-home-core` 자연 안전 생활핵 블록 | 0/3 필수 H1 승인 참조 |
-| 72 | `H2` | `h2-candidate:nature-restoration-recovery` 자연 복원·안전 회복 블록 | 0/2 필수 H1 승인 참조 |
-| 73 | `H2` | `h2-candidate:nature-threat-response` 자연 위협 추적·대피 블록 | 0/3 필수 H1 승인 참조 |
-| 74 | `H2` | `h2-candidate:nature-town-relief-transition` Nature–Town 대피·구호 전환 블록 | 0/3 필수 H1 승인 참조 |
-| 75 | `H2` | `h2-candidate:nature-trail-shelter` 자연 탐색·대피 블록 | 0/3 필수 H1 승인 참조 |
-| 76 | `H2` | `h2-candidate:nature-water-buffer` 산림·수변 완충 블록 | 0/2 필수 H1 승인 참조 |
-| 77 | `H2` | `h2-candidate:town-contamination-control` 생활권 오염 점검·정화 블록 | 0/3 필수 H1 승인 참조 |
-| 78 | `H2` | `h2-candidate:town-recall-relief` 생활권 회수 안내·자연권 구호 블록 | 0/3 필수 H1 승인 참조 |
-| 79 | `H2` | `h2-candidate:town-resident-service` 생활권 주민지원·공동수령 블록 | 0/3 필수 H1 승인 참조 |
-| 80 | `H2` | `h2-candidate:town-residential-alley` 생활권 주거 골목 블록 | 0/2 필수 H1 승인 참조 |
-| 81 | `H2` | `h2-candidate:town-returns-waste` 생활권 반품·폐기물 블록 | 0/3 필수 H1 승인 참조 |
-| 82 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | H2 설계 승인 전 조립 후보 |
-| 83 | `H3` | `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | H2 설계 승인 전 조립 후보 |
-| 84 | `H3` | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | H2 설계 승인 전 조립 후보 |
-| 85 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | H2 설계 승인 전 조립 후보 |
-| 86 | `H3` | `h3-candidate:farm-seasonal-production-loop` Farm 계절 생산·출하 순환 경관 | H2 설계 승인 전 조립 후보 |
-| 87 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | H2 설계 승인 전 조립 후보 |
-| 88 | `H3` | `h3-candidate:hub-maintenance-emergency-loop` City/Hub 정비·비상운영 회복 경관 | H2 설계 승인 전 조립 후보 |
-| 89 | `H3` | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | H2 설계 승인 전 조립 후보 |
-| 90 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | H2 설계 승인 전 조립 후보 |
-| 91 | `H3` | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | H2 설계 승인 전 조립 후보 |
-| 92 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | H2 설계 승인 전 조립 후보 |
-| 93 | `H3` | `h3-candidate:nature-home-encounter-defense` Nature 생활핵·조우·방어 폐루프 경관 | H2 설계 승인 전 조립 후보 |
-| 94 | `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | H2 설계 승인 전 조립 후보 |
-| 95 | `H3` | `h3-candidate:nature-town-relief-loop` Nature–Town 대피·구호 인계 경관 | H2 설계 승인 전 조립 후보 |
-| 96 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | H2 설계 승인 전 조립 후보 |
-| 97 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | H2 설계 승인 전 조립 후보 |
-| 98 | `H3` | `h3-candidate:town-contamination-relief` 생활권 오염 통제·구호 경관 | H2 설계 승인 전 조립 후보 |
-| 99 | `H3` | `h3-candidate:town-resident-service-loop` Town 주민서비스·공동수령 경관 | H2 설계 승인 전 조립 후보 |
+| 62 | `H2` | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | 0/2 필수 H1 승인 참조 |
+| 63 | `H2` | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | 0/2 필수 H1 승인 참조 |
+| 64 | `H2` | `h2-candidate:hub-maintenance-yard` Hub 차량·시설 정비 블록 | 0/2 필수 H1 승인 참조 |
+| 65 | `H2` | `h2-candidate:hub-outbound-vehicle` Hub 출고·차량 블록 | 0/3 필수 H1 승인 참조 |
+| 66 | `H2` | `h2-candidate:hub-returns-processing` Hub 반품 처리 블록 | 0/2 필수 H1 승인 참조 |
+| 67 | `H2` | `h2-candidate:hub-town-corridor` Hub–Town 회랑 블록 | 0/3 필수 H1 승인 참조 |
+| 68 | `H2` | `h2-candidate:lowrise-residential` 저층 주거 블록 | 0/2 필수 H1 승인 참조 |
+| 69 | `H2` | `h2-candidate:market-life-commerce` 마트·생활상권 블록 | 0/5 필수 H1 승인 참조 |
+| 70 | `H2` | `h2-candidate:nature-defense-ring` 자연 야간 방어 블록 | 0/3 필수 H1 승인 참조 |
+| 71 | `H2` | `h2-candidate:nature-encounter-route` 자연 몬스터 조우·이탈 블록 | 0/3 필수 H1 승인 참조 |
+| 72 | `H2` | `h2-candidate:nature-home-core` 자연 안전 생활핵 블록 | 0/3 필수 H1 승인 참조 |
+| 73 | `H2` | `h2-candidate:nature-restoration-recovery` 자연 복원·안전 회복 블록 | 0/2 필수 H1 승인 참조 |
+| 74 | `H2` | `h2-candidate:nature-threat-response` 자연 위협 추적·대피 블록 | 0/3 필수 H1 승인 참조 |
+| 75 | `H2` | `h2-candidate:nature-town-relief-transition` Nature–Town 대피·구호 전환 블록 | 0/3 필수 H1 승인 참조 |
+| 76 | `H2` | `h2-candidate:nature-trail-shelter` 자연 탐색·대피 블록 | 0/3 필수 H1 승인 참조 |
+| 77 | `H2` | `h2-candidate:nature-water-buffer` 산림·수변 완충 블록 | 0/2 필수 H1 승인 참조 |
+| 78 | `H2` | `h2-candidate:town-contamination-control` 생활권 오염 점검·정화 블록 | 0/3 필수 H1 승인 참조 |
+| 79 | `H2` | `h2-candidate:town-market-receiving` 마트 후방 입고·검수 블록 | 0/2 필수 H1 승인 참조 |
+| 80 | `H2` | `h2-candidate:town-order-fulfillment` 주문 피킹·포장·수령 블록 | 0/3 필수 H1 승인 참조 |
+| 81 | `H2` | `h2-candidate:town-recall-relief` 생활권 회수 안내·자연권 구호 블록 | 0/3 필수 H1 승인 참조 |
+| 82 | `H2` | `h2-candidate:town-resident-service` 생활권 주민지원·공동수령 블록 | 0/3 필수 H1 승인 참조 |
+| 83 | `H2` | `h2-candidate:town-residential-alley` 생활권 주거 골목 블록 | 0/2 필수 H1 승인 참조 |
+| 84 | `H2` | `h2-candidate:town-returns-waste` 생활권 반품·폐기물 블록 | 0/3 필수 H1 승인 참조 |
+| 85 | `H3` | `h3-candidate:circular-market-town` 반품·회수 순환형 시장 마을 경관 | H2 설계 승인 전 조립 후보 |
+| 86 | `H3` | `h3-candidate:farm-hub-logistics` 농장–물류 거점 연결 경관 | H2 설계 승인 전 조립 후보 |
+| 87 | `H3` | `h3-candidate:farm-incident-recovery` 농장 사건 격리·회복 경관 | H2 설계 승인 전 조립 후보 |
+| 88 | `H3` | `h3-candidate:farm-processing-campus` 농장 생산·후처리 복합 경관 | H2 설계 승인 전 조립 후보 |
+| 89 | `H3` | `h3-candidate:farm-seasonal-production-loop` Farm 계절 생산·출하 순환 경관 | H2 설계 승인 전 조립 후보 |
+| 90 | `H3` | `h3-candidate:highland-farm` 고지대 농장 경관 | H2 설계 승인 전 조립 후보 |
+| 91 | `H3` | `h3-candidate:hub-fulfillment-operations` City/Hub 보관·피킹·상차 운영 경관 | H2 설계 승인 전 조립 후보 |
+| 92 | `H3` | `h3-candidate:hub-maintenance-emergency-loop` City/Hub 정비·비상운영 회복 경관 | H2 설계 승인 전 조립 후보 |
+| 93 | `H3` | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | H2 설계 승인 전 조립 후보 |
+| 94 | `H3` | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | H2 설계 승인 전 조립 후보 |
+| 95 | `H3` | `h3-candidate:lowrise-market-town` 저층 생활·시장 경관 | H2 설계 승인 전 조립 후보 |
+| 96 | `H3` | `h3-candidate:nature-exploration-buffer` Nature 탐색·완충 경관 | H2 설계 승인 전 조립 후보 |
+| 97 | `H3` | `h3-candidate:nature-home-encounter-defense` Nature 생활핵·조우·방어 폐루프 경관 | H2 설계 승인 전 조립 후보 |
+| 98 | `H3` | `h3-candidate:nature-threat-recovery` 자연 생활·위협·회복 경관 | H2 설계 승인 전 조립 후보 |
+| 99 | `H3` | `h3-candidate:nature-town-relief-loop` Nature–Town 대피·구호 인계 경관 | H2 설계 승인 전 조립 후보 |
+| 100 | `H3` | `h3-candidate:nature-trail-network` 자연 탐색길·대피망 경관 | H2 설계 승인 전 조립 후보 |
+| 101 | `H3` | `h3-candidate:resilient-logistics-hub` 품질·보관 대응형 물류 Hub 경관 | H2 설계 승인 전 조립 후보 |
+| 102 | `H3` | `h3-candidate:town-contamination-relief` 생활권 오염 통제·구호 경관 | H2 설계 승인 전 조립 후보 |
+| 103 | `H3` | `h3-candidate:town-market-fulfillment` Town 마트 입고·주문이행 경관 | H2 설계 승인 전 조립 후보 |
+| 104 | `H3` | `h3-candidate:town-resident-service-loop` Town 주민서비스·공동수령 경관 | H2 설계 승인 전 조립 후보 |

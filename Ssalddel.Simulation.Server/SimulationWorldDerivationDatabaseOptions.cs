@@ -39,4 +39,10 @@ public sealed class SimulationWorldDerivationDatabaseOptions
     /// </summary>
     public string ActualE5SpatialCatalogPath { get; set; } =
         "../eng/world-seedbeds/generated/actual-e5-spatial.v1.json";
+
+    /// <summary>
+    /// H4 AreaSet과 물리 회랑을 H5 상대 좌표에 배치하고 선택형 E6 결속을 분리한 대장이다.
+    /// </summary>
+    public string WorldLayoutCatalogPath { get; set; } =
+        "../eng/world-seedbeds/generated/h5-world-layout.v1.json";
 }

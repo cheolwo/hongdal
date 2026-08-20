@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:hub-fulfillment",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "Hub 피킹·출고준비 작업 블록",
+  "summary": "보관 화물을 피킹하고 임시 적치한 뒤 차량 상차 공간으로 넘기는 City/Hub 출고 작업 블록이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "topologyCode": "Linear",
+  "requiredH1Refs": [
+    "h1-stock:hub-outbound-staging",
+    "h1-stock:hub-temporary-staging"
+  ],
+  "optionalH1Refs": [
+    "h1-stock:hub-long-term-storage",
+    "h1-stock:hub-vehicle-yard"
+  ],
+  "connectorRoleCodes": [
+    "StorageInput",
+    "PickingLoop",
+    "OutboundStagingOutput"
+  ],
+  "sizeVariantCodes": [
+    "Compact",
+    "Standard",
+    "Expanded"
+  ],
+  "authoredDocument": "authored/h2/hub-fulfillment.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:hub-fulfillment"
+  ],
+  "unresolvedItems": [
+    "기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

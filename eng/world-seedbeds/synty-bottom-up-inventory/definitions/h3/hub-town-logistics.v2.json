@@ -1,14 +1,16 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
   "stableId": "h3-candidate:hub-town-logistics",
-  "revision": 2,
+  "revision": 3,
   "hierarchyLevelCode": "H3",
   "title": "Hub–Town 연결 경관",
-  "summary": "기존 상향식 재고 v1에서 이관한 Hub–Town 연결 경관 지역 유형 청사진이다.",
+  "summary": "Hub 출고 블록, Hub–Town 회랑 블록, Town 입고·시장 블록을 의미 연결점으로 잇는 경계 통과 경관 청사진이다.",
   "knowledgeStateCode": "ExploratoryInventory",
   "topologyCode": "Linear",
   "requiredH2Refs": [
-    "h2-candidate:hub-town-corridor"
+    "h2-candidate:hub-outbound-vehicle",
+    "h2-candidate:hub-town-corridor",
+    "h2-candidate:market-life-commerce"
   ],
   "optionalH2Refs": [],
   "connectorRoleCodes": [

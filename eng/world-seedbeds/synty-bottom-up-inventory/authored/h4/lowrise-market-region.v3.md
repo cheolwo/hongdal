@@ -9,6 +9,7 @@
 @required-h3 h3-candidate:circular-market-town
 @required-h3 h3-candidate:town-contamination-relief
 @required-h3 h3-candidate:town-resident-service-loop
+@required-h3 h3-candidate:town-market-fulfillment
 @optional-h3 h3-candidate:nature-town-relief-loop
 
 저층 생활권과 순환형 시장, 오염 통제·주민 구호를 결합하는 위치 독립 Town AreaSet 청사진이다.

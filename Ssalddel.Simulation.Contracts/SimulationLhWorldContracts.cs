@@ -9,6 +9,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string GeneratorVersion = "lh-generator.pyeongchang.v1";
         public const string WorldSeed = "pyeongchang-daegwallyeong-farm-2026";
         public const string ScenarioProcedural = "ScenarioProcedural";
+        public const string AuthoritativeWorld = "AuthoritativeWorld";
         public const string ApprovedReference = "ApprovedReference";
         public const string IdeaInventory = "IdeaInventory";
         public const string ExploratoryInventory = "ExploratoryInventory";
@@ -86,7 +87,9 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string LevelCode { get; set; } = string.Empty;
         public int CellSizeMeters { get; set; }
+        // 기존 소비자 호환용 이름이다. L과 H가 같은 계층이라는 뜻이 아니다.
         public string DefaultHLevelCode { get; set; } = string.Empty;
+        public string PrimaryHQueryLevelCode { get; set; } = string.Empty;
     }
 
     public sealed class SimulationLhGenerationLayerResponse
@@ -115,6 +118,8 @@ namespace Ssalddel.Simulation.Contracts
         public string RequestEpoch { get; set; } = string.Empty;
         public string RecipeStableId { get; set; } = string.Empty;
         public string AreaSetStableId { get; set; } = string.Empty;
+        public string ContentSourceCode { get; set; }
+            = SimulationLhWorldCodes.ScenarioProcedural;
         public int WorldTick { get; set; }
         public long WorldRevision { get; set; }
         public SimulationLhSeasonSnapshot Season { get; set; } = new();
@@ -146,6 +151,8 @@ namespace Ssalddel.Simulation.Contracts
         public string L2ParentCellKey { get; set; } = string.Empty;
         public string WindowRoleCode { get; set; } = string.Empty;
         public int Priority { get; set; }
+        public string ContentSourceCode { get; set; }
+            = SimulationLhWorldCodes.ScenarioProcedural;
         public string BasePlanHashSha256 { get; set; } = string.Empty;
         public string PresentationHashSha256 { get; set; } = string.Empty;
         public SimulationLhHBindingResponse[] HBindings { get; set; }
@@ -200,6 +207,12 @@ namespace Ssalddel.Simulation.Contracts
         public string AreaSetStableId { get; set; } = string.Empty;
         public string AreaSetRevision { get; set; } = string.Empty;
         public string AreaSetBoundaryHashSha256 { get; set; } = string.Empty;
+        public string WorldLayoutStableId { get; set; } = string.Empty;
+        public int WorldLayoutRevision { get; set; }
+        public string WorldLayoutHashSha256 { get; set; } = string.Empty;
+        public string PlacementAuthorityCode { get; set; } = string.Empty;
+        public string WorldGroundingStateCode { get; set; } = string.Empty;
+        public string GroundingEvidenceHashSha256 { get; set; } = string.Empty;
         public string LastL3CellKey { get; set; } = string.Empty;
         public SimulationLhWorldDeltaSnapshot[] Deltas { get; set; }
             = Array.Empty<SimulationLhWorldDeltaSnapshot>();

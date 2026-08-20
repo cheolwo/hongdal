@@ -4,12 +4,12 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "e52b3593850c4e263b6303f9c889d4eeed84560261853ba2cc54cd6c5fc512ea",
+  "previousCatalogSha256": "ddd89ae50065c1991beec0176efd8f0c3e6cdb78a2131acd0809eb64cfebc114",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
-  "derivationRecipeSha256": "73b8983f988edb9f5adcd71407e485750b9067c49e496b78ec837049cee6c4a2",
+  "derivationRecipeSha256": "1e82042ba16855c460c729799c2bb3ec438a3a067819ce5031acfd7c8cc73162",
   "h1InteractionDefinitionRefs": [
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -1626,6 +1626,14 @@
       "documentSha256": "56d70f88bc8c4ae1400aae25dc16a92b67c59e705cce8d5ad1c4e1922f324984"
     },
     {
+      "stableId": "h2-candidate:hub-fulfillment",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-fulfillment.v2.json",
+      "definitionSha256": "0eb054b7aef2d30fed8587be5d19e1f2e3a391d6e3a9000b165d0c92b58b96e1",
+      "documentPath": "authored/h2/hub-fulfillment.v2.md",
+      "documentSha256": "4d77c076dd0d94968e436e8a63280a7619f179b4e0ac77e4cefa671f9f47afdb"
+    },
+    {
       "stableId": "h2-candidate:hub-inbound-storage",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-inbound-storage.v2.json",
@@ -1770,6 +1778,22 @@
       "documentSha256": "214f74bc22e05c8784b5a35dffd58cae1859a5a7fe3a3dc50e93f201abb588f8"
     },
     {
+      "stableId": "h2-candidate:town-market-receiving",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-market-receiving.v2.json",
+      "definitionSha256": "9458a239bef34ffb91959a20900eb5ecc4da5a05b6f89980b1074392d0621fcf",
+      "documentPath": "authored/h2/town-market-receiving.v2.md",
+      "documentSha256": "77ed5078cf3460a8825a25c9e50e42b1ea620af8718b3bd0f722bb60a42dc9f7"
+    },
+    {
+      "stableId": "h2-candidate:town-order-fulfillment",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-order-fulfillment.v2.json",
+      "definitionSha256": "ca0272874b8dc9337cde35bbf2eaa731a344a93d4302ffec96e469d8185cd6a2",
+      "documentPath": "authored/h2/town-order-fulfillment.v2.md",
+      "documentSha256": "34a3af9d1d59cf208577d68f5a23c8273d50c884a43eebfade8841a6c9c7e29c"
+    },
+    {
       "stableId": "h2-candidate:town-recall-relief",
       "revision": 1,
       "definitionPath": "definitions/h2/town-recall-relief.v2.json",
@@ -1813,11 +1837,11 @@
     },
     {
       "stableId": "h3-candidate:farm-hub-logistics",
-      "revision": 2,
+      "revision": 3,
       "definitionPath": "definitions/h3/farm-hub-logistics.v2.json",
-      "definitionSha256": "3cfe0a551639b7a7d512e0bf2db9107aa7baebf5c7e76f75586fd167edfc8db3",
+      "definitionSha256": "56fc2d0591ad81801a1f548d66ddc6e40a53c692b4ce6fb42964b6f7d8d568e4",
       "documentPath": "authored/h3/farm-hub-logistics.v2.md",
-      "documentSha256": "d4a7a2fa3c9cac093795eb29902bb58d81c6db52fdc7f30ec5a3ee5190694336"
+      "documentSha256": "c3c2bbde16475a36a6bddfc4509c08f946532b80074d33af23cd230929415ed9"
     },
     {
       "stableId": "h3-candidate:farm-incident-recovery",
@@ -1852,6 +1876,14 @@
       "documentSha256": "8aac687bb2f92e91fb0238c2d218c5fe85b627b2fce606510b17e5a5a10b3f52"
     },
     {
+      "stableId": "h3-candidate:hub-fulfillment-operations",
+      "revision": 1,
+      "definitionPath": "definitions/h3/hub-fulfillment-operations.v2.json",
+      "definitionSha256": "120653a2af66685fd7cc2d6d0b2991f38f256226fa5171df32d47c109fe248d4",
+      "documentPath": "authored/h3/hub-fulfillment-operations.v2.md",
+      "documentSha256": "1918d33e3d131ef13564a74b2c13607c0c185feb16b7e1eae908b52f00b2e34e"
+    },
+    {
       "stableId": "h3-candidate:hub-maintenance-emergency-loop",
       "revision": 1,
       "definitionPath": "definitions/h3/hub-maintenance-emergency-loop.v2.json",
@@ -1861,11 +1893,11 @@
     },
     {
       "stableId": "h3-candidate:hub-town-logistics",
-      "revision": 2,
+      "revision": 3,
       "definitionPath": "definitions/h3/hub-town-logistics.v2.json",
-      "definitionSha256": "acf2229d6a1b2173fbd72bcf430295f06b08970eef2af5446f7ec0db19f1c9c5",
+      "definitionSha256": "386158a984b42c732437dc35fe915d394fcce17aace47f387a772572ef482bcd",
       "documentPath": "authored/h3/hub-town-logistics.v2.md",
-      "documentSha256": "310b1083150d99921a6e0d6bb98d69b4a79461a5599f4a2b32797e4bffc4f8df"
+      "documentSha256": "f3d70e801cac3061f95b1f229971865346c035a6c073f8225ad3a5195274fdf9"
     },
     {
       "stableId": "h3-candidate:jinbu-hub",
@@ -1940,6 +1972,14 @@
       "documentSha256": "48d87f135542d72e559d6a4750798195ee167efaae4adffeb0484127de17bc45"
     },
     {
+      "stableId": "h3-candidate:town-market-fulfillment",
+      "revision": 1,
+      "definitionPath": "definitions/h3/town-market-fulfillment.v2.json",
+      "definitionSha256": "2cc3ce1bbe387dbe06beeb83439ed8470ae34d3c7104de81715319591bf0fa26",
+      "documentPath": "authored/h3/town-market-fulfillment.v2.md",
+      "documentSha256": "0a3879ea72cf237787f70ec0488171b681a32f5c5161e919fb0e86258f63cf5b"
+    },
+    {
       "stableId": "h3-candidate:town-resident-service-loop",
       "revision": 1,
       "definitionPath": "definitions/h3/town-resident-service-loop.v2.json",
@@ -1954,9 +1994,9 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-hub-town-region.v3.json",
-      "definitionSha256": "d232acb74a6f66d57251f2f4829f2eb84d2180c960a42205fff0155874e9b61e",
+      "definitionSha256": "ed886e645fd1205e297df19e85f858086f21e92b1c54a88c02321e4503d90e4f",
       "documentPath": "authored/h4/farm-hub-town-region.v3.md",
-      "documentSha256": "ffeca14c788987771653157549450e4332139d919730bbffc9e2b51b48cf45cf"
+      "documentSha256": "73526189ac42cd3b98c6a0e6bd6fee44870bb29b1e48de0523a38c042760a7a4"
     },
     {
       "stableId": "h4-blueprint:farm-production-processing-region",
@@ -1972,18 +2012,18 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/logistics-hub-region.v3.json",
-      "definitionSha256": "5345a10427dae7fabc59b8b0d8352a247a1620204777f8ddc8bf6c0317ebdee1",
+      "definitionSha256": "7bd52ed890fbce4fe3e28c9924ec0b62cda058c83b706f1d923c47ff56c87ac7",
       "documentPath": "authored/h4/logistics-hub-region.v3.md",
-      "documentSha256": "3d9bece4eaa9ff9df503a4340743b93fa4273bc58ba9618ae7f3f8ca21996ec3"
+      "documentSha256": "5e54bdc10e71a3e63ef166b7b466b074e402fe598f72f2bb143dbe8c04423214"
     },
     {
       "stableId": "h4-blueprint:lowrise-market-region",
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/lowrise-market-region.v3.json",
-      "definitionSha256": "e6d073fbcf03d3e6fc5483ed6ec816a58e51a69e1dfaa0c6a81b5a2d8c0c0666",
+      "definitionSha256": "4651ab31b5c7be8b2f9f94d355009e133b74be347a3c993d2a3f76761810e874",
       "documentPath": "authored/h4/lowrise-market-region.v3.md",
-      "documentSha256": "11e222c0c34563366e4aea83402cc35d8431806cb3e4dde387afd71ce30e0511"
+      "documentSha256": "4df253a4f25ce9c12907ce88e4f68e8eeceb67a52444e52f92119e9bd96e9fa2"
     },
     {
       "stableId": "h4-blueprint:nature-home-exploration-region",
@@ -2237,6 +2277,26 @@
         "transition:Road–BuildingFront 전환"
       ],
       "derivationInputHashSha256": "92dbc7fa0656a3182df7f044a9b4ab91158a4e5483f4b6b35afcf30dc219c0f5",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:hub-fulfillment",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.hub-fulfillment.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:hub-long-term-storage",
+        "h1-stock:hub-outbound-staging",
+        "h1-stock:hub-temporary-staging",
+        "h1-stock:hub-vehicle-yard"
+      ],
+      "sourceGrammarRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 직선",
+        "network:도시도로 T자"
+      ],
+      "derivationInputHashSha256": "57e1a9542f7c579c663af4d9c49e07c4558d5f8a538490f366b9827c206f5c6a",
       "presentationOnly": true
     },
     {
@@ -2614,6 +2674,49 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h2-candidate:town-market-receiving",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.town-market-receiving.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:road-facility-access",
+        "h1-stock:town-market-display",
+        "h1-stock:town-market-receiving",
+        "h1-stock:town-staff-rest"
+      ],
+      "sourceGrammarRefs": [
+        "city:공동주택 생활마당",
+        "city:도심 마트 앞마당",
+        "city:먹거리 상점 골목",
+        "network:타운도로 직선",
+        "network:타운도로 T자",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면",
+        "transition:Road–BuildingFront 전환"
+      ],
+      "derivationInputHashSha256": "0ce3e177375c3ce6fd698c31e29455aa84027dbf44a4007f2440ef445af50a06",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:town-order-fulfillment",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.town-order-fulfillment.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:town-market-display",
+        "h1-stock:town-neighborhood-service",
+        "h1-stock:town-order-packing",
+        "h1-stock:town-resident-pickup"
+      ],
+      "sourceGrammarRefs": [
+        "city:먹거리 상점 골목",
+        "network:타운도로 직선",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면"
+      ],
+      "derivationInputHashSha256": "4044f3d92fe88b7552b317050dcd7aa87f0629d13bdf9d5be2eafc7172b67956",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h2-candidate:town-recall-relief",
       "targetHierarchyLevelCode": "H2",
       "derivationRecipeCode": "h2.town-recall-relief.r1",
@@ -2732,14 +2835,27 @@
       "targetKnowledgeRef": "h3-candidate:farm-hub-logistics",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.farm-hub-logistics.r1",
-      "childKnowledgeRefs": "h2-candidate:farm-hub-corridor",
+      "childKnowledgeRefs": [
+        "h2-candidate:farm-hub-corridor",
+        "h2-candidate:farm-processing-shipping",
+        "h2-candidate:hub-inbound-storage"
+      ],
       "sourceGrammarRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "farm:농산물 집하·직판장",
+        "farm:시설하우스 단동",
         "farm:헛간 작업마당",
         "network:농촌도로 곡선",
         "network:농촌도로 직선",
-        "transition:Farm–Hub 전환"
+        "network:도시도로 곡선",
+        "network:도시도로 직선",
+        "network:도시도로 T자",
+        "transition:Farm–Hub 전환",
+        "transition:Road–BuildingFront 전환"
       ],
-      "derivationInputHashSha256": "6cdeade1e5f48b2392030edc68f57f5d60ea999ee9b28849b9734b9ab850bd31",
+      "derivationInputHashSha256": "894e68ba760d4b20065c065afe5190eeda8caada796bc38d79eab5c4f8d4241e",
       "presentationOnly": true
     },
     {
@@ -2857,6 +2973,30 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h3-candidate:hub-fulfillment-operations",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.hub-fulfillment-operations.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:hub-fulfillment",
+        "h2-candidate:hub-longterm-cold-storage",
+        "h2-candidate:hub-maintenance-yard",
+        "h2-candidate:hub-outbound-vehicle"
+      ],
+      "sourceGrammarRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 십자",
+        "network:도시도로 직선",
+        "network:도시도로 T자",
+        "transition:Hub–City 전환",
+        "transition:Road–BuildingFront 전환",
+        "transition:Town–Hub 전환"
+      ],
+      "derivationInputHashSha256": "89fdb155c4095b272930cf2d6f6701bf769dd1b4b136878825ddc4c12b55406f",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h3-candidate:hub-maintenance-emergency-loop",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.hub-maintenance-emergency-loop.r1",
@@ -2884,16 +3024,31 @@
       "targetKnowledgeRef": "h3-candidate:hub-town-logistics",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.hub-town-logistics.r1",
-      "childKnowledgeRefs": "h2-candidate:hub-town-corridor",
+      "childKnowledgeRefs": [
+        "h2-candidate:hub-outbound-vehicle",
+        "h2-candidate:hub-town-corridor",
+        "h2-candidate:market-life-commerce"
+      ],
       "sourceGrammarRefs": [
+        "city:도심 마트 앞마당",
+        "city:먹거리 상점 골목",
         "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 십자",
         "network:도시도로 직선",
+        "network:도시도로 T자",
+        "network:타운도로 십자",
         "network:타운도로 직선",
         "network:타운도로 T자",
+        "town:근린 놀이터",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면",
         "transition:Road–BuildingFront 전환",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "23b70eae0ed1058367ad79fcf543d10968305acc42c8b3a92b3fde8ea4454e3b",
+      "derivationInputHashSha256": "b167e5551a144dca13432d88f21ba1053edb66ff5de1fbd79df8c2f3c1091684",
       "presentationOnly": true
     },
     {
@@ -3129,6 +3284,33 @@
       "presentationOnly": true
     },
     {
+      "targetKnowledgeRef": "h3-candidate:town-market-fulfillment",
+      "targetHierarchyLevelCode": "H3",
+      "derivationRecipeCode": "h3.town-market-fulfillment.r1",
+      "childKnowledgeRefs": [
+        "h2-candidate:market-life-commerce",
+        "h2-candidate:town-market-receiving",
+        "h2-candidate:town-order-fulfillment",
+        "h2-candidate:town-resident-service"
+      ],
+      "sourceGrammarRefs": [
+        "city:공동주택 생활마당",
+        "city:도심 마트 앞마당",
+        "city:먹거리 상점 골목",
+        "network:타운도로 십자",
+        "network:타운도로 직선",
+        "network:타운도로 T자",
+        "town:근린 놀이터",
+        "town:버스 정류장·보행 쉼터",
+        "town:생활 공공광장",
+        "town:읍내 상점 전면",
+        "transition:Road–BuildingFront 전환",
+        "transition:Town–Hub 전환"
+      ],
+      "derivationInputHashSha256": "9e313145b282f9b5441b0fa198d2629c93fdada237d7c103dec08a279613fc43",
+      "presentationOnly": true
+    },
+    {
       "targetKnowledgeRef": "h3-candidate:town-resident-service-loop",
       "targetHierarchyLevelCode": "H3",
       "derivationRecipeCode": "h3.town-resident-service-loop.r1",
@@ -3165,5 +3347,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "9d6476536240032aad7d998f6422220d320427560acfe6708dc5c798e88c97ab"
+  "contentHashSha256": "71c97de6c42d7632bc8b5f4468387d37729c7aeda4cdf3002921576f161f10d7"
 }

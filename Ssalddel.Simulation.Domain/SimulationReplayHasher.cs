@@ -30,6 +30,15 @@ namespace Ssalddel.Simulation.Domain
                 Add(canonical, package.LhWorld.AreaSetStableId);
                 Add(canonical, package.LhWorld.AreaSetRevision);
                 Add(canonical, package.LhWorld.AreaSetBoundaryHashSha256);
+                if (!string.IsNullOrWhiteSpace(package.LhWorld.WorldLayoutStableId))
+                {
+                    Add(canonical, package.LhWorld.WorldLayoutStableId);
+                    Add(canonical, package.LhWorld.WorldLayoutRevision);
+                    Add(canonical, package.LhWorld.WorldLayoutHashSha256);
+                    Add(canonical, package.LhWorld.PlacementAuthorityCode);
+                    Add(canonical, package.LhWorld.WorldGroundingStateCode);
+                    Add(canonical, package.LhWorld.GroundingEvidenceHashSha256);
+                }
                 Add(canonical, package.LhWorld.LastL3CellKey);
                 Add(canonical, package.LhWorld.Deltas.Length);
                 foreach (var delta in package.LhWorld.Deltas.OrderBy(

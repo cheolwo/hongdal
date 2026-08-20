@@ -4,16 +4,16 @@
 
 - H1 인지 부품: `52`
 - H2에서 사용하는 H1: `51`
-- H2 조합 가능: `34 / 34`
-- H2 이론 공간 생산 완료: `34 / 34`
-- 작성 조립법 재사용 / 이론 파생 조립법: `6 / 28`
+- H2 조합 가능: `37 / 37`
+- H2 이론 공간 생산 완료: `37 / 37`
+- 작성 조립법 재사용 / 이론 파생 조립법: `6 / 31`
 - 사람 검토 때문에 이론 생산이 막힌 H2: `0`
 - Unity H2 Root·5시점 근거 등록: `6`
 - H2 사람 검토 준비: `6`
 - 기준 플레이 H2 추적: `12`
 - 엄격 관문 H2 / 추적 누락: `20 / 8`
-- 경고 전용 추적 누락: `12`
-- 게임플레이 우선 이론 생산 / 사람 검토 준비: `24 / 5`
+- 경고 전용 추적 누락: `15`
+- 게임플레이 우선 이론 생산 / 사람 검토 준비: `27 / 5`
 
 H1의 재고 상태와 사람 검토 대기 여부는 H2 이론 공간 생산을 직접 막지 않는다. 존재·게임 맥락·공간 역할·표현 근거를 인지한 뒤, 이론 공간 공장의 결정성·연결성 관문을 통과하면 `TheoryQualified`로 생산한다. Unity 검토 자료와 게임플레이 추적은 별도 축으로 남긴다.
 
@@ -31,6 +31,7 @@ H1의 재고 상태와 사람 검토 대기 여부는 H2 이론 공간 생산을
 | 숲 경계 농장 블록 (`h2-candidate:forest-edge-farm`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `Strict` | `SequenceMapped` | 3 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | 고지대 생산 블록 (`h2-candidate:highland-production`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `Strict` | `SequenceMapped` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | Hub 비상 전력·보관 유지 블록 (`h2-candidate:hub-emergency-power`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 3 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
+| Hub 피킹·출고준비 작업 블록 (`h2-candidate:hub-fulfillment`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | Hub 입고·창고 블록 (`h2-candidate:hub-inbound-storage`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | Hub 장기·저온 보관 블록 (`h2-candidate:hub-longterm-cold-storage`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | Hub 차량·시설 정비 블록 (`h2-candidate:hub-maintenance-yard`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
@@ -49,6 +50,8 @@ H1의 재고 상태와 사람 검토 대기 여부는 H2 이론 공간 생산을
 | 자연 탐색·대피 블록 (`h2-candidate:nature-trail-shelter`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `Strict` | `SequenceMapped` | 3 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | 산림·수변 완충 블록 (`h2-candidate:nature-water-buffer`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `Strict` | `SequenceMapped` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | 생활권 오염 점검·정화 블록 (`h2-candidate:town-contamination-control`) | `TheoryQualified` | `AuthoredRecipe` | `ReviewReady` | `WarningOnly` | `Unlinked` | 3 | 없음 | 없음 |
+| 마트 후방 입고·검수 블록 (`h2-candidate:town-market-receiving`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
+| 주문 피킹·포장·수령 블록 (`h2-candidate:town-order-fulfillment`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 3 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | 생활권 회수 안내·자연권 구호 블록 (`h2-candidate:town-recall-relief`) | `TheoryQualified` | `AuthoredRecipe` | `ReviewReady` | `Strict` | `Unlinked` | 3 | 없음 | 없음 |
 | 생활권 주민지원·공동수령 블록 (`h2-candidate:town-resident-service`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `Strict` | `Unlinked` | 3 | 없음 | UnityH2RootAndFiveViewCaptureMissing |
 | 생활권 주거 골목 블록 (`h2-candidate:town-residential-alley`) | `TheoryQualified` | `DerivedTheoryRecipe` | `AwaitingUnityReviewEvidence` | `WarningOnly` | `Unlinked` | 2 | 없음 | UnityH2RootAndFiveViewCaptureMissing |

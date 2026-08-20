@@ -25,6 +25,7 @@ public sealed class SimulationWorldStreamingController(
     SimulationWorldLandscapeCompositionService landscapeComposition,
     SimulationWorldAreaSetLandscapeGraphService areaSetGraphs,
     SimulationWorldActualE5SpatialService actualE5Spatial,
+    SimulationWorldLayoutService worldLayouts,
     SimulationWorld상호작용GraphService interactionGraphs,
     SimulationWorld상호작용NetworkService interactionNetwork) : ControllerBase
 {
@@ -117,6 +118,42 @@ public sealed class SimulationWorldStreamingController(
         return value == null
             ? NotFound(new SimulationErrorResponse
                 { ErrorCode = "SimulationWorldAreaSetNetworkNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("world-layouts/{worldLayoutStableId}")]
+    [ProducesResponseType(typeof(SimulationWorldLayoutDefinitionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldLayoutDefinitionResponse>> WorldLayout(
+        string worldLayoutStableId, CancellationToken cancellationToken)
+    {
+        var value = await worldLayouts.ReadDefinitionAsync(worldLayoutStableId, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldLayoutNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("world-layouts/{worldLayoutStableId}/grounding-binding")]
+    [ProducesResponseType(typeof(SimulationWorldGroundingBindingResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldGroundingBindingResponse>> WorldGroundingBinding(
+        string worldLayoutStableId, CancellationToken cancellationToken)
+    {
+        var value = await worldLayouts.ReadGroundingBindingAsync(worldLayoutStableId, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldGroundingBindingNotFound" })
+            : Ok(value);
+    }
+
+    [HttpGet("world-layouts/{worldLayoutStableId}/grounding-readiness")]
+    [ProducesResponseType(typeof(SimulationWorldGroundingReadinessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SimulationWorldGroundingReadinessResponse>> WorldGroundingReadiness(
+        string worldLayoutStableId, CancellationToken cancellationToken)
+    {
+        var value = await worldLayouts.ReadGroundingReadinessAsync(worldLayoutStableId, cancellationToken);
+        return value == null
+            ? NotFound(new SimulationErrorResponse { ErrorCode = "SimulationWorldGroundingReadinessNotFound" })
             : Ok(value);
     }
 

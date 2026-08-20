@@ -43,7 +43,7 @@ if ((@($slice[0].actualAreaSetStableIds) -join ",") -ne "area-set:sim:pyeongchan
 if (@($slice[0].completionBlockReasonCodes).Count -ne 4) { throw "NatureFarmCompletionBlockerCountInvalid" }
 if (@($slice[0].completionBlockReasonCodes) -contains "ActualE5BindingMissing") { throw "NatureFarmActualE5BlockerWasNotClosed" }
 if (@($slice[0].wiEvidence | Where-Object { @($_.e7EvidenceRefs).Count -gt 0 }).Count -ne 0) { throw "NatureFarmE7EvidenceWasInvented" }
-if ([string] $report.theorySpatialFactoryRevision -ne "simulation-world-theory-spatial-factory-output.r2") { throw "TheorySpatialFactoryRevisionMissing" }
+if ([string] $report.theorySpatialFactoryRevision -ne "simulation-world-theory-spatial-factory-output.r3") { throw "TheorySpatialFactoryRevisionMissing" }
 if ([string] $report.actualE5SpatialRevision -ne "simulation-world-actual-e5-spatial-output.r1") { throw "ActualE5SpatialRevisionMissing" }
 $directE5Wi = @($slice[0].wiEvidence | Where-Object { @($_.e5PlacementRefs).Count -gt 0 })
 $contextualE5Wi = @($slice[0].wiEvidence | Where-Object { @($_.e5ContextRefs).Count -gt 0 })

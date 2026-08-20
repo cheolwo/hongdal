@@ -3,13 +3,15 @@
 @spatial-knowledge h3-candidate:hub-town-logistics
 @hierarchy H3
 @state ExploratoryInventory
+@required-h2 h2-candidate:hub-outbound-vehicle
 @required-h2 h2-candidate:hub-town-corridor
+@required-h2 h2-candidate:market-life-commerce
 @connector HubOutboundGate
 @connector TownReceivingGate
 
 ## 존재 이유
 
-기존 상향식 재고 v1에서 이관한 Hub–Town 연결 경관 지역 유형 청사진이다.
+Hub 출고 블록, Hub–Town 회랑 블록, Town 입고·시장 블록을 연결점 의미와 방향에 맞춰 잇는 경계 통과 경관 청사진이다.
 
 ## 설계 상태
 

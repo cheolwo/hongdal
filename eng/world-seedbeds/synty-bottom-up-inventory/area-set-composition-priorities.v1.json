@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-area-set-composition-priorities.v1",
-  "revision": "simulation-world-area-set-composition-priorities.r9",
+  "revision": "simulation-world-area-set-composition-priorities.r10",
   "purpose": "게임 기획 묶음이 H 재고 범위를 통제하도록 Nature·Farm·Town·City/Hub의 핵심 경험과 H1→H2→H3→H4 상향 조립 순서를 관리한다.",
   "areaSetCandidates": [
     {
@@ -36,7 +36,7 @@
       "title": "Town 생활·시장 AreaSet",
       "primaryExpressionPackCode": "Town",
       "stateCode": "ReadyForDesignComposition",
-      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief", "h3-candidate:town-resident-service-loop"],
+      "requiredH3Refs": ["h3-candidate:lowrise-market-town", "h3-candidate:circular-market-town", "h3-candidate:town-contamination-relief", "h3-candidate:town-resident-service-loop", "h3-candidate:town-market-fulfillment"],
       "optionalH3Refs": ["h3-candidate:nature-town-relief-loop"],
       "playerWorldRoleCode": "ProfessionalWorld"
       ,"corePlayerVerbCodes": ["ReceiveGoods", "Display", "Order", "Pack", "Pickup", "RelieveResidents"]
@@ -49,7 +49,7 @@
       "title": "City/Hub 물류 AreaSet",
       "primaryExpressionPackCode": "City",
       "stateCode": "QueuedAfterTown",
-      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub", "h3-candidate:hub-maintenance-emergency-loop"],
+      "requiredH3Refs": ["h3-candidate:jinbu-hub", "h3-candidate:resilient-logistics-hub", "h3-candidate:hub-maintenance-emergency-loop", "h3-candidate:hub-fulfillment-operations"],
       "optionalH3Refs": [],
       "playerWorldRoleCode": "ProfessionalWorld"
       ,"corePlayerVerbCodes": ["Unload", "Inspect", "Store", "Pick", "Stage", "Load"]

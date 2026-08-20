@@ -521,6 +521,14 @@
       "documentSha256": "56d70f88bc8c4ae1400aae25dc16a92b67c59e705cce8d5ad1c4e1922f324984"
     },
     {
+      "stableId": "h2-candidate:hub-fulfillment",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-fulfillment.v2.json",
+      "definitionSha256": "0eb054b7aef2d30fed8587be5d19e1f2e3a391d6e3a9000b165d0c92b58b96e1",
+      "documentPath": "authored/h2/hub-fulfillment.v2.md",
+      "documentSha256": "4d77c076dd0d94968e436e8a63280a7619f179b4e0ac77e4cefa671f9f47afdb"
+    },
+    {
       "stableId": "h2-candidate:hub-inbound-storage",
       "revision": 2,
       "definitionPath": "definitions/h2/hub-inbound-storage.v2.json",
@@ -665,6 +673,22 @@
       "documentSha256": "214f74bc22e05c8784b5a35dffd58cae1859a5a7fe3a3dc50e93f201abb588f8"
     },
     {
+      "stableId": "h2-candidate:town-market-receiving",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-market-receiving.v2.json",
+      "definitionSha256": "9458a239bef34ffb91959a20900eb5ecc4da5a05b6f89980b1074392d0621fcf",
+      "documentPath": "authored/h2/town-market-receiving.v2.md",
+      "documentSha256": "77ed5078cf3460a8825a25c9e50e42b1ea620af8718b3bd0f722bb60a42dc9f7"
+    },
+    {
+      "stableId": "h2-candidate:town-order-fulfillment",
+      "revision": 1,
+      "definitionPath": "definitions/h2/town-order-fulfillment.v2.json",
+      "definitionSha256": "ca0272874b8dc9337cde35bbf2eaa731a344a93d4302ffec96e469d8185cd6a2",
+      "documentPath": "authored/h2/town-order-fulfillment.v2.md",
+      "documentSha256": "34a3af9d1d59cf208577d68f5a23c8273d50c884a43eebfade8841a6c9c7e29c"
+    },
+    {
       "stableId": "h2-candidate:town-recall-relief",
       "revision": 1,
       "definitionPath": "definitions/h2/town-recall-relief.v2.json",
@@ -708,11 +732,11 @@
     },
     {
       "stableId": "h3-candidate:farm-hub-logistics",
-      "revision": 2,
+      "revision": 3,
       "definitionPath": "definitions/h3/farm-hub-logistics.v2.json",
-      "definitionSha256": "3cfe0a551639b7a7d512e0bf2db9107aa7baebf5c7e76f75586fd167edfc8db3",
+      "definitionSha256": "56fc2d0591ad81801a1f548d66ddc6e40a53c692b4ce6fb42964b6f7d8d568e4",
       "documentPath": "authored/h3/farm-hub-logistics.v2.md",
-      "documentSha256": "d4a7a2fa3c9cac093795eb29902bb58d81c6db52fdc7f30ec5a3ee5190694336"
+      "documentSha256": "c3c2bbde16475a36a6bddfc4509c08f946532b80074d33af23cd230929415ed9"
     },
     {
       "stableId": "h3-candidate:farm-incident-recovery",
@@ -747,6 +771,14 @@
       "documentSha256": "8aac687bb2f92e91fb0238c2d218c5fe85b627b2fce606510b17e5a5a10b3f52"
     },
     {
+      "stableId": "h3-candidate:hub-fulfillment-operations",
+      "revision": 1,
+      "definitionPath": "definitions/h3/hub-fulfillment-operations.v2.json",
+      "definitionSha256": "120653a2af66685fd7cc2d6d0b2991f38f256226fa5171df32d47c109fe248d4",
+      "documentPath": "authored/h3/hub-fulfillment-operations.v2.md",
+      "documentSha256": "1918d33e3d131ef13564a74b2c13607c0c185feb16b7e1eae908b52f00b2e34e"
+    },
+    {
       "stableId": "h3-candidate:hub-maintenance-emergency-loop",
       "revision": 1,
       "definitionPath": "definitions/h3/hub-maintenance-emergency-loop.v2.json",
@@ -756,11 +788,11 @@
     },
     {
       "stableId": "h3-candidate:hub-town-logistics",
-      "revision": 2,
+      "revision": 3,
       "definitionPath": "definitions/h3/hub-town-logistics.v2.json",
-      "definitionSha256": "acf2229d6a1b2173fbd72bcf430295f06b08970eef2af5446f7ec0db19f1c9c5",
+      "definitionSha256": "386158a984b42c732437dc35fe915d394fcce17aace47f387a772572ef482bcd",
       "documentPath": "authored/h3/hub-town-logistics.v2.md",
-      "documentSha256": "310b1083150d99921a6e0d6bb98d69b4a79461a5599f4a2b32797e4bffc4f8df"
+      "documentSha256": "f3d70e801cac3061f95b1f229971865346c035a6c073f8225ad3a5195274fdf9"
     },
     {
       "stableId": "h3-candidate:jinbu-hub",
@@ -833,6 +865,14 @@
       "definitionSha256": "3f0c7531f929f8f2ba08ffe3b7b262596cdc3c8c0b24fcc74745ace57fb8c6c4",
       "documentPath": "authored/h3/town-contamination-relief.v2.md",
       "documentSha256": "48d87f135542d72e559d6a4750798195ee167efaae4adffeb0484127de17bc45"
+    },
+    {
+      "stableId": "h3-candidate:town-market-fulfillment",
+      "revision": 1,
+      "definitionPath": "definitions/h3/town-market-fulfillment.v2.json",
+      "definitionSha256": "2cc3ce1bbe387dbe06beeb83439ed8470ae34d3c7104de81715319591bf0fa26",
+      "documentPath": "authored/h3/town-market-fulfillment.v2.md",
+      "documentSha256": "0a3879ea72cf237787f70ec0488171b681a32f5c5161e919fb0e86258f63cf5b"
     },
     {
       "stableId": "h3-candidate:town-resident-service-loop",

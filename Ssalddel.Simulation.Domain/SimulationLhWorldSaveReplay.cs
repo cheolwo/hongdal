@@ -38,6 +38,24 @@ namespace Ssalddel.Simulation.Domain
                 || value.AreaSetBoundaryHashSha256.Length != 64
                 || !TryParseL3CellKey(value.LastL3CellKey))
                 throw new SimulationContractException("SimulationLhWorldStateInvalid");
+            var hasWorldLayout = !string.IsNullOrWhiteSpace(value.WorldLayoutStableId);
+            if (hasWorldLayout && (value.WorldLayoutRevision <= 0
+                    || value.WorldLayoutHashSha256.Length != 64
+                    || (value.PlacementAuthorityCode != SimulationWorldLayoutCodes.ScenarioRelative
+                        && value.PlacementAuthorityCode != SimulationWorldLayoutCodes.E6Grounded)
+                    || (value.WorldGroundingStateCode != SimulationWorldLayoutCodes.NotApplied
+                        && value.WorldGroundingStateCode != SimulationWorldLayoutCodes.Grounded)
+                    || (value.WorldGroundingStateCode == SimulationWorldLayoutCodes.Grounded
+                        && value.GroundingEvidenceHashSha256.Length != 64)
+                    || (value.WorldGroundingStateCode == SimulationWorldLayoutCodes.NotApplied
+                        && !string.IsNullOrEmpty(value.GroundingEvidenceHashSha256))))
+                throw new SimulationContractException("SimulationLhWorldLayoutProvenanceInvalid");
+            if (!hasWorldLayout && (value.WorldLayoutRevision != 0
+                    || !string.IsNullOrEmpty(value.WorldLayoutHashSha256)
+                    || !string.IsNullOrEmpty(value.PlacementAuthorityCode)
+                    || !string.IsNullOrEmpty(value.WorldGroundingStateCode)
+                    || !string.IsNullOrEmpty(value.GroundingEvidenceHashSha256)))
+                throw new SimulationContractException("SimulationLhWorldLayoutProvenanceInvalid");
             if (value.Deltas == null
                 || value.Deltas.Any(delta => delta == null
                     || string.IsNullOrWhiteSpace(delta.GeneratedStableId)

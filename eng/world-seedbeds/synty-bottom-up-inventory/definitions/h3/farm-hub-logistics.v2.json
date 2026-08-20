@@ -1,14 +1,16 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h3.v2",
   "stableId": "h3-candidate:farm-hub-logistics",
-  "revision": 2,
+  "revision": 3,
   "hierarchyLevelCode": "H3",
   "title": "농장–물류 거점 연결 경관",
-  "summary": "기존 상향식 재고 v1에서 이관한 농장–물류 거점 연결 경관 지역 유형 청사진이다.",
+  "summary": "농장 출하 블록, Farm–Hub 회랑 블록, Hub 입고 블록을 의미 연결점으로 잇는 경계 통과 경관 청사진이다.",
   "knowledgeStateCode": "ExploratoryInventory",
   "topologyCode": "Linear",
   "requiredH2Refs": [
-    "h2-candidate:farm-hub-corridor"
+    "h2-candidate:farm-processing-shipping",
+    "h2-candidate:farm-hub-corridor",
+    "h2-candidate:hub-inbound-storage"
   ],
   "optionalH2Refs": [],
   "connectorRoleCodes": [

@@ -84,11 +84,13 @@ function Expand-H4Coverage(
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $knowledgeRoot = Join-Path $repositoryRoot "eng/world-seedbeds/synty-bottom-up-inventory"
 $policyPath = Join-Path $knowledgeRoot "gameplay-led-h-policy.v1.json"
+$demandPath = Join-Path $knowledgeRoot "gameplay-h-inventory-demands.v1.json"
 $priorityPath = Join-Path $knowledgeRoot "area-set-composition-priorities.v1.json"
 $catalogPath = Join-Path $knowledgeRoot "catalog.v3.json"
 $worldInteractionPath = Join-Path $repositoryRoot "eng/execution-ledgers/world-interactions.json"
 
 $policy = Read-Json $policyPath
+$demands = Read-Json $demandPath
 $priority = Read-Json $priorityPath
 $catalog = Read-Json $catalogPath
 $worldInteractions = Read-Json $worldInteractionPath
@@ -97,6 +99,7 @@ $gameplaySpatialCompletion = Read-Json $gameplaySpatialCompletionPath
 $theoryFactoryPolicyPath = Join-Path $repositoryRoot ([string] $policy.theoryFactoryPolicyPath -replace "/", [IO.Path]::DirectorySeparatorChar)
 $theoryFactoryPolicy = Read-Json $theoryFactoryPolicyPath
 Require ([string] $policy.schemaVersion -eq "simulation-world-gameplay-led-h-policy.v1") "PolicySchema"
+Require ([string] $demands.schemaVersion -eq "simulation-world-gameplay-h-inventory-demands.v1") "DemandSchema"
 Require ([bool] $policy.admissionRules.publicDataFieldsForbiddenInHDefinitions) "PublicDataBoundary"
 Require ([string] $policy.admissionRules.orphanDispositionCode -eq "QuarantineAsIdeaInventory") "OrphanDisposition"
 Require ([string] $gameplaySpatialCompletion.schemaVersion -eq "simulation-world-gameplay-spatial-completion.v1") "GameplaySpatialCompletionSchema"
@@ -213,6 +216,35 @@ $playableSliceSummary = @($gameplaySpatialCompletion.playableSlices | ForEach-Ob
 
 $worldInteractionMap = @{}
 foreach ($wi in @($worldInteractions.items)) { $worldInteractionMap[[string] $wi.id] = $wi }
+$knownGamePlanCodes = @(($priority.areaSetCandidates.gamePlanCode + $policy.crossWorldBlueprintBindings.gamePlanCode) | Sort-Object -Unique)
+$knownH2Refs = @($h2.stableId)
+$knownH3Refs = @($h3.stableId)
+Require ([int] $demands.targetInventoryAfterWave.h2 -eq @($h2).Count) "DemandH2TargetMismatch"
+Require ([int] $demands.targetInventoryAfterWave.h3 -eq @($h3).Count) "DemandH3TargetMismatch"
+Require (@($demands.demandItems.demandStableId | Sort-Object -Unique).Count -eq @($demands.demandItems).Count) "DemandStableIdDuplicate"
+$demandSummary = @($demands.demandItems | ForEach-Object {
+    $demand = $_
+    Require ([string] $demand.gamePlanCode -in $knownGamePlanCodes) "DemandGamePlanUnknown:$($demand.demandStableId)"
+    Require ([string] $demand.demandKindCode -in @("Reuse", "RevisionExpansion", "SpatialInventoryGap", "EvidenceGap")) "DemandKindInvalid:$($demand.demandStableId)"
+    foreach ($wiId in @($demand.requiredWiRefs)) { Require ($worldInteractionMap.ContainsKey([string] $wiId)) "DemandWiUnknown:$($demand.demandStableId):$wiId" }
+    foreach ($h2Ref in @($demand.reuseH2Refs + $demand.newH2Refs)) { Require ([string] $h2Ref -in $knownH2Refs) "DemandH2Unknown:$($demand.demandStableId):$h2Ref" }
+    foreach ($h3Ref in @($demand.newH3Refs)) { Require ([string] $h3Ref -in $knownH3Refs) "DemandH3Unknown:$($demand.demandStableId):$h3Ref" }
+    if ([string] $demand.demandKindCode -eq "EvidenceGap") { Require (@($demand.newH2Refs + $demand.newH3Refs).Count -eq 0) "EvidenceGapMustNotCreateH:$($demand.demandStableId)" }
+    if ([string] $demand.stateCode -eq "SatisfiedByTheoryInventory") { Require (@($demand.reuseH2Refs + $demand.newH2Refs + $demand.newH3Refs).Count -gt 0) "SatisfiedDemandInventoryMissing:$($demand.demandStableId)" }
+    [ordered]@{
+        demandStableId = [string] $demand.demandStableId
+        priorityCode = [string] $demand.priorityCode
+        title = [string] $demand.title
+        gamePlanCode = [string] $demand.gamePlanCode
+        demandKindCode = [string] $demand.demandKindCode
+        requiredWiRefs = @($demand.requiredWiRefs)
+        reuseH2Refs = @($demand.reuseH2Refs)
+        newH2Refs = @($demand.newH2Refs)
+        newH3Refs = @($demand.newH3Refs)
+        requiredFlowCodes = @($demand.requiredFlowCodes)
+        stateCode = [string] $demand.stateCode
+    }
+})
 $wiEvidenceQueueSummary = @($policy.wiEvidenceQueue | ForEach-Object {
     $queueItem = $_
     $trackCode = [string] $queueItem.evidenceTrackCode
@@ -253,6 +285,7 @@ $result = [ordered]@{
     policyRevision = [string] $policy.revision
     catalogRevision = [string] $catalog.revision
     areaSetPriorityRevision = [string] $priority.revision
+    demandRevision = [string] $demands.revision
     counts = [ordered]@{
         primaryGamePlans = @($planCoverage).Count
         crossWorldPlans = @($crossWorldCoverage).Count
@@ -265,6 +298,8 @@ $result = [ordered]@{
         warningOnlyGamePlansWithoutPlayableSlice = $warningOnlyGamePlanCodesMissingPlayableSlice.Count
         violations = @($contextlessInteractionH1 + $unlinkedExpressionH1 + $orphanH1 + $orphanH2 + $orphanH3).Count
         quarantinedExpressionH1 = @($quarantinedExpressionH1).Count
+        inventoryDemands = @($demandSummary).Count
+        satisfiedInventoryDemands = @($demandSummary | Where-Object stateCode -eq "SatisfiedByTheoryInventory").Count
     }
     planCoverage = $planCoverage
     crossWorldCoverage = $crossWorldCoverage
@@ -273,6 +308,7 @@ $result = [ordered]@{
     violations = $violations
     hExpansionQueue = @($policy.hExpansionQueue)
     wiEvidenceQueue = $wiEvidenceQueueSummary
+    inventoryDemandSummary = $demandSummary
     authorityBoundary = "H는 게임 기획에 속한 위치 독립 설계다. E5가 실제 배치, E6가 선정 WI의 공공데이터 계보다."
 }
 
@@ -301,6 +337,16 @@ foreach ($plan in $planCoverage) {
 [void] $builder.AppendLine("## H 확장 순서")
 [void] $builder.AppendLine()
 foreach ($item in @($policy.hExpansionQueue)) { [void] $builder.AppendLine("1. **$($item.priorityCode) $($item.title)** — $($item.goal)") }
+[void] $builder.AppendLine()
+[void] $builder.AppendLine("## 게임플레이 기반 H2·H3 수요")
+[void] $builder.AppendLine()
+[void] $builder.AppendLine("| 순위 | 게임플레이 수요 | 종류 | 신규 H2/H3 | 상태 |")
+[void] $builder.AppendLine("| --- | --- | --- | --- | --- |")
+foreach ($item in $demandSummary) {
+    $newRefs = @($item.newH2Refs + $item.newH3Refs) -join ', '
+    if ([string]::IsNullOrWhiteSpace($newRefs)) { $newRefs = "기존 재고 개정·재사용" }
+    [void] $builder.AppendLine("| $($item.priorityCode) | $($item.title) | ``$($item.demandKindCode)`` | $newRefs | ``$($item.stateCode)`` |")
+}
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 플레이 가능한 완성 단위")
 [void] $builder.AppendLine()

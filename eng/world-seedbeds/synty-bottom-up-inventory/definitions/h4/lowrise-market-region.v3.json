@@ -12,7 +12,8 @@
     "h3-candidate:lowrise-market-town",
     "h3-candidate:circular-market-town",
     "h3-candidate:town-contamination-relief",
-    "h3-candidate:town-resident-service-loop"
+    "h3-candidate:town-resident-service-loop",
+    "h3-candidate:town-market-fulfillment"
   ],
   "optionalH3Refs": [
     "h3-candidate:nature-town-relief-loop"
@@ -22,6 +23,7 @@
     "h3-candidate:lowrise-market-town",
     "h3-candidate:nature-town-relief-loop",
     "h3-candidate:town-contamination-relief",
+    "h3-candidate:town-market-fulfillment",
     "h3-candidate:town-resident-service-loop"
   ],
   "worldThemeCodes": [
@@ -64,7 +66,7 @@
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.lowrise-market-region.r1",
-  "derivationInputHashSha256": "07682f25ba019f9e827205af13fc9ce0f974f8279877342f79ec847fd292b6ec",
+  "derivationInputHashSha256": "7af95db58a400c659a1332a310b9327b914dba586a4d91f7dfad06462d20eac5",
   "authoredDocument": "authored/h4/lowrise-market-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

@@ -11,10 +11,12 @@
   "requiredH3Refs": [
     "h3-candidate:jinbu-hub",
     "h3-candidate:resilient-logistics-hub",
-    "h3-candidate:hub-maintenance-emergency-loop"
+    "h3-candidate:hub-maintenance-emergency-loop",
+    "h3-candidate:hub-fulfillment-operations"
   ],
   "optionalH3Refs": [],
   "childKnowledgeRefs": [
+    "h3-candidate:hub-fulfillment-operations",
     "h3-candidate:hub-maintenance-emergency-loop",
     "h3-candidate:jinbu-hub",
     "h3-candidate:resilient-logistics-hub"
@@ -40,7 +42,7 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.logistics-hub-region.r1",
-  "derivationInputHashSha256": "2a38e4176b0ec4e2cb47d366a0129964e452faa0dfdb4d469cde6132c10db53c",
+  "derivationInputHashSha256": "4c30fdda5e941287cf01f96537c6ac1a1bf90c4235b4f1d94d234adf4c02d637",
   "authoredDocument": "authored/h4/logistics-hub-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

@@ -12,7 +12,7 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationLhWorldTests
 {
     [Fact]
-    public void LH_Profile은_L0부터_L3와_H4부터_H1의기본대응을봉인한다()
+    public void LH_Profile은_L실행해상도별_H주조회계층을제공한다()
     {
         var profile = SimulationLhWorldService.CreateDefaultProfile();
 
@@ -33,6 +33,44 @@ public sealed class SimulationLhWorldTests
         Assert.Equal(4, profile.PrefetchRadius);
         Assert.Equal(6, profile.GenerationLayers.Length);
         Assert.False(profile.IsOperationalState);
+    }
+
+    [Fact]
+    public void 스트리밍범위계산기는_H주조회계층을바꿔도_같은L3창을계산한다()
+    {
+        var profile = SimulationLhWorldService.CreateDefaultProfile();
+        var original = new SimulationLhWindowPlanner().Plan(
+            Request("epoch:window:original", "E"), profile);
+        foreach (var level in profile.Levels)
+        {
+            level.DefaultHLevelCode = "H1";
+            level.PrimaryHQueryLevelCode = "H1";
+        }
+        var changed = new SimulationLhWindowPlanner().Plan(
+            Request("epoch:window:changed", "E"), profile);
+
+        Assert.Equal(original.Cells.Select(value => value.CellKey),
+            changed.Cells.Select(value => value.CellKey));
+        Assert.Equal(original.Cells.Select(value => value.WindowRoleCode),
+            changed.Cells.Select(value => value.WindowRoleCode));
+        Assert.Equal(original.Cells.Select(value => value.Priority),
+            changed.Cells.Select(value => value.Priority));
+    }
+
+    [Fact]
+    public void 셀내용공급자는_L3범위계산과분리해_교체할수있다()
+    {
+        var source = new RecordingCellContentSource();
+        var service = new SimulationLhWorldService(
+            new SimulationLhWindowPlanner(), source);
+        var preview = service.Preview(
+            Request("epoch:content-source", "None"), 1, 0, 7);
+
+        Assert.Equal(81, source.RequestedCellKeys.Count);
+        Assert.Equal(SimulationLhWorldCodes.AuthoritativeWorld,
+            preview.ContentSourceCode);
+        Assert.All(preview.Cells, value => Assert.Equal(
+            SimulationLhWorldCodes.AuthoritativeWorld, value.ContentSourceCode));
     }
 
     [Fact]
@@ -220,6 +258,7 @@ public sealed class SimulationLhWorldTests
         Assert.Equal(code, value.LevelCode);
         Assert.Equal(meters, value.CellSizeMeters);
         Assert.Equal(hCode, value.DefaultHLevelCode);
+        Assert.Equal(hCode, value.PrimaryHQueryLevelCode);
     }
 
     private static void AssertSeason(
@@ -265,4 +304,30 @@ public sealed class SimulationLhWorldTests
                     });
                 });
             });
+
+    private sealed class RecordingCellContentSource : ISimulationLhCellContentSource
+    {
+        public List<string> RequestedCellKeys { get; } = new();
+
+        public string ContentSourceCode => SimulationLhWorldCodes.AuthoritativeWorld;
+
+        public SimulationLhCellPlanResponse CreateCellPlan(
+            SimulationLhWindowCell windowCell,
+            SimulationLhCellContentContext context)
+        {
+            RequestedCellKeys.Add(windowCell.CellKey);
+            return new SimulationLhCellPlanResponse
+            {
+                CellKey = windowCell.CellKey,
+                CellX = windowCell.CellX,
+                CellY = windowCell.CellY,
+                WindowRoleCode = windowCell.WindowRoleCode,
+                Priority = windowCell.Priority,
+                ContentSourceCode = ContentSourceCode,
+                BasePlanHashSha256 = new string('a', 64),
+                PresentationHashSha256 = new string('b', 64),
+                PresentationOnly = true,
+            };
+        }
+    }
 }

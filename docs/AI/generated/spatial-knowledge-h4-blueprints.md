@@ -6,7 +6,7 @@
 
 - 후보: `h4-blueprint:farm-hub-town-region`
 - 필수 H3: h3-candidate:highland-farm, h3-candidate:farm-hub-logistics, h3-candidate:jinbu-hub, h3-candidate:hub-town-logistics, h3-candidate:lowrise-market-town
-- 선택 H3: h3-candidate:farm-processing-campus, h3-candidate:resilient-logistics-hub, h3-candidate:circular-market-town
+- 선택 H3: h3-candidate:farm-processing-campus, h3-candidate:resilient-logistics-hub, h3-candidate:circular-market-town, h3-candidate:hub-fulfillment-operations, h3-candidate:town-market-fulfillment
 - 설계 관계: FarmToHub, HubToTown
 
 ## 농업 생산·후처리권
@@ -19,14 +19,14 @@
 ## 물류 Hub권
 
 - 후보: `h4-blueprint:logistics-hub-region`
-- 필수 H3: h3-candidate:jinbu-hub, h3-candidate:resilient-logistics-hub, h3-candidate:hub-maintenance-emergency-loop
+- 필수 H3: h3-candidate:jinbu-hub, h3-candidate:resilient-logistics-hub, h3-candidate:hub-maintenance-emergency-loop, h3-candidate:hub-fulfillment-operations
 - 선택 H3: 없음
 - 설계 관계: InboundToStorage, StorageToOutbound
 
 ## 저층 생활·시장권
 
 - 후보: `h4-blueprint:lowrise-market-region`
-- 필수 H3: h3-candidate:lowrise-market-town, h3-candidate:circular-market-town, h3-candidate:town-contamination-relief, h3-candidate:town-resident-service-loop
+- 필수 H3: h3-candidate:lowrise-market-town, h3-candidate:circular-market-town, h3-candidate:town-contamination-relief, h3-candidate:town-resident-service-loop, h3-candidate:town-market-fulfillment
 - 선택 H3: h3-candidate:nature-town-relief-loop
 - 설계 관계: LivingToMarket, MarketReturnLoop, IncidentToRelief, ReliefToNature
 

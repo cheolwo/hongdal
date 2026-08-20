@@ -218,9 +218,9 @@
   ],
   "h3AssemblyCandidates": [
     { "candidateId": "h3-candidate:highland-farm", "title": "고지대 농장 경관", "topologyCode": "ContourAdaptive", "h2CandidateRefs": ["h2-candidate:highland-production", "h2-candidate:farm-processing-shipping", "h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["FarmExternalGate"] },
-    { "candidateId": "h3-candidate:farm-hub-logistics", "title": "농장–물류 거점 연결 경관", "topologyCode": "Linear", "h2CandidateRefs": ["h2-candidate:farm-hub-corridor"], "connectorRoleCodes": ["FarmGate", "HubInboundGate"] },
+    { "candidateId": "h3-candidate:farm-hub-logistics", "title": "농장–물류 거점 연결 경관", "topologyCode": "Linear", "h2CandidateRefs": ["h2-candidate:farm-processing-shipping", "h2-candidate:farm-hub-corridor", "h2-candidate:hub-inbound-storage"], "connectorRoleCodes": ["FarmGate", "HubInboundGate"] },
     { "candidateId": "h3-candidate:jinbu-hub", "title": "진부형 물류 Hub 경관", "topologyCode": "ModifiedGrid", "h2CandidateRefs": ["h2-candidate:hub-inbound-storage", "h2-candidate:hub-outbound-vehicle"], "connectorRoleCodes": ["HubInboundGate", "HubOutboundGate"] },
-    { "candidateId": "h3-candidate:hub-town-logistics", "title": "Hub–Town 연결 경관", "topologyCode": "Linear", "h2CandidateRefs": ["h2-candidate:hub-town-corridor"], "connectorRoleCodes": ["HubOutboundGate", "TownReceivingGate"] },
+    { "candidateId": "h3-candidate:hub-town-logistics", "title": "Hub–Town 연결 경관", "topologyCode": "Linear", "h2CandidateRefs": ["h2-candidate:hub-outbound-vehicle", "h2-candidate:hub-town-corridor", "h2-candidate:market-life-commerce"], "connectorRoleCodes": ["HubOutboundGate", "TownReceivingGate"] },
     { "candidateId": "h3-candidate:lowrise-market-town", "title": "저층 생활·시장 경관", "topologyCode": "ModifiedGrid", "h2CandidateRefs": ["h2-candidate:lowrise-residential", "h2-candidate:market-life-commerce"], "connectorRoleCodes": ["TownReceivingGate", "TownLocalRoad"] },
     { "candidateId": "h3-candidate:nature-exploration-buffer", "title": "Nature 탐색·완충 경관", "topologyCode": "Organic", "h2CandidateRefs": ["h2-candidate:nature-water-buffer", "h2-candidate:forest-edge-farm"], "connectorRoleCodes": ["NatureTrail", "FarmEdge"] }
   ],

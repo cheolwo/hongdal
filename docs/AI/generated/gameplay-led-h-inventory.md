@@ -6,7 +6,7 @@ H 재고는 게임 기획 묶음에 속해야 하며, WI 또는 예상 플레이
 
 - 상호작용 H1: 52장
 - 팩 표현 H1: 32장
-- H2/H3/H4: 34/18/6
+- H2/H3/H4: 37/20/6
 - 맥락·계보 위반: 0건
 - 게임 기획 연결 전 격리된 팩 표현 H1: 9장
 
@@ -16,8 +16,8 @@ H 재고는 게임 기획 묶음에 속해야 하며, WI 또는 예상 플레이
 | --- | --- | --- | --- |
 | P1 | Nature 생활·탐험 AreaSet (NatureHomeThreatRecovery) | Explore → ObserveThreat → Retreat → Restore → Recover | 16/11/5/2 |
 | P2 | Farm 생산·생존 AreaSet (FarmProductionSurvival) | Cultivate → Harvest → ContainIncident → RecoverLoss → Ship | 17/10/4/1 |
-| P3 | Town 생활·시장 AreaSet (TownLivingMarketSafety) | ReceiveGoods → Display → Order → Pack → Pickup → RelieveResidents | 22/10/5/1 |
-| P4 | City/Hub 물류 AreaSet (CityHubLogisticsResilience) | Unload → Inspect → Store → Pick → Stage → Load | 10/7/3/1 |
+| P3 | Town 생활·시장 AreaSet (TownLivingMarketSafety) | ReceiveGoods → Display → Order → Pack → Pickup → RelieveResidents | 22/12/6/1 |
+| P4 | City/Hub 물류 AreaSet (CityHubLogisticsResilience) | Unload → Inspect → Store → Pick → Stage → Load | 10/8/4/1 |
 
 ## H 확장 순서
 
@@ -26,6 +26,16 @@ H 재고는 게임 기획 묶음에 속해야 하며, WI 또는 예상 플레이
 1. **H-P2 Farm 생산·사건 대응·출하** — 재배에서 사건 격리와 출하까지 이어지는 생산 공간을 완결한다.
 1. **H-P3 Town 생활·시장 안전** — 입고·진열·주문·포장·수령과 오염 대응 공간을 완결한다.
 1. **H-P4 City/Hub 물류 회복력** — 입고·검수·보관·피킹·출고와 품질 대응 공간을 완결한다.
+
+## 게임플레이 기반 H2·H3 수요
+
+| 순위 | 게임플레이 수요 | 종류 | 신규 H2/H3 | 상태 |
+| --- | --- | --- | --- | --- |
+| P1 | City/Hub 피킹·출고준비 공간 분리 | `SpatialInventoryGap` | h2-candidate:hub-fulfillment, h3-candidate:hub-fulfillment-operations | `SatisfiedByTheoryInventory` |
+| P2 | Town 마트 후방 입고·검수 공간 분리 | `SpatialInventoryGap` | h2-candidate:town-market-receiving, h3-candidate:town-market-fulfillment | `SatisfiedByTheoryInventory` |
+| P3 | Town 주문 피킹·포장·수령 공간 분리 | `SpatialInventoryGap` | h2-candidate:town-order-fulfillment, h3-candidate:town-market-fulfillment | `SatisfiedByTheoryInventory` |
+| P4 | Farm–Hub–Town 화물 인과선 의미 폐쇄 | `Reuse` | h3-candidate:hub-fulfillment-operations, h3-candidate:town-market-fulfillment | `SatisfiedByTheoryInventory` |
+| P5 | Nature 위협·후퇴·회복 의미 개정 | `RevisionExpansion` | h3-candidate:nature-threat-recovery | `Queued` |
 
 ## 플레이 가능한 완성 단위
 

@@ -123,7 +123,13 @@ H4 후보는 작성된 세계 의도, 필수 H3, 지역 내부 관계와 외부 
 
 이론 적격 H 설계를 전용 `area-set:theory:*`에 배치하고 이동 경로를 닫는 작업은 `E5TheoryQualified`다. 그 인스턴스에 필요한 공공데이터를 선별해 계보를 연결하는 작업은 E6이며 실제 서버·Unity Runtime 검증은 E7이다. 이론 E5를 사람 승인, 실제 지역 AreaSet, E6 또는 E7 완료 상태로 자동 대체하지 않는다.
 
-자동 공장은 H2 34개, H3 18개와 Nature·Farm·City/Hub·Town 이론 E5 인스턴스를 반복 생성한다. 팩 내부 H3가 준비되면 AreaSet 후보가 H2를 임시로 직접 소유하지 않고 해당 H3를 통해 하위 블록을 추적한다. Nature–Town 혼합 H3는 두 청사진의 선택 가능한 교차 경관 계보이며 실제 Graph나 지역 E5 인스턴스로 자동 복제하지 않는다. 사람 검토 결과는 별도의 `DeferredBatchReview`로 기록하며 생성 중단 조건이나 자동 승인 근거로 사용하지 않는다.
+자동 공장은 H2 37개, H3 20개와 Nature·Farm·City/Hub·Town 이론 E5 인스턴스를 반복 생성한다. 팩 내부 H3가 준비되면 AreaSet 후보가 H2를 임시로 직접 소유하지 않고 해당 H3를 통해 하위 블록을 추적한다. Nature–Town 혼합 H3와 신규 City/Hub 출고 운영 H3·Town 마트 주문이행 H3는 위치 독립 이론 재고이며 실제 Graph나 지역 E5 인스턴스로 자동 복제하지 않는다. 사람 검토 결과는 별도의 `DeferredBatchReview`로 기록하며 생성 중단 조건이나 자동 승인 근거로 사용하지 않는다.
+
+### 게임플레이 목적형 H2·H3 재고 수요
+
+`gameplay-h-inventory-demands.v1.json`은 팩별 목표 수량이 아니라 플레이 인과선에서 역할이 과도하게 합쳐졌거나 빠진 장소를 생산 근거로 기록한다. 첫 증산은 기존 H1을 재사용해 `Hub 피킹·출고준비 작업 블록`, `마트 후방 입고·검수 블록`, `주문 피킹·포장·수령 블록`을 만들고, 이를 각각 `Hub 보관·피킹·상차 운영 구역`과 `마트 입고·주문이행 구역`으로 조립한다.
+
+수요 종류는 기존 재고 재사용, 기존 의미 개정, 실제 공간 재고 부족과 증거 부족을 구분한다. `SpatialInventoryGap`만 신규 H 생성을 허용하며 `EvidenceGap`은 H를 늘리지 않고 WI·시험·실행 증거 대기열로 보낸다. 수요가 이론 재고로 충족돼도 실제 E5·공공데이터 E6·Unity Runtime E7은 별도 관문으로 남는다.
 
 Prefab 이름, GUID, Material, Scene 경로, GameObject 이름은 어느 승격 관문에서도 공간 StableId나 Simulation 권위가 될 수 없다.
 
@@ -141,7 +147,7 @@ H2·H3의 저장·계보 참조는 기존 `h2-candidate:*`, `h3-candidate:*` Sta
 
 ### 공간 계획기용 배치 계약
 
-H2와 H3의 주 용도는 행동 목록을 분류하는 것이 아니라 공간 계획기에 놓고 이어 붙이는 것이다. 이론 공간 공장은 이름 대장 r6부터 다음 계약을 함께 생성한다.
+H2와 H3의 주 용도는 행동 목록을 분류하는 것이 아니라 공간 계획기에 놓고 이어 붙이는 것이다. 이론 공간 공장은 이름 대장 r8부터 다음 계약을 함께 생성한다.
 
 - H2 `BlockPattern`: 로컬 미터 좌표계의 H1 배치, 내부 이동 관계, 기준 경계, 90도 회전 단위, 크기 변형과 외부 연결 역할을 가진다.
 - H3 `LandscapeAssemblyPattern`: H2 배치, 블록 사이 이동 관계, 기준 경계, 구역 형태와 외부 연결 역할을 가진다.
@@ -151,6 +157,25 @@ H2와 H3의 주 용도는 행동 목록을 분류하는 것이 아니라 공간 
 - `referenceBoundsMeters`: 결정적 상대 배치에서 계산한 이론상 기준 경계다. 실제 지역 면적·건물 경계·공공데이터 근거가 아니다.
 
 기존 H2·H3 StableId와 팩·계열 패턴 코드는 유지한다. 따라서 저장·계보 참조를 깨지 않고 공간 계획 화면은 `물리 공간 이름 → 형태·크기·연결구 → 게임플레이 활용 유형` 순으로 재고를 제시할 수 있다.
+
+### 재귀형 의미 관계 관문
+
+공간 공장은 하위 항목 배열의 순서만으로 이동선을 만들지 않는다. [`semantic-spatial-relations.v1.json`](../../eng/world-seedbeds/synty-bottom-up-inventory/semantic-spatial-relations.v1.json)이 각 계층의 하위 공간, 연결점, 방향, 이동 종류, 호환 규칙과 필수 흐름을 명시한다.
+
+```text
+H2 = H1 배치 + H1 의미 관계
+H3 = H2 배치 + H2 의미 관계
+AreaSet = H3 Graph 배치 + H3 의미 관계
+Theory World = AreaSet 배치 + AreaSet 의미 관계
+```
+
+연결점 방향은 `Input / Output / Bidirectional`, 관계 방향은 `Directed / Bidirectional`, 이동 종류는 연결점마다 배열로 기록한다. 관계 고유 식별자는 배열 번호가 아니라 양쪽 하위 공간·연결점·이동 종류·호환 규칙에서 결정적으로 계산하며, 모든 관계·연결점·Node를 정규 정렬한 뒤 hash를 만든다.
+
+각 계층은 먼저 방향을 무시한 연결 성분으로 `StructureQualified`를 판정하고, 그 다음 연결점 원본 계보·방향·이동 종류·호환 규칙과 필수 시작점→목표점 방향 도달성을 검사해 `TheoryQualified`를 판정한다. H3는 H2 두 개 이상을 가져야 한다. Farm–Hub와 Hub–Town 회랑 H3도 각각 출하 또는 출고 블록, 경계 회랑, 입고 블록의 세 H2로 보정한다.
+
+존재하지 않는 고유 식별자, 중복 관계 고유 식별자, 알 수 없는 방향·호환 규칙은 잘못된 계약이므로 생성을 실패시킨다. 반면 필요한 연결점이나 의미 경로가 아직 없는 경우에는 `SemanticRelationUnresolved`로 생성 가능 상태와 이론 적격 실패를 구분한다. `SpatialInventoryGap`은 필요한 공간 후보 생성의 근거이고, `EvidenceGap`은 기존 공간의 WI·시험·계보 보완 대상으로서 새 H를 자동 생성하지 않는다.
+
+Theory World는 Nature↔Farm·Town·City/Hub의 양방향 플레이어 이동과 Farm→City/Hub→Town의 단방향 화물 흐름을 별도로 검증한다. 이 의미 폐쇄 역시 위치 독립 이론 결과이며 사람 승인, 실제 AreaSet, 공공데이터 E6 또는 Runtime E7 권위를 만들지 않는다.
 
 ### 팩별 패턴 생산 순서
 
