@@ -32,6 +32,13 @@ namespace Ssalddel.Simulation.Application
         bool IsLocked(string sessionStableId, string resourceStableId);
     }
 
+    public interface ISimulationBattleReservationReader
+    {
+        bool IsActorCommitted(string sessionStableId, string actorStableId);
+        bool HasWorldTargetConflict(string sessionStableId,
+            string worldEffectTargetStableId, string capabilityCode);
+    }
+
     [SsalddelCodeMetadata(
         SsalddelCodeFeatureKeys.SimulationParallelBattle,
         SsalddelCodeLayer.Application,
@@ -49,14 +56,17 @@ namespace Ssalddel.Simulation.Application
         private readonly I경영SimulationSessionStore sessionStore;
         private readonly ISimulationTeamObservationPolicyStore teamPolicyStore;
         private readonly ISimulationBattleInstanceStore battleStore;
+        private readonly ISimulationBattlefieldDerivationService? battlefieldDerivationService;
 
         public SimulationBattleInstanceService(I경영SimulationSessionStore sessions,
             ISimulationTeamObservationPolicyStore policies,
-            ISimulationBattleInstanceStore battles)
+            ISimulationBattleInstanceStore battles,
+            ISimulationBattlefieldDerivationService? battlefieldDerivation = null)
         {
             sessionStore = sessions ?? throw new ArgumentNullException(nameof(sessions));
             teamPolicyStore = policies ?? throw new ArgumentNullException(nameof(policies));
             battleStore = battles ?? throw new ArgumentNullException(nameof(battles));
+            battlefieldDerivationService = battlefieldDerivation;
         }
 
         public SimulationBattleCreatePreviewSnapshot PreviewCreate(string sessionStableId,
@@ -70,7 +80,8 @@ namespace Ssalddel.Simulation.Application
             var natureEncounter = world.NatureThreat.Encounters.FirstOrDefault(value =>
                 value.EncounterStableId == request.EncounterStableId.Trim());
             var blocks = new List<string>();
-            if (request.ExpectedWorldRevision != world.Revision)
+            if (battlefieldDerivationService == null
+                && request.ExpectedWorldRevision != world.Revision)
                 blocks.Add("SimulationExpectedRevisionMismatch");
             if ((farm == null || farm.IsOperationalState || !farm.SimulationOnly)
                 && natureEncounter == null)
@@ -108,6 +119,28 @@ namespace Ssalddel.Simulation.Application
             if (!battleStore.CanReserve(sessionStableId.Trim(), areaStableId,
                 initialResources)) blocks.Add("BattleResourceLocked");
 
+            var derivation = new SimulationBattlefieldDerivationSnapshot();
+            var roster = new SimulationBattleUnitRosterSnapshot();
+            if (battlefieldDerivationService != null && hostileStrength > 0
+                && !string.IsNullOrWhiteSpace(areaStableId))
+            {
+                derivation = battlefieldDerivationService.Derive(sessionStableId.Trim(),
+                    request.EncounterStableId.Trim(), areaStableId, world.Revision,
+                    natureEncounter != null);
+                if (!derivation.CanConfirm)
+                    blocks.AddRange(derivation.BlockingReasonCodes);
+                roster = SimulationBattleUnitRosterBuilder.Build(
+                    request.EncounterStableId.Trim(), farm?.Actors
+                        ?? Array.Empty<SimulationFarmActorSnapshot>(), hostileStrength,
+                    encounter?.ThreatTypeCode ?? "NatureThreat", world.TeamRoleCards);
+                if (derivation.CanConfirm)
+                    SimulationBattleUnitRosterBuilder.BindBattlefieldPlan(roster,
+                        derivation.BattlefieldPlan.BattlefieldPlanHashSha256);
+                if (!roster.Units.Any(value => value.SideCode ==
+                    SimulationFarmTacticalCombatCodes.Allied))
+                    blocks.Add("SimulationBattleAlliedUnitRosterUnavailable");
+            }
+
             return new SimulationBattleCreatePreviewSnapshot
             {
                 SessionStableId = world.SessionStableId,
@@ -120,6 +153,8 @@ namespace Ssalddel.Simulation.Application
                 HostileStrength = hostileStrength,
                 InitialResourceStableIds = initialResources,
                 ReinforcementCandidateStableIds = reinforcementActors,
+                BattlefieldDerivation = derivation,
+                UnitRoster = roster,
                 CanConfirm = blocks.Count == 0,
                 BlockingReasonCodes = blocks.ToArray(),
                 SimulationOnly = policy.SimulationOnly,
@@ -130,12 +165,30 @@ namespace Ssalddel.Simulation.Application
             SimulationBattleCreateConfirmRequest request)
         {
             ValidateCommand(request.CommandId);
+            var usesSpatialHashContract = battlefieldDerivationService != null
+                && (!string.IsNullOrWhiteSpace(
+                        request.ExpectedBattleWorldContextHashSha256)
+                    || !string.IsNullOrWhiteSpace(
+                        request.ExpectedBattlefieldDerivationInputHashSha256));
+            if (usesSpatialHashContract)
+            {
+                Require(request.ExpectedBattleWorldContextHashSha256,
+                    "SimulationBattleWorldContextHashInvalid");
+                Require(request.ExpectedBattlefieldDerivationInputHashSha256,
+                    "SimulationBattleDerivationInputHashInvalid");
+            }
             var existing = battleStore.Find("battle:" + request.CommandId.Trim());
             if (existing != null)
             {
                 var snapshot = existing.Snapshot();
                 if (snapshot.SessionStableId != sessionStableId.Trim()
                     || snapshot.EncounterStableId != request.EncounterStableId.Trim()
+                    || (usesSpatialHashContract
+                        && (snapshot.BattlefieldDerivation.WorldContext.ContextHashSha256 !=
+                                request.ExpectedBattleWorldContextHashSha256.Trim()
+                            || snapshot.BattlefieldDerivation
+                                .BattlefieldDerivationInputHashSha256 != request
+                                .ExpectedBattlefieldDerivationInputHashSha256.Trim()))
                     || !snapshot.Participants.Any(value => value.ActorStableId ==
                         request.RequestingActorStableId.Trim()
                         && value.ParticipationRoleCode == SimulationBattleInstanceCodes.Commander))
@@ -150,6 +203,23 @@ namespace Ssalddel.Simulation.Application
             });
             if (!preview.CanConfirm)
                 throw new SimulationConflictException(preview.BlockingReasonCodes[0]);
+            if (battlefieldDerivationService != null && !usesSpatialHashContract
+                && request.ExpectedWorldRevision != preview.WorldRevision)
+                throw new SimulationConflictException("SimulationExpectedRevisionMismatch");
+            if (usesSpatialHashContract)
+            {
+                if (!string.Equals(request.ExpectedBattleWorldContextHashSha256.Trim(),
+                    preview.BattlefieldDerivation.WorldContext.ContextHashSha256,
+                    StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationBattleWorldContextChanged");
+                if (!string.Equals(
+                    request.ExpectedBattlefieldDerivationInputHashSha256.Trim(),
+                    preview.BattlefieldDerivation.BattlefieldDerivationInputHashSha256,
+                    StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationBattleDerivationInputChanged");
+            }
             var session = FindSession(sessionStableId).Snapshot();
             return battleStore.CreateOrGet(new SimulationBattleCreationContext
             {
@@ -165,6 +235,8 @@ namespace Ssalddel.Simulation.Application
                 HostileStrength = preview.HostileStrength,
                 InitialResourceStableIds = preview.InitialResourceStableIds,
                 ReinforcementCandidateStableIds = preview.ReinforcementCandidateStableIds,
+                BattlefieldDerivation = preview.BattlefieldDerivation,
+                UnitRoster = preview.UnitRoster,
                 CreateCommandId = request.CommandId.Trim(),
             }).Snapshot();
         }
@@ -245,19 +317,37 @@ namespace Ssalddel.Simulation.Application
                 HeroContribution(session, battle.EncounterStableId));
         }
 
+        public SimulationBattleInstanceSnapshot ConfirmTacticalCommand(
+            string sessionStableId, string battleStableId,
+            SimulationBattleTacticalCommandConfirmRequest request)
+        {
+            FindPolicy(sessionStableId, request.RequestingActorStableId);
+            return FindBattle(sessionStableId, battleStableId)
+                .ConfirmTacticalCommand(request);
+        }
+
         public void Reconcile(string sessionStableId, 경영SimulationSessionSnapshot world)
         {
             var session = FindSession(sessionStableId);
             foreach (var battle in battleStore.FindBySession(sessionStableId.Trim()))
             {
-                var snapshot = battle.Reconcile(world.CurrentTick, world.Revision);
-                if (snapshot.Outcome?.ResultCode == SimulationBattleInstanceCodes.Victory
-                    && snapshot.Outcome.ReconciliationStateCode ==
-                        SimulationBattleInstanceCodes.Applied
+                var pending = battle.Snapshot();
+                if (pending.PhaseCode != SimulationBattleInstanceCodes.Completed
+                    || pending.Outcome == null
+                    || world.CurrentTick <= pending.Outcome.CompletedWorldTick)
+                    continue;
+                session.ApplyBattleSemanticEffects(pending.BattleStableId,
+                    pending.EncounterStableId, pending.Outcome,
+                    pending.SemanticEffects.Where(value =>
+                        value.ReconciliationStateCode ==
+                            SimulationBattlefieldDerivationCodes.Pending));
+                if (pending.Outcome.ResultCode == SimulationBattleInstanceCodes.Victory
                     && world.NatureThreat.Encounters.Any(value =>
-                        value.EncounterStableId == snapshot.EncounterStableId))
-                    session.ApplyNatureEncounterVictory(snapshot.BattleStableId,
-                        snapshot.EncounterStableId);
+                        value.EncounterStableId == pending.EncounterStableId))
+                    session.ApplyNatureEncounterVictory(pending.BattleStableId,
+                        pending.EncounterStableId);
+                var current = session.Snapshot();
+                battle.Reconcile(current.CurrentTick, current.Revision);
             }
         }
 

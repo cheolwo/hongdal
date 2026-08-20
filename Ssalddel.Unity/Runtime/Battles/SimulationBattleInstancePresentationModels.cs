@@ -34,6 +34,8 @@ namespace Ssalddel.Unity.Battles
             = Array.Empty<BattleParticipantApiModel>();
         public BattleSupportApiModel[] Supports { get; set; }
             = Array.Empty<BattleSupportApiModel>();
+        public BattlefieldDerivationApiModel BattlefieldDerivation { get; set; } = new();
+        public BattleUnitRosterApiModel UnitRoster { get; set; } = new();
         public BattleOutcomeApiModel? Outcome { get; set; }
         public string ReplayHashSha256 { get; set; } = string.Empty;
         public bool SimulationOnly { get; set; }

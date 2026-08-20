@@ -51,6 +51,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string CommandId { get; set; } = string.Empty;
         public long ExpectedWorldRevision { get; set; }
+        public string ExpectedBattleWorldContextHashSha256 { get; set; } = string.Empty;
+        public string ExpectedBattlefieldDerivationInputHashSha256 { get; set; } = string.Empty;
         public string EncounterStableId { get; set; } = string.Empty;
         public string RequestingActorStableId { get; set; } = string.Empty;
     }
@@ -66,6 +68,8 @@ namespace Ssalddel.Simulation.Contracts
         public int HostileStrength { get; set; }
         public string[] InitialResourceStableIds { get; set; } = Array.Empty<string>();
         public string[] ReinforcementCandidateStableIds { get; set; } = Array.Empty<string>();
+        public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
+        public SimulationBattleUnitRosterSnapshot UnitRoster { get; set; } = new();
         public bool CanConfirm { get; set; }
         public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
         public bool SimulationOnly { get; set; } = true;
@@ -171,6 +175,14 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationBattleResourceReservationSnapshot>();
         public SimulationBattleSupportSnapshot[] Supports { get; set; }
             = Array.Empty<SimulationBattleSupportSnapshot>();
+        public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
+        public SimulationBattleUnitRosterSnapshot UnitRoster { get; set; } = new();
+        public SimulationBattleParticipationReservationSnapshot[] ParticipationReservations
+            { get; set; } = Array.Empty<SimulationBattleParticipationReservationSnapshot>();
+        public SimulationBattleWorldTargetReservationSnapshot[] WorldTargetReservations
+            { get; set; } = Array.Empty<SimulationBattleWorldTargetReservationSnapshot>();
+        public SimulationBattleSemanticEffectSnapshot[] SemanticEffects { get; set; }
+            = Array.Empty<SimulationBattleSemanticEffectSnapshot>();
         public SimulationBattleOutcomeSnapshot? Outcome { get; set; }
         public string ReplayHashSha256 { get; set; } = string.Empty;
         public bool SimulationOnly { get; set; } = true;
@@ -239,6 +251,8 @@ namespace Ssalddel.Simulation.Contracts
         public int HostileStrength { get; set; }
         public string[] InitialResourceStableIds { get; set; } = Array.Empty<string>();
         public string[] ReinforcementCandidateStableIds { get; set; } = Array.Empty<string>();
+        public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
+        public SimulationBattleUnitRosterSnapshot UnitRoster { get; set; } = new();
         public string CreateCommandId { get; set; } = string.Empty;
     }
 

@@ -25,6 +25,112 @@ public sealed class SimulationBattleInstanceTests
             typeof(InMemorySimulationBattleInstanceStore).Namespace);
 
     [Fact]
+    public void 전역개정이달라도_지역전투문맥과파생입력이같으면_확정한다()
+    {
+        var context = CreateContext();
+        var ready = AdvanceToEncounter(context.SessionStore.Find(context.SessionId)!);
+        var encounter = Encounter(ready);
+        var battles = new SimulationBattleInstanceService(context.SessionStore,
+            new FixedPolicyStore(Policy(context.SessionId)), context.BattleStore,
+            new FixedBattlefieldDerivationService());
+        var preview = battles.PreviewCreate(context.SessionId,
+            new SimulationBattleCreatePreviewRequest
+            {
+                ExpectedWorldRevision = ready.Revision - 1,
+                EncounterStableId = encounter.EncounterStableId,
+                RequestingActorStableId = Commander,
+            });
+
+        var created = battles.ConfirmCreate(context.SessionId,
+            new SimulationBattleCreateConfirmRequest
+            {
+                CommandId = "command:battle:local-hash-confirm",
+                ExpectedWorldRevision = ready.Revision - 1,
+                ExpectedBattleWorldContextHashSha256 = preview
+                    .BattlefieldDerivation.WorldContext.ContextHashSha256,
+                ExpectedBattlefieldDerivationInputHashSha256 = preview
+                    .BattlefieldDerivation.BattlefieldDerivationInputHashSha256,
+                EncounterStableId = encounter.EncounterStableId,
+                RequestingActorStableId = Commander,
+            });
+
+        Assert.True(preview.CanConfirm);
+        Assert.Equal("context-hash:local", created.BattlefieldDerivation
+            .WorldContext.ContextHashSha256);
+        Assert.Throws<SimulationConflictException>(() => battles.ConfirmCreate(
+            context.SessionId, new SimulationBattleCreateConfirmRequest
+            {
+                CommandId = "command:battle:changed-local-input",
+                ExpectedWorldRevision = ready.Revision,
+                ExpectedBattleWorldContextHashSha256 = "context-hash:changed",
+                ExpectedBattlefieldDerivationInputHashSha256 =
+                    "derivation-hash:local",
+                EncounterStableId = encounter.EncounterStableId,
+                RequestingActorStableId = Commander,
+            }));
+    }
+
+    [Fact]
+    public void 전장사본은_부대예약_의미효과_저장재생을한폐루프로보존한다()
+    {
+        var state = new SimulationBattleInstanceState(SpatialCreation());
+        var created = state.Snapshot();
+        Assert.Contains(created.ParticipationReservations,
+            value => value.ActorStableId == NpcA
+                && value.StateCode ==
+                    SimulationBattlefieldDerivationCodes.CommittedToBattle);
+        Assert.Contains(created.WorldTargetReservations,
+            value => value.WorldEffectTargetStableId == "defense:farm:fence");
+
+        var active = state.ConfirmDeployment(new SimulationBattleDeploymentConfirmRequest
+        {
+            CommandId = "command:spatial:deploy",
+            ExpectedBattleRevision = created.BattleRevision,
+            ActorStableId = Commander,
+            DeploymentCode = SimulationBattleInstanceCodes.Defensive,
+        });
+        var commanded = state.ConfirmTacticalCommand(
+            new SimulationBattleTacticalCommandConfirmRequest
+            {
+                CommandId = "command:spatial:hold",
+                ExpectedBattleRevision = active.BattleRevision,
+                RequestingActorStableId = Commander,
+                UnitStableId = "battle-unit:allied:000",
+                CommandCode = SimulationBattlefieldDerivationCodes.Hold,
+            });
+        var completed = state.Advance(new SimulationBattleAdvanceRequest
+        {
+            CommandId = "command:spatial:finish",
+            ExpectedBattleRevision = commanded.BattleRevision,
+            CombatTickCount = SimulationBattleInstanceCodes.MaximumCombatTick,
+        }, 5, 0);
+
+        Assert.NotEmpty(completed.SemanticEffects);
+        Assert.All(completed.SemanticEffects, value => Assert.Equal(
+            SimulationBattlefieldDerivationCodes.Pending,
+            value.ReconciliationStateCode));
+        Assert.All(completed.SemanticEffects, value => Assert.StartsWith(
+            "battle:spatial|", value.WorldEffectApplicationKey));
+
+        var reconciled = state.Reconcile(6, 9);
+        Assert.All(reconciled.ParticipationReservations, value => Assert.Equal(
+            SimulationBattlefieldDerivationCodes.Released, value.StateCode));
+        Assert.All(reconciled.SemanticEffects, value => Assert.Equal(
+            SimulationBattlefieldDerivationCodes.Applied,
+            value.ReconciliationStateCode));
+        var restored = SimulationBattleInstanceState.Restore(state.CreateSaveRecord())
+            .Snapshot();
+        Assert.Equal(reconciled.BattlefieldDerivation.BattlefieldPlan
+            .BattlefieldPlanHashSha256, restored.BattlefieldDerivation
+            .BattlefieldPlan.BattlefieldPlanHashSha256);
+        Assert.Equal(reconciled.UnitRoster.CombatSeedHashSha256,
+            restored.UnitRoster.CombatSeedHashSha256);
+        Assert.Equal(reconciled.SemanticEffects.Select(value =>
+                value.WorldEffectApplicationKey),
+            restored.SemanticEffects.Select(value => value.WorldEffectApplicationKey));
+    }
+
+    [Fact]
     public void 전투와WorldTick은_서로다른개정으로병렬진행되고_다음Tick에결과가합류한다()
     {
         var context = CreateContext();
@@ -414,6 +520,105 @@ public sealed class SimulationBattleInstanceTests
         ReinforcementCandidateStableIds = [NpcB],
         CreateCommandId = commandId,
     };
+
+    private static SimulationBattleCreationContext SpatialCreation() => new()
+    {
+        BattleStableId = "battle:spatial",
+        SessionStableId = "simulation-session:spatial",
+        EncounterStableId = "encounter:spatial",
+        AreaStableId = "area:daegwallyeong-farm",
+        CommanderActorStableId = Commander,
+        StartedWorldTick = 5,
+        StartedWorldRevision = 8,
+        ScenarioSeed = 20260820,
+        AlliedStrength = 12,
+        HostileStrength = 10,
+        InitialResourceStableIds = ["defense:farm:fence", NpcA],
+        BattlefieldDerivation = FixedDerivation(),
+        UnitRoster = new SimulationBattleUnitRosterSnapshot
+        {
+            BattleUnitRosterHashSha256 = "roster-hash:spatial",
+            CardModifierHashSha256 = "card-hash:spatial",
+            CombatSeedHashSha256 = "combat-seed-hash:spatial",
+            CombatSeed = 42,
+            Units =
+            [
+                new SimulationBattleUnitSnapshot
+                {
+                    UnitStableId = "battle-unit:allied:000",
+                    SideCode = SimulationFarmTacticalCombatCodes.Allied,
+                    MemberActorStableIds = [NpcA],
+                    MemberCount = 1,
+                    CombatStrength = 8,
+                },
+                new SimulationBattleUnitSnapshot
+                {
+                    UnitStableId = "battle-unit:hostile:000",
+                    SideCode = SimulationFarmTacticalCombatCodes.Hostile,
+                    ThreatTypeCode = SimulationFarmSurvivalCodes.ZombiePressure,
+                    MemberCount = 10,
+                    CombatStrength = 10,
+                },
+            ],
+        },
+        CreateCommandId = "command:spatial:create",
+    };
+
+    private static SimulationBattlefieldDerivationSnapshot FixedDerivation() => new()
+    {
+        CanConfirm = true,
+        BattlefieldDerivationInputHashSha256 = "derivation-hash:local",
+        TacticalTerrainInputHashSha256 = "terrain-hash:local",
+        WorldContext = new SimulationBattleWorldContextSnapshot
+        {
+            ContextHashSha256 = "context-hash:local",
+            AnchorSetHashSha256 = "anchor-hash:local",
+            Anchors =
+            [
+                new SimulationBattlefieldAnchorSnapshot
+                {
+                    BattlefieldAnchorStableId = "battle-anchor:fence",
+                    SourceStableId = "defense:farm:fence",
+                    WorldEffectTargetStableId = "defense:farm:fence",
+                    PreservationPolicyCode =
+                        SimulationBattlefieldDerivationCodes.Required,
+                    AnchorTypeCodes =
+                    [
+                        SimulationBattlefieldDerivationCodes.Physical,
+                        SimulationBattlefieldDerivationCodes.Objective,
+                    ],
+                },
+            ],
+        },
+        BattlefieldPlan = new SimulationBattlefieldPlanSnapshot
+        {
+            BattlefieldPlanHashSha256 = "plan-hash:local",
+            BattlefieldDerivationInputHashSha256 = "derivation-hash:local",
+            BattlefieldSeedHashSha256 = "battlefield-seed-hash:local",
+            BattlefieldPlanStableId = "battlefield-plan:local",
+            ValidationCodes = [],
+        },
+    };
+
+    private sealed class FixedBattlefieldDerivationService
+        : ISimulationBattlefieldDerivationService
+    {
+        public SimulationBattlefieldDerivationSnapshot Derive(string sessionStableId,
+            string encounterStableId, string areaStableId,
+            long capturedWorldRevision, bool natureEncounter)
+        {
+            var value = FixedDerivation();
+            value.SpatialOrigin.CapturedWorldRevision = capturedWorldRevision;
+            return value;
+        }
+    }
+
+    private sealed class FixedPolicyStore(SimulationTeamObservationPolicySnapshot value)
+        : ISimulationTeamObservationPolicyStore
+    {
+        public SimulationTeamObservationPolicySnapshot? FindForObserver(
+            string sessionStableId, string observerActorStableId) => value;
+    }
 
     private static SimulationTeamObservationPolicySnapshot Policy(string sessionId) => new()
     {

@@ -183,6 +183,10 @@ public static class SimulationServerServiceCollectionExtensions
             provider.GetRequiredService<InMemorySimulationBattleInstanceStore>());
         services.AddSingleton<ISimulationBattleResourceLockReader>(provider =>
             provider.GetRequiredService<InMemorySimulationBattleInstanceStore>());
+        services.AddSingleton<ISimulationBattleReservationReader>(provider =>
+            provider.GetRequiredService<InMemorySimulationBattleInstanceStore>());
+        services.AddSingleton<ISimulationBattlefieldDerivationService,
+            SimulationBattlefieldDerivationService>();
         services.AddSingleton<SimulationBattleInstanceService>();
         services.AddSingleton<ISimulationBattleWorldReconciler>(provider =>
             provider.GetRequiredService<SimulationBattleInstanceService>());

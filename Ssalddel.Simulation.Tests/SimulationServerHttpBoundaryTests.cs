@@ -37,9 +37,9 @@ public sealed class SimulationServerHttpBoundaryTests
         var hash = Convert.ToHexString(SHA256.HashData(
                 Encoding.UTF8.GetBytes(string.Join("\n", manifest))))
             .ToLowerInvariant();
-        Assert.Equal(113, manifest.Length);
+        Assert.Equal(114, manifest.Length);
         Assert.Equal(
-            "36cb54a2ae00b6a1acd3720d7d86307b2a4fcadb513a48f0f5bfe1bdbfb094b8",
+            "3597ebc64af71e3f3c947bbc3dc57b28cbab01b4de56077b13f8755ff9bc1de8",
             hash);
     }
 

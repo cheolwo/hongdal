@@ -959,7 +959,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Application",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 49\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ISimulationTeamObservationSessionStore, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 51\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ..."
     },
     {
       "severity": "Warning",

@@ -80,6 +80,13 @@ public sealed class SimulationBattlesController(SimulationBattleInstanceService 
         [FromBody] SimulationBattleAdvanceRequest request)
         => Execute(() => service.Advance(sessionStableId, battleStableId, request));
 
+    [HttpPost("{battleStableId}/commands/confirm")]
+    public ActionResult<SimulationBattleInstanceSnapshot> ConfirmTacticalCommand(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationBattleTacticalCommandConfirmRequest request)
+        => Execute(() => service.ConfirmTacticalCommand(sessionStableId,
+            battleStableId, request));
+
     private ActionResult<T> Execute<T>(Func<T> action)
     {
         try { return Ok(action()); }

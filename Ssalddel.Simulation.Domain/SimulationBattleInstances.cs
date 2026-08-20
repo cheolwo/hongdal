@@ -23,6 +23,8 @@ namespace Ssalddel.Simulation.Domain
         public int HostileStrength { get; set; }
         public string[] InitialResourceStableIds { get; set; } = Array.Empty<string>();
         public string[] ReinforcementCandidateStableIds { get; set; } = Array.Empty<string>();
+        public SimulationBattlefieldDerivationSnapshot BattlefieldDerivation { get; set; } = new();
+        public SimulationBattleUnitRosterSnapshot UnitRoster { get; set; } = new();
         public string CreateCommandId { get; set; } = string.Empty;
     }
 
@@ -48,6 +50,14 @@ namespace Ssalddel.Simulation.Domain
             new List<SimulationBattleResourceReservationSnapshot>();
         private readonly List<SimulationBattleSupportSnapshot> supports =
             new List<SimulationBattleSupportSnapshot>();
+        private readonly List<SimulationBattleParticipationReservationSnapshot>
+            participationReservations =
+                new List<SimulationBattleParticipationReservationSnapshot>();
+        private readonly List<SimulationBattleWorldTargetReservationSnapshot>
+            worldTargetReservations =
+                new List<SimulationBattleWorldTargetReservationSnapshot>();
+        private readonly List<SimulationBattleSemanticEffectSnapshot> semanticEffects =
+            new List<SimulationBattleSemanticEffectSnapshot>();
         private readonly Dictionary<string, AppliedCommand> commands =
             new Dictionary<string, AppliedCommand>(StringComparer.Ordinal);
         private readonly List<string> replayEvents = new List<string>();
@@ -77,6 +87,40 @@ namespace Ssalddel.Simulation.Domain
                     ReservationKindCode = "InitialBattleResource",
                     SourceCommandId = creation.CreateCommandId.Trim(),
                 });
+            }
+            foreach (var actor in context.UnitRoster.Units
+                .Where(value => value.SideCode == SimulationFarmTacticalCombatCodes.Allied)
+                .SelectMany(value => value.MemberActorStableIds)
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Distinct(StringComparer.Ordinal))
+            {
+                participationReservations.Add(
+                    new SimulationBattleParticipationReservationSnapshot
+                    {
+                        ActorStableId = actor,
+                        BattleStableId = context.BattleStableId,
+                        ReservedWorldTick = context.StartedWorldTick,
+                        EnteredBattleTick = 0,
+                    });
+            }
+            foreach (var target in context.BattlefieldDerivation.WorldContext.Anchors
+                .Where(value => !string.IsNullOrWhiteSpace(value.WorldEffectTargetStableId)
+                    && value.PreservationPolicyCode !=
+                        SimulationBattlefieldDerivationCodes.ContextOnly)
+                .Select(value => value.WorldEffectTargetStableId)
+                .Distinct(StringComparer.Ordinal))
+            {
+                worldTargetReservations.Add(
+                    new SimulationBattleWorldTargetReservationSnapshot
+                    {
+                        WorldEffectTargetStableId = target,
+                        BattleStableId = context.BattleStableId,
+                        ReservedWorldTick = context.StartedWorldTick,
+                        ConflictCapabilityCodes = new[]
+                        {
+                            "FacilityRelocation", "FacilityRepair", "FacilityRemoval",
+                        },
+                    });
             }
             replayEvents.Add("create~" + Payload(creation));
         }
@@ -129,6 +173,17 @@ namespace Ssalddel.Simulation.Domain
                 restored.reservations.AddRange(record.State.ResourceReservations.Select(CloneReservation));
                 restored.supports.Clear();
                 restored.supports.AddRange(record.State.Supports.Select(CloneSupport));
+                restored.participationReservations.Clear();
+                restored.participationReservations.AddRange(record.State
+                    .ParticipationReservations.Select(
+                        SimulationBattlefieldSnapshotCloner.Participation));
+                restored.worldTargetReservations.Clear();
+                restored.worldTargetReservations.AddRange(record.State
+                    .WorldTargetReservations.Select(
+                        SimulationBattlefieldSnapshotCloner.WorldTarget));
+                restored.semanticEffects.Clear();
+                restored.semanticEffects.AddRange(record.State.SemanticEffects.Select(
+                    SimulationBattlefieldSnapshotCloner.Effect));
                 restored.outcome = record.State.Outcome == null
                     ? null : CloneOutcome(record.State.Outcome);
                 restored.phaseCode = record.State.PhaseCode;
@@ -160,7 +215,10 @@ namespace Ssalddel.Simulation.Domain
                 || record.ReplayEvents == null || record.AppliedCommands == null
                 || record.State.Participants == null
                 || record.State.ResourceReservations == null
-                || record.State.Supports == null)
+                || record.State.Supports == null
+                || record.State.ParticipationReservations == null
+                || record.State.WorldTargetReservations == null
+                || record.State.SemanticEffects == null)
                 throw new SimulationContractException("SimulationBattleSaveRecordInvalid");
             var context = ToCreationContext(record.Creation);
             ValidateCreation(context);
@@ -171,6 +229,15 @@ namespace Ssalddel.Simulation.Domain
                 || record.State.StartedWorldTick != context.StartedWorldTick
                 || record.State.StartedWorldRevision != context.StartedWorldRevision
                 || record.State.ScenarioSeed != context.ScenarioSeed
+                || record.State.BattlefieldDerivation.BattlefieldDerivationInputHashSha256
+                    != context.BattlefieldDerivation.BattlefieldDerivationInputHashSha256
+                || record.State.BattlefieldDerivation.BattlefieldPlan
+                    .BattlefieldPlanHashSha256 != context.BattlefieldDerivation
+                    .BattlefieldPlan.BattlefieldPlanHashSha256
+                || record.State.UnitRoster.BattleUnitRosterHashSha256 !=
+                    context.UnitRoster.BattleUnitRosterHashSha256
+                || record.State.UnitRoster.CombatSeedHashSha256 !=
+                    context.UnitRoster.CombatSeedHashSha256
                 || record.State.IsOperationalState || !record.State.SimulationOnly
                 || record.State.BattleRevision < 0 || record.State.CombatTick < 0
                 || record.AppliedCommands.Any(value => value == null
@@ -178,7 +245,10 @@ namespace Ssalddel.Simulation.Domain
                     || value.Result == null
                     || value.Result.Participants == null
                     || value.Result.ResourceReservations == null
-                    || value.Result.Supports == null))
+                    || value.Result.Supports == null
+                    || value.Result.ParticipationReservations == null
+                    || value.Result.WorldTargetReservations == null
+                    || value.Result.SemanticEffects == null))
                 throw new SimulationContractException("SimulationBattleSaveRecordInvalid");
             if (record.AppliedCommands.Select(value => value.CommandId)
                 .Distinct(StringComparer.Ordinal).Count() != record.AppliedCommands.Length)
@@ -392,6 +462,41 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        public SimulationBattleInstanceSnapshot ConfirmTacticalCommand(
+            SimulationBattleTacticalCommandConfirmRequest request)
+        {
+            ValidateTacticalCommand(request);
+            lock (gate)
+            {
+                return Apply(request.CommandId, request.ExpectedBattleRevision,
+                    string.Join("~", request.RequestingActorStableId.Trim(),
+                        request.UnitStableId.Trim(), request.CommandCode.Trim(),
+                        request.TargetUnitStableId.Trim(), request.TargetXCentimeters,
+                        request.TargetZCentimeters, request.FormationCode.Trim()),
+                    () =>
+                    {
+                        if (phaseCode != SimulationBattleInstanceCodes.Active)
+                            throw new SimulationConflictException(
+                                "SimulationBattleNotActive");
+                        if (!IsCommander(request.RequestingActorStableId))
+                            throw new SimulationConflictException(
+                                "SimulationBattleCommanderRequired");
+                        var unit = context.UnitRoster.Units.FirstOrDefault(value =>
+                            value.UnitStableId == request.UnitStableId.Trim()
+                            && value.SideCode == SimulationFarmTacticalCombatCodes.Allied);
+                        if (unit == null)
+                            throw new SimulationConflictException(
+                                "SimulationBattleUnitNotControllable");
+                        if (request.CommandCode == SimulationBattlefieldDerivationCodes.Attack
+                            && !context.UnitRoster.Units.Any(value => value.UnitStableId ==
+                                request.TargetUnitStableId.Trim()
+                                && value.SideCode == SimulationFarmTacticalCombatCodes.Hostile))
+                            throw new SimulationConflictException(
+                                "SimulationBattleTargetUnitUnavailable");
+                    });
+            }
+        }
+
         public SimulationBattleInstanceSnapshot Reconcile(int worldTick, long worldRevision)
         {
             lock (gate)
@@ -404,6 +509,25 @@ namespace Ssalddel.Simulation.Domain
                 phaseCode = SimulationBattleInstanceCodes.Reconciled;
                 foreach (var reservation in reservations)
                     reservation.StateCode = SimulationBattleInstanceCodes.Released;
+                foreach (var reservation in participationReservations)
+                {
+                    reservation.StateCode = SimulationBattlefieldDerivationCodes.Released;
+                    reservation.ReleasedWorldTick = worldTick;
+                }
+                foreach (var reservation in worldTargetReservations)
+                {
+                    reservation.StateCode = SimulationBattlefieldDerivationCodes.Released;
+                    reservation.ReleasedWorldTick = worldTick;
+                }
+                foreach (var effect in semanticEffects.Where(value =>
+                    value.ReconciliationStateCode ==
+                        SimulationBattlefieldDerivationCodes.Pending))
+                {
+                    effect.ReconciliationStateCode =
+                        SimulationBattlefieldDerivationCodes.Applied;
+                    effect.AppliedWorldTick = worldTick;
+                    effect.AppliedWorldRevision = worldRevision;
+                }
                 foreach (var support in supports.Where(value =>
                     value.StateCode == SimulationBattleInstanceCodes.InTransit))
                     support.StateCode = SimulationBattleInstanceCodes.Returned;
@@ -442,6 +566,8 @@ namespace Ssalddel.Simulation.Domain
                 MoraleDelta = victory ? 3 : -5,
                 UsedDeterministicAutoCommand = heroContributionScore <= 0,
             };
+            semanticEffects.Clear();
+            semanticEffects.AddRange(BuildSemanticEffects(outcome));
             phaseCode = SimulationBattleInstanceCodes.Completed;
         }
 
@@ -486,6 +612,15 @@ namespace Ssalddel.Simulation.Domain
                 Participants = participants.Select(CloneParticipant).ToArray(),
                 ResourceReservations = reservations.Select(CloneReservation).ToArray(),
                 Supports = supports.Select(CloneSupport).ToArray(),
+                BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
+                    context.BattlefieldDerivation),
+                UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(context.UnitRoster),
+                ParticipationReservations = participationReservations.Select(
+                    SimulationBattlefieldSnapshotCloner.Participation).ToArray(),
+                WorldTargetReservations = worldTargetReservations.Select(
+                    SimulationBattlefieldSnapshotCloner.WorldTarget).ToArray(),
+                SemanticEffects = semanticEffects.Select(
+                    SimulationBattlefieldSnapshotCloner.Effect).ToArray(),
                 Outcome = outcome == null ? null : CloneOutcome(outcome),
             };
             snapshot.ReplayHashSha256 = CalculateReplayHash(snapshot);
@@ -506,11 +641,117 @@ namespace Ssalddel.Simulation.Domain
                 Participants = source.Participants.Select(CloneParticipant).ToArray(),
                 ResourceReservations = source.ResourceReservations.Select(CloneReservation).ToArray(),
                 Supports = source.Supports.Select(CloneSupport).ToArray(),
+                BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
+                    source.BattlefieldDerivation),
+                UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(source.UnitRoster),
+                ParticipationReservations = source.ParticipationReservations.Select(
+                    SimulationBattlefieldSnapshotCloner.Participation).ToArray(),
+                WorldTargetReservations = source.WorldTargetReservations.Select(
+                    SimulationBattlefieldSnapshotCloner.WorldTarget).ToArray(),
+                SemanticEffects = source.SemanticEffects.Select(
+                    SimulationBattlefieldSnapshotCloner.Effect).ToArray(),
                 Outcome = source.Outcome == null ? null : CloneOutcome(source.Outcome),
                 ReplayHashSha256 = source.ReplayHashSha256,
                 SimulationOnly = source.SimulationOnly,
                 IsOperationalState = source.IsOperationalState,
             };
+
+        private SimulationBattleSemanticEffectSnapshot[] BuildSemanticEffects(
+            SimulationBattleOutcomeSnapshot resolved)
+        {
+            var effects = new List<SimulationBattleSemanticEffectSnapshot>();
+            var evidence = Math.Max(0, Math.Min(1000,
+                (int)Math.Round(resolved.FacilityDamageUnits * 100m,
+                    MidpointRounding.AwayFromZero)));
+            foreach (var group in context.BattlefieldDerivation.WorldContext.Anchors
+                .Where(value => !string.IsNullOrWhiteSpace(value.WorldEffectTargetStableId)
+                    && value.PreservationPolicyCode !=
+                        SimulationBattlefieldDerivationCodes.ContextOnly)
+                .GroupBy(value => value.WorldEffectTargetStableId,
+                    StringComparer.Ordinal))
+            {
+                var anchors = group.OrderBy(value => value.BattlefieldAnchorStableId,
+                    StringComparer.Ordinal).ToArray();
+                var effectCode = anchors.Any(value => value.AnchorTypeCodes.Contains(
+                        SimulationBattlefieldDerivationCodes.Gate,
+                        StringComparer.Ordinal))
+                    ? SimulationBattlefieldDerivationCodes.GateCombatDamage
+                    : SimulationBattlefieldDerivationCodes.FacilityCombatDamage;
+                effects.Add(CreateSemanticEffect(group.Key, effectCode, evidence,
+                    anchors.Select(value => value.BattlefieldAnchorStableId).ToArray(),
+                    SimulationBattlefieldDerivationCodes.MaxSeverity));
+            }
+
+            var casualtyCount = Math.Min(resolved.RecoverableInjuryCount,
+                context.UnitRoster.Units.Where(value => value.SideCode ==
+                        SimulationFarmTacticalCombatCodes.Allied)
+                    .SelectMany(value => value.MemberActorStableIds)
+                    .Distinct(StringComparer.Ordinal).Count());
+            foreach (var actor in context.UnitRoster.Units
+                .Where(value => value.SideCode == SimulationFarmTacticalCombatCodes.Allied)
+                .SelectMany(value => value.MemberActorStableIds)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(value => value, StringComparer.Ordinal).Take(casualtyCount))
+            {
+                effects.Add(CreateSemanticEffect(actor,
+                    SimulationBattlefieldDerivationCodes.ActorCombatCasualty,
+                    resolved.ResultCode == SimulationBattleInstanceCodes.Victory ? 500 : 800,
+                    Array.Empty<string>(), SimulationBattlefieldDerivationCodes.SumCapped));
+            }
+
+            var objective = context.BattlefieldDerivation.WorldContext.Anchors.FirstOrDefault(
+                value => value.AnchorTypeCodes.Contains(
+                    SimulationBattlefieldDerivationCodes.Objective,
+                    StringComparer.Ordinal));
+            if (objective != null && !string.IsNullOrWhiteSpace(
+                    objective.WorldEffectTargetStableId))
+            {
+                effects.Add(CreateSemanticEffect(objective.WorldEffectTargetStableId,
+                    resolved.ResultCode == SimulationBattleInstanceCodes.Victory
+                        ? SimulationBattlefieldDerivationCodes.ObjectiveSecured
+                        : SimulationBattlefieldDerivationCodes.ObjectiveLost,
+                    1000, new[] { objective.BattlefieldAnchorStableId },
+                    SimulationBattlefieldDerivationCodes.MaxSeverity));
+            }
+            return effects.OrderBy(value => value.WorldEffectTargetStableId,
+                    StringComparer.Ordinal)
+                .ThenBy(value => value.SemanticEffectCode, StringComparer.Ordinal).ToArray();
+        }
+
+        private SimulationBattleSemanticEffectSnapshot CreateSemanticEffect(
+            string targetStableId, string effectCode, int evidence,
+            string[] anchorIds, string aggregation)
+        {
+            var severity = evidence >= 900 ? SimulationBattlefieldDerivationCodes.Destroyed
+                : evidence >= 650 ? SimulationBattlefieldDerivationCodes.Severe
+                : evidence >= 300 ? SimulationBattlefieldDerivationCodes.Moderate
+                : SimulationBattlefieldDerivationCodes.Light;
+            var stableId = "battle-effect:" + StableHash(string.Join("|",
+                BattleStableId, targetStableId, effectCode,
+                string.Join(",", anchorIds.OrderBy(value => value,
+                    StringComparer.Ordinal)))).Substring(0, 24);
+            return new SimulationBattleSemanticEffectSnapshot
+            {
+                SemanticEffectStableId = stableId,
+                BattleStableId = BattleStableId,
+                BattlefieldAnchorStableIds = anchorIds,
+                WorldEffectTargetStableId = targetStableId,
+                SemanticEffectCode = effectCode,
+                SeverityCode = severity,
+                TacticalEvidencePermille = evidence,
+                AggregationPolicyCode = aggregation,
+                RuleRevision = "battle-world-effect.semantic.r1",
+                WorldEffectApplicationKey = string.Join("|", BattleStableId,
+                    targetStableId, effectCode, stableId),
+            };
+        }
+
+        private static string StableHash(string value)
+        {
+            using var sha = SHA256.Create();
+            return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value)))
+                .Replace("-", string.Empty).ToLowerInvariant();
+        }
 
         private string CalculateReplayHash(SimulationBattleInstanceSnapshot snapshot)
         {
@@ -549,8 +790,22 @@ namespace Ssalddel.Simulation.Domain
             ValidateCommandId(value.CreateCommandId);
             if (value.AlliedStrength <= 0 || value.HostileStrength <= 0
                 || value.InitialResourceStableIds == null
-                || value.ReinforcementCandidateStableIds == null)
+                || value.ReinforcementCandidateStableIds == null
+                || value.BattlefieldDerivation == null || value.UnitRoster == null)
                 throw new SimulationContractException("SimulationBattleCreationContextInvalid");
+            var spatial = !string.IsNullOrWhiteSpace(value.BattlefieldDerivation
+                .BattlefieldDerivationInputHashSha256);
+            if (spatial && (!value.BattlefieldDerivation.CanConfirm
+                || string.IsNullOrWhiteSpace(value.BattlefieldDerivation.WorldContext
+                    .ContextHashSha256)
+                || string.IsNullOrWhiteSpace(value.BattlefieldDerivation.WorldContext
+                    .AnchorSetHashSha256)
+                || string.IsNullOrWhiteSpace(value.BattlefieldDerivation.BattlefieldPlan
+                    .BattlefieldPlanHashSha256)
+                || string.IsNullOrWhiteSpace(value.UnitRoster.BattleUnitRosterHashSha256)
+                || string.IsNullOrWhiteSpace(value.UnitRoster.CombatSeedHashSha256)))
+                throw new SimulationContractException(
+                    "SimulationBattleSpatialCreationContextInvalid");
         }
         private static void ValidateParticipation(SimulationBattleParticipationConfirmRequest value)
         {
@@ -590,6 +845,30 @@ namespace Ssalddel.Simulation.Domain
                 || value.CombatTickCount > SimulationBattleInstanceCodes.MaximumCombatTick)
                 throw new SimulationContractException("SimulationBattleAdvanceInvalid");
         }
+        private static void ValidateTacticalCommand(
+            SimulationBattleTacticalCommandConfirmRequest value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            ValidateCommandId(value.CommandId);
+            Require(value.RequestingActorStableId, "SimulationBattleActorInvalid");
+            Require(value.UnitStableId, "SimulationBattleUnitInvalid");
+            if (value.ExpectedBattleRevision < 0
+                || Math.Abs(value.TargetXCentimeters) > 25000
+                || Math.Abs(value.TargetZCentimeters) > 25000)
+                throw new SimulationContractException(
+                    "SimulationBattleTacticalCommandInvalid");
+            if (value.CommandCode != SimulationBattlefieldDerivationCodes.Move
+                && value.CommandCode != SimulationBattlefieldDerivationCodes.Attack
+                && value.CommandCode != SimulationBattlefieldDerivationCodes.Hold
+                && value.CommandCode != SimulationBattlefieldDerivationCodes.Retreat
+                && value.CommandCode != SimulationBattlefieldDerivationCodes.SetFormation)
+                throw new SimulationContractException(
+                    "SimulationBattleTacticalCommandInvalid");
+            if (value.CommandCode == SimulationBattlefieldDerivationCodes.Attack)
+                Require(value.TargetUnitStableId, "SimulationBattleTargetUnitInvalid");
+            if (value.CommandCode == SimulationBattlefieldDerivationCodes.SetFormation)
+                Require(value.FormationCode, "SimulationBattleFormationInvalid");
+        }
         private static void ValidateCommandId(string value) =>
             Require(value, "SimulationCommandIdInvalid");
         private static void Require(string value, string code)
@@ -604,7 +883,12 @@ namespace Ssalddel.Simulation.Domain
             value.AreaStableId.Trim(), value.CommanderActorStableId.Trim(), value.StartedWorldTick,
             value.StartedWorldRevision, value.ScenarioSeed, value.AlliedStrength, value.HostileStrength,
             string.Join(",", value.InitialResourceStableIds.OrderBy(x => x, StringComparer.Ordinal)),
-            string.Join(",", value.ReinforcementCandidateStableIds.OrderBy(x => x, StringComparer.Ordinal)));
+            string.Join(",", value.ReinforcementCandidateStableIds.OrderBy(x => x, StringComparer.Ordinal)),
+            value.BattlefieldDerivation.BattlefieldDerivationInputHashSha256,
+            value.BattlefieldDerivation.BattlefieldPlan.BattlefieldPlanHashSha256,
+            value.UnitRoster.BattleUnitRosterHashSha256,
+            value.UnitRoster.CardModifierHashSha256,
+            value.UnitRoster.CombatSimulationRevision);
         private static SimulationBattleCreationContext CloneContext(SimulationBattleCreationContext value) => new()
         {
             BattleStableId = value.BattleStableId.Trim(), SessionStableId = value.SessionStableId.Trim(),
@@ -614,6 +898,9 @@ namespace Ssalddel.Simulation.Domain
             AlliedStrength = value.AlliedStrength, HostileStrength = value.HostileStrength,
             InitialResourceStableIds = value.InitialResourceStableIds.Select(x => x.Trim()).ToArray(),
             ReinforcementCandidateStableIds = value.ReinforcementCandidateStableIds.Select(x => x.Trim()).ToArray(),
+            BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
+                value.BattlefieldDerivation),
+            UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(value.UnitRoster),
             CreateCommandId = value.CreateCommandId.Trim(),
         };
         private static SimulationBattleParticipantSnapshot CloneParticipant(SimulationBattleParticipantSnapshot v) => new()
@@ -657,6 +944,10 @@ namespace Ssalddel.Simulation.Domain
                     InitialResourceStableIds = source.Creation.InitialResourceStableIds.ToArray(),
                     ReinforcementCandidateStableIds = source.Creation
                         .ReinforcementCandidateStableIds.ToArray(),
+                    BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
+                        source.Creation.BattlefieldDerivation),
+                    UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(
+                        source.Creation.UnitRoster),
                     CreateCommandId = source.Creation.CreateCommandId,
                 },
                 State = Clone(source.State),
@@ -686,6 +977,9 @@ namespace Ssalddel.Simulation.Domain
                 HostileStrength = value.HostileStrength,
                 InitialResourceStableIds = value.InitialResourceStableIds.ToArray(),
                 ReinforcementCandidateStableIds = value.ReinforcementCandidateStableIds.ToArray(),
+                BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
+                    value.BattlefieldDerivation),
+                UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(value.UnitRoster),
                 CreateCommandId = value.CreateCommandId,
             };
 
@@ -693,7 +987,8 @@ namespace Ssalddel.Simulation.Domain
             SimulationBattleCreationSnapshot value)
         {
             if (value == null || value.InitialResourceStableIds == null
-                || value.ReinforcementCandidateStableIds == null)
+                || value.ReinforcementCandidateStableIds == null
+                || value.BattlefieldDerivation == null || value.UnitRoster == null)
                 throw new SimulationContractException("SimulationBattleSaveRecordInvalid");
             return new SimulationBattleCreationContext
             {
@@ -709,6 +1004,9 @@ namespace Ssalddel.Simulation.Domain
                 HostileStrength = value.HostileStrength,
                 InitialResourceStableIds = value.InitialResourceStableIds.ToArray(),
                 ReinforcementCandidateStableIds = value.ReinforcementCandidateStableIds.ToArray(),
+                BattlefieldDerivation = SimulationBattlefieldSnapshotCloner.Derivation(
+                    value.BattlefieldDerivation),
+                UnitRoster = SimulationBattlefieldSnapshotCloner.Roster(value.UnitRoster),
                 CreateCommandId = value.CreateCommandId,
             };
         }
@@ -753,6 +1051,16 @@ namespace Ssalddel.Simulation.Domain
             foreach (var id in value.InitialResourceStableIds) AddCanonical(target, id);
             AddCanonical(target, value.ReinforcementCandidateStableIds.Length);
             foreach (var id in value.ReinforcementCandidateStableIds) AddCanonical(target, id);
+            AddCanonical(target, value.BattlefieldDerivation.WorldContext.ContextHashSha256);
+            AddCanonical(target, value.BattlefieldDerivation.WorldContext.AnchorSetHashSha256);
+            AddCanonical(target,
+                value.BattlefieldDerivation.BattlefieldDerivationInputHashSha256);
+            AddCanonical(target,
+                value.BattlefieldDerivation.BattlefieldPlan.BattlefieldPlanHashSha256);
+            AddCanonical(target, value.UnitRoster.CombatSimulationRevision);
+            AddCanonical(target, value.UnitRoster.BattleUnitRosterHashSha256);
+            AddCanonical(target, value.UnitRoster.CardModifierHashSha256);
+            AddCanonical(target, value.UnitRoster.CombatSeedHashSha256);
             AddCanonical(target, value.CreateCommandId);
         }
 
@@ -803,6 +1111,58 @@ namespace Ssalddel.Simulation.Domain
                 AddCanonical(target, support.ArrivesCombatTick);
                 AddCanonical(target, support.StrengthBonus);
                 AddCanonical(target, support.StateCode);
+            }
+            AddCanonical(target, value.BattlefieldDerivation.WorldContext.ContextHashSha256);
+            AddCanonical(target, value.BattlefieldDerivation.WorldContext.AnchorSetHashSha256);
+            AddCanonical(target,
+                value.BattlefieldDerivation.BattlefieldDerivationInputHashSha256);
+            AddCanonical(target,
+                value.BattlefieldDerivation.BattlefieldPlan.BattlefieldPlanHashSha256);
+            AddCanonical(target, value.UnitRoster.CombatSimulationRevision);
+            AddCanonical(target, value.UnitRoster.BattleUnitRosterHashSha256);
+            AddCanonical(target, value.UnitRoster.CardModifierHashSha256);
+            AddCanonical(target, value.UnitRoster.CombatSeedHashSha256);
+            AddCanonical(target, value.ParticipationReservations.Length);
+            foreach (var reservation in value.ParticipationReservations)
+            {
+                AddCanonical(target, reservation.ActorStableId);
+                AddCanonical(target, reservation.BattleStableId);
+                AddCanonical(target, reservation.ReservedWorldTick);
+                AddCanonical(target, reservation.EnteredBattleTick);
+                AddCanonical(target, reservation.ReleasedWorldTick);
+                AddCanonical(target, reservation.StateCode);
+            }
+            AddCanonical(target, value.WorldTargetReservations.Length);
+            foreach (var reservation in value.WorldTargetReservations)
+            {
+                AddCanonical(target, reservation.WorldEffectTargetStableId);
+                AddCanonical(target, reservation.BattleStableId);
+                AddCanonical(target, reservation.ReservationKindCode);
+                AddCanonical(target, reservation.ConflictCapabilityCodes.Length);
+                foreach (var capability in reservation.ConflictCapabilityCodes)
+                    AddCanonical(target, capability);
+                AddCanonical(target, reservation.ReservedWorldTick);
+                AddCanonical(target, reservation.ReleasedWorldTick);
+                AddCanonical(target, reservation.StateCode);
+            }
+            AddCanonical(target, value.SemanticEffects.Length);
+            foreach (var effect in value.SemanticEffects)
+            {
+                AddCanonical(target, effect.SemanticEffectStableId);
+                AddCanonical(target, effect.BattleStableId);
+                AddCanonical(target, effect.BattlefieldAnchorStableIds.Length);
+                foreach (var anchor in effect.BattlefieldAnchorStableIds)
+                    AddCanonical(target, anchor);
+                AddCanonical(target, effect.WorldEffectTargetStableId);
+                AddCanonical(target, effect.SemanticEffectCode);
+                AddCanonical(target, effect.SeverityCode);
+                AddCanonical(target, effect.TacticalEvidencePermille);
+                AddCanonical(target, effect.AggregationPolicyCode);
+                AddCanonical(target, effect.RuleRevision);
+                AddCanonical(target, effect.ReconciliationStateCode);
+                AddCanonical(target, effect.WorldEffectApplicationKey);
+                AddCanonical(target, effect.AppliedWorldTick);
+                AddCanonical(target, effect.AppliedWorldRevision);
             }
             AddCanonical(target, value.Outcome != null);
             if (value.Outcome != null)

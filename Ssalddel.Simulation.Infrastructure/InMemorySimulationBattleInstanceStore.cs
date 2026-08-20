@@ -22,7 +22,8 @@ namespace Ssalddel.Simulation.Infrastructure
         FlowOrder = 50,
         Boundary = "실제 창고 재고나 인력을 잠그지 않는 process-local Simulation 저장소다.")]
     public sealed class InMemorySimulationBattleInstanceStore
-        : ISimulationBattleInstanceStore, ISimulationBattleResourceLockReader
+        : ISimulationBattleInstanceStore, ISimulationBattleResourceLockReader,
+            ISimulationBattleReservationReader
     {
         private readonly object gate = new object();
         private readonly ConcurrentDictionary<string, SimulationBattleInstanceState> values =
@@ -47,15 +48,44 @@ namespace Ssalddel.Simulation.Infrastructure
                 if (snapshot.AreaStableId == areaStableId) return false;
                 return !snapshot.ResourceReservations.Any(reservation =>
                     reservation.StateCode == SimulationBattleInstanceCodes.Reserved
-                    && requested.Contains(reservation.ResourceStableId));
+                    && requested.Contains(reservation.ResourceStableId))
+                    && !snapshot.ParticipationReservations.Any(reservation =>
+                        reservation.StateCode ==
+                            SimulationBattlefieldDerivationCodes.CommittedToBattle
+                        && requested.Contains(reservation.ActorStableId));
             });
         }
 
         public bool IsLocked(string sessionStableId, string resourceStableId)
+            => FindBySession(sessionStableId).Any(value =>
+            {
+                var snapshot = value.Snapshot();
+                return snapshot.ResourceReservations.Any(reservation =>
+                        reservation.ResourceStableId == resourceStableId.Trim()
+                        && reservation.StateCode == SimulationBattleInstanceCodes.Reserved)
+                    || snapshot.ParticipationReservations.Any(reservation =>
+                        reservation.ActorStableId == resourceStableId.Trim()
+                        && reservation.StateCode ==
+                            SimulationBattlefieldDerivationCodes.CommittedToBattle);
+            });
+
+        public bool IsActorCommitted(string sessionStableId, string actorStableId)
             => FindBySession(sessionStableId).Any(value => value.Snapshot()
-                .ResourceReservations.Any(reservation =>
-                    reservation.ResourceStableId == resourceStableId.Trim()
-                    && reservation.StateCode == SimulationBattleInstanceCodes.Reserved));
+                .ParticipationReservations.Any(reservation =>
+                    reservation.ActorStableId == actorStableId.Trim()
+                    && reservation.StateCode ==
+                        SimulationBattlefieldDerivationCodes.CommittedToBattle));
+
+        public bool HasWorldTargetConflict(string sessionStableId,
+            string worldEffectTargetStableId, string capabilityCode)
+            => FindBySession(sessionStableId).Any(value => value.Snapshot()
+                .WorldTargetReservations.Any(reservation =>
+                    reservation.WorldEffectTargetStableId ==
+                        worldEffectTargetStableId.Trim()
+                    && reservation.StateCode ==
+                        SimulationBattlefieldDerivationCodes.Reserved
+                    && reservation.ConflictCapabilityCodes.Contains(
+                        capabilityCode.Trim(), StringComparer.Ordinal)));
 
         public SimulationBattleInstanceState CreateOrGet(SimulationBattleCreationContext context)
         {
@@ -115,10 +145,18 @@ namespace Ssalddel.Simulation.Infrastructure
                     var firstResources = new HashSet<string>(first.ResourceReservations
                         .Where(value => value.StateCode == SimulationBattleInstanceCodes.Reserved)
                         .Select(value => value.ResourceStableId), StringComparer.Ordinal);
+                    firstResources.UnionWith(first.ParticipationReservations
+                        .Where(value => value.StateCode ==
+                            SimulationBattlefieldDerivationCodes.CommittedToBattle)
+                        .Select(value => value.ActorStableId));
                     if (first.AreaStableId == second.AreaStableId
                         || second.ResourceReservations.Any(value =>
                             value.StateCode == SimulationBattleInstanceCodes.Reserved
-                            && firstResources.Contains(value.ResourceStableId)))
+                            && firstResources.Contains(value.ResourceStableId))
+                        || second.ParticipationReservations.Any(value =>
+                            value.StateCode ==
+                                SimulationBattlefieldDerivationCodes.CommittedToBattle
+                            && firstResources.Contains(value.ActorStableId)))
                         throw new SimulationConflictException("BattleResourceLocked");
                 }
                 foreach (var battle in restored)
