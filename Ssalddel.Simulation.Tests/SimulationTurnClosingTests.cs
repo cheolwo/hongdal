@@ -105,6 +105,8 @@ public sealed class SimulationTurnClosingTests
         Assert.Equal("culture-local-context-awareness:r1", active.EffectRuleRevision);
         Assert.StartsWith("https://www.mcst.go.kr/", active.SourceUrl, StringComparison.Ordinal);
         Assert.Equal(saved.ReplayHash, restored.ReplayHash);
+        Assert.Equal(SimulationSaveSchemaVersions.V5, saved.SchemaVersion);
+        Assert.Equal(1, restored.Session.RegionalCausality.RecoveryScore);
     }
 
     [Fact]
@@ -154,6 +156,43 @@ public sealed class SimulationTurnClosingTests
         Assert.Equal("Awareness", active.TargetStatCode);
         Assert.Equal(1, active.StatDelta);
         Assert.Equal(closing.TurnClosingStableId, active.SourceTurnClosingStableId);
+        Assert.Equal(1, next.RegionalCausality.RecoveryScore);
+        Assert.Equal(0, next.RegionalCausality.ThreatScore);
+        Assert.Equal(SimulationRegionalIncidentCodes.OpportunityOutcome,
+            next.RegionalCausality.OutcomeCode);
+        Assert.Contains(next.RegionalCausality.Changes, value =>
+            value.SourceCode == SimulationRegionalIncidentCodes.PositiveTurnCard);
+    }
+
+    [Fact]
+    public void TURN0_역방향타로카드는_지역위협점수를더한다()
+    {
+        var service = Service();
+        var session = service.Create(CreateRequest());
+        var offer = service.GetTurnClosingContext(session.SessionStableId)
+            .TarotDraw.Offers.First(value => value.OrientationCode ==
+                Simulation타로카드방향Codes.Reversed);
+        var preview = new SimulationTurnClosingPreviewRequest
+        {
+            ExpectedRevision = session.Revision,
+            SelectedTarotCard = new Simulation타로CardSelectionRequest
+            {
+                OfferStableId = offer.OfferStableId,
+                CardStableId = offer.Card.CardStableId,
+                OrientationCode = offer.OrientationCode,
+            },
+        };
+
+        var next = service.ConfirmTurnClosing(session.SessionStableId,
+            ConfirmRequest("command:turn.reversed-regional-threat", 0, preview));
+
+        Assert.Equal(1, next.RegionalCausality.ThreatScore);
+        Assert.Equal(0, next.RegionalCausality.RecoveryScore);
+        Assert.Equal(SimulationRegionalIncidentCodes.ThreatOutcome,
+            next.RegionalCausality.OutcomeCode);
+        Assert.Contains(next.RegionalCausality.Changes, value =>
+            value.SourceCode == SimulationRegionalIncidentCodes.ReversedTurnCard
+            && value.SourceStableId == offer.OfferStableId);
     }
 
     [Fact]

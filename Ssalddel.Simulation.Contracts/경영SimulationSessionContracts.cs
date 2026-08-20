@@ -135,6 +135,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationRegionalIncidentSnapshot>();
         public SimulationNatureThreatStateSnapshot NatureThreat { get; set; }
             = new SimulationNatureThreatStateSnapshot();
+        public SimulationRegionalCausalityStateSnapshot RegionalCausality { get; set; }
+            = new SimulationRegionalCausalityStateSnapshot();
     }
 
     public sealed class SimulationWorldContextSnapshot

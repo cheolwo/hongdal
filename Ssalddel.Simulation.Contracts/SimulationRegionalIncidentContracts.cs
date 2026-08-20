@@ -40,6 +40,19 @@ namespace Ssalddel.Simulation.Contracts
         public const string Infested = "Infested";
         public const string EncounterBand = "EncounterBand";
         public const string Active = "Active";
+
+        public const string NormalOutcome = "Normal";
+        public const string OpportunityOutcome = "Opportunity";
+        public const string ThreatOutcome = "Threat";
+        public const string RecoveryOutcome = "Recovery";
+
+        public const string SafeIncidentResponse = "SafeIncidentResponse";
+        public const string UnsafeIncidentResponse = "UnsafeIncidentResponse";
+        public const string IncidentDeadlineMissed = "IncidentDeadlineMissed";
+        public const string NatureRestorationCompleted = "NatureRestorationCompleted";
+        public const string NaturePartyRecoveryCompleted = "NaturePartyRecoveryCompleted";
+        public const string PositiveTurnCard = "PositiveTurnCard";
+        public const string ReversedTurnCard = "ReversedTurnCard";
     }
 
     public static class SimulationNatureInteractionCodes
@@ -258,6 +271,9 @@ namespace Ssalddel.Simulation.Contracts
         public int RootRemainingSeverity { get; set; }
         public int GlobalSpilloverPressure { get; set; }
         public int EffectivePressure { get; set; }
+        public int IncidentPressure { get; set; }
+        public int ThreatScoreModifier { get; set; }
+        public int RecoveryScoreModifier { get; set; }
         public string PressureLevelCode { get; set; } = SimulationRegionalIncidentCodes.Stable;
         public string[] SourceIncidentStableIds { get; set; } = Array.Empty<string>();
     }
@@ -284,6 +300,32 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationNatureThreatRouteSnapshot>();
         public SimulationNatureThreatEncounterSnapshot[] Encounters { get; set; }
             = Array.Empty<SimulationNatureThreatEncounterSnapshot>();
+        public bool SimulationOnly { get; set; } = true;
+        public bool IsOperationalState { get; set; }
+    }
+
+    public sealed class SimulationRegionalCausalityChangeSnapshot
+    {
+        public string ChangeStableId { get; set; } = string.Empty;
+        public string SourceCode { get; set; } = string.Empty;
+        public int ThreatDelta { get; set; }
+        public int RecoveryDelta { get; set; }
+        public int AppliedWorldTick { get; set; }
+        public string SourceStableId { get; set; } = string.Empty;
+        public string NatureRouteCode { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationRegionalCausalityStateSnapshot
+    {
+        public long Revision { get; set; }
+        public int ThreatScore { get; set; }
+        public int RecoveryScore { get; set; }
+        public int NetPressureModifier { get; set; }
+        public string OutcomeCode { get; set; } =
+            SimulationRegionalIncidentCodes.NormalOutcome;
+        public int LastChangedWorldTick { get; set; }
+        public SimulationRegionalCausalityChangeSnapshot[] Changes { get; set; } =
+            Array.Empty<SimulationRegionalCausalityChangeSnapshot>();
         public bool SimulationOnly { get; set; } = true;
         public bool IsOperationalState { get; set; }
     }

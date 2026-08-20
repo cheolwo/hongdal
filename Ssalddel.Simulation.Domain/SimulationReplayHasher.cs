@@ -16,6 +16,9 @@ namespace Ssalddel.Simulation.Domain
             Add(canonical, package.SchemaVersion);
             AddCreateRequest(canonical, package.SessionCreateRequest);
             AddSnapshot(canonical, package.Snapshot);
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                    StringComparison.Ordinal))
+                AddRegionalCausality(canonical, package.Snapshot.RegionalCausality);
             if (package.SessionCreateRequest.WorldInventory != null)
                 AddWorldInventory(canonical, package.WorldInventory);
             if (package.SessionCreateRequest.SurvivalTarot != null)
@@ -813,6 +816,31 @@ namespace Ssalddel.Simulation.Domain
                 Add(target, inventory.UpdatedTick);
                 Add(target, inventory.Revision);
                 AddStrings(target, inventory.SourceStableIds);
+            }
+        }
+
+        private static void AddRegionalCausality(
+            StringBuilder target,
+            SimulationRegionalCausalityStateSnapshot value)
+        {
+            Add(target, "RegionalCausalityExtensionV1");
+            Add(target, value.Revision);
+            Add(target, value.ThreatScore);
+            Add(target, value.RecoveryScore);
+            Add(target, value.NetPressureModifier);
+            Add(target, value.OutcomeCode);
+            Add(target, value.LastChangedWorldTick);
+            Add(target, value.Changes.Length);
+            foreach (var change in value.Changes.OrderBy(
+                         item => item.ChangeStableId, StringComparer.Ordinal))
+            {
+                Add(target, change.ChangeStableId);
+                Add(target, change.SourceCode);
+                Add(target, change.ThreatDelta);
+                Add(target, change.RecoveryDelta);
+                Add(target, change.AppliedWorldTick);
+                Add(target, change.SourceStableId);
+                Add(target, change.NatureRouteCode);
             }
         }
 

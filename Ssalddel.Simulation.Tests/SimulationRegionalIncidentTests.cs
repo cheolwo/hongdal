@@ -13,6 +13,42 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationRegionalIncidentTests
 {
     [Fact]
+    public void 기존V4지역사건저장은_새인과점수를적용하지않고그대로재생한다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        session.UseLegacyRegionalCausalityRules();
+        var harvested = HarvestAndCreateIncident(session);
+        var incident = Assert.Single(harvested.RegionalIncidents);
+        session.ConfirmRegionalIncidentResponse(incident.EventStableId,
+            new SimulationRegionalIncidentResponseConfirmRequest
+            {
+                CommandId = "command:test:legacy-v4-unsafe",
+                ExpectedRevision = session.Revision,
+                ActorStableId = "actor:test:manager",
+                ChoiceStableId = SimulationRegionalIncidentCodes.FarmLeaveExposed,
+            });
+        var package = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:test:legacy-regional-v4",
+            ExpectedRevision = session.Revision,
+        });
+
+        var restored = SimulationSessionReplay.Restore(package);
+        var replayed = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = package.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+
+        Assert.Equal(SimulationSaveSchemaVersions.V4, package.SchemaVersion);
+        Assert.Equal(package.ReplayHash, replayed.ReplayHash);
+        Assert.Equal(0, restored.Snapshot().RegionalCausality.Revision);
+        Assert.Equal(4, restored.Snapshot().NatureThreat.Routes.Single(value =>
+            value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
+            .EffectivePressure);
+    }
+
+    [Fact]
     public void 경로압력은_원인심각도두배와전체삼분의일을합산하고_상한을적용한다()
     {
         var routes = SimulationNatureThreatPressurePolicy.Evaluate(
@@ -73,9 +109,15 @@ public sealed class SimulationRegionalIncidentTests
             Assert.Single(confirmed.RegionalIncidents).StateCode);
         var route = confirmed.NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm);
-        Assert.Equal(4, route.EffectivePressure);
+        Assert.Equal(4, route.IncidentPressure);
+        Assert.Equal(2, route.ThreatScoreModifier);
+        Assert.Equal(6, route.EffectivePressure);
+        Assert.Equal(2, confirmed.RegionalCausality.ThreatScore);
+        Assert.Equal(0, confirmed.RegionalCausality.RecoveryScore);
+        Assert.Equal(SimulationRegionalIncidentCodes.ThreatOutcome,
+            confirmed.RegionalCausality.OutcomeCode);
         var encounter = Assert.Single(confirmed.NatureThreat.Encounters);
-        Assert.Equal(1, encounter.ThreatUnitCount);
+        Assert.Equal(2, encounter.ThreatUnitCount);
         Assert.Equal(SimulationRegionalIncidentCodes.Active, encounter.StateCode);
 
         var afterVictory = session.ApplyNatureEncounterVictory(
@@ -87,7 +129,7 @@ public sealed class SimulationRegionalIncidentTests
             SaveStableId = "save:test:regional-incident",
             ExpectedRevision = session.Revision,
         });
-        Assert.Equal(SimulationSaveSchemaVersions.V4, package.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V5, package.SchemaVersion);
         var restored = SimulationSessionReplay.Restore(package);
         var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
         {
@@ -97,7 +139,7 @@ public sealed class SimulationRegionalIncidentTests
         Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
         Assert.Equal(encounter.EncounterStableId,
             Assert.Single(restored.Snapshot().NatureThreat.Encounters).EncounterStableId);
-        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
+        Assert.Equal(SimulationRegionalIncidentCodes.Active,
             Assert.Single(restored.Snapshot().NatureThreat.Encounters).StateCode);
     }
 
@@ -139,9 +181,10 @@ public sealed class SimulationRegionalIncidentTests
         });
         Assert.Equal(SimulationRegionalIncidentCodes.DeadlineMissed,
             Assert.Single(advanced.RegionalIncidents).OutcomeCode);
-        Assert.Equal(4, advanced.NatureThreat.Routes.Single(value =>
+        Assert.Equal(6, advanced.NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToFarm)
             .EffectivePressure);
+        Assert.Equal(2, advanced.RegionalCausality.ThreatScore);
     }
 
     [Fact]
@@ -240,11 +283,18 @@ public sealed class SimulationRegionalIncidentTests
         var second = session.ApplyNatureEncounterVictory(
             "battle:test:second", encounter.EncounterStableId);
         Assert.Equal(1, Assert.Single(second.RegionalIncidents).RemainingSeverity);
-        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
+        Assert.Equal(SimulationRegionalIncidentCodes.Active,
             Assert.Single(second.NatureThreat.Encounters).StateCode);
-        Assert.Equal(2, second.NatureThreat.Routes.Single(value =>
+        Assert.Equal(5, second.NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == SimulationRegionalIncidentCodes.NatureToCityHub)
             .EffectivePressure);
+
+        var third = session.ApplyNatureEncounterVictory(
+            "battle:test:third", encounter.EncounterStableId);
+        Assert.Equal(0, Assert.Single(third.RegionalIncidents).RemainingSeverity);
+        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
+            Assert.Single(third.NatureThreat.Encounters).StateCode);
+        Assert.Equal(3, third.RegionalCausality.RecoveryScore);
     }
 
     [Fact]
@@ -674,6 +724,8 @@ public sealed class SimulationRegionalIncidentTests
         var request = RestorationRequest(session.Revision, "restoration");
         var pressureBefore = resolved.NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == request.NatureRouteCode).EffectivePressure;
+        var threatBefore = resolved.RegionalCausality.ThreatScore;
+        var recoveryBefore = resolved.RegionalCausality.RecoveryScore;
 
         var preview = session.PreviewNatureRestoration(request);
 
@@ -715,6 +767,13 @@ public sealed class SimulationRegionalIncidentTests
             && value.StatusCode == Simulation공간예약상태Codes.Released);
         Assert.Equal(pressureBefore, completed.NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == request.NatureRouteCode).EffectivePressure);
+        Assert.Equal(Math.Max(0, threatBefore - 1),
+            completed.RegionalCausality.ThreatScore);
+        Assert.Equal(recoveryBefore + 1,
+            completed.RegionalCausality.RecoveryScore);
+        Assert.Contains(completed.RegionalCausality.Changes, value =>
+            value.SourceCode ==
+            SimulationRegionalIncidentCodes.NatureRestorationCompleted);
         request.ExpectedRevision = completed.Revision;
         Assert.Contains("NatureRouteAlreadyRestored",
             session.PreviewNatureRestoration(request).BlockingReasonCodes);
@@ -837,6 +896,7 @@ public sealed class SimulationRegionalIncidentTests
         var request = PartyRecoveryRequest(session.Revision, "party-recovery");
         var pressureBefore = session.Snapshot().NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == request.NatureRouteCode).EffectivePressure;
+        var causalityBefore = session.Snapshot().RegionalCausality;
 
         var preview = session.PreviewNaturePartyRecovery(request);
 
@@ -877,8 +937,15 @@ public sealed class SimulationRegionalIncidentTests
             value.TaskStableId == request.TaskStableId
             && value.ReservationKindCode == Simulation공간용량Codes.RestAreaParty
             && value.StatusCode == Simulation공간예약상태Codes.Released);
-        Assert.Equal(pressureBefore, completed.NatureThreat.Routes.Single(value =>
+        Assert.Equal(Math.Max(0, pressureBefore - 2), completed.NatureThreat.Routes.Single(value =>
             value.NatureRouteCode == request.NatureRouteCode).EffectivePressure);
+        Assert.Equal(Math.Max(0, causalityBefore.ThreatScore - 1),
+            completed.RegionalCausality.ThreatScore);
+        Assert.Equal(causalityBefore.RecoveryScore + 1,
+            completed.RegionalCausality.RecoveryScore);
+        Assert.Contains(completed.RegionalCausality.Changes, value =>
+            value.SourceCode ==
+            SimulationRegionalIncidentCodes.NaturePartyRecoveryCompleted);
         request.ExpectedRevision = completed.Revision;
         Assert.Contains("PartyAlreadyRecovered",
             session.PreviewNaturePartyRecovery(request).BlockingReasonCodes);

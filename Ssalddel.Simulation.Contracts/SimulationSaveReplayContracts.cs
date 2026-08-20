@@ -9,6 +9,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string V2 = "simulation-save.v2";
         public const string V3 = "simulation-save.v3";
         public const string V4 = "simulation-save.v4";
+        public const string V5 = "simulation-save.v5";
     }
 
     public static class SimulationReplayHashAlgorithmCodes

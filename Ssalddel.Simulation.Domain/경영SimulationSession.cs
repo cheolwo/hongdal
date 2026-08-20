@@ -254,6 +254,7 @@ namespace Ssalddel.Simulation.Domain
                 CollectibleCardRewards = CreateCollectibleCardRewardStateSnapshotOrNull(),
                 RegionalIncidents = CreateRegionalIncidentSnapshots(),
                 NatureThreat = CreateNatureThreatStateSnapshot(),
+                RegionalCausality = CreateRegionalCausalitySnapshot(),
             };
 
         internal static 경영SimulationSessionSnapshot Clone(경영SimulationSessionSnapshot source)
@@ -335,6 +336,9 @@ namespace Ssalddel.Simulation.Domain
                             NatureRouteCode = value.NatureRouteCode,
                             RootRemainingSeverity = value.RootRemainingSeverity,
                             GlobalSpilloverPressure = value.GlobalSpilloverPressure,
+                            IncidentPressure = value.IncidentPressure,
+                            ThreatScoreModifier = value.ThreatScoreModifier,
+                            RecoveryScoreModifier = value.RecoveryScoreModifier,
                             EffectivePressure = value.EffectivePressure,
                             PressureLevelCode = value.PressureLevelCode,
                             SourceIncidentStableIds = value.SourceIncidentStableIds.ToArray(),
@@ -344,6 +348,8 @@ namespace Ssalddel.Simulation.Domain
                     SimulationOnly = source.NatureThreat.SimulationOnly,
                     IsOperationalState = source.NatureThreat.IsOperationalState,
                 },
+                RegionalCausality = CloneRegionalCausalityState(
+                    source.RegionalCausality),
             };
 
         internal static void ValidateCreate(경영SimulationSession생성Request request)

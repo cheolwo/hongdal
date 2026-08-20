@@ -113,6 +113,8 @@ namespace Ssalddel.Simulation.Domain
                         SourceUrl = card.SourceUrl,
                         EvidenceCheckedAtUtc = card.EvidenceCheckedAtUtc,
                     }).ToArray();
+                ObserveRegionalCausalityTurnCards(closing);
+                RebuildNatureThreat(CurrentTick);
 
                 AppendTurnClosingCommand(request);
                 var snapshot = CreateSnapshot();

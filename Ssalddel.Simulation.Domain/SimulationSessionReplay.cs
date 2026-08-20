@@ -15,6 +15,9 @@ namespace Ssalddel.Simulation.Domain
             ValidatePackage(package);
             var aggregate = new 경영SimulationSessionAggregate(
                 SimulationSaveReplayCloner.CloneCreateRequest(package.SessionCreateRequest));
+            if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                    StringComparison.Ordinal))
+                aggregate.UseLegacyRegionalCausalityRules();
             if (!string.Equals(aggregate.SessionStableId, package.SessionStableId, StringComparison.Ordinal))
                 throw new SimulationConflictException("SimulationSaveSessionIdentityMismatch");
 
@@ -271,6 +274,8 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V4,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationSaveSchemaUnsupported");
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
@@ -317,6 +322,9 @@ namespace Ssalddel.Simulation.Domain
                 || package.Snapshot.NpcWorkRecords == null
                 || package.Snapshot.NpcActionProjections == null
                 || package.Snapshot.NpcFacilityInventories == null
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
+                        StringComparison.Ordinal)
+                    && package.Snapshot.RegionalCausality == null)
                 || package.CommandLog == null
                 || package.Battles == null)
             {

@@ -217,6 +217,7 @@ namespace Ssalddel.Simulation.Domain
                     task.Revision++;
                     task.ActualEndTick = task.ExpectedEndTick;
                     ObserveRegionalIncidentTaskCompletion(task, task.ExpectedEndTick);
+                    ObserveRegionalCausalityTaskCompletion(task, task.ExpectedEndTick);
                     foreach (var effect in effects.Values.Where(
                         value => value.CausedByTaskStableId == task.TaskStableId
                             && value.StateCode == SimulationEffectStateCodes.Pending))

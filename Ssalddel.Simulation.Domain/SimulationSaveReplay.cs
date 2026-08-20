@@ -35,8 +35,13 @@ namespace Ssalddel.Simulation.Domain
                 var lhWorld = request.LhWorldState ?? lhWorldState;
                 var package = new SimulationSessionSavePackage
                 {
-                    SchemaVersion = regionalIncidents.Count > 0
-                        || appliedRegionalIncidentResponseCommands.Count > 0
+                    SchemaVersion = regionalCausalitySchemaEnabled
+                                    && (regionalIncidents.Count > 0
+                                        || appliedRegionalIncidentResponseCommands.Count > 0
+                                        || regionalCausalityRevision > 0)
+                        ? SimulationSaveSchemaVersions.V5
+                        : regionalIncidents.Count > 0
+                          || appliedRegionalIncidentResponseCommands.Count > 0
                         ? SimulationSaveSchemaVersions.V4
                         : lhWorld != null
                         ? SimulationSaveSchemaVersions.V3

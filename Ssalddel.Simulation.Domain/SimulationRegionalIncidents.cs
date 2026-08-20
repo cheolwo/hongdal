@@ -8,7 +8,8 @@ namespace Ssalddel.Simulation.Domain
     public static class SimulationNatureThreatPressurePolicy
     {
         public static SimulationNatureThreatRouteSnapshot[] Evaluate(
-            IEnumerable<SimulationRegionalIncidentSnapshot> incidents)
+            IEnumerable<SimulationRegionalIncidentSnapshot> incidents,
+            SimulationRegionalCausalityStateSnapshot? causality = null)
         {
             var active = incidents.Where(value => value.RemainingSeverity > 0).ToArray();
             var total = active.Sum(value => value.RemainingSeverity);
@@ -24,12 +25,28 @@ namespace Ssalddel.Simulation.Domain
                     .ThenBy(value => value.IncidentStableId, StringComparer.Ordinal).ToArray();
                 var root = routeIncidents.Sum(value => value.RemainingSeverity);
                 var spillover = total / 3;
-                var pressure = Math.Min(12, root * 2 + spillover);
+                var incidentPressure = Math.Min(12, root * 2 + spillover);
+                var relevantChanges = causality?.Changes.Where(value =>
+                    string.IsNullOrWhiteSpace(value.NatureRouteCode)
+                    || value.NatureRouteCode == route).ToArray()
+                    ?? Array.Empty<SimulationRegionalCausalityChangeSnapshot>();
+                var hasChangeLedger = causality?.Changes.Length > 0;
+                var threatModifier = hasChangeLedger
+                    ? Math.Max(0, relevantChanges.Sum(value => value.ThreatDelta))
+                    : causality?.ThreatScore ?? 0;
+                var recoveryModifier = hasChangeLedger
+                    ? Math.Max(0, relevantChanges.Sum(value => value.RecoveryDelta))
+                    : causality?.RecoveryScore ?? 0;
+                var pressure = Math.Max(0, Math.Min(12,
+                    incidentPressure + threatModifier - recoveryModifier));
                 return new SimulationNatureThreatRouteSnapshot
                 {
                     NatureRouteCode = route,
                     RootRemainingSeverity = root,
                     GlobalSpilloverPressure = spillover,
+                    IncidentPressure = incidentPressure,
+                    ThreatScoreModifier = threatModifier,
+                    RecoveryScoreModifier = recoveryModifier,
                     EffectivePressure = pressure,
                     PressureLevelCode = pressure <= 1
                         ? SimulationRegionalIncidentCodes.Stable
@@ -153,6 +170,9 @@ namespace Ssalddel.Simulation.Domain
                     incident.StateCode = SimulationRegionalIncidentCodes.AdverseOutcome;
                     incident.OutcomeCode = SimulationRegionalIncidentCodes.UnsafeResponse;
                     incident.RemainingSeverity = incident.Severity;
+                    ObserveUnsafeRegionalIncidentOutcome(incident,
+                        SimulationRegionalIncidentCodes.UnsafeIncidentResponse,
+                        CurrentTick);
                 }
                 else
                 {
@@ -200,6 +220,7 @@ namespace Ssalddel.Simulation.Domain
                     {
                         incident.StateCode = SimulationRegionalIncidentCodes.Resolved;
                         incident.OutcomeCode = SimulationRegionalIncidentCodes.Corrected;
+                        ObserveSafeRegionalIncidentOutcome(incident, CurrentTick);
                         UpdateRegionalIncidentWorldEvent(incident);
                     }
                     RebuildNatureThreat(CurrentTick);
@@ -294,6 +315,9 @@ namespace Ssalddel.Simulation.Domain
                 incident.OutcomeCode = SimulationRegionalIncidentCodes.DeadlineMissed;
                 incident.RemainingSeverity = incident.Severity;
                 incident.IncidentRevision++;
+                ObserveUnsafeRegionalIncidentOutcome(incident,
+                    SimulationRegionalIncidentCodes.IncidentDeadlineMissed,
+                    currentWorldTick);
                 UpdateRegionalIncidentWorldEvent(incident);
             }
             RebuildNatureThreat(currentWorldTick);
@@ -344,18 +368,22 @@ namespace Ssalddel.Simulation.Domain
                     ? SimulationRegionalIncidentCodes.Corrected
                     : SimulationRegionalIncidentCodes.Contained;
             incident.RemainingSeverity = 0;
+            ObserveSafeRegionalIncidentOutcome(incident, completedWorldTick);
         }
 
         private void RebuildNatureThreat(int currentWorldTick)
         {
             var routes = SimulationNatureThreatPressurePolicy.Evaluate(
-                regionalIncidents.Values);
+                regionalIncidents.Values,
+                regionalCausalitySchemaEnabled
+                    ? CreateRegionalCausalitySnapshot() : null);
             foreach (var route in routes)
             {
                 var encounterId = "nature-encounter:" + SessionStableId + ":"
                     + route.NatureRouteCode + ":pressure";
-                var shouldBeActive = route.RootRemainingSeverity > 0
-                    && route.EffectivePressure >= 4;
+                var shouldBeActive = route.EffectivePressure >= 4
+                    && (route.RootRemainingSeverity > 0
+                        || route.ThreatScoreModifier > 0);
                 if (!natureThreatEncounters.TryGetValue(encounterId, out var encounter))
                 {
                     if (!shouldBeActive)
@@ -393,7 +421,9 @@ namespace Ssalddel.Simulation.Domain
             => new SimulationNatureThreatStateSnapshot
             {
                 Routes = SimulationNatureThreatPressurePolicy.Evaluate(
-                    regionalIncidents.Values.Select(CloneRegionalIncident)),
+                    regionalIncidents.Values.Select(CloneRegionalIncident),
+                    regionalCausalitySchemaEnabled
+                        ? CreateRegionalCausalitySnapshot() : null),
                 Encounters = natureThreatEncounters.Values
                     .OrderBy(value => value.NatureRouteCode, StringComparer.Ordinal)
                     .Select(CloneNatureEncounter).ToArray(),
