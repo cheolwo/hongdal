@@ -71,6 +71,8 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient<I농사로농작업일정Module, 농사로농작업일정Module>();
         services.AddScoped<I농사로감자생육요구Profile조회UseCase,
             농사로감자생육요구Profile조회UseCase>();
+        services.AddScoped<INongsaro감자ProfileArchiveService,
+            Nongsaro감자ProfileArchiveService>();
         services
             .AddHttpClient<I기상청Asos일관측Client, 기상청Asos일관측Client>(
                 (serviceProvider, client) =>

@@ -173,7 +173,8 @@ public sealed class 농사로감자생육요구Profile조회UseCase(
             response.OperationName,
             sourceRecordId,
             response.RetrievedAtUtc,
-            response.SourceDocumentationUrl);
+            response.SourceDocumentationUrl,
+            response.RawContentHashSha256);
 
     private static 농사로작물생육근거Topic Topic(
         string topicCode,

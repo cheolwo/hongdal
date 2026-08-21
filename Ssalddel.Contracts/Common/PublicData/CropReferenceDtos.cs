@@ -53,7 +53,8 @@ public sealed record 농사로작물생육SourceSnapshot(
     string OperationName,
     string SourceRecordId,
     DateTimeOffset RetrievedAtUtc,
-    string SourceHref);
+    string SourceHref,
+    string RawContentHashSha256 = "");
 
 public sealed record 농사로작물생육근거Topic(
     string TopicCode,

@@ -1,4 +1,6 @@
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
@@ -20,7 +22,8 @@ public sealed record Nongsaro공공데이터Response(
     string ResultMessage,
     DateTimeOffset RetrievedAtUtc,
     string SourceDocumentationUrl,
-    IReadOnlyList<Nongsaro공공데이터Item> Items);
+    IReadOnlyList<Nongsaro공공데이터Item> Items,
+    string RawContentHashSha256 = "");
 
 public interface INongsaroOpenApiClient
 {
@@ -222,16 +225,19 @@ public sealed class NongsaroOpenApiClient : INongsaroOpenApiClient
             operationName,
             path,
             cancellationToken);
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        await using var stream = new MemoryStream(bytes, writable: false);
         var document = await LoadXmlAsync(stream, cancellationToken);
-        return Parse(document, serviceName, operationName, _timeProvider.GetUtcNow());
+        return Parse(document, serviceName, operationName, _timeProvider.GetUtcNow(),
+            Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant());
     }
 
     internal static Nongsaro공공데이터Response Parse(
         XDocument document,
         string serviceName,
         string operationName,
-        DateTimeOffset retrievedAtUtc)
+        DateTimeOffset retrievedAtUtc,
+        string rawContentHashSha256 = "")
     {
         var resultCode = Read(document.Root, "resultCode");
         var resultMessage = Read(document.Root, "resultMsg");
@@ -258,7 +264,12 @@ public sealed class NongsaroOpenApiClient : INongsaroOpenApiClient
             resultMessage,
             retrievedAtUtc,
             Nongsaro공공데이터Catalog.DocumentationUrl,
-            items);
+            items,
+            string.IsNullOrWhiteSpace(rawContentHashSha256)
+                ? Convert.ToHexString(SHA256.HashData(
+                    Encoding.UTF8.GetBytes(document.ToString(SaveOptions.DisableFormatting))))
+                    .ToLowerInvariant()
+                : rawContentHashSha256);
     }
 
     private string BuildPath(

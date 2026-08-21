@@ -5,6 +5,7 @@ using Ssalddel.Contracts.Common.PublicData;
 using Ssalddel.Domain.PublicData;
 using Ssalddel.Infrastructure.Persistence.PublicData;
 using 살뜰.Services.External.PublicData;
+using 살뜰.Services.External.PublicData.Agriculture;
 
 namespace Ssalddel.Tests.Services.External.PublicData;
 
@@ -48,6 +49,26 @@ public sealed class ExternalDataIngestionFoundationTests
 
         Assert.NotEmpty(catalog.GetCatalog().Items);
         Assert.All(catalog.GetCatalog().Items, item => Assert.False(item.DefaultCollectionEnabled));
+    }
+
+    [Fact]
+    public void SourceCatalog_FarmRealityThreeProvidersKeepStableDatasetBoundaries()
+    {
+        var catalog = new ExternalDataSourceCatalog(
+            new StubApiCatalog(), [new FarmRealityDataSourceRegistration()]);
+
+        Assert.Equal("CropWorkReference", catalog.GetRequired(
+            FarmRealityDataSourceIds.Nongsaro,
+            FarmRealityDataSourceIds.NongsaroWorkSchedule).DataDomain);
+        Assert.Equal("MarketPriceObservation", catalog.GetRequired(
+            FarmRealityDataSourceIds.Kamis,
+            FarmRealityDataSourceIds.KamisPriceObservations).DataDomain);
+        var ams = catalog.GetRequired(FarmRealityDataSourceIds.UsdaAms,
+            FarmRealityDataSourceIds.UsdaAmsPriceObservations);
+        Assert.Contains("직접 비교하지 않습니다", ams.UsageLimitations,
+            StringComparison.Ordinal);
+        Assert.All(catalog.GetCatalog().Items,
+            item => Assert.False(item.DefaultCollectionEnabled));
     }
 
     [Fact]

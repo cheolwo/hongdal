@@ -30,6 +30,9 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
 
     public DbSet<KamisPriceObservation> KamisPriceObservations => Set<KamisPriceObservation>();
 
+    public DbSet<Nongsaro감자ProfileArchive> NongsaroPotatoProfiles =>
+        Set<Nongsaro감자ProfileArchive>();
+
     public DbSet<Bls평균소매가격수집Run> BlsAverageRetailPriceCollectionRuns =>
         Set<Bls평균소매가격수집Run>();
 
@@ -122,6 +125,7 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new 공통식품품목Code관계검토이력Configuration());
         modelBuilder.ApplyConfiguration(new KamisPriceCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceObservationConfiguration());
+        modelBuilder.ApplyConfiguration(new Nongsaro감자ProfileArchiveConfiguration());
         modelBuilder.ApplyConfiguration(new Bls평균소매가격수집RunConfiguration());
         modelBuilder.ApplyConfiguration(new Bls평균소매가격관측Configuration());
         modelBuilder.ApplyConfiguration(new 국제농수산가격수집RunConfiguration());

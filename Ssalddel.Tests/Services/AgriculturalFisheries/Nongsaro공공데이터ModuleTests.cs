@@ -31,6 +31,8 @@ public sealed class Nongsaro공공데이터ModuleTests
         Assert.Equal("식량작물", item.Get("mainCategoryNm"));
         Assert.Equal(timeProvider.GetUtcNow(), result.RetrievedAtUtc);
         Assert.Equal(Nongsaro공공데이터Catalog.DocumentationUrl, result.SourceDocumentationUrl);
+        Assert.Equal(64, result.RawContentHashSha256.Length);
+        Assert.All(result.RawContentHashSha256, value => Assert.True(Uri.IsHexDigit(value)));
         Assert.Contains("apiKey=test-key", handler.RequestUri?.Query, StringComparison.Ordinal);
     }
 

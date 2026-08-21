@@ -23,6 +23,7 @@ public static partial class ServiceCollectionExtensions
 
         services.AddSingleton<IExternalDataSourceRegistration, WorldBank경지면적SourceRegistration>();
         services.AddSingleton<IExternalDataSourceRegistration, AgriculturalDataResearchSourceRegistration>();
+        services.AddSingleton<IExternalDataSourceRegistration, FarmRealityDataSourceRegistration>();
         services.AddHttpClient<WorldBank경지면적Collector>(client =>
         {
             client.Timeout = Timeout.InfiniteTimeSpan;
