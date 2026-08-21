@@ -39,6 +39,7 @@ public static class SsalddelCodeFeatureKeys
     public const string SimulationWorldDerivation = "simulation-world-derivation";
     public const string SimulationSyntyLandscape = "simulation-synty-landscape";
     public const string SimulationWorldStreaming = "simulation-world-streaming";
+    public const string SimulationFarmRealityEvidence = "simulation-farm-reality-evidence";
     public const string UnityResilientWorldLoad = "unity-resilient-world-load";
 }
 

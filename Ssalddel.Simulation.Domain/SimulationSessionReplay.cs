@@ -14,10 +14,25 @@ namespace Ssalddel.Simulation.Domain
         {
             ValidatePackage(package);
             var aggregate = new 경영SimulationSessionAggregate(
-                SimulationSaveReplayCloner.CloneCreateRequest(package.SessionCreateRequest));
+                SimulationSaveReplayCloner.CloneCreateRequest(package.SessionCreateRequest),
+                package.RealityContext == null ? null
+                    : 경영SimulationSessionAggregate.CloneRealityContext(
+                        package.RealityContext));
             if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V7,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
                     StringComparison.Ordinal))
                 aggregate.UseLegacyRegionalCausalityRules();
             if (!string.Equals(aggregate.SessionStableId, package.SessionStableId, StringComparison.Ordinal))
@@ -302,6 +317,18 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V7,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationSaveSchemaUnsupported");
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
@@ -352,11 +379,70 @@ namespace Ssalddel.Simulation.Domain
                         StringComparison.Ordinal)
                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
                         StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V7,
+                        StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                        StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                        StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                        StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                        StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                        StringComparison.Ordinal)
                     ) && package.Snapshot.RegionalCausality == null)
                 || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
                         StringComparison.Ordinal)
                     && (package.SessionCreateRequest.IntegratedWorld == null
                         || package.Snapshot.IntegratedWorld == null))
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V7,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null
+                    && package.Snapshot.IntegratedWorld == null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null
+                    && package.Snapshot.IntegratedWorld == null)
+                || ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                         StringComparison.Ordinal))
+                    && package.SessionCreateRequest.IntegratedWorld != null
+                    && package.Snapshot.IntegratedWorld == null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                        StringComparison.Ordinal)
+                    && (package.RealityContext == null
+                        || string.IsNullOrWhiteSpace(
+                            package.SessionCreateRequest.RealityContextProfileStableId)))
+                || ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                         StringComparison.Ordinal))
+                    && package.Snapshot.NatureMind == null)
+                || ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                         StringComparison.Ordinal))
+                    && package.Snapshot.AreaAccess == null)
+                || ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                         StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                         StringComparison.Ordinal))
+                    && package.Snapshot.HostedWorld == null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                        StringComparison.Ordinal)
+                    && package.Snapshot.CoopConstruction == null)
                 || package.CommandLog == null
                 || package.Battles == null)
             {

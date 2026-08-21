@@ -59,6 +59,12 @@ namespace Ssalddel.Simulation.Domain
             new Dictionary<string, 적용된TickCommand>(StringComparer.Ordinal);
 
         public 경영SimulationSessionAggregate(경영SimulationSession생성Request request)
+            : this(request, null)
+        {
+        }
+
+        public 경영SimulationSessionAggregate(경영SimulationSession생성Request request,
+            SimulationRealityContextSnapshot? frozenRealityContext)
         {
             ValidateCreate(request);
             SessionStableId = "simulation-session:" + request.ClientRequestId.ToString("N");
@@ -67,6 +73,8 @@ namespace Ssalddel.Simulation.Domain
             ScenarioDataRevision = request.ScenarioDataRevision.Trim();
             ScenarioSeed = request.ScenarioSeed;
             RuleRevision = request.RuleRevision.Trim();
+            RealityContextProfileStableId = (request.RealityContextProfileStableId
+                ?? string.Empty).Trim();
             DurationTicks = request.DurationTicks;
             FactionStableId = request.WorldContext.FactionStableId.Trim();
             TerritoryStableId = request.WorldContext.TerritoryStableId.Trim();
@@ -81,6 +89,11 @@ namespace Ssalddel.Simulation.Domain
             InitializeTeamRoleCards(request.TeamRoleCards);
             InitializeCollectibleCardRewards();
             InitializeIntegratedWorld(request.IntegratedWorld);
+            InitializeNatureMind(request.NatureMind);
+            InitializeAreaAccess(request.FarmSurvival != null);
+            InitializeHostedWorld();
+            InitializeCoopConstruction();
+            InitializeRealityContext(frozenRealityContext);
         }
 
         public string SessionStableId { get; }
@@ -89,6 +102,7 @@ namespace Ssalddel.Simulation.Domain
         public string ScenarioDataRevision { get; }
         public int ScenarioSeed { get; }
         public string RuleRevision { get; }
+        public string RealityContextProfileStableId { get; }
         public int CurrentTick { get; private set; }
         public int DurationTicks { get; }
         public string FactionStableId { get; }
@@ -137,6 +151,7 @@ namespace Ssalddel.Simulation.Domain
                 AdvanceFarmSurvival(previousTick, CurrentTick);
                 AdvanceRegionalIncidents(CurrentTick);
                 AdvanceIntegratedWorld(CurrentTick);
+                RefreshAllAreaAccessEvidence();
                 EvaluateSurvivalTarotOpportunity();
                 AppendTickCommand(request);
                 var snapshot = CreateSnapshot();
@@ -147,7 +162,8 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
-        public void EnsureSameCreationRequest(경영SimulationSession생성Request request)
+        public void EnsureSameCreationRequest(경영SimulationSession생성Request request,
+            SimulationRealityContextSnapshot? frozenRealityContext = null)
         {
             ValidateCreate(request);
             if (ClientRequestId != request.ClientRequestId
@@ -155,6 +171,11 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(ScenarioDataRevision, request.ScenarioDataRevision.Trim(), StringComparison.Ordinal)
                 || ScenarioSeed != request.ScenarioSeed
                 || !string.Equals(RuleRevision, request.RuleRevision.Trim(), StringComparison.Ordinal)
+                || !string.Equals(RealityContextProfileStableId,
+                    (request.RealityContextProfileStableId ?? string.Empty).Trim(),
+                    StringComparison.Ordinal)
+                || !string.Equals(realityContext?.InputHashSha256,
+                    frozenRealityContext?.InputHashSha256, StringComparison.Ordinal)
                 || DurationTicks != request.DurationTicks
                 || !string.Equals(FactionStableId, request.WorldContext.FactionStableId.Trim(), StringComparison.Ordinal)
                 || !string.Equals(TerritoryStableId, request.WorldContext.TerritoryStableId.Trim(), StringComparison.Ordinal)
@@ -191,6 +212,9 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(
                     BuildIntegratedWorldInitialFingerprint(integratedWorldCreationState),
                     BuildIntegratedWorldInitialFingerprint(request.IntegratedWorld),
+                    StringComparison.Ordinal)
+                || !string.Equals(natureMindInitialPayloadKey,
+                    BuildNatureMindInitialPayloadKey(request.NatureMind),
                     StringComparison.Ordinal))
             {
                 throw new SimulationConflictException("SimulationCreateRequestPayloadConflict");
@@ -263,6 +287,10 @@ namespace Ssalddel.Simulation.Domain
                 RegionalIncidents = CreateRegionalIncidentSnapshots(),
                 NatureThreat = CreateNatureThreatStateSnapshot(),
                 RegionalCausality = CreateRegionalCausalitySnapshot(),
+                NatureMind = CreateNatureMindStateSnapshot(),
+                AreaAccess = CreateAreaAccessStateSnapshot(),
+                HostedWorld = CreateHostedWorldSnapshot(),
+                CoopConstruction = CreateCoopConstructionStateSnapshot(),
                 IntegratedWorld = CreateIntegratedWorldSnapshot(),
             };
 
@@ -360,6 +388,10 @@ namespace Ssalddel.Simulation.Domain
                 },
                 RegionalCausality = CloneRegionalCausalityState(
                     source.RegionalCausality),
+                NatureMind = CloneNatureMindState(source.NatureMind),
+                AreaAccess = CloneAreaAccessState(source.AreaAccess),
+                HostedWorld = CloneHostedWorldState(source.HostedWorld),
+                CoopConstruction = CloneCoopConstructionState(source.CoopConstruction),
                 IntegratedWorld = CloneIntegratedWorldSnapshot(source.IntegratedWorld),
             };
 
@@ -371,6 +403,9 @@ namespace Ssalddel.Simulation.Domain
             RequireStableId(request.ScenarioStableId, "SimulationScenarioStableIdInvalid");
             RequireText(request.ScenarioDataRevision, "SimulationScenarioDataRevisionMissing");
             RequireText(request.RuleRevision, "SimulationRuleRevisionMissing");
+            if (!string.IsNullOrWhiteSpace(request.RealityContextProfileStableId))
+                RequireStableId(request.RealityContextProfileStableId,
+                    "SimulationRealityContextProfileStableIdInvalid");
             if (request.DurationTicks <= 0 || request.DurationTicks > 365)
                 throw new SimulationContractException("SimulationDurationTicksInvalid");
             if (request.WorldContext == null)

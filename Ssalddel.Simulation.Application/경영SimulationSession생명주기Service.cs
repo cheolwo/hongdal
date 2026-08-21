@@ -45,8 +45,9 @@ namespace Ssalddel.Simulation.Application
             this.battleReconciler = battleReconciler;
         }
 
-        public 경영SimulationSessionSnapshot Create(경영SimulationSession생성Request request)
-            => sessions.CreateOrGet(request).Snapshot();
+        public 경영SimulationSessionSnapshot Create(경영SimulationSession생성Request request,
+            SimulationRealityContextSnapshot? frozenRealityContext = null)
+            => sessions.CreateOrGet(request, frozenRealityContext).Snapshot();
 
         public 경영SimulationSessionSnapshot Get(string sessionStableId)
             => sessions.Require(sessionStableId).Snapshot();
@@ -78,14 +79,35 @@ namespace Ssalddel.Simulation.Application
 
         public SimulationSessionRestoreResult Restore(SimulationSessionRestoreRequest request)
         {
+            var (package, restored) = Replay(request);
+            sessions.Restore(restored);
+            battleReconciler?.Restore(package.SessionStableId, package.Battles);
+            return Result(package, restored);
+        }
+
+        public SimulationSessionRestoreResult VerifyReplay(
+            SimulationSessionRestoreRequest request)
+        {
+            var (package, restored) = Replay(request);
+            return Result(package, restored);
+        }
+
+        private (SimulationSessionSavePackage Package,
+            경영SimulationSessionAggregate Restored) Replay(
+            SimulationSessionRestoreRequest request)
+        {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (string.IsNullOrWhiteSpace(request.SaveStableId))
                 throw new SimulationContractException("SimulationSaveStableIdInvalid");
             var package = saveStore.Find(request.SaveStableId.Trim())
                 ?? throw new SimulationNotFoundException("SimulationSaveNotFound");
-            var restored = SimulationSessionReplay.Restore(package);
-            sessions.Restore(restored);
-            battleReconciler?.Restore(package.SessionStableId, package.Battles);
+            return (package, SimulationSessionReplay.Restore(package));
+        }
+
+        private static SimulationSessionRestoreResult Result(
+            SimulationSessionSavePackage package,
+            경영SimulationSessionAggregate restored)
+        {
             return new SimulationSessionRestoreResult
             {
                 SaveStableId = package.SaveStableId,

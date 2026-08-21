@@ -40,7 +40,7 @@ public sealed class SimulationSaveReplayTests
         var saved = service.Save(session.SessionStableId, SaveRequest("save:sim.empty-1", 0));
         var unchanged = service.Get(session.SessionStableId);
 
-        Assert.Equal(SimulationSaveSchemaVersions.V1, saved.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V7, saved.SchemaVersion);
         Assert.Equal(SimulationReplayHashAlgorithmCodes.Sha256, saved.ReplayHashAlgorithmCode);
         Assert.Equal(64, saved.ReplayHash.Length);
         Assert.Equal(0, saved.SavedWorldTick);
@@ -127,6 +127,34 @@ public sealed class SimulationSaveReplayTests
         Assert.Equal(completed.Decisions[0].DecisionStableId, restored.Session.Decisions[0].DecisionStableId);
         Assert.Equal(SimulationTaskStateCodes.Completed, restored.Session.Tasks[0].StateCode);
         Assert.Equal(SimulationEffectStateCodes.Applied, restored.Session.Effects[0].StateCode);
+    }
+
+    [Fact]
+    public void 활성session의_저장본검증은_현재상태를덮어쓰지않고_동일hash를재현한다()
+    {
+        var saveStore = new InMemorySimulationSessionSaveStore();
+        var service = Service(new InMemory경영SimulationSessionStore(), saveStore);
+        var session = CreateSession(service);
+        var savedTick = service.Advance(
+            session.SessionStableId,
+            TickRequest("command:save-replay.verify-saved", 0));
+        var saved = service.Save(
+            session.SessionStableId,
+            SaveRequest("save:sim.verify-active", savedTick.Revision));
+        var current = service.Advance(
+            session.SessionStableId,
+            TickRequest("command:save-replay.verify-current", savedTick.Revision));
+
+        var verified = service.VerifyReplay(new SimulationSessionRestoreRequest
+        {
+            SaveStableId = saved.SaveStableId,
+        });
+
+        Assert.Equal(saved.ReplayHash, verified.ReplayHash);
+        Assert.Equal(savedTick.Revision, verified.Session.Revision);
+        Assert.Equal(savedTick.CurrentTick, verified.Session.CurrentTick);
+        Assert.Equal(current.Revision, service.Get(session.SessionStableId).Revision);
+        Assert.Equal(current.CurrentTick, service.Get(session.SessionStableId).CurrentTick);
     }
 
     [Fact]

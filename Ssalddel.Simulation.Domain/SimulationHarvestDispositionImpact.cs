@@ -20,6 +20,7 @@ namespace Ssalddel.Simulation.Domain
             ValidateHarvestDispositionImpactRequest(request);
             lock (gate)
             {
+                EnsureHarvestDispositionMatchesFarmLedger(request);
                 return CreateHarvestDispositionImpactPreview(request);
             }
         }
@@ -45,6 +46,7 @@ namespace Ssalddel.Simulation.Domain
                 if (request.ExpectedRevision != Revision)
                     throw new SimulationConflictException("SimulationExpectedRevisionMismatch");
 
+                EnsureHarvestDispositionMatchesFarmLedger(request.Impact);
                 var impactPreview = CreateHarvestDispositionImpactPreview(request.Impact);
                 if (impactPreview.CommonDecisionPreview.Decision.BlockReasonCodes.Length > 0)
                     throw new SimulationConflictException("SimulationDecisionPreviewBlocked");

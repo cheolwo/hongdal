@@ -35,6 +35,9 @@ namespace Ssalddel.Simulation.Contracts
         public string PlacementAuthorityCode { get; set; } = SimulationWorldLayoutCodes.ScenarioRelative;
         public string WorldGroundingStateCode { get; set; } = SimulationWorldLayoutCodes.NotApplied;
         public string[] WorldInteractionIds { get; set; } = Array.Empty<string>();
+        public string RealityContextSnapshotStableId { get; set; } = string.Empty;
+        public string RealityContextAvailabilityCode { get; set; } =
+            SimulationRealityContextCodes.Unavailable;
         public 경영SimulationSessionSnapshot Session { get; set; } = new();
     }
 }

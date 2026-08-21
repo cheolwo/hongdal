@@ -20,6 +20,20 @@ namespace Ssalddel.Simulation.Application
             SimulationHarvestDispositionImpactConfirmRequest request)
             => sessions.Require(sessionStableId).ConfirmHarvestDispositionImpact(request);
 
+        public SimulationFarmChoiceContextSnapshot GetFarmChoiceContext(
+            string sessionStableId)
+            => sessions.Require(sessionStableId).GetFarmChoiceContext();
+
+        public SimulationFarmChoicePreviewSnapshot PreviewFarmChoice(
+            string sessionStableId,
+            SimulationFarmChoicePreviewRequest request)
+            => sessions.Require(sessionStableId).PreviewFarmChoice(request);
+
+        public 경영SimulationSessionSnapshot ConfirmFarmChoice(
+            string sessionStableId,
+            SimulationFarmChoiceConfirmRequest request)
+            => sessions.Require(sessionStableId).ConfirmFarmChoice(request);
+
         public Simulation수출준비PreviewSnapshot Preview수출준비(
             string sessionStableId,
             Simulation수출준비PreviewRequest request)

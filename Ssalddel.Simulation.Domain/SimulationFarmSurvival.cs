@@ -489,6 +489,27 @@ namespace Ssalddel.Simulation.Domain
                     projectedQuantity = harvestLot.Quantity;
                     projectedQuantityUnitCode = harvestLot.UnitCode;
                     projectedLotStableId = PackageLotStableId(harvestLot.HarvestLotStableId);
+                    if (!harvestLotAllocationIds.TryGetValue(
+                        harvestLot.HarvestLotStableId,
+                        out var allocationStableId))
+                    {
+                        blocks.Add("SimulationHarvestDispositionChoiceRequired");
+                    }
+                    else
+                    {
+                        var allocation = harvestLotAllocations[allocationStableId];
+                        if (allocation.ChoiceCode
+                            != SimulationHarvestDispositionChoiceCodes.CooperativeShipment)
+                        {
+                            blocks.Add(
+                                "SimulationHarvestDispositionChoiceDoesNotUseOutboundPacking");
+                        }
+                        else if (allocation.StateCode
+                            != SimulationHarvestLotAllocationStateCodes.Applied)
+                        {
+                            blocks.Add("SimulationHarvestDispositionChoiceNotApplied");
+                        }
+                    }
                 }
                 RequireFarmActorCapability(actor, SimulationFarmActorCapabilityCodes.FarmPacking,
                     blocks);
@@ -815,7 +836,21 @@ namespace Ssalddel.Simulation.Domain
                 harvestLot.StateCode = Simulation수확Lot상태Codes.PackedForShipment;
                 harvestLot.Revision++;
                 var packageLotId = PackageLotStableId(harvestLot.HarvestLotStableId);
-                var allocationId = "allocation:harvest-lot:" + harvestLot.HarvestLotStableId;
+                if (!harvestLotAllocationIds.TryGetValue(
+                    harvestLot.HarvestLotStableId,
+                    out var allocationId))
+                {
+                    throw new SimulationConflictException(
+                        "SimulationHarvestDispositionChoiceRequired");
+                }
+                var allocation = harvestLotAllocations[allocationId];
+                if (allocation.ChoiceCode
+                    != SimulationHarvestDispositionChoiceCodes.CooperativeShipment
+                    || allocation.StateCode != SimulationHarvestLotAllocationStateCodes.Applied)
+                {
+                    throw new SimulationConflictException(
+                        "SimulationHarvestDispositionChoiceInvalidForOutboundPacking");
+                }
                 packageLots.Add(packageLotId, new Simulation포장LotSnapshot
                 {
                     PackageLotStableId = packageLotId,
@@ -833,29 +868,6 @@ namespace Ssalddel.Simulation.Domain
                         .Append(harvestLot.HarvestLotStableId)
                         .OrderBy(value => value, StringComparer.Ordinal).ToArray(),
                 });
-                if (harvestLotAllocations.ContainsKey(allocationId)
-                    || harvestLotAllocationIds.ContainsKey(harvestLot.HarvestLotStableId))
-                    throw new SimulationConflictException("SimulationHarvestLotAlreadyAllocated");
-                harvestLotAllocations.Add(allocationId, new SimulationHarvestLotAllocationSnapshot
-                {
-                    AllocationStableId = allocationId,
-                    HarvestLotStableId = harvestLot.HarvestLotStableId,
-                    HarvestLotRevision = harvestLot.Revision,
-                    ProductStableId = harvestLot.ProductStableId,
-                    Quantity = harvestLot.Quantity,
-                    UnitCode = harvestLot.UnitCode,
-                    ChoiceCode = SimulationHarvestDispositionChoiceCodes.CooperativeShipment,
-                    NextWorkflowCode = SimulationHarvestDispositionWorkflowCodes.CooperativeIntakeCandidate,
-                    DecisionStableId = "decision:farm-supply:" + workOrder.CommandId,
-                    TaskStableId = workOrder.WorkOrderStableId,
-                    FacilityStableId = farmSurvivalCreationState!.FarmBuildingStableId,
-                    StateCode = SimulationHarvestLotAllocationStateCodes.Applied,
-                    ReservedTick = workOrder.StartedWorldTick,
-                    AppliedTick = workOrder.CompletesWorldTick,
-                    AvailableQuantity = harvestLot.Quantity,
-                    SourceStableIds = packageLots[packageLotId].SourceStableIds.ToArray(),
-                });
-                harvestLotAllocationIds.Add(harvestLot.HarvestLotStableId, allocationId);
                 ObserveRegionalIncidentAction(workOrder.ActionCode,
                     harvestLot.HarvestLotStableId, workOrder.CompletesWorldTick);
                 return;

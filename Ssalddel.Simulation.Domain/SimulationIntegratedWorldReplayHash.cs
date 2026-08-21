@@ -18,6 +18,12 @@ namespace Ssalddel.Simulation.Domain
                 Add(target, definition.HashSha256); Add(target, definition.FacilityTypeCode);
                 foreach (var code in definition.CapabilityCodes.OrderBy(item => item,
                              StringComparer.Ordinal)) Add(target, code);
+                foreach (var capacity in definition.Capacities.OrderBy(item =>
+                             item.CapacityCode, StringComparer.Ordinal))
+                {
+                    Add(target, capacity.CapacityCode); Add(target, capacity.Quantity);
+                    Add(target, capacity.UnitCode);
+                }
             }
             foreach (var seed in value.FacilitySeeds.OrderBy(item => item.FacilityStableId,
                          StringComparer.Ordinal))
@@ -51,6 +57,8 @@ namespace Ssalddel.Simulation.Domain
             {
                 Add(target, blueprint.BlueprintStableId); Add(target, blueprint.Revision);
                 Add(target, blueprint.HashSha256); Add(target, blueprint.FacilityDefinitionStableId);
+                Add(target, blueprint.SettlementFacilityTypeCode);
+                Add(target, blueprint.SettlementDistrictStableId);
                 Add(target, blueprint.ConstructionTicks); AddRequirements(target, blueprint.Materials);
             }
         }
@@ -64,7 +72,10 @@ namespace Ssalddel.Simulation.Domain
             {
                 Add(target, facility.FacilityStableId); Add(target, facility.FacilityDefinitionStableId);
                 Add(target, facility.FacilityDefinitionRevision); Add(target, facility.FacilityDefinitionHashSha256);
-                Add(target, facility.PlacementH1StableId); Add(target, facility.LifecycleCode);
+                Add(target, facility.PlacementH1StableId);
+                Add(target, facility.SettlementFacilityTypeCode);
+                Add(target, facility.SettlementDistrictStableId);
+                Add(target, facility.LifecycleCode);
                 Add(target, facility.IntegrityCode); Add(target, facility.MaintenanceCode);
                 foreach (var connector in facility.AccessConnectorStableIds.OrderBy(item => item,
                              StringComparer.Ordinal)) Add(target, connector);
@@ -74,6 +85,12 @@ namespace Ssalddel.Simulation.Domain
                     Add(target, capability.CapabilityCode); Add(target, capability.StateCode);
                     foreach (var source in capability.SourceRestrictionStableIds.OrderBy(item => item,
                                  StringComparer.Ordinal)) Add(target, source);
+                }
+                foreach (var capacity in facility.DefinedCapacities.OrderBy(item =>
+                             item.CapacityCode, StringComparer.Ordinal))
+                {
+                    Add(target, capacity.CapacityCode); Add(target, capacity.Quantity);
+                    Add(target, capacity.UnitCode);
                 }
             }
             foreach (var restriction in value.FacilityRestrictions.OrderBy(item =>

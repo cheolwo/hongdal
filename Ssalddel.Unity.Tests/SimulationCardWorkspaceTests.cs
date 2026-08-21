@@ -10,7 +10,8 @@ public sealed class SimulationCardWorkspaceTests
         var coordinator = new CardWorkspaceCoordinator(new ICardFamilySource[]
         {
             Source(CardFamilyCodes.Tarot, CardHierarchyTierCodes.Meta,
-                CardAuthorityCodes.ServerMutable, "tarot:tower", "탑"),
+                CardAuthorityCodes.ServerMutable, "tarot:tower", "탑",
+                CardMetaLayerCodes.ActiveMajorArcana),
             Source(CardFamilyCodes.TeamRole, CardHierarchyTierCodes.Action,
                 CardAuthorityCodes.ServerMutable, "role:defend", "Farm Gate 방어"),
         });
@@ -19,6 +20,8 @@ public sealed class SimulationCardWorkspaceTests
 
         Assert.True(result.PresentationOnly);
         Assert.Equal(2, result.Items.Length);
+        Assert.Equal(CardMetaLayerCodes.ActiveMajorArcana,
+            result.Items[0].MetaLayerCode);
         Assert.Contains(result.Items, value => value.HierarchyTierCode == "Meta");
         Assert.Contains(result.Items, value => value.HierarchyTierCode == "Action");
     }
@@ -27,7 +30,7 @@ public sealed class SimulationCardWorkspaceTests
     public async Task LoadAsync_RejectsRelationThatChangesAvailability()
     {
         var source = Source(CardFamilyCodes.Tarot, CardHierarchyTierCodes.Meta,
-            CardAuthorityCodes.ServerMutable, "tarot:tower", "탑",
+            CardAuthorityCodes.ServerMutable, "tarot:tower", "탑", string.Empty,
             new CardWorkspaceRelation
             {
                 SourceCardStableId = "tarot:tower",
@@ -44,6 +47,7 @@ public sealed class SimulationCardWorkspaceTests
 
     private static ICardFamilySource Source(string family, string tier,
         string authority, string stableId, string title,
+        string metaLayerCode = "",
         params CardWorkspaceRelation[] relations)
         => new FakeSource(new CardWorkspaceFamilySnapshot
         {
@@ -56,6 +60,7 @@ public sealed class SimulationCardWorkspaceTests
                     Title = title,
                     FamilyCode = family,
                     HierarchyTierCode = tier,
+                    MetaLayerCode = metaLayerCode,
                     AuthorityCode = authority,
                     IsAvailable = true,
                 },

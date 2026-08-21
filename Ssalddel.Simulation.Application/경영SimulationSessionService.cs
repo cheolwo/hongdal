@@ -5,7 +5,8 @@ namespace Ssalddel.Simulation.Application
 {
     public interface I경영SimulationSessionStore
     {
-        경영SimulationSessionAggregate CreateOrGet(경영SimulationSession생성Request request);
+        경영SimulationSessionAggregate CreateOrGet(경영SimulationSession생성Request request,
+            SimulationRealityContextSnapshot? frozenRealityContext = null);
         경영SimulationSessionAggregate? Find(string sessionStableId);
         경영SimulationSessionAggregate Restore(경영SimulationSessionAggregate session);
     }
@@ -20,6 +21,7 @@ namespace Ssalddel.Simulation.Application
     public sealed class 경영SimulationSessionService
     {
         private readonly 경영SimulationSession생명주기Service lifecycle;
+        private readonly 경영SimulationWorldGameplayService worldGameplay;
         private readonly 경영Simulation턴결정Service turnDecision;
         private readonly 경영Simulation물류창고Service logistics;
         private readonly 경영Simulation주문소비Service commerce;
@@ -35,6 +37,7 @@ namespace Ssalddel.Simulation.Application
                 sessions,
                 saveStore,
                 battleReconciler);
+            worldGameplay = new 경영SimulationWorldGameplayService(sessions);
             turnDecision = new 경영Simulation턴결정Service(sessions, battleReconciler);
             logistics = new 경영Simulation물류창고Service(sessions);
             commerce = new 경영Simulation주문소비Service(sessions);
@@ -45,6 +48,63 @@ namespace Ssalddel.Simulation.Application
             => lifecycle.Create(request);
         public 경영SimulationSessionSnapshot Get(string sessionStableId)
             => lifecycle.Get(sessionStableId);
+        public SimulationNatureMindStateSnapshot GetNatureMindState(
+            string sessionStableId)
+            => worldGameplay.GetNatureMindState(sessionStableId);
+        public SimulationNatureFarmInterpretationSnapshot GetNatureFarmInterpretation(
+            string sessionStableId, string playerStableId)
+            => worldGameplay.GetNatureFarmInterpretation(sessionStableId, playerStableId);
+        public SimulationPlayerAreaAccessStateSnapshot GetPlayerAreaAccess(
+            string sessionStableId, string playerStableId)
+            => worldGameplay.GetPlayerAreaAccess(sessionStableId, playerStableId);
+        public SimulationAreaTraversalPreviewSnapshot PreviewAreaTraversal(
+            string sessionStableId, SimulationAreaTraversalPreviewRequest request)
+            => worldGameplay.PreviewAreaTraversal(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmAreaTraversal(
+            string sessionStableId, SimulationAreaTraversalConfirmRequest request)
+            => worldGameplay.ConfirmAreaTraversal(sessionStableId, request);
+        public SimulationHostedWorldStateSnapshot GetHostedWorldState(string sessionStableId)
+            => worldGameplay.GetHostedWorldState(sessionStableId);
+        public SimulationHostedWorldPreviewSnapshot PreviewOpenHostedWorld(
+            string sessionStableId, SimulationHostedWorldOpenPreviewRequest request)
+            => worldGameplay.PreviewOpenHostedWorld(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmOpenHostedWorld(
+            string sessionStableId, SimulationHostedWorldOpenConfirmRequest request)
+            => worldGameplay.ConfirmOpenHostedWorld(sessionStableId, request);
+        public SimulationHostedWorldPreviewSnapshot PreviewJoinHostedWorld(
+            string sessionStableId, SimulationHostedWorldJoinPreviewRequest request)
+            => worldGameplay.PreviewJoinHostedWorld(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmJoinHostedWorld(
+            string sessionStableId, SimulationHostedWorldJoinConfirmRequest request)
+            => worldGameplay.ConfirmJoinHostedWorld(sessionStableId, request);
+        public SimulationHostedWorldPreviewSnapshot PreviewHostedGuestAction(
+            string sessionStableId, SimulationHostedGuestActionPreviewRequest request)
+            => worldGameplay.PreviewHostedGuestAction(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmHostedGuestAction(
+            string sessionStableId, SimulationHostedGuestActionConfirmRequest request)
+            => worldGameplay.ConfirmHostedGuestAction(sessionStableId, request);
+        public SimulationCoopConstructionStateSnapshot GetCoopConstructionState(
+            string sessionStableId) => worldGameplay.GetCoopConstructionState(sessionStableId);
+        public SimulationCoopConstructionPreviewSnapshot PreviewCoopContribution(
+            string sessionStableId, SimulationCoopContributionPreviewRequest request)
+            => worldGameplay.PreviewCoopContribution(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmCoopContribution(
+            string sessionStableId, SimulationCoopContributionConfirmRequest request)
+            => worldGameplay.ConfirmCoopContribution(sessionStableId, request);
+        public SimulationCoopConstructionPreviewSnapshot PreviewCoopDemolition(
+            string sessionStableId, SimulationCoopProtectedActionPreviewRequest request)
+            => worldGameplay.PreviewCoopDemolition(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmCoopDemolition(
+            string sessionStableId, SimulationCoopProtectedActionConfirmRequest request)
+            => worldGameplay.ConfirmCoopDemolition(sessionStableId, request);
+        public SimulationCoopConstructionPreviewSnapshot PreviewCoopRestore(
+            string sessionStableId, SimulationCoopProtectedActionPreviewRequest request)
+            => worldGameplay.PreviewCoopRestore(sessionStableId, request);
+        public 경영SimulationSessionSnapshot ConfirmCoopRestore(
+            string sessionStableId, SimulationCoopProtectedActionConfirmRequest request)
+            => worldGameplay.ConfirmCoopRestore(sessionStableId, request);
+        public SimulationGameplayObservabilitySnapshot GetGameplayObservability(
+            string sessionStableId) => worldGameplay.GetGameplayObservability(sessionStableId);
         public 경영SimulationSessionSnapshot Advance(
             string sessionStableId, 경영SimulationTick진행Request request)
             => lifecycle.Advance(sessionStableId, request);
@@ -53,6 +113,9 @@ namespace Ssalddel.Simulation.Application
             => lifecycle.Save(sessionStableId, request);
         public SimulationSessionRestoreResult Restore(SimulationSessionRestoreRequest request)
             => lifecycle.Restore(request);
+        public SimulationSessionRestoreResult VerifyReplay(
+            SimulationSessionRestoreRequest request)
+            => lifecycle.VerifyReplay(request);
 
         public SimulationTurnClosingContextSnapshot GetTurnClosingContext(string sessionStableId)
             => turnDecision.GetTurnClosingContext(sessionStableId);

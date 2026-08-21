@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "simulation-reality-context-catalog.v1",
+  "profiles": [
+    {
+      "profileStableId": "reality-context-profile:sim:pyeongchang:farm-production.v1",
+      "profileRevision": 1,
+      "signalRuleRevision": "reality-signal-rule:farm-advisory.r1",
+      "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "maxAgeHours": 48,
+      "h3StableIds": [
+        "h3-candidate:highland-farm",
+        "h3-candidate:farm-processing-campus",
+        "h3-candidate:farm-seasonal-production-loop",
+        "h3-candidate:farm-incident-recovery"
+      ],
+      "sourceSnapshots": [
+        {
+          "sourceEvidenceStableId": "reality-source:farm:kma-asos-daily",
+          "sourceName": "기상청 종관기상관측 일자료",
+          "datasetCode": "kma-asos-daily",
+          "availabilityCode": "Unavailable",
+          "qualityCode": "Unavailable",
+          "observedAtUtc": null,
+          "retrievedAtUtc": null,
+          "spatialPrecisionCode": "StationObservation",
+          "sourceHashSha256": "",
+          "licenseCode": "PublicDataPortalType1",
+          "sourceHref": "https://www.data.go.kr/data/15059093/openapi.do",
+          "limitationCodes": [
+            "ApprovedObservationNotCollected",
+            "StationObservationIsNotParcelObservation",
+            "NoScenarioFallback",
+            "NotAutomaticWorkOrIncidentRule"
+          ],
+          "measurements": []
+        },
+        {
+          "sourceEvidenceStableId": "reality-source:farm:kamis-price-observation",
+          "sourceName": "한국농수산식품유통공사 KAMIS 가격 관측",
+          "datasetCode": "kamis-price-observations",
+          "availabilityCode": "Unavailable",
+          "qualityCode": "Unavailable",
+          "observedAtUtc": null,
+          "retrievedAtUtc": null,
+          "spatialPrecisionCode": "MarketSurvey",
+          "sourceHashSha256": "",
+          "licenseCode": "PublicDataSourceTerms",
+          "sourceHref": "https://www.kamis.or.kr",
+          "limitationCodes": [
+            "ApprovedObservationNotCollected",
+            "MarketContextOnly",
+            "UnitAndMarketStageAlignmentRequired",
+            "NotProductionProfitOrSalePriceRule",
+            "NoScenarioFallback"
+          ],
+          "measurements": []
+        },
+        {
+          "sourceEvidenceStableId": "reality-source:farm:kma-short-term-forecast",
+          "sourceName": "기상청 단기예보",
+          "datasetCode": "kma-vilage-short-term-forecast",
+          "availabilityCode": "Unavailable",
+          "qualityCode": "Unavailable",
+          "observedAtUtc": null,
+          "retrievedAtUtc": null,
+          "spatialPrecisionCode": "FiveKilometerGrid",
+          "sourceHashSha256": "",
+          "licenseCode": "PublicDataPortalType1",
+          "sourceHref": "https://www.data.go.kr/data/15084084/openapi.do",
+          "limitationCodes": [
+            "ApprovedForecastNotCollected",
+            "FiveKilometerGridIsNotParcelForecast",
+            "NoScenarioFallback",
+            "NotAutomaticWorkOrIncidentRule"
+          ],
+          "measurements": []
+        }
+      ],
+      "publicDataChangesSimulationRules": false,
+      "publicDataMovesSpatialDefinitions": false,
+      "contextProposalCreatesIncidentOrEffect": false
+    }
+  ]
+}

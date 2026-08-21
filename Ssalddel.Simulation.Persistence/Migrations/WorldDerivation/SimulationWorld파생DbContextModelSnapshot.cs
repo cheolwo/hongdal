@@ -22,6 +22,49 @@ namespace Ssalddel.Simulation.Persistence.Migrations.WorldDerivation
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationFarmRealityEvidenceEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AreaSetStableId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("BundleJson")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CanonicalProductStableId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("EvidenceRevision")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("InputHashSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTime>("SyncedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AreaSetStableId", "CanonicalProductStableId", "EvidenceRevision")
+                        .IsUnique();
+
+                    b.ToTable("시뮬레이션월드_농장현실근거", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Simulation.Persistence.SimulationWorldAreaSetGraph참조Entity", b =>
                 {
                     b.Property<long>("Id")

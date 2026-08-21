@@ -19,6 +19,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string Planned = "Planned";
         public const string UnderConstruction = "UnderConstruction";
         public const string Operational = "Operational";
+        public const string Removed = "Removed";
     }
 
     public static class SimulationFacilityIntegrityCodes
@@ -59,6 +60,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string ManufacturingRawMaterial = "ManufacturingRawMaterial";
         public const string TransportBox = "TransportBox";
         public const string FacilityComponent = "FacilityComponent";
+        public const string CoopFacilityComponent = "CoopFacilityComponent";
         public const string HarvestPotato = "HarvestPotato";
         public const string PackagedPotato = "PackagedPotato";
     }
@@ -130,6 +132,15 @@ namespace Ssalddel.Simulation.Contracts
         public string HashSha256 { get; set; } = string.Empty;
         public string FacilityTypeCode { get; set; } = string.Empty;
         public string[] CapabilityCodes { get; set; } = Array.Empty<string>();
+        public SimulationFacilityCapacityDefinitionRequest[] Capacities { get; set; }
+            = Array.Empty<SimulationFacilityCapacityDefinitionRequest>();
+    }
+
+    public sealed class SimulationFacilityCapacityDefinitionRequest
+    {
+        public string CapacityCode { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitCode { get; set; } = string.Empty;
     }
 
     public sealed class SimulationScenarioFacilitySeedRequest
@@ -174,6 +185,8 @@ namespace Ssalddel.Simulation.Contracts
         public string Revision { get; set; } = string.Empty;
         public string HashSha256 { get; set; } = string.Empty;
         public string FacilityDefinitionStableId { get; set; } = string.Empty;
+        public string SettlementFacilityTypeCode { get; set; } = string.Empty;
+        public string SettlementDistrictStableId { get; set; } = string.Empty;
         public int ConstructionTicks { get; set; }
         public SimulationIntegratedItemRequirement[] Materials { get; set; }
             = Array.Empty<SimulationIntegratedItemRequirement>();
@@ -310,13 +323,24 @@ namespace Ssalddel.Simulation.Contracts
         public string FacilityDefinitionRevision { get; set; } = string.Empty;
         public string FacilityDefinitionHashSha256 { get; set; } = string.Empty;
         public string PlacementH1StableId { get; set; } = string.Empty;
+        public string SettlementFacilityTypeCode { get; set; } = string.Empty;
+        public string SettlementDistrictStableId { get; set; } = string.Empty;
         public string[] AccessConnectorStableIds { get; set; } = Array.Empty<string>();
         public string LifecycleCode { get; set; } = SimulationFacilityLifecycleCodes.Operational;
         public string IntegrityCode { get; set; } = SimulationFacilityIntegrityCodes.Intact;
         public string MaintenanceCode { get; set; } = SimulationFacilityMaintenanceCodes.None;
         public string[] DefinedCapabilityCodes { get; set; } = Array.Empty<string>();
+        public SimulationRuntimeFacilityCapacitySnapshot[] DefinedCapacities { get; set; }
+            = Array.Empty<SimulationRuntimeFacilityCapacitySnapshot>();
         public SimulationEffectiveFacilityCapabilitySnapshot[] EffectiveCapabilities { get; set; }
             = Array.Empty<SimulationEffectiveFacilityCapabilitySnapshot>();
+    }
+
+    public sealed class SimulationRuntimeFacilityCapacitySnapshot
+    {
+        public string CapacityCode { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitCode { get; set; } = string.Empty;
     }
 
     public sealed class SimulationEffectiveFacilityCapabilitySnapshot

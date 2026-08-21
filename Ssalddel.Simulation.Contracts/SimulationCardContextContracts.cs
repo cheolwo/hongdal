@@ -49,8 +49,27 @@ namespace Ssalddel.Simulation.Contracts
         public const string Incident = "Incident";
     }
 
+    public static class SimulationTarotMetaLayerCodes
+    {
+        public const string JourneyRoot = "JourneyRoot";
+        public const string ActiveMajorArcana = "ActiveMajorArcana";
+    }
+
+    public static class SimulationTarotJourneyRootCodes
+    {
+        public const string FoolCardStableId =
+            "learning:hongik.fool.beginner-mind";
+        public const string FoolFrameStableId = "tarot-journey-root:fool";
+        public const int TraditionalArcanaNumber = 0;
+        public const int JourneySequenceOrder = 1;
+    }
+
     public static class SimulationTarotThemeCodes
     {
+        public const string Beginning = "Beginning";
+        public const string Possibility = "Possibility";
+        public const string Unknown = "Unknown";
+        public const string Cycle = "Cycle";
         public const string Growth = "Growth";
         public const string Abundance = "Abundance";
         public const string Nurture = "Nurture";
@@ -63,6 +82,7 @@ namespace Ssalddel.Simulation.Contracts
 
     public static class SimulationTarotContextProposalCodes
     {
+        public const string BeginnerMind = "BeginnerMind";
         public const string Growth = "Growth";
         public const string Movement = "Movement";
         public const string Balance = "Balance";
@@ -76,6 +96,23 @@ namespace Ssalddel.Simulation.Contracts
         public const string Blocked = "Blocked";
     }
 
+    public sealed class SimulationTarotJourneyRootSnapshot
+    {
+        public string FrameStableId { get; set; } = string.Empty;
+        public string CardStableId { get; set; } = string.Empty;
+        public string CardRevision { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public int TraditionalArcanaNumber { get; set; }
+        public int JourneySequenceOrder { get; set; }
+        public string HierarchyTierCode { get; set; } = string.Empty;
+        public string MetaLayerCode { get; set; } = string.Empty;
+        public bool IsAlwaysActive { get; set; }
+        public string[] ThemeCodes { get; set; } = Array.Empty<string>();
+        public string RuleRevision { get; set; } = string.Empty;
+        public string SourceStableId { get; set; } = string.Empty;
+    }
+
     public sealed class SimulationTarotFrameSnapshot
     {
         public string FrameStableId { get; set; } = string.Empty;
@@ -83,6 +120,8 @@ namespace Ssalddel.Simulation.Contracts
         public string CardCopyStableId { get; set; } = string.Empty;
         public string CardRevision { get; set; } = string.Empty;
         public string OrientationCode { get; set; } = string.Empty;
+        public string ParentJourneyFrameStableId { get; set; } = string.Empty;
+        public string MetaLayerCode { get; set; } = string.Empty;
         public string FrameScopeCode { get; set; } = string.Empty;
         public string ScopeTargetStableId { get; set; } = string.Empty;
         public int StartsAtTurnNumber { get; set; }
@@ -100,6 +139,7 @@ namespace Ssalddel.Simulation.Contracts
         public long Revision { get; set; }
         public long SourceWorldRevision { get; set; }
         public int SourceTurnNumber { get; set; }
+        public SimulationTarotJourneyRootSnapshot JourneyRoot { get; set; } = new();
         public SimulationTarotFrameSnapshot[] ActiveFrames { get; set; }
             = Array.Empty<SimulationTarotFrameSnapshot>();
         public string FrameSetHashSha256 { get; set; } = string.Empty;

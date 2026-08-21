@@ -11,6 +11,12 @@ namespace Ssalddel.Simulation.Contracts
         public const string V4 = "simulation-save.v4";
         public const string V5 = "simulation-save.v5";
         public const string V6 = "simulation-save.v6";
+        public const string V7 = "simulation-save.v7";
+        public const string V8 = "simulation-save.v8";
+        public const string V9 = "simulation-save.v9";
+        public const string V10 = "simulation-save.v10";
+        public const string V11 = "simulation-save.v11";
+        public const string V12 = "simulation-save.v12";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -148,6 +154,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationBattleSaveRecordSnapshot[] Battles { get; set; }
             = Array.Empty<SimulationBattleSaveRecordSnapshot>();
         public SimulationLhWorldStateSnapshot? LhWorld { get; set; }
+        public SimulationRealityContextSnapshot? RealityContext { get; set; }
     }
 
     public sealed class SimulationSessionRestoreResult

@@ -24,6 +24,19 @@ public sealed class SimulationTurnClosingTests
         Assert.True(context.CanCloseTurn);
         Assert.Equal(3, context.AvailableCards.Length);
         Assert.Equal(3, context.TarotDraw.Offers.Length);
+        var journeyRoot = context.TarotContext.FrameSet.JourneyRoot;
+        Assert.Equal(SimulationTarotJourneyRootCodes.FoolCardStableId,
+            journeyRoot.CardStableId);
+        Assert.Equal(SimulationTarotJourneyRootCodes.TraditionalArcanaNumber,
+            journeyRoot.TraditionalArcanaNumber);
+        Assert.Equal(SimulationTarotJourneyRootCodes.JourneySequenceOrder,
+            journeyRoot.JourneySequenceOrder);
+        Assert.Equal(SimulationTarotMetaLayerCodes.JourneyRoot,
+            journeyRoot.MetaLayerCode);
+        Assert.Equal(SimulationCardHierarchyTierCodes.Meta,
+            journeyRoot.HierarchyTierCode);
+        Assert.True(journeyRoot.IsAlwaysActive);
+        Assert.Empty(context.TarotContext.FrameSet.ActiveFrames);
         Assert.All(context.AvailableCards.Where(card =>
             card.CardKindCode == SimulationTurnCardKindCodes.Philosophy), card =>
         {
@@ -105,7 +118,7 @@ public sealed class SimulationTurnClosingTests
         Assert.Equal("culture-local-context-awareness:r1", active.EffectRuleRevision);
         Assert.StartsWith("https://www.mcst.go.kr/", active.SourceUrl, StringComparison.Ordinal);
         Assert.Equal(saved.ReplayHash, restored.ReplayHash);
-        Assert.Equal(SimulationSaveSchemaVersions.V5, saved.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V7, saved.SchemaVersion);
         Assert.Equal(1, restored.Session.RegionalCausality.RecoveryScore);
     }
 
@@ -217,10 +230,17 @@ public sealed class SimulationTurnClosingTests
         var next = service.ConfirmTurnClosing(session.SessionStableId,
             ConfirmRequest("command:turn.tarot-context", 0, preview));
         var frame = Assert.Single(next.TarotContext.FrameSet.ActiveFrames);
+        var journeyRoot = next.TarotContext.FrameSet.JourneyRoot;
         var proposal = Assert.Single(next.TarotContext.Proposals);
         var evaluation = Assert.Single(next.TarotContext.IncidentEvaluations);
 
         Assert.Equal(SimulationTarotFrameScopeCodes.Turn, frame.FrameScopeCode);
+        Assert.Equal(journeyRoot.FrameStableId,
+            frame.ParentJourneyFrameStableId);
+        Assert.Equal(SimulationTarotMetaLayerCodes.ActiveMajorArcana,
+            frame.MetaLayerCode);
+        Assert.Equal(SimulationTarotJourneyRootCodes.FoolCardStableId,
+            journeyRoot.CardStableId);
         Assert.Equal(frame.FrameStableId, proposal.SourceFrameStableId);
         Assert.Equal(SimulationTarotIncidentEvaluationResultCodes.NoIncident,
             evaluation.EvaluationResultCode);
@@ -362,6 +382,9 @@ public sealed class SimulationTurnClosingTests
         Assert.NotNull(saved.CommandLog[0].TurnClosingConfirmRequest);
         Assert.Equal(FoolCard,
             Assert.Single(restored.Session.ActiveTurnCardEffects).CardStableId);
+        Assert.Equal(SimulationTarotJourneyRootCodes.FoolCardStableId,
+            restored.Session.TarotContext.FrameSet.JourneyRoot.CardStableId);
+        Assert.True(restored.Session.TarotContext.FrameSet.JourneyRoot.IsAlwaysActive);
         Assert.Equal(1, restored.Session.CurrentTick);
         Assert.Single(restored.Session.TurnClosings);
     }

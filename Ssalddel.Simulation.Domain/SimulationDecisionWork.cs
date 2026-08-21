@@ -118,6 +118,7 @@ namespace Ssalddel.Simulation.Domain
                 var exportShipmentPlan = Prepare수출선적계획(request.Preview, preview);
                 var exportShipmentExecution = Prepare수출선적실행(request.Preview, preview);
                 var spatialReservationsToRegister = PrepareSimulationSpatialReservations(task);
+                var coopReservation = PrepareCoopConstructionTask(task);
 
                 var effectValues = includeExpectedCostsAsEffects
                     ? decision.ExpectedCosts.Concat(decision.ExpectedEffects)
@@ -151,6 +152,7 @@ namespace Ssalddel.Simulation.Domain
                 RegisterSimulationSpatialReservations(task, spatialReservationsToRegister);
                 decisions.Add(decision.DecisionStableId, decision);
                 tasks.Add(task.TaskStableId, task);
+                ApplyCoopConstructionTaskReservation(task, coopReservation);
                 foreach (var effect in pendingEffects)
                     effects.Add(effect.EffectStableId, effect);
                 ReserveIndividualOrder(individualOrder);
@@ -218,6 +220,9 @@ namespace Ssalddel.Simulation.Domain
                     task.ActualEndTick = task.ExpectedEndTick;
                     ObserveRegionalIncidentTaskCompletion(task, task.ExpectedEndTick);
                     ObserveRegionalCausalityTaskCompletion(task, task.ExpectedEndTick);
+                    ObserveAreaAccessTaskCompletion(task, task.ExpectedEndTick);
+                    ObserveHostedWorldTaskCompletion(task, task.ExpectedEndTick);
+                    ObserveCoopConstructionTaskCompletion(task, task.ExpectedEndTick);
                     foreach (var effect in effects.Values.Where(
                         value => value.CausedByTaskStableId == task.TaskStableId
                             && value.StateCode == SimulationEffectStateCodes.Pending))

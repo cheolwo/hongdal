@@ -100,6 +100,7 @@ namespace Ssalddel.Simulation.Domain
             else if (allocation.ChoiceCode == SimulationHarvestDispositionChoiceCodes.ReserveStorage)
                 ApplyReserveStorage(allocation);
 
+            ApplyNatureMindImpactForHarvestDisposition(allocation, appliedTick);
             allocation.StateCode = SimulationHarvestLotAllocationStateCodes.Applied;
             allocation.AppliedTick = appliedTick;
         }

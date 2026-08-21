@@ -163,6 +163,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         RunWork(session, "seedbed-collect", harvestLot.HarvestLotStableId,
             SimulationFarmSurvivalCodes.HarvestCollection,
             SimulationWorldInteractionSpatialSeedbedTestFixture.CollectionArea);
+        RunHubChoice(session, "seedbed");
         var packed = RunWork(session, "seedbed-pack", harvestLot.HarvestLotStableId,
             SimulationFarmSurvivalCodes.OutboundPacking,
             SimulationWorldInteractionSpatialSeedbedTestFixture.PackingArea);
@@ -345,8 +346,10 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         Assert.Equal(Simulation수확Lot상태Codes.CollectedAtYard,
             Assert.Single(collected.FarmSurvival!.HarvestLots).StateCode);
 
+        var choiceApplied = RunHubChoice(session, "wi-farm");
         var packingConfirmed = session.ConfirmFarmWork(Confirm(
-            "command:wi-farm:pack", collected.Revision, harvestLot.HarvestLotStableId,
+            "command:wi-farm:pack", choiceApplied.Revision,
+            harvestLot.HarvestLotStableId,
             SimulationFarmSurvivalCodes.OutboundPacking,
             PyeongchangSimulation공간StableIds.대관령Farm포장공간));
         var packed = session.Advance(Tick("command:wi-farm:pack:tick",
@@ -381,6 +384,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         RunWork(session, "chain-collect", harvestLotId,
             SimulationFarmSurvivalCodes.HarvestCollection,
             PyeongchangSimulation공간StableIds.대관령Farm집하공간);
+        RunHubChoice(session, "chain");
         var packed = RunWork(session, "chain-pack", harvestLotId,
             SimulationFarmSurvivalCodes.OutboundPacking,
             PyeongchangSimulation공간StableIds.대관령Farm포장공간);
@@ -625,6 +629,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         current = await RunFarmWork(client, current, "http-collect", harvestLotId,
             SimulationFarmSurvivalCodes.HarvestCollection,
             PyeongchangSimulation공간StableIds.대관령Farm집하공간);
+        current = await RunHubChoiceHttp(client, current, "http");
         current = await RunFarmWork(client, current, "http-pack", harvestLotId,
             SimulationFarmSurvivalCodes.OutboundPacking,
             PyeongchangSimulation공간StableIds.대관령Farm포장공간);
@@ -830,6 +835,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         RunWork(session, "save-collect", harvestLotId,
             SimulationFarmSurvivalCodes.HarvestCollection,
             PyeongchangSimulation공간StableIds.대관령Farm집하공간);
+        RunHubChoice(session, "save");
         var completed = RunWork(session, "save-pack", harvestLotId,
             SimulationFarmSurvivalCodes.OutboundPacking,
             PyeongchangSimulation공간StableIds.대관령Farm포장공간);
@@ -864,6 +870,32 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             actionCode, spatialStableId));
         return session.Advance(Tick("command:wi-farm:" + commandSuffix + ":tick",
             confirmed.WorldRevision));
+    }
+
+    private static 경영SimulationSessionSnapshot RunHubChoice(
+        경영SimulationSessionAggregate session,
+        string commandSuffix)
+    {
+        var context = session.GetFarmChoiceContext();
+        Assert.Equal(SimulationFarmChoicePlayableCodes.AwaitingChoice,
+            context.SituationStateCode);
+        var preview = session.PreviewFarmChoice(new SimulationFarmChoicePreviewRequest
+        {
+            ExpectedRevision = context.WorldRevision,
+            ChoiceStableId = SimulationFarmChoicePlayableCodes.HubShipmentChoice,
+        });
+        var confirmed = session.ConfirmFarmChoice(new SimulationFarmChoiceConfirmRequest
+        {
+            CommandId = "command:wi-farm:choice:" + commandSuffix,
+            ExpectedRevision = preview.BaseRevision,
+            ChoiceStableId = preview.ChoiceStableId,
+        });
+        return session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:wi-farm:choice:" + commandSuffix + ":tick",
+            ExpectedRevision = confirmed.Revision,
+            TickCount = preview.Impact.DurationTicks,
+        });
     }
 
     private static 경영SimulationSessionSnapshot AdvanceTicks(
@@ -902,6 +934,35 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             $"/api/simulation/v1/sessions/{current.SessionStableId}");
         return await TickHttp(client, current,
             "command:wi-http:" + commandSuffix + ":tick", 1);
+    }
+
+    private static async System.Threading.Tasks.Task<경영SimulationSessionSnapshot>
+        RunHubChoiceHttp(
+            HttpClient client,
+            경영SimulationSessionSnapshot current,
+            string commandSuffix)
+    {
+        var route = $"/api/simulation/v1/sessions/{current.SessionStableId}";
+        var context = await Get<SimulationFarmChoiceContextSnapshot>(client,
+            route + "/farm-choice-context");
+        var preview = await Post<SimulationFarmChoicePreviewSnapshot>(client,
+            route + "/farm-choice-previews",
+            new SimulationFarmChoicePreviewRequest
+            {
+                ExpectedRevision = context.WorldRevision,
+                ChoiceStableId = SimulationFarmChoicePlayableCodes.HubShipmentChoice,
+            });
+        current = await Post<경영SimulationSessionSnapshot>(client,
+            route + "/farm-choices/confirm",
+            new SimulationFarmChoiceConfirmRequest
+            {
+                CommandId = "command:wi-http:choice:" + commandSuffix,
+                ExpectedRevision = preview.BaseRevision,
+                ChoiceStableId = preview.ChoiceStableId,
+            });
+        return await TickHttp(client, current,
+            "command:wi-http:choice:" + commandSuffix + ":tick",
+            preview.Impact.DurationTicks);
     }
 
     private static async System.Threading.Tasks.Task<경영SimulationSessionSnapshot> TickHttp(

@@ -16,6 +16,8 @@ namespace Ssalddel.Simulation.Domain
                 var decisionRequest = BuildNaturePartyRecoveryDecision(request, context,
                     includeExpectedRevisionBlock: true);
                 var preview = CreateDecisionPreview(decisionRequest);
+                var period = natureMindCreationState == null ? null
+                    : ResolveNaturePeriodForActor(request.ActorStableId.Trim());
                 return new SimulationNaturePartyRecoveryPreviewSnapshot
                 {
                     SessionStableId = SessionStableId,
@@ -23,6 +25,12 @@ namespace Ssalddel.Simulation.Domain
                     HasRetreatPredecessor = context.RetreatEffects.Length > 0,
                     HasRestorationPredecessor = context.RestorationEffects.Length > 0,
                     NextPlayerActionCode = "Explore",
+                    PlayerStableId = period?.PlayerStableId ?? string.Empty,
+                    NaturePeriodStateCode = period?.PeriodStateCode
+                        ?? SimulationNaturePeriodCodes.OrdinaryPeriod,
+                    BaseDurationTicks = natureMindCreationState == null ? 1
+                        : 2,
+                    EffectiveDurationTicks = preview.TaskPlan.DurationTicks,
                     DecisionPreview = preview,
                     CanConfirm = preview.Decision.BlockReasonCodes.Length == 0,
                     BlockingReasonCodes = preview.Decision.BlockReasonCodes.ToArray(),
@@ -131,7 +139,8 @@ namespace Ssalddel.Simulation.Domain
                     PreferredSpatialStableId = request.PreferredSpatialStableId.Trim(),
                     AssignedCapacity = 1m,
                     AssignedCapacityUnitCode = "party",
-                    DurationTicks = 1,
+                    DurationTicks = ResolveNaturePeriodRecoveryWorkDuration(
+                        request.ActorStableId.Trim()),
                     InputLotStableIds = new[] { routeStableId },
                     OutputCandidateCodes = new[]
                     {

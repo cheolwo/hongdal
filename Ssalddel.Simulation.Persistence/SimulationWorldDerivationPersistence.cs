@@ -63,6 +63,8 @@ public sealed class SimulationWorld파생DbContext(
     public DbSet<SimulationWorld경관Graph관계Entity> LandscapeGraphRelations => Set<SimulationWorld경관Graph관계Entity>();
     public DbSet<SimulationWorld상호작용Graph준비도Entity> WorldInteractionGraphReadiness =>
         Set<SimulationWorld상호작용Graph준비도Entity>();
+    public DbSet<SimulationFarmRealityEvidenceEntity> FarmRealityEvidence =>
+        Set<SimulationFarmRealityEvidenceEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -118,6 +120,7 @@ public sealed class SimulationWorld파생DbContext(
         modelBuilder.ApplyConfiguration(new SimulationWorld경관GraphTile참조Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorld경관Graph관계Configuration());
         modelBuilder.ApplyConfiguration(new SimulationWorld상호작용Graph준비도Configuration());
+        modelBuilder.ApplyConfiguration(new SimulationFarmRealityEvidenceConfiguration());
     }
 }
 
@@ -566,6 +569,11 @@ public static class SimulationWorldDerivationPersistenceRegistration
                 mysql.MigrationsHistoryTable("__EF마이그레이션이력_시뮬레이션월드파생");
             }));
         services.AddScoped<ISimulationWorld파생원장Store, SimulationWorld파생원장Store>();
+        services.AddScoped<ISimulationFarmRealityOperationalReader,
+            SimulationFarmRealityOperationalReader>();
+        services.AddScoped<ISimulationFarmRealityEvidenceStore,
+            SimulationFarmRealityEvidenceStore>();
+        services.AddScoped<SimulationFarmRealityEvidenceService>();
         services.AddScoped<ISimulationWorld지역ProjectionReader, SimulationWorld지역ProjectionReader>();
         services.AddScoped<ISimulationWorld지역표현요약Reader, SimulationWorld지역표현요약Reader>();
         services.AddScoped<ISimulationWorldTileArtifactReader, SimulationWorldTileArtifactReader>();

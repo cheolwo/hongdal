@@ -167,6 +167,10 @@ namespace Ssalddel.Simulation.Contracts
         public bool HasRetreatPredecessor { get; set; }
         public bool HasRestorationPredecessor { get; set; }
         public string NextPlayerActionCode { get; set; } = string.Empty;
+        public string PlayerStableId { get; set; } = string.Empty;
+        public string NaturePeriodStateCode { get; set; } = string.Empty;
+        public int BaseDurationTicks { get; set; }
+        public int EffectiveDurationTicks { get; set; }
         public SimulationDecisionPreviewSnapshot DecisionPreview { get; set; }
             = new SimulationDecisionPreviewSnapshot();
         public bool CanConfirm { get; set; }

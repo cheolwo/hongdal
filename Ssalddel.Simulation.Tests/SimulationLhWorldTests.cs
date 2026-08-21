@@ -197,7 +197,7 @@ public sealed class SimulationLhWorldTests
             ExpectedRevision = restored.Revision,
         });
 
-        Assert.Equal(SimulationSaveSchemaVersions.V3, saved.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V7, saved.SchemaVersion);
         Assert.NotNull(saved.LhWorld);
         Assert.Single(saved.LhWorld!.Deltas);
         Assert.Equal(saved.ReplayHash, replayed.ReplayHash);

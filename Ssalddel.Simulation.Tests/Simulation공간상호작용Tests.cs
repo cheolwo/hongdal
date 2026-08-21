@@ -166,7 +166,7 @@ public sealed class Simulation공간상호작용Tests
             SaveStableId = "save:sim:spatial-cancel",
             ExpectedRevision = cancelled.Revision,
         });
-        Assert.Equal(SimulationSaveSchemaVersions.V2, saved.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V7, saved.SchemaVersion);
         var restored = new 경영SimulationSessionService(
                 new InMemory경영SimulationSessionStore(), saveStore)
             .Restore(new SimulationSessionRestoreRequest { SaveStableId = saved.SaveStableId });

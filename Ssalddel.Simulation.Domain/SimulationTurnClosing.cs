@@ -7,7 +7,8 @@ namespace Ssalddel.Simulation.Domain
 {
     public sealed partial class 경영SimulationSessionAggregate
     {
-        private const string FoolCardStableId = "learning:hongik.fool.beginner-mind";
+        private const string FoolCardStableId =
+            SimulationTarotJourneyRootCodes.FoolCardStableId;
         private const string ChariotCardStableId = "learning:hongik.chariot.integrated-progress";
         internal const string TarotChariotCardStableId = "tarot:major.chariot";
         internal const string SeoulLivingCultureCardStableId =

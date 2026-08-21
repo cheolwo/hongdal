@@ -44,6 +44,12 @@ namespace Ssalddel.Unity.Cards
         public const string BlockExplained = "BlockExplained";
     }
 
+    public static class CardMetaLayerCodes
+    {
+        public const string JourneyRoot = "JourneyRoot";
+        public const string ActiveMajorArcana = "ActiveMajorArcana";
+    }
+
     public static class CardActionRouteCodes
     {
         public const string None = "None";
@@ -71,6 +77,7 @@ namespace Ssalddel.Unity.Cards
         public string Summary { get; set; } = string.Empty;
         public string FamilyCode { get; set; } = string.Empty;
         public string HierarchyTierCode { get; set; } = string.Empty;
+        public string MetaLayerCode { get; set; } = string.Empty;
         public string AuthorityCode { get; set; } = string.Empty;
         public string ActionRouteCode { get; set; } = CardActionRouteCodes.None;
         public string ApplicableControlModeCode { get; set; } = string.Empty;

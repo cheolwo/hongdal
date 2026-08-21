@@ -122,11 +122,20 @@ namespace Ssalddel.Simulation.Domain
                         FacilityDefinitionRevision = facility.FacilityDefinitionRevision,
                         FacilityDefinitionHashSha256 = facility.FacilityDefinitionHashSha256,
                         PlacementH1StableId = facility.PlacementH1StableId,
+                        SettlementFacilityTypeCode = facility.SettlementFacilityTypeCode,
+                        SettlementDistrictStableId = facility.SettlementDistrictStableId,
                         AccessConnectorStableIds = facility.AccessConnectorStableIds.ToArray(),
                         LifecycleCode = facility.LifecycleCode,
                         IntegrityCode = facility.IntegrityCode,
                         MaintenanceCode = facility.MaintenanceCode,
                         DefinedCapabilityCodes = facility.DefinedCapabilityCodes.ToArray(),
+                        DefinedCapacities = facility.DefinedCapacities.Select(capacity =>
+                            new SimulationRuntimeFacilityCapacitySnapshot
+                            {
+                                CapacityCode = capacity.CapacityCode,
+                                Quantity = capacity.Quantity,
+                                UnitCode = capacity.UnitCode,
+                            }).ToArray(),
                         EffectiveCapabilities = facility.EffectiveCapabilities.Select(capability =>
                             new SimulationEffectiveFacilityCapabilitySnapshot
                             {

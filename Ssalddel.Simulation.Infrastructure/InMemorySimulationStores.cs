@@ -24,12 +24,14 @@ namespace Ssalddel.Simulation.Infrastructure
         private readonly ConcurrentDictionary<string, 경영SimulationSessionAggregate> sessions =
             new ConcurrentDictionary<string, 경영SimulationSessionAggregate>(StringComparer.Ordinal);
 
-        public 경영SimulationSessionAggregate CreateOrGet(경영SimulationSession생성Request request)
+        public 경영SimulationSessionAggregate CreateOrGet(
+            경영SimulationSession생성Request request,
+            SimulationRealityContextSnapshot? frozenRealityContext = null)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            var candidate = new 경영SimulationSessionAggregate(request);
+            var candidate = new 경영SimulationSessionAggregate(request, frozenRealityContext);
             var session = sessions.GetOrAdd(candidate.SessionStableId, candidate);
-            session.EnsureSameCreationRequest(request);
+            session.EnsureSameCreationRequest(request, frozenRealityContext);
             return session;
         }
 

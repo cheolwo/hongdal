@@ -30,6 +30,8 @@ namespace Ssalddel.Simulation.Domain
                 Battles = source.Battles.Select(
                     SimulationBattleInstanceState.CloneSaveRecord).ToArray(),
                 LhWorld = CloneLhWorld(source.LhWorld),
+                RealityContext = source.RealityContext == null ? null
+                    : 경영SimulationSessionAggregate.CloneRealityContext(source.RealityContext),
             };
 
         public static SimulationLhWorldStateSnapshot? CloneLhWorld(
@@ -70,6 +72,7 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioDataRevision = source.ScenarioDataRevision,
                 ScenarioSeed = source.ScenarioSeed,
                 RuleRevision = source.RuleRevision,
+                RealityContextProfileStableId = source.RealityContextProfileStableId,
                 DurationTicks = source.DurationTicks,
                 WorldContext = new SimulationWorldContext생성Request
                 {
@@ -93,6 +96,8 @@ namespace Ssalddel.Simulation.Domain
                     .CloneTeamRoleCardInitialStateOrNull(source.TeamRoleCards),
                 IntegratedWorld = 경영SimulationSessionAggregate
                     .CloneIntegratedWorldInitialState(source.IntegratedWorld),
+                NatureMind = 경영SimulationSessionAggregate
+                    .CloneNatureMindInitialState(source.NatureMind),
             };
 
         public static SimulationCommandLogEntrySnapshot CloneCommand(

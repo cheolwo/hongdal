@@ -10,6 +10,8 @@ namespace Ssalddel.Simulation.Domain
 {
     public sealed partial class 경영SimulationSessionAggregate
     {
+        private const string TarotJourneyRootRuleRevision =
+            "tarot-journey-root.r1";
         private const string TarotFrameRuleRevision = "tarot-context-frame.r1";
         private const string TarotProposalRuleRevision = "tarot-context-proposal.r1";
         private const string TarotRelationRuleRevision = "tarot-card-relation.r1";
@@ -48,6 +50,9 @@ namespace Ssalddel.Simulation.Domain
                 CardCopyStableId = selected.CardCopyStableId,
                 CardRevision = selected.CardRevision,
                 OrientationCode = selected.OrientationCode,
+                ParentJourneyFrameStableId =
+                    SimulationTarotJourneyRootCodes.FoolFrameStableId,
+                MetaLayerCode = SimulationTarotMetaLayerCodes.ActiveMajorArcana,
                 FrameScopeCode = SimulationTarotFrameScopeCodes.Turn,
                 ScopeTargetStableId = SessionStableId,
                 StartsAtTurnNumber = CurrentTick + 1,
@@ -76,6 +81,7 @@ namespace Ssalddel.Simulation.Domain
                 Revision = nextFrameSetRevision,
                 SourceWorldRevision = Revision,
                 SourceTurnNumber = CurrentTick + 1,
+                JourneyRoot = BuildFoolJourneyRoot(),
                 ActiveFrames = new[] { frame },
             };
             frameSet.FrameSetHashSha256 = Hash(CanonicalFrameSet(frameSet));
@@ -250,6 +256,7 @@ namespace Ssalddel.Simulation.Domain
                     SourceWorldRevision = source.FrameSet.SourceWorldRevision,
                     SourceTurnNumber = source.FrameSet.SourceTurnNumber,
                     FrameSetHashSha256 = source.FrameSet.FrameSetHashSha256,
+                    JourneyRoot = CloneJourneyRoot(source.FrameSet.JourneyRoot),
                     ActiveFrames = source.FrameSet.ActiveFrames.Select(value => new
                         SimulationTarotFrameSnapshot
                     {
@@ -258,6 +265,9 @@ namespace Ssalddel.Simulation.Domain
                         CardCopyStableId = value.CardCopyStableId,
                         CardRevision = value.CardRevision,
                         OrientationCode = value.OrientationCode,
+                        ParentJourneyFrameStableId =
+                            value.ParentJourneyFrameStableId,
+                        MetaLayerCode = value.MetaLayerCode,
                         FrameScopeCode = value.FrameScopeCode,
                         ScopeTargetStableId = value.ScopeTargetStableId,
                         StartsAtTurnNumber = value.StartsAtTurnNumber,
@@ -323,6 +333,7 @@ namespace Ssalddel.Simulation.Domain
                 Revision = revision,
                 SourceWorldRevision = worldRevision,
                 SourceTurnNumber = turnNumber,
+                JourneyRoot = BuildFoolJourneyRoot(),
                 ActiveFrames = Array.Empty<SimulationTarotFrameSnapshot>(),
             };
             frameSet.FrameSetHashSha256 = Hash(CanonicalFrameSet(frameSet));
@@ -334,11 +345,74 @@ namespace Ssalddel.Simulation.Domain
             return state;
         }
 
-        private static string CanonicalFrameSet(SimulationTarotFrameSetSnapshot value)
+        private static SimulationTarotJourneyRootSnapshot BuildFoolJourneyRoot()
+            => new()
+            {
+                FrameStableId = SimulationTarotJourneyRootCodes.FoolFrameStableId,
+                CardStableId = SimulationTarotJourneyRootCodes.FoolCardStableId,
+                CardRevision = "evening-hakdang.fixture-r1",
+                Title = "0. 바보 · 여정의 시작",
+                Summary = "모름을 인정하고 가능성을 열어 둔 채 아르카나의 변화를 지나간다.",
+                TraditionalArcanaNumber =
+                    SimulationTarotJourneyRootCodes.TraditionalArcanaNumber,
+                JourneySequenceOrder =
+                    SimulationTarotJourneyRootCodes.JourneySequenceOrder,
+                HierarchyTierCode = SimulationCardHierarchyTierCodes.Meta,
+                MetaLayerCode = SimulationTarotMetaLayerCodes.JourneyRoot,
+                IsAlwaysActive = true,
+                ThemeCodes = new[]
+                {
+                    SimulationTarotThemeCodes.Beginning,
+                    SimulationTarotThemeCodes.Possibility,
+                    SimulationTarotThemeCodes.Unknown,
+                    SimulationTarotThemeCodes.Cycle,
+                },
+                RuleRevision = TarotJourneyRootRuleRevision,
+                SourceStableId = "source:hongik-hakdang.fool.beginner-mind",
+            };
+
+        private static SimulationTarotJourneyRootSnapshot CloneJourneyRoot(
+            SimulationTarotJourneyRootSnapshot? source)
+        {
+            if (source == null || string.IsNullOrWhiteSpace(source.CardStableId))
+                return BuildFoolJourneyRoot();
+            return new SimulationTarotJourneyRootSnapshot
+            {
+                FrameStableId = source.FrameStableId,
+                CardStableId = source.CardStableId,
+                CardRevision = source.CardRevision,
+                Title = source.Title,
+                Summary = source.Summary,
+                TraditionalArcanaNumber = source.TraditionalArcanaNumber,
+                JourneySequenceOrder = source.JourneySequenceOrder,
+                HierarchyTierCode = source.HierarchyTierCode,
+                MetaLayerCode = source.MetaLayerCode,
+                IsAlwaysActive = source.IsAlwaysActive,
+                ThemeCodes = source.ThemeCodes.ToArray(),
+                RuleRevision = source.RuleRevision,
+                SourceStableId = source.SourceStableId,
+            };
+        }
+
+        private static string CanonicalFrameSet(
+            SimulationTarotFrameSetSnapshot value,
+            bool includeJourneyRoot = true)
         {
             var target = new StringBuilder();
             Add(target, value.Revision); Add(target, value.SourceWorldRevision);
             Add(target, value.SourceTurnNumber);
+            if (includeJourneyRoot)
+            {
+                var root = CloneJourneyRoot(value.JourneyRoot);
+                Add(target, root.FrameStableId); Add(target, root.CardStableId);
+                Add(target, root.CardRevision); Add(target, root.Title);
+                Add(target, root.Summary); Add(target, root.TraditionalArcanaNumber);
+                Add(target, root.JourneySequenceOrder); Add(target, root.HierarchyTierCode);
+                Add(target, root.MetaLayerCode); Add(target, root.IsAlwaysActive);
+                foreach (var theme in root.ThemeCodes.OrderBy(item => item,
+                             StringComparer.Ordinal)) Add(target, theme);
+                Add(target, root.RuleRevision); Add(target, root.SourceStableId);
+            }
             foreach (var frame in value.ActiveFrames.OrderBy(item => item.FrameScopeCode,
                          StringComparer.Ordinal).ThenBy(item => item.ScopeTargetStableId,
                          StringComparer.Ordinal).ThenBy(item => item.FrameStableId,
@@ -346,7 +420,13 @@ namespace Ssalddel.Simulation.Domain
             {
                 Add(target, frame.FrameStableId); Add(target, frame.CardStableId);
                 Add(target, frame.CardCopyStableId); Add(target, frame.CardRevision);
-                Add(target, frame.OrientationCode); Add(target, frame.FrameScopeCode);
+                Add(target, frame.OrientationCode);
+                if (includeJourneyRoot)
+                {
+                    Add(target, frame.ParentJourneyFrameStableId);
+                    Add(target, frame.MetaLayerCode);
+                }
+                Add(target, frame.FrameScopeCode);
                 Add(target, frame.ScopeTargetStableId); Add(target, frame.StartsAtTurnNumber);
                 Add(target, frame.EndsAtTurnNumber);
                 foreach (var theme in frame.ThemeCodes.OrderBy(item => item,
@@ -360,9 +440,11 @@ namespace Ssalddel.Simulation.Domain
         }
 
         private static string CanonicalTarotContext(
-            SimulationTarotContextStateSnapshot value)
+            SimulationTarotContextStateSnapshot value,
+            bool includeJourneyRoot = true)
         {
-            var target = new StringBuilder(CanonicalFrameSet(value.FrameSet));
+            var target = new StringBuilder(CanonicalFrameSet(
+                value.FrameSet, includeJourneyRoot));
             foreach (var proposal in value.Proposals.OrderBy(item => item.ProposalStableId,
                          StringComparer.Ordinal))
             {
@@ -402,6 +484,14 @@ namespace Ssalddel.Simulation.Domain
         internal static string BuildTarotContextStatePayloadKey(
             SimulationTarotContextStateSnapshot value)
             => CanonicalTarotContext(value);
+
+        internal static string BuildLegacyTarotContextStatePayloadKey(
+            SimulationTarotContextStateSnapshot value)
+            => CanonicalTarotContext(value, false);
+
+        internal static string BuildLegacyTarotContextStateHash(
+            SimulationTarotContextStateSnapshot value)
+            => Hash(CanonicalTarotContext(value, false));
 
         private static void Add(StringBuilder target, object? value)
         {

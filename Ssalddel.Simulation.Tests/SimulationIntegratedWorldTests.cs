@@ -203,7 +203,7 @@ public sealed class SimulationIntegratedWorldTests
             SaveStableId = "save:h5-integrated-world",
             ExpectedRevision = session.Revision,
         });
-        Assert.Equal(SimulationSaveSchemaVersions.V6, save.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V7, save.SchemaVersion);
         var replayed = SimulationSessionReplay.Restore(save).Snapshot();
         Assert.Equal(session.Revision, replayed.Revision);
         Assert.Equal(restored.Facilities.Select(value =>

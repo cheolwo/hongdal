@@ -15,17 +15,21 @@ namespace Ssalddel.Simulation.Application
         private readonly SimulationWorld상호작용NetworkService interactionNetwork;
         private readonly SimulationWorldLayoutService worldLayouts;
         private readonly 경영SimulationSession생명주기Service sessions;
+        private readonly SimulationRealityContextService realityContexts;
 
         public SimulationActualE5SessionCreationService(
             SimulationWorld상호작용NetworkService interactionNetwork,
             SimulationWorldLayoutService worldLayouts,
-            경영SimulationSession생명주기Service sessions)
+            경영SimulationSession생명주기Service sessions,
+            SimulationRealityContextService realityContexts)
         {
             this.interactionNetwork = interactionNetwork
                 ?? throw new ArgumentNullException(nameof(interactionNetwork));
             this.worldLayouts = worldLayouts
                 ?? throw new ArgumentNullException(nameof(worldLayouts));
             this.sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
+            this.realityContexts = realityContexts
+                ?? throw new ArgumentNullException(nameof(realityContexts));
         }
 
         public async Task<SimulationActualE5SessionCreateResponse> CreateAsync(
@@ -66,7 +70,15 @@ namespace Ssalddel.Simulation.Application
                 request.AreaSetStableId,
                 wiIds,
                 cancellationToken).ConfigureAwait(false);
-            var snapshot = sessions.Create(request.Session);
+            SimulationRealityContextSnapshot? realityContext = null;
+            if (!string.IsNullOrWhiteSpace(request.Session.RealityContextProfileStableId))
+            {
+                realityContext = realityContexts.FreezeForSession(
+                    request.Session.RealityContextProfileStableId,
+                    request.AreaSetStableId,
+                    request.Session.ClientRequestId);
+            }
+            var snapshot = sessions.Create(request.Session, realityContext);
 
             return new SimulationActualE5SessionCreateResponse
             {
@@ -76,6 +88,10 @@ namespace Ssalddel.Simulation.Application
                 WorldLayoutRevision = layout.WorldLayoutRevision,
                 WorldLayoutHashSha256 = layout.WorldLayoutHashSha256,
                 WorldInteractionIds = wiIds,
+                RealityContextSnapshotStableId = realityContext?.ContextSnapshotStableId
+                    ?? string.Empty,
+                RealityContextAvailabilityCode = realityContext?.AvailabilityCode
+                    ?? SimulationRealityContextCodes.Unavailable,
                 Session = snapshot,
             };
         }

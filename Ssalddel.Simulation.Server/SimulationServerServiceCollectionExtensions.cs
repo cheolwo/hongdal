@@ -85,6 +85,11 @@ public static class SimulationServerServiceCollectionExtensions
             DisabledSimulationWorldAreaSetGraphStore>();
         services.AddSingleton<ISimulationWorld상호작용GraphReadinessStore,
             DisabledSimulationWorld상호작용GraphReadinessStore>();
+        services.AddSingleton<ISimulationFarmRealityOperationalReader,
+            DisabledSimulationFarmRealityOperationalReader>();
+        services.AddSingleton<ISimulationFarmRealityEvidenceStore,
+            DisabledSimulationFarmRealityEvidenceStore>();
+        services.AddScoped<SimulationFarmRealityEvidenceService>();
         if (derivationOptions.Enabled)
         {
             var connectionString = configuration.GetConnectionString(
@@ -96,6 +101,9 @@ public static class SimulationServerServiceCollectionExtensions
                 connectionString,
                 derivationOptions.LandscapeGrammarManifestPath,
                 derivationOptions.AreaSetDefinitionPath);
+            if (!sharedOptions.Enabled)
+                services.AddSingleton<ISimulationFarmRealityOperationalReader,
+                    DisabledSimulationFarmRealityOperationalReader>();
             if (sharedOptions.Enabled)
                 services.Add평창군공간파생Pipeline();
         }
@@ -122,6 +130,16 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<경영SimulationSessionService>();
         services.AddSingleton<경영SimulationSessionAccessor>();
         services.AddSingleton<경영SimulationSession생명주기Service>();
+        services.AddSingleton<경영SimulationWorldGameplayService>();
+        services.AddSingleton<ISimulationRealityContextClock,
+            SystemSimulationRealityContextClock>();
+        var fileRealityContextReader = new FileSimulationRealityContextCatalogReader(
+            derivationOptions.RealityContextCatalogPath);
+        services.AddSingleton<ISimulationRealityContextCatalogReader>(provider =>
+            new SimulationFarmRealityContextCatalogReader(
+                provider.GetRequiredService<IServiceScopeFactory>(),
+                fileRealityContextReader));
+        services.AddSingleton<SimulationRealityContextService>();
         services.AddSingleton<경영Simulation통합생활세계Service>();
         services.AddSingleton<ISimulationBattleRuntimeProjectionProvider,
             SimulationBattleRuntimeProjectionProvider>();

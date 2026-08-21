@@ -14,20 +14,108 @@ namespace Ssalddel.Simulation.Domain
         {
             var canonical = new StringBuilder();
             Add(canonical, package.SchemaVersion);
-            AddCreateRequest(canonical, package.SessionCreateRequest);
-            AddSnapshot(canonical, package.Snapshot);
+            var includesRealityContext = string.Equals(package.SchemaVersion,
+                SimulationSaveSchemaVersions.V8, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V9, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V10, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V11, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V12, StringComparison.Ordinal);
+            AddCreateRequest(canonical, package.SessionCreateRequest,
+                includesRealityContext);
+            var includesTarotJourneyRoot = string.Equals(package.SchemaVersion,
+                SimulationSaveSchemaVersions.V7, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V8, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V9, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V10, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V11, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V12, StringComparison.Ordinal);
+            AddSnapshot(canonical, package.Snapshot, includesTarotJourneyRoot);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V7,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
                     StringComparison.Ordinal))
                 AddRegionalCausality(canonical, package.Snapshot.RegionalCausality);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
-                    StringComparison.Ordinal))
+                    StringComparison.Ordinal)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V7,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null)
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                        StringComparison.Ordinal)
+                    && package.SessionCreateRequest.IntegratedWorld != null))
             {
                 AddIntegratedWorldInitialState(canonical,
                     package.SessionCreateRequest.IntegratedWorld!);
                 AddIntegratedWorldSnapshot(canonical, package.Snapshot.IntegratedWorld);
             }
+            if ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V8,
+                     StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                     StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                     StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                     StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                     StringComparison.Ordinal)) && package.RealityContext != null)
+                AddRealityContext(canonical, package.RealityContext);
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                    StringComparison.Ordinal))
+                AddNatureMind(canonical, package.Snapshot.NatureMind);
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                    StringComparison.Ordinal))
+                AddAreaAccess(canonical, package.Snapshot.AreaAccess);
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
+                    StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                    StringComparison.Ordinal))
+                AddHostedWorld(canonical, package.Snapshot.HostedWorld);
+            if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
+                    StringComparison.Ordinal))
+                AddCoopConstruction(canonical, package.Snapshot.CoopConstruction);
             if (package.SessionCreateRequest.WorldInventory != null)
                 AddWorldInventory(canonical, package.WorldInventory);
             if (package.SessionCreateRequest.SurvivalTarot != null)
@@ -312,13 +400,16 @@ namespace Ssalddel.Simulation.Domain
 
         private static void AddCreateRequest(
             StringBuilder target,
-            경영SimulationSession생성Request request)
+            경영SimulationSession생성Request request,
+            bool includesRealityContext)
         {
             Add(target, request.ClientRequestId.ToString("N"));
             Add(target, request.ScenarioStableId);
             Add(target, request.ScenarioDataRevision);
             Add(target, request.ScenarioSeed);
             Add(target, request.RuleRevision);
+            if (includesRealityContext)
+                Add(target, request.RealityContextProfileStableId);
             Add(target, request.DurationTicks);
             Add(target, request.WorldContext.FactionStableId);
             Add(target, request.WorldContext.TerritoryStableId);
@@ -342,6 +433,307 @@ namespace Ssalddel.Simulation.Domain
             if (request.TeamRoleCards != null)
                 Add(target, 경영SimulationSessionAggregate.BuildTeamRoleCardPayloadKey(
                     request.TeamRoleCards));
+            if (request.NatureMind != null)
+                Add(target, 경영SimulationSessionAggregate.BuildNatureMindInitialPayloadKey(
+                    request.NatureMind));
+        }
+
+        private static void AddNatureMind(StringBuilder target,
+            SimulationNatureMindStateSnapshot value)
+        {
+            Add(target, "NatureMindExtensionV1");
+            Add(target, value.RuleRevision);
+            Add(target, value.Balances.Length);
+            foreach (var balance in value.Balances.OrderBy(item =>
+                         item.PlayerStableId, StringComparer.Ordinal))
+            {
+                Add(target, balance.PlayerStableId);
+                Add(target, balance.RecoveryOutput);
+                Add(target, balance.ThreatOutput);
+                Add(target, balance.RecoveryShare);
+                Add(target, balance.ThreatShare);
+                Add(target, balance.InterpretationStrength);
+                Add(target, balance.InterpretationBandCode);
+                Add(target, balance.Revision);
+                Add(target, balance.BalanceHashSha256);
+            }
+            Add(target, value.Effects.Length);
+            foreach (var effect in value.Effects.OrderBy(item =>
+                         item.EffectStableId, StringComparer.Ordinal))
+            {
+                Add(target, effect.EffectStableId);
+                Add(target, effect.PlayerStableId);
+                Add(target, effect.SourceCode);
+                Add(target, effect.SourceStableId);
+                Add(target, effect.AxisCode);
+                Add(target, effect.Magnitude);
+                Add(target, effect.AppliedWorldTick);
+                Add(target, effect.RuleRevision);
+            }
+            Add(target, value.Periods.Length);
+            foreach (var period in value.Periods.OrderBy(item =>
+                         item.PlayerStableId, StringComparer.Ordinal))
+            {
+                Add(target, period.PlayerStableId);
+                Add(target, period.PeriodStateCode);
+                Add(target, period.PeriodInstanceStableId);
+                Add(target, period.SourceBalanceRevision);
+                Add(target, period.SourceBalanceHashSha256);
+                Add(target, period.EnteredAtWorldTick);
+                Add(target, period.EnterReasonCode);
+                Add(target, period.ExitThresholdPolicyRevision);
+                Add(target, period.Revision);
+                Add(target, period.PeriodStateHashSha256);
+                Add(target, period.BaseRecoveryWorkDurationTicks);
+                Add(target, period.EffectiveRecoveryWorkDurationTicks);
+                Add(target, period.WorkDurationModifierTicks);
+                AddStrings(target, period.CandidateStableIds);
+            }
+            Add(target, value.PeriodHistory.Length);
+            foreach (var history in value.PeriodHistory.OrderBy(item =>
+                         item.PeriodInstanceStableId, StringComparer.Ordinal))
+            {
+                Add(target, history.PlayerStableId);
+                Add(target, history.PeriodInstanceStableId);
+                Add(target, history.StateCode);
+                Add(target, history.EnterTick);
+                Add(target, history.ExitTick?.ToString(
+                    CultureInfo.InvariantCulture) ?? string.Empty);
+                AddStrings(target, history.MajorOutcomeRefs);
+            }
+            Add(target, value.PeriodTransitionEffects.Length);
+            foreach (var effect in value.PeriodTransitionEffects.OrderBy(item =>
+                         item.EffectStableId, StringComparer.Ordinal))
+            {
+                Add(target, effect.EffectStableId);
+                Add(target, effect.EffectTypeCode);
+                Add(target, effect.PlayerStableId);
+                Add(target, effect.PeriodInstanceStableId);
+                Add(target, effect.StateCode);
+                Add(target, effect.AppliedWorldTick);
+                Add(target, effect.SourceBalanceHashSha256);
+            }
+        }
+
+        private static void AddAreaAccess(StringBuilder target,
+            SimulationPlayerAreaAccessStateSnapshot value)
+        {
+            Add(target, "PlayerAreaAccessExtensionV1");
+            Add(target, value.RuleRevision);
+            Add(target, value.WorldRevision);
+            Add(target, value.WorldTick);
+            Add(target, value.CurrentAreaSetStableId);
+            Add(target, value.MutatesStaticHDefinitions);
+            Add(target, value.AccessEntries.Length);
+            foreach (var entry in value.AccessEntries.OrderBy(item =>
+                         item.AreaSetStableId, StringComparer.Ordinal))
+            {
+                Add(target, entry.PlayerStableId);
+                Add(target, entry.AreaSetStableId);
+                Add(target, entry.AccessLevelCode);
+                Add(target, entry.AccessStateCode);
+                AddStrings(target, entry.GrantedByEvidenceIds);
+                Add(target, entry.GrantedAtWorldRevision);
+                Add(target, entry.RevocationPolicyCode);
+                Add(target, entry.SourceHDefinitionHashSha256);
+                AddStrings(target, entry.AvailableWorldInteractionIds);
+                Add(target, entry.Revision);
+                Add(target, entry.AccessHashSha256);
+            }
+        }
+
+        private static void AddHostedWorld(StringBuilder target,
+            SimulationHostedWorldStateSnapshot value)
+        {
+            Add(target, "HostedWorldExtensionV1");
+            Add(target, value.WorldRevision);
+            Add(target, value.WorldTick);
+            Add(target, value.HostedSessionStableId);
+            Add(target, value.WorldStableId);
+            Add(target, value.OwnerPlayerStableId);
+            Add(target, value.SessionModeCode);
+            Add(target, value.JoinPolicyCode);
+            Add(target, value.DefaultGuestPermissionProfileCode);
+            Add(target, value.Participants.Length);
+            foreach (var participant in value.Participants.OrderBy(item =>
+                         item.PlayerStableId, StringComparer.Ordinal))
+            {
+                Add(target, participant.PlayerStableId);
+                Add(target, participant.ParticipantStateCode);
+                Add(target, participant.CurrentAreaSetStableId);
+                Add(target, participant.JoinedAtWorldRevision);
+            }
+            Add(target, value.PermissionGrants.Length);
+            foreach (var grant in value.PermissionGrants.OrderBy(item =>
+                         item.TargetPlayerStableId, StringComparer.Ordinal).ThenBy(item =>
+                         item.ScopeStableId, StringComparer.Ordinal).ThenBy(item =>
+                         item.CapabilityCode, StringComparer.Ordinal))
+            {
+                Add(target, grant.TargetPlayerStableId);
+                Add(target, grant.ScopeStableId);
+                Add(target, grant.CapabilityCode);
+                Add(target, grant.GrantStateCode);
+                Add(target, grant.ActionRiskPolicyCode);
+                Add(target, grant.GrantedByPlayerStableId);
+                Add(target, grant.Revision);
+                Add(target, grant.GrantHashSha256);
+            }
+            Add(target, value.AuditTrail.Length);
+            foreach (var audit in value.AuditTrail.OrderBy(item =>
+                         item.EffectStableId, StringComparer.Ordinal))
+            {
+                Add(target, audit.EffectStableId);
+                Add(target, audit.EffectTypeCode);
+                Add(target, audit.ChangedByPlayerStableId);
+                Add(target, audit.TargetPlayerStableId);
+                Add(target, audit.ScopeStableId);
+                Add(target, audit.CapabilityCode);
+                Add(target, audit.AppliedWorldTick);
+            }
+            Add(target, value.PermissionRevision);
+            Add(target, value.CreatedAtWorldRevision);
+            Add(target, value.HostLossBlocksMutation);
+            Add(target, value.EscPausesWorld);
+            Add(target, value.SessionHashSha256);
+            Add(target, value.SimulationOnly);
+            Add(target, value.IsOperationalState);
+        }
+
+        private static void AddCoopConstruction(StringBuilder target,
+            SimulationCoopConstructionStateSnapshot value)
+        {
+            Add(target, "CoopConstructionExtensionV1");
+            Add(target, value.RuleRevision);
+            Add(target, value.ProtectionRuleRevision);
+            Add(target, value.WorldRevision);
+            Add(target, value.WorldTick);
+            Add(target, value.Projects.Length);
+            foreach (var project in value.Projects.OrderBy(item =>
+                         item.ProjectStableId, StringComparer.Ordinal))
+            {
+                Add(target, project.ProjectStableId);
+                Add(target, project.BlueprintStableId);
+                Add(target, project.BuildSiteH1StableId);
+                Add(target, project.TargetFacilityStableId);
+                Add(target, project.StageCode);
+                Add(target, project.RequiredMaterialQuantity);
+                Add(target, project.ContributedMaterialQuantity);
+                Add(target, project.ProgressValue);
+                Add(target, project.UnitCode);
+                Add(target, project.Revision);
+                Add(target, project.CompletedWorldTick ?? -1);
+                AddStrings(target, project.OpenedCapabilityCodes);
+                AddStrings(target, project.OpenedWorldInteractionIds);
+                Add(target, project.ProjectHashSha256);
+            }
+            Add(target, value.Contributions.Length);
+            foreach (var contribution in value.Contributions.OrderBy(item =>
+                         item.ContributionStableId, StringComparer.Ordinal))
+            {
+                Add(target, contribution.ContributionStableId);
+                Add(target, contribution.ProjectStableId);
+                Add(target, contribution.PlayerStableId);
+                Add(target, contribution.SourceLotStableId);
+                Add(target, contribution.SourceLotRevisionBefore);
+                Add(target, contribution.MaterialQuantity);
+                Add(target, contribution.EffectiveWork);
+                Add(target, contribution.UnitCode);
+                Add(target, contribution.StateCode);
+                Add(target, contribution.AppliedWorldTick);
+            }
+            Add(target, value.SourceLots.Length);
+            foreach (var lot in value.SourceLots.OrderBy(item => item.LotStableId,
+                         StringComparer.Ordinal))
+            {
+                Add(target, lot.LotStableId);
+                Add(target, lot.Revision);
+                Add(target, lot.ReservedQuantity);
+                Add(target, lot.RemainingQuantity);
+                Add(target, lot.UnitCode);
+            }
+            Add(target, value.ProtectionCheckpoints.Length);
+            foreach (var checkpoint in value.ProtectionCheckpoints.OrderBy(item =>
+                         item.CheckpointStableId, StringComparer.Ordinal))
+            {
+                Add(target, checkpoint.CheckpointStableId);
+                Add(target, checkpoint.CheckpointKindCode);
+                Add(target, checkpoint.WorldStableId);
+                AddStrings(target, checkpoint.TargetStableIds);
+                Add(target, checkpoint.BeforeWorldRevision);
+                Add(target, checkpoint.SpatialStateHashSha256);
+                AddStrings(target, checkpoint.RelatedResourceRefs);
+                AddStrings(target, checkpoint.RelatedConnectorRefs);
+                Add(target, checkpoint.CreatedByActionRequestId);
+                Add(target, checkpoint.HistoricalEffectsDeleted);
+            }
+            Add(target, value.RestoreEffects.Length);
+            foreach (var effect in value.RestoreEffects.OrderBy(item =>
+                         item.EffectStableId, StringComparer.Ordinal))
+            {
+                Add(target, effect.EffectStableId);
+                Add(target, effect.CheckpointStableId);
+                Add(target, effect.TargetStableId);
+                Add(target, effect.EffectTypeCode);
+                Add(target, effect.AppliedWorldTick);
+                Add(target, effect.DeletesHistoricalEffects);
+                Add(target, effect.DuplicatesResources);
+            }
+            Add(target, value.UsesCompensatingEffects);
+            Add(target, value.MutatesStaticHDefinitions);
+            Add(target, value.StateHashSha256);
+            Add(target, value.SimulationOnly);
+            Add(target, value.IsOperationalState);
+        }
+
+        private static void AddRealityContext(StringBuilder target,
+            SimulationRealityContextSnapshot value)
+        {
+            Add(target, "RealityContextExtensionV1");
+            Add(target, value.SchemaVersion);
+            Add(target, value.ContextSnapshotStableId);
+            Add(target, value.ProfileStableId);
+            Add(target, value.ProfileRevision);
+            Add(target, value.SignalRuleRevision);
+            Add(target, value.AreaSetStableId);
+            Add(target, value.FrozenAtUtc.ToUniversalTime().ToString("O",
+                CultureInfo.InvariantCulture));
+            Add(target, value.AvailabilityCode);
+            Add(target, value.InputHashSha256);
+            Add(target, value.ChangesSimulationRules);
+            Add(target, value.MovesSpatialDefinitions);
+            Add(target, value.CreatesIncidentOrEffect);
+            Add(target, value.SourceEvidence.Length);
+            foreach (var source in value.SourceEvidence.OrderBy(item =>
+                         item.SourceEvidenceStableId, StringComparer.Ordinal))
+            {
+                Add(target, source.SourceEvidenceStableId);
+                Add(target, source.SourceName);
+                Add(target, source.DatasetCode);
+                Add(target, source.AvailabilityCode);
+                Add(target, source.QualityCode);
+                Add(target, source.FreshnessCode);
+                Add(target, source.ObservedAtUtc?.ToUniversalTime().ToString("O",
+                    CultureInfo.InvariantCulture) ?? string.Empty);
+                Add(target, source.RetrievedAtUtc?.ToUniversalTime().ToString("O",
+                    CultureInfo.InvariantCulture) ?? string.Empty);
+                Add(target, source.SpatialPrecisionCode);
+                AddStrings(target, source.UnitCodes);
+                Add(target, source.SourceHashSha256);
+                Add(target, source.LicenseCode);
+                Add(target, source.SourceHref);
+                AddStrings(target, source.LimitationCodes);
+            }
+            Add(target, value.SemanticSignals.Length);
+            foreach (var signal in value.SemanticSignals.OrderBy(item =>
+                         item.SignalStableId, StringComparer.Ordinal))
+            {
+                Add(target, signal.SignalStableId);
+                Add(target, signal.SignalCode);
+                Add(target, signal.SignalRuleRevision);
+                AddStrings(target, signal.H3StableIds);
+                AddStrings(target, signal.AdvisoryCodes);
+                AddStrings(target, signal.SourceEvidenceStableIds);
+            }
         }
 
         private static void AddWorldInventory(
@@ -534,7 +926,8 @@ namespace Ssalddel.Simulation.Domain
             AddStrings(target, value.SourceStableIds);
         }
 
-        private static void AddSnapshot(StringBuilder target, 경영SimulationSessionSnapshot value)
+        private static void AddSnapshot(StringBuilder target,
+            경영SimulationSessionSnapshot value, bool includesTarotJourneyRoot)
         {
             Add(target, value.SessionStableId);
             Add(target, value.ClientRequestId.ToString("N"));
@@ -645,14 +1038,24 @@ namespace Ssalddel.Simulation.Domain
                 }
             }
             if (value.TarotContext != null
-                && (value.TarotContext.FrameSet.ActiveFrames.Length > 0
+                && ((includesTarotJourneyRoot
+                        && !string.IsNullOrWhiteSpace(
+                            value.TarotContext.FrameSet.JourneyRoot.CardStableId))
+                    || value.TarotContext.FrameSet.ActiveFrames.Length > 0
                     || value.TarotContext.Proposals.Length > 0
                     || value.TarotContext.IncidentEvaluations.Length > 0))
             {
-                Add(target, "TarotContextExtensionV1");
-                Add(target, 경영SimulationSessionAggregate
-                    .BuildTarotContextStatePayloadKey(value.TarotContext));
-                Add(target, value.TarotContext.ContextStateHashSha256);
+                Add(target, includesTarotJourneyRoot
+                    ? "TarotContextExtensionV2" : "TarotContextExtensionV1");
+                Add(target, includesTarotJourneyRoot
+                    ? 경영SimulationSessionAggregate
+                        .BuildTarotContextStatePayloadKey(value.TarotContext)
+                    : 경영SimulationSessionAggregate
+                        .BuildLegacyTarotContextStatePayloadKey(value.TarotContext));
+                Add(target, includesTarotJourneyRoot
+                    ? value.TarotContext.ContextStateHashSha256
+                    : 경영SimulationSessionAggregate
+                        .BuildLegacyTarotContextStateHash(value.TarotContext));
             }
             AddNpcWorkforceSnapshot(target, value);
             AddSimulationSpatialSnapshot(target, value);

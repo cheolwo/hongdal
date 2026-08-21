@@ -125,6 +125,8 @@ namespace Ssalddel.Simulation.Domain
                 SourceStableId = sourceStableId,
                 NatureRouteCode = natureRouteCode,
             });
+            ApplyNatureMindImpactForRegionalCausality(changeStableId, sourceCode,
+                threatDelta, recoveryDelta, appliedWorldTick, sourceStableId);
         }
 
         private SimulationRegionalCausalityStateSnapshot CreateRegionalCausalitySnapshot()

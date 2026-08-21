@@ -52,4 +52,11 @@ public sealed class SimulationWorldDerivationDatabaseOptions
     /// </summary>
     public string AreaSetImmersionReadinessCatalogPath { get; set; } =
         "../eng/world-seedbeds/generated/area-set-immersion-readiness.v1.json";
+
+    /// <summary>
+    /// 승인된 현실 자료 상태 사본을 세션 시작 시 동결하기 위한 대장이다.
+    /// 원 Provider는 Tick이나 Unity 조회 중 호출하지 않는다.
+    /// </summary>
+    public string RealityContextCatalogPath { get; set; } =
+        "../eng/world-seedbeds/reality-context/farm-production.v1.json";
 }

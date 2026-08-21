@@ -35,13 +35,24 @@ namespace Ssalddel.Simulation.Domain
                 var lhWorld = request.LhWorldState ?? lhWorldState;
                 var package = new SimulationSessionSavePackage
                 {
-                    SchemaVersion = integratedWorldCreationState != null
-                        ? SimulationSaveSchemaVersions.V6
+                    SchemaVersion = !regionalCausalitySchemaEnabled
+                        && (regionalIncidents.Count > 0
+                            || appliedRegionalIncidentResponseCommands.Count > 0)
+                        ? SimulationSaveSchemaVersions.V4
+                        : coopConstructionProjects.Count > 0
+                        ? SimulationSaveSchemaVersions.V12
+                        : string.Equals(hostedSessionModeCode,
+                        SimulationHostedWorldCodes.HostedMultiplayer,
+                        StringComparison.Ordinal)
+                        ? SimulationSaveSchemaVersions.V11
+                        : areaAccessConfigured
+                        ? SimulationSaveSchemaVersions.V10
+                        : natureMindCreationState != null
+                        ? SimulationSaveSchemaVersions.V9
+                        : realityContext != null
+                        ? SimulationSaveSchemaVersions.V8
                         : regionalCausalitySchemaEnabled
-                                    && (regionalIncidents.Count > 0
-                                        || appliedRegionalIncidentResponseCommands.Count > 0
-                                        || regionalCausalityRevision > 0)
-                        ? SimulationSaveSchemaVersions.V5
+                        ? SimulationSaveSchemaVersions.V7
                         : regionalIncidents.Count > 0
                           || appliedRegionalIncidentResponseCommands.Count > 0
                         ? SimulationSaveSchemaVersions.V4
@@ -61,6 +72,8 @@ namespace Ssalddel.Simulation.Domain
                     SurvivalTarot = CreateSurvivalTarotStateSnapshot(),
                     CommandLog = commandLog.Select(SimulationSaveReplayCloner.CloneCommand).ToArray(),
                     LhWorld = SimulationSaveReplayCloner.CloneLhWorld(lhWorld),
+                    RealityContext = realityContext == null ? null
+                        : CloneRealityContext(realityContext),
                 };
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
                 return SimulationSaveReplayCloner.ClonePackage(package);
@@ -328,6 +341,7 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioDataRevision = ScenarioDataRevision,
                 ScenarioSeed = ScenarioSeed,
                 RuleRevision = RuleRevision,
+                RealityContextProfileStableId = RealityContextProfileStableId,
                 DurationTicks = DurationTicks,
                 WorldContext = new SimulationWorldContext생성Request
                 {
@@ -346,6 +360,7 @@ namespace Ssalddel.Simulation.Domain
                     teamRoleCardCreationState),
                 IntegratedWorld = CloneIntegratedWorldInitialState(
                     integratedWorldCreationState),
+                NatureMind = CloneNatureMindInitialState(natureMindCreationState),
             };
 
         private static void ValidateSaveRequest(SimulationSessionSaveRequest request)

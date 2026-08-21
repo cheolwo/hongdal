@@ -9,6 +9,26 @@ namespace Ssalddel.Simulation.Server.Controllers;
 public sealed class 경영Simulation수확수출Controller(
     경영Simulation수확수출Service service) : ControllerBase
 {
+    [HttpGet("{sessionStableId}/farm-choice-context")]
+    [ProducesResponseType(typeof(SimulationFarmChoiceContextSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<SimulationFarmChoiceContextSnapshot> Farm선택Context(
+        string sessionStableId)
+        => Ok(service.GetFarmChoiceContext(sessionStableId));
+
+    [HttpPost("{sessionStableId}/farm-choice-previews")]
+    [ProducesResponseType(typeof(SimulationFarmChoicePreviewSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<SimulationFarmChoicePreviewSnapshot> Farm선택Preview(
+        string sessionStableId,
+        [FromBody] SimulationFarmChoicePreviewRequest request)
+        => Ok(service.PreviewFarmChoice(sessionStableId, request));
+
+    [HttpPost("{sessionStableId}/farm-choices/confirm")]
+    [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status200OK)]
+    public ActionResult<경영SimulationSessionSnapshot> Farm선택Confirm(
+        string sessionStableId,
+        [FromBody] SimulationFarmChoiceConfirmRequest request)
+        => Ok(service.ConfirmFarmChoice(sessionStableId, request));
+
     [HttpPost("{sessionStableId}/harvest-disposition-impact-previews")]
     [ProducesResponseType(typeof(SimulationHarvestDispositionImpactPreviewSnapshot), StatusCodes.Status200OK)]
     public ActionResult<SimulationHarvestDispositionImpactPreviewSnapshot> PreviewHarvestImpact(

@@ -17,7 +17,7 @@ public sealed class SimulationWorldActualE5SpatialTests
         Assert.Equal(PyeongchangAreaSetStableIds.ActualNetwork,
             catalog.Network.NetworkStableId);
         Assert.Equal(4, catalog.AreaSets.Count);
-        Assert.Equal(17, catalog.Graphs.Count);
+        Assert.Equal(19, catalog.Graphs.Count);
         Assert.Equal(8, catalog.Network.Relations.Length);
         Assert.Equal(3, catalog.Network.RouteGraphs.Length);
         Assert.All(catalog.AreaSets.Values, areaSet =>
@@ -50,7 +50,7 @@ public sealed class SimulationWorldActualE5SpatialTests
         Assert.Equal(30, result.DirectBindings.Length);
         Assert.Equal(5, result.ContextualBindings.Length);
         Assert.Equal(6, result.NonSpatialBindings.Length);
-        Assert.Equal(17, result.GraphAudits.Length);
+        Assert.Equal(19, result.GraphAudits.Length);
         Assert.All(result.DirectBindings, item =>
         {
             Assert.Equal(SimulationWorld상호작용Graph상태Codes.Ready,

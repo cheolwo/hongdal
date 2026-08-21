@@ -12,8 +12,9 @@ namespace Ssalddel.Simulation.Application
             => this.store = store ?? throw new ArgumentNullException(nameof(store));
 
         public 경영SimulationSessionAggregate CreateOrGet(
-            경영SimulationSession생성Request request)
-            => store.CreateOrGet(request);
+            경영SimulationSession생성Request request,
+            SimulationRealityContextSnapshot? frozenRealityContext = null)
+            => store.CreateOrGet(request, frozenRealityContext);
 
         public 경영SimulationSessionAggregate Require(string sessionStableId)
             => store.Find(sessionStableId)

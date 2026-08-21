@@ -64,6 +64,7 @@ namespace Ssalddel.Simulation.Domain
                     "SimulationFacilityDefinitionStableIdInvalid");
                 RequireStableId(definition.Revision, "SimulationFacilityDefinitionRevisionInvalid");
                 RequireStableId(definition.HashSha256, "SimulationFacilityDefinitionHashInvalid");
+                ValidateFacilityCapacities(definition.Capacities);
                 if (!integratedFacilityDefinitions.TryAdd(definition.FacilityDefinitionStableId,
                         CloneFacilityDefinition(definition)))
                     throw new SimulationContractException("SimulationFacilityDefinitionDuplicate");
@@ -124,6 +125,11 @@ namespace Ssalddel.Simulation.Domain
                          value.BlueprintStableId, StringComparer.Ordinal))
             {
                 ValidateBlueprint(blueprint);
+                if (!integratedFacilityDefinitions.TryGetValue(
+                        blueprint.FacilityDefinitionStableId, out var definition))
+                    throw new SimulationContractException(
+                        "SimulationFacilityBlueprintDefinitionNotFound");
+                ValidateSettlementFacilityProjection(blueprint, definition);
                 if (!integratedBlueprints.TryAdd(blueprint.BlueprintStableId,
                         CloneBlueprint(blueprint)))
                     throw new SimulationContractException("SimulationFacilityBlueprintDuplicate");
@@ -581,7 +587,9 @@ namespace Ssalddel.Simulation.Domain
             var definition = integratedFacilityDefinitions[blueprint.FacilityDefinitionStableId];
             integratedFacilities.Add(facilityId, CreateRuntimeFacility(facilityId, definition,
                 payload.BuildSiteH1StableId, Array.Empty<string>(),
-                SimulationFacilityLifecycleCodes.Planned));
+                SimulationFacilityLifecycleCodes.Planned,
+                blueprint.SettlementFacilityTypeCode,
+                blueprint.SettlementDistrictStableId));
             ReserveRequirements(projectId, blueprint.Materials, preview.ReservedLotStableIds);
             AddReservation(projectId, payload.BuildSiteH1StableId, "BuildSite", 1m);
             AddCommitment(preview.SelectedActorStableIds[0],
@@ -1224,9 +1232,24 @@ namespace Ssalddel.Simulation.Domain
             SimulationIntegratedWorldInitialStateRequest? value)
             => value == null ? string.Empty : HashIntegrated(string.Join("|",
                 value.ScenarioRevision, value.ScenarioHashSha256,
-                value.FacilityDefinitions.Length, value.FacilitySeeds.Length,
-                value.Actors.Length, value.Lots.Length,
-                value.ManufacturingRecipes.Length, value.FacilityBlueprints.Length));
+                string.Join(";", value.FacilityDefinitions.OrderBy(item =>
+                    item.FacilityDefinitionStableId, StringComparer.Ordinal).Select(item =>
+                    string.Join(",", item.FacilityDefinitionStableId, item.Revision,
+                        item.HashSha256, item.FacilityTypeCode,
+                        string.Join("+", item.CapabilityCodes.OrderBy(code => code,
+                            StringComparer.Ordinal)),
+                        string.Join("+", item.Capacities.OrderBy(capacity =>
+                            capacity.CapacityCode, StringComparer.Ordinal).Select(capacity =>
+                            string.Join("=", capacity.CapacityCode, capacity.Quantity,
+                                capacity.UnitCode)))))),
+                string.Join(";", value.FacilityBlueprints.OrderBy(item =>
+                    item.BlueprintStableId, StringComparer.Ordinal).Select(item =>
+                    string.Join(",", item.BlueprintStableId, item.Revision,
+                        item.HashSha256, item.FacilityDefinitionStableId,
+                        item.SettlementFacilityTypeCode,
+                        item.SettlementDistrictStableId, item.ConstructionTicks))),
+                value.FacilitySeeds.Length, value.Actors.Length, value.Lots.Length,
+                value.ManufacturingRecipes.Length));
 
         internal static SimulationIntegratedWorldCommandRequest CloneIntegratedWorldCommand(
             SimulationIntegratedWorldCommandRequest value) => new()
@@ -1304,7 +1327,9 @@ namespace Ssalddel.Simulation.Domain
 
         private static SimulationRuntimeFacilitySnapshot CreateRuntimeFacility(string id,
             SimulationFacilityDefinitionRequest definition, string placement,
-            IEnumerable<string> connectors, string lifecycle)
+            IEnumerable<string> connectors, string lifecycle,
+            string settlementFacilityTypeCode = "",
+            string settlementDistrictStableId = "")
             => new()
             {
                 FacilityStableId = id.Trim(),
@@ -1312,6 +1337,8 @@ namespace Ssalddel.Simulation.Domain
                 FacilityDefinitionRevision = definition.Revision,
                 FacilityDefinitionHashSha256 = definition.HashSha256,
                 PlacementH1StableId = placement?.Trim() ?? string.Empty,
+                SettlementFacilityTypeCode = settlementFacilityTypeCode?.Trim() ?? string.Empty,
+                SettlementDistrictStableId = settlementDistrictStableId?.Trim() ?? string.Empty,
                 AccessConnectorStableIds = connectors?.OrderBy(value => value,
                     StringComparer.Ordinal).ToArray() ?? Array.Empty<string>(),
                 LifecycleCode = lifecycle,
@@ -1319,7 +1346,66 @@ namespace Ssalddel.Simulation.Domain
                 MaintenanceCode = SimulationFacilityMaintenanceCodes.None,
                 DefinedCapabilityCodes = definition.CapabilityCodes.OrderBy(value => value,
                     StringComparer.Ordinal).ToArray(),
+                DefinedCapacities = definition.Capacities
+                    .OrderBy(value => value.CapacityCode, StringComparer.Ordinal)
+                    .Select(value => new SimulationRuntimeFacilityCapacitySnapshot
+                    {
+                        CapacityCode = value.CapacityCode.Trim(),
+                        Quantity = value.Quantity,
+                        UnitCode = value.UnitCode.Trim(),
+                    }).ToArray(),
             };
+
+        private static void ValidateFacilityCapacities(
+            IEnumerable<SimulationFacilityCapacityDefinitionRequest> capacities)
+        {
+            var codes = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var capacity in capacities ??
+                     Array.Empty<SimulationFacilityCapacityDefinitionRequest>())
+            {
+                RequireStableId(capacity.CapacityCode,
+                    "SimulationFacilityCapacityCodeInvalid");
+                RequireStableId(capacity.UnitCode,
+                    "SimulationFacilityCapacityUnitInvalid");
+                if (capacity.Quantity <= 0m)
+                    throw new SimulationContractException(
+                        "SimulationFacilityCapacityQuantityInvalid");
+                if (!codes.Add(capacity.CapacityCode.Trim()))
+                    throw new SimulationContractException(
+                        "SimulationFacilityCapacityDuplicate");
+            }
+        }
+
+        private void ValidateSettlementFacilityProjection(
+            SimulationFacilityBlueprintRequest blueprint,
+            SimulationFacilityDefinitionRequest definition)
+        {
+            var hasType = !string.IsNullOrWhiteSpace(
+                blueprint.SettlementFacilityTypeCode);
+            var hasDistrict = !string.IsNullOrWhiteSpace(
+                blueprint.SettlementDistrictStableId);
+            if (hasType != hasDistrict)
+                throw new SimulationContractException(
+                    "SimulationSettlementFacilityProjectionInvalid");
+            if (!hasType) return;
+            if (settlementInitialState == null)
+                throw new SimulationContractException(
+                    "SimulationSettlementRequiredForFacilityProjection");
+            if (!settlementInitialState.Districts.Any(value =>
+                    value.DistrictStableId == blueprint.SettlementDistrictStableId.Trim()))
+                throw new SimulationContractException(
+                    "SimulationSettlementFacilityProjectionDistrictNotFound");
+            if (blueprint.SettlementFacilityTypeCode.Trim()
+                != SimulationSettlementFacilityTypeCodes.Storage) return;
+            var storage = definition.Capacities.SingleOrDefault(value =>
+                value.CapacityCode == Simulation공간용량Codes.StorageCapacity);
+            if (storage == null)
+                throw new SimulationContractException(
+                    "SimulationSettlementStorageCapacityProjectionRequired");
+            if (storage.UnitCode.Trim() != settlementInitialState.StorageUnitCode)
+                throw new SimulationContractException(
+                    "SimulationSettlementStorageCapacityProjectionUnitMismatch");
+        }
 
         private static void ValidateLotSeed(SimulationIntegratedLotSeedRequest value)
         {
@@ -1389,6 +1475,13 @@ namespace Ssalddel.Simulation.Domain
                 Revision = value.Revision, HashSha256 = value.HashSha256,
                 FacilityTypeCode = value.FacilityTypeCode,
                 CapabilityCodes = value.CapabilityCodes.ToArray(),
+                Capacities = value.Capacities.Select(capacity =>
+                    new SimulationFacilityCapacityDefinitionRequest
+                    {
+                        CapacityCode = capacity.CapacityCode,
+                        Quantity = capacity.Quantity,
+                        UnitCode = capacity.UnitCode,
+                    }).ToArray(),
             };
 
         private static SimulationManufacturingRecipeRequest CloneRecipe(
@@ -1405,6 +1498,8 @@ namespace Ssalddel.Simulation.Domain
                 BlueprintStableId = value.BlueprintStableId, Revision = value.Revision,
                 HashSha256 = value.HashSha256,
                 FacilityDefinitionStableId = value.FacilityDefinitionStableId,
+                SettlementFacilityTypeCode = value.SettlementFacilityTypeCode,
+                SettlementDistrictStableId = value.SettlementDistrictStableId,
                 ConstructionTicks = value.ConstructionTicks,
                 Materials = CloneRequirements(value.Materials),
             };
@@ -1445,10 +1540,19 @@ namespace Ssalddel.Simulation.Domain
                 FacilityDefinitionRevision = value.FacilityDefinitionRevision,
                 FacilityDefinitionHashSha256 = value.FacilityDefinitionHashSha256,
                 PlacementH1StableId = value.PlacementH1StableId,
+                SettlementFacilityTypeCode = value.SettlementFacilityTypeCode,
+                SettlementDistrictStableId = value.SettlementDistrictStableId,
                 AccessConnectorStableIds = value.AccessConnectorStableIds.ToArray(),
                 LifecycleCode = value.LifecycleCode, IntegrityCode = value.IntegrityCode,
                 MaintenanceCode = value.MaintenanceCode,
                 DefinedCapabilityCodes = value.DefinedCapabilityCodes.ToArray(),
+                DefinedCapacities = value.DefinedCapacities.Select(capacity =>
+                    new SimulationRuntimeFacilityCapacitySnapshot
+                    {
+                        CapacityCode = capacity.CapacityCode,
+                        Quantity = capacity.Quantity,
+                        UnitCode = capacity.UnitCode,
+                    }).ToArray(),
                 EffectiveCapabilities = value.EffectiveCapabilities.Select(capability =>
                     new SimulationEffectiveFacilityCapabilitySnapshot
                     {

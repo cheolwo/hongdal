@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
-using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Server.Controllers;
 
@@ -33,7 +32,7 @@ namespace Ssalddel.Simulation.Server.Controllers;
     FlowOrder = 20,
     Boundary = "저장 식별자와 기대 개정을 서버가 검증하며 운영 서버 저장 API로 전달하지 않는다.")]
 public sealed class 경영SimulationSessionsController(
-    경영SimulationSessionService service) : ControllerBase
+    경영SimulationSessionService service) : SimulationApiControllerBase
 {
     [HttpPost]
     [ProducesResponseType(typeof(경영SimulationSessionSnapshot), StatusCodes.Status201Created)]
@@ -70,6 +69,13 @@ public sealed class 경영SimulationSessionsController(
         [FromBody] SimulationSessionRestoreRequest request)
         => Execute<SimulationSessionRestoreResult>(() => Ok(service.Restore(request)));
 
+    [HttpPost("replay-verifications")]
+    [ProducesResponseType(typeof(SimulationSessionRestoreResult), StatusCodes.Status200OK)]
+    public ActionResult<SimulationSessionRestoreResult> VerifyReplay(
+        [FromBody] SimulationSessionRestoreRequest request)
+        => Execute<SimulationSessionRestoreResult>(() =>
+            Ok(service.VerifyReplay(request)));
+
     // 기존 직접 호출 시험과 내부 도구의 source 호환을 위한 비-API forwarding surface다.
     [NonAction]
     public ActionResult<SimulationTurnClosingContextSnapshot> GetTurnClosingContext(
@@ -88,23 +94,4 @@ public sealed class 경영SimulationSessionsController(
         SimulationTurnClosingConfirmRequest request)
         => Ok(service.ConfirmTurnClosing(sessionStableId, request));
 
-    private ActionResult<T> Execute<T>(Func<ActionResult<T>> action)
-    {
-        try
-        {
-            return action();
-        }
-        catch (SimulationContractException error)
-        {
-            return BadRequest(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
-        }
-        catch (SimulationNotFoundException error)
-        {
-            return NotFound(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
-        }
-        catch (SimulationConflictException error)
-        {
-            return Conflict(new SimulationErrorResponse { ErrorCode = error.ErrorCode });
-        }
-    }
 }

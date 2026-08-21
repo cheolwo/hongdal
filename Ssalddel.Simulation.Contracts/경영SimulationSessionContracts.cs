@@ -23,6 +23,11 @@ namespace Ssalddel.Simulation.Contracts
         public string ScenarioDataRevision { get; set; } = string.Empty;
         public int ScenarioSeed { get; set; }
         public string RuleRevision { get; set; } = string.Empty;
+        /// <summary>
+        /// 서버가 승인 대장에서 해석할 현실 자료 문맥 프로필이다.
+        /// 클라이언트는 원 관측값이나 의미 신호를 제출하지 않는다.
+        /// </summary>
+        public string RealityContextProfileStableId { get; set; } = string.Empty;
         public int DurationTicks { get; set; } = 28;
         public SimulationWorldContext생성Request WorldContext { get; set; }
             = new SimulationWorldContext생성Request();
@@ -34,6 +39,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationFarmSurvivalInitialStateRequest? FarmSurvival { get; set; }
         public SimulationTeamRoleCardInitialState? TeamRoleCards { get; set; }
         public SimulationIntegratedWorldInitialStateRequest? IntegratedWorld { get; set; }
+        public SimulationNatureMindInitialStateRequest? NatureMind { get; set; }
     }
 
     public sealed class SimulationWorldContext생성Request
@@ -138,6 +144,14 @@ namespace Ssalddel.Simulation.Contracts
             = new SimulationNatureThreatStateSnapshot();
         public SimulationRegionalCausalityStateSnapshot RegionalCausality { get; set; }
             = new SimulationRegionalCausalityStateSnapshot();
+        public SimulationNatureMindStateSnapshot NatureMind { get; set; }
+            = new SimulationNatureMindStateSnapshot();
+        public SimulationPlayerAreaAccessStateSnapshot AreaAccess { get; set; }
+            = new SimulationPlayerAreaAccessStateSnapshot();
+        public SimulationHostedWorldStateSnapshot HostedWorld { get; set; }
+            = new SimulationHostedWorldStateSnapshot();
+        public SimulationCoopConstructionStateSnapshot CoopConstruction { get; set; }
+            = new SimulationCoopConstructionStateSnapshot();
         public SimulationTarotContextStateSnapshot TarotContext { get; set; }
             = new SimulationTarotContextStateSnapshot();
         public SimulationIntegratedWorldSnapshot IntegratedWorld { get; set; }

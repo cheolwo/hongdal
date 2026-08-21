@@ -129,7 +129,7 @@ public sealed class SimulationRegionalIncidentTests
             SaveStableId = "save:test:regional-incident",
             ExpectedRevision = session.Revision,
         });
-        Assert.Equal(SimulationSaveSchemaVersions.V5, package.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V10, package.SchemaVersion);
         var restored = SimulationSessionReplay.Restore(package);
         var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
         {
@@ -889,6 +889,86 @@ public sealed class SimulationRegionalIncidentTests
     }
 
     [Fact]
+    public void Nature기간은_같은Balance로_광복기강화와_암흑기회복복귀를결정한다()
+    {
+        var gwangbokRequest = CreateRequest();
+        gwangbokRequest.NatureMind = NatureMindRequest(8m, 2m);
+        var gwangbok = new 경영SimulationSessionAggregate(gwangbokRequest);
+        PrepareRetreatedParty(gwangbok, "period-gwangbok");
+        var gwangbokPreview = gwangbok.PreviewNaturePartyRecovery(
+            PartyRecoveryRequest(gwangbok.Revision, "period-gwangbok"));
+        var gwangbokPeriod = Assert.Single(gwangbok.Snapshot().NatureMind.Periods);
+
+        Assert.Equal(SimulationNaturePeriodCodes.GwangbokPeriod,
+            gwangbokPeriod.PeriodStateCode);
+        Assert.Equal(1, gwangbokPreview.EffectiveDurationTicks);
+        Assert.Equal(-1, gwangbokPeriod.WorkDurationModifierTicks);
+        Assert.Contains(SimulationNaturePeriodCodes.GwangbokRevelationCandidate,
+            gwangbokPeriod.CandidateStableIds);
+
+        var darkAgeRequest = CreateRequest();
+        darkAgeRequest.NatureMind = NatureMindRequest(2m, 8m);
+        var darkAge = new 경영SimulationSessionAggregate(darkAgeRequest);
+        PrepareRetreatedParty(darkAge, "period-dark-age");
+        var recoveryRequest = PartyRecoveryRequest(
+            darkAge.Revision, "period-dark-age");
+        var darkPreview = darkAge.PreviewNaturePartyRecovery(recoveryRequest);
+        var darkBefore = Assert.Single(darkAge.Snapshot().NatureMind.Periods);
+
+        Assert.Equal(SimulationNaturePeriodCodes.DarkAgePeriod,
+            darkBefore.PeriodStateCode);
+        Assert.Equal(3, darkPreview.EffectiveDurationTicks);
+        Assert.Equal(1, darkBefore.WorkDurationModifierTicks);
+        Assert.Contains(SimulationNaturePeriodCodes.DarkAgeRecoveryWorldInteraction,
+            darkBefore.CandidateStableIds);
+
+        var confirmed = darkAge.ConfirmNaturePartyRecovery(
+            new SimulationNaturePartyRecoveryConfirmRequest
+            {
+                CommandId = "command:test:nature-period-recovery",
+                ExpectedRevision = darkAge.Revision,
+                Preview = recoveryRequest,
+            });
+        var completed = darkAge.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-period-recovery-ticks",
+            ExpectedRevision = confirmed.Revision,
+            TickCount = darkPreview.EffectiveDurationTicks,
+        });
+        var ordinary = Assert.Single(completed.NatureMind.Periods);
+        var history = Assert.Single(completed.NatureMind.PeriodHistory);
+
+        Assert.Equal(SimulationNaturePeriodCodes.OrdinaryPeriod,
+            ordinary.PeriodStateCode);
+        Assert.Equal(SimulationNaturePeriodCodes.DarkAgePeriod,
+            history.StateCode);
+        Assert.NotNull(history.ExitTick);
+        Assert.Contains(completed.NatureMind.PeriodTransitionEffects, value =>
+            value.EffectTypeCode == SimulationNaturePeriodCodes.EnteredEffect
+            && value.StateCode == SimulationNaturePeriodCodes.DarkAgePeriod);
+        Assert.Contains(completed.NatureMind.PeriodTransitionEffects, value =>
+            value.EffectTypeCode == SimulationNaturePeriodCodes.ExitedEffect
+            && value.PeriodInstanceStableId == history.PeriodInstanceStableId);
+
+        var package = darkAge.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:test:nature-period-dark-age",
+            ExpectedRevision = completed.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var restoredPackage = restored.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = package.SaveStableId,
+                ExpectedRevision = restored.Revision,
+            });
+        Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
+        Assert.Equal(ordinary.PeriodStateHashSha256,
+            Assert.Single(restored.Snapshot().NatureMind.Periods)
+                .PeriodStateHashSha256);
+    }
+
+    [Fact]
     public void 파티회복은_후퇴후_안전생활핵공간과보급을사용하고_탐색을다시연다()
     {
         var session = new 경영SimulationSessionAggregate(CreateRequest());
@@ -1362,6 +1442,7 @@ public sealed class SimulationRegionalIncidentTests
         var collected = RunFarmCauseWork(session, suffix + ":collect", harvestLotId,
             SimulationFarmSurvivalCodes.HarvestCollection,
             PyeongchangSimulation공간StableIds.대관령Farm집하공간);
+        ApplyHubChoice(session, suffix);
         var packed = RunFarmCauseWork(session, suffix + ":pack", harvestLotId,
             SimulationFarmSurvivalCodes.OutboundPacking,
             PyeongchangSimulation공간StableIds.대관령Farm포장공간);
@@ -1389,6 +1470,30 @@ public sealed class SimulationRegionalIncidentTests
             CommandId = "command:test:nature-cause-work-tick:" + suffix,
             ExpectedRevision = confirmed.WorldRevision,
             TickCount = 1,
+        });
+    }
+
+    private static void ApplyHubChoice(
+        경영SimulationSessionAggregate session,
+        string suffix)
+    {
+        var context = session.GetFarmChoiceContext();
+        var preview = session.PreviewFarmChoice(new SimulationFarmChoicePreviewRequest
+        {
+            ExpectedRevision = context.WorldRevision,
+            ChoiceStableId = SimulationFarmChoicePlayableCodes.HubShipmentChoice,
+        });
+        var confirmed = session.ConfirmFarmChoice(new SimulationFarmChoiceConfirmRequest
+        {
+            CommandId = "command:test:nature-hub-choice:" + suffix,
+            ExpectedRevision = preview.BaseRevision,
+            ChoiceStableId = preview.ChoiceStableId,
+        });
+        session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:nature-hub-choice-tick:" + suffix,
+            ExpectedRevision = confirmed.Revision,
+            TickCount = preview.Impact.DurationTicks,
         });
     }
 
@@ -1466,5 +1571,19 @@ public sealed class SimulationRegionalIncidentTests
             NatureRouteCode = SimulationRegionalIncidentCodes.NatureToFarm,
             PreferredSpatialStableId =
                 PyeongchangSimulation공간StableIds.Nature안전회복야영지,
+        };
+
+    private static SimulationNatureMindInitialStateRequest NatureMindRequest(
+        decimal recovery, decimal threat) => new()
+        {
+            Players = new[]
+            {
+                new SimulationNatureMindPlayerInitialStateRequest
+                {
+                    PlayerStableId = "actor:test:player-party",
+                    RecoveryBaseOutput = recovery,
+                    ThreatBaseOutput = threat,
+                },
+            },
         };
 }

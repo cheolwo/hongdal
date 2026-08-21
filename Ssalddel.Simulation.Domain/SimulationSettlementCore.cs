@@ -26,6 +26,24 @@ namespace Ssalddel.Simulation.Domain
         {
             if (settlementInitialState == null) return null;
 
+            var projectedFacilities = CreateOperationalSettlementFacilityProjections();
+            var projectedStorageCapacity = projectedFacilities
+                .Where(value => value.FacilityTypeCode
+                    == SimulationSettlementFacilityTypeCodes.Storage)
+                .Join(integratedFacilities.Values,
+                    projection => projection.FacilityStableId,
+                    facility => facility.FacilityStableId,
+                    (_, facility) => facility)
+                .Where(facility => FacilityHasActiveCapability(
+                    facility.FacilityStableId,
+                    SimulationIntegratedCapabilityCodes.Storage))
+                .SelectMany(facility => facility.DefinedCapacities)
+                .Where(value => value.CapacityCode
+                    == Simulation공간용량Codes.StorageCapacity
+                    && value.UnitCode == settlementInitialState.StorageUnitCode)
+                .Sum(value => value.Quantity);
+            var storageCapacity = settlementInitialState.StorageCapacity
+                + projectedStorageCapacity;
             var availableFoodEquivalent = settlementInitialState.ReserveStockLots.Sum(
                 value => value.FoodEquivalentQuantity
                     - value.OutboundReservedFoodEquivalentQuantity);
@@ -45,10 +63,10 @@ namespace Ssalddel.Simulation.Domain
                 LaborReserved = settlementInitialState.LaborReserved,
                 LaborAvailable = settlementInitialState.LaborCapacityTotal
                     - settlementInitialState.LaborReserved,
-                StorageCapacity = settlementInitialState.StorageCapacity,
+                StorageCapacity = storageCapacity,
                 StorageOccupied = settlementInitialState.StorageOccupied,
                 StorageReserved = settlementStorageReserved,
-                StorageAvailable = settlementInitialState.StorageCapacity
+                StorageAvailable = storageCapacity
                     - settlementInitialState.StorageOccupied
                     - settlementStorageReserved,
                 StorageUnitCode = settlementInitialState.StorageUnitCode,
@@ -75,7 +93,8 @@ namespace Ssalddel.Simulation.Domain
                         FacilityTypeCode = value.FacilityTypeCode,
                         DistrictStableId = value.DistrictStableId,
                         SourceStableIds = Copy(value.SourceStableIds),
-                    }).ToArray(),
+                    }).Concat(projectedFacilities).OrderBy(value =>
+                        value.FacilityStableId, StringComparer.Ordinal).ToArray(),
                 MarketSupplyByProduct = settlementInitialState.MarketSupplyByProduct.Select(value =>
                     new SimulationMarketSupplySnapshot
                     {
@@ -111,6 +130,31 @@ namespace Ssalddel.Simulation.Domain
                 SourceStableIds = Copy(settlementInitialState.SourceStableIds),
             };
         }
+
+        private SimulationSettlementFacilitySnapshot[]
+            CreateOperationalSettlementFacilityProjections()
+            => integratedFacilities.Values
+                .Where(value => value.LifecycleCode
+                    == SimulationFacilityLifecycleCodes.Operational)
+                .Where(value => !string.IsNullOrWhiteSpace(
+                    value.SettlementFacilityTypeCode)
+                    && !string.IsNullOrWhiteSpace(
+                        value.SettlementDistrictStableId))
+                .Where(value => !settlementInitialState!.Facilities.Any(existing =>
+                    existing.FacilityStableId == value.FacilityStableId))
+                .OrderBy(value => value.FacilityStableId, StringComparer.Ordinal)
+                .Select(value => new SimulationSettlementFacilitySnapshot
+                {
+                    FacilityStableId = value.FacilityStableId,
+                    FacilityTypeCode = value.SettlementFacilityTypeCode,
+                    DistrictStableId = value.SettlementDistrictStableId,
+                    SourceStableIds = new[]
+                    {
+                        value.FacilityDefinitionStableId,
+                        value.FacilityDefinitionRevision,
+                        value.FacilityDefinitionHashSha256,
+                    },
+                }).ToArray();
 
         internal static void ValidateSettlementInitialState(
             SimulationSettlementInitialStateRequest? request,
