@@ -3,12 +3,12 @@
   "revision": "simulation-world-gameplay-spatial-completion-report.r3",
   "sourceRevision": "simulation-world-gameplay-spatial-completion.r4",
   "hCatalogRevision": "simulation-world-spatial-design-knowledge.r3",
-  "worldInteractionRevision": "simulation-world-interactions.r4",
-  "evidenceStageRevision": "simulation-evidence-stages.r6",
+  "worldInteractionRevision": "simulation-world-interactions.r5",
+  "evidenceStageRevision": "simulation-evidence-stages.r7",
   "theorySpatialFactoryRevision": "simulation-world-theory-spatial-factory-output.r3",
   "theorySpatialFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r4",
-  "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r1",
-  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r2",
+  "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r3",
+  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r4",
   "axisDefinitions": {
     "h": "공간 자원의 종류와 H1→H4 조립 깊이",
     "gameplayTrace": "공간이 기준 플레이를 직접 또는 간접 지원하는 정도",
@@ -970,48 +970,60 @@
           "wiId": "WI-FARM-04",
           "title": "수확",
           "implementationStageCode": "E3",
-          "catalogIntegrationStageCode": "E4",
-          "integrationStageCode": "E5",
+          "catalogIntegrationStageCode": "E6",
+          "integrationStageCode": "E6",
           "e4SeedbedRefs": [
             "wi-spatial-seedbed:farm-production.v1"
           ],
           "e5PlacementRefs": [
+            "binding:actual-e5:wi-farm-04",
             "spatial:actual-e5:wi-farm-04"
           ],
           "e5ContextRefs": [],
-          "e6EvidenceRefs": [],
+          "e6EvidenceRefs": [
+            "question:highland-farm:cultivation-flow.r1",
+            "closure:farm:harvest-to-processing.r1"
+          ],
           "e7EvidenceRefs": []
         },
         {
           "wiId": "WI-FARM-05",
           "title": "수확물 집하",
           "implementationStageCode": "E3",
-          "catalogIntegrationStageCode": "E4",
-          "integrationStageCode": "E5",
+          "catalogIntegrationStageCode": "E6",
+          "integrationStageCode": "E6",
           "e4SeedbedRefs": [
             "wi-spatial-seedbed:farm-work-yard.v1"
           ],
           "e5PlacementRefs": [
+            "binding:actual-e5:wi-farm-05",
             "spatial:actual-e5:wi-farm-05"
           ],
           "e5ContextRefs": [],
-          "e6EvidenceRefs": [],
+          "e6EvidenceRefs": [
+            "question:farm-processing:place-flow.r1",
+            "closure:farm:harvest-to-processing.r1"
+          ],
           "e7EvidenceRefs": []
         },
         {
           "wiId": "WI-FARM-06",
           "title": "출하 준비·포장",
           "implementationStageCode": "E3",
-          "catalogIntegrationStageCode": "E4",
-          "integrationStageCode": "E5",
+          "catalogIntegrationStageCode": "E6",
+          "integrationStageCode": "E6",
           "e4SeedbedRefs": [
             "wi-spatial-seedbed:farm-work-yard.v1"
           ],
           "e5PlacementRefs": [
+            "binding:actual-e5:wi-farm-06",
             "spatial:actual-e5:wi-farm-06"
           ],
           "e5ContextRefs": [],
-          "e6EvidenceRefs": [],
+          "e6EvidenceRefs": [
+            "question:farm-processing:potato-context.r1",
+            "closure:farm:processing-to-shipping.r1"
+          ],
           "e7EvidenceRefs": []
         },
         {

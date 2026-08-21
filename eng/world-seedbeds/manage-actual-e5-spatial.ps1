@@ -6,6 +6,7 @@ param(
     [string] $Mode = "Check",
     [string] $PolicyPath = "eng/world-seedbeds/actual-e5-spatial-policy.v1.json",
     [string] $TheoryPath = "eng/world-seedbeds/generated/theory-spatial-factory.v1.json",
+    [string] $CompositionPath = "eng/world-seedbeds/generated/area-set-composition-plans.v1.json",
     [string] $JsonOutputPath = "eng/world-seedbeds/generated/actual-e5-spatial.v1.json",
     [string] $MarkdownOutputPath = "docs/AI/generated/actual-e5-spatial.md"
 )
@@ -72,6 +73,7 @@ function Values([object] $value, [string] $propertyName) {
 
 $policy = Read-Json $PolicyPath
 $theory = Read-Json $TheoryPath
+$composition = Read-Json $CompositionPath
 $worldInteractions = Read-Json "eng/execution-ledgers/world-interactions.json"
 $spatialPriorities = Read-Json "eng/world-seedbeds/wi-spatial-priorities.v1.json"
 $designCatalog = Read-Json "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
@@ -80,6 +82,7 @@ $outputRevision = if ($policy.PSObject.Properties.Name -contains "outputRevision
 
 Require ([string] $policy.schemaVersion -eq "simulation-world-actual-e5-spatial-policy.v1") "PolicySchema"
 Require ([string] $theory.schemaVersion -eq "simulation-world-theory-spatial-factory-output.v1") "TheorySchema"
+Require ([string] $composition.schemaVersion -eq "simulation-world-area-set-composition-plans.v1") "CompositionSchema"
 Require ([bool] $policy.presentationOnly -and -not [bool] $policy.isOperationalState) "AuthorityBoundary"
 Require (@($policy.areaSets).Count -eq 4) "AreaSetCount"
 Require (@($policy.networkRouteH3Refs).Count -eq 3) "NetworkRouteGraphCount"
@@ -87,14 +90,24 @@ Require (@($policy.networkRelations).Count -eq 8) "NetworkRelationCount"
 
 $h2ById = @{}; foreach ($h2 in @($theory.h2Plans)) { $h2ById[[string] $h2.h2StableId] = $h2 }
 $h3ById = @{}; foreach ($h3 in @($theory.h3Plans)) { $h3ById[[string] $h3.h3StableId] = $h3 }
+$compositionById = @{}; foreach ($plan in @($composition.resolvedPatterns)) { $compositionById[[string] $plan.compositionPatternStableId] = $plan }
+$baselineCompositionByRole = @{}; foreach ($selection in @($composition.baselineSelections)) {
+    Require ($compositionById.ContainsKey([string] $selection.baselinePatternStableId)) "CompositionSelectionUnknown:$($selection.baselinePatternStableId)"
+    $baselineCompositionByRole[[string] $selection.areaRoleCode] = $compositionById[[string] $selection.baselinePatternStableId]
+}
 $areaPolicyByTheory = @{}; foreach ($area in @($policy.areaSets)) { $areaPolicyByTheory[[string] $area.theoryAreaSetStableId] = $area }
 $deferredH3Refs = @($policy.deferredTheoryH3Refs | Sort-Object -Unique)
 $areaByH3 = @{}
-foreach ($instance in @($theory.e5AreaSetInstances)) {
-    Require ($areaPolicyByTheory.ContainsKey([string] $instance.areaSetStableId)) "AreaPolicyMissing:$($instance.areaSetStableId)"
-    foreach ($graph in @($instance.graphInstances)) {
-        if ($deferredH3Refs -contains [string] $graph.h3Ref) { continue }
-        $areaByH3[[string] $graph.h3Ref] = $areaPolicyByTheory[[string] $instance.areaSetStableId]
+foreach ($areaPolicy in @($policy.areaSets)) {
+    $roleCode = [string] $areaPolicy.areaRoleCode
+    Require ($baselineCompositionByRole.ContainsKey($roleCode)) "AreaCompositionMissing:$roleCode"
+    $compositionPlan = $baselineCompositionByRole[$roleCode]
+    Require ([string] $areaPolicy.compositionPatternStableId -eq [string] $compositionPlan.compositionPatternStableId) "AreaCompositionSelectionMismatch:$roleCode"
+    Require ([string] $areaPolicy.theoryAreaSetStableId -eq [string] $compositionPlan.worldIntentRef.Replace("h4-blueprint:", "area-set:theory:")) "AreaCompositionIntentMismatch:$roleCode"
+    foreach ($placement in @($compositionPlan.resolvedH3Placements)) {
+        $h3Ref = [string] $placement.selectedH3PatternRef
+        Require (-not $areaByH3.ContainsKey($h3Ref)) "AreaCompositionH3Duplicate:$h3Ref"
+        $areaByH3[$h3Ref] = $areaPolicy
     }
 }
 foreach ($routeRef in @($policy.networkRouteH3Refs)) {
@@ -357,29 +370,33 @@ $areaSets = @()
 foreach ($areaPolicy in @($policy.areaSets)) {
     $theoryArea = @($theory.e5AreaSetInstances | Where-Object areaSetStableId -eq ([string] $areaPolicy.theoryAreaSetStableId))[0]
     Require ($null -ne $theoryArea) "TheoryAreaMissing:$($areaPolicy.theoryAreaSetStableId)"
-    $promotedInstances = @($theoryArea.graphInstances | Where-Object { $deferredH3Refs -notcontains [string] $_.h3Ref })
-    $areaGraphs = @($promotedInstances | ForEach-Object { $graphMetadata[[string] $_.h3Ref].Graph })
-    $relations = @()
-    for ($index = 1; $index -lt $areaGraphs.Count; $index++) {
-        $fromH3 = [string] $promotedInstances[$index - 1].h3Ref
-        $toH3 = [string] $promotedInstances[$index].h3Ref
-        $relations += [ordered]@{
-            relationStableId = "graph-relation:actual-e5:" + ([string] $areaPolicy.areaRoleCode).ToLowerInvariant() + ":$index"
-            fromGraphStableId = Graph-Id $fromH3
-            toGraphStableId = Graph-Id $toH3
+    $compositionPlan = $compositionById[[string] $areaPolicy.compositionPatternStableId]
+    Require ($null -ne $compositionPlan) "CompositionPlanMissing:$($areaPolicy.compositionPatternStableId)"
+    Require ([string] $compositionPlan.patternKindCode -eq "Baseline") "CompositionPlanNotBaseline:$($areaPolicy.compositionPatternStableId)"
+    $promotedInstances = @($compositionPlan.resolvedH3Placements | Sort-Object placementStableId)
+    $areaGraphs = @($promotedInstances | ForEach-Object { $graphMetadata[[string] $_.selectedH3PatternRef].Graph })
+    $relations = @($compositionPlan.resolvedConnections | Sort-Object connectionStableId | ForEach-Object {
+        Require ([string] $_.fromConnectorRoleCode -eq "Egress" -and [string] $_.toConnectorRoleCode -eq "Ingress") "ActualE5CompositionRequiresGenericConnectors:$($_.connectionStableId)"
+        [ordered]@{
+            relationStableId = "graph-relation:actual-e5:" + ([string] $areaPolicy.areaRoleCode).ToLowerInvariant() + ":" + (Slug ([string] $_.connectionStableId))
+            fromGraphStableId = Graph-Id ([string] $_.fromH3PatternRef)
+            toGraphStableId = Graph-Id ([string] $_.toH3PatternRef)
             relationCode = "Transition"
             connectorPair = [ordered]@{
-                fromConnectorStableId = Stub-Id $fromH3 "egress"
-                toConnectorStableId = Stub-Id $toH3 "ingress"
+                fromConnectorStableId = Stub-Id ([string] $_.fromH3PatternRef) "egress"
+                toConnectorStableId = Stub-Id ([string] $_.toH3PatternRef) "ingress"
                 connectorTypeCode = "player-work"
-                routeSignature = "actual-e5.area-transition"
+                routeSignature = "actual-e5.area-composition." + ([string] $compositionPlan.patternCode).ToLowerInvariant()
             }
         }
-    }
+    })
     $areaCore = [ordered]@{
         areaSetStableId = [string] $areaPolicy.actualAreaSetStableId
         theoryAreaSetStableId = [string] $areaPolicy.theoryAreaSetStableId
         theoryHashSha256 = [string] $theoryArea.theoryHashSha256
+        compositionPatternStableId = [string] $compositionPlan.compositionPatternStableId
+        compositionPatternHashSha256 = [string] $compositionPlan.compositionPatternHashSha256
+        compositionDocumentHashSha256 = [string] $compositionPlan.documentHashSha256
         graphIds = @($areaGraphs.landscapeGraphStableId)
         graphRelations = $relations
     }
@@ -390,9 +407,13 @@ foreach ($areaPolicy in @($policy.areaSets)) {
         areaSetStableId = [string] $areaPolicy.actualAreaSetStableId
         revision = $outputRevision
         title = [string] $theoryArea.title
-        summary = "승인된 H1~H4를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다."
+        summary = "역할 슬롯 기반 AreaSet 구성 패턴으로 H3·H2를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다."
         definitionHashSha256 = $areaHash
-        documentHashSha256 = [string] $theoryArea.theoryHashSha256
+        documentHashSha256 = [string] $compositionPlan.documentHashSha256
+        sourceCompositionPatternStableId = [string] $compositionPlan.compositionPatternStableId
+        sourceCompositionPatternCode = [string] $compositionPlan.patternCode
+        sourceCompositionPatternHashSha256 = [string] $compositionPlan.compositionPatternHashSha256
+        sourceCompositionLedgerRevision = [string] $composition.sourceLedgerRevision
         canonicalNetworkStableId = [string] $policy.networkStableId
         coordinateSpaceCode = [string] $policy.coordinateSpaceCode
         areaRefs = @($areaRef)
@@ -408,10 +429,14 @@ foreach ($areaPolicy in @($policy.areaSets)) {
         -not [string]::IsNullOrWhiteSpace([string] $areaPolicy.defaultEntryH3Ref)) {
         [string] $areaPolicy.defaultEntryH3Ref
     }
-    else { [string] $promotedInstances[0].h3Ref }
-    Require (@($promotedInstances.h3Ref) -contains $defaultEntryH3Ref) "DefaultEntryH3NotPromoted:$($areaPolicy.actualAreaSetStableId)"
+    else { [string] $promotedInstances[0].selectedH3PatternRef }
+    Require (@($promotedInstances.selectedH3PatternRef) -contains $defaultEntryH3Ref) "DefaultEntryH3NotPromoted:$($areaPolicy.actualAreaSetStableId)"
     $areaSets += [ordered]@{
         theoryAreaSetStableId = [string] $areaPolicy.theoryAreaSetStableId
+        compositionPatternStableId = [string] $compositionPlan.compositionPatternStableId
+        compositionPatternCode = [string] $compositionPlan.patternCode
+        compositionPatternHashSha256 = [string] $compositionPlan.compositionPatternHashSha256
+        compositionDocumentHashSha256 = [string] $compositionPlan.documentHashSha256
         areaRoleCode = [string] $areaPolicy.areaRoleCode
         loadPolicyCode = [string] $areaPolicy.loadPolicyCode
         defaultEntryConnectorStableId = Stub-Id $defaultEntryH3Ref "ingress"
@@ -422,8 +447,9 @@ foreach ($areaPolicy in @($policy.areaSets)) {
 
 $areaByGraphRef = @{}
 foreach ($area in $areaSets) {
-    foreach ($instance in @($theory.e5AreaSetInstances | Where-Object areaSetStableId -eq $area.theoryAreaSetStableId).graphInstances | Where-Object { $deferredH3Refs -notcontains [string] $_.h3Ref }) {
-        $areaByGraphRef[[string] $instance.h3Ref] = $area
+    $compositionPlan = $compositionById[[string] $area.compositionPatternStableId]
+    foreach ($instance in @($compositionPlan.resolvedH3Placements)) {
+        $areaByGraphRef[[string] $instance.selectedH3PatternRef] = $area
     }
 }
 
@@ -591,6 +617,8 @@ $result = [ordered]@{
     schemaVersion = "simulation-world-actual-e5-spatial-output.v1"
     revision = "simulation-world-actual-e5-spatial-output.r$outputRevision"
     policyRevision = [string] $policy.revision
+    compositionPlanRevision = [string] $composition.revision
+    compositionLedgerRevision = [string] $composition.sourceLedgerRevision
     generatedAtRuleCode = "DeterministicNoWallClock"
     counts = [ordered]@{
         areaSets = $areaSets.Count
@@ -630,12 +658,13 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- 내부 Graph: ``$($result.counts.internalGraphs)`` · Network 경로 Graph: ``$($result.counts.networkRouteGraphs)``")
 [void] $builder.AppendLine("- Network 관계: ``$($result.counts.networkRelations)``")
 [void] $builder.AppendLine("- 이론 보류 Graph: ``$($result.counts.deferredTheoryGraphs)`` (정책 승격 전 실제 E5에서 제외)")
+[void] $builder.AppendLine("- AreaSet 구성 패턴: ``$($result.compositionPlanRevision)``")
 [void] $builder.AppendLine("- WI: 직접 ``$($result.counts.directBindings)`` · 문맥 ``$($result.counts.contextualBindings)`` · 비공간 ``$($result.counts.nonSpatialWi)``")
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("| 영역 | 실제 AreaSet | Graph | 적재 정책 |")
-[void] $builder.AppendLine("| --- | --- | ---: | --- |")
+[void] $builder.AppendLine("| 영역 | 구성 패턴 | 실제 AreaSet | Graph | 적재 정책 |")
+[void] $builder.AppendLine("| --- | --- | --- | ---: | --- |")
 foreach ($area in $areaSets) {
-    [void] $builder.AppendLine("| $($area.areaRoleCode) | ``$($area.definition.areaSetStableId)`` | $(@($area.graphs).Count) | ``$($area.loadPolicyCode)`` |")
+    [void] $builder.AppendLine("| $($area.areaRoleCode) | ``$($area.compositionPatternCode)`` | ``$($area.definition.areaSetStableId)`` | $(@($area.graphs).Count) | ``$($area.loadPolicyCode)`` |")
 }
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("작성 Scenario 근거는 E5 공간 결속이며 공공데이터 E6나 실제 서버·Unity E7 증거가 아니다.")

@@ -94,27 +94,46 @@ foreach ($definition in @($h3Definitions | Sort-Object stableId)) {
         $relation.toConnectorRoleCode = "Ingress"
         $relations += $relation
     }
+    if ($targetRef -eq "h3-candidate:nature-home-encounter-defense") {
+        $returnRelation = New-Relation "h2-flow-3" ([string] $children[-1]) ([string] $children[0]) "RecoveryHandoff"
+        $returnRelation.fromConnectorRoleCode = "Egress"
+        $returnRelation.toConnectorRoleCode = "Ingress"
+        $relations += $returnRelation
+    }
     $exposed = @(
         [ordered]@{ connectorStableId = "connector:h3:" + (Slug $targetRef) + ":ingress"; roleCode = "Ingress"; directionCode = "Input"; movementKindCodes = $movementKinds; sourceChildRef = [string] $children[0]; sourceChildConnectorRoleCode = "Ingress" },
         [ordered]@{ connectorStableId = "connector:h3:" + (Slug $targetRef) + ":egress"; roleCode = "Egress"; directionCode = "Output"; movementKindCodes = $movementKinds; sourceChildRef = [string] $children[-1]; sourceChildConnectorRoleCode = "Egress" })
-    $roleCodes = @($definition.connectorRoleCodes)
-    for ($index = 0; $index -lt $roleCodes.Count; $index++) {
-        $isInput = $index -lt [Math]::Ceiling($roleCodes.Count / 2.0)
-        $exposed += [ordered]@{
-            connectorStableId = "connector:h3:" + (Slug $targetRef) + ":" + (Slug ([string] $roleCodes[$index])).ToLowerInvariant()
-            roleCode = [string] $roleCodes[$index]
-            directionCode = if ($isInput) { "Input" } else { "Output" }
-            movementKindCodes = $movementKinds
-            sourceChildRef = if ($isInput) { [string] $children[0] } else { [string] $children[-1] }
-            sourceChildConnectorRoleCode = if ($isInput) { "Ingress" } else { "Egress" }
+    if ($targetRef -eq "h3-candidate:nature-home-encounter-defense") {
+        $exposed += @(
+            [ordered]@{ connectorStableId = "connector:h3:nature-home-encounter-defense:safecoregate"; roleCode = "SafeCoreGate"; directionCode = "Input"; movementKindCodes = $movementKinds; sourceChildRef = [string] $children[0]; sourceChildConnectorRoleCode = "Ingress" },
+            [ordered]@{ connectorStableId = "connector:h3:nature-home-encounter-defense:explorationoutput"; roleCode = "ExplorationOutput"; directionCode = "Output"; movementKindCodes = $movementKinds; sourceChildRef = [string] $children[0]; sourceChildConnectorRoleCode = "Egress" },
+            [ordered]@{ connectorStableId = "connector:h3:nature-home-encounter-defense:threatinput"; roleCode = "ThreatInput"; directionCode = "Input"; movementKindCodes = $movementKinds; sourceChildRef = [string] $children[-1]; sourceChildConnectorRoleCode = "Ingress" },
+            [ordered]@{ connectorStableId = "connector:h3:nature-home-encounter-defense:recoveryreturn"; roleCode = "RecoveryReturn"; directionCode = "Input"; movementKindCodes = $movementKinds; sourceChildRef = [string] $children[0]; sourceChildConnectorRoleCode = "Ingress" })
+    }
+    else {
+        $roleCodes = @($definition.connectorRoleCodes)
+        for ($index = 0; $index -lt $roleCodes.Count; $index++) {
+            $isInput = $index -lt [Math]::Ceiling($roleCodes.Count / 2.0)
+            $exposed += [ordered]@{
+                connectorStableId = "connector:h3:" + (Slug $targetRef) + ":" + (Slug ([string] $roleCodes[$index])).ToLowerInvariant()
+                roleCode = [string] $roleCodes[$index]
+                directionCode = if ($isInput) { "Input" } else { "Output" }
+                movementKindCodes = $movementKinds
+                sourceChildRef = if ($isInput) { [string] $children[0] } else { [string] $children[-1] }
+                sourceChildConnectorRoleCode = if ($isInput) { "Ingress" } else { "Egress" }
+            }
         }
+    }
+    $flowRequirements = @([ordered]@{ flowRequirementStableId = "flow:h3:" + (Slug $targetRef) + ":ingress-egress"; fromConnectorRoleCode = "Ingress"; toConnectorRoleCode = "Egress"; movementKindCode = $relationKind })
+    if ($targetRef -eq "h3-candidate:nature-home-encounter-defense") {
+        $flowRequirements += [ordered]@{ flowRequirementStableId = "flow:h3:nature-home-encounter-defense:recovery-return"; fromConnectorRoleCode = "Egress"; toConnectorRoleCode = "RecoveryReturn"; movementKindCode = "RecoveryHandoff" }
     }
     $h3Recipes += [ordered]@{
         targetRef = $targetRef
         requiredChildRefs = $children
         relations = $relations
         exposedConnectors = $exposed
-        flowRequirements = @([ordered]@{ flowRequirementStableId = "flow:h3:" + (Slug $targetRef) + ":ingress-egress"; fromConnectorRoleCode = "Ingress"; toConnectorRoleCode = "Egress"; movementKindCode = $relationKind })
+        flowRequirements = $flowRequirements
     }
 }
 
@@ -156,7 +175,7 @@ foreach ($candidate in @($priorities.areaSetCandidates | Sort-Object priorityCod
 
 $result = [ordered]@{
     schemaVersion = "simulation-world-semantic-spatial-relations.v1"
-    revision = "simulation-world-semantic-spatial-relations.r1"
+    revision = "simulation-world-semantic-spatial-relations.r2"
     allowedDirectionCodes = @("Input", "Output", "Bidirectional")
     allowedRelationDirectionCodes = @("Directed", "Bidirectional")
     allowedMovementKindCodes = @("PlayerTraversal", "WorkTraversal", "CargoLogistics", "IncidentHandoff", "RecoveryHandoff", "ServiceTraversal")

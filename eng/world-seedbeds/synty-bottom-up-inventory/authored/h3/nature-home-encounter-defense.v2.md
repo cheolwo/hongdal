@@ -16,6 +16,20 @@
 
 안전 생활핵에서 탐색을 시작해 몬스터 조우와 야간 방어를 거친 뒤 회복 공간으로 돌아오는 Nature 단독 경관이다.
 
+## 공간 폐루프
+
+```text
+자연 안전 생활핵 블록
+  → 자연 몬스터 조우·이탈 블록
+  → 자연 야간 방어 블록
+  → 자연 안전 생활핵 블록
+```
+
+- 첫 두 이동은 `PlayerTraversal`이다.
+- 방어환에서 생활핵으로 돌아오는 이동은 `RecoveryHandoff`다.
+- `SafeCoreGate`는 복귀 안전점, `ExplorationOutput`은 탐색 출발점, `ThreatInput`은 외부 위협 진입점, `RecoveryReturn`은 생활핵 복귀점이다.
+- 세 H2의 상대 배치와 연결 의미만 정의하며 실제 지역 좌표나 Unity 자산 경로는 포함하지 않는다.
+
 ## 설계 상태
 
 - 재고 상태: `ExploratoryInventory`

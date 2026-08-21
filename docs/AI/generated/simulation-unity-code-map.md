@@ -7,7 +7,9 @@ Simulation·Unity
 ├─ Simulation 세션 생명주기 [simulation-session-lifecycle]
 │  ├─ 010 contract.session-create · Contract · Definition
 │  ├─ 020 api.session-lifecycle · Api · Confirm
+│  ├─ 020 api.world-gameplay · Api · Confirm
 │  ├─ 030 application.session-lifecycle · Application · Confirm
+│  ├─ 030 application.world-gameplay · Application · Confirm
 │  ├─ 040 domain.session-aggregate · Domain · Tick
 │  └─ 050 infrastructure.session-store · Infrastructure · Persistence
 ├─ 병렬 경영-전투 [simulation-parallel-battle]
@@ -52,6 +54,11 @@ Simulation·Unity
 │  ├─ 030 application.world-stream · Application · Projection
 │  ├─ 031 application.lh-world-preview · Application · Preview
 │  └─ 032 api.lh-world-preview · Api · Preview
+├─ Farm 감자 3원천 현실근거 [simulation-farm-reality-evidence]
+│  ├─ 010 contract.farm-reality-evidence · Contract · Definition
+│  ├─ 020 api.farm-reality-evidence · Api · Persistence
+│  ├─ 030 application.farm-reality-sync · Application · Persistence
+│  └─ 040 infrastructure.farm-reality-store · Infrastructure · Persistence
 └─ Unity 마지막 성공 상태 로딩 [unity-resilient-world-load]
    ├─ 010 client.last-successful-runtime · ClientAdapter · Presentation
    ├─ 020 client.community-load · ClientAdapter · Query
@@ -73,11 +80,21 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: Simulation 실행 모드에서만 조립되며 오류 계약과 기존 route를 보존한다.
+- **020 api.world-gameplay** — [경영SimulationWorldGameplayController](../../../Ssalddel.Simulation.Server/Controllers/경영SimulationWorldGameplayController.cs) · 플레이어 심리·AreaSet 이동·호스팅·협동 건설의 세계 게임플레이 HTTP 경계를 제공한다.
+  - 계층/단계: `Api / Confirm`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: 기존 route를 보존하며 운영 상태나 Unity 표현 상태를 직접 변경하지 않는다.
 - **030 application.session-lifecycle** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/경영SimulationSession생명주기Service.cs) · 세션 생성·조회·Tick·저장·복원을 조율한다.
   - 계층/단계: `Application / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: 실제 업무 상태를 만들지 않으며 기대 개정과 저장 자료 무결성을 통과한 Simulation 상태만 변경한다.
+- **030 application.world-gameplay** — [경영SimulationWorldGameplayService](../../../Ssalddel.Simulation.Application/경영SimulationWorldGameplayService.cs) · 플레이어 심리·AreaSet 이동·호스팅·협동 건설의 세계 게임플레이를 조율한다.
+  - 계층/단계: `Application / Confirm`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: 운영 상태를 변경하지 않으며 서버 세션의 권한·개정·원장을 통해서만 세계 게임플레이 상태를 변경한다.
 - **040 domain.session-aggregate** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/경영SimulationSession.cs) · 결정적 세션 상태와 개정·Tick 상태 전이를 소유한다.
   - 계층/단계: `Domain / Tick`
   - 읽기/쓰기: `SimulationState → SimulationState`
@@ -296,6 +313,31 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 정확한 Transform을 받지 않고 양자화한 L3 Cell만 사용하며 Preview는 어떤 원장도 변경하지 않는다.
+
+## Farm 감자 3원천 현실근거 (`simulation-farm-reality-evidence`)
+
+선행 기능: `simulation-world-derivation`, `simulation-session-lifecycle`
+
+- **010 contract.farm-reality-evidence** — [SimulationFarmRealityEvidenceBundle](../../../Ssalddel.Simulation.Contracts/SimulationFarmRealityEvidenceContracts.cs) · 감자 Farm Area의 승인된 농사로·KAMIS·USDA AMS 현실 근거 묶음을 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: 원 단위와 관계 상태를 보존하며 가격 차이·수익·사건·공간 배치를 계산하지 않는다.
+- **020 api.farm-reality-evidence** — [SimulationFarmRealityEvidenceController](../../../Ssalddel.Simulation.Server/Controllers/SimulationFarmRealityEvidenceController.cs) · 감자 Farm 현실근거의 명시적 동기화와 읽기 전용 조회 경계를 제공한다.
+  - 계층/단계: `Api / Persistence`
+  - 읽기/쓰기: `SharedPublicData | DerivedWorld → DerivedWorld`
+  - 부수효과: `PersistentRead | PersistentWrite`
+  - 경계: 동기화는 명시적 요청에서만 수행하며 Tick·Unity 조회 중 Provider를 호출하지 않는다.
+- **030 application.farm-reality-sync** — [SimulationFarmRealityEvidenceService](../../../Ssalddel.Simulation.Application/SimulationFarmRealityEvidenceService.cs) · 운영 승인 묶음을 검증·해시해 Simulation 파생 원장에 명시적으로 동기화한다.
+  - 계층/단계: `Application / Persistence`
+  - 읽기/쓰기: `SharedPublicData → DerivedWorld`
+  - 부수효과: `PersistentRead | PersistentWrite`
+  - 경계: Provider를 호출하지 않고 승인된 운영 자료만 읽으며 ContextProposal 외 Simulation 효과를 만들지 않는다.
+- **040 infrastructure.farm-reality-store** — [SimulationFarmRealityEvidenceStore](../../../Ssalddel.Simulation.Persistence/SimulationFarmRealityEvidencePersistence.cs) · 승인 현실근거 묶음을 입력 hash 기준으로 Simulation World 파생 DB에 멱등 저장한다.
+  - 계층/단계: `Infrastructure / Persistence`
+  - 읽기/쓰기: `DerivedWorld → DerivedWorld`
+  - 부수효과: `PersistentRead | PersistentWrite`
+  - 경계: Simulation World 파생 DB만 변경하며 같은 revision의 다른 hash를 거부한다.
 
 ## Unity 마지막 성공 상태 로딩 (`unity-resilient-world-load`)
 

@@ -47,6 +47,29 @@
           "boundary": "Simulation \uC2E4\uD589 \uBAA8\uB4DC\uC5D0\uC11C\uB9CC \uC870\uB9BD\uB418\uBA70 \uC624\uB958 \uACC4\uC57D\uACFC \uAE30\uC874 route\uB97C \uBCF4\uC874\uD55C\uB2E4."
         },
         {
+          "flowOrder": 20,
+          "stepKey": "api.world-gameplay",
+          "dependsOnStepKeys": [
+            "contract.session-create"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.\uACBD\uC601SimulationWorldGameplayController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/\uACBD\uC601SimulationWorldGameplayController.cs",
+          "responsibility": "\uD50C\uB808\uC774\uC5B4 \uC2EC\uB9AC\u00B7AreaSet \uC774\uB3D9\u00B7\uD638\uC2A4\uD305\u00B7\uD611\uB3D9 \uAC74\uC124\uC758 \uC138\uACC4 \uAC8C\uC784\uD50C\uB808\uC774 HTTP \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uAE30\uC874 route\uB97C \uBCF4\uC874\uD558\uBA70 \uC6B4\uC601 \uC0C1\uD0DC\uB098 Unity \uD45C\uD604 \uC0C1\uD0DC\uB97C \uC9C1\uC811 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
           "flowOrder": 30,
           "stepKey": "application.session-lifecycle",
           "dependsOnStepKeys": [
@@ -69,6 +92,29 @@
             "SimulationState"
           ],
           "boundary": "\uC2E4\uC81C \uC5C5\uBB34 \uC0C1\uD0DC\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uC73C\uBA70 \uAE30\uB300 \uAC1C\uC815\uACFC \uC800\uC7A5 \uC790\uB8CC \uBB34\uACB0\uC131\uC744 \uD1B5\uACFC\uD55C Simulation \uC0C1\uD0DC\uB9CC \uBCC0\uACBD\uD55C\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.world-gameplay",
+          "dependsOnStepKeys": [
+            "api.world-gameplay"
+          ],
+          "executionStage": "Confirm",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.\uACBD\uC601SimulationWorldGameplayService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/\uACBD\uC601SimulationWorldGameplayService.cs",
+          "responsibility": "\uD50C\uB808\uC774\uC5B4 \uC2EC\uB9AC\u00B7AreaSet \uC774\uB3D9\u00B7\uD638\uC2A4\uD305\u00B7\uD611\uB3D9 \uAC74\uC124\uC758 \uC138\uACC4 \uAC8C\uC784\uD50C\uB808\uC774\uB97C \uC870\uC728\uD55C\uB2E4.",
+          "effects": [
+            "StateMutation"
+          ],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [
+            "SimulationState"
+          ],
+          "boundary": "\uC6B4\uC601 \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uC73C\uBA70 \uC11C\uBC84 \uC138\uC158\uC758 \uAD8C\uD55C\u00B7\uAC1C\uC815\u00B7\uC6D0\uC7A5\uC744 \uD1B5\uD574\uC11C\uB9CC \uC138\uACC4 \uAC8C\uC784\uD50C\uB808\uC774 \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD55C\uB2E4."
         },
         {
           "flowOrder": 40,
@@ -883,6 +929,104 @@
       ]
     },
     {
+      "key": "simulation-farm-reality-evidence",
+      "label": "Farm \uAC10\uC790 3\uC6D0\uCC9C \uD604\uC2E4\uADFC\uAC70",
+      "dependsOnFeatures": [
+        "simulation-world-derivation",
+        "simulation-session-lifecycle"
+      ],
+      "steps": [
+        {
+          "flowOrder": 10,
+          "stepKey": "contract.farm-reality-evidence",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationFarmRealityEvidenceBundle",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationFarmRealityEvidenceContracts.cs",
+          "responsibility": "\uAC10\uC790 Farm Area\uC758 \uC2B9\uC778\uB41C \uB18D\uC0AC\uB85C\u00B7KAMIS\u00B7USDA AMS \uD604\uC2E4 \uADFC\uAC70 \uBB36\uC74C\uC744 \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uC6D0 \uB2E8\uC704\uC640 \uAD00\uACC4 \uC0C1\uD0DC\uB97C \uBCF4\uC874\uD558\uBA70 \uAC00\uACA9 \uCC28\uC774\u00B7\uC218\uC775\u00B7\uC0AC\uAC74\u00B7\uACF5\uAC04 \uBC30\uCE58\uB97C \uACC4\uC0B0\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 20,
+          "stepKey": "api.farm-reality-evidence",
+          "dependsOnStepKeys": [
+            "contract.farm-reality-evidence"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Api",
+          "componentType": "Ssalddel.Simulation.Server.Controllers.SimulationFarmRealityEvidenceController",
+          "assembly": "Ssalddel.Simulation.Server",
+          "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationFarmRealityEvidenceController.cs",
+          "responsibility": "\uAC10\uC790 Farm \uD604\uC2E4\uADFC\uAC70\uC758 \uBA85\uC2DC\uC801 \uB3D9\uAE30\uD654\uC640 \uC77D\uAE30 \uC804\uC6A9 \uC870\uD68C \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SharedPublicData",
+            "DerivedWorld"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "\uB3D9\uAE30\uD654\uB294 \uBA85\uC2DC\uC801 \uC694\uCCAD\uC5D0\uC11C\uB9CC \uC218\uD589\uD558\uBA70 Tick\u00B7Unity \uC870\uD68C \uC911 Provider\uB97C \uD638\uCD9C\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.farm-reality-sync",
+          "dependsOnStepKeys": [
+            "api.farm-reality-evidence"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationFarmRealityEvidenceService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationFarmRealityEvidenceService.cs",
+          "responsibility": "\uC6B4\uC601 \uC2B9\uC778 \uBB36\uC74C\uC744 \uAC80\uC99D\u00B7\uD574\uC2DC\uD574 Simulation \uD30C\uC0DD \uC6D0\uC7A5\uC5D0 \uBA85\uC2DC\uC801\uC73C\uB85C \uB3D9\uAE30\uD654\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "SharedPublicData"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "Provider\uB97C \uD638\uCD9C\uD558\uC9C0 \uC54A\uACE0 \uC2B9\uC778\uB41C \uC6B4\uC601 \uC790\uB8CC\uB9CC \uC77D\uC73C\uBA70 ContextProposal \uC678 Simulation \uD6A8\uACFC\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 40,
+          "stepKey": "infrastructure.farm-reality-store",
+          "dependsOnStepKeys": [
+            "application.farm-reality-sync"
+          ],
+          "executionStage": "Persistence",
+          "layer": "Infrastructure",
+          "componentType": "Ssalddel.Simulation.Persistence.SimulationFarmRealityEvidenceStore",
+          "assembly": "Ssalddel.Simulation.Persistence",
+          "sourcePath": "Ssalddel.Simulation.Persistence/SimulationFarmRealityEvidencePersistence.cs",
+          "responsibility": "\uC2B9\uC778 \uD604\uC2E4\uADFC\uAC70 \uBB36\uC74C\uC744 \uC785\uB825 hash \uAE30\uC900\uC73C\uB85C Simulation World \uD30C\uC0DD DB\uC5D0 \uBA71\uB4F1 \uC800\uC7A5\uD55C\uB2E4.",
+          "effects": [
+            "PersistentRead",
+            "PersistentWrite"
+          ],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [
+            "DerivedWorld"
+          ],
+          "boundary": "Simulation World \uD30C\uC0DD DB\uB9CC \uBCC0\uACBD\uD558\uBA70 \uAC19\uC740 revision\uC758 \uB2E4\uB978 hash\uB97C \uAC70\uBD80\uD55C\uB2E4."
+        }
+      ]
+    },
+    {
       "key": "unity-resilient-world-load",
       "label": "Unity \uB9C8\uC9C0\uB9C9 \uC131\uACF5 \uC0C1\uD0DC \uB85C\uB529",
       "dependsOnFeatures": [
@@ -989,7 +1133,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Application",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 54\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ISimulationTeamObservationPolicyStore, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 56\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationFarmRealityEvidenceStore, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ..."
     },
     {
       "severity": "Warning",
@@ -1010,14 +1154,14 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Server",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 19\uAC1C: SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationIntegratedWorldController, SimulationSurvivalTarotController, SimulationTeamObservationController, SimulationTeamRoleCardsController, SimulationWorldEventsController, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 21\uAC1C: DisabledSimulationFarmRealityEvidenceStore, SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationIntegratedWorldController, SimulationRealityContextController, SimulationSurvivalTarotController, SimulationTeamObservationController, ..."
     },
     {
       "severity": "Warning",
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Unity",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 47\uAC1C: CardWorkspaceCoordinator, CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 48\uAC1C: CardWorkspaceCoordinator, CargoWarehouseHandoffMapper, CommunityMarketSquareMapper, CommunitySquareDataFlowLoadCoordinator, CommunitySquareDataMapper, CropReferenceCategoryMapper, FarmCombatPresentationMapper, FarmProducerPerspectiveMapper, ..."
     }
   ]
 }

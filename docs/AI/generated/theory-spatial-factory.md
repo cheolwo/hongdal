@@ -6,7 +6,7 @@ H2·H3·AreaSet·World를 같은 연결점·관계·흐름 규칙으로 판정�
 - H3 이론 적격: 20
 - 이론 E5 AreaSet: 4
 - 이론 World: `TheoryWorldQualified`
-- 의미 관계 대장: `simulation-world-semantic-spatial-relations.r1`
+- 의미 관계 대장: `simulation-world-semantic-spatial-relations.r2`
 
 ## 이론 AreaSet 의미 폐쇄
 

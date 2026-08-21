@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-actual-e5-spatial-policy.v1",
-  "revision": "simulation-world-actual-e5-spatial-policy.r3",
-  "outputRevision": 2,
+  "revision": "simulation-world-actual-e5-spatial-policy.r4",
+  "outputRevision": 3,
   "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
   "legacyFacadeAreaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
   "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -11,12 +11,14 @@
       "theoryAreaSetStableId": "area-set:theory:nature-home-exploration-region",
       "actualAreaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
       "areaRoleCode": "NatureHome",
+      "compositionPatternStableId": "area-set-composition:nature:forest-river-home-loop",
       "loadPolicyCode": "Persistent"
     },
     {
       "theoryAreaSetStableId": "area-set:theory:farm-production-processing-region",
       "actualAreaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
       "areaRoleCode": "Farm",
+      "compositionPatternStableId": "area-set-composition:farm:highland-production-processing",
       "loadPolicyCode": "OnDemand",
       "defaultEntryH3Ref": "h3-candidate:farm-processing-campus"
     },
@@ -24,12 +26,14 @@
       "theoryAreaSetStableId": "area-set:theory:logistics-hub-region",
       "actualAreaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
       "areaRoleCode": "CityHub",
+      "compositionPatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
       "loadPolicyCode": "OnDemand"
     },
     {
       "theoryAreaSetStableId": "area-set:theory:lowrise-market-region",
       "actualAreaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
       "areaRoleCode": "Town",
+      "compositionPatternStableId": "area-set-composition:town:lowrise-life-market",
       "loadPolicyCode": "OnDemand"
     }
   ],
@@ -39,9 +43,7 @@
     "h3-candidate:hub-town-logistics"
   ],
   "deferredTheoryH3Refs": [
-    "h3-candidate:nature-town-relief-loop",
-    "h3-candidate:hub-fulfillment-operations",
-    "h3-candidate:town-market-fulfillment"
+    "h3-candidate:nature-town-relief-loop"
   ],
   "networkRelations": [
     {

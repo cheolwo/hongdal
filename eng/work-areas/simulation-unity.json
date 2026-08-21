@@ -113,6 +113,17 @@
       ]
     },
     {
+      "key": "simulation-farm-reality-evidence",
+      "label": "Farm 감자 3원천 현실근거",
+      "dependsOnFeatures": ["simulation-world-derivation", "simulation-session-lifecycle"],
+      "requiredStepKeys": [
+        "contract.farm-reality-evidence",
+        "api.farm-reality-evidence",
+        "application.farm-reality-sync",
+        "infrastructure.farm-reality-store"
+      ]
+    },
+    {
       "key": "unity-resilient-world-load",
       "label": "Unity 마지막 성공 상태 로딩",
       "dependsOnFeatures": ["simulation-world-streaming"],

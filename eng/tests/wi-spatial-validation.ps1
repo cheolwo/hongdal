@@ -14,6 +14,8 @@ $tests = @(
     "spatial-resource-inventory.ps1",
     "spatial-design-knowledge.ps1",
     "theory-spatial-factory.ps1",
+    "area-set-composition-patterns.ps1",
+    "actual-e5-spatial.ps1",
     "gameplay-spatial-completion.ps1",
     "gameplay-led-h-inventory.ps1",
     "h2-composition-plans.ps1",

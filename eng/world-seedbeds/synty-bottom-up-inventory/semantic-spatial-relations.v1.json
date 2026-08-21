@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-semantic-spatial-relations.v1",
-  "revision": "simulation-world-semantic-spatial-relations.r1",
+  "revision": "simulation-world-semantic-spatial-relations.r2",
   "allowedDirectionCodes": [
     "Input",
     "Output",
@@ -6163,6 +6163,16 @@
           "relationKindCode": "PlayerTraversal",
           "relationDirectionCode": "Directed",
           "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "relationCode": "h2-flow-3",
+          "fromRef": "h2-candidate:nature-defense-ring",
+          "fromConnectorRoleCode": "Egress",
+          "toRef": "h2-candidate:nature-home-core",
+          "toConnectorRoleCode": "Ingress",
+          "relationKindCode": "RecoveryHandoff",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
         }
       ],
       "exposedConnectors": [
@@ -6208,6 +6218,32 @@
         {
           "connectorStableId": "connector:h3:nature-home-encounter-defense:explorationoutput",
           "roleCode": "ExplorationOutput",
+          "directionCode": "Output",
+          "movementKindCodes": [
+            "PlayerTraversal",
+            "WorkTraversal",
+            "IncidentHandoff",
+            "RecoveryHandoff"
+          ],
+          "sourceChildRef": "h2-candidate:nature-home-core",
+          "sourceChildConnectorRoleCode": "Egress"
+        },
+        {
+          "connectorStableId": "connector:h3:nature-home-encounter-defense:threatinput",
+          "roleCode": "ThreatInput",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "PlayerTraversal",
+            "WorkTraversal",
+            "IncidentHandoff",
+            "RecoveryHandoff"
+          ],
+          "sourceChildRef": "h2-candidate:nature-defense-ring",
+          "sourceChildConnectorRoleCode": "Ingress"
+        },
+        {
+          "connectorStableId": "connector:h3:nature-home-encounter-defense:recoveryreturn",
+          "roleCode": "RecoveryReturn",
           "directionCode": "Input",
           "movementKindCodes": [
             "PlayerTraversal",
@@ -6217,32 +6253,6 @@
           ],
           "sourceChildRef": "h2-candidate:nature-home-core",
           "sourceChildConnectorRoleCode": "Ingress"
-        },
-        {
-          "connectorStableId": "connector:h3:nature-home-encounter-defense:threatinput",
-          "roleCode": "ThreatInput",
-          "directionCode": "Output",
-          "movementKindCodes": [
-            "PlayerTraversal",
-            "WorkTraversal",
-            "IncidentHandoff",
-            "RecoveryHandoff"
-          ],
-          "sourceChildRef": "h2-candidate:nature-defense-ring",
-          "sourceChildConnectorRoleCode": "Egress"
-        },
-        {
-          "connectorStableId": "connector:h3:nature-home-encounter-defense:recoveryreturn",
-          "roleCode": "RecoveryReturn",
-          "directionCode": "Output",
-          "movementKindCodes": [
-            "PlayerTraversal",
-            "WorkTraversal",
-            "IncidentHandoff",
-            "RecoveryHandoff"
-          ],
-          "sourceChildRef": "h2-candidate:nature-defense-ring",
-          "sourceChildConnectorRoleCode": "Egress"
         }
       ],
       "flowRequirements": [
@@ -6251,6 +6261,12 @@
           "fromConnectorRoleCode": "Ingress",
           "toConnectorRoleCode": "Egress",
           "movementKindCode": "PlayerTraversal"
+        },
+        {
+          "flowRequirementStableId": "flow:h3:nature-home-encounter-defense:recovery-return",
+          "fromConnectorRoleCode": "Egress",
+          "toConnectorRoleCode": "RecoveryReturn",
+          "movementKindCode": "RecoveryHandoff"
         }
       ]
     },

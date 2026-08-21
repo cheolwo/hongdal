@@ -65,9 +65,9 @@
 
 | 기준 플레이 | WI | 구현 | 통합 | E5 직접 배치 | E5 문맥 | E7 플레이 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `reference-play:nature-farm-day.v1` | 수확 (`WI-FARM-04`) | `E3` | `E5` | 1 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 수확물 집하 (`WI-FARM-05`) | `E3` | `E5` | 1 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 출하 준비·포장 (`WI-FARM-06`) | `E3` | `E5` | 1 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 수확 (`WI-FARM-04`) | `E3` | `E6` | 2 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 수확물 집하 (`WI-FARM-05`) | `E3` | `E6` | 2 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 출하 준비·포장 (`WI-FARM-06`) | `E3` | `E6` | 2 | 0 | 0 |
 | `reference-play:nature-farm-day.v1` | 자연권 위협 관찰 (`WI-NATURE-01`) | `E3` | `E5` | 1 | 0 | 0 |
 | `reference-play:nature-farm-day.v1` | 자연권 긴급 후퇴 (`WI-NATURE-02`) | `E3` | `E5` | 1 | 0 | 0 |
 | `reference-play:nature-farm-day.v1` | 자연권 복원 (`WI-NATURE-03`) | `E3` | `E5` | 1 | 0 | 0 |

@@ -3,7 +3,7 @@
   "revision": "simulation-world-theory-spatial-factory-output.r3",
   "policyRevision": "simulation-world-theory-spatial-factory-policy.r4",
   "patternNamingRevision": "simulation-world-h-pattern-naming.r8",
-  "semanticRelationRevision": "simulation-world-semantic-spatial-relations.r1",
+  "semanticRelationRevision": "simulation-world-semantic-spatial-relations.r2",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "counts": {
     "h1Inputs": 52,
@@ -225,7 +225,7 @@
         "WaitForPacking",
         "WaitForVehicle"
       ],
-      "theoryHashSha256": "6cadcab3fe3a3e85f2d1335bdb8465c0875a93a9e97e53e8335ddc49e43d012b"
+      "theoryHashSha256": "ce7bfda2b6314a4a5181cf44f1cf226385c81207c2ff86243c231aa636e8b109"
     },
     {
       "h2StableId": "h2-candidate:farm-hub-corridor",
@@ -392,7 +392,7 @@
         "WI-LOG-03"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "216d0a31227ba4d6f7208e88a53716ecdf523094f52cd37dd86e5970d3564b83"
+      "theoryHashSha256": "02ff20e06f6e2aca2fb5d928a3e47ec90e626b5068133370ca4deb36c66663f9"
     },
     {
       "h2StableId": "h2-candidate:farm-incident-containment",
@@ -587,7 +587,7 @@
         "SafeHandoffDecision",
         "WeatherProtectedStaging"
       ],
-      "theoryHashSha256": "c1b119f3d90f74b98cbfdf3c342fa83504715bee77a9513b171192d50a3ec482"
+      "theoryHashSha256": "39148f4821b8b4a039435776580ce82c6f7d848f21ec01398b6088edde1ff775"
     },
     {
       "h2StableId": "h2-candidate:farm-irrigation-service",
@@ -787,7 +787,7 @@
         "MaterialShelter",
         "WeatherProtectedStaging"
       ],
-      "theoryHashSha256": "ab8166ac629a4eb8b97ee0b28a57dc604f57bca9d845548bbe621b0930282852"
+      "theoryHashSha256": "e1ac9aa2279ded75c1e6ef2e9c658f2621833dcda4f7567ffb5ce778286f6b90"
     },
     {
       "h2StableId": "h2-candidate:farm-loss-restoration-handoff",
@@ -983,7 +983,7 @@
         "ReleaseOrDiscard",
         "RestorationSupplyHandoff"
       ],
-      "theoryHashSha256": "b7362634fc848c28e6d0fc36c376816f263f70fecfcc129288b82c35f1a700e4"
+      "theoryHashSha256": "c5c4a1bc7e20425433b5e29d03f20ed5a9642ed5a1106bce76fa7bf2e8f2a612"
     },
     {
       "h2StableId": "h2-candidate:farm-processing-shipping",
@@ -1183,7 +1183,7 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "75471816f35e0dc9003a0462bbecee1baa8da1e8b8f6ab1174a458d21f71e72e"
+      "theoryHashSha256": "f2246d642402194d6682df91692afb937c92822fe5a95e9d4dacf198a9649be8"
     },
     {
       "h2StableId": "h2-candidate:farm-seed-and-tools",
@@ -1350,7 +1350,7 @@
         "ToolCheckout",
         "ToolReturn"
       ],
-      "theoryHashSha256": "2d34f9846cc8c94f0e6a4694036d1042a976be79e7ed3a87088fa4f22a565360"
+      "theoryHashSha256": "7baaf4e0cd9b0ac60ce159d9b3327319c3130081d73ff16348d855d216b0ff40"
     },
     {
       "h2StableId": "h2-candidate:farm-wash-sort-pack",
@@ -1584,7 +1584,7 @@
         "WasteWaterHandling",
         "WaterUse"
       ],
-      "theoryHashSha256": "5746f9789c0e52b3817a871d5dbfd98308cc77c9b9ff28101bca6efe0da0e9c2"
+      "theoryHashSha256": "628c51121fed9dbb276074b558d7b4f92000aee596a59df1a89557762fae867f"
     },
     {
       "h2StableId": "h2-candidate:farm-worker-support",
@@ -1787,7 +1787,7 @@
         "ToolReturn",
         "WorkerBriefing"
       ],
-      "theoryHashSha256": "e6314beaebbf4397b04bd4a26f2ca5d4d13f794c102f8fdc5df8a87ecc1bb73e"
+      "theoryHashSha256": "0be1923d5373b1760a2eae6590842d2042052612f68076f0c5a1b0a46a0049a0"
     },
     {
       "h2StableId": "h2-candidate:forest-edge-farm",
@@ -1990,7 +1990,7 @@
         "WI-WORLD-07"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "38f4e17113c33886decf8965fb775a791ca4db411ec394bd3d47aa434f3af4ef"
+      "theoryHashSha256": "f8ef719f3d565e4942f9f06182562132ba7bc6e6ac442a651582f282b8694d97"
     },
     {
       "h2StableId": "h2-candidate:highland-production",
@@ -2159,7 +2159,7 @@
         "WI-WORLD-05"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "7e8921a886f9c288fa73c0f95f296bfcfe6b5573ab9395e02ce96310e6802934"
+      "theoryHashSha256": "fa3c3af3abdac1aa1997c7f9147b8cf201426a50f65962d79222fe47c4f3f6d3"
     },
     {
       "h2StableId": "h2-candidate:hub-emergency-power",
@@ -2356,7 +2356,7 @@
         "StorageAging",
         "TemperatureExcursion"
       ],
-      "theoryHashSha256": "6fcf14150da4f07d784e1440170baa9222f76b10ac0485adc2f6a85a562ac5a6"
+      "theoryHashSha256": "5d5e475efc0467dff66b82f2254f4e689532b607e2cac0897f6b657a35f202fb"
     },
     {
       "h2StableId": "h2-candidate:hub-fulfillment",
@@ -2527,7 +2527,7 @@
         "InboundStaging",
         "OutboundStaging"
       ],
-      "theoryHashSha256": "cd760406370810c5ac8e7f8c914119a9d0a797155f62a66cd498ecd9e9a95747"
+      "theoryHashSha256": "f0ba411d8eab45a4e70c98d4f1b6710f159887d155bd81629dd84ac1f32b3039"
     },
     {
       "h2StableId": "h2-candidate:hub-inbound-storage",
@@ -2696,7 +2696,7 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "652f50f9b070fc63142e40a369871257840a48677f655fa29f3f7ddbc204abb6"
+      "theoryHashSha256": "bbb0041090deeadab895e384145fdf7f54f954c98b41f36271622fc83ecf9190"
     },
     {
       "h2StableId": "h2-candidate:hub-longterm-cold-storage",
@@ -2861,7 +2861,7 @@
         "StorageAging",
         "TemperatureExcursion"
       ],
-      "theoryHashSha256": "691a931bc5065c7d6442e38818c6d2025df15dc69a7a6752bff24aa4289fe625"
+      "theoryHashSha256": "859276a43e7462bce252a952b2c042a206f5c1b59fdca4d505112cd24375fc89"
     },
     {
       "h2StableId": "h2-candidate:hub-maintenance-yard",
@@ -3025,7 +3025,7 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "2f068fcb1c2cabdd86f09d496963e0bc3241349711e4b80eaffca4e043538ced"
+      "theoryHashSha256": "ee5958fd4b7373cb73d85068b91b3460235815ada7acdd80a32d339ff9c6806f"
     },
     {
       "h2StableId": "h2-candidate:hub-outbound-vehicle",
@@ -3227,7 +3227,7 @@
         "WI-MARKET-02"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "14cd86f91c60c5531dbed209b7003a2ac6b1f7f9bb2a2f155118d6f6e0b4dc74"
+      "theoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
     },
     {
       "h2StableId": "h2-candidate:hub-quarantine-staging",
@@ -3436,7 +3436,7 @@
         "QualityHold",
         "ReleaseOrReject"
       ],
-      "theoryHashSha256": "fccbba30ac6e9c6e13121044cfbc1d1a09a1e165dd968cb0d52d585685865695"
+      "theoryHashSha256": "4a348bc87e563cd42e14d3c5d686e5e0d87b48ddab4023fa722db61404161ede"
     },
     {
       "h2StableId": "h2-candidate:hub-returns-processing",
@@ -3599,7 +3599,7 @@
         "ReturnInspection",
         "ReturnReceiving"
       ],
-      "theoryHashSha256": "69e434cf183ccfcea33f0366e22139b290c89ed1146b5340e35a16430b546709"
+      "theoryHashSha256": "5e5289e3c64a61fbf3307916d633eb0212b75397858bde7ba6ce2d5708f47387"
     },
     {
       "h2StableId": "h2-candidate:hub-town-corridor",
@@ -3800,7 +3800,7 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "8ae221d22382378830af59048c2a3376003e8335331d1242ac5458a9019dd7e2"
+      "theoryHashSha256": "ba2c8b5a6fa94ddda7ffa0ced931a5b543e6bca4133cd20765053b0e6352e207"
     },
     {
       "h2StableId": "h2-candidate:lowrise-residential",
@@ -3965,7 +3965,7 @@
         "WI-WORLD-05"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "966b9d271764c5417c78502f4bdba631468d99c0efd847676177eeb1d6a96a54"
+      "theoryHashSha256": "7c5db356bc68ea53bf7f3bcf8e961af6fef746cc9a043b991d37fdfd58999cbf"
     },
     {
       "h2StableId": "h2-candidate:market-life-commerce",
@@ -4236,7 +4236,7 @@
         "WI-WORLD-05"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "75dbff253fd92c02724de5b11c965b48300cd0f602e4c709a10643b18acf770a"
+      "theoryHashSha256": "18b8ec615eadf297cd17449ad7014c7356b128dab272addbe28b2c647bd88516"
     },
     {
       "h2StableId": "h2-candidate:nature-defense-ring",
@@ -4449,7 +4449,7 @@
         "ThreatDebrief",
         "WeatherWait"
       ],
-      "theoryHashSha256": "0c3e37877a1fffcdda7390066c8b6094169ecd061493ec7181938ab467240e82"
+      "theoryHashSha256": "79e53864e10fd268d4dc977b99f3b00c8fa7543b206333cb4fcc6cd83e2488d2"
     },
     {
       "h2StableId": "h2-candidate:nature-encounter-route",
@@ -4664,7 +4664,7 @@
         "ThreatEvacuation",
         "ThreatTracking"
       ],
-      "theoryHashSha256": "f457d60931b3f9786cbbcb5702acd2344d1b15ff5de48eb122523ae2e08f32f7"
+      "theoryHashSha256": "ad15ce3d222a7b9b46c77404879531ac64da99cb0fc7f9b94c999a7bff045321"
     },
     {
       "h2StableId": "h2-candidate:nature-home-core",
@@ -4875,7 +4875,7 @@
         "TrailStart",
         "WeatherWait"
       ],
-      "theoryHashSha256": "86fb3e4934faa2cea4243fba81b2766d36420d33e55a1630a278223efd45a0ce"
+      "theoryHashSha256": "5d94c6148c323a120914cf8802540bcb9c2b1f804b5e395a91a73e1046642e7b"
     },
     {
       "h2StableId": "h2-candidate:nature-restoration-recovery",
@@ -5053,7 +5053,7 @@
         "RouteRecovery",
         "ThreatDebrief"
       ],
-      "theoryHashSha256": "0dd14b9f3404337ac2e94323f6049f9daf420e9983f39eb293fe4720610c0a39"
+      "theoryHashSha256": "acea8e8de75d6278281bc8bd43f63d6c79871668b10479fbef18ee03d8d14f23"
     },
     {
       "h2StableId": "h2-candidate:nature-threat-response",
@@ -5268,7 +5268,7 @@
         "ThreatEvacuation",
         "ThreatTracking"
       ],
-      "theoryHashSha256": "07ddf75d863a044f39a5c912d79cec0e87eb08cd7bfb35e7a151bca43efd2067"
+      "theoryHashSha256": "1dd0052897da07726ca9c043ec7fe9ab496e17670e219ee80703d928959ec5d8"
     },
     {
       "h2StableId": "h2-candidate:nature-town-relief-transition",
@@ -5481,7 +5481,7 @@
         "RouteRecovery",
         "ThreatDebrief"
       ],
-      "theoryHashSha256": "7dfdd17e900877312bf6b62a209c6c41f1e9c0de0cef7832dd024e8b27e0fbe1"
+      "theoryHashSha256": "5ba30f033d177b9bdaa4461bc917c12f7ba0c55588d319c0ee53d529191a8603"
     },
     {
       "h2StableId": "h2-candidate:nature-trail-shelter",
@@ -5687,7 +5687,7 @@
         "TrailStart",
         "WeatherWait"
       ],
-      "theoryHashSha256": "d3388f44b45386dbe6df4097e130fc3f478961149d94900070637eea010efa91"
+      "theoryHashSha256": "6d905cce8a86956d666b09b9cadfb6be0aa939197d9001495f5d1054799e9374"
     },
     {
       "h2StableId": "h2-candidate:nature-water-buffer",
@@ -5853,7 +5853,7 @@
         "WI-WORLD-07"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "66641f275d5330800b402b473f5cb4c91688ba591f14d52c9c74d7cfb3c08f3b"
+      "theoryHashSha256": "2eb7bceed5aff6be69291ab63bab319ac8ac3e51a7e446c46c47f79a3f275660"
     },
     {
       "h2StableId": "h2-candidate:town-contamination-control",
@@ -6052,7 +6052,7 @@
         "ServiceVehicleHandoff",
         "StockSafetyAssessment"
       ],
-      "theoryHashSha256": "0a9f59cdc6e21b8be76dbcf5bf4d941a62568619bfb522f897fcd66e92fa8f83"
+      "theoryHashSha256": "8816a5234ea5a4264bf9811b3d1ab3da56d25769221c5097c9241ae889f1e90b"
     },
     {
       "h2StableId": "h2-candidate:town-market-receiving",
@@ -6224,7 +6224,7 @@
         "WI-WORLD-04"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "cefab0d343d77d0fc9dd5313818ff3d32c150c80ee06dac17cb327f2d86a5287"
+      "theoryHashSha256": "d6bfe8a7302609c102b1561e4f9da12fd3820bd95d30be3925462a62073eadb4"
     },
     {
       "h2StableId": "h2-candidate:town-order-fulfillment",
@@ -6426,7 +6426,7 @@
         "WI-ORDER-06"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "990fd4bb34f8e2585a3a69e84ffc6cde2175d273269b37562f5dfef691c656df"
+      "theoryHashSha256": "d837a3339c056a186f5677cbc721e251f0d45bedcb7546ff59c5b91c4cb34a70"
     },
     {
       "h2StableId": "h2-candidate:town-recall-relief",
@@ -6628,7 +6628,7 @@
         "ResidentRecallNotice",
         "RestorationSupplyHandoff"
       ],
-      "theoryHashSha256": "d0273b0b587bc22a1ec6f8e3fb12eb287f731dd8729754b3c102e5b53352b0d6"
+      "theoryHashSha256": "1618b7581a84a82932f187929a835bc22018907ae25ca6dc7899cb5e1b24378a"
     },
     {
       "h2StableId": "h2-candidate:town-resident-service",
@@ -6830,7 +6830,7 @@
         "ReplacementPickup",
         "ResidentRecallNotice"
       ],
-      "theoryHashSha256": "7361ac5c4ca533abc96b446241c3df6c40a1b3108b5bb60351436d6f5fee0309"
+      "theoryHashSha256": "334b5ebc01275a50f6133e7e15094cdabfae4ee17f0d4e749d244543a98913ab"
     },
     {
       "h2StableId": "h2-candidate:town-residential-alley",
@@ -6999,7 +6999,7 @@
         "LocalInformation",
         "NeighborhoodTaskStart"
       ],
-      "theoryHashSha256": "0be0596cc7be02c44338765288853980bb3ce09b508bebb2cea9619b5ad5470c"
+      "theoryHashSha256": "5bd49d2264964f566d67eab9eaffaa07bb0b0632ed4fa009447a92bd4ab72e2e"
     },
     {
       "h2StableId": "h2-candidate:town-returns-waste",
@@ -7199,7 +7199,7 @@
         "WasteSorting",
         "WasteStorage"
       ],
-      "theoryHashSha256": "665fd3cffe23933d35482274ea57aebafb57565ba04943276b4a343c59de108b"
+      "theoryHashSha256": "3ee620bc594e60bdca086bde19bfad1454e107fa1c25b2ebc1136657cd2a933f"
     }
   ],
   "h3Plans": [
@@ -7257,7 +7257,7 @@
           "h2DisplayNameKo": "마트·생활상가 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "75dbff253fd92c02724de5b11c965b48300cd0f602e4c709a10643b18acf770a"
+          "h2TheoryHashSha256": "18b8ec615eadf297cd17449ad7014c7356b128dab272addbe28b2c647bd88516"
         },
         {
           "nodeId": "h2-town-returns-waste",
@@ -7266,7 +7266,7 @@
           "h2DisplayNameKo": "반품 집하장·폐기물 처리장 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "665fd3cffe23933d35482274ea57aebafb57565ba04943276b4a343c59de108b"
+          "h2TheoryHashSha256": "3ee620bc594e60bdca086bde19bfad1454e107fa1c25b2ebc1136657cd2a933f"
         }
       ],
       "edges": [
@@ -7434,7 +7434,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "820b32798f844bd3182efc90f1de5536707380ae75087c36050394c56d351db1"
+      "theoryHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825"
     },
     {
       "h3StableId": "h3-candidate:farm-hub-logistics",
@@ -7489,7 +7489,7 @@
           "h2DisplayNameKo": "농장 출구–Hub 진입 회랑 블록",
           "x": 0.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "216d0a31227ba4d6f7208e88a53716ecdf523094f52cd37dd86e5970d3564b83"
+          "h2TheoryHashSha256": "02ff20e06f6e2aca2fb5d928a3e47ec90e626b5068133370ca4deb36c66663f9"
         },
         {
           "nodeId": "h2-farm-processing-shipping",
@@ -7498,7 +7498,7 @@
           "h2DisplayNameKo": "작업마당·출하장 블록",
           "x": -420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "75471816f35e0dc9003a0462bbecee1baa8da1e8b8f6ab1174a458d21f71e72e"
+          "h2TheoryHashSha256": "f2246d642402194d6682df91692afb937c92822fe5a95e9d4dacf198a9649be8"
         },
         {
           "nodeId": "h2-hub-inbound-storage",
@@ -7507,7 +7507,7 @@
           "h2DisplayNameKo": "Hub 입고장·창고 전면 블록",
           "x": 420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "652f50f9b070fc63142e40a369871257840a48677f655fa29f3f7ddbc204abb6"
+          "h2TheoryHashSha256": "bbb0041090deeadab895e384145fdf7f54f954c98b41f36271622fc83ecf9190"
         }
       ],
       "edges": [
@@ -7659,7 +7659,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "a1029778321aef3bbf7e5b2dd9c5d9bf6e4125167077dc8dd4fc0bf1da57ebef"
+      "theoryHashSha256": "a3e7ccf011dffe575cdbf4e189375ca18243701167c968e575eed2e2b8dc95f6"
     },
     {
       "h3StableId": "h3-candidate:farm-incident-recovery",
@@ -7716,7 +7716,7 @@
           "h2DisplayNameKo": "점검마당·격리구획 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "c1b119f3d90f74b98cbfdf3c342fa83504715bee77a9513b171192d50a3ec482"
+          "h2TheoryHashSha256": "39148f4821b8b4a039435776580ce82c6f7d848f21ec01398b6088edde1ff775"
         },
         {
           "nodeId": "h2-farm-loss-restoration-handoff",
@@ -7725,7 +7725,7 @@
           "h2DisplayNameKo": "복구 작업장·복원 인계장 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "b7362634fc848c28e6d0fc36c376816f263f70fecfcc129288b82c35f1a700e4"
+          "h2TheoryHashSha256": "c5c4a1bc7e20425433b5e29d03f20ed5a9642ed5a1106bce76fa7bf2e8f2a612"
         }
       ],
       "edges": [
@@ -7907,7 +7907,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "342a8a93fe39c6b74fc70b0b7fcb13d1636dc0fb4cd84591ae840de083f5e25e"
+      "theoryHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4"
     },
     {
       "h3StableId": "h3-candidate:farm-processing-campus",
@@ -7960,7 +7960,7 @@
           "h2DisplayNameKo": "작업마당·출하장 블록",
           "x": 0.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "75471816f35e0dc9003a0462bbecee1baa8da1e8b8f6ab1174a458d21f71e72e"
+          "h2TheoryHashSha256": "f2246d642402194d6682df91692afb937c92822fe5a95e9d4dacf198a9649be8"
         },
         {
           "nodeId": "h2-farm-seed-and-tools",
@@ -7969,7 +7969,7 @@
           "h2DisplayNameKo": "종자창고·농기구고 블록",
           "x": 420.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "2d34f9846cc8c94f0e6a4694036d1042a976be79e7ed3a87088fa4f22a565360"
+          "h2TheoryHashSha256": "7baaf4e0cd9b0ac60ce159d9b3327319c3130081d73ff16348d855d216b0ff40"
         },
         {
           "nodeId": "h2-farm-wash-sort-pack",
@@ -7978,7 +7978,7 @@
           "h2DisplayNameKo": "세척장·선별장·포장장 블록",
           "x": -420.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "5746f9789c0e52b3817a871d5dbfd98308cc77c9b9ff28101bca6efe0da0e9c2"
+          "h2TheoryHashSha256": "628c51121fed9dbb276074b558d7b4f92000aee596a59df1a89557762fae867f"
         },
         {
           "nodeId": "h2-farm-worker-support",
@@ -7987,7 +7987,7 @@
           "h2DisplayNameKo": "농가·작업지원 생활 블록",
           "x": -420.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "e6314beaebbf4397b04bd4a26f2ca5d4d13f794c102f8fdc5df8a87ecc1bb73e"
+          "h2TheoryHashSha256": "0be1923d5373b1760a2eae6590842d2042052612f68076f0c5a1b0a46a0049a0"
         },
         {
           "nodeId": "h2-highland-production",
@@ -7996,7 +7996,7 @@
           "h2DisplayNameKo": "고지대 경작지 블록",
           "x": 0.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "7e8921a886f9c288fa73c0f95f296bfcfe6b5573ab9395e02ce96310e6802934"
+          "h2TheoryHashSha256": "fa3c3af3abdac1aa1997c7f9147b8cf201426a50f65962d79222fe47c4f3f6d3"
         }
       ],
       "edges": [
@@ -8208,7 +8208,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "2288f710cbd2511a7a1269b3e51de8188de14f3011d8006d02a6d8c9863778f9"
+      "theoryHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63"
     },
     {
       "h3StableId": "h3-candidate:farm-seasonal-production-loop",
@@ -8261,7 +8261,7 @@
           "h2DisplayNameKo": "생산구획·집하마당 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "6cadcab3fe3a3e85f2d1335bdb8465c0875a93a9e97e53e8335ddc49e43d012b"
+          "h2TheoryHashSha256": "ce7bfda2b6314a4a5181cf44f1cf226385c81207c2ff86243c231aa636e8b109"
         },
         {
           "nodeId": "h2-farm-irrigation-service",
@@ -8270,7 +8270,7 @@
           "h2DisplayNameKo": "농수로·급수시설 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "ab8166ac629a4eb8b97ee0b28a57dc604f57bca9d845548bbe621b0930282852"
+          "h2TheoryHashSha256": "e1ac9aa2279ded75c1e6ef2e9c658f2621833dcda4f7567ffb5ce778286f6b90"
         },
         {
           "nodeId": "h2-farm-processing-shipping",
@@ -8279,7 +8279,7 @@
           "h2DisplayNameKo": "작업마당·출하장 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "75471816f35e0dc9003a0462bbecee1baa8da1e8b8f6ab1174a458d21f71e72e"
+          "h2TheoryHashSha256": "f2246d642402194d6682df91692afb937c92822fe5a95e9d4dacf198a9649be8"
         }
       ],
       "edges": [
@@ -8455,7 +8455,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "eba7a6a29d3dc5133b95a631b36fcaf1c006d3dc3c4400b3ea06dcc8bebaf63a"
+      "theoryHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009"
     },
     {
       "h3StableId": "h3-candidate:highland-farm",
@@ -8508,7 +8508,7 @@
           "h2DisplayNameKo": "작업마당·출하장 블록",
           "x": 0.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "75471816f35e0dc9003a0462bbecee1baa8da1e8b8f6ab1174a458d21f71e72e"
+          "h2TheoryHashSha256": "f2246d642402194d6682df91692afb937c92822fe5a95e9d4dacf198a9649be8"
         },
         {
           "nodeId": "h2-forest-edge-farm",
@@ -8517,7 +8517,7 @@
           "h2DisplayNameKo": "숲 가장자리 경작지 블록",
           "x": 420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "38f4e17113c33886decf8965fb775a791ca4db411ec394bd3d47aa434f3af4ef"
+          "h2TheoryHashSha256": "f8ef719f3d565e4942f9f06182562132ba7bc6e6ac442a651582f282b8694d97"
         },
         {
           "nodeId": "h2-highland-production",
@@ -8526,7 +8526,7 @@
           "h2DisplayNameKo": "고지대 경작지 블록",
           "x": -420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "7e8921a886f9c288fa73c0f95f296bfcfe6b5573ab9395e02ce96310e6802934"
+          "h2TheoryHashSha256": "fa3c3af3abdac1aa1997c7f9147b8cf201426a50f65962d79222fe47c4f3f6d3"
         }
       ],
       "edges": [
@@ -8654,7 +8654,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "e89da2a9956b37c65dd5b52ec8bb39b4e7640e095dce128471e35d67c597b35a"
+      "theoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
     },
     {
       "h3StableId": "h3-candidate:hub-fulfillment-operations",
@@ -8707,7 +8707,7 @@
           "h2DisplayNameKo": "Hub 피킹·출고준비 작업 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "cd760406370810c5ac8e7f8c914119a9d0a797155f62a66cd498ecd9e9a95747"
+          "h2TheoryHashSha256": "f0ba411d8eab45a4e70c98d4f1b6710f159887d155bd81629dd84ac1f32b3039"
         },
         {
           "nodeId": "h2-hub-longterm-cold-storage",
@@ -8716,7 +8716,7 @@
           "h2DisplayNameKo": "Hub 장기·저온 창고 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "691a931bc5065c7d6442e38818c6d2025df15dc69a7a6752bff24aa4289fe625"
+          "h2TheoryHashSha256": "859276a43e7462bce252a952b2c042a206f5c1b59fdca4d505112cd24375fc89"
         },
         {
           "nodeId": "h2-hub-outbound-vehicle",
@@ -8725,7 +8725,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "14cd86f91c60c5531dbed209b7003a2ac6b1f7f9bb2a2f155118d6f6e0b4dc74"
+          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
         }
       ],
       "edges": [
@@ -8901,7 +8901,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "ac5acc154ec2eb25a77d835c605fde6098bfa3d86d4386fd532dc77947e2a430"
+      "theoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
     },
     {
       "h3StableId": "h3-candidate:hub-maintenance-emergency-loop",
@@ -8954,7 +8954,7 @@
           "h2DisplayNameKo": "Hub 비상전력실·보관동 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "6fcf14150da4f07d784e1440170baa9222f76b10ac0485adc2f6a85a562ac5a6"
+          "h2TheoryHashSha256": "5d5e475efc0467dff66b82f2254f4e689532b607e2cac0897f6b657a35f202fb"
         },
         {
           "nodeId": "h2-hub-maintenance-yard",
@@ -8963,7 +8963,7 @@
           "h2DisplayNameKo": "Hub 정비고·차량 마당 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "2f068fcb1c2cabdd86f09d496963e0bc3241349711e4b80eaffca4e043538ced"
+          "h2TheoryHashSha256": "ee5958fd4b7373cb73d85068b91b3460235815ada7acdd80a32d339ff9c6806f"
         },
         {
           "nodeId": "h2-hub-outbound-vehicle",
@@ -8972,7 +8972,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "14cd86f91c60c5531dbed209b7003a2ac6b1f7f9bb2a2f155118d6f6e0b4dc74"
+          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
         }
       ],
       "edges": [
@@ -9148,7 +9148,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "76a4832692979661e79a71f9bb12fe7281915ea55e2c8b90f91a5916fe7f85d6"
+      "theoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
     },
     {
       "h3StableId": "h3-candidate:hub-town-logistics",
@@ -9203,7 +9203,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": -420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "14cd86f91c60c5531dbed209b7003a2ac6b1f7f9bb2a2f155118d6f6e0b4dc74"
+          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
         },
         {
           "nodeId": "h2-hub-town-corridor",
@@ -9212,7 +9212,7 @@
           "h2DisplayNameKo": "Hub 출구–Town 입고 회랑 블록",
           "x": 0.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "8ae221d22382378830af59048c2a3376003e8335331d1242ac5458a9019dd7e2"
+          "h2TheoryHashSha256": "ba2c8b5a6fa94ddda7ffa0ced931a5b543e6bca4133cd20765053b0e6352e207"
         },
         {
           "nodeId": "h2-market-life-commerce",
@@ -9221,7 +9221,7 @@
           "h2DisplayNameKo": "마트·생활상가 블록",
           "x": 420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "75dbff253fd92c02724de5b11c965b48300cd0f602e4c709a10643b18acf770a"
+          "h2TheoryHashSha256": "18b8ec615eadf297cd17449ad7014c7356b128dab272addbe28b2c647bd88516"
         }
       ],
       "edges": [
@@ -9381,7 +9381,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "afab577ff79811733b6c17d2c87f2c825eb654a25039f7dceee259a4d0221797"
+      "theoryHashSha256": "b1882fea91efcf4701256180c13769d804abd4a47c98329a6134bd4d75b5270e"
     },
     {
       "h3StableId": "h3-candidate:jinbu-hub",
@@ -9433,7 +9433,7 @@
           "h2DisplayNameKo": "Hub 입고장·창고 전면 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "652f50f9b070fc63142e40a369871257840a48677f655fa29f3f7ddbc204abb6"
+          "h2TheoryHashSha256": "bbb0041090deeadab895e384145fdf7f54f954c98b41f36271622fc83ecf9190"
         },
         {
           "nodeId": "h2-hub-outbound-vehicle",
@@ -9442,7 +9442,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "14cd86f91c60c5531dbed209b7003a2ac6b1f7f9bb2a2f155118d6f6e0b4dc74"
+          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
         }
       ],
       "edges": [
@@ -9576,7 +9576,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "1685288c2b4a43505fc73a8a2576502a574c6c6a090e04d15b806f86702f7b15"
+      "theoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
     },
     {
       "h3StableId": "h3-candidate:lowrise-market-town",
@@ -9628,7 +9628,7 @@
           "h2DisplayNameKo": "저층 주거·생활광장 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "966b9d271764c5417c78502f4bdba631468d99c0efd847676177eeb1d6a96a54"
+          "h2TheoryHashSha256": "7c5db356bc68ea53bf7f3bcf8e961af6fef746cc9a043b991d37fdfd58999cbf"
         },
         {
           "nodeId": "h2-market-life-commerce",
@@ -9637,7 +9637,7 @@
           "h2DisplayNameKo": "마트·생활상가 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "75dbff253fd92c02724de5b11c965b48300cd0f602e4c709a10643b18acf770a"
+          "h2TheoryHashSha256": "18b8ec615eadf297cd17449ad7014c7356b128dab272addbe28b2c647bd88516"
         }
       ],
       "edges": [
@@ -9779,7 +9779,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "b2c398dae4b8f0dd4ae8f7df7da9f73dfbefed5a2ee5148e53b633de6ac2207b"
+      "theoryHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57"
     },
     {
       "h3StableId": "h3-candidate:nature-exploration-buffer",
@@ -9831,7 +9831,7 @@
           "h2DisplayNameKo": "숲 가장자리 경작지 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "38f4e17113c33886decf8965fb775a791ca4db411ec394bd3d47aa434f3af4ef"
+          "h2TheoryHashSha256": "f8ef719f3d565e4942f9f06182562132ba7bc6e6ac442a651582f282b8694d97"
         },
         {
           "nodeId": "h2-nature-water-buffer",
@@ -9840,7 +9840,7 @@
           "h2DisplayNameKo": "산림·수변 완충지 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "66641f275d5330800b402b473f5cb4c91688ba591f14d52c9c74d7cfb3c08f3b"
+          "h2TheoryHashSha256": "2eb7bceed5aff6be69291ab63bab319ac8ac3e51a7e446c46c47f79a3f275660"
         }
       ],
       "edges": [
@@ -9982,7 +9982,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "c69c7c0abb8e255b4198253cd2db36fd2d7a2701baf7cf1451b3793763ef3cb6"
+      "theoryHashSha256": "28c3c63c835d432ab0170667c7727af02a201ea158af50533de944816ca1b867"
     },
     {
       "h3StableId": "h3-candidate:nature-home-encounter-defense",
@@ -10036,7 +10036,7 @@
           "h2DisplayNameKo": "방어환·야영지 블록",
           "x": 420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "0c3e37877a1fffcdda7390066c8b6094169ecd061493ec7181938ab467240e82"
+          "h2TheoryHashSha256": "79e53864e10fd268d4dc977b99f3b00c8fa7543b206333cb4fcc6cd83e2488d2"
         },
         {
           "nodeId": "h2-nature-encounter-route",
@@ -10045,7 +10045,7 @@
           "h2DisplayNameKo": "조우로·이탈로 블록",
           "x": 0.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "f457d60931b3f9786cbbcb5702acd2344d1b15ff5de48eb122523ae2e08f32f7"
+          "h2TheoryHashSha256": "ad15ce3d222a7b9b46c77404879531ac64da99cb0fc7f9b94c999a7bff045321"
         },
         {
           "nodeId": "h2-nature-home-core",
@@ -10054,7 +10054,7 @@
           "h2DisplayNameKo": "안전 생활핵·보급 거점 블록",
           "x": -420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "86fb3e4934faa2cea4243fba81b2766d36420d33e55a1630a278223efd45a0ce"
+          "h2TheoryHashSha256": "5d94c6148c323a120914cf8802540bcb9c2b1f804b5e395a91a73e1046642e7b"
         }
       ],
       "edges": [
@@ -10063,6 +10063,13 @@
           "fromNodeId": "h2-nature-encounter-route",
           "toNodeId": "h2-nature-defense-ring",
           "relationCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed"
+        },
+        {
+          "edgeId": "relation:h3-nature-home-encounter-defense:70143a0b9a204158",
+          "fromNodeId": "h2-nature-defense-ring",
+          "toNodeId": "h2-nature-home-core",
+          "relationCode": "RecoveryHandoff",
           "relationDirectionCode": "Directed"
         },
         {
@@ -10090,7 +10097,7 @@
           "connectorId": "connector:h3:nature-home-encounter-defense:explorationoutput",
           "roleCode": "ExplorationOutput",
           "attachedNodeId": "h2-nature-home-core",
-          "directionCode": "Input",
+          "directionCode": "Output",
           "movementKindCodes": [
             "IncidentHandoff",
             "PlayerTraversal",
@@ -10113,8 +10120,8 @@
         {
           "connectorId": "connector:h3:nature-home-encounter-defense:recoveryreturn",
           "roleCode": "RecoveryReturn",
-          "attachedNodeId": "h2-nature-defense-ring",
-          "directionCode": "Output",
+          "attachedNodeId": "h2-nature-home-core",
+          "directionCode": "Input",
           "movementKindCodes": [
             "IncidentHandoff",
             "PlayerTraversal",
@@ -10138,7 +10145,7 @@
           "connectorId": "connector:h3:nature-home-encounter-defense:threatinput",
           "roleCode": "ThreatInput",
           "attachedNodeId": "h2-nature-defense-ring",
-          "directionCode": "Output",
+          "directionCode": "Input",
           "movementKindCodes": [
             "IncidentHandoff",
             "PlayerTraversal",
@@ -10156,6 +10163,17 @@
           "toRef": "h2-candidate:nature-defense-ring",
           "toConnectorRoleCode": "Ingress",
           "relationKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "relationStableId": "relation:h3-nature-home-encounter-defense:70143a0b9a204158",
+          "relationCode": "h2-flow-3",
+          "fromRef": "h2-candidate:nature-defense-ring",
+          "fromConnectorRoleCode": "Egress",
+          "toRef": "h2-candidate:nature-home-core",
+          "toConnectorRoleCode": "Ingress",
+          "relationKindCode": "RecoveryHandoff",
           "relationDirectionCode": "Directed",
           "compatibilityRuleCode": "OutputToInputSameFlow"
         },
@@ -10189,7 +10207,7 @@
         {
           "connectorStableId": "connector:h3:nature-home-encounter-defense:explorationoutput",
           "roleCode": "ExplorationOutput",
-          "directionCode": "Input",
+          "directionCode": "Output",
           "movementKindCodes": [
             "IncidentHandoff",
             "PlayerTraversal",
@@ -10197,8 +10215,8 @@
             "WorkTraversal"
           ],
           "sourceChildRef": "h2-candidate:nature-home-core",
-          "sourceChildConnectorRoleCode": "Ingress",
-          "sourceChildConnectorStableId": "connector:h2:nature-home-core:ingress"
+          "sourceChildConnectorRoleCode": "Egress",
+          "sourceChildConnectorStableId": "connector:h2:nature-home-core:egress"
         },
         {
           "connectorStableId": "connector:h3:nature-home-encounter-defense:ingress",
@@ -10217,16 +10235,16 @@
         {
           "connectorStableId": "connector:h3:nature-home-encounter-defense:recoveryreturn",
           "roleCode": "RecoveryReturn",
-          "directionCode": "Output",
+          "directionCode": "Input",
           "movementKindCodes": [
             "IncidentHandoff",
             "PlayerTraversal",
             "RecoveryHandoff",
             "WorkTraversal"
           ],
-          "sourceChildRef": "h2-candidate:nature-defense-ring",
-          "sourceChildConnectorRoleCode": "Egress",
-          "sourceChildConnectorStableId": "connector:h2:nature-defense-ring:egress"
+          "sourceChildRef": "h2-candidate:nature-home-core",
+          "sourceChildConnectorRoleCode": "Ingress",
+          "sourceChildConnectorStableId": "connector:h2:nature-home-core:ingress"
         },
         {
           "connectorStableId": "connector:h3:nature-home-encounter-defense:safecoregate",
@@ -10245,7 +10263,7 @@
         {
           "connectorStableId": "connector:h3:nature-home-encounter-defense:threatinput",
           "roleCode": "ThreatInput",
-          "directionCode": "Output",
+          "directionCode": "Input",
           "movementKindCodes": [
             "IncidentHandoff",
             "PlayerTraversal",
@@ -10253,8 +10271,8 @@
             "WorkTraversal"
           ],
           "sourceChildRef": "h2-candidate:nature-defense-ring",
-          "sourceChildConnectorRoleCode": "Egress",
-          "sourceChildConnectorStableId": "connector:h2:nature-defense-ring:egress"
+          "sourceChildConnectorRoleCode": "Ingress",
+          "sourceChildConnectorStableId": "connector:h2:nature-defense-ring:ingress"
         }
       ],
       "flowRequirements": [
@@ -10263,10 +10281,16 @@
           "fromConnectorRoleCode": "Ingress",
           "toConnectorRoleCode": "Egress",
           "movementKindCode": "PlayerTraversal"
+        },
+        {
+          "flowRequirementStableId": "flow:h3:nature-home-encounter-defense:recovery-return",
+          "fromConnectorRoleCode": "Egress",
+          "toConnectorRoleCode": "RecoveryReturn",
+          "movementKindCode": "RecoveryHandoff"
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "6f58e862fadfa7fdff4010295301f78a2d7d55af98fef7291b517b8ccfdead8b"
+      "theoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
     },
     {
       "h3StableId": "h3-candidate:nature-threat-recovery",
@@ -10321,7 +10345,7 @@
           "h2DisplayNameKo": "복원 작업지·회복 쉼터 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "0dd14b9f3404337ac2e94323f6049f9daf420e9983f39eb293fe4720610c0a39"
+          "h2TheoryHashSha256": "acea8e8de75d6278281bc8bd43f63d6c79871668b10479fbef18ee03d8d14f23"
         },
         {
           "nodeId": "h2-nature-threat-response",
@@ -10330,7 +10354,7 @@
           "h2DisplayNameKo": "위험 흔적길·긴급 대피로 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "07ddf75d863a044f39a5c912d79cec0e87eb08cd7bfb35e7a151bca43efd2067"
+          "h2TheoryHashSha256": "1dd0052897da07726ca9c043ec7fe9ab496e17670e219ee80703d928959ec5d8"
         }
       ],
       "edges": [
@@ -10550,7 +10574,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "b9be1b6e1d1a91542037925edc0f03795804124d7c62aecd6070bc2be79e287a"
+      "theoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
     },
     {
       "h3StableId": "h3-candidate:nature-town-relief-loop",
@@ -10606,7 +10630,7 @@
           "h2DisplayNameKo": "복원 작업지·회복 쉼터 블록",
           "x": 420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "0dd14b9f3404337ac2e94323f6049f9daf420e9983f39eb293fe4720610c0a39"
+          "h2TheoryHashSha256": "acea8e8de75d6278281bc8bd43f63d6c79871668b10479fbef18ee03d8d14f23"
         },
         {
           "nodeId": "h2-nature-town-relief-transition",
@@ -10615,7 +10639,7 @@
           "h2DisplayNameKo": "자연권 출구–생활권 구호 인계 블록",
           "x": 0.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "7dfdd17e900877312bf6b62a209c6c41f1e9c0de0cef7832dd024e8b27e0fbe1"
+          "h2TheoryHashSha256": "5ba30f033d177b9bdaa4461bc917c12f7ba0c55588d319c0ee53d529191a8603"
         },
         {
           "nodeId": "h2-town-recall-relief",
@@ -10624,7 +10648,7 @@
           "h2DisplayNameKo": "주민 안내소·구호 물자 인계장 블록",
           "x": -420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "d0273b0b587bc22a1ec6f8e3fb12eb287f731dd8729754b3c102e5b53352b0d6"
+          "h2TheoryHashSha256": "1618b7581a84a82932f187929a835bc22018907ae25ca6dc7899cb5e1b24378a"
         }
       ],
       "edges": [
@@ -10810,7 +10834,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "f4f2f5a249dcb1e90cf11809d98fa40aa7528e2b25f0f9b08e2cfe11b41b0b03"
+      "theoryHashSha256": "fa2712d539ea9224bbcd5c96210c009ee06d34e8bd767ec27df75a19cd07ff46"
     },
     {
       "h3StableId": "h3-candidate:nature-trail-network",
@@ -10863,7 +10887,7 @@
           "h2DisplayNameKo": "탐색로·대피 쉼터 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "d3388f44b45386dbe6df4097e130fc3f478961149d94900070637eea010efa91"
+          "h2TheoryHashSha256": "6d905cce8a86956d666b09b9cadfb6be0aa939197d9001495f5d1054799e9374"
         },
         {
           "nodeId": "h2-nature-water-buffer",
@@ -10872,7 +10896,7 @@
           "h2DisplayNameKo": "산림·수변 완충지 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "66641f275d5330800b402b473f5cb4c91688ba591f14d52c9c74d7cfb3c08f3b"
+          "h2TheoryHashSha256": "2eb7bceed5aff6be69291ab63bab319ac8ac3e51a7e446c46c47f79a3f275660"
         }
       ],
       "edges": [
@@ -11040,7 +11064,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "810d1d6a2ed08c79ff777d791d68b7b90e6436739873d0b229bceb02a3c33932"
+      "theoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
     },
     {
       "h3StableId": "h3-candidate:resilient-logistics-hub",
@@ -11095,7 +11119,7 @@
           "h2DisplayNameKo": "Hub 입고장·창고 전면 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "652f50f9b070fc63142e40a369871257840a48677f655fa29f3f7ddbc204abb6"
+          "h2TheoryHashSha256": "bbb0041090deeadab895e384145fdf7f54f954c98b41f36271622fc83ecf9190"
         },
         {
           "nodeId": "h2-hub-longterm-cold-storage",
@@ -11104,7 +11128,7 @@
           "h2DisplayNameKo": "Hub 장기·저온 창고 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "691a931bc5065c7d6442e38818c6d2025df15dc69a7a6752bff24aa4289fe625"
+          "h2TheoryHashSha256": "859276a43e7462bce252a952b2c042a206f5c1b59fdca4d505112cd24375fc89"
         },
         {
           "nodeId": "h2-hub-outbound-vehicle",
@@ -11113,7 +11137,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": 210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "14cd86f91c60c5531dbed209b7003a2ac6b1f7f9bb2a2f155118d6f6e0b4dc74"
+          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
         },
         {
           "nodeId": "h2-hub-quarantine-staging",
@@ -11122,7 +11146,7 @@
           "h2DisplayNameKo": "Hub 검역장·격리창고 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "fccbba30ac6e9c6e13121044cfbc1d1a09a1e165dd968cb0d52d585685865695"
+          "h2TheoryHashSha256": "4a348bc87e563cd42e14d3c5d686e5e0d87b48ddab4023fa722db61404161ede"
         }
       ],
       "edges": [
@@ -11316,7 +11340,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "f0b6de17878bf46891c5b92ee9c7cb8f916c9318379389bc2bc7757d834886f9"
+      "theoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
     },
     {
       "h3StableId": "h3-candidate:town-contamination-relief",
@@ -11374,7 +11398,7 @@
           "h2DisplayNameKo": "오염 점검장·격리구획 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "0a9f59cdc6e21b8be76dbcf5bf4d941a62568619bfb522f897fcd66e92fa8f83"
+          "h2TheoryHashSha256": "8816a5234ea5a4264bf9811b3d1ab3da56d25769221c5097c9241ae889f1e90b"
         },
         {
           "nodeId": "h2-town-recall-relief",
@@ -11383,7 +11407,7 @@
           "h2DisplayNameKo": "주민 안내소·구호 물자 인계장 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "d0273b0b587bc22a1ec6f8e3fb12eb287f731dd8729754b3c102e5b53352b0d6"
+          "h2TheoryHashSha256": "1618b7581a84a82932f187929a835bc22018907ae25ca6dc7899cb5e1b24378a"
         }
       ],
       "edges": [
@@ -11603,7 +11627,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "c601db9e87d9e192d5de366d22c09bbf46755379ea644a021651b43353da6056"
+      "theoryHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6"
     },
     {
       "h3StableId": "h3-candidate:town-market-fulfillment",
@@ -11656,7 +11680,7 @@
           "h2DisplayNameKo": "마트·생활상가 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "75dbff253fd92c02724de5b11c965b48300cd0f602e4c709a10643b18acf770a"
+          "h2TheoryHashSha256": "18b8ec615eadf297cd17449ad7014c7356b128dab272addbe28b2c647bd88516"
         },
         {
           "nodeId": "h2-town-market-receiving",
@@ -11665,7 +11689,7 @@
           "h2DisplayNameKo": "마트 후방 입고·검수 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "cefab0d343d77d0fc9dd5313818ff3d32c150c80ee06dac17cb327f2d86a5287"
+          "h2TheoryHashSha256": "d6bfe8a7302609c102b1561e4f9da12fd3820bd95d30be3925462a62073eadb4"
         },
         {
           "nodeId": "h2-town-order-fulfillment",
@@ -11674,7 +11698,7 @@
           "h2DisplayNameKo": "주문 피킹·포장·수령 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "990fd4bb34f8e2585a3a69e84ffc6cde2175d273269b37562f5dfef691c656df"
+          "h2TheoryHashSha256": "d837a3339c056a186f5677cbc721e251f0d45bedcb7546ff59c5b91c4cb34a70"
         }
       ],
       "edges": [
@@ -11860,7 +11884,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "1f944face2164d3bcff4a03add209c49ecddb88ef6b2e616badcfee413f2419b"
+      "theoryHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c"
     },
     {
       "h3StableId": "h3-candidate:town-resident-service-loop",
@@ -11913,7 +11937,7 @@
           "h2DisplayNameKo": "저층 주거·생활광장 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "966b9d271764c5417c78502f4bdba631468d99c0efd847676177eeb1d6a96a54"
+          "h2TheoryHashSha256": "7c5db356bc68ea53bf7f3bcf8e961af6fef746cc9a043b991d37fdfd58999cbf"
         },
         {
           "nodeId": "h2-town-resident-service",
@@ -11922,7 +11946,7 @@
           "h2DisplayNameKo": "주민지원소·공동수령장 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "7361ac5c4ca533abc96b446241c3df6c40a1b3108b5bb60351436d6f5fee0309"
+          "h2TheoryHashSha256": "334b5ebc01275a50f6133e7e15094cdabfae4ee17f0d4e749d244543a98913ab"
         },
         {
           "nodeId": "h2-town-residential-alley",
@@ -11931,7 +11955,7 @@
           "h2DisplayNameKo": "저층 주거 골목 블록",
           "x": -210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "0be0596cc7be02c44338765288853980bb3ce09b508bebb2cea9619b5ad5470c"
+          "h2TheoryHashSha256": "5bd49d2264964f566d67eab9eaffaa07bb0b0632ed4fa009447a92bd4ab72e2e"
         }
       ],
       "edges": [
@@ -12117,7 +12141,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "db5757498b465de603b4b5adbb3b6bdbd8efc82983f06700cefbad6f00468bed"
+      "theoryHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278"
     }
   ],
   "e5AreaSetInstances": [
@@ -12142,7 +12166,7 @@
           "h3DisplayNameKo": "격리구획·복구 작업장 구역",
           "x": -480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "342a8a93fe39c6b74fc70b0b7fcb13d1636dc0fb4cd84591ae840de083f5e25e"
+          "h3TheoryHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4"
         },
         {
           "graphInstanceStableId": "graph:theory:farm-processing-campus",
@@ -12151,7 +12175,7 @@
           "h3DisplayNameKo": "농가·생산·후처리 생활 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "2288f710cbd2511a7a1269b3e51de8188de14f3011d8006d02a6d8c9863778f9"
+          "h3TheoryHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63"
         },
         {
           "graphInstanceStableId": "graph:theory:farm-seasonal-production-loop",
@@ -12160,7 +12184,7 @@
           "h3DisplayNameKo": "관수 경작지·출하장 구역",
           "x": 480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "eba7a6a29d3dc5133b95a631b36fcaf1c006d3dc3c4400b3ea06dcc8bebaf63a"
+          "h3TheoryHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009"
         },
         {
           "graphInstanceStableId": "graph:theory:highland-farm",
@@ -12169,7 +12193,7 @@
           "h3DisplayNameKo": "고지대 경작지·숲경계 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "e89da2a9956b37c65dd5b52ec8bb39b4e7640e095dce128471e35d67c597b35a"
+          "h3TheoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
         }
       ],
       "graphRelations": [
@@ -12252,7 +12276,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "83ecf49c098f65ff00ca748412fd21b29b666d1fac81d95fd66ffa70459d980f"
+      "theoryHashSha256": "1c554afb81359549a2c9a6c715d13c05e4f371374273309df9344b3cbf5cf4dc"
     },
     {
       "areaSetStableId": "area-set:theory:logistics-hub-region",
@@ -12275,7 +12299,7 @@
           "h3DisplayNameKo": "Hub 보관·피킹·상차 운영 구역",
           "x": 480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "ac5acc154ec2eb25a77d835c605fde6098bfa3d86d4386fd532dc77947e2a430"
+          "h3TheoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
         },
         {
           "graphInstanceStableId": "graph:theory:hub-maintenance-emergency-loop",
@@ -12284,7 +12308,7 @@
           "h3DisplayNameKo": "Hub 정비고·비상전력 구역",
           "x": -480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "76a4832692979661e79a71f9bb12fe7281915ea55e2c8b90f91a5916fe7f85d6"
+          "h3TheoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
         },
         {
           "graphInstanceStableId": "graph:theory:jinbu-hub",
@@ -12293,7 +12317,7 @@
           "h3DisplayNameKo": "Hub 입고장·창고·출고장 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "1685288c2b4a43505fc73a8a2576502a574c6c6a090e04d15b806f86702f7b15"
+          "h3TheoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
         },
         {
           "graphInstanceStableId": "graph:theory:resilient-logistics-hub",
@@ -12302,7 +12326,7 @@
           "h3DisplayNameKo": "Hub 검역장·저온창고 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "f0b6de17878bf46891c5b92ee9c7cb8f916c9318379389bc2bc7757d834886f9"
+          "h3TheoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
         }
       ],
       "graphRelations": [
@@ -12402,7 +12426,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "2eb8f361fed8e4afa7351d476d519b4adf43d3a5acad2734b346a55eaf5c253e"
+      "theoryHashSha256": "8874d65180d8ac52de68c973adfc6b0bfe072dd64fb06f9e8157a685c989989b"
     },
     {
       "areaSetStableId": "area-set:theory:lowrise-market-region",
@@ -12425,7 +12449,7 @@
           "h3DisplayNameKo": "시장·반품집하 구역",
           "x": 0.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "820b32798f844bd3182efc90f1de5536707380ae75087c36050394c56d351db1"
+          "h3TheoryHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825"
         },
         {
           "graphInstanceStableId": "graph:theory:lowrise-market-town",
@@ -12434,7 +12458,7 @@
           "h3DisplayNameKo": "저층 주거·마트 구역",
           "x": -960.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "b2c398dae4b8f0dd4ae8f7df7da9f73dfbefed5a2ee5148e53b633de6ac2207b"
+          "h3TheoryHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57"
         },
         {
           "graphInstanceStableId": "graph:theory:town-contamination-relief",
@@ -12443,7 +12467,7 @@
           "h3DisplayNameKo": "오염격리·주민구호 구역",
           "x": 960.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "c601db9e87d9e192d5de366d22c09bbf46755379ea644a021651b43353da6056"
+          "h3TheoryHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6"
         },
         {
           "graphInstanceStableId": "graph:theory:town-market-fulfillment",
@@ -12452,7 +12476,7 @@
           "h3DisplayNameKo": "마트 입고·주문이행 구역",
           "x": 0.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "1f944face2164d3bcff4a03add209c49ecddb88ef6b2e616badcfee413f2419b"
+          "h3TheoryHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c"
         },
         {
           "graphInstanceStableId": "graph:theory:town-resident-service-loop",
@@ -12461,7 +12485,7 @@
           "h3DisplayNameKo": "주거골목·주민지원 구역",
           "x": -960.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "db5757498b465de603b4b5adbb3b6bdbd8efc82983f06700cefbad6f00468bed"
+          "h3TheoryHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278"
         }
       ],
       "graphRelations": [
@@ -12554,7 +12578,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "8c5bef94d1f38cb026a9f0b014a752c5c45f6fa424e242baa82d40ebf448581c"
+      "theoryHashSha256": "b3927034645817006ff3e6622fcc47f9266910f3dc2743014cced3404d4b9781"
     },
     {
       "areaSetStableId": "area-set:theory:nature-home-exploration-region",
@@ -12577,7 +12601,7 @@
           "h3DisplayNameKo": "생활핵·조우로·방어환 구역",
           "x": -480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "6f58e862fadfa7fdff4010295301f78a2d7d55af98fef7291b517b8ccfdead8b"
+          "h3TheoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
         },
         {
           "graphInstanceStableId": "graph:theory:nature-threat-recovery",
@@ -12586,7 +12610,7 @@
           "h3DisplayNameKo": "생활핵·대피로·복원쉼터 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "b9be1b6e1d1a91542037925edc0f03795804124d7c62aecd6070bc2be79e287a"
+          "h3TheoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
         },
         {
           "graphInstanceStableId": "graph:theory:nature-trail-network",
@@ -12595,7 +12619,7 @@
           "h3DisplayNameKo": "탐색로·대피망 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "810d1d6a2ed08c79ff777d791d68b7b90e6436739873d0b229bceb02a3c33932"
+          "h3TheoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
         }
       ],
       "graphRelations": [
@@ -12657,7 +12681,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "3026a012baffcc66c2a750f773f4204f223b80593f2a7e6ca12f9f57cab7b8b8"
+      "theoryHashSha256": "f1d77cc4084ca273b4fc154e2ea3895271f68662202a536f206f93320b019f12"
     }
   ],
   "theoryWorld": {
@@ -12739,7 +12763,7 @@
       }
     ],
     "unresolvedSemanticRelations": [],
-    "theoryHashSha256": "dcc5250da50526abc172c4bf6e512e2bf8a523ea0319a14f1f416beda996e696"
+    "theoryHashSha256": "9c4bc4f7ae91267256513614ac12b66b0d458456f7f4b30058926e3b228304ce"
   },
   "interAreaSetRelations": [
     {
