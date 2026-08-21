@@ -11,7 +11,7 @@ GPT Chat과 Codex는 대화 기록이 아니라 저장소 문서를 공용 기�
 3. [현재 작업](docs/AI/CURRENT_WORK.md)
 4. 작업 경로에 가까운 `AGENTS.md`와 관련 Architecture 문서
 
-Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전체 Ssalddel 도메인을 `World`, `Data`, `Object`, `Interaction`, `Simulation` 관점에서 다루되, 실제 구현은 검증 가능한 좁은 vertical slice로 진행한다. 서버는 운영 상태의 최종 권위이며 Unity의 simulation과 operational data를 명확히 구분한다.
+Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전체 Ssalddel 도메인을 `World`, `Data`, `Object`, `Interaction`, `Simulation` 관점에서 다루되, 실제 구현은 검증 가능한 좁은 vertical slice로 진행한다. 영역 개발에서는 Farm·Hub·City 각각의 독립 완결 slice를 먼저 만들고, 영역 간 운송 경로를 기본 slice로 삼지 않는다. 서버는 운영 상태의 최종 권위이며 Unity의 simulation과 operational data를 명확히 구분한다.
 
 의미 있는 구현이나 설계 작업을 마치면 `docs/AI/CURRENT_WORK.md`를 누적 일지가 아닌 최신 snapshot으로 갱신한다. 변경 파일, 검증한 범위, runtime 검증 여부와 남은 문제를 사실대로 기록한다. 장기간 유지할 결정이 바뀌면 `docs/AI/DECISIONS.md`에 새 결정이나 대체 관계를 기록하고 과거 결정을 조용히 덮어쓰지 않는다.
 
@@ -105,6 +105,12 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 ## 구현 단위
 
 - 원장 또는 업무 node 하나를 골라 저장, 상태 전이, Event, API, UI, test까지 세로로 완성한다.
+- Farm·Hub·City는 서로 선후행 종속 관계가 아닌 독립 업무 영역으로 개발한다. 각 영역은 다른 영역의 존재나 화물 인계를 요구하지 않는 내부 플레이 폐루프, 독립 Fixture, 독립 조회·저장 경계를 먼저 가진다.
+- 별도 요청이 없으면 `Farm→Hub`, `Hub→City`, `Farm→Hub→City`를 첫 구현·다음 구현·대표 수직 슬라이스로 선택하지 않는다. 이런 경로는 양쪽 영역의 독립 준비가 확인된 뒤 수행하는 영역 간 통합 slice다.
+- Farm 성과나 화물을 Hub·City 개발의 필수 시작 상태로 재사용하지 않는다. 영역 간 계약은 선택 가능한 `ExternalConnectorStub`·Command·Event·Projection 경계로 두고 연결이 없어도 각 영역이 실행 가능해야 한다.
+- 새 문서·계획·작업 우선순위에서 `City/Hub`를 한 영역처럼 묶지 않는다. 기존 공개 계약·고유 식별자는 호환을 위해 보존하되 새 개발 판단에서는 Hub와 City의 목적·상태·완료 증거를 분리한다.
+- 영역 구현 순서는 의존 관계가 아니다. 현재 완성도가 낮은 독립 영역을 선택할 수 있으며, Farm을 먼저 만들었다는 이유만으로 다음 작업을 Farm 출하나 Farm→Hub 운송으로 이어가지 않는다.
+- Unity 표현은 공식 Scene을 영역별로 늘리지 않고 canonical `SimulationWorldShell` 안의 독립 영역 모듈로 조립한다. 상세 기준은 [Farm·Hub·City 독립 영역 우선 개발 정책](docs/Architecture/FarmHubCity독립영역우선개발정책.md)을 따른다.
 - 기존 naming, DI, repository 경계를 먼저 따르고 abstraction은 실제 중복이나 책임 혼합을 줄일 때만 추가한다.
 - 영속 workflow는 contract와 API 경계를 먼저 안정화하고 인증, 조회, 저장, 상태 전이 순으로 연결한다.
 - 상태 전이 성공 뒤 client는 같은 원장을 다시 조회해 여러 앱이 같은 상태를 보게 한다.
