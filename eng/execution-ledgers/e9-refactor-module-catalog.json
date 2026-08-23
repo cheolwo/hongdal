@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "simulation-e9-refactor-module-catalog.v1",
+  "revision": "simulation-e9-refactor-module-catalog.r1",
+  "defaultModuleStatus": "Named",
+  "allowedModuleStatuses": [
+    "Named",
+    "Outlined",
+    "Selected",
+    "Implemented",
+    "Verified",
+    "Deferred"
+  ],
+  "principles": {
+    "namesArePlanningSlotsNotCompletionClaims": true,
+    "downwardAndUpwardReuseSameModules": true,
+    "detailsAreAddedOnlyAfterReview": true,
+    "modulesDoNotReplaceEvidenceStages": true,
+    "modulesDoNotReplaceManagementSystems": true,
+    "modulesDoNotReplaceSpatialHierarchy": true
+  },
+  "downwardReviewOrder": [
+    "E9",
+    "E8",
+    "E7",
+    "E6",
+    "E5",
+    "E4",
+    "E3",
+    "E2",
+    "E1"
+  ],
+  "upwardAssemblyOrder": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "modules": [
+    {
+      "evidenceStage": "E9",
+      "managementSystem": "G4",
+      "koreanName": "변화 봉투",
+      "technicalName": "ChangeEnvelopeModule",
+      "status": "Named",
+      "downwardRole": "무엇을 바꾸고 어느 안정 상태를 목표로 하는지 검토한다.",
+      "upwardRole": "호환·Migration·rollback과 전체 재검증 결과를 묶는다.",
+      "namedSlots": [
+        "ChangeProposal",
+        "ImpactMap",
+        "CompatibilityPlan",
+        "RollbackPlan"
+      ]
+    },
+    {
+      "evidenceStage": "E8",
+      "managementSystem": "G3",
+      "koreanName": "생활 연속성",
+      "technicalName": "LifeContinuityModule",
+      "status": "Named",
+      "downwardRole": "NPC가 플레이어 없이도 살아갈 때 필요한 책임을 검토한다.",
+      "upwardRole": "목표·이동·작업·휴식·기억의 지속 폐루프를 검증한다.",
+      "namedSlots": [
+        "NpcIdentity",
+        "NpcGoals",
+        "AutonomousLifeLoop",
+        "MemoryContinuity"
+      ]
+    },
+    {
+      "evidenceStage": "E7",
+      "managementSystem": "G2",
+      "koreanName": "플레이 경험 폐루프",
+      "technicalName": "PlayableExperienceLoopModule",
+      "status": "Named",
+      "downwardRole": "사람이 시작·선택·결과·복귀를 경험하는 흐름을 검토한다.",
+      "upwardRole": "Solo·Hosted 실제 입력, UI 피드백과 실행 증거를 검증한다.",
+      "namedSlots": [
+        "InputFlow",
+        "PlayerLoop",
+        "InteractionFeedback",
+        "RuntimeProof"
+      ]
+    },
+    {
+      "evidenceStage": "E6",
+      "managementSystem": "G1",
+      "koreanName": "세계 정제",
+      "technicalName": "WorldRefinementModule",
+      "status": "Named",
+      "downwardRole": "플레이 전에 의미·인과·배치·통행·권위·근거 질문을 검토한다.",
+      "upwardRole": "필요한 질문과 자료 계보가 닫혔는지 검증한다.",
+      "namedSlots": [
+        "MeaningReview",
+        "CausalityReview",
+        "ProvenanceReview",
+        "ReadinessReview"
+      ]
+    },
+    {
+      "evidenceStage": "E5",
+      "managementSystem": "G1",
+      "koreanName": "실제 세계 조립",
+      "technicalName": "ActualWorldAssemblyModule",
+      "status": "Named",
+      "downwardRole": "AreaSet과 H 공간을 실제 세계에 어떻게 조립할지 검토한다.",
+      "upwardRole": "Graph·배치·통행과 저장 Scene 결속을 검증한다.",
+      "namedSlots": [
+        "AreaSetAssembly",
+        "SpatialGraph",
+        "PlacementControl",
+        "Traversal"
+      ]
+    },
+    {
+      "evidenceStage": "E4",
+      "managementSystem": "G1",
+      "koreanName": "상호작용 공간 결속",
+      "technicalName": "InteractionSpatialBindingModule",
+      "status": "Named",
+      "downwardRole": "WI가 요구하는 H1 능력·용량·예약·연결구를 검토한다.",
+      "upwardRole": "WI가 실제 공간 모판에서 다시 실행되는지 검증한다.",
+      "namedSlots": [
+        "WiBinding",
+        "H1Capability",
+        "CapacityReservation",
+        "Connector"
+      ]
+    },
+    {
+      "evidenceStage": "E3",
+      "managementSystem": "G1",
+      "koreanName": "회귀 증거",
+      "technicalName": "RegressionEvidenceModule",
+      "status": "Named",
+      "downwardRole": "어떤 실패와 회귀를 자동으로 잡아야 하는지 검토한다.",
+      "upwardRole": "계약·결정성·Save/Replay·소비자 회귀 결과를 모은다.",
+      "namedSlots": [
+        "ContractTest",
+        "Determinism",
+        "SaveReplayRegression",
+        "ConsumerRegression"
+      ]
+    },
+    {
+      "evidenceStage": "E2",
+      "managementSystem": "G1",
+      "koreanName": "실행 경계",
+      "technicalName": "RuntimeBoundaryModule",
+      "status": "Named",
+      "downwardRole": "Core·Application·Local/Remote Adapter·Unity 투영의 소유 위치를 검토한다.",
+      "upwardRole": "같은 Core가 실행 위치와 무관하게 계약대로 동작하는지 검증한다.",
+      "namedSlots": [
+        "SharedCore",
+        "LocalAdapter",
+        "RemoteAdapter",
+        "UnityProjection"
+      ]
+    },
+    {
+      "evidenceStage": "E1",
+      "managementSystem": "G1",
+      "koreanName": "핵심 계약",
+      "technicalName": "CoreContractModule",
+      "status": "Named",
+      "downwardRole": "목적·권위·식별자·판본·시간·완료·제외 경계를 검토한다.",
+      "upwardRole": "상위 모듈이 지켜야 하는 불변 경계를 확인한다.",
+      "namedSlots": [
+        "Purpose",
+        "Authority",
+        "IdentityRevisionTime",
+        "AcceptanceExclusion"
+      ]
+    }
+  ]
+}

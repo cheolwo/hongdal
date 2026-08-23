@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "e9-wi-h-module-bindings.v1",
+  "revision": "e9-wi-h-module-bindings.r1",
+  "scopeCode": "NatureFarmCurrentPlayableSlice",
+  "sources": {
+    "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+    "e9ModuleCatalogPath": "eng/execution-ledgers/e9-refactor-module-catalog.json",
+    "gameplaySpatialCompletionPath": "eng/world-seedbeds/gameplay-spatial-completion.v1.json",
+    "hDefinitionRootPath": "eng/world-seedbeds/synty-bottom-up-inventory/definitions"
+  },
+  "principles": {
+    "doesNotOwnWorldInteractions": true,
+    "doesNotOwnSpatialHierarchy": true,
+    "eModulesAreResponsibilityViews": true,
+    "hLevelsRemainSpatialInclusionDepth": true,
+    "bindingStateIsNotEvidencePromotion": true
+  },
+  "allowedBindingStateCodes": [
+    "SkeletonNamed",
+    "SourceReferenced",
+    "NeedsRuntimeAudit",
+    "SourceEvidenceClaimed",
+    "SpatialRefsBound",
+    "EvidenceRefsPresent",
+    "EvidenceMissing",
+    "Deferred"
+  ],
+  "stageResponsibilities": [
+    { "evidenceStage": "E9", "moduleTechnicalName": "ChangeEnvelopeModule", "reads": ["WI 변경 범위", "H 영향 범위", "하위 E 회귀 범위"], "produces": "변경 봉투와 재검증 범위" },
+    { "evidenceStage": "E8", "moduleTechnicalName": "LifeContinuityModule", "reads": ["WI 작업 후보", "H 이동·자원 문맥"], "produces": "NPC 생활 연속성 검토 자리" },
+    { "evidenceStage": "E7", "moduleTechnicalName": "PlayableExperienceLoopModule", "reads": ["WI Preview·Confirm", "H1 상호작용 위치", "H2~H4 이동 문맥"], "produces": "플레이어 입력부터 결과·복귀까지의 실행 증거" },
+    { "evidenceStage": "E6", "moduleTechnicalName": "WorldRefinementModule", "reads": ["WI 의미", "H3·H4 문맥", "현실 근거 질문"], "produces": "플레이 전 세계 정제와 설명 가능성" },
+    { "evidenceStage": "E5", "moduleTechnicalName": "ActualWorldAssemblyModule", "reads": ["WI 공간 요구", "H1~H4 포함 관계", "AreaSet·Graph"], "produces": "실제 세계 배치와 통행 결속" },
+    { "evidenceStage": "E4", "moduleTechnicalName": "InteractionSpatialBindingModule", "reads": ["WI 공간 능력·예약", "H1~H4 참조"], "produces": "상호작용과 공간 능력의 결속" },
+    { "evidenceStage": "E3", "moduleTechnicalName": "RegressionEvidenceModule", "reads": ["WI 결정성", "Save·Replay", "기존 시험"], "produces": "계약과 회귀 증거" },
+    { "evidenceStage": "E2", "moduleTechnicalName": "RuntimeBoundaryModule", "reads": ["WI Application 호출", "Local·Remote Adapter"], "produces": "SoloLocal과 Hosted의 동일 Core 실행 경계" },
+    { "evidenceStage": "E1", "moduleTechnicalName": "CoreContractModule", "reads": ["WI 목적·권위·판본", "완료·차단 상태"], "produces": "변경되지 않는 핵심 계약" }
+  ],
+  "bindings": [
+    {
+      "bindingId": "e9-wi-h:wi-farm-04", "wiId": "WI-FARM-04", "wiTitle": "수확",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
+      "hRefs": { "H1": ["h1-stock:farm-production", "h1-stock:farm-harvest-staging"], "H2": ["h2-candidate:highland-production", "h2-candidate:farm-wash-sort-pack"], "H3": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus"], "H4": ["h4-blueprint:farm-production-processing-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-farm-05", "wiId": "WI-FARM-05", "wiTitle": "수확물 집하",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
+      "hRefs": { "H1": ["h1-stock:farm-harvest-staging", "h1-stock:farm-work-yard"], "H2": ["h2-candidate:farm-wash-sort-pack", "h2-candidate:farm-processing-shipping"], "H3": ["h3-candidate:farm-processing-campus"], "H4": ["h4-blueprint:farm-production-processing-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-farm-06", "wiId": "WI-FARM-06", "wiTitle": "출하 준비·포장",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
+      "hRefs": { "H1": ["h1-stock:farm-work-yard", "h1-stock:farm-harvest-staging"], "H2": ["h2-candidate:farm-wash-sort-pack", "h2-candidate:farm-processing-shipping"], "H3": ["h3-candidate:farm-processing-campus"], "H4": ["h4-blueprint:farm-production-processing-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-01", "wiId": "WI-NATURE-01", "wiTitle": "자연권 위협 관찰",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
+      "hRefs": { "H1": ["h1-stock:nature-threat-watch", "h1-stock:nature-incident-trace"], "H2": ["h2-candidate:nature-threat-response"], "H3": ["h3-candidate:nature-threat-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-02", "wiId": "WI-NATURE-02", "wiTitle": "자연권 긴급 후퇴",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
+      "hRefs": { "H1": ["h1-stock:nature-emergency-retreat", "h1-stock:nature-safe-recovery-camp"], "H2": ["h2-candidate:nature-threat-response", "h2-candidate:nature-restoration-recovery"], "H3": ["h3-candidate:nature-threat-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-03", "wiId": "WI-NATURE-03", "wiTitle": "자연권 복원",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
+      "hRefs": { "H1": ["h1-stock:nature-restoration-site", "h1-stock:farm-restoration-supply"], "H2": ["h2-candidate:nature-restoration-recovery", "h2-candidate:farm-loss-restoration-handoff"], "H3": ["h3-candidate:nature-threat-recovery", "h3-candidate:farm-incident-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region", "h4-blueprint:farm-production-processing-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-04", "wiId": "WI-NATURE-04", "wiTitle": "파티 회복",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
+      "hRefs": { "H1": ["h1-stock:nature-safe-recovery-camp"], "H2": ["h2-candidate:nature-restoration-recovery"], "H3": ["h3-candidate:nature-threat-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "SpatialRefsBound", "E4": "SpatialRefsBound", "E3": "SourceEvidenceClaimed", "E2": "NeedsRuntimeAudit", "E1": "SourceReferenced" }
+    }
+  ]
+}
