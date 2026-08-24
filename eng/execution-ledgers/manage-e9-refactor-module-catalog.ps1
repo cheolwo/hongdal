@@ -31,6 +31,7 @@ Require ((@($catalog.upwardAssemblyOrder) -join ",") -eq
 foreach ($principle in @(
     "namesArePlanningSlotsNotCompletionClaims",
     "downwardAndUpwardReuseSameModules",
+    "downwardAndUpwardCyclesMayRepeat",
     "detailsAreAddedOnlyAfterReview",
     "modulesDoNotReplaceEvidenceStages",
     "modulesDoNotReplaceManagementSystems",
@@ -49,7 +50,8 @@ foreach ($module in $modules) {
     $stage = [string] $module.evidenceStage
     Require-Text $module.koreanName "KoreanNameMissing:$stage"
     Require-Text $module.technicalName "TechnicalNameMissing:$stage"
-    Require ([string] $module.technicalName -match "^[A-Z][A-Za-z0-9]+Module$") "TechnicalNameInvalid:$stage"
+    Require ([string] $module.technicalName -match "^E[1-9][\p{L}\p{Nd}]+Module$") "TechnicalNameInvalid:$stage"
+    Require ([string] $module.technicalName -match "^$stage") "TechnicalNameStageMismatch:$stage"
     Require (@($catalog.allowedModuleStatuses) -contains [string] $module.status) "StatusInvalid:$stage"
     Require ([string] $module.status -eq "Named") "SkeletonMustRemainNamed:$stage"
     Require-Text $module.downwardRole "DownwardRoleMissing:$stage"
@@ -57,6 +59,8 @@ foreach ($module in $modules) {
     Require (@($module.namedSlots).Count -gt 0) "NamedSlotsMissing:$stage"
     Require (@($module.namedSlots | Select-Object -Unique).Count -eq
         @($module.namedSlots).Count) "NamedSlotDuplicate:$stage"
+    Require (@($module.namedSlots | Where-Object { [string] $_ -match "\p{IsHangulSyllables}" }).Count -eq
+        @($module.namedSlots).Count) "NamedSlotMustBeKoreanCentered:$stage"
 
     $expectedManagement = if ($stage -eq "E9") { "G4" }
         elseif ($stage -eq "E8") { "G3" }
@@ -66,4 +70,4 @@ foreach ($module in $modules) {
 }
 
 Write-Output (
-    "E9RefactorModuleCatalogValid:Modules=9;Status=Named;Order=E9-E1-E9")
+    "E9RefactorModuleCatalogValid:Modules=9;Status=Named;Cycle=E9-E1-E9-Repeat")

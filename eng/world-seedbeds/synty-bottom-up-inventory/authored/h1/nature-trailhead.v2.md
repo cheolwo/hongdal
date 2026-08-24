@@ -5,6 +5,7 @@
 @state ExploratoryInventory
 @wi WI-WORLD-05
 @wi WI-WORLD-07
+@wi WI-NATURE-05
 @gameplay TrailStart
 @gameplay RouteCheck
 @gameplay ExplorationBriefing
@@ -12,6 +13,10 @@
 @capability Spatial.Traversable
 @capability Spatial.WorkerAccessible
 @capability Spatial.InformationArea
+@capability Spatial.PlayerAccessible
+@capability Spatial.ToolPickupPoint
+@capacity Actor
+@capacity Tool
 @predecessor h1-stock:road-facility-access
 @successor h1-stock:nature-lookout
 @successor h1-stock:nature-shelter

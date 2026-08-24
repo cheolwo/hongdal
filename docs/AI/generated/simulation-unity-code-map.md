@@ -51,6 +51,8 @@ Simulation·Unity
 │  ├─ 020 api.world-stream · Api · Query
 │  ├─ 025 api.world-region-summary · Api · Query
 │  ├─ 028 contract.world-layout-definition · Contract · Definition
+│  ├─ 029 contract.area-set-handover-plan · Contract · Preview
+│  ├─ 030 application.area-set-handover-plan · Application · Preview
 │  ├─ 030 application.world-stream · Application · Projection
 │  ├─ 031 application.lh-world-preview · Application · Preview
 │  └─ 032 api.lh-world-preview · Api · Preview
@@ -70,7 +72,7 @@ Simulation·Unity
 
 ## Simulation 세션 생명주기 (`simulation-session-lifecycle`)
 
-- **010 contract.session-create** — [경영SimulationSession생성Request](../../../Ssalddel.Simulation.Contracts/경영SimulationSessionContracts.cs) · Simulation 세션 생성 입력과 초기 World 문맥을 정의한다.
+- **010 contract.session-create** — [경영SimulationSession생성Request](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/경영SimulationSessionContracts.cs) · Simulation 세션 생성 입력과 초기 World 문맥을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -85,7 +87,7 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 기존 route를 보존하며 운영 상태나 Unity 표현 상태를 직접 변경하지 않는다.
-- **030 application.session-lifecycle** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/경영SimulationSession생명주기Service.cs) · 세션 생성·조회·Tick·저장·복원을 조율한다.
+- **030 application.session-lifecycle** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/RuntimeCore/경영SimulationSession생명주기Service.cs) · 세션 생성·조회·Tick·저장·복원을 조율한다.
   - 계층/단계: `Application / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `PersistentRead | PersistentWrite`
@@ -95,7 +97,7 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 운영 상태를 변경하지 않으며 서버 세션의 권한·개정·원장을 통해서만 세계 게임플레이 상태를 변경한다.
-- **040 domain.session-aggregate** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/경영SimulationSession.cs) · 결정적 세션 상태와 개정·Tick 상태 전이를 소유한다.
+- **040 domain.session-aggregate** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/경영SimulationSession.cs) · 결정적 세션 상태와 개정·Tick 상태 전이를 소유한다.
   - 계층/단계: `Domain / Tick`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
@@ -110,17 +112,17 @@ Simulation·Unity
 
 선행 기능: `simulation-session-lifecycle`
 
-- **010 contract.battle-preview** — [SimulationBattleCreatePreviewRequest](../../../Ssalddel.Simulation.Contracts/SimulationBattleInstanceContracts.cs) · 병렬 전투 생성 미리보기의 서버 입력을 정의한다.
+- **010 contract.battle-preview** — [SimulationBattleCreatePreviewRequest](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationBattleInstanceContracts.cs) · 병렬 전투 생성 미리보기의 서버 입력을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 클라이언트는 전투 결과나 수치 보정을 확정하지 않고 예상 World 개정과 안정 ID만 보낸다.
-- **010 contract.local-combat-control-mode** — [SimulationLocalCombatControlModeConfirmRequest](../../../Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs) · 현장 전투의 1인칭 직접 행동과 3인칭 전술 지휘 중 하나를 서버에 확정한다.
+- **010 contract.local-combat-control-mode** — [SimulationLocalCombatControlModeConfirmRequest](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs) · 현장 전투의 1인칭 직접 행동과 3인칭 전술 지휘 중 하나를 서버에 확정한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 카메라 자체가 아니라 서버가 확정한 전투 조작 방식만 행동 허용 범위를 바꾼다.
-- **011 contract.local-combat-action** — [SimulationLocalCombatActionConfirmRequest](../../../Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs) · 현재 H5/LH 공간에서 수행하는 전투 행동의 서버 입력을 정의한다.
+- **011 contract.local-combat-action** — [SimulationLocalCombatActionConfirmRequest](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs) · 현재 H5/LH 공간에서 수행하는 전투 행동의 서버 입력을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -135,7 +137,7 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 전투 Tick과 경영 WorldTick을 분리하고 완료 결과만 안전한 WorldTick에 합류시킨다.
-- **040 domain.battle-state** — [SimulationBattleInstanceState](../../../Ssalddel.Simulation.Domain/SimulationBattleInstances.cs) · 독립 BattleTick·참가·배치·지원·결과 상태 전이를 소유한다.
+- **040 domain.battle-state** — [SimulationBattleInstanceState](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBattleInstances.cs) · 독립 BattleTick·참가·배치·지원·결과 상태 전이를 소유한다.
   - 계층/단계: `Domain / Tick`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
@@ -155,7 +157,7 @@ Simulation·Unity
 
 선행 기능: `simulation-session-lifecycle`
 
-- **010 contract.farm-combat** — [SimulationCombatPerspectiveConfirmRequest](../../../Ssalddel.Simulation.Contracts/SimulationFarmCombatContracts.cs) · 전투 시점·박자·반응 입력의 서버 계약을 정의한다.
+- **010 contract.farm-combat** — [SimulationCombatPerspectiveConfirmRequest](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmCombatContracts.cs) · 전투 시점·박자·반응 입력의 서버 계약을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -165,12 +167,12 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: Simulation 전용 경로이며 운영 서버 권한·원장을 변경하지 않는다.
-- **030 application.farm-combat** — [SimulationFarmSurvivalService](../../../Ssalddel.Simulation.Application/SimulationFarmSurvivalService.cs) · 전투 입력을 현재 Simulation Session aggregate에 전달한다.
+- **030 application.farm-combat** — [SimulationFarmSurvivalService](../../../Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSurvivalService.cs) · 전투 입력을 현재 Simulation Session aggregate에 전달한다.
   - 계층/단계: `Application / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 운영 업무 상태가 아니라 Simulation Session 상태만 변경한다.
-- **040 domain.farm-combat** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/SimulationFarmCombat.cs) · 전투 박자·타이밍 등급·피해·전술 기회를 결정적으로 판정한다.
+- **040 domain.farm-combat** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmCombat.cs) · 전투 박자·타이밍 등급·피해·전술 기회를 결정적으로 판정한다.
   - 계층/단계: `Domain / Tick`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
@@ -185,7 +187,7 @@ Simulation·Unity
 
 선행 기능: `simulation-session-lifecycle`, `simulation-parallel-battle`
 
-- **010 contract.save-request** — [SimulationSessionSaveRequest](../../../Ssalddel.Simulation.Contracts/SimulationSaveReplayContracts.cs) · 세션 저장 식별자와 기대 개정을 정의한다.
+- **010 contract.save-request** — [SimulationSessionSaveRequest](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationSaveReplayContracts.cs) · 세션 저장 식별자와 기대 개정을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -195,12 +197,12 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: 저장 식별자와 기대 개정을 서버가 검증하며 운영 서버 저장 API로 전달하지 않는다.
-- **030 application.save-replay** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/경영SimulationSession생명주기Service.cs) · 세션 저장·복원과 전투 저장 자료 결합을 조율한다.
+- **030 application.save-replay** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/RuntimeCore/경영SimulationSession생명주기Service.cs) · 세션 저장·복원과 전투 저장 자료 결합을 조율한다.
   - 계층/단계: `Application / Persistence`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: 검증된 simulation-save.v1·v2 자료만 저장·복원하며 활성 세션을 임의로 덮어쓰지 않는다.
-- **040 domain.save-package** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/SimulationSaveReplay.cs) · 세션 Snapshot과 Command log를 봉인한 저장 자료로 만든다.
+- **040 domain.save-package** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSaveReplay.cs) · 세션 Snapshot과 Command log를 봉인한 저장 자료로 만든다.
   - 계층/단계: `Domain / Persistence`
   - 읽기/쓰기: `SimulationState → None`
   - 부수효과: `None`
@@ -213,17 +215,17 @@ Simulation·Unity
 
 ## 공공데이터-파생 World (`simulation-world-derivation`)
 
-- **010 domain.derived-world-ledger** — [SimulationWorld파생원장](../../../Ssalddel.Simulation.Domain/SimulationWorldDerivation.cs) · 공간 원본 계보·파생 node·관계·배치 계획을 불변 실행 단위로 정의한다.
+- **010 domain.derived-world-ledger** — [SimulationWorld파생원장](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldDerivation.cs) · 공간 원본 계보·파생 node·관계·배치 계획을 불변 실행 단위로 정의한다.
   - 계층/단계: `Domain / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 관측·파생·통계배분·시나리오·장식 근거를 분리하며 추정 위치를 실제 사실로 승격하지 않는다.
-- **016 contract.landscape-composition-tile** — [SimulationWorldLandscapeCompositionTileResponse](../../../Ssalddel.Simulation.Contracts/SimulationWorldLandscapeCompositionContracts.cs) · 공간 근거로 조립된 경관 Graph와 의미 기반 Composition 배치를 Unity에 전달한다.
+- **016 contract.landscape-composition-tile** — [SimulationWorldLandscapeCompositionTileResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLandscapeCompositionContracts.cs) · 공간 근거로 조립된 경관 Graph와 의미 기반 Composition 배치를 Unity에 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Prefab 경로·GUID·상품명은 노출하지 않으며, 응답은 표현 계획이지 운영 사실이나 실제 시설 존재의 확정이 아니다.
-- **017 contract.landscape-graph** — [SimulationWorldLandscapeGraphResponse](../../../Ssalddel.Simulation.Contracts/SimulationWorldLandscapeCompositionContracts.cs) · 여러 타일과 Area를 참조하는 하나의 경관 Graph를 Unity에 전달한다.
+- **017 contract.landscape-graph** — [SimulationWorldLandscapeGraphResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLandscapeCompositionContracts.cs) · 여러 타일과 Area를 참조하는 하나의 경관 Graph를 Unity에 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -238,7 +240,7 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → DerivedWorld`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: SimulationWorldDerived DB만 변경하며 입력 fingerprint가 다른 같은 식별자는 충돌로 거부한다.
-- **042 domain.landscape-graph-assembler** — [SimulationWorldLandscapeGraphAssembler](../../../Ssalddel.Simulation.Domain/SimulationWorldLandscapeAssembly.cs) · Macro·Meso 공간 골격을 156개 의미 모판의 연결·반복 문법으로 결정적으로 조립한다.
+- **042 domain.landscape-graph-assembler** — [SimulationWorldLandscapeGraphAssembler](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldLandscapeAssembly.cs) · Macro·Meso 공간 골격을 156개 의미 모판의 연결·반복 문법으로 결정적으로 조립한다.
   - 계층/단계: `Domain / Projection`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -253,7 +255,7 @@ Simulation·Unity
 
 선행 기능: `simulation-world-derivation`
 
-- **010 domain.synty-ledger** — [SimulationWorldSynty경관실행원장](../../../Ssalddel.Simulation.Domain/SimulationWorldSyntyLandscape.cs) · 공간 출력과 Synty·URP 대장 개정을 결합한 경관 실행 결과를 정의한다.
+- **010 domain.synty-ledger** — [SimulationWorldSynty경관실행원장](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldSyntyLandscape.cs) · 공간 출력과 Synty·URP 대장 개정을 결합한 경관 실행 결과를 정의한다.
   - 계층/단계: `Domain / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -273,12 +275,12 @@ Simulation·Unity
 
 선행 기능: `simulation-world-derivation`
 
-- **010 contract.stream-recipe** — [SimulationWorldStreamRecipeResponse](../../../Ssalddel.Simulation.Contracts/SimulationWorldStreamingContracts.cs) · L2 타일 활성·준비 범위와 사전 적재 규칙을 전달한다.
+- **010 contract.stream-recipe** — [SimulationWorldStreamRecipeResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldStreamingContracts.cs) · L2 타일 활성·준비 범위와 사전 적재 규칙을 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Recipe는 제공 범위와 로드 정책이며 Unity가 전체 타일을 동시에 생성하라는 명령이 아니다.
-- **011 contract.lh-world-profile** — [SimulationLhWorldProfileResponse](../../../Ssalddel.Simulation.Contracts/SimulationLhWorldContracts.cs) · L 해상도와 H 공간 계보를 결합하는 LH World 생성·스트리밍 Profile을 전달한다.
+- **011 contract.lh-world-profile** — [SimulationLhWorldProfileResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLhWorldContracts.cs) · L 해상도와 H 공간 계보를 결합하는 LH World 생성·스트리밍 Profile을 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
@@ -293,11 +295,21 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 요약 응답에는 상호명을 넣지 않고 명시적인 공개 상세 조회에서만 공개 공공데이터 상호명을 반환한다.
-- **028 contract.world-layout-definition** — [SimulationWorldLayoutDefinitionResponse](../../../Ssalddel.Simulation.Contracts/SimulationWorldLayoutContracts.cs) · H4 AreaSet과 H3 회랑의 H5 상대 공간 배치를 전달한다.
+- **028 contract.world-layout-definition** — [SimulationWorldLayoutDefinitionResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLayoutContracts.cs) · H4 AreaSet과 H3 회랑의 H5 상대 공간 배치를 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: ScenarioRelative H5는 E6 없이도 권위 세계이며 AreaSetNetwork나 Simulation 상태를 변경하지 않는다.
+- **029 contract.area-set-handover-plan** — [SimulationAreaSetHandoverPlanResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationAreaSetHandoverContracts.cs) · 현재 AreaSet에서 물리 회랑으로 이어지는 다음 AreaSet의 단계별 준비 후보를 전달한다.
+  - 계층/단계: `Contract / Preview`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: 인계 계획은 자료·메모리 준비 후보이며 현재 AreaSet, 이동 권한, WorldTick 또는 운영 상태를 변경하지 않는다.
+- **030 application.area-set-handover-plan** — [SimulationAreaSetHandoverPlanner](../../../Ssalddel.Simulation.Application/SimulationAreaSetHandoverPlanner.cs) · H5 물리 회랑과 이동 방향을 이용해 다음 AreaSet의 준비 깊이를 결정한다.
+  - 계층/단계: `Application / Preview`
+  - 읽기/쓰기: `SimulationState | DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 준비 우선순위만 계산하며 자료 상주 상태, 현재 AreaSet, 접근 권한과 WorldTick을 확정하지 않는다.
 - **030 application.world-stream** — [SimulationWorldStreamingService](../../../Ssalddel.Simulation.Application/SimulationWorldStreamingService.cs) · 카메라·플레이어 경계 접근에 필요한 타일 Recipe와 Manifest Projection을 제공한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `DerivedWorld → None`
@@ -318,7 +330,7 @@ Simulation·Unity
 
 선행 기능: `simulation-world-derivation`, `simulation-session-lifecycle`
 
-- **010 contract.farm-reality-evidence** — [SimulationFarmRealityEvidenceBundle](../../../Ssalddel.Simulation.Contracts/SimulationFarmRealityEvidenceContracts.cs) · 감자 Farm Area의 승인된 농사로·KAMIS·USDA AMS 현실 근거 묶음을 전달한다.
+- **010 contract.farm-reality-evidence** — [SimulationFarmRealityEvidenceBundle](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmRealityEvidenceContracts.cs) · 감자 Farm Area의 승인된 농사로·KAMIS·USDA AMS 현실 근거 묶음을 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`

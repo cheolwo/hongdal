@@ -86,7 +86,7 @@ foreach ($binding in @($actualE5.interactionSpatialCatalog.bindings)) {
 }
 
 Require ([string] $worldCatalog.revision -eq [string] $priority.worldInteractionCatalogRevision) "PriorityWorldCatalogRevisionMismatch"
-Require (@($worldCatalog.items).Count -eq 41) "WorldInteractionCountMustBe41"
+Require (@($worldCatalog.items).Count -eq 49) "WorldInteractionCountMustBe49"
 Require ([string] $priority.schemaVersion -eq "simulation-world-interaction-spatial-priorities.v1") "PrioritySchemaInvalid"
 Require ([string] $compositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "CompositionPlanSchemaInvalid"
 Require ([string] $p2CompositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "P2CompositionPlanSchemaInvalid"
@@ -227,7 +227,9 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
     $graphBindings = @(if ($graphBindingsByWi.ContainsKey($id)) { $graphBindingsByWi[$id].ToArray() } else { @() })
     $e5Refs = @(Get-Values $item.integration "e5PlacementRefs")
     $warnings = [Collections.Generic.List[string]]::new()
-    if ($participation -eq "Required" -and $interaction.Count -eq 0) { $warnings.Add("RequiredSpatialDesignMissing") }
+    if ($participation -eq "Required" -and $interaction.Count -eq 0 -and $official.Count -eq 0) {
+        $warnings.Add("RequiredSpatialDesignMissing")
+    }
     if ($graphBindings.Count -gt 0 -and $official.Count -eq 0) { $warnings.Add("GraphBindingWithoutApprovedH1") }
     $resolvedE5Bindings = @($e5Refs | Where-Object { $actualE5BindingsById.ContainsKey([string] $_) })
     if ($e5Refs.Count -gt 0 -and $resolvedE5Bindings.Count -ne $e5Refs.Count) { $warnings.Add("E5PlacementReferenceMissing") }
@@ -286,8 +288,8 @@ $summary = [ordered]@{
     definedH3Count = 5
     definedH4Count = 1
 }
-Require ($summary.implementationE3Count -eq 41) "AllWorldInteractionsMustBeE3"
-Require ($summary.establishedH1Count -eq 5) "EstablishedH1CountMustBe5"
+Require ($summary.implementationE3Count -eq 49) "AllWorldInteractionsMustBeE3"
+Require ($summary.establishedH1Count -eq 13) "EstablishedH1CountMustBe13"
 Require ($summary.establishedH3Count -eq 8) "EstablishedH3CountMustBe8"
 Require ($summary.candidateLineageCount -eq 22) "CandidateLineageCountMustBe22"
 Require ($summary.missingRequiredCount -eq 0) "MissingRequiredCountMustBe0"

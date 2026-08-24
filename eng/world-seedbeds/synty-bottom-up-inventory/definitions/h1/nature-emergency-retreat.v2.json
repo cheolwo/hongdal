@@ -9,7 +9,8 @@
   "originModeCode": "WorldIntent",
   "approvedDefinitionStableId": null,
   "wiIds": [
-    "WI-NATURE-02"
+    "WI-NATURE-02",
+    "WI-NATURE-11"
   ],
   "anticipatedGameplayCodes": [
     "EmergencyRetreat",
@@ -22,11 +23,16 @@
   "capabilityCodes": [
     "Spatial.Traversable",
     "Spatial.EmergencyAccess",
-    "Spatial.PlayerEscapeRoute"
+    "Spatial.PlayerEscapeRoute",
+    "Spatial.EncounterDecisionArea",
+    "Spatial.RetreatRoute"
   ],
   "capacityConceptCodes": [
     "EscapeRouteParty",
-    "EmergencyPassage"
+    "EmergencyPassage",
+    "EncounterArea",
+    "RetreatRoute",
+    "Actor"
   ],
   "predecessorH1Refs": [
     "h1-stock:nature-incident-trace",

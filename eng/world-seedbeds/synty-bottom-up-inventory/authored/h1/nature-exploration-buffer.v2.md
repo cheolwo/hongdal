@@ -5,7 +5,18 @@
 @state ExploratoryInventory
 @wi WI-WORLD-05
 @wi WI-WORLD-07
+@wi WI-NATURE-06
+@gameplay TimberHarvest
 @role NatureExplorationBuffer
+@capability Spatial.Traversable
+@capability Spatial.WorkerAccessible
+@capability Spatial.HarvestResourceWorkArea
+@capacity WorkArea
+@capacity ResourceNode
+@capacity Actor
+@capacity Tool
+@connector HomeInput
+@connector HomeReturn
 @grammar nature:숲 빈터·고사목
 @grammar nature:산길·바위 길목
 
@@ -21,6 +32,6 @@
 
 ## 미해결
 
-- 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.
+- 실제 ResourceNode별 점유와 재생성 해제는 Simulation Core가 검증한다.
 
 이 문서는 상향식 공간 설계 지식이며 실제 좌표·AreaSet·LandscapeGraph·Unity 자산 권위를 만들지 않는다.

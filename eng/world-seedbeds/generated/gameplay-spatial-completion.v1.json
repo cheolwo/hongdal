@@ -3,8 +3,8 @@
   "revision": "simulation-world-gameplay-spatial-completion-report.r3",
   "sourceRevision": "simulation-world-gameplay-spatial-completion.r4",
   "hCatalogRevision": "simulation-world-spatial-design-knowledge.r3",
-  "worldInteractionRevision": "simulation-world-interactions.r5",
-  "evidenceStageRevision": "simulation-evidence-stages.r7",
+  "worldInteractionRevision": "simulation-world-interactions.r7",
+  "evidenceStageRevision": "simulation-evidence-stages.r10",
   "theorySpatialFactoryRevision": "simulation-world-theory-spatial-factory-output.r3",
   "theorySpatialFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r4",
   "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r3",
@@ -12,7 +12,7 @@
   "axisDefinitions": {
     "h": "공간 자원의 종류와 H1→H4 조립 깊이",
     "gameplayTrace": "공간이 기준 플레이를 직접 또는 간접 지원하는 정도",
-    "evidence": "E0→E7 구현·통합 증거 깊이",
+    "evidence": "E0→E9 구현·통합 증거 깊이",
     "playableSlice": "사람이 시작부터 다음 날까지 완주하는 마감 상태"
   },
   "gatePolicy": {

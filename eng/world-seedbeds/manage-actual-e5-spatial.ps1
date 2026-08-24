@@ -76,8 +76,24 @@ $theory = Read-Json $TheoryPath
 $composition = Read-Json $CompositionPath
 $worldInteractions = Read-Json "eng/execution-ledgers/world-interactions.json"
 $spatialPriorities = Read-Json "eng/world-seedbeds/wi-spatial-priorities.v1.json"
+$spatialSeedbedCatalog = Read-Json "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json"
 $designCatalog = Read-Json "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
 $h1Definitions = Load-H1Definitions $designCatalog
+$spatialSeedbedByWi = @{}
+foreach ($definitionRef in @($spatialSeedbedCatalog.definitionRefs)) {
+    $seedbed = Read-Json ("eng/world-seedbeds/wi-spatial-seedbeds/" + [string] $definitionRef)
+    if ([string] $seedbed.reviewStatusCode -ne "ApprovedForSimulation") { continue }
+    $spacesByCode = @{}
+    foreach ($space in @($seedbed.internalSpaces)) { $spacesByCode[[string] $space.spaceCode] = $space }
+    foreach ($binding in @($seedbed.wiBindings)) {
+        $bindingWiId = [string] $binding.worldInteractionId
+        Require (-not $spatialSeedbedByWi.ContainsKey($bindingWiId)) "SeedbedWiBindingDuplicate:$bindingWiId"
+        $spatialSeedbedByWi[$bindingWiId] = [pscustomobject]@{
+            StableId = [string] $seedbed.stableId
+            Space = $spacesByCode[[string] $binding.internalSpaceCode]
+        }
+    }
+}
 $outputRevision = if ($policy.PSObject.Properties.Name -contains "outputRevision") { [int] $policy.outputRevision } else { 1 }
 
 Require ([string] $policy.schemaVersion -eq "simulation-world-actual-e5-spatial-policy.v1") "PolicySchema"
@@ -530,7 +546,25 @@ foreach ($preference in @($policy.wiBindingPreferences.PSObject.Properties | Sor
         if ([string] $_ -like "Spatial.*") { [string] $_ } else { "Spatial." + [string] $_ }
     } | Sort-Object -Unique)
     $capacities = [object[]] @()
-    if (@($requirements | Where-Object { $_ -like "*WorkArea" -or $_ -like "*Area" }).Count -gt 0) {
+    $seedbedBinding = if ($spatialSeedbedByWi.ContainsKey($wiId)) {
+        $spatialSeedbedByWi[$wiId]
+    } else { $null }
+    if ($null -ne $seedbedBinding -and $wiId -like "WI-NATURE-*") {
+        foreach ($requirement in $requirements) {
+            Require (@($seedbedBinding.Space.capabilityCodes) -contains $requirement) "SeedbedCapabilityMissing:${wiId}:$requirement"
+        }
+        $capacities = @($seedbedBinding.Space.baseCapacities | ForEach-Object {
+            [ordered]@{
+                capacityCode = [string] $_.capacityCode
+                quantity = [decimal] $_.quantity
+                unitCode = [string] $_.unitCode
+                evidenceKindCode = "Scenario"
+                evidenceReference = [string] $seedbedBinding.StableId
+                capacityRuleRevision = "nature-survival-spatial-capacity.r1"
+            }
+        })
+    }
+    elseif (@($requirements | Where-Object { $_ -like "*WorkArea" -or $_ -like "*Area" }).Count -gt 0) {
         $capacities = ,([ordered]@{
             capacityCode = "WorkArea"
             quantity = 1
@@ -561,7 +595,9 @@ foreach ($preference in @($policy.wiBindingPreferences.PSObject.Properties | Sor
         h1Ref = [string] $selected.H1Ref
         h2Ref = [string] $selected.H2Ref
         h3Ref = [string] $selected.H3Ref
-        sourceStableIds = @([string] $policy.approvalSourceStableId, [string] $selected.H1Ref, [string] $selected.H2Ref, [string] $selected.H3Ref)
+        sourceStableIds = @([string] $policy.approvalSourceStableId, [string] $selected.H1Ref, [string] $selected.H2Ref, [string] $selected.H3Ref) + @(
+            if ($null -ne $seedbedBinding) { [string] $seedbedBinding.StableId }
+        )
     }
 }
 
@@ -571,6 +607,7 @@ $contextAreaMap = [ordered]@{
     "WI-WORLD-01" = "area-set:sim:pyeongchang:farm-production.v1"
     "WI-WORLD-05" = [string] $policy.networkStableId
     "WI-WORLD-07" = [string] $policy.networkStableId
+    "WI-NATURE-12" = "area-set:sim:pyeongchang:nature-home.v1"
 }
 $contextBindings = @($contextAreaMap.GetEnumerator() | Sort-Object Key | ForEach-Object {
     [ordered]@{
@@ -582,9 +619,15 @@ $contextBindings = @($contextAreaMap.GetEnumerator() | Sort-Object Key | ForEach
     }
 })
 $nonSpatialWiIds = @($spatialPriorities.notRequiredWiIds | Sort-Object)
-Require ($bindings.Count -eq 30) "DirectBindingCount:$($bindings.Count)"
-Require ($contextBindings.Count -eq 5) "ContextBindingCount:$($contextBindings.Count)"
+$classifiedWiIds = @($bindings.worldInteractionId) +
+    @($contextBindings.worldInteractionId) + $nonSpatialWiIds
+$pendingE5WiIds = @($worldInteractions.items.id |
+    Where-Object { $classifiedWiIds -notcontains [string] $_ } |
+    Sort-Object)
+Require ($bindings.Count -eq 37) "DirectBindingCount:$($bindings.Count)"
+Require ($contextBindings.Count -eq 6) "ContextBindingCount:$($contextBindings.Count)"
 Require ($nonSpatialWiIds.Count -eq 6) "NonSpatialCount:$($nonSpatialWiIds.Count)"
+Require ($pendingE5WiIds.Count -eq 0) "PendingE5Count:$($pendingE5WiIds.Count)"
 
 $transitions = @()
 $transitionIds = @{}
@@ -609,6 +652,7 @@ $interactionSpatialCatalog = [ordered]@{
     bindings = $bindings
     contextualBindings = $contextBindings
     nonSpatialWiIds = $nonSpatialWiIds
+    pendingE5WiIds = $pendingE5WiIds
     transitions = $transitions
 }
 $interactionSpatialCatalog.catalogHashSha256 = Text-Hash (Stable-Json $interactionSpatialCatalog)
@@ -630,6 +674,7 @@ $result = [ordered]@{
         directBindings = $bindings.Count
         contextualBindings = $contextBindings.Count
         nonSpatialWi = $nonSpatialWiIds.Count
+        pendingE5Wi = $pendingE5WiIds.Count
     }
     network = $network
     areaSets = $areaSets
@@ -659,7 +704,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- Network 관계: ``$($result.counts.networkRelations)``")
 [void] $builder.AppendLine("- 이론 보류 Graph: ``$($result.counts.deferredTheoryGraphs)`` (정책 승격 전 실제 E5에서 제외)")
 [void] $builder.AppendLine("- AreaSet 구성 패턴: ``$($result.compositionPlanRevision)``")
-[void] $builder.AppendLine("- WI: 직접 ``$($result.counts.directBindings)`` · 문맥 ``$($result.counts.contextualBindings)`` · 비공간 ``$($result.counts.nonSpatialWi)``")
+[void] $builder.AppendLine("- WI: 직접 ``$($result.counts.directBindings)`` · 문맥 ``$($result.counts.contextualBindings)`` · 비공간 ``$($result.counts.nonSpatialWi)`` · E5 배치 대기 ``$($result.counts.pendingE5Wi)``")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("| 영역 | 구성 패턴 | 실제 AreaSet | Graph | 적재 정책 |")
 [void] $builder.AppendLine("| --- | --- | --- | ---: | --- |")
@@ -677,7 +722,7 @@ if ($Mode -eq "Check") {
     Require (Test-Path -LiteralPath $markdownPath) "MarkdownOutputMissing"
     Require ((Normalize ([IO.File]::ReadAllText($jsonPath))) -ceq $json) "JsonOutputStale"
     Require ((Normalize ([IO.File]::ReadAllText($markdownPath))) -ceq $markdown) "MarkdownOutputStale"
-    Write-Output "ActualE5SpatialValid:AreaSets=$($areaSets.Count);Graphs=$($graphs.Count);Relations=$($networkRelations.Count);WI=$($bindings.Count)/$($contextBindings.Count)/$($nonSpatialWiIds.Count)"
+    Write-Output "ActualE5SpatialValid:AreaSets=$($areaSets.Count);Graphs=$($graphs.Count);Relations=$($networkRelations.Count);WI=$($bindings.Count)/$($contextBindings.Count)/$($nonSpatialWiIds.Count)/$($pendingE5WiIds.Count)"
     exit 0
 }
 
@@ -688,4 +733,4 @@ foreach ($pair in @(@($jsonPath, $json), @($markdownPath, $markdown))) {
         [IO.File]::WriteAllText($pair[0], [string] $pair[1], [Text.UTF8Encoding]::new($false))
     }
 }
-Write-Output "ActualE5SpatialGenerated:AreaSets=$($areaSets.Count);Graphs=$($graphs.Count);Relations=$($networkRelations.Count);WI=$($bindings.Count)/$($contextBindings.Count)/$($nonSpatialWiIds.Count)"
+Write-Output "ActualE5SpatialGenerated:AreaSets=$($areaSets.Count);Graphs=$($graphs.Count);Relations=$($networkRelations.Count);WI=$($bindings.Count)/$($contextBindings.Count)/$($nonSpatialWiIds.Count)/$($pendingE5WiIds.Count)"

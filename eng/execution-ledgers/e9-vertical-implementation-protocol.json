@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "simulation-e9-vertical-implementation-protocol.v1",
+  "revision": "simulation-e9-vertical-implementation-protocol.r3",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "workOrderSchemaVersion": "simulation-e9-vertical-work-order.v1",
+  "refactorModuleCatalogPath": "eng/execution-ledgers/e9-refactor-module-catalog.json",
+  "principles": {
+    "targetFirstPlanningDoesNotClaimE9Evidence": true,
+    "everyStageMustBeAssessed": true,
+    "firstDownwardReviewPrecedesFirstImplementation": true,
+    "implementationStartsFromLowestUnclosedDependency": true,
+    "moduleSkeletonDoesNotRequireImmediateImplementation": true,
+    "upwardValidationIsRequiredForPromotion": true,
+    "downwardAndUpwardPassesRepeatUntilStable": true,
+    "upwardFindingsReopenDownwardImpactReview": true,
+    "workOrderRepresentsCurrentCycleSnapshot": true,
+    "evidenceStagesRemainDistinctFromManagementAndSpatialAxes": true,
+    "wiOrWiLoopIsEvidenceSubject": true,
+    "spatialEvidenceIsConditionalInput": true,
+    "soloAndHostedUseTheSameSimulationCore": true,
+    "authorityStorageAdapterRefactorsRequireWorkOrder": true,
+    "placementControlIsNotAnHLevel": true,
+    "canonicalUnitySceneRemainsSingle": true
+  },
+  "allowedWorkTypes": [
+    "NewVerticalSlice",
+    "ExistingE8Change"
+  ],
+  "allowedDownwardDispositions": [
+    "Defined",
+    "Affected",
+    "ReusedWithVerification",
+    "Gap",
+    "Blocked"
+  ],
+  "allowedUpwardStatuses": [
+    "NotStarted",
+    "InProgress",
+    "Blocked",
+    "Passed"
+  ],
+  "allowedCurrentPasses": [
+    "DownwardImpactReview",
+    "LowestUnclosedDependencyImplementation",
+    "UpwardAssemblyAndValidation",
+    "ImpactReassessment",
+    "StableOrExplicitlyBlocked"
+  ],
+  "iterationCycle": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "stepOrder": [
+      "DownwardImpactReview",
+      "LowestUnclosedDependencyImplementation",
+      "UpwardAssemblyAndValidation",
+      "ImpactReassessment"
+    ],
+    "repeatWhenUpwardFindingsChangeImpact": true,
+    "repeatWhenLowerContractOrEvidenceReopens": true,
+    "closeWhenSelectedScopeStableOrExplicitlyBlocked": true,
+    "doesNotRequireAllStagesToBeImplementedInOneCycle": true
+  },
+  "downwardReviewOrder": [
+    "E9",
+    "E8",
+    "E7",
+    "E6",
+    "E5",
+    "E4",
+    "E3",
+    "E2",
+    "E1"
+  ],
+  "upwardImplementationOrder": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "upwardValidationOrder": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "stagePlans": [
+    {
+      "code": "E9",
+      "question": "어떤 안정 세계를 무엇으로 바꾸고 어떻게 되돌릴 것인가?",
+      "requiredDimensions": [
+        "changeEnvelope",
+        "baselineAndTargetRevision",
+        "migrationCompatibility",
+        "rollbackBoundary"
+      ]
+    },
+    {
+      "code": "E8",
+      "question": "NPC가 플레이어 없이도 이 변화 속에서 계속 살아갈 수 있는가?",
+      "requiredDimensions": [
+        "npcRoleGroup",
+        "continuousLifeLoop",
+        "playerAbsentBehavior",
+        "saveReplay"
+      ]
+    },
+    {
+      "code": "E7",
+      "question": "플레이어가 Solo와 Hosted 권위에서 같은 폐루프를 실제로 완주하는가?",
+      "requiredDimensions": [
+        "playerLoop",
+        "authorityModes",
+        "canonicalScene",
+        "runtimeEvidence"
+      ]
+    },
+    {
+      "code": "E6",
+      "question": "E5에서 발현한 WI 또는 WI 폐루프를 E7 플레이 전에 정제하고 필요한 세계·현실 문맥을 계보와 한계까지 설명할 수 있는가?",
+      "requiredDimensions": [
+        "worldStateExplanation",
+        "groundingProfile",
+        "provenanceLimitations",
+        "causalQuestionMatrix"
+      ]
+    },
+    {
+      "code": "E5",
+      "question": "허용 발생원의 WI가 권위 전이·Task/Effect·결과·후속 선택을 가진 결정적 세계 변화로 발현됐는가?",
+      "requiredDimensions": [
+        "triggerOccurrence",
+        "authorityTransition",
+        "taskEffectResult",
+        "successorOrReturnPath",
+        "conditionalSpatialEvidence"
+      ]
+    },
+    {
+      "code": "E4",
+      "question": "WI의 허용 발생원과 주체·대상·자료·자원·시간 문맥이 결속됐으며 필요한 경우 H 공간 문맥도 결속됐는가?",
+      "requiredDimensions": [
+        "allowedTriggerSources",
+        "subjectAndTargetBindings",
+        "dataResourceTimeBindings",
+        "spatialApplicability"
+      ]
+    },
+    {
+      "code": "E3",
+      "question": "계약·결정성·저장·재생과 영향 소비자의 자동 회귀가 통과하는가?",
+      "requiredDimensions": [
+        "contractTests",
+        "determinism",
+        "saveReplayRegression",
+        "consumerRegression"
+      ]
+    },
+    {
+      "code": "E2",
+      "question": "공통 Core와 Local·Remote Adapter, Unity 투영 코드가 계약대로 준비됐는가?",
+      "requiredDimensions": [
+        "contracts",
+        "applicationDomain",
+        "adapters",
+        "unityProjection"
+      ]
+    },
+    {
+      "code": "E1",
+      "question": "목적·권위·StableId·Revision·시간·완료·제외 경계가 확정됐는가?",
+      "requiredDimensions": [
+        "purposeAndReturn",
+        "authorityAndAllowedTriggerSources",
+        "stableIdsAndRevision",
+        "acceptanceAndExclusions"
+      ]
+    }
+  ]
+}

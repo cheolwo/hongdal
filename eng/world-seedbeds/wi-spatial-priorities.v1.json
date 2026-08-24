@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-priorities.v1",
   "revision": "simulation-world-interaction-spatial-priorities.r1",
-  "worldInteractionCatalogRevision": "simulation-world-interactions.r5",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r8",
   "spatialParticipationCodes": [
     "Required",
     "Contextual",
@@ -30,7 +30,15 @@
         "WI-NATURE-01",
         "WI-NATURE-02",
         "WI-NATURE-03",
-        "WI-NATURE-04"
+        "WI-NATURE-04",
+        "WI-NATURE-05",
+        "WI-NATURE-06",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
+        "WI-NATURE-11",
+        "WI-NATURE-12"
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "simulation-evidence-stages.v3",
-  "revision": "simulation-evidence-stages.r7",
+  "schemaVersion": "simulation-evidence-stages.v4",
+  "revision": "simulation-evidence-stages.r10",
   "stages": [
     {
       "code": "E0",
@@ -24,23 +24,33 @@
     },
     {
       "code": "E4",
-      "label": "WI 공간 모판 완료",
-      "completionGate": "하나 이상의 E3 세계 상호작용이 위치 독립 공간 역할·능력·용량·내부 관계·외부 연결구를 가진 승인된 H1 WI 공간 모판에서 다시 실행되었다."
+      "label": "WI 실행 문맥 결속",
+      "completionGate": "하나 이상의 E3 세계 상호작용에 허용 발생원, 발의·수행 주체, 대상, 자료·자원·예약, 시간 규칙과 공간 적용 여부가 결속되었다. 공간이 필요한 WI만 위치 독립 H 역할·능력·용량·연결구를 요구하며 비공간 WI는 NotApplicable을 명시한다."
     },
     {
       "code": "E5",
-      "label": "실제 지역 경관 조립",
-      "completionGate": "승인된 H1~H4 설계를 특정 AreaSet의 H2 LandscapeBlock·H3 LandscapeGraph·H4 지역 구성 인스턴스로 배치하고, 사람이 작성한 도로·교차로·Gate·GraphRelation과 이동 경로가 결정적으로 연결되었다. 공공데이터 결속은 요구하지 않는다."
+      "label": "WI 세계 발현",
+      "completionGate": "결정적 Simulation 세계에서 허용 발생원 중 하나가 WI를 만들고 Preview·Confirm 또는 권위 판정, Task·Effect, 결과 상태와 후속·복귀 WI까지 연결되었다. 공간 WI는 H·AreaSet·Graph·통행 조립 증거를 추가로 요구하지만 공간 조립만으로 E5를 선언하지 않으며, 비공간 WI는 자료·상태·인과 발현으로 검증한다."
     },
     {
       "code": "E6",
-      "label": "AreaSet 정밀 몰입·현실 근거 결속",
-      "completionGate": "E5로 성립한 AreaSet의 모든 H3·H2·H1·WI·상태 변화와 H3 사이 인과 폐루프를 질문 행렬로 정밀 조사하고, 필요한 현실 문맥 근거의 출처·판본·hash·한계를 연결해 그 장소를 설명할 수 있다. GIS 결속은 독립 선택 축이며 DEM·도로를 공통 필수 자료로 간주하지 않는다."
+      "label": "AreaSet 플레이 전 정제·필요 근거 결속",
+      "completionGate": "E5에서 발현한 WI 또는 WI 폐루프를 E7 실제 플레이에 올리기 전에 의미·인과·결과 표현·권위·최신성 결함을 정제한다. 공간 WI는 관련 H·AreaSet·통행을 함께 검토하고 필요한 현실 문맥은 출처·판본·hash·한계와 함께 연결한다. GIS 결속은 독립 선택 축이며 DEM·도로를 공통 필수 자료로 간주하지 않는다."
     },
     {
       "code": "E7",
       "label": "실제 플레이 폐루프",
-      "completionGate": "사람이 실제 서버와 저장 Scene에서 이동·선택·Preview·Confirm·Tick·재조회를 수행하고 Game View와 Console로 확인했다. AreaSet이 RequiredBeforeE7을 선언하면 Current 상태의 E6 정밀 몰입 합격을 선행하며, GIS NotApplied 자체는 E7을 차단하지 않는다."
+      "completionGate": "사람이 실제 서버와 저장 Scene에서 이동·선택·Preview·Confirm·Tick·재조회를 수행하고 Game View와 Console로 확인했다. AreaSet이 RequiredBeforeE7을 선언하면 Current 상태의 E6 플레이 전 정제 합격을 선행하며, GIS NotApplied 자체는 E7을 차단하지 않는다."
+    },
+    {
+      "code": "E8",
+      "label": "NPC 생활세계 폐루프",
+      "completionGate": "선정된 E7 세계에서 NPC가 지속되는 정체성·역할·생활 상태로 다음 목표를 결정하고 실제 H 공간을 이동해 WI를 수행하며, 경쟁·협력·Effect가 후속 행동을 바꾸는 연속 폐루프를 Save/Replay와 실제 서버·저장 SimulationWorldShell의 Play Mode·Game View로 검증했다."
+    },
+    {
+      "code": "E9",
+      "label": "변화 적응형 세계",
+      "completionGate": "E8 세계에 새 규칙·콘텐츠·공간·사건·카드·역할 또는 시스템 변경을 적용하고, E8부터 E1까지의 하향 영향 분석과 E1부터 E8까지의 상향 재검증, Revision·Migration·Save/API 호환성·결정성·기존 폐루프 회귀를 통과해 새 안정 상태로 승격했다."
     }
   ]
 }

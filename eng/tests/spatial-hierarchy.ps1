@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
@@ -15,18 +15,18 @@ $check = & $script -Mode Check
 
 if ($firstHash -ne $secondHash) { throw "SpatialHierarchyGenerationIsNotDeterministic" }
 if ($firstWriteTicks -ne $secondWriteTicks) { throw "SpatialHierarchyUnchangedOutputWasRewritten" }
-if ($check -notmatch "SpatialHierarchyValid:H1=5;H2=0;H3=5;H4=1") {
+if ($check -notmatch "SpatialHierarchyValid:H1=7;H2=0;H3=5;H4=1") {
     throw "SpatialHierarchyValidationDidNotComplete"
 }
 
 $document = Get-Content -LiteralPath $output -Raw -Encoding UTF8
-if ($document -notmatch "E.*증거 깊이.*H.*공간 포함 깊이") {
+if ($document -notmatch "E.*증거 성숙도.*G.*관리 체계.*H.*공간 포함 깊이") {
     throw "SpatialHierarchyAxisDistinctionMissing"
 }
 if ($document -notmatch "H4 지역 모판 \(AreaSet\)[\s\S]*H3 경관 모판 \(LandscapeGraph\)[\s\S]*H2 블록 모판 \(LandscapeBlock\)[\s\S]*H1 작업공간 모판 \(WI 공간 모판\)") {
     throw "SpatialHierarchyContainmentDiagramMissing"
 }
-if ($document -notmatch "H4 AreaSet과 H3 Graph가 존재해도[\s\S]*E5가 아니다") {
+if ($document -notmatch "H4 AreaSet과 H3 Graph가 존재해도[\s\S]*E4·E5가 아니다") {
     throw "SpatialHierarchyDoesNotPreventFalseE5Promotion"
 }
 

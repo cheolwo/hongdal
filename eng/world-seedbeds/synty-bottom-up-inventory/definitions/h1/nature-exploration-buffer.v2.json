@@ -10,17 +10,32 @@
   "approvedDefinitionStableId": null,
   "wiIds": [
     "WI-WORLD-05",
-    "WI-WORLD-07"
+    "WI-WORLD-07",
+    "WI-NATURE-06"
   ],
-  "anticipatedGameplayCodes": [],
+  "anticipatedGameplayCodes": [
+    "TimberHarvest"
+  ],
   "spatialRoleCodes": [
     "NatureExplorationBuffer"
   ],
-  "capabilityCodes": [],
-  "capacityConceptCodes": [],
+  "capabilityCodes": [
+    "Spatial.Traversable",
+    "Spatial.WorkerAccessible",
+    "Spatial.HarvestResourceWorkArea"
+  ],
+  "capacityConceptCodes": [
+    "WorkArea",
+    "ResourceNode",
+    "Actor",
+    "Tool"
+  ],
   "predecessorH1Refs": [],
   "successorH1Refs": [],
-  "connectorRoleCodes": [],
+  "connectorRoleCodes": [
+    "HomeInput",
+    "HomeReturn"
+  ],
   "sourcePackCodes": [
     "Nature"
   ],
@@ -38,7 +53,7 @@
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:nature-exploration-buffer"
   ],
-  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "unresolvedItems": "실제 ResourceNode별 점유와 재생성 해제는 Simulation Core가 검증한다.",
   "presentationOnly": true,
   "isOperationalState": false
 }

@@ -2,6 +2,7 @@
 
 @spatial-knowledge h1-stock:nature-emergency-retreat
 @wi WI-NATURE-02
+@wi WI-NATURE-11
 @hierarchy H1
 @state CandidateForReview
 @gameplay EmergencyRetreat
@@ -11,8 +12,13 @@
 @capability Spatial.Traversable
 @capability Spatial.EmergencyAccess
 @capability Spatial.PlayerEscapeRoute
+@capability Spatial.EncounterDecisionArea
+@capability Spatial.RetreatRoute
 @capacity EscapeRouteParty
 @capacity EmergencyPassage
+@capacity EncounterArea
+@capacity RetreatRoute
+@capacity Actor
 @predecessor h1-stock:nature-incident-trace
 @predecessor h1-stock:nature-threat-watch
 @successor h1-stock:nature-shelter

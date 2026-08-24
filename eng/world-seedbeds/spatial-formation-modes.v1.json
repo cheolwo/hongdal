@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "simulation-spatial-formation-modes.v1",
+  "revision": "simulation-spatial-formation-modes.r1",
+  "title": "LH 조립 공간과 플레이어 조립 공간 형성 방식",
+  "principles": {
+    "formationModeIsIndependentFromHLevel": true,
+    "formationModeDoesNotReplaceDefinitionOrigin": true,
+    "unityGameObjectDoesNotOwnFormation": true,
+    "playerCompositionRequiresSimulationConfirm": true,
+    "runtimeCompositionDoesNotRewriteHDefinitions": true
+  },
+  "existingAxes": [
+    {
+      "axisCode": "DefinitionOrigin",
+      "exampleField": "originModeCode",
+      "meaning": "H 설계 지식이 WorldIntent, ExpressionExploration, Mixed 중 어디서 유래했는지 나타낸다."
+    },
+    {
+      "axisCode": "CellContentSource",
+      "exampleField": "ContentSourceCode",
+      "meaning": "LH 셀 내용을 ScenarioProcedural 또는 AuthoritativeWorld 중 어디서 공급했는지 나타낸다."
+    },
+    {
+      "axisCode": "PlacementAuthority",
+      "exampleField": "PlacementAuthorityCode",
+      "meaning": "배치 결과의 권위와 근거 상태를 나타낸다."
+    }
+  ],
+  "formationModes": [
+    {
+      "code": "LhComposed",
+      "koreanName": "LH 조립 공간",
+      "meaning": "승인된 H 정의·조립 계획·현재 세계 상태를 LH 셀 내용 공급자가 조립한 기본 공간이다.",
+      "playerMayModify": false,
+      "requiresLineage": ["HDefinitionRefs", "CompositionPlanStableId", "CellPlanHash", "WorldRevision"]
+    },
+    {
+      "code": "PlayerComposed",
+      "koreanName": "플레이어 조립 공간",
+      "meaning": "플레이어의 Preview·Confirm·Task·Effect로 새 H 공간 인스턴스가 성립한 공간이다.",
+      "playerMayModify": true,
+      "requiresLineage": ["HDefinitionRefs", "ActorStableId", "CommandId", "WorldRevision"]
+    },
+    {
+      "code": "HybridEvolving",
+      "koreanName": "혼합 성장 공간",
+      "meaning": "LH가 만든 기본 공간 위에 플레이어의 배치·제거·복구·연결 변경분이 누적된 공간이다.",
+      "playerMayModify": true,
+      "requiresLineage": ["BaseCellPlanHash", "PlayerDeltaRefs", "WorldRevision"]
+    }
+  ],
+  "hLevelPolicies": [
+    {
+      "hLevelCode": "H1",
+      "lhComposition": "Allowed",
+      "playerComposition": "DirectConfirmAllowed",
+      "rule": "오두막·작업대·울타리·밭·보관소처럼 행위 가능한 공간 인스턴스를 직접 배치·제거·복구할 수 있다."
+    },
+    {
+      "hLevelCode": "H2",
+      "lhComposition": "Allowed",
+      "playerComposition": "QualifiedFromH1Set",
+      "rule": "플레이어가 H2를 한 번에 배치하지 않는다. 필요한 H1·연결구·폐루프가 충족되면 H2 인스턴스가 성립한다."
+    },
+    {
+      "hLevelCode": "H3",
+      "lhComposition": "Allowed",
+      "playerComposition": "QualifiedFromH2Loop",
+      "rule": "플레이어가 H3를 한 번에 배치하지 않는다. 복수 H2와 시작→행동→결과→복귀 폐루프가 유지될 때 성장 상태로 판정한다."
+    },
+    {
+      "hLevelCode": "H4",
+      "lhComposition": "RequiredForInitialWorld",
+      "playerComposition": "InternalEvolutionOnly",
+      "rule": "현재 단계에서 플레이어가 새 H4 지역을 직접 만들지 않는다. 기존 H4 내부 구성과 경계 상태에만 영향을 준다."
+    }
+  ],
+  "runtimeLineageFields": [
+    "FormationModeCode",
+    "SpatialInstanceStableId",
+    "SourceHDefinitionRefs",
+    "ParentSpatialInstanceStableId",
+    "FormedByActorStableId",
+    "FormationCommandId",
+    "BaseCompositionHashSha256",
+    "AppliedDeltaStableIds",
+    "FormedAtWorldRevision"
+  ],
+  "allowedTransitions": [
+    { "from": "LhComposed", "action": "PlayerConfirmedDelta", "to": "HybridEvolving" },
+    { "from": "PlayerComposed", "action": "PlayerConfirmedDelta", "to": "PlayerComposed" },
+    { "from": "HybridEvolving", "action": "PlayerConfirmedDelta", "to": "HybridEvolving" }
+  ],
+  "evidenceBoundary": "형성 방식 기록만으로 Actual E5, E6, E7을 증명하지 않는다. 플레이어 조립은 Simulation Confirm과 Save/Replay 계보, Unity 실제 입력 증거가 함께 있어야 한다."
+}

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Ssalddel.CodeMetadata\Ssalddel.CodeMetadata.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Application\Ssalddel.Simulation.Application.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Contracts\Ssalddel.Simulation.Contracts.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Domain\Ssalddel.Simulation.Domain.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Infrastructure\Ssalddel.Simulation.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Persistence\Ssalddel.Simulation.Persistence.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Server\Ssalddel.Simulation.Server.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Simulation.Tests\Ssalddel.Simulation.Tests.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Unity\Ssalddel.Unity.csproj" />
+    <ProjectReference Include="..\..\Ssalddel.Unity.Tests\Ssalddel.Unity.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

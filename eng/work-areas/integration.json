@@ -1,0 +1,47 @@
+{
+  "key": "integration",
+  "version": "1",
+  "label": "책임 간 계약·호환",
+  "repository": "cheolwo/ssalddel",
+  "branchPrefix": "integration/",
+  "commitScope": "integration",
+  "authority": "없음; 각 소유자의 공개 계약과 Adapter를 연결",
+  "readFirst": [
+    "AGENTS.md",
+    "docs/ProjectOverview/GptProjectContext.md",
+    "docs/Architecture/OperationsSimulationUnity작업흐름분리.md",
+    "docs/Architecture/SsalddelCodeMetadata.md",
+    "eng/work-areas/responsibility-workstreams.json"
+  ],
+  "sourceRoots": [
+    "Ssalddel.CodeMetadata",
+    "Ssalddel.WorkflowRules.Contracts",
+    "Ssalddel.WorkflowRules",
+    "Ssalddel.Simulation.Contracts",
+    "Ssalddel.Unity",
+    "Ssalddel.UnityReview.Api",
+    "Ssalddel.UnityReview.Core"
+  ],
+  "excludedRoots": [
+    "bin",
+    "obj",
+    ".vs",
+    "artifacts"
+  ],
+  "allowedChanges": [
+    "호환 가능한 공개 계약과 stable ID",
+    "Local·Remote Runtime Adapter",
+    "직렬화·Save 판본·migration",
+    "생산자와 소비자를 함께 확인하는 교차 회귀 시험"
+  ],
+  "mustNotOwn": [
+    "독립된 업무 상태 원장",
+    "독립된 Simulation Session 상태",
+    "모든 프로젝트가 참조하는 만능 공통 계층"
+  ],
+  "validation": [
+    "계약 생산자 build/test",
+    "모든 변경 소비자 build/test",
+    "기존 API·Save·Replay·직렬화 호환 검사"
+  ]
+}

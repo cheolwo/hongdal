@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "world-interaction-maturity.v1",
+  "revision": "world-interaction-maturity.r1",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "triggerSourceCatalogPath": "eng/execution-ledgers/world-interaction-trigger-sources.json",
+  "selectedSpatialBindingPath": "eng/execution-ledgers/e9-wi-h-module-bindings.json",
+  "principles": {
+    "worldInteractionOwnsEvidenceMaturity": true,
+    "spatialEvidenceIsConditional": true,
+    "clientCannotChooseTriggerSource": true,
+    "unselectedInteractionsRemainUnpromoted": true
+  },
+  "defaultUnselectedState": {
+    "e4StateCode": "ContextUnbound",
+    "e5StateCode": "ManifestationMissing",
+    "spatialEvidenceStateCode": "RequiredMissing"
+  },
+  "selectedRuntimeWorldInteractionIds": [
+    "WI-FARM-04", "WI-FARM-05", "WI-FARM-06",
+    "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04",
+    "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-08",
+    "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"
+  ],
+  "bindings": [
+    { "worldInteractionId": "WI-FARM-04", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-farm-04"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-FARM-05", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-farm-05"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-FARM-06", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-farm-06"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-01", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-01"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-02", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-02"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-03", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-03"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-04", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-04"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-05", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-05"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-06", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-06"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-07", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-07"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-08", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-08"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-09", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-09"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-10", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-10"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-11", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-11"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" },
+    { "worldInteractionId": "WI-NATURE-12", "boundTriggerSourceCodes": ["PlayerDriven"], "boundContextCodes": ["Initiator", "Actor", "Target", "DataResource", "Time", "Spatial"], "spatialApplicabilityCode": "Required", "spatialEvidenceStateCode": "Bound", "spatialEvidenceRefs": ["e9-wi-h:wi-nature-12"], "e4StateCode": "ContextBound", "e5StateCode": "ManifestationPartial" }
+  ]
+}

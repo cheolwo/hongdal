@@ -1,6 +1,12 @@
 {
   "key": "simulation-unity",
   "version": "1",
+  "routingRole": "기존 Simulation·Unity 코드 지도 생성을 위한 호환 집계",
+  "responsibilityManifests": [
+    "eng/work-areas/simulation.json",
+    "eng/work-areas/unity.json",
+    "eng/work-areas/integration.json"
+  ],
   "solutions": [
     "Ssalddel.Simulation.slnx",
     "Ssalddel.Unity.slnx"

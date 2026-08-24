@@ -24,7 +24,11 @@ if ((@($report.planCoverage.gamePlanCode) -join ",") -ne "NatureHomeThreatRecove
 $town = @($report.planCoverage | Where-Object gamePlanCode -eq "TownLivingMarketSafety")
 if (@($town.coverage.h1InteractionRefs) -notcontains "h1-stock:town-order-packing") { throw "GameplayLedHInventoryOrderPackingMissing" }
 $nature = @($report.planCoverage | Where-Object gamePlanCode -eq "NatureHomeThreatRecovery")
-$natureWiIds = @("WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04")
+$natureWiIds = @(
+    "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04",
+    "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-08",
+    "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"
+)
 foreach ($wiId in $natureWiIds) {
     if (@($nature.coreWiIds) -notcontains $wiId) { throw "GameplayLedHInventoryNatureWiMissing:$wiId" }
 }
@@ -33,11 +37,14 @@ if ($natureEvidence.Count -ne 1 -or (@($natureEvidence.wiIds) -join ",") -ne ($n
     throw "GameplayLedHInventoryNatureEvidenceQueueInvalid"
 }
 if ([string] $natureEvidence.evidenceTrackCode -ne "Integration") { throw "GameplayLedHInventoryNatureEvidenceTrackInvalid" }
-if ((@($natureEvidence.currentStageCodes) -join ",") -ne "E1") { throw "GameplayLedHInventoryNatureCurrentStageInvalid" }
+if ((@($natureEvidence.currentStageCodes) -join ",") -ne "E1,E4") { throw "GameplayLedHInventoryNatureCurrentStageInvalid" }
 if ([string] $natureEvidence.targetStageCode -ne "E4") { throw "GameplayLedHInventoryNatureTargetStageInvalid" }
 if ((@($report.hExpansionQueue.priorityCode) -join ",") -ne "H-P0,H-P1,H-P2,H-P3,H-P4") { throw "GameplayLedHInventoryHPriorityInvalid" }
 if ((@($report.wiEvidenceQueue.priorityCode) -join ",") -ne "E-P1,E-P2,E-P3,E-P4,E-P5") { throw "GameplayLedHInventoryEPriorityInvalid" }
-if ([string] $report.wiEvidenceQueue[-1].targetStageCode -ne "E6") { throw "GameplayLedHInventoryE6BoundaryInvalid" }
+if ([string] $report.wiEvidenceQueue[0].targetStageCode -ne "E6" -or
+    [string] $report.wiEvidenceQueue[-1].targetStageCode -ne "E6") {
+    throw "GameplayLedHInventoryE6BoundaryInvalid"
+}
 if ([string] $report.policyRevision -ne "simulation-world-gameplay-led-h-policy.r7") { throw "GameplayLedHInventoryPolicyRevisionInvalid" }
 if (@($report.planCoverage.stagedPackNativeH2Refs | Sort-Object -Unique).Count -ne 0) { throw "GameplayLedHInventoryStagedPackNativeH2MustBeEmptyAfterH3Promotion" }
 $playableSlice = @($report.playableSliceSummary | Where-Object playableSliceId -eq "reference-play:nature-farm-day.v1")

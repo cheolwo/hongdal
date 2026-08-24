@@ -1,0 +1,55 @@
+{
+  "key": "operations",
+  "version": "1",
+  "label": "운영·비즈니스",
+  "repository": "cheolwo/ssalddel",
+  "branchPrefix": "operations/",
+  "commitScope": "operations",
+  "authority": "실제 사용자·조직과 업무 원장",
+  "readFirst": [
+    "AGENTS.md",
+    "docs/ProjectOverview/GptProjectContext.md",
+    "docs/Architecture/OperationsSimulationUnity작업흐름분리.md",
+    "Ssalddel/AGENTS.md",
+    "docs/Architecture/BusinessWorkflowResponsibilityModel.md"
+  ],
+  "sourceRoots": [
+    "Ssalddel",
+    "Ssalddel.Contracts",
+    "Ssalddel.Domain",
+    "Ssalddel.Infrastructure",
+    "Ssalddel.Community",
+    "Ssalddel.Ui.Common",
+    "Ssalddel.Tests"
+  ],
+  "childWorkAreas": [
+    "community-foundation",
+    "regional-culture-public-data",
+    "individual-intent",
+    "group-purchase",
+    "trade-readiness"
+  ],
+  "excludedRoots": [
+    "Ssalddel.Simulation.Contracts",
+    "Ssalddel.Simulation.Domain",
+    "Ssalddel.Simulation.Application",
+    "Ssalddel.Simulation.Infrastructure",
+    "Ssalddel.Simulation.Persistence",
+    "Ssalddel.Simulation.Server",
+    "Ssalddel.Unity",
+    "bin",
+    "obj",
+    ".vs",
+    "artifacts"
+  ],
+  "mustNotOwn": [
+    "게임 Session과 가상 시간",
+    "Simulation Save와 Replay",
+    "Unity Scene과 GameObject 상태"
+  ],
+  "validation": [
+    "영향받는 제품 version solution build",
+    "Ssalddel.Tests의 관련 또는 전체 시험",
+    "상태 전이·권한·Event/Outbox·소비 client 재조회"
+  ]
+}

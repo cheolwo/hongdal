@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet("Write", "Check")]
     [string] $Mode = "Check",
@@ -129,12 +129,14 @@ $evidenceByCode = @{}
 foreach ($stage in @($evidence.stages)) { $evidenceByCode[[string] $stage.code] = $stage }
 Require ($evidenceByCode.ContainsKey("E4")) "E4Missing"
 Require ($evidenceByCode.ContainsKey("E5")) "E5Missing"
-Require ([string] $evidenceByCode.E4.completionGate -match "H1") "E4MustVerifyH1"
-foreach ($code in @("H1", "H2", "H3", "H4")) {
-    Require ([string] $evidenceByCode.E5.completionGate -match $code) "E5MustVerify:$code"
-}
-Require ([string] $evidenceByCode.E6.completionGate -notmatch "H[1-4]") "E6MustNotBeHierarchyLevel"
-Require ([string] $evidenceByCode.E7.completionGate -notmatch "H[1-4]") "E7MustNotBeHierarchyLevel"
+Require ([string] $evidenceByCode.E4.completionGate -match "발생원") "E4MustVerifyTriggerSource"
+Require ([string] $evidenceByCode.E4.completionGate -match "공간 적용") "E4MustClassifySpatialApplicability"
+Require ([string] $evidenceByCode.E5.completionGate -match "Task") "E5MustVerifyTaskOrEffect"
+Require ([string] $evidenceByCode.E5.completionGate -match "후속") "E5MustVerifySuccessor"
+Require ([string] $evidenceByCode.E6.completionGate -notmatch "공간 포함 계층") "E6MustNotBeHierarchyLevel"
+Require ([string] $evidenceByCode.E7.completionGate -notmatch "공간 포함 계층") "E7MustNotBeHierarchyLevel"
+Require ($evidenceByCode.ContainsKey("E8")) "E8Missing"
+Require ($evidenceByCode.ContainsKey("E9")) "E9Missing"
 
 Require (@($catalog.referenceAxes).Count -eq 5) "ReferenceAxisCountMustBeFive"
 $referenceAxisCodes = @($catalog.referenceAxes | ForEach-Object { [string] $_.code })
@@ -154,7 +156,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- 계층 대장 개정: ``$($catalog.revision)``")
 [void] $builder.AppendLine("- 증거 단계 개정: ``$($evidence.revision)``")
-[void] $builder.AppendLine("- 축 구분: ``E``는 증거 깊이, ``H``는 공간 포함 깊이다.")
+[void] $builder.AppendLine("- 축 구분: ``E``는 증거 성숙도, ``G``는 성숙도를 높이는 관리 체계, ``H``는 공간 포함 깊이다.")
 [void] $builder.AppendLine("- 모판 계열: ``H1 작업공간 → H2 블록 → H3 경관 → H4 지역``으로 상향 조립하며 재고 상태는 별도 대장에서 관리한다.")
 [void] $builder.AppendLine("- 현재 정의 수: ``H1 $($counts.H1) / H2 $($counts.H2) / H3 $($counts.H3) / H4 $($counts.H4)``")
 [void] $builder.AppendLine()
@@ -174,17 +176,19 @@ foreach ($level in $levels) {
 [void] $builder.AppendLine("      └─ H1 작업공간 모판 (WI 공간 모판) 인스턴스")
 [void] $builder.AppendLine('```')
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("H 코드는 리소스 종류를 분류할 뿐 완료 상태를 올리지 않는다. 현재 H4 AreaSet과 H3 Graph가 존재해도 실제 H2 Block과 연결 폐루프가 없으므로 E5가 아니다.")
+[void] $builder.AppendLine("H 코드는 리소스 종류를 분류할 뿐 E 완료 상태를 올리지 않는다. 현재 H4 AreaSet과 H3 Graph가 존재해도 WI의 실행 문맥, 권위 전이·Task/Effect·결과·후속 선택이 닫히지 않으면 E4·E5가 아니다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## E 증거 단계와의 관계")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("| 증거 | H 계층 사용 | 완료 의미 |")
 [void] $builder.AppendLine("| --- | --- | --- |")
 [void] $builder.AppendLine("| ``E3`` | 없음 | WI 행위 계약·코드·자동 시험이 성립한다. |")
-[void] $builder.AppendLine("| ``E4`` | H1 | H1 모판에서 포함된 E3 WI를 다시 실행한다. |")
-[void] $builder.AppendLine("| ``E5`` | H1→H2→H3→H4 | 실제 Block·Graph·AreaSet 이동 경로가 닫힌다. |")
-[void] $builder.AppendLine("| ``E6`` | E5 결과 사용 | 공공데이터 원본·파생·출처·hash 계보를 검증한다. |")
+[void] $builder.AppendLine("| ``E4`` | 공간 적용이 Required인 WI만 H1~H5 참조 | 허용 발생원·주체·대상·자료·자원·시간과 선택적 공간 문맥을 결속한다. |")
+[void] $builder.AppendLine("| ``E5`` | 공간 WI의 조건부 증거로 H1→H5 조립 사용 | 권위 전이·Task/Effect·결과·후속 선택이 결정적 세계에서 발현된다. 공간 조립만으로 완료되지 않는다. |")
+[void] $builder.AppendLine("| ``E6`` | E5 WI 폐루프와 필요한 H 결과 사용 | WI·상태 변화와 인과 폐루프를 설명하고 필요한 현실 문맥의 출처·판본·hash·한계를 결속한다. |")
 [void] $builder.AppendLine("| ``E7`` | E6 결과 사용 | 플레이어가 실제 서버와 저장 Scene에서 폐루프를 수행한다. |")
+[void] $builder.AppendLine("| ``E8`` | 선정된 E7 세계의 H 경로 사용 | NPC가 지속되는 생활·업무 주체로 행동한다. |")
+[void] $builder.AppendLine("| ``E9`` | E1~E8 계약과 증거 재사용 | 변경 영향 분석과 하위 단계 재검증을 거쳐 새 안정 상태를 만든다. |")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 계층에서 제외하는 축")
 [void] $builder.AppendLine()

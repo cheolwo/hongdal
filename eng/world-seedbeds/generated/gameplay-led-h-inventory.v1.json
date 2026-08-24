@@ -27,6 +27,12 @@
       "playerWorldRoleCode": "PersistentHomeWorld",
       "corePlayerVerbCodes": [
         "Explore",
+        "AcquireTool",
+        "Harvest",
+        "PlaceShelter",
+        "BuildShelter",
+        "EnterShelter",
+        "RespondEncounter",
         "ObserveThreat",
         "Retreat",
         "Restore",
@@ -38,7 +44,15 @@
         "WI-NATURE-01",
         "WI-NATURE-02",
         "WI-NATURE-03",
-        "WI-NATURE-04"
+        "WI-NATURE-04",
+        "WI-NATURE-05",
+        "WI-NATURE-06",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
+        "WI-NATURE-11",
+        "WI-NATURE-12"
       ],
       "stagedPackNativeH2Refs": null,
       "coverage": {
@@ -535,9 +549,9 @@
       "title": "Farm 수확·출하 공간 실행",
       "evidenceTrackCode": "Integration",
       "currentStageCodes": [
-        "E4"
+        "E6"
       ],
-      "targetStageCode": "E5",
+      "targetStageCode": "E6",
       "wiIds": [
         "WI-FARM-04",
         "WI-FARM-05",
@@ -588,17 +602,26 @@
     },
     {
       "priorityCode": "E-P4",
-      "title": "Nature 사건 공간 모판 재검증",
+      "title": "Nature 생활·탐사·사건 공간 모판 재검증",
       "evidenceTrackCode": "Integration",
       "currentStageCodes": [
-        "E1"
+        "E1",
+        "E4"
       ],
       "targetStageCode": "E4",
       "wiIds": [
         "WI-NATURE-01",
         "WI-NATURE-02",
         "WI-NATURE-03",
-        "WI-NATURE-04"
+        "WI-NATURE-04",
+        "WI-NATURE-05",
+        "WI-NATURE-06",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
+        "WI-NATURE-11",
+        "WI-NATURE-12"
       ],
       "completionStateCode": "SeedbedValidated",
       "selectionPolicyCode": ""

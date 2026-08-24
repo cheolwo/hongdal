@@ -9,7 +9,11 @@
   "originModeCode": "WorldIntent",
   "approvedDefinitionStableId": null,
   "wiIds": [
-    "WI-WORLD-07"
+    "WI-WORLD-07",
+    "WI-NATURE-07",
+    "WI-NATURE-08",
+    "WI-NATURE-09",
+    "WI-NATURE-10"
   ],
   "anticipatedGameplayCodes": [
     "TemporaryShelter",
@@ -22,9 +26,20 @@
   "capabilityCodes": [
     "Spatial.Traversable",
     "Spatial.RestArea",
-    "Spatial.WeatherShelter"
+    "Spatial.WeatherShelter",
+    "Spatial.PlayerAccessible",
+    "Spatial.WorkerAccessible",
+    "Spatial.BuildingSite",
+    "Spatial.ShelterConstructionWorkArea",
+    "Spatial.ShelterEntrance",
+    "Spatial.ShelterInterior"
   ],
-  "capacityConceptCodes": [],
+  "capacityConceptCodes": [
+    "BuildingSite",
+    "WorkArea",
+    "Material",
+    "ShelterOccupancy"
+  ],
   "predecessorH1Refs": [
     "h1-stock:nature-trailhead"
   ],

@@ -10,7 +10,8 @@
   "approvedDefinitionStableId": null,
   "wiIds": [
     "WI-WORLD-05",
-    "WI-WORLD-07"
+    "WI-WORLD-07",
+    "WI-NATURE-05"
   ],
   "anticipatedGameplayCodes": [
     "TrailStart",
@@ -23,9 +24,14 @@
   "capabilityCodes": [
     "Spatial.Traversable",
     "Spatial.WorkerAccessible",
-    "Spatial.InformationArea"
+    "Spatial.InformationArea",
+    "Spatial.PlayerAccessible",
+    "Spatial.ToolPickupPoint"
   ],
-  "capacityConceptCodes": [],
+  "capacityConceptCodes": [
+    "Actor",
+    "Tool"
+  ],
   "predecessorH1Refs": [
     "h1-stock:road-facility-access"
   ],

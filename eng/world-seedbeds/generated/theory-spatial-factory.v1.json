@@ -1858,13 +1858,19 @@
           "x": 0.0,
           "z": 28.0,
           "wiIds": [
+            "WI-NATURE-06",
             "WI-WORLD-05",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureExplorationBuffer"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "Actor",
+            "ResourceNode",
+            "Tool",
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-nature-farm-edge",
@@ -1986,11 +1992,14 @@
         "WI-FARM-02",
         "WI-FARM-03",
         "WI-FARM-04",
+        "WI-NATURE-06",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
-      "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "f8ef719f3d565e4942f9f06182562132ba7bc6e6ac442a651582f282b8694d97"
+      "anticipatedGameplayCodes": [
+        "TimberHarvest"
+      ],
+      "theoryHashSha256": "0ce7efa674fdbb760e00b57cb4b10c98d4b0d4bd6b261805bab5306f77bba960"
     },
     {
       "h2StableId": "h2-candidate:highland-production",
@@ -4304,12 +4313,21 @@
           "x": -40.0,
           "z": 69.28,
           "wiIds": [
+            "WI-NATURE-07",
+            "WI-NATURE-08",
+            "WI-NATURE-09",
+            "WI-NATURE-10",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureTemporaryShelterArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "BuildingSite",
+            "Material",
+            "ShelterOccupancy",
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-nature-threat-watch",
@@ -4436,6 +4454,10 @@
       "gameplayWiIds": [
         "WI-NATURE-01",
         "WI-NATURE-04",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
         "WI-WORLD-07"
       ],
       "anticipatedGameplayCodes": [
@@ -4449,7 +4471,7 @@
         "ThreatDebrief",
         "WeatherWait"
       ],
-      "theoryHashSha256": "79e53864e10fd268d4dc977b99f3b00c8fa7543b206333cb4fcc6cd83e2488d2"
+      "theoryHashSha256": "220d38e430ac020f99bfeaa12d843b97c970badbeca733173321b5a06eccdb93"
     },
     {
       "h2StableId": "h2-candidate:nature-encounter-route",
@@ -4501,14 +4523,18 @@
           "x": 80.0,
           "z": -28.0,
           "wiIds": [
-            "WI-NATURE-02"
+            "WI-NATURE-02",
+            "WI-NATURE-11"
           ],
           "spatialRoleCodes": [
             "NatureEmergencyRetreatArea"
           ],
           "capacityConceptCodes": [
+            "Actor",
             "EmergencyPassage",
-            "EscapeRouteParty"
+            "EncounterArea",
+            "EscapeRouteParty",
+            "RetreatRoute"
           ]
         },
         {
@@ -4651,7 +4677,8 @@
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
         "WI-NATURE-01",
-        "WI-NATURE-02"
+        "WI-NATURE-02",
+        "WI-NATURE-11"
       ],
       "anticipatedGameplayCodes": [
         "CauseIdentification",
@@ -4664,7 +4691,7 @@
         "ThreatEvacuation",
         "ThreatTracking"
       ],
-      "theoryHashSha256": "ad15ce3d222a7b9b46c77404879531ac64da99cb0fc7f9b94c999a7bff045321"
+      "theoryHashSha256": "a85daa315d44f188ed936e74d67b19ad95dab55bf30c02e7b485ffbb015161bf"
     },
     {
       "h2StableId": "h2-candidate:nature-home-core",
@@ -4732,12 +4759,21 @@
           "x": -40.0,
           "z": 69.28,
           "wiIds": [
+            "WI-NATURE-07",
+            "WI-NATURE-08",
+            "WI-NATURE-09",
+            "WI-NATURE-10",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureTemporaryShelterArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "BuildingSite",
+            "Material",
+            "ShelterOccupancy",
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-nature-trailhead",
@@ -4745,13 +4781,17 @@
           "x": -40.0,
           "z": -69.28,
           "wiIds": [
+            "WI-NATURE-05",
             "WI-WORLD-05",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureTrailheadArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "Actor",
+            "Tool"
+          ]
         }
       ],
       "edges": [
@@ -4861,6 +4901,11 @@
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
         "WI-NATURE-04",
+        "WI-NATURE-05",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
@@ -4875,7 +4920,7 @@
         "TrailStart",
         "WeatherWait"
       ],
-      "theoryHashSha256": "5d94c6148c323a120914cf8802540bcb9c2b1f804b5e395a91a73e1046642e7b"
+      "theoryHashSha256": "45a5874f29c694c5478205104ec578b4bb97079fbe04a9b7a6b3db1427c34759"
     },
     {
       "h2StableId": "h2-candidate:nature-restoration-recovery",
@@ -5105,14 +5150,18 @@
           "x": -72.0,
           "z": -58.0,
           "wiIds": [
-            "WI-NATURE-02"
+            "WI-NATURE-02",
+            "WI-NATURE-11"
           ],
           "spatialRoleCodes": [
             "NatureEmergencyRetreatArea"
           ],
           "capacityConceptCodes": [
+            "Actor",
             "EmergencyPassage",
-            "EscapeRouteParty"
+            "EncounterArea",
+            "EscapeRouteParty",
+            "RetreatRoute"
           ]
         },
         {
@@ -5255,7 +5304,8 @@
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
         "WI-NATURE-01",
-        "WI-NATURE-02"
+        "WI-NATURE-02",
+        "WI-NATURE-11"
       ],
       "anticipatedGameplayCodes": [
         "CauseIdentification",
@@ -5268,7 +5318,7 @@
         "ThreatEvacuation",
         "ThreatTracking"
       ],
-      "theoryHashSha256": "1dd0052897da07726ca9c043ec7fe9ab496e17670e219ee80703d928959ec5d8"
+      "theoryHashSha256": "4a3f4225788b7fa63a4cd795df813bbd244470300616c81f218d96ef141e54e3"
     },
     {
       "h2StableId": "h2-candidate:nature-town-relief-transition",
@@ -5546,12 +5596,21 @@
           "x": 80.0,
           "z": -28.0,
           "wiIds": [
+            "WI-NATURE-07",
+            "WI-NATURE-08",
+            "WI-NATURE-09",
+            "WI-NATURE-10",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureTemporaryShelterArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "BuildingSite",
+            "Material",
+            "ShelterOccupancy",
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-nature-trailhead",
@@ -5559,13 +5618,17 @@
           "x": -80.0,
           "z": -28.0,
           "wiIds": [
+            "WI-NATURE-05",
             "WI-WORLD-05",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureTrailheadArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "Actor",
+            "Tool"
+          ]
         }
       ],
       "edges": [
@@ -5674,6 +5737,11 @@
       ],
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
+        "WI-NATURE-05",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
@@ -5687,7 +5755,7 @@
         "TrailStart",
         "WeatherWait"
       ],
-      "theoryHashSha256": "6d905cce8a86956d666b09b9cadfb6be0aa939197d9001495f5d1054799e9374"
+      "theoryHashSha256": "2717cb75c737286e40998fe0f18c95f1bcab939ecbba47fb28b4d6fa7c1e13cb"
     },
     {
       "h2StableId": "h2-candidate:nature-water-buffer",
@@ -5739,13 +5807,19 @@
           "x": -40.0,
           "z": -28.0,
           "wiIds": [
+            "WI-NATURE-06",
             "WI-WORLD-05",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
             "NatureExplorationBuffer"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "Actor",
+            "ResourceNode",
+            "Tool",
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-nature-farm-edge",
@@ -5849,11 +5923,14 @@
       ],
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
+        "WI-NATURE-06",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
-      "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "2eb7bceed5aff6be69291ab63bab319ac8ac3e51a7e446c46c47f79a3f275660"
+      "anticipatedGameplayCodes": [
+        "TimberHarvest"
+      ],
+      "theoryHashSha256": "205066d97f74eaad23ee763b6cfa37a6b70b767feab839f08556ef140acddccd"
     },
     {
       "h2StableId": "h2-candidate:town-contamination-control",
@@ -8517,7 +8594,7 @@
           "h2DisplayNameKo": "숲 가장자리 경작지 블록",
           "x": 420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "f8ef719f3d565e4942f9f06182562132ba7bc6e6ac442a651582f282b8694d97"
+          "h2TheoryHashSha256": "0ce7efa674fdbb760e00b57cb4b10c98d4b0d4bd6b261805bab5306f77bba960"
         },
         {
           "nodeId": "h2-highland-production",
@@ -8654,7 +8731,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
+      "theoryHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf"
     },
     {
       "h3StableId": "h3-candidate:hub-fulfillment-operations",
@@ -9831,7 +9908,7 @@
           "h2DisplayNameKo": "숲 가장자리 경작지 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "f8ef719f3d565e4942f9f06182562132ba7bc6e6ac442a651582f282b8694d97"
+          "h2TheoryHashSha256": "0ce7efa674fdbb760e00b57cb4b10c98d4b0d4bd6b261805bab5306f77bba960"
         },
         {
           "nodeId": "h2-nature-water-buffer",
@@ -9840,7 +9917,7 @@
           "h2DisplayNameKo": "산림·수변 완충지 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "2eb7bceed5aff6be69291ab63bab319ac8ac3e51a7e446c46c47f79a3f275660"
+          "h2TheoryHashSha256": "205066d97f74eaad23ee763b6cfa37a6b70b767feab839f08556ef140acddccd"
         }
       ],
       "edges": [
@@ -9982,7 +10059,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "28c3c63c835d432ab0170667c7727af02a201ea158af50533de944816ca1b867"
+      "theoryHashSha256": "30746db6ea9946fa536e103f7d80e6cd6a7f988714a4fa0c1ff06f0a27d9698b"
     },
     {
       "h3StableId": "h3-candidate:nature-home-encounter-defense",
@@ -10036,7 +10113,7 @@
           "h2DisplayNameKo": "방어환·야영지 블록",
           "x": 420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "79e53864e10fd268d4dc977b99f3b00c8fa7543b206333cb4fcc6cd83e2488d2"
+          "h2TheoryHashSha256": "220d38e430ac020f99bfeaa12d843b97c970badbeca733173321b5a06eccdb93"
         },
         {
           "nodeId": "h2-nature-encounter-route",
@@ -10045,7 +10122,7 @@
           "h2DisplayNameKo": "조우로·이탈로 블록",
           "x": 0.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "ad15ce3d222a7b9b46c77404879531ac64da99cb0fc7f9b94c999a7bff045321"
+          "h2TheoryHashSha256": "a85daa315d44f188ed936e74d67b19ad95dab55bf30c02e7b485ffbb015161bf"
         },
         {
           "nodeId": "h2-nature-home-core",
@@ -10054,7 +10131,7 @@
           "h2DisplayNameKo": "안전 생활핵·보급 거점 블록",
           "x": -420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "5d94c6148c323a120914cf8802540bcb9c2b1f804b5e395a91a73e1046642e7b"
+          "h2TheoryHashSha256": "45a5874f29c694c5478205104ec578b4bb97079fbe04a9b7a6b3db1427c34759"
         }
       ],
       "edges": [
@@ -10290,7 +10367,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
+      "theoryHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c"
     },
     {
       "h3StableId": "h3-candidate:nature-threat-recovery",
@@ -10354,7 +10431,7 @@
           "h2DisplayNameKo": "위험 흔적길·긴급 대피로 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "1dd0052897da07726ca9c043ec7fe9ab496e17670e219ee80703d928959ec5d8"
+          "h2TheoryHashSha256": "4a3f4225788b7fa63a4cd795df813bbd244470300616c81f218d96ef141e54e3"
         }
       ],
       "edges": [
@@ -10574,7 +10651,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
+      "theoryHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44"
     },
     {
       "h3StableId": "h3-candidate:nature-town-relief-loop",
@@ -10887,7 +10964,7 @@
           "h2DisplayNameKo": "탐색로·대피 쉼터 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "6d905cce8a86956d666b09b9cadfb6be0aa939197d9001495f5d1054799e9374"
+          "h2TheoryHashSha256": "2717cb75c737286e40998fe0f18c95f1bcab939ecbba47fb28b4d6fa7c1e13cb"
         },
         {
           "nodeId": "h2-nature-water-buffer",
@@ -10896,7 +10973,7 @@
           "h2DisplayNameKo": "산림·수변 완충지 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "2eb7bceed5aff6be69291ab63bab319ac8ac3e51a7e446c46c47f79a3f275660"
+          "h2TheoryHashSha256": "205066d97f74eaad23ee763b6cfa37a6b70b767feab839f08556ef140acddccd"
         }
       ],
       "edges": [
@@ -11064,7 +11141,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
+      "theoryHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32"
     },
     {
       "h3StableId": "h3-candidate:resilient-logistics-hub",
@@ -12193,7 +12270,7 @@
           "h3DisplayNameKo": "고지대 경작지·숲경계 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
+          "h3TheoryHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf"
         }
       ],
       "graphRelations": [
@@ -12276,7 +12353,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "1c554afb81359549a2c9a6c715d13c05e4f371374273309df9344b3cbf5cf4dc"
+      "theoryHashSha256": "89852db21f218158ca6ddb8d9201687b2630a72355c78c86d6911c38b02a864d"
     },
     {
       "areaSetStableId": "area-set:theory:logistics-hub-region",
@@ -12601,7 +12678,7 @@
           "h3DisplayNameKo": "생활핵·조우로·방어환 구역",
           "x": -480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
+          "h3TheoryHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c"
         },
         {
           "graphInstanceStableId": "graph:theory:nature-threat-recovery",
@@ -12610,7 +12687,7 @@
           "h3DisplayNameKo": "생활핵·대피로·복원쉼터 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
+          "h3TheoryHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44"
         },
         {
           "graphInstanceStableId": "graph:theory:nature-trail-network",
@@ -12619,7 +12696,7 @@
           "h3DisplayNameKo": "탐색로·대피망 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
+          "h3TheoryHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32"
         }
       ],
       "graphRelations": [
@@ -12681,7 +12758,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "f1d77cc4084ca273b4fc154e2ea3895271f68662202a536f206f93320b019f12"
+      "theoryHashSha256": "a1c17673d189a66caf589cfeb6f04aa28d60b2d881bb25fbf47c678581e50f56"
     }
   ],
   "theoryWorld": {

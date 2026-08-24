@@ -16,7 +16,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.\uACBD\uC601SimulationSession\uC0DD\uC131Request",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/\uACBD\uC601SimulationSessionContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/\uACBD\uC601SimulationSessionContracts.cs",
           "responsibility": "Simulation \uC138\uC158 \uC0DD\uC131 \uC785\uB825\uACFC \uCD08\uAE30 World \uBB38\uB9E5\uC744 \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -79,7 +79,7 @@
           "layer": "Application",
           "componentType": "Ssalddel.Simulation.Application.\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service",
           "assembly": "Ssalddel.Simulation.Application",
-          "sourcePath": "Ssalddel.Simulation.Application/\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service.cs",
+          "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service.cs",
           "responsibility": "\uC138\uC158 \uC0DD\uC131\u00B7\uC870\uD68C\u00B7Tick\u00B7\uC800\uC7A5\u00B7\uBCF5\uC6D0\uC744 \uC870\uC728\uD55C\uB2E4.",
           "effects": [
             "PersistentRead",
@@ -126,7 +126,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/\uACBD\uC601SimulationSession.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/\uACBD\uC601SimulationSession.cs",
           "responsibility": "\uACB0\uC815\uC801 \uC138\uC158 \uC0C1\uD0DC\uC640 \uAC1C\uC815\u00B7Tick \uC0C1\uD0DC \uC804\uC774\uB97C \uC18C\uC720\uD55C\uB2E4.",
           "effects": [
             "StateMutation"
@@ -179,7 +179,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationBattleCreatePreviewRequest",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationBattleInstanceContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationBattleInstanceContracts.cs",
           "responsibility": "\uBCD1\uB82C \uC804\uD22C \uC0DD\uC131 \uBBF8\uB9AC\uBCF4\uAE30\uC758 \uC11C\uBC84 \uC785\uB825\uC744 \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -194,7 +194,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationLocalCombatControlModeConfirmRequest",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs",
           "responsibility": "\uD604\uC7A5 \uC804\uD22C\uC758 1\uC778\uCE6D \uC9C1\uC811 \uD589\uB3D9\uACFC 3\uC778\uCE6D \uC804\uC220 \uC9C0\uD718 \uC911 \uD558\uB098\uB97C \uC11C\uBC84\uC5D0 \uD655\uC815\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -209,7 +209,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationLocalCombatActionConfirmRequest",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationLocalCombatContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs",
           "responsibility": "\uD604\uC7AC H5/LH \uACF5\uAC04\uC5D0\uC11C \uC218\uD589\uD558\uB294 \uC804\uD22C \uD589\uB3D9\uC758 \uC11C\uBC84 \uC785\uB825\uC744 \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -272,7 +272,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.SimulationBattleInstanceState",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/SimulationBattleInstances.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBattleInstances.cs",
           "responsibility": "\uB3C5\uB9BD BattleTick\u00B7\uCC38\uAC00\u00B7\uBC30\uCE58\u00B7\uC9C0\uC6D0\u00B7\uACB0\uACFC \uC0C1\uD0DC \uC804\uC774\uB97C \uC18C\uC720\uD55C\uB2E4.",
           "effects": [
             "StateMutation"
@@ -344,7 +344,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationCombatPerspectiveConfirmRequest",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationFarmCombatContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmCombatContracts.cs",
           "responsibility": "\uC804\uD22C \uC2DC\uC810\u00B7\uBC15\uC790\u00B7\uBC18\uC751 \uC785\uB825\uC758 \uC11C\uBC84 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -384,7 +384,7 @@
           "layer": "Application",
           "componentType": "Ssalddel.Simulation.Application.SimulationFarmSurvivalService",
           "assembly": "Ssalddel.Simulation.Application",
-          "sourcePath": "Ssalddel.Simulation.Application/SimulationFarmSurvivalService.cs",
+          "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSurvivalService.cs",
           "responsibility": "\uC804\uD22C \uC785\uB825\uC744 \uD604\uC7AC Simulation Session aggregate\uC5D0 \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [
             "StateMutation"
@@ -407,7 +407,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/SimulationFarmCombat.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmCombat.cs",
           "responsibility": "\uC804\uD22C \uBC15\uC790\u00B7\uD0C0\uC774\uBC0D \uB4F1\uAE09\u00B7\uD53C\uD574\u00B7\uC804\uC220 \uAE30\uD68C\uB97C \uACB0\uC815\uC801\uC73C\uB85C \uD310\uC815\uD55C\uB2E4.",
           "effects": [
             "StateMutation"
@@ -461,7 +461,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationSessionSaveRequest",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationSaveReplayContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationSaveReplayContracts.cs",
           "responsibility": "\uC138\uC158 \uC800\uC7A5 \uC2DD\uBCC4\uC790\uC640 \uAE30\uB300 \uAC1C\uC815\uC744 \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -502,7 +502,7 @@
           "layer": "Application",
           "componentType": "Ssalddel.Simulation.Application.\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service",
           "assembly": "Ssalddel.Simulation.Application",
-          "sourcePath": "Ssalddel.Simulation.Application/\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service.cs",
+          "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/\uACBD\uC601SimulationSession\uC0DD\uBA85\uC8FC\uAE30Service.cs",
           "responsibility": "\uC138\uC158 \uC800\uC7A5\u00B7\uBCF5\uC6D0\uACFC \uC804\uD22C \uC800\uC7A5 \uC790\uB8CC \uACB0\uD569\uC744 \uC870\uC728\uD55C\uB2E4.",
           "effects": [
             "PersistentRead",
@@ -526,7 +526,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/SimulationSaveReplay.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSaveReplay.cs",
           "responsibility": "\uC138\uC158 Snapshot\uACFC Command log\uB97C \uBD09\uC778\uD55C \uC800\uC7A5 \uC790\uB8CC\uB85C \uB9CC\uB4E0\uB2E4.",
           "effects": [],
           "readsFrom": [
@@ -574,7 +574,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.SimulationWorld\uD30C\uC0DD\uC6D0\uC7A5",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/SimulationWorldDerivation.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldDerivation.cs",
           "responsibility": "\uACF5\uAC04 \uC6D0\uBCF8 \uACC4\uBCF4\u00B7\uD30C\uC0DD node\u00B7\uAD00\uACC4\u00B7\uBC30\uCE58 \uACC4\uD68D\uC744 \uBD88\uBCC0 \uC2E4\uD589 \uB2E8\uC704\uB85C \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -589,7 +589,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldLandscapeCompositionTileResponse",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldLandscapeCompositionContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLandscapeCompositionContracts.cs",
           "responsibility": "\uACF5\uAC04 \uADFC\uAC70\uB85C \uC870\uB9BD\uB41C \uACBD\uAD00 Graph\uC640 \uC758\uBBF8 \uAE30\uBC18 Composition \uBC30\uCE58\uB97C Unity\uC5D0 \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -604,7 +604,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldLandscapeGraphResponse",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldLandscapeCompositionContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLandscapeCompositionContracts.cs",
           "responsibility": "\uC5EC\uB7EC \uD0C0\uC77C\uACFC Area\uB97C \uCC38\uC870\uD558\uB294 \uD558\uB098\uC758 \uACBD\uAD00 Graph\uB97C Unity\uC5D0 \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -669,7 +669,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.SimulationWorldLandscapeGraphAssembler",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/SimulationWorldLandscapeAssembly.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldLandscapeAssembly.cs",
           "responsibility": "Macro\u00B7Meso \uACF5\uAC04 \uACE8\uACA9\uC744 156\uAC1C \uC758\uBBF8 \uBAA8\uD310\uC758 \uC5F0\uACB0\u00B7\uBC18\uBCF5 \uBB38\uBC95\uC73C\uB85C \uACB0\uC815\uC801\uC73C\uB85C \uC870\uB9BD\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -717,7 +717,7 @@
           "layer": "Domain",
           "componentType": "Ssalddel.Simulation.Domain.SimulationWorldSynty\uACBD\uAD00\uC2E4\uD589\uC6D0\uC7A5",
           "assembly": "Ssalddel.Simulation.Domain",
-          "sourcePath": "Ssalddel.Simulation.Domain/SimulationWorldSyntyLandscape.cs",
+          "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldSyntyLandscape.cs",
           "responsibility": "\uACF5\uAC04 \uCD9C\uB825\uACFC Synty\u00B7URP \uB300\uC7A5 \uAC1C\uC815\uC744 \uACB0\uD569\uD55C \uACBD\uAD00 \uC2E4\uD589 \uACB0\uACFC\uB97C \uC815\uC758\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -789,7 +789,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldStreamRecipeResponse",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldStreamingContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldStreamingContracts.cs",
           "responsibility": "L2 \uD0C0\uC77C \uD65C\uC131\u00B7\uC900\uBE44 \uBC94\uC704\uC640 \uC0AC\uC804 \uC801\uC7AC \uADDC\uCE59\uC744 \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -806,7 +806,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationLhWorldProfileResponse",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationLhWorldContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLhWorldContracts.cs",
           "responsibility": "L \uD574\uC0C1\uB3C4\uC640 H \uACF5\uAC04 \uACC4\uBCF4\uB97C \uACB0\uD569\uD558\uB294 LH World \uC0DD\uC131\u00B7\uC2A4\uD2B8\uB9AC\uBC0D Profile\uC744 \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -860,12 +860,51 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationWorldLayoutDefinitionResponse",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationWorldLayoutContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLayoutContracts.cs",
           "responsibility": "H4 AreaSet\uACFC H3 \uD68C\uB791\uC758 H5 \uC0C1\uB300 \uACF5\uAC04 \uBC30\uCE58\uB97C \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
           "writesTo": [],
           "boundary": "ScenarioRelative H5\uB294 E6 \uC5C6\uC774\uB3C4 \uAD8C\uC704 \uC138\uACC4\uC774\uBA70 AreaSetNetwork\uB098 Simulation \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 29,
+          "stepKey": "contract.area-set-handover-plan",
+          "dependsOnStepKeys": [
+            "contract.lh-world-profile",
+            "contract.world-layout-definition"
+          ],
+          "executionStage": "Preview",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.SimulationAreaSetHandoverPlanResponse",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationAreaSetHandoverContracts.cs",
+          "responsibility": "\uD604\uC7AC AreaSet\uC5D0\uC11C \uBB3C\uB9AC \uD68C\uB791\uC73C\uB85C \uC774\uC5B4\uC9C0\uB294 \uB2E4\uC74C AreaSet\uC758 \uB2E8\uACC4\uBCC4 \uC900\uBE44 \uD6C4\uBCF4\uB97C \uC804\uB2EC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [],
+          "writesTo": [],
+          "boundary": "\uC778\uACC4 \uACC4\uD68D\uC740 \uC790\uB8CC\u00B7\uBA54\uBAA8\uB9AC \uC900\uBE44 \uD6C4\uBCF4\uC774\uBA70 \uD604\uC7AC AreaSet, \uC774\uB3D9 \uAD8C\uD55C, WorldTick \uB610\uB294 \uC6B4\uC601 \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 30,
+          "stepKey": "application.area-set-handover-plan",
+          "dependsOnStepKeys": [
+            "contract.area-set-handover-plan",
+            "contract.world-layout-definition"
+          ],
+          "executionStage": "Preview",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.SimulationAreaSetHandoverPlanner",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/SimulationAreaSetHandoverPlanner.cs",
+          "responsibility": "H5 \uBB3C\uB9AC \uD68C\uB791\uACFC \uC774\uB3D9 \uBC29\uD5A5\uC744 \uC774\uC6A9\uD574 \uB2E4\uC74C AreaSet\uC758 \uC900\uBE44 \uAE4A\uC774\uB97C \uACB0\uC815\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState",
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "\uC900\uBE44 \uC6B0\uC120\uC21C\uC704\uB9CC \uACC4\uC0B0\uD558\uBA70 \uC790\uB8CC \uC0C1\uC8FC \uC0C1\uD0DC, \uD604\uC7AC AreaSet, \uC811\uADFC \uAD8C\uD55C\uACFC WorldTick\uC744 \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4."
         },
         {
           "flowOrder": 30,
@@ -944,7 +983,7 @@
           "layer": "Contract",
           "componentType": "Ssalddel.Simulation.Contracts.SimulationFarmRealityEvidenceBundle",
           "assembly": "Ssalddel.Simulation.Contracts",
-          "sourcePath": "Ssalddel.Simulation.Contracts/SimulationFarmRealityEvidenceContracts.cs",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmRealityEvidenceContracts.cs",
           "responsibility": "\uAC10\uC790 Farm Area\uC758 \uC2B9\uC778\uB41C \uB18D\uC0AC\uB85C\u00B7KAMIS\u00B7USDA AMS \uD604\uC2E4 \uADFC\uAC70 \uBB36\uC74C\uC744 \uC804\uB2EC\uD55C\uB2E4.",
           "effects": [],
           "readsFrom": [],
@@ -1133,14 +1172,14 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Application",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 56\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationFarmRealityEvidenceStore, ISimulationSessionSaveStore, ISimulationTeamMemberPoseStore, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 71\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationBattleInstanceStore, ISimulationBattlefieldDerivationService, ISimulationFarmChoiceRuntime, ISimulationFarmRealityEvidenceStore, ISimulationFarmWorldInteractionRuntime, ..."
     },
     {
       "severity": "Warning",
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Infrastructure",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 1\uAC1C: InMemorySimulationSessionSaveStore"
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 2\uAC1C: FileSimulationLocalSaveSlotStore, InMemorySimulationSessionSaveStore"
     },
     {
       "severity": "Warning",
@@ -1154,7 +1193,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Server",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 21\uAC1C: DisabledSimulationFarmRealityEvidenceStore, SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationIntegratedWorldController, SimulationRealityContextController, SimulationSurvivalTarotController, SimulationTeamObservationController, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 23\uAC1C: DisabledSimulationFarmRealityEvidenceStore, SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationFarmConstructionPlacementController, SimulationIntegratedWorldController, SimulationNatureSurvivalController, SimulationRealityContextController, ..."
     },
     {
       "severity": "Warning",

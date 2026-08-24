@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "player-centered-development-flow.v1",
+  "revision": "player-centered-development-flow.r1",
+  "purpose": "플레이어의 인지, 선택, 재료 획득, 조립, 결과 체감과 다음 선택을 E, WI, H, Simulation, Unity 작업에 끝까지 연결한다.",
+  "authority": {
+    "developmentViewpoint": "PlayerChoiceAndExperience",
+    "authoritativeStateOwner": "SharedSimulationCore",
+    "unityRole": "InputAndPresentation",
+    "playerCenteredDoesNotGrantUnityStateAuthority": true
+  },
+  "playerLoop": [
+    {
+      "order": 1,
+      "code": "ObserveSituation",
+      "question": "플레이어가 현재 상황과 가능한 변화를 알아차릴 수 있는가?"
+    },
+    {
+      "order": 2,
+      "code": "UnderstandGoal",
+      "question": "플레이어가 욕구와 목표, 선택 이유를 이해하는가?"
+    },
+    {
+      "order": 3,
+      "code": "CompareChoices",
+      "question": "선택 후보의 비용, 시간, 위험과 기대 결과를 비교할 수 있는가?"
+    },
+    {
+      "order": 4,
+      "code": "GatherAndAllocate",
+      "question": "필요한 재료와 도구를 찾고 모으고 운반하거나 배정할 수 있는가?"
+    },
+    {
+      "order": 5,
+      "code": "PreviewAndConfirm",
+      "question": "배치와 행동 결과를 Preview한 뒤 명시적으로 Confirm하는가?"
+    },
+    {
+      "order": 6,
+      "code": "PerformAndWait",
+      "question": "이동, 작업, 전투와 권위 있는 시간 진행을 통과하는가?"
+    },
+    {
+      "order": 7,
+      "code": "ReadWorldResult",
+      "question": "재고, 공간과 세계 상태의 결과를 이해할 수 있는가?"
+    },
+    {
+      "order": 8,
+      "code": "RecoverReturnOrChooseAgain",
+      "question": "회복, 귀환 또는 달라진 다음 선택으로 이어지는가?"
+    }
+  ],
+  "evidenceStageReview": [
+    { "stage": "E1", "playerQuestion": "왜 이 행동을 하며 어떤 선택과 결과를 약속받는가?" },
+    { "stage": "E2", "playerQuestion": "의도가 권위 경계로 들어가고 결과 상태 사본으로 돌아오는가?" },
+    { "stage": "E3", "playerQuestion": "같은 선택, 비용과 시간이 저장과 재생에서도 같은 결과를 만드는가?" },
+    { "stage": "E4", "playerQuestion": "행동, 재료와 도구가 실제 WI와 H1 능력에 결속됐는가?" },
+    { "stage": "E5", "playerQuestion": "필요한 장소를 찾고 이동하고 사용하고 다시 만날 수 있는가?" },
+    { "stage": "E6", "playerQuestion": "장소, 원인, 피드백과 귀환을 이해하며 자료 한계가 드러나는가?" },
+    { "stage": "E7", "playerQuestion": "저장된 공식 Scene에서 실제 입력으로 선택 폐루프를 끝낼 수 있는가?" },
+    { "stage": "E8", "playerQuestion": "NPC의 생활이 플레이어 선택과 세계 이해를 바꾸는가?" },
+    { "stage": "E9", "playerQuestion": "새 선택을 만들면서 기존 선택 폐루프와 저장을 보존하는가?" }
+  ],
+  "spatialComposition": {
+    "directPlayerCompositionLevels": ["H1"],
+    "playerGoalDirectedGrowthLevels": ["H2", "H3"],
+    "worldAuthoredContractLevels": ["H4", "H5"],
+    "formationModes": ["LhComposed", "PlayerComposed", "HybridEvolving"],
+    "upperLevelGrowthRequiresRules": true,
+    "singleH1DoesNotAutomaticallyPromoteToH2OrH3": true
+  },
+  "resourceSemantics": [
+    "WorldResourceOrLot",
+    "ConstructionRecipeAndCost",
+    "PlacementPreview",
+    "H1SpatialInstance",
+    "H2H3GrowthAssessment",
+    "UnityVisualAsset"
+  ],
+  "responsibilityRouting": [
+    { "stream": "Operations", "responsibility": "실제 업무 자료의 동의, 승인, 출처와 외부 효과" },
+    { "stream": "Simulation", "responsibility": "선택 조건, 비용, 시간, 결과, Save/Replay와 H 성장 판정" },
+    { "stream": "Unity", "responsibility": "선택 발견, 비교, 입력, 공간 표현과 결과 피드백" },
+    { "stream": "Integration", "responsibility": "Local, Hosted와 계약 소비자 사이의 선택 의미 호환" }
+  ],
+  "sourceDocuments": [
+    "docs/Architecture/플레이어중심게임개발업무구조.md",
+    "docs/Architecture/게임개발업무순서기준.md",
+    "docs/Architecture/E성숙도와G관리체계.md",
+    "docs/Architecture/LH조립공간과플레이어조립공간구분.md",
+    "docs/ProjectOverview/templates/게임개발작업단위템플릿.md"
+  ],
+  "sourceLedgers": [
+    "eng/execution-ledgers/evidence-stages.json",
+    "eng/execution-ledgers/evidence-management-systems.json",
+    "eng/execution-ledgers/e9-wi-h-module-bindings.json",
+    "eng/world-seedbeds/spatial-formation-modes.v1.json"
+  ]
+}

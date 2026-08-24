@@ -7,7 +7,7 @@
 - Network 관계: `8`
 - 이론 보류 Graph: `1` (정책 승격 전 실제 E5에서 제외)
 - AreaSet 구성 패턴: `simulation-world-area-set-composition-plans.r1`
-- WI: 직접 `30` · 문맥 `5` · 비공간 `6`
+- WI: 직접 `37` · 문맥 `6` · 비공간 `6` · E5 배치 대기 `0`
 
 | 영역 | 구성 패턴 | 실제 AreaSet | Graph | 적재 정책 |
 | --- | --- | --- | ---: | --- |

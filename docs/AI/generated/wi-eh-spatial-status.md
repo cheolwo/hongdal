@@ -2,13 +2,13 @@
 
 > 이 문서는 E/H 원장·공간 재고·공식 H 정의를 대조해 자동 생성한다. 직접 수정하지 않는다.
 
-- WI: `41개` · E3: `41개`
-- E4/H1 실행 성립: `5개`
+- WI: `49개` · E3: `49개`
+- E4/H1 실행 성립: `13개`
 - E5/H3 실제 공간 결속: `8개`
 - H1~H4 설계 후보 계보만 존재: `22개`
 - 필수 공간 설계 누락: `0개`
 - 공간 비적용: `6개`
-- 공식 H 정의: `H1 5 / H2 0 / H3 5 / H4 1`
+- 공식 H 정의: `H1 7 / H2 0 / H3 5 / H4 1`
 
 후보 H2·H3·H4 계보와 Graph binding은 설계 입력이며 E 단계나 실제 배치를 자동 승격하지 않는다.
 
@@ -62,6 +62,14 @@
 | `WI-NATURE-02` 자연권 긴급 후퇴 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P1` | `DesignCandidateOnly` |  |
 | `WI-NATURE-03` 자연권 복원 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P1` | `DesignCandidateOnly` |  |
 | `WI-NATURE-04` 파티 회복 | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P1` | `DesignCandidateOnly` |  |
+| `WI-NATURE-05` 도끼 획득 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-06` 벌목 시작 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-07` 오두막 위치 배치 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-08` 오두막 건설 시작 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-09` 오두막 입장 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-10` 오두막 퇴장 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-11` 황혼 조우 대응 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
+| `WI-NATURE-12` 진행 작업 취소 | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 
 ## ORDER
 

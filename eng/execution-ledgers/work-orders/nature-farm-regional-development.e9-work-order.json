@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v1",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "workOrderId": "E9-WO-NATURE-FARM-REGIONAL-DEVELOPMENT",
+  "title": "Nature 위협 대응에서 Farm 공간 발전으로 돌아오는 수직 구현",
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E2",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "nature-farm-regional-development.e7-target.r1",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "지역 사건·전투·Farm 발전 책임 분리 뒤 E2 구현 상태와 E4~E7 누락을 다시 판정했다.",
+    "nextReopenCondition": "WI-FARM-07~09 또는 Unity 귀환 플레이가 사건·기회·H 성장 계약을 바꾸면 E9→E1 검토를 다시 연다."
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v1",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9",
+      "disposition": "Defined",
+      "summary": "지역 사건·Nature 전투·Farm 발전 계약을 이전 저장과 결정성을 보존하며 확장할 변화 봉투를 정의한다.",
+      "dimensions": {
+        "changeEnvelope": "NatureToFarm 승리의 즉시 안전과 사건별 발전 기회, Farm H1 프로젝트 세 개를 추가한다.",
+        "baselineAndTargetRevision": "현재 E8 기준선은 없으며 첫 목표는 nature-farm-regional-development.e7-target.r1이다.",
+        "migrationCompatibility": "simulation-save.v1~v13은 기존 승리 의미로 재생하고 신규 명령은 v14에서만 발전 원장을 만든다.",
+        "rollbackBoundary": "신규 발전 계약과 v14 쓰기를 비활성화해도 기존 사건·전투·Farm 배치 읽기가 유지되어야 한다."
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md", "docs/Architecture/지역사건-자연권위협-규칙.md"],
+      "nextAction": "E1~E7 구현 뒤 실제 E8 기준선과 migration 회귀를 별도로 검증한다."
+    },
+    {
+      "code": "E8",
+      "disposition": "Gap",
+      "summary": "NPC가 발전 기회를 선택·시공·사용하는 생활 폐루프는 이번 범위가 아니다.",
+      "dimensions": {
+        "npcRoleGroup": "미선정",
+        "continuousLifeLoop": "플레이어 선택형 프로젝트까지만 구현",
+        "playerAbsentBehavior": "미구현",
+        "saveReplay": "NPC 기억·의사결정은 미포함"
+      },
+      "sourceReferences": ["docs/Architecture/E8-NPC생활세계폐루프정의.md"],
+      "nextAction": "E7 플레이 폐루프가 닫힌 뒤 별도 G3 작업으로 정의한다."
+    },
+    {
+      "code": "E7",
+      "disposition": "Affected",
+      "summary": "플레이어가 Nature 승리 뒤 Farm으로 돌아와 발전 프로젝트를 선택하고 결과를 확인한다.",
+      "dimensions": {
+        "playerLoop": "지역 사건→Nature 조우 승리→즉시 경로 안전→Farm 귀환→프로젝트 선택→시공→새 대응 선택",
+        "authorityModes": "Solo LocalProcess와 Hosted RemoteHost가 같은 Core를 사용",
+        "canonicalScene": "SimulationWorldShell",
+        "runtimeEvidence": "코드·시험 뒤 Play Mode·Game View 수용 증거가 필요"
+      },
+      "sourceReferences": ["docs/AI/authority-maps/06_UNITY_CURRENT_STRUCTURE.md"],
+      "nextAction": "Farm 배치 팔레트와 실제 귀환 조건을 연결한다."
+    },
+    {
+      "code": "E6",
+      "disposition": "Affected",
+      "summary": "사건 원인과 발전 프로젝트의 현실 의미를 플레이 전에 설명한다.",
+      "dimensions": {
+        "worldStateExplanation": "노출 점검·사건 격리·기상 보호 WI가 Farm 회복 선택을 늘리는 인과를 설명한다.",
+        "groundingProfile": "Scenario 기반, 현실 자료 자동 적용 없음",
+        "provenanceLimitations": "Synty 표현은 현실 근거가 아님",
+        "causalQuestionMatrix": "전투 승리와 사건 원인 해결을 분리해 표시"
+      },
+      "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md"],
+      "nextAction": "신규 WI 설명과 제한을 문서화한다."
+    },
+    {
+      "code": "E5",
+      "disposition": "Affected",
+      "summary": "세 Farm 발전 WI가 실제 세계 변화와 다음 선택으로 발현되고 필요한 공간 증거를 함께 사용해야 한다.",
+      "dimensions": {
+        "triggerOccurrence": "WI-FARM-07~09의 PlayerDriven 선택과 WorldDerived 지역 상태 입력을 실행 인스턴스별로 기록한다.",
+        "authorityTransition": "발전 기회 예약·Confirm·소비와 WorldRevision 전이를 Session Aggregate가 소유한다.",
+        "taskEffectResult": "노출 점검·사건 격리·기상 보호 Task/Effect와 Farm 회복 결과를 연결한다.",
+        "successorOrReturnPath": "각 발전 결과가 Farm 내부의 다음 선택과 Nature 경로 후보 상태로 돌아가도록 닫는다.",
+        "conditionalSpatialEvidence": "Farm 독립 AreaSet, 기존 H3, h2-candidate:farm-incident-containment와 세 H1 배치 통제를 Required 증거로 사용한다."
+      },
+      "sourceReferences": ["docs/AI/authority-maps/03_H1_H5_CURRENT_TREE.md"],
+      "nextAction": "세 H1의 실제 배치·통행 검증 기록을 확보한다."
+    },
+    {
+      "code": "E4",
+      "disposition": "Affected",
+      "summary": "WI-FARM-07~09의 발생원·주체·대상·발전 기회·시간과 Required 공간 문맥을 결속한다.",
+      "dimensions": {
+        "allowedTriggerSources": "WI-FARM-07~09는 PlayerDriven 발전 선택과 필요한 WorldDerived 판정을 허용하고 클라이언트가 발생원을 임의 선택하지 못하게 한다.",
+        "subjectAndTargetBindings": "플레이어 또는 세계 판정 발의자와 Farm 발전 프로젝트·지역 사건 대상을 StableId로 결속한다.",
+        "dataResourceTimeBindings": "발전 기회는 배치 Confirm에 예약되고 취소 시 반환되며 Operational에서 소비되는 시간·자원 문맥을 가진다.",
+        "spatialApplicability": "세 WI는 Required이며 점검 정보·전파 격리·기한 연장 H1과 완료 뒤 Nature↔Farm 연결 후보를 공간 문맥으로 사용한다."
+      },
+      "sourceReferences": ["docs/AI/authority-maps/04_WI_GAMEPLAY_GRAPH.md"],
+      "nextAction": "배치 작업 취소·완료 훅을 연결한다."
+    },
+    {
+      "code": "E3",
+      "disposition": "Affected",
+      "summary": "승리 멱등성·경로 안전·기회 단일 발급·예약·저장 재생을 자동 검증한다.",
+      "dimensions": {
+        "contractTests": "NatureToFarm 승리와 Farm 프로젝트 Preview/Confirm",
+        "determinism": "동일 명령 로그의 canonical hash 일치",
+        "saveReplayRegression": "v1~v13 읽기와 v14 round-trip",
+        "consumerRegression": "Server와 Unity 계약 컴파일"
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Tests"],
+      "nextAction": "낮은 계약부터 집중 시험을 추가한다."
+    },
+    {
+      "code": "E2",
+      "disposition": "Affected",
+      "summary": "공통 Contracts·Domain에 원장을 두고 Local·Remote·Unity는 같은 상태 사본을 투영한다.",
+      "dimensions": {
+        "contracts": "RegionalDevelopment snapshot과 Farm 배치 catalyst ID",
+        "applicationDomain": "Session Aggregate가 발급·예약·소비 권위 소유",
+        "adapters": "Local/Remote는 같은 Preview/Confirm 경계",
+        "unityProjection": "SimulationWorldShell 기존 배치 팔레트에 발전 탭 추가"
+      },
+      "sourceReferences": ["docs/Architecture/SoloFirstSimulationRuntime.md"],
+      "nextAction": "공통 UPM Runtime 소스에 구현한다."
+    },
+    {
+      "code": "E1",
+      "disposition": "Defined",
+      "summary": "전투는 사건을 지우지 않고 경로 안전과 사건당 한 번의 Farm 발전 기회를 만든다.",
+      "dimensions": {
+        "purposeAndReturn": "위협 제거가 원인 업무 영역의 선택 가능한 공간 발전으로 돌아온다.",
+        "authorityAndAllowedTriggerSources": "GameObject가 아니라 Session Aggregate가 권위를 가지며 PlayerDriven과 WorldDerived 허용 발생원을 정의한다.",
+        "stableIdsAndRevision": "incident·battle·opportunity·H1/H2·connector stable ID와 revision을 보존한다.",
+        "acceptanceAndExclusions": "Farm 첫 조각만 구현하며 Town·CityHub·NPC·영역 간 실제 건설은 제외한다."
+      },
+      "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md"],
+      "nextAction": "계약과 승리 의미를 구현한다."
+    }
+  ],
+  "upwardValidation": [
+    { "code": "E1", "status": "Passed", "evidence": ["docs/Architecture/지역사건-Nature위협-지역발전모듈경계.md", "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationRegionalDevelopmentContracts.cs"], "nextAction": "WI 세부 계약과 제외 범위를 유지한다." },
+    { "code": "E2", "status": "Passed", "evidence": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationRegionalDevelopment.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureEncounterOutcome.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs"], "nextAction": "Remote 소비자와 Unity 투영을 추가한다." },
+    { "code": "E3", "status": "InProgress", "evidence": ["Ssalddel.Simulation.Tests/SimulationRegionalIncidentTests.cs", "Ssalddel.Simulation.Tests/SimulationFarmConstructionPlacementTests.cs"], "nextAction": "WI·취소·Local·Remote·Unity 소비자 시험을 추가하고 전체 회귀 실패를 분리한다." },
+    { "code": "E4", "status": "NotStarted", "evidence": [], "nextAction": "WI 실행 문맥과 조건부 공간 문맥 결속" },
+    { "code": "E5", "status": "NotStarted", "evidence": [], "nextAction": "결정적 세계 발현과 후속 선택 검증" },
+    { "code": "E6", "status": "NotStarted", "evidence": [], "nextAction": "플레이 전 설명 검증" },
+    { "code": "E7", "status": "NotStarted", "evidence": [], "nextAction": "실제 플레이 검증" },
+    { "code": "E8", "status": "NotStarted", "evidence": [], "nextAction": "별도 NPC 폐루프" },
+    { "code": "E9", "status": "NotStarted", "evidence": [], "nextAction": "기준선·migration·회귀 검증" }
+  ],
+  "promotionBlockers": [
+    "실제 E8 기준선이 없다.",
+    "Town·CityHub 발전과 NPC 생활 폐루프는 구현하지 않는다.",
+    "SimulationWorldShell Play Mode·Game View 수용 증거가 없다."
+  ],
+  "finalEvidenceReferences": []
+}

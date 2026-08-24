@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v1",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "workOrderId": "E9-WO-TEMPLATE",
+  "title": "새 수직 구현 작업",
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E0",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "작성 필요",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "DownwardImpactReview",
+    "lastReassessment": "현재 목표와 기존 증거를 기준으로 첫 하향 검토를 작성한다.",
+    "nextReopenCondition": "상향 구현·검증에서 새 영향, 계약 변경 또는 증거 누락이 발견되면 관련 하향 판정을 다시 연다."
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "작성 필요",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9",
+      "disposition": "Gap",
+      "summary": "변경 목표와 안정 revision을 작성한다.",
+      "dimensions": {
+        "changeEnvelope": "작성 필요",
+        "baselineAndTargetRevision": "작성 필요",
+        "migrationCompatibility": "작성 필요",
+        "rollbackBoundary": "작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "E9 변화 봉투를 확정한다."
+    },
+    {
+      "code": "E8",
+      "disposition": "Gap",
+      "summary": "NPC 생활세계 영향을 작성한다.",
+      "dimensions": {
+        "npcRoleGroup": "작성 필요",
+        "continuousLifeLoop": "작성 필요",
+        "playerAbsentBehavior": "작성 필요",
+        "saveReplay": "작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "NPC 역할군과 연속 폐루프를 정한다."
+    },
+    {
+      "code": "E7",
+      "disposition": "Gap",
+      "summary": "플레이어 실제 폐루프를 작성한다.",
+      "dimensions": {
+        "playerLoop": "작성 필요",
+        "authorityModes": "작성 필요",
+        "canonicalScene": "SimulationWorldShell",
+        "runtimeEvidence": "작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "Solo와 Hosted 수용 시나리오를 정한다."
+    },
+    {
+      "code": "E6",
+      "disposition": "Gap",
+      "summary": "E5에서 발현한 WI의 세계 정제와 필요한 현실 문맥을 작성한다.",
+      "dimensions": {
+        "worldStateExplanation": "작성 필요",
+        "groundingProfile": "Required, Optional 또는 NotApplied와 근거를 작성",
+        "provenanceLimitations": "작성 필요",
+        "causalQuestionMatrix": "E6 정제 질문표 작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "E6 정제 질문표와 자료 적용 정책을 정한다."
+    },
+    {
+      "code": "E5",
+      "disposition": "Gap",
+      "summary": "WI가 실제 Simulation 세계에서 발현되는 경로를 작성한다.",
+      "dimensions": {
+        "triggerOccurrence": "작성 필요",
+        "authorityTransition": "작성 필요",
+        "taskEffectResult": "작성 필요",
+        "successorOrReturnPath": "작성 필요",
+        "conditionalSpatialEvidence": "Required 또는 NotApplicable 작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "발생원부터 결과·후속 WI까지의 결정적 발현 Fixture를 정한다."
+    },
+    {
+      "code": "E4",
+      "disposition": "Gap",
+      "summary": "WI 실행 문맥 결속 계약을 작성한다.",
+      "dimensions": {
+        "allowedTriggerSources": "작성 필요",
+        "subjectAndTargetBindings": "작성 필요",
+        "dataResourceTimeBindings": "작성 필요",
+        "spatialApplicability": "Required 또는 NotApplicable 작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "발생원·주체·대상·자료·자원·시간과 선택적 H 결속을 정한다."
+    },
+    {
+      "code": "E3",
+      "disposition": "Gap",
+      "summary": "자동 검증 묶음을 작성한다.",
+      "dimensions": {
+        "contractTests": "작성 필요",
+        "determinism": "작성 필요",
+        "saveReplayRegression": "작성 필요",
+        "consumerRegression": "작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "실패부터 드러내는 시험 계획을 정한다."
+    },
+    {
+      "code": "E2",
+      "disposition": "Gap",
+      "summary": "구현 소유 위치를 작성한다.",
+      "dimensions": {
+        "contracts": "작성 필요",
+        "applicationDomain": "작성 필요",
+        "adapters": "작성 필요",
+        "unityProjection": "작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "공통 Core와 Local·Remote Adapter 변경 후보를 정한다."
+    },
+    {
+      "code": "E1",
+      "disposition": "Gap",
+      "summary": "최하위 불변 계약과 완료 경계를 작성한다.",
+      "dimensions": {
+        "purposeAndReturn": "작성 필요",
+        "authorityAndAllowedTriggerSources": "작성 필요",
+        "stableIdsAndRevision": "작성 필요",
+        "acceptanceAndExclusions": "작성 필요"
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "E1 계약을 확정하고 구현을 시작한다."
+    }
+  ],
+  "upwardValidation": [
+    { "code": "E1", "status": "NotStarted", "evidence": [], "nextAction": "E1 계약 검토" },
+    { "code": "E2", "status": "NotStarted", "evidence": [], "nextAction": "E2 구현 검증" },
+    { "code": "E3", "status": "NotStarted", "evidence": [], "nextAction": "E3 자동 시험" },
+    { "code": "E4", "status": "NotStarted", "evidence": [], "nextAction": "E4 실행 문맥 결속 검증" },
+    { "code": "E5", "status": "NotStarted", "evidence": [], "nextAction": "E5 WI 세계 발현 검증" },
+    { "code": "E6", "status": "NotStarted", "evidence": [], "nextAction": "E6 플레이 전 정제 검증" },
+    { "code": "E7", "status": "NotStarted", "evidence": [], "nextAction": "E7 실제 플레이 검증" },
+    { "code": "E8", "status": "NotStarted", "evidence": [], "nextAction": "E8 NPC 생활세계 검증" },
+    { "code": "E9", "status": "NotStarted", "evidence": [], "nextAction": "E9 호환·회귀·승격 검증" }
+  ],
+  "promotionBlockers": [
+    "템플릿은 완료 증거가 아니다."
+  ],
+  "finalEvidenceReferences": []
+}

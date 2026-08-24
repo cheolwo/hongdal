@@ -1,0 +1,44 @@
+{
+  "key": "responsibility-workstreams",
+  "version": "1",
+  "historicalBaseline": {
+    "repository": "cheolwo/ssalddel",
+    "branch": "codex/rename-ssalddel",
+    "policy": "preserve-integrated-history",
+    "allowsNewGeneralPurposeWork": false,
+    "rewritesExistingHistory": false
+  },
+  "primaryWorkstreams": [
+    {
+      "key": "operations",
+      "manifest": "eng/work-areas/operations.json",
+      "branchPrefix": "operations/",
+      "commitScope": "operations"
+    },
+    {
+      "key": "simulation",
+      "manifest": "eng/work-areas/simulation.json",
+      "branchPrefix": "simulation/",
+      "commitScope": "simulation"
+    },
+    {
+      "key": "unity",
+      "manifest": "eng/work-areas/unity.json",
+      "branchPrefix": "unity/",
+      "commitScope": "unity"
+    }
+  ],
+  "sharedWorkstream": {
+    "key": "integration",
+    "manifest": "eng/work-areas/integration.json",
+    "branchPrefix": "integration/",
+    "commitScope": "integration"
+  },
+  "rules": [
+    "Choose one primary authority owner before selecting files.",
+    "Do not use Integration as a fourth state authority.",
+    "Split commits by responsibility before pushing.",
+    "Validate both producer and consumer when a shared contract changes.",
+    "Preserve unrelated dirty-worktree changes."
+  ]
+}

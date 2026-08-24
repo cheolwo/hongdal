@@ -209,6 +209,21 @@ function Test-RequiresCodeMapCheck {
     ).Count -gt 0
 }
 
+function Test-RequiresEvidenceMapCheck {
+    param([string[]] $Files)
+
+    return @(
+        $Files | Where-Object {
+            (Test-IsCodeMetadataSharedPath -File $_) -or
+            (Test-IsSimulationPath -File $_) -or
+            (Test-IsUnityPath -File $_) -or
+            $_ -match "^eng/Ssalddel\.EvidenceMap/" -or
+            $_ -eq "eng/execution-ledgers/e9-refactor-module-catalog.json" -or
+            $_ -match "^docs/AI/generated/evidence-responsibility-code-map\.(json|md)$"
+        }
+    ).Count -gt 0
+}
+
 function Test-IsProductPath {
     param([string] $File)
 
@@ -452,6 +467,7 @@ try {
     $changedFiles = @(Get-ChangedFiles)
     $guidanceOnly = Test-IsGuidanceOnly -Files $changedFiles
     $codeMapCheck = Test-RequiresCodeMapCheck -Files $changedFiles
+    $evidenceMapCheck = Test-RequiresEvidenceMapCheck -Files $changedFiles
     $buildTargets = @()
     $testPlans = @()
 
@@ -532,6 +548,7 @@ try {
         ChangedPaths = @($changedFiles)
         GuidanceOnly = $guidanceOnly
         CodeMapCheck = $codeMapCheck
+        EvidenceMapCheck = $evidenceMapCheck
         BuildTargets = @($buildTargets)
         TestPlans = @($testPlans | ForEach-Object {
             [pscustomobject]@{
@@ -553,6 +570,7 @@ try {
     Write-Host "  Changed paths: $($changedFiles.Count)"
     Write-Host "  Guidance/docs only: $guidanceOnly"
     Write-Host "  Code map check: $codeMapCheck"
+    Write-Host "  E responsibility map check: $evidenceMapCheck"
     if ($buildTargets.Count -eq 0) {
         Write-Host "  Build: skipped"
     }
@@ -603,6 +621,27 @@ try {
             -Executable "dotnet" `
             -Arguments $codeMapArguments `
             -LogPath (Join-Path $runDirectory "code-map-check.log")
+    }
+
+    if ($evidenceMapCheck) {
+        $evidenceMapArguments = @(
+            "run",
+            "--project",
+            "eng/Ssalddel.EvidenceMap/Ssalddel.EvidenceMap.csproj",
+            "--configuration",
+            $Configuration,
+            "--no-launch-profile"
+        )
+        if ($NoRestore) {
+            $evidenceMapArguments += "--no-restore"
+        }
+        $evidenceMapArguments += @("--", "--strict")
+
+        Invoke-LoggedCommand `
+            -Name "E responsibility code map check" `
+            -Executable "dotnet" `
+            -Arguments $evidenceMapArguments `
+            -LogPath (Join-Path $runDirectory "evidence-map-check.log")
     }
 
     $buildIndex = 0

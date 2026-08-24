@@ -158,7 +158,7 @@ foreach ($interaction in @($worldInteractionCatalog.items)) {
 
 $evidenceStagePath = Resolve-RepositoryPath $repositoryRoot ([string] $source.evidenceStageCatalogPath)
 $evidenceStageCatalog = Read-Json $evidenceStagePath
-Require ([string] $evidenceStageCatalog.schemaVersion -eq "simulation-evidence-stages.v3") "EvidenceStageSchema"
+Require ([string] $evidenceStageCatalog.schemaVersion -eq "simulation-evidence-stages.v4") "EvidenceStageSchema"
 $evidenceStageCodes = @($evidenceStageCatalog.stages.code)
 
 $theorySpatialFactoryPath = Resolve-RepositoryPath $repositoryRoot ([string] $source.theorySpatialFactoryOutputPath)
@@ -523,7 +523,7 @@ $result = [ordered]@{
     axisDefinitions = [ordered]@{
         h = "공간 자원의 종류와 H1→H4 조립 깊이"
         gameplayTrace = "공간이 기준 플레이를 직접 또는 간접 지원하는 정도"
-        evidence = "E0→E7 구현·통합 증거 깊이"
+        evidence = "E0→E9 구현·통합 증거 깊이"
         playableSlice = "사람이 시작부터 다음 날까지 완주하는 마감 상태"
     }
     gatePolicy = $source.gatePolicy
@@ -548,7 +548,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- **H 구조:** 공간 자원의 종류와 H1→H4 조립 깊이")
 [void] $builder.AppendLine("- **게임플레이 추적:** 공간이 기준 플레이를 직접 또는 간접 지원하는 정도")
-[void] $builder.AppendLine("- **E 증거:** E0→E7 구현·통합 증거 깊이")
+[void] $builder.AppendLine("- **E 증거:** E0→E9 구현·통합 증거 깊이")
 [void] $builder.AppendLine("- **완성 단위:** 사람이 시작부터 다음 날까지 완주하는 마감 상태")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("이론 공간은 게임플레이 추적·사람 검토를 기다리지 않고 생산한다. ``E5TheoryQualified``와 실제 E5 결속·E7 완주는 서로 다른 사실이다.")

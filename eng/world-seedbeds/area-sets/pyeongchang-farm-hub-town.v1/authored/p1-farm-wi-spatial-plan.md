@@ -1,6 +1,6 @@
 # 대관령 Farm WI 공간 폐루프 계획
 
-> 단계 해석: 이 문서의 실제 Graph Node·Edge·연결점 판정은 D-152 이후 `E5 실제 지역 경관 조립` 후보 근거다. `E4 WI 공간 모판`의 실행 정의는 `eng/world-seedbeds/wi-spatial-seedbeds/`에서 별도로 관리한다.
+> 단계 해석: 이 문서의 Graph Node·Edge·연결점 판정은 D-232 이후 공간 WI의 `SpatialAssembly` 증거다. `eng/world-seedbeds/wi-spatial-seedbeds/`의 위치 독립 정의와 함께 E4 실행 문맥·E5 세계 발현 판정에 입력되지만 공간 조립만으로 E4·E5를 완료하지 않는다.
 
 이 문서는 대관령 Farm의 세계 상호작용을 현재 경관 Graph에 연결하기 위한 P1 승인 계획이다. 공간 역할은 장소의 의미를, 공간 능력은 그 장소에서 가능한 활동을 나타낸다.
 

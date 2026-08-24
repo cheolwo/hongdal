@@ -22,14 +22,14 @@ $stages = Get-Content -LiteralPath (
     Join-Path $repositoryRoot ([string] $ledger.evidenceStageCatalogPath)) -Raw -Encoding UTF8 |
     ConvertFrom-Json
 $expectedCount = @($ledger.items).Count
-if ((@($stages.stages.code) -join ",") -ne "E0,E1,E2,E3,E4,E5,E6,E7") {
+if ((@($stages.stages.code) -join ",") -ne "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") {
     throw "ExecutionLedgerEvidenceStageOrderInvalid"
 }
 $e6 = @($stages.stages | Where-Object code -eq "E6")
 if ($e6.Count -ne 1 -or
-    [string] $e6[0].label -ne "AreaSet 정밀 몰입·현실 근거 결속" -or
+    [string] $e6[0].label -ne "AreaSet 플레이 전 정제·필요 근거 결속" -or
     [string] $e6[0].completionGate -notmatch "DEM·도로를 공통 필수 자료로 간주하지 않는다") {
-    throw "ExecutionLedgerE6AreaSetImmersionPolicyInvalid"
+    throw "ExecutionLedgerE6PrePlayRefinementPolicyInvalid"
 }
 if (@($ledger.items | Where-Object { $_.targetEvidenceStage -ne "E7" }).Count -ne 0) {
     throw "ExecutionLedgerTargetMustBeE7"

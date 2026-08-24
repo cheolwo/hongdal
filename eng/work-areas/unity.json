@@ -1,0 +1,50 @@
+{
+  "key": "unity",
+  "version": "1",
+  "label": "Unity 플레이 표현",
+  "repository": "cheolwo/unity",
+  "checkoutPolicy": "개발자별로 별도 구성하며 저장소에 절대 경로를 고정하지 않음",
+  "branchPrefix": "unity/",
+  "commitScope": "unity",
+  "authority": "입력·공간·카메라·UI와 권위 상태 사본의 표현",
+  "readFirst": [
+    "AGENTS.md",
+    "docs/ProjectOverview/GptProjectContext.md",
+    "docs/AI/DECISIONS.md",
+    "docs/AI/CURRENT_WORK.md",
+    "docs/Architecture/OperationsSimulationUnity작업흐름분리.md",
+    "Ssalddel.Unity/PROJECT_STRUCTURE.md"
+  ],
+  "sourceRoots": [
+    "Ssalddel.Unity",
+    "Ssalddel.Unity.Tests",
+    "Ssalddel.UnityReview.Api",
+    "Ssalddel.UnityReview.Core"
+  ],
+  "externalSourceRoots": [
+    "Assets/Ssalddel",
+    "Packages",
+    "ProjectSettings"
+  ],
+  "excludedRoots": [
+    "Ssalddel.Simulation.Domain",
+    "Ssalddel.Simulation.Application",
+    "Ssalddel.Simulation.Persistence",
+    "Ssalddel.Domain",
+    "Ssalddel.Infrastructure",
+    "Library",
+    "Temp",
+    "Logs",
+    "artifacts"
+  ],
+  "mustNotOwn": [
+    "운영 원장과 결제 결과",
+    "GameObject만으로 확정한 Simulation 상태",
+    "서버 응답 없이 성공으로 간주한 Preview·Confirm"
+  ],
+  "validation": [
+    "백엔드 Ssalddel.Unity.slnx build와 관련 시험",
+    "제품 Unity 저장 Scene·EditMode 구조 검증",
+    "입력·카메라·시각 결과가 범위일 때 Play Mode·Game View"
+  ]
+}

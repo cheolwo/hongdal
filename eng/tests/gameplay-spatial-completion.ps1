@@ -44,11 +44,13 @@ if (@($slice[0].completionBlockReasonCodes).Count -ne 4) { throw "NatureFarmComp
 if (@($slice[0].completionBlockReasonCodes) -contains "ActualE5BindingMissing") { throw "NatureFarmActualE5BlockerWasNotClosed" }
 if (@($slice[0].wiEvidence | Where-Object { @($_.e7EvidenceRefs).Count -gt 0 }).Count -ne 0) { throw "NatureFarmE7EvidenceWasInvented" }
 if ([string] $report.theorySpatialFactoryRevision -ne "simulation-world-theory-spatial-factory-output.r3") { throw "TheorySpatialFactoryRevisionMissing" }
-if ([string] $report.actualE5SpatialRevision -ne "simulation-world-actual-e5-spatial-output.r1") { throw "ActualE5SpatialRevisionMissing" }
+if ([string] $report.actualE5SpatialRevision -ne "simulation-world-actual-e5-spatial-output.r3") { throw "ActualE5SpatialRevisionMissing" }
 $directE5Wi = @($slice[0].wiEvidence | Where-Object { @($_.e5PlacementRefs).Count -gt 0 })
 $contextualE5Wi = @($slice[0].wiEvidence | Where-Object { @($_.e5ContextRefs).Count -gt 0 })
 if ($directE5Wi.Count -ne 7 -or $contextualE5Wi.Count -ne 1) { throw "NatureFarmWiActualE5PartitionInvalid" }
-if (@($slice[0].wiEvidence | Where-Object integrationStageCode -ne "E5").Count -ne 0) { throw "NatureFarmWiEffectiveE5StageInvalid" }
+$effectiveE5 = @($slice[0].wiEvidence | Where-Object integrationStageCode -eq "E5")
+$effectiveE6 = @($slice[0].wiEvidence | Where-Object integrationStageCode -eq "E6")
+if ($effectiveE5.Count -ne 5 -or $effectiveE6.Count -ne 3) { throw "NatureFarmWiEffectiveStagePartitionInvalid" }
 $natureToFarmHandoff = @($slice[0].regionalHandoffs | Where-Object handoffCode -eq "NatureToFarmTraversal")
 if ($natureToFarmHandoff.Count -ne 1) { throw "NatureFarmRegionalHandoffMissing" }
 if ([string] $natureToFarmHandoff[0].theoryBindingStateCode -ne "E5TheoryQualified") { throw "NatureFarmHandoffTheoryBindingInvalid" }

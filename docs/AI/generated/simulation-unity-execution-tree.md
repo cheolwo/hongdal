@@ -3,7 +3,7 @@
 > 이 문서는 `eng/execution-ledgers/simulation-unity.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - 원장 개정: `simulation-unity-incomplete-execution.r3`
-- 증거 단계 개정: `simulation-evidence-stages.r7`
+- 증거 단계 개정: `simulation-evidence-stages.r10`
 - 마지막 확인일: `2026-08-17`
 - 첫 실행축: `TRACK-DAEGWALLYEONG-L2-REAL-DATA`
 - 중심 타일: `kr5186:l2:700:1145`
@@ -109,7 +109,7 @@
 ## 승격 규칙
 
 - 계획 문구나 코드 존재만으로 완료 처리하지 않는다.
-- E4는 WI 공간 모판, E5는 권위 경관 조립, E6는 AreaSet 정밀 몰입·현실 문맥 결속, E7은 실제 플레이 폐루프다. GIS 결속은 E6 안의 독립 선택 축이다.
+- E4는 WI 공간 모판, E5는 권위 경관 조립, E6는 AreaSet 플레이 전 정제·필요 근거 결속, E7은 실제 플레이 폐루프다. GIS 결속은 E6 안의 독립 선택 축이다.
 - DEM·도로는 공통 필수 자료가 아니다. 선택한 현실 결속 프로필이 요구할 때만 E6 준비도와 완료 판정에 참여한다.
 - 실제 DB 적용, HTTP 왕복, Play Mode, Game View, commit과 push는 서로 다른 증거다.
 - `Done`은 목표 증거 단계와 검증 자료가 모두 있을 때만 허용한다.

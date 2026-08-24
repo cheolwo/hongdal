@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v1",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "workOrderId": "E9-WO-SOLO-FIRST-SIMULATION-RUNTIME",
+  "title": "Solo 우선 Simulation Runtime과 영역 Adapter 재조립",
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "solo-first-simulation-runtime.r2",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "공통 Runtime의 E1~E3 증거 뒤 E4 WI-H1 예약과 연결구를 다음 최저 누락으로 다시 판정했다.",
+    "nextReopenCondition": "Remote Adapter 또는 Unity 실제 플레이 검증이 권위·저장·공간 계약을 바꾸면 전체 하향 영향을 다시 검토한다."
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "기존 H 의미 계층과 공간 조립 호환 배치 통제를 재사용하고 Runtime 이관만으로 WI의 E4·E5 증거를 승격하지 않는다.",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9",
+      "disposition": "Gap",
+      "summary": "서버 중심 실행을 Shared Core의 LocalProcess·RemoteHost 이중 Host 구조로 바꾸되 아직 E8 기준선이 없어 E9 변화 승격은 차단한다.",
+      "dimensions": {
+        "changeEnvelope": "Nature·턴 마감·Farm 선택·물류와 후속 영역 Adapter가 같은 Simulation Core를 사용하도록 실행 위치를 재편한다.",
+        "baselineAndTargetRevision": "기준 E8 revision은 없으며 장기 목표 안정판은 solo-first-simulation-runtime.r2다.",
+        "migrationCompatibility": "simulation-save.v13, Command·ExpectedRevision·WorldTick·Replay hash와 기존 HTTP 계약을 보존하고 Local·Remote parity를 요구한다.",
+        "rollbackBoundary": "영역별 Local Adapter를 제거하고 기존 Remote Adapter로 되돌릴 수 있으나 Fixture를 Solo 권위로 자동 승격하지 않는다."
+      },
+      "sourceReferences": [
+        "docs/Architecture/E9하향식수직구현체계.md",
+        "docs/Architecture/SoloFirstSimulationRuntime.md"
+      ],
+      "nextAction": "E1부터 E8까지 재조립한 뒤 별도 실제 변화 단위와 migration 회귀가 생길 때만 E9 승격을 검토한다."
+    },
+    {
+      "code": "E8",
+      "disposition": "Gap",
+      "summary": "Local Runtime 위에서 NPC가 플레이어 없이 생활·작업·위협 대응을 이어 가는 폐루프가 아직 없다.",
+      "dimensions": {
+        "npcRoleGroup": "Nature 생활 주체와 Farm 작업자·운송 주체를 독립 역할군으로 정의해야 한다.",
+        "continuousLifeLoop": "목표 선택→이동→작업→휴식·협력→다음 목표의 지속 폐루프가 필요하다.",
+        "playerAbsentBehavior": "플레이어 입력 없이 같은 Session에서 WorldTick과 실시간 이동이 합류해야 한다.",
+        "saveReplay": "NPC 목표·예약·기억·행동 결과를 simulation-save.v13 계보와 Replay hash에 포함해야 한다."
+      },
+      "sourceReferences": [
+        "docs/AI/authority-maps/01_E1_E9_DEFINITION.md",
+        "docs/Architecture/SoloFirstSimulationRuntime.md"
+      ],
+      "nextAction": "E7 플레이 폐루프가 닫힌 뒤 G3 작업으로 NPC 지속 생활을 구현한다."
+    },
+    {
+      "code": "E7",
+      "disposition": "Gap",
+      "summary": "서버 없는 준비 로그는 확인했지만 Solo와 Hosted의 동일 실제 플레이·저장·복귀 폐루프는 미완료다.",
+      "dimensions": {
+        "playerLoop": "Nature 준비·회복과 Farm 수확→집하→판로 선택→포장→내부 보관 또는 선택적 운송→귀환을 실제 입력으로 완주한다.",
+        "authorityModes": "Solo LocalProcess와 Hosted RemoteHost가 같은 seed·명령·시간 입력에서 같은 canonical 상태를 내야 한다.",
+        "canonicalScene": "공식 실행 Scene은 SimulationWorldShell 하나이며 영역별 공식 Scene을 추가하지 않는다.",
+        "runtimeEvidence": "저장 Scene 배선, Play Mode 입력, Game View, Console, Save 종료·Load와 Local·Remote parity 증거가 필요하다."
+      },
+      "sourceReferences": [
+        "docs/AI/authority-maps/04_WI_GAMEPLAY_GRAPH.md",
+        "docs/Architecture/SoloFirstSimulationRuntime.md"
+      ],
+      "nextAction": "E4~E6 재검증 뒤 Nature↔Farm 왕복과 Farm 독립 반환 폐루프를 실제 입력으로 검증한다."
+    },
+    {
+      "code": "E6",
+      "disposition": "ReusedWithVerification",
+      "summary": "Farm WI에는 기존 E6 질문·계보가 있으나 Runtime 실행 위치 변경 뒤 플레이 전 정제 결과를 다시 확인해야 한다.",
+      "dimensions": {
+        "worldStateExplanation": "Nature 심리 영역과 Farm 업무 영역에서 실행되는 WI의 목적·상태·이동·반환을 분리해 설명한다.",
+        "groundingProfile": "Farm의 기존 현실 문맥은 Required 또는 NotApplied 판정을 보존하고 Solo Runtime 자체에는 새 현실자료를 요구하지 않는다.",
+        "provenanceLimitations": "Fixture·Synty 표현·Scenario 공간을 현실 또는 WI E5 세계 발현 근거로 대체하지 않고 revision·hash·한계를 유지한다.",
+        "causalQuestionMatrix": "수확·후처리·반복 생산과 Nature 회복의 원인을 섞지 않는 기존 E6 질문을 Runtime 변경 뒤 재검증한다."
+      },
+      "sourceReferences": [
+        "eng/execution-ledgers/world-interactions.json",
+        "docs/AI/authority-maps/04_WI_GAMEPLAY_GRAPH.md"
+      ],
+      "nextAction": "E5 재조립 뒤 영향받은 Farm·Nature 질문과 자료 계보만 선택적으로 다시 검사한다."
+    },
+    {
+      "code": "E5",
+      "disposition": "ReusedWithVerification",
+      "summary": "기존 Nature·Farm WI 구현과 조건부 H 공간 증거가 있으나 Local Session에서 발생원부터 결과·후속 선택까지 다시 확인해야 한다.",
+      "dimensions": {
+        "triggerOccurrence": "Farm·Nature WI의 PlayerDriven 발생과 향후 NpcDriven 또는 WorldDerived 재사용을 실행 인스턴스별로 기록한다.",
+        "authorityTransition": "LocalProcess와 RemoteHost 모두 Preview 무변경, Confirm·ExpectedRevision과 권위 상태 전이를 같은 계약으로 남긴다.",
+        "taskEffectResult": "수확·집하·포장·자원·건설·회복의 Task/Effect와 결과 상태 사본을 결속한다.",
+        "successorOrReturnPath": "각 독립 영역 안에서 다음 WI 또는 반환 선택을 닫고 Hub 연결을 기본 완료 조건으로 만들지 않는다.",
+        "conditionalSpatialEvidence": "NatureHome·Farm AreaSet, H3 Graph·H2 Block·H1과 배치 통제는 Required WI에만 조건부 증거로 사용한다."
+      },
+      "sourceReferences": [
+        "docs/Architecture/Nature생활핵조우방어공간계획.md",
+        "docs/Architecture/SpatialTileAreaSetLandscapePipeline.md"
+      ],
+      "nextAction": "영향 WI의 H3 Graph·H2 Block·H1 발자국과 저장 Scene 결속을 Actual 상태로 다시 검사한다."
+    },
+    {
+      "code": "E4",
+      "disposition": "Affected",
+      "summary": "공통 Runtime 이관으로 WI 명령 권위 위치가 바뀌었으므로 발생원·주체·대상·자료·자원·시간과 선택적 공간 문맥을 다시 닫아야 한다.",
+      "dimensions": {
+        "allowedTriggerSources": "WI-FARM-04·05·06, WI-LOG-01과 Nature 자원·건설·회복 WI의 PlayerDriven·NpcDriven·WorldDerived 허용 범위를 정의와 실행 인스턴스로 분리한다.",
+        "subjectAndTargetBindings": "플레이어·NPC 발의자와 재배 단위·Lot·Cargo·시설·자원 노드 대상을 StableId로 결속한다.",
+        "dataResourceTimeBindings": "재배 단위·수확 Lot·작업 영역·행위자·Cargo·차량 예약과 Realtime·WorldTick 경계를 Preview/Confirm 계보에 결속한다.",
+        "spatialApplicability": "이동·배치가 필요한 WI는 Farm·Nature H 능력과 연결구를 Required로 결속하고 비공간 WI는 NotApplicable 근거를 남긴다."
+      },
+      "sourceReferences": [
+        "eng/execution-ledgers/world-interactions.json",
+        "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"
+      ],
+      "nextAction": "Solo Runtime의 상향 구현을 계속 선택할 경우 영향받은 WI–H1 모판과 Farm 내부 반환 계약 재검증부터 시작한다."
+    },
+    {
+      "code": "E3",
+      "disposition": "Defined",
+      "summary": "공통 Runtime·화물 운송·Unity 같은 Session 조회 회귀가 통과했으며 이후 단계 변경 때 같은 묶음을 반복한다.",
+      "dimensions": {
+        "contractTests": "Local Runtime과 화물 운송 집중 시험 14/14 및 Unity 같은 Session 조회 EditMode 1/1을 기준선으로 둔다.",
+        "determinism": "Aggregate가 후보 점수·명령·WorldTick·Revision을 소유하고 Unity는 결과만 투영하는지 검증한다.",
+        "saveReplayRegression": "simulation-save.v13과 Replay hash 보존 시험을 유지하고 실제 전체 플레이 저장·복원은 E7에서 추가한다.",
+        "consumerRegression": "Nature·턴 마감·Farm 선택·물류 Local Adapter와 기존 Remote 경로의 소비자 회귀를 단계별로 실행한다."
+      },
+      "sourceReferences": [
+        "Ssalddel.Simulation.Tests/LocalSimulationRuntimeTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationFreightTransportTests.cs"
+      ],
+      "nextAction": "E4~E7 변경마다 14/14 기준선과 Unity 소비자 시험을 다시 실행하고 Remote parity 시험을 추가한다."
+    },
+    {
+      "code": "E2",
+      "disposition": "Defined",
+      "summary": "Shared Core와 LocalProcess 실행 경계, Session Gameplay 포트와 Unity Local Adapter가 구현됐다.",
+      "dimensions": {
+        "contracts": "ISimulationRuntime과 Session·Nature·Gameplay 하위 계약이 AuthorityLocation과 네트워크 요구를 분리한다.",
+        "applicationDomain": "LocalSimulationRuntime이 ASP.NET·HTTP 없이 같은 Session Aggregate의 Preview·Confirm·WorldTick·Save를 실행한다.",
+        "adapters": "Nature·턴 마감·Farm 선택·물류는 Local Adapter를 사용하고 Remote Adapter는 같은 계약을 Host하는 후속 parity 대상이다.",
+        "unityProjection": "SimulationWorldShell에서 Unity GameObject가 상태를 직접 바꾸지 않고 LocalSimulation 상태 사본을 표시한다."
+      },
+      "sourceReferences": [
+        "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
+        "docs/Architecture/SoloFirstSimulationRuntime.md"
+      ],
+      "nextAction": "후속 영역도 별도 엔진을 만들지 말고 같은 포트의 Local·Remote Adapter로만 이관한다."
+    },
+    {
+      "code": "E1",
+      "disposition": "Defined",
+      "summary": "Solo 기본값, Shared Core 권위와 Hosted Host 경계, 저장·시간·운영 제외 조건이 확정됐다.",
+      "dimensions": {
+        "purposeAndReturn": "인터넷 없이 같은 세계의 활동·결정·WorldTick·저장·복귀를 수행하고 Hosted에서도 의미가 바뀌지 않게 한다.",
+        "authorityAndAllowedTriggerSources": "GameObject가 아니라 SharedSimulationCore가 권위이며 Solo는 LocalProcess, Hosted는 RemoteHost다. 각 WI 정의는 허용 발생원을 제한한다.",
+        "stableIdsAndRevision": "기존 Session·WI·H StableId, ExpectedRevision, WorldRevision, simulation-save.v13을 호환 유지한다.",
+        "acceptanceAndExclusions": "운영 계약·결제·실제 입고는 제외하며 준비 로그나 Fixture 성공만으로 E7 이상을 주장하지 않는다."
+      },
+      "sourceReferences": [
+        "docs/AI/DECISIONS.md",
+        "docs/Architecture/SoloFirstSimulationRuntime.md"
+      ],
+      "nextAction": "E1 경계를 유지하고, 다음 검토에서 선택한 모듈이 있으면 가장 낮은 미완료 관문부터 상향 재조립한다."
+    }
+  ],
+  "upwardValidation": [
+    {
+      "code": "E1",
+      "status": "Passed",
+      "evidence": [
+        "Solo 기본 LocalProcess와 Hosted RemoteHost 경계가 DECISIONS와 SoloFirstSimulationRuntime에 정의됨"
+      ],
+      "nextAction": "권위·저장·운영 제외 경계 변경 시 작업 명세를 다시 하향 분석한다."
+    },
+    {
+      "code": "E2",
+      "status": "Passed",
+      "evidence": [
+        "ISimulationRuntime·LocalSimulationRuntime·Session Gameplay 포트 구현",
+        "Application 빌드 경고 0·오류 0과 Unity Editor 재컴파일 오류 0"
+      ],
+      "nextAction": "RemoteSimulationRuntime parity Adapter와 남은 영역 Local Adapter를 같은 Core 경계에 추가한다."
+    },
+    {
+      "code": "E3",
+      "status": "Passed",
+      "evidence": [
+        ".NET Local Runtime·화물 운송 집중 시험 14/14",
+        "Unity 같은 Local Session 조회 EditMode 시험 1/1"
+      ],
+      "nextAction": "E4 이상 변경 뒤 소비자·Save/Replay·결정성 회귀를 반복한다."
+    },
+    {
+      "code": "E4",
+      "status": "InProgress",
+      "evidence": [
+        "Farm WI-FARM-04·05·06과 WI-LOG-01에 기존 공간 모판 참조가 존재함"
+      ],
+      "nextAction": "이 모듈을 구현 대상으로 선택하면 Local Session 명령과 실제 H1 능력·예약·Farm 내부 반환 연결구를 다시 결속한다."
+    },
+    {
+      "code": "E5",
+      "status": "Blocked",
+      "evidence": [
+        "기존 Nature·Farm H 재고와 배치 통제 자료 존재"
+      ],
+      "nextAction": "E4 완료 뒤 저장 Scene의 Actual AreaSet·Graph·통행 결속을 재검증한다."
+    },
+    {
+      "code": "E6",
+      "status": "Blocked",
+      "evidence": [
+        "Farm 생산·후처리·반복 폐루프 E6 질문 참조 존재"
+      ],
+      "nextAction": "E5 완료 뒤 Runtime 변경 영향이 있는 질문·계보·NotApplied 근거를 다시 확인한다."
+    },
+    {
+      "code": "E7",
+      "status": "Blocked",
+      "evidence": [
+        "서버 프로세스 0개 Play Mode에서 Local Runtime 준비와 새 Console 오류 0개 확인"
+      ],
+      "nextAction": "Nature↔Farm 왕복과 Farm 독립 반환, Save·Load를 Solo·Hosted 실제 입력으로 완주한다."
+    },
+    {
+      "code": "E8",
+      "status": "Blocked",
+      "evidence": [],
+      "nextAction": "E7 폐루프 뒤 NPC 목표·이동·작업·휴식·기억의 지속 생활세계를 구현한다."
+    },
+    {
+      "code": "E9",
+      "status": "Blocked",
+      "evidence": [],
+      "nextAction": "E8 안정 기준선과 후속 실제 변화·migration·rollback·E1~E8 재검증을 확보한다."
+    }
+  ],
+  "promotionBlockers": [
+    "신규 수직 리팩토링이라 변경 전 E8 안정 기준선이 없다.",
+    "영향받은 WI와 실제 H1 능력·예약·연결구의 E4 재결속이 완료되지 않았다.",
+    "Solo·Hosted 동일 실제 플레이 E7과 NPC 생활세계 E8 증거가 없다.",
+    "실제 E8 변화에 대한 migration·rollback과 E1→E8 상향 재검증이 없다."
+  ],
+  "finalEvidenceReferences": []
+}

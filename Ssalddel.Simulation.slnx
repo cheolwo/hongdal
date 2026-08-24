@@ -17,4 +17,7 @@
   <Folder Name="/Tests/">
     <Project Path="Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj" />
   </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="eng/Ssalddel.EvidenceMap/Ssalddel.EvidenceMap.csproj" />
+  </Folder>
 </Solution>

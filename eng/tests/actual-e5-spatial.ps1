@@ -14,7 +14,7 @@ if ($value.counts.areaSets -ne 4) { throw "ActualE5AreaSetCountInvalid" }
 if ($value.counts.internalGraphs -ne 16 -or $value.counts.networkRouteGraphs -ne 3) { throw "ActualE5GraphCountInvalid" }
 if ($value.counts.deferredTheoryGraphs -ne 1 -or @($value.deferredTheoryH3Refs).Count -ne 1) { throw "ActualE5DeferredTheoryGraphCountInvalid" }
 if ($value.counts.networkRelations -ne 8) { throw "ActualE5RelationCountInvalid" }
-if ($value.counts.directBindings -ne 30 -or $value.counts.contextualBindings -ne 5 -or $value.counts.nonSpatialWi -ne 6) { throw "ActualE5WiPartitionInvalid" }
+if ($value.counts.directBindings -ne 37 -or $value.counts.contextualBindings -ne 6 -or $value.counts.nonSpatialWi -ne 6 -or $value.counts.pendingE5Wi -ne 0) { throw "ActualE5WiPartitionInvalid" }
 $unresolvedCount = @($value.areaSets | ForEach-Object { @($_.graphs) } | ForEach-Object { @($_.unresolved) } | Where-Object { $null -ne $_ }).Count
 $unresolvedCount += @($value.routeGraphs | ForEach-Object { @($_.unresolved) } | Where-Object { $null -ne $_ }).Count
 if ($unresolvedCount -ne 0) { throw "ActualE5GraphUnresolved" }
@@ -28,4 +28,4 @@ if ($graphIds.Count -ne @($graphIds | Sort-Object -Unique).Count) { throw "Actua
 if ([string] $value.network.title -notmatch '[\uac00-\ud7a3]') { throw "ActualE5NetworkTitleEncodingInvalid" }
 $markdown = Get-Content -LiteralPath $markdownPath -Raw -Encoding UTF8
 if ($markdown -notmatch '[\uac00-\ud7a3]' -or $markdown.Contains([char] 0xFFFD)) { throw "ActualE5MarkdownEncodingInvalid" }
-Write-Output "ActualE5SpatialTestsPassed:AreaSets=4;Graphs=19;Deferred=1;Relations=8;WI=30/5/6;CompositionPatterns=4"
+Write-Output "ActualE5SpatialTestsPassed:AreaSets=4;Graphs=19;Deferred=1;Relations=8;WI=37/6/6/0;CompositionPatterns=4"

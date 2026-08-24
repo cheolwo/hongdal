@@ -36,17 +36,31 @@ $catalog = Get-Content -LiteralPath $resolvedInput -Raw -Encoding UTF8 | Convert
 $resolvedStageCatalog = (Resolve-Path (Join-Path $repositoryRoot ([string] $catalog.evidenceStageCatalogPath))).Path
 $stageCatalog = Get-Content -LiteralPath $resolvedStageCatalog -Raw -Encoding UTF8 | ConvertFrom-Json
 $evidenceStages = @($stageCatalog.stages)
+$resolvedTriggerCatalog = (Resolve-Path (Join-Path $repositoryRoot ([string] $catalog.triggerSourceCatalogPath))).Path
+$triggerCatalog = Get-Content -LiteralPath $resolvedTriggerCatalog -Raw -Encoding UTF8 |
+    ConvertFrom-Json
 
 Require-Text $catalog.catalogKey "CatalogKeyMissing"
 Require-Text $catalog.revision "RevisionMissing"
 Require-Text $catalog.evidenceStageCatalogPath "EvidenceStageCatalogPathMissing"
+Require-Text $catalog.triggerSourceCatalogPath "TriggerSourceCatalogPathMissing"
 Require ([string] $catalog.defaultImplementationTargetStage -eq "E3") "DefaultImplementationTargetMustBeE3"
 Require ([string] $catalog.defaultIntegrationTargetStage -eq "E7") "DefaultIntegrationTargetMustBeE7"
-Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v3") "EvidenceStageCatalogSchemaInvalid"
-Require ($evidenceStages.Count -eq 8) "EvidenceStagesMustHaveEightEntries"
-Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7") "EvidenceStageOrderInvalid"
-Require (@($catalog.items).Count -eq 41) "WorldInteractionCountMustBe41"
+Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v4") "EvidenceStageCatalogSchemaInvalid"
+Require ($evidenceStages.Count -eq 10) "EvidenceStagesMustHaveTenEntries"
+Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") "EvidenceStageOrderInvalid"
+Require (@($catalog.items).Count -eq 49) "WorldInteractionCountMustBe49"
 Require ([string] $catalog.schemaVersion -eq "3") "WorldInteractionCatalogSchemaMustBe3"
+Require ([string] $triggerCatalog.schemaVersion -eq
+    "world-interaction-trigger-sources.v1") "TriggerSourceCatalogSchemaInvalid"
+Require ([bool] $triggerCatalog.principles.observationCollectionIsNotWorldInteraction -and
+    [bool] $triggerCatalog.principles.meaningfulAuthorityTransitionCreatesWorldInteraction -and
+    [bool] $triggerCatalog.principles.executionInstanceStoresSingleSource -and
+    [bool] $triggerCatalog.principles.clientCannotChooseTrustedSource) "TriggerSourcePrinciplesMissing"
+$triggerSourceCodes = @($triggerCatalog.triggerSourceCodes.code)
+Require (($triggerSourceCodes -join ",") -eq
+    "DataDriven,PlayerDriven,NpcDriven,WorldDerived") "TriggerSourceCodesInvalid"
+$resolvedTriggerSourcesByWi = @{}
 
 $seedbedRoot = Join-Path $repositoryRoot "eng/world-seedbeds/wi-spatial-seedbeds"
 $seedbedCatalog = Get-Content -LiteralPath (Join-Path $seedbedRoot "catalog.json") -Raw -Encoding UTF8 |
@@ -86,6 +100,22 @@ foreach ($item in @($catalog.items)) {
     Require (@($item.httpContracts).Count -gt 0) "HttpContractMissing:$id"
     Require (@($item.sourceReferences).Count -gt 0) "SourceReferenceMissing:$id"
 
+    $override = $triggerCatalog.overrides.PSObject.Properties[$id]
+    $allowedTriggerSources = @(if ($null -ne $override) { @($override.Value) }
+        else {
+            $default = $triggerCatalog.defaultAllowedByInteractionKind.PSObject.Properties[
+                [string] $item.kind]
+            Require ($null -ne $default) "TriggerSourceDefaultMissing:$id"
+            @($default.Value)
+        })
+    Require ($allowedTriggerSources.Count -gt 0) "AllowedTriggerSourceMissing:$id"
+    Require (@($allowedTriggerSources | Select-Object -Unique).Count -eq
+        $allowedTriggerSources.Count) "AllowedTriggerSourceDuplicate:$id"
+    foreach ($triggerSource in $allowedTriggerSources) {
+        Require ($triggerSourceCodes -contains [string] $triggerSource) "AllowedTriggerSourceUnknown:${id}:$triggerSource"
+    }
+    $resolvedTriggerSourcesByWi[$id] = @($allowedTriggerSources)
+
     $implementation = $item.implementation
     $integration = $item.integration
     Require ($allowedImplementationStatuses -contains [string] $implementation.status) "ImplementationStatusInvalid:$id"
@@ -104,7 +134,8 @@ foreach ($item in @($catalog.items)) {
         Require ([string] $implementation.currentStage -eq "E3") "ImplementationDoneWithoutE3:$id"
         Require (@($implementation.evidence).Count -gt 0) "ImplementationEvidenceMissing:$id"
     }
-    if ($integrationCurrent -ge (Get-StageIndex $evidenceStages "E4")) {
+    if ($integrationCurrent -ge (Get-StageIndex $evidenceStages "E4") -and
+        @($item.spatialRequirements).Count -gt 0) {
         Require ($integration.PSObject.Properties.Name -contains "e4SeedbedRefs") "E4SeedbedRefsMissing:$id"
         Require (@($integration.e4SeedbedRefs).Count -gt 0) "E4SeedbedRefsEmpty:$id"
         foreach ($seedbedRef in @($integration.e4SeedbedRefs)) {
@@ -129,7 +160,7 @@ foreach ($item in @($catalog.items)) {
     $itemsById[$id] = $item
 }
 
-Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 30) "CommandCountMustBe30"
+Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 38) "CommandCountMustBe38"
 Require (@($catalog.items | Where-Object kind -eq "AutomaticTransition").Count -eq 10) "AutomaticTransitionCountMustBe10"
 Require (@($catalog.items | Where-Object kind -eq "SharedPolicy").Count -eq 1) "SharedPolicyCountMustBe1"
 
@@ -159,6 +190,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- 대장 개정: ``$($catalog.revision)``")
 [void] $builder.AppendLine("- 증거 단계 개정: ``$($stageCatalog.revision)``")
+[void] $builder.AppendLine("- WI 발생원 개정: ``$($triggerCatalog.revision)``")
 [void] $builder.AppendLine("- 마지막 확인일: ``$($catalog.lastVerifiedDate)``")
 [void] $builder.AppendLine("- 기본 구현 완료선: ``E3 자동 시험 통과``")
 [void] $builder.AppendLine("- 실제 공간·공공데이터·Unity 통합 목표선: ``E7 실제 플레이 폐루프``")
@@ -166,7 +198,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 읽는 법")
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("WI는 새 업무 엔티티가 아니라 행위자·공간·자원·미리보기·확정·예약·작업·효과·저장/재생을 관통하는 구현·검증 단위다. ``Command``만 독립 확정을 가지며, ``AutomaticTransition``은 부모 명령의 계보와 Tick으로 진행되고, ``SharedPolicy``는 여러 WI가 함께 쓰는 판정 규칙이다.")
+[void] $builder.AppendLine("WI는 새 업무 엔티티가 아니라 발생원·행위자·대상·자료·자원·미리보기·확정·작업·효과·저장/재생을 관통하는 구현·검증 단위다. 자료를 읽은 사실만으로 WI가 되지 않으며 의미 있는 권위 상태 전이가 생길 때 WI가 된다. ``Command``만 독립 확정을 가지며, ``AutomaticTransition``은 부모 명령의 계보와 Tick으로 진행되고, ``SharedPolicy``는 여러 WI가 함께 쓰는 판정 규칙이다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 분류 요약")
 [void] $builder.AppendLine()
@@ -180,18 +212,19 @@ foreach ($group in @($catalog.items | Sort-Object groupCode, sequence | Group-Ob
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("## $($group.Name) 작업군")
     [void] $builder.AppendLine()
-    [void] $builder.AppendLine("| WI | 종류 | 시작 → 완료 | 구현 | 통합 |")
-    [void] $builder.AppendLine("| --- | --- | --- | --- | --- |")
+    [void] $builder.AppendLine("| WI | 종류 | 허용 발생원 | 시작 → 완료 | 구현 | 통합 |")
+    [void] $builder.AppendLine("| --- | --- | --- | --- | --- | --- |")
     foreach ($item in @($group.Group | Sort-Object sequence, id)) {
         $states = "$(Escape-Markdown (@($item.startStateCodes) -join ', ')) → $(Escape-Markdown (@($item.completionStateCodes) -join ', '))"
         $implementation = "$($statusLabels[[string] $item.implementation.status]) · ``$($item.implementation.currentStage)→$($item.implementation.targetStage)``"
         $integration = "$($statusLabels[[string] $item.integration.status]) · ``$($item.integration.currentStage)→$($item.integration.targetStage)``"
-        [void] $builder.AppendLine("| ``$($item.id)`` $($item.title) | $($kindLabels[[string] $item.kind]) | $states | $implementation | $integration |")
+        $triggerSources = (@($resolvedTriggerSourcesByWi[[string] $item.id]) -join ", ")
+        [void] $builder.AppendLine("| ``$($item.id)`` $($item.title) | $($kindLabels[[string] $item.kind]) | $triggerSources | $states | $implementation | $integration |")
     }
 }
 
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("## 첫 E4 · H1 WI 공간 모판 공급선")
+[void] $builder.AppendLine("## 첫 WI 실행 문맥·세계 발현 공급선")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine('```text')
 [void] $builder.AppendLine("WI-FARM-04 수확 (100㎡ × 3kg/㎡ = 300kg)")
@@ -210,9 +243,9 @@ foreach ($group in @($catalog.items | Sort-Object groupCode, sequence | Group-Ob
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- E3는 계약·코드·자동 시험의 구현 완료선이다.")
 [void] $builder.AppendLine("- Scenario 공간으로 통과한 E3는 실제 LandscapeGraph 또는 공공 공간자료 증거가 아니다.")
-[void] $builder.AppendLine("- E4는 하나 이상의 E3 WI를 품는 H1 위치 독립 공간 모판 완료선이다. 실제 AreaSet·Graph·좌표를 요구하지 않는다.")
-[void] $builder.AppendLine("- E5는 승인된 H1 모판을 H2 LandscapeBlock에 배치하고 H3 LandscapeGraph와 H4 AreaSet까지 이동 경로를 닫는 단계다.")
-[void] $builder.AppendLine("- H는 공간 포함 계층이며 증거 단계가 아니다. H4 AreaSet이 존재해도 H2 실제 Block 폐루프가 없으면 E5가 아니다.")
+[void] $builder.AppendLine("- E4는 WI의 허용 발생원·주체·대상·자료·자원·시간과 공간 적용 여부가 결속되는 단계다.")
+[void] $builder.AppendLine("- E5는 실제 Simulation 세계에서 WI가 발생해 권위 상태·Task·Effect·결과·후속 경로로 발현되는 단계다.")
+[void] $builder.AppendLine("- H는 공간 포함 계층이며 공간 WI의 E4·E5 입력 증거다. AreaSet·Graph가 존재해도 WI 발현이 없으면 E5가 아니다.")
 [void] $builder.AppendLine("- 실제 서버와 저장 Scene에서 사람이 조작한 Play Mode·Game View·Console 증거가 있어야 E7이다.")
 [void] $builder.AppendLine("- Unity 애니메이션이나 GameObject 상태가 Task 완료를 확정하지 않는다.")
 

@@ -219,7 +219,7 @@ $output["qualificationHashSha256"] = $qualificationHash
 $json = (Get-StableJson $output) + "`n"
 
 $lines = @(
-    "# Farm AreaSet E6 정밀 몰입 판정",
+    "# Farm AreaSet E6 플레이 전 정제 판정",
     "",
     "- AreaSet: $($profile.areaSetStableId)",
     "- 공간 성숙도: $($profile.spatialMaturityCode)",

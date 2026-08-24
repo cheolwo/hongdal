@@ -4,6 +4,10 @@
 @hierarchy H1
 @state IdeaInventory
 @wi WI-WORLD-07
+@wi WI-NATURE-07
+@wi WI-NATURE-08
+@wi WI-NATURE-09
+@wi WI-NATURE-10
 @gameplay TemporaryShelter
 @gameplay WeatherWait
 @gameplay Recovery
@@ -11,6 +15,16 @@
 @capability Spatial.Traversable
 @capability Spatial.RestArea
 @capability Spatial.WeatherShelter
+@capability Spatial.PlayerAccessible
+@capability Spatial.WorkerAccessible
+@capability Spatial.BuildingSite
+@capability Spatial.ShelterConstructionWorkArea
+@capability Spatial.ShelterEntrance
+@capability Spatial.ShelterInterior
+@capacity BuildingSite
+@capacity WorkArea
+@capacity Material
+@capacity ShelterOccupancy
 @predecessor h1-stock:nature-trailhead
 @successor h1-stock:nature-exploration-buffer
 @connector TrailInput

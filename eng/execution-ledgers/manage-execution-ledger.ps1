@@ -51,9 +51,9 @@ $evidenceStages = @($stageCatalog.stages)
 Require (-not [string]::IsNullOrWhiteSpace($ledger.ledgerKey)) "LedgerKeyMissing"
 Require (-not [string]::IsNullOrWhiteSpace($ledger.revision)) "RevisionMissing"
 Require (-not [string]::IsNullOrWhiteSpace($ledger.evidenceStageCatalogPath)) "EvidenceStageCatalogPathMissing"
-Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v3") "EvidenceStageCatalogSchemaInvalid"
-Require ($evidenceStages.Count -eq 8) "EvidenceStagesMustHaveEightEntries"
-Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7") "EvidenceStageOrderInvalid"
+Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v4") "EvidenceStageCatalogSchemaInvalid"
+Require ($evidenceStages.Count -eq 10) "EvidenceStagesMustHaveTenEntries"
+Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") "EvidenceStageOrderInvalid"
 Require (@($ledger.items).Count -gt 0) "ItemsMissing"
 
 $allowedStatuses = @("NotStarted", "InProgress", "Blocked", "Done", "Superseded")
@@ -164,7 +164,7 @@ foreach ($category in @($ledger.items | Sort-Object priority, id | Group-Object 
 [void] $builder.AppendLine("## 승격 규칙")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- 계획 문구나 코드 존재만으로 완료 처리하지 않는다.")
-[void] $builder.AppendLine("- E4는 WI 공간 모판, E5는 권위 경관 조립, E6는 AreaSet 정밀 몰입·현실 문맥 결속, E7은 실제 플레이 폐루프다. GIS 결속은 E6 안의 독립 선택 축이다.")
+[void] $builder.AppendLine("- E4는 WI 공간 모판, E5는 권위 경관 조립, E6는 AreaSet 플레이 전 정제·필요 근거 결속, E7은 실제 플레이 폐루프다. GIS 결속은 E6 안의 독립 선택 축이다.")
 [void] $builder.AppendLine("- DEM·도로는 공통 필수 자료가 아니다. 선택한 현실 결속 프로필이 요구할 때만 E6 준비도와 완료 판정에 참여한다.")
 [void] $builder.AppendLine("- 실제 DB 적용, HTTP 왕복, Play Mode, Game View, commit과 push는 서로 다른 증거다.")
 [void] $builder.AppendLine("- ``Done``은 목표 증거 단계와 검증 자료가 모두 있을 때만 허용한다.")

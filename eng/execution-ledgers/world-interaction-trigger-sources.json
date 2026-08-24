@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "world-interaction-trigger-sources.v1",
+  "revision": "world-interaction-trigger-sources.r1",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "principles": {
+    "observationCollectionIsNotWorldInteraction": true,
+    "meaningfulAuthorityTransitionCreatesWorldInteraction": true,
+    "definitionStoresAllowedSources": true,
+    "executionInstanceStoresSingleSource": true,
+    "subjectBindingRemainsSeparate": true,
+    "clientCannotChooseTrustedSource": true
+  },
+  "triggerSourceCodes": [
+    { "code": "DataDriven", "koreanName": "데이터 발생", "trustedBoundary": "ObservationThresholdEvaluator" },
+    { "code": "PlayerDriven", "koreanName": "플레이어 발생", "trustedBoundary": "PlayerCommandAdapter" },
+    { "code": "NpcDriven", "koreanName": "NPC 발생", "trustedBoundary": "NpcDecisionEngine" },
+    { "code": "WorldDerived", "koreanName": "세계 종합 발생", "trustedBoundary": "WorldDerivedRuleEvaluator" }
+  ],
+  "defaultAllowedByInteractionKind": {
+    "Command": ["PlayerDriven", "NpcDriven"],
+    "AutomaticTransition": ["WorldDerived"],
+    "SharedPolicy": ["NpcDriven", "WorldDerived"]
+  },
+  "overrides": {
+    "WI-NATURE-01": ["PlayerDriven", "NpcDriven", "WorldDerived"],
+    "WI-WORLD-05": ["PlayerDriven", "NpcDriven", "WorldDerived"],
+    "WI-WORLD-08": ["PlayerDriven", "NpcDriven", "WorldDerived"]
+  },
+  "notes": [
+    "현재 49개 WI에는 DataDriven 전용 정의가 없다. 향후 기상·가격 관측이 임계값을 넘어 권위 상태를 바꾸는 WI를 추가할 때 명시적으로 허용한다.",
+    "Command 기본값은 플레이어와 NPC가 같은 WI 계약을 재사용할 수 있게 하며 실제 실행 포트가 준비되지 않은 발생원은 E4 ContextPartiallyBound로 남긴다."
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "ssalddel-project-invariant-baseline.v1",
+  "revision": "ssalddel-project-invariant-baseline.r1",
+  "authorityDocumentPath": "docs/Architecture/프로젝트불변개발골격.md",
+  "principles": {
+    "refactoringDoesNotPromoteEvidence": true,
+    "compatibilityRequiresExplicitMigration": true,
+    "integrationOwnsNoIndependentAuthority": true,
+    "sameSimulationCoreAcrossAuthorityLocations": true,
+    "unityPresentationIsNotSimulationAuthority": true
+  },
+  "allowedCategories": [
+    "Authority",
+    "Execution",
+    "Command",
+    "Time",
+    "Evidence",
+    "Spatial",
+    "World",
+    "Compatibility"
+  ],
+  "allowedOwners": [
+    "Operations",
+    "Simulation",
+    "Unity",
+    "Integration",
+    "ProjectGovernance"
+  ],
+  "requiredChangePolicy": "AcceptedDecisionAndCompatibilityPlan",
+  "invariants": [
+    {
+      "id": "INV-AUTHORITY-01",
+      "category": "Authority",
+      "koreanName": "운영·Simulation·Unity 권위 분리",
+      "owners": ["Operations", "Simulation", "Unity", "Integration"],
+      "rule": "Operations는 실제 업무 원장, Simulation은 게임 세계, Unity는 입력·표현을 소유하며 Integration은 독립 권위를 갖지 않는다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/OperationsSimulationUnity작업흐름분리.md",
+        "eng/work-areas/responsibility-workstreams.json"
+      ]
+    },
+    {
+      "id": "INV-CORE-01",
+      "category": "Execution",
+      "koreanName": "Solo·Hosted 공통 Simulation Core",
+      "owners": ["Simulation", "Unity"],
+      "rule": "Solo LocalProcess와 Hosted RemoteHost는 같은 Simulation Core를 실행하며 Unity GameObject는 권위가 아니다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/SoloFirstSimulationRuntime.md",
+        "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs"
+      ]
+    },
+    {
+      "id": "INV-COMMAND-01",
+      "category": "Command",
+      "koreanName": "명시적 선택과 권위 상태 변경",
+      "owners": ["Simulation", "Operations"],
+      "rule": "권위 변경은 Preview, 명시적 Confirm, Task 또는 Effect, Revision과 canonical 상태 사본 경계를 통과한다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/ProjectOverview/GptProjectContext.md",
+        "docs/Architecture/BusinessWorkflowResponsibilityModel.md"
+      ]
+    },
+    {
+      "id": "INV-TIME-01",
+      "category": "Time",
+      "koreanName": "세계 시간과 표현 시간 분리",
+      "owners": ["Simulation", "Unity"],
+      "rule": "표현 실시간, 권위 실시간, WorldTick, BattleTick과 WorldRevision은 서로 다른 의미를 유지한다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/WorldTick과실시간실행경계.md"
+      ]
+    },
+    {
+      "id": "INV-EGH-01",
+      "category": "Evidence",
+      "koreanName": "E·G·H 독립 축",
+      "owners": ["ProjectGovernance"],
+      "rule": "E는 증거 성숙도, G는 관리 체계, H는 공간 포함 깊이이며 서로의 완료를 대신하지 않는다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/E성숙도와G관리체계.md",
+        "eng/execution-ledgers/evidence-management-systems.json"
+      ]
+    },
+    {
+      "id": "INV-SPACE-01",
+      "category": "Spatial",
+      "koreanName": "플레이어 H1 조립과 H2·H3 성장 판정",
+      "owners": ["Simulation", "Unity"],
+      "rule": "플레이어는 H1을 조립할 수 있고 H2·H3는 집합·연결·폐루프를 Simulation이 판정하며 H4·H5는 현재 임의 생성하지 않는다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/LH조립공간과플레이어조립공간구분.md",
+        "docs/Architecture/플레이어중심게임개발업무구조.md"
+      ]
+    },
+    {
+      "id": "INV-WORLD-01",
+      "category": "World",
+      "koreanName": "단일 공식 Scene과 독립 영역 폐루프",
+      "owners": ["Simulation", "Unity"],
+      "rule": "SimulationWorldShell을 단일 공식 진입점으로 유지하고 Nature와 업무 영역의 기준 왕복 및 각 업무 영역의 독립 폐루프를 먼저 검증한다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/FarmHubCity독립영역우선개발정책.md",
+        "docs/AI/authority-maps/00_GAME_DESIGN_TREE.md"
+      ]
+    },
+    {
+      "id": "INV-COMPAT-01",
+      "category": "Compatibility",
+      "koreanName": "공개 계약과 저장 호환",
+      "owners": ["Integration", "Simulation", "Operations", "Unity"],
+      "rule": "공개 Stable ID, API, 직렬화, Save와 Replay hash 의미는 명시적인 Migration과 소비자 회귀 없이 변경하지 않는다.",
+      "changePolicy": "AcceptedDecisionAndCompatibilityPlan",
+      "guardReferences": [
+        "docs/Architecture/E9하향식수직구현체계.md",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationSaveReplayContracts.cs"
+      ]
+    }
+  ]
+}

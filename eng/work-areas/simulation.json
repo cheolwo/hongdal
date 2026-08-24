@@ -1,0 +1,46 @@
+{
+  "key": "simulation",
+  "version": "1",
+  "label": "게임 Simulation",
+  "repository": "cheolwo/ssalddel",
+  "branchPrefix": "simulation/",
+  "commitScope": "simulation",
+  "authority": "가상 세계 Session과 결정적 상태 변화",
+  "readFirst": [
+    "AGENTS.md",
+    "docs/ProjectOverview/GptProjectContext.md",
+    "docs/AI/DECISIONS.md",
+    "docs/AI/CURRENT_WORK.md",
+    "docs/Architecture/OperationsSimulationUnity작업흐름분리.md",
+    "Ssalddel.Simulation.Server/README.md"
+  ],
+  "sourceRoots": [
+    "Ssalddel.Simulation.Contracts",
+    "Ssalddel.Simulation.Domain",
+    "Ssalddel.Simulation.Application",
+    "Ssalddel.Simulation.Infrastructure",
+    "Ssalddel.Simulation.Persistence",
+    "Ssalddel.Simulation.Server",
+    "Ssalddel.Simulation.Tests"
+  ],
+  "excludedRoots": [
+    "Ssalddel/Controllers/Common",
+    "Ssalddel.Domain",
+    "Ssalddel.Infrastructure",
+    "Ssalddel.Unity",
+    "bin",
+    "obj",
+    ".vs",
+    "artifacts"
+  ],
+  "mustNotOwn": [
+    "실제 계약·발주·결제·입고 원장",
+    "운영 사용자 권한과 동의",
+    "Unity 표현과 GameObject 상태"
+  ],
+  "validation": [
+    "Ssalddel.Simulation.slnx build",
+    "Ssalddel.Simulation.Tests 관련 또는 전체 시험",
+    "Preview·Confirm·Revision·Save/Replay 결정성 회귀"
+  ]
+}
