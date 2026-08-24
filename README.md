@@ -36,7 +36,7 @@
   </a>
 </p>
 
-> 현재 Unity 화면은 개발용 Simulation입니다. 실제 판매·결제·배차·수출·정산을 실행하지 않으며, 운영 상태의 최종 권위는 서버에 있습니다.
+> 현재 Unity 화면은 개발용 Simulation입니다. 실제 판매·결제·배차·수출·정산을 실행하지 않으며, 운영 상태의 최종 권위는 서버에 있습니다. 게임 Simulation Core는 Solo에서 Unity 내부 Local Runtime, Hosted Multiplayer에서만 Simulation 서버가 실행합니다.
 
 현재 세계 구축은 공공데이터에서 출발하지 않습니다. 게임 플레이와 세계 의도에서 필요한 WI와 H 공간을 상향식으로 조립하고, AreaSet이 요구한 현실 근거만 E6에서 연결합니다.
 
@@ -65,11 +65,14 @@ AreaSet 세계 설계
 └─ LandscapeGraph 공간 조립
    ├─ Node·Edge·외부 Connector
    ├─ 공간 역할·공간 능력·업무 용량
-   ├─ 선택형 E6 현실 결속
+   ├─ E6 플레이 전 정제·선택형 현실 결속
    │  └─ 선택한 프로필의 DataRequirement·EvidenceBinding·DerivedArtifact
-   └─ Simulation 서버
+   └─ Simulation Core
       └─ Preview → Confirm → WorldTick → 최신 상태 재조회
-         └─ Unity SimulationWorldShell 표현
+         ├─ Solo: Unity 내부 Local Runtime
+         └─ Hosted: Simulation 서버 Host
+            ↓
+         Unity SimulationWorldShell 표현
             └─ E7 실제 플레이·Save / Replay 검증
 ```
 
@@ -114,6 +117,49 @@ AreaSet 세계 설계
 <p align="center">
   <img src="docs/assets/changes/2026-07-28-figma-code-convergence/admin-mobile-srp.png" alt="Admin Mobile 화면" width="900">
 </p>
+
+## 게임 개발 업무 순서
+
+Ssalddel의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시작해 플레이어가 이해할 수 있는 가장 작은 선택 폐루프를 고릅니다. 그 작업을 E9 목표부터 E1 계약까지 하향 분해하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 E9까지 실제 증거를 다시 확인합니다.
+
+```text
+현재 목표와 차단점
+  → 플레이어의 상황·선택·재료·결과·다음 선택
+  → E9→E1 영향·누락 검토
+  → 가장 낮은 미완료 의존성 구현
+  → E1→E9 조립·증거 검증
+  → 새 영향이면 다시 하향 검토
+  → 안정 또는 명시적 차단까지 왕복
+```
+
+플레이어 중심은 Unity나 플레이어에게 상태 권위를 넘긴다는 뜻이 아닙니다. Simulation Core가 조건·비용·시간·결과와 H 공간 성장을 판정하고 Unity는 입력과 표현을 담당합니다. E9를 먼저 적는 것도 완료 주장이 아니라 영향과 누락을 먼저 보는 작업 순서입니다.
+
+- [문서 안내와 질문별 기준 문서](docs/README.md): 같은 설명을 반복하지 않고 각 질문의 단일 권위를 찾는 진입점
+- [프로젝트 불변 개발 골격](docs/Architecture/프로젝트불변개발골격.md): 리팩토링과 기능 개발이 보존할 기준선
+- [플레이어 중심 게임 개발 업무 구조](docs/Architecture/플레이어중심게임개발업무구조.md): 모든 단계에 적용하는 플레이어 선택 관점
+- [게임 개발 업무 순서 기준](docs/Architecture/게임개발업무순서기준.md): 작업 선택부터 다음 판단까지의 실행 순서
+- [E9↔E1 반복 왕복 구현 체계](docs/Architecture/E9하향식수직구현체계.md): 하향 영향 검토와 상향 조립·검증을 안정 상태까지 반복하는 절차
+- [E 성숙도 책임 코드 지도](docs/Architecture/SsalddelCodeMetadata.md#e-성숙도-책임-메타데이터): Simulation·Unity 구성 요소를 E1~E9 검토 책임에 연결하고, E1~E3은 사람용 하위 모듈로 다시 묶어 탐색하며 무사유 누락을 차단하는 기준
+- [WI 성숙도 현재 지도](docs/AI/generated/world-interaction-maturity.md): 전체 WI 48개의 선택 여부, E4 문맥, 조건부 H 근거와 E5 발현 상태
+- [현재 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md): 완료·부분 완료·미완료·보류 구분
+
+문서, 코드, 자동 시험, Actual E5, 실제 서버, Play Mode·Game View와 운영 효과는 서로 다른 증거로 기록합니다. Farm·Hub·Town·City는 독립 내부 폐루프를 먼저 만들고 영역 간 연결은 양쪽이 준비된 뒤 별도 통합 작업으로 선택합니다.
+
+## 개발 책임과 짧은 작업 흐름
+
+기존 `codex/rename-ssalddel`의 운영·Simulation 혼합 이력은 과거 통합 기준선으로 보존합니다. 새 작업은 실제로 바꾸는 권위 상태를 기준으로 `Operations`, `Simulation`, `Unity` 중 주 책임 하나를 먼저 고르고, 공개 계약·Adapter·호환 변경만 `Integration`으로 분리합니다.
+
+```text
+cheolwo/ssalddel
+├─ operations/<작업명>   실제 업무 원장
+├─ simulation/<작업명>   게임 Session·규칙·Save/Replay
+└─ integration/<작업명>  계약·Adapter·호환
+
+cheolwo/unity
+└─ unity/<작업명>        SimulationWorldShell·입력·표현
+```
+
+Git push는 폴더가 아니라 커밋과 브랜치를 전송하므로 서로 다른 책임을 한 커밋에 섞지 않습니다. 작업 ID는 공유할 수 있지만 각 저장소에서 짧은 브랜치, 책임별 커밋과 검증으로 진행합니다. 세부 기준은 [운영·Simulation·Unity 작업 흐름 분리](docs/Architecture/OperationsSimulationUnity작업흐름분리.md), 기계 판독 기준은 [책임 작업 흐름 원장](eng/work-areas/responsibility-workstreams.json)에서 확인합니다.
 
 ## 개발
 

@@ -2331,3 +2331,199 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 연결: 영역 간 경로는 기본 수직 slice가 아니라 독립 준비 뒤의 통합 slice다.
 - Unity: 세 영역은 `SimulationWorldShell`의 독립 모듈로 두고 Hub와 City를 구분한다.
 - 상세 기준: [Farm·Hub·City 독립 영역 우선 개발 정책](../Architecture/FarmHubCity독립영역우선개발정책.md)을 따른다.
+
+## D-215 E는 증거 성숙도이고 G는 다음 E로 올리는 관리 체계다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-22
+- 축 분리: `E0~E9`는 세계가 실제로 확보한 증거 성숙도, `G1~G4`는 다음 E 증거를 만들기 위한 관리 체계, `H1~H5`는 공간 포함 깊이로 사용한다. G 작업 완료를 E 승격으로 간주하지 않는다.
+- 관리 구간: G1은 E1→E6 세계 성립, G2는 E6→E7 플레이어 경험, G3는 E7→E8 NPC 생활세계, G4는 E8→E9 변화·확장 적응을 주로 관리한다. 구간은 책임 routing이며 단계 간 결함 수정 왕복을 금지하지 않는다.
+- E9 정의: E9는 기능 수가 아니라 선정된 E8 세계에 실제 변화를 적용하고 `E8→E1` 하향 영향 분석, Revision·Migration·Save/API 호환성·결정성 검증, `E1→E8` 상향 폐루프 재검증을 거쳐 새 안정 revision을 만든 증거다.
+- 이관: WI–H 공간 생산 순서에 사용하던 과거 `G1~G4` 사람 표시를 `H관문-1~4`로 바꾼다. 제품·공급자별 단계도 소유 영역을 포함한 이름을 사용한다. 공개 계약·저장 값의 안정 식별자는 소비자 호환성 확인 없이 일괄 변경하지 않는다.
+- 현재 경계: 기존 세계 상호작용·실행 원장의 기본 통합 목표 E7은 유지한다. 이 결정과 대장 확장 자체는 E8·E9 증거가 아니며 선정된 NPC 생활세계 또는 실제 변화 단위별 완료 관문이 필요하다.
+- 상세 기준: [E 성숙도와 G 관리 체계](../Architecture/E성숙도와G관리체계.md), [E9 변화 적응형 세계 정의](../Architecture/E9-변화적응형세계정의.md)와 `eng/execution-ledgers/evidence-management-systems.json`을 따른다.
+
+## D-216 권위 지도 묶음은 플레이 목적부터 실행 증거까지 잇는 navigation 기준이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-22
+- 진입점: 새 아이디어와 Codex 작업은 [게임 기획 최상위 권위 트리](authority-maps/00_GAME_DESIGN_TREE.md)에서 플레이 목적을 찾고 [WI 전체 게임플레이 그래프](authority-maps/04_WI_GAMEPLAY_GRAPH.md)를 거쳐 H 공간, E 증거, G 관리 체계, 실제 Simulation·Unity 소유 위치로 내려간다.
+- 비중복 경계: `docs/AI/authority-maps/00~09`는 사람이 읽는 현재 navigation snapshot이다. 기계 JSON 대장, 계약·코드, `CURRENT_WORK.md`, 이 결정 문서와 실제 실행 기록의 권위를 복제하거나 대체하지 않는다. `08_CURRENT_WORK.md`와 `09_DECISIONS.md`는 중앙 문서로 가는 고정 진입점만 제공한다.
+- 우선순위: 첫 추적 기준은 Nature↔Farm 왕복이다. Farm·Hub·Town·City의 WI가 한 그래프에 연결돼 있어도 영역 간 사슬을 기본 개발 순서나 완료 의존 관계로 해석하지 않는다.
+- 갱신 규칙: WI·H·E/G·권위 소유자 또는 완료 판정이 바뀌는 의미 있는 작업은 원천 대장·코드와 중앙 snapshot을 먼저 갱신하고, 같은 변경에서 영향받는 권위 지도를 함께 갱신한다.
+
+## D-217 배치 통제 계층은 H 공간 의미와 분리하고 Player 실측 크기를 기준으로 한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 계층 경계: H1~H5는 작업공간·블록·경관·AreaSet·세계 배치의 의미 포함 계층으로 유지한다. 배치 통제 계층은 H4.5나 새 H 단계가 아니라 `세계 외곽 → AreaSet 외곽 → H3 경관 → H2 블록 → H1 발자국`의 허용 범위와 소속을 검사하는 별도 제작·검증 계층이다.
+- 크기 기준: Unity 배치 객체의 높이와 수평 발자국은 고정 임의 수치만 사용하지 않고 같은 Scene의 Player 시각 형상 실측 높이에 대한 등급별 비율로 제한한다. 건물·울타리·능선·일반 표현은 서로 다른 비율 범위를 가지며 범위를 벗어난 표현은 정규화하거나 배치를 거부한다.
+- 자산 계보: Synty 원본 Transform의 부모 구조는 출처와 교체 가능성을 위해 보존한다. 배치 통제 계층은 H1마다 결정된 H3·H2 소속, 적용 위치, 실측 발자국과 Player 상대 비율을 참조 기록으로 남긴다.
+- 모듈 조립: 패턴은 `H3 경관 축 → H2 전면·이격·출입구 규칙 → H1 구성 모듈 조립` 순서로 결정한다. H1 Prefab을 가까운 상위 노드 이름에 사후 귀속시키지 않고, 의도한 H3·H2 역할을 먼저 선택한 뒤 도로·울타리·건물·상호작용 소켓을 배치하며 원본 구성 키를 보존한다.
+- 증거 경계: 평탄 H3 바닥의 비율·이격·연속성 통과는 실제 DEM 경사, 도로·수계, NavMesh 통행과 H1 행동 연결 증거가 아니다. 실제 E5/E6 지형에서는 같은 계약에 `slope`와 `placement-mask` 표본을 공급해야 한다.
+
+## D-218 게임 개발은 현재 목표에서 증거와 다음 판단까지 같은 업무 순서를 사용한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 업무 순서: 현재 목표와 차단점 확인 → 시작·선택·결과·복귀가 있는 플레이 단위 선택 → WI와 상태 권위 확정 → Simulation 세로 구현 → H 공간 결속 → canonical `SimulationWorldShell` 조립 → 증거 구분 → 현재 상태 갱신과 다음 판단 순서를 사용한다.
+- 선택 우선순위: 현재 목표의 직접 차단점, 현재 폐루프의 서버·저장·Unity 증거, 회귀·배선 실패, 완성도가 낮은 독립 영역의 내부 폐루프, 준비된 영역 간 통합, E8 NPC 생활세계, E9 변화 적응 순으로 판단한다. Farm→Hub→Town 같은 영역 간 경로를 자동 다음 단계로 삼지 않는다.
+- 작업 단위: 파일·기능·Scene보다 플레이어의 시작 상태, 선택, 권위 있는 결과와 복귀가 드러나는 작은 흐름을 사용한다. 선택 이유, WI·H, 상태 소유자, 목표 E/G, 포함·제외, 검증과 다음 판단을 기록한다.
+- 증거 경계: 문서 작성, 코드 존재, 자동 시험, Actual E5, 실제 서버, Play Mode·Game View와 운영 효과는 서로 다른 증거다. 업무 상태나 템플릿 작성 자체는 E 성숙도 또는 구현 완료가 아니다.
+- 기준 문서: [게임 개발 업무 순서 기준](../Architecture/게임개발업무순서기준.md)과 [게임 개발 작업 단위 템플릿](../ProjectOverview/templates/게임개발작업단위템플릿.md)을 따른다.
+
+## D-219 Nature는 생존 생활거점을 1차 플레이로 두고 심리 회복을 그 결과에 결합한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 플레이 우선순위: Nature의 첫 플레이는 안전 빈터 등장 → 도끼 획득 → 수확 구역 벌목 → 통나무 휴대 → 단계형 오두막 건설 → 황혼 위협 → 전투 또는 후퇴 → 회복·재출발이다. 심리 회복은 유지하지만 이 흐름의 1차 행동을 대체하지 않는다.
+- 시간 권위: `nature-survival.realtime.r1`은 실제 20분을 한 주기로 사용한다. Solo는 메뉴·응용프로그램 비활성 중 멈추고 Hosted는 계속 간다. 종료 중 경과 시간은 따라잡지 않으며 새 프로필만 주기 경계에서 기존 WorldTick을 진행한다.
+- 공간 재사용: 새 H 재고나 공식 Scene을 만들지 않고 기존 `h3-candidate:nature-home-encounter-defense`, 생활핵·조우로 H2, trailhead·shelter·exploration-buffer H1을 재사용한다.
+- 권위·저장: 서버 행동은 Preview·Confirm과 개정을 검증하고 도끼·통나무는 기존 플레이어 소지품 원장을 사용한다. 새 상태와 명령은 `simulation-save.v13` hash와 재생에 포함한다. Solo Unity는 같은 공유 규칙의 로컬 권위를 사용하고 Hosted는 서버 권위를 사용한다.
+- 호환 관계: D-048의 고정 15:00 표현은 새 프로필에서 대체하고 프로필이 없는 기존 Scene·Session에는 유지한다. D-177의 심리 영역 정의와 D-209의 가벼운 조우 흐름은 폐기하지 않고, Nature 1차 플레이를 생존·생활 거점으로 확장한다. Farm 독립 업무와 Nature↔Farm 통합은 별도 slice로 남긴다.
+- 대체 형상: 현재 Skeleton은 명시적인 Synty Generic 대체 위협이다. 실제 몬스터 자산·최종 시각 마감·Game View 증거로 표현하지 않는다.
+- 상세 기준: [Nature 생존 생활거점 세로 조각](../Architecture/Nature생존생활거점세로조각.md)을 따른다.
+
+## D-220 WorldTick·권위 실시간·표현 실시간·BattleTick을 분리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 시간 경계: Unity 프레임 시간은 이동·카메라·애니메이션 표현, 권위 실시간 시계는 정규화된 경과 초와 짧은 작업, WorldTick은 NPC·Task·생산·물류·사건의 큰 시간 결과, BattleTick은 전투 내부의 빠른 결정적 진행을 담당한다.
+- 개정 경계: `WorldRevision`은 WorldTick과 같은 값이 아니다. Confirm, 권위 실시간 시계와 Tick 등 권위 상태가 바뀔 때 증가하며 WorldTick은 시간 의존 세계 규칙을 진행하는 큰 경계다.
+- 현재 Profile: 기본 경영 Session은 명시적 Tick과 `OneTickOneDay`를 사용한다. `nature-survival.realtime.r1`은 1,200초 주기 중 작업·위상을 권위 상태로 누적하고 주기 경계에서만 WorldTick을 진행한다. 전투는 100ms BattleTick 결과를 이후 WorldTick에 합류시킨다.
+- Unity 경계: Presentation의 `Update()`·`deltaTime`은 서버 Tick·개정·재고·Effect를 직접 확정하지 않는다. 로컬 권위가 필요하면 Nature `SoloLocal`처럼 공유 결정 규칙, 권위 모드, 개정, Save/Replay 경계를 명시한다.
+- 상세 기준: [WorldTick과 실시간 실행 경계](../Architecture/WorldTick과실시간실행경계.md)를 따른다.
+
+## D-221 Simulation Core는 게임 세계이고 Server는 Hosted Host다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 실행 경계: 게임 규칙·Session Aggregate·Preview/Confirm·Task/Effect·WorldTick/Revision·Save/Replay는 공통 `Simulation Core`가 소유한다. `Simulation.Server`는 Hosted Multiplayer에서 같은 Core를 실행하는 Host이며 독립 게임 엔진이 아니다.
+- Solo 권위: Solo의 기본 권위 위치는 Unity 프로세스 안의 `LocalSimulationRuntime`이다. Unity `GameObject`, `Update()`와 표현 상태는 권위가 아니며 모든 상태 변경은 공통 Application·Aggregate와 상태 사본 경계를 통과한다.
+- 축 분리: `AuthorityLocation = LocalProcess | RemoteHost | ReviewFixture`는 게임 Simulation 실행 위치다. 운영 실행 모드, Session 참가 방식과 기존 호환 enum을 한 축으로 합치지 않는다. 운영 계약·결제·입고 원장의 서버 최종 권위는 유지한다.
+- 저장·호환: Solo는 로컬 파일 Adapter를 사용하되 기존 Save Package·Command log·Replay hash·WorldTick·WorldRevision 의미를 보존한다. Hosted는 같은 계약을 서버 저장소에 연결한다.
+- 이관 순서: Nature를 첫 공통 Local Runtime 검증 대상으로 삼고 Farm·건설·물류 등은 기능별로 이관한다. Nature 단독 성공을 전체 `SimulationWorldShell`의 서버 의존 제거 완료로 간주하지 않는다.
+- 상세 기준: [Solo 우선 Simulation Runtime](../Architecture/SoloFirstSimulationRuntime.md)을 따른다.
+
+## D-222 의미 있는 게임 작업은 E9 목표부터 하향 분해하고 E1부터 상향 검증한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 시작 원칙: 새 게임 기능·규칙·공간·저장 변경은 최종 안정 세계와 호환·rollback을 E9 목표 봉투로 먼저 선언하고 `E9 → E1` 순서로 NPC·플레이어·현실 문맥·AreaSet·WI 공간·시험·코드·계약을 모두 분해한다. 자료가 없으면 층을 지우지 않고 `Gap` 또는 `Blocked`로 남긴다.
+- 구현 원칙: 하향 작업 명세가 E1까지 닫힌 뒤 가장 낮은 미완료 의존성부터 구현한다. 구현 후에는 `E1 → E9` 순서로 실제 증거를 재검증하며 하위 관문을 통과하지 않은 상위 코드·화면·문서를 완료 증거로 사용하지 않는다.
+- 증거 경계: `targetEvidenceStage = E9`는 장기 완결 방향이지 현재 E9 판정이 아니다. 신규 세로 조각은 E8까지 완성해도 자동 E9가 아니며, 변경 전 E8 안정 revision에 실제 후속 변화·Migration·호환·회귀와 새 안정 revision을 증명해야 `promotionEligible = true`가 될 수 있다.
+- 실행·공간 경계: Solo `LocalProcess`와 Hosted `RemoteHost`는 같은 `SharedSimulationCore`를 사용한다. H1~H5 의미 계층과 Player 비율·경사·이격·연속성·출입구를 검사하는 배치 통제 계층은 분리하며 공식 Unity 진입점은 `SimulationWorldShell` 하나로 유지한다.
+- 적용: 현재 첫 기계 작업 명세는 Nature 생존·Solo 공통 Core·배치 통제 세로 조각이다. 현재 E3까지만 증거가 있고 E4 WI–H1 모판, E5 Actual 배치·통행, E6 질문 행렬, E7 실제 Solo·Hosted 플레이, E8 NPC와 E9 변화 기준선은 명시적 차단으로 남긴다.
+- 상세 기준: [E9↔E1 반복 왕복 구현 체계](../Architecture/E9하향식수직구현체계.md)와 `eng/execution-ledgers/e9-vertical-implementation-protocol.json`을 따른다.
+
+## D-223 E6는 E5 세계를 E7 전에 정제하는 관문이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 명칭: E6의 사람 중심 이름을 `AreaSet 플레이 전 정제·필요 근거 결속`으로 사용한다. E5까지 조립·성장한 세계를 E7 실제 플레이에 올리기 전에 다듬는 역할을 이름에 명시한다.
+- 정제 범위: `E6 정제 질문표`로 장소 의미, H3 사이 인과, WI 시작·완료·복귀, 배치·통행, 권위 경계, 자료 최신성과 한계를 검토한다. 결함은 E5나 더 낮은 소유 단계로 되돌려 수정하고 다시 E6를 통과한다.
+- 현실자료 경계: 현실자료와 GIS는 계속 선택형이다. `NotApplied`는 허용할 수 있지만 정제 질문 자체를 생략하는 근거가 아니며, 적용한 자료는 출처·판본·hash·한계를 보존한다.
+- 호환: D-207의 E6 의미를 폐기하지 않고 명칭과 설명을 구체화한다. 저장·API의 `ImmersionQualified`, `SpatialMaturity`, `ImmersionMaturity`, `FreshnessState`, `GroundingStatus`와 기존 질문 StableId는 호환을 위해 유지한다.
+- 상세 기준: [H5 세계 배치와 E6 플레이 전 정제·선택형 GIS 결속](../Architecture/H5세계배치와선택형E6결속.md), [E 성숙도와 G 관리 체계](../Architecture/E성숙도와G관리체계.md)를 따른다.
+
+## D-224 기존 통합 이력은 보존하고 새 작업은 운영·Simulation·Unity 책임으로 분리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 기준선: `codex/rename-ssalddel`의 기존 운영·Simulation·문서 혼합 커밋은 과거 통합 이력으로 보존한다. 대규모 history rewrite로 재분할하지 않으며 이 브랜치에 새 일반 목적 작업을 계속 누적하지 않는다.
+- 책임 흐름: 실제 사용자·권한·동의·업무 원장은 `Operations`, 게임 Session·규칙·시간·Save/Replay는 `Simulation`, 입력·공간·UI와 권위 상태 사본 표현은 `Unity`가 맡는다. `Integration`은 공개 계약·Adapter·직렬화·호환 회귀만 다루며 독립 상태 권위를 갖지 않는다.
+- 브랜치: `cheolwo/ssalddel`은 `operations/*`, `simulation/*`, `integration/*`, 별도 `cheolwo/unity` 저장소는 `unity/*`의 짧은 브랜치를 사용한다. Git은 커밋을 전송하므로 서로 다른 책임 변경은 push 전에 커밋으로 분리한다.
+- 적용: 제품 기능 작업 영역과 시스템 책임 흐름은 별도 축이다. 각 작업은 제품 기능 영역과 주 책임을 함께 선택하고, 공유 계약 변경은 생산자와 모든 소비자 검증을 별도로 남긴다.
+- 상세 기준: [운영·Simulation·Unity 작업 흐름 분리](../Architecture/OperationsSimulationUnity작업흐름분리.md), `eng/work-areas/responsibility-workstreams.json`과 연결된 세부 manifest를 따른다.
+
+## D-225 게임 작업은 플레이어 선택 폐루프를 E·WI·H 전 단계의 공통 관점으로 사용한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 작업 출발점: 기능·Scene·자산보다 플레이어가 상황과 욕구를 인지하고 선택의 비용·시간·위험을 비교하며, 재료를 획득·운반·배정·조립하고 결과를 체감해 귀환 또는 다음 선택으로 이어지는 폐루프를 먼저 정의한다.
+- E 관계: 플레이어 관점은 G2·E7에서 처음 시작되지 않는다. E1의 플레이어 약속부터 E9의 변화 후 선택 보존까지 각 단계에 검토 질문을 두되, 기존 E 완료 관문이나 증거 수준을 바꾸거나 앞당기지 않는다.
+- H 관계: 플레이어는 H1을 직접 배치·복구·연결하고 H2·H3 목표를 유도할 수 있다. H2는 H1 집합·연결구·용량, H3는 H2 사이 이동·인과·반환 폐루프로 Simulation이 성장 판정하며 H4·H5 계약은 현재 단계에서 플레이어가 임의 생성하지 않는다.
+- 재료·표현 경계: 세계 자원·Lot, 조립법·비용, 배치 Preview, H1 공간 인스턴스, H2/H3 성장 판정과 Synty 시각 자산을 별도 상태로 유지한다. Prefab 배치는 자원 소비나 H 성립 증거가 아니다.
+- 권위 경계: 플레이어 중심은 개발 관점이며 권위 이전이 아니다. Solo `LocalSimulationRuntime`과 Hosted Simulation 서버가 같은 Core에서 선택 조건·비용·결과·Save/Replay를 판정하고 Unity는 입력·공간 표현·피드백을 담당한다.
+- 상세 기준: [플레이어 중심 게임 개발 업무 구조](../Architecture/플레이어중심게임개발업무구조.md)와 `eng/execution-ledgers/player-centered-development-flow.json`을 따른다.
+
+## D-226 지역 사건·Nature 위협·전투 결과·지역 발전을 독립 모듈로 잇는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 책임 분리: 업무 영역 사건은 원인·기한·필요 WI, 지역 인과는 위협·회복 계보, Nature 압력 정책은 순수 계산, Nature 투영은 경고·조우, 전투 결과는 즉시 안전 인계, 지역 발전은 기회·영역 준비도, Farm 프로젝트는 플레이어의 H1 배치·자원·Task를 각각 소유한다.
+- 전이 경계: Nature 전투 승리는 업무 사건 원인을 해결하지 않는다. 같은 원인 사건의 발전 기회는 한 번만 발급하며 기회는 건설 비용이 아니라 시작 자격이다. Confirm에서 예약하고 취소 시 반환하며 H1 `Operational`에서 소비한다.
+- 공간 경계: 첫 조각은 기존 `h2-candidate:farm-incident-containment`와 세 H1을 사용한다. 세 H1 완료가 H2 독립 준비와 Nature↔Farm 연결 후보를 열 수 있지만 실제 영역 간 시설·운송·다른 영역 발전을 자동 생성하지 않는다.
+- 구현 순서: 기존 동작을 보존하는 파일·책임 분리와 회귀 시험을 먼저 끝내고, 발전 계약 빈 상태 → 저장 판본 → 승리 인계 → Farm 프로젝트 → WI 효과 → Local·Remote → Unity 순으로 구현한다. 파일 분리나 문서 작성만으로 E 단계가 승격되지는 않는다.
+- 상세 기준: [지역 사건·Nature 위협·지역 발전 모듈 경계](../Architecture/지역사건-Nature위협-지역발전모듈경계.md)와 `eng/execution-ledgers/work-orders/nature-farm-regional-development.e9-work-order.json`을 따른다.
+
+## D-227 최근 개발 철학의 반복 경계를 프로젝트 불변 골격으로 고정한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 불변 범위: Operations·Simulation·Unity 권위, Solo·Hosted 공통 Core, Preview·Confirm·Revision 상태 변경, 시간 축, E·G·H 분리, 플레이어 H1 조립과 H2/H3 성장 판정, 단일 `SimulationWorldShell`, 공개 계약·저장 호환을 리팩토링과 새 기능이 보존할 골격으로 사용한다.
+- 변경 경계: 파일·내부 이름·구체 Adapter·표현은 바꿀 수 있다. 불변 골격을 바꾸려면 새 확정 결정, 호환·Migration 계획과 생산자·소비자 회귀 근거가 먼저 필요하며 문서나 관리 작업만으로 E 단계를 승격하지 않는다.
+- 호환 적용: 기존 `CityHub`, 지역 사건 코드 묶음, Runtime의 `ReviewFixture`, 넓은 Gameplay·WI 인터페이스는 즉시 삭제·이름 변경하지 않는다. 새 내부 책임과 좁은 인터페이스를 추가하고 기존 표면은 호환 facade로 유지한다.
+- 대체 관계: D-221의 권위 위치 목록에 `ReviewFixture`를 함께 적은 표현만 대체한다. 실제 권위 위치는 `LocalProcess | RemoteHost`, 검토 Fixture는 `SimulationRuntimePurpose`의 실행 목적이며 D-221의 공통 Core·저장·이관 원칙은 유지한다.
+- 상세 기준: [프로젝트 불변 개발 골격](../Architecture/프로젝트불변개발골격.md)과 `eng/execution-ledgers/project-invariant-baseline.json`을 따른다.
+
+## D-228 게임 개발 기준 문서는 질문별 단일 책임을 갖고 대체 경로는 호환 안내로 남긴다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 단일 책임: 프로젝트 불변선, 플레이어 관점, 업무 순서, E/G 정의, E9 하향·상향 절차, H 형성 계보, Operations·Simulation·Unity routing을 각각 하나의 기준 문서가 소유한다. 다른 문서는 같은 표·절차를 다시 쓰지 않고 해당 기준을 링크한다.
+- 첫 통합: `E9리팩토링모듈골격.md`의 모듈 이름·상태·선택 규칙은 `E9하향식수직구현체계.md`로 통합한다. WI·H의 현재 결속은 기계 대장과 `CURRENT_WORK.md`가 소유하며 장기 절차 문서에 상태 사본을 중복하지 않는다.
+- 호환 경계: 대체된 문서 경로는 바로 삭제하지 않고 짧은 호환 안내로 남긴다. 변경 기록과 화면 증빙은 현재 기준과 내용이 겹쳐도 과거 사실이므로 통합·삭제 대상에서 제외한다.
+- 진입점: [문서 안내](../README.md)의 `게임 개발 기준 문서의 책임` 표를 현재 문서 routing 기준으로 사용한다.
+
+## D-229 E9와 E1 사이는 한 번 통과하는 파이프라인이 아니라 안정될 때까지 반복 왕복한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 반복 구조: E9→E1은 현재 목표·영향·누락을 보는 하향 검토이고 E1→E9는 가장 낮은 누락부터 실제로 조립·검증하는 상향 통과다. 상향 중 새 영향, 계약 변경, 잘못된 가정이나 증거 누락이 발견되면 같은 작업 명세에서 관련 하향 판정을 다시 연다.
+- 상태 사본: 작업 명세는 계획본과 검증본을 주기마다 새로 만들지 않고 현재 왕복 주기의 상태 사본을 유지한다. 이미 통과한 단계도 새 영향이 있으면 `ReusedWithVerification`, `Affected`, `Gap` 또는 `Blocked`로 다시 판정할 수 있다.
+- 종료 조건: 하향 1회와 상향 1회를 마쳤다는 이유로 작업을 닫지 않는다. 선택 범위가 실제 증거로 안정됐거나 남은 차단이 명시됐을 때 현재 주기를 닫으며, E9 승격에는 기존 E8 기준선·실제 변화·Migration·호환·회귀 조건이 계속 필요하다.
+- 대체 관계: D-222의 E9 목표 우선, 최저 미완료 의존성 구현, 상향 증거 원칙은 유지한다. 다만 이를 `E9→E1→E9` 단일 통과로 읽는 표현은 이 결정이 대체한다.
+- 상세 기준: [E9↔E1 반복 왕복 구현 체계](../Architecture/E9하향식수직구현체계.md)와 `simulation-e9-vertical-implementation-protocol.r3`를 따른다.
+
+## D-230 게임 코드에는 E 증거 상태가 아니라 E 검토 책임을 메타데이터로 남긴다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-23
+- 축 분리: `SsalddelEvidenceResponsibilityAttribute`는 구성 요소가 E1~E9 중 어느 질문에 답할 책임이 있는지 표시한다. 현재 증거 통과·승격·`promotionEligible`을 기록하지 않으며 기능 호출 흐름을 나타내는 `SsalddelCodeMetadataAttribute`와 분리한다.
+- 대표 책임: 검사 후보 타입과 선택된 공개 WI 메서드는 대표 `Primary` E를 정확히 하나 가진다. 실제 교차 책임만 `Secondary`로 추가하며 대표 책임에는 완료 오인을 막는 `Boundary`를 필수로 둔다.
+- 전수 경계: Simulation, Simulation Server, 공유 Unity adapter, 실제 Unity 제품과 검증 코드를 강제 범위로 삼는다. 일반 Operations는 제외한다. 호환 facade·기술 보조·생성·외부·Sample·Experiment는 사유가 있는 제외 Attribute를 사용한다.
+- 자동 관문: 공통 Reader·validator와 .NET·Unity 생성 지도를 둔다. 이관 뒤 새 공개 후보의 무사유 누락, 다중 Primary, 책임과 제외의 동시 사용, 잘못된 WI 고유 식별자는 strict 검사 오류다.
+- 증거 경계: 지도 생성과 strict 통과는 코드 분류·컴파일 증거일 뿐 저장 Scene, 실제 서버, Play Mode·Game View, Save/Replay 폐루프 또는 E 승격을 대신하지 않는다.
+- 상세 기준: [코드 탐색 메타데이터의 E 성숙도 책임](../Architecture/SsalddelCodeMetadata.md#e-성숙도-책임-메타데이터)을 따른다.
+
+## D-231 플레이어가 확정하는 Nature 생존 행동은 정식 WI로 관리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-24
+- 판정 기준: 플레이어가 대상을 선택하고 Preview 뒤 Confirm하여 권위 세계 상태를 바꾸는 행동은 WI다. 시간 경과, 입력 유지 중 작업 진행, 자동 조우 발생과 완료 결과는 각각 Realtime·Task·자동 상태 전이·Effect로 남기며 독립 WI로 늘리지 않는다.
+- Nature 적용: 기존 `WI-NATURE-01~04`를 보존하고 도끼 획득, 벌목 시작, 오두막 위치 배치, 건설 시작, 입장, 퇴장, 황혼 조우 대응을 `WI-NATURE-05~11`로 등록한다. 같은 `ISimulationNatureSurvivalRuntime.PreviewAsync/ConfirmAsync`를 공유해도 안정 WI 식별자와 영향·증거는 각각 추적한다.
+- H 결속: 생활핵과 탐사·조우의 승인 H1 모판을 분리하고 기존 H2 생활핵·조우로 및 H3 생활·조우·방어 폐루프에 연결한다. H1 모판 결속은 E4 증거이며 실제 H2·H3 배치나 E7 플레이를 대신하지 않는다.
+- 미완료 경계: 벌목·건설의 공간 예약 충돌과 취소·자재 반환, 오두막 점유 용량, Actual E5 배치와 Play Mode·Game View 증거는 남아 있다. 따라서 신규 7개 WI는 Actual E5 대장에서 `E5 배치 대기`이며 Network 전체 상태는 `Partial`이다.
+- 대체 관계: Nature 생존 행동을 41개 대장 밖 프로필 행동으로만 둔 D-219의 해당 범위와 [Nature 생존 생활거점 세로 조각](../Architecture/Nature생존생활거점세로조각.md)의 이전 설명을 대체한다. D-219의 규칙 값·권위·시간·저장 경계는 유지한다.
+
+## D-232 E 성숙도의 주어는 WI이며 공간은 조건부 발현 증거다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-24
+- 중심 축: E1~E9는 WI 또는 서로 이어지는 WI 폐루프가 얼마나 성숙하게 계약·구현·검증·발현·플레이·생활·변화하는지를 추적한다. H1~H5와 AreaSet·Graph는 공간 의미와 포함 깊이 및 공간 조립 증거를 소유하지만 E 단계 자체를 소유하지 않는다.
+- E4: `WI 실행 문맥 결속`으로 정의한다. 허용 발생원, 발의·수행 주체, 대상, 자료·자원·예약, 시간 규칙과 공간 적용 여부를 결속한다. 공간 WI만 H 능력·용량·연결구를 요구하며 비공간 WI는 `NotApplicable`을 명시한다.
+- E5: `WI 세계 발현`으로 정의한다. 결정적 Simulation 세계에서 허용 발생원 중 하나가 WI를 만들고 권위 상태 전이, Task·Effect, 결과와 후속·복귀 WI까지 이어져야 한다. AreaSet·Graph·통행은 공간 WI의 추가 증거지만 공간 조립만으로 E5를 선언하지 않는다.
+- 발생원: 정의에는 `DataDriven | PlayerDriven | NpcDriven | WorldDerived` 허용 목록을 두고 실행 인스턴스에는 하나만 기록한다. 자료 수집 자체는 WI가 아니며 조건 판정으로 의미 있는 권위 상태 전이가 생길 때 WI가 된다. 기존 발의·수행·진행·권위 `subjectBinding`은 발생원과 분리해 유지한다.
+- 호환: 기존 `ActualE5` 공간 계약과 저장·API 값은 이관 기간 동안 공간 조립 증거 facade로 보존한다. 신규 코드와 판정은 `SpatialAssembly` 의미를 사용하며 기존 공간 대장만으로 E5 승격을 만들지 않는다.
+- 대체 관계: D-152의 E4 공간 모판·E5 지역 경관 조립을 E 단계의 완료 관문으로 둔 부분과 D-231의 H1 모판 결속을 곧바로 E4 증거로 표현한 부분을 대체한다. 기존 H 설계·ActualE5 공간 산출물과 검증 사실은 삭제하거나 강등하지 않고 조건부 공간 증거로 재분류한다.
+
+## D-233 진행 작업 취소는 예약을 반환하는 독립 WI이며 원래 공간 문맥을 이어받는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-24
+- 판정 기준: 입력을 놓아 작업 진행을 멈추는 것은 Realtime 일시 정지다. 진행 작업을 닫고 Actor·Tool·ResourceNode·WorkArea·BuildingSite 점유를 해제하거나 예약 Material을 반환하는 명시 선택은 권위 상태 전이이므로 `WI-NATURE-12`로 관리한다.
+- Core 계약: 벌목 취소는 나무와 통나무 상태를 바꾸지 않고 진행 작업만 닫는다. 오두막 건설 취소는 예약 통나무를 인벤토리에 전량 반환하고 건설 진행률과 예약량을 0으로 만든다. 완료된 건설은 예약량을 남기지 않는다.
+- 공간 결속: 취소 전용 H1을 새로 만들지 않는다. WI-NATURE-12는 취소 대상 벌목 또는 건설이 이미 결속한 H·Graph와 예약 문맥을 이어받는 Contextual 결속이며, 실행 발현에는 원래 WI와 취소 WI를 함께 기록한다.
+- 증거 경계: `simulation-save.v15` Replay hash와 canonical `SimulationWorldShell` PlayMode에서 C 취소·E 퇴장·R 후퇴·저장·Scene 재진입을 검증했다. 이는 Solo PlayMode 증거이며 Hosted 동등성, 수동 Game View·Console, 전체 Nature E7 또는 E8을 대신하지 않는다.
+- 대체 관계: D-231의 취소·자재 반환과 Actual E5 배치를 미완료로 둔 부분을 대체한다. D-231의 WI 판정 기준과 WI-NATURE-05~11 식별자는 유지한다.

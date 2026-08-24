@@ -34,6 +34,7 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 | `Ssalddel.Tests/` test | `Ssalddel.Tests/AGENTS.md` | filter 우선, 영향 project build |
 | `docs/` 문서·변경 기록 | `docs/AGENTS.md` | 기준 문서 단일화, link·diff 검증 |
 | 여러 project를 통과하는 기능 | `SsalddelCodeMetadataAttribute`, `SsalddelCodeFeatureKeys` 검색 | `StepKey`, `FlowOrder`, `Layer`, `ExecutionStage`, `ReadsFrom/WritesTo`, `Effects`, `Boundary` |
+| 운영·Simulation·Unity 책임 분류 | `docs/Architecture/OperationsSimulationUnity작업흐름분리.md`, `eng/work-areas/responsibility-workstreams.json` | 주 상태 소유자를 먼저 고르고 `operations/*`, `simulation/*`, `unity/*`로 짧게 진행하며 계약·Adapter만 `integration/*`로 분리 |
 | Simulation·Unity 탐색 | `eng/work-areas/simulation-unity.json`, `docs/AI/generated/simulation-unity-code-map.md` | 생성 트리에서 기능 키와 핵심 단계를 고른 뒤 소스로 이동하고, 생성 문서를 직접 수정하지 않음 |
 | 커뮤니티 0.0 | `[SsalddelCommunityV0Module]` 검색 | module catalog와 `0.0-A~E` |
 | 기능 slice 작업 | `docs/Architecture/FunctionalWorkAreaPartitioning.md`, `eng/work-areas/<slice>.json` | manifest의 `readFirst`, `sourceRoots`, `excludedRoots`만 먼저 읽고 범위를 넓힐 때 이유를 남김 |
@@ -104,6 +105,10 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 
 ## 구현 단위
 
+- 게임 작업은 [플레이어 중심 게임 개발 업무 구조](docs/Architecture/플레이어중심게임개발업무구조.md)에 따라 플레이어가 보는 상황·욕구·선택·대가·재료 획득·조립·결과·다음 선택을 먼저 적는다. 이 관점은 E/G/H/WI를 대체하지 않으며 Unity 또는 플레이어에게 상태 권위를 주지 않는다. 플레이어는 H1 조립을 선택하고 H2·H3 성장을 유도할 수 있지만 상위 공간 성립은 Simulation 규칙이 판정한다.
+- 의미 있는 새 게임 기능·규칙·공간·저장 변경은 구현 전에 [E9↔E1 반복 왕복 구현 체계](docs/Architecture/E9하향식수직구현체계.md)의 작업 명세를 만든다. E9 목표부터 E1 계약까지 영향과 누락을 검토하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 상향 조립·검증한다. 상향 결과에서 새 영향이나 잘못된 가정이 발견되면 같은 작업 명세를 다시 E9→E1로 검토하며 안정 상태 또는 명시적 차단까지 왕복한다.
+- `targetEvidenceStage = E9`는 완결 방향이지 현재 E9 증거가 아니다. 각 상향 주기 뒤 E1→E9 검증 상태를 갱신하고, 새 영향이 있으면 관련 하향 판정을 다시 연다. 실제 E8 기준선·Migration·호환·회귀가 없으면 `promotionEligible = false`를 유지한다.
+- Solo는 `LocalProcess`, Hosted는 `RemoteHost`에서 같은 Simulation Core를 실행하도록 작업 명세에 적는다. H 의미 계층과 배치 통제 계층을 분리하고 canonical `SimulationWorldShell` 외의 새 공식 Scene을 만들지 않는다.
 - 원장 또는 업무 node 하나를 골라 저장, 상태 전이, Event, API, UI, test까지 세로로 완성한다.
 - Farm·Hub·City는 서로 선후행 종속 관계가 아닌 독립 업무 영역으로 개발한다. 각 영역은 다른 영역의 존재나 화물 인계를 요구하지 않는 내부 플레이 폐루프, 독립 Fixture, 독립 조회·저장 경계를 먼저 가진다.
 - 별도 요청이 없으면 `Farm→Hub`, `Hub→City`, `Farm→Hub→City`를 첫 구현·다음 구현·대표 수직 슬라이스로 선택하지 않는다. 이런 경로는 양쪽 영역의 독립 준비가 확인된 뒤 수행하는 영역 간 통합 slice다.
