@@ -582,6 +582,10 @@ namespace Ssalddel.Simulation.Application
         public string AreaStableId { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "WI와 공간 능력·예약·연결 책임을 결속한다.",
+        Boundary = "H 포함 깊이와 E 증거 성숙도를 서로 대신하지 않는다.")]
     public static class SimulationWorld상호작용공간모판ScenarioBuilder
     {
         public static Simulation공간세계InitialStateRequest Build(

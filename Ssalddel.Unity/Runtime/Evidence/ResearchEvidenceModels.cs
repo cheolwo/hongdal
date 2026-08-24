@@ -48,6 +48,10 @@ namespace Ssalddel.Unity.Evidence
         public string LimitationSummary { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "Unity가 세계 의미·인과·현실 근거와 준비도 문맥을 표현한다.",
+        Boundary = "표현된 근거와 Simulation 규칙 및 운영 사실을 분리한다.")]
     public sealed class 연구근거Validator
     {
         public string[] Validate(연구근거Card card)

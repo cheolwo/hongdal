@@ -17,6 +17,10 @@ namespace Ssalddel.Simulation.Server.Controllers;
     ReadsFrom = SsalddelCodeDataScope.SimulationState | SsalddelCodeDataScope.DerivedWorld,
     FlowOrder = 32,
     Boundary = "정확한 Transform을 받지 않고 양자화한 L3 Cell만 사용하며 Preview는 어떤 원장도 변경하지 않는다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationLhWorldController(
     SimulationLhWorldService lhWorld,
     경영SimulationSessionService sessions) : ControllerBase
@@ -41,7 +45,8 @@ public sealed class SimulationLhWorldController(
                 (state.WorldContext.GameDate.Date
                     - state.WorldContext.GameDateStartsOn.Date).Days + 1,
                 state.WorldContext.WorldTick,
-                state.WorldContext.WorldRevision));
+                state.WorldContext.WorldRevision,
+                state.AreaAccess));
         }
         catch (ArgumentException exception)
         {

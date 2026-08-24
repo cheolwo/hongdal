@@ -156,6 +156,8 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<SimulationRuntimeWorldPresentationService>();
         services.AddScoped<SimulationWorldStreamingService>();
         services.AddScoped<ISimulationLhWindowPlanner, SimulationLhWindowPlanner>();
+        services.AddScoped<ISimulationAreaSetHandoverPlanner,
+            SimulationAreaSetHandoverPlanner>();
         services.AddScoped<SimulationLhWorldService>();
         services.AddScoped<SimulationWorldLandscapeCompositionService>();
         services.AddScoped<SimulationWorldLandscapeCompositionJobShell>();
@@ -189,6 +191,9 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddScoped<SimulationWorld지역표현요약Service>();
         services.AddScoped<SimulationWorldExplorationService>();
         services.AddSingleton<SimulationWorldSurvivalInventoryService>();
+        services.AddSingleton<I세계상호작용실행Pipeline,
+            세계상호작용실행Pipeline>();
+        services.AddSingleton<SimulationNatureSurvivalService>();
         services.AddSingleton<SimulationSurvivalTarotService>();
         services.AddSingleton<SimulationWorldEventProjectionService>();
         services.AddSingleton<SimulationRegionalIncidentService>();

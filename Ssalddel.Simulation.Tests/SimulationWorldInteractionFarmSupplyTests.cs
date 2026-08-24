@@ -8,12 +8,19 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
+using Ssalddel.Simulation.Infrastructure;
 using Ssalddel.WorkflowRules.Contracts;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.",
+    SubmoduleKey = Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceSubmoduleKeys.E3로컬원격동등성)]
 public sealed class SimulationWorldInteractionFarmSupplyTests
 {
     private const string Player = "actor:wi-farm:player";
@@ -135,7 +142,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
     }
 
     [Fact]
-    public void 다섯_E4공간모판은_13개_WI_300kg공급선을_SaveReplay까지다시실행한다()
+    public void Farm_Hub_공간모판은_13개_WI_300kg공급선을_SaveReplay까지다시실행한다()
     {
         var spatialWorld = SimulationWorldInteractionSpatialSeedbedTestFixture
             .CreateSpatialWorld();
@@ -370,6 +377,60 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             value => Assert.Equal(SimulationTaskStateCodes.Completed, value.StateCode));
         Assert.All(packed.SpatialReservations,
             value => Assert.Equal(Simulation공간예약상태Codes.Released, value.StatusCode));
+    }
+
+    [Fact]
+    public void WI_FARM_04는_공통Pipeline에서_Tick결과까지V15증거로완료한다()
+    {
+        var store = new InMemory경영SimulationSessionStore();
+        var session = store.CreateOrGet(CreateRequest());
+        var service = new SimulationFarmSurvivalService(store);
+        var commandId = "command:wi-farm:pipeline-harvest";
+
+        service.ConfirmWork(session.SessionStableId, Confirm(
+            commandId, session.Snapshot().Revision, CultivationUnit,
+            SimulationFarmSurvivalCodes.Harvesting,
+            PyeongchangSimulation공간StableIds.대관령Farm수확공간));
+        var confirmed = session.Snapshot();
+        var beforeTick = session.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = "save:wi-farm:pipeline-before-tick",
+                ExpectedRevision = confirmed.Revision,
+            });
+        Assert.Equal(SimulationSaveSchemaVersions.V15,
+            beforeTick.SchemaVersion);
+        Assert.Equal(
+            SimulationWorldInteractionMaturityStateCodes.ManifestationPartial,
+            Assert.Single(beforeTick.WorldInteractionManifestations).StateCode);
+
+        var completed = session.Advance(Tick(
+            commandId + ":tick", confirmed.Revision));
+        var saved = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:wi-farm:pipeline-completed",
+            ExpectedRevision = completed.Revision,
+        });
+        var manifestation = Assert.Single(saved.WorldInteractionManifestations);
+        Assert.Equal("WI-FARM-04", manifestation.WorldInteractionId);
+        Assert.Equal(
+            SimulationWorldInteractionMaturityStateCodes.Manifested,
+            manifestation.StateCode);
+        Assert.Empty(manifestation.MissingEvidenceCodes);
+        Assert.NotEmpty(manifestation.ResultStateCodes);
+        Assert.Contains(manifestation.TaskOrEffectReferenceIds, value =>
+            value.EndsWith(":production-effect", StringComparison.Ordinal));
+
+        var restored = SimulationSessionReplay.Restore(saved);
+        var restoredSave = restored.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = saved.SaveStableId,
+                ExpectedRevision = restored.Revision,
+            });
+        Assert.Equal(saved.ReplayHash, restoredSave.ReplayHash);
+        Assert.Equal(SimulationWorldInteractionMaturityStateCodes.Manifested,
+            Assert.Single(restoredSave.WorldInteractionManifestations).StateCode);
     }
 
     [Fact]
@@ -739,6 +800,13 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             });
         Assert.False(string.IsNullOrWhiteSpace(save.ReplayHash));
         Assert.Equal(current.Revision, save.Snapshot.Revision);
+        Assert.Equal(SimulationSaveSchemaVersions.V15, save.SchemaVersion);
+        Assert.Contains(save.WorldInteractionManifestations, value =>
+            value.WorldInteractionId == "WI-FARM-04");
+        Assert.Contains(save.WorldInteractionManifestations, value =>
+            value.WorldInteractionId == "WI-FARM-05");
+        Assert.Contains(save.WorldInteractionManifestations, value =>
+            value.WorldInteractionId == "WI-FARM-06");
     }
 
     [Fact]

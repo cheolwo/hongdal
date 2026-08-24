@@ -10,9 +10,13 @@ using Ssalddel.Simulation.Contracts;
 namespace Ssalddel.Simulation.Application
 {
     /// <summary>
-    /// 4개 실제 E5 AreaSet과 AreaSet Network 위에서 41개 WI의 공간 참여 방식을
-    /// 직접 30, 문맥 5, 비공간 6으로 분리해 검증한다.
+    /// 4개 실제 E5 AreaSet과 AreaSet Network 위에서 49개 WI의 공간 참여 방식을
+    /// 직접 37, 문맥 6, 비공간 6으로 분리해 검증한다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "WI와 공간 능력·예약·연결 책임을 결속한다.",
+        Boundary = "H 포함 깊이와 E 증거 성숙도를 서로 대신하지 않는다.")]
     public sealed class SimulationWorld상호작용NetworkService
     {
         private readonly ISimulationWorldActualE5SpatialCatalogReader reader;
@@ -84,7 +88,8 @@ namespace Ssalddel.Simulation.Application
                                SimulationWorld상호작용Graph상태Codes.ContextBound)
                            && nonSpatialBindings.All(item => item.StatusCode ==
                                SimulationWorld상호작용Graph상태Codes.NotSpatiallyApplicable)
-                           && transitions.All(IsReadyTransition);
+                           && transitions.All(IsReadyTransition)
+                           && catalog.PendingE5WiIds.Length == 0;
 
             return Task.FromResult(new SimulationWorld상호작용Network준비도Response
             {
@@ -102,9 +107,12 @@ namespace Ssalddel.Simulation.Application
                 DirectBindings = direct,
                 ContextualBindings = contextual,
                 NonSpatialBindings = nonSpatialBindings,
+                PendingE5WiIds = catalog.PendingE5WiIds
+                    .OrderBy(item => item, StringComparer.Ordinal).ToArray(),
                 Transitions = transitions,
                 TotalWorldInteractionCount = direct.Length + contextual.Length
-                                             + nonSpatialBindings.Length,
+                                             + nonSpatialBindings.Length
+                                             + catalog.PendingE5WiIds.Length,
                 PresentationOnly = true,
                 IsOperationalState = false,
             });
@@ -165,14 +173,16 @@ namespace Ssalddel.Simulation.Application
                 "SimulationWorldInteractionNetworkCatalogMismatch");
             Require(catalog.CatalogHashSha256.Length == 64,
                 "SimulationWorldInteractionNetworkCatalogHashInvalid");
-            Require(catalog.Bindings.Length == 30
-                    && catalog.ContextualBindings.Length == 5
-                    && catalog.NonSpatialWiIds.Length == 6,
+            Require(catalog.Bindings.Length == 37
+                    && catalog.ContextualBindings.Length == 6
+                    && catalog.NonSpatialWiIds.Length == 6
+                    && catalog.PendingE5WiIds.Length == 0,
                 "SimulationWorldInteractionNetworkPartitionInvalid");
             var ids = catalog.Bindings.Select(item => item.WorldInteractionId)
                 .Concat(catalog.ContextualBindings.Select(item => item.WorldInteractionId))
-                .Concat(catalog.NonSpatialWiIds).ToArray();
-            Require(ids.Length == 41 && ids.Distinct(StringComparer.Ordinal).Count() == 41,
+                .Concat(catalog.NonSpatialWiIds)
+                .Concat(catalog.PendingE5WiIds).ToArray();
+            Require(ids.Length == 49 && ids.Distinct(StringComparer.Ordinal).Count() == 49,
                 "SimulationWorldInteractionNetworkCoverageInvalid");
             Require(catalog.Bindings.All(item =>
                     item.ParticipationCode == SimulationWorld상호작용공간참여Codes.Required

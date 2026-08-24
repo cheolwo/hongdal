@@ -106,6 +106,10 @@ public sealed class SimulationWorldScenario규칙항목Entity
     public bool Required { get; set; }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationWorld업무규칙집결Store(SimulationWorld파생DbContext dbContext)
     : ISimulationWorld업무규칙집결Store
 {

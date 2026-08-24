@@ -3,21 +3,25 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.")]
 public sealed class SimulationWorldInteractionSpatialSeedbedTests
 {
     [Fact]
-    public void 다섯_E4공간모판은_13개_E3_WI와_경관구성후보를_결정적으로검증한다()
+    public void 일곱_공간모판은_21개_E3_WI와_경관구성후보를_결정적으로검증한다()
     {
         var first = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
         var second = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
 
         Assert.Equal("simulation-world-interaction-spatial-seedbeds.r1", first.Revision);
-        Assert.Equal("simulation-world-interactions.r5",
+        Assert.Equal("simulation-world-interactions.r8",
             first.WorldInteractionCatalogRevision);
         Assert.Equal("pyeongchang-landscape-grammar.v1",
             first.LandscapeGrammarRevision);
-        Assert.Equal(5, first.Definitions.Length);
-        Assert.Equal(13, first.Definitions.SelectMany(value => value.IncludedWiIds)
+        Assert.Equal(7, first.Definitions.Length);
+        Assert.Equal(21, first.Definitions.SelectMany(value => value.IncludedWiIds)
             .Distinct(StringComparer.Ordinal).Count());
         Assert.Equal(first.CatalogHashSha256, second.CatalogHashSha256);
         Assert.All(first.Definitions, definition =>
@@ -44,11 +48,11 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
     }
 
     [Fact]
-    public void E4모판_Scenario어댑터는_지역좌표없이_기존공간계약을생성한다()
+    public void 공간모판_Scenario어댑터는_지역좌표없이_기존공간계약을생성한다()
     {
         var world = SimulationWorldInteractionSpatialSeedbedTestFixture.CreateSpatialWorld();
 
-        Assert.Equal(9, world.Definitions.Length);
+        Assert.Equal(14, world.Definitions.Length);
         Assert.Equal(world.Definitions.Length, world.Definitions
             .Select(value => value.SpatialStableId).Distinct(StringComparer.Ordinal).Count());
         Assert.All(world.Definitions, definition =>
@@ -207,6 +211,26 @@ internal static class SimulationWorldInteractionSpatialSeedbedTestFixture
                     HubInspection, hubFacility, "area:sim:pyeongchang:jinbu-hub"),
                 Binding("wi-spatial-seedbed:hub-receiving-storage.v1", "storage-area",
                     HubStorage, hubFacility, "area:sim:pyeongchang:jinbu-hub"),
+                Binding("wi-spatial-seedbed:nature-survival-home.v1", "safe-clearing",
+                    "spatial:seedbed:nature-survival-home:safe-clearing",
+                    "facility:scenario:pyeongchang:nature-home",
+                    "area:pyeongchang:nature-home"),
+                Binding("wi-spatial-seedbed:nature-survival-home.v1", "cabin-site",
+                    "spatial:seedbed:nature-survival-home:cabin-site",
+                    "facility:scenario:pyeongchang:nature-home",
+                    "area:pyeongchang:nature-home"),
+                Binding("wi-spatial-seedbed:nature-survival-home.v1", "cabin-threshold",
+                    "spatial:seedbed:nature-survival-home:cabin-threshold",
+                    "facility:scenario:pyeongchang:nature-home",
+                    "area:pyeongchang:nature-home"),
+                Binding("wi-spatial-seedbed:nature-survival-encounter.v1", "harvest-grove",
+                    "spatial:seedbed:nature-survival-encounter:harvest-grove",
+                    "facility:scenario:pyeongchang:nature-encounter",
+                    "area:pyeongchang:nature-home"),
+                Binding("wi-spatial-seedbed:nature-survival-encounter.v1", "encounter-edge",
+                    "spatial:seedbed:nature-survival-encounter:encounter-edge",
+                    "facility:scenario:pyeongchang:nature-encounter",
+                    "area:pyeongchang:nature-home"),
             },
         };
         return SimulationWorld상호작용공간모판ScenarioBuilder.Build(Compile(), profile);

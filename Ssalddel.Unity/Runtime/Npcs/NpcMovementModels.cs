@@ -86,6 +86,10 @@ namespace Ssalddel.Unity.Npcs
         public DateTimeOffset GeneratedAt { get; set; }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E8,
+        "NPC 목표·행동·기억의 생활 연속성을 표현하거나 조율한다.",
+        Boundary = "NPC 표현 코드 존재만으로 E8 폐루프 완료를 주장하지 않는다.")]
     public sealed class NpcMovementMapper
     {
         private static readonly HashSet<string> States = new HashSet<string>(StringComparer.Ordinal)
@@ -313,6 +317,10 @@ namespace Ssalddel.Unity.Npcs
         public string WorldZoneCode { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E8,
+        "NPC 목표·행동·기억의 생활 연속성을 표현하거나 조율한다.",
+        Boundary = "NPC 표현 코드 존재만으로 E8 폐루프 완료를 주장하지 않는다.")]
     public interface INpcMovementApiClient
     {
         Task<NpcMovementApiModel?> GetAsync(
@@ -320,6 +328,10 @@ namespace Ssalddel.Unity.Npcs
             CancellationToken cancellationToken = default);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E8,
+        "NPC 목표·행동·기억의 생활 연속성을 표현하거나 조율한다.",
+        Boundary = "NPC 표현 코드 존재만으로 E8 폐루프 완료를 주장하지 않는다.")]
     public interface INpcMovementRepository
     {
         Task<NpcMovementSnapshot?> 조회Async(
@@ -327,6 +339,10 @@ namespace Ssalddel.Unity.Npcs
             CancellationToken cancellationToken = default);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E8,
+        "NPC 목표·행동·기억의 생활 연속성을 표현하거나 조율한다.",
+        Boundary = "NPC 표현 코드 존재만으로 E8 폐루프 완료를 주장하지 않는다.")]
     public sealed class NpcMovementApiRepository : INpcMovementRepository
     {
         private readonly INpcMovementApiClient apiClient;
@@ -370,6 +386,10 @@ namespace Ssalddel.Unity.Npcs
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E8,
+        "NPC 목표·행동·기억의 생활 연속성을 표현하거나 조율한다.",
+        Boundary = "NPC 표현 코드 존재만으로 E8 폐루프 완료를 주장하지 않는다.")]
     public sealed class NpcMovementQueryUseCase
     {
         private readonly INpcMovementRepository repository;

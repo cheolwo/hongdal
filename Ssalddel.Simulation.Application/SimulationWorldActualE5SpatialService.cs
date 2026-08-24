@@ -25,8 +25,17 @@ namespace Ssalddel.Simulation.Application
         bool TryRead(out SimulationWorldActualE5SpatialCatalog catalog, out string errorCode);
     }
 
-    public sealed class DisabledSimulationWorldActualE5SpatialCatalogReader :
+    /// <summary>
+    /// 신규 코드는 ActualE5라는 단계 이름 대신 조건부 공간 조립 증거로 읽는다.
+    /// 기존 reader 계약과 wire 형식은 호환을 위해 그대로 상속한다.
+    /// </summary>
+    public interface ISimulationWorldSpatialAssemblyCatalogReader :
         ISimulationWorldActualE5SpatialCatalogReader
+    {
+    }
+
+    public sealed class DisabledSimulationWorldActualE5SpatialCatalogReader :
+        ISimulationWorldSpatialAssemblyCatalogReader
     {
         public bool TryRead(out SimulationWorldActualE5SpatialCatalog catalog, out string errorCode)
         {
@@ -37,7 +46,7 @@ namespace Ssalddel.Simulation.Application
     }
 
     public sealed class FileSimulationWorldActualE5SpatialCatalogReader :
-        ISimulationWorldActualE5SpatialCatalogReader
+        ISimulationWorldSpatialAssemblyCatalogReader
     {
         private readonly string path;
 
@@ -126,14 +135,16 @@ namespace Ssalddel.Simulation.Application
             Require(interaction.SchemaVersion == "simulation-world-interaction-graph-binding.v2"
                     && interaction.NetworkStableId == root.Network.NetworkStableId,
                 "ActualE5InteractionCatalogInvalid");
-            Require(interaction.Bindings.Length == 30
-                    && interaction.ContextualBindings.Length == 5
-                    && interaction.NonSpatialWiIds.Length == 6,
+            Require(interaction.Bindings.Length == 37
+                    && interaction.ContextualBindings.Length == 6
+                    && interaction.NonSpatialWiIds.Length == 6
+                    && interaction.PendingE5WiIds.Length == 0,
                 "ActualE5InteractionPartitionInvalid");
             Require(interaction.Bindings.Select(item => item.WorldInteractionId)
                     .Concat(interaction.ContextualBindings.Select(item => item.WorldInteractionId))
                     .Concat(interaction.NonSpatialWiIds)
-                    .Distinct(StringComparer.Ordinal).Count() == 41,
+                    .Concat(interaction.PendingE5WiIds)
+                    .Distinct(StringComparer.Ordinal).Count() == 49,
                 "ActualE5InteractionCoverageInvalid");
         }
 
@@ -186,11 +197,15 @@ namespace Ssalddel.Simulation.Application
         }
     }
 
-    public sealed class SimulationWorldActualE5SpatialService
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "공간 WI의 실행 문맥과 세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+        Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
+    public class SimulationWorldSpatialAssemblyService
     {
         private readonly ISimulationWorldActualE5SpatialCatalogReader reader;
 
-        public SimulationWorldActualE5SpatialService(
+        public SimulationWorldSpatialAssemblyService(
             ISimulationWorldActualE5SpatialCatalogReader reader) =>
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
 
@@ -263,6 +278,22 @@ namespace Ssalddel.Simulation.Application
                     .ToArray(),
                 PresentationOnly = true,
             });
+        }
+    }
+
+    /// <summary>
+    /// 기존 API·DI 소비자를 위한 이름 호환 facade다. 신규 코드는
+    /// SimulationWorldSpatialAssemblyService를 사용한다.
+    /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceCoverageExclusion(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceCoverageExclusionCategory.CompatibilityFacade,
+        "기존 ActualE5 서비스 이름을 보존하는 공간 조립 증거 호환 facade다.")]
+    public sealed class SimulationWorldActualE5SpatialService :
+        SimulationWorldSpatialAssemblyService
+    {
+        public SimulationWorldActualE5SpatialService(
+            ISimulationWorldActualE5SpatialCatalogReader reader) : base(reader)
+        {
         }
     }
 }

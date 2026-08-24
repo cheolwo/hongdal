@@ -12,6 +12,10 @@ namespace Ssalddel.Simulation.Application
     /// 플레이어 주변에서 먼저 준비할 L3 셀과 준비 순서를 계산한다.
     /// 셀 안의 H 의미·배치·현실 공간자료는 알지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public interface ISimulationLhWindowPlanner
     {
         SimulationLhWindowPlan Plan(
@@ -36,6 +40,10 @@ namespace Ssalddel.Simulation.Application
         public int Priority { get; init; }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class SimulationLhWindowPlanner : ISimulationLhWindowPlanner
     {
         public SimulationLhWindowPlan Plan(

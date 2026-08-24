@@ -9,6 +9,10 @@ using Ssalddel.WorkflowRules.Contracts;
 
 namespace Ssalddel.Simulation.Application
 {
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public sealed class SimulationFreight렌더링의도Projector
 {
     public const string RuleRevision = "simulation-render-intent.freight.v1";
@@ -112,6 +116,10 @@ public sealed class Simulation렌더링의도합성결과
         Array.Empty<Simulation렌더링의도억제기록>();
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public sealed class Simulation렌더링의도합성Policy
 {
     public Simulation렌더링의도합성결과 Compose(
@@ -273,6 +281,10 @@ public sealed class Simulation기본Urp표현Catalog
         };
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public sealed class SimulationRuntimeWorldPresentationService
 {
     private readonly SimulationFreight렌더링의도Projector _projector;
@@ -331,6 +343,10 @@ public sealed class SimulationRuntimeWorldPresentationService
     }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public static class Simulation렌더링PipelineValidator
 {
     public const string InvalidCode = "SimulationRenderingPipelineInvalid";

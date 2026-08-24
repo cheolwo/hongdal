@@ -148,6 +148,10 @@ namespace Ssalddel.Unity.Warehouse
     }
 
     /// <summary>기존 W1 소비 코드와의 호환 facade입니다.</summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "Unity WI 표현과 공간 능력·연결 책임을 결속한다.",
+        Boundary = "Unity 배선이 H 또는 E 증거를 자동 승격하지 않는다.")]
     public sealed class WarehouseWorldSelectionService
     {
         private readonly WarehouseRelationResolver resolver;

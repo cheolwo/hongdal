@@ -156,6 +156,10 @@ namespace Ssalddel.Unity.TeamRoles
         public bool PresentationOnly { get; set; }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class TeamRoleCardPresentationMapper
     {
         public TeamRoleCardPresentationState Map(TeamRoleCardStateApiModel source)
@@ -206,6 +210,10 @@ namespace Ssalddel.Unity.TeamRoles
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 권위 Core 또는 원격 Host와 통신하는 Adapter 경계를 제공한다.",
+        Boundary = "Unity 표현은 서버·Local Runtime의 권위 상태를 대신하지 않는다.")]
     public interface ITeamRoleCardAuthorityClient
     {
         Task<TeamRoleCardStateApiModel> LoadAsync(string sessionStableId,
@@ -221,6 +229,10 @@ namespace Ssalddel.Unity.TeamRoles
             CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class TeamRoleCardClientCoordinator
     {
         private readonly ITeamRoleCardAuthorityClient authority;

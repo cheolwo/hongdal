@@ -85,6 +85,10 @@ internal sealed class SimulationSession저장자료Configuration
     WritesTo = SsalddelCodeDataScope.SimulationState,
     FlowOrder = 50,
     Boundary = "공유 공공데이터 DB가 아니라 별도 SimulationSession DB만 읽고 쓴다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "결정성·Save/Replay 또는 회귀 검증 책임을 제공한다.",
+    Boundary = "저장 구현 존재만으로 상위 E 증거를 승격하지 않는다.")]
 public sealed class SimulationSessionSaveStore(
     IDbContextFactory<SimulationSessionDbContext> dbContextFactory)
     : ISimulationSessionSaveStore

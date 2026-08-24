@@ -105,6 +105,10 @@ namespace Ssalddel.Unity.Battles
     /// 1인칭 우클릭은 평소 마우스 시점을 보존하고 피격 예고 중에만 회피가 되며,
     /// 3인칭 우클릭은 평소 접근 이동, 피격 예고 중 회피가 된다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public static class LocalCombatInputCommandFactory
     {
         public static LocalCombatActionCommandDraft? CreatePointerAction(

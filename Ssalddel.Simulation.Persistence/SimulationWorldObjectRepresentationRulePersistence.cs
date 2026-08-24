@@ -104,6 +104,10 @@ public sealed class SimulationWorld객체표현해석ResultEntity
     public SimulationWorld객체표현해석RunEntity InterpretationRun { get; set; } = null!;
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationWorld객체표현규칙Store(
     SimulationWorld파생DbContext dbContext) : ISimulationWorld객체표현규칙Store
 {

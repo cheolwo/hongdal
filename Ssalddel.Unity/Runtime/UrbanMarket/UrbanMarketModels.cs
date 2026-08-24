@@ -63,11 +63,19 @@ namespace Ssalddel.Unity.UrbanMarket
         public 도심마트상품ScreenModel[] 상품목록 { get; set; } = Array.Empty<도심마트상품ScreenModel>();
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public interface I도심마트조회UseCase
     {
         Task<도심마트ScreenModel> 조회Async(CancellationToken cancellationToken = default);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class Simulated도심마트조회UseCase : I도심마트조회UseCase
     {
         private readonly I도심마트공개상품DataQuery dataQuery;
@@ -95,6 +103,10 @@ namespace Ssalddel.Unity.UrbanMarket
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 도심마트ScreenModelValidator
     {
         private static readonly HashSet<string> SourceTypes = new HashSet<string>(StringComparer.Ordinal)

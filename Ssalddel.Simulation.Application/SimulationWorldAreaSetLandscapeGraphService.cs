@@ -9,6 +9,10 @@ using Ssalddel.Simulation.Domain;
 namespace Ssalddel.Simulation.Application
 {
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public interface ISimulationWorldAreaSetGraphStore
 {
     Task ReplaceAreaSetBuildAsync(
@@ -29,6 +33,10 @@ public interface ISimulationWorldAreaSetGraphStore
         CancellationToken cancellationToken = default);
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class DisabledSimulationWorldAreaSetGraphStore : ISimulationWorldAreaSetGraphStore
 {
     public Task ReplaceAreaSetBuildAsync(
@@ -52,6 +60,10 @@ public sealed class DisabledSimulationWorldAreaSetGraphStore : ISimulationWorldA
         Task.FromResult<SimulationWorldLandscapeCompositionTileResponse?>(null);
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class SimulationWorldAreaSetLandscapeGraphJobShell
 {
     private readonly ISimulationWorldAreaSetDefinitionReader _definitionReader;
@@ -220,6 +232,10 @@ public sealed class SimulationWorldAreaSetLandscapeGraphJobShell
     };
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class SimulationWorldAreaSetLandscapeGraphService
 {
     private readonly ISimulationWorldAreaSetDefinitionReader _definitionReader;
@@ -297,6 +313,10 @@ public sealed class SimulationWorldAreaSetLandscapeGraphService
 /// 서로 다른 Graph는 Node를 직접 참조하지 않고 AreaSet의 Connector pair로만 이어진다.
 /// 양쪽 Graph가 모두 생성 가능한 시점에만 실제 stub 호환을 검사한다.
 /// </summary>
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public static class SimulationWorldLandscapeGraphRelationValidator
 {
     private const double MaximumConnectorDistanceMeters = 2d;

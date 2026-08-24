@@ -11,6 +11,10 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.")]
 public sealed class SimulationServerHttpBoundaryTests
 {
     [Fact]
@@ -37,9 +41,9 @@ public sealed class SimulationServerHttpBoundaryTests
         var hash = Convert.ToHexString(SHA256.HashData(
                 Encoding.UTF8.GetBytes(string.Join("\n", manifest))))
             .ToLowerInvariant();
-        Assert.Equal(149, manifest.Length);
+        Assert.Equal(155, manifest.Length);
         Assert.Equal(
-            "499e3c78ba25e74cd35f7d054a36179dd0471d59a945c995ba10a9454ae1dd65",
+            "827a8edc77ef5e908dc9daa75f26af99a4e9f2de7f2ef41f01c9d547010a8f5c",
             hash);
     }
 

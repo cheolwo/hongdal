@@ -17,6 +17,10 @@ namespace Ssalddel.Simulation.Application
             CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "세계 의미·인과·근거와 플레이 준비도 책임을 제공한다.",
+        Boundary = "근거 자료와 Simulation 규칙 및 E 승격을 분리한다.")]
     public interface ISimulationFarmRealityEvidenceStore
     {
         Task<SimulationFarmRealityEvidenceSyncResponse> UpsertAsync(
@@ -39,6 +43,10 @@ namespace Ssalddel.Simulation.Application
         Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
         FlowOrder = 30,
         Boundary = "Provider를 호출하지 않고 승인된 운영 자료만 읽으며 ContextProposal 외 Simulation 효과를 만들지 않는다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "세계 의미·인과·근거와 플레이 준비도 책임을 제공한다.",
+        Boundary = "근거 자료와 Simulation 규칙 및 E 승격을 분리한다.")]
     public sealed class SimulationFarmRealityEvidenceService
     {
         private readonly ISimulationFarmRealityOperationalReader operationalReader;

@@ -19,6 +19,10 @@ namespace Ssalddel.Simulation.Application
         ReadsFrom = SsalddelCodeDataScope.SimulationState | SsalddelCodeDataScope.DerivedWorld,
         FlowOrder = 31,
         Boundary = "Preview는 공간 권위·운영 원장·자원 원장을 변경하지 않는다. 시나리오 셀 내용 공급자는 실제 E5·E6 근거로 자동 승격되지 않는다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class SimulationLhWorldService
     {
         public const string ProfileRevision = "lh-world.pyeongchang-farm.r1";
@@ -70,21 +74,31 @@ namespace Ssalddel.Simulation.Application
 
         private readonly ISimulationLhWindowPlanner windowPlanner;
         private readonly ISimulationLhCellContentSource cellContentSource;
+        private readonly ISimulationAreaSetHandoverPlanner? handoverPlanner;
 
         public SimulationLhWorldService()
             : this(new SimulationLhWindowPlanner(),
-                new ScenarioProceduralSimulationLhCellContentSource())
+                new ScenarioProceduralSimulationLhCellContentSource(), null)
         {
         }
 
         public SimulationLhWorldService(
             ISimulationLhWindowPlanner streamingWindowPlanner,
             ISimulationLhCellContentSource contentSource)
+            : this(streamingWindowPlanner, contentSource, null)
+        {
+        }
+
+        public SimulationLhWorldService(
+            ISimulationLhWindowPlanner streamingWindowPlanner,
+            ISimulationLhCellContentSource contentSource,
+            ISimulationAreaSetHandoverPlanner? areaSetHandoverPlanner)
         {
             windowPlanner = streamingWindowPlanner
                 ?? throw new ArgumentNullException(nameof(streamingWindowPlanner));
             cellContentSource = contentSource
                 ?? throw new ArgumentNullException(nameof(contentSource));
+            handoverPlanner = areaSetHandoverPlanner;
         }
 
         public static SimulationLhWorldProfileResponse CreateDefaultProfile()
@@ -143,7 +157,8 @@ namespace Ssalddel.Simulation.Application
             SimulationLhCellPreviewRequest request,
             int dayNumber,
             int worldTick,
-            long worldRevision)
+            long worldRevision,
+            SimulationPlayerAreaAccessStateSnapshot? areaAccess = null)
         {
             ValidateRequest(request, worldRevision);
             var profile = CreateDefaultProfile();
@@ -161,6 +176,26 @@ namespace Ssalddel.Simulation.Application
                 .OrderBy(value => value.Priority)
                 .ThenBy(value => value.CellKey, StringComparer.Ordinal)
                 .ToArray();
+            var handover = handoverPlanner?.Plan(
+                new SimulationAreaSetHandoverPlanRequest
+                {
+                    RequestEpoch = request.RequestEpoch,
+                    FocusL3CellKey = request.FocusL3CellKey,
+                    MovementDirectionCode = request.MovementDirectionCode,
+                    CurrentAreaSetStableId = areaAccess?.CurrentAreaSetStableId
+                                             ?? string.Empty,
+                    AreaAccess = areaAccess,
+                }) ?? new SimulationAreaSetHandoverPlanResponse
+                {
+                    RequestEpoch = request.RequestEpoch.Trim(),
+                    FocusL3CellKey = request.FocusL3CellKey,
+                    MovementDirectionCode = request.MovementDirectionCode,
+                    AvailabilityCode = SimulationAreaSetHandoverCodes.NotAvailable,
+                    BlockingReasonCodes = new[] { "AreaSetHandoverPlannerNotConfigured" },
+                    Candidates = Array.Empty<SimulationAreaSetHandoverCandidateResponse>(),
+                    PlanHashSha256 = Hash("area-set-handover:not-configured|"
+                                            + request.RequestEpoch.Trim()),
+                };
 
             return new SimulationLhCellPreviewResponse
             {
@@ -172,6 +207,7 @@ namespace Ssalddel.Simulation.Application
                 WorldRevision = worldRevision,
                 Season = season,
                 Profile = profile,
+                AreaSetHandover = handover,
                 Cells = cells,
                 OutsideCoverageCellKeys = window.OutsideCoverageCellKeys,
                 IsCandidateOnly = true,

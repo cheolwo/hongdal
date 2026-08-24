@@ -19,6 +19,10 @@ namespace Ssalddel.Simulation.Server.Controllers;
     WritesTo = SsalddelCodeDataScope.SimulationState,
     FlowOrder = 20,
     Boundary = "기존 route를 보존하며 운영 상태나 Unity 표현 상태를 직접 변경하지 않는다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class 경영SimulationWorldGameplayController(
     경영SimulationWorldGameplayService service) : SimulationApiControllerBase
 {

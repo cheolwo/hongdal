@@ -147,6 +147,10 @@ namespace Ssalddel.Unity.PresentationContracts.LearningCards
     /// Perspective가 결정한 의미를 공통 카드 계약으로 정규화합니다.
     /// 권한을 만들거나 업무 값을 다시 계산하지 않습니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class ConceptCardDeckProjector
     {
         public ConceptCardDeckPresentationModel? Project(ConceptCardDeckProjectionInput source)

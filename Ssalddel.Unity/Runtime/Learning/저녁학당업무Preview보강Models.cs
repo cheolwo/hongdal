@@ -64,6 +64,10 @@ namespace Ssalddel.Unity.Learning
     /// 저녁 학당에서 고른 한 규칙을 다음 날 업무 Preview의 정보 보강으로만 투영합니다.
     /// 원본 Preview의 revision, 상품, 수량, 단위, source lineage와 허용 intent는 변경하지 않습니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 저녁학당업무Preview보강Projector
     {
         public 저녁학당업무Preview보강 Project(저녁학당업무Preview보강Input input)

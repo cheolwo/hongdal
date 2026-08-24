@@ -73,6 +73,10 @@ namespace Ssalddel.Unity.UrbanMarket
             Array.Empty<ConceptCardSourceLineageItem>();
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class UrbanMarketSupplyManagementPresentationMapper
     {
         public UrbanMarketSupplyManagementPresentationModel Map(UrbanMarketSupplyManagementApiModel source)
@@ -168,6 +172,10 @@ namespace Ssalddel.Unity.UrbanMarket
         void ApplyRepresentativeDialogue(ResidentialGroupRepresentativeDialoguePresentationModel model);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class ResidentialGroupRepresentativeUnityCoordinator
     {
         private readonly ResidentialGroupRepresentativeVisitValidator visitValidator =

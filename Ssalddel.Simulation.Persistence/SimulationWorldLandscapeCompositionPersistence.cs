@@ -100,6 +100,10 @@ public sealed class SimulationWorld경관조립미해결Entity
     public SimulationWorld경관조립실행Entity? Run { get; set; }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 경관 조립 문맥과 계보를 저장한다.",
+    Boundary = "경관 조립 저장만으로 권위 상태 전이와 결과 발현을 증명하지 않는다.")]
 public sealed class SimulationWorldLandscapeCompositionStore(
     SimulationWorld파생DbContext dbContext)
     : ISimulationWorldLandscapeCompositionStore,

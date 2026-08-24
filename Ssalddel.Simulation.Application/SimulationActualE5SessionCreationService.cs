@@ -10,6 +10,10 @@ namespace Ssalddel.Simulation.Application
     /// 위치 독립 실제 E5 경관과 H5 배치를 검증한 뒤 세션 공간 상태를 생성한다.
     /// 클라이언트가 임의 공간 정의를 주입하거나 E5 실패를 Scenario로 대체할 수 없다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class SimulationActualE5SessionCreationService
     {
         private readonly SimulationWorld상호작용NetworkService interactionNetwork;

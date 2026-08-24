@@ -20,6 +20,10 @@ namespace Ssalddel.Simulation.Application
             out string missingLayerCode);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+        Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
     public interface ISimulationWorldLandscapeCompositionStore
     {
         Task ReplaceBuildAsync(
@@ -46,6 +50,10 @@ namespace Ssalddel.Simulation.Application
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+        Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
     public sealed class DisabledSimulationWorldLandscapeCompositionStore
         : ISimulationWorldLandscapeCompositionStore,
           ISimulationWorldLandscapeCompositionReader
@@ -72,6 +80,10 @@ namespace Ssalddel.Simulation.Application
         Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
         FlowOrder = 44,
         Boundary = "자료가 없는 타일은 꾸며내지 않고 대기 상태로 저장하며 Unity Prefab을 해석하지 않는다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+        Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
     public sealed class SimulationWorldLandscapeCompositionJobShell
     {
         public static readonly string[] FirstVerticalSliceTileKeys =
@@ -167,6 +179,10 @@ namespace Ssalddel.Simulation.Application
             };
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+        "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+        Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
     public sealed class SimulationWorldLandscapeCompositionService
     {
         private readonly ISimulationWorldLandscapeCompositionReader _reader;

@@ -77,6 +77,10 @@ namespace Ssalddel.Unity.PublicData
     /// 서버가 확정한 현상과 선택형 출처 설명만 투영한다.
     /// 관측 원수치, 입력 hash, API key, 필지 식별자는 이 경계에 존재하지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "Unity가 세계 의미·인과·현실 근거와 준비도 문맥을 표현한다.",
+        Boundary = "표현된 근거와 Simulation 규칙 및 운영 사실을 분리한다.")]
     public sealed class RealityContextPresentationMapper
     {
         public RealityContextWorldPresentation Map(
@@ -133,12 +137,20 @@ namespace Ssalddel.Unity.PublicData
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "Unity가 세계 의미·인과·현실 근거와 준비도 문맥을 표현한다.",
+        Boundary = "표현된 근거와 Simulation 규칙 및 운영 사실을 분리한다.")]
     public interface IRealityContextApiClient
     {
         Task<RealityContextPlayerProjectionApiModel> GetAsync(string sessionStableId,
             bool includeSourceDetails, CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "Unity가 세계 의미·인과·현실 근거와 준비도 문맥을 표현한다.",
+        Boundary = "표현된 근거와 Simulation 규칙 및 운영 사실을 분리한다.")]
     public sealed class RealityContextRepository
     {
         private readonly IRealityContextApiClient apiClient;
@@ -164,6 +176,10 @@ namespace Ssalddel.Unity.PublicData
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "Unity가 세계 의미·인과·현실 근거와 준비도 문맥을 표현한다.",
+        Boundary = "표현된 근거와 Simulation 규칙 및 운영 사실을 분리한다.")]
     public sealed class RealityContextUseCase
     {
         private readonly RealityContextRepository repository;

@@ -4,6 +4,10 @@ using Ssalddel.Unity.Learning;
 
 namespace Ssalddel.Unity.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.")]
 public sealed class 수출항만인수학당PreviewAdapterTests
 {
     private readonly 수출항만인수학당PreviewAdapter adapter = new();

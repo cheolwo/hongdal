@@ -216,6 +216,10 @@ namespace Ssalddel.Unity.Survival
     /// 서버가 확정한 전투 박자를 카메라·HUD 표현으로만 투영한다.
     /// 허용 구간과 판정 수치는 재계산하지 않고 서버 상태 사본을 그대로 사용한다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class FarmCombatPresentationMapper
     {
         public FarmCombatPresentationFrame Map(
@@ -312,6 +316,10 @@ namespace Ssalddel.Unity.Survival
         WritesTo = SsalddelCodeDataScope.ClientPresentation,
         Effects = SsalddelCodeEffect.UiStateMutation,
         Boundary = "피해·판정 등급·전술 효과를 계산하지 않고 안정 식별자와 입력 시각만 전달한다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public static class FarmCombatInputCommandFactory
     {
         public static FarmCombatPerspectiveCommandDraft CreatePerspective(
@@ -419,6 +427,10 @@ namespace Ssalddel.Unity.Survival
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 권위 Core 또는 원격 Host와 통신하는 Adapter 경계를 제공한다.",
+        Boundary = "Unity 표현은 서버·Local Runtime의 권위 상태를 대신하지 않는다.")]
     public interface ISimulationFarmCombatAuthorityClient
     {
         Task<FarmCombatStateApiModel> LoadAsync(
@@ -467,6 +479,10 @@ namespace Ssalddel.Unity.Survival
                 : throw new ArgumentException("FarmCombatRouteValueRequired", name);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public static class FarmCombatReactionCommandFactory
     {
         public static FarmCombatReactionCommandDraft Create(
@@ -546,6 +562,10 @@ namespace Ssalddel.Unity.Survival
         public bool ChangesWorldState { get; set; }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class FarmTacticalMovementPresentationMapper
     {
         private const int MaximumDisplayedMembersPerSquad = 6;
@@ -693,6 +713,10 @@ namespace Ssalddel.Unity.Survival
     /// 서버가 연 명령창과 주변 전선만 3인칭 전술 제안으로 투영한다.
     /// 카메라는 강제로 바꾸지 않고 사용자가 제안을 수락했을 때만 기존 곡선 전환을 사용한다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class FarmTacticalOrderPresentationMapper
     {
         public FarmTacticalOrderPresentationFrame Map(
@@ -784,6 +808,10 @@ namespace Ssalddel.Unity.Survival
         public string OpportunityStableId { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public static class FarmTacticalOrderCommandFactory
     {
         public static FarmTacticalOrderPreviewDraft CreatePreview(

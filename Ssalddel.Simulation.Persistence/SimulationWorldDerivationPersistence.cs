@@ -332,6 +332,10 @@ public sealed class SimulationWorldUnity산출물Entity
     WritesTo = SsalddelCodeDataScope.DerivedWorld,
     FlowOrder = 30,
     Boundary = "SimulationWorldDerived DB만 변경하며 입력 fingerprint가 다른 같은 식별자는 충돌로 거부한다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationWorld파생원장Store(
     SimulationWorld파생DbContext dbContext) : ISimulationWorld파생원장Store
 {

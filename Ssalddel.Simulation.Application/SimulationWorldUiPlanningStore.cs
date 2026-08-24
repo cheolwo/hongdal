@@ -20,6 +20,10 @@ public sealed class SimulationWorldUI기획저장결과
     public int RuleBindingCount { get; set; }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public interface ISimulationWorldUI기획Store
 {
     Task<SimulationWorldUI기획저장결과> 저장Async(
@@ -39,6 +43,10 @@ public sealed class PyeongchangSimulationWorldUI기획Assembler : ISimulationWor
         PyeongchangSimulationWorldUI기획Factory.Create(businessRules);
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public sealed class SimulationWorldUI기획JobShell
 {
     public const string BusinessRuleCatalogNotFoundCode = "SimulationWorldUiPlanningBusinessRuleCatalogNotFound";
@@ -67,6 +75,10 @@ public sealed class SimulationWorldUI기획JobShell
     }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
 public static class PyeongchangSimulationWorldUI기획Factory
 {
     public static SimulationWorldUI기획원장 Create(SimulationWorld업무규칙집결원장 rules)

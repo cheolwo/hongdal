@@ -20,6 +20,10 @@ namespace Ssalddel.Simulation.Server.Controllers;
     WritesTo = SsalddelCodeDataScope.SimulationState,
     Effects = SsalddelCodeEffect.StateMutation,
     Boundary = "Simulation 전용 경로이며 운영 서버 권한·원장을 변경하지 않는다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationFarmSurvivalController(
     SimulationFarmSurvivalService service) : ControllerBase
 {

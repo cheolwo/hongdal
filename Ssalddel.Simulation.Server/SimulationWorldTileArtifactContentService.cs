@@ -13,6 +13,10 @@ public sealed record SimulationWorldTileArtifactFile(
 /// 파생 DB가 가리킨 로컬 개발 산출물을 경로 이탈과 SHA-256 변조 없이 제공한다.
 /// 운영 객체 저장소 전송 경계는 별도 구현으로 교체한다.
 /// </summary>
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationWorldTileArtifactContentService(
     IOptions<SimulationWorldDerivationDatabaseOptions> options,
     IWebHostEnvironment environment)

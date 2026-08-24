@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.Simulation.Domain",
+  "rootNamespace": "Ssalddel.Simulation.Domain",
+  "references": ["Ssalddel.CodeMetadata", "Ssalddel.Simulation.Contracts", "Ssalddel.WorkflowRules.Contracts", "Ssalddel.WorkflowRules"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

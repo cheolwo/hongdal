@@ -121,6 +121,10 @@ namespace Ssalddel.Unity.Warehouse
     /// 기존 소비 코드의 호환 facade입니다. 새 코드는 WarehouseDataMapper와
     /// WarehouseWorldInterpreter를 명시적으로 조합합니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class WarehouseWorldMapper
     {
         private readonly WarehouseDataMapper dataMapper;
@@ -141,14 +145,26 @@ namespace Ssalddel.Unity.Warehouse
             => interpreter.Interpret(dataMapper.Map(source));
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 권위 Core 또는 원격 Host와 통신하는 Adapter 경계를 제공한다.",
+        Boundary = "Unity 표현은 서버·Local Runtime의 권위 상태를 대신하지 않는다.")]
     public interface IWarehouseWorldApiClient
     {
         Task<WarehouseWorldSnapshotApiModel> GetAsync(long warehouseId, CancellationToken cancellationToken = default);
     }
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public interface IWarehouseWorldRepository
     {
         Task<WarehouseWorldSnapshot> 조회Async(long warehouseId, CancellationToken cancellationToken = default);
     }
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 권위 Core 또는 원격 Host와 통신하는 Adapter 경계를 제공한다.",
+        Boundary = "Unity 표현은 서버·Local Runtime의 권위 상태를 대신하지 않는다.")]
     public sealed class WarehouseWorldApiRepository : IWarehouseWorldRepository
     {
         private readonly IWarehouseWorldApiClient client; private readonly WarehouseWorldMapper mapper;
@@ -159,6 +175,10 @@ namespace Ssalddel.Unity.Warehouse
             return mapper.Map(await client.GetAsync(warehouseId, cancellationToken).ConfigureAwait(false));
         }
     }
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class WarehouseWorldQueryUseCase
     {
         private readonly IWarehouseDataRepository? dataRepository;
@@ -249,6 +269,10 @@ namespace Ssalddel.Unity.Warehouse
         WritesTo = SsalddelCodeDataScope.ClientPresentation,
         FlowOrder = 20,
         Boundary = "권한 적용된 창고 Projection만 표현하며 Unity가 입출고 완료를 확정하지 않는다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class WarehouseWorldLoadCoordinator
     {
         private readonly WarehouseWorldQueryUseCase query;

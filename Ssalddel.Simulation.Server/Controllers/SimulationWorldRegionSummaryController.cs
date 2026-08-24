@@ -18,6 +18,10 @@ namespace Ssalddel.Simulation.Server.Controllers;
     ReadsFrom = SsalddelCodeDataScope.DerivedWorld,
     FlowOrder = 25,
     Boundary = "요약 응답에는 상호명을 넣지 않고 명시적인 공개 상세 조회에서만 공개 공공데이터 상호명을 반환한다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationWorldRegionSummaryController(
     SimulationWorld지역표현요약Service service) : ControllerBase
 {

@@ -41,6 +41,10 @@ public sealed class SimulationWorld업무규칙집결Reader(SimulationWorld파�
     }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationWorldUI기획Store(SimulationWorld파생DbContext db) : ISimulationWorldUI기획Store
 {
     public async Task<SimulationWorldUI기획저장결과> 저장Async(SimulationWorldUI기획원장 plan, SimulationWorld업무규칙집결원장 rules, CancellationToken cancellationToken)

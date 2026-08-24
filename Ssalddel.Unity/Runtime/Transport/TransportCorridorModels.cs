@@ -31,6 +31,10 @@ namespace Ssalddel.Unity.Transport
         public InterpretationLineage Lineage { get; set; } = null!;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "권위 회랑 상태를 Unity 이동·표현 모델로 투영한다.",
+        Boundary = "투영 모델은 통행 권위나 WI 발현을 확정하지 않는다.")]
     public sealed class TransportCorridorProjector
     {
         public TransportCorridorSnapshot? Project(CargoWarehouseHandoffSnapshot? handoff)
@@ -91,6 +95,10 @@ namespace Ssalddel.Unity.Transport
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 회랑 조회 흐름을 조율한다.",
+        Boundary = "조회 UseCase는 Simulation 상태나 WorldRevision을 바꾸지 않는다.")]
     public sealed class TransportCorridorQueryUseCase
     {
         private readonly CargoWarehouseHandoffQueryUseCase handoffQuery;

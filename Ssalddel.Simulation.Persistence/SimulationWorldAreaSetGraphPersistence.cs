@@ -91,6 +91,10 @@ public sealed class SimulationWorld경관Graph관계Entity
     public string RouteSignature { get; set; } = string.Empty;
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 AreaSet·Graph·통행 문맥을 저장한다.",
+    Boundary = "Graph 저장은 WI Invocation·Task·Effect·결과를 대신하지 않는다.")]
 public sealed class SimulationWorldAreaSetGraphStore(SimulationWorld파생DbContext dbContext)
     : ISimulationWorldAreaSetGraphStore
 {

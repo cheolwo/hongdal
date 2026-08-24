@@ -9,15 +9,10 @@ using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Application
 {
-    public interface ISimulationBattleWorldReconciler
-    {
-        void EnsureWorldTickCanAdvance(string sessionStableId);
-        void Reconcile(string sessionStableId, 경영SimulationSessionSnapshot world);
-        SimulationBattleSaveRecordSnapshot[] Capture(string sessionStableId);
-        void Restore(string sessionStableId,
-            SimulationBattleSaveRecordSnapshot[] records);
-    }
-
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public interface ISimulationBattleInstanceStore
     {
         SimulationBattleInstanceState? Find(string battleStableId);
@@ -28,11 +23,6 @@ namespace Ssalddel.Simulation.Application
         SimulationBattleSaveRecordSnapshot[] CaptureSession(string sessionStableId);
         void RestoreSession(string sessionStableId,
             SimulationBattleSaveRecordSnapshot[] records);
-    }
-
-    public interface ISimulationBattleResourceLockReader
-    {
-        bool IsLocked(string sessionStableId, string resourceStableId);
     }
 
     public interface ISimulationBattleReservationReader
@@ -54,6 +44,10 @@ namespace Ssalddel.Simulation.Application
         WritesTo = SsalddelCodeDataScope.SimulationState,
         FlowOrder = 30,
         Boundary = "전투 Tick과 경영 WorldTick을 분리하고 완료 결과만 안전한 WorldTick에 합류시킨다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class SimulationBattleInstanceService : ISimulationBattleWorldReconciler
     {
         private readonly I경영SimulationSessionStore sessionStore;

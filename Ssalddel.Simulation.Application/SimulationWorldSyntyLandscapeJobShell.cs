@@ -37,6 +37,10 @@ public sealed class SimulationWorldSynty경관저장결과
     public int RejectionCount { get; set; }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public interface ISimulationWorldSynty경관Store
 {
     Task<SimulationWorldSynty경관저장결과> 저장Async(
@@ -55,6 +59,10 @@ public sealed class SimulationWorldSynty경관계획결과
         Array.Empty<SimulationWorldSynty배치거부>();
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public interface ISimulationWorldSynty경관Planner
 {
     SimulationWorldSynty경관계획결과 계획(
@@ -75,6 +83,10 @@ public interface ISimulationWorldSynty경관Planner
     WritesTo = SsalddelCodeDataScope.DerivedWorld,
     FlowOrder = 30,
     Boundary = "Synty 원본 경로나 Prefab 이름을 업무 권위로 사용하지 않고 공간 출력 hash를 입력으로 삼는다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class SimulationWorldSynty경관JobShell
 {
     public const string SpatialBuildNotFoundCode = "SimulationWorldSpatialBuildNotFound";
@@ -189,6 +201,10 @@ public sealed class SimulationWorldSynty경관JobShell
     }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class SimulationWorld기본Synty경관Planner : ISimulationWorldSynty경관Planner
 {
     public SimulationWorldSynty경관계획결과 계획(

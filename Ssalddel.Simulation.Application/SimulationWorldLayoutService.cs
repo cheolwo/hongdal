@@ -133,6 +133,10 @@ public sealed class FileSimulationWorldLayoutCatalogReader :
     }
 }
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 실행 문맥·세계 발현 판정에 사용할 공간 조립 증거를 제공한다.",
+    Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class SimulationWorldLayoutService
 {
     private readonly ISimulationWorldLayoutCatalogReader reader;

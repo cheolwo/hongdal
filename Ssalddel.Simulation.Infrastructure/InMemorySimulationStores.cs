@@ -19,6 +19,10 @@ namespace Ssalddel.Simulation.Infrastructure
         WritesTo = SsalddelCodeDataScope.SimulationState,
         FlowOrder = 50,
         Boundary = "프로세스 내부 저장소이며 durable 저장이나 다중 인스턴스 동기화를 보장하지 않는다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
     public sealed class InMemory경영SimulationSessionStore : I경영SimulationSessionStore
     {
         private readonly ConcurrentDictionary<string, 경영SimulationSessionAggregate> sessions =
@@ -51,6 +55,10 @@ namespace Ssalddel.Simulation.Infrastructure
     }
 
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "결정성·Save/Replay 또는 회귀 검증 책임을 제공한다.",
+        Boundary = "저장 구현 존재만으로 상위 E 증거를 승격하지 않는다.")]
     public sealed class InMemorySimulationSessionSaveStore : ISimulationSessionSaveStore
     {
         private readonly ConcurrentDictionary<string, SimulationSessionSavePackage> saves =

@@ -96,6 +96,10 @@ namespace Ssalddel.Simulation.Application
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "E5에서 발현한 공간 WI 폐루프의 의미·인과·배치·통행·권위·최신성을 정제한다.",
+        Boundary = "정제 준비도는 E7 실제 플레이나 E5 발현을 대신하지 않는다.")]
     public sealed class SimulationAreaSetImmersionService
     {
         private readonly ISimulationAreaSetImmersionCatalogReader reader;

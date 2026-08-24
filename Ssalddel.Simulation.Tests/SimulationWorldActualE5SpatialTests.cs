@@ -6,6 +6,10 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.")]
 public sealed class SimulationWorldActualE5SpatialTests
 {
     [Fact]
@@ -38,7 +42,7 @@ public sealed class SimulationWorldActualE5SpatialTests
     }
 
     [Fact]
-    public async Task 마흔한개WI를_직접30_문맥5_비공간6으로완전분류한다()
+    public async Task 마흔아홉개WI를_직접37_문맥6_비공간6으로완전분류한다()
     {
         var service = new SimulationWorld상호작용NetworkService(Reader());
 
@@ -46,10 +50,11 @@ public sealed class SimulationWorldActualE5SpatialTests
 
         Assert.Equal(SimulationWorld상호작용Graph상태Codes.Ready,
             result.OverallStatusCode);
-        Assert.Equal(41, result.TotalWorldInteractionCount);
-        Assert.Equal(30, result.DirectBindings.Length);
-        Assert.Equal(5, result.ContextualBindings.Length);
+        Assert.Equal(49, result.TotalWorldInteractionCount);
+        Assert.Equal(37, result.DirectBindings.Length);
+        Assert.Equal(6, result.ContextualBindings.Length);
         Assert.Equal(6, result.NonSpatialBindings.Length);
+        Assert.Empty(result.PendingE5WiIds);
         Assert.Equal(19, result.GraphAudits.Length);
         Assert.All(result.DirectBindings, item =>
         {
@@ -66,8 +71,11 @@ public sealed class SimulationWorldActualE5SpatialTests
         Assert.All(result.NonSpatialBindings, item => Assert.Equal(
             SimulationWorld상호작용Graph상태Codes.NotSpatiallyApplicable,
             item.StatusCode));
-        Assert.DoesNotContain(result.Transitions, item =>
-            item.StatusCode == SimulationWorld상호작용Graph상태Codes.PathUnresolved);
+        Assert.All(result.Transitions.Where(item =>
+            item.StatusCode == SimulationWorld상호작용Graph상태Codes.PathUnresolved),
+            item => Assert.True(
+                result.PendingE5WiIds.Contains(item.FromWorldInteractionId)
+                || result.PendingE5WiIds.Contains(item.ToWorldInteractionId)));
     }
 
     [Fact]
@@ -108,7 +116,40 @@ public sealed class SimulationWorldActualE5SpatialTests
     }
 
     [Fact]
-    public async Task WorldStream_API에서_Network와마흔한개WI준비도를조회한다()
+    public async Task Nature생활WI는_실제E5_H1_H2_H3와Graph근거로세션에공급된다()
+    {
+        var service = new SimulationWorld상호작용NetworkService(Reader());
+        var wiIds = Enumerable.Range(5, 7)
+            .Select(number => $"WI-NATURE-{number:00}")
+            .ToArray();
+
+        var world = await service.ResolveSpatialWorldAsync(
+            PyeongchangAreaSetStableIds.ActualNetwork,
+            PyeongchangAreaSetStableIds.NatureAreaSet,
+            wiIds);
+
+        Assert.Equal(7, world.Definitions.Length);
+        Assert.All(world.Definitions, definition =>
+        {
+            Assert.Equal(PyeongchangAreaSetStableIds.NatureAreaSet,
+                definition.AreaSetStableId);
+            Assert.Equal(Simulation공간근거종류Codes.LandscapeGraph,
+                definition.EvidenceKindCode);
+            Assert.StartsWith("landscape-graph:sim:pyeongchang:nature-",
+                definition.LandscapeGraphStableId);
+            Assert.Contains(definition.SourceStableIds,
+                item => item.StartsWith("h1-", StringComparison.Ordinal));
+            Assert.Contains(definition.SourceStableIds,
+                item => item.StartsWith("h2-", StringComparison.Ordinal));
+            Assert.Contains(definition.SourceStableIds,
+                item => item.StartsWith("h3-", StringComparison.Ordinal));
+            Assert.Contains(definition.SourceStableIds,
+                item => item.StartsWith("binding-sha256:", StringComparison.Ordinal));
+        });
+    }
+
+    [Fact]
+    public async Task WorldStream_API에서_Network와마흔아홉개WI준비도를조회한다()
     {
         using var factory = new WebApplicationFactory<Program>();
         using var client = factory.CreateClient();
@@ -127,7 +168,8 @@ public sealed class SimulationWorldActualE5SpatialTests
         var readiness = await readinessResponse.Content
             .ReadFromJsonAsync<SimulationWorld상호작용Network준비도Response>();
         Assert.Equal(4, network!.AreaSets.Length);
-        Assert.Equal(41, readiness!.TotalWorldInteractionCount);
+        Assert.Equal(49, readiness!.TotalWorldInteractionCount);
+        Assert.Empty(readiness.PendingE5WiIds);
         Assert.Equal(SimulationWorld상호작용Graph상태Codes.Ready,
             readiness.OverallStatusCode);
     }

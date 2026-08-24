@@ -140,6 +140,10 @@ public sealed class SimulationWorld공간실행Reader(
     WritesTo = SsalddelCodeDataScope.DerivedWorld,
     FlowOrder = 40,
     Boundary = "공간 실행과 별도 fingerprint를 사용하며 Synty 대장 변경이 공간 원장을 다시 쓰게 하지 않는다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI의 선택적 Synty 경관 문맥을 저장한다.",
+    Boundary = "시각 자산 대장은 WI 세계 발현이나 실제 플레이 증거가 아니다.")]
 public sealed class SimulationWorldSynty경관Store(
     SimulationWorld파생DbContext dbContext) : ISimulationWorldSynty경관Store
 {

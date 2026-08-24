@@ -21,6 +21,10 @@ namespace Ssalddel.Simulation.Infrastructure
         WritesTo = SsalddelCodeDataScope.SimulationState,
         FlowOrder = 50,
         Boundary = "실제 창고 재고나 인력을 잠그지 않는 process-local Simulation 저장소다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
     public sealed class InMemorySimulationBattleInstanceStore
         : ISimulationBattleInstanceStore, ISimulationBattleResourceLockReader,
             ISimulationBattleReservationReader

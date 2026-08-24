@@ -7,6 +7,10 @@ using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Application
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public interface ISimulationTeamObservationPolicyStore
     {
         SimulationTeamObservationPolicySnapshot? FindForObserver(
@@ -18,6 +22,10 @@ namespace Ssalddel.Simulation.Application
     /// 실제 팀 원장이 연결되기 전 사용하는 process-local 연결 지점이다.
     /// Controller에는 쓰기 API를 노출하지 않으며 서버 조립부나 test fixture만 정책을 교체한다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class InMemorySimulationTeamObservationPolicyStore
         : ISimulationTeamObservationPolicyStore
     {
@@ -77,6 +85,10 @@ namespace Ssalddel.Simulation.Application
             };
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public interface ISimulationTeamMemberPoseStore
     {
         SimulationTeamMemberPoseSnapshot? Find(
@@ -88,6 +100,10 @@ namespace Ssalddel.Simulation.Application
     /// Netcode 또는 전용 위치 수집기가 갱신할 공개 관찰 Pose 연결 지점이다.
     /// HTTP Controller는 이 저장소에 쓰기 기능을 노출하지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class InMemorySimulationTeamMemberPoseStore
         : ISimulationTeamMemberPoseStore
     {
@@ -156,6 +172,10 @@ namespace Ssalddel.Simulation.Application
             };
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public interface ISimulationTeamObservationSessionStore
     {
         SimulationTeamObservationSessionResponse Start(
@@ -170,6 +190,10 @@ namespace Ssalddel.Simulation.Application
             string targetActorStableId);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class InMemorySimulationTeamObservationSessionStore
         : ISimulationTeamObservationSessionStore
     {
@@ -266,6 +290,10 @@ namespace Ssalddel.Simulation.Application
             };
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
+        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
     public sealed class SimulationTeamObservationService
     {
         private readonly ISimulationTeamObservationPolicyStore policyStore;

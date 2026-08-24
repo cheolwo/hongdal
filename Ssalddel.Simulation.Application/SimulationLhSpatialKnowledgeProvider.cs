@@ -58,9 +58,9 @@ namespace Ssalddel.Simulation.Application
                     "simulation-world-interaction-spatial-composition-plan.v1",
                 "PlanSchemaInvalid");
             var summary = status.GetProperty("summary");
-            Require(summary.GetProperty("totalWorldInteractions").GetInt32() == 41,
+            Require(summary.GetProperty("totalWorldInteractions").GetInt32() == 49,
                 "StatusInteractionCountInvalid");
-            Require(summary.GetProperty("establishedH1Count").GetInt32() == 5,
+            Require(summary.GetProperty("establishedH1Count").GetInt32() == 13,
                 "StatusEstablishedH1CountInvalid");
             Require(summary.GetProperty("establishedH3Count").GetInt32() == 8,
                 "StatusEstablishedH3CountInvalid");

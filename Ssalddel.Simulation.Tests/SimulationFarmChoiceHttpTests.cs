@@ -9,6 +9,10 @@ using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.")]
 public sealed class SimulationFarmChoiceHttpTests
 {
     private const string Player = "actor:sim.farm-choice-http.farmer-1";

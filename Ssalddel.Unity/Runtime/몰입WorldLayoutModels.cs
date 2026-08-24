@@ -55,6 +55,10 @@ namespace Ssalddel.Unity.ImmersiveWorld
         public bool PresentationOnly { get; set; }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어에게 AreaSet 자산 준비 상태를 표현한다.",
+        Boundary = "자산 Gate 표현은 WI 권위 전이와 실제 플레이 완료 증거가 아니다.")]
     public static class 몰입World자산GatePolicy
     {
         public static 몰입World자산GateDecision Evaluate(
@@ -87,6 +91,10 @@ namespace Ssalddel.Unity.ImmersiveWorld
         public bool PresentationOnly { get; set; }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "Nature 조우 상태를 플레이어가 이해할 수 있는 표현으로 투영한다.",
+        Boundary = "Presentation 정책은 Simulation 결과를 결정하지 않는다.")]
     public static class Nature조우PresentationPolicy
     {
         public const int MaximumThreatUnitCount = 5;
@@ -136,6 +144,10 @@ namespace Ssalddel.Unity.ImmersiveWorld
     /// 서버가 확정한 자연권 압력을 경고와 조우 표현으로만 번역한다.
     /// 자산 팩이 없더라도 경고는 유지하며 다른 팩의 몬스터로 대체하지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "Nature 위협 경로를 플레이어 경험으로 표현한다.",
+        Boundary = "경로 표현은 위협 상태나 WI 결과를 확정하지 않는다.")]
     public static class Nature위협RoutePresentationPolicy
     {
         public static Nature위협RoutePresentationDecision Evaluate(
@@ -174,6 +186,10 @@ namespace Ssalddel.Unity.ImmersiveWorld
     /// <summary>
     /// 경관 인스턴스의 원자적 표현 전환만 관리한다. Simulation Tick과 업무 상태는 바꾸지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "결정된 경관 상태의 화면 전환을 조율한다.",
+        Boundary = "Unity 전환은 WorldTick·Revision·WI 결과를 변경하지 않는다.")]
     public sealed class 몰입WorldTransitionCoordinator
     {
         private readonly HashSet<string> knownInstanceIds;

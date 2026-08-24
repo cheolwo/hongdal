@@ -47,6 +47,10 @@ public sealed record 대표건축물선정항목(
     WritesTo = SsalddelCodeDataScope.DerivedWorld,
     FlowOrder = 20,
     Boundary = "공유 공공데이터는 읽기 전용이며 건물 도형이나 DEM이 없으면 임의 좌표를 생성하지 않는다.")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
+    "공간 WI가 요구하는 AreaSet·Graph·배치·통행 문맥의 파생 근거를 제공한다.",
+    Boundary = "파생 공간을 저장해도 WI의 권위 전이·Task·Effect·결과 발현을 증명하지 않는다.")]
 public sealed class 평창군공간파생Pipeline(
     PublicDataIngestionDbContext publicDataDb,
     ISimulationWorld파생원장Store derivedStore)

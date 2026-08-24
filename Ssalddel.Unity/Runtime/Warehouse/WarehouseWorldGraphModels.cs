@@ -21,6 +21,10 @@ namespace Ssalddel.Unity.Warehouse
     /// 기존 WarehouseWorldObject의 명시적 참조를 typed World relation으로 변환하는
     /// compatibility adapter입니다. 새로운 해석 코드는 이 graph를 직접 생성해야 합니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "창고 권위 상태를 Unity 공간 탐색 Graph로 투영한다.",
+        Boundary = "Graph Builder는 입고·적치 결과나 E5 발현을 확정하지 않는다.")]
     public sealed class WarehouseWorldGraphBuilder
     {
         public WorldGraphIndex<WarehouseWorldGraphNode> Build(WarehouseWorldSnapshot snapshot)

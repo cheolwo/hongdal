@@ -1,0 +1,10 @@
+{
+  "name": "com.ssalddel.simulation.contracts",
+  "version": "0.1.0",
+  "displayName": "Ssalddel Simulation Contracts",
+  "description": "Simulation Core와 Host가 공유하는 형식 안전 계약입니다.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.ssalddel.code-metadata": "0.1.0"
+  }
+}

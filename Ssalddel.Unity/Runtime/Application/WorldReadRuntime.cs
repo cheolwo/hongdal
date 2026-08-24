@@ -82,6 +82,10 @@ namespace Ssalddel.Unity.Application
         TPerspectiveWorld Interpret(TSharedWorld world, TContext context);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public interface IPresentationProjector<in TPerspectiveWorld, in TContext, out TPresentation>
     {
         TPresentation Project(TPerspectiveWorld world, TContext context);
@@ -124,6 +128,10 @@ namespace Ssalddel.Unity.Application
     /// Authorized Data 조회, 공통 World 해석, 관점 해석과 Presentation 투영의
     /// 생명주기만 조율합니다. 각 단계의 의미·시각 정책은 해당 port가 담당합니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class WorldReadRuntime<
         TQuery,
         TData,

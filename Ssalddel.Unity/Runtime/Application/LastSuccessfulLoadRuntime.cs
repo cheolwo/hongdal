@@ -28,6 +28,10 @@ namespace Ssalddel.Unity.Application
         WritesTo = SsalddelCodeDataScope.ClientPresentation,
         FlowOrder = 10,
         Boundary = "서버 상태를 만들거나 변경하지 않고 실패 시 마지막 성공 표현만 보존한다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class LastSuccessfulLoadRuntime<TSnapshot, TChange>
         where TSnapshot : class
     {

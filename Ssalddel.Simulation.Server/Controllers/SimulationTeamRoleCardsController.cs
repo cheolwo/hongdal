@@ -8,6 +8,10 @@ namespace Ssalddel.Simulation.Server.Controllers;
 
 [ApiController]
 [Route("api/simulation/v1/sessions/{sessionStableId}/team-role-cards")]
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+    "구성 요소의 공통 Core·Server 또는 Adapter 실행 경계를 제공한다.",
+    Boundary = "운영 상태와 Simulation 상태의 권위 경계를 유지한다.")]
 public sealed class SimulationTeamRoleCardsController(
     SimulationTeamRoleCardService service) : ControllerBase
 {

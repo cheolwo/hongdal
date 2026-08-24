@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.Simulation.RuntimeCore",
+  "rootNamespace": "Ssalddel.Simulation.Application",
+  "references": ["Ssalddel.CodeMetadata", "Ssalddel.Simulation.Contracts", "Ssalddel.Simulation.Domain"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

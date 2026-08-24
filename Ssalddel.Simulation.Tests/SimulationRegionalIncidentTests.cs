@@ -10,8 +10,42 @@ using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "Simulation·Unity 계약과 결정성 및 회귀 증거를 검증한다.",
+    Boundary = "자동 시험 통과와 실제 Play Mode·Game View·E 승격 증거를 구분한다.")]
 public sealed class SimulationRegionalIncidentTests
 {
+    [Fact]
+    public void 지역발전원장골격은_Farm세H1과잠긴Nature연결을제공하고_기존상태를변경하지않는다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var before = session.Snapshot();
+
+        var development = before.RegionalDevelopment;
+
+        Assert.Equal(0, development.Revision);
+        Assert.Empty(development.Opportunities);
+        Assert.Empty(development.RouteSafeties);
+        var farm = Assert.Single(development.Areas);
+        Assert.Equal(SimulationRegionalIncidentCodes.Farm, farm.AreaCode);
+        Assert.Equal(SimulationRegionalDevelopmentCodes.FarmIncidentContainmentH2,
+            farm.TargetH2StableId);
+        Assert.Equal(SimulationRegionalDevelopmentCodes.NotStarted, farm.StateCode);
+        Assert.Equal(new[]
+        {
+            SimulationRegionalDevelopmentCodes.FarmExposureInspectionH1,
+            SimulationRegionalDevelopmentCodes.FarmIncidentQuarantineH1,
+            SimulationRegionalDevelopmentCodes.FarmWeatherProtectionH1,
+        }, farm.RequiredH1StableIds);
+        Assert.Empty(farm.OperationalH1StableIds);
+        var connector = Assert.Single(development.Connectors);
+        Assert.Equal(SimulationRegionalDevelopmentCodes.NatureFarmSafetyConnector,
+            connector.ConnectorStableId);
+        Assert.Equal(SimulationRegionalDevelopmentCodes.Locked, connector.StateCode);
+        Assert.Equal(0, session.Revision);
+    }
+
     [Fact]
     public void 기존V4지역사건저장은_새인과점수를적용하지않고그대로재생한다()
     {
@@ -122,14 +156,27 @@ public sealed class SimulationRegionalIncidentTests
 
         var afterVictory = session.ApplyNatureEncounterVictory(
             "battle:test:farm-pressure", encounter.EncounterStableId);
-        Assert.Equal(1, Assert.Single(afterVictory.RegionalIncidents).RemainingSeverity);
+        Assert.Equal(2, Assert.Single(afterVictory.RegionalIncidents).RemainingSeverity);
+        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
+            Assert.Single(afterVictory.NatureThreat.Encounters).StateCode);
+        var opportunity = Assert.Single(afterVictory.RegionalDevelopment.Opportunities);
+        Assert.Equal(incident.IncidentStableId, opportunity.SourceIncidentStableId);
+        Assert.Equal(SimulationRegionalDevelopmentCodes.Available,
+            opportunity.StateCode);
+        var safety = Assert.Single(afterVictory.RegionalDevelopment.RouteSafeties);
+        Assert.Equal(afterVictory.CurrentTick + 1, safety.SecuredUntilWorldTick);
+
+        var duplicate = session.ApplyNatureEncounterVictory(
+            "battle:test:farm-pressure", encounter.EncounterStableId);
+        Assert.Equal(afterVictory.Revision, duplicate.Revision);
+        Assert.Single(duplicate.RegionalDevelopment.Opportunities);
 
         var package = session.CreateSavePackage(new SimulationSessionSaveRequest
         {
             SaveStableId = "save:test:regional-incident",
             ExpectedRevision = session.Revision,
         });
-        Assert.Equal(SimulationSaveSchemaVersions.V10, package.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V14, package.SchemaVersion);
         var restored = SimulationSessionReplay.Restore(package);
         var restoredPackage = restored.CreateSavePackage(new SimulationSessionSaveRequest
         {
@@ -139,8 +186,9 @@ public sealed class SimulationRegionalIncidentTests
         Assert.Equal(package.ReplayHash, restoredPackage.ReplayHash);
         Assert.Equal(encounter.EncounterStableId,
             Assert.Single(restored.Snapshot().NatureThreat.Encounters).EncounterStableId);
-        Assert.Equal(SimulationRegionalIncidentCodes.Active,
+        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
             Assert.Single(restored.Snapshot().NatureThreat.Encounters).StateCode);
+        Assert.Single(restored.Snapshot().RegionalDevelopment.Opportunities);
     }
 
     [Fact]
@@ -257,9 +305,10 @@ public sealed class SimulationRegionalIncidentTests
     }
 
     [Fact]
-    public void 자연권전투승리는_해당경로의가장오래된원인을한단계만줄이고_재적용되지않는다()
+    public void 기존저장규칙의_자연권전투승리는_원인심각도감소의미를보존한다()
     {
         var session = new 경영SimulationSessionAggregate(CreateRequest());
+        session.UseLegacyRegionalDevelopmentRules();
         session.RegisterHubCargoBacklogIncident(
             "cargo:test:battle", "facility:test:hub", 0);
         var incident = Assert.Single(session.Snapshot().RegionalIncidents);
@@ -966,6 +1015,44 @@ public sealed class SimulationRegionalIncidentTests
         Assert.Equal(ordinary.PeriodStateHashSha256,
             Assert.Single(restored.Snapshot().NatureMind.Periods)
                 .PeriodStateHashSha256);
+    }
+
+    [Fact]
+    public void Farm경로안전은_다음WorldTick에서끝나고_같은원인기회는한번만발급된다()
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var incidentState = HarvestAndCreateIncident(session);
+        var incident = Assert.Single(incidentState.RegionalIncidents);
+        var adverse = session.ConfirmRegionalIncidentResponse(incident.EventStableId,
+            new SimulationRegionalIncidentResponseConfirmRequest
+            {
+                CommandId = "command:test:farm-safety-source",
+                ExpectedRevision = incidentState.Revision,
+                ActorStableId = "actor:test:manager",
+                ChoiceStableId = SimulationRegionalIncidentCodes.FarmLeaveExposed,
+            });
+        var encounter = Assert.Single(adverse.NatureThreat.Encounters);
+        var secured = session.ApplyNatureEncounterVictory(
+            "battle:test:farm-safety-first", encounter.EncounterStableId);
+
+        Assert.Equal(SimulationRegionalIncidentCodes.Resolved,
+            Assert.Single(secured.NatureThreat.Encounters).StateCode);
+        Assert.Single(secured.RegionalDevelopment.Opportunities);
+
+        var nextTick = session.Advance(new 경영SimulationTick진행Request
+        {
+            CommandId = "command:test:farm-safety-next-tick",
+            ExpectedRevision = secured.Revision,
+            TickCount = 1,
+        });
+
+        Assert.Equal(SimulationRegionalIncidentCodes.Active,
+            Assert.Single(nextTick.NatureThreat.Encounters).StateCode);
+        Assert.Single(nextTick.RegionalDevelopment.Opportunities);
+        var secondVictory = session.ApplyNatureEncounterVictory(
+            "battle:test:farm-safety-second", encounter.EncounterStableId);
+        Assert.Single(secondVictory.RegionalDevelopment.Opportunities);
+        Assert.Equal(2, Assert.Single(secondVictory.RegionalIncidents).RemainingSeverity);
     }
 
     [Fact]

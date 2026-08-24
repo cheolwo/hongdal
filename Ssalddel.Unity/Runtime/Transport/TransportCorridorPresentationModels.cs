@@ -29,6 +29,10 @@ namespace Ssalddel.Unity.Transport
         public string StatusLabelText { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "회랑 상태와 이동 피드백을 플레이어에게 표현한다.",
+        Boundary = "화면 표현은 실제 통행·운송 완료 증거가 아니다.")]
     public sealed class TransportCorridorPresenter
     {
         public TruckMovementPresentationModel? Present(TransportCorridorSnapshot? snapshot)

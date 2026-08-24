@@ -29,11 +29,19 @@ namespace Ssalddel.Unity.UrbanMarket
         public string 재고기준안내 { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 권위 Core 또는 원격 Host와 통신하는 Adapter 경계를 제공한다.",
+        Boundary = "Unity 표현은 서버·Local Runtime의 권위 상태를 대신하지 않는다.")]
     public interface I도심마트ApiClient
     {
         Task<도심마트목록ApiModel> GetAsync(CancellationToken cancellationToken = default);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 도심마트ApiMapper
     {
         private readonly 도심마트공개상품DataMapper dataMapper;
@@ -61,11 +69,19 @@ namespace Ssalddel.Unity.UrbanMarket
             => dataMapper.Map(source);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public interface I도심마트Repository
     {
         Task<도심마트ScreenModel> LoadAsync(CancellationToken cancellationToken = default);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 권위 Core 또는 원격 Host와 통신하는 Adapter 경계를 제공한다.",
+        Boundary = "Unity 표현은 서버·Local Runtime의 권위 상태를 대신하지 않는다.")]
     public sealed class 도심마트ApiRepository : I도심마트Repository
     {
         private readonly I도심마트ApiClient apiClient;
@@ -84,6 +100,10 @@ namespace Ssalddel.Unity.UrbanMarket
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class Operational도심마트조회UseCase : I도심마트조회UseCase
     {
         private readonly I도심마트Repository repository;

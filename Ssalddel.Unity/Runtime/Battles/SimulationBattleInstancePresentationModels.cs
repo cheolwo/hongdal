@@ -125,6 +125,10 @@ namespace Ssalddel.Unity.Battles
         ReadsFrom = SsalddelCodeDataScope.SimulationState,
         FlowOrder = 60,
         Boundary = "전투 결과·World 상태를 계산하거나 변경하지 않는 순수 Unity 표현 변환이다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class BattlePresentationMapper
     {
         public BattlePresentationState Map(BattleInstanceApiModel source,
@@ -212,6 +216,10 @@ namespace Ssalddel.Unity.Battles
         public string SourceResourceStableId { get; set; } = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public static class BattleSupportCommandFactory
     {
         public static BattleSupportCommandDraft Create(BattlePresentationState frame,
