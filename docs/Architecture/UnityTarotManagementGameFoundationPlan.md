@@ -1,15 +1,18 @@
 # Unity 일반 타로 기반 지역 경영 게임 뼈대 기획
 
 - 기준일: 2026-08-12
-- 문서 성격: 뼈대 기준 기획서
+- 문서 성격: 일반 타로 규칙·계약의 세부 기준
 - 구현 상태: `ARC-RULE-1~2B`, `ARC-F1~F3` 완료. `ARC-F4`의 전차 대응 3종 서버 규칙 완료, Unity 비교 화면 연결 전
 - 가칭: **살뜰 아르카나: 한 장이 움직이는 도시**
 - 첫 시나리오: **14일 동안 감자 300kg을 농장에서 마트까지 안정적으로 공급한다**
 - 관련 기준:
+  - [Ssalddel 게임 기획 통합 기준](게임기획통합기준.md)
   - [Unity 턴 카드 모판 설계](UnityTurnCardSeedbedDesign.md)
   - [Unity 통합 모판 대응 모듈 구현 현황](UnityIntegratedSeedbedModuleStatus.md)
   - [Unity 아르카나 카드와 비즈니스 흐름 통합 제안](UnityArcanaBusinessFlowIntegrationProposal.md)
   - [현재 작업 기준선](../AI/CURRENT_WORK.md)
+
+> 게임 세계·심리 기간·카드군·사건·WI의 공통 관계는 통합 기준이 소유한다. 이 문서는 일반 타로 원형, 결정적 제안, 보정선과 첫 구현 순서만 소유하며 현재 최우선 플레이나 전체 게임 목적을 다시 정하지 않는다.
 
 ## 1. 이번 단계의 목적
 

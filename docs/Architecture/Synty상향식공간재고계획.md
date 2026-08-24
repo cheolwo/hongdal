@@ -105,6 +105,8 @@ P1~P3 여섯 후보는 [`h2-composition-recipes.v1.json`](../../eng/world-seedbe
 
 Construction을 포함한 다섯 팩의 조립 규칙과 심리 영역의 두 발전소 상세안은 [심리·업무 영역 Synty 5팩 공간 조립 계획](심리업무영역Synty공간조립계획.md)을 따른다. 이 계획은 대표 Prefab을 표현 후보로만 사용하며 기존 H 대장·Stable ID·Simulation 권위를 자동 변경하지 않는다.
 
+팩별 전수 분류가 현재 어떤 H1 작업공간·H2 블록·H3 경관의 표현과 관련되는지는 [Synty 5팩 자산과 H1~H3 연결 지도](Synty5팩자산-H1-H3연결지도.md)에서 확인한다. 이 연결은 자산 선택용 역색인이며 H 승인이나 Actual E5 배치가 아니다.
+
 다섯 팩 활용 확장의 첫 구현 순서는 H 카드 추가가 아니라 기술 대장 확장이다. 기존 Farm·Town·City 1,535개 항목의 고유 식별자를 유지하면서 Nature 227개와 Construction 584개를 더해 2,346개 전부에 정규화 분류, 의미 자산군, 활용 트랙과 최소 한 계획 적용 영역 또는 보류 사유를 기록한다. Construction 자산군은 H1 팩 표현 카드로 자동 승격하지 않고 정상 운영·점검·공사·손상 격리·복구 재가동의 공통 상태층 후보로 분류한다.
 
 2026-08-19 현재 `synty-pack-inventory.v2` 기술 대장을 생성해 위 범위를 구현했다. 2,346개는 1,499개 의미 자산군, 자동 분류 2,345개, 사람 검토 대기 1개로 나뉜다. Vehicle 51개는 `Vehicles`·`vehicle`로 분류하고 Nature `Misc` 1개만 사람 검토에 남긴다. 기존 3팩 `inventoryId` 재료는 유지하고 원본 폴더명이 다른 `Environment(s)`는 별도 정규화 필드로 흡수한다. 이 대장은 표현 재료 재고이며 H 승인·AreaSet 사실·Simulation 상태를 만들지 않는다.

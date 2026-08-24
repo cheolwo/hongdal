@@ -277,7 +277,7 @@ Google Maps Platform은 application restriction과 API restriction을 함께 적
 
 종료 기준: key 원문이 source·tracked config·로그에 없고, 각 adapter가 관련 페이지·workflow·fallback과 연결되며, 외부 호출을 하지 않는 구성 test가 통과한다.
 
-### Phase G1 — 0.0 공개 정보 운영
+### Phase Google-1 — 0.0 공개 정보 운영
 
 1. `/community/home` Google Maps runtime key를 제한된 preview origin에 주입하고 낮·밤 한 지도 전환을 확인한다.
 2. YouTube channel sync에 quota·ETag·부분 응답과 운영 dashboard를 추가한다.
@@ -287,7 +287,7 @@ Google Maps Platform은 application restriction과 API restriction을 함께 적
 
 종료 기준: 외부 API 장애·quota 소진 상태에서도 공개 커뮤니티 조회·글쓰기 fallback이 동작하고, 자동 게시·자동 차단·자동 상태 확정이 발생하지 않는다.
 
-### Phase G2 — 후속 업무 pilot
+### Phase Google-2 — 후속 업무 pilot
 
 1. 미국 주소 1개 흐름에 Address Validation을 붙이고 사용자 확인 상태를 저장한다.
 2. legacy Distance Matrix와 Routes API의 거리·기간·지연·비용을 고정 표본으로 비교한다.
@@ -296,7 +296,7 @@ Google Maps Platform은 application restriction과 API restriction을 함께 적
 
 종료 기준: API 결과가 기존 Command를 우회하지 않고, 원문·후보·사용자 확인·최종 원장 상태가 구분되며, 삭제·재처리·비용 상한이 test로 검증된다.
 
-### Phase G3 — 분석·개인 연동
+### Phase Google-3 — 분석·개인 연동
 
 - BigQuery 비식별 projection, Google 로그인, Calendar·Drive·Sheets export는 0.0 release gate 이후 별도 승인한다.
 - Azure에서 Google Cloud API를 지속 사용한다면 Workload Identity Federation과 provider별 비용·장애 관측을 운영 기준으로 확정한다.

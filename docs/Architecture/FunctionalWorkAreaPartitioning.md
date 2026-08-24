@@ -17,13 +17,28 @@
 
 각 작업영역의 기계 판독 범위는 `eng/work-areas/*.json`을 단일 기준으로 사용한다.
 
+## 제품 기능 영역과 시스템 책임 흐름
+
+위 표는 커뮤니티·공공데이터·개별 의향처럼 **어떤 제품 기능을 개발하는가**를 나눈다. 운영·Simulation·Unity 구분은 **어느 실행 책임이 상태를 소유하는가**를 나누는 별도 축이다. 작업을 시작할 때 제품 기능 영역 하나와 시스템 책임 흐름 하나를 함께 고른다.
+
+| 책임 흐름 | 기본 branch prefix | 상태 소유 기준 |
+| --- | --- | --- |
+| `operations` | `operations/` | 실제 사용자·권한·동의·업무 원장 |
+| `simulation` | `simulation/` | 게임 Session·가상 시간·WorldTick·Save/Replay |
+| `unity` | `unity/` | 입력·공간·UI와 권위 상태 사본 표현 |
+| `integration` | `integration/` | 공개 계약·Adapter·호환 검증이며 독립 상태를 소유하지 않음 |
+
+예를 들어 Farm 현실자료 작업은 제품 기능상 `regional-culture-public-data`이면서 책임상 원자료 승인·운영 저장은 `operations`, 세션 동결 상태는 `simulation`, 계약·파생 경계는 `integration`, 표시만 바꾸는 작업은 `unity`다. 여러 책임을 통과하는 하나의 기능도 커밋과 검증을 책임별로 나눈다.
+
+`codex/rename-ssalddel`의 기존 혼합 이력은 과거 통합 기준선으로 보존하고 새 일반 목적 작업을 계속 누적하지 않는다. 상세 기준과 기계 원장은 [운영·Simulation·Unity 작업 흐름 분리](OperationsSimulationUnity작업흐름분리.md), `eng/work-areas/responsibility-workstreams.json`을 따른다.
+
 ## Codex 읽기 규칙
 
-1. 요청의 주 작업영역 하나를 고른다.
+1. 요청의 주 제품 기능 영역과 시스템 책임 흐름을 하나씩 고른다. 단일 책임 작업은 제품 기능 영역을 생략할 수 있지만 책임 흐름은 생략하지 않는다.
 2. 해당 manifest의 `readFirst`만 먼저 읽는다.
 3. 검색은 `sourceRoots` 안에서 시작하고 `excludedRoots`는 제외한다.
 4. 다른 작업영역 contract가 필요한 경우 공개 route·DTO·metadata부터 읽고 내부 구현 전체로 바로 확장하지 않는다.
-5. 둘 이상의 작업영역을 변경하면 커밋을 영역별로 나누고, 공유 contract 변경은 소비 영역 test를 별도로 실행한다.
+5. 둘 이상의 제품 기능 영역 또는 시스템 책임을 변경하면 커밋을 영역·책임별로 나누고, 공유 contract 변경은 생산자와 소비 영역 test를 별도로 실행한다.
 6. 전체 repository 검색은 이름 충돌, DI 조립, migration snapshot, 공개 route 호환처럼 전역 확인이 필요한 경우에만 수행한다.
 7. `simulation-unity`에서는 생성 코드 지도의 기능 트리를 먼저 읽고, `StepKey` 순서로 핵심 타입만 연 뒤 세부 구현으로 확장한다.
 

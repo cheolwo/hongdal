@@ -4,6 +4,8 @@
 - 구현 상태: `TURN-CARD-SEEDBED-0` 분류·승격 Gate와 `TURN-CARD-SEEDBED-UI-1` 실제 Unity 모판 화면 완료
 - 관련 구현: `TURN-0`, `TURN-CARD-UI-1A`, `TURN-CARD-UI-1B`, `CULTURE-CARD-0`, `TURN-CARD-HTTP-1`
 
+> 카드군의 게임 역할과 타로·사건·WI의 공통 관계는 [Ssalddel 게임 기획 통합 기준](게임기획통합기준.md)이 소유한다. 이 문서는 카드 씨앗을 검수하고 canonical catalog로 승격하는 절차만 소유한다.
+
 ## 1. 목적
 
 턴 카드는 아이디어가 생겼다는 이유만으로 다음 날 경영 효과를 갖지 않는다. 에셋을 모판에서 연구한 뒤 Scene으로 옮겨 심듯이, 철학·학당·문화·경영사건 카드도 별도 **턴 카드 모판**에서 출처, 내용, 적용 기간, 효과 규칙과 화면 표현을 검증한 뒤 서버 canonical catalog로 승격한다.

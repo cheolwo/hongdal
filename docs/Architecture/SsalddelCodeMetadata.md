@@ -33,6 +33,89 @@
 - `StepKey`는 같은 기능 안에서 중복하지 않고 의존 단계보다 큰 `FlowOrder`를 사용한다. 여러 병렬 단계는 같은 `FlowOrder`를 사용할 수 있다.
 - 기능을 분리하거나 이름을 바꾸면 특성, reader 검증 테스트와 관련 아키텍처 문서를 함께 갱신한다.
 
+## E 성숙도 책임 메타데이터
+
+`SsalddelEvidenceResponsibilityAttribute`는 게임 코드가 E1~E9 중 어느
+성숙도 질문에 주로 답해야 하는지를 표시한다. 이것은
+`SsalddelCodeMetadataAttribute`의 기능 흐름을 대체하거나 확장한 필드가 아니다.
+기능 흐름 메타데이터는 "이 호출이 어디를 지나가는가"를, E 책임 메타데이터는
+"이 구성 요소를 어느 E 검토에서 다시 읽어야 하는가"를 답한다.
+
+가장 중요한 경계는 다음과 같다.
+
+- Attribute는 **책임 참여**를 뜻하며 현재 E 증거 통과나 승격을 뜻하지 않는다.
+- 검사 후보 타입은 대표 `Primary` 책임을 정확히 하나 가진다. 실제로 두 번째
+  단계의 책임도 수행할 때만 `Secondary`를 추가한다.
+- `Boundary`에는 그 타입만으로 완료를 주장할 수 없는 경계를 반드시 적는다.
+- WI의 실제 `Preview`·`Confirm`처럼 단계 판정에 중요한 공개 메서드만 선택해
+  메서드 Attribute를 붙인다. 메서드도 대표 책임은 하나다.
+- `WorldInteractionIds`는 기존 `WI-*` 고유 식별자를 참조할 뿐 WI 정의를 새로
+  소유하지 않는다. H1~H5 역시 Attribute 문자열로 새 계층을 만들지 않는다.
+- 호환 facade, 기술 보조 타입, 생성·외부 코드, Sample·Experiment처럼 검사에서
+  빠져야 하는 공개 후보는 `SsalddelEvidenceCoverageExclusionAttribute`와 구체적인
+  사유를 남긴다. 사유 없는 누락은 허용하지 않는다.
+
+### E1~E3 사람용 하위 모듈
+
+E1·E2·E3은 적용 범위가 넓으므로 `SubmoduleKey`로 한 번 더 나눠 탐색한다.
+이 값은 새 E 단계나 물리 프로젝트를 만드는 분류가 아니다. 대표 E 책임 안에서
+구성 요소가 맡는 역할을 사람이 바로 알아볼 수 있게 하는 안정 key다.
+
+| E | 사람용 하위 모듈 |
+| --- | --- |
+| E1 핵심 계약 | `E1세션권위계약Module`, `E1세계상호작용계약Module`, `E1공간계약Module`, `E1저장재생계약Module`, `E1전투위협계약Module` |
+| E2 실행 경계 | `E2세션실행Module`, `E2세계상호작용실행Module`, `E2로컬권위AdapterModule`, `E2원격HostAdapterModule`, `E2Unity권위ClientModule` |
+| E3 회귀 증거 | `E3계약회귀Module`, `E3결정성검증Module`, `E3저장재생검증Module`, `E3로컬원격동등성Module`, `E3Unity소비자회귀Module` |
+
+정의의 기계 기준은 `SsalddelEvidenceSubmoduleDefinitionCatalog`이며 현재 결속
+대상과 개수는 자동 생성되는
+[E 책임 코드 지도](../AI/generated/evidence-responsibility-code-map.md#e1e3-사람용-하위-모듈)에서 확인한다.
+Attribute에는 다음처럼 안정 key를 지정한다.
+
+```csharp
+[SsalddelEvidenceResponsibility(
+    SsalddelEvidenceStage.E2,
+    "Farm·Nature WI Preview·Confirm 실행 포트를 제공한다.",
+    Boundary = "플레이 완료나 E2 증거 승격을 단독으로 주장하지 않는다.",
+    SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E2세계상호작용실행)]
+```
+
+- `SubmoduleKey`의 E 번호는 Attribute의 대표 E와 같아야 한다.
+- 새로 만들거나 의미 있게 수정하는 E1~E3 핵심 구성 요소는 정확한 하위 모듈이
+  있을 때 지정한다.
+- 기존 구성 요소는 기능 단위로 옮긴다. 뜻이 불분명한 코드를 개수 맞추기 위해
+  억지로 분류하지 않으며 미지정 개수를 생성 지도에 드러낸다.
+- 하위 모듈 결속과 코드 지도 통과는 책임 탐색 증거일 뿐 E1~E3 완료나 상위 E
+  승격 증거가 아니다.
+
+E 단계·G 관리 체계·모듈 이름의 단일 기계 기준은
+`eng/execution-ledgers/e9-refactor-module-catalog.json`이다. 공통 코드의
+`SsalddelEvidenceStageDefinitionCatalog`와 생성 도구는 이 대장과 일치하는지
+검사한다. E 단계 자체의 완료 질문과 반복 왕복 절차는
+[E9↔E1 반복 왕복 구현 체계](E9하향식수직구현체계.md)가 소유한다.
+
+현재 강제 범위는 게임 경계인 Simulation 계약·Domain·Application·저장·Server,
+공유 Unity adapter, 실제 Unity 제품 코드와 검증 코드다. 일반 Operations 코드는
+게임 E 책임 전수 검사에 포함하지 않는다. Unity의 Sample·Experiment 어셈블리는
+제품 후보가 아니지만 각 어셈블리의 제외 Attribute와 사유는 지도에 남긴다.
+
+저장소 쪽 전수 지도는 다음 명령으로 갱신하고 검사한다.
+
+```powershell
+dotnet run --project eng/Ssalddel.EvidenceMap -- --write --strict
+dotnet run --project eng/Ssalddel.EvidenceMap -- --strict
+```
+
+- 생성 결과는 `docs/AI/generated/evidence-responsibility-code-map.md`와 JSON이며,
+  JSON schema `v2`부터 E1~E3 하위 모듈 정의·결속 수·미지정 수를 함께 기록한다.
+- `eng/validate-changes.ps1`은 관련 게임 코드나 메타데이터가 바뀌면 strict 검사를
+  실행하며 후보 타입의 무사유 누락을 오류로 처리한다.
+- 실제 Unity 제품은 `Ssalddel/검증/E 책임 코드 지도 갱신` 메뉴와
+  `UnityEvidenceResponsibilityMetadataTests`로 별도 전수 검사한다. 생성 결과는
+  Unity 저장소의 `Documentation/Generated/`에 둔다.
+- 코드 지도 통과는 컴파일·Attribute 정합 증거다. 저장 Scene, Play Mode,
+  Game View, 실제 서버 또는 E 단계 승격 증거를 대신하지 않는다.
+
 ## 코드 명명 언어
 
 이 절은 저장소 코드 명명 언어의 단일 기준이다. 기술 책임을 나타내는 용어는
