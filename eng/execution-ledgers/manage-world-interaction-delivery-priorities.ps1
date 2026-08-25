@@ -278,7 +278,7 @@ foreach ($priority in @($ledger.items | Sort-Object { [int] $waveByCode[[string]
 [void] $contract.AppendLine("    }")
 [void] $contract.AppendLine("}")
 
-$markdownContent = ConvertTo-DeterministicText $builder.ToString()
+$markdownContent = ConvertTo-DeterministicText ($builder.ToString().TrimEnd() + "`n")
 $contractContent = ConvertTo-DeterministicText $contract.ToString()
 $resolvedOutput = Join-Path $repositoryRoot $OutputPath
 $resolvedContractOutput = Join-Path $repositoryRoot $ContractOutputPath
