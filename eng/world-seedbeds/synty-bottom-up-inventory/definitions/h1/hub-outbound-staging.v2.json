@@ -1,13 +1,13 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
   "stableId": "h1-stock:hub-outbound-staging",
-  "revision": 2,
+  "revision": 3,
   "hierarchyLevelCode": "H1",
   "title": "Hub 피킹·출고 준비 공간",
   "summary": "기존 상향식 재고 v1에서 이관한 Hub 피킹·출고 준비 공간 설계 지식이다.",
-  "knowledgeStateCode": "ExploratoryInventory",
+  "knowledgeStateCode": "ApprovedReference",
   "originModeCode": "Mixed",
-  "approvedDefinitionStableId": null,
+  "approvedDefinitionStableId": "wi-spatial-seedbed:hub-outbound-staging.v1",
   "wiIds": [
     "WI-HUB-03",
     "WI-HUB-04",
@@ -18,11 +18,21 @@
     "HubPickingArea",
     "HubOutboundStagingArea"
   ],
-  "capabilityCodes": [],
-  "capacityConceptCodes": [],
+  "capabilityCodes": [
+    "Spatial.CargoAccessible",
+    "Spatial.OutboundStagingArea",
+    "Spatial.PickingWorkArea",
+    "Spatial.Storage",
+    "Spatial.WorkerAccessible"
+  ],
+  "capacityConceptCodes": [
+    "WorkArea"
+  ],
   "predecessorH1Refs": [],
   "successorH1Refs": [],
-  "connectorRoleCodes": [],
+  "connectorRoleCodes": [
+    "cargo-handoff"
+  ],
   "sourcePackCodes": [
     "City"
   ],
@@ -40,7 +50,7 @@
   "sourceReferences": [
     "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v1.json#h1-stock:hub-outbound-staging"
   ],
-  "unresolvedItems": "공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다.",
+  "unresolvedItems": null,
   "presentationOnly": true,
   "isOperationalState": false
 }

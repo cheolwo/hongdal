@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-HUB-INTERNAL-WAREHOUSE-PLACEMENT",
+  "title": "Hub 내부 창고 상향식 H 공간 성립과 정밀 배치",
+  "playableLoopRefs": [
+    "playable-loop:hub-inbound-putaway.v1",
+    "playable-loop:hub-outbound-ready-return.v1"
+  ],
+  "evidencePackageRefs": [],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "placement-control-hierarchy.v3",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "H1 증거에서 H2·H3·H4 준비도를 계산하는 계약·Core·v22 저장과 Unity v3 표현을 구현했다. 실제 Play Mode 증거와 H3 차량 H2가 없어 E3에서 멈춘다.",
+    "nextReopenCondition": "canonical Scene v3 저장 배선 또는 Hub 차량 H2를 구현할 때 E4~E9 영향을 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Unity", "Integration"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:unity", "workstream:integration"],
+    "allowedChangeRoots": [
+      "Ssalddel.Interior.Contracts",
+      "Ssalddel.Interior.Domain",
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application",
+      "Ssalddel.Simulation.Server/Controllers",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "eng/world-seedbeds",
+      "docs/Architecture",
+      "docs/AI"
+    ],
+    "dependencyWorkOrderIds": ["E9-WO-HUB-NPC-ROUTINE-OUTBOUND"],
+    "handoffIn": ["Hub 입고·출고 독립 폐루프와 interior-placement-plan.v2"],
+    "handoffOut": ["H3 차량 H2와 canonical Scene v3 Runtime 증거"],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "공간 성립 계약·Core·저장·Adapter·Unity 표현·시험을 좁게 분리"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v3",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    { "code": "E9", "disposition": "Defined", "summary": "v1/v2와 v21 이하를 보존하면서 상향식 성립을 선택형 v3/v22로 추가한다.", "dimensions": { "changeEnvelope": "Hub H1→H2→H3→H4 준비도와 정밀 배치 증거", "baselineAndTargetRevision": "v2 배치와 v21 저장에서 v3 구성과 v22 저장", "migrationCompatibility": "프로필 없는 세션과 기존 hash 보존", "rollbackBoundary": "SpatialCompositionRuleRevision을 비우면 기존 경로" }, "sourceReferences": ["docs/Architecture/상향식배치성립통제계층.md"], "nextAction": "E8 기준선 전 promotionEligible=false 유지" },
+    { "code": "E8", "disposition": "Gap", "summary": "지속 NPC 생활세계는 범위 밖이다.", "dimensions": { "npcRoleGroup": "기존 Hub 담당 NPC", "continuousLifeLoop": "WI-001~WI-HUB-05 내부 반환만", "playerAbsentBehavior": "WorldTick 성립 판정", "saveReplay": "v22 구성 graph 보존" }, "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md"], "nextAction": "지속 생활세계 기준선 별도 구현" },
+    { "code": "E7", "disposition": "Gap", "summary": "실제 Scene 이동·화면 증거가 없다.", "dimensions": { "playerLoop": "입고→검수→보관→피킹→출고 준비", "authorityModes": "LocalProcess와 RemoteHost 공통 Core", "canonicalScene": "SimulationWorldShell", "runtimeEvidence": "Play Mode·Game View 미검증" }, "sourceReferences": ["docs/Architecture/상향식배치성립통제계층.md"], "nextAction": "저장 Scene v3와 실제 통행 검증" },
+    { "code": "E6", "disposition": "Defined", "summary": "외부 현실 자료를 적용하지 않는다.", "dimensions": { "worldStateExplanation": "Fixture와 승인 H·배치 hash", "groundingProfile": "NotApplied", "provenanceLimitations": "Provider·운영 DB 미사용", "causalQuestionMatrix": "배치 표현은 성립 원인이 아님" }, "sourceReferences": ["docs/Architecture/상향식배치성립통제계층.md"], "nextAction": "현실 자료 필요 시 별도 승인" },
+    { "code": "E5", "disposition": "Affected", "summary": "WorldTick이 Qualified H2를 Formed로 확정하고 손실 시 Degraded로 만든다.", "dimensions": { "triggerOccurrence": "선택형 composition revision", "authorityTransition": "Simulation WorldTick", "taskEffectResult": "H2 인스턴스와 graph hash", "successorOrReturnPath": "H3 차단·H4 부분 준비", "conditionalSpatialEvidence": "Required" }, "sourceReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSpatialCompositionState.cs"], "nextAction": "실제 WI Manifestation과 결속 검증" },
+    { "code": "E4", "disposition": "Affected", "summary": "두 Hub H1의 능력·용량·연결·계획 hash를 H2 규칙에 결속한다.", "dimensions": { "allowedTriggerSources": "WorldDerived", "subjectAndTargetBindings": "receiving-storage와 outbound-staging", "dataResourceTimeBindings": "catalog·plan·world revision/hash", "spatialApplicability": "Required" }, "sourceReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/PyeongchangHubSpatialCompositionFixture.cs"], "nextAction": "승인 대장과 runtime 증거 동등성 유지" },
+    { "code": "E3", "disposition": "Affected", "summary": "결정성·차단·저하·순환·v22·Local/Hosted를 자동 시험한다.", "dimensions": { "contractTests": "필수 H1·능력·배치 검사", "determinism": "입력 순서 독립 graph hash", "saveReplayRegression": "v22 roundtrip와 v21 보존", "consumerRegression": "Local/Hosted 같은 revision hash" }, "sourceReferences": ["Ssalddel.Simulation.Tests/SimulationSpatialCompositionTests.cs", "Ssalddel.Simulation.Tests/SimulationSpatialCompositionSessionTests.cs"], "nextAction": "집중 회귀 유지" },
+    { "code": "E2", "disposition": "Affected", "summary": "공유 계약·Core·Local/HTTP 조회를 호환 확장한다.", "dimensions": { "contracts": "구성 규칙·상태·handle", "applicationDomain": "결정적 성립 Engine", "adapters": "Local Runtime와 서버 GET", "unityProjection": "v3 이중 방향 표현" }, "sourceReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationSpatialCompositionContracts.cs"], "nextAction": "소비자 컴파일 유지" },
+    { "code": "E1", "disposition": "Defined", "summary": "H1부터 상위 공간이 성립하며 Unity는 상태 권위를 갖지 않는다.", "dimensions": { "purposeAndReturn": "Hub 내부 폐루프 공간을 하위 증거로 성립", "authorityAndAllowedTriggerSources": "Simulation Core와 WorldTick", "stableIdsAndRevision": "h2-candidate:hub-internal-warehouse, v3, v22", "acceptanceAndExclusions": "H4 readiness only; 차량·NavMesh·운영 효과 제외" }, "sourceReferences": ["docs/Architecture/상향식배치성립통제계층.md"], "nextAction": "권위 불변식 유지" }
+  ],
+  "upwardValidation": [
+    { "code": "E1", "status": "Passed", "evidence": ["docs/Architecture/상향식배치성립통제계층.md"], "nextAction": "불변식 유지" },
+    { "code": "E2", "status": "Passed", "evidence": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationSpatialCompositionContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSpatialComposition.cs"], "nextAction": "소비자 회귀" },
+    { "code": "E3", "status": "Passed", "evidence": ["Ssalddel.Simulation.Tests/SimulationSpatialCompositionTests.cs", "Ssalddel.Simulation.Tests/SimulationSpatialCompositionSessionTests.cs"], "nextAction": "집중 시험 유지" },
+    { "code": "E4", "status": "Passed", "evidence": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/PyeongchangHubSpatialCompositionFixture.cs"], "nextAction": "승인 대장 동등성 유지" },
+    { "code": "E5", "status": "Blocked", "evidence": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSpatialCompositionState.cs"], "nextAction": "WI 발현과 실제 공간 결속 증거" },
+    { "code": "E6", "status": "NotStarted", "evidence": [], "nextAction": "필요 시 정제" },
+    { "code": "E7", "status": "Blocked", "evidence": [], "nextAction": "Play Mode·Game View 검증" },
+    { "code": "E8", "status": "Blocked", "evidence": [], "nextAction": "지속 생활세계 기준선" },
+    { "code": "E9", "status": "Blocked", "evidence": [], "nextAction": "E8·migration·runtime 회귀" }
+  ],
+  "promotionBlockers": [
+    "canonical SimulationWorldShell 저장 Scene의 v3 배선과 실제 통행 증거가 없다.",
+    "Hub 차량 H2와 WI-HUB-06은 범위 밖이므로 H3가 성립하지 않는다.",
+    "지속 NPC 생활세계 E8 기준선이 없다."
+  ],
+  "finalEvidenceReferences": [
+    "Ssalddel.Simulation.Tests/SimulationSpatialCompositionTests.cs",
+    "Ssalddel.Simulation.Tests/SimulationSpatialCompositionSessionTests.cs"
+  ]
+}

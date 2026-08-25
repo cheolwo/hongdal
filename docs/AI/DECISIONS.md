@@ -2527,3 +2527,14 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 공간 결속: 취소 전용 H1을 새로 만들지 않는다. WI-NATURE-12는 취소 대상 벌목 또는 건설이 이미 결속한 H·Graph와 예약 문맥을 이어받는 Contextual 결속이며, 실행 발현에는 원래 WI와 취소 WI를 함께 기록한다.
 - 증거 경계: `simulation-save.v15` Replay hash와 canonical `SimulationWorldShell` PlayMode에서 C 취소·E 퇴장·R 후퇴·저장·Scene 재진입을 검증했다. 이는 Solo PlayMode 증거이며 Hosted 동등성, 수동 Game View·Console, 전체 Nature E7 또는 E8을 대신하지 않는다.
 - 대체 관계: D-231의 취소·자재 반환과 Actual E5 배치를 미완료로 둔 부분을 대체한다. D-231의 WI 판정 기준과 WI-NATURE-05~11 식별자는 유지한다.
+
+## D-242 배치 통제의 주 성립 축은 H1에서 H4 준비도로 올라간다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 이중 방향: 공간의 주 성립 판단은 `H1 운영 증거 → H2 성립 → H3 성립 → H4 AreaSet 준비도`다. 기존 `WorldEnvelope → AreaEnvelope → H3/H2/H1 → 실내` 방향은 폐기하지 않고 위치·크기·충돌을 제한하는 하향식 제약 검사 축으로 재분류한다.
+- 권위: H1의 능력·용량·연결·운영 상태·배치 계획 hash를 Simulation Core가 규칙 catalog로 평가한다. Unity Transform, Scene 계층, 시각 배치 통과는 H2 이상의 성립이나 능력 권위를 만들지 않는다.
+- 첫 조립: `h1-stock:hub-receiving-storage`와 `h1-stock:hub-outbound-staging`이 같은 승인 Hub 실내 계획을 제공하면 `h2-candidate:hub-internal-warehouse`가 Qualified 뒤 WorldTick에서 Formed가 된다. 하위 증거가 사라지면 Degraded가 된다.
+- 상위 경계: H3 진부 Hub는 내부 창고 H2와 차량 H2를 함께 요구한다. 차량 H2가 없는 현재 범위에서는 H3는 Blocked이고 H4는 PartiallyReady이며 H4 인스턴스를 자동 생성하지 않는다.
+- 호환과 저장: `placement-control-hierarchy.v1/v2`와 기존 실내 계획을 읽고, 상향식 상태는 선택형 `placement-control-hierarchy.v3`와 `simulation-save.v22`에만 추가한다. 프로필 없는 v21 이하 세션의 hash 의미를 유지한다.
+- 증거 경계: 계약·결정성·저장 재생·Local/Hosted Adapter 자동 시험은 E3이며 저장 Scene v3 배선, 실제 이동·NPC 동선·Game View는 E7 별도 증거다.

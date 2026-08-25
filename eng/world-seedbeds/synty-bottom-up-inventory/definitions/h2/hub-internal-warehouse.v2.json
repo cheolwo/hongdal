@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h2.v2",
+  "stableId": "h2-candidate:hub-internal-warehouse",
+  "revision": 1,
+  "hierarchyLevelCode": "H2",
+  "title": "Hub 내부 입고·보관·출고 작업 블록",
+  "summary": "검증된 입고·검수·보관 H1과 피킹·출고 준비 H1을 한 창고 안에서 연결하고, 두 H1의 운영 증거가 충족될 때만 Simulation이 성립시키는 Hub 독립 작업 블록이다.",
+  "knowledgeStateCode": "ApprovedReference",
+  "topologyCode": "ModifiedGrid",
+  "requiredH1Refs": [
+    "h1-stock:hub-receiving-storage",
+    "h1-stock:hub-outbound-staging"
+  ],
+  "optionalH1Refs": [],
+  "connectorRoleCodes": [
+    "ReceivingOutput",
+    "OutboundInput",
+    "WorkerTraversal"
+  ],
+  "sizeVariantCodes": [
+    "Standard"
+  ],
+  "authoredDocument": "authored/h2/hub-internal-warehouse.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h2-candidate:hub-internal-warehouse"
+  ],
+  "unresolvedItems": [],
+  "presentationOnly": true,
+  "isOperationalState": false
+}
