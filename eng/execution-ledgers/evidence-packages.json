@@ -439,7 +439,7 @@
     },
     {
       "evidenceId": "evidence:nature-shelter-playmode-20260825",
-      "title": "Nature 생활거점 실제 입력 E7 후보",
+      "title": "Nature 생활거점 실제 입력·수동 완주 E7 후보",
       "evidenceKindCode": "UnityPlayMode",
       "resultCode": "Partial",
       "statusCode": "Current",
@@ -448,26 +448,38 @@
         "playable-loop:nature-shelter-foundation.v1"
       ],
       "evidenceStageCodes": ["E5", "E6", "E7"],
-      "sourceRevision": "worktree:2026-08-26-nature-shelter-e7-input-audio-r2",
-      "executedAt": "2026-08-26T01:45:00+09:00",
+      "sourceRevision": "worktree:2026-08-26-nature-shelter-e7-manual-r3",
+      "executedAt": "2026-08-26T04:01:58+09:00",
       "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
-      "scope": "실제 Input System으로 도끼 획득, 벌목 취소·재시도, 세 나무 벌목, 오두막 배치·건설, 입장·퇴장, HUD 저장과 Scene 재진입 복원을 자동 PlayMode로 검증했다. 폐루프와 감각 표현 결합 2/2, 하단 UI 입력 경계 EditMode 1/1이 통과했고 직접 Game View에서 Nature 진입·도끼 획득을 확인했다. 음향 진단은 48 kHz Stereo, Listener 활성과 절차형 행동 효과음 4개 결속을 기록했다.",
+      "scope": "실제 Editor Play Mode에서 도끼 획득, 첫 벌목 취소·자원 무변경, 재시도와 세 나무 벌목, 오두막 도면 배치·건설, 입장·퇴장, HUD 저장과 Play Mode 재진입 복원을 사람이 수동 완주했다. 복원 Game View는 Day 2, 도끼 보유, 통나무 0, 그루터기 3개와 오두막 완성을 기록했고 Console 오류는 0개였다. 같은 revision에서 실제 Input System 전체 폐루프 PlayMode 1/1(27.49초), 감각 표현 PlayMode 1/1(2.92초), 하단 UI 입력 경계 EditMode 1/1이 통과했다. 오두막 우선 접근은 이미 가까운 플레이어를 외벽 밖 안전 반경까지 이격한다. 음향 진단은 48 kHz Stereo, Listener 활성과 절차형 행동 효과음 4개 결속을 기록했다.",
       "exclusions": [
-        "사람이 도끼 획득부터 저장 복원까지 전 과정을 수동 완주한 증거",
-        "실제 음향 청취와 승인 Nature Ambient·BGM",
+        "FMOD 출력 장치 초기화 오류 60으로 차단된 실제 음향 청취",
+        "E7 필수 조건이 아닌 승인 Nature Ambient·BGM 선택 채널",
         "운영 Provider와 운영 DB"
       ],
       "artifactReferences": [
         {
           "locationKind": "ExternalCheckout",
-          "locator": "C:/Users/user/ssalddel/Documentation/Changes/2026-08-25-wi-nature-05-e7/README.md",
-          "sha256": "",
+          "locator": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-26-nature-e7-entry/README.md",
+          "sha256": "e8d1df71b7a499192b3b48b19cc94e5fcff102fc80d08a617cded673a0234af6",
           "retentionCode": "External"
         },
         {
           "locationKind": "ExternalCheckout",
-          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-e7/playmode-loop-sensory-results.xml",
-          "sha256": "",
+          "locator": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-26-nature-e7-entry/nature-e7-restored-closed-loop-game-view.png",
+          "sha256": "3adf22eb830685a231c7c53d53deb122392c4d67fb1c3c8e8e3210a4dfc8a3f1",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-e7/playmode-loop-current.xml",
+          "sha256": "3544d0c2dc375799e320c35bde75028cd1a41eb254cd1f393689d0b631bc63f0",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-e7/playmode-sensory-current.xml",
+          "sha256": "4dd006d8617ff2f1133db93c3392bef887f5ac038e49ffc6fe962a388afa9832",
           "retentionCode": "External"
         }
       ],

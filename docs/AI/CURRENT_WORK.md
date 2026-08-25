@@ -7,9 +7,9 @@
 - 활성 Goal: `playable-loop:nature-shelter-foundation.v1 → E7 PlayClosed`
 - 현재 WI / E: `WI-NATURE-05 벌목 도끼 확보` / `E6 → E7 Partial`
 - WIP: Goal `1/1`, WI `1/1`
-- 이번 증거: 자동 실제 입력 전체 폐루프·감각 표현 결합 `2/2`, 입력 경계 EditMode `1/1`, 별도 RemoteHost 동등성, 실제 Editor의 `Nature 탐험` 진입·도끼 획득과 진입 목표·음향 경계 진단, Game View PNG, canonical Scene Missing Script `0개`, `evidence:nature-shelter-playmode-20260825`, `evidence:nature-shelter-hosted-parity-20260825`
-- 남은 차단: 사람이 도끼 획득부터 저장 복원까지 전체를 수동 완주한 증거, 실제 음향 청취, 승인 Nature Ambient·BGM 연결
-- 다음 최저 미완료 의존성: 위 두 차단을 해소해 WI-05 E7을 닫고, 그 뒤에만 `WI-NATURE-06 나무 벌목 작업 시작`을 활성화한다.
+- 이번 증거: 실제 Editor의 도끼 획득 → 첫 벌목 취소·무변경 → 재시도·세 나무 벌목 → 오두막 배치·건설 → 입실·퇴실 → 저장 → Play Mode 재진입 복원을 사람 입력으로 완주했다. 복원 Game View는 `Day 2`, `도끼 보유`, 통나무 `0`, 그루터기 3개와 `오두막 완성`을 기록한다. 같은 revision의 전체 폐루프 PlayMode `1/1`, 감각 표현 PlayMode `1/1`, 입력 경계 EditMode `1/1`, 별도 RemoteHost 동등성, Console 오류 `0`, canonical Scene Missing Script `0개`, `evidence:nature-shelter-playmode-20260825`, `evidence:nature-shelter-hosted-parity-20260825`
+- 남은 차단: FMOD 출력 장치 초기화 오류 60으로 실제 음향 청취가 차단돼 있다. 승인 Nature Ambient·BGM은 E7 필수 조건이 아닌 선택 채널로 대기한다.
+- 다음 최저 미완료 의존성: 출력 장치를 복구해 절차형 행동 효과음 4개를 실제 청음하고 WI-05 E7을 닫은 뒤에만 `WI-NATURE-06 나무 벌목 작업 시작`을 활성화한다.
 - 기계 상태판: [Codex PlayableLoop Goal 상태](generated/codex-playable-loop-goals.md)
 
 ## 현재 목표
@@ -27,7 +27,7 @@
 
 ## 현재 구현 기준선
 
-- 2026-08-26 canonical `SimulationWorldShell`의 하단 모드 선택을 `World / Nature 탐험 / Farm 1P / Farm 3P`로 분리하고 Nature 진입 시 현재 다음 상호작용 대상(도끼→나무→오두막)을 화면 중앙에 결정적으로 조준하도록 표현 계층을 보강했다. 고유 Unity Editor에서 실제 `Nature 탐험` 버튼과 중앙 마우스 입력으로 도끼를 획득해 HUD의 `도끼 보유`·다음 벌목 안내를 확인하고 `Assets/Documentation/Changes/2026-08-26-nature-e7-entry/nature-e7-axe-acquired-game-view.png`를 저장했다. 일인칭 커서를 푼 뒤 하단 모드 UI 입력이 상호작용·커서 재잠금에 소비되지 않도록 Unity UI 레이캐스트와 하단 지속 모드 영역 경계를 추가했으며 입력 경계 EditMode `1/1`이 통과했다. 자동 실제 입력 전체 폐루프와 감각 표현 결합 `2/2`(26.05초), 통합 모드·첫 대상 조준 `1/1`, WI-NATURE-05 전용 `1/1`, Nature EditMode `12/12`가 통과했다. 런타임 음향 진단은 48 kHz Stereo·Listener 활성·도끼 획득/타격/취소/나무 낙하 절차형 효과음 4개 결속을 확인했지만, 프로젝트 안 승인 음원 파일은 `0개`이고 Ambient·BGM 채널은 `OptionalAreaAmbientPending`·`OptionalAreaMusicPending`이다. Editor는 FMOD 출력 장치 초기화 오류 60으로 무음 소프트웨어 출력 중이다. 저장 canonical Scene의 전수 검증은 Missing Script `0개`이며 이전 10개 경고는 Unity Test Runner가 여는 `Temp/__Backupscenes/0.backup`의 임시 사본에서 발생한 것으로 분리했다. 실제 Play의 Console 오류는 `0`이고 남은 경고는 LocalProcess 미이관 능력 대기다. 사람의 전체 폐루프 수동 완주와 Editor 장치에서의 실제 음향 청취·승인 Ambient/BGM은 남아 있으므로 Goal과 WI-NATURE-05는 `E7 Partial`, WIP `1/1`을 유지한다.
+- 2026-08-26 canonical `SimulationWorldShell`의 하단 모드 선택을 `World / Nature 탐험 / Farm 1P / Farm 3P`로 분리하고 Nature 진입 시 현재 다음 상호작용 대상(도끼→나무→오두막)을 화면 중앙에 결정적으로 조준하도록 표현 계층을 보강했다. 고유 Unity Editor에서 도끼 획득, 첫 벌목 취소와 자원 무변경, 재시도·세 나무 벌목, 오두막 도면 배치·건설, 입실·퇴실, HUD 저장과 Play Mode 재진입 복원을 사람 입력으로 완주했다. 복원된 `Day 2` 안전 선택 상태는 `Assets/Documentation/Changes/2026-08-26-nature-e7-entry/nature-e7-restored-closed-loop-game-view.png`에 저장했다. 오두막 접근은 남은 나무보다 생활 거점을 우선하며 플레이어가 이미 너무 가까우면 외벽 밖 안전 반경까지 물러난다. 일인칭 커서를 푼 뒤 하단 모드 UI 입력이 상호작용·커서 재잠금에 소비되지 않도록 Unity UI 레이캐스트와 하단 지속 모드 영역 경계를 추가했다. 같은 revision의 전체 폐루프 PlayMode `1/1`(27.49초), 감각 표현 PlayMode `1/1`(2.92초), 입력 경계 EditMode `1/1`, 통합 모드·첫 대상 조준 `1/1`, WI-NATURE-05 전용 `1/1`, Nature EditMode `12/12`가 통과했다. 런타임 음향 진단은 48 kHz Stereo·Listener 활성·도끼 획득/타격/취소/나무 낙하 절차형 효과음 4개 결속을 확인했지만 Editor는 FMOD 출력 장치 초기화 오류 60으로 실제 청음이 차단됐다. 승인 Ambient·BGM은 E7 필수 조건이 아닌 선택 채널로 대기한다. 저장 canonical Scene의 Missing Script는 `0개`, 실제 Play Console 오류는 `0`이다. 실제 청음 전까지 Goal과 WI-NATURE-05는 `E7 Partial`, WIP `1/1`을 유지한다.
 - 2026-08-25 canonical `SimulationWorldShell`에서 `playable-loop:nature-shelter-foundation.v1`의 자동 실제 입력 후보를 닫았다. Input System으로 도끼 획득 -> 벌목 시작·`C` 취소 -> 같은 나무 재시도와 세 나무 지속 벌목 -> `B` 오두막 배치 -> 오두막 지속 건설 -> 입장·`E` 퇴장 -> HUD 저장 클릭 -> Scene 재진입 복원을 수행하며 시험 전용 Core 완료 메서드를 사용하지 않는다. Unity PlayMode 폐루프 `1/1`(53.3초), 도끼 단일 WI `1/1`, 감각 표현 `1/1`, EditMode `16/16`, Simulation Nature 집중 `36/36`, PlayMode 프로젝트 빌드 오류 0개가 통과했다. 이어 별도 `dotnet` RemoteHost를 127.0.0.1 전용 포트에 기동해 같은 취소·재수확·오두막 건설·입장·퇴장·저장·Replay verification 명령 15개를 LocalProcess와 대조했고 revision `15`, `simulation-save.v23`, replay hash `83a5582724e76d95f8a3344bf86ee7ea56703edbe708aaaf1fa920a131ede0e0`이 일치했다. 자동 시험은 사람의 Game View·실제 청음을 대신하지 않으므로 `WI-NATURE-05`와 부모 폐루프의 E7은 `Partial`을 유지하고 WIP 1도 해제하지 않는다. 배치 모드 로그의 기존 FarmPlot·HarvestLot 직렬화 자동 보정 메시지와 Unity 라이선스 갱신 오류도 별도 잔여 위험으로 남긴다.
 - 2026-08-25 고유 Unity Editor에서 canonical `SimulationWorldShell`을 직접 Play Mode로 열어 Nature Solo HUD·Synty 공간, 1인칭/3인칭 실제 시점 전환, 1인칭 조준선·도끼 View, 대상 없음 상호작용 피드백과 HUD 저장 입력을 확인했다. 런타임에는 Player `AudioListener`, 선택형 Area Ambient/BGM, 2D UI와 배치 기준점별 3D 효과음 `AudioSource`가 생성됐다. 승인 Ambient/BGM clip은 미결이고 Editor 오디오 장치 초기화 실패로 실제 청음은 하지 못했다. Console은 오류 0에서 시작했으나 범위 밖 오늘 작업 계획 모듈의 `DailyWorkServerRequestFailed:0:ConnectionError`가 1건 발생했다. 따라서 자동 실제 입력 전체 폐루프와 외부 RemoteHost 동등성은 닫혔지만 사람의 전체 수동 완주·실제 청음·범위 밖 오류 분리 전까지 E7은 `Partial`이다.
 - 2026-08-25 배치 통제를 `H1→H4` 상향식 공간 성립축과 `World→소품` 하향식 제약축에 더해 Graphics·Camera·Animation·Lighting·Audio·UI를 교차 검증하는 `플레이어 감각 표현축`으로 확장했다. 새 `placement-presentation-bindings.v1`은 Camera Focus·Actor Work·Tool Socket·3D Audio Emitter·FX 기준점을 기존 구조 배치 근거에 결속하고, `wi-presentation-plan.v1`은 WI 권위 상태 사본별 표현 요구를 분리한다. Unity `placement-control-hierarchy.v4`는 여섯 표현 영역을 읽기 전용으로 기록하며 Nature `WI-NATURE-05~06` Adapter는 도끼 획득, 벌목 타격·취소, 나무 낙하를 1·3인칭 도구 View, 절차형 효과음, FX와 자세로 투영한다. .NET 계약 `5/5`, Unity EditMode 상태 투영 `5/5`·배치 v4 `4/4`, canonical Scene 자동 PlayMode 감각 표현 `1/1`과 기존 실제 Input System 도끼 회귀 `1/1`이 통과했고 PlayMode 종료 수명주기 예외와 Audio Listener 누락도 보완했다. Animation·Audio·FX는 Command·WorldTick·업무 완료를 호출하지 않고 표현 hash도 Simulation save/replay hash를 바꾸지 않는다. 범위 Fast는 diff와 Simulation–Unity 코드 지도까지 통과했으나 병행 수정 중인 E 책임 생성 지도가 현재 Attribute보다 뒤처져 strict 검사에서 멈췄고 생성 파일은 덮어쓰지 않았다. 승인된 Nature Ambient·BGM 음원은 없어 선택 채널 미결로 남겼고 연결된 Editor가 없어 수동 Game View·실제 청음·최종 PNG는 미검증이므로 E7 완료를 주장하지 않는다. 기준은 [플레이어 감각 표현축](../Architecture/플레이어감각표현축.md)과 D-247이다.
@@ -101,11 +101,10 @@
 
 ## 다음 검토 순서
 
-1. LocalProcess와 RemoteHost가 WI-NATURE-05~12의 같은 Invocation·Manifestation·취소 반환·Replay hash를 만드는지 HTTP 경계 집중 시험을 추가한다.
-2. Nature의 도끼→벌목→건설→조우→복귀 전체 후속 경로를 결정적 Fixture에서 `Manifested`로 닫고 E5 판정을 갱신한다.
-3. Nature 전용 E6 정제 질문표와 현실자료 `NotApplied` 근거를 승인한다.
-4. canonical `SimulationWorldShell`의 수동 Game View와 오류 없는 Console을 확인해 Solo E7 증거를 보강한다.
-5. 선택된 15개에서 확인한 Pipeline을 기준으로 다음 WI를 한 번에 늘리지 않고 독립 폐루프 단위로 선택·결속한다. 나머지 34개는 원장상 미선택 상태를 유지한다.
+1. `WI-NATURE-05`의 사람 전체 수동 완주는 닫혔다. FMOD 출력 장치 오류 60을 복구해 절차형 행동 효과음 4개를 실제 청음한 뒤 E7을 닫는다. canonical Missing Script `0개`와 외부 프로세스 RemoteHost 동등성은 확인됐으며, 남은 차단을 닫기 전에는 WIP 한도 1을 유지하고 `WI-NATURE-06`을 활성화하지 않는다.
+2. WI-05 E7이 닫힌 뒤 `WI-NATURE-06 나무 벌목 작업 시작` 하나를 E4부터 올리고, 벌목 완료·통나무 생성은 같은 WI의 Task·Effect인지 별도 책임인지 현재 단일 책임 대장에 따라 검증한다.
+3. 이후 `playable-loop:nature-shelter-foundation.v1`의 건설→취소·복귀와 Save/Replay를 WI 하나씩 닫는다.
+4. Nature 생활거점 Core 뒤에도 Farm·Hub·Town·City는 각 독립 Fixture와 내부 폐루프를 먼저 닫고 영역 간 운송은 후속 D6 통합으로 남긴다.
 
 ## 남은 위험과 제한
 

@@ -82,8 +82,8 @@
       "statusCode": "InProgress",
       "evidencePackageRefs": ["evidence:simulation-task-20260824", "evidence:nature-r2-core-20260825", "evidence:nature-shelter-playmode-20260825", "evidence:nature-shelter-hosted-parity-20260825"],
       "workOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json"],
-      "blockers": ["자동 실제 입력 전체 폐루프·감각 표현과 외부 RemoteHost 동등성은 통과했지만 사람의 전체 수동 완주·실제 청음·승인 Ambient/BGM 연결이 남아 있다."],
-      "nextAction": "WI-NATURE-05 E7의 실제 Game View 수동 완주와 오디오 출력 장치·승인 Ambient/BGM 증거를 보강한다."
+      "blockers": ["실제 음향 청취가 FMOD 출력 장치 초기화 오류 60으로 차단돼 있다. 승인 Nature Ambient·BGM은 E7 필수 조건이 아닌 선택 채널로 대기한다."],
+      "nextAction": "오디오 출력 장치를 복구해 절차형 행동 효과음 4개를 실제 청음하고 WI-NATURE-05 E7을 닫는다."
     },
     {
       "priority": 3,

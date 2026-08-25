@@ -46,7 +46,7 @@ E7 PlayClosed까지 닫는다.
 
 | 현재 WI | 현재 E | 현재 증거 | 남은 차단 | 다음 최저 의존성 |
 | --- | --- | --- | --- | --- |
-| `WI-NATURE-05` 벌목 도끼 확보 | E6 → E7 | evidence:simulation-task-20260824<br>evidence:nature-r2-core-20260825<br>evidence:nature-shelter-playmode-20260825<br>evidence:nature-shelter-hosted-parity-20260825 | 자동 실제 입력 전체 폐루프·감각 표현과 외부 RemoteHost 동등성은 통과했지만 사람의 전체 수동 완주·실제 청음·승인 Ambient/BGM 연결이 남아 있다. | `WI-NATURE-05` |
+| `WI-NATURE-05` 벌목 도끼 확보 | E6 → E7 | evidence:simulation-task-20260824<br>evidence:nature-r2-core-20260825<br>evidence:nature-shelter-playmode-20260825<br>evidence:nature-shelter-hosted-parity-20260825 | 실제 음향 청취가 FMOD 출력 장치 초기화 오류 60으로 차단돼 있다. 승인 Nature Ambient·BGM은 E7 필수 조건이 아닌 선택 채널로 대기한다. | `WI-NATURE-05` |
 
 ## Goal 대기열
 

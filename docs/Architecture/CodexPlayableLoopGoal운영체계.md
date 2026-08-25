@@ -53,7 +53,7 @@ E9는 즉시 목표가 아니다. 안정된 E8 기준선에 대한 변경의 Mig
 
 ## 현재 Goal
 
-현재 활성 Goal은 `playable-loop:nature-shelter-foundation.v1 → E7 PlayClosed`, 활성 작업은 `WI-NATURE-05 벌목 도끼 확보`다. 자동 실제 입력 전체 폐루프와 LocalProcess·RemoteHost 동등성은 현재 EvidencePackage에 기록돼 있으나, 사람의 전체 수동 완주·실제 청음과 남은 Scene 경고 분리 전에는 E7을 `Partial`로 유지한다.
+현재 활성 Goal은 `playable-loop:nature-shelter-foundation.v1 → E7 PlayClosed`, 활성 작업은 `WI-NATURE-05 벌목 도끼 확보`다. 자동 실제 입력 전체 폐루프와 LocalProcess·RemoteHost 동등성에 더해 사람 입력의 취소·재시도·세 나무 벌목·오두막 건설·입실·퇴실·저장·Play Mode 재진입 복원과 Game View를 현재 EvidencePackage에 기록했다. FMOD 출력 장치 초기화 오류 60 때문에 실제 청음은 아직 없으므로 E7을 `Partial`로 유지한다. 승인 Nature Ambient·BGM은 E7 필수 조건이 아닌 선택 채널로 대기한다.
 
 진행 보고는 항상 다음 순서를 사용한다.
 
