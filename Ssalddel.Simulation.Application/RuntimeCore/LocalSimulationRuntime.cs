@@ -87,6 +87,12 @@ namespace Ssalddel.Simulation.Application
             => ExecuteAsync(() => lifecycle.Advance(sessionStableId, request),
                 cancellationToken);
 
+        public ValueTask<SimulationSpatialCompositionStateSnapshot>
+            GetSpatialCompositionAsync(string sessionStableId, string areaCode,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .GetSpatialComposition(areaCode), cancellationToken);
+
         ValueTask<SimulationNatureSurvivalStateSnapshot>
             ISimulationNatureSurvivalRuntime.GetAsync(
             string sessionStableId,

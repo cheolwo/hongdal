@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 using Xunit;
@@ -39,6 +42,37 @@ public sealed class SimulationSpatialCompositionSessionBindingTests
         Assert.DoesNotContain(second.Assessments,
             value => value.StateCode == "mutated");
         Assert.Equal(64, second.GraphHashSha256.Length);
+    }
+
+    [Fact]
+    public async Task LocalProcessAndRemoteFacade_ReturnSameGraphHash()
+    {
+        var localRoot = Path.Combine(Path.GetTempPath(),
+            "ssalddel-spatial-binding-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            using var local = new LocalSimulationRuntime(
+                new InMemory경영SimulationSessionStore(),
+                new InMemorySimulationSessionSaveStore(),
+                new FileSimulationLocalSaveSlotStore(localRoot));
+            var localSession = await local.CreateAsync(CreateRequest());
+            var localGraph = await local.GetSpatialCompositionAsync(
+                localSession.SessionStableId, "Hub");
+
+            var remoteStore = new InMemory경영SimulationSessionStore();
+            var remote = new 경영SimulationSessionService(remoteStore,
+                new InMemorySimulationSessionSaveStore());
+            var remoteSession = remote.Create(CreateRequest());
+            var remoteGraph = remote.GetSpatialComposition(
+                remoteSession.SessionStableId, "Hub");
+
+            Assert.Equal(localGraph.GraphHashSha256,
+                remoteGraph.GraphHashSha256);
+        }
+        finally
+        {
+            if (Directory.Exists(localRoot)) Directory.Delete(localRoot, true);
+        }
     }
 
     private static SpatialCompositionAssessment InternalWarehouse(

@@ -337,6 +337,11 @@ namespace Ssalddel.Simulation.Application
             경영SimulationTick진행Request request,
             CancellationToken cancellationToken = default);
 
+        ValueTask<SimulationSpatialCompositionStateSnapshot>
+            GetSpatialCompositionAsync(string sessionStableId,
+                string areaCode,
+                CancellationToken cancellationToken = default);
+
         ValueTask<SimulationLocalSaveSlotResult> SaveSlotAsync(
             string sessionStableId,
             SimulationLocalSaveSlotRequest request,

@@ -73,5 +73,9 @@ namespace Ssalddel.Simulation.Application
             string sessionStableId,
             SimulationSupplyChainWorkConfirmRequest request)
             => sessions.Require(sessionStableId).ConfirmSupplyChainWork(request);
+
+        public SimulationSpatialCompositionStateSnapshot GetSpatialComposition(
+            string sessionStableId, string areaCode)
+            => sessions.Require(sessionStableId).GetSpatialComposition(areaCode);
     }
 }

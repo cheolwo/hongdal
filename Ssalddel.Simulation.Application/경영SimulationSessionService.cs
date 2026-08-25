@@ -209,6 +209,9 @@ namespace Ssalddel.Simulation.Application
         public 경영SimulationSessionSnapshot ConfirmSupplyChainWork(
             string sessionStableId, SimulationSupplyChainWorkConfirmRequest request)
             => logistics.ConfirmSupplyChainWork(sessionStableId, request);
+        public SimulationSpatialCompositionStateSnapshot GetSpatialComposition(
+            string sessionStableId, string areaCode)
+            => logistics.GetSpatialComposition(sessionStableId, areaCode);
 
         public SimulationHarvestDispositionImpactPreviewSnapshot PreviewHarvestDispositionImpact(
             string sessionStableId, SimulationHarvestDispositionImpactPreviewRequest request)
