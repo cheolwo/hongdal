@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.Interior.Contracts",
+  "rootNamespace": "Ssalddel.Interior.Contracts",
+  "references": ["Ssalddel.CodeMetadata"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

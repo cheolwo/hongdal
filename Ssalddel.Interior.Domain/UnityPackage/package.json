@@ -1,0 +1,11 @@
+{
+  "name": "com.ssalddel.interior.domain",
+  "version": "0.1.0",
+  "displayName": "Ssalddel Interior Domain",
+  "description": "결정적 Zone, Fixture, Surface, Slot, LooseItem 배치와 계획 hash를 생성합니다.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.ssalddel.code-metadata": "0.1.0",
+    "com.ssalddel.interior.contracts": "0.1.0"
+  }
+}

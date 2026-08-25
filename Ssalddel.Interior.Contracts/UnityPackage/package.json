@@ -1,0 +1,10 @@
+{
+  "name": "com.ssalddel.interior.contracts",
+  "version": "0.1.0",
+  "displayName": "Ssalddel Interior Contracts",
+  "description": "H 공간 의미와 LH 실행 사이에서 결정적 실내 배치 계획을 공유하는 계약입니다.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.ssalddel.code-metadata": "0.1.0"
+  }
+}
