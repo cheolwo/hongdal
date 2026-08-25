@@ -2538,3 +2538,15 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 상위 경계: H3 진부 Hub는 내부 창고 H2와 차량 H2를 함께 요구한다. 차량 H2가 없는 현재 범위에서는 H3는 Blocked이고 H4는 PartiallyReady이며 H4 인스턴스를 자동 생성하지 않는다.
 - 호환과 저장: `placement-control-hierarchy.v1/v2`와 기존 실내 계획을 읽고, 상향식 상태는 선택형 `placement-control-hierarchy.v3`와 `simulation-save.v22`에만 추가한다. 프로필 없는 v21 이하 세션의 hash 의미를 유지한다.
 - 증거 경계: 계약·결정성·저장 재생·Local/Hosted Adapter 자동 시험은 E3이며 저장 Scene v3 배선, 실제 이동·NPC 동선·Game View는 E7 별도 증거다.
+
+## D-247 배치 결과는 플레이어 감각 표현축에서 교차 검증한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 세 축: D-242의 `H1→H4` 상향식 성립축과 `World→소품` 하향식 제약축을 유지하고, Graphics·Camera·Animation·Lighting·Audio·UI를 묶는 `플레이어 감각 표현축`을 교차 검증 축으로 추가한다. 표현 영역은 새 H 단계나 E 단계가 아니다.
+- 책임 분리: `placement-presentation-bindings.v1`은 Camera Focus·Actor Work·Tool Socket·Audio Emitter·FX·Cutaway 기준점만 소유한다. `wi-presentation-plan.v1`은 권위 상태 사본별 Animation·Audio·FX·UI Intent와 필수·선택 영역을 소유한다.
+- 음향 범위: 객체 접촉음은 배치 객체의 3D Emitter에, 공간 Ambient는 H1~H3 환경에, BGM은 AreaSet·플레이 세션 문맥에 결속한다. BGM은 개별 WI 완료 조건이 아니며 승인 자산이 없으면 미결 상태를 드러낸다.
+- 권위와 저장: Animation Event·Audio·FX·카메라 전환은 Command·WorldTick·Task 완료를 호출하지 않는다. 표현 plan/hash는 EvidencePackage 무효화 근거지만 Simulation canonical save/replay hash를 바꾸지 않는다.
+- 첫 적용: `WI-NATURE-05~06`은 도끼 획득·벌목 진행·취소·나무 낙하를 상태 사본에서 표현한다. 벌목 Animation과 접촉음은 필수 표현 영역이고 Nature Ambient·BGM은 현재 선택 채널이다.
+- 증거 경계: 계약·EditMode·자동 PlayMode는 실제 Game View 판독과 청음을 대신하지 않는다. E7은 canonical Scene의 실제 입력·Animation 중단·복귀·Audio·Console 증거를 별도로 요구한다.
+- 상세 기준: [플레이어 감각 표현축](../Architecture/플레이어감각표현축.md)을 따른다.

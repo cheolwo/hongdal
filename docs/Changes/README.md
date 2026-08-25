@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-08-25 | [플레이어 감각 표현축과 Nature 벌목 표현](2026-08-25-player-sensory-presentation-axis.md) | 간접 확인 — 배치 객체를 Camera Focus·Actor Work·Tool Socket·3D Audio·FX 기준점에 결속하고 도끼 획득·벌목 타격·취소·나무 낙하를 권위 상태 사본에서 표현; 자동 PlayMode와 기존 실제 입력 회귀 통과, 수동 Game View·실제 청음·최종 PNG 미검증 |
 | 2026-08-18 | [싱글 플레이 로컬 LH 지도 생성](2026-08-18-local-lh-world-engine.md) | 간접 확인 — 상태 문구에 로컬 싱글 플레이 생성 출처를 추가하고 저장 Scene이 서버 없이 시드·계절·H4 경계 기준으로 주변 L3 셀을 계산하도록 연결; EditMode 10/10과 저장 Scene 검사 완료, Play Mode·Game View 미검증 |
 | 2026-08-11 | [Unity 턴 카드 모판 정리와 화면](2026-08-11-unity-turn-card-seedbed.md) | 직접 확인 — 철학·학당·지역문화 후보를 C0~C6 Gate로 분리하고 실제 게임 덱·턴 authority와 분리된 한국어 모판 Scene에서 단계·출처·차단 사유를 표시 |
 | 2026-08-11 | [Unity 턴 카드 실제 Simulation 서버 연결](2026-08-11-unity-turn-card-server-connection.md) | 직접 확인 — 서버 context·Preview·Confirm·canonical 재조회로 서울 문화 카드 턴을 넘기고 WorldShell을 4월 13일·Tick 1·Revision 1·`LocalContextAwareness`로 갱신 |
