@@ -448,20 +448,25 @@
         "playable-loop:nature-shelter-foundation.v1"
       ],
       "evidenceStageCodes": ["E5", "E6", "E7"],
-      "sourceRevision": "worktree:2026-08-25-nature-shelter-e7-followup-r1",
-      "executedAt": "2026-08-25T20:20:00+09:00",
+      "sourceRevision": "worktree:2026-08-26-nature-shelter-e7-input-audio-r2",
+      "executedAt": "2026-08-26T01:45:00+09:00",
       "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
-      "scope": "실제 Input System으로 도끼 획득, 벌목 취소·재시도, 세 나무 벌목, 오두막 배치·건설, 입장·퇴장, HUD 저장과 Scene 재진입 복원을 자동 PlayMode 1/1로 검증하고 직접 Game View에서 시점·조준·실패 피드백·저장 입력을 확인했다.",
+      "scope": "실제 Input System으로 도끼 획득, 벌목 취소·재시도, 세 나무 벌목, 오두막 배치·건설, 입장·퇴장, HUD 저장과 Scene 재진입 복원을 자동 PlayMode로 검증했다. 폐루프와 감각 표현 결합 2/2, 하단 UI 입력 경계 EditMode 1/1이 통과했고 직접 Game View에서 Nature 진입·도끼 획득을 확인했다. 음향 진단은 48 kHz Stereo, Listener 활성과 절차형 행동 효과음 4개 결속을 기록했다.",
       "exclusions": [
         "사람이 도끼 획득부터 저장 복원까지 전 과정을 수동 완주한 증거",
         "실제 음향 청취와 승인 Nature Ambient·BGM",
-        "재로드 때 발생하는 기존 Scene 직렬화 경고 분리",
         "운영 Provider와 운영 DB"
       ],
       "artifactReferences": [
         {
           "locationKind": "ExternalCheckout",
           "locator": "C:/Users/user/ssalddel/Documentation/Changes/2026-08-25-wi-nature-05-e7/README.md",
+          "sha256": "",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-e7/playmode-loop-sensory-results.xml",
           "sha256": "",
           "retentionCode": "External"
         }
