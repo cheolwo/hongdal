@@ -33,6 +33,8 @@ namespace Ssalddel.Simulation.Contracts
         /// 클라이언트는 원 관측값이나 의미 신호를 제출하지 않는다.
         /// </summary>
         public string RealityContextProfileStableId { get; set; } = string.Empty;
+        public string SpatialCompositionRuleRevision { get; set; }
+            = string.Empty;
         public int DurationTicks { get; set; } = 28;
         public SimulationWorldContext생성Request WorldContext { get; set; }
             = new SimulationWorldContext생성Request();

@@ -80,6 +80,8 @@ namespace Ssalddel.Simulation.Domain
             RuleRevision = request.RuleRevision.Trim();
             RealityContextProfileStableId = (request.RealityContextProfileStableId
                 ?? string.Empty).Trim();
+            SpatialCompositionRuleRevision =
+                (request.SpatialCompositionRuleRevision ?? string.Empty).Trim();
             DurationTicks = request.DurationTicks;
             FactionStableId = request.WorldContext.FactionStableId.Trim();
             TerritoryStableId = request.WorldContext.TerritoryStableId.Trim();
@@ -100,6 +102,7 @@ namespace Ssalddel.Simulation.Domain
             InitializeHostedWorld();
             InitializeCoopConstruction();
             InitializeRealityContext(frozenRealityContext);
+            InitializeSpatialComposition();
         }
 
         public string SessionStableId { get; }
@@ -109,6 +112,7 @@ namespace Ssalddel.Simulation.Domain
         public int ScenarioSeed { get; }
         public string RuleRevision { get; }
         public string RealityContextProfileStableId { get; }
+        public string SpatialCompositionRuleRevision { get; }
         public int CurrentTick { get; private set; }
         public int DurationTicks { get; }
         public string FactionStableId { get; }
@@ -180,6 +184,7 @@ namespace Ssalddel.Simulation.Domain
             AdvanceIntegratedWorld(CurrentTick);
             RefreshAllAreaAccessEvidence();
             EvaluateSurvivalTarotOpportunity();
+            EvaluateSpatialComposition();
         }
 
         public void EnsureSameCreationRequest(경영SimulationSession생성Request request,
@@ -193,6 +198,10 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(RuleRevision, request.RuleRevision.Trim(), StringComparison.Ordinal)
                 || !string.Equals(RealityContextProfileStableId,
                     (request.RealityContextProfileStableId ?? string.Empty).Trim(),
+                    StringComparison.Ordinal)
+                || !string.Equals(SpatialCompositionRuleRevision,
+                    (request.SpatialCompositionRuleRevision
+                     ?? string.Empty).Trim(),
                     StringComparison.Ordinal)
                 || !string.Equals(realityContext?.InputHashSha256,
                     frozenRealityContext?.InputHashSha256, StringComparison.Ordinal)
@@ -434,6 +443,13 @@ namespace Ssalddel.Simulation.Domain
             if (!string.IsNullOrWhiteSpace(request.RealityContextProfileStableId))
                 RequireStableId(request.RealityContextProfileStableId,
                     "SimulationRealityContextProfileStableIdInvalid");
+            if (!string.IsNullOrWhiteSpace(
+                    request.SpatialCompositionRuleRevision)
+                && !string.Equals(request.SpatialCompositionRuleRevision,
+                    SimulationSpatialCompositionCodes.RuleRevision,
+                    StringComparison.Ordinal))
+                throw new SimulationContractException(
+                    "SimulationSpatialCompositionRuleRevisionInvalid");
             if (request.DurationTicks <= 0 || request.DurationTicks > 365)
                 throw new SimulationContractException("SimulationDurationTicksInvalid");
             if (request.WorldContext == null)
