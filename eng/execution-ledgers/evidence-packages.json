@@ -1,0 +1,510 @@
+{
+  "schemaVersion": "ssalddel-evidence-package-catalog.v1",
+  "revision": "ssalddel-evidence-package-catalog.r6",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
+  "principles": {
+    "artifactScopeDoesNotPromoteSubjectAutomatically": true,
+    "codeTestRuntimeAndOperationsEvidenceRemainDistinct": true,
+    "evidenceIsBoundToRevisionAndEnvironment": true,
+    "invalidationTriggersMustBeExplicit": true,
+    "localArtifactMayBeUnavailableOnAnotherWorktree": true
+  },
+  "allowedEvidenceKindCodes": [
+    "Contract",
+    "AutomatedTest",
+    "SaveReplay",
+    "HttpRuntime",
+    "UnityEditMode",
+    "UnityPlayMode",
+    "GameView",
+    "HostedParity",
+    "Operations"
+  ],
+  "allowedResultCodes": [
+    "Passed",
+    "Failed",
+    "Partial",
+    "NotRun"
+  ],
+  "allowedStatusCodes": [
+    "Current",
+    "Stale",
+    "Superseded",
+    "Blocked"
+  ],
+  "allowedLocationKinds": [
+    "RepositoryPath",
+    "LocalArtifact",
+    "ExternalCheckout"
+  ],
+  "allowedRetentionCodes": [
+    "Tracked",
+    "LocalOnly",
+    "External"
+  ],
+  "packages": [
+    {
+      "evidenceId": "evidence:hub-npc-routine-core-20260825",
+      "title": "Hub 운영 유래 WI NPC 루틴 Core",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:hub-outbound-ready-return.v1"
+      ],
+      "evidenceStageCodes": ["E3"],
+      "sourceRevision": "worktree:2026-08-25-hub-npc-routine-control-r1",
+      "executedAt": "2026-08-25T12:56:00+09:00",
+      "environment": "Windows; .NET 10; SharedSimulationCore; LocalProcess and Hosted HTTP test adapter",
+      "scope": "독립 Hub 재고 Fixture, 전용 출고 NPC·정책, WI-HUB-03~05 결정적 WorldTick, 플레이어 직접 Confirm 차단, 정책·담당자 차단, 취소 반환, Local·Hosted 읽기 모델, simulation-save.v21 및 관련 FarmSupply·AreaBuilding·WI 성숙도 회귀 35/35",
+      "exclusions": [
+        "Hub PickingWorkArea·OutboundStagingArea H 공간 결속",
+        "WI-HUB-06 차량 상차와 외부 운송",
+        "Unity Play Mode·Game View",
+        "지속 NPC 생활세계 E8",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/hub-npc-routine-targeted/hub-npc-routine-targeted.trx",
+          "sha256": "f7ae4c567535790dd8963a53d289da6c0ec54b6c8aea91301c96dd0c820d6ba2",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "eng/execution-ledgers/work-orders/hub-npc-routine-outbound.e9-work-order.json",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "npc-routine-control.r1의 유래·통제·직접 Confirm 차단 의미 변경",
+        "WI-HUB-03~05 상태 전이 또는 후보·담당자 결정 순서 변경",
+        "simulation-save.v21 NPC 루틴 계보 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:simulation-task-20260824",
+      "title": "Simulation 전체 Task 회귀",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Stale",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-shelter-foundation.v1",
+        "playable-loop:nature-night-day2.v1",
+        "playable-loop:farm-internal-production.v1",
+        "playable-loop:farm-crop-cycle.v1",
+        "playable-loop:farm-pack-store-return.v1",
+        "playable-loop:farm-player-placement.v1"
+      ],
+      "evidenceStageCodes": [
+        "E3"
+      ],
+      "sourceRevision": "worktree:2026-08-24-simulation-task",
+      "executedAt": "2026-08-24T20:07:05+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.slnx; Task validation",
+      "scope": "Simulation 솔루션 빌드, 코드 지도·E 책임 지도와 전체 Simulation 시험 764/764",
+      "exclusions": [
+        "Unity 실제 입력",
+        "Game View와 Console",
+        "Hosted RemoteHost 동등성",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/20260824-200646/Ssalddel.Simulation.Tests.trx",
+          "sha256": "ccc7f77e895fd22069fd90e00c62fd0c8aacdbd05a07b361ca727aa58db9d599",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "docs/AI/CURRENT_WORK.md",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "Simulation Core 규칙 또는 Session Aggregate 변경",
+        "WI-NATURE-01~12 또는 WI-FARM-01~06 계약·Revision 변경",
+        "Save/Replay schema 또는 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-playmode-20260824",
+      "title": "Nature Solo LocalProcess PlayMode",
+      "evidenceKindCode": "UnityPlayMode",
+      "resultCode": "Passed",
+      "statusCode": "Stale",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-shelter-foundation.v1"
+      ],
+      "evidenceStageCodes": [
+        "E7"
+      ],
+      "sourceRevision": "worktree:2026-08-24-nature-e7-loop",
+      "executedAt": "2026-08-24T19:55:19+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Solo LocalProcess",
+      "scope": "실제 Input System의 도끼 획득·C 취소·B 배치·E 퇴장·R 후퇴와 저장·Scene 재진입 복원 1/1",
+      "exclusions": [
+        "수동 Game View 시각 수용",
+        "오류 없는 Console 캡처",
+        "Hosted RemoteHost",
+        "전체 후속 경로의 E5 Manifested 판정"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-e7-playmode.xml",
+          "sha256": "8edbd2d0c32bab4d438a823adf6ac867849d2e75bf2f1a52f9c55c58c383b933",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "docs/AI/CURRENT_WORK.md",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell 저장 Scene 배선 변경",
+        "Nature 입력·Controller·Local Runtime Adapter 변경",
+        "WI-NATURE-05~12 규칙 또는 Save 복원 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-r2-core-20260825",
+      "title": "Nature 첫날 r2 Core와 Unity 컴파일",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Stale",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-shelter-foundation.v1",
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "evidenceStageCodes": [
+        "E3"
+      ],
+      "sourceRevision": "worktree:2026-08-25-nature-r2-core",
+      "executedAt": "2026-08-25T00:20:00+09:00",
+      "environment": "Windows; .NET 10; Unity 6000.5.6f1 batch compile; Solo LocalProcess code boundary",
+      "scope": "WI-NATURE-13~15, r2 보관·위협·WorldLocal 전투 후퇴 인계·전투 결과·수면·Day2 계획·simulation-save.v17 집중 시험 31/31, Simulation 빌드, Unity 스크립트 컴파일",
+      "exclusions": [
+        "실제 직접 전투의 LocalProcess 권위 연결",
+        "Hosted RemoteHost revision hash 동등성",
+        "Play Mode 전체 첫날 완주",
+        "수동 Game View와 Console 수용"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "Ssalddel.Simulation.Tests/TestResults/nature-r2-combat.trx",
+          "sha256": "8a11302246b505511554945ba001f12a515b226aa94a122089fed513573186b3",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-r2-unity-compile.log",
+          "sha256": "6be49edab03b79f6f44d5b5147d479fb7cadd6ea969da2316fd5eaf738a9afec",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "Nature r2 규칙·WI-NATURE-13~15 계약 변경",
+        "SimulationLocalCombat 결과 인계 또는 save.v17 hash 의미 변경",
+        "Unity Nature Controller·Local Runtime Adapter 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-dual-combat-core-20260825",
+      "title": "Nature 관찰 운영·직접 개입 Core와 LocalProcess 폐루프",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-twilight-return.v1"
+      ],
+      "evidenceStageCodes": [
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "sourceRevision": "worktree:2026-08-25-nature-dual-combat-r1",
+      "executedAt": "2026-08-25T08:01:00+09:00",
+      "environment": "Windows; .NET 10; SharedSimulationCore; Solo LocalProcess and ASP.NET test host",
+      "scope": "관찰 방식 잠금·카드 hash·자동 행동·단일 비상 개입, 직접 S/A/B 성과, Nature 서버 전용 추가 보상, HTTP 없는 LocalProcess 전투, simulation-save.v17 읽기 호환과 v18 슬롯 복원, 세션 API route 회귀 57/57",
+      "exclusions": [
+        "실제 Unity Play Mode 입력과 Game View",
+        "LocalProcess·RemoteHost WorldRevision별 hash 동등성",
+        "E6 난도·보상 체감 정제",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-dual-combat-core-20260825.trx",
+          "sha256": "c3aea042be1c9afe429a5fb6747c83d3521f4b986bf0271a4683b519cd03b041",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "eng/execution-ledgers/work-orders/nature-dual-combat-participation.e9-work-order.json",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationLocalCombat R3 방식·카드·성과 규칙 변경",
+        "Nature 전투 결과 인계 또는 simulation-save.v18 canonical hash 의미 변경",
+        "LocalSimulationRuntime 전투 Application 조립 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-dual-combat-unity-editmode-20260825",
+      "title": "Nature 이중 전투 Unity 컴파일과 공식 Scene 배선",
+      "evidenceKindCode": "UnityEditMode",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-twilight-return.v1"
+      ],
+      "evidenceStageCodes": [
+        "E3",
+        "E4"
+      ],
+      "sourceRevision": "worktree:2026-08-25-nature-dual-combat-r1",
+      "executedAt": "2026-08-25T08:00:05+09:00",
+      "environment": "Unity 6000.5.6f1; EditMode; canonical SimulationWorldShell",
+      "scope": "공통 RuntimeCore와 Local battle Adapter 스크립트 컴파일, 현장전투 입력 번역과 저장 SimulationWorldShell 배선 4/4",
+      "exclusions": [
+        "관찰 일시정지·비상 카드의 실제 Input System 조작",
+        "1인칭 직접 전투 완주",
+        "Play Mode·Game View·Console",
+        "Hosted RemoteHost"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-dual-combat-unity-editmode.xml",
+          "sha256": "6fc2965ff99062901181ab2486a32157590dd0d2e66ebd77a6f40b5a09e9bfdd",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Infrastructure/Simulation/LocalSimulationUnifiedBattleAuthorityClient.cs",
+          "sha256": "",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell 현장전투 Composition Root 배선 변경",
+        "전투 시점 입력 또는 Local battle authority Adapter 변경",
+        "공통 RuntimeCore Unity package 포함 경계 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-building-core-20260825",
+      "title": "Nature 건물 발전·배움 확장 Core",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-workbench-foundation.v1",
+        "playable-loop:nature-building-learning.v1"
+      ],
+      "evidenceStageCodes": ["E3", "E4", "E5"],
+      "sourceRevision": "worktree:2026-08-25-nature-area-building-r1",
+      "executedAt": "2026-08-25T09:58:02+09:00",
+      "environment": "Windows; .NET 10; SharedSimulationCore; Solo LocalProcess and Hosted HTTP test adapter",
+      "scope": "Nature r3 작업대·배움터 건설, 비용·선행·발자국·취소 반환·NPC 학습 방문과 simulation-save.v19의 결정적 Fixture 집중 시험 5/5",
+      "exclusions": [
+        "Farm·Town·Hub·City 실제 건설 상태 전이",
+        "Unity Play Mode 배치 입력과 Game View",
+        "Hosted RemoteHost hash 동등성",
+        "외부 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/playable-loop-closure/nature-building.trx",
+          "sha256": "bd2dd79eb675cbc3f1ac6a6f50bacb4bd64e6ad1b3fcb66ebe40991c4b66ff6b",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "WI-CON-01 또는 area-building-tech-tree.r1 규칙 변경",
+        "Nature r3 건물·학습 상태나 simulation-save.v19 canonical hash 의미 변경",
+        "LocalSimulationRuntime 건물 Application 조립 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:town-arcana-core-20260825",
+      "title": "Town 활성화별 아르카나와 NPC 생활복구 Core 문맥",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:town-resident-market.v1",
+        "playable-loop:town-order-consume-return.v1",
+        "playable-loop:town-arcana-context.v1"
+      ],
+      "evidenceStageCodes": ["E3", "E4"],
+      "sourceRevision": "worktree:2026-08-24-town-arcana-npc-life-r1",
+      "executedAt": "2026-08-24T22:03:41+09:00",
+      "environment": "Windows; .NET 10; SharedSimulationCore",
+      "scope": "활성화별 방향 가변·활성 중 불변, 고정 정밀도 51%, 단일 Fan-out, 물품 경쟁·대체 선택·소비·다음 욕구와 simulation-save.v16 집중 시험 8/8",
+      "exclusions": [
+        "ORDER 01~07 전체 E5 세계 발현",
+        "Town H1 이동과 실제 소비 표현",
+        "Unity Play Mode·Game View",
+        "LocalProcess·RemoteHost hash 동등성"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/arcana-town-npc-life-final/arcana-town-npc-life-final.trx",
+          "sha256": "0123a2a35f0cb8f029712b4ddbf37cd1e309432bc2117471b0e1250c7c978784",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "WI-CARD-01 또는 arcana-town-life.r1 방향·상속 규칙 변경",
+        "Town NPC 욕구·경쟁·소비·다음 목표 규칙 변경",
+        "simulation-save.v16 활성화·상속·배율 계보 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-field-supply-core-20260825",
+      "title": "Nature 현장 성과·거점 제작·다음 원정 왕복 Core",
+      "evidenceKindCode": "AutomatedTest",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-field-supply-return.v1"
+      ],
+      "evidenceStageCodes": ["E3", "E4"],
+      "sourceRevision": "worktree:2026-08-25-nature-play-flow-cycle-r2",
+      "executedAt": "2026-08-25T15:00:00+09:00",
+      "environment": "Windows; .NET 10; SharedSimulationCore; Solo LocalProcess",
+      "scope": "Nature r4 직접 제작 WI-NATURE-16을 보존하고 npc-routine-control.r3 정책 비활성·활성, 적격 NPC 결정, 입력 없는 4초 WI-NATURE-17 위임 제작, 직접 제작 경합, 취소 반환, 보급 꾸러미 원정 준비·패배 보호와 simulation-save.v20·v21 결정적 재생 집중 시험 및 Nature 생활핵 CraftingWorkArea 문맥 결속",
+      "exclusions": [
+        "Unity Play Mode 작업대 입력과 Game View",
+        "Hosted RemoteHost revision별 hash 동등성",
+        "별도 다중 Lot 재고 원장",
+        "외부 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationAreaBuildingProgressionTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNaturePlayFlowCycleTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "WI-NATURE-16·17 또는 nature-survival.realtime.r4·npc-routine-control.r3 제작·보호·위임 규칙 변경",
+        "simulation-save.v20·v21 canonical hash 의미 변경",
+        "Nature 작업대 H1 능력 또는 LocalSimulationRuntime Adapter 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-shelter-playmode-20260825",
+      "title": "Nature 생활거점 실제 입력 E7 후보",
+      "evidenceKindCode": "UnityPlayMode",
+      "resultCode": "Partial",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-shelter-foundation.v1"
+      ],
+      "evidenceStageCodes": ["E5", "E6", "E7"],
+      "sourceRevision": "worktree:2026-08-25-nature-shelter-e7-followup-r1",
+      "executedAt": "2026-08-25T20:20:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "실제 Input System으로 도끼 획득, 벌목 취소·재시도, 세 나무 벌목, 오두막 배치·건설, 입장·퇴장, HUD 저장과 Scene 재진입 복원을 자동 PlayMode 1/1로 검증하고 직접 Game View에서 시점·조준·실패 피드백·저장 입력을 확인했다.",
+      "exclusions": [
+        "사람이 도끼 획득부터 저장 복원까지 전 과정을 수동 완주한 증거",
+        "실제 음향 청취와 승인 Nature Ambient·BGM",
+        "재로드 때 발생하는 기존 Scene 직렬화 경고 분리",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Documentation/Changes/2026-08-25-wi-nature-05-e7/README.md",
+          "sha256": "",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell Nature 입력·카메라·저장 배선 변경",
+        "WI-NATURE-05~12 상태 전이 또는 실제 입력 PlayMode 경로 변경",
+        "Nature 감각 표현 plan·binding 또는 Unity 프로젝트 판본 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-shelter-hosted-parity-20260825",
+      "title": "Nature 생활거점 LocalProcess·RemoteHost 동등성",
+      "evidenceKindCode": "HostedParity",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:nature-shelter-foundation.v1"
+      ],
+      "evidenceStageCodes": ["E5", "E7"],
+      "sourceRevision": "hongdal:0ec66b5d",
+      "executedAt": "2026-08-25T20:00:00+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and separate dotnet RemoteHost over 127.0.0.1",
+      "scope": "취소·재수확·오두막 건설·입장·퇴장·저장·Replay verification 명령 15개를 LocalProcess와 RemoteHost에 적용해 최종 revision 15, simulation-save.v23과 replay hash 83a5582724e76d95f8a3344bf86ee7ea56703edbe708aaaf1fa920a131ede0e0 동등성을 확인했다.",
+      "exclusions": [
+        "canonical Scene의 사람 수동 완주",
+        "실제 음향 청취와 최종 화면 캡처",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "docs/Changes/2026-08-25-nature-shelter-remote-host-parity.md",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "LocalSimulationRuntime 또는 RemoteHost Adapter 변경",
+        "WI-NATURE-05~12 Command·revision·Save/Replay 의미 변경",
+        "simulation-save.v23 canonical hash 의미 변경"
+      ]
+    }
+  ]
+}

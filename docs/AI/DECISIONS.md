@@ -2550,3 +2550,15 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 첫 적용: `WI-NATURE-05~06`은 도끼 획득·벌목 진행·취소·나무 낙하를 상태 사본에서 표현한다. 벌목 Animation과 접촉음은 필수 표현 영역이고 Nature Ambient·BGM은 현재 선택 채널이다.
 - 증거 경계: 계약·EditMode·자동 PlayMode는 실제 Game View 판독과 청음을 대신하지 않는다. E7은 canonical Scene의 실제 입력·Animation 중단·복귀·Audio·Console 증거를 별도로 요구한다.
 - 상세 기준: [플레이어 감각 표현축](../Architecture/플레이어감각표현축.md)을 따른다.
+
+## D-248 Codex 장기 Goal은 PlayableUnit 하나를 소유하고 WI WIP 1로 진행한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- Goal 경계: 장기 Goal은 플레이어 약속을 가진 `PlayableUnit` 하나와 목표 `E7 PlayClosed` 또는 `E8 WorldClosed`를 소유한다. `AreaAggregate`·`WorldAggregate`, H 전체, E/G 체계 전체를 Goal 하나에 넣지 않고 필수 자식의 완료에서 파생한다.
+- 실행 경계: 동시에 활성 Goal 하나와 WI 하나만 허용한다. 같은 플레이어 약속 안에서 새 영향이 발견되면 Goal을 폐기하지 않고 작업 명세의 E9→E1 하향 검토를 다시 열며, 플레이어 약속 변경 또는 독립 폐루프 교체 때만 Goal을 바꾼다.
+- 증거 경계: E7은 실제 입력·Play Mode·Game View·성공/실패/회복/귀환·결정적 Save/Restore/Replay를 요구한다. 필수 `NpcRoutine`이 있는 폐루프는 NPC 판단→행동→결과→다음 판단까지 닫는 E8 `WorldClosed`를 목표로 한다. E9는 안정된 E8 기준선의 변경 적응 증거이지 새 기능의 즉시 Goal이 아니다.
+- 우선순위: 플레이어 연속성 기준 `Nature→Farm→Hub→Town→City`를 사용하되 각 영역은 독립 실행한다. Core를 같은 영역의 Extension보다 먼저 닫고 영역 간 화물·운송을 선행 의존으로 만들지 않는다.
+- 대체 관계: D-239의 당시 준비도 기준 `Nature→Town→Farm→Hub→City` 실행 순서는 이 플레이어 연속성 우선순위로 대체한다. D-239의 PlayableUnit·Core/Extension·파생 Aggregate 원칙과 기존 StableId는 유지한다.
+- 첫 Goal: `playable-loop:nature-shelter-foundation.v1 → E7 PlayClosed`, WI WIP는 `WI-NATURE-05`다. 자동 실제 입력과 Hosted 동등성이 있어도 사람의 전체 수동 완주·실제 청음·남은 Scene 경고 분리 전에는 E7을 `Partial`로 유지한다.
+- 상세 기준: [Codex PlayableLoop Goal 운영 체계](../Architecture/CodexPlayableLoopGoal운영체계.md)와 `codex-playable-loop-goals.v1`을 따른다.

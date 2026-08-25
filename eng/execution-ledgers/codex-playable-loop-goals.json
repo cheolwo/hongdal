@@ -1,0 +1,207 @@
+{
+  "schemaVersion": "codex-playable-loop-goals.v1",
+  "revision": "codex-playable-loop-goals.r1",
+  "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
+  "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
+  "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
+  "principles": {
+    "goalOwnsExactlyOnePlayableUnit": true,
+    "aggregateMilestonesAreDerived": true,
+    "oneGoalAndOneWorldInteractionAtATime": true,
+    "evidenceMaturityDoesNotEqualImplementationProgress": true,
+    "sameGoalSurvivesDownwardReassessment": true,
+    "playerPromiseChangeReplacesGoal": true,
+    "independentPlayableLoopChangeReplacesGoal": true,
+    "corePrecedesExtensionWithinArea": true,
+    "simulationAuthorityRemainsOutsideUnityPresentation": true
+  },
+  "policy": {
+    "goalSubjectLevelCode": "PlayableUnit",
+    "aggregateTreatmentCode": "DerivedMilestone",
+    "priorityModeCode": "PlayerContinuity",
+    "goalWorkInProgressLimit": 1,
+    "worldInteractionWorkInProgressLimit": 1,
+    "defaultPlayerTargetEvidenceStage": "E7",
+    "e9AllowedAsGoalTarget": false,
+    "areaContinuityOrderCodes": ["Nature", "Farm", "Hub", "Town", "City"],
+    "goalReplacementTriggerCodes": [
+      "PlayerPromiseChanged",
+      "IndependentPlayableLoopSelected"
+    ]
+  },
+  "allowedGoalStateCodes": [
+    "Active",
+    "Queued",
+    "WaitingForDecision",
+    "Blocked",
+    "Completed",
+    "Deferred"
+  ],
+  "allowedCompletionRoleCodes": ["Core", "Extension"],
+  "activeGoal": {
+    "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+    "targetEvidenceStage": "E7",
+    "targetClosureStateCode": "PlayClosed",
+    "goalStateCode": "Active",
+    "activeWorldInteractionId": "WI-NATURE-05",
+    "baselineRevision": "world-interaction-delivery-priorities.r4",
+    "workOrderRef": "eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json",
+    "workOrderTargetRevision": "nature-survival-world.e9-target.r2-first-day"
+  },
+  "items": [
+    {
+      "queueOrder": 1,
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "areaCode": "Nature",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Active",
+      "activationPrerequisiteLoopStableIds": [],
+      "nextWorldInteractionId": "WI-NATURE-05"
+    },
+    {
+      "queueOrder": 2,
+      "loopStableId": "playable-loop:nature-twilight-return.v1",
+      "areaCode": "Nature",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:nature-shelter-foundation.v1"],
+      "nextWorldInteractionId": "WI-NATURE-01"
+    },
+    {
+      "queueOrder": 3,
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "areaCode": "Nature",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:nature-twilight-return.v1"],
+      "nextWorldInteractionId": "WI-NATURE-13"
+    },
+    {
+      "queueOrder": 4,
+      "loopStableId": "playable-loop:nature-workbench-foundation.v1",
+      "areaCode": "Nature",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:nature-night-day2.v1"],
+      "nextWorldInteractionId": "WI-CON-01"
+    },
+    {
+      "queueOrder": 5,
+      "loopStableId": "playable-loop:nature-field-supply-return.v1",
+      "areaCode": "Nature",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E8",
+      "targetClosureStateCode": "WorldClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:nature-workbench-foundation.v1"],
+      "nextWorldInteractionId": "WI-NATURE-16"
+    },
+    {
+      "queueOrder": 6,
+      "loopStableId": "playable-loop:nature-building-learning.v1",
+      "areaCode": "Nature",
+      "completionRoleCode": "Extension",
+      "targetEvidenceStage": "E8",
+      "targetClosureStateCode": "WorldClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:nature-field-supply-return.v1"],
+      "nextWorldInteractionId": "WI-CON-01"
+    },
+    {
+      "queueOrder": 7,
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "areaCode": "Farm",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": [],
+      "nextWorldInteractionId": "WI-FARM-01"
+    },
+    {
+      "queueOrder": 8,
+      "loopStableId": "playable-loop:farm-pack-store-return.v1",
+      "areaCode": "Farm",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:farm-crop-cycle.v1"],
+      "nextWorldInteractionId": "WI-FARM-05"
+    },
+    {
+      "queueOrder": 9,
+      "loopStableId": "playable-loop:farm-player-placement.v1",
+      "areaCode": "Farm",
+      "completionRoleCode": "Extension",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:farm-pack-store-return.v1"],
+      "nextWorldInteractionId": "WI-WORLD-03"
+    },
+    {
+      "queueOrder": 10,
+      "loopStableId": "playable-loop:hub-inbound-putaway.v1",
+      "areaCode": "Hub",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E8",
+      "targetClosureStateCode": "WorldClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": [],
+      "nextWorldInteractionId": "WI-001"
+    },
+    {
+      "queueOrder": 11,
+      "loopStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "areaCode": "Hub",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E8",
+      "targetClosureStateCode": "WorldClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:hub-inbound-putaway.v1"],
+      "nextWorldInteractionId": "WI-HUB-03"
+    },
+    {
+      "queueOrder": 12,
+      "loopStableId": "playable-loop:town-order-consume-return.v1",
+      "areaCode": "Town",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E8",
+      "targetClosureStateCode": "WorldClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": [],
+      "nextWorldInteractionId": "WI-ORDER-01"
+    },
+    {
+      "queueOrder": 13,
+      "loopStableId": "playable-loop:town-arcana-context.v1",
+      "areaCode": "Town",
+      "completionRoleCode": "Extension",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": ["playable-loop:town-order-consume-return.v1"],
+      "nextWorldInteractionId": "WI-CARD-01"
+    },
+    {
+      "queueOrder": 14,
+      "loopStableId": "playable-loop:city-demand-service-return.v1",
+      "areaCode": "City",
+      "completionRoleCode": "Core",
+      "targetEvidenceStage": "E8",
+      "targetClosureStateCode": "WorldClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": [],
+      "nextWorldInteractionId": "WI-CITY-01"
+    }
+  ]
+}

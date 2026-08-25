@@ -2,9 +2,20 @@
 
 > GPT Chat과 Codex가 다음 작업을 이어받기 위한 최신 상태판이다. 완료 이력을 누적하지 않으며 장기 결정은 [DECISIONS.md](DECISIONS.md), 세부 설계와 과거 근거는 연결된 Architecture 문서를 따른다.
 
+## 현재 PlayableLoop Goal 상태
+
+- 활성 Goal: `playable-loop:nature-shelter-foundation.v1 → E7 PlayClosed`
+- 현재 WI / E: `WI-NATURE-05 벌목 도끼 확보` / `E6 → E7 Partial`
+- WIP: Goal `1/1`, WI `1/1`
+- 이번 증거: 자동 실제 입력 전체 폐루프, 별도 RemoteHost 동등성, `evidence:nature-shelter-playmode-20260825`, `evidence:nature-shelter-hosted-parity-20260825`, Solo LocalProcess에서 오늘 작업 원격 요청을 시작하지 않는 PlayMode 회귀 `1/1`
+- 남은 차단: 사람이 도끼 획득부터 저장 복원까지 전체를 수동 완주한 증거, 실제 음향 청취, Scene 재로드 직렬화 경고 분리
+- 다음 최저 미완료 의존성: 위 차단을 해소해 WI-05 E7을 닫고, 그 뒤에만 `WI-NATURE-06 나무 벌목 작업 시작`을 활성화한다.
+- 기계 상태판: [Codex PlayableLoop Goal 상태](generated/codex-playable-loop-goals.md)
+
 ## 현재 목표
 
-- `Nature 생존 생활거점`을 첫 실제 플레이 폐루프로 완성한다. 안전 빈터 등장 → 도끼 획득 → 벌목 → 통나무 → 오두막 → 황혼 위협 → 전투/후퇴 → 회복·재출발을 먼저 닫고, Nature↔Farm 및 다른 영역 연결은 별도 통합 slice로 다룬다.
+- 장기 Codex Goal은 `PlayableUnit` 하나만 소유하고 `AreaAggregate`·`WorldAggregate`는 필수 자식 상태에서 파생한다. 플레이어 연속성 기준 `Nature→Farm→Hub→Town→City`로 각 독립 영역의 Core를 Extension보다 먼저 닫으며 Goal WIP와 WI WIP를 각각 1로 유지한다. 현재 E5로 닫힌 단위는 Nature 생활거점 기초·황혼 대응·작업대 Core와 건물·배움 Extension이고 모든 영역 집계는 아직 `Open`이다.
+- `Nature 생존 생활거점`을 첫 실제 플레이 폐루프로 완성한다. 안전 빈터 등장 → 도끼 획득 → 벌목 → 오두막 → 보관 → 황혼 위협 → 3인칭 관찰 운영 또는 1인칭 직접 개입/후퇴 → 수면 → 새벽 확장 계획을 먼저 닫고, Nature↔Farm 및 다른 영역 연결은 별도 통합 slice로 다룬다.
 - 공식 Unity 진입점은 `SimulationWorldShell` 하나로 유지한다. 검토·실험 Scene과 Fixture는 실제 서버 플레이 및 완료 증거와 분리한다.
 - 운영 서버, Simulation 상태, Unity 표현의 책임을 분리한다. 운영 자료는 승인·동기화·세션 동결을 거쳐 정보와 제안으로만 사용하며 자동 생산량·수익·사건 규칙을 만들지 않는다.
 - 공간은 `H1 작업공간 → H2 블록 → H3 경관 → H4 AreaSet → H5 세계 배치`, 증거는 `E0~E9`, 관리 체계는 `G1~G4`로 분리해 판정한다. E의 판정 주체는 WI 또는 WI 폐루프이며 E4는 실행 문맥 결속, E5는 결정적 세계 발현이다. H·AreaSet·Graph는 필요한 WI의 조건부 공간 증거이고 G 작업 완료나 공간 조립 출력은 E 승격을 대신하지 않는다.

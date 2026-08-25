@@ -105,8 +105,9 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 
 ## 구현 단위
 
-- 게임 작업은 [플레이어 중심 게임 개발 업무 구조](docs/Architecture/플레이어중심게임개발업무구조.md)에 따라 플레이어가 보는 상황·욕구·선택·대가·재료 획득·조립·결과·다음 선택을 먼저 적는다. 이 관점은 E/G/H/WI를 대체하지 않으며 Unity 또는 플레이어에게 상태 권위를 주지 않는다. 플레이어는 H1 조립을 선택하고 H2·H3 성장을 유도할 수 있지만 상위 공간 성립은 Simulation 규칙이 판정한다.
-- 의미 있는 새 게임 기능·규칙·공간·저장 변경은 구현 전에 [E9↔E1 반복 왕복 구현 체계](docs/Architecture/E9하향식수직구현체계.md)의 작업 명세를 만든다. E9 목표부터 E1 계약까지 영향과 누락을 검토하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 상향 조립·검증한다. 상향 결과에서 새 영향이나 잘못된 가정이 발견되면 같은 작업 명세를 다시 E9→E1로 검토하며 안정 상태 또는 명시적 차단까지 왕복한다.
+- 게임 작업은 [플레이어 중심 게임 개발 업무 구조](docs/Architecture/플레이어중심게임개발업무구조.md)에 따라 플레이어가 보는 상황·욕구·선택·대가·재료 획득·조립·결과·다음 선택을 먼저 적는다. 여러 WI가 성공·실패·회복·귀환까지 닫히는 단위는 [플레이 폐루프와 증거 묶음 개발 체계](docs/Architecture/플레이폐루프와증거묶음개발체계.md)의 PlayableLoop로 등록하고, 시험·Runtime·화면·Hosted·운영 증거는 범위·제외·revision·무효화 조건을 가진 EvidencePackage로 분리한다. 이 관점과 연결 객체는 E/G/H/WI를 대체하지 않으며 Unity 또는 플레이어에게 상태 권위를 주지 않는다. 플레이어는 H1 조립을 선택하고 H2·H3 성장을 유도할 수 있지만 상위 공간 성립은 Simulation 규칙이 판정한다.
+- 장기 Codex Goal은 [Codex PlayableLoop Goal 운영 체계](docs/Architecture/CodexPlayableLoopGoal운영체계.md)에 따라 `PlayableUnit` 하나만 소유한다. Goal WIP와 WI WIP를 각각 1로 유지하고 `eng/execution-ledgers/codex-playable-loop-goals.json`과 생성 상태판에서 현재 Goal·WI·E·차단·다음 의존성을 확인한다. `AreaAggregate`·`WorldAggregate`는 필수 자식 상태에서 파생하며 Goal로 직접 활성화하지 않는다.
+- 의미 있는 새 게임 기능·규칙·공간·저장 변경은 구현 전에 [E9↔E1 반복 왕복 구현 체계](docs/Architecture/E9하향식수직구현체계.md)의 작업 명세를 만든다. 작업 명세는 대상 PlayableLoop·사용 EvidencePackage와 주 작업 흐름·담당·검토·허용 경로·의존·입출력 인계를 기록한다. E9 목표부터 E1 계약까지 영향과 누락을 검토하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 상향 조립·검증한다. 상향 결과에서 새 영향이나 잘못된 가정이 발견되면 같은 작업 명세를 다시 E9→E1로 검토하며 안정 상태 또는 명시적 차단까지 왕복한다.
 - `targetEvidenceStage = E9`는 완결 방향이지 현재 E9 증거가 아니다. 각 상향 주기 뒤 E1→E9 검증 상태를 갱신하고, 새 영향이 있으면 관련 하향 판정을 다시 연다. 실제 E8 기준선·Migration·호환·회귀가 없으면 `promotionEligible = false`를 유지한다.
 - Solo는 `LocalProcess`, Hosted는 `RemoteHost`에서 같은 Simulation Core를 실행하도록 작업 명세에 적는다. H 의미 계층과 배치 통제 계층을 분리하고 canonical `SimulationWorldShell` 외의 새 공식 Scene을 만들지 않는다.
 - 원장 또는 업무 node 하나를 골라 저장, 상태 전이, Event, API, UI, test까지 세로로 완성한다.
