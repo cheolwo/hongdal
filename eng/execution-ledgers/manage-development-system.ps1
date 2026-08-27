@@ -100,7 +100,7 @@ $postE7Mode = if ($Mode -eq "Write") { "Write" } else { "Check" }
 & $postE7Manager -Mode $postE7Mode `
     -InputPath $PostE7EvidenceCampaignPath | Out-Null
 
-Require ([string] $loops.schemaVersion -eq "ssalddel-playable-loop-catalog.v5") `
+Require ([string] $loops.schemaVersion -eq "ssalddel-playable-loop-catalog.v6") `
     "PlayableLoopSchemaInvalid"
 Require ([string] $loops.evidenceModelRevision -eq "horizontal-dual-cycle-evidence.r3") `
     "PlayableLoopEvidenceModelInvalid"
@@ -131,7 +131,9 @@ foreach ($principle in @(
     "worldInteractionPolarityDoesNotClassifyDevelopmentTrack",
     "playableUnitVerticalMaturityEndsAtE7",
     "playableUnitHorizontalStabilityUsesE8",
-    "areaAggregateHarmonyStartsAtE9")) {
+    "areaAggregateHarmonyStartsAtE9",
+    "topicDesignPrecedesGoalActivation",
+    "topicMapsToExactlyOnePlayableUnit")) {
     $property = $loops.principles.PSObject.Properties[$principle]
     Require ($null -ne $property -and [bool] $property.Value) `
         "PlayableLoopPrincipleMissing:$principle"
@@ -291,9 +293,6 @@ foreach ($package in @($evidence.packages)) {
 }
 
 $wiIds = @($wiCatalog.items.id)
-$detailedDesignRequiredIds = @(
-    $loops.designDocumentationPolicy.requiredDetailedDesignLoopStableIds |
-        ForEach-Object { [string] $_ })
 $loopById = @{}
 foreach ($loop in @($loops.items)) {
     $id = [string] $loop.loopStableId
@@ -318,19 +317,6 @@ foreach ($loop in @($loops.items)) {
     Require (@($loop.returnStateCodes).Count -gt 0) "LoopReturnMissing:$id"
     Require (@($loop.requiredHCapabilities).Count -gt 0) "LoopHCapabilityMissing:$id"
     Require-Text $loop.nextAction "LoopNextActionMissing:$id"
-    if ($detailedDesignRequiredIds -contains $id) {
-        Require-Text $loop.designDocumentRef "LoopDesignDocumentMissing:$id"
-        $designPath = Resolve-RepositoryPath ([string] $loop.designDocumentRef)
-        Require (Test-Path -LiteralPath $designPath) `
-            "LoopDesignDocumentNotFound:${id}:$($loop.designDocumentRef)"
-        Require (@($loop.sourcePlanningDocumentRefs).Count -gt 0) `
-            "LoopSourcePlanningDocumentMissing:$id"
-        foreach ($sourceRef in @($loop.sourcePlanningDocumentRefs)) {
-            Require (Test-Path -LiteralPath (Resolve-RepositoryPath ([string] $sourceRef))) `
-                "LoopSourcePlanningDocumentNotFound:${id}:$sourceRef"
-        }
-    }
-
     $currentIndex = Stage-Index ([string] $loop.currentEvidenceStage)
     $nextIndex = Stage-Index ([string] $loop.nextClosureTargetStage)
     $finalIndex = Stage-Index ([string] $loop.finalEvidenceStage)
@@ -340,6 +326,8 @@ foreach ($loop in @($loops.items)) {
 
     $isUnit = [string] $loop.loopLevelCode -eq "PlayableUnit"
     if ($isUnit) {
+        Require ($null -ne $loop.PSObject.Properties["planningGate"]) `
+            "PlanningGateMissing:$id"
         $maturityProperty = $loop.PSObject.Properties["maturityTracks"]
         Require ($null -ne $maturityProperty) "DualMaturityMissing:$id"
         $logic = $loop.maturityTracks.logic
@@ -407,6 +395,8 @@ foreach ($loop in @($loops.items)) {
         }
     }
     else {
+        Require ($null -eq $loop.PSObject.Properties["planningGate"]) `
+            "AggregateHasPlanningGate:$id"
         Require ($null -eq $loop.PSObject.Properties["maturityTracks"]) `
             "DualMaturityOnAggregate:$id"
     }
@@ -594,7 +584,7 @@ foreach ($loop in @($loops.items)) {
             }
         }
     }
-    if ($detailedDesignRequiredIds -contains $id) {
+    if ($null -ne $loop.PSObject.Properties["predecessorLoopStableIds"]) {
         foreach ($predecessorId in @($loop.predecessorLoopStableIds)) {
             Require ($loopById.ContainsKey([string] $predecessorId)) `
                 "LoopPredecessorUnknown:${id}:$predecessorId"

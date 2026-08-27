@@ -1,9 +1,10 @@
 {
-  "schemaVersion": "codex-playable-loop-goals.v1",
-  "revision": "codex-playable-loop-goals.r19",
+  "schemaVersion": "codex-playable-loop-goals.v3",
+  "revision": "codex-playable-loop-goals.r22",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
   "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
+  "engineInteractionValidationPath": "eng/execution-ledgers/playable-loop-engine-interaction-validation.json",
   "principles": {
     "goalOwnsExactlyOnePlayableUnit": true,
     "aggregateMilestonesUseSeparateHarmonyCampaign": true,
@@ -19,7 +20,11 @@
     "presentationEvidenceE5RequiresLogicE5": true,
     "presentationFeedbackCanReopenLogic": true,
     "playableUnitGoalEndsAtE7": true,
-    "postE7CampaignIsNotPlayableUnitGoal": true
+    "postE7CampaignIsNotPlayableUnitGoal": true,
+    "pipelineValidationIsIntegratedGate": true,
+    "pipelineFailureReopensSameGoal": true,
+    "topicPlanningGateRequiredBeforeActivation": true,
+    "legacyActivePlanningGateCannotTransfer": true
   },
   "policy": {
     "goalSubjectLevelCode": "PlayableUnit",
@@ -31,25 +36,37 @@
     "defaultPlayerTargetEvidenceStage": "E7",
     "e9AllowedAsGoalTarget": false,
     "areaContinuityOrderCodes": ["Nature", "Farm", "Hub", "Town", "City"],
-    "goalReplacementTriggerCodes": ["PlayerPromiseChanged", "IndependentPlayableLoopSelected"]
+    "goalReplacementTriggerCodes": ["PlayerPromiseChanged", "IndependentPlayableLoopSelected"],
+    "allowedPipelineGateStatusCodes": ["Pending", "Passed", "Blocked", "Stale"],
+    "allowedActivePlanningStatusCodes": ["Approved", "LegacyActiveMigration"]
   },
   "allowedGoalStateCodes": ["Active", "Queued", "WaitingForDecision", "Blocked", "Completed", "Deferred"],
   "allowedCompletionRoleCodes": ["Core", "Extension"],
   "activeGoal": {
-    "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+    "loopStableId": "playable-loop:nature-night-day2.v1",
     "targetEvidenceStage": "E7",
     "targetClosureStateCode": "PlayClosed",
-    "goalStateCode": "Completed",
+    "goalStateCode": "Active",
     "activeMaturityTrackCode": "Presentation",
-    "activeWorldInteractionId": "WI-ACTOR-02",
-    "baselineRevision": "world-interaction-delivery-priorities.r21",
-    "workOrderRef": "eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json",
-    "workOrderTargetRevision": "actor-equipment.r1/simulation-save.v27"
+    "activeWorldInteractionId": "WI-NATURE-15",
+    "baselineRevision": "world-interaction-delivery-priorities.r22",
+    "workOrderRef": "eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json",
+    "workOrderTargetRevision": "nature-night-day2.r1/world-atmosphere.r1/simulation-save.v28",
+    "pipelineValidation": {
+      "profileKey": "playable-loop:nature-night-day2.v1|WI-NATURE-15",
+      "profileRevision": "nature-night-day2.engine-interaction.r2",
+      "logicStatusCode": "Passed",
+      "presentationStatusCode": "Blocked",
+      "integratedStatusCode": "Blocked",
+      "earliestReopenEvidenceStageCode": "E5",
+      "evidenceRefs": ["test:SimulationNatureSurvivalTests", "test:SimulationPlayableLoopEngineInteractionTests"],
+      "blockerCodes": ["PresentationActionRecordCursorEvidenceMissing", "CurrentGameViewPipelineEvidenceMissing"]
+    }
   },
   "items": [
     { "queueOrder": 1, "loopStableId": "playable-loop:nature-shelter-foundation.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Completed", "activationPrerequisiteLoopStableIds": [], "nextWorldInteractionId": "WI-ACTOR-02" },
     { "queueOrder": 2, "loopStableId": "playable-loop:nature-twilight-return.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Completed", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-shelter-foundation.v1"], "nextWorldInteractionId": "WI-NATURE-11" },
-    { "queueOrder": 3, "loopStableId": "playable-loop:nature-night-day2.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Queued", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-twilight-return.v1"], "nextWorldInteractionId": "WI-NATURE-14" },
+    { "queueOrder": 3, "loopStableId": "playable-loop:nature-night-day2.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Active", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-twilight-return.v1"], "nextWorldInteractionId": "WI-NATURE-15" },
     { "queueOrder": 4, "loopStableId": "playable-loop:nature-workbench-foundation.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Queued", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-night-day2.v1"], "nextWorldInteractionId": "WI-CON-01" },
     { "queueOrder": 5, "loopStableId": "playable-loop:nature-field-supply-return.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Queued", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-workbench-foundation.v1"], "nextWorldInteractionId": "WI-NATURE-16" },
     { "queueOrder": 6, "loopStableId": "playable-loop:farm-crop-cycle.v1", "areaCode": "Farm", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Queued", "activationPrerequisiteLoopStableIds": [], "nextWorldInteractionId": "WI-FARM-01" },

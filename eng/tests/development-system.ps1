@@ -117,12 +117,12 @@ $unknownWiUnit = $unknownWi.items | Where-Object `
 $unknownWiUnit.worldInteractionIds[0] = "WI-NATURE-UNKNOWN"
 Require-Rejected "unknown-wi" $unknownWi "LoopWiUnknown"
 
-$missingDesign = Read-Loops
-$missingDesignUnit = $missingDesign.items | Where-Object `
+$missingPlanningGate = Read-Loops
+$missingPlanningGateUnit = $missingPlanningGate.items | Where-Object `
     loopStableId -eq "playable-loop:nature-base-reflection.v1"
-$missingDesignUnit.designDocumentRef = ""
-Require-Rejected "missing-loop-design" $missingDesign `
-    "LoopDesignDocumentMissing:playable-loop:nature-base-reflection.v1"
+$missingPlanningGateUnit.PSObject.Properties.Remove("planningGate")
+Require-Rejected "missing-planning-gate" $missingPlanningGate `
+    "PlanningGateMissing:playable-loop:nature-base-reflection.v1"
 
 $falseClosure = Read-Loops
 $falseClosureUnit = $falseClosure.items | Where-Object `

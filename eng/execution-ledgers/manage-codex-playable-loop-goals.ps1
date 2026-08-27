@@ -28,8 +28,9 @@ $ledger = Get-Content -LiteralPath $resolvedInput -Raw -Encoding UTF8 | ConvertF
 $loops = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.playableLoopCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 $delivery = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.worldInteractionDeliveryPriorityPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 $evidence = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.evidencePackageCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
+$pipeline = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.engineInteractionValidationPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 
-Require ([string] $ledger.schemaVersion -eq "codex-playable-loop-goals.v1") "SchemaInvalid"
+Require ([string] $ledger.schemaVersion -eq "codex-playable-loop-goals.v3") "SchemaInvalid"
 foreach ($principle in @(
     "goalOwnsExactlyOnePlayableUnit",
     "aggregateMilestonesUseSeparateHarmonyCampaign",
@@ -45,7 +46,11 @@ foreach ($principle in @(
     "presentationEvidenceE5RequiresLogicE5",
     "presentationFeedbackCanReopenLogic",
     "playableUnitGoalEndsAtE7",
-    "postE7CampaignIsNotPlayableUnitGoal")) {
+    "postE7CampaignIsNotPlayableUnitGoal",
+    "pipelineValidationIsIntegratedGate",
+    "pipelineFailureReopensSameGoal",
+    "topicPlanningGateRequiredBeforeActivation",
+    "legacyActivePlanningGateCannotTransfer")) {
     $property = $ledger.principles.PSObject.Properties[$principle]
     Require ($null -ne $property -and [bool] $property.Value) "PrincipleMissing:$principle"
 }
@@ -61,6 +66,13 @@ Require ([string] $ledger.policy.defaultPlayerTargetEvidenceStage -eq "E7") "Def
 Require (-not [bool] $ledger.policy.e9AllowedAsGoalTarget) "E9CannotBeImmediateGoalTarget"
 Require ((@($ledger.policy.areaContinuityOrderCodes) -join ",") -eq "Nature,Farm,Hub,Town,City") "AreaContinuityOrderInvalid"
 Require ((@($ledger.policy.goalReplacementTriggerCodes) -join ",") -eq "PlayerPromiseChanged,IndependentPlayableLoopSelected") "GoalReplacementTriggersInvalid"
+Require ((@($ledger.policy.allowedPipelineGateStatusCodes) -join ",") -eq
+    "Pending,Passed,Blocked,Stale") "PipelineGateStatusCodesInvalid"
+Require ((@($ledger.policy.allowedActivePlanningStatusCodes) -join ",") -eq
+    "Approved,LegacyActiveMigration") "ActivePlanningStatusCodesInvalid"
+Require ([string] $pipeline.schemaVersion -eq
+    "playable-loop-engine-interaction-validation.v2") `
+    "PipelineValidationSchemaInvalid"
 
 $loopById = @{}
 foreach ($loop in @($loops.items)) { $loopById[[string] $loop.loopStableId] = $loop }
@@ -123,6 +135,24 @@ $active = $ledger.activeGoal
 $activeItem = @($ledger.items | Where-Object {
         [string] $_.loopStableId -eq [string] $active.loopStableId
     })[0]
+$activeLoop = $loopById[[string] $active.loopStableId]
+$planningGate = $activeLoop.planningGate
+Require ($null -ne $activeLoop.PSObject.Properties["planningGate"]) `
+    "ActivePlanningGateMissing"
+$activePlanningStatus = [string] $planningGate.statusCode
+Require (@($ledger.policy.allowedActivePlanningStatusCodes) -contains `
+    $activePlanningStatus) "ActiveGoalPlanningNotApproved"
+if ($activePlanningStatus -eq "LegacyActiveMigration") {
+    Require ([string] $loops.designDocumentationPolicy.legacyActiveMigrationLoopStableId `
+        -eq [string] $active.loopStableId) "LegacyPlanningGateTransferred"
+    Require ([string] $active.goalStateCode -eq "Active") `
+        "LegacyPlanningGateCannotComplete"
+}
+$topicPlanningManager = Join-Path $PSScriptRoot `
+    "manage-playable-loop-topic-planning.ps1"
+& $topicPlanningManager -Mode Validate `
+    -PlayableLoopPath ([string] $ledger.playableLoopCatalogPath) `
+    -GoalLedgerPath $InputPath | Out-Null
 Require ([string] $active.goalStateCode -in @("Active", "Completed")) "ActiveGoalStateInvalid"
 Require ([string] $active.goalStateCode -eq [string] $activeItem.goalStateCode) "ActiveGoalStateDrift"
 if ([string] $active.goalStateCode -eq "Active") {
@@ -147,8 +177,30 @@ Require ([string] $workOrder.playableUnitStableId -eq [string] $active.loopStabl
     "ActiveWorkOrderLoopMissing"
 Require ([string] $workOrder.integratedGate.candidateRevision -eq `
     [string] $active.workOrderTargetRevision) "ActiveWorkOrderRevisionDrift"
+$pipelineState = $active.pipelineValidation
+$pipelineKey = "{0}|{1}" -f $active.loopStableId,
+    $active.activeWorldInteractionId
+Require ([string] $pipelineState.profileKey -eq $pipelineKey) `
+    "ActivePipelineProfileKeyDrift"
+Require-Text $pipelineState.profileRevision "ActivePipelineProfileRevisionMissing"
+foreach ($statusName in @("logicStatusCode", "presentationStatusCode",
+    "integratedStatusCode")) {
+    Require (@($ledger.policy.allowedPipelineGateStatusCodes) -contains
+        [string] $pipelineState.$statusName) `
+        "ActivePipelineStatusInvalid:$statusName"
+}
+Require ([string] $pipelineState.earliestReopenEvidenceStageCode -match
+    '^E[1-7]$') "ActivePipelineReopenStageInvalid"
+Require (@($activeLoop.worldInteractionIds) -contains
+    [string] $active.activeWorldInteractionId) `
+    "ActivePipelineProfilePairMissing"
+Require ([string] $workOrder.pipelineValidation.profileKey -eq
+    [string] $pipelineState.profileKey) "WorkOrderPipelineProfileDrift"
+Require ([string] $workOrder.pipelineValidation.profileRevision -eq
+    [string] $pipelineState.profileRevision) "WorkOrderPipelineRevisionDrift"
+Require ([string] $workOrder.pipelineValidation.integratedStatusCode -eq
+    [string] $pipelineState.integratedStatusCode) "WorkOrderPipelineStatusDrift"
 
-$activeLoop = $loopById[[string] $active.loopStableId]
 $goalCompleted = [string] $active.goalStateCode -eq "Completed"
 if ($goalCompleted) {
     Require ([string] $activeLoop.currentEvidenceStage -eq [string] $active.targetEvidenceStage) "CompletedGoalEvidenceStageDrift"
@@ -173,6 +225,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- Goal WIP: ``$($activeItems.Count)/$($ledger.policy.goalWorkInProgressLimit)``")
 $wiWip = if ($goalCompleted) { 0 } else { 1 }
 [void] $builder.AppendLine("- WI WIP: ``$wiWip/$($ledger.policy.worldInteractionWorkInProgressLimit)``")
+[void] $builder.AppendLine("- 주제 기획 관문: ``$activePlanningStatus`` / ``$($planningGate.topicStableId)``")
 [void] $builder.AppendLine("- 우선순위: ``$($ledger.policy.priorityModeCode)`` / ``$(@($ledger.policy.areaContinuityOrderCodes) -join ' → ')``")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## 현재 `/goal` 입력")
@@ -190,6 +243,8 @@ $wiWip = if ($goalCompleted) { 0 } else { 1 }
 [void] $builder.AppendLine("- 현재 WI 증거 단계: $($delivery.activeWork.currentEvidenceStage)")
 [void] $builder.AppendLine("- 현재 성숙도 궤적: $($active.activeMaturityTrackCode)")
 [void] $builder.AppendLine("- 현재 작업 WI: $($active.activeWorldInteractionId) $($currentWi.title)")
+[void] $builder.AppendLine("- 파이프라인 관문: Logic $($pipelineState.logicStatusCode) / Presentation $($pipelineState.presentationStatusCode) / 통합 $($pipelineState.integratedStatusCode)")
+[void] $builder.AppendLine("- 파이프라인 재개 E: $($pipelineState.earliestReopenEvidenceStageCode)")
 [void] $builder.AppendLine("- 기준 revision: $($active.baselineRevision) / $($active.workOrderTargetRevision)")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("운영 규칙:")
@@ -200,6 +255,7 @@ $wiWip = if ($goalCompleted) { 0 } else { 1 }
 [void] $builder.AppendLine("- Scene·Synty 배치·문서·EditMode만으로 E7을 선언하지 않는다.")
 [void] $builder.AppendLine("- Solo LocalProcess와 Hosted RemoteHost는 같은 Simulation Core 계약을 사용한다.")
 [void] $builder.AppendLine("- 플레이어 의도, Simulation 권위, Unity 표현을 분리한다.")
+[void] $builder.AppendLine("- 권위 변경은 행위 원장 기록을 남기고 분야 성장은 적용 또는 사유 있는 NotApplicable로 판정한다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("완료 조건:")
 [void] $builder.AppendLine("- 필수 WI가 모두 필요한 증거 단계를 충족한다.")

@@ -2900,3 +2900,39 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 증거 무효화: 후보 revision이 바뀌면 영향받은 E8 반복 안정성과 E9 조화·사람 승인을 다시 연다. E8 실패는 같은 PlayableUnit의 가장 이른 E1~E7, E9 실패는 E9 모듈 또는 관련 PlayableUnit의 가장 이른 E1~E8로 귀속한다.
 - 대체 관계: D-260의 E7 수직 종료와 E10 제한 운영 경계는 유지한다. D-260·D-264·D-265의 `E8=AreaHarmonySet`, `E9=별도 HumanPlaytestCampaign` 해석과 부분 조화의 E8 단계 표기는 이 결정이 대체한다. 과거 E8 NPC·E9 변화 적응과 `.e9-work-order.json`은 계속 판본화된 읽기 호환 자료다.
 - 상세 기준: [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](../Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md), `eng/execution-ledgers/post-e7-evidence-campaigns.json`, `eng/execution-ledgers/codex-playable-loop-goals.json`을 따른다.
+
+## D-267 권위 행위 기록은 엔진과 분리하고 분야 성장은 효과 계보에서 파생한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 기록 경계: 권위 WI 결과는 Effect 적용과 같은 결과 계보에서 중립 `행위 발현 기록`으로 멱등 추가한다. 기록에는 엔진 이름 대신 변화 의미·영향 공간·WI·Command·Task·Effect·revision·hash를 둔다.
+- 엔진 경계: LH·실외 배치·실내 배치·Sky 엔진은 파이프라인의 필수 단계나 라우터 대상이 아니다. 각 엔진이 자신의 생명주기에서 기록을 cursor로 읽고 자신의 파생·표현 상태만 변경하며 Simulation `WorldRevision`은 변경하지 않는다.
+- 성장 경계: 플레이어 분야는 이해도·현장 숙련도·운영 숙련도를 분리한다. 성공은 `+2`, 의미 있는 실패·후퇴/복구는 `+1`, 취소·차단은 `0`이며 서로 다른 유효 반복에 감쇠나 일일 상한을 두지 않는다. 동일 기록은 중복 지급하지 않는다.
+- NPC 경계: NPC 완료만으로 플레이어 숙련도를 지급하지 않는다. 명시적 플레이어 위임, 그 위임을 참조한 NPC 완료, 두 기록을 참조한 플레이어 `WI-REVIEW-01` 검토가 모두 있어야 운영 숙련 기여가 성립한다.
+- 개인화 경계: 이해도는 권한 있는 사실을 숨기거나 주변 몬스터 기본 생성량을 바꾸지 않는다. 강조·설명·선택형 기회 후보만 조정한다.
+- 저장·호환: `simulation-save.v28`은 체크포인트+tail 원장과 분야 Profile을 함께 hash로 봉인한다. 둘 중 하나만 있는 저장은 거부하고 v1~v27 읽기 호환을 유지한다.
+- 대체 관계: D-261에서 지형 평탄화용으로 미리 적어 둔 `simulation-save.v28` 번호 예약만 이 결정이 대체한다. `WI-WORLD-09`의 의미와 구현 보류 상태는 유지하며 실제 저장 연결 시 다음 가용 wrapper 판본을 사용한다.
+- 증거 경계: 현재 구현은 계약·도메인·fixture·저장 재생의 E1~E3 기반이다. 실제 WI Effect 자동 append, Session Adapter, 엔진 cursor 연결, Unity 상태창·Game View는 별도 상향 조립과 증거가 필요하다.
+- 상세 기준: [플레이어 행위 기록과 분야 성장 통합 체계](../Architecture/플레이어행위기록과분야성장통합체계.md)와 `eng/execution-ledgers/player-domain-proficiencies.json`을 따른다.
+
+## D-268 행위 파이프라인은 E Logic·Presentation과 E8~E10의 공통 통합 관문이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 성숙도 경계: 행위 파이프라인은 Logic·Presentation을 대신하는 세 번째 E 축이 아니다. 실패는 같은 PlayableUnit Goal에서 책임이 시작되는 가장 이른 Logic 또는 Presentation E를 다시 연다.
+- E5 권위 경계: 성공한 WI Confirm은 권위 결과와 같은 원자 경계에서 행위 원장을 반드시 추가한다. 플레이어 분야 성장은 별도 필수 결과가 아니며 직접 수행·결속 정책이 맞을 때만 적용하고, 그 외에는 사유가 있는 `NotApplicable`를 기록한다.
+- 전수 적용: 16개 PlayableUnit과 55개 Loop-WI 조합을 결정적으로 파생해 검증한다. 현재 Adapter가 없는 조합은 완료로 간주하지 않고 차단 프로필로 유지한다.
+- 표현 경계: Presentation E5 이상은 표현 엔진이 행위 원장을 cursor로 읽고 같은 `CommandId + AuthorityRevision`을 보존하며 Simulation `WorldRevision`을 바꾸지 않았다는 증거를 요구한다.
+- 수평 증거: E8은 행위 원장·조건부 성장·Trace hash 동등성, E9는 같은 Profile bundle과 cursor 연속성, E10은 중복 기록·hash 불일치·cursor 재구축 실패가 없는 제한 운영을 요구한다. 새 관문 이전의 E8·E9 증거는 삭제하지 않지만 자동 승격 근거로 재사용하지 않는다.
+- 상세 기준: [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](../Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md), [Codex PlayableLoop Goal 운영 체계](../Architecture/CodexPlayableLoopGoal운영체계.md), `eng/execution-ledgers/playable-loop-engine-interaction-validation.json`을 따른다.
+
+## D-269 주제 기획 승인은 새 PlayableLoop Goal보다 앞선다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 1:1 경계: 하나의 주제는 하나의 `PlayableUnit`에만 대응하며 하나의 장기 Goal과 한 번에 하나의 활성 WI로 구현한다. `AreaAggregate`·`WorldAggregate`에는 주제 기획 관문을 두지 않는다.
+- 책임 분리: 주제 기획서는 플레이어 약속·재미·선택·대가·실패 회복을 소유한다. PlayableLoop·Goal 원장과 생성 상태판은 현재 Logic·Presentation·통합 E, 시험, 차단과 활성 WI를 소유한다.
+- 활성화 관문: 새 Goal은 기획서 경로, 필수 절, source 참조, revision, SHA-256, 명시적 승인 근거가 모두 맞는 `Approved` 상태에서만 활성화한다. 승인 뒤 파일 hash가 달라지면 승인을 무효화한다.
+- 이전 예외: 현재 활성 `playable-loop:nature-night-day2.v1`만 `LegacyActiveMigration`을 한시적으로 허용한다. 예외는 다른 루프로 이전할 수 없고 이 Goal을 완료하기 전에 `Approved`로 전환한다. 다음 대기 Goal부터 예외는 없다.
+- 변경 규칙: 플레이어 약속이 바뀌면 새 주제·PlayableLoop·Goal을 만들고, 같은 약속의 정제는 기획 판본을 올려 다시 승인한 뒤 가장 이른 영향 E를 연다.
+- 상세 기준: [주제 기획 기반 PlayableLoop 개발 체계](../Architecture/주제기획기반PlayableLoop개발체계.md), `eng/execution-ledgers/manage-playable-loop-topic-planning.ps1`을 따른다.

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "ssalddel-playable-loop-catalog.v5",
-  "revision": "ssalddel-playable-loop-catalog.r18",
+  "schemaVersion": "ssalddel-playable-loop-catalog.v6",
+  "revision": "ssalddel-playable-loop-catalog.r19",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -19,7 +19,9 @@
     "worldInteractionPolarityDoesNotClassifyDevelopmentTrack": true,
     "playableUnitVerticalMaturityEndsAtE7": true,
     "playableUnitHorizontalStabilityUsesE8": true,
-    "areaAggregateHarmonyStartsAtE9": true
+    "areaAggregateHarmonyStartsAtE9": true,
+    "topicDesignPrecedesGoalActivation": true,
+    "topicMapsToExactlyOnePlayableUnit": true
   },
   "dualMaturityPolicy": {
     "rolloutCode": "AllPlayableUnits",
@@ -34,7 +36,8 @@
       "WorldStateMissing",
       "AssetMappingMissing",
       "PresentationUnreadable",
-      "RuntimeExperienceFailure"
+      "RuntimeExperienceFailure",
+      "PipelinePresentationEvidenceMissing"
     ],
     "presentationPlanningMayAdvanceThroughStage": "E4",
     "presentationEvidenceRequiresLogicStageFrom": "E5",
@@ -43,8 +46,12 @@
   "designDocumentationPolicy": {
     "statusSnapshotAuthorityPath": "eng/execution-ledgers/playable-loops.json",
     "detailedDesignRoot": "docs/Architecture/PlayableLoops",
-    "requiredDetailedDesignLoopStableIds": ["playable-loop:nature-base-reflection.v1"],
-    "existingCatalogMigrationStatusCode": "Incremental"
+    "topicDesignTemplateRef": "docs/ProjectOverview/templates/PlayableLoop주제기획서템플릿.md",
+    "topicPlanningRequiredForPlayableUnits": true,
+    "topicMapsToExactlyOnePlayableUnit": true,
+    "allowedPlanningStatusCodes": ["NotStarted", "Draft", "ReadyForReview", "Approved", "LegacyActiveMigration"],
+    "legacyActiveMigrationLoopStableId": "playable-loop:nature-night-day2.v1",
+    "existingCatalogMigrationStatusCode": "ActiveAndNext"
   },
   "allowedLoopKinds": ["IndependentArea", "WorldIntegration", "CrossAreaIntegration"],
   "allowedLoopLevelCodes": ["PlayableUnit", "AreaAggregate", "WorldAggregate"],
@@ -94,6 +101,7 @@
       "title": "Nature 도끼·벌목·오두막 기초",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-shelter-foundation.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -144,6 +152,7 @@
       "title": "Nature 황혼 위협 대응·귀환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-twilight-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -193,6 +202,7 @@
       "title": "Nature 지역 위협 후퇴·복원·회복",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-regional-threat-recovery.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -228,6 +238,7 @@
       "title": "Nature 보관·수면·Day2 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-night-day2.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "LegacyActiveMigration", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -242,7 +253,7 @@
       "requiredHCapabilities": ["ShelterStorage", "ShelterSleep", "DawnPlanChoice"],
       "independentExecutionRequired": true,
       "saveCheckpointCodes": ["AfterCabinStorage", "Day2Ready"],
-      "currentEvidenceStage": "E6",
+      "currentEvidenceStage": "E4",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
@@ -250,19 +261,19 @@
       "maturityTracks": {
         "logic": {
           "trackCode": "Logic",
-          "currentStage": "E7",
+          "currentStage": "E5",
           "targetStage": "E7",
-          "statusCode": "Validated",
+          "statusCode": "InProgress",
           "evidencePackageRefs": ["evidence:nature-night-day2-wi13-hosted-parity-20260826", "evidence:nature-night-day2-wi14-hosted-parity-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826"],
-          "blockers": []
+          "blockers": ["v28 행위 원장·분야 성장 계보가 포함된 실제 입력과 LocalProcess·RemoteHost 반복 증거를 다시 확보해야 한다."]
         },
         "presentation": {
           "trackCode": "Presentation",
-          "currentStage": "E6",
+          "currentStage": "E4",
           "targetStage": "E7",
-          "statusCode": "InProgress",
+          "statusCode": "Blocked",
           "evidencePackageRefs": ["evidence:nature-night-day2-wi13-playmode-20260826", "evidence:nature-night-day2-wi14-playmode-20260826", "evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-night-day2-presentation-e7-20260826"],
-          "blockers": ["world-atmosphere.r1의 맑음·비·뇌우·실내 차폐·새벽 맑음 실제 Play Mode와 Game View 증거가 아직 없다."]
+          "blockers": ["표현 엔진의 행위 원장 cursor 소비와 같은 Revision Game View 증거가 없다.", "Day2 계획판의 세 선택·비용·다음 행동 판독과 오두막 주변 구도, 사람 직접 입력·청음 수용이 남았다."]
         }
       },
       "openFeedbackItems": [
@@ -274,12 +285,21 @@
           "reopenStage": "E6",
           "targetRefs": ["WI-NATURE-14", "world-atmosphere.r1"],
           "statusCode": "Open"
+        },
+        {
+          "feedbackId": "feedback:nature-night-day2:pipeline-presentation-cursor.r1",
+          "reasonCode": "PipelinePresentationEvidenceMissing",
+          "detectedAtStage": "E7",
+          "targetTrackCode": "Presentation",
+          "reopenStage": "E5",
+          "targetRefs": ["WI-NATURE-15", "Simulation.ActionJournal", "World.Presentation"],
+          "statusCode": "Open"
         }
       ],
       "evidencePackageRefs": ["evidence:nature-r2-core-20260825", "evidence:nature-night-day2-wi13-playmode-20260826", "evidence:nature-night-day2-wi13-hosted-parity-20260826", "evidence:nature-night-day2-wi14-playmode-20260826", "evidence:nature-night-day2-wi14-hosted-parity-20260826", "evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-night-day2-presentation-e7-20260826"],
       "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json", "eng/execution-ledgers/work-orders/nature-sky-engine.e9-work-order.json"],
-      "blockers": ["Unity Editor의 기존 Job lock 해소 뒤 Sky Engine 실제 Test Runner·Play Mode·Game View·Console을 재검증해야 한다."],
-      "nextAction": "SkyEngineTests와 canonical Scene 다섯 날씨 상태·오두막 내부 강수 차폐를 검증한다."
+      "blockers": ["행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.", "Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다."],
+      "nextAction": "WI-NATURE-15 표현 엔진 cursor 소비를 연결한 뒤 v28 실제 입력·Save 재진입·Game View를 같은 revision에서 재검증한다."
     },
     {
       "priority": 5,
@@ -287,6 +307,7 @@
       "title": "Nature 작업대 기반",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-workbench-foundation.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -346,6 +367,7 @@
       "title": "Nature 건물 발전·배움 확장",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-building-learning.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -381,6 +403,7 @@
       "title": "Nature 현장 성과·거점 제작·다음 원정 왕복",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-field-supply-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -416,6 +439,7 @@
       "title": "Nature 거점 성찰·다음 원정 준비",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:nature-base-reflection.v1", "designDocumentRef": "docs/Architecture/PlayableLoops/nature-base-reflection.v1.md", "designRevision": "nature-base-reflection.design.r1", "designHashSha256": "C6564C4CFE18CF4C33305925D4ECC7AF870FA773488244309131CB3095EE4DF8", "statusCode": "Draft", "approvalEvidenceRef": "" },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -484,6 +508,7 @@
       "title": "Town 주문·소비·다음 욕구",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:town-order-consume-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:town-resident-market.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -519,6 +544,7 @@
       "title": "Town 메이저 아르카나 문맥 확장",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:town-arcana-context.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:town-resident-market.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -584,6 +610,7 @@
       "title": "Farm 경작·성장·수확",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:farm-crop-cycle.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:farm-internal-production.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -619,6 +646,7 @@
       "title": "Farm 집하·포장·내부 보관 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:farm-pack-store-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:farm-internal-production.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -654,6 +682,7 @@
       "title": "Farm 플레이어 배치 확장",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:farm-player-placement.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:farm-internal-production.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -719,6 +748,7 @@
       "title": "Hub 입고·검수·적치",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:hub-inbound-putaway.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:hub-internal-warehouse.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -754,6 +784,7 @@
       "title": "Hub 출고 준비·작업 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:hub-outbound-ready-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:hub-internal-warehouse.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -824,6 +855,7 @@
       "title": "City 수요·서비스·결과 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
+      "planningGate": { "topicStableId": "topic:city-demand-service-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:city-urban-logistics.v1",
       "requiredCoreChildLoopStableIds": [],

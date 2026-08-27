@@ -17,7 +17,11 @@ EvidencePackage = 시험·저장·Runtime·화면·Hosted 증거 묶음
 
 ## 운영 원장
 
-권위 입력은 [`codex-playable-loop-goals.json`](../../eng/execution-ledgers/codex-playable-loop-goals.json)이다. 검사기는 Goal WIP 1, WI WIP 1, PlayableUnit 전용 Goal, 목표 E7, 대기열 순서와 기존 PlayableLoop·WI 원장 참조를 검증한다. 사람이 읽는 현재 `/goal` 입력과 상태 보고는 [`codex-playable-loop-goals.md`](../AI/generated/codex-playable-loop-goals.md)로 자동 생성한다.
+권위 입력은 [`codex-playable-loop-goals.json`](../../eng/execution-ledgers/codex-playable-loop-goals.json)이다. 검사기는 Goal WIP 1, WI WIP 1, PlayableUnit 전용 Goal, 목표 E7, 대기열 순서와 기존 PlayableLoop·WI 원장 참조를 검증한다. 새 Goal은 [주제 기획 기반 PlayableLoop 개발 체계](주제기획기반PlayableLoop개발체계.md)의 `Approved` 관문을 통과해야 한다. 사람이 읽는 현재 `/goal` 입력과 상태 보고는 [`codex-playable-loop-goals.md`](../AI/generated/codex-playable-loop-goals.md)로 자동 생성한다.
+
+주제와 PlayableLoop는 1:1이다. 기획서는 재미·플레이어 약속·선택·대가를 소유하고 Goal 원장과 상태판은 현재 WI·E·증거·차단을 소유한다. 현재 이미 활성인 `nature-night-day2`만 `LegacyActiveMigration`을 한시적으로 허용하며, 이 예외는 양도할 수 없고 Goal 완료 전 승인 상태로 전환해야 한다. 전체 기획 상태는 [주제 기획 상태판](../AI/generated/playable-loop-topic-planning.md)에서 확인한다.
+
+활성 Goal은 현재 WI의 파이프라인 프로필 key·revision, Logic·Presentation·통합 관문 상태, 가장 이른 재개 E와 차단 사유도 함께 가진다. 권위 변화의 행위 기록이나 표현 엔진 cursor 소비가 빠지면 Goal을 교체하지 않고 같은 Goal의 해당 E를 다시 연다. Goal은 여전히 E7에서 끝나며 E8~E10 파이프라인 안정·조화·관찰은 별도 캠페인으로 인계한다.
 
 현재 우선순위는 모든 Core를 먼저 닫고 Extension을 뒤에 여는 방식이다.
 
@@ -36,11 +40,12 @@ Nature Core 5개
 
 ## Goal 생명주기
 
-1. 현재 `PlayableLoop`의 플레이어 약속과 목표 E를 Goal로 고정한다.
-2. E7→E1 영향 검토에서 가장 낮은 미완료 의존성 WI 하나만 활성화한다.
-3. WI를 필요한 증거 단계까지 올린 뒤 E1→E7 방향으로 다시 검증한다.
-4. 새 영향이 나오면 같은 Goal과 작업 명세의 하향 검토를 다시 연다.
-5. 플레이어 약속이 바뀌거나 독립 폐루프를 선택할 때만 Goal을 교체한다.
+1. 1:1 주제 기획서의 필수 절·revision·hash·승인 근거를 확인하고 `Approved`로 고정한다.
+2. 현재 `PlayableLoop`의 플레이어 약속과 목표 E를 Goal로 고정한다.
+3. E7→E1 영향 검토에서 가장 낮은 미완료 의존성 WI 하나만 활성화한다.
+4. WI를 필요한 증거 단계까지 올린 뒤 E1→E7 방향으로 다시 검증한다.
+5. 새 영향이 나오면 같은 Goal과 작업 명세의 하향 검토를 다시 연다.
+6. 플레이어 약속이 바뀌거나 독립 폐루프를 선택할 때만 새 주제·PlayableLoop·Goal로 교체한다.
 
 Goal은 `activeMaturityTrackCode`로 현재 논리 또는 표현 궤적을 표시한다. 표현 실패가 권위 상태 누락에서 시작됐으면 같은 Goal을 유지한 채 논리 궤적으로 돌아가며, 통합 E는 [논리·시각 이중 순환 기준](플레이폐루프논리시각이중순환체계.md)에 따라 두 궤적 중 낮은 단계다.
 
@@ -55,7 +60,7 @@ E8~E10은 Goal의 다음 수직 목표가 아니다. 각 `PlayableUnit`이 E7을
 
 ## 현재 Goal
 
-현재 활성 Goal은 `playable-loop:nature-shelter-foundation.v1`, 활성 WI는 보편 장착 계약의 `WI-ACTOR-02`, 활성 궤적은 `Presentation`이다. `playable-loop:nature-twilight-return.v1`은 완료 기록으로 유지한다. 다음은 Nature의 나머지 Core를 닫고 Farm·Hub·Town·City Core까지 순서대로 E7을 통과시킨 뒤 Extension으로 이동한다. 각 단위는 E7 직후 자기 E8 안정성 캠페인을 열 수 있지만, E9 영역 조화는 같은 영역의 E8 Core가 둘 이상일 때만 시작한다.
+현재 활성 Goal은 `playable-loop:nature-night-day2.v1`, 활성 WI는 `WI-NATURE-15`, 활성 궤적은 `Presentation`이다. 이 Goal만 한시적 `LegacyActiveMigration`이며 완료 전 정식 승인이 필요하다. 다음 `playable-loop:nature-workbench-foundation.v1`부터는 기획서가 `Approved`가 아니면 활성화할 수 없다. 실제 E·차단·다음 의존성은 생성 상태판을 현재 기준으로 삼는다.
 
 진행 보고는 항상 다음 순서를 사용한다.
 

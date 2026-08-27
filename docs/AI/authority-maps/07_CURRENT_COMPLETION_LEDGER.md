@@ -4,7 +4,7 @@
 > CoreClosed는 E5 핵심 폐루프, ExtendedClosed는 선택형 확장 E5, PlayClosed는 E7 핵심 플레이 폐루프, WorldClosed는 E8 개별 안정성을 거친 둘 이상의 Core가 E9 영역 조화·사람 승인을 통과한 집계를 뜻한다.
 > Nature 시범 루프는 논리·시각 성숙도를 별도로 기록하며 통합 E는 두 축 중 낮은 단계다. WI 음양 분류는 개발 성숙도 축과 무관하다.
 
-- 플레이 폐루프 대장: `ssalddel-playable-loop-catalog.r18`
+- 플레이 폐루프 대장: `ssalddel-playable-loop-catalog.r19`
 - 증거 묶음 대장: `ssalddel-evidence-package-catalog.r24`
 - 플레이 단위·집계: `23`
 - 등록 증거 묶음: `32`
@@ -28,7 +28,7 @@
 | 1 | `playable-loop:nature-survival-homestead.v1` Nature 생존 생활거점 영역 집계 | AreaAggregate/Aggregate | 0 | - | - | E1→E2/E9 | Open | InProgress | 2 | 생활 거점 기초와 밤→Day2 자식 폐루프를 각각 E5로 닫은 뒤 영역 CoreClosed를 파생 판정한다. |
 | 2 | `playable-loop:nature-shelter-foundation.v1` Nature 도끼·벌목·오두막 기초 | PlayableUnit/Core | 10 | E7 | E7 | E7→E7/E7 | PlayClosed | Validated | 8 | stability:nature-shelter-foundation.v1 E8 통과를 유지하고 stability:nature-twilight-return.v1의 고정 후보를 검증한다. |
 | 3 | `playable-loop:nature-twilight-return.v1` Nature 황혼 위협 대응·귀환 | PlayableUnit/Core | 2 | E7 | E7 | E7→E7/E7 | PlayClosed | Validated | 5 | 완료 상태를 유지하되 H3 ThreatInput·전투 상태·Skeleton 표현 계약 변경 시 논리와 표현 증거를 각각 재검증한다. |
-| 4 | `playable-loop:nature-night-day2.v1` Nature 보관·수면·Day2 반환 | PlayableUnit/Core | 3 | E7 | E6 | E6→E7/E7 | Open | InProgress | 9 | SkyEngineTests와 canonical Scene 다섯 날씨 상태·오두막 내부 강수 차폐를 검증한다. |
+| 4 | `playable-loop:nature-night-day2.v1` Nature 보관·수면·Day2 반환 | PlayableUnit/Core | 3 | E5 | E4 | E4→E7/E7 | Open | InProgress | 9 | WI-NATURE-15 표현 엔진 cursor 소비를 연결한 뒤 v28 실제 입력·Save 재진입·Game View를 같은 revision에서 재검증한다. |
 | 5 | `playable-loop:nature-workbench-foundation.v1` Nature 작업대 기반 | PlayableUnit/Core | 2 | E7 | E6 | E6→E7/E7 | Open | InProgress | 4 | Table Saw·목재·상자·조명을 배치 통제 계층에서 하나의 작업 구역으로 조립하고 건설·취소·운영 화면 차이를 재검증한다. |
 | 6 | `playable-loop:nature-field-supply-return.v1` Nature 현장 성과·거점 제작·다음 원정 왕복 | PlayableUnit/Core | 6 | E4 | E1 | E1→E2/E7 | Open | InProgress | 1 | WI-NATURE-16·17의 실제 공간 발현과 Hosted 동등성을 검증한 뒤 E4·E5를 판정한다. |
 | 7 | `playable-loop:nature-base-reflection.v1` Nature 거점 성찰·다음 원정 준비 | PlayableUnit/Extension | 1 | E3 | E1 | E1→E2/E7 | Open | Defined | 1 | 공용 E1~E3 계약·시험을 기준선으로 삼아 WI-REFLECT-01과 기존 Nature 오두막 H1을 결속한다. |
@@ -54,7 +54,7 @@
 - **Nature 생존 생활거점 영역 집계** `Open`
   - 필수 Core: `playable-loop:nature-shelter-foundation.v1` — E7, PlayClosed
   - 필수 Core: `playable-loop:nature-twilight-return.v1` — E7, PlayClosed
-  - 필수 Core: `playable-loop:nature-night-day2.v1` — E6, Open
+  - 필수 Core: `playable-loop:nature-night-day2.v1` — E4, Open
   - 필수 Core: `playable-loop:nature-workbench-foundation.v1` — E6, Open
   - 필수 Core: `playable-loop:nature-field-supply-return.v1` — E1, Open
   - 선택 Extension: `playable-loop:nature-base-reflection.v1` — E1, Open
@@ -79,7 +79,8 @@
 ## 열린 경계
 
 - `playable-loop:nature-night-day2.v1`
-  - Unity Editor의 기존 Job lock 해소 뒤 Sky Engine 실제 Test Runner·Play Mode·Game View·Console을 재검증해야 한다.
+  - 행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.
+  - Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다.
 - `playable-loop:nature-workbench-foundation.v1`
   - 작업대 상태별 공간 조립과 운영 가능성의 시각 E7 증거가 부족하다.
 - `playable-loop:nature-field-supply-return.v1`
@@ -159,7 +160,7 @@
 
 ## 현재 최우선 실행 순서
 
-1. **Nature 보관·수면·Day2 반환** — SkyEngineTests와 canonical Scene 다섯 날씨 상태·오두막 내부 강수 차폐를 검증한다.
+1. **Nature 보관·수면·Day2 반환** — WI-NATURE-15 표현 엔진 cursor 소비를 연결한 뒤 v28 실제 입력·Save 재진입·Game View를 같은 revision에서 재검증한다.
 2. **Nature 작업대 기반** — Table Saw·목재·상자·조명을 배치 통제 계층에서 하나의 작업 구역으로 조립하고 건설·취소·운영 화면 차이를 재검증한다.
 3. **Nature 현장 성과·거점 제작·다음 원정 왕복** — WI-NATURE-16·17의 실제 공간 발현과 Hosted 동등성을 검증한 뒤 E4·E5를 판정한다.
 4. **Nature 거점 성찰·다음 원정 준비** — 공용 E1~E3 계약·시험을 기준선으로 삼아 WI-REFLECT-01과 기존 Nature 오두막 H1을 결속한다.

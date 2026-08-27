@@ -2,27 +2,30 @@
 
 > 이 문서는 `eng/execution-ledgers/codex-playable-loop-goals.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- Goal 원장 개정: `codex-playable-loop-goals.r19`
-- Goal WIP: `0/1`
-- WI WIP: `0/1`
+- Goal 원장 개정: `codex-playable-loop-goals.r22`
+- Goal WIP: `1/1`
+- WI WIP: `1/1`
+- 주제 기획 관문: `LegacyActiveMigration` / `topic:nature-night-day2.v1`
 - 우선순위: `CoreFirstPlayerContinuity` / `Nature → Farm → Hub → Town → City`
 
 ## 현재 /goal 입력
 
 ```text
 목표:
-playable-loop:nature-shelter-foundation.v1의 플레이어 약속을
+playable-loop:nature-night-day2.v1의 플레이어 약속을
 E7 PlayClosed까지 닫는다.
 
 플레이어 약속:
-도끼를 얻고 나무를 베어 오두막을 완성한 뒤 다시 안전한 선택 상태로 돌아온다.
+오두막에 자원을 보관하고 수면한 뒤 새벽에 다음 확장 계획을 선택한다.
 
 현재 기준:
-- 현재 폐루프 증거 단계: E7
-- 현재 WI 증거 단계: E7
+- 현재 폐루프 증거 단계: E4
+- 현재 WI 증거 단계: E6
 - 현재 성숙도 궤적: Presentation
-- 현재 작업 WI: WI-ACTOR-02 장착 상태 변경
-- 기준 revision: world-interaction-delivery-priorities.r21 / actor-equipment.r1/simulation-save.v27
+- 현재 작업 WI: WI-NATURE-15 다음 날 거점 확장 계획 선택
+- 파이프라인 관문: Logic Passed / Presentation Blocked / 통합 Blocked
+- 파이프라인 재개 E: E5
+- 기준 revision: world-interaction-delivery-priorities.r22 / nature-night-day2.r1/world-atmosphere.r1/simulation-save.v28
 
 운영 규칙:
 - 동시에 하나의 WI만 구현한다.
@@ -32,6 +35,7 @@ E7 PlayClosed까지 닫는다.
 - Scene·Synty 배치·문서·EditMode만으로 E7을 선언하지 않는다.
 - Solo LocalProcess와 Hosted RemoteHost는 같은 Simulation Core 계약을 사용한다.
 - 플레이어 의도, Simulation 권위, Unity 표현을 분리한다.
+- 권위 변경은 행위 원장 기록을 남기고 분야 성장은 적용 또는 사유 있는 NotApplicable로 판정한다.
 
 완료 조건:
 - 필수 WI가 모두 필요한 증거 단계를 충족한다.
@@ -48,7 +52,7 @@ E7 PlayClosed까지 닫는다.
 
 | 현재 WI | 현재 E | 현재 증거 | 남은 차단 | 다음 최저 의존성 |
 | --- | --- | --- | --- | --- |
-| `WI-ACTOR-02` 장착 상태 변경 | 폐루프 E7 / WI E7 → E7 | evidence:simulation-task-20260824<br>evidence:nature-r2-core-20260825<br>evidence:nature-shelter-playmode-20260825<br>evidence:nature-shelter-hosted-parity-20260825<br>evidence:nature-r5-logic-20260826<br>evidence:nature-dual-loop-game-view-20260826<br>evidence:nature-first-evening-equipment-logic-20260827<br>evidence:nature-shelter-explicit-equipment-e7-20260827 |  | 완료 |
+| `WI-NATURE-15` 다음 날 거점 확장 계획 선택 | 폐루프 E4 / WI E6 → E7 | evidence:nature-r2-core-20260825<br>evidence:nature-night-day2-wi13-playmode-20260826<br>evidence:nature-night-day2-wi13-hosted-parity-20260826<br>evidence:nature-night-day2-wi14-playmode-20260826<br>evidence:nature-night-day2-wi14-hosted-parity-20260826<br>evidence:nature-night-day2-wi15-playmode-20260826<br>evidence:nature-night-day2-wi15-hosted-parity-20260826<br>evidence:nature-dual-loop-game-view-20260826<br>evidence:nature-night-day2-presentation-e7-20260826 | 행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.<br>Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다. | `WI-NATURE-15 E6` |
 
 ## Goal 대기열
 
@@ -56,7 +60,7 @@ E7 PlayClosed까지 닫는다.
 | ---: | --- | --- | --- | --- | --- | --- |
 | 1 | Nature | Core | Nature 도끼·벌목·오두막 기초<br>`playable-loop:nature-shelter-foundation.v1` | E7 PlayClosed | Completed | `WI-ACTOR-02` |
 | 2 | Nature | Core | Nature 황혼 위협 대응·귀환<br>`playable-loop:nature-twilight-return.v1` | E7 PlayClosed | Completed | `WI-NATURE-11` |
-| 3 | Nature | Core | Nature 보관·수면·Day2 반환<br>`playable-loop:nature-night-day2.v1` | E7 PlayClosed | Queued | `WI-NATURE-14` |
+| 3 | Nature | Core | Nature 보관·수면·Day2 반환<br>`playable-loop:nature-night-day2.v1` | E7 PlayClosed | Active | `WI-NATURE-15` |
 | 4 | Nature | Core | Nature 작업대 기반<br>`playable-loop:nature-workbench-foundation.v1` | E7 PlayClosed | Queued | `WI-CON-01` |
 | 5 | Nature | Core | Nature 현장 성과·거점 제작·다음 원정 왕복<br>`playable-loop:nature-field-supply-return.v1` | E7 PlayClosed | Queued | `WI-NATURE-16` |
 | 6 | Farm | Core | Farm 경작·성장·수확<br>`playable-loop:farm-crop-cycle.v1` | E7 PlayClosed | Queued | `WI-FARM-01` |

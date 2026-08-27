@@ -1,6 +1,6 @@
 # Nature 거점 성찰·다음 원정 준비
 
-## 식별과 목적
+## 식별과 근거
 
 - `loopStableId`: `playable-loop:nature-base-reflection.v1`
 - 선행 폐루프: `playable-loop:nature-field-supply-return.v1`
@@ -8,10 +8,12 @@
 - 최종 목표: 플레이어 전용 `E7 / PlayClosed`
 - 실행 단위: `WI-REFLECT-01 승인 자료로 거점 성찰 확정`
 - 설계 기준 상태의 단일 출처: `eng/execution-ledgers/playable-loops.json`
+- 주제 고유 식별자: `topic:nature-base-reflection.v1`
+- 기획 revision: `nature-base-reflection.design.r1`
 
 플레이어가 Nature 바깥 활동에서 돌아온 뒤 그냥 쉬거나, 승인된 자료를 매개로 오늘 행동을 성찰하고, 다음 활동에서 위험 Preview와 후퇴·회복·제작·위임 선택을 조금 더 잘 읽을 수 있게 하는 선택형 폐루프다. 특정 시간대나 `저녁학당`이라는 장소를 강제하지 않는다.
 
-## 플레이어 약속
+## 플레이어 약속과 재미
 
 > 원정 결과를 가지고 거점에 돌아오면 그냥 쉬거나 승인 자료로 오늘의 행동을 성찰할 수 있고, 성찰한 경우 다음 원정의 선택 정보가 영구 내면 성장에 따라 달라진다.
 
@@ -29,7 +31,22 @@
 2. `ReflectOnToday`: 세션 시작 때 동결한 승인 Publication 하나를 골라 성찰한다.
 3. `OpenOptionalSource`: 선택적으로 원문 링크를 연다. 시청·재생·체류 시간은 보상 근거가 아니다.
 
-## WI와 단일 책임
+핵심 재미는 원정에서 얻은 사건을 그대로 수치 보상으로 바꾸는 것이 아니라, 어떤 경험을 성찰할지 선택하고 다음 원정에서 이전에는 읽지 못했던 선택 근거를 발견하는 데 있다.
+
+## 반복 폐루프
+
+`바깥 활동 → 거점 귀환 → 휴식 또는 성찰 선택 → 내면 학습 적용 → 다음 원정 정보 변화 → 새 바깥 활동`
+
+진입 상태는 거점 귀환과 승인 자료 상태 사본의 준비이며, 종료 상태는 다음 활동을 다시 선택할 수 있는 상태다.
+
+## 선택·대가·성공·실패·회복
+
+- 성찰은 하루 한 번의 기회를 사용하며, 자료 없이 쉬는 선택은 학습 보상을 포기하는 대신 즉시 다음 활동으로 돌아간다.
+- 성공은 승인 자료의 허용 효과가 다음 활동 경계에서 한 번 적용되는 것이다.
+- 중복·변조·미승인 자료는 거부하고 상태를 바꾸지 않는다.
+- 실패 뒤에는 자료를 다시 선택하거나 `RestOnly`로 돌아가 새 활동을 시작할 수 있다.
+
+## WI 단일 책임 후보
 
 `WI-REFLECT-01`은 `SimulationNative / PlayerDirect / Yin / -+`이다. 한 번의 Confirm이 소유하는 주 결과는 `InnerLearningPending` 하나이며, 다음 활동 경계에서 `InnerLearningApplied`로 전이한다.
 
@@ -51,7 +68,13 @@
 
 Apify 또는 YouTube Adapter는 운영자 수집 경계에서만 호출한다. Simulation 세션 생성·Tick·Preview·Confirm·Unity 조회는 동결된 Simulation 파생 원장만 읽는다.
 
-## 공간 요구
+## 논리·표현 요구
+
+- 논리는 승인 자료 hash, 하루 제한, 중복 지급 방지와 다음 활동 경계 적용을 결정적으로 판정한다.
+- 표현은 성찰 대상, 선택의 대가, 적용된 내면 효과와 다음 원정에서 달라진 정보를 플레이어가 구분하게 한다.
+- 같은 권위 revision의 Preview·Confirm·적용 결과를 사용하며 Unity 표현은 권위 revision을 바꾸지 않는다.
+
+## H 공간과 자산 요구
 
 | H | 판정 | 요구 |
 | --- | --- | --- |
@@ -63,7 +86,7 @@ Apify 또는 YouTube Adapter는 운영자 수집 경계에서만 호출한다. S
 
 H1의 실제 Synty 배치와 Unity 입력은 E4 이후 작업이다. 새 공식 Scene을 만들지 않고 canonical `SimulationWorldShell`에서 검증한다.
 
-## 상태와 저장 경계
+## 저장·권위·외부 경계
 
 세션 시작 시 다음을 불변 사본으로 고정한다.
 
@@ -85,10 +108,12 @@ H1의 실제 Synty 배치와 Unity 입력은 E4 이후 작업이다. 새 공식 
 - E7: `SimulationWorldShell` 실제 입력, 저장 재진입, LocalProcess·RemoteHost revision별 hash, Game View·Console 증거로 `PlayClosed` 판정.
 - E8: E7 완결 뒤 이 PlayableUnit 자체의 반복 결정성·Save 재진입·Local/Remote·실제 입력 안정성을 별도 캠페인으로 검증한다. NPC 학습 기능은 `playable-loop:nature-building-learning.v1`이 별도 PlayableUnit으로 소유하고, 두 폐루프의 생활 조화가 필요할 때 E9 AreaHarmonySet에서 만난다.
 
-## 이번 구현의 제외 범위
+## 제외 범위와 승인
 
 - 실제 YouTube·Apify Provider 호출과 API key
 - 운영 DB Migration 적용과 배포
 - Unity H1·UI 구현, Play Mode, Game View
 - NPC 학습과 장기 목표
 - 공격력·생산량·가격·타로 수치 변경
+
+현재 기획 상태는 `Draft`다. 이 문서는 승인 근거가 생기기 전 Goal 활성화 근거로 사용할 수 없다.
