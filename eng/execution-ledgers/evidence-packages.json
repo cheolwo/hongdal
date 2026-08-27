@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r23",
+  "revision": "ssalddel-evidence-package-catalog.r24",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -1323,6 +1323,48 @@
         "LH 실외·실내 배치 또는 SimulationWorldShell 구조 변경",
         "simulation-save.v27 저장·복원 정규형 변경"
       ]
+    },
+    {
+      "evidenceId": "evidence:nature-twilight-e8-logic-20260827",
+      "title": "Nature 황혼 대응·귀환 고정 후보 E8 논리 반복 안정성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-twilight-return.v1"],
+      "evidenceStageCodes": ["E8"],
+      "sourceRevision": "nature-survival.realtime.r2/simulation-save.v27/unity:2bde342/hongdal:f2e3d0a2",
+      "executedAt": "2026-08-27T18:24:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "ObserverOperation과 DirectAction 두 황혼 대응 명령열을 세 차례 실행해 매회 2/2 통과했다. 각 실행은 전투 결과·Battle Replay hash·최종 WorldRevision·simulation-save.v27 저장 hash의 LocalProcess/RemoteHost 동등성과 RemoteHost 패키지의 Local slot 복원을 검증했다.",
+      "exclusions": ["Unity 실제 전투·후퇴 입력", "사람의 논리·표현 조화와 재미·몰입·완성도 승인", "운영 Provider와 운영 DB"],
+      "artifactReferences": [
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-logic-1.trx", "sha256": "b86fff4d2638a1610983e79b3eaf3eb95bb746f15b537db2d4c4647b2f061513", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-logic-2.trx", "sha256": "a6e5427389cedf38182284ab2b39741a0969fa9c7a9e3b1dff1c09f41e9b6393", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-logic-3.trx", "sha256": "c1f14d50d1780bb2ecf497377cda18df1fc6c19778716fca6885c972991b4326", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["WI-NATURE-11 관찰·참여 방식·전투 결과 인계 변경", "LocalProcess·RemoteHost 전투 Adapter 변경", "simulation-save.v27 또는 Battle Replay hash 의미 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-twilight-e8-presentation-20260827",
+      "title": "Nature 황혼 후퇴·직접 개입 E8 실제 입력·재진입 안정성",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-twilight-return.v1"],
+      "evidenceStageCodes": ["E8"],
+      "sourceRevision": "nature-survival.realtime.r2/simulation-save.v27/unity:2bde342/hongdal:f2e3d0a2",
+      "executedAt": "2026-08-27T18:21:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "실제 O/R 후퇴와 O/F/좌클릭 직접 개입 두 경로를 네 차례 각각 2/2 통과했다. 두 경로 모두 결과 저장 뒤 canonical Scene을 다시 열어 같은 SessionStableId·WorldRevision·EncounterResolved·LastCombatResultCode를 복원했고, 마지막 cursor 4300~4400 구간의 신규 Console 오류는 0건이었다.",
+      "exclusions": ["ObserverOperation 전술 일시정지·비상 카드 사람 조작", "사람의 최종 미감·청음과 E9 승인", "RemoteHost Unity 프로세스 실제 네트워크 실행"],
+      "artifactReferences": [
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-playmode-final.json", "sha256": "abe6e79d05ed9d6c97833e5a634f9a35c9b8a0e15e37e627d9c8f76ec25d2e3c", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-retreat-final.png", "sha256": "ded6661ee27dc6354660dbf0e75501418a82324255c175079d9689e8354fa7d7", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-direct-final.png", "sha256": "5a39cdd30e8882717e5bdec2449af550c5a521462e701898dfe36f60bdb18084", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["SimulationWorldShell O/R/F·직접 전투 입력 배선 변경", "황혼 전투 결과 저장·Scene 재진입 복원 변경", "Nature 결과·귀환 HUD 또는 전투 카메라 표현 변경"]
     }
   ]
 }

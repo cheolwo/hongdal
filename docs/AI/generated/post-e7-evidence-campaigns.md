@@ -13,7 +13,7 @@
 | PlayableUnit | 현재 E | 상태 | 승격 가능 | 차단 |
 | --- | --- | --- | --- | --- |
 | `playable-loop:nature-shelter-foundation.v1` | E7 | Passed | True |  |
-| `playable-loop:nature-twilight-return.v1` | E7 | Ready | False | 동일 후보 revision에서 E8 반복 안정성 검증을 실행하지 않았다. |
+| `playable-loop:nature-twilight-return.v1` | E7 | Passed | True |  |
 | `playable-loop:nature-night-day2.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:nature-workbench-foundation.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:nature-field-supply-return.v1` | E1 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
@@ -34,7 +34,7 @@
 | 영역 | 후보 | 구성원 | 논리 | 표현 | 통합 | 사람 승인 |
 | --- | --- | ---: | --- | --- | --- | --- |
 | Nature | `area-harmony:nature-core.v1` | 5 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
-| Nature | `area-harmony:nature-first-evening.v1` | 2 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
+| Nature | `area-harmony:nature-first-evening.v1` | 2 | Ready | Ready | Ready | False |
 | Farm | `area-harmony:farm-core.v1` | 2 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
 | Hub | `area-harmony:hub-core.v1` | 2 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
 
