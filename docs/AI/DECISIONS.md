@@ -2936,3 +2936,25 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 이전 예외: 현재 활성 `playable-loop:nature-night-day2.v1`만 `LegacyActiveMigration`을 한시적으로 허용한다. 예외는 다른 루프로 이전할 수 없고 이 Goal을 완료하기 전에 `Approved`로 전환한다. 다음 대기 Goal부터 예외는 없다.
 - 변경 규칙: 플레이어 약속이 바뀌면 새 주제·PlayableLoop·Goal을 만들고, 같은 약속의 정제는 기획 판본을 올려 다시 승인한 뒤 가장 이른 영향 E를 연다.
 - 상세 기준: [주제 기획 기반 PlayableLoop 개발 체계](../Architecture/주제기획기반PlayableLoop개발체계.md), `eng/execution-ledgers/manage-playable-loop-topic-planning.ps1`을 따른다.
+
+## D-270 집중 판정은 WI Task에 종속하고 명상은 횡단 성장축으로 둔다
+
+- 상태: `Superseded by D-271`
+- 결정일: 2026-08-28
+- 행위 경계: `FocusTiming`은 새 WI가 아니라 기존 WI Task의 선택적 수행 품질 판정이다. 기본 행위 성공·실패와 분야 숙련을 재정의하지 않으며 Task가 권위 완료된 경우에만 발현한다.
+- 성장 경계: 명상 숙련은 17번째 분야가 아니라 모든 분야를 가로지르는 성장축이다. 분야·세부 숙련·Challenge·완료 행위 기록 계보를 함께 보존한다.
+- 판정 경계: 권위 Core는 백만분율 정수 왕복 위치를 계산한다. `Standard`, `Assisted`, `NeutralSkip`을 구분하고 건너뛰기는 실패 연속·명상·심리 수치를 변경하지 않는다.
+- 심리 경계: 정확·양호는 플레이어 개인 NatureMind 회복, 같은 세부 숙련의 실패 두 번은 개인 위협에만 기여한다. 지역 전체 위협, 몬스터 생성, 자원량과 운영 상태는 직접 변경하지 않는다.
+- 저장·증거: 명상 기여가 있는 저장은 `simulation-save.v29`로 봉인하고 v1~v28 읽기 호환을 유지한다. 서버 Logic E5 자동 시험은 Unity 실제 입력·상태창·Game View Presentation E7을 대신하지 않는다.
+- 상세 기준: [벌목 집중과 명상 숙련 체계](../Architecture/벌목집중과명상숙련체계.md)를 따른다.
+
+## D-271 모든 플레이어 WI를 집중 Profile로 분류하고 명상 성장은 행위 원장 계보에 결속한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 적용 경계: 플레이어 분야 카탈로그에 결속된 모든 WI는 `Applied`, `PendingProfile`, `NpcOnly`, `Automatic`, `Excluded` 중 하나로 분류한다. Profile이 승인되지 않은 WI에는 보상을 추정하지 않고 판본화된 `NotApplicable`을 남긴다.
+- 실행 경계: 공통 실행 파이프라인은 `FocusEvidenceCollect`를 권위 확정 전에, `MeditationProgressionApply`를 행위 기록과 분야 성장 뒤에 기록한다. 분야·명상 기여와 허용된 개인 심리 효과는 같은 완료 행위·Command·Revision 계보를 사용한다.
+- 보상 경계: 첫 판본은 Perfect `250 Milli`, Good `100 Milli`의 작은 명상 경험과 같은 양의 개인 회복만 지급한다. 집중 실패만으로 위협을 올리지 않으며 기본 WI 결과와 물질 보상을 재정의하지 않는다.
+- 소비 경계: LH·Sky·실외·실내·World Presentation은 행위 원장 또는 같은 Revision 상태 사본을 자신의 생명주기에서 독립 조회한다. 엔진은 파이프라인에 종속되어 즉시 호출될 필요가 없고 권위 Revision을 변경할 수 없다.
+- 저장·증거: 권위 원본은 `명상경험Milli`이며 `simulation-save.v29`가 Challenge·명상 기여·행위 원장 계보를 봉인한다. 자동 Logic E5는 Unity 실제 입력·상태창·Game View Presentation E7을 대신하지 않는다.
+- 상세 기준: [전 행위 몰입과 명상 숙련·행위 원장 통합 체계](../Architecture/전행위몰입과명상숙련행위원장통합체계.md)와 [벌목 집중과 명상 숙련 체계](../Architecture/벌목집중과명상숙련체계.md)를 따른다.

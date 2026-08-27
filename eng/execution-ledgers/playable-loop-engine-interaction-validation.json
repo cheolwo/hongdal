@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-engine-interaction-validation.v2",
-  "revision": "playable-loop-engine-interaction-validation.r3",
+  "revision": "playable-loop-engine-interaction-validation.r4",
   "evidenceTrackCodes": ["Logic", "Presentation"],
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "principles": {
@@ -16,10 +16,11 @@
   },
   "allowedStatusCodes": ["Executed", "Reused", "NotApplicable", "Blocked"],
   "components": [
-    { "componentCode": "WI.ExecutionPipeline", "componentKindCode": "Orchestration", "componentRevision": "playable-loop-engine-trace.r2", "mayMutateAuthority": false },
+    { "componentCode": "WI.ExecutionPipeline", "componentKindCode": "Orchestration", "componentRevision": "playable-loop-engine-trace.r3", "mayMutateAuthority": false },
     { "componentCode": "Simulation.AuthorityCore", "componentKindCode": "Authority", "componentRevision": "simulation-core.current", "mayMutateAuthority": true },
     { "componentCode": "Simulation.ActionJournal", "componentKindCode": "Authority", "componentRevision": "simulation-action-manifestation.v1", "mayMutateAuthority": true },
     { "componentCode": "Simulation.PlayerDomainProgression", "componentKindCode": "Authority", "componentRevision": "player-domain-progress.r1", "mayMutateAuthority": true },
+    { "componentCode": "Simulation.PlayerMeditationProgression", "componentKindCode": "Authority", "componentRevision": "meditation-progress.r2", "mayMutateAuthority": true },
     { "componentCode": "LH.Surface", "componentKindCode": "Presentation", "componentRevision": "lh-streaming.r1", "mayMutateAuthority": false },
     { "componentCode": "Sky.Presentation", "componentKindCode": "Presentation", "componentRevision": "sky-engine.r2", "mayMutateAuthority": false },
     { "componentCode": "Placement.Exterior", "componentKindCode": "Presentation", "componentRevision": "exterior-placement.r1", "mayMutateAuthority": false },
@@ -29,15 +30,17 @@
   ],
   "profileDerivation": {
     "requiredLoopLevelCode": "PlayableUnit",
-    "profileRevision": "all-playable-units.pipeline-gate.r1",
+    "profileRevision": "all-playable-units.pipeline-gate.r2",
     "expectedPlayableUnitCount": 16,
     "expectedLoopWiPairCount": 55,
     "baseRequirements": [
       { "order": 10, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Preview", "trackCode": "Logic", "reopenStage": "E4", "allowsReused": false, "allowsNotApplicable": false },
       { "order": 20, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Confirm", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": false, "allowsNotApplicable": false },
+      { "order": 25, "componentCode": "WI.ExecutionPipeline", "phaseCode": "FocusEvidenceCollect", "trackCode": "Logic", "reopenStage": "E4", "allowsReused": true, "allowsNotApplicable": true },
       { "order": 30, "componentCode": "Simulation.AuthorityCore", "phaseCode": "AuthorityCommit", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": false },
       { "order": 40, "componentCode": "Simulation.ActionJournal", "phaseCode": "ActionRecordAppend", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": false },
       { "order": 50, "componentCode": "Simulation.PlayerDomainProgression", "phaseCode": "PlayerProgressionApply", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": true },
+      { "order": 55, "componentCode": "Simulation.PlayerMeditationProgression", "phaseCode": "MeditationProgressionApply", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": true },
       { "order": 60, "componentCode": "WI.ExecutionPipeline", "phaseCode": "ReturnProjection", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": false }
     ],
     "areaDefaults": {
@@ -57,8 +60,8 @@
     }
   },
   "profileOverrides": [
-    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-13", "displayNameKo": "거점 보관", "profileRevision": "nature-night-day2.engine-interaction.r2", "changeSemanticCodes": ["InventoryChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] },
-    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-14", "displayNameKo": "오두막 수면과 새벽 전환", "profileRevision": "nature-night-day2.engine-interaction.r2", "changeSemanticCodes": ["ActorStateChanged", "TimeStateChanged", "AtmosphereChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["LH.Surface", "Sky.Presentation", "Placement.Exterior", "Placement.Interior", "Lighting.Directional", "World.Presentation"] },
-    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-15", "displayNameKo": "다음 확장 계획 선택과 Day2 반환", "profileRevision": "nature-night-day2.engine-interaction.r2", "changeSemanticCodes": ["ActorStateChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] }
+    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-13", "displayNameKo": "거점 보관", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["InventoryChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] },
+    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-14", "displayNameKo": "오두막 수면과 새벽 전환", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["ActorStateChanged", "TimeStateChanged", "AtmosphereChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["LH.Surface", "Sky.Presentation", "Placement.Exterior", "Placement.Interior", "Lighting.Directional", "World.Presentation"] },
+    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-15", "displayNameKo": "다음 확장 계획 선택과 Day2 반환", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["ActorStateChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] }
   ]
 }

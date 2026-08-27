@@ -8,7 +8,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD575\uC2EC \uACC4\uC57D",
       "technicalName": "E1\uD575\uC2EC\uACC4\uC57DModule",
-      "primaryCount": 37,
+      "primaryCount": 38,
       "secondaryCount": 0
     },
     {
@@ -24,7 +24,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD68C\uADC0 \uC99D\uAC70",
       "technicalName": "E3\uD68C\uADC0\uC99D\uAC70Module",
-      "primaryCount": 187,
+      "primaryCount": 188,
       "secondaryCount": 1
     },
     {
@@ -3809,6 +3809,25 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.Simulation\uC9D1\uC911\uD310\uC815Policy",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Domain",
+      "componentName": "Ssalddel.Simulation.Domain.Simulation\uC9D1\uC911\uD310\uC815Policy",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFocusTimingPolicy.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uC9D1\uC911 \uD310\uC815\uC758 \uACB0\uC815\uC801 \uC815\uC218 \uC815\uCC45\uACFC \uC811\uADFC\uC131 \uBAA8\uB4DC \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uD310\uC815 \uC815\uCC45\uC740 Task \uC644\uB8CC\uB098 Unity \uD45C\uD604\uC744 \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Domain",
@@ -5318,6 +5337,25 @@
       "primaryEvidenceStage": "E3",
       "responsibility": "Simulation\u00B7Unity \uACC4\uC57D\uACFC \uACB0\uC815\uC131 \uBC0F \uD68C\uADC0 \uC99D\uAC70\uB97C \uAC80\uC99D\uD55C\uB2E4.",
       "boundary": "\uC790\uB3D9 \uC2DC\uD5D8 \uD1B5\uACFC\uC640 \uC2E4\uC81C Play Mode\u00B7Game View\u00B7E \uC2B9\uACA9 \uC99D\uAC70\uB97C \uAD6C\uBD84\uD55C\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationFocusMeditationTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationFocusMeditationTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationFocusMeditationTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC9D1\uC911 \uD310\uC815\u00B7\uBA85\uC0C1 \uC131\uC7A5\u00B7v29 \uC800\uC7A5 \uC7AC\uC0DD\uC758 \uACB0\uC815\uC131\uACFC \uACC4\uBCF4\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 Unity \uC2E4\uC81C \uC785\uB825\uACFC Game View \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -12319,8 +12357,8 @@
     }
   ],
   "coverage": {
-    "candidateTypeCount": 590,
-    "annotatedTypeCount": 587,
+    "candidateTypeCount": 592,
+    "annotatedTypeCount": 589,
     "excludedTypeCount": 3,
     "uncoveredTypeCount": 0,
     "annotatedMethodCount": 17

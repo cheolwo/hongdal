@@ -2,8 +2,8 @@
 
 > 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 후보 타입: `590`
-- 책임 지정: `587`
+- 후보 타입: `592`
+- 책임 지정: `589`
 - 사유 있는 제외: `3`
 - 미분류: `0`
 - 메서드 책임: `17`
@@ -12,9 +12,9 @@
 
 | E | G | 모듈 | 대표 | 보조 |
 | --- | --- | --- | ---: | ---: |
-| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 37 | 0 |
+| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 38 | 0 |
 | `E2` | `G1` | `E2실행경계Module` 실행 경계 | 158 | 0 |
-| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 187 | 1 |
+| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 188 | 1 |
 | `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 38 | 0 |
 | `E5` | `G1` | `E5세계발현Module` 세계 발현 | 7 | 0 |
 | `E6` | `G1` | `E6세계정제Module` 세계 정제 | 21 | 0 |
@@ -47,9 +47,9 @@
 
 ### 아직 하위 모듈을 지정하지 않은 기존 책임
 
-- `E1`: `28`개
+- `E1`: `29`개
 - `E2`: `139`개
-- `E3`: `166`개
+- `E3`: `167`개
 
 ## 미분류 후보
 
@@ -234,6 +234,7 @@
 | `Ssalddel.Simulation.Domain.Simulation결정적환경발생DecisionEngine` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation승인학습자료파생원장` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-REFLECT-01` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation자원효과묶음Validator` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Domain.Simulation집중판정Policy` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate.ExecuteWorldInteraction` | `E5` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.도심마트4주DemandScenarioBuilder` | `E1` | `` | `` | `` | `Annotated` |
@@ -310,6 +311,7 @@
 | `Ssalddel.Simulation.Tests.SimulationFarmConstructionPlacementTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationFarmRealityEvidenceTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationFarmSurvivalTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationFocusMeditationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationFreightTransportTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationHarvestDispositionImpactTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationIndividualOrderTests` | `E3` | `` | `` | `` | `Annotated` |
