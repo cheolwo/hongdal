@@ -1,15 +1,31 @@
 {
-  "schemaVersion": "simulation-evidence-management-systems.v1",
-  "revision": "simulation-evidence-management-systems.r2",
+  "schemaVersion": "simulation-evidence-management-systems.v3",
+  "revision": "simulation-evidence-management-systems.r7",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
-  "targetFirstVerticalImplementationProtocolPath": "eng/execution-ledgers/e9-vertical-implementation-protocol.json",
-  "targetFirstWorkOrderTemplatePath": "eng/execution-ledgers/work-orders/e9-vertical-work-order.template.json",
+  "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
+  "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
+  "targetFirstVerticalImplementationProtocolPath": "eng/execution-ledgers/e7-vertical-implementation-protocol.json",
+  "targetFirstWorkOrderTemplatePath": "eng/execution-ledgers/work-orders/e7-vertical-work-order.template.json",
+  "postE7EvidenceCampaignCatalogPath": "eng/execution-ledgers/post-e7-evidence-campaigns.json",
+  "legacyCompatibility": {
+    "evidenceStageCatalogPath": "eng/execution-ledgers/compatibility/evidence-stages.legacy-r10.json",
+    "verticalImplementationProtocolPath": "eng/execution-ledgers/e9-vertical-implementation-protocol.json",
+    "workOrderSchemaVersion": "simulation-e9-vertical-work-order.v2",
+    "meaning": "Legacy E8 NPC 생활세계·E9 변화 적응 작업 명세를 읽기 위한 호환 경로이며 현재 E8·E9 승격에 사용하지 않는다."
+  },
   "principles": {
     "managementSystemsAreNotEvidenceStages": true,
     "managementCompletionDoesNotPromoteEvidence": true,
     "promotionRequiresStageCompletionGateEvidence": true,
     "lowerStageContractsRemainValidUntilExplicitlyRevised": true,
-    "targetFirstPlanningDoesNotPromoteEvidence": true
+    "targetFirstPlanningDoesNotPromoteEvidence": true,
+    "evidencePackageDoesNotPromoteSubjectAutomatically": true,
+    "playableUnitVerticalMaturityEndsAtE7": true,
+    "postE7EvidenceUsesStabilityAggregateAndOperationalSubjects": true,
+    "logicAndPresentationCycleThroughE1ToE9": true,
+    "integratedEvidenceUsesLowerTrack": true,
+    "legacyE9DoesNotPromoteCurrentE9": true
   },
   "systems": [
     {
@@ -43,33 +59,48 @@
     },
     {
       "code": "G3",
-      "label": "NPC 생활세계 관리",
+      "label": "개별 폐루프 안정 관리",
       "primaryTransition": { "from": "E7", "to": "E8" },
-      "question": "플레이어가 없어도 다른 주체가 이 세계를 살아갈 수 있는가?",
+      "question": "완성된 하나의 E7 폐루프가 반복 실행과 저장 재진입에서도 안정적인가?",
       "responsibilities": [
-        "NPC 정체성, 역할, 욕구와 목표",
-        "행동 후보, 우선순위와 자율 의사결정",
-        "생활 이동과 업무 이동",
-        "공간과 자원 경쟁",
-        "협력과 인계",
-        "기억과 연속성",
-        "NPC 행동 표현"
+        "PlayableUnit 후보 revision과 build hash 동결",
+        "Logic 최소 3회 결정적 실행",
+        "Save·Restore·Replay hash 일치",
+        "LocalProcess·RemoteHost 동등성",
+        "Presentation 최소 2회 실제 입력 완주",
+        "Save 재진입과 차단 Console 오류 0건"
       ]
     },
     {
       "code": "G4",
-      "label": "변화·확장 적응 관리",
+      "label": "영역 조화·사람 승인 관리",
       "primaryTransition": { "from": "E8", "to": "E9" },
-      "question": "세계를 안전하게 변화시킬 수 있는가?",
+      "question": "같은 영역의 안정된 Core 폐루프들이 조화롭게 이어지고 사람에게 승인받는가?",
       "responsibilities": [
-        "변경 제안과 영향 범위 분석",
-        "E8에서 E1까지의 하향 의존 관계 추적",
-        "Revision과 데이터 Migration 계획",
-        "Save와 API 호환성",
-        "결정성 회귀 검사",
-        "기존 플레이어와 NPC 폐루프 회귀 검사",
-        "신규 기능 승격",
-        "변경 후 E1에서 E8까지의 상향 재검증"
+        "둘 이상의 E8 Core로 AreaHarmonySet 구성",
+        "권위·자원·시간·실패 회복·NPC 연속성 조화",
+        "공간 이동·카메라·입력·상태 피드백 조화",
+        "사람 플레이 세션과 대표 실행 순서",
+        "Logic의 인과·선택 결과·진행 귀환 평가",
+        "Presentation의 판독·피드백·전환 평가",
+        "재미·몰입·완성도 통합 평가",
+        "Blocking·Major 발견 사항 분류",
+        "E9 조화 또는 관련 PlayableUnit의 가장 이른 E1~E8 재개",
+        "후보 revision·build hash 승인"
+      ]
+    },
+    {
+      "code": "G5",
+      "label": "제한 운영 관리",
+      "primaryTransition": { "from": "E9", "to": "E10" },
+      "question": "승인된 후보 빌드가 제한 운영 관찰창에서 안전하게 지속되는가?",
+      "responsibilities": [
+        "Windows x64 LocalProcess 후보 빌드 동결",
+        "관찰 일수·완주 세션·시험자 기준",
+        "크래시·예외·저장 손상·Replay 불일치 관찰",
+        "rollback 훈련",
+        "사람의 계속 운영 승인",
+        "외부 운영 효과 별도 권위 경계"
       ]
     }
   ]

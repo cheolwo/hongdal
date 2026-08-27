@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-NATURE-DUAL-LOOP-VISUAL-COMPLETION",
+  "title": "Nature 논리·시각 플레이 폐루프 순환 보완",
+  "playableLoopRefs": [
+    "playable-loop:nature-shelter-foundation.v1",
+    "playable-loop:nature-twilight-return.v1",
+    "playable-loop:nature-night-day2.v1",
+    "playable-loop:nature-workbench-foundation.v1"
+  ],
+  "evidencePackageRefs": [
+    "evidence:nature-shelter-hosted-parity-20260825",
+    "evidence:nature-shelter-playmode-20260825",
+    "evidence:nature-dual-loop-game-view-20260826",
+    "evidence:nature-night-day2-presentation-e7-20260826"
+  ],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E7",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "nature-survival.realtime.r5",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "ImpactReassessment",
+    "lastReassessment": "보관·수면·새벽 계획은 상태별 공간 표현과 실제 입력 Game View로 E7을 회복했다. 작업대는 논리 E7·표현 E6이며 완성 화면의 카메라 가림과 작업 구역 구성이 다음 피드백이다.",
+    "nextReopenCondition": "Game View에서 핵심 대상·원인·결과·다음 선택이 읽히지 않으면 원인을 소유한 가장 낮은 Logic 또는 Presentation E 단계로 되돌린다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Unity", "Integration", "ProjectGovernance"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:unity", "workstream:integration"],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application",
+      "Ssalddel.Simulation.Server",
+      "Ssalddel.Simulation.Tests",
+      "docs/Architecture",
+      "docs/AI",
+      "eng/execution-ledgers",
+      "C:/Users/user/ssalddel/Assets/Ssalddel"
+    ],
+    "dependencyWorkOrderIds": ["E9-WO-NATURE-SURVIVAL-SOLO-PLACEMENT"],
+    "handoffIn": [
+      "기존 Nature r4 상태 전이와 E7 증거",
+      "Synty Nature·Construction·Generic 자산",
+      "canonical SimulationWorldShell과 배치 통제 계층"
+    ],
+    "handoffOut": [
+      "WI-NATURE-18 지면 통나무 획득 계약",
+      "simulation-save.v24 결정적 상태 사본",
+      "Nature 표현준비묶음과 실제 Game View 피드백"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "논리·시각 성숙도 원장, WI-NATURE-18, Nature 시각 표현과 증거를 맥락별로 분리"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v1",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {"code":"E9","disposition":"Affected","summary":"기존 증거를 삭제하지 않고 논리·시각 성숙도와 피드백 재개방 계보를 추가한다.","dimensions":{"changeEnvelope":"Nature 네 Core 폐루프와 WI-NATURE-18 및 표현 계층","baselineAndTargetRevision":"r4/v23에서 r5/v24로 확장","migrationCompatibility":"r1~r4 즉시 지급과 v23 이하 hash를 유지","rollbackBoundary":"r5 선택을 중지하면 기존 세션 동작은 유지"},"sourceReferences":["docs/Architecture/E9하향식수직구현체계.md"],"nextAction":"두 트랙 E7 뒤 승격 검토"},
+    {"code":"E8","disposition":"ReusedWithVerification","summary":"NPC 생활세계는 바꾸지 않고 플레이어 Nature Core만 보완한다.","dimensions":{"npcRoleGroup":"변경 없음","continuousLifeLoop":"기존 계약 유지","playerAbsentBehavior":"자동 획득 없음","saveReplay":"지면 통나무만 추가"},"sourceReferences":["docs/Architecture/E8-NPC생활세계폐루프정의.md"],"nextAction":"NPC 변경 없이 유지"},
+    {"code":"E7","disposition":"Gap","summary":"실제 입력과 Game View에서 설명 없이 대상과 결과를 식별해야 한다.","dimensions":{"playerLoop":"벌목-통나무 생성-줍기-운반-다음 선택","authorityModes":"LocalProcess와 RemoteHost 동일","canonicalScene":"SimulationWorldShell","runtimeEvidence":"실제 입력, Game View, Console, 저장 재진입"},"sourceReferences":["docs/Architecture/플레이폐루프와증거묶음개발체계.md"],"nextAction":"시각 루프 검증"},
+    {"code":"E6","disposition":"Affected","summary":"오두막·통나무·위협·작업대의 Synty 표현과 문맥 안내를 상태 사본에 결속한다.","dimensions":{"worldStateExplanation":"원인·결과·다음 선택을 월드에서 읽게 한다","groundingProfile":"NotApplied","provenanceLimitations":"Synty 표현은 권위 증거가 아님","causalQuestionMatrix":"안 보이는 원인이 자산·카메라·상태 중 어디인지 기록"},"sourceReferences":["docs/Architecture/Synty5팩자산-H1-H3연결지도.md"],"nextAction":"표현준비묶음 연결"},
+    {"code":"E5","disposition":"Affected","summary":"r5 Fixture에서 지면 통나무와 별도 획득이 실제 상태로 발현된다.","dimensions":{"triggerOccurrence":"벌목 완료가 지면 묶음을 생성","authorityTransition":"줍기 Confirm만 인벤토리 이전","taskEffectResult":"용량 차단과 멱등 획득","successorOrReturnPath":"추가 벌목·건설·보관","conditionalSpatialEvidence":"Required"},"sourceReferences":["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs"],"nextAction":"Local·Hosted 동등성"},
+    {"code":"E4","disposition":"Affected","summary":"WI-NATURE-18을 플레이어·지면 통나무·인벤토리 용량·기존 ResourceNode H1에 결속한다.","dimensions":{"allowedTriggerSources":"PlayerDriven","subjectAndTargetBindings":"PlayerStableId와 DroppedTimberStableId","dataResourceTimeBindings":"수량·용량·WorldRevision","spatialApplicability":"Required; 기존 벌목 H1"},"sourceReferences":["eng/execution-ledgers/world-interactions.json"],"nextAction":"Actual E5와 Unity 표시자 연결"},
+    {"code":"E3","disposition":"Affected","summary":"생성·용량 차단·멱등 획득·v24 hash를 집중 시험한다.","dimensions":{"contractTests":"Preview와 Confirm","determinism":"stable ID와 정렬","saveReplayRegression":"v24 및 v23 이하 호환","consumerRegression":"기존 r1~r4 시험 유지"},"sourceReferences":["Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],"nextAction":"Hosted·Unity 소비자 시험"},
+    {"code":"E2","disposition":"Affected","summary":"DroppedTimber 상태 사본과 CollectDroppedTimber 계약을 추가한다.","dimensions":{"contracts":"한국어 도메인 의미와 영어 기술 역할","applicationDomain":"Simulation Core 권위","adapters":"기존 Nature endpoint 재사용","unityProjection":"상태 읽기와 명령 전달만"},"sourceReferences":["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs"],"nextAction":"r5 소비자 연결"},
+    {"code":"E1","disposition":"Defined","summary":"벌목과 획득은 별도 단일 책임이고 논리 완료 뒤 시각 검증을 수행한다.","dimensions":{"purposeAndReturn":"플레이어가 결과물을 보고 직접 줍고 다음 선택으로 복귀","authorityAndAllowedTriggerSources":"PlayerDriven, Simulation Core","stableIdsAndRevision":"WI-NATURE-18, r5, v24","acceptanceAndExclusions":"자동 줍기·Unity 수량 계산·운영 효과 제외"},"sourceReferences":["docs/Architecture/WI단일책임원칙.md"],"nextAction":"계약 회귀 유지"}
+  ],
+  "upwardValidation": [
+    {"code":"E1","status":"Passed","evidence":["WI-NATURE-18 단일 책임 정의"],"nextAction":"변경 시 재검토"},
+    {"code":"E2","status":"Passed","evidence":["r5 DroppedTimber 계약과 Domain"],"nextAction":"소비자 연결"},
+    {"code":"E3","status":"Passed","evidence":["SimulationNatureSurvivalTests 44/44"],"nextAction":"Hosted 동등성"},
+    {"code":"E4","status":"Passed","evidence":["기존 벌목 H1 문맥 재사용"],"nextAction":"Actual E5 생성"},
+    {"code":"E5","status":"Passed","evidence":["r5 Local Fixture와 기존 Nature night-day2 Hosted 동등성"],"nextAction":"권위 계약 변경 시 재검토"},
+    {"code":"E6","status":"Passed","evidence":["Synty 보관 더미·침상·캠프파이어·계획판 상태 표현"],"nextAction":"작업대 작업 구역 표현을 별도 Goal에서 보완"},
+    {"code":"E7","status":"Passed","evidence":["evidence:nature-night-day2-presentation-e7-20260826"],"nextAction":"작업대 폐루프 표현 E7은 별도 Goal에서 검증"},
+    {"code":"E8","status":"Passed","evidence":["NPC 범위 변경 없음"],"nextAction":"분리 유지"},
+    {"code":"E9","status":"Blocked","evidence":[],"nextAction":"두 트랙 E7 뒤 승격"}
+  ],
+  "promotionBlockers": [
+    "playable-loop:nature-workbench-foundation.v1의 작업 구역 표현과 카메라 가시성 E7이 아직 열려 있다.",
+    "전체 Nature PlayMode 묶음의 기존 이동 제한·황혼 상태 문구 회귀 2건을 별도로 정리해야 한다.",
+    "E8 기준선과 Migration 승격 검토는 이번 E7 표현 보완 범위 밖이다."
+  ],
+  "finalEvidenceReferences": [
+    "evidence:nature-dual-loop-game-view-20260826",
+    "evidence:nature-night-day2-presentation-e7-20260826"
+  ]
+}

@@ -1,26 +1,27 @@
 # E 책임 코드 지도
 
-> 이 문서는 C# E 책임 Attribute와 E9 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
+> 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 후보 타입: `544`
-- 책임 지정: `542`
-- 사유 있는 제외: `2`
+- 후보 타입: `589`
+- 책임 지정: `586`
+- 사유 있는 제외: `3`
 - 미분류: `0`
-- 메서드 책임: `16`
+- 메서드 책임: `17`
 
 ## E 단계별 책임
 
 | E | G | 모듈 | 대표 | 보조 |
 | --- | --- | --- | ---: | ---: |
-| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 30 | 0 |
-| `E2` | `G1` | `E2실행경계Module` 실행 경계 | 144 | 0 |
-| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 165 | 1 |
-| `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 36 | 0 |
-| `E5` | `G1` | `E5세계발현Module` 세계 발현 | 4 | 0 |
-| `E6` | `G1` | `E6세계정제Module` 세계 정제 | 19 | 0 |
-| `E7` | `G2` | `E7플레이경험폐루프Module` 플레이 경험 폐루프 | 149 | 0 |
-| `E8` | `G3` | `E8생활연속성Module` 생활 연속성 | 13 | 0 |
-| `E9` | `G4` | `E9변화봉투Module` 변화 봉투 | 1 | 0 |
+| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 37 | 0 |
+| `E2` | `G1` | `E2실행경계Module` 실행 경계 | 158 | 0 |
+| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 186 | 1 |
+| `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 38 | 0 |
+| `E5` | `G1` | `E5세계발현Module` 세계 발현 | 7 | 0 |
+| `E6` | `G1` | `E6세계정제Module` 세계 정제 | 21 | 0 |
+| `E7` | `G2` | `E7플레이경험폐루프Module` 플레이 경험 폐루프 | 151 | 0 |
+| `E8` | `G3` | `E8개별폐루프안정Module` 개별 폐루프 안정 | 13 | 0 |
+| `E9` | `G4` | `E9영역조화사람승인Module` 영역 조화·사람 승인 | 0 | 0 |
+| `E10` | `G5` | `E10제한운영검증Module` 제한 운영 검증 | 0 | 0 |
 
 ## E1~E3 사람용 하위 모듈
 
@@ -29,26 +30,26 @@
 | E | 하위 모듈 | 안정 key | 책임 | 대표 결속 | 보조 결속 |
 | --- | --- | --- | --- | ---: | ---: |
 | `E1` | `E1전투위협계약Module` 전투·위협 계약 | `E1.CombatThreatContract` | 전투 입력·관찰·위협 압력과 결과 경계를 정의한다. | 1 | 0 |
-| `E1` | `E1저장재생계약Module` 저장·재생 계약 | `E1.SaveReplayContract` | Save schema·Command Log·Replay hash의 호환 계약을 정의한다. | 1 | 0 |
+| `E1` | `E1저장재생계약Module` 저장·재생 계약 | `E1.SaveReplayContract` | Save schema·Command Log·Replay hash의 호환 계약을 정의한다. | 2 | 0 |
 | `E1` | `E1세션권위계약Module` 세션 권위 계약 | `E1.SessionAuthorityContract` | Session 식별자·Revision·시간과 상태 권위의 불변 경계를 정의한다. | 2 | 0 |
 | `E1` | `E1공간계약Module` 공간 계약 | `E1.SpatialContract` | H·AreaSet·Graph·Handover의 안정 식별자와 구조 계약을 정의한다. | 1 | 0 |
-| `E1` | `E1세계상호작용계약Module` 세계 상호작용 계약 | `E1.WorldInteractionContract` | WI 목적·StableId·허용 발생원과 Preview·Confirm 계약을 정의한다. | 2 | 0 |
+| `E1` | `E1세계상호작용계약Module` 세계 상호작용 계약 | `E1.WorldInteractionContract` | WI 목적·StableId·허용 발생원과 Preview·Confirm 계약을 정의한다. | 3 | 0 |
 | `E2` | `E2로컬권위AdapterModule` 로컬 권위 Adapter | `E2.LocalAuthorityAdapter` | Solo LocalProcess에서 공통 Simulation Core를 실행한다. | 1 | 0 |
-| `E2` | `E2원격HostAdapterModule` 원격 Host Adapter | `E2.RemoteHostAdapter` | Hosted Server에서 같은 Core를 HTTP 경계로 노출한다. | 2 | 0 |
+| `E2` | `E2원격HostAdapterModule` 원격 Host Adapter | `E2.RemoteHostAdapter` | Hosted Server에서 같은 Core를 HTTP 경계로 노출한다. | 3 | 0 |
 | `E2` | `E2세션실행Module` 세션 실행 | `E2.SessionExecution` | Session 생성·조회·Tick·Save/Load의 공통 실행 포트를 제공한다. | 4 | 0 |
 | `E2` | `E2Unity권위ClientModule` Unity 권위 Client | `E2.UnityAuthorityClient` | Unity 입력을 Local 또는 Remote 권위 포트에 전달한다. | 1 | 0 |
-| `E2` | `E2세계상호작용실행Module` 세계 상호작용 실행 | `E2.WorldInteractionExecution` | Farm·Nature WI Preview·Confirm 실행 포트를 제공한다. | 7 | 0 |
-| `E3` | `E3계약회귀Module` 계약 회귀 | `E3.ContractRegression` | StableId·요청·응답·WI metadata 계약의 회귀를 검증한다. | 2 | 0 |
-| `E3` | `E3결정성검증Module` 결정성 검증 | `E3.DeterminismRegression` | 같은 Seed·명령·시간이 같은 canonical 상태를 만드는지 검증한다. | 1 | 0 |
-| `E3` | `E3로컬원격동등성Module` 로컬·원격 동등성 | `E3.LocalRemoteParityRegression` | LocalProcess와 RemoteHost가 같은 권위 결과를 만드는지 검증한다. | 1 | 0 |
-| `E3` | `E3저장재생검증Module` 저장·재생 검증 | `E3.SaveReplayRegression` | Save schema 호환·복원·Replay hash 회귀를 검증한다. | 1 | 1 |
-| `E3` | `E3Unity소비자회귀Module` Unity 소비자 회귀 | `E3.UnityConsumerRegression` | Unity Adapter·Projection이 권위 계약을 임의 변경하지 않는지 검증한다. | 1 | 0 |
+| `E2` | `E2세계상호작용실행Module` 세계 상호작용 실행 | `E2.WorldInteractionExecution` | Farm·Nature WI Preview·Confirm 실행 포트를 제공한다. | 10 | 0 |
+| `E3` | `E3계약회귀Module` 계약 회귀 | `E3.ContractRegression` | StableId·요청·응답·WI metadata 계약의 회귀를 검증한다. | 4 | 0 |
+| `E3` | `E3결정성검증Module` 결정성 검증 | `E3.DeterminismRegression` | 같은 Seed·명령·시간이 같은 canonical 상태를 만드는지 검증한다. | 6 | 0 |
+| `E3` | `E3로컬원격동등성Module` 로컬·원격 동등성 | `E3.LocalRemoteParityRegression` | LocalProcess와 RemoteHost가 같은 권위 결과를 만드는지 검증한다. | 2 | 0 |
+| `E3` | `E3저장재생검증Module` 저장·재생 검증 | `E3.SaveReplayRegression` | Save schema 호환·복원·Replay hash 회귀를 검증한다. | 4 | 1 |
+| `E3` | `E3Unity소비자회귀Module` Unity 소비자 회귀 | `E3.UnityConsumerRegression` | Unity Adapter·Projection이 권위 계약을 임의 변경하지 않는지 검증한다. | 5 | 0 |
 
 ### 아직 하위 모듈을 지정하지 않은 기존 책임
 
-- `E1`: `23`개
-- `E2`: `129`개
-- `E3`: `159`개
+- `E1`: `28`개
+- `E2`: `139`개
+- `E3`: `165`개
 
 ## 미분류 후보
 
@@ -61,8 +62,10 @@
 | `Ssalddel.Simulation.Application.DisabledSimulationWorldAreaSetGraphStore` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.DisabledSimulationWorldLandscapeCompositionStore` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.DisabledSimulationWorld상호작용GraphReadinessStore` | `E6` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationActorEquipmentRuntime` | `E2` | `` | `` | `WI-ACTOR-01,WI-ACTOR-02` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationAreaSetHandoverPlanner` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationBattleInstanceStore` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationBattleRuntime` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationBattlefieldDerivationService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationFarmChoiceRuntime` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationFarmRealityEvidenceStore` | `E6` | `` | `` | `` | `Annotated` |
@@ -74,9 +77,10 @@
 | `Ssalddel.Simulation.Application.ISimulationLhWindowPlanner` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationLocalSaveSlotStore` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationLogisticsRuntime` | `E2` | `` | `` | `` | `Annotated` |
-| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-NATURE-05,WI-NATURE-06,WI-NATURE-07,WI-NATURE-08,WI-NATURE-09,WI-NATURE-10,WI-NATURE-11` | `Annotated` |
-| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime.ConfirmAsync` | `E2` | `` | `` | `WI-NATURE-05,WI-NATURE-06,WI-NATURE-07,WI-NATURE-08,WI-NATURE-09,WI-NATURE-10,WI-NATURE-11` | `Annotated` |
-| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime.PreviewAsync` | `E2` | `` | `` | `WI-NATURE-05,WI-NATURE-06,WI-NATURE-07,WI-NATURE-08,WI-NATURE-09,WI-NATURE-10,WI-NATURE-11` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-CON-01,WI-NATURE-05,WI-NATURE-06,WI-NATURE-07,WI-NATURE-08,WI-NATURE-09,WI-NATURE-10,WI-NATURE-11,WI-NATURE-13,WI-NATURE-14,WI-NATURE-15,WI-NATURE-16,WI-NATURE-17` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime.AdvanceRealtimeAsync` | `E2` | `` | `` | `WI-NATURE-17` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime.ConfirmAsync` | `E2` | `` | `` | `WI-CON-01,WI-NATURE-05,WI-NATURE-06,WI-NATURE-07,WI-NATURE-08,WI-NATURE-09,WI-NATURE-10,WI-NATURE-11,WI-NATURE-13,WI-NATURE-14,WI-NATURE-15,WI-NATURE-16` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime.PreviewAsync` | `E2` | `` | `` | `WI-CON-01,WI-NATURE-05,WI-NATURE-06,WI-NATURE-07,WI-NATURE-08,WI-NATURE-09,WI-NATURE-10,WI-NATURE-11,WI-NATURE-13,WI-NATURE-14,WI-NATURE-15,WI-NATURE-16` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationNatureWorldInteractionRuntime` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-NATURE-01,WI-NATURE-02,WI-NATURE-03,WI-NATURE-04` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationNatureWorldInteractionRuntime.ConfirmNatureEmergencyRetreatAsync` | `E2` | `` | `` | `WI-NATURE-02` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationNatureWorldInteractionRuntime.ConfirmNaturePartyRecoveryAsync` | `E2` | `` | `` | `WI-NATURE-04` | `Annotated` |
@@ -105,6 +109,7 @@
 | `Ssalddel.Simulation.Application.ISimulationWorld상호작용GraphReadinessStore` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationWorld업무규칙집결Store` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationWorld파생원장Store` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.InMemorySimulationPlayableLoopEngineTraceSink` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationTeamMemberPoseStore` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationTeamObservationPolicyStore` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationTeamObservationSessionStore` | `E2` | `` | `` | `` | `Annotated` |
@@ -117,12 +122,14 @@
 | `Ssalddel.Simulation.Application.I세계상호작용E6세계정제Module` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.I세계상호작용E7플레이경험폐루프Module` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.I세계상호작용E8생활연속성Module` | `E8` | `` | `` | `` | `Annotated` |
-| `Ssalddel.Simulation.Application.I세계상호작용E9변화봉투Module` | `E9` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.I세계상호작용E9변화봉투Module` | `-` | `` | `` | `` | `Excluded` |
 | `Ssalddel.Simulation.Application.I세계상호작용E단계Module` | `-` | `` | `` | `` | `Excluded` |
 | `Ssalddel.Simulation.Application.I세계상호작용E단계ModuleSet` | `-` | `` | `` | `` | `Excluded` |
 | `Ssalddel.Simulation.Application.LocalSimulationRuntime` | `E2` | `E2.LocalAuthorityAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.NullSimulationPlayableLoopEngineTraceSink` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.PyeongchangSimulationWorldUI기획Factory` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.PyeongchangSimulationWorld업무규칙CatalogFactory` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationActorEquipmentService` | `E2` | `E2.WorldInteractionExecution` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationActualE5SessionCreationService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationAreaSetHandoverPlanner` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationAreaSetImmersionService` | `E6` | `` | `` | `` | `Annotated` |
@@ -133,12 +140,20 @@
 | `Ssalddel.Simulation.Application.SimulationFarmRealityEvidenceService` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationFarmSurvivalService` | `E2` | `E2.WorldInteractionExecution` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationFreight렌더링의도Projector` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationLhInteriorPlanHandleService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationLhWindowPlanner` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationLhWorldService` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationNatureFirstDayEngineValidationProfiles` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationNatureSurvivalService` | `E2` | `E2.WorldInteractionExecution` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationNatureWorldCellAssemblyEngine` | `E5` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationNature공간변화ProjectionBuilder` | `E4` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationNature세계자산배치Service` | `E5` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationPlayableLoopEngineInteractionValidator` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationRealityContextService` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationRegionalIncidentService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationRuntimeWorldPresentationService` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationScenario지도구성Engine` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationSeparatedLhCellContentSource` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationSurvivalTarotService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationTeamObservationService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationTeamRoleCardService` | `E2` | `` | `` | `` | `Annotated` |
@@ -167,8 +182,10 @@
 | `Ssalddel.Simulation.Application.SimulationWorld상호작용공간모판ScenarioBuilder` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationWorld업무규칙집결JobShell` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationWorld지역표현요약Service` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.Simulation결정적세계자산배치Engine` | `E5` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.Simulation렌더링PipelineValidator` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.Simulation렌더링의도합성Policy` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.Simulation분리세계자산배치Coordinator` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.Simulation타로객체반응PreviewService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.Simulation타로화물운송PreviewService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.경영SimulationSessionService` | `E2` | `` | `` | `` | `Annotated` |
@@ -181,18 +198,25 @@
 | `Ssalddel.Simulation.Application.경영Simulation통합생활세계Service` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.세계상호작용ExecutionHeadCatalog` | `E1` | `E1.WorldInteractionContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.세계상호작용실행Pipeline` | `E5` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.ISimulation세계자산배치Engine` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.ISimulation지도구성Engine` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.ISimulation환경발생DecisionEngine` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.SimulationActorEquipmentInitialStateRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationAreaSetHandoverPlanResponse` | `E1` | `E1.SpatialContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationBattleCreatePreviewRequest` | `E1` | `E1.CombatThreatContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationCombatPerspectiveConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationFarmRealityEvidenceBundle` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.SimulationInteriorPlanHandleSnapshot` | `E1` | `E1.SaveReplayContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationLhWorldProfileResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationLocalCombatActionConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationLocalCombatControlModeConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.SimulationLocalCombatObserverInterventionConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationSessionSaveRequest` | `E1` | `E1.SaveReplayContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldLandscapeCompositionTileResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldLandscapeGraphResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldLayoutDefinitionResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldStreamRecipeResponse` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.SimulationYouTube학습원문관측Snapshot` | `E1` | `E1.WorldInteractionContract` | `` | `WI-REFLECT-01` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.경영SimulationSession생성Request` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationBattleInstanceState` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationCombatScalePolicy` | `E1` | `` | `` | `` | `Annotated` |
@@ -206,6 +230,9 @@
 | `Ssalddel.Simulation.Domain.SimulationWorld업무규칙집결Validator` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationWorld파생원장` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationWorld파생원장Validator` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Domain.Simulation거점성찰Engine` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-REFLECT-01` | `Annotated` |
+| `Ssalddel.Simulation.Domain.Simulation결정적환경발생DecisionEngine` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Domain.Simulation승인학습자료파생원장` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-REFLECT-01` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation자원효과묶음Validator` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate.ExecuteWorldInteraction` | `E5` | `` | `` | `` | `Annotated` |
@@ -232,6 +259,7 @@
 | `Ssalddel.Simulation.Persistence.SimulationWorld파생DbContextDesignTimeFactory` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Persistence.SimulationWorld파생원장Store` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Persistence.평창군공간파생Pipeline` | `E4` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Server.Controllers.SimulationActorEquipmentController` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationActualE5SessionsController` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationAreaSetImmersionController` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationBattlesController` | `E2` | `` | `` | `` | `Annotated` |
@@ -263,9 +291,14 @@
 | `Ssalddel.Simulation.Server.Controllers.경영Simulation턴결정Controller` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.DisabledSimulationFarmRealityEvidenceStore` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.SimulationWorldTileArtifactContentService` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.InteriorLayoutEngineTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.LocalSimulationRuntimeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.PyeongchangRepresentativeSelectionTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationActorEquipmentTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationArcanaTownNpcLifeTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationAreaBuildingProgressionTests` | `E3` | `E3.SaveReplayRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationAreaSetHandoverPlannerTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationBaseReflectionTests` | `E3` | `E3.SaveReplayRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationBattleInstanceTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationBattlefieldDerivationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationCollectibleCardRewardTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -281,12 +314,16 @@
 | `Ssalddel.Simulation.Tests.SimulationIndividualOrderTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationIntegratedWorldTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationLayerBoundaryTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationLhInteriorPlanHandleServiceTests` | `E3` | `E3.ContractRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationLhWorldTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationLocalCombatTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationLogisticsMovementTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNatureMindTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationNaturePlayFlowCycleTests` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNatureSurvivalTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationNature생활거점동등성Tests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNpcWorkforceTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationPlayableLoopEngineInteractionTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationRealityContextTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationRegionalIncidentTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationRuntimeRenderingPipelineTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -295,6 +332,9 @@
 | `Ssalddel.Simulation.Tests.SimulationSessionSavePersistenceTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationSettlementCoreTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationSharedPublicDataTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationSpatialCompositionSessionBindingTests` | `E3` | `E3.LocalRemoteParityRegression` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationSpatialCompositionSessionTests` | `E3` | `E3.SaveReplayRegression` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationSpatialCompositionTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationSurvivalTarotTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationTeamObservationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationTeamRoleCardTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -302,12 +342,15 @@
 | `Ssalddel.Simulation.Tests.SimulationUnityCodeMetadataTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldActualE5SpatialTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldAreaSetLandscapeGraphTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationWorldAssetPlacementTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationWorldAtmosphereTests` | `E3` | `E3.DeterminismRegression` | `` | `WI-NATURE-14` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldBusinessRuleCatalogTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldDerivationPersistenceTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldExplorationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldFourPackLandscapeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldGameplayBoundaryTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldInboundInspectionUiVerticalSliceTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationWorldInteractionDeliveryPriorityTests` | `E3` | `E3.ContractRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldInteractionFarmSupplyTests` | `E3` | `E3.LocalRemoteParityRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldInteractionMaturityTests` | `E3` | `E3.ContractRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldInteractionSpatialSeedbedTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -347,6 +390,7 @@
 | `Ssalddel.Simulation.Tests.도심마트주문자집단PerspectiveTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.도심마트주문자집단SimulationWorldGraphTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.도심마트지역수요SimulationTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.상품특성효과DerivationEngineTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Tests.UnityData.CargoJourneyPresentationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Tests.UnityData.CommunityMarketSquareVerticalSliceTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Tests.UnityData.FarmProducerVerticalSliceTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -376,6 +420,7 @@
 | `Ssalddel.Tests.UnityData.WorldProjectionArchitectureTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Tests.UnityData.WorldReadRuntimeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Tests.UnityData.농업SimulationDataTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Tests.AreaBuildingProgressionPresentationTests` | `E3` | `E3.UnityConsumerRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.CanonicalProductCultivationLifecycleTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.CanonicalProductHarvestCargoLifecycleTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.ConceptCardPresentationTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -387,10 +432,12 @@
 | `Ssalddel.Unity.Tests.FarmEnvironmentalGrowthTurnTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.HarvestDispositionBranchAdapterTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.HarvestDispositionChoiceTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Tests.InteriorPresentationProjectionTests` | `E3` | `E3.UnityConsumerRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.LastSuccessfulLoadRuntimeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.LogisticsFacilityOverviewTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.MarketProductBusinessSeedbedTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.PlayerActivityViewPolicyTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Tests.PlayerSensoryPresentationTests` | `E3` | `E3.UnityConsumerRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.PotatoCargoJourneyLifecycleTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.PotatoHubDispositionLifecycleTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.PotatoHubReceivingLifecycleTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -417,6 +464,7 @@
 | `Ssalddel.Unity.Tests.UrbanMarketResidentialRepresentativeNpcTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.UrbanMarketSupplyManagementUnityBindingTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.몰입WorldLayoutTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Tests.상품근거ItemDetailProjectionTests` | `E3` | `E3.UnityConsumerRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.수출항만인수학당PreviewAdapterTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.저녁학당업무Preview보강Tests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.턴마감CoordinatorTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -449,6 +497,8 @@
 | `Ssalddel.Unity.Crops.I작물기준정보Repository` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Crops.작물기준정보분류조회UseCase` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Data.IScenarioPackageRepository` | `E7` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Data.Interiors.InteriorPresentationProjection` | `E7` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Data.Interiors.상품근거ItemDetailProjection` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Data.WorldDataContextRuntime` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Data.농업ScenarioValidator` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Data.시장가격관측Mapper` | `E7` | `` | `` | `` | `Annotated` |
@@ -483,6 +533,7 @@
 | `Ssalddel.Unity.Farm.작물환경생육RuleValidator` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Farm.재배달력ProfileValidator` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.ImmersiveWorld.Nature위협RoutePresentationPolicy` | `E7` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.ImmersiveWorld.Nature위협관찰PresentationPolicy` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.ImmersiveWorld.Nature조우PresentationPolicy` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.ImmersiveWorld.몰입WorldTransitionCoordinator` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.ImmersiveWorld.몰입World자산GatePolicy` | `E7` | `` | `` | `` | `Annotated` |
@@ -537,6 +588,7 @@
 | `Ssalddel.Unity.PresentationContracts.LearningCards.ConceptCardDeckProjector` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.PresentationContracts.Reconciliation.StableIdReconciliationPolicy`1` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.PresentationContracts.표현규칙Validator` | `E7` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.PresentationContracts.플레이어감각표현Validator` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.PublicData.IPublicWorldMapApiClient` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.PublicData.IPublicWorldMapDataRepository` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.PublicData.IPublicWorldMapRepository` | `E7` | `` | `` | `` | `Annotated` |

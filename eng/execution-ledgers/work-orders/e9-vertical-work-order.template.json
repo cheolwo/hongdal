@@ -1,8 +1,10 @@
 {
-  "schemaVersion": "simulation-e9-vertical-work-order.v1",
-  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
   "workOrderId": "E9-WO-TEMPLATE",
   "title": "새 수직 구현 작업",
+  "playableLoopRefs": [],
+  "evidencePackageRefs": [],
   "workType": "NewVerticalSlice",
   "targetEvidenceStage": "E9",
   "currentEvidenceStage": "E0",
@@ -14,6 +16,30 @@
     "currentPass": "DownwardImpactReview",
     "lastReassessment": "현재 목표와 기존 증거를 기준으로 첫 하향 검토를 작성한다.",
     "nextReopenCondition": "상향 구현·검증에서 새 영향, 계약 변경 또는 증거 누락이 발견되면 관련 하향 판정을 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": [
+      "Simulation",
+      "Unity",
+      "Integration"
+    ],
+    "ownerRef": "작성 필요",
+    "reviewerRefs": [
+      "작성 필요"
+    ],
+    "allowedChangeRoots": [
+      "작성 필요"
+    ],
+    "dependencyWorkOrderIds": [],
+    "handoffIn": [
+      "현재 계약·대장·증거 기준선을 적는다."
+    ],
+    "handoffOut": [
+      "변경 계약·검증 결과·남은 차단을 다음 작업에 인계한다."
+    ],
+    "branchPolicy": "ShortLivedWorkstreamBranch",
+    "commitScope": "기능 또는 리팩토링 맥락별 좁은 커밋"
   },
   "authorityProfile": {
     "simulationCore": "SharedSimulationCore",

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-ACTOR-ITEM-EQUIPMENT",
+  "title": "보편 물품 획득·장착 WI와 Nature 도끼 특화",
+  "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+  "activeWorldInteractionId": "WI-ACTOR-02",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E6",
+  "promotionEligible": false,
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "실제 입력·Game View·저장 재진입에서 논리 또는 표현 차이가 발견되면 해당 트랙의 가장 이른 E1~E7을 다시 연다."
+  },
+  "changeImpactReviewRef": "eng/execution-ledgers/work-orders/actor-item-equipment.e9-work-order.json",
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E7",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "LocalProcess와 RemoteHost에서 실제 명령열·revision·저장 복원을 같은 후보 revision으로 다시 검증해야 한다." },
+        { "code": "E6", "disposition": "Affected", "summary": "획득·장착·능력 파생·차단 이유를 플레이 전에 설명할 수 있어야 한다." },
+        { "code": "E5", "disposition": "Affected", "summary": "획득과 장착 Confirm이 권위 상태와 벌목 허용 여부를 변경한다." },
+        { "code": "E4", "disposition": "Defined", "summary": "Actor·ItemInstance·Slot·Revision을 결속하고 보편 장착 WI의 공간은 NotApplicable로 둔다." },
+        { "code": "E3", "disposition": "Affected", "summary": "멱등성·능력 파생·v27 Replay·Local/Remote 동등성을 회귀한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "공통 계약·Aggregate·Application Runtime·HTTP Adapter를 같은 Core에 연결한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "획득과 장착은 별도 WI이며 도구 능력은 장착 상태에서만 생긴다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["WI-ACTOR-01", "WI-ACTOR-02"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["actor-equipment.r1"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["evidence:nature-r5-logic-20260826"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["WI-ACTOR-02"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["evidence:nature-r5-logic-20260826"] },
+        { "code": "E6", "status": "Passed", "evidenceRefs": ["evidence:nature-shelter-hosted-parity-20260825"] },
+        { "code": "E7", "status": "Passed", "evidenceRefs": ["evidence:nature-first-evening-equipment-logic-20260827"] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E6",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "canonical Scene에서 획득·I 상태창·MainHand 장착·벌목·해제 차단·저장 재진입을 실제 입력으로 완주해야 한다." },
+        { "code": "E6", "disposition": "Affected", "summary": "상태창 슬롯·손 도끼·문맥 차단 피드백을 Game View에서 판독해야 한다." },
+        { "code": "E5", "disposition": "Affected", "summary": "권위 상태 사본에서 Inventory·Equipped·Capability 표현 자료를 만든다." },
+        { "code": "E4", "disposition": "Defined", "summary": "도끼 Pickup 기준점과 장착 상태창 입력 문맥을 결속한다." },
+        { "code": "E3", "disposition": "Defined", "summary": "도끼 Prefab·8개 슬롯·손 장착 표현 후보를 준비한다." },
+        { "code": "E2", "disposition": "Defined", "summary": "소유·장착·해제·차단을 구분하는 표현 언어를 정의한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어가 소유 상태와 장착 슬롯, 현재 가능한 행동을 볼 수 있어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["WI-ACTOR-02"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["actor-equipment.r1"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["actor-equipment.r1"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["WI-NATURE-05"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["evidence:nature-dual-loop-game-view-20260826"] },
+        { "code": "E6", "status": "Passed", "evidenceRefs": ["evidence:nature-dual-loop-game-view-20260826"] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E6",
+    "status": "Blocked",
+    "candidateRevision": "actor-equipment.r1/simulation-save.v27",
+    "evidenceRefs": ["evidence:nature-r5-logic-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-first-evening-equipment-logic-20260827"],
+    "openFeedbackRefs": ["feedback:nature-shelter:explicit-equipment-r1"]
+  }
+}

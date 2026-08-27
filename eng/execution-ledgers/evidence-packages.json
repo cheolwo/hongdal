@@ -1,14 +1,17 @@
 {
-  "schemaVersion": "ssalddel-evidence-package-catalog.v1",
-  "revision": "ssalddel-evidence-package-catalog.r6",
+  "schemaVersion": "ssalddel-evidence-package-catalog.v3",
+  "revision": "ssalddel-evidence-package-catalog.r19",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
     "artifactScopeDoesNotPromoteSubjectAutomatically": true,
     "codeTestRuntimeAndOperationsEvidenceRemainDistinct": true,
     "evidenceIsBoundToRevisionAndEnvironment": true,
     "invalidationTriggersMustBeExplicit": true,
-    "localArtifactMayBeUnavailableOnAnotherWorktree": true
+    "localArtifactMayBeUnavailableOnAnotherWorktree": true,
+    "logicPresentationAndIntegratedEvidenceRemainDistinct": true
   },
+  "allowedEvidenceTrackCodes": ["Logic", "Presentation", "Integrated"],
   "allowedEvidenceKindCodes": [
     "Contract",
     "AutomatedTest",
@@ -47,6 +50,7 @@
       "evidenceId": "evidence:hub-npc-routine-core-20260825",
       "title": "Hub 운영 유래 WI NPC 루틴 Core",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -94,6 +98,7 @@
       "evidenceId": "evidence:simulation-task-20260824",
       "title": "Simulation 전체 Task 회귀",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Stale",
       "subjectRefs": [
@@ -142,6 +147,7 @@
       "evidenceId": "evidence:nature-playmode-20260824",
       "title": "Nature Solo LocalProcess PlayMode",
       "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
       "resultCode": "Passed",
       "statusCode": "Stale",
       "subjectRefs": [
@@ -185,6 +191,7 @@
       "evidenceId": "evidence:nature-r2-core-20260825",
       "title": "Nature 첫날 r2 Core와 Unity 컴파일",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Stale",
       "subjectRefs": [
@@ -229,6 +236,7 @@
       "evidenceId": "evidence:nature-dual-combat-core-20260825",
       "title": "Nature 관찰 운영·직접 개입 Core와 LocalProcess 폐루프",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -274,6 +282,7 @@
       "evidenceId": "evidence:nature-dual-combat-unity-editmode-20260825",
       "title": "Nature 이중 전투 Unity 컴파일과 공식 Scene 배선",
       "evidenceKindCode": "UnityEditMode",
+      "evidenceTrackCode": "Presentation",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -318,6 +327,7 @@
       "evidenceId": "evidence:nature-building-core-20260825",
       "title": "Nature 건물 발전·배움 확장 Core",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -359,6 +369,7 @@
       "evidenceId": "evidence:town-arcana-core-20260825",
       "title": "Town 활성화별 아르카나와 NPC 생활복구 Core 문맥",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -401,6 +412,7 @@
       "evidenceId": "evidence:nature-field-supply-core-20260825",
       "title": "Nature 현장 성과·거점 제작·다음 원정 왕복 Core",
       "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -439,29 +451,30 @@
     },
     {
       "evidenceId": "evidence:nature-shelter-playmode-20260825",
-      "title": "Nature 생활거점 실제 입력·수동 완주 E7 후보",
+      "title": "Nature 생활거점 실제 입력·수동 완주 E7",
       "evidenceKindCode": "UnityPlayMode",
-      "resultCode": "Partial",
-      "statusCode": "Current",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Superseded",
       "subjectRefs": [
         "playable-loop:nature-survival-homestead.v1",
         "playable-loop:nature-shelter-foundation.v1"
       ],
       "evidenceStageCodes": ["E5", "E6", "E7"],
-      "sourceRevision": "worktree:2026-08-26-nature-shelter-e7-manual-r3",
-      "executedAt": "2026-08-26T04:01:58+09:00",
+      "sourceRevision": "unity:83cc1c13;hongdal:nature-shelter-e7-closed.r4",
+      "executedAt": "2026-08-26T04:23:12+09:00",
       "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
-      "scope": "실제 Editor Play Mode에서 도끼 획득, 첫 벌목 취소·자원 무변경, 재시도와 세 나무 벌목, 오두막 도면 배치·건설, 입장·퇴장, HUD 저장과 Play Mode 재진입 복원을 사람이 수동 완주했다. 복원 Game View는 Day 2, 도끼 보유, 통나무 0, 그루터기 3개와 오두막 완성을 기록했고 Console 오류는 0개였다. 같은 revision에서 실제 Input System 전체 폐루프 PlayMode 1/1(27.49초), 감각 표현 PlayMode 1/1(2.92초), 하단 UI 입력 경계 EditMode 1/1이 통과했다. 오두막 우선 접근은 이미 가까운 플레이어를 외벽 밖 안전 반경까지 이격한다. 음향 진단은 48 kHz Stereo, Listener 활성과 절차형 행동 효과음 4개 결속을 기록했다.",
+      "scope": "실제 Editor Play Mode에서 도끼 획득, 첫 벌목 취소·자원 무변경, 재시도와 세 나무 벌목, 오두막 도면 배치·건설, 입장·퇴장, HUD 저장과 Play Mode 재진입 복원을 사람이 수동 완주했다. 복원 Game View는 Day 2, 도끼 보유, 통나무 0, 그루터기 3개와 오두막 완성을 기록했고 Console 오류는 0개였다. 같은 Unity revision에서 실제 Input System 전체 폐루프 PlayMode 1/1(27.49초), 감각 표현 PlayMode 1/1(2.92초), 하단 UI 입력 경계 EditMode 1/1이 통과했다. 최신 Simulation revision에서는 Nature·Local Runtime 집중 회귀 44/44와 취소·재수확·오두막·저장·복원 전체 LocalProcess·RemoteHost 동등성 1/1이 통과했다. 오두막 우선 접근은 이미 가까운 플레이어를 외벽 밖 안전 반경까지 이격한다. 음향 진단은 48 kHz Stereo, Listener 활성과 절차형 행동 효과음 4개 결속을 기록했다.",
       "exclusions": [
-        "FMOD 출력 장치 초기화 오류 60으로 차단된 실제 음향 청취",
-        "E7 필수 조건이 아닌 승인 Nature Ambient·BGM 선택 채널",
+        "현재 연결된 Windows 재생 종단점이 없어 수행하지 못한 선택형 실제 음향 청취",
+        "승인 Nature Ambient·BGM 선택 채널",
         "운영 Provider와 운영 DB"
       ],
       "artifactReferences": [
         {
           "locationKind": "ExternalCheckout",
           "locator": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-26-nature-e7-entry/README.md",
-          "sha256": "e8d1df71b7a499192b3b48b19cc94e5fcff102fc80d08a617cded673a0234af6",
+          "sha256": "fa801b148e484069b82ce329b5bc8861d43ac8e074ba47fd368a71d2b1c59db3",
           "retentionCode": "External"
         },
         {
@@ -481,6 +494,18 @@
           "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-e7/playmode-sensory-current.xml",
           "sha256": "4dd006d8617ff2f1133db93c3392bef887f5ac038e49ffc6fe962a388afa9832",
           "retentionCode": "External"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-e7/nature-shelter-current-regression.trx",
+          "sha256": "e47c5a7991c172a2fb7f0435928fce4abbd375b797d7a3e96adf6351f2cd0683",
+          "retentionCode": "LocalOnly"
         }
       ],
       "invalidationTriggers": [
@@ -493,6 +518,7 @@
       "evidenceId": "evidence:nature-shelter-hosted-parity-20260825",
       "title": "Nature 생활거점 LocalProcess·RemoteHost 동등성",
       "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
       "statusCode": "Current",
       "subjectRefs": [
@@ -500,13 +526,13 @@
         "playable-loop:nature-shelter-foundation.v1"
       ],
       "evidenceStageCodes": ["E5", "E7"],
-      "sourceRevision": "hongdal:0ec66b5d",
-      "executedAt": "2026-08-25T20:00:00+09:00",
-      "environment": "Windows; .NET 10; Solo LocalProcess and separate dotnet RemoteHost over 127.0.0.1",
-      "scope": "취소·재수확·오두막 건설·입장·퇴장·저장·Replay verification 명령 15개를 LocalProcess와 RemoteHost에 적용해 최종 revision 15, simulation-save.v23과 replay hash 83a5582724e76d95f8a3344bf86ee7ea56703edbe708aaaf1fa920a131ede0e0 동등성을 확인했다.",
+      "sourceRevision": "worktree:2026-08-26-nature-shelter-parity-r2",
+      "executedAt": "2026-08-26T04:23:12+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "현재 Simulation revision에서 취소 전 2초 진행, 취소, 재수확, 나무 3개 벌목, 오두막 건설, 입장·퇴장과 저장·복원을 LocalProcess와 RemoteHost HTTP에 동일하게 적용했다. 두 실행 위치는 최종 revision 15, simulation-save.v23, 저장 revision과 Replay hash가 일치했고 Local slot 복원과 RemoteHost replay-verifications도 같은 완료 상태를 복원했다. 전용 전체 동등성 1/1과 Nature·Local Runtime 집중 회귀 44/44가 통과했다.",
       "exclusions": [
-        "canonical Scene의 사람 수동 완주",
-        "실제 음향 청취와 최종 화면 캡처",
+        "별도 UnityPlayMode EvidencePackage가 소유하는 사람 수동 완주와 Game View",
+        "선택형 실제 음향 청취",
         "운영 Provider와 운영 DB"
       ],
       "artifactReferences": [
@@ -515,12 +541,685 @@
           "locator": "docs/Changes/2026-08-25-nature-shelter-remote-host-parity.md",
           "sha256": "",
           "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-e7/nature-shelter-parity-current.trx",
+          "sha256": "55c9ab84d1b1172866957f8c6f8b25853ea26ecae491bdd7ae088ca9018e9d6c",
+          "retentionCode": "LocalOnly"
         }
       ],
       "invalidationTriggers": [
         "LocalSimulationRuntime 또는 RemoteHost Adapter 변경",
         "WI-NATURE-05~12 Command·revision·Save/Replay 의미 변경",
         "simulation-save.v23 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-regional-threat-core-20260826",
+      "title": "Nature 지역 위협 후퇴·복원·회복 Core 계약",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-regional-threat-recovery.v1"
+      ],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "worktree:2026-08-26-nature-regional-threat-separation-r1",
+      "executedAt": "2026-08-26T10:05:00+09:00",
+      "environment": "Windows; .NET 10; deterministic Simulation regional incident fixture and HTTP test host",
+      "scope": "지역 위협 관찰 뒤 EmergencyRetreat의 경로·Actor 예약과 취소 반환, NatureRestoration의 원인 계보·자재, PartyRecovery의 안전 생활핵 조건, Save/Replay와 HTTP 계약을 자동 시험한다. 황혼 조우 ResolveEncounter Retreat와는 Stable ID·상태·공간 책임이 다름을 E1에서 분리했다.",
+      "exclusions": [
+        "실제 Nature AreaSet 경관 Graph 배치",
+        "canonical SimulationWorldShell 실제 이동·회복 입력과 Game View",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationRegionalIncidentTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureEmergencyRetreat.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "WI-NATURE-02~04 Stable ID·상태·Effect 변경",
+        "지역 사건 공간 예약 또는 Save/Replay 의미 변경",
+        "황혼 조우 Retreat와 지역 사건 EmergencyRetreat 책임 재통합"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-twilight-wi11-playmode-20260826",
+      "title": "Nature 황혼 관찰 운영·직접 개입 실제 입력과 거점 귀환",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Superseded",
+      "subjectRefs": [
+        "playable-loop:nature-twilight-return.v1"
+      ],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-twilight-wi11-r1",
+      "executedAt": "2026-08-26T08:48:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "관찰 경로는 실제 O/F 입력 뒤 ObserverOperation 전투를 33.82초에 완주했고, 직접 경로는 실제 O/F/좌클릭 입력 뒤 DirectAction 전투를 9.26초에 완주했다. 별도 실제 O/R 입력은 조우를 Retreat로 해결하고 안전 거점 선택으로 돌아왔다. 세 경로 모두 Simulation 권위 결과를 Nature EncounterResolved와 거점 다음 선택 피드백으로 인계했다. 결과 Game View PNG 세 장과 마지막 시험 이후 Console 오류 0개를 확인했다.",
+      "exclusions": [
+        "관찰 운영의 선택형 전술 일시정지·비상 카드 수동 조작",
+        "선택형 실제 음향 청취",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs",
+          "sha256": "",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi01-observed-game-view.png",
+          "sha256": "7024846ff5174cc4211af62e8b8872b654cf2227db7775fa316e23f5e1c780e8",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi11-direct-result-game-view.png",
+          "sha256": "5aa204c5afffe74bc643202848eeae7fcc7c6fb9e6361e6e2d1c312230424671",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi11-retreat-result-game-view.png",
+          "sha256": "86f3cbd4a6398248595cdf717939b905b865d6827439f42d92a1833daa081ce6",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell Nature O/F 또는 전투 입력 배선 변경",
+        "ObserverOperation·DirectAction 참여 방식 잠금 또는 결과 인계 변경",
+        "Nature 결과·귀환 HUD와 카메라 표현 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-twilight-wi11-hosted-parity-20260826",
+      "title": "Nature 황혼 이중 참여 LocalProcess·RemoteHost 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-twilight-return.v1"
+      ],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-twilight-wi11-r1",
+      "executedAt": "2026-08-26T09:02:00+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "ObserverOperation과 DirectAction 각각에 동일한 황혼 관찰·Fight·전투 명령열을 적용해 결과 코드, 최종 World revision, Battle Replay hash, simulation-save.v23 Replay hash를 일치시켰다. RemoteHost 저장 묶음을 Local slot 실제 복원 경로로 읽어 Battle Store와 Nature EncounterResolved·결과 상태를 함께 복원했다. 전용 동등성 2/2와 Nature 회귀 40/40이 통과했다.",
+      "exclusions": [
+        "별도 UnityPlayMode EvidencePackage가 소유하는 실제 입력과 Game View",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-twilight/nature-twilight-wi11-host-parity-current.trx",
+          "sha256": "cadcac570a4550de4fbe8e313e8e6d5de8f0a1a4ab3fed3157fd6ff28935a18d",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-twilight/nature-twilight-wi11-nature-regression.trx",
+          "sha256": "ccb3913f96e0e277bd324af2079b5c6c68af69a01ccc53efc10c0bd772a47a7f",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "LocalSimulationRuntime 또는 RemoteHost Battle Adapter 변경",
+        "Nature WorldLocal context 또는 전투 결과 인계 변경",
+        "simulation-save.v23 또는 Battle Replay hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-wi13-playmode-20260826",
+      "title": "Nature 획득 자원 거점 보관 실제 입력",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Superseded",
+      "subjectRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi13-r1",
+      "executedAt": "2026-08-26T09:48:41+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "완성 오두막에 들어간 상태에서 실제 G 입력으로 소지 통나무 2개를 오두막 보관함으로 옮겼다. Simulation 상태 사본은 소지 2→0, 보관 0→2를 확정했고 Unity는 결과만 표시했다. 전용 PlayMode 1/1(3.40초), 결과 Game View PNG와 마지막 시험 이후 Console 오류 0건을 확인했다.",
+      "exclusions": [
+        "WI-NATURE-14 수면과 WI-NATURE-15 새벽 계획 선택",
+        "선택형 보관 애니메이션·효과음 실제 수용 확인",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs",
+          "sha256": "",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi13-store-game-view.png",
+          "sha256": "d79545d340a86d4a24d9f056e604d5cc9491f292cb3939c2cd6e808997ce3c72",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell Nature G 입력 또는 오두막 접근 배선 변경",
+        "WI-NATURE-13 수량·용량·Transfer 결과 표시 변경",
+        "Nature Controller가 Simulation 권위 대신 이동량을 계산하도록 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-wi13-hosted-parity-20260826",
+      "title": "Nature 획득 자원 거점 보관 LocalProcess·RemoteHost 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi13-r1",
+      "executedAt": "2026-08-26T09:59:30+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "nature-survival.realtime.r2에서 도끼 획득, 나무 4개 벌목, 오두막 배치·건설·입장과 통나무 2개 보관을 동일 명령열로 실행했다. LocalProcess와 RemoteHost의 최종 revision, simulation-save.v23 Replay hash, 오두막 Container와 입고 Transfer가 일치했고 Local slot 복원이 같은 보관 상태를 되살렸다. 전용 동등성 1/1이 통과했다.",
+      "exclusions": [
+        "별도 UnityPlayMode EvidencePackage가 소유하는 실제 G 입력과 Game View",
+        "WI-NATURE-14~15 밤→Day2 전체 폐루프",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-night-day2/nature-night-day2-wi13-host-parity.trx",
+          "sha256": "81045c461af456421df292f85ddf56e9d4dbdecb6520eb8e8a7b63c24381e2da",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "LocalSimulationRuntime 또는 RemoteHost Nature Adapter 변경",
+        "WI-NATURE-13 Container·Transfer·revision 의미 변경",
+        "simulation-save.v23 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-wi14-playmode-20260826",
+      "title": "Nature 오두막 수면·새벽 맞기 실제 입력",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Superseded",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1"],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi14-r1",
+      "executedAt": "2026-08-26T10:16:48+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "오두막 보관과 황혼 후퇴를 준비한 뒤 밤에 실제 T 입력으로 수면을 시작했다. Simulation 상태 사본은 Sleeping=true를 확정했고 권위 실시간 60초를 6배 밤 진행으로 적용해 정확히 1110초 DawnReached·Sleeping=false로 자동 기상했다. 전용 PlayMode 1/1(3.43초), 새벽 Game View와 Console 오류 0건을 확인했다.",
+      "exclusions": [
+        "WI-NATURE-15 새벽 확장 계획 실제 선택",
+        "선택형 수면 애니메이션·환경음 실제 수용 확인",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs",
+          "sha256": "",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi14-dawn-game-view.png",
+          "sha256": "69e4923db0d113e0aed87fdcbd29d2d0f235ec1e7bbe4729ac4286470bbc9824",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell Nature T 입력 또는 수면 HUD 배선 변경",
+        "WI-NATURE-14 Sleeping·밤 배율·DawnReached 표현 변경",
+        "Unity가 Simulation 상태 사본 대신 시간 배율이나 기상을 판정하도록 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-wi14-hosted-parity-20260826",
+      "title": "Nature 오두막 수면·새벽 맞기 LocalProcess·RemoteHost 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1"],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi14-r1",
+      "executedAt": "2026-08-26T10:18:30+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "r2 도끼·벌목·오두막·보관·황혼 후퇴 전제에서 SleepInCabin과 권위 실시간 60초를 동일하게 실행했다. LocalProcess와 RemoteHost는 정확히 1110초 Dawn, Sleeping=false, 보관 통나무 2개, 최종 revision과 simulation-save.v23 Replay hash가 일치했고 Local slot 복원이 같은 새벽 상태를 되살렸다. 전용 동등성 1/1이 통과했다.",
+      "exclusions": [
+        "별도 UnityPlayMode EvidencePackage가 소유하는 실제 T 입력과 Game View",
+        "WI-NATURE-15 계획 선택과 Day2Ready",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-night-day2/nature-night-day2-wi14-host-parity.trx",
+          "sha256": "fad803968dd963c70082ff565a8189fb4ccdc9ab4226344e938742d1edeefc9a",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "LocalSimulationRuntime 또는 RemoteHost Nature clock Adapter 변경",
+        "WI-NATURE-14 수면 배율·DawnReached·revision 의미 변경",
+        "simulation-save.v23 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-wi15-playmode-20260826",
+      "title": "Nature Day2 확장 계획 실제 입력",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1"],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi15-r1",
+      "executedAt": "2026-08-26T10:35:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "오두막 보관·황혼 후퇴·수면·새벽을 권위 상태로 준비한 뒤 실제 숫자 1 입력으로 작업대 확장 계획을 선택했다. Simulation 상태 사본은 SelectedExpansionPlanCode=Workbench와 Day2Ready=true를 확정했고 Unity는 Day 2 계획 고정 결과만 표시했다. 전용 PlayMode 1/1(3.53초), Day2Ready Game View와 마지막 시험 이후 Console 오류 0건을 확인했다.",
+      "exclusions": [
+        "Day2 작업대 건설 WI-CON-01 실행",
+        "선택형 계획 카드 애니메이션·효과음 실제 수용 확인",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs",
+          "sha256": "",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi15-day2-ready-game-view.png",
+          "sha256": "3ca40640ccaea8530c853e57127990a4d993d122fb252ef0d165b175cf9948f9",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell Nature 숫자 계획 입력 또는 Day2 HUD 배선 변경",
+        "WI-NATURE-15 ExpansionPlanSelected·Day2Ready 표현 변경",
+        "Unity가 Simulation 상태 사본 대신 계획 비용이나 건설 Effect를 적용하도록 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-wi15-hosted-parity-20260826",
+      "title": "Nature Day2 확장 계획 LocalProcess·RemoteHost 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1"],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi15-r1",
+      "executedAt": "2026-08-26T10:37:00+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "r2 도끼·벌목·오두막·보관·황혼 후퇴·수면·새벽 전제에서 Workbench 계획 선택을 동일하게 실행했다. LocalProcess와 RemoteHost는 ExpansionPlanSelected=Workbench, Day2Ready=true, 최종 revision과 simulation-save.v23 Replay hash가 일치했고 Local slot 복원이 같은 Day2 상태를 되살렸다. WI-NATURE-13~15를 포함한 생활 거점 동등성 회귀 4/4가 통과했다.",
+      "exclusions": [
+        "별도 UnityPlayMode EvidencePackage가 소유하는 실제 숫자 1 입력과 Game View",
+        "WI-CON-01 작업대 건설과 이후 Day2 실행",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-night-day2/nature-night-day2-host-parity-regression.trx",
+          "sha256": "aa8639f77b2962e16b1a9c85b4514620aeb71252cf3a4dab2b8c33213093f55a",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "LocalSimulationRuntime 또는 RemoteHost Nature 계획 Adapter 변경",
+        "WI-NATURE-13~15 Container·Sleep·Day2Ready·revision 의미 변경",
+        "simulation-save.v23 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-workbench-wi-con-01-playmode-20260826",
+      "title": "Nature 작업대 배치·취소·재시도·운영 실제 입력",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Superseded",
+      "subjectRefs": ["playable-loop:nature-workbench-foundation.v1"],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-workbench-wi-con-01-r1",
+      "executedAt": "2026-08-26T11:12:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess nature-survival.realtime.r4",
+      "scope": "Day2Ready와 작업대 계획 이후 실제 숫자 1 입력으로 배치 모드에 들어가 지면 클릭으로 Preview·Confirm하고, 실제 C 입력으로 예약 통나무·재건 부품 반환을 확인한 뒤 재배치와 HUD 작업 유지 입력으로 권위 20초 건설을 완료했다. Simulation 상태 사본은 h1:nature:workbench의 Operational과 ActiveWork 해제를 확정했고 Unity는 Synty Construction 작업대와 HUD를 표현했다. 전용 PlayMode 1/1(22.99초), Game View PNG, 마지막 재컴파일 이후 Console 오류 0건을 확인했다.",
+      "exclusions": [
+        "수동 사람 조작에 의한 미세 시각 마감 평가",
+        "작업대 제작 애니메이션·효과음의 실제 수용 확인",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs",
+          "sha256": "",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-workbench-foundation/nature-workbench-wi-con-01-operational-game-view.png",
+          "sha256": "c2151af58c509f11901947df028663839121425df8c4bda70eb8bd3109befe4a",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "SimulationWorldShell Nature 숫자 1·지면 클릭·C·작업 유지 입력 배선 변경",
+        "WI-CON-01 Preview 비용·취소 반환·Operational 상태 표현 변경",
+        "Unity가 Simulation 상태 사본 대신 건설 비용이나 완료를 판정하도록 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-workbench-wi-con-01-hosted-parity-20260826",
+      "title": "Nature 작업대 건설 LocalProcess·RemoteHost 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-workbench-foundation.v1"],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-workbench-wi-con-01-r1",
+      "executedAt": "2026-08-26T10:57:00+09:00",
+      "environment": "Windows; .NET 10; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary; nature-survival.realtime.r4",
+      "scope": "동일한 도끼·벌목 6회·오두막·전투 승리·수면·Day2 작업대 계획 기준선에서 WI-CON-01 건설 시작, WI-NATURE-12 취소 반환, 동일 위치 재시도와 권위 20초 완료를 실행했다. LocalProcess와 RemoteHost는 h1:nature:workbench Operational, 최종 revision, simulation-save.v23 schema와 Replay hash가 일치했다. 전용 동등성 1/1이 통과했다.",
+      "exclusions": [
+        "별도 UnityPlayMode EvidencePackage가 소유하는 실제 입력과 Game View",
+        "WI-NATURE-16 현장 보급 제작의 실제 입력과 다른 안정 Core와의 E9 NPC 생활 조화",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "LocalSimulationRuntime 또는 RemoteHost Nature r4 Adapter 변경",
+        "WI-CON-01 비용·예약·취소·권위 시간·H1 Operational 의미 변경",
+        "simulation-save.v23 canonical hash 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-r5-logic-20260826",
+      "title": "Nature r5 지면 통나무·저장·동등성 논리 증거",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-shelter-foundation.v1"],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-survival-r5-save-v24",
+      "executedAt": "2026-08-26T20:10:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; deterministic fixture; LocalProcess and RemoteHost adapters",
+      "scope": "WI-NATURE-18 지면 통나무 생성·용량 차단·멱등 획득, r1~r4 즉시 지급 호환, simulation-save.v24 복원·Replay hash, LocalProcess·RemoteHost 상태 동등성을 포함한 Nature 집중 시험 45/45를 검증했다.",
+      "exclusions": [
+        "운영 Provider와 운영 DB",
+        "별도 Presentation 증거가 소유하는 Unity 실제 입력과 Game View"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-r5/nature-r5-final.trx",
+          "sha256": "48ffb666367801f3ff1f88739b3fcd5624e06c37a6a4704fae68eb6be5fed8e8",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "nature-survival.realtime.r5 벌목·획득 계약 변경",
+        "simulation-save.v24 NatureDroppedTimber 정규형 변경",
+        "LocalProcess 또는 RemoteHost Nature Adapter 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-dual-loop-game-view-20260826",
+      "title": "Nature 논리·시각 이중 순환 Synty 표현과 실제 입력",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-shelter-foundation.v1",
+        "playable-loop:nature-twilight-return.v1",
+        "playable-loop:nature-night-day2.v1",
+        "playable-loop:nature-workbench-foundation.v1"
+      ],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-dual-loop-visual-r1",
+      "executedAt": "2026-08-26T20:20:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess; Synty POLYGON Nature and Construction",
+      "scope": "Nature H 영역 기준으로 Synty Garden Shed·통나무·Skeleton·Table Saw를 배치하고 진단 HUD를 기본 접힘으로 바꿨다. EditMode 14/14, PlayMode 전체 실행의 비저장 경로 5/5와 저장 revision 경계 수정 후 집중 복원 1/1을 통과했다. Game View에서 세 통나무 묶음과 실제 왼쪽 버튼 획득, 오두막, 황혼 Skeleton, 작업대를 확인했다. 이 증거는 오두막·벌목과 황혼 루프의 표현 E7, 보관·수면·Day2와 작업대 루프의 표현 E6만 뒷받침한다.",
+      "exclusions": [
+        "사람 수동 조작에 의한 최종 미감·청음 수용",
+        "보관·수면·새벽 상태별 공간 변화와 카메라 가림 해소",
+        "목재·상자·조명을 포함한 완성 작업 구역",
+        "RemoteHost Unity 실행과 운영 Provider·운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-26-nature-dual-loop-visual/nature-wi18-dropped-timber-game-view.png",
+          "sha256": "777432e44a61a61418ffdd4697084b7c0b874de2e7bbb3cf64def26a2c38e6be",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-26-nature-dual-loop-visual/nature-synty-cabin-compact-hud-game-view.png",
+          "sha256": "85773cbdc0a16b21ccd0cd0eda0499afb7b66d8851b259db2496d10c40bb553a",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi01-observed-game-view.png",
+          "sha256": "7024846ff5174cc4211af62e8b8872b654cf2227db7775fa316e23f5e1c780e8",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-workbench-foundation/nature-workbench-wi-con-01-operational-game-view.png",
+          "sha256": "c2151af58c509f11901947df028663839121425df8c4bda70eb8bd3109befe4a",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "Nature H 기준점 또는 SimulationWorldShell 진입 배선 변경",
+        "Synty visual catalog나 Nature Controller 상태 표현 변경",
+        "WI-NATURE-18 실제 입력·DroppedTimber 상태 사본 변경",
+        "진단 HUD와 카메라 조준 정책 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-presentation-e7-20260826",
+      "title": "Nature 보관·수면·새벽 계획 표현 E7 실제 입력과 Game View",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Stale",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1"],
+      "evidenceStageCodes": ["E6", "E7"],
+      "sourceRevision": "worktree:2026-08-26-nature-night-day2-presentation-r2",
+      "executedAt": "2026-08-26T16:55:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess; Synty POLYGON Farm, Nature and Construction",
+      "scope": "Logic E7 기준선을 바꾸지 않고 WI-NATURE-13의 실제 G 입력 후 오두막 옆 Synty 목재 더미와 보관 수량, WI-NATURE-14의 실제 T 입력 후 야간 차광·침상·캠프파이어 자리와 권위 시간에 따른 새벽 계획판 전환, WI-NATURE-15의 실제 숫자 1 입력 후 작업대 계획 확정·건설 위치 선택 상태를 같은 canonical Scene에서 검증했다. 집중 PlayMode 3/3과 시각 자산 대장 EditMode 1/1이 통과했다. 전체 Nature E7 PlayMode 6건 중 현재 세 WI 3건과 작업대 1건은 통과했고, 기존 이동 제한과 황혼 상태 문구 2건은 별도 회귀로 남겼다.",
+      "exclusions": [
+        "사람 수동 조작에 의한 최종 미감·실제 청음 수용",
+        "작업대 건설 중·운영 중 작업 구역의 표현 E7",
+        "전체 Nature PlayMode 묶음의 기존 이동 제한·황혼 상태 문구 실패 2건",
+        "RemoteHost Unity 실행과 운영 Provider·운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi13-store-game-view.png",
+          "sha256": "d79545d340a86d4a24d9f056e604d5cc9491f292cb3939c2cd6e808997ce3c72",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi14-sleeping-game-view.png",
+          "sha256": "d0a34b38bf73d218acc8a1e9fb309d6ef7c848dc568bde97e097ba16d8cd8666",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi14-dawn-game-view.png",
+          "sha256": "69e4923db0d113e0aed87fdcbd29d2d0f235ec1e7bbe4729ac4286470bbc9824",
+          "retentionCode": "External"
+        },
+        {
+          "locationKind": "ExternalCheckout",
+          "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-night-day2/nature-night-day2-wi15-day2-ready-game-view.png",
+          "sha256": "3ca40640ccaea8530c853e57127990a4d993d122fb252ef0d165b175cf9948f9",
+          "retentionCode": "External"
+        }
+      ],
+      "invalidationTriggers": [
+        "WI-NATURE-13~15 권위 상태·입력 계약 변경",
+        "Nature visual catalog 또는 보관·수면·새벽 계획 표현 변경",
+        "SimulationWorldShell 카메라·HUD·Nature 진입 배선 변경",
+        "관련 Game View PNG hash 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-base-reflection-e3-20260826",
+      "title": "Nature 거점 성찰 승인자료·결정성 집중 자동 시험",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-base-reflection.v1"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "worktree:2026-08-26-base-reflection-r1",
+      "executedAt": "2026-08-26T14:30:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; deterministic fixture only",
+      "scope": "원문 관측→해석 후보→사람 승인 Publication, Publication hash와 파생 원장 멱등 동기화, 세션 불변 사본, 하루 한 번·Publication revision 한 번 제한, 원문 열기 무보상, 다음 활동 내면 효과 적용, 상태 hash 복원·변조 거부와 동일 입력 계산 동등성 7/7을 검증했다.",
+      "exclusions": [
+        "실제 YouTube·Apify Provider 호출과 운영 DB",
+        "주 세션 simulation-save.v24 및 HTTP LocalProcess·RemoteHost Adapter",
+        "Unity H1 배치, Play Mode, Game View"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationBaseReflectionTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        }
+      ],
+      "invalidationTriggers": [
+        "approved-learning-material.v1 hash 정규형 또는 허용 효과 변경",
+        "WI-REFLECT-01 하루·Publication revision 제한 변경",
+        "Simulation거점성찰StateHasher 또는 다음 활동 적용 의미 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-first-evening-equipment-logic-20260827",
+      "title": "Nature 첫 저녁 명시적 장착·생활거점 LocalProcess·RemoteHost 논리 증거",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-shelter-foundation.v1"],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "actor-equipment.r1/simulation-save.v27",
+      "executedAt": "2026-08-27T13:28:25+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; deterministic fixture; LocalProcess and ASP.NET Core RemoteHost adapter",
+      "scope": "WI-ACTOR-01 획득과 WI-ACTOR-02 장착·해제·Swap, 장착 상태에서만 생기는 벌목 능력, simulation-save.v27 복원·Replay와 Nature 생활거점 LocalProcess·RemoteHost revision/hash 동등성을 묶은 집중 시험 10/10을 검증했다.",
+      "exclusions": [
+        "Unity 실제 I 입력·상태창 버튼·손 도끼와 Game View",
+        "열린 Unity Editor의 Job Lock 오류와 전경 지형 가림",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+          "sha256": "",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/validation/nature-first-evening/nature-first-evening-logic.trx",
+          "sha256": "1ae520a6f0258fcc32b023b3665bf7a5717b681645fb880ffe076bfc503aa733",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "WI-ACTOR-01·02 획득·장착·능력 파생 의미 변경",
+        "Nature 생활거점 명령열 또는 LocalProcess·RemoteHost Adapter 변경",
+        "simulation-save.v27 canonical hash 의미 변경"
       ]
     }
   ]

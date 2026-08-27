@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-NATURE-SKY-ENGINE",
+  "title": "Nature 세계 공통 Sky Engine 결정적 대기 표현",
+  "playableLoopRefs": ["playable-loop:nature-night-day2.v1"],
+  "evidencePackageRefs": ["evidence:nature-night-day2-presentation-e7-20260826"],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "world-atmosphere.r1",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "기존 Nature 시간대 표현을 보존하면서 세계 공통 대기 상태, simulation-save.v25, Unity Sky Engine과 directional-lighting.natural.r1 표면 명암 검증 경계를 추가했다.",
+    "nextReopenCondition": "날씨가 플레이어 선택이나 결과에 영향을 주도록 확장되거나 Game View에서 날씨·광원 방향·그늘 면의 상태 차이가 읽히지 않으면 가장 이른 권위·표현 E 단계를 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Unity", "Integration", "ProjectGovernance"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:unity", "workstream:integration"],
+    "allowedChangeRoots": [
+      "Ssalddel.WorkflowRules.Contracts/UnityPackage/Runtime",
+      "Ssalddel.WorkflowRules/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Tests",
+      "docs/Architecture",
+      "docs/AI",
+      "eng/execution-ledgers",
+      "C:/Users/user/ssalddel/Assets/Ssalddel"
+    ],
+    "dependencyWorkOrderIds": ["E9-WO-NATURE-DUAL-LOOP-VISUAL-COMPLETION"],
+    "handoffIn": [
+      "Nature r5 결정적 1,200초 권위 시계",
+      "기존 월드시간대Presenter와 canonical SimulationWorldShell",
+      "Polygon Farm Synty 구름·비 Prefab"
+    ],
+    "handoffOut": [
+      "world-atmosphere.r1 상태 사본",
+      "simulation-save.v25 결정적 저장·Replay hash",
+      "SkyEnginePresenter와 실내 강수 차폐",
+      "Atmosphere 표현 검증 모듈",
+      "directional-lighting.natural.r1과 Nature 핵심물 방향광 검증 기록"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "Simulation 대기 계약·저장과 Unity Sky Engine·Scene·검증 문서를 한 맥락으로 제한"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v3",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {"code":"E9","disposition":"Affected","summary":"안정 Nature E7 기준선에 세계 공통 대기 계약을 호환 확장한다.","dimensions":{"changeEnvelope":"Nature night-day2와 세계 공통 하늘 표현","baselineAndTargetRevision":"nature r5/v24에서 world-atmosphere.r1/v25로 확장","migrationCompatibility":"대기 없는 v24 이하 hash 유지","rollbackBoundary":"대기 프로필을 빼면 기존 시간대 Presenter가 단독 동작"},"sourceReferences":["docs/Architecture/SkyEngine세계대기표현계층.md"],"nextAction":"E7 재검증 뒤 E9는 E8 기준선까지 차단"},
+    {"code":"E8","disposition":"ReusedWithVerification","summary":"NPC 판단과 생활세계는 변경하지 않는다.","dimensions":{"npcRoleGroup":"변경 없음","continuousLifeLoop":"변경 없음","playerAbsentBehavior":"Nature 시계 상태만 결정적 투영","saveReplay":"v25 대기 상태 포함"},"sourceReferences":["docs/Architecture/E8-NPC생활세계폐루프정의.md"],"nextAction":"NPC 대기 반응은 후속 범위"},
+    {"code":"E7","disposition":"Gap","summary":"맑음·비·뇌우·실내 차폐·새벽 맑음을 실제 Game View와 Console에서 구분한다.","dimensions":{"playerLoop":"밤 보관·수면·새벽 반환 중 하늘 변화 체감","authorityModes":"LocalProcess와 RemoteHost 공통 Core","canonicalScene":"SimulationWorldShell","runtimeEvidence":"실제 Play Mode, Game View, Console, 중요 상태 캡처"},"sourceReferences":["docs/Architecture/플레이폐루프논리시각이중순환체계.md"],"nextAction":"Unity Editor Job lock 해소 뒤 Runtime 증거"},
+    {"code":"E6","disposition":"Affected","summary":"시간대 조명에 구름·비·뇌우·음향과 실내 차폐를 합성하고 Nature 핵심물의 방향광·법선·그림자 판독을 검증한다.","dimensions":{"worldStateExplanation":"날씨 코드별 가시·청각 차이와 광원 방향별 밝은 면·그늘 면","groundingProfile":"CameraGlobal atmosphere + LH cell presentation targets","provenanceLimitations":"Synty FX와 Renderer 명암은 권위가 아님","causalQuestionMatrix":"상태·카메라·차폐·FX·음향·법선·그림자를 분리 판정"},"sourceReferences":["docs/Architecture/SkyEngine세계대기표현계층.md"],"nextAction":"Unity 집중 시험과 Game View"},
+    {"code":"E5","disposition":"Affected","summary":"canonical Scene에 Synty 구름 다섯 개와 비·번개·음향 Root를 저장한다.","dimensions":{"triggerOccurrence":"Nature 권위 시계 구간 전환","authorityTransition":"Simulation 상태 사본만 변경","taskEffectResult":"날씨 표현 상태 투영","successorOrReturnPath":"새벽 Clear와 다음 선택","conditionalSpatialEvidence":"NotApplicableWorldGlobal"},"sourceReferences":["docs/Architecture/SkyEngine세계대기표현계층.md"],"nextAction":"Scene 배선 검증"},
+    {"code":"E4","disposition":"Affected","summary":"Atmosphere 프로필을 Nature 시계·세계 범위·표현 상태에 결속한다.","dimensions":{"allowedTriggerSources":"WorldDerived","subjectAndTargetBindings":"World scope와 NatureCycleClock","dataResourceTimeBindings":"scenarioSeed, cycleIndex, elapsedSecondsInCycle","spatialApplicability":"NotApplicable; 카메라 전역 표현"},"sourceReferences":["Ssalddel.WorkflowRules/UnityPackage/Runtime/WorldAtmosphereRules.cs"],"nextAction":"Local·Hosted 상태 사본 동등성"},
+    {"code":"E3","disposition":"Affected","summary":"구간 결정성, v25 저장 복원, v24 호환 hash와 방향광 수학·프로필 결정을 검증한다.","dimensions":{"contractTests":"대기 입력과 상태 사본","determinism":"같은 seed·시계에서 같은 대기·방향광 투영","saveReplayRegression":"v25 복원 및 v24 이하 유지","consumerRegression":"Unity Editor·EditMode 어셈블리 빌드와 방향광 집중 시험"},"sourceReferences":["Ssalddel.Simulation.Tests/SimulationWorldAtmosphereTests.cs", "docs/Architecture/SkyEngine세계대기표현계층.md"],"nextAction":"Unity EditMode Test Runner 실행"},
+    {"code":"E2","disposition":"Affected","summary":"세계 대기 입력·상태 사본과 Unity Adapter를 추가한다.","dimensions":{"contracts":"profile, rule, clock, weather, intensities","applicationDomain":"Simulation Aggregate 파생 상태","adapters":"Nature LocalProcess 생성·조회","unityProjection":"월드시간대와 감각 표현 합성"},"sourceReferences":["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationAtmosphereContracts.cs"],"nextAction":"소비자 회귀"},
+    {"code":"E1","disposition":"Defined","summary":"플레이어는 같은 Nature 하루에서 하늘 변화를 보고 실내외 차이를 체감하되 날씨를 직접 확정하지 않는다.","dimensions":{"purposeAndReturn":"날씨를 읽고 보관·수면·새벽 다음 선택으로 귀환","authorityAndAllowedTriggerSources":"WorldDerived, Simulation Core","stableIdsAndRevision":"world-atmosphere.r1, nature-night-day2","acceptanceAndExclusions":"게임 효과·현실 기상·외부 Provider·새 Scene 제외"},"sourceReferences":["docs/Architecture/SkyEngine세계대기표현계층.md"],"nextAction":"플레이어 약속 변경 시 재검토"}
+  ],
+  "upwardValidation": [
+    {"code":"E1","status":"Passed","evidence":["Sky Engine 플레이어 약속과 제외 범위"],"nextAction":"변경 시 재검토"},
+    {"code":"E2","status":"Passed","evidence":["Atmosphere 계약·Domain·Unity Adapter"],"nextAction":"소비자 회귀"},
+    {"code":"E3","status":"Passed","evidence":["SimulationWorldAtmosphereTests 10/10", "Nature+Atmosphere 집중 시험 55/55", "Unity Editor·EditMode 어셈블리 빌드 오류 0"],"nextAction":"Unity Job lock 해소 뒤 Test Runner 실행"},
+    {"code":"E4","status":"Passed","evidence":["NatureCycleClock·World scope·Presenter 결속", "Local Core·RemoteHost v25 대기 상태·Replay hash 동등성"],"nextAction":"표현 상태와 권위 상태의 실제 Runtime 인계 확인"},
+    {"code":"E5","status":"Passed","evidence":["canonical Scene SkyEngineVisualRoot, Synty cloud 5, rain Particle 1"],"nextAction":"Play Mode 활성 배선"},
+    {"code":"E6","status":"InProgress","evidence":["SkyEngineProjector, 강수 차폐, 절차 음향 코드", "directional-lighting.natural.r1 내적 모델과 Nature 핵심물 검증 Controller"],"nextAction":"EditMode 집중 시험과 실제 Game View 그늘 면 판독"},
+    {"code":"E7","status":"Blocked","evidence":[],"nextAction":"Unity Editor Job lock 해소 뒤 실제 Play Mode·Game View"},
+    {"code":"E8","status":"NotStarted","evidence":[],"nextAction":"NPC 날씨 반응은 별도 선택 범위"},
+    {"code":"E9","status":"Blocked","evidence":[],"nextAction":"E8 기준선·Migration·전체 회귀 없음"}
+  ],
+  "promotionBlockers": [
+    "열린 SimulationWorldShell에 기존 미저장 변경이 있어 Test Runner가 저장 여부를 요구했으며 병행 변경 보호를 위해 실행을 취소했다.",
+    "Unity Pipeline의 Access version should be odd when acquiring lock 오류가 남아 방향광·Sky 집중 시험 결과를 새로 만들지 못했다.",
+    "맑음·비·뇌우·실내 차폐·새벽 맑음과 Nature 핵심물의 밝은 면·그늘 면을 함께 판독한 실제 Play Mode·Game View·Console 증거가 없다.",
+    "E8 기준선과 Migration 승격 검토는 이번 E7 표현 범위 밖이다."
+  ],
+  "finalEvidenceReferences": []
+}

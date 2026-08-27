@@ -1,19 +1,63 @@
 {
-  "schemaVersion": "simulation-e9-vertical-work-order.v1",
-  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
   "workOrderId": "E9-WO-NATURE-SURVIVAL-SOLO-PLACEMENT",
   "title": "Nature 생존·Solo 공통 Core·배치 통제 수직 구현",
+  "playableLoopRefs": [
+    "playable-loop:nature-survival-homestead.v1",
+    "playable-loop:nature-shelter-foundation.v1",
+    "playable-loop:nature-night-day2.v1"
+  ],
+  "evidencePackageRefs": [
+    "evidence:simulation-task-20260824",
+    "evidence:nature-playmode-20260824"
+  ],
   "workType": "NewVerticalSlice",
   "targetEvidenceStage": "E9",
   "currentEvidenceStage": "E4",
   "promotionEligible": false,
   "baselineE8Revision": "",
-  "targetStableRevision": "nature-survival-world.e9-target.r1",
+  "targetStableRevision": "nature-survival-world.e9-target.r2-first-day",
   "iterationState": {
     "cycleCode": "E9-E1-E9-Repeat",
     "currentPass": "UpwardAssemblyAndValidation",
-    "lastReassessment": "WI-NATURE-05~12를 실제 E5 H1·H2·H3·Graph에 결속하고 취소·예약 반환·Solo PlayMode 저장 복원을 상향 재검증했다.",
+    "lastReassessment": "첫날 플레이어 약속을 보관·세 전투 결과·수면·새벽 계획까지 닫도록 r2 영향 범위를 다시 하향 검토하고 E1~E3 Core를 상향 구현했다.",
     "nextReopenCondition": "E4~E7 상향 조립에서 계약·통행·플레이 약속이 달라지면 E9→E1 영향 판정을 다시 수행한다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": [
+      "Simulation",
+      "Unity",
+      "Integration"
+    ],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": [
+      "workstream:unity",
+      "workstream:integration"
+    ],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application/RuntimeCore",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "eng/world-seedbeds",
+      "docs/Architecture",
+      "docs/AI"
+    ],
+    "dependencyWorkOrderIds": [],
+    "handoffIn": [
+      "WI-NATURE-01~12 계약과 Actual E5 Nature H 결속",
+      "Solo LocalProcess 공통 Runtime과 simulation-save.v16 이하 호환 경계",
+      "첫날 플레이어 약속과 WI-NATURE-13~15 계약"
+    ],
+    "handoffOut": [
+      "Local·Hosted 결과 동등성 요구와 E5 Manifested 차단",
+      "SimulationWorldShell 실제 입력·Game View 수용 범위"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "Nature 계약·Core·Unity 소비자·증거를 분리 가능한 맥락으로 커밋"
   },
   "authorityProfile": {
     "simulationCore": "SharedSimulationCore",
@@ -35,7 +79,7 @@
       "dimensions": {
         "changeEnvelope": "Nature 도끼·벌목·오두막·황혼 조우와 Solo 공통 Runtime, H 배치 통제를 한 변화 묶음으로 추적한다.",
         "baselineAndTargetRevision": "신규 세로 조각이므로 E8 기준선은 아직 없고 목표 식별자는 nature-survival-world.e9-target.r1이다.",
-        "migrationCompatibility": "simulation-save.v13, 기존 Session·WI·StableId와 Local·Remote 결과 동일성을 보존해야 한다.",
+        "migrationCompatibility": "r2는 simulation-save.v17을 사용하고 r1 Session·API·v1~v16 hash 의미와 Local·Remote 결과 동일성을 보존해야 한다.",
         "rollbackBoundary": "프로필 비활성화와 이전 Save 판본 읽기, 기존 SimulationWorldShell 진입점 보존을 중단 경계로 둔다."
       },
       "sourceReferences": [
@@ -65,7 +109,7 @@
       "disposition": "Affected",
       "summary": "Solo LocalProcess의 canonical Scene 폐루프는 PlayMode에서 통과했고 Hosted RemoteHost 동등성과 실제 Game View 수용 증거는 남아 있다.",
       "dimensions": {
-        "playerLoop": "안전 빈터→도끼→벌목→통나무→오두막→황혼 대응→회복·재출발을 완주한다.",
+        "playerLoop": "안전 빈터→도끼→벌목→오두막→명시적 보관→황혼 전투/후퇴→수면→새벽 확장 계획→Day2Ready를 완주한다.",
         "authorityModes": "Solo는 LocalSimulationRuntime, Hosted는 서버 Host가 같은 Simulation Core 계약을 실행한다.",
         "canonicalScene": "새 공식 Scene 없이 SimulationWorldShell 하나에서 실행한다.",
         "runtimeEvidence": "서버 없는 취소·입장·퇴장·후퇴·저장·Scene 재진입 복원 PlayMode 1/1이 통과했다. Hosted 동일 결과와 수동 Game View·Console 증거는 남아 있다."
@@ -97,7 +141,7 @@
       "disposition": "Affected",
       "summary": "허용 발생원에서 Nature WI가 권위 전이·Task·Effect·결과·후속 선택으로 발현되는 결정적 세계 Fixture가 필요하다.",
       "dimensions": {
-        "triggerOccurrence": "WI-NATURE-05~12의 현재 PlayerDriven 실행과 향후 NpcDriven 재사용 경로를 구분해 기록한다.",
+        "triggerOccurrence": "WI-NATURE-05~15의 PlayerDriven 실행, 첫 주기 확정 조우와 기존 전투 결과의 WorldDerived 인계를 구분해 기록한다.",
         "authorityTransition": "Preview·Confirm 뒤 권위 상태 Revision 변화와 차단 사유를 기록한다.",
         "taskEffectResult": "벌목·건설 Task, 도끼·목재·오두막·조우 Effect와 결과 상태를 연결한다.",
         "successorOrReturnPath": "획득→벌목→배치→건설→입장·퇴장과 조우 대응 뒤 탐사·거점 복귀를 닫는다.",
@@ -112,12 +156,12 @@
     {
       "code": "E4",
       "disposition": "Affected",
-      "summary": "WI-NATURE-05~12의 PlayerDriven 발생원, 주체·대상·자료·자원·시간과 Required 공간 문맥을 실제 E5 Graph에 결속했다.",
+      "summary": "WI-NATURE-05~12의 기존 공간 결속을 유지하고 WI-NATURE-13~15의 오두막 보관·수면·새벽 계획 문맥을 추가한다.",
       "dimensions": {
         "allowedTriggerSources": "현재 PlayerDriven 실행은 존재하고 같은 WI의 NpcDriven 포트는 아직 미구현이다.",
         "subjectAndTargetBindings": "PlayerStableId와 도끼·ResourceNode·오두막·Encounter 대상을 각 WI가 소유한다.",
-        "dataResourceTimeBindings": "Tool·ResourceNode·WorkArea·BuildingSite·Material·ShelterOccupancy와 벌목·건설 시간을 결속하고 WI-NATURE-12가 작업 점유 해제와 건설 예약 통나무 반환을 수행한다.",
-        "spatialApplicability": "WI-NATURE-05~11은 직접 Actual E5 정의를, WI-NATURE-12는 진행 작업의 공간·예약 문맥을 이어받는 Contextual 결속을 사용한다."
+        "dataResourceTimeBindings": "Tool·ResourceNode·WorkArea·BuildingSite·Material·ShelterOccupancy·ContainerCapacity와 벌목·건설·수면 시간을 결속한다.",
+        "spatialApplicability": "WI-NATURE-05~11은 기존 Actual E5 정의를, WI-NATURE-12는 작업 문맥을 이어받고 WI-NATURE-13~15는 오두막 H1의 보관·수면·계획 Anchor가 필요하다."
       },
       "sourceReferences": [
         "docs/AI/authority-maps/04_WI_GAMEPLAY_GRAPH.md",
@@ -130,9 +174,9 @@
       "disposition": "Affected",
       "summary": "Nature·Local Runtime·Save/Replay·Actual E5 집중 시험 44건과 canonical Scene PlayMode 시험 1건이 통과했다.",
       "dimensions": {
-        "contractTests": "Preview·Confirm·ExpectedRevision·멱등성·시간 경계 시험을 유지한다.",
+        "contractTests": "Preview 무변경·Confirm 멱등성·용량·첫 조우·세 전투 결과·시계 정지·수면·계획 시험을 유지한다.",
         "determinism": "같은 seed·명령·경과 초에서 Local과 Hosted canonical 상태 hash가 같아야 한다.",
-        "saveReplayRegression": "simulation-save.v13 읽기·쓰기·Replay와 이전 판본 호환을 검증한다.",
+        "saveReplayRegression": "simulation-save.v17의 r2 상태와 v1~v16 읽기·hash 의미 호환을 검증한다.",
         "consumerRegression": "Unity Adapter, 서버 Controller와 기존 Nature·Farm 입력 우선순위 회귀를 검증한다."
       },
       "sourceReferences": [
@@ -164,7 +208,7 @@
       "dimensions": {
         "purposeAndReturn": "자원 채집과 생활 거점 건설, 황혼 대응 뒤 회복·재출발하는 폐루프다.",
         "authorityAndAllowedTriggerSources": "Simulation Core가 상태를 소유하고 Solo는 LocalProcess, Hosted는 RemoteHost에서 실행한다. 현재 허용 발생원은 PlayerDriven이며 NpcDriven 재사용은 별도 결속한다.",
-        "stableIdsAndRevision": "nature-survival.realtime.r1, 기존 Nature H StableId와 simulation-save.v13을 보존한다.",
+        "stableIdsAndRevision": "nature-survival.realtime.r2와 WI-NATURE-13~15를 추가하되 r1, 기존 Nature H StableId와 v1~v16을 보존한다.",
         "acceptanceAndExclusions": "실제 플레이·NPC·운영 효과는 별도 증거이며 Skeleton은 대체 표현이다."
       },
       "sourceReferences": [
@@ -207,7 +251,7 @@
       "code": "E4",
       "status": "Passed",
       "evidence": [
-        "WI-NATURE-05~12 정식 WI 대장과 E1~E9 실행 머리 결속",
+        "WI-NATURE-05~15 정식 WI 대장과 E1~E9 실행 머리 결속",
         "wi-spatial-seedbed:nature-survival-home.v1 승인 모판",
         "wi-spatial-seedbed:nature-survival-encounter.v1 승인 모판",
         "Actual E5 직접 37·문맥 6·비공간 6·대기 0 분류"
@@ -253,6 +297,7 @@
   ],
   "promotionBlockers": [
     "신규 세로 조각이라 변경 전 E8 안정 기준선이 없다.",
+    "r2 Core E3는 구현됐지만 기존 SimulationLocalCombat의 LocalProcess·RemoteHost 생성과 승리·후퇴·패배 결과 인계가 실제 Runtime에 연결되지 않았다.",
     "Nature E5는 부분 발현이며 전체 후속·복귀 경로의 Manifested 증거가 남아 있다.",
     "Solo PlayMode는 통과했지만 Hosted 동등성·수동 Game View와 E8 NPC 생활세계 증거가 없다.",
     "E1→E8 상향 재검증과 migration·rollback 실행 증거가 없다."

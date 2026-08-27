@@ -1,14 +1,14 @@
 {
   "schemaVersion": "ssalddel-evidence-responsibility-map.v2",
   "repositoryKey": "hongdal-simulation-unity-shared",
-  "moduleCatalogRevision": "simulation-e9-refactor-module-catalog.r2",
+  "moduleCatalogRevision": "simulation-evidence-responsibility-module-catalog.r3",
   "stages": [
     {
       "evidenceStage": "E1",
       "managementSystem": "G1",
       "koreanName": "\uD575\uC2EC \uACC4\uC57D",
       "technicalName": "E1\uD575\uC2EC\uACC4\uC57DModule",
-      "primaryCount": 30,
+      "primaryCount": 37,
       "secondaryCount": 0
     },
     {
@@ -16,7 +16,7 @@
       "managementSystem": "G1",
       "koreanName": "\uC2E4\uD589 \uACBD\uACC4",
       "technicalName": "E2\uC2E4\uD589\uACBD\uACC4Module",
-      "primaryCount": 144,
+      "primaryCount": 158,
       "secondaryCount": 0
     },
     {
@@ -24,7 +24,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD68C\uADC0 \uC99D\uAC70",
       "technicalName": "E3\uD68C\uADC0\uC99D\uAC70Module",
-      "primaryCount": 165,
+      "primaryCount": 186,
       "secondaryCount": 1
     },
     {
@@ -32,7 +32,7 @@
       "managementSystem": "G1",
       "koreanName": "\uC2E4\uD589 \uBB38\uB9E5 \uACB0\uC18D",
       "technicalName": "E4\uC2E4\uD589\uBB38\uB9E5\uACB0\uC18DModule",
-      "primaryCount": 36,
+      "primaryCount": 38,
       "secondaryCount": 0
     },
     {
@@ -40,7 +40,7 @@
       "managementSystem": "G1",
       "koreanName": "\uC138\uACC4 \uBC1C\uD604",
       "technicalName": "E5\uC138\uACC4\uBC1C\uD604Module",
-      "primaryCount": 4,
+      "primaryCount": 7,
       "secondaryCount": 0
     },
     {
@@ -48,7 +48,7 @@
       "managementSystem": "G1",
       "koreanName": "\uC138\uACC4 \uC815\uC81C",
       "technicalName": "E6\uC138\uACC4\uC815\uC81CModule",
-      "primaryCount": 19,
+      "primaryCount": 21,
       "secondaryCount": 0
     },
     {
@@ -56,23 +56,31 @@
       "managementSystem": "G2",
       "koreanName": "\uD50C\uB808\uC774 \uACBD\uD5D8 \uD3D0\uB8E8\uD504",
       "technicalName": "E7\uD50C\uB808\uC774\uACBD\uD5D8\uD3D0\uB8E8\uD504Module",
-      "primaryCount": 149,
+      "primaryCount": 151,
       "secondaryCount": 0
     },
     {
       "evidenceStage": "E8",
       "managementSystem": "G3",
-      "koreanName": "\uC0DD\uD65C \uC5F0\uC18D\uC131",
-      "technicalName": "E8\uC0DD\uD65C\uC5F0\uC18D\uC131Module",
+      "koreanName": "\uAC1C\uBCC4 \uD3D0\uB8E8\uD504 \uC548\uC815",
+      "technicalName": "E8\uAC1C\uBCC4\uD3D0\uB8E8\uD504\uC548\uC815Module",
       "primaryCount": 13,
       "secondaryCount": 0
     },
     {
       "evidenceStage": "E9",
       "managementSystem": "G4",
-      "koreanName": "\uBCC0\uD654 \uBD09\uD22C",
-      "technicalName": "E9\uBCC0\uD654\uBD09\uD22CModule",
-      "primaryCount": 1,
+      "koreanName": "\uC601\uC5ED \uC870\uD654\u00B7\uC0AC\uB78C \uC2B9\uC778",
+      "technicalName": "E9\uC601\uC5ED\uC870\uD654\uC0AC\uB78C\uC2B9\uC778Module",
+      "primaryCount": 0,
+      "secondaryCount": 0
+    },
+    {
+      "evidenceStage": "E10",
+      "managementSystem": "G5",
+      "koreanName": "\uC81C\uD55C \uC6B4\uC601 \uAC80\uC99D",
+      "technicalName": "E10\uC81C\uD55C\uC6B4\uC601\uAC80\uC99DModule",
+      "primaryCount": 0,
       "secondaryCount": 0
     }
   ],
@@ -92,7 +100,7 @@
       "koreanName": "\uC800\uC7A5\u00B7\uC7AC\uC0DD \uACC4\uC57D",
       "technicalName": "E1\uC800\uC7A5\uC7AC\uC0DD\uACC4\uC57DModule",
       "responsibility": "Save schema\u00B7Command Log\u00B7Replay hash\uC758 \uD638\uD658 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
-      "primaryCount": 1,
+      "primaryCount": 2,
       "secondaryCount": 0
     },
     {
@@ -119,7 +127,7 @@
       "koreanName": "\uC138\uACC4 \uC0C1\uD638\uC791\uC6A9 \uACC4\uC57D",
       "technicalName": "E1\uC138\uACC4\uC0C1\uD638\uC791\uC6A9\uACC4\uC57DModule",
       "responsibility": "WI \uBAA9\uC801\u00B7StableId\u00B7\uD5C8\uC6A9 \uBC1C\uC0DD\uC6D0\uACFC Preview\u00B7Confirm \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
-      "primaryCount": 2,
+      "primaryCount": 3,
       "secondaryCount": 0
     },
     {
@@ -137,7 +145,7 @@
       "koreanName": "\uC6D0\uACA9 Host Adapter",
       "technicalName": "E2\uC6D0\uACA9HostAdapterModule",
       "responsibility": "Hosted Server\uC5D0\uC11C \uAC19\uC740 Core\uB97C HTTP \uACBD\uACC4\uB85C \uB178\uCD9C\uD55C\uB2E4.",
-      "primaryCount": 2,
+      "primaryCount": 3,
       "secondaryCount": 0
     },
     {
@@ -164,7 +172,7 @@
       "koreanName": "\uC138\uACC4 \uC0C1\uD638\uC791\uC6A9 \uC2E4\uD589",
       "technicalName": "E2\uC138\uACC4\uC0C1\uD638\uC791\uC6A9\uC2E4\uD589Module",
       "responsibility": "Farm\u00B7Nature WI Preview\u00B7Confirm \uC2E4\uD589 \uD3EC\uD2B8\uB97C \uC81C\uACF5\uD55C\uB2E4.",
-      "primaryCount": 7,
+      "primaryCount": 10,
       "secondaryCount": 0
     },
     {
@@ -173,7 +181,7 @@
       "koreanName": "\uACC4\uC57D \uD68C\uADC0",
       "technicalName": "E3\uACC4\uC57D\uD68C\uADC0Module",
       "responsibility": "StableId\u00B7\uC694\uCCAD\u00B7\uC751\uB2F5\u00B7WI metadata \uACC4\uC57D\uC758 \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
-      "primaryCount": 2,
+      "primaryCount": 4,
       "secondaryCount": 0
     },
     {
@@ -182,7 +190,7 @@
       "koreanName": "\uACB0\uC815\uC131 \uAC80\uC99D",
       "technicalName": "E3\uACB0\uC815\uC131\uAC80\uC99DModule",
       "responsibility": "\uAC19\uC740 Seed\u00B7\uBA85\uB839\u00B7\uC2DC\uAC04\uC774 \uAC19\uC740 canonical \uC0C1\uD0DC\uB97C \uB9CC\uB4DC\uB294\uC9C0 \uAC80\uC99D\uD55C\uB2E4.",
-      "primaryCount": 1,
+      "primaryCount": 6,
       "secondaryCount": 0
     },
     {
@@ -191,7 +199,7 @@
       "koreanName": "\uB85C\uCEEC\u00B7\uC6D0\uACA9 \uB3D9\uB4F1\uC131",
       "technicalName": "E3\uB85C\uCEEC\uC6D0\uACA9\uB3D9\uB4F1\uC131Module",
       "responsibility": "LocalProcess\uC640 RemoteHost\uAC00 \uAC19\uC740 \uAD8C\uC704 \uACB0\uACFC\uB97C \uB9CC\uB4DC\uB294\uC9C0 \uAC80\uC99D\uD55C\uB2E4.",
-      "primaryCount": 1,
+      "primaryCount": 2,
       "secondaryCount": 0
     },
     {
@@ -200,7 +208,7 @@
       "koreanName": "\uC800\uC7A5\u00B7\uC7AC\uC0DD \uAC80\uC99D",
       "technicalName": "E3\uC800\uC7A5\uC7AC\uC0DD\uAC80\uC99DModule",
       "responsibility": "Save schema \uD638\uD658\u00B7\uBCF5\uC6D0\u00B7Replay hash \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
-      "primaryCount": 1,
+      "primaryCount": 4,
       "secondaryCount": 1
     },
     {
@@ -209,7 +217,7 @@
       "koreanName": "Unity \uC18C\uBE44\uC790 \uD68C\uADC0",
       "technicalName": "E3Unity\uC18C\uBE44\uC790\uD68C\uADC0Module",
       "responsibility": "Unity Adapter\u00B7Projection\uC774 \uAD8C\uC704 \uACC4\uC57D\uC744 \uC784\uC758 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uC9C0 \uAC80\uC99D\uD55C\uB2E4.",
-      "primaryCount": 1,
+      "primaryCount": 5,
       "secondaryCount": 0
     }
   ],
@@ -272,6 +280,28 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.ISimulationActorEquipmentRuntime",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.ISimulationActorEquipmentRuntime",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uBCF4\uD3B8 \uBB3C\uD488 \uD68D\uB4DD\uACFC \uC7A5\uCC29 \uC0C1\uD0DC \uBCC0\uACBD WI \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "\uD45C\uD604 \uAC1D\uCCB4\uAC00 \uC544\uB2C8\uB77C \uACF5\uD1B5 Simulation Core\uAC00 \uBB3C\uD488\uACFC \uC2AC\uB86F \uC0C1\uD0DC\uB97C \uD655\uC815\uD55C\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-ACTOR-01",
+        "WI-ACTOR-02"
+      ],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.ISimulationAreaSetHandoverPlanner",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
@@ -296,11 +326,30 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.ISimulationBattleInstanceStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationBattleInstanceService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationBattleInstanceService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
       "boundary": "\uC2E4\uD589 \uACBD\uACC4\uB294 \uC2E4\uC81C \uAD8C\uC704 \uC704\uCE58\uC640 E \uB2E8\uACC4 \uB2EC\uC131 \uC99D\uAC70\uB97C \uBD84\uB9AC\uD55C\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.ISimulationBattleRuntime",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.ISimulationBattleRuntime",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uD604\uC7A5 \uC804\uD22C\uC758 \uC0DD\uC131\u00B7\uCC38\uC5EC \uBC29\uC2DD\u00B7\uD589\uB3D9\u00B7\uAD00\uCC30 \uAC1C\uC785\u00B7\uC804\uD22C Tick \uACF5\uD1B5 \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "LocalProcess\uC640 RemoteHost\uB294 \uAC19\uC740 \uACC4\uC57D\uC744 \uC0AC\uC6A9\uD558\uACE0 Unity\uB294 \uD53C\uD574\uB098 \uC131\uACFC\uB97C \uACC4\uC0B0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -315,11 +364,11 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.ISimulationBattlefieldDerivationService",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationBattlefieldDerivationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationBattlefieldDerivationContract.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
-      "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
-      "boundary": "\uC2E4\uD589 \uACBD\uACC4\uB294 \uC2E4\uC81C \uAD8C\uC704 \uC704\uCE58\uC640 E \uB2E8\uACC4 \uB2EC\uC131 \uC99D\uAC70\uB97C \uBD84\uB9AC\uD55C\uB2E4.",
+      "responsibility": "Solo\uC640 Hosted\uAC00 \uACF5\uC720\uD558\uB294 \uC804\uD22C \uACF5\uAC04 \uD30C\uC0DD \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "\uB85C\uCEEC \uC804\uD22C\uB294 \uD30C\uC0DD\uAE30\uAC00 \uC5C6\uC744 \uB54C \uBD88\uBCC0 World \uBB38\uB9E5\uC73C\uB85C \uC2E4\uD589\uD558\uBA70 \uC6B4\uC601 \uACF5\uAC04\uC744 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -545,13 +594,40 @@
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [
+        "WI-CON-01",
         "WI-NATURE-05",
         "WI-NATURE-06",
         "WI-NATURE-07",
         "WI-NATURE-08",
         "WI-NATURE-09",
         "WI-NATURE-10",
-        "WI-NATURE-11"
+        "WI-NATURE-11",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
+        "WI-NATURE-16",
+        "WI-NATURE-17"
+      ],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime::AdvanceRealtimeAsync(System.String,Ssalddel.Simulation.Contracts.SimulationNatureSurvivalClockAdvanceRequest,System.Threading.CancellationToken)",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.ISimulationNatureSurvivalRuntime.AdvanceRealtimeAsync",
+      "memberKind": "Method",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "Nature \uAD8C\uC704 \uC2DC\uACC4\uAC00 \uC815\uCC45\uC73C\uB85C \uC2B9\uC778\uB41C NPC \uD604\uC7A5 \uBCF4\uAE09 \uC791\uC5C5\uC744 \uC9C4\uD589\uD55C\uB2E4.",
+      "boundary": "\uD50C\uB808\uC774\uC5B4 \uC785\uB825 \uC720\uC9C0\uB098 Unity \uD45C\uD604\uC774 NPC \uC704\uC784 \uC791\uC5C5 \uC644\uB8CC\uB97C \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-NATURE-17"
       ],
       "workOrderIds": [],
       "featureKeys": [],
@@ -572,13 +648,18 @@
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [
+        "WI-CON-01",
         "WI-NATURE-05",
         "WI-NATURE-06",
         "WI-NATURE-07",
         "WI-NATURE-08",
         "WI-NATURE-09",
         "WI-NATURE-10",
-        "WI-NATURE-11"
+        "WI-NATURE-11",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
+        "WI-NATURE-16"
       ],
       "workOrderIds": [],
       "featureKeys": [],
@@ -599,13 +680,18 @@
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [
+        "WI-CON-01",
         "WI-NATURE-05",
         "WI-NATURE-06",
         "WI-NATURE-07",
         "WI-NATURE-08",
         "WI-NATURE-09",
         "WI-NATURE-10",
-        "WI-NATURE-11"
+        "WI-NATURE-11",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
+        "WI-NATURE-16"
       ],
       "workOrderIds": [],
       "featureKeys": [],
@@ -908,7 +994,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.ISimulationTeamMemberPoseStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -927,7 +1013,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.ISimulationTeamObservationPolicyStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -946,7 +1032,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.ISimulationTeamObservationSessionStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -1169,12 +1255,31 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.InMemorySimulationPlayableLoopEngineTraceSink",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.InMemorySimulationPlayableLoopEngineTraceSink",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayableLoopEngineInteractionValidation.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uB85C\uCEEC \uC9C4\uB2E8\uACFC \uC2DC\uD5D8\uC5D0\uC11C \uAC19\uC740 WI \uBA85\uB839\uC758 \uC5D4\uC9C4 \uCD94\uC801 \uC21C\uC11C\uB97C \uACB0\uC815\uC801\uC73C\uB85C \uC218\uC9D1\uD55C\uB2E4.",
+      "boundary": "\uC218\uC9D1 \uACB0\uACFC\uB294 Session Save\uC640 Replay canonical hash\uC5D0 \uD3EC\uD568\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.InMemorySimulationTeamMemberPoseStore",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.InMemorySimulationTeamMemberPoseStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -1193,7 +1298,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.InMemorySimulationTeamObservationPolicyStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -1212,7 +1317,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.InMemorySimulationTeamObservationSessionStore",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -1403,17 +1508,15 @@
       "componentName": "Ssalddel.Simulation.Application.I\uC138\uACC4\uC0C1\uD638\uC791\uC6A9E9\uBCC0\uD654\uBD09\uD22CModule",
       "memberKind": "Type",
       "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/\uC138\uACC4\uC0C1\uD638\uC791\uC6A9E\uB2E8\uACC4Modules.cs",
-      "coverageState": "Annotated",
-      "primaryEvidenceStage": "E9",
-      "responsibility": "WI \uBCC0\uACBD \uBD09\uD22C\uC640 \uD558\uC704 \uC601\uD5A5 \uBC94\uC704\uB97C \uAC80\uD1A0\uD55C\uB2E4.",
-      "boundary": "\uBCC0\uACBD \uC601\uD5A5\uACFC \uC7AC\uAC80\uC99D \uBC94\uC704\uB97C \uB2E4\uB8E8\uBA70 E9 \uB2EC\uC131\uC744 \uC8FC\uC7A5\uD558\uC9C0 \uC54A\uB294\uB2E4.",
-      "primarySubmoduleKey": "",
+      "coverageState": "Excluded",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
       "workOrderIds": [],
       "featureKeys": [],
-      "stepKeys": []
+      "stepKeys": [],
+      "exclusionCategory": "CompatibilityFacade",
+      "exclusionReason": "\uAD6C\uD310 E9 \uC218\uC9C1 \uC791\uC5C5 \uBA85\uC138\uC758 \uBCC0\uACBD \uBD09\uD22C\uB97C \uC77D\uAE30 \uC704\uD574 \uBCF4\uC874\uD558\uBA70 \uD604\uC7AC E9 \uC0AC\uB78C \uAC80\uC99D \uCC45\uC784\uC774 \uC544\uB2C8\uB2E4."
     },
     {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.I\uC138\uACC4\uC0C1\uD638\uC791\uC6A9E\uB2E8\uACC4Module",
@@ -1469,6 +1572,25 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.NullSimulationPlayableLoopEngineTraceSink",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.NullSimulationPlayableLoopEngineTraceSink",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayableLoopEngineInteractionValidation.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uC5D4\uC9C4 \uCD94\uC801\uC744 \uC0AC\uC6A9\uD558\uC9C0 \uC54A\uB294 Host\uAC00 \uAE30\uC874 \uC2E4\uD589\uC744 \uC720\uC9C0\uD558\uB294 Null Adapter\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "Null Adapter\uB294 \uAD8C\uC704 \uC0C1\uD0DC\uC640 \uAE30\uC874 WI \uC2E4\uD589 \uACB0\uACFC\uB97C \uBC14\uAFB8\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.PyeongchangSimulationWorldUI\uAE30\uD68DFactory",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
@@ -1499,6 +1621,25 @@
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
       "boundary": "\uC2E4\uD589 \uACBD\uACC4\uB294 \uC2E4\uC81C \uAD8C\uC704 \uC704\uCE58\uC640 E \uB2E8\uACC4 \uB2EC\uC131 \uC99D\uAC70\uB97C \uBD84\uB9AC\uD55C\uB2E4.",
       "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationActorEquipmentService",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationActorEquipmentService",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationActorEquipmentService.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uBB3C\uD488 \uD68D\uB4DD\uACFC \uC7A5\uCC29 \uC0C1\uD0DC \uBCC0\uACBD\uC758 Preview\u00B7Confirm \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "\uC7A5\uCC29 \uC0C1\uD0DC\uC640 \uD30C\uC0DD \uB2A5\uB825\uC740 Simulation Core\uAC00 \uACB0\uC815\uD558\uBA70 \uD45C\uD604 \uAC1D\uCCB4\uAC00 \uAD8C\uC704\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E2.WorldInteractionExecution",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
@@ -1573,7 +1714,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.SimulationBattleInstanceService",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationBattleInstanceService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationBattleInstanceService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -1596,7 +1737,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.SimulationBattleUnitRosterBuilder",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationBattleUnitRosterBuilder.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationBattleUnitRosterBuilder.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -1713,6 +1854,31 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationLhInteriorPlanHandleService",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationLhInteriorPlanHandleService",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationLhInteriorPlanHandleService.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uC0DD\uC131\uB41C \uC2E4\uB0B4 \uACC4\uD68D\uACFC LH \uACF5\uAC04 \uC2E4\uD589 \uC0AC\uC774\uC758 Application \uC5F0\uACB0 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "\uC2E4\uD589 \uACBD\uACC4 \uC874\uC7AC\uB294 \uC2E4\uC81C Town \uACF5\uAC04 \uACB0\uC18D\uC774\uB098 E5\u00B7E7 \uC99D\uAC70\uB97C \uB73B\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [
+        "simulation-world-streaming"
+      ],
+      "stepKeys": [
+        "application.lh-interior-plan-handle"
+      ]
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationLhWindowPlanner",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
@@ -1755,6 +1921,25 @@
       ]
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationNatureFirstDayEngineValidationProfiles",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationNatureFirstDayEngineValidationProfiles",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayableLoopEngineInteractionValidation.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "Nature \uCCAB\uB0A0 WI\uC758 \uAD8C\uC704\u00B7\uD45C\uD604 \uC5D4\uC9C4 \uC21C\uC11C \uACC4\uC57D\uC744 \uACF5\uD1B5 \uAC80\uC99D Profile\uB85C \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "Profile\uC740 \uC2E4\uC81C \uC2E4\uD589 \uC99D\uAC70\uB098 \uBCC4\uB3C4 \uC131\uC219\uB3C4 \uCD95\uC774 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationNatureSurvivalService",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
@@ -1766,6 +1951,92 @@
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
       "boundary": "\uC2E4\uD589 \uACBD\uACC4\uB294 \uC2E4\uC81C \uAD8C\uC704 \uC704\uCE58\uC640 E \uB2E8\uACC4 \uB2EC\uC131 \uC99D\uAC70\uB97C \uBD84\uB9AC\uD55C\uB2E4.",
       "primarySubmoduleKey": "E2.WorldInteractionExecution",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationNatureWorldCellAssemblyEngine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationNatureWorldCellAssemblyEngine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureWorldCellAssemblyEngine.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E5",
+      "responsibility": "Nature \uAD8C\uC704 \uACB0\uACFC\uB97C \uAC19\uC740 revision\uC758 \uC2E4\uC678\u00B7\uC2E4\uB0B4 \uC140 \uC870\uB9BD \uACC4\uD68D\uC73C\uB85C \uACB0\uC18D\uD55C\uB2E4.",
+      "boundary": "\uBC30\uCE58 \uACC4\uD68D\uC740 \uC2E4\uC81C Unity \uD45C\uD604 \uB610\uB294 \uD50C\uB808\uC774 \uC785\uB825 \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-WORLD-MAP-ASSET-PLACEMENT"
+      ],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "application.nature-world-cell-assembly"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationNature\uACF5\uAC04\uBCC0\uD654ProjectionBuilder",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationNature\uACF5\uAC04\uBCC0\uD654ProjectionBuilder",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E4",
+      "responsibility": "Nature \uAD8C\uC704 \uACB0\uACFC\uB97C WI\u00B7\uB300\uC0C1\u00B7H\u00B7revision\uC774 \uC788\uB294 \uACF5\uAC04 \uBCC0\uD654 \uC0AC\uC2E4\uB85C \uACB0\uC18D\uD55C\uB2E4.",
+      "boundary": "Projection\uC740 \uC6D0\uBCF8 \uAD8C\uC704 \uC0C1\uD0DC\uB97C \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationNature\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Service",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationNature\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Service",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E5",
+      "responsibility": "Nature \uAD8C\uC704 \uC0C1\uD0DC\uC5D0\uC11C \uC9C0\uB3C4\u00B7\uBCC0\uD654\u00B7\uD658\uACBD\u00B7\uC2E4\uB0B4\uB97C \uD558\uB098\uC758 \uACB0\uC815\uC801 \uBC30\uCE58 \uC0C1\uD0DC\uB85C \uC870\uB9BD\uD55C\uB2E4.",
+      "boundary": "\uC0C1\uD0DC \uC0AC\uBCF8\uC740 LH \uD65C\uC131\uD654\uC640 Unity Prefab \uD45C\uD604\uC744 \uC644\uB8CC\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "application.nature-world-asset-placement-state"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationPlayableLoopEngineInteractionValidator",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationPlayableLoopEngineInteractionValidator",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayableLoopEngineInteractionValidation.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uB3D9\uC77C WI \uBA85\uB839\uC758 \uAD8C\uC704\u00B7LH\u00B7Sky\u00B7\uC2E4\uB0B4\uC678 \uBC30\uCE58 \uC21C\uC11C\uC640 \uBE44\uAD8C\uC704 \uACBD\uACC4\uB97C \uACB0\uC815\uC801\uC73C\uB85C \uAC80\uC0AC\uD55C\uB2E4.",
+      "boundary": "\uC5D4\uC9C4 \uCD94\uC801\uC740 Logic\u00B7Presentation \uC99D\uAC70\uB97C \uBCF4\uC870\uD558\uBA70 \uBCC4\uB3C4 E \uC131\uC219\uB3C4\uB098 Save \uAD8C\uC704 \uC0C1\uD0DC\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
@@ -1831,6 +2102,52 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationScenario\uC9C0\uB3C4\uAD6C\uC131Engine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationScenario\uC9C0\uB3C4\uAD6C\uC131Engine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "H \uACB0\uC18D\u00B7\uC5F0\uACB0\uAD6C\u00B7Anchor\uB97C \uC790\uC0B0 \uC120\uD0DD \uC5C6\uB294 \uC9C0\uB3C4 \uACC4\uD68D\uC73C\uB85C \uC870\uB9BD\uD55C\uB2E4.",
+      "boundary": "\uC9C0\uB3C4 \uACC4\uD68D\uC740 H \uB610\uB294 WI\uC758 \uC2E4\uC81C E5 \uBC1C\uD604\uC744 \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "application.world-map-composition"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationSeparatedLhCellContentSource",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.SimulationSeparatedLhCellContentSource",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationSeparatedLhCellContentSource.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uBD84\uB9AC \uC5D4\uC9C4\uC744 \uAE30\uC874 LH \uC140 \uC2E4\uD589 \uACC4\uC57D\uC5D0 \uC5F0\uACB0\uD558\uACE0 r1 hash \uD638\uD658\uC744 \uC720\uC9C0\uD55C\uB2E4.",
+      "boundary": "\uD638\uD658 Adapter\uB294 \uC2E4\uC81C \uACF5\uAC04 \uD65C\uC131\uD654\uB098 \uD654\uBA74 \uC99D\uAC70\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "adapter.lh-separated-cell-content"
+      ]
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.SimulationSurvivalTarotService",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
@@ -1855,7 +2172,7 @@
       "assemblyName": "Ssalddel.Simulation.Application",
       "componentName": "Ssalddel.Simulation.Application.SimulationTeamObservationService",
       "memberKind": "Type",
-      "sourcePath": "Ssalddel.Simulation.Application/SimulationTeamObservationService.cs",
+      "sourcePath": "Ssalddel.Simulation.Application/RuntimeCore/SimulationTeamObservationService.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E2",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uACF5\uD1B5 Core\u00B7Application \uB610\uB294 Adapter \uC2E4\uD589 \uACBD\uACC4\uB97C \uC81C\uACF5\uD55C\uB2E4.",
@@ -2373,6 +2690,29 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.Simulation\uACB0\uC815\uC801\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Engine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.Simulation\uACB0\uC815\uC801\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Engine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E5",
+      "responsibility": "\uC9C0\uB3C4\u00B7\uAD8C\uC704 \uBCC0\uD654\u00B7\uD658\uACBD \uACB0\uC815\uC5D0\uC11C \uC57C\uC678\u00B7\uAC74\uBB3C\u00B7\uC2E4\uB0B4 \uBC30\uCE58 \uACC4\uD68D\uC744 \uBC1C\uD604\uD55C\uB2E4.",
+      "boundary": "\uACC4\uD68D \uBC1C\uD604\uC740 \uC2E4\uC81C Unity Scene\u00B7Game View E7 \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "application.world-asset-placement"
+      ]
+    },
+    {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.Simulation\uB80C\uB354\uB9C1PipelineValidator",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Application",
@@ -2409,6 +2749,31 @@
       "workOrderIds": [],
       "featureKeys": [],
       "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.Simulation\uBD84\uB9AC\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Coordinator",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Application",
+      "componentName": "Ssalddel.Simulation.Application.Simulation\uBD84\uB9AC\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Coordinator",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Application/SimulationSeparatedWorldAssetPlacement.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uD1B5\uD569 \uC138\uACC4\uC790\uC0B0 \uACC4\uD68D\uC744 \uC2E4\uC678\u00B7\uC2E4\uB0B4 \uC2E4\uD589 \uACC4\uD68D\uACFC \uC2E4\uC678 \uD658\uACBD \uD45C\uD604 \uC785\uB825\uC73C\uB85C \uBD84\uB9AC\uD55C\uB2E4.",
+      "boundary": "\uACC4\uD68D \uBD84\uB9AC\uB294 \uC2E4\uC81C Unity \uACF5\uAC04 \uD65C\uC131\uD654\uB098 E7 \uD50C\uB808\uC774 \uC99D\uAC70\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-WORLD-MAP-ASSET-PLACEMENT"
+      ],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "application.separated-world-asset-placement"
+      ]
     },
     {
       "componentId": "Ssalddel.Simulation.Application:Ssalddel.Simulation.Application.Simulation\uD0C0\uB85C\uAC1D\uCCB4\uBC18\uC751PreviewService",
@@ -2649,6 +3014,94 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.ISimulation\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Engine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.ISimulation\uC138\uACC4\uC790\uC0B0\uBC30\uCE58Engine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uC9C0\uB3C4\u00B7\uBCC0\uD654\u00B7\uD658\uACBD \uACB0\uC815\uC5D0\uC11C \uC790\uC0B0 \uBC30\uCE58 \uACC4\uD68D\uC744 \uB9CC\uB4DC\uB294 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uACC4\uC57D\uC740 \uC2E4\uC81C Scene \uD45C\uD604\uC774\uB098 \uD50C\uB808\uC774 \uC785\uB825 \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "contract.world-asset-placement"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.ISimulation\uC9C0\uB3C4\uAD6C\uC131Engine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.ISimulation\uC9C0\uB3C4\uAD6C\uC131Engine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uC9C0\uB3C4\uAD6C\uC131 \uC785\uB825\u00B7H \uACB0\uC18D\u00B7\uC5F0\uACB0\uAD6C\u00B7Anchor\uC758 \uACF5\uD1B5 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uACC4\uC57D\uC740 \uC2E4\uC81C \uC140 \uBC1C\uD604\uC774\uB098 Unity \uBC30\uCE58\uB97C \uC99D\uBA85\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "contract.world-map-composition"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.ISimulation\uD658\uACBD\uBC1C\uC0DDDecisionEngine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.ISimulation\uD658\uACBD\uBC1C\uC0DDDecisionEngine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uD658\uACBD \uBC1C\uC0DD \uD6C4\uBCF4\u00B7\uAC00\uC911\uCE58\u00B7\uACB0\uC815 \uACB0\uACFC\uC758 \uACF5\uD1B5 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uBC1C\uC0DD \uACC4\uC57D\uC740 \uAD8C\uC704 \uAC1C\uCCB4 \uC0DD\uC131\uC744 \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "contract.environment-spawn-decision"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.SimulationActorEquipmentInitialStateRequest",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.SimulationActorEquipmentInitialStateRequest",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationActorEquipmentContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "Actor \uBB3C\uD488 \uC778\uC2A4\uD134\uC2A4\uC640 \uC7A5\uCC29 \uC2AC\uB86F\uC758 \uCD08\uAE30 \uAD8C\uC704 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uC218\uB7C9 \uC7AC\uB8CC \uC6D0\uC7A5\uACFC \uBB3C\uB9AC \uC7A5\uCC29 \uC778\uC2A4\uD134\uC2A4\uB97C \uBD84\uB9AC\uD55C\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.SimulationAreaSetHandoverPlanResponse",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Contracts",
@@ -2741,6 +3194,25 @@
       ]
     },
     {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.SimulationInteriorPlanHandleSnapshot",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.SimulationInteriorPlanHandleSnapshot",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationInteriorPlacementContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uC138\uC158\uC774 \uB3D9\uACB0\uD558\uB294 Interior \uBC30\uCE58 \uACC4\uD68D\uC758 \uCD5C\uC18C \uACC4\uC57D\uACFC hash \uACBD\uACC4\uB97C \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uC0C1\uD0DC \uC0AC\uBCF8 \uACC4\uC57D\uC740 \uC2E4\uC81C Unity \uBC30\uCE58\u00B7\uD1B5\uD589 \uB610\uB294 E5 \uC99D\uAC70\uB97C \uB9CC\uB4E4\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E1.SaveReplayContract",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.SimulationLhWorldProfileResponse",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Contracts",
@@ -2807,6 +3279,29 @@
       ],
       "stepKeys": [
         "contract.local-combat-control-mode"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.SimulationLocalCombatObserverInterventionConfirmRequest",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.SimulationLocalCombatObserverInterventionConfirmRequest",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uD575\uC2EC \uACC4\uC57D\uACFC \uBD88\uBCC0 \uACBD\uACC4\uB97C \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uACC4\uC57D \uC815\uC758\uB294 \uC2E4\uD589 \uD6A8\uACFC\uB098 E \uB2E8\uACC4 \uB2EC\uC131 \uC99D\uAC70\uB97C \uC18C\uC720\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-parallel-battle"
+      ],
+      "stepKeys": [
+        "contract.local-combat-observer-intervention"
       ]
     },
     {
@@ -2922,6 +3417,33 @@
       ],
       "stepKeys": [
         "contract.stream-recipe"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.SimulationYouTube\uD559\uC2B5\uC6D0\uBB38\uAD00\uCE21Snapshot",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.SimulationYouTube\uD559\uC2B5\uC6D0\uBB38\uAD00\uCE21Snapshot",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationBaseReflectionContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "WI-REFLECT-01\uC758 \uC2B9\uC778 \uD559\uC2B5\uC790\uB8CC\uC640 \uAC70\uC810 \uC131\uCC30 \uC0C1\uD0DC \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uACC4\uC57D\uC740 \uC790\uB8CC \uC2B9\uC778, \uC2E4\uD589 \uACB0\uACFC \uB610\uB294 E7 \uD50C\uB808\uC774 \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E1.WorldInteractionContract",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "workOrderIds": [
+        "E9-WO-NATURE-BASE-REFLECTION"
+      ],
+      "featureKeys": [
+        "simulation-session-lifecycle"
+      ],
+      "stepKeys": [
+        "contract.base-reflection-learning-material"
       ]
     },
     {
@@ -3189,6 +3711,83 @@
       "workOrderIds": [],
       "featureKeys": [],
       "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.Simulation\uAC70\uC810\uC131\uCC30Engine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Domain",
+      "componentName": "Ssalddel.Simulation.Domain.Simulation\uAC70\uC810\uC131\uCC30Engine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBaseReflection.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "WI-REFLECT-01\uC758 Preview, Confirm\uACFC \uB2E4\uC74C \uD65C\uB3D9 \uC801\uC6A9\uC744 \uAD8C\uC704 \uC0C1\uD0DC\uC5D0\uC11C \uCC98\uB9AC\uD55C\uB2E4.",
+      "boundary": "\uB3C4\uBA54\uC778 \uC2E4\uD589\uC740 Unity H1 \uC0C1\uD638\uC791\uC6A9, \uC2E4\uC81C \uC785\uB825 \uB610\uB294 E7 \uD3D0\uB8E8\uD504 \uC99D\uAC70\uB97C \uC18C\uC720\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E2.WorldInteractionExecution",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "workOrderIds": [
+        "E9-WO-NATURE-BASE-REFLECTION"
+      ],
+      "featureKeys": [
+        "simulation-session-lifecycle"
+      ],
+      "stepKeys": [
+        "domain.base-reflection"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.Simulation\uACB0\uC815\uC801\uD658\uACBD\uBC1C\uC0DDDecisionEngine",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Domain",
+      "componentName": "Ssalddel.Simulation.Domain.Simulation\uACB0\uC815\uC801\uD658\uACBD\uBC1C\uC0DDDecisionEngine",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldAssetPlacement.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uD658\uACBD \uBC1C\uC0DD \uAC00\uC911\uCE58\uC640 seed\uB97C \uAC19\uC740 Core\uC5D0\uC11C \uACB0\uC815\uC801\uC73C\uB85C \uACC4\uC0B0\uD55C\uB2E4.",
+      "boundary": "\uACB0\uC815 \uACB0\uACFC\uB294 WorldTick Confirm \uC804 \uAD8C\uC704 Spawn\uC774 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "domain.environment-spawn-decision"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.Simulation\uC2B9\uC778\uD559\uC2B5\uC790\uB8CC\uD30C\uC0DD\uC6D0\uC7A5",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Domain",
+      "componentName": "Ssalddel.Simulation.Domain.Simulation\uC2B9\uC778\uD559\uC2B5\uC790\uB8CC\uD30C\uC0DD\uC6D0\uC7A5",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBaseReflection.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uC2B9\uC778 \uC790\uB8CC\uB97C \uBA71\uB4F1 \uB3D9\uAE30\uD654\uD558\uACE0 \uC138\uC158\uC774 \uB3D9\uACB0\uD560 \uBD88\uBCC0 \uC0AC\uBCF8\uC744 \uC81C\uACF5\uD55C\uB2E4.",
+      "boundary": "\uD30C\uC0DD \uC6D0\uC7A5 \uC900\uBE44\uB294 \uAC70\uC810 \uC131\uCC30 \uC2E4\uD589\uC774\uB098 E3 \uD68C\uADC0 \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E2.WorldInteractionExecution",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "workOrderIds": [
+        "E9-WO-NATURE-BASE-REFLECTION"
+      ],
+      "featureKeys": [
+        "simulation-session-lifecycle"
+      ],
+      "stepKeys": [
+        "domain.approved-learning-ledger"
+      ]
     },
     {
       "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.Simulation\uC790\uC6D0\uD6A8\uACFC\uBB36\uC74CValidator",
@@ -3717,6 +4316,25 @@
       "stepKeys": [
         "application.pyeongchang-derivation"
       ]
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Server:Ssalddel.Simulation.Server.Controllers.SimulationActorEquipmentController",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Server",
+      "componentName": "Ssalddel.Simulation.Server.Controllers.SimulationActorEquipmentController",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Server/Controllers/SimulationActorEquipmentController.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uC6D0\uACA9 Host\uC5D0\uC11C \uBCF4\uD3B8 \uBB3C\uD488 \uD68D\uB4DD\u00B7\uC7A5\uCC29 \uACC4\uC57D\uC744 \uAC19\uC740 Simulation Core\uB85C \uC804\uB2EC\uD55C\uB2E4.",
+      "boundary": "HTTP Adapter\uB294 \uC7A5\uCC29 \uACB0\uACFC\uB098 \uB2A5\uB825\uC744 \uC790\uCCB4 \uACC4\uC0B0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E2.RemoteHostAdapter",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
     },
     {
       "componentId": "Ssalddel.Simulation.Server:Ssalddel.Simulation.Server.Controllers.SimulationActualE5SessionsController",
@@ -4342,6 +4960,27 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.InteriorLayoutEngineTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.InteriorLayoutEngineTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/InteriorLayoutEngineTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC2E4\uB0B4 \uACC4\uD68D\uC758 \uACB0\uC815\uC131\u00B7\uC81C\uC57D\u00B7hash \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 \uC2E4\uC81C Scene \uD1B5\uD589\uC774\uB098 Game View \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E3.DeterminismRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.LocalSimulationRuntimeTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -4380,6 +5019,65 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationActorEquipmentTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationActorEquipmentTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uBCF4\uD3B8 \uBB3C\uD488 \uD68D\uB4DD\u00B7\uC7A5\uCC29\uC758 \uAD8C\uC704 \uC0C1\uD0DC, \uACB0\uC815\uC131, \uC800\uC7A5\u00B7\uC7AC\uC0DD\uACFC Local\u00B7Remote \uB3D9\uB4F1\uC131\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 canonical Scene\uC758 \uC2E4\uC81C \uC785\uB825\u00B7Play Mode\u00B7Game View E7 \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationArcanaTownNpcLifeTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationArcanaTownNpcLifeTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationArcanaTownNpcLifeTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uBA54\uC774\uC800 \uC544\uB974\uCE74\uB098 \uD65C\uC131\uD654 \uBC29\uD5A5\uACFC Town NPC \uC0DD\uD65C\uBCF5\uAD6C \uD3D0\uB8E8\uD504\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 \uC2E4\uC81C Unity Game View\uC640 \uC6B4\uC601 \uC0C1\uD488 \uC5F0\uB3D9 \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationAreaBuildingProgressionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationAreaBuildingProgressionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationAreaBuildingProgressionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC601\uC5ED \uAC74\uBB3C \uCE74\uD0C8\uB85C\uADF8\u00B7Nature \uAC74\uC124\u00B7\uD559\uC2B5\u00B7\uC800\uC7A5\u00B7HTTP\uC758 \uACB0\uC815\uC801 \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 Fixture\uB294 \uC2E4\uC81C SimulationWorldShell \uBC30\uCE58\u00B7Play Mode\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.SaveReplayRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-NATURE-AREA-BUILDING-PROGRESSION"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationAreaSetHandoverPlannerTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -4395,6 +5093,27 @@
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
       "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationBaseReflectionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationBaseReflectionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationBaseReflectionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uAC70\uC810 \uC131\uCC30\uC758 \uC2B9\uC778\uC790\uB8CC \uB3D9\uAE30\uD654, Preview, Confirm, \uB2E4\uC74C \uD65C\uB3D9 \uC801\uC6A9\uACFC \uC800\uC7A5 hash\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "Fixture \uAC80\uC99D\uC740 \uC2E4\uC81C Provider \uD638\uCD9C, Unity H1 \uBC30\uCE58, Play Mode \uB610\uB294 Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.SaveReplayRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-NATURE-BASE-REFLECTION"
+      ],
       "featureKeys": [],
       "stepKeys": []
     },
@@ -4684,6 +5403,27 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationLhInteriorPlanHandleServiceTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationLhInteriorPlanHandleServiceTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationLhInteriorPlanHandleServiceTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "LH\uAC00 \uC0DD\uC131\uB41C \uC2E4\uB0B4 handle\uB9CC \uC18C\uBE44\uD558\uACE0 \uC7AC\uBC30\uCE58\uD558\uC9C0 \uC54A\uB294 \uACC4\uC57D\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uACC4\uC57D \uD68C\uADC0\uB294 actual H1 \uACB0\uC18D \uB610\uB294 \uD50C\uB808\uC774 \uC644\uB8CC \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.ContractRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationLhWorldTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -4760,6 +5500,27 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationNaturePlayFlowCycleTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationNaturePlayFlowCycleTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationNaturePlayFlowCycleTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E4",
+      "responsibility": "Nature \uBC1C\uC0B0 \uD68D\uB4DD\uACFC \uC218\uB834 \uC815\uCC45\u00B7NPC \uC704\uC784\uC774 \uD604\uC7A5 \uBCF4\uAE09\uC73C\uB85C \uB2E4\uC2DC \uC5F0\uACB0\uB418\uB294 \uCCAB \uD50C\uB808\uC774 \uC21C\uD658\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 \uC2E4\uC81C SimulationWorldShell \uBC30\uCE58\u00B7Play Mode\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-NATURE-AREA-BUILDING-PROGRESSION"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationNatureSurvivalTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -4779,6 +5540,25 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationNature\uC0DD\uD65C\uAC70\uC810\uB3D9\uB4F1\uC131Tests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationNature\uC0DD\uD65C\uAC70\uC810\uB3D9\uB4F1\uC131Tests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationNature\uC0DD\uD65C\uAC70\uC810\uB3D9\uB4F1\uC131Tests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Nature \uC0DD\uD65C\uAC70\uC810 \uD3D0\uB8E8\uD504\uC758 LocalProcess\u00B7RemoteHost \uACB0\uC815\uC131\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uB3D9\uB4F1\uC131 \uC99D\uAC70\uC640 \uC0AC\uB78C\uC758 Play Mode\u00B7Game View \uC99D\uAC70\uB97C \uAD6C\uBD84\uD55C\uB2E4.",
+      "primarySubmoduleKey": "E3.DeterminismRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationNpcWorkforceTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -4789,6 +5569,25 @@
       "primaryEvidenceStage": "E3",
       "responsibility": "Simulation\u00B7Unity \uACC4\uC57D\uACFC \uACB0\uC815\uC131 \uBC0F \uD68C\uADC0 \uC99D\uAC70\uB97C \uAC80\uC99D\uD55C\uB2E4.",
       "boundary": "\uC790\uB3D9 \uC2DC\uD5D8 \uD1B5\uACFC\uC640 \uC2E4\uC81C Play Mode\u00B7Game View\u00B7E \uC2B9\uACA9 \uC99D\uAC70\uB97C \uAD6C\uBD84\uD55C\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationPlayableLoopEngineInteractionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationPlayableLoopEngineInteractionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationPlayableLoopEngineInteractionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uD3D0\uB8E8\uD504 \uD558\uB098\uC5D0\uC11C WI \uAD8C\uC704 \uC2E4\uD589\uACFC LH\u00B7Sky\u00B7\uC2E4\uB0B4\uC678 \uD45C\uD604 \uC21C\uC11C \uBC0F \uACBD\uACC4\uB97C \uC790\uB3D9 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 SimulationWorldShell \uC2E4\uC81C \uC785\uB825\u00B7Game View E7 \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -4950,6 +5749,63 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationSpatialCompositionSessionBindingTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationSpatialCompositionSessionBindingTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationSpatialCompositionSessionBindingTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uACF5\uAC04 \uC870\uB9BD \uC0C1\uD0DC\uC640 LocalProcess\u00B7RemoteHost \uACB0\uACFC\uC758 \uD68C\uADC0 \uB3D9\uB4F1\uC131\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uD68C\uADC0 \uC2DC\uD5D8\uC774\uBA70 \uC2E4\uC81C Scene \uBC30\uCE58\uB098 Play Mode\u00B7Game View \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E3.LocalRemoteParityRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationSpatialCompositionSessionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationSpatialCompositionSessionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationSpatialCompositionSessionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Hub \uACF5\uAC04 \uC870\uB9BD graph\uC758 WorldTick\u00B7v22 \uC800\uC7A5 \uC7AC\uC0DD\uACFC Local\u00B7Hosted \uB3D9\uB4F1\uC131\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 \uC2E4\uC81C Unity \uBC30\uCE58\u00B7\uD1B5\uD589 \uB610\uB294 E5 \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.SaveReplayRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationSpatialCompositionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationSpatialCompositionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationSpatialCompositionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Hub H1\uBD80\uD130 H4 \uC900\uBE44\uB3C4\uAE4C\uC9C0\uC758 \uACB0\uC815\uC801 \uACF5\uAC04 \uC870\uB9BD \uADDC\uCE59\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uADDC\uCE59 \uC790\uB3D9 \uC2DC\uD5D8\uC740 \uC2E4\uC81C Scene \uBC30\uCE58\u00B7\uD1B5\uD589 \uB610\uB294 E5 \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.DeterminismRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationSurvivalTarotTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -5083,6 +5939,48 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationWorldAssetPlacementTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationWorldAssetPlacementTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationWorldAssetPlacementTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC9C0\uB3C4\uAD6C\uC131\u00B7\uBCC0\uD654 \uAE30\uBC18 \uBC30\uCE58\u00B7\uC2E4\uB0B4 Overlay\u00B7v26 \uC800\uC7A5\uC758 \uACB0\uC815\uC131\uACFC \uD638\uD658\uC744 \uC790\uB3D9 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 SimulationWorldShell Play Mode\u00B7Game View E7 \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationWorldAtmosphereTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationWorldAtmosphereTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationWorldAtmosphereTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC138\uACC4 \uB300\uAE30 \uAD6C\uAC04 \uACB0\uC815\uC131, simulation-save.v25 \uBCF5\uC6D0\uACFC \uC774\uC804 \uC800\uC7A5 hash \uD638\uD658\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 Unity Play Mode, Game View, \uC74C\uD5A5 \uB610\uB294 \uD604\uC2E4 \uAE30\uC0C1 \uAC80\uC99D\uC744 \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E3.DeterminismRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-NATURE-14"
+      ],
+      "workOrderIds": [
+        "E9-WO-NATURE-SKY-ENGINE"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationWorldBusinessRuleCatalogTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -5189,6 +6087,25 @@
       "responsibility": "Simulation\u00B7Unity \uACC4\uC57D\uACFC \uACB0\uC815\uC131 \uBC0F \uD68C\uADC0 \uC99D\uAC70\uB97C \uAC80\uC99D\uD55C\uB2E4.",
       "boundary": "\uC790\uB3D9 \uC2DC\uD5D8 \uD1B5\uACFC\uC640 \uC2E4\uC81C Play Mode\u00B7Game View\u00B7E \uC2B9\uACA9 \uC99D\uAC70\uB97C \uAD6C\uBD84\uD55C\uB2E4.",
       "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationWorldInteractionDeliveryPriorityTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationWorldInteractionDeliveryPriorityTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationWorldInteractionDeliveryPriorityTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "WI \uB2E8\uC704 \uC2E4\uD589 \uC6B0\uC120\uC21C\uC704\uC640 WIP \uD55C\uB3C4 \uACC4\uC57D\uC758 \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC6B0\uC120\uC21C\uC704 \uB300\uC7A5\uC740 E \uB2E8\uACC4 \uB2EC\uC131\uC774\uB098 \uC2E4\uC81C Play Mode \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "E3.ContractRegression",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
@@ -5938,6 +6855,27 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.\uC0C1\uD488\uD2B9\uC131\uD6A8\uACFCDerivationEngineTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.\uC0C1\uD488\uD2B9\uC131\uD6A8\uACFCDerivationEngineTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/\uC0C1\uD488\uD2B9\uC131\uD6A8\uACFCDerivationEngineTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC0C1\uD488 \uADFC\uAC70 \uD2B9\uC131\uC5D0\uC11C \uD30C\uC0DD\uB418\uB294 Item \uD6A8\uACFC \uC815\uC758\uC758 \uACB0\uC815\uC131\u00B7revision\u00B7\uAD8C\uC704 \uCC28\uB2E8\uC744 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uD6A8\uACFC \uC815\uC758 \uC2DC\uD5D8\uC740 \uC2E4\uC81C WI \uC2E4\uD589\u00B7WorldTick \uC801\uC6A9\u00B7Scene\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.DeterminismRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Unity.Tests:Ssalddel.Tests.UnityData.CargoJourneyPresentationTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Unity.Tests",
@@ -6489,6 +7427,27 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.AreaBuildingProgressionPresentationTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity.Tests",
+      "componentName": "Ssalddel.Unity.Tests.AreaBuildingProgressionPresentationTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity.Tests/AreaBuildingProgressionPresentationTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Unity \uC601\uC5ED \uAC74\uBB3C \uC77D\uAE30 \uBAA8\uB378\uC758 \uC2B9\uC778 \uC790\uB8CC \uD544\uD130\uC640 fail-closed \uACBD\uACC4\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC5D4\uC9C4 \uB3C5\uB9BD \uC18C\uBE44\uC790 \uC2DC\uD5D8\uC740 \uC800\uC7A5 Scene\u00B7Play Mode\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.UnityConsumerRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-NATURE-AREA-BUILDING-PROGRESSION"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.CanonicalProductCultivationLifecycleTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Unity.Tests",
@@ -6698,6 +7657,27 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.InteriorPresentationProjectionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity.Tests",
+      "componentName": "Ssalddel.Unity.Tests.InteriorPresentationProjectionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity.Tests/InteriorPresentationProjectionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Unity \uC2E4\uB0B4 Focus\u00B7Reference \uACBD\uACC4\uC640 pinned plan fail-closed\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC5D4\uC9C4 \uB3C5\uB9BD \uC18C\uBE44\uC790 \uC2DC\uD5D8\uC740 \uC800\uC7A5 Scene\u00B7Play Mode\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.UnityConsumerRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.LastSuccessfulLoadRuntimeTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Unity.Tests",
@@ -6770,6 +7750,27 @@
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
       "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.PlayerSensoryPresentationTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity.Tests",
+      "componentName": "Ssalddel.Unity.Tests.PlayerSensoryPresentationTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity.Tests/PlayerSensoryPresentationTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uD50C\uB808\uC774\uC5B4 \uAC10\uAC01 \uD45C\uD604 \uACC4\uC57D\uC758 \uACB0\uC815\uC131\u00B7\uAD8C\uC704 \uBD84\uB9AC\u00B7\uD544\uC218 \uC601\uC5ED \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uACC4\uC57D \uC2DC\uD5D8\uC740 Unity Play Mode\u00B7Game View\u00B7\uC2E4\uC81C \uCCAD\uC74C \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.UnityConsumerRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-NATURE-SURVIVAL-SOLO-PLACEMENT"
+      ],
       "featureKeys": [],
       "stepKeys": []
     },
@@ -7264,6 +8265,27 @@
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
       "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.\uC0C1\uD488\uADFC\uAC70ItemDetailProjectionTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity.Tests",
+      "componentName": "Ssalddel.Unity.Tests.\uC0C1\uD488\uADFC\uAC70ItemDetailProjectionTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity.Tests/\uC0C1\uD488\uADFC\uAC70ItemDetailProjectionTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Unity \uC0C1\uD488 \uADFC\uAC70 Item \uC0C1\uC138\uAC00 Synty VisualKey\u00B7\uD2B9\uC131\u00B7\uD6A8\uACFC\u00B7\uCD9C\uCC98\uB97C \uC77D\uAE30 \uC804\uC6A9\uC73C\uB85C \uD22C\uC601\uD558\uB294\uC9C0 \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC18C\uBE44\uC790 \uC2DC\uD5D8\uC740 \uD074\uB9AD \uC785\uB825\u00B7WI \uD6A8\uACFC \uC801\uC6A9\u00B7\uC800\uC7A5 Scene\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E3.UnityConsumerRegression",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
       "featureKeys": [],
       "stepKeys": []
     },
@@ -7886,6 +8908,56 @@
       "workOrderIds": [],
       "featureKeys": [],
       "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Unity:Ssalddel.Unity.Data.Interiors.InteriorPresentationProjection",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity",
+      "componentName": "Ssalddel.Unity.Data.Interiors.InteriorPresentationProjection",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity/Runtime/Interiors/InteriorPresentationProjection.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E7",
+      "responsibility": "\uC2E4\uB0B4 \uACC4\uD68D\uC744 \uD50C\uB808\uC774\uC5B4 Focus\uC5D0 \uB530\uB978 Unity \uD45C\uD604\uC73C\uB85C \uD22C\uC601\uD55C\uB2E4.",
+      "boundary": "Projection \uCF54\uB4DC\uC640 \uB2E8\uC704 \uC2DC\uD5D8\uC740 \uC800\uC7A5 Scene\u00B7Play Mode\u00B7Game View\uC758 \uC2E4\uC81C \uD50C\uB808\uC774 \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [
+        "simulation-world-streaming"
+      ],
+      "stepKeys": [
+        "unity.interior-plan-presentation"
+      ]
+    },
+    {
+      "componentId": "Ssalddel.Unity:Ssalddel.Unity.Data.Interiors.\uC0C1\uD488\uADFC\uAC70ItemDetailProjection",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity",
+      "componentName": "Ssalddel.Unity.Data.Interiors.\uC0C1\uD488\uADFC\uAC70ItemDetailProjection",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity/Runtime/Interiors/\uC0C1\uD488\uADFC\uAC70ItemDetailProjection.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E7",
+      "responsibility": "\uD50C\uB808\uC774\uC5B4\uAC00 \uC2E4\uB0B4 Item\uC758 \uC2B9\uC778 \uD2B9\uC131\u00B7\uD6A8\uACFC \uC815\uC758\uC640 \uD604\uC2E4 \uAD00\uCE21 \uADFC\uAC70\uB97C \uC77D\uB294 \uC0C1\uC138 \uD22C\uC601 \uCC45\uC784\uC774\uB2E4.",
+      "boundary": "\uC0C1\uC138 Projection\uC740 Item \uC0AC\uC6A9 WI\u00B7Simulation \uD6A8\uACFC \uC801\uC6A9\u00B7\uC800\uC7A5 Scene\u00B7Game View \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT"
+      ],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "unity.marketplace-grounded-item-detail"
+      ]
     },
     {
       "componentId": "Ssalddel.Unity:Ssalddel.Unity.Data.WorldDataContextRuntime",
@@ -8525,6 +9597,25 @@
       "primaryEvidenceStage": "E7",
       "responsibility": "Nature \uC704\uD611 \uACBD\uB85C\uB97C \uD50C\uB808\uC774\uC5B4 \uACBD\uD5D8\uC73C\uB85C \uD45C\uD604\uD55C\uB2E4.",
       "boundary": "\uACBD\uB85C \uD45C\uD604\uC740 \uC704\uD611 \uC0C1\uD0DC\uB098 WI \uACB0\uACFC\uB97C \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Unity:Ssalddel.Unity.ImmersiveWorld.Nature\uC704\uD611\uAD00\uCC30PresentationPolicy",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity",
+      "componentName": "Ssalddel.Unity.ImmersiveWorld.Nature\uC704\uD611\uAD00\uCC30PresentationPolicy",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity/Runtime/\uBAB0\uC785WorldLayoutModels.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E6",
+      "responsibility": "\uC704\uD611 \uAD00\uCC30\uC758 \uD50C\uB808\uC774\uC5B4 \uC9C8\uBB38\u00B7\uC2E0\uD638\u00B7\uB2E4\uC74C \uC120\uD0DD\uC744 \uC815\uC81C\uD55C\uB2E4.",
+      "boundary": "\uCE74\uBA54\uB77C\u00B7\uC560\uB2C8\uBA54\uC774\uC158\u00B7\uC74C\uD5A5 Cue\uB294 \uAD00\uCC30 Confirm\uC774\uB098 \uC704\uD611 \uACB0\uACFC\uB97C \uD655\uC815\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -9556,6 +10647,27 @@
       "secondarySubmoduleKeys": [],
       "worldInteractionIds": [],
       "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Unity:Ssalddel.Unity.PresentationContracts.\uD50C\uB808\uC774\uC5B4\uAC10\uAC01\uD45C\uD604Validator",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity",
+      "componentName": "Ssalddel.Unity.PresentationContracts.\uD50C\uB808\uC774\uC5B4\uAC10\uAC01\uD45C\uD604Validator",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity/Runtime/PresentationContracts/PlayerSensoryPresentationModels.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E6",
+      "responsibility": "\uBC30\uCE58 \uAC1D\uCCB4\uC758 \uCE74\uBA54\uB77C\u00B7\uC560\uB2C8\uBA54\uC774\uC158\u00B7\uC870\uBA85\u00B7\uC74C\uD5A5\u00B7UI \uD45C\uD604 \uACB0\uC18D\uC744 \uC815\uC81C\uD55C\uB2E4.",
+      "boundary": "\uD45C\uD604 \uACC4\uC57D\uACFC \uC790\uB3D9 \uAC80\uC99D\uC740 \uC2E4\uC81C Game View\u00B7\uCCAD\uC74C \uB610\uB294 \uAD8C\uC704 \uC0C1\uD0DC \uC644\uB8CC\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [
+        "E9-WO-NATURE-SURVIVAL-SOLO-PLACEMENT"
+      ],
       "featureKeys": [],
       "stepKeys": []
     },
@@ -11188,11 +12300,11 @@
     }
   ],
   "coverage": {
-    "candidateTypeCount": 544,
-    "annotatedTypeCount": 542,
-    "excludedTypeCount": 2,
+    "candidateTypeCount": 589,
+    "annotatedTypeCount": 586,
+    "excludedTypeCount": 3,
     "uncoveredTypeCount": 0,
-    "annotatedMethodCount": 16
+    "annotatedMethodCount": 17
   },
   "diagnostics": []
 }

@@ -1,0 +1,198 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT",
+  "title": "상품 관측 기반 Town 저층주택 실내공간조립",
+  "playableLoopRefs": [],
+  "evidencePackageRefs": [],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "interior-layout-engine.r1",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "독립 계약·결정적 배치 엔진·상품 승인·LH handle에 이어 승인 특성→효과 정의와 Unity 읽기 전용 상세 골격까지 닫았고 실제 WI 효과와 Town canonical Scene 배선은 아직 열려 있다.",
+    "nextReopenCondition": "실제 Town Structure·VisualKey Mapping·Scene 통행 검증에서 계약 누락이나 잘못된 공간 가정이 발견되면 E9부터 영향을 다시 검토한다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Unity", "Integration"],
+    "ownerRef": "simulation-interior-layout",
+    "reviewerRefs": ["town-world-design", "unity-world-projection"],
+    "allowedChangeRoots": [
+      "Ssalddel.Interior.Contracts/",
+      "Ssalddel.Interior.Domain/",
+      "Ssalddel.Simulation.Application/",
+      "Ssalddel.Simulation.Tests/",
+      "Ssalddel.Unity/",
+      "Ssalddel.Unity.Tests/",
+      "Ssalddel/Services/External/Apify/",
+      "Ssalddel/Services/Options/",
+      "Ssalddel/Extensions/",
+      "Ssalddel.Tests/Services/Content/",
+      "docs/Architecture/",
+      "docs/AI/",
+      "eng/Ssalddel.CodeMap/",
+      "eng/execution-ledgers/work-orders/",
+      "eng/work-areas/"
+    ],
+    "dependencyWorkOrderIds": [],
+    "handoffIn": ["Town H1 주거 생활공간 의미와 실제 BuildingPlacementStableId는 다음 Scene 작업에서 선택한다."],
+    "handoffOut": ["InteriorPlacementPlan handle·VisualKey·상품근거ItemDefinition을 LH, WI 효과 작업과 canonical SimulationWorldShell 조립 작업에 인계한다."],
+    "branchPolicy": "ShortLivedWorkstreamBranch",
+    "commitScope": "실내 계약·엔진·상품 승인·LH·Unity 투영을 되돌릴 수 있는 맥락으로 분리"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "H는 의미만 소유하고 독립 실내공간조립Engine이 Plan을 생성하며 LH는 handle의 준비·활성만 결정한다.",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9",
+      "disposition": "Gap",
+      "summary": "기존 세계가 새 Catalog 때문에 변하지 않도록 revision과 plan hash를 분리했지만 실제 E8 기준선과 Migration 회귀는 없다.",
+      "dimensions": {
+        "changeEnvelope": "Town 주택 PresentationOnly 실내와 승인 상품 참고 근거만 추가한다.",
+        "baselineAndTargetRevision": "E8 기준선 없음; target은 interior-layout-engine.r1이다.",
+        "migrationCompatibility": "Save schema를 바꾸지 않고 새 세계 정의의 InteriorPlanHandle에서 revision을 고정한다.",
+        "rollbackBoundary": "Interior handle을 제거하면 기존 외형·Simulation 상태·WorldLayout은 유지된다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 Town Scene 기준선 후 기존 Save와 Catalog 교체 회귀를 추가한다."
+    },
+    {
+      "code": "E8",
+      "disposition": "Defined",
+      "summary": "NPC 생활과 자율행동에는 연결하지 않는 PresentationOnly 범위다.",
+      "dimensions": {
+        "npcRoleGroup": "NotApplied; 첫 판본은 NPC 역할·판단을 만들지 않는다.",
+        "continuousLifeLoop": "NotApplied; 실내 객체는 생활 폐루프 권위가 아니다.",
+        "playerAbsentBehavior": "같은 pinned plan을 정적으로 재현할 뿐 자율 상태를 변경하지 않는다.",
+        "saveReplay": "개별 물품 상태를 저장하지 않고 세계 정의의 revision과 hash만 향후 고정한다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "NPC 사용 객체 승격 시 별도 WI 작업 명세를 만든다."
+    },
+    {
+      "code": "E7",
+      "disposition": "Blocked",
+      "summary": "Unity 표현 투영 계약은 있으나 SimulationWorldShell 저장 Scene과 실제 Object Focus 입력 증거가 없다.",
+      "dimensions": {
+        "playerLoop": "건물 접근과 Object Focus에서 실내를 보는 읽기 전용 흐름까지만 계획했다.",
+        "authorityModes": "Solo·Hosted 모두 같은 pinned plan을 소비하며 Unity는 상태 권위를 갖지 않는다.",
+        "canonicalScene": "SimulationWorldShell 하나만 사용한다.",
+        "runtimeEvidence": "코드·단위 시험만 통과; Play Mode·Game View 미검증이다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 Town H1 선택 후 canonical Scene에 한 채를 연결한다."
+    },
+    {
+      "code": "E6",
+      "disposition": "Affected",
+      "summary": "승인 상품 관측과 별도 승인 특성 Profile은 실내 Item 효과 정의의 근거이지만 게임 재고·가격·소유 또는 현실 성능 사실이 아니다.",
+      "dimensions": {
+        "worldStateExplanation": "Reference와 승인 Trait Profile은 범주형 Item 다양성과 효과 정의를 설명하지만 DefinitionOnly 상태에서는 Simulation을 바꾸지 않는다.",
+        "groundingProfile": "Optional; 승인 Catalog가 비어도 필수 Fixture는 VisualKey로 생성 가능하다.",
+        "provenanceLimitations": "원상품명·HTTPS URL·관측시각·raw hash·Source revision과 승인 특성 요약만 공개 Projection에 남긴다.",
+        "causalQuestionMatrix": "상품 관측은 효과 정의 근거가 될 수 있지만 실제 인과는 별도 WI Confirm과 Simulation Core 규칙을 통과할 때만 허용한다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 승인 Snapshot에서 허용할 구조화 특성 목록과 승인 절차를 검토한다."
+    },
+    {
+      "code": "E5",
+      "disposition": "Defined",
+      "summary": "현재 객체는 PresentationOnly라 WI 발현 경로를 의도적으로 만들지 않는다.",
+      "dimensions": {
+        "triggerOccurrence": "NotApplicable; 관측 수집 자체와 읽기 전용 실내 표시는 WI가 아니다.",
+        "authorityTransition": "Plan 생성은 표현 세계 정의이며 Simulation 상태 전이가 없다.",
+        "taskEffectResult": "효과는 DefinitionOnly 후보로만 존재하며 Task·Effect·WorldTick 변경이 없다.",
+        "successorOrReturnPath": "건물 이탈 시 LH가 상세 표현을 해제하고 외형으로 돌아간다.",
+        "conditionalSpatialEvidence": "Required; 실제 Structure·통로·문 배치 증거는 Scene 단계에서 필요하다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "상태 변경 객체는 PresentationOnly에서 별도 WI로 명시 승격하고 Item 정의를 Simulation 효과 규칙에 결속한다."
+    },
+    {
+      "code": "E4",
+      "disposition": "Affected",
+      "summary": "Town H1·건물 배치·Definition·Catalog·Seed가 계획 생성 문맥으로 결속된다.",
+      "dimensions": {
+        "allowedTriggerSources": "NotApplicable for WI; Plan 생성은 명시적 세계 조립 과정에서만 호출한다.",
+        "subjectAndTargetBindings": "BuildingPlacementStableId가 대상, H1StableId가 공간 의미 결속이다.",
+        "dataResourceTimeBindings": "WorldSeed, Definition revision, Catalog revision, Generator revision을 입력으로 고정한다.",
+        "spatialApplicability": "Required; Structure bounds, Zone bounds, exclusion과 traversal anchor를 검사한다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 Town H1 기준안과 BuildingPlacementStableId를 연결한다."
+    },
+    {
+      "code": "E3",
+      "disposition": "ReusedWithVerification",
+      "summary": "결정성·제약·승인·LH·상품 특성 효과 hash·Unity fail-closed 자동 시험을 추가했다.",
+      "dimensions": {
+        "contractTests": "Town 5 Zone, 필수 Fixture, PresentationOnly, 안전 Reference Projection을 검사한다.",
+        "determinism": "입력 배열 순서를 뒤집어도 같은 Plan hash와 Item 정의 hash를 검사하고 Rule revision 변경은 새 hash를 만든다.",
+        "saveReplayRegression": "Save schema는 변경하지 않았고 plan pin 불일치 fail-closed를 검사한다.",
+        "consumerRegression": "Simulation Application LH binder, 상품 효과 정의와 Unity Focus·Item 상세 투영 시험을 각각 실행한다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 승인 Fixture Snapshot과 Scene 구조 시험을 추가한다."
+    },
+    {
+      "code": "E2",
+      "disposition": "Defined",
+      "summary": "Contracts·Domain·External Adapter·LH Binder·Unity Projection의 소유 위치를 분리했다.",
+      "dimensions": {
+        "contracts": "Ssalddel.Interior.Contracts가 엔진 독립 계약과 Plan handle을 소유한다.",
+        "applicationDomain": "Ssalddel.Interior.Domain이 결정적 엔진과 canonical hash를 소유한다.",
+        "adapters": "Ssalddel Apify Adapter가 수집·Marketplace normalizer·명시적 승인을 소유한다.",
+        "unityProjection": "Ssalddel.Unity는 Focus별 VisualKey와 Reference 카드 투영만 소유한다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 CompositionRoot에서 모듈 생성과 plan 저장 Adapter를 연결한다."
+    },
+    {
+      "code": "E1",
+      "disposition": "Defined",
+      "summary": "H·실내 엔진·LH·Unity·상품 관측의 불변 책임과 제외 범위를 계약으로 고정했다.",
+      "dimensions": {
+        "purposeAndReturn": "H 의미와 건물 문맥을 InteriorPlacementPlan으로 결정적으로 구체화한다.",
+        "authorityAndAllowedTriggerSources": "Simulation 상태 권위 없음; 명시적 조립 호출과 승인 Catalog만 입력으로 허용한다.",
+        "stableIdsAndRevision": "Building·H1·Definition·Catalog·Generator Stable ID/revision과 Plan hash를 사용한다.",
+        "acceptanceAndExclusions": "PresentationOnly, 새 H 단계 없음, 새 Scene 없음, 가격·재고·소유·WI·유료 호출 제외다."
+      },
+      "sourceReferences": ["docs/Architecture/상품관측기반실내공간조립엔진.md"],
+      "nextAction": "실제 Town Structure 입력이 계약을 만족하는지 검토한다."
+    }
+  ],
+  "upwardValidation": [
+    { "code": "E1", "status": "Passed", "evidence": ["Ssalddel.Interior.Contracts/UnityPackage/Runtime/InteriorLayoutContracts.cs", "Ssalddel.Interior.Contracts/UnityPackage/Runtime/상품근거ItemContracts.cs"], "nextAction": "실제 Town 계약 검토" },
+    { "code": "E2", "status": "Passed", "evidence": ["Ssalddel.Interior.Domain/UnityPackage/Runtime/DeterministicInteriorLayoutEngine.cs", "Ssalddel.Interior.Domain/UnityPackage/Runtime/상품특성효과DerivationEngine.cs", "Ssalddel.Simulation.Application/SimulationLhInteriorPlanHandleService.cs", "Ssalddel.Unity/Runtime/Interiors/InteriorPresentationProjection.cs", "Ssalddel.Unity/Runtime/Interiors/상품근거ItemDetailProjection.cs"], "nextAction": "CompositionRoot와 실제 WI 효과 연결" },
+    { "code": "E3", "status": "Passed", "evidence": ["Ssalddel.Simulation.Tests/InteriorLayoutEngineTests.cs", "Ssalddel.Simulation.Tests/상품특성효과DerivationEngineTests.cs", "Ssalddel.Unity.Tests/InteriorPresentationProjectionTests.cs", "Ssalddel.Unity.Tests/상품근거ItemDetailProjectionTests.cs", "Ssalddel.Tests/Services/Content/ApifyInteriorProductObservationTests.cs"], "nextAction": "Scene 구조와 WI 효과 회귀 시험" },
+    { "code": "E4", "status": "InProgress", "evidence": ["H1StableId와 BuildingPlacementStableId 계약"], "nextAction": "실제 Town H1 결속" },
+    { "code": "E5", "status": "Blocked", "evidence": [], "nextAction": "실제 Structure·문·통로 Scene 증거" },
+    { "code": "E6", "status": "InProgress", "evidence": ["승인 Catalog·Trait Profile·Effect Rule 계보와 읽기 전용 상세 경계 자동 시험"], "nextAction": "승인 Snapshot 구조화 특성 허용 목록 검토" },
+    { "code": "E7", "status": "Blocked", "evidence": [], "nextAction": "SimulationWorldShell Play Mode 검증" },
+    { "code": "E8", "status": "NotStarted", "evidence": [], "nextAction": "NPC 승격 전까지 NotApplied 유지" },
+    { "code": "E9", "status": "NotStarted", "evidence": [], "nextAction": "기존 E8 기준선 이후 호환·회귀 검증" }
+  ],
+  "promotionBlockers": [
+    "실제 Town H1 및 저층주택 Structure revision이 선택되지 않았다.",
+    "SimulationWorldShell 저장 Scene·Synty VisualKey Mapping·Play Mode·Game View가 미검증이다.",
+    "상품근거ItemDefinition은 DefinitionOnly이며 실제 WI·Simulation Core·Save/Replay 효과에 연결되지 않았다.",
+    "기존 E8 세계 기준선과 Migration·Save 회귀가 없다."
+  ],
+  "finalEvidenceReferences": []
+}

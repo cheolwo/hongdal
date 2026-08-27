@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
@@ -7,7 +7,7 @@ $manager = Join-Path $repositoryRoot `
 
 $result = @(& $manager -Mode Validate)
 if (($result -join "`n") -notlike `
-    "*DevelopmentSystemValid:Loops=21;Independent=19;World=1;Cross=1;Evidence=11*") {
+    "*DevelopmentSystemValid:Loops=23;Independent=21;World=1;Cross=1;Evidence=27*") {
     throw "DevelopmentSystemValidationFailed:$($result -join ';')"
 }
 
@@ -18,9 +18,11 @@ foreach ($expected in @(
     "playable-loop:nature-survival-homestead.v1",
     "playable-loop:nature-shelter-foundation.v1",
     "playable-loop:nature-twilight-return.v1",
+    "playable-loop:nature-regional-threat-recovery.v1",
     "playable-loop:nature-night-day2.v1",
     "playable-loop:nature-workbench-foundation.v1",
     "playable-loop:nature-building-learning.v1",
+    "playable-loop:nature-base-reflection.v1",
     "playable-loop:town-order-consume-return.v1",
     "playable-loop:town-arcana-context.v1",
     "playable-loop:farm-crop-cycle.v1",
@@ -32,8 +34,16 @@ foreach ($expected in @(
     "playable-loop:nature-farm-roundtrip.v1",
     "evidence:hub-npc-routine-core-20260825",
     "evidence:nature-building-core-20260825",
+    "evidence:nature-base-reflection-e3-20260826",
     "evidence:nature-shelter-playmode-20260825",
     "evidence:nature-shelter-hosted-parity-20260825",
+    "evidence:nature-regional-threat-core-20260826",
+    "evidence:nature-night-day2-wi13-playmode-20260826",
+    "evidence:nature-night-day2-wi13-hosted-parity-20260826",
+    "evidence:nature-night-day2-wi14-playmode-20260826",
+    "evidence:nature-night-day2-wi14-hosted-parity-20260826",
+    "evidence:nature-night-day2-wi15-playmode-20260826",
+    "evidence:nature-night-day2-wi15-hosted-parity-20260826",
     "evidence:town-arcana-core-20260825")) {
     if (-not $completion.Contains($expected)) {
         throw "DevelopmentCompletionLedgerEntryMissing:$expected"
@@ -70,13 +80,15 @@ function Require-Rejected(
     [string] $ExpectedCode,
     [string] $EvidenceCatalogPath = "") {
     $path = Join-Path $artifactDirectory "$Name.json"
+    $outputPath = Join-Path $artifactDirectory "$Name.md"
     Write-Json $Catalog $path
     $arguments = @(
         "-NoProfile",
         "-ExecutionPolicy", "Bypass",
         "-File", $manager,
-        "-Mode", "Validate",
-        "-PlayableLoopPath", (Relative $path)
+        "-Mode", "Write",
+        "-PlayableLoopPath", (Relative $path),
+        "-OutputPath", (Relative $outputPath)
     )
     if (-not [string]::IsNullOrWhiteSpace($EvidenceCatalogPath)) {
         $arguments += @("-EvidencePackagePath", $EvidenceCatalogPath)
@@ -100,17 +112,27 @@ $unknownWiUnit = $unknownWi.items | Where-Object `
 $unknownWiUnit.worldInteractionIds[0] = "WI-NATURE-UNKNOWN"
 Require-Rejected "unknown-wi" $unknownWi "LoopWiUnknown"
 
+$missingDesign = Read-Loops
+$missingDesignUnit = $missingDesign.items | Where-Object `
+    loopStableId -eq "playable-loop:nature-base-reflection.v1"
+$missingDesignUnit.designDocumentRef = ""
+Require-Rejected "missing-loop-design" $missingDesign `
+    "LoopDesignDocumentMissing:playable-loop:nature-base-reflection.v1"
+
 $falseClosure = Read-Loops
 $falseClosureUnit = $falseClosure.items | Where-Object `
     loopStableId -eq "playable-loop:nature-night-day2.v1"
-$falseClosureUnit.closureStateCode = "CoreClosed"
-Require-Rejected "false-core-closure" $falseClosure "LoopCoreClosureBelowE5"
+$falseClosureUnit.closureStateCode = "PlayClosed"
+Require-Rejected "false-dual-play-closure" $falseClosure `
+    "DualMaturityPlayClosureBelowGate"
 
 $falseWorldClosure = Read-Loops
 $falseWorldClosureUnit = $falseWorldClosure.items | Where-Object `
-    loopStableId -eq "playable-loop:nature-field-supply-return.v1"
+    loopStableId -eq "playable-loop:nature-survival-homestead.v1"
+$falseWorldClosureUnit.currentEvidenceStage = "E8"
+$falseWorldClosureUnit.nextClosureTargetStage = "E9"
 $falseWorldClosureUnit.closureStateCode = "WorldClosed"
-Require-Rejected "false-world-closure" $falseWorldClosure "LoopWorldClosureBelowE8"
+Require-Rejected "false-world-closure" $falseWorldClosure "LoopWorldClosureBelowE9"
 
 $missingInvalidation = Get-Content -LiteralPath $evidencePath -Raw -Encoding UTF8 |
     ConvertFrom-Json
@@ -139,10 +161,26 @@ $falseAggregate = Read-Loops
 $natureParent = $falseAggregate.items | Where-Object `
     loopStableId -eq "playable-loop:nature-survival-homestead.v1"
 $natureParent.currentEvidenceStage = "E5"
+$natureParent.nextClosureTargetStage = "E6"
 $natureParent.closureStateCode = "CoreClosed"
 foreach ($childId in @($natureParent.requiredCoreChildLoopStableIds)) {
     $child = $falseAggregate.items | Where-Object loopStableId -eq $childId
     $child.currentEvidenceStage = "E5"
+    $child.nextClosureTargetStage = "E6"
+    if ($null -ne $child.PSObject.Properties["maturityTracks"]) {
+        $child.maturityTracks.logic.currentStage = "E5"
+        $child.maturityTracks.presentation.currentStage = "E5"
+    }
+    if ($child.closureStateCode -eq "PlayClosed") {
+        $child.closureStateCode = "CoreClosed"
+        $child.statusCode = "InProgress"
+        $child.blockers = @("fixture-incomplete")
+    }
+    if ($childId -eq "playable-loop:nature-shelter-foundation.v1") {
+        $child.closureStateCode = "CoreClosed"
+        $child.statusCode = "InProgress"
+        $child.blockers = @("fixture-incomplete")
+    }
 }
 Require-Rejected "false-aggregate-closure" $falseAggregate `
     "LoopAggregateCoreClosureInvalid"
@@ -151,15 +189,23 @@ $extensionDoesNotBlockCore = Read-Loops
 $natureParent = $extensionDoesNotBlockCore.items | Where-Object `
     loopStableId -eq "playable-loop:nature-survival-homestead.v1"
 $natureParent.currentEvidenceStage = "E5"
+$natureParent.nextClosureTargetStage = "E6"
 $natureParent.closureStateCode = "CoreClosed"
 foreach ($childId in @($natureParent.requiredCoreChildLoopStableIds)) {
     $child = $extensionDoesNotBlockCore.items | Where-Object loopStableId -eq $childId
     $child.currentEvidenceStage = "E5"
+    $child.nextClosureTargetStage = "E6"
+    if ($null -ne $child.PSObject.Properties["maturityTracks"]) {
+        $child.maturityTracks.logic.currentStage = "E5"
+        $child.maturityTracks.presentation.currentStage = "E5"
+    }
     $child.closureStateCode = "CoreClosed"
+    $child.statusCode = "InProgress"
+    $child.blockers = @("fixture-incomplete")
 }
 $natureExtension = $extensionDoesNotBlockCore.items | Where-Object `
     loopStableId -eq "playable-loop:nature-building-learning.v1"
-$natureExtension.currentEvidenceStage = "E4"
+$natureExtension.currentEvidenceStage = "E1"
 $natureExtension.closureStateCode = "Open"
 $positivePath = Join-Path $artifactDirectory "extension-does-not-block-core.json"
 Write-Json $extensionDoesNotBlockCore $positivePath
@@ -168,4 +214,4 @@ $positiveLedgerPath = Join-Path $artifactDirectory "extension-does-not-block-cor
     -OutputPath (Relative $positiveLedgerPath) | Out-Null
 
 Write-Output `
-    "DevelopmentSystemTestsPassed:Loops=21;Evidence=11;GeneratedLedger=1;Negative=7;Positive=1"
+    "DevelopmentSystemTestsPassed:Loops=23;Evidence=27;GeneratedLedger=1;Negative=8;Positive=1"

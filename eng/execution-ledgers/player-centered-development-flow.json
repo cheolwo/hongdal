@@ -1,12 +1,117 @@
 {
-  "schemaVersion": "player-centered-development-flow.v1",
-  "revision": "player-centered-development-flow.r1",
+  "schemaVersion": "player-centered-development-flow.v4",
+  "revision": "player-centered-development-flow.r6",
+  "worldInteractionPolarityQuadrantCatalogPath": "eng/execution-ledgers/world-interaction-polarity-quadrants.json",
   "purpose": "플레이어의 인지, 선택, 재료 획득, 조립, 결과 체감과 다음 선택을 E, WI, H, Simulation, Unity 작업에 끝까지 연결한다.",
   "authority": {
     "developmentViewpoint": "PlayerChoiceAndExperience",
     "authoritativeStateOwner": "SharedSimulationCore",
     "unityRole": "InputAndPresentation",
     "playerCenteredDoesNotGrantUnityStateAuthority": true
+  },
+  "activityTracks": {
+    "classificationOnly": true,
+    "permanentRoleOrMode": false,
+    "roleSwitchApiAllowed": false,
+    "tracks": [
+      {
+        "code": "FieldExpedition",
+        "koreanName": "현장 원정",
+        "playerQuestion": "바깥 위협과 자원에 직접 개입해 무엇을 거점으로 가져올 것인가?"
+      },
+      {
+        "code": "AreaOperation",
+        "koreanName": "영역 운영",
+        "playerQuestion": "현재 재고·위험·우선순위를 보고 다음 행동을 무엇으로 정할 것인가?"
+      },
+      {
+        "code": "AreaManufacturing",
+        "koreanName": "영역 제조·건설",
+        "playerQuestion": "획득한 자원을 어느 H1 작업 장소에서 어떤 기능으로 바꿀 것인가?"
+      }
+    ],
+    "interdependenceRules": [
+      "현장 원정의 성과는 영역 운영과 제조 선택의 재료가 된다.",
+      "영역 제조 결과는 다음 현장 원정의 위험·선택지를 바꿀 수 있다.",
+      "거점 발전과 무관하게 기본 원정·후퇴·회복 경로는 항상 남긴다.",
+      "원격 카드·목록은 우선순위와 상태를 표시할 뿐 H1 제작·건설을 대신 확정하지 않는다."
+    ]
+  },
+  "playFlowCycle": {
+    "classificationOnly": true,
+    "classificationBasis": "ActorActionPurpose",
+    "actualActorBindingDeterminesSecondSign": true,
+    "triggerSourceDoesNotDetermineActorSign": true,
+    "permanentPlayerTrait": false,
+    "areaSetDeterminesFlow": false,
+    "runtimeBalanceMeterEnabled": false,
+    "forcedAlternation": false,
+    "flows": [
+      {
+        "stableId": "play-flow:outward-yang.v1",
+        "code": "Outward",
+        "koreanName": "발산 흐름(陽)",
+        "meaning": "탐사·채집·전투·구조처럼 실제 행위자가 세계의 위협과 기회에 직접 개입한다."
+      },
+      {
+        "stableId": "play-flow:inward-yin.v1",
+        "code": "Inward",
+        "koreanName": "수렴 흐름(陰)",
+        "meaning": "재고·위험을 검토하고 정책·우선순위·위임·회복 방식을 정한다."
+      }
+    ],
+    "transformationBridge": {
+      "stableId": "play-flow-bridge:transformation.v1",
+      "code": "TransformationBridge",
+      "koreanName": "순환 연결부",
+      "activityTrackCodes": ["AreaManufacturing"],
+      "meaning": "발산 성과를 거점 역량으로 바꾸고 수렴 계획을 다음 발산의 보급품으로 바꾼다."
+    },
+    "harmonyRule": {
+      "code": "BidirectionalHandoffClosed",
+      "requiresEqualShare": false,
+      "grantsNumericBonus": false,
+      "punishesSingleFlowPlay": false,
+      "cardInfluenceMode": "PresentationOnly",
+      "completionQuestion": "발산 결과가 수렴 선택으로 인계되고 수렴 결과가 다음 발산 선택을 실제로 바꾸는가?"
+    },
+    "firstProof": {
+      "playableLoopStableId": "playable-loop:nature-field-supply-return.v1",
+      "segments": [
+        {
+          "order": 1,
+          "flowStableId": "play-flow:outward-yang.v1",
+          "worldInteractionIds": ["WI-NATURE-11"],
+          "resultCodes": ["EncounterVictoryRewarded", "NatureSafeChoiceAvailable"]
+        },
+        {
+          "order": 2,
+          "flowStableId": "play-flow:inward-yin.v1",
+          "worldInteractionIds": ["WI-NATURE-13", "WI-NATURE-16", "WI-NATURE-17"],
+          "resultCodes": ["NpcFieldSupplyPolicySelected", "NatureFieldSupplyPackAdded"]
+        },
+        {
+          "order": 3,
+          "flowStableId": "play-flow:outward-yang.v1",
+          "worldInteractionIds": ["WI-NATURE-06", "WI-NATURE-11"],
+          "resultCodes": ["ExpeditionPrepared", "NatureSafeChoiceAvailable"]
+        }
+      ],
+      "handoffs": [
+        {
+          "code": "OutwardToInward",
+          "fromFlowStableId": "play-flow:outward-yang.v1",
+          "toFlowStableId": "play-flow:inward-yin.v1",
+          "requiredResultCodes": ["EncounterVictoryRewarded", "NatureSafeChoiceAvailable"]
+        },
+        {
+          "code": "InwardToOutward",
+          "fromFlowStableId": "play-flow:inward-yin.v1",
+          "toFlowStableId": "play-flow:outward-yang.v1",
+          "requiredResultCodes": ["NatureFieldSupplyPackAdded", "ExpeditionPrepared"]
+        }
+      ]
+    }
   },
   "playerLoop": [
     {
@@ -58,8 +163,9 @@
     { "stage": "E5", "playerQuestion": "필요한 장소를 찾고 이동하고 사용하고 다시 만날 수 있는가?" },
     { "stage": "E6", "playerQuestion": "장소, 원인, 피드백과 귀환을 이해하며 자료 한계가 드러나는가?" },
     { "stage": "E7", "playerQuestion": "저장된 공식 Scene에서 실제 입력으로 선택 폐루프를 끝낼 수 있는가?" },
-    { "stage": "E8", "playerQuestion": "NPC의 생활이 플레이어 선택과 세계 이해를 바꾸는가?" },
-    { "stage": "E9", "playerQuestion": "새 선택을 만들면서 기존 선택 폐루프와 저장을 보존하는가?" }
+    { "stage": "E8", "playerQuestion": "같은 영역에서 완성된 여러 E7 폐루프의 선택·결과·실패·회복·귀환이 조화를 이루는가?" },
+    { "stage": "E9", "playerQuestion": "조립된 폐루프들을 반복 플레이할 때 재미·몰입·완성도가 충분한가?" },
+    { "stage": "E10", "playerQuestion": "승인된 후보가 제한 운영 관찰창에서 안정적으로 계속 플레이되는가?" }
   ],
   "spatialComposition": {
     "directPlayerCompositionLevels": ["H1"],
@@ -85,6 +191,7 @@
   ],
   "sourceDocuments": [
     "docs/Architecture/플레이어중심게임개발업무구조.md",
+    "docs/Architecture/플레이폐루프와증거묶음개발체계.md",
     "docs/Architecture/게임개발업무순서기준.md",
     "docs/Architecture/E성숙도와G관리체계.md",
     "docs/Architecture/LH조립공간과플레이어조립공간구분.md",
@@ -93,7 +200,10 @@
   "sourceLedgers": [
     "eng/execution-ledgers/evidence-stages.json",
     "eng/execution-ledgers/evidence-management-systems.json",
-    "eng/execution-ledgers/e9-wi-h-module-bindings.json",
+    "eng/execution-ledgers/playable-loops.json",
+    "eng/execution-ledgers/evidence-packages.json",
+    "eng/execution-ledgers/e7-vertical-implementation-protocol.json",
+    "eng/execution-ledgers/post-e7-evidence-campaigns.json",
     "eng/world-seedbeds/spatial-formation-modes.v1.json"
   ]
 }

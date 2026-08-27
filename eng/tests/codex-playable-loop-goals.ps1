@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
@@ -15,17 +15,22 @@ if ((Get-FileHash -Algorithm SHA256 -LiteralPath $outputPath).Hash -ne $hash -or
     (Get-Item -LiteralPath $outputPath).LastWriteTimeUtc.Ticks -ne $ticks) {
     throw "CodexPlayableLoopGoalOutputIsNotDeterministic"
 }
-if ($check -notmatch "CodexPlayableLoopGoalsValid:Goals=14") {
+if ($check -notmatch "CodexPlayableLoopGoalsValid:Goals=16") {
     throw "CodexPlayableLoopGoalValidationDidNotComplete"
 }
 
 $generated = Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8
 foreach ($expected in @(
     "playable-loop:nature-shelter-foundation.v1",
-    "WI-NATURE-05",
+    "playable-loop:nature-base-reflection.v1",
+    "playable-loop:nature-regional-threat-recovery.v1",
+    "WI-ACTOR-02",
+    "현재 성숙도 궤적: Presentation",
     "E7 PlayClosed",
+    "폐루프 E6 / WI E5 → E7",
     "Nature → Farm → Hub → Town → City",
-    "Goal WIP: ``1/1``")) {
+    "Goal WIP: ``1/1``",
+    "WI WIP: ``1/1``")) {
     if (-not $generated.Contains($expected)) {
         throw "CodexPlayableLoopGoalGeneratedEntryMissing:$expected"
     }
@@ -46,9 +51,16 @@ function Read-Ledger() {
 function Require-Rejected([string] $Name, [object] $Ledger, [string] $ExpectedCode) {
     $path = Join-Path $artifactDirectory "$Name.json"
     [IO.File]::WriteAllText($path, ($Ledger | ConvertTo-Json -Depth 40), $utf8)
+    $arguments = @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", $manager,
+        "-Mode", "Check",
+        "-InputPath", (Relative $path)
+    )
     $failureText = ""
     try {
-        $failureText = (& pwsh -NoProfile -File $manager -Mode Check -InputPath (Relative $path) 2>&1 | Out-String)
+        $failureText = (& powershell @arguments 2>&1 | Out-String)
     }
     catch {
         $failureText = $_.Exception.Message + "`n" + ($_ | Out-String)
@@ -68,7 +80,7 @@ $secondActive.items[1].goalStateCode = "Active"
 Require-Rejected "two-active-goals" $secondActive "ActiveGoalCountInvalid"
 
 $e9Target = Read-Ledger
-$e9Target.items[1].targetEvidenceStage = "E9"
+$e9Target.items[2].targetEvidenceStage = "E9"
 Require-Rejected "e9-immediate-target" $e9Target "TargetEvidenceStageDrift"
 
 $wrongWi = Read-Ledger
@@ -76,7 +88,19 @@ $wrongWi.items[0].nextWorldInteractionId = "WI-FARM-01"
 $wrongWi.activeGoal.activeWorldInteractionId = "WI-FARM-01"
 Require-Rejected "wi-outside-loop" $wrongWi "NextWorldInteractionOutsideLoop"
 
-Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=3;Negative=4"
+$missingPlayableUnit = Read-Ledger
+$missingPlayableUnit.items = @($missingPlayableUnit.items | Select-Object -First 15)
+Require-Rejected "missing-playable-unit" $missingPlayableUnit `
+    "PlayableUnitGoalCoverageCountInvalid"
+
+$extensionBeforeCore = Read-Ledger
+$coreOrder = $extensionBeforeCore.items[10].queueOrder
+$extensionBeforeCore.items[10].queueOrder = $extensionBeforeCore.items[11].queueOrder
+$extensionBeforeCore.items[11].queueOrder = $coreOrder
+Require-Rejected "extension-before-core" $extensionBeforeCore `
+    "CoreGoalAfterExtensionPhase"
+
+Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=3;Negative=6;Goals=16"
 Write-Output $first
 Write-Output $second
 Write-Output $check

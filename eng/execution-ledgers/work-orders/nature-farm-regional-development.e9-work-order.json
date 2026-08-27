@@ -1,8 +1,13 @@
 {
-  "schemaVersion": "simulation-e9-vertical-work-order.v1",
-  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
   "workOrderId": "E9-WO-NATURE-FARM-REGIONAL-DEVELOPMENT",
   "title": "Nature 위협 대응에서 Farm 공간 발전으로 돌아오는 수직 구현",
+  "playableLoopRefs": [
+    "playable-loop:nature-regional-threat-recovery.v1",
+    "playable-loop:nature-farm-roundtrip.v1"
+  ],
+  "evidencePackageRefs": ["evidence:nature-regional-threat-core-20260826"],
   "workType": "NewVerticalSlice",
   "targetEvidenceStage": "E9",
   "currentEvidenceStage": "E2",
@@ -14,6 +19,42 @@
     "currentPass": "UpwardAssemblyAndValidation",
     "lastReassessment": "지역 사건·전투·Farm 발전 책임 분리 뒤 E2 구현 상태와 E4~E7 누락을 다시 판정했다.",
     "nextReopenCondition": "WI-FARM-07~09 또는 Unity 귀환 플레이가 사건·기회·H 성장 계약을 바꾸면 E9→E1 검토를 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": [
+      "Simulation",
+      "Unity",
+      "Integration"
+    ],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": [
+      "workstream:unity",
+      "workstream:integration"
+    ],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application/RuntimeCore",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "eng/world-seedbeds",
+      "docs/Architecture",
+      "docs/AI"
+    ],
+    "dependencyWorkOrderIds": [
+      "E9-WO-NATURE-SURVIVAL-SOLO-PLACEMENT"
+    ],
+    "handoffIn": [
+      "Nature 위협 결과와 Farm 독립 발전 기회 계약",
+      "Nature와 Farm 각각의 독립 폐루프 준비 상태"
+    ],
+    "handoffOut": [
+      "지역 발전 WI 후보와 Farm H 성장 판정",
+      "선택적 Nature↔Farm 통합의 양방향 귀환 계약"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "지역 인과·Farm 발전·Unity 귀환을 각각 되돌릴 수 있는 맥락으로 커밋"
   },
   "authorityProfile": {
     "simulationCore": "SharedSimulationCore",

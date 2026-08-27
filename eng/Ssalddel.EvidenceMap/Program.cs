@@ -16,10 +16,10 @@ using Ssalddel.Unity.Tests;
 
 var repositoryRoot = FindRepositoryRoot();
 var moduleCatalogPath = Path.Combine(repositoryRoot, "eng", "execution-ledgers",
-    "e9-refactor-module-catalog.json");
+    "evidence-responsibility-module-catalog.json");
 var moduleCatalog = JsonSerializer.Deserialize<ModuleCatalogDocument>(
     File.ReadAllText(moduleCatalogPath, Encoding.UTF8), JsonOptions())
-    ?? throw new InvalidOperationException("E9 모듈 대장을 읽을 수 없습니다.");
+    ?? throw new InvalidOperationException("E 책임 모듈 대장을 읽을 수 없습니다.");
 
 var assemblies = new[]
 {
@@ -245,11 +245,11 @@ static int ParseStage(string stage)
 
 static void ValidateModuleCatalog(ModuleCatalogDocument catalog)
 {
-    var expected = Enumerable.Range(1, 9).Select(value => "E" + value).ToArray();
+    var expected = Enumerable.Range(1, 10).Select(value => "E" + value).ToArray();
     var actual = catalog.Modules.OrderBy(item => ParseStage(item.EvidenceStage))
         .Select(item => item.EvidenceStage).ToArray();
     if (!actual.SequenceEqual(expected, StringComparer.Ordinal))
-        throw new InvalidOperationException("E9 모듈 대장은 E1~E9를 각각 하나씩 가져야 합니다.");
+        throw new InvalidOperationException("E 책임 모듈 대장은 E1~E10을 각각 하나씩 가져야 합니다.");
     foreach (var definition in SsalddelEvidenceStageDefinitionCatalog.All)
     {
         var source = catalog.Modules.Single(item => item.EvidenceStage ==
@@ -258,7 +258,7 @@ static void ValidateModuleCatalog(ModuleCatalogDocument catalog)
             source.KoreanName != definition.KoreanName ||
             source.TechnicalName != definition.TechnicalName)
             throw new InvalidOperationException(
-                $"E9 모듈 대장과 C# 투영이 다릅니다: {source.EvidenceStage}");
+                $"E 책임 모듈 대장과 C# 투영이 다릅니다: {source.EvidenceStage}");
     }
     var submodules = SsalddelEvidenceSubmoduleDefinitionCatalog.All;
     if (submodules.Count != 15 || submodules.Select(item => item.SubmoduleKey)
@@ -328,7 +328,7 @@ static string BuildMarkdown(EvidenceMapDocument document)
     var builder = new StringBuilder();
     builder.AppendLine("# E 책임 코드 지도");
     builder.AppendLine();
-    builder.AppendLine("> 이 문서는 C# E 책임 Attribute와 E9 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.");
+    builder.AppendLine("> 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.");
     builder.AppendLine();
     builder.AppendLine($"- 후보 타입: `{document.Coverage.CandidateTypeCount}`");
     builder.AppendLine($"- 책임 지정: `{document.Coverage.AnnotatedTypeCount}`");

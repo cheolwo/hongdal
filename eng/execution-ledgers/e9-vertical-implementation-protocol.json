@@ -1,9 +1,11 @@
 {
   "schemaVersion": "simulation-e9-vertical-implementation-protocol.v1",
-  "revision": "simulation-e9-vertical-implementation-protocol.r3",
-  "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
-  "workOrderSchemaVersion": "simulation-e9-vertical-work-order.v1",
+  "revision": "simulation-e9-vertical-implementation-protocol.r4",
+  "evidenceStageCatalogPath": "eng/execution-ledgers/compatibility/evidence-stages.legacy-r10.json",
+  "workOrderSchemaVersion": "simulation-e9-vertical-work-order.v2",
   "refactorModuleCatalogPath": "eng/execution-ledgers/e9-refactor-module-catalog.json",
+  "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
+  "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
   "principles": {
     "targetFirstPlanningDoesNotClaimE9Evidence": true,
     "everyStageMustBeAssessed": true,
@@ -46,6 +48,24 @@
     "ImpactReassessment",
     "StableOrExplicitlyBlocked"
   ],
+  "collaborationPolicy": {
+    "allowedWorkstreams": [
+      "Operations",
+      "Simulation",
+      "Unity",
+      "Integration",
+      "ProjectGovernance"
+    ],
+    "allowedBranchPolicies": [
+      "ShortLivedWorkstreamBranch",
+      "ExistingScopedBranch"
+    ],
+    "primaryWorkstreamMustParticipate": true,
+    "ownerAndReviewerRequired": true,
+    "allowedChangeRootsRequired": true,
+    "handoffInAndOutRequired": true,
+    "commitScopeRequired": true
+  },
   "iterationCycle": {
     "cycleCode": "E9-E1-E9-Repeat",
     "stepOrder": [

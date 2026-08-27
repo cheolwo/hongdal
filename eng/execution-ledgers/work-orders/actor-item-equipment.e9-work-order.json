@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-ACTOR-ITEM-EQUIPMENT",
+  "title": "보편 물품 획득·장착 WI와 Nature 도끼 특화",
+  "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"],
+  "evidencePackageRefs": [],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E5",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "actor-equipment.r1/simulation-save.v27",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "획득과 장착을 분리하고 장착 인스턴스에서 능력을 파생하도록 공통 Core·Local·Remote·Unity 소비 경계를 조립했다.",
+    "nextReopenCondition": "실제 Play Mode에서 입력·표현·저장 복원이 다르거나 기존 v1~v26 호환 hash가 달라지면 가장 이른 계약·저장 단계를 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Unity", "Integration", "ProjectGovernance"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:unity", "workstream:integration"],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application/RuntimeCore",
+      "Ssalddel.Simulation.Server",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "docs/Architecture",
+      "docs/AI",
+      "C:/Users/user/ssalddel/Assets/Ssalddel"
+    ],
+    "dependencyWorkOrderIds": ["E9-WO-NATURE-SURVIVAL-SOLO-PLACEMENT"],
+    "handoffIn": ["Nature 도끼 획득·벌목 E7 기준선과 simulation-save.v26 이하 호환 계약"],
+    "handoffOut": ["WI-ACTOR-01·02 계약, actor-equipment.r1 상태 사본, simulation-save.v27, Unity I 장착 상태창"],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "보편 물품·장착 계약과 Nature 도끼 소비 경계로 제한"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "보편 장착 WI는 NotApplicable, 구체 획득 WI만 H 공간 결속",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {"code":"E9","disposition":"Affected","summary":"기존 Nature 도끼 계약에 보편 획득·장착 상태를 호환 확장한다.","dimensions":{"changeEnvelope":"물품 인스턴스·8개 슬롯·장착 능력·v27 저장","baselineAndTargetRevision":"v26 이하에서 actor-equipment.r1/v27","migrationCompatibility":"기존 Save hash와 LegacyAutoEquipCompatibility 유지","rollbackBoundary":"새 ActorEquipment 입력이 없으면 기존 Nature 자동 장착 의미 유지"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"기존 Save 전체 회귀 뒤 상위 승격은 별도 검토한다."},
+    {"code":"E8","disposition":"ReusedWithVerification","summary":"NPC 생활세계는 변경하지 않고 향후 같은 공통 장착 계약을 사용할 수 있게 한다.","dimensions":{"npcRoleGroup":"이번 범위는 플레이어 한 명, NPC 장착은 후속","continuousLifeLoop":"변경 없음","playerAbsentBehavior":"변경 없음","saveReplay":"v27 상태 사본은 Actor 식별자를 보존"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"NPC 장착 판단은 별도 PlayableLoop에서 연다."},
+    {"code":"E7","disposition":"Gap","summary":"canonical Scene에서 도끼 획득 뒤 I 상태창으로 장착하고 벌목·저장·재진입을 실제 입력으로 확인해야 한다.","dimensions":{"playerLoop":"획득→I→MainHand 장착→벌목→해제 시 차단→저장 복원","authorityModes":"LocalProcess와 RemoteHost 같은 Core","canonicalScene":"SimulationWorldShell","runtimeEvidence":"Play Mode·Game View·Console 증거 미확보"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"실행 중 Editor 잠금 해소 뒤 실제 입력 검증을 수행한다."},
+    {"code":"E6","disposition":"Affected","summary":"획득과 장착의 차이, 슬롯·능력·차단 이유를 상태창과 손 도구 표현으로 설명한다.","dimensions":{"worldStateExplanation":"획득은 Inventory, 장착은 Equipped와 capability 파생","groundingProfile":"NotApplied; 현실 자료가 필요하지 않은 게임 규칙","provenanceLimitations":"Synty 도구 Prefab은 표현이며 권위를 변경하지 않음","causalQuestionMatrix":"획득·장착·능력·작업 허용·저장 복원을 분리 판정"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"Game View에서 상태와 문맥 행동이 읽히는지 확인한다."},
+    {"code":"E5","disposition":"Affected","summary":"공통 획득·장착 Confirm이 권위 상태와 벌목 가능 여부를 실제로 바꾼다.","dimensions":{"triggerOccurrence":"플레이어 획득·장착 명령","authorityTransition":"WorldPickup→Inventory→Equipped 또는 해제","taskEffectResult":"ItemAcquired·ItemEquipmentChanged와 capability 파생","successorOrReturnPath":"장착된 도끼로 WI-NATURE-06 벌목, 해제 시 차단","conditionalSpatialEvidence":"보편 WI는 NotApplicable, WI-NATURE-05는 기존 H 결속 재사용"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"Runtime 소비 상태와 저장 재진입을 확인한다."},
+    {"code":"E4","disposition":"Defined","summary":"PlayerDriven 행위자·고유 물품·슬롯·장착 개정을 결속하고 보편 WI의 공간은 NotApplicable로 둔다.","dimensions":{"allowedTriggerSources":"PlayerDriven, 향후 NpcDriven 허용","subjectAndTargetBindings":"ActorStableId·ItemInstanceStableId·SlotCode","dataResourceTimeBindings":"ItemDefinition·EquipmentRevision·즉시 완료","spatialApplicability":"보편 WI NotApplicable, 특화 획득 WI Required"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"특화 WI가 보편 계약을 우회하지 않는지 검증한다."},
+    {"code":"E3","disposition":"Affected","summary":"분리·멱등성·능력 파생·v27 Replay·Local/Remote 동등성을 자동 검증한다.","dimensions":{"contractTests":"획득 Preview/Confirm, Equip/Unequip/Swap 계약","determinism":"정렬된 정의·인스턴스·슬롯 state hash","saveReplayRegression":"v27 복원·Replay와 v1~v26 유지","consumerRegression":"서버와 Unity Presentation·EditMode·PlayMode 어셈블리 컴파일"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"기존 넓은 회귀와 Unity Test Runner를 수행한다."},
+    {"code":"E2","disposition":"Affected","summary":"공통 계약·Aggregate·Application Runtime·HTTP Adapter·Unity 소비 인터페이스를 추가한다.","dimensions":{"contracts":"SimulationActorEquipmentContracts","applicationDomain":"경영SimulationSessionAggregate actor-equipment partial","adapters":"LocalSimulationRuntime와 SimulationActorEquipmentController","unityProjection":"Nature생존Controller I 상태창과 손 도끼"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"공개 경계 소비자 회귀를 유지한다."},
+    {"code":"E1","disposition":"Defined","summary":"획득과 장착은 별도 WI이며 도구 능력은 장착 상태에서만 생긴다.","dimensions":{"purposeAndReturn":"도구를 찾아 소유하고 원하는 슬롯에 장착해 다음 행동을 연다.","authorityAndAllowedTriggerSources":"Simulation Core, PlayerDriven·NpcDriven","stableIdsAndRevision":"WI-ACTOR-01, WI-ACTOR-02, actor-equipment.r1, simulation-save.v27","acceptanceAndExclusions":"물리 물품만 포함, 역할 카드·전투 편성·지형 평탄화 v28 제외"},"sourceReferences":["docs/Architecture/플레이어중심게임개발업무구조.md"],"nextAction":"계약 변경 시 v27 호환 경계를 다시 검토한다."}
+  ],
+  "upwardValidation": [
+    {"code":"E1","status":"Passed","evidence":["WI-ACTOR-01·02와 물리 장착 원장 경계"],"nextAction":"변경 시 재검토"},
+    {"code":"E2","status":"Passed","evidence":["공통 계약·Domain·Local·HTTP·Unity 소비 코드"],"nextAction":"소비자 회귀 유지"},
+    {"code":"E3","status":"Passed","evidence":["SimulationActorEquipmentTests 5/5, Nature 기존 시험 46/46, 서버와 Unity 시험 어셈블리 빌드 오류 0"],"nextAction":"Unity Test Runner 실행"},
+    {"code":"E4","status":"Passed","evidence":["PlayerDriven Actor·Item·Slot·Revision 결속과 공간 NotApplicable 검사"],"nextAction":"NpcDriven 특화는 후속"},
+    {"code":"E5","status":"Passed","evidence":["획득·장착·해제에 따른 벌목 능력 허용·차단과 v27 상태 발현"],"nextAction":"Unity Runtime 인계 확인"},
+    {"code":"E6","status":"InProgress","evidence":["I 상태창·8개 슬롯·손 도끼 표현 코드와 컴파일"],"nextAction":"실제 Game View 판독"},
+    {"code":"E7","status":"Blocked","evidence":[],"nextAction":"실행 중 Unity Editor 잠금 해소 뒤 실제 입력·저장 재진입"},
+    {"code":"E8","status":"NotStarted","evidence":[],"nextAction":"영역 조화와 NPC 공용 장착은 후속"},
+    {"code":"E9","status":"Blocked","evidence":[],"nextAction":"E7 이후 사람 통합 플레이와 호환 회귀"}
+  ],
+  "promotionBlockers": [
+    "실행 중 Unity Editor 때문에 새 Test Runner와 실제 Play Mode·Game View 검증을 수행하지 못했다.",
+    "도끼 획득 이후 명시적 장착이 추가되어 기존 Nature E7 실제 입력 증거를 재검증해야 한다.",
+    "지형 평탄화 WI-WORLD-09와 simulation-save.v28은 후속 작업이며 이번 승격 근거가 아니다."
+  ],
+  "finalEvidenceReferences": []
+}

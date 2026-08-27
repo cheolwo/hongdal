@@ -31,6 +31,7 @@ public enum SsalddelEvidenceSubjectKind
     HumanPlaytestCampaign = 4,
     LimitedOperationWindow = 5,
     LimitedOperationCandidate = LimitedOperationWindow,
+    PlayableUnitStabilityCampaign = 6,
 }
 
 public static class SsalddelEvidenceModelRevisions
@@ -38,7 +39,8 @@ public static class SsalddelEvidenceModelRevisions
     public const string LegacyChangeAdaptiveR10 = "legacy-change-adaptive.r10";
     public const string HorizontalHarmonyR1 = "horizontal-harmony-evidence.r1";
     public const string HorizontalDualCycleR2 = "horizontal-dual-cycle-evidence.r2";
-    public const string Current = HorizontalDualCycleR2;
+    public const string HorizontalDualCycleR3 = "horizontal-dual-cycle-evidence.r3";
+    public const string Current = HorizontalDualCycleR3;
 }
 
 public sealed record SsalddelEvidenceStageHandle
@@ -80,11 +82,11 @@ public sealed record SsalddelEvidenceStageHandle
             >= SsalddelEvidenceStage.E1 and <= SsalddelEvidenceStage.E7
                 => subjectKind == SsalddelEvidenceSubjectKind.PlayableUnit,
             SsalddelEvidenceStage.E8
+                => subjectKind ==
+                    SsalddelEvidenceSubjectKind.PlayableUnitStabilityCampaign,
+            SsalddelEvidenceStage.E9
                 => subjectKind is SsalddelEvidenceSubjectKind.AreaHarmonySet
                     or SsalddelEvidenceSubjectKind.WorldHarmonySet,
-            SsalddelEvidenceStage.E9
-                => subjectKind ==
-                    SsalddelEvidenceSubjectKind.HumanPlaytestCampaign,
             SsalddelEvidenceStage.E10
                 => subjectKind ==
                     SsalddelEvidenceSubjectKind.LimitedOperationWindow,
@@ -281,17 +283,27 @@ public interface IE6세계정제Module : IE단계Module { }
     Boundary = "모듈 타입 존재는 E7 증거 완료가 아니다.")]
 public interface IE7플레이경험폐루프Module : IE단계Module { }
 [SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E8,
-    "둘 이상의 E7 폐루프가 영역 안에서 조화를 이루는지 검토할 공통 모듈 이름을 제공한다.",
+    "한 E7 폐루프의 반복 결정성·저장 재진입·Host 동등성·실제 입력 안정성을 검토할 공통 모듈 이름을 제공한다.",
     Boundary = "모듈 타입 존재는 E8 증거 완료가 아니다.")]
-public interface IE8영역폐루프조화Module : IE단계Module { }
+public interface IE8개별폐루프안정Module : IE단계Module { }
 [SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E9,
-    "E8 조화본을 사람이 반복 플레이하며 개선하는 책임의 공통 모듈 이름을 제공한다.",
+    "같은 영역의 안정 Core 둘 이상이 조화로운지 검증하고 사람이 후보를 승인하는 공통 모듈 이름을 제공한다.",
     Boundary = "모듈 타입 존재는 E9 증거 완료가 아니다.")]
-public interface IE9사람통합플레이개선Module : IE단계Module { }
+public interface IE9영역조화사람승인Module : IE단계Module { }
 [SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E10,
     "승인된 후보 빌드의 제한 운영을 검증하는 책임의 공통 모듈 이름을 제공한다.",
     Boundary = "모듈 타입 존재는 E10 증거 완료나 운영 권한 부여가 아니다.")]
 public interface IE10제한운영검증Module : IE단계Module { }
+
+[SsalddelEvidenceCoverageExclusion(
+    SsalddelEvidenceCoverageExclusionCategory.CompatibilityFacade,
+    "horizontal-dual-cycle-evidence.r2의 E8 영역 조화 이름을 읽기 위해 보존한다.")]
+public interface IE8영역폐루프조화Module : IE단계Module { }
+
+[SsalddelEvidenceCoverageExclusion(
+    SsalddelEvidenceCoverageExclusionCategory.CompatibilityFacade,
+    "horizontal-dual-cycle-evidence.r2의 E9 사람 개선 이름을 읽기 위해 보존한다.")]
+public interface IE9사람통합플레이개선Module : IE단계Module { }
 
 [SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E8,
     "NPC 판단·이동·WI·결과·다음 판단이 영역 폐루프 사이에서 이어지는지 검토한다.",
@@ -336,9 +348,9 @@ public static class SsalddelEvidenceStageDefinitionCatalog
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E7,
                 "G2", "플레이 경험 폐루프", "E7플레이경험폐루프Module"),
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E8,
-                "G3", "영역 폐루프 조화", "E8영역폐루프조화Module"),
+                "G3", "개별 폐루프 안정", "E8개별폐루프안정Module"),
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E9,
-                "G4", "사람 통합 플레이 개선", "E9사람통합플레이개선Module"),
+                "G4", "영역 조화·사람 승인", "E9영역조화사람승인Module"),
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E10,
                 "G5", "제한 운영 검증", "E10제한운영검증Module"),
         };

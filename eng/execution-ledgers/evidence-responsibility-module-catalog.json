@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "simulation-evidence-responsibility-module-catalog.v1",
+  "revision": "simulation-evidence-responsibility-module-catalog.r3",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "modules": [
+    { "evidenceStage": "E1", "managementSystem": "G1", "koreanName": "핵심 계약", "technicalName": "E1핵심계약Module" },
+    { "evidenceStage": "E2", "managementSystem": "G1", "koreanName": "실행 경계", "technicalName": "E2실행경계Module" },
+    { "evidenceStage": "E3", "managementSystem": "G1", "koreanName": "회귀 증거", "technicalName": "E3회귀증거Module" },
+    { "evidenceStage": "E4", "managementSystem": "G1", "koreanName": "실행 문맥 결속", "technicalName": "E4실행문맥결속Module" },
+    { "evidenceStage": "E5", "managementSystem": "G1", "koreanName": "세계 발현", "technicalName": "E5세계발현Module" },
+    { "evidenceStage": "E6", "managementSystem": "G1", "koreanName": "세계 정제", "technicalName": "E6세계정제Module" },
+    { "evidenceStage": "E7", "managementSystem": "G2", "koreanName": "플레이 경험 폐루프", "technicalName": "E7플레이경험폐루프Module" },
+    { "evidenceStage": "E8", "managementSystem": "G3", "koreanName": "개별 폐루프 안정", "technicalName": "E8개별폐루프안정Module" },
+    { "evidenceStage": "E9", "managementSystem": "G4", "koreanName": "영역 조화·사람 승인", "technicalName": "E9영역조화사람승인Module" },
+    { "evidenceStage": "E10", "managementSystem": "G5", "koreanName": "제한 운영 검증", "technicalName": "E10제한운영검증Module" }
+  ]
+}

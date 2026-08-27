@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-TEMPLATE",
+  "title": "새 PlayableUnit 수직 구현 작업",
+  "playableUnitStableId": "playable-loop:작성-필요.v1",
+  "activeWorldInteractionId": "WI-작성-필요",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E0",
+  "promotionEligible": false,
+  "iterationState": {
+    "currentPass": "DownwardImpactReview",
+    "nextReopenCondition": "상향 검증에서 계약·권위·표현·귀환 결함이 발견되면 가장 이른 E1~E7을 다시 연다."
+  },
+  "changeImpactReviewRef": "",
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E0",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "실제 명령열과 권위 결과 동등성을 작성한다." },
+        { "code": "E6", "disposition": "Gap", "summary": "상태와 인과 설명을 작성한다." },
+        { "code": "E5", "disposition": "Gap", "summary": "권위 세계 발현과 귀환을 작성한다." },
+        { "code": "E4", "disposition": "Gap", "summary": "실행 문맥 결속을 작성한다." },
+        { "code": "E3", "disposition": "Gap", "summary": "결정성·저장·재생 회귀를 작성한다." },
+        { "code": "E2", "disposition": "Gap", "summary": "공통 Core와 Adapter 경계를 작성한다." },
+        { "code": "E1", "disposition": "Gap", "summary": "권위 계약과 반환 상태를 작성한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E2", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E3", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E4", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E5", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E6", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E7", "status": "NotStarted", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E0",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "실제 입력·Game View·귀환 판독을 작성한다." },
+        { "code": "E6", "disposition": "Gap", "summary": "크기·배치·카메라·피드백 정제를 작성한다." },
+        { "code": "E5", "disposition": "Gap", "summary": "권위 상태 사본의 표현 자료를 작성한다." },
+        { "code": "E4", "disposition": "Gap", "summary": "H 기준점·조준·문맥 안내를 작성한다." },
+        { "code": "E3", "disposition": "Gap", "summary": "Prefab·표현 상태·입력 후보를 작성한다." },
+        { "code": "E2", "disposition": "Gap", "summary": "대상·위험·선택의 표현 언어를 작성한다." },
+        { "code": "E1", "disposition": "Gap", "summary": "플레이어가 보아야 할 정보 계약을 작성한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E2", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E3", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E4", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E5", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E6", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E7", "status": "NotStarted", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E0",
+    "status": "NotStarted",
+    "candidateRevision": "",
+    "evidenceRefs": [],
+    "openFeedbackRefs": []
+  }
+}

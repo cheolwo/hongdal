@@ -33,6 +33,8 @@ using Ssalddel.Contracts.Common.Metadata;
 [assembly: TypeForwardedTo(typeof(IE5세계발현Module))]
 [assembly: TypeForwardedTo(typeof(IE6세계정제Module))]
 [assembly: TypeForwardedTo(typeof(IE7플레이경험폐루프Module))]
+[assembly: TypeForwardedTo(typeof(IE8개별폐루프안정Module))]
+[assembly: TypeForwardedTo(typeof(IE9영역조화사람승인Module))]
 [assembly: TypeForwardedTo(typeof(IE8영역폐루프조화Module))]
 [assembly: TypeForwardedTo(typeof(IE9사람통합플레이개선Module))]
 [assembly: TypeForwardedTo(typeof(IE10제한운영검증Module))]

@@ -44,7 +44,7 @@ Hub 입고, 현장 전투, Nature 탐험 조우와 실제 E5 Network는 아직 �
 
 ## 이관 관문
 
-이 리팩토링의 하향 영향과 상향 재조립 상태는 [`solo-first-simulation-runtime.e9-work-order.json`](../../eng/execution-ledgers/work-orders/solo-first-simulation-runtime.e9-work-order.json)을 기준으로 관리한다. 기능별 Adapter를 수평으로 계속 추가하는 대신 `E9→E1` 영향 분석을 먼저 끝내고, 가장 낮은 미완료 단계부터 `E1→E9` 순서로 다시 검증한다. 현재는 E3까지 통과했고 다음 관문은 영향받은 WI–H1 결속과 Farm 내부 반환 계약을 닫는 E4다.
+이 리팩토링의 과거 하향 영향과 상향 재조립 기록은 [`solo-first-simulation-runtime.e9-work-order.json`](../../eng/execution-ledgers/work-orders/solo-first-simulation-runtime.e9-work-order.json)에 보존한다. 해당 파일의 E8 NPC·E9 변화 적응 의미는 `legacy-change-adaptive.r10` 호환 기록이며 현재 E9 영역 조화·사람 승인 증거가 아니다. 이후 같은 PlayableUnit 작업은 [현재 증거 모델](E1-E7수직폐루프와E8-E10수평증거체계.md)에 따라 E7→E1로 영향을 검토하고 가장 낮은 미완료 단계부터 E1→E7 순서로 검증한다. 현재는 E3까지 통과했고 다음 관문은 영향받은 WI–H1 결속과 Farm 내부 반환 계약을 닫는 E4다.
 
 1. 기능의 Application·Domain이 ASP.NET·HTTP·서버 환경 변수 없이 실행된다.
 2. 기존 HTTP 경로는 같은 Core를 호출하는 Remote Adapter로 유지한다.

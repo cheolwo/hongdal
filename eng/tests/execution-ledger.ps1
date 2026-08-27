@@ -22,7 +22,8 @@ $stages = Get-Content -LiteralPath (
     Join-Path $repositoryRoot ([string] $ledger.evidenceStageCatalogPath)) -Raw -Encoding UTF8 |
     ConvertFrom-Json
 $expectedCount = @($ledger.items).Count
-if ((@($stages.stages.code) -join ",") -ne "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") {
+if ((@($stages.stages.code) -join ",") -ne
+    "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9,E10") {
     throw "ExecutionLedgerEvidenceStageOrderInvalid"
 }
 $e6 = @($stages.stages | Where-Object code -eq "E6")

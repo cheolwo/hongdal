@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-PLAYABLE-LOOP-ENGINE-INTERACTION",
+  "title": "WI 논리·표현 폐루프 엔진 상호작용 통합 관문",
+  "playableLoopRefs": ["playable-loop:nature-night-day2.v1"],
+  "evidencePackageRefs": [],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "playable-loop-engine-interaction-validation.r1",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "기존 Logic·Presentation 궤적과 WI Pipeline, LH·Sky·실내외 배치 경계를 보존하고 동일 Command·Revision 추적 관문을 추가했다.",
+    "nextReopenCondition": "필수 엔진 누락, 순서 역전, 표현 단계의 권위 Revision 변경 또는 실제 Play Mode 귀환 실패가 발견되면 가장 이른 E3~E7을 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Integration",
+    "participatingWorkstreams": ["Simulation", "Unity", "Integration", "ProjectGovernance"],
+    "ownerRef": "workstream:integration",
+    "reviewerRefs": ["workstream:simulation", "workstream:unity"],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application/RuntimeCore",
+      "Ssalddel.Simulation.Tests",
+      "docs/Architecture",
+      "docs/AI",
+      "eng/execution-ledgers",
+      "eng/tests",
+      "C:/Users/user/ssalddel/Assets/Ssalddel"
+    ],
+    "dependencyWorkOrderIds": ["E9-WO-NATURE-SKY-ENGINE"],
+    "handoffIn": [
+      "세계상호작용실행Pipeline의 WI·Command·Revision 문맥",
+      "World공간표현조립Coordinator의 LH→Sky→실외→실내 단계 이력",
+      "Nature 보관·수면·Day2 반환 Logic E7 상태 사본"
+    ],
+    "handoffOut": [
+      "playable-loop-engine-interaction-validation.r1 대장",
+      "비권위 엔진 Trace 계약과 결정적 검증기",
+      "Nature WI-NATURE-13~15 Simulation→Unity 추적 인계",
+      "실제 Play Mode 증거와 분리된 자동 검증 상태판"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "폐루프 엔진 추적 계약·검증·Nature 첫 연결과 기준 문서로 제한"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v3",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {"code":"E9","disposition":"Affected","summary":"장기 변화 뒤에도 WI와 엔진 추적 프로필을 revision 단위로 재검증한다.","dimensions":{"changeEnvelope":"Logic·Presentation 통합 관문","baselineAndTargetRevision":"기존 이중 궤적에서 engine-interaction.r1 추가","migrationCompatibility":"Save/Replay hash와 기존 API 무변경","rollbackBoundary":"Trace sink를 Null로 바꾸면 기존 실행 유지"},"sourceReferences":["docs/Architecture/플레이폐루프엔진상호작용검증체계.md"],"nextAction":"E8 기준선 전에는 E9 승격 차단"},
+    {"code":"E8","disposition":"ReusedWithVerification","summary":"NPC 생활 권위는 변경하지 않고 향후 NpcDriven WI에 같은 프로필을 적용할 수 있게 한다.","dimensions":{"npcRoleGroup":"변경 없음","continuousLifeLoop":"변경 없음","playerAbsentBehavior":"후속 범위","saveReplay":"Trace 제외"},"sourceReferences":["docs/Architecture/E8-NPC생활세계폐루프정의.md"],"nextAction":"NPC 적용은 별도 작업 명세"},
+    {"code":"E7","disposition":"Gap","summary":"실제 입력 명령열과 Game View 귀환에서 같은 Command 추적을 확인한다.","dimensions":{"playerLoop":"보관·수면·Day2 반환","authorityModes":"LocalProcess와 RemoteHost","canonicalScene":"SimulationWorldShell","runtimeEvidence":"Play Mode·Game View·Console"},"sourceReferences":["docs/Architecture/플레이폐루프논리시각이중순환체계.md"],"nextAction":"Unity Editor 실제 입력 검증"},
+    {"code":"E6","disposition":"Affected","summary":"엔진 누락과 차단 사유를 플레이어 표현 실패와 구분해 읽을 수 있게 한다.","dimensions":{"worldStateExplanation":"구성 요소·단계·상태·사유","groundingProfile":"기존 H·배치 검증 재사용","provenanceLimitations":"진단 기록은 권위 아님","causalQuestionMatrix":"Logic 결과와 Presentation 원인을 같은 revision으로 비교"},"sourceReferences":["docs/Architecture/플레이폐루프엔진상호작용검증체계.md"],"nextAction":"생성 상태판 검토"},
+    {"code":"E5","disposition":"Affected","summary":"Nature WI-NATURE-13~15 결과가 Unity 표현 단계로 인계되는 구조를 기록한다.","dimensions":{"triggerOccurrence":"Preview·Confirm","authorityTransition":"Simulation Core만 변경","taskEffectResult":"보관·수면·계획 상태 사본","successorOrReturnPath":"조우·계획·Day2Ready","conditionalSpatialEvidence":"기존 Nature H 결속"},"sourceReferences":["Ssalddel.Simulation.Application/RuntimeCore/세계상호작용실행Pipeline.cs"],"nextAction":"Unity 집중 시험"},
+    {"code":"E4","disposition":"Affected","summary":"PlayableLoop·WI·Command·권위 위치와 엔진 구성 요소를 결속한다.","dimensions":{"allowedTriggerSources":"기존 WI 발생원 유지","subjectAndTargetBindings":"기존 실행 Context 재사용","dataResourceTimeBindings":"Command와 Revision, 벽시계 제외","spatialApplicability":"WI14에서 LH·Sky·배치 순서 적용"},"sourceReferences":["eng/execution-ledgers/playable-loop-engine-interaction-validation.json"],"nextAction":"대장 자동 검증"},
+    {"code":"E3","disposition":"Affected","summary":"필수 구성 요소 순서, 재사용, 누락과 권위 불변을 결정적으로 검사한다.","dimensions":{"contractTests":"Trace·Profile·검증 결과","determinism":"벽시계와 Unity instance ID 제외","saveReplayRegression":"canonical hash 무변경","consumerRegression":"Simulation·Unity 컴파일"},"sourceReferences":["Ssalddel.Simulation.Tests/SimulationPlayableLoopEngineInteractionTests.cs"],"nextAction":"집중 시험"},
+    {"code":"E2","disposition":"Affected","summary":"공유 Trace 계약, 수집기와 Unity 인계 경계를 추가한다.","dimensions":{"contracts":"Context·Entry·Profile·Snapshot","applicationDomain":"비권위 수집·검증","adapters":"LocalProcess 추적 노출","unityProjection":"Coordinator 단계 기록"},"sourceReferences":["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayableLoopEngineInteractionContracts.cs"],"nextAction":"소비자 빌드"},
+    {"code":"E1","disposition":"Defined","summary":"플레이어 행동 하나가 세계 결과와 엔진 표현을 거쳐 다음 선택으로 돌아오는지 같은 명령으로 설명한다.","dimensions":{"purposeAndReturn":"논리·표현·귀환 통합 검증","authorityAndAllowedTriggerSources":"기존 Simulation Core와 WI 발생원 유지","stableIdsAndRevision":"engine-interaction.r1","acceptanceAndExclusions":"새 E 축·Save 필드·운영 API·새 Scene 제외"},"sourceReferences":["docs/Architecture/플레이폐루프엔진상호작용검증체계.md"],"nextAction":"범위 변경 시 재검토"}
+  ],
+  "upwardValidation": [
+    {"code":"E1","status":"Passed","evidence":["통합 관문 목적·제외 정의"],"nextAction":"변경 시 재검토"},
+    {"code":"E2","status":"Passed","evidence":["공유 Trace 계약·Local 수집·Unity 인계"],"nextAction":"소비자 회귀"},
+    {"code":"E3","status":"Passed","evidence":["Simulation 집중 시험 51/51", "순서·누락·재사용·권위 불변 검증", "Unity EditMode 소비자 어셈블리 빌드 경고·오류 0"],"nextAction":"Unity Test Runner"},
+    {"code":"E4","status":"Passed","evidence":["Nature WI13~15 프로필 대장"],"nextAction":"코드·대장 동등성 검토"},
+    {"code":"E5","status":"InProgress","evidence":["Simulation Pipeline과 Unity Coordinator 연결"],"nextAction":"Unity Test Runner"},
+    {"code":"E6","status":"NotStarted","evidence":[],"nextAction":"차단 사유 판독과 상태판 검토"},
+    {"code":"E7","status":"Blocked","evidence":[],"nextAction":"실제 Play Mode·Game View"},
+    {"code":"E8","status":"NotStarted","evidence":[],"nextAction":"후속 NPC 범위"},
+    {"code":"E9","status":"Blocked","evidence":[],"nextAction":"E8 기준선과 Migration 검토"}
+  ],
+  "promotionBlockers": [
+    "Unity Test Runner와 실제 Play Mode·Game View 명령열에서 통합 Trace가 아직 검증되지 않았다.",
+    "E8 기준선과 장기 프로필 Migration은 이번 범위 밖이다."
+  ],
+  "finalEvidenceReferences": []
+}

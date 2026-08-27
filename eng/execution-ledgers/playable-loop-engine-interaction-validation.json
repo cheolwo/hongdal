@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "playable-loop-engine-interaction-validation.v1",
+  "revision": "playable-loop-engine-interaction-validation.r2",
+  "evidenceTrackCodes": ["Logic", "Presentation"],
+  "principles": {
+    "engineInteractionIsIntegratedGateNotThirdMaturityTrack": true,
+    "simulationAuthorityPrecedesPresentation": true,
+    "presentationMustPreserveAuthorityRevision": true,
+    "traceIsExcludedFromSaveReplayCanonicalHash": true,
+    "actualPlayModeEvidenceRemainsSeparate": true,
+    "localProcessAndRemoteHostShareTheSameProfile": true
+  },
+  "allowedStatusCodes": ["Executed", "Reused", "NotApplicable", "Blocked"],
+  "components": [
+    {
+      "componentCode": "WI.ExecutionPipeline",
+      "componentKindCode": "Orchestration",
+      "componentRevision": "playable-loop-engine-trace.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Simulation.AuthorityCore",
+      "componentKindCode": "Authority",
+      "componentRevision": "simulation-core.current",
+      "mayMutateAuthority": true
+    },
+    {
+      "componentCode": "LH.Surface",
+      "componentKindCode": "Presentation",
+      "componentRevision": "lh-streaming.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Sky.Presentation",
+      "componentKindCode": "Presentation",
+      "componentRevision": "sky-engine.r2",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Placement.Exterior",
+      "componentKindCode": "Presentation",
+      "componentRevision": "exterior-placement.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Placement.Interior",
+      "componentKindCode": "Presentation",
+      "componentRevision": "nature-cabin-presentation.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Lighting.Directional",
+      "componentKindCode": "Presentation",
+      "componentRevision": "directional-lighting.natural.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "World.Presentation",
+      "componentKindCode": "Presentation",
+      "componentRevision": "world-presentation.r1",
+      "mayMutateAuthority": false
+    }
+  ],
+  "profiles": [
+    {
+      "profileRevision": "nature-night-day2.engine-interaction.r1",
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-NATURE-13",
+      "displayNameKo": "거점 보관",
+      "requirements": [
+        { "order": 10, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Preview", "allowsReused": false },
+        { "order": 20, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Confirm", "allowsReused": false },
+        { "order": 30, "componentCode": "Simulation.AuthorityCore", "phaseCode": "AuthorityCommit", "allowsReused": true },
+        { "order": 40, "componentCode": "WI.ExecutionPipeline", "phaseCode": "ReturnProjection", "allowsReused": true },
+        { "order": 50, "componentCode": "Placement.Interior", "phaseCode": "InteriorPlacement", "allowsReused": true },
+        { "order": 60, "componentCode": "World.Presentation", "phaseCode": "ReturnProjection", "allowsReused": true }
+      ]
+    },
+    {
+      "profileRevision": "nature-night-day2.engine-interaction.r1",
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-NATURE-14",
+      "displayNameKo": "오두막 수면과 새벽 전환",
+      "requirements": [
+        { "order": 10, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Preview", "allowsReused": false },
+        { "order": 20, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Confirm", "allowsReused": false },
+        { "order": 30, "componentCode": "Simulation.AuthorityCore", "phaseCode": "AuthorityCommit", "allowsReused": true },
+        { "order": 40, "componentCode": "WI.ExecutionPipeline", "phaseCode": "ReturnProjection", "allowsReused": true },
+        { "order": 50, "componentCode": "LH.Surface", "phaseCode": "SurfacePreparation", "allowsReused": true },
+        { "order": 60, "componentCode": "Sky.Presentation", "phaseCode": "AtmosphereProjection", "allowsReused": true },
+        { "order": 70, "componentCode": "Placement.Exterior", "phaseCode": "ExteriorPlacement", "allowsReused": true },
+        { "order": 80, "componentCode": "Placement.Interior", "phaseCode": "InteriorPlacement", "allowsReused": true },
+        { "order": 90, "componentCode": "Lighting.Directional", "phaseCode": "PresentationValidation", "allowsReused": true },
+        { "order": 100, "componentCode": "World.Presentation", "phaseCode": "ReturnProjection", "allowsReused": true }
+      ]
+    },
+    {
+      "profileRevision": "nature-night-day2.engine-interaction.r1",
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-NATURE-15",
+      "displayNameKo": "다음 확장 계획 선택과 Day2 반환",
+      "requirements": [
+        { "order": 10, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Preview", "allowsReused": false },
+        { "order": 20, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Confirm", "allowsReused": false },
+        { "order": 30, "componentCode": "Simulation.AuthorityCore", "phaseCode": "AuthorityCommit", "allowsReused": true },
+        { "order": 40, "componentCode": "WI.ExecutionPipeline", "phaseCode": "ReturnProjection", "allowsReused": true },
+        { "order": 50, "componentCode": "Placement.Interior", "phaseCode": "InteriorPlacement", "allowsReused": true },
+        { "order": 60, "componentCode": "World.Presentation", "phaseCode": "ReturnProjection", "allowsReused": true }
+      ]
+    }
+  ]
+}

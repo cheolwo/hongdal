@@ -1,6 +1,7 @@
 {
-  "schemaVersion": "simulation-evidence-stages.v4",
-  "revision": "simulation-evidence-stages.r10",
+  "schemaVersion": "simulation-evidence-stages.v7",
+  "revision": "simulation-evidence-stages.r13",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "stages": [
     {
       "code": "E0",
@@ -39,18 +40,23 @@
     },
     {
       "code": "E7",
-      "label": "실제 플레이 폐루프",
-      "completionGate": "사람이 실제 서버와 저장 Scene에서 이동·선택·Preview·Confirm·Tick·재조회를 수행하고 Game View와 Console로 확인했다. AreaSet이 RequiredBeforeE7을 선언하면 Current 상태의 E6 플레이 전 정제 합격을 선행하며, GIS NotApplied 자체는 E7을 차단하지 않는다."
+      "label": "핵심 플레이 폐루프",
+      "completionGate": "하나의 PlayableUnit에서 Logic과 Presentation이 각각 E7을 통과하고 통합 단계는 두 궤적 중 낮은 값으로 판정된다. 사람이 실제 권위 Runtime과 저장 Scene에서 이동·선택·Preview·Confirm·Tick·재조회·성공·실패 회복·귀환을 수행하고 Play Mode·Game View·Console로 확인해야 한다. AreaSet이 RequiredBeforeE7을 선언하면 Current 상태의 E6 플레이 전 정제 합격을 선행하며 GIS NotApplied 자체는 E7을 차단하지 않는다."
     },
     {
       "code": "E8",
-      "label": "NPC 생활세계 폐루프",
-      "completionGate": "선정된 E7 세계에서 NPC가 지속되는 정체성·역할·생활 상태로 다음 목표를 결정하고 실제 H 공간을 이동해 WI를 수행하며, 경쟁·협력·Effect가 후속 행동을 바꾸는 연속 폐루프를 Save/Replay와 실제 서버·저장 SimulationWorldShell의 Play Mode·Game View로 검증했다."
+      "label": "개별 플레이 폐루프 안정",
+      "completionGate": "E7을 통과한 하나의 PlayableUnit을 같은 후보 revision과 build hash로 반복 검증한다. Logic은 최소 3회의 결정적 실행, Save·Restore·Replay 일치와 LocalProcess·RemoteHost 동등성을 통과하고 Presentation은 최소 2회의 실제 입력 완주, Save 재진입과 차단 Console 오류 0건을 통과해야 한다. 통합 E8은 두 결과 중 낮은 값이며 열린 차단 피드백이 없어야 한다."
     },
     {
       "code": "E9",
-      "label": "변화 적응형 세계",
-      "completionGate": "E8 세계에 새 규칙·콘텐츠·공간·사건·카드·역할 또는 시스템 변경을 적용하고, E8부터 E1까지의 하향 영향 분석과 E1부터 E8까지의 상향 재검증, Revision·Migration·Save/API 호환성·결정성·기존 폐루프 회귀를 통과해 새 안정 상태로 승격했다."
+      "label": "영역 폐루프 조화·사람 승인",
+      "completionGate": "같은 업무·심리 영역에서 E8을 통과한 둘 이상의 Core PlayableUnit을 하나의 AreaHarmonySet으로 고정한다. Logic의 권위·자원·시간·결과·NPC 연속성과 Presentation의 공간 이동·카메라·입력·상태 피드백을 같은 후보 revision에서 서로 다른 대표 순서로 검증하고, 사람이 인과·선택 결과·진행 귀환·판독·피드백·전환을 평가한다. 재미·몰입·완성도가 모두 5점 만점에 4점 이상이고 Blocking·Major 발견 사항이 없으며 사람이 후보 revision과 build hash를 명시적으로 승인해야 한다."
+    },
+    {
+      "code": "E10",
+      "label": "제한 운영 검증",
+      "completionGate": "E9에서 승인한 불변 후보 빌드를 판본화된 제한 운영 프로필로 관찰하고, 시작·완주·실패 회복·저장·복원·Replay·rollback과 운영 품질 기준을 통과한 뒤 사람이 계속 운영을 명시적으로 승인했다. Provider 호출·운영 DB·결제·계약·일반 공개는 별도 권위 승인 없이는 포함하지 않는다."
     }
   ]
 }

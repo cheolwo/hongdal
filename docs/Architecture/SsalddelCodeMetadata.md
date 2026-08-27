@@ -35,7 +35,7 @@
 
 ## E 성숙도 책임 메타데이터
 
-`SsalddelEvidenceResponsibilityAttribute`는 게임 코드가 E1~E9 중 어느
+`SsalddelEvidenceResponsibilityAttribute`는 게임 코드가 현재 E1~E10 중 어느
 성숙도 질문에 주로 답해야 하는지를 표시한다. 이것은
 `SsalddelCodeMetadataAttribute`의 기능 흐름을 대체하거나 확장한 필드가 아니다.
 기능 흐름 메타데이터는 "이 호출이 어디를 지나가는가"를, E 책임 메타데이터는
@@ -89,10 +89,10 @@ Attribute에는 다음처럼 안정 key를 지정한다.
   승격 증거가 아니다.
 
 E 단계·G 관리 체계·모듈 이름의 단일 기계 기준은
-`eng/execution-ledgers/e9-refactor-module-catalog.json`이다. 공통 코드의
+현재 모듈 기준은 `eng/execution-ledgers/evidence-responsibility-module-catalog.json`이다. 과거 호환 모듈 기준은 `eng/execution-ledgers/e9-refactor-module-catalog.json`이며 공통 코드의
 `SsalddelEvidenceStageDefinitionCatalog`와 생성 도구는 이 대장과 일치하는지
 검사한다. E 단계 자체의 완료 질문과 반복 왕복 절차는
-[E9↔E1 반복 왕복 구현 체계](E9하향식수직구현체계.md)가 소유한다.
+[E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](E1-E7수직폐루프와E8-E10수평증거체계.md)가 소유한다. 과거 E9↔E1 작업 명세는 [호환 문서](E9하향식수직구현체계.md)에서만 해석한다.
 
 현재 강제 범위는 게임 경계인 Simulation 계약·Domain·Application·저장·Server,
 공유 Unity adapter, 실제 Unity 제품 코드와 검증 코드다. 일반 Operations 코드는

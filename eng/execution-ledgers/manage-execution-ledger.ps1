@@ -51,9 +51,10 @@ $evidenceStages = @($stageCatalog.stages)
 Require (-not [string]::IsNullOrWhiteSpace($ledger.ledgerKey)) "LedgerKeyMissing"
 Require (-not [string]::IsNullOrWhiteSpace($ledger.revision)) "RevisionMissing"
 Require (-not [string]::IsNullOrWhiteSpace($ledger.evidenceStageCatalogPath)) "EvidenceStageCatalogPathMissing"
-Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v4") "EvidenceStageCatalogSchemaInvalid"
-Require ($evidenceStages.Count -eq 10) "EvidenceStagesMustHaveTenEntries"
-Require ((@($evidenceStages.code) -join ",") -eq "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") "EvidenceStageOrderInvalid"
+Require ([string] $stageCatalog.schemaVersion -eq "simulation-evidence-stages.v7") "EvidenceStageCatalogSchemaInvalid"
+Require ($evidenceStages.Count -eq 11) "EvidenceStagesMustHaveElevenEntries"
+Require ((@($evidenceStages.code) -join ",") -eq
+    "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9,E10") "EvidenceStageOrderInvalid"
 Require (@($ledger.items).Count -gt 0) "ItemsMissing"
 
 $allowedStatuses = @("NotStarted", "InProgress", "Blocked", "Done", "Superseded")

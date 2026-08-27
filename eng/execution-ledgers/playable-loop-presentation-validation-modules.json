@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "playable-loop-presentation-validation-modules.v1",
+  "revision": "playable-loop-presentation-validation-modules.r3",
+  "trackCode": "Presentation",
+  "appliesToLoopLevelCodes": ["PlayableUnit"],
+  "allowedEvidenceStageCodes": ["E4", "E5", "E6", "E7"],
+  "allowedApplicabilityCodes": ["Common", "Feature"],
+  "allowedSeverityCodes": ["Blocking", "Warning"],
+  "allowedAutomationLevelCodes": ["Automated", "Mixed", "ManualEvidence"],
+  "principles": {
+    "commonModulesApplyToEveryPlayableUnit": true,
+    "featureModulesAreSelectedByDeclaredCapability": true,
+    "blockingFailurePreventsTrackPromotion": true,
+    "warningDoesNotPromoteEvidence": true,
+    "runtimeEvidenceDoesNotReplaceAutomatedPrecheck": true,
+    "failureReopensEarliestOwningStage": true,
+    "presentationValidationDoesNotMutateSimulationAuthority": true
+  },
+  "generatedDocumentText": {
+    "titleKo": "PlayableLoop 공통 표현 검증 모듈 상태",
+    "sourceNoticeFormatKo": "> `{0}`와 `{1}`에서 자동 생성된다. 직접 수정하지 않는다.",
+    "catalogLabelKo": "모듈 대장",
+    "commonCountLabelKo": "공통 모듈",
+    "conditionalCountLabelKo": "조건 모듈",
+    "playableUnitCountLabelKo": "적용 PlayableUnit",
+    "commonGateHeadingKo": "공통 관문",
+    "commonGateHeaderKo": "| E | 모듈 | 자동화 | 차단 |",
+    "profileHeadingKo": "기능 프로필",
+    "profileHeaderKo": "| 폐루프 | 기능 | 선택된 모듈 |",
+    "commonOnlyKo": "공통만 적용"
+  },
+  "commonModuleCodes": [
+    "presentation-binding",
+    "visual-source-bounds",
+    "player-scale-spacing",
+    "state-difference-readability",
+    "actual-camera-input-result-return"
+  ],
+  "featureCodes": [
+    "GroundSurface",
+    "Building",
+    "FenceChain",
+    "Actor",
+    "Interior",
+    "WorkZone",
+    "CameraOcclusion",
+    "Atmosphere",
+    "DirectionalLighting"
+  ],
+  "modules": [
+    {
+      "moduleCode": "presentation-binding",
+      "displayNameKo": "표현 상태·H 기준점 결속 검증",
+      "evidenceStageCode": "E4",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["권위 상태 사본", "H 기준점", "VisualKey"],
+      "failureReasonCodes": ["PresentationStateBindingMissing", "PresentationHAnchorMissing"]
+    },
+    {
+      "moduleCode": "visual-source-bounds",
+      "displayNameKo": "시각 자산·Renderer Bounds 준비 검증",
+      "evidenceStageCode": "E5",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["Prefab 또는 대체 표현", "활성 Renderer", "Collider", "Bounds"],
+      "failureReasonCodes": ["VisualSourceMissing", "VisibleRendererMissing", "VisibleBoundsInvalid"]
+    },
+    {
+      "moduleCode": "player-scale-spacing",
+      "displayNameKo": "Player 대비 크기·간격 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["Player 기준 크기", "객체 Bounds", "배치 통제 ScaleBand"],
+      "failureReasonCodes": ["PlayerScaleRatioInvalid", "ObjectSpacingInvalid"]
+    },
+    {
+      "moduleCode": "state-difference-readability",
+      "displayNameKo": "상태별 표현 차이 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["진입·진행·성공·실패·귀환 상태", "상태별 Renderer·FX·안내"],
+      "failureReasonCodes": ["PresentationStateDifferenceMissing", "ResultFeedbackUnreadable"]
+    },
+    {
+      "moduleCode": "actual-camera-input-result-return",
+      "displayNameKo": "실제 카메라·입력·결과·귀환 검증",
+      "evidenceStageCode": "E7",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "ManualEvidence",
+      "reads": ["저장 Scene", "실제 입력 명령열", "Game View", "결과 상태 재조회"],
+      "failureReasonCodes": ["RuntimeExperienceFailure", "CameraTargetUnreadable", "ReturnChoiceUnavailable"]
+    },
+    {
+      "moduleCode": "surface-clearance",
+      "displayNameKo": "배치 객체 표면 여유 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["GroundSurface"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["Renderer 하단 Bounds", "승인 지면 높이", "표면 여유 정책"],
+      "failureReasonCodes": ["VisibleBottomBelowSurface", "ObjectFloatingAboveSurface", "GroundSurfaceMissing"]
+    },
+    {
+      "moduleCode": "building-foundation-entry",
+      "displayNameKo": "건물 기초면·출입구 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["Building"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["건물 발자국", "표면 높이 표본", "기초대", "출입구 연결"],
+      "failureReasonCodes": ["FootprintSurfaceVariationTooHigh", "FoundationMissing", "BuildingEntranceBlocked"]
+    },
+    {
+      "moduleCode": "fence-continuity-entry-gap",
+      "displayNameKo": "울타리 연속성과 출입구 간격 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["FenceChain"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["울타리 연결점", "도로변 전면", "출입구 간격"],
+      "failureReasonCodes": ["FenceContinuityBroken", "EntranceGapMissing"]
+    },
+    {
+      "moduleCode": "actor-grounding-identification",
+      "displayNameKo": "Actor 지면 정렬·식별 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["Actor"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["발바닥 Bounds", "이동 표면", "식별 거리"],
+      "failureReasonCodes": ["ActorFootBelowSurface", "ActorFloating", "ActorUnreadable"]
+    },
+    {
+      "moduleCode": "interior-clearance",
+      "displayNameKo": "실내 소품·통로 여유 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["Interior"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["건물 외피", "소품 Bounds", "보행·업무 통로"],
+      "failureReasonCodes": ["FixtureIntersectsShell", "TraversalClearanceBlocked"]
+    },
+    {
+      "moduleCode": "work-zone-readability",
+      "displayNameKo": "작업 구역 상태 식별 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["WorkZone"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["작업 구역", "건설·운영 상태", "도구·재료 배치"],
+      "failureReasonCodes": ["WorkZoneMissing", "WorkStateUnreadable"]
+    },
+    {
+      "moduleCode": "camera-occlusion",
+      "displayNameKo": "카메라 가림·절단 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["CameraOcclusion"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["대상 Bounds", "지원 카메라", "전경 가림체"],
+      "failureReasonCodes": ["CameraOcclusionUnresolved", "TargetClippedByFraming"]
+    },
+    {
+      "moduleCode": "atmosphere-authority-binding",
+      "displayNameKo": "세계 대기 상태·시간 원천 결속 검증",
+      "evidenceStageCode": "E4",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["Atmosphere"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": ["세계 대기 프로필", "규칙 revision", "권위 시계 원천", "세계 공통 범위"],
+      "failureReasonCodes": ["AtmosphereProfileMissing", "AtmosphereClockSourceInvalid", "AtmosphereScopeInvalid"]
+    },
+    {
+      "moduleCode": "weather-camera-audio-exposure",
+      "displayNameKo": "날씨·카메라·음향·차폐 표현 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["Atmosphere"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["시간대 합성 조명", "구름·강수·번개", "빗소리·천둥", "실내 차폐 상태"],
+      "failureReasonCodes": ["WeatherStateUnreadable", "PrecipitationExposureInvalid", "WeatherAudioMissing", "TimeOfDayCompatibilityBroken"]
+    },
+    {
+      "moduleCode": "directional-light-surface-readability",
+      "displayNameKo": "방향광·표면 명암 판독 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": ["Atmosphere", "DirectionalLighting"],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": ["시간대 합성 광원 방향", "Mesh World Normal", "Lit Shader", "그림자 투사·수신 정책", "Game View 그늘 면 가독성"],
+      "failureReasonCodes": ["LightDirectionInvalid", "SurfaceNormalMissing", "LitShaderUnsupported", "ShadowPolicyMismatch", "ShadowSideUnreadable"]
+    }
+  ],
+  "loopProfiles": [
+    {
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "featureCodes": ["GroundSurface", "Building", "CameraOcclusion"]
+    },
+    {
+      "loopStableId": "playable-loop:nature-twilight-return.v1",
+      "featureCodes": ["GroundSurface", "Actor", "CameraOcclusion"]
+    },
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "featureCodes": ["Building", "Interior", "CameraOcclusion", "Atmosphere", "DirectionalLighting"]
+    },
+    {
+      "loopStableId": "playable-loop:nature-workbench-foundation.v1",
+      "featureCodes": ["GroundSurface", "WorkZone", "CameraOcclusion"]
+    }
+  ]
+}

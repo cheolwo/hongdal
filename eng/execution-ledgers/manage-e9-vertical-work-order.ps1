@@ -23,6 +23,12 @@ $workOrder = Get-Content -LiteralPath $resolvedInput -Raw -Encoding UTF8 | Conve
 $resolvedStages = (Resolve-Path (Join-Path $repositoryRoot (
     [string] $protocol.evidenceStageCatalogPath))).Path
 $stageCatalog = Get-Content -LiteralPath $resolvedStages -Raw -Encoding UTF8 | ConvertFrom-Json
+$resolvedLoops = (Resolve-Path (Join-Path $repositoryRoot (
+    [string] $protocol.playableLoopCatalogPath))).Path
+$loopCatalog = Get-Content -LiteralPath $resolvedLoops -Raw -Encoding UTF8 | ConvertFrom-Json
+$resolvedEvidence = (Resolve-Path (Join-Path $repositoryRoot (
+    [string] $protocol.evidencePackageCatalogPath))).Path
+$evidenceCatalog = Get-Content -LiteralPath $resolvedEvidence -Raw -Encoding UTF8 | ConvertFrom-Json
 
 Require ([string] $protocol.schemaVersion -eq
     "simulation-e9-vertical-implementation-protocol.v1") "ProtocolSchemaInvalid"
@@ -52,6 +58,17 @@ foreach ($condition in @(
     Require ($null -ne $property -and [bool] $property.Value) "IterationConditionMissing:$condition"
 }
 
+foreach ($condition in @(
+    "primaryWorkstreamMustParticipate",
+    "ownerAndReviewerRequired",
+    "allowedChangeRootsRequired",
+    "handoffInAndOutRequired",
+    "commitScopeRequired")) {
+    $property = $protocol.collaborationPolicy.PSObject.Properties[$condition]
+    Require ($null -ne $property -and [bool] $property.Value) `
+        "CollaborationPolicyMissing:$condition"
+}
+
 foreach ($principle in @(
     "targetFirstPlanningDoesNotClaimE9Evidence",
     "everyStageMustBeAssessed",
@@ -75,6 +92,14 @@ foreach ($principle in @(
 
 Require-Text $workOrder.workOrderId "WorkOrderIdMissing"
 Require-Text $workOrder.title "TitleMissing"
+foreach ($loopRef in @($workOrder.playableLoopRefs)) {
+    Require (@($loopCatalog.items.loopStableId) -contains [string] $loopRef) `
+        "PlayableLoopRefUnknown:$loopRef"
+}
+foreach ($evidenceRef in @($workOrder.evidencePackageRefs)) {
+    Require (@($evidenceCatalog.packages.evidenceId) -contains [string] $evidenceRef) `
+        "EvidencePackageRefUnknown:$evidenceRef"
+}
 Require (@($protocol.allowedWorkTypes) -contains [string] $workOrder.workType) "WorkTypeInvalid"
 Require ([string] $workOrder.targetEvidenceStage -eq "E9") "TargetMustBeE9"
 Require (@($stageCatalog.stages.code) -contains [string] $workOrder.currentEvidenceStage) "CurrentEvidenceStageInvalid"
@@ -85,6 +110,43 @@ Require (@($protocol.allowedCurrentPasses) -contains
     [string] $workOrder.iterationState.currentPass) "WorkOrderCurrentPassInvalid"
 Require-Text $workOrder.iterationState.lastReassessment "LastReassessmentMissing"
 Require-Text $workOrder.iterationState.nextReopenCondition "NextReopenConditionMissing"
+
+$collaboration = $workOrder.collaborationProfile
+Require (@($protocol.collaborationPolicy.allowedWorkstreams) -contains
+    [string] $collaboration.primaryWorkstream) "PrimaryWorkstreamInvalid"
+$participating = @($collaboration.participatingWorkstreams)
+Require ($participating.Count -gt 0) "ParticipatingWorkstreamsMissing"
+Require (($participating | Sort-Object -Unique).Count -eq $participating.Count) `
+    "ParticipatingWorkstreamDuplicate"
+foreach ($workstream in $participating) {
+    Require (@($protocol.collaborationPolicy.allowedWorkstreams) -contains
+        [string] $workstream) "ParticipatingWorkstreamInvalid:$workstream"
+}
+Require ($participating -contains [string] $collaboration.primaryWorkstream) `
+    "PrimaryWorkstreamMustParticipate"
+Require-Text $collaboration.ownerRef "CollaborationOwnerMissing"
+Require (@($collaboration.reviewerRefs).Count -gt 0) "CollaborationReviewerMissing"
+foreach ($reviewer in @($collaboration.reviewerRefs)) {
+    Require-Text $reviewer "CollaborationReviewerEmpty"
+}
+Require (@($collaboration.allowedChangeRoots).Count -gt 0) `
+    "AllowedChangeRootsMissing"
+foreach ($root in @($collaboration.allowedChangeRoots)) {
+    Require-Text $root "AllowedChangeRootEmpty"
+}
+foreach ($dependency in @($collaboration.dependencyWorkOrderIds)) {
+    Require-Text $dependency "DependencyWorkOrderIdEmpty"
+    Require ([string] $dependency -ne [string] $workOrder.workOrderId) `
+        "DependencyWorkOrderSelfReference"
+}
+Require (@($collaboration.handoffIn).Count -gt 0) "HandoffInMissing"
+Require (@($collaboration.handoffOut).Count -gt 0) "HandoffOutMissing"
+foreach ($handoff in @($collaboration.handoffIn) + @($collaboration.handoffOut)) {
+    Require-Text $handoff "HandoffEmpty"
+}
+Require (@($protocol.collaborationPolicy.allowedBranchPolicies) -contains
+    [string] $collaboration.branchPolicy) "BranchPolicyInvalid"
+Require-Text $collaboration.commitScope "CommitScopeMissing"
 
 Require ([string] $workOrder.authorityProfile.simulationCore -eq "SharedSimulationCore") "SharedSimulationCoreRequired"
 Require ([string] $workOrder.authorityProfile.soloAuthorityLocation -eq "LocalProcess") "SoloAuthorityMustBeLocalProcess"

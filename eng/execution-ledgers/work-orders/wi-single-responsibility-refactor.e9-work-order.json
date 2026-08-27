@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-WI-SINGLE-RESPONSIBILITY",
+  "title": "WI 단일 책임과 업무 흐름 조립 분리",
+  "playableLoopRefs": [],
+  "evidencePackageRefs": [],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "world-interaction-single-responsibility.r1",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "StableOrExplicitlyBlocked",
+    "lastReassessment": "60개 WI에 하나의 주요 권위 결과를 지정하고 55개 순서·분기·반복 연결을 별도 흐름 대장으로 옮겼다. 복합 책임 6개, Task·Effect로 내릴 절차 6개, 실제 NPC 행동으로 바꿀 자동 전이 4개는 호환 migration 전까지 승격 차단으로 남긴다.",
+    "nextReopenCondition": "복합·절차·Actor 전환 대상의 새 실행 판본·저장 migration을 구현하거나 새로운 다중 효과·절차 결합이 발견되면 E9부터 영향을 다시 검토한다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Integration", "Unity"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:integration", "workstream:unity"],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "eng/world-seedbeds",
+      "docs/Architecture",
+      "docs/AI",
+      "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation",
+      "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode"
+    ],
+    "dependencyWorkOrderIds": [],
+    "handoffIn": [
+      "simulation-world-interactions.r14의 60개 안정 고유 식별자와 기존 API·저장·Replay 계약",
+      "D-241 발생원·행위자·통제 정책 분리와 D-244 한국어 기능명 우선 표시"
+    ],
+    "handoffOut": [
+      "복합 책임 6개와 절차 강등 6개, Actor 행동 전환 4개의 판본별 Command·Task·Effect·Save migration",
+      "플레이어와 NPC가 같은 atomic WI를 실행하고 위임 WI는 정책만 소유하는 Runtime 세로 조각"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "단일 책임 정책·흐름 분리·생성 계약·시험·문서를 되돌릴 수 있는 맥락으로 분리"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "기존 배치 통제 계층 유지; WI 흐름 분리는 H 계층을 변경하지 않음",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9",
+      "disposition": "Defined",
+      "summary": "WI를 한 의도·한 주요 결과로 제한하고 절차 조립을 별도 판본 대장으로 분리한다.",
+      "dimensions": {
+        "changeEnvelope": "60개 WI 고유 식별자는 유지하고 단일 책임 정책, 주요 결과, 흐름 조립 권위를 추가한다.",
+        "baselineAndTargetRevision": "simulation-world-interactions.r14에서 r15와 world-interaction-single-responsibility.r1로 이동한다.",
+        "migrationCompatibility": "기존 API·Event·save·replay·inline predecessor/successor 값은 읽기 호환하되 새 생성기는 이를 절차 권위로 사용하지 않는다.",
+        "rollbackBoundary": "새 책임·흐름 대장을 사용하지 않는 과거 실행 판본은 기존 결과를 재해석하지 않는다."
+      },
+      "sourceReferences": ["docs/Architecture/WI단일책임원칙.md", "eng/execution-ledgers/world-interaction-responsibilities.json"],
+      "nextAction": "복합 책임 migration 전 promotionEligible=false를 유지한다."
+    },
+    {
+      "code": "E8",
+      "disposition": "Gap",
+      "summary": "NPC 위임과 NPC 실제 행동이 분리된 지속 생활세계 기준선은 아직 없다.",
+      "dimensions": {
+        "npcRoleGroup": "NPC는 실행 문맥의 Actor이며 별도 NPC 전용 WI 복제로 책임을 나누지 않는다.",
+        "continuousLifeLoop": "현재 WI-NATURE-17은 위임과 제작 완료를 함께 소유하므로 migration 대상이다.",
+        "playerAbsentBehavior": "NPC가 플레이어 없이 같은 atomic WI를 수행하는 공통 실행 증거는 후속 범위다.",
+        "saveReplay": "기존 NPC 실행 계보는 보존하며 새 판본 전까지 재분류하지 않는다."
+      },
+      "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md", "docs/Architecture/WI단일책임원칙.md"],
+      "nextAction": "위임 정책 WI와 actor-agnostic 제작 WI를 새 저장 판본에서 분리한다."
+    },
+    {
+      "code": "E7",
+      "disposition": "Affected",
+      "summary": "Unity는 절차 단계 번호 대신 한국어 책임명을 표시한다.",
+      "dimensions": {
+        "playerLoop": "플레이어는 독립 행동을 선택하고 UI는 조립 흐름을 행동의 정체성으로 오인시키지 않는다.",
+        "authorityModes": "표시 계약은 LocalProcess와 RemoteHost가 공유하는 생성 C# 대장을 사용한다.",
+        "canonicalScene": "SimulationWorldShell만 유지하고 새 Scene을 만들지 않는다.",
+        "runtimeEvidence": "EditMode 소비자 시험 범위이며 Play Mode·Game View는 별도 증거다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldInteractionNames.generated.cs"],
+      "nextAction": "Game View에서 이름 가독성을 확인할 때만 E7을 다시 판정한다."
+    },
+    {
+      "code": "E6",
+      "disposition": "ReusedWithVerification",
+      "summary": "단일 책임 분리는 공공 데이터나 현실 자료 인과를 새로 만들지 않는다.",
+      "dimensions": {
+        "worldStateExplanation": "현실 자료는 WI 입력 문맥일 수 있지만 자료 수집 자체나 조립 흐름이 WI 책임이 되지 않는다.",
+        "groundingProfile": "NotApplied: 구조 리팩토링은 Provider와 운영 자료를 읽지 않는다.",
+        "provenanceLimitations": "기존 E6 출처·revision·hash 경계를 유지한다.",
+        "causalQuestionMatrix": "주요 결과를 일으킨 단일 의도와 supporting effect를 분리해 설명한다."
+      },
+      "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"],
+      "nextAction": "각 WI의 기존 E6 증거를 유지한다."
+    },
+    {
+      "code": "E5",
+      "disposition": "Blocked",
+      "summary": "공간 전이 생성은 별도 흐름 대장을 읽도록 바꿨지만 복합 WI의 Runtime 분할은 아직 하지 않았다.",
+      "dimensions": {
+        "triggerOccurrence": "발생원과 Actor는 WI 책임이 아니라 실행 인스턴스 문맥에 결속한다.",
+        "authorityTransition": "한 WI는 한 primaryOutcomeCode를 가지며 부수 효과는 같은 원자성 안에서만 허용한다.",
+        "taskEffectResult": "복합 책임 6개, 절차 강등 6개와 Actor 행동 전환 4개는 새 Task·Effect 계약으로 migration하기 전 기존 동작을 유지한다.",
+        "successorOrReturnPath": "후속·분기·반복은 world-interaction-flows.r1이 소유한다.",
+        "conditionalSpatialEvidence": "기존 H 결속은 유지하고 실제 공간 전이 생성기는 외부 흐름 대장을 읽는다."
+      },
+      "sourceReferences": ["eng/execution-ledgers/world-interaction-flows.json", "eng/world-seedbeds/manage-actual-e5-spatial.ps1"],
+      "nextAction": "복합·절차·Actor 전환 대상별 좁은 Runtime migration 작업을 별도로 연다."
+    },
+    {
+      "code": "E4",
+      "disposition": "Affected",
+      "summary": "Player·NPC·World 발생원과 WI의 책임 정체성을 분리한다.",
+      "dimensions": {
+        "allowedTriggerSources": "같은 WI가 허용된 PlayerDriven 또는 NpcDriven 인스턴스로 실행될 수 있다.",
+        "subjectAndTargetBindings": "Actor 종류는 실행 인스턴스에 결속하며 WI ID를 복제하는 근거가 아니다.",
+        "dataResourceTimeBindings": "Preview·Confirm·Task·Effect는 같은 책임의 revision과 계보를 공유한다.",
+        "spatialApplicability": "H는 필요한 실행 문맥이며 흐름 순서를 WI 내부에 주입하지 않는다."
+      },
+      "sourceReferences": ["eng/execution-ledgers/world-interaction-trigger-sources.json", "eng/execution-ledgers/world-interaction-responsibilities.json"],
+      "nextAction": "새 WI 추가 시 Actor 대신 의도·대상·주요 결과로 중복 여부를 검사한다."
+    },
+    {
+      "code": "E3",
+      "disposition": "Affected",
+      "summary": "주요 결과 누락, 다중 효과 미감사, 흐름 중복과 절차형 표시를 자동 거부한다.",
+      "dimensions": {
+        "contractTests": "60개 주요 결과, 원자적 부수 효과 10개, 배타적 결과 2개, 복합 책임 6개, 절차 강등 6개, Actor 전환 4개와 흐름 edge 55개를 검증한다.",
+        "determinism": "Markdown·C# 생성 결과와 no-change 재실행 hash를 검증한다.",
+        "saveReplayRegression": "WI 고유 식별자와 기존 payload를 변경하지 않았는지 관련 회귀를 유지한다.",
+        "consumerRegression": "Simulation과 Unity가 단계 번호 없는 한국어 표시와 책임 판정을 읽는지 검증한다."
+      },
+      "sourceReferences": ["eng/tests/world-interactions.ps1", "Ssalddel.Simulation.Tests/SimulationWorldInteractionMaturityTests.cs"],
+      "nextAction": "집중시험과 Unity EditMode를 유지한다."
+    },
+    {
+      "code": "E2",
+      "disposition": "Affected",
+      "summary": "생성 계약에 대장 순번·책임 종류·주요 결과·단일 책임 판정을 추가한다.",
+      "dimensions": {
+        "contracts": "Simulation세계상호작용이름Definition이 책임 메타데이터를 읽기 전용으로 제공한다.",
+        "applicationDomain": "현재 Domain 동작은 변경하지 않고 후속 migration 차단 정보를 제공한다.",
+        "adapters": "Local·Remote Adapter는 기존 WI ID를 유지한다.",
+        "unityProjection": "한국어 기능명을 먼저 표시하고 대장 순번을 실행 단계로 노출하지 않는다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldInteractionNames.generated.cs"],
+      "nextAction": "복합 책임 Runtime 분할 때 새 계약 판본을 추가한다."
+    },
+    {
+      "code": "E1",
+      "disposition": "Defined",
+      "summary": "WI는 한 의도와 하나의 주요 권위 결과만 소유한다.",
+      "dimensions": {
+        "purposeAndReturn": "행위 완료 뒤 하나의 primaryOutcomeCode를 반환하고 다음 선택은 흐름 조립기가 결정한다.",
+        "authorityAndAllowedTriggerSources": "Simulation Core가 결과 권위이며 Player·NPC·World는 허용된 발생원과 Actor binding이다.",
+        "stableIdsAndRevision": "기존 60개 ID를 유지하고 r15·responsibilities.r1·flows.r1을 판본화한다.",
+        "acceptanceAndExclusions": "원자적 부수 효과는 허용하지만 독립 실패·취소·재시도 가능한 책임과 강제 절차 소유는 금지한다."
+      },
+      "sourceReferences": ["docs/Architecture/WI단일책임원칙.md"],
+      "nextAction": "E1 자동 검사를 통과한 정의만 새 WI로 승인한다."
+    }
+  ],
+  "upwardValidation": [
+    { "code": "E1", "status": "Passed", "evidence": ["eng/execution-ledgers/world-interaction-responsibilities.json"], "nextAction": "단일 책임 불변식을 유지한다." },
+    { "code": "E2", "status": "Passed", "evidence": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldInteractionNames.generated.cs"], "nextAction": "공용 소비자 호환을 유지한다." },
+    { "code": "E3", "status": "Passed", "evidence": ["eng/tests/world-interactions.ps1", "Ssalddel.Simulation.Tests/SimulationWorldInteractionMaturityTests.cs"], "nextAction": "집중 회귀를 유지한다." },
+    { "code": "E4", "status": "Passed", "evidence": ["eng/execution-ledgers/world-interaction-trigger-sources.json", "eng/execution-ledgers/world-interaction-responsibilities.json"], "nextAction": "Actor binding과 책임을 분리한다." },
+    { "code": "E5", "status": "Blocked", "evidence": ["eng/execution-ledgers/world-interaction-flows.json"], "nextAction": "복합·절차·Actor 전환 대상 16개의 Runtime migration을 좁은 판본으로 나눠 구현한다." },
+    { "code": "E6", "status": "Passed", "evidence": ["docs/Architecture/WI단일책임원칙.md"], "nextAction": "기존 현실 자료 경계를 유지한다." },
+    { "code": "E7", "status": "Blocked", "evidence": ["C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/세계상호작용한국어이름Tests.cs"], "nextAction": "필요할 때 Play Mode·Game View를 검증한다." },
+    { "code": "E8", "status": "Blocked", "evidence": ["eng/execution-ledgers/world-interaction-responsibilities.json"], "nextAction": "위임과 NPC 실제 행동을 분리한 생활세계 증거를 만든다." },
+    { "code": "E9", "status": "Blocked", "evidence": ["eng/execution-ledgers/work-orders/wi-single-responsibility-refactor.e9-work-order.json"], "nextAction": "복합 책임 migration과 E8 기준선 전 승격하지 않는다." }
+  ],
+  "promotionBlockers": [
+    "복합 책임 6개, Task·Effect로 내릴 절차 6개, 실제 NPC 행동으로 전환할 자동 전이 4개의 Runtime migration이 필요하다.",
+    "기존 save·replay 계보를 보존하는 migration 판본이 없다.",
+    "Play Mode·Game View와 지속 NPC 생활세계 증거가 없다."
+  ],
+  "finalEvidenceReferences": [
+    "eng/execution-ledgers/world-interaction-responsibilities.json",
+    "eng/execution-ledgers/world-interaction-flows.json",
+    "docs/Architecture/WI단일책임원칙.md"
+  ]
+}

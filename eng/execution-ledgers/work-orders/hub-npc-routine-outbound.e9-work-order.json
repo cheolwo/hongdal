@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-HUB-NPC-ROUTINE-OUTBOUND",
+  "title": "Hub 창고 검수·적재·피킹·포장·출고 준비 NPC 폐루프",
+  "playableLoopRefs": [
+    "playable-loop:hub-outbound-ready-return.v1"
+  ],
+  "evidencePackageRefs": [
+    "evidence:hub-npc-routine-core-20260825"
+  ],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "npc-routine-control.r2",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "StableOrExplicitlyBlocked",
+    "lastReassessment": "300 KGM 감자의 WI-001·002·WI-HUB-03~05 NPC 폐루프, Hub H1 작업 능력 결속, 정밀 Interior 계획 동결, canonical Scene의 Synty 창고 구조와 simulation-save.v22 재생을 자동 검증했다. Play Mode 실제 NPC 통행과 Game View가 없어 E4에서 멈춘다.",
+    "nextReopenCondition": "SimulationWorldShell에서 실제 NPC 업무 경로·충돌·상태 전환을 Play Mode로 검증할 때 E5~E8 영향을 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Simulation", "Integration", "Unity"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:integration", "workstream:unity"],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application",
+      "Ssalddel.Simulation.Server/Controllers",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "eng/world-seedbeds",
+      "docs/Architecture",
+      "docs/AI"
+    ],
+    "dependencyWorkOrderIds": [],
+    "handoffIn": [
+      "WI-001·002와 WI-HUB-03~05의 기존 상태 전이와 NPC 조직·역량·정책 계약",
+      "Hub 독립 영역 우선 정책과 simulation-save.v21 이하 호환 기준"
+    ],
+    "handoffOut": [
+      "SimulationWorldShell에서 NPC 업무 경로의 실제 통행·상태 전환 증거",
+      "지속 Hub 생활세계와 플레이어 정책·예외 개입 Projection"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "NPC 루틴 계약·Core·SaveReplay·API·시험·원장과 문서를 되돌릴 수 있는 맥락으로 분리"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v2",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9",
+      "disposition": "Defined",
+      "summary": "운영 유래 반복 WI는 NPC가 수행하고 플레이어는 정책과 예외를 통제하는 안정된 게임 구조를 목표로 한다.",
+      "dimensions": {
+        "changeEnvelope": "59개 WI의 유래·통제 분류를 유지하면서 npc-routine-control.r2와 Hub WI-001·002·WI-HUB-03~05 폐루프, 정밀 배치 손잡이를 한 변화 묶음으로 추적한다.",
+        "baselineAndTargetRevision": "E8 기준선은 없으며 목표 revision은 npc-routine-control.r2, 저장 판본은 simulation-save.v22이다.",
+        "migrationCompatibility": "프로필 없는 기존 세션, r1과 simulation-save.v21 이하의 직접 Confirm·canonical hash를 보존한다.",
+        "rollbackBoundary": "새 프로필과 Interior 손잡이를 지정하지 않으면 기존 실행·저장 계약으로 돌아가며 v22 상태를 하위 hash에 역주입하지 않는다."
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md", "docs/Architecture/NPC루틴WI통제정책.md"],
+      "nextAction": "E8 기준선과 실제 migration 증거 전까지 promotionEligible=false를 유지한다."
+    },
+    {
+      "code": "E8",
+      "disposition": "Gap",
+      "summary": "NPC 출고 업무가 다른 욕구·생활·영역 선택으로 이어지는 지속 생활세계 증거가 없다.",
+      "dimensions": {
+        "npcRoleGroup": "전용 출고 준비 담당 NPC와 정책은 있지만 장기 교대·욕구·다른 직무 관계는 범위 밖이다.",
+        "continuousLifeLoop": "현재는 저장 재고→출고 준비→다음 Hub 작업 후보 반환만 닫고 지속 생활세계는 주장하지 않는다.",
+        "playerAbsentBehavior": "플레이어 Command 없이 WorldTick이 후보·담당자·03~05 전이를 결정한다.",
+        "saveReplay": "프로필·NPC 루틴 계보와 동결된 Interior plan handle을 v22 hash에 포함하고 과거 실행·배치를 재평가하지 않는다."
+      },
+      "sourceReferences": ["docs/Architecture/E8-NPC생활세계폐루프정의.md", "docs/Architecture/NPC루틴WI통제정책.md"],
+      "nextAction": "Hub 독립 생활세계 기준선이 생기기 전 E8을 차단 상태로 둔다."
+    },
+    {
+      "code": "E7",
+      "disposition": "Gap",
+      "summary": "플레이어가 정책·차단·NPC 진행을 이해하고 개입하는 실제 플레이 화면 증거가 없다.",
+      "dimensions": {
+        "playerLoop": "업무 후보 관찰→정책 또는 시설 개입→NPC 진행 관찰→다음 Hub 선택으로 복귀한다.",
+        "authorityModes": "Solo LocalProcess와 Hosted RemoteHost가 같은 Simulation Core와 조회 계약을 사용한다.",
+        "canonicalScene": "SimulationWorldShell만 공식 플레이 Scene으로 사용한다.",
+        "runtimeEvidence": "코드·자동 시험만 검증했으며 Play Mode·Game View 없이는 E7을 주장하지 않는다."
+      },
+      "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md"],
+      "nextAction": "읽기 전용 Projection을 canonical Scene에 연결하고 실제 입력·Game View를 별도 검증한다."
+    },
+    {
+      "code": "E6",
+      "disposition": "Defined",
+      "summary": "운영 코드는 의미의 유래일 뿐 실제 운영 자료나 Provider가 Simulation 업무 결과를 만들지 않는다.",
+      "dimensions": {
+        "worldStateExplanation": "내부 Fixture 재고·정책·NPC 역량·WorldTick만 후보와 결과를 설명한다.",
+        "groundingProfile": "NotApplied: 첫 조각은 실제 운영 주문·재고·상품 관측을 사용하지 않는다.",
+        "provenanceLimitations": "운영 API key·내부 식별자·원문·운영 DB를 Simulation·Unity 계약에 노출하지 않는다.",
+        "causalQuestionMatrix": "운영 유래라는 분류는 실행 원인이 아니며 WorldTick의 권위 조건이 충족될 때만 WI가 발생한다."
+      },
+      "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md"],
+      "nextAction": "향후 현실 자료를 붙일 때도 승인 Snapshot과 Simulation 인과를 분리한다."
+    },
+    {
+      "code": "E5",
+      "disposition": "Gap",
+      "summary": "결정적 Fixture와 저장 Scene 구조는 준비됐지만 실제 Play Mode에서의 WI 세계 발현 증거는 없다.",
+      "dimensions": {
+        "triggerOccurrence": "전용 정책이 활성이고 적격 NPC와 PendingInspection 감자가 있으면 WorldTick이 WI-001부터 한 건 시작한다.",
+        "authorityTransition": "신뢰된 NPC 루틴만 검수·적재·출고 Core를 호출하고 04·05는 후속 WorldTick 전이로 처리한다.",
+        "taskEffectResult": "검수·적재·피킹·포장·출고 준비 계보와 재고 상태를 남기며 차량 적재나 외부 효과를 만들지 않는다.",
+        "successorOrReturnPath": "OutboundReady 뒤 동일 재고는 재선택하지 않고 다음 Hub 후보를 조회한다.",
+        "conditionalSpatialEvidence": "BoundButRuntimeUnverified: PickingWorkArea·PackingWorkArea·LoadingWorkArea·OutboundStagingArea와 v2 배치 기록은 결속됐으나 실제 통행은 미검증이다."
+      },
+      "sourceReferences": ["eng/execution-ledgers/world-interactions.json", "eng/execution-ledgers/playable-loops.json"],
+      "nextAction": "canonical Scene Play Mode에서 NPC 경로·충돌·상태 전환을 함께 검증한다."
+    },
+    {
+      "code": "E4",
+      "disposition": "Affected",
+      "summary": "발생원·NPC·300 KGM 재고·정책·시간과 승인된 Hub H1 능력·Interior plan hash를 결속했다.",
+      "dimensions": {
+        "allowedTriggerSources": "WI-HUB-03은 NpcDriven, WI-HUB-04~05는 WorldDerived만 허용한다.",
+        "subjectAndTargetBindings": "검수·적재·출고 준비 NPC, Hub 조직·시설과 PendingInspection 감자 재고를 Fixture에 고정한다.",
+        "dataResourceTimeBindings": "정책 revision, 재고 갱신 Tick, WorldTick, 부모 실행 ID, H1·기준 대장·시각 치수·Interior plan hash를 보존한다.",
+        "spatialApplicability": "RequiredAndBound: 두 Hub H1 작업 능력과 내부 연결선, canonical Scene 배치 검증 기록을 결속한다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs"],
+      "nextAction": "배치 결속을 실제 Runtime 통행 증거로 올린다."
+    },
+    {
+      "code": "E3",
+      "disposition": "Affected",
+      "summary": "직접 Confirm 차단·결정적 후보 선택·차단·취소·SaveReplay·LocalHosted 조회를 자동 시험한다.",
+      "dimensions": {
+        "contractTests": "검수·적재·출고 NpcRoutine 직접 Confirm 거부, 정책 비활성·무담당 차단과 허용 개입을 검증한다.",
+        "determinism": "단계·정책 우선순위·재고 Tick·StableId 순서와 한 Tick 한 시작을 검증한다.",
+        "saveReplayRegression": "v22 계보·Interior plan handle 복원 hash와 v21 이하 호환을 검증한다.",
+        "consumerRegression": "Simulation Server HTTP와 LocalSimulationRuntime가 같은 읽기 모델을 반환하는지 검증한다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs"],
+      "nextAction": "관련 집중 시험과 기존 Farm·AreaBuilding 회귀를 계속 유지한다."
+    },
+    {
+      "code": "E2",
+      "disposition": "Affected",
+      "summary": "기존 Session·SupplyChain·NpcWorkforce 경계를 호환 확장한다.",
+      "dimensions": {
+        "contracts": "유래·통제·개입·실행 계보·읽기 모델, 세션 프로필과 Interior plan handle 상태 사본을 공유 계약에 추가한다.",
+        "applicationDomain": "Session WorldTick이 같은 Core의 NPC 루틴 평가기를 실행한다.",
+        "adapters": "Hosted GET 조회와 LocalSimulationRuntime 조회가 같은 Domain Projection을 사용한다.",
+        "unityProjection": "Unity에는 쓰기 업무 API 대신 읽기 전용 상태·차단·허용 개입을 제공한다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNpcRoutineControlContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs"],
+      "nextAction": "공개 계약과 기존 API 호환을 회귀 시험으로 유지한다."
+    },
+    {
+      "code": "E1",
+      "disposition": "Defined",
+      "summary": "업무 유래·통제 정책·실행 발생원을 분리하고 Hub 반복 창고 업무의 플레이어 직접 완료를 금지한다.",
+      "dimensions": {
+        "purposeAndReturn": "NPC가 Hub 검수부터 출고 준비까지 수행하고 플레이어는 정책·예외를 선택한 뒤 다음 Hub 운영 선택으로 돌아온다.",
+        "authorityAndAllowedTriggerSources": "Simulation Core가 권위이며 001·002·03은 NpcDriven, 04·05는 WorldDerived이고 플레이어 직접 Confirm은 금지한다.",
+        "stableIdsAndRevision": "59개 WI 분류, npc-routine-control.r2, 실행·부모 실행 StableId, placement-control-hierarchy.v2와 simulation-save.v22를 판본화한다.",
+        "acceptanceAndExclusions": "독립 300 KGM Fixture·결정성·LocalHosted 공통 Core·v21 이하 호환을 수용하고 차량 상차·외부 운송·운영 효과·새 Scene은 제외한다."
+      },
+      "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md", "eng/execution-ledgers/world-interactions.json"],
+      "nextAction": "분류와 권위 불변식을 유지한다."
+    }
+  ],
+  "upwardValidation": [
+    { "code": "E1", "status": "Passed", "evidence": ["docs/Architecture/NPC루틴WI통제정책.md", "eng/execution-ledgers/world-interactions.json"], "nextAction": "유래·통제·실행 발생원 분리를 유지한다." },
+    { "code": "E2", "status": "Passed", "evidence": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNpcRoutineControlContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs", "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs", "Ssalddel.Simulation.Server/Controllers/경영Simulation물류창고Controller.cs"], "nextAction": "공개 계약 호환을 유지한다." },
+    { "code": "E3", "status": "Passed", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs", "Ssalddel.Simulation.Tests/InteriorLayoutEngineTests.cs", "artifacts/local/validation/hub-warehouse-task.trx"], "nextAction": "결정성·SaveReplay·LocalHosted 회귀를 유지한다." },
+    { "code": "E4", "status": "Passed", "evidence": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/PyeongchangSimulationNpcWorkforceFixture.cs", "eng/world-seedbeds/wi-spatial-seedbeds/definitions/hub-outbound-staging.v1.json", "C:/Users/user/ssalddel/Assets/Ssalddel/Scenes/SimulationWorldShell.unity"], "nextAction": "Runtime 통행과 상태 전환을 검증한다." },
+    { "code": "E5", "status": "Blocked", "evidence": ["artifacts/local/validation/hub-warehouse-unity-editmode.xml"], "nextAction": "Play Mode에서 NPC 경로·충돌·WI 발현을 검증한다." },
+    { "code": "E6", "status": "NotStarted", "evidence": [], "nextAction": "Hub 장소·원인·피드백 정제를 검증한다." },
+    { "code": "E7", "status": "Blocked", "evidence": [], "nextAction": "SimulationWorldShell 실제 입력·Game View를 검증한다." },
+    { "code": "E8", "status": "Blocked", "evidence": [], "nextAction": "지속 NPC 생활세계 기준선을 만든다." },
+    { "code": "E9", "status": "Blocked", "evidence": [], "nextAction": "E8 기준선 뒤 migration·회귀로 안정 revision을 검증한다." }
+  ],
+  "promotionBlockers": [
+    "SimulationWorldShell의 실제 NPC 경로 통행·충돌·WI 상태 전환 Play Mode 증거가 없다.",
+    "Game View와 플레이어 정책 개입 증거가 없다.",
+    "지속 NPC 생활세계 E8 기준선과 실제 migration 검증이 없다."
+  ],
+  "finalEvidenceReferences": [
+    "Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs",
+    "Ssalddel.Simulation.Tests/InteriorLayoutEngineTests.cs",
+    "artifacts/local/validation/hub-warehouse-task.trx",
+    "artifacts/local/validation/hub-warehouse-unity-editmode.xml"
+  ]
+}

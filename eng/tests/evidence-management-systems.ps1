@@ -13,20 +13,36 @@ $workOrderTemplatePath = Join-Path $repositoryRoot (
 $responsibilityMapPath = Join-Path $repositoryRoot `
     "docs/AI/generated/evidence-responsibility-code-map.json"
 
-if ([string] $management.schemaVersion -ne "simulation-evidence-management-systems.v1") {
+if ([string] $management.schemaVersion -ne "simulation-evidence-management-systems.v3") {
     throw "EvidenceManagementSystemSchemaInvalid"
 }
-if ((@($stages.stages.code) -join ",") -ne "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") {
+if ([string] $management.evidenceModelRevision -ne
+    "horizontal-dual-cycle-evidence.r3" -or
+    (@($stages.stages.code) -join ",") -ne
+    "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9,E10") {
     throw "EvidenceManagementStageOrderInvalid"
 }
-if ((@($management.systems.code) -join ",") -ne "G1,G2,G3,G4") {
+if ((@($management.systems.code) -join ",") -ne "G1,G2,G3,G4,G5") {
     throw "EvidenceManagementSystemOrderInvalid"
 }
 if (-not [bool] $management.principles.managementSystemsAreNotEvidenceStages -or
     -not [bool] $management.principles.managementCompletionDoesNotPromoteEvidence -or
     -not [bool] $management.principles.promotionRequiresStageCompletionGateEvidence -or
-    -not [bool] $management.principles.targetFirstPlanningDoesNotPromoteEvidence) {
+    -not [bool] $management.principles.targetFirstPlanningDoesNotPromoteEvidence -or
+    -not [bool] $management.principles.evidencePackageDoesNotPromoteSubjectAutomatically -or
+    -not [bool] $management.principles.playableUnitVerticalMaturityEndsAtE7 -or
+    -not [bool] $management.principles.postE7EvidenceUsesStabilityAggregateAndOperationalSubjects -or
+    -not [bool] $management.principles.logicAndPresentationCycleThroughE1ToE9 -or
+    -not [bool] $management.principles.integratedEvidenceUsesLowerTrack -or
+    -not [bool] $management.principles.legacyE9DoesNotPromoteCurrentE9) {
     throw "EvidenceManagementAxisBoundaryInvalid"
+}
+foreach ($catalogPath in @(
+    [string] $management.playableLoopCatalogPath,
+    [string] $management.evidencePackageCatalogPath)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $repositoryRoot $catalogPath))) {
+        throw "EvidenceManagementDevelopmentCatalogMissing:$catalogPath"
+    }
 }
 if (-not (Test-Path -LiteralPath $verticalProtocolPath) -or
     -not (Test-Path -LiteralPath $workOrderTemplatePath)) {
@@ -35,19 +51,39 @@ if (-not (Test-Path -LiteralPath $verticalProtocolPath) -or
 $verticalProtocol = Get-Content -LiteralPath $verticalProtocolPath -Raw -Encoding UTF8 |
     ConvertFrom-Json
 if ((@($verticalProtocol.downwardReviewOrder) -join ",") -ne
-    "E9,E8,E7,E6,E5,E4,E3,E2,E1" -or
+    "E7,E6,E5,E4,E3,E2,E1" -or
     (@($verticalProtocol.upwardValidationOrder) -join ",") -ne
-    "E1,E2,E3,E4,E5,E6,E7,E8,E9" -or
-    [string] $verticalProtocol.iterationCycle.cycleCode -ne "E9-E1-E9-Repeat") {
+    "E1,E2,E3,E4,E5,E6,E7" -or
+    -not [bool] $verticalProtocol.principles.playableUnitVerticalMaturityEndsAtE7 -or
+    -not [bool] $verticalProtocol.principles.logicAndPresentationEachReviewE7ToE1 -or
+    -not [bool] $verticalProtocol.principles.logicAndPresentationEachValidateE1ToE7) {
     throw "EvidenceManagementVerticalProtocolOrderInvalid"
 }
 
-$expectedTransitions = @("E1>E6", "E6>E7", "E7>E8", "E8>E9")
+$expectedTransitions = @("E1>E6", "E6>E7", "E7>E8", "E8>E9", "E9>E10")
 $actualTransitions = @($management.systems | ForEach-Object {
     "$($_.primaryTransition.from)>$($_.primaryTransition.to)"
 })
 if (($actualTransitions -join ",") -ne ($expectedTransitions -join ",")) {
     throw "EvidenceManagementTransitionInvalid"
+}
+
+$legacyStagePath = Join-Path $repositoryRoot `
+    ([string] $management.legacyCompatibility.evidenceStageCatalogPath)
+$legacyStages = Get-Content -LiteralPath $legacyStagePath `
+    -Raw -Encoding UTF8 | ConvertFrom-Json
+if ([string] $legacyStages.evidenceModelRevision -ne
+    "legacy-change-adaptive.r10" -or
+    (@($legacyStages.stages.code) -join ",") -ne
+    "E0,E1,E2,E3,E4,E5,E6,E7,E8,E9") {
+    throw "EvidenceManagementLegacyStageCompatibilityInvalid"
+}
+$postE7Manager = Join-Path $repositoryRoot `
+    "eng/execution-ledgers/manage-post-e7-evidence-campaigns.ps1"
+$postE7Result = & $postE7Manager -Mode Check -InputPath `
+    ([string] $management.postE7EvidenceCampaignCatalogPath)
+if ([string] $postE7Result -notlike "PostE7EvidenceCampaignsValid:*") {
+    throw "EvidenceManagementPostE7CampaignInvalid:$postE7Result"
 }
 
 $stageCodes = @($stages.stages.code)
@@ -103,4 +139,4 @@ if (-not ($e5Components | Where-Object {
     throw "EvidenceManagementE5ExecutionPipelineMissing"
 }
 
-Write-Output "EvidenceManagementSystemsTestsPassed:G1=E1-E6;G2=E6-E7;G3=E7-E8;G4=E8-E9;Cycle=E9-E1-E9-Repeat;E1E3Submodules=$($submodules.Count);E5Components=$($e5Components.Count)"
+Write-Output "EvidenceManagementSystemsTestsPassed:G1=E1-E6;G2=E6-E7;G3=E7-E8;G4=E8-E9;G5=E9-E10;Vertical=E1-E7;E1E3Submodules=$($submodules.Count);E5Components=$($e5Components.Count)"

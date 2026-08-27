@@ -66,8 +66,8 @@ public sealed class SimulationWorldInteractionMaturityTests
             (SsalddelEvidenceStage.E5, "E5세계발현Module", typeof(IE5세계발현Module)),
             (SsalddelEvidenceStage.E6, "E6세계정제Module", typeof(IE6세계정제Module)),
             (SsalddelEvidenceStage.E7, "E7플레이경험폐루프Module", typeof(IE7플레이경험폐루프Module)),
-            (SsalddelEvidenceStage.E8, "E8영역폐루프조화Module", typeof(IE8영역폐루프조화Module)),
-            (SsalddelEvidenceStage.E9, "E9사람통합플레이개선Module", typeof(IE9사람통합플레이개선Module)),
+            (SsalddelEvidenceStage.E8, "E8개별폐루프안정Module", typeof(IE8개별폐루프안정Module)),
+            (SsalddelEvidenceStage.E9, "E9영역조화사람승인Module", typeof(IE9영역조화사람승인Module)),
             (SsalddelEvidenceStage.E10, "E10제한운영검증Module", typeof(IE10제한운영검증Module)),
         };
 
@@ -77,6 +77,10 @@ public sealed class SimulationWorldInteractionMaturityTests
         Assert.All(expected, item =>
             Assert.Contains(typeof(IE단계Module), item.Item3.GetInterfaces()));
 
+        Assert.Contains(typeof(IE단계Module),
+            typeof(IE8영역폐루프조화Module).GetInterfaces());
+        Assert.Contains(typeof(IE단계Module),
+            typeof(IE9사람통합플레이개선Module).GetInterfaces());
         Assert.Contains(typeof(IE단계Module),
             typeof(IE8생활연속성Module).GetInterfaces());
         Assert.Contains(typeof(IE단계Module),
@@ -93,17 +97,17 @@ public sealed class SimulationWorldInteractionMaturityTests
             SsalddelEvidenceModelRevisions.Current,
             SsalddelEvidenceStage.E7,
             SsalddelEvidenceSubjectKind.PlayableUnit);
-        var harmony = new SsalddelEvidenceStageHandle(
+        var stability = new SsalddelEvidenceStageHandle(
             SsalddelEvidenceModelRevisions.Current,
             SsalddelEvidenceStage.E8,
-            SsalddelEvidenceSubjectKind.AreaHarmonySet);
+            SsalddelEvidenceSubjectKind.PlayableUnitStabilityCampaign);
 
         Assert.Equal(SsalddelEvidenceStage.E7, unit.EvidenceStage);
-        Assert.Equal(SsalddelEvidenceSubjectKind.AreaHarmonySet,
-            harmony.SubjectKind);
+        Assert.Equal(SsalddelEvidenceSubjectKind.PlayableUnitStabilityCampaign,
+            stability.SubjectKind);
         Assert.Throws<ArgumentException>(() => new SsalddelEvidenceStageHandle(
             "", SsalddelEvidenceStage.E8,
-            SsalddelEvidenceSubjectKind.AreaHarmonySet));
+            SsalddelEvidenceSubjectKind.PlayableUnitStabilityCampaign));
         Assert.Throws<ArgumentException>(() => new SsalddelEvidenceStageHandle(
             SsalddelEvidenceModelRevisions.Current,
             SsalddelEvidenceStage.E8,
@@ -111,18 +115,18 @@ public sealed class SimulationWorldInteractionMaturityTests
         Assert.Throws<ArgumentException>(() => new SsalddelEvidenceStageHandle(
             SsalddelEvidenceModelRevisions.Current,
             SsalddelEvidenceStage.E9,
-            SsalddelEvidenceSubjectKind.AreaHarmonySet));
+            SsalddelEvidenceSubjectKind.HumanPlaytestCampaign));
 
-        var human = new SsalddelEvidenceStageHandle(
+        var harmony = new SsalddelEvidenceStageHandle(
             SsalddelEvidenceModelRevisions.Current,
             SsalddelEvidenceStage.E9,
-            SsalddelEvidenceSubjectKind.HumanPlaytestCampaign);
+            SsalddelEvidenceSubjectKind.AreaHarmonySet);
         var operation = new SsalddelEvidenceStageHandle(
             SsalddelEvidenceModelRevisions.Current,
             SsalddelEvidenceStage.E10,
             SsalddelEvidenceSubjectKind.LimitedOperationWindow);
-        Assert.Equal(SsalddelEvidenceSubjectKind.HumanPlaytestCampaign,
-            human.SubjectKind);
+        Assert.Equal(SsalddelEvidenceSubjectKind.AreaHarmonySet,
+            harmony.SubjectKind);
         Assert.Equal(SsalddelEvidenceSubjectKind.LimitedOperationWindow,
             operation.SubjectKind);
     }

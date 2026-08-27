@@ -1,8 +1,16 @@
 {
-  "schemaVersion": "simulation-e9-vertical-work-order.v1",
-  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r3",
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
   "workOrderId": "E9-WO-SOLO-FIRST-SIMULATION-RUNTIME",
   "title": "Solo 우선 Simulation Runtime과 영역 Adapter 재조립",
+  "playableLoopRefs": [
+    "playable-loop:solo-world-day.v1",
+    "playable-loop:nature-survival-homestead.v1",
+    "playable-loop:farm-internal-production.v1"
+  ],
+  "evidencePackageRefs": [
+    "evidence:simulation-task-20260824"
+  ],
   "workType": "NewVerticalSlice",
   "targetEvidenceStage": "E9",
   "currentEvidenceStage": "E3",
@@ -14,6 +22,40 @@
     "currentPass": "UpwardAssemblyAndValidation",
     "lastReassessment": "공통 Runtime의 E1~E3 증거 뒤 E4 WI-H1 예약과 연결구를 다음 최저 누락으로 다시 판정했다.",
     "nextReopenCondition": "Remote Adapter 또는 Unity 실제 플레이 검증이 권위·저장·공간 계약을 바꾸면 전체 하향 영향을 다시 검토한다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Integration",
+    "participatingWorkstreams": [
+      "Simulation",
+      "Unity",
+      "Integration"
+    ],
+    "ownerRef": "workstream:integration",
+    "reviewerRefs": [
+      "workstream:simulation",
+      "workstream:unity"
+    ],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application/RuntimeCore",
+      "Ssalddel.Simulation.Infrastructure",
+      "Ssalddel.Simulation.Server",
+      "Ssalddel.Simulation.Tests",
+      "eng/execution-ledgers",
+      "docs/Architecture",
+      "docs/AI"
+    ],
+    "dependencyWorkOrderIds": [],
+    "handoffIn": [
+      "기존 HTTP Runtime과 Session Aggregate 권위 계약",
+      "Unity Local Runtime 소비자와 기존 Save/Replay 판본"
+    ],
+    "handoffOut": [
+      "LocalProcess·RemoteHost 공통 Runtime 계약",
+      "영역별 Adapter 이관 상태와 미이관 시 명시적 NotAvailable 경계"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "Core 계약·Local Adapter·Remote Adapter·Unity 소비자를 분리 가능한 맥락으로 커밋"
   },
   "authorityProfile": {
     "simulationCore": "SharedSimulationCore",

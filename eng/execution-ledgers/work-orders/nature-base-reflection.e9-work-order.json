@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "simulation-e9-vertical-work-order.v2",
+  "protocolRevision": "simulation-e9-vertical-implementation-protocol.r4",
+  "workOrderId": "E9-WO-NATURE-BASE-REFLECTION",
+  "title": "Nature 거점 성찰과 다음 원정 준비",
+  "playableLoopRefs": ["playable-loop:nature-base-reflection.v1"],
+  "evidencePackageRefs": ["evidence:nature-base-reflection-e3-20260826"],
+  "workType": "NewVerticalSlice",
+  "targetEvidenceStage": "E9",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "baselineE8Revision": "",
+  "targetStableRevision": "base-reflection.r1",
+  "iterationState": {
+    "cycleCode": "E9-E1-E9-Repeat",
+    "currentPass": "UpwardAssemblyAndValidation",
+    "lastReassessment": "저녁학당이라는 시간·장소 고정 명칭을 새 계약에 사용하지 않고, 기존 Unity 형식은 호환 어댑터로 보존한다. 영상 시청이 아니라 게임 안 성찰 선택에만 보상을 귀속한다.",
+    "nextReopenCondition": "H1 실제 사용, 다음 원정 선택 변화, LocalProcess·RemoteHost 또는 주 세션 저장 통합에서 계약 차이가 발견되면 E9부터 관련 층을 다시 연다."
+  },
+  "collaborationProfile": {
+    "primaryWorkstream": "Simulation",
+    "participatingWorkstreams": ["Operations", "Simulation", "Unity", "Integration", "ProjectGovernance"],
+    "ownerRef": "workstream:simulation",
+    "reviewerRefs": ["workstream:operations", "workstream:unity", "workstream:integration"],
+    "allowedChangeRoots": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime",
+      "Ssalddel.Simulation.Application",
+      "Ssalddel.Simulation.Server",
+      "Ssalddel.Simulation.Tests",
+      "Ssalddel.Unity/Runtime/Learning",
+      "Ssalddel.Unity.Tests",
+      "docs/Architecture",
+      "docs/ProjectOverview/templates",
+      "docs/AI",
+      "eng/execution-ledgers"
+    ],
+    "dependencyWorkOrderIds": ["E9-WO-NATURE-AREA-BUILDING-PROGRESSION"],
+    "handoffIn": [
+      "Nature 현장 활동→거점 귀환과 Day2 선택 상태",
+      "운영자 승인 학습 Publication과 Simulation 파생 원장",
+      "기존 hongik-unity-learning-card-publication.v1 호환 계약"
+    ],
+    "handoffOut": [
+      "WI-REFLECT-01 단일 책임 계약",
+      "동결 승인자료와 내면 상태 hash",
+      "다음 원정 정보·선택 개선을 위한 허용 효과 계보"
+    ],
+    "branchPolicy": "ExistingScopedBranch",
+    "commitScope": "승인자료 계약, 거점 성찰 Domain·시험, PlayableLoop 대장과 설계 문서를 분리"
+  },
+  "authorityProfile": {
+    "simulationCore": "SharedSimulationCore",
+    "soloAuthorityLocation": "LocalProcess",
+    "hostedAuthorityLocation": "RemoteHost",
+    "operationalEffectsIncluded": false
+  },
+  "spatialProfile": {
+    "canonicalUnityScene": "SimulationWorldShell",
+    "placementControlPolicy": "placement-control-hierarchy.v1",
+    "hHierarchyIsSemanticNotPlacementControl": true,
+    "newOfficialSceneAllowed": false
+  },
+  "downwardPlan": [
+    {
+      "code": "E9", "disposition": "Affected",
+      "summary": "기존 Unity 저녁학당 계약과 v23 이하 저장 hash를 보존하며 거점 성찰을 새 변화 봉투로 추가한다.",
+      "dimensions": {
+        "changeEnvelope": "기존 이름·직렬화는 어댑터로 보존하고 새 공용 계약만 거점 성찰로 명명한다.",
+        "baselineAndTargetRevision": "기존 hongik publication과 simulation-save.v23을 기준으로 approved-learning-material.v1, base-reflection.r1을 추가한다.",
+        "migrationCompatibility": "운영 원문·기존 Publication을 제자리 변경하지 않고 승인 새 판본으로 투영한다.",
+        "rollbackBoundary": "거점 성찰 파생 원장과 새 WI를 비활성화하면 기존 Nature 폐루프는 유지된다."
+      },
+      "sourceReferences": ["docs/Architecture/E9하향식수직구현체계.md"],
+      "nextAction": "E7 증거와 주 세션 저장 통합 뒤 안정 revision을 판정한다."
+    },
+    {
+      "code": "E8", "disposition": "ReusedWithVerification",
+      "summary": "플레이어 전용 폐루프이며 NPC 학습 생활세계는 별도 Nature 건물 학습 폐루프가 소유한다.",
+      "dimensions": {
+        "npcRoleGroup": "없음",
+        "continuousLifeLoop": "없음",
+        "playerAbsentBehavior": "자동 학습 보상을 만들지 않는다.",
+        "saveReplay": "NPC 상태를 포함하지 않는다."
+      },
+      "sourceReferences": ["docs/Architecture/E8-NPC생활세계폐루프정의.md"],
+      "nextAction": "NPC 요구가 생기면 기존 nature-building-learning 작업에서 다룬다."
+    },
+    {
+      "code": "E7", "disposition": "Gap",
+      "summary": "SimulationWorldShell에서 귀환, 휴식/성찰, 다음 원정 선택 변화와 저장 재진입을 실제 입력으로 닫아야 한다.",
+      "dimensions": {
+        "playerLoop": "발산→귀환→휴식 또는 성찰→다음 활동 적용→달라진 다음 발산 선택이다.",
+        "authorityModes": "Solo LocalProcess와 Hosted RemoteHost가 같은 Core를 실행해야 한다.",
+        "canonicalScene": "SimulationWorldShell",
+        "runtimeEvidence": "실제 입력·저장 재진입·Game View·Console과 revision별 hash가 필요하다."
+      },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/nature-base-reflection.v1.md"],
+      "nextAction": "E4~E6 뒤 canonical Scene 실제 플레이를 검증한다."
+    },
+    {
+      "code": "E6", "disposition": "Gap",
+      "summary": "승인 근거와 이용 한계, 시청 무보상, 다음 선택이 달라지는 이유를 설명한다.",
+      "dimensions": {
+        "worldStateExplanation": "자료가 능력치를 직접 주는 것이 아니라 플레이어의 성찰 선택이 내면 효과를 만든다.",
+        "groundingProfile": "Optional; 승인 Publication이 있을 때만 원문 링크를 표시한다.",
+        "provenanceLimitations": "원문 전체·댓글·시청 telemetry·API key를 노출하지 않는다.",
+        "causalQuestionMatrix": "특정 채널 시청을 강제하는지, 공격·경제 수치로 과장되는지, 그냥 휴식이 유효한지 검토한다."
+      },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/nature-base-reflection.v1.md"],
+      "nextAction": "설명 가능한 Projection과 정제 시험을 추가한다."
+    },
+    {
+      "code": "E5", "disposition": "Gap",
+      "summary": "실제 Nature 거점에서 성찰 Confirm과 다음 활동 적용이 다음 원정 선택으로 돌아와야 한다.",
+      "dimensions": {
+        "triggerOccurrence": "플레이어의 명시적 성찰 Confirm만 보상 성찰을 만든다.",
+        "authorityTransition": "세션 revision, 하루 제한, Publication revision 지급 원장을 검증한다.",
+        "taskEffectResult": "적용 대기 뒤 다음 활동 경계에서 내면 학습을 영구 적용한다.",
+        "successorOrReturnPath": "위험 Preview와 후퇴·회복·제작·위임 선택으로 돌아간다.",
+        "conditionalSpatialEvidence": "Required; 기존 Nature 거점 내부 H1 anchor를 사용한다."
+      },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/nature-base-reflection.v1.md"],
+      "nextAction": "Application Adapter와 실제 Nature 상태 전이를 연결한다."
+    },
+    {
+      "code": "E4", "disposition": "Gap",
+      "summary": "WI-REFLECT-01을 플레이어, 승인 Publication, ReflectionInteractionAnchor와 다음 활동 경계에 결속한다.",
+      "dimensions": {
+        "allowedTriggerSources": "PlayerDriven",
+        "subjectAndTargetBindings": "PlayerStableId와 PublicationStableId+Revision",
+        "dataResourceTimeBindings": "승인 원장 revision/hash, 현재 일차, 세션 revision",
+        "spatialApplicability": "Required; H1 ReflectionInteractionAnchor 한 자리"
+      },
+      "sourceReferences": ["eng/execution-ledgers/world-interactions.json"],
+      "nextAction": "기존 오두막 H1 정의와 배치 통제 계층에 anchor를 추가한다."
+    },
+    {
+      "code": "E3", "disposition": "Affected",
+      "summary": "승인자료 hash·멱등 동기화, 성찰 제한, 무보상 원문 열기, 다음 활동 적용, 상태 복원을 자동 시험한다.",
+      "dimensions": {
+        "contractTests": "승인 상태·허용 효과·revision·hash와 선택 규칙을 시험한다.",
+        "determinism": "입력 순서와 무관한 Publication bundle 및 상태 hash를 요구한다.",
+        "saveReplayRegression": "거점 성찰 상태 hash 복원·변조 거부를 검증하고 주 세션 v24 연결은 E4로 남긴다.",
+        "consumerRegression": "현재 Provider·Unity·HTTP Adapter는 범위 밖이다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Tests/SimulationBaseReflectionTests.cs"],
+      "nextAction": "Application Local/Hosted Adapter와 주 세션 저장 계약을 연결한다."
+    },
+    {
+      "code": "E2", "disposition": "Affected",
+      "summary": "승인자료 3계층, 파생 원장, Preview·Confirm·내면 상태 계약과 Domain 엔진을 추가한다.",
+      "dimensions": {
+        "contracts": "원문 관측·해석 후보·승인 Publication과 거점 성찰 상태 사본을 공유 계약에 둔다.",
+        "applicationDomain": "사람 승인과 Provider는 운영 경계, 동기화·성찰 판정은 Simulation Domain이 소유한다.",
+        "adapters": "후속 E4에서 LocalProcess·RemoteHost를 같은 서비스에 연결한다.",
+        "unityProjection": "Unity는 선택·근거·결과를 표시하고 보상을 계산하지 않는다."
+      },
+      "sourceReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationBaseReflectionContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBaseReflection.cs"],
+      "nextAction": "Adapter 공개 계약을 추가한다."
+    },
+    {
+      "code": "E1", "disposition": "Defined",
+      "summary": "선택형 거점 성찰, 시청 무보상, 승인자료 동결, 제한된 내면 효과와 기존 명칭 호환을 불변 계약으로 고정한다.",
+      "dimensions": {
+        "purposeAndReturn": "귀환 뒤 성찰 여부를 고르고 다음 발산 선택으로 돌아온다.",
+        "authorityAndAllowedTriggerSources": "PlayerDriven Confirm을 Simulation Core만 확정한다.",
+        "stableIdsAndRevision": "playable-loop:nature-base-reflection.v1, WI-REFLECT-01, approved-learning-material.v1, base-reflection.r1",
+        "acceptanceAndExclusions": "내면 정보·선택 개선만 포함하며 시청 보상, 공격·경제·타로 수치, Provider 호출, NPC 학습은 제외한다."
+      },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/nature-base-reflection.v1.md"],
+      "nextAction": "계약 변경 시 기존 publication과 v23 이하 호환부터 재검토한다."
+    }
+  ],
+  "upwardValidation": [
+    {"code":"E1","status":"Passed","evidence":["거점 성찰 PlayableLoop 설계와 불변 경계"],"nextAction":"계약 변경 시 재검토"},
+    {"code":"E2","status":"Passed","evidence":["공용 승인자료·거점 성찰 계약과 Domain 엔진"],"nextAction":"Adapter 연결"},
+    {"code":"E3","status":"Passed","evidence":["SimulationBaseReflectionTests 7개 집중 시험"],"nextAction":"주 세션 저장과 전체 회귀"},
+    {"code":"E4","status":"NotStarted","evidence":[],"nextAction":"WI-H1-Adapter 결속"},
+    {"code":"E5","status":"NotStarted","evidence":[],"nextAction":"실제 Nature 세로 조각"},
+    {"code":"E6","status":"NotStarted","evidence":[],"nextAction":"설명·한계 정제"},
+    {"code":"E7","status":"Blocked","evidence":[],"nextAction":"SimulationWorldShell 실제 입력"},
+    {"code":"E8","status":"Passed","evidence":["플레이어 전용 범위이며 NPC 학습은 nature-building-learning 폐루프로 분리"],"nextAction":"NPC 학습 폐루프와 분리 유지"},
+    {"code":"E9","status":"Blocked","evidence":[],"nextAction":"E7·호환·회귀 뒤 승격"}
+  ],
+  "promotionBlockers": [
+    "WI-REFLECT-01과 H1 ReflectionInteractionAnchor의 E4 결속이 없다.",
+    "주 세션 simulation-save.v24와 LocalProcess·RemoteHost Adapter 통합이 없다.",
+    "canonical SimulationWorldShell 실제 입력·저장 재진입·Game View 증거가 없다."
+  ],
+  "finalEvidenceReferences": []
+}

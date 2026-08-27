@@ -1,5 +1,7 @@
 # E8 NPC 생활세계 폐루프 정의
 
+> 호환 문서: 이 문서는 과거 증거 모델 `legacy-change-adaptive.r10`의 E8 의미를 보존한다. 현재 `horizontal-dual-cycle-evidence.r3`에서 E8은 [개별 플레이 폐루프 안정](E1-E7수직폐루프와E8-E10수평증거체계.md#e8--개별-플레이-폐루프-안정)이며, NPC 논리 연속성과 행동 관찰 가능성은 관련 E9 `AreaHarmonySet`의 조건 모듈이다. 이 문서의 증거를 현재 E8로 자동 승격하거나 합산하지 않는다.
+
 ## 목적
 
 E8은 NPC가 Unity 장면에 보이거나 정해진 경로를 이동하는지를 판정하는 단계가 아니다.
@@ -111,15 +113,14 @@ NPC 2명 이상
 
 ## 현재 구현과의 경계
 
-현재 저장소에는 Simulation NPC 조직·역량·정책, 결정적 업무 배정, `Scheduled → Navigating → Working → Completed`, 업무 기록과 저장·재생 기반이 있다. 이 기반은 E8의 업무 수행 부분에 재사용할 수 있다.
+현재 저장소에는 Simulation NPC 조직·역량·정책, 결정적 업무 배정, `Scheduled → Navigating → Working → Completed`, 업무 기록과 저장·재생 기반이 있다. 여기에 Town 자동시험 Fixture로 주민 2명의 욕구 평가, 물품 경쟁, `WI-ORDER-01~07`, 소비에 따른 욕구 변화, 다음 목표 평가와 `simulation-save.v16` 재생이 추가됐다. 이 기준선은 E8의 자율 선택·경쟁·연속성·저장 일부를 검증하지만 Domain Fixture이므로 E8 증거로 승격하지 않는다.
 
 다만 다음은 아직 E8 완료 증거가 아니다.
 
-- 생활 상태를 포함한 지속 목표 선택
 - `NpcTraversal` 의미 이동 계약
 - H1~H3 공간을 이용한 NPC 목적지 해석
 - 생활 이동과 업무 WI가 이어지는 다중 행동 폐루프
-- 여러 NPC의 공유 공간 경쟁·협력 종단 검증
+- 여러 NPC의 공유 **공간** 경쟁·협력 종단 검증
 - 실제 서버·저장 장면에서의 E8 Play Mode·Game View 증거
 
 따라서 이 문서는 E8의 정의와 판정 관문만 확정한다. E0~E7 실행 원장, API, Simulation 계약과 Unity 구현은 별도 후속 작업에서 호환성을 유지하며 확장한다.
