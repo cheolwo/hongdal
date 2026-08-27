@@ -26,6 +26,8 @@ namespace Ssalddel.Simulation.Domain
                     source.WorldAssetPlacementBaseSchemaVersion,
                 ActorEquipmentBaseSchemaVersion =
                     source.ActorEquipmentBaseSchemaVersion,
+                ActionManifestationBaseSchemaVersion =
+                    source.ActionManifestationBaseSchemaVersion,
                 SessionCreateRequest = CloneCreateRequest(source.SessionCreateRequest),
                 Snapshot = 경영SimulationSessionAggregate.Clone(source.Snapshot),
                 WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventory(
@@ -66,7 +68,31 @@ namespace Ssalddel.Simulation.Domain
                 ActorEquipment = source.ActorEquipment == null ? null
                     : 경영SimulationSessionAggregate.CloneActorEquipmentState(
                         source.ActorEquipment),
+                ActionManifestationLedger = CloneActionManifestationLedger(
+                    source.ActionManifestationLedger),
+                PlayerDomainProfile = ClonePlayerDomainProfile(
+                    source.PlayerDomainProfile),
             };
+
+        public static Simulation행위기록LedgerSnapshot?
+            CloneActionManifestationLedger(
+                Simulation행위기록LedgerSnapshot? source)
+            => CloneDataContract(source);
+
+        public static Simulation플레이어분야ProfileSnapshot?
+            ClonePlayerDomainProfile(
+                Simulation플레이어분야ProfileSnapshot? source)
+            => CloneDataContract(source);
+
+        private static T? CloneDataContract<T>(T? source) where T : class
+        {
+            if (source == null) return null;
+            var serializer = new DataContractSerializer(typeof(T));
+            using var stream = new MemoryStream();
+            serializer.WriteObject(stream, source);
+            stream.Position = 0;
+            return (T?)serializer.ReadObject(stream);
+        }
 
         public static SimulationWorldAssetPlacementStateSnapshot?
             CloneWorldAssetPlacementState(

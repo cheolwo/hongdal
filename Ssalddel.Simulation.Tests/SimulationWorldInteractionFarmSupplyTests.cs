@@ -381,7 +381,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
     }
 
     [Fact]
-    public void WI_FARM_04는_공통Pipeline에서_Tick결과와V23음양증거까지완료한다()
+    public void WI_FARM_04는_공통Pipeline에서_Tick결과와V28행위증거까지완료한다()
     {
         var store = new InMemory경영SimulationSessionStore();
         var session = store.CreateOrGet(CreateRequest());
@@ -399,7 +399,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
                 SaveStableId = "save:wi-farm:pipeline-before-tick",
                 ExpectedRevision = confirmed.Revision,
             });
-        Assert.Equal(SimulationSaveSchemaVersions.V23,
+        Assert.Equal(SimulationSaveSchemaVersions.V28,
             beforeTick.SchemaVersion);
         var invocation = Assert.Single(beforeTick.CommandLog,
             value => value.WorldInteractionInvocation != null)
@@ -444,6 +444,9 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         Assert.Single(tampered.CommandLog,
                 value => value.WorldInteractionInvocation != null)
             .WorldInteractionInvocation!.음양주체분류.사분면기호 = "--";
+        // hash 변조와 계약 변조를 구분해, 여기서는 잘못된 WI 분류 계약을
+        // 직접 검증한다.
+        tampered.ReplayHash = SimulationReplayHasher.Calculate(tampered);
         var error = Assert.Throws<SimulationContractException>(() =>
             SimulationSessionReplay.Restore(tampered));
         Assert.Equal("SimulationSavePackageInvalid", error.Message);
@@ -1239,7 +1242,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             });
         Assert.False(string.IsNullOrWhiteSpace(save.ReplayHash));
         Assert.Equal(current.Revision, save.Snapshot.Revision);
-        Assert.Equal(SimulationSaveSchemaVersions.V23, save.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V28, save.SchemaVersion);
         Assert.Contains(save.WorldInteractionManifestations, value =>
             value.WorldInteractionId == "WI-FARM-04");
         Assert.Contains(save.WorldInteractionManifestations, value =>

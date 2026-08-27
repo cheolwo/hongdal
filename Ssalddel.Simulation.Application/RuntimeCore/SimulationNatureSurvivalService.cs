@@ -139,10 +139,17 @@ namespace Ssalddel.Simulation.Application
                     TimeReferenceId = "simulation-time:nature-realtime",
                     PlayableLoopStableId = request.ActionCode switch
                     {
+                        SimulationNatureSurvivalCodes.AcquireAxe or
+                        SimulationNatureSurvivalCodes.BeginHarvest or
                         SimulationNatureSurvivalCodes.PlaceCabinBlueprint or
                         SimulationNatureSurvivalCodes.BeginCabinBuild or
+                        SimulationNatureSurvivalCodes.EnterCabin or
+                        SimulationNatureSurvivalCodes.LeaveCabin or
+                        SimulationNatureSurvivalCodes.CancelActiveWork or
                         SimulationNatureSurvivalCodes.CollectDroppedTimber =>
                             "playable-loop:nature-shelter-foundation.v1",
+                        SimulationNatureSurvivalCodes.ResolveEncounter =>
+                            "playable-loop:nature-twilight-return.v1",
                         SimulationNatureSurvivalCodes.BeginBuildingConstruction =>
                             "playable-loop:nature-building-learning.v1",
                         SimulationNatureSurvivalCodes.PrepareFieldSupply =>
@@ -167,6 +174,20 @@ namespace Ssalddel.Simulation.Application
                         ? new[] { request.ActionCode + ":Confirmed" }
                         : Array.Empty<string>(),
                     SuccessorOrReturnCodes = new[] { successor },
+                    PrimaryOutcomeCode = immediateResult
+                        ? request.ActionCode + ":Confirmed"
+                        : request.ActionCode + ":TaskStarted",
+                    결과분류Code = request.ActionCode ==
+                                   SimulationNatureSurvivalCodes.CancelActiveWork
+                        ? Simulation행위결과분류Codes.취소
+                        : request.ActionCode ==
+                          SimulationNatureSurvivalCodes.ResolveEncounter
+                          && request.ChoiceCode ==
+                          SimulationNatureSurvivalCodes.Retreat
+                            ? Simulation행위결과분류Codes.후퇴복구
+                            : Simulation행위결과분류Codes.성공,
+                    변화의미Codes = ChangeSemantics(request.ActionCode),
+                    SpatialRevision = aggregate.SpatialCompositionRuleRevision,
                 };
             worldInteractions.RecordPreview(context, aggregate.Revision,
                 preview.CanConfirm, preview.BlockReasonCodes);
@@ -186,5 +207,54 @@ namespace Ssalddel.Simulation.Application
             return store.Find(sessionStableId.Trim())
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound");
         }
+
+        private static string[] ChangeSemantics(string actionCode)
+            => actionCode switch
+            {
+                SimulationNatureSurvivalCodes.AcquireAxe => new[]
+                {
+                    Simulation행위변화의미Codes.Actor상태변경,
+                    Simulation행위변화의미Codes.재고변경,
+                },
+                SimulationNatureSurvivalCodes.BeginHarvest or
+                SimulationNatureSurvivalCodes.CollectDroppedTimber => new[]
+                {
+                    Simulation행위변화의미Codes.세계객체생성,
+                    Simulation행위변화의미Codes.재고변경,
+                    Simulation행위변화의미Codes.실외배치변경,
+                },
+                SimulationNatureSurvivalCodes.PlaceCabinBlueprint or
+                SimulationNatureSurvivalCodes.BeginCabinBuild or
+                SimulationNatureSurvivalCodes.BeginBuildingConstruction or
+                SimulationNatureSurvivalCodes.PrepareFieldSupply => new[]
+                {
+                    Simulation행위변화의미Codes.세계객체생성,
+                    Simulation행위변화의미Codes.실외배치변경,
+                    Simulation행위변화의미Codes.통행변경,
+                },
+                SimulationNatureSurvivalCodes.StoreAtCabin => new[]
+                {
+                    Simulation행위변화의미Codes.재고변경,
+                    Simulation행위변화의미Codes.실내설비변경,
+                },
+                SimulationNatureSurvivalCodes.SleepInCabin => new[]
+                {
+                    Simulation행위변화의미Codes.Actor상태변경,
+                    Simulation행위변화의미Codes.시간상태변경,
+                    Simulation행위변화의미Codes.대기변경,
+                    Simulation행위변화의미Codes.실내설비변경,
+                },
+                SimulationNatureSurvivalCodes.EnterCabin or
+                SimulationNatureSurvivalCodes.LeaveCabin => new[]
+                {
+                    Simulation행위변화의미Codes.Actor상태변경,
+                    Simulation행위변화의미Codes.통행변경,
+                    Simulation행위변화의미Codes.실내설비변경,
+                },
+                _ => new[]
+                {
+                    Simulation행위변화의미Codes.Actor상태변경,
+                },
+            };
     }
 }

@@ -748,6 +748,7 @@ public sealed class SimulationRegionalIncidentTests
                 ExpectedRevision = ready.Revision,
                 Preview = retreat,
             });
+        Assert.Equal(HttpStatusCode.OK, confirmResponse.StatusCode);
         var confirmed = await confirmResponse.Content
             .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
         var tickResponse = await client.PostAsJsonAsync(sessionRoute + "/ticks",

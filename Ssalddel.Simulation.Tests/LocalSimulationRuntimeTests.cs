@@ -115,7 +115,7 @@ public sealed class LocalSimulationRuntimeTests
 
             Assert.NotEqual(firstSave.SaveStableId, secondSave.SaveStableId);
             var secondPackage = slotStore.Read("slot-01").Package;
-            Assert.Equal(SimulationSaveSchemaVersions.V23,
+            Assert.Equal(SimulationSaveSchemaVersions.V28,
                 secondPackage.SchemaVersion);
             Assert.Equal(2, secondPackage.WorldInteractionManifestations.Length);
             Assert.Equal(new[]
@@ -161,7 +161,7 @@ public sealed class LocalSimulationRuntimeTests
             Assert.Contains("SpatialEvidence",
                 completedHarvestEvidence.MissingEvidenceCodes);
             var verified = await runtime.Sessions.VerifySlotAsync("slot-01");
-            Assert.Equal(SimulationSaveSchemaVersions.V23,
+            Assert.Equal(SimulationSaveSchemaVersions.V28,
                 verified.Restore.SchemaVersion);
 
             var tampered = SimulationSaveReplayCloner.ClonePackage(secondPackage);
@@ -286,7 +286,7 @@ public sealed class LocalSimulationRuntimeTests
                 });
 
             var package = slotStore.Read("slot-cancelled").Package;
-            Assert.Equal(SimulationSaveSchemaVersions.V23, package.SchemaVersion);
+            Assert.Equal(SimulationSaveSchemaVersions.V28, package.SchemaVersion);
             Assert.Contains(package.WorldInteractionManifestations, value =>
                 value.WorldInteractionId ==
                     SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId
@@ -498,7 +498,7 @@ public sealed class LocalSimulationRuntimeTests
                     SlotStableId = "slot-local-observer-battle",
                     ExpectedRevision = session.Revision,
                 });
-            Assert.Equal(SimulationSaveSchemaVersions.V23,
+            Assert.Equal(SimulationSaveSchemaVersions.V28,
                 slotStore.Read("slot-local-observer-battle").Package.SchemaVersion);
 
             using var restoredRuntime = CreateRuntime(slotStore);

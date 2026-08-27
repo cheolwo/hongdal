@@ -13,6 +13,33 @@ namespace Ssalddel.Simulation.Domain
         public static string Calculate(SimulationSessionSavePackage package)
         {
             if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V28,
+                    StringComparison.Ordinal))
+            {
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.ActionManifestationBaseSchemaVersion;
+                basePackage.ActionManifestationBaseSchemaVersion = string.Empty;
+                basePackage.ActionManifestationLedger = null;
+                basePackage.PlayerDomainProfile = null;
+                basePackage.ReplayHash = string.Empty;
+                var baseReplayHash = Calculate(basePackage);
+                var v28Canonical = string.Join("|", new[]
+                {
+                    SimulationSaveSchemaVersions.V28,
+                    package.ActionManifestationBaseSchemaVersion,
+                    baseReplayHash,
+                    package.ActionManifestationLedger?.StateHashSha256
+                        ?? string.Empty,
+                    package.PlayerDomainProfile?.StateHashSha256
+                        ?? string.Empty,
+                });
+                using var sha = SHA256.Create();
+                return BitConverter.ToString(sha.ComputeHash(
+                        Encoding.UTF8.GetBytes(v28Canonical)))
+                    .Replace("-", string.Empty).ToLowerInvariant();
+            }
+            if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V27,
                     StringComparison.Ordinal))
             {

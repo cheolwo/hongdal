@@ -44,7 +44,7 @@ public sealed class SimulationNature생활거점동등성Tests
 
             AssertClosedLoop(localFinal);
             Assert.Equal(15, localFinal.Revision);
-            Assert.Equal(SimulationSaveSchemaVersions.V23,
+            Assert.Equal(SimulationSaveSchemaVersions.V28,
                 localPackage.SchemaVersion);
 
             using (var restoredRuntime = new LocalSimulationRuntime(

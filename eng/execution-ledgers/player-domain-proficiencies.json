@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "player-domain-proficiencies.v1",
+  "catalogRevision": "player-domain-catalog.r1",
+  "ruleRevision": "player-domain-progress.r1",
+  "authoritativeCatalogSource": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerDomainCatalog.cs",
+  "contractSource": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerDomainProficiencyContracts.cs",
+  "expectedWorldInteractionCount": 65,
+  "progressAxes": [
+    { "code": "Understanding", "한국어명": "이해도", "sources": ["ApprovedMaterialReflection"] },
+    { "code": "FieldProficiency", "한국어명": "현장 숙련도", "sources": ["PlayerFieldAction"] },
+    { "code": "OperationalProficiency", "한국어명": "운영 숙련도", "sources": ["PlayerOperationalDelegation"] }
+  ],
+  "resultProgress": {
+    "Success": 2,
+    "MeaningfulFailure": 1,
+    "RetreatOrRecovery": 1,
+    "Cancelled": 0,
+    "Blocked": 0
+  },
+  "domains": [
+    { "stableCode": "NatureSurvival", "한국어명": "자연 생존", "readiness": "Playable" },
+    { "stableCode": "ExplorationAndSpace", "한국어명": "탐사·공간", "readiness": "RegisteredWI" },
+    { "stableCode": "GatheringAndResources", "한국어명": "채집·자원", "readiness": "Playable" },
+    { "stableCode": "CombatAndHunting", "한국어명": "전투·사냥", "readiness": "Playable" },
+    { "stableCode": "ConstructionAndPlacement", "한국어명": "건설·배치", "readiness": "Playable" },
+    { "stableCode": "FacilitiesAndEnergy", "한국어명": "설비·에너지", "readiness": "AssetSeed" },
+    { "stableCode": "CraftingAndEquipment", "한국어명": "제작·장비", "readiness": "Playable" },
+    { "stableCode": "AgricultureAndProduction", "한국어명": "농업·생산", "readiness": "RegisteredWI" },
+    { "stableCode": "WarehouseAndInventory", "한국어명": "창고·재고", "readiness": "RegisteredWI" },
+    { "stableCode": "TransportAndDelivery", "한국어명": "운송·배송", "readiness": "RegisteredWI" },
+    { "stableCode": "MarketAndLifeService", "한국어명": "시장·생활 서비스", "readiness": "RegisteredWI" },
+    { "stableCode": "OperationsAndOrganization", "한국어명": "운영·조직", "readiness": "RegisteredWI" },
+    { "stableCode": "RegionalDevelopmentAndRecovery", "한국어명": "지역 발전·복구", "readiness": "RegisteredWI" },
+    { "stableCode": "TradeAndExport", "한국어명": "교역·수출", "readiness": "ContractSeed" },
+    { "stableCode": "ReflectionAndEvidenceInterpretation", "한국어명": "성찰·근거 해석", "readiness": "RegisteredWI" },
+    { "stableCode": "LegacyReflection", "한국어명": "기존 성찰 호환", "readiness": "ContractSeed" }
+  ],
+  "firstVerticalFixtures": [
+    { "code": "NatureCombatField", "worldInteractionId": "WI-NATURE-11", "axis": "FieldProficiency" },
+    { "code": "NatureApprovedReflection", "worldInteractionId": "WI-REFLECT-01", "axis": "Understanding" },
+    { "code": "NatureNpcCraftReview", "worldInteractionId": "WI-REVIEW-01", "axis": "OperationalProficiency", "requires": ["player-delegation", "npc-completion", "player-review"] }
+  ],
+  "boundaries": {
+    "npcCompletionAloneGrantsPlayerProgress": false,
+    "understandingHidesAuthorizedFacts": false,
+    "understandingChangesAmbientSpawn": false,
+    "enginesMutateSimulationWorldRevision": false,
+    "externalProviderCallsDuringTick": false
+  }
+}

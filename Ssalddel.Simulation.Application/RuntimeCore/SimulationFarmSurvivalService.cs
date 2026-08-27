@@ -78,14 +78,23 @@ namespace Ssalddel.Simulation.Application
             var aggregate = Find(sessionStableId);
             if (worldInteractionId.Length == 0)
                 return aggregate.ConfirmFarmWork(request);
+            var preview = aggregate.PreviewFarmWork(
+                new SimulationFarmWorkPreviewRequest
+                {
+                    ExpectedRevision = request.ExpectedRevision,
+                    ActorStableId = request.ActorStableId,
+                    TargetStableId = request.TargetStableId,
+                    ActionCode = request.ActionCode,
+                    AssignmentKindCode = request.AssignmentKindCode,
+                    PreferredSpatialStableId = request.PreferredSpatialStableId,
+                });
             var successor = worldInteractionId switch
             {
                 "WI-FARM-04" => "WI-FARM-05",
                 "WI-FARM-05" => "WI-FARM-06",
                 _ => "FarmInternalStorageOrNextProductionCycle",
             };
-            return worldInteractions.ExecutePlayerDriven(aggregate,
-                new 세계상호작용실행Context
+            var context = new 세계상호작용실행Context
                 {
                     WorldInteractionId = worldInteractionId,
                     CommandId = request.CommandId,
@@ -97,6 +106,10 @@ namespace Ssalddel.Simulation.Application
                         request.TargetStableId, request.ActionCode,
                     },
                     TimeReferenceId = "simulation-time:world-tick",
+                    PlayableLoopStableId = worldInteractionId == "WI-FARM-04"
+                        ? "playable-loop:farm-crop-cycle.v1"
+                        : "playable-loop:farm-pack-store-return.v1",
+                    AuthorityLocationCode = "RemoteHost",
                     SpatialEvidenceStateCode =
                         SimulationWorldInteractionSpatialEvidenceCodes.Bound,
                     SpatialEvidenceReferenceIds = new[]
@@ -107,8 +120,23 @@ namespace Ssalddel.Simulation.Application
                     {
                         "task:farm-supply:" + request.CommandId,
                     },
+                    // 작업 시작은 아직 세계 결과가 아니다. 실제 결과 상태는
+                    // WorldTick에서 효과가 적용될 때 기존 E5 기록에 결속한다.
+                    ResultStateCodes = Array.Empty<string>(),
                     SuccessorOrReturnCodes = new[] { successor },
-                }, () => aggregate.ConfirmFarmWork(request));
+                    PrimaryOutcomeCode = request.ActionCode + ":TaskStarted",
+                    결과분류Code = Simulation행위결과분류Codes.성공,
+                    변화의미Codes = new[]
+                    {
+                        Simulation행위변화의미Codes.재고변경,
+                        Simulation행위변화의미Codes.실외배치변경,
+                    },
+                    SpatialRevision = aggregate.SpatialCompositionRuleRevision,
+                };
+            worldInteractions.RecordPreview(context, aggregate.Revision,
+                preview.CanConfirm, preview.BlockingReasonCodes);
+            return worldInteractions.ExecutePlayerDriven(aggregate, context,
+                () => aggregate.ConfirmFarmWork(request));
         }
 
         public SimulationFarmWorkPlanPreviewSnapshot PreviewWorkPlan(

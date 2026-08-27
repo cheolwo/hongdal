@@ -35,6 +35,14 @@ namespace Ssalddel.Simulation.Domain
                 var lhWorld = request.LhWorldState ?? lhWorldState;
                 var worldAssetPlacement = request.WorldAssetPlacementState
                     ?? worldAssetPlacementState;
+                var actionManifestationLedger = request.ActionManifestationLedger
+                    ?? actionManifestationLedgerState;
+                var playerDomainProfile = request.PlayerDomainProfile
+                    ?? playerDomainProfileState;
+                if ((actionManifestationLedger == null) !=
+                    (playerDomainProfile == null))
+                    throw new SimulationContractException(
+                        "SimulationActionManifestationSaveStateIncomplete");
                 var hasWI음양주체분류 = commandLog.Any(value =>
                         string.Equals(value.WorldInteractionInvocation?.PayloadCode,
                             "WorldInteractionInvocation.v2",
@@ -122,6 +130,10 @@ namespace Ssalddel.Simulation.Domain
                         .CloneWorldAssetPlacementState(worldAssetPlacement),
                     ActorEquipment = actorEquipmentLegacyBridge ? null
                         : CreateActorEquipmentStateSnapshot(),
+                    ActionManifestationLedger = SimulationSaveReplayCloner
+                        .CloneActionManifestationLedger(actionManifestationLedger),
+                    PlayerDomainProfile = SimulationSaveReplayCloner
+                        .ClonePlayerDomainProfile(playerDomainProfile),
                 };
                 if (worldAssetPlacement != null)
                 {
@@ -133,6 +145,18 @@ namespace Ssalddel.Simulation.Domain
                 {
                     package.ActorEquipmentBaseSchemaVersion = package.SchemaVersion;
                     package.SchemaVersion = SimulationSaveSchemaVersions.V27;
+                }
+                if (package.ActionManifestationLedger != null
+                    && package.PlayerDomainProfile != null)
+                {
+                    // 행위 원장과 분야 진척은 같은 권위 결과 계보로 봉인한다.
+                    Simulation행위발현Ledger.Restore(
+                        package.ActionManifestationLedger);
+                    Simulation플레이어분야Engine.Restore(
+                        package.PlayerDomainProfile);
+                    package.ActionManifestationBaseSchemaVersion =
+                        package.SchemaVersion;
+                    package.SchemaVersion = SimulationSaveSchemaVersions.V28;
                 }
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
                 return SimulationSaveReplayCloner.ClonePackage(package);

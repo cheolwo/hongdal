@@ -604,12 +604,25 @@ public sealed class SimulationNatureSurvivalTests
             SimulationEngineInteractionPhaseCodes.Preview,
             SimulationEngineInteractionPhaseCodes.Confirm,
             SimulationEngineInteractionPhaseCodes.AuthorityCommit,
+            SimulationEngineInteractionPhaseCodes.ActionRecordAppend,
+            SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
             SimulationEngineInteractionPhaseCodes.ReturnProjection,
         }, trace.Select(value => value.PhaseCode));
         Assert.All(trace, value => Assert.Equal("LocalProcess",
             value.AuthorityLocationCode));
         Assert.Equal(aggregate.Revision,
             trace.Last().AfterAuthorityRevision);
+        var action = Assert.Single(aggregate.GetActionManifestationLedger()!
+            .TailRecords);
+        Assert.Equal(command.CommandId, action.CommandId);
+        Assert.Contains(Simulation행위변화의미Codes.플레이어진척변경,
+            action.변화의미Codes);
+        var profile = aggregate.GetPlayerDomainProfile();
+        Assert.NotNull(profile);
+        service.Confirm(aggregate.SessionStableId, command);
+        Assert.Single(aggregate.GetActionManifestationLedger()!.TailRecords);
+        Assert.Equal(profile!.Revision,
+            aggregate.GetPlayerDomainProfile()!.Revision);
     }
 
     [Fact]
@@ -1170,7 +1183,7 @@ public sealed class SimulationNatureSurvivalTests
     }
 
     [Fact]
-    public async Task 벌목통나무줍기WI는_LocalProcess와_RemoteHost에서_v24ReplayHash가같다()
+    public async Task 벌목통나무줍기WI는_LocalProcess와_RemoteHost에서_v28ReplayHash가같다()
     {
         using var factory = new WebApplicationFactory<Program>();
         using var client = factory.CreateClient();
@@ -1338,7 +1351,7 @@ public sealed class SimulationNatureSurvivalTests
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
             var remotePackage = (await saveResponse.Content.ReadFromJsonAsync<
                 SimulationSessionSavePackage>())!;
-            Assert.Equal(SimulationSaveSchemaVersions.V24,
+            Assert.Equal(SimulationSaveSchemaVersions.V28,
                 remotePackage.SchemaVersion);
             Assert.Equal(localPackage.SavedWorldRevision,
                 remotePackage.SavedWorldRevision);

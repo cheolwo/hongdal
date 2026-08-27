@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 using Ssalddel.WorkflowRules;
@@ -105,6 +106,101 @@ public sealed class SimulationWorldAtmosphereTests
         Assert.False(aggregate.Snapshot().Atmosphere.IsEnabled);
         Assert.Equal(SimulationSaveSchemaVersions.V24, package.SchemaVersion);
         Assert.Equal(package.ReplayHash, SimulationReplayHasher.Calculate(package));
+    }
+
+    [Fact]
+    public void 세계대기와_장착상태가함께있는_v28저장은_행위원장과재생hash를유지한다()
+    {
+        var request = CreateRequest();
+        request.ClientRequestId = Guid.NewGuid();
+        request.ScenarioStableId = "scenario:nature-solo-local";
+        request.ScenarioDataRevision =
+            SimulationNatureSurvivalCodes.ProfileRevisionR5;
+        request.NatureSurvival!.StartsWithAxe = false;
+        request.NatureSurvival.ResourceNodes = Enumerable.Range(1, 6)
+            .Select(index => new SimulationNatureResourceNodeInitialStateRequest
+            {
+                ResourceNodeStableId = $"resource:nature-tree:{index:00}",
+                H2StableId = "h2-candidate:nature-encounter-route",
+                H1StableId = "h1-stock:nature-exploration-buffer",
+                LocalX = -9f + index * 3f,
+                LocalZ = 8f + index % 2 * 2.5f,
+            }).ToArray();
+        request.SpatialWorld = new Simulation공간세계InitialStateRequest
+        {
+            Definitions = PyeongchangSimulation공간상호작용Fixture
+                .CreateNatureTwilightActualE5Observation().Definitions
+                .Concat(PyeongchangSimulation공간상호작용Fixture
+                    .CreateNatureDroppedTimberActualE5().Definitions)
+                .ToArray(),
+        };
+        request.ActorEquipment = new SimulationActorEquipmentInitialStateRequest
+        {
+            ActorStableId = "player:solo",
+            ItemInstances = new[]
+            {
+                new SimulationOwnedItemInstanceInitialState
+                {
+                    ItemInstanceStableId =
+                        SimulationNatureSurvivalCodes.AxePickupStableId,
+                    ItemDefinitionStableId =
+                        SimulationActorEquipmentCodes.AxeDefinitionStableId,
+                    LocationCode = SimulationActorEquipmentCodes.WorldPickup,
+                    SourceSpatialStableId =
+                        SimulationNatureSurvivalCodes.AxePickupStableId,
+                },
+            },
+        };
+        var aggregate = new 경영SimulationSessionAggregate(request);
+        var sessions = new InMemory경영SimulationSessionStore();
+        sessions.Restore(aggregate);
+        var nature = new SimulationNatureSurvivalService(sessions);
+        var acquirePreview = aggregate.PreviewNatureSurvivalAction(new()
+        {
+            ObservedWorldRevision = aggregate.Revision,
+            PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.AcquireAxe,
+            TargetStableId = SimulationNatureSurvivalCodes.AxePickupStableId,
+        });
+        Assert.True(acquirePreview.CanConfirm,
+            acquirePreview.SpatialEvidenceStateCode + ":"
+            + string.Join(",", acquirePreview.BlockReasonCodes) + ":"
+            + string.Join(",", acquirePreview.SpatialEvidenceReferenceIds));
+        nature.Confirm(aggregate.SessionStableId, new()
+        {
+            CommandId = "unity-local:AcquireAxe:revision-0:1",
+            ExpectedRevision = aggregate.Revision,
+            PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.AcquireAxe,
+            TargetStableId = SimulationNatureSurvivalCodes.AxePickupStableId,
+        });
+        var acquired = aggregate.GetActorEquipmentState();
+        aggregate.ConfirmActorEquipmentChange(new()
+        {
+            CommandId = "unity-local:actor-equipment-Equip:revision-1:2",
+            ExpectedEquipmentRevision = acquired.EquipmentRevision,
+            ActorStableId = "player:solo",
+            OperationCode = SimulationActorEquipmentCodes.Equip,
+            ItemInstanceStableId =
+                SimulationNatureSurvivalCodes.AxePickupStableId,
+            SlotCode = SimulationActorEquipmentCodes.MainHand,
+        });
+        var package = aggregate.CreateSavePackage(new()
+        {
+            SaveStableId = "save:nature-world-atmosphere-equipment",
+            ExpectedRevision = aggregate.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(package);
+        var replayed = restored.CreateSavePackage(new()
+        {
+            SaveStableId = package.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+
+        Assert.Equal(SimulationSaveSchemaVersions.V28, package.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V25,
+            package.ActorEquipmentBaseSchemaVersion);
+        Assert.Equal(package.ReplayHash, replayed.ReplayHash);
     }
 
     [Fact]

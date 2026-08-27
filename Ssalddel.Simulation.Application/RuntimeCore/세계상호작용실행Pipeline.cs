@@ -25,6 +25,11 @@ namespace Ssalddel.Simulation.Application
         public string[] TaskOrEffectReferenceIds { get; set; } = Array.Empty<string>();
         public string[] ResultStateCodes { get; set; } = Array.Empty<string>();
         public string[] SuccessorOrReturnCodes { get; set; } = Array.Empty<string>();
+        public string PrimaryOutcomeCode { get; set; } = "CommandAccepted";
+        public string 결과분류Code { get; set; }
+            = Simulation행위결과분류Codes.성공;
+        public string[] 변화의미Codes { get; set; } = Array.Empty<string>();
+        public string SpatialRevision { get; set; } = string.Empty;
     }
 
     public interface I세계상호작용실행Pipeline
@@ -43,7 +48,7 @@ namespace Ssalddel.Simulation.Application
         Boundary = "클라이언트 입력으로 발생원을 선택하지 않고 기존 Domain 차단 규칙을 우회하지 않는다.")]
     public sealed class 세계상호작용실행Pipeline : I세계상호작용실행Pipeline
     {
-        private const string TraceRevision = "playable-loop-engine-trace.r1";
+        private const string TraceRevision = "playable-loop-engine-trace.r2";
         private readonly SimulationWorldInteractionMaturityService maturity = new();
         private readonly ISimulationPlayableLoopEngineTraceSink traceSink;
 
@@ -131,10 +136,10 @@ namespace Ssalddel.Simulation.Application
                         context.CommandId, beforeAuthorityRevision,
                         context.TargetStableId), string.Empty, string.Empty));
 
-            T result;
+            Simulation세계상호작용실행Result<T> execution;
             try
             {
-                result = aggregate.ExecuteWorldInteraction(invocation,
+                execution = aggregate.ExecuteWorldInteraction(invocation,
                     authorityConfirm,
                     (beforeRevision, afterRevision) =>
                     {
@@ -155,7 +160,8 @@ namespace Ssalddel.Simulation.Application
                                 SpatialEvidenceStateCode =
                                     context.SpatialEvidenceStateCode,
                             });
-                        return new SimulationWorldInteractionManifestationRecord
+                        var manifestation =
+                            new SimulationWorldInteractionManifestationRecord
                         {
                             WorldInteractionId = context.WorldInteractionId,
                             OriginCommandId = context.CommandId,
@@ -172,6 +178,57 @@ namespace Ssalddel.Simulation.Application
                             SpatialEvidenceReferenceIds =
                                 Normalize(context.SpatialEvidenceReferenceIds),
                             MissingEvidenceCodes = e5.MissingEvidenceCodes,
+                        };
+                        var effectReferences = Normalize(
+                            context.TaskOrEffectReferenceIds);
+                        return new Simulation세계상호작용권위증거Bundle
+                        {
+                            기존E5발현기록 = manifestation,
+                            행위발현기록 = new Simulation행위발현Record
+                            {
+                                WorldStableId = aggregate.TerritoryStableId,
+                                SessionStableId = aggregate.SessionStableId,
+                                PlayableLoopStableId =
+                                    context.PlayableLoopStableId,
+                                WorldInteractionId = context.WorldInteractionId,
+                                CommandId = context.CommandId,
+                                TriggerSourceCode =
+                                    SimulationWorldInteractionTriggerSourceCodes
+                                        .PlayerDriven,
+                                InitiatorStableId = context.InitiatorStableId,
+                                ActorStableId = context.ActorStableId,
+                                ActorKindCode = "Player",
+                                TargetStableIds = Normalize(new[]
+                                {
+                                    context.TargetStableId,
+                                }),
+                                OutcomeStableId = "outcome:" + context.CommandId,
+                                PrimaryOutcomeCode = string.IsNullOrWhiteSpace(
+                                    context.PrimaryOutcomeCode)
+                                    ? "CommandAccepted"
+                                    : context.PrimaryOutcomeCode.Trim(),
+                                결과분류Code = context.결과분류Code,
+                                TaskStableId = effectReferences.FirstOrDefault(
+                                    value => value.StartsWith("task:",
+                                        StringComparison.Ordinal))
+                                    ?? string.Empty,
+                                EffectBatchStableId =
+                                    "effect-batch:" + context.CommandId,
+                                EffectReceiptStableIds = effectReferences
+                                    .Where(value => value.StartsWith("effect:",
+                                        StringComparison.Ordinal)).ToArray(),
+                                변화의미Codes = Normalize(context.변화의미Codes),
+                                영향공간StableIds = Normalize(
+                                    context.SpatialEvidenceReferenceIds),
+                                SourceReferenceIds = Normalize(
+                                    context.SourceReferenceIds),
+                                BeforeWorldRevision = beforeRevision,
+                                AfterWorldRevision = afterRevision,
+                                AppliedWorldTick = aggregate.CurrentTick,
+                                RuleRevision = aggregate.RuleRevision,
+                                SpatialRevision = context.SpatialRevision,
+                                DataRevision = aggregate.ScenarioDataRevision,
+                            },
                         };
                     });
             }
@@ -193,7 +250,7 @@ namespace Ssalddel.Simulation.Application
             var afterAuthorityRevision = aggregate.Revision;
             if (TraceEnabled(context))
             {
-                var status = afterAuthorityRevision == beforeAuthorityRevision
+                var status = execution.Reused
                     ? SimulationEngineInteractionStatusCodes.Reused
                     : SimulationEngineInteractionStatusCodes.Executed;
                 traceSink.Record(CreateTrace(context,
@@ -207,6 +264,42 @@ namespace Ssalddel.Simulation.Application
                         context.CommandId, afterAuthorityRevision),
                     status == SimulationEngineInteractionStatusCodes.Reused
                         ? "IdempotentCommandReused" : string.Empty));
+                var actionStatus = execution.행위발현기록 == null
+                                   || string.IsNullOrWhiteSpace(
+                                       execution.행위발현기록.기록HashSha256)
+                    ? SimulationEngineInteractionStatusCodes.Blocked
+                    : status;
+                traceSink.Record(CreateTrace(context,
+                    SimulationEngineInteractionComponentCodes.ActionJournal,
+                    SimulationEngineInteractionComponentKinds.Authority,
+                    SimulationEngineInteractionPhaseCodes.ActionRecordAppend,
+                    actionStatus, beforeAuthorityRevision,
+                    afterAuthorityRevision,
+                    SimulationPlayableLoopEngineTraceHash.Compute(
+                        context.CommandId, beforeAuthorityRevision),
+                    execution.행위발현기록?.기록HashSha256 ?? string.Empty,
+                    actionStatus == SimulationEngineInteractionStatusCodes.Blocked
+                        ? "ActionRecordMissing" : string.Empty));
+                var progressionStatus = execution.분야성장적용.상태Code switch
+                {
+                    Simulation분야성장적용상태Codes.Applied =>
+                        SimulationEngineInteractionStatusCodes.Executed,
+                    Simulation분야성장적용상태Codes.Reused =>
+                        SimulationEngineInteractionStatusCodes.Reused,
+                    _ => SimulationEngineInteractionStatusCodes.NotApplicable,
+                };
+                traceSink.Record(CreateTrace(context,
+                    SimulationEngineInteractionComponentCodes
+                        .PlayerDomainProgression,
+                    SimulationEngineInteractionComponentKinds.Authority,
+                    SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
+                    progressionStatus, afterAuthorityRevision,
+                    afterAuthorityRevision,
+                    SimulationPlayableLoopEngineTraceHash.Compute(
+                        execution.행위발현기록?.행위기록StableId),
+                    SimulationPlayableLoopEngineTraceHash.Compute(
+                        execution.분야성장적용.AfterProfileRevision),
+                    execution.분야성장적용.사유Code));
                 traceSink.Record(CreateTrace(context,
                     SimulationEngineInteractionComponentCodes
                         .WorldInteractionPipeline,
@@ -219,7 +312,7 @@ namespace Ssalddel.Simulation.Application
                         string.Join(",", Normalize(
                             context.SuccessorOrReturnCodes))), string.Empty));
             }
-            return result;
+            return execution.AuthorityResult;
         }
 
         private static bool TraceEnabled(세계상호작용실행Context context)

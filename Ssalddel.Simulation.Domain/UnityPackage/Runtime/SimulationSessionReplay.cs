@@ -14,6 +14,24 @@ namespace Ssalddel.Simulation.Domain
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
             if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V28,
+                    StringComparison.Ordinal))
+            {
+                ValidatePackage(package);
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.ActionManifestationBaseSchemaVersion;
+                basePackage.ActionManifestationBaseSchemaVersion = string.Empty;
+                basePackage.ActionManifestationLedger = null;
+                basePackage.PlayerDomainProfile = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                var restoredAggregate = Restore(basePackage);
+                restoredAggregate.RestoreActionManifestationAndPlayerDomainState(
+                    package.ActionManifestationLedger,
+                    package.PlayerDomainProfile);
+                return restoredAggregate;
+            }
+            if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V27,
                     StringComparison.Ordinal))
             {
@@ -481,6 +499,38 @@ namespace Ssalddel.Simulation.Domain
         private static void ValidatePackage(SimulationSessionSavePackage package)
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V28,
+                    StringComparison.Ordinal))
+            {
+                if (string.IsNullOrWhiteSpace(
+                        package.ActionManifestationBaseSchemaVersion)
+                    || string.Equals(package.ActionManifestationBaseSchemaVersion,
+                        SimulationSaveSchemaVersions.V28,
+                        StringComparison.Ordinal)
+                    || package.ActionManifestationLedger == null
+                    || package.PlayerDomainProfile == null)
+                    throw new SimulationContractException(
+                        "SimulationActionManifestationSaveStateInvalid");
+                Simulation행위발현Ledger.Restore(
+                    package.ActionManifestationLedger);
+                Simulation플레이어분야Engine.Restore(
+                    package.PlayerDomainProfile);
+                if (!string.Equals(package.ReplayHash,
+                        SimulationReplayHasher.Calculate(package),
+                        StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationReplayHashMismatch");
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.ActionManifestationBaseSchemaVersion;
+                basePackage.ActionManifestationBaseSchemaVersion = string.Empty;
+                basePackage.ActionManifestationLedger = null;
+                basePackage.PlayerDomainProfile = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                ValidatePackage(basePackage);
+                return;
+            }
             if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V27,
                     StringComparison.Ordinal))

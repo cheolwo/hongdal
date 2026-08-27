@@ -32,6 +32,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string V25 = "simulation-save.v25";
         public const string V26 = "simulation-save.v26";
         public const string V27 = "simulation-save.v27";
+        public const string V28 = "simulation-save.v28";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -95,6 +96,8 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationLhWorldStateSnapshot? LhWorldState { get; set; }
         public SimulationWorldAssetPlacementStateSnapshot?
             WorldAssetPlacementState { get; set; }
+        public Simulation행위기록LedgerSnapshot? ActionManifestationLedger { get; set; }
+        public Simulation플레이어분야ProfileSnapshot? PlayerDomainProfile { get; set; }
     }
 
     public sealed class SimulationSessionRestoreRequest
@@ -181,6 +184,8 @@ namespace Ssalddel.Simulation.Contracts
             = string.Empty;
         public string ActorEquipmentBaseSchemaVersion { get; set; }
             = string.Empty;
+        public string ActionManifestationBaseSchemaVersion { get; set; }
+            = string.Empty;
         public 경영SimulationSession생성Request SessionCreateRequest { get; set; }
             = new 경영SimulationSession생성Request();
         public 경영SimulationSessionSnapshot Snapshot { get; set; }
@@ -204,6 +209,8 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationWorldAssetPlacementStateSnapshot?
             WorldAssetPlacement { get; set; }
         public SimulationActorEquipmentStateSnapshot? ActorEquipment { get; set; }
+        public Simulation행위기록LedgerSnapshot? ActionManifestationLedger { get; set; }
+        public Simulation플레이어분야ProfileSnapshot? PlayerDomainProfile { get; set; }
     }
 
     public sealed class SimulationSessionRestoreResult
