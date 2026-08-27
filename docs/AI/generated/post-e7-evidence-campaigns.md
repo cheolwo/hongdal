@@ -12,7 +12,7 @@
 
 | PlayableUnit | 현재 E | 상태 | 승격 가능 | 차단 |
 | --- | --- | --- | --- | --- |
-| `playable-loop:nature-shelter-foundation.v1` | E6 | WaitingForE7 | False | PlayableUnit Presentation E7 실제 입력이 아직 열려 있다. |
+| `playable-loop:nature-shelter-foundation.v1` | E7 | Ready | False | 동일 후보 revision에서 E8 반복 결정성 3회·실제 입력 2회·Save 재진입·Console 오류 0건을 아직 실행하지 않았다. |
 | `playable-loop:nature-twilight-return.v1` | E7 | Ready | False | 동일 후보 revision에서 E8 반복 안정성 검증을 실행하지 않았다. |
 | `playable-loop:nature-night-day2.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:nature-workbench-foundation.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |

@@ -108,11 +108,11 @@
       "requiredHCapabilities": ["ToolAccessible", "HarvestWorkArea", "ShelterBuildingSite", "RecoveryWorkArea"],
       "independentExecutionRequired": true,
       "saveCheckpointCodes": ["AfterToolAcquired", "AfterCabinOperational"],
-      "currentEvidenceStage": "E6",
+      "currentEvidenceStage": "E7",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
-      "closureStateCode": "CoreClosed",
-      "statusCode": "InProgress",
+      "closureStateCode": "PlayClosed",
+      "statusCode": "Validated",
       "maturityTracks": {
         "logic": {
           "trackCode": "Logic",
@@ -124,11 +124,11 @@
         },
         "presentation": {
           "trackCode": "Presentation",
-          "currentStage": "E6",
+          "currentStage": "E7",
           "targetStage": "E7",
-          "statusCode": "InProgress",
-          "evidencePackageRefs": ["evidence:nature-shelter-playmode-20260825", "evidence:nature-dual-loop-game-view-20260826"],
-          "blockers": ["I 상태창 장착·해제와 손 도끼 표현을 실제 Play Mode·Game View에서 재검증해야 한다."]
+          "statusCode": "Validated",
+          "evidencePackageRefs": ["evidence:nature-shelter-playmode-20260825", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-shelter-explicit-equipment-e7-20260827"],
+          "blockers": []
         }
       },
       "openFeedbackItems": [
@@ -139,14 +139,14 @@
           "detectedAtStage": "E7",
           "reopenStage": "E6",
           "targetRefs": ["WI-ACTOR-02", "WI-NATURE-05", "WI-NATURE-06"],
-          "statusCode": "Open"
+          "statusCode": "Resolved"
         }
       ],
-      "evidencePackageRefs": ["evidence:simulation-task-20260824", "evidence:nature-r2-core-20260825", "evidence:nature-shelter-playmode-20260825", "evidence:nature-shelter-hosted-parity-20260825", "evidence:nature-r5-logic-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-first-evening-equipment-logic-20260827"],
+      "evidencePackageRefs": ["evidence:simulation-task-20260824", "evidence:nature-r2-core-20260825", "evidence:nature-shelter-playmode-20260825", "evidence:nature-shelter-hosted-parity-20260825", "evidence:nature-r5-logic-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-first-evening-equipment-logic-20260827", "evidence:nature-shelter-explicit-equipment-e7-20260827"],
       "workOrderRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"],
       "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json", "eng/execution-ledgers/work-orders/actor-item-equipment.e9-work-order.json"],
-      "blockers": ["명시적 장착의 Logic E7은 통과했지만 열린 Unity Editor의 Job Lock 오류와 전경 지형 가림 때문에 실제 입력 Presentation E7을 완료하지 못했다."],
-      "nextAction": "열린 Scene을 보존한 채 Unity Job Lock과 전경 지형 가림을 해소한 뒤 canonical SimulationWorldShell에서 획득→I→MainHand 장착→벌목→해제 차단→저장 재진입을 실제 입력으로 재검증한다."
+      "blockers": [],
+      "nextAction": "동일 actor-equipment.r1/simulation-save.v27 후보를 stability:nature-shelter-foundation.v1에서 반복 결정성·Save/Replay·Local/Remote·실제 입력 재진입으로 검증한다."
     },
     {
       "priority": 3,

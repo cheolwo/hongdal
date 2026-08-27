@@ -27,10 +27,10 @@ foreach ($expected in @(
     "WI-ACTOR-02",
     "현재 성숙도 궤적: Presentation",
     "E7 PlayClosed",
-    "폐루프 E6 / WI E5 → E7",
+    "폐루프 E7 / WI E7 → E7",
     "Nature → Farm → Hub → Town → City",
-    "Goal WIP: ``1/1``",
-    "WI WIP: ``1/1``")) {
+    "Goal WIP: ``0/1``",
+    "WI WIP: ``0/1``")) {
     if (-not $generated.Contains($expected)) {
         throw "CodexPlayableLoopGoalGeneratedEntryMissing:$expected"
     }

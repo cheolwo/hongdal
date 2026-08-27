@@ -47,7 +47,7 @@ $missing.playableUnitStabilityCampaigns = @($missing.playableUnitStabilityCampai
 Require-Rejected $missing "missing-stability" "StabilityCoverageCountInvalid"
 
 $premature = Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8 | ConvertFrom-Json
-$premature.playableUnitStabilityCampaigns[0].promotionEligible = $true
+$premature.playableUnitStabilityCampaigns[2].promotionEligible = $true
 Require-Rejected $premature "premature-stability" "StabilityCannotPromoteBeforeE7"
 
 $single = Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8 | ConvertFrom-Json

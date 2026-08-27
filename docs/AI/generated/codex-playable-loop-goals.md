@@ -3,8 +3,8 @@
 > 이 문서는 `eng/execution-ledgers/codex-playable-loop-goals.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - Goal 원장 개정: `codex-playable-loop-goals.r19`
-- Goal WIP: `1/1`
-- WI WIP: `1/1`
+- Goal WIP: `0/1`
+- WI WIP: `0/1`
 - 우선순위: `CoreFirstPlayerContinuity` / `Nature → Farm → Hub → Town → City`
 
 ## 현재 /goal 입력
@@ -18,8 +18,8 @@ E7 PlayClosed까지 닫는다.
 도끼를 얻고 나무를 베어 오두막을 완성한 뒤 다시 안전한 선택 상태로 돌아온다.
 
 현재 기준:
-- 현재 폐루프 증거 단계: E6
-- 현재 WI 증거 단계: E5
+- 현재 폐루프 증거 단계: E7
+- 현재 WI 증거 단계: E7
 - 현재 성숙도 궤적: Presentation
 - 현재 작업 WI: WI-ACTOR-02 장착 상태 변경
 - 기준 revision: world-interaction-delivery-priorities.r21 / actor-equipment.r1/simulation-save.v27
@@ -48,13 +48,13 @@ E7 PlayClosed까지 닫는다.
 
 | 현재 WI | 현재 E | 현재 증거 | 남은 차단 | 다음 최저 의존성 |
 | --- | --- | --- | --- | --- |
-| `WI-ACTOR-02` 장착 상태 변경 | 폐루프 E6 / WI E5 → E7 | evidence:simulation-task-20260824<br>evidence:nature-r2-core-20260825<br>evidence:nature-shelter-playmode-20260825<br>evidence:nature-shelter-hosted-parity-20260825<br>evidence:nature-r5-logic-20260826<br>evidence:nature-dual-loop-game-view-20260826<br>evidence:nature-first-evening-equipment-logic-20260827 | 명시적 장착의 Logic E7은 통과했지만 열린 Unity Editor의 Job Lock 오류와 전경 지형 가림 때문에 실제 입력 Presentation E7을 완료하지 못했다. | `WI-ACTOR-02 E6` |
+| `WI-ACTOR-02` 장착 상태 변경 | 폐루프 E7 / WI E7 → E7 | evidence:simulation-task-20260824<br>evidence:nature-r2-core-20260825<br>evidence:nature-shelter-playmode-20260825<br>evidence:nature-shelter-hosted-parity-20260825<br>evidence:nature-r5-logic-20260826<br>evidence:nature-dual-loop-game-view-20260826<br>evidence:nature-first-evening-equipment-logic-20260827<br>evidence:nature-shelter-explicit-equipment-e7-20260827 |  | 완료 |
 
 ## Goal 대기열
 
 | 순서 | 영역 | 역할 | PlayableLoop | 목표 | 상태 | 다음 WI |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | Nature | Core | Nature 도끼·벌목·오두막 기초<br>`playable-loop:nature-shelter-foundation.v1` | E7 PlayClosed | Active | `WI-ACTOR-02` |
+| 1 | Nature | Core | Nature 도끼·벌목·오두막 기초<br>`playable-loop:nature-shelter-foundation.v1` | E7 PlayClosed | Completed | `WI-ACTOR-02` |
 | 2 | Nature | Core | Nature 황혼 위협 대응·귀환<br>`playable-loop:nature-twilight-return.v1` | E7 PlayClosed | Completed | `WI-NATURE-11` |
 | 3 | Nature | Core | Nature 보관·수면·Day2 반환<br>`playable-loop:nature-night-day2.v1` | E7 PlayClosed | Queued | `WI-NATURE-14` |
 | 4 | Nature | Core | Nature 작업대 기반<br>`playable-loop:nature-workbench-foundation.v1` | E7 PlayClosed | Queued | `WI-CON-01` |

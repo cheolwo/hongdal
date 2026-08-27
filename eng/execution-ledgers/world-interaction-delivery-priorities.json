@@ -11,8 +11,8 @@
   "defaultIndividualTargetEvidenceStage": "E7",
   "activeWork": {
     "worldInteractionId": "WI-ACTOR-02",
-    "workStateCode": "Active",
-    "currentEvidenceStage": "E5",
+    "workStateCode": "E7Closed",
+    "currentEvidenceStage": "E7",
     "targetEvidenceStage": "E7",
     "startedReason": "도구별 WI를 늘리기 전에 보편 장착 계약을 닫고 Nature 도끼의 획득→장착→벌목 입력 흐름을 현재 revision에서 재검증한다.",
     "stageReviews": [

@@ -39,7 +39,7 @@
     "loopStableId": "playable-loop:nature-shelter-foundation.v1",
     "targetEvidenceStage": "E7",
     "targetClosureStateCode": "PlayClosed",
-    "goalStateCode": "Active",
+    "goalStateCode": "Completed",
     "activeMaturityTrackCode": "Presentation",
     "activeWorldInteractionId": "WI-ACTOR-02",
     "baselineRevision": "world-interaction-delivery-priorities.r21",
@@ -47,7 +47,7 @@
     "workOrderTargetRevision": "actor-equipment.r1/simulation-save.v27"
   },
   "items": [
-    { "queueOrder": 1, "loopStableId": "playable-loop:nature-shelter-foundation.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Active", "activationPrerequisiteLoopStableIds": [], "nextWorldInteractionId": "WI-ACTOR-02" },
+    { "queueOrder": 1, "loopStableId": "playable-loop:nature-shelter-foundation.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Completed", "activationPrerequisiteLoopStableIds": [], "nextWorldInteractionId": "WI-ACTOR-02" },
     { "queueOrder": 2, "loopStableId": "playable-loop:nature-twilight-return.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Completed", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-shelter-foundation.v1"], "nextWorldInteractionId": "WI-NATURE-11" },
     { "queueOrder": 3, "loopStableId": "playable-loop:nature-night-day2.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Queued", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-twilight-return.v1"], "nextWorldInteractionId": "WI-NATURE-14" },
     { "queueOrder": 4, "loopStableId": "playable-loop:nature-workbench-foundation.v1", "areaCode": "Nature", "completionRoleCode": "Core", "targetEvidenceStage": "E7", "targetClosureStateCode": "PlayClosed", "goalStateCode": "Queued", "activationPrerequisiteLoopStableIds": ["playable-loop:nature-night-day2.v1"], "nextWorldInteractionId": "WI-CON-01" },
