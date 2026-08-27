@@ -99,6 +99,7 @@
 
 ## 최신 검증
 
+- 2026-08-27 Unity Editor의 native Job Lock을 비파괴적으로 조사했다. 미저장 `SimulationWorldShell` 복구본을 Unity `artifacts/local/validation/20260827-unity-job-lock-recovery/SimulationWorldShell-unsaved-0.backup`에 복사했고 원본·복사본 SHA-256은 모두 `874C0A755F52A5E5BB90A499C2A1FF994ADF5FA4E2F7E9F72B6A769A711EFDA1`로 일치한다. 분리 Console을 닫은 뒤 canonical Game View와 Play 버튼을 실제 조작했지만 Play Mode는 열리지 않았고, `Assets Refresh`도 `MonoCompiler.Tick / Waiting for Unity's code to finish executing`에서 멈췄다. `Access version should be odd when acquiring lock` 반복으로 프로젝트 Editor 로그가 약 `25.3GB`까지 증가했다. 같은 현재 소스의 Unity EditMode·PlayMode 시험 프로젝트는 각각 오류 `0`으로 빌드되어 C# 컴파일 누락과 Editor native 상태를 분리했다. Editor 재시작 전에는 실제 E7 입력·Game View·오류 없는 Console을 승격 근거로 기록하지 않는다.
 - 2026-08-27 `horizontal-dual-cycle-evidence.r3`, 16개 PlayableUnit Goal, WI·H·Synty 공간 조립 정합성의 최종 작업 트리에서 Simulation 전체 시험 `904/904`와 `eng/tests` 전체 `45/45`가 통과했다. E 책임 코드 지도는 현재 소스와 일치하고 `git diff --check`도 통과했다. 이 검증은 계약·생성 대장·자동 시험 범위이며, Unity native Job Lock 때문에 남아 있는 `WI-ACTOR-02` 실제 장착·해제·벌목 차단·v27 저장 재진입 Game View와 오류 없는 Console 증거를 대신하지 않는다.
 
 - 2026-08-23 Nature·Farm 현재 플레이 범위 WI 7개의 실제 `Preview/Confirm` 실행 머리를 E9→E1 검토 모듈 이름과 결속했다. 코드 대장과 아홉 인터페이스 머리는 실행 상태를 변경하지 않으며 `LocalSimulationRuntime`도 아직 이를 구현하지 않는다. 결속 대장 `r2` 검증과 C# 집중 시험 `2/2`에서 WI 식별자, Runtime 메서드, 모듈 순서와 미배선 상태를 확인했다. 기능 동작·E 증거·저장 Scene은 변경하지 않았고 Play Mode·Game View는 재검증하지 않았다.
