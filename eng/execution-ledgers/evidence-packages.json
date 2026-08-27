@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r19",
+  "revision": "ssalddel-evidence-package-catalog.r23",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -860,7 +860,7 @@
       "evidenceKindCode": "UnityPlayMode",
       "evidenceTrackCode": "Presentation",
       "resultCode": "Passed",
-      "statusCode": "Current",
+      "statusCode": "Stale",
       "subjectRefs": ["playable-loop:nature-night-day2.v1"],
       "evidenceStageCodes": ["E6", "E7"],
       "sourceRevision": "worktree:2026-08-26-nature-night-day2-wi15-r1",
@@ -1043,7 +1043,7 @@
       "evidenceKindCode": "UnityPlayMode",
       "evidenceTrackCode": "Presentation",
       "resultCode": "Passed",
-      "statusCode": "Current",
+      "statusCode": "Stale",
       "subjectRefs": [
         "playable-loop:nature-shelter-foundation.v1",
         "playable-loop:nature-twilight-return.v1",
@@ -1228,7 +1228,7 @@
       "evidenceKindCode": "UnityPlayMode",
       "evidenceTrackCode": "Presentation",
       "resultCode": "Passed",
-      "statusCode": "Current",
+      "statusCode": "Superseded",
       "subjectRefs": ["playable-loop:nature-shelter-foundation.v1"],
       "evidenceStageCodes": ["E5", "E6", "E7"],
       "sourceRevision": "actor-equipment.r1/simulation-save.v27/worktree-20260827",
@@ -1259,6 +1259,68 @@
         "WI-ACTOR-01·02 입력·장착·능력 파생 계약 변경",
         "Nature Controller 장비 상태창·손 도끼·벌목 차단 표현 변경",
         "LH 실외·실내 배치 또는 SimulationWorldShell 입력 배선 변경",
+        "simulation-save.v27 저장·복원 정규형 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-shelter-e8-logic-20260827",
+      "title": "Nature 생활거점 고정 후보 E8 논리 반복 안정성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-shelter-foundation.v1"
+      ],
+      "evidenceStageCodes": ["E8"],
+      "sourceRevision": "actor-equipment.r1/simulation-save.v27/unity:6e0f022/hongdal:75742dc7",
+      "executedAt": "2026-08-27T18:05:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; deterministic fixture; LocalProcess and ASP.NET Core RemoteHost adapter",
+      "scope": "동일한 actor-equipment.r1/simulation-save.v27 후보에서 SimulationActorEquipmentTests와 SimulationNature생활거점동등성Tests를 세 차례 실행해 매회 10/10 통과했다. Save/Restore/Replay canonical hash와 LocalProcess·RemoteHost WorldRevision 동등성을 같은 시험 묶음에서 확인했다.",
+      "exclusions": [
+        "Unity 실제 입력·Game View 반복 안정성",
+        "사람의 재미·몰입·완성도 승인",
+        "운영 Provider와 운영 DB"
+      ],
+      "artifactReferences": [
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-shelter-e8-20260827/nature-shelter-e8-logic-1.trx", "sha256": "ebca720c3453a9e072801cdb6bd103154313b3c4c4719a6ddaca12b2a65e2367", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-shelter-e8-20260827/nature-shelter-e8-logic-2.trx", "sha256": "6055adfb41ba0c8cbe0d6956b0f64204a81870b950efc88839124b4923c8a0e1", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-shelter-e8-20260827/nature-shelter-e8-logic-3.trx", "sha256": "bc9c42c740adcd7e5db96350a4b346e77b8efcd27f7c8502c7ac29ffad6645e0", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": [
+        "actor-equipment.r1 또는 Nature 생활거점 명령열 변경",
+        "simulation-save.v27 canonical hash 의미 변경",
+        "LocalProcess·RemoteHost Adapter 또는 권위 인계 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-shelter-e8-presentation-20260827",
+      "title": "Nature 생활거점 고정 후보 E8 실제 입력·재진입 안정성",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-shelter-foundation.v1"
+      ],
+      "evidenceStageCodes": ["E8"],
+      "sourceRevision": "actor-equipment.r1/simulation-save.v27/unity:6e0f022/hongdal:75742dc7",
+      "executedAt": "2026-08-27T18:12:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "동일 Unity 코드와 저장 판본에서 실제 Input System I·포인터 입력, 장착·해제·미장착 벌목 차단·재장착, 오두막 보관, 저장과 Scene 재진입을 세 차례 통과했다. 마지막 실행 전 Console을 비우고 cursor 3930부터 3979까지 차단 오류 0건을 확인했다.",
+      "exclusions": [
+        "사람 직접 I 장착 반복과 미감·청음 승인",
+        "RemoteHost Unity 프로세스의 실제 네트워크 실행",
+        "E9 영역 조화와 사람 승인"
+      ],
+      "artifactReferences": [
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-shelter-e8-20260827/nature-shelter-e8-playmode-final.json", "sha256": "5e16d233ba7527809c533de6ea385327ceea193f36130281fc4b2180ef03ecb9", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-shelter-e8-20260827/nature-shelter-e8-dropped-timber-final.png", "sha256": "4115270a3c87d3c9b7443a3a66a5ef0ff4c999475a7cc07ae5d4ecca919bf070", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-shelter-e8-20260827/nature-shelter-e8-cabin-final.png", "sha256": "183f8c195418711234cd71f93fb8fe7a8ec19c3e0227ebe8d0fdc4737819c219", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": [
+        "Nature Controller 장착·벌목·보관·저장 재진입 입력 배선 변경",
+        "LH 실외·실내 배치 또는 SimulationWorldShell 구조 변경",
         "simulation-save.v27 저장·복원 정규형 변경"
       ]
     }

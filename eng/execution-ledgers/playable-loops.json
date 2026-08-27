@@ -131,22 +131,12 @@
           "blockers": []
         }
       },
-      "openFeedbackItems": [
-        {
-          "feedbackId": "feedback:nature-shelter:explicit-equipment-r1",
-          "reasonCode": "RuntimeExperienceFailure",
-          "targetTrackCode": "Presentation",
-          "detectedAtStage": "E7",
-          "reopenStage": "E6",
-          "targetRefs": ["WI-ACTOR-02", "WI-NATURE-05", "WI-NATURE-06"],
-          "statusCode": "Resolved"
-        }
-      ],
+      "openFeedbackItems": [],
       "evidencePackageRefs": ["evidence:simulation-task-20260824", "evidence:nature-r2-core-20260825", "evidence:nature-shelter-playmode-20260825", "evidence:nature-shelter-hosted-parity-20260825", "evidence:nature-r5-logic-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-first-evening-equipment-logic-20260827", "evidence:nature-shelter-explicit-equipment-e7-20260827"],
       "workOrderRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"],
       "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json", "eng/execution-ledgers/work-orders/actor-item-equipment.e9-work-order.json"],
       "blockers": [],
-      "nextAction": "동일 actor-equipment.r1/simulation-save.v27 후보를 stability:nature-shelter-foundation.v1에서 반복 결정성·Save/Replay·Local/Remote·실제 입력 재진입으로 검증한다."
+      "nextAction": "stability:nature-shelter-foundation.v1 E8 통과를 유지하고 stability:nature-twilight-return.v1의 고정 후보를 검증한다."
     },
     {
       "priority": 3,

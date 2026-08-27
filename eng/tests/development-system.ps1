@@ -7,7 +7,7 @@ $manager = Join-Path $repositoryRoot `
 
 $result = @(& $manager -Mode Validate)
 if (($result -join "`n") -notlike `
-    "*DevelopmentSystemValid:Loops=23;Independent=21;World=1;Cross=1;Evidence=27*") {
+    "*DevelopmentSystemValid:Loops=23;Independent=21;World=1;Cross=1;Evidence=30*") {
     throw "DevelopmentSystemValidationFailed:$($result -join ';')"
 }
 
@@ -37,6 +37,9 @@ foreach ($expected in @(
     "evidence:nature-base-reflection-e3-20260826",
     "evidence:nature-shelter-playmode-20260825",
     "evidence:nature-shelter-hosted-parity-20260825",
+    "evidence:nature-shelter-explicit-equipment-e7-20260827",
+    "evidence:nature-shelter-e8-logic-20260827",
+    "evidence:nature-shelter-e8-presentation-20260827",
     "evidence:nature-regional-threat-core-20260826",
     "evidence:nature-night-day2-wi13-playmode-20260826",
     "evidence:nature-night-day2-wi13-hosted-parity-20260826",
@@ -214,4 +217,4 @@ $positiveLedgerPath = Join-Path $artifactDirectory "extension-does-not-block-cor
     -OutputPath (Relative $positiveLedgerPath) | Out-Null
 
 Write-Output `
-    "DevelopmentSystemTestsPassed:Loops=23;Evidence=27;GeneratedLedger=1;Negative=8;Positive=1"
+    "DevelopmentSystemTestsPassed:Loops=23;Evidence=30;GeneratedLedger=1;Negative=8;Positive=1"
