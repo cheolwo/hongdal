@@ -2528,6 +2528,95 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 증거 경계: `simulation-save.v15` Replay hash와 canonical `SimulationWorldShell` PlayMode에서 C 취소·E 퇴장·R 후퇴·저장·Scene 재진입을 검증했다. 이는 Solo PlayMode 증거이며 Hosted 동등성, 수동 Game View·Console, 전체 Nature E7 또는 E8을 대신하지 않는다.
 - 대체 관계: D-231의 취소·자재 반환과 Actual E5 배치를 미완료로 둔 부분을 대체한다. D-231의 WI 판정 기준과 WI-NATURE-05~11 식별자는 유지한다.
 
+## D-234 PlayableLoop와 EvidencePackage를 WI·H·E 사이의 공식 연결 객체로 사용한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-24
+- 판정 단위: 개별 WI와 여러 WI가 성공·실패·회복·귀환까지 닫히는 PlayableLoop의 E를 분리한다. Farm·Hub·Town·City는 독립 PlayableLoop를 먼저 가지며 영역 간 통합은 별도 폐루프로 등록한다.
+- 증거 단위: Contract·자동 시험·Save/Replay·HTTP·Unity EditMode·PlayMode·Game View·Hosted·Operations를 EvidencePackage로 분리하고 대상 revision, 환경, 범위, 제외, 산출물 hash·보존 방식과 무효화 조건을 기록한다. 가장 높은 단일 산출물은 폐루프 E를 자동 승격하지 않는다.
+- 협업 경계: E9↔E1 작업 명세를 v2로 올리고 대상 PlayableLoop·EvidencePackage, 주·참여 작업 흐름, 담당·검토, 수정 허용 경로, 의존 작업, 입출력 인계, 브랜치와 커밋 범위를 필수화한다.
+- 상태 사본: `07_CURRENT_COMPLETION_LEDGER.md`는 `playable-loops.json`과 `evidence-packages.json`에서 생성하며 현재 폐루프 E와 차단을 사람이 중복 소유하지 않는다. `CURRENT_WORK.md`는 상세 작업 snapshot과 검증 로그를 설명한다.
+- 대체 관계: D-229의 반복 왕복 원칙은 유지한다. 작업 명세 형식과 protocol revision 참조는 `simulation-e9-vertical-work-order.v2`와 `simulation-e9-vertical-implementation-protocol.r4`가 대체한다.
+- 상세 기준: [플레이 폐루프와 증거 묶음 개발 체계](../Architecture/플레이폐루프와증거묶음개발체계.md)를 따른다.
+
+## D-235 메이저 아르카나 방향은 카드가 아니라 활성화 인스턴스에 귀속한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-24
+- 방향 가변성: 카드 고유 식별자는 정체성을 소유하고 정·역방향은 `MajorArcanaActivationStableId`별 권위 판정 사본이 소유한다. 동일 카드는 서로 다른 활성화에서 다른 방향일 수 있지만 한 활성화 수명 안에서는 재판정하지 않는다.
+- 활성 수명: 교체·해제·향후 재방향 판정은 기존 값을 제자리에서 바꾸지 않고 활성화를 종료한 뒤 새 활성화와 상속 계보를 만든다. 과거 방향·근거 revision/hash·Effect 계보는 보존한다.
+- 상속과 효과: 상위 방향은 하위 최종 카드에 한 번만 펼치며 `Numeric | Interpretive | Ordering | DirectionOnly` 정책과 허용 Effect 연결점을 구분한다. 카드가 WI를 직접 실행하거나 세계 사실·심리 기간·운영 상태를 바꾸지 않는다.
+- 첫 세로 조각: `RecoveryShare51` 정책과 Town 주민 생활복구 Fixture를 선택형 프로필로 추가한다. 기존 seed 기반 방향 정책과 `simulation-save.v1~v15` 정규형은 유지하고 새 활성화·Town 상태는 `simulation-save.v16`에서만 hash에 포함한다.
+- 증거 경계: Domain Fixture·집중 시험·저장 재생은 E8이 아니다. 실제 Town H 이동, canonical `SimulationWorldShell`, Play Mode·Game View, Hosted 동등성과 장기 생활 연속성은 별도 증거가 필요하다.
+- 상세 기준: [Ssalddel 게임 기획 통합 기준](../Architecture/게임기획통합기준.md)과 `eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json`을 따른다.
+
+## D-236 Marketplace 상품 관측은 Item 효과 근거이고 Synty는 범주형 외형이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-24
+- 표현 경계: Amazon·Alibaba 개별 상품 외형을 복제하지 않는다. Unity는 승인된 `VisualKey`를 Synty 범주형 Prefab으로 표현하며 같은 외형이 서로 다른 승인 특성과 효과 정의를 가질 수 있다.
+- 근거와 규칙: 공개 `ApprovedInteriorReference`와 별도 승인 `상품근거특성Profile`을 구분한다. 상품명 문자열이나 실시간 페이지에서 Runtime 효과를 임의 생성하지 않고 `상품특성효과RuleSet` revision으로 결정적으로 변환해 Catalog·Profile·Rule hash를 함께 고정한다.
+- 권위 경계: 최초 `상품근거ItemDefinition`은 `DefinitionOnly`이고 Unity 상세는 특성·효과·출처를 읽기 전용으로 표시한다. 실제 Item 사용·설치·장착 효과는 별도 WI Preview·Confirm과 Simulation Core의 Task·Effect·WorldTick을 통과하기 전에는 적용하지 않는다.
+- 제외: 가격·재고·브랜드·구매 이력·주민 소유 정보와 현실 상품 성능 보증은 게임 효과 근거로 사용하지 않는다. 기존 세계는 새 Marketplace 관측이나 Rule revision 때문에 자동 변경하지 않는다.
+- 상세 기준: [상품 관측 기반 실내공간조립엔진](../Architecture/상품관측기반실내공간조립엔진.md)과 `E9-WO-TOWN-HOUSE-INTERIOR-LAYOUT`을 따른다.
+
+## D-237 현장 전투 참여 방식은 관찰 운영과 직접 개입을 같은 권위 원장에서 잠근다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 단일 원장: `ObserverOperation`과 `DirectAction`은 별도 전투 시스템이나 카메라 상태가 아니다. BattleInstance 생성 뒤 플레이어가 방식과 동결 카드 hash를 한 번 확정하고 해당 전투 수명 동안 바꾸지 않으며 두 방식 모두 같은 100ms BattleTick·체력·승패·Nature 결과 인계를 사용한다.
+- 관찰 운영: Simulation Core가 카드 정책과 Stable ID 정렬로 자동 행동을 결정한다. 전투당 한 번의 전술 일시정지에서만 비상 카드 하나를 활성화하거나 건너뛸 수 있고, Unity는 피해 배율·대상·행동 결과를 계산하지 않는다.
+- 직접 개입: 기존 직접 이동·공격·방어·회피를 유지한다. 피격 횟수·회피 성공·완료 BattleTick으로 S/A/B 성과를 확정하고 기본 Nature 보상은 동일하게 유지한 채 직접 성과만 최대 재건 부품 2개를 추가한다. 공개 Nature API가 추가 보상을 주입하는 것은 금지하고 전투 Application의 내부 결과 인계만 허용한다.
+- 실행과 저장: Solo `LocalProcess`와 Hosted `RemoteHost`는 같은 전투 Application·Domain을 사용한다. 새 Nature r2 저장은 `simulation-save.v18`에 권위 추가 보상 명령을 포함하며 v17 이하 hash 의미는 유지한다. 카드 사본·방식·관찰 개입·직접 성과는 Battle save/replay에 봉인한다.
+- 증거 경계: Domain·LocalProcess·HTTP·Unity EditMode 자동시험은 실제 두 방식의 Play Mode 완주와 Game View 체감 증거를 대신하지 않는다. E7과 `promotionEligible`은 canonical `SimulationWorldShell` 실제 입력 및 Hosted 동등성까지 확인한 뒤 별도로 판정한다.
+- 대체 관계: D-206의 `TacticalCommand` 수동 전술 입력은 호환을 위해 남긴다. Nature 첫날의 기본 3인칭 참여는 이 결정의 `ObserverOperation`으로 구체화하며 D-206의 단일 전투 원장·서버 권위·공간/시간 경계는 유지한다.
+- 상세 기준: [Nature 생존 생활거점 세로 조각](../Architecture/Nature생존생활거점세로조각.md)과 `E9-WO-NATURE-DUAL-COMBAT-PARTICIPATION`을 따른다.
+
+## D-238 영역 건물 발전은 다섯 독립 누적 트리로 관리하고 Nature부터 실제 구현한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 독립성과 누적성: Nature·Farm·Town·Hub·City는 각각 Foundation→Operations→Specialization→Resilience→Landmark 카탈로그를 가지되 서로를 선행 조건으로 삼지 않는다. 한 영역 안에서도 첫 우선 갈래를 골랐다는 이유로 다른 갈래를 영구 잠그지 않으며 선행 건물·재료·배치 조건으로 누적한다.
+- 공간과 권위: 플레이어는 H1 건설을 `Preview → Confirm`으로 선택하고 Simulation Core가 비용·선행·발자국·완료를 판정한다. H1 운영 상태는 H2·H3 성장의 근거일 뿐 상위 공간을 자동 승격하지 않는다. Solo `LocalProcess`와 Hosted `RemoteHost`는 같은 Core를 사용한다.
+- 첫 실제 조각: Nature r3만 작업대·보관대·방책·자연 배움터·회복 시설의 실제 건설·취소·완료 상태를 가진다. Farm·Town·Hub·City는 현재 결정적 정의 카탈로그이며 실제 자원·작업·효과는 각 독립 세로 조각에서 추가한다.
+- 배움터 경계: 자연 배움터는 선택 시설이고 종교 점수·교리 우열·NPC 자격을 만들지 않는다. 운영자 승인 자료만 읽기 결과에 포함하고 현재는 중립 Fixture만 사용한다. 외부 영상 Provider는 세션·시계·Unity 조회에서 호출하지 않는다.
+- 저장과 증거: 새 상태는 `simulation-save.v19`에 카탈로그 revision/hash, 건물 노드·작업·학습 방문을 포함하고 v18 이하 hash 의미를 유지한다. 코드·자동시험 E5 Fixture를 실제 `SimulationWorldShell` Play Mode, Game View, Hosted 동등성 또는 E8 완료로 확대 해석하지 않는다.
+- 상세 기준: [영역별 건물 발전 테크트리 계획](../Architecture/영역별건물발전테크트리계획.md)과 `E9-WO-NATURE-AREA-BUILDING-PROGRESSION`을 따른다.
+
+## D-239 플레이 폐루프는 Core·Extension 자식과 영역·세계 집계로 완결 판정한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 계층: 직접 성공·실패·회복·귀환을 증명하는 최소 단위는 `PlayableUnit`, 한 영역의 필수 단위를 모으는 파생 판정은 `AreaAggregate`, 독립 영역을 하루 또는 선택적 이동으로 조립하는 판정은 `WorldAggregate`로 관리한다. PlayableUnit은 AreaAggregate 하나를 부모로 가지며 WorldAggregate는 독립 영역을 소유하지 않고 준비 의존으로 참조한다.
+- 완결 등급: 생존·생산·생활·창고·서비스의 최소 약속은 `Core`, 건물 발전·타로·사용자 배치는 `Extension`, 자식 상태에서 계산되는 항목은 `Aggregate`다. 선택형 Extension은 영역 Core 완결을 막지 않으며 구현됐다는 이유로 영역 전체를 완료시키지도 않는다.
+- 상태 판정: `CoreClosed`와 `ExtendedClosed`는 각각 E5 결정적 발현, `PlayClosed`는 E7 실제 입력·화면·귀환을 뜻한다. AreaAggregate의 CoreClosed는 모든 필수 Core 자식이 닫힌 경우에만 파생하고 단일 고단계 산출물이나 수동 상태 변경으로 승격하지 않는다.
+- 작업 순서: 현재 준비도에 따라 Nature→Town→Farm→Hub→City의 내부 Core E5를 먼저 닫고 E6·E7로 올린다. 이 순서는 영역 간 업무 의존이 아니며 Farm→Hub·Hub→City·Nature↔Farm은 독립 영역 준비 뒤 별도 통합 폐루프로 다룬다.
+- 경계: Hub Core는 `WI-HUB-05 OutboundReady`에서 닫고 `WI-HUB-06` 차량 적재는 외부 연결로 남긴다. Town 메이저 아르카나는 `WI-CARD-01`로 관리하며 기존 `WI-WORLD-06` 역할 카드 장착과 구분한다. Farm 내부 보관에 지역 발전 예약 번호 `WI-FARM-07~09`를 재사용하지 않는다.
+- 대체 관계: D-234의 PlayableLoop·EvidencePackage 원칙을 구체화하며 기존 Stable ID와 증거 묶음을 유지한다. 단일 큰 영역 폐루프를 직접 완료 판정하던 형식은 `ssalddel-playable-loop-catalog.v2`의 자식·집계 파생 판정으로 대체한다.
+- 상세 기준: [플레이 폐루프 완결 로드맵](../Architecture/플레이폐루프완결로드맵.md)과 [플레이 폐루프와 증거 묶음 개발 체계](../Architecture/플레이폐루프와증거묶음개발체계.md)를 따른다.
+
+## D-240 플레이어 활동은 역할이 아니라 현장 원정·영역 운영·영역 제조의 선택 가능한 세 갈래로 분류한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 플레이어 중심: 플레이어는 고정 직업이나 플레이 모드를 먼저 선택하지 않는다. 같은 플레이어가 `FieldExpedition`, `AreaOperation`, `AreaManufacturing`을 상황에 따라 오가며 각 행동과 기회 조회에 현재 갈래만 표시한다.
+- 상호의존: 현장 원정은 외부 재료와 위협 결과를 가져오고, 영역 운영은 안전·보관·작업공간을 열며, 영역 제조는 확보한 재료를 다음 원정이나 영역 운영에 쓸 수 있는 물품으로 바꾼다. 어느 한 갈래도 기본 플레이 진입을 독점하지 않는다.
+- 첫 실제 반환: Nature r4에서 운영 작업대와 오두막 내부 문맥을 요구하는 `WI-NATURE-16`이 통나무 2·재건 부품 1을 예약해 4초 뒤 현장 보급 꾸러미를 만든다. 취소하면 예약을 반환하고, 다음 원정에서 선택적으로 소비하면 패배 시 소지 재료 한 묶음을 한 번 보호한다. 보급이 없어도 기본 원정은 허용한다.
+- 권위와 저장: Preview는 상태를 바꾸지 않고 Confirm·권위 시계·전투 결과 인계만 자원과 준비 상태를 바꾼다. Solo `LocalProcess`와 Hosted `RemoteHost`는 같은 Simulation Core를 사용하며 r4 상태는 `simulation-save.v20`에만 추가하고 v19 이하 정규형을 유지한다.
+- 증거 경계: 활동 분류는 UI 역할 전환, 새 공식 Scene, 자동 수익·승리·생산량 보정이 아니다. 첫 보호 단위는 실제 Lot이 아니라 현재 인벤토리의 결정적으로 정렬한 재료 한 묶음이며, 실제 `SimulationWorldShell` 입력·Game View와 Hosted hash 동등성 전에는 E7이나 E9로 승격하지 않는다.
+- 상세 기준: [플레이어 중심 게임 개발 업무 구조](../Architecture/플레이어중심게임개발업무구조.md), [플레이 폐루프와 증거 묶음 개발 체계](../Architecture/플레이폐루프와증거묶음개발체계.md), [Nature 생존 생활거점 세로 조각](../Architecture/Nature생존생활거점세로조각.md)을 따른다.
+
+## D-241 운영 유래 반복 WI는 NPC 루틴이고 플레이어는 정책과 예외를 통제한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 분류: WI의 업무 의미 유래 `OperationsDerived | SimulationNative | Hybrid`, 게임 통제 정책 `NpcRoutine | PlayerOrNpc | PlayerDirect | WorldAutomatic`, 실행 인스턴스 발생원 `DataDriven | PlayerDriven | NpcDriven | WorldDerived`을 서로 다른 축으로 기록한다. 운영 유래라는 이유만으로 실행 발생원을 추정하지 않는다.
+- 플레이어 경계: `NpcRoutine`의 정상 업무는 NPC와 WorldTick이 수행한다. 플레이어는 자동화·우선순위·선호 담당자·완료 전 취소·시설 차단 해소를 선택할 수 있지만 업무 완료 상태나 Effect를 직접 주입하지 않는다. Farm의 직접 작업은 `PlayerOrNpc`로 유지한다.
+- 첫 세로 조각: `npc-routine-control.r1`에서 Hub 독립 Fixture의 `WI-HUB-03`은 전용 NPC가 시작하고 `WI-HUB-04~05`는 세계 파생 전이로 이어진다. `WI-HUB-05 OutboundReady`에서 반환하며 `WI-HUB-06` 차량 상차와 외부 운송은 포함하지 않는다. 새 프로필의 직접 Confirm 차단은 현재 이 조각에 구현됐고 나머지 `NpcRoutine` WI는 분류만 완료됐다.
+- 실행과 저장: Solo `LocalProcess`와 Hosted `RemoteHost`는 같은 Simulation Core와 읽기 모델을 사용한다. 새 프로필·실행 계보는 `simulation-save.v21`에만 포함하고 v20 이하의 직접 경로와 canonical hash 의미를 보존한다. 운영 Provider·운영 DB·외부 효과는 실행 경로에 포함하지 않는다.
+- 증거 경계: 독립 Fixture·결정성·차단·취소·Local/Hosted Adapter·Save/Replay 자동 시험은 E3 증거다. Hub H 공간 결속, 실제 WI 세계 발현, `SimulationWorldShell` Play Mode·Game View와 지속 NPC 생활세계가 없으므로 E5·E7·E8을 주장하지 않는다.
+- 상세 기준: [NPC 루틴 WI 통제 정책](../Architecture/NPC루틴WI통제정책.md)과 `E9-WO-HUB-NPC-ROUTINE-OUTBOUND`을 따른다.
+
 ## D-242 배치 통제의 주 성립 축은 H1에서 H4 준비도로 올라간다
 
 - 상태: `Accepted`
@@ -2538,6 +2627,51 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 상위 경계: H3 진부 Hub는 내부 창고 H2와 차량 H2를 함께 요구한다. 차량 H2가 없는 현재 범위에서는 H3는 Blocked이고 H4는 PartiallyReady이며 H4 인스턴스를 자동 생성하지 않는다.
 - 호환과 저장: `placement-control-hierarchy.v1/v2`와 기존 실내 계획을 읽고, 상향식 상태는 선택형 `placement-control-hierarchy.v3`와 `simulation-save.v22`에만 추가한다. 프로필 없는 v21 이하 세션의 hash 의미를 유지한다.
 - 증거 경계: 계약·결정성·저장 재생·Local/Hosted Adapter 자동 시험은 E3이며 저장 Scene v3 배선, 실제 이동·NPC 동선·Game View는 E7 별도 증거다.
+- 상세 기준: [상향식 배치 성립 통제 계층](../Architecture/상향식배치성립통제계층.md)과 `E9-WO-HUB-INTERNAL-WAREHOUSE-PLACEMENT`를 따른다.
+
+## D-243 발산과 수렴은 수치 균형이 아니라 양방향 플레이 인계로 조화를 판정한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 분류: `발산 흐름(陽)`은 탐사·채집·전투·구조처럼 세계에 직접 개입하는 행동 목적이고, `수렴 흐름(陰)`은 재고·위험을 읽어 정책·우선순위·NPC 위임·회복을 정하는 행동 목적이다. 장소·직업·성별·선악·플러스/마이너스 분류가 아니며 제조·건설·정비는 두 흐름의 순환 연결부다.
+- 조화 판정: 50:50 수치, 강제 교대, 단일 흐름 불이익과 자동 보정을 만들지 않는다. 발산 결과가 수렴 선택으로 인계되고 수렴 결과가 다음 발산 선택을 실제로 바꾸는 PlayableLoop가 닫혔을 때 조화를 증명한다.
+- 첫 세로 조각: 기존 Nature 현장 보급 왕복에서 `WI-NATURE-16` 직접 제작을 보존하고 `WI-NATURE-17` NPC 위임 제작을 대안으로 추가한다. NPC 부재·정책 중지·역량 부족에도 직접 제작과 기본 원정은 계속 가능하다.
+- 경계: 플레이 흐름은 WI 발생원·전투 참여 방식·E 증거·H 공간·타로 방향과 별도 축이다. 카드는 선택과 인계를 설명할 수 있지만 발산·수렴 상태가 메이저 아르카나 정·역방향이나 배율을 바꾸지 않는다.
+- 상세 기준: [플레이어 중심 게임 개발 업무 구조](../Architecture/플레이어중심게임개발업무구조.md)와 `player-centered-development-flow.r4`를 따른다.
+
+## D-244 WI는 한국어 기능명을 먼저 표시하고 안정 고유 식별자는 보조 표기로 유지한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 표시 기준: 사람이 읽는 WI 이름은 `한국어 작업군 + 진행 순서 + 한국어 기능명`으로 구성한다. 예시는 `자연 탐사·생활 거점 7단계 · 오두막을 지을 터 선정 (WI-NATURE-07)`이다.
+- 호환 경계: `WI-NATURE-07`, `WI-001` 같은 고유 식별자는 저장·재생·API·Event·metadata·공간 결속의 안정 값이므로 이름 정비를 이유로 변경하지 않는다. 한국어 이름은 설명·조회·Unity 표시용 파생값이며 상태 권위를 만들지 않는다.
+- 단일 원본: 60개 WI의 한국어 기능명·작업군·진행 순서는 `eng/execution-ledgers/world-interactions.json`이 소유한다. C# 이름 카탈로그와 생성 문서는 관리 스크립트가 결정적으로 생성하며 수동 복제하지 않는다.
+- 표시 실패: 알려진 WI를 번호나 ID만으로 표시하지 않는다. 미등록 ID는 임의로 번역하지 않고 `알 수 없는 세계 상호작용 (ID)`로 표시해 대장 누락을 드러낸다.
+- 상세 기준: [세계 상호작용 단위 중심 공간–Simulation 통합](../Architecture/세계상호작용단위중심공간Simulation통합.md)의 WI 한국어 명칭 규칙을 따른다.
+
+## D-245 WI는 한 의도와 하나의 주요 권위 결과만 소유하고 절차는 별도 흐름이 조립한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 단일 책임: WI 하나는 한 행위자의 한 의도와 하나의 `primaryOutcomeCode`를 소유한다. Preview·Confirm·Task·Effect는 별도 절차 WI가 아니라 같은 책임의 실행 생명주기다. 하나의 결과를 원자적으로 지키는 부수 효과와 배타적 결과 묶음은 허용하지만, 독립적으로 선택·취소·실패·재시도할 수 있는 행동은 별도 WI로 분리한다.
+- Actor 경계: Player·NPC·World는 WI 정체성이 아니라 실행 인스턴스의 발생원과 Actor 결속이다. 같은 의도·대상·결과를 가진 플레이어 작업과 NPC 작업은 같은 atomic WI를 사용하고, NPC 위임 정책과 NPC의 실제 작업은 서로 다른 책임으로 둔다.
+- 흐름 경계: 순서·분기·반복·귀환은 `world-interaction-flows.json`이 소유한다. 기존 `predecessorWiIds`·`successorWiIds`는 읽기 호환 힌트일 뿐 새 생성·공간 전이의 권위가 아니다. 선택형 영역 연결은 각 독립 영역의 성립 조건이 되지 않는다.
+- 표시 대체: D-244의 한국어 기능명 우선과 안정 ID 보존은 유지하지만 `진행 순서`를 사람이 읽는 이름에 넣는 규칙은 대체한다. `sequence`는 대장 탐색 순번이며 화면에는 `자연 탐사·생활 거점 · 오두막을 지을 터 선정 (WI-NATURE-07)`처럼 표시한다.
+- migration: 기존 ID·API·Event·save·replay를 제자리에서 다른 의미로 바꾸지 않는다. 복합 책임 `WI-001`, `WI-NATURE-11`, `14`, `16`, `17`, `WI-WORLD-07`은 책임별로 분리한다. 독립 의도가 없는 `WI-LOG-02~05`, `WI-ORDER-02`, `05`는 부모 Task/Effect로 내리고, 실제 Actor 작업인 `WI-HUB-04~05`, `WI-ORDER-03~04`는 `WorldAutomatic`에서 NPC 행동 책임으로 전환한다. 모두 새 실행·저장 판본에서만 적용한다.
+- 증거 경계: 60개 주요 결과·다중 효과 감사와 55개 흐름 분리는 E3 구조 증거다. 복합 WI Runtime migration, Play Mode·Game View, 지속 NPC 생활세계 전에는 E5·E7·E8·E9 완료를 주장하지 않는다.
+- 상세 기준: [WI 단일 책임 원칙](../Architecture/WI단일책임원칙.md)과 `E9-WO-WI-SINGLE-RESPONSIBILITY`를 따른다.
+
+## D-246 WI 음양 사분면은 행동 목적과 실제 수행 주체를 직교 결합한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-25
+- 분류 축: 첫 부호는 실행 행동의 목적이다. 탐사·전투·채집·이동·운반처럼 세계에 직접 개입하면 Yang, 관찰·정책·배정·보관·회복·계획처럼 상태를 수렴하면 Yin이다. 둘째 부호는 실제 `ActorBinding`이며 Player는 `+`, NPC는 `-`다. 따라서 `++`, `+-`, `-+`, `--`는 각각 양·Player, 양·NPC, 음·Player, 음·NPC다.
+- 발생원 경계: `TriggerSource`는 무엇 때문에 실행이 시작됐는지만 설명하며 수행 주체 부호를 정하지 않는다. Player가 정책을 선택한 뒤 NPC가 수행하면 `PlayerDriven`이어도 NPC 부호다. 실제 Player/NPC Actor가 없는 DataDriven·WorldDerived 자동 전이는 사분면 밖에 둔다.
+- 문맥과 불변성: 제조·건설·복원처럼 연결부인 WI는 승인된 PlayableLoop 문맥으로 실행별 Yang/Yin을 정하고 문맥이 없으면 `Unclassified`로 남긴다. 판정 사본은 Preview→Confirm→Task→Effect 수명 동안 고정하고 같은 WI의 다음 실행은 실제 Actor와 문맥에 따라 다른 사분면일 수 있다.
+- 권위와 효과: Simulation Core만 판정하며 Unity와 클라이언트는 상태 사본을 읽기만 한다. 이 사분면은 선악·성별·성공·실패가 아니고 생산량·피해·보상·재고·타로 방향·카드 배율에 영향을 주지 않는다.
+- 저장 호환: 새 분류 실행은 `WorldInteractionInvocation.v2`와 NPC 실행 상태 사본에 `world-interaction-polarity-quadrants.r1`을 동결하고 `simulation-save.v23` hash에 포함한다. v22 이하 정규 hash 의미와 복원 판본은 유지한다.
+- 대체 관계: D-243의 Player 중심 발산·수렴 설명을 실제 Player/NPC Actor 전체에 적용 가능한 `ActorActionPurpose`로 확장한다. D-232의 네 발생원과 D-245의 단일 책임·Actor 결속은 대체하지 않고 서로 다른 축으로 유지한다.
+- 상세 기준: [WI 음양·수행주체 사분면 체계](../Architecture/WI음양수행주체사분면체계.md)와 `E9-WO-WI-YIN-YANG-ACTOR-QUADRANTS`를 따른다.
 
 ## D-247 배치 결과는 플레이어 감각 표현축에서 교차 검증한다
 
@@ -2562,3 +2696,207 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 대체 관계: D-239의 당시 준비도 기준 `Nature→Town→Farm→Hub→City` 실행 순서는 이 플레이어 연속성 우선순위로 대체한다. D-239의 PlayableUnit·Core/Extension·파생 Aggregate 원칙과 기존 StableId는 유지한다.
 - 첫 Goal: `playable-loop:nature-shelter-foundation.v1 → E7 PlayClosed`, WI WIP는 `WI-NATURE-05`다. 자동 실제 입력과 Hosted 동등성이 있어도 사람의 전체 수동 완주·실제 청음·남은 Scene 경고 분리 전에는 E7을 `Partial`로 유지한다.
 - 상세 기준: [Codex PlayableLoop Goal 운영 체계](../Architecture/CodexPlayableLoopGoal운영체계.md)와 `codex-playable-loop-goals.v1`을 따른다.
+
+## D-249 거점 성찰은 승인 자료를 읽는 플레이어 선택이며 시청 보상이 아니다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 보편 용어: 새 계약·기획·상태 사본에서는 `거점 성찰`을 사용한다. 기존 Unity의 `저녁학당*`과 `hongik-unity-learning-card-publication.v1`은 저장·표현 호환 Adapter로 보존하며 새 권위 이름으로 확장하지 않는다.
+- 자료 경계: 영상·문서 원문은 `출처 관측 → 제공자 중립 해석 후보 → 사람 승인 학습 자료`의 세 층을 통과한다. Simulation은 명시적으로 동기화된 승인 자료의 revision과 hash만 읽고 Provider API, API key, 원문 전체, 댓글·시청 기록을 세션이나 Tick 중 조회하지 않는다.
+- 보상 경계: 외부 영상 열기나 시청 시간에는 능력치·재화·전투 보상을 부여하지 않는다. 보상은 승인 자료를 바탕으로 플레이어가 게임 안에서 `오늘을 돌아보기`를 명시적으로 확정하고 다음 활동을 시작할 때 한 번만 적용한다.
+- 첫 허용 효과: 첫 세로 조각은 `Awareness +1 / BeginnerMind` 또는 `Resolve +1 / IntegratedProgress`만 허용한다. 효과는 정보 해석과 다음 선택을 넓히며 피해·생산량·시장가격·타로 방향을 직접 바꾸지 않는다. 게임 날짜당 1회, 캐릭터와 자료 revision 조합당 1회로 제한한다.
+- 폐루프와 증거: `playable-loop:nature-base-reflection.v1`은 `playable-loop:nature-field-supply-return.v1`의 선택 Extension이며 플레이어 선택으로 닫는 E7 대상이다. NPC의 시설 방문과 학습 생활세계는 별도 `building-learning-routine` E8 대상이고 서로 완료 증거를 대신하지 않는다.
+- 공간 경계: E4 이후 canonical `SimulationWorldShell`의 기존 Nature H4·H3·H2 안에 H1 `ReflectionInteractionAnchor`를 결속한다. 새 공식 Scene이나 H5는 이 폐루프의 필수 의존성이 아니다.
+- 저장 경계: E1~E3 뼈대에서는 동결 상태 사본과 결정적 hash만 제공한다. 주 세션 `simulation-save.v24` 통합은 E4 작업으로 남기며 기존 v23 hash를 소급 변경하지 않는다.
+- 상세 기준: [Nature 거점 성찰 폐루프](../Architecture/PlayableLoops/nature-base-reflection.v1.md)와 `E9-WO-NATURE-BASE-REFLECTION`을 따른다.
+
+## D-250 플레이 폐루프의 논리와 표현 성숙도를 분리하고 낮은 단계로 통합 판정한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 두 궤적: `PlayableLoop`는 `Logic`과 `Presentation` 성숙도를 가진다. 논리는 권위 상태·결정성·저장·재생·Hosted 동등성을, 표현은 실제 입력·배치·카메라·Synty·HUD·Game View 식별 가능성을 판정한다.
+- 통합 판정: 통합 E는 두 궤적 중 낮은 단계다. 논리 E7만으로 `PlayClosed`를 선언하지 않으며 두 궤적이 E7 이상이고 열린 피드백이 없을 때만 닫는다.
+- 재개 규칙: 표현 검증에서 권위 상태나 H 계약 누락이 발견되면 같은 Goal과 PlayableLoop를 유지한 채 가장 이른 논리 E 단계를 다시 연다. 시각 배치 문제이면 표현 E4~E6만 다시 연다.
+- 비대체: 이중 성숙도는 E·G·H·WI와 WI 음양 사분면을 대체하지 않는다. `evidenceTrackCode`로 증거의 책임만 분리한다.
+- 상세 기준: [플레이 폐루프 논리·시각 이중 순환 체계](../Architecture/플레이폐루프논리시각이중순환체계.md)를 따른다.
+
+## D-251 표현 E4~E7 승격은 공통 검증 모듈과 기능별 조건 모듈을 통과한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 공통 관문: 모든 `PlayableUnit`은 E4 상태·H 결속, E5 시각 자료·Bounds, E6 Player 대비 크기·간격과 상태 차이, E7 실제 카메라·입력·결과·귀환 모듈을 적용한다.
+- 조건 관문: 지면·건물·울타리·Actor·실내·작업 구역·카메라 가림은 폐루프가 선언한 기능 프로필에 따라서만 추가한다. 사용하지 않는 기능을 억지로 통과시키거나 필요한 기능을 담당자 판단으로 생략하지 않는다.
+- 승격과 재개: `Blocking` 실패는 해당 표현 E 승격을 막고 가장 이른 책임 단계를 다시 연다. 상태·H 계약 누락이면 논리 E를, 위치·크기·Bounds·카메라 문제이면 표현 E4~E6을 연다. `Warning`은 위험을 기록하지만 증거를 승격하지 않는다.
+- 증거 경계: 자동 Bounds·간격 검증은 실제 Play Mode·Game View를 대신하지 않고 실제 화면 증거도 자동 사전 검증을 대신하지 않는다. 검증 모듈은 Simulation 권위 상태를 변경하지 않는다.
+- 관리 기준: 단일 원본은 `eng/execution-ledgers/playable-loop-presentation-validation-modules.json`, 선택 결과는 `docs/AI/generated/playable-loop-presentation-validation.md`다.
+- 상세 기준: [플레이 폐루프 논리·표현·결과 순환 개발 방법론](../Architecture/플레이폐루프논리시각이중순환체계.md)의 표현 검증 모듈 관문을 따른다.
+
+## D-252 LH의 3×3·5×5·9×9는 고정 계층이 아니라 기본 동적 맵 창 프로필이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 일반 계산: 스트리밍 범위 계산은 중심 정수 좌표, `상세 ≤ 활성 ≤ 선행` 반경과 이동 방향 우선순위만 사용한다. L 실행 해상도, H 의미 계층, 셀 키 형식과 셀 내용 공급은 계산기 밖의 Adapter 책임이다.
+- 기본 호환: 기존 `FocusL3CellKey`, 125m Scene 배선과 반경 `1·2·4`, 즉 `3×3·5×5·9×9`는 저장·API·Scene 회귀를 위한 첫 보행 PC 프로필로 유지한다. 이를 모든 AreaSet·이동 방식·장치의 보편적 고정값으로 해석하지 않는다.
+- 검증 경계: 반경 음수와 포함 순서 역전은 거부하고, 프로필 값은 결정적 창과 우선순위를 만든다. 원형 거리창, 속도 예측 회랑, 복수 스트리밍 원천과 메모리 예산형 선택은 측정 Fixture와 새 계약 전에는 완료로 주장하지 않는다.
+- 자료 경계: DEM과 특정 표본 해상도는 셀 내용 공급자의 선택 입력이며 동적 맵 창의 성립 조건이 아니다. 실제 공간 근거가 요구된 요청에서만 승인 자료 누락을 명시적 사용 불가로 처리한다.
+- 상세 기준: [LH 공간 실행계층](../Architecture/LH공간실행계층.md)을 따른다.
+
+## D-253 동적 셀 활성화 전에 객체의 표면·간격·가시 하단을 별도 관문으로 검증한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 동적 맵 창 계산과 객체 배치를 분리한다. 창은 어떤 셀을 준비할지만 정하고, 객체 배치 계획기는 월드 seed·셀 좌표·배치 정책 revision·표면 공급자로 결정적 배치점을 만든다.
+- 첫 구현은 평면 표면 공급자를 사용한다. 배치 계획기 자체는 H/L 의미와 지형 알고리즘을 모르며 월드 좌표 표본만 읽는다.
+- 셀 내부 최소 객체 간격과 인접 셀 경계 여유를 강제한다. 표면 누락, 배치 금지, 최대 경사 초과, 간격 부족과 후보 고갈을 명시적으로 구분한다.
+- Unity 표현은 규칙 적용 배치의 Prefab을 생성한 뒤 Renderer 가시 하단을 실제 셀 표면에 맞추고 공통 `surface-clearance` 검증을 통과해야 `VisualPrepared` 이후로 진행한다.
+- 다음 우선순위는 seed 고정 노이즈 표면 공급자와 불규칙 지형 시험이다. Perlin·Simplex·DEM 중 하나를 상위 계약에 고정하지 않으며, 알고리즘 비교는 동일 seed 재현성·셀 경계 연속성·경사·표면 여유·통행 가능성 증거로 판정한다.
+- 이번 기준선은 Scene 또는 지형 Mesh를 변경하지 않으며 Play Mode·Game View 완성 증거가 아니다.
+- 상세 기준: [LH 공간 실행계층](../Architecture/LH공간실행계층.md)을 따른다.
+
+## D-254 Sky Engine은 세계 공통 대기 권위와 카메라 전역 표현을 잇는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 축 분리: `LH Engine`은 지면 셀과 H 공간의 조립·적재를 맡고, `Sky Engine`은 세계 공통 시간대·구름·강수·바람·번개·음향을 카메라 전역으로 표현한다. Sky Engine은 H 단계나 배치 통제 단계가 아니며 Unity Transform은 대기 상태 권위를 만들지 않는다.
+- 첫 권위: `world-atmosphere.r1`은 Nature r5 권위 시계와 Scenario seed에서 `Clear → Cloudy → Rain → Thunderstorm → Rain → Dawn Clear`를 결정적으로 투영한다. 첫 판본은 가시·청각 표현만 제공하고 이동·수확·전투 같은 게임 효과와 현실 기상 Provider는 포함하지 않는다.
+- Unity 호환: 기존 `월드시간대Presenter`의 단독 경로를 유지하고 Sky Engine이 연결된 canonical `SimulationWorldShell`에서만 날씨를 합성한다. Polygon Farm 구름·비 Prefab은 Wrapper 아래 사용하며 오두막 내부 또는 `SkyExposureVolume`에서는 강수와 빗소리만 차폐한다.
+- 저장과 증거: 대기 프로필 세션은 `simulation-save.v25`에 상태와 Replay hash를 포함하고 프로필 없는 v24 이하 hash 의미를 유지한다. 코드·자동 시험·저장 Scene 배선은 실제 Play Mode·Game View·Console·청음 E7을 대신하지 않는다.
+- 관계: D-048의 프로필 없는 고정 시간대 호환, D-158·D-252·D-253의 LH 공간 실행 경계와 D-250·D-251의 표현 순환·검증 모듈을 유지하면서 세계 대기 표현을 별도 기능으로 추가한다.
+- 상세 기준: [Sky Engine 세계 대기 표현 계층](../Architecture/SkyEngine세계대기표현계층.md)과 `E9-WO-NATURE-SKY-ENGINE`을 따른다.
+
+## D-255 LH 불규칙 지형은 교체 가능한 표면 상태 사본으로 조립한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-26
+- 표면 경계: LH 셀과 객체 배치는 `I공간동적표면Provider`가 주는 월드 좌표 높이·경사·배치 허용 결과만 읽는다. 첫 불규칙 구현은 seed 고정 다중 옥타브 값 노이즈지만 Perlin·Simplex·DEM을 상위 계약이나 저장 형식에 고정하지 않는다.
+- 상태 사본: 비평면 셀은 `17×17` 높이 배열과 표면 mode·규칙 revision·설정 hash·grid hash를 셀 계획에 포함한다. 인접 셀은 공통 월드 좌표를 표본해 경계 높이를 공유하며 Unity는 이 상태 사본으로 통행 Mesh와 Collider를 만든다.
+- 호환과 선택: 기존 평면 Cube 경로가 기본이다. 노이즈는 구성 값 또는 `SSALDDEL_LH_NOISE_SURFACE=1`로 명시적으로 선택하며 Scene 기본값, H 의미 계층과 E5·E6 근거를 바꾸지 않는다. DEM은 승인 자료가 필요한 세계에서 사용할 수 있는 별도 선택형 공급자다.
+- 객체 관문: 절차 배치와 고정 H 기준점 모두 같은 표면 높이·경사를 사용하고 최대 경사, 간격, 경계 여유와 가시 하단 정렬을 통과해야 한다. 표면 검증 실패를 평면이나 임의 높이로 대체하지 않는다.
+- 증거 경계: 결정성 순수 시험과 세 Unity 어셈블리 빌드는 통과했다. 임시 Game View에서 불규칙 지면과 나무 접지를 확인했지만 조명·셀 경계 표현이 미완성이고 기존 Job lock·Sky Presenter Console 오류가 남아 있으므로 Play Mode E7 완료로 보지 않는다.
+- 관계: D-252의 가변 창, D-253의 표면·간격·가시 하단 관문과 D-199의 범위/내용 분리를 유지하면서 첫 교체형 불규칙 표면 구현을 추가함
+- 상세 기준: [LH 공간 실행계층](../Architecture/LH공간실행계층.md)을 따른다.
+
+## D-256 LH는 지면·셀을 준비하고 Sky 뒤 실외·실내 배치엔진이 표현을 조립한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 실행 순서: canonical `SimulationWorldShell`의 표현 조립은 `LH 지면·셀 준비 → Sky 상태 적용 → 실외자산배치 → 실내공간조립 → 셀 표현 완료` 순서다. Simulation 대기 계산 자체를 LH에 의존시키지는 않는다.
+- LH 경계: LH는 스트리밍 창, 지면 상태 사본, Mesh·Collider, H 결속, Connector와 셀 준비 상태만 소유한다. r1 `Placements` 필드는 호환 인계 자료로 유지하지만 Prefab 생성·캐시·해제는 LH 책임이 아니다.
+- 배치 경계: 실외배치엔진은 지면과 세계 변화에서 Stable ID·위치를 만들고, 실내공간조립엔진은 건물·H 의미·플레이어 구조 변화에서 고정 실내 계획을 만든다. 두 Runtime은 각자 생성한 표현 객체의 생명주기를 소유한다.
+- Sky·지면 영향: 첫 판본은 건조·젖음·적설·바람 같은 표현 Variant만 바꾼다. 날씨는 실외 Stable ID·위치·Spawn·이동·채집 규칙과 실내 가구 계획 hash를 변경하지 않는다.
+- 호환과 증거: 기존 `world-asset-placement-plan.v1`, `lh-world.v1`, `simulation-save.v26` 통합 계획과 canonical hash는 호환 Facade로 보존한다. 코드·자동 시험과 조립 순서 기록은 Play Mode·Game View E7을 대신하지 않는다.
+- 관계: D-253의 표면 검증, D-254의 Sky 권위·표현 분리와 D-255의 교체형 지면 상태 사본을 유지하면서 LH의 자산 생성 책임만 별도 엔진으로 이관한다.
+- 상세 기준: [지도구성과 세계자산배치 분리](../Architecture/지도구성과세계자산배치분리.md), [LH 공간 실행계층](../Architecture/LH공간실행계층.md), [Sky Engine 세계 대기 표현 계층](../Architecture/SkyEngine세계대기표현계층.md)을 따른다.
+
+## D-257 엔진 상호작용은 Logic·Presentation을 같은 WI 명령으로 묶는 통합 관문이다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 성숙도 경계: 엔진 상호작용 검증은 `Logic`과 `Presentation`에 이은 세 번째 E 궤적이 아니다. 같은 `PlayableLoopStableId`, WI, Command와 AuthorityRevision으로 두 궤적의 실제 인계와 귀환을 확인하는 `Integrated` 관문이다.
+- 실행 경계: 첫 기준 순서는 `WI Preview → Confirm → Simulation Authority → LH → Sky → 실외배치 → 실내배치 → 화면 결과·귀환`이다. 폐루프 프로필이 필요한 단계만 고르며 이미 준비된 결과는 `Reused`, 적용하지 않는 단계는 `NotApplicable`, 진행할 수 없으면 `Blocked`로 구분한다.
+- 권위 경계: `Simulation.AuthorityCore`만 AuthorityRevision을 변경할 수 있다. Unity 표현 단계는 같은 Revision을 읽고 전후 Revision을 보존해야 하며 Trace는 Save/Replay canonical hash, 운영 상태와 공개 진단 API에 포함하지 않는다.
+- 첫 적용: `playable-loop:nature-night-day2.v1`의 `WI-NATURE-13~15`에 적용한다. 코드·자동 Trace와 실제 Play Mode·Game View 증거는 서로 대신하지 않는다.
+- 관리 기준: 단일 원본은 `eng/execution-ledgers/playable-loop-engine-interaction-validation.json`, 선택 결과는 `docs/AI/generated/playable-loop-engine-interaction-validation.md`다.
+- 상세 기준: [플레이 폐루프 엔진 상호작용 검증 체계](../Architecture/플레이폐루프엔진상호작용검증체계.md)와 `E9-WO-PLAYABLE-LOOP-ENGINE-INTERACTION`을 따른다.
+
+## D-258 Synty 표현은 A/B/C 완전성이 아니라 PlayableUnit의 플레이 순간으로 모듈화한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 기준 단위: Synty 표현의 신규 기준 단위는 52개 의미군 × A/B/C가 아니라 `PlayableUnit`이다. 각 폐루프 모듈은 포함 WI·필요 H 능력과 진입·선택·진행·성공·실패 회복·귀환 순간을 실외 기반·기능 객체·상태 덧입힘·실내 설비/소품·Actor/FX 역할에 연결한다.
+- 자산 선택: 모듈은 Prefab 경로 대신 기술 대장의 `assetFamilyId` 후보를 선언한다. 후보 수를 세 개로 강제하지 않으며, 적합한 후보 하나는 그대로 사용하고 후보가 없으면 억지 대체하지 않고 차단 또는 명시적 보류로 남긴다.
+- 기존 문법: 156개 기준 경관 문법과 A/B/C Builder는 `LegacyGenerated` 읽기 호환 입력이다. 신규 생성·세 변형 완전성 검사를 중단하고 연결구·반복·Bounds·경사·통행처럼 검증 가치가 있는 규칙만 새 배치 검증으로 이관한다. 활성 폐루프·공식 Scene·WI 모판 참조가 0이 되기 전에는 생성 Prefab을 삭제하지 않는다.
+- 결정성과 권위: `WorldSeed + PlacementStableId + ModuleRevision + SlotStableId + AuthorityStateCode`로 자산 계열과 계열 내부 Prefab을 결정한다. Unity 표현은 Simulation의 WI 결과·H 의미·`WorldRevision`·Save/Replay hash를 변경하지 않는다.
+- 첫 적용: Nature 생활거점의 기초, 황혼 귀환, 밤→Day2, 작업대 네 PlayableUnit과 WI 15개를 첫 모듈로 관리한다. Construction은 독립 공간이 아닌 공유 상태 계층, Generic은 전수 재고 편입 대기 공통 골격, Starter는 제품 기본 후보에서 제외한 시험용 대체 자산이다.
+- 관리 기준: 단일 원본은 `eng/execution-ledgers/playable-loop-synty-expression-modules.json`, 생성 상태는 `docs/AI/generated/playable-loop-synty-expression-modules.md`다.
+- 상세 기준: [플레이 폐루프 Synty 표현 모듈 체계](../Architecture/플레이폐루프Synty표현모듈체계.md)를 따른다.
+
+## D-259 Synty 팩 출처와 게임 기능 모듈을 분리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 전수 대장: Nature·Farm·Town·City·Construction·Generic·Starter 7팩의 현재 Prefab `2,899`개를 팩 이름이 아니라 지면·식생·실외 구조·실외 기능 소품·통행망·전이·건설 상태·실내 구조·실내 설비·실내 소품·Actor/차량/도구·피드백 FX의 12개 기능 모듈로 분류한다. 모든 Prefab은 하나 이상의 기능 모듈 또는 명시적 보류 이유를 가져야 한다.
+- 수명주기: 자동 분류와 제품 배치 승인을 구분하기 위해 `production-ready`, `needs-review`, `shared-base`, `prototype-fallback`, `reserved-for-future-loop`, `excluded`를 사용한다. Construction은 독립 AreaSet이 아닌 공유 건설·복구 상태 계층, Generic은 공유 기반, Starter는 prototype fallback이다.
+- 폐루프 연결: 표현 슬롯은 배치 역할에서 기능 모듈을 먼저 요구하고 그 안에서 `assetFamilyId`와 Prefab을 결정한다. 결정 입력에는 자산 모듈 대장 revision을 포함하며 표현은 AuthorityRevision을 변경하지 않는다.
+- 호환: 기존 156개 A/B/C와 `CompositionKey`는 `LegacyCompositionAdapter`가 읽는 호환 입력이다. 신규 표현 모듈은 이를 직접 읽지 않으며 공식 참조 0·규칙 이관·저장/Scene 호환·폐루프 Runtime 검증 전에는 물리 삭제하지 않는다.
+- 관리 기준: `eng/execution-ledgers/synty-asset-functional-modules.json`과 [플레이 폐루프 Synty 표현 모듈 체계](../Architecture/플레이폐루프Synty표현모듈체계.md)를 따른다.
+
+## D-260 PlayableUnit 수직 성숙도는 E7에서 끝나고 E8~E10은 수평 증거로 판정한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 수직 경계: 하나의 `PlayableUnit`과 장기 Codex Goal은 E1 계약부터 E7 실제 플레이 폐루프까지만 수직으로 올라간다. 새 작업은 E7→E1로 영향을 검토하고 가장 낮은 미완료 의존성을 구현한 뒤 E1→E7로 검증한다.
+- 수평 판정: E8은 같은 업무·심리 영역의 E7 둘 이상을 묶은 `AreaHarmonySet` 조화, E9는 사람이 대표 순서로 평가하는 재미·몰입·완성도 개선, E10은 E9 승인 불변 build의 제한 운영 관찰이다. E8~E10은 한 WI나 PlayableUnit의 다음 숫자 승격이 아니다.
+- NPC 경계: 과거 E8 NPC 생활세계 책임은 폐기하지 않고 관련 E8 조화 묶음의 필수 `npc-life-continuity` 모듈로 이관한다. NPC가 관련되지 않은 묶음만 사유가 있는 `NotApplicable`을 허용한다.
+- 운영 경계: 첫 E10은 `WindowsX64 + LocalProcess`이며 판본화된 관찰 일수·완주 세션·시험자 수·rollback과 사람의 계속 운영 승인을 요구한다. Provider 호출·운영 DB·결제·계약·일반 공개는 별도 권위 승인 없이는 포함하지 않는다.
+- 호환: 과거 `legacy-change-adaptive.r10`의 E8 NPC·E9 변화 적응 문서, 계약과 `.e9-work-order.json`은 판본과 함께 읽기 호환한다. 과거 증거를 현재 E8·E9로 변환하거나 합산하지 않으며 변경 영향·Migration·호환·회귀는 단계 번호와 분리된 교차 책임으로 유지한다.
+- 현재 판정: Nature 현재 Goal `playable-loop:nature-night-day2.v1`은 통합 E6, 활성 WI `WI-NATURE-14`는 E5다. 첫 `area-harmony:nature-core.v1`은 구성원 미완료로 `WaitingForMembers`이며 E8·E9·E10 증거를 새로 주장하지 않는다.
+- 상세 기준: [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](../Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md)를 따른다.
+
+## D-261 물품 획득과 장착을 보편 WI로 분리하고 능력은 장착 상태에서 파생한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 보편 계약: `WI-ACTOR-01`은 세계의 고유 물품 인스턴스를 인벤토리로 이전하고 `WI-ACTOR-02`는 소유 물품의 `Equip`·`Unequip`·`Swap`을 확정한다. 도끼·삽·곡괭이 같은 구체 도구 WI는 이 계약을 특화한다.
+- 슬롯·능력: 첫 슬롯은 `MainHand`, `OffHand`, `Head`, `Body`, `Legs`, `Feet`, `Back`, `Accessory`다. 획득만으로 작업 능력을 주지 않으며 장착된 ItemDefinition에서 `capability:woodcutting`, `capability:terrain-grading`, `capability:mining` 등을 파생한다.
+- WI·H 경계: 보편 획득·장착 WI의 공간은 `NotApplicable`이다. 도끼 발견 지점·접근·작업 장소 같은 H 결속은 `WI-NATURE-05`와 후속 구체 WI가 소유한다. 상태창 열기처럼 읽기 전용 입력은 WI가 아니다.
+- 원장 경계: 역할 카드 `WI-WORLD-06`과 전투 편성은 물리 물품 장착과 같은 Preview·Confirm 리듬을 재사용할 수 있지만 공개 ID·저장 원장·효과 의미는 합치지 않는다.
+- 저장·호환: 새 명시적 장착 상태는 `simulation-save.v27`에 포함한다. ActorEquipment 입력이 없는 v1~v26 Nature 저장과 자동 장착 의미·hash는 호환 경계로 보존한다.
+- 적용·차단: Nature 도끼는 획득 뒤 인벤토리에 들어가고 MainHand 장착 뒤에만 벌목할 수 있다. 코드·자동 시험과 Unity 소비 어셈블리 빌드는 실제 Play Mode·Game View E7을 대신하지 않으며 기존 E7 증거는 새 입력 흐름으로 재검증한다. 지형 평탄화 `WI-WORLD-09`·`simulation-save.v28`은 이 재검증 뒤 여는 후속 작업이다.
+- 상세 기준: [플레이어 중심 게임 개발 업무 구조](../Architecture/플레이어중심게임개발업무구조.md)와 현재 `E7-WO-ACTOR-ITEM-EQUIPMENT`을 따른다. 과거 `E9-WO-ACTOR-ITEM-EQUIPMENT`은 D-264에 따라 읽기 호환 자료다.
+
+## D-262 자연 방향광은 URP Lit와 표현 검증 기록으로 강화한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 계산 경계: Nature의 실제 표면 명암은 URP Lit가 월드 법선과 표면→광원 방향의 `saturate(dot(N, L))`를 계산하게 한다. C# 방향광 모델은 동일 방향의 결정성·설명 가능성, 조명 프로필과 검증 입력을 제공하며 별도 색칠 Shader를 중복 구현하지 않는다.
+- 프로필: 첫 프로필은 `lighting.pyeongchang.shared-day.v2`, 규칙은 `directional-lighting.natural.r1`이다. 낮·황혼·밤의 환경광 보정은 그늘 면 판독을 위한 표현 값이며 게임 규칙·시야·은신 효과가 아니다.
+- 대상 경계: 첫 검증 대상은 LH 지면과 Nature 나무·통나무·오두막·작업대다. 상세 셀은 바닥만으로 통과할 수 없고 핵심물의 Mesh 법선, Lit Shader와 그림자 투사·수신 정책이 확인되어야 `WorldPresentation.Ready`가 된다.
+- 자산 경계: Synty 원본 Prefab·Material·Shader Graph는 수정하지 않는다. Runtime Wrapper와 기존 `자연경관ShadowPolicyView`를 우선하며 개별 Renderer 기본 색을 시간대마다 일괄 덮어쓰지 않는다.
+- 권위·증거 경계: 방향광 검증은 Presentation E6만 판정한다. 실패해도 LH 통행 준비, Simulation `WorldTick`·`AuthorityRevision`, Save/Replay hash를 변경하지 않으며 실제 그늘 면 가독성은 Play Mode·Game View에서 별도로 확인한다.
+- 관계: D-250·D-251의 논리·표현 순환과 공통 표현 검증, D-254의 Sky 권위·표현 분리, D-255·D-256의 LH 지면·배치엔진 분리를 유지하면서 방향광 표면 판독 관문을 추가한다.
+- 상세 기준: [Sky Engine 세계 대기 표현 계층](../Architecture/SkyEngine세계대기표현계층.md)과 `E9-WO-NATURE-SKY-ENGINE`을 따른다.
+
+## D-263 Synty 자산 설계 분류는 한국어를 먼저 쓰고 Stable Code를 보존한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 사람 분류: 설계·문서·생성 대장에서는 `실외 표현 / 실내 표현 / 공통 표현`을 최상위로 두고 `범위 → 기능군 → 세부 기능군 → 자산 종류 → 자산 계열 → 실제 Prefab` 순서로 읽는다.
+- 저장 호환: `Outdoor`, `Interior`, `Shared`, `world-surface`, `interior-fixture`, `assetFamilyId`와 Prefab GUID 같은 기존 Stable Code·직렬화 값은 바꾸지 않는다. 새 내부 분류 JSON의 필드명은 `범위Code`, `기능군Code`, `세부기능군Code`, `자산종류Code`, `자산계열StableId`처럼 한국어 업무명을 우선한다.
+- 권위 경계: 이 분류는 Synty 표현 자산을 찾고 검토하는 기술 대장이다. Prefab 이름·경로·분류 결과가 Simulation 상태, H 공간 의미, WI 결과나 운영 권위를 결정하지 않는다.
+- 호환 관계: D-258의 PlayableUnit 표현 선택과 D-259의 12개 영문 기능 Module Stable Code를 유지하면서 사람이 보는 이름과 하위 분류만 한국어 단일 원본으로 확장한다.
+- 관리 기준: 한국어 트리의 단일 원본은 `eng/execution-ledgers/synty-asset-human-taxonomy.json`, 기능군·팩 호환 대장은 `eng/execution-ledgers/synty-asset-functional-modules.json`이다. 상세 기준은 [플레이 폐루프 Synty 표현 모듈 체계](../Architecture/플레이폐루프Synty표현모듈체계.md)를 따른다.
+
+## D-264 E1~E9는 판정 주체를 바꾸되 Logic·Presentation 왕복을 유지한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 증거 모델: 현재 판본은 `horizontal-dual-cycle-evidence.r2`다. D-260의 `PlayableUnit E1~E7`, `AreaHarmonySet E8`, `HumanPlaytestCampaign E9`, `LimitedOperationWindow E10` 주체 분리는 유지한다.
+- PlayableUnit 왕복: 모든 PlayableUnit은 Logic·Presentation 각각에서 E7→E1 영향을 검토하고 E1→E7을 조립·검증한다. 통합 단계는 두 궤적의 낮은 값이며 열린 피드백이 있으면 닫지 않는다. 표현 E1~E4 계획은 논리 E5 전에 가능하지만 표현 E5 이상 증거는 논리 E5 상태 사본을 요구한다.
+- E8 왕복: AreaHarmonySet은 같은 frozen revision과 build에서 논리 인계·실패·NPC 연속성과 공간 전환·카메라·피드백·NPC 관찰 가능성을 별도 궤적으로 판정한다. 발견 사항은 E8 모듈 또는 관련 PlayableUnit의 가장 이른 E1~E7로 되돌린다.
+- E9 왕복: 사람 세션은 논리의 인과 일관성·선택 결과·진행 연속성과 표현의 판독·피드백 명료성·전환 자연스러움을 따로 평가한다. 두 궤적과 재미·몰입·완성도, 열린 중대 발견, 사람 승인을 같은 후보 revision에서 통합한다.
+- E10 경계: E10은 세 번째 논리·표현 확장이 아니라 E9에서 승인한 불변 후보의 제한 운영 통합 관문이다. E9 또는 후보 revision이 다시 열리면 관찰창을 무효화한다.
+- 이관: 기존 자동시험은 Logic 증거로 보존한다. 표현 증거가 분류되지 않은 PlayableUnit은 추정 승격하지 않고 Presentation E1로 이관한다. 과거 `.e9-work-order.json`은 읽기 호환 자료이며 활성 작업은 `simulation-e7-vertical-work-order.v2`를 사용한다.
+- 상세 기준: [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](../Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md), [플레이 폐루프 논리·표현·결과 순환](../Architecture/플레이폐루프논리시각이중순환체계.md)을 따른다.
+
+## D-265 E8 조화 묶음은 소유 AreaAggregate의 Core 일부를 선택할 수 있다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 소유 경계: 하나의 `PlayableUnit`은 기존처럼 정확히 하나의 `AreaAggregate`에만 속한다. 짧은 E8 검증을 위해 같은 자식을 가진 두 번째 Aggregate를 만들지 않는다.
+- 선택 경계: `AreaHarmonySet`은 소유 Aggregate의 필수 Core 자식 중 서로 이어지는 둘 이상을 선택할 수 있다. 선택한 모든 구성원이 해당 Aggregate의 Core여야 하며 외부 영역·선택 확장 자식을 조용히 섞을 수 없다.
+- 판정 경계: 부분 HarmonySet 통과는 선택한 실행 순서의 조화 증거일 뿐 전체 Aggregate 폐루프의 E8 완료를 뜻하지 않는다. 전체 Core 조화 캠페인은 별도 상태로 유지한다.
+- 첫 적용: `area-harmony:nature-first-evening.v1`은 Nature 생활거점 Aggregate 안의 `nature-shelter-foundation`과 `nature-twilight-return`만 묶어 관찰 승리·안전 귀환과 후퇴·안전 귀환 두 순서를 검증한다. 현재 Shelter Presentation E7이 막혀 있어 `WaitingForMembers`다.
+
+## D-266 E8은 개별 폐루프 안정, E9는 영역 조화와 사람 승인으로 판정한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-27
+- 증거 모델: 현재 판본은 `horizontal-dual-cycle-evidence.r3`다. PlayableUnit과 Codex Goal의 수직 성숙도는 E7에서 끝나며 Logic·Presentation 통합 단계는 낮은 값을 사용한다.
+- E8 주체: E7을 통과한 PlayableUnit 하나마다 정확히 하나의 `PlayableUnitStabilityCampaign`을 둔다. 같은 후보 revision과 build에서 Logic 결정적 실행 최소 3회, Save·Restore·Replay, LocalProcess·RemoteHost 동등성, Presentation 실제 입력 최소 2회, Save 재진입과 차단 Console 오류 0건을 요구한다.
+- E9 주체: 같은 AreaAggregate의 E8 Core 둘 이상을 `AreaHarmonySet`으로 묶는다. 권위·자원·시간·실패 회복·NPC 연속성과 공간 이동·카메라·입력·피드백 조화를 검증하고, 사람이 논리·표현 지표와 재미·몰입·완성도 4/5 이상, 열린 Blocking·Major 0건, 후보 revision·build hash를 명시적으로 승인해야 한다.
+- 영역 경계: Nature·Farm·Hub는 Core가 둘 이상이므로 E9 후보를 둘 수 있다. Town·City는 현재 Core가 하나뿐이며 E9 형식에 맞추려고 기존 Core를 억지로 분할하지 않는다. 새 독립 Core 플레이 약속이 정의될 때까지 E9 후보를 보류한다.
+- Goal 완전성: 16개 PlayableUnit을 Codex Goal 대장에 정확히 한 번 등록한다. 11개 Core를 Nature→Farm→Hub→Town→City 순서로 먼저 닫은 뒤 Nature·Farm·Town의 5개 Extension을 진행한다. Goal WIP와 WI WIP는 각각 1이다.
+- 증거 무효화: 후보 revision이 바뀌면 영향받은 E8 반복 안정성과 E9 조화·사람 승인을 다시 연다. E8 실패는 같은 PlayableUnit의 가장 이른 E1~E7, E9 실패는 E9 모듈 또는 관련 PlayableUnit의 가장 이른 E1~E8로 귀속한다.
+- 대체 관계: D-260의 E7 수직 종료와 E10 제한 운영 경계는 유지한다. D-260·D-264·D-265의 `E8=AreaHarmonySet`, `E9=별도 HumanPlaytestCampaign` 해석과 부분 조화의 E8 단계 표기는 이 결정이 대체한다. 과거 E8 NPC·E9 변화 적응과 `.e9-work-order.json`은 계속 판본화된 읽기 호환 자료다.
+- 상세 기준: [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](../Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md), `eng/execution-ledgers/post-e7-evidence-campaigns.json`, `eng/execution-ledgers/codex-playable-loop-goals.json`을 따른다.

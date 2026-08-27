@@ -46,6 +46,8 @@
 
 서버의 세션 생성, Preview, Confirm, 상태 조회, 저장, Replay verification 요청은 모두 성공했고 검증 뒤 전용 포트를 닫았다. 상세 자동 산출물은 로컬 전용 `artifacts/local/validation/nature-remote-host-parity/`에 있으며 저장소에는 포함하지 않는다.
 
+2026-08-26에는 현재 작업 트리의 `LocalSimulationRuntime`·Nature 계약·Save/Replay 변경을 반영해 이 경로를 전용 회귀 `SimulationNature생활거점동등성Tests`로 고정했다. 취소 전 2초 진행을 포함한 15 revision 전체 경로, Local slot 복원과 RemoteHost `replay-verifications`가 `1/1` 통과했고 Nature·Local Runtime 집중 회귀도 `44/44` 통과했다. 최신 원시 결과는 `artifacts/local/validation/nature-e7/nature-shelter-parity-current.trx`에 둔다.
+
 ## 증거 경계
 
-이 결과는 실제 TCP·JSON 경계를 지나는 독립 RemoteHost와 LocalProcess의 결정적 상태·저장 동등성 증거다. canonical Scene의 수동 Game View 조작, 실제 청음, 최종 화면 캡처를 대신하지 않는다. Unity 배치 모드에서 관찰된 기존 FarmPlot·HarvestLot Scene 직렬화 자동 보정 메시지와 라이선스 갱신 오류도 이 검증으로 해소됐다고 보지 않는다. 따라서 현재 `WI-NATURE-05`와 부모 폐루프의 E7 상태는 계속 `Partial`이다.
+이 결과는 RemoteHost HTTP·JSON 경계와 LocalProcess의 결정적 상태·저장 동등성 증거다. canonical Scene의 사람 수동 조작과 Game View는 별도 UnityPlayMode EvidencePackage가 소유한다. 두 증거를 함께 적용해 `WI-NATURE-05`와 대상 폐루프를 E7로 닫으며, 연결된 재생 종단점이 없어 수행하지 못한 실제 청음은 선택형 감각 수용 항목으로 분리한다. Unity 배치 모드의 범위 밖 경고나 운영 Provider·운영 DB 효과를 이 증거로 해소했다고 보지 않는다.

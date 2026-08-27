@@ -42,6 +42,8 @@
 
 ```text
 게임 기획과 세계 의도
+├─ 플레이어 약속과 PlayableLoop
+│  └─ 진입 → 선택 → WI → 성공·실패 → 회복·귀환
 ├─ 플레이어 경험
 │  ├─ Nature 체류·탐험·위협·회복
 │  ├─ Farm 생산·수확·출하
@@ -120,30 +122,35 @@ AreaSet 세계 설계
 
 ## 게임 개발 업무 순서
 
-Ssalddel의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시작해 플레이어가 이해할 수 있는 가장 작은 선택 폐루프를 고릅니다. 그 작업을 E9 목표부터 E1 계약까지 하향 분해하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 E9까지 실제 증거를 다시 확인합니다.
+Ssalddel의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시작해 플레이어가 이해할 수 있는 가장 작은 선택 폐루프를 고릅니다. 한 `PlayableUnit`은 E7 플레이 약속부터 E1 계약까지 하향 분해하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 E7까지 실제 증거를 다시 확인합니다. 완성된 각 E7은 별도 E8 반복 안정성 캠페인으로 검증하고, 같은 영역의 안정 Core 둘 이상은 E9 영역 조화·사람 승인, E10 제한 운영 캠페인으로 검증합니다.
 
 ```text
 현재 목표와 차단점
   → 플레이어의 상황·선택·재료·결과·다음 선택
-  → E9→E1 영향·누락 검토
+  → E7→E1 영향·누락 검토
   → 가장 낮은 미완료 의존성 구현
-  → E1→E9 조립·증거 검증
+  → E1→E7 조립·증거 검증
   → 새 영향이면 다시 하향 검토
   → 안정 또는 명시적 차단까지 왕복
+  → 필요한 형제 E7들과 E8~E10 수평 캠페인
 ```
 
-플레이어 중심은 Unity나 플레이어에게 상태 권위를 넘긴다는 뜻이 아닙니다. Simulation Core가 조건·비용·시간·결과와 H 공간 성장을 판정하고 Unity는 입력과 표현을 담당합니다. E9를 먼저 적는 것도 완료 주장이 아니라 영향과 누락을 먼저 보는 작업 순서입니다.
+플레이어 중심은 Unity나 플레이어에게 상태 권위를 넘긴다는 뜻이 아닙니다. Simulation Core가 조건·비용·시간·결과와 H 공간 성장을 판정하고 Unity는 입력과 표현을 담당합니다. E7을 먼저 적는 것도 완료 주장이 아니라 플레이어 약속에서 필요한 계약까지 영향을 먼저 보는 작업 순서입니다.
 
 - [문서 안내와 질문별 기준 문서](docs/README.md): 같은 설명을 반복하지 않고 각 질문의 단일 권위를 찾는 진입점
 - [프로젝트 불변 개발 골격](docs/Architecture/프로젝트불변개발골격.md): 리팩토링과 기능 개발이 보존할 기준선
 - [플레이어 중심 게임 개발 업무 구조](docs/Architecture/플레이어중심게임개발업무구조.md): 모든 단계에 적용하는 플레이어 선택 관점
+- [플레이 폐루프와 증거 묶음 개발 체계](docs/Architecture/플레이폐루프와증거묶음개발체계.md): 여러 WI의 폐루프 E 판정, 실제 증거 범위·무효화와 협업 인계
+- [플레이 폐루프 엔진 상호작용 검증 체계](docs/Architecture/플레이폐루프엔진상호작용검증체계.md): WI 권위 실행과 LH·Sky·실내외 표현을 같은 명령·Revision으로 묶는 통합 관문
+- [플레이 폐루프 완결 로드맵](docs/Architecture/플레이폐루프완결로드맵.md): Nature→Farm→Hub→Town→City의 Core 우선·Extension 후속과 영역·세계 집계 완결 순서
 - [게임 개발 업무 순서 기준](docs/Architecture/게임개발업무순서기준.md): 작업 선택부터 다음 판단까지의 실행 순서
-- [E9↔E1 반복 왕복 구현 체계](docs/Architecture/E9하향식수직구현체계.md): 하향 영향 검토와 상향 조립·검증을 안정 상태까지 반복하는 절차
-- [E 성숙도 책임 코드 지도](docs/Architecture/SsalddelCodeMetadata.md#e-성숙도-책임-메타데이터): Simulation·Unity 구성 요소를 E1~E9 검토 책임에 연결하고, E1~E3은 사람용 하위 모듈로 다시 묶어 탐색하며 무사유 누락을 차단하는 기준
+- [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](docs/Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md): 단일 폐루프·영역 조화·사람 플레이테스트에서 Logic·Presentation 왕복과 제한 운영의 판정 주체·관문
+- [WorldTick과 실시간 실행 경계](docs/Architecture/WorldTick과실시간실행경계.md): Unity 표현 시간·권위 실시간 시계·WorldTick·BattleTick·WorldRevision의 책임 구분
+- [E 성숙도 책임 코드 지도](docs/Architecture/SsalddelCodeMetadata.md#e-성숙도-책임-메타데이터): Simulation·Unity 구성 요소를 현재 E1~E10 검토 책임에 연결하고 과거 E8·E9 의미를 판본으로 분리하는 기준
 - [WI 성숙도 현재 지도](docs/AI/generated/world-interaction-maturity.md): 전체 WI 48개의 선택 여부, E4 문맥, 조건부 H 근거와 E5 발현 상태
 - [현재 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md): 완료·부분 완료·미완료·보류 구분
 
-문서, 코드, 자동 시험, Actual E5, 실제 서버, Play Mode·Game View와 운영 효과는 서로 다른 증거로 기록합니다. Farm·Hub·Town·City는 독립 내부 폐루프를 먼저 만들고 영역 간 연결은 양쪽이 준비된 뒤 별도 통합 작업으로 선택합니다.
+문서, 코드, 자동 시험, Actual E5, 실제 서버, Play Mode·Game View와 운영 효과는 서로 다른 `EvidencePackage`로 기록합니다. Farm·Hub·Town·City는 각각 `PlayableLoop` 독립 내부 폐루프를 먼저 만들고 영역 간 연결은 양쪽이 준비된 뒤 별도 통합 작업으로 선택합니다. 현재 폐루프와 증거 상태는 [자동 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md)에서 확인합니다.
 
 ## 개발 책임과 짧은 작업 흐름
 

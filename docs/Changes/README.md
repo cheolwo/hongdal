@@ -6,8 +6,16 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
-| 2026-08-26 | [Nature 생활거점 E7 수동 완주와 저장 복원](2026-08-26-nature-shelter-e7-manual.md) | 직접 확인 — 실제 입력으로 취소·재시도·세 나무 벌목·오두막 건설·입실·퇴실·저장·Play Mode 재진입 복원을 완주하고 Day 2 안전 선택 상태 Game View와 Console 오류 0개를 확인; 실제 청음은 FMOD 출력 장치 오류 60으로 미검증 |
+| 2026-08-27 | [Nature 자연 방향광과 표면 명암 검증](2026-08-27-nature-directional-lighting.md) | 간접 확인 — URP Lit 방향광과 Nature 핵심물 법선·Lit Shader·그림자 E6 검증을 추가하고 어셈블리 오류 0을 확인; 미저장 Scene 보호와 Pipeline lock 때문에 실제 Test Runner·Play Mode·Game View는 미검증 |
+| 2026-08-27 | [LH 지도와 Nature 세계자산배치 분리](2026-08-27-world-map-asset-placement.md) | 직접 확인·미통과 — Play Mode의 Nature 1인칭·도끼 획득·HUD 전이는 작동했지만 밤 화면의 다음 나무 식별성과 Console 잠금 오류 때문에 표현 E6·E7 및 최종 PNG는 차단 |
+| 2026-08-26 | [Nature Sky Engine 세계 대기 표현](2026-08-26-nature-sky-engine.md) | 간접 확인 — 결정적 맑음·흐림·비·뇌우·새벽 맑음 상태와 `simulation-save.v25`를 추가하고 canonical Scene에 Synty 구름 5·비 Particle 1·번개·음향 Root를 조립; Unity Editor·EditMode 어셈블리 오류 0, 기존 Job lock 때문에 실제 Test Runner·Play Mode·Game View·청음은 미검증 |
+| 2026-08-26 | [Nature 논리·시각 이중 순환과 r5 통나무 표현](2026-08-26-nature-dual-loop-visual.md) | 직접 확인 — Nature H 기준점에 Synty Garden Shed·통나무·Skeleton·Table Saw를 배치하고 실제 통나무 획득과 접힌 HUD를 검증; shelter·twilight는 논리·표현 E7, night/day2·workbench는 표현 E6로 분리 판정 |
+| 2026-08-26 | [Nature 보관·수면·Day2 반환 E7](2026-08-26-nature-night-day2-e7.md) | 직접 확인 — 실제 G 보관, T 수면, 숫자 1 작업대 계획 선택과 보관·야간·새벽·계획판 Game View로 Presentation E7을 회복; 집중 PlayMode 3/3·EditMode 1/1, 기존 Logic·Hosted 동등성 유지. 전체 Nature 묶음의 별도 회귀 2건과 Job lock Console 진단은 제외 |
+| 2026-08-26 | [Nature 획득 자원 거점 보관 E7](2026-08-26-nature-night-day2-wi13-e7.md) | 직접 확인 — canonical SimulationWorldShell에서 실제 G 입력으로 통나무 2개를 오두막에 보관하고 Game View·Console 오류 0개를 확인; Actual E5 공간 결속과 LocalProcess·RemoteHost revision·Save Replay hash·Container Transfer 동등성 1/1을 함께 검증 |
+| 2026-08-26 | [Nature 황혼 이중 전투 참여 E7](2026-08-26-nature-twilight-return-e7.md) | 직접 확인 — canonical SimulationWorldShell에서 실제 O/F 관찰 운영, O/F/좌클릭 직접 개입, O/R 안전 후퇴를 완주하고 세 결과의 거점 귀환 Game View, 마지막 시험 이후 Console 오류 0개, LocalProcess·RemoteHost 결과·revision·Battle/Save Replay hash 동등성 2/2를 확인 |
+| 2026-08-26 | [Nature 생활거점 E7 수동 완주와 저장 복원](2026-08-26-nature-shelter-e7-manual.md) | 직접 확인 — 실제 입력으로 취소·재시도·세 나무 벌목·오두막 건설·입실·퇴실·저장·Play Mode 재진입 복원을 완주하고 Day 2 안전 선택 상태 Game View와 Console 오류 0개를 확인; 최신 LocalProcess·RemoteHost 전체 동등성까지 통과해 E7 PlayClosed, 실제 청음은 선택형 증거로 대기 |
 | 2026-08-25 | [플레이어 감각 표현축과 Nature 벌목 표현](2026-08-25-player-sensory-presentation-axis.md) | 간접 확인 — 배치 객체를 Camera Focus·Actor Work·Tool Socket·3D Audio·FX 기준점에 결속하고 도끼 획득·벌목 타격·취소·나무 낙하를 권위 상태 사본에서 표현; 자동 PlayMode와 기존 실제 입력 회귀 통과, 수동 Game View·실제 청음·최종 PNG 미검증 |
+| 2026-08-25 | [Unity WI 한국어 기능명·단일 책임 표시](2026-08-25-unity-wi-korean-names.md) | 간접 확인 — 번호형 WI 고유 식별자를 단독 표시하지 않고 `한국어 작업군·기능명 (고유 식별자)`로 표시하며 대장 순번을 실행 단계처럼 노출하지 않도록 변경; 단일 책임 판정 소비자 시험 추가, Play Mode·Game View 미검증 |
 | 2026-08-18 | [싱글 플레이 로컬 LH 지도 생성](2026-08-18-local-lh-world-engine.md) | 간접 확인 — 상태 문구에 로컬 싱글 플레이 생성 출처를 추가하고 저장 Scene이 서버 없이 시드·계절·H4 경계 기준으로 주변 L3 셀을 계산하도록 연결; EditMode 10/10과 저장 Scene 검사 완료, Play Mode·Game View 미검증 |
 | 2026-08-11 | [Unity 턴 카드 모판 정리와 화면](2026-08-11-unity-turn-card-seedbed.md) | 직접 확인 — 철학·학당·지역문화 후보를 C0~C6 Gate로 분리하고 실제 게임 덱·턴 authority와 분리된 한국어 모판 Scene에서 단계·출처·차단 사유를 표시 |
 | 2026-08-11 | [Unity 턴 카드 실제 Simulation 서버 연결](2026-08-11-unity-turn-card-server-connection.md) | 직접 확인 — 서버 context·Preview·Confirm·canonical 재조회로 서울 문화 카드 턴을 넘기고 WorldShell을 4월 13일·Tick 1·Revision 1·`LocalContextAwareness`로 갱신 |
